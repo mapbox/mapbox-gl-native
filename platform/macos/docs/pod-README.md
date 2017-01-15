@@ -1,8 +1,16 @@
 # [Mapbox macOS SDK](https://github.com/mapbox/mapbox-gl-native/tree/master/platform/macos/)
 
-The Mapbox macOS SDK is an open-source framework for embedding interactive map views with scalable, customizable vector maps into Cocoa applications on macOS 10.10.0 and above using Objective-C, Swift, Interface Builder, or AppleScript. It takes stylesheets that conform to the [Mapbox Style Specification](https://www.mapbox.com/mapbox-gl-style-spec/), applies them to vector tiles that conform to the [Mapbox Vector Tile Specification](https://www.mapbox.com/developers/vector-tiles/), and renders them using OpenGL.
+Put interactive, scalable world maps into your native Cocoa application with the open-source Mapbox macOS SDK.
 
-<img alt="" src="https://raw.githubusercontent.com/mapbox/mapbox-gl-native/master/platform/macos/screenshot.png" width="645">
+* Mapbox-curated [map styles](https://www.mapbox.com/maps/) and [vector tiles](https://www.mapbox.com/vector-tiles/) make it easy to get started.
+* Customize every aspect of the map’s appearance in code or visually using [Mapbox Studio](https://www.mapbox.com/mapbox-studio/).
+* High-performance OpenGL rendering and multitouch gestures keep your users happy.
+* A well-designed, fully documented API helps you stay productive.
+* Develop across [multiple platforms](https://www.mapbox.com/maps/), including [iOS](https://www.mapbox.com/ios-sdk/), using the same styles and similar APIs.
+
+The Mapbox macOS SDK is compatible with macOS 10.10.0 and above for Cocoa applications developed in Objective-C, Swift, Interface Builder, or AppleScript. For hybrid applications, consider [Mapbox GL JS](https://www.mapbox.com/mapbox-gl-js/).
+
+[![](https://raw.githubusercontent.com/mapbox/mapbox-gl-native/master/platform/macos/docs/img/screenshot.jpg)]()
 
 Mapbox macOS SDK releases are [available on GitHub](https://github.com/mapbox/mapbox-gl-native/releases/) – look for the releases that begin with “macos-”. You can also integrate the Mapbox macOS SDK into your application using CocoaPods.
 

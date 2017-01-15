@@ -8,7 +8,7 @@ Pod::Spec.new do |m|
   m.homepage          = 'https://mapbox.github.io/mapbox-gl-native/macos/'
   m.license           = { :type => 'BSD', :file => 'LICENSE.md' }
   m.author            = { 'Mapbox' => 'mobile@mapbox.com' }
-  m.screenshot        = "https://raw.githubusercontent.com/mapbox/mapbox-gl-native/macos-#{m.version.to_s}/platform/macos/screenshot.png"
+  m.screenshot        = "https://raw.githubusercontent.com/mapbox/mapbox-gl-native/macos-#{m.version.to_s}/platform/macos/docs/img/screenshot.jpg"
   m.social_media_url  = 'https://twitter.com/mapbox'
   m.documentation_url = 'https://mapbox.github.io/mapbox-gl-native/macos/'
 

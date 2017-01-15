@@ -30,7 +30,7 @@ sed -n -e '/^## /{' -e ':a' -e 'n' -e '/^## /q' -e 'p' -e 'ba' -e '}' platform/m
 rm -rf ${OUTPUT}
 mkdir -p ${OUTPUT}
 
-cp platform/macos/screenshot.png "${OUTPUT}"
+cp -r platform/macos/docs/img "${OUTPUT}/img"
 
 jazzy \
     --config platform/macos/jazzy.yml \
