@@ -44,7 +44,7 @@ buildPackageStyle() {
             --tag "ios-v${PUBLISH_VERSION}" \
             --name ${file_name} \
             --file "${BINARY_DIRECTORY}/${file_name}" > /dev/null
-    fi        
+    fi
 }
 
 export TRAVIS_REPO_SLUG=mapbox-gl-native

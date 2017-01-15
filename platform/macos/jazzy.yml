@@ -2,6 +2,7 @@ module: Mapbox
 author: Mapbox
 author_url: https://www.mapbox.com/
 github_url: https://github.com/mapbox/mapbox-gl-native
+dash_url: https://mapbox.github.io/mapbox-gl-native/macos/docsets/Mapbox.xml
 copyright: '© 2014–2017 [Mapbox](https://www.mapbox.com/). See [license](https://github.com/mapbox/mapbox-gl-native/blob/master/LICENSE.md) for more details.'
 
 head: |
