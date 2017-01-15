@@ -38,6 +38,8 @@ constexpr double MAX_ZOOM = 25.5;
 constexpr float  MIN_ZOOM_F = MIN_ZOOM;
 constexpr float  MAX_ZOOM_F = MAX_ZOOM;
 
+constexpr uint8_t DEFAULT_PREFETCH_ZOOM_DELTA = 4;
+
 constexpr uint64_t DEFAULT_MAX_CACHE_SIZE = 50 * 1024 * 1024;
 
 constexpr Duration DEFAULT_TRANSITION_DURATION = Milliseconds(300);

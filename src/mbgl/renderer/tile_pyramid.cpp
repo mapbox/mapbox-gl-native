@@ -88,14 +88,30 @@ void TilePyramid::update(const std::vector<Immutable<style::Layer::Impl>>& layer
     // Determine the overzooming/underzooming amounts and required tiles.
     int32_t overscaledZoom = util::coveringZoomLevel(parameters.transformState.getZoom(), type, tileSize);
     int32_t tileZoom = overscaledZoom;
+    int32_t panZoom = zoomRange.max;
 
     std::vector<UnwrappedTileID> idealTiles;
+    std::vector<UnwrappedTileID> panTiles;
+
     if (overscaledZoom >= zoomRange.min) {
         int32_t idealZoom = std::min<int32_t>(zoomRange.max, overscaledZoom);
 
         // Make sure we're not reparsing overzoomed raster tiles.
         if (type == SourceType::Raster) {
             tileZoom = idealZoom;
+
+            // FIXME: Prefetching is only enabled for raster
+            // tiles until we fix #7026.
+
+            // Request lower zoom level tiles (if configure to do so) in an attempt
+            // to show something on the screen faster at the cost of a little of bandwidth.
+            if (parameters.prefetchZoomDelta) {
+                panZoom = std::max<int32_t>(tileZoom - parameters.prefetchZoomDelta, zoomRange.min);
+            }
+
+            if (panZoom < tileZoom) {
+                panTiles = util::tileCover(parameters.transformState, panZoom);
+            }
         }
 
         idealTiles = util::tileCover(parameters.transformState, idealZoom);
@@ -108,8 +124,10 @@ void TilePyramid::update(const std::vector<Immutable<style::Layer::Impl>>& layer
     std::set<OverscaledTileID> retain;
 
     auto retainTileFn = [&](Tile& tile, Resource::Necessity necessity) -> void {
-        retain.emplace(tile.id);
-        tile.setNecessity(necessity);
+        if (retain.emplace(tile.id).second) {
+            tile.setNecessity(necessity);
+        }
+
         if (needsRelayout) {
             tile.setLayers(layers);
         }
@@ -137,6 +155,12 @@ void TilePyramid::update(const std::vector<Immutable<style::Layer::Impl>>& layer
     };
 
     renderTiles.clear();
+
+    if (!panTiles.empty()) {
+        algorithm::updateRenderables(getTileFn, createTileFn, retainTileFn,
+                [](const UnwrappedTileID&, Tile&) {}, panTiles, zoomRange, panZoom);
+    }
+
     algorithm::updateRenderables(getTileFn, createTileFn, retainTileFn, renderTileFn,
                                  idealTiles, zoomRange, tileZoom);
 
