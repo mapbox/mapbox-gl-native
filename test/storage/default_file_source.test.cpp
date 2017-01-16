@@ -460,3 +460,35 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(NoCacheRefreshModifiedModified)) {
 
     loop.run();
 }
+
+TEST(DefaultFileSource, TEST_REQUIRES_SERVER(setURLTemplate)) {
+    util::RunLoop loop;
+    DefaultFileSource fs(":memory:", ".");
+
+    // Translates the URL "localhost://test to http://127.0.0.1:3000/test
+    fs.setURLSchemeTemplate("localhost", "http://127.0.0.1:3000/{domain}");
+
+    const Resource resource { Resource::Unknown, "localhost://test" };
+
+    std::unique_ptr<AsyncRequest> req;
+    req = fs.request(resource, [&](Response res) {
+        req.reset();
+        EXPECT_EQ(nullptr, res.error);
+        ASSERT_TRUE(res.data.get());
+        EXPECT_EQ("Hello World!", *res.data);
+        EXPECT_FALSE(bool(res.expires));
+        EXPECT_FALSE(bool(res.modified));
+        EXPECT_FALSE(bool(res.etag));
+        loop.stop();
+    });
+
+    loop.run();
+}
+
+TEST(DefaultFileSource, DisallowOverridingMapboxScheme) {
+    util::RunLoop loop;
+    DefaultFileSource fs(":memory:", ".");
+
+    EXPECT_THROW(fs.setURLSchemeTemplate("mapbox", "http://127.0.0.1:3000/{domain}"),
+                 std::runtime_error);
+}

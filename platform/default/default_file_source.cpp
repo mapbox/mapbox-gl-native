@@ -46,6 +46,14 @@ public:
         return onlineFileSource.getAccessToken();
     }
 
+    void setURLSchemeTemplate(const std::string& scheme, const std::string& tpl) {
+        onlineFileSource.setURLSchemeTemplate(scheme, tpl);
+    }
+
+    std::string getURLSchemeTemplate(const std::string& scheme) const {
+        return onlineFileSource.getURLSchemeTemplate(scheme);
+    }
+
     void listRegions(std::function<void (std::exception_ptr, optional<std::vector<OfflineRegion>>)> callback) {
         try {
             callback({}, offlineDatabase.listRegions());
@@ -185,6 +193,14 @@ void DefaultFileSource::setAccessToken(const std::string& accessToken) {
 
 std::string DefaultFileSource::getAccessToken() const {
     return thread->invokeSync(&Impl::getAccessToken);
+}
+
+void DefaultFileSource::setURLSchemeTemplate(const std::string& scheme, const std::string& tpl) {
+    thread->invokeSync(&Impl::setURLSchemeTemplate, scheme, tpl);
+}
+
+std::string DefaultFileSource::getURLSchemeTemplate(const std::string& scheme) const {
+    return thread->invokeSync(&Impl::getURLSchemeTemplate, scheme);
 }
 
 std::unique_ptr<AsyncRequest> DefaultFileSource::request(const Resource& resource, Callback callback) {

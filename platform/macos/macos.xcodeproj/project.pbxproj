@@ -61,6 +61,8 @@
 		556660C61E1BEA0100E2C41B /* MGLFoundation.h in Headers */ = {isa = PBXBuildFile; fileRef = 556660C51E1BEA0100E2C41B /* MGLFoundation.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		556660D61E1D07E400E2C41B /* MGLVersionNumber.m in Sources */ = {isa = PBXBuildFile; fileRef = 556660D51E1D07E400E2C41B /* MGLVersionNumber.m */; };
 		558F18221D0B13B100123F46 /* libmbgl-loop.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 558F18211D0B13B000123F46 /* libmbgl-loop.a */; };
+		559B96C21E279D13005D4D26 /* MGLOfflineStorage+MGLURLSchemeTemplateAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 559B96C01E279D13005D4D26 /* MGLOfflineStorage+MGLURLSchemeTemplateAdditions.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		559B96C51E279ED6005D4D26 /* MGLOfflineStorage+MGLURLSchemeTemplateAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = 559B96C41E279ED6005D4D26 /* MGLOfflineStorage+MGLURLSchemeTemplateAdditions.mm */; };
 		55D9B4B11D005D3900C1CCE2 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 55D9B4B01D005D3900C1CCE2 /* libz.tbd */; };
 		DA00FC8A1D5EEAC3009AABC8 /* MGLAttributionInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = DA00FC881D5EEAC3009AABC8 /* MGLAttributionInfo.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DA00FC8B1D5EEAC3009AABC8 /* MGLAttributionInfo.mm in Sources */ = {isa = PBXBuildFile; fileRef = DA00FC891D5EEAC3009AABC8 /* MGLAttributionInfo.mm */; };
@@ -310,6 +312,8 @@
 		556660C51E1BEA0100E2C41B /* MGLFoundation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLFoundation.h; sourceTree = "<group>"; };
 		556660D51E1D07E400E2C41B /* MGLVersionNumber.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = MGLVersionNumber.m; path = ../../darwin/test/MGLVersionNumber.m; sourceTree = "<group>"; };
 		558F18211D0B13B000123F46 /* libmbgl-loop.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libmbgl-loop.a"; path = "../../build/osx/Debug/libmbgl-loop.a"; sourceTree = "<group>"; };
+		559B96C01E279D13005D4D26 /* MGLOfflineStorage+MGLURLSchemeTemplateAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "MGLOfflineStorage+MGLURLSchemeTemplateAdditions.h"; sourceTree = "<group>"; };
+		559B96C41E279ED6005D4D26 /* MGLOfflineStorage+MGLURLSchemeTemplateAdditions.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "MGLOfflineStorage+MGLURLSchemeTemplateAdditions.mm"; sourceTree = "<group>"; };
 		55D9B4B01D005D3900C1CCE2 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 		55FE0E8D1D100A0900FD240B /* config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = config.xcconfig; path = ../../build/macos/config.xcconfig; sourceTree = "<group>"; };
 		DA00FC881D5EEAC3009AABC8 /* MGLAttributionInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLAttributionInfo.h; sourceTree = "<group>"; };
@@ -807,6 +811,8 @@
 		DAD1657F1CF4CF50001FF4B9 /* Categories */ = {
 			isa = PBXGroup;
 			children = (
+				559B96C01E279D13005D4D26 /* MGLOfflineStorage+MGLURLSchemeTemplateAdditions.h */,
+				559B96C41E279ED6005D4D26 /* MGLOfflineStorage+MGLURLSchemeTemplateAdditions.mm */,
 				408AA8601DAEED3300022900 /* MGLPolygon+MGLAdditions.h */,
 				408AA85C1DAEED3300022900 /* MGLPolygon+MGLAdditions.m */,
 				408AA8611DAEED3300022900 /* MGLPolyline+MGLAdditions.h */,
@@ -963,7 +969,9 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DAE6C3611CC31E0400DB3429 /* MGLOfflineStorage.h in Headers */,
 				556660C61E1BEA0100E2C41B /* MGLFoundation.h in Headers */,
+				559B96C21E279D13005D4D26 /* MGLOfflineStorage+MGLURLSchemeTemplateAdditions.h in Headers */,
 				DA8F258F1D51CA600010E6B5 /* MGLRasterStyleLayer.h in Headers */,
 				3508EC641D749D39009B0EE4 /* NSExpression+MGLAdditions.h in Headers */,
 				DAE6C38D1CC31E2A00DB3429 /* MGLOfflineRegion_Private.h in Headers */,
@@ -980,7 +988,6 @@
 				DAE6C3A31CC31E9400DB3429 /* MGLAnnotationImage.h in Headers */,
 				DAE6C3A41CC31E9400DB3429 /* MGLMapView.h in Headers */,
 				355BA4ED1D41633E00CCC6D5 /* NSColor+MGLAdditions.h in Headers */,
-				DAE6C3611CC31E0400DB3429 /* MGLOfflineStorage.h in Headers */,
 				352742781D4C220900A1ECE6 /* MGLStyleValue.h in Headers */,
 				DAE6C35E1CC31E0400DB3429 /* MGLMultiPoint.h in Headers */,
 				35602BFF1D3EA9B40050646F /* MGLStyleLayer_Private.h in Headers */,
@@ -1283,6 +1290,7 @@
 				35C5D84A1D6DD66D00E95907 /* NSCompoundPredicate+MGLAdditions.mm in Sources */,
 				408AA8681DAEEE5200022900 /* MGLPolygon+MGLAdditions.m in Sources */,
 				DAE6C3951CC31E2A00DB3429 /* MGLTilePyramidOfflineRegion.mm in Sources */,
+				559B96C51E279ED6005D4D26 /* MGLOfflineStorage+MGLURLSchemeTemplateAdditions.mm in Sources */,
 				DAE6C3851CC31E2A00DB3429 /* MGLAccountManager.m in Sources */,
 				DA00FC8B1D5EEAC3009AABC8 /* MGLAttributionInfo.mm in Sources */,
 				DAE6C3921CC31E2A00DB3429 /* MGLPolyline.mm in Sources */,

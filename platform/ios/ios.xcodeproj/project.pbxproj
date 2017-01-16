@@ -166,6 +166,10 @@
 		556660CA1E1BF3A900E2C41B /* MGLFoundation.h in Headers */ = {isa = PBXBuildFile; fileRef = 556660C91E1BF3A900E2C41B /* MGLFoundation.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		556660D81E1D085500E2C41B /* MGLVersionNumber.m in Sources */ = {isa = PBXBuildFile; fileRef = 556660D71E1D085500E2C41B /* MGLVersionNumber.m */; };
 		556660DB1E1D8E8D00E2C41B /* MGLFoundation.h in Headers */ = {isa = PBXBuildFile; fileRef = 556660C91E1BF3A900E2C41B /* MGLFoundation.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		559B96C81E27A22F005D4D26 /* MGLOfflineStorage+MGLURLSchemeTemplateAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 559B96C61E27A22F005D4D26 /* MGLOfflineStorage+MGLURLSchemeTemplateAdditions.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		559B96C91E27A22F005D4D26 /* MGLOfflineStorage+MGLURLSchemeTemplateAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 559B96C61E27A22F005D4D26 /* MGLOfflineStorage+MGLURLSchemeTemplateAdditions.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		559B96CA1E27A22F005D4D26 /* MGLOfflineStorage+MGLURLSchemeTemplateAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = 559B96C71E27A22F005D4D26 /* MGLOfflineStorage+MGLURLSchemeTemplateAdditions.mm */; };
+		559B96CB1E27A22F005D4D26 /* MGLOfflineStorage+MGLURLSchemeTemplateAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = 559B96C71E27A22F005D4D26 /* MGLOfflineStorage+MGLURLSchemeTemplateAdditions.mm */; };
 		55D8C9961D0F18CE00F42F10 /* libsqlite3.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 55D8C9951D0F18CE00F42F10 /* libsqlite3.tbd */; };
 		7E016D7E1D9E86BE00A29A21 /* MGLPolyline+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 7E016D7C1D9E86BE00A29A21 /* MGLPolyline+MGLAdditions.h */; };
 		7E016D7F1D9E86BE00A29A21 /* MGLPolyline+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 7E016D7C1D9E86BE00A29A21 /* MGLPolyline+MGLAdditions.h */; };
@@ -614,6 +618,8 @@
 		554180411D2E97DE00012372 /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
 		556660C91E1BF3A900E2C41B /* MGLFoundation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLFoundation.h; sourceTree = "<group>"; };
 		556660D71E1D085500E2C41B /* MGLVersionNumber.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = MGLVersionNumber.m; path = ../../darwin/test/MGLVersionNumber.m; sourceTree = "<group>"; };
+		559B96C61E27A22F005D4D26 /* MGLOfflineStorage+MGLURLSchemeTemplateAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "MGLOfflineStorage+MGLURLSchemeTemplateAdditions.h"; sourceTree = "<group>"; };
+		559B96C71E27A22F005D4D26 /* MGLOfflineStorage+MGLURLSchemeTemplateAdditions.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "MGLOfflineStorage+MGLURLSchemeTemplateAdditions.mm"; sourceTree = "<group>"; };
 		55D8C9941D0F133500F42F10 /* config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = config.xcconfig; path = ../../build/ios/config.xcconfig; sourceTree = "<group>"; };
 		55D8C9951D0F18CE00F42F10 /* libsqlite3.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.tbd; path = usr/lib/libsqlite3.tbd; sourceTree = SDKROOT; };
 		7E016D7C1D9E86BE00A29A21 /* MGLPolyline+MGLAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "MGLPolyline+MGLAdditions.h"; sourceTree = "<group>"; };
@@ -1367,6 +1373,8 @@
 		DAD165831CF4CFED001FF4B9 /* Categories */ = {
 			isa = PBXGroup;
 			children = (
+				559B96C61E27A22F005D4D26 /* MGLOfflineStorage+MGLURLSchemeTemplateAdditions.h */,
+				559B96C71E27A22F005D4D26 /* MGLOfflineStorage+MGLURLSchemeTemplateAdditions.mm */,
 				7E016D821D9E890300A29A21 /* MGLPolygon+MGLAdditions.h */,
 				7E016D831D9E890300A29A21 /* MGLPolygon+MGLAdditions.m */,
 				7E016D7C1D9E86BE00A29A21 /* MGLPolyline+MGLAdditions.h */,
@@ -1449,9 +1457,11 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DA8847F61CBAFA5100AB86E3 /* MGLOfflineStorage.h in Headers */,
 				556660DB1E1D8E8D00E2C41B /* MGLFoundation.h in Headers */,
 				35D13AC31D3D19DD00AFB4E0 /* MGLFillStyleLayer.h in Headers */,
 				DA88483A1CBAFB8500AB86E3 /* MGLAnnotationImage.h in Headers */,
+				559B96C81E27A22F005D4D26 /* MGLOfflineStorage+MGLURLSchemeTemplateAdditions.h in Headers */,
 				DA35A2BB1CCA9A6900E826B2 /* MGLClockDirectionFormatter.h in Headers */,
 				353933FE1D3FB7DD003F57D7 /* MGLSymbolStyleLayer.h in Headers */,
 				DA8848861CBB033F00AB86E3 /* Fabric+FABKits.h in Headers */,
@@ -1553,7 +1563,6 @@
 				DA8848601CBAFC2E00AB86E3 /* Mapbox.h in Headers */,
 				DAF0D8101DFE0EA000B28378 /* MGLRasterSource_Private.h in Headers */,
 				350098BB1D480108004B2AF0 /* MGLVectorSource.h in Headers */,
-				DA8847F61CBAFA5100AB86E3 /* MGLOfflineStorage.h in Headers */,
 				DAD1656E1CF41981001FF4B9 /* MGLFeature_Private.h in Headers */,
 				DA88483C1CBAFB8500AB86E3 /* MGLMapView.h in Headers */,
 			);
@@ -1563,7 +1572,9 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DABFB8641CBE99E500D62B32 /* MGLOfflineStorage.h in Headers */,
 				556660CA1E1BF3A900E2C41B /* MGLFoundation.h in Headers */,
+				559B96C91E27A22F005D4D26 /* MGLOfflineStorage+MGLURLSchemeTemplateAdditions.h in Headers */,
 				4032C5C01DE1FC780062E8BD /* NSValue+MGLStyleEnumAttributeAdditions.h in Headers */,
 				35B82BF91D6C5F8400B1B721 /* NSPredicate+MGLAdditions.h in Headers */,
 				DA35A2CA1CCAAAD200E826B2 /* NSValue+MGLAdditions.h in Headers */,
@@ -1572,7 +1583,6 @@
 				3566C76D1D4A8DFA008152BC /* MGLRasterSource.h in Headers */,
 				DAED38641D62D0FC00D7640F /* NSURL+MGLAdditions.h in Headers */,
 				DABFB85E1CBE99E500D62B32 /* MGLAnnotation.h in Headers */,
-				DABFB8641CBE99E500D62B32 /* MGLOfflineStorage.h in Headers */,
 				DAD165791CF4CDFF001FF4B9 /* MGLShapeCollection.h in Headers */,
 				4049C29E1DB6CD6C00B3F799 /* MGLPointCollection.h in Headers */,
 				3566C7671D4A77BA008152BC /* MGLShapeSource.h in Headers */,
@@ -1982,6 +1992,7 @@
 				35136D391D42271A00C20EFD /* MGLBackgroundStyleLayer.mm in Sources */,
 				3510FFEC1D6D9C7A00F413B2 /* NSComparisonPredicate+MGLAdditions.mm in Sources */,
 				7E016D801D9E86BE00A29A21 /* MGLPolyline+MGLAdditions.m in Sources */,
+				559B96CA1E27A22F005D4D26 /* MGLOfflineStorage+MGLURLSchemeTemplateAdditions.mm in Sources */,
 				DAED38651D62D0FC00D7640F /* NSURL+MGLAdditions.m in Sources */,
 				354B83981D2E873E005D9406 /* MGLUserLocationAnnotationView.m in Sources */,
 				DA88485D1CBAFB9800AB86E3 /* MGLFaux3DUserLocationAnnotationView.m in Sources */,
@@ -2057,6 +2068,7 @@
 				35136D3A1D42271A00C20EFD /* MGLBackgroundStyleLayer.mm in Sources */,
 				3510FFED1D6D9C7A00F413B2 /* NSComparisonPredicate+MGLAdditions.mm in Sources */,
 				7E016D811D9E86BE00A29A21 /* MGLPolyline+MGLAdditions.m in Sources */,
+				559B96CB1E27A22F005D4D26 /* MGLOfflineStorage+MGLURLSchemeTemplateAdditions.mm in Sources */,
 				354B83991D2E873E005D9406 /* MGLUserLocationAnnotationView.m in Sources */,
 				DAA4E4221CBB730400178DFB /* MGLPointAnnotation.mm in Sources */,
 				DAED38661D62D0FC00D7640F /* NSURL+MGLAdditions.m in Sources */,

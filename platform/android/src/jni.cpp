@@ -461,6 +461,18 @@ jni::jstring* nativeGetAccessToken(JNIEnv *env, jni::jobject* obj, jlong nativeM
     return std_string_to_jstring(env, nativeMapView->getFileSource().getAccessToken());
 }
 
+void nativeSetURLTemplate(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jni::jstring* scheme, jni::jstring* tpl) {
+    assert(nativeMapViewPtr != 0);
+    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
+    nativeMapView->getFileSource().setURLSchemeTemplate(std_string_from_jstring(env, scheme), std_string_from_jstring(env, tpl));
+}
+
+jni::jstring* nativeGetURLTemplate(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jni::jstring* scheme) {
+    assert(nativeMapViewPtr != 0);
+    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
+    return std_string_to_jstring(env, nativeMapView->getFileSource().getURLSchemeTemplate(std_string_from_jstring(env, scheme)));
+}
+
 void nativeCancelTransitions(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr) {
     assert(nativeMapViewPtr != 0);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
@@ -1827,6 +1839,8 @@ void registerNatives(JavaVM *vm) {
         MAKE_NATIVE_METHOD(nativeGetStyleJson, "(J)Ljava/lang/String;"),
         MAKE_NATIVE_METHOD(nativeSetAccessToken, "(JLjava/lang/String;)V"),
         MAKE_NATIVE_METHOD(nativeGetAccessToken, "(J)Ljava/lang/String;"),
+        MAKE_NATIVE_METHOD(nativeSetURLTemplate, "(JLjava/lang/String;Ljava/lang/String;)V"),
+        MAKE_NATIVE_METHOD(nativeGetURLTemplate, "(JLjava/lang/String;)Ljava/lang/String;"),
         MAKE_NATIVE_METHOD(nativeCancelTransitions, "(J)V"),
         MAKE_NATIVE_METHOD(nativeSetGestureInProgress, "(JZ)V"),
         MAKE_NATIVE_METHOD(nativeMoveBy, "(JDDJ)V"),

@@ -2,6 +2,7 @@
 
 #include <string>
 #include <mbgl/style/types.hpp>
+#include <mbgl/storage/resource.hpp>
 
 namespace mbgl {
 namespace util {

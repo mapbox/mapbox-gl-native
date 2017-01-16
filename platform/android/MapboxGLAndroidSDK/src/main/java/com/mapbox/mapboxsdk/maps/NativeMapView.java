@@ -308,6 +308,14 @@ final class NativeMapView {
     return nativeGetAccessToken(nativeMapViewPtr);
   }
 
+  public void setURLSchemeTemplate(String scheme, String tpl) {
+    nativeSetURLTemplate(nativeMapViewPtr, scheme, tpl);
+  }
+
+  public String getURLSchemeTemplate(String scheme) {
+    return nativeGetURLTemplate(nativeMapViewPtr, scheme);
+  }
+
   public void cancelTransitions() {
     if (isDestroyedOn("cancelTransitions")) {
       return;
@@ -986,6 +994,10 @@ final class NativeMapView {
   private native void nativeSetAccessToken(long nativeMapViewPtr, String accessToken);
 
   private native String nativeGetAccessToken(long nativeMapViewPtr);
+
+  private native void nativeSetURLTemplate(long nativeMapViewPtr, String scheme, String tpl);
+
+  private native String nativeGetURLTemplate(long nativeMapViewPtr, String scheme);
 
   private native void nativeCancelTransitions(long nativeMapViewPtr);
 
