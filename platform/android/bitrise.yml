@@ -215,8 +215,8 @@ workflows:
         - channel: "#gl-bots"
         - from_username: 'Bitrise Android'
         - from_username_on_error: 'Bitrise Android'
-        - message: '<${BITRISE_BUILD_URL}|Build #${BITRISE_BUILD_NUMBER}> Publish to maven SUCCESS.'
-        - message_on_error: '<${BITRISE_BUILD_URL}|Build #${BITRISE_BUILD_NUMBER}> Publish to maven FAILED.'
+        - message: '<${BITRISE_BUILD_URL}|Build #${BITRISE_BUILD_NUMBER}> Publish of nightly Android SDK SNAPSHOT to maven succeeded.'
+        - message_on_error: '<${BITRISE_BUILD_URL}|Build #${BITRISE_BUILD_NUMBER}> Publish of nightly Android SDK SNAPSHOT to maven failed. @android_team.'
         - icon_url: https://bitrise-public-content-production.s3.amazonaws.com/slack/bitrise-slack-icon-128.png
         - icon_url_on_error: https://bitrise-public-content-production.s3.amazonaws.com/slack/bitrise-slack-error-icon-128.png
   devicefarmUpload:
