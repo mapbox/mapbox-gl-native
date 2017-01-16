@@ -5,6 +5,7 @@
 #import "MGLTileSource_Private.h"
 #import "NSURL+MGLAdditions.h"
 
+#include <mbgl/map/map.hpp>
 #include <mbgl/style/sources/raster_source.hpp>
 
 const MGLTileSourceOption MGLTileSourceOptionTileSize = @"MGLTileSourceOptionTileSize";
@@ -50,7 +51,7 @@ static const CGFloat MGLRasterSourceRetinaTileSize = 512;
     if (self = [super initWithIdentifier:identifier tileURLTemplates:tileURLTemplates options:options]) {
         mbgl::Tileset tileSet = MGLTileSetFromTileURLTemplates(tileURLTemplates, options);
         
-        uint16_t tileSize;
+        uint16_t tileSize = MGLRasterSourceRetinaTileSize;
         if (NSNumber *tileSizeNumber = options[MGLTileSourceOptionTileSize]) {
             if (![tileSizeNumber isKindOfClass:[NSNumber class]]) {
                 [NSException raise:NSInvalidArgumentException
@@ -93,6 +94,11 @@ static const CGFloat MGLRasterSourceRetinaTileSize = 512;
 
 - (void)setRawSource:(mbgl::style::RasterSource *)rawSource {
     super.rawSource = rawSource;
+}
+
+- (NSURL *)configurationURL {
+    auto url = self.rawSource->getURL();
+    return url ? [NSURL URLWithString:@(url->c_str())] : nil;
 }
 
 - (NSString *)attributionHTMLString {

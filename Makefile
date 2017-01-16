@@ -163,6 +163,10 @@ macos-test: $(MACOS_PROJ_PATH)
 xpackage: $(MACOS_PROJ_PATH)
 	SYMBOLS=$(SYMBOLS) ./platform/macos/scripts/package.sh
 
+.PHONY: xdeploy
+xdeploy:
+	caffeinate -i ./platform/macos/scripts/deploy-packages.sh
+
 .PHONY: xdocument
 xdocument:
 	OUTPUT=$(OUTPUT) ./platform/macos/scripts/document.sh
@@ -276,7 +280,12 @@ idocument:
 .PHONY: darwin-style-code
 darwin-style-code:
 	node platform/darwin/scripts/generate-style-code.js
+	node platform/darwin/scripts/update-examples.js
 style-code: darwin-style-code
+
+.PHONY: darwin-update-examples
+darwin-update-examples:
+	node platform/darwin/scripts/update-examples.js
 
 .PHONY: check-public-symbols
 check-public-symbols:

@@ -6,7 +6,7 @@
     std::string png = encodePNG(spriteImage->image);
     NSData *data = [[NSData alloc] initWithBytes:png.data() length:png.size()];
     NSBitmapImageRep *rep = [NSBitmapImageRep imageRepWithData:data];
-    if ([self initWithSize:NSMakeSize(spriteImage->getWidth(), spriteImage->getHeight())]) {
+    if (self = [self initWithSize:NSMakeSize(spriteImage->getWidth(), spriteImage->getHeight())]) {
         [self addRepresentation:rep];
         [self setTemplate:spriteImage->sdf];
     }

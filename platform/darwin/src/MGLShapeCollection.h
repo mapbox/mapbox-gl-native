@@ -8,12 +8,30 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- The `MGLShapeCollection` class represents a shape consisting of one or more
+ An `MGLShapeCollection` object represents a shape consisting of zero or more
  distinct but related shapes that are instances of `MGLShape`. The constituent
  shapes can be a mixture of different kinds of shapes.
  
- @note `MGLShapeCollection` objects cannot be added to a map view using
-    `-[MGLMapView addAnnotations:]` and related methods.
+ `MGLShapeCollection` is most commonly used to add multiple shapes to a single
+ `MGLShapeSource`. Configure the appearance of an `MGLShapeSource`’s or
+ `MGLVectorSource`’s shape collection collectively using an
+ `MGLSymbolStyleLayer` object, or use multiple instances of
+ `MGLCircleStyleLayer`, `MGLFillStyleLayer`, and `MGLLineStyleLayer` to
+ configure the appearance of each kind of shape inside the collection.
+ 
+ You cannot add an `MGLShapeCollection` object directly to a map view as an
+ annotation. However, you can create individual `MGLPointAnnotation`,
+ `MGLPolyline`, and `MGLPolygon` objects from the `shapes` array and add those
+ annotation objects to the map view using the `-[MGLMapView addAnnotations:]`
+ method.
+ 
+ To represent a collection of point, polyline, or polygon shapes, it may be more
+ convenient to use an `MGLPointCollection`, `MGLMultiPolyline`, or
+ `MGLMultiPolygon` object, respectively.
+ 
+ A multipolyline is known as a
+ <a href="https://tools.ietf.org/html/rfc7946#section-3.1.8">GeometryCollection</a>
+ geometry in GeoJSON.
  */
 MGL_EXPORT
 @interface MGLShapeCollection : MGLShape

@@ -61,11 +61,15 @@ MGL_EXPORT
  <li><code>NSContainsPredicateOperatorType</code> (<code>CONTAINS</code>)</li>
  </ul>
  
- To test whether a feature has or lacks a specific attribute, compare the attribute to `NULL` or `NIL`. Predicates created using the `+[NSPredicate predicateWithValue:]` method are also supported. String operators and custom operators are not supported.
+ To test whether a feature has or lacks a specific attribute, compare the
+ attribute to `NULL` or `NIL`. Predicates created using the
+ `+[NSPredicate predicateWithValue:]` method are also supported. String
+ operators and custom operators are not supported.
  
  For details about the predicate format string syntax, consult the “Predicate
- Format String Syntax” chapter of the “Predicate Programming Guide” in Apple
- developer documentation.
+ Format String Syntax” chapter of the
+ “<a href="https://developer.apple.com/library/content/documentation/Cocoa/Conceptual/Predicates/">Predicate Programming Guide</a>”
+ in Apple developer documentation.
  
  The predicate's left-hand expression must be a string that identifies a feature
  attribute or, alternatively, one of the following special attributes:
@@ -121,15 +125,29 @@ MGL_EXPORT
  
  Automatic type casting is not performed. Therefore, a feature only matches this
  predicate if its value for the attribute in question is of the same type as the
- value specified in the predicate. Also, operator modifiers `c`, `d`, and the
- combined `cd` for case and diacritic insensitivity are unsupported for 
- comparison and aggregate operators that are used in the predicate.
+ value specified in the predicate. Also, operator modifiers such as `c` (for
+ case insensitivity), `d` (for diacritic insensitivity), and `l` (for locale
+ sensitivity) are unsupported for comparison and aggregate operators that are
+ used in the predicate.
  
  It is possible to create expressions that contain special characters in the 
  predicate format syntax. This includes the `$` in the `$id` and `$type` special 
  style attributes and also `hyphen-minus` and `tag:subtag`. However, you must use
  `%K` in the format string to represent these variables:
  `@"%K == 'LineString'", @"$type"`.
+ 
+ ### Example
+ 
+ To filter the layer to include only the features whose `index` attribute is 5
+ or 10 and whose `ele` attribute is at least 1,500, you could create an
+ `NSCompoundPredicate` along these lines:
+ 
+ ```swift
+ let layer = MGLLineStyleLayer(identifier: "contour", source: terrain)
+ layer.sourceLayerIdentifier = "contours"
+ layer.predicate = NSPredicate(format: "(index == 5 || index == 10) && ele >= 1500.0")
+ mapView.style?.addLayer(layer)
+ ```
  */
 @property (nonatomic, nullable) NSPredicate *predicate;
 

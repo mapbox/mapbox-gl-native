@@ -80,6 +80,36 @@
     return self;
 }
 
+- (instancetype)initWithCoder:(NSCoder *)decoder {
+    if (self = [super initWithCoder:decoder]) {
+        _polylines = [decoder decodeObjectOfClass:[NSArray class] forKey:@"polylines"];
+    }
+    return self;
+}
+
+- (void)encodeWithCoder:(NSCoder *)coder {
+    [super encodeWithCoder:coder];
+    [coder encodeObject:_polylines forKey:@"polylines"];
+}
+
+- (BOOL)isEqual:(id)other
+{
+    if (self == other) return YES;
+    if (![other isKindOfClass:[MGLMultiPolyline class]]) return NO;
+    
+    MGLMultiPolyline *otherMultipoline = other;
+    return ([super isEqual:otherMultipoline]
+            && [self.polylines isEqualToArray:otherMultipoline.polylines]);
+}
+
+- (NSUInteger)hash {
+    NSUInteger hash = [super hash];
+    for (MGLPolyline *polyline in self.polylines) {
+        hash += [polyline hash];
+    }
+    return hash;
+}
+
 - (BOOL)intersectsOverlayBounds:(MGLCoordinateBounds)overlayBounds {
     return MGLCoordinateBoundsIntersectsCoordinateBounds(_overlayBounds, overlayBounds);
 }

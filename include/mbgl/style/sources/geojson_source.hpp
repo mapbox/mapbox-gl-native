@@ -43,7 +43,7 @@ public:
     void setURL(const std::string& url);
     void setGeoJSON(const GeoJSON&);
 
-    optional<std::string> getURL();
+    optional<std::string> getURL() const;
 
     // Private implementation
 

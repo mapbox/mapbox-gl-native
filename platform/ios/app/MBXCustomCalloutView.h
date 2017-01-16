@@ -7,4 +7,8 @@
  * callout title for demonstration purpose.
  */
 @interface MBXCustomCalloutView : UIView <MGLCalloutView>
+
+@property (nonatomic, assign, getter=isAnchoredToAnnotation) BOOL anchoredToAnnotation;
+@property (nonatomic, assign) BOOL dismissesAutomatically;
+
 @end

@@ -1,5 +1,5 @@
 // This file is generated. 
-// Edit platform/darwin/scripts/generate-style-code.js, then run `make style-code-darwin`.
+// Edit platform/darwin/scripts/generate-style-code.js, then run `make darwin-style-code`.
 
 #import "MGLSource.h"
 #import "MGLMapView_Private.h"
@@ -8,6 +8,7 @@
 #import "MGLStyleValue_Private.h"
 #import "MGLBackgroundStyleLayer.h"
 
+#include <mbgl/map/map.hpp>
 #include <mbgl/style/layers/background_layer.hpp>
 
 @interface MGLBackgroundStyleLayer ()

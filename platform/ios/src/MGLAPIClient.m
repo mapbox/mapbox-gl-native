@@ -21,7 +21,6 @@ static NSString * const MGLAPIClientHTTPMethodPost = @"POST";
 @property (nonatomic, copy) NSData *geoTrustCert;
 @property (nonatomic, copy) NSData *testServerCert;
 @property (nonatomic, copy) NSString *userAgent;
-@property (nonatomic) NSMutableArray *dataTasks;
 @property (nonatomic) BOOL usesTestServer;
 
 @end
@@ -33,7 +32,6 @@ static NSString * const MGLAPIClientHTTPMethodPost = @"POST";
     if (self) {
         _session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]
                                                  delegate:self delegateQueue:nil];
-        _dataTasks = [NSMutableArray array];
         [self loadCertificates];
         [self setupBaseURL];
         [self setupUserAgent];
@@ -59,22 +57,13 @@ static NSString * const MGLAPIClientHTTPMethodPost = @"POST";
             error = error ?: statusError;
             completionHandler(error);
         }
-        [self.dataTasks removeObject:dataTask];
         dataTask = nil;
     }];
     [dataTask resume];
-    if (dataTask) {
-        [self.dataTasks addObject:dataTask];
-    }
 }
 
 - (void)postEvent:(nonnull MGLMapboxEventAttributes *)event completionHandler:(nullable void (^)(NSError * _Nullable error))completionHandler {
     [self postEvents:@[event] completionHandler:completionHandler];
-}
-
-- (void)cancelAll {
-    [self.dataTasks makeObjectsPerformSelector:@selector(cancel)];
-    [self.dataTasks removeAllObjects];
 }
 
 #pragma mark Utilities

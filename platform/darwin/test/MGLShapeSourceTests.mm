@@ -37,6 +37,19 @@
     XCTAssertNil(source.shape);
 }
 
+- (void)testUnclusterableShape {
+    NSDictionary *options = @{
+        MGLShapeSourceOptionClustered: @YES,
+    };
+    
+    MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"id" shape:[[MGLPointFeature alloc] init] options:options];
+    XCTAssertTrue([source.shape isKindOfClass:[MGLPointFeature class]]);
+    
+    MGLShapeCollectionFeature *feature = [MGLShapeCollectionFeature shapeCollectionWithShapes:@[]];
+    source = [[MGLShapeSource alloc] initWithIdentifier:@"id" shape:feature options:options];
+    XCTAssertTrue([source.shape isKindOfClass:[MGLShapeCollectionFeature class]]);
+}
+
 - (void)testMGLShapeSourceWithDataMultipleFeatures {
     
     NSString *geoJSON = @"{\"type\": \"FeatureCollection\",\"features\": [{\"type\": \"Feature\",\"properties\": {},\"geometry\": {\"type\": \"LineString\",\"coordinates\": [[-107.75390625,40.329795743702064],[-104.34814453125,37.64903402157866]]}}]}";
@@ -263,6 +276,45 @@
     MGLShapeCollectionFeature *shape = (MGLShapeCollectionFeature *)source.shape;
     XCTAssertNotNil(shape);
     XCTAssert(shape.shapes.count == 6, @"Shape collection should contain 6 shapes");
+}
+
+- (void)testMGLShapeSourceWithFeaturesConvenienceInitializer {
+    CLLocationCoordinate2D coordinates[] = {
+        CLLocationCoordinate2DMake(100.0, 0.0),
+        CLLocationCoordinate2DMake(101.0, 0.0),
+        CLLocationCoordinate2DMake(101.0, 1.0),
+        CLLocationCoordinate2DMake(100.0, 1.0),
+        CLLocationCoordinate2DMake(100.0, 0.0)};
+
+    MGLPolygonFeature *polygonFeature = [MGLPolygonFeature polygonWithCoordinates:coordinates count:sizeof(coordinates)/sizeof(coordinates[0]) interiorPolygons:nil];
+
+    MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"source-id" features:@[polygonFeature] options:nil];
+    MGLShapeCollectionFeature *shape = (MGLShapeCollectionFeature *)source.shape;
+
+    XCTAssertTrue([shape isKindOfClass:[MGLShapeCollectionFeature class]]);
+    XCTAssertEqual(shape.shapes.count, 1, @"Shape collection should contain 1 shape");
+
+    // when a shape is included in the features array
+    MGLPolygon *polygon = [MGLPolygon polygonWithCoordinates:coordinates count:sizeof(coordinates)/sizeof(coordinates[0]) interiorPolygons:nil];
+
+    XCTAssertThrowsSpecificNamed([[MGLShapeSource alloc] initWithIdentifier:@"source-id-invalid" features:@[polygon] options:nil], NSException, NSInvalidArgumentException, @"Shape source should raise an exception if a shape is sent to the features initializer");
+}
+
+- (void)testMGLShapeSourceWithShapesConvenienceInitializer {
+    CLLocationCoordinate2D coordinates[] = {
+        CLLocationCoordinate2DMake(100.0, 0.0),
+        CLLocationCoordinate2DMake(101.0, 0.0),
+        CLLocationCoordinate2DMake(101.0, 1.0),
+        CLLocationCoordinate2DMake(100.0, 1.0),
+        CLLocationCoordinate2DMake(100.0, 0.0)};
+
+    MGLPolygon *polygon = [MGLPolygon polygonWithCoordinates:coordinates count:sizeof(coordinates)/sizeof(coordinates[0]) interiorPolygons:nil];
+
+    MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"source-id" shapes:@[polygon] options:nil];
+    MGLShapeCollectionFeature *shape = (MGLShapeCollectionFeature *)source.shape;
+
+    XCTAssertTrue([shape isKindOfClass:[MGLShapeCollection class]]);
+    XCTAssertEqual(shape.shapes.count, 1, @"Shape collection should contain 1 shape");
 }
 
 @end

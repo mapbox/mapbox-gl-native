@@ -6,7 +6,7 @@ This document explains how to build the Mapbox iOS SDK from source. It is intend
 
 The Mapbox iOS SDK and iosapp demo application build against the iOS 7.0 SDK. The SDK is intended to run on iOS 7.0 and above, while iosapp is intended to run on iOS 8.0 and above due to the use of a dynamic framework. Both require Xcode on a computer running macOS.
 
-The Mapbox iOS SDK requires Xcode 7.3 or higher.
+The Mapbox iOS SDK requires Xcode 7.3 or above. The iosapp demo application requires Xcode 8.0 or above to build.
 
 ## Building the SDK
 
@@ -118,6 +118,22 @@ To add a localization to the iOS SDK:
 1. In the sheet that appears, select all the .strings and .stringsdict files but not the .storyboard file. (LaunchScreen.storyboard is part of the iosapp example application, which is not localized.)
 1. In the Project navigator, expand each .strings and .stringsdict file in the project. An additional version for your localization should be listed; translate it. Translate everything on the right side of the equals sign. Leave the left side and any comments unmodified. See Apple’s documentation on the [.strings](https://developer.apple.com/library/content/documentation/Cocoa/Conceptual/LoadingResources/Strings/Strings.html) and [.stringsdict](https://developer.apple.com/library/content/documentation/MacOSX/Conceptual/BPInternational/StringsdictFileFormat/StringsdictFileFormat.html) formats.
 1. You’re already most of the way towards localizing the macOS SDK too – consider [completing that localization](../macos/DEVELOPING.md#adding-a-localization).
+
+### Adding a code example
+
+To add an example code listing to the documentation for a class or class member:
+
+1. Add a test method named in the form `testMGLClass` or `testMGLClass$method`
+   to [MGLDocumentationExampleTests](test/MGLDocumentationExampleTests.swift).
+   Wrap the code you’d like to appear in the documentation within
+   `//#-example-code` and `//#-end-example-code` comments.
+1. Insert the code listings into the headers:
+
+```bash
+make darwin-update-examples
+```
+
+[SourceKitten](https://github.com/jpsim/SourceKitten/) is required and will be installed automatically using Homebrew.
 
 ## Testing
 
