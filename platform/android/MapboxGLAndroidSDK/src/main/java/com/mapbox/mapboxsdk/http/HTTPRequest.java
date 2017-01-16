@@ -16,6 +16,7 @@ import java.net.NoRouteToHostException;
 import java.net.ProtocolException;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.net.MalformedURLException;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.net.ssl.SSLException;
@@ -62,6 +63,9 @@ class HTTPRequest implements Callback {
       }
 
       HttpUrl httpUrl = HttpUrl.parse(resourceUrl);
+      if (httpUrl == null) {
+        throw new MalformedURLException("Could not load invalid URL: " + resourceUrl);
+      }
       final String host = httpUrl.host().toLowerCase(MapboxConstants.MAPBOX_LOCALE);
       if (host.equals("mapbox.com") || host.endsWith(".mapbox.com") || host.equals("mapbox.cn")
         || host.endsWith(".mapbox.cn")) {

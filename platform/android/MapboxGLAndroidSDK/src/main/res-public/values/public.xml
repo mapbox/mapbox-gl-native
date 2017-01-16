@@ -8,9 +8,7 @@
     <public name="mapbox_AlertDialogStyle" type="style" />
 
     <!-- Exposed attrs.xml -->
-    <public name="mapbox_accessToken" type="attr" />
     <public name="mapbox_styleUrl" type="attr" />
-    <public name="mapbox_apiBaseUrl" type="attr" />
 
     <public name="mapbox_cameraTargetLng" type="attr" />
     <public name="mapbox_cameraTargetLat" type="attr" />

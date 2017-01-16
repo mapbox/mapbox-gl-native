@@ -4,7 +4,6 @@
 
         <!--Configuration-->
         <attr name="mapbox_styleUrl" format="string" />
-        <attr name="mapbox_apiBaseUrl" format="string" />
 
         <!--Camera-->
         <attr name="mapbox_cameraTargetLat" format="float" />

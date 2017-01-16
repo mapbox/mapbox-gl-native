@@ -77,8 +77,6 @@ public class MapboxMapOptions implements Parcelable {
   private int myLocationAccuracyTintColor;
   private int myLocationAccuracyAlpha;
 
-  private String apiBaseUrl;
-
   @Deprecated
   private boolean textureMode;
 
@@ -141,7 +139,6 @@ public class MapboxMapOptions implements Parcelable {
     myLocationAccuracyTintColor = in.readInt();
 
     style = in.readString();
-    apiBaseUrl = in.readString();
     textureMode = in.readByte() != 0;
   }
 
@@ -172,7 +169,6 @@ public class MapboxMapOptions implements Parcelable {
     try {
       mapboxMapOptions.camera(new CameraPosition.Builder(typedArray).build());
       mapboxMapOptions.styleUrl(typedArray.getString(R.styleable.mapbox_MapView_mapbox_styleUrl));
-      mapboxMapOptions.apiBaseUrl(typedArray.getString(R.styleable.mapbox_MapView_mapbox_apiBaseUrl));
 
       mapboxMapOptions.zoomGesturesEnabled(
         typedArray.getBoolean(R.styleable.mapbox_MapView_mapbox_uiZoomGestures, true));
@@ -281,17 +277,6 @@ public class MapboxMapOptions implements Parcelable {
       typedArray.recycle();
     }
     return mapboxMapOptions;
-  }
-
-  /**
-   * Specifies the URL used for API endpoint.
-   *
-   * @param apiBaseUrl The base of our API endpoint
-   * @return This
-   */
-  public MapboxMapOptions apiBaseUrl(String apiBaseUrl) {
-    this.apiBaseUrl = apiBaseUrl;
-    return this;
   }
 
   /**
@@ -656,15 +641,6 @@ public class MapboxMapOptions implements Parcelable {
   }
 
   /**
-   * Get the current configured API endpoint base URL.
-   *
-   * @return Base URL to be used API endpoint.
-   */
-  public String getApiBaseUrl() {
-    return apiBaseUrl;
-  }
-
-  /**
    * Get the current configured initial camera position for a map view.
    *
    * @return CameraPosition to be initially used.
@@ -1003,7 +979,6 @@ public class MapboxMapOptions implements Parcelable {
     dest.writeInt(myLocationAccuracyTintColor);
 
     dest.writeString(style);
-    dest.writeString(apiBaseUrl);
     dest.writeByte((byte) (textureMode ? 1 : 0));
   }
 
@@ -1114,9 +1089,6 @@ public class MapboxMapOptions implements Parcelable {
     if (style != null ? !style.equals(options.style) : options.style != null) {
       return false;
     }
-    if (apiBaseUrl != null ? !apiBaseUrl.equals(options.apiBaseUrl) : options.apiBaseUrl != null) {
-      return false;
-    }
     return false;
   }
 
@@ -1156,7 +1128,6 @@ public class MapboxMapOptions implements Parcelable {
     result = 31 * result + Arrays.hashCode(myLocationBackgroundPadding);
     result = 31 * result + myLocationAccuracyTintColor;
     result = 31 * result + myLocationAccuracyAlpha;
-    result = 31 * result + (apiBaseUrl != null ? apiBaseUrl.hashCode() : 0);
     result = 31 * result + (textureMode ? 1 : 0);
     result = 31 * result + (style != null ? style.hashCode() : 0);
     return result;

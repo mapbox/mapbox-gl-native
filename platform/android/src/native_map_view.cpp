@@ -10,6 +10,7 @@
 
 #include <sys/system_properties.h>
 
+#include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/util/platform.hpp>
 #include <mbgl/util/event.hpp>
 #include <mbgl/util/logging.hpp>
@@ -37,10 +38,16 @@ void log_egl_string(EGLDisplay display, EGLint name, const char *label) {
     }
 }
 
-NativeMapView::NativeMapView(JNIEnv *env_, jobject obj_, float pixelRatio, int availableProcessors_, size_t totalMemory_)
+NativeMapView::NativeMapView(JNIEnv* env_,
+                             jobject obj_,
+                             jni::Object<DefaultFileSourcePeer> fileSource_,
+                             float pixelRatio,
+                             int availableProcessors_,
+                             size_t totalMemory_)
     : env(env_),
       availableProcessors(availableProcessors_),
       totalMemory(totalMemory_),
+      fileSource(fileSource_.NewGlobalRef(*env)),
       threadPool(4) {
     mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::NativeMapView");
 
@@ -58,13 +65,13 @@ NativeMapView::NativeMapView(JNIEnv *env_, jobject obj_, float pixelRatio, int a
         return;
     }
 
-    fileSource = std::make_unique<mbgl::DefaultFileSource>(
-        mbgl::android::cachePath + "/mbgl-offline.db",
-        mbgl::android::apkPath);
+    jni::Field<DefaultFileSourcePeer, jlong> peerField{ *env, DefaultFileSourcePeer::javaClass,
+                                                        "peer" };
+    auto fileSourcePtr = reinterpret_cast<DefaultFileSourcePeer*>(fileSource->Get(*env, peerField));
 
     map = std::make_unique<mbgl::Map>(
         *this, mbgl::Size{ static_cast<uint32_t>(width), static_cast<uint32_t>(height) },
-        pixelRatio, *fileSource, threadPool, MapMode::Continuous);
+        pixelRatio, fileSourcePtr->getFileSource(), threadPool, MapMode::Continuous);
 
     float zoomFactor   = map->getMaxZoom() - map->getMinZoom() + 1;
     float cpuFactor    = availableProcessors;
@@ -217,8 +224,6 @@ void NativeMapView::render() {
 }
 
 mbgl::Map &NativeMapView::getMap() { return *map; }
-
-mbgl::DefaultFileSource &NativeMapView::getFileSource() { return *fileSource; }
 
 void NativeMapView::initializeDisplay() {
     mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::initializeDisplay");
