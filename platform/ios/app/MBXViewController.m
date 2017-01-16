@@ -89,6 +89,8 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
 @end
 
 @interface MBXCustomCalloutAnnotation : MGLPointAnnotation
+@property (nonatomic, assign) BOOL anchoredToAnnotation;
+@property (nonatomic, assign) BOOL dismissesAutomatically;
 @end
 
 @implementation MBXCustomCalloutAnnotation
@@ -624,6 +626,17 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
 
     [self.mapView addAnnotation:triangle];
 
+    // West coast polyline
+    //
+    CLLocationCoordinate2D lineCoordinates[4] = {
+        CLLocationCoordinate2DMake(47.6025, -122.3327),
+        CLLocationCoordinate2DMake(45.5189, -122.6726),
+        CLLocationCoordinate2DMake(37.7790, -122.4177),
+        CLLocationCoordinate2DMake(34.0532, -118.2349)
+    };
+    MGLPolyline *line = [MGLPolyline polylineWithCoordinates:lineCoordinates count:4];
+    [self.mapView addAnnotation:line];
+
     // Orcas Island, WA hike polyline
     //
     NSDictionary *hike = [NSJSONSerialization JSONObjectWithData:
@@ -699,12 +712,28 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
 {
     [self.mapView removeAnnotations:self.mapView.annotations];
 
-    MBXCustomCalloutAnnotation *annotation = [[MBXCustomCalloutAnnotation alloc] init];
-    annotation.coordinate = CLLocationCoordinate2DMake(48.8533940, 2.3775439);
-    annotation.title = @"Custom Callout";
+    MBXCustomCalloutAnnotation *firstAnnotation = [[MBXCustomCalloutAnnotation alloc] init];
+    firstAnnotation.coordinate = CLLocationCoordinate2DMake(48.8533940, 2.3775439);
+    firstAnnotation.title = @"Open anchored to annotation";
+    firstAnnotation.anchoredToAnnotation = YES;
+    firstAnnotation.dismissesAutomatically = NO;
+    
+    MBXCustomCalloutAnnotation *secondAnnotation = [[MBXCustomCalloutAnnotation alloc] init];
+    secondAnnotation.coordinate = CLLocationCoordinate2DMake(48.8543940, 2.3775439);
+    secondAnnotation.title = @"Open not anchored to annotation";
+    secondAnnotation.anchoredToAnnotation = NO;
+    secondAnnotation.dismissesAutomatically = NO;
 
-    [self.mapView addAnnotation:annotation];
-    [self.mapView showAnnotations:@[annotation] animated:YES];
+    MBXCustomCalloutAnnotation *thirdAnnotation = [[MBXCustomCalloutAnnotation alloc] init];
+    thirdAnnotation.coordinate = CLLocationCoordinate2DMake(48.8553940, 2.3775439);
+    thirdAnnotation.title = @"Dismisses automatically";
+    thirdAnnotation.anchoredToAnnotation = YES;
+    thirdAnnotation.dismissesAutomatically = YES;
+    
+    NSArray *annotations = @[firstAnnotation, secondAnnotation, thirdAnnotation];
+    [self.mapView addAnnotations:annotations];
+    
+    [self.mapView showAnnotations:annotations animated:YES];
 }
 
 - (void)styleWaterLayer
@@ -901,8 +930,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     }
     
     dispatch_async(dispatch_get_main_queue(), ^{
-        MGLShapeCollectionFeature *features = [MGLShapeCollectionFeature shapeCollectionWithShapes:visibleFeatures];
-        MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:querySourceID shape:features options:nil];
+        MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:querySourceID features:visibleFeatures options:nil];
         [self.mapView.style addSource:source];
         
         MGLFillStyleLayer *fillLayer = [[MGLFillStyleLayer alloc] initWithIdentifier:queryLayerID source:source];
@@ -1184,13 +1212,13 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
         MGLSymbolStyleLayer *layer = (MGLSymbolStyleLayer *)[self.mapView.style layerWithIdentifier:layerName];
 
         if ([layer isKindOfClass:[MGLSymbolStyleLayer class]]) {
-            if ([layer.textField isKindOfClass:[MGLStyleConstantValue class]]) {
-                MGLStyleConstantValue *label = (MGLStyleConstantValue<NSString *> *)layer.textField;
+            if ([layer.text isKindOfClass:[MGLStyleConstantValue class]]) {
+                MGLStyleConstantValue *label = (MGLStyleConstantValue<NSString *> *)layer.text;
                 if ([label.rawValue hasPrefix:@"{name"]) {
-                    layer.textField = [MGLStyleValue valueWithRawValue:language];
+                    layer.text = [MGLStyleValue valueWithRawValue:language];
                 }
-            } else if ([layer.textField isKindOfClass:[MGLStyleFunction class]]) {
-                MGLStyleFunction *function = (MGLStyleFunction<NSString *> *)layer.textField;
+            } else if ([layer.text isKindOfClass:[MGLStyleFunction class]]) {
+                MGLStyleFunction *function = (MGLStyleFunction<NSString *> *)layer.text;
                 [function.stops enumerateKeysAndObjectsUsingBlock:^(id zoomLevel, id stop, BOOL *done) {
                     if ([stop isKindOfClass:[MGLStyleConstantValue class]]) {
                         MGLStyleConstantValue *label = (MGLStyleConstantValue<NSString *> *)stop;
@@ -1199,7 +1227,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                         }
                     }
                 }];
-                layer.textField = function;
+                layer.text = function;
             }
         } else {
             NSLog(@"%@ is not a symbol style layer", layerName);
@@ -1537,9 +1565,15 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     return YES;
 }
 
+- (CGFloat)mapView:(__unused MGLMapView *)mapView alphaForShapeAnnotation:(MGLShape *)annotation
+{
+    return ([annotation isKindOfClass:[MGLPolygon class]] ? 0.5 : 1.0);
+}
+
 - (UIColor *)mapView:(__unused MGLMapView *)mapView strokeColorForShapeAnnotation:(MGLShape *)annotation
 {
-    return ([annotation isKindOfClass:[MGLPolyline class]] ? [UIColor purpleColor] : [UIColor blackColor]);
+    UIColor *color = [annotation isKindOfClass:[MGLPolyline class]] ? [UIColor greenColor] : [UIColor blackColor];
+    return [color colorWithAlphaComponent:0.9];
 }
 
 - (UIColor *)mapView:(__unused MGLMapView *)mapView fillColorForPolygonAnnotation:(__unused MGLPolygon *)annotation
@@ -1582,8 +1616,11 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     if ([annotation respondsToSelector:@selector(title)]
         && [annotation isKindOfClass:[MBXCustomCalloutAnnotation class]])
     {
+        MBXCustomCalloutAnnotation *customAnnotation = (MBXCustomCalloutAnnotation *)annotation;
         MBXCustomCalloutView *calloutView = [[MBXCustomCalloutView alloc] init];
         calloutView.representedObject = annotation;
+        calloutView.anchoredToAnnotation = customAnnotation.anchoredToAnnotation;
+        calloutView.dismissesAutomatically = customAnnotation.dismissesAutomatically;
         return calloutView;
     }
     return nil;
@@ -1613,8 +1650,8 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     {
         return;
     }
-    
-    MGLPointAnnotation *point = annotation;
+
+    MGLPointAnnotation *point = (MGLPointAnnotation *)annotation;
     point.coordinate = [self.mapView convertPoint:self.mapView.center toCoordinateFromView:self.mapView];
 }
 

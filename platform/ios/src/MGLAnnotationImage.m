@@ -30,6 +30,41 @@
     return self;
 }
 
++ (BOOL)supportsSecureCoding {
+    return YES;
+}
+
+- (instancetype)initWithCoder:(NSCoder *)decoder {
+    if (self = [super init]) {
+        _image = [decoder decodeObjectOfClass:[UIImage class] forKey:@"image"];
+        _reuseIdentifier = [decoder decodeObjectOfClass:[NSString class] forKey:@"reuseIdentifier"];
+        _enabled = [decoder decodeBoolForKey:@"enabled"];
+    }
+    return self;
+}
+
+- (void)encodeWithCoder:(NSCoder *)coder {
+    [coder encodeObject:_image forKey:@"image"];
+    [coder encodeObject:_reuseIdentifier forKey:@"reuseIdentifier"];
+    [coder encodeBool:_enabled forKey:@"enabled"];
+}
+
+- (BOOL)isEqual:(id)other {
+    if (self == other) return YES;
+    if (![other isKindOfClass:[MGLAnnotationImage class]]) return NO;
+    
+    MGLAnnotationImage *otherAnnotationImage = other;
+    
+    return ((!_reuseIdentifier && !otherAnnotationImage.reuseIdentifier)
+            || [_reuseIdentifier isEqualToString:otherAnnotationImage.reuseIdentifier])
+    && _enabled == otherAnnotationImage.enabled
+    && (_image == otherAnnotationImage.image || [UIImagePNGRepresentation(_image) isEqualToData:UIImagePNGRepresentation(otherAnnotationImage.image)]);
+}
+
+- (NSUInteger)hash {
+    return _reuseIdentifier.hash + _enabled + _image.hash;
+}
+
 - (void)setImage:(UIImage *)image {
     _image = image;
     [self.delegate annotationImageNeedsRedisplay:self];

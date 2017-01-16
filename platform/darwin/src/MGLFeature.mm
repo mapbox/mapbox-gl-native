@@ -10,6 +10,7 @@
 #import "MGLPolyline+MGLAdditions.h"
 #import "MGLPolygon+MGLAdditions.h"
 #import "NSDictionary+MGLAdditions.h"
+#import "NSArray+MGLAdditions.h"
 
 #import "NSExpression+MGLAdditions.h"
 
@@ -24,6 +25,10 @@
 
 @synthesize identifier;
 @synthesize attributes;
+
+MGL_DEFINE_FEATURE_INIT_WITH_CODER();
+MGL_DEFINE_FEATURE_ENCODE();
+MGL_DEFINE_FEATURE_IS_EQUAL();
 
 - (id)attributeForKey:(NSString *)key {
     return self.attributes[key];
@@ -47,6 +52,10 @@
 @synthesize identifier;
 @synthesize attributes;
 
+MGL_DEFINE_FEATURE_INIT_WITH_CODER();
+MGL_DEFINE_FEATURE_ENCODE();
+MGL_DEFINE_FEATURE_IS_EQUAL();
+
 - (id)attributeForKey:(NSString *)key {
     return self.attributes[key];
 }
@@ -68,6 +77,10 @@
 
 @synthesize identifier;
 @synthesize attributes;
+
+MGL_DEFINE_FEATURE_INIT_WITH_CODER();
+MGL_DEFINE_FEATURE_ENCODE();
+MGL_DEFINE_FEATURE_IS_EQUAL();
 
 - (id)attributeForKey:(NSString *)key {
     return self.attributes[key];
@@ -91,6 +104,10 @@
 @synthesize identifier;
 @synthesize attributes;
 
+MGL_DEFINE_FEATURE_INIT_WITH_CODER();
+MGL_DEFINE_FEATURE_ENCODE();
+MGL_DEFINE_FEATURE_IS_EQUAL();
+
 - (id)attributeForKey:(NSString *)key {
     return self.attributes[key];
 }
@@ -113,6 +130,10 @@
 @synthesize identifier;
 @synthesize attributes;
 
+MGL_DEFINE_FEATURE_INIT_WITH_CODER();
+MGL_DEFINE_FEATURE_ENCODE();
+MGL_DEFINE_FEATURE_IS_EQUAL();
+
 - (id)attributeForKey:(NSString *)key {
     return self.attributes[key];
 }
@@ -134,6 +155,10 @@
 
 @synthesize identifier;
 @synthesize attributes;
+
+MGL_DEFINE_FEATURE_INIT_WITH_CODER();
+MGL_DEFINE_FEATURE_ENCODE();
+MGL_DEFINE_FEATURE_IS_EQUAL();
 
 - (id)attributeForKey:(NSString *)key {
     return self.attributes[key];
@@ -159,9 +184,13 @@
 
 @dynamic shapes;
 
-+ (instancetype)shapeCollectionWithShapes:(NSArray *)shapes {
++ (instancetype)shapeCollectionWithShapes:(NS_ARRAY_OF(MGLShape<MGLFeature> *) *)shapes {
     return [super shapeCollectionWithShapes:shapes];
 }
+
+MGL_DEFINE_FEATURE_INIT_WITH_CODER();
+MGL_DEFINE_FEATURE_ENCODE();
+MGL_DEFINE_FEATURE_IS_EQUAL();
 
 - (id)attributeForKey:(NSString *)key {
     return self.attributes[key];

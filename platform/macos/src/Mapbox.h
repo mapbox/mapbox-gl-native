@@ -50,6 +50,5 @@ FOUNDATION_EXPORT MGL_EXPORT const unsigned char MapboxVersionString[];
 #import "MGLTilePyramidOfflineRegion.h"
 #import "MGLTypes.h"
 #import "NSValue+MGLAdditions.h"
-#import "NSValue+MGLStyleEnumAttributeAdditions.h"
 #import "MGLStyleValue.h"
 #import "MGLAttributionInfo.h"

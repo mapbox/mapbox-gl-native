@@ -7,6 +7,7 @@
 
 #import "NSURL+MGLAdditions.h"
 
+#include <mbgl/map/map.hpp>
 #include <mbgl/style/sources/geojson_source.hpp>
 
 const MGLShapeSourceOption MGLShapeSourceOptionClustered = @"MGLShapeSourceOptionClustered";
@@ -53,6 +54,21 @@ const MGLShapeSourceOption MGLShapeSourceOptionSimplificationTolerance = @"MGLSh
         self.shape = shape;
     }
     return self;
+}
+
+- (instancetype)initWithIdentifier:(NSString *)identifier features:(NS_ARRAY_OF(MGLShape<MGLFeature> *) *)features options:(nullable NS_DICTIONARY_OF(MGLShapeSourceOption, id) *)options {
+    for (id <MGLFeature> feature in features) {
+        if (![feature conformsToProtocol:@protocol(MGLFeature)]) {
+            [NSException raise:NSInvalidArgumentException format:@"The object %@ included in the features argument does not conform to the MGLFeature protocol.", feature];
+        }
+    }
+    MGLShapeCollectionFeature *shapeCollectionFeature = [MGLShapeCollectionFeature shapeCollectionWithShapes:features];
+    return [self initWithIdentifier:identifier shape:shapeCollectionFeature options:options];
+}
+
+- (instancetype)initWithIdentifier:(NSString *)identifier shapes:(NS_ARRAY_OF(MGLShape *) *)shapes options:(nullable NS_DICTIONARY_OF(MGLShapeSourceOption, id) *)options {
+    MGLShapeCollection *shapeCollection = [MGLShapeCollection shapeCollectionWithShapes:shapes];
+    return [self initWithIdentifier:identifier shape:shapeCollection options:options];
 }
 
 - (instancetype)initWithRawSource:(mbgl::style::GeoJSONSource *)rawSource {

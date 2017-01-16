@@ -5,6 +5,7 @@
 #import "MGLTileSource_Private.h"
 #import "NSURL+MGLAdditions.h"
 
+#include <mbgl/map/map.hpp>
 #include <mbgl/style/sources/vector_source.hpp>
 
 @interface MGLVectorSource ()
@@ -67,6 +68,11 @@
 
 - (void)setRawSource:(mbgl::style::VectorSource *)rawSource {
     super.rawSource = rawSource;
+}
+
+- (NSURL *)configurationURL {
+    auto url = self.rawSource->getURL();
+    return url ? [NSURL URLWithString:@(url->c_str())] : nil;
 }
 
 - (NSString *)attributionHTMLString {

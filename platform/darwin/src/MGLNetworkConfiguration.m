@@ -1,5 +1,4 @@
 #import "MGLNetworkConfiguration.h"
-#import "NSProcessInfo+MGLAdditions.h"
 
 @implementation MGLNetworkConfiguration
 
@@ -12,9 +11,6 @@
 }
 
 + (instancetype)sharedManager {
-    if (NSProcessInfo.processInfo.mgl_isInterfaceBuilderDesignablesAgent) {
-        return nil;
-    }
     static dispatch_once_t onceToken;
     static MGLNetworkConfiguration *_sharedManager;
     void (^setupBlock)() = ^{

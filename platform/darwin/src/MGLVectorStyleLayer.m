@@ -4,12 +4,12 @@
 
 - (void)setPredicate:(NSPredicate *)predicate {
     [NSException raise:@"MGLAbstractClassException"
-                format:@"MGLVectorLayer is an abstract class"];
+                format:@"MGLVectorStyleLayer is an abstract class"];
 }
 
 - (NSPredicate *)predicate {
     [NSException raise:@"MGLAbstractClassException"
-                format:@"MGLVectorLayer is an abstract class"];
+                format:@"MGLVectorStyleLayer is an abstract class"];
     return nil;
 }
 

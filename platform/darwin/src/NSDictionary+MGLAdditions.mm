@@ -15,7 +15,7 @@
             propertyMap[[key UTF8String]] = [array mgl_vector];
         } else {
             NSExpression *expression = [NSExpression expressionForConstantValue:self[key]];
-            propertyMap[[key UTF8String]] = [expression mgl_filterValue];
+            propertyMap[[key UTF8String]] = expression.mgl_constantMBGLValue;
         }
     }
     return propertyMap;

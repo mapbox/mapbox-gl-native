@@ -6,8 +6,8 @@
     return [MGLStyleConstantValue valueWithRawValue:rawValue];
 }
 
-+ (instancetype)valueWithBase:(CGFloat)base stops:(NSDictionary *)stops {
-    return [MGLStyleFunction functionWithBase:base stops:stops];
++ (instancetype)valueWithInterpolationBase:(CGFloat)interpolationBase stops:(NSDictionary *)stops {
+    return [MGLStyleFunction functionWithInterpolationBase:interpolationBase stops:stops];
 }
 
 + (instancetype)valueWithStops:(NSDictionary *)stops {
@@ -49,44 +49,44 @@
 
 @implementation MGLStyleFunction
 
-+ (instancetype)functionWithBase:(CGFloat)base stops:(NSDictionary *)stops {
-    return [[self alloc] initWithBase:base stops:stops];
++ (instancetype)functionWithInterpolationBase:(CGFloat)interpolationBase stops:(NSDictionary *)stops {
+    return [[self alloc] initWithInterpolationBase:interpolationBase stops:stops];
 }
 
 + (instancetype)functionWithStops:(NSDictionary *)stops {
-    return [[self alloc] initWithBase:1 stops:stops];
+    return [[self alloc] initWithInterpolationBase:1 stops:stops];
 }
 
 - (instancetype)init {
-    return [self initWithBase:1 stops:@{}];
+    return [self initWithInterpolationBase:1 stops:@{}];
 }
 
-- (instancetype)initWithBase:(CGFloat)base stops:(NSDictionary *)stops {
+- (instancetype)initWithInterpolationBase:(CGFloat)interpolationBase stops:(NSDictionary *)stops {
     if (self = [super init]) {
         if (!stops.count)
         {
             [NSException raise:NSInvalidArgumentException format:@"%@ requires at least one stop.", self];
         }
-        _base = base;
+        _interpolationBase = interpolationBase;
         _stops = stops;
     }
     return self;
 }
 
 - (NSString *)description {
-    return [NSString stringWithFormat:@"<%@: %p, base = %f; stops = %@>",
+    return [NSString stringWithFormat:@"<%@: %p, interpolationBase = %f; stops = %@>",
             NSStringFromClass([self class]), (void *)self,
-            self.base,
+            self.interpolationBase,
             self.stops];
 }
 
 - (BOOL)isEqual:(MGLStyleFunction *)other {
-    return ([other isKindOfClass:[self class]] && other.base == self.base
+    return ([other isKindOfClass:[self class]] && other.interpolationBase == self.interpolationBase
             && [other.stops isEqualToDictionary:self.stops]);
 }
 
 - (NSUInteger)hash {
-    return self.base + self.stops.hash;
+    return self.interpolationBase + self.stops.hash;
 }
 
 @end

@@ -96,6 +96,32 @@ To add a localization to the macOS SDK:
 1. In the Project navigator, expand each .strings and .stringsdict file in the project. An additional version for your localization should be listed; translate it. Translate everything on the right side of the equals sign. Leave the left side and any comments unmodified. See Apple’s documentation on the [.strings](https://developer.apple.com/library/content/documentation/Cocoa/Conceptual/LoadingResources/Strings/Strings.html) and [.stringsdict](https://developer.apple.com/library/content/documentation/MacOSX/Conceptual/BPInternational/StringsdictFileFormat/StringsdictFileFormat.html) formats.
 1. You’re already most of the way towards localizing the iOS SDK too – consider [completing that localization](../ios/DEVELOPING.md#adding-a-localization).
 
+### Adding a code example
+
+To add an example code listing to the documentation for a class or class member:
+
+1. Add a test method named in the form `testMGLClass` or `testMGLClass$method`
+   to [MGLDocumentationExampleTests](test/MGLDocumentationExampleTests.swift).
+   Wrap the code you’d like to appear in the documentation within
+   `//#-example-code` and `//#-end-example-code` comments.
+1. Insert the code listings into the headers:
+
+```bash
+make darwin-update-examples
+```
+
+[SourceKitten](https://github.com/jpsim/SourceKitten/) is required and will be installed automatically using Homebrew.
+
+## Testing
+
+`make macos-test` builds and runs unit tests of cross-platform code as well as the SDK.
+
+To instead run the cross-platform tests in Xcode instead of on the command line:
+
+1. Run `make xproj` to set up the workspace.
+1. Change the scheme to “mbgl-test” and press Command-R to run core unit tests.
+1. Change the scheme to “CI” and press Command-U to run SDK integration tests.
+
 ## Access tokens
 
 The demo applications use Mapbox vector tiles, which require a Mapbox account and API access token. Obtain an access token on the [Mapbox account page](https://www.mapbox.com/studio/account/tokens/). You will be prompted for this access token the first time you launch the demo application.

@@ -26,8 +26,8 @@ typedef NS_ENUM (NSInteger, MGLOfflinePackState) {
      The pack is incomplete and is not currently downloading.
      
      This is the initial state of a pack that is created using the
-     `-[MGLOfflinePack addPackForRegion:withContext:completionHandler:]` method,
-     as well as after the `-[MGLOfflinePack suspend]` method is
+     `-[MGLOfflineStorage addPackForRegion:withContext:completionHandler:]`
+     method, as well as after the `-[MGLOfflinePack suspend]` method is
      called.
      */
     MGLOfflinePackStateInactive = 1,
