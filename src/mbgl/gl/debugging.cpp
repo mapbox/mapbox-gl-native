@@ -80,34 +80,6 @@ static ExtensionFunction<
         {"GL_ARB_debug_output", "glDebugMessageCallbackARB"}
     });
 
-static ExtensionFunction<
-    void (GLenum source,
-          GLuint id,
-          GLsizei length,
-          const GLchar *message)>
-    PushDebugGroup({
-        {"GL_KHR_debug", "glPushDebugGroup"}
-    });
-
-static ExtensionFunction<
-    void ()>
-    PopDebugGroup({
-        {"GL_KHR_debug", "glPopDebugGroup"}
-    });
-
-static ExtensionFunction<
-    void (GLsizei length,
-          const GLchar *marker)>
-    PushGroupMarkerEXT({
-      {"GL_EXT_debug_marker", "glPushGroupMarkerEXT"}
-    });
-
-static ExtensionFunction<
-    void ()>
-    PopGroupMarkerEXT({
-      {"GL_EXT_debug_marker", "glPopGroupMarkerEXT"}
-    });
-
 void debugCallback(GLenum source,
                    GLenum type,
                    GLuint id,
@@ -170,6 +142,35 @@ void enable() {
     MBGL_CHECK_ERROR(DebugMessageCallback(debugCallback, nullptr));
 }
 
+#ifndef NDEBUG
+static ExtensionFunction<
+    void (GLenum source,
+          GLuint id,
+          GLsizei length,
+          const GLchar *message)>
+    PushDebugGroup({
+        {"GL_KHR_debug", "glPushDebugGroup"}
+    });
+
+static ExtensionFunction<
+    void ()>
+    PopDebugGroup({
+        {"GL_KHR_debug", "glPopDebugGroup"}
+    });
+
+static ExtensionFunction<
+    void (GLsizei length,
+          const GLchar *marker)>
+    PushGroupMarkerEXT({
+      {"GL_EXT_debug_marker", "glPushGroupMarkerEXT"}
+    });
+
+static ExtensionFunction<
+    void ()>
+    PopGroupMarkerEXT({
+      {"GL_EXT_debug_marker", "glPopGroupMarkerEXT"}
+    });
+
 group::group(const std::string& str) {
     if (PushDebugGroup) {
         PushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, GLsizei(str.size()), str.c_str());
@@ -185,6 +186,7 @@ group::~group() {
         PopGroupMarkerEXT();
     }
 }
+#endif
 
 } // namespace debugging
 } // namespace gl
