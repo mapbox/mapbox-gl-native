@@ -17,7 +17,7 @@ if(NOT EXISTS "mapbox-gl-js/package.json")
    # Symlink mapbox-gl-js/node_modules so that the modules that are
    # about to be installed get cached between CI runs.
    execute_process(
-        COMMAND ln -s ../node_modules node_modules
+        COMMAND ln -sF ../node_modules .
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/mapbox-gl-js)
    execute_process(
         COMMAND npm install
