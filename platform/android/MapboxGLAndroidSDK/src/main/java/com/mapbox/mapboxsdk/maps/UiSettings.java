@@ -367,7 +367,7 @@ public final class UiSettings {
    * <p>
    * Enables or disables the Mapbox logo.
    * </p>
-   * By default, the compass is enabled.
+   * By default, the logo is enabled.
    *
    * @param enabled True to enable the logo; false to disable the logo.
    */

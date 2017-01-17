@@ -6,14 +6,30 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- The `MGLShape` class is an abstract class that defines the basic properties for
- all shape-based annotation objects. This class must be subclassed and cannot be
- used as is. Subclasses are responsible for defining the geometry of the shape
- and providing an appropriate value for the coordinate property inherited from
- the `MGLAnnotation` protocol.
+ `MGLShape` is an abstract class that represents a shape or annotation. Shapes
+ constitute the content of a map – not only the overlays atop the map, but also
+ the content that forms the base map.
+ 
+ You do not create instances of this class directly or create subclasses of this
+ class. Instead, you create instances of `MGLPointAnnotation`, 
+ `MGLPointCollection`, `MGLPolyline`, `MGLMultiPolyline`, `MGLPolygon`,
+ `MGLMultiPolygon`, or `MGLShapeCollection`. The shape classes correspond to the
+ <a href="https://tools.ietf.org/html/rfc7946#section-3.1">Geometry</a> object
+ types in the GeoJSON standard, but some have nonstandard names for backwards
+ compatibility.
+ 
+ Although you do not create instances of this class directly, you can use its
+ `+[MGLShape shapeWithData:encoding:error:]` factory method to create one of the
+ concrete subclasses of `MGLShape` noted above from GeoJSON data.
+ 
+ You can add shapes to the map by adding them to an `MGLShapeSource` object.
+ Configure the appearance of an `MGLShapeSource`’s or `MGLVectorSource`’s shapes
+ collectively using a concrete instance of `MGLVectorStyleLayer`. Alternatively,
+ you can add some kinds of shapes directly to a map view as annotations or
+ overlays.
  */
 MGL_EXPORT
-@interface MGLShape : NSObject <MGLAnnotation>
+@interface MGLShape : NSObject <MGLAnnotation, NSSecureCoding>
 
 #pragma mark Creating a Shape
 
@@ -26,6 +42,14 @@ MGL_EXPORT
  `MGLShape` that conforms to the `MGLFeature` protocol. If it is a feature
  collection object, the returned value is an instance of
  `MGLShapeCollectionFeature`.
+ 
+ ### Example
+ 
+ ```swift
+ let url = mainBundle.url(forResource: "amsterdam", withExtension: "geojson")!
+ let data = try! Data(contentsOf: url)
+ let feature = try! MGLShape(data: data, encoding: String.Encoding.utf8.rawValue) as! MGLShapeCollectionFeature
+ ```
  
  @param data String data containing GeoJSON source code.
  @param encoding The encoding used by `data`.
@@ -40,21 +64,34 @@ MGL_EXPORT
 #pragma mark Accessing the Shape Attributes
 
 /**
- The title of the shape annotation. The default value of this property is `nil`.
+ The title of the shape annotation.
+ 
+ The default value of this property is `nil`.
+ 
+ This property is ignored when the shape is used in an `MGLShapeSource`. To name
+ a shape used in a shape source, create an `MGLFeature` and add an attribute to
+ the `MGLFeature.attributes` property.
  */
 @property (nonatomic, copy, nullable) NSString *title;
 
 /**
  The subtitle of the shape annotation. The default value of this property is
  `nil`.
+ 
+ This property is ignored when the shape is used in an `MGLShapeSource`. To
+ provide additional information about a shape used in a shape source, create an
+ `MGLFeature` and add an attribute to the `MGLFeature.attributes` property.
  */
 @property (nonatomic, copy, nullable) NSString *subtitle;
 
 #if !TARGET_OS_IPHONE
 
 /**
- The tooltip of the shape annotation. The default value of this property is
- `nil`.
+ The tooltip of the shape annotation.
+ 
+ The default value of this property is `nil`.
+ 
+ This property is ignored when the shape is used in an `MGLShapeSource`.
  */
 @property (nonatomic, copy, nullable) NSString *toolTip;
 

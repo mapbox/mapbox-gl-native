@@ -11,7 +11,7 @@ NS_ASSUME_NONNULL_BEGIN
  and put into a reuse queue that is maintained by the map view.
  */
 MGL_EXPORT
-@interface MGLAnnotationImage : NSObject
+@interface MGLAnnotationImage : NSObject <NSSecureCoding>
 
 #pragma mark Initializing and Preparing the Image Object
 

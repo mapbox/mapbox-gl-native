@@ -77,9 +77,13 @@ class Shaping {
 
 class SDFGlyph {
 public:
+    // We're using this value throughout the Mapbox GL ecosystem. If this is different, the glyphs
+    // also need to be reencoded.
+    static constexpr const uint8_t borderSize = 3;
+
     uint32_t id = 0;
 
-    // A signed distance field of the glyph with a border of 3 pixels.
+    // A signed distance field of the glyph with a border (see above).
     std::string bitmap;
 
     // Glyph metrics

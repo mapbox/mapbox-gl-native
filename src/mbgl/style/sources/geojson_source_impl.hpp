@@ -17,7 +17,7 @@ public:
     ~Impl() final;
 
     void setURL(std::string);
-    optional<std::string> getURL();
+    optional<std::string> getURL() const;
 
     void setGeoJSON(const GeoJSON&);
     void setTileData(GeoJSONTile&, const OverscaledTileID& tileID);

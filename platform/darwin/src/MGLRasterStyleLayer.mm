@@ -1,5 +1,5 @@
 // This file is generated. 
-// Edit platform/darwin/scripts/generate-style-code.js, then run `make style-code-darwin`.
+// Edit platform/darwin/scripts/generate-style-code.js, then run `make darwin-style-code`.
 
 #import "MGLSource.h"
 #import "MGLMapView_Private.h"
@@ -8,6 +8,7 @@
 #import "MGLStyleValue_Private.h"
 #import "MGLRasterStyleLayer.h"
 
+#include <mbgl/map/map.hpp>
 #include <mbgl/style/layers/raster_layer.hpp>
 
 @interface MGLRasterStyleLayer ()
@@ -39,6 +40,13 @@
 - (void)setRawLayer:(mbgl::style::RasterLayer *)rawLayer
 {
     super.rawLayer = rawLayer;
+}
+
+- (NSString *)sourceIdentifier
+{
+    MGLAssertStyleLayerIsValid();
+    
+    return @(self.rawLayer->getSourceID().c_str());
 }
 
 #pragma mark - Adding to and removing from a map view
@@ -96,9 +104,11 @@
     return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(propertyValue);
 }
 
-
 - (void)setRasterBrightnessMax:(MGLStyleValue<NSNumber *> *)rasterBrightnessMax {
-    NSAssert(NO, @"Use -setMaximumRasterBrightness: instead.");
+}
+
+- (MGLStyleValue<NSNumber *> *)rasterBrightnessMax {
+    return self.maximumRasterBrightness;
 }
 
 - (void)setMinimumRasterBrightness:(MGLStyleValue<NSNumber *> *)minimumRasterBrightness {
@@ -115,9 +125,11 @@
     return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(propertyValue);
 }
 
-
 - (void)setRasterBrightnessMin:(MGLStyleValue<NSNumber *> *)rasterBrightnessMin {
-    NSAssert(NO, @"Use -setMinimumRasterBrightness: instead.");
+}
+
+- (MGLStyleValue<NSNumber *> *)rasterBrightnessMin {
+    return self.minimumRasterBrightness;
 }
 
 - (void)setRasterContrast:(MGLStyleValue<NSNumber *> *)rasterContrast {
@@ -162,9 +174,11 @@
     return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(propertyValue);
 }
 
-
 - (void)setRasterHueRotate:(MGLStyleValue<NSNumber *> *)rasterHueRotate {
-    NSAssert(NO, @"Use -setRasterHueRotation: instead.");
+}
+
+- (MGLStyleValue<NSNumber *> *)rasterHueRotate {
+    return self.rasterHueRotation;
 }
 
 - (void)setRasterOpacity:(MGLStyleValue<NSNumber *> *)rasterOpacity {

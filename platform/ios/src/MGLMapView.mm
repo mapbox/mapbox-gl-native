@@ -7,6 +7,7 @@
 #import <GLKit/GLKit.h>
 #import <OpenGLES/EAGL.h>
 
+#include <mbgl/map/map.hpp>
 #include <mbgl/map/view.hpp>
 #include <mbgl/annotation/annotation.hpp>
 #include <mbgl/sprite/sprite_image.hpp>
@@ -347,6 +348,11 @@ public:
     return self;
 }
 
++ (NS_SET_OF(NSString *) *)keyPathsForValuesAffectingStyle
+{
+    return [NSSet setWithObject:@"styleURL"];
+}
+
 + (NS_SET_OF(NSString *) *)keyPathsForValuesAffectingStyleURL
 {
     return [NSSet setWithObjects:@"styleURL__", nil];
@@ -369,10 +375,8 @@ public:
     }
 
     styleURL = styleURL.mgl_URLByStandardizingScheme;
-    [self willChangeValueForKey:@"style"];
-    _style = [[MGLStyle alloc] initWithMapView:self];
+    self.style = nil;
     _mbglMap->setStyleURL([[styleURL absoluteString] UTF8String]);
-    [self didChangeValueForKey:@"style"];
 }
 
 - (IBAction)reloadStyle:(__unused id)sender {
@@ -1734,7 +1738,7 @@ public:
     _attributionInfos = [self.style attributionInfosWithFontSize:[UIFont buttonFontSize] linkColor:nil];
     for (MGLAttributionInfo *info in _attributionInfos)
     {
-        NSString *title = [info.title.string capitalizedStringWithLocale:[NSLocale currentLocale]];
+        NSString *title = [info.title.string mgl_titleCasedStringWithLocale:[NSLocale currentLocale]];
         [self.attributionSheet addButtonWithTitle:title];
     }
     
@@ -3137,23 +3141,9 @@ public:
 
 - (double)alphaForShapeAnnotation:(MGLShape *)annotation
 {
-    // The explicit -mapView:alphaForShapeAnnotation: delegate method is deprecated
-    // but still used, if implemented. When not implemented, call the stroke or
-    // fill color delegate methods and pull the alpha from the returned color.
     if (_delegateHasAlphasForShapeAnnotations)
     {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
         return [self.delegate mapView:self alphaForShapeAnnotation:annotation];
-#pragma clang diagnostic pop
-    }
-    else if ([annotation isKindOfClass:[MGLPolygon class]])
-    {
-        return [self fillColorForPolygonAnnotation:(MGLPolygon *)annotation].a ?: 1.0;
-    }
-    else if ([annotation isKindOfClass:[MGLShape class]])
-    {
-        return [self strokeColorForShapeAnnotation:annotation].a ?: 1.0;
     }
     return 1.0;
 }
@@ -4566,21 +4556,34 @@ public:
                 || self.userTrackingMode == MGLUserTrackingModeNone
                 || self.userTrackingState != MGLUserTrackingStateChanged)
             {
-                // Deselect annotation if it lies outside the viewport
-                if (self.selectedAnnotation) {
-                    MGLAnnotationTag tag = [self annotationTagForAnnotation:self.selectedAnnotation];
-                    MGLAnnotationContext &annotationContext = _annotationContextsByAnnotationTag.at(tag);
-                    MGLAnnotationView *annotationView = annotationContext.annotationView;
-                    
-                    CGRect rect = [self positioningRectForCalloutForAnnotationWithTag:tag];
-                    
-                    if (annotationView)
-                    {
-                        rect = annotationView.frame;
-                    }
-                    
-                    if ( ! CGRectIntersectsRect(rect, self.frame)) {
-                        [self deselectAnnotation:self.selectedAnnotation animated:NO];
+                UIView<MGLCalloutView> *calloutView = self.calloutViewForSelectedAnnotation;
+                BOOL dismissesAutomatically = (calloutView
+                                               && [calloutView respondsToSelector:@selector(dismissesAutomatically)]
+                                               && calloutView.dismissesAutomatically);
+                // dismissesAutomatically is an optional property and we want to dismiss
+                // the callout view if it's unimplemented.
+                if (dismissesAutomatically || ![calloutView respondsToSelector:@selector(dismissesAutomatically)])
+                {
+                    [self deselectAnnotation:self.selectedAnnotation animated:NO];
+                }
+                else
+                {
+                    // Deselect annotation if it lies outside the viewport
+                    if (self.selectedAnnotation) {
+                        MGLAnnotationTag tag = [self annotationTagForAnnotation:self.selectedAnnotation];
+                        MGLAnnotationContext &annotationContext = _annotationContextsByAnnotationTag.at(tag);
+                        MGLAnnotationView *annotationView = annotationContext.annotationView;
+                        
+                        CGRect rect = [self positioningRectForCalloutForAnnotationWithTag:tag];
+                        
+                        if (annotationView)
+                        {
+                            rect = annotationView.frame;
+                        }
+                        
+                        if ( ! CGRectIntersectsRect(rect, self.frame)) {
+                            [self deselectAnnotation:self.selectedAnnotation animated:NO];
+                        }
                     }
                 }
             }
@@ -4690,11 +4693,7 @@ public:
         }
         case mbgl::MapChangeDidFinishLoadingStyle:
         {
-            [self.style willChangeValueForKey:@"name"];
-            [self.style willChangeValueForKey:@"sources"];
-            [self.style didChangeValueForKey:@"sources"];
-            [self.style willChangeValueForKey:@"layers"];
-            [self.style didChangeValueForKey:@"layers"];
+            self.style = [[MGLStyle alloc] initWithMapView:self];
             if ([self.delegate respondsToSelector:@selector(mapView:didFinishLoadingStyle:)])
             {
                 [self.delegate mapView:self didFinishLoadingStyle:self.style];
@@ -4805,7 +4804,12 @@ public:
             else
             {
                 CGRect adjustedFrame = annotationView.frame;
-                adjustedFrame.origin.x = CGRectGetWidth(annotationView.layer.presentationLayer.frame) * -2.0;
+                if (annotationView.layer.presentationLayer) {
+                    adjustedFrame.origin.x = -CGRectGetWidth(annotationView.layer.presentationLayer.frame) * 10.0;
+                } else {
+                    // views that are added off screen do not have a presentationLayer
+                    adjustedFrame.origin.x = -CGRectGetWidth(adjustedFrame) * 10.0;
+                }
                 annotationView.frame = adjustedFrame;
                 [self enqueueAnnotationViewForAnnotationContext:annotationContext];
             }
@@ -4820,7 +4824,12 @@ public:
     UIView <MGLCalloutView> *calloutView = self.calloutViewForSelectedAnnotation;
     id <MGLAnnotation> annotation = calloutView.representedObject;
     
-    if (calloutView && annotation)
+    BOOL isAnchoredToAnnotation = (calloutView
+                                   && annotation
+                                   && [calloutView respondsToSelector:@selector(isAnchoredToAnnotation)]
+                                   && calloutView.isAnchoredToAnnotation);
+    
+    if (isAnchoredToAnnotation)
     {
         MGLAnnotationTag tag = [self annotationTagForAnnotation:annotation];
         MGLAnnotationContext &annotationContext = _annotationContextsByAnnotationTag.at(tag);

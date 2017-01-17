@@ -163,6 +163,10 @@ macos-test: $(MACOS_PROJ_PATH)
 xpackage: $(MACOS_PROJ_PATH)
 	SYMBOLS=$(SYMBOLS) ./platform/macos/scripts/package.sh
 
+.PHONY: xdeploy
+xdeploy:
+	caffeinate -i ./platform/macos/scripts/deploy-packages.sh
+
 .PHONY: xdocument
 xdocument:
 	OUTPUT=$(OUTPUT) ./platform/macos/scripts/document.sh
@@ -188,8 +192,8 @@ compdb: $(BUILD_DEPS) $(TEST_DEPS) $(MACOS_COMPDB_PATH)/Makefile
 
 .PHONY: clang-tools
 clang-tools: compdb
-	if test -z $(CLANG_TIDY); then .mason/mason install clang-tidy 3.8.0; fi
-	if test -z $(CLANG_FORMAT); then .mason/mason install clang-format 3.8.0; fi
+	if test -z $(CLANG_TIDY); then .mason/mason install clang-tidy 3.9.1; fi
+	if test -z $(CLANG_FORMAT); then .mason/mason install clang-format 3.9.1; fi
 	$(MAKE) -C $(MACOS_COMPDB_PATH) mbgl-headers
 
 .PHONY: tidy
@@ -276,7 +280,12 @@ idocument:
 .PHONY: darwin-style-code
 darwin-style-code:
 	node platform/darwin/scripts/generate-style-code.js
+	node platform/darwin/scripts/update-examples.js
 style-code: darwin-style-code
+
+.PHONY: darwin-update-examples
+darwin-update-examples:
+	node platform/darwin/scripts/update-examples.js
 
 .PHONY: check-public-symbols
 check-public-symbols:
@@ -355,8 +364,8 @@ compdb: $(LINUX_BUILD)
 
 .PHONY: clang-tools
 clang-tools: compdb
-	if test -z $(CLANG_TIDY); then .mason/mason install clang-tidy 3.8.0; fi
-	if test -z $(CLANG_FORMAT); then .mason/mason install clang-format 3.8.0; fi
+	if test -z $(CLANG_TIDY); then .mason/mason install clang-tidy 3.9.1; fi
+	if test -z $(CLANG_FORMAT); then .mason/mason install clang-format 3.9.1; fi
 	$(NINJA) $(NINJA_ARGS) -j$(JOBS) -C $(LINUX_OUTPUT_PATH) mbgl-headers
 
 .PHONY: tidy

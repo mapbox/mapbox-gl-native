@@ -45,6 +45,9 @@ public:
             // Transition from prior value is now complete.
             prior = {};
             return finalValue;
+        } else if (parameters.now < begin) {
+            // Transition hasn't started yet.
+            return prior->get().evaluate(parameters, defaultValue);
         } else {
             // Interpolate between recursively-calculated prior value and final.
             float t = std::chrono::duration<float>(parameters.now - begin) / (end - begin);

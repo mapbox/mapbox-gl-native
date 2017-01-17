@@ -1,0 +1,31 @@
+syntax = "proto2";
+
+option optimize_for = LITE_RUNTIME;
+
+// Stores a glyph with metrics and optional SDF bitmap information.
+message glyph {
+    optional int64 id = 1;
+
+    // A signed distance field of the glyph with a border of 3 pixels.
+    optional bytes bitmap = 2;
+
+    // Glyph metrics.
+    optional int64 width = 3;
+    optional int64 height = 4;
+    optional sint64 left = 5;
+    optional sint64 top = 6;
+    optional int64 advance = 7;
+}
+
+// Stores fontstack information and a list of faces.
+message fontstack {
+    optional string name = 1;
+    optional string range = 2;
+    repeated glyph glyphs = 3;
+}
+
+message glyphs {
+    repeated fontstack stacks = 1;
+
+    extensions 16 to 8191;
+}

@@ -8,21 +8,28 @@
 
 @dynamic layerType;
 
-- (void)setUp {
-    [super setUp];
-#if TARGET_OS_IPHONE
-    UIApplication *app = [UIApplication sharedApplication];
-    UIViewController *vc = [[UIViewController alloc] init];
-    app.keyWindow.rootViewController = vc;
-    [vc view]; // Force load xib
-    _mapView = [[MGLMapView alloc] initWithFrame:CGRectMake(0, 0, 256, 256)];
-    [vc.view addSubview:_mapView];
-    _mapView.delegate = self;
-#else
-    [MGLAccountManager setAccessToken:@"pk.feedcafedeadbeefbadebede"];
-    NSWindowController *windowController = [[NSWindowController alloc] initWithWindowNibName:@"MGLStyleLayerTests" owner:self];
-    [windowController showWindow:nil];
-#endif
+- (void)testProperties {
+    MGLPointFeature *feature = [[MGLPointFeature alloc] init];
+    MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"sourceID" shape:feature options:nil];
+    
+    MGLFillStyleLayer *layer = [[MGLFillStyleLayer alloc] initWithIdentifier:@"layerID" source:source];
+    
+    XCTAssertEqualObjects(layer.identifier, @"layerID");
+    XCTAssertEqualObjects(layer.sourceIdentifier, source.identifier);
+    
+    XCTAssertTrue(layer.visible);
+    layer.visible = NO;
+    XCTAssertFalse(layer.visible);
+    layer.visible = YES;
+    XCTAssertTrue(layer.visible);
+    
+    XCTAssertEqual(layer.minimumZoomLevel, -INFINITY);
+    layer.minimumZoomLevel = 22;
+    XCTAssertEqual(layer.minimumZoomLevel, 22);
+    
+    XCTAssertEqual(layer.maximumZoomLevel, INFINITY);
+    layer.maximumZoomLevel = 0;
+    XCTAssertEqual(layer.maximumZoomLevel, 0);
 }
 
 - (void)testPropertyName:(NSString *)name isBoolean:(BOOL)isBoolean {
@@ -84,6 +91,28 @@
                                options:options
                            orthography:orthography
                            tokenRanges:NULL].firstObject;
+}
+
+@end
+
+@implementation NSValue (MGLStyleLayerTestAdditions)
+
++ (instancetype)valueWithMGLVector:(CGVector)vector {
+#if TARGET_OS_IPHONE
+    return [self valueWithCGVector:vector];
+#else
+    return [self value:&vector withObjCType:@encode(CGVector)];
+#endif
+}
+
+- (CGVector)MGLVectorValue {
+#if TARGET_OS_IPHONE
+    return self.CGVectorValue;
+#else
+    CGVector vector;
+    [self getValue:&vector];
+    return vector;
+#endif
 }
 
 @end
