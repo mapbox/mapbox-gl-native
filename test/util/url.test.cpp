@@ -76,15 +76,15 @@ TEST(URL, Domain) {
 }
 
 TEST(URL, Path) {
-    EXPECT_EQ(URL::Segment({ 19, 4 }), URL("http://example.com/test?query=foo").path);
-    EXPECT_EQ(URL::Segment({ 19, 4 }), URL("http://example.com/test?query=foo#bar").path);
-    EXPECT_EQ(URL::Segment({ 19, 4 }), URL("http://example.com/test#bar").path);
+    EXPECT_EQ(URL::Segment({ 18, 5 }), URL("http://example.com/test?query=foo").path);
+    EXPECT_EQ(URL::Segment({ 18, 5 }), URL("http://example.com/test?query=foo#bar").path);
+    EXPECT_EQ(URL::Segment({ 18, 5 }), URL("http://example.com/test#bar").path);
     EXPECT_EQ(URL::Segment({ 18, 0 }), URL("http://example.com?query=foo").path);
     EXPECT_EQ(URL::Segment({ 18, 0 }), URL("http://example.com#?query=foo").path);
-    EXPECT_EQ(URL::Segment({ 19, 0 }), URL("http://example.com/?query=foo").path);
+    EXPECT_EQ(URL::Segment({ 18, 1 }), URL("http://example.com/?query=foo").path);
     EXPECT_EQ(URL::Segment({ 3, 0 }), URL(":::").path);
     EXPECT_EQ(URL::Segment({ 13, 0 }), URL("http://domain").path);
-    EXPECT_EQ(URL::Segment({ 7, 3 }), URL("domain/foo?bar").path);
+    EXPECT_EQ(URL::Segment({ 6, 4 }), URL("domain/foo?bar").path);
     EXPECT_EQ(URL::Segment({ 6, 17 }), URL("data:,Hello%2C%20World!").path);
     EXPECT_EQ(URL::Segment({ 23, 24 }), URL("data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D").path);
 }
@@ -105,26 +105,26 @@ TEST(Path, Directory) {
 }
 
 TEST(Path, URLDirectory) {
-    EXPECT_EQ(Path::Segment({ 19, 8 }), URLPath("http://example.com/foo/bar/baz.ext").directory);
-    EXPECT_EQ(Path::Segment({ 19, 8 }), URLPath("http://example.com/foo/bar/baz.ext?query=foo.bar").directory);
-    EXPECT_EQ(Path::Segment({ 19, 8 }), URLPath("http://example.com/foo.bar/baz.ext").directory);
-    EXPECT_EQ(Path::Segment({ 19, 8 }), URLPath("http://example.com/foo.bar/baz.ext?query=foo.bar").directory);
-    EXPECT_EQ(Path::Segment({ 19, 8 }), URLPath("http://example.com/foo.bar/baz").directory);
-    EXPECT_EQ(Path::Segment({ 19, 8 }), URLPath("http://example.com/foo.bar/baz?query=foo.bar").directory);
-    EXPECT_EQ(Path::Segment({ 19, 8 }), URLPath("http://example.com/foo/bar/.ext").directory);
-    EXPECT_EQ(Path::Segment({ 19, 8 }), URLPath("http://example.com/foo/bar/.ext?query=foo.bar").directory);
-    EXPECT_EQ(Path::Segment({ 19, 4 }), URLPath("http://example.com/foo/bar@2x.png").directory);
-    EXPECT_EQ(Path::Segment({ 19, 4 }), URLPath("http://example.com/foo/bar@2x.png?query=foo.bar").directory);
-    EXPECT_EQ(Path::Segment({ 19, 4 }), URLPath("http://example.com/foo/b").directory);
-    EXPECT_EQ(Path::Segment({ 19, 4 }), URLPath("http://example.com/foo/b?query=foo.bar").directory);
-    EXPECT_EQ(Path::Segment({ 19, 4 }), URLPath("http://example.com/foo/").directory);
-    EXPECT_EQ(Path::Segment({ 19, 4 }), URLPath("http://example.com/foo/?query=foo.bar").directory);
-    EXPECT_EQ(Path::Segment({ 19, 0 }), URLPath("http://example.com/foo").directory);
-    EXPECT_EQ(Path::Segment({ 19, 0 }), URLPath("http://example.com/foo?query=foo.bar").directory);
-    EXPECT_EQ(Path::Segment({ 19, 0 }), URLPath("http://example.com/foo.png").directory);
-    EXPECT_EQ(Path::Segment({ 19, 0 }), URLPath("http://example.com/foo.png?query=foo.bar").directory);
-    EXPECT_EQ(Path::Segment({ 19, 0 }), URLPath("http://example.com/").directory);
-    EXPECT_EQ(Path::Segment({ 19, 0 }), URLPath("http://example.com/?query=foo.bar").directory);
+    EXPECT_EQ(Path::Segment({ 18, 9 }), URLPath("http://example.com/foo/bar/baz.ext").directory);
+    EXPECT_EQ(Path::Segment({ 18, 9 }), URLPath("http://example.com/foo/bar/baz.ext?query=foo.bar").directory);
+    EXPECT_EQ(Path::Segment({ 18, 9 }), URLPath("http://example.com/foo.bar/baz.ext").directory);
+    EXPECT_EQ(Path::Segment({ 18, 9 }), URLPath("http://example.com/foo.bar/baz.ext?query=foo.bar").directory);
+    EXPECT_EQ(Path::Segment({ 18, 9 }), URLPath("http://example.com/foo.bar/baz").directory);
+    EXPECT_EQ(Path::Segment({ 18, 9 }), URLPath("http://example.com/foo.bar/baz?query=foo.bar").directory);
+    EXPECT_EQ(Path::Segment({ 18, 9 }), URLPath("http://example.com/foo/bar/.ext").directory);
+    EXPECT_EQ(Path::Segment({ 18, 9 }), URLPath("http://example.com/foo/bar/.ext?query=foo.bar").directory);
+    EXPECT_EQ(Path::Segment({ 18, 5 }), URLPath("http://example.com/foo/bar@2x.png").directory);
+    EXPECT_EQ(Path::Segment({ 18, 5 }), URLPath("http://example.com/foo/bar@2x.png?query=foo.bar").directory);
+    EXPECT_EQ(Path::Segment({ 18, 5 }), URLPath("http://example.com/foo/b").directory);
+    EXPECT_EQ(Path::Segment({ 18, 5 }), URLPath("http://example.com/foo/b?query=foo.bar").directory);
+    EXPECT_EQ(Path::Segment({ 18, 5 }), URLPath("http://example.com/foo/").directory);
+    EXPECT_EQ(Path::Segment({ 18, 5 }), URLPath("http://example.com/foo/?query=foo.bar").directory);
+    EXPECT_EQ(Path::Segment({ 18, 1 }), URLPath("http://example.com/foo").directory);
+    EXPECT_EQ(Path::Segment({ 18, 1 }), URLPath("http://example.com/foo?query=foo.bar").directory);
+    EXPECT_EQ(Path::Segment({ 18, 1 }), URLPath("http://example.com/foo.png").directory);
+    EXPECT_EQ(Path::Segment({ 18, 1 }), URLPath("http://example.com/foo.png?query=foo.bar").directory);
+    EXPECT_EQ(Path::Segment({ 18, 1 }), URLPath("http://example.com/").directory);
+    EXPECT_EQ(Path::Segment({ 18, 1 }), URLPath("http://example.com/?query=foo.bar").directory);
     EXPECT_EQ(Path::Segment({ 18, 0 }), URLPath("http://example.com").directory);
     EXPECT_EQ(Path::Segment({ 18, 0 }), URLPath("http://example.com?query=foo.bar").directory);
 }

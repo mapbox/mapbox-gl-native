@@ -56,7 +56,7 @@ std::string normalizeStyleURL(const std::string& baseURL,
         return str;
     }
 
-    const auto tpl = baseURL + "/styles/v1/{path}?access_token=" + accessToken;
+    const auto tpl = baseURL + "/styles/v1{path}?access_token=" + accessToken;
     return transformURL(tpl, str, url);
 }
 
@@ -74,7 +74,7 @@ std::string normalizeSpriteURL(const std::string& baseURL,
     }
 
     const auto tpl =
-        baseURL + "/styles/v1/{directory}{filename}/sprite{extension}?access_token=" + accessToken;
+        baseURL + "/styles/v1{directory}{filename}/sprite{extension}?access_token=" + accessToken;
     return transformURL(tpl, str, url);
 }
 
@@ -91,7 +91,7 @@ std::string normalizeGlyphsURL(const std::string& baseURL,
         return str;
     }
 
-    const auto tpl = baseURL + "/fonts/v1/{path}?access_token=" + accessToken;
+    const auto tpl = baseURL + "/fonts/v1{path}?access_token=" + accessToken;
     return transformURL(tpl, str, url);
 }
 
@@ -108,13 +108,13 @@ std::string normalizeTileURL(const std::string& baseURL,
         return str;
     }
 
-    const auto tpl = baseURL + "/v4/{path}?access_token=" + accessToken;
+    const auto tpl = baseURL + "/v4{path}?access_token=" + accessToken;
     return transformURL(tpl, str, url);
 }
 
 std::string
 canonicalizeTileURL(const std::string& str, const SourceType type, const uint16_t tileSize) {
-    const char* version = "v4/";
+    const char* version = "/v4/";
     const size_t versionLen = strlen(version);
 
     const URL url(str);
