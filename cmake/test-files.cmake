@@ -55,6 +55,7 @@ set(MBGL_TEST_FILES
     test/src/mbgl/test/stub_file_source.hpp
     test/src/mbgl/test/stub_layer_observer.hpp
     test/src/mbgl/test/stub_style_observer.hpp
+    test/src/mbgl/test/stub_tile_observer.hpp
     test/src/mbgl/test/test.cpp
     test/src/mbgl/test/util.cpp
     test/src/mbgl/test/util.hpp
@@ -80,6 +81,7 @@ set(MBGL_TEST_FILES
     test/style/filter.test.cpp
     test/style/functions.test.cpp
     test/style/group_by_layout.test.cpp
+    test/style/paint_property.test.cpp
     test/style/source.test.cpp
     test/style/style.test.cpp
     test/style/style_layer.test.cpp
