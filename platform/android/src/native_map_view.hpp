@@ -6,7 +6,7 @@
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/default_thread_pool.hpp>
 
-#include "storage/default_file_source_peer.hpp"
+#include "jni/peer.hpp"
 
 #include <string>
 #include <jni.h>
@@ -14,13 +14,16 @@
 #include <EGL/egl.h>
 
 namespace mbgl {
+
+class DefaultFileSource;
+
 namespace android {
 
 class NativeMapView : public mbgl::View, public mbgl::Backend {
 public:
     NativeMapView(JNIEnv* env,
                   jobject obj,
-                  jni::Object<DefaultFileSourcePeer> fileSourcePeer,
+                  jni::Object<Peer<DefaultFileSource>> fileSourcePeer,
                   float pixelRatio,
                   int availableProcessors,
                   size_t totalMemory);
@@ -101,7 +104,7 @@ private:
     size_t totalMemory = 0;
 
     // Ensure these are initialised last
-    jni::UniqueObject<DefaultFileSourcePeer> fileSource;
+    jni::UniqueObject<Peer<DefaultFileSource>> fileSource;
     mbgl::ThreadPool threadPool;
     std::unique_ptr<mbgl::Map> map;
     mbgl::EdgeInsets insets;

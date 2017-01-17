@@ -1,5 +1,6 @@
 #include "native_map_view.hpp"
 #include "jni.hpp"
+#include "jni/peer.hpp"
 
 #include <cstdlib>
 #include <ctime>
@@ -40,7 +41,7 @@ void log_egl_string(EGLDisplay display, EGLint name, const char *label) {
 
 NativeMapView::NativeMapView(JNIEnv* env_,
                              jobject obj_,
-                             jni::Object<DefaultFileSourcePeer> fileSource_,
+                             jni::Object<Peer<DefaultFileSource>> fileSource_,
                              float pixelRatio,
                              int availableProcessors_,
                              size_t totalMemory_)
@@ -65,13 +66,9 @@ NativeMapView::NativeMapView(JNIEnv* env_,
         return;
     }
 
-    jni::Field<DefaultFileSourcePeer, jlong> peerField{ *env, DefaultFileSourcePeer::javaClass,
-                                                        "peer" };
-    auto fileSourcePtr = reinterpret_cast<DefaultFileSourcePeer*>(fileSource->Get(*env, peerField));
-
     map = std::make_unique<mbgl::Map>(
         *this, mbgl::Size{ static_cast<uint32_t>(width), static_cast<uint32_t>(height) },
-        pixelRatio, fileSourcePtr->getFileSource(), threadPool, MapMode::Continuous);
+        pixelRatio, Peer<DefaultFileSource>::Get(*env, *fileSource), threadPool, MapMode::Continuous);
 
     float zoomFactor   = map->getMaxZoom() - map->getMinZoom() + 1;
     float cpuFactor    = availableProcessors;

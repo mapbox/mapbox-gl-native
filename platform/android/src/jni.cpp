@@ -9,12 +9,12 @@
 #include <sys/system_properties.h>
 
 #include "jni.hpp"
+#include "jni/peer.hpp"
 #include "java_types.hpp"
 #include "native_map_view.hpp"
 #include "connectivity_listener.hpp"
 #include "style/layers/layers.hpp"
 #include "style/sources/sources.hpp"
-#include "storage/default_file_source_peer.hpp"
 
 #include "conversion/conversion.hpp"
 #include "conversion/collection.hpp"
@@ -298,7 +298,7 @@ namespace {
 using namespace mbgl::android;
 using DebugOptions = mbgl::MapDebugOptions;
 
-jlong nativeCreate(JNIEnv *env, jni::jobject* obj, jni::Object<DefaultFileSourcePeer> fileSource, jfloat pixelRatio, jint availableProcessors, jlong totalMemory) {
+jlong nativeCreate(JNIEnv *env, jni::jobject* obj, jni::Object<Peer<mbgl::DefaultFileSource>> fileSource, jfloat pixelRatio, jint availableProcessors, jlong totalMemory) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeCreate");
     return reinterpret_cast<jlong>(new NativeMapView(env, jni::Unwrap(obj), fileSource, pixelRatio, availableProcessors, totalMemory));
 }
@@ -1705,9 +1705,7 @@ void registerNatives(JavaVM *vm) {
     registerNativeLayers(env);
     registerNativeSources(env);
     ConnectivityListener::registerNative(env);
-
-    mbgl::Log::Error(mbgl::Event::JNI, "registering DefaultFileSource peer");
-    DefaultFileSourcePeer::registerNative(env);
+    Peer<DefaultFileSource>::RegisterNative(env);
 
     latLngClass = &jni::FindClass(env, "com/mapbox/mapboxsdk/geometry/LatLng");
     latLngClass = jni::NewGlobalRef(env, latLngClass).release();

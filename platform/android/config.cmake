@@ -91,7 +91,6 @@ macro(mbgl_platform_core)
 
         # Storage
         PRIVATE platform/android/src/storage/default_file_source_peer.cpp
-        PRIVATE platform/android/src/storage/default_file_source_peer.hpp
 
         # Conversion C++ -> Java
         platform/android/src/conversion/constant.hpp
