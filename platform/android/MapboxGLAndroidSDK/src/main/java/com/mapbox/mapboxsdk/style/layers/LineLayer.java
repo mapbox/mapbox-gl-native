@@ -1,5 +1,6 @@
-package com.mapbox.mapboxsdk.style.layers;
 // This file is generated. Edit android/platform/scripts/generate-style-code.js, then run `make android-style-code`.
+
+package com.mapbox.mapboxsdk.style.layers;
 
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
@@ -96,14 +97,13 @@ public class LineLayer extends Layer {
     return this;
   }
 
-
   /**
    * Set a property or properties.
    *
    * @param properties the var-args properties
    * @return This
    */
-  public LineLayer withProperties(@NonNull Property<?>... properties) {
+  public LineLayer withProperties(@NonNull PropertyValue<?>... properties) {
     setProperties(properties);
     return this;
   }
@@ -117,7 +117,7 @@ public class LineLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<String> getLineCap() {
-    return (PropertyValue<String>) new PropertyValue(nativeGetLineCap());
+    return (PropertyValue<String>) new PropertyValue("line-cap", nativeGetLineCap());
   }
 
   /**
@@ -127,7 +127,7 @@ public class LineLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<String> getLineJoin() {
-    return (PropertyValue<String>) new PropertyValue(nativeGetLineJoin());
+    return (PropertyValue<String>) new PropertyValue("line-join", nativeGetLineJoin());
   }
 
   /**
@@ -137,7 +137,7 @@ public class LineLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<Float> getLineMiterLimit() {
-    return (PropertyValue<Float>) new PropertyValue(nativeGetLineMiterLimit());
+    return (PropertyValue<Float>) new PropertyValue("line-miter-limit", nativeGetLineMiterLimit());
   }
 
   /**
@@ -147,7 +147,7 @@ public class LineLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<Float> getLineRoundLimit() {
-    return (PropertyValue<Float>) new PropertyValue(nativeGetLineRoundLimit());
+    return (PropertyValue<Float>) new PropertyValue("line-round-limit", nativeGetLineRoundLimit());
   }
 
   /**
@@ -157,7 +157,7 @@ public class LineLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<Float> getLineOpacity() {
-    return (PropertyValue<Float>) new PropertyValue(nativeGetLineOpacity());
+    return (PropertyValue<Float>) new PropertyValue("line-opacity", nativeGetLineOpacity());
   }
 
   /**
@@ -167,7 +167,7 @@ public class LineLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<String> getLineColor() {
-    return (PropertyValue<String>) new PropertyValue(nativeGetLineColor());
+    return (PropertyValue<String>) new PropertyValue("line-color", nativeGetLineColor());
   }
 
   /**
@@ -194,7 +194,7 @@ public class LineLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<Float[]> getLineTranslate() {
-    return (PropertyValue<Float[]>) new PropertyValue(nativeGetLineTranslate());
+    return (PropertyValue<Float[]>) new PropertyValue("line-translate", nativeGetLineTranslate());
   }
 
   /**
@@ -204,7 +204,7 @@ public class LineLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<String> getLineTranslateAnchor() {
-    return (PropertyValue<String>) new PropertyValue(nativeGetLineTranslateAnchor());
+    return (PropertyValue<String>) new PropertyValue("line-translate-anchor", nativeGetLineTranslateAnchor());
   }
 
   /**
@@ -214,7 +214,7 @@ public class LineLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<Float> getLineWidth() {
-    return (PropertyValue<Float>) new PropertyValue(nativeGetLineWidth());
+    return (PropertyValue<Float>) new PropertyValue("line-width", nativeGetLineWidth());
   }
 
   /**
@@ -224,7 +224,7 @@ public class LineLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<Float> getLineGapWidth() {
-    return (PropertyValue<Float>) new PropertyValue(nativeGetLineGapWidth());
+    return (PropertyValue<Float>) new PropertyValue("line-gap-width", nativeGetLineGapWidth());
   }
 
   /**
@@ -234,7 +234,7 @@ public class LineLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<Float> getLineOffset() {
-    return (PropertyValue<Float>) new PropertyValue(nativeGetLineOffset());
+    return (PropertyValue<Float>) new PropertyValue("line-offset", nativeGetLineOffset());
   }
 
   /**
@@ -244,7 +244,7 @@ public class LineLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<Float> getLineBlur() {
-    return (PropertyValue<Float>) new PropertyValue(nativeGetLineBlur());
+    return (PropertyValue<Float>) new PropertyValue("line-blur", nativeGetLineBlur());
   }
 
   /**
@@ -254,7 +254,7 @@ public class LineLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<Float[]> getLineDasharray() {
-    return (PropertyValue<Float[]>) new PropertyValue(nativeGetLineDasharray());
+    return (PropertyValue<Float[]>) new PropertyValue("line-dasharray", nativeGetLineDasharray());
   }
 
   /**
@@ -264,7 +264,7 @@ public class LineLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<String> getLinePattern() {
-    return (PropertyValue<String>) new PropertyValue(nativeGetLinePattern());
+    return (PropertyValue<String>) new PropertyValue("line-pattern", nativeGetLinePattern());
   }
 
   private native Object nativeGetLineCap();

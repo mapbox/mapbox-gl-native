@@ -1,6 +1,9 @@
 package com.mapbox.mapboxsdk.style.layers;
 
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+
+import com.mapbox.mapboxsdk.style.functions.Function;
 
 import timber.log.Timber;
 
@@ -9,9 +12,11 @@ import timber.log.Timber;
  */
 public class PropertyValue<T> {
 
-  private final Object value;
+  public final String name;
+  public final T value;
 
-  /* package */ PropertyValue(Object value) {
+  /* package */ PropertyValue(@NonNull String name, T value) {
+    this.name = name;
     this.value = value;
   }
 
@@ -28,10 +33,10 @@ public class PropertyValue<T> {
   }
 
   @Nullable
-  public Function<T> getFunction() {
+  public Function<?, T> getFunction() {
     if (isFunction()) {
       // noinspection unchecked
-      return (Function<T>) value;
+      return (Function<?, T>) value;
     } else {
       Timber.w("not a function, try value");
       return null;
@@ -51,7 +56,6 @@ public class PropertyValue<T> {
 
   @Override
   public String toString() {
-    return String.format("%s (%s)", getClass().getSimpleName(), value != null
-      ? value.getClass().getSimpleName() : null);
+    return String.format("%s: %s", name, value);
   }
 }

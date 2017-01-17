@@ -1,8 +1,12 @@
-package com.mapbox.mapboxsdk.style.layers;
 // This file is generated. Edit android/platform/scripts/generate-style-code.js, then run `make android-style-code`.
+
+package com.mapbox.mapboxsdk.style.layers;
 
 import android.annotation.SuppressLint;
 import android.support.annotation.ColorInt;
+
+import com.mapbox.mapboxsdk.style.functions.Function;
+import com.mapbox.mapboxsdk.style.functions.CameraFunction;
 
 /**
  * Constructs paint/layout properties for Layers
@@ -17,18 +21,19 @@ public class PropertyFactory {
    * @param value the visibility value
    * @return property wrapper around visibility
    */
-  public static Property<String> visibility(@Property.VISIBILITY String value) {
-    return new LayoutProperty<>("visibility", value);
+  public static PropertyValue<String> visibility(@Property.VISIBILITY String value) {
+    return new LayoutPropertyValue<>("visibility", value);
   }
 
   /**
    * Set the property visibility.
    *
+   * @param <T> the function input type
    * @param function the visibility function
    * @return property wrapper around a String function
    */
-  public static Property<Function<String>> visibility(Function<String> function) {
-    return new LayoutProperty<>("visibility", function);
+  public static <T> PropertyValue<Function<T, String>> visibility(Function<T, String> function) {
+    return new LayoutPropertyValue<>("visibility", function);
   }
 
   /**
@@ -37,73 +42,74 @@ public class PropertyFactory {
    * @param value a Boolean value
    * @return property wrapper around Boolean
    */
-  public static Property<Boolean> fillAntialias(Boolean value) {
-    return new PaintProperty<>("fill-antialias", value);
+  public static PropertyValue<Boolean> fillAntialias(Boolean value) {
+    return new PaintPropertyValue<>("fill-antialias", value);
   }
+
 
   /**
    * Whether or not the fill should be antialiased.
    *
-   * @param function a wrapper function for Boolean
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for Boolean
    * @return property wrapper around a Boolean function
    */
-  public static Property<Function<Boolean>> fillAntialias(Function<Boolean> function) {
-    return new PaintProperty<>("fill-antialias", function);
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, Boolean>> fillAntialias(CameraFunction<Z, Boolean> function) {
+    return new PaintPropertyValue<>("fill-antialias", function);
   }
 
   /**
-   * The opacity of the entire fill layer. In contrast to the {@link PropertyFactory#fillColor}, this value will also
-   * affect the 1px stroke around the fill, if the stroke is used.
+   * The opacity of the entire fill layer. In contrast to the {@link PropertyFactory#fillColor}, this value will also affect the 1px stroke around the fill, if the stroke is used.
    *
    * @param value a Float value
    * @return property wrapper around Float
    */
-  public static Property<Float> fillOpacity(Float value) {
-    return new PaintProperty<>("fill-opacity", value);
+  public static PropertyValue<Float> fillOpacity(Float value) {
+    return new PaintPropertyValue<>("fill-opacity", value);
   }
 
+
   /**
-   * The opacity of the entire fill layer. In contrast to the {@link PropertyFactory#fillColor}, this value will also
-   * affect the 1px stroke around the fill, if the stroke is used.
+   * The opacity of the entire fill layer. In contrast to the {@link PropertyFactory#fillColor}, this value will also affect the 1px stroke around the fill, if the stroke is used.
    *
+   * @param <T> the function input type
    * @param function a wrapper function for Float
    * @return property wrapper around a Float function
    */
-  public static Property<Function<Float>> fillOpacity(Function<Float> function) {
-    return new PaintProperty<>("fill-opacity", function);
+  public static <T> PropertyValue<Function<T, Float>> fillOpacity(Function<T, Float> function) {
+    return new PaintPropertyValue<>("fill-opacity", function);
   }
 
   /**
-   * The color of the filled part of this layer. This color can be specified as `rgba` with an alpha component and the
-   * color's opacity will not affect the opacity of the 1px stroke, if it is used.
+   * The color of the filled part of this layer. This color can be specified as `rgba` with an alpha component and the color's opacity will not affect the opacity of the 1px stroke, if it is used.
    *
    * @param value a int color value
    * @return property wrapper around String color
    */
-  public static Property<String> fillColor(@ColorInt int value) {
-    return new PaintProperty<>("fill-color", colorToRgbaString(value));
+  public static PropertyValue<String> fillColor(@ColorInt int value) {
+    return new PaintPropertyValue<>("fill-color", colorToRgbaString(value));
   }
 
   /**
-   * The color of the filled part of this layer. This color can be specified as `rgba` with an alpha component and the
-   * color's opacity will not affect the opacity of the 1px stroke, if it is used.
+   * The color of the filled part of this layer. This color can be specified as `rgba` with an alpha component and the color's opacity will not affect the opacity of the 1px stroke, if it is used.
    *
    * @param value a String value
    * @return property wrapper around String
    */
-  public static Property<String> fillColor(String value) {
-    return new PaintProperty<>("fill-color", value);
+  public static PropertyValue<String> fillColor(String value) {
+    return new PaintPropertyValue<>("fill-color", value);
   }
 
+
   /**
-   * The color of the filled part of this layer. This color can be specified as `rgba` with an alpha component and the
-   * color's opacity will not affect the opacity of the 1px stroke, if it is used.
+   * The color of the filled part of this layer. This color can be specified as `rgba` with an alpha component and the color's opacity will not affect the opacity of the 1px stroke, if it is used.
    *
+   * @param <T> the function input type
    * @param function a wrapper function for String
    * @return property wrapper around a String function
    */
-  public static Property<Function<String>> fillColor(Function<String> function) {
-    return new PaintProperty<>("fill-color", function);
+  public static <T> PropertyValue<Function<T, String>> fillColor(Function<T, String> function) {
+    return new PaintPropertyValue<>("fill-color", function);
   }
 
   /**
@@ -112,8 +118,8 @@ public class PropertyFactory {
    * @param value a int color value
    * @return property wrapper around String color
    */
-  public static Property<String> fillOutlineColor(@ColorInt int value) {
-    return new PaintProperty<>("fill-outline-color", colorToRgbaString(value));
+  public static PropertyValue<String> fillOutlineColor(@ColorInt int value) {
+    return new PaintPropertyValue<>("fill-outline-color", colorToRgbaString(value));
   }
 
   /**
@@ -122,18 +128,20 @@ public class PropertyFactory {
    * @param value a String value
    * @return property wrapper around String
    */
-  public static Property<String> fillOutlineColor(String value) {
-    return new PaintProperty<>("fill-outline-color", value);
+  public static PropertyValue<String> fillOutlineColor(String value) {
+    return new PaintPropertyValue<>("fill-outline-color", value);
   }
+
 
   /**
    * The outline color of the fill. Matches the value of {@link PropertyFactory#fillColor} if unspecified.
    *
+   * @param <T> the function input type
    * @param function a wrapper function for String
    * @return property wrapper around a String function
    */
-  public static Property<Function<String>> fillOutlineColor(Function<String> function) {
-    return new PaintProperty<>("fill-outline-color", function);
+  public static <T> PropertyValue<Function<T, String>> fillOutlineColor(Function<T, String> function) {
+    return new PaintPropertyValue<>("fill-outline-color", function);
   }
 
   /**
@@ -142,18 +150,20 @@ public class PropertyFactory {
    * @param value a Float[] value
    * @return property wrapper around Float[]
    */
-  public static Property<Float[]> fillTranslate(Float[] value) {
-    return new PaintProperty<>("fill-translate", value);
+  public static PropertyValue<Float[]> fillTranslate(Float[] value) {
+    return new PaintPropertyValue<>("fill-translate", value);
   }
+
 
   /**
    * The geometry's offset. Values are [x, y] where negatives indicate left and up, respectively.
    *
-   * @param function a wrapper function for Float[]
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for Float[]
    * @return property wrapper around a Float[] function
    */
-  public static Property<Function<Float[]>> fillTranslate(Function<Float[]> function) {
-    return new PaintProperty<>("fill-translate", function);
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, Float[]>> fillTranslate(CameraFunction<Z, Float[]> function) {
+    return new PaintPropertyValue<>("fill-translate", function);
   }
 
   /**
@@ -162,40 +172,42 @@ public class PropertyFactory {
    * @param value a String value
    * @return property wrapper around String
    */
-  public static Property<String> fillTranslateAnchor(@Property.FILL_TRANSLATE_ANCHOR String value) {
-    return new PaintProperty<>("fill-translate-anchor", value);
+  public static PropertyValue<String> fillTranslateAnchor(@Property.FILL_TRANSLATE_ANCHOR String value) {
+    return new PaintPropertyValue<>("fill-translate-anchor", value);
   }
+
 
   /**
    * Controls the translation reference point.
    *
-   * @param function a wrapper function for String
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for String
    * @return property wrapper around a String function
    */
-  public static Property<Function<String>> fillTranslateAnchor(Function<String> function) {
-    return new PaintProperty<>("fill-translate-anchor", function);
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, String>> fillTranslateAnchor(CameraFunction<Z, String> function) {
+    return new PaintPropertyValue<>("fill-translate-anchor", function);
   }
 
   /**
-   * Name of image in sprite to use for drawing image fills. For seamless patterns, image width and height must be a
-   * factor of two (2, 4, 8, ..., 512).
+   * Name of image in sprite to use for drawing image fills. For seamless patterns, image width and height must be a factor of two (2, 4, 8, ..., 512).
    *
    * @param value a String value
    * @return property wrapper around String
    */
-  public static Property<String> fillPattern(String value) {
-    return new PaintProperty<>("fill-pattern", value);
+  public static PropertyValue<String> fillPattern(String value) {
+    return new PaintPropertyValue<>("fill-pattern", value);
   }
 
+
   /**
-   * Name of image in sprite to use for drawing image fills. For seamless patterns, image width and height must be a
-   * factor of two (2, 4, 8, ..., 512).
+   * Name of image in sprite to use for drawing image fills. For seamless patterns, image width and height must be a factor of two (2, 4, 8, ..., 512).
    *
-   * @param function a wrapper function for String
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for String
    * @return property wrapper around a String function
    */
-  public static Property<Function<String>> fillPattern(Function<String> function) {
-    return new PaintProperty<>("fill-pattern", function);
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, String>> fillPattern(CameraFunction<Z, String> function) {
+    return new PaintPropertyValue<>("fill-pattern", function);
   }
 
   /**
@@ -204,18 +216,20 @@ public class PropertyFactory {
    * @param value a Float value
    * @return property wrapper around Float
    */
-  public static Property<Float> lineOpacity(Float value) {
-    return new PaintProperty<>("line-opacity", value);
+  public static PropertyValue<Float> lineOpacity(Float value) {
+    return new PaintPropertyValue<>("line-opacity", value);
   }
+
 
   /**
    * The opacity at which the line will be drawn.
    *
+   * @param <T> the function input type
    * @param function a wrapper function for Float
    * @return property wrapper around a Float function
    */
-  public static Property<Function<Float>> lineOpacity(Function<Float> function) {
-    return new PaintProperty<>("line-opacity", function);
+  public static <T> PropertyValue<Function<T, Float>> lineOpacity(Function<T, Float> function) {
+    return new PaintPropertyValue<>("line-opacity", function);
   }
 
   /**
@@ -224,8 +238,8 @@ public class PropertyFactory {
    * @param value a int color value
    * @return property wrapper around String color
    */
-  public static Property<String> lineColor(@ColorInt int value) {
-    return new PaintProperty<>("line-color", colorToRgbaString(value));
+  public static PropertyValue<String> lineColor(@ColorInt int value) {
+    return new PaintPropertyValue<>("line-color", colorToRgbaString(value));
   }
 
   /**
@@ -234,18 +248,20 @@ public class PropertyFactory {
    * @param value a String value
    * @return property wrapper around String
    */
-  public static Property<String> lineColor(String value) {
-    return new PaintProperty<>("line-color", value);
+  public static PropertyValue<String> lineColor(String value) {
+    return new PaintPropertyValue<>("line-color", value);
   }
+
 
   /**
    * The color with which the line will be drawn.
    *
+   * @param <T> the function input type
    * @param function a wrapper function for String
    * @return property wrapper around a String function
    */
-  public static Property<Function<String>> lineColor(Function<String> function) {
-    return new PaintProperty<>("line-color", function);
+  public static <T> PropertyValue<Function<T, String>> lineColor(Function<T, String> function) {
+    return new PaintPropertyValue<>("line-color", function);
   }
 
   /**
@@ -254,18 +270,20 @@ public class PropertyFactory {
    * @param value a Float[] value
    * @return property wrapper around Float[]
    */
-  public static Property<Float[]> lineTranslate(Float[] value) {
-    return new PaintProperty<>("line-translate", value);
+  public static PropertyValue<Float[]> lineTranslate(Float[] value) {
+    return new PaintPropertyValue<>("line-translate", value);
   }
+
 
   /**
    * The geometry's offset. Values are [x, y] where negatives indicate left and up, respectively.
    *
-   * @param function a wrapper function for Float[]
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for Float[]
    * @return property wrapper around a Float[] function
    */
-  public static Property<Function<Float[]>> lineTranslate(Function<Float[]> function) {
-    return new PaintProperty<>("line-translate", function);
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, Float[]>> lineTranslate(CameraFunction<Z, Float[]> function) {
+    return new PaintPropertyValue<>("line-translate", function);
   }
 
   /**
@@ -274,18 +292,20 @@ public class PropertyFactory {
    * @param value a String value
    * @return property wrapper around String
    */
-  public static Property<String> lineTranslateAnchor(@Property.LINE_TRANSLATE_ANCHOR String value) {
-    return new PaintProperty<>("line-translate-anchor", value);
+  public static PropertyValue<String> lineTranslateAnchor(@Property.LINE_TRANSLATE_ANCHOR String value) {
+    return new PaintPropertyValue<>("line-translate-anchor", value);
   }
+
 
   /**
    * Controls the translation reference point.
    *
-   * @param function a wrapper function for String
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for String
    * @return property wrapper around a String function
    */
-  public static Property<Function<String>> lineTranslateAnchor(Function<String> function) {
-    return new PaintProperty<>("line-translate-anchor", function);
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, String>> lineTranslateAnchor(CameraFunction<Z, String> function) {
+    return new PaintPropertyValue<>("line-translate-anchor", function);
   }
 
   /**
@@ -294,18 +314,20 @@ public class PropertyFactory {
    * @param value a Float value
    * @return property wrapper around Float
    */
-  public static Property<Float> lineWidth(Float value) {
-    return new PaintProperty<>("line-width", value);
+  public static PropertyValue<Float> lineWidth(Float value) {
+    return new PaintPropertyValue<>("line-width", value);
   }
+
 
   /**
    * Stroke thickness.
    *
-   * @param function a wrapper function for Float
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for Float
    * @return property wrapper around a Float function
    */
-  public static Property<Function<Float>> lineWidth(Function<Float> function) {
-    return new PaintProperty<>("line-width", function);
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, Float>> lineWidth(CameraFunction<Z, Float> function) {
+    return new PaintPropertyValue<>("line-width", function);
   }
 
   /**
@@ -314,42 +336,42 @@ public class PropertyFactory {
    * @param value a Float value
    * @return property wrapper around Float
    */
-  public static Property<Float> lineGapWidth(Float value) {
-    return new PaintProperty<>("line-gap-width", value);
+  public static PropertyValue<Float> lineGapWidth(Float value) {
+    return new PaintPropertyValue<>("line-gap-width", value);
   }
+
 
   /**
    * Draws a line casing outside of a line's actual path. Value indicates the width of the inner gap.
    *
+   * @param <T> the function input type
    * @param function a wrapper function for Float
    * @return property wrapper around a Float function
    */
-  public static Property<Function<Float>> lineGapWidth(Function<Float> function) {
-    return new PaintProperty<>("line-gap-width", function);
+  public static <T> PropertyValue<Function<T, Float>> lineGapWidth(Function<T, Float> function) {
+    return new PaintPropertyValue<>("line-gap-width", function);
   }
 
   /**
-   * The line's offset. For linear features, a positive value offsets the line to the right, relative to the direction
-   * of the line, and a negative value to the left. For polygon features, a positive value results in an inset, and a
-   * negative value results in an outset.
+   * The line's offset. For linear features, a positive value offsets the line to the right, relative to the direction of the line, and a negative value to the left. For polygon features, a positive value results in an inset, and a negative value results in an outset.
    *
    * @param value a Float value
    * @return property wrapper around Float
    */
-  public static Property<Float> lineOffset(Float value) {
-    return new PaintProperty<>("line-offset", value);
+  public static PropertyValue<Float> lineOffset(Float value) {
+    return new PaintPropertyValue<>("line-offset", value);
   }
 
+
   /**
-   * The line's offset. For linear features, a positive value offsets the line to the right, relative to the direction
-   * of the line, and a negative value to the left. For polygon features, a positive value results in an inset, and a
-   * negative value results in an outset.
+   * The line's offset. For linear features, a positive value offsets the line to the right, relative to the direction of the line, and a negative value to the left. For polygon features, a positive value results in an inset, and a negative value results in an outset.
    *
+   * @param <T> the function input type
    * @param function a wrapper function for Float
    * @return property wrapper around a Float function
    */
-  public static Property<Function<Float>> lineOffset(Function<Float> function) {
-    return new PaintProperty<>("line-offset", function);
+  public static <T> PropertyValue<Function<T, Float>> lineOffset(Function<T, Float> function) {
+    return new PaintPropertyValue<>("line-offset", function);
   }
 
   /**
@@ -358,62 +380,64 @@ public class PropertyFactory {
    * @param value a Float value
    * @return property wrapper around Float
    */
-  public static Property<Float> lineBlur(Float value) {
-    return new PaintProperty<>("line-blur", value);
+  public static PropertyValue<Float> lineBlur(Float value) {
+    return new PaintPropertyValue<>("line-blur", value);
   }
+
 
   /**
    * Blur applied to the line, in pixels.
    *
+   * @param <T> the function input type
    * @param function a wrapper function for Float
    * @return property wrapper around a Float function
    */
-  public static Property<Function<Float>> lineBlur(Function<Float> function) {
-    return new PaintProperty<>("line-blur", function);
+  public static <T> PropertyValue<Function<T, Float>> lineBlur(Function<T, Float> function) {
+    return new PaintPropertyValue<>("line-blur", function);
   }
 
   /**
-   * Specifies the lengths of the alternating dashes and gaps that form the dash pattern. The lengths are later scaled
-   * by the line width. To convert a dash length to pixels, multiply the length by the current line width.
+   * Specifies the lengths of the alternating dashes and gaps that form the dash pattern. The lengths are later scaled by the line width. To convert a dash length to pixels, multiply the length by the current line width.
    *
    * @param value a Float[] value
    * @return property wrapper around Float[]
    */
-  public static Property<Float[]> lineDasharray(Float[] value) {
-    return new PaintProperty<>("line-dasharray", value);
+  public static PropertyValue<Float[]> lineDasharray(Float[] value) {
+    return new PaintPropertyValue<>("line-dasharray", value);
   }
 
+
   /**
-   * Specifies the lengths of the alternating dashes and gaps that form the dash pattern. The lengths are later scaled
-   * by the line width. To convert a dash length to pixels, multiply the length by the current line width.
+   * Specifies the lengths of the alternating dashes and gaps that form the dash pattern. The lengths are later scaled by the line width. To convert a dash length to pixels, multiply the length by the current line width.
    *
-   * @param function a wrapper function for Float[]
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for Float[]
    * @return property wrapper around a Float[] function
    */
-  public static Property<Function<Float[]>> lineDasharray(Function<Float[]> function) {
-    return new PaintProperty<>("line-dasharray", function);
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, Float[]>> lineDasharray(CameraFunction<Z, Float[]> function) {
+    return new PaintPropertyValue<>("line-dasharray", function);
   }
 
   /**
-   * Name of image in sprite to use for drawing image lines. For seamless patterns, image width must be a factor of two
-   * (2, 4, 8, ..., 512).
+   * Name of image in sprite to use for drawing image lines. For seamless patterns, image width must be a factor of two (2, 4, 8, ..., 512).
    *
    * @param value a String value
    * @return property wrapper around String
    */
-  public static Property<String> linePattern(String value) {
-    return new PaintProperty<>("line-pattern", value);
+  public static PropertyValue<String> linePattern(String value) {
+    return new PaintPropertyValue<>("line-pattern", value);
   }
 
+
   /**
-   * Name of image in sprite to use for drawing image lines. For seamless patterns, image width must be a factor of two
-   * (2, 4, 8, ..., 512).
+   * Name of image in sprite to use for drawing image lines. For seamless patterns, image width must be a factor of two (2, 4, 8, ..., 512).
    *
-   * @param function a wrapper function for String
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for String
    * @return property wrapper around a String function
    */
-  public static Property<Function<String>> linePattern(Function<String> function) {
-    return new PaintProperty<>("line-pattern", function);
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, String>> linePattern(CameraFunction<Z, String> function) {
+    return new PaintPropertyValue<>("line-pattern", function);
   }
 
   /**
@@ -422,18 +446,20 @@ public class PropertyFactory {
    * @param value a Float value
    * @return property wrapper around Float
    */
-  public static Property<Float> iconOpacity(Float value) {
-    return new PaintProperty<>("icon-opacity", value);
+  public static PropertyValue<Float> iconOpacity(Float value) {
+    return new PaintPropertyValue<>("icon-opacity", value);
   }
+
 
   /**
    * The opacity at which the icon will be drawn.
    *
-   * @param function a wrapper function for Float
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for Float
    * @return property wrapper around a Float function
    */
-  public static Property<Function<Float>> iconOpacity(Function<Float> function) {
-    return new PaintProperty<>("icon-opacity", function);
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, Float>> iconOpacity(CameraFunction<Z, Float> function) {
+    return new PaintPropertyValue<>("icon-opacity", function);
   }
 
   /**
@@ -442,8 +468,8 @@ public class PropertyFactory {
    * @param value a int color value
    * @return property wrapper around String color
    */
-  public static Property<String> iconColor(@ColorInt int value) {
-    return new PaintProperty<>("icon-color", colorToRgbaString(value));
+  public static PropertyValue<String> iconColor(@ColorInt int value) {
+    return new PaintPropertyValue<>("icon-color", colorToRgbaString(value));
   }
 
   /**
@@ -452,18 +478,20 @@ public class PropertyFactory {
    * @param value a String value
    * @return property wrapper around String
    */
-  public static Property<String> iconColor(String value) {
-    return new PaintProperty<>("icon-color", value);
+  public static PropertyValue<String> iconColor(String value) {
+    return new PaintPropertyValue<>("icon-color", value);
   }
+
 
   /**
    * The color of the icon. This can only be used with sdf icons.
    *
-   * @param function a wrapper function for String
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for String
    * @return property wrapper around a String function
    */
-  public static Property<Function<String>> iconColor(Function<String> function) {
-    return new PaintProperty<>("icon-color", function);
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, String>> iconColor(CameraFunction<Z, String> function) {
+    return new PaintPropertyValue<>("icon-color", function);
   }
 
   /**
@@ -472,8 +500,8 @@ public class PropertyFactory {
    * @param value a int color value
    * @return property wrapper around String color
    */
-  public static Property<String> iconHaloColor(@ColorInt int value) {
-    return new PaintProperty<>("icon-halo-color", colorToRgbaString(value));
+  public static PropertyValue<String> iconHaloColor(@ColorInt int value) {
+    return new PaintPropertyValue<>("icon-halo-color", colorToRgbaString(value));
   }
 
   /**
@@ -482,18 +510,20 @@ public class PropertyFactory {
    * @param value a String value
    * @return property wrapper around String
    */
-  public static Property<String> iconHaloColor(String value) {
-    return new PaintProperty<>("icon-halo-color", value);
+  public static PropertyValue<String> iconHaloColor(String value) {
+    return new PaintPropertyValue<>("icon-halo-color", value);
   }
+
 
   /**
    * The color of the icon's halo. Icon halos can only be used with SDF icons.
    *
-   * @param function a wrapper function for String
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for String
    * @return property wrapper around a String function
    */
-  public static Property<Function<String>> iconHaloColor(Function<String> function) {
-    return new PaintProperty<>("icon-halo-color", function);
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, String>> iconHaloColor(CameraFunction<Z, String> function) {
+    return new PaintPropertyValue<>("icon-halo-color", function);
   }
 
   /**
@@ -502,18 +532,20 @@ public class PropertyFactory {
    * @param value a Float value
    * @return property wrapper around Float
    */
-  public static Property<Float> iconHaloWidth(Float value) {
-    return new PaintProperty<>("icon-halo-width", value);
+  public static PropertyValue<Float> iconHaloWidth(Float value) {
+    return new PaintPropertyValue<>("icon-halo-width", value);
   }
+
 
   /**
    * Distance of halo to the icon outline.
    *
-   * @param function a wrapper function for Float
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for Float
    * @return property wrapper around a Float function
    */
-  public static Property<Function<Float>> iconHaloWidth(Function<Float> function) {
-    return new PaintProperty<>("icon-halo-width", function);
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, Float>> iconHaloWidth(CameraFunction<Z, Float> function) {
+    return new PaintPropertyValue<>("icon-halo-width", function);
   }
 
   /**
@@ -522,40 +554,42 @@ public class PropertyFactory {
    * @param value a Float value
    * @return property wrapper around Float
    */
-  public static Property<Float> iconHaloBlur(Float value) {
-    return new PaintProperty<>("icon-halo-blur", value);
+  public static PropertyValue<Float> iconHaloBlur(Float value) {
+    return new PaintPropertyValue<>("icon-halo-blur", value);
   }
+
 
   /**
    * Fade out the halo towards the outside.
    *
-   * @param function a wrapper function for Float
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for Float
    * @return property wrapper around a Float function
    */
-  public static Property<Function<Float>> iconHaloBlur(Function<Float> function) {
-    return new PaintProperty<>("icon-halo-blur", function);
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, Float>> iconHaloBlur(CameraFunction<Z, Float> function) {
+    return new PaintPropertyValue<>("icon-halo-blur", function);
   }
 
   /**
-   * Distance that the icon's anchor is moved from its original placement. Positive values indicate right and down,
-   * while negative values indicate left and up.
+   * Distance that the icon's anchor is moved from its original placement. Positive values indicate right and down, while negative values indicate left and up.
    *
    * @param value a Float[] value
    * @return property wrapper around Float[]
    */
-  public static Property<Float[]> iconTranslate(Float[] value) {
-    return new PaintProperty<>("icon-translate", value);
+  public static PropertyValue<Float[]> iconTranslate(Float[] value) {
+    return new PaintPropertyValue<>("icon-translate", value);
   }
 
+
   /**
-   * Distance that the icon's anchor is moved from its original placement. Positive values indicate right and down,
-   * while negative values indicate left and up.
+   * Distance that the icon's anchor is moved from its original placement. Positive values indicate right and down, while negative values indicate left and up.
    *
-   * @param function a wrapper function for Float[]
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for Float[]
    * @return property wrapper around a Float[] function
    */
-  public static Property<Function<Float[]>> iconTranslate(Function<Float[]> function) {
-    return new PaintProperty<>("icon-translate", function);
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, Float[]>> iconTranslate(CameraFunction<Z, Float[]> function) {
+    return new PaintPropertyValue<>("icon-translate", function);
   }
 
   /**
@@ -564,18 +598,20 @@ public class PropertyFactory {
    * @param value a String value
    * @return property wrapper around String
    */
-  public static Property<String> iconTranslateAnchor(@Property.ICON_TRANSLATE_ANCHOR String value) {
-    return new PaintProperty<>("icon-translate-anchor", value);
+  public static PropertyValue<String> iconTranslateAnchor(@Property.ICON_TRANSLATE_ANCHOR String value) {
+    return new PaintPropertyValue<>("icon-translate-anchor", value);
   }
+
 
   /**
    * Controls the translation reference point.
    *
-   * @param function a wrapper function for String
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for String
    * @return property wrapper around a String function
    */
-  public static Property<Function<String>> iconTranslateAnchor(Function<String> function) {
-    return new PaintProperty<>("icon-translate-anchor", function);
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, String>> iconTranslateAnchor(CameraFunction<Z, String> function) {
+    return new PaintPropertyValue<>("icon-translate-anchor", function);
   }
 
   /**
@@ -584,18 +620,20 @@ public class PropertyFactory {
    * @param value a Float value
    * @return property wrapper around Float
    */
-  public static Property<Float> textOpacity(Float value) {
-    return new PaintProperty<>("text-opacity", value);
+  public static PropertyValue<Float> textOpacity(Float value) {
+    return new PaintPropertyValue<>("text-opacity", value);
   }
+
 
   /**
    * The opacity at which the text will be drawn.
    *
-   * @param function a wrapper function for Float
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for Float
    * @return property wrapper around a Float function
    */
-  public static Property<Function<Float>> textOpacity(Function<Float> function) {
-    return new PaintProperty<>("text-opacity", function);
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, Float>> textOpacity(CameraFunction<Z, Float> function) {
+    return new PaintPropertyValue<>("text-opacity", function);
   }
 
   /**
@@ -604,8 +642,8 @@ public class PropertyFactory {
    * @param value a int color value
    * @return property wrapper around String color
    */
-  public static Property<String> textColor(@ColorInt int value) {
-    return new PaintProperty<>("text-color", colorToRgbaString(value));
+  public static PropertyValue<String> textColor(@ColorInt int value) {
+    return new PaintPropertyValue<>("text-color", colorToRgbaString(value));
   }
 
   /**
@@ -614,18 +652,20 @@ public class PropertyFactory {
    * @param value a String value
    * @return property wrapper around String
    */
-  public static Property<String> textColor(String value) {
-    return new PaintProperty<>("text-color", value);
+  public static PropertyValue<String> textColor(String value) {
+    return new PaintPropertyValue<>("text-color", value);
   }
+
 
   /**
    * The color with which the text will be drawn.
    *
-   * @param function a wrapper function for String
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for String
    * @return property wrapper around a String function
    */
-  public static Property<Function<String>> textColor(Function<String> function) {
-    return new PaintProperty<>("text-color", function);
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, String>> textColor(CameraFunction<Z, String> function) {
+    return new PaintPropertyValue<>("text-color", function);
   }
 
   /**
@@ -634,8 +674,8 @@ public class PropertyFactory {
    * @param value a int color value
    * @return property wrapper around String color
    */
-  public static Property<String> textHaloColor(@ColorInt int value) {
-    return new PaintProperty<>("text-halo-color", colorToRgbaString(value));
+  public static PropertyValue<String> textHaloColor(@ColorInt int value) {
+    return new PaintPropertyValue<>("text-halo-color", colorToRgbaString(value));
   }
 
   /**
@@ -644,18 +684,20 @@ public class PropertyFactory {
    * @param value a String value
    * @return property wrapper around String
    */
-  public static Property<String> textHaloColor(String value) {
-    return new PaintProperty<>("text-halo-color", value);
+  public static PropertyValue<String> textHaloColor(String value) {
+    return new PaintPropertyValue<>("text-halo-color", value);
   }
+
 
   /**
    * The color of the text's halo, which helps it stand out from backgrounds.
    *
-   * @param function a wrapper function for String
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for String
    * @return property wrapper around a String function
    */
-  public static Property<Function<String>> textHaloColor(Function<String> function) {
-    return new PaintProperty<>("text-halo-color", function);
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, String>> textHaloColor(CameraFunction<Z, String> function) {
+    return new PaintPropertyValue<>("text-halo-color", function);
   }
 
   /**
@@ -664,18 +706,20 @@ public class PropertyFactory {
    * @param value a Float value
    * @return property wrapper around Float
    */
-  public static Property<Float> textHaloWidth(Float value) {
-    return new PaintProperty<>("text-halo-width", value);
+  public static PropertyValue<Float> textHaloWidth(Float value) {
+    return new PaintPropertyValue<>("text-halo-width", value);
   }
+
 
   /**
    * Distance of halo to the font outline. Max text halo width is 1/4 of the font-size.
    *
-   * @param function a wrapper function for Float
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for Float
    * @return property wrapper around a Float function
    */
-  public static Property<Function<Float>> textHaloWidth(Function<Float> function) {
-    return new PaintProperty<>("text-halo-width", function);
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, Float>> textHaloWidth(CameraFunction<Z, Float> function) {
+    return new PaintPropertyValue<>("text-halo-width", function);
   }
 
   /**
@@ -684,40 +728,42 @@ public class PropertyFactory {
    * @param value a Float value
    * @return property wrapper around Float
    */
-  public static Property<Float> textHaloBlur(Float value) {
-    return new PaintProperty<>("text-halo-blur", value);
+  public static PropertyValue<Float> textHaloBlur(Float value) {
+    return new PaintPropertyValue<>("text-halo-blur", value);
   }
+
 
   /**
    * The halo's fadeout distance towards the outside.
    *
-   * @param function a wrapper function for Float
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for Float
    * @return property wrapper around a Float function
    */
-  public static Property<Function<Float>> textHaloBlur(Function<Float> function) {
-    return new PaintProperty<>("text-halo-blur", function);
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, Float>> textHaloBlur(CameraFunction<Z, Float> function) {
+    return new PaintPropertyValue<>("text-halo-blur", function);
   }
 
   /**
-   * Distance that the text's anchor is moved from its original placement. Positive values indicate right and down,
-   * while negative values indicate left and up.
+   * Distance that the text's anchor is moved from its original placement. Positive values indicate right and down, while negative values indicate left and up.
    *
    * @param value a Float[] value
    * @return property wrapper around Float[]
    */
-  public static Property<Float[]> textTranslate(Float[] value) {
-    return new PaintProperty<>("text-translate", value);
+  public static PropertyValue<Float[]> textTranslate(Float[] value) {
+    return new PaintPropertyValue<>("text-translate", value);
   }
 
+
   /**
-   * Distance that the text's anchor is moved from its original placement. Positive values indicate right and down,
-   * while negative values indicate left and up.
+   * Distance that the text's anchor is moved from its original placement. Positive values indicate right and down, while negative values indicate left and up.
    *
-   * @param function a wrapper function for Float[]
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for Float[]
    * @return property wrapper around a Float[] function
    */
-  public static Property<Function<Float[]>> textTranslate(Function<Float[]> function) {
-    return new PaintProperty<>("text-translate", function);
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, Float[]>> textTranslate(CameraFunction<Z, Float[]> function) {
+    return new PaintPropertyValue<>("text-translate", function);
   }
 
   /**
@@ -726,18 +772,20 @@ public class PropertyFactory {
    * @param value a String value
    * @return property wrapper around String
    */
-  public static Property<String> textTranslateAnchor(@Property.TEXT_TRANSLATE_ANCHOR String value) {
-    return new PaintProperty<>("text-translate-anchor", value);
+  public static PropertyValue<String> textTranslateAnchor(@Property.TEXT_TRANSLATE_ANCHOR String value) {
+    return new PaintPropertyValue<>("text-translate-anchor", value);
   }
+
 
   /**
    * Controls the translation reference point.
    *
-   * @param function a wrapper function for String
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for String
    * @return property wrapper around a String function
    */
-  public static Property<Function<String>> textTranslateAnchor(Function<String> function) {
-    return new PaintProperty<>("text-translate-anchor", function);
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, String>> textTranslateAnchor(CameraFunction<Z, String> function) {
+    return new PaintPropertyValue<>("text-translate-anchor", function);
   }
 
   /**
@@ -746,18 +794,20 @@ public class PropertyFactory {
    * @param value a Float value
    * @return property wrapper around Float
    */
-  public static Property<Float> circleRadius(Float value) {
-    return new PaintProperty<>("circle-radius", value);
+  public static PropertyValue<Float> circleRadius(Float value) {
+    return new PaintPropertyValue<>("circle-radius", value);
   }
+
 
   /**
    * Circle radius.
    *
+   * @param <T> the function input type
    * @param function a wrapper function for Float
    * @return property wrapper around a Float function
    */
-  public static Property<Function<Float>> circleRadius(Function<Float> function) {
-    return new PaintProperty<>("circle-radius", function);
+  public static <T> PropertyValue<Function<T, Float>> circleRadius(Function<T, Float> function) {
+    return new PaintPropertyValue<>("circle-radius", function);
   }
 
   /**
@@ -766,8 +816,8 @@ public class PropertyFactory {
    * @param value a int color value
    * @return property wrapper around String color
    */
-  public static Property<String> circleColor(@ColorInt int value) {
-    return new PaintProperty<>("circle-color", colorToRgbaString(value));
+  public static PropertyValue<String> circleColor(@ColorInt int value) {
+    return new PaintPropertyValue<>("circle-color", colorToRgbaString(value));
   }
 
   /**
@@ -776,18 +826,20 @@ public class PropertyFactory {
    * @param value a String value
    * @return property wrapper around String
    */
-  public static Property<String> circleColor(String value) {
-    return new PaintProperty<>("circle-color", value);
+  public static PropertyValue<String> circleColor(String value) {
+    return new PaintPropertyValue<>("circle-color", value);
   }
+
 
   /**
    * The fill color of the circle.
    *
+   * @param <T> the function input type
    * @param function a wrapper function for String
    * @return property wrapper around a String function
    */
-  public static Property<Function<String>> circleColor(Function<String> function) {
-    return new PaintProperty<>("circle-color", function);
+  public static <T> PropertyValue<Function<T, String>> circleColor(Function<T, String> function) {
+    return new PaintPropertyValue<>("circle-color", function);
   }
 
   /**
@@ -796,18 +848,20 @@ public class PropertyFactory {
    * @param value a Float value
    * @return property wrapper around Float
    */
-  public static Property<Float> circleBlur(Float value) {
-    return new PaintProperty<>("circle-blur", value);
+  public static PropertyValue<Float> circleBlur(Float value) {
+    return new PaintPropertyValue<>("circle-blur", value);
   }
+
 
   /**
    * Amount to blur the circle. 1 blurs the circle such that only the centerpoint is full opacity.
    *
+   * @param <T> the function input type
    * @param function a wrapper function for Float
    * @return property wrapper around a Float function
    */
-  public static Property<Function<Float>> circleBlur(Function<Float> function) {
-    return new PaintProperty<>("circle-blur", function);
+  public static <T> PropertyValue<Function<T, Float>> circleBlur(Function<T, Float> function) {
+    return new PaintPropertyValue<>("circle-blur", function);
   }
 
   /**
@@ -816,18 +870,20 @@ public class PropertyFactory {
    * @param value a Float value
    * @return property wrapper around Float
    */
-  public static Property<Float> circleOpacity(Float value) {
-    return new PaintProperty<>("circle-opacity", value);
+  public static PropertyValue<Float> circleOpacity(Float value) {
+    return new PaintPropertyValue<>("circle-opacity", value);
   }
+
 
   /**
    * The opacity at which the circle will be drawn.
    *
+   * @param <T> the function input type
    * @param function a wrapper function for Float
    * @return property wrapper around a Float function
    */
-  public static Property<Function<Float>> circleOpacity(Function<Float> function) {
-    return new PaintProperty<>("circle-opacity", function);
+  public static <T> PropertyValue<Function<T, Float>> circleOpacity(Function<T, Float> function) {
+    return new PaintPropertyValue<>("circle-opacity", function);
   }
 
   /**
@@ -836,18 +892,20 @@ public class PropertyFactory {
    * @param value a Float[] value
    * @return property wrapper around Float[]
    */
-  public static Property<Float[]> circleTranslate(Float[] value) {
-    return new PaintProperty<>("circle-translate", value);
+  public static PropertyValue<Float[]> circleTranslate(Float[] value) {
+    return new PaintPropertyValue<>("circle-translate", value);
   }
+
 
   /**
    * The geometry's offset. Values are [x, y] where negatives indicate left and up, respectively.
    *
-   * @param function a wrapper function for Float[]
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for Float[]
    * @return property wrapper around a Float[] function
    */
-  public static Property<Function<Float[]>> circleTranslate(Function<Float[]> function) {
-    return new PaintProperty<>("circle-translate", function);
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, Float[]>> circleTranslate(CameraFunction<Z, Float[]> function) {
+    return new PaintPropertyValue<>("circle-translate", function);
   }
 
   /**
@@ -856,18 +914,20 @@ public class PropertyFactory {
    * @param value a String value
    * @return property wrapper around String
    */
-  public static Property<String> circleTranslateAnchor(@Property.CIRCLE_TRANSLATE_ANCHOR String value) {
-    return new PaintProperty<>("circle-translate-anchor", value);
+  public static PropertyValue<String> circleTranslateAnchor(@Property.CIRCLE_TRANSLATE_ANCHOR String value) {
+    return new PaintPropertyValue<>("circle-translate-anchor", value);
   }
+
 
   /**
    * Controls the translation reference point.
    *
-   * @param function a wrapper function for String
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for String
    * @return property wrapper around a String function
    */
-  public static Property<Function<String>> circleTranslateAnchor(Function<String> function) {
-    return new PaintProperty<>("circle-translate-anchor", function);
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, String>> circleTranslateAnchor(CameraFunction<Z, String> function) {
+    return new PaintPropertyValue<>("circle-translate-anchor", function);
   }
 
   /**
@@ -876,38 +936,42 @@ public class PropertyFactory {
    * @param value a String value
    * @return property wrapper around String
    */
-  public static Property<String> circlePitchScale(@Property.CIRCLE_PITCH_SCALE String value) {
-    return new PaintProperty<>("circle-pitch-scale", value);
+  public static PropertyValue<String> circlePitchScale(@Property.CIRCLE_PITCH_SCALE String value) {
+    return new PaintPropertyValue<>("circle-pitch-scale", value);
   }
+
 
   /**
    * Controls the scaling behavior of the circle when the map is pitched.
    *
-   * @param function a wrapper function for String
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for String
    * @return property wrapper around a String function
    */
-  public static Property<Function<String>> circlePitchScale(Function<String> function) {
-    return new PaintProperty<>("circle-pitch-scale", function);
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, String>> circlePitchScale(CameraFunction<Z, String> function) {
+    return new PaintPropertyValue<>("circle-pitch-scale", function);
   }
 
   /**
-   * The width of the circle's stroke. Strokes are placed outside of the "circle-radius".
+   * The width of the circle's stroke. Strokes are placed outside of the {@link PropertyFactory#circleRadius}.
    *
    * @param value a Float value
    * @return property wrapper around Float
    */
-  public static Property<Float> circleStrokeWidth(Float value) {
-    return new PaintProperty<>("circle-stroke-width", value);
+  public static PropertyValue<Float> circleStrokeWidth(Float value) {
+    return new PaintPropertyValue<>("circle-stroke-width", value);
   }
 
+
   /**
-   * The width of the circle's stroke. Strokes are placed outside of the "circle-radius".
+   * The width of the circle's stroke. Strokes are placed outside of the {@link PropertyFactory#circleRadius}.
    *
+   * @param <T> the function input type
    * @param function a wrapper function for Float
    * @return property wrapper around a Float function
    */
-  public static Property<Function<Float>> circleStrokeWidth(Function<Float> function) {
-    return new PaintProperty<>("circle-stroke-width", function);
+  public static <T> PropertyValue<Function<T, Float>> circleStrokeWidth(Function<T, Float> function) {
+    return new PaintPropertyValue<>("circle-stroke-width", function);
   }
 
   /**
@@ -916,8 +980,8 @@ public class PropertyFactory {
    * @param value a int color value
    * @return property wrapper around String color
    */
-  public static Property<String> circleStrokeColor(@ColorInt int value) {
-    return new PaintProperty<>("circle-stroke-color", colorToRgbaString(value));
+  public static PropertyValue<String> circleStrokeColor(@ColorInt int value) {
+    return new PaintPropertyValue<>("circle-stroke-color", colorToRgbaString(value));
   }
 
   /**
@@ -926,18 +990,20 @@ public class PropertyFactory {
    * @param value a String value
    * @return property wrapper around String
    */
-  public static Property<String> circleStrokeColor(String value) {
-    return new PaintProperty<>("circle-stroke-color", value);
+  public static PropertyValue<String> circleStrokeColor(String value) {
+    return new PaintPropertyValue<>("circle-stroke-color", value);
   }
+
 
   /**
    * The stroke color of the circle.
    *
+   * @param <T> the function input type
    * @param function a wrapper function for String
    * @return property wrapper around a String function
    */
-  public static Property<Function<String>> circleStrokeColor(Function<String> function) {
-    return new PaintProperty<>("circle-stroke-color", function);
+  public static <T> PropertyValue<Function<T, String>> circleStrokeColor(Function<T, String> function) {
+    return new PaintPropertyValue<>("circle-stroke-color", function);
   }
 
   /**
@@ -946,18 +1012,20 @@ public class PropertyFactory {
    * @param value a Float value
    * @return property wrapper around Float
    */
-  public static Property<Float> circleStrokeOpacity(Float value) {
-    return new PaintProperty<>("circle-stroke-opacity", value);
+  public static PropertyValue<Float> circleStrokeOpacity(Float value) {
+    return new PaintPropertyValue<>("circle-stroke-opacity", value);
   }
+
 
   /**
    * The opacity of the circle's stroke.
    *
+   * @param <T> the function input type
    * @param function a wrapper function for Float
    * @return property wrapper around a Float function
    */
-  public static Property<Function<Float>> circleStrokeOpacity(Function<Float> function) {
-    return new PaintProperty<>("circle-stroke-opacity", function);
+  public static <T> PropertyValue<Function<T, Float>> circleStrokeOpacity(Function<T, Float> function) {
+    return new PaintPropertyValue<>("circle-stroke-opacity", function);
   }
 
   /**
@@ -966,18 +1034,20 @@ public class PropertyFactory {
    * @param value a Float value
    * @return property wrapper around Float
    */
-  public static Property<Float> rasterOpacity(Float value) {
-    return new PaintProperty<>("raster-opacity", value);
+  public static PropertyValue<Float> rasterOpacity(Float value) {
+    return new PaintPropertyValue<>("raster-opacity", value);
   }
+
 
   /**
    * The opacity at which the image will be drawn.
    *
-   * @param function a wrapper function for Float
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for Float
    * @return property wrapper around a Float function
    */
-  public static Property<Function<Float>> rasterOpacity(Function<Float> function) {
-    return new PaintProperty<>("raster-opacity", function);
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, Float>> rasterOpacity(CameraFunction<Z, Float> function) {
+    return new PaintPropertyValue<>("raster-opacity", function);
   }
 
   /**
@@ -986,18 +1056,20 @@ public class PropertyFactory {
    * @param value a Float value
    * @return property wrapper around Float
    */
-  public static Property<Float> rasterHueRotate(Float value) {
-    return new PaintProperty<>("raster-hue-rotate", value);
+  public static PropertyValue<Float> rasterHueRotate(Float value) {
+    return new PaintPropertyValue<>("raster-hue-rotate", value);
   }
+
 
   /**
    * Rotates hues around the color wheel.
    *
-   * @param function a wrapper function for Float
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for Float
    * @return property wrapper around a Float function
    */
-  public static Property<Function<Float>> rasterHueRotate(Function<Float> function) {
-    return new PaintProperty<>("raster-hue-rotate", function);
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, Float>> rasterHueRotate(CameraFunction<Z, Float> function) {
+    return new PaintPropertyValue<>("raster-hue-rotate", function);
   }
 
   /**
@@ -1006,18 +1078,20 @@ public class PropertyFactory {
    * @param value a Float value
    * @return property wrapper around Float
    */
-  public static Property<Float> rasterBrightnessMin(Float value) {
-    return new PaintProperty<>("raster-brightness-min", value);
+  public static PropertyValue<Float> rasterBrightnessMin(Float value) {
+    return new PaintPropertyValue<>("raster-brightness-min", value);
   }
+
 
   /**
    * Increase or reduce the brightness of the image. The value is the minimum brightness.
    *
-   * @param function a wrapper function for Float
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for Float
    * @return property wrapper around a Float function
    */
-  public static Property<Function<Float>> rasterBrightnessMin(Function<Float> function) {
-    return new PaintProperty<>("raster-brightness-min", function);
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, Float>> rasterBrightnessMin(CameraFunction<Z, Float> function) {
+    return new PaintPropertyValue<>("raster-brightness-min", function);
   }
 
   /**
@@ -1026,18 +1100,20 @@ public class PropertyFactory {
    * @param value a Float value
    * @return property wrapper around Float
    */
-  public static Property<Float> rasterBrightnessMax(Float value) {
-    return new PaintProperty<>("raster-brightness-max", value);
+  public static PropertyValue<Float> rasterBrightnessMax(Float value) {
+    return new PaintPropertyValue<>("raster-brightness-max", value);
   }
+
 
   /**
    * Increase or reduce the brightness of the image. The value is the maximum brightness.
    *
-   * @param function a wrapper function for Float
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for Float
    * @return property wrapper around a Float function
    */
-  public static Property<Function<Float>> rasterBrightnessMax(Function<Float> function) {
-    return new PaintProperty<>("raster-brightness-max", function);
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, Float>> rasterBrightnessMax(CameraFunction<Z, Float> function) {
+    return new PaintPropertyValue<>("raster-brightness-max", function);
   }
 
   /**
@@ -1046,18 +1122,20 @@ public class PropertyFactory {
    * @param value a Float value
    * @return property wrapper around Float
    */
-  public static Property<Float> rasterSaturation(Float value) {
-    return new PaintProperty<>("raster-saturation", value);
+  public static PropertyValue<Float> rasterSaturation(Float value) {
+    return new PaintPropertyValue<>("raster-saturation", value);
   }
+
 
   /**
    * Increase or reduce the saturation of the image.
    *
-   * @param function a wrapper function for Float
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for Float
    * @return property wrapper around a Float function
    */
-  public static Property<Function<Float>> rasterSaturation(Function<Float> function) {
-    return new PaintProperty<>("raster-saturation", function);
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, Float>> rasterSaturation(CameraFunction<Z, Float> function) {
+    return new PaintPropertyValue<>("raster-saturation", function);
   }
 
   /**
@@ -1066,18 +1144,20 @@ public class PropertyFactory {
    * @param value a Float value
    * @return property wrapper around Float
    */
-  public static Property<Float> rasterContrast(Float value) {
-    return new PaintProperty<>("raster-contrast", value);
+  public static PropertyValue<Float> rasterContrast(Float value) {
+    return new PaintPropertyValue<>("raster-contrast", value);
   }
+
 
   /**
    * Increase or reduce the contrast of the image.
    *
-   * @param function a wrapper function for Float
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for Float
    * @return property wrapper around a Float function
    */
-  public static Property<Function<Float>> rasterContrast(Function<Float> function) {
-    return new PaintProperty<>("raster-contrast", function);
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, Float>> rasterContrast(CameraFunction<Z, Float> function) {
+    return new PaintPropertyValue<>("raster-contrast", function);
   }
 
   /**
@@ -1086,18 +1166,20 @@ public class PropertyFactory {
    * @param value a Float value
    * @return property wrapper around Float
    */
-  public static Property<Float> rasterFadeDuration(Float value) {
-    return new PaintProperty<>("raster-fade-duration", value);
+  public static PropertyValue<Float> rasterFadeDuration(Float value) {
+    return new PaintPropertyValue<>("raster-fade-duration", value);
   }
+
 
   /**
    * Fade duration when a new tile is added.
    *
-   * @param function a wrapper function for Float
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for Float
    * @return property wrapper around a Float function
    */
-  public static Property<Function<Float>> rasterFadeDuration(Function<Float> function) {
-    return new PaintProperty<>("raster-fade-duration", function);
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, Float>> rasterFadeDuration(CameraFunction<Z, Float> function) {
+    return new PaintPropertyValue<>("raster-fade-duration", function);
   }
 
   /**
@@ -1106,8 +1188,8 @@ public class PropertyFactory {
    * @param value a int color value
    * @return property wrapper around String color
    */
-  public static Property<String> backgroundColor(@ColorInt int value) {
-    return new PaintProperty<>("background-color", colorToRgbaString(value));
+  public static PropertyValue<String> backgroundColor(@ColorInt int value) {
+    return new PaintPropertyValue<>("background-color", colorToRgbaString(value));
   }
 
   /**
@@ -1116,40 +1198,42 @@ public class PropertyFactory {
    * @param value a String value
    * @return property wrapper around String
    */
-  public static Property<String> backgroundColor(String value) {
-    return new PaintProperty<>("background-color", value);
+  public static PropertyValue<String> backgroundColor(String value) {
+    return new PaintPropertyValue<>("background-color", value);
   }
+
 
   /**
    * The color with which the background will be drawn.
    *
-   * @param function a wrapper function for String
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for String
    * @return property wrapper around a String function
    */
-  public static Property<Function<String>> backgroundColor(Function<String> function) {
-    return new PaintProperty<>("background-color", function);
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, String>> backgroundColor(CameraFunction<Z, String> function) {
+    return new PaintPropertyValue<>("background-color", function);
   }
 
   /**
-   * Name of image in sprite to use for drawing an image background. For seamless patterns, image width and height must
-   * be a factor of two (2, 4, 8, ..., 512).
+   * Name of image in sprite to use for drawing an image background. For seamless patterns, image width and height must be a factor of two (2, 4, 8, ..., 512).
    *
    * @param value a String value
    * @return property wrapper around String
    */
-  public static Property<String> backgroundPattern(String value) {
-    return new PaintProperty<>("background-pattern", value);
+  public static PropertyValue<String> backgroundPattern(String value) {
+    return new PaintPropertyValue<>("background-pattern", value);
   }
 
+
   /**
-   * Name of image in sprite to use for drawing an image background. For seamless patterns, image width and height must
-   * be a factor of two (2, 4, 8, ..., 512).
+   * Name of image in sprite to use for drawing an image background. For seamless patterns, image width and height must be a factor of two (2, 4, 8, ..., 512).
    *
-   * @param function a wrapper function for String
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for String
    * @return property wrapper around a String function
    */
-  public static Property<Function<String>> backgroundPattern(Function<String> function) {
-    return new PaintProperty<>("background-pattern", function);
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, String>> backgroundPattern(CameraFunction<Z, String> function) {
+    return new PaintPropertyValue<>("background-pattern", function);
   }
 
   /**
@@ -1158,18 +1242,20 @@ public class PropertyFactory {
    * @param value a Float value
    * @return property wrapper around Float
    */
-  public static Property<Float> backgroundOpacity(Float value) {
-    return new PaintProperty<>("background-opacity", value);
+  public static PropertyValue<Float> backgroundOpacity(Float value) {
+    return new PaintPropertyValue<>("background-opacity", value);
   }
+
 
   /**
    * The opacity at which the background will be drawn.
    *
-   * @param function a wrapper function for Float
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for Float
    * @return property wrapper around a Float function
    */
-  public static Property<Function<Float>> backgroundOpacity(Function<Float> function) {
-    return new PaintProperty<>("background-opacity", function);
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, Float>> backgroundOpacity(CameraFunction<Z, Float> function) {
+    return new PaintPropertyValue<>("background-opacity", function);
   }
 
   /**
@@ -1178,18 +1264,21 @@ public class PropertyFactory {
    * @param value a String value
    * @return property wrapper around String
    */
-  public static Property<String> lineCap(@Property.LINE_CAP String value) {
-    return new LayoutProperty<>("line-cap", value);
+  public static PropertyValue<String> lineCap(@Property.LINE_CAP String value) {
+    return new LayoutPropertyValue<>("line-cap", value);
   }
+
+
 
   /**
    * The display of line endings.
    *
-   * @param function a wrapper function for String
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for String
    * @return property wrapper around a String function
    */
-  public static Property<Function<String>> lineCap(Function<String> function) {
-    return new LayoutProperty<>("line-cap", function);
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, String>> lineCap(CameraFunction<Z, String> function) {
+    return new LayoutPropertyValue<>("line-cap", function);
   }
 
   /**
@@ -1198,18 +1287,21 @@ public class PropertyFactory {
    * @param value a String value
    * @return property wrapper around String
    */
-  public static Property<String> lineJoin(@Property.LINE_JOIN String value) {
-    return new LayoutProperty<>("line-join", value);
+  public static PropertyValue<String> lineJoin(@Property.LINE_JOIN String value) {
+    return new LayoutPropertyValue<>("line-join", value);
   }
+
+
 
   /**
    * The display of lines when joining.
    *
-   * @param function a wrapper function for String
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for String
    * @return property wrapper around a String function
    */
-  public static Property<Function<String>> lineJoin(Function<String> function) {
-    return new LayoutProperty<>("line-join", function);
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, String>> lineJoin(CameraFunction<Z, String> function) {
+    return new LayoutPropertyValue<>("line-join", function);
   }
 
   /**
@@ -1218,18 +1310,21 @@ public class PropertyFactory {
    * @param value a Float value
    * @return property wrapper around Float
    */
-  public static Property<Float> lineMiterLimit(Float value) {
-    return new LayoutProperty<>("line-miter-limit", value);
+  public static PropertyValue<Float> lineMiterLimit(Float value) {
+    return new LayoutPropertyValue<>("line-miter-limit", value);
   }
+
+
 
   /**
    * Used to automatically convert miter joins to bevel joins for sharp angles.
    *
-   * @param function a wrapper function for Float
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for Float
    * @return property wrapper around a Float function
    */
-  public static Property<Function<Float>> lineMiterLimit(Function<Float> function) {
-    return new LayoutProperty<>("line-miter-limit", function);
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, Float>> lineMiterLimit(CameraFunction<Z, Float> function) {
+    return new LayoutPropertyValue<>("line-miter-limit", function);
   }
 
   /**
@@ -1238,18 +1333,21 @@ public class PropertyFactory {
    * @param value a Float value
    * @return property wrapper around Float
    */
-  public static Property<Float> lineRoundLimit(Float value) {
-    return new LayoutProperty<>("line-round-limit", value);
+  public static PropertyValue<Float> lineRoundLimit(Float value) {
+    return new LayoutPropertyValue<>("line-round-limit", value);
   }
+
+
 
   /**
    * Used to automatically convert round joins to miter joins for shallow angles.
    *
-   * @param function a wrapper function for Float
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for Float
    * @return property wrapper around a Float function
    */
-  public static Property<Function<Float>> lineRoundLimit(Function<Float> function) {
-    return new LayoutProperty<>("line-round-limit", function);
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, Float>> lineRoundLimit(CameraFunction<Z, Float> function) {
+    return new LayoutPropertyValue<>("line-round-limit", function);
   }
 
   /**
@@ -1258,18 +1356,21 @@ public class PropertyFactory {
    * @param value a String value
    * @return property wrapper around String
    */
-  public static Property<String> symbolPlacement(@Property.SYMBOL_PLACEMENT String value) {
-    return new LayoutProperty<>("symbol-placement", value);
+  public static PropertyValue<String> symbolPlacement(@Property.SYMBOL_PLACEMENT String value) {
+    return new LayoutPropertyValue<>("symbol-placement", value);
   }
+
+
 
   /**
    * Label placement relative to its geometry.
    *
-   * @param function a wrapper function for String
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for String
    * @return property wrapper around a String function
    */
-  public static Property<Function<String>> symbolPlacement(Function<String> function) {
-    return new LayoutProperty<>("symbol-placement", function);
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, String>> symbolPlacement(CameraFunction<Z, String> function) {
+    return new LayoutPropertyValue<>("symbol-placement", function);
   }
 
   /**
@@ -1278,42 +1379,44 @@ public class PropertyFactory {
    * @param value a Float value
    * @return property wrapper around Float
    */
-  public static Property<Float> symbolSpacing(Float value) {
-    return new LayoutProperty<>("symbol-spacing", value);
+  public static PropertyValue<Float> symbolSpacing(Float value) {
+    return new LayoutPropertyValue<>("symbol-spacing", value);
   }
+
+
 
   /**
    * Distance between two symbol anchors.
    *
-   * @param function a wrapper function for Float
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for Float
    * @return property wrapper around a Float function
    */
-  public static Property<Function<Float>> symbolSpacing(Function<Float> function) {
-    return new LayoutProperty<>("symbol-spacing", function);
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, Float>> symbolSpacing(CameraFunction<Z, Float> function) {
+    return new LayoutPropertyValue<>("symbol-spacing", function);
   }
 
   /**
-   * If true, the symbols will not cross tile edges to avoid mutual collisions. Recommended in layers that don't have
-   * enough padding in the vector tile to prevent collisions, or if it is a point symbol layer placed after a line
-   * symbol layer.
+   * If true, the symbols will not cross tile edges to avoid mutual collisions. Recommended in layers that don't have enough padding in the vector tile to prevent collisions, or if it is a point symbol layer placed after a line symbol layer.
    *
    * @param value a Boolean value
    * @return property wrapper around Boolean
    */
-  public static Property<Boolean> symbolAvoidEdges(Boolean value) {
-    return new LayoutProperty<>("symbol-avoid-edges", value);
+  public static PropertyValue<Boolean> symbolAvoidEdges(Boolean value) {
+    return new LayoutPropertyValue<>("symbol-avoid-edges", value);
   }
 
+
+
   /**
-   * If true, the symbols will not cross tile edges to avoid mutual collisions. Recommended in layers that don't have
-   * enough padding in the vector tile to prevent collisions, or if it is a point symbol layer placed after a line
-   * symbol layer.
+   * If true, the symbols will not cross tile edges to avoid mutual collisions. Recommended in layers that don't have enough padding in the vector tile to prevent collisions, or if it is a point symbol layer placed after a line symbol layer.
    *
-   * @param function a wrapper function for Boolean
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for Boolean
    * @return property wrapper around a Boolean function
    */
-  public static Property<Function<Boolean>> symbolAvoidEdges(Function<Boolean> function) {
-    return new LayoutProperty<>("symbol-avoid-edges", function);
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, Boolean>> symbolAvoidEdges(CameraFunction<Z, Boolean> function) {
+    return new LayoutPropertyValue<>("symbol-avoid-edges", function);
   }
 
   /**
@@ -1322,18 +1425,21 @@ public class PropertyFactory {
    * @param value a Boolean value
    * @return property wrapper around Boolean
    */
-  public static Property<Boolean> iconAllowOverlap(Boolean value) {
-    return new LayoutProperty<>("icon-allow-overlap", value);
+  public static PropertyValue<Boolean> iconAllowOverlap(Boolean value) {
+    return new LayoutPropertyValue<>("icon-allow-overlap", value);
   }
+
+
 
   /**
    * If true, the icon will be visible even if it collides with other previously drawn symbols.
    *
-   * @param function a wrapper function for Boolean
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for Boolean
    * @return property wrapper around a Boolean function
    */
-  public static Property<Function<Boolean>> iconAllowOverlap(Function<Boolean> function) {
-    return new LayoutProperty<>("icon-allow-overlap", function);
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, Boolean>> iconAllowOverlap(CameraFunction<Z, Boolean> function) {
+    return new LayoutPropertyValue<>("icon-allow-overlap", function);
   }
 
   /**
@@ -1342,40 +1448,44 @@ public class PropertyFactory {
    * @param value a Boolean value
    * @return property wrapper around Boolean
    */
-  public static Property<Boolean> iconIgnorePlacement(Boolean value) {
-    return new LayoutProperty<>("icon-ignore-placement", value);
+  public static PropertyValue<Boolean> iconIgnorePlacement(Boolean value) {
+    return new LayoutPropertyValue<>("icon-ignore-placement", value);
   }
+
+
 
   /**
    * If true, other symbols can be visible even if they collide with the icon.
    *
-   * @param function a wrapper function for Boolean
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for Boolean
    * @return property wrapper around a Boolean function
    */
-  public static Property<Function<Boolean>> iconIgnorePlacement(Function<Boolean> function) {
-    return new LayoutProperty<>("icon-ignore-placement", function);
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, Boolean>> iconIgnorePlacement(CameraFunction<Z, Boolean> function) {
+    return new LayoutPropertyValue<>("icon-ignore-placement", function);
   }
 
   /**
-   * If true, text will display without their corresponding icons when the icon collides with other symbols and the
-   * text does not.
+   * If true, text will display without their corresponding icons when the icon collides with other symbols and the text does not.
    *
    * @param value a Boolean value
    * @return property wrapper around Boolean
    */
-  public static Property<Boolean> iconOptional(Boolean value) {
-    return new LayoutProperty<>("icon-optional", value);
+  public static PropertyValue<Boolean> iconOptional(Boolean value) {
+    return new LayoutPropertyValue<>("icon-optional", value);
   }
 
+
+
   /**
-   * If true, text will display without their corresponding icons when the icon collides with other symbols and the
-   * text does not.
+   * If true, text will display without their corresponding icons when the icon collides with other symbols and the text does not.
    *
-   * @param function a wrapper function for Boolean
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for Boolean
    * @return property wrapper around a Boolean function
    */
-  public static Property<Function<Boolean>> iconOptional(Function<Boolean> function) {
-    return new LayoutProperty<>("icon-optional", function);
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, Boolean>> iconOptional(CameraFunction<Z, Boolean> function) {
+    return new LayoutPropertyValue<>("icon-optional", function);
   }
 
   /**
@@ -1384,18 +1494,21 @@ public class PropertyFactory {
    * @param value a String value
    * @return property wrapper around String
    */
-  public static Property<String> iconRotationAlignment(@Property.ICON_ROTATION_ALIGNMENT String value) {
-    return new LayoutProperty<>("icon-rotation-alignment", value);
+  public static PropertyValue<String> iconRotationAlignment(@Property.ICON_ROTATION_ALIGNMENT String value) {
+    return new LayoutPropertyValue<>("icon-rotation-alignment", value);
   }
+
+
 
   /**
    * In combination with {@link Property.SYMBOL_PLACEMENT}, determines the rotation behavior of icons.
    *
-   * @param function a wrapper function for String
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for String
    * @return property wrapper around a String function
    */
-  public static Property<Function<String>> iconRotationAlignment(Function<String> function) {
-    return new LayoutProperty<>("icon-rotation-alignment", function);
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, String>> iconRotationAlignment(CameraFunction<Z, String> function) {
+    return new LayoutPropertyValue<>("icon-rotation-alignment", function);
   }
 
   /**
@@ -1404,18 +1517,21 @@ public class PropertyFactory {
    * @param value a Float value
    * @return property wrapper around Float
    */
-  public static Property<Float> iconSize(Float value) {
-    return new LayoutProperty<>("icon-size", value);
+  public static PropertyValue<Float> iconSize(Float value) {
+    return new LayoutPropertyValue<>("icon-size", value);
   }
+
+
 
   /**
    * Scale factor for icon. 1 is original size, 3 triples the size.
    *
-   * @param function a wrapper function for Float
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for Float
    * @return property wrapper around a Float function
    */
-  public static Property<Function<Float>> iconSize(Function<Float> function) {
-    return new LayoutProperty<>("icon-size", function);
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, Float>> iconSize(CameraFunction<Z, Float> function) {
+    return new LayoutPropertyValue<>("icon-size", function);
   }
 
   /**
@@ -1424,40 +1540,44 @@ public class PropertyFactory {
    * @param value a String value
    * @return property wrapper around String
    */
-  public static Property<String> iconTextFit(@Property.ICON_TEXT_FIT String value) {
-    return new LayoutProperty<>("icon-text-fit", value);
+  public static PropertyValue<String> iconTextFit(@Property.ICON_TEXT_FIT String value) {
+    return new LayoutPropertyValue<>("icon-text-fit", value);
   }
+
+
 
   /**
    * Scales the icon to fit around the associated text.
    *
-   * @param function a wrapper function for String
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for String
    * @return property wrapper around a String function
    */
-  public static Property<Function<String>> iconTextFit(Function<String> function) {
-    return new LayoutProperty<>("icon-text-fit", function);
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, String>> iconTextFit(CameraFunction<Z, String> function) {
+    return new LayoutPropertyValue<>("icon-text-fit", function);
   }
 
   /**
-   * Size of the additional area added to dimensions determined by {@link Property.ICON_TEXT_FIT}, in clockwise order:
-   * top, right, bottom, left.
+   * Size of the additional area added to dimensions determined by {@link Property.ICON_TEXT_FIT}, in clockwise order: top, right, bottom, left.
    *
    * @param value a Float[] value
    * @return property wrapper around Float[]
    */
-  public static Property<Float[]> iconTextFitPadding(Float[] value) {
-    return new LayoutProperty<>("icon-text-fit-padding", value);
+  public static PropertyValue<Float[]> iconTextFitPadding(Float[] value) {
+    return new LayoutPropertyValue<>("icon-text-fit-padding", value);
   }
 
+
+
   /**
-   * Size of the additional area added to dimensions determined by {@link Property.ICON_TEXT_FIT}, in clockwise order:
-   * top, right, bottom, left.
+   * Size of the additional area added to dimensions determined by {@link Property.ICON_TEXT_FIT}, in clockwise order: top, right, bottom, left.
    *
-   * @param function a wrapper function for Float[]
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for Float[]
    * @return property wrapper around a Float[] function
    */
-  public static Property<Function<Float[]>> iconTextFitPadding(Function<Float[]> function) {
-    return new LayoutProperty<>("icon-text-fit-padding", function);
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, Float[]>> iconTextFitPadding(CameraFunction<Z, Float[]> function) {
+    return new LayoutPropertyValue<>("icon-text-fit-padding", function);
   }
 
   /**
@@ -1466,18 +1586,21 @@ public class PropertyFactory {
    * @param value a String value
    * @return property wrapper around String
    */
-  public static Property<String> iconImage(String value) {
-    return new LayoutProperty<>("icon-image", value);
+  public static PropertyValue<String> iconImage(String value) {
+    return new LayoutPropertyValue<>("icon-image", value);
   }
+
+
 
   /**
    * A string with {tokens} replaced, referencing the data property to pull from.
    *
-   * @param function a wrapper function for String
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for String
    * @return property wrapper around a String function
    */
-  public static Property<Function<String>> iconImage(Function<String> function) {
-    return new LayoutProperty<>("icon-image", function);
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, String>> iconImage(CameraFunction<Z, String> function) {
+    return new LayoutPropertyValue<>("icon-image", function);
   }
 
   /**
@@ -1486,18 +1609,21 @@ public class PropertyFactory {
    * @param value a Float value
    * @return property wrapper around Float
    */
-  public static Property<Float> iconRotate(Float value) {
-    return new LayoutProperty<>("icon-rotate", value);
+  public static PropertyValue<Float> iconRotate(Float value) {
+    return new LayoutPropertyValue<>("icon-rotate", value);
   }
+
+
 
   /**
    * Rotates the icon clockwise.
    *
+   * @param <T> the function input type
    * @param function a wrapper function for Float
    * @return property wrapper around a Float function
    */
-  public static Property<Function<Float>> iconRotate(Function<Float> function) {
-    return new LayoutProperty<>("icon-rotate", function);
+  public static <T> PropertyValue<Function<T, Float>> iconRotate(Function<T, Float> function) {
+    return new LayoutPropertyValue<>("icon-rotate", function);
   }
 
   /**
@@ -1506,18 +1632,21 @@ public class PropertyFactory {
    * @param value a Float value
    * @return property wrapper around Float
    */
-  public static Property<Float> iconPadding(Float value) {
-    return new LayoutProperty<>("icon-padding", value);
+  public static PropertyValue<Float> iconPadding(Float value) {
+    return new LayoutPropertyValue<>("icon-padding", value);
   }
+
+
 
   /**
    * Size of the additional area around the icon bounding box used for detecting symbol collisions.
    *
-   * @param function a wrapper function for Float
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for Float
    * @return property wrapper around a Float function
    */
-  public static Property<Function<Float>> iconPadding(Function<Float> function) {
-    return new LayoutProperty<>("icon-padding", function);
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, Float>> iconPadding(CameraFunction<Z, Float> function) {
+    return new LayoutPropertyValue<>("icon-padding", function);
   }
 
   /**
@@ -1526,40 +1655,44 @@ public class PropertyFactory {
    * @param value a Boolean value
    * @return property wrapper around Boolean
    */
-  public static Property<Boolean> iconKeepUpright(Boolean value) {
-    return new LayoutProperty<>("icon-keep-upright", value);
+  public static PropertyValue<Boolean> iconKeepUpright(Boolean value) {
+    return new LayoutPropertyValue<>("icon-keep-upright", value);
   }
+
+
 
   /**
    * If true, the icon may be flipped to prevent it from being rendered upside-down.
    *
-   * @param function a wrapper function for Boolean
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for Boolean
    * @return property wrapper around a Boolean function
    */
-  public static Property<Function<Boolean>> iconKeepUpright(Function<Boolean> function) {
-    return new LayoutProperty<>("icon-keep-upright", function);
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, Boolean>> iconKeepUpright(CameraFunction<Z, Boolean> function) {
+    return new LayoutPropertyValue<>("icon-keep-upright", function);
   }
 
   /**
-   * Offset distance of icon from its anchor. Positive values indicate right and down, while negative values indicate
-   * left and up.
+   * Offset distance of icon from its anchor. Positive values indicate right and down, while negative values indicate left and up. When combined with {@link PropertyFactory#iconRotate} the offset will be as if the rotated direction was up.
    *
    * @param value a Float[] value
    * @return property wrapper around Float[]
    */
-  public static Property<Float[]> iconOffset(Float[] value) {
-    return new LayoutProperty<>("icon-offset", value);
+  public static PropertyValue<Float[]> iconOffset(Float[] value) {
+    return new LayoutPropertyValue<>("icon-offset", value);
   }
 
+
+
   /**
-   * Offset distance of icon from its anchor. Positive values indicate right and down, while negative values indicate
-   * left and up.
+   * Offset distance of icon from its anchor. Positive values indicate right and down, while negative values indicate left and up. When combined with {@link PropertyFactory#iconRotate} the offset will be as if the rotated direction was up.
    *
+   * @param <T> the function input type
    * @param function a wrapper function for Float[]
    * @return property wrapper around a Float[] function
    */
-  public static Property<Function<Float[]>> iconOffset(Function<Float[]> function) {
-    return new LayoutProperty<>("icon-offset", function);
+  public static <T> PropertyValue<Function<T, Float[]>> iconOffset(Function<T, Float[]> function) {
+    return new LayoutPropertyValue<>("icon-offset", function);
   }
 
   /**
@@ -1568,40 +1701,44 @@ public class PropertyFactory {
    * @param value a String value
    * @return property wrapper around String
    */
-  public static Property<String> textPitchAlignment(@Property.TEXT_PITCH_ALIGNMENT String value) {
-    return new LayoutProperty<>("text-pitch-alignment", value);
+  public static PropertyValue<String> textPitchAlignment(@Property.TEXT_PITCH_ALIGNMENT String value) {
+    return new LayoutPropertyValue<>("text-pitch-alignment", value);
   }
+
+
 
   /**
    * Orientation of text when map is pitched.
    *
-   * @param function a wrapper function for String
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for String
    * @return property wrapper around a String function
    */
-  public static Property<Function<String>> textPitchAlignment(Function<String> function) {
-    return new LayoutProperty<>("text-pitch-alignment", function);
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, String>> textPitchAlignment(CameraFunction<Z, String> function) {
+    return new LayoutPropertyValue<>("text-pitch-alignment", function);
   }
 
   /**
-   * In combination with {@link Property.SYMBOL_PLACEMENT}, determines the rotation behavior of the individual glyphs
-   * forming the text.
+   * In combination with {@link Property.SYMBOL_PLACEMENT}, determines the rotation behavior of the individual glyphs forming the text.
    *
    * @param value a String value
    * @return property wrapper around String
    */
-  public static Property<String> textRotationAlignment(@Property.TEXT_ROTATION_ALIGNMENT String value) {
-    return new LayoutProperty<>("text-rotation-alignment", value);
+  public static PropertyValue<String> textRotationAlignment(@Property.TEXT_ROTATION_ALIGNMENT String value) {
+    return new LayoutPropertyValue<>("text-rotation-alignment", value);
   }
 
+
+
   /**
-   * In combination with {@link Property.SYMBOL_PLACEMENT}, determines the rotation behavior of the individual glyphs
-   * forming the text.
+   * In combination with {@link Property.SYMBOL_PLACEMENT}, determines the rotation behavior of the individual glyphs forming the text.
    *
-   * @param function a wrapper function for String
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for String
    * @return property wrapper around a String function
    */
-  public static Property<Function<String>> textRotationAlignment(Function<String> function) {
-    return new LayoutProperty<>("text-rotation-alignment", function);
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, String>> textRotationAlignment(CameraFunction<Z, String> function) {
+    return new LayoutPropertyValue<>("text-rotation-alignment", function);
   }
 
   /**
@@ -1610,18 +1747,21 @@ public class PropertyFactory {
    * @param value a String value
    * @return property wrapper around String
    */
-  public static Property<String> textField(String value) {
-    return new LayoutProperty<>("text-field", value);
+  public static PropertyValue<String> textField(String value) {
+    return new LayoutPropertyValue<>("text-field", value);
   }
+
+
 
   /**
    * Value to use for a text label. Feature properties are specified using tokens like {field_name}.
    *
-   * @param function a wrapper function for String
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for String
    * @return property wrapper around a String function
    */
-  public static Property<Function<String>> textField(Function<String> function) {
-    return new LayoutProperty<>("text-field", function);
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, String>> textField(CameraFunction<Z, String> function) {
+    return new LayoutPropertyValue<>("text-field", function);
   }
 
   /**
@@ -1630,18 +1770,21 @@ public class PropertyFactory {
    * @param value a String[] value
    * @return property wrapper around String[]
    */
-  public static Property<String[]> textFont(String[] value) {
-    return new LayoutProperty<>("text-font", value);
+  public static PropertyValue<String[]> textFont(String[] value) {
+    return new LayoutPropertyValue<>("text-font", value);
   }
+
+
 
   /**
    * Font stack to use for displaying text.
    *
-   * @param function a wrapper function for String[]
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for String[]
    * @return property wrapper around a String[] function
    */
-  public static Property<Function<String[]>> textFont(Function<String[]> function) {
-    return new LayoutProperty<>("text-font", function);
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, String[]>> textFont(CameraFunction<Z, String[]> function) {
+    return new LayoutPropertyValue<>("text-font", function);
   }
 
   /**
@@ -1650,18 +1793,21 @@ public class PropertyFactory {
    * @param value a Float value
    * @return property wrapper around Float
    */
-  public static Property<Float> textSize(Float value) {
-    return new LayoutProperty<>("text-size", value);
+  public static PropertyValue<Float> textSize(Float value) {
+    return new LayoutPropertyValue<>("text-size", value);
   }
+
+
 
   /**
    * Font size.
    *
-   * @param function a wrapper function for Float
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for Float
    * @return property wrapper around a Float function
    */
-  public static Property<Function<Float>> textSize(Function<Float> function) {
-    return new LayoutProperty<>("text-size", function);
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, Float>> textSize(CameraFunction<Z, Float> function) {
+    return new LayoutPropertyValue<>("text-size", function);
   }
 
   /**
@@ -1670,18 +1816,21 @@ public class PropertyFactory {
    * @param value a Float value
    * @return property wrapper around Float
    */
-  public static Property<Float> textMaxWidth(Float value) {
-    return new LayoutProperty<>("text-max-width", value);
+  public static PropertyValue<Float> textMaxWidth(Float value) {
+    return new LayoutPropertyValue<>("text-max-width", value);
   }
+
+
 
   /**
    * The maximum line width for text wrapping.
    *
-   * @param function a wrapper function for Float
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for Float
    * @return property wrapper around a Float function
    */
-  public static Property<Function<Float>> textMaxWidth(Function<Float> function) {
-    return new LayoutProperty<>("text-max-width", function);
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, Float>> textMaxWidth(CameraFunction<Z, Float> function) {
+    return new LayoutPropertyValue<>("text-max-width", function);
   }
 
   /**
@@ -1690,18 +1839,21 @@ public class PropertyFactory {
    * @param value a Float value
    * @return property wrapper around Float
    */
-  public static Property<Float> textLineHeight(Float value) {
-    return new LayoutProperty<>("text-line-height", value);
+  public static PropertyValue<Float> textLineHeight(Float value) {
+    return new LayoutPropertyValue<>("text-line-height", value);
   }
+
+
 
   /**
    * Text leading value for multi-line text.
    *
-   * @param function a wrapper function for Float
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for Float
    * @return property wrapper around a Float function
    */
-  public static Property<Function<Float>> textLineHeight(Function<Float> function) {
-    return new LayoutProperty<>("text-line-height", function);
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, Float>> textLineHeight(CameraFunction<Z, Float> function) {
+    return new LayoutPropertyValue<>("text-line-height", function);
   }
 
   /**
@@ -1710,18 +1862,21 @@ public class PropertyFactory {
    * @param value a Float value
    * @return property wrapper around Float
    */
-  public static Property<Float> textLetterSpacing(Float value) {
-    return new LayoutProperty<>("text-letter-spacing", value);
+  public static PropertyValue<Float> textLetterSpacing(Float value) {
+    return new LayoutPropertyValue<>("text-letter-spacing", value);
   }
+
+
 
   /**
    * Text tracking amount.
    *
-   * @param function a wrapper function for Float
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for Float
    * @return property wrapper around a Float function
    */
-  public static Property<Function<Float>> textLetterSpacing(Function<Float> function) {
-    return new LayoutProperty<>("text-letter-spacing", function);
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, Float>> textLetterSpacing(CameraFunction<Z, Float> function) {
+    return new LayoutPropertyValue<>("text-letter-spacing", function);
   }
 
   /**
@@ -1730,18 +1885,21 @@ public class PropertyFactory {
    * @param value a String value
    * @return property wrapper around String
    */
-  public static Property<String> textJustify(@Property.TEXT_JUSTIFY String value) {
-    return new LayoutProperty<>("text-justify", value);
+  public static PropertyValue<String> textJustify(@Property.TEXT_JUSTIFY String value) {
+    return new LayoutPropertyValue<>("text-justify", value);
   }
+
+
 
   /**
    * Text justification options.
    *
-   * @param function a wrapper function for String
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for String
    * @return property wrapper around a String function
    */
-  public static Property<Function<String>> textJustify(Function<String> function) {
-    return new LayoutProperty<>("text-justify", function);
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, String>> textJustify(CameraFunction<Z, String> function) {
+    return new LayoutPropertyValue<>("text-justify", function);
   }
 
   /**
@@ -1750,18 +1908,21 @@ public class PropertyFactory {
    * @param value a String value
    * @return property wrapper around String
    */
-  public static Property<String> textAnchor(@Property.TEXT_ANCHOR String value) {
-    return new LayoutProperty<>("text-anchor", value);
+  public static PropertyValue<String> textAnchor(@Property.TEXT_ANCHOR String value) {
+    return new LayoutPropertyValue<>("text-anchor", value);
   }
+
+
 
   /**
    * Part of the text placed closest to the anchor.
    *
-   * @param function a wrapper function for String
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for String
    * @return property wrapper around a String function
    */
-  public static Property<Function<String>> textAnchor(Function<String> function) {
-    return new LayoutProperty<>("text-anchor", function);
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, String>> textAnchor(CameraFunction<Z, String> function) {
+    return new LayoutPropertyValue<>("text-anchor", function);
   }
 
   /**
@@ -1770,18 +1931,21 @@ public class PropertyFactory {
    * @param value a Float value
    * @return property wrapper around Float
    */
-  public static Property<Float> textMaxAngle(Float value) {
-    return new LayoutProperty<>("text-max-angle", value);
+  public static PropertyValue<Float> textMaxAngle(Float value) {
+    return new LayoutPropertyValue<>("text-max-angle", value);
   }
+
+
 
   /**
    * Maximum angle change between adjacent characters.
    *
-   * @param function a wrapper function for Float
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for Float
    * @return property wrapper around a Float function
    */
-  public static Property<Function<Float>> textMaxAngle(Function<Float> function) {
-    return new LayoutProperty<>("text-max-angle", function);
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, Float>> textMaxAngle(CameraFunction<Z, Float> function) {
+    return new LayoutPropertyValue<>("text-max-angle", function);
   }
 
   /**
@@ -1790,18 +1954,21 @@ public class PropertyFactory {
    * @param value a Float value
    * @return property wrapper around Float
    */
-  public static Property<Float> textRotate(Float value) {
-    return new LayoutProperty<>("text-rotate", value);
+  public static PropertyValue<Float> textRotate(Float value) {
+    return new LayoutPropertyValue<>("text-rotate", value);
   }
+
+
 
   /**
    * Rotates the text clockwise.
    *
-   * @param function a wrapper function for Float
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for Float
    * @return property wrapper around a Float function
    */
-  public static Property<Function<Float>> textRotate(Function<Float> function) {
-    return new LayoutProperty<>("text-rotate", function);
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, Float>> textRotate(CameraFunction<Z, Float> function) {
+    return new LayoutPropertyValue<>("text-rotate", function);
   }
 
   /**
@@ -1810,18 +1977,21 @@ public class PropertyFactory {
    * @param value a Float value
    * @return property wrapper around Float
    */
-  public static Property<Float> textPadding(Float value) {
-    return new LayoutProperty<>("text-padding", value);
+  public static PropertyValue<Float> textPadding(Float value) {
+    return new LayoutPropertyValue<>("text-padding", value);
   }
+
+
 
   /**
    * Size of the additional area around the text bounding box used for detecting symbol collisions.
    *
-   * @param function a wrapper function for Float
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for Float
    * @return property wrapper around a Float function
    */
-  public static Property<Function<Float>> textPadding(Function<Float> function) {
-    return new LayoutProperty<>("text-padding", function);
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, Float>> textPadding(CameraFunction<Z, Float> function) {
+    return new LayoutPropertyValue<>("text-padding", function);
   }
 
   /**
@@ -1830,18 +2000,21 @@ public class PropertyFactory {
    * @param value a Boolean value
    * @return property wrapper around Boolean
    */
-  public static Property<Boolean> textKeepUpright(Boolean value) {
-    return new LayoutProperty<>("text-keep-upright", value);
+  public static PropertyValue<Boolean> textKeepUpright(Boolean value) {
+    return new LayoutPropertyValue<>("text-keep-upright", value);
   }
+
+
 
   /**
    * If true, the text may be flipped vertically to prevent it from being rendered upside-down.
    *
-   * @param function a wrapper function for Boolean
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for Boolean
    * @return property wrapper around a Boolean function
    */
-  public static Property<Function<Boolean>> textKeepUpright(Function<Boolean> function) {
-    return new LayoutProperty<>("text-keep-upright", function);
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, Boolean>> textKeepUpright(CameraFunction<Z, Boolean> function) {
+    return new LayoutPropertyValue<>("text-keep-upright", function);
   }
 
   /**
@@ -1850,40 +2023,44 @@ public class PropertyFactory {
    * @param value a String value
    * @return property wrapper around String
    */
-  public static Property<String> textTransform(@Property.TEXT_TRANSFORM String value) {
-    return new LayoutProperty<>("text-transform", value);
+  public static PropertyValue<String> textTransform(@Property.TEXT_TRANSFORM String value) {
+    return new LayoutPropertyValue<>("text-transform", value);
   }
+
+
 
   /**
    * Specifies how to capitalize text, similar to the CSS {@link PropertyFactory#textTransform} property.
    *
-   * @param function a wrapper function for String
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for String
    * @return property wrapper around a String function
    */
-  public static Property<Function<String>> textTransform(Function<String> function) {
-    return new LayoutProperty<>("text-transform", function);
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, String>> textTransform(CameraFunction<Z, String> function) {
+    return new LayoutPropertyValue<>("text-transform", function);
   }
 
   /**
-   * Offset distance of text from its anchor. Positive values indicate right and down, while negative values indicate
-   * left and up.
+   * Offset distance of text from its anchor. Positive values indicate right and down, while negative values indicate left and up.
    *
    * @param value a Float[] value
    * @return property wrapper around Float[]
    */
-  public static Property<Float[]> textOffset(Float[] value) {
-    return new LayoutProperty<>("text-offset", value);
+  public static PropertyValue<Float[]> textOffset(Float[] value) {
+    return new LayoutPropertyValue<>("text-offset", value);
   }
 
+
+
   /**
-   * Offset distance of text from its anchor. Positive values indicate right and down, while negative values indicate
-   * left and up.
+   * Offset distance of text from its anchor. Positive values indicate right and down, while negative values indicate left and up.
    *
-   * @param function a wrapper function for Float[]
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for Float[]
    * @return property wrapper around a Float[] function
    */
-  public static Property<Function<Float[]>> textOffset(Function<Float[]> function) {
-    return new LayoutProperty<>("text-offset", function);
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, Float[]>> textOffset(CameraFunction<Z, Float[]> function) {
+    return new LayoutPropertyValue<>("text-offset", function);
   }
 
   /**
@@ -1892,18 +2069,21 @@ public class PropertyFactory {
    * @param value a Boolean value
    * @return property wrapper around Boolean
    */
-  public static Property<Boolean> textAllowOverlap(Boolean value) {
-    return new LayoutProperty<>("text-allow-overlap", value);
+  public static PropertyValue<Boolean> textAllowOverlap(Boolean value) {
+    return new LayoutPropertyValue<>("text-allow-overlap", value);
   }
+
+
 
   /**
    * If true, the text will be visible even if it collides with other previously drawn symbols.
    *
-   * @param function a wrapper function for Boolean
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for Boolean
    * @return property wrapper around a Boolean function
    */
-  public static Property<Function<Boolean>> textAllowOverlap(Function<Boolean> function) {
-    return new LayoutProperty<>("text-allow-overlap", function);
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, Boolean>> textAllowOverlap(CameraFunction<Z, Boolean> function) {
+    return new LayoutPropertyValue<>("text-allow-overlap", function);
   }
 
   /**
@@ -1912,46 +2092,49 @@ public class PropertyFactory {
    * @param value a Boolean value
    * @return property wrapper around Boolean
    */
-  public static Property<Boolean> textIgnorePlacement(Boolean value) {
-    return new LayoutProperty<>("text-ignore-placement", value);
+  public static PropertyValue<Boolean> textIgnorePlacement(Boolean value) {
+    return new LayoutPropertyValue<>("text-ignore-placement", value);
   }
+
+
 
   /**
    * If true, other symbols can be visible even if they collide with the text.
    *
-   * @param function a wrapper function for Boolean
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for Boolean
    * @return property wrapper around a Boolean function
    */
-  public static Property<Function<Boolean>> textIgnorePlacement(Function<Boolean> function) {
-    return new LayoutProperty<>("text-ignore-placement", function);
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, Boolean>> textIgnorePlacement(CameraFunction<Z, Boolean> function) {
+    return new LayoutPropertyValue<>("text-ignore-placement", function);
   }
 
   /**
-   * If true, icons will display without their corresponding text when the text collides with other symbols and the
-   * icon does not.
+   * If true, icons will display without their corresponding text when the text collides with other symbols and the icon does not.
    *
    * @param value a Boolean value
    * @return property wrapper around Boolean
    */
-  public static Property<Boolean> textOptional(Boolean value) {
-    return new LayoutProperty<>("text-optional", value);
+  public static PropertyValue<Boolean> textOptional(Boolean value) {
+    return new LayoutPropertyValue<>("text-optional", value);
   }
 
+
+
   /**
-   * If true, icons will display without their corresponding text when the text collides with other symbols and the
-   * icon does not.
+   * If true, icons will display without their corresponding text when the text collides with other symbols and the icon does not.
    *
-   * @param function a wrapper function for Boolean
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for Boolean
    * @return property wrapper around a Boolean function
    */
-  public static Property<Function<Boolean>> textOptional(Function<Boolean> function) {
-    return new LayoutProperty<>("text-optional", function);
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, Boolean>> textOptional(CameraFunction<Z, Boolean> function) {
+    return new LayoutPropertyValue<>("text-optional", function);
   }
 
   @SuppressLint("DefaultLocale")
-  static String colorToRgbaString(@ColorInt int value) {
-    return String.format("rgba(%d, %d, %d, %d)", (value >> 16) & 0xFF, (value >> 8) & 0xFF, value & 0xFF,
-      (value >> 24) & 0xFF);
+  public static String colorToRgbaString(@ColorInt int value) {
+    return String.format("rgba(%d, %d, %d, %d)", (value >> 16) & 0xFF, (value >> 8) & 0xFF, value & 0xFF, (value >> 24) & 0xFF);
   }
 
 }

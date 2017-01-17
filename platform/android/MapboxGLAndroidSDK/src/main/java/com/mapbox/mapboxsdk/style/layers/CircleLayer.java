@@ -1,5 +1,6 @@
-package com.mapbox.mapboxsdk.style.layers;
 // This file is generated. Edit android/platform/scripts/generate-style-code.js, then run `make android-style-code`.
+
+package com.mapbox.mapboxsdk.style.layers;
 
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
@@ -96,14 +97,13 @@ public class CircleLayer extends Layer {
     return this;
   }
 
-
   /**
    * Set a property or properties.
    *
    * @param properties the var-args properties
    * @return This
    */
-  public CircleLayer withProperties(@NonNull Property<?>... properties) {
+  public CircleLayer withProperties(@NonNull PropertyValue<?>... properties) {
     setProperties(properties);
     return this;
   }
@@ -117,7 +117,7 @@ public class CircleLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<Float> getCircleRadius() {
-    return (PropertyValue<Float>) new PropertyValue(nativeGetCircleRadius());
+    return (PropertyValue<Float>) new PropertyValue("circle-radius", nativeGetCircleRadius());
   }
 
   /**
@@ -127,7 +127,7 @@ public class CircleLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<String> getCircleColor() {
-    return (PropertyValue<String>) new PropertyValue(nativeGetCircleColor());
+    return (PropertyValue<String>) new PropertyValue("circle-color", nativeGetCircleColor());
   }
 
   /**
@@ -154,7 +154,7 @@ public class CircleLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<Float> getCircleBlur() {
-    return (PropertyValue<Float>) new PropertyValue(nativeGetCircleBlur());
+    return (PropertyValue<Float>) new PropertyValue("circle-blur", nativeGetCircleBlur());
   }
 
   /**
@@ -164,7 +164,7 @@ public class CircleLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<Float> getCircleOpacity() {
-    return (PropertyValue<Float>) new PropertyValue(nativeGetCircleOpacity());
+    return (PropertyValue<Float>) new PropertyValue("circle-opacity", nativeGetCircleOpacity());
   }
 
   /**
@@ -174,7 +174,7 @@ public class CircleLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<Float[]> getCircleTranslate() {
-    return (PropertyValue<Float[]>) new PropertyValue(nativeGetCircleTranslate());
+    return (PropertyValue<Float[]>) new PropertyValue("circle-translate", nativeGetCircleTranslate());
   }
 
   /**
@@ -184,7 +184,7 @@ public class CircleLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<String> getCircleTranslateAnchor() {
-    return (PropertyValue<String>) new PropertyValue(nativeGetCircleTranslateAnchor());
+    return (PropertyValue<String>) new PropertyValue("circle-translate-anchor", nativeGetCircleTranslateAnchor());
   }
 
   /**
@@ -194,7 +194,7 @@ public class CircleLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<String> getCirclePitchScale() {
-    return (PropertyValue<String>) new PropertyValue(nativeGetCirclePitchScale());
+    return (PropertyValue<String>) new PropertyValue("circle-pitch-scale", nativeGetCirclePitchScale());
   }
 
   /**
@@ -204,7 +204,7 @@ public class CircleLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<Float> getCircleStrokeWidth() {
-    return (PropertyValue<Float>) new PropertyValue(nativeGetCircleStrokeWidth());
+    return (PropertyValue<Float>) new PropertyValue("circle-stroke-width", nativeGetCircleStrokeWidth());
   }
 
   /**
@@ -214,7 +214,7 @@ public class CircleLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<String> getCircleStrokeColor() {
-    return (PropertyValue<String>) new PropertyValue(nativeGetCircleStrokeColor());
+    return (PropertyValue<String>) new PropertyValue("circle-stroke-color", nativeGetCircleStrokeColor());
   }
 
   /**
@@ -241,7 +241,7 @@ public class CircleLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<Float> getCircleStrokeOpacity() {
-    return (PropertyValue<Float>) new PropertyValue(nativeGetCircleStrokeOpacity());
+    return (PropertyValue<Float>) new PropertyValue("circle-stroke-opacity", nativeGetCircleStrokeOpacity());
   }
 
   private native Object nativeGetCircleRadius();

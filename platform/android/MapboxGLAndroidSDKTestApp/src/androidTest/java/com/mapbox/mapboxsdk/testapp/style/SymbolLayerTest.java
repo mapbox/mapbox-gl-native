@@ -1,12 +1,23 @@
-package com.mapbox.mapboxsdk.testapp.style;
 // This file is generated. Edit android/platform/scripts/generate-style-code.js, then run `make android-style-code`.
+
+package com.mapbox.mapboxsdk.testapp.style;
 
 import android.graphics.Color;
 import android.support.test.espresso.Espresso;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
+import timber.log.Timber;
 
 import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.style.functions.CompositeFunction;
+import com.mapbox.mapboxsdk.style.functions.CameraFunction;
+import com.mapbox.mapboxsdk.style.functions.SourceFunction;
+import com.mapbox.mapboxsdk.style.functions.stops.CategoricalStops;
+import com.mapbox.mapboxsdk.style.functions.stops.CompositeStops;
+import com.mapbox.mapboxsdk.style.functions.stops.ExponentialStops;
+import com.mapbox.mapboxsdk.style.functions.stops.IdentityStops;
+import com.mapbox.mapboxsdk.style.functions.stops.IntervalStops;
+import com.mapbox.mapboxsdk.style.functions.stops.Stops;
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.activity.style.RuntimeStyleTestActivity;
@@ -18,71 +29,14 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import timber.log.Timber;
+import java.util.Map;
 
-import static com.mapbox.mapboxsdk.style.layers.Property.ICON_ROTATION_ALIGNMENT_MAP;
-import static com.mapbox.mapboxsdk.style.layers.Property.ICON_TEXT_FIT_NONE;
-import static com.mapbox.mapboxsdk.style.layers.Property.ICON_TRANSLATE_ANCHOR_MAP;
-import static com.mapbox.mapboxsdk.style.layers.Property.NONE;
-import static com.mapbox.mapboxsdk.style.layers.Property.SYMBOL_PLACEMENT_POINT;
-import static com.mapbox.mapboxsdk.style.layers.Property.TEXT_ANCHOR_CENTER;
-import static com.mapbox.mapboxsdk.style.layers.Property.TEXT_JUSTIFY_LEFT;
-import static com.mapbox.mapboxsdk.style.layers.Property.TEXT_PITCH_ALIGNMENT_MAP;
-import static com.mapbox.mapboxsdk.style.layers.Property.TEXT_ROTATION_ALIGNMENT_MAP;
-import static com.mapbox.mapboxsdk.style.layers.Property.TEXT_TRANSFORM_NONE;
-import static com.mapbox.mapboxsdk.style.layers.Property.TEXT_TRANSLATE_ANCHOR_MAP;
-import static com.mapbox.mapboxsdk.style.layers.Property.VISIBLE;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconAllowOverlap;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconColor;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconHaloBlur;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconHaloColor;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconHaloWidth;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconIgnorePlacement;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconImage;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconKeepUpright;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconOffset;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconOpacity;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconOptional;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconPadding;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconRotate;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconRotationAlignment;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconSize;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconTextFit;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconTextFitPadding;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconTranslate;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconTranslateAnchor;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.symbolAvoidEdges;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.symbolPlacement;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.symbolSpacing;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textAllowOverlap;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textAnchor;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textColor;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textField;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textFont;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textHaloBlur;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textHaloColor;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textHaloWidth;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textIgnorePlacement;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textJustify;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textKeepUpright;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textLetterSpacing;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textLineHeight;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textMaxAngle;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textMaxWidth;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textOffset;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textOpacity;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textOptional;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textPadding;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textPitchAlignment;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textRotate;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textRotationAlignment;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textSize;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textTransform;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textTranslate;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textTranslateAnchor;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.visibility;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static com.mapbox.mapboxsdk.style.functions.Function.*;
+import static com.mapbox.mapboxsdk.style.functions.stops.Stop.stop;
+import static com.mapbox.mapboxsdk.style.functions.stops.Stops.*;
+import static org.junit.Assert.*;
+import static com.mapbox.mapboxsdk.style.layers.Property.*;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.*;
 
 /**
  * Basic smoke tests for SymbolLayer
@@ -103,12 +57,6 @@ public class SymbolLayerTest extends BaseStyleTest {
   public void setup() {
     idlingResource = new OnMapReadyIdlingResource(rule.getActivity());
     Espresso.registerIdlingResources(idlingResource);
-  }
-
-  @Test
-  public void testSetVisibility() {
-    checkViewIsDisplayed(R.id.mapView);
-
     mapboxMap = rule.getActivity().getMapboxMap();
 
     if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
@@ -119,7 +67,12 @@ public class SymbolLayerTest extends BaseStyleTest {
       // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
-    Timber.i("visibility");
+  }
+
+  @Test
+  public void testSetVisibility() {
+    checkViewIsDisplayed(R.id.mapView);
+    Timber.i("Visibility");
     assertNotNull(layer);
 
     // Get initial
@@ -131,19 +84,8 @@ public class SymbolLayerTest extends BaseStyleTest {
   }
 
   @Test
-  public void testSymbolPlacement() {
+  public void testSymbolPlacementAsConstant() {
     checkViewIsDisplayed(R.id.mapView);
-
-    mapboxMap = rule.getActivity().getMapboxMap();
-
-    if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-      Timber.i("Adding layer");
-      layer = new SymbolLayer("my-layer", "composite");
-      layer.setSourceLayer("composite");
-      mapboxMap.addLayer(layer);
-      // Layer reference is now stale, get new reference
-      layer = mapboxMap.getLayerAs("my-layer");
-    }
     Timber.i("symbol-placement");
     assertNotNull(layer);
 
@@ -153,19 +95,33 @@ public class SymbolLayerTest extends BaseStyleTest {
   }
 
   @Test
-  public void testSymbolSpacing() {
+  public void testSymbolPlacementAsCameraFunction() {
     checkViewIsDisplayed(R.id.mapView);
+    Timber.i("symbol-placement");
+    assertNotNull(layer);
 
-    mapboxMap = rule.getActivity().getMapboxMap();
+    // Set
+    layer.setProperties(
+      symbolPlacement(
+        zoom(
+          interval(
+            stop(2, symbolPlacement(SYMBOL_PLACEMENT_POINT))
+          )
+        )
+      )
+    );
 
-    if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-      Timber.i("Adding layer");
-      layer = new SymbolLayer("my-layer", "composite");
-      layer.setSourceLayer("composite");
-      mapboxMap.addLayer(layer);
-      // Layer reference is now stale, get new reference
-      layer = mapboxMap.getLayerAs("my-layer");
-    }
+    // Verify
+    assertNotNull(layer.getSymbolPlacement());
+    assertNotNull(layer.getSymbolPlacement().getFunction());
+    assertEquals(CameraFunction.class, layer.getSymbolPlacement().getFunction().getClass());
+    assertEquals(IntervalStops.class, layer.getSymbolPlacement().getFunction().getStops().getClass());
+    assertEquals(1, ((IntervalStops) layer.getSymbolPlacement().getFunction().getStops()).size());
+  }
+
+  @Test
+  public void testSymbolSpacingAsConstant() {
+    checkViewIsDisplayed(R.id.mapView);
     Timber.i("symbol-spacing");
     assertNotNull(layer);
 
@@ -175,19 +131,34 @@ public class SymbolLayerTest extends BaseStyleTest {
   }
 
   @Test
-  public void testSymbolAvoidEdges() {
+  public void testSymbolSpacingAsCameraFunction() {
     checkViewIsDisplayed(R.id.mapView);
+    Timber.i("symbol-spacing");
+    assertNotNull(layer);
 
-    mapboxMap = rule.getActivity().getMapboxMap();
+    // Set
+    layer.setProperties(
+      symbolSpacing(
+        zoom(
+          exponential(
+            stop(2, symbolSpacing(0.3f))
+          ).withBase(0.5f)
+        )
+      )
+    );
 
-    if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-      Timber.i("Adding layer");
-      layer = new SymbolLayer("my-layer", "composite");
-      layer.setSourceLayer("composite");
-      mapboxMap.addLayer(layer);
-      // Layer reference is now stale, get new reference
-      layer = mapboxMap.getLayerAs("my-layer");
-    }
+    // Verify
+    assertNotNull(layer.getSymbolSpacing());
+    assertNotNull(layer.getSymbolSpacing().getFunction());
+    assertEquals(CameraFunction.class, layer.getSymbolSpacing().getFunction().getClass());
+    assertEquals(ExponentialStops.class, layer.getSymbolSpacing().getFunction().getStops().getClass());
+    assertEquals(0.5f, ((ExponentialStops) layer.getSymbolSpacing().getFunction().getStops()).getBase(), 0.001);
+    assertEquals(1, ((ExponentialStops) layer.getSymbolSpacing().getFunction().getStops()).size());
+  }
+
+  @Test
+  public void testSymbolAvoidEdgesAsConstant() {
+    checkViewIsDisplayed(R.id.mapView);
     Timber.i("symbol-avoid-edges");
     assertNotNull(layer);
 
@@ -197,19 +168,33 @@ public class SymbolLayerTest extends BaseStyleTest {
   }
 
   @Test
-  public void testIconAllowOverlap() {
+  public void testSymbolAvoidEdgesAsCameraFunction() {
     checkViewIsDisplayed(R.id.mapView);
+    Timber.i("symbol-avoid-edges");
+    assertNotNull(layer);
 
-    mapboxMap = rule.getActivity().getMapboxMap();
+    // Set
+    layer.setProperties(
+      symbolAvoidEdges(
+        zoom(
+          interval(
+            stop(2, symbolAvoidEdges(true))
+          )
+        )
+      )
+    );
 
-    if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-      Timber.i("Adding layer");
-      layer = new SymbolLayer("my-layer", "composite");
-      layer.setSourceLayer("composite");
-      mapboxMap.addLayer(layer);
-      // Layer reference is now stale, get new reference
-      layer = mapboxMap.getLayerAs("my-layer");
-    }
+    // Verify
+    assertNotNull(layer.getSymbolAvoidEdges());
+    assertNotNull(layer.getSymbolAvoidEdges().getFunction());
+    assertEquals(CameraFunction.class, layer.getSymbolAvoidEdges().getFunction().getClass());
+    assertEquals(IntervalStops.class, layer.getSymbolAvoidEdges().getFunction().getStops().getClass());
+    assertEquals(1, ((IntervalStops) layer.getSymbolAvoidEdges().getFunction().getStops()).size());
+  }
+
+  @Test
+  public void testIconAllowOverlapAsConstant() {
+    checkViewIsDisplayed(R.id.mapView);
     Timber.i("icon-allow-overlap");
     assertNotNull(layer);
 
@@ -219,19 +204,33 @@ public class SymbolLayerTest extends BaseStyleTest {
   }
 
   @Test
-  public void testIconIgnorePlacement() {
+  public void testIconAllowOverlapAsCameraFunction() {
     checkViewIsDisplayed(R.id.mapView);
+    Timber.i("icon-allow-overlap");
+    assertNotNull(layer);
 
-    mapboxMap = rule.getActivity().getMapboxMap();
+    // Set
+    layer.setProperties(
+      iconAllowOverlap(
+        zoom(
+          interval(
+            stop(2, iconAllowOverlap(true))
+          )
+        )
+      )
+    );
 
-    if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-      Timber.i("Adding layer");
-      layer = new SymbolLayer("my-layer", "composite");
-      layer.setSourceLayer("composite");
-      mapboxMap.addLayer(layer);
-      // Layer reference is now stale, get new reference
-      layer = mapboxMap.getLayerAs("my-layer");
-    }
+    // Verify
+    assertNotNull(layer.getIconAllowOverlap());
+    assertNotNull(layer.getIconAllowOverlap().getFunction());
+    assertEquals(CameraFunction.class, layer.getIconAllowOverlap().getFunction().getClass());
+    assertEquals(IntervalStops.class, layer.getIconAllowOverlap().getFunction().getStops().getClass());
+    assertEquals(1, ((IntervalStops) layer.getIconAllowOverlap().getFunction().getStops()).size());
+  }
+
+  @Test
+  public void testIconIgnorePlacementAsConstant() {
+    checkViewIsDisplayed(R.id.mapView);
     Timber.i("icon-ignore-placement");
     assertNotNull(layer);
 
@@ -241,19 +240,33 @@ public class SymbolLayerTest extends BaseStyleTest {
   }
 
   @Test
-  public void testIconOptional() {
+  public void testIconIgnorePlacementAsCameraFunction() {
     checkViewIsDisplayed(R.id.mapView);
+    Timber.i("icon-ignore-placement");
+    assertNotNull(layer);
 
-    mapboxMap = rule.getActivity().getMapboxMap();
+    // Set
+    layer.setProperties(
+      iconIgnorePlacement(
+        zoom(
+          interval(
+            stop(2, iconIgnorePlacement(true))
+          )
+        )
+      )
+    );
 
-    if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-      Timber.i("Adding layer");
-      layer = new SymbolLayer("my-layer", "composite");
-      layer.setSourceLayer("composite");
-      mapboxMap.addLayer(layer);
-      // Layer reference is now stale, get new reference
-      layer = mapboxMap.getLayerAs("my-layer");
-    }
+    // Verify
+    assertNotNull(layer.getIconIgnorePlacement());
+    assertNotNull(layer.getIconIgnorePlacement().getFunction());
+    assertEquals(CameraFunction.class, layer.getIconIgnorePlacement().getFunction().getClass());
+    assertEquals(IntervalStops.class, layer.getIconIgnorePlacement().getFunction().getStops().getClass());
+    assertEquals(1, ((IntervalStops) layer.getIconIgnorePlacement().getFunction().getStops()).size());
+  }
+
+  @Test
+  public void testIconOptionalAsConstant() {
+    checkViewIsDisplayed(R.id.mapView);
     Timber.i("icon-optional");
     assertNotNull(layer);
 
@@ -263,19 +276,33 @@ public class SymbolLayerTest extends BaseStyleTest {
   }
 
   @Test
-  public void testIconRotationAlignment() {
+  public void testIconOptionalAsCameraFunction() {
     checkViewIsDisplayed(R.id.mapView);
+    Timber.i("icon-optional");
+    assertNotNull(layer);
 
-    mapboxMap = rule.getActivity().getMapboxMap();
+    // Set
+    layer.setProperties(
+      iconOptional(
+        zoom(
+          interval(
+            stop(2, iconOptional(true))
+          )
+        )
+      )
+    );
 
-    if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-      Timber.i("Adding layer");
-      layer = new SymbolLayer("my-layer", "composite");
-      layer.setSourceLayer("composite");
-      mapboxMap.addLayer(layer);
-      // Layer reference is now stale, get new reference
-      layer = mapboxMap.getLayerAs("my-layer");
-    }
+    // Verify
+    assertNotNull(layer.getIconOptional());
+    assertNotNull(layer.getIconOptional().getFunction());
+    assertEquals(CameraFunction.class, layer.getIconOptional().getFunction().getClass());
+    assertEquals(IntervalStops.class, layer.getIconOptional().getFunction().getStops().getClass());
+    assertEquals(1, ((IntervalStops) layer.getIconOptional().getFunction().getStops()).size());
+  }
+
+  @Test
+  public void testIconRotationAlignmentAsConstant() {
+    checkViewIsDisplayed(R.id.mapView);
     Timber.i("icon-rotation-alignment");
     assertNotNull(layer);
 
@@ -285,19 +312,33 @@ public class SymbolLayerTest extends BaseStyleTest {
   }
 
   @Test
-  public void testIconSize() {
+  public void testIconRotationAlignmentAsCameraFunction() {
     checkViewIsDisplayed(R.id.mapView);
+    Timber.i("icon-rotation-alignment");
+    assertNotNull(layer);
 
-    mapboxMap = rule.getActivity().getMapboxMap();
+    // Set
+    layer.setProperties(
+      iconRotationAlignment(
+        zoom(
+          interval(
+            stop(2, iconRotationAlignment(ICON_ROTATION_ALIGNMENT_MAP))
+          )
+        )
+      )
+    );
 
-    if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-      Timber.i("Adding layer");
-      layer = new SymbolLayer("my-layer", "composite");
-      layer.setSourceLayer("composite");
-      mapboxMap.addLayer(layer);
-      // Layer reference is now stale, get new reference
-      layer = mapboxMap.getLayerAs("my-layer");
-    }
+    // Verify
+    assertNotNull(layer.getIconRotationAlignment());
+    assertNotNull(layer.getIconRotationAlignment().getFunction());
+    assertEquals(CameraFunction.class, layer.getIconRotationAlignment().getFunction().getClass());
+    assertEquals(IntervalStops.class, layer.getIconRotationAlignment().getFunction().getStops().getClass());
+    assertEquals(1, ((IntervalStops) layer.getIconRotationAlignment().getFunction().getStops()).size());
+  }
+
+  @Test
+  public void testIconSizeAsConstant() {
+    checkViewIsDisplayed(R.id.mapView);
     Timber.i("icon-size");
     assertNotNull(layer);
 
@@ -307,19 +348,34 @@ public class SymbolLayerTest extends BaseStyleTest {
   }
 
   @Test
-  public void testIconTextFit() {
+  public void testIconSizeAsCameraFunction() {
     checkViewIsDisplayed(R.id.mapView);
+    Timber.i("icon-size");
+    assertNotNull(layer);
 
-    mapboxMap = rule.getActivity().getMapboxMap();
+    // Set
+    layer.setProperties(
+      iconSize(
+        zoom(
+          exponential(
+            stop(2, iconSize(0.3f))
+          ).withBase(0.5f)
+        )
+      )
+    );
 
-    if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-      Timber.i("Adding layer");
-      layer = new SymbolLayer("my-layer", "composite");
-      layer.setSourceLayer("composite");
-      mapboxMap.addLayer(layer);
-      // Layer reference is now stale, get new reference
-      layer = mapboxMap.getLayerAs("my-layer");
-    }
+    // Verify
+    assertNotNull(layer.getIconSize());
+    assertNotNull(layer.getIconSize().getFunction());
+    assertEquals(CameraFunction.class, layer.getIconSize().getFunction().getClass());
+    assertEquals(ExponentialStops.class, layer.getIconSize().getFunction().getStops().getClass());
+    assertEquals(0.5f, ((ExponentialStops) layer.getIconSize().getFunction().getStops()).getBase(), 0.001);
+    assertEquals(1, ((ExponentialStops) layer.getIconSize().getFunction().getStops()).size());
+  }
+
+  @Test
+  public void testIconTextFitAsConstant() {
+    checkViewIsDisplayed(R.id.mapView);
     Timber.i("icon-text-fit");
     assertNotNull(layer);
 
@@ -329,41 +385,70 @@ public class SymbolLayerTest extends BaseStyleTest {
   }
 
   @Test
-  public void testIconTextFitPadding() {
+  public void testIconTextFitAsCameraFunction() {
     checkViewIsDisplayed(R.id.mapView);
+    Timber.i("icon-text-fit");
+    assertNotNull(layer);
 
-    mapboxMap = rule.getActivity().getMapboxMap();
+    // Set
+    layer.setProperties(
+      iconTextFit(
+        zoom(
+          interval(
+            stop(2, iconTextFit(ICON_TEXT_FIT_NONE))
+          )
+        )
+      )
+    );
 
-    if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-      Timber.i("Adding layer");
-      layer = new SymbolLayer("my-layer", "composite");
-      layer.setSourceLayer("composite");
-      mapboxMap.addLayer(layer);
-      // Layer reference is now stale, get new reference
-      layer = mapboxMap.getLayerAs("my-layer");
-    }
+    // Verify
+    assertNotNull(layer.getIconTextFit());
+    assertNotNull(layer.getIconTextFit().getFunction());
+    assertEquals(CameraFunction.class, layer.getIconTextFit().getFunction().getClass());
+    assertEquals(IntervalStops.class, layer.getIconTextFit().getFunction().getStops().getClass());
+    assertEquals(1, ((IntervalStops) layer.getIconTextFit().getFunction().getStops()).size());
+  }
+
+  @Test
+  public void testIconTextFitPaddingAsConstant() {
+    checkViewIsDisplayed(R.id.mapView);
     Timber.i("icon-text-fit-padding");
     assertNotNull(layer);
 
     // Set and Get
-    layer.setProperties(iconTextFitPadding(new Float[] {0f, 0f, 0f, 0f}));
-    assertEquals((Float[]) layer.getIconTextFitPadding().getValue(), (Float[]) new Float[] {0f, 0f, 0f, 0f});
+    layer.setProperties(iconTextFitPadding(new Float[]{0f,0f,0f,0f}));
+    assertEquals((Float[]) layer.getIconTextFitPadding().getValue(), (Float[]) new Float[]{0f,0f,0f,0f});
   }
 
   @Test
-  public void testIconImage() {
+  public void testIconTextFitPaddingAsCameraFunction() {
     checkViewIsDisplayed(R.id.mapView);
+    Timber.i("icon-text-fit-padding");
+    assertNotNull(layer);
 
-    mapboxMap = rule.getActivity().getMapboxMap();
+    // Set
+    layer.setProperties(
+      iconTextFitPadding(
+        zoom(
+          exponential(
+            stop(2, iconTextFitPadding(new Float[]{0f,0f,0f,0f}))
+          ).withBase(0.5f)
+        )
+      )
+    );
 
-    if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-      Timber.i("Adding layer");
-      layer = new SymbolLayer("my-layer", "composite");
-      layer.setSourceLayer("composite");
-      mapboxMap.addLayer(layer);
-      // Layer reference is now stale, get new reference
-      layer = mapboxMap.getLayerAs("my-layer");
-    }
+    // Verify
+    assertNotNull(layer.getIconTextFitPadding());
+    assertNotNull(layer.getIconTextFitPadding().getFunction());
+    assertEquals(CameraFunction.class, layer.getIconTextFitPadding().getFunction().getClass());
+    assertEquals(ExponentialStops.class, layer.getIconTextFitPadding().getFunction().getStops().getClass());
+    assertEquals(0.5f, ((ExponentialStops) layer.getIconTextFitPadding().getFunction().getStops()).getBase(), 0.001);
+    assertEquals(1, ((ExponentialStops) layer.getIconTextFitPadding().getFunction().getStops()).size());
+  }
+
+  @Test
+  public void testIconImageAsConstant() {
+    checkViewIsDisplayed(R.id.mapView);
     Timber.i("icon-image");
     assertNotNull(layer);
 
@@ -373,19 +458,33 @@ public class SymbolLayerTest extends BaseStyleTest {
   }
 
   @Test
-  public void testIconRotate() {
+  public void testIconImageAsCameraFunction() {
     checkViewIsDisplayed(R.id.mapView);
+    Timber.i("icon-image");
+    assertNotNull(layer);
 
-    mapboxMap = rule.getActivity().getMapboxMap();
+    // Set
+    layer.setProperties(
+      iconImage(
+        zoom(
+          interval(
+            stop(2, iconImage("undefined"))
+          )
+        )
+      )
+    );
 
-    if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-      Timber.i("Adding layer");
-      layer = new SymbolLayer("my-layer", "composite");
-      layer.setSourceLayer("composite");
-      mapboxMap.addLayer(layer);
-      // Layer reference is now stale, get new reference
-      layer = mapboxMap.getLayerAs("my-layer");
-    }
+    // Verify
+    assertNotNull(layer.getIconImage());
+    assertNotNull(layer.getIconImage().getFunction());
+    assertEquals(CameraFunction.class, layer.getIconImage().getFunction().getClass());
+    assertEquals(IntervalStops.class, layer.getIconImage().getFunction().getStops().getClass());
+    assertEquals(1, ((IntervalStops) layer.getIconImage().getFunction().getStops()).size());
+  }
+
+  @Test
+  public void testIconRotateAsConstant() {
+    checkViewIsDisplayed(R.id.mapView);
     Timber.i("icon-rotate");
     assertNotNull(layer);
 
@@ -395,19 +494,142 @@ public class SymbolLayerTest extends BaseStyleTest {
   }
 
   @Test
-  public void testIconPadding() {
+  public void testIconRotateAsCameraFunction() {
     checkViewIsDisplayed(R.id.mapView);
+    Timber.i("icon-rotate");
+    assertNotNull(layer);
 
-    mapboxMap = rule.getActivity().getMapboxMap();
+    // Set
+    layer.setProperties(
+      iconRotate(
+        zoom(
+          exponential(
+            stop(2, iconRotate(0.3f))
+          ).withBase(0.5f)
+        )
+      )
+    );
 
-    if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-      Timber.i("Adding layer");
-      layer = new SymbolLayer("my-layer", "composite");
-      layer.setSourceLayer("composite");
-      mapboxMap.addLayer(layer);
-      // Layer reference is now stale, get new reference
-      layer = mapboxMap.getLayerAs("my-layer");
-    }
+    // Verify
+    assertNotNull(layer.getIconRotate());
+    assertNotNull(layer.getIconRotate().getFunction());
+    assertEquals(CameraFunction.class, layer.getIconRotate().getFunction().getClass());
+    assertEquals(ExponentialStops.class, layer.getIconRotate().getFunction().getStops().getClass());
+    assertEquals(0.5f, ((ExponentialStops) layer.getIconRotate().getFunction().getStops()).getBase(), 0.001);
+    assertEquals(1, ((ExponentialStops) layer.getIconRotate().getFunction().getStops()).size());
+  }
+
+  @Test
+  public void testIconRotateAsIdentitySourceFunction() {
+    checkViewIsDisplayed(R.id.mapView);
+    Timber.i("icon-rotate");
+    assertNotNull(layer);
+
+    // Set
+    layer.setProperties(
+      iconRotate(property("FeaturePropertyA", Stops.<Float>identity()))
+    );
+
+    // Verify
+    assertNotNull(layer.getIconRotate());
+    assertNotNull(layer.getIconRotate().getFunction());
+    assertEquals(SourceFunction.class, layer.getIconRotate().getFunction().getClass());
+    assertEquals("FeaturePropertyA", ((SourceFunction) layer.getIconRotate().getFunction()).getProperty());
+    assertEquals(IdentityStops.class, layer.getIconRotate().getFunction().getStops().getClass());
+  }
+
+  @Test
+  public void testIconRotateAsExponentialSourceFunction() {
+    checkViewIsDisplayed(R.id.mapView);
+    Timber.i("icon-rotate");
+    assertNotNull(layer);
+
+    // Set
+    layer.setProperties(
+      iconRotate(
+        property(
+          "FeaturePropertyA",
+          exponential(
+            stop(0.3f, iconRotate(0.3f))
+          ).withBase(0.5f)
+        )
+      )
+    );
+
+    // Verify
+    assertNotNull(layer.getIconRotate());
+    assertNotNull(layer.getIconRotate().getFunction());
+    assertEquals(SourceFunction.class, layer.getIconRotate().getFunction().getClass());
+    assertEquals("FeaturePropertyA", ((SourceFunction) layer.getIconRotate().getFunction()).getProperty());
+    assertEquals(ExponentialStops.class, layer.getIconRotate().getFunction().getStops().getClass());
+  }
+
+  @Test
+  public void testIconRotateAsCategoricalSourceFunction() {
+    checkViewIsDisplayed(R.id.mapView);
+    Timber.i("icon-rotate");
+    assertNotNull(layer);
+
+    // Set
+    layer.setProperties(
+      iconRotate(
+        property(
+          "FeaturePropertyA",
+          categorical(
+            stop(1.0f, iconRotate(0.3f))
+          )
+        ).withDefaultValue(0.3f)
+      )
+    );
+
+    // Verify
+    assertNotNull(layer.getIconRotate());
+    assertNotNull(layer.getIconRotate().getFunction());
+    assertEquals(SourceFunction.class, layer.getIconRotate().getFunction().getClass());
+    assertEquals("FeaturePropertyA", ((SourceFunction) layer.getIconRotate().getFunction()).getProperty());
+    assertEquals(CategoricalStops.class, layer.getIconRotate().getFunction().getStops().getClass());
+    assertEquals(0.3f, ((SourceFunction) layer.getIconRotate().getFunction()).getDefaultValue());
+  }
+
+  @Test
+  public void testIconRotateAsCompositeFunction() {
+    checkViewIsDisplayed(R.id.mapView);
+    Timber.i("icon-rotate");
+    assertNotNull(layer);
+
+    // Set
+    layer.setProperties(
+      iconRotate(
+        composite(
+          "FeaturePropertyA",
+          exponential(
+            stop(0, 0.3f, iconRotate(0.9f))
+          ).withBase(0.5f)
+        ).withDefaultValue(0.3f)
+      )
+    );
+
+    // Verify
+    assertNotNull(layer.getIconRotate());
+    assertNotNull(layer.getIconRotate().getFunction());
+    assertEquals(CompositeFunction.class, layer.getIconRotate().getFunction().getClass());
+    assertEquals("FeaturePropertyA", ((CompositeFunction) layer.getIconRotate().getFunction()).getProperty());
+    assertEquals(CompositeStops.class, layer.getIconRotate().getFunction().getStops().getClass());
+    assertEquals(1, ((CompositeStops) layer.getIconRotate().getFunction().getStops()).size());
+
+    CompositeStops<Float, Float, Float, ExponentialStops<Float, Float>> stops =
+      (CompositeStops<Float, Float, Float, ExponentialStops<Float, Float>>) layer.getIconRotate().getFunction().getStops();
+    Map.Entry<Float, ExponentialStops<Float, Float>> stop = stops.iterator().next();
+    assertEquals(ExponentialStops.class, stop.getValue().getClass());
+    assertEquals(0f, stop.getKey(), 0.001);
+    assertEquals(1, stop.getValue().size());
+    assertEquals(0.3f, stop.getValue().iterator().next().in, 0.001f);
+    assertEquals(0.9f, stop.getValue().iterator().next().out, 0.001f);
+  }
+
+  @Test
+  public void testIconPaddingAsConstant() {
+    checkViewIsDisplayed(R.id.mapView);
     Timber.i("icon-padding");
     assertNotNull(layer);
 
@@ -417,19 +639,34 @@ public class SymbolLayerTest extends BaseStyleTest {
   }
 
   @Test
-  public void testIconKeepUpright() {
+  public void testIconPaddingAsCameraFunction() {
     checkViewIsDisplayed(R.id.mapView);
+    Timber.i("icon-padding");
+    assertNotNull(layer);
 
-    mapboxMap = rule.getActivity().getMapboxMap();
+    // Set
+    layer.setProperties(
+      iconPadding(
+        zoom(
+          exponential(
+            stop(2, iconPadding(0.3f))
+          ).withBase(0.5f)
+        )
+      )
+    );
 
-    if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-      Timber.i("Adding layer");
-      layer = new SymbolLayer("my-layer", "composite");
-      layer.setSourceLayer("composite");
-      mapboxMap.addLayer(layer);
-      // Layer reference is now stale, get new reference
-      layer = mapboxMap.getLayerAs("my-layer");
-    }
+    // Verify
+    assertNotNull(layer.getIconPadding());
+    assertNotNull(layer.getIconPadding().getFunction());
+    assertEquals(CameraFunction.class, layer.getIconPadding().getFunction().getClass());
+    assertEquals(ExponentialStops.class, layer.getIconPadding().getFunction().getStops().getClass());
+    assertEquals(0.5f, ((ExponentialStops) layer.getIconPadding().getFunction().getStops()).getBase(), 0.001);
+    assertEquals(1, ((ExponentialStops) layer.getIconPadding().getFunction().getStops()).size());
+  }
+
+  @Test
+  public void testIconKeepUprightAsConstant() {
+    checkViewIsDisplayed(R.id.mapView);
     Timber.i("icon-keep-upright");
     assertNotNull(layer);
 
@@ -439,41 +676,115 @@ public class SymbolLayerTest extends BaseStyleTest {
   }
 
   @Test
-  public void testIconOffset() {
+  public void testIconKeepUprightAsCameraFunction() {
     checkViewIsDisplayed(R.id.mapView);
+    Timber.i("icon-keep-upright");
+    assertNotNull(layer);
 
-    mapboxMap = rule.getActivity().getMapboxMap();
+    // Set
+    layer.setProperties(
+      iconKeepUpright(
+        zoom(
+          interval(
+            stop(2, iconKeepUpright(true))
+          )
+        )
+      )
+    );
 
-    if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-      Timber.i("Adding layer");
-      layer = new SymbolLayer("my-layer", "composite");
-      layer.setSourceLayer("composite");
-      mapboxMap.addLayer(layer);
-      // Layer reference is now stale, get new reference
-      layer = mapboxMap.getLayerAs("my-layer");
-    }
+    // Verify
+    assertNotNull(layer.getIconKeepUpright());
+    assertNotNull(layer.getIconKeepUpright().getFunction());
+    assertEquals(CameraFunction.class, layer.getIconKeepUpright().getFunction().getClass());
+    assertEquals(IntervalStops.class, layer.getIconKeepUpright().getFunction().getStops().getClass());
+    assertEquals(1, ((IntervalStops) layer.getIconKeepUpright().getFunction().getStops()).size());
+  }
+
+  @Test
+  public void testIconOffsetAsConstant() {
+    checkViewIsDisplayed(R.id.mapView);
     Timber.i("icon-offset");
     assertNotNull(layer);
 
     // Set and Get
-    layer.setProperties(iconOffset(new Float[] {0f, 0f}));
-    assertEquals((Float[]) layer.getIconOffset().getValue(), (Float[]) new Float[] {0f, 0f});
+    layer.setProperties(iconOffset(new Float[]{0f,0f}));
+    assertEquals((Float[]) layer.getIconOffset().getValue(), (Float[]) new Float[]{0f,0f});
   }
 
   @Test
-  public void testTextPitchAlignment() {
+  public void testIconOffsetAsCameraFunction() {
     checkViewIsDisplayed(R.id.mapView);
+    Timber.i("icon-offset");
+    assertNotNull(layer);
 
-    mapboxMap = rule.getActivity().getMapboxMap();
+    // Set
+    layer.setProperties(
+      iconOffset(
+        zoom(
+          exponential(
+            stop(2, iconOffset(new Float[]{0f,0f}))
+          ).withBase(0.5f)
+        )
+      )
+    );
 
-    if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-      Timber.i("Adding layer");
-      layer = new SymbolLayer("my-layer", "composite");
-      layer.setSourceLayer("composite");
-      mapboxMap.addLayer(layer);
-      // Layer reference is now stale, get new reference
-      layer = mapboxMap.getLayerAs("my-layer");
-    }
+    // Verify
+    assertNotNull(layer.getIconOffset());
+    assertNotNull(layer.getIconOffset().getFunction());
+    assertEquals(CameraFunction.class, layer.getIconOffset().getFunction().getClass());
+    assertEquals(ExponentialStops.class, layer.getIconOffset().getFunction().getStops().getClass());
+    assertEquals(0.5f, ((ExponentialStops) layer.getIconOffset().getFunction().getStops()).getBase(), 0.001);
+    assertEquals(1, ((ExponentialStops) layer.getIconOffset().getFunction().getStops()).size());
+  }
+
+  @Test
+  public void testIconOffsetAsIdentitySourceFunction() {
+    checkViewIsDisplayed(R.id.mapView);
+    Timber.i("icon-offset");
+    assertNotNull(layer);
+
+    // Set
+    layer.setProperties(
+      iconOffset(property("FeaturePropertyA", Stops.<Float[]>identity()))
+    );
+
+    // Verify
+    assertNotNull(layer.getIconOffset());
+    assertNotNull(layer.getIconOffset().getFunction());
+    assertEquals(SourceFunction.class, layer.getIconOffset().getFunction().getClass());
+    assertEquals("FeaturePropertyA", ((SourceFunction) layer.getIconOffset().getFunction()).getProperty());
+    assertEquals(IdentityStops.class, layer.getIconOffset().getFunction().getStops().getClass());
+  }
+
+  @Test
+  public void testIconOffsetAsIntervalSourceFunction() {
+    checkViewIsDisplayed(R.id.mapView);
+    Timber.i("icon-offset");
+    assertNotNull(layer);
+
+    // Set
+    layer.setProperties(
+      iconOffset(
+        property(
+          "FeaturePropertyA",
+          interval(
+            stop(1, iconOffset(new Float[]{0f,0f}))
+          )
+        )
+      )
+    );
+
+    // Verify
+    assertNotNull(layer.getIconOffset());
+    assertNotNull(layer.getIconOffset().getFunction());
+    assertEquals(SourceFunction.class, layer.getIconOffset().getFunction().getClass());
+    assertEquals("FeaturePropertyA", ((SourceFunction) layer.getIconOffset().getFunction()).getProperty());
+    assertEquals(IntervalStops.class, layer.getIconOffset().getFunction().getStops().getClass());
+  }
+
+  @Test
+  public void testTextPitchAlignmentAsConstant() {
+    checkViewIsDisplayed(R.id.mapView);
     Timber.i("text-pitch-alignment");
     assertNotNull(layer);
 
@@ -483,19 +794,33 @@ public class SymbolLayerTest extends BaseStyleTest {
   }
 
   @Test
-  public void testTextRotationAlignment() {
+  public void testTextPitchAlignmentAsCameraFunction() {
     checkViewIsDisplayed(R.id.mapView);
+    Timber.i("text-pitch-alignment");
+    assertNotNull(layer);
 
-    mapboxMap = rule.getActivity().getMapboxMap();
+    // Set
+    layer.setProperties(
+      textPitchAlignment(
+        zoom(
+          interval(
+            stop(2, textPitchAlignment(TEXT_PITCH_ALIGNMENT_MAP))
+          )
+        )
+      )
+    );
 
-    if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-      Timber.i("Adding layer");
-      layer = new SymbolLayer("my-layer", "composite");
-      layer.setSourceLayer("composite");
-      mapboxMap.addLayer(layer);
-      // Layer reference is now stale, get new reference
-      layer = mapboxMap.getLayerAs("my-layer");
-    }
+    // Verify
+    assertNotNull(layer.getTextPitchAlignment());
+    assertNotNull(layer.getTextPitchAlignment().getFunction());
+    assertEquals(CameraFunction.class, layer.getTextPitchAlignment().getFunction().getClass());
+    assertEquals(IntervalStops.class, layer.getTextPitchAlignment().getFunction().getStops().getClass());
+    assertEquals(1, ((IntervalStops) layer.getTextPitchAlignment().getFunction().getStops()).size());
+  }
+
+  @Test
+  public void testTextRotationAlignmentAsConstant() {
+    checkViewIsDisplayed(R.id.mapView);
     Timber.i("text-rotation-alignment");
     assertNotNull(layer);
 
@@ -505,19 +830,33 @@ public class SymbolLayerTest extends BaseStyleTest {
   }
 
   @Test
-  public void testTextField() {
+  public void testTextRotationAlignmentAsCameraFunction() {
     checkViewIsDisplayed(R.id.mapView);
+    Timber.i("text-rotation-alignment");
+    assertNotNull(layer);
 
-    mapboxMap = rule.getActivity().getMapboxMap();
+    // Set
+    layer.setProperties(
+      textRotationAlignment(
+        zoom(
+          interval(
+            stop(2, textRotationAlignment(TEXT_ROTATION_ALIGNMENT_MAP))
+          )
+        )
+      )
+    );
 
-    if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-      Timber.i("Adding layer");
-      layer = new SymbolLayer("my-layer", "composite");
-      layer.setSourceLayer("composite");
-      mapboxMap.addLayer(layer);
-      // Layer reference is now stale, get new reference
-      layer = mapboxMap.getLayerAs("my-layer");
-    }
+    // Verify
+    assertNotNull(layer.getTextRotationAlignment());
+    assertNotNull(layer.getTextRotationAlignment().getFunction());
+    assertEquals(CameraFunction.class, layer.getTextRotationAlignment().getFunction().getClass());
+    assertEquals(IntervalStops.class, layer.getTextRotationAlignment().getFunction().getStops().getClass());
+    assertEquals(1, ((IntervalStops) layer.getTextRotationAlignment().getFunction().getStops()).size());
+  }
+
+  @Test
+  public void testTextFieldAsConstant() {
+    checkViewIsDisplayed(R.id.mapView);
     Timber.i("text-field");
     assertNotNull(layer);
 
@@ -527,42 +866,69 @@ public class SymbolLayerTest extends BaseStyleTest {
   }
 
   @Test
-  public void testTextFont() {
+  public void testTextFieldAsCameraFunction() {
     checkViewIsDisplayed(R.id.mapView);
+    Timber.i("text-field");
+    assertNotNull(layer);
 
-    mapboxMap = rule.getActivity().getMapboxMap();
+    // Set
+    layer.setProperties(
+      textField(
+        zoom(
+          interval(
+            stop(2, textField(""))
+          )
+        )
+      )
+    );
 
-    if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-      Timber.i("Adding layer");
-      layer = new SymbolLayer("my-layer", "composite");
-      layer.setSourceLayer("composite");
-      mapboxMap.addLayer(layer);
-      // Layer reference is now stale, get new reference
-      layer = mapboxMap.getLayerAs("my-layer");
-    }
+    // Verify
+    assertNotNull(layer.getTextField());
+    assertNotNull(layer.getTextField().getFunction());
+    assertEquals(CameraFunction.class, layer.getTextField().getFunction().getClass());
+    assertEquals(IntervalStops.class, layer.getTextField().getFunction().getStops().getClass());
+    assertEquals(1, ((IntervalStops) layer.getTextField().getFunction().getStops()).size());
+  }
+
+  @Test
+  public void testTextFontAsConstant() {
+    checkViewIsDisplayed(R.id.mapView);
     Timber.i("text-font");
     assertNotNull(layer);
 
     // Set and Get
-    layer.setProperties(textFont(new String[] {"Open Sans Regular", "Arial Unicode MS Regular"}));
-    assertEquals((String[]) layer.getTextFont().getValue(), (String[]) new String[] {"Open Sans Regular",
-      "Arial Unicode MS Regular"});
+    layer.setProperties(textFont(new String[]{"Open Sans Regular", "Arial Unicode MS Regular"}));
+    assertEquals((String[]) layer.getTextFont().getValue(), (String[]) new String[]{"Open Sans Regular", "Arial Unicode MS Regular"});
   }
 
   @Test
-  public void testTextSize() {
+  public void testTextFontAsCameraFunction() {
     checkViewIsDisplayed(R.id.mapView);
+    Timber.i("text-font");
+    assertNotNull(layer);
 
-    mapboxMap = rule.getActivity().getMapboxMap();
+    // Set
+    layer.setProperties(
+      textFont(
+        zoom(
+          interval(
+            stop(2, textFont(new String[]{"Open Sans Regular", "Arial Unicode MS Regular"}))
+          )
+        )
+      )
+    );
 
-    if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-      Timber.i("Adding layer");
-      layer = new SymbolLayer("my-layer", "composite");
-      layer.setSourceLayer("composite");
-      mapboxMap.addLayer(layer);
-      // Layer reference is now stale, get new reference
-      layer = mapboxMap.getLayerAs("my-layer");
-    }
+    // Verify
+    assertNotNull(layer.getTextFont());
+    assertNotNull(layer.getTextFont().getFunction());
+    assertEquals(CameraFunction.class, layer.getTextFont().getFunction().getClass());
+    assertEquals(IntervalStops.class, layer.getTextFont().getFunction().getStops().getClass());
+    assertEquals(1, ((IntervalStops) layer.getTextFont().getFunction().getStops()).size());
+  }
+
+  @Test
+  public void testTextSizeAsConstant() {
+    checkViewIsDisplayed(R.id.mapView);
     Timber.i("text-size");
     assertNotNull(layer);
 
@@ -572,19 +938,34 @@ public class SymbolLayerTest extends BaseStyleTest {
   }
 
   @Test
-  public void testTextMaxWidth() {
+  public void testTextSizeAsCameraFunction() {
     checkViewIsDisplayed(R.id.mapView);
+    Timber.i("text-size");
+    assertNotNull(layer);
 
-    mapboxMap = rule.getActivity().getMapboxMap();
+    // Set
+    layer.setProperties(
+      textSize(
+        zoom(
+          exponential(
+            stop(2, textSize(0.3f))
+          ).withBase(0.5f)
+        )
+      )
+    );
 
-    if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-      Timber.i("Adding layer");
-      layer = new SymbolLayer("my-layer", "composite");
-      layer.setSourceLayer("composite");
-      mapboxMap.addLayer(layer);
-      // Layer reference is now stale, get new reference
-      layer = mapboxMap.getLayerAs("my-layer");
-    }
+    // Verify
+    assertNotNull(layer.getTextSize());
+    assertNotNull(layer.getTextSize().getFunction());
+    assertEquals(CameraFunction.class, layer.getTextSize().getFunction().getClass());
+    assertEquals(ExponentialStops.class, layer.getTextSize().getFunction().getStops().getClass());
+    assertEquals(0.5f, ((ExponentialStops) layer.getTextSize().getFunction().getStops()).getBase(), 0.001);
+    assertEquals(1, ((ExponentialStops) layer.getTextSize().getFunction().getStops()).size());
+  }
+
+  @Test
+  public void testTextMaxWidthAsConstant() {
+    checkViewIsDisplayed(R.id.mapView);
     Timber.i("text-max-width");
     assertNotNull(layer);
 
@@ -594,19 +975,34 @@ public class SymbolLayerTest extends BaseStyleTest {
   }
 
   @Test
-  public void testTextLineHeight() {
+  public void testTextMaxWidthAsCameraFunction() {
     checkViewIsDisplayed(R.id.mapView);
+    Timber.i("text-max-width");
+    assertNotNull(layer);
 
-    mapboxMap = rule.getActivity().getMapboxMap();
+    // Set
+    layer.setProperties(
+      textMaxWidth(
+        zoom(
+          exponential(
+            stop(2, textMaxWidth(0.3f))
+          ).withBase(0.5f)
+        )
+      )
+    );
 
-    if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-      Timber.i("Adding layer");
-      layer = new SymbolLayer("my-layer", "composite");
-      layer.setSourceLayer("composite");
-      mapboxMap.addLayer(layer);
-      // Layer reference is now stale, get new reference
-      layer = mapboxMap.getLayerAs("my-layer");
-    }
+    // Verify
+    assertNotNull(layer.getTextMaxWidth());
+    assertNotNull(layer.getTextMaxWidth().getFunction());
+    assertEquals(CameraFunction.class, layer.getTextMaxWidth().getFunction().getClass());
+    assertEquals(ExponentialStops.class, layer.getTextMaxWidth().getFunction().getStops().getClass());
+    assertEquals(0.5f, ((ExponentialStops) layer.getTextMaxWidth().getFunction().getStops()).getBase(), 0.001);
+    assertEquals(1, ((ExponentialStops) layer.getTextMaxWidth().getFunction().getStops()).size());
+  }
+
+  @Test
+  public void testTextLineHeightAsConstant() {
+    checkViewIsDisplayed(R.id.mapView);
     Timber.i("text-line-height");
     assertNotNull(layer);
 
@@ -616,19 +1012,34 @@ public class SymbolLayerTest extends BaseStyleTest {
   }
 
   @Test
-  public void testTextLetterSpacing() {
+  public void testTextLineHeightAsCameraFunction() {
     checkViewIsDisplayed(R.id.mapView);
+    Timber.i("text-line-height");
+    assertNotNull(layer);
 
-    mapboxMap = rule.getActivity().getMapboxMap();
+    // Set
+    layer.setProperties(
+      textLineHeight(
+        zoom(
+          exponential(
+            stop(2, textLineHeight(0.3f))
+          ).withBase(0.5f)
+        )
+      )
+    );
 
-    if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-      Timber.i("Adding layer");
-      layer = new SymbolLayer("my-layer", "composite");
-      layer.setSourceLayer("composite");
-      mapboxMap.addLayer(layer);
-      // Layer reference is now stale, get new reference
-      layer = mapboxMap.getLayerAs("my-layer");
-    }
+    // Verify
+    assertNotNull(layer.getTextLineHeight());
+    assertNotNull(layer.getTextLineHeight().getFunction());
+    assertEquals(CameraFunction.class, layer.getTextLineHeight().getFunction().getClass());
+    assertEquals(ExponentialStops.class, layer.getTextLineHeight().getFunction().getStops().getClass());
+    assertEquals(0.5f, ((ExponentialStops) layer.getTextLineHeight().getFunction().getStops()).getBase(), 0.001);
+    assertEquals(1, ((ExponentialStops) layer.getTextLineHeight().getFunction().getStops()).size());
+  }
+
+  @Test
+  public void testTextLetterSpacingAsConstant() {
+    checkViewIsDisplayed(R.id.mapView);
     Timber.i("text-letter-spacing");
     assertNotNull(layer);
 
@@ -638,19 +1049,34 @@ public class SymbolLayerTest extends BaseStyleTest {
   }
 
   @Test
-  public void testTextJustify() {
+  public void testTextLetterSpacingAsCameraFunction() {
     checkViewIsDisplayed(R.id.mapView);
+    Timber.i("text-letter-spacing");
+    assertNotNull(layer);
 
-    mapboxMap = rule.getActivity().getMapboxMap();
+    // Set
+    layer.setProperties(
+      textLetterSpacing(
+        zoom(
+          exponential(
+            stop(2, textLetterSpacing(0.3f))
+          ).withBase(0.5f)
+        )
+      )
+    );
 
-    if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-      Timber.i("Adding layer");
-      layer = new SymbolLayer("my-layer", "composite");
-      layer.setSourceLayer("composite");
-      mapboxMap.addLayer(layer);
-      // Layer reference is now stale, get new reference
-      layer = mapboxMap.getLayerAs("my-layer");
-    }
+    // Verify
+    assertNotNull(layer.getTextLetterSpacing());
+    assertNotNull(layer.getTextLetterSpacing().getFunction());
+    assertEquals(CameraFunction.class, layer.getTextLetterSpacing().getFunction().getClass());
+    assertEquals(ExponentialStops.class, layer.getTextLetterSpacing().getFunction().getStops().getClass());
+    assertEquals(0.5f, ((ExponentialStops) layer.getTextLetterSpacing().getFunction().getStops()).getBase(), 0.001);
+    assertEquals(1, ((ExponentialStops) layer.getTextLetterSpacing().getFunction().getStops()).size());
+  }
+
+  @Test
+  public void testTextJustifyAsConstant() {
+    checkViewIsDisplayed(R.id.mapView);
     Timber.i("text-justify");
     assertNotNull(layer);
 
@@ -660,19 +1086,33 @@ public class SymbolLayerTest extends BaseStyleTest {
   }
 
   @Test
-  public void testTextAnchor() {
+  public void testTextJustifyAsCameraFunction() {
     checkViewIsDisplayed(R.id.mapView);
+    Timber.i("text-justify");
+    assertNotNull(layer);
 
-    mapboxMap = rule.getActivity().getMapboxMap();
+    // Set
+    layer.setProperties(
+      textJustify(
+        zoom(
+          interval(
+            stop(2, textJustify(TEXT_JUSTIFY_LEFT))
+          )
+        )
+      )
+    );
 
-    if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-      Timber.i("Adding layer");
-      layer = new SymbolLayer("my-layer", "composite");
-      layer.setSourceLayer("composite");
-      mapboxMap.addLayer(layer);
-      // Layer reference is now stale, get new reference
-      layer = mapboxMap.getLayerAs("my-layer");
-    }
+    // Verify
+    assertNotNull(layer.getTextJustify());
+    assertNotNull(layer.getTextJustify().getFunction());
+    assertEquals(CameraFunction.class, layer.getTextJustify().getFunction().getClass());
+    assertEquals(IntervalStops.class, layer.getTextJustify().getFunction().getStops().getClass());
+    assertEquals(1, ((IntervalStops) layer.getTextJustify().getFunction().getStops()).size());
+  }
+
+  @Test
+  public void testTextAnchorAsConstant() {
+    checkViewIsDisplayed(R.id.mapView);
     Timber.i("text-anchor");
     assertNotNull(layer);
 
@@ -682,19 +1122,33 @@ public class SymbolLayerTest extends BaseStyleTest {
   }
 
   @Test
-  public void testTextMaxAngle() {
+  public void testTextAnchorAsCameraFunction() {
     checkViewIsDisplayed(R.id.mapView);
+    Timber.i("text-anchor");
+    assertNotNull(layer);
 
-    mapboxMap = rule.getActivity().getMapboxMap();
+    // Set
+    layer.setProperties(
+      textAnchor(
+        zoom(
+          interval(
+            stop(2, textAnchor(TEXT_ANCHOR_CENTER))
+          )
+        )
+      )
+    );
 
-    if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-      Timber.i("Adding layer");
-      layer = new SymbolLayer("my-layer", "composite");
-      layer.setSourceLayer("composite");
-      mapboxMap.addLayer(layer);
-      // Layer reference is now stale, get new reference
-      layer = mapboxMap.getLayerAs("my-layer");
-    }
+    // Verify
+    assertNotNull(layer.getTextAnchor());
+    assertNotNull(layer.getTextAnchor().getFunction());
+    assertEquals(CameraFunction.class, layer.getTextAnchor().getFunction().getClass());
+    assertEquals(IntervalStops.class, layer.getTextAnchor().getFunction().getStops().getClass());
+    assertEquals(1, ((IntervalStops) layer.getTextAnchor().getFunction().getStops()).size());
+  }
+
+  @Test
+  public void testTextMaxAngleAsConstant() {
+    checkViewIsDisplayed(R.id.mapView);
     Timber.i("text-max-angle");
     assertNotNull(layer);
 
@@ -704,19 +1158,34 @@ public class SymbolLayerTest extends BaseStyleTest {
   }
 
   @Test
-  public void testTextRotate() {
+  public void testTextMaxAngleAsCameraFunction() {
     checkViewIsDisplayed(R.id.mapView);
+    Timber.i("text-max-angle");
+    assertNotNull(layer);
 
-    mapboxMap = rule.getActivity().getMapboxMap();
+    // Set
+    layer.setProperties(
+      textMaxAngle(
+        zoom(
+          exponential(
+            stop(2, textMaxAngle(0.3f))
+          ).withBase(0.5f)
+        )
+      )
+    );
 
-    if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-      Timber.i("Adding layer");
-      layer = new SymbolLayer("my-layer", "composite");
-      layer.setSourceLayer("composite");
-      mapboxMap.addLayer(layer);
-      // Layer reference is now stale, get new reference
-      layer = mapboxMap.getLayerAs("my-layer");
-    }
+    // Verify
+    assertNotNull(layer.getTextMaxAngle());
+    assertNotNull(layer.getTextMaxAngle().getFunction());
+    assertEquals(CameraFunction.class, layer.getTextMaxAngle().getFunction().getClass());
+    assertEquals(ExponentialStops.class, layer.getTextMaxAngle().getFunction().getStops().getClass());
+    assertEquals(0.5f, ((ExponentialStops) layer.getTextMaxAngle().getFunction().getStops()).getBase(), 0.001);
+    assertEquals(1, ((ExponentialStops) layer.getTextMaxAngle().getFunction().getStops()).size());
+  }
+
+  @Test
+  public void testTextRotateAsConstant() {
+    checkViewIsDisplayed(R.id.mapView);
     Timber.i("text-rotate");
     assertNotNull(layer);
 
@@ -726,19 +1195,34 @@ public class SymbolLayerTest extends BaseStyleTest {
   }
 
   @Test
-  public void testTextPadding() {
+  public void testTextRotateAsCameraFunction() {
     checkViewIsDisplayed(R.id.mapView);
+    Timber.i("text-rotate");
+    assertNotNull(layer);
 
-    mapboxMap = rule.getActivity().getMapboxMap();
+    // Set
+    layer.setProperties(
+      textRotate(
+        zoom(
+          exponential(
+            stop(2, textRotate(0.3f))
+          ).withBase(0.5f)
+        )
+      )
+    );
 
-    if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-      Timber.i("Adding layer");
-      layer = new SymbolLayer("my-layer", "composite");
-      layer.setSourceLayer("composite");
-      mapboxMap.addLayer(layer);
-      // Layer reference is now stale, get new reference
-      layer = mapboxMap.getLayerAs("my-layer");
-    }
+    // Verify
+    assertNotNull(layer.getTextRotate());
+    assertNotNull(layer.getTextRotate().getFunction());
+    assertEquals(CameraFunction.class, layer.getTextRotate().getFunction().getClass());
+    assertEquals(ExponentialStops.class, layer.getTextRotate().getFunction().getStops().getClass());
+    assertEquals(0.5f, ((ExponentialStops) layer.getTextRotate().getFunction().getStops()).getBase(), 0.001);
+    assertEquals(1, ((ExponentialStops) layer.getTextRotate().getFunction().getStops()).size());
+  }
+
+  @Test
+  public void testTextPaddingAsConstant() {
+    checkViewIsDisplayed(R.id.mapView);
     Timber.i("text-padding");
     assertNotNull(layer);
 
@@ -748,19 +1232,34 @@ public class SymbolLayerTest extends BaseStyleTest {
   }
 
   @Test
-  public void testTextKeepUpright() {
+  public void testTextPaddingAsCameraFunction() {
     checkViewIsDisplayed(R.id.mapView);
+    Timber.i("text-padding");
+    assertNotNull(layer);
 
-    mapboxMap = rule.getActivity().getMapboxMap();
+    // Set
+    layer.setProperties(
+      textPadding(
+        zoom(
+          exponential(
+            stop(2, textPadding(0.3f))
+          ).withBase(0.5f)
+        )
+      )
+    );
 
-    if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-      Timber.i("Adding layer");
-      layer = new SymbolLayer("my-layer", "composite");
-      layer.setSourceLayer("composite");
-      mapboxMap.addLayer(layer);
-      // Layer reference is now stale, get new reference
-      layer = mapboxMap.getLayerAs("my-layer");
-    }
+    // Verify
+    assertNotNull(layer.getTextPadding());
+    assertNotNull(layer.getTextPadding().getFunction());
+    assertEquals(CameraFunction.class, layer.getTextPadding().getFunction().getClass());
+    assertEquals(ExponentialStops.class, layer.getTextPadding().getFunction().getStops().getClass());
+    assertEquals(0.5f, ((ExponentialStops) layer.getTextPadding().getFunction().getStops()).getBase(), 0.001);
+    assertEquals(1, ((ExponentialStops) layer.getTextPadding().getFunction().getStops()).size());
+  }
+
+  @Test
+  public void testTextKeepUprightAsConstant() {
+    checkViewIsDisplayed(R.id.mapView);
     Timber.i("text-keep-upright");
     assertNotNull(layer);
 
@@ -770,19 +1269,33 @@ public class SymbolLayerTest extends BaseStyleTest {
   }
 
   @Test
-  public void testTextTransform() {
+  public void testTextKeepUprightAsCameraFunction() {
     checkViewIsDisplayed(R.id.mapView);
+    Timber.i("text-keep-upright");
+    assertNotNull(layer);
 
-    mapboxMap = rule.getActivity().getMapboxMap();
+    // Set
+    layer.setProperties(
+      textKeepUpright(
+        zoom(
+          interval(
+            stop(2, textKeepUpright(true))
+          )
+        )
+      )
+    );
 
-    if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-      Timber.i("Adding layer");
-      layer = new SymbolLayer("my-layer", "composite");
-      layer.setSourceLayer("composite");
-      mapboxMap.addLayer(layer);
-      // Layer reference is now stale, get new reference
-      layer = mapboxMap.getLayerAs("my-layer");
-    }
+    // Verify
+    assertNotNull(layer.getTextKeepUpright());
+    assertNotNull(layer.getTextKeepUpright().getFunction());
+    assertEquals(CameraFunction.class, layer.getTextKeepUpright().getFunction().getClass());
+    assertEquals(IntervalStops.class, layer.getTextKeepUpright().getFunction().getStops().getClass());
+    assertEquals(1, ((IntervalStops) layer.getTextKeepUpright().getFunction().getStops()).size());
+  }
+
+  @Test
+  public void testTextTransformAsConstant() {
+    checkViewIsDisplayed(R.id.mapView);
     Timber.i("text-transform");
     assertNotNull(layer);
 
@@ -792,41 +1305,70 @@ public class SymbolLayerTest extends BaseStyleTest {
   }
 
   @Test
-  public void testTextOffset() {
+  public void testTextTransformAsCameraFunction() {
     checkViewIsDisplayed(R.id.mapView);
+    Timber.i("text-transform");
+    assertNotNull(layer);
 
-    mapboxMap = rule.getActivity().getMapboxMap();
+    // Set
+    layer.setProperties(
+      textTransform(
+        zoom(
+          interval(
+            stop(2, textTransform(TEXT_TRANSFORM_NONE))
+          )
+        )
+      )
+    );
 
-    if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-      Timber.i("Adding layer");
-      layer = new SymbolLayer("my-layer", "composite");
-      layer.setSourceLayer("composite");
-      mapboxMap.addLayer(layer);
-      // Layer reference is now stale, get new reference
-      layer = mapboxMap.getLayerAs("my-layer");
-    }
+    // Verify
+    assertNotNull(layer.getTextTransform());
+    assertNotNull(layer.getTextTransform().getFunction());
+    assertEquals(CameraFunction.class, layer.getTextTransform().getFunction().getClass());
+    assertEquals(IntervalStops.class, layer.getTextTransform().getFunction().getStops().getClass());
+    assertEquals(1, ((IntervalStops) layer.getTextTransform().getFunction().getStops()).size());
+  }
+
+  @Test
+  public void testTextOffsetAsConstant() {
+    checkViewIsDisplayed(R.id.mapView);
     Timber.i("text-offset");
     assertNotNull(layer);
 
     // Set and Get
-    layer.setProperties(textOffset(new Float[] {0f, 0f}));
-    assertEquals((Float[]) layer.getTextOffset().getValue(), (Float[]) new Float[] {0f, 0f});
+    layer.setProperties(textOffset(new Float[]{0f,0f}));
+    assertEquals((Float[]) layer.getTextOffset().getValue(), (Float[]) new Float[]{0f,0f});
   }
 
   @Test
-  public void testTextAllowOverlap() {
+  public void testTextOffsetAsCameraFunction() {
     checkViewIsDisplayed(R.id.mapView);
+    Timber.i("text-offset");
+    assertNotNull(layer);
 
-    mapboxMap = rule.getActivity().getMapboxMap();
+    // Set
+    layer.setProperties(
+      textOffset(
+        zoom(
+          exponential(
+            stop(2, textOffset(new Float[]{0f,0f}))
+          ).withBase(0.5f)
+        )
+      )
+    );
 
-    if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-      Timber.i("Adding layer");
-      layer = new SymbolLayer("my-layer", "composite");
-      layer.setSourceLayer("composite");
-      mapboxMap.addLayer(layer);
-      // Layer reference is now stale, get new reference
-      layer = mapboxMap.getLayerAs("my-layer");
-    }
+    // Verify
+    assertNotNull(layer.getTextOffset());
+    assertNotNull(layer.getTextOffset().getFunction());
+    assertEquals(CameraFunction.class, layer.getTextOffset().getFunction().getClass());
+    assertEquals(ExponentialStops.class, layer.getTextOffset().getFunction().getStops().getClass());
+    assertEquals(0.5f, ((ExponentialStops) layer.getTextOffset().getFunction().getStops()).getBase(), 0.001);
+    assertEquals(1, ((ExponentialStops) layer.getTextOffset().getFunction().getStops()).size());
+  }
+
+  @Test
+  public void testTextAllowOverlapAsConstant() {
+    checkViewIsDisplayed(R.id.mapView);
     Timber.i("text-allow-overlap");
     assertNotNull(layer);
 
@@ -836,19 +1378,33 @@ public class SymbolLayerTest extends BaseStyleTest {
   }
 
   @Test
-  public void testTextIgnorePlacement() {
+  public void testTextAllowOverlapAsCameraFunction() {
     checkViewIsDisplayed(R.id.mapView);
+    Timber.i("text-allow-overlap");
+    assertNotNull(layer);
 
-    mapboxMap = rule.getActivity().getMapboxMap();
+    // Set
+    layer.setProperties(
+      textAllowOverlap(
+        zoom(
+          interval(
+            stop(2, textAllowOverlap(true))
+          )
+        )
+      )
+    );
 
-    if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-      Timber.i("Adding layer");
-      layer = new SymbolLayer("my-layer", "composite");
-      layer.setSourceLayer("composite");
-      mapboxMap.addLayer(layer);
-      // Layer reference is now stale, get new reference
-      layer = mapboxMap.getLayerAs("my-layer");
-    }
+    // Verify
+    assertNotNull(layer.getTextAllowOverlap());
+    assertNotNull(layer.getTextAllowOverlap().getFunction());
+    assertEquals(CameraFunction.class, layer.getTextAllowOverlap().getFunction().getClass());
+    assertEquals(IntervalStops.class, layer.getTextAllowOverlap().getFunction().getStops().getClass());
+    assertEquals(1, ((IntervalStops) layer.getTextAllowOverlap().getFunction().getStops()).size());
+  }
+
+  @Test
+  public void testTextIgnorePlacementAsConstant() {
+    checkViewIsDisplayed(R.id.mapView);
     Timber.i("text-ignore-placement");
     assertNotNull(layer);
 
@@ -858,19 +1414,33 @@ public class SymbolLayerTest extends BaseStyleTest {
   }
 
   @Test
-  public void testTextOptional() {
+  public void testTextIgnorePlacementAsCameraFunction() {
     checkViewIsDisplayed(R.id.mapView);
+    Timber.i("text-ignore-placement");
+    assertNotNull(layer);
 
-    mapboxMap = rule.getActivity().getMapboxMap();
+    // Set
+    layer.setProperties(
+      textIgnorePlacement(
+        zoom(
+          interval(
+            stop(2, textIgnorePlacement(true))
+          )
+        )
+      )
+    );
 
-    if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-      Timber.i("Adding layer");
-      layer = new SymbolLayer("my-layer", "composite");
-      layer.setSourceLayer("composite");
-      mapboxMap.addLayer(layer);
-      // Layer reference is now stale, get new reference
-      layer = mapboxMap.getLayerAs("my-layer");
-    }
+    // Verify
+    assertNotNull(layer.getTextIgnorePlacement());
+    assertNotNull(layer.getTextIgnorePlacement().getFunction());
+    assertEquals(CameraFunction.class, layer.getTextIgnorePlacement().getFunction().getClass());
+    assertEquals(IntervalStops.class, layer.getTextIgnorePlacement().getFunction().getStops().getClass());
+    assertEquals(1, ((IntervalStops) layer.getTextIgnorePlacement().getFunction().getStops()).size());
+  }
+
+  @Test
+  public void testTextOptionalAsConstant() {
+    checkViewIsDisplayed(R.id.mapView);
     Timber.i("text-optional");
     assertNotNull(layer);
 
@@ -880,19 +1450,33 @@ public class SymbolLayerTest extends BaseStyleTest {
   }
 
   @Test
-  public void testIconOpacity() {
+  public void testTextOptionalAsCameraFunction() {
     checkViewIsDisplayed(R.id.mapView);
+    Timber.i("text-optional");
+    assertNotNull(layer);
 
-    mapboxMap = rule.getActivity().getMapboxMap();
+    // Set
+    layer.setProperties(
+      textOptional(
+        zoom(
+          interval(
+            stop(2, textOptional(true))
+          )
+        )
+      )
+    );
 
-    if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-      Timber.i("Adding layer");
-      layer = new SymbolLayer("my-layer", "composite");
-      layer.setSourceLayer("composite");
-      mapboxMap.addLayer(layer);
-      // Layer reference is now stale, get new reference
-      layer = mapboxMap.getLayerAs("my-layer");
-    }
+    // Verify
+    assertNotNull(layer.getTextOptional());
+    assertNotNull(layer.getTextOptional().getFunction());
+    assertEquals(CameraFunction.class, layer.getTextOptional().getFunction().getClass());
+    assertEquals(IntervalStops.class, layer.getTextOptional().getFunction().getStops().getClass());
+    assertEquals(1, ((IntervalStops) layer.getTextOptional().getFunction().getStops()).size());
+  }
+
+  @Test
+  public void testIconOpacityAsConstant() {
+    checkViewIsDisplayed(R.id.mapView);
     Timber.i("icon-opacity");
     assertNotNull(layer);
 
@@ -902,19 +1486,34 @@ public class SymbolLayerTest extends BaseStyleTest {
   }
 
   @Test
-  public void testIconColor() {
+  public void testIconOpacityAsCameraFunction() {
     checkViewIsDisplayed(R.id.mapView);
+    Timber.i("icon-opacity");
+    assertNotNull(layer);
 
-    mapboxMap = rule.getActivity().getMapboxMap();
+    // Set
+    layer.setProperties(
+      iconOpacity(
+        zoom(
+          exponential(
+            stop(2, iconOpacity(0.3f))
+          ).withBase(0.5f)
+        )
+      )
+    );
 
-    if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-      Timber.i("Adding layer");
-      layer = new SymbolLayer("my-layer", "composite");
-      layer.setSourceLayer("composite");
-      mapboxMap.addLayer(layer);
-      // Layer reference is now stale, get new reference
-      layer = mapboxMap.getLayerAs("my-layer");
-    }
+    // Verify
+    assertNotNull(layer.getIconOpacity());
+    assertNotNull(layer.getIconOpacity().getFunction());
+    assertEquals(CameraFunction.class, layer.getIconOpacity().getFunction().getClass());
+    assertEquals(ExponentialStops.class, layer.getIconOpacity().getFunction().getStops().getClass());
+    assertEquals(0.5f, ((ExponentialStops) layer.getIconOpacity().getFunction().getStops()).getBase(), 0.001);
+    assertEquals(1, ((ExponentialStops) layer.getIconOpacity().getFunction().getStops()).size());
+  }
+
+  @Test
+  public void testIconColorAsConstant() {
+    checkViewIsDisplayed(R.id.mapView);
     Timber.i("icon-color");
     assertNotNull(layer);
 
@@ -924,19 +1523,34 @@ public class SymbolLayerTest extends BaseStyleTest {
   }
 
   @Test
-  public void testIconColorAsInt() {
+  public void testIconColorAsCameraFunction() {
     checkViewIsDisplayed(R.id.mapView);
+    Timber.i("icon-color");
+    assertNotNull(layer);
 
-    mapboxMap = rule.getActivity().getMapboxMap();
+    // Set
+    layer.setProperties(
+      iconColor(
+        zoom(
+          exponential(
+            stop(2, iconColor("rgba(0, 0, 0, 1)"))
+          ).withBase(0.5f)
+        )
+      )
+    );
 
-    if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-      Timber.i("Adding layer");
-      layer = new SymbolLayer("my-layer", "composite");
-      layer.setSourceLayer("composite");
-      mapboxMap.addLayer(layer);
-      // Layer reference is now stale, get new reference
-      layer = mapboxMap.getLayerAs("my-layer");
-    }
+    // Verify
+    assertNotNull(layer.getIconColor());
+    assertNotNull(layer.getIconColor().getFunction());
+    assertEquals(CameraFunction.class, layer.getIconColor().getFunction().getClass());
+    assertEquals(ExponentialStops.class, layer.getIconColor().getFunction().getStops().getClass());
+    assertEquals(0.5f, ((ExponentialStops) layer.getIconColor().getFunction().getStops()).getBase(), 0.001);
+    assertEquals(1, ((ExponentialStops) layer.getIconColor().getFunction().getStops()).size());
+  }
+
+  @Test
+  public void testIconColorAsIntConstant() {
+    checkViewIsDisplayed(R.id.mapView);
     Timber.i("icon-color");
     assertNotNull(layer);
 
@@ -946,19 +1560,8 @@ public class SymbolLayerTest extends BaseStyleTest {
   }
 
   @Test
-  public void testIconHaloColor() {
+  public void testIconHaloColorAsConstant() {
     checkViewIsDisplayed(R.id.mapView);
-
-    mapboxMap = rule.getActivity().getMapboxMap();
-
-    if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-      Timber.i("Adding layer");
-      layer = new SymbolLayer("my-layer", "composite");
-      layer.setSourceLayer("composite");
-      mapboxMap.addLayer(layer);
-      // Layer reference is now stale, get new reference
-      layer = mapboxMap.getLayerAs("my-layer");
-    }
     Timber.i("icon-halo-color");
     assertNotNull(layer);
 
@@ -968,19 +1571,34 @@ public class SymbolLayerTest extends BaseStyleTest {
   }
 
   @Test
-  public void testIconHaloColorAsInt() {
+  public void testIconHaloColorAsCameraFunction() {
     checkViewIsDisplayed(R.id.mapView);
+    Timber.i("icon-halo-color");
+    assertNotNull(layer);
 
-    mapboxMap = rule.getActivity().getMapboxMap();
+    // Set
+    layer.setProperties(
+      iconHaloColor(
+        zoom(
+          exponential(
+            stop(2, iconHaloColor("rgba(0, 0, 0, 1)"))
+          ).withBase(0.5f)
+        )
+      )
+    );
 
-    if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-      Timber.i("Adding layer");
-      layer = new SymbolLayer("my-layer", "composite");
-      layer.setSourceLayer("composite");
-      mapboxMap.addLayer(layer);
-      // Layer reference is now stale, get new reference
-      layer = mapboxMap.getLayerAs("my-layer");
-    }
+    // Verify
+    assertNotNull(layer.getIconHaloColor());
+    assertNotNull(layer.getIconHaloColor().getFunction());
+    assertEquals(CameraFunction.class, layer.getIconHaloColor().getFunction().getClass());
+    assertEquals(ExponentialStops.class, layer.getIconHaloColor().getFunction().getStops().getClass());
+    assertEquals(0.5f, ((ExponentialStops) layer.getIconHaloColor().getFunction().getStops()).getBase(), 0.001);
+    assertEquals(1, ((ExponentialStops) layer.getIconHaloColor().getFunction().getStops()).size());
+  }
+
+  @Test
+  public void testIconHaloColorAsIntConstant() {
+    checkViewIsDisplayed(R.id.mapView);
     Timber.i("icon-halo-color");
     assertNotNull(layer);
 
@@ -990,19 +1608,8 @@ public class SymbolLayerTest extends BaseStyleTest {
   }
 
   @Test
-  public void testIconHaloWidth() {
+  public void testIconHaloWidthAsConstant() {
     checkViewIsDisplayed(R.id.mapView);
-
-    mapboxMap = rule.getActivity().getMapboxMap();
-
-    if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-      Timber.i("Adding layer");
-      layer = new SymbolLayer("my-layer", "composite");
-      layer.setSourceLayer("composite");
-      mapboxMap.addLayer(layer);
-      // Layer reference is now stale, get new reference
-      layer = mapboxMap.getLayerAs("my-layer");
-    }
     Timber.i("icon-halo-width");
     assertNotNull(layer);
 
@@ -1012,19 +1619,34 @@ public class SymbolLayerTest extends BaseStyleTest {
   }
 
   @Test
-  public void testIconHaloBlur() {
+  public void testIconHaloWidthAsCameraFunction() {
     checkViewIsDisplayed(R.id.mapView);
+    Timber.i("icon-halo-width");
+    assertNotNull(layer);
 
-    mapboxMap = rule.getActivity().getMapboxMap();
+    // Set
+    layer.setProperties(
+      iconHaloWidth(
+        zoom(
+          exponential(
+            stop(2, iconHaloWidth(0.3f))
+          ).withBase(0.5f)
+        )
+      )
+    );
 
-    if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-      Timber.i("Adding layer");
-      layer = new SymbolLayer("my-layer", "composite");
-      layer.setSourceLayer("composite");
-      mapboxMap.addLayer(layer);
-      // Layer reference is now stale, get new reference
-      layer = mapboxMap.getLayerAs("my-layer");
-    }
+    // Verify
+    assertNotNull(layer.getIconHaloWidth());
+    assertNotNull(layer.getIconHaloWidth().getFunction());
+    assertEquals(CameraFunction.class, layer.getIconHaloWidth().getFunction().getClass());
+    assertEquals(ExponentialStops.class, layer.getIconHaloWidth().getFunction().getStops().getClass());
+    assertEquals(0.5f, ((ExponentialStops) layer.getIconHaloWidth().getFunction().getStops()).getBase(), 0.001);
+    assertEquals(1, ((ExponentialStops) layer.getIconHaloWidth().getFunction().getStops()).size());
+  }
+
+  @Test
+  public void testIconHaloBlurAsConstant() {
+    checkViewIsDisplayed(R.id.mapView);
     Timber.i("icon-halo-blur");
     assertNotNull(layer);
 
@@ -1034,41 +1656,71 @@ public class SymbolLayerTest extends BaseStyleTest {
   }
 
   @Test
-  public void testIconTranslate() {
+  public void testIconHaloBlurAsCameraFunction() {
     checkViewIsDisplayed(R.id.mapView);
+    Timber.i("icon-halo-blur");
+    assertNotNull(layer);
 
-    mapboxMap = rule.getActivity().getMapboxMap();
+    // Set
+    layer.setProperties(
+      iconHaloBlur(
+        zoom(
+          exponential(
+            stop(2, iconHaloBlur(0.3f))
+          ).withBase(0.5f)
+        )
+      )
+    );
 
-    if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-      Timber.i("Adding layer");
-      layer = new SymbolLayer("my-layer", "composite");
-      layer.setSourceLayer("composite");
-      mapboxMap.addLayer(layer);
-      // Layer reference is now stale, get new reference
-      layer = mapboxMap.getLayerAs("my-layer");
-    }
+    // Verify
+    assertNotNull(layer.getIconHaloBlur());
+    assertNotNull(layer.getIconHaloBlur().getFunction());
+    assertEquals(CameraFunction.class, layer.getIconHaloBlur().getFunction().getClass());
+    assertEquals(ExponentialStops.class, layer.getIconHaloBlur().getFunction().getStops().getClass());
+    assertEquals(0.5f, ((ExponentialStops) layer.getIconHaloBlur().getFunction().getStops()).getBase(), 0.001);
+    assertEquals(1, ((ExponentialStops) layer.getIconHaloBlur().getFunction().getStops()).size());
+  }
+
+  @Test
+  public void testIconTranslateAsConstant() {
+    checkViewIsDisplayed(R.id.mapView);
     Timber.i("icon-translate");
     assertNotNull(layer);
 
     // Set and Get
-    layer.setProperties(iconTranslate(new Float[] {0f, 0f}));
-    assertEquals((Float[]) layer.getIconTranslate().getValue(), (Float[]) new Float[] {0f, 0f});
+    layer.setProperties(iconTranslate(new Float[]{0f,0f}));
+    assertEquals((Float[]) layer.getIconTranslate().getValue(), (Float[]) new Float[]{0f,0f});
   }
 
   @Test
-  public void testIconTranslateAnchor() {
+  public void testIconTranslateAsCameraFunction() {
     checkViewIsDisplayed(R.id.mapView);
+    Timber.i("icon-translate");
+    assertNotNull(layer);
 
-    mapboxMap = rule.getActivity().getMapboxMap();
+    // Set
+    layer.setProperties(
+      iconTranslate(
+        zoom(
+          exponential(
+            stop(2, iconTranslate(new Float[]{0f,0f}))
+          ).withBase(0.5f)
+        )
+      )
+    );
 
-    if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-      Timber.i("Adding layer");
-      layer = new SymbolLayer("my-layer", "composite");
-      layer.setSourceLayer("composite");
-      mapboxMap.addLayer(layer);
-      // Layer reference is now stale, get new reference
-      layer = mapboxMap.getLayerAs("my-layer");
-    }
+    // Verify
+    assertNotNull(layer.getIconTranslate());
+    assertNotNull(layer.getIconTranslate().getFunction());
+    assertEquals(CameraFunction.class, layer.getIconTranslate().getFunction().getClass());
+    assertEquals(ExponentialStops.class, layer.getIconTranslate().getFunction().getStops().getClass());
+    assertEquals(0.5f, ((ExponentialStops) layer.getIconTranslate().getFunction().getStops()).getBase(), 0.001);
+    assertEquals(1, ((ExponentialStops) layer.getIconTranslate().getFunction().getStops()).size());
+  }
+
+  @Test
+  public void testIconTranslateAnchorAsConstant() {
+    checkViewIsDisplayed(R.id.mapView);
     Timber.i("icon-translate-anchor");
     assertNotNull(layer);
 
@@ -1078,19 +1730,33 @@ public class SymbolLayerTest extends BaseStyleTest {
   }
 
   @Test
-  public void testTextOpacity() {
+  public void testIconTranslateAnchorAsCameraFunction() {
     checkViewIsDisplayed(R.id.mapView);
+    Timber.i("icon-translate-anchor");
+    assertNotNull(layer);
 
-    mapboxMap = rule.getActivity().getMapboxMap();
+    // Set
+    layer.setProperties(
+      iconTranslateAnchor(
+        zoom(
+          interval(
+            stop(2, iconTranslateAnchor(ICON_TRANSLATE_ANCHOR_MAP))
+          )
+        )
+      )
+    );
 
-    if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-      Timber.i("Adding layer");
-      layer = new SymbolLayer("my-layer", "composite");
-      layer.setSourceLayer("composite");
-      mapboxMap.addLayer(layer);
-      // Layer reference is now stale, get new reference
-      layer = mapboxMap.getLayerAs("my-layer");
-    }
+    // Verify
+    assertNotNull(layer.getIconTranslateAnchor());
+    assertNotNull(layer.getIconTranslateAnchor().getFunction());
+    assertEquals(CameraFunction.class, layer.getIconTranslateAnchor().getFunction().getClass());
+    assertEquals(IntervalStops.class, layer.getIconTranslateAnchor().getFunction().getStops().getClass());
+    assertEquals(1, ((IntervalStops) layer.getIconTranslateAnchor().getFunction().getStops()).size());
+  }
+
+  @Test
+  public void testTextOpacityAsConstant() {
+    checkViewIsDisplayed(R.id.mapView);
     Timber.i("text-opacity");
     assertNotNull(layer);
 
@@ -1100,19 +1766,34 @@ public class SymbolLayerTest extends BaseStyleTest {
   }
 
   @Test
-  public void testTextColor() {
+  public void testTextOpacityAsCameraFunction() {
     checkViewIsDisplayed(R.id.mapView);
+    Timber.i("text-opacity");
+    assertNotNull(layer);
 
-    mapboxMap = rule.getActivity().getMapboxMap();
+    // Set
+    layer.setProperties(
+      textOpacity(
+        zoom(
+          exponential(
+            stop(2, textOpacity(0.3f))
+          ).withBase(0.5f)
+        )
+      )
+    );
 
-    if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-      Timber.i("Adding layer");
-      layer = new SymbolLayer("my-layer", "composite");
-      layer.setSourceLayer("composite");
-      mapboxMap.addLayer(layer);
-      // Layer reference is now stale, get new reference
-      layer = mapboxMap.getLayerAs("my-layer");
-    }
+    // Verify
+    assertNotNull(layer.getTextOpacity());
+    assertNotNull(layer.getTextOpacity().getFunction());
+    assertEquals(CameraFunction.class, layer.getTextOpacity().getFunction().getClass());
+    assertEquals(ExponentialStops.class, layer.getTextOpacity().getFunction().getStops().getClass());
+    assertEquals(0.5f, ((ExponentialStops) layer.getTextOpacity().getFunction().getStops()).getBase(), 0.001);
+    assertEquals(1, ((ExponentialStops) layer.getTextOpacity().getFunction().getStops()).size());
+  }
+
+  @Test
+  public void testTextColorAsConstant() {
+    checkViewIsDisplayed(R.id.mapView);
     Timber.i("text-color");
     assertNotNull(layer);
 
@@ -1122,19 +1803,34 @@ public class SymbolLayerTest extends BaseStyleTest {
   }
 
   @Test
-  public void testTextColorAsInt() {
+  public void testTextColorAsCameraFunction() {
     checkViewIsDisplayed(R.id.mapView);
+    Timber.i("text-color");
+    assertNotNull(layer);
 
-    mapboxMap = rule.getActivity().getMapboxMap();
+    // Set
+    layer.setProperties(
+      textColor(
+        zoom(
+          exponential(
+            stop(2, textColor("rgba(0, 0, 0, 1)"))
+          ).withBase(0.5f)
+        )
+      )
+    );
 
-    if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-      Timber.i("Adding layer");
-      layer = new SymbolLayer("my-layer", "composite");
-      layer.setSourceLayer("composite");
-      mapboxMap.addLayer(layer);
-      // Layer reference is now stale, get new reference
-      layer = mapboxMap.getLayerAs("my-layer");
-    }
+    // Verify
+    assertNotNull(layer.getTextColor());
+    assertNotNull(layer.getTextColor().getFunction());
+    assertEquals(CameraFunction.class, layer.getTextColor().getFunction().getClass());
+    assertEquals(ExponentialStops.class, layer.getTextColor().getFunction().getStops().getClass());
+    assertEquals(0.5f, ((ExponentialStops) layer.getTextColor().getFunction().getStops()).getBase(), 0.001);
+    assertEquals(1, ((ExponentialStops) layer.getTextColor().getFunction().getStops()).size());
+  }
+
+  @Test
+  public void testTextColorAsIntConstant() {
+    checkViewIsDisplayed(R.id.mapView);
     Timber.i("text-color");
     assertNotNull(layer);
 
@@ -1144,19 +1840,8 @@ public class SymbolLayerTest extends BaseStyleTest {
   }
 
   @Test
-  public void testTextHaloColor() {
+  public void testTextHaloColorAsConstant() {
     checkViewIsDisplayed(R.id.mapView);
-
-    mapboxMap = rule.getActivity().getMapboxMap();
-
-    if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-      Timber.i("Adding layer");
-      layer = new SymbolLayer("my-layer", "composite");
-      layer.setSourceLayer("composite");
-      mapboxMap.addLayer(layer);
-      // Layer reference is now stale, get new reference
-      layer = mapboxMap.getLayerAs("my-layer");
-    }
     Timber.i("text-halo-color");
     assertNotNull(layer);
 
@@ -1166,19 +1851,34 @@ public class SymbolLayerTest extends BaseStyleTest {
   }
 
   @Test
-  public void testTextHaloColorAsInt() {
+  public void testTextHaloColorAsCameraFunction() {
     checkViewIsDisplayed(R.id.mapView);
+    Timber.i("text-halo-color");
+    assertNotNull(layer);
 
-    mapboxMap = rule.getActivity().getMapboxMap();
+    // Set
+    layer.setProperties(
+      textHaloColor(
+        zoom(
+          exponential(
+            stop(2, textHaloColor("rgba(0, 0, 0, 1)"))
+          ).withBase(0.5f)
+        )
+      )
+    );
 
-    if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-      Timber.i("Adding layer");
-      layer = new SymbolLayer("my-layer", "composite");
-      layer.setSourceLayer("composite");
-      mapboxMap.addLayer(layer);
-      // Layer reference is now stale, get new reference
-      layer = mapboxMap.getLayerAs("my-layer");
-    }
+    // Verify
+    assertNotNull(layer.getTextHaloColor());
+    assertNotNull(layer.getTextHaloColor().getFunction());
+    assertEquals(CameraFunction.class, layer.getTextHaloColor().getFunction().getClass());
+    assertEquals(ExponentialStops.class, layer.getTextHaloColor().getFunction().getStops().getClass());
+    assertEquals(0.5f, ((ExponentialStops) layer.getTextHaloColor().getFunction().getStops()).getBase(), 0.001);
+    assertEquals(1, ((ExponentialStops) layer.getTextHaloColor().getFunction().getStops()).size());
+  }
+
+  @Test
+  public void testTextHaloColorAsIntConstant() {
+    checkViewIsDisplayed(R.id.mapView);
     Timber.i("text-halo-color");
     assertNotNull(layer);
 
@@ -1188,19 +1888,8 @@ public class SymbolLayerTest extends BaseStyleTest {
   }
 
   @Test
-  public void testTextHaloWidth() {
+  public void testTextHaloWidthAsConstant() {
     checkViewIsDisplayed(R.id.mapView);
-
-    mapboxMap = rule.getActivity().getMapboxMap();
-
-    if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-      Timber.i("Adding layer");
-      layer = new SymbolLayer("my-layer", "composite");
-      layer.setSourceLayer("composite");
-      mapboxMap.addLayer(layer);
-      // Layer reference is now stale, get new reference
-      layer = mapboxMap.getLayerAs("my-layer");
-    }
     Timber.i("text-halo-width");
     assertNotNull(layer);
 
@@ -1210,19 +1899,34 @@ public class SymbolLayerTest extends BaseStyleTest {
   }
 
   @Test
-  public void testTextHaloBlur() {
+  public void testTextHaloWidthAsCameraFunction() {
     checkViewIsDisplayed(R.id.mapView);
+    Timber.i("text-halo-width");
+    assertNotNull(layer);
 
-    mapboxMap = rule.getActivity().getMapboxMap();
+    // Set
+    layer.setProperties(
+      textHaloWidth(
+        zoom(
+          exponential(
+            stop(2, textHaloWidth(0.3f))
+          ).withBase(0.5f)
+        )
+      )
+    );
 
-    if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-      Timber.i("Adding layer");
-      layer = new SymbolLayer("my-layer", "composite");
-      layer.setSourceLayer("composite");
-      mapboxMap.addLayer(layer);
-      // Layer reference is now stale, get new reference
-      layer = mapboxMap.getLayerAs("my-layer");
-    }
+    // Verify
+    assertNotNull(layer.getTextHaloWidth());
+    assertNotNull(layer.getTextHaloWidth().getFunction());
+    assertEquals(CameraFunction.class, layer.getTextHaloWidth().getFunction().getClass());
+    assertEquals(ExponentialStops.class, layer.getTextHaloWidth().getFunction().getStops().getClass());
+    assertEquals(0.5f, ((ExponentialStops) layer.getTextHaloWidth().getFunction().getStops()).getBase(), 0.001);
+    assertEquals(1, ((ExponentialStops) layer.getTextHaloWidth().getFunction().getStops()).size());
+  }
+
+  @Test
+  public void testTextHaloBlurAsConstant() {
+    checkViewIsDisplayed(R.id.mapView);
     Timber.i("text-halo-blur");
     assertNotNull(layer);
 
@@ -1232,47 +1936,102 @@ public class SymbolLayerTest extends BaseStyleTest {
   }
 
   @Test
-  public void testTextTranslate() {
+  public void testTextHaloBlurAsCameraFunction() {
     checkViewIsDisplayed(R.id.mapView);
+    Timber.i("text-halo-blur");
+    assertNotNull(layer);
 
-    mapboxMap = rule.getActivity().getMapboxMap();
+    // Set
+    layer.setProperties(
+      textHaloBlur(
+        zoom(
+          exponential(
+            stop(2, textHaloBlur(0.3f))
+          ).withBase(0.5f)
+        )
+      )
+    );
 
-    if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-      Timber.i("Adding layer");
-      layer = new SymbolLayer("my-layer", "composite");
-      layer.setSourceLayer("composite");
-      mapboxMap.addLayer(layer);
-      // Layer reference is now stale, get new reference
-      layer = mapboxMap.getLayerAs("my-layer");
-    }
+    // Verify
+    assertNotNull(layer.getTextHaloBlur());
+    assertNotNull(layer.getTextHaloBlur().getFunction());
+    assertEquals(CameraFunction.class, layer.getTextHaloBlur().getFunction().getClass());
+    assertEquals(ExponentialStops.class, layer.getTextHaloBlur().getFunction().getStops().getClass());
+    assertEquals(0.5f, ((ExponentialStops) layer.getTextHaloBlur().getFunction().getStops()).getBase(), 0.001);
+    assertEquals(1, ((ExponentialStops) layer.getTextHaloBlur().getFunction().getStops()).size());
+  }
+
+  @Test
+  public void testTextTranslateAsConstant() {
+    checkViewIsDisplayed(R.id.mapView);
     Timber.i("text-translate");
     assertNotNull(layer);
 
     // Set and Get
-    layer.setProperties(textTranslate(new Float[] {0f, 0f}));
-    assertEquals((Float[]) layer.getTextTranslate().getValue(), (Float[]) new Float[] {0f, 0f});
+    layer.setProperties(textTranslate(new Float[]{0f,0f}));
+    assertEquals((Float[]) layer.getTextTranslate().getValue(), (Float[]) new Float[]{0f,0f});
   }
 
   @Test
-  public void testTextTranslateAnchor() {
+  public void testTextTranslateAsCameraFunction() {
     checkViewIsDisplayed(R.id.mapView);
+    Timber.i("text-translate");
+    assertNotNull(layer);
 
-    mapboxMap = rule.getActivity().getMapboxMap();
+    // Set
+    layer.setProperties(
+      textTranslate(
+        zoom(
+          exponential(
+            stop(2, textTranslate(new Float[]{0f,0f}))
+          ).withBase(0.5f)
+        )
+      )
+    );
 
-    if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-      Timber.i("Adding layer");
-      layer = new SymbolLayer("my-layer", "composite");
-      layer.setSourceLayer("composite");
-      mapboxMap.addLayer(layer);
-      // Layer reference is now stale, get new reference
-      layer = mapboxMap.getLayerAs("my-layer");
-    }
+    // Verify
+    assertNotNull(layer.getTextTranslate());
+    assertNotNull(layer.getTextTranslate().getFunction());
+    assertEquals(CameraFunction.class, layer.getTextTranslate().getFunction().getClass());
+    assertEquals(ExponentialStops.class, layer.getTextTranslate().getFunction().getStops().getClass());
+    assertEquals(0.5f, ((ExponentialStops) layer.getTextTranslate().getFunction().getStops()).getBase(), 0.001);
+    assertEquals(1, ((ExponentialStops) layer.getTextTranslate().getFunction().getStops()).size());
+  }
+
+  @Test
+  public void testTextTranslateAnchorAsConstant() {
+    checkViewIsDisplayed(R.id.mapView);
     Timber.i("text-translate-anchor");
     assertNotNull(layer);
 
     // Set and Get
     layer.setProperties(textTranslateAnchor(TEXT_TRANSLATE_ANCHOR_MAP));
     assertEquals((String) layer.getTextTranslateAnchor().getValue(), (String) TEXT_TRANSLATE_ANCHOR_MAP);
+  }
+
+  @Test
+  public void testTextTranslateAnchorAsCameraFunction() {
+    checkViewIsDisplayed(R.id.mapView);
+    Timber.i("text-translate-anchor");
+    assertNotNull(layer);
+
+    // Set
+    layer.setProperties(
+      textTranslateAnchor(
+        zoom(
+          interval(
+            stop(2, textTranslateAnchor(TEXT_TRANSLATE_ANCHOR_MAP))
+          )
+        )
+      )
+    );
+
+    // Verify
+    assertNotNull(layer.getTextTranslateAnchor());
+    assertNotNull(layer.getTextTranslateAnchor().getFunction());
+    assertEquals(CameraFunction.class, layer.getTextTranslateAnchor().getFunction().getClass());
+    assertEquals(IntervalStops.class, layer.getTextTranslateAnchor().getFunction().getStops().getClass());
+    assertEquals(1, ((IntervalStops) layer.getTextTranslateAnchor().getFunction().getStops()).size());
   }
 
 

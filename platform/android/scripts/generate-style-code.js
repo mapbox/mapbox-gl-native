@@ -10,7 +10,7 @@ require('../../../scripts/style-code');
 // Specification parsing //
 
 // Collect layer types from spec
-const layers = Object.keys(spec.layer.type.values).map((type) => {
+var layers = Object.keys(spec.layer.type.values).map((type) => {
   const layoutProperties = Object.keys(spec[`layout_${type}`]).reduce((memo, name) => {
     if (name !== 'visibility') {
       spec[`layout_${type}`][name].name = name;
@@ -33,6 +33,9 @@ const layers = Object.keys(spec.layer.type.values).map((type) => {
     properties: layoutProperties.concat(paintProperties)
   };
 });
+
+// XXX Remove fill-extrusion layer for now
+layers = _(layers).filter(layer => layer.type != "fill-extrusion").value();
 
 // Process all layer properties
 const layoutProperties = _(layers).map('layoutProperties').flatten().value();
@@ -210,6 +213,14 @@ global.propertyValueDoc = function (property, value) {
         }
     });
     return doc;
+};
+
+global.supportsZoomFunction = function (property) {
+  return property['zoom-function'] === true;
+};
+
+global.supportsPropertyFunction = function (property) {
+  return property['property-function'] === true;
 };
 
 // Template processing //
