@@ -256,7 +256,7 @@
         "stroke-width": 2,
         "stroke-opacity": 1,
         "fill": "#555555",
-        "fill-opacity": 0.5,
+        "fill-opacity": 1.0,
         "name": "Sarphatipark",
         "type": "park",
         "description": "Sarphatipark is a small park in the popular De Pijp neighbourhood. It was openend in late 19th century, and named after Samuel Sarphati."
@@ -482,7 +482,7 @@
         "stroke-width": 2,
         "stroke-opacity": 1,
         "fill": "#555555",
-        "fill-opacity": 0.5,
+        "fill-opacity": 0.1,
         "name": "Sloterdijk",
         "type": "area",
         "description": "To protect the area around Sloten from the as-yet undrained IJ the Spaarndammerdijk was laid along the south bank of this inlet. In this vicinity at the same time, a dam on the Slochter (or Slooter) river was built, the Slooterdam. Trade grew in the vicinity, and in the 15th century a weigh house and a church were built. The area is nowadays best known as a large intersection of train lines and a business and industrial centre north-west of Amsterdam."
@@ -574,7 +574,7 @@
         "stroke-width": 2,
         "stroke-opacity": 1,
         "fill": "#555555",
-        "fill-opacity": 0.5,
+        "fill-opacity": 0.7,
         "name": "Artis",
         "type": "poi",
         "description": "Artis, short for Natura Artis Magistra (Latin for \"Nature is the teacher of art and science\"), is a zoo in the centre of Amsterdam. It is the oldest zoo in the Netherlands and one of the oldest zoos of mainland Europe. Artis Royal Zoo is not just a zoo, it also contains an aquarium and a planetarium. Artis also has an arboretum and a fairly large art collection. A part of the art collection is on display in the Aquarium building of the zoo. Artis contains 27 monumental buildings, most of which are used as enclosures for the animals, making Artis a unique cultural heritage of the 19th century."

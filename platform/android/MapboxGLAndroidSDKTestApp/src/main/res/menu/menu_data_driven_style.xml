@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:mapbox="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_add_exponential_zoom_function"
+        android:title="Add an exponential zoom function"
+        mapbox:showAsAction="never"/>
+
+    <item
+        android:id="@+id/action_add_interval_zoom_function"
+        android:title="Add an interval zoom function"
+        mapbox:showAsAction="never"/>
+
+    <item
+        android:id="@+id/action_add_categorical_source_function"
+        android:title="Add a categorical source function"
+        mapbox:showAsAction="never"/>
+
+    <item
+        android:id="@+id/action_add_exponential_source_function"
+        android:title="Add an exponential source function"
+        mapbox:showAsAction="never"/>
+
+    <item
+        android:id="@+id/action_add_identity_source_function"
+        android:title="Add an identity source function"
+        mapbox:showAsAction="never"/>
+
+    <item
+        android:id="@+id/action_add_interval_source_function"
+        android:title="Add an interval source function"
+        mapbox:showAsAction="never"/>
+
+    <item
+        android:id="@+id/action_add_composite_exponential_function"
+        android:title="Add a composite, exponential function"
+        mapbox:showAsAction="never"/>
+
+    <item
+        android:id="@+id/action_add_composite_categorical_function"
+        android:title="Add a composite, categorical function"
+        mapbox:showAsAction="never"/>
+
+    <item
+        android:id="@+id/action_add_composite_interval_function"
+        android:title="Add a composite, interval function"
+        mapbox:showAsAction="never"/>
+
+</menu>

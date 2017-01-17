@@ -49,6 +49,7 @@
     <string name="activity_minmax_zoom">Min/Max Zoom</string>
     <string name="activity_viewpager">ViewPager</string>
     <string name="activity_runtime_style">Runtime Style</string>
+    <string name="activity_data_driven_style">Data Driven Style</string>
     <string name="activity_circle_layer">Circle layer</string>
     <string name="activity_style_file">Local Style file</string>
     <string name="activity_geojson_clustering">GeoJson Clustering</string>
@@ -100,6 +101,7 @@
     <string name="description_dynamic_info_window_adapter">Learn how to create a dynamic custom InfoWindow</string>
     <string name="description_viewpager">Use SupportMapFragments in a ViewPager</string>
     <string name="description_runtime_style">Adopt the map style on the fly</string>
+    <string name="description_data_driven_style">Use functions to change the map appearance</string>
     <string name="description_symbol_layer">Manipulate symbols at runtime</string>
     <string name="description_custom_sprite">Use a custom sprite in a Symbol Layer</string>
     <string name="description_geojson_clustering">Use GeoJson sources and dynamic layers to cluster information</string>
