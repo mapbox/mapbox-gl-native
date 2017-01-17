@@ -102,6 +102,17 @@ TEST(Path, Directory) {
     EXPECT_EQ(Path::Segment({ 0, 0 }), Path("foo").directory);
     EXPECT_EQ(Path::Segment({ 0, 0 }), Path("foo.png").directory);
     EXPECT_EQ(Path::Segment({ 0, 0 }), Path("").directory);
+
+    EXPECT_EQ(Path::Segment({ 0, 9 }), Path("/foo/bar/baz.ext").directory);
+    EXPECT_EQ(Path::Segment({ 0, 9 }), Path("/foo.bar/baz.ext").directory);
+    EXPECT_EQ(Path::Segment({ 0, 9 }), Path("/foo.bar/baz").directory);
+    EXPECT_EQ(Path::Segment({ 0, 9 }), Path("/foo/bar/.ext").directory);
+    EXPECT_EQ(Path::Segment({ 0, 5 }), Path("/foo/bar@2x.png").directory);
+    EXPECT_EQ(Path::Segment({ 0, 5 }), Path("/foo/b").directory);
+    EXPECT_EQ(Path::Segment({ 0, 5 }), Path("/foo/").directory);
+    EXPECT_EQ(Path::Segment({ 0, 1 }), Path("/foo").directory);
+    EXPECT_EQ(Path::Segment({ 0, 1 }), Path("/foo.png").directory);
+    EXPECT_EQ(Path::Segment({ 0, 1 }), Path("/").directory);
 }
 
 TEST(Path, URLDirectory) {
@@ -141,6 +152,18 @@ TEST(Path, Extension) {
     EXPECT_EQ(Path::Segment({ 3, 0 }), Path("foo").extension);
     EXPECT_EQ(Path::Segment({ 3, 4 }), Path("foo.png").extension);
     EXPECT_EQ(Path::Segment({ 0, 0 }), Path("").extension);
+
+    EXPECT_EQ(Path::Segment({ 12, 4 }), Path("/foo/bar/baz.ext").extension);
+    EXPECT_EQ(Path::Segment({ 12, 4 }), Path("/foo.bar/baz.ext").extension);
+    EXPECT_EQ(Path::Segment({ 19, 4 }), Path("/foo.bar/baz.vector.pbf").extension);
+    EXPECT_EQ(Path::Segment({ 12, 0 }), Path("/foo.bar/baz").extension);
+    EXPECT_EQ(Path::Segment({ 9, 4 }), Path("/foo/bar/.ext").extension);
+    EXPECT_EQ(Path::Segment({ 8, 7 }), Path("/foo/bar@2x.png").extension);
+    EXPECT_EQ(Path::Segment({ 6, 0 }), Path("/foo/b").extension);
+    EXPECT_EQ(Path::Segment({ 5, 0 }), Path("/foo/").extension);
+    EXPECT_EQ(Path::Segment({ 4, 0 }), Path("/foo").extension);
+    EXPECT_EQ(Path::Segment({ 4, 4 }), Path("/foo.png").extension);
+    EXPECT_EQ(Path::Segment({ 1, 0 }), Path("/").extension);
 }
 
 TEST(Path, URLExtension) {
@@ -179,6 +202,17 @@ TEST(Path, Filename) {
     EXPECT_EQ(Path::Segment({ 0, 3 }), Path("foo").filename);
     EXPECT_EQ(Path::Segment({ 0, 3 }), Path("foo.png").filename);
     EXPECT_EQ(Path::Segment({ 0, 0 }), Path("").filename);
+
+    EXPECT_EQ(Path::Segment({ 9, 3 }), Path("/foo/bar/baz.ext").filename);
+    EXPECT_EQ(Path::Segment({ 9, 3 }), Path("/foo.bar/baz.ext").filename);
+    EXPECT_EQ(Path::Segment({ 9, 3 }), Path("/foo.bar/baz").filename);
+    EXPECT_EQ(Path::Segment({ 9, 0 }), Path("/foo/bar/.ext").filename);
+    EXPECT_EQ(Path::Segment({ 5, 3 }), Path("/foo/bar@2x.png").filename);
+    EXPECT_EQ(Path::Segment({ 5, 1 }), Path("/foo/b").filename);
+    EXPECT_EQ(Path::Segment({ 5, 0 }), Path("/foo/").filename);
+    EXPECT_EQ(Path::Segment({ 1, 3 }), Path("/foo").filename);
+    EXPECT_EQ(Path::Segment({ 1, 3 }), Path("/foo.png").filename);
+    EXPECT_EQ(Path::Segment({ 1, 0 }), Path("/").filename);
 }
 
 TEST(Path, URLFilename) {
