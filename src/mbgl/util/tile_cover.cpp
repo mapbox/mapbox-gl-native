@@ -109,8 +109,7 @@ std::vector<UnwrappedTileID> tileCover(const Point<double>& tl,
 
     // Sort first by distance, then by x/y.
     std::sort(t.begin(), t.end(), [](const ID& a, const ID& b) {
-        return (a.sqDist != b.sqDist) ? (a.sqDist < b.sqDist)
-                                      : ((a.x != b.x) ? (a.x < b.x) : (a.y < b.y));
+        return std::tie(a.sqDist, a.x, a.y) < std::tie(b.sqDist, b.x, b.y);
     });
 
     // Erase duplicate tile IDs (they typically occur at the common side of both triangles).
