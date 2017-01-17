@@ -76,3 +76,27 @@ TEST(MergeLines, CircularLines) {
         EXPECT_TRUE(input3[i].geometry == expected3[i].geometry);
     }
 }
+
+TEST(MergeLines, EmptyOuterGeometry) {
+    std::vector<mbgl::SymbolFeature> input = {
+        { FeatureType::LineString, {}, aaa, {}, 0 },
+    };
+
+    const std::vector<mbgl::SymbolFeature> expected = input;
+
+    mbgl::util::mergeLines(input);
+
+    EXPECT_EQ(expected[0].geometry, input[0].geometry);
+}
+
+TEST(MergeLines, EmptyInnerGeometry) {
+    std::vector<mbgl::SymbolFeature> input = {
+        { FeatureType::LineString, {{}}, aaa, {}, 0 },
+    };
+
+    const std::vector<mbgl::SymbolFeature> expected = input;
+
+    mbgl::util::mergeLines(input);
+
+    EXPECT_EQ(expected[0].geometry, input[0].geometry);
+}

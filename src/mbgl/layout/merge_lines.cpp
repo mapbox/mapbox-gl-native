@@ -6,15 +6,16 @@
 namespace mbgl {
 namespace util {
 
-using Index = std::unordered_map<size_t, unsigned int>;
+// Map of key -> index into features
+using Index = std::unordered_map<size_t, size_t>;
 
-unsigned int mergeFromRight(std::vector<SymbolFeature> &features,
-                            Index &rightIndex,
-                            Index::iterator left,
-                            size_t rightKey,
-                            GeometryCollection &geom) {
+size_t mergeFromRight(std::vector<SymbolFeature>& features,
+                      Index& rightIndex,
+                      Index::iterator left,
+                      size_t rightKey,
+                      GeometryCollection& geom) {
 
-    unsigned int index = left->second;
+    const size_t index = left->second;
     rightIndex.erase(left);
     rightIndex[rightKey] = index;
     features[index].geometry[0].pop_back();
@@ -24,13 +25,13 @@ unsigned int mergeFromRight(std::vector<SymbolFeature> &features,
     return index;
 }
 
-unsigned int mergeFromLeft(std::vector<SymbolFeature> &features,
-                           Index &leftIndex,
-                           size_t leftKey,
-                           Index::iterator right,
-                           GeometryCollection &geom) {
+size_t mergeFromLeft(std::vector<SymbolFeature>& features,
+                     Index& leftIndex,
+                     Index::iterator right,
+                     size_t leftKey,
+                     GeometryCollection& geom) {
 
-    unsigned int index = right->second;
+    const size_t index = right->second;
     leftIndex.erase(right);
     leftIndex[leftKey] = index;
     geom[0].pop_back();
@@ -41,51 +42,40 @@ unsigned int mergeFromLeft(std::vector<SymbolFeature> &features,
     return index;
 }
 
-enum class Side {
-    Left = false,
-    Right = true,
-};
-
-size_t
-getKey(const std::u16string& text, const GeometryCollection& geom, Side side) {
-    const GeometryCoordinate& coord = side == Side::Right ? geom[0].back() : geom[0].front();
-
+size_t getKey(const std::u16string& text, const GeometryCoordinate& coord) {
     auto hash = std::hash<std::u16string>()(text);
     boost::hash_combine(hash, coord.x);
     boost::hash_combine(hash, coord.y);
     return hash;
 }
 
-void mergeLines(std::vector<SymbolFeature> &features) {
-
+void mergeLines(std::vector<SymbolFeature>& features) {
     Index leftIndex;
     Index rightIndex;
 
-    for (unsigned int k = 0; k < features.size(); k++) {
-        SymbolFeature &feature = features[k];
-        GeometryCollection &geometry = feature.geometry;
+    for (size_t k = 0; k < features.size(); k++) {
+        SymbolFeature& feature = features[k];
+        GeometryCollection& geometry = feature.geometry;
 
-        if (!feature.text) {
+        if (!feature.text || geometry.empty() || geometry[0].empty()) {
             continue;
         }
 
-        const auto leftKey = getKey(*feature.text, geometry, Side::Left);
-        const auto rightKey = getKey(*feature.text, geometry, Side::Right);
+        const size_t leftKey = getKey(*feature.text, geometry[0].front());
+        const size_t rightKey = getKey(*feature.text, geometry[0].back());
 
         const auto left = rightIndex.find(leftKey);
         const auto right = leftIndex.find(rightKey);
 
-        if ((left != rightIndex.end()) && (right != leftIndex.end()) &&
-            (left->second != right->second)) {
+        if (left != rightIndex.end() && right != leftIndex.end() && left->second != right->second) {
             // found lines with the same text adjacent to both ends of the current line, merge all
             // three
-            unsigned int j = mergeFromLeft(features, leftIndex, leftKey, right, geometry);
-            unsigned int i =
-                mergeFromRight(features, rightIndex, left, rightKey, features[j].geometry);
+            size_t j = mergeFromLeft(features, leftIndex, right, leftKey, geometry);
+            size_t i = mergeFromRight(features, rightIndex, left, rightKey, features[j].geometry);
 
             leftIndex.erase(leftKey);
             rightIndex.erase(rightKey);
-            rightIndex[getKey(*feature.text, features[i].geometry, Side::Right)] = i;
+            rightIndex[getKey(*feature.text, features[i].geometry[0].back())] = i;
 
         } else if (left != rightIndex.end()) {
             // found mergeable line adjacent to the start of the current line, merge
@@ -93,7 +83,7 @@ void mergeLines(std::vector<SymbolFeature> &features) {
 
         } else if (right != leftIndex.end()) {
             // found mergeable line adjacent to the end of the current line, merge
-            mergeFromLeft(features, leftIndex, leftKey, right, geometry);
+            mergeFromLeft(features, leftIndex, right, leftKey, geometry);
 
         } else {
             // no adjacent lines, add as a new item
