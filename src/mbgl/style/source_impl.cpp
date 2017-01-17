@@ -217,9 +217,8 @@ std::unordered_map<std::string, std::vector<Feature>> Source::Impl::queryRendere
 
 
     auto sortRenderTiles = [](const RenderTile& a, const RenderTile& b) {
-        return a.id.canonical.z != b.id.canonical.z ? a.id.canonical.z < b.id.canonical.z :
-               a.id.canonical.y != b.id.canonical.y ? a.id.canonical.y < b.id.canonical.y :
-               a.id.wrap != b.id.wrap ? a.id.wrap < b.id.wrap : a.id.canonical.x < b.id.canonical.x;
+        return std::tie(a.id.canonical.z, a.id.canonical.y, a.id.wrap, a.id.canonical.x) <
+            std::tie(b.id.canonical.z, b.id.canonical.y, b.id.wrap, b.id.canonical.x);
     };
     std::vector<std::reference_wrapper<const RenderTile>> sortedTiles;
     std::transform(renderTiles.cbegin(), renderTiles.cend(), std::back_inserter(sortedTiles),
