@@ -29,10 +29,7 @@ NS_ASSUME_NONNULL_BEGIN
  
  After initializing and configuring the style layer, add it to a map view’s
  style using the `-[MGLStyle addLayer:]` or
- `-[MGLStyle insertLayer:belowLayer:]` method. Should not be used to create an 
- instance of MGLStyleLayer directly. Instead, create instances of
- `MGLBackgroundStyleLayer` and the concrete subclasses of
- `MGLForegroundStyleLayer`.
+ `-[MGLStyle insertLayer:belowLayer:]` method. 
  
  @param identifier A string that uniquely identifies the layer in the style to
     which it is added.
