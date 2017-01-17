@@ -2,6 +2,8 @@ package com.mapbox.mapboxsdk.style.layers;
 
 import android.support.annotation.NonNull;
 
+import com.mapbox.mapboxsdk.style.functions.Function;
+
 /**
  * Base class for the different Layer types
  */
@@ -17,14 +19,14 @@ public abstract class Layer {
   public Layer() {
   }
 
-  public void setProperties(@NonNull Property<?>... properties) {
+  public void setProperties(@NonNull PropertyValue<?>... properties) {
     if (properties.length == 0) {
       return;
     }
 
-    for (Property<?> property : properties) {
+    for (PropertyValue<?> property : properties) {
       Object converted = convertValue(property.value);
-      if (property instanceof PaintProperty) {
+      if (property instanceof PaintPropertyValue) {
         nativeSetPaintProperty(property.name, converted);
       } else {
         nativeSetLayoutProperty(property.name, converted);
@@ -37,7 +39,7 @@ public abstract class Layer {
   }
 
   public PropertyValue<String> getVisibility() {
-    return new PropertyValue<>(nativeGetVisibility());
+    return new PaintPropertyValue<>("visibility", (String) nativeGetVisibility());
   }
 
   public float getMinZoom() {

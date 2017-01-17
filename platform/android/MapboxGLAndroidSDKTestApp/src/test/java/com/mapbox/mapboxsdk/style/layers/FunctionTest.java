@@ -1,9 +1,12 @@
 package com.mapbox.mapboxsdk.style.layers;
 
+import com.mapbox.mapboxsdk.style.functions.Function;
+
 import org.junit.Test;
 
-import static com.mapbox.mapboxsdk.style.layers.Function.stop;
-import static com.mapbox.mapboxsdk.style.layers.Function.zoom;
+import static com.mapbox.mapboxsdk.style.functions.Function.zoom;
+import static com.mapbox.mapboxsdk.style.functions.stops.Stop.stop;
+import static com.mapbox.mapboxsdk.style.functions.stops.Stops.interval;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineBlur;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertNotNull;
@@ -15,9 +18,10 @@ public class FunctionTest {
 
   @Test
   public void testZoomFunction() {
-    Function zoomF = zoom(
+    Function<Float, Float> zoomF = zoom(interval(
       stop(1f, lineBlur(1f)),
       stop(10f, lineBlur(20f))
+      )
     );
 
     assertNotNull(zoomF.toValueObject());

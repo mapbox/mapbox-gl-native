@@ -1,5 +1,6 @@
-package com.mapbox.mapboxsdk.style.layers;
 // This file is generated. Edit android/platform/scripts/generate-style-code.js, then run `make android-style-code`.
+
+package com.mapbox.mapboxsdk.style.layers;
 
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
@@ -96,14 +97,13 @@ public class FillLayer extends Layer {
     return this;
   }
 
-
   /**
    * Set a property or properties.
    *
    * @param properties the var-args properties
    * @return This
    */
-  public FillLayer withProperties(@NonNull Property<?>... properties) {
+  public FillLayer withProperties(@NonNull PropertyValue<?>... properties) {
     setProperties(properties);
     return this;
   }
@@ -117,7 +117,7 @@ public class FillLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<Boolean> getFillAntialias() {
-    return (PropertyValue<Boolean>) new PropertyValue(nativeGetFillAntialias());
+    return (PropertyValue<Boolean>) new PropertyValue("fill-antialias", nativeGetFillAntialias());
   }
 
   /**
@@ -127,7 +127,7 @@ public class FillLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<Float> getFillOpacity() {
-    return (PropertyValue<Float>) new PropertyValue(nativeGetFillOpacity());
+    return (PropertyValue<Float>) new PropertyValue("fill-opacity", nativeGetFillOpacity());
   }
 
   /**
@@ -137,12 +137,11 @@ public class FillLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<String> getFillColor() {
-    return (PropertyValue<String>) new PropertyValue(nativeGetFillColor());
+    return (PropertyValue<String>) new PropertyValue("fill-color", nativeGetFillColor());
   }
 
   /**
-   * The color of the filled part of this layer. This color can be specified as `rgba` with an alpha component and the
-   * color's opacity will not affect the opacity of the 1px stroke, if it is used.
+   * The color of the filled part of this layer. This color can be specified as `rgba` with an alpha component and the color's opacity will not affect the opacity of the 1px stroke, if it is used.
    *
    * @return int representation of a rgba string color
    * @throws RuntimeException thrown if property isn't a value
@@ -165,7 +164,7 @@ public class FillLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<String> getFillOutlineColor() {
-    return (PropertyValue<String>) new PropertyValue(nativeGetFillOutlineColor());
+    return (PropertyValue<String>) new PropertyValue("fill-outline-color", nativeGetFillOutlineColor());
   }
 
   /**
@@ -192,7 +191,7 @@ public class FillLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<Float[]> getFillTranslate() {
-    return (PropertyValue<Float[]>) new PropertyValue(nativeGetFillTranslate());
+    return (PropertyValue<Float[]>) new PropertyValue("fill-translate", nativeGetFillTranslate());
   }
 
   /**
@@ -202,7 +201,7 @@ public class FillLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<String> getFillTranslateAnchor() {
-    return (PropertyValue<String>) new PropertyValue(nativeGetFillTranslateAnchor());
+    return (PropertyValue<String>) new PropertyValue("fill-translate-anchor", nativeGetFillTranslateAnchor());
   }
 
   /**
@@ -212,7 +211,7 @@ public class FillLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<String> getFillPattern() {
-    return (PropertyValue<String>) new PropertyValue(nativeGetFillPattern());
+    return (PropertyValue<String>) new PropertyValue("fill-pattern", nativeGetFillPattern());
   }
 
   private native Object nativeGetFillAntialias();
