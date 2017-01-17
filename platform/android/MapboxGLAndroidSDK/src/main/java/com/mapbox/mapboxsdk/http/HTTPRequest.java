@@ -71,6 +71,15 @@ class HTTPRequest implements Callback {
           resourceUrl = resourceUrl + "&";
         }
         resourceUrl = resourceUrl + "events=true";
+      } else {
+        String customQuery = Mapbox.getCustomQuery(host);
+        if (customQuery != null) {
+          if (httpUrl.querySize() == 0) {
+            resourceUrl = resourceUrl + "?" + customQuery;
+          } else {
+            resourceUrl = resourceUrl + "&" + customQuery;
+          }
+        }
       }
 
       Request.Builder builder = new Request.Builder()

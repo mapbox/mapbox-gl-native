@@ -207,6 +207,13 @@ std::unique_ptr<AsyncRequest> HTTPFileSource::request(const Resource& resource, 
             NSString* absoluteString = [url.absoluteString
                 stringByAppendingFormat:(url.query ? @"&%@" : @"?%@"), @"events=true"];
             url = [NSURL URLWithString:absoluteString];
+        } else {
+            NSDictionary* customQueries = [[NSUserDefaults standardUserDefaults] dictionaryForKey:@"MBXCustomQuery"];
+            if (NSString* customQuery = customQueries[url.host]) {
+                NSString* absoluteString = [url.absoluteString
+                                            stringByAppendingFormat:(url.query ? @"&%@" : @"?%@"), customQuery];
+                url = [NSURL URLWithString:absoluteString];
+            }
         }
 
         NSMutableURLRequest* req = [NSMutableURLRequest requestWithURL:url];
