@@ -29,7 +29,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (instancetype)camera;
 
 /**
- Returns a new camera using based on information about the camera’s viewpoint
+ Returns a new camera based on information about the camera’s viewpoint
  and focus point.
  
  @param centerCoordinate The geographic coordinate on which the map should be
