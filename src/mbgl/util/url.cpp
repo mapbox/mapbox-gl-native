@@ -107,11 +107,6 @@ URL::URL(const std::string& str)
           if (isData) {
               // Skip comma
               pathPos++;
-          } else {
-              // Skip optional leading slash
-              while (pathPos < query.first && (str[pathPos] == '/')) {
-                  ++pathPos;
-              }
           }
           return { pathPos, query.first - pathPos };
       }()) {
