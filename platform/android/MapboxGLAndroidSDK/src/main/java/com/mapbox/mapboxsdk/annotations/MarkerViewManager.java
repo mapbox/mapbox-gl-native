@@ -665,6 +665,7 @@ public class MarkerViewManager {
             viewHolder.marker = marker;
             viewHolder.imageView.setImageBitmap(marker.getIcon().getBitmap());
             convertView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
+            convertView.clearAnimation();
             return convertView;
         }
 
