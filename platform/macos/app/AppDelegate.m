@@ -131,6 +131,9 @@ NSString * const MGLLastMapDebugMaskDefaultsKey = @"MGLLastMapDebugMask";
         [self showPreferences:nil];
     }
 
+    NSDictionary* customQueries = [NSDictionary dictionaryWithObject:@"access_token=xxx" forKey:@"a.tile.openstreetmap.org"];
+    [[NSUserDefaults standardUserDefaults] setObject:customQueries forKey:@"MBXCustomQuery"];
+
     [self.offlinePacksArrayController bind:@"content" toObject:[MGLOfflineStorage sharedOfflineStorage] withKeyPath:@"packs" options:nil];
 }
 

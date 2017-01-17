@@ -38,6 +38,8 @@ public class MapboxApplication extends Application {
       .build());
 
     Mapbox.getInstance(getApplicationContext(), getString(R.string.mapbox_access_token));
+
+    Mapbox.setCustomQuery("a.tile.openstreetmap.org", "access_token=xxx");
   }
 
   private void initializeLogger() {
