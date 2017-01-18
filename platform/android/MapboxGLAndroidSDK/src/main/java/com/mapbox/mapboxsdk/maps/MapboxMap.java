@@ -167,7 +167,11 @@ public final class MapboxMap {
   // Style
 
   /**
-   * Get the current transition animation duration
+   * <p>
+   * Get the animation duration for style changes.
+   * </p>
+   * The default value is zero (instant change).
+   *
    * @return Duration in seconds
    */
   @UiThread
@@ -176,7 +180,8 @@ public final class MapboxMap {
   }
 
   /**
-   * Set the transition animation duration
+   * Set the animation duration for style changes.
+   *
    * @param duration Duration in seconds
    */
   @UiThread
@@ -185,7 +190,11 @@ public final class MapboxMap {
   }
 
   /**
-   * Get the current transition animation delay
+   * <p>
+   * Get the animation delay for style changes.
+   * </p>
+   * The default value is zero (instant change).
+   *
    * @return Delay in seconds
    */
   @UiThread
@@ -194,7 +203,8 @@ public final class MapboxMap {
   }
 
   /**
-   * Set the transition animation delay
+   * Set the animation delay for style changes.
+   *
    * @param delay Delay in seconds
    */
   @UiThread

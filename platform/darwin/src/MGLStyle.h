@@ -444,7 +444,14 @@ MGL_EXPORT
 
 #pragma mark Managing a Style’s Transition Options
 
+/**
+ Animation duration for style changes. Defaults to zero (instant change).
+ */
 @property (nonatomic) NSTimeInterval transitionDuration;
+
+/**
+ Animation delay for style changes. Defaults to zero (instant change).
+ */
 @property (nonatomic) NSTimeInterval transitionDelay;
 
 @end
