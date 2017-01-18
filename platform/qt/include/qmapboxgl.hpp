@@ -1,18 +1,18 @@
 #ifndef QMAPBOXGL_H
 #define QMAPBOXGL_H
 
+#include <QImage>
 #include <QMapbox>
 #include <QMargins>
 #include <QObject>
 #include <QPointF>
 #include <QSize>
+#include <QString>
+#include <QStringList>
 
-class QImage;
-class QMargins;
-class QSize;
-class QString;
-class QStringList;
-class QOpenGLFramebufferObject;
+#if QT_VERSION >= 0x050000
+#include <QOpenGLFramebufferObject>
+#endif
 
 class QMapboxGLPrivate;
 

@@ -43,7 +43,9 @@ public:
 
     bool dirty { false };
 
+#if QT_VERSION >= 0x050000
     QOpenGLFramebufferObject *fbo { nullptr };
+#endif
 
 public slots:
     void connectionEstablished();
