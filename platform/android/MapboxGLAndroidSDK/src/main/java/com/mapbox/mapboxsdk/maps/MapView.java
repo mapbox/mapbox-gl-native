@@ -76,8 +76,13 @@ public class MapView extends FrameLayout implements GLSurfaceView.Renderer {
   private boolean hasSurface = false;
 
   private GLSurfaceView glSurfaceView;
+  private CompassView compassView;
+  private ImageView attrView;
+  private View logoView;
+  private MyLocationView myLocationView;
+  private RenderRunnable renderRunnable = new RenderRunnable();
   private MapboxMap mapboxMap;
-  private MapCallback mapCallback;
+  private MapCallback mapCallback = new MapCallback();
   private boolean onStartCalled;
   private boolean onStopCalled;
 
@@ -86,6 +91,8 @@ public class MapView extends FrameLayout implements GLSurfaceView.Renderer {
   private MapZoomButtonController mapZoomButtonController;
 
   private ConnectivityReceiver connectivityReceiver;
+
+  private MapboxMapOptions mapboxMapOptions;
 
   @UiThread
   public MapView(@NonNull Context context) {
@@ -120,11 +127,23 @@ public class MapView extends FrameLayout implements GLSurfaceView.Renderer {
 
     // inflate view
     View view = LayoutInflater.from(context).inflate(R.layout.mapbox_mapview_internal, this);
-    CompassView compassView = (CompassView) view.findViewById(R.id.compassView);
-    MyLocationView myLocationView = (MyLocationView) view.findViewById(R.id.userLocationView);
-    ImageView attrView = (ImageView) view.findViewById(R.id.attributionView);
+    compassView = (CompassView) view.findViewById(R.id.compassView);
+    myLocationView = (MyLocationView) view.findViewById(R.id.userLocationView);
+    attrView = (ImageView) view.findViewById(R.id.attributionView);
     initialiseDrawingSurface();
+    logoView = view.findViewById(R.id.logoView);
 
+  }
+
+  private void initialiseDrawingSurface() {
+    glSurfaceView = (GLSurfaceView) findViewById(R.id.surfaceView);
+    glSurfaceView.setEGLContextClientVersion(2);
+    glSurfaceView.setRenderer(this);
+    glSurfaceView.setRenderMode(RENDERMODE_WHEN_DIRTY);
+  }
+
+  @Override
+  public void onSurfaceCreated(GL10 gl10, EGLConfig eglConfig) {
     // create native Map object
     nativeMapView = new NativeMapView(this);
 
@@ -136,7 +155,7 @@ public class MapView extends FrameLayout implements GLSurfaceView.Renderer {
 
     // setup components for MapboxMap creation
     Projection proj = new Projection(nativeMapView);
-    UiSettings uiSettings = new UiSettings(proj, focalPoint, compassView, attrView, view.findViewById(R.id.logoView));
+    UiSettings uiSettings = new UiSettings(proj, focalPoint, compassView, attrView, logoView);
     TrackingSettings trackingSettings = new TrackingSettings(myLocationView, uiSettings, focalPoint);
     MyLocationViewSettings myLocationViewSettings = new MyLocationViewSettings(myLocationView, proj, focalPoint);
     MarkerViewManager markerViewManager = new MarkerViewManager((ViewGroup) findViewById(R.id.markerViewContainer));
@@ -146,14 +165,14 @@ public class MapView extends FrameLayout implements GLSurfaceView.Renderer {
       registerTouchListener, annotations);
 
     // user input
-    mapGestureDetector = new MapGestureDetector(context, transform, proj, uiSettings, trackingSettings, annotations);
+    mapGestureDetector = new MapGestureDetector(getContext(), transform, proj, uiSettings, trackingSettings, annotations);
     mapKeyListener = new MapKeyListener(transform, trackingSettings, uiSettings);
     mapZoomButtonController = new MapZoomButtonController(this, uiSettings, transform);
 
     // inject widgets with MapboxMap
     compassView.setMapboxMap(mapboxMap);
     myLocationView.setMapboxMap(mapboxMap);
-    attrView.setOnClickListener(new AttributionOnClickListener(context, transform));
+    attrView.setOnClickListener(new AttributionOnClickListener(getContext(), transform));
 
     // Ensure this view is interactable
     setClickable(true);
@@ -169,21 +188,15 @@ public class MapView extends FrameLayout implements GLSurfaceView.Renderer {
     nativeMapView.setReachability(isConnected());
 
     // initialise MapboxMap
-    mapboxMap.initialise(context, options);
-  }
+    mapboxMap.initialise(getContext(), mapboxMapOptions);
 
-  private void initialiseDrawingSurface() {
-    glSurfaceView = (GLSurfaceView) findViewById(R.id.surfaceView);
-    glSurfaceView.setEGLContextClientVersion(2);
-    glSurfaceView.setRenderer(this);
-    glSurfaceView.setRenderMode(RENDERMODE_WHEN_DIRTY);
-  }
+    addOnMapChangedListener(mapCallback);
+    mapboxMap.onStart();
 
-  @Override
-  public void onSurfaceCreated(GL10 gl10, EGLConfig eglConfig) {
     nativeMapView.initializeDisplay();
     nativeMapView.initializeContext();
     nativeMapView.createSurface(glSurfaceView.getHolder().getSurface());
+
     hasSurface = true;
   }
 
@@ -215,7 +228,7 @@ public class MapView extends FrameLayout implements GLSurfaceView.Renderer {
    */
   @UiThread
   public void onCreate(@Nullable Bundle savedInstanceState) {
-    nativeMapView.setAccessToken(Mapbox.getAccessToken());
+    //nativeMapView.setAccessToken(Mapbox.getAccessToken());
 
     if (savedInstanceState == null) {
       MapboxEvent.trackMapLoadEvent();
@@ -223,7 +236,6 @@ public class MapView extends FrameLayout implements GLSurfaceView.Renderer {
       mapboxMap.onRestoreInstanceState(savedInstanceState);
     }
 
-    addOnMapChangedListener(mapCallback = new MapCallback(mapboxMap));
   }
 
   /**
@@ -246,7 +258,6 @@ public class MapView extends FrameLayout implements GLSurfaceView.Renderer {
   public void onStart() {
     onStartCalled = true;
     registerConnectivityReceiver();
-    mapboxMap.onStart();
     glSurfaceView.onResume();
   }
 
@@ -445,15 +456,7 @@ public class MapView extends FrameLayout implements GLSurfaceView.Renderer {
       return;
     }
 
-    if (destroyed) {
-      return;
-    }
-
-    if (!hasSurface) {
-      return;
-    }
-
-    nativeMapView.render();
+    glSurfaceView.queueEvent(renderRunnable);
   }
 
   @Override
@@ -463,7 +466,9 @@ public class MapView extends FrameLayout implements GLSurfaceView.Renderer {
     }
 
     if (!isInEditMode()) {
-      nativeMapView.resizeView(width, height);
+      if (nativeMapView != null) {
+        nativeMapView.resizeView(width, height);
+      }
     }
   }
 
@@ -485,7 +490,9 @@ public class MapView extends FrameLayout implements GLSurfaceView.Renderer {
     if (isInEditMode()) {
       return;
     }
-    mapZoomButtonController.setVisible(visibility == View.VISIBLE);
+    if (mapZoomButtonController != null) {
+      mapZoomButtonController.setVisible(visibility == View.VISIBLE);
+    }
   }
 
   //
@@ -498,7 +505,7 @@ public class MapView extends FrameLayout implements GLSurfaceView.Renderer {
     // Called when an action we are listening to in the manifest has been sent
     @Override
     public void onReceive(Context context, Intent intent) {
-      if (!destroyed && intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
+      if (nativeMapView != null && !destroyed && intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
         nativeMapView.setReachability(!intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, false));
       }
     }
@@ -907,15 +914,10 @@ public class MapView extends FrameLayout implements GLSurfaceView.Renderer {
     }
   }
 
-  private static class MapCallback implements OnMapChangedListener {
+  private class MapCallback implements OnMapChangedListener {
 
-    private final MapboxMap mapboxMap;
     private final List<OnMapReadyCallback> onMapReadyCallbackList = new ArrayList<>();
     private boolean initialLoad = true;
-
-    MapCallback(MapboxMap mapboxMap) {
-      this.mapboxMap = mapboxMap;
-    }
 
     @Override
     public void onMapChanged(@MapChange int change) {
@@ -947,6 +949,20 @@ public class MapView extends FrameLayout implements GLSurfaceView.Renderer {
 
     void addOnMapReadyCallback(OnMapReadyCallback callback) {
       onMapReadyCallbackList.add(callback);
+    }
+  }
+
+  private class RenderRunnable implements Runnable {
+    @Override
+    public void run() {
+      if (destroyed) {
+        return;
+      }
+
+      if (!hasSurface) {
+        return;
+      }
+      nativeMapView.render();
     }
   }
 }
