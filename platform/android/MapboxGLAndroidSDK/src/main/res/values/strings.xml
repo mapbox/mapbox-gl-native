@@ -18,8 +18,6 @@
      may change as we improve the style. -->
     <string name="mapbox_style_mapbox_streets">mapbox://styles/mapbox/streets-v9</string>
     <string name="mapbox_style_outdoors">mapbox://styles/mapbox/outdoors-v9</string>
-    <!-- Note: Emerald style has been deprecated and will be removed in a future release-->
-    <string name="mapbox_style_emerald">mapbox://styles/mapbox/emerald-v8</string>
     <string name="mapbox_style_light">mapbox://styles/mapbox/light-v9</string>
     <string name="mapbox_style_dark">mapbox://styles/mapbox/dark-v9</string>
     <string name="mapbox_style_satellite">mapbox://styles/mapbox/satellite-v9</string>

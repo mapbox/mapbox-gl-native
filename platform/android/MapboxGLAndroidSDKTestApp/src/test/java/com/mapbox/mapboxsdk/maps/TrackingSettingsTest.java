@@ -44,15 +44,15 @@ public class TrackingSettingsTest {
 
   @Test
   public void testDismissTrackingModesOnGesture() {
-    trackingSettings.setDismissTrackingOnGesture(false);
-    assertFalse("DismissTrackingOnGesture should be false", trackingSettings.isDismissTrackingOnGesture());
+    trackingSettings.setDismissAllTrackingOnGesture(false);
+    assertFalse("DismissTrackingOnGesture should be false", trackingSettings.isAllDismissTrackingOnGesture());
   }
 
   @Test
   public void testValidateGesturesForTrackingModes() {
-    trackingSettings.setDismissTrackingOnGesture(false);
+    trackingSettings.setDismissAllTrackingOnGesture(false);
     trackingSettings.setMyLocationTrackingMode(MyLocationTracking.TRACKING_FOLLOW);
-    assertFalse("DismissTrackingOnGesture should be false", trackingSettings.isDismissTrackingOnGesture());
+    assertFalse("DismissTrackingOnGesture should be false", trackingSettings.isAllDismissTrackingOnGesture());
   }
 
   @Test

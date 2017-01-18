@@ -824,7 +824,6 @@ public final class MapboxMap {
    * @deprecated use {@link #setStyleUrl(String)} instead with versioned url methods from {@link Style}
    */
   @UiThread
-  @Deprecated
   public void setStyle(@Style.StyleUrl String style) {
     setStyleUrl(style);
   }

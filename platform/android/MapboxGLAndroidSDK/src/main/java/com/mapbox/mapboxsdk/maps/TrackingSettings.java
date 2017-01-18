@@ -153,34 +153,12 @@ public final class TrackingSettings {
   }
 
   /**
-   * Returns if the tracking modes will be dismissed when a gesture occurs.
-   *
-   * @return True to indicate the tracking modes will be dismissed.
-   * @deprecated use @link #isAllDismissTrackingOnGestureinstead
-   */
-  @Deprecated
-  public boolean isDismissTrackingOnGesture() {
-    return dismissLocationTrackingOnGesture && dismissBearingTrackingOnGesture;
-  }
-
-  /**
    * Returns if all tracking modes will be dismissed when a gesture occurs.
    *
    * @return True to indicate that location and bearing tracking will be dismissed.
    */
   public boolean isAllDismissTrackingOnGesture() {
     return dismissLocationTrackingOnGesture && dismissBearingTrackingOnGesture;
-  }
-
-  /**
-   * Set the dismissal of the tracking modes if a gesture occurs.
-   *
-   * @param dismissTrackingOnGesture True to dismiss the tracking modes.
-   * @deprecated use @link #setDismissAllTrackingOnGesture instead
-   */
-  @Deprecated
-  public void setDismissTrackingOnGesture(boolean dismissTrackingOnGesture) {
-    setDismissAllTrackingOnGesture(dismissTrackingOnGesture);
   }
 
   /**
