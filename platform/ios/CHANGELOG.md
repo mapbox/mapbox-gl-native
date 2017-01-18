@@ -8,6 +8,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * Improved the line wrapping behavior of point-placed labels written in Chinese, Japanese, and Yi. ([#6828](https://github.com/mapbox/mapbox-gl-native/pull/6828))
 * Fixed an issue where translucent, non-view-backed point annotations along tile boundaries would be drawn darker than expected. ([#6832](https://github.com/mapbox/mapbox-gl-native/pull/6832))
 * Added a Simplified Chinese localization. ([#7316](https://github.com/mapbox/mapbox-gl-native/pull/7316))
+* Support for style-wide transition animation duration and delay. [#6779](https://github.com/mapbox/mapbox-gl-native/issues/6779)
 
 ## 3.4.0
 

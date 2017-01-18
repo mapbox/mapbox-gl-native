@@ -1226,7 +1226,7 @@ public:
         if (drift)
         {
             CGPoint offset = CGPointMake(velocity.x * self.decelerationRate / 4, velocity.y * self.decelerationRate / 4);
-            _mbglMap->moveBy({ offset.x, offset.y }, MGLDurationInSeconds(self.decelerationRate));
+            _mbglMap->moveBy({ offset.x, offset.y }, MGLDurationInSecondsFromTimeInterval(self.decelerationRate));
         }
 
         [self notifyGestureDidEndWithDrift:drift];
@@ -1316,7 +1316,7 @@ public:
 
         if (velocity && duration)
         {
-            _mbglMap->setScale(newScale, mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y }, MGLDurationInSeconds(duration));
+            _mbglMap->setScale(newScale, mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y }, MGLDurationInSecondsFromTimeInterval(duration));
         }
 
         [self notifyGestureDidEndWithDrift:velocity && duration];
@@ -1375,7 +1375,7 @@ public:
             CGFloat newRadians = radians + velocity * decelerationRate * 0.1;
             CGFloat newDegrees = MGLDegreesFromRadians(newRadians) * -1;
 
-            _mbglMap->setBearing(newDegrees, mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y }, MGLDurationInSeconds(decelerationRate));
+            _mbglMap->setBearing(newDegrees, mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y }, MGLDurationInSecondsFromTimeInterval(decelerationRate));
 
             [self notifyGestureDidEndWithDrift:YES];
 
@@ -1504,7 +1504,7 @@ public:
         CGPoint gesturePoint = [self anchorPointForGesture:doubleTap];
 
         mbgl::ScreenCoordinate center(gesturePoint.x, gesturePoint.y);
-        _mbglMap->scaleBy(2, center, MGLDurationInSeconds(MGLAnimationDuration));
+        _mbglMap->scaleBy(2, center, MGLDurationInSecondsFromTimeInterval(MGLAnimationDuration));
 
         __weak MGLMapView *weakSelf = self;
 
@@ -1532,7 +1532,7 @@ public:
         CGPoint gesturePoint = [self anchorPointForGesture:twoFingerTap];
 
         mbgl::ScreenCoordinate center(gesturePoint.x, gesturePoint.y);
-        _mbglMap->scaleBy(0.5, center, MGLDurationInSeconds(MGLAnimationDuration));
+        _mbglMap->scaleBy(0.5, center, MGLDurationInSecondsFromTimeInterval(MGLAnimationDuration));
 
         __weak MGLMapView *weakSelf = self;
 
@@ -2288,7 +2288,7 @@ public:
     mbgl::AnimationOptions animationOptions;
     if (duration)
     {
-        animationOptions.duration.emplace(MGLDurationInSeconds(duration));
+        animationOptions.duration.emplace(MGLDurationInSecondsFromTimeInterval(duration));
         animationOptions.easing.emplace(MGLUnitBezierForMediaTimingFunction(function));
     }
     if (completion)
@@ -2329,7 +2329,7 @@ public:
 
     _mbglMap->setZoom(zoomLevel,
                       MGLEdgeInsetsFromNSEdgeInsets(self.contentInset),
-                      MGLDurationInSeconds(duration));
+                      MGLDurationInSecondsFromTimeInterval(duration));
 }
 
 - (void)setMinimumZoomLevel:(double)minimumZoomLevel
@@ -2441,7 +2441,7 @@ public:
     mbgl::AnimationOptions animationOptions;
     if (duration > 0)
     {
-        animationOptions.duration.emplace(MGLDurationInSeconds(duration));
+        animationOptions.duration.emplace(MGLDurationInSecondsFromTimeInterval(duration));
         animationOptions.easing.emplace(MGLUnitBezierForMediaTimingFunction(function));
     }
     if (completion)
@@ -2489,13 +2489,13 @@ public:
     {
         _mbglMap->setBearing(direction,
                              MGLEdgeInsetsFromNSEdgeInsets(self.contentInset),
-                             MGLDurationInSeconds(duration));
+                             MGLDurationInSecondsFromTimeInterval(duration));
     }
     else
     {
         CGPoint centerPoint = self.userLocationAnnotationViewCenter;
         _mbglMap->setBearing(direction, mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y },
-                             MGLDurationInSeconds(duration));
+                             MGLDurationInSecondsFromTimeInterval(duration));
     }
 }
 
@@ -2548,7 +2548,7 @@ public:
     mbgl::AnimationOptions animationOptions;
     if (duration > 0)
     {
-        animationOptions.duration.emplace(MGLDurationInSeconds(duration));
+        animationOptions.duration.emplace(MGLDurationInSecondsFromTimeInterval(duration));
         animationOptions.easing.emplace(MGLUnitBezierForMediaTimingFunction(function));
     }
     if (completion)
@@ -2594,7 +2594,7 @@ public:
     mbgl::AnimationOptions animationOptions;
     if (duration >= 0)
     {
-        animationOptions.duration = MGLDurationInSeconds(duration);
+        animationOptions.duration = MGLDurationInSecondsFromTimeInterval(duration);
     }
     if (peakAltitude >= 0)
     {

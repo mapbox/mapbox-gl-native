@@ -442,6 +442,22 @@ MGL_EXPORT
  */
 - (void)removeImageForName:(NSString *)name;
 
+#pragma mark Managing a Style’s Transition Options
+
+/**
+ The duration in seconds to animate any changes to the style URL or to layout and paint attributes.
+ 
+ By default, this property is set to zero seconds, so any changes take effect without animation.
+ */
+@property (nonatomic) NSTimeInterval transitionDuration;
+
+/**
+ The delay in seconds to before applying any changes to the style URL or to layout and paint attributes.
+
+ By default, this property is set to zero seconds, so any changes begin to animate immediately.
+ */
+@property (nonatomic) NSTimeInterval transitionDelay;
+
 @end
 
 NS_ASSUME_NONNULL_END

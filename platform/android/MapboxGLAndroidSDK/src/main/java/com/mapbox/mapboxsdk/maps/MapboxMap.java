@@ -166,6 +166,52 @@ public final class MapboxMap {
 
   // Style
 
+  /**
+   * <p>
+   * Get the animation duration for style changes.
+   * </p>
+   * The default value is zero, so any changes take effect without animation.
+   *
+   * @return Duration in seconds
+   */
+  @UiThread
+  public long getTransitionDuration() {
+    return nativeMapView.getTransitionDuration();
+  }
+
+  /**
+   * Set the animation duration for style changes.
+   *
+   * @param duration Duration in seconds
+   */
+  @UiThread
+  public void setTransitionDuration(long duration) {
+    nativeMapView.setTransitionDuration(duration);
+  }
+
+  /**
+   * <p>
+   * Get the animation delay for style changes.
+   * </p>
+   * The default value is zero, so any changes begin to animate immediately.
+   *
+   * @return Delay in seconds
+   */
+  @UiThread
+  public long getTransitionDelay() {
+    return nativeMapView.getTransitionDelay();
+  }
+
+  /**
+   * Set the animation delay for style changes.
+   *
+   * @param delay Delay in seconds
+   */
+  @UiThread
+  public void setTransitionDelay(long delay) {
+    nativeMapView.setTransitionDelay(delay);
+  }
+
   @Nullable
   @UiThread
   public Layer getLayer(@NonNull String layerId) {

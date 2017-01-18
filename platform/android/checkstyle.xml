@@ -19,7 +19,10 @@
         <!-- <module name="NewlineAtEndOfFile">
         <property name="lineSeparator" value="lf" />
     </module> -->
-    <module name="FileLength"/>
+    <module name="FileLength">
+        <property name="max" value="2042"/>
+    </module>
+
     <module name="FileTabCharacter"/>
 
     <!-- Trailing spaces -->
