@@ -170,7 +170,7 @@ public final class MapboxMap {
    * <p>
    * Get the animation duration for style changes.
    * </p>
-   * The default value is zero (instant change).
+   * The default value is zero, so any changes take effect without animation.
    *
    * @return Duration in seconds
    */
@@ -193,7 +193,7 @@ public final class MapboxMap {
    * <p>
    * Get the animation delay for style changes.
    * </p>
-   * The default value is zero (instant change).
+   * The default value is zero, so any changes begin to animate immediately.
    *
    * @return Delay in seconds
    */

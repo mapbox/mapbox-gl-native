@@ -445,12 +445,16 @@ MGL_EXPORT
 #pragma mark Managing a Style’s Transition Options
 
 /**
- Animation duration for style changes. Defaults to zero (instant change).
+ The duration in seconds to animate any changes to the style URL or to layout and paint attributes.
+ 
+ By default, this property is set to zero seconds, so any changes take effect without animation.
  */
 @property (nonatomic) NSTimeInterval transitionDuration;
 
 /**
- Animation delay for style changes. Defaults to zero (instant change).
+ The delay in seconds to before applying any changes to the style URL or to layout and paint attributes.
+
+ By default, this property is set to zero seconds, so any changes begin to animate immediately.
  */
 @property (nonatomic) NSTimeInterval transitionDelay;
 
