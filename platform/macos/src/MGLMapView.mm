@@ -231,7 +231,11 @@ public:
 - (void)awakeFromNib {
     [super awakeFromNib];
 
-    self.styleURL = nil;
+    // If the Style URL inspectable was not set, make sure to go through
+    // -setStyleURL: to load the default style.
+    if (_mbglMap->getStyleURL().empty()) {
+        self.styleURL = nil;
+    }
 }
 
 + (NSArray *)restorableStateKeyPaths {
