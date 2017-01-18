@@ -23,6 +23,66 @@ set(NodeJS_USE_CLANG_STDLIB OFF CACHE BOOL "Don't use libc++ by default" FORCE)
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/node_modules/node-cmake)
 find_package(NodeJS)
 
+find_program(npm_EXECUTABLE
+    NAMES npm
+    PATHS ${NodeJS_ROOT_DIR})
+
+if (NOT npm_EXECUTABLE)
+    message(FATAL_ERROR "Could not find npm")
+endif()
+
+function(_npm_install DIRECTORY NAME ADDITIONAL_DEPS)
+    SET(NPM_INSTALL_FAILED FALSE)
+    if("${DIRECTORY}/package.json" IS_NEWER_THAN "${DIRECTORY}/node_modules/.${NAME}.stamp")
+        message(STATUS "Running 'npm install' for ${NAME}...")
+        execute_process(
+            COMMAND ${NodeJS_EXECUTABLE} ${npm_EXECUTABLE} install --ignore-scripts
+            WORKING_DIRECTORY "${DIRECTORY}"
+            RESULT_VARIABLE NPM_INSTALL_FAILED)
+        if(NOT NPM_INSTALL_FAILED)
+            execute_process(COMMAND ${CMAKE_COMMAND} -E touch "${DIRECTORY}/node_modules/.${NAME}.stamp")
+        endif()
+    endif()
+
+    add_custom_command(
+        OUTPUT "${DIRECTORY}/node_modules/.${NAME}.stamp"
+        COMMAND ${NodeJS_EXECUTABLE} ${npm_EXECUTABLE} install --ignore-scripts
+        COMMAND ${CMAKE_COMMAND} -E touch "${DIRECTORY}/node_modules/.${NAME}.stamp"
+        WORKING_DIRECTORY "${DIRECTORY}"
+        DEPENDS ${ADDITIONAL_DEPS} "${DIRECTORY}/package.json"
+        COMMENT "Running 'npm install' for ${NAME}...")
+endfunction()
+
+# Run submodule update
+message(STATUS "Updating submodules...")
+execute_process(
+    COMMAND git submodule update --init .mason mapbox-gl-js
+    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+
+if(NOT EXISTS "${CMAKE_SOURCE_DIR}/mapbox-gl-js/node_modules")
+    # Symlink mapbox-gl-js/node_modules so that the modules that are
+    # about to be installed get cached between CI runs.
+    execute_process(
+         COMMAND ln -sF ../node_modules .
+         WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/mapbox-gl-js")
+endif()
+
+# Add target for running submodule update during builds
+add_custom_target(
+    update-submodules ALL
+    COMMAND git submodule update --init .mason mapbox-gl-js
+    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+    COMMENT "Updating submodules..."
+)
+
+# Run npm install for both directories, and add custom commands, and a target that depends on them.
+_npm_install("${CMAKE_SOURCE_DIR}" mapbox-gl-native update-submodules)
+_npm_install("${CMAKE_SOURCE_DIR}/mapbox-gl-js" mapbox-gl-js "${CMAKE_SOURCE_DIR}/node_modules/.mapbox-gl-native.stamp")
+add_custom_target(
+    npm-install ALL
+    DEPENDS "${CMAKE_SOURCE_DIR}/node_modules/.mapbox-gl-js.stamp"
+)
+
 # Generate source groups so the files are properly sorted in IDEs like Xcode.
 function(create_source_groups target)
     get_target_property(sources ${target} SOURCES)

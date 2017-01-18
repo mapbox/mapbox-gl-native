@@ -3,27 +3,6 @@ project(mbgl LANGUAGES CXX C)
 set(CMAKE_CXX_STANDARD 14)
 
 include(cmake/mbgl.cmake)
-
-if(NOT EXISTS ".mason/mason.cmake")
-   execute_process(
-        COMMAND git submodule update --init .mason
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
-endif()
-
-if(NOT EXISTS "mapbox-gl-js/package.json")
-   execute_process(
-        COMMAND git submodule update --init mapbox-gl-js
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
-   # Symlink mapbox-gl-js/node_modules so that the modules that are
-   # about to be installed get cached between CI runs.
-   execute_process(
-        COMMAND ln -sF ../node_modules .
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/mapbox-gl-js)
-   execute_process(
-        COMMAND npm install
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/mapbox-gl-js)
-endif()
-
 include(.mason/mason.cmake)
 
 option(WITH_CXX11ABI "Use cxx11abi mason packages" OFF)
