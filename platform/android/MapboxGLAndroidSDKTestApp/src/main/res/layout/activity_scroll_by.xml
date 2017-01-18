@@ -82,7 +82,7 @@
                 android:layout_height="match_parent"
                 app:mapbox_cameraTargetLat="37.176546"
                 app:mapbox_cameraTargetLng="-3.599007"
-                app:mapbox_styleUrl="@string/mapbox_style_emerald"
+                app:mapbox_styleUrl="@string/mapbox_style_dark"
                 app:mapbox_cameraZoom="15" />
 
             <android.support.design.widget.FloatingActionButton

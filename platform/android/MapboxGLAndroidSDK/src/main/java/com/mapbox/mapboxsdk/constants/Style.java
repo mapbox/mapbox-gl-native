@@ -23,7 +23,7 @@ public class Style {
    * constants means your map style will always use the latest version and may change as we
    * improve the style
    */
-  @StringDef( {MAPBOX_STREETS, OUTDOORS, EMERALD, LIGHT, DARK, SATELLITE, SATELLITE_STREETS})
+  @StringDef( {MAPBOX_STREETS, OUTDOORS, LIGHT, DARK, SATELLITE, SATELLITE_STREETS})
   @Retention(RetentionPolicy.SOURCE)
   public @interface StyleUrl {
   }
@@ -42,14 +42,6 @@ public class Style {
    * your map style will always use the latest version and may change as we improve the style.
    */
   public static final String OUTDOORS = "mapbox://styles/mapbox/outdoors-v9";
-
-  /**
-   * Emerald: A versatile style, with emphasis on road networks and public transit.
-   *
-   * @deprecated this style has been deprecated and will be removed in future versions.
-   */
-  @Deprecated
-  public static final String EMERALD = "mapbox://styles/mapbox/emerald-v8";
 
   /**
    * Light: Subtle light backdrop for data visualizations. Using this constant means your map

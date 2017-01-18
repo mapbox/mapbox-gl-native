@@ -54,8 +54,6 @@ endmacro()
 
 macro(mbgl_platform_test)
     target_sources(mbgl-test
-        PRIVATE test/src/main.cpp
-        PRIVATE platform/qt/test/qmapboxgl.cpp
         PRIVATE platform/default/mbgl/gl/headless_backend.cpp
         PRIVATE platform/default/mbgl/gl/headless_backend.hpp
         PRIVATE platform/default/mbgl/gl/headless_display.cpp
@@ -63,10 +61,12 @@ macro(mbgl_platform_test)
         PRIVATE platform/default/mbgl/gl/offscreen_view.cpp
         PRIVATE platform/default/mbgl/gl/offscreen_view.hpp
         PRIVATE platform/qt/test/headless_backend_qt.cpp
+        PRIVATE platform/qt/test/main.cpp
+        PRIVATE platform/qt/test/qmapboxgl.cpp
     )
 
     set_source_files_properties(
-        test/src/main.cpp
+        platform/qt/test/main.cpp
         PROPERTIES COMPILE_FLAGS -DWORK_DIRECTORY="${CMAKE_SOURCE_DIR}"
     )
 
