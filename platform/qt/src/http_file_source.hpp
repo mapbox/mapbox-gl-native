@@ -8,7 +8,6 @@
 #include <QObject>
 #include <QPair>
 #include <QQueue>
-#include <QSslConfiguration>
 #include <QUrl>
 #include <QVector>
 
@@ -33,7 +32,6 @@ public slots:
 private:
     QMap<QUrl, QPair<QNetworkReply *, QVector<HTTPRequest *>>> m_pending;
     QNetworkAccessManager *m_manager;
-    QSslConfiguration m_ssl;
 };
 
 } // namespace mbgl
