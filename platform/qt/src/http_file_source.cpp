@@ -9,31 +9,11 @@
 #include <QNetworkReply>
 #include <QSslConfiguration>
 
-// Needs to be on the global namespace
-// for linking purposes.
-void initResources() {
-    Q_INIT_RESOURCE(qmapbox);
-}
-
 namespace mbgl {
 
 HTTPFileSource::Impl::Impl() : m_manager(new QNetworkAccessManager(this))
 {
-    initResources();
-
     QNetworkProxyFactory::setUseSystemConfiguration(true);
-
-#if QT_VERSION >= 0x050000
-    m_ssl.setProtocol(QSsl::SecureProtocols);
-#else
-    // Qt 4 defines SecureProtocols as TLS1 or SSL3, but we don't want SSL3.
-    m_ssl.setProtocol(QSsl::TlsV1);
-#endif
-
-    m_ssl.setCaCertificates(QSslCertificate::fromPath(":ca-bundle.crt"));
-    if (m_ssl.caCertificates().isEmpty()) {
-        mbgl::Log::Warning(mbgl::Event::HttpRequest, "Could not load list of certificate authorities");
-    }
 }
 
 void HTTPFileSource::Impl::request(HTTPRequest* req)
@@ -49,7 +29,6 @@ void HTTPFileSource::Impl::request(HTTPRequest* req)
     }
 
     QNetworkRequest networkRequest = req->networkRequest();
-    networkRequest.setSslConfiguration(m_ssl);
 
     data.first = m_manager->get(networkRequest);
     connect(data.first, SIGNAL(finished()), this, SLOT(onReplyFinished()));
