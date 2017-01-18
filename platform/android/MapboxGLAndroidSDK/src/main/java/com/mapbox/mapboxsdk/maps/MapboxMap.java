@@ -166,6 +166,42 @@ public final class MapboxMap {
 
   // Style
 
+  /**
+   * Get the current transition animation duration
+   * @return Duration in seconds
+   */
+  @UiThread
+  public long getTransitionDuration() {
+    return nativeMapView.getTransitionDuration();
+  }
+
+  /**
+   * Set the transition animation duration
+   * @param duration Duration in seconds
+   */
+  @UiThread
+  public void setTransitionDuration(long duration) {
+    nativeMapView.setTransitionDuration(duration);
+  }
+
+  /**
+   * Get the current transition animation delay
+   * @return Delay in seconds
+   */
+  @UiThread
+  public long getTransitionDelay() {
+    return nativeMapView.getTransitionDelay();
+  }
+
+  /**
+   * Set the transition animation delay
+   * @param delay Delay in seconds
+   */
+  @UiThread
+  public void setTransitionDelay(long delay) {
+    nativeMapView.setTransitionDelay(delay);
+  }
+
   @Nullable
   @UiThread
   public Layer getLayer(@NonNull String layerId) {

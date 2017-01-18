@@ -767,6 +767,22 @@ final class NativeMapView {
 
   // Runtime style Api
 
+  public long getTransitionDuration() {
+    return nativeGetTransitionDuration(nativeMapViewPtr);
+  }
+
+  public void setTransitionDuration(long duration) {
+    nativeSetTransitionDuration(nativeMapViewPtr, duration);
+  }
+
+  public long getTransitionDelay() {
+    return nativeGetTransitionDelay(nativeMapViewPtr);
+  }
+
+  public void setTransitionDelay(long delay) {
+    nativeSetTransitionDelay(nativeMapViewPtr, delay);
+  }
+
   public Layer getLayer(String layerId) {
     if (isDestroyedOn("getLayer")) {
       return null;
@@ -1097,6 +1113,14 @@ final class NativeMapView {
                                   long duration, double pitch, double zoom);
 
   private native double[] nativeGetCameraValues(long nativeMapViewPtr);
+
+  private native long nativeGetTransitionDuration(long nativeMapViewPtr);
+
+  private native void nativeSetTransitionDuration(long nativeMapViewPtr, long duration);
+
+  private native long nativeGetTransitionDelay(long nativeMapViewPtr);
+
+  private native void nativeSetTransitionDelay(long nativeMapViewPtr, long delay);
 
   private native Layer nativeGetLayer(long nativeMapViewPtr, String layerId);
 
