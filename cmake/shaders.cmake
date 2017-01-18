@@ -6,6 +6,7 @@ function(add_shader VAR name)
     add_custom_command(
        OUTPUT ${shader_source_prefix}/${name}.hpp
        COMMAND ${shader_build_cmd} ${name} ${shader_file_prefix} ${shader_source_prefix}
+       DEPENDS npm-install
        DEPENDS ${CMAKE_SOURCE_DIR}/scripts/build-shaders.js
        DEPENDS ${shader_file_prefix}/${name}.vertex.glsl
        DEPENDS ${shader_file_prefix}/${name}.fragment.glsl
