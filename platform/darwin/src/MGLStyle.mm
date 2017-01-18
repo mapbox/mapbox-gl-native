@@ -502,7 +502,7 @@ static NSURL *MGLStyleURL_emerald;
         newAppliedClasses.push_back([appliedClass UTF8String]);
     }
 
-    mbgl::style::TransitionOptions transition { { MGLDurationInSeconds(transitionDuration) } };
+    mbgl::style::TransitionOptions transition { { MGLDurationInSecondsFromTimeInterval(transitionDuration) } };
     self.mapView.mbglMap->setTransitionOptions(transition);
     self.mapView.mbglMap->setClasses(newAppliedClasses);
 }
@@ -575,27 +575,27 @@ static NSURL *MGLStyleURL_emerald;
 - (void)setTransitionDuration:(NSTimeInterval)duration
 {
     auto transitionOptions = self.mapView.mbglMap->getTransitionOptions();
-    transitionOptions.duration = MGLDurationInSeconds(duration);
+    transitionOptions.duration = MGLDurationInSecondsFromTimeInterval(duration);
     self.mapView.mbglMap->setTransitionOptions(transitionOptions);
 }
 
 - (NSTimeInterval)transitionDuration
 {
     const mbgl::style::TransitionOptions transitionOptions = self.mapView.mbglMap->getTransitionOptions();
-    return MGLSecondsFromDuration(transitionOptions.duration.value_or(mbgl::Duration::zero()));
+    return MGLTimeIntervalFromDurationInSeconds(transitionOptions.duration.value_or(mbgl::Duration::zero()));
 }
 
 - (void)setTransitionDelay:(NSTimeInterval)delay
 {
     auto transitionOptions = self.mapView.mbglMap->getTransitionOptions();
-    transitionOptions.delay = MGLDurationInSeconds(delay);
+    transitionOptions.delay = MGLDurationInSecondsFromTimeInterval(delay);
     self.mapView.mbglMap->setTransitionOptions(transitionOptions);
 }
 
 - (NSTimeInterval)transitionDelay
 {
     const mbgl::style::TransitionOptions transitionOptions = self.mapView.mbglMap->getTransitionOptions();
-    return MGLSecondsFromDuration(transitionOptions.delay.value_or(mbgl::Duration::zero()));
+    return MGLTimeIntervalFromDurationInSeconds(transitionOptions.delay.value_or(mbgl::Duration::zero()));
 }
 
 - (NSString *)description
