@@ -979,7 +979,7 @@ public:
     [self willChangeValueForKey:@"centerCoordinate"];
     _mbglMap->setLatLng(MGLLatLngFromLocationCoordinate2D(centerCoordinate),
                         MGLEdgeInsetsFromNSEdgeInsets(self.contentInsets),
-                        MGLDurationInSeconds(animated ? MGLAnimationDuration : 0));
+                        MGLDurationInSecondsFromTimeInterval(animated ? MGLAnimationDuration : 0));
     [self didChangeValueForKey:@"centerCoordinate"];
 }
 
@@ -987,7 +987,7 @@ public:
     [self willChangeValueForKey:@"centerCoordinate"];
     _mbglMap->cancelTransitions();
     _mbglMap->moveBy({ delta.x, delta.y },
-                     MGLDurationInSeconds(animated ? MGLAnimationDuration : 0));
+                     MGLDurationInSecondsFromTimeInterval(animated ? MGLAnimationDuration : 0));
     [self didChangeValueForKey:@"centerCoordinate"];
 }
 
@@ -1023,7 +1023,7 @@ public:
     [self willChangeValueForKey:@"zoomLevel"];
     _mbglMap->setZoom(zoomLevel,
                       MGLEdgeInsetsFromNSEdgeInsets(self.contentInsets),
-                      MGLDurationInSeconds(animated ? MGLAnimationDuration : 0));
+                      MGLDurationInSecondsFromTimeInterval(animated ? MGLAnimationDuration : 0));
     [self didChangeValueForKey:@"zoomLevel"];
 }
 
@@ -1035,7 +1035,7 @@ public:
     [self willChangeValueForKey:@"centerCoordinate"];
     [self willChangeValueForKey:@"zoomLevel"];
     mbgl::ScreenCoordinate center(point.x, self.bounds.size.height - point.y);
-    _mbglMap->scaleBy(scaleFactor, center, MGLDurationInSeconds(animated ? MGLAnimationDuration : 0));
+    _mbglMap->scaleBy(scaleFactor, center, MGLDurationInSecondsFromTimeInterval(animated ? MGLAnimationDuration : 0));
     [self didChangeValueForKey:@"zoomLevel"];
     [self didChangeValueForKey:@"centerCoordinate"];
 }
@@ -1092,7 +1092,7 @@ public:
     [self willChangeValueForKey:@"direction"];
     _mbglMap->setBearing(direction,
                          MGLEdgeInsetsFromNSEdgeInsets(self.contentInsets),
-                         MGLDurationInSeconds(animated ? MGLAnimationDuration : 0));
+                         MGLDurationInSecondsFromTimeInterval(animated ? MGLAnimationDuration : 0));
     [self didChangeValueForKey:@"direction"];
 }
 
@@ -1126,7 +1126,7 @@ public:
     mbgl::CameraOptions cameraOptions = [self cameraOptionsObjectForAnimatingToCamera:camera];
     mbgl::AnimationOptions animationOptions;
     if (duration > 0) {
-        animationOptions.duration.emplace(MGLDurationInSeconds(duration));
+        animationOptions.duration.emplace(MGLDurationInSecondsFromTimeInterval(duration));
         animationOptions.easing.emplace(MGLUnitBezierForMediaTimingFunction(function));
     }
     if (completion) {
@@ -1162,7 +1162,7 @@ public:
     mbgl::CameraOptions cameraOptions = [self cameraOptionsObjectForAnimatingToCamera:camera];
     mbgl::AnimationOptions animationOptions;
     if (duration >= 0) {
-        animationOptions.duration = MGLDurationInSeconds(duration);
+        animationOptions.duration = MGLDurationInSecondsFromTimeInterval(duration);
     }
     if (peakAltitude >= 0) {
         CLLocationDegrees peakLatitude = (self.centerCoordinate.latitude + camera.centerCoordinate.latitude) / 2;
@@ -1228,7 +1228,7 @@ public:
     mbgl::CameraOptions cameraOptions = _mbglMap->cameraForLatLngBounds(MGLLatLngBoundsFromCoordinateBounds(bounds), padding);
     mbgl::AnimationOptions animationOptions;
     if (animated) {
-        animationOptions.duration = MGLDurationInSeconds(MGLAnimationDuration);
+        animationOptions.duration = MGLDurationInSecondsFromTimeInterval(MGLAnimationDuration);
     }
 
     [self willChangeValueForKey:@"visibleCoordinateBounds"];
