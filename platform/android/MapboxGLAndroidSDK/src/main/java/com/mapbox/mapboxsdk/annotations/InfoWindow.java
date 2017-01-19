@@ -72,7 +72,7 @@ public class InfoWindow {
 
           if (!handledDefaultClick) {
             // default behavior: close it when clicking on the tooltip:
-            close();
+            closeInfoWindow();
           }
         }
       }
@@ -93,6 +93,14 @@ public class InfoWindow {
     });
   }
 
+  private void closeInfoWindow() {
+    MapboxMap mapbox = mapboxMap.get();
+    Marker marker = boundMarker.get();
+    if (marker != null && mapbox != null) {
+      mapbox.deselectMarker(marker);
+    }
+    close();
+  }
 
   /**
    * Open the info window at the specified position.
