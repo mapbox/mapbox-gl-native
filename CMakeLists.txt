@@ -19,14 +19,8 @@ if(WITH_OSMESA AND WITH_EGL)
     message(FATAL_ERROR "WITH_OSMESA and WITH_EGL are mutually exclusive.")
 endif()
 
-if(WITH_OSMESA)
-    # Default mesa mason binary is OSMesa.
-    set(MASON_MESA_SUFFIX "")
-elseif(WITH_EGL)
+if(WITH_EGL)
     add_definitions(-DMBGL_USE_GLES2=1)
-    set(MASON_MESA_SUFFIX "-egl")
-else()
-    set(MASON_MESA_SUFFIX "-glx")
 endif()
 
 if(IS_CI_BUILD)
