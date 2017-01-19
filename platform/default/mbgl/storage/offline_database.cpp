@@ -793,6 +793,31 @@ bool OfflineDatabase::evict(uint64_t neededFreeSize) {
     // size, and because pages can get fragmented on the database.
     while (usedSize() + neededFreeSize + pageSize > maximumCacheSize) {
         // clang-format off
+        Statement accessedStmt = getStatement(
+            "SELECT max(accessed) "
+            "FROM ( "
+            "    SELECT accessed "
+            "    FROM resources "
+            "    LEFT JOIN region_resources "
+            "    ON resource_id = resources.id "
+            "    WHERE resource_id IS NULL "
+            "  UNION ALL "
+            "    SELECT accessed "
+            "    FROM tiles "
+            "    LEFT JOIN region_tiles "
+            "    ON tile_id = tiles.id "
+            "    WHERE tile_id IS NULL "
+            "  ORDER BY accessed ASC LIMIT ?1 "
+            ") "
+        );
+        accessedStmt->bind(1, 50);
+        // clang-format on
+        if (!accessedStmt->run()) {
+            return false;
+        }
+        Timestamp accessed = accessedStmt->get<Timestamp>(0);
+        
+        // clang-format off
         Statement stmt1 = getStatement(
             "DELETE FROM resources "
             "WHERE id IN ( "
@@ -800,10 +825,10 @@ bool OfflineDatabase::evict(uint64_t neededFreeSize) {
             "  LEFT JOIN region_resources "
             "  ON resource_id = resources.id "
             "  WHERE resource_id IS NULL "
-            "  ORDER BY accessed ASC LIMIT ?1 "
+            "  AND accessed <= ?1 "
             ") ");
         // clang-format on
-        stmt1->bind(1, 50);
+        stmt1->bind(1, accessed);
         stmt1->run();
         uint64_t changes1 = db->changes();
 
@@ -815,10 +840,10 @@ bool OfflineDatabase::evict(uint64_t neededFreeSize) {
             "  LEFT JOIN region_tiles "
             "  ON tile_id = tiles.id "
             "  WHERE tile_id IS NULL "
-            "  ORDER BY accessed ASC LIMIT ?1 "
+            "  AND accessed <= ?1 "
             ") ");
         // clang-format on
-        stmt2->bind(1, 50);
+        stmt2->bind(1, accessed);
         stmt2->run();
         uint64_t changes2 = db->changes();
 
