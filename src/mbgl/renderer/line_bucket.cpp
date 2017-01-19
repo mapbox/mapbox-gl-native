@@ -139,7 +139,14 @@ void LineBucket::addGeometry(const GeometryCoordinates& coordinates) {
 
         // Determine the normal of the join extrusion. It is the angle bisector
         // of the segments between the previous line and the next line.
-        Point<double> joinNormal = util::unit(*prevNormal + *nextNormal);
+        // In the case of 180° angles, the prev and next normals cancel each other out:
+        // prevNormal + nextNormal = (0, 0), its magnitude is 0, so the unit vector would be
+        // undefined. In that case, we're keeping the joinNormal at (0, 0), so that the cosHalfAngle
+        // below will also become 0 and miterLength will become Infinity.
+        Point<double> joinNormal = *prevNormal + *nextNormal;
+        if (joinNormal.x != 0 || joinNormal.y != 0) {
+            joinNormal = util::unit(joinNormal);
+        }
 
         /*  joinNormal     prevNormal
          *             ↖      ↑
@@ -155,7 +162,8 @@ void LineBucket::addGeometry(const GeometryCoordinates& coordinates) {
         // Find the cosine of the angle between the next and join normals
         // using dot product. The inverse of that is the miter length.
         const double cosHalfAngle = joinNormal.x * nextNormal->x + joinNormal.y * nextNormal->y;
-        const double miterLength = cosHalfAngle != 0 ? 1 / cosHalfAngle: 1;
+        const double miterLength =
+            cosHalfAngle != 0 ? 1 / cosHalfAngle : std::numeric_limits<double>::infinity();
 
         const bool isSharpCorner = cosHalfAngle < COS_HALF_SHARP_CORNER && prevCoordinate && nextCoordinate;
 
@@ -189,7 +197,7 @@ void LineBucket::addGeometry(const GeometryCoordinates& coordinates) {
 
             if (currentJoin == LineJoinType::Bevel) {
                 // The maximum extrude length is 128 / 63 = 2 times the width of the line
-                // so if miterLength >= 2 we need to draw a different type of bevel where.
+                // so if miterLength >= 2 we need to draw a different type of bevel here.
                 if (miterLength > 2) {
                     currentJoin = LineJoinType::FlipBevel;
                 }
@@ -216,7 +224,7 @@ void LineBucket::addGeometry(const GeometryCoordinates& coordinates) {
 
             if (miterLength > 100) {
                 // Almost parallel lines
-                joinNormal = *nextNormal;
+                joinNormal = *nextNormal * -1.0;
             } else {
                 const double direction = prevNormal->x * nextNormal->y - prevNormal->y * nextNormal->x > 0 ? -1 : 1;
                 const double bevelLength = miterLength * util::mag(*prevNormal + *nextNormal) /

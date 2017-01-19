@@ -49,7 +49,7 @@ struct LineAttributes : gl::Attributes<
                 static_cast<int16_t>((p.y * 2) | t.y)
             },
             {
-                // add 128 to store an byte in an unsigned byte
+                // add 128 to store a byte in an unsigned byte
                 static_cast<uint8_t>(::round(extrudeScale * e.x) + 128),
                 static_cast<uint8_t>(::round(extrudeScale * e.y) + 128),
 
