@@ -121,6 +121,9 @@ workflows:
             echo "Build seperate test apk:"
             make android-ui-test
 
+            echo "Print contents build folder"
+            ls platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/
+
             echo "Run tests on firebase:"
             gcloud auth activate-service-account --key-file secret.json --project android-gl-native
             gcloud beta test android devices list
