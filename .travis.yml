@@ -84,23 +84,6 @@ matrix:
         - git fetch origin master:refs/remotes/origin/master
         - make check
 
-    # OSMesa - Node - Clang 3.8 - Debug
-    - os: linux
-      sudo: required
-      dist: trusty
-      language: node
-      compiler: "osmesa-node4-clang38-debug"
-      env: BUILDTYPE=Debug _CXX=clang++-3.8 _CC=clang-3.8 WITH_OSMESA=1
-      addons: *clang38
-      script:
-        - nvm install 4
-        - nvm use 4
-        - make node
-        - make test-node
-      after_script:
-        - ccache --show-stats
-        - ./platform/node/scripts/after_script.sh ${TRAVIS_JOB_NUMBER}
-
     # EGL - Node - Clang 3.8 - Debug
     - os: linux
       sudo: required
@@ -120,13 +103,13 @@ matrix:
         - ccache --show-stats
         - ./platform/node/scripts/after_script.sh ${TRAVIS_JOB_NUMBER}
 
-    # GLX - Node - Clang 3.8 - Release
+    # EGL - Node - Clang 3.8 - Release
     - os: linux
       sudo: required
       dist: trusty
       language: node
-      compiler: "glx-node4-clang38-release"
-      env: BUILDTYPE=Release _CXX=clang++-3.8 _CC=clang-3.8
+      compiler: "egl-node4-clang38-release"
+      env: BUILDTYPE=Release _CXX=clang++-3.8 _CC=clang-3.8 WITH_EGL=1
       addons: *clang38
       before_script:
         - export PACKAGE_JSON_VERSION=$(node -e "console.log(require('./package.json').version)")
@@ -143,45 +126,52 @@ matrix:
       after_success:
         - ./platform/node/scripts/after_success.sh
 
-    # OSMesa - GCC 5 - Debug (Coverage)
-    # FIXME: https://github.com/mapbox/mapbox-gl-native/issues/6918
+    # EGL - GCC 5 - Debug (Coverage)
     - os: linux
       sudo: required
       dist: trusty
       language: cpp
-      compiler: "osmesa-gcc5-debug"
-      env: BUILDTYPE=Debug _CXX=g++-5 _CC=gcc-5 WITH_COVERAGE=1 WITH_OSMESA=1
+      compiler: "egl-gcc5-debug"
+      env: BUILDTYPE=Debug _CXX=g++-5 _CC=gcc-5 WITH_COVERAGE=1 WITH_EGL=1
       addons: *gcc5
+      before_script:
+        - mapbox_start_xvfb
       after_script:
         - ccache --show-stats
         - ./platform/linux/scripts/coveralls.sh
 
-    # OSMesa - GCC 5 - Release
+    # EGL - GCC 5 - Release
     - os: linux
       sudo: required
       dist: trusty
       language: cpp
-      compiler: "osmesa-gcc5-release"
-      env: BUILDTYPE=Release _CXX=g++-5 _CC=gcc-5 WITH_OSMESA=1
+      compiler: "egl-gcc5-release"
+      env: BUILDTYPE=Release _CXX=g++-5 _CC=gcc-5 WITH_EGL=1
       addons: *gcc5
+      before_script:
+        - mapbox_start_xvfb
 
-    # OSMesa - Clang 3.8 - Debug
+    # EGL - Clang 3.8 - Debug
     - os: linux
       sudo: required
       dist: trusty
       language: cpp
-      compiler: "osmesa-clang38-debug"
-      env: BUILDTYPE=Debug _CXX=clang++-3.8 _CC=clang-3.8 WITH_OSMESA=1
+      compiler: "egl-clang38-debug"
+      env: BUILDTYPE=Debug _CXX=clang++-3.8 _CC=clang-3.8 WITH_EGL=1
       addons: *clang38
+      before_script:
+        - mapbox_start_xvfb
 
-    # OSMesa - Clang 3.8 - Release
+    # EGL - Clang 3.8 - Release
     - os: linux
       sudo: required
       dist: trusty
       language: cpp
-      compiler: "osmesa-clang38-release"
-      env: BUILDTYPE=Release _CXX=clang++-3.8 _CC=clang-3.8 WITH_OSMESA=1
+      compiler: "egl-clang38-release"
+      env: BUILDTYPE=Release _CXX=clang++-3.8 _CC=clang-3.8 WITH_EGL=1
       addons: *clang38
+      before_script:
+        - mapbox_start_xvfb
 
     # Qt 4 - GCC 5 - Release
     - os: linux
