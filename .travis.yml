@@ -10,7 +10,6 @@ addons:
       - &common_packages [ 'libllvm3.8v4', 'cmake', 'cmake-data' ]
       - &clang38_packages [ 'clang-3.8', 'libstdc++-5-dev', 'libstdc++6' ]
       - &gcc5_packages [ 'gcc-5', 'g++-5' ]
-      - &egl_packages [ 'libgles2-mesa-dev', 'libgbm-dev' ]
       - &glfw_packages [ 'libxrandr-dev', 'libxcursor-dev', 'libxinerama-dev' ]
 
 addons_shortcuts:
@@ -20,7 +19,6 @@ addons_shortcuts:
       packages:
         - *common_packages
         - *clang38_packages
-        - *egl_packages
         - *glfw_packages
   addons_gcc5: &gcc5
     apt:
@@ -28,7 +26,6 @@ addons_shortcuts:
       packages:
         - *common_packages
         - *gcc5_packages
-        - *egl_packages
         - *glfw_packages
   addons_qt4: &qt4
     apt:
@@ -94,6 +91,7 @@ matrix:
       addons: *clang38
       before_script:
         - mapbox_start_xvfb
+        - mapbox_export_mesa_library_path
       script:
         - nvm install 4
         - nvm use 4
@@ -112,9 +110,12 @@ matrix:
       env: BUILDTYPE=Release _CXX=clang++-3.8 _CC=clang-3.8 WITH_EGL=1
       addons: *clang38
       before_script:
+        # fglrx causes the GLX extension to be unavailable
+        - sudo apt-get purge -qq fglrx
         - export PACKAGE_JSON_VERSION=$(node -e "console.log(require('./package.json').version)")
         - export PUBLISH=$([[ "${TRAVIS_TAG:-}" == "node-v${PACKAGE_JSON_VERSION}" ]] && echo true)
         - mapbox_start_xvfb
+        - mapbox_export_mesa_library_path
       script:
         - nvm install 4
         - nvm use 4
@@ -136,6 +137,7 @@ matrix:
       addons: *gcc5
       before_script:
         - mapbox_start_xvfb
+        - mapbox_export_mesa_library_path
       after_script:
         - ccache --show-stats
         - ./platform/linux/scripts/coveralls.sh
@@ -150,6 +152,7 @@ matrix:
       addons: *gcc5
       before_script:
         - mapbox_start_xvfb
+        - mapbox_export_mesa_library_path
 
     # EGL - Clang 3.8 - Debug
     - os: linux
@@ -161,6 +164,7 @@ matrix:
       addons: *clang38
       before_script:
         - mapbox_start_xvfb
+        - mapbox_export_mesa_library_path
 
     # EGL - Clang 3.8 - Release
     - os: linux
@@ -172,6 +176,7 @@ matrix:
       addons: *clang38
       before_script:
         - mapbox_start_xvfb
+        - mapbox_export_mesa_library_path
 
     # Qt 4 - GCC 5 - Release
     - os: linux
