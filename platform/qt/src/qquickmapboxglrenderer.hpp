@@ -29,6 +29,7 @@ signals:
 
 private:
     bool m_initialized = false;
+    qreal m_pixelRatio = 1;
 
     QScopedPointer<QMapboxGL> m_map;
 };

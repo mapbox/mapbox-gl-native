@@ -11,7 +11,7 @@
 namespace mbgl {
 
 std::string encodePNG(const PremultipliedImage& src) {
-    CGDataProviderRef provider = CGDataProviderCreateWithData(NULL, src.data.get(), src.size(), NULL);
+    CGDataProviderRef provider = CGDataProviderCreateWithData(NULL, src.data.get(), src.bytes(), NULL);
     if (!provider) {
         return "";
     }
@@ -22,9 +22,10 @@ std::string encodePNG(const PremultipliedImage& src) {
         return "";
     }
 
-    CGImageRef image = CGImageCreate(src.width, src.height, 8, 32, 4 * src.width, color_space,
-        kCGBitmapByteOrderDefault | kCGImageAlphaPremultipliedLast, provider, NULL, false,
-        kCGRenderingIntentDefault);
+    CGImageRef image =
+        CGImageCreate(src.size.width, src.size.height, 8, 32, 4 * src.size.width, color_space,
+                      kCGBitmapByteOrderDefault | kCGImageAlphaPremultipliedLast, provider, NULL,
+                      false, kCGRenderingIntentDefault);
     if (!image) {
         CGColorSpaceRelease(color_space);
         CGDataProviderRelease(provider);
@@ -92,11 +93,12 @@ PremultipliedImage decodeImage(const std::string &source_data) {
         throw std::runtime_error("CGColorSpaceCreateDeviceRGB failed");
     }
 
-    PremultipliedImage result{ static_cast<uint16_t>(CGImageGetWidth(image)),
-                               static_cast<uint16_t>(CGImageGetHeight(image)) };
+    PremultipliedImage result({ static_cast<uint32_t>(CGImageGetWidth(image)),
+                                static_cast<uint32_t>(CGImageGetHeight(image)) });
 
-    CGContextRef context = CGBitmapContextCreate(result.data.get(), result.width, result.height, 8, result.stride(),
-        color_space, kCGImageAlphaPremultipliedLast);
+    CGContextRef context =
+        CGBitmapContextCreate(result.data.get(), result.size.width, result.size.height, 8,
+                              result.stride(), color_space, kCGImageAlphaPremultipliedLast);
     if (!context) {
         CGColorSpaceRelease(color_space);
         CGImageRelease(image);
@@ -107,7 +109,9 @@ PremultipliedImage decodeImage(const std::string &source_data) {
 
     CGContextSetBlendMode(context, kCGBlendModeCopy);
 
-    CGRect rect = {{ 0, 0 }, { static_cast<CGFloat>(result.width), static_cast<CGFloat>(result.height) }};
+    CGRect rect = { { 0, 0 },
+                    { static_cast<CGFloat>(result.size.width),
+                      static_cast<CGFloat>(result.size.height) } };
     CGContextDrawImage(context, rect, image);
 
     CGContextRelease(context);

@@ -8,7 +8,7 @@
     size_t width = CGImageGetWidth(cgImage);
     size_t height = CGImageGetHeight(cgImage);
     CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
-    mbgl::PremultipliedImage cPremultipliedImage(width, height);
+    mbgl::PremultipliedImage cPremultipliedImage({ static_cast<uint32_t>(width), static_cast<uint32_t>(height) });
     size_t bytesPerPixel = 4;
     size_t bytesPerRow = bytesPerPixel * width;
     size_t bitsPerComponent = 8;

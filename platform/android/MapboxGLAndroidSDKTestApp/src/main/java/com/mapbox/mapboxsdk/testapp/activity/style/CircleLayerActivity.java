@@ -84,7 +84,6 @@ public class CircleLayerActivity extends AppCompatActivity {
                             mapboxMap.addLayer(circleLayer, "waterway-label");
                         } else {
                             // change size and color
-                            circleLayer = mapboxMap.getLayer("circleLayer");
                             circleLayer.setProperties(
                                     circleRadius(mapView.getTag() == null
                                         ? getResources().getDimension(R.dimen.activity_horizontal_margin)

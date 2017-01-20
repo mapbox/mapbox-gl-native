@@ -26,8 +26,8 @@ public class CustomLayerActivity extends AppCompatActivity {
 
     private MapboxMap mapboxMap;
     private MapView mapView;
+    private CustomLayer customLayer;
 
-    private boolean isShowingCustomLayer = false;
     private FloatingActionButton fab;
 
     @Override
@@ -43,7 +43,6 @@ public class CustomLayerActivity extends AppCompatActivity {
             @Override
             public void onMapReady(MapboxMap map) {
                 mapboxMap = map;
-
                 mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(39.91448, -243.60947), 10));
 
             }
@@ -62,30 +61,28 @@ public class CustomLayerActivity extends AppCompatActivity {
     }
 
     private void swapCustomLayer() {
-
-        if (isShowingCustomLayer) {
+        if (customLayer != null) {
             try {
-                mapboxMap.removeLayer("custom");
+                mapboxMap.removeLayer(customLayer.getId());
+                customLayer = null;
             } catch (NoSuchLayerException noSuchLayerException) {
                 Log.e(TAG, "No custom layer to remove");
             }
             fab.setImageResource(R.drawable.ic_layers_24dp);
         } else {
-            mapboxMap.addLayer(new CustomLayer("custom",
+            customLayer = new CustomLayer("custom",
                     ExampleCustomLayer.createContext(),
                     ExampleCustomLayer.InitializeFunction,
                     ExampleCustomLayer.RenderFunction,
-                    ExampleCustomLayer.DeinitializeFunction), "building");
+                    ExampleCustomLayer.DeinitializeFunction);
+            mapboxMap.addLayer(customLayer, "building");
             fab.setImageResource(R.drawable.ic_layers_clear_24dp);
         }
-
-        isShowingCustomLayer = !isShowingCustomLayer;
     }
 
     private void updateLayer() {
-        CustomLayer custom = mapboxMap.getLayerAs("custom");
-        if (custom != null) {
-            custom.update();
+        if (customLayer != null) {
+            customLayer.update();
         }
     }
 

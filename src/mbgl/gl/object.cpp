@@ -41,6 +41,11 @@ void FramebufferDeleter::operator()(FramebufferID id) const {
     context->abandonedFramebuffers.push_back(id);
 }
 
+void RenderbufferDeleter::operator()(RenderbufferID id) const {
+    assert(context);
+    context->abandonedRenderbuffers.push_back(id);
+}
+
 } // namespace detail
 } // namespace gl
 } // namespace mbgl

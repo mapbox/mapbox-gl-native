@@ -19,7 +19,7 @@ public final class Polygon extends MultiPoint {
     /**
      * Get the color of the fill region of the polygon.
      *
-     * @return the color of the fill
+     * @return The color of the fill.
      */
     public int getFillColor() {
         return fillColor;
@@ -28,7 +28,7 @@ public final class Polygon extends MultiPoint {
     /**
      * Get the color fo the stroke of the polygon.
      *
-     * @return the color of the stroke
+     * @return The color of the stroke.
      */
     public int getStrokeColor() {
         return strokeColor;
@@ -37,7 +37,7 @@ public final class Polygon extends MultiPoint {
     /**
      * Sets the color of the fill region of the polygon.
      *
-     * @param color - the color in ARGB format
+     * @param color The color in ARGB format.
      */
     public void setFillColor(int color) {
         fillColor = color;
@@ -47,7 +47,7 @@ public final class Polygon extends MultiPoint {
     /**
      * Sets the color of the stroke of the polygon.
      *
-     * @param color - the color in ARGB format
+     * @param color The color in ARGB format.
      */
     public void setStrokeColor(int color) {
         strokeColor = color;

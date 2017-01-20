@@ -7,7 +7,7 @@
 using namespace mbgl;
 
 TEST(Image, PNGRoundTrip) {
-    PremultipliedImage rgba { 1, 1 };
+    PremultipliedImage rgba({ 1, 1 });
     rgba.data[0] = 128;
     rgba.data[1] = 0;
     rgba.data[2] = 0;
@@ -21,7 +21,7 @@ TEST(Image, PNGRoundTrip) {
 }
 
 TEST(Image, PNGRoundTripAlpha) {
-    PremultipliedImage rgba { 1, 1 };
+    PremultipliedImage rgba({ 1, 1 });
     rgba.data[0] = 128;
     rgba.data[1] = 0;
     rgba.data[2] = 0;
@@ -68,26 +68,26 @@ TEST(Image, PNGReadProfileAlpha) {
 
 TEST(Image, PNGTile) {
     PremultipliedImage image = decodeImage(util::read_file("test/fixtures/image/tile.png"));
-    EXPECT_EQ(256u, image.width);
-    EXPECT_EQ(256u, image.height);
+    EXPECT_EQ(256u, image.size.width);
+    EXPECT_EQ(256u, image.size.height);
 }
 
 TEST(Image, JPEGTile) {
     PremultipliedImage image = decodeImage(util::read_file("test/fixtures/image/tile.jpeg"));
-    EXPECT_EQ(256u, image.width);
-    EXPECT_EQ(256u, image.height);
+    EXPECT_EQ(256u, image.size.width);
+    EXPECT_EQ(256u, image.size.height);
 }
 
 #if !defined(__ANDROID__) && !defined(__APPLE__) && !defined(QT_IMAGE_DECODERS)
 TEST(Image, WebPTile) {
     PremultipliedImage image = decodeImage(util::read_file("test/fixtures/image/tile.webp"));
-    EXPECT_EQ(256u, image.width);
-    EXPECT_EQ(256u, image.height);
+    EXPECT_EQ(256u, image.size.width);
+    EXPECT_EQ(256u, image.size.height);
 }
 #endif // !defined(__ANDROID__) && !defined(__APPLE__) && !defined(QT_IMAGE_DECODERS)
 
 TEST(Image, Premultiply) {
-    UnassociatedImage rgba { 1, 1 };
+    UnassociatedImage rgba({ 1, 1 });
     rgba.data[0] = 255;
     rgba.data[1] = 254;
     rgba.data[2] = 253;

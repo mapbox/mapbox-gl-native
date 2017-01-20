@@ -25,8 +25,8 @@ const static bool png_version_check __attribute__((unused)) = []() {
 namespace mbgl {
 
 std::string encodePNG(const PremultipliedImage& pre) {
-    PremultipliedImage copy { pre.width, pre.height };
-    std::copy(pre.data.get(), pre.data.get() + pre.size(), copy.data.get());
+    PremultipliedImage copy(pre.size);
+    std::copy(pre.data.get(), pre.data.get() + pre.bytes(), copy.data.get());
 
     UnassociatedImage src = util::unpremultiply(std::move(copy));
 
@@ -42,8 +42,8 @@ std::string encodePNG(const PremultipliedImage& pre) {
         throw std::runtime_error("couldn't create info_ptr");
     }
 
-    png_set_IHDR(png_ptr, info_ptr, src.width, src.height, 8, PNG_COLOR_TYPE_RGB_ALPHA, PNG_INTERLACE_NONE,
-                 PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
+    png_set_IHDR(png_ptr, info_ptr, src.size.width, src.size.height, 8, PNG_COLOR_TYPE_RGB_ALPHA,
+                 PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
 
     jmp_buf *jmp_context = (jmp_buf *)png_get_error_ptr(png_ptr);
     if (jmp_context) {
@@ -61,9 +61,9 @@ std::string encodePNG(const PremultipliedImage& pre) {
         ptrs(size_t count) : rows(new png_bytep[count]) {}
         ~ptrs() { delete[] rows; }
         png_bytep *rows = nullptr;
-    } pointers(src.height);
+    } pointers(src.size.height);
 
-    for (size_t i = 0; i < src.height; i++) {
+    for (size_t i = 0; i < src.size.height; i++) {
         pointers.rows[i] = src.data.get() + src.stride() * i;
     }
 

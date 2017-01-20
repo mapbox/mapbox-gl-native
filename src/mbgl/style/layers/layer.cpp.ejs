@@ -89,7 +89,7 @@ void <%- camelize(type) %>Layer::set<%- camelize(property.name) %>(PropertyValue
     if (value == get<%- camelize(property.name) %>())
         return;
     impl->layout.<%- camelizeWithLeadingLowercase(property.name) %>.set(value);
-    impl->observer->onLayerLayoutPropertyChanged(*this);
+    impl->observer->onLayerLayoutPropertyChanged(*this, "<%- property.name %>");
 }
 <% } -%>
 

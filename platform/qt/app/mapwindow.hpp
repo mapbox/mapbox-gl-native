@@ -24,6 +24,7 @@ protected slots:
 
 private:
     void changeStyle();
+    qreal pixelRatio();
 
     // QGLWidget implementation.
     void keyPressEvent(QKeyEvent *ev) final;
@@ -32,7 +33,6 @@ private:
     void wheelEvent(QWheelEvent *ev) final;
 
     void initializeGL() final;
-    void resizeGL(int w, int h) final;
     void paintGL() final;
 
     QPointF m_lastPos;

@@ -21,33 +21,47 @@ public abstract class MultiPoint extends Annotation {
     /**
      * Returns a copy of the points.
      *
-     * @return points - as a copy
+     * @return A {@link List} of points.
      */
     public List<LatLng> getPoints() {
         return new ArrayList<>(points);
     }
 
     /**
-     * Sets the points of this polyline. This method will take a copy
-     * of the points, so further mutations to points will have no effect
-     * on this polyline.
+     * Sets the points of this polyline. This method will take a copy of the points, so further
+     * mutations to points will have no effect on this polyline.
      *
-     * @param points the points of the polyline
+     * @param points A {@link List} of {@link LatLng} points making up the polyline.
      */
     public void setPoints(List<LatLng> points) {
         this.points = new ArrayList<>(points);
         update();
     }
 
+    /**
+     * Add a point to the polyline.
+     *
+     * @param point A {@link LatLng} point to be added.
+     */
     public void addPoint(LatLng point) {
         points.add(point);
         update();
     }
 
+    /**
+     * Value between 0 and 1 defining the polyline alpha.
+     *
+     * @return float value between 0 and 1.
+     */
     public float getAlpha() {
         return alpha;
     }
 
+    /**
+     * Set this {@link MultiPoint}s alpha.
+     *
+     * @param alpha float value between 0 and 1.
+     */
     public void setAlpha(float alpha) {
         this.alpha = alpha;
         update();

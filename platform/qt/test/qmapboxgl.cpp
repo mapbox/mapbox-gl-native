@@ -19,7 +19,7 @@ public:
         widget.makeCurrent();
         QMapbox::initializeGLExtensions();
 
-        map.resize(QSize(512, 512));
+        map.resize(QSize(512, 512), QSize(512, 512));
         map.setCoordinateZoom(QMapbox::Coordinate(60.170448, 24.942046), 14);
     }
 

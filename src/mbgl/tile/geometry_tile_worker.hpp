@@ -34,12 +34,14 @@ public:
     void setLayers(std::vector<std::unique_ptr<style::Layer>>, uint64_t correlationID);
     void setData(std::unique_ptr<const GeometryTileData>, uint64_t correlationID);
     void setPlacementConfig(PlacementConfig, uint64_t correlationID);
+    void symbolDependenciesChanged();
 
 private:
     void coalesce();
     void coalesced();
     void redoLayout();
     void attemptPlacement();
+    bool hasPendingSymbolDependencies() const;
 
     ActorRef<GeometryTileWorker> self;
     ActorRef<GeometryTile> parent;

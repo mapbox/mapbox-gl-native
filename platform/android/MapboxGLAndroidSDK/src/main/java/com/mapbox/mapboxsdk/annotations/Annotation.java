@@ -35,12 +35,15 @@ public abstract class Annotation implements Comparable<Annotation> {
      * This ID is unique for a MapView instance and is suitable for associating your own extra
      * data with.
      *
-     * @return the assigned id
+     * @return the assigned id.
      */
     public long getId() {
         return id;
     }
 
+    /**
+     * Do not use this method, used internally by the SDK.
+     */
     public void remove() {
         if (mapboxMap == null) {
             return;
@@ -49,7 +52,7 @@ public abstract class Annotation implements Comparable<Annotation> {
     }
 
     /**
-     * Do not use this method. Used internally by the SDK.
+     * Do not use this method, used internally by the SDK.
      *
      * @param id the assigned id
      */
@@ -58,7 +61,7 @@ public abstract class Annotation implements Comparable<Annotation> {
     }
 
     /**
-     * Do not use this method. Used internally by the SDK.
+     * Do not use this method, used internally by the SDK.
      *
      * @param mapboxMap the hosting mapbox map
      */
@@ -76,7 +79,7 @@ public abstract class Annotation implements Comparable<Annotation> {
     }
 
     /**
-     * Don not use this method.  Used internally by the SDK.
+     * Do not use this method, used internally by the SDK.
      *
      * @param mapView the hosting map view
      */
@@ -103,6 +106,14 @@ public abstract class Annotation implements Comparable<Annotation> {
         return 0;
     }
 
+    /**
+     * Compares this {@link PolylineOptions} object with another {@link PolylineOptions} and
+     * determines if their color, alpha, width, and vertices match.
+     *
+     * @param o Another {@link PolylineOptions} to compare with this object.
+     * @return True if color, alpha, width, and vertices match this {@link PolylineOptions} object.
+     * Else, false.
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -111,6 +122,14 @@ public abstract class Annotation implements Comparable<Annotation> {
         return id == that.getId();
     }
 
+    /**
+     * Gives an integer which can be used as the bucket number for storing elements of the set/map.
+     * This bucket number is the address of the element inside the set/map. There's no guarantee
+     * that this hash value will be consistent between different Java implementations, or even
+     * between different execution runs of the same program.
+     *
+     * @return integer value you can use for storing element.
+     */
     @Override
     public int hashCode() {
         return (int) (getId() ^ (getId() >>> 32));

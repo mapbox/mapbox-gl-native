@@ -26,7 +26,7 @@ auto imageFromAtlas(const SpriteAtlas& atlas) {
     auto data = std::make_unique<uint8_t[]>(bytes);
     const auto src = reinterpret_cast<const uint8_t*>(atlas.getData());
     std::copy(src, src + bytes, data.get());
-    return PremultipliedImage{ atlas.getTextureWidth(), atlas.getTextureHeight(), std::move(data) };
+    return PremultipliedImage{ { atlas.getTextureWidth(), atlas.getTextureHeight() }, std::move(data) };
 }
 
 } // namespace
@@ -56,8 +56,8 @@ TEST(SpriteAtlas, Basic) {
     EXPECT_EQ(20, metro.pos.h);
     EXPECT_EQ(18, metro.spriteImage->getWidth());
     EXPECT_EQ(18, metro.spriteImage->getHeight());
-    EXPECT_EQ(18u, metro.spriteImage->image.width);
-    EXPECT_EQ(18u, metro.spriteImage->image.height);
+    EXPECT_EQ(18u, metro.spriteImage->image.size.width);
+    EXPECT_EQ(18u, metro.spriteImage->image.size.height);
     EXPECT_EQ(1.0f, metro.spriteImage->pixelRatio);
 
     EXPECT_TRUE(atlas.getData());
@@ -110,8 +110,8 @@ TEST(SpriteAtlas, Size) {
     EXPECT_EQ(16, metro.pos.h);
     EXPECT_EQ(18, metro.spriteImage->getWidth());
     EXPECT_EQ(18, metro.spriteImage->getHeight());
-    EXPECT_EQ(18u, metro.spriteImage->image.width);
-    EXPECT_EQ(18u, metro.spriteImage->image.height);
+    EXPECT_EQ(18u, metro.spriteImage->image.size.width);
+    EXPECT_EQ(18u, metro.spriteImage->image.size.height);
     EXPECT_EQ(1.0f, metro.spriteImage->pixelRatio);
 
     EXPECT_EQ(readImage("test/fixtures/annotations/result-spriteatlassize.png"),
@@ -127,7 +127,7 @@ TEST(SpriteAtlas, Updates) {
     EXPECT_EQ(32, atlas.getTextureWidth());
     EXPECT_EQ(32, atlas.getTextureHeight());
 
-    atlas.setSprite("one", std::make_shared<SpriteImage>(PremultipliedImage(16, 12), 1));
+    atlas.setSprite("one", std::make_shared<SpriteImage>(PremultipliedImage({ 16, 12 }), 1));
     auto one = *atlas.getImage("one", SpritePatternMode::Single);
     EXPECT_EQ(0, one.pos.x);
     EXPECT_EQ(0, one.pos.y);
@@ -135,16 +135,16 @@ TEST(SpriteAtlas, Updates) {
     EXPECT_EQ(16, one.pos.h);
     EXPECT_EQ(16, one.spriteImage->getWidth());
     EXPECT_EQ(12, one.spriteImage->getHeight());
-    EXPECT_EQ(16u, one.spriteImage->image.width);
-    EXPECT_EQ(12u, one.spriteImage->image.height);
+    EXPECT_EQ(16u, one.spriteImage->image.size.width);
+    EXPECT_EQ(12u, one.spriteImage->image.size.height);
     EXPECT_EQ(1.0f, one.spriteImage->pixelRatio);
 
     EXPECT_EQ(readImage("test/fixtures/annotations/result-spriteatlas-empty.png"),
               imageFromAtlas(atlas));
 
     // Update sprite
-    PremultipliedImage image2(16, 12);
-    for (size_t i = 0; i < image2.size(); i++) {
+    PremultipliedImage image2({ 16, 12 });
+    for (size_t i = 0; i < image2.bytes(); i++) {
         image2.data.get()[i] = 255;
     }
     auto newSprite = std::make_shared<SpriteImage>(std::move(image2), 1);
@@ -165,9 +165,9 @@ TEST(SpriteAtlas, Updates) {
 TEST(SpriteAtlas, AddRemove) {
     FixtureLog log;
 
-    const auto sprite1 = std::make_shared<SpriteImage>(PremultipliedImage(16, 16), 2);
-    const auto sprite2 = std::make_shared<SpriteImage>(PremultipliedImage(16, 16), 2);
-    const auto sprite3 = std::make_shared<SpriteImage>(PremultipliedImage(16, 16), 2);
+    const auto sprite1 = std::make_shared<SpriteImage>(PremultipliedImage({ 16, 16 }), 2);
+    const auto sprite2 = std::make_shared<SpriteImage>(PremultipliedImage({ 16, 16 }), 2);
+    const auto sprite3 = std::make_shared<SpriteImage>(PremultipliedImage({ 16, 16 }), 2);
 
     SpriteAtlas atlas(32, 32, 1);
 
@@ -210,7 +210,7 @@ TEST(SpriteAtlas, AddRemove) {
 TEST(SpriteAtlas, OtherPixelRatio) {
     FixtureLog log;
 
-    const auto sprite1 = std::make_shared<SpriteImage>(PremultipliedImage(8, 8), 1);
+    const auto sprite1 = std::make_shared<SpriteImage>(PremultipliedImage({ 8, 8 }), 1);
 
     SpriteAtlas atlas(32, 32, 1);
 
@@ -219,8 +219,8 @@ TEST(SpriteAtlas, OtherPixelRatio) {
 }
 
 TEST(SpriteAtlas, Multiple) {
-    const auto sprite1 = std::make_shared<SpriteImage>(PremultipliedImage(16, 16), 2);
-    const auto sprite2 = std::make_shared<SpriteImage>(PremultipliedImage(16, 16), 2);
+    const auto sprite1 = std::make_shared<SpriteImage>(PremultipliedImage({ 16, 16 }), 2);
+    const auto sprite2 = std::make_shared<SpriteImage>(PremultipliedImage({ 16, 16 }), 2);
 
     SpriteAtlas atlas(32, 32, 1);
 
@@ -232,8 +232,8 @@ TEST(SpriteAtlas, Multiple) {
 TEST(SpriteAtlas, Replace) {
     FixtureLog log;
 
-    const auto sprite1 = std::make_shared<SpriteImage>(PremultipliedImage(16, 16), 2);
-    const auto sprite2 = std::make_shared<SpriteImage>(PremultipliedImage(16, 16), 2);
+    const auto sprite1 = std::make_shared<SpriteImage>(PremultipliedImage({ 16, 16 }), 2);
+    const auto sprite2 = std::make_shared<SpriteImage>(PremultipliedImage({ 16, 16 }), 2);
 
     SpriteAtlas atlas(32, 32, 1);
 
@@ -246,10 +246,10 @@ TEST(SpriteAtlas, Replace) {
 TEST(SpriteAtlas, ReplaceWithDifferentDimensions) {
     FixtureLog log;
 
-    PremultipliedImage image(16, 16);
-    PremultipliedImage image2(18, 18);
-    const auto sprite1 = std::make_shared<SpriteImage>(PremultipliedImage(16, 16), 2);
-    const auto sprite2 = std::make_shared<SpriteImage>(PremultipliedImage(18, 18), 2);
+    PremultipliedImage image({ 16, 16 });
+    PremultipliedImage image2({ 18, 18 });
+    const auto sprite1 = std::make_shared<SpriteImage>(PremultipliedImage({ 16, 16 }), 2);
+    const auto sprite2 = std::make_shared<SpriteImage>(PremultipliedImage({ 18, 18 }), 2);
 
     SpriteAtlas atlas(32, 32, 1);
 

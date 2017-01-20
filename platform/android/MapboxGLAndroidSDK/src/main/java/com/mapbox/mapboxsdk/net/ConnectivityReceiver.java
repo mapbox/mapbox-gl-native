@@ -23,7 +23,10 @@ public class ConnectivityReceiver extends BroadcastReceiver {
     private static ConnectivityReceiver INSTANCE;
 
     /**
-     * Get or create the singleton instance
+     * Get or create the singleton instance.
+     *
+     * @param context the Context in which the receiver is running.
+     * @return instance.
      */
     public static synchronized ConnectivityReceiver instance(Context context) {
         if (INSTANCE == null) {
@@ -44,7 +47,10 @@ public class ConnectivityReceiver extends BroadcastReceiver {
     }
 
     /**
-     * @see BroadcastReceiver#onReceive(Context, Intent)
+     * Prints whether the Connectivity receiver is connect of not.
+     *
+     * @param context the Context in which the receiver is running.
+     * @param intent  the Intent being received.
      */
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -78,7 +84,7 @@ public class ConnectivityReceiver extends BroadcastReceiver {
     /**
      * Get current connectivity state
      *
-     * @param context current Context
+     * @param context the Context in which the receiver is running.
      * @return true if connected
      */
     public boolean isConnected(Context context) {

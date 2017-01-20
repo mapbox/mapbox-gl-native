@@ -9,10 +9,15 @@
 #include <QMouseEvent>
 #include <QString>
 
+#if QT_VERSION >= 0x050000
+#include <QWindow>
+#endif
+
 int kAnimationDuration = 10000;
 
+
 MapWindow::MapWindow(const QMapboxGLSettings &settings)
-    : m_map(nullptr, settings)
+    : m_map(nullptr, settings, size(), pixelRatio())
     , m_bearingAnimation(&m_map, "bearing")
     , m_zoomAnimation(&m_map, "zoom")
 {
@@ -45,6 +50,17 @@ void MapWindow::selfTest()
     m_zoomAnimation.setEndValue(m_map.zoom() + 3);
     m_zoomAnimation.start();
 }
+
+qreal MapWindow::pixelRatio() {
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 6, 0))
+    return devicePixelRatioF();
+#elif (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    return devicePixelRatio();
+#else
+    return 1;
+#endif
+}
+
 
 void MapWindow::animationFinished()
 {
@@ -288,15 +304,11 @@ void MapWindow::initializeGL()
     QMapbox::initializeGLExtensions();
 }
 
-void MapWindow::resizeGL(int w, int h)
-{
-    QSize size(w, h);
-    m_map.resize(size);
-}
-
 void MapWindow::paintGL()
 {
     m_frameDraws++;
+
+    m_map.resize(size(), size() * pixelRatio());
 
 #if QT_VERSION < 0x050400 && defined(__APPLE__)
     // XXX GL framebuffer is valid only after first attempt of painting on

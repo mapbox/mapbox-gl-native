@@ -103,7 +103,7 @@ global.propertyNativeType = function (property) {
   if (/-translate-anchor$/.test(property.name)) {
     return 'TranslateAnchorType';
   }
-  if (/-(rotation|pitch)-alignment$/.test(property.name)) {
+  if (/-(rotation|pitch|illumination)-alignment$/.test(property.name)) {
     return 'AlignmentType';
   }
   switch (property.type) {

@@ -13,30 +13,31 @@
 namespace mbgl {
 
 SpriteImagePtr createSpriteImage(const PremultipliedImage& image,
-                                 const uint16_t srcX,
-                                 const uint16_t srcY,
-                                 const uint16_t width,
-                                 const uint16_t height,
+                                 const uint32_t srcX,
+                                 const uint32_t srcY,
+                                 const uint32_t width,
+                                 const uint32_t height,
                                  const double ratio,
                                  const bool sdf) {
     // Disallow invalid parameter configurations.
     if (width <= 0 || height <= 0 || width > 1024 || height > 1024 ||
         ratio <= 0 || ratio > 10 ||
-        srcX + width > image.width || srcY + height > image.height) {
+        srcX >= image.size.width || srcY >= image.size.height ||
+        srcX + width > image.size.width || srcY + height > image.size.height) {
         Log::Error(Event::Sprite, "Can't create sprite with invalid metrics");
         return nullptr;
     }
 
-    PremultipliedImage dstImage(width, height);
+    PremultipliedImage dstImage({ width, height });
 
     auto srcData = reinterpret_cast<const uint32_t*>(image.data.get());
     auto dstData = reinterpret_cast<uint32_t*>(dstImage.data.get());
 
     // Copy from the source image into our individual sprite image
-    for (uint16_t y = 0; y < height; ++y) {
+    for (uint32_t y = 0; y < height; ++y) {
         const auto dstRow = y * width;
-        const auto srcRow = (y + srcY) * image.width + srcX;
-        for (uint16_t x = 0; x < width; ++x) {
+        const auto srcRow = (y + srcY) * image.size.width + srcX;
+        for (uint32_t x = 0; x < width; ++x) {
             dstData[dstRow + x] = srcData[srcRow + x];
         }
     }

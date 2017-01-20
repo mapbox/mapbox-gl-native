@@ -12,7 +12,7 @@ public:
     virtual void onLayerFilterChanged(Layer&) {}
     virtual void onLayerVisibilityChanged(Layer&) {}
     virtual void onLayerPaintPropertyChanged(Layer&) {}
-    virtual void onLayerLayoutPropertyChanged(Layer&) {}
+    virtual void onLayerLayoutPropertyChanged(Layer&, const char *) {}
 };
 
 } // namespace style

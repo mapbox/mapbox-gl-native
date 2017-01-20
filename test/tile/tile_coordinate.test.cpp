@@ -26,8 +26,7 @@ TEST(TileCoordinate, FromLatLng) {
     Transform transform(onMapChange);
 
     const double max = util::tileSize;
-    const std::array<uint16_t, 2> size { { uint16_t(max), uint16_t(max) } };
-    transform.resize(size);
+    transform.resize({ static_cast<uint32_t>(max), static_cast<uint32_t>(max) });
 
     // Center, top-left, bottom-left, bottom-right, top-right edges.
     std::vector<std::pair<LatLng, ScreenCoordinate>> edges {

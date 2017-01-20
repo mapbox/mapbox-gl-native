@@ -1,11 +1,12 @@
 #include <mbgl/platform/default/headless_display.hpp>
 
-#include <cstring>
-#include <stdexcept>
-
 #if MBGL_USE_GLX
 #include <GL/glx.h>
 #endif
+
+#include <cstring>
+#include <stdexcept>
+#include <string>
 
 namespace mbgl {
 

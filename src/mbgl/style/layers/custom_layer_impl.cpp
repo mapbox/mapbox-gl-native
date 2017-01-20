@@ -23,11 +23,7 @@ CustomLayer::Impl::Impl(const CustomLayer::Impl& other)
     // Don't copy anything else.
 }
 
-CustomLayer::Impl::~Impl() {
-    if (deinitializeFn) {
-        deinitializeFn(context);
-    }
-}
+CustomLayer::Impl::~Impl() = default;
 
 std::unique_ptr<Layer> CustomLayer::Impl::clone() const {
     return std::make_unique<CustomLayer>(*this);
@@ -43,13 +39,19 @@ void CustomLayer::Impl::initialize() {
     initializeFn(context);
 }
 
+void CustomLayer::Impl::deinitialize() {
+    if (deinitializeFn) {
+        deinitializeFn(context);
+    }
+}
+
 void CustomLayer::Impl::render(const TransformState& state) const {
     assert(renderFn);
 
     CustomLayerRenderParameters parameters;
 
-    parameters.width = state.getWidth();
-    parameters.height = state.getHeight();
+    parameters.width = state.getSize().width;
+    parameters.height = state.getSize().height;
     parameters.latitude = state.getLatLng().latitude;
     parameters.longitude = state.getLatLng().longitude;
     parameters.zoom = state.getZoom();

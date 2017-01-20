@@ -26,7 +26,7 @@ namespace android {
     void CustomLayer::update(jni::JNIEnv&) {
         Log::Debug(mbgl::Event::JNI, "Updating map");
         if (map) {
-            map->update(mbgl::Update::Repaint);
+            map->triggerRepaint();
         } else {
             Log::Error(mbgl::Event::JNI, "No map reference, cannot update");
         }

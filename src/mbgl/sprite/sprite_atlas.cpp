@@ -128,7 +128,7 @@ void SpriteAtlas::_setSprite(const std::string& name,
         auto it = sprites.find(name);
         if (it != sprites.end()) {
             // There is already a sprite with that name in our store.
-            if ((it->second->image.width != sprite->image.width || it->second->image.height != sprite->image.height)) {
+            if (it->second->image.size != sprite->image.size) {
                 Log::Warning(Event::Sprite, "Can't change sprite dimensions for '%s'", name.c_str());
                 return;
             }
@@ -164,8 +164,8 @@ std::shared_ptr<const SpriteImage> SpriteAtlas::getSprite(const std::string& nam
 
 Rect<SpriteAtlas::dimension> SpriteAtlas::allocateImage(const SpriteImage& spriteImage) {
 
-    const uint16_t pixel_width = std::ceil(spriteImage.image.width / pixelRatio);
-    const uint16_t pixel_height = std::ceil(spriteImage.image.height / pixelRatio);
+    const uint16_t pixel_width = std::ceil(spriteImage.image.size.width / pixelRatio);
+    const uint16_t pixel_height = std::ceil(spriteImage.image.size.height / pixelRatio);
 
     // Increase to next number divisible by 4, but at least 1.
     // This is so we can scale down the texture coordinates and pack them
@@ -275,9 +275,10 @@ void SpriteAtlas::copy(const Holder& holder, const SpritePatternMode mode) {
 
     const int padding = 1;
 
-    copyBitmap(srcData, uint32_t(holder.spriteImage->image.width), 0, 0,
-            dstData, pixelWidth, (holder.pos.x + padding) * pixelRatio, (holder.pos.y + padding) * pixelRatio, pixelWidth * pixelHeight,
-            uint32_t(holder.spriteImage->image.width), uint32_t(holder.spriteImage->image.height), mode);
+    copyBitmap(srcData, holder.spriteImage->image.size.width, 0, 0, dstData, pixelWidth,
+               (holder.pos.x + padding) * pixelRatio, (holder.pos.y + padding) * pixelRatio,
+               pixelWidth * pixelHeight, holder.spriteImage->image.size.width,
+               holder.spriteImage->image.size.height, mode);
 
     dirtyFlag = true;
 }

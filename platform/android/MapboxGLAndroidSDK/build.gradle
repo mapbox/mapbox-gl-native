@@ -26,7 +26,12 @@ dependencies {
     compile "com.android.support:support-v4:${supportLibVersion}"
     compile "com.android.support:design:${supportLibVersion}"
     compile 'com.squareup.okhttp3:okhttp:3.5.0'
-    compile 'com.mapzen.android:lost:1.1.1'
+
+    // Exclude Guava to avoid an unnecessary transitive dependency
+    // See: https://github.com/mapbox/mapbox-gl-native/issues/7129
+    compile ('com.mapzen.android:lost:1.1.1') {
+        exclude group: 'com.google.guava'
+    }
 
     // Mapbox Android Services
     compile('com.mapbox.mapboxsdk:mapbox-java-services:1.3.1@jar') {

@@ -78,13 +78,13 @@ public class GeocoderActivity extends AppCompatActivity implements OnMapReadyCal
     public void onMapReady(MapboxMap map) {
         mapboxMap = map;
         final Projection projection = mapboxMap.getProjection();
-        final int width = mapView.getMeasuredWidth();
-        final int height = mapView.getMeasuredHeight();
 
         // Click listener
         mapboxMap.setOnMapClickListener(new MapboxMap.OnMapClickListener() {
             @Override
             public void onMapClick(@NonNull LatLng point) {
+                int width = mapView.getMeasuredWidth();
+                int height = mapView.getMeasuredHeight();
                 PointF centerPoint = new PointF(width / 2, (height + dropPinView.getHeight()) / 2);
                 LatLng centerLatLng = new LatLng(projection.fromScreenLocation(centerPoint));
 

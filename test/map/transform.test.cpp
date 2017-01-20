@@ -107,7 +107,7 @@ TEST(Transform, PerspectiveProjection) {
     LatLng loc;
 
     Transform transform;
-    transform.resize({{ 1000, 1000 }});
+    transform.resize({ 1000, 1000 });
     transform.setScale(2 << 9);
     transform.setPitch(0.9);
     transform.setLatLng(LatLng(38, -77));
@@ -137,7 +137,7 @@ TEST(Transform, PerspectiveProjection) {
 
 TEST(Transform, UnwrappedLatLng) {
     Transform transform;
-    transform.resize({{ 1000, 1000 }});
+    transform.resize({ 1000, 1000 });
     transform.setScale(2 << 9);
     transform.setPitch(0.9);
     transform.setLatLng(LatLng(38, -77));
@@ -169,7 +169,7 @@ TEST(Transform, ConstrainHeightOnly) {
     LatLng loc;
 
     Transform transform;
-    transform.resize({{ 1000, 1000 }});
+    transform.resize({ 1000, 1000 });
     transform.setScale(std::pow(2, util::MAX_ZOOM));
 
     transform.setLatLng(LatLngBounds::world().southwest());
@@ -187,7 +187,7 @@ TEST(Transform, ConstrainWidthAndHeight) {
     LatLng loc;
 
     Transform transform(nullptr, ConstrainMode::WidthAndHeight);
-    transform.resize({{ 1000, 1000 }});
+    transform.resize({ 1000, 1000 });
     transform.setScale(std::pow(2, util::MAX_ZOOM));
 
     transform.setLatLng(LatLngBounds::world().southwest());
@@ -203,7 +203,7 @@ TEST(Transform, ConstrainWidthAndHeight) {
 
 TEST(Transform, Anchor) {
     Transform transform;
-    transform.resize({{ 1000, 1000 }});
+    transform.resize({ 1000, 1000 });
 
     const LatLng latLng { 10, -100 };
     transform.setLatLngZoom(latLng, 10);
@@ -303,7 +303,7 @@ TEST(Transform, Anchor) {
 
 TEST(Transform, Padding) {
     Transform transform;
-    transform.resize({{ 1000, 1000 }});
+    transform.resize({ 1000, 1000 });
 
     ASSERT_DOUBLE_EQ(0, transform.getLatLng().latitude);
     ASSERT_DOUBLE_EQ(0, transform.getLatLng().longitude);
@@ -340,7 +340,7 @@ TEST(Transform, Padding) {
 
 TEST(Transform, MoveBy) {
     Transform transform;
-    transform.resize({{ 1000, 1000 }});
+    transform.resize({ 1000, 1000 });
     transform.setLatLngZoom({ 0, 0 }, 10);
 
     LatLng trueCenter = transform.getLatLng();
@@ -367,7 +367,7 @@ TEST(Transform, MoveBy) {
 
 TEST(Transform, Antimeridian) {
     Transform transform;
-    transform.resize({{ 1000, 1000 }});
+    transform.resize({ 1000, 1000 });
     transform.setLatLngZoom({ 0, 0 }, 1);
 
     const LatLng coordinateSanFrancisco { 37.7833, -122.4167 };
@@ -410,7 +410,7 @@ TEST(Transform, Antimeridian) {
 
 TEST(Transform, Camera) {
     Transform transform;
-    transform.resize({{ 1000, 1000 }});
+    transform.resize({ 1000, 1000 });
 
     const LatLng latLng1 { 45, 135 };
     CameraOptions cameraOptions1;
@@ -481,8 +481,8 @@ TEST(Transform, DefaultTransform) {
 
     LatLng nullIsland, latLng = {};
     ScreenCoordinate center, point = {};
-    const uint16_t min = std::numeric_limits<uint16_t>::min();
-    const uint16_t max = std::numeric_limits<uint16_t>::max();
+    const uint32_t min = 0;
+    const uint32_t max = 65535;
 
     auto testConversions = [&](const LatLng& coord, const ScreenCoordinate& screenCoord) {
         latLng = state.screenCoordinateToLatLng(center);
@@ -496,21 +496,21 @@ TEST(Transform, DefaultTransform) {
     testConversions(nullIsland, center);
 
     // Cannot assign the current size.
-    ASSERT_FALSE(transform.resize({{}}));
+    ASSERT_FALSE(transform.resize({}));
 
-    ASSERT_TRUE(transform.resize({{ min, max }}));
+    ASSERT_TRUE(transform.resize({ min, max }));
     testConversions(nullIsland, center);
 
-    ASSERT_TRUE(transform.resize({{ max, min }}));
+    ASSERT_TRUE(transform.resize({ max, min }));
     testConversions(nullIsland, center);
 
-    ASSERT_TRUE(transform.resize({{ min, min }}));
+    ASSERT_TRUE(transform.resize({ min, min }));
     testConversions(nullIsland, center);
 
     center = { max / 2., max / 2. };
 
-    // -1 evaluates to UINT_MAX.
-    ASSERT_TRUE(transform.resize({{ static_cast<uint16_t>(-1), static_cast<uint16_t>(-1) }}));
-    ASSERT_FALSE(transform.resize({{ max, max }}));
+    // Double resize
+    ASSERT_TRUE(transform.resize({ max, max }));
+    ASSERT_FALSE(transform.resize({ max, max }));
     testConversions(nullIsland, center);
 }

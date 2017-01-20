@@ -71,7 +71,7 @@ void LineLayer::setLineCap(PropertyValue<LineCapType> value) {
     if (value == getLineCap())
         return;
     impl->layout.lineCap.set(value);
-    impl->observer->onLayerLayoutPropertyChanged(*this);
+    impl->observer->onLayerLayoutPropertyChanged(*this, "line-cap");
 }
 PropertyValue<LineJoinType> LineLayer::getDefaultLineJoin() {
     return { LineJoinType::Miter };
@@ -85,7 +85,7 @@ void LineLayer::setLineJoin(PropertyValue<LineJoinType> value) {
     if (value == getLineJoin())
         return;
     impl->layout.lineJoin.set(value);
-    impl->observer->onLayerLayoutPropertyChanged(*this);
+    impl->observer->onLayerLayoutPropertyChanged(*this, "line-join");
 }
 PropertyValue<float> LineLayer::getDefaultLineMiterLimit() {
     return { 2 };
@@ -99,7 +99,7 @@ void LineLayer::setLineMiterLimit(PropertyValue<float> value) {
     if (value == getLineMiterLimit())
         return;
     impl->layout.lineMiterLimit.set(value);
-    impl->observer->onLayerLayoutPropertyChanged(*this);
+    impl->observer->onLayerLayoutPropertyChanged(*this, "line-miter-limit");
 }
 PropertyValue<float> LineLayer::getDefaultLineRoundLimit() {
     return { 1 };
@@ -113,7 +113,7 @@ void LineLayer::setLineRoundLimit(PropertyValue<float> value) {
     if (value == getLineRoundLimit())
         return;
     impl->layout.lineRoundLimit.set(value);
-    impl->observer->onLayerLayoutPropertyChanged(*this);
+    impl->observer->onLayerLayoutPropertyChanged(*this, "line-round-limit");
 }
 
 // Paint properties

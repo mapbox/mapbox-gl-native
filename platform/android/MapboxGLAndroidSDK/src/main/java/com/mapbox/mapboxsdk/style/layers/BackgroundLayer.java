@@ -55,7 +55,6 @@ public class BackgroundLayer extends Layer {
      */
     @SuppressWarnings("unchecked")
     public PropertyValue<String> getBackgroundColor() {
-        checkValidity();
         return (PropertyValue<String>) new PropertyValue(nativeGetBackgroundColor());
     }
      /**
@@ -66,7 +65,6 @@ public class BackgroundLayer extends Layer {
      */
     @ColorInt
     public int getBackgroundColorAsInt() {
-        checkValidity();
         PropertyValue<String> value = getBackgroundColor();
         if (value.isValue()) {
             return rgbaToColor(value.getValue());
@@ -83,7 +81,6 @@ public class BackgroundLayer extends Layer {
      */
     @SuppressWarnings("unchecked")
     public PropertyValue<String> getBackgroundPattern() {
-        checkValidity();
         return (PropertyValue<String>) new PropertyValue(nativeGetBackgroundPattern());
     }
  
@@ -94,7 +91,6 @@ public class BackgroundLayer extends Layer {
      */
     @SuppressWarnings("unchecked")
     public PropertyValue<Float> getBackgroundOpacity() {
-        checkValidity();
         return (PropertyValue<Float>) new PropertyValue(nativeGetBackgroundOpacity());
     }
  
