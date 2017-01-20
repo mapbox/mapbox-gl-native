@@ -12,12 +12,11 @@ public:
 };
 
 std::u16string applyArabicShaping(const std::u16string& input) {
-    QString utf16string = QString::fromStdU16String(input);
-    return utf16string.toStdU16String();
+    return input;
 }
 
 void BiDi::mergeParagraphLineBreaks(std::set<std::size_t>& lineBreakPoints) {
-    lineBreakPoints.insert(static_cast<std::size_t>(bidi.impl->string.length()));
+    lineBreakPoints.insert(static_cast<std::size_t>(impl->string.length()));
 }
 
 std::vector<std::u16string>
@@ -27,7 +26,7 @@ BiDi::applyLineBreaking(std::set<std::size_t> lineBreakPoints) {
     std::vector<std::u16string> transformedLines;
     std::size_t start = 0;
     for (std::size_t lineBreakPoint : lineBreakPoints) {
-        transformedLines.push_back(bidi.getLine(start, lineBreakPoint));
+        transformedLines.push_back(getLine(start, lineBreakPoint));
         start = lineBreakPoint;
     }
 
@@ -41,12 +40,13 @@ BiDi::BiDi() : impl(std::make_unique<BiDiImpl>())
 BiDi::~BiDi() = default;
 
 std::vector<std::u16string> BiDi::processText(const std::u16string& input, std::set<std::size_t> lineBreakPoints) {
-    impl->string = QString::fromStdU16String(input);
+    impl->string = QString::fromUtf16(reinterpret_cast<const ushort*>(input.data()), int(input.size()));
     return applyLineBreaking(lineBreakPoints);
 }
 
 std::u16string BiDi::getLine(std::size_t start, std::size_t end) {
-    return impl->string.mid(static_cast<int32_t>(start), static_cast<int32_t>(end - start)).toStdU16String();
+    auto utf16 = impl->string.mid(static_cast<int32_t>(start), static_cast<int32_t>(end - start));
+    return std::u16string(reinterpret_cast<const char16_t*>(utf16.utf16()), utf16.length());
 }
 
 } // end namespace mbgl
