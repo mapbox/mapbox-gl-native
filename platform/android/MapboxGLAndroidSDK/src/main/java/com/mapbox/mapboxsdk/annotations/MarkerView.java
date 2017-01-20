@@ -342,6 +342,7 @@ public class MarkerView extends Marker {
   public void setPosition(LatLng position) {
     super.setPosition(position);
     if (markerViewManager != null) {
+      markerViewManager.setWaitingForRenderInvoke(true);
       markerViewManager.update();
     }
   }
