@@ -10,6 +10,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.ColorInt;
+import android.support.annotation.FloatRange;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -34,10 +35,13 @@ import java.util.Arrays;
  */
 public class MapboxMapOptions implements Parcelable {
 
-  private static final float DIMENSION_SEVEN_DP = 7f;
-  private static final float DIMENSION_TEN_DP = 10f;
-  private static final float DIMENSION_SIXTEEN_DP = 16f;
-  private static final float DIMENSION_SEVENTY_SIX_DP = 76f;
+    // to avoid reliance on knowledge of ordinals, map values from xml here.
+    private static UiSettings.ScaleUnit[] scaleUnits = {UiSettings.ScaleUnit.KM, UiSettings.ScaleUnit.MILE, UiSettings.ScaleUnit.NM};
+
+    private static final float DIMENSION_SEVEN_DP = 7f;
+    private static final float DIMENSION_TEN_DP = 10f;
+    private static final float DIMENSION_SIXTEEN_DP = 16f;
+    private static final float DIMENSION_SEVENTY_SIX_DP = 76f;
 
   private CameraPosition cameraPosition;
 
@@ -48,9 +52,16 @@ public class MapboxMapOptions implements Parcelable {
   private int compassGravity = Gravity.TOP | Gravity.END;
   private int[] compassMargins;
 
-  private boolean logoEnabled = true;
-  private int logoGravity = Gravity.BOTTOM | Gravity.START;
-  private int[] logoMargins;
+    private boolean scaleEnabled = true;
+    private float scaleWidth = 0.34f;
+    private int scaleGravity = Gravity.BOTTOM | Gravity.RIGHT;
+    private int[] scaleMargins;
+    private UiSettings.ScaleUnit scaleUnit = UiSettings.ScaleUnit.KM;
+    private int scaleColor = 0;
+
+    private boolean logoEnabled = true;
+    private int logoGravity = Gravity.BOTTOM | Gravity.START;
+    private int[] logoMargins;
 
   @ColorInt
   private int attributionTintColor = -1;
@@ -204,6 +215,15 @@ public class MapboxMapOptions implements Parcelable {
           DIMENSION_TEN_DP * pxlRatio))});
       mapboxMapOptions.compassFadesWhenFacingNorth(typedArray.getBoolean(
         R.styleable.mapbox_MapView_mapbox_uiCompassFadeFacingNorth, true));
+mapboxMapOptions.scaleEnabled(typedArray.getBoolean(R.styleable.mapbox_MapView_mapbox_uiScaleEnabled, true));
+            mapboxMapOptions.scaleColor(typedArray.getInt(R.styleable.mapbox_MapView_mapbox_uiScaleColor, MapboxConstants.SCALE_COLOR_BLACK));
+            mapboxMapOptions.scaleWidth(typedArray.getFloat(R.styleable.mapbox_MapView_mapbox_uiScaleWidth, 0.34f));
+            mapboxMapOptions.scaleUnit(scaleUnits[typedArray.getInt(R.styleable.mapbox_MapView_mapbox_uiScaleUnit, 0)]);
+            mapboxMapOptions.scaleGravity(typedArray.getInt(R.styleable.mapbox_MapView_mapbox_uiScaleGravity, Gravity.BOTTOM | Gravity.RIGHT));
+            mapboxMapOptions.scaleMargins(new int[]{(int) (typedArray.getDimension(R.styleable.mapbox_MapView_mapbox_uiScaleMarginLeft, DIMENSION_SEVEN_DP) * pxlRatio)
+                    , ((int) typedArray.getDimension(R.styleable.mapbox_MapView_mapbox_uiScaleMarginTop, DIMENSION_SEVEN_DP * pxlRatio))
+                    , ((int) typedArray.getDimension(R.styleable.mapbox_MapView_mapbox_uiScaleMarginRight, DIMENSION_SEVEN_DP * pxlRatio))
+                    , ((int) typedArray.getDimension(R.styleable.mapbox_MapView_mapbox_uiScaleMarginBottom, DIMENSION_SEVEN_DP * pxlRatio))});
 
       mapboxMapOptions.logoEnabled(typedArray.getBoolean(R.styleable.mapbox_MapView_mapbox_uiLogo, true));
       mapboxMapOptions.logoGravity(typedArray.getInt(R.styleable.mapbox_MapView_mapbox_uiLogoGravity,
@@ -1030,6 +1050,12 @@ public class MapboxMapOptions implements Parcelable {
     if (compassGravity != options.compassGravity) {
       return false;
     }
+	if (scaleColor != options.scaleColor) return false;
+        if (scaleEnabled != options.scaleEnabled) return false;
+        if (scaleGravity != options.scaleGravity) return false;
+        if (scaleWidth != options.scaleWidth) return false;
+        if (scaleUnit != options.scaleUnit) return false;
+		
     if (logoEnabled != options.logoEnabled) {
       return false;
     }
@@ -1130,6 +1156,11 @@ public class MapboxMapOptions implements Parcelable {
     result = 31 * result + (fadeCompassFacingNorth ? 1 : 0);
     result = 31 * result + compassGravity;
     result = 31 * result + Arrays.hashCode(compassMargins);
+        result = 31 * result + (scaleEnabled ? 1 : 0);
+        result = 31 * result + scaleColor;
+        result = 31 * result + scaleGravity;
+        result = 31 * result + scaleUnit.ordinal();
+        result = 31 * result + Arrays.hashCode(scaleMargins);
     result = 31 * result + (logoEnabled ? 1 : 0);
     result = 31 * result + logoGravity;
     result = 31 * result + Arrays.hashCode(logoMargins);
@@ -1161,4 +1192,128 @@ public class MapboxMapOptions implements Parcelable {
     result = 31 * result + (style != null ? style.hashCode() : 0);
     return result;
   }
+    /**
+     * Is the map scale widget enabled?
+     *
+     * @return the current enabled state
+     */
+    public boolean getScaleEnabled() {
+        return scaleEnabled;
+    }
+
+    /**
+     * Control whether the map scale widget is shown.
+     * The scale widget shows a scale of distance on the map
+     *
+     * @param scaleEnabled
+     * @return this
+     */
+    public MapboxMapOptions scaleEnabled(boolean scaleEnabled) {
+        this.scaleEnabled = scaleEnabled;
+        return this;
+    }
+
+    /**
+     * Get the color index of the scale widget.
+     *
+     * @return the scale unit
+     */
+    public int getScaleColor() {
+        return scaleColor;
+    }
+
+    /**
+     * Set the color for the scale widget. Choices are:
+     * MapboxConstants.SCALE_COLOR_BLACK (default)
+     * MapboxConstants.SCALE_COLOR_WHITE
+     *
+     * @param scaleColor
+     * @return
+     */
+    public MapboxMapOptions scaleColor(int scaleColor) {
+        this.scaleColor = scaleColor;
+        return this;
+    }
+
+    /**
+     * Get the current unit used to label the scale widget
+     *
+     * @return the scale unit
+     */
+    public UiSettings.ScaleUnit getScaleUnit() {
+        return scaleUnit;
+    }
+
+    /**
+     * Set the unit used for labelling the scale widget.
+     * <p>
+     * See {@link UiSettings.ScaleUnit}
+     *
+     * @param scaleUnit
+     * @return
+     */
+    public MapboxMapOptions scaleUnit(UiSettings.ScaleUnit scaleUnit) {
+        this.scaleUnit = scaleUnit;
+        return this;
+    }
+
+    /**
+     * Get the width of the scale widget.
+     *
+     * @return The scale width as a fraction of the display width
+     */
+    public float getScaleWidth() {
+        return scaleWidth;
+    }
+
+    /**
+     * Set the width of the scale widget as a fraction of the display width.
+     *
+     * @param scaleWidth
+     * @return this
+     */
+    public MapboxMapOptions scaleWidth(@FloatRange(from = 0f, to = 1f) float scaleWidth) {
+        this.scaleWidth = scaleWidth;
+        return this;
+    }
+
+    /**
+     * Get the gravity settings for the scale widget.
+     *
+     * @return a bit mask of gravity contstants
+     */
+    public int getScaleGravity() {
+        return scaleGravity;
+    }
+
+    /**
+     * Set the gravity of the scale widget. See
+     *
+     * @param scaleGravity see {@link android.view.Gravity}
+     * @return this
+     */
+
+    public MapboxMapOptions scaleGravity(int scaleGravity) {
+        this.scaleGravity = scaleGravity;
+        return this;
+    }
+
+    /**
+     * Get the margins for the scale widget
+     *
+     * @return 4 long array for LTRB margins
+     */
+    public int[] getScaleMargins() {
+        return scaleMargins;
+    }
+
+    /**
+     * Set the margins for the scale widget
+     *
+     * @param scaleMargins 4 long array for LTRB margins
+     */
+    public MapboxMapOptions scaleMargins(int[] scaleMargins) {
+        this.scaleMargins = scaleMargins;
+        return this;
+    }
 }

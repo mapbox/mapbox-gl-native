@@ -172,6 +172,11 @@ final class Transform implements MapView.OnMapChangedListener {
   }
 
   void zoom(boolean zoomIn) {
+    if(getZoom()>MapboxConstants.MAXIMUM_ZOOM) {
+      mapView.setZoom(MapboxConstants.MAXIMUM_ZOOM);
+    }else if (getZoom()<MapboxConstants.MINIMUM_ZOOM){
+      mapView.setZoom(MapboxConstants.MINIMUM_ZOOM);
+    }
     zoom(zoomIn, -1.0f, -1.0f);
   }
 
@@ -179,11 +184,30 @@ final class Transform implements MapView.OnMapChangedListener {
     // Cancel any animation
     cancelTransitions();
 
+    int curZoom= (int)Math.rint(mapView.getZoom());
     if (zoomIn) {
-      mapView.scaleBy(2.0, x, y, MapboxConstants.ANIMATION_DURATION);
+//      mapView.saleBy(2.0, x, y, MapboxConstants.ANIMATION_DURATION);
+      if(curZoom<MapboxConstants.MAXIMUM_ZOOM) {
+        curZoom = curZoom + 1;
+      }else{
+        curZoom=(int)MapboxConstants.MAXIMUM_ZOOM;
+      }
     } else {
-      mapView.scaleBy(0.5, x, y, MapboxConstants.ANIMATION_DURATION);
+      if (curZoom <= MapboxConstants.MINIMUM_ZOOM) {
+        curZoom = (int) MapboxConstants.MINIMUM_ZOOM;
+      } else {
+        curZoom = curZoom - 1;
+      }
     }
+    if(curZoom==3){
+      mapView.setZoom(curZoom+0.02);
+    }else if(curZoom==10){
+      mapView.setZoom(curZoom-0.02);
+    } else {
+      mapView.setZoom(curZoom);
+    }
+//      mapView.scaleBy(0.5, x, y, MapboxConstants.ANIMATION_DURATION);
+
   }
 
   // Direction

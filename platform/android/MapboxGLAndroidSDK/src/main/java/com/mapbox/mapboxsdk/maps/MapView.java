@@ -45,6 +45,7 @@ import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.maps.widgets.CompassView;
 import com.mapbox.mapboxsdk.maps.widgets.MyLocationView;
 import com.mapbox.mapboxsdk.maps.widgets.MyLocationViewSettings;
+import com.mapbox.mapboxsdk.maps.widgets.scaleview.MapScaleView;
 import com.mapbox.mapboxsdk.telemetry.MapboxEvent;
 import com.mapbox.mapboxsdk.telemetry.MapboxEventManager;
 
@@ -119,6 +120,7 @@ public class MapView extends FrameLayout {
     // inflate view
     View view = LayoutInflater.from(context).inflate(R.layout.mapbox_mapview_internal, this);
     CompassView compassView = (CompassView) view.findViewById(R.id.compassView);
+	MapScaleView scaleView = (MapScaleView) view.findViewById(R.id.scaleView);
     MyLocationView myLocationView = (MyLocationView) view.findViewById(R.id.userLocationView);
     ImageView attrView = (ImageView) view.findViewById(R.id.attributionView);
     initalizeDrawingSurface(context, options);
@@ -134,7 +136,7 @@ public class MapView extends FrameLayout {
 
     // setup components for MapboxMap creation
     Projection proj = new Projection(nativeMapView);
-    UiSettings uiSettings = new UiSettings(proj, focalPoint, compassView, attrView, view.findViewById(R.id.logoView));
+    UiSettings uiSettings = new UiSettings(proj, focalPoint, compassView,scaleView, attrView, view.findViewById(R.id.logoView));
     TrackingSettings trackingSettings = new TrackingSettings(myLocationView, uiSettings, focalPoint);
     MyLocationViewSettings myLocationViewSettings = new MyLocationViewSettings(myLocationView, proj, focalPoint);
     MarkerViewManager markerViewManager = new MarkerViewManager((ViewGroup) findViewById(R.id.markerViewContainer));

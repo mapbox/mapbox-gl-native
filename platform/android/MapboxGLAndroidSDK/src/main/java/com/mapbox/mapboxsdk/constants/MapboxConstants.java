@@ -60,12 +60,12 @@ public class MapboxConstants {
   /**
    * The currently supported minimum zoom level.
    */
-  public static final float MINIMUM_ZOOM = 0.0f;
+  public static final float MINIMUM_ZOOM = 2f;
 
   /**
    * The currently supported maximum zoom level.
    */
-  public static final float MAXIMUM_ZOOM = 20.0f;
+  public static final float MAXIMUM_ZOOM = 15f;
 
   /**
    * The currently supported maximum tilt value.
@@ -128,6 +128,14 @@ public class MapboxConstants {
   public static final String STATE_COMPASS_MARGIN_RIGHT = "compassMarginRight";
   public static final String STATE_COMPASS_MARGIN_BOTTOM = "compassMarginBottom";
   public static final String STATE_COMPASS_FADE_WHEN_FACING_NORTH = "compassFade";
+  public static final String STATE_SCALE_ENABLED = "scaleEnabled";
+  public static final String STATE_SCALE_GRAVITY = "scaleGravity";
+  public static final String STATE_SCALE_MARGIN_LEFT = "scaleMarginLeft";
+  public static final String STATE_SCALE_MARGIN_TOP = "scaleMarginTop";
+  public static final String STATE_SCALE_MARGIN_RIGHT = "scaleMarginRight";
+  public static final String STATE_SCALE_MARGIN_BOTTOM = "scaleMarginBottom";
+  public static final String STATE_SCALE_WIDTH = "scaleWidth";
+  public static final String STATE_SCALE_UNIT = "scaleUnit";
   public static final String STATE_LOGO_GRAVITY = "logoGravity";
   public static final String STATE_LOGO_MARGIN_LEFT = "logoMarginLeft";
   public static final String STATE_LOGO_MARGIN_TOP = "logoMarginTop";
