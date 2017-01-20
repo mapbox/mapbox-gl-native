@@ -194,7 +194,7 @@ matrix:
       dist: trusty
       language: cpp
       compiler: "qt5-gcc5-release"
-      env: BUILDTYPE=Release _CXX=g++-5 _CC=gcc-5
+      env: BUILDTYPE=Release _CXX=g++-5 _CC=gcc-5 WITH_QT_I18N=1
       addons: *qt5
       before_script:
         - mapbox_start_xvfb
