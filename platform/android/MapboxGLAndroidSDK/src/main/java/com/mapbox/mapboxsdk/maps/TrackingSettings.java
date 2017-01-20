@@ -28,6 +28,7 @@ public final class TrackingSettings {
   private final MyLocationView myLocationView;
   private final UiSettings uiSettings;
   private final FocalPointChangeListener focalPointChangedListener;
+  private final CameraZoomInvalidator zoomInvalidator;
   private LocationListener myLocationListener;
 
   private boolean myLocationEnabled;
@@ -38,10 +39,11 @@ public final class TrackingSettings {
   private MapboxMap.OnMyBearingTrackingModeChangeListener onMyBearingTrackingModeChangeListener;
 
   TrackingSettings(@NonNull MyLocationView myLocationView, UiSettings uiSettings,
-                   FocalPointChangeListener focalPointChangedListener) {
+                   FocalPointChangeListener focalPointChangedListener, CameraZoomInvalidator zoomInvalidator) {
     this.myLocationView = myLocationView;
     this.focalPointChangedListener = focalPointChangedListener;
     this.uiSettings = uiSettings;
+    this.zoomInvalidator = zoomInvalidator;
   }
 
   void initialise(MapboxMapOptions options) {
@@ -92,6 +94,7 @@ public final class TrackingSettings {
     myLocationView.setMyLocationTrackingMode(myLocationTrackingMode);
 
     if (myLocationTrackingMode == MyLocationTracking.TRACKING_FOLLOW) {
+      zoomInvalidator.zoomTo(2.0);
       focalPointChangedListener.onFocalPointChanged(new PointF(myLocationView.getCenterX(),
         myLocationView.getCenterY()));
     } else {
@@ -342,5 +345,9 @@ public final class TrackingSettings {
 
   void onStop() {
     myLocationView.onStop();
+  }
+
+  interface CameraZoomInvalidator {
+    void zoomTo(double zoomLevel);
   }
 }
