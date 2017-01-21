@@ -127,7 +127,7 @@ In style JSON | In the SDK
 `raster`      | `MGLRasterSource`
 `vector`      | `MGLVectorSource`
 
-`image` and `video` sources are not supported.
+`canvas`, `image`, and `video` sources are not supported.
 
 ### Tile sources
 
