@@ -275,9 +275,10 @@ Array (`-offset`, `-translate`) | `NSValue.CGVectorValue` | `NSValue.cgVectorVal
 Array (`-padding`) | `NSValue.UIEdgeInsetsValue` | `NSValue.uiEdgeInsetsValue`
 
 For padding attributes, note that the arguments to
-`UIEdgeInsetsMake()` in Objective-C and
-`EdgeInsets(top:left:bottom:right:)` in Swift are specified in counterclockwise
-order, in contrast to the clockwise order defined by the style specification.
+`UIEdgeInsetsMake()` in Objective-C and `UIEdgeInsets(top:left:bottom:right:)`
+in Swift
+are specified in counterclockwise order, in contrast to the clockwise order
+defined by the style specification.
 
 ## Filtering sources
 

@@ -282,9 +282,15 @@ Array (`-padding`) | `NSValue.edgeInsetsValue` | `NSValue.edgeInsetsValue`
 <% } -%>
 
 For padding attributes, note that the arguments to
-`<%- cocoaPrefix %>EdgeInsetsMake()` in Objective-C and
-`EdgeInsets(top:left:bottom:right:)` in Swift are specified in counterclockwise
-order, in contrast to the clockwise order defined by the style specification.
+<% if (iOS) { -%>
+`UIEdgeInsetsMake()` in Objective-C and `UIEdgeInsets(top:left:bottom:right:)`
+in Swift
+<% } else { -%>
+`NSEdgeInsetsMake()` in Objective-C and `EdgeInsets(top:left:bottom:right:)` in
+Swift
+<% } -%>
+are specified in counterclockwise order, in contrast to the clockwise order
+defined by the style specification.
 
 <% if (macOS) { -%>
 Additionally, on macOS, a screen coordinate of (0, 0) is located at the
