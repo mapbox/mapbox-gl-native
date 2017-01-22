@@ -1,15 +1,11 @@
 package com.mapbox.mapboxsdk.offline;
 
 import android.content.Context;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageManager;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 
 import com.mapbox.mapboxsdk.Mapbox;
-import com.mapbox.mapboxsdk.constants.MapboxConstants;
 
 import java.io.File;
 
@@ -92,72 +88,15 @@ public class OfflineManager {
    * Constructors
    */
   private OfflineManager(Context context) {
+    // TODO: r
     // Get a pointer to the DefaultFileSource instance
-    String assetRoot = getDatabasePath(context);
+    String assetRoot = Mapbox.getDatabasePath(context);
     String cachePath = assetRoot + File.separator + DATABASE_NAME;
     mDefaultFileSourcePtr = createDefaultFileSource(cachePath, assetRoot, DEFAULT_MAX_CACHE_SIZE);
-    setAccessToken(mDefaultFileSourcePtr, Mapbox.getAccessToken());
+    setAccessToken(mDefaultFileSourcePtr, Mapbox.getDefaultFileSource().getAccessToken());
 
     // Delete any existing previous ambient cache database
     deleteAmbientDatabase(context);
-  }
-
-  public static String getDatabasePath(Context context) {
-    // Default value
-    boolean setStorageExternal = MapboxConstants.DEFAULT_SET_STORAGE_EXTERNAL;
-
-    try {
-      // Try getting a custom value from the app Manifest
-      ApplicationInfo appInfo = context.getPackageManager().getApplicationInfo(
-        context.getPackageName(), PackageManager.GET_META_DATA);
-      setStorageExternal = appInfo.metaData.getBoolean(
-        MapboxConstants.KEY_META_DATA_SET_STORAGE_EXTERNAL,
-        MapboxConstants.DEFAULT_SET_STORAGE_EXTERNAL);
-    } catch (PackageManager.NameNotFoundException exception) {
-      Timber.e("Failed to read the package metadata: ", exception);
-    } catch (Exception exception) {
-      Timber.e("Failed to read the storage key: ", exception);
-    }
-
-    String databasePath = null;
-    if (setStorageExternal && isExternalStorageReadable()) {
-      try {
-        // Try getting the external storage path
-        databasePath = context.getExternalFilesDir(null).getAbsolutePath();
-      } catch (NullPointerException exception) {
-        Timber.e("Failed to obtain the external storage path: ", exception);
-      }
-    }
-
-    if (databasePath == null) {
-      // Default to internal storage
-      databasePath = context.getFilesDir().getAbsolutePath();
-    }
-
-    return databasePath;
-  }
-
-  /**
-   * Checks if external storage is available to at least read. In order for this to work, make
-   * sure you include &lt;uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" /&gt;
-   * (or WRITE_EXTERNAL_STORAGE) for API level &lt; 18 in your app Manifest.
-   * <p>
-   * Code from https://developer.android.com/guide/topics/data/data-storage.html#filesExternal
-   * </p>
-   *
-   * @return true if external storage is readable
-   */
-  public static boolean isExternalStorageReadable() {
-    String state = Environment.getExternalStorageState();
-    if (Environment.MEDIA_MOUNTED.equals(state) || Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
-      return true;
-    }
-
-    Timber.w("External storage was requested but it isn't readable. For API level < 18"
-      + " make sure you've requested READ_EXTERNAL_STORAGE or WRITE_EXTERNAL_STORAGE"
-      + " permissions in your app Manifest (defaulting to internal storage).");
-
-    return false;
   }
 
   private void deleteAmbientDatabase(final Context context) {

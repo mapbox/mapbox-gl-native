@@ -11,9 +11,6 @@ namespace android {
 
 extern JavaVM* theJVM;
 
-extern std::string cachePath;
-extern std::string dataPath;
-extern std::string apkPath;
 extern std::string androidRelease;
 
 extern jmethodID onInvalidateId;

@@ -5,7 +5,8 @@
 #include <mbgl/map/backend.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/default_thread_pool.hpp>
-#include <mbgl/storage/default_file_source.hpp>
+
+#include "jni/peer.hpp"
 
 #include <string>
 #include <jni.h>
@@ -13,11 +14,19 @@
 #include <EGL/egl.h>
 
 namespace mbgl {
+
+class DefaultFileSource;
+
 namespace android {
 
 class NativeMapView : public mbgl::View, public mbgl::Backend {
 public:
-    NativeMapView(JNIEnv *env, jobject obj, float pixelRatio, int availableProcessors, size_t totalMemory);
+    NativeMapView(JNIEnv* env,
+                  jobject obj,
+                  jni::Object<Peer<DefaultFileSource>> fileSourcePeer,
+                  float pixelRatio,
+                  int availableProcessors,
+                  size_t totalMemory);
     virtual ~NativeMapView();
 
     mbgl::Size getFramebufferSize() const;
@@ -29,7 +38,6 @@ public:
     void notifyMapChange(mbgl::MapChange) override;
 
     mbgl::Map &getMap();
-    mbgl::DefaultFileSource &getFileSource();
 
     void initializeDisplay();
     void terminateDisplay();
@@ -96,7 +104,7 @@ private:
     size_t totalMemory = 0;
 
     // Ensure these are initialised last
-    std::unique_ptr<mbgl::DefaultFileSource> fileSource;
+    jni::UniqueObject<Peer<DefaultFileSource>> fileSource;
     mbgl::ThreadPool threadPool;
     std::unique_ptr<mbgl::Map> map;
     mbgl::EdgeInsets insets;

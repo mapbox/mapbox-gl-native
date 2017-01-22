@@ -9,6 +9,7 @@
 #include <sys/system_properties.h>
 
 #include "jni.hpp"
+#include "jni/peer.hpp"
 #include "java_types.hpp"
 #include "native_map_view.hpp"
 #include "connectivity_listener.hpp"
@@ -27,6 +28,7 @@
 #include <mbgl/sprite/sprite_image.hpp>
 #include <mbgl/util/event.hpp>
 #include <mbgl/util/logging.hpp>
+#include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/storage/network_status.hpp>
 #include <mbgl/util/exception.hpp>
 #include <mbgl/util/optional.hpp>
@@ -46,9 +48,6 @@ void RegisterNativeHTTPRequest(JNIEnv&);
 
 JavaVM* theJVM;
 
-std::string cachePath;
-std::string dataPath;
-std::string apkPath;
 std::string androidRelease;
 
 jni::jmethodID* onInvalidateId = nullptr;
@@ -299,12 +298,9 @@ namespace {
 using namespace mbgl::android;
 using DebugOptions = mbgl::MapDebugOptions;
 
-jlong nativeCreate(JNIEnv *env, jni::jobject* obj, jni::jstring* cachePath_, jni::jstring* dataPath_, jni::jstring* apkPath_, jfloat pixelRatio, jint availableProcessors, jlong totalMemory) {
+jlong nativeCreate(JNIEnv *env, jni::jobject* obj, jni::Object<Peer<mbgl::DefaultFileSource>> fileSource, jfloat pixelRatio, jint availableProcessors, jlong totalMemory) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeCreate");
-    cachePath = std_string_from_jstring(env, cachePath_);
-    dataPath = std_string_from_jstring(env, dataPath_);
-    apkPath = std_string_from_jstring(env, apkPath_);
-    return reinterpret_cast<jlong>(new NativeMapView(env, jni::Unwrap(obj), pixelRatio, availableProcessors, totalMemory));
+    return reinterpret_cast<jlong>(new NativeMapView(env, jni::Unwrap(obj), fileSource, pixelRatio, availableProcessors, totalMemory));
 }
 
 void nativeDestroy(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr) {
@@ -419,12 +415,6 @@ jni::jobject* nativeGetClasses(JNIEnv *env, jni::jobject* obj, jlong nativeMapVi
     return std_vector_string_to_jobject(env, nativeMapView->getMap().getClasses());
 }
 
-void nativeSetAPIBaseURL(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jni::jstring* url) {
-    assert(nativeMapViewPtr != 0);
-    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    nativeMapView->getFileSource().setAPIBaseURL(std_string_from_jstring(env, url));
-}
-
 void nativeSetStyleUrl(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jni::jstring* url) {
     assert(nativeMapViewPtr != 0);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
@@ -447,18 +437,6 @@ jni::jstring* nativeGetStyleJson(JNIEnv *env, jni::jobject* obj, jlong nativeMap
     assert(nativeMapViewPtr != 0);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
     return std_string_to_jstring(env, nativeMapView->getMap().getStyleJSON());
-}
-
-void nativeSetAccessToken(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jni::jstring* accessToken) {
-    assert(nativeMapViewPtr != 0);
-    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    nativeMapView->getFileSource().setAccessToken(std_string_from_jstring(env, accessToken));
-}
-
-jni::jstring* nativeGetAccessToken(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr) {
-    assert(nativeMapViewPtr != 0);
-    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    return std_string_to_jstring(env, nativeMapView->getFileSource().getAccessToken());
 }
 
 void nativeCancelTransitions(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr) {
@@ -1769,6 +1747,7 @@ void registerNatives(JavaVM *vm) {
     registerNativeLayers(env);
     registerNativeSources(env);
     ConnectivityListener::registerNative(env);
+    Peer<DefaultFileSource>::RegisterNative(env);
 
     latLngClass = &jni::FindClass(env, "com/mapbox/mapboxsdk/geometry/LatLng");
     latLngClass = jni::NewGlobalRef(env, latLngClass).release();
@@ -1846,7 +1825,7 @@ void registerNatives(JavaVM *vm) {
     #define MAKE_NATIVE_METHOD(name, sig) jni::MakeNativeMethod<decltype(name), name>( #name, sig )
 
     jni::RegisterNatives(env, nativeMapViewClass,
-        MAKE_NATIVE_METHOD(nativeCreate, "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;FIJ)J"),
+        MAKE_NATIVE_METHOD(nativeCreate, "(Lcom/mapbox/mapboxsdk/storage/DefaultFileSource;FIJ)J"),
         MAKE_NATIVE_METHOD(nativeDestroy, "(J)V"),
         MAKE_NATIVE_METHOD(nativeInitializeDisplay, "(J)V"),
         MAKE_NATIVE_METHOD(nativeTerminateDisplay, "(J)V"),
@@ -1867,8 +1846,6 @@ void registerNatives(JavaVM *vm) {
         MAKE_NATIVE_METHOD(nativeGetStyleUrl, "(J)Ljava/lang/String;"),
         MAKE_NATIVE_METHOD(nativeSetStyleJson, "(JLjava/lang/String;)V"),
         MAKE_NATIVE_METHOD(nativeGetStyleJson, "(J)Ljava/lang/String;"),
-        MAKE_NATIVE_METHOD(nativeSetAccessToken, "(JLjava/lang/String;)V"),
-        MAKE_NATIVE_METHOD(nativeGetAccessToken, "(J)Ljava/lang/String;"),
         MAKE_NATIVE_METHOD(nativeCancelTransitions, "(J)V"),
         MAKE_NATIVE_METHOD(nativeSetGestureInProgress, "(JZ)V"),
         MAKE_NATIVE_METHOD(nativeMoveBy, "(JDDJ)V"),
@@ -1935,8 +1912,7 @@ void registerNatives(JavaVM *vm) {
         MAKE_NATIVE_METHOD(nativeSetContentPadding, "(JDDDD)V"),
         MAKE_NATIVE_METHOD(nativeScheduleTakeSnapshot, "(J)V"),
         MAKE_NATIVE_METHOD(nativeQueryRenderedFeaturesForPoint, "(JFF[Ljava/lang/String;)[Lcom/mapbox/services/commons/geojson/Feature;"),
-        MAKE_NATIVE_METHOD(nativeQueryRenderedFeaturesForBox, "(JFFFF[Ljava/lang/String;)[Lcom/mapbox/services/commons/geojson/Feature;"),
-        MAKE_NATIVE_METHOD(nativeSetAPIBaseURL, "(JLjava/lang/String;)V")
+        MAKE_NATIVE_METHOD(nativeQueryRenderedFeaturesForBox, "(JFFFF[Ljava/lang/String;)[Lcom/mapbox/services/commons/geojson/Feature;")
     );
 
     // Offline begin

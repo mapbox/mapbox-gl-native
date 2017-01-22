@@ -37,7 +37,14 @@ public class MapboxApplication extends Application {
       .penaltyDeath()
       .build());
 
-    Mapbox.getInstance(getApplicationContext(), getString(R.string.mapbox_access_token));
+    // Obtain the API base URL, but don't expect it to exist.
+    String apiBaseURL = null;
+    int apiBaseURLID = getResources().getIdentifier("mapbox_api_base_url", "string", getPackageName());
+    if (apiBaseURLID != 0) {
+      apiBaseURL = getString(apiBaseURLID);
+    }
+
+    Mapbox.getInstance(getApplicationContext(), getString(R.string.mapbox_access_token), apiBaseURL);
   }
 
   private void initializeLogger() {

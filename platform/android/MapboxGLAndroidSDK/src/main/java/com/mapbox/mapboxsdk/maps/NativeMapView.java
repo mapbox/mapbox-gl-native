@@ -13,6 +13,7 @@ import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.Surface;
 
+import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.annotations.Icon;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.Polygon;
@@ -20,7 +21,7 @@ import com.mapbox.mapboxsdk.annotations.Polyline;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.ProjectedMeters;
-import com.mapbox.mapboxsdk.offline.OfflineManager;
+import com.mapbox.mapboxsdk.storage.DefaultFileSource;
 import com.mapbox.mapboxsdk.style.layers.Layer;
 import com.mapbox.mapboxsdk.style.layers.NoSuchLayerException;
 import com.mapbox.mapboxsdk.style.sources.NoSuchSourceException;
@@ -70,15 +71,10 @@ final class NativeMapView {
 
   public NativeMapView(MapView mapView) {
     Context context = mapView.getContext();
-    String dataPath = OfflineManager.getDatabasePath(context);
 
-    // With the availability of offline, we're unifying the ambient (cache) and the offline
-    // databases to be in the same folder, outside cache, to avoid automatic deletion from
-    // the system
-    String cachePath = dataPath;
+    DefaultFileSource fileSource = Mapbox.getDefaultFileSource();
 
     pixelRatio = context.getResources().getDisplayMetrics().density;
-    String apkPath = context.getPackageCodePath();
     int availableProcessors = Runtime.getRuntime().availableProcessors();
     ActivityManager.MemoryInfo memoryInfo = new ActivityManager.MemoryInfo();
     ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
@@ -97,7 +93,7 @@ final class NativeMapView {
     }
     onMapChangedListeners = new CopyOnWriteArrayList<>();
     this.mapView = mapView;
-    nativeMapViewPtr = nativeCreate(cachePath, dataPath, apkPath, pixelRatio, availableProcessors, totalMemory);
+    nativeMapViewPtr = nativeCreate(fileSource, pixelRatio, availableProcessors, totalMemory);
   }
 
   //
@@ -292,20 +288,6 @@ final class NativeMapView {
       return null;
     }
     return nativeGetStyleJson(nativeMapViewPtr);
-  }
-
-  public void setAccessToken(String accessToken) {
-    if (isDestroyedOn("setAccessToken")) {
-      return;
-    }
-    nativeSetAccessToken(nativeMapViewPtr, accessToken);
-  }
-
-  public String getAccessToken() {
-    if (isDestroyedOn("getAccessToken")) {
-      return null;
-    }
-    return nativeGetAccessToken(nativeMapViewPtr);
   }
 
   public void cancelTransitions() {
@@ -900,13 +882,6 @@ final class NativeMapView {
     nativeScheduleTakeSnapshot(nativeMapViewPtr);
   }
 
-  public void setApiBaseUrl(String baseUrl) {
-    if (isDestroyedOn("setApiBaseUrl")) {
-      return;
-    }
-    nativeSetAPIBaseURL(nativeMapViewPtr, baseUrl);
-  }
-
   public float getPixelRatio() {
     return pixelRatio;
   }
@@ -954,7 +929,7 @@ final class NativeMapView {
   // JNI methods
   //
 
-  private native long nativeCreate(String cachePath, String dataPath, String apkPath, float pixelRatio,
+  private native long nativeCreate(DefaultFileSource fileSource, float pixelRatio,
                                    int availableProcessors, long totalMemory);
 
   private native void nativeDestroy(long nativeMapViewPtr);
@@ -998,10 +973,6 @@ final class NativeMapView {
   private native void nativeSetStyleJson(long nativeMapViewPtr, String newStyleJson);
 
   private native String nativeGetStyleJson(long nativeMapViewPtr);
-
-  private native void nativeSetAccessToken(long nativeMapViewPtr, String accessToken);
-
-  private native String nativeGetAccessToken(long nativeMapViewPtr);
 
   private native void nativeCancelTransitions(long nativeMapViewPtr);
 
@@ -1154,8 +1125,6 @@ final class NativeMapView {
 
   private native Feature[] nativeQueryRenderedFeaturesForBox(long nativeMapViewPtr, float left, float top, float right,
                                                              float bottom, String[] layerIds);
-
-  private native void nativeSetAPIBaseURL(long nativeMapViewPtr, String baseUrl);
 
   int getWidth() {
     if (isDestroyedOn("")) {

@@ -90,6 +90,9 @@ macro(mbgl_platform_core)
         PRIVATE platform/default/mbgl/util/default_thread_pool.cpp
         PRIVATE platform/default/mbgl/util/default_thread_pool.hpp
 
+        # Storage
+        PRIVATE platform/android/src/storage/default_file_source_peer.cpp
+
         # Conversion C++ -> Java
         platform/android/src/conversion/constant.hpp
         platform/android/src/conversion/conversion.hpp

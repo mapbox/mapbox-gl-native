@@ -11,7 +11,16 @@ public class MapboxApplication extends Application {
   @Override
   public void onCreate() {
     super.onCreate();
-    Mapbox.getInstance(getApplicationContext(), getString(R.string.mapbox_access_token));
+
+    // Obtain the API base URL, but don't expect it to exist.
+    String apiBaseURL = null;
+    int apiBaseURLID = getResources().getIdentifier("mapbox_api_base_url", "string", getPackageName());
+    if (apiBaseURLID != 0) {
+      apiBaseURL = getString(apiBaseURLID);
+    }
+
+    Mapbox.getInstance(getApplicationContext(), getString(R.string.mapbox_access_token), apiBaseURL);
+
     LeakCanary.install(this);
     StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
       .detectDiskReads()
