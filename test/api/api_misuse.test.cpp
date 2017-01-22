@@ -24,7 +24,7 @@ TEST(API, RenderWithoutCallback) {
     HeadlessBackend backend { test::sharedDisplay() };
     OffscreenView view { backend.getContext(), { 128, 512 } };
     StubFileSource fileSource;
-    ThreadPool threadPool(4);
+    ThreadPool threadPool{ 4, { "Worker" } };
 
     std::unique_ptr<Map> map =
         std::make_unique<Map>(backend, view.size, 1, fileSource, threadPool, MapMode::Still);
@@ -49,7 +49,7 @@ TEST(API, RenderWithoutStyle) {
     HeadlessBackend backend { test::sharedDisplay() };
     OffscreenView view { backend.getContext(), { 128, 512 } };
     StubFileSource fileSource;
-    ThreadPool threadPool(4);
+    ThreadPool threadPool{ 4, { "Worker" } };
 
     Map map(backend, view.size, 1, fileSource, threadPool, MapMode::Still);
 

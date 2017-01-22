@@ -1,12 +1,18 @@
 #include <mbgl/util/default_thread_pool.hpp>
 #include <mbgl/actor/mailbox.hpp>
+#include <mbgl/util/platform.hpp>
 
 namespace mbgl {
 
-ThreadPool::ThreadPool(std::size_t count) {
+ThreadPool::ThreadPool(std::size_t count, const util::ThreadContext& context) {
     threads.reserve(count);
     for (std::size_t i = 0; i < count; ++i) {
-        threads.emplace_back([this] () {
+        threads.emplace_back([this, context] () {
+            platform::setCurrentThreadName(context.name);
+            if (context.priority == util::ThreadPriority::Low) {
+                platform::makeThreadLowPriority();
+            }
+
             while (true) {
                 std::unique_lock<std::mutex> lock(mutex);
 

@@ -31,7 +31,7 @@ public:
     StubStyleObserver observer;
     Transform transform;
     TransformState transformState;
-    ThreadPool threadPool { 1 };
+    ThreadPool threadPool{ 1, { "Worker" } };
     AnnotationManager annotationManager { 1.0 };
     style::Style style { fileSource, 1.0 };
 

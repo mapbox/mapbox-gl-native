@@ -5,6 +5,7 @@
 #import "MGLNetworkConfiguration.h"
 #import "MGLOfflinePack_Private.h"
 #import "MGLOfflineRegion_Private.h"
+#import "MGLThreadPool_Private.h"
 #import "MGLTilePyramidOfflineRegion.h"
 #import "NSValue+MGLAdditions.h"
 
@@ -130,7 +131,9 @@ NSString * const MGLOfflinePackMaximumCountUserInfoKey = MGLOfflinePackUserInfoK
             [[NSFileManager defaultManager] moveItemAtPath:subdirectorylessCacheURL.path toPath:cachePath error:NULL];
         }
 
-        _mbglFileSource = new mbgl::DefaultFileSource(cachePath.UTF8String, [NSBundle mainBundle].resourceURL.path.UTF8String);
+        _mbglFileSource = new mbgl::DefaultFileSource(
+            *[MGLThreadPool sharedPool].mbglThreadPool, cachePath.UTF8String,
+            [NSBundle mainBundle].resourceURL.path.UTF8String);
 
         // Observe for changes to the API base URL (and find out the current one).
         [[MGLNetworkConfiguration sharedManager] addObserver:self
