@@ -39,6 +39,12 @@ public:
 
     jni::Object<jni::ObjectTag> getCirclePitchScale(jni::JNIEnv&);
 
+    jni::Object<jni::ObjectTag> getCircleStrokeWidth(jni::JNIEnv&);
+
+    jni::Object<jni::ObjectTag> getCircleStrokeColor(jni::JNIEnv&);
+
+    jni::Object<jni::ObjectTag> getCircleStrokeOpacity(jni::JNIEnv&);
+
     jni::jobject* createJavaPeer(jni::JNIEnv&);
 
 }; // class CircleLayer

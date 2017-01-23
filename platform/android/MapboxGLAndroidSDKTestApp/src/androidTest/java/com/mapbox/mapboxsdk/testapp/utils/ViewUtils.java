@@ -10,13 +10,13 @@ import static android.support.test.espresso.matcher.ViewMatchers.withId;
 
 public class ViewUtils {
 
-    public static void clickView(@IdRes int viewRes) {
-        onView(withId(viewRes))
-                .perform(click());
-    }
+  public static void clickView(@IdRes int viewRes) {
+    onView(withId(viewRes))
+      .perform(click());
+  }
 
-    public static void checkViewIsDisplayed(int id) {
-        onView(withId(id))
-                .check(matches(isDisplayed()));
-    }
+  public static void checkViewIsDisplayed(int id) {
+    onView(withId(id))
+      .check(matches(isDisplayed()));
+  }
 }

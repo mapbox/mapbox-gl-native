@@ -59,7 +59,8 @@ void FeatureIndex::query(
         const optional<std::vector<std::string>>& filterLayerIDs,
         const GeometryTileData& geometryTileData,
         const CanonicalTileID& tileID,
-        const style::Style& style) const {
+        const style::Style& style,
+        const CollisionTile* collisionTile) const {
 
     mapbox::geometry::box<int16_t> box = mapbox::geometry::envelope(queryGeometry);
 
@@ -150,12 +151,8 @@ optional<GeometryCoordinates> FeatureIndex::translateQueryGeometry(
     return translated;
 }
 
-void FeatureIndex::addBucketLayerName(const std::string& bucketName, const std::string& layerID) {
-    bucketLayerIDs[bucketName].push_back(layerID);
-}
-
-void FeatureIndex::setCollisionTile(std::unique_ptr<CollisionTile> collisionTile_) {
-    collisionTile = std::move(collisionTile_);
+void FeatureIndex::setBucketLayerIDs(const std::string& bucketName, const std::vector<std::string>& layerIDs) {
+    bucketLayerIDs[bucketName] = layerIDs;
 }
 
 } // namespace mbgl

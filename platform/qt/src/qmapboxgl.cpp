@@ -13,6 +13,7 @@
 #include <mbgl/style/conversion/layer.hpp>
 #include <mbgl/style/conversion/source.hpp>
 #include <mbgl/style/layers/custom_layer.hpp>
+#include <mbgl/style/sources/geojson_source.hpp>
 #include <mbgl/style/transition_options.hpp>
 #include <mbgl/sprite/sprite_image.hpp>
 #include <mbgl/storage/network_status.hpp>
@@ -41,10 +42,6 @@
 
 using namespace QMapbox;
 
-// mbgl::MapMode
-static_assert(mbgl::underlying_type(QMapboxGLSettings::ContinuousMap) == mbgl::underlying_type(mbgl::MapMode::Continuous), "error");
-static_assert(mbgl::underlying_type(QMapboxGLSettings::StillMap) == mbgl::underlying_type(mbgl::MapMode::Still), "error");
-
 // mbgl::GLContextMode
 static_assert(mbgl::underlying_type(QMapboxGLSettings::UniqueGLContext) == mbgl::underlying_type(mbgl::GLContextMode::Unique), "error");
 static_assert(mbgl::underlying_type(QMapboxGLSettings::SharedGLContext) == mbgl::underlying_type(mbgl::GLContextMode::Shared), "error");
@@ -58,6 +55,24 @@ static_assert(mbgl::underlying_type(QMapboxGLSettings::ConstrainWidthAndHeight) 
 static_assert(mbgl::underlying_type(QMapboxGLSettings::DefaultViewport) == mbgl::underlying_type(mbgl::ViewportMode::Default), "error");
 static_assert(mbgl::underlying_type(QMapboxGLSettings::FlippedYViewport) == mbgl::underlying_type(mbgl::ViewportMode::FlippedY), "error");
 
+// mbgl::MapChange
+static_assert(mbgl::underlying_type(QMapboxGL::MapChangeRegionWillChange) == mbgl::underlying_type(mbgl::MapChangeRegionWillChange), "error");
+static_assert(mbgl::underlying_type(QMapboxGL::MapChangeRegionWillChangeAnimated) == mbgl::underlying_type(mbgl::MapChangeRegionWillChangeAnimated), "error");
+static_assert(mbgl::underlying_type(QMapboxGL::MapChangeRegionIsChanging) == mbgl::underlying_type(mbgl::MapChangeRegionIsChanging), "error");
+static_assert(mbgl::underlying_type(QMapboxGL::MapChangeRegionDidChange) == mbgl::underlying_type(mbgl::MapChangeRegionDidChange), "error");
+static_assert(mbgl::underlying_type(QMapboxGL::MapChangeRegionDidChangeAnimated) == mbgl::underlying_type(mbgl::MapChangeRegionDidChangeAnimated), "error");
+static_assert(mbgl::underlying_type(QMapboxGL::MapChangeWillStartLoadingMap) == mbgl::underlying_type(mbgl::MapChangeWillStartLoadingMap), "error");
+static_assert(mbgl::underlying_type(QMapboxGL::MapChangeDidFinishLoadingMap) == mbgl::underlying_type(mbgl::MapChangeDidFinishLoadingMap), "error");
+static_assert(mbgl::underlying_type(QMapboxGL::MapChangeDidFailLoadingMap) == mbgl::underlying_type(mbgl::MapChangeDidFailLoadingMap), "error");
+static_assert(mbgl::underlying_type(QMapboxGL::MapChangeWillStartRenderingFrame) == mbgl::underlying_type(mbgl::MapChangeWillStartRenderingFrame), "error");
+static_assert(mbgl::underlying_type(QMapboxGL::MapChangeDidFinishRenderingFrame) == mbgl::underlying_type(mbgl::MapChangeDidFinishRenderingFrame), "error");
+static_assert(mbgl::underlying_type(QMapboxGL::MapChangeDidFinishRenderingFrameFullyRendered) == mbgl::underlying_type(mbgl::MapChangeDidFinishRenderingFrameFullyRendered), "error");
+static_assert(mbgl::underlying_type(QMapboxGL::MapChangeWillStartRenderingMap) == mbgl::underlying_type(mbgl::MapChangeWillStartRenderingMap), "error");
+static_assert(mbgl::underlying_type(QMapboxGL::MapChangeDidFinishRenderingMap) == mbgl::underlying_type(mbgl::MapChangeDidFinishRenderingMap), "error");
+static_assert(mbgl::underlying_type(QMapboxGL::MapChangeDidFinishRenderingMapFullyRendered) == mbgl::underlying_type(mbgl::MapChangeDidFinishRenderingMapFullyRendered), "error");
+static_assert(mbgl::underlying_type(QMapboxGL::MapChangeDidFinishLoadingStyle) == mbgl::underlying_type(mbgl::MapChangeDidFinishLoadingStyle), "error");
+static_assert(mbgl::underlying_type(QMapboxGL::MapChangeSourceDidChange) == mbgl::underlying_type(mbgl::MapChangeSourceDidChange), "error");
+
 // mbgl::NorthOrientation
 static_assert(mbgl::underlying_type(QMapboxGL::NorthUpwards) == mbgl::underlying_type(mbgl::NorthOrientation::Upwards), "error");
 static_assert(mbgl::underlying_type(QMapboxGL::NorthRightwards) == mbgl::underlying_type(mbgl::NorthOrientation::Rightwards), "error");
@@ -68,7 +83,7 @@ namespace {
 
 QThreadStorage<std::shared_ptr<mbgl::util::RunLoop>> loop;
 
-// Convertion helper functions.
+// Conversion helper functions.
 
 auto fromQMapboxGLShapeAnnotation(const ShapeAnnotation &shapeAnnotation) {
     const LineString &lineString = shapeAnnotation.first;
@@ -82,26 +97,6 @@ auto fromQMapboxGLShapeAnnotation(const ShapeAnnotation &shapeAnnotation) {
     }
 
     return mbgl::StyleSourcedAnnotation { std::move(mbglLineString), styleLayer.toStdString() };
-}
-
-auto fromQMapboxTransitionOptions(const QMapbox::TransitionOptions &options) {
-    auto convert = [](auto& value) -> mbgl::optional<mbgl::Duration> {
-        if (value.isValid()) {
-            return std::chrono::duration_cast<mbgl::Duration>(mbgl::Milliseconds(value.template value<qint64>()));
-        };
-        return {};
-    };
-    return mbgl::style::TransitionOptions { convert(options.duration), convert(options.delay) };
-}
-
-auto toQMapboxTransitionOptions(const mbgl::style::TransitionOptions &options) {
-    auto convert = [](auto& value) -> QVariant {
-        if (value) {
-            return qint64(std::chrono::duration_cast<mbgl::Milliseconds>(*value).count());
-        }
-        return {};
-    };
-    return QMapbox::TransitionOptions { convert(options.duration), convert(options.delay) };
 }
 
 auto fromQStringList(const QStringList &list)
@@ -146,17 +141,47 @@ std::unique_ptr<const mbgl::SpriteImage> toSpriteImage(const QImage &sprite) {
 /*!
     \enum QMapboxGLSettings::GLContextMode
 
-    This enum set the expectations towards the GL state.
+    This enum sets the expectations for the OpenGL state.
 
-    \value UniqueGLContext  The GL context is only used by QMapboxGL, so it is not
+    \value UniqueGLContext  The OpenGL context is only used by QMapboxGL, so it is not
     reset before each rendering. Use this mode if the intention is to only draw a
     fullscreen map.
 
-    \value SharedGLContext  The GL context is shared and the state will be restored
-    before rendering. This mode is safer when GL calls are performed prior of after
+    \value SharedGLContext  The OpenGL context is shared and the state will be restored
+    before rendering. This mode is safer when OpenGL calls are performed prior of after
     we call QMapboxGL::render for rendering a map.
 
     \sa contextMode()
+*/
+
+/*!
+    \enum QMapboxGLSettings::ConstrainMode
+
+    This enum determines if the map wraps.
+
+    \value NoConstrain              The map will wrap on the horizontal axis. Since it doesn't
+    make sense to wrap on the vertical axis in a Web Mercator projection, the map will scroll
+    and show some empty space.
+
+    \value ConstrainHeightOnly      The map will wrap around the horizontal axis, like a spinning
+    globe. This is the recommended constrain mode.
+
+    \value ConstrainWidthAndHeight  The map won't wrap and panning is restricted to the boundaries
+    of the map.
+
+    \sa constrainMode()
+*/
+
+/*!
+    \enum QMapboxGLSettings::ViewportMode
+
+    This enum flips the map vertically.
+
+    \value DefaultViewport  Native orientation.
+
+    \value FlippedYViewport  Mirrored vertically.
+
+    \sa viewportMode()
 */
 
 /*!
@@ -164,94 +189,184 @@ std::unique_ptr<const mbgl::SpriteImage> toSpriteImage(const QImage &sprite) {
     configuration is valid for initializing a QMapboxGL.
 */
 QMapboxGLSettings::QMapboxGLSettings()
-    : m_mapMode(QMapboxGLSettings::ContinuousMap)
-    , m_contextMode(QMapboxGLSettings::SharedGLContext)
+    : m_contextMode(QMapboxGLSettings::SharedGLContext)
     , m_constrainMode(QMapboxGLSettings::ConstrainHeightOnly)
     , m_viewportMode(QMapboxGLSettings::DefaultViewport)
     , m_cacheMaximumSize(mbgl::util::DEFAULT_MAX_CACHE_SIZE)
     , m_cacheDatabasePath(":memory:")
     , m_assetPath(QCoreApplication::applicationDirPath())
     , m_accessToken(qgetenv("MAPBOX_ACCESS_TOKEN"))
+    , m_apiBaseUrl(mbgl::util::API_BASE_URL)
 {
 }
 
-QMapboxGLSettings::MapMode QMapboxGLSettings::mapMode() const
-{
-    return m_mapMode;
-}
+/*!
+    Returns the OpenGL context mode. This is specially important when mixing
+    with other OpenGL draw calls.
 
-void QMapboxGLSettings::setMapMode(MapMode mode)
-{
-    m_mapMode = mode;
-}
-
+    By default, it is set to QMapboxGLSettings::SharedGLContext.
+*/
 QMapboxGLSettings::GLContextMode QMapboxGLSettings::contextMode() const
 {
     return m_contextMode;
 }
 
+/*!
+    Sets the OpenGL context \a mode.
+*/
 void QMapboxGLSettings::setContextMode(GLContextMode mode)
 {
     m_contextMode = mode;
 }
 
+/*!
+    Returns the constrain mode. This is used to limit the map to wrap
+    around the globe horizontally.
+
+    By default, it is set to QMapboxGLSettings::ConstrainHeightOnly.
+*/
 QMapboxGLSettings::ConstrainMode QMapboxGLSettings::constrainMode() const
 {
     return m_constrainMode;
 }
 
+/*!
+    Sets the map constrain \a mode.
+*/
 void QMapboxGLSettings::setConstrainMode(ConstrainMode mode)
 {
     m_constrainMode = mode;
 }
 
+/*!
+    Returns the viewport mode. This is used to flip the vertical
+    orientation of the map as some devices may use inverted orientation.
+
+    By default, it is set to QMapboxGLSettings::DefaultViewport.
+*/
 QMapboxGLSettings::ViewportMode QMapboxGLSettings::viewportMode() const
 {
     return m_viewportMode;
 }
 
+/*!
+    Sets the viewport \a mode.
+*/
 void QMapboxGLSettings::setViewportMode(ViewportMode mode)
 {
     m_viewportMode = mode;
 }
 
+/*!
+    Returns the cache database maximum hard size in bytes. The database
+    will grow until the limit is reached. Setting a maximum size smaller
+    than the current size of an existing database results in undefined
+    behavior
+
+    By default, it is set to 50 MB.
+*/
 unsigned QMapboxGLSettings::cacheDatabaseMaximumSize() const
 {
     return m_cacheMaximumSize;
 }
 
+/*!
+    Returns the maximum allowed cache database \a size in bytes.
+*/
 void QMapboxGLSettings::setCacheDatabaseMaximumSize(unsigned size)
 {
     m_cacheMaximumSize = size;
 }
 
+/*!
+    Returns the cache database path. The cache is used for storing
+    recently used resources like tiles and also an offline tile database
+    pre-populated by the
+    \l {https://github.com/mapbox/mapbox-gl-native/blob/master/bin/offline.sh}
+    {Offline Tool}.
+
+    By default, it is set to \c :memory: meaning it will create an in-memory
+    cache instead of a file on disk.
+*/
 QString QMapboxGLSettings::cacheDatabasePath() const
 {
     return m_cacheDatabasePath;
 }
 
+/*!
+    Sets the cache database \a path.
+
+    Setting the \a path to \c :memory: will create an in-memory cache.
+*/
 void QMapboxGLSettings::setCacheDatabasePath(const QString &path)
 {
     m_cacheDatabasePath = path;
 }
 
+/*!
+    Returns the asset path, which is the root directory from where
+    the \c asset:// scheme gets resolved in a style. \c asset:// can be used
+    for loading a resource from the disk in a style rather than fetching
+    it from the network.
+
+    By default, it is set to the value returned by QCoreApplication::applicationDirPath().
+*/
 QString QMapboxGLSettings::assetPath() const
 {
     return m_assetPath;
 }
 
+/*!
+    Sets the asset \a path.
+*/
 void QMapboxGLSettings::setAssetPath(const QString &path)
 {
     m_assetPath = path;
 }
 
+/*!
+    Returns the access token.
+
+    By default, it is taken from the environment variable \c MAPBOX_ACCESS_TOKEN
+    or empty if the variable is not set.
+*/
 QString QMapboxGLSettings::accessToken() const {
     return m_accessToken;
 }
 
+/*!
+    Sets the access \a token.
+
+    Mapbox-hosted vector tiles and styles require an API
+    \l {https://www.mapbox.com/help/define-access-token/}{access token}, which you
+    can obtain from the \l {https://www.mapbox.com/studio/account/tokens/}
+    {Mapbox account page}. Access tokens associate requests to Mapbox's vector tile
+    and style APIs with your Mapbox account. They also deter other developers from
+    using your styles without your permission.
+*/
 void QMapboxGLSettings::setAccessToken(const QString &token)
 {
     m_accessToken = token;
+}
+
+/*!
+    Returns the API base URL.
+*/
+QString QMapboxGLSettings::apiBaseUrl() const
+{
+    return m_apiBaseUrl;
+}
+
+/*!
+    Sets the API base \a url.
+
+    The API base URL is the URL that the \b "mapbox://" protocol will
+    be resolved to. It defaults to "https://api.mapbox.com" but can be
+    changed, for instance, to a tile cache server address.
+*/
+void QMapboxGLSettings::setApiBaseUrl(const QString& url)
+{
+    m_apiBaseUrl = url;
 }
 
 /*!
@@ -266,14 +381,84 @@ void QMapboxGLSettings::setAccessToken(const QString &token)
     QNetworkAccessManager for HTTP requests and QString for UTF-8 manipulation.
 
     QMapboxGL is not thread-safe and it is assumed that it will be accessed from
-    the same thread as the thread where the GL context lives.
+    the same thread as the thread where the OpenGL context lives.
 
     \since 4.7
 */
 
 /*!
+    \enum QMapboxGL::MapChange
+
+    This enum represents the last changed occurred to the map state.
+
+    \value MapChangeRegionWillChange                      A region of the map will change, like
+    when resizing the map.
+
+    \value MapChangeRegionWillChangeAnimated              Not in use by QMapboxGL.
+
+    \value MapChangeRegionIsChanging                      A region of the map is changing.
+
+    \value MapChangeRegionDidChange                       A region of the map finished changing.
+
+    \value MapChangeRegionDidChangeAnimated               Not in use by QMapboxGL.
+
+    \value MapChangeWillStartLoadingMap                   The map is getting loaded. This state
+    is set only once right after QMapboxGL is created and a style is set.
+
+    \value MapChangeDidFinishLoadingMap                   All the resources were loaded and parsed
+    and the map is fully rendered. After this state the mapChanged() signal won't fire again unless
+    the is some client side interaction with the map or a tile expires, causing a new resource
+    to be requested from the network.
+
+    \value MapChangeDidFailLoadingMap                     An error occurred when loading the map.
+
+    \value MapChangeWillStartRenderingFrame               Just before rendering the frame. This
+    is the state of the map just after calling render() and might happened many times before
+    the map is fully loaded.
+
+    \value MapChangeDidFinishRenderingFrame               The current frame was rendered but was
+    left in a partial state. Some parts of the map might be missing because have not arrived
+    from the network or are being parsed.
+
+    \value MapChangeDidFinishRenderingFrameFullyRendered  The current frame was fully rendered.
+
+    \value MapChangeWillStartRenderingMap                 Set once when the map is about to get
+    rendered for the first time.
+
+    \value MapChangeDidFinishRenderingMap                 Not in use by QMapboxGL.
+
+    \value MapChangeDidFinishRenderingMapFullyRendered    Map is fully loaded and rendered.
+
+    \value MapChangeDidFinishLoadingStyle                 The style was loaded.
+
+    \value MapChangeSourceDidChange                       A source has changed.
+
+    \sa mapChanged()
+*/
+
+/*!
+    \enum QMapboxGL::NorthOrientation
+
+    This enum sets the orientation of the north bearing. It will directly affect bearing when
+    resetting the north (i.e. setting bearing to 0).
+
+    \value NorthUpwards     The north is pointing up in the map. This is usually how maps are oriented.
+
+    \value NorthRightwards  The north is pointing right.
+
+    \value NorthDownwards   The north is pointing down.
+
+    \value NorthLeftwards   The north is pointing left.
+
+    \sa northOrientation()
+    \sa bearing()
+*/
+
+/*!
     Constructs a QMapboxGL object with \a settings and sets \a parent as the parent
-    object. The \a settings cannot be changed after the object is constructed.
+    object. The \a settings cannot be changed after the object is constructed. The
+    \a size represents the size of the viewport and the \a pixelRatio the initial pixel
+    density of the screen.
 */
 QMapboxGL::QMapboxGL(QObject *parent, const QMapboxGLSettings &settings, const QSize& size, qreal pixelRatio)
     : QObject(parent)
@@ -287,56 +472,76 @@ QMapboxGL::QMapboxGL(QObject *parent, const QMapboxGLSettings &settings, const Q
     d_ptr = new QMapboxGLPrivate(this, settings, size, pixelRatio);
 }
 
+/*!
+    Destroys this QMapboxGL.
+*/
 QMapboxGL::~QMapboxGL()
 {
     delete d_ptr;
 }
 
+/*!
+    Cycles through several debug options like showing the tile borders,
+    tile numbers, expiration time and wireframe.
+*/
 void QMapboxGL::cycleDebugOptions()
 {
     d_ptr->mapObj->cycleDebugOptions();
 }
 
+/*!
+    \property QMapboxGL::styleJson
+    \brief the map style JSON.
+
+    Sets a new \a style from a JSON that must conform to the
+    \l {https://www.mapbox.com/mapbox-gl-style-spec/}
+    {Mapbox style specification}.
+
+    \note In case of a invalid style it will trigger a mapChanged
+    signal with QMapboxGL::MapChangeDidFailLoadingMap as argument.
+*/
 QString QMapboxGL::styleJson() const
 {
     return QString::fromStdString(d_ptr->mapObj->getStyleJSON());
 }
 
-QString QMapboxGL::styleUrl() const
-{
-    return QString::fromStdString(d_ptr->mapObj->getStyleURL());
-}
-
-/*!
-    Sets a new \a style from a JSON that must conform with the
-    \l {https://www.mapbox.com/mapbox-gl-style-spec/}
-    {Mapbox Style Specification}.
-
-    \note In case of a invalid style it will trigger a mapChanged
-    signal with QMapbox::MapChangeDidFailLoadingMap as argument.
-*/
 void QMapboxGL::setStyleJson(const QString &style)
 {
     d_ptr->mapObj->setStyleJSON(style.toStdString());
 }
 
 /*!
-    Sets a URL for fetching a JSON that will be later feed to
+    \property QMapboxGL::styleUrl
+    \brief the map style URL.
+
+    Sets a URL for fetching a JSON that will be later fed to
     setStyleJson. URLs using the Mapbox scheme (\a mapbox://) are
     also accepted and translated automatically to an actual HTTPS
     request.
 
-    The Mapbox scheme is not enforced by any means and a style can
-    be fetched from anything that QNetworkAccessManager can handle.
+    The Mapbox scheme is not enforced and a style can be fetched
+    from anything that QNetworkAccessManager can handle.
 
     \note In case of a invalid style it will trigger a mapChanged
-    signal with QMapbox::MapChangeDidFailLoadingMap as argument.
+    signal with QMapboxGL::MapChangeDidFailLoadingMap as argument.
 */
+QString QMapboxGL::styleUrl() const
+{
+    return QString::fromStdString(d_ptr->mapObj->getStyleURL());
+}
+
 void QMapboxGL::setStyleUrl(const QString &url)
 {
     d_ptr->mapObj->setStyleURL(url.toStdString());
 }
 
+/*!
+    \property QMapboxGL::latitude
+    \brief the map's current latitude in degrees.
+
+    Setting a latitude doesn't necessarily mean it will be accepted since QMapboxGL
+    might constrain it within the limits of the Web Mercator projection.
+*/
 double QMapboxGL::latitude() const
 {
     return d_ptr->mapObj->getLatLng(d_ptr->margins).latitude;
@@ -347,6 +552,14 @@ void QMapboxGL::setLatitude(double latitude_)
     d_ptr->mapObj->setLatLng(mbgl::LatLng { latitude_, longitude() }, d_ptr->margins);
 }
 
+/*!
+    \property QMapboxGL::longitude
+    \brief the map current longitude in degrees.
+
+    Setting a longitude beyond the limits of the Web Mercator projection will make
+    the map wrap. As an example, setting the longitude to 360 is effectively the same
+    as setting it to 0.
+*/
 double QMapboxGL::longitude() const
 {
     return d_ptr->mapObj->getLatLng(d_ptr->margins).longitude;
@@ -357,6 +570,19 @@ void QMapboxGL::setLongitude(double longitude_)
     d_ptr->mapObj->setLatLng(mbgl::LatLng { latitude(), longitude_ }, d_ptr->margins);
 }
 
+/*!
+    \property QMapboxGL::scale
+    \brief the map scale factor.
+
+    This property is used to zoom the map. When \a center is defined, the map will
+    scale in the direction of the center pixel coordinates. The \a center will remain
+    at the same pixel coordinate after scaling as before calling this method.
+
+    \note This function could be used for implementing a pinch gesture or zooming
+    by using the mouse scroll wheel.
+
+    \sa zoom()
+*/
 double QMapboxGL::scale() const
 {
     return d_ptr->mapObj->getScale();
@@ -367,6 +593,16 @@ void QMapboxGL::setScale(double scale_, const QPointF &center)
     d_ptr->mapObj->setScale(scale_, mbgl::ScreenCoordinate { center.x(), center.y() });
 }
 
+/*!
+    \property QMapboxGL::zoom
+    \brief the map zoom factor.
+
+    This property is used to zoom the map. When \a center is defined, the map will
+    zoom in the direction of the center. This function could be used for implementing
+    a pinch gesture or zooming by using the mouse scroll wheel.
+
+    \sa scale()
+*/
 double QMapboxGL::zoom() const
 {
     return d_ptr->mapObj->getZoom();
@@ -377,34 +613,66 @@ void QMapboxGL::setZoom(double zoom_)
     d_ptr->mapObj->setZoom(zoom_, d_ptr->margins);
 }
 
+/*!
+    Returns the minimum zoom level allowed for the map.
+
+    \sa maximumZoom()
+*/
 double QMapboxGL::minimumZoom() const
 {
     return d_ptr->mapObj->getMinZoom();
 }
 
+/*!
+    Returns the maximum zoom level allowed for the map.
+
+    \sa minimumZoom()
+*/
 double QMapboxGL::maximumZoom() const
 {
     return d_ptr->mapObj->getMaxZoom();
 }
 
+/*!
+    \property QMapboxGL::coordinate
+    \brief the map center \a coordinate.
+
+    Centers the map at a geographic coordinate respecting the margins, if set.
+
+    \sa margins()
+*/
 Coordinate QMapboxGL::coordinate() const
 {
     const mbgl::LatLng& latLng = d_ptr->mapObj->getLatLng(d_ptr->margins);
     return Coordinate(latLng.latitude, latLng.longitude);
 }
 
-void QMapboxGL::setCoordinate(const Coordinate &coordinate_)
+void QMapboxGL::setCoordinate(const QMapbox::Coordinate &coordinate_)
 {
     d_ptr->mapObj->setLatLng(mbgl::LatLng { coordinate_.first, coordinate_.second }, d_ptr->margins);
 }
 
-void QMapboxGL::setCoordinateZoom(const Coordinate &coordinate_, double zoom_)
+/*!
+    \fn QMapboxGL::setCoordinateZoom(const QMapbox::Coordinate &coordinate, double zoom)
+
+    Convenience method for setting the \a coordinate and \a zoom simultaneously.
+
+    \note Setting \a coordinate and \a zoom at once is more efficient than doing
+    it in two steps.
+
+    \sa zoom()
+    \sa coordinate()
+*/
+void QMapboxGL::setCoordinateZoom(const QMapbox::Coordinate &coordinate_, double zoom_)
 {
     d_ptr->mapObj->setLatLngZoom(
             mbgl::LatLng { coordinate_.first, coordinate_.second }, zoom_, d_ptr->margins);
 }
 
-void QMapboxGL::jumpTo(const CameraOptions& camera)
+/*!
+    Atomically jumps to the \a camera options.
+*/
+void QMapboxGL::jumpTo(const QMapboxGLCameraOptions& camera)
 {
     mbgl::CameraOptions mbglCamera;
     if (camera.center.isValid()) {
@@ -430,6 +698,18 @@ void QMapboxGL::jumpTo(const CameraOptions& camera)
     d_ptr->mapObj->jumpTo(mbglCamera);
 }
 
+/*!
+    \property QMapboxGL::bearing
+    \brief the map bearing in degrees.
+
+    Set the angle in degrees. Negative values and values over 360 are
+    valid and will wrap. The direction of the rotation is counterclockwise.
+
+    When \a center is defined, the map will rotate around the center pixel coordinate
+    respecting the margins if defined.
+
+    \sa margins()
+*/
 double QMapboxGL::bearing() const
 {
     return d_ptr->mapObj->getBearing();
@@ -445,6 +725,15 @@ void QMapboxGL::setBearing(double degrees, const QPointF &center)
     d_ptr->mapObj->setBearing(degrees, mbgl::ScreenCoordinate { center.x(), center.y() });
 }
 
+/*!
+    \property QMapboxGL::pitch
+    \brief the map pitch in degrees.
+
+    Pitch toward the horizon measured in degrees, with 0 resulting in a
+    two-dimensional map. It will be constrained at 60 degrees.
+
+    \sa margins()
+*/
 double QMapboxGL::pitch() const
 {
     return d_ptr->mapObj->getPitch();
@@ -455,41 +744,86 @@ void QMapboxGL::setPitch(double pitch_)
     d_ptr->mapObj->setPitch(pitch_);
 }
 
+/*!
+    Returns the north orientation mode.
+*/
 QMapboxGL::NorthOrientation QMapboxGL::northOrientation() const
 {
     return static_cast<QMapboxGL::NorthOrientation>(d_ptr->mapObj->getNorthOrientation());
 }
 
+/*!
+    Sets the north orientation mode to \a orientation.
+*/
 void QMapboxGL::setNorthOrientation(NorthOrientation orientation)
 {
     d_ptr->mapObj->setNorthOrientation(static_cast<mbgl::NorthOrientation>(orientation));
 }
 
-void QMapboxGL::setGestureInProgress(bool inProgress)
+/*!
+    Tells the map rendering engine that there is currently a gesture in \a progress. This
+    affects how the map renders labels, as it will use different texture filters if a gesture
+    is ongoing.
+*/
+void QMapboxGL::setGestureInProgress(bool progress)
 {
-    d_ptr->mapObj->setGestureInProgress(inProgress);
+    d_ptr->mapObj->setGestureInProgress(progress);
 }
 
+/*!
+    Adds an \a className to the list of active classes. Layers tagged with a certain class
+    will only be active when the class is added.
+
+    This was removed from the \l {https://www.mapbox.com/mapbox-gl-style-spec/#layer-paint.*}
+    {Mapbox style specification} and should no longer be used.
+
+    \deprecated
+    \sa removeClass()
+*/
 void QMapboxGL::addClass(const QString &className)
 {
     d_ptr->mapObj->addClass(className.toStdString());
 }
 
+/*!
+    Removes a \a className.
+
+    \deprecated
+    \sa addClass()
+*/
 void QMapboxGL::removeClass(const QString &className)
 {
     d_ptr->mapObj->removeClass(className.toStdString());
 }
 
+/*!
+    Returns true when \a className is active, false otherwise.
+
+    \deprecated
+    \sa addClass()
+*/
 bool QMapboxGL::hasClass(const QString &className) const
 {
     return d_ptr->mapObj->hasClass(className.toStdString());
 }
 
+/*!
+    Bulk adds a list of \a classNames.
+
+    \deprecated
+    \sa addClass()
+*/
 void QMapboxGL::setClasses(const QStringList &classNames)
 {
     d_ptr->mapObj->setClasses(fromQStringList(classNames));
 }
 
+/*!
+    Returns a list of active classes.
+
+    \deprecated
+    \sa setClasses()
+*/
 QStringList QMapboxGL::getClasses() const
 {
     QStringList classNames;
@@ -499,12 +833,19 @@ QStringList QMapboxGL::getClasses() const
     return classNames;
 }
 
-QMapbox::TransitionOptions QMapboxGL::getTransitionOptions() const {
-    return toQMapboxTransitionOptions(d_ptr->mapObj->getTransitionOptions());
-}
+/*!
+    Sets the \a duration and \a delay of style class transitions. Style property
+    values transition to new values with animation when a new class is set.
 
-void QMapboxGL::setTransitionOptions(const QMapbox::TransitionOptions &options) {
-    d_ptr->mapObj->setTransitionOptions(fromQMapboxTransitionOptions(options));
+    \deprecated
+    \sa addClass()
+*/
+void QMapboxGL::setTransitionOptions(qint64 duration, qint64 delay) {
+    static auto convert = [](qint64 value) -> mbgl::optional<mbgl::Duration> {
+        return std::chrono::duration_cast<mbgl::Duration>(mbgl::Milliseconds(value));
+    };
+
+    d_ptr->mapObj->setTransitionOptions(mbgl::style::TransitionOptions{ convert(duration), convert(delay) });
 }
 
 mbgl::Annotation fromPointAnnotation(const PointAnnotation &pointAnnotation) {
@@ -513,92 +854,206 @@ mbgl::Annotation fromPointAnnotation(const PointAnnotation &pointAnnotation) {
     return mbgl::SymbolAnnotation { mbgl::Point<double> { coordinate.second, coordinate.first }, icon.toStdString() };
 }
 
-AnnotationID QMapboxGL::addPointAnnotation(const PointAnnotation &pointAnnotation)
+/*!
+    Adds a \a point annotation to the map.
+
+    Returns the unique identifier for the new annotation.
+
+    \sa addAnnotationIcon()
+*/
+QMapbox::AnnotationID QMapboxGL::addPointAnnotation(const QMapbox::PointAnnotation &point)
 {
-    return d_ptr->mapObj->addAnnotation(fromPointAnnotation(pointAnnotation));
+    return d_ptr->mapObj->addAnnotation(fromPointAnnotation(point));
 }
 
-void QMapboxGL::updatePointAnnotation(AnnotationID id, const PointAnnotation &pointAnnotation)
+/*!
+    Updates an existing \a point annotation referred by \a id.
+
+    \sa addAnnotationIcon()
+*/
+void QMapboxGL::updatePointAnnotation(QMapbox::AnnotationID id, const QMapbox::PointAnnotation &point)
 {
-    d_ptr->mapObj->updateAnnotation(id, fromPointAnnotation(pointAnnotation));
+    d_ptr->mapObj->updateAnnotation(id, fromPointAnnotation(point));
 }
 
-AnnotationID QMapboxGL::addShapeAnnotation(const ShapeAnnotation &shapeAnnotation)
+/*!
+    Adds a \a shape annotation to the map.
+
+    Returns the unique identifier for the new annotation.
+*/
+QMapbox::AnnotationID QMapboxGL::addShapeAnnotation(const QMapbox::ShapeAnnotation &shape)
 {
-    return d_ptr->mapObj->addAnnotation(fromQMapboxGLShapeAnnotation(shapeAnnotation));
+    return d_ptr->mapObj->addAnnotation(fromQMapboxGLShapeAnnotation(shape));
 }
 
-void QMapboxGL::removeAnnotation(AnnotationID annotationID)
+/*!
+    Removes an existing annotation referred by \a id.
+*/
+void QMapboxGL::removeAnnotation(QMapbox::AnnotationID id)
 {
-    d_ptr->mapObj->removeAnnotation(annotationID);
+    d_ptr->mapObj->removeAnnotation(id);
 }
 
-void QMapboxGL::setLayoutProperty(const QString& layer_, const QString& property, const QVariant& value)
+/*!
+    Sets a layout \a property \a value to an existing \a layer. The \a property string can be any
+    as defined by the \l {https://www.mapbox.com/mapbox-gl-style-spec/} {Mapbox style specification}
+    for layout properties.
+
+    This example hides the layer \c route:
+
+    \code
+        map->setLayoutProperty("route", "visibility", "none");
+    \endcode
+
+    This table describes the mapping between \l {https://www.mapbox.com/mapbox-gl-style-spec/#types}
+    {style types} and Qt types accepted by setLayoutProperty():
+
+    \table
+    \header
+        \li Mapbox style type
+        \li Qt type
+    \row
+        \li Enum
+        \li QString
+    \row
+        \li String
+        \li QString
+    \row
+        \li Boolean
+        \li \c bool
+    \row
+        \li Number
+        \li \c int, \c double or \c float
+    \row
+        \li Array
+        \li QVariantList
+    \endtable
+*/
+void QMapboxGL::setLayoutProperty(const QString& layer, const QString& property, const QVariant& value)
 {
     using namespace mbgl::style;
 
-    Layer* layer = d_ptr->mapObj->getLayer(layer_.toStdString());
-    if (!layer) {
-        qWarning() << "Layer not found:" << layer_;
+    Layer* layer_ = d_ptr->mapObj->getLayer(layer.toStdString());
+    if (!layer_) {
+        qWarning() << "Layer not found:" << layer;
         return;
     }
 
-    if (conversion::setLayoutProperty(*layer, property.toStdString(), value)) {
-        qWarning() << "Error setting layout property:" << layer_ << "-" << property;
+    if (conversion::setLayoutProperty(*layer_, property.toStdString(), value)) {
+        qWarning() << "Error setting layout property:" << layer << "-" << property;
         return;
     }
 }
 
-void QMapboxGL::setPaintProperty(const QString& layer_, const QString& property, const QVariant& value, const QString& klass_)
+/*!
+    Sets a paint \a property \a value to an existing \a layer. The \a property string can be any
+    as defined by the \l {https://www.mapbox.com/mapbox-gl-style-spec/} {Mapbox style specification}
+    for paint properties.
+
+    The argument \a styleClass is deprecated and is used for defining the style class for the paint
+    property.
+
+    For paint properties that take a color as \a value, such as \c fill-color, a string such as
+    \c blue can be passed or a QColor.
+
+    \code
+        map->setPaintProperty("route", "line-color", QColor("blue"));
+    \endcode
+
+    This table describes the mapping between \l {https://www.mapbox.com/mapbox-gl-style-spec/#types}
+    {style types} and Qt types accepted by setPaintProperty():
+
+    \table
+    \header
+        \li Mapbox style type
+        \li Qt type
+    \row
+        \li Color
+        \li QString or QColor
+    \row
+        \li Enum
+        \li QString
+    \row
+        \li String
+        \li QString
+    \row
+        \li Boolean
+        \li \c bool
+    \row
+        \li Number
+        \li \c int, \c double or \c float
+    \row
+        \li Array
+        \li QVariantList
+    \endtable
+
+    If the style specification defines the property's type as \b Array, use a QVariantList. For
+    example, the following code sets a \c route layer's \c line-dasharray property:
+
+    \code
+        QVariantList lineDashArray;
+        lineDashArray.append(1);
+        lineDashArray.append(2);
+
+        map->setPaintProperty("route","line-dasharray", lineDashArray);
+    \endcode
+*/
+void QMapboxGL::setPaintProperty(const QString& layer, const QString& property, const QVariant& value, const QString& styleClass)
 {
     using namespace mbgl::style;
 
-    Layer* layer = d_ptr->mapObj->getLayer(layer_.toStdString());
-    if (!layer) {
-        qWarning() << "Layer not found:" << layer_;
+    Layer* layer_ = d_ptr->mapObj->getLayer(layer.toStdString());
+    if (!layer_) {
+        qWarning() << "Layer not found:" << layer;
         return;
     }
 
     mbgl::optional<std::string> klass;
-    if (!klass_.isEmpty()) {
-        klass = klass_.toStdString();
+    if (!styleClass.isEmpty()) {
+        klass = styleClass.toStdString();
     }
 
-    if (conversion::setPaintProperty(*layer, property.toStdString(), value, klass)) {
-        qWarning() << "Error setting paint property:" << layer_ << "-" << property;
+    if (conversion::setPaintProperty(*layer_, property.toStdString(), value, klass)) {
+        qWarning() << "Error setting paint property:" << layer << "-" << property;
         return;
     }
 }
 
-bool QMapboxGL::isRotating() const
-{
-    return d_ptr->mapObj->isRotating();
-}
-
-bool QMapboxGL::isScaling() const
-{
-    return d_ptr->mapObj->isScaling();
-}
-
-bool QMapboxGL::isPanning() const
-{
-    return d_ptr->mapObj->isPanning();
-}
-
+/*!
+    Returns true when the map is completely rendered, false otherwise. A partially
+    rendered map ranges from nothing rendered at all to only labels missing.
+*/
 bool QMapboxGL::isFullyLoaded() const
 {
     return d_ptr->mapObj->isFullyLoaded();
 }
 
+/*!
+    Pan the map by \a offset in pixels.
+
+    The pixel coordinate origin is located at the upper left corner of the map.
+*/
 void QMapboxGL::moveBy(const QPointF &offset)
 {
     d_ptr->mapObj->moveBy(mbgl::ScreenCoordinate { offset.x(), offset.y() });
 }
 
+/*!
+    \fn QMapboxGL::scaleBy(double scale, const QPointF &center)
+
+    Scale the map by \a scale in the direction of the \a center. This function
+    can be used for implementing a pinch gesture.
+*/
 void QMapboxGL::scaleBy(double scale_, const QPointF &center) {
     d_ptr->mapObj->scaleBy(scale_, mbgl::ScreenCoordinate { center.x(), center.y() });
 }
 
+/*!
+    Rotate the map from the \a first screen coordinate to the \a second screen coordinate.
+    This method can be used for implementing rotating the map by clicking and dragging,
+    being \a first the cursor coordinate at the last frame and \a second the cursor coordinate
+    at the current frame.
+*/
 void QMapboxGL::rotateBy(const QPointF &first, const QPointF &second)
 {
     d_ptr->mapObj->rotateBy(
@@ -606,6 +1061,17 @@ void QMapboxGL::rotateBy(const QPointF &first, const QPointF &second)
             mbgl::ScreenCoordinate { second.x(), second.y() });
 }
 
+/*!
+    Resize the map to \a size and scale to fit at \a framebufferSize. For
+    high DPI screens, the size will be smaller than the \a framebufferSize.
+
+    This fallowing example will double the pixel density of the map for
+    a given \c size:
+
+    \code
+        map->resize(size / 2, size);
+    \endcode
+*/
 void QMapboxGL::resize(const QSize& size, const QSize& framebufferSize)
 {
     if (d_ptr->size == size && d_ptr->fbSize == framebufferSize) return;
@@ -617,14 +1083,34 @@ void QMapboxGL::resize(const QSize& size, const QSize& framebufferSize)
         { static_cast<uint32_t>(size.width()), static_cast<uint32_t>(size.height()) });
 }
 
-void QMapboxGL::addAnnotationIcon(const QString &name, const QImage &sprite)
-{
-    if (sprite.isNull()) return;
+/*!
+    Adds an \a icon to the annotation icon pool. This can be later used by the annotation
+    functions to shown any drawing on the map by referencing its \a name.
 
-    d_ptr->mapObj->addAnnotationIcon(name.toStdString(), toSpriteImage(sprite));
+    Unlike using addIcon() for runtime styling, annotations added with addPointAnnotation()
+    will survive style changes.
+
+    \sa addPointAnnotation()
+*/
+void QMapboxGL::addAnnotationIcon(const QString &name, const QImage &icon)
+{
+    if (icon.isNull()) return;
+
+    d_ptr->mapObj->addAnnotationIcon(name.toStdString(), toSpriteImage(icon));
 }
 
-QPointF QMapboxGL::pixelForCoordinate(const Coordinate &coordinate_) const
+/*!
+    \fn QMapboxGL::pixelForCoordinate(const QMapbox::Coordinate &coordinate) const
+
+    Returns the offset in pixels for \a coordinate. The origin pixel coordinate is
+    located at the top left corner of the map view.
+
+    This method returns the correct value for any coordinate, even if the coordinate
+    is not currently visible on the screen.
+
+    /note The return value is affected by the current zoom level, bearing and pitch.
+*/
+QPointF QMapboxGL::pixelForCoordinate(const QMapbox::Coordinate &coordinate_) const
 {
     const mbgl::ScreenCoordinate pixel =
         d_ptr->mapObj->pixelForLatLng(mbgl::LatLng { coordinate_.first, coordinate_.second });
@@ -632,7 +1118,10 @@ QPointF QMapboxGL::pixelForCoordinate(const Coordinate &coordinate_) const
     return QPointF(pixel.x, pixel.y);
 }
 
-Coordinate QMapboxGL::coordinateForPixel(const QPointF &pixel) const
+/*!
+    Returns the geographic coordinate for the \a pixel coordinate.
+*/
+QMapbox::Coordinate QMapboxGL::coordinateForPixel(const QPointF &pixel) const
 {
     const mbgl::LatLng latLng =
         d_ptr->mapObj->latLngForPixel(mbgl::ScreenCoordinate { pixel.x(), pixel.y() });
@@ -640,7 +1129,11 @@ Coordinate QMapboxGL::coordinateForPixel(const QPointF &pixel) const
     return Coordinate(latLng.latitude, latLng.longitude);
 }
 
-CoordinateZoom QMapboxGL::coordinateZoomForBounds(const Coordinate &sw, Coordinate &ne) const
+/*!
+    Returns the coordinate and zoom combination needed in order to make the coordinate
+    bounding box \a sw and \a ne visible.
+*/
+QMapbox::CoordinateZoom QMapboxGL::coordinateZoomForBounds(const QMapbox::Coordinate &sw, QMapbox::Coordinate &ne) const
 {
     auto bounds = mbgl::LatLngBounds::hull(mbgl::LatLng { sw.first, sw.second }, mbgl::LatLng { ne.first, ne.second });
     mbgl::CameraOptions camera = d_ptr->mapObj->cameraForLatLngBounds(bounds, d_ptr->margins);
@@ -648,8 +1141,13 @@ CoordinateZoom QMapboxGL::coordinateZoomForBounds(const Coordinate &sw, Coordina
     return {{ (*camera.center).latitude, (*camera.center).longitude }, *camera.zoom };
 }
 
-CoordinateZoom QMapboxGL::coordinateZoomForBounds(const Coordinate &sw, Coordinate &ne,
+/*!
+    Returns the coordinate and zoom combination needed in order to make the coordinate
+    bounding box \a sw and \a ne visible taking into account \a newBearing and \a newPitch.
+*/
+QMapbox::CoordinateZoom QMapboxGL::coordinateZoomForBounds(const QMapbox::Coordinate &sw, QMapbox::Coordinate &ne,
     double newBearing, double newPitch)
+
 {
     // FIXME: mbgl::Map::cameraForLatLngBounds should
     // take bearing and pitch as input too, so this
@@ -669,6 +1167,12 @@ CoordinateZoom QMapboxGL::coordinateZoomForBounds(const Coordinate &sw, Coordina
     return {{ (*camera.center).latitude, (*camera.center).longitude }, *camera.zoom };
 }
 
+/*!
+    \property QMapboxGL::margins
+    \brief the map margins in pixels from the corners of the map.
+
+    This property sets a new reference center for the map.
+*/
 void QMapboxGL::setMargins(const QMargins &margins_)
 {
     d_ptr->margins = {
@@ -689,12 +1193,30 @@ QMargins QMapboxGL::margins() const
     );
 }
 
-void QMapboxGL::addSource(const QString &sourceID, const QVariantMap &params)
+/*!
+    Adds a source \a id to the map as specified by the \l
+    {https://www.mapbox.com/mapbox-gl-style-spec/#root-sources}{Mapbox style specification} with
+    \a params.
+
+    This example reads a GeoJSON from the Qt resource system and adds it as source:
+
+    \code
+        QFile geojson(":source1.geojson");
+        geojson.open(QIODevice::ReadOnly);
+
+        QVariantMap routeSource;
+        routeSource["type"] = "geojson";
+        routeSource["data"] = geojson.readAll();
+
+        map->addSource("routeSource", routeSource);
+    \endcode
+*/
+void QMapboxGL::addSource(const QString &id, const QVariantMap &params)
 {
     using namespace mbgl::style;
     using namespace mbgl::style::conversion;
 
-    Result<std::unique_ptr<Source>> source = convert<std::unique_ptr<Source>>(QVariant(params), sourceID.toStdString());
+    Result<std::unique_ptr<Source>> source = convert<std::unique_ptr<Source>>(QVariant(params), id.toStdString());
     if (!source) {
         qWarning() << "Unable to add source:" << source.error().message.c_str();
         return;
@@ -703,16 +1225,64 @@ void QMapboxGL::addSource(const QString &sourceID, const QVariantMap &params)
     d_ptr->mapObj->addSource(std::move(*source));
 }
 
-void QMapboxGL::removeSource(const QString& sourceID)
+/*!
+    Updates the source \a id with new \a params.
+
+    If the source does not exist, it will be added like in addSource(). Only
+    GeoJSON sources can be updated.
+*/
+void QMapboxGL::updateSource(const QString &id, const QVariantMap &params)
 {
-    d_ptr->mapObj->removeSource(sourceID.toStdString());
+    using namespace mbgl::style;
+    using namespace mbgl::style::conversion;
+
+    auto source = d_ptr->mapObj->getSource(id.toStdString());
+    if (!source) {
+        addSource(id, params);
+        return;
+    }
+
+    auto sourceGeoJSON = source->as<GeoJSONSource>();
+    if (!sourceGeoJSON) {
+        qWarning() << "Unable to update source: only GeoJSON sources are mutable.";
+        return;
+    }
+
+    if (params.contains("data")) {
+        auto result = convertGeoJSON(params["data"]);
+        if (result) {
+            sourceGeoJSON->setGeoJSON(*result);
+        }
+    }
 }
 
+/*!
+    Removes the source \a id.
+
+    This method has no effect if the source does not exist.
+*/
+void QMapboxGL::removeSource(const QString& id)
+{
+    auto sourceIDStdString = id.toStdString();
+
+    if (d_ptr->mapObj->getSource(sourceIDStdString)) {
+        d_ptr->mapObj->removeSource(sourceIDStdString);
+    }
+}
+
+/*!
+    Adds a custom layer \a id with the initialization function \a initFn, the
+    render function \a renderFn and the deinitialization function \a deinitFn with
+    the user data \a context before the existing layer \a before.
+
+    \warning This is used for delegating the rendering of a layer to the user of
+    this API and is not officially supported. Use at your own risk.
+*/
 void QMapboxGL::addCustomLayer(const QString &id,
         QMapbox::CustomLayerInitializeFunction initFn,
         QMapbox::CustomLayerRenderFunction renderFn,
         QMapbox::CustomLayerDeinitializeFunction deinitFn,
-        void *context_,
+        void *context,
         char *before)
 {
     d_ptr->mapObj->addLayer(std::make_unique<mbgl::style::CustomLayer>(
@@ -722,10 +1292,29 @@ void QMapboxGL::addCustomLayer(const QString &id,
             // CustomLayerRenderParameters members remains the same.
             (mbgl::style::CustomLayerRenderFunction)renderFn,
             reinterpret_cast<mbgl::style::CustomLayerDeinitializeFunction>(deinitFn),
-            context_),
+            context),
             before ? mbgl::optional<std::string>(before) : mbgl::optional<std::string>());
 }
 
+/*!
+    Adds a style layer to the map as specified by the \l
+    {https://www.mapbox.com/mapbox-gl-style-spec/#root-layers}{Mapbox style specification} with
+    \a params.
+
+    This example shows how to add a layer that will be used to show a route line on the map. Note
+    that nothing will be drawn until we set paint properties using setPaintProperty().
+
+    \code
+        QVariantMap route;
+        route["id"] = "route";
+        route["type"] = "line";
+        route["source"] = "routeSource";
+
+        map->addLayer(route);
+    \endcode
+
+    /note The source must exist prior to adding a layer.
+*/
 void QMapboxGL::addLayer(const QVariantMap &params)
 {
     using namespace mbgl::style;
@@ -740,63 +1329,108 @@ void QMapboxGL::addLayer(const QVariantMap &params)
     d_ptr->mapObj->addLayer(std::move(*layer));
 }
 
+/*!
+    Removes the layer \a id.
+*/
 void QMapboxGL::removeLayer(const QString& id)
 {
     d_ptr->mapObj->removeLayer(id.toStdString());
 }
 
-void QMapboxGL::addImage(const QString &name, const QImage &sprite)
-{
-    if (sprite.isNull()) return;
+/*!
+    Adds the \a image with the identifier \a id that can be used
+    later by a symbol layer.
 
-    d_ptr->mapObj->addImage(name.toStdString(), toSpriteImage(sprite));
+    If the \a id was already added, it gets replaced by the new
+    \a image only if the dimensions of the image are the same as
+    the old image, otherwise it has no effect.
+
+    \sa addLayer()
+*/
+void QMapboxGL::addImage(const QString &id, const QImage &image)
+{
+    if (image.isNull()) return;
+
+    d_ptr->mapObj->addImage(id.toStdString(), toSpriteImage(image));
 }
 
-void QMapboxGL::removeImage(const QString &name)
+/*!
+    Removes the image \a id.
+*/
+void QMapboxGL::removeImage(const QString &id)
 {
-    d_ptr->mapObj->removeImage(name.toStdString());
+    d_ptr->mapObj->removeImage(id.toStdString());
 }
 
-void QMapboxGL::setFilter(const QString& layer_, const QVariant& filter_)
+/*!
+    Adds a \a filter to a style \a layer using the format described in the \l
+    {https://www.mapbox.com/mapbox-gl-style-spec/#types-filter}{Mapbox style specification}.
+
+    Given a layer \c marker from an arbitrary GeoJSON source containing features of type \b
+    "Point" and \b "LineString", this example shows how to make sure the layer will only tag
+    features of type \b "Point".
+
+    \code
+        QVariantList filterExpression;
+        filterExpression.append("==");
+        filterExpression.append("$type");
+        filterExpression.append("Point");
+
+        QVariantList filter;
+        filter.append(filterExpression);
+
+        map->setFilter("marker", filter);
+    \endcode
+*/
+void QMapboxGL::setFilter(const QString& layer, const QVariant& filter)
 {
     using namespace mbgl::style;
     using namespace mbgl::style::conversion;
 
-    Layer* layer = d_ptr->mapObj->getLayer(layer_.toStdString());
-    if (!layer) {
-        qWarning() << "Layer not found:" << layer_;
+    Layer* layer_ = d_ptr->mapObj->getLayer(layer.toStdString());
+    if (!layer_) {
+        qWarning() << "Layer not found:" << layer;
         return;
     }
 
-    Filter filter;
+    Filter filter_;
 
-    Result<Filter> converted = convert<Filter>(filter_);
+    Result<Filter> converted = convert<Filter>(filter);
     if (!converted) {
         qWarning() << "Error parsing filter:" << converted.error().message.c_str();
         return;
     }
-    filter = std::move(*converted);
+    filter_ = std::move(*converted);
 
-    if (layer->is<FillLayer>()) {
-        layer->as<FillLayer>()->setFilter(filter);
+    if (layer_->is<FillLayer>()) {
+        layer_->as<FillLayer>()->setFilter(filter_);
         return;
     }
-    if (layer->is<LineLayer>()) {
-        layer->as<LineLayer>()->setFilter(filter);
+    if (layer_->is<LineLayer>()) {
+        layer_->as<LineLayer>()->setFilter(filter_);
         return;
     }
-    if (layer->is<SymbolLayer>()) {
-        layer->as<SymbolLayer>()->setFilter(filter);
+    if (layer_->is<SymbolLayer>()) {
+        layer_->as<SymbolLayer>()->setFilter(filter_);
         return;
     }
-    if (layer->is<CircleLayer>()) {
-        layer->as<CircleLayer>()->setFilter(filter);
+    if (layer_->is<CircleLayer>()) {
+        layer_->as<CircleLayer>()->setFilter(filter_);
         return;
     }
 
     qWarning() << "Layer doesn't support filters";
 }
 
+/*!
+    Renders the map using OpenGL draw calls. If \a fbo is passed, it will
+    make sure to bind the framebuffer object before drawing; otherwise a
+    valid OpenGL context is expected with an appropriate OpenGL viewport state set
+    for the size of the canvas.
+
+    This function should be called only after the signal needsRendering() is
+    emitted at least once.
+*/
 #if QT_VERSION >= 0x050000
 void QMapboxGL::render(QOpenGLFramebufferObject *fbo)
 {
@@ -820,10 +1454,41 @@ void QMapboxGL::render()
 }
 #endif
 
+/*!
+    Informs the map that the network connection has been established, causing
+    all network requests that previously timed out to be retried immediately.
+*/
 void QMapboxGL::connectionEstablished()
 {
     d_ptr->connectionEstablished();
 }
+
+/*!
+    \fn void QMapboxGL::needsRendering()
+
+    This signal is emitted when the visual contents of the map have changed
+    and a redraw is needed in order to keep the map visually consistent
+    with the current state.
+
+    \sa render()
+*/
+
+/*!
+    \fn void QMapboxGL::mapChanged(QMapboxGL::MapChange change)
+
+    This signal is emitted when the state of the map has changed. This signal
+    may be used for detecting errors when loading a style or detecting when
+    a map is fully loaded by analyzing the parameter \a change.
+*/
+
+/*!
+    \fn void QMapboxGL::copyrightsChanged(const QString &copyrightsHtml);
+
+    This signal is emitted when the copyrights of the current content of the map
+    have changed. This can be caused by a style change or adding a new source.
+
+    \a copyrightsHtml is a string with a HTML snippet.
+*/
 
 QMapboxGLPrivate::QMapboxGLPrivate(QMapboxGL *q, const QMapboxGLSettings &settings, const QSize &size_, qreal pixelRatio)
     : QObject(q)
@@ -837,16 +1502,18 @@ QMapboxGLPrivate::QMapboxGLPrivate(QMapboxGL *q, const QMapboxGLSettings &settin
     , mapObj(std::make_unique<mbgl::Map>(
         *this, mbgl::Size{ static_cast<uint32_t>(size.width()), static_cast<uint32_t>(size.height()) },
         pixelRatio, *fileSourceObj, threadPool,
-        static_cast<mbgl::MapMode>(settings.mapMode()),
+        mbgl::MapMode::Continuous,
         static_cast<mbgl::GLContextMode>(settings.contextMode()),
         static_cast<mbgl::ConstrainMode>(settings.constrainMode()),
         static_cast<mbgl::ViewportMode>(settings.viewportMode())))
 {
-    qRegisterMetaType<QMapbox::MapChange>("QMapbox::MapChange");
+    qRegisterMetaType<QMapboxGL::MapChange>("QMapboxGL::MapChange");
 
     fileSourceObj->setAccessToken(settings.accessToken().toStdString());
+    fileSourceObj->setAPIBaseURL(settings.apiBaseUrl().toStdString());
+
     connect(this, SIGNAL(needsRendering()), q_ptr, SIGNAL(needsRendering()), Qt::QueuedConnection);
-    connect(this, SIGNAL(mapChanged(QMapbox::MapChange)), q_ptr, SIGNAL(mapChanged(QMapbox::MapChange)), Qt::QueuedConnection);
+    connect(this, SIGNAL(mapChanged(QMapboxGL::MapChange)), q_ptr, SIGNAL(mapChanged(QMapboxGL::MapChange)), Qt::QueuedConnection);
     connect(this, SIGNAL(copyrightsChanged(QString)), q_ptr, SIGNAL(copyrightsChanged(QString)), Qt::QueuedConnection);
 }
 
@@ -893,7 +1560,7 @@ void QMapboxGLPrivate::notifyMapChange(mbgl::MapChange change)
         emit copyrightsChanged(QString::fromStdString(attribution));
     }
 
-    emit mapChanged(static_cast<QMapbox::MapChange>(change));
+    emit mapChanged(static_cast<QMapboxGL::MapChange>(change));
 }
 
 void QMapboxGLPrivate::connectionEstablished()

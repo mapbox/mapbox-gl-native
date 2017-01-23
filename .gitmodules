@@ -12,3 +12,6 @@
 [submodule "platform/ios/uitest/OHHTTPStubs"]
 	path = platform/ios/uitest/OHHTTPStubs
 	url = https://github.com/AliSoftware/OHHTTPStubs.git
+[submodule "mapbox-gl-js"]
+	path = mapbox-gl-js
+	url = git://github.com/mapbox/mapbox-gl-js.git

@@ -5,7 +5,7 @@ package com.mapbox.mapboxsdk.style.sources;
  */
 public class NoSuchSourceException extends Exception {
 
-    public NoSuchSourceException(String message) {
-        super(message);
-    }
+  public NoSuchSourceException(String message) {
+    super(message);
+  }
 }

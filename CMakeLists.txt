@@ -3,13 +3,6 @@ project(mbgl LANGUAGES CXX C)
 set(CMAKE_CXX_STANDARD 14)
 
 include(cmake/mbgl.cmake)
-
-if(NOT EXISTS ".mason/mason.cmake")
-   execute_process(
-        COMMAND git submodule update --init .mason
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
-endif()
-
 include(.mason/mason.cmake)
 
 option(WITH_CXX11ABI "Use cxx11abi mason packages" OFF)
@@ -52,7 +45,9 @@ mason_use(earcut VERSION 0.12.1 HEADER_ONLY)
 mason_use(protozero VERSION 1.4.2 HEADER_ONLY)
 mason_use(pixelmatch VERSION 0.10.0 HEADER_ONLY)
 mason_use(geojson VERSION 0.4.0 HEADER_ONLY)
-mason_use(icu VERSION 58.1)
+mason_use(polylabel VERSION 1.0.2 HEADER_ONLY)
+
+add_definitions(-DRAPIDJSON_HAS_STDSTRING=1)
 
 if(WITH_COVERAGE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage")

@@ -111,6 +111,8 @@ test('Map', function(t) {
             'addSource',
             'addLayer',
             'removeLayer',
+            'addImage',
+            'removeImage',
             'setLayoutProperty',
             'setPaintProperty',
             'setFilter',
@@ -127,6 +129,164 @@ test('Map', function(t) {
         }
 
         t.end();
+    });
+
+    t.test('.addImage', function(t) {
+        var options = {
+            request: function() {},
+            ratio: 1
+        };
+
+        t.test('requires 3 arguments', function(t) {
+            var map = new mbgl.Map(options);
+
+            t.throws(function() {
+                map.addImage();
+            }, /Three arguments required/);
+
+            map.release();
+            t.end();
+        });
+
+        t.test('requires image argument to be an object', function(t) {
+            var map = new mbgl.Map(options);
+
+            t.throws(function() {
+                map.addImage('foo', '', {});
+            }, /Second argument must be an object/);
+
+            map.release();
+            t.end();
+        });
+
+        t.test('requires options argument to have a height param', function(t) {
+            var map = new mbgl.Map(options);
+
+            t.throws(function() {
+                map.addImage('foo', {}, {
+                    width: 40,
+                    pixelRatio: 2
+                });
+            }, /height parameter required/);
+
+            map.release();
+            t.end();
+        });
+
+        t.test('requires options argument to have a pixelRatio param', function(t) {
+            var map = new mbgl.Map(options);
+
+            t.throws(function() {
+                map.addImage('foo', {}, {
+                    width: 40,
+                    height: 40
+                });
+            }, /pixelRatio parameter required/);
+
+            map.release();
+            t.end();
+        });
+
+        t.test('requires specified height to be actual height of image', function(t) {
+            var map = new mbgl.Map(options);
+
+            t.throws(function() {
+                map.addImage('foo', new Buffer(''), {
+                    width: 401,
+                    height: 400,
+                    pixelRatio: 1
+                }, 'Image size does not match buffer size');
+            });
+
+            map.release();
+            t.end();
+        });
+
+        t.test('requires height and width to be less than 1024', function(t) {
+            var map = new mbgl.Map(options);
+
+            t.throws(function() {
+                map.addImage('foo', new Buffer(''), {
+                    width: 1025,
+                    height: 1025,
+                    pixelRatio: 1
+                }, 'Max height and width is 1024');
+            });
+
+            map.release();
+            t.end();
+        });
+
+
+        t.test('requires specified height to be actual height of image', function(t) {
+            var map = new mbgl.Map(options);
+
+            t.throws(function() {
+                map.addImage('foo', new Buffer('   '), {
+                    width: 401,
+                    height: 400,
+                    pixelRatio: 1
+                }, 'Image size does not match buffer size');
+            });
+
+            map.release();
+            t.end();
+        });
+
+        t.test('No error', function(t) {
+            var map = new mbgl.Map(options);
+
+            t.doesNotThrow(function() {
+                map.addImage('foo', new Buffer('    '), {
+                    width: 1,
+                    height: 1,
+                    pixelRatio: 1
+                });
+            });
+
+            map.release();
+            t.end();
+        });
+    });
+
+    t.test('.removeImage', function(t) {
+        var options = {
+            request: function() {},
+            ratio: 1
+        };
+
+        t.test('requires one argument', function(t) {
+            var map = new mbgl.Map(options);
+
+            t.throws(function() {
+                map.removeImage();
+            }, /One argument required/);
+
+            map.release();
+            t.end();
+        });
+
+        t.test('requires string as first argument', function(t) {
+            var map = new mbgl.Map(options);
+
+            t.throws(function() {
+                map.removeImage({});
+            }, /First argument must be a string/);
+
+            map.release();
+            t.end();
+        });
+
+        t.test('removes image', function(t) {
+            var map = new mbgl.Map(options);
+
+            t.doesNotThrow(function() {
+                map.removeImage('fooBar');
+            });
+
+            map.release();
+            t.end();
+        });
     });
 
     t.test('.load', function(t) {
@@ -371,6 +531,48 @@ test('Map', function(t) {
             map.release();
             t.end();
         });
+
+        // This can't be tested with a test-suite render test because zoom and center
+        // are set via a different code path when included as style properties.
+        t.test('sets zoom before center', function(t) {
+            var map = new mbgl.Map(options);
+            map.load({
+                "version": 8,
+                "sources": {
+                    "geojson": {
+                        "type": "geojson",
+                        "data": {
+                            "type": "Point",
+                            "coordinates": [
+                                18.05489,
+                                59.32744
+                            ]
+                        }
+                    }
+                },
+                "layers": [
+                    {
+                        "id": "circle",
+                        "type": "circle",
+                        "source": "geojson",
+                        "paint": {
+                            "circle-color": "red"
+                        }
+                    }
+                ]
+            });
+            map.render({width: 400, height: 400, zoom: 5, center: [18.05489, 59.32744]}, function(err, actual) {
+                t.error(err);
+
+                var PNG = require('pngjs').PNG;
+                var pixelmatch = require('pixelmatch');
+                var expected = PNG.sync.read(
+                    fs.readFileSync(path.join(__dirname, '../fixtures/zoom-center/expected.png'))).data;
+                var numPixels = pixelmatch(actual, expected, undefined, 400, 400, { threshold: 0.13 });
+                t.equal(numPixels, 0);
+                t.end();
+            });
+        })
     });
 
     t.test('request callback', function (t) {

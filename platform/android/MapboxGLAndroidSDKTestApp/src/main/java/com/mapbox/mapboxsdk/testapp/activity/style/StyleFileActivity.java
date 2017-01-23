@@ -9,7 +9,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import timber.log.Timber;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
@@ -30,8 +29,7 @@ import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
 
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.circleColor;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.circleRadius;
+import timber.log.Timber;
 
 /**
  * Example on how to use a file:// resource for the style.json
@@ -88,10 +86,10 @@ public class StyleFileActivity extends AppCompatActivity {
         cacheStyleFile.createNewFile();
         Timber.i("Writing style file to: " + cacheStyleFile.getAbsolutePath());
         writeToFile(cacheStyleFile, readRawResource(R.raw.local_style));
-      } catch (Exception e) {
+      } catch (Exception exception) {
         Toast.makeText(StyleFileActivity.this, "Could not create style file in cache dir", Toast.LENGTH_SHORT).show();
       }
-      return 1l;
+      return 1L;
     }
 
     protected void onPostExecute(Long result) {
@@ -105,9 +103,9 @@ public class StyleFileActivity extends AppCompatActivity {
       char[] buffer = new char[1024];
       try {
         Reader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-        int n;
-        while ((n = reader.read(buffer)) != -1) {
-          writer.write(buffer, 0, n);
+        int numRead;
+        while ((numRead = reader.read(buffer)) != -1) {
+          writer.write(buffer, 0, numRead);
         }
       } finally {
         is.close();

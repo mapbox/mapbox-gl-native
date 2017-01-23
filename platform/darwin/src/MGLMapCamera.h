@@ -2,12 +2,15 @@
 #import <CoreGraphics/CoreGraphics.h>
 #import <CoreLocation/CoreLocation.h>
 
+#import "MGLFoundation.h"
+
 NS_ASSUME_NONNULL_BEGIN
 
 /**
  An `MGLMapCamera` object represents a viewpoint from which the user observes
  some point on an `MGLMapView`.
  */
+MGL_EXPORT
 @interface MGLMapCamera : NSObject <NSSecureCoding, NSCopying>
 
 /** Coordinate at the center of the map view. */

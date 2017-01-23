@@ -14,31 +14,31 @@ import static android.support.test.espresso.matcher.ViewMatchers.withId;
  */
 public class BaseStyleTest {
 
-    protected final static String HOME_BUTTON_STRING = "Navigate up";
+  protected static final String HOME_BUTTON_STRING = "Navigate up";
 
-    /*
-     * Shortcuts for common UI tests
-     */
+  /*
+   * Shortcuts for common UI tests
+   */
 
-    protected void checkViewIsDisplayed(int id) {
-        onView(withId(id))
-                .check(matches(isDisplayed()));
-    }
+  protected void checkViewIsDisplayed(int id) {
+    onView(withId(id))
+      .check(matches(isDisplayed()));
+  }
 
-    /*
-     * Screenshots logic
-     */
+  /*
+   * Screenshots logic
+   */
 
-    protected void takeNamedScreenshot(final Activity activity, final String name) {
+  protected void takeNamedScreenshot(final Activity activity, final String name) {
 
-        // Screenshots need to be taken on the UI thread
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                ScreenshotUtil.take(activity, name);
-            }
-        });
+    // Screenshots need to be taken on the UI thread
+    activity.runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        ScreenshotUtil.take(activity, name);
+      }
+    });
 
-    }
+  }
 
 }

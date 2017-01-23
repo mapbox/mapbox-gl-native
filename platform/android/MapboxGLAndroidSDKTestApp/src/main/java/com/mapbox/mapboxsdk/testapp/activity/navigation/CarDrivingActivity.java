@@ -32,170 +32,170 @@ import com.mapbox.mapboxsdk.testapp.R;
 
 public class CarDrivingActivity extends AppCompatActivity implements MapboxMap.OnMyLocationChangeListener {
 
-    private static final int PERMISSIONS_LOCATION = 0;
+  private static final int PERMISSIONS_LOCATION = 0;
 
-    private MapView mapView;
-    private MapboxMap mapboxMap;
-    private Location location;
+  private MapView mapView;
+  private MapboxMap mapboxMap;
+  private Location location;
 
-    @Override
-    protected void onCreate(final Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_car_driving);
+  @Override
+  protected void onCreate(final Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.activity_car_driving);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+    Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+    setSupportActionBar(toolbar);
 
-        final ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setDisplayShowHomeEnabled(true);
-        }
-
-        mapView = (MapView) findViewById(R.id.mapView);
-        mapView.onCreate(savedInstanceState);
-        mapView.getMapAsync(new OnMapReadyCallback() {
-            @Override
-            public void onMapReady(@NonNull MapboxMap mapboxMap) {
-                CarDrivingActivity.this.mapboxMap = mapboxMap;
-
-                // view settings
-                MyLocationViewSettings settings = mapboxMap.getMyLocationViewSettings();
-                settings.setPadding(0, getWindow().getDecorView().getMeasuredHeight() / 3, 0, 0);
-
-                // get car
-                Drawable car = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_taxi_top_small, getTheme());
-                settings.setForegroundTintColor(Color.TRANSPARENT);
-                settings.setForegroundDrawable(car, car);
-
-                // remove accuracy circle
-                settings.setAccuracyAlpha(0);
-
-                // disable dismissal when a gesture occurs
-                TrackingSettings trackingSettings = mapboxMap.getTrackingSettings();
-                trackingSettings.setDismissLocationTrackingOnGesture(false);
-                trackingSettings.setDismissBearingTrackingOnGesture(false);
-
-                mapboxMap.setOnMyLocationChangeListener(CarDrivingActivity.this);
-
-                if (savedInstanceState == null) {
-                    toggleGps(true);
-                }
-            }
-        });
+    final ActionBar actionBar = getSupportActionBar();
+    if (actionBar != null) {
+      actionBar.setDisplayHomeAsUpEnabled(true);
+      actionBar.setDisplayShowHomeEnabled(true);
     }
 
-    @UiThread
-    public void toggleGps(boolean enableGps) {
-        if (enableGps) {
-            if ((ContextCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
-                || (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED)) {
-                ActivityCompat.requestPermissions(this, new String[]{
-                    Manifest.permission.ACCESS_COARSE_LOCATION,
-                    Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_LOCATION);
-            } else {
-                enableLocation(true);
-            }
-        } else {
-            enableLocation(false);
-        }
-    }
+    mapView = (MapView) findViewById(R.id.mapView);
+    mapView.onCreate(savedInstanceState);
+    mapView.getMapAsync(new OnMapReadyCallback() {
+      @Override
+      public void onMapReady(@NonNull MapboxMap mapboxMap) {
+        CarDrivingActivity.this.mapboxMap = mapboxMap;
 
-    private void enableLocation(boolean enabled) {
-        if (enabled) {
-            mapboxMap.setMyLocationEnabled(true);
-            Location location = mapboxMap.getMyLocation();
-            if (location != null) {
-                setInitialPosition(new LatLng(location));
-            }
-        } else {
-            mapboxMap.setMyLocationEnabled(false);
-        }
-    }
+        // view settings
+        MyLocationViewSettings settings = mapboxMap.getMyLocationViewSettings();
+        settings.setPadding(0, getWindow().getDecorView().getMeasuredHeight() / 3, 0, 0);
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == PERMISSIONS_LOCATION) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                enableLocation(true);
-            }
-        }
-    }
+        // get car
+        Drawable car = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_taxi_top_small, getTheme());
+        settings.setForegroundTintColor(Color.TRANSPARENT);
+        settings.setForegroundDrawable(car, car);
 
-    private void setInitialPosition(LatLng latLng) {
-        mapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(
-                new CameraPosition.Builder().target(latLng).zoom(15).tilt(20f).build()));
-        mapboxMap.setMyLocationEnabled(true);
+        // remove accuracy circle
+        settings.setAccuracyAlpha(0);
 
+        // disable dismissal when a gesture occurs
         TrackingSettings trackingSettings = mapboxMap.getTrackingSettings();
-        trackingSettings.setMyLocationTrackingMode(MyLocationTracking.TRACKING_FOLLOW);
-        trackingSettings.setMyBearingTrackingMode(MyBearingTracking.GPS);
-    }
+        trackingSettings.setDismissLocationTrackingOnGesture(false);
+        trackingSettings.setDismissBearingTrackingOnGesture(false);
 
-    @Override
-    public void onMyLocationChange(@Nullable Location location) {
-        if (location != null) {
-            if (this.location == null) {
-                // initial location to reposition map
-                setInitialPosition(new LatLng(location));
-            }
-            this.location = location;
+        mapboxMap.setOnMyLocationChangeListener(CarDrivingActivity.this);
+
+        if (savedInstanceState == null) {
+          toggleGps(true);
         }
-    }
+      }
+    });
+  }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        mapView.onStart();
+  @UiThread
+  public void toggleGps(boolean enableGps) {
+    if (enableGps) {
+      if ((ContextCompat.checkSelfPermission(this,
+        Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+        || (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+        != PackageManager.PERMISSION_GRANTED)) {
+        ActivityCompat.requestPermissions(this, new String[] {
+          Manifest.permission.ACCESS_COARSE_LOCATION,
+          Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_LOCATION);
+      } else {
+        enableLocation(true);
+      }
+    } else {
+      enableLocation(false);
     }
+  }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        mapView.onResume();
+  private void enableLocation(boolean enabled) {
+    if (enabled) {
+      mapboxMap.setMyLocationEnabled(true);
+      Location location = mapboxMap.getMyLocation();
+      if (location != null) {
+        setInitialPosition(new LatLng(location));
+      }
+    } else {
+      mapboxMap.setMyLocationEnabled(false);
     }
+  }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        mapView.onPause();
+  @Override
+  public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    if (requestCode == PERMISSIONS_LOCATION) {
+      if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+        enableLocation(true);
+      }
     }
+  }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        mapView.onStop();
-    }
+  private void setInitialPosition(LatLng latLng) {
+    mapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(
+      new CameraPosition.Builder().target(latLng).zoom(15).tilt(20f).build()));
+    mapboxMap.setMyLocationEnabled(true);
 
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        mapView.onSaveInstanceState(outState);
-    }
+    TrackingSettings trackingSettings = mapboxMap.getTrackingSettings();
+    trackingSettings.setMyLocationTrackingMode(MyLocationTracking.TRACKING_FOLLOW);
+    trackingSettings.setMyBearingTrackingMode(MyBearingTracking.GPS);
+  }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        mapView.onDestroy();
+  @Override
+  public void onMyLocationChange(@Nullable Location location) {
+    if (location != null) {
+      if (this.location == null) {
+        // initial location to reposition map
+        setInitialPosition(new LatLng(location));
+      }
+      this.location = location;
     }
+  }
 
-    @Override
-    public void onLowMemory() {
-        super.onLowMemory();
-        mapView.onLowMemory();
-    }
+  @Override
+  protected void onStart() {
+    super.onStart();
+    mapView.onStart();
+  }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                onBackPressed();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
+  @Override
+  protected void onResume() {
+    super.onResume();
+    mapView.onResume();
+  }
+
+  @Override
+  protected void onPause() {
+    super.onPause();
+    mapView.onPause();
+  }
+
+  @Override
+  protected void onStop() {
+    super.onStop();
+    mapView.onStop();
+  }
+
+  @Override
+  protected void onSaveInstanceState(Bundle outState) {
+    super.onSaveInstanceState(outState);
+    mapView.onSaveInstanceState(outState);
+  }
+
+  @Override
+  protected void onDestroy() {
+    super.onDestroy();
+    mapView.onDestroy();
+  }
+
+  @Override
+  public void onLowMemory() {
+    super.onLowMemory();
+    mapView.onLowMemory();
+  }
+
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+    switch (item.getItemId()) {
+      case android.R.id.home:
+        onBackPressed();
+        return true;
+      default:
+        return super.onOptionsItemSelected(item);
     }
+  }
 
 }

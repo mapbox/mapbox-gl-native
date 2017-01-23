@@ -107,9 +107,6 @@ Rect<uint16_t> GlyphAtlas::addGlyph(uintptr_t tileUID,
                                     const FontStack& fontStack,
                                     const SDFGlyph& glyph)
 {
-    // Use constant value for now.
-    const uint8_t buffer = 3;
-
     std::map<uint32_t, GlyphValue>& face = index[fontStack];
     auto it = face.find(glyph.id);
 
@@ -120,13 +117,21 @@ Rect<uint16_t> GlyphAtlas::addGlyph(uintptr_t tileUID,
         return value.rect;
     }
 
-    // The glyph bitmap has zero width.
-    if (glyph.bitmap.empty()) {
+    // Guard against glyphs that are too large, or that we don't need to place into the atlas since
+    // they don't have any pixels.
+    if (glyph.metrics.width == 0 || glyph.metrics.width >= 256 ||
+        glyph.metrics.height == 0 || glyph.metrics.height >= 256) {
         return Rect<uint16_t>{ 0, 0, 0, 0 };
     }
 
-    uint16_t buffered_width = glyph.metrics.width + buffer * 2;
-    uint16_t buffered_height = glyph.metrics.height + buffer * 2;
+    uint16_t buffered_width = glyph.metrics.width + SDFGlyph::borderSize * 2;
+    uint16_t buffered_height = glyph.metrics.height + SDFGlyph::borderSize * 2;
+
+    // Guard against mismatches between the glyph bitmap size and the size mandated by
+    // its metrics.
+    if (size_t(buffered_width * buffered_height) != glyph.bitmap.size()) {
+        return Rect<uint16_t>{ 0, 0, 0, 0 };
+    }
 
     // Add a 1px border around every image.
     const uint16_t padding = 1;
@@ -145,6 +150,8 @@ Rect<uint16_t> GlyphAtlas::addGlyph(uintptr_t tileUID,
         return rect;
     }
 
+    // Verify that binpack didn't produce a rect that goes beyond the size of the image.
+    // This should never happen.
     assert(rect.x + rect.w <= image.size.width);
     assert(rect.y + rect.h <= image.size.height);
 

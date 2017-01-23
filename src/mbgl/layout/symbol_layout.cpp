@@ -3,6 +3,7 @@
 #include <mbgl/layout/clip_lines.hpp>
 #include <mbgl/renderer/symbol_bucket.hpp>
 #include <mbgl/style/filter_evaluator.hpp>
+#include <mbgl/style/layer.hpp>
 #include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/text/glyph_atlas.hpp>
 #include <mbgl/text/get_anchors.hpp>
@@ -20,11 +21,13 @@
 #include <mbgl/util/platform.hpp>
 #include <mbgl/util/logging.hpp>
 
+#include <mapbox/polylabel.hpp>
+
 namespace mbgl {
 
 using namespace style;
 
-SymbolLayout::SymbolLayout(std::string bucketName_,
+SymbolLayout::SymbolLayout(std::vector<std::string> layerIDs_,
                            std::string sourceLayerName_,
                            uint32_t overscaling_,
                            float zoom_,
@@ -34,7 +37,7 @@ SymbolLayout::SymbolLayout(std::string bucketName_,
                            style::SymbolLayoutProperties::Evaluated layout_,
                            float textMaxSize_,
                            SpriteAtlas& spriteAtlas_)
-    : bucketName(std::move(bucketName_)),
+    : layerIDs(std::move(layerIDs_)),
       sourceLayerName(std::move(sourceLayerName_)),
       overscaling(overscaling_),
       zoom(zoom_),
@@ -103,16 +106,8 @@ SymbolLayout::SymbolLayout(std::string bucketName_,
         }
 
         if (ft.text || ft.icon) {
-            auto &multiline = ft.geometry;
-
-            GeometryCollection geometryCollection = feature->getGeometries();
-            for (auto& line : geometryCollection) {
-                multiline.emplace_back();
-                for (auto& point : line) {
-                    multiline.back().emplace_back(point.x, point.y);
-                }
-            }
-
+            ft.type = feature->getType();
+            ft.geometry = feature->getGeometries();
             features.push_back(std::move(ft));
         }
     }
@@ -229,17 +224,17 @@ void SymbolLayout::prepare(uintptr_t tileUID,
 
         // if either shapedText or icon position is present, add the feature
         if (shapedText || shapedIcon) {
-            addFeature(feature.geometry, shapedText, shapedIcon, face, feature.index);
+            addFeature(feature, shapedText, shapedIcon, face);
         }
     }
 
     features.clear();
 }
 
-
-void SymbolLayout::addFeature(const GeometryCollection &lines,
-        const Shaping &shapedText, const PositionedIcon &shapedIcon, const GlyphPositions &face, const size_t index) {
-
+void SymbolLayout::addFeature(const SymbolFeature& feature,
+                              const Shaping& shapedText,
+                              const PositionedIcon& shapedIcon,
+                              const GlyphPositions& face) {
     const float minScale = 0.5f;
     const float glyphSize = 24.0f;
 
@@ -258,65 +253,93 @@ void SymbolLayout::addFeature(const GeometryCollection &lines,
     const SymbolPlacementType iconPlacement = layout.get<IconRotationAlignment>() != AlignmentType::Map
                                                   ? SymbolPlacementType::Point
                                                   : layout.get<SymbolPlacement>();
-    const bool isLine = layout.get<SymbolPlacement>() == SymbolPlacementType::Line;
     const float textRepeatDistance = symbolSpacing / 2;
+    IndexedSubfeature indexedFeature = {feature.index, sourceLayerName, layerIDs.at(0), symbolInstances.size()};
 
-    auto& clippedLines = isLine ?
-        util::clipLines(lines, 0, 0, util::EXTENT, util::EXTENT) :
-        lines;
+    auto addSymbolInstance = [&] (const GeometryCoordinates& line, Anchor& anchor) {
+        // https://github.com/mapbox/vector-tile-spec/tree/master/2.1#41-layers
+        // +-------------------+ Symbols with anchors located on tile edges
+        // |(0,0)             || are duplicated on neighbor tiles.
+        // |                  ||
+        // |                  || In continuous mode, to avoid overdraw we
+        // |                  || skip symbols located on the extent edges.
+        // |       Tile       || In still mode, we include the features in
+        // |                  || the buffers for both tiles and clip them
+        // |                  || at draw time.
+        // |                  ||
+        // +-------------------| In this scenario, the inner bounding box
+        // +-------------------+ is called 'withinPlus0', and the outer
+        //       (extent,extent) is called 'inside'.
+        const bool withinPlus0 = anchor.point.x >= 0 && anchor.point.x < util::EXTENT && anchor.point.y >= 0 && anchor.point.y < util::EXTENT;
+        const bool inside = withinPlus0 || anchor.point.x == util::EXTENT || anchor.point.y == util::EXTENT;
 
-    IndexedSubfeature indexedFeature = {index, sourceLayerName, bucketName, symbolInstances.size()};
+        if (avoidEdges && !inside) return;
 
-    for (const auto& line : clippedLines) {
-        if (line.empty()) continue;
+        const bool addToBuffers = mode == MapMode::Still || withinPlus0;
 
-        // Calculate the anchor points around which you want to place labels
-        Anchors anchors = isLine ?
-            getAnchors(line, symbolSpacing, textMaxAngle, shapedText.left, shapedText.right, shapedIcon.left, shapedIcon.right, glyphSize, textMaxBoxScale, overscaling) :
-            Anchors({ Anchor(float(line[0].x), float(line[0].y), 0, minScale) });
+        symbolInstances.emplace_back(anchor, line, shapedText, shapedIcon, layout, addToBuffers, symbolInstances.size(),
+                textBoxScale, textPadding, textPlacement,
+                iconBoxScale, iconPadding, iconPlacement,
+                face, indexedFeature);
+    };
 
-        // For each potential label, create the placement features used to check for collisions, and the quads use for rendering.
-        for (Anchor &anchor : anchors) {
-            if (shapedText && isLine) {
-                if (anchorIsTooClose(shapedText.text, textRepeatDistance, anchor)) {
-                    continue;
+    if (layout.get<SymbolPlacement>() == SymbolPlacementType::Line) {
+        auto clippedLines = util::clipLines(feature.geometry, 0, 0, util::EXTENT, util::EXTENT);
+        for (const auto& line : clippedLines) {
+            Anchors anchors = getAnchors(line,
+                                         symbolSpacing,
+                                         textMaxAngle,
+                                         shapedText.left,
+                                         shapedText.right,
+                                         shapedIcon.left,
+                                         shapedIcon.right,
+                                         glyphSize,
+                                         textMaxBoxScale,
+                                         overscaling);
+
+            for (auto& anchor : anchors) {
+                if (!shapedText || !anchorIsTooClose(shapedText.text, textRepeatDistance, anchor)) {
+                    addSymbolInstance(line, anchor);
                 }
             }
+        }
+    } else if (feature.type == FeatureType::Polygon) {
+        for (const auto& polygon : classifyRings(feature.geometry)) {
+            Polygon<double> poly;
+            for (const auto& ring : polygon) {
+                LinearRing<double> r;
+                for (const auto& p : ring) {
+                    r.push_back(convertPoint<double>(p));
+                }
+                poly.push_back(r);
+            }
 
-            // https://github.com/mapbox/vector-tile-spec/tree/master/2.1#41-layers
-            // +-------------------+ Symbols with anchors located on tile edges
-            // |(0,0)             || are duplicated on neighbor tiles.
-            // |                  ||
-            // |                  || In continuous mode, to avoid overdraw we
-            // |                  || skip symbols located on the extent edges.
-            // |       Tile       || In still mode, we include the features in
-            // |                  || the buffers for both tiles and clip them
-            // |                  || at draw time.
-            // |                  ||
-            // +-------------------| In this scenario, the inner bounding box
-            // +-------------------+ is called 'withinPlus0', and the outer
-            //       (extent,extent) is called 'inside'.
-            const bool withinPlus0 = anchor.point.x >= 0 && anchor.point.x < util::EXTENT && anchor.point.y >= 0 && anchor.point.y < util::EXTENT;
-            const bool inside = withinPlus0 || anchor.point.x == util::EXTENT || anchor.point.y == util::EXTENT;
-
-            if (avoidEdges && !inside) continue;
-
-            const bool addToBuffers = mode == MapMode::Still || withinPlus0;
-
-            symbolInstances.emplace_back(anchor, line, shapedText, shapedIcon, layout, addToBuffers, symbolInstances.size(),
-                    textBoxScale, textPadding, textPlacement,
-                    iconBoxScale, iconPadding, iconPlacement,
-                    face, indexedFeature);
+            // 1 pixel worth of precision, in tile coordinates
+            auto poi = mapbox::polylabel(poly, double(util::EXTENT / util::tileSize));
+            Anchor anchor(poi.x, poi.y, 0, minScale);
+            addSymbolInstance(polygon[0], anchor);
+        }
+    } else if (feature.type == FeatureType::LineString) {
+        for (const auto& line : feature.geometry) {
+            Anchor anchor(line[0].x, line[0].y, 0, minScale);
+            addSymbolInstance(line, anchor);
+        }
+    } else if (feature.type == FeatureType::Point) {
+        for (const auto& points : feature.geometry) {
+            for (const auto& point : points) {
+                Anchor anchor(point.x, point.y, 0, minScale);
+                addSymbolInstance({point}, anchor);
+            }
         }
     }
 }
 
-bool SymbolLayout::anchorIsTooClose(const std::u16string &text, const float repeatDistance, Anchor &anchor) {
+bool SymbolLayout::anchorIsTooClose(const std::u16string& text, const float repeatDistance, const Anchor& anchor) {
     if (compareText.find(text) == compareText.end()) {
         compareText.emplace(text, Anchors());
     } else {
         auto otherAnchors = compareText.find(text)->second;
-        for (Anchor &otherAnchor : otherAnchors) {
+        for (const Anchor& otherAnchor : otherAnchors) {
             if (util::dist<float>(anchor.point, otherAnchor.point) < repeatDistance) {
                 return true;
             }

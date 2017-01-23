@@ -9,6 +9,7 @@ namespace mbgl {
 
 class SymbolFeature {
 public:
+    FeatureType type;
     GeometryCollection geometry;
     optional<std::u16string> text;
     optional<std::string> icon;

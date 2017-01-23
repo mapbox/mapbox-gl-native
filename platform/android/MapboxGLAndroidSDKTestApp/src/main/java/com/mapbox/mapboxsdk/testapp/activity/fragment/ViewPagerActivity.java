@@ -19,81 +19,81 @@ import com.mapbox.mapboxsdk.testapp.R;
 
 public class ViewPagerActivity extends AppCompatActivity {
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_viewpager);
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.activity_viewpager);
 
-        final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+    final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+    setSupportActionBar(toolbar);
 
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setDisplayShowHomeEnabled(true);
-        }
-
-        ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
-        if (viewPager != null) {
-            MapFragmentAdapter adapter = new MapFragmentAdapter(getSupportFragmentManager());
-            viewPager.setAdapter(adapter);
-        }
+    ActionBar actionBar = getSupportActionBar();
+    if (actionBar != null) {
+      actionBar.setDisplayHomeAsUpEnabled(true);
+      actionBar.setDisplayShowHomeEnabled(true);
     }
 
-    public static class MapFragmentAdapter extends FragmentPagerAdapter {
+    ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
+    if (viewPager != null) {
+      MapFragmentAdapter adapter = new MapFragmentAdapter(getSupportFragmentManager());
+      viewPager.setAdapter(adapter);
+    }
+  }
 
-        private static int NUM_ITEMS = 3;
+  public static class MapFragmentAdapter extends FragmentPagerAdapter {
 
-        public MapFragmentAdapter(FragmentManager fragmentManager) {
-            super(fragmentManager);
-        }
+    private static int NUM_ITEMS = 3;
 
-        @Override
-        public int getCount() {
-            return NUM_ITEMS;
-        }
-
-        @Override
-        public Fragment getItem(int position) {
-            SupportMapFragment fragment = null;
-            MapboxMapOptions options = new MapboxMapOptions();
-
-            switch (position) {
-                case 0:
-                    options.styleUrl(Style.MAPBOX_STREETS);
-                    options.camera(new CameraPosition.Builder().target(new LatLng(34.920526, 102.634774)).zoom(3).build());
-                    fragment = SupportMapFragment.newInstance(options);
-                    break;
-                case 1:
-                    options.styleUrl(Style.DARK);
-                    options.camera(new CameraPosition.Builder().target(new LatLng(62.326440, 92.764913)).zoom(3).build());
-                    fragment = SupportMapFragment.newInstance(options);
-                    break;
-                case 2:
-                    options.styleUrl(Style.SATELLITE);
-                    options.camera(new CameraPosition.Builder().target(new LatLng(-25.007786, 133.623852)).zoom(3).build());
-                    fragment = SupportMapFragment.newInstance(options);
-                    break;
-            }
-            return fragment;
-        }
-
-
-        @Override
-        public CharSequence getPageTitle(int position) {
-            return "Page " + position;
-        }
+    public MapFragmentAdapter(FragmentManager fragmentManager) {
+      super(fragmentManager);
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                onBackPressed();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
+    public int getCount() {
+      return NUM_ITEMS;
     }
+
+    @Override
+    public Fragment getItem(int position) {
+      SupportMapFragment fragment = null;
+      MapboxMapOptions options = new MapboxMapOptions();
+
+      switch (position) {
+        case 0:
+          options.styleUrl(Style.MAPBOX_STREETS);
+          options.camera(new CameraPosition.Builder().target(new LatLng(34.920526, 102.634774)).zoom(3).build());
+          fragment = SupportMapFragment.newInstance(options);
+          break;
+        case 1:
+          options.styleUrl(Style.DARK);
+          options.camera(new CameraPosition.Builder().target(new LatLng(62.326440, 92.764913)).zoom(3).build());
+          fragment = SupportMapFragment.newInstance(options);
+          break;
+        case 2:
+          options.styleUrl(Style.SATELLITE);
+          options.camera(new CameraPosition.Builder().target(new LatLng(-25.007786, 133.623852)).zoom(3).build());
+          fragment = SupportMapFragment.newInstance(options);
+          break;
+      }
+      return fragment;
+    }
+
+
+    @Override
+    public CharSequence getPageTitle(int position) {
+      return "Page " + position;
+    }
+  }
+
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+    switch (item.getItemId()) {
+      case android.R.id.home:
+        onBackPressed();
+        return true;
+      default:
+        return super.onOptionsItemSelected(item);
+    }
+  }
 }
 

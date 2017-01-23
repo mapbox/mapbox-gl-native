@@ -1,13 +1,22 @@
 #import "MGLShape.h"
 
-#import <mbgl/util/feature.hpp>
+#import <mbgl/util/geojson.hpp>
+#import <mbgl/util/geometry.hpp>
+#import <mbgl/util/geo.hpp>
+
+bool operator==(const CLLocationCoordinate2D lhs, const CLLocationCoordinate2D rhs);
 
 @interface MGLShape (Private)
 
 /**
- Returns an `mbgl::Feature` representation of the `MGLShape`.
+ Returns an `mbgl::GeoJSON` representation of the `MGLShape`.
  */
-- (mbgl::Feature)featureObject;
+- (mbgl::GeoJSON)geoJSONObject;
+
+/**
+ Returns an `mbgl::Geometry<double>` representation of the `MGLShape`.
+ */
+- (mbgl::Geometry<double>)geometryObject;
 
 /**
  Returns a dictionary with the GeoJSON geometry member object.

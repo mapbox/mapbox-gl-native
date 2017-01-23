@@ -30,6 +30,8 @@ TEST(TileCover, WorldZ0) {
 TEST(TileCover, Pitch) {
     Transform transform;
     transform.resize({ 512, 512 });
+    // slightly offset center so that tile order is better defined
+    transform.setLatLng({ 0.01, -0.01 });
     transform.setZoom(2);
     transform.setPitch(40.0 * M_PI / 180.0);
 

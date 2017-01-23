@@ -37,6 +37,18 @@ struct CirclePitchScale : PaintProperty<CirclePitchScaleType> {
     static CirclePitchScaleType defaultValue() { return CirclePitchScaleType::Map; }
 };
 
+struct CircleStrokeWidth : PaintProperty<float> {
+    static float defaultValue() { return 0; }
+};
+
+struct CircleStrokeColor : PaintProperty<Color> {
+    static Color defaultValue() { return Color::black(); }
+};
+
+struct CircleStrokeOpacity : PaintProperty<float> {
+    static float defaultValue() { return 1; }
+};
+
 class CirclePaintProperties : public PaintProperties<
     CircleRadius,
     CircleColor,
@@ -44,7 +56,10 @@ class CirclePaintProperties : public PaintProperties<
     CircleOpacity,
     CircleTranslate,
     CircleTranslateAnchor,
-    CirclePitchScale
+    CirclePitchScale,
+    CircleStrokeWidth,
+    CircleStrokeColor,
+    CircleStrokeOpacity
 > {};
 
 } // namespace style

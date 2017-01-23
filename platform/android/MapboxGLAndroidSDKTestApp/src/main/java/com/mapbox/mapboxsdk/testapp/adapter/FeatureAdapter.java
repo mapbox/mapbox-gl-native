@@ -15,41 +15,41 @@ import java.util.List;
 
 public class FeatureAdapter extends RecyclerView.Adapter<FeatureAdapter.ViewHolder> {
 
-    private List<Feature> features;
+  private List<Feature> features;
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+  public static class ViewHolder extends RecyclerView.ViewHolder {
 
-        public TextView labelView;
-        public TextView descriptionView;
+    public TextView labelView;
+    public TextView descriptionView;
 
-        public ViewHolder(View view) {
-            super(view);
-            Typeface typeface = FontCache.get("Roboto-Regular.ttf",view.getContext());
-            labelView = (TextView) view.findViewById(R.id.nameView);
-            labelView.setTypeface(typeface);
-            descriptionView = (TextView) view.findViewById(R.id.descriptionView);
-            descriptionView.setTypeface(typeface);
-        }
+    public ViewHolder(View view) {
+      super(view);
+      Typeface typeface = FontCache.get("Roboto-Regular.ttf", view.getContext());
+      labelView = (TextView) view.findViewById(R.id.nameView);
+      labelView.setTypeface(typeface);
+      descriptionView = (TextView) view.findViewById(R.id.descriptionView);
+      descriptionView.setTypeface(typeface);
     }
+  }
 
-    public FeatureAdapter(List<Feature> features) {
-        this.features = features;
-    }
+  public FeatureAdapter(List<Feature> features) {
+    this.features = features;
+  }
 
-    @Override
-    public FeatureAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_main_feature, parent, false);
-        return new ViewHolder(view);
-    }
+  @Override
+  public FeatureAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_main_feature, parent, false);
+    return new ViewHolder(view);
+  }
 
-    @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
-        holder.labelView.setText(features.get(position).getLabel());
-        holder.descriptionView.setText(features.get(position).getDescription());
-    }
+  @Override
+  public void onBindViewHolder(ViewHolder holder, int position) {
+    holder.labelView.setText(features.get(position).getLabel());
+    holder.descriptionView.setText(features.get(position).getDescription());
+  }
 
-    @Override
-    public int getItemCount() {
-        return features.size();
-    }
+  @Override
+  public int getItemCount() {
+    return features.size();
+  }
 }

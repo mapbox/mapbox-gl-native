@@ -22,7 +22,7 @@ ClearDepth::Type ClearDepth::Get() {
     return clearDepth;
 }
 
-const constexpr ClearColor::Type ClearColor::Default;
+const ClearColor::Type ClearColor::Default { 0, 0, 0, 0 };
 
 void ClearColor::Set(const Type& value) {
     MBGL_CHECK_ERROR(glClearColor(value.r, value.g, value.b, value.a));
@@ -205,7 +205,7 @@ BlendFunc::Type BlendFunc::Get() {
              static_cast<ColorMode::BlendFactor>(dfactor) };
 }
 
-const constexpr BlendColor::Type BlendColor::Default;
+const BlendColor::Type BlendColor::Default { 0, 0, 0, 0 };
 
 void BlendColor::Set(const Type& value) {
     MBGL_CHECK_ERROR(glBlendColor(value.r, value.g, value.b, value.a));

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "qmapbox.hpp"
+#include "qmapboxgl.hpp"
 #include "qquickmapboxglmapparameter.hpp"
 
 #include <QColor>
@@ -11,9 +12,9 @@
 #include <QPointF>
 #include <QQmlListProperty>
 #include <QQuickFramebufferObject>
+#include <QQuickItem>
 
 class QDeclarativeGeoServiceProvider;
-class QQuickItem;
 class QQuickMapboxGLRenderer;
 
 class Q_DECL_EXPORT QQuickMapboxGL : public QQuickFramebufferObject
@@ -98,7 +99,7 @@ public slots:
     void setCenter(const QGeoCoordinate &center);
 
 private slots:
-    void onMapChanged(QMapbox::MapChange);
+    void onMapChanged(QMapboxGL::MapChange);
     void onParameterPropertyUpdated(const QString &name);
 
 private:

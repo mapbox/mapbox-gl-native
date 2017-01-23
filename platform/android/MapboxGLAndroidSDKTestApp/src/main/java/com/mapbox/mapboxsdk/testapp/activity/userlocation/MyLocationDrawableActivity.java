@@ -29,154 +29,154 @@ import com.mapbox.mapboxsdk.testapp.R;
 
 public class MyLocationDrawableActivity extends AppCompatActivity implements LocationListener {
 
-    private static final int PERMISSIONS_LOCATION = 0;
+  private static final int PERMISSIONS_LOCATION = 0;
 
-    private MapView mapView;
-    private MapboxMap mapboxMap;
+  private MapView mapView;
+  private MapboxMap mapboxMap;
 
-    @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_my_location_customization);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+  @Override
+  protected void onCreate(@Nullable Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.activity_my_location_customization);
+    Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+    setSupportActionBar(toolbar);
 
-        final ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setDisplayShowHomeEnabled(true);
-        }
-
-        findViewById(R.id.progress).setVisibility(View.GONE);
-
-        MapboxMapOptions mapboxMapOptions = new MapboxMapOptions();
-        mapboxMapOptions.styleUrl(Style.MAPBOX_STREETS);
-
-        // configure MyLocationView drawables
-        mapboxMapOptions.myLocationForegroundDrawable(ContextCompat.getDrawable(this, R.drawable.ic_chelsea));
-        mapboxMapOptions.myLocationBackgroundDrawable(ContextCompat.getDrawable(this, R.drawable.ic_arsenal));
-        mapboxMapOptions.myLocationForegroundTintColor(Color.GREEN);
-        mapboxMapOptions.myLocationBackgroundTintColor(Color.YELLOW);
-        mapboxMapOptions.myLocationBackgroundPadding(new int[]{0, 0,
-            (int) getResources().getDimension(R.dimen.locationview_background_drawable_padding),
-            (int) getResources().getDimension(R.dimen.locationview_background_drawable_padding)});
-
-        mapboxMapOptions.myLocationAccuracyTint(Color.RED);
-        mapboxMapOptions.myLocationAccuracyAlpha(155);
-
-        mapView = new MapView(this, mapboxMapOptions);
-        mapView.setId(R.id.mapView);
-        ViewGroup parent = (ViewGroup) findViewById(R.id.container);
-        parent.addView(mapView);
-
-        mapView.onCreate(savedInstanceState);
-        mapView.getMapAsync(new OnMapReadyCallback() {
-            @Override
-            public void onMapReady(MapboxMap map) {
-                mapboxMap = map;
-                toggleGps(true);
-            }
-        });
+    final ActionBar actionBar = getSupportActionBar();
+    if (actionBar != null) {
+      actionBar.setDisplayHomeAsUpEnabled(true);
+      actionBar.setDisplayShowHomeEnabled(true);
     }
 
-    public void toggleGps(boolean enableGps) {
-        if (enableGps) {
-            if ((ContextCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
-                || (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED)) {
-                ActivityCompat.requestPermissions(this, new String[]{
-                    Manifest.permission.ACCESS_COARSE_LOCATION,
-                    Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_LOCATION);
-            } else {
-                enableLocation(true);
-            }
-        } else {
-            enableLocation(false);
-        }
-    }
+    findViewById(R.id.progress).setVisibility(View.GONE);
 
-    private void enableLocation(boolean enabled) {
-        if (enabled) {
-            mapboxMap.setMyLocationEnabled(true);
-            Location location = mapboxMap.getMyLocation();
-            if (location != null) {
-                onLocationChanged(location);
-            } else {
-                LocationServices.getLocationServices(this).addLocationListener(this);
-            }
-        } else {
-            mapboxMap.setMyLocationEnabled(false);
-        }
-    }
+    MapboxMapOptions mapboxMapOptions = new MapboxMapOptions();
+    mapboxMapOptions.styleUrl(Style.MAPBOX_STREETS);
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == PERMISSIONS_LOCATION) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                enableLocation(true);
-            }
-        }
-    }
+    // configure MyLocationView drawables
+    mapboxMapOptions.myLocationForegroundDrawable(ContextCompat.getDrawable(this, R.drawable.ic_chelsea));
+    mapboxMapOptions.myLocationBackgroundDrawable(ContextCompat.getDrawable(this, R.drawable.ic_arsenal));
+    mapboxMapOptions.myLocationForegroundTintColor(Color.GREEN);
+    mapboxMapOptions.myLocationBackgroundTintColor(Color.YELLOW);
+    mapboxMapOptions.myLocationBackgroundPadding(new int[] {0, 0,
+      (int) getResources().getDimension(R.dimen.locationview_background_drawable_padding),
+      (int) getResources().getDimension(R.dimen.locationview_background_drawable_padding)});
 
-    @Override
-    public void onLocationChanged(Location location) {
-        if (mapboxMap != null) {
-            mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location), 14));
-        }
-    }
+    mapboxMapOptions.myLocationAccuracyTint(Color.RED);
+    mapboxMapOptions.myLocationAccuracyAlpha(155);
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        mapView.onStart();
-    }
+    mapView = new MapView(this, mapboxMapOptions);
+    mapView.setId(R.id.mapView);
+    ViewGroup parent = (ViewGroup) findViewById(R.id.container);
+    parent.addView(mapView);
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        mapView.onResume();
-    }
+    mapView.onCreate(savedInstanceState);
+    mapView.getMapAsync(new OnMapReadyCallback() {
+      @Override
+      public void onMapReady(MapboxMap map) {
+        mapboxMap = map;
+        toggleGps(true);
+      }
+    });
+  }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        mapView.onPause();
+  public void toggleGps(boolean enableGps) {
+    if (enableGps) {
+      if ((ContextCompat.checkSelfPermission(this,
+        Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+        || (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+        != PackageManager.PERMISSION_GRANTED)) {
+        ActivityCompat.requestPermissions(this, new String[] {
+          Manifest.permission.ACCESS_COARSE_LOCATION,
+          Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_LOCATION);
+      } else {
+        enableLocation(true);
+      }
+    } else {
+      enableLocation(false);
     }
+  }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        mapView.onStop();
+  private void enableLocation(boolean enabled) {
+    if (enabled) {
+      mapboxMap.setMyLocationEnabled(true);
+      Location location = mapboxMap.getMyLocation();
+      if (location != null) {
+        onLocationChanged(location);
+      } else {
+        LocationServices.getLocationServices(this).addLocationListener(this);
+      }
+    } else {
+      mapboxMap.setMyLocationEnabled(false);
     }
+  }
 
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        mapView.onSaveInstanceState(outState);
+  @Override
+  public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    if (requestCode == PERMISSIONS_LOCATION) {
+      if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+        enableLocation(true);
+      }
     }
+  }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        mapView.onDestroy();
+  @Override
+  public void onLocationChanged(Location location) {
+    if (mapboxMap != null) {
+      mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location), 14));
     }
+  }
 
-    @Override
-    public void onLowMemory() {
-        super.onLowMemory();
-        mapView.onLowMemory();
-    }
+  @Override
+  protected void onStart() {
+    super.onStart();
+    mapView.onStart();
+  }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                onBackPressed();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
+  @Override
+  protected void onResume() {
+    super.onResume();
+    mapView.onResume();
+  }
+
+  @Override
+  protected void onPause() {
+    super.onPause();
+    mapView.onPause();
+  }
+
+  @Override
+  protected void onStop() {
+    super.onStop();
+    mapView.onStop();
+  }
+
+  @Override
+  protected void onSaveInstanceState(Bundle outState) {
+    super.onSaveInstanceState(outState);
+    mapView.onSaveInstanceState(outState);
+  }
+
+  @Override
+  protected void onDestroy() {
+    super.onDestroy();
+    mapView.onDestroy();
+  }
+
+  @Override
+  public void onLowMemory() {
+    super.onLowMemory();
+    mapView.onLowMemory();
+  }
+
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+    switch (item.getItemId()) {
+      case android.R.id.home:
+        onBackPressed();
+        return true;
+      default:
+        return super.onOptionsItemSelected(item);
     }
+  }
 
 }

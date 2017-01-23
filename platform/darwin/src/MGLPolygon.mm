@@ -5,6 +5,8 @@
 
 #import "MGLPolygon+MGLAdditions.h"
 
+#import <mbgl/util/geojson.hpp>
+
 @implementation MGLPolygon
 
 @dynamic overlayBounds;
@@ -26,6 +28,32 @@
     return self;
 }
 
+- (instancetype)initWithCoder:(NSCoder *)decoder {
+    self = [super initWithCoder:decoder];
+    if (self) {
+        _interiorPolygons = [decoder decodeObjectOfClass:[NSArray class] forKey:@"interiorPolygons"];
+    }
+    return self;
+}
+
+- (void)encodeWithCoder:(NSCoder *)coder {
+    [super encodeWithCoder:coder];
+    [coder encodeObject:self.interiorPolygons forKey:@"interiorPolygons"];
+}
+
+- (BOOL)isEqual:(id)other {
+    if (self == other) return YES;
+    if (![other isKindOfClass:[MGLPolygon class]]) return NO;
+    
+    MGLPolygon *otherPolygon = (MGLPolygon *)other;
+    return ([super isEqual:otherPolygon] &&
+            [[self geoJSONDictionary] isEqualToDictionary:[otherPolygon geoJSONDictionary]]);
+}
+
+- (NSUInteger)hash {
+    return [super hash] + [[self geoJSONDictionary] hash];
+}
+
 - (mbgl::LinearRing<double>)ring {
     NSUInteger count = self.pointCount;
     CLLocationCoordinate2D *coordinates = self.coordinates;
@@ -38,23 +66,22 @@
     return result;
 }
 
-- (mbgl::Feature)featureObject {
+- (mbgl::Polygon<double>)polygon {
     mbgl::Polygon<double> geometry;
     geometry.push_back(self.ring);
     for (MGLPolygon *polygon in self.interiorPolygons) {
         geometry.push_back(polygon.ring);
     }
-    return mbgl::Feature{geometry};
+    return geometry;
+}
+
+- (mbgl::Geometry<double>)geometryObject {
+    return [self polygon];
 }
 
 - (mbgl::Annotation)annotationObjectWithDelegate:(id <MGLMultiPointDelegate>)delegate {
-    mbgl::Polygon<double> geometry;
-    geometry.push_back(self.ring);
-    for (MGLPolygon *polygon in self.interiorPolygons) {
-        geometry.push_back(polygon.ring);
-    }
-
-    mbgl::FillAnnotation annotation { geometry };
+    
+    mbgl::FillAnnotation annotation { [self polygon] };
     annotation.opacity = { static_cast<float>([delegate alphaForShapeAnnotation:self]) };
     annotation.outlineColor = { [delegate strokeColorForShapeAnnotation:self] };
     annotation.color = { [delegate fillColorForPolygonAnnotation:self] };
@@ -99,11 +126,40 @@
     return self;
 }
 
-- (BOOL)intersectsOverlayBounds:(MGLCoordinateBounds)overlayBounds {
-    return MGLLatLngBoundsFromCoordinateBounds(_overlayBounds).intersects(MGLLatLngBoundsFromCoordinateBounds(overlayBounds));
+- (instancetype)initWithCoder:(NSCoder *)decoder {
+    if (self = [super initWithCoder:decoder]) {
+        _polygons = [decoder decodeObjectOfClass:[NSArray class] forKey:@"polygons"];
+    }
+    return self;
 }
 
-- (mbgl::Feature)featureObject {
+- (void)encodeWithCoder:(NSCoder *)coder {
+    [super encodeWithCoder:coder];
+    [coder encodeObject:_polygons forKey:@"polygons"];
+}
+
+- (BOOL)isEqual:(id)other {
+    if (self == other) return YES;
+    if (![other isKindOfClass:[MGLMultiPolygon class]]) return NO;
+    
+    MGLMultiPolygon *otherMultiPolygon = other;
+    return [super isEqual:other]
+    && [self.polygons isEqualToArray:otherMultiPolygon.polygons];
+}
+
+- (NSUInteger)hash {
+    NSUInteger hash = [super hash];
+    for (MGLPolygon *polygon in self.polygons) {
+        hash += [polygon hash];
+    }
+    return hash;
+}
+
+- (BOOL)intersectsOverlayBounds:(MGLCoordinateBounds)overlayBounds {
+    return MGLCoordinateBoundsIntersectsCoordinateBounds(_overlayBounds, overlayBounds);
+}
+
+- (mbgl::Geometry<double>)geometryObject {
     mbgl::MultiPolygon<double> multiPolygon;
     multiPolygon.reserve(self.polygons.count);
     for (MGLPolygon *polygon in self.polygons) {
@@ -114,7 +170,7 @@
         }
         multiPolygon.push_back(geometry);
     }
-    return mbgl::Feature {multiPolygon};
+    return multiPolygon;
 }
 
 - (NSDictionary *)geoJSONDictionary {

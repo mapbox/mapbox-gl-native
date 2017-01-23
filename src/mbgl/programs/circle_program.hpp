@@ -10,6 +10,9 @@ namespace mbgl {
 
 namespace uniforms {
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_radius);
+MBGL_DEFINE_UNIFORM_SCALAR(Color, u_stroke_color);
+MBGL_DEFINE_UNIFORM_SCALAR(float, u_stroke_width);
+MBGL_DEFINE_UNIFORM_SCALAR(float, u_stroke_opacity);
 MBGL_DEFINE_UNIFORM_SCALAR(bool, u_scale_with_map);
 } // namespace uniforms
 
@@ -26,6 +29,9 @@ class CircleProgram : public Program<
         uniforms::u_color,
         uniforms::u_radius,
         uniforms::u_blur,
+        uniforms::u_stroke_color,
+        uniforms::u_stroke_width,
+        uniforms::u_stroke_opacity,
         uniforms::u_scale_with_map,
         uniforms::u_extrude_scale>>
 {

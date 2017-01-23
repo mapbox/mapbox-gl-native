@@ -9,6 +9,10 @@ if(NOT WITH_QT_DECODERS)
     mason_use(webp VERSION 0.5.1)
 endif()
 
+if(NOT WITH_QT_I18N)
+    mason_use(icu VERSION 58.1)
+endif()
+
 macro(mbgl_platform_core)
     target_sources(mbgl-core
         ${MBGL_QT_FILES}
@@ -38,12 +42,18 @@ macro(mbgl_platform_core)
     else()
         add_definitions(-DQT_IMAGE_DECODERS)
     endif()
+
+    if(NOT WITH_QT_I18N)
+        target_sources(mbgl-core PRIVATE platform/default/bidi.cpp)
+        target_add_mason_package(mbgl-core PRIVATE icu)
+    else()
+        target_sources(mbgl-core PRIVATE platform/qt/src/bidi.cpp)
+    endif()
+
 endmacro()
 
 macro(mbgl_platform_test)
     target_sources(mbgl-test
-        PRIVATE test/src/main.cpp
-        PRIVATE platform/qt/test/qmapboxgl.cpp
         PRIVATE platform/default/mbgl/gl/headless_backend.cpp
         PRIVATE platform/default/mbgl/gl/headless_backend.hpp
         PRIVATE platform/default/mbgl/gl/headless_display.cpp
@@ -51,10 +61,12 @@ macro(mbgl_platform_test)
         PRIVATE platform/default/mbgl/gl/offscreen_view.cpp
         PRIVATE platform/default/mbgl/gl/offscreen_view.hpp
         PRIVATE platform/qt/test/headless_backend_qt.cpp
+        PRIVATE platform/qt/test/main.cpp
+        PRIVATE platform/qt/test/qmapboxgl.cpp
     )
 
     set_source_files_properties(
-        test/src/main.cpp
+        platform/qt/test/main.cpp
         PROPERTIES COMPILE_FLAGS -DWORK_DIRECTORY="${CMAKE_SOURCE_DIR}"
     )
 

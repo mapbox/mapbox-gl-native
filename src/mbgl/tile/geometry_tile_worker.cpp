@@ -5,6 +5,7 @@
 #include <mbgl/text/glyph_atlas.hpp>
 #include <mbgl/layout/symbol_layout.hpp>
 #include <mbgl/style/bucket_parameters.hpp>
+#include <mbgl/style/group_by_layout.hpp>
 #include <mbgl/style/layers/symbol_layer.hpp>
 #include <mbgl/style/layers/symbol_layer_impl.hpp>
 #include <mbgl/renderer/symbol_bucket.hpp>
@@ -201,55 +202,61 @@ void GeometryTileWorker::redoLayout() {
         return;
     }
 
-    // We're doing a fresh parse of the tile, because the underlying data or style has changed.
-    symbolLayouts.clear();
+    std::vector<std::string> symbolOrder;
+    for (auto it = layers->rbegin(); it != layers->rend(); it++) {
+        if ((*it)->is<SymbolLayer>()) {
+            symbolOrder.push_back((*it)->getID());
+        }
+    }
 
-    // We're storing a set of bucket names we've parsed to avoid parsing a bucket twice that is
-    // referenced from more than one layer
-    std::unordered_set<std::string> parsed;
-    std::unordered_map<std::string, std::unique_ptr<Bucket>> buckets;
+    std::unordered_map<std::string, std::unique_ptr<SymbolLayout>> symbolLayoutMap;
+    std::unordered_map<std::string, std::shared_ptr<Bucket>> buckets;
     auto featureIndex = std::make_unique<FeatureIndex>();
+    BucketParameters parameters { id, obsolete, *featureIndex, mode };
 
-    for (auto i = layers->rbegin(); i != layers->rend(); i++) {
+    std::vector<std::vector<const Layer*>> groups = groupByLayout(*layers);
+    for (auto& group : groups) {
         if (obsolete) {
             return;
         }
-
-        const Layer* layer = i->get();
-        const std::string& bucketName = layer->baseImpl->bucketName();
-
-        featureIndex->addBucketLayerName(bucketName, layer->baseImpl->id);
-
-        if (parsed.find(bucketName) != parsed.end()) {
-            continue;
-        }
-
-        parsed.emplace(bucketName);
 
         if (!*data) {
             continue; // Tile has no data.
         }
 
-        auto geometryLayer = (*data)->getLayer(layer->baseImpl->sourceLayer);
+        const Layer& leader = *group.at(0);
+
+        auto geometryLayer = (*data)->getLayer(leader.baseImpl->sourceLayer);
         if (!geometryLayer) {
             continue;
         }
 
-        BucketParameters parameters(id,
-                                    *geometryLayer,
-                                    obsolete,
-                                    reinterpret_cast<uintptr_t>(this),
-                                    glyphAtlas,
-                                    *featureIndex,
-                                    mode);
+        std::vector<std::string> layerIDs;
+        for (const auto& layer : group) {
+            layerIDs.push_back(layer->getID());
+        }
 
-        if (layer->is<SymbolLayer>()) {
-            symbolLayouts.push_back(layer->as<SymbolLayer>()->impl->createLayout(parameters));
+        featureIndex->setBucketLayerIDs(leader.getID(), layerIDs);
+
+        if (leader.is<SymbolLayer>()) {
+            symbolLayoutMap.emplace(leader.getID(),
+                leader.as<SymbolLayer>()->impl->createLayout(parameters, *geometryLayer, layerIDs));
         } else {
-            std::unique_ptr<Bucket> bucket = layer->baseImpl->createBucket(parameters);
-            if (bucket->hasData()) {
-                buckets.emplace(layer->baseImpl->bucketName(), std::move(bucket));
+            std::shared_ptr<Bucket> bucket = leader.baseImpl->createBucket(parameters, *geometryLayer);
+            if (!bucket->hasData()) {
+                continue;
             }
+            for (const auto& layer : group) {
+                buckets.emplace(layer->getID(), bucket);
+            }
+        }
+    }
+
+    symbolLayouts.clear();
+    for (const auto& symbolLayerID : symbolOrder) {
+        auto it = symbolLayoutMap.find(symbolLayerID);
+        if (it != symbolLayoutMap.end()) {
+            symbolLayouts.push_back(std::move(it->second));
         }
     }
 
@@ -304,7 +311,7 @@ void GeometryTileWorker::attemptPlacement() {
     }
 
     auto collisionTile = std::make_unique<CollisionTile>(*placementConfig);
-    std::unordered_map<std::string, std::unique_ptr<Bucket>> buckets;
+    std::unordered_map<std::string, std::shared_ptr<Bucket>> buckets;
 
     for (auto& symbolLayout : symbolLayouts) {
         if (obsolete) {
@@ -312,9 +319,13 @@ void GeometryTileWorker::attemptPlacement() {
         }
 
         symbolLayout->state = SymbolLayout::Placed;
-        if (symbolLayout->hasSymbolInstances()) {
-            buckets.emplace(symbolLayout->bucketName,
-                            symbolLayout->place(*collisionTile));
+        if (!symbolLayout->hasSymbolInstances()) {
+            continue;
+        }
+
+        std::shared_ptr<Bucket> bucket = symbolLayout->place(*collisionTile);
+        for (const auto& layerID : symbolLayout->layerIDs) {
+            buckets.emplace(layerID, bucket);
         }
     }
 

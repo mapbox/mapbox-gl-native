@@ -72,6 +72,7 @@ Anchors getAnchors(const GeometryCoordinates &line, float spacing,
         const float maxAngle, const float textLeft, const float textRight,
         const float iconLeft, const float iconRight,
         const float glyphSize, const float boxScale, const float overscaling) {
+    if (line.empty()) return {};
 
     // Resample a line to get anchor points for labels and check that each
     // potential label passes text-max-angle check and has enough froom to fit

@@ -43,9 +43,6 @@ set(MBGL_TEST_FILES
     test/sprite/sprite_image.test.cpp
     test/sprite/sprite_parser.test.cpp
 
-    # src
-    test/src/main.cpp
-
     # src/mbgl/test
     test/src/mbgl/test/conversion_stubs.hpp
     test/src/mbgl/test/fake_file_source.hpp
@@ -55,6 +52,7 @@ set(MBGL_TEST_FILES
     test/src/mbgl/test/stub_file_source.hpp
     test/src/mbgl/test/stub_layer_observer.hpp
     test/src/mbgl/test/stub_style_observer.hpp
+    test/src/mbgl/test/stub_tile_observer.hpp
     test/src/mbgl/test/test.cpp
     test/src/mbgl/test/util.cpp
     test/src/mbgl/test/util.hpp
@@ -72,11 +70,15 @@ set(MBGL_TEST_FILES
     test/storage/resource.test.cpp
 
     # style/conversion
+    test/style/conversion/function.test.cpp
     test/style/conversion/geojson_options.test.cpp
+    test/style/conversion/stringify.test.cpp
 
     # style
     test/style/filter.test.cpp
     test/style/functions.test.cpp
+    test/style/group_by_layout.test.cpp
+    test/style/paint_property.test.cpp
     test/style/source.test.cpp
     test/style/style.test.cpp
     test/style/style_layer.test.cpp
@@ -85,9 +87,11 @@ set(MBGL_TEST_FILES
 
     # text
     test/text/glyph_atlas.test.cpp
+    test/text/glyph_pbf.test.cpp
     test/text/quads.test.cpp
 
     # tile
+    test/tile/geojson_tile.test.cpp
     test/tile/geometry_tile_data.test.cpp
     test/tile/raster_tile.test.cpp
     test/tile/tile_coordinate.test.cpp

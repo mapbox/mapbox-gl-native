@@ -22,9 +22,11 @@ $(".token").click(function(event) {
     return;
   }
   var link = $(this);
+  var linkIcon = link.find('.token-icon');
   var animationDuration = 300;
-  var tokenOffset = "-15px";
+  var tokenOffset = "0px";
   var original = link.css('marginLeft') == tokenOffset;
+  linkIcon.toggleClass('token-icon-minus');
   link.animate({'margin-left':original ? "0px" : tokenOffset}, animationDuration);
   $content = link.parent().parent().next();
   $content.slideToggle(animationDuration);
@@ -37,4 +39,9 @@ $(".token").click(function(event) {
     location.hash = href;
   }
   event.preventDefault();
+});
+
+// Dumb down quotes within code blocks that delimit strings instead of quotations.
+$("code q").replaceWith(function () {
+  return ["\"", $(this).contents(), "\""];
 });

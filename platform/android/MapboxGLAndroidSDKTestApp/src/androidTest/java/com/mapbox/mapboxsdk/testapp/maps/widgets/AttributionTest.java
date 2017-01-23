@@ -37,120 +37,120 @@ import static org.hamcrest.core.IsNot.not;
 
 public class AttributionTest {
 
-    @Rule
-    public final ActivityTestRule<EspressoTestActivity> rule = new ActivityTestRule<>(EspressoTestActivity.class);
+  @Rule
+  public final ActivityTestRule<EspressoTestActivity> rule = new ActivityTestRule<>(EspressoTestActivity.class);
 
-    private OnMapReadyIdlingResource idlingResource;
+  private OnMapReadyIdlingResource idlingResource;
 
-    private String[] dialogTexts;
-    private String[] dialogLinks;
+  private String[] dialogTexts;
+  private String[] dialogLinks;
 
-    @Before
-    public void beforeTest() {
-        idlingResource = new OnMapReadyIdlingResource(rule.getActivity());
-        Espresso.registerIdlingResources(idlingResource);
-        Intents.init();
-        dialogTexts = rule.getActivity().getResources().getStringArray(R.array.mapbox_attribution_names);
-        dialogLinks = rule.getActivity().getResources().getStringArray(R.array.mapbox_attribution_links);
+  @Before
+  public void beforeTest() {
+    idlingResource = new OnMapReadyIdlingResource(rule.getActivity());
+    Espresso.registerIdlingResources(idlingResource);
+    Intents.init();
+    dialogTexts = rule.getActivity().getResources().getStringArray(R.array.mapbox_attribution_names);
+    dialogLinks = rule.getActivity().getResources().getStringArray(R.array.mapbox_attribution_links);
+  }
+
+  @Test
+  public void testDisabled() {
+    ViewUtils.checkViewIsDisplayed(R.id.mapView);
+    MapboxMap mapboxMap = rule.getActivity().getMapboxMap();
+
+    // Default
+    onView(withId(R.id.attributionView)).check(matches(isDisplayed()));
+
+    // Disabled
+    onView(withId(R.id.attributionView))
+      .perform(new DisableAction(mapboxMap))
+      .check(matches(not(isDisplayed())));
+  }
+
+  @Test
+  public void testMapboxLink() {
+    ViewUtils.checkViewIsDisplayed(R.id.mapView);
+
+    // click on View to open dialog
+    onView(withId(R.id.attributionView)).perform(click());
+    onView(withText(R.string.mapbox_attributionsDialogTitle)).check(matches(isDisplayed()));
+
+    // click on link and validate browser opening
+    Matcher<Intent> expectedIntent = allOf(hasAction(Intent.ACTION_VIEW), hasData(Uri.parse(dialogLinks[0])));
+    intending(expectedIntent).respondWith(new Instrumentation.ActivityResult(0, null));
+    onView(withText(dialogTexts[0])).perform(click());
+    intended(expectedIntent);
+  }
+
+  @Test
+  public void testOpenStreetMapLink() {
+    ViewUtils.checkViewIsDisplayed(R.id.mapView);
+
+    // click on View to open dialog
+    onView(withId(R.id.attributionView)).perform(click());
+    onView(withText(R.string.mapbox_attributionsDialogTitle)).check(matches(isDisplayed()));
+
+    // click on link and validate browser opening
+    Matcher<Intent> expectedIntent = allOf(hasAction(Intent.ACTION_VIEW), hasData(Uri.parse(dialogLinks[1])));
+    intending(expectedIntent).respondWith(new Instrumentation.ActivityResult(0, null));
+    onView(withText(dialogTexts[1])).perform(click());
+  }
+
+  @Test
+  public void testImproveMapLink() {
+    ViewUtils.checkViewIsDisplayed(R.id.mapView);
+
+    // click on View to open dialog
+    onView(withId(R.id.attributionView)).perform(click());
+    onView(withText(R.string.mapbox_attributionsDialogTitle)).check(matches(isDisplayed()));
+
+    // click on Mapbox link and validate browser opening
+    Matcher<Intent> expectedIntent = allOf(hasAction(Intent.ACTION_VIEW), hasData(Uri.parse(dialogLinks[3])));
+    intending(expectedIntent).respondWith(new Instrumentation.ActivityResult(0, null));
+    onView(withText(dialogTexts[3])).perform(click());
+  }
+
+  @Test
+  public void testTelemetryDialog() {
+    ViewUtils.checkViewIsDisplayed(R.id.mapView);
+
+    // click on View to open dialog
+    onView(withId(R.id.attributionView)).perform(click());
+    onView(withText(R.string.mapbox_attributionsDialogTitle)).check(matches(isDisplayed()));
+
+    // click on item to open second dialog
+    onView(withText(dialogTexts[3])).perform(click());
+    onView(withText(R.string.mapbox_attributionTelemetryTitle)).check(matches(isDisplayed()));
+  }
+
+  @After
+  public void afterTest() {
+    Intents.release();
+    Espresso.unregisterIdlingResources(idlingResource);
+  }
+
+  private class DisableAction implements ViewAction {
+
+    private MapboxMap mapboxMap;
+
+    DisableAction(MapboxMap map) {
+      mapboxMap = map;
     }
 
-    @Test
-    public void testDisabled() {
-        ViewUtils.checkViewIsDisplayed(R.id.mapView);
-        MapboxMap mapboxMap = rule.getActivity().getMapboxMap();
-
-        // Default
-        onView(withId(R.id.attributionView)).check(matches(isDisplayed()));
-
-        // Disabled
-        onView(withId(R.id.attributionView))
-                .perform(new DisableAction(mapboxMap))
-                .check(matches(not(isDisplayed())));
+    @Override
+    public Matcher<View> getConstraints() {
+      return isDisplayed();
     }
 
-    @Test
-    public void testMapboxLink() {
-        ViewUtils.checkViewIsDisplayed(R.id.mapView);
-
-        // click on View to open dialog
-        onView(withId(R.id.attributionView)).perform(click());
-        onView(withText(R.string.mapbox_attributionsDialogTitle)).check(matches(isDisplayed()));
-
-        // click on link and validate browser opening
-        Matcher<Intent> expectedIntent = allOf(hasAction(Intent.ACTION_VIEW), hasData(Uri.parse(dialogLinks[0])));
-        intending(expectedIntent).respondWith(new Instrumentation.ActivityResult(0, null));
-        onView(withText(dialogTexts[0])).perform(click());
-        intended(expectedIntent);
+    @Override
+    public String getDescription() {
+      return getClass().getSimpleName();
     }
 
-    @Test
-    public void testOpenStreetMapLink() {
-        ViewUtils.checkViewIsDisplayed(R.id.mapView);
-
-        // click on View to open dialog
-        onView(withId(R.id.attributionView)).perform(click());
-        onView(withText(R.string.mapbox_attributionsDialogTitle)).check(matches(isDisplayed()));
-
-        // click on link and validate browser opening
-        Matcher<Intent> expectedIntent = allOf(hasAction(Intent.ACTION_VIEW), hasData(Uri.parse(dialogLinks[1])));
-        intending(expectedIntent).respondWith(new Instrumentation.ActivityResult(0, null));
-        onView(withText(dialogTexts[1])).perform(click());
+    @Override
+    public void perform(UiController uiController, View view) {
+      mapboxMap.getUiSettings().setAttributionEnabled(false);
     }
-
-    @Test
-    public void testImproveMapLink() {
-        ViewUtils.checkViewIsDisplayed(R.id.mapView);
-
-        // click on View to open dialog
-        onView(withId(R.id.attributionView)).perform(click());
-        onView(withText(R.string.mapbox_attributionsDialogTitle)).check(matches(isDisplayed()));
-
-        // click on Mapbox link and validate browser opening
-        Matcher<Intent> expectedIntent = allOf(hasAction(Intent.ACTION_VIEW), hasData(Uri.parse(dialogLinks[3])));
-        intending(expectedIntent).respondWith(new Instrumentation.ActivityResult(0, null));
-        onView(withText(dialogTexts[3])).perform(click());
-    }
-
-    @Test
-    public void testTelemetryDialog() {
-        ViewUtils.checkViewIsDisplayed(R.id.mapView);
-
-        // click on View to open dialog
-        onView(withId(R.id.attributionView)).perform(click());
-        onView(withText(R.string.mapbox_attributionsDialogTitle)).check(matches(isDisplayed()));
-
-        // click on item to open second dialog
-        onView(withText(dialogTexts[3])).perform(click());
-        onView(withText(R.string.mapbox_attributionTelemetryTitle)).check(matches(isDisplayed()));
-    }
-
-    @After
-    public void afterTest() {
-        Intents.release();
-        Espresso.unregisterIdlingResources(idlingResource);
-    }
-
-    private class DisableAction implements ViewAction {
-
-        private MapboxMap mapboxMap;
-
-        DisableAction(MapboxMap map) {
-            mapboxMap = map;
-        }
-
-        @Override
-        public Matcher<View> getConstraints() {
-            return isDisplayed();
-        }
-
-        @Override
-        public String getDescription() {
-            return getClass().getSimpleName();
-        }
-
-        @Override
-        public void perform(UiController uiController, View view) {
-            mapboxMap.getUiSettings().setAttributionEnabled(false);
-        }
-    }
+  }
 }

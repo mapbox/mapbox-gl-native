@@ -7,27 +7,27 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
  */
 public class MapViewUtils {
 
-    public static void setDirection(MapboxMap mapboxMap, float direction) {
-        mapboxMap.getTransform().setBearing(direction);
-    }
+  public static void setDirection(MapboxMap mapboxMap, float direction) {
+    mapboxMap.getTransform().setBearing(direction);
+  }
 
-    public static float getDirection(MapboxMap mapboxMap) {
-        return (float) mapboxMap.getTransform().getBearing();
-    }
+  public static float getDirection(MapboxMap mapboxMap) {
+    return (float) mapboxMap.getTransform().getBearing();
+  }
 
-    public static void setTilt(MapboxMap mapboxMap, float tilt) {
-        mapboxMap.getTransform().setTilt((double) tilt);
-    }
+  public static void setTilt(MapboxMap mapboxMap, float tilt) {
+    mapboxMap.getTransform().setTilt((double) tilt);
+  }
 
-    public static float getTilt(MapboxMap mapboxMap) {
-        return (float) mapboxMap.getTransform().getTilt();
-    }
+  public static float getTilt(MapboxMap mapboxMap) {
+    return (float) mapboxMap.getTransform().getTilt();
+  }
 
-    public static void setLatLng(MapboxMap mapboxMap, LatLng latLng) {
-        mapboxMap.getTransform().setCenterCoordinate(latLng);
-    }
+  public static void setLatLng(MapboxMap mapboxMap, LatLng latLng) {
+    mapboxMap.getTransform().setCenterCoordinate(latLng);
+  }
 
-    public static LatLng getLatLng(MapboxMap mapboxMap) {
-        return mapboxMap.getTransform().getCenterCoordinate();
-    }
+  public static LatLng getLatLng(MapboxMap mapboxMap) {
+    return mapboxMap.getTransform().getCenterCoordinate();
+  }
 }

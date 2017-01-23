@@ -173,8 +173,8 @@ private:
             return false;
         }
 
-        bool operator()(const std::unordered_map<std::string, Value>&,
-                        const std::unordered_map<std::string, Value>&) const {
+        bool operator()(const PropertyMap&,
+                        const PropertyMap&) const {
             // Should be unreachable; nested values are not currently allowed by the style specification.
             assert(false);
             return false;

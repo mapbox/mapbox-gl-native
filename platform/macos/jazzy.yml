@@ -2,7 +2,8 @@ module: Mapbox
 author: Mapbox
 author_url: https://www.mapbox.com/
 github_url: https://github.com/mapbox/mapbox-gl-native
-copyright: '© 2014–2016 [Mapbox](https://www.mapbox.com/). See [license](https://github.com/mapbox/mapbox-gl-native/blob/master/LICENSE.md) for more details.'
+dash_url: https://mapbox.github.io/mapbox-gl-native/macos/docsets/Mapbox.xml
+copyright: '© 2014–2017 [Mapbox](https://www.mapbox.com/). See [license](https://github.com/mapbox/mapbox-gl-native/blob/master/LICENSE.md) for more details.'
 
 head: |
   <link rel='shortcut icon' href='https://www.mapbox.com/img/favicon.ico' type='image/x-icon' />
@@ -14,56 +15,64 @@ umbrella_header: src/Mapbox.h
 framework_root: ../darwin/src
 
 custom_categories:
+  - name: Guides
+    children:
+      - Working with GeoJSON Data
+      - For Style Authors
+      - Info.plist Keys
   - name: Maps
     children:
       - MGLAccountManager
       - MGLMapCamera
       - MGLMapView
       - MGLMapViewDelegate
-      - MGLStyle
       - MGLUserTrackingMode
-  - name: Annotations
+  - name: Shapes and Annotations
     children:
       - MGLAnnotation
       - MGLAnnotationImage
+      - MGLOverlay
+      - MGLShape
       - MGLMultiPoint
-      - MGLMultiPolygon
-      - MGLMultiPolyline
       - MGLPointAnnotation
       - MGLPointCollection
       - MGLPolygon
       - MGLPolyline
-      - MGLOverlay
-      - MGLShape
+      - MGLMultiPolygon
+      - MGLMultiPolyline
       - MGLShapeCollection
-  - name: Map Data
+  - name: Styling the Map
     children:
-      - MGLFeature      
+      - MGLStyle
+      - MGLStyleValue
+  - name: Content Primitives
+    children:
+      - MGLFeature
+      - MGLPointFeature
+      - MGLPolygonFeature
+      - MGLPolylineFeature
       - MGLMultiPolygonFeature
       - MGLMultiPolylineFeature
       - MGLPointCollectionFeature
-      - MGLPointFeature      
-      - MGLPolygonFeature
-      - MGLPolylineFeature
       - MGLShapeCollectionFeature
-  - name: Style Layers
-    children:
-      - MGLBackgroundStyleLayer
-      - MGLCircleStyleLayer
-      - MGLFillStyleLayer
-      - MGLForegroundStyleLayer
-      - MGLLineStyleLayer
-      - MGLRasterStyleLayer
-      - MGLStyleLayer
-      - MGLSymbolStyleLayer
-      - MGLVectorStyleLayer
-  - name: Data Sources
+  - name: Content Sources
     children:
       - MGLSource
-      - MGLGeoJSONSource
+      - MGLTileSource
+      - MGLShapeSource
       - MGLRasterSource
-      - MGLTileSet
       - MGLVectorSource
+  - name: Style Layers
+    children:
+      - MGLStyleLayer
+      - MGLForegroundStyleLayer
+      - MGLBackgroundStyleLayer
+      - MGLRasterStyleLayer
+      - MGLVectorStyleLayer
+      - MGLCircleStyleLayer
+      - MGLFillStyleLayer
+      - MGLLineStyleLayer
+      - MGLSymbolStyleLayer
   - name: Offline Maps
     children:
       - MGLOfflineRegion
@@ -74,15 +83,13 @@ custom_categories:
       - MGLTilePyramidOfflineRegion
   - name: Geometry
     children:
-      - MGLClockDirectionFormatter
-      - MGLCompassDirectionFormatter
       - MGLCoordinateBounds
       - MGLCoordinateBoundsEqualToCoordinateBounds
       - MGLCoordinateBoundsGetCoordinateSpan
+      - MGLCoordinateBoundsIntersectsCoordinateBounds
       - MGLCoordinateBoundsIsEmpty
       - MGLCoordinateBoundsMake
       - MGLCoordinateBoundsOffset
-      - MGLCoordinateFormatter
       - MGLCoordinateInCoordinateBounds
       - MGLCoordinateSpan
       - MGLCoordinateSpanEqualToCoordinateSpan
@@ -91,3 +98,8 @@ custom_categories:
       - MGLDegreesFromRadians
       - MGLRadiansFromDegrees
       - MGLStringFromCoordinateBounds
+  - name: Formatters
+    children:
+      - MGLClockDirectionFormatter
+      - MGLCompassDirectionFormatter
+      - MGLCoordinateFormatter

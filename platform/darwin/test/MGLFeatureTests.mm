@@ -159,7 +159,7 @@
 }
 
 - (void)testPointFeatureGeoJSONDictionary {
-    MGLPointFeature<MGLFeaturePrivate> *pointFeature = (MGLPointFeature<MGLFeaturePrivate> *)[[MGLPointFeature alloc] init];
+    MGLPointFeature *pointFeature = [[MGLPointFeature alloc] init];
     CLLocationCoordinate2D coordinate = { 10, 10 };
     pointFeature.coordinate = coordinate;
     
@@ -321,6 +321,15 @@
                                                            @"coordinates": @[@[@(coord1.longitude), @(coord1.latitude)],
                                                                              @[@(coord2.longitude), @(coord2.latitude)]]}
                                                        ]};
+    XCTAssertEqualObjects(geoJSONFeature[@"geometry"], expectedGeometry);
+
+    // When the shape collection is created with an empty array of shapes
+    shapeCollectionFeature = [MGLShapeCollectionFeature shapeCollectionWithShapes:@[]];
+
+    // it has the correct (empty) geometry
+    geoJSONFeature = [shapeCollectionFeature geoJSONDictionary];
+    expectedGeometry = @{@"type": @"GeometryCollection",
+                         @"geometries": @[]};
     XCTAssertEqualObjects(geoJSONFeature[@"geometry"], expectedGeometry);
 }
 

@@ -10,6 +10,8 @@ namespace gl {
 class Context;
 } // namespace gl
 
+class BackendScope;
+
 class Backend {
 public:
     Backend();
@@ -18,6 +20,14 @@ public:
     // Returns the backend's context which manages OpenGL state.
     gl::Context& getContext();
 
+    // Called when the map needs to be rendered; the backend should call Map::render() at some point
+    // in the near future. (Not called for Map::renderStill() mode.)
+    virtual void invalidate() = 0;
+
+    // Notifies a watcher of map x/y/scale/rotation changes.
+    virtual void notifyMapChange(MapChange change);
+
+protected:
     // Called when the backend's GL context needs to be made active or inactive. These are called,
     // as a matched pair, in four situations:
     //
@@ -31,15 +41,24 @@ public:
     virtual void activate() = 0;
     virtual void deactivate() = 0;
 
-    // Called when the map needs to be rendered; the backend should call Map::render() at some point
-    // in the near future. (Not called for Map::renderStill() mode.)
-    virtual void invalidate() = 0;
-
-    // Notifies a watcher of map x/y/scale/rotation changes.
-    virtual void notifyMapChange(MapChange change);
-
 private:
     const std::unique_ptr<gl::Context> context;
+
+    friend class BackendScope;
+};
+
+class BackendScope {
+public:
+    BackendScope(Backend& backend_) : backend(backend_) {
+        backend.activate();
+    }
+
+    ~BackendScope() {
+        backend.deactivate();
+    }
+
+private:
+    Backend& backend;
 };
 
 } // namespace mbgl

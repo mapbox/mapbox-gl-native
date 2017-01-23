@@ -54,6 +54,18 @@ public:
     PropertyValue<CirclePitchScaleType> getCirclePitchScale(const optional<std::string>& klass = {}) const;
     void setCirclePitchScale(PropertyValue<CirclePitchScaleType>, const optional<std::string>& klass = {});
 
+    static PropertyValue<float> getDefaultCircleStrokeWidth();
+    PropertyValue<float> getCircleStrokeWidth(const optional<std::string>& klass = {}) const;
+    void setCircleStrokeWidth(PropertyValue<float>, const optional<std::string>& klass = {});
+
+    static PropertyValue<Color> getDefaultCircleStrokeColor();
+    PropertyValue<Color> getCircleStrokeColor(const optional<std::string>& klass = {}) const;
+    void setCircleStrokeColor(PropertyValue<Color>, const optional<std::string>& klass = {});
+
+    static PropertyValue<float> getDefaultCircleStrokeOpacity();
+    PropertyValue<float> getCircleStrokeOpacity(const optional<std::string>& klass = {}) const;
+    void setCircleStrokeOpacity(PropertyValue<float>, const optional<std::string>& klass = {});
+
     // Private implementation
 
     class Impl;

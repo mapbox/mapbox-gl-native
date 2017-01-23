@@ -1,38 +1,57 @@
-#import "MGLMapView.h"
-#import "MGLStyle_Private.h"
-
-#import "MGLGeoJSONSource.h"
-#import "MGLRasterSource.h"
-#import "MGLVectorSource.h"
-
-#import "MGLBackgroundStyleLayer.h"
-#import "MGLCircleStyleLayer.h"
-#import "MGLFillStyleLayer.h"
-#import "MGLLineStyleLayer.h"
-#import "MGLRasterStyleLayer.h"
-#import "MGLSymbolStyleLayer.h"
+#import <Mapbox/Mapbox.h>
 
 #import "NSBundle+MGLAdditions.h"
 
 #import <mbgl/util/default_styles.hpp>
 
 #import <XCTest/XCTest.h>
+#if TARGET_OS_IPHONE
+    #import <UIKit/UIKit.h>
+#else
+    #import <Cocoa/Cocoa.h>
+#endif
 #import <objc/runtime.h>
 
-@interface MGLStyleTests : XCTestCase
+@interface MGLStyleTests : XCTestCase <MGLMapViewDelegate>
 
 @property (nonatomic) MGLMapView *mapView;
 @property (nonatomic) MGLStyle *style;
 
 @end
 
-@implementation MGLStyleTests
+@implementation MGLStyleTests {
+    XCTestExpectation *_styleLoadingExpectation;
+}
 
 - (void)setUp {
     [super setUp];
+    
+    [MGLAccountManager setAccessToken:@"pk.feedcafedeadbeefbadebede"];
+    NSURL *styleURL = [[NSBundle bundleForClass:[self class]] URLForResource:@"one-liner" withExtension:@"json"];
+    self.mapView = [[MGLMapView alloc] initWithFrame:CGRectMake(0, 0, 100, 100) styleURL:styleURL];
+    self.mapView.delegate = self;
+    if (!self.mapView.style) {
+        _styleLoadingExpectation = [self expectationWithDescription:@"Map view should finish loading style."];
+        [self waitForExpectationsWithTimeout:1 handler:nil];
+    }
+}
 
-    self.mapView = [[MGLMapView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];
-    self.style = [[MGLStyle alloc] initWithMapView:self.mapView];
+- (void)mapView:(MGLMapView *)mapView didFinishLoadingStyle:(MGLStyle *)style {
+    XCTAssertNotNil(mapView.style);
+    XCTAssertEqual(mapView.style, style);
+    
+    [_styleLoadingExpectation fulfill];
+}
+
+- (void)tearDown {
+    _styleLoadingExpectation = nil;
+    self.mapView = nil;
+    
+    [super tearDown];
+}
+
+- (MGLStyle *)style {
+    return self.mapView.style;
 }
 
 - (void)testUnversionedStyleURLs {
@@ -115,30 +134,64 @@
     }];
 }
 
-- (void)testAddingSourcesTwice {
-    MGLGeoJSONSource *geoJSONSource = [[MGLGeoJSONSource alloc] initWithIdentifier:@"geoJSONSource" features:@[] options:nil];
-    [self.style addSource:geoJSONSource];
-    XCTAssertThrowsSpecificNamed([self.style addSource:geoJSONSource], NSException, @"MGLRedundantSourceException");
+- (void)testName {
+    XCTAssertNil(self.style.name);
+}
 
-    MGLRasterSource *rasterSource = [[MGLRasterSource alloc] initWithIdentifier:@"rasterSource" URL:[NSURL new] tileSize:42];
+- (void)testSources {
+    NSSet<MGLSource *> *initialSources = self.style.sources;
+    if ([initialSources.anyObject.identifier isEqualToString:@"com.mapbox.annotations"]) {
+        XCTAssertEqual(self.style.sources.count, 1);
+    } else {
+        XCTAssertEqual(self.style.sources.count, 0);
+    }
+    MGLShapeSource *shapeSource = [[MGLShapeSource alloc] initWithIdentifier:@"shapeSource" shape:nil options:nil];
+    [self.style addSource:shapeSource];
+    XCTAssertEqual(self.style.sources.count, initialSources.count + 1);
+    [self.style removeSource:shapeSource];
+    XCTAssertEqual(self.style.sources.count, initialSources.count);
+}
+
+- (void)testAddingSourcesTwice {
+    MGLShapeSource *shapeSource = [[MGLShapeSource alloc] initWithIdentifier:@"shapeSource" shape:nil options:nil];
+    [self.style addSource:shapeSource];
+    XCTAssertThrowsSpecificNamed([self.style addSource:shapeSource], NSException, @"MGLRedundantSourceException");
+
+    MGLRasterSource *rasterSource = [[MGLRasterSource alloc] initWithIdentifier:@"rasterSource" configurationURL:[NSURL URLWithString:@".json"] tileSize:42];
     [self.style addSource:rasterSource];
     XCTAssertThrowsSpecificNamed([self.style addSource:rasterSource], NSException, @"MGLRedundantSourceException");
 
-    MGLVectorSource *vectorSource = [[MGLVectorSource alloc] initWithIdentifier:@"vectorSource" URL:[NSURL new]];
+    MGLVectorSource *vectorSource = [[MGLVectorSource alloc] initWithIdentifier:@"vectorSource" configurationURL:[NSURL URLWithString:@".json"]];
     [self.style addSource:vectorSource];
     XCTAssertThrowsSpecificNamed([self.style addSource:vectorSource], NSException, @"MGLRedundantSourceException");
 }
 
 - (void)testAddingSourcesWithDuplicateIdentifiers {
-    MGLVectorSource *source1 = [[MGLVectorSource alloc] initWithIdentifier:@"my-source" URL:[NSURL URLWithString:@"mapbox://mapbox.mapbox-terrain-v2"]];
-    MGLVectorSource *source2 = [[MGLVectorSource alloc] initWithIdentifier:@"my-source" URL:[NSURL URLWithString:@"mapbox://mapbox.mapbox-terrain-v2"]];
+    MGLVectorSource *source1 = [[MGLVectorSource alloc] initWithIdentifier:@"my-source" configurationURL:[NSURL URLWithString:@"mapbox://mapbox.mapbox-terrain-v2"]];
+    MGLVectorSource *source2 = [[MGLVectorSource alloc] initWithIdentifier:@"my-source" configurationURL:[NSURL URLWithString:@"mapbox://mapbox.mapbox-terrain-v2"]];
 
     [self.style addSource: source1];
-    XCTAssertThrowsSpecificNamed([self.style addSource: source2], NSException, @"MGLRedundantSourceIdentiferException");
+    XCTAssertThrowsSpecificNamed([self.style addSource: source2], NSException, @"MGLRedundantSourceIdentifierException");
+}
+
+- (void)testLayers {
+    NSArray<MGLStyleLayer *> *initialLayers = self.style.layers;
+    if ([initialLayers.firstObject.identifier isEqualToString:@"com.mapbox.annotations.points"]) {
+        XCTAssertEqual(self.style.layers.count, 1);
+    } else {
+        XCTAssertEqual(self.style.layers.count, 0);
+    }
+    MGLShapeSource *shapeSource = [[MGLShapeSource alloc] initWithIdentifier:@"shapeSource" shape:nil options:nil];
+    [self.style addSource:shapeSource];
+    MGLFillStyleLayer *fillLayer = [[MGLFillStyleLayer alloc] initWithIdentifier:@"fillLayer" source:shapeSource];
+    [self.style addLayer:fillLayer];
+    XCTAssertEqual(self.style.layers.count, initialLayers.count + 1);
+    [self.style removeLayer:fillLayer];
+    XCTAssertEqual(self.style.layers.count, initialLayers.count);
 }
 
 - (void)testAddingLayersTwice {
-    MGLGeoJSONSource *source = [[MGLGeoJSONSource alloc] initWithIdentifier:@"geoJSONSource" features:@[] options:nil];
+    MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"shapeSource" shape:nil options:nil];
 
     MGLBackgroundStyleLayer *backgroundLayer = [[MGLBackgroundStyleLayer alloc] initWithIdentifier:@"backgroundLayer"];
     [self.style addLayer:backgroundLayer];
@@ -165,6 +218,23 @@
     XCTAssertThrowsSpecificNamed([self.style addLayer:symbolLayer], NSException, @"MGLRedundantLayerException");
 }
 
+- (void)testAddingLayersWithDuplicateIdentifiers {
+    //Just some source
+    MGLVectorSource *source = [[MGLVectorSource alloc] initWithIdentifier:@"my-source" configurationURL:[NSURL URLWithString:@"mapbox://mapbox.mapbox-terrain-v2"]];
+    [self.style addSource: source];
+    
+    //Add initial layer
+    MGLFillStyleLayer *initial = [[MGLFillStyleLayer alloc] initWithIdentifier:@"my-layer" source:source];
+    [self.style addLayer:initial];
+    
+    //Try to add the duplicate
+    XCTAssertThrowsSpecificNamed([self.style addLayer:[[MGLFillStyleLayer alloc] initWithIdentifier:@"my-layer" source:source]], NSException, @"MGLRedundantLayerIdentifierException");
+    XCTAssertThrowsSpecificNamed([self.style insertLayer:[[MGLFillStyleLayer alloc] initWithIdentifier:@"my-layer" source:source] belowLayer:initial],NSException, @"MGLRedundantLayerIdentifierException");
+    XCTAssertThrowsSpecificNamed([self.style insertLayer:[[MGLFillStyleLayer alloc] initWithIdentifier:@"my-layer" source:source] aboveLayer:initial], NSException, @"MGLRedundantLayerIdentifierException");
+    XCTAssertThrowsSpecificNamed([self.style insertLayer:[[MGLFillStyleLayer alloc] initWithIdentifier:@"my-layer" source:source] atIndex:0], NSException, @"MGLRedundantLayerIdentifierException");
+    XCTAssertThrowsSpecificNamed([self.style insertLayer:[[MGLOpenGLStyleLayer alloc] initWithIdentifier:@"my-layer"] atIndex:0], NSException, @"MGLRedundantLayerIdentifierException");
+}
+
 - (NSString *)stringWithContentsOfStyleHeader {
     NSURL *styleHeaderURL = [[[NSBundle mgl_frameworkBundle].bundleURL
                               URLByAppendingPathComponent:@"Headers" isDirectory:YES]
@@ -173,6 +243,63 @@
     NSString *styleHeader = [NSString stringWithContentsOfURL:styleHeaderURL usedEncoding:nil error:&styleHeaderError];
     XCTAssertNil(styleHeaderError, @"Error getting contents of MGLStyle.h.");
     return styleHeader;
+}
+
+- (void)testClasses {
+    XCTAssertEqual(self.style.styleClasses.count, 0);
+}
+
+- (void)testImages {
+    NSString *imageName = @"TrackingLocationMask";
+#if TARGET_OS_IPHONE
+    MGLImage *image = [MGLImage imageNamed:imageName
+                                  inBundle:[NSBundle bundleForClass:[self class]]
+             compatibleWithTraitCollection:nil];
+#else
+    MGLImage *image = [[NSBundle bundleForClass:[self class]] imageForResource:imageName];
+#endif
+    XCTAssertNotNil(image);
+    
+    [self.style setImage:image forName:imageName];
+    MGLImage *styleImage = [self.style imageForName:imageName];
+    
+    XCTAssertNotNil(styleImage);
+    XCTAssertEqual(image.size.width, styleImage.size.width);
+    XCTAssertEqual(image.size.height, styleImage.size.height);
+}
+
+- (void)testLayersOrder {
+    NSString *filePath = [[NSBundle bundleForClass:self.class] pathForResource:@"amsterdam" ofType:@"geojson"];
+    NSURL *url = [NSURL fileURLWithPath:filePath];
+    MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"sourceID" URL:url options:nil];
+    [self.style addSource:source];
+    
+    MGLCircleStyleLayer *layer1 = [[MGLCircleStyleLayer alloc] initWithIdentifier:@"layer1" source:source];
+    [self.style addLayer:layer1];
+    
+    MGLCircleStyleLayer *layer3 = [[MGLCircleStyleLayer alloc] initWithIdentifier:@"layer3" source:source];
+    [self.style addLayer:layer3];
+    
+    MGLCircleStyleLayer *layer2 = [[MGLCircleStyleLayer alloc] initWithIdentifier:@"layer2" source:source];
+    [self.style insertLayer:layer2 aboveLayer:layer1];
+    
+    MGLCircleStyleLayer *layer4 = [[MGLCircleStyleLayer alloc] initWithIdentifier:@"layer4" source:source];
+    [self.style insertLayer:layer4 aboveLayer:layer3];
+    
+    MGLCircleStyleLayer *layer0 = [[MGLCircleStyleLayer alloc] initWithIdentifier:@"layer0" source:source];
+    [self.style insertLayer:layer0 belowLayer:layer1];
+    
+    NSArray<MGLStyleLayer *> *layers = [self.style layers];
+    NSUInteger startIndex = 0;
+    if ([layers.firstObject.identifier isEqualToString:@"com.mapbox.annotations.points"]) {
+        startIndex++;
+    }
+    
+    XCTAssertEqualObjects(layers[startIndex++].identifier, layer0.identifier);
+    XCTAssertEqualObjects(layers[startIndex++].identifier, layer1.identifier);
+    XCTAssertEqualObjects(layers[startIndex++].identifier, layer2.identifier);
+    XCTAssertEqualObjects(layers[startIndex++].identifier, layer3.identifier);
+    XCTAssertEqualObjects(layers[startIndex++].identifier, layer4.identifier);
 }
 
 @end

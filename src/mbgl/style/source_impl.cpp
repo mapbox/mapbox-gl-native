@@ -141,8 +141,8 @@ void Source::Impl::updateTiles(const UpdateParameters& parameters) {
 
     if (type != SourceType::Annotations && cache.getSize() == 0) {
         size_t conservativeCacheSize =
-            ((float)parameters.transformState.getSize().width / util::tileSize) *
-            ((float)parameters.transformState.getSize().height / util::tileSize) *
+            std::max((float)parameters.transformState.getSize().width / util::tileSize, 1.0f) *
+            std::max((float)parameters.transformState.getSize().height / util::tileSize, 1.0f) *
             (parameters.transformState.getMaxZoom() - parameters.transformState.getMinZoom() + 1) *
             0.5;
         cache.setSize(conservativeCacheSize);
@@ -217,9 +217,8 @@ std::unordered_map<std::string, std::vector<Feature>> Source::Impl::queryRendere
 
 
     auto sortRenderTiles = [](const RenderTile& a, const RenderTile& b) {
-        return a.id.canonical.z != b.id.canonical.z ? a.id.canonical.z < b.id.canonical.z :
-               a.id.canonical.y != b.id.canonical.y ? a.id.canonical.y < b.id.canonical.y :
-               a.id.wrap != b.id.wrap ? a.id.wrap < b.id.wrap : a.id.canonical.x < b.id.canonical.x;
+        return std::tie(a.id.canonical.z, a.id.canonical.y, a.id.wrap, a.id.canonical.x) <
+            std::tie(b.id.canonical.z, b.id.canonical.y, b.id.wrap, b.id.canonical.x);
     };
     std::vector<std::reference_wrapper<const RenderTile>> sortedTiles;
     std::transform(renderTiles.cbegin(), renderTiles.cend(), std::back_inserter(sortedTiles),

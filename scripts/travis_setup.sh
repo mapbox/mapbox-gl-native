@@ -56,14 +56,10 @@ function mapbox_start_xvfb {
 export -f mapbox_start_xvfb
 
 function mapbox_export_mesa_library_path {
-    CXX11ABI=""
-    if [ `scripts/check-cxx11abi.sh` = 'ON' ]; then
-        CXX11ABI="-cxx11abi"
-    fi
     # Install and set up to load a more recent version of mesa
     mapbox_time "install_mesa" \
-    mason install mesa 13.0.0-glx${CXX11ABI}
-    export LD_LIBRARY_PATH="`mason prefix mesa 13.0.0-glx${CXX11ABI}`/lib:${LD_LIBRARY_PATH:-}"
+    mason install mesa 13.0.0-glx
+    export LD_LIBRARY_PATH="`mason prefix mesa 13.0.0-glx`/lib:${LD_LIBRARY_PATH:-}"
 }
 
 export -f mapbox_export_mesa_library_path

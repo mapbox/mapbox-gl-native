@@ -168,7 +168,7 @@ Box CollisionTile::getTreeBox(const Point<float>& anchor, const CollisionBox& bo
     };
 }
 
-std::vector<IndexedSubfeature> CollisionTile::queryRenderedSymbols(const GeometryCoordinates& queryGeometry, float scale) {
+std::vector<IndexedSubfeature> CollisionTile::queryRenderedSymbols(const GeometryCoordinates& queryGeometry, float scale) const {
     std::vector<IndexedSubfeature> result;
     if (queryGeometry.empty() || (tree.empty() && ignoredTree.empty())) {
         return result;

@@ -41,11 +41,14 @@ void Painter::renderCircle(PaintParameters& parameters,
             uniforms::u_color::Value{ properties.get<CircleColor>() },
             uniforms::u_radius::Value{ properties.get<CircleRadius>() },
             uniforms::u_blur::Value{ properties.get<CircleBlur>() },
+            uniforms::u_stroke_color::Value{ properties.get<CircleStrokeColor>() },
+            uniforms::u_stroke_width::Value{ properties.get<CircleStrokeWidth>() },
+            uniforms::u_stroke_opacity::Value{ properties.get<CircleStrokeOpacity>() },
             uniforms::u_scale_with_map::Value{ scaleWithMap },
             uniforms::u_extrude_scale::Value{ scaleWithMap
                 ? std::array<float, 2> {{
-                    pixelsToGLUnits[0] * state.getAltitude(),
-                    pixelsToGLUnits[1] * state.getAltitude()
+                    pixelsToGLUnits[0] * state.getCameraToCenterDistance(),
+                    pixelsToGLUnits[1] * state.getCameraToCenterDistance()
                   }}
                 : pixelsToGLUnits }
         },

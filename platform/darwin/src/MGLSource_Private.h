@@ -1,10 +1,21 @@
 #import "MGLSource.h"
 
-#include <mbgl/style/source.hpp>
+NS_ASSUME_NONNULL_BEGIN
+
+namespace mbgl {
+    namespace style {
+        class Source;
+    }
+}
 
 @class MGLMapView;
 
 @interface MGLSource (Private)
+
+/**
+ Initializes and returns a source with a raw pointer to the backing store.
+ */
+- (instancetype)initWithRawSource:(mbgl::style::Source *)rawSource;
 
 /**
  A raw pointer to the mbgl object, which is always initialized, either to the 
@@ -37,3 +48,5 @@
 - (void)removeFromMapView:(MGLMapView *)mapView;
 
 @end
+
+NS_ASSUME_NONNULL_END

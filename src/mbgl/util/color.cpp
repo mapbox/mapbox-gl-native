@@ -1,4 +1,5 @@
 #include <mbgl/util/color.hpp>
+#include <mbgl/util/string.hpp>
 
 #include <csscolorparser/csscolorparser.hpp>
 
@@ -15,6 +16,14 @@ optional<Color> Color::parse(const std::string& s) {
         css_color.b * factor,
         css_color.a
     }};
+}
+
+std::string Color::stringify() const {
+    return "rgba(" +
+        util::toString(r * 255) + "," +
+        util::toString(g * 255) + "," +
+        util::toString(b * 255) + "," +
+        util::toString(a) + ")";
 }
 
 } // namespace mbgl

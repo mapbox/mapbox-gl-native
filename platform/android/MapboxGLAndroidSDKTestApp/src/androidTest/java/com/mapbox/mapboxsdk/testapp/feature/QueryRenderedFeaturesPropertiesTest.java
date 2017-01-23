@@ -33,45 +33,46 @@ import static android.support.test.espresso.matcher.ViewMatchers.withText;
  */
 public class QueryRenderedFeaturesPropertiesTest {
 
-    @Rule
-    public final ActivityTestRule<QueryRenderedFeaturesPropertiesActivity> rule = new ActivityTestRule<>(QueryRenderedFeaturesPropertiesActivity.class);
+  @Rule
+  public final ActivityTestRule<QueryRenderedFeaturesPropertiesActivity> rule =
+    new ActivityTestRule<>(QueryRenderedFeaturesPropertiesActivity.class);
 
-    private OnMapReadyIdlingResource idlingResource;
+  private OnMapReadyIdlingResource idlingResource;
 
-    @Before
-    public void registerIdlingResource() {
-        idlingResource = new OnMapReadyIdlingResource(rule.getActivity());
-        Espresso.registerIdlingResources(idlingResource);
-    }
+  @Before
+  public void registerIdlingResource() {
+    idlingResource = new OnMapReadyIdlingResource(rule.getActivity());
+    Espresso.registerIdlingResources(idlingResource);
+  }
 
-    @Test
-    @Ignore
-    public void testCountFeatures() {
-        MapboxMap mapboxMap = rule.getActivity().getMapboxMap();
-        LatLng centerScreen = mapboxMap.getCameraPosition().target;
-        PointF centerPixel = mapboxMap.getProjection().toScreenLocation(centerScreen);
-        onView(withId(R.id.mapView)).perform(clickXY(centerPixel.x, centerPixel.y));
-        onView(withText("Found 4 features")).check(matches(isDisplayed()));
-    }
+  @Test
+  @Ignore
+  public void testCountFeatures() {
+    MapboxMap mapboxMap = rule.getActivity().getMapboxMap();
+    LatLng centerScreen = mapboxMap.getCameraPosition().target;
+    PointF centerPixel = mapboxMap.getProjection().toScreenLocation(centerScreen);
+    onView(withId(R.id.mapView)).perform(clickXY(centerPixel.x, centerPixel.y));
+    onView(withText("Found 4 features")).check(matches(isDisplayed()));
+  }
 
-    @After
-    public void unregisterIdlingResource() {
-        Espresso.unregisterIdlingResources(idlingResource);
-    }
+  @After
+  public void unregisterIdlingResource() {
+    Espresso.unregisterIdlingResources(idlingResource);
+  }
 
-    private static ViewAction clickXY(final float x, final float y) {
-        return new GeneralClickAction(
-                Tap.SINGLE,
-                new CoordinatesProvider() {
-                    @Override
-                    public float[] calculateCoordinates(View view) {
-                        final int[] screenPos = new int[2];
-                        view.getLocationOnScreen(screenPos);
-                        final float screenX = screenPos[0] + x;
-                        final float screenY = screenPos[1] + y;
-                        return new float[]{screenX, screenY};
-                    }
-                },
-                Press.FINGER);
-    }
+  private static ViewAction clickXY(final float x, final float y) {
+    return new GeneralClickAction(
+      Tap.SINGLE,
+      new CoordinatesProvider() {
+        @Override
+        public float[] calculateCoordinates(View view) {
+          final int[] screenPos = new int[2];
+          view.getLocationOnScreen(screenPos);
+          final float screenX = screenPos[0] + x;
+          final float screenY = screenPos[1] + y;
+          return new float[] {screenX, screenY};
+        }
+      },
+      Press.FINGER);
+  }
 }

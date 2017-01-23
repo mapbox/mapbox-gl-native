@@ -6,7 +6,9 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+
 import timber.log.Timber;
+
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,147 +25,147 @@ import com.mapbox.mapboxsdk.testapp.model.customlayer.ExampleCustomLayer;
 
 public class CustomLayerActivity extends AppCompatActivity {
 
-    private MapboxMap mapboxMap;
-    private MapView mapView;
-    private CustomLayer customLayer;
+  private MapboxMap mapboxMap;
+  private MapView mapView;
+  private CustomLayer customLayer;
 
-    private FloatingActionButton fab;
+  private FloatingActionButton fab;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_custom_layer);
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.activity_custom_layer);
 
-        setupActionBar();
+    setupActionBar();
 
-        mapView = (MapView) findViewById(R.id.mapView);
-        mapView.onCreate(savedInstanceState);
-        mapView.getMapAsync(new OnMapReadyCallback() {
-            @Override
-            public void onMapReady(MapboxMap map) {
-                mapboxMap = map;
-                mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(39.91448, -243.60947), 10));
+    mapView = (MapView) findViewById(R.id.mapView);
+    mapView.onCreate(savedInstanceState);
+    mapView.getMapAsync(new OnMapReadyCallback() {
+      @Override
+      public void onMapReady(MapboxMap map) {
+        mapboxMap = map;
+        mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(39.91448, -243.60947), 10));
 
-            }
-        });
+      }
+    });
 
-        fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setColorFilter(ContextCompat.getColor(this, R.color.primary));
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (mapboxMap != null) {
-                    swapCustomLayer();
-                }
-            }
-        });
-    }
-
-    private void swapCustomLayer() {
-        if (customLayer != null) {
-            try {
-                mapboxMap.removeLayer(customLayer.getId());
-                customLayer = null;
-            } catch (NoSuchLayerException noSuchLayerException) {
-                Timber.e("No custom layer to remove");
-            }
-            fab.setImageResource(R.drawable.ic_layers_24dp);
-        } else {
-            customLayer = new CustomLayer("custom",
-                    ExampleCustomLayer.createContext(),
-                    ExampleCustomLayer.InitializeFunction,
-                    ExampleCustomLayer.RenderFunction,
-                    ExampleCustomLayer.DeinitializeFunction);
-            mapboxMap.addLayer(customLayer, "building");
-            fab.setImageResource(R.drawable.ic_layers_clear_24dp);
+    fab = (FloatingActionButton) findViewById(R.id.fab);
+    fab.setColorFilter(ContextCompat.getColor(this, R.color.primary));
+    fab.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        if (mapboxMap != null) {
+          swapCustomLayer();
         }
-    }
+      }
+    });
+  }
 
-    private void updateLayer() {
-        if (customLayer != null) {
-            customLayer.update();
-        }
+  private void swapCustomLayer() {
+    if (customLayer != null) {
+      try {
+        mapboxMap.removeLayer(customLayer.getId());
+        customLayer = null;
+      } catch (NoSuchLayerException noSuchLayerException) {
+        Timber.e("No custom layer to remove");
+      }
+      fab.setImageResource(R.drawable.ic_layers_24dp);
+    } else {
+      customLayer = new CustomLayer("custom",
+        ExampleCustomLayer.createContext(),
+        ExampleCustomLayer.InitializeFunction,
+        ExampleCustomLayer.RenderFunction,
+        ExampleCustomLayer.DeinitializeFunction);
+      mapboxMap.addLayer(customLayer, "building");
+      fab.setImageResource(R.drawable.ic_layers_clear_24dp);
     }
+  }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        mapView.onStart();
+  private void updateLayer() {
+    if (customLayer != null) {
+      customLayer.update();
     }
+  }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        mapView.onResume();
-    }
+  @Override
+  protected void onStart() {
+    super.onStart();
+    mapView.onStart();
+  }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        mapView.onPause();
-    }
+  @Override
+  protected void onResume() {
+    super.onResume();
+    mapView.onResume();
+  }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        mapView.onStop();
-    }
+  @Override
+  protected void onPause() {
+    super.onPause();
+    mapView.onPause();
+  }
 
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        mapView.onSaveInstanceState(outState);
-    }
+  @Override
+  protected void onStop() {
+    super.onStop();
+    mapView.onStop();
+  }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        mapView.onDestroy();
-    }
+  @Override
+  protected void onSaveInstanceState(Bundle outState) {
+    super.onSaveInstanceState(outState);
+    mapView.onSaveInstanceState(outState);
+  }
 
-    @Override
-    public void onLowMemory() {
-        super.onLowMemory();
-        mapView.onLowMemory();
-    }
+  @Override
+  protected void onDestroy() {
+    super.onDestroy();
+    mapView.onDestroy();
+  }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_custom_layer, menu);
+  @Override
+  public void onLowMemory() {
+    super.onLowMemory();
+    mapView.onLowMemory();
+  }
+
+  @Override
+  public boolean onCreateOptionsMenu(Menu menu) {
+    getMenuInflater().inflate(R.menu.menu_custom_layer, menu);
+    return true;
+  }
+
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+    switch (item.getItemId()) {
+      case android.R.id.home:
+        onBackPressed();
         return true;
+      case R.id.action_update_layer:
+        updateLayer();
+        return true;
+      case R.id.action_set_color_red:
+        ExampleCustomLayer.setColor(1, 0, 0, 1);
+        return true;
+      case R.id.action_set_color_green:
+        ExampleCustomLayer.setColor(0, 1, 0, 1);
+        return true;
+      case R.id.action_set_color_blue:
+        ExampleCustomLayer.setColor(0, 0, 1, 1);
+        return true;
+      default:
+        return super.onOptionsItemSelected(item);
     }
+  }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                onBackPressed();
-                return true;
-            case R.id.action_update_layer:
-                updateLayer();
-                return true;
-            case R.id.action_set_color_red:
-                ExampleCustomLayer.setColor(1, 0, 0, 1);
-                return true;
-            case R.id.action_set_color_green:
-                ExampleCustomLayer.setColor(0, 1, 0, 1);
-                return true;
-            case R.id.action_set_color_blue:
-                ExampleCustomLayer.setColor(0, 0, 1, 1);
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
+  private void setupActionBar() {
+    Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+    setSupportActionBar(toolbar);
+
+    final ActionBar actionBar = getSupportActionBar();
+    if (actionBar != null) {
+      actionBar.setDisplayHomeAsUpEnabled(true);
+      actionBar.setDisplayShowHomeEnabled(true);
     }
-
-    private void setupActionBar() {
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-        final ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setDisplayShowHomeEnabled(true);
-        }
-    }
+  }
 }

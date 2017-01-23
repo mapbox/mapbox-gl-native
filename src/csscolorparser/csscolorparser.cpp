@@ -1,5 +1,5 @@
 // (c) Dean McNamee <dean@gmail.com>, 2012.
-// C++ port by Konstantin Käfer <mail@kkaefer.com>, 2014.
+// C++ port by Mapbox, Konstantin Käfer <mail@kkaefer.com>, 2014-2017.
 //
 // https://github.com/deanm/css-color-parser-js
 // https://github.com/kkaefer/css-color-parser-cpp
@@ -27,7 +27,6 @@
 #include <cstdint>
 #include <vector>
 #include <sstream>
-#include <cmath>
 #include <algorithm>
 
 namespace CSSColorParser {
@@ -117,12 +116,12 @@ const size_t namedColorCount = sizeof (namedColors) / sizeof (NamedColor);
 template <typename T>
 uint8_t clamp_css_byte(T i) {  // Clamp to integer 0 .. 255.
     i = ::round(i);  // Seems to be what Chrome does (vs truncation).
-    return i < 0 ? 0 : i > 255 ? 255 : i;
+    return i < 0 ? 0 : i > 255 ? 255 : uint8_t(i);
 }
 
 template <typename T>
 float clamp_css_float(T f) {  // Clamp to float 0.0 .. 1.0.
-    return f < 0 ? 0 : f > 1 ? 1 : f;
+    return f < 0 ? 0 : f > 1 ? 1 : float(f);
 }
 
 float parseFloat(const std::string& str) {
@@ -163,7 +162,7 @@ float css_hue_to_rgb(float m1, float m2, float h) {
         return m2;
     }
     if (h * 3.0f < 2.0f) {
-        return m1 + (m2 - m1) * (2.0 / 3.0 - h) * 6.0f;
+        return m1 + (m2 - m1) * (2.0f / 3.0f - h) * 6.0f;
     }
     return m1;
 }

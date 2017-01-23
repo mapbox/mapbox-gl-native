@@ -4,3 +4,5 @@
 -dontwarn org.codehaus.**
 -keep class com.google.**
 -dontwarn com.google.**
+
+-keep class com.mapbox.mapboxsdk.testapp.model.customlayer.ExampleCustomLayer { *; }

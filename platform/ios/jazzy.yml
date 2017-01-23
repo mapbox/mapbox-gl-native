@@ -3,7 +3,7 @@ author: Mapbox
 author_url: https://www.mapbox.com/
 github_url: https://github.com/mapbox/mapbox-gl-native
 dash_url: https://www.mapbox.com/ios-sdk/docsets/Mapbox.xml
-copyright: '© 2014–2016 [Mapbox](https://www.mapbox.com/). See [license](https://github.com/mapbox/mapbox-gl-native/blob/master/LICENSE.md) for more details.'
+copyright: '© 2014–2017 [Mapbox](https://www.mapbox.com/). See [license](https://github.com/mapbox/mapbox-gl-native/blob/master/LICENSE.md) for more details.'
 
 head: |
   <link rel='shortcut icon' href='https://www.mapbox.com/img/favicon.ico' type='image/x-icon' />
@@ -15,61 +15,76 @@ umbrella_header: src/Mapbox.h
 framework_root: ../darwin/src
 
 custom_categories:
+  - name: Guides
+    children:
+      - Adding Points to a Map
+      - Runtime Styling
+      - Working with Mapbox Studio
+      - Working with GeoJSON Data
+      - For Style Authors
+      - Info.plist Keys
   - name: Maps
     children:
       - MGLAccountManager
       - MGLMapCamera
       - MGLMapView
       - MGLMapViewDelegate
-      - MGLStyle
       - MGLUserTrackingMode
-  - name: Annotations
+  - name: Primitive Shapes
     children:
       - MGLAnnotation
-      - MGLAnnotationImage
-      - MGLAnnotationView
-      - MGLCalloutView
-      - MGLCalloutViewDelegate
+      - MGLOverlay
+      - MGLShape
       - MGLMultiPoint
-      - MGLMultiPolygon
-      - MGLMultiPolyline
       - MGLPointAnnotation
       - MGLPointCollection
       - MGLPolygon
       - MGLPolyline
-      - MGLOverlay
-      - MGLShape
+      - MGLMultiPolygon
+      - MGLMultiPolyline
       - MGLShapeCollection
+  - name: Annotations
+    children:
+      - MGLAnnotationImage
+      - MGLAnnotationView
       - MGLUserLocation
       - MGLUserLocationAnnotationView
-  - name: Map Data
+  - name: User Interaction
+    children:
+      - MGLCalloutView
+      - MGLCalloutViewDelegate
+  - name: Styling the Map
+    children:
+      - MGLStyle
+      - MGLStyleValue
+  - name: Style Primitives
     children:
       - MGLFeature
-      - MGLMultiPolygonFeature
-      - MGLMultiPolylineFeature
-      - MGLPointCollectionFeature      
       - MGLPointFeature
       - MGLPolygonFeature
       - MGLPolylineFeature
+      - MGLMultiPolygonFeature
+      - MGLMultiPolylineFeature
+      - MGLPointCollectionFeature
       - MGLShapeCollectionFeature
-  - name: Style Layers
-    children:
-      - MGLBackgroundStyleLayer
-      - MGLCircleStyleLayer
-      - MGLFillStyleLayer
-      - MGLForegroundStyleLayer
-      - MGLLineStyleLayer
-      - MGLRasterStyleLayer
-      - MGLStyleLayer
-      - MGLSymbolStyleLayer
-      - MGLVectorStyleLayer
-  - name: Data Sources
+  - name: Style Content
     children:
       - MGLSource
-      - MGLGeoJSONSource
+      - MGLTileSource
+      - MGLShapeSource
       - MGLRasterSource
-      - MGLTileSet
       - MGLVectorSource
+  - name: Style Layers
+    children:
+      - MGLStyleLayer
+      - MGLForegroundStyleLayer
+      - MGLBackgroundStyleLayer
+      - MGLRasterStyleLayer
+      - MGLVectorStyleLayer
+      - MGLCircleStyleLayer
+      - MGLFillStyleLayer
+      - MGLLineStyleLayer
+      - MGLSymbolStyleLayer
   - name: Offline Maps
     children:
       - MGLOfflineRegion
@@ -80,15 +95,13 @@ custom_categories:
       - MGLTilePyramidOfflineRegion
   - name: Geometry
     children:
-      - MGLClockDirectionFormatter
-      - MGLCompassDirectionFormatter
       - MGLCoordinateBounds
       - MGLCoordinateBoundsEqualToCoordinateBounds
       - MGLCoordinateBoundsGetCoordinateSpan
+      - MGLCoordinateBoundsIntersectsCoordinateBounds
       - MGLCoordinateBoundsIsEmpty
       - MGLCoordinateBoundsMake
       - MGLCoordinateBoundsOffset
-      - MGLCoordinateFormatter
       - MGLCoordinateInCoordinateBounds
       - MGLCoordinateSpan
       - MGLCoordinateSpanEqualToCoordinateSpan
@@ -97,3 +110,8 @@ custom_categories:
       - MGLDegreesFromRadians
       - MGLRadiansFromDegrees
       - MGLStringFromCoordinateBounds
+  - name: Formatters
+    children:
+      - MGLClockDirectionFormatter
+      - MGLCompassDirectionFormatter
+      - MGLCoordinateFormatter

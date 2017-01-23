@@ -1,10 +1,12 @@
 #import <Foundation/Foundation.h>
 
+#import "MGLFoundation.h"
+
 /// Project version number for Mapbox.
-FOUNDATION_EXPORT double MapboxVersionNumber;
+FOUNDATION_EXPORT MGL_EXPORT double MapboxVersionNumber;
 
 /// Project version string for Mapbox.
-FOUNDATION_EXPORT const unsigned char MapboxVersionString[];
+FOUNDATION_EXPORT MGL_EXPORT const unsigned char MapboxVersionString[];
 
 #import "MGLAnnotationView.h"
 #import "MGLAccountManager.h"
@@ -19,7 +21,6 @@ FOUNDATION_EXPORT const unsigned char MapboxVersionString[];
 #import "MGLMapCamera.h"
 #import "MGLMapView.h"
 #import "MGLMapView+IBAdditions.h"
-#import "MGLMapView+MGLCustomStyleLayerAdditions.h"
 #import "MGLMapViewDelegate.h"
 #import "MGLMultiPoint.h"
 #import "MGLOfflinePack.h"
@@ -42,10 +43,12 @@ FOUNDATION_EXPORT const unsigned char MapboxVersionString[];
 #import "MGLRasterStyleLayer.h"
 #import "MGLCircleStyleLayer.h"
 #import "MGLBackgroundStyleLayer.h"
+#import "MGLOpenGLStyleLayer.h"
 #import "MGLSource.h"
+#import "MGLTileSource.h"
 #import "MGLVectorSource.h"
+#import "MGLShapeSource.h"
 #import "MGLGeoJSONSourceBase.h"
-#import "MGLGeoJSONSource.h"
 #import "MGLCustomVectorSource.h"
 #import "MGLRasterSource.h"
 #import "MGLTilePyramidOfflineRegion.h"
@@ -53,6 +56,5 @@ FOUNDATION_EXPORT const unsigned char MapboxVersionString[];
 #import "MGLUserLocation.h"
 #import "MGLUserLocationAnnotationView.h"
 #import "NSValue+MGLAdditions.h"
-#import "NSValue+MGLStyleEnumAttributeAdditions.h"
 #import "MGLStyleValue.h"
-#import "MGLTileSet.h"
+#import "MGLAttributionInfo.h"

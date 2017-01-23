@@ -362,7 +362,7 @@ TEST(Transform, Padding) {
     
     const LatLng shiftedCenter = transform.getLatLng(padding);
     ASSERT_NE(trueCenter.latitude, shiftedCenter.latitude);
-    ASSERT_DOUBLE_EQ(trueCenter.longitude, shiftedCenter.longitude);
+    ASSERT_NEAR(trueCenter.longitude, shiftedCenter.longitude, 1e-9);
     ASSERT_DOUBLE_EQ(manualShiftedCenter.latitude, shiftedCenter.latitude);
     ASSERT_DOUBLE_EQ(manualShiftedCenter.longitude, shiftedCenter.longitude);
 }
@@ -401,12 +401,12 @@ TEST(Transform, Antimeridian) {
 
     const LatLng coordinateSanFrancisco { 37.7833, -122.4167 };
     ScreenCoordinate pixelSF = transform.latLngToScreenCoordinate(coordinateSanFrancisco);
-    ASSERT_DOUBLE_EQ(151.79409149185352, pixelSF.x);
-    ASSERT_DOUBLE_EQ(383.76774094913071, pixelSF.y);
+    ASSERT_NEAR(151.79409149185352, pixelSF.x, 1e-2);
+    ASSERT_NEAR(383.76774094913071, pixelSF.y, 1e-2);
 
     transform.setLatLng({ 0, -181 });
     ScreenCoordinate pixelSFBackwards = transform.latLngToScreenCoordinate(coordinateSanFrancisco);
-    ASSERT_DOUBLE_EQ(666.63617954008976, pixelSFBackwards.x);
+    ASSERT_NEAR(666.63617954008976, pixelSFBackwards.x, 1e-2);
     ASSERT_DOUBLE_EQ(pixelSF.y, pixelSFBackwards.y);
 
     transform.setLatLng({ 0, 179 });
@@ -417,12 +417,12 @@ TEST(Transform, Antimeridian) {
     const LatLng coordinateWaikiri{ -16.9310, 179.9787 };
     transform.setLatLngZoom(coordinateWaikiri, 10);
     ScreenCoordinate pixelWaikiri = transform.latLngToScreenCoordinate(coordinateWaikiri);
-    ASSERT_DOUBLE_EQ(500.00000000007759, pixelWaikiri.x);
-    ASSERT_DOUBLE_EQ(500, pixelWaikiri.y);
+    ASSERT_NEAR(500, pixelWaikiri.x, 1e-2);
+    ASSERT_NEAR(500, pixelWaikiri.y, 1e-2);
 
     transform.setLatLng({ coordinateWaikiri.latitude, 180.0213 });
     ScreenCoordinate pixelWaikiriForwards = transform.latLngToScreenCoordinate(coordinateWaikiri);
-    ASSERT_DOUBLE_EQ(437.95953728819512, pixelWaikiriForwards.x);
+    ASSERT_NEAR(437.95953728819512, pixelWaikiriForwards.x, 1e-2);
     ASSERT_DOUBLE_EQ(pixelWaikiri.y, pixelWaikiriForwards.y);
     LatLng coordinateFromPixel = transform.screenCoordinateToLatLng(pixelWaikiriForwards);
     ASSERT_NEAR(coordinateWaikiri.latitude, coordinateFromPixel.latitude, 0.000001);

@@ -1,6 +1,7 @@
 #import <Cocoa/Cocoa.h>
 #import <CoreLocation/CoreLocation.h>
 
+#import "MGLFoundation.h"
 #import "MGLTypes.h"
 #import "MGLGeometry.h"
 
@@ -47,7 +48,7 @@ NS_ASSUME_NONNULL_BEGIN
  @note You are responsible for getting permission to use the map data and for
     ensuring that your use adheres to the relevant terms of use.
  */
-IB_DESIGNABLE
+MGL_EXPORT IB_DESIGNABLE
 @interface MGLMapView : NSView
 
 #pragma mark Creating Instances
@@ -94,6 +95,13 @@ IB_DESIGNABLE
  Unlike the `styleURL` property, this property is set to an object that allows
  you to manipulate every aspect of the style locally.
  
+ If the style is loading, this property is set to `nil` until the style finishes
+ loading. If the style has failed to load, this property is set to `nil`.
+ Because the style loads asynchronously, you should manipulate it in the
+ `-[MGLMapViewDelegate mapView:didFinishLoadingStyle:]` or
+ `-[MGLMapViewDelegate mapViewDidFinishLoadingMap:]` method. It is not possible
+ to manipulate the style before it has finished loading.
+ 
  @note The default styles provided by Mapbox contain sources and layers with
     identifiers that will change over time. Applications that use APIs that
     manipulate a style's sources and layers must first set the style URL to an
@@ -101,7 +109,7 @@ IB_DESIGNABLE
     `+[MGLStyle outdoorsStyleURLWithVersion:]`, `MGLMapView`'s “Style URL”
     inspectable in Interface Builder, or a manually constructed `NSURL`.
  */
-@property (nonatomic, readonly) MGLStyle *style;
+@property (nonatomic, readonly, nullable) MGLStyle *style;
 
 /**
  URL of the style currently displayed in the receiver.
@@ -949,6 +957,25 @@ IB_DESIGNABLE
  @return The distance in meters spanned by a single point.
  */
 - (CLLocationDistance)metersPerPointAtLatitude:(CLLocationDegrees)latitude;
+
+#pragma mark Giving Feedback to Improve the Map
+
+/**
+ Opens one or more webpages in the default Web browser in which the user can
+ provide feedback about the map data.
+ 
+ You should add a menu item to the Help menu of your application that invokes
+ this method. Title it “Improve This Map” or similar. Set its target to the
+ first responder and its action to `giveFeedback:`.
+ 
+ This map view searches the current style’s sources for webpages to open.
+ Specifically, each source’s tile set has an `attribution` property containing
+ HTML code; if an <code>&lt;a></code> tag (link) within that code has an
+ <code>class</code> attribute set to <code>mapbox-improve-map</code>, its
+ <code>href</code> attribute defines the URL to open. Such links are omitted
+ from the attribution view.
+ */
+- (IBAction)giveFeedback:(id)sender;
 
 #pragma mark Debugging the Map
 

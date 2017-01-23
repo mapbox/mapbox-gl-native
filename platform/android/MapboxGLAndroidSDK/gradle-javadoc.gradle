@@ -10,7 +10,7 @@ android.libraryVariants.all { variant ->
         options.windowTitle("Mapbox Android SDK $VERSION_NAME Reference")
         options.docTitle("Mapbox Android SDK $VERSION_NAME")
         options.header("Mapbox Android SDK $VERSION_NAME Reference")
-        options.bottom("&copy; 2015&ndash;2016 Mapbox. All rights reserved.")
+        options.bottom("&copy; 2015&ndash;2017 Mapbox. All rights reserved.")
         options.links("http://docs.oracle.com/javase/7/docs/api/")
         options.linksOffline("http://d.android.com/reference/", "$System.env.ANDROID_HOME/docs/reference")
         options.overview("src/main/java/overview.html")

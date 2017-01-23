@@ -8,12 +8,11 @@ namespace mbgl {
 
 using namespace style;
 
-RasterBucket::RasterBucket(PremultipliedImage&& image_) : image(std::move(image_)) {
+RasterBucket::RasterBucket(UnassociatedImage&& image_) : image(std::move(image_)) {
 }
 
 void RasterBucket::upload(gl::Context& context) {
-    texture = context.createTexture(image);
-    image = {};
+    texture = context.createTexture(std::move(image));
     uploaded = true;
 }
 

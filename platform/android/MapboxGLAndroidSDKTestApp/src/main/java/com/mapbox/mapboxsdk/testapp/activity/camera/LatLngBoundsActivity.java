@@ -4,7 +4,9 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+
 import timber.log.Timber;
+
 import android.view.MenuItem;
 
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
@@ -23,120 +25,120 @@ import java.util.List;
 
 public class LatLngBoundsActivity extends AppCompatActivity implements OnMapReadyCallback {
 
-    private static final LatLng LOS_ANGELES = new LatLng(34.053940, -118.242622);
-    private static final LatLng NEW_YORK = new LatLng(40.712730, -74.005953);
+  private static final LatLng LOS_ANGELES = new LatLng(34.053940, -118.242622);
+  private static final LatLng NEW_YORK = new LatLng(40.712730, -74.005953);
 
-    private MapView mapView;
-    private MapboxMap mapboxMap;
+  private MapView mapView;
+  private MapboxMap mapboxMap;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_visible_bounds);
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.activity_visible_bounds);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+    Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+    setSupportActionBar(toolbar);
 
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setDisplayShowHomeEnabled(true);
-        }
-
-        mapView = (MapView) findViewById(R.id.mapView);
-        mapView.setStyleUrl(Style.DARK);
-        mapView.onCreate(savedInstanceState);
-        mapView.getMapAsync(this);
+    ActionBar actionBar = getSupportActionBar();
+    if (actionBar != null) {
+      actionBar.setDisplayHomeAsUpEnabled(true);
+      actionBar.setDisplayShowHomeEnabled(true);
     }
 
-    @Override
-    public void onMapReady(MapboxMap map) {
-        mapboxMap = map;
-        UiSettings uiSettings = mapboxMap.getUiSettings();
-        uiSettings.setAllGesturesEnabled(false);
+    mapView = (MapView) findViewById(R.id.mapView);
+    mapView.setStyleUrl(Style.DARK);
+    mapView.onCreate(savedInstanceState);
+    mapView.getMapAsync(this);
+  }
 
-        mapboxMap.addMarker(new MarkerOptions()
-                .title("Los Angeles")
-                .snippet("City Hall")
-                .position(LOS_ANGELES));
+  @Override
+  public void onMapReady(MapboxMap map) {
+    mapboxMap = map;
+    UiSettings uiSettings = mapboxMap.getUiSettings();
+    uiSettings.setAllGesturesEnabled(false);
 
-        mapboxMap.addMarker(new MarkerOptions()
-                .title("New York")
-                .snippet("City Hall")
-                .position(NEW_YORK));
+    mapboxMap.addMarker(new MarkerOptions()
+      .title("Los Angeles")
+      .snippet("City Hall")
+      .position(LOS_ANGELES));
 
-        List<LatLng> points = new ArrayList<>();
-        points.add(NEW_YORK);
-        points.add(LOS_ANGELES);
+    mapboxMap.addMarker(new MarkerOptions()
+      .title("New York")
+      .snippet("City Hall")
+      .position(NEW_YORK));
 
-        // Create Bounds
-        final LatLngBounds bounds = new LatLngBounds.Builder()
-                .includes(points)
-                .build();
+    List<LatLng> points = new ArrayList<>();
+    points.add(NEW_YORK);
+    points.add(LOS_ANGELES);
 
-        // Add map padding
-        int mapPadding = (int) getResources().getDimension(R.dimen.fab_margin);
-        mapboxMap.setPadding(mapPadding, mapPadding, mapPadding, mapPadding);
+    // Create Bounds
+    final LatLngBounds bounds = new LatLngBounds.Builder()
+      .includes(points)
+      .build();
 
-        // Move camera to the bounds with added padding
-        int padding = (int) getResources().getDimension(R.dimen.coordinatebounds_margin);
-        mapboxMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, padding));
+    // Add map padding
+    int mapPadding = (int) getResources().getDimension(R.dimen.fab_margin);
+    mapboxMap.setPadding(mapPadding, mapPadding, mapPadding, mapPadding);
 
-        // Log data
-        Timber.e("Move to bounds: " + bounds.toString());
-        Timber.e("Resulting bounds:" + mapboxMap.getProjection().getVisibleRegion().latLngBounds.toString());
+    // Move camera to the bounds with added padding
+    int padding = (int) getResources().getDimension(R.dimen.coordinatebounds_margin);
+    mapboxMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, padding));
+
+    // Log data
+    Timber.e("Move to bounds: " + bounds.toString());
+    Timber.e("Resulting bounds:" + mapboxMap.getProjection().getVisibleRegion().latLngBounds.toString());
+  }
+
+  @Override
+  protected void onStart() {
+    super.onStart();
+    mapView.onStart();
+  }
+
+  @Override
+  protected void onResume() {
+    super.onResume();
+    mapView.onResume();
+  }
+
+  @Override
+  protected void onPause() {
+    super.onPause();
+    mapView.onPause();
+  }
+
+  @Override
+  protected void onStop() {
+    super.onStop();
+    mapView.onStop();
+  }
+
+  @Override
+  protected void onSaveInstanceState(Bundle outState) {
+    super.onSaveInstanceState(outState);
+    mapView.onSaveInstanceState(outState);
+  }
+
+  @Override
+  protected void onDestroy() {
+    super.onDestroy();
+    mapView.onDestroy();
+  }
+
+  @Override
+  public void onLowMemory() {
+    super.onLowMemory();
+    mapView.onLowMemory();
+  }
+
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+    switch (item.getItemId()) {
+      case android.R.id.home:
+        onBackPressed();
+        return true;
+      default:
+        return super.onOptionsItemSelected(item);
     }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        mapView.onStart();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        mapView.onResume();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        mapView.onPause();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        mapView.onStop();
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        mapView.onSaveInstanceState(outState);
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        mapView.onDestroy();
-    }
-
-    @Override
-    public void onLowMemory() {
-        super.onLowMemory();
-        mapView.onLowMemory();
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                onBackPressed();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
+  }
 }

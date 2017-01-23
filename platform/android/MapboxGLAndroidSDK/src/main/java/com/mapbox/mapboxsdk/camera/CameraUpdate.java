@@ -9,6 +9,6 @@ import com.mapbox.mapboxsdk.maps.MapboxMap;
  */
 public interface CameraUpdate {
 
-    CameraPosition getCameraPosition(@NonNull MapboxMap mapboxMap);
+  CameraPosition getCameraPosition(@NonNull MapboxMap mapboxMap);
 
 }

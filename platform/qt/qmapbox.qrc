@@ -1,6 +1,0 @@
-<!DOCTYPE RCC><RCC version="1.0">
-<qresource>
-    <file alias="ca-bundle.crt">../../common/ca-bundle.crt</file>
-    <file alias="icon.png">../../common/icon.png</file>
-</qresource>
-</RCC>

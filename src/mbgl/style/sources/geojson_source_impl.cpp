@@ -47,7 +47,7 @@ void GeoJSONSource::Impl::setURL(std::string url_) {
     }
 }
 
-optional<std::string> GeoJSONSource::Impl::getURL() {
+optional<std::string> GeoJSONSource::Impl::getURL() const {
     return url;
 }
 
@@ -63,15 +63,9 @@ void GeoJSONSource::Impl::_setGeoJSON(const GeoJSON& geoJSON) {
 
     cache.clear();
 
-    if (!options.cluster) {
-        mapbox::geojsonvt::Options vtOptions;
-        vtOptions.maxZoom = options.maxzoom;
-        vtOptions.extent = util::EXTENT;
-        vtOptions.buffer = std::round(scale * options.buffer);
-        vtOptions.tolerance = scale * options.tolerance;
-        geoJSONOrSupercluster = std::make_unique<mapbox::geojsonvt::GeoJSONVT>(geoJSON, vtOptions);
-
-    } else {
+    if (options.cluster
+        && geoJSON.is<mapbox::geometry::feature_collection<double>>()
+        && !geoJSON.get<mapbox::geometry::feature_collection<double>>().empty()) {
         mapbox::supercluster::Options clusterOptions;
         clusterOptions.maxZoom = options.clusterMaxZoom;
         clusterOptions.extent = util::EXTENT;
@@ -80,6 +74,13 @@ void GeoJSONSource::Impl::_setGeoJSON(const GeoJSON& geoJSON) {
         const auto& features = geoJSON.get<mapbox::geometry::feature_collection<double>>();
         geoJSONOrSupercluster =
             std::make_unique<mapbox::supercluster::Supercluster>(features, clusterOptions);
+    } else {
+        mapbox::geojsonvt::Options vtOptions;
+        vtOptions.maxZoom = options.maxzoom;
+        vtOptions.extent = util::EXTENT;
+        vtOptions.buffer = std::round(scale * options.buffer);
+        vtOptions.tolerance = scale * options.tolerance;
+        geoJSONOrSupercluster = std::make_unique<mapbox::geojsonvt::GeoJSONVT>(geoJSON, vtOptions);
     }
 
     for (auto const &item : tiles) {

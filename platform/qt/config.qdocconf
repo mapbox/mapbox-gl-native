@@ -12,4 +12,5 @@ headerdirs += include
 sourcedirs += src
 
 indexes = $QT_INSTALL_DOCS/qtcore/qtcore.index \
+          $QT_INSTALL_DOCS/qtgui/qtgui.index \
           $QT_INSTALL_DOCS/qtnetwork/qtnetwork.index

@@ -4,7 +4,7 @@ The Mapbox iOS SDK is an open-source framework for embedding interactive map vie
 
 For more information, check out the [Mapbox iOS SDK homepage](https://www.mapbox.com/ios-sdk/) and the [full changelog](https://github.com/mapbox/mapbox-gl-native/blob/master/platform/ios/CHANGELOG.md) online.
 
-[![](https://raw.githubusercontent.com/mapbox/mapbox-gl-native/master/platform/ios/screenshot.png)]()
+[![](https://raw.githubusercontent.com/mapbox/mapbox-gl-native/master/platform/ios/docs/img/screenshot.png)]()
 
 ## Installation
 

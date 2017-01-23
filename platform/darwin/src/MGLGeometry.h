@@ -2,6 +2,8 @@
 #import <CoreLocation/CoreLocation.h>
 #import <CoreGraphics/CGBase.h>
 
+#import "MGLFoundation.h"
+
 NS_ASSUME_NONNULL_BEGIN
 
 /** Defines the area spanned by an `MGLCoordinateBounds`. */
@@ -33,7 +35,7 @@ NS_INLINE BOOL MGLCoordinateSpanEqualToCoordinateSpan(MGLCoordinateSpan span1, M
 }
 
 /** An area of zero width and zero height. */
-extern const MGLCoordinateSpan MGLCoordinateSpanZero;
+extern MGL_EXPORT const MGLCoordinateSpan MGLCoordinateSpanZero;
 
 /** A rectangular area as measured on a two-dimensional map projection. */
 typedef struct MGLCoordinateBounds {
@@ -60,6 +62,14 @@ NS_INLINE BOOL MGLCoordinateBoundsEqualToCoordinateBounds(MGLCoordinateBounds bo
             bounds1.sw.longitude == bounds2.sw.longitude &&
             bounds1.ne.latitude == bounds2.ne.latitude &&
             bounds1.ne.longitude == bounds2.ne.longitude);
+}
+
+/** Returns `YES` if the two coordinate bounds intersect. */
+NS_INLINE BOOL MGLCoordinateBoundsIntersectsCoordinateBounds(MGLCoordinateBounds bounds1, MGLCoordinateBounds bounds2) {
+    return (bounds1.ne.latitude  > bounds2.sw.latitude  &&
+            bounds1.sw.latitude  < bounds2.ne.latitude  &&
+            bounds1.ne.longitude > bounds2.sw.longitude &&
+            bounds1.sw.longitude < bounds2.ne.longitude);
 }
 
 /** Returns `YES` if the coordinate is within the coordinate bounds. */

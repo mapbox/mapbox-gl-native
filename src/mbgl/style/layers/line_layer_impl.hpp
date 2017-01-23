@@ -11,11 +11,12 @@ class LineLayer::Impl : public Layer::Impl {
 public:
     std::unique_ptr<Layer> clone() const override;
     std::unique_ptr<Layer> cloneRef(const std::string& id) const override;
+    void stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>&) const override;
 
     void cascade(const CascadeParameters&) override;
     bool evaluate(const PropertyEvaluationParameters&) override;
 
-    std::unique_ptr<Bucket> createBucket(BucketParameters&) const override;
+    std::unique_ptr<Bucket> createBucket(BucketParameters&, const GeometryTileLayer&) const override;
 
     float getQueryRadius() const override;
     bool queryIntersectsGeometry(

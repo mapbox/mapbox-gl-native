@@ -1,5 +1,6 @@
 #import <Foundation/Foundation.h>
 
+#import "MGLFoundation.h"
 #import "MGLTypes.h"
 
 NS_ASSUME_NONNULL_BEGIN
@@ -18,13 +19,14 @@ NS_ASSUME_NONNULL_BEGIN
  `userInfo` dictionary contains the pack’s current state in the
  `MGLOfflinePackStateUserInfoKey` key and details about the pack’s current
  progress in the `MGLOfflinePackProgressUserInfoKey` key. You may also consult
- the pack’s `state` and `progress` properties, which provide the same values.
+ the `MGLOfflinePack.state` and `MGLOfflinePack.progress` properties, which
+ provide the same values.
  
  If you only need to observe changes in a particular pack’s progress, you can
  alternatively observe KVO change notifications to the pack’s `progress` key
  path.
  */
-extern const NSNotificationName MGLOfflinePackProgressChangedNotification;
+extern MGL_EXPORT const NSNotificationName MGLOfflinePackProgressChangedNotification;
 
 /**
  Posted by the shared `MGLOfflineStorage` object whenever an `MGLOfflinePack`
@@ -37,7 +39,7 @@ extern const NSNotificationName MGLOfflinePackProgressChangedNotification;
  `userInfo` dictionary contains the error object in the
  `MGLOfflinePackErrorUserInfoKey` key.
  */
-extern const NSNotificationName MGLOfflinePackErrorNotification;
+extern MGL_EXPORT const NSNotificationName MGLOfflinePackErrorNotification;
 
 /**
  Posted by the shared `MGLOfflineStorage` object when the maximum number of
@@ -52,7 +54,7 @@ extern const NSNotificationName MGLOfflinePackErrorNotification;
  calling the `-[MGLOfflineStorage removePack:withCompletionHandler:]` method.
  Contact your Mapbox sales representative to have the limit raised.
  */
-extern const NSNotificationName MGLOfflinePackMaximumMapboxTilesReachedNotification;
+extern MGL_EXPORT const NSNotificationName MGLOfflinePackMaximumMapboxTilesReachedNotification;
 
 /**
  A key in the `userInfo` property of a notification posted by `MGLOfflinePack`.
@@ -65,9 +67,9 @@ typedef NSString *MGLOfflinePackUserInfoKey NS_EXTENSIBLE_STRING_ENUM;
  `MGLOfflinePackProgressChangedNotification` notification. Call `-integerValue`
  on the object to receive the `MGLOfflinePackState`-typed state.
  */
-extern const MGLOfflinePackUserInfoKey MGLOfflinePackUserInfoKeyState;
+extern MGL_EXPORT const MGLOfflinePackUserInfoKey MGLOfflinePackUserInfoKeyState;
 
-extern NSString * const MGLOfflinePackStateUserInfoKey __attribute__((deprecated("Use MGLOfflinePackUserInfoKeyState")));
+extern MGL_EXPORT NSString * const MGLOfflinePackStateUserInfoKey __attribute__((deprecated("Use MGLOfflinePackUserInfoKeyState")));
 
 /**
  The key for an `NSValue` object that indicates an offline pack’s current
@@ -76,9 +78,9 @@ extern NSString * const MGLOfflinePackStateUserInfoKey __attribute__((deprecated
  `-MGLOfflinePackProgressValue` on the object to receive the
  `MGLOfflinePackProgress`-typed progress.
  */
-extern const MGLOfflinePackUserInfoKey MGLOfflinePackUserInfoKeyProgress;
+extern MGL_EXPORT const MGLOfflinePackUserInfoKey MGLOfflinePackUserInfoKeyProgress;
 
-extern NSString * const MGLOfflinePackProgressUserInfoKey __attribute__((deprecated("Use MGLOfflinePackUserInfoKeyProgress")));
+extern MGL_EXPORT NSString * const MGLOfflinePackProgressUserInfoKey __attribute__((deprecated("Use MGLOfflinePackUserInfoKeyProgress")));
 
 /**
  The key for an `NSError` object that is encountered in the course of
@@ -86,9 +88,9 @@ extern NSString * const MGLOfflinePackProgressUserInfoKey __attribute__((depreca
  an `MGLOfflinePackErrorNotification` notification. The error’s domain is
  `MGLErrorDomain`. See `MGLErrorCode` for possible error codes.
  */
-extern const MGLOfflinePackUserInfoKey MGLOfflinePackUserInfoKeyError;
+extern MGL_EXPORT const MGLOfflinePackUserInfoKey MGLOfflinePackUserInfoKeyError;
 
-extern NSString * const MGLOfflinePackErrorUserInfoKey __attribute__((deprecated("Use MGLOfflinePackUserInfoKeyError")));
+extern MGL_EXPORT NSString * const MGLOfflinePackErrorUserInfoKey __attribute__((deprecated("Use MGLOfflinePackUserInfoKeyError")));
 
 /**
  The key for an `NSNumber` object that indicates the maximum number of
@@ -98,9 +100,9 @@ extern NSString * const MGLOfflinePackErrorUserInfoKey __attribute__((deprecated
  `-unsignedLongLongValue` on the object to receive the `uint64_t`-typed tile
  limit.
  */
-extern const MGLOfflinePackUserInfoKey MGLOfflinePackUserInfoKeyMaximumCount;
+extern MGL_EXPORT const MGLOfflinePackUserInfoKey MGLOfflinePackUserInfoKeyMaximumCount;
 
-extern NSString * const MGLOfflinePackMaximumCountUserInfoKey __attribute__((deprecated("Use MGLOfflinePackUserInfoKeyMaximumCount")));
+extern MGL_EXPORT NSString * const MGLOfflinePackMaximumCountUserInfoKey __attribute__((deprecated("Use MGLOfflinePackUserInfoKeyMaximumCount")));
 
 /**
  A block to be called once an offline pack has been completely created and
@@ -135,6 +137,7 @@ typedef void (^MGLOfflinePackRemovalCompletionHandler)(NSError * _Nullable error
  fact that offline resources are stored in a database. The shared object
  maintains a canonical collection of offline packs in its `packs` property.
  */
+MGL_EXPORT
 @interface MGLOfflineStorage : NSObject
 
 /**
@@ -181,8 +184,8 @@ typedef void (^MGLOfflinePackRemovalCompletionHandler)(NSError * _Nullable error
 - (void)addPackForRegion:(id <MGLOfflineRegion>)region withContext:(NSData *)context completionHandler:(nullable MGLOfflinePackAdditionCompletionHandler)completion;
 
 /**
- Unregisters the given offline pack and frees any resources that are no longer
- required by any remaining packs.
+ Unregisters the given offline pack and allows resources that are no longer
+ required by any remaining packs to be potentially freed.
  
  As soon as this method is called on a pack, the pack becomes invalid; any
  attempt to send it a message will result in an exception being thrown. If an
@@ -194,6 +197,13 @@ typedef void (^MGLOfflinePackRemovalCompletionHandler)(NSError * _Nullable error
  KVO change notifications on the shared offline storage object’s `packs` key
  path. Removals from that array result in an `NSKeyValueChangeRemoval` change.
  
+ When you remove an offline pack, any resources that are required by that pack,
+ but not other packs, become eligible for deletion from offline storage. Because
+ the backing store used for offline storage is also used as a general purpose
+ cache for map resources, such resources may not be immediately removed if the
+ implementation determines that they remain useful for general performance of
+ the map.
+
  @param pack The offline pack to remove.
  @param completion The completion handler to call once the pack has been
     removed. This handler is executed asynchronously on the main queue.

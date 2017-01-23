@@ -54,6 +54,7 @@ To add any Objective-C type, constant, or member to the iOS SDK’s public inter
 
 To add an Objective-C class, protocol, category, typedef, enumeration, or global constant to the macOS SDK’s public interface:
 
+1. _(Optional.)_ Add the macro `MGL_EXPORT` prior to the declaration for classes and global constants. To use this macro, include `MGLFoundation.h`. You can check whether all public symbols are exported correctly by running `make check-public-symbols`.
 1. _(Optional.)_ Add the type or constant’s name to the relevant category in the `custom_categories` section of [the jazzy configuration file](./jazzy.yml). This is required for classes and protocols and also recommended for any other type that is strongly associated with a particular class or protocol. If you leave out this step, the symbol will appear in an “Other” section in the generated HTML documentation’s table of contents.
 1. _(Optional.)_ If the symbol would also be publicly exposed in the iOS SDK, consult [the companion iOS document](../ios/DEVELOPING.md#making-a-type-or-constant-public) for further instructions.
 
@@ -94,6 +95,32 @@ To add a localization to the macOS SDK:
 1. In the sheet that appears, select all the .strings and .stringsdict files but no .xib file. (Most of the XIBs are part of the macosapp example application, which is not localized, while MGLAnnotationCallout.xib contains no localizable strings.)
 1. In the Project navigator, expand each .strings and .stringsdict file in the project. An additional version for your localization should be listed; translate it. Translate everything on the right side of the equals sign. Leave the left side and any comments unmodified. See Apple’s documentation on the [.strings](https://developer.apple.com/library/content/documentation/Cocoa/Conceptual/LoadingResources/Strings/Strings.html) and [.stringsdict](https://developer.apple.com/library/content/documentation/MacOSX/Conceptual/BPInternational/StringsdictFileFormat/StringsdictFileFormat.html) formats.
 1. You’re already most of the way towards localizing the iOS SDK too – consider [completing that localization](../ios/DEVELOPING.md#adding-a-localization).
+
+### Adding a code example
+
+To add an example code listing to the documentation for a class or class member:
+
+1. Add a test method named in the form `testMGLClass` or `testMGLClass$method`
+   to [MGLDocumentationExampleTests](test/MGLDocumentationExampleTests.swift).
+   Wrap the code you’d like to appear in the documentation within
+   `//#-example-code` and `//#-end-example-code` comments.
+1. Insert the code listings into the headers:
+
+```bash
+make darwin-update-examples
+```
+
+[SourceKitten](https://github.com/jpsim/SourceKitten/) is required and will be installed automatically using Homebrew.
+
+## Testing
+
+`make macos-test` builds and runs unit tests of cross-platform code as well as the SDK.
+
+To instead run the cross-platform tests in Xcode instead of on the command line:
+
+1. Run `make xproj` to set up the workspace.
+1. Change the scheme to “mbgl-test” and press Command-R to run core unit tests.
+1. Change the scheme to “CI” and press Command-U to run SDK integration tests.
 
 ## Access tokens
 

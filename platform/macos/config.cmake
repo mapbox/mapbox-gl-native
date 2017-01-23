@@ -4,12 +4,11 @@ mason_use(glfw VERSION 3.2.1)
 mason_use(boost_libprogram_options VERSION 1.62.0)
 mason_use(gtest VERSION 1.7.0${MASON_CXXABI_SUFFIX})
 mason_use(benchmark VERSION 1.0.0)
+mason_use(icu VERSION 58.1)
 
 include(cmake/loop-darwin.cmake)
 
 macro(mbgl_platform_core)
-    set_xcode_property(mbgl-core GCC_SYMBOLS_PRIVATE_EXTERN YES)
-
     target_sources(mbgl-core
         # File source
         PRIVATE platform/darwin/src/http_file_source.mm
@@ -37,6 +36,8 @@ macro(mbgl_platform_core)
         PRIVATE platform/darwin/src/logging_nslog.mm
         PRIVATE platform/darwin/src/nsthread.mm
         PRIVATE platform/darwin/src/string_nsstring.mm
+        PRIVATE platform/default/bidi.cpp
+        PRIVATE platform/default/utf.cpp
 
         # Image handling
         PRIVATE platform/darwin/src/image.mm
@@ -56,9 +57,11 @@ macro(mbgl_platform_core)
     )
 
     target_add_mason_package(mbgl-core PUBLIC geojson)
+    target_add_mason_package(mbgl-core PUBLIC icu)
 
     target_compile_options(mbgl-core
         PRIVATE -fobjc-arc
+        PRIVATE -fvisibility=hidden
     )
 
     target_include_directories(mbgl-core
@@ -82,8 +85,6 @@ endmacro()
 
 
 macro(mbgl_platform_render)
-    set_xcode_property(mbgl-render GCC_SYMBOLS_PRIVATE_EXTERN YES)
-
     target_link_libraries(mbgl-render
         PRIVATE mbgl-loop
         PRIVATE "-framework Foundation"
@@ -97,8 +98,6 @@ endmacro()
 
 
 macro(mbgl_platform_offline)
-    set_xcode_property(mbgl-offline GCC_SYMBOLS_PRIVATE_EXTERN YES)
-
     target_link_libraries(mbgl-offline
         PRIVATE mbgl-loop
         PRIVATE "-framework Foundation"
@@ -112,16 +111,18 @@ endmacro()
 
 
 macro(mbgl_platform_test)
-    set_xcode_property(mbgl-test GCC_SYMBOLS_PRIVATE_EXTERN YES)
-
     target_sources(mbgl-test
-        PRIVATE test/src/main.cpp
+        PRIVATE platform/default/mbgl/test/main.cpp
     )
 
     set_source_files_properties(
-        test/src/main.cpp
+        platform/default/mbgl/test/main.cpp
             PROPERTIES
         COMPILE_FLAGS -DWORK_DIRECTORY="${CMAKE_SOURCE_DIR}"
+    )
+
+    target_compile_options(mbgl-test
+        PRIVATE -fvisibility=hidden
     )
 
     target_link_libraries(mbgl-test
@@ -136,7 +137,9 @@ macro(mbgl_platform_test)
 endmacro()
 
 macro(mbgl_platform_benchmark)
-    set_xcode_property(mbgl-benchmark GCC_SYMBOLS_PRIVATE_EXTERN YES)
+    target_compile_options(mbgl-benchmark
+        PRIVATE -fvisibility=hidden
+    )
 
     target_sources(mbgl-benchmark
         PRIVATE benchmark/src/main.cpp
@@ -160,10 +163,13 @@ macro(mbgl_platform_benchmark)
 endmacro()
 
 macro(mbgl_platform_node)
-    set_xcode_property(mbgl-node GCC_SYMBOLS_PRIVATE_EXTERN YES)
+    target_compile_options(mbgl-node
+        PRIVATE -fvisibility=hidden
+    )
 
     target_link_libraries(mbgl-node
         PRIVATE "-framework Foundation"
         PRIVATE "-framework OpenGL"
+        PRIVATE "-Wl,-bind_at_load"
     )
 endmacro()

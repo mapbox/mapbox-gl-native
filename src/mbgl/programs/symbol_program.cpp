@@ -23,8 +23,8 @@ Values makeValues(const style::SymbolPropertyValues& values,
         extrudeScale.fill(tile.id.pixelsToTileUnits(1, state.getZoom()) * scale);
     } else {
         extrudeScale = {{
-            pixelsToGLUnits[0] * scale * state.getAltitude(),
-            pixelsToGLUnits[1] * scale * state.getAltitude()
+            pixelsToGLUnits[0] * scale * state.getCameraToCenterDistance(),
+            pixelsToGLUnits[1] * scale * state.getCameraToCenterDistance()
         }};
     }
 
@@ -75,9 +75,9 @@ static SymbolSDFProgram::UniformValues makeSDFValues(const style::SymbolProperty
     // The default gamma value has to be adjust for the current pixelratio so that we're not
     // drawing blurry font on retina screens.
     const float gammaBase = 0.105 * values.sdfScale / values.paintSize / pixelRatio;
-    const float gammaScale = values.pitchAlignment == AlignmentType::Map
+    const float gammaScale = (values.pitchAlignment == AlignmentType::Map
         ? 1.0 / std::cos(state.getPitch())
-        : 1.0;
+        : 1.0) / state.getCameraToCenterDistance();
 
     return makeValues<SymbolSDFProgram::UniformValues>(
         values,

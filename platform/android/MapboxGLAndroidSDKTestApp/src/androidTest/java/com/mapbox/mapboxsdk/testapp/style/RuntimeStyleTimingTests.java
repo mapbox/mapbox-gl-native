@@ -20,25 +20,26 @@ import org.junit.runner.RunWith;
 @RunWith(AndroidJUnit4.class)
 public class RuntimeStyleTimingTests extends BaseStyleTest {
 
-    @Rule
-    public final ActivityTestRule<RuntimeStyleTimingTestActivity> rule = new ActivityTestRule<>(RuntimeStyleTimingTestActivity.class);
+  @Rule
+  public final ActivityTestRule<RuntimeStyleTimingTestActivity> rule =
+    new ActivityTestRule<>(RuntimeStyleTimingTestActivity.class);
 
-    private OnMapReadyIdlingResource idlingResource;
+  private OnMapReadyIdlingResource idlingResource;
 
-    @Before
-    public void registerIdlingResource() {
-        idlingResource = new OnMapReadyIdlingResource(rule.getActivity());
-        Espresso.registerIdlingResources(idlingResource);
-    }
+  @Before
+  public void registerIdlingResource() {
+    idlingResource = new OnMapReadyIdlingResource(rule.getActivity());
+    Espresso.registerIdlingResources(idlingResource);
+  }
 
-    @Test
-    public void testGetAddRemoveLayer() {
-        checkViewIsDisplayed(R.id.mapView);
-        //We're good if it didn't crash
-    }
+  @Test
+  public void testGetAddRemoveLayer() {
+    checkViewIsDisplayed(R.id.mapView);
+    //We're good if it didn't crash
+  }
 
-    @After
-    public void unregisterIntentServiceIdlingResource() {
-        Espresso.unregisterIdlingResources(idlingResource);
-    }
+  @After
+  public void unregisterIntentServiceIdlingResource() {
+    Espresso.unregisterIdlingResources(idlingResource);
+  }
 }

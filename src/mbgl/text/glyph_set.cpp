@@ -48,10 +48,9 @@ const Shaping GlyphSet::getShaping(const std::u16string& logicalInput,
     // different from the glyphs that get shown
     Shaping shaping(translate.x * 24, translate.y * 24, logicalInput);
 
-    ProcessedBiDiText processedText = bidi.processText(logicalInput);
-
     std::vector<std::u16string> reorderedLines =
-        processedText.applyLineBreaking(determineLineBreaks(logicalInput, spacing, maxWidth));
+        bidi.processText(logicalInput,
+                         determineLineBreaks(logicalInput, spacing, maxWidth));
 
     shapeLines(shaping, reorderedLines, spacing, lineHeight, horizontalAlign, verticalAlign,
                justify, translate);
@@ -65,7 +64,7 @@ void align(Shaping& shaping,
            const float verticalAlign,
            const float maxLineLength,
            const float lineHeight,
-           const uint32_t lineCount,
+           const std::size_t lineCount,
            const Point<float>& translate) {
     const float shiftX =
         (justify - horizontalAlign) * maxLineLength + ::round(translate.x * 24 /* one em */);
@@ -81,11 +80,12 @@ void align(Shaping& shaping,
 // justify left = 0, right = 1, center = .5
 void justifyLine(std::vector<PositionedGlyph>& positionedGlyphs,
                  const std::map<uint32_t, SDFGlyph>& sdfs,
-                 uint32_t start,
-                 uint32_t end,
+                 std::size_t start,
+                 std::size_t end,
                  float justify) {
-    if (!justify)
+    if (!justify) {
         return;
+    }
 
     PositionedGlyph& glyph = positionedGlyphs[end];
     auto it = sdfs.find(glyph.glyph);
@@ -93,76 +93,143 @@ void justifyLine(std::vector<PositionedGlyph>& positionedGlyphs,
         const uint32_t lastAdvance = it->second.metrics.advance;
         const float lineIndent = float(glyph.x + lastAdvance) * justify;
 
-        for (uint32_t j = start; j <= end; j++) {
+        for (std::size_t j = start; j <= end; j++) {
             positionedGlyphs[j].x -= lineIndent;
         }
     }
 }
 
-float GlyphSet::determineIdeographicLineWidth(const std::u16string& logicalInput,
+float GlyphSet::determineAverageLineWidth(const std::u16string& logicalInput,
                                               const float spacing,
                                               float maxWidth) const {
     float totalWidth = 0;
 
-    // totalWidth doesn't include the last character for magical tuning reasons. This makes the
-    // algorithm a little
-    //  more agressive about trying to fit the text into fewer lines, taking advantage of the
-    //  tolerance for going a little
-    //  over maxWidth
-    for (uint32_t i = 0; i < logicalInput.size() - 1; i++) {
-        auto it = sdfs.find(logicalInput[i]);
-        if (it != sdfs.end())
+    for (char16_t chr : logicalInput) {
+        auto it = sdfs.find(chr);
+        if (it != sdfs.end()) {
             totalWidth += it->second.metrics.advance + spacing;
+        }
     }
 
-    int32_t lineCount = std::fmax(1, std::ceil(totalWidth / maxWidth));
-    return totalWidth / lineCount;
+    int32_t targetLineCount = std::fmax(1, std::ceil(totalWidth / maxWidth));
+    return totalWidth / targetLineCount;
 }
+    
+float calculateBadness(const float lineWidth, const float targetWidth, const float penalty, const bool isLastBreak) {
+    const float raggedness = std::pow(lineWidth - targetWidth, 2);
+    if (isLastBreak) {
+        // Favor finals lines shorter than average over longer than average
+        if (lineWidth < targetWidth) {
+            return raggedness / 2;
+        } else {
+            return raggedness * 2;
+        }
+    }
+    if (penalty < 0) {
+        return raggedness - std::pow(penalty, 2);
+    }
+    return raggedness + std::pow(penalty, 2);
+}
+    
+float calculatePenalty(char16_t codePoint, char16_t nextCodePoint) {
+    float penalty = 0;
+    // Force break on newline
+    if (codePoint == 0x0a) {
+        penalty -= 10000;
+    }
+    // Penalize open parenthesis at end of line
+    if (codePoint == 0x28 || codePoint == 0xff08) {
+        penalty += 50;
+    }
+
+    // Penalize close parenthesis at beginning of line
+    if (nextCodePoint == 0x29 || nextCodePoint == 0xff09) {
+        penalty += 50;
+    }
+    
+    return penalty;
+}
+    
+struct PotentialBreak {
+    PotentialBreak(const std::size_t p_index, const float p_x, const PotentialBreak* p_priorBreak, const float p_badness)
+        : index(p_index), x(p_x), priorBreak(p_priorBreak), badness(p_badness)
+    {}
+    
+    const std::size_t index;
+    const float x;
+    const PotentialBreak* priorBreak;
+    const float badness;
+};
+
+    
+PotentialBreak evaluateBreak(const std::size_t breakIndex, const float breakX, const float targetWidth, const std::list<PotentialBreak>& potentialBreaks, const float penalty, const bool isLastBreak) {
+    // We could skip evaluating breaks where the line length (breakX - priorBreak.x) > maxWidth
+    //  ...but in fact we allow lines longer than maxWidth (if there's no break points)
+    //  ...and when targetWidth and maxWidth are close, strictly enforcing maxWidth can give
+    //     more lopsided results.
+    
+    const PotentialBreak* bestPriorBreak = nullptr;
+    float bestBreakBadness = calculateBadness(breakX, targetWidth, penalty, isLastBreak);
+    for (const auto& potentialBreak : potentialBreaks) {
+        const float lineWidth = breakX - potentialBreak.x;
+        float breakBadness =
+            calculateBadness(lineWidth, targetWidth, penalty, isLastBreak) + potentialBreak.badness;
+        if (breakBadness <= bestBreakBadness) {
+            bestPriorBreak = &potentialBreak;
+            bestBreakBadness = breakBadness;
+        }
+    }
+
+    return PotentialBreak(breakIndex, breakX, bestPriorBreak, bestBreakBadness);
+}
+    
+std::set<std::size_t> leastBadBreaks(const PotentialBreak& lastLineBreak) {
+    std::set<std::size_t> leastBadBreaks = { lastLineBreak.index };
+    const PotentialBreak* priorBreak = lastLineBreak.priorBreak;
+    while (priorBreak) {
+        leastBadBreaks.insert(priorBreak->index);
+        priorBreak = priorBreak->priorBreak;
+    }
+    return leastBadBreaks;
+}
+
 
 // We determine line breaks based on shaped text in logical order. Working in visual order would be
 //  more intuitive, but we can't do that because the visual order may be changed by line breaks!
-std::set<int32_t> GlyphSet::determineLineBreaks(const std::u16string& logicalInput,
+std::set<std::size_t> GlyphSet::determineLineBreaks(const std::u16string& logicalInput,
                                                 const float spacing,
                                                 float maxWidth) const {
-    if (!maxWidth)
+    if (!maxWidth) {
         return {};
-
-    if (logicalInput.empty())
-        return {};
-
-    if (util::i18n::allowsIdeographicBreaking(logicalInput))
-        maxWidth = determineIdeographicLineWidth(logicalInput, spacing, maxWidth);
-
-    std::set<int32_t> lineBreakPoints;
-    float currentX = 0;
-    uint32_t lastSafeBreak = 0;
-    float lastSafeBreakX = 0;
-
-    for (uint32_t i = 0; i < logicalInput.size(); i++) {
-        auto it = sdfs.find(logicalInput[i]);
-        if (it == sdfs.end())
-            continue;
-
-        const SDFGlyph& glyph = it->second;
-
-        // Ideographic characters, spaces, and word-breaking punctuation that often appear without
-        // surrounding spaces.
-        if (util::i18n::allowsWordBreaking(glyph.id) ||
-            util::i18n::allowsIdeographicBreaking(glyph.id)) {
-            lastSafeBreak = i;
-            lastSafeBreakX = currentX;
-        }
-
-        if (currentX > maxWidth && lastSafeBreak > 0) {
-            lineBreakPoints.insert(lastSafeBreak);
-            currentX -= lastSafeBreakX;
-            lastSafeBreakX = 0;
-        }
-
-        currentX += glyph.metrics.advance + spacing;
     }
 
-    return lineBreakPoints;
+    if (logicalInput.empty()) {
+        return {};
+    }
+ 
+    const float targetWidth = determineAverageLineWidth(logicalInput, spacing, maxWidth);
+    
+    std::list<PotentialBreak> potentialBreaks;
+    float currentX = 0;
+
+    for (std::size_t i = 0; i < logicalInput.size(); i++) {
+        const char16_t codePoint = logicalInput[i];
+        auto it = sdfs.find(codePoint);
+        if (it != sdfs.end() && !boost::algorithm::is_any_of(u" \t\n\v\f\r")(codePoint)) {
+            currentX += it->second.metrics.advance + spacing;
+        }
+        
+        // Ideographic characters, spaces, and word-breaking punctuation that often appear without
+        // surrounding spaces.
+        if ((i < logicalInput.size() - 1) &&
+            (util::i18n::allowsWordBreaking(codePoint) || util::i18n::allowsIdeographicBreaking(codePoint))) {
+            potentialBreaks.push_back(evaluateBreak(i+1, currentX, targetWidth, potentialBreaks,
+                                                     calculatePenalty(codePoint, logicalInput[i+1]),
+                                                     false));
+        }
+    }
+
+    return leastBadBreaks(evaluateBreak(logicalInput.size(), currentX, targetWidth, potentialBreaks, 0, true));
 }
 
 void GlyphSet::shapeLines(Shaping& shaping,
@@ -186,34 +253,38 @@ void GlyphSet::shapeLines(Shaping& shaping,
         // Collapse whitespace so it doesn't throw off justification
         boost::algorithm::trim_if(line, boost::algorithm::is_any_of(u" \t\n\v\f\r"));
 
-        if (line.empty())
+        if (line.empty()) {
+            y += lineHeight; // Still need a line feed after empty line
             continue;
+        }
 
-        uint32_t lineStartIndex = static_cast<uint32_t>(shaping.positionedGlyphs.size());
+        std::size_t lineStartIndex = shaping.positionedGlyphs.size();
         for (char16_t chr : line) {
             auto it = sdfs.find(chr);
-            if (it == sdfs.end())
+            if (it == sdfs.end()) {
                 continue;
+            }
 
             const SDFGlyph& glyph = it->second;
             shaping.positionedGlyphs.emplace_back(chr, x, y);
             x += glyph.metrics.advance + spacing;
         }
 
-        if (static_cast<uint32_t>(shaping.positionedGlyphs.size()) == lineStartIndex)
-            continue;
-
-        maxLineLength = util::max(x, maxLineLength);
-
-        justifyLine(shaping.positionedGlyphs, sdfs, lineStartIndex,
-                    static_cast<uint32_t>(shaping.positionedGlyphs.size()) - 1, justify);
+        // Only justify if we placed at least one glyph
+        if (shaping.positionedGlyphs.size() != lineStartIndex) {
+            float lineLength = x - spacing; // Don't count trailing spacing
+            maxLineLength = util::max(lineLength, maxLineLength);
+            
+            justifyLine(shaping.positionedGlyphs, sdfs, lineStartIndex,
+                        shaping.positionedGlyphs.size() - 1, justify);
+        }
 
         x = 0;
-        y += lineHeight; // Move to next line
+        y += lineHeight;
     }
 
     align(shaping, justify, horizontalAlign, verticalAlign, maxLineLength, lineHeight,
-          static_cast<uint32_t>(lines.size()), translate);
+          lines.size(), translate);
     const uint32_t height = lines.size() * lineHeight;
 
     // Calculate the bounding box

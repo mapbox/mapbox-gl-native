@@ -10,18 +10,22 @@ namespace mbgl {
 namespace style {
 
 struct LineCap : LayoutProperty<LineCapType> {
+    static constexpr const char * key = "line-cap";
     static LineCapType defaultValue() { return LineCapType::Butt; }
 };
 
 struct LineJoin : LayoutProperty<LineJoinType> {
+    static constexpr const char * key = "line-join";
     static LineJoinType defaultValue() { return LineJoinType::Miter; }
 };
 
 struct LineMiterLimit : LayoutProperty<float> {
+    static constexpr const char * key = "line-miter-limit";
     static float defaultValue() { return 2; }
 };
 
 struct LineRoundLimit : LayoutProperty<float> {
+    static constexpr const char * key = "line-round-limit";
     static float defaultValue() { return 1; }
 };
 

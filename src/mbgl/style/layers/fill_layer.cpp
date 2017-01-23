@@ -2,6 +2,7 @@
 
 #include <mbgl/style/layers/fill_layer.hpp>
 #include <mbgl/style/layers/fill_layer_impl.hpp>
+#include <mbgl/style/conversion/stringify.hpp>
 
 namespace mbgl {
 namespace style {
@@ -27,9 +28,11 @@ std::unique_ptr<Layer> FillLayer::Impl::clone() const {
 std::unique_ptr<Layer> FillLayer::Impl::cloneRef(const std::string& id_) const {
     auto result = std::make_unique<FillLayer>(*this);
     result->impl->id = id_;
-    result->impl->ref = this->id;
     result->impl->paint = FillPaintProperties();
     return std::move(result);
+}
+
+void FillLayer::Impl::stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>&) const {
 }
 
 // Source

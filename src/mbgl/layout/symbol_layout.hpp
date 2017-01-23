@@ -21,13 +21,14 @@ class SymbolBucket;
 
 namespace style {
 class Filter;
+class Layer;
 } // namespace style
 
 struct Anchor;
 
 class SymbolLayout {
 public:
-    SymbolLayout(std::string bucketName_,
+    SymbolLayout(std::vector<std::string> layerIDs_,
                  std::string sourceLayerName_,
                  uint32_t overscaling,
                  float zoom,
@@ -55,17 +56,16 @@ public:
 
     State state = Pending;
 
-    const std::string bucketName;
+    const std::vector<std::string> layerIDs;
     const std::string sourceLayerName;
 
 private:
-    void addFeature(const GeometryCollection&,
+    void addFeature(const SymbolFeature&,
                     const Shaping& shapedText,
                     const PositionedIcon& shapedIcon,
-                    const GlyphPositions& face,
-                    const size_t index);
+                    const GlyphPositions& face);
 
-    bool anchorIsTooClose(const std::u16string& text, const float repeatDistance, Anchor&);
+    bool anchorIsTooClose(const std::u16string& text, const float repeatDistance, const Anchor&);
     std::map<std::u16string, std::vector<Anchor>> compareText;
 
     void addToDebugBuffers(CollisionTile&, SymbolBucket&);

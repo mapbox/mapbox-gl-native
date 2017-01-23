@@ -2,5 +2,5 @@ package com.mapbox.mapboxsdk.testapp.model.constants;
 
 public class AppConstant {
 
-    public static final int STYLE_VERSION = 9;
+  public static final int STYLE_VERSION = 9;
 }

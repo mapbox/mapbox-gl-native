@@ -5,6 +5,8 @@
 
 #import "MGLPolyline+MGLAdditions.h"
 
+#import <mbgl/util/geojson.hpp>
+
 @implementation MGLPolyline
 
 @dynamic overlayBounds;
@@ -37,8 +39,8 @@
     return annotation;
 }
 
-- (mbgl::Feature)featureObject {
-    return mbgl::Feature {[self lineString]};    
+- (mbgl::Geometry<double>)geometryObject {
+    return [self lineString];
 }
 
 - (NSDictionary *)geoJSONDictionary {
@@ -78,17 +80,47 @@
     return self;
 }
 
-- (BOOL)intersectsOverlayBounds:(MGLCoordinateBounds)overlayBounds {
-    return MGLLatLngBoundsFromCoordinateBounds(_overlayBounds).intersects(MGLLatLngBoundsFromCoordinateBounds(overlayBounds));
+- (instancetype)initWithCoder:(NSCoder *)decoder {
+    if (self = [super initWithCoder:decoder]) {
+        _polylines = [decoder decodeObjectOfClass:[NSArray class] forKey:@"polylines"];
+    }
+    return self;
 }
 
-- (mbgl::Feature)featureObject {
+- (void)encodeWithCoder:(NSCoder *)coder {
+    [super encodeWithCoder:coder];
+    [coder encodeObject:_polylines forKey:@"polylines"];
+}
+
+- (BOOL)isEqual:(id)other
+{
+    if (self == other) return YES;
+    if (![other isKindOfClass:[MGLMultiPolyline class]]) return NO;
+    
+    MGLMultiPolyline *otherMultipoline = other;
+    return ([super isEqual:otherMultipoline]
+            && [self.polylines isEqualToArray:otherMultipoline.polylines]);
+}
+
+- (NSUInteger)hash {
+    NSUInteger hash = [super hash];
+    for (MGLPolyline *polyline in self.polylines) {
+        hash += [polyline hash];
+    }
+    return hash;
+}
+
+- (BOOL)intersectsOverlayBounds:(MGLCoordinateBounds)overlayBounds {
+    return MGLCoordinateBoundsIntersectsCoordinateBounds(_overlayBounds, overlayBounds);
+}
+
+- (mbgl::Geometry<double>)geometryObject {
     mbgl::MultiLineString<double> multiLineString;
     multiLineString.reserve(self.polylines.count);
     for (MGLPolyline *polyline in self.polylines) {
         multiLineString.push_back([polyline lineString]);
     }
-    return mbgl::Feature {multiLineString};
+    return multiLineString;
 }
 
 - (NSDictionary *)geoJSONDictionary {

@@ -1082,6 +1082,48 @@ void nativeFlyTo(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jdouble
     nativeMapView->getMap().flyTo(cameraOptions, animationOptions);
 }
 
+jlong nativeGetTransitionDuration(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr) {
+    assert(env);
+    assert(nativeMapViewPtr != 0);
+
+    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
+
+    const auto transitionOptions = nativeMapView->getMap().getTransitionOptions();
+    return transitionOptions.duration.value_or(mbgl::Duration::zero()).count();
+}
+
+void nativeSetTransitionDuration(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jlong duration) {
+    assert(env);
+    assert(nativeMapViewPtr != 0);
+
+    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
+
+    auto transitionOptions = nativeMapView->getMap().getTransitionOptions();
+    transitionOptions.duration = std::chrono::duration_cast<mbgl::Duration>(std::chrono::duration<jlong>(duration));
+    nativeMapView->getMap().setTransitionOptions(transitionOptions);
+}
+
+jlong nativeGetTransitionDelay(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr) {
+    assert(env);
+    assert(nativeMapViewPtr != 0);
+
+    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
+
+    const auto transitionOptions = nativeMapView->getMap().getTransitionOptions();
+    return transitionOptions.delay.value_or(mbgl::Duration::zero()).count();
+}
+
+void nativeSetTransitionDelay(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jlong delay) {
+    assert(env);
+    assert(nativeMapViewPtr != 0);
+
+    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
+
+    auto transitionOptions = nativeMapView->getMap().getTransitionOptions();
+    transitionOptions.delay = std::chrono::duration_cast<mbgl::Duration>(std::chrono::duration<jlong>(delay));
+    nativeMapView->getMap().setTransitionOptions(transitionOptions);
+}
+
 jni::jobject* nativeGetLayer(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jni::jstring* layerId) {
     assert(env);
     assert(nativeMapViewPtr != 0);
@@ -1876,6 +1918,10 @@ void registerNatives(JavaVM *vm) {
         MAKE_NATIVE_METHOD(nativeJumpTo, "(JDDDDD)V"),
         MAKE_NATIVE_METHOD(nativeEaseTo, "(JDDDJDDZ)V"),
         MAKE_NATIVE_METHOD(nativeFlyTo, "(JDDDJDD)V"),
+        MAKE_NATIVE_METHOD(nativeGetTransitionDuration, "(J)J"),
+        MAKE_NATIVE_METHOD(nativeSetTransitionDuration, "(JJ)V"),
+        MAKE_NATIVE_METHOD(nativeGetTransitionDelay, "(J)J"),
+        MAKE_NATIVE_METHOD(nativeSetTransitionDelay, "(JJ)V"),
         MAKE_NATIVE_METHOD(nativeGetLayer, "(JLjava/lang/String;)Lcom/mapbox/mapboxsdk/style/layers/Layer;"),
         MAKE_NATIVE_METHOD(nativeAddLayer, "(JJLjava/lang/String;)V"),
         MAKE_NATIVE_METHOD(nativeRemoveLayerById, "(JLjava/lang/String;)V"),

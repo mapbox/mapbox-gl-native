@@ -1,10 +1,12 @@
 #import <Cocoa/Cocoa.h>
 
+#import "MGLFoundation.h"
+
 /// Project version number for Mapbox.
-FOUNDATION_EXPORT double MapboxVersionNumber;
+FOUNDATION_EXPORT MGL_EXPORT double MapboxVersionNumber;
 
 /// Project version string for Mapbox.
-FOUNDATION_EXPORT const unsigned char MapboxVersionString[];
+FOUNDATION_EXPORT MGL_EXPORT const unsigned char MapboxVersionString[];
 
 #import "MGLAccountManager.h"
 #import "MGLAnnotation.h"
@@ -39,12 +41,14 @@ FOUNDATION_EXPORT const unsigned char MapboxVersionString[];
 #import "MGLRasterStyleLayer.h"
 #import "MGLCircleStyleLayer.h"
 #import "MGLBackgroundStyleLayer.h"
+#import "MGLOpenGLStyleLayer.h"
 #import "MGLSource.h"
+#import "MGLTileSource.h"
 #import "MGLVectorSource.h"
-#import "MGLGeoJSONSource.h"
+#import "MGLShapeSource.h"
 #import "MGLRasterSource.h"
 #import "MGLTilePyramidOfflineRegion.h"
 #import "MGLTypes.h"
 #import "NSValue+MGLAdditions.h"
-#import "NSValue+MGLStyleEnumAttributeAdditions.h"
 #import "MGLStyleValue.h"
+#import "MGLAttributionInfo.h"

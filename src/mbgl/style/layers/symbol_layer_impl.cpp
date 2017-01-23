@@ -24,12 +24,14 @@ bool SymbolLayer::Impl::evaluate(const PropertyEvaluationParameters& parameters)
     return paint.hasTransition();
 }
 
-std::unique_ptr<Bucket> SymbolLayer::Impl::createBucket(BucketParameters&) const {
+std::unique_ptr<Bucket> SymbolLayer::Impl::createBucket(BucketParameters&, const GeometryTileLayer&) const {
     assert(false); // Should be calling createLayout() instead.
     return nullptr;
 }
 
-std::unique_ptr<SymbolLayout> SymbolLayer::Impl::createLayout(BucketParameters& parameters) const {
+std::unique_ptr<SymbolLayout> SymbolLayer::Impl::createLayout(BucketParameters& parameters,
+                                                              const GeometryTileLayer& layer,
+                                                              std::vector<std::string> group) const {
     PropertyEvaluationParameters p(parameters.tileID.overscaledZ);
     SymbolLayoutProperties::Evaluated evaluated = layout.evaluate(p);
 
@@ -59,12 +61,12 @@ std::unique_ptr<SymbolLayout> SymbolLayer::Impl::createLayout(BucketParameters& 
     evaluated.get<IconSize>() = layout.evaluate<IconSize>(PropertyEvaluationParameters(p.z + 1));
     evaluated.get<TextSize>() = layout.evaluate<TextSize>(PropertyEvaluationParameters(p.z + 1));
 
-    return std::make_unique<SymbolLayout>(id,
-                                          parameters.layer.getName(),
+    return std::make_unique<SymbolLayout>(std::move(group),
+                                          layer.getName(),
                                           parameters.tileID.overscaleFactor(),
                                           parameters.tileID.overscaledZ,
                                           parameters.mode,
-                                          parameters.layer,
+                                          layer,
                                           filter,
                                           evaluated,
                                           textMaxSize,

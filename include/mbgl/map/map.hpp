@@ -171,6 +171,7 @@ public:
     // Add image, bound to the style
     void addImage(const std::string&, std::unique_ptr<const SpriteImage>);
     void removeImage(const std::string&);
+    const SpriteImage* getImage(const std::string&);
 
     // Defaults
     std::string getStyleName() const;

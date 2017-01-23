@@ -62,6 +62,10 @@ struct Uninterpolated {
     }
 };
 
+template <>
+struct Interpolator<bool>
+    : Uninterpolated {};
+
 template <class T>
 struct Interpolator<T, typename std::enable_if_t<std::is_enum<T>::value>>
     : Uninterpolated {};

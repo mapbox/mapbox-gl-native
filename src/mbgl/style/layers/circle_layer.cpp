@@ -2,6 +2,7 @@
 
 #include <mbgl/style/layers/circle_layer.hpp>
 #include <mbgl/style/layers/circle_layer_impl.hpp>
+#include <mbgl/style/conversion/stringify.hpp>
 
 namespace mbgl {
 namespace style {
@@ -27,9 +28,11 @@ std::unique_ptr<Layer> CircleLayer::Impl::clone() const {
 std::unique_ptr<Layer> CircleLayer::Impl::cloneRef(const std::string& id_) const {
     auto result = std::make_unique<CircleLayer>(*this);
     result->impl->id = id_;
-    result->impl->ref = this->id;
     result->impl->paint = CirclePaintProperties();
     return std::move(result);
+}
+
+void CircleLayer::Impl::stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>&) const {
 }
 
 // Source
@@ -164,6 +167,51 @@ void CircleLayer::setCirclePitchScale(PropertyValue<CirclePitchScaleType> value,
     if (value == getCirclePitchScale(klass))
         return;
     impl->paint.set<CirclePitchScale>(value, klass);
+    impl->observer->onLayerPaintPropertyChanged(*this);
+}
+
+PropertyValue<float> CircleLayer::getDefaultCircleStrokeWidth() {
+    return { 0 };
+}
+
+PropertyValue<float> CircleLayer::getCircleStrokeWidth(const optional<std::string>& klass) const {
+    return impl->paint.get<CircleStrokeWidth>(klass);
+}
+
+void CircleLayer::setCircleStrokeWidth(PropertyValue<float> value, const optional<std::string>& klass) {
+    if (value == getCircleStrokeWidth(klass))
+        return;
+    impl->paint.set<CircleStrokeWidth>(value, klass);
+    impl->observer->onLayerPaintPropertyChanged(*this);
+}
+
+PropertyValue<Color> CircleLayer::getDefaultCircleStrokeColor() {
+    return { Color::black() };
+}
+
+PropertyValue<Color> CircleLayer::getCircleStrokeColor(const optional<std::string>& klass) const {
+    return impl->paint.get<CircleStrokeColor>(klass);
+}
+
+void CircleLayer::setCircleStrokeColor(PropertyValue<Color> value, const optional<std::string>& klass) {
+    if (value == getCircleStrokeColor(klass))
+        return;
+    impl->paint.set<CircleStrokeColor>(value, klass);
+    impl->observer->onLayerPaintPropertyChanged(*this);
+}
+
+PropertyValue<float> CircleLayer::getDefaultCircleStrokeOpacity() {
+    return { 1 };
+}
+
+PropertyValue<float> CircleLayer::getCircleStrokeOpacity(const optional<std::string>& klass) const {
+    return impl->paint.get<CircleStrokeOpacity>(klass);
+}
+
+void CircleLayer::setCircleStrokeOpacity(PropertyValue<float> value, const optional<std::string>& klass) {
+    if (value == getCircleStrokeOpacity(klass))
+        return;
+    impl->paint.set<CircleStrokeOpacity>(value, klass);
     impl->observer->onLayerPaintPropertyChanged(*this);
 }
 

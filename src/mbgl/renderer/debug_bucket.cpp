@@ -46,8 +46,8 @@ DebugBucket::DebugBucket(const OverscaledTileID& id,
                     vertices.emplace_back(FillAttributes::vertex(p));
 
                     if (prev) {
-                        indices.emplace_back(vertices.vertexSize() - 1,
-                                             vertices.vertexSize());
+                        indices.emplace_back(vertices.vertexSize() - 2,
+                                             vertices.vertexSize() - 1);
                     }
 
                     prev = p;

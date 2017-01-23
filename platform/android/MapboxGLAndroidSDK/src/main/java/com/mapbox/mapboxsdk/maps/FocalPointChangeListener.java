@@ -4,5 +4,5 @@ import android.graphics.PointF;
 
 public interface FocalPointChangeListener {
 
-    void onFocalPointChanged(PointF pointF);
+  void onFocalPointChanged(PointF pointF);
 }

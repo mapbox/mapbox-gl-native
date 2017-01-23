@@ -51,6 +51,7 @@ void Painter::renderLine(PaintParameters& parameters,
                  frame.pixelRatio,
                  tile,
                  state,
+                 pixelsToGLUnits,
                  posA,
                  posB,
                  layer.impl->dashLineWidth,
@@ -72,6 +73,7 @@ void Painter::renderLine(PaintParameters& parameters,
                  properties,
                  tile,
                  state,
+                 pixelsToGLUnits,
                  *posA,
                  *posB));
 
@@ -80,7 +82,8 @@ void Painter::renderLine(PaintParameters& parameters,
              LineProgram::uniformValues(
                  properties,
                  tile,
-                 state));
+                 state,
+                 pixelsToGLUnits));
     }
 }
 

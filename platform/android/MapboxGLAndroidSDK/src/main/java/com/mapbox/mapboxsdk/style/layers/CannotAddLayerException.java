@@ -5,8 +5,8 @@ package com.mapbox.mapboxsdk.style.layers;
  */
 public class CannotAddLayerException extends RuntimeException {
 
-    public CannotAddLayerException(String message) {
-        super(message);
-    }
+  public CannotAddLayerException(String message) {
+    super(message);
+  }
 
 }

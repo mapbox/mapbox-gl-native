@@ -34,120 +34,120 @@ import static org.junit.Assert.assertEquals;
 
 public class CompassViewTest {
 
-    @Rule
-    public final ActivityTestRule<EspressoTestActivity> rule = new ActivityTestRule<>(EspressoTestActivity.class);
+  @Rule
+  public final ActivityTestRule<EspressoTestActivity> rule = new ActivityTestRule<>(EspressoTestActivity.class);
 
-    private OnMapReadyIdlingResource idlingResource;
+  private OnMapReadyIdlingResource idlingResource;
 
-    @Before
-    public void registerIdlingResource() {
-        idlingResource = new OnMapReadyIdlingResource(rule.getActivity());
-        Espresso.registerIdlingResources(idlingResource);
+  @Before
+  public void registerIdlingResource() {
+    idlingResource = new OnMapReadyIdlingResource(rule.getActivity());
+    Espresso.registerIdlingResources(idlingResource);
+  }
+
+  @Test
+  public void testDefault() {
+    ViewUtils.checkViewIsDisplayed(R.id.mapView);
+    onView(withId(R.id.compassView)).check(matches(not(isDisplayed())));
+  }
+
+  @Test
+  public void testVisible() {
+    ViewUtils.checkViewIsDisplayed(R.id.mapView);
+    MapboxMap mapboxMap = rule.getActivity().getMapboxMap();
+
+    onView(withId(R.id.mapView)).perform(new MoveCameraAction(mapboxMap,
+        CameraUpdateFactory.newCameraPosition(
+          new CameraPosition.Builder()
+            .bearing(45)
+            .zoom(1)
+            .target(new LatLng())
+            .build()
+        )
+      )
+    );
+
+    onView(withId(R.id.compassView)).check(matches(isDisplayed()));
+  }
+
+  @Test
+  @Ignore // 10-31-2016 click action is not working
+  public void testClick() {
+    ViewUtils.checkViewIsDisplayed(R.id.mapView);
+    MapboxMap mapboxMap = rule.getActivity().getMapboxMap();
+
+    onView(withId(R.id.mapView)).perform(new MoveCameraAction(mapboxMap,
+        CameraUpdateFactory.newCameraPosition(
+          new CameraPosition.Builder()
+            .bearing(45)
+            .zoom(1)
+            .target(new LatLng())
+            .build()
+        )
+      )
+    );
+
+    onView(withId(R.id.compassView)).perform(click());
+    onView(withId(R.id.mapView)).perform(new WaitAction(3000));
+    onView(withId(R.id.compassView)).check(matches(not(isDisplayed())));
+
+    CameraPosition cameraPosition = mapboxMap.getCameraPosition();
+    assertEquals("Camera bearing should face north, ", 0, cameraPosition.bearing, TestConstants.BEARING_DELTA);
+  }
+
+  @After
+  public void unregisterIdlingResource() {
+    Espresso.unregisterIdlingResources(idlingResource);
+  }
+
+  private class WaitAction implements ViewAction {
+
+    private long waitTime;
+
+    WaitAction(long waitTime) {
+      this.waitTime = waitTime;
     }
 
-    @Test
-    public void testDefault() {
-        ViewUtils.checkViewIsDisplayed(R.id.mapView);
-        onView(withId(R.id.compassView)).check(matches(not(isDisplayed())));
+    @Override
+    public Matcher<View> getConstraints() {
+      return isDisplayed();
     }
 
-    @Test
-    public void testVisible(){
-        ViewUtils.checkViewIsDisplayed(R.id.mapView);
-        MapboxMap mapboxMap = rule.getActivity().getMapboxMap();
-
-        onView(withId(R.id.mapView)).perform(new MoveCameraAction(mapboxMap,
-                        CameraUpdateFactory.newCameraPosition(
-                                new CameraPosition.Builder()
-                                        .bearing(45)
-                                        .zoom(1)
-                                        .target(new LatLng())
-                                        .build()
-                        )
-                )
-        );
-
-        onView(withId(R.id.compassView)).check(matches(isDisplayed()));
+    @Override
+    public String getDescription() {
+      return getClass().getSimpleName();
     }
 
-    @Test
-    @Ignore // 10-31-2016 click action is not working
-    public void testClick() {
-        ViewUtils.checkViewIsDisplayed(R.id.mapView);
-        MapboxMap mapboxMap = rule.getActivity().getMapboxMap();
+    @Override
+    public void perform(UiController uiController, View view) {
+      uiController.loopMainThreadForAtLeast(waitTime);
+    }
+  }
 
-        onView(withId(R.id.mapView)).perform(new MoveCameraAction(mapboxMap,
-                        CameraUpdateFactory.newCameraPosition(
-                                new CameraPosition.Builder()
-                                        .bearing(45)
-                                        .zoom(1)
-                                        .target(new LatLng())
-                                        .build()
-                        )
-                )
-        );
+  private class MoveCameraAction implements ViewAction {
 
-        onView(withId(R.id.compassView)).perform(click());
-        onView(withId(R.id.mapView)).perform(new WaitAction(3000));
-        onView(withId(R.id.compassView)).check(matches(not(isDisplayed())));
+    private MapboxMap mapboxMap;
+    private CameraUpdate cameraUpdate;
 
-        CameraPosition cameraPosition = mapboxMap.getCameraPosition();
-        assertEquals("Camera bearing should face north, ", 0, cameraPosition.bearing, TestConstants.BEARING_DELTA);
+    MoveCameraAction(MapboxMap map, CameraUpdate update) {
+      mapboxMap = map;
+      cameraUpdate = update;
     }
 
-    @After
-    public void unregisterIdlingResource() {
-        Espresso.unregisterIdlingResources(idlingResource);
+    @Override
+    public Matcher<View> getConstraints() {
+      return isDisplayed();
     }
 
-    private class WaitAction implements ViewAction {
-
-        private long waitTime;
-
-        WaitAction(long waitTime) {
-            this.waitTime = waitTime;
-        }
-
-        @Override
-        public Matcher<View> getConstraints() {
-            return isDisplayed();
-        }
-
-        @Override
-        public String getDescription() {
-            return getClass().getSimpleName();
-        }
-
-        @Override
-        public void perform(UiController uiController, View view) {
-            uiController.loopMainThreadForAtLeast(waitTime);
-        }
+    @Override
+    public String getDescription() {
+      return getClass().getSimpleName();
     }
 
-    private class MoveCameraAction implements ViewAction {
-
-        private MapboxMap mapboxMap;
-        private CameraUpdate cameraUpdate;
-
-        MoveCameraAction(MapboxMap map, CameraUpdate update) {
-            mapboxMap = map;
-            cameraUpdate = update;
-        }
-
-        @Override
-        public Matcher<View> getConstraints() {
-            return isDisplayed();
-        }
-
-        @Override
-        public String getDescription() {
-            return getClass().getSimpleName();
-        }
-
-        @Override
-        public void perform(UiController uiController, View view) {
-            mapboxMap.moveCamera(cameraUpdate);
-        }
+    @Override
+    public void perform(UiController uiController, View view) {
+      mapboxMap.moveCamera(cameraUpdate);
     }
+  }
 }
 

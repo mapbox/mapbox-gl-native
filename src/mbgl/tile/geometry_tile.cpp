@@ -6,6 +6,7 @@
 #include <mbgl/style/layer_impl.hpp>
 #include <mbgl/style/layers/background_layer.hpp>
 #include <mbgl/style/layers/custom_layer.hpp>
+#include <mbgl/style/layers/symbol_layer.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/geometry/feature_index.hpp>
@@ -61,6 +62,12 @@ void GeometryTile::setPlacementConfig(const PlacementConfig& desiredConfig) {
         return;
     }
 
+    // Mark the tile as pending again if it was complete before to prevent signaling a complete
+    // state despite pending parse operations.
+    if (availableData == DataAvailability::All) {
+        availableData = DataAvailability::Some;
+    }
+
     ++correlationID;
     requestedConfig = desiredConfig;
     worker.invoke(&GeometryTileWorker::setPlacementConfig, desiredConfig, correlationID);
@@ -99,7 +106,7 @@ void GeometryTile::redoLayout() {
 
 void GeometryTile::onLayout(LayoutResult result) {
     availableData = DataAvailability::Some;
-    buckets = std::move(result.buckets);
+    nonSymbolBuckets = std::move(result.nonSymbolBuckets);
     featureIndex = std::move(result.featureIndex);
     data = std::move(result.tileData);
     observer->onTileChanged(*this);
@@ -109,10 +116,8 @@ void GeometryTile::onPlacement(PlacementResult result) {
     if (result.correlationID == correlationID) {
         availableData = DataAvailability::All;
     }
-    for (auto& bucket : result.buckets) {
-        buckets[bucket.first] = std::move(bucket.second);
-    }
-    featureIndex->setCollisionTile(std::move(result.collisionTile));
+    symbolBuckets = std::move(result.symbolBuckets);
+    collisionTile = std::move(result.collisionTile);
     observer->onTileChanged(*this);
 }
 
@@ -122,7 +127,8 @@ void GeometryTile::onError(std::exception_ptr err) {
 }
 
 Bucket* GeometryTile::getBucket(const Layer& layer) {
-    const auto it = buckets.find(layer.baseImpl->bucketName());
+    const auto& buckets = layer.is<SymbolLayer>() ? symbolBuckets : nonSymbolBuckets;
+    const auto it = buckets.find(layer.baseImpl->id);
     if (it == buckets.end()) {
         return nullptr;
     }
@@ -147,7 +153,8 @@ void GeometryTile::queryRenderedFeatures(
                         layerIDs,
                         *data,
                         id.canonical,
-                        style);
+                        style,
+                        collisionTile.get());
 }
 
 } // namespace mbgl

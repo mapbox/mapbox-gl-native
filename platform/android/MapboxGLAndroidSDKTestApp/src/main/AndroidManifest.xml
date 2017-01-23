@@ -335,16 +335,8 @@
         </activity>
         <activity
             android:name=".activity.style.CircleLayerActivity"
-            android:description="@string/description_circle"
-            android:label="@string/activity_circle">
-            <meta-data
-                android:name="@string/category"
-                android:value="@string/category_style"/>
-        </activity>
-        <activity
-            android:name=".activity.style.SymbolLayerActivity"
-            android:description="@string/description_symbol_layer"
-            android:label="@string/activity_symbol_layer">
+            android:description="@string/description_circle_layer"
+            android:label="@string/activity_circle_layer">
             <meta-data
                 android:name="@string/category"
                 android:value="@string/category_style"/>

@@ -11,6 +11,13 @@ The Mapbox macOS SDK requires the macOS 10.10.0 SDK (or above) and Xcode 7.3 (or
 Grab a [prebuilt release](https://github.com/mapbox/mapbox-gl-native/releases/) – look for the releases that begin with “macos-” – or build the SDK from source:
 
 1. [Install core dependencies](../../INSTALL.md).
+
+1. Install [jazzy](https://github.com/realm/jazzy) for generating API documentation:
+
+   ```
+   [sudo] gem install jazzy
+   ```
+
 1. Run `make xpackage`, which produces a `Mapbox.framework` in the `build/macos/pkg/` folder.
 
 ### Installation
@@ -28,6 +35,7 @@ In a storyboard or XIB:
 3. MGLMapView needs to be layer-backed:
   * You can make the window layer-backed by selecting the window and checking Full Size Content View in the Attributes inspector. This allows the map view to underlap the title bar and toolbar.
   * Alternatively, if you don’t want the entire window to be layer-backed, you can make just the map view layer-backed by selecting it and checking its entry under the View Effects inspector’s Core Animation Layer section.
+4. Add a map feedback item to your Help menu. (Drag Menu Item from the Object library into Main Menu ‣ Help ‣ Menu.) Title it “Improve This Map” or similar, and connect it to the `giveFeedback:` action of First Responder.
 
 If you need to manipulate the map view programmatically:
 
@@ -63,4 +71,4 @@ script AppDelegate
 end script
 ```
 
-Run `make xdocument` to generate complete API documentation. The [Mapbox iOS SDK](https://www.mapbox.com/ios-sdk/)’s [API documentation](https://www.mapbox.com/ios-sdk/api/) and [online examples](https://www.mapbox.com/ios-sdk/examples/) apply to the Mapbox macOS SDK with few differences, mostly around unimplemented features like user location tracking.
+For further instructions, consult the [macOS SDK documentation](https://mapbox.github.io/mapbox-gl-native/macos/) or run `make xdocument` to generate the documentation. The [Mapbox iOS SDK](https://www.mapbox.com/ios-sdk/)’s [API documentation](https://www.mapbox.com/ios-sdk/) and [online examples](https://www.mapbox.com/ios-sdk/examples/) apply to the Mapbox macOS SDK with few differences, mostly around unimplemented features like user location tracking.

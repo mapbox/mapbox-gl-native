@@ -37,6 +37,14 @@ workflows:
             curl -sL https://deb.nodesource.com/setup_4.x | sudo -E bash -
             sudo apt-get install -y pkg-config nodejs cmake
     - script:
+        title: Run Checkstyle
+        run_if: '{{enveq "SKIPCI" "false"}}'
+        inputs:
+        - content: |-
+            #!/bin/bash
+            # Run checkstyle gradle task on all modules
+            cd platform/android && ./gradlew checkstyle
+    - script:
         title: Configure Google Cloud SDK
         run_if: '{{enveq "SKIPCI" "false"}}'
         inputs:
@@ -75,13 +83,21 @@ workflows:
             echo "Compiling core tests:"
             BUILDTYPE=Debug make android-test-lib-arm-v7
     - script:
-        title: Run local JVM Unit tests
+        title: Run local JVM Unit tests on phone module
         run_if: '{{enveq "SKIPCI" "false"}}'
         inputs:
         - content: |-
             #!/bin/bash
-            echo "Running unit tests from testapp/src/test:"
+            echo "Running unit tests from MapboxGLAndroidSDKTestApp/src/test:"
             make run-android-unit-test
+    - script:
+        title: Run local JVM Unit tests on wear module
+        run_if: '{{enveq "SKIPCI" "false"}}'
+        inputs:
+        - content: |-
+            #!/bin/bash
+            echo "Running unit tests from MapboxGLAndroidSDKWearTestApp/src/test:"
+            make run-android-wear-unit-test
     - script:
         title: Generate Espresso sanity tests
         run_if: '{{enveq "SKIPCI" "false"}}'
@@ -105,7 +121,7 @@ workflows:
             echo "Run tests on firebase:"
             gcloud auth activate-service-account --key-file secret.json --project android-gl-native
             gcloud beta test android devices list
-            gcloud beta test android run --type instrumentation --app platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/MapboxGLAndroidSDKTestApp-debug.apk --test platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/MapboxGLAndroidSDKTestApp-debug-androidTest.apk --device-ids shamu --os-version-ids 22 --locales en --orientations portrait --timeout 15m
+            gcloud beta test android run --type instrumentation --app platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/MapboxGLAndroidSDKTestApp-debug.apk --test platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/MapboxGLAndroidSDKTestApp-debug-androidTest.apk --device-ids shamu --os-version-ids 22 --locales en --orientations portrait --timeout 15m --test-targets "class com.mapbox.mapboxsdk.testapp.maps.widgets.AttributionTest"
     - script:
         title: Download Firebase results
         run_if: '{{enveq "SKIPCI" "false"}}'
@@ -113,10 +129,12 @@ workflows:
         inputs:
         - content: |-
             #!/bin/bash
+            mkdir -p platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk
+
             echo "The details from Firebase will be downloaded, zipped and attached as a build artefact."
             testUri=$(gsutil ls "gs://test-lab-wrrntqk05p31w-h3y1qk44vuunw/" | tail -n1)
             echo "Downloading from : "$testUri
-            cd platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk && gsutil -m cp -R -Z $testUri .
+            gsutil -m cp -R -Z $testUri platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk
 
             echo "Try running ndk-stack on downloaded logcat to symbolicate the stacktraces:"
             find platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk -type f -name "logcat" -print0 | xargs -0 -Imylogcat mv -i mylogcat ./
@@ -182,14 +200,19 @@ workflows:
             #!/bin/bash
             echo "Compile libmapbox-gl.so for all supportd abi's:"
             export BUILDTYPE=Release
-            make apackage
+            make android-lib-arm-v5
+            make android-lib-arm-v7
+            make android-lib-arm-v8
+            make android-lib-x86
+            make android-lib-x86-64
+            cd platform/android && ./gradlew :MapboxGLAndroidSDK:assembleRelease
     - script:
         title: Publish to maven
         inputs:
         - content: |-
             #!/bin/bash
             echo "Upload aar file to maven:"
-            cd platform/android && ./gradlew uploadArchives
+            cd platform/android && ./gradlew :MapboxGLAndroidSDK:uploadArchives
     - slack:
         title: Post to Slack
         inputs:
@@ -197,8 +220,8 @@ workflows:
         - channel: "#gl-bots"
         - from_username: 'Bitrise Android'
         - from_username_on_error: 'Bitrise Android'
-        - message: '<${BITRISE_BUILD_URL}|Build #${BITRISE_BUILD_NUMBER}> Publish to maven SUCCESS.'
-        - message_on_error: '<${BITRISE_BUILD_URL}|Build #${BITRISE_BUILD_NUMBER}> Publish to maven FAILED.'
+        - message: '<${BITRISE_BUILD_URL}|Build #${BITRISE_BUILD_NUMBER}> Publish of nightly Android SDK SNAPSHOT to maven succeeded.'
+        - message_on_error: '<${BITRISE_BUILD_URL}|Build #${BITRISE_BUILD_NUMBER}> Publish of nightly Android SDK SNAPSHOT to maven failed. @android_team.'
         - icon_url: https://bitrise-public-content-production.s3.amazonaws.com/slack/bitrise-slack-icon-128.png
         - icon_url_on_error: https://bitrise-public-content-production.s3.amazonaws.com/slack/bitrise-slack-error-icon-128.png
   devicefarmUpload:
@@ -275,7 +298,12 @@ workflows:
             #!/bin/bash
             echo "Compile libmapbox-gl.so for all supportd abi's:"
             export BUILDTYPE=Release
-            make apackage
+            make android-lib-arm-v5
+            make android-lib-arm-v7
+            make android-lib-arm-v8
+            make android-lib-x86
+            make android-lib-x86-64
+            cd platform/android && ./gradlew :MapboxGLAndroidSDK:assembleRelease
     - script:
         title: Log metrics
         inputs:

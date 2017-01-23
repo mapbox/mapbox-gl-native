@@ -1,6 +1,8 @@
 #import "MGLMapView.h"
 
-#include <mbgl/map/map.hpp>
+namespace mbgl {
+    class Map;
+}
 
 @interface MGLMapView (Private)
 
@@ -18,6 +20,9 @@
 @property (nonatomic) CLLocationDegrees pendingLatitude;
 /// Center longitude set independently of the center latitude in an inspectable.
 @property (nonatomic) CLLocationDegrees pendingLongitude;
+
+/// Asynchronously render a frame of the map.
+- (void)setNeedsGLDisplay;
 
 /// Synchronously render a frame of the map.
 - (void)renderSync;

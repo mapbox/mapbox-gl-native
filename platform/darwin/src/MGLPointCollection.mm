@@ -1,14 +1,15 @@
 #import "MGLPointCollection_Private.h"
 #import "MGLGeometry_Private.h"
+#import "NSArray+MGLAdditions.h"
 
+#import <mbgl/util/geojson.hpp>
 #import <mbgl/util/geometry.hpp>
-#import <mbgl/util/feature.hpp>
 
 NS_ASSUME_NONNULL_BEGIN
 
 @implementation MGLPointCollection
 {
-    MGLCoordinateBounds _bounds;
+    mbgl::optional<mbgl::LatLngBounds> _bounds;
     std::vector<CLLocationCoordinate2D> _coordinates;
 }
 
@@ -23,14 +24,41 @@ NS_ASSUME_NONNULL_BEGIN
     if (self)
     {
         _coordinates = { coords, coords + count };
-        mbgl::LatLngBounds bounds = mbgl::LatLngBounds::empty();
-        for (auto coordinate : _coordinates)
-        {
-            bounds.extend(mbgl::LatLng(coordinate.latitude, coordinate.longitude));
-        }
-        _bounds = MGLCoordinateBoundsFromLatLngBounds(bounds);
     }
     return self;
+}
+
+- (nullable instancetype)initWithCoder:(NSCoder *)decoder {
+    if (self = [super initWithCoder:decoder]) {
+        NSArray *coordinates = [decoder decodeObjectOfClass:[NSArray class] forKey:@"coordinates"];
+        _coordinates = [coordinates mgl_coordinates];
+    }
+    return self;
+}
+
+- (void)encodeWithCoder:(NSCoder *)coder {
+    [super encodeWithCoder:coder];
+    [coder encodeObject:[NSArray mgl_coordinatesFromCoordinates:_coordinates] forKey:@"coordinates"];
+}
+
+- (BOOL)isEqual:(id)other {
+    if (self == other) return YES;
+    if (![other isKindOfClass:[MGLPointCollection class]]) return NO;
+    
+    MGLPointCollection *otherCollection = (MGLPointCollection *)other;
+    return ([super isEqual:other]
+            && ((![self geoJSONDictionary] && ![otherCollection geoJSONDictionary]) || [[self geoJSONDictionary] isEqualToDictionary:[otherCollection geoJSONDictionary]]));
+}
+
+- (MGLCoordinateBounds)overlayBounds {
+    if (!_bounds) {
+        mbgl::LatLngBounds bounds = mbgl::LatLngBounds::empty();
+        for (auto coordinate : _coordinates) {
+            bounds.extend(mbgl::LatLng(coordinate.latitude, coordinate.longitude));
+        }
+        _bounds = bounds;
+    }
+    return MGLCoordinateBoundsFromLatLngBounds(*_bounds);
 }
 
 - (NSUInteger)pointCount
@@ -61,17 +89,12 @@ NS_ASSUME_NONNULL_BEGIN
     std::copy(_coordinates.begin() + range.location, _coordinates.begin() + NSMaxRange(range), coords);
 }
 
-- (MGLCoordinateBounds)overlayBounds
-{
-    return _bounds;
-}
-
 - (BOOL)intersectsOverlayBounds:(MGLCoordinateBounds)overlayBounds
 {
-    return MGLLatLngBoundsFromCoordinateBounds(_bounds).intersects(MGLLatLngBoundsFromCoordinateBounds(overlayBounds));
+    return MGLCoordinateBoundsIntersectsCoordinateBounds(self.overlayBounds, overlayBounds);
 }
 
-- (mbgl::Feature)featureObject
+- (mbgl::Geometry<double>)geometryObject
 {
     mbgl::MultiPoint<double> multiPoint;
     multiPoint.reserve(self.pointCount);
@@ -79,7 +102,7 @@ NS_ASSUME_NONNULL_BEGIN
     {
         multiPoint.push_back(mbgl::Point<double>(self.coordinates[i].longitude, self.coordinates[i].latitude));
     }
-    return mbgl::Feature {multiPoint};
+    return multiPoint;
 }
 
 - (NSDictionary *)geoJSONDictionary

@@ -537,6 +537,12 @@
                                     <action selector="drawAnimatedAnnotation:" target="-1" id="CYM-WB-s97"/>
                                 </connections>
                             </menuItem>
+                            <menuItem title="Add Lime Green Layer" id="UWY-vl-t2m">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="insertCustomStyleLayer:" target="-1" id="LE5-lz-kx3"/>
+                                </connections>
+                            </menuItem>
                             <menuItem title="Show All Annnotations" keyEquivalent="A" id="yMj-uM-8SN">
                                 <modifierMask key="keyEquivalentModifierMask" shift="YES" command="YES"/>
                                 <connections>

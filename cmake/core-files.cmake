@@ -221,6 +221,8 @@ set(MBGL_CORE_FILES
     src/mbgl/style/cross_faded_property_evaluator.cpp
     src/mbgl/style/cross_faded_property_evaluator.hpp
     src/mbgl/style/function.cpp
+    src/mbgl/style/group_by_layout.cpp
+    src/mbgl/style/group_by_layout.hpp
     src/mbgl/style/layer.cpp
     src/mbgl/style/layer_impl.cpp
     src/mbgl/style/layer_impl.hpp
@@ -260,11 +262,13 @@ set(MBGL_CORE_FILES
     include/mbgl/style/conversion/property_value.hpp
     include/mbgl/style/conversion/source.hpp
     include/mbgl/style/conversion/tileset.hpp
+    src/mbgl/style/conversion/stringify.hpp
 
     # style/layers
     include/mbgl/style/layers/background_layer.hpp
     include/mbgl/style/layers/circle_layer.hpp
     include/mbgl/style/layers/custom_layer.hpp
+    include/mbgl/style/layers/fill_extrusion_layer.hpp
     include/mbgl/style/layers/fill_layer.hpp
     include/mbgl/style/layers/line_layer.hpp
     include/mbgl/style/layers/raster_layer.hpp
@@ -282,6 +286,11 @@ set(MBGL_CORE_FILES
     src/mbgl/style/layers/custom_layer.cpp
     src/mbgl/style/layers/custom_layer_impl.cpp
     src/mbgl/style/layers/custom_layer_impl.hpp
+    src/mbgl/style/layers/fill_extrusion_layer.cpp
+    src/mbgl/style/layers/fill_extrusion_layer_impl.cpp
+    src/mbgl/style/layers/fill_extrusion_layer_impl.hpp
+    src/mbgl/style/layers/fill_extrusion_layer_properties.cpp
+    src/mbgl/style/layers/fill_extrusion_layer_properties.hpp
     src/mbgl/style/layers/fill_layer.cpp
     src/mbgl/style/layers/fill_layer_impl.cpp
     src/mbgl/style/layers/fill_layer_impl.hpp
@@ -322,7 +331,6 @@ set(MBGL_CORE_FILES
     src/mbgl/style/sources/vector_source_impl.hpp
 
     # text
-    src/mbgl/text/bidi.cpp
     src/mbgl/text/bidi.hpp
     src/mbgl/text/check_max_angle.cpp
     src/mbgl/text/check_max_angle.hpp

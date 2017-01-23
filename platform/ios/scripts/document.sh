@@ -30,7 +30,10 @@ sed -n -e '/^## /{' -e ':a' -e 'n' -e '/^## /q' -e 'p' -e 'ba' -e '}' platform/i
 rm -rf ${OUTPUT}
 mkdir -p ${OUTPUT}
 
-cp platform/ios/screenshot.png "${OUTPUT}"
+cp -r platform/ios/docs/img "${OUTPUT}/img"
+
+DEFAULT_THEME="platform/darwin/docs/theme"
+THEME=${JAZZY_THEME:-$DEFAULT_THEME}
 
 jazzy \
     --config platform/ios/jazzy.yml \
@@ -38,10 +41,10 @@ jazzy \
     --github-file-prefix https://github.com/mapbox/mapbox-gl-native/tree/${BRANCH} \
     --module-version ${SHORT_VERSION} \
     --readme ${README} \
-    --documentation="platform/ios/docs/Info.plist Keys.md" \
+    --documentation="platform/{darwin,ios}/docs/guides/*.md" \
     --root-url https://www.mapbox.com/ios-sdk/api/${RELEASE_VERSION}/ \
-    --theme platform/darwin/docs/theme \
+    --theme ${THEME} \
     --output ${OUTPUT}
 # https://github.com/realm/jazzy/issues/411
 find ${OUTPUT} -name *.html -exec \
-    perl -pi -e 's/Mapbox\s+(Docs|Reference)/Mapbox iOS SDK $1/' {} \;
+    perl -pi -e 's/BRANDLESS_DOCSET_TITLE/iOS SDK $1/, s/Mapbox\s+(Docs|Reference)/Mapbox iOS SDK $1/' {} \;

@@ -1,5 +1,6 @@
 #import <Foundation/Foundation.h>
 
+#import "MGLFoundation.h"
 #import "MGLStyleLayer.h"
 
 #import "MGLTypes.h"
@@ -27,17 +28,28 @@ NS_ASSUME_NONNULL_BEGIN
     the constant itself. Such details may change significantly from version to
     version.
  */
-static const NSInteger MGLStyleDefaultVersion = 9;
+static MGL_EXPORT const NSInteger MGLStyleDefaultVersion = 9;
 
 /**
- The proxy object for the current map style for customization purposes and a
- set of convenience methods for creating style URLs of default styles provided
- by Mapbox.
+ The proxy object for the current map style.
+ 
+ MGLStyle provides a set of convenience methods for changing Mapbox
+ default styles using `-[MGLMapView styleURL]`.
  <a href="https://www.mapbox.com/maps/">Learn more about Mapbox default styles</a>.
+ 
+ It is also possible to directly manipulate the current map style 
+ via `-[MGLMapView style]` by updating the style's data sources or layers.
+ 
+ @note Wait until the map style has finished loading before modifying a map's
+    style via any of the `MGLStyle` instance methods below. You can use the 
+    `-[MGLMapViewDelegate mapView:didFinishLoadingStyle:]` or
+    `-[MGLMapViewDelegate mapViewDidFinishLoadingMap:]` methods as indicators
+    that it's safe to modify the map's style.
  */
+MGL_EXPORT
 @interface MGLStyle : NSObject
 
-#pragma mark Accessing Common Styles
+#pragma mark Accessing Default Styles
 
 /**
  Returns the URL to version 8 of the
@@ -179,7 +191,7 @@ static const NSInteger MGLStyleDefaultVersion = 9;
 /**
  A set containing the style’s sources.
  */
-@property (nonatomic, strong) NS_MUTABLE_SET_OF(MGLSource *) *sources;
+@property (nonatomic, strong) NS_SET_OF(__kindof MGLSource *) *sources;
 
 /**
  Returns a source with the given identifier in the current style.
@@ -199,12 +211,17 @@ static const NSInteger MGLStyleDefaultVersion = 9;
 
 /**
  Adds a new source to the current style.
-
- @note Adding the same source instance more than once will result in a 
+ 
+ @note Adding the same source instance more than once will result in a
     `MGLRedundantSourceException`. Reusing the same source identifier, even with
     different source instances, will result in a 
-    `MGLRedundantSourceIdentiferException`.
+    `MGLRedundantSourceIdentifierException`. 
  
+ @note Sources should be added in 
+    `-[MGLMapViewDelegate mapView:didFinishLoadingStyle:]` or
+    `-[MGLMapViewDelegate mapViewDidFinishLoadingMap:]` to ensure that the map 
+    has loaded the style and is ready to accept a new source.
+
  @param source The source to add to the current style.
  */
 - (void)addSource:(MGLSource *)source;
@@ -227,10 +244,10 @@ static const NSInteger MGLStyleDefaultVersion = 9;
 #pragma mark Managing Style Layers
 
 /**
- The layers included in the style, arranged according to their front-to-back
+ The layers included in the style, arranged according to their back-to-front
  ordering on the screen.
  */
-@property (nonatomic, strong) NS_MUTABLE_ARRAY_OF(MGLStyleLayer *) *layers;
+@property (nonatomic, strong) NS_ARRAY_OF(__kindof MGLStyleLayer *) *layers;
 
 /**
  Returns a style layer with the given identifier in the current style.
@@ -251,10 +268,15 @@ static const NSInteger MGLStyleDefaultVersion = 9;
 
 /**
  Adds a new layer on top of existing layers.
-
+ 
  @note Adding the same layer instance more than once will result in a
     `MGLRedundantLayerException`. Reusing the same layer identifer, even with
-    different layer instances, will also result in an exception.
+    different layer instances, will also result in an exception. 
+ 
+ @note Layers should be added in 
+    `-[MGLMapViewDelegate mapView:didFinishLoadingStyle:]` or
+    `-[MGLMapViewDelegate mapViewDidFinishLoadingMap:]` to ensure that the map 
+    has loaded the style and is ready to accept a new layer.
 
  @param layer The layer object to add to the map view. This object must be an
     instance of a concrete subclass of `MGLStyleLayer`.
@@ -266,7 +288,12 @@ static const NSInteger MGLStyleDefaultVersion = 9;
  
  @note Adding the same layer instance more than once will result in a
     `MGLRedundantLayerException`. Reusing the same layer identifer, even with
-    different layer instances, will also result in an exception.
+    different layer instances, will also result in an exception. 
+ 
+ @note Layers should be added in
+    `-[MGLMapViewDelegate mapView:didFinishLoadingStyle:]` or
+    `-[MGLMapViewDelegate mapViewDidFinishLoadingMap:]` to ensure that the map 
+    has loaded the style and is ready to accept a new layer.
 
  @param layer The layer to insert.
  @param index The index at which to insert the layer. An index of 0 would send
@@ -372,10 +399,28 @@ static const NSInteger MGLStyleDefaultVersion = 9;
 #pragma mark Managing a Style’s Images
 
 /**
+ Returns the image associated with the given name in the style.
+ 
+ @note Names and their associated images are not guaranteed to exist across
+    styles or different versions of the same style. Applications that use this
+    API must first set the style URL to an explicitly versioned style using a
+    convenience method like `+[MGLStyle outdoorsStyleURLWithVersion:]`,
+    `MGLMapView`'s “Style URL” inspectable in Interface Builder, or a manually
+    constructed `NSURL`. This approach also avoids image name changes that will 
+    occur in the default style over time.
+ 
+ @param name The name associated with the image you want to obtain.
+ @return The image associated with the given name, or `nil` if no image is
+    associated with that name.
+ */
+- (nullable MGLImage *)imageForName:(NSString *)name;
+
+/**
  Adds or overrides an image used by the style’s layers.
  
  To use an image in a style layer, give it a unique name using this method, then
- set the `iconImage` property of an `MGLSymbolStyleLayer` object to that name.
+ set the `iconImageName` property of an `MGLSymbolStyleLayer` object to that
+ name.
  
  @param image The image for the name.
  @param name The name of the image to set to the style.
@@ -396,6 +441,22 @@ static const NSInteger MGLStyleDefaultVersion = 9;
  @param name The name of the image to remove.
  */
 - (void)removeImageForName:(NSString *)name;
+
+#pragma mark Managing a Style’s Transition Options
+
+/**
+ The duration in seconds to animate any changes to the style URL or to layout and paint attributes.
+ 
+ By default, this property is set to zero seconds, so any changes take effect without animation.
+ */
+@property (nonatomic) NSTimeInterval transitionDuration;
+
+/**
+ The delay in seconds to before applying any changes to the style URL or to layout and paint attributes.
+
+ By default, this property is set to zero seconds, so any changes begin to animate immediately.
+ */
+@property (nonatomic) NSTimeInterval transitionDelay;
 
 @end
 
