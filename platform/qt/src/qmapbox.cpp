@@ -7,8 +7,6 @@
 #include <mbgl/util/traits.hpp>
 
 #if QT_VERSION >= 0x050000
-#include "qquickmapboxgl.hpp"
-#include "qquickmapboxglmapparameter.hpp"
 #include <QOpenGLContext>
 #else
 #include <QGLContext>
@@ -55,14 +53,6 @@ Q_DECL_EXPORT void initializeGLExtensions()
         return reinterpret_cast<mbgl::gl::glProc>(thisContext->getProcAddress(name));
 #endif
     });
-}
-
-Q_DECL_EXPORT void registerTypes()
-{
-#if QT_VERSION >= 0x050000
-    qmlRegisterType<QQuickMapboxGL>("QQuickMapboxGL", 1, 0, "MapboxMap");
-    qmlRegisterType<QQuickMapboxGLMapParameter>("QQuickMapboxGL", 1, 0, "MapParameter");
-#endif
 }
 
 }
