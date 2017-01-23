@@ -142,18 +142,6 @@ matrix:
         - ccache --show-stats
         - ./platform/linux/scripts/coveralls.sh
 
-    # EGL - GCC 5 - Release
-    - os: linux
-      sudo: required
-      dist: trusty
-      language: cpp
-      compiler: "egl-gcc5-release"
-      env: BUILDTYPE=Release _CXX=g++-5 _CC=gcc-5 WITH_EGL=1
-      addons: *gcc5
-      before_script:
-        - mapbox_start_xvfb
-        - mapbox_export_mesa_library_path
-
     # EGL - Clang 3.8 - Debug
     - os: linux
       sudo: required
@@ -161,18 +149,6 @@ matrix:
       language: cpp
       compiler: "egl-clang38-debug"
       env: BUILDTYPE=Debug _CXX=clang++-3.8 _CC=clang-3.8 WITH_EGL=1
-      addons: *clang38
-      before_script:
-        - mapbox_start_xvfb
-        - mapbox_export_mesa_library_path
-
-    # EGL - Clang 3.8 - Release
-    - os: linux
-      sudo: required
-      dist: trusty
-      language: cpp
-      compiler: "egl-clang38-release"
-      env: BUILDTYPE=Release _CXX=clang++-3.8 _CC=clang-3.8 WITH_EGL=1
       addons: *clang38
       before_script:
         - mapbox_start_xvfb
