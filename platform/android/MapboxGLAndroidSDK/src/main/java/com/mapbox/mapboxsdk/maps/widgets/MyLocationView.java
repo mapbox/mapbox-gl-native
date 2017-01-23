@@ -310,6 +310,7 @@ public class MyLocationView extends View {
     if (myLocationTrackingMode == MyLocationTracking.TRACKING_FOLLOW) {
       mapboxMap.getUiSettings().setFocalPoint(new PointF(getCenterX(), getCenterY()));
     }
+    invalidate();
   }
 
   public void setBearing(double bearing) {
@@ -327,8 +328,8 @@ public class MyLocationView extends View {
 
   public void setCameraPosition(CameraPosition position) {
     if (position != null) {
-      setTilt(position.tilt);
       setBearing(position.bearing);
+      setTilt(position.tilt);
     }
   }
 

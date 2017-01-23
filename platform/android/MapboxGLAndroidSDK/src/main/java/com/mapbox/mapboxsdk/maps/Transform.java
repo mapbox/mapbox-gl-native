@@ -73,7 +73,7 @@ final class Transform implements MapView.OnMapChangedListener {
   @Override
   public void onMapChanged(@MapView.MapChange int change) {
     if (change == REGION_DID_CHANGE_ANIMATED && cameraCancelableCallback != null) {
-      invalidateCameraPosition();
+      updateCameraPosition(invalidateCameraPosition());
       if (cameraCancelableCallback != null) {
         cameraCancelableCallback.onFinish();
         cameraCancelableCallback = null;
