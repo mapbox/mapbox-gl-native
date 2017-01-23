@@ -77,10 +77,10 @@ typedef NS_ENUM(NSUInteger, MGLAnnotationVerticalAlignment) {
  built into `MGLMapView`.  If you would like to use your own, you will need to implement 
  `-[UIGestureRecognizerDelegate gestureRecognizer:shouldRecognizeSimultaneouslyWithGestureRecognizer:]`
  in order to set up which gesture takes precedence. For example, you could create your own
- `UITapGestureRecognizer` that will be called only if the default MGLMapView tap gesture fails by
+ `UITapGestureRecognizer` that will be called only if the default `MGLMapView` tap gesture fails by
  implementing the following:
  
- ```
+ ```swift
  let mapTapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(myCustomFunction))
  for recognizer in mapView.gestureRecognizers! where recognizer is UITapGestureRecognizer {
      mapTapGestureRecognizer.require(toFail: recognizer)
