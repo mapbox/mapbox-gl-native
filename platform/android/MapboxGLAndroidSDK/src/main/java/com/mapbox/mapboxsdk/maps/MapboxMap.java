@@ -515,9 +515,6 @@ public final class MapboxMap {
   @UiThread
   public final void moveCamera(CameraUpdate update) {
     moveCamera(update, null);
-    // MapChange.REGION_DID_CHANGE_ANIMATED is not called for `jumpTo`
-    // invalidate camera position to provide OnCameraChange event.
-    invalidateCameraPosition();
   }
 
   /**
@@ -534,6 +531,9 @@ public final class MapboxMap {
       @Override
       public void run() {
         transform.moveCamera(MapboxMap.this, update, callback);
+        // MapChange.REGION_DID_CHANGE_ANIMATED is not called for `jumpTo`
+        // invalidate camera position to provide OnCameraChange event.
+        invalidateCameraPosition();
       }
     });
   }
