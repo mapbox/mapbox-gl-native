@@ -73,12 +73,11 @@ typedef NS_ENUM(NSUInteger, MGLAnnotationVerticalAlignment) {
  your Mapbox account. They also deter other developers from using your styles
  without your permission.
  
- Adding your own gestures to `MGLMapView` will block the default gesture recognizer
- built into `MGLMapView`.  If you would like to use your own, you will need to implement 
- `-[UIGestureRecognizerDelegate gestureRecognizer:shouldRecognizeSimultaneouslyWithGestureRecognizer:]`
- in order to set up which gesture takes precedence. For example, you could create your own
- `UITapGestureRecognizer` that will be called only if the default `MGLMapView` tap gesture fails by
- implementing the following:
+ Adding your own gesture recognizer to `MGLMapView` will block the corresponding
+ gesture recognizer built into `MGLMapView`. To avoid conflicts, define which
+ gesture takes precedence. For example, you can create your own
+ `UITapGestureRecognizer` that will be invoked only if the default `MGLMapView`
+ tap gesture fails:
  
  ```swift
  let mapTapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(myCustomFunction))
