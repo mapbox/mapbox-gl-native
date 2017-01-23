@@ -1,7 +1,9 @@
-#import "MGLSource.h"
-#import "MGLGeoJSONSource.h"
-#import "MGLGeoJSONSourceBase.h"
+#import "MGLAbstractShapeSource.h"
+
+#import "MGLFoundation.h"
 #import "MGLGeometry.h"
+#import "MGLTypes.h"
+#import "MGLShape.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -12,7 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
  data, one based on tile coordinates, and one based on a bounding box. Clases that implement this
  protocol must implement one, and only one of the methods.
  */
-@protocol MGLCustomVectorSourceDataSource <NSObject>
+@protocol MGLComputedShapeSourceDataSource <NSObject>
 
 @optional
 /** 
@@ -21,14 +23,14 @@ NS_ASSUME_NONNULL_BEGIN
  @param y tile Y coordinate
  @param zoomLevel tile zoom level
  */
-- (NSArray<id <MGLFeature>>*)featuresInTileAtX:(NSUInteger)x y:(NSUInteger)y zoomLevel:(NSUInteger)zoomLevel;
+- (NSArray<MGLShape <MGLFeature> *>*)featuresInTileAtX:(NSUInteger)x y:(NSUInteger)y zoomLevel:(NSUInteger)zoomLevel;
 
 /**
  Fetch features for a tile. This will not be called on the main queue, it will be called on the callers requestQueue.
  @param bounds The bounds to fetch data for
  @param zoomLevel tile zoom level
  */
-- (NSArray<id <MGLFeature>>*)featuresInCoordinateBounds:(MGLCoordinateBounds)bounds zoomLevel:(NSUInteger)zoomLevel;
+- (NSArray<MGLShape <MGLFeature> *>*)featuresInCoordinateBounds:(MGLCoordinateBounds)bounds zoomLevel:(NSUInteger)zoomLevel;
 
 @end
 
@@ -36,7 +38,7 @@ NS_ASSUME_NONNULL_BEGIN
  A source for vector data that is fetched 1 tile at a time. Useful for sources that are
  too large to fit in memory, or are already divided into tiles, but not in Mapbox Vector Tile format.
  */
-@interface MGLCustomVectorSource : MGLGeoJSONSourceBase
+@interface MGLComputedShapeSource : MGLAbstractShapeSource
 
 /**
  Returns a custom vector datasource initialized with an identifier, datasource,  and a
@@ -47,7 +49,7 @@ NS_ASSUME_NONNULL_BEGIN
  @param identifier A string that uniquely identifies the source.
  @param options An `NSDictionary` of options for this source.
  */
-- (instancetype)initWithIdentifier:(NSString *)identifier options:(NS_DICTIONARY_OF(MGLGeoJSONSourceOption, id) *)options NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithIdentifier:(NSString *)identifier  options:(nullable NS_DICTIONARY_OF(MGLShapeSourceOption, id) *)options NS_DESIGNATED_INITIALIZER;
 
 /**
  Request that the source reloads a region.
@@ -62,7 +64,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  An object that implements the `MGLCustomVectorSourceDataSource` protocol that will be queried for tile data.
  */
-@property (nonatomic, weak, nullable) id<MGLCustomVectorSourceDataSource> dataSource;
+@property (nonatomic, weak, nullable) id<MGLComputedShapeSourceDataSource> dataSource;
 
 /**
  A queue that calls to the datasource will be made on.

@@ -374,6 +374,7 @@ set(MBGL_CORE_FILES
     src/mbgl/tile/tile_cache.cpp
     src/mbgl/tile/tile_cache.hpp
     src/mbgl/tile/tile_id.hpp
+    src/mbgl/tile/tile_id_hash.hpp
     src/mbgl/tile/tile_id_io.cpp
     src/mbgl/tile/tile_loader.hpp
     src/mbgl/tile/tile_loader_impl.hpp

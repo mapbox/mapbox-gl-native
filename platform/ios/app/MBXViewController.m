@@ -106,7 +106,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
 @interface MBXViewController () <UITableViewDelegate,
                                  UITableViewDataSource,
                                  MGLMapViewDelegate,
-                                 MGLCustomVectorSourceDataSource>
+                                 MGLComputedShapeSourceDataSource>
 
 
 @property (nonatomic) IBOutlet MGLMapView *mapView;
@@ -1212,8 +1212,8 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
 
 - (void)addLatLonGrid
 {
-    MGLCustomVectorSource *source = [[MGLCustomVectorSource alloc] initWithIdentifier:@"latlon"
-                                                                              options:@{MGLGeoJSONSourceOptionMaximumZoomLevel:@14}];
+    MGLComputedShapeSource *source = [[MGLComputedShapeSource alloc] initWithIdentifier:@"latlon"
+                                                                              options:@{MGLShapeSourceOptionMaximumZoomLevel:@14}];
     source.dataSource = self;
     [self.mapView.style addSource:source];
     MGLLineStyleLayer *lineLayer = [[MGLLineStyleLayer alloc] initWithIdentifier:@"latlonlines"
@@ -1221,7 +1221,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     [self.mapView.style addLayer:lineLayer];
     MGLSymbolStyleLayer *labelLayer = [[MGLSymbolStyleLayer alloc] initWithIdentifier:@"latlonlabels"
                                                                                source:source];
-    labelLayer.textField = [MGLStyleValue valueWithRawValue:@"{value}"];
+    labelLayer.text = [MGLStyleValue valueWithRawValue:@"{value}"];
     [self.mapView.style addLayer:labelLayer];
 }
 
