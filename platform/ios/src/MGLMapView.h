@@ -73,17 +73,23 @@ typedef NS_ENUM(NSUInteger, MGLAnnotationVerticalAlignment) {
  your Mapbox account. They also deter other developers from using your styles
  without your permission.
  
+ Adding your own gestures to `MGLMapView` will block the default gesture recognizer
+ built into `MGLMapView`.  If you would like to use your own, you will need to implement 
+ `-[UIGestureRecognizerDelegate gestureRecognizer:shouldRecognizeSimultaneouslyWithGestureRecognizer:]`
+ in order to set up which gesture takes precedence. For example, you could create your own
+ `UITapGestureRecognizer` that will be called only if the default MGLMapView tap gesture fails by
+ implementing the following:
+ 
+ ```
+ let mapTapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(myCustomFunction))
+ for recognizer in mapView.gestureRecognizers! where recognizer is UITapGestureRecognizer {
+     mapTapGestureRecognizer.require(toFail: recognizer)
+ }
+ ```
+ 
  @note You are responsible for getting permission to use the map data and for
  ensuring that your use adheres to the relevant terms of use.
- @note Adding your own gestures to MGLMapView will block the default gesture recognizer
- built into MGLMapView.  If you would like to use your own, you will need to implement 
- `gestureRecognizer:shouldRecognizeSimultaneouslyWithGestureRecognizer:` in order to setup
- which gesture takes precedence. For example, you could create your own UITapGestureRecognizer
- that will be called only if the default MGLMapView tap fails by implementing the following:<br/>
- ```swift
- let mapTapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(myCustomFunction))
- mapView.gestureRecognizers?.forEach { if($0 is UITapGestureRecognizer){mapTapGestureRecognizer.require(toFail: $0)} }
- ```
+
  */
 IB_DESIGNABLE
 @interface MGLMapView : UIView
