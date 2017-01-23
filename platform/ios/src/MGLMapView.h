@@ -75,6 +75,15 @@ typedef NS_ENUM(NSUInteger, MGLAnnotationVerticalAlignment) {
  
  @note You are responsible for getting permission to use the map data and for
  ensuring that your use adheres to the relevant terms of use.
+ @note Adding your own gestures to MGLMapView will block the default gesture recognizer
+ built into MGLMapView.  If you would like to use your own, you will need to implement 
+ `gestureRecognizer:shouldRecognizeSimultaneouslyWithGestureRecognizer:` in order to setup
+ which gesture takes precedence. For example, you could create your own UITapGestureRecognizer
+ that will be called only if the default MGLMapView tap fails by implementing the following:<br/>
+ ```swift
+ let mapTapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(myCustomFunction))
+ mapView.gestureRecognizers?.forEach { if($0 is UITapGestureRecognizer){mapTapGestureRecognizer.require(toFail: $0)} }
+ ```
  */
 IB_DESIGNABLE
 @interface MGLMapView : UIView
