@@ -91,7 +91,8 @@ public class FeatureSectionAdapter extends RecyclerView.Adapter<RecyclerView.Vie
   @Override
   public void onBindViewHolder(RecyclerView.ViewHolder sectionViewHolder, int position) {
     if (isSectionHeaderPosition(position)) {
-      ((SectionViewHolder) sectionViewHolder).title.setText(sections.get(position).title);
+      String cleanTitle = sections.get(position).title.toString().replace("_", " ");
+      ((SectionViewHolder) sectionViewHolder).title.setText(cleanTitle);
     } else {
       adapter.onBindViewHolder(sectionViewHolder, getConvertedPosition(position));
     }

@@ -390,7 +390,7 @@
             android:label="@string/activity_simple_map">
             <meta-data
                 android:name="@string/category"
-                android:value="@string/category_maplayout"/>
+                android:value="@string/category_basic"/>
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activity.FeatureOverviewActivity"/>
