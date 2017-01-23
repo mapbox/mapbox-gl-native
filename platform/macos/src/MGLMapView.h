@@ -44,6 +44,21 @@ NS_ASSUME_NONNULL_BEGIN
  your Mapbox account. They also deter other developers from using your styles
  without your permission.
  
+ Adding your own gesture recognizer to `MGLMapView` will block the corresponding
+ gesture recognizer built into `MGLMapView`. To avoid conflicts, define which
+ gesture recognizer takes precedence. For example, you can subclass
+ `NSClickGestureRecognizer` and override `-[NSGestureRecognizer shouldRequireFailureOfGestureRecognizer:]`,
+ so that your subclass will be invoked only if the default `MGLMapView` click
+ gesture recognizer fails:
+ 
+ ```swift
+ class MapClickGestureRecognizer: NSClickGestureRecognizer {
+     override func shouldRequireFailure(of otherGestureRecognizer: NSGestureRecognizer) -> Bool {
+         return otherGestureRecognizer is NSClickGestureRecognizer
+     }
+ }
+ ```
+ 
  @note You are responsible for getting permission to use the map data and for
     ensuring that your use adheres to the relevant terms of use.
  */
