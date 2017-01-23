@@ -1,4 +1,5 @@
-#include <QMapbox>
+#include <QQuickMapboxGL>
+#include <QQuickMapboxGLMapParameter>
 
 #include <QGuiApplication>
 #include <QIcon>
@@ -13,9 +14,8 @@ int main(int argc, char *argv[])
     app.setWindowIcon(QIcon(":icon.png"));
 #endif
 
-    // Exposes the QQuickMapboxGL module so we
-    // can do `import QQuickMapboxGL 1.0`.
-    QMapbox::registerTypes();
+    qmlRegisterType<QQuickMapboxGL>("QQuickMapboxGL", 1, 0, "MapboxMap");
+    qmlRegisterType<QQuickMapboxGLMapParameter>("QQuickMapboxGL", 1, 0, "MapParameter");
 
     QQmlApplicationEngine engine;
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
