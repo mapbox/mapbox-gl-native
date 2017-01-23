@@ -5,19 +5,16 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.view.MenuItem;
 import android.view.View;
 
-import com.mapbox.mapboxsdk.camera.CameraPosition;
+import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.location.LocationListener;
+import com.mapbox.mapboxsdk.location.LocationServices;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
@@ -29,6 +26,9 @@ public class MyLocationToggleActivity extends AppCompatActivity {
   private MapboxMap mapboxMap;
   private FloatingActionButton locationToggleFab;
 
+  private LocationServices locationServices;
+  private LocationListener locationListener;
+
   private static final int PERMISSIONS_LOCATION = 0;
 
   @Override
@@ -36,15 +36,7 @@ public class MyLocationToggleActivity extends AppCompatActivity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_my_location_toggle);
 
-    Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-    setSupportActionBar(toolbar);
-
-    final ActionBar actionBar = getSupportActionBar();
-    if (actionBar != null) {
-      actionBar.setDisplayShowTitleEnabled(true);
-      actionBar.setDisplayHomeAsUpEnabled(true);
-      actionBar.setDisplayShowHomeEnabled(true);
-    }
+    locationServices = LocationServices.getLocationServices(MyLocationToggleActivity.this);
 
     mapView = (MapView) findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
@@ -100,6 +92,11 @@ public class MyLocationToggleActivity extends AppCompatActivity {
   protected void onDestroy() {
     super.onDestroy();
     mapView.onDestroy();
+    // Ensure no memory leak occurs if we register the location listener but the call hasn't
+    // been made yet.
+    if (locationListener != null) {
+      locationServices.removeLocationListener(locationListener);
+    }
   }
 
   @Override
@@ -108,27 +105,11 @@ public class MyLocationToggleActivity extends AppCompatActivity {
     mapView.onLowMemory();
   }
 
-
-  @Override
-  public boolean onOptionsItemSelected(MenuItem item) {
-    switch (item.getItemId()) {
-      case android.R.id.home:
-        onBackPressed();
-        return true;
-      default:
-        return false;
-    }
-  }
-
   @UiThread
   public void toggleGps(boolean enableGps) {
     if (enableGps) {
-      if ((ContextCompat.checkSelfPermission(this,
-        Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
-        || (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-        != PackageManager.PERMISSION_GRANTED)) {
-        ActivityCompat.requestPermissions(this, new String[] {
-          Manifest.permission.ACCESS_COARSE_LOCATION,
+      if (!LocationServices.getLocationServices(MyLocationToggleActivity.this).areLocationPermissionsGranted()) {
+        ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.ACCESS_COARSE_LOCATION,
           Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_LOCATION);
       } else {
         enableLocation(true);
@@ -140,25 +121,32 @@ public class MyLocationToggleActivity extends AppCompatActivity {
 
   private void enableLocation(boolean enabled) {
     if (enabled) {
-      mapboxMap.setOnMyLocationChangeListener(new MapboxMap.OnMyLocationChangeListener() {
-        @Override
-        public void onMyLocationChange(@Nullable Location location) {
-          if (location != null) {
-            mapboxMap.setCameraPosition(new CameraPosition.Builder()
-              .target(new LatLng(location))
-              .zoom(16)
-              .bearing(0)
-              .tilt(0)
-              .build());
-            mapboxMap.setOnMyLocationChangeListener(null);
-          }
+      // To move the camera instantly, we attempt to get the last known location and either
+      // ease or animate the camera to that position depending on the zoom level.
+      Location lastLocation = LocationServices.getLocationServices(this).getLastLocation();
+
+      if (lastLocation != null) {
+        if (mapboxMap.getCameraPosition().zoom > 15.99) {
+          mapboxMap.easeCamera(CameraUpdateFactory.newLatLng(new LatLng(lastLocation)), 1000);
+        } else {
+          mapboxMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lastLocation), 16), 1000);
         }
-      });
+      } else {
+        locationListener = new LocationListener() {
+          @Override
+          public void onLocationChanged(Location location) {
+            if (location != null) {
+              mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location), 16));
+              locationServices.removeLocationListener(this);
+            }
+          }
+        };
+        locationServices.addLocationListener(locationListener);
+      }
       locationToggleFab.setImageResource(R.drawable.ic_location_disabled_24dp);
     } else {
       locationToggleFab.setImageResource(R.drawable.ic_my_location_24dp);
     }
-
     mapboxMap.setMyLocationEnabled(enabled);
   }
 

@@ -1,32 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-
-    <android.support.v7.widget.Toolbar
-        android:id="@id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="@color/primary"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
-
-        <Spinner
-            android:id="@+id/spinner"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
-    </android.support.v7.widget.Toolbar>
 
     <com.mapbox.mapboxsdk.maps.MapView
         android:id="@id/mapView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:mapbox_cameraTargetLat="38.87031"
         android:layout_below="@id/toolbar"
+        app:mapbox_cameraTargetLat="38.87031"
         app:mapbox_cameraTargetLng="-77.00897"
-        app:mapbox_styleUrl="@string/mapbox_style_mapbox_streets"
-        app:mapbox_cameraZoom="10" />
+        app:mapbox_cameraZoom="10"
+        app:mapbox_styleUrl="@string/mapbox_style_mapbox_streets"/>
 
     <TextView
         android:id="@+id/countView"
@@ -45,6 +32,6 @@
         android:layout_alignParentRight="true"
         android:layout_gravity="end|bottom"
         android:layout_margin="@dimen/fab_margin"
-        android:src="@drawable/ic_animate_coordinates" />
+        android:src="@drawable/ic_animate_coordinates"/>
 
 </RelativeLayout>

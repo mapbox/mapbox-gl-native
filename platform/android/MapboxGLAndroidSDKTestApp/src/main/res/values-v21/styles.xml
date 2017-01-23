@@ -3,16 +3,16 @@
 
     <style name="AppTheme" parent="AppBaseTheme">
 
-    </style>r
+    </style>
 
-    <style name="AppTheme.ActionBar.Transparent" parent="AppTheme">
+    <style name="AppTheme.ActionBar.Transparent" parent="NoActionBar">
         <item name="colorPrimary">@android:color/transparent</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:windowTranslucentStatus">true</item>
     </style>
 
     <style name="AppTheme.ActionBar" parent="AppTheme">
-        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="colorPrimaryDark">@color/primaryDark</item>
         <item name="colorPrimary">@color/primary</item>
     </style>
 

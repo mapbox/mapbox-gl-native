@@ -1,57 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:app="http://schemas.android.com/apk/res-auto"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:orientation="vertical">
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/coordinator_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/toolbar"
+    <com.mapbox.mapboxsdk.maps.MapView
+        android:id="@+id/mapView"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="@color/primary"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+        android:layout_height="match_parent"/>
 
-    </android.support.v7.widget.Toolbar>
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fabDebug"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|bottom"
+        android:layout_marginBottom="82dp"
+        android:layout_marginRight="@dimen/fab_margin"
+        android:src="@drawable/ic_refresh_24dp"
+        app:backgroundTint="@color/accent"
+        app:layout_anchorGravity="top"/>
 
-    <FrameLayout
-        android:id="@+id/content_frame"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        >
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fabStyles"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|bottom"
+        android:layout_margin="@dimen/fab_margin"
+        android:src="@drawable/ic_layers_24dp"
+        app:backgroundTint="@color/primary"/>
 
-        <android.support.design.widget.CoordinatorLayout
-            android:id="@+id/coordinator_layout"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <com.mapbox.mapboxsdk.maps.MapView
-                android:id="@+id/mapView"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
-
-            <android.support.design.widget.FloatingActionButton
-                android:id="@+id/fabDebug"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end|bottom"
-                android:layout_marginBottom="82dp"
-                android:layout_marginRight="@dimen/fab_margin"
-                android:src="@drawable/ic_refresh_24dp"
-                app:backgroundTint="@color/accent"
-                app:layout_anchorGravity="top" />
-
-            <android.support.design.widget.FloatingActionButton
-                android:id="@+id/fabStyles"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end|bottom"
-                android:layout_margin="@dimen/fab_margin"
-                android:src="@drawable/ic_layers_24dp"
-                app:backgroundTint="@color/primary" />
-
-        </android.support.design.widget.CoordinatorLayout>
-
-    </FrameLayout>
-
-</LinearLayout>
+</android.support.design.widget.CoordinatorLayout>

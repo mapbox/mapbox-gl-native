@@ -3,12 +3,7 @@ package com.mapbox.mapboxsdk.testapp.activity.customlayer;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-
-import timber.log.Timber;
-
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,6 +18,8 @@ import com.mapbox.mapboxsdk.style.layers.NoSuchLayerException;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.model.customlayer.ExampleCustomLayer;
 
+import timber.log.Timber;
+
 public class CustomLayerActivity extends AppCompatActivity {
 
   private MapboxMap mapboxMap;
@@ -35,8 +32,6 @@ public class CustomLayerActivity extends AppCompatActivity {
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_custom_layer);
-
-    setupActionBar();
 
     mapView = (MapView) findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
@@ -138,9 +133,6 @@ public class CustomLayerActivity extends AppCompatActivity {
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
     switch (item.getItemId()) {
-      case android.R.id.home:
-        onBackPressed();
-        return true;
       case R.id.action_update_layer:
         updateLayer();
         return true;
@@ -155,17 +147,6 @@ public class CustomLayerActivity extends AppCompatActivity {
         return true;
       default:
         return super.onOptionsItemSelected(item);
-    }
-  }
-
-  private void setupActionBar() {
-    Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-    setSupportActionBar(toolbar);
-
-    final ActionBar actionBar = getSupportActionBar();
-    if (actionBar != null) {
-      actionBar.setDisplayHomeAsUpEnabled(true);
-      actionBar.setDisplayShowHomeEnabled(true);
     }
   }
 }

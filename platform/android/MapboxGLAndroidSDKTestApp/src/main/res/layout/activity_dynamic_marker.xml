@@ -1,51 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/coordinator_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="@color/primary"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
-
-    <FrameLayout
-        android:id="@+id/content_frame"
+    <com.mapbox.mapboxsdk.maps.MapView
+        android:id="@id/mapView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/toolbar">
+        app:mapbox_cameraBearing="90"
+        app:mapbox_cameraTargetLat="51.506675"
+        app:mapbox_cameraTargetLng="-0.128699"
+        app:mapbox_cameraTilt="40"
+        app:mapbox_cameraZoom="10"
+        app:mapbox_uiCompassFadeFacingNorth="false"/>
 
-        <android.support.design.widget.CoordinatorLayout
-            android:id="@+id/coordinator_layout"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|bottom"
+        android:layout_margin="@dimen/fab_margin"
+        android:src="@drawable/ic_animate_coordinates"
+        app:backgroundTint="@color/white"/>
 
-            <com.mapbox.mapboxsdk.maps.MapView
-                android:id="@id/mapView"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                app:mapbox_cameraTargetLat="51.506675"
-                app:mapbox_cameraTargetLng="-0.128699"
-                app:mapbox_uiCompassFadeFacingNorth="false"
-                app:mapbox_cameraBearing="90"
-                app:mapbox_cameraTilt="40"
-                app:mapbox_cameraZoom="10" />
-
-            <android.support.design.widget.FloatingActionButton
-                android:id="@+id/fab"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end|bottom"
-                android:layout_margin="@dimen/fab_margin"
-                android:src="@drawable/ic_animate_coordinates"
-                app:backgroundTint="@color/white" />
-
-        </android.support.design.widget.CoordinatorLayout>
-
-    </FrameLayout>
-
-</RelativeLayout>
-
-
+</android.support.design.widget.CoordinatorLayout>

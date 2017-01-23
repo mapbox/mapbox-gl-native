@@ -1,25 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical">
-
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="@color/primary"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
     <com.mapbox.mapboxsdk.maps.MapView
         android:id="@id/mapView"
-        app:mapbox_cameraTargetLat="50.871062"
-        app:mapbox_cameraTargetLng="1.583210"
-        app:mapbox_cameraBearing="220"
-        app:mapbox_cameraZoom="10"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/toolbar" />
+        android:layout_below="@id/toolbar"
+        app:mapbox_cameraBearing="220"
+        app:mapbox_cameraTargetLat="50.871062"
+        app:mapbox_cameraTargetLng="1.583210"
+        app:mapbox_cameraZoom="10"/>
 
 </RelativeLayout>

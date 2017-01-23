@@ -13,13 +13,12 @@
 
     <!-- Annotations -->
     <string name="activity_add_bulk_markers">Add Markers In Bulk</string>
-    <string name="activity_animated_marker">Animated Marker (experimental)</string>
+    <string name="activity_animated_marker">Animated Markers</string>
     <string name="activity_dynamic_marker">Dynamic Marker</string>
     <string name="activity_polyline">Polyline</string>
     <string name="activity_polygon">Polygon</string>
     <string name="activity_press_for_marker">Press Map For Marker</string>
     <string name="activity_view_marker">View Marker API</string>
-    <string name="activity_view_marker_scale">Scaling in the View Marker API</string>
     <string name="activity_add_remove_markers">Add/Remove marker</string>
 
     <!-- InfoWindow-->
@@ -33,14 +32,6 @@
     <string name="activity_visible_coordinate_bounds">LatLngBounds Method</string>
     <string name="activity_camera_position">CameraPosition Method</string>
     <string name="activity_scroll_by">Scroll By Method</string>
-
-    <!-- API -->
-    <string name="activity_directions">Directions</string>
-    <string name="activity_geocoder">Geocoder</string>
-
-    <!-- Navigation -->
-    <string name="activity_location_picker">Location Picker</string>
-    <string name="activity_car_driving">Driving animation</string>
 
     <!-- Other -->
     <string name="activity_double_map">Double Map Activity</string>
@@ -98,19 +89,15 @@
     <string name="description_debug_mode">Debug Mode</string>
     <string name="description_offline">Offline Map example</string>
     <string name="description_update_metadata">Update metadata example</string>
-    <string name="description_animated_marker">Animate the position change of a Marker</string>
+    <string name="description_animated_marker">Animate the position change of a marker</string>
     <string name="description_polyline">Add a polyline to a map</string>
     <string name="description_polygon">Add a polygon to a map</string>
-    <string name="description_directions">Example with Directions API</string>
-    <string name="description_geocoder">Example with Geocoder API</string>
     <string name="description_scroll_by">Scroll with pixels in x,y direction</string>
     <string name="description_snapshot">Example to make a snapshot of the map</string>
     <string name="description_doublemap">2 maps in a view hierarchy</string>
     <string name="description_back_to_map">Restart map view after temporarily leaving to another activity</string>
     <string name="description_view_marker">Use an Android SDK View as marker</string>
-    <string name="description_view_marker_scale">Scale a View Marker</string>
     <string name="description_dynamic_info_window_adapter">Learn how to create a dynamic custom InfoWindow</string>
-    <string name="description_location_picker">Use a fixed Marker to select your location</string>
     <string name="description_viewpager">Use SupportMapFragments in a ViewPager</string>
     <string name="description_runtime_style">Adopt the map style on the fly</string>
     <string name="description_symbol_layer">Manipulate symbols at runtime</string>
@@ -123,7 +110,6 @@
     <string name="description_query_rendered_features_box_count">Count all rendered features in box</string>
     <string name="description_query_rendered_features_box_symbol_count">Count all rendered symbols in box</string>
     <string name="description_query_rendered_features_box_highlight">Hightligh buildings in box</string>
-    <string name="description_car_driving">MyLocationView follow map update example</string>
     <string name="description_simple_map">Shows a simple map</string>
     <string name="description_add_remove_markers">Based on zoom level</string>
     <string name="description_style_file">Use a local file as the style</string>
@@ -141,15 +127,12 @@
     <string name="category_annotation">Annotation</string>
     <string name="category_camera">Camera</string>
     <string name="category_custom_layer">Custom Layer</string>
-    <string name="category_directions">Directions</string>
     <string name="category_fragment">Fragment</string>
-    <string name="category_geocoding">Geocoding</string>
     <string name="category_imagegenerator">Image Generator</string>
-    <string name="category_infowindow">InfoWindow</string>
+    <string name="category_infowindow">Info Window</string>
     <string name="category_maplayout">Map Layout</string>
     <string name="category_offline">Offline</string>
     <string name="category_userlocation">User Location</string>
-    <string name="category_navigation">Navigation</string>
     <string name="category_style">Styling</string>
     <string name="category_features">Features</string>
 
