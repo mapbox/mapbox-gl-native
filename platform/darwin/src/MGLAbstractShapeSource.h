@@ -36,6 +36,16 @@ extern MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionClusterRadius;
 extern MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionMaximumZoomLevelForClustering;
 
 /**
+ An `NSNumber` object containing an integer; specifies the minimum zoom level at
+ which to create vector tiles. The default value is 0.
+
+ This attribute corresponds to the
+ <a href="https://www.mapbox.com/mapbox-gl-style-spec/#sources-geojson-minzoom"><code>minzoom</code></a>
+ source property in the Mapbox Style Specification.
+ */
+extern const MGLShapeSourceOption MGLGeoJSONSourceOptionMinimumZoomLevel;
+
+/**
  An `NSNumber` object containing an integer; specifies the maximum zoom level at
  which to create vector tiles. A greater value produces greater detail at high
  zoom levels. The default value is 18.
