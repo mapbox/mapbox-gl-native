@@ -186,6 +186,10 @@ final class Transform implements MapView.OnMapChangedListener {
     }
   }
 
+  void setZoom(double zoom) {
+    mapView.setZoom(zoom);
+  }
+
   // Direction
   double getBearing() {
     double direction = -mapView.getBearing();

@@ -1,6 +1,5 @@
 package com.mapbox.mapboxsdk.maps.widgets;
 
-import android.graphics.PointF;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.ColorInt;
 import android.support.annotation.IntRange;
@@ -289,8 +288,7 @@ public class MyLocationViewSettings {
 
   private void invalidateFocalPointForTracking(MyLocationView myLocationView) {
     if (!(myLocationView.getMyLocationTrackingMode() == MyLocationTracking.TRACKING_NONE)) {
-      focalPointChangeListener.onFocalPointChanged(new PointF(myLocationView.getCenterX(),
-        myLocationView.getCenterY()));
+      focalPointChangeListener.onFocalPointChanged(myLocationView.getCenter());
     } else {
       focalPointChangeListener.onFocalPointChanged(null);
     }

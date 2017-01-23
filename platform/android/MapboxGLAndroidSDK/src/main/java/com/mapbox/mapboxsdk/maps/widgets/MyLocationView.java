@@ -308,7 +308,7 @@ public class MyLocationView extends View {
   public void setTilt(@FloatRange(from = 0, to = 60.0f) double tilt) {
     this.tilt = tilt;
     if (myLocationTrackingMode == MyLocationTracking.TRACKING_FOLLOW) {
-      mapboxMap.getUiSettings().setFocalPoint(new PointF(getCenterX(), getCenterY()));
+      mapboxMap.getUiSettings().setFocalPoint(getCenter());
     }
     invalidate();
   }
@@ -529,11 +529,15 @@ public class MyLocationView extends View {
     directionAnimator.start();
   }
 
-  public float getCenterX() {
+  public PointF getCenter() {
+    return new PointF(getCenterX(), getCenterY());
+  }
+
+  private float getCenterX() {
     return (getX() + getMeasuredWidth()) / 2 + contentPaddingX - projectedX;
   }
 
-  public float getCenterY() {
+  private float getCenterY() {
     return (getY() + getMeasuredHeight()) / 2 + contentPaddingY - projectedY;
   }
 

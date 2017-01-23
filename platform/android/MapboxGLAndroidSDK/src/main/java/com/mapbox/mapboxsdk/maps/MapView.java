@@ -132,10 +132,13 @@ public class MapView extends FrameLayout {
     // callback for registering touch listeners
     RegisterTouchListener registerTouchListener = new RegisterTouchListener();
 
+    // callback for zooming in the camera
+    CameraZoomInvalidator zoomInvalidator = new CameraZoomInvalidator();
+
     // setup components for MapboxMap creation
     Projection proj = new Projection(nativeMapView);
     UiSettings uiSettings = new UiSettings(proj, focalPoint, compassView, attrView, view.findViewById(R.id.logoView));
-    TrackingSettings trackingSettings = new TrackingSettings(myLocationView, uiSettings, focalPoint);
+    TrackingSettings trackingSettings = new TrackingSettings(myLocationView, uiSettings, focalPoint, zoomInvalidator);
     MyLocationViewSettings myLocationViewSettings = new MyLocationViewSettings(myLocationView, proj, focalPoint);
     MarkerViewManager markerViewManager = new MarkerViewManager((ViewGroup) findViewById(R.id.markerViewContainer));
     AnnotationManager annotations = new AnnotationManager(nativeMapView, this, markerViewManager);
@@ -967,6 +970,16 @@ public class MapView extends FrameLayout {
     @Override
     public void onRegisterFlingListener(MapboxMap.OnFlingListener listener) {
       mapGestureDetector.setOnFlingListener(listener);
+    }
+  }
+
+  private class CameraZoomInvalidator implements TrackingSettings.CameraZoomInvalidator {
+    @Override
+    public void zoomTo(double zoomLevel) {
+      double currentZoomLevel = mapboxMap.getCameraPosition().zoom;
+      if (currentZoomLevel < zoomLevel) {
+        mapboxMap.getTransform().setZoom(zoomLevel);
+      }
     }
   }
 
