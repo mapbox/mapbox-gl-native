@@ -2,7 +2,6 @@ package com.mapbox.mapboxsdk.maps;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
-import android.graphics.PointF;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -95,8 +94,7 @@ public final class TrackingSettings {
 
     if (myLocationTrackingMode == MyLocationTracking.TRACKING_FOLLOW) {
       zoomInvalidator.zoomTo(2.0);
-      focalPointChangedListener.onFocalPointChanged(new PointF(myLocationView.getCenterX(),
-        myLocationView.getCenterY()));
+      focalPointChangedListener.onFocalPointChanged(myLocationView.getCenter());
     } else {
       focalPointChangedListener.onFocalPointChanged(null);
     }
