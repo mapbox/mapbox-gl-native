@@ -6,6 +6,8 @@
         <item name="colorPrimaryDark">@color/primaryDark</item>
         <item name="colorAccent">@color/accent</item>
         <item name="android:windowBackground">@color/white</item>
+        <item name="android:spinnerItemStyle">@style/MySpinnerStyle</item>
+        <item name="android:spinnerDropDownItemStyle">@style/SpinnerItem.DropDownItem</item>
     </style>
 
     <style name="NoActionBar" parent="Theme.AppCompat.NoActionBar">
@@ -23,6 +25,15 @@
 
     <style name="AppTheme.ActionBar" parent="AppTheme">
         <item name="windowActionBarOverlay">false</item>
+    </style>
+
+    <style name="MySpinnerStyle">
+        <item name="android:popupBackground">@android:color/background_light</item>
+        <item name="android:textColor">@android:color/background_light</item>
+    </style>
+
+    <style name="SpinnerItem.DropDownItem" parent="@android:style/Widget.DropDownItem.Spinner">
+        <item name="android:textColor">@android:color/background_light</item>
     </style>
 
     <style name="AppTheme" parent="AppBaseTheme" />
