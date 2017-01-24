@@ -83,6 +83,7 @@ macro(mbgl_platform_core)
 
         # Image handling
         PRIVATE platform/default/image.cpp
+        PRIVATE platform/default/png_writer.cpp
         PRIVATE platform/default/png_reader.cpp
         PRIVATE platform/default/jpeg_reader.cpp
 
