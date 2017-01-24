@@ -61,6 +61,11 @@ private:
     unsigned m_animationTicks = 0;
     unsigned m_frameDraws = 0;
 
+    QVariant m_symbolAnnotationId;
+    QVariant m_lineAnnotationId;
+    QVariant m_fillAnnotationId;
+    QVariant m_styleSourcedAnnotationId;
+
     bool m_sourceAdded = false;
 };
 

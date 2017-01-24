@@ -203,6 +203,61 @@ void MapWindow::keyPressEvent(QKeyEvent *ev)
             m_map->setLayoutProperty("road-label-small", "text-size", 30.0);
         }
         break;
+    case Qt::Key_1: {
+            if (m_symbolAnnotationId.isNull()) {
+                QMapbox::Coordinate coordinate = m_map->coordinate();
+                QMapbox::SymbolAnnotation symbol { coordinate, "default_marker" };
+                m_map->addAnnotationIcon("default_marker", QImage(":default_marker.svg"));
+                m_symbolAnnotationId = m_map->addAnnotation(QVariant::fromValue<QMapbox::SymbolAnnotation>(symbol));
+            } else {
+                m_map->removeAnnotation(m_symbolAnnotationId.toUInt());
+                m_symbolAnnotationId.clear();
+            }
+        }
+        break;
+    case Qt::Key_2: {
+            if (m_lineAnnotationId.isNull()) {
+                QMapbox::Coordinate topLeft     = m_map->coordinateForPixel({ 0, 0 });
+                QMapbox::Coordinate bottomRight = m_map->coordinateForPixel({ qreal(size().width()), qreal(size().height()) });
+                QMapbox::CoordinatesCollections geometry { { { topLeft, bottomRight } } };
+                QMapbox::LineAnnotation line { { QMapbox::ShapeAnnotationGeometry::Type::LineStringType, geometry }, 0.5f, 1.0f, Qt::red };
+                m_lineAnnotationId = m_map->addAnnotation(QVariant::fromValue<QMapbox::LineAnnotation>(line));
+            } else {
+                m_map->removeAnnotation(m_lineAnnotationId.toUInt());
+                m_lineAnnotationId.clear();
+            }
+        }
+        break;
+    case Qt::Key_3: {
+            if (m_fillAnnotationId.isNull()) {
+                QMapbox::Coordinate topLeft     = m_map->coordinateForPixel({ 0, 0 });
+                QMapbox::Coordinate topRight    = m_map->coordinateForPixel({ 0, qreal(size().height()) });
+                QMapbox::Coordinate bottomLeft  = m_map->coordinateForPixel({ qreal(size().width()), 0 });
+                QMapbox::Coordinate bottomRight = m_map->coordinateForPixel({ qreal(size().width()), qreal(size().height()) });
+                QMapbox::CoordinatesCollections geometry { { { bottomLeft, bottomRight, topRight, topLeft, bottomLeft } } };
+                QMapbox::FillAnnotation fill { { QMapbox::ShapeAnnotationGeometry::Type::PolygonType, geometry }, 0.5f, Qt::green, QVariant::fromValue<QColor>(QColor(Qt::black)) };
+                m_fillAnnotationId = m_map->addAnnotation(QVariant::fromValue<QMapbox::FillAnnotation>(fill));
+            } else {
+                m_map->removeAnnotation(m_fillAnnotationId.toUInt());
+                m_fillAnnotationId.clear();
+            }
+        }
+        break;
+    case Qt::Key_4: {
+            if (m_styleSourcedAnnotationId.isNull()) {
+                QMapbox::Coordinate topLeft     = m_map->coordinateForPixel({ 0, 0 });
+                QMapbox::Coordinate topRight    = m_map->coordinateForPixel({ 0, qreal(size().height()) });
+                QMapbox::Coordinate bottomLeft  = m_map->coordinateForPixel({ qreal(size().width()), 0 });
+                QMapbox::Coordinate bottomRight = m_map->coordinateForPixel({ qreal(size().width()), qreal(size().height()) });
+                QMapbox::CoordinatesCollections geometry { { { bottomLeft, bottomRight, topRight, topLeft, bottomLeft } } };
+                QMapbox::StyleSourcedAnnotation styleSourced { { QMapbox::ShapeAnnotationGeometry::Type::PolygonType, geometry }, "water" };
+                m_styleSourcedAnnotationId = m_map->addAnnotation(QVariant::fromValue<QMapbox::StyleSourcedAnnotation>(styleSourced));
+            } else {
+                m_map->removeAnnotation(m_styleSourcedAnnotationId.toUInt());
+                m_styleSourcedAnnotationId.clear();
+            }
+        }
+        break;
     case Qt::Key_Tab:
         m_map->cycleDebugOptions();
         break;
