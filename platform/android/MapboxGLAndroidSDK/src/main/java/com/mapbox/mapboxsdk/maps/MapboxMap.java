@@ -1174,6 +1174,19 @@ public class MapboxMap {
      */
     @UiThread
     public void updateMarker(@NonNull Marker updatedMarker) {
+        if(updatedMarker instanceof MarkerView){
+            // listen for a render event, so we can invalidate MarkerViews
+            mapView.addOnMapChangedListener(new MapView.OnMapChangedListener() {
+                @Override
+                public void onMapChanged(@MapView.MapChange int change) {
+                    if (change == MapView.DID_FINISH_RENDERING_FRAME_FULLY_RENDERED) {
+                        markerViewManager.invalidateViewMarkersInVisibleRegion();
+                        mapView.removeOnMapChangedListener(this);
+                    }
+                }
+            });
+        }
+
         mapView.updateMarker(updatedMarker);
 
         int index = annotations.indexOfKey(updatedMarker.getId());
