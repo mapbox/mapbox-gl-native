@@ -1,6 +1,8 @@
-# Integrating custom builds of the Mapbox iOS SDK into your application
+# Integrating the Mapbox iOS SDK into your application
 
-This document explains how to build a development version of Mapbox iOS SDK for use in your own Cocoa Touch application. To use a production-ready version of the SDK, see the [Mapbox iOS SDK homepage](https://mapbox.com/ios-sdk).
+This document explains how to build a _development_ version of Mapbox iOS SDK for use in your own Cocoa Touch application. To use a production-ready version of the SDK, see the [Mapbox iOS SDK homepage](https://mapbox.com/ios-sdk) for download links and installation instructions.
+
+## Building and integrating the Mapbox iOS SDK into your application
 
 ### Requirements
 
@@ -54,7 +56,7 @@ bash "${BUILT_PRODUCTS_DIR}/${FRAMEWORKS_FOLDER_PATH}/Mapbox.framework/strip-fra
 
 If your application targets iOS 7.x, you’ll need to install the static framework instead:
 
-1. Build from source manually, per above.
+1. Build from source manually, per above. _Note: Pre-compiled binaries are available on the [releases page](https://github.com/mapbox/mapbox-gl-native/releases) in `mapbox-ios-sdk-x.x.x.zip` under the `static` folder._
 
 1. Drag the Mapbox.bundle and Mapbox.framework from the `build/ios/pkg/static/` directory into the Project navigator. In the sheet that appears, make sure “Copy items if needed” is checked, then click Finish. Open the project editor and select your application target to verify that the following changes occurred automatically:
 
