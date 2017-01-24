@@ -17,6 +17,8 @@ HeadlessDisplay::HeadlessDisplay() {
     CGLPixelFormatAttribute attributes[] = {
         kCGLPFAOpenGLProfile,
         static_cast<CGLPixelFormatAttribute>(kCGLOGLPVersion_Legacy),
+        kCGLPFASupportsAutomaticGraphicsSwitching,
+        kCGLPFAAllowOfflineRenderers, // Allows using the integrated GPU
         static_cast<CGLPixelFormatAttribute>(0)
     };
 

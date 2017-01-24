@@ -32,6 +32,7 @@
         NSOpenGLPFADepthSize, 16,
         NSOpenGLPFAStencilSize, 8,
         NSOpenGLPFAScreenMask, mask,
+        NSOpenGLPFAAllowOfflineRenderers, // Allows using the integrated GPU
         0
     };
     return [[NSOpenGLPixelFormat alloc] initWithAttributes:pfas];
