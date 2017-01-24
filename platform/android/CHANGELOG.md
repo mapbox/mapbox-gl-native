@@ -35,6 +35,19 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 * Gesture handling bugs
   - Avoid calls to onFling when while pinch zooming [#7666](https://github.com/mapbox/mapbox-gl-native/issues/7666)
 
+## 4.2.2 - January 27, 2017
+
+Mapbox Android 4.2.2 builds further on v4.2.1 and resolves:
+* OnFling gesture improvements
+ - Improve fling by calculating animation time based on velocity [#7676](https://github.com/mapbox/mapbox-gl-native/pull/7676)
+ - Avoid triggering a fling after a scale gesture [#7675](https://github.com/mapbox/mapbox-gl-native/issues/7675)
+* Deselect marker on infowindow click [#7784](https://github.com/mapbox/mapbox-gl-native/issues/7784)
+* Update build tools to Bitrise supported one [#7729](https://github.com/mapbox/mapbox-gl-native/issues/7729)
+* Removal of redudant log statements in native_map_view.cpp [#7801](https://github.com/mapbox/mapbox-gl-native/issues/7801)
+* Invalidate markersviews when updating their position [#7794](https://github.com/mapbox/mapbox-gl-native/issues/7794)
+* Avoid clustering unclusterable GeoJSON [#7633](https://github.com/mapbox/mapbox-gl-native/pull/7633)
+* Prevent null pointer exceptions when receiving connecitivy change events [#6858](https://github.com/mapbox/mapbox-gl-native/issues/6858)
+
 ## 4.2.1 - December 22, 2016
 
 Mapbox Android 4.2.1 is a bugfix release build on top of 4.2.0 and resolves:
