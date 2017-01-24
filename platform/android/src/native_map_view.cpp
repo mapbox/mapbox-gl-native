@@ -18,6 +18,8 @@
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/image.hpp>
 
+#include "bitmap.hpp"
+
 namespace mbgl {
 namespace android {
 
@@ -172,14 +174,10 @@ void NativeMapView::render() {
 
          // take snapshot
          auto image = getContext().readFramebuffer<mbgl::PremultipliedImage>(getFramebufferSize());
-
-         // encode and convert to jbytes
-         std::string string = encodePNG(image);
-         jbyteArray arr = env->NewByteArray(string.length());
-         env->SetByteArrayRegion(arr,0,string.length(),(jbyte*)string.c_str());
+         auto bitmap = Bitmap::CreateBitmap(*env, std::move(image));
 
          // invoke Mapview#OnSnapshotReady
-         env->CallVoidMethod(obj, onSnapshotReadyId, arr);
+         env->CallVoidMethod(obj, onSnapshotReadyId, jni::Unwrap(*bitmap));
          if (env->ExceptionCheck()) {
              env->ExceptionDescribe();
          }

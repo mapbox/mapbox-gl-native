@@ -1604,18 +1604,8 @@ public final class MapboxMap {
    * @param bitmap   A pre-allocated bitmap.
    */
   @UiThread
-  public void snapshot(@NonNull SnapshotReadyCallback callback, @Nullable final Bitmap bitmap) {
-    nativeMapView.addSnapshotCallback(callback, bitmap);
-  }
-
-  /**
-   * Takes a snapshot of the map.
-   *
-   * @param callback Callback method invoked when the snapshot is taken.
-   */
-  @UiThread
   public void snapshot(@NonNull SnapshotReadyCallback callback) {
-    snapshot(callback, null);
+    nativeMapView.addSnapshotCallback(callback);
   }
 
   /**
