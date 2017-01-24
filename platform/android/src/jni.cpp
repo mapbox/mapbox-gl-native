@@ -11,6 +11,8 @@
 #include "jni.hpp"
 #include "java_types.hpp"
 #include "native_map_view.hpp"
+#include "bitmap.hpp"
+#include "bitmap_factory.hpp"
 #include "connectivity_listener.hpp"
 #include "style/layers/layers.hpp"
 #include "style/sources/sources.hpp"
@@ -1766,6 +1768,8 @@ void registerNatives(JavaVM *vm) {
     mbgl::android::RegisterNativeHTTPRequest(env);
 
     java::registerNatives(env);
+    Bitmap::registerNative(env);
+    BitmapFactory::registerNative(env);
     registerNativeLayers(env);
     registerNativeSources(env);
     ConnectivityListener::registerNative(env);
@@ -1841,7 +1845,7 @@ void registerNatives(JavaVM *vm) {
     onInvalidateId = &jni::GetMethodID(env, nativeMapViewClass, "onInvalidate", "()V");
     onMapChangedId = &jni::GetMethodID(env, nativeMapViewClass, "onMapChanged", "(I)V");
     onFpsChangedId = &jni::GetMethodID(env, nativeMapViewClass, "onFpsChanged", "(D)V");
-    onSnapshotReadyId = &jni::GetMethodID(env, nativeMapViewClass, "onSnapshotReady","([B)V");
+    onSnapshotReadyId = &jni::GetMethodID(env, nativeMapViewClass, "onSnapshotReady","(Landroid/graphics/Bitmap;)V");
 
     #define MAKE_NATIVE_METHOD(name, sig) jni::MakeNativeMethod<decltype(name), name>( #name, sig )
 
