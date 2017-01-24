@@ -641,6 +641,8 @@ public:
 
 - (void)reachabilityChanged:(NSNotification *)notification
 {
+    MGLAssertIsMainThread();
+
     MGLReachability *reachability = [notification object];
     if ( ! _isWaitingForRedundantReachableNotification && [reachability isReachable])
     {
@@ -707,6 +709,8 @@ public:
 
 - (void)didReceiveMemoryWarning
 {
+    MGLAssertIsMainThread();
+
     _mbglMap->onLowMemory();
 }
 
