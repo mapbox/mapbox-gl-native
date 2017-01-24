@@ -183,11 +183,8 @@ public:
 
     void addAnnotationIcon(const QString &name, const QImage &sprite);
 
-    QMapbox::AnnotationID addPointAnnotation(const QMapbox::PointAnnotation &);
-    QMapbox::AnnotationID addShapeAnnotation(const QMapbox::ShapeAnnotation &);
-
-    void updatePointAnnotation(QMapbox::AnnotationID, const QMapbox::PointAnnotation &);
-
+    QMapbox::AnnotationID addAnnotation(const QMapbox::Annotation &);
+    void updateAnnotation(QMapbox::AnnotationID, const QMapbox::Annotation &);
     void removeAnnotation(QMapbox::AnnotationID);
 
     void setLayoutProperty(const QString &layer, const QString &property, const QVariant &value);

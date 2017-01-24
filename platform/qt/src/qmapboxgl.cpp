@@ -17,8 +17,10 @@
 #include <mbgl/style/transition_options.hpp>
 #include <mbgl/sprite/sprite_image.hpp>
 #include <mbgl/storage/network_status.hpp>
+#include <mbgl/util/color.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/geo.hpp>
+#include <mbgl/util/geometry.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/traits.hpp>
 
@@ -84,20 +86,6 @@ namespace {
 QThreadStorage<std::shared_ptr<mbgl::util::RunLoop>> loop;
 
 // Conversion helper functions.
-
-auto fromQMapboxGLShapeAnnotation(const ShapeAnnotation &shapeAnnotation) {
-    const LineString &lineString = shapeAnnotation.first;
-    const QString &styleLayer = shapeAnnotation.second;
-
-    mbgl::LineString<double> mbglLineString;
-    mbglLineString.reserve(lineString.size());
-
-    for (const Coordinate &coordinate : lineString) {
-        mbglLineString.emplace_back(mbgl::Point<double> { coordinate.first, coordinate.second });
-    }
-
-    return mbgl::StyleSourcedAnnotation { std::move(mbglLineString), styleLayer.toStdString() };
-}
 
 auto fromQStringList(const QStringList &list)
 {
@@ -848,42 +836,114 @@ void QMapboxGL::setTransitionOptions(qint64 duration, qint64 delay) {
     d_ptr->mapObj->setTransitionOptions(mbgl::style::TransitionOptions{ convert(duration), convert(delay) });
 }
 
-mbgl::Annotation fromPointAnnotation(const PointAnnotation &pointAnnotation) {
-    const Coordinate &coordinate = pointAnnotation.first;
-    const QString &icon = pointAnnotation.second;
-    return mbgl::SymbolAnnotation { mbgl::Point<double> { coordinate.second, coordinate.first }, icon.toStdString() };
+mbgl::ShapeAnnotationGeometry asMapboxGLGeometry(const QMapbox::ShapeAnnotationGeometry &geometry) {
+    auto asMapboxGLLineString = [&](const QMapbox::Coordinates &lineString) {
+        mbgl::LineString<double> mbglLineString;
+        mbglLineString.reserve(lineString.size());
+        for (const auto &coordinate : lineString) {
+            mbglLineString.emplace_back(mbgl::Point<double> { coordinate.second, coordinate.first });
+        }
+        return mbglLineString;
+    };
+
+    auto asMapboxGLMultiLineString = [&](const QMapbox::CoordinatesCollection &multiLineString) {
+        mbgl::MultiLineString<double> mbglMultiLineString;
+        mbglMultiLineString.reserve(multiLineString.size());
+        for (const auto &lineString : multiLineString) {
+            mbglMultiLineString.emplace_back(std::forward<mbgl::LineString<double>>(asMapboxGLLineString(lineString)));
+        }
+        return mbglMultiLineString;
+    };
+
+    auto asMapboxGLPolygon = [&](const QMapbox::CoordinatesCollection &polygon) {
+        mbgl::Polygon<double> mbglPolygon;
+        mbglPolygon.reserve(polygon.size());
+        for (const auto &linearRing : polygon) {
+            mbgl::LinearRing<double> mbglLinearRing;
+            mbglLinearRing.reserve(linearRing.size());
+            for (const auto &coordinate: linearRing) {
+                mbglLinearRing.emplace_back(mbgl::Point<double> { coordinate.second, coordinate.first });
+            }
+            mbglPolygon.emplace_back(std::move(mbglLinearRing));
+        }
+        return mbglPolygon;
+    };
+
+    auto asMapboxGLMultiPolygon = [&](const QMapbox::CoordinatesCollections &multiPolygon) {
+        mbgl::MultiPolygon<double> mbglMultiPolygon;
+        mbglMultiPolygon.reserve(multiPolygon.size());
+        for (const auto &polygon : multiPolygon) {
+            mbglMultiPolygon.emplace_back(std::forward<mbgl::Polygon<double>>(asMapboxGLPolygon(polygon)));
+        }
+        return mbglMultiPolygon;
+    };
+
+    mbgl::ShapeAnnotationGeometry result;
+    switch (geometry.type) {
+    case QMapbox::ShapeAnnotationGeometry::LineStringType:
+        result = { asMapboxGLLineString(geometry.geometry.first().first()) };
+        break;
+    case QMapbox::ShapeAnnotationGeometry::PolygonType:
+        result = { asMapboxGLPolygon(geometry.geometry.first()) };
+        break;
+    case QMapbox::ShapeAnnotationGeometry::MultiLineStringType:
+        result = { asMapboxGLMultiLineString(geometry.geometry.first()) };
+        break;
+    case QMapbox::ShapeAnnotationGeometry::MultiPolygonType:
+        result = { asMapboxGLMultiPolygon(geometry.geometry) };
+        break;
+    }
+
+    return result;
+}
+
+mbgl::Annotation asMapboxGLAnnotation(const QMapbox::Annotation & annotation) {
+    if (annotation.canConvert<QMapbox::SymbolAnnotation>()) {
+        QMapbox::SymbolAnnotation symbolAnnotation = annotation.value<QMapbox::SymbolAnnotation>();
+        QMapbox::Coordinate& pair = symbolAnnotation.geometry;
+        return mbgl::SymbolAnnotation { mbgl::Point<double> { pair.second, pair.first }, symbolAnnotation.icon.toStdString() };
+    } else if (annotation.canConvert<QMapbox::LineAnnotation>()) {
+        QMapbox::LineAnnotation lineAnnotation = annotation.value<QMapbox::LineAnnotation>();
+        auto color = mbgl::Color::parse(lineAnnotation.color.name().toStdString());
+        return mbgl::LineAnnotation { asMapboxGLGeometry(lineAnnotation.geometry), lineAnnotation.opacity, lineAnnotation.width, { *color } };
+    } else if (annotation.canConvert<QMapbox::FillAnnotation>()) {
+        QMapbox::FillAnnotation fillAnnotation = annotation.value<QMapbox::FillAnnotation>();
+        auto color = mbgl::Color::parse(fillAnnotation.color.name().toStdString());
+        if (fillAnnotation.outlineColor.canConvert<QColor>()) {
+            auto outlineColor = mbgl::Color::parse(fillAnnotation.outlineColor.value<QColor>().name().toStdString());
+            return mbgl::FillAnnotation { asMapboxGLGeometry(fillAnnotation.geometry), fillAnnotation.opacity, { *color }, { *outlineColor } };
+        } else {
+            return mbgl::FillAnnotation { asMapboxGLGeometry(fillAnnotation.geometry), fillAnnotation.opacity, { *color }, {} };
+        }
+    } else if (annotation.canConvert<QMapbox::StyleSourcedAnnotation>()) {
+        QMapbox::StyleSourcedAnnotation styleSourcedAnnotation = annotation.value<QMapbox::StyleSourcedAnnotation>();
+        return mbgl::StyleSourcedAnnotation { asMapboxGLGeometry(styleSourcedAnnotation.geometry), styleSourcedAnnotation.layerID.toStdString() };
+    }
+
+    qWarning() << "Unable to convert annotation:" << annotation;
+    return {};
 }
 
 /*!
-    Adds a \a point annotation to the map.
+    Adds an \a annotation to the map.
 
     Returns the unique identifier for the new annotation.
 
     \sa addAnnotationIcon()
 */
-QMapbox::AnnotationID QMapboxGL::addPointAnnotation(const QMapbox::PointAnnotation &point)
+QMapbox::AnnotationID QMapboxGL::addAnnotation(const QMapbox::Annotation &annotation)
 {
-    return d_ptr->mapObj->addAnnotation(fromPointAnnotation(point));
+    return d_ptr->mapObj->addAnnotation(asMapboxGLAnnotation(annotation));
 }
 
 /*!
-    Updates an existing \a point annotation referred by \a id.
+    Updates an existing \a annotation referred by \a id.
 
     \sa addAnnotationIcon()
 */
-void QMapboxGL::updatePointAnnotation(QMapbox::AnnotationID id, const QMapbox::PointAnnotation &point)
+void QMapboxGL::updateAnnotation(QMapbox::AnnotationID id, const QMapbox::Annotation &annotation)
 {
-    d_ptr->mapObj->updateAnnotation(id, fromPointAnnotation(point));
-}
-
-/*!
-    Adds a \a shape annotation to the map.
-
-    Returns the unique identifier for the new annotation.
-*/
-QMapbox::AnnotationID QMapboxGL::addShapeAnnotation(const QMapbox::ShapeAnnotation &shape)
-{
-    return d_ptr->mapObj->addAnnotation(fromQMapboxGLShapeAnnotation(shape));
+    d_ptr->mapObj->updateAnnotation(id, asMapboxGLAnnotation(annotation));
 }
 
 /*!
@@ -1087,10 +1147,10 @@ void QMapboxGL::resize(const QSize& size, const QSize& framebufferSize)
     Adds an \a icon to the annotation icon pool. This can be later used by the annotation
     functions to shown any drawing on the map by referencing its \a name.
 
-    Unlike using addIcon() for runtime styling, annotations added with addPointAnnotation()
+    Unlike using addIcon() for runtime styling, annotations added with addAnnotation()
     will survive style changes.
 
-    \sa addPointAnnotation()
+    \sa addAnnotation()
 */
 void QMapboxGL::addAnnotationIcon(const QString &name, const QImage &icon)
 {
