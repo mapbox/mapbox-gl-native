@@ -283,8 +283,8 @@
     
     [tester.mapView twoFingerRotateAtPoint:tester.mapView.center angle:-45];
     
-    XCTAssertGreaterThanOrEqual(fabs(tester.mapView.direction - startAngle),
-                                -20,
+    XCTAssertGreaterThanOrEqual(fabs(startAngle - tester.mapView.direction),
+                                20,
                                 @"rotating map should change angle");
     XCTAssertGreaterThan(tester.mapView.camera.heading, 0, @"camera should not go negative");
 }
