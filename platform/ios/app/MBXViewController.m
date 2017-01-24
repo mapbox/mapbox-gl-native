@@ -1698,7 +1698,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     }
 }
 
-#pragma mark - MGLCustomVectorSourceDataSource
+#pragma mark - MGLComputedShapeSourceDataSource
 - (NSArray<id <MGLFeature>>*)featuresInCoordinateBounds:(MGLCoordinateBounds)bounds zoomLevel:(NSUInteger)zoom {
     double gridSpacing;
     if(zoom >= 13) {

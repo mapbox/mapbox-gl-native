@@ -38,6 +38,7 @@ NS_ASSUME_NONNULL_BEGIN
  A source for vector data that is fetched 1 tile at a time. Useful for sources that are
  too large to fit in memory, or are already divided into tiles, but not in Mapbox Vector Tile format.
  */
+MGL_EXPORT
 @interface MGLComputedShapeSource : MGLAbstractShapeSource
 
 /**

@@ -79,8 +79,18 @@ extern MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionBuffer;
  */
 extern MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionSimplificationTolerance;
 
+/**
+ `MGLAbstractShapeSource` is an abstract base class for map content sources that 
+ supply vector shapes to be shown on the map. A shape source is added to an
+ `MGLStyle` object along with an `MGLVectorStyleLayer` object. The vector style
+ layer defines the appearance of any content supplied by the shape source.
 
-
+ 
+ Do not create instances of this class directly, and do not create your own
+ subclasses of this class. Instead, create instances of `MGLShapeSource` or 
+ `MGLComputedShapeSource`.
+ */
+MGL_EXPORT
 @interface MGLAbstractShapeSource : MGLSource
 
 
