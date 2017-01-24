@@ -14,12 +14,15 @@ typedef NSString *MGLShapeSourceOption NS_STRING_ENUM;
 
 /**
  An `NSNumber` object containing a Boolean enabling or disabling clustering.
- If the `shape` property contains point shapes, setting this option to
+ If the `shape` property contains point shapes defined by a GeoJSON source, setting this option to
  `YES` clusters the points by radius into groups. The default value is `NO`.
 
  This attribute corresponds to the
  <a href="https://www.mapbox.com/mapbox-gl-style-spec/#sources-geojson-cluster"><code>cluster</code></a>
  source property in the Mapbox Style Specification.
+ 
+ 
+ @note Clustering is currently supported for shapes with a GeoJSON source.
  */
 extern const MGLShapeSourceOption MGLShapeSourceOptionClustered;
 
