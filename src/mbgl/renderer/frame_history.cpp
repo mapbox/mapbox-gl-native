@@ -8,7 +8,7 @@ namespace mbgl {
 
 FrameHistory::FrameHistory() {
     changeOpacities.fill(0);
-    std::fill(opacities.data.get(), opacities.data.get() + opacities.bytes(), 0);
+    std::fill(opacities.data(), opacities.data() + opacities.bytes(), 0);
 }
 
 void FrameHistory::record(const TimePoint& now, float zoom, const Duration& duration) {
@@ -19,7 +19,7 @@ void FrameHistory::record(const TimePoint& now, float zoom, const Duration& dura
         changeTimes.fill(now);
 
         for (int16_t z = 0; z <= zoomIndex; z++) {
-            opacities.data[z] = 255u;
+            opacities.data()[z] = 255u;
         }
         firstFrame = false;
     }
@@ -27,12 +27,12 @@ void FrameHistory::record(const TimePoint& now, float zoom, const Duration& dura
     if (zoomIndex < previousZoomIndex) {
         for (int16_t z = zoomIndex + 1; z <= previousZoomIndex; z++) {
             changeTimes[z] = now;
-            changeOpacities[z] = opacities.data[z];
+            changeOpacities[z] = opacities.data()[z];
         }
     } else {
         for (int16_t z = zoomIndex; z > previousZoomIndex; z--) {
             changeTimes[z] = now;
-            changeOpacities[z] = opacities.data[z];
+            changeOpacities[z] = opacities.data()[z];
         }
     }
 
@@ -40,9 +40,9 @@ void FrameHistory::record(const TimePoint& now, float zoom, const Duration& dura
         std::chrono::duration<float> timeDiff = now - changeTimes[z];
         int32_t opacityChange = (duration == Milliseconds(0) ? 1 : (timeDiff / duration)) * 255;
         if (z <= zoomIndex) {
-            opacities.data[z] = util::min(255, changeOpacities[z] + opacityChange);
+            opacities.data()[z] = util::min(255, changeOpacities[z] + opacityChange);
         } else {
-            opacities.data[z] = util::max(0, changeOpacities[z] - opacityChange);
+            opacities.data()[z] = util::max(0, changeOpacities[z] - opacityChange);
         }
     }
 

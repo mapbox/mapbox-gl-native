@@ -24,11 +24,11 @@ const static bool png_version_check __attribute__((unused)) = []() {
 
 namespace mbgl {
 
-std::string encodePNG(const PremultipliedImage& pre) {
-    PremultipliedImage copy(pre.size);
-    std::copy(pre.data.get(), pre.data.get() + pre.bytes(), copy.data.get());
-
-    UnassociatedImage src = util::unpremultiply(std::move(copy));
+std::string encodePNG(const PremultipliedImage& image) {
+    // Make a copy of the image data that we can premultiply.
+    auto data = std::make_unique<uint8_t[]>(image.bytes());
+    std::copy(image.data(), image.data() + image.bytes(), data.get());
+    util::unpremultiply(data.get(), image.bytes());
 
     png_voidp error_ptr = nullptr;
     png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, error_ptr, nullptr, nullptr);
@@ -42,7 +42,7 @@ std::string encodePNG(const PremultipliedImage& pre) {
         throw std::runtime_error("couldn't create info_ptr");
     }
 
-    png_set_IHDR(png_ptr, info_ptr, src.size.width, src.size.height, 8, PNG_COLOR_TYPE_RGB_ALPHA,
+    png_set_IHDR(png_ptr, info_ptr, image.size.width, image.size.height, 8, PNG_COLOR_TYPE_RGB_ALPHA,
                  PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
 
     jmp_buf *jmp_context = (jmp_buf *)png_get_error_ptr(png_ptr);
@@ -52,19 +52,19 @@ std::string encodePNG(const PremultipliedImage& pre) {
     }
 
     std::string result;
-    png_set_write_fn(png_ptr, &result, [](png_structp png_ptr_, png_bytep data, png_size_t length) {
+    png_set_write_fn(png_ptr, &result, [](png_structp png_ptr_, png_bytep data_, png_size_t length_) {
         std::string *out = static_cast<std::string *>(png_get_io_ptr(png_ptr_));
-        out->append(reinterpret_cast<char *>(data), length);
+        out->append(reinterpret_cast<char *>(data_), length_);
     }, nullptr);
 
     struct ptrs {
         ptrs(size_t count) : rows(new png_bytep[count]) {}
         ~ptrs() { delete[] rows; }
         png_bytep *rows = nullptr;
-    } pointers(src.size.height);
+    } pointers(image.size.height);
 
-    for (size_t i = 0; i < src.size.height; i++) {
-        pointers.rows[i] = src.data.get() + src.stride() * i;
+    for (size_t i = 0; i < image.size.height; i++) {
+        pointers.rows[i] = data.get() + image.stride() * i;
     }
 
     png_set_rows(png_ptr, info_ptr, pointers.rows);

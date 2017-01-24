@@ -34,8 +34,8 @@ SpriteImagePtr createSpriteImage(const PremultipliedImage& image,
 
     PremultipliedImage dstImage({ width, height });
 
-    auto srcData = reinterpret_cast<const uint32_t*>(image.data.get());
-    auto dstData = reinterpret_cast<uint32_t*>(dstImage.data.get());
+    auto srcData = reinterpret_cast<const uint32_t*>(image.data());
+    auto dstData = reinterpret_cast<uint32_t*>(dstImage.data());
 
     // Copy from the source image into our individual sprite image
     for (uint32_t y = 0; y < height; ++y) {

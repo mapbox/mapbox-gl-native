@@ -147,11 +147,11 @@ void checkImage(const std::string& base,
 
     ASSERT_EQ(expected.size, actual.size);
 
-    double pixels = mapbox::pixelmatch(actual.data.get(),
-                                       expected.data.get(),
+    double pixels = mapbox::pixelmatch(actual.data(),
+                                       expected.data(),
                                        expected.size.width,
                                        expected.size.height,
-                                       diff.data.get(),
+                                       diff.data(),
                                        pixelThreshold);
 
     EXPECT_LE(pixels / (expected.size.width * expected.size.height), imageThreshold);

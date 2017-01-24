@@ -137,7 +137,7 @@ TEST(SpriteAtlas, Updates) {
     // Update sprite
     PremultipliedImage image2({ 16, 12 });
     for (size_t i = 0; i < image2.bytes(); i++) {
-        image2.data.get()[i] = 255;
+        image2.data()[i] = 255;
     }
     auto newSprite = std::make_shared<SpriteImage>(std::move(image2), 1);
     atlas.setSprite("one", newSprite);
