@@ -217,4 +217,25 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
 
         XCTAssertNotNil(mapView.style?.layer(withIdentifier: "contour"))
     }
+    
+    func testMGLMapView() {
+        //#-example-code
+        #if os(macOS)
+            class MapClickGestureRecognizer: NSClickGestureRecognizer {
+                override func shouldRequireFailure(of otherGestureRecognizer: NSGestureRecognizer) -> Bool {
+                    return otherGestureRecognizer is NSClickGestureRecognizer
+                }
+            }
+        #else
+            let mapTapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(myCustomFunction))
+            for recognizer in mapView.gestureRecognizers! where recognizer is UITapGestureRecognizer {
+                mapTapGestureRecognizer.require(toFail: recognizer)
+            }
+            mapView.addGestureRecognizer(mapTapGestureRecognizer)
+        #endif
+        //#-end-example-code
+    }
+    
+    // For testMGLMapView().
+    func myCustomFunction() {}
 }

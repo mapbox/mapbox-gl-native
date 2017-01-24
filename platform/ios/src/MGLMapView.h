@@ -84,6 +84,7 @@ typedef NS_ENUM(NSUInteger, MGLAnnotationVerticalAlignment) {
  for recognizer in mapView.gestureRecognizers! where recognizer is UITapGestureRecognizer {
      mapTapGestureRecognizer.require(toFail: recognizer)
  }
+ mapView.addGestureRecognizer(mapTapGestureRecognizer)
  ```
  
  @note You are responsible for getting permission to use the map data and for

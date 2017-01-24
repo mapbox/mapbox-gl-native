@@ -108,10 +108,10 @@ function completeExamples(os) {
         }
         
         // Resolve conditional compilation blocks.
-        example = example.replace(/^(\s*)#if\s+os\((iOS|macOS)\)\n([^]*?)(?:^\1#else\n([^]*?))?^\1#endif\n/gm,
+        example = example.replace(/^(\s*)#if\s+os\((iOS|macOS)\)\n([^]*?)(?:^\1#else\n([^]*?))?^\1#endif\b\n?/gm,
                                   function (m, indentation, ifOs, ifCase, elseCase) {
           return (os === ifOs ? ifCase : elseCase).replace(new RegExp('^    ', 'gm'), '');
-        });
+        }).replace(/\n$/, '');
         
         // Insert the test method contents into the documentation comment just
         // above the substructure.
