@@ -2,7 +2,6 @@
 
 #import "MGLMapView_Private.h"
 #import "MGLSource_Private.h"
-#import "MGLFeature_Private.h"
 #import "MGLShape_Private.h"
 #import "MGLAbstractShapeSource_Private.h"
 #import "MGLGeometry_Private.h"

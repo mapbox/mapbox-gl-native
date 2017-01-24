@@ -63,9 +63,11 @@
 		556660D61E1D07E400E2C41B /* MGLVersionNumber.m in Sources */ = {isa = PBXBuildFile; fileRef = 556660D51E1D07E400E2C41B /* MGLVersionNumber.m */; };
 		558F18221D0B13B100123F46 /* libmbgl-loop.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 558F18211D0B13B000123F46 /* libmbgl-loop.a */; };
 		55D9B4B11D005D3900C1CCE2 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 55D9B4B01D005D3900C1CCE2 /* libz.tbd */; };
+		8877024C1E37977D0097E255 /* MGLComputedShapeSource.mm in Sources */ = {isa = PBXBuildFile; fileRef = 88B079B01E3794F300834FAB /* MGLComputedShapeSource.mm */; };
 		88B079AC1E37941300834FAB /* MGLAbstractShapeSource.mm in Sources */ = {isa = PBXBuildFile; fileRef = 88B079AA1E3793E000834FAB /* MGLAbstractShapeSource.mm */; };
 		88B079AD1E37942700834FAB /* MGLAbstractShapeSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 88B079A91E3793E000834FAB /* MGLAbstractShapeSource.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		88B079AE1E37943900834FAB /* MGLAbstractShapeSource_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 88B079A81E3793E000834FAB /* MGLAbstractShapeSource_Private.h */; };
+		88B079B21E37957000834FAB /* MGLComputedShapeSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 88B079AF1E3794F300834FAB /* MGLComputedShapeSource.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DA00FC8A1D5EEAC3009AABC8 /* MGLAttributionInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = DA00FC881D5EEAC3009AABC8 /* MGLAttributionInfo.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DA00FC8B1D5EEAC3009AABC8 /* MGLAttributionInfo.mm in Sources */ = {isa = PBXBuildFile; fileRef = DA00FC891D5EEAC3009AABC8 /* MGLAttributionInfo.mm */; };
 		DA0CD58E1CF56F5800A5F5A5 /* MGLFeatureTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = DA0CD58D1CF56F5800A5F5A5 /* MGLFeatureTests.mm */; };
@@ -322,6 +324,8 @@
 		88B079A81E3793E000834FAB /* MGLAbstractShapeSource_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLAbstractShapeSource_Private.h; sourceTree = "<group>"; };
 		88B079A91E3793E000834FAB /* MGLAbstractShapeSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLAbstractShapeSource.h; sourceTree = "<group>"; };
 		88B079AA1E3793E000834FAB /* MGLAbstractShapeSource.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLAbstractShapeSource.mm; sourceTree = "<group>"; };
+		88B079AF1E3794F300834FAB /* MGLComputedShapeSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLComputedShapeSource.h; sourceTree = "<group>"; };
+		88B079B01E3794F300834FAB /* MGLComputedShapeSource.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLComputedShapeSource.mm; sourceTree = "<group>"; };
 		DA00FC881D5EEAC3009AABC8 /* MGLAttributionInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLAttributionInfo.h; sourceTree = "<group>"; };
 		DA00FC891D5EEAC3009AABC8 /* MGLAttributionInfo.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLAttributionInfo.mm; sourceTree = "<group>"; };
 		DA0CD58D1CF56F5800A5F5A5 /* MGLFeatureTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLFeatureTests.mm; path = ../../darwin/test/MGLFeatureTests.mm; sourceTree = "<group>"; };
@@ -575,6 +579,8 @@
 		3527427E1D4C242B00A1ECE6 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
+				88B079AF1E3794F300834FAB /* MGLComputedShapeSource.h */,
+				88B079B01E3794F300834FAB /* MGLComputedShapeSource.mm */,
 				352742831D4C244700A1ECE6 /* MGLRasterSource.h */,
 				DA7DC9821DED647F0027472F /* MGLRasterSource_Private.h */,
 				352742841D4C244700A1ECE6 /* MGLRasterSource.mm */,
@@ -1051,6 +1057,7 @@
 				DA35A2CF1CCAAED300E826B2 /* NSValue+MGLAdditions.h in Headers */,
 				DAE6C3A61CC31E9400DB3429 /* MGLMapViewDelegate.h in Headers */,
 				DAE6C38B1CC31E2A00DB3429 /* MGLOfflinePack_Private.h in Headers */,
+				88B079B21E37957000834FAB /* MGLComputedShapeSource.h in Headers */,
 				DACC22141CF3D3E200D220D9 /* MGLFeature.h in Headers */,
 				3538AA231D542685008EC33D /* MGLStyleLayer.h in Headers */,
 				DAE6C35C1CC31E0400DB3429 /* MGLGeometry.h in Headers */,
@@ -1321,6 +1328,7 @@
 				35C5D8481D6DD66D00E95907 /* NSComparisonPredicate+MGLAdditions.mm in Sources */,
 				DA35A2AE1CCA091800E826B2 /* MGLCompassDirectionFormatter.m in Sources */,
 				DA8F258C1D51CA540010E6B5 /* MGLLineStyleLayer.mm in Sources */,
+				8877024C1E37977D0097E255 /* MGLComputedShapeSource.mm in Sources */,
 				408AA8691DAEEE5500022900 /* MGLPolyline+MGLAdditions.m in Sources */,
 				DA8F25941D51CA750010E6B5 /* MGLSymbolStyleLayer.mm in Sources */,
 				3529039C1D6C63B80002C7DF /* NSPredicate+MGLAdditions.mm in Sources */,
