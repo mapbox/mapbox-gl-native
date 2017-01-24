@@ -188,6 +188,10 @@
 		7E016D871D9E890300A29A21 /* MGLPolygon+MGLAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 7E016D831D9E890300A29A21 /* MGLPolygon+MGLAdditions.m */; };
 		920A3E5D1E6F995200C16EFC /* MGLSourceQueryTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 920A3E5C1E6F995200C16EFC /* MGLSourceQueryTests.m */; };
 		9221B2F11E6F9D1400A2385E /* query-style.json in Resources */ = {isa = PBXBuildFile; fileRef = 9221B2F01E6F9D1400A2385E /* query-style.json */; };
+		88B079A61E363A7200834FAB /* MGLAbstractShapeSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 88B079A51E36371A00834FAB /* MGLAbstractShapeSource.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		88B079A71E363A7300834FAB /* MGLAbstractShapeSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 88B079A51E36371A00834FAB /* MGLAbstractShapeSource.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		88DDFB2F1DCBC21700B53BDD /* MGLAbstractShapeSource.mm in Sources */ = {isa = PBXBuildFile; fileRef = 88DDFB2C1DCBC21700B53BDD /* MGLAbstractShapeSource.mm */; };
+		88DDFB301DCBC21700B53BDD /* MGLAbstractShapeSource.mm in Sources */ = {isa = PBXBuildFile; fileRef = 88DDFB2C1DCBC21700B53BDD /* MGLAbstractShapeSource.mm */; };
 		968F36B51E4D128D003A5522 /* MGLDistanceFormatter.h in Headers */ = {isa = PBXBuildFile; fileRef = 3557F7AE1E1D27D300CCA5E6 /* MGLDistanceFormatter.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		96E027231E57C76E004B8E66 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 96E027251E57C76E004B8E66 /* Localizable.strings */; };
 		DA00FC8E1D5EEB0D009AABC8 /* MGLAttributionInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = DA00FC8C1D5EEB0D009AABC8 /* MGLAttributionInfo.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -644,6 +648,9 @@
 		7E016D831D9E890300A29A21 /* MGLPolygon+MGLAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "MGLPolygon+MGLAdditions.m"; sourceTree = "<group>"; };
 		920A3E5C1E6F995200C16EFC /* MGLSourceQueryTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MGLSourceQueryTests.m; path = ../../darwin/test/MGLSourceQueryTests.m; sourceTree = "<group>"; };
 		9221B2F01E6F9D1400A2385E /* query-style.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = "query-style.json"; path = "../../darwin/test/query-style.json"; sourceTree = "<group>"; };
+		88B079A51E36371A00834FAB /* MGLAbstractShapeSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLAbstractShapeSource.h; sourceTree = "<group>"; };
+		88DDFB2C1DCBC21700B53BDD /* MGLAbstractShapeSource.mm */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLAbstractShapeSource.mm; sourceTree = "<group>"; tabWidth = 4; };
+		88DDFB311DCBC36E00B53BDD /* MGLAbstractShapeSource_Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLAbstractShapeSource_Private.h; sourceTree = "<group>"; };
 		9660916B1E5BBFD700A9A03B /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
 		9660916C1E5BBFD900A9A03B /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/Localizable.strings; sourceTree = "<group>"; };
 		9660916D1E5BBFDB00A9A03B /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -953,6 +960,9 @@
 				350098B91D480108004B2AF0 /* MGLVectorSource.h */,
 				DAF0D8121DFE0EC500B28378 /* MGLVectorSource_Private.h */,
 				350098BA1D480108004B2AF0 /* MGLVectorSource.mm */,
+				88DDFB311DCBC36E00B53BDD /* MGLAbstractShapeSource_Private.h */,
+				88B079A51E36371A00834FAB /* MGLAbstractShapeSource.h */,
+				88DDFB2C1DCBC21700B53BDD /* MGLAbstractShapeSource.mm */,
 			);
 			name = Sources;
 			sourceTree = "<group>";
@@ -1586,6 +1596,7 @@
 				DD0902AB1DB192A800C5BDCE /* MGLNetworkConfiguration.h in Headers */,
 				DA8848571CBAFB9800AB86E3 /* MGLMapboxEvents.h in Headers */,
 				DA8848311CBAFA6200AB86E3 /* NSString+MGLAdditions.h in Headers */,
+				88B079A61E363A7200834FAB /* MGLAbstractShapeSource.h in Headers */,
 				353933F81D3FB79F003F57D7 /* MGLLineStyleLayer.h in Headers */,
 				DAAF722D1DA903C700312FA4 /* MGLStyleValue_Private.h in Headers */,
 				DA8847F41CBAFA5100AB86E3 /* MGLOfflinePack.h in Headers */,
@@ -1706,6 +1717,7 @@
 				40F887711D7A1E59008ECB67 /* MGLShapeSource_Private.h in Headers */,
 				DABFB8631CBE99E500D62B32 /* MGLOfflineRegion.h in Headers */,
 				DA35A2B21CCA141D00E826B2 /* MGLCompassDirectionFormatter.h in Headers */,
+				88B079A71E363A7300834FAB /* MGLAbstractShapeSource.h in Headers */,
 				DAF0D8141DFE0EC500B28378 /* MGLVectorSource_Private.h in Headers */,
 				DABFB8731CBE9A9900D62B32 /* Mapbox.h in Headers */,
 				357FE2DE1E02D2B20068B753 /* NSCoder+MGLAdditions.h in Headers */,
@@ -2136,6 +2148,7 @@
 				DA8848321CBAFA6200AB86E3 /* NSString+MGLAdditions.m in Sources */,
 				408AA8581DAEDA1E00022900 /* NSDictionary+MGLAdditions.mm in Sources */,
 				DA35A2A11CC9E95F00E826B2 /* MGLCoordinateFormatter.m in Sources */,
+				88DDFB2F1DCBC21700B53BDD /* MGLAbstractShapeSource.mm in Sources */,
 				35305D481D22AA680007D005 /* NSData+MGLAdditions.mm in Sources */,
 				DA8848291CBAFA6200AB86E3 /* MGLStyle.mm in Sources */,
 				357FE2DF1E02D2B20068B753 /* NSCoder+MGLAdditions.mm in Sources */,
@@ -2213,6 +2226,7 @@
 				DA35A2CC1CCAAAD200E826B2 /* NSValue+MGLAdditions.m in Sources */,
 				408AA8591DAEDA1E00022900 /* NSDictionary+MGLAdditions.mm in Sources */,
 				DAA4E4281CBB730400178DFB /* MGLTypes.m in Sources */,
+				88DDFB301DCBC21700B53BDD /* MGLAbstractShapeSource.mm in Sources */,
 				DA35A2A21CC9E95F00E826B2 /* MGLCoordinateFormatter.m in Sources */,
 				35305D491D22AA680007D005 /* NSData+MGLAdditions.mm in Sources */,
 				357FE2E01E02D2B20068B753 /* NSCoder+MGLAdditions.mm in Sources */,

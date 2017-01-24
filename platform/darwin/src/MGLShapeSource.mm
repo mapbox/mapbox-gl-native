@@ -1,4 +1,5 @@
 #import "MGLShapeSource_Private.h"
+#import "MGLAbstractShapeSource_Private.h"
 
 #import "MGLMapView_Private.h"
 #import "MGLSource_Private.h"
@@ -11,12 +12,7 @@
 #include <mbgl/map/map.hpp>
 #include <mbgl/style/sources/geojson_source.hpp>
 
-const MGLShapeSourceOption MGLShapeSourceOptionClustered = @"MGLShapeSourceOptionClustered";
-const MGLShapeSourceOption MGLShapeSourceOptionClusterRadius = @"MGLShapeSourceOptionClusterRadius";
-const MGLShapeSourceOption MGLShapeSourceOptionMaximumZoomLevelForClustering = @"MGLShapeSourceOptionMaximumZoomLevelForClustering";
-const MGLShapeSourceOption MGLShapeSourceOptionMaximumZoomLevel = @"MGLShapeSourceOptionMaximumZoomLevel";
-const MGLShapeSourceOption MGLShapeSourceOptionBuffer = @"MGLShapeSourceOptionBuffer";
-const MGLShapeSourceOption MGLShapeSourceOptionSimplificationTolerance = @"MGLShapeSourceOptionSimplificationTolerance";
+
 
 @interface MGLShapeSource ()
 
@@ -148,57 +144,3 @@ const MGLShapeSourceOption MGLShapeSourceOptionSimplificationTolerance = @"MGLSh
 }
 
 @end
-
-mbgl::style::GeoJSONOptions MGLGeoJSONOptionsFromDictionary(NS_DICTIONARY_OF(MGLShapeSourceOption, id) *options) {
-    auto geoJSONOptions = mbgl::style::GeoJSONOptions();
-
-    if (NSNumber *value = options[MGLShapeSourceOptionMaximumZoomLevel]) {
-        if (![value isKindOfClass:[NSNumber class]]) {
-            [NSException raise:NSInvalidArgumentException
-                        format:@"MGLShapeSourceOptionMaximumZoomLevel must be an NSNumber."];
-        }
-        geoJSONOptions.maxzoom = value.integerValue;
-    }
-
-    if (NSNumber *value = options[MGLShapeSourceOptionBuffer]) {
-        if (![value isKindOfClass:[NSNumber class]]) {
-            [NSException raise:NSInvalidArgumentException
-                        format:@"MGLShapeSourceOptionBuffer must be an NSNumber."];
-        }
-        geoJSONOptions.buffer = value.integerValue;
-    }
-
-    if (NSNumber *value = options[MGLShapeSourceOptionSimplificationTolerance]) {
-        if (![value isKindOfClass:[NSNumber class]]) {
-            [NSException raise:NSInvalidArgumentException
-                        format:@"MGLShapeSourceOptionSimplificationTolerance must be an NSNumber."];
-        }
-        geoJSONOptions.tolerance = value.doubleValue;
-    }
-
-    if (NSNumber *value = options[MGLShapeSourceOptionClusterRadius]) {
-        if (![value isKindOfClass:[NSNumber class]]) {
-            [NSException raise:NSInvalidArgumentException
-                        format:@"MGLShapeSourceOptionClusterRadius must be an NSNumber."];
-        }
-        geoJSONOptions.clusterRadius = value.integerValue;
-    }
-
-    if (NSNumber *value = options[MGLShapeSourceOptionMaximumZoomLevelForClustering]) {
-        if (![value isKindOfClass:[NSNumber class]]) {
-            [NSException raise:NSInvalidArgumentException
-                        format:@"MGLShapeSourceOptionMaximumZoomLevelForClustering must be an NSNumber."];
-        }
-        geoJSONOptions.clusterMaxZoom = value.integerValue;
-    }
-
-    if (NSNumber *value = options[MGLShapeSourceOptionClustered]) {
-        if (![value isKindOfClass:[NSNumber class]]) {
-            [NSException raise:NSInvalidArgumentException
-                        format:@"MGLShapeSourceOptionClustered must be an NSNumber."];
-        }
-        geoJSONOptions.cluster = value.boolValue;
-    }
-
-    return geoJSONOptions;
-}

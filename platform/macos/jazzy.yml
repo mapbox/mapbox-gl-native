@@ -59,6 +59,7 @@ custom_categories:
     children:
       - MGLSource
       - MGLTileSource
+      - MGLAbstractShapeSource
       - MGLShapeSource
       - MGLRasterSource
       - MGLVectorSource

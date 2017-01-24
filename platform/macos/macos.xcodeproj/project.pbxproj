@@ -72,6 +72,9 @@
 		55E2AD111E5B0A6900E8C587 /* MGLOfflineStorageTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 55E2AD101E5B0A6900E8C587 /* MGLOfflineStorageTests.mm */; };
 		920A3E591E6F859D00C16EFC /* MGLSourceQueryTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 920A3E581E6F859D00C16EFC /* MGLSourceQueryTests.m */; };
 		920A3E5B1E6F8E0700C16EFC /* query-style.json in Resources */ = {isa = PBXBuildFile; fileRef = 920A3E5A1E6F8E0700C16EFC /* query-style.json */; };
+		88B079AC1E37941300834FAB /* MGLAbstractShapeSource.mm in Sources */ = {isa = PBXBuildFile; fileRef = 88B079AA1E3793E000834FAB /* MGLAbstractShapeSource.mm */; };
+		88B079AD1E37942700834FAB /* MGLAbstractShapeSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 88B079A91E3793E000834FAB /* MGLAbstractShapeSource.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		88B079AE1E37943900834FAB /* MGLAbstractShapeSource_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 88B079A81E3793E000834FAB /* MGLAbstractShapeSource_Private.h */; };
 		96E027311E57C9A7004B8E66 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 96E027331E57C9A7004B8E66 /* Localizable.strings */; };
 		DA00FC8A1D5EEAC3009AABC8 /* MGLAttributionInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = DA00FC881D5EEAC3009AABC8 /* MGLAttributionInfo.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DA00FC8B1D5EEAC3009AABC8 /* MGLAttributionInfo.mm in Sources */ = {isa = PBXBuildFile; fileRef = DA00FC891D5EEAC3009AABC8 /* MGLAttributionInfo.mm */; };
@@ -334,6 +337,9 @@
 		55FE0E8D1D100A0900FD240B /* config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = config.xcconfig; path = ../../build/macos/config.xcconfig; sourceTree = "<group>"; };
 		920A3E581E6F859D00C16EFC /* MGLSourceQueryTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLSourceQueryTests.m; sourceTree = "<group>"; };
 		920A3E5A1E6F8E0700C16EFC /* query-style.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = "query-style.json"; path = "../../darwin/test/query-style.json"; sourceTree = "<group>"; };
+		88B079A81E3793E000834FAB /* MGLAbstractShapeSource_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLAbstractShapeSource_Private.h; sourceTree = "<group>"; };
+		88B079A91E3793E000834FAB /* MGLAbstractShapeSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLAbstractShapeSource.h; sourceTree = "<group>"; };
+		88B079AA1E3793E000834FAB /* MGLAbstractShapeSource.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLAbstractShapeSource.mm; sourceTree = "<group>"; };
 		966091701E5BBFF700A9A03B /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
 		966091711E5BBFF900A9A03B /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/Localizable.strings; sourceTree = "<group>"; };
 		966091721E5BBFFA00A9A03B /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -626,6 +632,9 @@
 				DA7DC9821DED647F0027472F /* MGLRasterSource_Private.h */,
 				352742841D4C244700A1ECE6 /* MGLRasterSource.mm */,
 				352742871D4C245800A1ECE6 /* MGLShapeSource.h */,
+				88B079A81E3793E000834FAB /* MGLAbstractShapeSource_Private.h */,
+				88B079A91E3793E000834FAB /* MGLAbstractShapeSource.h */,
+				88B079AA1E3793E000834FAB /* MGLAbstractShapeSource.mm */,
 				DA87A99B1DC9D8DD00810D09 /* MGLShapeSource_Private.h */,
 				352742881D4C245800A1ECE6 /* MGLShapeSource.mm */,
 				3527427F1D4C243B00A1ECE6 /* MGLSource.h */,
@@ -1056,6 +1065,7 @@
 				35C5D8471D6DD66D00E95907 /* NSComparisonPredicate+MGLAdditions.h in Headers */,
 				DAE6C3A31CC31E9400DB3429 /* MGLAnnotationImage.h in Headers */,
 				DAE6C3A41CC31E9400DB3429 /* MGLMapView.h in Headers */,
+				88B079AE1E37943900834FAB /* MGLAbstractShapeSource_Private.h in Headers */,
 				355BA4ED1D41633E00CCC6D5 /* NSColor+MGLAdditions.h in Headers */,
 				DAE6C3611CC31E0400DB3429 /* MGLOfflineStorage.h in Headers */,
 				352742781D4C220900A1ECE6 /* MGLStyleValue.h in Headers */,
@@ -1124,6 +1134,7 @@
 				DAE6C3891CC31E2A00DB3429 /* MGLMultiPoint_Private.h in Headers */,
 				DAE6C3A51CC31E9400DB3429 /* MGLMapView+IBAdditions.h in Headers */,
 				DA35A2AD1CCA091800E826B2 /* MGLCompassDirectionFormatter.h in Headers */,
+				88B079AD1E37942700834FAB /* MGLAbstractShapeSource.h in Headers */,
 				352742851D4C244700A1ECE6 /* MGLRasterSource.h in Headers */,
 				408AA85B1DAEECFE00022900 /* MGLShape_Private.h in Headers */,
 				DACC22181CF3D4F700D220D9 /* MGLFeature_Private.h in Headers */,
@@ -1386,6 +1397,7 @@
 				DAE6C3B51CC31EF300DB3429 /* MGLCompassCell.m in Sources */,
 				DA8F25901D51CA600010E6B5 /* MGLRasterStyleLayer.mm in Sources */,
 				DAD165751CF4CD7A001FF4B9 /* MGLShapeCollection.mm in Sources */,
+				88B079AC1E37941300834FAB /* MGLAbstractShapeSource.mm in Sources */,
 				35C5D8481D6DD66D00E95907 /* NSComparisonPredicate+MGLAdditions.mm in Sources */,
 				DA35A2AE1CCA091800E826B2 /* MGLCompassDirectionFormatter.m in Sources */,
 				DA8F258C1D51CA540010E6B5 /* MGLLineStyleLayer.mm in Sources */,
