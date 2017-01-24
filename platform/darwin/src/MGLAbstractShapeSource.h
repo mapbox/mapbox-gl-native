@@ -43,7 +43,7 @@ extern MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionMaximumZoomLeve
  <a href="https://www.mapbox.com/mapbox-gl-style-spec/#sources-geojson-minzoom"><code>minzoom</code></a>
  source property in the Mapbox Style Specification.
  */
-extern const MGLShapeSourceOption MGLGeoJSONSourceOptionMinimumZoomLevel;
+extern const MGLShapeSourceOption MGLShapeSourceOptionMinimumZoomLevel;
 
 /**
  An `NSNumber` object containing an integer; specifies the maximum zoom level at
