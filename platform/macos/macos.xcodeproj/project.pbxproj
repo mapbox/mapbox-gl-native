@@ -72,9 +72,12 @@
 		55E2AD111E5B0A6900E8C587 /* MGLOfflineStorageTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 55E2AD101E5B0A6900E8C587 /* MGLOfflineStorageTests.mm */; };
 		920A3E591E6F859D00C16EFC /* MGLSourceQueryTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 920A3E581E6F859D00C16EFC /* MGLSourceQueryTests.m */; };
 		920A3E5B1E6F8E0700C16EFC /* query-style.json in Resources */ = {isa = PBXBuildFile; fileRef = 920A3E5A1E6F8E0700C16EFC /* query-style.json */; };
+		8877024C1E37977D0097E255 /* MGLComputedShapeSource.mm in Sources */ = {isa = PBXBuildFile; fileRef = 88B079B01E3794F300834FAB /* MGLComputedShapeSource.mm */; };
 		88B079AC1E37941300834FAB /* MGLAbstractShapeSource.mm in Sources */ = {isa = PBXBuildFile; fileRef = 88B079AA1E3793E000834FAB /* MGLAbstractShapeSource.mm */; };
 		88B079AD1E37942700834FAB /* MGLAbstractShapeSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 88B079A91E3793E000834FAB /* MGLAbstractShapeSource.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		88B079AE1E37943900834FAB /* MGLAbstractShapeSource_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 88B079A81E3793E000834FAB /* MGLAbstractShapeSource_Private.h */; };
+		88B079B21E37957000834FAB /* MGLComputedShapeSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 88B079AF1E3794F300834FAB /* MGLComputedShapeSource.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		88EF0E6F1E6777ED008A6617 /* MGLComputedShapeSourceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 88EF0E6D1E6777E8008A6617 /* MGLComputedShapeSourceTests.m */; };
 		96E027311E57C9A7004B8E66 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 96E027331E57C9A7004B8E66 /* Localizable.strings */; };
 		DA00FC8A1D5EEAC3009AABC8 /* MGLAttributionInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = DA00FC881D5EEAC3009AABC8 /* MGLAttributionInfo.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DA00FC8B1D5EEAC3009AABC8 /* MGLAttributionInfo.mm in Sources */ = {isa = PBXBuildFile; fileRef = DA00FC891D5EEAC3009AABC8 /* MGLAttributionInfo.mm */; };
@@ -340,6 +343,9 @@
 		88B079A81E3793E000834FAB /* MGLAbstractShapeSource_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLAbstractShapeSource_Private.h; sourceTree = "<group>"; };
 		88B079A91E3793E000834FAB /* MGLAbstractShapeSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLAbstractShapeSource.h; sourceTree = "<group>"; };
 		88B079AA1E3793E000834FAB /* MGLAbstractShapeSource.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLAbstractShapeSource.mm; sourceTree = "<group>"; };
+		88B079AF1E3794F300834FAB /* MGLComputedShapeSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLComputedShapeSource.h; sourceTree = "<group>"; };
+		88B079B01E3794F300834FAB /* MGLComputedShapeSource.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLComputedShapeSource.mm; sourceTree = "<group>"; };
+		88EF0E6D1E6777E8008A6617 /* MGLComputedShapeSourceTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLComputedShapeSourceTests.m; sourceTree = "<group>"; };
 		966091701E5BBFF700A9A03B /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
 		966091711E5BBFF900A9A03B /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/Localizable.strings; sourceTree = "<group>"; };
 		966091721E5BBFFA00A9A03B /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -628,6 +634,8 @@
 		3527427E1D4C242B00A1ECE6 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
+				88B079AF1E3794F300834FAB /* MGLComputedShapeSource.h */,
+				88B079B01E3794F300834FAB /* MGLComputedShapeSource.mm */,
 				352742831D4C244700A1ECE6 /* MGLRasterSource.h */,
 				DA7DC9821DED647F0027472F /* MGLRasterSource_Private.h */,
 				352742841D4C244700A1ECE6 /* MGLRasterSource.mm */,
@@ -735,6 +743,7 @@
 			isa = PBXGroup;
 			children = (
 				DA87A9961DC9D88400810D09 /* MGLShapeSourceTests.mm */,
+				88EF0E6D1E6777E8008A6617 /* MGLComputedShapeSourceTests.m */,
 				DA87A9971DC9D88400810D09 /* MGLTileSetTests.mm */,
 				920A3E581E6F859D00C16EFC /* MGLSourceQueryTests.m */,
 			);
@@ -1116,6 +1125,7 @@
 				DAE6C3A61CC31E9400DB3429 /* MGLMapViewDelegate.h in Headers */,
 				DAE6C38B1CC31E2A00DB3429 /* MGLOfflinePack_Private.h in Headers */,
 				558DE7A61E56161C00C7916D /* MGLFoundation_Private.h in Headers */,
+				88B079B21E37957000834FAB /* MGLComputedShapeSource.h in Headers */,
 				DACC22141CF3D3E200D220D9 /* MGLFeature.h in Headers */,
 				3538AA231D542685008EC33D /* MGLStyleLayer.h in Headers */,
 				DAE6C35C1CC31E0400DB3429 /* MGLGeometry.h in Headers */,
@@ -1401,6 +1411,7 @@
 				35C5D8481D6DD66D00E95907 /* NSComparisonPredicate+MGLAdditions.mm in Sources */,
 				DA35A2AE1CCA091800E826B2 /* MGLCompassDirectionFormatter.m in Sources */,
 				DA8F258C1D51CA540010E6B5 /* MGLLineStyleLayer.mm in Sources */,
+				8877024C1E37977D0097E255 /* MGLComputedShapeSource.mm in Sources */,
 				408AA8691DAEEE5500022900 /* MGLPolyline+MGLAdditions.m in Sources */,
 				DA8F25941D51CA750010E6B5 /* MGLSymbolStyleLayer.mm in Sources */,
 				3529039C1D6C63B80002C7DF /* NSPredicate+MGLAdditions.mm in Sources */,
@@ -1424,6 +1435,7 @@
 				DA87A9A41DCACC5000810D09 /* MGLSymbolStyleLayerTests.mm in Sources */,
 				40E1601D1DF217D6005EA6D9 /* MGLStyleLayerTests.m in Sources */,
 				DA87A9A61DCACC5000810D09 /* MGLCircleStyleLayerTests.mm in Sources */,
+				88EF0E6F1E6777ED008A6617 /* MGLComputedShapeSourceTests.m in Sources */,
 				DA87A99E1DC9DC2100810D09 /* MGLPredicateTests.mm in Sources */,
 				DD58A4C91D822C6700E1F038 /* MGLExpressionTests.mm in Sources */,
 				DA87A9A71DCACC5000810D09 /* MGLBackgroundStyleLayerTests.mm in Sources */,

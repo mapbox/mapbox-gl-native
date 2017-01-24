@@ -3,6 +3,7 @@
 ## master
 
 * The error passed into `-[MGLMapViewDelegate mapViewDidFailLoadingMap:withError:]` now includes a more specific description and failure reason. ([#8418](https://github.com/mapbox/mapbox-gl-native/pull/8418))
+* Added `MGLComputedShapeSource` source class that allows applications to supply vector data on a per-tile basis.
 
 ## 0.4.0
 
