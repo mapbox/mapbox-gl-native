@@ -29,8 +29,9 @@ underneath.
 The user location annotation view, the attribution button, any buttons in
 callout views, and any items in the navigation bar are influenced by your
 application’s tint color, so choose a tint color that constrasts well with your
-map style. If you intend your style to be used in the dark, consider the impact
-that Night Shift may have on your style’s colors.
+map style.
+If you intend your style to be used in the dark, consider the impact that Night
+Shift may have on your style’s colors.
 
 ### Typography and graphics
 

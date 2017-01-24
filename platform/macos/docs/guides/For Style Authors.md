@@ -26,6 +26,8 @@ style is present. Standard user interface elements such as toolbars, sidebars,
 and sheets often overlap the map view with a translucent, blurred background, so
 make sure the contents of these elements remain legible with the map view
 underneath.
+If you intend your style to be used in the dark, consider the impact that Night
+Shift may have on your style’s colors.
 
 ### Typography and graphics
 
