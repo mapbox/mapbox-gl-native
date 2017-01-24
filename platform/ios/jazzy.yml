@@ -71,7 +71,9 @@ custom_categories:
     children:
       - MGLSource
       - MGLTileSource
+      - MGLAbstractShapeSource
       - MGLShapeSource
+      - MGLComputedShapeSource
       - MGLRasterSource
       - MGLVectorSource
   - name: Style Layers

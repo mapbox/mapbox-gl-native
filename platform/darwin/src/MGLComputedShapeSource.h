@@ -10,7 +10,7 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol MGLFeature;
 
 /**
- Data source for `MGLCustomVectorSource`. This protocol defines two optionak methods for fetching
+ Data source for `MGLComputedShapeSource`. This protocol defines two optionak methods for fetching
  data, one based on tile coordinates, and one based on a bounding box. Clases that implement this
  protocol must implement one, and only one of the methods.
  */
@@ -63,7 +63,7 @@ MGL_EXPORT
 - (void)reloadData;
 
 /**
- An object that implements the `MGLCustomVectorSourceDataSource` protocol that will be queried for tile data.
+ An object that implements the `MGLComputedShapeSource` protocol that will be queried for tile data.
  */
 @property (nonatomic, weak, nullable) id<MGLComputedShapeSourceDataSource> dataSource;
 

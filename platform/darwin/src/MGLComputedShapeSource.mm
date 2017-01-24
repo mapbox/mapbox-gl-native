@@ -67,9 +67,9 @@
     self.dataSourceImplementsFeaturesForBounds = [dataSource respondsToSelector:@selector(featuresInCoordinateBounds:zoomLevel:)];
     
     if(!self.dataSourceImplementsFeaturesForBounds && !self.dataSourceImplementsFeaturesForTile) {
-        [NSException raise:@"Invalid Datasource" format:@"Datasource does not implement any MGLCustomVectorSourceDataSource methods"];
+        [NSException raise:@"Invalid Datasource" format:@"Datasource does not implement any MGLComputedShapeSourceDataSource methods"];
     } else if(self.dataSourceImplementsFeaturesForBounds && self.dataSourceImplementsFeaturesForTile) {
-        [NSException raise:@"Invalid Datasource" format:@"Datasource implements multiple MGLCustomVectorSourceDataSource methods"];
+        [NSException raise:@"Invalid Datasource" format:@"Datasource implements multiple MGLComputedShapeSourceDataSource methods"];
     }
 
     _dataSource = dataSource;
