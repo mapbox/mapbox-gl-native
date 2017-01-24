@@ -21,6 +21,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * Fixed incorrect interpolation of style functions in Boolean-typed style attributes. ([#7526](https://github.com/mapbox/mapbox-gl-native/pull/7526))
 * Removed support for the `ref` property in layers in style JSON files. ([#7586](https://github.com/mapbox/mapbox-gl-native/pull/7586))
 * Fixed an issue that collapsed consecutive newlines within text labels. ([#7446](https://github.com/mapbox/mapbox-gl-native/pull/7446))
+* Added `MGLComputedShapeSource` source class that allows applications to supply vector data on a per-tile basis.
 
 ### Other changes
 
