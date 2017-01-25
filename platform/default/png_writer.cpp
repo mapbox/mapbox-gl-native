@@ -39,12 +39,8 @@ namespace mbgl {
 
 // Encode PNGs without libpng.
 std::string encodePNG(const PremultipliedImage& pre) {
-    const UnassociatedImage src = [&pre] {
-        // Make copy of the image so that we can unpremultiply it.
-        PremultipliedImage copy(pre.size);
-        std::copy(pre.data.get(), pre.data.get() + pre.bytes(), copy.data.get());
-        return util::unpremultiply(std::move(copy));
-    }();
+    // Make copy of the image so that we can unpremultiply it.
+    const auto src = util::unpremultiply(pre.clone());
 
     // PNG magic bytes
     const char preamble[8] = { char(0x89), 'P', 'N', 'G', '\r', '\n', 0x1a, '\n' };

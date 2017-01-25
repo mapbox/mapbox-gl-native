@@ -48,6 +48,13 @@ public:
         return size && data.get() != nullptr;
     }
 
+    template <typename T = Image>
+    T clone() const {
+        T copy(size);
+        std::copy(data.get(), data.get() + bytes(), copy.data.get());
+        return copy;
+    }
+
     size_t stride() const { return channels * size.width; }
     size_t bytes() const { return stride() * size.height; }
 
