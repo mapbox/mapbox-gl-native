@@ -2007,7 +2007,7 @@ public class MapView extends FrameLayout {
             // Cancel any animation
             cancelTransitions();
 
-            nativeMapView.moveBy(offsetX, offsetY, animationTime);
+            nativeMapView.moveBy(offsetX / screenDensity, offsetY / screenDensity, animationTime);
 
             MapboxMap.OnFlingListener listener = mapboxMap.getOnFlingListener();
             if (listener != null) {
