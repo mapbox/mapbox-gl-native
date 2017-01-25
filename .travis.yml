@@ -190,7 +190,7 @@ matrix:
         - make qt-app
         - make qt-qml-app
         - make qt-test
-        - scripts/valgrind.sh build/qt-linux-x86_64/Release/mbgl-test --gtest_filter=-*.Load
+        - scripts/valgrind.sh build/qt-linux-x86_64/Release/mbgl-test --gtest_filter=-*.Load --gtest_filter=-Memory.Vector
 
 cache:
   directories:
