@@ -25,6 +25,7 @@
 * Fixed an issue where translucent point annotations along tile boundaries would be drawn darker than expected. ([#6832](https://github.com/mapbox/mapbox-gl-native/pull/6832))
 * Fixed flickering that occurred when panning past the antimeridian. ([#7574](https://github.com/mapbox/mapbox-gl-native/pull/7574))
 * Fixed an issue that could prevent a cached style from appearing while the computer is offline. ([#7770](https://github.com/mapbox/mapbox-gl-native/pull/7770))
+* Allows use of the integrated GPU on machines that have more than one GPU. Follow [Apple’s Technical QA1734](https://developer.apple.com/library/content/qa/qa1734/_index.html) to enable this in your app. ([#7834](https://github.com/mapbox/mapbox-gl-native/pull/7834))
 
 ## 0.3.0
 
