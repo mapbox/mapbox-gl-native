@@ -118,7 +118,7 @@ extern const MGLShapeSourceOption MGLShapeSourceOptionSimplificationTolerance;
  the source.
  
  @param identifier A string that uniquely identifies the source.
- @param URL An HTTP(S) URL, absolute file URL, or local file URL relative to the
+ @param url An HTTP(S) URL, absolute file URL, or local file URL relative to the
     current application’s resource bundle.
  @param options An `NSDictionary` of options for this source.
  @return An initialized shape source.
