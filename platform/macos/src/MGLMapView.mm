@@ -787,9 +787,7 @@ public:
 
         if (_isPrinting) {
             _isPrinting = NO;
-            std::string png = encodePNG(_mbglView->readStillImage());
-            NSData *data = [[NSData alloc] initWithBytes:png.data() length:png.size()];
-            NSImage *image = [[NSImage alloc] initWithData:data];
+            NSImage *image = [[NSImage alloc] initWithMGLPremultipliedImage:_mbglView->readStillImage()];
             [self performSelector:@selector(printWithImage:) withObject:image afterDelay:0];
         }
 
