@@ -20,6 +20,8 @@ typedef NSString *MGLShapeSourceOption NS_STRING_ENUM;
  This attribute corresponds to the
  <a href="https://www.mapbox.com/mapbox-gl-style-spec/#sources-geojson-cluster"><code>cluster</code></a>
  source property in the Mapbox Style Specification.
+ 
+ This option only affects point features within a shape source.
  */
 extern const MGLShapeSourceOption MGLShapeSourceOptionClustered;
 
