@@ -24,6 +24,7 @@
 
 - (NSOpenGLPixelFormat *)openGLPixelFormatForDisplayMask:(uint32_t)mask {
     NSOpenGLPixelFormatAttribute pfas[] = {
+        NSOpenGLPFAOpenGLProfile, NSOpenGLProfileVersionLegacy,
         NSOpenGLPFAAccelerated,
         NSOpenGLPFAClosestPolicy,
         NSOpenGLPFAAccumSize, 32,

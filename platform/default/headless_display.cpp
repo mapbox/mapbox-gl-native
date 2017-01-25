@@ -15,8 +15,14 @@ HeadlessDisplay::HeadlessDisplay() {
     // TODO: test if OpenGL 4.1 with GL_ARB_ES2_compatibility is supported
     // If it is, use kCGLOGLPVersion_3_2_Core and enable that extension.
     CGLPixelFormatAttribute attributes[] = {
-        kCGLPFAOpenGLProfile,
-        static_cast<CGLPixelFormatAttribute>(kCGLOGLPVersion_Legacy),
+        kCGLPFAOpenGLProfile, static_cast<CGLPixelFormatAttribute>(kCGLOGLPVersion_Legacy),
+        // Not adding kCGLPFAAccelerated, as this will make headless rendering impossible when running in VMs.
+        kCGLPFAClosestPolicy,
+        kCGLPFAAccumSize, static_cast<CGLPixelFormatAttribute>(32),
+        kCGLPFAColorSize, static_cast<CGLPixelFormatAttribute>(24),
+        kCGLPFAAlphaSize, static_cast<CGLPixelFormatAttribute>(8),
+        kCGLPFADepthSize, static_cast<CGLPixelFormatAttribute>(16),
+        kCGLPFAStencilSize, static_cast<CGLPixelFormatAttribute>(8),
         kCGLPFASupportsAutomaticGraphicsSwitching,
         kCGLPFAAllowOfflineRenderers, // Allows using the integrated GPU
         static_cast<CGLPixelFormatAttribute>(0)
