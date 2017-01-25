@@ -72,7 +72,7 @@ std::string encodePNG(const PremultipliedImage& pre) {
                 (12 + idat.size() /* IDAT */) + (12 /* IEND */));
     png.append(preamble, 8);
     addChunk(png, "IHDR", ihdr, 13);
-    addChunk(png, "IDAT", idat.data(), idat.size());
+    addChunk(png, "IDAT", idat.data(), static_cast<uint32_t>(idat.size()));
     addChunk(png, "IEND");
     return png;
 }

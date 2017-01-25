@@ -6,6 +6,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface NSImage (MGLAdditions)
 
+- (nullable instancetype)initWithMGLPremultipliedImage:(mbgl::PremultipliedImage&&)image;
+
 - (nullable instancetype)initWithMGLSpriteImage:(const mbgl::SpriteImage *)spriteImage;
 
 - (std::unique_ptr<mbgl::SpriteImage>)mgl_spriteImage;

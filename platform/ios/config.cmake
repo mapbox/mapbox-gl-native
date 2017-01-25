@@ -44,7 +44,9 @@ macro(mbgl_platform_core)
         PRIVATE platform/default/utf.cpp
 
         # Image handling
+        PRIVATE platform/darwin/mbgl/util/image+MGLAdditions.hpp
         PRIVATE platform/darwin/src/image.mm
+        PRIVATE platform/default/png_writer.cpp
 
         # Headless view
         PRIVATE platform/default/mbgl/gl/headless_backend.cpp
