@@ -1339,7 +1339,7 @@ public:
             // the illusion that it has stayed in place during the entire gesture.
             CGPoint cursorPoint = [self convertPoint:startPoint toView:nil];
             cursorPoint = [self.window convertRectToScreen:{ startPoint, NSZeroSize }].origin;
-            cursorPoint.y = [NSScreen mainScreen].frame.size.height - cursorPoint.y;
+            cursorPoint.y = self.window.screen.frame.size.height - cursorPoint.y;
             CGDisplayMoveCursorToPoint(kCGDirectMainDisplay, cursorPoint);
             CGDisplayShowCursor(kCGDirectMainDisplay);
         }
