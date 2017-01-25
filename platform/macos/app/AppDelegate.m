@@ -261,6 +261,14 @@ NSString * const MGLLastMapDebugMaskDefaultsKey = @"MGLLastMapDebugMask";
     [self.preferencesWindow makeKeyAndOrderFront:sender];
 }
 
+- (IBAction)print:(id)sender {
+    NSDocument *currentDocument = [NSDocumentController sharedDocumentController].currentDocument;
+    if ([currentDocument isKindOfClass:[MapDocument class]]) {
+        MGLMapView *mapView = [(MapDocument *)currentDocument mapView];
+        [mapView print:sender];
+    }
+}
+
 - (IBAction)openAccessTokenManager:(id)sender {
     [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"https://www.mapbox.com/studio/account/tokens/"]];
 }
@@ -275,6 +283,9 @@ NSString * const MGLLastMapDebugMaskDefaultsKey = @"MGLLastMapDebugMask";
         return YES;
     }
     if (menuItem.action == @selector(showOfflinePacksPanel:)) {
+        return YES;
+    }
+    if (menuItem.action == @selector(print:)) {
         return YES;
     }
     if (menuItem.action == @selector(delete:)) {
