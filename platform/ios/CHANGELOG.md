@@ -10,6 +10,10 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * Added a Simplified Chinese localization. ([#7316](https://github.com/mapbox/mapbox-gl-native/pull/7316))
 * `MGLOfflineStorage` instances now support a delegate conforming to `MGLOfflineStorageDelegate`, which allows altering URLs before they are requested from the internet. ([#8084](https://github.com/mapbox/mapbox-gl-native/pull/8084))
 
+## 3.4.1
+
+* Fixed a build error in the static framework flavor of this SDK caused by a missing header. ([#7844](https://github.com/mapbox/mapbox-gl-native/pull/7844))
+
 ## 3.4.0
 
 ### Packaging
