@@ -127,13 +127,8 @@ public class LatLng implements ILatLng, Parcelable {
    * @return New LatLng object with wrapped Longitude
    */
   public LatLng wrap() {
-    LatLng wrappedVersion = new LatLng(this);
-    double lon = wrappedVersion.getLongitude();
-    if (lon < GeoConstants.MIN_LONGITUDE || lon > GeoConstants.MAX_LONGITUDE) {
-      wrappedVersion.setLongitude(MathUtils.wrap(wrappedVersion.getLongitude(), GeoConstants.MIN_LONGITUDE,
-        GeoConstants.MAX_LONGITUDE));
-    }
-    return wrappedVersion;
+    longitude = MathUtils.wrap(longitude, GeoConstants.MIN_LONGITUDE, GeoConstants.MAX_LONGITUDE);
+    return this;
   }
 
   @Override
