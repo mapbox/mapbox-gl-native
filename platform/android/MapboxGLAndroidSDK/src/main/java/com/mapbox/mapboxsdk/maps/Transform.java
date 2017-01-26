@@ -95,11 +95,9 @@ final class Transform implements MapView.OnMapChangedListener {
 
   @UiThread
   final void easeCamera(MapboxMap mapboxMap, CameraUpdate update, int durationMs, boolean easingInterpolator,
-                        boolean resetTrackingMode, final MapboxMap.CancelableCallback callback) {
+                        final MapboxMap.CancelableCallback callback) {
     cameraPosition = update.getCameraPosition(mapboxMap);
-    if (resetTrackingMode) {
-      trackingSettings.resetTrackingModesIfRequired(cameraPosition);
-    }
+    trackingSettings.resetTrackingModesIfRequired(cameraPosition);
 
     cancelTransitions();
     if (callback != null) {
