@@ -6,7 +6,7 @@ This version of the Mapbox macOS SDK corresponds to version 3.4.1 of the Mapbox 
 
 * Fixed an issue causing MGLMapView’s `camera`’s `heading` to be set to a negative value, indicating an undefined heading, when the map view faces northwest. The heading is now wrapped to between zero and 360 degrees, for consistency with MGLMapView’s `direction` property. ([#7724](https://github.com/mapbox/mapbox-gl-native/pull/7724))
 * Fixed an issue causing the mouse cursor to jump after shift- or option-dragging a map view if the window opened on a screen with a different size than the screen with keyboard focus. ([#7846](https://github.com/mapbox/mapbox-gl-native/pull/7846))
-* Style class methods in `MGLStyle` marked as deprecated. ([#7785](https://github.com/mapbox/mapbox-gl-native/pull/7785))
+* Deprecated the style class methods in MGLStyle. ([#7785](https://github.com/mapbox/mapbox-gl-native/pull/7785))
 
 ## 0.3.0
 

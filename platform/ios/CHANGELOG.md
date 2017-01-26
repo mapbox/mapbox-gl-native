@@ -6,8 +6,8 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 
 * Fixed a build error in the static framework flavor of this SDK caused by a missing header. ([#7844](https://github.com/mapbox/mapbox-gl-native/pull/7844))
 * Fixed an issue causing MGLMapView’s `camera`’s `heading` to be set to a negative value, indicating an undefined heading, when the map view faces northwest. The heading is now wrapped to between zero and 360 degrees, for consistency with MGLMapView’s `direction` property. ([#7724](https://github.com/mapbox/mapbox-gl-native/pull/7724))
-* Fixed an issue causing MGLMapView flash of black. ([#7859](https://github.com/mapbox/mapbox-gl-native/pull/7859))
-* Style class methods in `MGLStyle` marked as deprecated. ([#7785](https://github.com/mapbox/mapbox-gl-native/pull/7785))
+* Fixed an issue where MGLMapView could initially flash black before loading. ([#7859](https://github.com/mapbox/mapbox-gl-native/pull/7859))
+* Deprecated the style class methods in MGLStyle. ([#7785](https://github.com/mapbox/mapbox-gl-native/pull/7785))
 
 ## 3.4.0
 
