@@ -394,7 +394,7 @@ public:
     MGLinitializeRunLoop();
 
     _isTargetingInterfaceBuilder = NSProcessInfo.processInfo.mgl_isInterfaceBuilderDesignablesAgent;
-    _opaque = YES;
+    _opaque = NO;
 
     BOOL background = [UIApplication sharedApplication].applicationState == UIApplicationStateBackground;
     if (!background)
