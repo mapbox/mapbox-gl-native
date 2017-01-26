@@ -333,9 +333,6 @@ final class MapGestureDetector {
       if (onFlingListener != null) {
         onFlingListener.onFling();
       }
-
-      MapboxEvent.trackGestureEvent(projection,
-        MapboxEvent.GESTURE_PAN_START, e1.getX(), e1.getY(), transform.getZoom());
       return true;
     }
 
@@ -344,6 +341,8 @@ final class MapGestureDetector {
     public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
       if (!scrollInProgress) {
         scrollInProgress = true;
+        MapboxEvent.trackGestureEvent(projection,
+          MapboxEvent.GESTURE_PAN_START, e1.getX(), e1.getY(), transform.getZoom());
       }
       if (!trackingSettings.isScrollGestureCurrentlyEnabled()) {
         return false;
