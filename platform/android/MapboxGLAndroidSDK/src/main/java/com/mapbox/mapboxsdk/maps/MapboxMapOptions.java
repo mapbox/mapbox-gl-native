@@ -66,6 +66,7 @@ public class MapboxMapOptions implements Parcelable {
   private boolean tiltGesturesEnabled = true;
   private boolean zoomGesturesEnabled = true;
   private boolean zoomControlsEnabled = false;
+  private boolean doubleTapGesturesEnabled = true;
 
   private boolean myLocationEnabled;
   private Drawable myLocationForegroundDrawable;
@@ -116,6 +117,7 @@ public class MapboxMapOptions implements Parcelable {
     tiltGesturesEnabled = in.readByte() != 0;
     zoomControlsEnabled = in.readByte() != 0;
     zoomGesturesEnabled = in.readByte() != 0;
+    doubleTapGesturesEnabled = in.readByte() != 0;
 
     myLocationEnabled = in.readByte() != 0;
 
@@ -184,6 +186,8 @@ public class MapboxMapOptions implements Parcelable {
         typedArray.getBoolean(R.styleable.mapbox_MapView_mapbox_uiTiltGestures, true));
       mapboxMapOptions.zoomControlsEnabled(
         typedArray.getBoolean(R.styleable.mapbox_MapView_mapbox_uiZoomControls, false));
+      mapboxMapOptions.doubleTapGesturesEnabled(
+        typedArray.getBoolean(R.styleable.mapbox_MapView_mapbox_uiDoubleTapGestures, true));
 
       mapboxMapOptions.maxZoomPreference(typedArray.getFloat(R.styleable.mapbox_MapView_mapbox_cameraZoomMax,
         MapboxConstants.MAXIMUM_ZOOM));
@@ -529,6 +533,17 @@ public class MapboxMapOptions implements Parcelable {
   }
 
   /**
+   * Specifies if the double tap gesture is enabled for a map view.
+   *
+   * @param enabled True and gesture will be enabled
+   * @return This
+   */
+  public MapboxMapOptions doubleTapGesturesEnabled(boolean enabled) {
+    doubleTapGesturesEnabled = enabled;
+    return this;
+  }
+
+  /**
    * Specifies if the user location view is enabled for a map view.
    *
    * @param locationEnabled True and gesture will be enabled
@@ -809,6 +824,15 @@ public class MapboxMapOptions implements Parcelable {
   }
 
   /**
+   * Get the current configured double tap gesture state for a map view.
+   *
+   * @return True indicates gesture is enabled
+   */
+  public boolean getDoubleTapGesturesEnabled() {
+    return doubleTapGesturesEnabled;
+  }
+
+  /**
    * Get the current configured visibility state for attribution for a map view.
    *
    * @return Visibility state of the attribution
@@ -987,6 +1011,7 @@ public class MapboxMapOptions implements Parcelable {
     dest.writeByte((byte) (tiltGesturesEnabled ? 1 : 0));
     dest.writeByte((byte) (zoomControlsEnabled ? 1 : 0));
     dest.writeByte((byte) (zoomGesturesEnabled ? 1 : 0));
+    dest.writeByte((byte) (doubleTapGesturesEnabled ? 1 : 0));
 
     dest.writeByte((byte) (myLocationEnabled ? 1 : 0));
 
@@ -1064,6 +1089,9 @@ public class MapboxMapOptions implements Parcelable {
       return false;
     }
     if (zoomControlsEnabled != options.zoomControlsEnabled) {
+      return false;
+    }
+    if (doubleTapGesturesEnabled != options.doubleTapGesturesEnabled) {
       return false;
     }
     if (myLocationEnabled != options.myLocationEnabled) {
@@ -1146,6 +1174,7 @@ public class MapboxMapOptions implements Parcelable {
     result = 31 * result + (tiltGesturesEnabled ? 1 : 0);
     result = 31 * result + (zoomGesturesEnabled ? 1 : 0);
     result = 31 * result + (zoomControlsEnabled ? 1 : 0);
+    result = 31 * result + (doubleTapGesturesEnabled ? 1 : 0);
     result = 31 * result + (myLocationEnabled ? 1 : 0);
     result = 31 * result + (myLocationForegroundDrawable != null ? myLocationForegroundDrawable.hashCode() : 0);
     result = 31 * result + (myLocationForegroundBearingDrawable != null

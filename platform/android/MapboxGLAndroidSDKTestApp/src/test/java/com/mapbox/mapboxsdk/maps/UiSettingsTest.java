@@ -286,6 +286,41 @@ public class UiSettingsTest {
   }
 
   @Test
+  public void testDoubleTapGesturesEnabled() {
+    uiSettings.setDoubleTapGesturesEnabled(true);
+    assertEquals("DoubleTap gesture should be enabled", true, uiSettings.isDoubleTapGesturesEnabled());
+  }
+
+  @Test
+  public void testDoubleTapGesturesDisabled() {
+    uiSettings.setDoubleTapGesturesEnabled(false);
+    assertEquals("DoubleTap gesture should be disabled", false, uiSettings.isDoubleTapGesturesEnabled());
+  }
+
+  @Test
+  public void testDoubleTapGestureChange() {
+    assertEquals("Default state should be true", true, uiSettings.isDoubleTapGestureChangeAllowed());
+    uiSettings.setDoubleTapGestureChangeAllowed(false);
+    assertEquals("State should have been changed", false, uiSettings.isDoubleTapGestureChangeAllowed());
+  }
+
+  @Test
+  public void testDoubleTapGestureChangeAllowed() {
+    uiSettings.setDoubleTapGesturesEnabled(false);
+    assertEquals("DoubleTap gesture should be false", false, uiSettings.isDoubleTapGesturesEnabled());
+    uiSettings.setDoubleTapGesturesEnabled(true);
+    assertEquals("DoubleTap gesture should be true", true, uiSettings.isDoubleTapGesturesEnabled());
+  }
+
+  @Test
+  public void testDoubleTapGestureChangeDisallowed() {
+    assertEquals("DoubleTap gesture should be true", true, uiSettings.isDoubleTapGesturesEnabled());
+    uiSettings.setDoubleTapGestureChangeAllowed(false);
+    uiSettings.setDoubleTapGesturesEnabled(false);
+    assertEquals("DoubleTap gesture change should be ignored", true, uiSettings.isDoubleTapGesturesEnabled());
+  }
+
+  @Test
   public void testScrollGesturesEnabled() {
     uiSettings.setScrollGesturesEnabled(true);
     assertEquals("Scroll gesture should be enabled", true, uiSettings.isScrollGesturesEnabled());

@@ -225,7 +225,7 @@ final class MapGestureDetector {
 
     @Override
     public boolean onDoubleTapEvent(MotionEvent e) {
-      if (!uiSettings.isZoomGesturesEnabled()) {
+      if (!uiSettings.isZoomGesturesEnabled() || !uiSettings.isDoubleTapGesturesEnabled()) {
         return false;
       }
 
