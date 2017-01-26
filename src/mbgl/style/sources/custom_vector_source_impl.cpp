@@ -74,6 +74,9 @@ void CustomVectorSource::Impl::setTileData(uint8_t z, uint32_t x, uint32_t y, co
 }
     
 void CustomVectorSource::Impl::updateTile(uint8_t z, uint32_t x, uint32_t y) {
+    if(cache.has(OverscaledTileID(z, x, y))) {
+        cache.clear();
+    }
     for (auto const &item : tiles) {
         GeoJSONTile* tile = static_cast<GeoJSONTile*>(item.second.get());
         if(tile->id.canonical.z == z && tile->id.canonical.x == x && tile->id.canonical.y == y) {
@@ -81,7 +84,7 @@ void CustomVectorSource::Impl::updateTile(uint8_t z, uint32_t x, uint32_t y) {
         }
     }
 }
- 
+
 void CustomVectorSource::Impl::reloadRegion(mbgl::LatLngBounds bounds, uint8_t z) {
     for (const auto& tile : mbgl::util::tileCover(bounds, z)) {
         updateTile(tile.canonical.z, tile.canonical.x, tile.canonical.z);
@@ -89,6 +92,7 @@ void CustomVectorSource::Impl::reloadRegion(mbgl::LatLngBounds bounds, uint8_t z
 }
 
 void CustomVectorSource::Impl::reload() {
+    cache.clear();
     for (auto const &item : tiles) {
         GeoJSONTile* tile = static_cast<GeoJSONTile*>(item.second.get());
         fetchTile(tile->id.canonical.z, tile->id.canonical.x, tile->id.canonical.y);
