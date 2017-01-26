@@ -27,7 +27,7 @@ public:
        static jni::jclass* javaClass = jni::NewGlobalRef(env, &jni::FindClass(env, "com/mapbox/services/commons/geojson/Point")).release();
        static jni::jmethodID* fromCoordinates = &jni::GetStaticMethodID(env, *javaClass, "fromCoordinates", "([D)Lcom/mapbox/services/commons/geojson/Point;");
 
-       //Create Point
+       // Create Point
        jni::LocalObject<jni::jarray<jni::jdouble>> position = jni::NewLocalObject(env, toGeoJsonPosition(env, geometry.x, geometry.y));
        return reinterpret_cast<jni::jobject*>(jni::CallStaticMethod<jni::jobject*>(env, *javaClass, *fromCoordinates, position.get()));
     }
@@ -39,7 +39,7 @@ public:
         static jni::jclass* javaClass = jni::NewGlobalRef(env, &jni::FindClass(env, "com/mapbox/services/commons/geojson/LineString")).release();
         static jni::jmethodID* fromCoordinates = &jni::GetStaticMethodID(env, *javaClass, "fromCoordinates", "([[D)Lcom/mapbox/services/commons/geojson/LineString;");
 
-        //Create
+        // Create
         jni::LocalObject<jni::jarray<jni::jobject>> coordinates = jni::NewLocalObject(env, toGeoJsonCoordinates(env, geometry));
         return reinterpret_cast<jni::jobject*>(jni::CallStaticMethod<jni::jobject*>(env, *javaClass, *fromCoordinates, coordinates.get()));
     }
@@ -51,7 +51,7 @@ public:
         static jni::jclass* javaClass = jni::NewGlobalRef(env, &jni::FindClass(env, "com/mapbox/services/commons/geojson/MultiPoint")).release();
         static jni::jmethodID* fromCoordinates = &jni::GetStaticMethodID(env, *javaClass, "fromCoordinates", "([[D)Lcom/mapbox/services/commons/geojson/MultiPoint;");
 
-        //Create
+        // Create
         jni::LocalObject<jni::jarray<jni::jobject>> coordinates = jni::NewLocalObject(env, toGeoJsonCoordinates(env, geometry));
         return reinterpret_cast<jni::jobject*>(jni::CallStaticMethod<jni::jobject*>(env, *javaClass, *fromCoordinates, coordinates.get()));
     }
@@ -63,7 +63,7 @@ public:
         static jni::jclass* javaClass = jni::NewGlobalRef(env, &jni::FindClass(env, "com/mapbox/services/commons/geojson/Polygon")).release();
         static jni::jmethodID* fromCoordinates = &jni::GetStaticMethodID(env, *javaClass, "fromCoordinates", "([[[D)Lcom/mapbox/services/commons/geojson/Polygon;");
 
-        //Create
+        // Create
         jni::LocalObject<jni::jarray<jni::jobject>> shape = jni::NewLocalObject(env, toShape<>(env, geometry));
         return reinterpret_cast<jni::jobject*>(jni::CallStaticMethod<jni::jobject*>(env, *javaClass, *fromCoordinates, shape.get()));
     }
@@ -75,7 +75,7 @@ public:
         static jni::jclass* javaClass = jni::NewGlobalRef(env, &jni::FindClass(env, "com/mapbox/services/commons/geojson/MultiLineString")).release();
         static jni::jmethodID* fromCoordinates = &jni::GetStaticMethodID(env, *javaClass, "fromCoordinates", "([[[D)Lcom/mapbox/services/commons/geojson/MultiLineString;");
 
-        //Create
+        // Create
         jni::LocalObject<jni::jarray<jni::jobject>> shape = jni::NewLocalObject(env, toShape<>(env, geometry));
         return reinterpret_cast<jni::jobject*>(jni::CallStaticMethod<jni::jobject*>(env, *javaClass, *fromCoordinates, shape.get()));
     }
@@ -92,7 +92,7 @@ public:
             jni::SetObjectArrayElement(env, *jarray, i, shape.get());
         }
 
-        //Create the MultiPolygon
+        // Create the MultiPolygon
         static jni::jclass* javaClass = jni::NewGlobalRef(env, &jni::FindClass(env, "com/mapbox/services/commons/geojson/MultiPolygon")).release();
         static jni::jmethodID* fromGeometries = &jni::GetStaticMethodID(env, *javaClass, "fromCoordinates", "([[[[D)Lcom/mapbox/services/commons/geojson/MultiPolygon;");
         return reinterpret_cast<jni::jobject*>(jni::CallStaticMethod<jni::jobject*>(env, *javaClass, *fromGeometries, jarray.get()));
@@ -111,7 +111,7 @@ public:
             jni::SetObjectArrayElement(env, *jarray, i, converted.get());
         }
 
-        //Turn into array list and create the GeometryCollection
+        // Turn into array list and create the GeometryCollection
         static jni::jclass* javaClass = jni::NewGlobalRef(env, &jni::FindClass(env, "com/mapbox/services/commons/geojson/GeometryCollection")).release();
         static jni::jmethodID* fromGeometries = &jni::GetStaticMethodID(env, *javaClass, "fromGeometries", "(Ljava/util/List;)Lcom/mapbox/services/commons/geojson/GeometryCollection;");
 

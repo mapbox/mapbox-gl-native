@@ -44,7 +44,7 @@ public class MarkerViewActivity extends AppCompatActivity {
     new LatLng(38.907227, -77.036530),
     new LatLng(38.905607, -77.031916),
     new LatLng(38.889441, -77.050134),
-    new LatLng(38.888000, -77.050000) //Slight overlap to show re-ordering on selection
+    new LatLng(38.888000, -77.050000) // Slight overlap to show re-ordering on selection
   };
 
   private MapboxMap mapboxMap;

@@ -29,61 +29,61 @@ namespace mbgl {
         mbgl::style::AllFilter expected;
         MGLAssertEqualFilters(actual, expected);
     }
-    
+
     {
         auto actual = [NSPredicate predicateWithValue:NO].mgl_filter;
         mbgl::style::AnyFilter expected;
         MGLAssertEqualFilters(actual, expected);
     }
-    
+
     {
         auto actual = [NSPredicate predicateWithFormat:@"a = 'b'"].mgl_filter;
         mbgl::style::EqualsFilter expected = { .key = "a", .value = std::string("b") };
         MGLAssertEqualFilters(actual, expected);
     }
-    
+
     {
         auto actual = [NSPredicate predicateWithFormat:@"a = nil"].mgl_filter;
         mbgl::style::NotHasFilter expected = { .key = "a" };
         MGLAssertEqualFilters(actual, expected);
     }
-    
+
     {
         auto actual = [NSPredicate predicateWithFormat:@"a != 'b'"].mgl_filter;
         mbgl::style::NotEqualsFilter expected = { .key = "a", .value = std::string("b") };
         MGLAssertEqualFilters(actual, expected);
     }
-    
+
     {
         auto actual = [NSPredicate predicateWithFormat:@"a != nil"].mgl_filter;
         mbgl::style::HasFilter expected = { .key = "a" };
         MGLAssertEqualFilters(actual, expected);
     }
-    
+
     {
         auto actual = [NSPredicate predicateWithFormat:@"a < 'b'"].mgl_filter;
         mbgl::style::LessThanFilter expected = { .key = "a", .value = std::string("b") };
         MGLAssertEqualFilters(actual, expected);
     }
-    
+
     {
         auto actual = [NSPredicate predicateWithFormat:@"a <= 'b'"].mgl_filter;
         mbgl::style::LessThanEqualsFilter expected = { .key = "a", .value = std::string("b") };
         MGLAssertEqualFilters(actual, expected);
     }
-    
+
     {
         auto actual = [NSPredicate predicateWithFormat:@"a > 'b'"].mgl_filter;
         mbgl::style::GreaterThanFilter expected = { .key = "a", .value = std::string("b") };
         MGLAssertEqualFilters(actual, expected);
     }
-    
+
     {
         auto actual = [NSPredicate predicateWithFormat:@"a >= 'b'"].mgl_filter;
         mbgl::style::GreaterThanEqualsFilter expected = { .key = "a", .value = std::string("b") };
         MGLAssertEqualFilters(actual, expected);
     }
-    
+
     {
         auto actual = [NSPredicate predicateWithFormat:@"a BETWEEN {'b', 'z'}"].mgl_filter;
         mbgl::style::AllFilter expected = {
@@ -94,7 +94,7 @@ namespace mbgl {
         };
         MGLAssertEqualFilters(actual, expected);
     }
-    
+
     {
         auto actual = [NSPredicate predicateWithFormat:@"a BETWEEN %@", @[@"b", @"z"]].mgl_filter;
         mbgl::style::AllFilter expected = {
@@ -105,35 +105,35 @@ namespace mbgl {
         };
         MGLAssertEqualFilters(actual, expected);
     }
-    
+
     {
         auto actual = [NSPredicate predicateWithFormat:@"a IN {'b', 'c'}"].mgl_filter;
         mbgl::style::InFilter expected = { .key = "a", .values = { std::string("b"), std::string("c") } };
         MGLAssertEqualFilters(actual, expected);
     }
-    
+
     {
         auto actual = [NSPredicate predicateWithFormat:@"a IN %@", @[@"b", @"c"]].mgl_filter;
         mbgl::style::InFilter expected = { .key = "a", .values = { std::string("b"), std::string("c") } };
         MGLAssertEqualFilters(actual, expected);
     }
-    
+
     XCTAssertThrowsSpecificNamed([NSPredicate predicateWithFormat:@"'Mapbox' IN a"].mgl_filter, NSException, NSInvalidArgumentException);
-    
+
     {
         auto actual = [NSPredicate predicateWithFormat:@"{'b', 'c'} CONTAINS a"].mgl_filter;
         mbgl::style::InFilter expected = { .key = "a", .values = { std::string("b"), std::string("c") } };
         MGLAssertEqualFilters(actual, expected);
     }
-    
+
     {
         auto actual = [NSPredicate predicateWithFormat:@"%@ CONTAINS a", @[@"b", @"c"]].mgl_filter;
         mbgl::style::InFilter expected = { .key = "a", .values = { std::string("b"), std::string("c") } };
         MGLAssertEqualFilters(actual, expected);
     }
-    
+
     XCTAssertThrowsSpecificNamed([NSPredicate predicateWithFormat:@"a CONTAINS 'Mapbox'"].mgl_filter, NSException, NSInvalidArgumentException);
-    
+
     {
         auto actual = [NSPredicate predicateWithFormat:@"a == 'b' AND c == 'd'"].mgl_filter;
         mbgl::style::AllFilter expected = {
@@ -144,7 +144,7 @@ namespace mbgl {
         };
         MGLAssertEqualFilters(actual, expected);
     }
-    
+
     {
         auto actual = [NSPredicate predicateWithFormat:@"a == 'b' OR c == 'd'"].mgl_filter;
         mbgl::style::AnyFilter expected = {
@@ -155,7 +155,7 @@ namespace mbgl {
         };
         MGLAssertEqualFilters(actual, expected);
     }
-    
+
     {
         auto actual = [NSPredicate predicateWithFormat:@"NOT(a == 'b' AND c == 'd')"].mgl_filter;
         mbgl::style::NoneFilter expected = {
@@ -170,7 +170,7 @@ namespace mbgl {
         };
         MGLAssertEqualFilters(actual, expected);
     }
-    
+
     {
         auto actual = [NSPredicate predicateWithFormat:@"NOT(a == 'b' OR c == 'd')"].mgl_filter;
         mbgl::style::NoneFilter expected = {
@@ -181,50 +181,50 @@ namespace mbgl {
         };
         MGLAssertEqualFilters(actual, expected);
     }
-    
+
     {
         auto actual = [NSPredicate predicateWithFormat:@"NOT a == nil"].mgl_filter;
         mbgl::style::HasFilter expected = { .key = "a" };
         MGLAssertEqualFilters(actual, expected);
     }
-    
+
     {
         auto actual = [NSPredicate predicateWithFormat:@"NOT a != nil"].mgl_filter;
         mbgl::style::NotHasFilter expected = { .key = "a" };
         MGLAssertEqualFilters(actual, expected);
     }
-    
+
     {
         auto actual = [NSPredicate predicateWithFormat:@"NOT a IN {'b', 'c'}"].mgl_filter;
         mbgl::style::NotInFilter expected = { .key = "a", .values = { std::string("b"), std::string("c") } };
         MGLAssertEqualFilters(actual, expected);
     }
-    
+
     {
         auto actual = [NSPredicate predicateWithFormat:@"NOT a IN %@", @[@"b", @"c"]].mgl_filter;
         mbgl::style::NotInFilter expected = { .key = "a", .values = { std::string("b"), std::string("c") } };
         MGLAssertEqualFilters(actual, expected);
     }
-    
+
     {
         auto actual = [NSPredicate predicateWithFormat:@"NOT {'b', 'c'} CONTAINS a"].mgl_filter;
         mbgl::style::NotInFilter expected = { .key = "a", .values = { std::string("b"), std::string("c") } };
         MGLAssertEqualFilters(actual, expected);
     }
-    
+
     {
         auto actual = [NSPredicate predicateWithFormat:@"NOT %@ CONTAINS a", @[@"b", @"c"]].mgl_filter;
         mbgl::style::NotInFilter expected = { .key = "a", .values = { std::string("b"), std::string("c") } };
         MGLAssertEqualFilters(actual, expected);
     }
-    
+
     XCTAssertThrowsSpecificNamed([NSPredicate predicateWithFormat:@"a BEGINSWITH 'L'"].mgl_filter, NSException, NSInvalidArgumentException);
     XCTAssertThrowsSpecificNamed([NSPredicate predicateWithFormat:@"a ENDSWITH 'itude'"].mgl_filter, NSException, NSInvalidArgumentException);
     XCTAssertThrowsSpecificNamed([NSPredicate predicateWithFormat:@"a LIKE 'glob?trotter'"].mgl_filter, NSException, NSInvalidArgumentException);
     XCTAssertThrowsSpecificNamed([NSPredicate predicateWithFormat:@"a MATCHES 'i\\w{18}n'"].mgl_filter, NSException, NSInvalidArgumentException);
     NSPredicate *selectorPredicate = [NSPredicate predicateWithFormat:@"(SELF isKindOfClass: %@)", [MGLPolyline class]];
     XCTAssertThrowsSpecificNamed(selectorPredicate.mgl_filter, NSException, NSInvalidArgumentException);
-    
+
     XCTAssertThrowsSpecificNamed([NSPredicate predicateWithBlock:^BOOL(id _Nullable evaluatedObject, NSDictionary<NSString *, id> * _Nullable bindings) {
         XCTAssertTrue(NO, @"Predicate block should not be evaluated.");
         return NO;
@@ -233,47 +233,47 @@ namespace mbgl {
 
 - (void)testPredication {
     XCTAssertNil([NSPredicate mgl_predicateWithFilter:mbgl::style::NullFilter()]);
-    
+
     {
         mbgl::style::EqualsFilter filter = { .key = "a", .value = std::string("b") };
         XCTAssertEqualObjects([NSPredicate mgl_predicateWithFilter:filter], [NSPredicate predicateWithFormat:@"a = 'b'"]);
     }
-    
+
     {
         mbgl::style::NotHasFilter filter = { .key = "a" };
         XCTAssertEqualObjects([NSPredicate mgl_predicateWithFilter:filter], [NSPredicate predicateWithFormat:@"a = nil"]);
     }
-    
+
     {
         mbgl::style::NotEqualsFilter filter = { .key = "a", .value = std::string("b") };
         XCTAssertEqualObjects([NSPredicate mgl_predicateWithFilter:filter], [NSPredicate predicateWithFormat:@"a != 'b'"]);
     }
-    
+
     {
         mbgl::style::HasFilter filter = { .key = "a" };
         XCTAssertEqualObjects([NSPredicate mgl_predicateWithFilter:filter], [NSPredicate predicateWithFormat:@"a != nil"]);
     }
-    
+
     {
         mbgl::style::LessThanFilter filter = { .key = "a", .value = std::string("b") };
         XCTAssertEqualObjects([NSPredicate mgl_predicateWithFilter:filter], [NSPredicate predicateWithFormat:@"a < 'b'"]);
     }
-    
+
     {
         mbgl::style::LessThanEqualsFilter filter = { .key = "a", .value = std::string("b") };
         XCTAssertEqualObjects([NSPredicate mgl_predicateWithFilter:filter], [NSPredicate predicateWithFormat:@"a <= 'b'"]);
     }
-    
+
     {
         mbgl::style::GreaterThanFilter filter = { .key = "a", .value = std::string("b") };
         XCTAssertEqualObjects([NSPredicate mgl_predicateWithFilter:filter], [NSPredicate predicateWithFormat:@"a > 'b'"]);
     }
-    
+
     {
         mbgl::style::GreaterThanEqualsFilter filter = { .key = "a", .value = std::string("b") };
         XCTAssertEqualObjects([NSPredicate mgl_predicateWithFilter:filter], [NSPredicate predicateWithFormat:@"a >= 'b'"]);
     }
-    
+
     {
         mbgl::style::AllFilter filter = {
             .filters = {
@@ -283,7 +283,7 @@ namespace mbgl {
         };
         XCTAssertEqualObjects([NSPredicate mgl_predicateWithFilter:filter], [NSPredicate predicateWithFormat:@"a BETWEEN {'b', 'z'}"]);
     }
-    
+
     {
         mbgl::style::AllFilter filter = {
             .filters = {
@@ -293,22 +293,22 @@ namespace mbgl {
         };
         XCTAssertEqualObjects([NSPredicate mgl_predicateWithFilter:filter], [NSPredicate predicateWithFormat:@"a BETWEEN {'b', 'z'}"]);
     }
-    
+
     {
         mbgl::style::InFilter filter = { .key = "a", .values = { std::string("b"), std::string("c") } };
         XCTAssertEqualObjects([NSPredicate mgl_predicateWithFilter:filter].predicateFormat, [NSPredicate predicateWithFormat:@"a IN {'b', 'c'}"].predicateFormat);
     }
-    
+
     {
         mbgl::style::NotInFilter filter = { .key = "a", .values = { std::string("b"), std::string("c") } };
         XCTAssertEqualObjects([NSPredicate mgl_predicateWithFilter:filter].predicateFormat, [NSPredicate predicateWithFormat:@"NOT a IN {'b', 'c'}"].predicateFormat);
     }
-    
+
     {
         mbgl::style::AllFilter filter;
         XCTAssertEqualObjects([NSPredicate mgl_predicateWithFilter:filter], [NSPredicate predicateWithValue:YES]);
     }
-    
+
     {
         mbgl::style::AllFilter filter = {
             .filters = {
@@ -318,12 +318,12 @@ namespace mbgl {
         };
         XCTAssertEqualObjects([NSPredicate mgl_predicateWithFilter:filter], [NSPredicate predicateWithFormat:@"a == 'b' AND c == 'd'"]);
     }
-    
+
     {
         mbgl::style::AnyFilter filter;
         XCTAssertEqualObjects([NSPredicate mgl_predicateWithFilter:filter], [NSPredicate predicateWithValue:NO]);
     }
-    
+
     {
         mbgl::style::AnyFilter filter = {
             .filters = {
@@ -333,12 +333,12 @@ namespace mbgl {
         };
         XCTAssertEqualObjects([NSPredicate mgl_predicateWithFilter:filter], [NSPredicate predicateWithFormat:@"a == 'b' OR c == 'd'"]);
     }
-    
+
     {
         mbgl::style::NoneFilter filter;
         XCTAssertEqualObjects([NSPredicate mgl_predicateWithFilter:filter], [NSPredicate predicateWithValue:YES]);
     }
-    
+
     {
         mbgl::style::NoneFilter filter = {
             .filters = {
@@ -355,20 +355,20 @@ namespace mbgl {
     [self testSymmetryWithFormat:@"a != 1" reverseFormat:@"1 != a" mustRoundTrip:YES];
     XCTAssertThrowsSpecificNamed([NSPredicate predicateWithFormat:@"a = b"].mgl_filter, NSException, NSInvalidArgumentException);
     XCTAssertThrowsSpecificNamed([NSPredicate predicateWithFormat:@"1 = 1"].mgl_filter, NSException, NSInvalidArgumentException);
-    
+
     // In the predicate format language, $ is a special character denoting a
     // variable. Use %K to escape the special feature attribute $id.
     XCTAssertThrowsSpecificNamed([NSPredicate predicateWithFormat:@"$id == 670861802"].mgl_filter, NSException, NSInvalidArgumentException);
     XCTAssertThrowsSpecificNamed([NSPredicate predicateWithFormat:@"a = $id"].mgl_filter, NSException, NSInvalidArgumentException);
-    
+
     [self testSymmetryWithFormat:@"a = nil" reverseFormat:@"nil = a" mustRoundTrip:YES];
     [self testSymmetryWithFormat:@"a != nil" reverseFormat:@"nil != a" mustRoundTrip:YES];
-    
+
     [self testSymmetryWithFormat:@"a < 1" reverseFormat:@"1 > a" mustRoundTrip:YES];
     [self testSymmetryWithFormat:@"a <= 1" reverseFormat:@"1 >= a" mustRoundTrip:YES];
     [self testSymmetryWithFormat:@"a > 1" reverseFormat:@"1 < a" mustRoundTrip:YES];
     [self testSymmetryWithFormat:@"a >= 1" reverseFormat:@"1 <= a" mustRoundTrip:YES];
-    
+
     [self testSymmetryWithFormat:@"a BETWEEN {1, 2}" reverseFormat:@"1 <= a && 2 >= a" mustRoundTrip:YES];
     [self testSymmetryWithPredicate:[NSPredicate predicateWithFormat:@"a BETWEEN %@", @[@1, @2]]
                    reversePredicate:[NSPredicate predicateWithFormat:@"1 <= a && 2 >= a"]
@@ -378,12 +378,12 @@ namespace mbgl {
     XCTAssertThrowsSpecificNamed(betweenSetPredicate.mgl_filter, NSException, NSInvalidArgumentException);
     XCTAssertThrowsSpecificNamed([NSPredicate predicateWithFormat:@"a BETWEEN {1}"].mgl_filter, NSException, NSInvalidArgumentException);
     XCTAssertThrowsSpecificNamed([NSPredicate predicateWithFormat:@"a BETWEEN {1, 2, 3}"].mgl_filter, NSException, NSInvalidArgumentException);
-    
+
     [self testSymmetryWithFormat:@"a IN {1, 2}" reverseFormat:@"{1, 2} CONTAINS a" mustRoundTrip:NO];
     [self testSymmetryWithPredicate:[NSPredicate predicateWithFormat:@"a IN %@", @[@1, @2]]
                    reversePredicate:[NSPredicate predicateWithFormat:@"%@ CONTAINS a", @[@1, @2]]
                       mustRoundTrip:YES];
-    
+
     // The reverse formats here are a bit backwards because we canonicalize
     // a reverse CONTAINS to a forward IN.
     [self testSymmetryWithFormat:@"{1, 2} CONTAINS a" reverseFormat:@"{1, 2} CONTAINS a" mustRoundTrip:NO];
@@ -406,12 +406,12 @@ namespace mbgl {
         // example, so compare formats instead of the predicates themselves.
         XCTAssertEqualObjects(forwardPredicate.predicateFormat, forwardPredicateAfter.predicateFormat);
     }
-    
+
     if (reversePredicate) {
         auto reverseFilter = reversePredicate.mgl_filter;
         NSPredicate *reversePredicateAfter = [NSPredicate mgl_predicateWithFilter:reverseFilter];
         XCTAssertNotEqualObjects(reversePredicate, reversePredicateAfter);
-        
+
         XCTAssertEqualObjects(forwardPredicateAfter, reversePredicateAfter);
     }
 }

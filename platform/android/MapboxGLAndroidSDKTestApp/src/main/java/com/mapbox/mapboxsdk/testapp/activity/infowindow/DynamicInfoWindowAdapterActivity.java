@@ -48,38 +48,38 @@ public class DynamicInfoWindowAdapterActivity extends AppCompatActivity implemen
 
     mapboxMap = map;
 
-    //Add info window adapter
+    // Add info window adapter
     addCustomInfoWindowAdapter(mapboxMap);
 
-    //Keep info windows open on click
+    // Keep info windows open on click
     mapboxMap.getUiSettings().setDeselectMarkersOnTap(false);
 
-    //Add a marker
+    // Add a marker
     final MarkerView marker = addMarker(mapboxMap);
     mapboxMap.selectMarker(marker);
 
-    //On map click, change the info window contents
+    // On map click, change the info window contents
     mapboxMap.setOnMapClickListener(new MapboxMap.OnMapClickListener() {
       @Override
       public void onMapClick(@NonNull LatLng point) {
-        //Distance from click to marker
+        // Distance from click to marker
         double distanceKm = marker.getPosition().distanceTo(point) / 1000;
 
-        //Get the info window
+        // Get the info window
         InfoWindow infoWindow = marker.getInfoWindow();
 
-        //Get the view from the info window
+        // Get the view from the info window
         if (infoWindow != null && infoWindow.getView() != null) {
-          //Set the new text on the text view in the info window
+          // Set the new text on the text view in the info window
           ((TextView) infoWindow.getView()).setText(String.format("%.2fkm", distanceKm));
 
-          //Update the info window position (as the text length changes)
+          // Update the info window position (as the text length changes)
           infoWindow.update();
         }
       }
     });
 
-    //Focus on Paris
+    // Focus on Paris
     mapboxMap.animateCamera(CameraUpdateFactory.newLatLng(paris));
   }
 

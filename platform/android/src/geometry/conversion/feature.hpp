@@ -64,7 +64,7 @@ public:
         static jni::jclass* javaClass = jni::NewGlobalRef(env, &jni::FindClass(env, "com/google/gson/JsonPrimitive")).release();
         static jni::jmethodID* constructor = &jni::GetMethodID(env, *javaClass, "<init>", "(Ljava/lang/Boolean;)V");
 
-        //Create JsonPrimitive
+        // Create JsonPrimitive
         jni::LocalObject<jni::jobject> converted = jni::NewLocalObject(env, *convert<jni::jobject*, bool>(env, value));
         jni::jobject* object = &jni::NewObject(env, *javaClass, *constructor, *converted);
 
@@ -78,7 +78,7 @@ public:
         static jni::jclass* javaClass = jni::NewGlobalRef(env, &jni::FindClass(env, "com/google/gson/JsonPrimitive")).release();
         static jni::jmethodID* constructor = &jni::GetMethodID(env, *javaClass, "<init>", "(Ljava/lang/String;)V");
 
-        //Create JsonPrimitive
+        // Create JsonPrimitive
         jni::LocalObject<jni::jobject> converted = jni::NewLocalObject(env, *convert<jni::jobject*, std::string>(env, value));
         jni::jobject* object = &jni::NewObject(env, *javaClass, *constructor, converted.get());
 
@@ -93,7 +93,7 @@ public:
         static jni::jclass* javaClass = jni::NewGlobalRef(env, &jni::FindClass(env, "com/google/gson/JsonPrimitive")).release();
         static jni::jmethodID* constructor = &jni::GetMethodID(env, *javaClass, "<init>", "(Ljava/lang/Number;)V");
 
-        //Create JsonPrimitive
+        // Create JsonPrimitive
         jni::LocalObject<jni::jobject> converted = jni::NewLocalObject(env, *convert<jni::jobject*, Number>(env, value));
         jni::jobject* object = &jni::NewObject(env, *javaClass, *constructor, converted.get());
 
@@ -109,10 +109,10 @@ public:
         static jni::jmethodID* constructor = &jni::GetMethodID(env, *javaClass, "<init>", "()V");;
         static jni::jmethodID* add = &jni::GetMethodID(env, *javaClass, "add", "(Lcom/google/gson/JsonElement;)V");
 
-        //Create json array
+        // Create json array
         jni::jobject* jarray = &jni::NewObject(env, *javaClass, *constructor);
 
-        //Add values
+        // Add values
         for (const auto &v : values) {
             jni::LocalObject<jni::jobject> converted = jni::NewLocalObject(env, mbgl::Value::visit(v, *this));
             jni::CallMethod<void>(env, jarray, *add, converted.get());
@@ -125,15 +125,15 @@ public:
      * Json Object
      */
     jni::jobject* operator()(const std::unordered_map<std::string, mbgl::Value> &value) const {
-        //TODO: clean up duplication here
+        // TODO: clean up duplication here
         static jni::jclass* javaClass = jni::NewGlobalRef(env, &jni::FindClass(env, "com/google/gson/JsonObject")).release();
         static jni::jmethodID* constructor = &jni::GetMethodID(env, *javaClass, "<init>", "()V");;
         static jni::jmethodID* add = &jni::GetMethodID(env, *javaClass, "add", "(Ljava/lang/String;Lcom/google/gson/JsonElement;)V");
 
-        //Create json object
+        // Create json object
         jni::jobject* jsonObject = &jni::NewObject(env, *javaClass, *constructor);
 
-        //Add items
+        // Add items
         for (auto &item : value) {
             jni::LocalObject<jni::jobject> converted = jni::NewLocalObject(env, mbgl::Value::visit(item.second, *this));
             jni::LocalObject<jni::jobject> key = jni::NewLocalObject(env, *convert<jni::jobject*, std::string>(env, item.first));
@@ -151,10 +151,10 @@ struct Converter<jni::jobject*, std::unordered_map<std::string, mbgl::Value>> {
         static jni::jmethodID* constructor = &jni::GetMethodID(env, *javaClass, "<init>", "()V");;
         static jni::jmethodID* add = &jni::GetMethodID(env, *javaClass, "add", "(Ljava/lang/String;Lcom/google/gson/JsonElement;)V");
 
-        //Create json object
+        // Create json object
         jni::jobject* jsonObject = &jni::NewObject(env, *javaClass, *constructor);
 
-        //Add items
+        // Add items
         PropertyValueEvaluator evaluator {env};
         for (auto &item : value) {
             jni::LocalObject<jni::jobject> converted = jni::NewLocalObject(env, mbgl::Value::visit(item.second, evaluator));
@@ -173,18 +173,18 @@ struct Converter<jni::jobject*, mbgl::Feature> {
         static jni::jclass* javaClass = jni::NewGlobalRef(env, &jni::FindClass(env, "com/mapbox/services/commons/geojson/Feature")).release();
         static jni::jmethodID* fromGeometry = &jni::GetStaticMethodID(env, *javaClass, "fromGeometry", "(Lcom/mapbox/services/commons/geojson/Geometry;Lcom/google/gson/JsonObject;Ljava/lang/String;)Lcom/mapbox/services/commons/geojson/Feature;");
 
-        //Convert Id
+        // Convert Id
         FeatureIdVisitor idEvaluator;
         std::string id = (value.id) ? mapbox::geometry::identifier::visit(value.id.value(), idEvaluator) : "";
         jni::LocalObject<jni::jobject> jid = jni::NewLocalObject(env, *convert<jni::jobject*>(env, id));
 
-        //Convert properties
+        // Convert properties
         jni::LocalObject<jni::jobject> properties = jni::NewLocalObject(env, *convert<jni::jobject*>(env, value.properties));
 
-        //Convert geometry
+        // Convert geometry
         jni::LocalObject<jni::jobject> geometry = jni::NewLocalObject(env, *convert<jni::jobject*>(env, value.geometry));
 
-        //Create feature
+        // Create feature
         return {reinterpret_cast<jni::jobject*>(jni::CallStaticMethod<jni::jobject*>(env, *javaClass, *fromGeometry, geometry.get(), properties.get(), jid.get()))};
     }
 };

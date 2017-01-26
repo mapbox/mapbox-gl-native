@@ -30,7 +30,7 @@ public class PropertyValue<T> {
   @Nullable
   public Function<T> getFunction() {
     if (isFunction()) {
-      //noinspection unchecked
+      // noinspection unchecked
       return (Function<T>) value;
     } else {
       Timber.w("not a function, try value");
@@ -41,7 +41,7 @@ public class PropertyValue<T> {
   @Nullable
   public T getValue() {
     if (isValue()) {
-      //noinspection unchecked
+      // noinspection unchecked
       return (T) value;
     } else {
       Timber.w("not a value, try function");

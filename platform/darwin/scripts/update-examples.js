@@ -10,9 +10,9 @@ const examplesSrc = fs.readFileSync('platform/darwin/test/MGLDocumentationExampl
 // /** Front matter to describe the example. **/
 // func testMGLClass$member() {
 //     ...
-//     //#-example-code
+//     // #-example-code
 //     let sampleCode: String?
-//     //#-end-example-code
+//     // #-end-example-code
 //     ...
 // }
 //
@@ -35,16 +35,16 @@ function completeSymbolInSource(src, line, exampleCode) {
   // Split the file contents right before the symbol declaration (but after its documentation comment).
   let srcUpToSymbol = src.split('\n', line - 1).join('\n');
   let srcFromSymbol = src.substr(srcUpToSymbol.length);
-  
+
   // Match the documentation comment block that is not followed by the beginning or end of a declaration.
   let commentMatch = srcUpToSymbol.match(/\/\*\*\s*(?:[^*]|\*(?!\/))+?\s*\*\/[^;{}]*?$/);
-  
+
   // Replace the Swift code block with the test method’s contents.
   let completedComment = commentMatch[0].replace(/^([ \t]*)```swift\n[^]*?```/m, function (m, indentation) {
     // Apply the original indentation to each line.
     return ('```swift\n' + exampleCode + '\n```').replace(/^/gm, indentation);
   });
-  
+
   // Splice the modified comment into the overall file contents.
   srcUpToSymbol = (srcUpToSymbol.substr(0, commentMatch.index) + completedComment +
                    srcUpToSymbol.substr(commentMatch.index + commentMatch[0].length));
@@ -60,13 +60,13 @@ while ((match = exampleRegex.exec(examplesSrc)) !== null) {
 
   // Trim leading whitespace from the example code.
   exampleCode = exampleCode.replace(new RegExp('^' + indentation, 'gm'), '');
-  
+
   examples[testMethodName] = exampleCode;
 }
 
 function completeExamples(os) {
   console.log(`Installing ${os} SDK examples…`);
-  
+
   let sdk = os === 'iOS' ? 'iphonesimulator' : 'macosx';
   let sysroot = execFileSync('xcrun', ['--show-sdk-path', '--sdk', sdk]).toString().trim();
   let umbrellaPath = `platform/${os.toLowerCase()}/src/Mapbox.h`;
@@ -88,17 +88,17 @@ function completeExamples(os) {
         _.forEachRight(substructure['key.substructure'], function (substructure, idx, substructures) {
           completeSubstructure(substructure, idx, substructures, _.concat(symbolPath, substructure['key.name']));
         });
-        
+
         let comment = substructure['key.doc.comment'];
         if (!comment || !comment.match(/^(?:\s*)```swift\n/m)) {
           return;
         }
-        
+
         // Lazily read in the existing file.
         if (!src) {
           newSrc = src = fs.readFileSync(path, 'utf8');
         }
-        
+
         // Get the contents of the test method whose name matches the symbol path.
         let testMethodName = symbolPath.join('$').replace(/\$[+-]/, '$').replace(/:/g, '_');
         let example = examples[testMethodName];
@@ -106,23 +106,23 @@ function completeExamples(os) {
           console.error(`MGLDocumentationExampleTests.${testMethodName}() not found.`);
           process.exit(1);
         }
-        
+
         // Resolve conditional compilation blocks.
         example = example.replace(/^(\s*)#if\s+os\((iOS|macOS)\)\n([^]*?)(?:^\1#else\n([^]*?))?^\1#endif\b\n?/gm,
                                   function (m, indentation, ifOs, ifCase, elseCase) {
           return (os === ifOs ? ifCase : elseCase).replace(new RegExp('^    ', 'gm'), '');
         }).replace(/\n$/, '');
-        
+
         // Insert the test method contents into the documentation comment just
         // above the substructure.
         let startLine = substructure['key.parsed_scope.start'];
         newSrc = completeSymbolInSource(newSrc, startLine, example);
       });
-      
+
       if (!src) {
         return;
       }
-      
+
       // Write out the modified file contents.
       if (src === newSrc) {
         console.log('Skipping', path);

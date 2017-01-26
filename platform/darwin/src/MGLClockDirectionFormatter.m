@@ -28,16 +28,16 @@
         case NSFormattingUnitStyleShort:
             format = NSLocalizedStringWithDefaultValue(@"CLOCK_FMT_SHORT", @"Foundation", nil, @"%@:00", @"Clock position format, short: {hours}:00");
             break;
-            
+
         case NSFormattingUnitStyleMedium:
             format = NSLocalizedStringWithDefaultValue(@"CLOCK_FMT_MEDIUM", @"Foundation", nil, @"%@ o’clock", @"Clock position format, medium: {hours} o’clock");
-            
+
             break;
-            
+
         case NSFormattingUnitStyleLong:
             format = NSLocalizedStringWithDefaultValue(@"CLOCK_FMT_LONG", @"Foundation", nil, @"%@ o’clock", @"Clock position format, long: {hours} o’clock");
             break;
-            
+
         default:
             break;
     }

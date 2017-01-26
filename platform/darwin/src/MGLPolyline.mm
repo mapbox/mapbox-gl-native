@@ -20,13 +20,13 @@
 - (mbgl::LineString<double>)lineString {
     NSUInteger count = self.pointCount;
     CLLocationCoordinate2D *coordinates = self.coordinates;
-    
+
     mbgl::LineString<double> geometry;
     geometry.reserve(self.pointCount);
     for (NSUInteger i = 0; i < count; i++) {
         geometry.push_back(mbgl::Point<double>(coordinates[i].longitude, coordinates[i].latitude));
     }
-    
+
     return geometry;
 }
 
@@ -69,9 +69,9 @@
 - (instancetype)initWithPolylines:(NS_ARRAY_OF(MGLPolyline *) *)polylines {
     if (self = [super init]) {
         _polylines = polylines;
-        
+
         mbgl::LatLngBounds bounds = mbgl::LatLngBounds::empty();
-        
+
         for (MGLPolyline *polyline in _polylines) {
             bounds.extend(MGLLatLngBoundsFromCoordinateBounds(polyline.overlayBounds));
         }
@@ -96,7 +96,7 @@
 {
     if (self == other) return YES;
     if (![other isKindOfClass:[MGLMultiPolyline class]]) return NO;
-    
+
     MGLMultiPolyline *otherMultipoline = other;
     return ([super isEqual:otherMultipoline]
             && [self.polylines isEqualToArray:otherMultipoline.polylines]);
@@ -127,7 +127,7 @@
     NSMutableArray *coordinates = [NSMutableArray array];
     for (MGLPolylineFeature *feature in self.polylines) {
         [coordinates addObject: feature.mgl_coordinates];
-    }    
+    }
     return @{@"type": @"MultiLineString",
              @"coordinates": coordinates};
 }

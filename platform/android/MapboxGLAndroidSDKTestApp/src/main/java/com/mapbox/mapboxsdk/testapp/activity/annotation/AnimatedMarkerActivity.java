@@ -134,7 +134,7 @@ public class AnimatedMarkerActivity extends AppCompatActivity {
   private void randomlyMoveMarker(final MarkerView marker) {
     ValueAnimator animator = animateMoveMarker(marker, getLatLngInBounds());
 
-    //Add listener to restart animation on end
+    // Add listener to restart animation on end
     animator.addListener(new AnimatorListenerAdapter() {
       @Override
       public void onAnimationEnd(Animator animation) {
@@ -162,12 +162,12 @@ public class AnimatedMarkerActivity extends AppCompatActivity {
     Icon icon = IconFactory.getInstance(AnimatedMarkerActivity.this)
       .fromResource(carResource);
 
-    //View Markers
+    // View Markers
     return mapboxMap.addMarker(new MarkerViewOptions()
       .position(start)
       .icon(icon), listener);
 
-    //GL Markers
+    // GL Markers
 //        return mapboxMap.addMarker(new MarkerOptions()
 //                .position(start)
 //                .icon(icon));

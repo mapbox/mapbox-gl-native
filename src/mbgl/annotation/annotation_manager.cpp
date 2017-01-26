@@ -90,7 +90,7 @@ void AnnotationManager::add(const AnnotationID& id, const StyleSourcedAnnotation
 
 Update AnnotationManager::update(const AnnotationID& id, const SymbolAnnotation& annotation, const uint8_t maxZoom) {
     Update result = Update::Nothing;
-    
+
     auto it = symbolAnnotations.find(id);
     if (it == symbolAnnotations.end()) {
         assert(false); // Attempt to update a non-existent symbol annotation

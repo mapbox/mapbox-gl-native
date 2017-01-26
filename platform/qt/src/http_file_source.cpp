@@ -108,4 +108,4 @@ uint32_t HTTPFileSource::maximumConcurrentRequests() {
 #endif
 }
 
-} // mbgl
+} // namespace mbgl

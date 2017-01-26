@@ -229,7 +229,7 @@ public final class MapboxMap {
   @UiThread
   public <T extends Layer> T getLayerAs(@NonNull String layerId) {
     try {
-      //noinspection unchecked
+      // noinspection unchecked
       return (T) nativeMapView.getLayer(layerId);
     } catch (ClassCastException exception) {
       Timber.e(String.format("Layer: %s is a different type: %s", layerId, exception));
@@ -297,7 +297,7 @@ public final class MapboxMap {
   @UiThread
   public <T extends Source> T getSourceAs(@NonNull String sourceId) {
     try {
-      //noinspection unchecked
+      // noinspection unchecked
       return (T) nativeMapView.getSource(sourceId);
     } catch (ClassCastException exception) {
       Timber.e(String.format("Source: %s is a different type: %s", sourceId, exception));

@@ -19,11 +19,11 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  An interactive, customizable map view with an interface similar to the one
  provided by Apple’s MapKit.
- 
+
  Using `MGLMapView`, you can embed the map inside a view, allow users to
  manipulate it with standard gestures, animate the map between different
  viewpoints, and present information in the form of annotations and overlays.
- 
+
  The map view loads scalable vector tiles that conform to the
  <a href="https://github.com/mapbox/vector-tile-spec">Mapbox Vector Tile Specification</a>.
  It styles them with a style that conforms to the
@@ -31,27 +31,27 @@ NS_ASSUME_NONNULL_BEGIN
  Such styles can be designed in
  <a href="https://www.mapbox.com/studio/">Mapbox Studio</a> and hosted on
  mapbox.com.
- 
+
  A collection of Mapbox-hosted styles is available through the `MGLStyle` class.
  These basic styles use
  <a href="https://www.mapbox.com/developers/vector-tiles/mapbox-streets">Mapbox Streets</a>
  or <a href="https://www.mapbox.com/satellite/">Mapbox Satellite</a> data
  sources, but you can specify a custom style that makes use of your own data.
- 
+
  Mapbox-hosted vector tiles and styles require an API access token, which you
  can obtain from the
  <a href="https://www.mapbox.com/studio/account/tokens/">Mapbox account page</a>.
  Access tokens associate requests to Mapbox’s vector tile and style APIs with
  your Mapbox account. They also deter other developers from using your styles
  without your permission.
- 
+
  Adding your own gesture recognizer to `MGLMapView` will block the corresponding
  gesture recognizer built into `MGLMapView`. To avoid conflicts, define which
  gesture recognizer takes precedence. For example, you can subclass
  `NSClickGestureRecognizer` and override `-[NSGestureRecognizer shouldRequireFailureOfGestureRecognizer:]`,
  so that your subclass will be invoked only if the default `MGLMapView` click
  gesture recognizer fails:
- 
+
  ```swift
  class MapClickGestureRecognizer: NSClickGestureRecognizer {
      override func shouldRequireFailure(of otherGestureRecognizer: NSGestureRecognizer) -> Bool {
@@ -59,7 +59,7 @@ NS_ASSUME_NONNULL_BEGIN
      }
  }
  ```
- 
+
  @note You are responsible for getting permission to use the map data and for
     ensuring that your use adheres to the relevant terms of use.
  */
@@ -71,7 +71,7 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  Initializes and returns a newly allocated map view with the specified frame and
  the default style.
- 
+
  @param frame The frame for the view, measured in points.
  @return An initialized map view.
  */
@@ -80,7 +80,7 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  Initializes and returns a newly allocated map view with the specified frame and
  style URL.
- 
+
  @param frame The frame for the view, measured in points.
  @param styleURL URL of the map style to display. The URL may be a full HTTP or
     HTTPS URL, a Mapbox URL indicating the style’s map ID
@@ -94,7 +94,7 @@ MGL_EXPORT IB_DESIGNABLE
 
 /**
  The receiver’s delegate.
- 
+
  A map view sends messages to its delegate to notify it of changes to its
  contents or the viewpoint. The delegate also provides information about
  annotations displayed on the map, such as the styles to apply to individual
@@ -106,17 +106,17 @@ MGL_EXPORT IB_DESIGNABLE
 
 /**
  The style currently displayed in the receiver.
- 
+
  Unlike the `styleURL` property, this property is set to an object that allows
  you to manipulate every aspect of the style locally.
- 
+
  If the style is loading, this property is set to `nil` until the style finishes
  loading. If the style has failed to load, this property is set to `nil`.
  Because the style loads asynchronously, you should manipulate it in the
  `-[MGLMapViewDelegate mapView:didFinishLoadingStyle:]` or
  `-[MGLMapViewDelegate mapViewDidFinishLoadingMap:]` method. It is not possible
  to manipulate the style before it has finished loading.
- 
+
  @note The default styles provided by Mapbox contain sources and layers with
     identifiers that will change over time. Applications that use APIs that
     manipulate a style's sources and layers must first set the style URL to an
@@ -128,14 +128,14 @@ MGL_EXPORT IB_DESIGNABLE
 
 /**
  URL of the style currently displayed in the receiver.
- 
+
  The URL may be a full HTTP or HTTPS URL, a Mapbox URL indicating the style’s
  map ID (`mapbox://styles/<user>/<style>`), or a path to a local file relative
  to the application’s resource path.
- 
+
  If you set this property to `nil`, the receiver will use the default style and
  this property will automatically be set to that style’s URL.
- 
+
  If you want to modify the current style without replacing it outright, or if
  you want to introspect individual style attributes, use the `style` property.
  */
@@ -143,7 +143,7 @@ MGL_EXPORT IB_DESIGNABLE
 
 /**
  Reloads the style.
- 
+
  You do not normally need to call this method. The map view automatically
  responds to changes in network connectivity by reloading the style. You may
  need to call this method if you change the access token after a style has
@@ -164,7 +164,7 @@ MGL_EXPORT IB_DESIGNABLE
 
 /**
  The Mapbox logo, positioned in the lower-left corner.
- 
+
  @note The Mapbox terms of service, which governs the use of Mapbox-hosted
     vector tiles and styles,
     <a href="https://www.mapbox.com/help/mapbox-logo/">requires</a> most Mapbox
@@ -176,7 +176,7 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  A view showing legally required copyright notices, positioned along the bottom
  of the map view, to the left of the Mapbox logo.
- 
+
  @note The Mapbox terms of service, which governs the use of Mapbox-hosted
     vector tiles and styles,
     <a href="https://www.mapbox.com/help/attribution/">requires</a> these
@@ -191,10 +191,10 @@ MGL_EXPORT IB_DESIGNABLE
 
 /**
  The geographic coordinate at the center of the map view.
- 
+
  Changing the value of this property centers the map on the new coordinate
  without changing the current zoom level.
- 
+
  Changing the value of this property updates the map view immediately. If you
  want to animate the change, use the `-setCenterCoordinate:animated:` method
  instead.
@@ -203,10 +203,10 @@ MGL_EXPORT IB_DESIGNABLE
 
 /**
  Changes the center coordinate of the map and optionally animates the change.
- 
+
  Changing the center coordinate centers the map on the new coordinate without
  changing the current zoom level.
- 
+
  @param coordinate The new center coordinate for the map.
  @param animated Specify `YES` if you want the map view to scroll to the new
     location or `NO` if you want the map to display the new location
@@ -216,12 +216,12 @@ MGL_EXPORT IB_DESIGNABLE
 
 /**
  The zoom level of the receiver.
- 
+
  In addition to affecting the visual size and detail of features on the map, the
  zoom level affects the size of the vector tiles that are loaded. At zoom level
  0, each tile covers the entire world map; at zoom level 1, it covers ¼ of the
  world; at zoom level 2, <sup>1</sup>⁄<sub>16</sub> of the world, and so on.
- 
+
  Changing the value of this property updates the map view immediately. If you
  want to animate the change, use the `-setZoomLevel:animated:` method instead.
  */
@@ -229,34 +229,34 @@ MGL_EXPORT IB_DESIGNABLE
 
 /**
  The minimum zoom level at which the map can be shown.
- 
+
  Depending on the map view’s aspect ratio, the map view may be prevented from
  reaching the minimum zoom level, in order to keep the map from repeating within
  the current viewport.
- 
+
  If the value of this property is greater than that of the `maximumZoomLevel`
  property, the behavior is undefined.
- 
+
  The default value of this property is 0.
  */
 @property (nonatomic) double minimumZoomLevel;
 
 /**
  The maximum zoom level the map can be shown at.
- 
+
  If the value of this property is smaller than that of the `minimumZoomLevel`
  property, the behavior is undefined.
- 
+
  The default value of this property is 20.
  */
 @property (nonatomic) double maximumZoomLevel;
 
 /**
  Changes the zoom level of the map and optionally animates the change.
- 
+
  Changing the zoom level scales the map without changing the current center
  coordinate.
- 
+
  @param zoomLevel The new zoom level for the map.
  @param animated Specify `YES` if you want the map view to animate the change
     to the new zoom level or `NO` if you want the map to display the new zoom
@@ -266,11 +266,11 @@ MGL_EXPORT IB_DESIGNABLE
 
 /**
  The heading of the map, measured in degrees clockwise from true north.
- 
+
  The value `0` means that the top edge of the map view corresponds to true
  north. The value `90` means the top of the map is pointing due east. The value
  `180` means the top of the map points due south, and so on.
- 
+
  Changing the value of this property updates the map view immediately. If you
  want to animate the change, use the `-setDirection:animated:` method instead.
  */
@@ -278,10 +278,10 @@ MGL_EXPORT IB_DESIGNABLE
 
 /**
  Changes the heading of the map and optionally animates the change.
- 
+
  Changing the heading rotates the map without changing the current center
  coordinate or zoom level.
- 
+
  @param direction The heading of the map, measured in degrees clockwise from
     true north.
  @param animated Specify `YES` if you want the map view to animate the change
@@ -298,7 +298,7 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  Moves the viewpoint to a different location with respect to the map with an
  optional transition animation.
- 
+
  @param camera The new viewpoint.
  @param animated Specify `YES` if you want the map view to animate the change to
     the new viewpoint or `NO` if you want the map to display the new viewpoint
@@ -309,7 +309,7 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  Moves the viewpoint to a different location with respect to the map with an
  optional transition duration and timing function.
- 
+
  @param camera The new viewpoint.
  @param duration The amount of time, measured in seconds, that the transition
     animation should take. Specify `0` to jump to the new viewpoint
@@ -325,10 +325,10 @@ MGL_EXPORT IB_DESIGNABLE
  Moves the viewpoint to a different location using a transition animation that
  evokes powered flight and a default duration based on the length of the flight
  path.
- 
+
  The transition animation seamlessly incorporates zooming and panning to help
  the user find his or her bearings even after traversing a great distance.
- 
+
  @param camera The new viewpoint.
  @param completion The block to execute after the animation finishes.
  */
@@ -337,10 +337,10 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  Moves the viewpoint to a different location using a transition animation that
  evokes powered flight and an optional transition duration.
- 
+
  The transition animation seamlessly incorporates zooming and panning to help
  the user find his or her bearings even after traversing a great distance.
- 
+
  @param camera The new viewpoint.
  @param duration The amount of time, measured in seconds, that the transition
     animation should take. Specify `0` to jump to the new viewpoint
@@ -353,10 +353,10 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  Moves the viewpoint to a different location using a transition animation that
  evokes powered flight and an optional transition duration and peak altitude.
- 
+
  The transition animation seamlessly incorporates zooming and panning to help
  the user find his or her bearings even after traversing a great distance.
- 
+
  @param camera The new viewpoint.
  @param duration The amount of time, measured in seconds, that the transition
     animation should take. Specify `0` to jump to the new viewpoint
@@ -372,7 +372,7 @@ MGL_EXPORT IB_DESIGNABLE
 
 /**
  The geographic coordinate bounds visible in the receiver’s viewport.
- 
+
  Changing the value of this property updates the receiver immediately. If you
  want to animate the change, use the `-setVisibleCoordinateBounds:animated:`
  method instead.
@@ -382,7 +382,7 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  Changes the receiver’s viewport to fit the given coordinate bounds, optionally
  animating the change.
- 
+
  @param bounds The bounds that the viewport will show in its entirety.
  @param animated Specify `YES` to animate the change by smoothly scrolling and
     zooming or `NO` to immediately display the given bounds.
@@ -392,7 +392,7 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  Changes the receiver’s viewport to fit the given coordinate bounds and
  optionally some additional padding on each side.
- 
+
  @param bounds The bounds that the viewport will show in its entirety.
  @param insets The minimum padding (in screen points) that will be visible
     around the given coordinate bounds.
@@ -432,7 +432,7 @@ MGL_EXPORT IB_DESIGNABLE
 
 /**
  Returns the camera that best fits the given coordinate bounds.
- 
+
  @param bounds The coordinate bounds to fit to the receiver’s viewport.
  @return A camera object centered on the same location as the coordinate bounds
     with zoom level as high (close to the ground) as possible while still
@@ -444,7 +444,7 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  Returns the camera that best fits the given coordinate bounds, optionally with
  some additional padding on each side.
- 
+
  @param bounds The coordinate bounds to fit to the receiver’s viewport.
  @param insets The minimum padding (in screen points) that would be visible
     around the returned camera object if it were set as the receiver’s camera.
@@ -458,13 +458,13 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  A Boolean value indicating whether the receiver automatically adjusts its
  content insets.
- 
+
  When the value of this property is `YES`, the map view automatically updates
  its `contentInsets` property to account for any overlapping title bar or
  toolbar. To overlap with the title bar or toolbar, the containing window’s
  style mask must have `NSFullSizeContentViewWindowMask` set, and the title bar
  must not be transparent.
- 
+
  The default value of this property is `YES`.
  */
 @property (nonatomic, assign) BOOL automaticallyAdjustsContentInsets;
@@ -472,16 +472,16 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  The distance from the edges of the map view’s frame to the edges of the map
  view’s logical viewport.
- 
+
  When the value of this property is equal to `NSEdgeInsetsZero`, viewport
  properties such as `centerCoordinate` assume a viewport that matches the map
  view’s frame. Otherwise, those properties are inset, excluding part of the
  frame from the viewport. For instance, if the only the top edge is inset, the
  map center is effectively shifted downward.
- 
+
  When the value of the `automaticallyAdjustsContentInsets` property is `YES`,
  the value of this property may be overridden at any time.
- 
+
  Changing the value of this property updates the map view immediately. If you
  want to animate the change, use the `-setContentInsets:animated:` method
  instead.
@@ -491,16 +491,16 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  Sets the distance from the edges of the map view’s frame to the edges of the
  map view’s logical viewport, with an optional transition animation.
- 
+
  When the value of this property is equal to `NSEdgeInsetsZero`, viewport
  properties such as `centerCoordinate` assume a viewport that matches the map
  view’s frame. Otherwise, those properties are inset, excluding part of the
  frame from the viewport. For instance, if the only the top edge is inset, the
  map center is effectively shifted downward.
- 
+
  When the value of the `automaticallyAdjustsContentInsets` property is `YES`,
  the value of this property may be overridden at any time.
- 
+
  @param contentInsets The new values to inset the content by.
  @param animated Specify `YES` if you want the map view to animate the change to
     the content insets or `NO` if you want the map to inset the content
@@ -513,13 +513,13 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  A Boolean value that determines whether the user may zoom the map in and out,
  changing the zoom level.
- 
+
  When this property is set to `YES`, the default, the user may zoom the map in
  and out by pinching two fingers, by using a scroll wheel on a traditional
  mouse, or by dragging the mouse cursor up and down while holding down the Shift
  key. When the receiver has focus, the user may also zoom by pressing the up and
  down arrow keys while holding down the Option key.
- 
+
  This property controls only user interactions with the map. If you set the
  value of this property to `NO`, you may still change the map zoom
  programmatically.
@@ -529,11 +529,11 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  A Boolean value that determines whether the user may scroll around the map,
  changing the center coordinate.
- 
+
  When this property is set to `YES`, the default, the user may scroll the map by
  swiping with two fingers or dragging the mouse cursor. When the receiver has
  focus, the user may also scroll around the map by pressing the arrow keys.
- 
+
  This property controls only user interactions with the map. If you set the
  value of this property to `NO`, you may still change the map location
  programmatically.
@@ -543,13 +543,13 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  A Boolean value that determines whether the user may rotate the map, changing
  the direction.
- 
+
  When this property is set to `YES`, the default, the user may rotate the map by
  moving two fingers in a circular motion or by dragging the mouse cursor left
  and right while holding down the Option key. When the receiver has focus, the
  user may also zoom by pressing the left and right arrow keys while holding down
  the Option key.
- 
+
  This property controls only user interactions with the map. If you set the
  value of this property to `NO`, you may still rotate the map programmatically.
  */
@@ -558,10 +558,10 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  A Boolean value that determines whether the user may tilt of the map, changing
  the pitch.
- 
+
  When this property is set to `YES`, the default, the user may rotate the map by
  dragging the mouse cursor up and down while holding down the Option key.
- 
+
  This property controls only user interactions with the map. If you set the
  value of this property to `NO`, you may still change the pitch of the map
  programmatically.
@@ -572,7 +572,7 @@ MGL_EXPORT IB_DESIGNABLE
 
 /**
  The complete list of annotations associated with the receiver. (read-only)
- 
+
  The objects in this array must adopt the `MGLAnnotation` protocol. If no
  annotations are associated with the map view, the value of this property is
  `nil`.
@@ -581,13 +581,13 @@ MGL_EXPORT IB_DESIGNABLE
 
 /**
  Adds an annotation to the map view.
- 
+
  @note `MGLMultiPolyline`, `MGLMultiPolygon`, and `MGLShapeCollection` objects
     cannot be added to the map view at this time. Nor can `MGLMultiPoint`
     objects that are not instances of `MGLPolyline` or `MGLPolygon`. Any
     multipoint, multipolyline, multipolygon, or shape collection object that is
     specified is silently ignored.
- 
+
  @param annotation The annotation object to add to the receiver. This object
     must conform to the `MGLAnnotation` protocol. The map view retains the
     annotation object.
@@ -596,13 +596,13 @@ MGL_EXPORT IB_DESIGNABLE
 
 /**
  Adds an array of annotations to the map view.
- 
+
  @note `MGLMultiPolyline`, `MGLMultiPolygon`, and `MGLShapeCollection` objects
     cannot be added to the map view at this time. Nor can `MGLMultiPoint`
     objects that are not instances of `MGLPolyline` or `MGLPolygon`. Any
     multipoint, multipolyline, multipolygon, or shape collection objects that
     are specified are silently ignored.
- 
+
  @param annotations An array of annotation objects. Each object in the array
     must conform to the `MGLAnnotation` protocol. The map view retains each
     individual annotation object.
@@ -612,7 +612,7 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  The complete list of annotations associated with the receiver that are
  currently visible.
- 
+
  The objects in this array must adopt the `MGLAnnotation` protocol. If no
  annotations are associated with the map view or if no annotations associated
  with the map view are currently visible, the value of this property is `nil`.
@@ -621,11 +621,11 @@ MGL_EXPORT IB_DESIGNABLE
 
 /**
  Removes an annotation from the map view, deselecting it if it is selected.
- 
+
  Removing an annotation object dissociates it from the map view entirely,
  preventing it from being displayed on the map. Thus you would typically call
  this method only when you want to hide or delete a given annotation.
- 
+
  @param annotation The annotation object to remove. This object must conform to
     the `MGLAnnotation` protocol.
  */
@@ -634,11 +634,11 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  Removes an array of annotations from the map view, deselecting any selected
  annotations in the array.
- 
+
  Removing annotation objects dissociates them from the map view entirely,
  preventing them from being displayed on the map. Thus you would typically call
  this method only when you want to hide or delete the given annotations.
- 
+
  @param annotations The array of annotation objects to remove. Objects in the
     array must conform to the `MGLAnnotation` protocol.
  */
@@ -646,11 +646,11 @@ MGL_EXPORT IB_DESIGNABLE
 
 /**
  Returns a reusable annotation image object associated with its identifier.
- 
+
  For performance reasons, you should generally reuse `MGLAnnotationImage`
  objects for identical-looking annotations in your map views. Dequeueing saves
  time and memory during performance-critical operations such as scrolling.
- 
+
  @param identifier A string identifying the annotation image to be reused. This
     string is the same one you specify when initially returning the annotation
     image object using the `-mapView:imageForAnnotation:` method.
@@ -662,7 +662,7 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  Returns the list of annotations associated with the receiver that intersect with
  the given rectangle.
- 
+
  @param rect A rectangle expressed in the map view’s coordinate system.
  @return An array of objects that adopt the `MGLAnnotation` protocol or `nil` if
  no annotations associated with the map view are currently visible in the
@@ -674,7 +674,7 @@ MGL_EXPORT IB_DESIGNABLE
 
 /**
  The currently selected annotations.
- 
+
  Assigning a new array to this property selects only the first annotation in the
  array.
  */
@@ -682,30 +682,30 @@ MGL_EXPORT IB_DESIGNABLE
 
 /**
  Selects an annotation and displays a callout popover for it.
- 
+
  If the given annotation is not visible within the current viewport, this method
  has no effect.
- 
+
  @param annotation The annotation object to select.
  */
 - (void)selectAnnotation:(id <MGLAnnotation>)annotation;
 
 /**
  Deselects an annotation and hides its callout popover.
- 
+
  @param annotation The annotation object to deselect.
  */
 - (void)deselectAnnotation:(nullable id <MGLAnnotation>)annotation;
 
 /**
  A common view controller for managing a callout popover’s content view.
- 
+
  Like any instance of `NSPopover`, an annotation callout manages its contents
  with a view controller. The annotation object is the view controller’s
  represented object. This means that you can bind controls in the view
  controller’s content view to KVO-compliant properties of the annotation object,
  such as `title` and `subtitle`.
- 
+
  This property defines a common view controller that is used for every
  annotation’s callout view. If you set this property to `nil`, a default view
  controller will be used that manages a simple title label and subtitle label.
@@ -719,7 +719,7 @@ MGL_EXPORT IB_DESIGNABLE
 
 /**
  Returns a point annotation located at the given point.
- 
+
  @param point A point in the view’s coordinate system.
  @return A point annotation whose annotation image coincides with the point. If
     multiple point annotations coincide with the point, the return value is the
@@ -731,9 +731,9 @@ MGL_EXPORT IB_DESIGNABLE
 
 /**
  Adds a single overlay to the map.
- 
+
  To remove an overlay from a map, use the `-removeOverlay:` method.
- 
+
  @param overlay The overlay object to add. This object must conform to the
      `MGLOverlay` protocol.
  */
@@ -741,9 +741,9 @@ MGL_EXPORT IB_DESIGNABLE
 
 /**
  Adds an array of overlays to the map.
- 
+
  To remove multiple overlays from a map, use the `-removeOverlays:` method.
- 
+
  @param overlays An array of objects, each of which must conform to the
      `MGLOverlay` protocol.
  */
@@ -751,19 +751,19 @@ MGL_EXPORT IB_DESIGNABLE
 
 /**
  Removes a single overlay from the map.
- 
+
  If the specified overlay is not currently associated with the map view, this
  method does nothing.
- 
+
  @param overlay The overlay object to remove.
  */
 - (void)removeOverlay:(id <MGLOverlay>)overlay;
 
 /**
  Removes an array of overlays from the map.
- 
+
  If a given overlay object is not associated with the map view, it is ignored.
- 
+
  @param overlays An array of objects, each of which conforms to the `MGLOverlay`
      protocol.
  */
@@ -773,12 +773,12 @@ MGL_EXPORT IB_DESIGNABLE
 
 /**
  Returns an array of rendered map features that intersect with a given point.
- 
+
  This method may return features from any of the map’s style layers. To restrict
  the search to a particular layer or layers, use the
  `-visibleFeaturesAtPoint:inStyleLayersWithIdentifiers:` method. For more
  information about searching for map features, see that method’s documentation.
- 
+
  @param point A point expressed in the map view’s coordinate system.
  @return An array of objects conforming to the `MGLFeature` protocol that
     represent features in the sources used by the current style.
@@ -788,13 +788,13 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  Returns an array of rendered map features that intersect with a given point,
  restricted to the given style layers.
- 
+
  Each object in the returned array represents a feature rendered by the
  current style and provides access to attributes specified by the relevant
  <a href="https://www.mapbox.com/mapbox-gl-style-spec/#sources">tile sources</a>.
  The returned array includes features specified in vector and GeoJSON tile
  sources but does not include anything from raster, image, or video sources.
- 
+
  Only visible features are returned. For example, suppose the current style uses
  the
  <a href="https://www.mapbox.com/vector-tiles/mapbox-streets/">Mapbox Streets source</a>,
@@ -807,22 +807,22 @@ MGL_EXPORT IB_DESIGNABLE
  attributes). The dictionary contains only the attributes provided by the
  tile source; it does not include computed attribute values or rules about how
  the feature is rendered by the current style.
- 
+
  The returned array is sorted by z-order, starting with the topmost rendered
  feature and ending with the bottommost rendered feature. A feature that is
  rendered multiple times due to wrapping across the antimeridian at low zoom
  levels is included only once, subject to the caveat that follows.
- 
+
  Features come from tiled vector data or GeoJSON data that is converted to tiles
  internally, so feature geometries are clipped at tile boundaries and features
  may appear duplicated across tiles. For example, suppose the specified point
  lies along a road that spans the screen. The resulting array includes those
  parts of the road that lie within the map tile that contain the specified
  point, even if the road extends into other tiles.
- 
+
  To find out the layer names in a particular style, view the style in
  <a href="https://www.mapbox.com/studio/">Mapbox Studio</a>.
- 
+
  @note Layer identifiers are not guaranteed to exist across styles or different
     versions of the same style. Applications that use this API must first set the
     style URL to an explicitly versioned style using a convenience method like
@@ -843,12 +843,12 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  Returns an array of rendered map features that intersect with the given
  rectangle.
- 
+
  This method may return features from any of the map’s style layers. To restrict
  the search to a particular layer or layers, use the
  `-visibleFeaturesAtPoint:inStyleLayersWithIdentifiers:` method. For more
  information about searching for map features, see that method’s documentation.
- 
+
  @param rect A rectangle expressed in the map view’s coordinate system.
  @return An array of objects conforming to the `MGLFeature` protocol that
     represent features in the sources used by the current style.
@@ -858,13 +858,13 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  Returns an array of rendered map features that intersect with the given
  rectangle, restricted to the given style layers.
- 
+
  Each object in the returned array represents a feature rendered by the
  current style and provides access to attributes specified by the relevant
  <a href="https://www.mapbox.com/mapbox-gl-style-spec/#sources">tile sources</a>.
  The returned array includes features specified in vector and GeoJSON tile
  sources but does not include anything from raster, image, or video sources.
- 
+
  Only visible features are returned. For example, suppose the current style uses
  the
  <a href="https://www.mapbox.com/vector-tiles/mapbox-streets/">Mapbox Streets source</a>,
@@ -877,12 +877,12 @@ MGL_EXPORT IB_DESIGNABLE
  contains only the attributes provided by the tile source; it does not include
  computed attribute values or rules about how the feature is rendered by the
  current style.
- 
+
  The returned array is sorted by z-order, starting with the topmost rendered
  feature and ending with the bottommost rendered feature. A feature that is
  rendered multiple times due to wrapping across the antimeridian at low zoom
  levels is included only once, subject to the caveat that follows.
- 
+
  Features come from tiled vector data or GeoJSON data that is converted to tiles
  internally, so feature geometries are clipped at tile boundaries and features
  may appear duplicated across tiles. For example, suppose the specified
@@ -890,10 +890,10 @@ MGL_EXPORT IB_DESIGNABLE
  includes those parts of the road that lie within the map tiles covering the
  specified rectangle, even if the road extends into other tiles. The portion of
  the road within each map tile is included individually.
- 
+
  To find out the layer names in a particular style, view the style in
  <a href="https://www.mapbox.com/studio/">Mapbox Studio</a>.
- 
+
  @note Layer identifiers are not guaranteed to exist across styles or different
     versions of the same style. Applications that use this API must first set the
     style URL to an explicitly versioned style using a convenience method like
@@ -916,7 +916,7 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  Converts a geographic coordinate to a point in the given view’s coordinate
  system.
- 
+
  @param coordinate The geographic coordinate to convert.
  @param view The view in whose coordinate system the returned point should be
     expressed. If this parameter is `nil`, the returned point is expressed in
@@ -930,7 +930,7 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  Converts a point in the given view’s coordinate system to a geographic
  coordinate.
- 
+
  @param point The point to convert.
  @param view The view in whose coordinate system the point is expressed.
  @return The geographic coordinate at the given point.
@@ -940,7 +940,7 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  Converts a geographic bounding box to a rectangle in the given view’s
  coordinate system.
- 
+
  @param bounds The geographic bounding box to convert.
  @param view The view in whose coordinate system the returned rectangle should
     be expressed. If this parameter is `nil`, the returned rectangle is
@@ -952,7 +952,7 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  Converts a rectangle in the given view’s coordinate system to a geographic
  bounding box.
- 
+
  @param rect The rectangle to convert.
  @param view The view in whose coordinate system the rectangle is expressed.
  @return The geographic bounding box coextensive with the given rectangle.
@@ -962,11 +962,11 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  Returns the distance spanned by one point in the map view’s coordinate system
  at the given latitude and current zoom level.
- 
+
  The distance between points decreases as the latitude approaches the poles.
  This relationship parallels the relationship between longitudinal coordinates
  at different latitudes.
- 
+
  @param latitude The latitude of the geographic coordinate represented by the
     point.
  @return The distance in meters spanned by a single point.
@@ -978,11 +978,11 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  Opens one or more webpages in the default Web browser in which the user can
  provide feedback about the map data.
- 
+
  You should add a menu item to the Help menu of your application that invokes
  this method. Title it “Improve This Map” or similar. Set its target to the
  first responder and its action to `giveFeedback:`.
- 
+
  This map view searches the current style’s sources for webpages to open.
  Specifically, each source’s tile set has an `attribution` property containing
  HTML code; if an <code>&lt;a></code> tag (link) within that code has an
@@ -996,7 +996,7 @@ MGL_EXPORT IB_DESIGNABLE
 
 /**
  The options that determine which debugging aids are shown on the map.
- 
+
  These options are all disabled by default and should remain disabled in
  released software for performance and aesthetic reasons.
  */

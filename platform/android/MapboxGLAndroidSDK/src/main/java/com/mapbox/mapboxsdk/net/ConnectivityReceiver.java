@@ -27,11 +27,11 @@ public class ConnectivityReceiver extends BroadcastReceiver {
    */
   public static synchronized ConnectivityReceiver instance(Context context) {
     if (INSTANCE == null) {
-      //Register new instance
+      // Register new instance
       INSTANCE = new ConnectivityReceiver();
       context.registerReceiver(INSTANCE, new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE"));
 
-      //Add default listeners
+      // Add default listeners
       INSTANCE.addListener(new NativeConnectivityListener());
     }
 
@@ -51,7 +51,7 @@ public class ConnectivityReceiver extends BroadcastReceiver {
     boolean connected = isConnected(context);
     Timber.v("Connected: " + connected);
 
-    //Loop over listeners
+    // Loop over listeners
     for (ConnectivityListener listener : listeners) {
       listener.onNetworkStateChanged(connected);
     }

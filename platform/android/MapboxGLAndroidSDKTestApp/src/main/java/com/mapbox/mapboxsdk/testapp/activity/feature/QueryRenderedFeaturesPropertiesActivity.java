@@ -42,7 +42,7 @@ public class QueryRenderedFeaturesPropertiesActivity extends AppCompatActivity {
 
     final float density = getResources().getDisplayMetrics().density;
 
-    //Initialize map as normal
+    // Initialize map as normal
     mapView = (MapView) findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
     mapView.getMapAsync(new OnMapReadyCallback() {
@@ -50,14 +50,14 @@ public class QueryRenderedFeaturesPropertiesActivity extends AppCompatActivity {
       public void onMapReady(final MapboxMap mapboxMap) {
         QueryRenderedFeaturesPropertiesActivity.this.mapboxMap = mapboxMap;
 
-        //Add custom window adapter
+        // Add custom window adapter
         addCustomInfoWindowAdapter(mapboxMap);
 
-        //Add a click listener
+        // Add a click listener
         mapboxMap.setOnMapClickListener(new MapboxMap.OnMapClickListener() {
           @Override
           public void onMapClick(@NonNull LatLng point) {
-            //Query
+            // Query
             final PointF pixel = mapboxMap.getProjection().toScreenLocation(point);
             Timber.i(String.format(
               "Requesting features for %sx%s (%sx%s adjusted for density)",
@@ -65,15 +65,15 @@ public class QueryRenderedFeaturesPropertiesActivity extends AppCompatActivity {
             );
             List<Feature> features = mapboxMap.queryRenderedFeatures(pixel);
 
-            //Debug output
+            // Debug output
             debugOutput(features);
 
-            //Remove any previous markers
+            // Remove any previous markers
             if (marker != null) {
               mapboxMap.removeMarker(marker);
             }
 
-            //Add a marker on the clicked point
+            // Add a marker on the clicked point
             marker = mapboxMap.addMarker(new CustomMarkerOptions().position(point).features(features));
             mapboxMap.selectMarker(marker);
           }
@@ -205,7 +205,7 @@ public class QueryRenderedFeaturesPropertiesActivity extends AppCompatActivity {
     }
 
     private CustomMarkerOptions(Parcel in) {
-      //Should implement this
+      // Should implement this
     }
 
     @Override
@@ -236,7 +236,7 @@ public class QueryRenderedFeaturesPropertiesActivity extends AppCompatActivity {
 
     @Override
     public void writeToParcel(Parcel out, int flags) {
-      //Should implement this
+      // Should implement this
     }
   }
 }

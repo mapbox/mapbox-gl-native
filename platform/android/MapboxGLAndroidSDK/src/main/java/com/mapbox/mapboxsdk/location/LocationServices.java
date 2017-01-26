@@ -96,7 +96,7 @@ public class LocationServices implements LostApiClient.ConnectionCallbacks,
 
   @Override
   public void onConnected() {
-    //noinspection MissingPermission
+    // noinspection MissingPermission
     Location lastLocation = FusedLocationApi.getLastLocation(locationClient);
     if (lastLocation != null) {
       this.lastLocation = lastLocation;
@@ -110,7 +110,7 @@ public class LocationServices implements LostApiClient.ConnectionCallbacks,
         .setFastestInterval(1000)
         .setSmallestDisplacement(3.0f)
         .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-      //noinspection MissingPermission
+      // noinspection MissingPermission
       FusedLocationApi.requestLocationUpdates(locationClient, locationRequest, this);
     } else {
       // LocationRequest Tuned for PASSIVE
@@ -118,7 +118,7 @@ public class LocationServices implements LostApiClient.ConnectionCallbacks,
         .setFastestInterval(1000)
         .setSmallestDisplacement(3.0f)
         .setPriority(LocationRequest.PRIORITY_NO_POWER);
-      //noinspection MissingPermission
+      // noinspection MissingPermission
       FusedLocationApi.requestLocationUpdates(locationClient, locationRequest, this);
     }
   }

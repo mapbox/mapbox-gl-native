@@ -37,7 +37,7 @@ public class QueryRenderedFeaturesBoxHighlightActivity extends AppCompatActivity
 
     final View selectionBox = findViewById(R.id.selection_box);
 
-    //Initialize map as normal
+    // Initialize map as normal
     mapView = (MapView) findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
     mapView.getMapAsync(new OnMapReadyCallback() {
@@ -48,28 +48,28 @@ public class QueryRenderedFeaturesBoxHighlightActivity extends AppCompatActivity
         selectionBox.setOnClickListener(new View.OnClickListener() {
           @Override
           public void onClick(View view) {
-            //Query
+            // Query
             int top = selectionBox.getTop() - mapView.getTop();
             int left = selectionBox.getLeft() - mapView.getLeft();
             RectF box = new RectF(left, top, left + selectionBox.getWidth(), top + selectionBox.getHeight());
             Timber.i(String.format("Querying box %s for buildings", box));
             List<Feature> features = mapboxMap.queryRenderedFeatures(box, "building");
 
-            //Show count
+            // Show count
             Toast.makeText(
               QueryRenderedFeaturesBoxHighlightActivity.this,
               String.format("%s features in box", features.size()),
               Toast.LENGTH_SHORT).show();
 
-            //remove layer / source if already added
+            // remove layer / source if already added
             try {
               mapboxMap.removeSource("highlighted-shapes-source");
               mapboxMap.removeLayer("highlighted-shapes-layer");
             } catch (Exception exception) {
-              //that's ok
+              // that's ok
             }
 
-            //Add layer / source
+            // Add layer / source
             mapboxMap.addSource(
               new GeoJsonSource("highlighted-shapes-source",
                 FeatureCollection.fromFeatures(features))

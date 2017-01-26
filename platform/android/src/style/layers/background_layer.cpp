@@ -47,12 +47,12 @@ namespace android {
     }
 
     void BackgroundLayer::registerNative(jni::JNIEnv& env) {
-        //Lookup the class
+        // Lookup the class
         BackgroundLayer::javaClass = *jni::Class<BackgroundLayer>::Find(env).NewGlobalRef(env).release();
 
         #define METHOD(MethodPtr, name) jni::MakeNativePeerMethod<decltype(MethodPtr), (MethodPtr)>(name)
 
-        //Register the peer
+        // Register the peer
         jni::RegisterNativePeer<BackgroundLayer>(
             env, BackgroundLayer::javaClass, "nativePtr",
             std::make_unique<BackgroundLayer, JNIEnv&, jni::String>,

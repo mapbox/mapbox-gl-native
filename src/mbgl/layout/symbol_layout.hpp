@@ -92,7 +92,7 @@ private:
     GlyphRangeSet ranges;
     std::vector<SymbolInstance> symbolInstances;
     std::vector<SymbolFeature> features;
-    
+
     BiDi bidi; // Consider moving this up to geometry tile worker to reduce reinstantiation costs; use of BiDi/ubiditransform object must be constrained to one thread
 };
 

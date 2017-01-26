@@ -578,7 +578,7 @@ OfflineRegionMetadata OfflineDatabase::updateMetadata(const int64_t regionID, co
     stmt->bindBlob(1, metadata);
     stmt->bind(2, regionID);
     stmt->run();
-    
+
     return metadata;
 }
 
@@ -815,7 +815,7 @@ bool OfflineDatabase::evict(uint64_t neededFreeSize) {
             return false;
         }
         Timestamp accessed = accessedStmt->get<Timestamp>(0);
-        
+
         // clang-format off
         Statement stmt1 = getStatement(
             "DELETE FROM resources "

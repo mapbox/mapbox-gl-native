@@ -94,7 +94,7 @@ Painter::Painter(gl::Context& context_, const TransformState& state_, float pixe
     ProgramParameters programParameters{ pixelRatio, false };
     programs = std::make_unique<Programs>(context, programParameters);
 #ifndef NDEBUG
-    
+
     ProgramParameters programParametersOverdraw{ pixelRatio, true };
     overdrawPrograms = std::make_unique<Programs>(context, programParametersOverdraw);
 #endif

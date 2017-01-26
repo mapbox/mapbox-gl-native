@@ -23,7 +23,7 @@ public:
 
         repeat = repeat_;
         task = std::move(task_);
-        //Prevent overflows when timeout is set to Duration::max()
+        // Prevent overflows when timeout is set to Duration::max()
         due = (timeout == Duration::max()) ? std::chrono::time_point<Clock>::max() : Clock::now() + timeout;
         loop->addRunnable(this);
     }

@@ -46,7 +46,7 @@ public class QueryRenderedFeaturesBoxSymbolCountActivity extends AppCompatActivi
 
     final View selectionBox = findViewById(R.id.selection_box);
 
-    //Initialize map as normal
+    // Initialize map as normal
     mapView = (MapView) findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
     mapView.getMapAsync(new OnMapReadyCallback() {
@@ -55,7 +55,7 @@ public class QueryRenderedFeaturesBoxSymbolCountActivity extends AppCompatActivi
       public void onMapReady(final MapboxMap mapboxMap) {
         QueryRenderedFeaturesBoxSymbolCountActivity.this.mapboxMap = mapboxMap;
 
-        //Add a symbol layer (also works with annotations)
+        // Add a symbol layer (also works with annotations)
         try {
           mapboxMap.addSource(new GeoJsonSource("symbols-source", readRawResource(R.raw.test_points_utrecht)));
         } catch (IOException ioException) {
@@ -72,14 +72,14 @@ public class QueryRenderedFeaturesBoxSymbolCountActivity extends AppCompatActivi
         selectionBox.setOnClickListener(new View.OnClickListener() {
           @Override
           public void onClick(View view) {
-            //Query
+            // Query
             int top = selectionBox.getTop() - mapView.getTop();
             int left = selectionBox.getLeft() - mapView.getLeft();
             RectF box = new RectF(left, top, left + selectionBox.getWidth(), top + selectionBox.getHeight());
             Timber.i(String.format("Querying box %s", box));
             List<Feature> features = mapboxMap.queryRenderedFeatures(box, "symbols-layer");
 
-            //Show count
+            // Show count
             if (toast != null) {
               toast.cancel();
             }

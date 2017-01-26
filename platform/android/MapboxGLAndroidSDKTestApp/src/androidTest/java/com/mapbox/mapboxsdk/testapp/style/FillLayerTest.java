@@ -66,16 +66,16 @@ public class FillLayerTest extends BaseStyleTest {
       layer = new FillLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("visibility");
     assertNotNull(layer);
 
-    //Get initial
+    // Get initial
     assertEquals(layer.getVisibility().getValue(), VISIBLE);
 
-    //Set
+    // Set
     layer.setProperties(visibility(NONE));
     assertEquals(layer.getVisibility().getValue(), NONE);
   }
@@ -91,13 +91,13 @@ public class FillLayerTest extends BaseStyleTest {
       layer = new FillLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("fill-antialias");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(fillAntialias(true));
     assertEquals((Boolean) layer.getFillAntialias().getValue(), (Boolean) true);
   }
@@ -113,13 +113,13 @@ public class FillLayerTest extends BaseStyleTest {
       layer = new FillLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("fill-opacity");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(fillOpacity(0.3f));
     assertEquals((Float) layer.getFillOpacity().getValue(), (Float) 0.3f);
   }
@@ -135,13 +135,13 @@ public class FillLayerTest extends BaseStyleTest {
       layer = new FillLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("fill-color");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(fillColor("rgba(0, 0, 0, 1)"));
     assertEquals((String) layer.getFillColor().getValue(), (String) "rgba(0, 0, 0, 1)");
   }
@@ -157,13 +157,13 @@ public class FillLayerTest extends BaseStyleTest {
       layer = new FillLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("fill-color");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(fillColor(Color.RED));
     assertEquals(layer.getFillColorAsInt(), Color.RED);
   }
@@ -179,13 +179,13 @@ public class FillLayerTest extends BaseStyleTest {
       layer = new FillLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("fill-outline-color");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(fillOutlineColor("rgba(0, 0, 0, 1)"));
     assertEquals((String) layer.getFillOutlineColor().getValue(), (String) "rgba(0, 0, 0, 1)");
   }
@@ -201,13 +201,13 @@ public class FillLayerTest extends BaseStyleTest {
       layer = new FillLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("fill-outline-color");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(fillOutlineColor(Color.RED));
     assertEquals(layer.getFillOutlineColorAsInt(), Color.RED);
   }
@@ -223,13 +223,13 @@ public class FillLayerTest extends BaseStyleTest {
       layer = new FillLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("fill-translate");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(fillTranslate(new Float[] {0f, 0f}));
     assertEquals((Float[]) layer.getFillTranslate().getValue(), (Float[]) new Float[] {0f, 0f});
   }
@@ -245,13 +245,13 @@ public class FillLayerTest extends BaseStyleTest {
       layer = new FillLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("fill-translate-anchor");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(fillTranslateAnchor(FILL_TRANSLATE_ANCHOR_MAP));
     assertEquals((String) layer.getFillTranslateAnchor().getValue(), (String) FILL_TRANSLATE_ANCHOR_MAP);
   }
@@ -267,13 +267,13 @@ public class FillLayerTest extends BaseStyleTest {
       layer = new FillLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("fill-pattern");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(fillPattern("pedestrian-polygon"));
     assertEquals((String) layer.getFillPattern().getValue(), (String) "pedestrian-polygon");
   }

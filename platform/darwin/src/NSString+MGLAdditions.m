@@ -45,7 +45,7 @@
     scanner.charactersToBeSkipped = nil;
     NSString *prefix;
     [scanner scanCharactersFromSet:set intoString:&prefix];
-    
+
     NSString *trimmedString = [self.string stringByTrimmingCharactersInSet:set];
     return [self attributedSubstringFromRange:NSMakeRange(prefix.length, trimmedString.length)];
 }

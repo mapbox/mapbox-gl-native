@@ -436,7 +436,7 @@ public:
     }
     attributionView.subviews = @[];
     [attributionView removeConstraints:attributionView.constraints];
-    
+
     // Make the whole string mini by default.
     // Force links to be black, because the default blue is distracting.
     CGFloat miniSize = [NSFont systemFontSizeForControlSize:NSMiniControlSize];
@@ -446,7 +446,7 @@ public:
         if (info.feedbackLink) {
             continue;
         }
-        
+
         // For each attribution, add a borderless button that responds to clicks
         // and feels like a hyperlink.
         NSButton *button = [[MGLAttributionButton alloc] initWithAttributionInfo:info];
@@ -483,7 +483,7 @@ public:
                                      multiplier:1
                                        constant:0]];
     }
-    
+
     if (attributionInfos.count) {
         [attributionView addConstraint:
          [NSLayoutConstraint constraintWithItem:attributionView
@@ -615,7 +615,7 @@ public:
     if (_isTargetingInterfaceBuilder) {
         return;
     }
-    
+
     // Default to Streets.
     if (!styleURL) {
         // An access token is required to load any default style, including
@@ -1706,12 +1706,12 @@ public:
     {
         return nil;
     }
-    
+
     std::vector<MGLAnnotationTag> annotationTags = [self annotationTagsInRect:rect];
     if (annotationTags.size())
     {
         NSMutableArray *annotations = [NSMutableArray arrayWithCapacity:annotationTags.size()];
-        
+
         for (auto const& annotationTag: annotationTags)
         {
             if (!_annotationContextsByAnnotationTag.count(annotationTag))
@@ -1721,10 +1721,10 @@ public:
             MGLAnnotationContext annotationContext = _annotationContextsByAnnotationTag.at(annotationTag);
             [annotations addObject:annotationContext.annotation];
         }
-        
+
         return [annotations copy];
     }
-    
+
     return nil;
 }
 

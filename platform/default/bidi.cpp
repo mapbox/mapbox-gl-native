@@ -18,7 +18,7 @@ public:
     UBiDi* bidiText = nullptr;
     UBiDi* bidiLine = nullptr;
 };
-    
+
 BiDi::BiDi() : impl(std::make_unique<BiDiImpl>()) {}
 BiDi::~BiDi() = default;
 

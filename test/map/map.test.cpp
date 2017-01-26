@@ -237,7 +237,7 @@ TEST(Map, StyleLoadedSignal) {
     });
     map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
     EXPECT_TRUE(emitted);
-    
+
     // But not when the style couldn't be parsed
     emitted = false;
     map.setStyleJSON("invalid");

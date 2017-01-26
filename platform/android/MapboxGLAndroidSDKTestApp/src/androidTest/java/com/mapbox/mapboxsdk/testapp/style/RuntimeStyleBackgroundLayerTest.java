@@ -44,10 +44,10 @@ public class RuntimeStyleBackgroundLayerTest
         BackgroundLayer layer = mapboxMap.getLayerAs("background");
         assertNotNull(layer);
 
-        //Get initial
+        // Get initial
         assertEquals(layer.getVisibility().getValue(), Property.VISIBLE);
 
-        //Set
+        // Set
         layer.setProperties(PropertyFactory.visibility(Property.NONE));
         assertEquals(layer.getVisibility().getValue(), Property.NONE);
       }

@@ -122,11 +122,11 @@ public:
         activateRequest(request);
         assert(pendingRequestsMap.size() == pendingRequestsList.size());
     }
-    
+
     bool isPending(OnlineFileRequest* request) {
         return pendingRequestsMap.find(request) != pendingRequestsMap.end();
     }
-    
+
     bool isActive(OnlineFileRequest* request) {
         return activeRequests.find(request) != activeRequests.end();
     }

@@ -22,12 +22,12 @@ namespace android {
     jni::Class<ConnectivityListener> ConnectivityListener::javaClass;
 
     void ConnectivityListener::registerNative(jni::JNIEnv& env) {
-        //Lookup the class
+        // Lookup the class
         ConnectivityListener::javaClass = *jni::Class<ConnectivityListener>::Find(env).NewGlobalRef(env).release();
 
         #define METHOD(MethodPtr, name) jni::MakeNativePeerMethod<decltype(MethodPtr), (MethodPtr)>(name)
 
-        //Register the peer
+        // Register the peer
         jni::RegisterNativePeer<ConnectivityListener>(
             env,
             ConnectivityListener::javaClass,
@@ -39,5 +39,5 @@ namespace android {
         );
     }
 
-} //android
-} //mbgl
+} // namespace android
+} // namespace mbgl

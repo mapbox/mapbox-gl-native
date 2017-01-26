@@ -44,7 +44,7 @@
 - (BOOL)isEqual:(id)other {
     if (self == other) return YES;
     if (![other isKindOfClass:[MGLPolygon class]]) return NO;
-    
+
     MGLPolygon *otherPolygon = (MGLPolygon *)other;
     return ([super isEqual:otherPolygon] &&
             [[self geoJSONDictionary] isEqualToDictionary:[otherPolygon geoJSONDictionary]]);
@@ -80,7 +80,7 @@
 }
 
 - (mbgl::Annotation)annotationObjectWithDelegate:(id <MGLMultiPointDelegate>)delegate {
-    
+
     mbgl::FillAnnotation annotation { [self polygon] };
     annotation.opacity = { static_cast<float>([delegate alphaForShapeAnnotation:self]) };
     annotation.outlineColor = { [delegate strokeColorForShapeAnnotation:self] };
@@ -115,9 +115,9 @@
 - (instancetype)initWithPolygons:(NS_ARRAY_OF(MGLPolygon *) *)polygons {
     if (self = [super init]) {
         _polygons = polygons;
-        
+
         mbgl::LatLngBounds bounds = mbgl::LatLngBounds::empty();
-        
+
         for (MGLPolygon *polygon in _polygons) {
             bounds.extend(MGLLatLngBoundsFromCoordinateBounds(polygon.overlayBounds));
         }
@@ -141,7 +141,7 @@
 - (BOOL)isEqual:(id)other {
     if (self == other) return YES;
     if (![other isKindOfClass:[MGLMultiPolygon class]]) return NO;
-    
+
     MGLMultiPolygon *otherMultiPolygon = other;
     return [super isEqual:other]
     && [self.polygons isEqualToArray:otherMultiPolygon.polygons];

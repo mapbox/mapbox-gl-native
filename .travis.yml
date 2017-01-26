@@ -80,6 +80,7 @@ matrix:
       script:
         - git fetch origin master:refs/remotes/origin/master
         - make check
+        - make codestyle
 
     # EGL - Node - Clang 3.8 - Debug
     - os: linux

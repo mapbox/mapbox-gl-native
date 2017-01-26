@@ -33,7 +33,7 @@
 - (instancetype)initWithIdentifier:(NSString *)identifier tileURLTemplates:(NS_ARRAY_OF(NSString *) *)tileURLTemplates options:(nullable NS_DICTIONARY_OF(MGLTileSourceOption, id) *)options {
     if (self = [super initWithIdentifier:identifier tileURLTemplates:tileURLTemplates options:options]) {
         mbgl::Tileset tileSet = MGLTileSetFromTileURLTemplates(tileURLTemplates, options);
-        
+
         auto source = std::make_unique<mbgl::style::VectorSource>(identifier.UTF8String, tileSet);
         _pendingSource = std::move(source);
         self.rawSource = _pendingSource.get();

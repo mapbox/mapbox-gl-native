@@ -27,9 +27,5 @@ public:
 
 };
 
-} //android
-} //mbgl
-
-
-
-
+} // namespace android
+} // namespace mbgl

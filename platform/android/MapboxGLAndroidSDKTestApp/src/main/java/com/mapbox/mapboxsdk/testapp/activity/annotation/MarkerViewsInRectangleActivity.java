@@ -33,7 +33,7 @@ public class MarkerViewsInRectangleActivity extends AppCompatActivity implements
 
     selectionBox = findViewById(R.id.selection_box);
 
-    //Initialize map as normal
+    // Initialize map as normal
     mapView = (MapView) findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
     mapView.getMapAsync(this);
@@ -49,14 +49,14 @@ public class MarkerViewsInRectangleActivity extends AppCompatActivity implements
 
   @Override
   public void onClick(View view) {
-    //Query
+    // Query
     int top = selectionBox.getTop() - mapView.getTop();
     int left = selectionBox.getLeft() - mapView.getLeft();
     RectF box = new RectF(left, top, left + selectionBox.getWidth(), top + selectionBox.getHeight());
     Timber.i(String.format("Querying box %s", box));
     List<MarkerView> markers = mapboxMap.getMarkerViewsInRect(box);
 
-    //Show count
+    // Show count
     Toast.makeText(
       MarkerViewsInRectangleActivity.this,
       String.format("%s markers inside box", markers.size()),

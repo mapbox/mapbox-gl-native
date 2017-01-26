@@ -52,9 +52,9 @@
 - (BOOL)isEqual:(id)other {
     if (self == other) return YES;
     if (![other isKindOfClass:[MGLAnnotationImage class]]) return NO;
-    
+
     MGLAnnotationImage *otherAnnotationImage = other;
-    
+
     return ((!_reuseIdentifier && !otherAnnotationImage.reuseIdentifier)
             || [_reuseIdentifier isEqualToString:otherAnnotationImage.reuseIdentifier])
     && _enabled == otherAnnotationImage.enabled

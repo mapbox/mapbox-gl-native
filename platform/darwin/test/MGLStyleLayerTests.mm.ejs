@@ -3,7 +3,7 @@
   const properties = locals.properties;
   const enumProperties = locals.enumProperties;
 -%>
-// This file is generated. 
+// This file is generated.
 // Edit platform/darwin/scripts/generate-style-code.js, then run `make style-code-darwin`.
 
 #import "MGLStyleLayerTests.h"
@@ -26,13 +26,13 @@
     MGLPointFeature *feature = [[MGLPointFeature alloc] init];
     MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"sourceID" shape:feature options:nil];
     MGL<%- camelize(type) %>StyleLayer *layer = [[MGL<%- camelize(type) %>StyleLayer alloc] initWithIdentifier:@"layerID" source:source];
-    
+
     XCTAssertNil(layer.sourceLayerIdentifier);
     layer.sourceLayerIdentifier = @"layerID";
     XCTAssertEqualObjects(layer.sourceLayerIdentifier, @"layerID");
     layer.sourceLayerIdentifier = nil;
     XCTAssertNil(layer.sourceLayerIdentifier);
-    
+
     XCTAssertNil(layer.predicate);
     layer.predicate = [NSPredicate predicateWithValue:NO];
     XCTAssertEqualObjects(layer.predicate, [NSPredicate predicateWithValue:NO]);
@@ -47,20 +47,20 @@
 <% } else { -%>
     MGLPointFeature *feature = [[MGLPointFeature alloc] init];
     MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"sourceID" shape:feature options:nil];
-    
+
     MGL<%- camelize(type) %>StyleLayer *layer = [[MGL<%- camelize(type) %>StyleLayer alloc] initWithIdentifier:@"layerID" source:source];
 <% } -%>
     XCTAssertNotEqual(layer.rawLayer, nullptr);
     XCTAssertTrue(layer.rawLayer->is<mbgl::style::<%- camelize(type) %>Layer>());
     auto rawLayer = layer.rawLayer->as<mbgl::style::<%- camelize(type) %>Layer>();
 <% for (const property of properties) { -%>
-    
+
     // <%- originalPropertyName(property) %>
     {
         XCTAssertTrue(rawLayer->get<%- camelize(originalPropertyName(property)) %>().isUndefined(),
                       @"<%- originalPropertyName(property) %> should be unset initially.");
         MGLStyleValue<<%- propertyType(property) %>> *defaultStyleValue = layer.<%- objCName(property) %>;
-        
+
         MGLStyleValue<<%- propertyType(property) %>> *styleValue = [MGLStyleValue<<%- propertyType(property) %>> valueWithRawValue:<%- objCTestValue(property, type, 3) %>];
         layer.<%- objCName(property) %> = styleValue;
         mbgl::style::PropertyValue<<%- mbglType(property) %>> propertyValue = { <%- mbglTestValue(property, type) %> };
@@ -68,7 +68,7 @@
                        @"Setting <%- objCName(property) %> to a constant value should update <%- originalPropertyName(property) %>.");
         XCTAssertEqualObjects(layer.<%- objCName(property) %>, styleValue,
                               @"<%- objCName(property) %> should round-trip constant values.");
-        
+
         styleValue = [MGLStyleValue<<%- propertyType(property) %>> valueWithStops:@{
             @18: styleValue,
         }];
@@ -82,7 +82,7 @@
         XCTAssertEqualObjects(layer.<%- objCName(property) %>, styleValue,
                               @"<%- objCName(property) %> should round-trip functions.");
 <% if (!property.required) { -%>
-        
+
         layer.<%- objCName(property) %> = nil;
         XCTAssertTrue(rawLayer->get<%- camelize(originalPropertyName(property)) %>().isUndefined(),
                       @"Unsetting <%- objCName(property) %> should return <%- originalPropertyName(property) %> to the default value.");

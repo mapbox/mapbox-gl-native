@@ -38,6 +38,6 @@ public class MyBearingTracking {
    */
   public static final int GPS = 0x00000008;
 
-  //public static final int COMBINED = 0x00000012;
+  // public static final int COMBINED = 0x00000012;
 
 }

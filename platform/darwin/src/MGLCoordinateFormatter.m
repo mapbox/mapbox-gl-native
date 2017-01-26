@@ -28,7 +28,7 @@
             negativeLongitudeFormat = NSLocalizedStringWithDefaultValue(@"COORD_W_SHORT", @"Foundation", nil, @"%@W", @"West longitude format, short: {longitude}");
             stringFormat = NSLocalizedStringWithDefaultValue(@"COORD_FMT_SHORT", @"Foundation", nil, @"%@, %@", @"Coordinate pair format, short: {latitude}, {longitude}");
             break;
-            
+
         case NSFormattingUnitStyleMedium:
             positiveLatitudeFormat = NSLocalizedStringWithDefaultValue(@"COORD_N_MEDIUM", @"Foundation", nil, @"%@ north", @"North latitude format, medium: {latitude}");
             negativeLatitudeFormat = NSLocalizedStringWithDefaultValue(@"COORD_S_MEDIUM", @"Foundation", nil, @"%@ south", @"South latitude format, medium: {latitude}");
@@ -36,7 +36,7 @@
             negativeLongitudeFormat = NSLocalizedStringWithDefaultValue(@"COORD_W_MEDIUM", @"Foundation", nil, @"%@ west", @"West longitude format, medium: {longitude}");
             stringFormat = NSLocalizedStringWithDefaultValue(@"COORD_FMT_MEDIUM", @"Foundation", nil, @"%@, %@", @"Coordinate pair format, medium: {latitude}, {longitude}");
             break;
-            
+
         case NSFormattingUnitStyleLong:
             positiveLatitudeFormat = NSLocalizedStringWithDefaultValue(@"COORD_N_LONG", @"Foundation", nil, @"%@ north", @"North latitude format, long: {latitude}");
             negativeLatitudeFormat = NSLocalizedStringWithDefaultValue(@"COORD_S_LONG", @"Foundation", nil, @"%@ south", @"South latitude format, long: {latitude}");
@@ -57,7 +57,7 @@
 - (NSString *)stringFromLocationDegrees:(CLLocationDegrees)degrees positiveFormat:(NSString *)positiveFormat negativeFormat:(NSString *)negativeFormat {
     CLLocationDegrees minutes = (fabs(degrees) - floor(fabs(degrees))) * 60;
     CLLocationDegrees seconds = (minutes - floor(minutes)) * 60;
-    
+
     NSString *degreesFormat;
     NSString *minutesFormat;
     NSString *secondsFormat;
@@ -71,7 +71,7 @@
             degreesMinutesFormat = NSLocalizedStringWithDefaultValue(@"COORD_DM_SHORT", @"Foundation", nil, @"%@%@", @"Coordinate format, short: {degrees}{minutes}");
             degreesMinutesSecondsFormat = NSLocalizedStringWithDefaultValue(@"COORD_DMS_SHORT", @"Foundation", nil, @"%@%@%@", @"Coordinate format, short: {degrees}{minutes}{seconds}");
             break;
-            
+
         case NSFormattingUnitStyleMedium:
             degreesFormat = NSLocalizedStringWithDefaultValue(@"COORD_DEG_MEDIUM", @"Foundation", nil, @"%d°", @"Degrees format, medium: {degrees}");
             minutesFormat = NSLocalizedStringWithDefaultValue(@"COORD_MIN_MEDIUM", @"Foundation", nil, @"%d′", @"Minutes format, medium: {minutes}");
@@ -79,7 +79,7 @@
             degreesMinutesFormat = NSLocalizedStringWithDefaultValue(@"COORD_DM_MEDIUM", @"Foundation", nil, @"%@%@", @"Coordinate format, medium: {degrees}{minutes}");
             degreesMinutesSecondsFormat = NSLocalizedStringWithDefaultValue(@"COORD_DMS_MEDIUM", @"Foundation", nil, @"%@%@%@", @"Coordinate format, medium: {degrees}{minutes}{seconds}");
             break;
-            
+
         case NSFormattingUnitStyleLong:
             degreesFormat = NSLocalizedStringWithDefaultValue(@"COORD_DEG_LONG", @"Foundation", nil, @"%d degree(s)", @"Degrees format, long");
             minutesFormat = NSLocalizedStringWithDefaultValue(@"COORD_MIN_LONG", @"Foundation", nil, @"%d minute(s)", @"Minutes format, long");
@@ -88,9 +88,9 @@
             degreesMinutesSecondsFormat = NSLocalizedStringWithDefaultValue(@"COORD_DMS_LONG", @"Foundation", nil, @"%@, %@, and %@", @"Coordinate format, long: {degrees}{minutes}{seconds}");
             break;
     }
-    
+
     NSString *degreesString = [NSString stringWithFormat:degreesFormat, (int)floor(fabs(degrees))];
-    
+
     NSString *string;
     if (trunc(seconds) > 0 && self.allowsSeconds) {
         NSString *minutesString = [NSString stringWithFormat:minutesFormat, (int)floor(minutes)];
@@ -104,7 +104,7 @@
     } else {
         string = [NSString stringWithFormat:degreesFormat, (int)round(fabs(degrees))];
     }
-    
+
     if (degrees == 0) {
         return string;
     }

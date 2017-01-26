@@ -9,7 +9,7 @@ require('../../../scripts/style-code');
 
 // Specification parsing //
 
-//Collect layer types from spec
+// Collect layer types from spec
 const layers = Object.keys(spec.layer.type.values).map((type) => {
   const layoutProperties = Object.keys(spec[`layout_${type}`]).reduce((memo, name) => {
     if (name !== 'visibility') {
@@ -34,7 +34,7 @@ const layers = Object.keys(spec.layer.type.values).map((type) => {
   };
 });
 
-//Process all layer properties
+// Process all layer properties
 const layoutProperties = _(layers).map('layoutProperties').flatten().value();
 const paintProperties = _(layers).map('paintProperties').flatten().value();
 const allProperties = _(layoutProperties).union(paintProperties).value();
@@ -156,17 +156,17 @@ global.defaultValueJava = function(property) {
  */
 global.propertyFactoryMethodDoc = function (property) {
     let doc = property.doc;
-    //Match other items in back ticks
+    // Match other items in back ticks
     doc = doc.replace(/`(.+?)`/g, function (m, symbol, offset, str) {
         if (str.substr(offset - 4, 3) !== 'CSS' && symbol[0].toUpperCase() != symbol[0] && _(enumProperties).filter({'name': symbol}).value().length > 0) {
-            //Property 'enums'
+            // Property 'enums'
             symbol = snakeCaseUpper(symbol);
             return '{@link Property.' + symbol + '}';
         } else if( _(allProperties).filter({'name': symbol}).value().length > 0) {
-            //Other properties
+            // Other properties
             return '{@link PropertyFactory#' + camelizeWithLeadingLowercase(symbol) + '}';
         } else {
-            //Left overs
+            // Left overs
             return '`' + symbol + '`';
         }
     });
@@ -193,19 +193,19 @@ global.propertyValueDoc = function (property, value) {
         return 'is equivalent to {@link Property#' + propertyValue + '}';
     });
 
-    //Match other items in back ticks
+    // Match other items in back ticks
     doc = doc.replace(/`(.+?)`/g, function (m, symbol, offset, str) {
         if ('values' in property && Object.keys(property.values).indexOf(symbol) !== -1) {
-            //Property values
+            // Property values
             propertyValue = snakeCaseUpper(property.name) + '_' + snakeCaseUpper(symbol);
             console.log("Transforming", symbol, propertyValue);
             return '{@link Property#' + `${propertyValue}` + '}';
         } else if (str.substr(offset - 4, 3) !== 'CSS' && symbol[0].toUpperCase() != symbol[0]) {
-            //Property 'enums'
+            // Property 'enums'
             symbol = snakeCaseUpper(symbol);
             return '{@link ' + symbol + '}';
         } else {
-            //Left overs
+            // Left overs
             return symbol
         }
     });
@@ -242,7 +242,7 @@ writeIfModified(
     enumPropertyJavaTemplate({properties: enumProperties})
 );
 
-//De-duplicate enum properties before processing jni property templates
+// De-duplicate enum properties before processing jni property templates
 const enumPropertiesDeDup = _(enumProperties).uniqBy(global.propertyNativeType).value();
 
 // JNI Enum property conversion templates

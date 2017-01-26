@@ -16,7 +16,7 @@ public:
     Program(gl::Context& context, const ProgramParameters& programParameters)
         : ParentType(context, vertexSource(programParameters), fragmentSource(programParameters))
         {}
-    
+
     static std::string pixelRatioDefine(const ProgramParameters& parameters) {
         std::ostringstream pixelRatioSS;
         pixelRatioSS.imbue(std::locale("C"));

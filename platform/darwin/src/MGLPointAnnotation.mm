@@ -33,7 +33,7 @@
 {
     if (other == self) return YES;
     if (![other isKindOfClass:[MGLPointAnnotation class]]) return NO;
-    
+
     MGLPointAnnotation *otherAnnotation = other;
     return ([super isEqual:other]
             && self.coordinate.latitude == otherAnnotation.coordinate.latitude

@@ -61,7 +61,7 @@
 - (float)minimumZoomLevel
 {
     MGLAssertStyleLayerIsValid();
-    
+
     return self.rawLayer->getMinZoom();
 }
 

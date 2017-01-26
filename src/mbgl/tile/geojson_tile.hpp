@@ -16,7 +16,7 @@ public:
                 const style::UpdateParameters&);
 
     void updateData(const mapbox::geometry::feature_collection<int16_t>&);
-    
+
     void setNecessity(Necessity) final;
 };
 

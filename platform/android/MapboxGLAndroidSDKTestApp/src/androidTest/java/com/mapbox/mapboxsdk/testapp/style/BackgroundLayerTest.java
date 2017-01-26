@@ -61,10 +61,10 @@ public class BackgroundLayerTest extends BaseStyleTest {
     Timber.i("visibility");
     assertNotNull(layer);
 
-    //Get initial
+    // Get initial
     assertEquals(layer.getVisibility().getValue(), VISIBLE);
 
-    //Set
+    // Set
     layer.setProperties(visibility(NONE));
     assertEquals(layer.getVisibility().getValue(), NONE);
   }
@@ -80,7 +80,7 @@ public class BackgroundLayerTest extends BaseStyleTest {
     Timber.i("background-color");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(backgroundColor("rgba(0, 0, 0, 1)"));
     assertEquals((String) layer.getBackgroundColor().getValue(), (String) "rgba(0, 0, 0, 1)");
   }
@@ -96,7 +96,7 @@ public class BackgroundLayerTest extends BaseStyleTest {
     Timber.i("background-color");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(backgroundColor(Color.RED));
     assertEquals(layer.getBackgroundColorAsInt(), Color.RED);
   }
@@ -112,7 +112,7 @@ public class BackgroundLayerTest extends BaseStyleTest {
     Timber.i("background-pattern");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(backgroundPattern("pedestrian-polygon"));
     assertEquals((String) layer.getBackgroundPattern().getValue(), (String) "pedestrian-polygon");
   }
@@ -128,7 +128,7 @@ public class BackgroundLayerTest extends BaseStyleTest {
     Timber.i("background-opacity");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(backgroundOpacity(0.3f));
     assertEquals((Float) layer.getBackgroundOpacity().getValue(), (Float) 0.3f);
   }

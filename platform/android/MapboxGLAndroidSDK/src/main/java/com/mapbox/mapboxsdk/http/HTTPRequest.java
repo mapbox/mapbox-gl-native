@@ -123,7 +123,7 @@ class HTTPRequest implements Callback {
       body = response.body().bytes();
     } catch (IOException ioException) {
       onFailure(ioException);
-      //throw ioException;
+      // throw ioException;
       return;
     } finally {
       response.body().close();

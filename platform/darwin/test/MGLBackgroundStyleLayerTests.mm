@@ -1,4 +1,4 @@
-// This file is generated. 
+// This file is generated.
 // Edit platform/darwin/scripts/generate-style-code.js, then run `make style-code-darwin`.
 
 #import "MGLStyleLayerTests.h"
@@ -21,13 +21,13 @@
     XCTAssertNotEqual(layer.rawLayer, nullptr);
     XCTAssertTrue(layer.rawLayer->is<mbgl::style::BackgroundLayer>());
     auto rawLayer = layer.rawLayer->as<mbgl::style::BackgroundLayer>();
-    
+
     // background-color
     {
         XCTAssertTrue(rawLayer->getBackgroundColor().isUndefined(),
                       @"background-color should be unset initially.");
         MGLStyleValue<MGLColor *> *defaultStyleValue = layer.backgroundColor;
-        
+
         MGLStyleValue<MGLColor *> *styleValue = [MGLStyleValue<MGLColor *> valueWithRawValue:[MGLColor redColor]];
         layer.backgroundColor = styleValue;
         mbgl::style::PropertyValue<mbgl::Color> propertyValue = { { 1, 0, 0, 1 } };
@@ -35,7 +35,7 @@
                        @"Setting backgroundColor to a constant value should update background-color.");
         XCTAssertEqualObjects(layer.backgroundColor, styleValue,
                               @"backgroundColor should round-trip constant values.");
-        
+
         styleValue = [MGLStyleValue<MGLColor *> valueWithStops:@{
             @18: styleValue,
         }];
@@ -48,20 +48,20 @@
                        @"Setting backgroundColor to a function should update background-color.");
         XCTAssertEqualObjects(layer.backgroundColor, styleValue,
                               @"backgroundColor should round-trip functions.");
-        
+
         layer.backgroundColor = nil;
         XCTAssertTrue(rawLayer->getBackgroundColor().isUndefined(),
                       @"Unsetting backgroundColor should return background-color to the default value.");
         XCTAssertEqualObjects(layer.backgroundColor, defaultStyleValue,
                               @"backgroundColor should return the default value after being unset.");
     }
-    
+
     // background-opacity
     {
         XCTAssertTrue(rawLayer->getBackgroundOpacity().isUndefined(),
                       @"background-opacity should be unset initially.");
         MGLStyleValue<NSNumber *> *defaultStyleValue = layer.backgroundOpacity;
-        
+
         MGLStyleValue<NSNumber *> *styleValue = [MGLStyleValue<NSNumber *> valueWithRawValue:@0xff];
         layer.backgroundOpacity = styleValue;
         mbgl::style::PropertyValue<float> propertyValue = { 0xff };
@@ -69,7 +69,7 @@
                        @"Setting backgroundOpacity to a constant value should update background-opacity.");
         XCTAssertEqualObjects(layer.backgroundOpacity, styleValue,
                               @"backgroundOpacity should round-trip constant values.");
-        
+
         styleValue = [MGLStyleValue<NSNumber *> valueWithStops:@{
             @18: styleValue,
         }];
@@ -82,20 +82,20 @@
                        @"Setting backgroundOpacity to a function should update background-opacity.");
         XCTAssertEqualObjects(layer.backgroundOpacity, styleValue,
                               @"backgroundOpacity should round-trip functions.");
-        
+
         layer.backgroundOpacity = nil;
         XCTAssertTrue(rawLayer->getBackgroundOpacity().isUndefined(),
                       @"Unsetting backgroundOpacity should return background-opacity to the default value.");
         XCTAssertEqualObjects(layer.backgroundOpacity, defaultStyleValue,
                               @"backgroundOpacity should return the default value after being unset.");
     }
-    
+
     // background-pattern
     {
         XCTAssertTrue(rawLayer->getBackgroundPattern().isUndefined(),
                       @"background-pattern should be unset initially.");
         MGLStyleValue<NSString *> *defaultStyleValue = layer.backgroundPattern;
-        
+
         MGLStyleValue<NSString *> *styleValue = [MGLStyleValue<NSString *> valueWithRawValue:@"Background Pattern"];
         layer.backgroundPattern = styleValue;
         mbgl::style::PropertyValue<std::string> propertyValue = { "Background Pattern" };
@@ -103,7 +103,7 @@
                        @"Setting backgroundPattern to a constant value should update background-pattern.");
         XCTAssertEqualObjects(layer.backgroundPattern, styleValue,
                               @"backgroundPattern should round-trip constant values.");
-        
+
         styleValue = [MGLStyleValue<NSString *> valueWithStops:@{
             @18: styleValue,
         }];
@@ -116,7 +116,7 @@
                        @"Setting backgroundPattern to a function should update background-pattern.");
         XCTAssertEqualObjects(layer.backgroundPattern, styleValue,
                               @"backgroundPattern should round-trip functions.");
-        
+
         layer.backgroundPattern = nil;
         XCTAssertTrue(rawLayer->getBackgroundPattern().isUndefined(),
                       @"Unsetting backgroundPattern should return background-pattern to the default value.");

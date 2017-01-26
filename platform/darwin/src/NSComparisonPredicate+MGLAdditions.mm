@@ -18,28 +18,28 @@
             mbgl::style::EqualsFilter eqFilter;
             eqFilter.key = self.mgl_keyPath.UTF8String;
             eqFilter.value = self.mgl_constantValue;
-            
+
             // Convert == nil to NotHasFilter.
             if (eqFilter.value.is<mbgl::NullValue>()) {
                 mbgl::style::NotHasFilter notHasFilter;
                 notHasFilter.key = eqFilter.key;
                 return notHasFilter;
             }
-            
+
             return eqFilter;
         }
         case NSNotEqualToPredicateOperatorType: {
             mbgl::style::NotEqualsFilter neFilter;
             neFilter.key = self.mgl_keyPath.UTF8String;
             neFilter.value = self.mgl_constantValue;
-            
+
             // Convert != nil to HasFilter.
             if (neFilter.value.is<mbgl::NullValue>()) {
                 mbgl::style::HasFilter hasFilter;
                 hasFilter.key = neFilter.key;
                 return hasFilter;
             }
-            
+
             return neFilter;
         }
         case NSGreaterThanPredicateOperatorType: {
@@ -155,7 +155,7 @@
             [NSException raise:NSInvalidArgumentException
                         format:@"NSPredicateOperatorType:%lu is not supported.", (unsigned long)self.predicateOperatorType];
     }
-    
+
     return {};
 }
 
@@ -169,7 +169,7 @@
     } else if (leftType == NSConstantValueExpressionType && rightType == NSKeyPathExpressionType) {
         return rightExpression.keyPath;
     }
-    
+
     [NSException raise:NSInvalidArgumentException
                 format:@"Comparison predicate must compare an attribute (as a key path) to a constant or vice versa."];
     return nil;

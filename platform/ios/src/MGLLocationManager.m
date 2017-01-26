@@ -32,7 +32,7 @@ static NSString * const MGLLocationManagerRegionIdentifier = @"MGLLocationManage
     if ([self isUpdatingLocation]) {
         return;
     }
-    
+
     [self configurePassiveStandardLocationManager];
     [self startLocationServices];
 }
@@ -78,7 +78,7 @@ static NSString * const MGLLocationManagerRegionIdentifier = @"MGLLocationManage
                 self.standardLocationManager.allowsBackgroundLocationUpdates = YES;
             }
         }
-        
+
         [self.standardLocationManager startUpdatingLocation];
         self.updatingLocation = YES;
         if ([self.delegate respondsToSelector:@selector(locationManagerDidStartLocationUpdates:)]) {
@@ -91,13 +91,13 @@ static NSString * const MGLLocationManagerRegionIdentifier = @"MGLLocationManage
     if (self.backgroundLocationServiceTimeoutAllowedDate == nil) {
         return;
     }
-  
+
     if ([UIApplication sharedApplication].applicationState == UIApplicationStateActive ||
         [UIApplication sharedApplication].applicationState == UIApplicationStateInactive ) {
         [self startBackgroundTimeoutTimer];
         return;
     }
-    
+
     NSTimeInterval timeIntervalSinceTimeoutAllowed = [[NSDate date] timeIntervalSinceDate:self.backgroundLocationServiceTimeoutAllowedDate];
     if (timeIntervalSinceTimeoutAllowed > 0) {
         [self.standardLocationManager stopUpdatingLocation];

@@ -65,7 +65,7 @@
 
 - (mbgl::FeatureIdentifier)mgl_featureIdentifier {
     mbgl::Value mbglValue = self.mgl_constantMBGLValue;
-    
+
     if (mbglValue.is<std::string>()) {
         return mbglValue.get<std::string>();
     }
@@ -78,7 +78,7 @@
     if (mbglValue.is<int64_t>()) {
         return mbglValue.get<int64_t>();
     }
-    
+
     return {};
 }
 

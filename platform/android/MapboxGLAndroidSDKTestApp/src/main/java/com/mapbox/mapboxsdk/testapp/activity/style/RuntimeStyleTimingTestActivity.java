@@ -29,7 +29,7 @@ public class RuntimeStyleTimingTestActivity extends AppCompatActivity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_runtime_style);
 
-    //Initialize map as normal
+    // Initialize map as normal
     mapView = (MapView) findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
     mapView.getMapAsync(new OnMapReadyCallback() {

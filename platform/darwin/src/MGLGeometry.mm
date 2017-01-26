@@ -6,7 +6,7 @@
 
 /** Vertical field of view, measured in degrees, for determining the altitude
     of the viewpoint.
-    
+
     TransformState::getProjMatrix() has a variable vertical field of view that
     defaults to 2 arctan ⅓ rad ≈ 36.9° but MapKit uses a vertical field of view of 30°.
     flyTo() assumes a field of view of 2 arctan ½ rad. */

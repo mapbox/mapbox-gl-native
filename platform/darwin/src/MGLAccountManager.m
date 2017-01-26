@@ -65,7 +65,7 @@
     if (!accessToken.length) {
         return;
     }
-    
+
     [MGLAccountManager sharedManager].accessToken = accessToken;
 
 #if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR

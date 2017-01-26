@@ -21,7 +21,7 @@ bool operator==(const CLLocationCoordinate2D lhs, const CLLocationCoordinate2D r
         }
         return nil;
     }
-    
+
     try {
         const auto geojson = mapbox::geojson::parse(string.UTF8String);
         return MGLShapeFromGeoJSON(geojson);
@@ -81,7 +81,7 @@ bool operator==(const CLLocationCoordinate2D lhs, const CLLocationCoordinate2D r
 {
     if (other == self) { return YES; }
     id <MGLAnnotation> annotation = other;
-    
+
 #if TARGET_OS_IPHONE
     return ((!_title && ![annotation title]) || [_title isEqualToString:[annotation title]])
             && ((!_subtitle && ![annotation subtitle]) || [_subtitle isEqualToString:[annotation subtitle]]);

@@ -114,7 +114,7 @@ float GlyphSet::determineAverageLineWidth(const std::u16string& logicalInput,
     int32_t targetLineCount = std::fmax(1, std::ceil(totalWidth / maxWidth));
     return totalWidth / targetLineCount;
 }
-    
+
 float calculateBadness(const float lineWidth, const float targetWidth, const float penalty, const bool isLastBreak) {
     const float raggedness = std::pow(lineWidth - targetWidth, 2);
     if (isLastBreak) {
@@ -130,7 +130,7 @@ float calculateBadness(const float lineWidth, const float targetWidth, const flo
     }
     return raggedness + std::pow(penalty, 2);
 }
-    
+
 float calculatePenalty(char16_t codePoint, char16_t nextCodePoint) {
     float penalty = 0;
     // Force break on newline
@@ -146,28 +146,28 @@ float calculatePenalty(char16_t codePoint, char16_t nextCodePoint) {
     if (nextCodePoint == 0x29 || nextCodePoint == 0xff09) {
         penalty += 50;
     }
-    
+
     return penalty;
 }
-    
+
 struct PotentialBreak {
     PotentialBreak(const std::size_t p_index, const float p_x, const PotentialBreak* p_priorBreak, const float p_badness)
         : index(p_index), x(p_x), priorBreak(p_priorBreak), badness(p_badness)
     {}
-    
+
     const std::size_t index;
     const float x;
     const PotentialBreak* priorBreak;
     const float badness;
 };
 
-    
+
 PotentialBreak evaluateBreak(const std::size_t breakIndex, const float breakX, const float targetWidth, const std::list<PotentialBreak>& potentialBreaks, const float penalty, const bool isLastBreak) {
     // We could skip evaluating breaks where the line length (breakX - priorBreak.x) > maxWidth
     //  ...but in fact we allow lines longer than maxWidth (if there's no break points)
     //  ...and when targetWidth and maxWidth are close, strictly enforcing maxWidth can give
     //     more lopsided results.
-    
+
     const PotentialBreak* bestPriorBreak = nullptr;
     float bestBreakBadness = calculateBadness(breakX, targetWidth, penalty, isLastBreak);
     for (const auto& potentialBreak : potentialBreaks) {
@@ -182,7 +182,7 @@ PotentialBreak evaluateBreak(const std::size_t breakIndex, const float breakX, c
 
     return PotentialBreak(breakIndex, breakX, bestPriorBreak, bestBreakBadness);
 }
-    
+
 std::set<std::size_t> leastBadBreaks(const PotentialBreak& lastLineBreak) {
     std::set<std::size_t> leastBadBreaks = { lastLineBreak.index };
     const PotentialBreak* priorBreak = lastLineBreak.priorBreak;
@@ -206,9 +206,9 @@ std::set<std::size_t> GlyphSet::determineLineBreaks(const std::u16string& logica
     if (logicalInput.empty()) {
         return {};
     }
- 
+
     const float targetWidth = determineAverageLineWidth(logicalInput, spacing, maxWidth);
-    
+
     std::list<PotentialBreak> potentialBreaks;
     float currentX = 0;
 
@@ -218,7 +218,7 @@ std::set<std::size_t> GlyphSet::determineLineBreaks(const std::u16string& logica
         if (it != sdfs.end() && !boost::algorithm::is_any_of(u" \t\n\v\f\r")(codePoint)) {
             currentX += it->second.metrics.advance + spacing;
         }
-        
+
         // Ideographic characters, spaces, and word-breaking punctuation that often appear without
         // surrounding spaces.
         if ((i < logicalInput.size() - 1) &&
@@ -274,7 +274,7 @@ void GlyphSet::shapeLines(Shaping& shaping,
         if (shaping.positionedGlyphs.size() != lineStartIndex) {
             float lineLength = x - spacing; // Don't count trailing spacing
             maxLineLength = util::max(lineLength, maxLineLength);
-            
+
             justifyLine(shaping.positionedGlyphs, sdfs, lineStartIndex,
                         shaping.positionedGlyphs.size() - 1, justify);
         }

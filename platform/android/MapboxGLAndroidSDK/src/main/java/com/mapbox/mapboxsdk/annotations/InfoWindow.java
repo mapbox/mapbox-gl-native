@@ -198,7 +198,7 @@ public class InfoWindow {
       // Calculate x-offset for update method
       viewWidthOffset = x - coordinates.x - offsetX;
 
-      close(); //if it was already opened
+      close(); // if it was already opened
       mapView.addView(view, lp);
       isVisible = true;
     }

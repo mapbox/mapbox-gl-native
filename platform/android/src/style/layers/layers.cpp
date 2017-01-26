@@ -60,5 +60,5 @@ void registerNativeLayers(jni::JNIEnv& env) {
     CustomLayer::registerNative(env);
 }
 
-} //android
-} //mbgl
+} // namespace android
+} // namespace mbgl

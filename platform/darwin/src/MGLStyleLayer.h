@@ -9,11 +9,11 @@ NS_ASSUME_NONNULL_BEGIN
  `MGLStyleLayer` is an abstract base class for style layers. A style layer
  manages the layout and appearance of content at a specific z-index in a style.
  An `MGLStyle` object consists of one or more `MGLStyleLayer` objects.
- 
+
  Each style layer defined by the style JSON file is represented at runtime by an
  `MGLStyleLayer` object, which you can use to refine the map’s appearance. You
  can also add and remove style layers dynamically.
- 
+
  Do not create instances of this class directly, and do not create your own
  subclasses of this class. Instead, create instances of
  `MGLBackgroundStyleLayer` and the concrete subclasses of
@@ -28,16 +28,16 @@ MGL_EXPORT
 
 /**
  Returns a style layer object initialized with the given identifier.
- 
+
  The default implementation of this initializer in MGLStyleLayer creates an
  invalid style layer. Call this initializer on `MGLBackgroundStyleLayer` or one of
  the concrete subclasses of `MGLForegroundStyleLayer` to create a valid style
  layer.
- 
+
  After initializing and configuring the style layer, add it to a map view’s
  style using the `-[MGLStyle addLayer:]` or
- `-[MGLStyle insertLayer:belowLayer:]` method. 
- 
+ `-[MGLStyle insertLayer:belowLayer:]` method.
+
  @param identifier A string that uniquely identifies the layer in the style to
     which it is added.
  @return An initialized style layer.

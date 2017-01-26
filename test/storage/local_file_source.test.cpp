@@ -104,14 +104,14 @@ TEST(LocalFileSource, URLEncoding) {
 
 TEST(LocalFileSource, URLLimit) {
     util::RunLoop loop;
-    
+
     size_t length = PATH_MAX - toAbsoluteURL("").size();
     LocalFileSource fs;
     char filename[length];
     memset(filename, 'x', length);
-    
+
     std::string url(filename, length);
-    
+
     std::unique_ptr<AsyncRequest> req = fs.request({ Resource::Unknown, toAbsoluteURL(url) }, [&](Response res) {
         req.reset();
         ASSERT_NE(nullptr, res.error);
@@ -119,6 +119,6 @@ TEST(LocalFileSource, URLLimit) {
         ASSERT_FALSE(res.data.get());
         loop.stop();
     });
-    
+
     loop.run();
 }

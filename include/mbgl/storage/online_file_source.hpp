@@ -12,7 +12,7 @@ public:
 
     void setAPIBaseURL(const std::string& t) { apiBaseURL = t; }
     std::string getAPIBaseURL() const { return apiBaseURL; }
-    
+
     void setAccessToken(const std::string& t) { accessToken = t; }
     std::string getAccessToken() const { return accessToken; }
 

@@ -23,7 +23,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, readonly, nullable) CLLocation *location;
 
-/** 
+/**
  A Boolean value indicating whether the user’s location is currently being
  updated. (read-only)
  */
@@ -31,8 +31,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  The heading of the user location. (read-only)
- 
- This property is `nil` if the user location tracking mode is not 
+
+ This property is `nil` if the user location tracking mode is not
  `MGLUserTrackingModeFollowWithHeading`.
  */
 @property (nonatomic, readonly, nullable) CLHeading *heading;

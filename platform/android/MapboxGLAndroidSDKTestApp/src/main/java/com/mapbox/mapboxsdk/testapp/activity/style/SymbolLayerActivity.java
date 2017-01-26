@@ -56,21 +56,21 @@ public class SymbolLayerActivity extends AppCompatActivity implements MapboxMap.
       public void onMapReady(@NonNull final MapboxMap map) {
         mapboxMap = map;
 
-        //Add a image for the makers
+        // Add a image for the makers
         mapboxMap.addImage(
           "my-marker-image",
           BitmapFactory.decodeResource(SymbolLayerActivity.this.getResources(),
             R.drawable.mapbox_marker_icon_default)
         );
 
-        //Add a source
+        // Add a source
         FeatureCollection markers = FeatureCollection.fromFeatures(new Feature[] {
           Feature.fromGeometry(Point.fromCoordinates(new double[] {4.91638, 52.35673}), featureProperties("Marker 1")),
           Feature.fromGeometry(Point.fromCoordinates(new double[] {4.91638, 52.34673}), featureProperties("Marker 2"))
         });
         mapboxMap.addSource(new GeoJsonSource(MARKER_SOURCE, markers));
 
-        //Add the symbol-layer
+        // Add the symbol-layer
         mapboxMap.addLayer(
           new SymbolLayer(MARKER_LAYER, MARKER_SOURCE)
             .withProperties(
@@ -82,10 +82,10 @@ public class SymbolLayerActivity extends AppCompatActivity implements MapboxMap.
             )
         );
 
-        //Show
+        // Show
         mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(52.35273, 4.91638), 14));
 
-        //Set a click-listener so we can manipulate the map
+        // Set a click-listener so we can manipulate the map
         mapboxMap.setOnMapClickListener(SymbolLayerActivity.this);
       }
     });
@@ -93,13 +93,13 @@ public class SymbolLayerActivity extends AppCompatActivity implements MapboxMap.
 
   @Override
   public void onMapClick(@NonNull LatLng point) {
-    //Query which features are clicked
+    // Query which features are clicked
     PointF screenLoc = mapboxMap.getProjection().toScreenLocation(point);
     List<Feature> features = mapboxMap.queryRenderedFeatures(screenLoc, MARKER_LAYER);
 
     SymbolLayer layer = mapboxMap.getLayerAs(MARKER_LAYER);
     if (features.size() == 0) {
-      //Reset
+      // Reset
       layer.setProperties(iconSize(1f));
     } else {
       layer.setProperties(iconSize(3f));

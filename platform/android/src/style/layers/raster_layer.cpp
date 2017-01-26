@@ -71,12 +71,12 @@ namespace android {
     }
 
     void RasterLayer::registerNative(jni::JNIEnv& env) {
-        //Lookup the class
+        // Lookup the class
         RasterLayer::javaClass = *jni::Class<RasterLayer>::Find(env).NewGlobalRef(env).release();
 
         #define METHOD(MethodPtr, name) jni::MakeNativePeerMethod<decltype(MethodPtr), (MethodPtr)>(name)
 
-        //Register the peer
+        // Register the peer
         jni::RegisterNativePeer<RasterLayer>(
             env, RasterLayer::javaClass, "nativePtr",
             std::make_unique<RasterLayer, JNIEnv&, jni::String, jni::String>,

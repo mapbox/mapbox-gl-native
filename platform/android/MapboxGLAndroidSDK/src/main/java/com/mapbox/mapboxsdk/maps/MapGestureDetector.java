@@ -181,7 +181,7 @@ final class MapGestureDetector {
    */
   boolean onGenericMotionEvent(MotionEvent event) {
     // Mouse events
-    //if (event.isFromSource(InputDevice.SOURCE_CLASS_POINTER)) { // this is not available before API 18
+    // if (event.isFromSource(InputDevice.SOURCE_CLASS_POINTER)) { // this is not available before API 18
     if ((event.getSource() & InputDevice.SOURCE_CLASS_POINTER) == InputDevice.SOURCE_CLASS_POINTER) {
       // Choose the action
       switch (event.getActionMasked()) {

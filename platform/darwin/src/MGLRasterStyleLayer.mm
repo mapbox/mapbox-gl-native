@@ -1,4 +1,4 @@
-// This file is generated. 
+// This file is generated.
 // Edit platform/darwin/scripts/generate-style-code.js, then run `make darwin-style-code`.
 
 #import "MGLSource.h"
@@ -45,7 +45,7 @@
 - (NSString *)sourceIdentifier
 {
     MGLAssertStyleLayerIsValid();
-    
+
     return @(self.rawLayer->getSourceID().c_str());
 }
 

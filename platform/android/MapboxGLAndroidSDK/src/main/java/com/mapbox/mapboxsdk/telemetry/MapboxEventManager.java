@@ -117,10 +117,10 @@ public class MapboxEventManager {
    */
   public void initialize(@NonNull Context context, @NonNull String accessToken) {
 
-    //Timber.i("Telemetry initialize() called...");
+    // Timber.i("Telemetry initialize() called...");
 
     if (initialized) {
-      //Timber.i("Mapbox Telemetry has already been initialized.");
+      // Timber.i("Mapbox Telemetry has already been initialized.");
       return;
     }
 
@@ -143,7 +143,7 @@ public class MapboxEventManager {
       Context.MODE_PRIVATE);
 
     // Determine if Telemetry Should Be Enabled
-    ///Timber.i("Right before Telemetry set enabled in initialized()");
+    /// Timber.i("Right before Telemetry set enabled in initialized()");
     setTelemetryEnabled(prefs.getBoolean(MapboxConstants.MAPBOX_SHARED_PREFERENCE_KEY_TELEMETRY_ENABLED, true));
 
     // Load / Create Vendor Id
@@ -171,7 +171,7 @@ public class MapboxEventManager {
       String stagingAccessToken = appInfo.metaData.getString(MapboxConstants.KEY_META_DATA_STAGING_ACCESS_TOKEN);
 
       if (TextUtils.isEmpty(stagingURL) || TextUtils.isEmpty(stagingAccessToken)) {
-        //Timber.d("Looking in SharedPreferences for Staging Credentials");
+        // Timber.d("Looking in SharedPreferences for Staging Credentials");
         stagingURL = prefs.getString(MapboxConstants.MAPBOX_SHARED_PREFERENCE_KEY_TELEMETRY_STAGING_URL, null);
         stagingAccessToken = prefs.getString(
           MapboxConstants.MAPBOX_SHARED_PREFERENCE_KEY_TELEMETRY_STAGING_ACCESS_TOKEN, null);
@@ -191,7 +191,7 @@ public class MapboxEventManager {
       }
 
     } catch (Exception exception) {
-      //Timber.e("Error Trying to load Staging Credentials: ", exception);
+      // Timber.e("Error Trying to load Staging Credentials: ", exception);
     }
 
     // Register for battery updates
@@ -227,7 +227,7 @@ public class MapboxEventManager {
         }
       }
     } catch (Exception exception) {
-      //Timber.w("Error checking for Telemetry Service Config: ", exception);
+      // Timber.w("Error checking for Telemetry Service Config: ", exception);
     }
     throw new TelemetryServiceNotConfiguredException();
   }
@@ -246,26 +246,26 @@ public class MapboxEventManager {
    * @param telemetryEnabled True to start telemetry, false to stop it
    */
   public void setTelemetryEnabled(boolean telemetryEnabled) {
-    //Timber.i("this.telemetryEnabled = " + this.telemetryEnabled + "; telemetryEnabled = " + telemetryEnabled);
+    // Timber.i("this.telemetryEnabled = " + this.telemetryEnabled + "; telemetryEnabled = " + telemetryEnabled);
     if (this.telemetryEnabled == telemetryEnabled) {
-      //Timber.d("No need to start / stop telemetry as it's already in that state.");
+      // Timber.d("No need to start / stop telemetry as it's already in that state.");
       return;
     }
 
     if (telemetryEnabled) {
-      //Timber.d("Starting Telemetry Up!");
+      // Timber.d("Starting Telemetry Up!");
       // Start It Up
       context.startService(new Intent(context, TelemetryService.class));
 
       // Make sure Ambient Mode is started at a minimum
       if (LocationServices.getLocationServices(context).areLocationPermissionsGranted()) {
-        //Timber.i("Permissions are good, see if GPS is enabled and if not then setup Ambient.");
+        // Timber.i("Permissions are good, see if GPS is enabled and if not then setup Ambient.");
         if (LocationServices.getLocationServices(context).isGpsEnabled()) {
           LocationServices.getLocationServices(context).toggleGPS(false);
         }
       } else {
         // Start timer that checks for Permissions
-        //Timber.i("Permissions are not good.  Need to do some looping to check on stuff.");
+        // Timber.i("Permissions are not good.  Need to do some looping to check on stuff.");
 
         final Handler permsHandler = new Handler();
         Runnable runnable = new Runnable() {
@@ -275,7 +275,7 @@ public class MapboxEventManager {
           @Override
           public void run() {
             if (LocationServices.getLocationServices(context).areLocationPermissionsGranted()) {
-              //Timber.i("Permissions finally granted, so starting Ambient if GPS isn't already enabled");
+              // Timber.i("Permissions finally granted, so starting Ambient if GPS isn't already enabled");
               // Start Ambient
               if (LocationServices.getLocationServices(context).isGpsEnabled()) {
                 LocationServices.getLocationServices(context).toggleGPS(false);
@@ -283,7 +283,7 @@ public class MapboxEventManager {
             } else {
               // Restart Handler
               long nextWaitTime = exponentialBackoffCounter.getNextCount();
-              //Timber.i("Permissions not granted yet... let's try again in " + nextWaitTime/1000 + " seconds");
+              // Timber.i("Permissions not granted yet... let's try again in " + nextWaitTime/1000 + " seconds");
               permsHandler.postDelayed(this, nextWaitTime);
             }
           }
@@ -295,7 +295,7 @@ public class MapboxEventManager {
       timer = new Timer();
       timer.schedule(new FlushEventsTimerTask(), flushDelayInitialInMillis, flushDelayInMillis);
     } else {
-      //Timber.d("Shutting Telemetry Down");
+      // Timber.d("Shutting Telemetry Down");
       // Shut It Down
       events.removeAllElements();
       context.stopService(new Intent(context, TelemetryService.class));
@@ -322,7 +322,7 @@ public class MapboxEventManager {
    * NOTE: Permission set to package private to enable only telemetry code to use this.
    */
   void flushEventsQueueImmediately() {
-    //Timber.i("flushEventsQueueImmediately() called...");
+    // Timber.i("flushEventsQueueImmediately() called...");
     new FlushTheEventsTask().execute();
   }
 
@@ -337,7 +337,7 @@ public class MapboxEventManager {
     }
     events.add(event);
     if (events.size() == FLUSH_EVENTS_CAP) {
-      //Timber.d("eventsSize == flushCap so send data.");
+      // Timber.d("eventsSize == flushCap so send data.");
       flushEventsQueueImmediately();
     }
   }
@@ -437,7 +437,7 @@ public class MapboxEventManager {
       eventWithAttributes.put(MapboxEvent.ATTRIBUTE_CELLULAR_NETWORK_TYPE, getCellularNetworkType());
       eventWithAttributes.put(MapboxEvent.ATTRIBUTE_WIFI, getConnectedToWifi());
     } else {
-      //Timber.w("This is not an event type in the Events Data Model.");
+      // Timber.w("This is not an event type in the Events Data Model.");
       return;
     }
 
@@ -459,7 +459,7 @@ public class MapboxEventManager {
 
     // Send to Server Immediately
     flushEventsQueueImmediately();
-    //Timber.d("turnstile event pushed.");
+    // Timber.d("turnstile event pushed.");
   }
 
   /**
@@ -485,7 +485,7 @@ public class MapboxEventManager {
         return hex;
       }
     } catch (Exception exception) {
-      //Timber.w("Error encoding string, will return in original form.", exception);
+      // Timber.w("Error encoding string, will return in original form.", exception);
     }
     return string;
   }
@@ -624,7 +624,7 @@ public class MapboxEventManager {
           status = true;
         }
       } catch (Exception exception) {
-        //Timber.w("Error getting Wifi Connection Status: ", exception);
+        // Timber.w("Error getting Wifi Connection Status: ", exception);
         status = false;
       }
     }
@@ -642,13 +642,13 @@ public class MapboxEventManager {
     protected Void doInBackground(Void... voids) {
 
       if (events.isEmpty()) {
-        //Timber.d("No events in the queue to send so returning.");
+        // Timber.d("No events in the queue to send so returning.");
         return null;
       }
 
       // Check for NetworkConnectivity
       if (!Mapbox.isConnected()) {
-        //Timber.w("Not connected to network, so empty events cache and return without attempting to send events");
+        // Timber.w("Not connected to network, so empty events cache and return without attempting to send events");
         // Make sure that events don't pile up when Offline
         // and thus impact available memory over time.
         events.removeAllElements();
@@ -772,7 +772,7 @@ public class MapboxEventManager {
           .post(body)
           .build();
         response = client.newCall(request).execute();
-        //Timber.d("response code = " + response.code() + " for events " + events.size());
+        // Timber.d("response code = " + response.code() + " for events " + events.size());
 
       } catch (Exception exception) {
         Timber.e("FlushTheEventsTask borked: ", exception);

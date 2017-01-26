@@ -252,7 +252,7 @@ template <> struct hash<mbgl::CanonicalTileID> {
         return seed;
     }
 };
-    
+
 template <> struct hash<mbgl::UnwrappedTileID> {
     size_t operator()(const mbgl::UnwrappedTileID &id) const {
         std::size_t seed = 0;
@@ -261,7 +261,7 @@ template <> struct hash<mbgl::UnwrappedTileID> {
         return seed;
     }
 };
-    
+
 template <> struct hash<mbgl::OverscaledTileID> {
     size_t operator()(const mbgl::OverscaledTileID &id) const {
         std::size_t seed = 0;

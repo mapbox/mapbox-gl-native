@@ -134,12 +134,12 @@ void Style::setJSON(const std::string& json) {
     spriteAtlas->load(parser.spriteURL, fileSource);
 
     loaded = true;
-    
+
     observer->onStyleLoaded();
 }
 
 void Style::addSource(std::unique_ptr<Source> source) {
-    //Guard against duplicate source ids
+    // Guard against duplicate source ids
     auto it = std::find_if(sources.begin(), sources.end(), [&](const auto& existing) {
         return existing->getID() == source->getID();
     });
@@ -667,7 +667,7 @@ void Style::onLayerLayoutPropertyChanged(Layer& layer, const char * property) {
 
     auto update = Update::Layout;
 
-    //Recalculate the style for certain properties
+    // Recalculate the style for certain properties
     bool needsRecalculation = strcmp(property, "icon-size") == 0 || strcmp(property, "text-size") == 0;
     if (needsRecalculation) {
         update |= Update::RecalculateStyle;

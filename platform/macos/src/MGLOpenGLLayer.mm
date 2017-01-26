@@ -8,9 +8,9 @@
     return (MGLMapView *)super.view;
 }
 
-//- (BOOL)isAsynchronous {
+// - (BOOL)isAsynchronous {
 //    return YES;
-//}
+// }
 
 - (BOOL)needsDisplayOnBoundsChange {
     return YES;

@@ -63,17 +63,17 @@ public class <%- camelize(type) %>LayerTest extends BaseStyleTest {
             layer = new <%- camelize(type) %>Layer("my-layer", "composite");
             layer.setSourceLayer("composite");
             mapboxMap.addLayer(layer);
-            //Layer reference is now stale, get new reference
+            // Layer reference is now stale, get new reference
             layer = mapboxMap.getLayerAs("my-layer");
         }
 <% } -%>
         Timber.i("visibility");
         assertNotNull(layer);
 
-        //Get initial
+        // Get initial
         assertEquals(layer.getVisibility().getValue(), VISIBLE);
 
-        //Set
+        // Set
         layer.setProperties(visibility(NONE));
         assertEquals(layer.getVisibility().getValue(), NONE);
     }
@@ -94,14 +94,14 @@ public class <%- camelize(type) %>LayerTest extends BaseStyleTest {
             layer = new <%- camelize(type) %>Layer("my-layer", "composite");
             layer.setSourceLayer("composite");
             mapboxMap.addLayer(layer);
-            //Layer reference is now stale, get new reference
+            // Layer reference is now stale, get new reference
             layer = mapboxMap.getLayerAs("my-layer");
         }
 <% } -%>
         Timber.i("<%- property.name %>");
         assertNotNull(layer);
 
-        //Set and Get
+        // Set and Get
         layer.setProperties(<%- camelizeWithLeadingLowercase(property.name) %>(<%- defaultValueJava(property) %>));
         assertEquals((<%- propertyType(property) %>) layer.get<%- camelize(property.name) %>().getValue(), (<%- propertyType(property) %>) <%- defaultValueJava(property) %>);
     }
@@ -122,14 +122,14 @@ public class <%- camelize(type) %>LayerTest extends BaseStyleTest {
             layer = new <%- camelize(type) %>Layer("my-layer", "composite");
             layer.setSourceLayer("composite");
             mapboxMap.addLayer(layer);
-            //Layer reference is now stale, get new reference
+            // Layer reference is now stale, get new reference
             layer = mapboxMap.getLayerAs("my-layer");
         }
 <% } -%>
         Timber.i("<%- property.name %>");
         assertNotNull(layer);
 
-        //Set and Get
+        // Set and Get
         layer.setProperties(<%- camelizeWithLeadingLowercase(property.name) %>(Color.RED));
         assertEquals(layer.get<%- camelize(property.name) %>AsInt(), Color.RED);
     }

@@ -17,7 +17,7 @@
 template <typename MBGLType, typename ObjCType, typename MBGLElement = MBGLType, typename ObjCEnum = ObjCType>
 class MGLStyleValueTransformer {
 public:
-    
+
     MGLStyleValue<ObjCType> *toStyleValue(const mbgl::style::PropertyValue<MBGLType> &mbglValue) {
         if (mbglValue.isConstant()) {
             return toStyleConstantValue(mbglValue.asConstant());
@@ -109,7 +109,7 @@ private:
         auto rawValue = toMGLRawStyleValue(mbglValue);
         return [MGLStyleConstantValue<ObjCType> valueWithRawValue:rawValue];
     }
-    
+
     MGLStyleFunction<ObjCType> *toStyleFunction(const mbgl::style::Function<MBGLType> &mbglFunction) {
         const auto &mbglStops = mbglFunction.getStops();
         NSMutableDictionary *stops = [NSMutableDictionary dictionaryWithCapacity:mbglStops.size()];
@@ -133,29 +133,29 @@ private:
     NSNumber *toMGLRawStyleValue(const bool mbglStopValue) {
         return @(mbglStopValue);
     }
-    
+
     NSNumber *toMGLRawStyleValue(const float mbglStopValue) {
         return @(mbglStopValue);
     }
-    
+
     NSString *toMGLRawStyleValue(const std::string &mbglStopValue) {
         return @(mbglStopValue.c_str());
     }
-    
+
     // Offsets
     NSValue *toMGLRawStyleValue(const std::array<float, 2> &mbglStopValue) {
         return [NSValue mgl_valueWithOffsetArray:mbglStopValue];
     }
-    
+
     // Padding
     NSValue *toMGLRawStyleValue(const std::array<float, 4> &mbglStopValue) {
         return [NSValue mgl_valueWithPaddingArray:mbglStopValue];
     }
-    
+
     MGLColor *toMGLRawStyleValue(const mbgl::Color mbglStopValue) {
         return [MGLColor mgl_colorWithColor:mbglStopValue];
     }
-    
+
     ObjCType toMGLRawStyleValue(const std::vector<MBGLElement> &mbglStopValue) {
         NSMutableArray *array = [NSMutableArray arrayWithCapacity:mbglStopValue.size()];
         for (const auto &mbglElement: mbglStopValue) {
@@ -169,29 +169,29 @@ private:
     void getMBGLValue(NSNumber *rawValue, bool &mbglValue) {
         mbglValue = !!rawValue.boolValue;
     }
-    
+
     void getMBGLValue(NSNumber *rawValue, float &mbglValue) {
         mbglValue = rawValue.floatValue;
     }
-    
+
     void getMBGLValue(NSString *rawValue, std::string &mbglValue) {
         mbglValue = rawValue.UTF8String;
     }
-    
+
     // Offsets
     void getMBGLValue(NSValue *rawValue, std::array<float, 2> &mbglValue) {
         mbglValue = rawValue.mgl_offsetArrayValue;
     }
-    
+
     // Padding
     void getMBGLValue(NSValue *rawValue, std::array<float, 4> &mbglValue) {
         mbglValue = rawValue.mgl_paddingArrayValue;
     }
-    
+
     void getMBGLValue(MGLColor *rawValue, mbgl::Color &mbglValue) {
         mbglValue = rawValue.mgl_color;
     }
-    
+
     void getMBGLValue(ObjCType rawValue, std::vector<MBGLElement> &mbglValue) {
         mbglValue.reserve(rawValue.count);
         for (id obj in rawValue) {

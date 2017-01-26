@@ -10,7 +10,7 @@ namespace mbgl {
 namespace android {
 namespace conversion {
 
-    //visibility
+    // visibility
     inline std::string toString(mbgl::style::VisibilityType value) {
         switch (value) {
           case mbgl::style::VisibilityType::Visible:
@@ -24,7 +24,7 @@ namespace conversion {
         }
     }
 
-    //line-cap
+    // line-cap
     inline std::string toString(mbgl::style::LineCapType value) {
         switch (value) {
           case mbgl::style::LineCapType::Butt:
@@ -41,7 +41,7 @@ namespace conversion {
         }
     }
 
-    //line-join
+    // line-join
     inline std::string toString(mbgl::style::LineJoinType value) {
         switch (value) {
           case mbgl::style::LineJoinType::Bevel:
@@ -58,7 +58,7 @@ namespace conversion {
         }
     }
 
-    //symbol-placement
+    // symbol-placement
     inline std::string toString(mbgl::style::SymbolPlacementType value) {
         switch (value) {
           case mbgl::style::SymbolPlacementType::Point:
@@ -72,7 +72,7 @@ namespace conversion {
         }
     }
 
-    //icon-rotation-alignment
+    // icon-rotation-alignment
     inline std::string toString(mbgl::style::AlignmentType value) {
         switch (value) {
           case mbgl::style::AlignmentType::Map:
@@ -89,7 +89,7 @@ namespace conversion {
         }
     }
 
-    //icon-text-fit
+    // icon-text-fit
     inline std::string toString(mbgl::style::IconTextFitType value) {
         switch (value) {
           case mbgl::style::IconTextFitType::None:
@@ -109,7 +109,7 @@ namespace conversion {
         }
     }
 
-    //text-justify
+    // text-justify
     inline std::string toString(mbgl::style::TextJustifyType value) {
         switch (value) {
           case mbgl::style::TextJustifyType::Left:
@@ -126,7 +126,7 @@ namespace conversion {
         }
     }
 
-    //text-anchor
+    // text-anchor
     inline std::string toString(mbgl::style::TextAnchorType value) {
         switch (value) {
           case mbgl::style::TextAnchorType::Center:
@@ -161,7 +161,7 @@ namespace conversion {
         }
     }
 
-    //text-transform
+    // text-transform
     inline std::string toString(mbgl::style::TextTransformType value) {
         switch (value) {
           case mbgl::style::TextTransformType::None:
@@ -178,7 +178,7 @@ namespace conversion {
         }
     }
 
-    //fill-translate-anchor
+    // fill-translate-anchor
     inline std::string toString(mbgl::style::TranslateAnchorType value) {
         switch (value) {
           case mbgl::style::TranslateAnchorType::Map:
@@ -192,7 +192,7 @@ namespace conversion {
         }
     }
 
-    //circle-pitch-scale
+    // circle-pitch-scale
     inline std::string toString(mbgl::style::CirclePitchScaleType value) {
         switch (value) {
           case mbgl::style::CirclePitchScaleType::Map:

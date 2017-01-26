@@ -46,12 +46,12 @@ namespace android {
     }
 
     void <%- camelize(type) %>Layer::registerNative(jni::JNIEnv& env) {
-        //Lookup the class
+        // Lookup the class
         <%- camelize(type) %>Layer::javaClass = *jni::Class<<%- camelize(type) %>Layer>::Find(env).NewGlobalRef(env).release();
 
         #define METHOD(MethodPtr, name) jni::MakeNativePeerMethod<decltype(MethodPtr), (MethodPtr)>(name)
 
-        //Register the peer
+        // Register the peer
         jni::RegisterNativePeer<<%- camelize(type) %>Layer>(
             env, <%- camelize(type) %>Layer::javaClass, "nativePtr",
 <% if (type === 'background') { -%>

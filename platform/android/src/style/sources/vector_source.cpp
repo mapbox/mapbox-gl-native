@@ -35,12 +35,12 @@ namespace android {
     }
 
     void VectorSource::registerNative(jni::JNIEnv& env) {
-        //Lookup the class
+        // Lookup the class
         VectorSource::javaClass = *jni::Class<VectorSource>::Find(env).NewGlobalRef(env).release();
 
         #define METHOD(MethodPtr, name) jni::MakeNativePeerMethod<decltype(MethodPtr), (MethodPtr)>(name)
 
-        //Register the peer
+        // Register the peer
         jni::RegisterNativePeer<VectorSource>(
             env, VectorSource::javaClass, "nativePtr",
             std::make_unique<VectorSource, JNIEnv&, jni::String, jni::Object<>>,

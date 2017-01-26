@@ -5,9 +5,9 @@
 - (mbgl::Color)mgl_color
 {
     CGFloat r, g, b, a;
-    
+
     [[self colorUsingColorSpaceName:NSCalibratedRGBColorSpace] getRed:&r green:&g blue:&b alpha:&a];
-    
+
     return { (float)r, (float)g, (float)b, (float)a };
 }
 

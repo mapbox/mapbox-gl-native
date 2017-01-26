@@ -31,7 +31,7 @@ _.forOwn(cocoaConventions, function (properties, kind) {
         }
         delete spec[kind][oldName];
         spec[kind][newName] = property;
-        
+
         // Update requirements in other properties.
         let updateRequirements = function (property, name) {
             let requires = property.requires || [];
@@ -225,7 +225,7 @@ global.testHelperMessage = function (property, layerType, isFunction) {
 };
 
 global.propertyDoc = function (propertyName, property, layerType, kind) {
-    // Match references to other property names & values. 
+    // Match references to other property names & values.
     // Requires the format 'When `foo` is set to `bar`,'.
     let doc = property.doc.replace(/`([^`]+?)` is set to `([^`]+?)`/g, function (m, peerPropertyName, propertyValue, offset, str) {
         let otherProperty = camelizeWithLeadingLowercase(peerPropertyName);
@@ -561,13 +561,13 @@ for (var layer of layers) {
     if (enumProperties.length) {
         layer.enumProperties = enumProperties;
     }
-    
+
     let renamedProperties = {};
     _.assign(renamedProperties, _.filter(layer.properties, prop => 'original' in prop || 'getter' in prop));
     if (!_.isEmpty(renamedProperties)) {
         renamedPropertiesByLayerType[layer.type] = renamedProperties;
     }
-    
+
     fs.writeFileSync(`platform/darwin/src/${prefix}${camelize(layer.type)}${suffix}.h`, duplicatePlatformDecls(layerH(layer)));
     fs.writeFileSync(`platform/darwin/src/${prefix}${camelize(layer.type)}${suffix}.mm`, layerM(layer));
     fs.writeFileSync(`platform/darwin/test/${prefix}${camelize(layer.type)}${suffix}Tests.mm`, testLayers(layer));

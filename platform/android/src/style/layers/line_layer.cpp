@@ -113,12 +113,12 @@ namespace android {
     }
 
     void LineLayer::registerNative(jni::JNIEnv& env) {
-        //Lookup the class
+        // Lookup the class
         LineLayer::javaClass = *jni::Class<LineLayer>::Find(env).NewGlobalRef(env).release();
 
         #define METHOD(MethodPtr, name) jni::MakeNativePeerMethod<decltype(MethodPtr), (MethodPtr)>(name)
 
-        //Register the peer
+        // Register the peer
         jni::RegisterNativePeer<LineLayer>(
             env, LineLayer::javaClass, "nativePtr",
             std::make_unique<LineLayer, JNIEnv&, jni::String, jni::String>,

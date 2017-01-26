@@ -116,16 +116,16 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
       layer = new SymbolLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("visibility");
     assertNotNull(layer);
 
-    //Get initial
+    // Get initial
     assertEquals(layer.getVisibility().getValue(), VISIBLE);
 
-    //Set
+    // Set
     layer.setProperties(visibility(NONE));
     assertEquals(layer.getVisibility().getValue(), NONE);
   }
@@ -141,13 +141,13 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
       layer = new SymbolLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("symbol-placement");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(symbolPlacement(SYMBOL_PLACEMENT_POINT));
     assertEquals((String) layer.getSymbolPlacement().getValue(), (String) SYMBOL_PLACEMENT_POINT);
   }
@@ -163,13 +163,13 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
       layer = new SymbolLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("symbol-spacing");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(symbolSpacing(0.3f));
     assertEquals((Float) layer.getSymbolSpacing().getValue(), (Float) 0.3f);
   }
@@ -185,13 +185,13 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
       layer = new SymbolLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("symbol-avoid-edges");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(symbolAvoidEdges(true));
     assertEquals((Boolean) layer.getSymbolAvoidEdges().getValue(), (Boolean) true);
   }
@@ -207,13 +207,13 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
       layer = new SymbolLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("icon-allow-overlap");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(iconAllowOverlap(true));
     assertEquals((Boolean) layer.getIconAllowOverlap().getValue(), (Boolean) true);
   }
@@ -229,13 +229,13 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
       layer = new SymbolLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("icon-ignore-placement");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(iconIgnorePlacement(true));
     assertEquals((Boolean) layer.getIconIgnorePlacement().getValue(), (Boolean) true);
   }
@@ -251,13 +251,13 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
       layer = new SymbolLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("icon-optional");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(iconOptional(true));
     assertEquals((Boolean) layer.getIconOptional().getValue(), (Boolean) true);
   }
@@ -273,13 +273,13 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
       layer = new SymbolLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("icon-rotation-alignment");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(iconRotationAlignment(ICON_ROTATION_ALIGNMENT_MAP));
     assertEquals((String) layer.getIconRotationAlignment().getValue(), (String) ICON_ROTATION_ALIGNMENT_MAP);
   }
@@ -295,13 +295,13 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
       layer = new SymbolLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("icon-size");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(iconSize(0.3f));
     assertEquals((Float) layer.getIconSize().getValue(), (Float) 0.3f);
   }
@@ -317,13 +317,13 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
       layer = new SymbolLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("icon-text-fit");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(iconTextFit(ICON_TEXT_FIT_NONE));
     assertEquals((String) layer.getIconTextFit().getValue(), (String) ICON_TEXT_FIT_NONE);
   }
@@ -339,13 +339,13 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
       layer = new SymbolLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("icon-text-fit-padding");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(iconTextFitPadding(new Float[] {0f, 0f, 0f, 0f}));
     assertEquals((Float[]) layer.getIconTextFitPadding().getValue(), (Float[]) new Float[] {0f, 0f, 0f, 0f});
   }
@@ -361,13 +361,13 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
       layer = new SymbolLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("icon-image");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(iconImage("undefined"));
     assertEquals((String) layer.getIconImage().getValue(), (String) "undefined");
   }
@@ -383,13 +383,13 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
       layer = new SymbolLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("icon-rotate");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(iconRotate(0.3f));
     assertEquals((Float) layer.getIconRotate().getValue(), (Float) 0.3f);
   }
@@ -405,13 +405,13 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
       layer = new SymbolLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("icon-padding");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(iconPadding(0.3f));
     assertEquals((Float) layer.getIconPadding().getValue(), (Float) 0.3f);
   }
@@ -427,13 +427,13 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
       layer = new SymbolLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("icon-keep-upright");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(iconKeepUpright(true));
     assertEquals((Boolean) layer.getIconKeepUpright().getValue(), (Boolean) true);
   }
@@ -449,13 +449,13 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
       layer = new SymbolLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("icon-offset");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(iconOffset(new Float[] {0f, 0f}));
     assertEquals((Float[]) layer.getIconOffset().getValue(), (Float[]) new Float[] {0f, 0f});
   }
@@ -471,13 +471,13 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
       layer = new SymbolLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("text-pitch-alignment");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(textPitchAlignment(TEXT_PITCH_ALIGNMENT_MAP));
     assertEquals((String) layer.getTextPitchAlignment().getValue(), (String) TEXT_PITCH_ALIGNMENT_MAP);
   }
@@ -493,13 +493,13 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
       layer = new SymbolLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("text-rotation-alignment");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(textRotationAlignment(TEXT_ROTATION_ALIGNMENT_MAP));
     assertEquals((String) layer.getTextRotationAlignment().getValue(), (String) TEXT_ROTATION_ALIGNMENT_MAP);
   }
@@ -515,13 +515,13 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
       layer = new SymbolLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("text-field");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(textField(""));
     assertEquals((String) layer.getTextField().getValue(), (String) "");
   }
@@ -537,13 +537,13 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
       layer = new SymbolLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("text-font");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(textFont(new String[] {"Open Sans Regular", "Arial Unicode MS Regular"}));
     assertEquals((String[]) layer.getTextFont().getValue(), (String[]) new String[] {"Open Sans Regular",
       "Arial Unicode MS Regular"});
@@ -560,13 +560,13 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
       layer = new SymbolLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("text-size");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(textSize(0.3f));
     assertEquals((Float) layer.getTextSize().getValue(), (Float) 0.3f);
   }
@@ -582,13 +582,13 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
       layer = new SymbolLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("text-max-width");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(textMaxWidth(0.3f));
     assertEquals((Float) layer.getTextMaxWidth().getValue(), (Float) 0.3f);
   }
@@ -604,13 +604,13 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
       layer = new SymbolLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("text-line-height");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(textLineHeight(0.3f));
     assertEquals((Float) layer.getTextLineHeight().getValue(), (Float) 0.3f);
   }
@@ -626,13 +626,13 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
       layer = new SymbolLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("text-letter-spacing");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(textLetterSpacing(0.3f));
     assertEquals((Float) layer.getTextLetterSpacing().getValue(), (Float) 0.3f);
   }
@@ -648,13 +648,13 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
       layer = new SymbolLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("text-justify");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(textJustify(TEXT_JUSTIFY_LEFT));
     assertEquals((String) layer.getTextJustify().getValue(), (String) TEXT_JUSTIFY_LEFT);
   }
@@ -670,13 +670,13 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
       layer = new SymbolLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("text-anchor");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(textAnchor(TEXT_ANCHOR_CENTER));
     assertEquals((String) layer.getTextAnchor().getValue(), (String) TEXT_ANCHOR_CENTER);
   }
@@ -692,13 +692,13 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
       layer = new SymbolLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("text-max-angle");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(textMaxAngle(0.3f));
     assertEquals((Float) layer.getTextMaxAngle().getValue(), (Float) 0.3f);
   }
@@ -714,13 +714,13 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
       layer = new SymbolLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("text-rotate");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(textRotate(0.3f));
     assertEquals((Float) layer.getTextRotate().getValue(), (Float) 0.3f);
   }
@@ -736,13 +736,13 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
       layer = new SymbolLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("text-padding");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(textPadding(0.3f));
     assertEquals((Float) layer.getTextPadding().getValue(), (Float) 0.3f);
   }
@@ -758,13 +758,13 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
       layer = new SymbolLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("text-keep-upright");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(textKeepUpright(true));
     assertEquals((Boolean) layer.getTextKeepUpright().getValue(), (Boolean) true);
   }
@@ -780,13 +780,13 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
       layer = new SymbolLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("text-transform");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(textTransform(TEXT_TRANSFORM_NONE));
     assertEquals((String) layer.getTextTransform().getValue(), (String) TEXT_TRANSFORM_NONE);
   }
@@ -802,13 +802,13 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
       layer = new SymbolLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("text-offset");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(textOffset(new Float[] {0f, 0f}));
     assertEquals((Float[]) layer.getTextOffset().getValue(), (Float[]) new Float[] {0f, 0f});
   }
@@ -824,13 +824,13 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
       layer = new SymbolLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("text-allow-overlap");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(textAllowOverlap(true));
     assertEquals((Boolean) layer.getTextAllowOverlap().getValue(), (Boolean) true);
   }
@@ -846,13 +846,13 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
       layer = new SymbolLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("text-ignore-placement");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(textIgnorePlacement(true));
     assertEquals((Boolean) layer.getTextIgnorePlacement().getValue(), (Boolean) true);
   }
@@ -868,13 +868,13 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
       layer = new SymbolLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("text-optional");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(textOptional(true));
     assertEquals((Boolean) layer.getTextOptional().getValue(), (Boolean) true);
   }
@@ -890,13 +890,13 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
       layer = new SymbolLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("icon-opacity");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(iconOpacity(0.3f));
     assertEquals((Float) layer.getIconOpacity().getValue(), (Float) 0.3f);
   }
@@ -912,13 +912,13 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
       layer = new SymbolLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("icon-color");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(iconColor("rgba(0, 0, 0, 1)"));
     assertEquals((String) layer.getIconColor().getValue(), (String) "rgba(0, 0, 0, 1)");
   }
@@ -934,13 +934,13 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
       layer = new SymbolLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("icon-color");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(iconColor(Color.RED));
     assertEquals(layer.getIconColorAsInt(), Color.RED);
   }
@@ -956,13 +956,13 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
       layer = new SymbolLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("icon-halo-color");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(iconHaloColor("rgba(0, 0, 0, 1)"));
     assertEquals((String) layer.getIconHaloColor().getValue(), (String) "rgba(0, 0, 0, 1)");
   }
@@ -978,13 +978,13 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
       layer = new SymbolLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("icon-halo-color");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(iconHaloColor(Color.RED));
     assertEquals(layer.getIconHaloColorAsInt(), Color.RED);
   }
@@ -1000,13 +1000,13 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
       layer = new SymbolLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("icon-halo-width");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(iconHaloWidth(0.3f));
     assertEquals((Float) layer.getIconHaloWidth().getValue(), (Float) 0.3f);
   }
@@ -1022,13 +1022,13 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
       layer = new SymbolLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("icon-halo-blur");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(iconHaloBlur(0.3f));
     assertEquals((Float) layer.getIconHaloBlur().getValue(), (Float) 0.3f);
   }
@@ -1044,13 +1044,13 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
       layer = new SymbolLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("icon-translate");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(iconTranslate(new Float[] {0f, 0f}));
     assertEquals((Float[]) layer.getIconTranslate().getValue(), (Float[]) new Float[] {0f, 0f});
   }
@@ -1066,13 +1066,13 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
       layer = new SymbolLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("icon-translate-anchor");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(iconTranslateAnchor(ICON_TRANSLATE_ANCHOR_MAP));
     assertEquals((String) layer.getIconTranslateAnchor().getValue(), (String) ICON_TRANSLATE_ANCHOR_MAP);
   }
@@ -1088,13 +1088,13 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
       layer = new SymbolLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("text-opacity");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(textOpacity(0.3f));
     assertEquals((Float) layer.getTextOpacity().getValue(), (Float) 0.3f);
   }
@@ -1110,13 +1110,13 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
       layer = new SymbolLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("text-color");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(textColor("rgba(0, 0, 0, 1)"));
     assertEquals((String) layer.getTextColor().getValue(), (String) "rgba(0, 0, 0, 1)");
   }
@@ -1132,13 +1132,13 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
       layer = new SymbolLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("text-color");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(textColor(Color.RED));
     assertEquals(layer.getTextColorAsInt(), Color.RED);
   }
@@ -1154,13 +1154,13 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
       layer = new SymbolLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("text-halo-color");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(textHaloColor("rgba(0, 0, 0, 1)"));
     assertEquals((String) layer.getTextHaloColor().getValue(), (String) "rgba(0, 0, 0, 1)");
   }
@@ -1176,13 +1176,13 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
       layer = new SymbolLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("text-halo-color");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(textHaloColor(Color.RED));
     assertEquals(layer.getTextHaloColorAsInt(), Color.RED);
   }
@@ -1198,13 +1198,13 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
       layer = new SymbolLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("text-halo-width");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(textHaloWidth(0.3f));
     assertEquals((Float) layer.getTextHaloWidth().getValue(), (Float) 0.3f);
   }
@@ -1220,13 +1220,13 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
       layer = new SymbolLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("text-halo-blur");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(textHaloBlur(0.3f));
     assertEquals((Float) layer.getTextHaloBlur().getValue(), (Float) 0.3f);
   }
@@ -1242,13 +1242,13 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
       layer = new SymbolLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("text-translate");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(textTranslate(new Float[] {0f, 0f}));
     assertEquals((Float[]) layer.getTextTranslate().getValue(), (Float[]) new Float[] {0f, 0f});
   }
@@ -1264,13 +1264,13 @@ public class SymbolLayerStyleTest extends BaseStyleTest {
       layer = new SymbolLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("text-translate-anchor");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(textTranslateAnchor(TEXT_TRANSLATE_ANCHOR_MAP));
     assertEquals((String) layer.getTextTranslateAnchor().getValue(), (String) TEXT_TRANSLATE_ANCHOR_MAP);
   }

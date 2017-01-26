@@ -14,7 +14,7 @@ namespace {
 
 const char* protocol = "file://";
 const std::size_t protocolLength = 7;
-    
+
 } // namespace
 
 namespace mbgl {
@@ -22,7 +22,7 @@ namespace mbgl {
 class LocalFileSource::Impl {
 public:
     void request(const std::string& url, FileSource::Callback callback) {
-        //Cut off the protocol
+        // Cut off the protocol
         std::string path = mbgl::util::percentDecode(url.substr(protocolLength));
 
         Response response;
@@ -58,7 +58,7 @@ LocalFileSource::~LocalFileSource() = default;
 std::unique_ptr<AsyncRequest> LocalFileSource::request(const Resource& resource, Callback callback) {
     return thread->invokeWithCallback(&Impl::request, resource.url, callback);
 }
-    
+
 bool LocalFileSource::acceptsURL(const std::string& url) {
     return url.compare(0, protocolLength, protocol) == 0;
 }

@@ -93,10 +93,10 @@ public class RuntimeStyleTests {
     public void perform(UiController uiController, View view) {
       MapboxMap mapboxMap = rule.getActivity().getMapboxMap();
 
-      //Get initial
+      // Get initial
       assertNotNull(mapboxMap.getLayer("building"));
 
-      //Remove
+      // Remove
       try {
         mapboxMap.removeLayer("building");
       } catch (NoSuchLayerException noSuchSourceException) {
@@ -104,37 +104,37 @@ public class RuntimeStyleTests {
       }
       assertNull(mapboxMap.getLayer("building"));
 
-      //Add
+      // Add
       FillLayer layer = new FillLayer("building", "composite");
       layer.setSourceLayer("building");
       mapboxMap.addLayer(layer);
       assertNotNull(mapboxMap.getLayer("building"));
 
-      //Assure the reference still works
+      // Assure the reference still works
       layer.setProperties(PropertyFactory.visibility(Property.VISIBLE));
 
-      //Remove, preserving the reference
+      // Remove, preserving the reference
       try {
         mapboxMap.removeLayer(layer);
       } catch (NoSuchLayerException noSuchSourceException) {
         fail("Definitively exists: " + noSuchSourceException.getMessage());
       }
 
-      //Property setters should still work
+      // Property setters should still work
       layer.setProperties(PropertyFactory.fillColor(Color.RED));
 
-      //Re-add the reference...
+      // Re-add the reference...
       mapboxMap.addLayer(layer);
 
-      //Ensure it's there
+      // Ensure it's there
       Assert.assertNotNull(mapboxMap.getLayer(layer.getId()));
 
-      //Test adding a duplicate layer
+      // Test adding a duplicate layer
       try {
         mapboxMap.addLayer(new FillLayer("building", "composite"));
         fail("Should not have been allowed to add a layer with a duplicate id");
       } catch (CannotAddLayerException cannotAddLayerException) {
-        //OK
+        // OK
       }
     }
   }
@@ -155,10 +155,10 @@ public class RuntimeStyleTests {
     public void perform(UiController uiController, View view) {
       MapboxMap mapboxMap = rule.getActivity().getMapboxMap();
 
-      //Add initial source
+      // Add initial source
       mapboxMap.addSource(new VectorSource("my-source", "mapbox://mapbox.mapbox-terrain-v2"));
 
-      //Remove
+      // Remove
       try {
         mapboxMap.removeSource("my-source");
       } catch (NoSuchSourceException noSuchSourceException) {
@@ -166,30 +166,30 @@ public class RuntimeStyleTests {
       }
       assertNull(mapboxMap.getLayer("my-source"));
 
-      //Add
+      // Add
       Source source = new VectorSource("my-source", "mapbox://mapbox.mapbox-terrain-v2");
       mapboxMap.addSource(source);
 
-      //Remove, preserving the reference
+      // Remove, preserving the reference
       try {
         mapboxMap.removeSource(source);
       } catch (NoSuchSourceException noSuchSourceException) {
         fail("Definitively exists: " + noSuchSourceException.getMessage());
       }
 
-      //Re-add the reference...
+      // Re-add the reference...
       mapboxMap.addSource(source);
 
-      //Ensure it's there
+      // Ensure it's there
       Assert.assertNotNull(mapboxMap.getSource(source.getId()));
 
-      //Test adding a duplicate source
+      // Test adding a duplicate source
       try {
         Source source2 = new VectorSource("my-source", "mapbox://mapbox.mapbox-terrain-v2");
         mapboxMap.addSource(source2);
         fail("Should not have been allowed to add a source with a duplicate id");
       } catch (CannotAddSourceException cannotAddSourceException) {
-        //OK
+        // OK
       }
     }
   }

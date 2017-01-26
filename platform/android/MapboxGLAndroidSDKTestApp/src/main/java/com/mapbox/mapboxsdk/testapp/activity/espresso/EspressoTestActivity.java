@@ -21,7 +21,7 @@ public class EspressoTestActivity extends AppCompatActivity implements OnMapRead
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_camera_test);
 
-    //Initialize map as normal
+    // Initialize map as normal
     mapView = (MapView) findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
     mapView.getMapAsync(this);

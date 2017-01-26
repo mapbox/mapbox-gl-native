@@ -9,19 +9,19 @@ NS_ASSUME_NONNULL_BEGIN
  `MGLShape` is an abstract class that represents a shape or annotation. Shapes
  constitute the content of a map – not only the overlays atop the map, but also
  the content that forms the base map.
- 
+
  You do not create instances of this class directly or create subclasses of this
- class. Instead, you create instances of `MGLPointAnnotation`, 
+ class. Instead, you create instances of `MGLPointAnnotation`,
  `MGLPointCollection`, `MGLPolyline`, `MGLMultiPolyline`, `MGLPolygon`,
  `MGLMultiPolygon`, or `MGLShapeCollection`. The shape classes correspond to the
  <a href="https://tools.ietf.org/html/rfc7946#section-3.1">Geometry</a> object
  types in the GeoJSON standard, but some have nonstandard names for backwards
  compatibility.
- 
+
  Although you do not create instances of this class directly, you can use its
  `+[MGLShape shapeWithData:encoding:error:]` factory method to create one of the
  concrete subclasses of `MGLShape` noted above from GeoJSON data.
- 
+
  You can add shapes to the map by adding them to an `MGLShapeSource` object.
  Configure the appearance of an `MGLShapeSource`’s or `MGLVectorSource`’s shapes
  collectively using a concrete instance of `MGLVectorStyleLayer`. Alternatively,
@@ -36,21 +36,21 @@ MGL_EXPORT
 /**
  Returns an `MGLShape` object initialized with the given data interpreted as a
  string containing a GeoJSON object.
- 
+
  If the GeoJSON object is a geometry, the returned value is a kind of
  `MGLShape`. If it is a feature object, the returned value is a kind of
  `MGLShape` that conforms to the `MGLFeature` protocol. If it is a feature
  collection object, the returned value is an instance of
  `MGLShapeCollectionFeature`.
- 
+
  ### Example
- 
+
  ```swift
  let url = mainBundle.url(forResource: "amsterdam", withExtension: "geojson")!
  let data = try! Data(contentsOf: url)
  let feature = try! MGLShape(data: data, encoding: String.Encoding.utf8.rawValue) as! MGLShapeCollectionFeature
  ```
- 
+
  @param data String data containing GeoJSON source code.
  @param encoding The encoding used by `data`.
  @param outError Upon return, if an error has occurred, a pointer to an
@@ -65,9 +65,9 @@ MGL_EXPORT
 
 /**
  The title of the shape annotation.
- 
+
  The default value of this property is `nil`.
- 
+
  This property is ignored when the shape is used in an `MGLShapeSource`. To name
  a shape used in a shape source, create an `MGLFeature` and add an attribute to
  the `MGLFeature.attributes` property.
@@ -77,7 +77,7 @@ MGL_EXPORT
 /**
  The subtitle of the shape annotation. The default value of this property is
  `nil`.
- 
+
  This property is ignored when the shape is used in an `MGLShapeSource`. To
  provide additional information about a shape used in a shape source, create an
  `MGLFeature` and add an attribute to the `MGLFeature.attributes` property.
@@ -88,9 +88,9 @@ MGL_EXPORT
 
 /**
  The tooltip of the shape annotation.
- 
+
  The default value of this property is `nil`.
- 
+
  This property is ignored when the shape is used in an `MGLShapeSource`.
  */
 @property (nonatomic, copy, nullable) NSString *toolTip;
@@ -102,7 +102,7 @@ MGL_EXPORT
 /**
  Returns the GeoJSON string representation of the shape encapsulated in a data
  object.
- 
+
  @param encoding The string encoding to use.
  @return A data object containing the shape’s GeoJSON string representation.
  */

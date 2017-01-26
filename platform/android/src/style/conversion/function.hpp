@@ -39,10 +39,10 @@ struct Converter<jni::jobject*, mbgl::style::Function<T>> {
         static jni::jmethodID* constructor = &jni::GetMethodID(env, *javaClass, "<init>", "([Lcom/mapbox/mapboxsdk/style/layers/Function$Stop;)V");
         static jni::jmethodID* withBase = &jni::GetMethodID(env, *javaClass, "withBase", "(F)Lcom/mapbox/mapboxsdk/style/layers/Function;");
 
-        //Create object
+        // Create object
         jni::jobject* jfunction = &jni::NewObject(env, *javaClass, *constructor, *toFunctionStopJavaArray(env, value.getStops()));
 
-        //Set base
+        // Set base
         jni::CallMethod<jni::jobject*>(env, jfunction, *withBase, value.getBase());
 
         return {jfunction};

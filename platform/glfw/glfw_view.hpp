@@ -54,7 +54,7 @@ private:
 
     // Internal
     void report(float duration);
-    
+
     void setMapChangeCallback(std::function<void(mbgl::MapChange)> callback);
     void notifyMapChange(mbgl::MapChange change) override;
 

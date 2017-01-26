@@ -50,7 +50,7 @@ static const CGFloat MGLRasterSourceRetinaTileSize = 512;
 - (instancetype)initWithIdentifier:(NSString *)identifier tileURLTemplates:(NS_ARRAY_OF(NSString *) *)tileURLTemplates options:(nullable NS_DICTIONARY_OF(MGLTileSourceOption, id) *)options {
     if (self = [super initWithIdentifier:identifier tileURLTemplates:tileURLTemplates options:options]) {
         mbgl::Tileset tileSet = MGLTileSetFromTileURLTemplates(tileURLTemplates, options);
-        
+
         uint16_t tileSize = MGLRasterSourceRetinaTileSize;
         if (NSNumber *tileSizeNumber = options[MGLTileSourceOptionTileSize]) {
             if (![tileSizeNumber isKindOfClass:[NSNumber class]]) {
@@ -59,7 +59,7 @@ static const CGFloat MGLRasterSourceRetinaTileSize = 512;
             }
             tileSize = static_cast<uint16_t>(round(tileSizeNumber.doubleValue));
         }
-        
+
         auto source = std::make_unique<mbgl::style::RasterSource>(identifier.UTF8String, tileSet, tileSize);
         _pendingSource = std::move(source);
         self.rawSource = _pendingSource.get();

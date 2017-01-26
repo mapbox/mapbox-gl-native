@@ -10,7 +10,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  The pack’s delegate.
- 
+
  You can use the offline pack delegate to be notified of any changes in the
  pack’s progress and of any errors while downloading. For more information, see
  the `MGLOfflinePackDelegate` documentation.
@@ -41,7 +41,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Sent whenever the pack’s state or download progress changes. Every change to a
  field in the `progress` property corresponds to an invocation of this method.
- 
+
  @param pack The pack whose state of progress changed.
  @param progress The updated progress. To get the updated state, refer to the
     `state` property.
@@ -50,11 +50,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  Sent whenever the pack encounters an error while downloading.
- 
+
  Download errors may be recoverable. For example, this pack’s implementation may
  attempt to re-request failed resources based on an exponential backoff
  strategy or upon the restoration of network access.
- 
+
  @param pack The pack that encountered an error.
  @param error A download error. For a list of possible error codes, see
     `MGLErrorCode`.
@@ -64,7 +64,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Sent when the maximum number of Mapbox-hosted tiles has been downloaded and
  stored on the current device.
- 
+
  Once this limit is reached, no instance of `MGLOfflinePack` can download
  additional tiles from Mapbox APIs until already downloaded tiles are removed by
  calling the `-[MGLOfflineStorage removePack:withCompletionHandler:]` method.

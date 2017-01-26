@@ -20,7 +20,7 @@ void CircleBucket::upload(gl::Context& context) {
 }
 
 void CircleBucket::render(Painter& painter,
-                        PaintParameters& parameters, 
+                        PaintParameters& parameters,
                         const Layer& layer,
                         const RenderTile& tile) {
     painter.renderCircle(parameters, *this, *layer.as<CircleLayer>(), tile);

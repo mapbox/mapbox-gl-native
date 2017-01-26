@@ -20,16 +20,16 @@
 {
     mbgl::LatLng centerLatLng = mbgl::LatLng(centerCoordinate.latitude, centerCoordinate.longitude);
     mbgl::LatLng eyeLatLng = mbgl::LatLng(eyeCoordinate.latitude, eyeCoordinate.longitude);
-    
+
     mbgl::ProjectedMeters centerMeters = mbgl::Projection::projectedMetersForLatLng(centerLatLng);
     mbgl::ProjectedMeters eyeMeters = mbgl::Projection::projectedMetersForLatLng(eyeLatLng);
     CLLocationDirection heading = std::atan((centerMeters.northing - eyeMeters.northing) /
                                             (centerMeters.easting - eyeMeters.easting));
-    
+
     double groundDistance = std::hypot(centerMeters.northing - eyeMeters.northing,
                                        centerMeters.easting - eyeMeters.easting);
     CGFloat pitch = std::atan(eyeAltitude / groundDistance);
-    
+
     return [[self alloc] initWithCenterCoordinate:centerCoordinate
                                          altitude:eyeAltitude
                                             pitch:pitch
@@ -108,7 +108,7 @@
     {
         return YES;
     }
-    
+
     MGLMapCamera *otherCamera = other;
     return (_centerCoordinate.latitude == otherCamera.centerCoordinate.latitude
             && _centerCoordinate.longitude == otherCamera.centerCoordinate.longitude

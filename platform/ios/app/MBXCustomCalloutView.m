@@ -31,7 +31,7 @@ static CGFloat const tipWidth = 10.0;
         self.backgroundColor = [UIColor clearColor];
         _mainLabel = [[UILabel alloc] initWithFrame: CGRectZero];
         _mainLabel.backgroundColor = [UIColor clearColor];
-        
+
         [self addSubview: _mainLabel];
     }
     return self;
@@ -46,7 +46,7 @@ static CGFloat const tipWidth = 10.0;
     {
         [self.delegate performSelector:@selector(calloutViewWillAppear:) withObject:self];
     }
-    
+
     [view addSubview:self];
     // prepare title label
     if ([self.representedObject respondsToSelector:@selector(title)])
@@ -61,7 +61,7 @@ static CGFloat const tipWidth = 10.0;
     CGFloat frameOriginY = rect.origin.y - frameHeight;
     self.frame = CGRectMake(frameOriginX, frameOriginY,
                             frameWidth, frameHeight);
-    
+
     if ([self.delegate respondsToSelector:@selector(calloutViewDidAppear:)])
     {
         [self.delegate performSelector:@selector(calloutViewDidAppear:) withObject:self];
@@ -84,14 +84,14 @@ static CGFloat const tipWidth = 10.0;
 - (void)drawRect:(CGRect)rect
 {
     UIColor *fillColor = [UIColor colorWithWhite:0.7 alpha:1.0];
-    
+
     CGFloat tipLeft = rect.origin.x + (rect.size.width / 2.0) - (tipWidth / 2.0);
     CGPoint tipBottom = CGPointMake(rect.origin.x + (rect.size.width / 2.0), rect.origin.y +rect.size.height);
     CGFloat heightWithoutTip = rect.size.height - tipHeight;
-    
+
     // draw the white background with tip
     CGContextRef ctxt = UIGraphicsGetCurrentContext();
-    
+
     CGMutablePathRef tipPath = CGPathCreateMutable();
     CGPathMoveToPoint(tipPath, NULL, 0, 0);
     CGPathAddLineToPoint(tipPath, NULL, 0, heightWithoutTip);
@@ -101,7 +101,7 @@ static CGFloat const tipWidth = 10.0;
     CGPathAddLineToPoint(tipPath, NULL, CGRectGetWidth(rect), heightWithoutTip);
     CGPathAddLineToPoint(tipPath, NULL, CGRectGetWidth(rect), 0);
     CGPathCloseSubpath(tipPath);
-    
+
     [fillColor setFill];
     CGContextAddPath(ctxt, tipPath);
     CGContextFillPath(ctxt);

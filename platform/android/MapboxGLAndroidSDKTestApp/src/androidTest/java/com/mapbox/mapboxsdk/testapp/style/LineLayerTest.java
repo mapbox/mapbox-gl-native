@@ -75,16 +75,16 @@ public class LineLayerTest extends BaseStyleTest {
       layer = new LineLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("visibility");
     assertNotNull(layer);
 
-    //Get initial
+    // Get initial
     assertEquals(layer.getVisibility().getValue(), VISIBLE);
 
-    //Set
+    // Set
     layer.setProperties(visibility(NONE));
     assertEquals(layer.getVisibility().getValue(), NONE);
   }
@@ -100,13 +100,13 @@ public class LineLayerTest extends BaseStyleTest {
       layer = new LineLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("line-cap");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(lineCap(LINE_CAP_BUTT));
     assertEquals((String) layer.getLineCap().getValue(), (String) LINE_CAP_BUTT);
   }
@@ -122,13 +122,13 @@ public class LineLayerTest extends BaseStyleTest {
       layer = new LineLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("line-join");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(lineJoin(LINE_JOIN_BEVEL));
     assertEquals((String) layer.getLineJoin().getValue(), (String) LINE_JOIN_BEVEL);
   }
@@ -144,13 +144,13 @@ public class LineLayerTest extends BaseStyleTest {
       layer = new LineLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("line-miter-limit");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(lineMiterLimit(0.3f));
     assertEquals((Float) layer.getLineMiterLimit().getValue(), (Float) 0.3f);
   }
@@ -166,13 +166,13 @@ public class LineLayerTest extends BaseStyleTest {
       layer = new LineLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("line-round-limit");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(lineRoundLimit(0.3f));
     assertEquals((Float) layer.getLineRoundLimit().getValue(), (Float) 0.3f);
   }
@@ -188,13 +188,13 @@ public class LineLayerTest extends BaseStyleTest {
       layer = new LineLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("line-opacity");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(lineOpacity(0.3f));
     assertEquals((Float) layer.getLineOpacity().getValue(), (Float) 0.3f);
   }
@@ -210,13 +210,13 @@ public class LineLayerTest extends BaseStyleTest {
       layer = new LineLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("line-color");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(lineColor("rgba(0, 0, 0, 1)"));
     assertEquals((String) layer.getLineColor().getValue(), (String) "rgba(0, 0, 0, 1)");
   }
@@ -232,13 +232,13 @@ public class LineLayerTest extends BaseStyleTest {
       layer = new LineLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("line-color");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(lineColor(Color.RED));
     assertEquals(layer.getLineColorAsInt(), Color.RED);
   }
@@ -254,13 +254,13 @@ public class LineLayerTest extends BaseStyleTest {
       layer = new LineLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("line-translate");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(lineTranslate(new Float[] {0f, 0f}));
     assertEquals((Float[]) layer.getLineTranslate().getValue(), (Float[]) new Float[] {0f, 0f});
   }
@@ -276,13 +276,13 @@ public class LineLayerTest extends BaseStyleTest {
       layer = new LineLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("line-translate-anchor");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(lineTranslateAnchor(LINE_TRANSLATE_ANCHOR_MAP));
     assertEquals((String) layer.getLineTranslateAnchor().getValue(), (String) LINE_TRANSLATE_ANCHOR_MAP);
   }
@@ -298,13 +298,13 @@ public class LineLayerTest extends BaseStyleTest {
       layer = new LineLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("line-width");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(lineWidth(0.3f));
     assertEquals((Float) layer.getLineWidth().getValue(), (Float) 0.3f);
   }
@@ -320,13 +320,13 @@ public class LineLayerTest extends BaseStyleTest {
       layer = new LineLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("line-gap-width");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(lineGapWidth(0.3f));
     assertEquals((Float) layer.getLineGapWidth().getValue(), (Float) 0.3f);
   }
@@ -342,13 +342,13 @@ public class LineLayerTest extends BaseStyleTest {
       layer = new LineLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("line-offset");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(lineOffset(0.3f));
     assertEquals((Float) layer.getLineOffset().getValue(), (Float) 0.3f);
   }
@@ -364,13 +364,13 @@ public class LineLayerTest extends BaseStyleTest {
       layer = new LineLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("line-blur");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(lineBlur(0.3f));
     assertEquals((Float) layer.getLineBlur().getValue(), (Float) 0.3f);
   }
@@ -386,13 +386,13 @@ public class LineLayerTest extends BaseStyleTest {
       layer = new LineLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("line-dasharray");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(lineDasharray(new Float[] {}));
     assertEquals((Float[]) layer.getLineDasharray().getValue(), (Float[]) new Float[] {});
   }
@@ -408,13 +408,13 @@ public class LineLayerTest extends BaseStyleTest {
       layer = new LineLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("line-pattern");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(linePattern("pedestrian-polygon"));
     assertEquals((String) layer.getLinePattern().getValue(), (String) "pedestrian-polygon");
   }

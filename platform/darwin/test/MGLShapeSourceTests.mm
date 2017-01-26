@@ -19,7 +19,7 @@
                               MGLShapeSourceOptionMaximumZoomLevel: @99,
                               MGLShapeSourceOptionBuffer: @1976,
                               MGLShapeSourceOptionSimplificationTolerance: @0.42};
-    
+
     auto mbglOptions = MGLGeoJSONOptionsFromDictionary(options);
     XCTAssertTrue(mbglOptions.cluster);
     XCTAssertEqual(mbglOptions.clusterRadius, 42);
@@ -27,7 +27,7 @@
     XCTAssertEqual(mbglOptions.maxzoom, 99);
     XCTAssertEqual(mbglOptions.buffer, 1976);
     XCTAssertEqual(mbglOptions.tolerance, 0.42);
-  
+
     options = @{MGLShapeSourceOptionClustered: @"number 1"};
     XCTAssertThrows(MGLGeoJSONOptionsFromDictionary(options));
 }
@@ -41,26 +41,26 @@
     NSDictionary *options = @{
         MGLShapeSourceOptionClustered: @YES,
     };
-    
+
     MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"id" shape:[[MGLPointFeature alloc] init] options:options];
     XCTAssertTrue([source.shape isKindOfClass:[MGLPointFeature class]]);
-    
+
     MGLShapeCollectionFeature *feature = [MGLShapeCollectionFeature shapeCollectionWithShapes:@[]];
     source = [[MGLShapeSource alloc] initWithIdentifier:@"id" shape:feature options:options];
     XCTAssertTrue([source.shape isKindOfClass:[MGLShapeCollectionFeature class]]);
 }
 
 - (void)testMGLShapeSourceWithDataMultipleFeatures {
-    
+
     NSString *geoJSON = @"{\"type\": \"FeatureCollection\",\"features\": [{\"type\": \"Feature\",\"properties\": {},\"geometry\": {\"type\": \"LineString\",\"coordinates\": [[-107.75390625,40.329795743702064],[-104.34814453125,37.64903402157866]]}}]}";
-    
+
     NSData *data = [geoJSON dataUsingEncoding:NSUTF8StringEncoding];
     NSError *error;
     MGLShape *shape = [MGLShape shapeWithData:data encoding:NSUTF8StringEncoding error:&error];
     XCTAssertNil(error);
     XCTAssertNotNil(shape);
     MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"source-id" shape:shape options:nil];
-    
+
     MGLShapeCollection *collection = (MGLShapeCollection *)source.shape;
     XCTAssertNotNil(collection);
     XCTAssertEqual(collection.shapes.count, 1);
@@ -95,9 +95,9 @@
 - (void)testMGLShapeSourceWithPolylineFeatures {
     CLLocationCoordinate2D coordinates[] = { CLLocationCoordinate2DMake(0, 0), CLLocationCoordinate2DMake(10, 10)};
     MGLPolylineFeature *polylineFeature = [MGLPolylineFeature polylineWithCoordinates:coordinates count:2];
-    
+
     MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"source-id" shape:polylineFeature options:nil];
-    
+
     XCTAssertNotNil(source.shape);
     XCTAssertTrue([source.shape isMemberOfClass:[MGLPolylineFeature class]]);
 }
@@ -109,7 +109,7 @@
         CLLocationCoordinate2DMake(101.0, 1.0),
         CLLocationCoordinate2DMake(100.0, 1.0),
         CLLocationCoordinate2DMake(100.0, 0.0)};
-    
+
     MGLPolygonFeature *polygonFeature = [MGLPolygonFeature polygonWithCoordinates:coordinates count:5];
     polygonFeature.identifier = @"feature-id";
     NSString *stringAttribute = @"string";
@@ -123,7 +123,7 @@
                                       @"key-4": arrayValue};
     NSArray *arrayOfArrays = @[@[@1, @"string-value", @[@"jagged"]]];
     NSArray *arrayOfDictionaries = @[@{@"key": @"value"}];
-    
+
     polygonFeature.attributes = @{@"name": stringAttribute,
                                   @"bool": boolAttribute,
                                   @"double": doubleAttribute,
@@ -131,9 +131,9 @@
                                   @"array-attribute": arrayValue,
                                   @"array-of-array-attribute": arrayOfArrays,
                                   @"array-of-dictionary-attribute": arrayOfDictionaries};
-    
+
     MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"source-id" shape:polygonFeature options:nil];
-    
+
     XCTAssertNotNil(source.shape);
     MGLPolygonFeature *expectedPolygonFeature = (MGLPolygonFeature *)source.shape;
     XCTAssertEqualObjects(expectedPolygonFeature.identifier, polygonFeature.identifier);
@@ -155,20 +155,20 @@
         CLLocationCoordinate2DMake(101.0, 1.0),
         CLLocationCoordinate2DMake(100.0, 1.0),
         CLLocationCoordinate2DMake(100.0, 0.0)};
-    
+
     CLLocationCoordinate2D interiorCoordinates[] = {
         CLLocationCoordinate2DMake(100.2, 0.2),
         CLLocationCoordinate2DMake(100.8, 0.2),
         CLLocationCoordinate2DMake(100.8, 0.8),
         CLLocationCoordinate2DMake(100.2, 0.8),
         CLLocationCoordinate2DMake(100.2, 0.2)};
-    
+
     MGLPolygon *polygon = [MGLPolygon polygonWithCoordinates:interiorCoordinates count:5];
-    
+
     MGLPolygonFeature *polygonFeature = [MGLPolygonFeature polygonWithCoordinates:coordinates count:5 interiorPolygons:@[polygon]];
-    
+
     MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"source-id" shape:polygonFeature options:nil];
-    
+
     XCTAssertNotNil(source.shape);
     XCTAssertTrue([source.shape isMemberOfClass:[MGLPolygonFeature class]]);
 }
@@ -179,9 +179,9 @@
     CLLocationCoordinate2D secondCoordinates[] = { CLLocationCoordinate2DMake(0, 0), CLLocationCoordinate2DMake(10, 10)};
     MGLPolylineFeature *secondPolylineFeature = [MGLPolylineFeature polylineWithCoordinates:secondCoordinates count:2];
     MGLMultiPolylineFeature *multiPolylineFeature = [MGLMultiPolylineFeature multiPolylineWithPolylines:@[firstPolylineFeature, secondPolylineFeature]];
-    
+
     MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"source-id" shape:multiPolylineFeature options:nil];
-    
+
     XCTAssertNotNil(source.shape);
     XCTAssertTrue([source.shape isMemberOfClass:[MGLMultiPolylineFeature class]]);
 }
@@ -193,23 +193,23 @@
         CLLocationCoordinate2DMake(101.0, 1.0),
         CLLocationCoordinate2DMake(100.0, 1.0),
         CLLocationCoordinate2DMake(100.0, 0.0)};
-    
+
     CLLocationCoordinate2D interiorCoordinates[] = {
         CLLocationCoordinate2DMake(100.2, 0.2),
         CLLocationCoordinate2DMake(100.8, 0.2),
         CLLocationCoordinate2DMake(100.8, 0.8),
         CLLocationCoordinate2DMake(100.2, 0.8),
         CLLocationCoordinate2DMake(100.2, 0.2)};
-    
+
     MGLPolygon *polygon = [MGLPolygon polygonWithCoordinates:interiorCoordinates count:5];
-    
+
     MGLPolygonFeature *firstPolygon = [MGLPolygonFeature polygonWithCoordinates:coordinates count:5 interiorPolygons:@[polygon]];
     MGLPolygonFeature *secondPolygon = [MGLPolygonFeature polygonWithCoordinates:coordinates count:5 interiorPolygons:@[polygon]];
-    
+
     MGLMultiPolygonFeature *multiPolygonFeature = [MGLMultiPolygonFeature multiPolygonWithPolygons:@[firstPolygon, secondPolygon]];
-    
+
     MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"source-id" shape:multiPolygonFeature options:nil];
-    
+
     XCTAssertNotNil(source.shape);
     XCTAssertTrue([source.shape isMemberOfClass:[MGLMultiPolygonFeature class]]);
 }
@@ -217,9 +217,9 @@
 - (void)testMGLShapeSourceWithPointFeature {
     MGLPointFeature *pointFeature = [MGLPointFeature new];
     pointFeature.coordinate = CLLocationCoordinate2DMake(100.2, 0.2);
-    
+
     MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"souce-id" shape:pointFeature options:nil];
-    
+
     XCTAssertNotNil(source.shape);
     XCTAssertTrue([source.shape isMemberOfClass:[MGLPointFeature class]]);
 }
@@ -245,34 +245,34 @@
         CLLocationCoordinate2DMake(101.0, 1.0),
         CLLocationCoordinate2DMake(100.0, 1.0),
         CLLocationCoordinate2DMake(100.0, 0.0)};
-    
+
     CLLocationCoordinate2D interiorCoordinates[] = {
         CLLocationCoordinate2DMake(100.2, 0.2),
         CLLocationCoordinate2DMake(100.8, 0.2),
         CLLocationCoordinate2DMake(100.8, 0.8),
         CLLocationCoordinate2DMake(100.2, 0.8),
         CLLocationCoordinate2DMake(100.2, 0.2)};
-    
+
     MGLPolygon *polygon = [MGLPolygon polygonWithCoordinates:interiorCoordinates count:5];
-    
+
     MGLPolygonFeature *polygonFeature = [MGLPolygonFeature polygonWithCoordinates:coordinates count:5 interiorPolygons:@[polygon]];
-    
+
     CLLocationCoordinate2D coordinates_2[] = { CLLocationCoordinate2DMake(0, 0), CLLocationCoordinate2DMake(10, 10)};
     MGLPolylineFeature *polylineFeature = [MGLPolylineFeature polylineWithCoordinates:coordinates_2 count:2];
-    
+
     MGLMultiPolygonFeature *multiPolygonFeature = [MGLMultiPolygonFeature multiPolygonWithPolygons:@[polygonFeature, polygonFeature]];
-    
+
     MGLMultiPolylineFeature *multiPolylineFeature = [MGLMultiPolylineFeature multiPolylineWithPolylines:@[polylineFeature, polylineFeature]];
-    
+
     MGLPointCollectionFeature *pointCollectionFeature = [MGLPointCollectionFeature pointCollectionWithCoordinates:coordinates count:5];
-    
+
     MGLPointFeature *pointFeature = [MGLPointFeature new];
     pointFeature.coordinate = CLLocationCoordinate2DMake(100.2, 0.2);
-    
+
     MGLShapeCollectionFeature *shapeCollectionFeature = [MGLShapeCollectionFeature shapeCollectionWithShapes:@[polygonFeature, polylineFeature, multiPolygonFeature, multiPolylineFeature, pointCollectionFeature, pointFeature]];
 
     MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"source-id" shape:shapeCollectionFeature options:nil];
-    
+
     MGLShapeCollectionFeature *shape = (MGLShapeCollectionFeature *)source.shape;
     XCTAssertNotNil(shape);
     XCTAssert(shape.shapes.count == 6, @"Shape collection should contain 6 shapes");

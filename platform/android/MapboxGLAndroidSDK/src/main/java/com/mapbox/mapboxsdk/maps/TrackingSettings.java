@@ -63,10 +63,10 @@ public final class TrackingSettings {
     } catch (SecurityException ignore) {
       // User did not accept location permissions
     }
-    //noinspection ResourceType
+    // noinspection ResourceType
     setMyLocationTrackingMode(savedInstanceState.getInt(
       MapboxConstants.STATE_MY_LOCATION_TRACKING_MODE, MyLocationTracking.TRACKING_NONE));
-    //noinspection ResourceType
+    // noinspection ResourceType
     setMyBearingTrackingMode(savedInstanceState.getInt(
       MapboxConstants.STATE_MY_BEARING_TRACKING_MODE, MyBearingTracking.NONE));
     setDismissLocationTrackingOnGesture(savedInstanceState.getBoolean(

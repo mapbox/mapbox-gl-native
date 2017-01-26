@@ -67,16 +67,16 @@ public class CircleLayerStyleTest extends BaseStyleTest {
       layer = new CircleLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("visibility");
     assertNotNull(layer);
 
-    //Get initial
+    // Get initial
     assertEquals(layer.getVisibility().getValue(), VISIBLE);
 
-    //Set
+    // Set
     layer.setProperties(visibility(NONE));
     assertEquals(layer.getVisibility().getValue(), NONE);
   }
@@ -92,13 +92,13 @@ public class CircleLayerStyleTest extends BaseStyleTest {
       layer = new CircleLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("circle-radius");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(circleRadius(0.3f));
     assertEquals((Float) layer.getCircleRadius().getValue(), (Float) 0.3f);
   }
@@ -114,13 +114,13 @@ public class CircleLayerStyleTest extends BaseStyleTest {
       layer = new CircleLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("circle-color");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(circleColor("rgba(0, 0, 0, 1)"));
     assertEquals((String) layer.getCircleColor().getValue(), (String) "rgba(0, 0, 0, 1)");
   }
@@ -136,13 +136,13 @@ public class CircleLayerStyleTest extends BaseStyleTest {
       layer = new CircleLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("circle-color");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(circleColor(Color.RED));
     assertEquals(layer.getCircleColorAsInt(), Color.RED);
   }
@@ -158,13 +158,13 @@ public class CircleLayerStyleTest extends BaseStyleTest {
       layer = new CircleLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("circle-blur");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(circleBlur(0.3f));
     assertEquals((Float) layer.getCircleBlur().getValue(), (Float) 0.3f);
   }
@@ -180,13 +180,13 @@ public class CircleLayerStyleTest extends BaseStyleTest {
       layer = new CircleLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("circle-opacity");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(circleOpacity(0.3f));
     assertEquals((Float) layer.getCircleOpacity().getValue(), (Float) 0.3f);
   }
@@ -202,13 +202,13 @@ public class CircleLayerStyleTest extends BaseStyleTest {
       layer = new CircleLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("circle-translate");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(circleTranslate(new Float[] {0f, 0f}));
     assertEquals((Float[]) layer.getCircleTranslate().getValue(), (Float[]) new Float[] {0f, 0f});
   }
@@ -224,13 +224,13 @@ public class CircleLayerStyleTest extends BaseStyleTest {
       layer = new CircleLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("circle-translate-anchor");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(circleTranslateAnchor(CIRCLE_TRANSLATE_ANCHOR_MAP));
     assertEquals((String) layer.getCircleTranslateAnchor().getValue(), (String) CIRCLE_TRANSLATE_ANCHOR_MAP);
   }
@@ -246,13 +246,13 @@ public class CircleLayerStyleTest extends BaseStyleTest {
       layer = new CircleLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("circle-pitch-scale");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(circlePitchScale(CIRCLE_PITCH_SCALE_MAP));
     assertEquals((String) layer.getCirclePitchScale().getValue(), (String) CIRCLE_PITCH_SCALE_MAP);
   }

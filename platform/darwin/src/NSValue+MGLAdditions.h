@@ -15,7 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Creates a new value object containing the specified Core Location geographic
  coordinate structure.
- 
+
  @param coordinate The value for the new object.
  @return A new value object that contains the geographic coordinate information.
  */
@@ -29,7 +29,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Creates a new value object containing the specified Mapbox coordinate span
  structure.
- 
+
  @param span The value for the new object.
  @return A new value object that contains the coordinate span information.
  */
@@ -43,7 +43,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Creates a new value object containing the specified Mapbox coordinate bounds
  structure.
- 
+
  @param bounds The value for the new object.
  @return A new value object that contains the coordinate bounds information.
  */
@@ -59,7 +59,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Creates a new value object containing the given `MGLOfflinePackProgress`
  structure.
- 
+
  @param progress The value for the new object.
  @return A new value object that contains the offline pack progress information.
  */

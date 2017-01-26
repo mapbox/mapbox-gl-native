@@ -21,19 +21,19 @@
             NSAssert(self.subpredicates.count <= 1, @"NOT predicate cannot have multiple subpredicates.");
             NSPredicate *subpredicate = self.subpredicates.firstObject;
             mbgl::style::Filter subfilter = subpredicate.mgl_filter;
-            
+
             // Convert NOT(!= nil) to NotHasFilter.
             if (subfilter.is<mbgl::style::HasFilter>()) {
                 auto hasFilter = subfilter.get<mbgl::style::HasFilter>();
                 return mbgl::style::NotHasFilter { .key = hasFilter.key };
             }
-            
+
             // Convert NOT(== nil) to HasFilter.
             if (subfilter.is<mbgl::style::NotHasFilter>()) {
                 auto hasFilter = subfilter.get<mbgl::style::NotHasFilter>();
                 return mbgl::style::HasFilter { .key = hasFilter.key };
             }
-            
+
             // Convert NOT(IN) or NOT(CONTAINS) to NotInFilter.
             if (subfilter.is<mbgl::style::InFilter>()) {
                 auto inFilter = subfilter.get<mbgl::style::InFilter>();
@@ -42,7 +42,7 @@
                 notInFilter.values = inFilter.values;
                 return notInFilter;
             }
-            
+
             // Convert NOT(), NOT(AND), NOT(NOT), NOT(==), etc. into NoneFilter.
             mbgl::style::NoneFilter noneFilter;
             if (subfilter.is<mbgl::style::AnyFilter>()) {
@@ -64,7 +64,7 @@
             return filter;
         }
     }
-    
+
     [NSException raise:@"Compound predicate type not handled"
                 format:@""];
     return {};

@@ -44,7 +44,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)isEqual:(id)other {
     if (self == other) return YES;
     if (![other isKindOfClass:[MGLPointCollection class]]) return NO;
-    
+
     MGLPointCollection *otherCollection = (MGLPointCollection *)other;
     return ([super isEqual:other]
             && ((![self geoJSONDictionary] && ![otherCollection geoJSONDictionary]) || [[self geoJSONDictionary] isEqualToDictionary:[otherCollection geoJSONDictionary]]));
@@ -112,7 +112,7 @@ NS_ASSUME_NONNULL_BEGIN
         CLLocationCoordinate2D coordinate = self.coordinates[index];
         [coordinates addObject:@[@(coordinate.longitude), @(coordinate.latitude)]];
     }
-    
+
     return @{@"type": @"MultiPoint",
              @"coordinates": coordinates};
 }

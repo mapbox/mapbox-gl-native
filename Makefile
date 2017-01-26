@@ -634,6 +634,10 @@ android-javadoc:
 style-code:
 	node scripts/generate-style-code.js
 
+.PHONY: codestyle
+codestyle:
+	scripts/codestyle.sh
+
 .PHONY: clean
 clean:
 	-rm -rf ./build \

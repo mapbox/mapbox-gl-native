@@ -81,7 +81,7 @@ public class StyleFileActivity extends AppCompatActivity {
     }
 
     protected void onPostExecute(Long result) {
-      //Actual file:// usage
+      // Actual file:// usage
       mapboxMap.setStyleUrl("file://" + cacheStyleFile.getAbsolutePath());
     }
 

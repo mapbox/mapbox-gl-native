@@ -11,7 +11,7 @@ static MGLCoordinateFormatter *DroppedPinCoordinateFormatter;
     NSTimer *_timer;
     NSTimeInterval _priorShownTimeInterval;
     NSDate *_dateShown;
-    
+
     NSValueTransformer *_timeIntervalTransformer;
 }
 

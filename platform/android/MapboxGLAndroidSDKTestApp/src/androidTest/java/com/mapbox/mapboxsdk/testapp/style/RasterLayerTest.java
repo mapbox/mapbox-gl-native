@@ -64,16 +64,16 @@ public class RasterLayerTest extends BaseStyleTest {
       layer = new RasterLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("visibility");
     assertNotNull(layer);
 
-    //Get initial
+    // Get initial
     assertEquals(layer.getVisibility().getValue(), VISIBLE);
 
-    //Set
+    // Set
     layer.setProperties(visibility(NONE));
     assertEquals(layer.getVisibility().getValue(), NONE);
   }
@@ -89,13 +89,13 @@ public class RasterLayerTest extends BaseStyleTest {
       layer = new RasterLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("raster-opacity");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(rasterOpacity(0.3f));
     assertEquals((Float) layer.getRasterOpacity().getValue(), (Float) 0.3f);
   }
@@ -111,13 +111,13 @@ public class RasterLayerTest extends BaseStyleTest {
       layer = new RasterLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("raster-hue-rotate");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(rasterHueRotate(0.3f));
     assertEquals((Float) layer.getRasterHueRotate().getValue(), (Float) 0.3f);
   }
@@ -133,13 +133,13 @@ public class RasterLayerTest extends BaseStyleTest {
       layer = new RasterLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("raster-brightness-min");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(rasterBrightnessMin(0.3f));
     assertEquals((Float) layer.getRasterBrightnessMin().getValue(), (Float) 0.3f);
   }
@@ -155,13 +155,13 @@ public class RasterLayerTest extends BaseStyleTest {
       layer = new RasterLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("raster-brightness-max");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(rasterBrightnessMax(0.3f));
     assertEquals((Float) layer.getRasterBrightnessMax().getValue(), (Float) 0.3f);
   }
@@ -177,13 +177,13 @@ public class RasterLayerTest extends BaseStyleTest {
       layer = new RasterLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("raster-saturation");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(rasterSaturation(0.3f));
     assertEquals((Float) layer.getRasterSaturation().getValue(), (Float) 0.3f);
   }
@@ -199,13 +199,13 @@ public class RasterLayerTest extends BaseStyleTest {
       layer = new RasterLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("raster-contrast");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(rasterContrast(0.3f));
     assertEquals((Float) layer.getRasterContrast().getValue(), (Float) 0.3f);
   }
@@ -221,13 +221,13 @@ public class RasterLayerTest extends BaseStyleTest {
       layer = new RasterLayer("my-layer", "composite");
       layer.setSourceLayer("composite");
       mapboxMap.addLayer(layer);
-      //Layer reference is now stale, get new reference
+      // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
     Timber.i("raster-fade-duration");
     assertNotNull(layer);
 
-    //Set and Get
+    // Set and Get
     layer.setProperties(rasterFadeDuration(0.3f));
     assertEquals((Float) layer.getRasterFadeDuration().getValue(), (Float) 0.3f);
   }

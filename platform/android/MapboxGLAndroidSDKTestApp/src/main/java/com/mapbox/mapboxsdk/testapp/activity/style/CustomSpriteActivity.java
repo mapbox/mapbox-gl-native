@@ -61,7 +61,7 @@ public class CustomSpriteActivity extends AppCompatActivity {
               // Add an icon to reference later
               mapboxMap.addImage(CUSTOM_ICON, BitmapFactory.decodeResource(getResources(), R.drawable.ic_car_top));
 
-              //Add a source with a geojson point
+              // Add a source with a geojson point
               point = Point.fromCoordinates(Position.fromCoordinates(13.400972d, 52.519003d));
               source = new GeoJsonSource(
                 "point",
@@ -69,10 +69,10 @@ public class CustomSpriteActivity extends AppCompatActivity {
               );
               mapboxMap.addSource(source);
 
-              //Add a symbol layer that references that point source
+              // Add a symbol layer that references that point source
               layer = new SymbolLayer("layer", "point");
               layer.setProperties(
-                //Set the id of the sprite to use
+                // Set the id of the sprite to use
                 iconImage(CUSTOM_ICON)
               );
 
@@ -81,14 +81,14 @@ public class CustomSpriteActivity extends AppCompatActivity {
 
               fab.setImageResource(R.drawable.ic_directions_car_black_24dp);
             } else {
-              //Update point
+              // Update point
               point = Point.fromCoordinates(
                 Position.fromCoordinates(point.getCoordinates().getLongitude() + 0.001,
                   point.getCoordinates().getLatitude() + 0.001)
               );
               source.setGeoJson(FeatureCollection.fromFeatures(new Feature[] {Feature.fromGeometry(point)}));
 
-              //Move the camera as well
+              // Move the camera as well
               mapboxMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(
                 point.getCoordinates().getLatitude(), point.getCoordinates().getLongitude())));
             }

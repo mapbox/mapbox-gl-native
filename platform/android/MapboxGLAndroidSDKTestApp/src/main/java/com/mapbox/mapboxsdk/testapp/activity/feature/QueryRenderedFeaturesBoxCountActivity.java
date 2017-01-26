@@ -33,7 +33,7 @@ public class QueryRenderedFeaturesBoxCountActivity extends AppCompatActivity {
 
     final View selectionBox = findViewById(R.id.selection_box);
 
-    //Initialize map as normal
+    // Initialize map as normal
     mapView = (MapView) findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
     mapView.getMapAsync(new OnMapReadyCallback() {
@@ -44,20 +44,20 @@ public class QueryRenderedFeaturesBoxCountActivity extends AppCompatActivity {
         selectionBox.setOnClickListener(new View.OnClickListener() {
           @Override
           public void onClick(View view) {
-            //Query
+            // Query
             int top = selectionBox.getTop() - mapView.getTop();
             int left = selectionBox.getLeft() - mapView.getLeft();
             RectF box = new RectF(left, top, left + selectionBox.getWidth(), top + selectionBox.getHeight());
             Timber.i(String.format("Querying box %s", box));
             List<Feature> features = mapboxMap.queryRenderedFeatures(box);
 
-            //Show count
+            // Show count
             Toast.makeText(
               QueryRenderedFeaturesBoxCountActivity.this,
               String.format("%s features in box", features.size()),
               Toast.LENGTH_SHORT).show();
 
-            //Debug output
+            // Debug output
             debugOutput(features);
           }
         });

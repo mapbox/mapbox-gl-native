@@ -13,7 +13,7 @@ namespace mbgl {
 namespace android {
 namespace conversion {
 
-    //visibility
+    // visibility
     inline std::string toString(mbgl::style::VisibilityType value) {
         switch (value) {
           case mbgl::style::VisibilityType::Visible:
@@ -28,7 +28,7 @@ namespace conversion {
     }
 
 <% for (const property of properties) { -%>
-    //<%- property.name %>
+    // <%- property.name %>
     inline std::string toString(mbgl::style::<%- propertyNativeType(property) %> value) {
         switch (value) {
 <% for (const value in property.values) { -%>

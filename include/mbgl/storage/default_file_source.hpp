@@ -29,7 +29,7 @@ public:
     bool supportsOptionalRequests() const override {
         return true;
     }
-    
+
     void setAPIBaseURL(const std::string&);
     std::string getAPIBaseURL() const;
 

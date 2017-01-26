@@ -9,13 +9,13 @@ NS_ASSUME_NONNULL_BEGIN
  An `MGLStyleValue` object is a generic container for a style attribute value.
  The layout and paint attribute properties of `MGLStyleLayer` can be set to
  `MGLStyleValue` objects.
- 
+
  The `MGLStyleValue` class itself represents a class cluster. Under the hood, a
  particular `MGLStyleValue` object may be either an `MGLStyleConstantValue` to
  represent a constant value or an `MGLStyleFunction` to represent a value
  function. Do not initialize an `MGLStyleValue` object directly; instead, use
  one of the class factory methods to create an `MGLStyleValue` object.
- 
+
  The `MGLStyleValue` class takes a generic parameter `T` that indicates the
  Foundation class being wrapped by this class. Common values for `T` include:
 
@@ -34,7 +34,7 @@ MGL_EXPORT
 
 /**
  Creates and returns an `MGLStyleConstantValue` object containing a raw value.
- 
+
  @param rawValue The constant value contained by the object.
  @return An `MGLStyleConstantValue` object containing `rawValue`, which is
     treated as a constant value.
@@ -44,7 +44,7 @@ MGL_EXPORT
 /**
  Creates and returns an `MGLStyleFunction` object representing a linear zoom
  level function with any number of stops.
- 
+
  @param stops A dictionary associating zoom levels with style values.
  @return An `MGLStyleFunction` object with the given stops.
  */
@@ -53,7 +53,7 @@ MGL_EXPORT
 /**
  Creates and returns an `MGLStyleFunction` object representing a zoom level
  function with an exponential interpolation base and any number of stops.
- 
+
  @param interpolationBase The exponential base of the interpolation curve.
  @param stops A dictionary associating zoom levels with style values.
  @return An `MGLStyleFunction` object with the given interpolation base and stops.
@@ -67,7 +67,7 @@ MGL_EXPORT
  value that remains constant as the zoom level changes. The layout and paint
  attribute properties of `MGLStyleLayer` objects can be set to
  `MGLStyleConstantValue` objects.
- 
+
  The `MGLStyleConstantValue` class takes a generic parameter `T` that indicates
  the Foundation class being wrapped by this class.
  */
@@ -78,7 +78,7 @@ MGL_EXPORT
 
 /**
  Creates and returns an `MGLStyleConstantValue` object containing a raw value.
- 
+
  @param rawValue The constant value contained by the object.
  @return An `MGLStyleConstantValue` object containing `rawValue`, which is
     treated as a constant value.
@@ -91,7 +91,7 @@ MGL_EXPORT
 
 /**
  Returns an `MGLStyleConstantValue` object containing a raw value.
- 
+
  @param rawValue The value contained by the receiver.
  @return An `MGLStyleConstantValue` object containing `rawValue`.
  */
@@ -111,7 +111,7 @@ MGL_EXPORT
  as the zoom level changes. The layout and paint attribute properties of an
  `MGLStyleLayer` object can be set to `MGLStyleFunction` objects. Use a zoom
  level function to create the illusion of depth and control data density.
- 
+
  The `MGLStyleFunction` class takes a generic parameter `T` that indicates the
  Foundation class being wrapped by this class.
  */
@@ -123,7 +123,7 @@ MGL_EXPORT
 /**
  Creates and returns an `MGLStyleFunction` object representing a linear zoom
  level function with any number of stops.
- 
+
  @param stops A dictionary associating zoom levels with style values.
  @return An `MGLStyleFunction` object with the given stops.
  */
@@ -132,7 +132,7 @@ MGL_EXPORT
 /**
  Creates and returns an `MGLStyleFunction` object representing a zoom level
  function with an exponential interpolation base and any number of stops.
- 
+
  @param interpolationBase The exponential base of the interpolation curve.
  @param stops A dictionary associating zoom levels with style values.
  @return An `MGLStyleFunction` object with the given interpolation base and stops.
@@ -144,7 +144,7 @@ MGL_EXPORT
 /**
  Returns an `MGLStyleFunction` object representing a zoom level function with an
  exponential interpolation base and any number of stops.
- 
+
  @param interpolationBase The exponential base of the interpolation curve.
  @param stops A dictionary associating zoom levels with style values.
  @return An `MGLStyleFunction` object with the given interpolation base and stops.
@@ -155,7 +155,7 @@ MGL_EXPORT
 
 /**
  The exponential interpolation base of the function’s interpolation curve.
- 
+
  The exponential interpolation base controls the rate at which the function’s output values
  increase. A value of 1 causes the function to increase linearly by zoom level.
  A higher exponential interpolation base causes the function’s output values to vary
@@ -166,7 +166,7 @@ MGL_EXPORT
 
 /**
  A dictionary associating zoom levels with style values.
- 
+
  Each of the function’s stops is represented by one key-value pair in the
  dictionary. Each key in the dictionary is an `NSNumber` object containing a
  floating-point zoom level. Each value in the dictionary is an `MGLStyleValue`

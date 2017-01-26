@@ -29,11 +29,11 @@ public:
     Impl(const std::string& cachePath, uint64_t maximumCacheSize)
         : offlineDatabase(cachePath, maximumCacheSize) {
     }
-    
+
     void setAPIBaseURL(const std::string& url) {
         onlineFileSource.setAPIBaseURL(url);
     }
-    
+
     std::string getAPIBaseURL() const{
         return onlineFileSource.getAPIBaseURL();
     }
@@ -63,7 +63,7 @@ public:
             callback(std::current_exception(), {});
         }
     }
-    
+
     void updateMetadata(const int64_t regionID,
                       const OfflineRegionMetadata& metadata,
                       std::function<void (std::exception_ptr, optional<OfflineRegionMetadata>)> callback) {
@@ -174,11 +174,11 @@ DefaultFileSource::~DefaultFileSource() = default;
 void DefaultFileSource::setAPIBaseURL(const std::string& baseURL) {
     thread->invokeSync(&Impl::setAPIBaseURL, baseURL);
 }
-    
+
 std::string DefaultFileSource::getAPIBaseURL() const {
     return thread->invokeSync(&Impl::getAPIBaseURL);
 }
-    
+
 void DefaultFileSource::setAccessToken(const std::string& accessToken) {
     thread->invokeSync(&Impl::setAccessToken, accessToken);
 }

@@ -843,16 +843,16 @@ final class NativeMapView {
     if (isDestroyedOn("addImage")) {
       return;
     }
-    //Check/correct config
+    // Check/correct config
     if (image.getConfig() != Bitmap.Config.ARGB_8888) {
       image = image.copy(Bitmap.Config.ARGB_8888, false);
     }
 
-    //Get pixels
+    // Get pixels
     ByteBuffer buffer = ByteBuffer.allocate(image.getByteCount());
     image.copyPixelsToBuffer(buffer);
 
-    //Determine pixel ratio
+    // Determine pixel ratio
     float density = image.getDensity() == Bitmap.DENSITY_NONE ? Bitmap.DENSITY_NONE : image.getDensity();
     float pixelRatio = density / DisplayMetrics.DENSITY_DEFAULT;
 

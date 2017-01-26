@@ -12,7 +12,7 @@ set -e
 
 if [ ! -f "$1" ]; then
 	printf "No file found at ${1}\n"
-	printf "Usage: $ ./validate_zip.sh <path to zip>\n"; exit 1; 
+	printf "Usage: $ ./validate_zip.sh <path to zip>\n"; exit 1;
 fi
 
 function verifyFramework() {
@@ -32,14 +32,14 @@ function verifyFramework() {
 	printf "$FRAMEWORK_NAME contains modulemap: ✓\n"
 
 	# Verify there is a modulemap so Swift can use the framework
-	if grep -q "link" "$MODULE_MAP"; then 
+	if grep -q "link" "$MODULE_MAP"; then
 		printf "$FRAMEWORK_NAME modulemap contains dependent system frameworks ✓\n"
 	else
 		printf "Warning: ${FRAMEWORK_NAME} does not list any system library dependencies. Double check all dependent frameworks and libraries are listed. \n";
 	fi
 
 	# Verify there is at least one header listed in the module map
-	if grep -q ".*.h" "$MODULE_MAP"; then 
+	if grep -q ".*.h" "$MODULE_MAP"; then
 		printf "$FRAMEWORK_NAME modulemap contains headers ✓\n";
 	else
 		printf "Error: ${FRAMEWORK_NAME} does not list any headers in the modulemap\n";
@@ -47,7 +47,7 @@ function verifyFramework() {
 	fi
 
 	# Verify there is at least a headers folder
-	if [[ ! -d "$HEADER_PATH" ]]; then 
+	if [[ ! -d "$HEADER_PATH" ]]; then
 		printf "ERROR: Headers not not found in ${FRAMEWORK_NAME}\n";
 		exit 5;
 	fi
@@ -55,7 +55,7 @@ function verifyFramework() {
 	# Verify the static lib at least has simulator and the two common ARM architectures
 	local PRESENT_ARCHITECTURES=$( xcrun lipo -info "${BINARY_PATH}" )
 	for arch in "armv7" "arm64" "i386" "x86_64"; do
-		if [[ ! $PRESENT_ARCHITECTURES == *$arch* ]]; then 
+		if [[ ! $PRESENT_ARCHITECTURES == *$arch* ]]; then
 			printf "ERROR: Architecture ${arch} not found in ${FRAMEWORK_NAME}\n";
 			exit 6;
 		fi
@@ -69,7 +69,7 @@ function verifyFramework() {
  		if [[ ! $SYMBOLS == *"LLVM"* ]]; then
 			printf "ERROR: Bitcode segments not found in ${FRAMEWORK_NAME}. Users will fail to archive their builds \n";
 			exit 7;
- 		fi 
+ 		fi
 	done
 	printf "$FRAMEWORK_NAME contains bitcode: ✓\n"
 
@@ -82,19 +82,19 @@ function verifyFramework() {
 	printf "$FRAMEWORK_NAME contains Info.plist: ✓\n"
 
 	# Verify there is a bundle identifier in Info.plist
-	# And verify it does not contain any vestigial string templating 
+	# And verify it does not contain any vestigial string templating
 	local BUNDLE_NAME=$(/usr/libexec/PlistBuddy -c "Print :CFBundleIdentifier" "${PLIST_PATH}")
 	if [[ -z "$BUNDLE_NAME" ]]; then
 		printf "ERROR: Info.plist not found in $FRAMEWORK_NAME or CFBundleIdentifier not set\n";
 		exit 9;
-	elif [[ "$BUNDLE_NAME" == *"$"* ]]; then 
+	elif [[ "$BUNDLE_NAME" == *"$"* ]]; then
 		printf "ERROR: CFBundleIdentifier is invalid: $BUNDLE_NAME\n";
 		exit 10;
 	else
 		printf "$FRAMEWORK_NAME has bundle: $BUNDLE_NAME ✓\n"
 	fi
 
-	# Verify there is a bundle version in the Info.plist 
+	# Verify there is a bundle version in the Info.plist
 	local BUNDLE_VERSION=$(/usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" "${PLIST_PATH}")
 	if [[ -z "$BUNDLE_VERSION" ]]; then
 		printf "ERROR: No CFBundleShortVersionString found in $FRAMEWORK_NAME\n";
@@ -119,7 +119,7 @@ printf "Scanning for frameworks...\n"
 FRAMEWORKS=( $(find "$TEMP_DIR" -name "*.framework" -maxdepth 1) )
 if [ -z "$FRAMEWORKS" ]; then
 	printf "ERROR: No frameworks found at the top level within the zip archive.";
-	exit 2; 
+	exit 2;
 fi
 
 # Verify each framework found individually

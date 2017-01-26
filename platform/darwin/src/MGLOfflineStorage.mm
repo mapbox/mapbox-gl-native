@@ -161,11 +161,11 @@ NSString * const MGLOfflinePackMaximumCountUserInfoKey = MGLOfflinePackUserInfoK
 - (void)dealloc {
     [[MGLNetworkConfiguration sharedManager] removeObserver:self forKeyPath:@"apiBaseURL"];
     [[MGLAccountManager sharedManager] removeObserver:self forKeyPath:@"accessToken"];
-    
+
     for (MGLOfflinePack *pack in self.packs) {
         [pack invalidate];
     }
-    
+
     delete _mbglFileSource;
     _mbglFileSource = nullptr;
 }
@@ -210,7 +210,7 @@ NSString * const MGLOfflinePackMaximumCountUserInfoKey = MGLOfflinePackUserInfoK
          @"Regions of type %@ are unsupported.", NSStringFromClass([region class])];
         return;
     }
-    
+
     const mbgl::OfflineTilePyramidRegionDefinition regionDefinition = [(id <MGLOfflineRegion_Private>)region offlineRegionDefinition];
     mbgl::OfflineRegionMetadata metadata(context.length);
     [context getBytes:&metadata[0] length:metadata.size()];
@@ -247,7 +247,7 @@ NSString * const MGLOfflinePackMaximumCountUserInfoKey = MGLOfflinePackUserInfoK
         completion(nil);
         return;
     }
-    
+
     self.mbglFileSource->deleteOfflineRegion(std::move(*mbglOfflineRegion), [&, completion](std::exception_ptr exception) {
         NSError *error;
         if (exception) {
@@ -269,7 +269,7 @@ NSString * const MGLOfflinePackMaximumCountUserInfoKey = MGLOfflinePackUserInfoK
             [pack invalidate];
         }
         self.packs = [packs mutableCopy];
-        
+
         for (MGLOfflinePack *pack in packs) {
             pack.delegate = self;
         }
@@ -312,7 +312,7 @@ NSString * const MGLOfflinePackMaximumCountUserInfoKey = MGLOfflinePackUserInfoK
     if (!cachePath) {
         return 0;
     }
-    
+
     NSDictionary *attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:cachePath error:NULL];
     return attributes.fileSize;
 }

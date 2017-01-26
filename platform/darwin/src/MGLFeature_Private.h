@@ -28,7 +28,7 @@ MGLShape* MGLShapeFromGeoJSON(const mapbox::geojson::geojson &geojson);
 
 /**
  Takes an `mbgl::Feature` object, an identifer, and attributes dictionary and
- returns the feature object with converted `mbgl::FeatureIdentifier` and 
+ returns the feature object with converted `mbgl::FeatureIdentifier` and
  `mbgl::PropertyMap` properties.
  */
 mbgl::Feature mbglFeature(mbgl::Feature feature, id identifier, NSDictionary *attributes);

@@ -217,7 +217,7 @@ static NSURL *MGLStyleURL_emerald;
         if (![source isKindOfClass:[MGLTileSource class]]) {
             continue;
         }
-        
+
         NSArray *tileSetInfos = [source attributionInfosWithFontSize:fontSize linkColor:linkColor];
         [infos growArrayByAddingAttributionInfosFromArray:tileSetInfos];
     }
@@ -321,7 +321,7 @@ static NSURL *MGLStyleURL_emerald;
 - (MGLStyleLayer *)layerFromMBGLLayer:(mbgl::style::Layer *)mbglLayer
 {
     NSParameterAssert(mbglLayer);
-    
+
     NSString *identifier = @(mbglLayer->getID().c_str());
     MGLStyleLayer *styleLayer;
     if (auto fillLayer = mbglLayer->as<mbgl::style::FillLayer>()) {
@@ -438,7 +438,7 @@ static NSURL *MGLStyleURL_emerald;
          @"Make sure sibling was obtained using -[MGLStyle layerWithIdentifier:].",
          sibling];
     }
-    
+
     auto layers = self.mapView.mbglMap->getLayers();
     std::string siblingIdentifier = sibling.identifier.UTF8String;
     NSUInteger index = 0;
@@ -448,7 +448,7 @@ static NSURL *MGLStyleURL_emerald;
         }
         index++;
     }
-    
+
     [self willChangeValueForKey:@"layers"];
     if (index + 1 > layers.size()) {
         [NSException raise:NSInvalidArgumentException
