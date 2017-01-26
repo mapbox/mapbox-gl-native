@@ -14,4 +14,4 @@
 	url = https://github.com/AliSoftware/OHHTTPStubs.git
 [submodule "mapbox-gl-js"]
 	path = mapbox-gl-js
-	url = git://github.com/mapbox/mapbox-gl-js.git
+	url = https://github.com/mapbox/mapbox-gl-js.git
