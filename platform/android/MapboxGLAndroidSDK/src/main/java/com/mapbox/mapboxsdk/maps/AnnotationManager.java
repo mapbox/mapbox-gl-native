@@ -359,6 +359,7 @@ class AnnotationManager {
     return selectedMarkers;
   }
 
+  @NonNull
   List<Marker> getMarkersInRect(@NonNull RectF rectangle) {
     // convert Rectangle to be density depedent
     float pixelRatio = nativeMapView.getPixelRatio();
@@ -622,6 +623,7 @@ class AnnotationManager {
   boolean onTap(PointF tapPoint, float screenDensity) {
     float toleranceSides = 4 * screenDensity;
     float toleranceTopBottom = 10 * screenDensity;
+    boolean handledDefaultClick = false;
 
     RectF tapRect = new RectF(tapPoint.x - iconManager.getAverageIconWidth() / 2 - toleranceSides,
       tapPoint.y - iconManager.getAverageIconHeight() / 2 - toleranceTopBottom,
@@ -631,7 +633,8 @@ class AnnotationManager {
     List<Marker> nearbyMarkers = getMarkersInRect(tapRect);
     long newSelectedMarkerId = -1;
 
-    if (nearbyMarkers != null && nearbyMarkers.size() > 0) {
+    // find a Marker that isn't selected yet
+    if (nearbyMarkers.size() > 0) {
       Collections.sort(nearbyMarkers);
       for (Marker nearbyMarker : nearbyMarkers) {
         boolean found = false;
@@ -647,6 +650,7 @@ class AnnotationManager {
       }
     }
 
+    // if unselected marker found
     if (newSelectedMarkerId >= 0) {
       List<Annotation> annotations = getAnnotations();
       int count = annotations.size();
@@ -655,7 +659,6 @@ class AnnotationManager {
         if (annotation instanceof Marker) {
           if (annotation.getId() == newSelectedMarkerId) {
             Marker marker = (Marker) annotation;
-            boolean handledDefaultClick = false;
 
             if (marker instanceof MarkerView) {
               handledDefaultClick = markerViewManager.onClickMarkerView((MarkerView) marker);
@@ -675,6 +678,22 @@ class AnnotationManager {
               }
             }
 
+            return true;
+          }
+        }
+      }
+    } else if (nearbyMarkers.size() > 0) {
+      // we didn't find an unselected marker, check if we can close an already open markers
+      for (Marker nearbyMarker : nearbyMarkers) {
+        for (Marker selectedMarker : selectedMarkers) {
+          if (nearbyMarker.equals(selectedMarker)) {
+            if (onMarkerClickListener != null) {
+              // end developer has provided a custom click listener
+              handledDefaultClick = onMarkerClickListener.onMarkerClick(nearbyMarker);
+              if (!handledDefaultClick) {
+                deselectMarker(nearbyMarker);
+              }
+            }
             return true;
           }
         }
