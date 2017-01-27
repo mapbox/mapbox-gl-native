@@ -36,6 +36,19 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
   - Avoid calls to onFling when while pinch zooming [#7666](https://github.com/mapbox/mapbox-gl-native/issues/7666)
 * Support for style-wide transition animation duration and delay [#6779](https://github.com/mapbox/mapbox-gl-native/issues/6779)
 
+## 4.2.2 - January 27, 2017
+
+Mapbox Android 4.2.2 builds further on v4.2.1 and resolves:
+* OnFling gesture improvements
+ - Improve fling by calculating animation time based on velocity [#7676](https://github.com/mapbox/mapbox-gl-native/pull/7676)
+ - Avoid triggering a fling after a scale gesture [#7675](https://github.com/mapbox/mapbox-gl-native/issues/7675)
+* Deselect marker on infowindow click [#7784](https://github.com/mapbox/mapbox-gl-native/issues/7784)
+* Update build tools to Bitrise supported one [#7729](https://github.com/mapbox/mapbox-gl-native/issues/7729)
+* Removal of redudant log statements in native_map_view.cpp [#7801](https://github.com/mapbox/mapbox-gl-native/issues/7801)
+* Invalidate markersviews when updating their position [#7794](https://github.com/mapbox/mapbox-gl-native/issues/7794)
+* Avoid clustering unclusterable GeoJSON [#7633](https://github.com/mapbox/mapbox-gl-native/pull/7633)
+* Prevent null pointer exceptions when receiving connecitivy change events [#6858](https://github.com/mapbox/mapbox-gl-native/issues/6858)
+
 ## 4.2.1 - December 22, 2016
 
 Mapbox Android 4.2.1 is a bugfix release build on top of 4.2.0 and resolves:
@@ -50,13 +63,25 @@ Mapbox Android 4.2.1 is a bugfix release build on top of 4.2.0 and resolves:
 
 ## 4.2.0 - December 14, 2016
 
-Mapbox Android 4.2.0 contains all 4.2.0-beta.3 changes and adds:
+Mapbox Android 4.2.0 contains all 4.2.0-beta.5 changes and adds:
 
 * Adds additional documentation to APIs
 * Resolved issue with marker views occasionally not showing up until a gesture was performed on map [#7239](https://github.com/mapbox/mapbox-gl-native/pull/7239)
 * Added horizontal accuracy to location events [#7237](https://github.com/mapbox/mapbox-gl-native/pull/7237)
 * Resolved issue with changing visibility of a layer [#7242](https://github.com/mapbox/mapbox-gl-native/pull/7242)
 * Proguard improvement and fixes
+
+## 4.2.0-beta.5 - October 25, 2016
+
+Mapbox Android 4.2.0-beta.5 adds no new features, only bug fixes.
+
+## 4.2.0-beta.4 - October 25, 2016
+
+Mapbox Android 4.2.0-beta.4 contains all 4.2.0-beta.3 changes and adds:
+
+* Query rendered features by source [#6516](https://github.com/mapbox/mapbox-gl-native/issues/6516)
+* Decreased logging for release builds [#6787](https://github.com/mapbox/mapbox-gl-native/pull/6787)
+* setConnected method to manually set a connected flag [#6618](https://github.com/mapbox/mapbox-gl-native/pull/6618)
 
 ## 4.2.0-beta.3 - September 21, 2016
 
