@@ -1271,7 +1271,7 @@ public:
     _mbglMap->cancelTransitions();
 
     CGPoint centerPoint = [self anchorPointForGesture:pinch];
-
+    MGLMapCamera *oldCamera = self.camera;
     if (pinch.state == UIGestureRecognizerStateBegan)
     {
         [self trackGestureEvent:MGLEventGesturePinchStart forRecognizer:pinch];
@@ -1341,6 +1341,12 @@ public:
 
         [self unrotateIfNeededForGesture];
     }
+    
+    if ([self.delegate respondsToSelector:@selector(mapView:shouldChangeFromCamera:toCamera:)]
+        && ![self.delegate mapView:self shouldChangeFromCamera:oldCamera toCamera:self.camera])
+    {
+        self.camera = oldCamera;
+    }
 
     _previousPinchCenterCoordinate = [self convertPoint:centerPoint toCoordinateFromView:self];
     _previousPinchNumberOfTouches = pinch.numberOfTouches;
@@ -1353,7 +1359,7 @@ public:
     _mbglMap->cancelTransitions();
 
     CGPoint centerPoint = [self anchorPointForGesture:rotate];
-
+    MGLMapCamera *oldCamera = self.camera;
     if (rotate.state == UIGestureRecognizerStateBegan)
     {
         [self trackGestureEvent:MGLEventGestureRotateStart forRecognizer:rotate];
@@ -1378,10 +1384,16 @@ public:
             newDegrees = fminf(newDegrees,  30);
             newDegrees = fmaxf(newDegrees, -30);
         }
-
-        _mbglMap->setBearing(newDegrees, mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y });
-
-        [self notifyMapChange:mbgl::MapChangeRegionIsChanging];
+        
+        if ([self.delegate respondsToSelector:@selector(mapView:shouldChangeFromCamera:toCamera:)]
+            && ![self.delegate mapView:self shouldChangeFromCamera:oldCamera toCamera:self.camera])
+        {
+            self.camera = oldCamera;
+        } else {
+            _mbglMap->setBearing(newDegrees, mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y });
+            [self notifyMapChange:mbgl::MapChangeRegionIsChanging];
+        }
+        
     }
     else if (rotate.state == UIGestureRecognizerStateEnded || rotate.state == UIGestureRecognizerStateCancelled)
     {
@@ -1410,6 +1422,8 @@ public:
             [self unrotateIfNeededForGesture];
         }
     }
+    
+    
 }
 
 - (void)handleSingleTapGesture:(UITapGestureRecognizer *)singleTap
