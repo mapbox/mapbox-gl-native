@@ -32,20 +32,6 @@ set(ANDROID_JNI_TARGET_DIR ${ANDROID_SDK_PROJECT_DIR}/src/main/jniLibs/${ANDROID
 set(ANDROID_ASSETS_TARGET_DIR ${ANDROID_SDK_PROJECT_DIR}/src/main/assets)
 set(ANDROID_TEST_APP_JNI_TARGET_DIR ${CMAKE_SOURCE_DIR}/platform/android/MapboxGLAndroidSDKTestApp/src/main/jniLibs/${ANDROID_JNIDIR})
 
-macro(mbgl_android_copy_asset source target)
-    add_custom_command(
-        OUTPUT ${ANDROID_ASSETS_TARGET_DIR}/${target}
-        COMMAND  ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/${source} ${ANDROID_ASSETS_TARGET_DIR}/${target}
-        DEPENDS ${CMAKE_SOURCE_DIR}/${source}
-    )
-endmacro()
-
-mbgl_android_copy_asset(common/ca-bundle.crt ca-bundle.crt)
-
-add_custom_target(mbgl-copy-android-assets
-    DEPENDS ${ANDROID_ASSETS_TARGET_DIR}/ca-bundle.crt
-)
-
 ## mbgl core ##
 
 macro(mbgl_platform_core)
@@ -192,10 +178,6 @@ endmacro()
 
 add_library(mapbox-gl SHARED
     platform/android/src/main.cpp
-)
-
-add_dependencies(mapbox-gl
-    mbgl-copy-android-assets
 )
 
 target_compile_options(mapbox-gl

@@ -110,6 +110,13 @@ macro(mbgl_platform_glfw)
     target_link_libraries(mbgl-glfw
         PRIVATE mbgl-loop
     )
+
+    add_custom_command(
+        TARGET mbgl-glfw POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
+                ${CMAKE_SOURCE_DIR}/common/ca-bundle.crt
+                ${CMAKE_CURRENT_BINARY_DIR}/ca-bundle.crt
+    )
 endmacro()
 
 
