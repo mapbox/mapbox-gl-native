@@ -19,8 +19,8 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".activity.FeatureOverviewActivity"
-            android:launchMode="singleTop"
-            android:label="@string/app_name">
+            android:label="@string/app_name"
+            android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
@@ -564,9 +564,13 @@
         </activity>
 
         <!-- For Instrumentation tests -->
-        <activity android:name=".activity.style.RuntimeStyleTestActivity"/>
-        <activity android:name=".activity.style.RuntimeStyleTimingTestActivity"/>
-        <activity android:name=".activity.espresso.EspressoTestActivity"/>
+        <activity
+            android:name=".activity.style.RuntimeStyleTestActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".activity.style.RuntimeStyleTimingTestActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".activity.espresso.EspressoTestActivity"
+            android:screenOrientation="portrait"/>
 
         <!-- Configuration Settings -->
         <meta-data
