@@ -61,7 +61,7 @@ String.prototype.wrap = function (cols, indent) {
 };
 
 String.prototype.indent = function (cols) {
-	return this.replace(/^|\n/g, "$&" + " ".repeat(cols));
+	return this.replace(/^|\n/g, "$&" + " ".repeat(cols)).replace(/(^|\n)\s+(?=\n)/g, "$1");
 };
 
 global.camelize = function (str) {

@@ -177,7 +177,7 @@ MGL_EXPORT
 
 /**
  The width of the circle's stroke. Strokes are placed outside of the
- "circle-radius".
+ `circleRadius`.
 
  This property is measured in points.
 
