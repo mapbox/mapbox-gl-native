@@ -82,7 +82,8 @@ public class BackgroundLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(backgroundColor("rgba(0, 0, 0, 1)"));
-    assertEquals((String) layer.getBackgroundColor().getValue(), (String) "rgba(0, 0, 0, 1)");
+    assertEquals((String) layer.getBackgroundColor().getValue(),
+                 (String) "rgba(0, 0, 0, 1)");
   }
 
   @Test
@@ -114,7 +115,8 @@ public class BackgroundLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(backgroundPattern("pedestrian-polygon"));
-    assertEquals((String) layer.getBackgroundPattern().getValue(), (String) "pedestrian-polygon");
+    assertEquals((String) layer.getBackgroundPattern().getValue(),
+                 (String) "pedestrian-polygon");
   }
 
   @Test
@@ -130,7 +132,8 @@ public class BackgroundLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(backgroundOpacity(0.3f));
-    assertEquals((Float) layer.getBackgroundOpacity().getValue(), (Float) 0.3f);
+    assertEquals((Float) layer.getBackgroundOpacity().getValue(),
+                 (Float) 0.3f);
   }
 
 

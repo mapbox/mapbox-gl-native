@@ -22,13 +22,12 @@ public abstract class Property<T> {
    */
   public static final String NONE = "none";
 
-  @StringDef( {
+  @StringDef({
     VISIBLE,
-    NONE
+    NONE,
   })
   @Retention(RetentionPolicy.SOURCE)
-  public @interface VISIBILITY {
-  }
+  public @interface VISIBILITY {}
 
   // LINE_CAP: The display of line endings.
 
@@ -50,14 +49,13 @@ public abstract class Property<T> {
   /**
    * The display of line endings.
    */
-  @StringDef( {
+  @StringDef({
     LINE_CAP_BUTT,
     LINE_CAP_ROUND,
     LINE_CAP_SQUARE,
   })
   @Retention(RetentionPolicy.SOURCE)
-  public @interface LINE_CAP {
-  }
+  public @interface LINE_CAP {}
 
   // LINE_JOIN: The display of lines when joining.
 
@@ -80,14 +78,13 @@ public abstract class Property<T> {
   /**
    * The display of lines when joining.
    */
-  @StringDef( {
+  @StringDef({
     LINE_JOIN_BEVEL,
     LINE_JOIN_ROUND,
     LINE_JOIN_MITER,
   })
   @Retention(RetentionPolicy.SOURCE)
-  public @interface LINE_JOIN {
-  }
+  public @interface LINE_JOIN {}
 
   // SYMBOL_PLACEMENT: Label placement relative to its geometry.
 
@@ -103,13 +100,12 @@ public abstract class Property<T> {
   /**
    * Label placement relative to its geometry.
    */
-  @StringDef( {
+  @StringDef({
     SYMBOL_PLACEMENT_POINT,
     SYMBOL_PLACEMENT_LINE,
   })
   @Retention(RetentionPolicy.SOURCE)
-  public @interface SYMBOL_PLACEMENT {
-  }
+  public @interface SYMBOL_PLACEMENT {}
 
   // ICON_ROTATION_ALIGNMENT: In combination with `symbol-placement`, determines the rotation behavior of icons.
 
@@ -133,14 +129,13 @@ public abstract class Property<T> {
   /**
    * In combination with `symbol-placement`, determines the rotation behavior of icons.
    */
-  @StringDef( {
+  @StringDef({
     ICON_ROTATION_ALIGNMENT_MAP,
     ICON_ROTATION_ALIGNMENT_VIEWPORT,
     ICON_ROTATION_ALIGNMENT_AUTO,
   })
   @Retention(RetentionPolicy.SOURCE)
-  public @interface ICON_ROTATION_ALIGNMENT {
-  }
+  public @interface ICON_ROTATION_ALIGNMENT {}
 
   // ICON_TEXT_FIT: Scales the icon to fit around the associated text.
 
@@ -164,15 +159,14 @@ public abstract class Property<T> {
   /**
    * Scales the icon to fit around the associated text.
    */
-  @StringDef( {
+  @StringDef({
     ICON_TEXT_FIT_NONE,
     ICON_TEXT_FIT_WIDTH,
     ICON_TEXT_FIT_HEIGHT,
     ICON_TEXT_FIT_BOTH,
   })
   @Retention(RetentionPolicy.SOURCE)
-  public @interface ICON_TEXT_FIT {
-  }
+  public @interface ICON_TEXT_FIT {}
 
   // TEXT_PITCH_ALIGNMENT: Orientation of text when map is pitched.
 
@@ -192,14 +186,13 @@ public abstract class Property<T> {
   /**
    * Orientation of text when map is pitched.
    */
-  @StringDef( {
+  @StringDef({
     TEXT_PITCH_ALIGNMENT_MAP,
     TEXT_PITCH_ALIGNMENT_VIEWPORT,
     TEXT_PITCH_ALIGNMENT_AUTO,
   })
   @Retention(RetentionPolicy.SOURCE)
-  public @interface TEXT_PITCH_ALIGNMENT {
-  }
+  public @interface TEXT_PITCH_ALIGNMENT {}
 
   // TEXT_ROTATION_ALIGNMENT: In combination with `symbol-placement`, determines the rotation behavior of the individual
   // glyphs forming the text.
@@ -224,14 +217,13 @@ public abstract class Property<T> {
   /**
    * In combination with `symbol-placement`, determines the rotation behavior of the individual glyphs forming the text.
    */
-  @StringDef( {
+  @StringDef({
     TEXT_ROTATION_ALIGNMENT_MAP,
     TEXT_ROTATION_ALIGNMENT_VIEWPORT,
     TEXT_ROTATION_ALIGNMENT_AUTO,
   })
   @Retention(RetentionPolicy.SOURCE)
-  public @interface TEXT_ROTATION_ALIGNMENT {
-  }
+  public @interface TEXT_ROTATION_ALIGNMENT {}
 
   // TEXT_JUSTIFY: Text justification options.
 
@@ -251,14 +243,13 @@ public abstract class Property<T> {
   /**
    * Text justification options.
    */
-  @StringDef( {
+  @StringDef({
     TEXT_JUSTIFY_LEFT,
     TEXT_JUSTIFY_CENTER,
     TEXT_JUSTIFY_RIGHT,
   })
   @Retention(RetentionPolicy.SOURCE)
-  public @interface TEXT_JUSTIFY {
-  }
+  public @interface TEXT_JUSTIFY {}
 
   // TEXT_ANCHOR: Part of the text placed closest to the anchor.
 
@@ -302,7 +293,7 @@ public abstract class Property<T> {
   /**
    * Part of the text placed closest to the anchor.
    */
-  @StringDef( {
+  @StringDef({
     TEXT_ANCHOR_CENTER,
     TEXT_ANCHOR_LEFT,
     TEXT_ANCHOR_RIGHT,
@@ -314,8 +305,7 @@ public abstract class Property<T> {
     TEXT_ANCHOR_BOTTOM_RIGHT,
   })
   @Retention(RetentionPolicy.SOURCE)
-  public @interface TEXT_ANCHOR {
-  }
+  public @interface TEXT_ANCHOR {}
 
   // TEXT_TRANSFORM: Specifies how to capitalize text, similar to the CSS `text-transform` property.
 
@@ -335,14 +325,13 @@ public abstract class Property<T> {
   /**
    * Specifies how to capitalize text, similar to the CSS `text-transform` property.
    */
-  @StringDef( {
+  @StringDef({
     TEXT_TRANSFORM_NONE,
     TEXT_TRANSFORM_UPPERCASE,
     TEXT_TRANSFORM_LOWERCASE,
   })
   @Retention(RetentionPolicy.SOURCE)
-  public @interface TEXT_TRANSFORM {
-  }
+  public @interface TEXT_TRANSFORM {}
 
   // FILL_TRANSLATE_ANCHOR: Controls the translation reference point.
 
@@ -358,13 +347,12 @@ public abstract class Property<T> {
   /**
    * Controls the translation reference point.
    */
-  @StringDef( {
+  @StringDef({
     FILL_TRANSLATE_ANCHOR_MAP,
     FILL_TRANSLATE_ANCHOR_VIEWPORT,
   })
   @Retention(RetentionPolicy.SOURCE)
-  public @interface FILL_TRANSLATE_ANCHOR {
-  }
+  public @interface FILL_TRANSLATE_ANCHOR {}
 
   // LINE_TRANSLATE_ANCHOR: Controls the translation reference point.
 
@@ -380,13 +368,12 @@ public abstract class Property<T> {
   /**
    * Controls the translation reference point.
    */
-  @StringDef( {
+  @StringDef({
     LINE_TRANSLATE_ANCHOR_MAP,
     LINE_TRANSLATE_ANCHOR_VIEWPORT,
   })
   @Retention(RetentionPolicy.SOURCE)
-  public @interface LINE_TRANSLATE_ANCHOR {
-  }
+  public @interface LINE_TRANSLATE_ANCHOR {}
 
   // ICON_TRANSLATE_ANCHOR: Controls the translation reference point.
 
@@ -402,13 +389,12 @@ public abstract class Property<T> {
   /**
    * Controls the translation reference point.
    */
-  @StringDef( {
+  @StringDef({
     ICON_TRANSLATE_ANCHOR_MAP,
     ICON_TRANSLATE_ANCHOR_VIEWPORT,
   })
   @Retention(RetentionPolicy.SOURCE)
-  public @interface ICON_TRANSLATE_ANCHOR {
-  }
+  public @interface ICON_TRANSLATE_ANCHOR {}
 
   // TEXT_TRANSLATE_ANCHOR: Controls the translation reference point.
 
@@ -424,13 +410,12 @@ public abstract class Property<T> {
   /**
    * Controls the translation reference point.
    */
-  @StringDef( {
+  @StringDef({
     TEXT_TRANSLATE_ANCHOR_MAP,
     TEXT_TRANSLATE_ANCHOR_VIEWPORT,
   })
   @Retention(RetentionPolicy.SOURCE)
-  public @interface TEXT_TRANSLATE_ANCHOR {
-  }
+  public @interface TEXT_TRANSLATE_ANCHOR {}
 
   // CIRCLE_TRANSLATE_ANCHOR: Controls the translation reference point.
 
@@ -446,13 +431,12 @@ public abstract class Property<T> {
   /**
    * Controls the translation reference point.
    */
-  @StringDef( {
+  @StringDef({
     CIRCLE_TRANSLATE_ANCHOR_MAP,
     CIRCLE_TRANSLATE_ANCHOR_VIEWPORT,
   })
   @Retention(RetentionPolicy.SOURCE)
-  public @interface CIRCLE_TRANSLATE_ANCHOR {
-  }
+  public @interface CIRCLE_TRANSLATE_ANCHOR {}
 
   // CIRCLE_PITCH_SCALE: Controls the scaling behavior of the circle when the map is pitched.
 
@@ -468,13 +452,12 @@ public abstract class Property<T> {
   /**
    * Controls the scaling behavior of the circle when the map is pitched.
    */
-  @StringDef( {
+  @StringDef({
     CIRCLE_PITCH_SCALE_MAP,
     CIRCLE_PITCH_SCALE_VIEWPORT,
   })
   @Retention(RetentionPolicy.SOURCE)
-  public @interface CIRCLE_PITCH_SCALE {
-  }
+  public @interface CIRCLE_PITCH_SCALE {}
 
   // Class definition
   public final String name;

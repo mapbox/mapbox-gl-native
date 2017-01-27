@@ -891,7 +891,7 @@ public class PropertyFactory {
   }
 
   /**
-   * The width of the circle's stroke. Strokes are placed outside of the "circle-radius".
+   * The width of the circle's stroke. Strokes are placed outside of the {@link PropertyFactory#circleRadius}.
    *
    * @param value a Float value
    * @return property wrapper around Float
@@ -901,7 +901,7 @@ public class PropertyFactory {
   }
 
   /**
-   * The width of the circle's stroke. Strokes are placed outside of the "circle-radius".
+   * The width of the circle's stroke. Strokes are placed outside of the {@link PropertyFactory#circleRadius}.
    *
    * @param function a wrapper function for Float
    * @return property wrapper around a Float function

@@ -7,6 +7,11 @@ const _ = require('lodash');
 
 require('../../../scripts/style-code');
 
+///
+// Temporarily IGNORE layers that are in the spec yet still not supported in mbgl core
+///
+delete spec.layer.type.values['fill-extrusion'];
+
 // Specification parsing //
 
 // Collect layer types from spec
@@ -120,7 +125,7 @@ global.defaultValueJava = function(property) {
         return '"pedestrian-polygon"';
     }
     if(property.name.endsWith("-font")) {
-        return 'new String[]{"Open Sans Regular", "Arial Unicode MS Regular"}';
+        return 'new String[] {"Open Sans Regular", "Arial Unicode MS Regular"}';
     }
      switch (property.type) {
       case 'boolean':
@@ -138,11 +143,11 @@ global.defaultValueJava = function(property) {
               case 'string':
                 return '[' + property['default'] + "]";
               case 'number':
-                var result ='new Float[]{';
+                var result ='new Float[] {';
                 for (var i = 0; i < property.length; i++) {
                     result += "0f";
                     if (i +1 != property.length) {
-                        result += ",";
+                        result += ", ";
                     }
                 }
                 return result + "}";

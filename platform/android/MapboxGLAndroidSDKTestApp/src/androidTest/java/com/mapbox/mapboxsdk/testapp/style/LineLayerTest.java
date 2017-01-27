@@ -108,7 +108,8 @@ public class LineLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(lineCap(LINE_CAP_BUTT));
-    assertEquals((String) layer.getLineCap().getValue(), (String) LINE_CAP_BUTT);
+    assertEquals((String) layer.getLineCap().getValue(),
+                 (String) LINE_CAP_BUTT);
   }
 
   @Test
@@ -130,7 +131,8 @@ public class LineLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(lineJoin(LINE_JOIN_BEVEL));
-    assertEquals((String) layer.getLineJoin().getValue(), (String) LINE_JOIN_BEVEL);
+    assertEquals((String) layer.getLineJoin().getValue(),
+                 (String) LINE_JOIN_BEVEL);
   }
 
   @Test
@@ -152,7 +154,8 @@ public class LineLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(lineMiterLimit(0.3f));
-    assertEquals((Float) layer.getLineMiterLimit().getValue(), (Float) 0.3f);
+    assertEquals((Float) layer.getLineMiterLimit().getValue(),
+                 (Float) 0.3f);
   }
 
   @Test
@@ -174,7 +177,8 @@ public class LineLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(lineRoundLimit(0.3f));
-    assertEquals((Float) layer.getLineRoundLimit().getValue(), (Float) 0.3f);
+    assertEquals((Float) layer.getLineRoundLimit().getValue(),
+                 (Float) 0.3f);
   }
 
   @Test
@@ -196,7 +200,8 @@ public class LineLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(lineOpacity(0.3f));
-    assertEquals((Float) layer.getLineOpacity().getValue(), (Float) 0.3f);
+    assertEquals((Float) layer.getLineOpacity().getValue(),
+                 (Float) 0.3f);
   }
 
   @Test
@@ -218,7 +223,8 @@ public class LineLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(lineColor("rgba(0, 0, 0, 1)"));
-    assertEquals((String) layer.getLineColor().getValue(), (String) "rgba(0, 0, 0, 1)");
+    assertEquals((String) layer.getLineColor().getValue(),
+                 (String) "rgba(0, 0, 0, 1)");
   }
 
   @Test
@@ -262,7 +268,8 @@ public class LineLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(lineTranslate(new Float[] {0f, 0f}));
-    assertEquals((Float[]) layer.getLineTranslate().getValue(), (Float[]) new Float[] {0f, 0f});
+    assertEquals((Float[]) layer.getLineTranslate().getValue(),
+                 (Float[]) new Float[] {0f, 0f});
   }
 
   @Test
@@ -284,7 +291,8 @@ public class LineLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(lineTranslateAnchor(LINE_TRANSLATE_ANCHOR_MAP));
-    assertEquals((String) layer.getLineTranslateAnchor().getValue(), (String) LINE_TRANSLATE_ANCHOR_MAP);
+    assertEquals((String) layer.getLineTranslateAnchor().getValue(),
+                 (String) LINE_TRANSLATE_ANCHOR_MAP);
   }
 
   @Test
@@ -306,7 +314,8 @@ public class LineLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(lineWidth(0.3f));
-    assertEquals((Float) layer.getLineWidth().getValue(), (Float) 0.3f);
+    assertEquals((Float) layer.getLineWidth().getValue(),
+                 (Float) 0.3f);
   }
 
   @Test
@@ -328,7 +337,8 @@ public class LineLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(lineGapWidth(0.3f));
-    assertEquals((Float) layer.getLineGapWidth().getValue(), (Float) 0.3f);
+    assertEquals((Float) layer.getLineGapWidth().getValue(),
+                 (Float) 0.3f);
   }
 
   @Test
@@ -350,7 +360,8 @@ public class LineLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(lineOffset(0.3f));
-    assertEquals((Float) layer.getLineOffset().getValue(), (Float) 0.3f);
+    assertEquals((Float) layer.getLineOffset().getValue(),
+                 (Float) 0.3f);
   }
 
   @Test
@@ -372,7 +383,8 @@ public class LineLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(lineBlur(0.3f));
-    assertEquals((Float) layer.getLineBlur().getValue(), (Float) 0.3f);
+    assertEquals((Float) layer.getLineBlur().getValue(),
+                 (Float) 0.3f);
   }
 
   @Test
@@ -394,7 +406,8 @@ public class LineLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(lineDasharray(new Float[] {}));
-    assertEquals((Float[]) layer.getLineDasharray().getValue(), (Float[]) new Float[] {});
+    assertEquals((Float[]) layer.getLineDasharray().getValue(),
+                 (Float[]) new Float[] {});
   }
 
   @Test
@@ -416,7 +429,8 @@ public class LineLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(linePattern("pedestrian-polygon"));
-    assertEquals((String) layer.getLinePattern().getValue(), (String) "pedestrian-polygon");
+    assertEquals((String) layer.getLinePattern().getValue(),
+                 (String) "pedestrian-polygon");
   }
 
 
