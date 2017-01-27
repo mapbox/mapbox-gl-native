@@ -21,6 +21,8 @@ typedef NSString *MGLShapeSourceOption NS_STRING_ENUM;
  This attribute corresponds to the
  <a href="https://www.mapbox.com/mapbox-gl-style-spec/#sources-geojson-cluster"><code>cluster</code></a>
  source property in the Mapbox Style Specification.
+ 
+ This option only affects point features within a shape source.
  */
 extern MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionClustered;
 
@@ -118,7 +120,7 @@ MGL_EXPORT
  the source.
  
  @param identifier A string that uniquely identifies the source.
- @param URL An HTTP(S) URL, absolute file URL, or local file URL relative to the
+ @param url An HTTP(S) URL, absolute file URL, or local file URL relative to the
     current application’s resource bundle.
  @param options An `NSDictionary` of options for this source.
  @return An initialized shape source.

@@ -260,7 +260,7 @@
                                @"disabling pan gesture should disallow horizontal panning");
 }
 
-- (void)testRotate {
+- (void)testRotateClockwise {
     CLLocationDirection startAngle = tester.mapView.direction;
 
     XCTAssertNotEqual(startAngle,
@@ -272,6 +272,21 @@
     XCTAssertGreaterThanOrEqual(fabs(tester.mapView.direction - startAngle),
                                 20,
                                 @"rotating map should change angle");
+}
+
+- (void)testRotateCounterclockwise {
+    CLLocationDirection startAngle = tester.mapView.direction;
+    
+    XCTAssertNotEqual(startAngle,
+                      -45,
+                      @"start angle must not be destination angle");
+    
+    [tester.mapView twoFingerRotateAtPoint:tester.mapView.center angle:-45];
+    
+    XCTAssertGreaterThanOrEqual(fabs(startAngle - tester.mapView.direction),
+                                20,
+                                @"rotating map should change angle");
+    XCTAssertGreaterThan(tester.mapView.camera.heading, 0, @"camera should not go negative");
 }
 
 - (void)testRotateDisabled {

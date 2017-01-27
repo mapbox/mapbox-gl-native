@@ -231,7 +231,11 @@ public:
 - (void)awakeFromNib {
     [super awakeFromNib];
 
-    self.styleURL = nil;
+    // If the Style URL inspectable was not set, make sure to go through
+    // -setStyleURL: to load the default style.
+    if (_mbglMap->getStyleURL().empty()) {
+        self.styleURL = nil;
+    }
 }
 
 + (NSArray *)restorableStateKeyPaths {
@@ -1250,7 +1254,7 @@ public:
 - (MGLMapCamera *)cameraForCameraOptions:(const mbgl::CameraOptions &)cameraOptions {
     CLLocationCoordinate2D centerCoordinate = MGLLocationCoordinate2DFromLatLng(cameraOptions.center ? *cameraOptions.center : _mbglMap->getLatLng());
     double zoomLevel = cameraOptions.zoom ? *cameraOptions.zoom : self.zoomLevel;
-    CLLocationDirection direction = cameraOptions.angle ? -MGLDegreesFromRadians(*cameraOptions.angle) : self.direction;
+    CLLocationDirection direction = cameraOptions.angle ? mbgl::util::wrap(-MGLDegreesFromRadians(*cameraOptions.angle), 0., 360.) : self.direction;
     CGFloat pitch = cameraOptions.pitch ? MGLDegreesFromRadians(*cameraOptions.pitch) : _mbglMap->getPitch();
     CLLocationDistance altitude = MGLAltitudeForZoomLevel(zoomLevel, pitch,
                                                           centerCoordinate.latitude,
@@ -1340,7 +1344,7 @@ public:
             // the illusion that it has stayed in place during the entire gesture.
             CGPoint cursorPoint = [self convertPoint:startPoint toView:nil];
             cursorPoint = [self.window convertRectToScreen:{ startPoint, NSZeroSize }].origin;
-            cursorPoint.y = [NSScreen mainScreen].frame.size.height - cursorPoint.y;
+            cursorPoint.y = self.window.screen.frame.size.height - cursorPoint.y;
             CGDisplayMoveCursorToPoint(kCGDirectMainDisplay, cursorPoint);
             CGDisplayShowCursor(kCGDirectMainDisplay);
         }
@@ -1825,7 +1829,7 @@ public:
             }
 
             // Opt into potentially expensive tooltip tracking areas.
-            if (annotation.toolTip.length) {
+            if ([annotation respondsToSelector:@selector(toolTip)] && annotation.toolTip.length) {
                 _wantsToolTipRects = YES;
             }
         }
@@ -2360,7 +2364,7 @@ public:
         for (MGLAnnotationTag annotationTag : annotationTags) {
             MGLAnnotationImage *annotationImage = [self imageOfAnnotationWithTag:annotationTag];
             id <MGLAnnotation> annotation = [self annotationWithTag:annotationTag];
-            if (annotation.toolTip.length) {
+            if ([annotation respondsToSelector:@selector(toolTip)] && annotation.toolTip.length) {
                 // Add a tooltip tracking area over the annotation image’s
                 // frame, accounting for the image’s alignment rect.
                 NSImage *image = annotationImage.image;

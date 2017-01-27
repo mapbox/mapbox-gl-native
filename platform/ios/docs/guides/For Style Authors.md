@@ -29,8 +29,9 @@ underneath.
 The user location annotation view, the attribution button, any buttons in
 callout views, and any items in the navigation bar are influenced by your
 application’s tint color, so choose a tint color that constrasts well with your
-map style. If you intend your style to be used in the dark, consider the impact
-that Night Shift may have on your style’s colors.
+map style.
+If you intend your style to be used in the dark, consider the impact that Night
+Shift may have on your style’s colors.
 
 ### Typography and graphics
 
@@ -127,7 +128,7 @@ In style JSON | In the SDK
 `raster`      | `MGLRasterSource`
 `vector`      | `MGLVectorSource`
 
-`image` and `video` sources are not supported.
+`canvas`, `image`, and `video` sources are not supported.
 
 ### Tile sources
 
@@ -275,9 +276,10 @@ Array (`-offset`, `-translate`) | `NSValue.CGVectorValue` | `NSValue.cgVectorVal
 Array (`-padding`) | `NSValue.UIEdgeInsetsValue` | `NSValue.uiEdgeInsetsValue`
 
 For padding attributes, note that the arguments to
-`UIEdgeInsetsMake()` in Objective-C and
-`EdgeInsets(top:left:bottom:right:)` in Swift are specified in counterclockwise
-order, in contrast to the clockwise order defined by the style specification.
+`UIEdgeInsetsMake()` in Objective-C and `UIEdgeInsets(top:left:bottom:right:)`
+in Swift
+are specified in counterclockwise order, in contrast to the clockwise order
+defined by the style specification.
 
 ## Filtering sources
 

@@ -2,7 +2,7 @@
 
 Put interactive, scalable world maps into your native Cocoa application with the open-source Mapbox macOS SDK.
 
-* Mapbox-curated [map styles](https://www.mapbox.com/maps/) and [vector tiles](https://www.mapbox.com/vector-tiles/) make it easy to get started.
+* Mapbox-curated [map styles](https://www.mapbox.com/maps/) and [OpenStreetMap-based](https://www.mapbox.com/vector-tiles/mapbox-streets-v7/) [vector tiles](https://www.mapbox.com/vector-tiles/) make it easy to get started.
 * Customize every aspect of the map’s appearance in code or visually using [Mapbox Studio](https://www.mapbox.com/mapbox-studio/).
 * High-performance OpenGL rendering and multitouch gestures keep your users happy.
 * A well-designed, fully documented API helps you stay productive.
@@ -12,9 +12,9 @@ Put interactive, scalable world maps into your native Cocoa application with the
 
 The Mapbox macOS SDK is compatible with macOS 10.10.0 and above for Cocoa applications developed in Objective-C, Swift, Interface Builder, or AppleScript. For hybrid applications, consider [Mapbox GL JS](https://www.mapbox.com/mapbox-gl-js/).
 
-Mapbox macOS SDK releases are [available on GitHub](https://github.com/mapbox/mapbox-gl-native/releases/) – look for the releases that begin with “macos-”. You can also integrate the Mapbox macOS SDK into your application using CocoaPods.
-
 ## Installation
+
+1. Download the [latest Mapbox macOS SDK release](https://github.com/mapbox/mapbox-gl-native/releases/) from GitHub – look for a release that begins with “macos-”. (Alternatively, you can integrate the Mapbox macOS SDK into your application [using CocoaPods](https://cocoapods.org/pods/Mapbox-macOS-SDK). If you do use CocoaPods, skip the next step.)
 
 1. Open the project editor, select your application target, then go to the General tab. Drag Mapbox.framework into the “Embedded Binaries” section. (Don’t drag it into the “Linked Frameworks and Libraries” section; Xcode will add it there automatically.) In the sheet that appears, make sure “Copy items if needed” is checked, then click Finish.
 

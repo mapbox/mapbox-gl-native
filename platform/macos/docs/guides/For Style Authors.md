@@ -26,6 +26,8 @@ style is present. Standard user interface elements such as toolbars, sidebars,
 and sheets often overlap the map view with a translucent, blurred background, so
 make sure the contents of these elements remain legible with the map view
 underneath.
+If you intend your style to be used in the dark, consider the impact that Night
+Shift may have on your style’s colors.
 
 ### Typography and graphics
 
@@ -115,7 +117,7 @@ In style JSON | In the SDK
 `raster`      | `MGLRasterSource`
 `vector`      | `MGLVectorSource`
 
-`image` and `video` sources are not supported.
+`canvas`, `image`, and `video` sources are not supported.
 
 ### Tile sources
 
@@ -263,9 +265,10 @@ Array (`-offset`, `-translate`) | `NSValue` containing `CGVector` | `NSValue` co
 Array (`-padding`) | `NSValue.edgeInsetsValue` | `NSValue.edgeInsetsValue`
 
 For padding attributes, note that the arguments to
-`NSEdgeInsetsMake()` in Objective-C and
-`EdgeInsets(top:left:bottom:right:)` in Swift are specified in counterclockwise
-order, in contrast to the clockwise order defined by the style specification.
+`NSEdgeInsetsMake()` in Objective-C and `EdgeInsets(top:left:bottom:right:)` in
+Swift
+are specified in counterclockwise order, in contrast to the clockwise order
+defined by the style specification.
 
 Additionally, on macOS, a screen coordinate of (0, 0) is located at the
 lower-left corner of the screen. Therefore, a positive `CGVector.dy` means an

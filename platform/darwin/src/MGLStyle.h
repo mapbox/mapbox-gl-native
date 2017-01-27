@@ -363,7 +363,7 @@ MGL_EXPORT
 /**
  Currently active style classes, represented as an array of string identifiers.
  */
-@property (nonatomic) NS_ARRAY_OF(NSString *) *styleClasses;
+@property (nonatomic) NS_ARRAY_OF(NSString *) *styleClasses __attribute__((deprecated("This property will be removed in a future release.")));
 
 /**
  Returns a Boolean value indicating whether the style class with the given
@@ -372,14 +372,14 @@ MGL_EXPORT
  @param styleClass The style class to query for.
  @return Whether the style class is currently active.
  */
-- (BOOL)hasStyleClass:(NSString *)styleClass;
+- (BOOL)hasStyleClass:(NSString *)styleClass __attribute__((deprecated("This method will be removed in a future release.")));
 
 /**
  Activates the style class with the given identifier.
 
  @param styleClass The style class to activate.
  */
-- (void)addStyleClass:(NSString *)styleClass;
+- (void)addStyleClass:(NSString *)styleClass __attribute__((deprecated("This method will be removed in a future release.")));
 
 /**
  Deactivates the style class with the given identifier.
@@ -394,7 +394,7 @@ MGL_EXPORT
 
  @param styleClass The style class to deactivate.
  */
-- (void)removeStyleClass:(NSString *)styleClass;
+- (void)removeStyleClass:(NSString *)styleClass __attribute__((deprecated("This method will be removed in a future release.")));
 
 #pragma mark Managing a Style’s Images
 
