@@ -96,10 +96,13 @@ matrix:
         - nvm install 4
         - nvm use 4
         - make node
-        - make test-node
+        - mason install apitrace 6a30de1
+        - $(mason prefix apitrace 6a30de1)/bin/apitrace trace --api=egl -v make test-node
       after_script:
         - ccache --show-stats
         - ./platform/node/scripts/after_script.sh ${TRAVIS_JOB_NUMBER}
+      after_failure:
+        - aws s3 cp --acl public-read *.trace s3://mapbox/mapbox-gl-native/render-tests/$TRAVIS_JOB_NUMBER
 
     # EGL - Node - Clang 3.8 - Release
     - os: linux
@@ -120,12 +123,15 @@ matrix:
         - nvm install 4
         - nvm use 4
         - make node
-        - make test-node
+        - mason install apitrace 6a30de1
+        - $(mason prefix apitrace 6a30de1)/bin/apitrace trace --api=egl -v make test-node
       after_script:
         - ccache --show-stats
         - ./platform/node/scripts/after_script.sh ${TRAVIS_JOB_NUMBER}
       after_success:
         - ./platform/node/scripts/after_success.sh
+      after_failure:
+        - aws s3 cp --acl public-read *.trace s3://mapbox/mapbox-gl-native/render-tests/$TRAVIS_JOB_NUMBER
 
     # EGL - GCC 5 - Debug (Coverage)
     - os: linux
