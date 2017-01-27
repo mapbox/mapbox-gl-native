@@ -610,12 +610,13 @@ public:
     
     // Default to Streets.
     if (!styleURL) {
-        // An access token is required to load any default style, including
-        // Streets.
-        if (![MGLAccountManager accessToken]) {
-            return;
-        }
         styleURL = [MGLStyle streetsStyleURLWithVersion:MGLStyleDefaultVersion];
+    }
+    
+    // An access token is required to load any default style, including Streets.
+    if (![MGLAccountManager accessToken] && [styleURL.scheme isEqualToString:@"mapbox"]) {
+        NSLog(@"Cannot set the style URL to %@ because no access token has been specified.", styleURL);
+        return;
     }
 
     styleURL = styleURL.mgl_URLByStandardizingScheme;
