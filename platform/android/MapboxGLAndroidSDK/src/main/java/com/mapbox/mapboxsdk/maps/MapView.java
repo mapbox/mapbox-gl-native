@@ -45,8 +45,8 @@ import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.maps.widgets.CompassView;
 import com.mapbox.mapboxsdk.maps.widgets.MyLocationView;
 import com.mapbox.mapboxsdk.maps.widgets.MyLocationViewSettings;
-import com.mapbox.mapboxsdk.telemetry.MapboxEvent;
-import com.mapbox.mapboxsdk.telemetry.MapboxEventManager;
+import com.mapbox.services.android.telemetry.MapboxEvent;
+import com.mapbox.services.android.telemetry.MapboxTelemetry;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -205,7 +205,7 @@ public class MapView extends FrameLayout {
     nativeMapView.setAccessToken(Mapbox.getAccessToken());
 
     if (savedInstanceState == null) {
-      MapboxEvent.trackMapLoadEvent();
+      MapboxTelemetry.getInstance().pushEvent(MapboxEvent.buildMapLoadEvent());
     } else if (savedInstanceState.getBoolean(MapboxConstants.STATE_HAS_SAVED_STATE)) {
       mapboxMap.onRestoreInstanceState(savedInstanceState);
     }
@@ -666,7 +666,7 @@ public class MapView extends FrameLayout {
         builder.setPositiveButton(R.string.mapbox_attributionTelemetryPositive, new DialogInterface.OnClickListener() {
           @Override
           public void onClick(DialogInterface dialog, int which) {
-            MapboxEventManager.getMapboxEventManager().setTelemetryEnabled(true);
+            MapboxTelemetry.getInstance().setTelemetryEnabled(true);
             dialog.cancel();
           }
         });
@@ -683,7 +683,7 @@ public class MapView extends FrameLayout {
         builder.setNegativeButton(R.string.mapbox_attributionTelemetryNegative, new DialogInterface.OnClickListener() {
           @Override
           public void onClick(DialogInterface dialog, int which) {
-            MapboxEventManager.getMapboxEventManager().setTelemetryEnabled(false);
+            MapboxTelemetry.getInstance().setTelemetryEnabled(false);
             dialog.cancel();
           }
         });
