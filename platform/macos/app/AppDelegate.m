@@ -71,7 +71,7 @@ NSString * const MGLLastMapDebugMaskDefaultsKey = @"MGLLastMapDebugMask";
 
 @end
 
-@interface AppDelegate ()
+@interface AppDelegate () <NSWindowDelegate>
 
 @property (weak) IBOutlet NSArrayController *offlinePacksArrayController;
 @property (weak) IBOutlet NSPanel *offlinePacksPanel;
@@ -281,6 +281,15 @@ NSString * const MGLLastMapDebugMaskDefaultsKey = @"MGLLastMapDebugMask";
         return self.offlinePacksArrayController.selectedObjects.count;
     }
     return NO;
+}
+
+#pragma mark NSWindowDelegate methods
+
+- (void)windowWillClose:(NSNotification *)notification {
+    NSWindow *window = notification.object;
+    if (window == self.preferencesWindow) {
+        [window makeFirstResponder:nil];
+    }
 }
 
 @end
