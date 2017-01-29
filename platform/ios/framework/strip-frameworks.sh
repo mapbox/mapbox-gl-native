@@ -68,3 +68,12 @@ else
   # Delete *.bcsymbolmap files from framework bundle unless archiving
   find . -name '*.bcsymbolmap' -type f -exec rm -rf "{}" +\;
 fi
+
+# When this script finishes executing, delete itself from the built product
+function finish {
+  if [[ $0 == "${BUILT_PRODUCTS_DIR}"* ]]; then
+    rm -f $0;
+  fi
+}
+
+trap finish EXIT
