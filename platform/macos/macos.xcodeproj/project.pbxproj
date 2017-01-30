@@ -496,6 +496,8 @@
 		DAF0D8151DFE6B1800B28378 /* MGLAttributionInfo_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLAttributionInfo_Private.h; sourceTree = "<group>"; };
 		DAF0D81A1DFF567C00B28378 /* MGLVectorSource+MBXAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "MGLVectorSource+MBXAdditions.h"; sourceTree = "<group>"; };
 		DAF0D81B1DFF567C00B28378 /* MGLVectorSource+MBXAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "MGLVectorSource+MBXAdditions.m"; sourceTree = "<group>"; };
+		DAFBD0D51E3FA969000CD6BF /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		DAFBD0D61E3FA983000CD6BF /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/Foundation.strings"; sourceTree = "<group>"; };
 		DD0902AF1DB1AC6400C5BDCE /* MGLNetworkConfiguration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLNetworkConfiguration.m; sourceTree = "<group>"; };
 		DD0902B01DB1AC6400C5BDCE /* MGLNetworkConfiguration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLNetworkConfiguration.h; sourceTree = "<group>"; };
 		DD58A4C71D822C6200E1F038 /* MGLExpressionTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLExpressionTests.mm; path = ../../darwin/test/MGLExpressionTests.mm; sourceTree = "<group>"; };
@@ -1187,6 +1189,7 @@
 				en,
 				Base,
 				"zh-Hans",
+				"zh-Hant",
 			);
 			mainGroup = DA839E891CC2E3400062CAFB;
 			productRefGroup = DA839E931CC2E3400062CAFB /* Products */;
@@ -1409,6 +1412,7 @@
 			children = (
 				DA8933AC1CCD290700E68420 /* Base */,
 				DA88520F1E0A4D0D009D7AD6 /* zh-Hans */,
+				DAFBD0D51E3FA969000CD6BF /* zh-Hant */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -1418,6 +1422,7 @@
 			children = (
 				DA8933B41CCD2C2500E68420 /* Base */,
 				DA8852101E0A4D3A009D7AD6 /* zh-Hans */,
+				DAFBD0D61E3FA983000CD6BF /* zh-Hant */,
 			);
 			name = Foundation.strings;
 			sourceTree = "<group>";
