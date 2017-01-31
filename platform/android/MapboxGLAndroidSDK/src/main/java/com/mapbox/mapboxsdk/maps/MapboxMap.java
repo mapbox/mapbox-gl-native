@@ -615,39 +615,14 @@ public final class MapboxMap {
    * easing the camera stops. If {@link #getCameraPosition()} is called during the animation, it
    * will return the current location of the camera in flight.
    * <p>
-   * Note that this will cancel location tracking mode if enabled.
+   * Note that this will cancel location tracking mode if enabled. You can change this behaviour by calling
+   * {@link TrackingSettings#setDismissTrackingModeForCameraPositionChange(boolean)} with false before invoking this
+   * method and calling it with true in the {@link CancelableCallback#onFinish()}.
    * </p>
    *
    * @param update             The change that should be applied to the camera.
    * @param durationMs         The duration of the animation in milliseconds. This must be strictly
    *                           positive, otherwise an IllegalArgumentException will be thrown.
-   * @param easingInterpolator True for easing interpolator, false for linear.
-   * @param callback           An optional callback to be notified from the main thread when the animation
-   *                           stops. If the animation stops due to its natural completion, the callback
-   *                           will be notified with onFinish(). If the animation stops due to interruption
-   *                           by a later camera movement or a user gesture, onCancel() will be called.
-   *                           Do not update or ease the camera from within onCancel().
-   */
-  @UiThread
-  public final void easeCamera(
-    CameraUpdate update, int durationMs, boolean easingInterpolator, final MapboxMap.CancelableCallback callback) {
-    // dismiss tracking, moving camera is equal to a gesture
-    easeCamera(update, durationMs, easingInterpolator, true, callback);
-  }
-
-  /**
-   * Gradually move the camera by a specified duration in milliseconds, zoom will not be affected
-   * unless specified within {@link CameraUpdate}. A callback can be used to be notified when
-   * easing the camera stops. If {@link #getCameraPosition()} is called during the animation, it
-   * will return the current location of the camera in flight.
-   * <p>
-   * Note that this will cancel location tracking mode if enabled.
-   * </p>
-   *
-   * @param update             The change that should be applied to the camera.
-   * @param durationMs         The duration of the animation in milliseconds. This must be strictly
-   *                           positive, otherwise an IllegalArgumentException will be thrown.
-   * @param resetTrackingMode  True to reset tracking modes if required, false to ignore
    * @param easingInterpolator True for easing interpolator, false for linear.
    * @param callback           An optional callback to be notified from the main thread when the animation
    *                           stops. If the animation stops due to its natural completion, the callback
@@ -657,11 +632,11 @@ public final class MapboxMap {
    */
   @UiThread
   public final void easeCamera(final CameraUpdate update, final int durationMs, final boolean easingInterpolator,
-                               final boolean resetTrackingMode, final MapboxMap.CancelableCallback callback) {
+                               final MapboxMap.CancelableCallback callback) {
     new Handler().post(new Runnable() {
       @Override
       public void run() {
-        transform.easeCamera(MapboxMap.this, update, durationMs, easingInterpolator, resetTrackingMode, callback);
+        transform.easeCamera(MapboxMap.this, update, durationMs, easingInterpolator, callback);
       }
     });
   }

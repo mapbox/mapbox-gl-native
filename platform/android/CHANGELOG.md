@@ -35,6 +35,7 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 * Gesture handling bugs
   - Avoid calls to onFling when while pinch zooming [#7666](https://github.com/mapbox/mapbox-gl-native/issues/7666)
 * Support for style-wide transition animation duration and delay [#6779](https://github.com/mapbox/mapbox-gl-native/issues/6779)
+* Support for all animated camera changes to configure dismissing tracking modes [#7854](https://github.com/mapbox/mapbox-gl-native/issues/7854)
 
 ## 4.2.2 - January 27, 2017
 

@@ -478,8 +478,19 @@ public class MyLocationView extends View {
     if (location != null) {
       if (myLocationTrackingMode == MyLocationTracking.TRACKING_FOLLOW) {
         // center map directly
+        mapboxMap.getTrackingSettings().setDismissTrackingModeForCameraPositionChange(false);
         mapboxMap.easeCamera(CameraUpdateFactory.newLatLng(new LatLng(location)), 0, false /*linear interpolator*/,
-          false /*do not disable tracking*/, null);
+          new MapboxMap.CancelableCallback() {
+            @Override
+            public void onCancel() {
+
+            }
+
+            @Override
+            public void onFinish() {
+              mapboxMap.getTrackingSettings().setDismissTrackingModeForCameraPositionChange(true);
+            }
+          });
       } else {
         // do not use interpolated location from tracking mode
         latLng = null;
@@ -624,8 +635,19 @@ public class MyLocationView extends View {
     private void rotateCamera(float rotation) {
       CameraPosition.Builder builder = new CameraPosition.Builder();
       builder.bearing(rotation);
+      mapboxMap.getTrackingSettings().setDismissTrackingModeForCameraPositionChange(false);
       mapboxMap.easeCamera(CameraUpdateFactory.newCameraPosition(builder.build()), COMPASS_UPDATE_RATE_MS,
-        false /*linear interpolator*/, false /*do not disable tracking*/, null);
+        false /*linear interpolator*/, new MapboxMap.CancelableCallback() {
+          @Override
+          public void onCancel() {
+
+          }
+
+          @Override
+          public void onFinish() {
+            mapboxMap.getTrackingSettings().setDismissTrackingModeForCameraPositionChange(true);
+          }
+        });
     }
 
     @Override
@@ -739,9 +761,20 @@ public class MyLocationView extends View {
       // accuracy
       updateAccuracy(location);
 
+      mapboxMap.getTrackingSettings().setDismissTrackingModeForCameraPositionChange(false);
       // ease to new camera position with a linear interpolator
       mapboxMap.easeCamera(CameraUpdateFactory.newCameraPosition(builder.build()), (int) animationDuration,
-        false /*linear interpolator*/, false /*do not disable tracking*/, null);
+        false /*linear interpolator*/, new MapboxMap.CancelableCallback() {
+          @Override
+          public void onCancel() {
+
+          }
+
+          @Override
+          public void onFinish() {
+            mapboxMap.getTrackingSettings().setDismissTrackingModeForCameraPositionChange(true);
+          }
+        });
     }
 
     @Override
