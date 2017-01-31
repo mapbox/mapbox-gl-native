@@ -1791,6 +1791,9 @@ public class MapView extends FrameLayout {
         // Handle two finger tap
         switch (event.getActionMasked()) {
             case MotionEvent.ACTION_DOWN:
+                /* Mappy : on touch down, stop map inertia */
+                cancelTransitions();
+
                 // First pointer down, reset scaleGestureOccurred, used to avoid triggering a fling after a scale gesture #7666
                 scaleGestureOccurred = false;
                 nativeMapView.setGestureInProgress(true);
