@@ -50,12 +50,13 @@ public:
     using Attributes = gl::Attributes<Attribute>;
     using Vertex = typename Attributes::Vertex;
 
-    SourceFunctionPaintPropertyBinder(SourceFunction<T> function_)
-        : function(std::move(function_)) {
+    SourceFunctionPaintPropertyBinder(SourceFunction<T> function_, T defaultValue_)
+        : function(std::move(function_)),
+          defaultValue(std::move(defaultValue_)) {
     }
 
     void populateVertexVector(const GeometryTileFeature& feature, std::size_t length) {
-        AttributeValue value = Attribute::value(function.evaluate(feature));
+        AttributeValue value = Attribute::value(function.evaluate(feature, defaultValue));
         for (std::size_t i = vertexVector.vertexSize(); i < length; ++i) {
             vertexVector.emplace_back(Vertex { value });
         }
@@ -86,6 +87,7 @@ public:
 
 private:
     SourceFunction<T> function;
+    T defaultValue;
     gl::VertexVector<Vertex> vertexVector;
     optional<gl::VertexBuffer<Vertex>> vertexBuffer;
 };
@@ -103,13 +105,14 @@ public:
     using Attributes = gl::Attributes<MinAttribute, MaxAttribute>;
     using Vertex = typename Attributes::Vertex;
 
-    CompositeFunctionPaintPropertyBinder(CompositeFunction<T> function_, float zoom)
+    CompositeFunctionPaintPropertyBinder(CompositeFunction<T> function_, float zoom, T defaultValue_)
         : function(std::move(function_)),
+          defaultValue(std::move(defaultValue_)),
           coveringRanges(function.coveringRanges(zoom)) {
     }
 
     void populateVertexVector(const GeometryTileFeature& feature, std::size_t length) {
-        Range<T> range = function.evaluate(std::get<1>(coveringRanges), feature);
+        Range<T> range = function.evaluate(std::get<1>(coveringRanges), feature, defaultValue);
         AttributeValue min = Attribute::value(range.min);
         AttributeValue max = Attribute::value(range.max);
         for (std::size_t i = vertexVector.vertexSize(); i < length; ++i) {
@@ -148,6 +151,7 @@ public:
 private:
     using InnerStops = typename CompositeFunction<T>::InnerStops;
     CompositeFunction<T> function;
+    T defaultValue;
     std::tuple<Range<float>, Range<InnerStops>> coveringRanges;
     gl::VertexVector<Vertex> vertexVector;
     optional<gl::VertexBuffer<Vertex>> vertexBuffer;
@@ -171,10 +175,10 @@ public:
                 return ConstantPaintPropertyBinder<Type, Attribute>(constant);
             },
             [&] (const SourceFunction<Type>& function) {
-                return SourceFunctionPaintPropertyBinder<Type, Attribute>(function);
+                return SourceFunctionPaintPropertyBinder<Type, Attribute>(function, PaintProperty::defaultValue());
             },
             [&] (const CompositeFunction<Type>& function) {
-                return CompositeFunctionPaintPropertyBinder<Type, Attribute>(function, zoom);
+                return CompositeFunctionPaintPropertyBinder<Type, Attribute>(function, zoom, PaintProperty::defaultValue());
             }
         )) {
     }

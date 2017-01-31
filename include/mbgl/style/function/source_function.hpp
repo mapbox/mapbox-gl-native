@@ -28,28 +28,31 @@ public:
             CategoricalStops<T>,
             IdentityStops<T>>>;
 
-    SourceFunction(std::string property_, Stops stops_)
+    SourceFunction(std::string property_, Stops stops_, optional<T> defaultValue_ = {})
         : property(std::move(property_)),
-          stops(std::move(stops_)) {
+          stops(std::move(stops_)),
+          defaultValue(std::move(defaultValue_)) {
     }
 
-    T evaluate(const GeometryTileFeature& feature) const {
+    T evaluate(const GeometryTileFeature& feature, T finalDefaultValue) const {
         optional<Value> v = feature.getValue(property);
         if (!v) {
-            return T();
+            return defaultValue.value_or(finalDefaultValue);
         }
-        return stops.match([&] (const auto& s) {
-            return s.evaluate(*v);
+        return stops.match([&] (const auto& s) -> T {
+            return s.evaluate(*v).value_or(defaultValue.value_or(finalDefaultValue));
         });
     }
 
     friend bool operator==(const SourceFunction& lhs,
                            const SourceFunction& rhs) {
-        return lhs.property == rhs.property && lhs.stops == rhs.stops;
+        return std::tie(lhs.property, lhs.stops, lhs.defaultValue)
+            == std::tie(rhs.property, rhs.stops, rhs.defaultValue);
     }
 
     std::string property;
     Stops stops;
+    optional<T> defaultValue;
 };
 
 } // namespace style

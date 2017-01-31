@@ -43,13 +43,6 @@ public:
     auto match(Ts&&... ts) const {
         return value.match(std::forward<Ts>(ts)...);
     }
-
-    T evaluate(float z, const GeometryTileFeature& feature) const {
-        return value.match(
-            [&] (const T& t) { return t; },
-            [&] (const SourceFunction<T>& t) { return t.evaluate(feature); },
-            [&] (const CompositeFunction<T>& t) { return t.evaluate(z, feature); });
-    }
 };
 
 } // namespace style

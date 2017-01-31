@@ -330,6 +330,10 @@ void stringify(Writer& writer, const SourceFunction<T>& f) {
     writer.Key("property");
     writer.String(f.property);
     SourceFunction<T>::Stops::visit(f.stops, StringifyStops<Writer> { writer });
+    if (f.defaultValue) {
+        writer.Key("default");
+        stringify(writer, *f.defaultValue);
+    }
     writer.EndObject();
 }
 
@@ -339,6 +343,10 @@ void stringify(Writer& writer, const CompositeFunction<T>& f) {
     writer.Key("property");
     writer.String(f.property);
     CompositeFunction<T>::Stops::visit(f.stops, StringifyStops<Writer> { writer });
+    if (f.defaultValue) {
+        writer.Key("default");
+        stringify(writer, *f.defaultValue);
+    }
     writer.EndObject();
 }
 

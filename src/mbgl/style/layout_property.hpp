@@ -17,6 +17,7 @@ public:
     using UnevaluatedType = PropertyValue<T>;
     using EvaluatorType = PropertyEvaluator<T>;
     using EvaluatedType = T;
+    using Type = T;
 };
 
 template <class T>
@@ -25,6 +26,7 @@ public:
     using UnevaluatedType = DataDrivenPropertyValue<T>;
     using EvaluatorType = DataDrivenPropertyEvaluator<T>;
     using EvaluatedType = PossiblyEvaluatedPropertyValue<T>;
+    using Type = T;
 };
 
 template <class... Ps>
@@ -40,6 +42,15 @@ public:
     class Evaluated : public Tuple<EvaluatedTypes> {
     public:
         using Tuple<EvaluatedTypes>::Tuple;
+
+        template <class P>
+        typename P::Type evaluate(float z, const GeometryTileFeature& feature) const {
+            using T = typename P::Type;
+            return this->template get<P>().match(
+                [&] (const T& t) { return t; },
+                [&] (const SourceFunction<T>& t) { return t.evaluate(feature, P::defaultValue()); },
+                [&] (const CompositeFunction<T>& t) { return t.evaluate(z, feature, P::defaultValue()); });
+        }
     };
 
     class Unevaluated : public Tuple<UnevaluatedTypes> {

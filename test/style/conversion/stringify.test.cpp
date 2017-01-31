@@ -95,6 +95,8 @@ TEST(Stringify, SourceFunction) {
         "{\"property\":\"property\",\"type\":\"categorical\",\"stops\":[[true,1.0]]}");
     ASSERT_EQ(stringify(SourceFunction<float>("property", IdentityStops<float> {})),
         "{\"property\":\"property\",\"type\":\"identity\"}");
+    ASSERT_EQ(stringify(SourceFunction<float>("property", IdentityStops<float> {}, 0.0f)),
+        "{\"property\":\"property\",\"type\":\"identity\",\"default\":0.0}");
 }
 
 TEST(Stringify, CompositeFunction) {
@@ -102,11 +104,11 @@ TEST(Stringify, CompositeFunction) {
         std::map<float, ExponentialStops<float>> {
             { 0, ExponentialStops<float> { {{0, 1}}, 2 } },
             { 1, ExponentialStops<float> { {{0, 1}}, 2 } }
-        })),
+        }, 0.0f)),
         "{\"property\":\"property\",\"type\":\"exponential\",\"base\":2.0,"
         "\"stops\":["
             "[{\"zoom\":0.0,\"value\":0.0},1.0],"
-            "[{\"zoom\":1.0,\"value\":0.0},1.0]]}");
+            "[{\"zoom\":1.0,\"value\":0.0},1.0]],\"default\":0.0}");
 }
 
 TEST(Stringify, PropertyValue) {

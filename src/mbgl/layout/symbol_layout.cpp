@@ -129,8 +129,8 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
 
         if (hasIcon) {
             ft.icon = util::replaceTokens(layout.get<IconImage>(), getValue);
-            ft.iconOffset = layout.get<IconOffset>().evaluate(zoom, *feature);
-            ft.iconRotation = layout.get<IconRotate>().evaluate(zoom, *feature) * util::DEG2RAD;
+            ft.iconOffset = layout.evaluate<IconOffset>(zoom, *feature);
+            ft.iconRotation = layout.evaluate<IconRotate>(zoom, *feature) * util::DEG2RAD;
         }
 
         if (ft.text || ft.icon) {

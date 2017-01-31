@@ -8,7 +8,7 @@ namespace style {
 template <class T>
 class IdentityStops {
 public:
-    T evaluate(const Value&) const;
+    optional<T> evaluate(const Value&) const;
 
     friend bool operator==(const IdentityStops&,
                            const IdentityStops&) {
