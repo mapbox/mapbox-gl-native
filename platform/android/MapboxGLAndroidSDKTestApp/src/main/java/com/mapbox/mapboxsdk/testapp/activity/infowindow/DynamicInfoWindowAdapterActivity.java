@@ -1,17 +1,14 @@
 package com.mapbox.mapboxsdk.testapp.activity.infowindow;
 
 import android.graphics.Color;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.content.ContextCompat;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.TextView;
 
-import com.mapbox.mapboxsdk.annotations.IconFactory;
 import com.mapbox.mapboxsdk.annotations.InfoWindow;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerView;
@@ -22,6 +19,7 @@ import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.R;
+import com.mapbox.mapboxsdk.testapp.utils.IconUtils;
 
 /**
  * Shows how to dynamically update InfoWindow when Using an MapboxMap.InfoWindowAdapter
@@ -84,18 +82,12 @@ public class DynamicInfoWindowAdapterActivity extends AppCompatActivity implemen
   }
 
   private MarkerView addMarker(MapboxMap mapboxMap) {
-    IconFactory iconFactory = IconFactory.getInstance(this);
-    Drawable iconDrawable = ContextCompat.getDrawable(this, R.drawable.ic_location_city_24dp);
-    iconDrawable.setColorFilter(
-      ContextCompat.getColor(DynamicInfoWindowAdapterActivity.this, R.color.mapbox_blue),
-      PorterDuff.Mode.SRC_IN
-    );
-
     return mapboxMap.addMarker(
       new MarkerViewOptions()
         .position(paris)
-        .icon(iconFactory.fromDrawable(iconDrawable))
-    );
+        .icon(IconUtils.drawableToIcon(this, R.drawable.ic_location_city,
+          ResourcesCompat.getColor(getResources(),R.color.mapbox_blue, getTheme()))
+    ));
   }
 
   private void addCustomInfoWindowAdapter(final MapboxMap mapboxMap) {

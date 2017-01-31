@@ -22,7 +22,7 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
         android:layout_margin="@dimen/fab_margin"
-        android:src="@drawable/ic_add_24dp"
+        android:src="@drawable/ic_add"
         app:backgroundTint="@android:color/white"/>
 
 </RelativeLayout>

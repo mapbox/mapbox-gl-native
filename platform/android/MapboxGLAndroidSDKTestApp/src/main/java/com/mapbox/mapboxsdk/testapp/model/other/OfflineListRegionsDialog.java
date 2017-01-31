@@ -28,7 +28,7 @@ public class OfflineListRegionsDialog extends DialogFragment {
     CharSequence[] items = offlineRegionsNames.toArray(new CharSequence[offlineRegionsNames.size()]);
 
     builder.setTitle("List of offline regions")
-      .setIcon(R.drawable.ic_airplanemode_active_black_24dp)
+      .setIcon(R.drawable.ic_airplanemode_active_black)
       .setItems(items, new DialogInterface.OnClickListener() {
         @Override
         public void onClick(DialogInterface dialog, int which) {

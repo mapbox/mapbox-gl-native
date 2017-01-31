@@ -3,12 +3,9 @@ package com.mapbox.mapboxsdk.testapp.activity.annotation;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.app.ProgressDialog;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -22,7 +19,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.mapbox.mapboxsdk.annotations.Icon;
-import com.mapbox.mapboxsdk.annotations.IconFactory;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.annotations.MarkerViewOptions;
@@ -32,6 +28,7 @@ import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.utils.GeoParseUtil;
+import com.mapbox.mapboxsdk.testapp.utils.IconUtils;
 
 import org.json.JSONException;
 
@@ -39,6 +36,7 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Random;
 
 import timber.log.Timber;
@@ -117,11 +115,8 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
     Random random = new Random();
     int randomIndex;
 
-    Drawable drawable = ContextCompat.getDrawable(BulkMarkerActivity.this, R.drawable.ic_droppin_24dp);
-
-    int redColor = ResourcesCompat.getColor(getResources(), android.R.color.holo_red_dark, getTheme());
-    drawable.setColorFilter(redColor, PorterDuff.Mode.SRC_IN);
-    Icon icon = IconFactory.getInstance(this).fromDrawable(drawable);
+    int color = ResourcesCompat.getColor(getResources(), R.color.redAccent, getTheme());
+    Icon icon = IconUtils.drawableToIcon(this, R.drawable.ic_droppin, color);
 
     List<MarkerViewOptions> markerOptionsList = new ArrayList<>();
     for (int i = 0; i < amount; i++) {
@@ -203,6 +198,9 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
   }
 
   private class FabClickListener implements View.OnClickListener {
+
+    private TextView viewCountView;
+
     @Override
     public void onClick(final View view) {
       if (mapboxMap != null) {
@@ -225,13 +223,15 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
           showMarkers(amount);
         }
 
+        viewCountView = (TextView) findViewById(R.id.countView);
+
         mapView.addOnMapChangedListener(new MapView.OnMapChangedListener() {
           @Override
           public void onMapChanged(@MapView.MapChange int change) {
             if (change == MapView.REGION_IS_CHANGING || change == MapView.REGION_DID_CHANGE) {
               if (!mapboxMap.getMarkerViewManager().getMarkerViewAdapters().isEmpty()) {
-                TextView viewCountView = (TextView) findViewById(R.id.countView);
-                viewCountView.setText("ViewCache size " + (mapView.getChildCount() - 5));
+                viewCountView.setText(String.format(Locale.getDefault(), "ViewCache size %d",
+                  mapboxMap.getMarkerViewManager().getMarkerViewContainer().getChildCount()));
               }
             }
           }

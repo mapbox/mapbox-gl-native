@@ -8,7 +8,9 @@ import android.animation.ValueAnimator;
 import android.os.Bundle;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 
 import com.mapbox.mapboxsdk.annotations.Icon;
@@ -24,9 +26,12 @@ import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.R;
+import com.mapbox.mapboxsdk.testapp.utils.IconUtils;
 import com.mapbox.services.commons.models.Position;
 import com.mapbox.services.api.utils.turf.TurfMeasurement;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class AnimatedMarkerActivity extends AppCompatActivity {
@@ -40,6 +45,9 @@ public class AnimatedMarkerActivity extends AppCompatActivity {
   private MarkerView carMarker = null;
 
   private Runnable animationRunnable;
+
+  private List<MarkerView> markerViews = new ArrayList<>();
+  private boolean stopped;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -79,11 +87,15 @@ public class AnimatedMarkerActivity extends AppCompatActivity {
   }
 
   private void addPassenger() {
+    if (isActivityStopped()) {
+      return;
+    }
+
     LatLng randomLatLng = getLatLngInBounds();
 
     if (passengerMarker == null) {
-      Icon icon = IconFactory.getInstance(AnimatedMarkerActivity.this)
-        .fromResource(R.drawable.ic_directions_run_black_24dp);
+      Icon icon = IconUtils.drawableToIcon(this, R.drawable.ic_directions_run_black,
+        ResourcesCompat.getColor(getResources(), R.color.blueAccent, getTheme()));
       passengerMarker = mapboxMap.addMarker(new MarkerViewOptions()
         .position(randomLatLng)
         .icon(icon));
@@ -93,6 +105,10 @@ public class AnimatedMarkerActivity extends AppCompatActivity {
   }
 
   private void addMainCar() {
+    if (isActivityStopped()) {
+      return;
+    }
+
     LatLng randomLatLng = getLatLngInBounds();
 
     if (carMarker == null) {
@@ -105,13 +121,17 @@ public class AnimatedMarkerActivity extends AppCompatActivity {
             animateMoveToPassenger(carMarker);
           }
         });
-
+      markerViews.add(carMarker);
     } else {
       carMarker.setPosition(randomLatLng);
     }
   }
 
   private void animateMoveToPassenger(final MarkerView car) {
+    if (isActivityStopped()) {
+      return;
+    }
+
     ValueAnimator animator = animateMoveMarker(car, passengerMarker.getPosition());
     animator.addListener(new AnimatorListenerAdapter() {
       @Override
@@ -123,15 +143,20 @@ public class AnimatedMarkerActivity extends AppCompatActivity {
   }
 
   protected void addRandomCar() {
-    createCarMarker(getLatLngInBounds(), R.drawable.ic_car_top, new MarkerViewManager.OnMarkerViewAddedListener() {
-      @Override
-      public void onViewAdded(@NonNull MarkerView markerView) {
-        randomlyMoveMarker(markerView);
-      }
-    });
+    markerViews.add(createCarMarker(getLatLngInBounds(), R.drawable.ic_car_top,
+      new MarkerViewManager.OnMarkerViewAddedListener() {
+        @Override
+        public void onViewAdded(@NonNull MarkerView markerView) {
+          randomlyMoveMarker(markerView);
+        }
+      }));
   }
 
   private void randomlyMoveMarker(final MarkerView marker) {
+    if (isActivityStopped()) {
+      return;
+    }
+
     ValueAnimator animator = animateMoveMarker(marker, getLatLngInBounds());
 
     // Add listener to restart animation on end
@@ -205,6 +230,19 @@ public class AnimatedMarkerActivity extends AppCompatActivity {
   @Override
   protected void onStop() {
     super.onStop();
+
+    stopped = true;
+
+    // Stop ongoing animations, prevent memory lekas
+    MarkerViewManager markerViewManager = mapboxMap.getMarkerViewManager();
+    for (MarkerView markerView : markerViews) {
+      View view = markerViewManager.getView(markerView);
+      if (view != null) {
+        view.animate().cancel();
+      }
+    }
+
+    // onStop
     mapView.onStop();
     mapView.removeCallbacks(animationRunnable);
   }
@@ -249,5 +287,9 @@ public class AnimatedMarkerActivity extends AppCompatActivity {
       Position.fromCoordinates(from.getLongitude(), from.getLatitude()),
       Position.fromCoordinates(to.getLongitude(), to.getLatitude())
     );
+  }
+
+  private boolean isActivityStopped() {
+    return stopped;
   }
 }
