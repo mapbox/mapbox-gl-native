@@ -1636,6 +1636,7 @@ public:
 
     _mbglMap->cancelTransitions();
     MGLMapCamera *oldCamera = self.camera;
+    BOOL didCameraChanged = NO;
     if (twoFingerDrag.state == UIGestureRecognizerStateBegan)
     {
         [self trackGestureEvent:MGLEventGesturePitchStart forRecognizer:twoFingerDrag];
@@ -1652,7 +1653,7 @@ public:
         CGPoint centerPoint = [self anchorPointForGesture:twoFingerDrag];
 
         _mbglMap->setPitch(pitchNew, mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y });
-
+        didCameraChanged = YES;
         [self notifyMapChange:mbgl::MapChangeRegionIsChanging];
     }
     else if (twoFingerDrag.state == UIGestureRecognizerStateEnded || twoFingerDrag.state == UIGestureRecognizerStateCancelled)
@@ -1661,7 +1662,8 @@ public:
         [self unrotateIfNeededForGesture];
     }
     
-    if ([self.delegate respondsToSelector:@selector(mapView:shouldChangeFromCamera:toCamera:)]
+    if (didCameraChanged
+        && [self.delegate respondsToSelector:@selector(mapView:shouldChangeFromCamera:toCamera:)]
         && ![self.delegate mapView:self shouldChangeFromCamera:oldCamera toCamera:self.camera])
     {
         self.camera = oldCamera;
