@@ -5,12 +5,11 @@
 #include <mbgl/map/backend.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/default_thread_pool.hpp>
+#include <mbgl/util/run_loop.hpp>
 #include <mbgl/storage/default_file_source.hpp>
 
 #include <string>
 #include <jni.h>
-#include <android/native_window.h>
-#include <EGL/egl.h>
 
 namespace mbgl {
 namespace android {
@@ -20,68 +19,57 @@ public:
     NativeMapView(JNIEnv *env, jobject obj, float pixelRatio, int availableProcessors, size_t totalMemory);
     virtual ~NativeMapView();
 
-    mbgl::Size getFramebufferSize() const;
-    void updateViewBinding();
+    // mbgl::View //
+
     void bind() override;
 
-    void invalidate() override;
+    // mbgl::Backend //
 
+    void invalidate() override;
     void notifyMapChange(mbgl::MapChange) override;
+
+    // JNI //
 
     mbgl::Map &getMap();
     mbgl::DefaultFileSource &getFileSource();
 
-    void initializeDisplay();
-    void terminateDisplay();
-
-    void initializeContext();
-    void terminateContext();
-
-    void createSurface(ANativeWindow *window);
-    void destroySurface();
-
     void render();
 
     void enableFps(bool enable);
-    void updateFps();
 
-    void resizeView(int width, int height);
-    void resizeFramebuffer(int width, int height);
+    void onViewportChanged(int width, int height);
+
     mbgl::EdgeInsets getInsets() { return insets;}
     void setInsets(mbgl::EdgeInsets insets_);
 
     void scheduleTakeSnapshot();
 
 protected:
-    void activate() override;
-    void deactivate() override;
+    // Unused //
+
+    void activate() override {};
+    void deactivate() override {};
 
 private:
-    EGLConfig chooseConfig(const EGLConfig configs[], EGLint numConfigs);
+    void wake();
+    void updateViewBinding();
+    mbgl::Size getFramebufferSize() const;
+
+    void resizeView(int width, int height);
+    void resizeFramebuffer(int width, int height);
+
+    void updateFps();
 
 private:
+
     JavaVM *vm = nullptr;
     JNIEnv *env = nullptr;
     jweak obj = nullptr;
 
-    ANativeWindow *window = nullptr;
-
-    EGLDisplay oldDisplay = EGL_NO_DISPLAY;
-    EGLSurface oldReadSurface = EGL_NO_SURFACE;
-    EGLSurface oldDrawSurface = EGL_NO_SURFACE;
-    EGLContext oldContext = EGL_NO_CONTEXT;
-
-    EGLDisplay display = EGL_NO_DISPLAY;
-    EGLSurface surface = EGL_NO_SURFACE;
-    EGLContext context = EGL_NO_CONTEXT;
-
-    EGLConfig config = nullptr;
-    EGLint format = -1;
-
     std::string styleUrl;
     std::string apiKey;
 
-    bool firstTime = false;
+    float pixelRatio;
     bool fpsEnabled = false;
     bool snapshot = false;
     double fps = 0.0;
@@ -96,12 +84,12 @@ private:
     size_t totalMemory = 0;
 
     // Ensure these are initialised last
+    std::unique_ptr<mbgl::util::RunLoop> runLoop;
     std::unique_ptr<mbgl::DefaultFileSource> fileSource;
     mbgl::ThreadPool threadPool;
     std::unique_ptr<mbgl::Map> map;
     mbgl::EdgeInsets insets;
 
-    unsigned active = 0;
 };
 }
 }

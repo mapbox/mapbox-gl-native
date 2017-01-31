@@ -59,6 +59,7 @@ std::string apkPath;
 std::string androidRelease;
 
 jni::jmethodID* onInvalidateId = nullptr;
+jni::jmethodID* wakeCallbackId = nullptr;
 jni::jmethodID* onMapChangedId = nullptr;
 jni::jmethodID* onFpsChangedId = nullptr;
 jni::jmethodID* onSnapshotReadyId = nullptr;
@@ -307,59 +308,19 @@ using namespace mbgl::android;
 using DebugOptions = mbgl::MapDebugOptions;
 
 jlong nativeCreate(JNIEnv *env, jni::jobject* obj, jni::jstring* cachePath_, jni::jstring* dataPath_, jni::jstring* apkPath_, jfloat pixelRatio, jint availableProcessors, jlong totalMemory) {
-    mbgl::Log::Debug(mbgl::Event::JNI, "nativeCreate");
+    mbgl::Log::Info(mbgl::Event::JNI, "nativeCreate");
     cachePath = std_string_from_jstring(env, cachePath_);
     dataPath = std_string_from_jstring(env, dataPath_);
     apkPath = std_string_from_jstring(env, apkPath_);
+
+    mbgl::Log::Info(mbgl::Event::JNI, "Create NativeMapView");
     return reinterpret_cast<jlong>(new NativeMapView(env, jni::Unwrap(obj), pixelRatio, availableProcessors, totalMemory));
 }
 
 void nativeDestroy(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr) {
-    mbgl::Log::Debug(mbgl::Event::JNI, "nativeDestroy");
+    mbgl::Log::Info(mbgl::Event::JNI, "nativeDestroy");
     assert(nativeMapViewPtr != 0);
     delete reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-}
-
-void nativeInitializeDisplay(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr) {
-    mbgl::Log::Debug(mbgl::Event::JNI, "nativeInitializeDisplay");
-    assert(nativeMapViewPtr != 0);
-    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    nativeMapView->initializeDisplay();
-}
-
-void nativeTerminateDisplay(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr) {
-    mbgl::Log::Debug(mbgl::Event::JNI, "nativeTerminateDisplay");
-    assert(nativeMapViewPtr != 0);
-    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    nativeMapView->terminateDisplay();
-}
-
-void nativeInitializeContext(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr) {
-    mbgl::Log::Debug(mbgl::Event::JNI, "nativeInitializeContext");
-    assert(nativeMapViewPtr != 0);
-    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    nativeMapView->initializeContext();
-}
-
-void nativeTerminateContext(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr) {
-    mbgl::Log::Debug(mbgl::Event::JNI, "nativeTerminateContext");
-    assert(nativeMapViewPtr != 0);
-    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    nativeMapView->terminateContext();
-}
-
-void nativeCreateSurface(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jni::jobject* surface) {
-    mbgl::Log::Debug(mbgl::Event::JNI, "nativeCreateSurface");
-    assert(nativeMapViewPtr != 0);
-    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    nativeMapView->createSurface(ANativeWindow_fromSurface(env, jni::Unwrap(surface)));
-}
-
-void nativeDestroySurface(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr) {
-    mbgl::Log::Debug(mbgl::Event::JNI, "nativeDestroySurface");
-    assert(nativeMapViewPtr != 0);
-    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    nativeMapView->destroySurface();
 }
 
 void nativeUpdate(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr) {
@@ -369,31 +330,22 @@ void nativeUpdate(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr) {
 }
 
 void nativeRender(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr) {
+    mbgl::Log::Info(mbgl::Event::JNI, "nativeRender");
+    mbgl::util::RunLoop::Get()->runOnce();
     assert(nativeMapViewPtr != 0);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
     nativeMapView->render();
 }
 
-void nativeViewResize(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jint width, jint height) {
-    mbgl::Log::Debug(mbgl::Event::JNI, "nativeViewResize");
+void nativeOnViewportChanged(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jint width, jint height) {
+    mbgl::Log::Info(mbgl::Event::JNI, "nativeViewResize");
     assert(nativeMapViewPtr != 0);
     assert(width >= 0);
     assert(height >= 0);
     assert(width <= UINT16_MAX);
     assert(height <= UINT16_MAX);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    nativeMapView->resizeView(width, height);
-}
-
-void nativeFramebufferResize(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jint fbWidth, jint fbHeight) {
-    mbgl::Log::Debug(mbgl::Event::JNI, "nativeFramebufferResize");
-    assert(nativeMapViewPtr != 0);
-    assert(fbWidth >= 0);
-    assert(fbHeight >= 0);
-    assert(fbWidth <= UINT16_MAX);
-    assert(fbHeight <= UINT16_MAX);
-    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    nativeMapView->resizeFramebuffer(fbWidth, fbHeight);
+    nativeMapView->onViewportChanged(width, height);
 }
 
 void nativeRemoveClass(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jni::jstring* clazz) {
@@ -1149,7 +1101,7 @@ jni::jobject* nativeGetLayer(JNIEnv *env, jni::jobject* obj, jlong nativeMapView
     // Find the layer
     mbgl::style::Layer* coreLayer = nativeMapView->getMap().getLayer(std_string_from_jstring(env, layerId));
     if (!coreLayer) {
-       mbgl::Log::Debug(mbgl::Event::JNI, "No layer found");
+       mbgl::Log::Info(mbgl::Event::JNI, "No layer found");
        return jni::Object<Layer>();
     }
 
@@ -1210,7 +1162,7 @@ jni::jobject* nativeGetSource(JNIEnv *env, jni::jobject* obj, jni::jlong nativeM
     // Find the source
     mbgl::style::Source* coreSource = nativeMapView->getMap().getSource(std_string_from_jstring(env, sourceId));
     if (!coreSource) {
-       mbgl::Log::Debug(mbgl::Event::JNI, "No source found");
+       mbgl::Log::Info(mbgl::Event::JNI, "No source found");
        return jni::Object<Source>();
     }
 
@@ -1329,7 +1281,7 @@ void listOfflineRegions(JNIEnv *env, jni::jobject* obj, jlong defaultFileSourceP
         JNIEnv *env2;
         jboolean renderDetach = attach_jni_thread(theJVM, &env2, "Offline Thread");
         if (renderDetach) {
-            mbgl::Log::Debug(mbgl::Event::JNI, "Attached.");
+            mbgl::Log::Info(mbgl::Event::JNI, "Attached.");
         }
 
         if (error) {
@@ -1419,7 +1371,7 @@ void createOfflineRegion(JNIEnv *env, jni::jobject* obj, jlong defaultFileSource
         JNIEnv *env2;
         jboolean renderDetach = attach_jni_thread(theJVM, &env2, "Offline Thread");
         if (renderDetach) {
-            mbgl::Log::Debug(mbgl::Event::JNI, "Attached.");
+            mbgl::Log::Info(mbgl::Event::JNI, "Attached.");
         }
 
         if (error) {
@@ -1505,7 +1457,7 @@ void setOfflineRegionObserver(JNIEnv *env, jni::jobject* offlineRegion_, jni::jo
         }
 
         ~Observer() override {
-            mbgl::Log::Debug(mbgl::Event::JNI, "~Observer()");
+            mbgl::Log::Info(mbgl::Event::JNI, "~Observer()");
             // Env
             JNIEnv* env2;
             jboolean renderDetach = attach_jni_thread(theJVM, &env2, "Offline Thread");
@@ -1650,7 +1602,7 @@ void getOfflineRegionStatus(JNIEnv *env, jni::jobject* offlineRegion_, jni::jobj
         JNIEnv *env2;
         jboolean renderDetach = attach_jni_thread(theJVM, &env2, "Offline Thread");
         if (renderDetach) {
-            mbgl::Log::Debug(mbgl::Event::JNI, "Attached.");
+            mbgl::Log::Info(mbgl::Event::JNI, "Attached.");
         }
 
         if (error) {
@@ -1704,7 +1656,7 @@ void deleteOfflineRegion(JNIEnv *env, jni::jobject* offlineRegion_, jni::jobject
         JNIEnv *env2;
         jboolean renderDetach = attach_jni_thread(theJVM, &env2, "Offline Thread");
         if (renderDetach) {
-            mbgl::Log::Debug(mbgl::Event::JNI, "Attached.");
+            mbgl::Log::Info(mbgl::Event::JNI, "Attached.");
         }
 
         if (error) {
@@ -1747,7 +1699,7 @@ void updateOfflineRegionMetadata(JNIEnv *env, jni::jobject* offlineRegion_, jni:
         JNIEnv *env2;
         jboolean renderDetach = attach_jni_thread(theJVM, &env2, "Offline Thread");
         if (renderDetach) {
-            mbgl::Log::Debug(mbgl::Event::JNI, "Attached.");
+            mbgl::Log::Info(mbgl::Event::JNI, "Attached.");
         }
 
         if (error) {
@@ -1776,6 +1728,7 @@ void registerNatives(JavaVM *vm) {
 
     jni::JNIEnv& env = jni::GetEnv(*vm, jni::jni_version_1_6);
 
+    //For the DefaultFileSource
     static mbgl::util::RunLoop mainRunLoop;
 
     mbgl::android::RegisterNativeHTTPRequest(env);
@@ -1861,6 +1814,7 @@ void registerNatives(JavaVM *vm) {
     jni::jclass& nativeMapViewClass = jni::FindClass(env, "com/mapbox/mapboxsdk/maps/NativeMapView");
 
     onInvalidateId = &jni::GetMethodID(env, nativeMapViewClass, "onInvalidate", "()V");
+    wakeCallbackId = &jni::GetMethodID(env, nativeMapViewClass, "wakeCallback","()V");
     onMapChangedId = &jni::GetMethodID(env, nativeMapViewClass, "onMapChanged", "(I)V");
     onFpsChangedId = &jni::GetMethodID(env, nativeMapViewClass, "onFpsChanged", "(D)V");
     onSnapshotReadyId = &jni::GetMethodID(env, nativeMapViewClass, "onSnapshotReady","(Landroid/graphics/Bitmap;)V");
@@ -1870,16 +1824,9 @@ void registerNatives(JavaVM *vm) {
     jni::RegisterNatives(env, nativeMapViewClass,
         MAKE_NATIVE_METHOD(nativeCreate, "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;FIJ)J"),
         MAKE_NATIVE_METHOD(nativeDestroy, "(J)V"),
-        MAKE_NATIVE_METHOD(nativeInitializeDisplay, "(J)V"),
-        MAKE_NATIVE_METHOD(nativeTerminateDisplay, "(J)V"),
-        MAKE_NATIVE_METHOD(nativeInitializeContext, "(J)V"),
-        MAKE_NATIVE_METHOD(nativeTerminateContext, "(J)V"),
-        MAKE_NATIVE_METHOD(nativeCreateSurface, "(JLandroid/view/Surface;)V"),
-        MAKE_NATIVE_METHOD(nativeDestroySurface, "(J)V"),
         MAKE_NATIVE_METHOD(nativeUpdate, "(J)V"),
         MAKE_NATIVE_METHOD(nativeRender, "(J)V"),
-        MAKE_NATIVE_METHOD(nativeViewResize, "(JII)V"),
-        MAKE_NATIVE_METHOD(nativeFramebufferResize, "(JII)V"),
+        MAKE_NATIVE_METHOD(nativeOnViewportChanged, "(JII)V"),
         MAKE_NATIVE_METHOD(nativeAddClass, "(JLjava/lang/String;)V"),
         MAKE_NATIVE_METHOD(nativeRemoveClass, "(JLjava/lang/String;)V"),
         MAKE_NATIVE_METHOD(nativeHasClass, "(JLjava/lang/String;)Z"),

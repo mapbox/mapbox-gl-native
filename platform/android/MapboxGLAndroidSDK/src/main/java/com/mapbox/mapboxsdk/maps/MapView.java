@@ -53,6 +53,8 @@ import java.util.List;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
+import timber.log.Timber;
+
 import static android.opengl.GLSurfaceView.RENDERMODE_WHEN_DIRTY;
 
 /**
@@ -69,15 +71,18 @@ import static android.opengl.GLSurfaceView.RENDERMODE_WHEN_DIRTY;
  * <strong>Warning:</strong> Please note that you are responsible for getting permission to use the map data,
  * and for ensuring your use adheres to the relevant terms of use.
  */
-public class MapView extends FrameLayout implements GLSurfaceView.Renderer {
+public class MapView extends FrameLayout {
 
   private NativeMapView nativeMapView;
   private boolean destroyed;
-  private boolean hasSurface = false;
 
   private GLSurfaceView glSurfaceView;
+  private CompassView compassView;
+  private ImageView attrView;
+  private View logoView;
+  private MyLocationView myLocationView;
   private MapboxMap mapboxMap;
-  private MapCallback mapCallback;
+  private MapCallback mapCallback = new MapCallback();
   private boolean onStartCalled;
   private boolean onStopCalled;
 
@@ -86,6 +91,8 @@ public class MapView extends FrameLayout implements GLSurfaceView.Renderer {
   private MapZoomButtonController mapZoomButtonController;
 
   private ConnectivityReceiver connectivityReceiver;
+
+  private MapboxMapOptions mapboxMapOptions;
 
   @UiThread
   public MapView(@NonNull Context context) {
@@ -112,21 +119,89 @@ public class MapView extends FrameLayout implements GLSurfaceView.Renderer {
   }
 
   private void initialise(@NonNull final Context context, @NonNull final MapboxMapOptions options) {
+    Timber.i("Initialize");
+    this.mapboxMapOptions = options;
+
+    // in IDE, show preview map
     if (isInEditMode()) {
-      // in IDE, show preview map
       LayoutInflater.from(context).inflate(R.layout.mapbox_mapview_preview, this);
       return;
     }
 
+    //Setup basic view properties
+    setupViewProperties();
+
     // inflate view
     View view = LayoutInflater.from(context).inflate(R.layout.mapbox_mapview_internal, this);
-    CompassView compassView = (CompassView) view.findViewById(R.id.compassView);
-    MyLocationView myLocationView = (MyLocationView) view.findViewById(R.id.userLocationView);
-    ImageView attrView = (ImageView) view.findViewById(R.id.attributionView);
-    initialiseDrawingSurface();
+    compassView = (CompassView) view.findViewById(R.id.compassView);
+    myLocationView = (MyLocationView) view.findViewById(R.id.userLocationView);
+    attrView = (ImageView) view.findViewById(R.id.attributionView);
+    logoView = view.findViewById(R.id.logoView);
 
-    // create native Map object
-    nativeMapView = new NativeMapView(this);
+    glSurfaceView = (GLSurfaceView) findViewById(R.id.surfaceView);
+    glSurfaceView.setEGLConfigChooser(8, 8, 8, 0 /** TODO: What alpha value do we need here?? */, 16, 8);
+    glSurfaceView.setEGLContextClientVersion(2);
+    glSurfaceView.setRenderer(new GLSurfaceView.Renderer() {
+      @Override
+      public void onSurfaceCreated(final GL10 gl, EGLConfig eglConfig) {
+        Timber.i("[%s] onSurfaceCreated", Thread.currentThread().getName());
+        glSurfaceView.setRenderMode(RENDERMODE_WHEN_DIRTY);
+
+        // Create native Map object
+        nativeMapView = new NativeMapView(MapView.this);
+
+        //Continue configuring the map view on the main thread
+        MapView.this.post(new Runnable() {
+          @Override
+          public void run() {
+            onNativeMapViewReady();
+          }
+        });
+      }
+
+      @Override
+      public void onSurfaceChanged(GL10 gl, int width, int height) {
+        Timber.i("[%s] onSurfaceChanged %sx%s", Thread.currentThread().getName(), width, height);
+        // Sets the current view port to the new size.
+        gl.glViewport(0, 0, width, height);
+        nativeMapView.onViewportChanged(width, height);
+      }
+
+      @Override
+      public void onDrawFrame(GL10 gl) {
+        Timber.i("[%s] onDrawFrame", Thread.currentThread().getName());
+        nativeMapView.render();
+      }
+    });
+
+  }
+
+  private void setupViewProperties() {
+    // allow onDraw invocation
+    setWillNotDraw(false);
+
+    // Ensure this view is interactable
+    setClickable(true);
+    setLongClickable(true);
+    setFocusable(true);
+    setFocusableInTouchMode(true);
+    requestDisallowInterceptTouchEvent(true);
+  }
+
+//  private void loopRender() {
+//    postDelayed(new Runnable() {
+//      @Override
+//      public void run() {
+//        //glSurfaceView.queueEvent(renderRunnable);
+//        onInvalidate();
+////        nativeMapView.update();
+//        //onInvalidate();
+//        loopRender();
+//      }
+//    }, 500);
+//  }
+
+  protected void onNativeMapViewReady() {
 
     // callback for focal point invalidation
     FocalPointInvalidator focalPoint = new FocalPointInvalidator(compassView);
@@ -139,7 +214,7 @@ public class MapView extends FrameLayout implements GLSurfaceView.Renderer {
 
     // setup components for MapboxMap creation
     Projection proj = new Projection(nativeMapView);
-    UiSettings uiSettings = new UiSettings(proj, focalPoint, compassView, attrView, view.findViewById(R.id.logoView));
+    UiSettings uiSettings = new UiSettings(proj, focalPoint, compassView, attrView, logoView);
     TrackingSettings trackingSettings = new TrackingSettings(myLocationView, uiSettings, focalPoint, zoomInvalidator);
     MyLocationViewSettings myLocationViewSettings = new MyLocationViewSettings(myLocationView, proj, focalPoint);
     MarkerViewManager markerViewManager = new MarkerViewManager((ViewGroup) findViewById(R.id.markerViewContainer));
@@ -149,56 +224,23 @@ public class MapView extends FrameLayout implements GLSurfaceView.Renderer {
       registerTouchListener, annotations);
 
     // user input
-    mapGestureDetector = new MapGestureDetector(context, transform, proj, uiSettings, trackingSettings, annotations);
+    mapGestureDetector = new MapGestureDetector(getContext(), transform, proj, uiSettings, trackingSettings, annotations);
     mapKeyListener = new MapKeyListener(transform, trackingSettings, uiSettings);
     mapZoomButtonController = new MapZoomButtonController(this, uiSettings, transform);
 
     // inject widgets with MapboxMap
     compassView.setMapboxMap(mapboxMap);
     myLocationView.setMapboxMap(mapboxMap);
-    attrView.setOnClickListener(new AttributionOnClickListener(context, transform));
-
-    // Ensure this view is interactable
-    setClickable(true);
-    setLongClickable(true);
-    setFocusable(true);
-    setFocusableInTouchMode(true);
-    requestDisallowInterceptTouchEvent(true);
-
-    // allow onDraw invocation
-    setWillNotDraw(false);
+    attrView.setOnClickListener(new AttributionOnClickListener(getContext(), transform));
 
     // notify Map object about current connectivity state
     nativeMapView.setReachability(isConnected());
 
     // initialise MapboxMap
-    mapboxMap.initialise(context, options);
-  }
+    mapboxMap.initialise(getContext(), mapboxMapOptions);
 
-  private void initialiseDrawingSurface() {
-    glSurfaceView = (GLSurfaceView) findViewById(R.id.surfaceView);
-    glSurfaceView.setEGLContextClientVersion(2);
-    glSurfaceView.setRenderer(this);
-    glSurfaceView.setRenderMode(RENDERMODE_WHEN_DIRTY);
-  }
-
-  @Override
-  public void onSurfaceCreated(GL10 gl10, EGLConfig eglConfig) {
-    nativeMapView.initializeDisplay();
-    nativeMapView.initializeContext();
-    nativeMapView.createSurface(glSurfaceView.getHolder().getSurface());
-    hasSurface = true;
-  }
-
-  @Override
-  public void onSurfaceChanged(GL10 gl10, int i, int i1) {
-    nativeMapView.resizeView(i, i1);
-    nativeMapView.resizeFramebuffer(i, i1);
-  }
-
-  @Override
-  public void onDrawFrame(GL10 gl10) {
-
+    addOnMapChangedListener(mapCallback);
+    mapboxMap.onStart();
   }
 
   //
@@ -218,7 +260,7 @@ public class MapView extends FrameLayout implements GLSurfaceView.Renderer {
    */
   @UiThread
   public void onCreate(@Nullable Bundle savedInstanceState) {
-    nativeMapView.setAccessToken(Mapbox.getAccessToken());
+    //nativeMapView.setAccessToken(Mapbox.getAccessToken());
 
     if (savedInstanceState == null) {
       MapboxTelemetry.getInstance().pushEvent(MapboxEvent.buildMapLoadEvent());
@@ -226,7 +268,6 @@ public class MapView extends FrameLayout implements GLSurfaceView.Renderer {
       mapboxMap.onRestoreInstanceState(savedInstanceState);
     }
 
-    addOnMapChangedListener(mapCallback = new MapCallback(mapboxMap));
   }
 
   /**
@@ -249,7 +290,6 @@ public class MapView extends FrameLayout implements GLSurfaceView.Renderer {
   public void onStart() {
     onStartCalled = true;
     registerConnectivityReceiver();
-    mapboxMap.onStart();
     glSurfaceView.onResume();
   }
 
@@ -296,12 +336,17 @@ public class MapView extends FrameLayout implements GLSurfaceView.Renderer {
     }
 
     destroyed = true;
-    hasSurface = false;
-    nativeMapView.terminateContext();
-    nativeMapView.terminateDisplay();
-    nativeMapView.destroySurface();
-    nativeMapView.destroy();
-    nativeMapView = null;
+    //nativeMapView.terminateContext();
+    //nativeMapView.terminateDisplay();
+    //nativeMapView.destroySurface();
+
+    glSurfaceView.queueEvent(new Runnable() {
+      @Override
+      public void run() {
+        nativeMapView.destroy();
+        nativeMapView = null;
+      }
+    });
   }
 
   private void registerConnectivityReceiver() {
@@ -435,28 +480,34 @@ public class MapView extends FrameLayout implements GLSurfaceView.Renderer {
   // Rendering
   //
 
-  // Called when the map needs to be rerendered
-  // Called via JNI from NativeMapView
+  /**
+   * Called when the map needs to be re-rendered
+   * Called via JNI from NativeMapView
+   * <p>
+   * May be called from any thread
+   */
   protected void onInvalidate() {
+    Timber.i("onInvalidate");
+    //glSurfaceView.onInvalidate();
+    //XXX Don't need this right? postInvalidate();
     postInvalidate();
+  }
+
+  protected void requestRender() {
+    if (glSurfaceView != null) {
+      glSurfaceView.requestRender();
+    }
   }
 
   @Override
   public void onDraw(Canvas canvas) {
+    Timber.i("onDraw");
     super.onDraw(canvas);
     if (isInEditMode()) {
       return;
     }
 
-    if (destroyed) {
-      return;
-    }
-
-    if (!hasSurface) {
-      return;
-    }
-
-    nativeMapView.render();
+    //glSurfaceView.queueEvent(renderRunnable);
   }
 
   @Override
@@ -466,7 +517,9 @@ public class MapView extends FrameLayout implements GLSurfaceView.Renderer {
     }
 
     if (!isInEditMode()) {
-      nativeMapView.resizeView(width, height);
+      if (nativeMapView != null) {
+        //XXX This should happen through GLSurfaceView#Renderer callbacks nativeMapView.resizeView(width, height);
+      }
     }
   }
 
@@ -488,7 +541,9 @@ public class MapView extends FrameLayout implements GLSurfaceView.Renderer {
     if (isInEditMode()) {
       return;
     }
-    mapZoomButtonController.setVisible(visibility == View.VISIBLE);
+    if (mapZoomButtonController != null) {
+      mapZoomButtonController.setVisible(visibility == View.VISIBLE);
+    }
   }
 
   //
@@ -501,7 +556,7 @@ public class MapView extends FrameLayout implements GLSurfaceView.Renderer {
     // Called when an action we are listening to in the manifest has been sent
     @Override
     public void onReceive(Context context, Intent intent) {
-      if (!destroyed && intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
+      if (nativeMapView != null && !destroyed && intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
         nativeMapView.setReachability(!intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, false));
       }
     }
@@ -929,15 +984,10 @@ public class MapView extends FrameLayout implements GLSurfaceView.Renderer {
     }
   }
 
-  private static class MapCallback implements OnMapChangedListener {
+  private class MapCallback implements OnMapChangedListener {
 
-    private final MapboxMap mapboxMap;
     private final List<OnMapReadyCallback> onMapReadyCallbackList = new ArrayList<>();
     private boolean initialLoad = true;
-
-    MapCallback(MapboxMap mapboxMap) {
-      this.mapboxMap = mapboxMap;
-    }
 
     @Override
     public void onMapChanged(@MapChange int change) {
@@ -969,6 +1019,16 @@ public class MapView extends FrameLayout implements GLSurfaceView.Renderer {
 
     void addOnMapReadyCallback(OnMapReadyCallback callback) {
       onMapReadyCallbackList.add(callback);
+    }
+  }
+
+  private class RenderRunnable implements Runnable {
+    @Override
+    public void run() {
+      if (destroyed) {
+        return;
+      }
+      nativeMapView.render();
     }
   }
 }

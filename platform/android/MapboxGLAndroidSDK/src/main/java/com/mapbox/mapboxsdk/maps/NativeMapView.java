@@ -68,6 +68,8 @@ final class NativeMapView {
   //
 
   public NativeMapView(MapView mapView) {
+    this.mapView = mapView;
+
     Context context = mapView.getContext();
     String dataPath = OfflineManager.getDatabasePath(context);
 
@@ -95,7 +97,10 @@ final class NativeMapView {
       throw new IllegalArgumentException("totalMemory cannot be negative.");
     }
     onMapChangedListeners = new CopyOnWriteArrayList<>();
-    this.mapView = mapView;
+
+//    if (Looper.myLooper() == null) {
+//      Looper.prepare();
+//    }
     nativeMapViewPtr = nativeCreate(cachePath, dataPath, apkPath, pixelRatio, availableProcessors, totalMemory);
   }
 
@@ -103,84 +108,10 @@ final class NativeMapView {
   // Methods
   //
 
-  private boolean isDestroyedOn(String callingMethod) {
-    if (destroyed && !TextUtils.isEmpty(callingMethod)) {
-      Timber.e(String.format(MapboxConstants.MAPBOX_LOCALE,
-        "You're calling `%s` after the `MapView` was destroyed, were you invoking it after `onDestroy()`?",
-        callingMethod));
-    }
-    return destroyed;
-  }
-
-  public void destroy() {
-    nativeDestroy(nativeMapViewPtr);
-    nativeMapViewPtr = 0;
-    mapView = null;
-    destroyed = true;
-  }
-
-  public void initializeDisplay() {
-    if (isDestroyedOn("initializeDisplay")) {
+  public void onViewportChanged(int width, int height) {
+    if (isDestroyedOn("onViewportChanged")) {
       return;
     }
-    nativeInitializeDisplay(nativeMapViewPtr);
-  }
-
-  public void terminateDisplay() {
-    if (isDestroyedOn("terminateDisplay")) {
-      return;
-    }
-    nativeTerminateDisplay(nativeMapViewPtr);
-  }
-
-  public void initializeContext() {
-    if (isDestroyedOn("initializeContext")) {
-      return;
-    }
-    nativeInitializeContext(nativeMapViewPtr);
-  }
-
-  public void terminateContext() {
-    if (isDestroyedOn("terminateContext")) {
-      return;
-    }
-    nativeTerminateContext(nativeMapViewPtr);
-  }
-
-  public void createSurface(Surface surface) {
-    if (isDestroyedOn("createSurface")) {
-      return;
-    }
-    nativeCreateSurface(nativeMapViewPtr, surface);
-  }
-
-  public void destroySurface() {
-    if (isDestroyedOn("destroySurface")) {
-      return;
-    }
-    nativeDestroySurface(nativeMapViewPtr);
-  }
-
-  public void update() {
-    if (isDestroyedOn("update")) {
-      return;
-    }
-    nativeUpdate(nativeMapViewPtr);
-  }
-
-  public void render() {
-    if (isDestroyedOn("render")) {
-      return;
-    }
-    nativeRender(nativeMapViewPtr);
-  }
-
-  public void resizeView(int width, int height) {
-    if (isDestroyedOn("resizeView")) {
-      return;
-    }
-    width = (int) (width / pixelRatio);
-    height = (int) (height / pixelRatio);
 
     if (width < 0) {
       throw new IllegalArgumentException("width cannot be negative.");
@@ -203,31 +134,39 @@ final class NativeMapView {
         + "capping value at 65535 instead of " + height);
       height = 65535;
     }
-    nativeViewResize(nativeMapViewPtr, width, height);
+
+    nativeOnViewportChanged(nativeMapViewPtr, width, height);
   }
 
-  public void resizeFramebuffer(int fbWidth, int fbHeight) {
-    if (isDestroyedOn("resizeFramebuffer")) {
+  private boolean isDestroyedOn(String callingMethod) {
+    if (destroyed && !TextUtils.isEmpty(callingMethod)) {
+      Timber.e(String.format(MapboxConstants.MAPBOX_LOCALE,
+        "You're calling `%s` after the `MapView` was destroyed, were you invoking it after `onDestroy()`?",
+        callingMethod));
+    }
+    return destroyed;
+  }
+
+  public void destroy() {
+    nativeDestroy(nativeMapViewPtr);
+    nativeMapViewPtr = 0;
+    mapView = null;
+    destroyed = true;
+  }
+
+  public void update() {
+    if (isDestroyedOn("update")) {
       return;
     }
-    if (fbWidth < 0) {
-      throw new IllegalArgumentException("fbWidth cannot be negative.");
-    }
+    nativeUpdate(nativeMapViewPtr);
+  }
 
-    if (fbHeight < 0) {
-      throw new IllegalArgumentException("fbHeight cannot be negative.");
+  public void render() {
+    Timber.i("Render");
+    if (isDestroyedOn("render")) {
+      return;
     }
-
-    if (fbWidth > 65535) {
-      throw new IllegalArgumentException(
-        "fbWidth cannot be greater than 65535.");
-    }
-
-    if (fbHeight > 65535) {
-      throw new IllegalArgumentException(
-        "fbHeight cannot be greater than 65535.");
-    }
-    nativeFramebufferResize(nativeMapViewPtr, fbWidth, fbHeight);
+    nativeRender(nativeMapViewPtr);
   }
 
   public void addClass(String clazz) {
@@ -329,6 +268,7 @@ final class NativeMapView {
   }
 
   public void moveBy(double dx, double dy, long duration) {
+    Timber.i("Move by %sx%s - %s", dx, dy, duration);
     if (isDestroyedOn("moveBy")) {
       return;
     }
@@ -343,6 +283,7 @@ final class NativeMapView {
   }
 
   public void setLatLng(LatLng latLng, long duration) {
+    Timber.i("setLatLng %sx%s - %s", latLng.getLatitude(), latLng.getLongitude(), duration);
     if (isDestroyedOn("setLatLng")) {
       return;
     }
@@ -372,6 +313,7 @@ final class NativeMapView {
   }
 
   public void setPitch(double pitch, long duration) {
+    Timber.i("setLatLng %s - %s", pitch, duration);
     if (isDestroyedOn("setPitch")) {
       return;
     }
@@ -926,14 +868,29 @@ final class NativeMapView {
   // Callbacks
   //
 
+  /**
+   * Called through JNI when the map needs to be re-rendered
+   */
   protected void onInvalidate() {
+    Timber.i("onInvalidate");
     mapView.onInvalidate();
   }
 
-  protected void onMapChanged(int rawChange) {
+  protected void wakeCallback() {
+    Timber.i("wake!");
+    mapView.requestRender();
+  }
+
+  protected void onMapChanged(final int rawChange) {
+    Timber.i("onMapChanged: %s", rawChange);
     if (onMapChangedListeners != null) {
-      for (MapView.OnMapChangedListener onMapChangedListener : onMapChangedListeners) {
-        onMapChangedListener.onMapChanged(rawChange);
+      for (final MapView.OnMapChangedListener onMapChangedListener : onMapChangedListeners) {
+        mapView.post(new Runnable() {
+          @Override
+          public void run() {
+            onMapChangedListener.onMapChanged(rawChange);
+          }
+        });
       }
     }
   }
@@ -974,9 +931,7 @@ final class NativeMapView {
 
   private native void nativeRender(long nativeMapViewPtr);
 
-  private native void nativeViewResize(long nativeMapViewPtr, int width, int height);
-
-  private native void nativeFramebufferResize(long nativeMapViewPtr, int fbWidth, int fbHeight);
+  private native void nativeOnViewportChanged(long nativeMapViewPtr, int width, int height);
 
   private native void nativeAddClass(long nativeMapViewPtr, String clazz);
 
