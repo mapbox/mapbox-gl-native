@@ -134,6 +134,7 @@ public class Marker extends Annotation {
         MapboxMap map = getMapboxMap();
         if (map != null) {
             map.updateMarker(this);
+            mapboxMap.getMarkerViewManager().scheduleViewMarkerInvalidation();
         }
     }
 

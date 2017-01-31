@@ -72,7 +72,7 @@ public class InfoWindow {
 
                     if (!handledDefaultClick) {
                         // default behavior: close it when clicking on the tooltip:
-                        close();
+                        closeInfoWindow();
                     }
                 }
             }
@@ -93,8 +93,16 @@ public class InfoWindow {
         });
     }
 
+  private void closeInfoWindow() {
+    MapboxMap mapbox = mMapboxMap.get();
+    Marker marker = mBoundMarker.get();
+    if (marker != null && mapbox != null) {
+      mapbox.deselectMarker(marker);
+    }
+    close();
+  }
 
-    /**
+  /**
      * Open the info window at the specified position.
      *
      * @param boundMarker The marker on which is hooked the view.

@@ -1,6 +1,7 @@
 package com.mapbox.mapboxsdk.constants;
 
 import android.content.Context;
+
 import java.util.Locale;
 
 /**
@@ -8,7 +9,7 @@ import java.util.Locale;
  */
 public class MapboxConstants {
 
-    /**
+   /**
      * Default Locale for data processing (ex: String.toLowerCase(MAPBOX_LOCALE, "foo"))
      */
     public static final Locale MAPBOX_LOCALE = Locale.US;
@@ -91,6 +92,16 @@ public class MapboxConstants {
     public static final double MINIMUM_DIRECTION = 0;
 
     /**
+     * The currently used minimun scale factor to clamp to when a quick zoom gesture occurs
+     */
+    public static final float MINIMUM_SCALE_FACTOR_CLAMP = 0.65f;
+
+    /**
+     * The currently used maximum scale factor to clamp to when a quick zoom gesture occurs
+     */
+    public static final float MAXIMUM_SCALE_FACTOR_CLAMP = 1.35f;
+
+    /**
      * Fragment Argument Key for MapboxMapOptions
      */
     public static final String FRAG_ARG_MAPBOXMAPOPTIONS = "MapboxMapOptions";
@@ -141,4 +152,14 @@ public class MapboxConstants {
     public static final String MAPBOX_SHARED_PREFERENCE_KEY_TELEMETRY_ENABLED = "mapboxTelemetryEnabled";
     public static final String MAPBOX_SHARED_PREFERENCE_KEY_TELEMETRY_STAGING_URL = "mapboxTelemetryStagingUrl";
     public static final String MAPBOX_SHARED_PREFERENCE_KEY_TELEMETRY_STAGING_ACCESS_TOKEN = "mapboxTelemetryStagingAccessToken";
+
+    /**
+    * Animation time of a fling gesture
+    */
+    public static final long ANIMATION_DURATION_FLING_BASE = ANIMATION_DURATION_SHORT;
+
+    /**
+    * Velocity threshold for a fling gesture
+    */
+    public static final long VELOCITY_THRESHOLD_IGNORE_FLING = 1000;
 }
