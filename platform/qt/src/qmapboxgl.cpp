@@ -780,16 +780,16 @@ mbgl::optional<mbgl::Annotation> asMapboxGLAnnotation(const QMapbox::Annotation 
         mbgl::ShapeAnnotationGeometry result;
         switch (geometry.type) {
         case QMapbox::ShapeAnnotationGeometry::LineStringType:
-            result = { asMapboxGLLineString(geometry.geometry.first().first()) };
+            result = asMapboxGLLineString(geometry.geometry.first().first());
             break;
         case QMapbox::ShapeAnnotationGeometry::PolygonType:
-            result = { asMapboxGLPolygon(geometry.geometry.first()) };
+            result = asMapboxGLPolygon(geometry.geometry.first());
             break;
         case QMapbox::ShapeAnnotationGeometry::MultiLineStringType:
-            result = { asMapboxGLMultiLineString(geometry.geometry.first()) };
+            result = asMapboxGLMultiLineString(geometry.geometry.first());
             break;
         case QMapbox::ShapeAnnotationGeometry::MultiPolygonType:
-            result = { asMapboxGLMultiPolygon(geometry.geometry) };
+            result = asMapboxGLMultiPolygon(geometry.geometry);
             break;
         }
         return result;
@@ -798,19 +798,19 @@ mbgl::optional<mbgl::Annotation> asMapboxGLAnnotation(const QMapbox::Annotation 
     if (annotation.canConvert<QMapbox::SymbolAnnotation>()) {
         QMapbox::SymbolAnnotation symbolAnnotation = annotation.value<QMapbox::SymbolAnnotation>();
         QMapbox::Coordinate& pair = symbolAnnotation.geometry;
-        return { mbgl::SymbolAnnotation { mbgl::Point<double> { pair.second, pair.first }, symbolAnnotation.icon.toStdString() } };
+        return { mbgl::SymbolAnnotation(mbgl::Point<double> { pair.second, pair.first }, symbolAnnotation.icon.toStdString()) };
     } else if (annotation.canConvert<QMapbox::LineAnnotation>()) {
         QMapbox::LineAnnotation lineAnnotation = annotation.value<QMapbox::LineAnnotation>();
         auto color = mbgl::Color::parse(lineAnnotation.color.name().toStdString());
-        return { mbgl::LineAnnotation { asMapboxGLGeometry(lineAnnotation.geometry), lineAnnotation.opacity, lineAnnotation.width, { *color } } };
+        return { mbgl::LineAnnotation(asMapboxGLGeometry(lineAnnotation.geometry), lineAnnotation.opacity, lineAnnotation.width, { *color }) };
     } else if (annotation.canConvert<QMapbox::FillAnnotation>()) {
         QMapbox::FillAnnotation fillAnnotation = annotation.value<QMapbox::FillAnnotation>();
         auto color = mbgl::Color::parse(fillAnnotation.color.name().toStdString());
         if (fillAnnotation.outlineColor.canConvert<QColor>()) {
             auto outlineColor = mbgl::Color::parse(fillAnnotation.outlineColor.value<QColor>().name().toStdString());
-            return { mbgl::FillAnnotation { asMapboxGLGeometry(fillAnnotation.geometry), fillAnnotation.opacity, { *color }, { *outlineColor } } };
+            return { mbgl::FillAnnotation(asMapboxGLGeometry(fillAnnotation.geometry), fillAnnotation.opacity, { *color }, { *outlineColor }) };
         } else {
-            return { mbgl::FillAnnotation { asMapboxGLGeometry(fillAnnotation.geometry), fillAnnotation.opacity, { *color }, {} } };
+            return { mbgl::FillAnnotation(asMapboxGLGeometry(fillAnnotation.geometry), fillAnnotation.opacity, { *color }, {}) };
         }
     }
 
