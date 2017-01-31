@@ -28,7 +28,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * Fixed flickering that occurred when panning past the antimeridian. ([#7574](https://github.com/mapbox/mapbox-gl-native/pull/7574))
 * Fixed an issue that could prevent a cached style from appearing while the device is offline. ([#7770](https://github.com/mapbox/mapbox-gl-native/pull/7770))
 * Added `MGLDistanceFormatter` which can be used to format geographic distances. ([#7888](https://github.com/mapbox/mapbox-gl-native/pull/7888))
-* Fixed an issue where an offline pack downloaded from a server that returns 403s for missing tiles will not complete ([#7904](https://github.com/mapbox/mapbox-gl-native/pull/7904/files))
+* Fixed an issue where an offline pack downloaded from a server that returns 403s for missing tiles will not complete ([#7904](https://github.com/mapbox/mapbox-gl-native/pull/7904))
 
 ## 3.4.1 
 
