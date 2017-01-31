@@ -2,6 +2,10 @@
 
 Mapbox welcomes participation and contributions from everyone. Please read [CONTRIBUTING.md](../../CONTRIBUTING.md) to get started.
 
+## 3.4.2
+
+* Programmatic camera changes no longer resets user tracking mode. ([#7856](https://github.com/mapbox/mapbox-gl-native/pull/7856))
+
 ## 3.4.1 
 
 * Fixed a build error in the static framework flavor of this SDK caused by a missing header. ([#7844](https://github.com/mapbox/mapbox-gl-native/pull/7844))
