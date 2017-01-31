@@ -10,6 +10,7 @@ import android.support.annotation.NonNull;
 
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
+import com.mapbox.mapboxsdk.net.ConnectivityReceiver;
 
 import java.io.File;
 
@@ -47,6 +48,9 @@ public class OfflineManager {
 
   // This object is implemented as a singleton
   private static OfflineManager instance;
+
+  // The application context
+  private final Context context;
 
   /**
    * This callback receives an asynchronous response containing a list of all
@@ -92,6 +96,7 @@ public class OfflineManager {
    * Constructors
    */
   private OfflineManager(Context context) {
+    this.context = context.getApplicationContext();
     // Get a pointer to the DefaultFileSource instance
     String assetRoot = getDatabasePath(context);
     String cachePath = assetRoot + File.separator + DATABASE_NAME;
@@ -249,12 +254,14 @@ public class OfflineManager {
     @NonNull byte[] metadata,
     @NonNull final CreateOfflineRegionCallback callback) {
 
+    ConnectivityReceiver.instance(context).activate();
     createOfflineRegion(mDefaultFileSourcePtr, definition, metadata, new CreateOfflineRegionCallback() {
       @Override
       public void onCreate(final OfflineRegion offlineRegion) {
         getHandler().post(new Runnable() {
           @Override
           public void run() {
+            ConnectivityReceiver.instance(context).deactivate();
             callback.onCreate(offlineRegion);
           }
         });
@@ -265,6 +272,7 @@ public class OfflineManager {
         getHandler().post(new Runnable() {
           @Override
           public void run() {
+            ConnectivityReceiver.instance(context).deactivate();
             callback.onError(error);
           }
         });
