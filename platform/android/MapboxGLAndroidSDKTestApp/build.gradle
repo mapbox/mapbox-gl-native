@@ -59,13 +59,14 @@ android {
     buildTypes {
         debug {
             testCoverageEnabled = true
-            minifyEnabled false
+        }
+        ci{
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.release
         }
     }
 }
@@ -84,6 +85,7 @@ dependencies {
 
     // Leak Canary
     debugCompile "com.squareup.leakcanary:leakcanary-android:${leakCanaryVersion}"
+    ciCompile "com.squareup.leakcanary:leakcanary-android-no-op:${leakCanaryVersion}"
     releaseCompile "com.squareup.leakcanary:leakcanary-android-no-op:${leakCanaryVersion}"
     testCompile "com.squareup.leakcanary:leakcanary-android-no-op:${leakCanaryVersion}"
 
