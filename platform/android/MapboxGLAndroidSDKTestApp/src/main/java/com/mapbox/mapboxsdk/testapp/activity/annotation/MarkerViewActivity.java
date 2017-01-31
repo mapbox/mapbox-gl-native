@@ -3,7 +3,9 @@ package com.mapbox.mapboxsdk.testapp.activity.annotation;
 import android.animation.Animator;
 import android.animation.AnimatorInflater;
 import android.animation.AnimatorListenerAdapter;
+import android.animation.FloatEvaluator;
 import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
@@ -98,7 +100,12 @@ public class MarkerViewActivity extends AppCompatActivity {
         options.title("Hello");
         options.position(new LatLng(38.899774, -77.023237));
         options.flat(true);
-        mapboxMap.addMarker(options);
+        MarkerView markerView = mapboxMap.addMarker(options);
+
+        // Use object animator to rotate MarkerView
+        ValueAnimator markerAnimator = ObjectAnimator.ofObject(markerView, "rotation", new FloatEvaluator(), -90, 90);
+        markerAnimator.setDuration(5000);
+        markerAnimator.start();
 
         MarkerViewActivity.this.mapboxMap.addMarker(new MarkerOptions()
           .title("United States")
