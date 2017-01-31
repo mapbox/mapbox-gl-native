@@ -885,43 +885,41 @@ mbgl::ShapeAnnotationGeometry asMapboxGLGeometry(const QMapbox::ShapeAnnotationG
     mbgl::ShapeAnnotationGeometry result;
     switch (geometry.type) {
     case QMapbox::ShapeAnnotationGeometry::LineStringType:
-        result = { asMapboxGLLineString(geometry.geometry.first().first()) };
+        result = asMapboxGLLineString(geometry.geometry.first().first());
         break;
     case QMapbox::ShapeAnnotationGeometry::PolygonType:
-        result = { asMapboxGLPolygon(geometry.geometry.first()) };
+        result = asMapboxGLPolygon(geometry.geometry.first());
         break;
     case QMapbox::ShapeAnnotationGeometry::MultiLineStringType:
-        result = { asMapboxGLMultiLineString(geometry.geometry.first()) };
+        result = asMapboxGLMultiLineString(geometry.geometry.first());
         break;
     case QMapbox::ShapeAnnotationGeometry::MultiPolygonType:
-        result = { asMapboxGLMultiPolygon(geometry.geometry) };
+        result = asMapboxGLMultiPolygon(geometry.geometry);
         break;
     }
-
     return result;
 }
 
 mbgl::Annotation asMapboxGLAnnotation(const QMapbox::Annotation & annotation) {
     if (annotation.canConvert<QMapbox::SymbolAnnotation>()) {
-        QMapbox::SymbolAnnotation symbolAnnotation = annotation.value<QMapbox::SymbolAnnotation>();
-        QMapbox::Coordinate& pair = symbolAnnotation.geometry;
-        return mbgl::SymbolAnnotation { mbgl::Point<double> { pair.second, pair.first }, symbolAnnotation.icon.toStdString() };
+        QMapbox::SymbolAnnotation symbol = annotation.value<QMapbox::SymbolAnnotation>();
+        QMapbox::Coordinate& pair = symbol.geometry;
+        return mbgl::SymbolAnnotation(mbgl::Point<double>(pair.second, pair.first), symbol.icon.toStdString());
     } else if (annotation.canConvert<QMapbox::LineAnnotation>()) {
-        QMapbox::LineAnnotation lineAnnotation = annotation.value<QMapbox::LineAnnotation>();
-        auto color = mbgl::Color::parse(lineAnnotation.color.name().toStdString());
-        return mbgl::LineAnnotation { asMapboxGLGeometry(lineAnnotation.geometry), lineAnnotation.opacity, lineAnnotation.width, { *color } };
+        QMapbox::LineAnnotation line = annotation.value<QMapbox::LineAnnotation>();
+        mbgl::style::PropertyValue<mbgl::Color> color = *mbgl::Color::parse(line.color.name().toStdString());
+        return mbgl::LineAnnotation(asMapboxGLGeometry(line.geometry), line.opacity, line.width, color);
     } else if (annotation.canConvert<QMapbox::FillAnnotation>()) {
-        QMapbox::FillAnnotation fillAnnotation = annotation.value<QMapbox::FillAnnotation>();
-        auto color = mbgl::Color::parse(fillAnnotation.color.name().toStdString());
-        if (fillAnnotation.outlineColor.canConvert<QColor>()) {
-            auto outlineColor = mbgl::Color::parse(fillAnnotation.outlineColor.value<QColor>().name().toStdString());
-            return mbgl::FillAnnotation { asMapboxGLGeometry(fillAnnotation.geometry), fillAnnotation.opacity, { *color }, { *outlineColor } };
-        } else {
-            return mbgl::FillAnnotation { asMapboxGLGeometry(fillAnnotation.geometry), fillAnnotation.opacity, { *color }, {} };
+        QMapbox::FillAnnotation fill = annotation.value<QMapbox::FillAnnotation>();
+        mbgl::style::PropertyValue<mbgl::Color> color = *mbgl::Color::parse(fill.color.name().toStdString());
+        mbgl::style::PropertyValue<mbgl::Color> outlineColor;
+        if (fill.outlineColor.canConvert<QColor>()) {
+            outlineColor = *mbgl::Color::parse(fill.outlineColor.value<QColor>().name().toStdString());
         }
+        return mbgl::FillAnnotation(asMapboxGLGeometry(fill.geometry), fill.opacity, color, outlineColor);
     } else if (annotation.canConvert<QMapbox::StyleSourcedAnnotation>()) {
-        QMapbox::StyleSourcedAnnotation styleSourcedAnnotation = annotation.value<QMapbox::StyleSourcedAnnotation>();
-        return mbgl::StyleSourcedAnnotation { asMapboxGLGeometry(styleSourcedAnnotation.geometry), styleSourcedAnnotation.layerID.toStdString() };
+        QMapbox::StyleSourcedAnnotation styleSourced = annotation.value<QMapbox::StyleSourcedAnnotation>();
+        return mbgl::StyleSourcedAnnotation(asMapboxGLGeometry(styleSourced.geometry), styleSourced.layerID.toStdString());
     }
 
     qWarning() << "Unable to convert annotation:" << annotation;

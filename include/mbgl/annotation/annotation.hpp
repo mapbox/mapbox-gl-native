@@ -16,6 +16,11 @@ using AnnotationIDs = std::vector<AnnotationID>;
 
 class SymbolAnnotation {
 public:
+    SymbolAnnotation() = default;
+
+    SymbolAnnotation(Point<double> geometry_, std::string icon_)
+        : geometry(std::move(geometry_)), icon(std::move(icon_)) {}
+
     Point<double> geometry;
     std::string icon;
 };
@@ -28,9 +33,9 @@ using ShapeAnnotationGeometry = variant<
 
 class LineAnnotation {
 public:
-    LineAnnotation(const ShapeAnnotationGeometry &geometry_, const style::PropertyValue<float> &opacity_,
-            const style::PropertyValue<float> &width_, const style::PropertyValue<Color> &color_) :
-        geometry(geometry_), opacity(opacity_), width(width_), color(color_) {}
+    LineAnnotation(ShapeAnnotationGeometry geometry_, style::PropertyValue<float> opacity_,
+                   style::PropertyValue<float> width_, style::PropertyValue<Color> color_)
+        : geometry(std::move(geometry_)), opacity(std::move(opacity_)), width(std::move(width_)), color(std::move(color_)) {}
 
     ShapeAnnotationGeometry geometry;
     style::PropertyValue<float> opacity { 1.0f };
@@ -40,9 +45,9 @@ public:
 
 class FillAnnotation {
 public:
-    FillAnnotation(const ShapeAnnotationGeometry &geometry_, const style::PropertyValue<float> &opacity_,
-            const style::PropertyValue<Color> &color_, const style::PropertyValue<Color> &outlineColor_) :
-        geometry(geometry_), opacity(opacity_), color(color_), outlineColor(outlineColor_) {}
+    FillAnnotation(ShapeAnnotationGeometry geometry_, style::PropertyValue<float> opacity_,
+                   style::PropertyValue<Color> color_, style::PropertyValue<Color> outlineColor_)
+        : geometry(std::move(geometry_)), opacity(std::move(opacity_)), color(std::move(color_)), outlineColor(std::move(outlineColor_)) {}
 
     ShapeAnnotationGeometry geometry;
     style::PropertyValue<float> opacity { 1.0f };
@@ -53,6 +58,9 @@ public:
 // An annotation whose type and properties are sourced from a style layer.
 class StyleSourcedAnnotation {
 public:
+    StyleSourcedAnnotation(ShapeAnnotationGeometry geometry_, std::string layerID_)
+        : geometry(std::move(geometry_)), layerID(std::move(layerID_)) {}
+
     ShapeAnnotationGeometry geometry;
     std::string layerID;
 };

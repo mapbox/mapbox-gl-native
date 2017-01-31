@@ -32,6 +32,12 @@ struct Q_DECL_EXPORT ShapeAnnotationGeometry {
         MultiLineStringType,
         MultiPolygonType
     };
+
+    ShapeAnnotationGeometry() {}
+
+    ShapeAnnotationGeometry(Type type_, const CoordinatesCollections& geometry_)
+        : type(type_), geometry(geometry_) {}
+
     Type type;
     CoordinatesCollections geometry;
 };
@@ -44,6 +50,11 @@ struct Q_DECL_EXPORT SymbolAnnotation {
 
 // Reflects mbgl::LineAnnotation.
 struct Q_DECL_EXPORT LineAnnotation {
+    LineAnnotation() {}
+
+    LineAnnotation(const ShapeAnnotationGeometry& geometry_, float opacity_, float width_, const QColor& color_)
+        : geometry(geometry_), opacity(opacity_), width(width_), color(color_) {}
+
     ShapeAnnotationGeometry geometry;
     float opacity = 1.0f;
     float width = 1.0f;
@@ -52,6 +63,11 @@ struct Q_DECL_EXPORT LineAnnotation {
 
 // Reflects mbgl::FillAnnotation.
 struct Q_DECL_EXPORT FillAnnotation {
+    FillAnnotation() {}
+
+    FillAnnotation(const ShapeAnnotationGeometry& geometry_, float opacity_, const QColor& color_, const QVariant& outlineColor_ = QVariant())
+        : geometry(geometry_), opacity(opacity_), color(color_), outlineColor(outlineColor_) {}
+
     ShapeAnnotationGeometry geometry;
     float opacity = 1.0f;
     QColor color = Qt::black;
@@ -60,6 +76,11 @@ struct Q_DECL_EXPORT FillAnnotation {
 
 // Reflects mbgl::StyleSourcedAnnotation.
 struct Q_DECL_EXPORT StyleSourcedAnnotation {
+    StyleSourcedAnnotation() {}
+
+    StyleSourcedAnnotation(const ShapeAnnotationGeometry geometry_, const QString& layerID_)
+        : geometry(geometry_), layerID(layerID_) {}
+
     ShapeAnnotationGeometry geometry;
     QString layerID;
 };
