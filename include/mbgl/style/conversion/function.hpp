@@ -198,6 +198,21 @@ struct Converter<CameraFunction<T>> {
     }
 };
 
+template <class T, class V>
+Result<optional<T>> convertDefaultValue(const V& value) {
+    auto defaultValueValue = objectMember(value, "defaultValue");
+    if (!defaultValueValue) {
+        return {};
+    }
+
+    auto defaultValue = convert<T>(*defaultValueValue);
+    if (!defaultValue) {
+        return Error { "wrong type for \"default\": " + defaultValue.error().message };
+    }
+
+    return *defaultValue;
+}
+
 template <class T>
 struct Converter<SourceFunction<T>> {
     template <class V>
@@ -221,7 +236,12 @@ struct Converter<SourceFunction<T>> {
             return stops.error();
         }
 
-        return SourceFunction<T>(*propertyString, *stops);
+        auto defaultValue = convertDefaultValue<T>(value);
+        if (!defaultValue) {
+            return defaultValue.error();
+        }
+
+        return SourceFunction<T>(*propertyString, *stops, *defaultValue);
     }
 };
 
@@ -280,6 +300,11 @@ struct Converter<CompositeFunction<T>> {
             return Error { "function property must be a string" };
         }
 
+        auto defaultValue = convertDefaultValue<T>(value);
+        if (!defaultValue) {
+            return defaultValue.error();
+        }
+
         std::string type = "exponential";
         auto typeValue = objectMember(value, "type");
         if (typeValue && toString(*typeValue)) {
@@ -305,7 +330,7 @@ struct Converter<CompositeFunction<T>> {
                 inner.stops.emplace(stop.first.second, stop.second);
             }
 
-            return CompositeFunction<T>(*propertyString, convertedStops);
+            return CompositeFunction<T>(*propertyString, convertedStops, *defaultValue);
         } else if (type == "interval") {
             auto stops = convertStops<CompositeValue<float>, T>(value);
             if (!stops) {
@@ -318,7 +343,7 @@ struct Converter<CompositeFunction<T>> {
                 inner.stops.emplace(stop.first.second, stop.second);
             }
 
-            return CompositeFunction<T>(*propertyString, convertedStops);
+            return CompositeFunction<T>(*propertyString, convertedStops, *defaultValue);
         } else if (type == "categorical") {
             auto stops = convertStops<CompositeValue<CategoricalValue>, T>(value);
             if (!stops) {
@@ -331,7 +356,7 @@ struct Converter<CompositeFunction<T>> {
                 inner.stops.emplace(stop.first.second, stop.second);
             }
 
-            return CompositeFunction<T>(*propertyString, convertedStops);
+            return CompositeFunction<T>(*propertyString, convertedStops, *defaultValue);
         } else {
             return Error { "unsupported function type" };
         }

@@ -18,13 +18,13 @@ optional<CategoricalValue> categoricalValue(const Value& value) {
 }
 
 template <class T>
-T CategoricalStops<T>::evaluate(const Value& value) const {
+optional<T> CategoricalStops<T>::evaluate(const Value& value) const {
     auto v = categoricalValue(value);
     if (!v) {
-        return defaultValue;
+        return {};
     }
     auto it = stops.find(*v);
-    return it == stops.end() ? defaultValue : it->second;
+    return it == stops.end() ? optional<T>() : it->second;
 }
 
 template class CategoricalStops<float>;

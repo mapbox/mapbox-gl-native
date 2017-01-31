@@ -25,7 +25,7 @@ public:
 
     T evaluate(float zoom) const {
         return stops.match([&] (const auto& s) {
-            return s.evaluate(Value(double(zoom)));
+            return s.evaluate(Value(double(zoom))).value_or(T());
         });
     }
 

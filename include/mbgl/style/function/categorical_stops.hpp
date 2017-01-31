@@ -21,20 +21,18 @@ public:
     using Stops = std::map<CategoricalValue, T>;
 
     Stops stops;
-    T defaultValue;
 
     CategoricalStops() = default;
-    CategoricalStops(Stops stops_, T defaultValue_ = T())
-        : stops(std::move(stops_)),
-          defaultValue(std::move(defaultValue_)) {
+    CategoricalStops(Stops stops_)
+        : stops(std::move(stops_)) {
         assert(stops.size() > 0);
     }
 
-    T evaluate(const Value&) const;
+    optional<T> evaluate(const Value&) const;
 
     friend bool operator==(const CategoricalStops& lhs,
                            const CategoricalStops& rhs) {
-        return lhs.stops == rhs.stops && lhs.defaultValue == rhs.defaultValue;
+        return lhs.stops == rhs.stops;
     }
 };
 

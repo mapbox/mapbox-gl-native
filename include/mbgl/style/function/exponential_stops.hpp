@@ -22,7 +22,7 @@ public:
           base(base_) {
     }
 
-    T evaluate(const Value& value) const {
+    optional<T> evaluate(const Value& value) const {
         if (stops.empty()) {
             assert(false);
             return T();

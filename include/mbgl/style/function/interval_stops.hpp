@@ -18,15 +18,15 @@ public:
         : stops(std::move(stops_)) {
     }
 
-    T evaluate(const Value& value) const {
+    optional<T> evaluate(const Value& value) const {
         if (stops.empty()) {
             assert(false);
-            return T();
+            return {};
         }
 
         optional<float> z = numericValue<float>(value);
         if (!z) {
-            return T();
+            return {};
         }
 
         auto it = stops.upper_bound(*z);

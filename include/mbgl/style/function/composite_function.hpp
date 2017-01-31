@@ -43,9 +43,10 @@ public:
             std::map<float, IntervalStops<T>>,
             std::map<float, CategoricalStops<T>>>>;
 
-    CompositeFunction(std::string property_, Stops stops_)
+    CompositeFunction(std::string property_, Stops stops_, optional<T> defaultValue_ = {})
         : property(std::move(property_)),
-          stops(std::move(stops_)) {
+          stops(std::move(stops_)),
+          defaultValue(std::move(defaultValue_)) {
     }
 
     std::tuple<Range<float>, Range<InnerStops>>
@@ -73,13 +74,17 @@ public:
     }
 
     Range<T> evaluate(Range<InnerStops> coveringStops,
-                      const GeometryTileFeature& feature) const {
+                      const GeometryTileFeature& feature,
+                      T finalDefaultValue) const {
         optional<Value> v = feature.getValue(property);
         if (!v) {
-            return { T(), T() };
+            return {
+                defaultValue.value_or(finalDefaultValue),
+                defaultValue.value_or(finalDefaultValue)
+            };
         }
         auto eval = [&] (const auto& s) {
-            return s.evaluate(*v);
+            return s.evaluate(*v).value_or(defaultValue.value_or(finalDefaultValue));
         };
         return Range<T> {
             coveringStops.min.match(eval),
@@ -87,9 +92,9 @@ public:
         };
     }
 
-    T evaluate(float zoom, const GeometryTileFeature& feature) const {
+    T evaluate(float zoom, const GeometryTileFeature& feature, T finalDefaultValue) const {
         std::tuple<Range<float>, Range<InnerStops>> ranges = coveringRanges(zoom);
-        Range<T> resultRange = evaluate(std::get<1>(ranges), feature);
+        Range<T> resultRange = evaluate(std::get<1>(ranges), feature, finalDefaultValue);
         return util::interpolate(
             resultRange.min,
             resultRange.max,
@@ -98,11 +103,13 @@ public:
 
     friend bool operator==(const CompositeFunction& lhs,
                            const CompositeFunction& rhs) {
-        return lhs.property == rhs.property && lhs.stops == rhs.stops;
+        return std::tie(lhs.property, lhs.stops, lhs.defaultValue)
+            == std::tie(rhs.property, rhs.stops, rhs.defaultValue);
     }
 
     std::string property;
     Stops stops;
+    optional<T> defaultValue;
 };
 
 } // namespace style
