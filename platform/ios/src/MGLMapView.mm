@@ -1206,7 +1206,6 @@ public:
     _mbglMap->cancelTransitions();
 
     MGLMapCamera *oldCamera = self.camera;
-    BOOL didChangeCamera = NO;
     if (pan.state == UIGestureRecognizerStateBegan)
     {
         [self trackGestureEvent:MGLEventGesturePanStart forRecognizer:pan];
@@ -1220,7 +1219,6 @@ public:
         CGPoint delta = [pan translationInView:pan.view];
         _mbglMap->moveBy({ delta.x, delta.y });
         [pan setTranslation:CGPointZero inView:pan.view];
-        didChangeCamera = YES;
 
         [self notifyMapChange:mbgl::MapChangeRegionIsChanging];
     }
@@ -1254,8 +1252,7 @@ public:
         }];
     }
     
-    if (didChangeCamera
-        && [self.delegate respondsToSelector:@selector(mapView:shouldChangeFromCamera:toCamera:)]
+    if ([self.delegate respondsToSelector:@selector(mapView:shouldChangeFromCamera:toCamera:)]
         && ![self.delegate mapView:self shouldChangeFromCamera:oldCamera toCamera:self.camera])
     {
         self.camera = oldCamera;
@@ -1385,14 +1382,8 @@ public:
             newDegrees = fmaxf(newDegrees, -30);
         }
         
-        if ([self.delegate respondsToSelector:@selector(mapView:shouldChangeFromCamera:toCamera:)]
-            && ![self.delegate mapView:self shouldChangeFromCamera:oldCamera toCamera:self.camera])
-        {
-            self.camera = oldCamera;
-        } else {
-            _mbglMap->setBearing(newDegrees, mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y });
-            [self notifyMapChange:mbgl::MapChangeRegionIsChanging];
-        }
+        _mbglMap->setBearing(newDegrees, mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y });
+        [self notifyMapChange:mbgl::MapChangeRegionIsChanging];
         
     }
     else if (rotate.state == UIGestureRecognizerStateEnded || rotate.state == UIGestureRecognizerStateCancelled)
@@ -1423,7 +1414,11 @@ public:
         }
     }
     
-    
+    if ([self.delegate respondsToSelector:@selector(mapView:shouldChangeFromCamera:toCamera:)]
+        && ![self.delegate mapView:self shouldChangeFromCamera:oldCamera toCamera:self.camera])
+    {
+        self.camera = oldCamera;
+    }
 }
 
 - (void)handleSingleTapGesture:(UITapGestureRecognizer *)singleTap
@@ -1532,18 +1527,26 @@ public:
 
     if (doubleTap.state == UIGestureRecognizerStateEnded)
     {
-        [self trackGestureEvent:MGLEventGestureDoubleTap forRecognizer:doubleTap];
-        CGPoint gesturePoint = [self anchorPointForGesture:doubleTap];
-
-        mbgl::ScreenCoordinate center(gesturePoint.x, gesturePoint.y);
-        _mbglMap->scaleBy(2, center, MGLDurationInSecondsFromTimeInterval(MGLAnimationDuration));
-
-        __weak MGLMapView *weakSelf = self;
-
-        [self animateWithDelay:MGLAnimationDuration animations:^
+        MGLMapCamera *oldCamera = self.camera;
+        if ([self.delegate respondsToSelector:@selector(mapView:shouldChangeFromCamera:toCamera:)]
+            && ![self.delegate mapView:self shouldChangeFromCamera:oldCamera toCamera:self.camera])
         {
-            [weakSelf unrotateIfNeededForGesture];
-        }];
+            self.camera = oldCamera;
+        } else {
+            [self trackGestureEvent:MGLEventGestureDoubleTap forRecognizer:doubleTap];
+            CGPoint gesturePoint = [self anchorPointForGesture:doubleTap];
+            
+            mbgl::ScreenCoordinate center(gesturePoint.x, gesturePoint.y);
+            _mbglMap->scaleBy(2, center, MGLDurationInSecondsFromTimeInterval(MGLAnimationDuration));
+            
+            __weak MGLMapView *weakSelf = self;
+            
+            [self animateWithDelay:MGLAnimationDuration animations:^
+             {
+                 [weakSelf unrotateIfNeededForGesture];
+             }];
+        }
+
     }
 }
 
@@ -1561,17 +1564,25 @@ public:
     }
     else if (twoFingerTap.state == UIGestureRecognizerStateEnded)
     {
-        CGPoint gesturePoint = [self anchorPointForGesture:twoFingerTap];
-
-        mbgl::ScreenCoordinate center(gesturePoint.x, gesturePoint.y);
-        _mbglMap->scaleBy(0.5, center, MGLDurationInSecondsFromTimeInterval(MGLAnimationDuration));
-
-        __weak MGLMapView *weakSelf = self;
-
-        [self animateWithDelay:MGLAnimationDuration animations:^
+        MGLMapCamera *oldCamera = self.camera;
+        if ([self.delegate respondsToSelector:@selector(mapView:shouldChangeFromCamera:toCamera:)]
+            && ![self.delegate mapView:self shouldChangeFromCamera:oldCamera toCamera:self.camera])
         {
-            [weakSelf unrotateIfNeededForGesture];
-        }];
+            self.camera = oldCamera;
+        } else {
+            CGPoint gesturePoint = [self anchorPointForGesture:twoFingerTap];
+            
+            mbgl::ScreenCoordinate center(gesturePoint.x, gesturePoint.y);
+            _mbglMap->scaleBy(0.5, center, MGLDurationInSecondsFromTimeInterval(MGLAnimationDuration));
+            
+            __weak MGLMapView *weakSelf = self;
+            
+            [self animateWithDelay:MGLAnimationDuration animations:^
+             {
+                 [weakSelf unrotateIfNeededForGesture];
+             }];
+        }
+        
     }
 }
 
@@ -1580,7 +1591,7 @@ public:
     if ( ! self.isZoomEnabled) return;
 
     _mbglMap->cancelTransitions();
-
+    MGLMapCamera *oldCamera = self.camera;
     if (quickZoom.state == UIGestureRecognizerStateBegan)
     {
         [self trackGestureEvent:MGLEventGestureQuickZoom forRecognizer:quickZoom];
@@ -1611,6 +1622,12 @@ public:
         [self notifyGestureDidEndWithDrift:NO];
         [self unrotateIfNeededForGesture];
     }
+    
+    if ([self.delegate respondsToSelector:@selector(mapView:shouldChangeFromCamera:toCamera:)]
+        && ![self.delegate mapView:self shouldChangeFromCamera:oldCamera toCamera:self.camera])
+    {
+        self.camera = oldCamera;
+    }
 }
 
 - (void)handleTwoFingerDragGesture:(UIPanGestureRecognizer *)twoFingerDrag
@@ -1618,7 +1635,7 @@ public:
     if ( ! self.isPitchEnabled) return;
 
     _mbglMap->cancelTransitions();
-
+    MGLMapCamera *oldCamera = self.camera;
     if (twoFingerDrag.state == UIGestureRecognizerStateBegan)
     {
         [self trackGestureEvent:MGLEventGesturePitchStart forRecognizer:twoFingerDrag];
@@ -1642,6 +1659,12 @@ public:
     {
         [self notifyGestureDidEndWithDrift:NO];
         [self unrotateIfNeededForGesture];
+    }
+    
+    if ([self.delegate respondsToSelector:@selector(mapView:shouldChangeFromCamera:toCamera:)]
+        && ![self.delegate mapView:self shouldChangeFromCamera:oldCamera toCamera:self.camera])
+    {
+        self.camera = oldCamera;
     }
 }
 
