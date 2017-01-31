@@ -2532,7 +2532,6 @@ public:
 
 - (void)setCamera:(MGLMapCamera *)camera withDuration:(NSTimeInterval)duration animationTimingFunction:(nullable CAMediaTimingFunction *)function completionHandler:(nullable void (^)(void))completion
 {
-    self.userTrackingMode = MGLUserTrackingModeNone;
     _mbglMap->cancelTransitions();
     if ([self.camera isEqual:camera])
     {
@@ -2572,8 +2571,6 @@ public:
 
 - (void)flyToCamera:(MGLMapCamera *)camera withDuration:(NSTimeInterval)duration peakAltitude:(CLLocationDistance)peakAltitude completionHandler:(nullable void (^)(void))completion
 {
-    self.userTrackingMode = MGLUserTrackingModeNone;
-
     [self _flyToCamera:camera edgePadding:self.contentInset withDuration:duration peakAltitude:peakAltitude completionHandler:completion];
 }
 
