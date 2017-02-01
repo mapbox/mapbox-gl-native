@@ -102,7 +102,7 @@ matrix:
         - ccache --show-stats
         - ./platform/node/scripts/after_script.sh ${TRAVIS_JOB_NUMBER}
       after_failure:
-        - aws s3 cp --acl public-read *.trace s3://mapbox/mapbox-gl-native/render-tests/$TRAVIS_JOB_NUMBER
+        - aws s3 cp . s3://mapbox/mapbox-gl-native/render-tests/$TRAVIS_JOB_NUMBER --recursive --exclude "*" --include "*.trace"
 
     # EGL - Node - Clang 3.8 - Release
     - os: linux
@@ -131,7 +131,7 @@ matrix:
       after_success:
         - ./platform/node/scripts/after_success.sh
       after_failure:
-        - aws s3 cp --acl public-read *.trace s3://mapbox/mapbox-gl-native/render-tests/$TRAVIS_JOB_NUMBER
+        - aws s3 cp . s3://mapbox/mapbox-gl-native/render-tests/$TRAVIS_JOB_NUMBER --recursive --exclude "*" --include "*.trace"
 
     # EGL - GCC 5 - Debug (Coverage)
     - os: linux
