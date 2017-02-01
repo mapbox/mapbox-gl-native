@@ -296,7 +296,7 @@ public class MyLocationView extends View {
     }
 
     // draw foreground
-    if (myBearingTrackingMode == MyBearingTracking.NONE) {
+    if (myBearingTrackingMode == MyBearingTracking.NONE || !compassListener.isSensorAvailable()) {
       if (foregroundDrawable != null) {
         foregroundDrawable.draw(canvas);
       }
@@ -320,7 +320,8 @@ public class MyLocationView extends View {
         if (location != null) {
           setCompass(location.getBearing() - bearing);
         }
-      } else if (myBearingTrackingMode == MyBearingTracking.COMPASS) {
+      } else if (myBearingTrackingMode == MyBearingTracking.COMPASS
+              && compassListener.isSensorAvailable()) {
         setCompass(magneticHeading - bearing);
       }
     }
@@ -334,7 +335,8 @@ public class MyLocationView extends View {
   }
 
   public void onStart() {
-    if (myBearingTrackingMode == MyBearingTracking.COMPASS) {
+    if (myBearingTrackingMode == MyBearingTracking.COMPASS
+            && compassListener.isSensorAvailable()) {
       compassListener.onResume();
     }
     if (isEnabled()) {
@@ -457,7 +459,8 @@ public class MyLocationView extends View {
 
   public void setMyBearingTrackingMode(@MyBearingTracking.Mode int myBearingTrackingMode) {
     this.myBearingTrackingMode = myBearingTrackingMode;
-    if (myBearingTrackingMode == MyBearingTracking.COMPASS) {
+    if (myBearingTrackingMode == MyBearingTracking.COMPASS
+            && compassListener.isSensorAvailable()) {
       compassListener.onResume();
     } else {
       compassListener.onPause();
@@ -601,6 +604,10 @@ public class MyLocationView extends View {
 
     public void onPause() {
       sensorManager.unregisterListener(this, rotationVectorSensor);
+    }
+
+    public boolean isSensorAvailable() {
+      return rotationVectorSensor != null;
     }
 
     @Override
