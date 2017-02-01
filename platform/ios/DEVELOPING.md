@@ -112,12 +112,24 @@ To add or update text that the user may see in the iOS SDK:
 
 ### Adding a localization
 
-To add a localization to the iOS SDK:
+Translations of all the Mapbox GL Native SDKs are managed [in Transifex](https://www.transifex.com/mapbox/mapbox-gl-native/). If your language already has a translation, feel free to complete or proofread it. Otherwise, please [request your language](https://www.transifex.com/mapbox/mapbox-gl-native/languages/). Note that we’re primarily interested in languages that iOS supports as system languages.
+
+Once you’ve finished translating the SDK into a new language in Transifex, perform these steps to make Xcode aware of the translation:
 
 1. In ios.xcworkspace, open the project editor for ios.xcodeproj. Using the project editor’s sidebar or tab bar dropdown, go to the “ios” project; under the Localizations section of the Info tab, click the + button to add your language to the project.
-1. In the sheet that appears, select all the .strings and .stringsdict files but not the .storyboard file. (LaunchScreen.storyboard is part of the iosapp example application, which is not localized.)
-1. In the Project navigator, expand each .strings and .stringsdict file in the project. An additional version for your localization should be listed; translate it. Translate everything on the right side of the equals sign. Leave the left side and any comments unmodified. See Apple’s documentation on the [.strings](https://developer.apple.com/library/content/documentation/Cocoa/Conceptual/LoadingResources/Strings/Strings.html) and [.stringsdict](https://developer.apple.com/library/content/documentation/MacOSX/Conceptual/BPInternational/StringsdictFileFormat/StringsdictFileFormat.html) formats.
-1. You’re already most of the way towards localizing the macOS SDK too – consider [completing that localization](../macos/DEVELOPING.md#adding-a-localization).
+1. In the sheet that appears, select all the .strings and .stringsdict files but not the .storyboard file. (LaunchScreen.storyboard is part of the iosapp example application, which is not localized.) If your language lacks declension and pluralization, as in the case of Chinese, omit the .stringsdict files.
+1. In the Project navigator, expand each .stringsdict file in the project. An additional version for your localization should be listed; translate it. See Apple’s documentation on the [.stringsdict format](https://developer.apple.com/library/content/documentation/MacOSX/Conceptual/BPInternational/StringsdictFileFormat/StringsdictFileFormat.html).
+1. Repeat the steps above in macos.xcworkspace.
+
+The .strings files should still be in the original English – that’s expected. Now you can pull your translations into this repository:
+
+1. _(First time only.)_ Download the [`tx` command line tool](https://docs.transifex.com/client/installing-the-client) and [configure your .transifexrc](https://docs.transifex.com/client/client-configuration).
+1. Run `tx pull -a`.
+1. Convert any added .strings files from UTF-16 encoding to UTF-8 encoding to facilitate diffing and merging. You can convert the file encoding using Xcode’s File inspector or the following command (substituting _MYLANG_ for the locale code):
+
+```
+find platform/{darwin,ios}/resources platform/macos/sdk -path '*/MYLANG.lproj/*.strings' -exec textutil -convert txt -extension strings -inputencoding UTF-16 -encoding UTF-8 {} -output {} \;
+```
 
 ### Adding a code example
 
