@@ -103,7 +103,8 @@ public class CircleLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(circleRadius(0.3f));
-    assertEquals((Float) layer.getCircleRadius().getValue(), (Float) 0.3f);
+    assertEquals((Float) layer.getCircleRadius().getValue(),
+                 (Float) 0.3f);
   }
 
   @Test
@@ -125,7 +126,8 @@ public class CircleLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(circleColor("rgba(0, 0, 0, 1)"));
-    assertEquals((String) layer.getCircleColor().getValue(), (String) "rgba(0, 0, 0, 1)");
+    assertEquals((String) layer.getCircleColor().getValue(),
+                 (String) "rgba(0, 0, 0, 1)");
   }
 
   @Test
@@ -169,7 +171,8 @@ public class CircleLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(circleBlur(0.3f));
-    assertEquals((Float) layer.getCircleBlur().getValue(), (Float) 0.3f);
+    assertEquals((Float) layer.getCircleBlur().getValue(),
+                 (Float) 0.3f);
   }
 
   @Test
@@ -191,7 +194,8 @@ public class CircleLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(circleOpacity(0.3f));
-    assertEquals((Float) layer.getCircleOpacity().getValue(), (Float) 0.3f);
+    assertEquals((Float) layer.getCircleOpacity().getValue(),
+                 (Float) 0.3f);
   }
 
   @Test
@@ -213,7 +217,8 @@ public class CircleLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(circleTranslate(new Float[] {0f, 0f}));
-    assertEquals((Float[]) layer.getCircleTranslate().getValue(), (Float[]) new Float[] {0f, 0f});
+    assertEquals((Float[]) layer.getCircleTranslate().getValue(),
+                 (Float[]) new Float[] {0f, 0f});
   }
 
   @Test
@@ -235,7 +240,8 @@ public class CircleLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(circleTranslateAnchor(CIRCLE_TRANSLATE_ANCHOR_MAP));
-    assertEquals((String) layer.getCircleTranslateAnchor().getValue(), (String) CIRCLE_TRANSLATE_ANCHOR_MAP);
+    assertEquals((String) layer.getCircleTranslateAnchor().getValue(),
+                 (String) CIRCLE_TRANSLATE_ANCHOR_MAP);
   }
 
   @Test
@@ -257,7 +263,8 @@ public class CircleLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(circlePitchScale(CIRCLE_PITCH_SCALE_MAP));
-    assertEquals((String) layer.getCirclePitchScale().getValue(), (String) CIRCLE_PITCH_SCALE_MAP);
+    assertEquals((String) layer.getCirclePitchScale().getValue(),
+                 (String) CIRCLE_PITCH_SCALE_MAP);
   }
 
   @Test
@@ -279,7 +286,8 @@ public class CircleLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(circleStrokeWidth(0.3f));
-    assertEquals((Float) layer.getCircleStrokeWidth().getValue(), (Float) 0.3f);
+    assertEquals((Float) layer.getCircleStrokeWidth().getValue(),
+                 (Float) 0.3f);
   }
 
   @Test
@@ -301,7 +309,8 @@ public class CircleLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(circleStrokeColor("rgba(0, 0, 0, 1)"));
-    assertEquals((String) layer.getCircleStrokeColor().getValue(), (String) "rgba(0, 0, 0, 1)");
+    assertEquals((String) layer.getCircleStrokeColor().getValue(),
+                 (String) "rgba(0, 0, 0, 1)");
   }
 
   @Test
@@ -345,7 +354,8 @@ public class CircleLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(circleStrokeOpacity(0.3f));
-    assertEquals((Float) layer.getCircleStrokeOpacity().getValue(), (Float) 0.3f);
+    assertEquals((Float) layer.getCircleStrokeOpacity().getValue(),
+                 (Float) 0.3f);
   }
 
 

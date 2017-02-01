@@ -149,7 +149,8 @@ public class SymbolLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(symbolPlacement(SYMBOL_PLACEMENT_POINT));
-    assertEquals((String) layer.getSymbolPlacement().getValue(), (String) SYMBOL_PLACEMENT_POINT);
+    assertEquals((String) layer.getSymbolPlacement().getValue(),
+                 (String) SYMBOL_PLACEMENT_POINT);
   }
 
   @Test
@@ -171,7 +172,8 @@ public class SymbolLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(symbolSpacing(0.3f));
-    assertEquals((Float) layer.getSymbolSpacing().getValue(), (Float) 0.3f);
+    assertEquals((Float) layer.getSymbolSpacing().getValue(),
+                 (Float) 0.3f);
   }
 
   @Test
@@ -193,7 +195,8 @@ public class SymbolLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(symbolAvoidEdges(true));
-    assertEquals((Boolean) layer.getSymbolAvoidEdges().getValue(), (Boolean) true);
+    assertEquals((Boolean) layer.getSymbolAvoidEdges().getValue(),
+                 (Boolean) true);
   }
 
   @Test
@@ -215,7 +218,8 @@ public class SymbolLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(iconAllowOverlap(true));
-    assertEquals((Boolean) layer.getIconAllowOverlap().getValue(), (Boolean) true);
+    assertEquals((Boolean) layer.getIconAllowOverlap().getValue(),
+                 (Boolean) true);
   }
 
   @Test
@@ -237,7 +241,8 @@ public class SymbolLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(iconIgnorePlacement(true));
-    assertEquals((Boolean) layer.getIconIgnorePlacement().getValue(), (Boolean) true);
+    assertEquals((Boolean) layer.getIconIgnorePlacement().getValue(),
+                 (Boolean) true);
   }
 
   @Test
@@ -259,7 +264,8 @@ public class SymbolLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(iconOptional(true));
-    assertEquals((Boolean) layer.getIconOptional().getValue(), (Boolean) true);
+    assertEquals((Boolean) layer.getIconOptional().getValue(),
+                 (Boolean) true);
   }
 
   @Test
@@ -281,7 +287,8 @@ public class SymbolLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(iconRotationAlignment(ICON_ROTATION_ALIGNMENT_MAP));
-    assertEquals((String) layer.getIconRotationAlignment().getValue(), (String) ICON_ROTATION_ALIGNMENT_MAP);
+    assertEquals((String) layer.getIconRotationAlignment().getValue(),
+                 (String) ICON_ROTATION_ALIGNMENT_MAP);
   }
 
   @Test
@@ -303,7 +310,8 @@ public class SymbolLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(iconSize(0.3f));
-    assertEquals((Float) layer.getIconSize().getValue(), (Float) 0.3f);
+    assertEquals((Float) layer.getIconSize().getValue(),
+                 (Float) 0.3f);
   }
 
   @Test
@@ -325,7 +333,8 @@ public class SymbolLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(iconTextFit(ICON_TEXT_FIT_NONE));
-    assertEquals((String) layer.getIconTextFit().getValue(), (String) ICON_TEXT_FIT_NONE);
+    assertEquals((String) layer.getIconTextFit().getValue(),
+                 (String) ICON_TEXT_FIT_NONE);
   }
 
   @Test
@@ -347,7 +356,8 @@ public class SymbolLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(iconTextFitPadding(new Float[] {0f, 0f, 0f, 0f}));
-    assertEquals((Float[]) layer.getIconTextFitPadding().getValue(), (Float[]) new Float[] {0f, 0f, 0f, 0f});
+    assertEquals((Float[]) layer.getIconTextFitPadding().getValue(),
+                 (Float[]) new Float[] {0f, 0f, 0f, 0f});
   }
 
   @Test
@@ -369,7 +379,8 @@ public class SymbolLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(iconImage("undefined"));
-    assertEquals((String) layer.getIconImage().getValue(), (String) "undefined");
+    assertEquals((String) layer.getIconImage().getValue(),
+                 (String) "undefined");
   }
 
   @Test
@@ -391,7 +402,8 @@ public class SymbolLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(iconRotate(0.3f));
-    assertEquals((Float) layer.getIconRotate().getValue(), (Float) 0.3f);
+    assertEquals((Float) layer.getIconRotate().getValue(),
+                 (Float) 0.3f);
   }
 
   @Test
@@ -413,7 +425,8 @@ public class SymbolLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(iconPadding(0.3f));
-    assertEquals((Float) layer.getIconPadding().getValue(), (Float) 0.3f);
+    assertEquals((Float) layer.getIconPadding().getValue(),
+                 (Float) 0.3f);
   }
 
   @Test
@@ -435,7 +448,8 @@ public class SymbolLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(iconKeepUpright(true));
-    assertEquals((Boolean) layer.getIconKeepUpright().getValue(), (Boolean) true);
+    assertEquals((Boolean) layer.getIconKeepUpright().getValue(),
+                 (Boolean) true);
   }
 
   @Test
@@ -457,7 +471,8 @@ public class SymbolLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(iconOffset(new Float[] {0f, 0f}));
-    assertEquals((Float[]) layer.getIconOffset().getValue(), (Float[]) new Float[] {0f, 0f});
+    assertEquals((Float[]) layer.getIconOffset().getValue(),
+                 (Float[]) new Float[] {0f, 0f});
   }
 
   @Test
@@ -479,7 +494,8 @@ public class SymbolLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(textPitchAlignment(TEXT_PITCH_ALIGNMENT_MAP));
-    assertEquals((String) layer.getTextPitchAlignment().getValue(), (String) TEXT_PITCH_ALIGNMENT_MAP);
+    assertEquals((String) layer.getTextPitchAlignment().getValue(),
+                 (String) TEXT_PITCH_ALIGNMENT_MAP);
   }
 
   @Test
@@ -501,7 +517,8 @@ public class SymbolLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(textRotationAlignment(TEXT_ROTATION_ALIGNMENT_MAP));
-    assertEquals((String) layer.getTextRotationAlignment().getValue(), (String) TEXT_ROTATION_ALIGNMENT_MAP);
+    assertEquals((String) layer.getTextRotationAlignment().getValue(),
+                 (String) TEXT_ROTATION_ALIGNMENT_MAP);
   }
 
   @Test
@@ -523,7 +540,8 @@ public class SymbolLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(textField(""));
-    assertEquals((String) layer.getTextField().getValue(), (String) "");
+    assertEquals((String) layer.getTextField().getValue(),
+                 (String) "");
   }
 
   @Test
@@ -545,8 +563,8 @@ public class SymbolLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(textFont(new String[] {"Open Sans Regular", "Arial Unicode MS Regular"}));
-    assertEquals((String[]) layer.getTextFont().getValue(), (String[]) new String[] {"Open Sans Regular",
-      "Arial Unicode MS Regular"});
+    assertEquals((String[]) layer.getTextFont().getValue(),
+                 (String[]) new String[] {"Open Sans Regular", "Arial Unicode MS Regular"});
   }
 
   @Test
@@ -568,7 +586,8 @@ public class SymbolLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(textSize(0.3f));
-    assertEquals((Float) layer.getTextSize().getValue(), (Float) 0.3f);
+    assertEquals((Float) layer.getTextSize().getValue(),
+                 (Float) 0.3f);
   }
 
   @Test
@@ -590,7 +609,8 @@ public class SymbolLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(textMaxWidth(0.3f));
-    assertEquals((Float) layer.getTextMaxWidth().getValue(), (Float) 0.3f);
+    assertEquals((Float) layer.getTextMaxWidth().getValue(),
+                 (Float) 0.3f);
   }
 
   @Test
@@ -612,7 +632,8 @@ public class SymbolLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(textLineHeight(0.3f));
-    assertEquals((Float) layer.getTextLineHeight().getValue(), (Float) 0.3f);
+    assertEquals((Float) layer.getTextLineHeight().getValue(),
+                 (Float) 0.3f);
   }
 
   @Test
@@ -634,7 +655,8 @@ public class SymbolLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(textLetterSpacing(0.3f));
-    assertEquals((Float) layer.getTextLetterSpacing().getValue(), (Float) 0.3f);
+    assertEquals((Float) layer.getTextLetterSpacing().getValue(),
+                 (Float) 0.3f);
   }
 
   @Test
@@ -656,7 +678,8 @@ public class SymbolLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(textJustify(TEXT_JUSTIFY_LEFT));
-    assertEquals((String) layer.getTextJustify().getValue(), (String) TEXT_JUSTIFY_LEFT);
+    assertEquals((String) layer.getTextJustify().getValue(),
+                 (String) TEXT_JUSTIFY_LEFT);
   }
 
   @Test
@@ -678,7 +701,8 @@ public class SymbolLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(textAnchor(TEXT_ANCHOR_CENTER));
-    assertEquals((String) layer.getTextAnchor().getValue(), (String) TEXT_ANCHOR_CENTER);
+    assertEquals((String) layer.getTextAnchor().getValue(),
+                 (String) TEXT_ANCHOR_CENTER);
   }
 
   @Test
@@ -700,7 +724,8 @@ public class SymbolLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(textMaxAngle(0.3f));
-    assertEquals((Float) layer.getTextMaxAngle().getValue(), (Float) 0.3f);
+    assertEquals((Float) layer.getTextMaxAngle().getValue(),
+                 (Float) 0.3f);
   }
 
   @Test
@@ -722,7 +747,8 @@ public class SymbolLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(textRotate(0.3f));
-    assertEquals((Float) layer.getTextRotate().getValue(), (Float) 0.3f);
+    assertEquals((Float) layer.getTextRotate().getValue(),
+                 (Float) 0.3f);
   }
 
   @Test
@@ -744,7 +770,8 @@ public class SymbolLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(textPadding(0.3f));
-    assertEquals((Float) layer.getTextPadding().getValue(), (Float) 0.3f);
+    assertEquals((Float) layer.getTextPadding().getValue(),
+                 (Float) 0.3f);
   }
 
   @Test
@@ -766,7 +793,8 @@ public class SymbolLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(textKeepUpright(true));
-    assertEquals((Boolean) layer.getTextKeepUpright().getValue(), (Boolean) true);
+    assertEquals((Boolean) layer.getTextKeepUpright().getValue(),
+                 (Boolean) true);
   }
 
   @Test
@@ -788,7 +816,8 @@ public class SymbolLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(textTransform(TEXT_TRANSFORM_NONE));
-    assertEquals((String) layer.getTextTransform().getValue(), (String) TEXT_TRANSFORM_NONE);
+    assertEquals((String) layer.getTextTransform().getValue(),
+                 (String) TEXT_TRANSFORM_NONE);
   }
 
   @Test
@@ -810,7 +839,8 @@ public class SymbolLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(textOffset(new Float[] {0f, 0f}));
-    assertEquals((Float[]) layer.getTextOffset().getValue(), (Float[]) new Float[] {0f, 0f});
+    assertEquals((Float[]) layer.getTextOffset().getValue(),
+                 (Float[]) new Float[] {0f, 0f});
   }
 
   @Test
@@ -832,7 +862,8 @@ public class SymbolLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(textAllowOverlap(true));
-    assertEquals((Boolean) layer.getTextAllowOverlap().getValue(), (Boolean) true);
+    assertEquals((Boolean) layer.getTextAllowOverlap().getValue(),
+                 (Boolean) true);
   }
 
   @Test
@@ -854,7 +885,8 @@ public class SymbolLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(textIgnorePlacement(true));
-    assertEquals((Boolean) layer.getTextIgnorePlacement().getValue(), (Boolean) true);
+    assertEquals((Boolean) layer.getTextIgnorePlacement().getValue(),
+                 (Boolean) true);
   }
 
   @Test
@@ -876,7 +908,8 @@ public class SymbolLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(textOptional(true));
-    assertEquals((Boolean) layer.getTextOptional().getValue(), (Boolean) true);
+    assertEquals((Boolean) layer.getTextOptional().getValue(),
+                 (Boolean) true);
   }
 
   @Test
@@ -898,7 +931,8 @@ public class SymbolLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(iconOpacity(0.3f));
-    assertEquals((Float) layer.getIconOpacity().getValue(), (Float) 0.3f);
+    assertEquals((Float) layer.getIconOpacity().getValue(),
+                 (Float) 0.3f);
   }
 
   @Test
@@ -920,7 +954,8 @@ public class SymbolLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(iconColor("rgba(0, 0, 0, 1)"));
-    assertEquals((String) layer.getIconColor().getValue(), (String) "rgba(0, 0, 0, 1)");
+    assertEquals((String) layer.getIconColor().getValue(),
+                 (String) "rgba(0, 0, 0, 1)");
   }
 
   @Test
@@ -964,7 +999,8 @@ public class SymbolLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(iconHaloColor("rgba(0, 0, 0, 1)"));
-    assertEquals((String) layer.getIconHaloColor().getValue(), (String) "rgba(0, 0, 0, 1)");
+    assertEquals((String) layer.getIconHaloColor().getValue(),
+                 (String) "rgba(0, 0, 0, 1)");
   }
 
   @Test
@@ -1008,7 +1044,8 @@ public class SymbolLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(iconHaloWidth(0.3f));
-    assertEquals((Float) layer.getIconHaloWidth().getValue(), (Float) 0.3f);
+    assertEquals((Float) layer.getIconHaloWidth().getValue(),
+                 (Float) 0.3f);
   }
 
   @Test
@@ -1030,7 +1067,8 @@ public class SymbolLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(iconHaloBlur(0.3f));
-    assertEquals((Float) layer.getIconHaloBlur().getValue(), (Float) 0.3f);
+    assertEquals((Float) layer.getIconHaloBlur().getValue(),
+                 (Float) 0.3f);
   }
 
   @Test
@@ -1052,7 +1090,8 @@ public class SymbolLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(iconTranslate(new Float[] {0f, 0f}));
-    assertEquals((Float[]) layer.getIconTranslate().getValue(), (Float[]) new Float[] {0f, 0f});
+    assertEquals((Float[]) layer.getIconTranslate().getValue(),
+                 (Float[]) new Float[] {0f, 0f});
   }
 
   @Test
@@ -1074,7 +1113,8 @@ public class SymbolLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(iconTranslateAnchor(ICON_TRANSLATE_ANCHOR_MAP));
-    assertEquals((String) layer.getIconTranslateAnchor().getValue(), (String) ICON_TRANSLATE_ANCHOR_MAP);
+    assertEquals((String) layer.getIconTranslateAnchor().getValue(),
+                 (String) ICON_TRANSLATE_ANCHOR_MAP);
   }
 
   @Test
@@ -1096,7 +1136,8 @@ public class SymbolLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(textOpacity(0.3f));
-    assertEquals((Float) layer.getTextOpacity().getValue(), (Float) 0.3f);
+    assertEquals((Float) layer.getTextOpacity().getValue(),
+                 (Float) 0.3f);
   }
 
   @Test
@@ -1118,7 +1159,8 @@ public class SymbolLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(textColor("rgba(0, 0, 0, 1)"));
-    assertEquals((String) layer.getTextColor().getValue(), (String) "rgba(0, 0, 0, 1)");
+    assertEquals((String) layer.getTextColor().getValue(),
+                 (String) "rgba(0, 0, 0, 1)");
   }
 
   @Test
@@ -1162,7 +1204,8 @@ public class SymbolLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(textHaloColor("rgba(0, 0, 0, 1)"));
-    assertEquals((String) layer.getTextHaloColor().getValue(), (String) "rgba(0, 0, 0, 1)");
+    assertEquals((String) layer.getTextHaloColor().getValue(),
+                 (String) "rgba(0, 0, 0, 1)");
   }
 
   @Test
@@ -1206,7 +1249,8 @@ public class SymbolLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(textHaloWidth(0.3f));
-    assertEquals((Float) layer.getTextHaloWidth().getValue(), (Float) 0.3f);
+    assertEquals((Float) layer.getTextHaloWidth().getValue(),
+                 (Float) 0.3f);
   }
 
   @Test
@@ -1228,7 +1272,8 @@ public class SymbolLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(textHaloBlur(0.3f));
-    assertEquals((Float) layer.getTextHaloBlur().getValue(), (Float) 0.3f);
+    assertEquals((Float) layer.getTextHaloBlur().getValue(),
+                 (Float) 0.3f);
   }
 
   @Test
@@ -1250,7 +1295,8 @@ public class SymbolLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(textTranslate(new Float[] {0f, 0f}));
-    assertEquals((Float[]) layer.getTextTranslate().getValue(), (Float[]) new Float[] {0f, 0f});
+    assertEquals((Float[]) layer.getTextTranslate().getValue(),
+                 (Float[]) new Float[] {0f, 0f});
   }
 
   @Test
@@ -1272,7 +1318,8 @@ public class SymbolLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(textTranslateAnchor(TEXT_TRANSLATE_ANCHOR_MAP));
-    assertEquals((String) layer.getTextTranslateAnchor().getValue(), (String) TEXT_TRANSLATE_ANCHOR_MAP);
+    assertEquals((String) layer.getTextTranslateAnchor().getValue(),
+                 (String) TEXT_TRANSLATE_ANCHOR_MAP);
   }
 
 

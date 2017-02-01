@@ -25,13 +25,13 @@ import static android.support.test.espresso.matcher.ViewMatchers.withId;
 @RunWith(AndroidJUnit4.class)
 public class <%- activity %>Test extends BaseActivityTest {
 
-    @Test
-    public void testSanity() {
-        onView(withId(R.id.mapView)).check(matches(isDisplayed()));
-    }
+  @Test
+  public void testSanity() {
+    onView(withId(R.id.mapView)).check(matches(isDisplayed()));
+  }
 
-    @Override
-    protected Class getActivityClass() {
-        return <%- activity %>.class;
-    }
+  @Override
+  protected Class getActivityClass() {
+    return <%- activity %>.class;
+  }
 }

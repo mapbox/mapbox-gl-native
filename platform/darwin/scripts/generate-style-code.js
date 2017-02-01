@@ -55,15 +55,6 @@ _.forOwn(cocoaConventions, function (properties, kind) {
     })
 });
 
-String.prototype.wrap = function (cols, indent) {
-	let wrapRe = new RegExp(`(.{1,${cols - indent}})(?: +|\n|$)`, "gm");
-	return this.replace(wrapRe, "$1\n").replace(/\s+$/, "").indent(indent);
-};
-
-String.prototype.indent = function (cols) {
-	return this.replace(/^|\n/g, "$&" + " ".repeat(cols));
-};
-
 global.camelize = function (str) {
     return str.replace(/(?:^|-)(.)/g, function (_, x) {
         return x.toUpperCase();

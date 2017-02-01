@@ -97,7 +97,8 @@ public class RasterLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(rasterOpacity(0.3f));
-    assertEquals((Float) layer.getRasterOpacity().getValue(), (Float) 0.3f);
+    assertEquals((Float) layer.getRasterOpacity().getValue(),
+                 (Float) 0.3f);
   }
 
   @Test
@@ -119,7 +120,8 @@ public class RasterLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(rasterHueRotate(0.3f));
-    assertEquals((Float) layer.getRasterHueRotate().getValue(), (Float) 0.3f);
+    assertEquals((Float) layer.getRasterHueRotate().getValue(),
+                 (Float) 0.3f);
   }
 
   @Test
@@ -141,7 +143,8 @@ public class RasterLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(rasterBrightnessMin(0.3f));
-    assertEquals((Float) layer.getRasterBrightnessMin().getValue(), (Float) 0.3f);
+    assertEquals((Float) layer.getRasterBrightnessMin().getValue(),
+                 (Float) 0.3f);
   }
 
   @Test
@@ -163,7 +166,8 @@ public class RasterLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(rasterBrightnessMax(0.3f));
-    assertEquals((Float) layer.getRasterBrightnessMax().getValue(), (Float) 0.3f);
+    assertEquals((Float) layer.getRasterBrightnessMax().getValue(),
+                 (Float) 0.3f);
   }
 
   @Test
@@ -185,7 +189,8 @@ public class RasterLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(rasterSaturation(0.3f));
-    assertEquals((Float) layer.getRasterSaturation().getValue(), (Float) 0.3f);
+    assertEquals((Float) layer.getRasterSaturation().getValue(),
+                 (Float) 0.3f);
   }
 
   @Test
@@ -207,7 +212,8 @@ public class RasterLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(rasterContrast(0.3f));
-    assertEquals((Float) layer.getRasterContrast().getValue(), (Float) 0.3f);
+    assertEquals((Float) layer.getRasterContrast().getValue(),
+                 (Float) 0.3f);
   }
 
   @Test
@@ -229,7 +235,8 @@ public class RasterLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(rasterFadeDuration(0.3f));
-    assertEquals((Float) layer.getRasterFadeDuration().getValue(), (Float) 0.3f);
+    assertEquals((Float) layer.getRasterFadeDuration().getValue(),
+                 (Float) 0.3f);
   }
 
 

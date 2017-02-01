@@ -99,7 +99,8 @@ public class FillLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(fillAntialias(true));
-    assertEquals((Boolean) layer.getFillAntialias().getValue(), (Boolean) true);
+    assertEquals((Boolean) layer.getFillAntialias().getValue(),
+                 (Boolean) true);
   }
 
   @Test
@@ -121,7 +122,8 @@ public class FillLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(fillOpacity(0.3f));
-    assertEquals((Float) layer.getFillOpacity().getValue(), (Float) 0.3f);
+    assertEquals((Float) layer.getFillOpacity().getValue(),
+                 (Float) 0.3f);
   }
 
   @Test
@@ -143,7 +145,8 @@ public class FillLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(fillColor("rgba(0, 0, 0, 1)"));
-    assertEquals((String) layer.getFillColor().getValue(), (String) "rgba(0, 0, 0, 1)");
+    assertEquals((String) layer.getFillColor().getValue(),
+                 (String) "rgba(0, 0, 0, 1)");
   }
 
   @Test
@@ -187,7 +190,8 @@ public class FillLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(fillOutlineColor("rgba(0, 0, 0, 1)"));
-    assertEquals((String) layer.getFillOutlineColor().getValue(), (String) "rgba(0, 0, 0, 1)");
+    assertEquals((String) layer.getFillOutlineColor().getValue(),
+                 (String) "rgba(0, 0, 0, 1)");
   }
 
   @Test
@@ -231,7 +235,8 @@ public class FillLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(fillTranslate(new Float[] {0f, 0f}));
-    assertEquals((Float[]) layer.getFillTranslate().getValue(), (Float[]) new Float[] {0f, 0f});
+    assertEquals((Float[]) layer.getFillTranslate().getValue(),
+                 (Float[]) new Float[] {0f, 0f});
   }
 
   @Test
@@ -253,7 +258,8 @@ public class FillLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(fillTranslateAnchor(FILL_TRANSLATE_ANCHOR_MAP));
-    assertEquals((String) layer.getFillTranslateAnchor().getValue(), (String) FILL_TRANSLATE_ANCHOR_MAP);
+    assertEquals((String) layer.getFillTranslateAnchor().getValue(),
+                 (String) FILL_TRANSLATE_ANCHOR_MAP);
   }
 
   @Test
@@ -275,7 +281,8 @@ public class FillLayerTest extends BaseStyleTest {
 
     // Set and Get
     layer.setProperties(fillPattern("pedestrian-polygon"));
-    assertEquals((String) layer.getFillPattern().getValue(), (String) "pedestrian-polygon");
+    assertEquals((String) layer.getFillPattern().getValue(),
+                 (String) "pedestrian-polygon");
   }
 
 
