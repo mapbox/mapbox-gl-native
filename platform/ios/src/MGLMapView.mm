@@ -1528,8 +1528,18 @@ public:
     if (doubleTap.state == UIGestureRecognizerStateEnded)
     {
         MGLMapCamera *oldCamera = self.camera;
+        
+        mbgl::EdgeInsets padding = MGLEdgeInsetsFromNSEdgeInsets(self.contentInset);
+        mbgl::CameraOptions currentCameraOptions = _mbglMap->getCameraOptions(padding);
+        double zoom = 0.0;
+        if (currentCameraOptions.zoom) {
+            zoom = *currentCameraOptions.zoom + 1.0;
+        }
+        currentCameraOptions.zoom = mbgl::util::clamp(zoom, self.minimumZoomLevel, self.maximumZoomLevel);
+        MGLMapCamera *zoomInCamera = [self cameraForCameraOptions:currentCameraOptions];
+        
         if ([self.delegate respondsToSelector:@selector(mapView:shouldChangeFromCamera:toCamera:)]
-            && ![self.delegate mapView:self shouldChangeFromCamera:oldCamera toCamera:self.camera])
+            && ![self.delegate mapView:self shouldChangeFromCamera:oldCamera toCamera:zoomInCamera])
         {
             self.camera = oldCamera;
         } else {
@@ -1565,8 +1575,18 @@ public:
     else if (twoFingerTap.state == UIGestureRecognizerStateEnded)
     {
         MGLMapCamera *oldCamera = self.camera;
+        
+        mbgl::EdgeInsets padding = MGLEdgeInsetsFromNSEdgeInsets(self.contentInset);
+        mbgl::CameraOptions currentCameraOptions = _mbglMap->getCameraOptions(padding);
+        double zoom = 0.0;
+        if (currentCameraOptions.zoom) {
+            zoom = *currentCameraOptions.zoom - 1.0;
+        }
+        currentCameraOptions.zoom = mbgl::util::clamp(zoom, self.minimumZoomLevel, self.maximumZoomLevel);
+        MGLMapCamera *zoomOutCamera = [self cameraForCameraOptions:currentCameraOptions];
+        
         if ([self.delegate respondsToSelector:@selector(mapView:shouldChangeFromCamera:toCamera:)]
-            && ![self.delegate mapView:self shouldChangeFromCamera:oldCamera toCamera:self.camera])
+            && ![self.delegate mapView:self shouldChangeFromCamera:oldCamera toCamera:zoomOutCamera])
         {
             self.camera = oldCamera;
         } else {
