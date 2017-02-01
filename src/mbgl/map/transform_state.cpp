@@ -234,6 +234,26 @@ bool TransformState::isGestureInProgress() const {
 }
 
 
+# pragma mark – Light 
+// TODO move elsewhere
+std::array<float, 3> TransformState::getLightPosition() const {
+    return {{ 1.15, 210, 30 }};
+    // TODO i'm faking this with all defaults
+}
+
+Color TransformState::getLightColor() const {
+    return Color::white();
+    // TODO i'm faking this with all defaults
+}
+
+float TransformState::getLightIntensity() const {
+    return 0.5;
+    // TODO i'm faking this with all defaults
+}
+
+// TODO also light anchor
+
+
 #pragma mark - Projection
 
 double TransformState::zoomScale(double zoom) const {

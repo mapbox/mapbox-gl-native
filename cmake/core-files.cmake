@@ -139,6 +139,10 @@ set(MBGL_CORE_FILES
     src/mbgl/programs/collision_box_program.cpp
     src/mbgl/programs/collision_box_program.hpp
     src/mbgl/programs/debug_program.hpp
+    src/mbgl/programs/extrusion_texture_program.cpp
+    src/mbgl/programs/extrusion_texture_program.hpp
+    src/mbgl/programs/fill_extrusion_program.cpp
+    src/mbgl/programs/fill_extrusion_program.hpp
     src/mbgl/programs/fill_program.cpp
     src/mbgl/programs/fill_program.hpp
     src/mbgl/programs/line_program.cpp
@@ -162,6 +166,8 @@ set(MBGL_CORE_FILES
     src/mbgl/renderer/debug_bucket.hpp
     src/mbgl/renderer/fill_bucket.cpp
     src/mbgl/renderer/fill_bucket.hpp
+    src/mbgl/renderer/fill_extrusion_bucket.cpp
+    src/mbgl/renderer/fill_extrusion_bucket.hpp
     src/mbgl/renderer/frame_history.cpp
     src/mbgl/renderer/frame_history.hpp
     src/mbgl/renderer/group_by_layout.cpp
@@ -176,6 +182,7 @@ set(MBGL_CORE_FILES
     src/mbgl/renderer/painter_clipping.cpp
     src/mbgl/renderer/painter_debug.cpp
     src/mbgl/renderer/painter_fill.cpp
+    src/mbgl/renderer/painter_fill_extrusion.cpp
     src/mbgl/renderer/painter_line.cpp
     src/mbgl/renderer/painter_raster.cpp
     src/mbgl/renderer/painter_symbol.cpp

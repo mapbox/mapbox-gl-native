@@ -1,6 +1,7 @@
 #pragma once
 
 #include <mbgl/map/mode.hpp>
+#include <mbgl/util/color.hpp>
 #include <mbgl/util/geo.hpp>
 #include <mbgl/util/geometry.hpp>
 #include <mbgl/util/constants.hpp>
@@ -73,6 +74,11 @@ public:
     bool isScaling() const;
     bool isPanning() const;
     bool isGestureInProgress() const;
+
+    // Light TODO may move this elsewhere
+    std::array<float, 3> getLightPosition() const;
+    Color getLightColor() const;
+    float getLightIntensity() const;
 
     // Conversion
     ScreenCoordinate latLngToScreenCoordinate(const LatLng&) const;
