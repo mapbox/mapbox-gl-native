@@ -4,6 +4,7 @@
 #include <QSqlError>
 #include <QSqlQuery>
 #include <QStringList>
+#include <QThread>
 #include <QVariant>
 
 #include <cassert>
@@ -52,10 +53,16 @@ void checkDatabaseError(const QSqlDatabase &db) {
 class DatabaseImpl {
 public:
     DatabaseImpl(const char* filename, int flags) {
+        static uint64_t count = 0;
+        const QString connectionName = QString::number(uint64_t(QThread::currentThread())) + QString::number(count++);
+
         if (!QSqlDatabase::drivers().contains("QSQLITE")) {
             throw Exception { Exception::Code::CANTOPEN, "SQLite driver not found." };
         }
-        db.reset(new QSqlDatabase(QSqlDatabase::addDatabase("QSQLITE", QString::number(qrand()))));
+
+        assert(!QSqlDatabase::contains(connectionName));
+        db.reset(new QSqlDatabase(QSqlDatabase::addDatabase("QSQLITE", connectionName)));
+
         QString connectOptions = db->connectOptions();
         if (flags & OpenFlag::ReadOnly) {
             if (!connectOptions.isEmpty()) connectOptions.append(';');
