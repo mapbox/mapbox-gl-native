@@ -46,7 +46,7 @@ workflows:
             brew install cmake
             brew unlink node
             brew install awscli node@4
-            brew link node@4
+            brew link node@4 --force
             gem install xcpretty --no-rdoc --no-ri
             make node
     - script:
