@@ -82,6 +82,10 @@ StyleParseResult Parser::parse(const std::string& json) {
         }
     }
 
+    if (document.HasMember("light")) {
+        parseLight(document["light"]);
+    }
+
     if (document.HasMember("sources")) {
         parseSources(document["sources"]);
     }
@@ -105,6 +109,18 @@ StyleParseResult Parser::parse(const std::string& json) {
     }
 
     return nullptr;
+}
+
+void Parser::parseLight(const JSValue& value) {
+    if (!value.IsObject()) {
+        Log::Warning(Event::ParseStyle, "light must be an object");
+        return;
+    }
+
+//    for (const auto& property : value.GetObject()) {
+////        std::string id = *conversion::toString(property.name);
+//// TODO let there be light how
+//    }
 }
 
 void Parser::parseSources(const JSValue& value) {

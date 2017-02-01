@@ -26,11 +26,6 @@ template <class> class Faded;
 
 namespace uniforms {
 MBGL_DEFINE_UNIFORM_SCALAR(Size,     u_world);
-MBGL_DEFINE_UNIFORM_SCALAR(float,    u_scale_a);
-MBGL_DEFINE_UNIFORM_SCALAR(float,    u_scale_b);
-MBGL_DEFINE_UNIFORM_SCALAR(float,    u_tile_units_to_pixels);
-MBGL_DEFINE_UNIFORM_VECTOR(float, 2, u_pixel_coord_upper);
-MBGL_DEFINE_UNIFORM_VECTOR(float, 2, u_pixel_coord_lower);
 } // namespace uniforms
 
 struct FillLayoutAttributes : gl::Attributes<

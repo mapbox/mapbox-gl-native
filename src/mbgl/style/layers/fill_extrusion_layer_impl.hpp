@@ -18,6 +18,14 @@ public:
 
     std::unique_ptr<Bucket> createBucket(const BucketParameters&, const std::vector<const Layer*>&) const override;
 
+    // TODO:
+    float getQueryRadius() const override;
+    bool queryIntersectsGeometry(
+            const GeometryCoordinates& queryGeometry,
+            const GeometryCollection& geometry,
+            const float bearing,
+            const float pixelsToTileUnits) const override;
+
     FillExtrusionPaintProperties paint;
 };
 
