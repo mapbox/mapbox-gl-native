@@ -460,7 +460,6 @@ SOURCES += \
     platform/default/mbgl/util/default_thread_pool.cpp \
     platform/default/online_file_source.cpp \
     platform/qt/src/async_task.cpp \
-    platform/qt/src/bidi.cpp \
     platform/qt/src/http_file_source.cpp \
     platform/qt/src/http_request.cpp \
     platform/qt/src/image.cpp \
@@ -578,3 +577,13 @@ qtConfig(system-zlib) {
 
 # QTBUG-59035
 TR_EXCLUDE += $$PWD/*
+
+qtConfig(icu) {
+    include(icu_dependency.pri)
+
+    SOURCES += \
+        platform/default/src/bidi.cpp
+} else {
+    SOURCES += \
+        platform/qt/src/bidi.cpp
+}
