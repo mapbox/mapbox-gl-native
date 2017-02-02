@@ -69,6 +69,9 @@ NS_ASSUME_NONNULL_BEGIN
  called in response to a programmatic camera change, such as by setting the
  `centerCoordinate` property or calling `-flyToCamera:completionHandler:`.
  
+ This method is called many times during gesturing, so you should avoid performing 
+ complex or performance-intensive tasks in your implementation.
+ 
  @param mapView The map view that the user is manipulating.
  @param oldCamera The camera representing the viewpoint at the moment the
     gesture is recognized. If this method returns `NO`, the map view’s camera
