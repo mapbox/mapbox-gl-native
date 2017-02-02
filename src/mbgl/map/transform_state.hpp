@@ -77,7 +77,7 @@ public:
 
     // Light TODO may move this elsewhere
     std::array<float, 3> getLightPosition() const;
-    Color getLightColor() const;
+    std::array<float, 3> getLightColor() const;
     float getLightIntensity() const;
 
     // Conversion

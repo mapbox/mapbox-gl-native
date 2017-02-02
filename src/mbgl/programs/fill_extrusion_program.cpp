@@ -22,7 +22,6 @@ namespace mbgl {
         int32_t tileSizeAtNearestZoom = util::tileSize * state.zoomScale(state.getIntegerZoom() - tileID.canonical.z);
         int32_t pixelX = tileSizeAtNearestZoom * (tileID.canonical.x + tileID.wrap * state.zoomScale(tileID.canonical.z));
         int32_t pixelY = tileSizeAtNearestZoom * tileID.canonical.y;
-        Color lightColor = state.getLightColor();
 
         return FillExtrusionPatternUniforms::Values {
             uniforms::u_matrix::Value{ matrix },
@@ -40,7 +39,7 @@ namespace mbgl {
             uniforms::u_pixel_coord_lower::Value{ std::array<float, 2> {{ float(pixelX & 0xFFFF), float(pixelY & 0xFFFF) }} },
             uniforms::u_tile_units_to_pixels::Value{ 1.0f / tileID.pixelsToTileUnits(1.0f, state.getIntegerZoom()) },
             uniforms::u_height_factor::Value{ heightFactor }, // float
-            uniforms::u_lightcolor::Value{{{ lightColor.r, lightColor.g, lightColor.b }}}, // TODO these are all just standins until we implement light more fully
+            uniforms::u_lightcolor::Value{ state.getLightColor() }, // TODO these are all just standins until we implement light more fully
             uniforms::u_lightpos::Value{ state.getLightPosition() },
             uniforms::u_lightintensity::Value{ state.getLightIntensity() },
         };

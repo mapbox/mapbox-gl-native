@@ -12,6 +12,7 @@
 #include <mbgl/programs/debug_program.hpp>
 #include <mbgl/programs/program_parameters.hpp>
 #include <mbgl/programs/fill_program.hpp>
+#include <mbgl/programs/extrusion_texture_program.hpp>
 #include <mbgl/programs/raster_program.hpp>
 
 #include <mbgl/style/style.hpp>
@@ -37,6 +38,7 @@ class Tile;
 
 class DebugBucket;
 class FillBucket;
+class FillExtrusionBucket;
 class LineBucket;
 class CircleBucket;
 class SymbolBucket;
@@ -51,6 +53,7 @@ namespace style {
 class Style;
 class Source;
 class FillLayer;
+class FillExtrusionLayer;
 class LineLayer;
 class CircleLayer;
 class SymbolLayer;
@@ -81,6 +84,7 @@ public:
     void renderClippingMask(const UnwrappedTileID&, const ClipID&);
     void renderTileDebug(const RenderTile&);
     void renderFill(PaintParameters&, FillBucket&, const style::FillLayer&, const RenderTile&);
+    void renderFillExtrusion(PaintParameters&, FillExtrusionBucket&, const style::FillExtrusionLayer&, const RenderTile&);
     void renderLine(PaintParameters&, LineBucket&, const style::LineLayer&, const RenderTile&);
     void renderCircle(PaintParameters&, CircleBucket&, const style::CircleLayer&, const RenderTile&);
     void renderSymbol(PaintParameters&, SymbolBucket&, const style::SymbolLayer&, const RenderTile&);
@@ -160,6 +164,7 @@ private:
 
     gl::VertexBuffer<FillLayoutVertex> tileVertexBuffer;
     gl::VertexBuffer<RasterLayoutVertex> rasterVertexBuffer;
+    gl::VertexBuffer<ExtrusionTextureLayoutVertex> extrusionTextureVertexBuffer;
 
     gl::IndexBuffer<gl::Triangles> tileTriangleIndexBuffer;
     gl::IndexBuffer<gl::LineStrip> tileBorderIndexBuffer;

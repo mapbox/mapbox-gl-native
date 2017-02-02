@@ -37,6 +37,15 @@ style::FillExtrusionPaintProperties>
 {
 public:
     using Program::Program;
+
+    static LayoutVertex layoutVertex(Point<int16_t> p) {
+        return LayoutVertex {
+            {{
+                p.x,
+                p.y
+            }}
+        };
+    }
 };
 
 using ExtrusionTextureLayoutVertex = ExtrusionTextureProgram::LayoutVertex;

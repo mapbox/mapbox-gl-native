@@ -79,6 +79,21 @@ static gl::VertexVector<RasterLayoutVertex> rasterVertices() {
     return result;
 }
 
+static gl::VertexVector<ExtrusionTextureLayoutVertex>
+extrusionTextureVertices(const TransformState& state) {
+    gl::VertexVector<ExtrusionTextureLayoutVertex> result;
+    result.emplace_back(ExtrusionTextureProgram::layoutVertex({ 0, 0 }));
+    result.emplace_back(
+        ExtrusionTextureProgram::layoutVertex({ static_cast<int16_t>(state.getSize().width), 0 }));
+    result.emplace_back(
+        ExtrusionTextureProgram::layoutVertex({ 0, static_cast<int16_t>(state.getSize().height) }));
+    result.emplace_back(
+        ExtrusionTextureProgram::layoutVertex({ static_cast<int16_t>(state.getSize().width),
+                                                static_cast<short>(state.getSize().height) }));
+    return result;
+}
+
+
 Painter::Painter(gl::Context& context_,
                  const TransformState& state_,
                  float pixelRatio,
@@ -87,6 +102,7 @@ Painter::Painter(gl::Context& context_,
       state(state_),
       tileVertexBuffer(context.createVertexBuffer(tileVertices())),
       rasterVertexBuffer(context.createVertexBuffer(rasterVertices())),
+      extrusionTextureVertexBuffer(context.createVertexBuffer(extrusionTextureVertices(state_))),
       tileTriangleIndexBuffer(context.createIndexBuffer(tileTriangleIndices())),
       tileBorderIndexBuffer(context.createIndexBuffer(tileLineStripIndices())) {
 

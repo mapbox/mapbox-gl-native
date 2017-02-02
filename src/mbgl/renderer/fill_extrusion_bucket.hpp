@@ -12,32 +12,31 @@
 
 namespace mbgl {
 
-    namespace style {
-        class BucketParameters;
-    } // namespace style
+namespace style {
+class BucketParameters;
+} // namespace style
 
-    class FillExtrusionBucket : public Bucket {
-    public:
-        FillExtrusionBucket(const style::BucketParameters&, const std::vector<const style::Layer*>&);
+class FillExtrusionBucket : public Bucket {
+public:
+    FillExtrusionBucket(const style::BucketParameters&, const std::vector<const style::Layer*>&);
 
-        void addFeature(const GeometryTileFeature&,
-                        const GeometryCollection&) override;
-        bool hasData() const override;
+    void addFeature(const GeometryTileFeature&,
+                    const GeometryCollection&) override;
+    bool hasData() const override;
 
-        void upload(gl::Context&) override;
-        void render(Painter&, PaintParameters&, const style::Layer&, const RenderTile&) override;
+    void upload(gl::Context&) override;
+    void render(Painter&, PaintParameters&, const style::Layer&, const RenderTile&) override;
 
-        gl::VertexVector<FillExtrusionLayoutVertex> vertices;
-        gl::IndexVector<gl::Lines> lines;
-        gl::IndexVector<gl::Triangles> triangles;
-        gl::SegmentVector<FillExtrusionAttributes> lineSegments;
-        gl::SegmentVector<FillExtrusionAttributes> triangleSegments;
+    gl::VertexVector<FillExtrusionLayoutVertex> vertices;
+    gl::IndexVector<gl::Triangles> triangles;
+    gl::SegmentVector<FillExtrusionAttributes> triangleSegments;
 
-        optional<gl::VertexBuffer<FillExtrusionLayoutVertex>> vertexBuffer;
-        optional<gl::IndexBuffer<gl::Lines>> lineIndexBuffer;
-        optional<gl::IndexBuffer<gl::Triangles>> triangleIndexBuffer;
-        
-        std::unordered_map<std::string, FillExtrusionProgram::PaintPropertyBinders> paintPropertyBinders;
-    };
+    optional<gl::VertexBuffer<FillExtrusionLayoutVertex>> vertexBuffer;
+    optional<gl::IndexBuffer<gl::Triangles>> indexBuffer;
     
+    std::unordered_map<std::string, FillExtrusionProgram::PaintPropertyBinders> paintPropertyBinders;
+};
+
+bool isBoundaryEdge(const Point<int16_t>&, const Point<int16_t>&);
+
 } // namespace mbgl
