@@ -1390,7 +1390,15 @@ void QMapboxGL::addLayer(const QVariantMap &params)
 }
 
 /*!
-    Removes the layer \a id.
+    Returns true if the layer with given \a id exists, false otherwise.
+*/
+bool QMapboxGL::layerExists(const QString& id)
+{
+    return !!d_ptr->mapObj->getLayer(id.toStdString());
+}
+
+/*!
+    Removes the layer with given \a id.
 */
 void QMapboxGL::removeLayer(const QString& id)
 {
