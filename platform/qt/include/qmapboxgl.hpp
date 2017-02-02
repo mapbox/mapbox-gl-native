@@ -221,6 +221,7 @@ public:
         void* context,
         char* before = NULL);
     void addLayer(const QVariantMap &params);
+    bool layerExists(const QString &id);
     void removeLayer(const QString &id);
 
     void setFilter(const QString &layer, const QVariant &filter);
