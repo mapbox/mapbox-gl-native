@@ -241,8 +241,9 @@ std::array<float, 3> TransformState::getLightPosition() const {
     // TODO i'm faking this with all defaults
 }
 
-Color TransformState::getLightColor() const {
-    return Color::white();
+std::array<float, 3> TransformState::getLightColor() const {
+    const auto &white = Color::white();
+    return {{ white.r, white.g, white.b }};
     // TODO i'm faking this with all defaults
 }
 
