@@ -1,4 +1,4 @@
-#User Interactions in the Mapbox iOS SDK
+# User Interactions in the Mapbox iOS SDK
 
 The Mapbox iOS SDK provides a set of built-in gesture recognizers to developers. These interactions can be customized to fit your use case. You see what gesture recognizers are on your `MGLMapView` by accessing the `gestureRecognizers` property on your map.
 
@@ -25,7 +25,7 @@ These properties are built in ways to enable or disable a set of gesture recogni
 |Two Finger Drag | `handleTwoFingerDragGesture:` | Adjusts the pitch of the `MGLMapView` | `pitchEnabled` |
 |"Quick Zoom" |`handleQuickZoomGesture:` |Tap twice. On second tap, hold your finger on the map and pan up to zoom in, or down to zoom out | `zoomEnabled`|
 
-![quick zoom](img/user-interaction/quickzoom.gif) ![rotation](img/user-interaction/RotateSydney.gif) 
+![quick zoom](img/user-interaction/quickzoom.gif) ![rotation](img/user-interaction/RotateSydney.gif)
 
 ## Adding custom gesture recognizers
 
@@ -42,3 +42,5 @@ for recognizer in mapView.gestureRecognizers! where recognizer is UITapGestureRe
 mapView.addGestureRecognizer(mapTapGestureRecognizer)`
 
 If you would like to disable a specific set of gesture recognizers, such as zoom, you can set the Boolean value for the appropriate property to `false`. You can then add your own gesture recognizers to perform those actions.
+
+With [runtime styling](runtime-styling.html), you can also use user interactions to style the map!
