@@ -367,13 +367,7 @@ private: // Private utilities for converting from mgl to mbgl values
         }];
         mbgl::style::CategoricalStops<MBGLType> categoricalStops = {stops};
         mbgl::style::SourceFunction<MBGLType> sourceFunction = {sourceStyleFunction.attributeName.UTF8String, categoricalStops};
-        if (sourceStyleFunction.defaultValue) {
-            NSCAssert([sourceStyleFunction.defaultValue isKindOfClass:[MGLStyleConstantValue class]], @"Default value must be constant");
-            MBGLType mbglValue;
-            id mglValue = [(MGLStyleConstantValue<ObjCType> *)sourceStyleFunction.defaultValue rawValue];
-            getMBGLValue(mglValue, mbglValue);
-            sourceFunction.defaultValue = mbglValue;
-        }
+        setDefaultMBGLValue(sourceStyleFunction, sourceFunction);
         return sourceFunction;
     }
 
@@ -387,13 +381,7 @@ private: // Private utilities for converting from mgl to mbgl values
         }];
         mbgl::style::ExponentialStops<MBGLType> exponentialStops = {stops, (float)sourceStyleFunction.interpolationBase};
         mbgl::style::SourceFunction<MBGLType> sourceFunction = {sourceStyleFunction.attributeName.UTF8String, exponentialStops};
-        if (sourceStyleFunction.defaultValue) {
-            NSCAssert([sourceStyleFunction.defaultValue isKindOfClass:[MGLStyleConstantValue class]], @"Default value must be constant");
-            MBGLType mbglValue;
-            id mglValue = [(MGLStyleConstantValue<ObjCType> *)sourceStyleFunction.defaultValue rawValue];
-            getMBGLValue(mglValue, mbglValue);
-            sourceFunction.defaultValue = mbglValue;
-        }
+        setDefaultMBGLValue(sourceStyleFunction, sourceFunction);
         return sourceFunction;
     }
 
@@ -407,6 +395,18 @@ private: // Private utilities for converting from mgl to mbgl values
         }];
         mbgl::style::IntervalStops<MBGLType> intervalStops = {stops};
         mbgl::style::SourceFunction<MBGLType> sourceFunction = {sourceStyleFunction.attributeName.UTF8String, intervalStops};
+        setDefaultMBGLValue(sourceStyleFunction, sourceFunction);
+        return sourceFunction;
+    }
+
+    mbgl::style::SourceFunction<MBGLType> toMBGLIdentitySourceFunction(MGLSourceStyleFunction<ObjCType> *sourceStyleFunction) {
+        mbgl::style::IdentityStops<MBGLType> identityStops;
+        mbgl::style::SourceFunction<MBGLType> sourceFunction = {sourceStyleFunction.attributeName.UTF8String, identityStops};
+        setDefaultMBGLValue(sourceStyleFunction, sourceFunction);
+        return sourceFunction;
+    }
+
+    void setDefaultMBGLValue(MGLSourceStyleFunction<ObjCType> *sourceStyleFunction, mbgl::style::SourceFunction<MBGLType> &sourceFunction) {
         if (sourceStyleFunction.defaultValue) {
             NSCAssert([sourceStyleFunction.defaultValue isKindOfClass:[MGLStyleConstantValue class]], @"Default value must be constant");
             MBGLType mbglValue;
@@ -414,13 +414,6 @@ private: // Private utilities for converting from mgl to mbgl values
             getMBGLValue(mglValue, mbglValue);
             sourceFunction.defaultValue = mbglValue;
         }
-        return sourceFunction;
-    }
-
-    mbgl::style::SourceFunction<MBGLType> toMBGLIdentitySourceFunction(MGLSourceStyleFunction<ObjCType> *sourceStyleFunction) {
-        mbgl::style::IdentityStops<MBGLType> identityStops;
-        mbgl::style::SourceFunction<MBGLType> sourceFunction = {sourceStyleFunction.attributeName.UTF8String, identityStops};
-        return sourceFunction;
     }
 
     // Bool
@@ -638,9 +631,13 @@ private: // Private utilities for converting from mbgl to mgl values
         }
 
         id operator()(const mbgl::style::IdentityStops<MBGLType> &mbglStops) {
-            return [MGLSourceStyleFunction functionWithInterpolationMode:MGLInterpolationModeIdentity
-                                                          stops:nil
-                                                  attributeName:@(mbglFunction.property.c_str()) options:nil];
+            MGLSourceStyleFunction *sourceFunction = [MGLSourceStyleFunction functionWithInterpolationMode:MGLInterpolationModeIdentity
+                                                                                                     stops:nil
+                                                                                             attributeName:@(mbglFunction.property.c_str()) options:nil];
+            if (mbglFunction.defaultValue) {
+                sourceFunction.defaultValue = [MGLStyleValue valueWithRawValue:toMGLRawStyleValue(*mbglFunction.defaultValue)];
+            }
+            return sourceFunction;
         }
 
         const mbgl::style::SourceFunction<MBGLType> &mbglFunction;
