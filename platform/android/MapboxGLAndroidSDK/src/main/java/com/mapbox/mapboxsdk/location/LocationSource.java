@@ -20,7 +20,7 @@ import com.mapzen.android.lost.api.LostApiClient;
  * {@link #addLocationEngineListener(LocationEngineListener)} to receive
  * location updates.</li>
  * <li> You can unregister a {@link LocationEngineListener} with
- * {@link #removeLocationEngineListener(LocationEngineListener)}.</li>
+ * {@link #removeLocationEngineListener(LocationEngineListener)} to stop receiving location updates.</li>
  * </ul>
  * <p>
  * Note: If registering a listener in your Activity.onStart() implementation, you should unregister it in
