@@ -27,6 +27,18 @@ if(IS_CI_BUILD)
     add_compile_options(-DCI_BUILD=1)
 endif()
 
+if(EXISTS ${CMAKE_SOURCE_DIR}/.git/HEAD)
+    exec_program(
+        "git"
+        ${CMAKE_SOURCE_DIR}
+        ARGS "rev-parse --short=8 HEAD"
+        OUTPUT_VARIABLE MBGL_VERSION_REV )
+else()
+    set(MBGL_VERSION_REV 00000000)
+endif()
+
+set_source_files_properties(src/mbgl/util/version.cpp PROPERTIES COMPILE_DEFINITIONS MBGL_VERSION_REV="${MBGL_VERSION_REV}")
+
 mason_use(geometry VERSION 0.9.0 HEADER_ONLY)
 mason_use(variant VERSION 1.1.4 HEADER_ONLY)
 mason_use(unique_resource VERSION dev HEADER_ONLY)

@@ -4,7 +4,6 @@
 
 #include <mbgl/util/http_header.hpp>
 #include <mbgl/util/async_task.hpp>
-
 #include <mbgl/util/version.hpp>
 
 #import <Foundation/Foundation.h>
@@ -133,8 +132,8 @@ NSString *HTTPFileSource::Impl::getUserAgent() const {
 
     // Avoid %s here because it inserts hidden bidirectional markers on macOS when the system
     // language is set to a right-to-left language.
-    [userAgentComponents addObject:[NSString stringWithFormat:@"MapboxGL/%@ (%@)",
-                                    CFSTR(MBGL_VERSION_STRING), CFSTR(MBGL_VERSION_REV)]];
+    [userAgentComponents addObject:[NSString stringWithFormat:@"MapboxGL/0.0.0 (%@)",
+                                    @(mbgl::version::revision)]];
 
     NSString *systemName = @"Darwin";
 #if TARGET_OS_IPHONE

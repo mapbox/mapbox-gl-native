@@ -10,8 +10,6 @@ if (NOT MASON_PLATFORM)
     set(MASON_PLATFORM "${MBGL_PLATFORM}")
 endif()
 
-set(MBGL_GENERATED ${CMAKE_BINARY_DIR}/generated/${CMAKE_CFG_INTDIR})
-
 if(NOT EXISTS ${CMAKE_SOURCE_DIR}/node_modules/node-cmake/FindNodeJS.cmake)
     message(FATAL_ERROR "Can't find node-cmake")
 endif()
