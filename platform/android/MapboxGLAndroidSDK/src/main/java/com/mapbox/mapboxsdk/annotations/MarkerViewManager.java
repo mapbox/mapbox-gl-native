@@ -475,7 +475,10 @@ public class MarkerViewManager {
      * </p>
      */
     public void invalidateViewMarkersInVisibleRegion() {
-        RectF mapViewRect = new RectF(0, 0, mapView.getWidth(), mapView.getHeight());
+        //MAPPY: change to hide the marker with the padding
+        int[] padding = mapboxMap.getPadding();
+        RectF mapViewRect = new RectF(padding[0], padding[1], mapView.getWidth() - padding[2], mapView.getHeight() - padding[3]);
+
         List<MarkerView> markers = mapView.getMarkerViewsInRect(mapViewRect);
         View convertView;
 

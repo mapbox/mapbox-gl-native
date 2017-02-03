@@ -303,7 +303,7 @@ public class MyLocationView extends View {
         // draw circle
         canvas.drawCircle(0, 0, accuracyPixels, accuracyPaint);
 
-        if (myBearingTrackingMode == MyBearingTracking.NONE) {
+        if (myBearingTrackingMode == MyBearingTracking.NONE || !compassListener.isSensorAvailable()) {
             draw(canvas, foregroundDrawable, backgroundDrawable);
         } else {
             draw(canvas, foregroundBearingDrawable, backgroundBearingDrawable);
@@ -311,7 +311,7 @@ public class MyLocationView extends View {
     }
 
     public RectF getDrawRect() {
-        if (myBearingTrackingMode == MyBearingTracking.NONE) {
+        if (myBearingTrackingMode == MyBearingTracking.NONE || !compassListener.isSensorAvailable()) {
             drawRect.set(foregroundDrawable.getBounds());
         } else {
             drawRect.set(foregroundBearingDrawable.getBounds());
@@ -380,7 +380,8 @@ public class MyLocationView extends View {
 
     public void onResume() {
         if (isEnabled()) {
-            if (myBearingTrackingMode == MyBearingTracking.COMPASS) {
+            if (myBearingTrackingMode == MyBearingTracking.COMPASS
+                    && compassListener.isSensorAvailable()) {
                 compassListener.onResume();
             }
             toggleGps(true);
@@ -438,7 +439,8 @@ public class MyLocationView extends View {
 
         if (enabled) {
             setVisibility(View.VISIBLE);
-            if (myBearingTrackingMode == MyBearingTracking.COMPASS) {
+            if (myBearingTrackingMode == MyBearingTracking.COMPASS
+                    && compassListener.isSensorAvailable()) {
                 compassListener.onResume();
             } else {
                 compassListener.onPause();
@@ -514,7 +516,8 @@ public class MyLocationView extends View {
 
     public void setMyBearingTrackingMode(@MyBearingTracking.Mode int myBearingTrackingMode) {
         this.myBearingTrackingMode = myBearingTrackingMode;
-        if (myBearingTrackingMode == MyBearingTracking.COMPASS) {
+        if (myBearingTrackingMode == MyBearingTracking.COMPASS
+                && compassListener.isSensorAvailable()) {
             compassListener.onResume();
         } else {
             compassListener.onPause();
@@ -623,6 +626,10 @@ public class MyLocationView extends View {
 
         public void onResume() {
             sensorManager.registerListener(this, rotationVectorSensor, SensorManager.SENSOR_DELAY_NORMAL);
+        }
+
+        public boolean isSensorAvailable() {
+            return rotationVectorSensor != null;
         }
 
         public void onPause() {
