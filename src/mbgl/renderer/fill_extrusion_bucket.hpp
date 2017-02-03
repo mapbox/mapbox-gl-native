@@ -8,8 +8,6 @@
 #include <mbgl/programs/fill_extrusion_program.hpp>
 #include <mbgl/style/layers/fill_extrusion_layer_properties.hpp>
 
-#include <vector>
-
 namespace mbgl {
 
 namespace style {
