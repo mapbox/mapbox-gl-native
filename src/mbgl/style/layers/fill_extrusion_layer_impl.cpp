@@ -4,7 +4,6 @@
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/intersection_tests.hpp>
 
-
 namespace mbgl {
 namespace style {
 
@@ -20,10 +19,8 @@ bool FillExtrusionLayer::Impl::evaluate(const PropertyEvaluationParameters& para
     return paint.hasTransition();
 }
 
-std::unique_ptr<Bucket> FillExtrusionLayer::Impl::createBucket(const BucketParameters&, const std::vector<const Layer*>&) const {
-    return nullptr;
-    // TODOf
-//    return std::make_unique<FillExtrusionBucket>(parameters, layers);
+std::unique_ptr<Bucket> FillExtrusionLayer::Impl::createBucket(const BucketParameters& parameters, const std::vector<const Layer*>& layers) const {
+    return std::make_unique<FillExtrusionBucket>(parameters, layers);
 }
 
 float FillExtrusionLayer::Impl::getQueryRadius() const {

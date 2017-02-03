@@ -33,7 +33,7 @@ void Painter::renderFillExtrusion(PaintParameters& parameters,
                          context,
                          gl::Triangles(),
                          depthModeForSublayer(0, gl::DepthMode::ReadWrite),
-                         stencilModeForClipping(tile.clip),
+                         gl::StencilMode::disabled(),
                          colorModeForRenderPass(),
                          FillExtrusionProgram::UniformValues {
                              uniforms::u_matrix::Value{
@@ -41,7 +41,7 @@ void Painter::renderFillExtrusion(PaintParameters& parameters,
                                                        properties.get<FillExtrusionTranslateAnchor>(),
                                                        state)
                              },
-                             uniforms::u_lightcolor::Value{ state.getLightColor() },    // TODO these are all placeholder getters
+                             uniforms::u_lightcolor::Value{ state.getLightColor() },    // TODO these are all placeholders/defaults
                              uniforms::u_lightpos::Value{ state.getLightPosition() },
                              uniforms::u_lightintensity::Value{ state.getLightIntensity() }
                          },

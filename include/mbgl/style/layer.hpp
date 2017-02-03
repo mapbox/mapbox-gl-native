@@ -72,7 +72,7 @@ public:
 
     // Convenience method for dynamic dispatch on the concrete layer type. Using
     // method overloading, this allows consolidation of logic common to vector-based
-    // layers (Fill, Line, Circle, or Symbol). For example:
+    // layers (Fill, FillExtrusion, Line, Circle, or Symbol). For example:
     //
     //     struct Visitor {
     //         void operator()(CustomLayer&) { ... }

@@ -32,9 +32,9 @@ struct GeometryTooLongException : std::exception {};
 FillExtrusionBucket::FillExtrusionBucket(const BucketParameters& parameters, const std::vector<const Layer*>& layers) {
     for (const auto& layer : layers) {
         paintPropertyBinders.emplace(layer->getID(),
-                                     FillExtrusionProgram::PaintPropertyBinders(
-                                                                       layer->as<FillExtrusionLayer>()->impl->paint.evaluated,
-                                                                       parameters.tileID.overscaledZ));
+            FillExtrusionProgram::PaintPropertyBinders(
+                layer->as<FillExtrusionLayer>()->impl->paint.evaluated,
+                parameters.tileID.overscaledZ));
     }
 }
 
@@ -52,9 +52,8 @@ void FillExtrusionBucket::addFeature(const GeometryTileFeature& feature,
                 throw GeometryTooLongException();
         }
 
-        // COPIED: do we need
-//        std:vector<GLsizei> flatIndices;
-//        flatIndices.reserve(totalVertices);
+        std::vector<GLsizei> flatIndices;
+        flatIndices.reserve(totalVertices);
 
 // TODO this was all a lot of copying; make sure segment sizing/creation happens correctly
 
@@ -68,6 +67,8 @@ void FillExtrusionBucket::addFeature(const GeometryTileFeature& feature,
         assert(triangleSegment.vertexLength <= std::numeric_limits<uint16_t>::max());
         uint16_t triangleIndex = triangleSegment.vertexLength;
 
+        assert(triangleIndex + (5 * (totalVertices - 1) + 1) <= std::numeric_limits<uint16_t>::max());
+
         for (const auto& ring : polygon) {
             std::size_t nVertices = ring.size();
 
@@ -79,7 +80,9 @@ void FillExtrusionBucket::addFeature(const GeometryTileFeature& feature,
             for (uint32_t i = 0; i < nVertices; i++) {
                 const auto& p1 = ring[i];
 
-                // add vertex + vertex index
+                vertices.emplace_back(FillExtrusionProgram::layoutVertex(p1, 0, 0, 1, 1, edgeDistance));
+                flatIndices.emplace_back(triangleIndex);
+                triangleIndex++;
 
                 if (i != 0) {
                     const auto& p2 = ring[i - 1];
@@ -98,8 +101,8 @@ void FillExtrusionBucket::addFeature(const GeometryTileFeature& feature,
                         vertices.emplace_back(FillExtrusionProgram::layoutVertex(p2, perp.x, perp.y, 0, 0, edgeDistance));
                         vertices.emplace_back(FillExtrusionProgram::layoutVertex(p2, perp.x, perp.y, 0, 1, edgeDistance));
 
+                        triangles.emplace_back(triangleIndex, triangleIndex + 1, triangleIndex + 2);
                         triangles.emplace_back(triangleIndex + 1, triangleIndex + 2, triangleIndex + 3);
-                        triangles.emplace_back(triangleIndex + 2, triangleIndex + 3, triangleIndex + 4);
                         triangleIndex += 4;
                         triangleSegment.vertexLength += 4;
                         triangleSegment.indexLength += 2;
@@ -110,17 +113,17 @@ void FillExtrusionBucket::addFeature(const GeometryTileFeature& feature,
 
         std::vector<uint32_t> indices = mapbox::earcut(polygon);
 
-        std::size_t nIndicies = indices.size();
-        assert(nIndicies % 3 == 0);
+        std::size_t nIndices = indices.size();
+        assert(nIndices % 3 == 0);
 
-        for (uint32_t i = 0; i < nIndicies; i += 3) {
-            triangles.emplace_back(triangleIndex + indices[i],
-                                   triangleIndex + indices[i + 1],
-                                   triangleIndex + indices[i + 2]);
+        for (uint32_t i = 0; i < nIndices; i += 3) {
+            triangles.emplace_back(flatIndices[indices[i]],
+                                   flatIndices[indices[i + 1]],
+                                   flatIndices[indices[i + 2]]);
         }
 
         triangleSegment.vertexLength += totalVertices;
-        triangleSegment.indexLength += nIndicies;
+        triangleSegment.indexLength += nIndices;
     }
 
     for (auto& pair : paintPropertyBinders) {
