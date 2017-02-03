@@ -3,7 +3,7 @@
 #include <mbgl/programs/program.hpp>
 #include <mbgl/programs/attributes.hpp>
 #include <mbgl/programs/uniforms.hpp>
-#include <mbgl/shader/collision_box.hpp>
+#include <mbgl/shaders/collision_box.hpp>
 #include <mbgl/util/geometry.hpp>
 
 #include <cmath>

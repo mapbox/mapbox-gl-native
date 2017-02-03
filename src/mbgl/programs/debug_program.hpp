@@ -3,7 +3,7 @@
 #include <mbgl/programs/program.hpp>
 #include <mbgl/programs/attributes.hpp>
 #include <mbgl/programs/uniforms.hpp>
-#include <mbgl/shader/debug.hpp>
+#include <mbgl/shaders/debug.hpp>
 
 namespace mbgl {
 

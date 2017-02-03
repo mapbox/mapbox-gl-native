@@ -620,6 +620,7 @@ android-checkstyle:
 .PHONY: style-code
 style-code:
 	node scripts/generate-style-code.js
+	node scripts/generate-shaders.js
 
 .PHONY: clean
 clean:

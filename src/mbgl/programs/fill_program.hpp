@@ -3,10 +3,10 @@
 #include <mbgl/programs/program.hpp>
 #include <mbgl/programs/attributes.hpp>
 #include <mbgl/programs/uniforms.hpp>
-#include <mbgl/shader/fill.hpp>
-#include <mbgl/shader/fill_pattern.hpp>
-#include <mbgl/shader/fill_outline.hpp>
-#include <mbgl/shader/fill_outline_pattern.hpp>
+#include <mbgl/shaders/fill.hpp>
+#include <mbgl/shaders/fill_pattern.hpp>
+#include <mbgl/shaders/fill_outline.hpp>
+#include <mbgl/shaders/fill_outline_pattern.hpp>
 #include <mbgl/util/geometry.hpp>
 #include <mbgl/util/mat4.hpp>
 #include <mbgl/util/size.hpp>
