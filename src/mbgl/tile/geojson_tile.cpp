@@ -25,6 +25,10 @@ public:
         return feature.properties;
     }
 
+    optional<FeatureIdentifier> getID() const override {
+        return feature.id;
+    }
+
     GeometryCollection getGeometries() const override {
         GeometryCollection geometry = apply_visitor(ToGeometryCollection(), feature.geometry);
 
