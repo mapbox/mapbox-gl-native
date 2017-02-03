@@ -42,8 +42,6 @@ for recognizer in gestureRecognizers where recognizer is UITapGestureRecognizer 
 }
 mapView.addGestureRecognizer(singleTapGestureRecognizer)`
 
-
-
 If you would like to disable a specific set of gesture recognizers, such as zoom, you can set the Boolean value for the appropriate property to `false`. You can then add your own gesture recognizers to perform those actions.
 
 With [runtime styling](runtime-styling.html), you can also use user interactions to style the map!
