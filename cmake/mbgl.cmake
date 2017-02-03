@@ -59,14 +59,6 @@ execute_process(
     COMMAND git submodule update --init .mason mapbox-gl-js
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 
-if(NOT EXISTS "${CMAKE_SOURCE_DIR}/mapbox-gl-js/node_modules")
-    # Symlink mapbox-gl-js/node_modules so that the modules that are
-    # about to be installed get cached between CI runs.
-    execute_process(
-         COMMAND ln -sF ../node_modules .
-         WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/mapbox-gl-js")
-endif()
-
 # Add target for running submodule update during builds
 add_custom_target(
     update-submodules ALL
@@ -77,10 +69,9 @@ add_custom_target(
 
 # Run npm install for both directories, and add custom commands, and a target that depends on them.
 _npm_install("${CMAKE_SOURCE_DIR}" mapbox-gl-native update-submodules)
-_npm_install("${CMAKE_SOURCE_DIR}/mapbox-gl-js" mapbox-gl-js "${CMAKE_SOURCE_DIR}/node_modules/.mapbox-gl-native.stamp")
 add_custom_target(
     npm-install ALL
-    DEPENDS "${CMAKE_SOURCE_DIR}/node_modules/.mapbox-gl-js.stamp"
+    DEPENDS "${CMAKE_SOURCE_DIR}/node_modules/.mapbox-gl-native.stamp"
 )
 
 # Generate source groups so the files are properly sorted in IDEs like Xcode.
