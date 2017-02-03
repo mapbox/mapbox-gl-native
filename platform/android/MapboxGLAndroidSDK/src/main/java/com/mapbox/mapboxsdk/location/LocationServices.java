@@ -99,7 +99,7 @@ public class LocationServices implements LostApiClient.ConnectionCallbacks,
     // noinspection MissingPermission
     Location lastLocation = FusedLocationApi.getLastLocation(locationClient);
     if (lastLocation != null) {
-      this.lastLocation = lastLocation;
+      onLocationChanged(lastLocation);
     }
 
     LocationRequest locationRequest;
