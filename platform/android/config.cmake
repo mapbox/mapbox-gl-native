@@ -237,7 +237,6 @@ target_include_directories(mbgl-test
     PRIVATE test/include
     PRIVATE test/src
     PRIVATE platform/default
-    PRIVATE ${MBGL_GENERATED}/include
 )
 
 target_link_libraries(mbgl-test

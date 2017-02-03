@@ -1,25 +1,5 @@
-set(MBGL_VERSION_DEPS package.json)
-if(EXISTS ${CMAKE_SOURCE_DIR}/.git/HEAD)
-    set(MBGL_VERSION_DEPS ${MBGL_VERSION_DEPS} .git/HEAD)
-endif()
-
-add_custom_command(
-    OUTPUT ${MBGL_GENERATED}/include/mbgl/util/version.hpp
-    DEPENDS ${MBGL_VERSION_DEPS}
-    COMMAND ${NodeJS_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/build-version.js ${MBGL_GENERATED}
-    VERBATIM
-)
-
-add_custom_target(mbgl-headers DEPENDS
-    ${MBGL_GENERATED}/include/mbgl/util/version.hpp
-)
-
 add_library(mbgl-core STATIC
     ${MBGL_CORE_FILES}
-)
-
-add_dependencies(mbgl-core
-    mbgl-headers
 )
 
 target_compile_options(mbgl-core
@@ -30,7 +10,6 @@ target_compile_options(mbgl-core
 target_include_directories(mbgl-core
     PUBLIC include
     PUBLIC src # TODO: make private
-    PRIVATE ${MBGL_GENERATED}/include
 )
 
 target_add_mason_package(mbgl-core PUBLIC geometry)

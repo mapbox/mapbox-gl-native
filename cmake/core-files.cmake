@@ -519,7 +519,8 @@ set(MBGL_CORE_FILES
     src/mbgl/util/url.cpp
     src/mbgl/util/url.hpp
     src/mbgl/util/utf.hpp
-    src/mbgl/util/version_info.cpp
+    src/mbgl/util/version.cpp
+    src/mbgl/util/version.hpp
     src/mbgl/util/work_queue.cpp
     src/mbgl/util/work_queue.hpp
     src/mbgl/util/work_request.cpp
