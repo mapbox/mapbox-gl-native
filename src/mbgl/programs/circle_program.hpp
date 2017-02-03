@@ -3,7 +3,7 @@
 #include <mbgl/programs/program.hpp>
 #include <mbgl/programs/attributes.hpp>
 #include <mbgl/programs/uniforms.hpp>
-#include <mbgl/shader/circle.hpp>
+#include <mbgl/shaders/circle.hpp>
 #include <mbgl/util/geometry.hpp>
 #include <mbgl/style/layers/circle_layer_properties.hpp>
 

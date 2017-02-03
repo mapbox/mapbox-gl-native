@@ -3,7 +3,7 @@
 #include <mbgl/programs/program.hpp>
 #include <mbgl/programs/attributes.hpp>
 #include <mbgl/programs/uniforms.hpp>
-#include <mbgl/shader/raster.hpp>
+#include <mbgl/shaders/raster.hpp>
 #include <mbgl/util/geometry.hpp>
 #include <mbgl/style/layers/raster_layer_properties.hpp>
 

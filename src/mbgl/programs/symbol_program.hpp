@@ -3,8 +3,8 @@
 #include <mbgl/programs/program.hpp>
 #include <mbgl/programs/attributes.hpp>
 #include <mbgl/programs/uniforms.hpp>
-#include <mbgl/shader/symbol_icon.hpp>
-#include <mbgl/shader/symbol_sdf.hpp>
+#include <mbgl/shaders/symbol_icon.hpp>
+#include <mbgl/shaders/symbol_sdf.hpp>
 #include <mbgl/util/geometry.hpp>
 #include <mbgl/util/size.hpp>
 #include <mbgl/style/layers/symbol_layer_properties.hpp>

@@ -3,9 +3,9 @@
 #include <mbgl/programs/program.hpp>
 #include <mbgl/programs/attributes.hpp>
 #include <mbgl/programs/uniforms.hpp>
-#include <mbgl/shader/line.hpp>
-#include <mbgl/shader/line_pattern.hpp>
-#include <mbgl/shader/line_sdf.hpp>
+#include <mbgl/shaders/line.hpp>
+#include <mbgl/shaders/line_pattern.hpp>
+#include <mbgl/shaders/line_sdf.hpp>
 #include <mbgl/util/geometry.hpp>
 #include <mbgl/style/layers/line_layer_properties.hpp>
 
