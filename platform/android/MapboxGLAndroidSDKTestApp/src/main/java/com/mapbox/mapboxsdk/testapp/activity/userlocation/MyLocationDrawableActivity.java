@@ -16,15 +16,15 @@ import android.view.ViewGroup;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.mapbox.mapboxsdk.location.LocationListener;
-import com.mapbox.mapboxsdk.location.LocationServices;
+import com.mapbox.mapboxsdk.location.LocationSource;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.MapboxMapOptions;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.R;
+import com.mapbox.services.android.telemetry.location.LocationEngineListener;
 
-public class MyLocationDrawableActivity extends AppCompatActivity implements LocationListener {
+public class MyLocationDrawableActivity extends AppCompatActivity implements LocationEngineListener {
 
   private static final int PERMISSIONS_LOCATION = 0;
 
@@ -92,7 +92,7 @@ public class MyLocationDrawableActivity extends AppCompatActivity implements Loc
       if (location != null) {
         onLocationChanged(location);
       } else {
-        LocationServices.getLocationServices(this).addLocationListener(this);
+        LocationSource.getLocationEngine(this).addLocationEngineListener(this);
       }
     } else {
       mapboxMap.setMyLocationEnabled(false);
@@ -106,6 +106,11 @@ public class MyLocationDrawableActivity extends AppCompatActivity implements Loc
         enableLocation(true);
       }
     }
+  }
+
+  @Override
+  public void onConnected() {
+    // Nothing
   }
 
   @Override

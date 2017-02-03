@@ -31,10 +31,12 @@ import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.constants.MyBearingTracking;
 import com.mapbox.mapboxsdk.constants.MyLocationTracking;
 import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.mapbox.mapboxsdk.location.LocationListener;
-import com.mapbox.mapboxsdk.location.LocationServices;
+import com.mapbox.mapboxsdk.location.LocationSource;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.Projection;
+import com.mapbox.services.android.telemetry.location.LocationEngine;
+import com.mapbox.services.android.telemetry.location.LocationEngineListener;
+import com.mapbox.services.android.telemetry.location.LocationEnginePriority;
 
 import java.lang.ref.WeakReference;
 
@@ -367,8 +369,7 @@ public class MyLocationView extends View {
     }
 
     if (userLocationListener != null) {
-      LocationServices services = LocationServices.getLocationServices(getContext());
-      services.removeLocationListener(userLocationListener);
+      LocationSource.getLocationEngine(getContext()).removeLocationEngineListener(userLocationListener);
       userLocationListener = null;
     }
   }
@@ -418,10 +419,10 @@ public class MyLocationView extends View {
    * @param enableGps true if GPS is to be enabled, false if GPS is to be disabled
    */
   private void toggleGps(boolean enableGps) {
-    LocationServices locationServices = LocationServices.getLocationServices(getContext());
+    LocationEngine locationEngine = LocationSource.getLocationEngine(getContext());
     if (enableGps) {
       // Set an initial location if one available
-      Location lastLocation = locationServices.getLastLocation();
+      Location lastLocation = locationEngine.getLastLocation();
 
       if (lastLocation != null) {
         setLocation(lastLocation);
@@ -431,14 +432,14 @@ public class MyLocationView extends View {
         userLocationListener = new GpsLocationListener(this);
       }
 
-      locationServices.addLocationListener(userLocationListener);
+      locationEngine.addLocationEngineListener(userLocationListener);
     } else {
       // Disable location and user dot
       location = null;
-      locationServices.removeLocationListener(userLocationListener);
+      locationEngine.removeLocationEngineListener(userLocationListener);
     }
 
-    locationServices.toggleGPS(enableGps);
+    locationEngine.setPriority(LocationEnginePriority.HIGH_ACCURACY);
   }
 
   public Location getLocation() {
@@ -557,12 +558,21 @@ public class MyLocationView extends View {
     contentPaddingY = (padding[1] - padding[3]) / 2;
   }
 
-  private static class GpsLocationListener implements LocationListener {
+  private static class GpsLocationListener implements LocationEngineListener {
 
     private WeakReference<MyLocationView> userLocationView;
 
     GpsLocationListener(MyLocationView myLocationView) {
       userLocationView = new WeakReference<>(myLocationView);
+    }
+
+    @Override
+    public void onConnected() {
+      MyLocationView locationView = userLocationView.get();
+      if (locationView != null) {
+        Location location = LocationSource.getLocationEngine(locationView.getContext()).getLastLocation();
+        locationView.setLocation(location);
+      }
     }
 
     /**

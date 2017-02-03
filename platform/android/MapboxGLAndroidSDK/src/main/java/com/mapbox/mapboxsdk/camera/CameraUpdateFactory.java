@@ -11,7 +11,7 @@ import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.Projection;
 import com.mapbox.mapboxsdk.maps.UiSettings;
-import com.mapbox.mapboxsdk.utils.MathUtils;
+import com.mapbox.services.android.telemetry.utils.MathUtils;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

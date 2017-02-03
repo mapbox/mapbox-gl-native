@@ -4,8 +4,8 @@ import android.location.Location;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.mapbox.mapboxsdk.constants.GeoConstants;
-import com.mapbox.mapboxsdk.utils.MathUtils;
+import com.mapbox.services.android.telemetry.constants.GeoConstants;
+import com.mapbox.services.android.telemetry.utils.MathUtils;
 
 /**
  * A geographical location which contains a single latitude, longitude pair, with

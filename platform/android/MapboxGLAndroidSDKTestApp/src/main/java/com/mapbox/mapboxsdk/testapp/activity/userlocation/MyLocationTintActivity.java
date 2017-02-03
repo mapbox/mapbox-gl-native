@@ -18,16 +18,16 @@ import android.view.View;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.constants.MyLocationTracking;
 import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.mapbox.mapboxsdk.location.LocationListener;
-import com.mapbox.mapboxsdk.location.LocationServices;
+import com.mapbox.mapboxsdk.location.LocationSource;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.TrackingSettings;
 import com.mapbox.mapboxsdk.maps.widgets.MyLocationViewSettings;
 import com.mapbox.mapboxsdk.testapp.R;
+import com.mapbox.services.android.telemetry.location.LocationEngineListener;
 
-public class MyLocationTintActivity extends AppCompatActivity implements LocationListener {
+public class MyLocationTintActivity extends AppCompatActivity implements LocationEngineListener {
 
   private MapView mapView;
   private MapboxMap mapboxMap;
@@ -121,6 +121,11 @@ public class MyLocationTintActivity extends AppCompatActivity implements Locatio
   }
 
   @Override
+  public void onConnected() {
+    // Nothing
+  }
+
+  @Override
   public void onLocationChanged(Location location) {
     if (mapboxMap != null && firstRun) {
       mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location), 15));
@@ -132,7 +137,7 @@ public class MyLocationTintActivity extends AppCompatActivity implements Locatio
   protected void onStart() {
     super.onStart();
     mapView.onStart();
-    LocationServices.getLocationServices(this).addLocationListener(this);
+    LocationSource.getLocationEngine(this).addLocationEngineListener(this);
   }
 
   @Override
@@ -150,7 +155,7 @@ public class MyLocationTintActivity extends AppCompatActivity implements Locatio
   @Override
   protected void onStop() {
     super.onStop();
-    LocationServices.getLocationServices(this).removeLocationListener(this);
+    LocationSource.getLocationEngine(this).removeLocationEngineListener(this);
     mapView.onStop();
   }
 

@@ -13,12 +13,14 @@ import android.view.View;
 
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.mapbox.mapboxsdk.location.LocationListener;
-import com.mapbox.mapboxsdk.location.LocationServices;
+import com.mapbox.mapboxsdk.location.LocationSource;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.R;
+import com.mapbox.services.android.telemetry.location.LocationEngine;
+import com.mapbox.services.android.telemetry.location.LocationEngineListener;
+import com.mapbox.services.android.telemetry.permissions.PermissionsManager;
 
 public class MyLocationToggleActivity extends AppCompatActivity {
 
@@ -26,8 +28,8 @@ public class MyLocationToggleActivity extends AppCompatActivity {
   private MapboxMap mapboxMap;
   private FloatingActionButton locationToggleFab;
 
-  private LocationServices locationServices;
-  private LocationListener locationListener;
+  private LocationEngine locationServices;
+  private LocationEngineListener locationListener;
 
   private static final int PERMISSIONS_LOCATION = 0;
 
@@ -36,7 +38,7 @@ public class MyLocationToggleActivity extends AppCompatActivity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_my_location_toggle);
 
-    locationServices = LocationServices.getLocationServices(MyLocationToggleActivity.this);
+    locationServices = LocationSource.getLocationEngine(this);
 
     mapView = (MapView) findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
@@ -95,7 +97,7 @@ public class MyLocationToggleActivity extends AppCompatActivity {
     // Ensure no memory leak occurs if we register the location listener but the call hasn't
     // been made yet.
     if (locationListener != null) {
-      locationServices.removeLocationListener(locationListener);
+      locationServices.removeLocationEngineListener(locationListener);
     }
   }
 
@@ -108,7 +110,7 @@ public class MyLocationToggleActivity extends AppCompatActivity {
   @UiThread
   public void toggleGps(boolean enableGps) {
     if (enableGps) {
-      if (!LocationServices.getLocationServices(MyLocationToggleActivity.this).areLocationPermissionsGranted()) {
+      if (!PermissionsManager.areLocationPermissionsGranted(this)) {
         ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.ACCESS_COARSE_LOCATION,
           Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_LOCATION);
       } else {
@@ -123,7 +125,7 @@ public class MyLocationToggleActivity extends AppCompatActivity {
     if (enabled) {
       // To move the camera instantly, we attempt to get the last known location and either
       // ease or animate the camera to that position depending on the zoom level.
-      Location lastLocation = LocationServices.getLocationServices(this).getLastLocation();
+      Location lastLocation = LocationSource.getLocationEngine(this).getLastLocation();
 
       if (lastLocation != null) {
         if (mapboxMap.getCameraPosition().zoom > 15.99) {
@@ -132,16 +134,21 @@ public class MyLocationToggleActivity extends AppCompatActivity {
           mapboxMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lastLocation), 16), 1000);
         }
       } else {
-        locationListener = new LocationListener() {
+        locationListener = new LocationEngineListener() {
+          @Override
+          public void onConnected() {
+            // Nothing
+          }
+
           @Override
           public void onLocationChanged(Location location) {
             if (location != null) {
               mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location), 16));
-              locationServices.removeLocationListener(this);
+              locationServices.removeLocationEngineListener(this);
             }
           }
         };
-        locationServices.addLocationListener(locationListener);
+        locationServices.addLocationEngineListener(locationListener);
       }
       locationToggleFab.setImageResource(R.drawable.ic_location_disabled_24dp);
     } else {

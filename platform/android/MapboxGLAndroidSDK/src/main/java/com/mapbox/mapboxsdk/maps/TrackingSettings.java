@@ -1,21 +1,19 @@
 package com.mapbox.mapboxsdk.maps;
 
-import android.Manifest;
-import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
-import android.support.v4.content.ContextCompat;
 
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.constants.MyBearingTracking;
 import com.mapbox.mapboxsdk.constants.MyLocationTracking;
-import com.mapbox.mapboxsdk.location.LocationListener;
-import com.mapbox.mapboxsdk.location.LocationServices;
+import com.mapbox.mapboxsdk.location.LocationSource;
 import com.mapbox.mapboxsdk.maps.widgets.MyLocationView;
+import com.mapbox.services.android.telemetry.location.LocationEngineListener;
+import com.mapbox.services.android.telemetry.permissions.PermissionsManager;
 
 import timber.log.Timber;
 
@@ -28,7 +26,7 @@ public final class TrackingSettings {
   private final UiSettings uiSettings;
   private final FocalPointChangeListener focalPointChangedListener;
   private final CameraZoomInvalidator zoomInvalidator;
-  private LocationListener myLocationListener;
+  private LocationEngineListener myLocationListener;
 
   private boolean myLocationEnabled;
   private boolean dismissLocationTrackingOnGesture = true;
@@ -317,7 +315,12 @@ public final class TrackingSettings {
 
   void setOnMyLocationChangeListener(@Nullable final MapboxMap.OnMyLocationChangeListener listener) {
     if (listener != null) {
-      myLocationListener = new LocationListener() {
+      myLocationListener = new LocationEngineListener() {
+        @Override
+        public void onConnected() {
+          // Nothing
+        }
+
         @Override
         public void onLocationChanged(Location location) {
           if (listener != null) {
@@ -325,18 +328,11 @@ public final class TrackingSettings {
           }
         }
       };
-      LocationServices.getLocationServices(myLocationView.getContext()).addLocationListener(myLocationListener);
+      LocationSource.getLocationEngine(myLocationView.getContext()).addLocationEngineListener(myLocationListener);
     } else {
-      LocationServices.getLocationServices(myLocationView.getContext()).removeLocationListener(myLocationListener);
+      LocationSource.getLocationEngine(myLocationView.getContext()).removeLocationEngineListener(myLocationListener);
       myLocationListener = null;
     }
-  }
-
-  boolean isPermissionsAccepted() {
-    return (ContextCompat.checkSelfPermission(myLocationView.getContext(),
-      Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)
-      || ContextCompat.checkSelfPermission(myLocationView.getContext(),
-      Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
   }
 
   void setOnMyLocationTrackingModeChangeListener(MapboxMap.OnMyLocationTrackingModeChangeListener listener) {
@@ -357,7 +353,7 @@ public final class TrackingSettings {
   }
 
   void setMyLocationEnabled(boolean locationEnabled) {
-    if (!isPermissionsAccepted()) {
+    if (!PermissionsManager.areLocationPermissionsGranted(myLocationView.getContext())) {
       Timber.e("Could not activate user location tracking: "
         + "user did not accept the permission or permissions were not requested.");
       return;
