@@ -71,7 +71,7 @@ add_custom_target(
 
 # Run npm install for both directories, and add custom commands, and a target that depends on them.
 _npm_install("${CMAKE_SOURCE_DIR}" mapbox-gl-native update-submodules)
-_npm_install("${CMAKE_SOURCE_DIR}/mapbox-gl-js" mapbox-gl-js "${CMAKE_SOURCE_DIR}/node_modules/.mapbox-gl-native.stamp")
+_npm_install("${CMAKE_SOURCE_DIR}/mapbox-gl-js/test/integration" mapbox-gl-js "${CMAKE_SOURCE_DIR}/node_modules/.mapbox-gl-native.stamp")
 add_custom_target(
     npm-install ALL
     DEPENDS "${CMAKE_SOURCE_DIR}/node_modules/.mapbox-gl-js.stamp"

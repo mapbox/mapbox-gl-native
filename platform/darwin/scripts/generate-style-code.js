@@ -11,7 +11,7 @@ const cocoaConventions = require('./style-spec-cocoa-conventions-v8.json');
 const prefix = 'MGL';
 const suffix = 'StyleLayer';
 
-let spec = _.merge(require('../../../mapbox-gl-js/js/style-spec').latest, require('./style-spec-overrides-v8.json'));
+let spec = _.merge(require('../../../mapbox-gl-js/src/style-spec/reference/v8'), require('./style-spec-overrides-v8.json'));
 
 ///
 // Temporarily IGNORE layers that are in the spec yet still not supported in mbgl core

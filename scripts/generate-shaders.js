@@ -3,7 +3,7 @@
 const path = require('path');
 const fs = require('fs');
 
-const inputPath = 'mapbox-gl-js/shaders';
+const inputPath = 'mapbox-gl-js/src/shaders';
 const outputPath = 'src/mbgl/shaders';
 
 require('./style-code');
