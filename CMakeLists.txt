@@ -68,7 +68,6 @@ endif()
 include(platform/${MBGL_PLATFORM}/config.cmake)
 
 include(cmake/core-files.cmake)
-include(cmake/shaders.cmake)
 include(cmake/core.cmake)
 
 if(COMMAND mbgl_platform_test)

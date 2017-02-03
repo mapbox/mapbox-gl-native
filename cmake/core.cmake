@@ -12,7 +12,6 @@ add_custom_command(
 
 add_custom_target(mbgl-headers DEPENDS
     ${MBGL_GENERATED}/include/mbgl/util/version.hpp
-    ${MBGL_SHADER_FILES}
 )
 
 add_library(mbgl-core STATIC
