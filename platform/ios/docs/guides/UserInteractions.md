@@ -4,7 +4,7 @@ The Mapbox iOS SDK provides a set of built-in gesture recognizers to developers.
 
 ## Configuring user interaction
 
-These properties are built in ways to enable or disable a set of gesture recognizers. Boolean values are set to `true` by default.
+These properties are built-in ways to enable or disable a set of gesture recognizers. Boolean values are set to `true` by default.
 
 - `zoomEnabled` - Allows the user to zoom in and out by pinching two fingers, double tapping, or using "quick zoom". Accepts Boolean values.
 - `scrollEnabled` - Allows the user to scroll by dragging or swiping one finger. Accepts Boolean values.
@@ -33,7 +33,7 @@ You can add `UIGestureRecognizers` to your map programmatically or via storyboar
 
 The gesture recognizers that you add will take priority over the built-in gesture recognizer. You can also set up your own gesture recognizer to work simultaneously with built-in gesture recognizers by using `-gestureRecognizer:shouldRecognizeSimultaneouslyWithGestureRecognizer:`, allowing you to enhance already existing gesture recognizers.
 
-You can also add gesture recognizers that are only called when the default gesture recognizer fails, such as when a user taps on a part of the map that is not an annotation. For example:
+You can also add gesture recognizers that are only called when the default gesture recognizer fails (and vice versa), such as when a user taps on a part of the map that is not an annotation. For example:
 
 `let gestureRecognizers = mapView.gestureRecognizers
 let singleTapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(myCustomFunction))
@@ -41,6 +41,8 @@ for recognizer in gestureRecognizers where recognizer is UITapGestureRecognizer 
     singleTapGestureRecognizer.require(toFail: recognizer)
 }
 mapView.addGestureRecognizer(singleTapGestureRecognizer)`
+
+
 
 If you would like to disable a specific set of gesture recognizers, such as zoom, you can set the Boolean value for the appropriate property to `false`. You can then add your own gesture recognizers to perform those actions.
 
