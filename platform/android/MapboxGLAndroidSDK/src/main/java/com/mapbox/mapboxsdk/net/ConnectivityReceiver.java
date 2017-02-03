@@ -10,37 +10,48 @@ import android.support.annotation.NonNull;
 
 import com.mapbox.mapboxsdk.Mapbox;
 
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-
-import timber.log.Timber;
-
 /**
  * Interface definition for a callback to be invoked when connectivity changes.
  * Not public api.
  */
 public class ConnectivityReceiver extends BroadcastReceiver {
   private static ConnectivityReceiver INSTANCE;
+  private final Context context;
+  private final NativeConnectivityListener nativeConnectivityListener = new NativeConnectivityListener();
+  private int counter;
 
   /**
    * Get or create the singleton instance
    */
   public static synchronized ConnectivityReceiver instance(Context context) {
     if (INSTANCE == null) {
-      // Register new instance
-      INSTANCE = new ConnectivityReceiver();
-      context.registerReceiver(INSTANCE, new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE"));
-
-      // Add default listeners
-      INSTANCE.addListener(new NativeConnectivityListener());
+      INSTANCE = new ConnectivityReceiver(context);
     }
-
     return INSTANCE;
   }
 
-  private List<ConnectivityListener> listeners = new CopyOnWriteArrayList<>();
+  private ConnectivityReceiver(@NonNull Context context) {
+    this.context = context.getApplicationContext();
+  }
 
-  private ConnectivityReceiver() {
+  /**
+   * Activate listening to connectivity change events.
+   */
+  public void activate() {
+    if (counter == 0) {
+      context.registerReceiver(INSTANCE, new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE"));
+    }
+    counter++;
+  }
+
+  /**
+   * Deactivate listening to connectivity change events.
+   */
+  public void deactivate() {
+    counter--;
+    if (counter == 0) {
+      context.unregisterReceiver(INSTANCE);
+    }
   }
 
   /**
@@ -48,40 +59,15 @@ public class ConnectivityReceiver extends BroadcastReceiver {
    */
   @Override
   public void onReceive(Context context, Intent intent) {
-    boolean connected = isConnected(context);
-    Timber.v("Connected: " + connected);
-
-    // Loop over listeners
-    for (ConnectivityListener listener : listeners) {
-      listener.onNetworkStateChanged(connected);
-    }
-  }
-
-  /**
-   * Add a listener to be notified
-   *
-   * @param listener the listener to add
-   */
-  public void addListener(@NonNull ConnectivityListener listener) {
-    listeners.add(listener);
-  }
-
-  /**
-   * Remove a listener
-   *
-   * @param listener the listener to remove
-   */
-  public void removeListener(@NonNull ConnectivityListener listener) {
-    listeners.remove(listener);
+    nativeConnectivityListener.nativeOnConnectivityStateChanged(isConnected());
   }
 
   /**
    * Get current connectivity state
    *
-   * @param context current Context
    * @return true if connected
    */
-  public boolean isConnected(Context context) {
+  public boolean isConnected() {
     Boolean connected = Mapbox.isConnected();
     if (connected != null) {
       // Connectivity state overridden by app
