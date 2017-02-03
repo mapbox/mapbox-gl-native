@@ -4,7 +4,7 @@ The Mapbox iOS SDK provides a set of built-in gesture recognizers to developers.
 
 ## Configuring user interaction
 
-These properties are built-in ways to enable or disable a set of gesture recognizers. Boolean values are set to `true` by default.
+There are several properties on a `MGLMapView` that are built-in ways to enable or disable a set of gesture recognizers. Boolean values are set to `true` by default.
 
 - `zoomEnabled` - Allows the user to zoom in and out by pinching two fingers, double tapping, or using "quick zoom". Accepts Boolean values.
 - `scrollEnabled` - Allows the user to scroll by dragging or swiping one finger. Accepts Boolean values.
