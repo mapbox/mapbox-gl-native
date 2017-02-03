@@ -184,11 +184,11 @@ struct IconOpacity : PaintProperty<float> {
     static float defaultValue() { return 1; }
 };
 
-struct IconColor : PaintProperty<Color> {
+struct IconColor : DataDrivenPaintProperty<Color, attributes::a_color> {
     static Color defaultValue() { return Color::black(); }
 };
 
-struct IconHaloColor : PaintProperty<Color> {
+struct IconHaloColor : DataDrivenPaintProperty<Color, attributes::a_halo_color> {
     static Color defaultValue() { return {}; }
 };
 
@@ -212,11 +212,11 @@ struct TextOpacity : PaintProperty<float> {
     static float defaultValue() { return 1; }
 };
 
-struct TextColor : PaintProperty<Color> {
+struct TextColor : DataDrivenPaintProperty<Color, attributes::a_color> {
     static Color defaultValue() { return Color::black(); }
 };
 
-struct TextHaloColor : PaintProperty<Color> {
+struct TextHaloColor : DataDrivenPaintProperty<Color, attributes::a_halo_color> {
     static Color defaultValue() { return {}; }
 };
 

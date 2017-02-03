@@ -30,6 +30,7 @@ MBGL_DEFINE_UNIFORM_SCALAR(gl::TextureUnit, u_fadetexture);
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_buffer);
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_gamma);
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_aspect_ratio);
+MBGL_DEFINE_UNIFORM_SCALAR(bool, u_is_halo);
 } // namespace uniforms
 
 struct SymbolLayoutAttributes : gl::Attributes<
@@ -107,13 +108,13 @@ class SymbolSDFProgram : public Program<
         uniforms::u_rotate_with_map,
         uniforms::u_texture,
         uniforms::u_fadetexture,
-        uniforms::u_color,
         uniforms::u_buffer,
         uniforms::u_gamma,
         uniforms::u_pitch,
         uniforms::u_bearing,
         uniforms::u_aspect_ratio,
-        uniforms::u_pitch_with_map>,
+        uniforms::u_pitch_with_map,
+        uniforms::u_is_halo>,
     style::SymbolPaintProperties>
 {
 public:

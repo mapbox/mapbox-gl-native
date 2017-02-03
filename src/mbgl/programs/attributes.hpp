@@ -64,6 +64,34 @@ struct a_color : gl::Attribute<gl::Normalized<uint8_t>, 4> {
     }
 };
 
+// used in the symbol sdf shader
+struct a_fill_color : gl::Attribute<gl::Normalized<uint8_t>, 4> {
+    static auto name() { return "a_fill_color"; }
+    
+    static Value value(const Color& color) {
+        return {{
+            gl::Normalized<uint8_t>(color.r),
+            gl::Normalized<uint8_t>(color.g),
+            gl::Normalized<uint8_t>(color.b),
+            gl::Normalized<uint8_t>(color.a)
+        }};
+    }
+};
+
+// used in the symbol sdf shader
+struct a_halo_color : gl::Attribute<gl::Normalized<uint8_t>, 4> {
+    static auto name() { return "a_halo_color"; }
+    
+    static Value value(const Color& color) {
+        return {{
+            gl::Normalized<uint8_t>(color.r),
+            gl::Normalized<uint8_t>(color.g),
+            gl::Normalized<uint8_t>(color.b),
+            gl::Normalized<uint8_t>(color.a)
+        }};
+    }
+};
+
 struct a_stroke_color : gl::Attribute<gl::Normalized<uint8_t>, 4> {
     static auto name() { return "a_stroke_color"; }
 
@@ -170,6 +198,24 @@ struct a_offset<1> : gl::Attribute<float, 1> {
         return {{ offset }};
     }
 };
+
+struct a_halo_width : gl::Attribute<float, 1> {
+    static auto name() { return "a_halo_width"; }
+    
+    static Value value(float width) {
+        return {{ width }};
+    }
+};
+
+struct a_halo_blur : gl::Attribute<float, 1> {
+    static auto name() { return "a_halo_blur"; }
+    
+    static Value value(float blur) {
+        return {{ blur }};
+    }
+};
+
+
 
 } // namespace attributes
 } // namespace mbgl

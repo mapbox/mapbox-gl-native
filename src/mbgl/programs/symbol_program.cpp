@@ -68,9 +68,9 @@ static SymbolSDFProgram::UniformValues makeSDFValues(const style::SymbolProperty
                                                const RenderTile& tile,
                                                const TransformState& state,
                                                float pixelRatio,
-                                               Color color,
                                                float buffer,
-                                               float gammaAdjust)
+                                               float gammaAdjust,
+                                               bool isHalo)
 {
     // The default gamma value has to be adjust for the current pixelratio so that we're not
     // drawing blurry font on retina screens.
@@ -85,13 +85,13 @@ static SymbolSDFProgram::UniformValues makeSDFValues(const style::SymbolProperty
         pixelsToGLUnits,
         tile,
         state,
-        uniforms::u_color::Value{ color },
         uniforms::u_buffer::Value{ buffer },
         uniforms::u_gamma::Value{ (gammaBase + gammaAdjust) * gammaScale },
         uniforms::u_pitch::Value{ state.getPitch() },
         uniforms::u_bearing::Value{ -1.0f * state.getAngle() },
         uniforms::u_aspect_ratio::Value{ (state.getSize().width * 1.0f) / (state.getSize().height * 1.0f) },
-        uniforms::u_pitch_with_map::Value{ values.pitchAlignment == AlignmentType::Map }
+        uniforms::u_pitch_with_map::Value{ values.pitchAlignment == AlignmentType::Map },
+        uniforms::u_is_halo::Value{ isHalo }
     );
 }
 
@@ -115,9 +115,9 @@ SymbolSDFProgram::haloUniformValues(const style::SymbolPropertyValues& values,
         tile,
         state,
         pixelRatio,
-        values.haloColor,
         (haloOffset - values.haloWidth / scale) / sdfPx,
-        values.haloBlur * blurOffset / scale / sdfPx
+        values.haloBlur * blurOffset / scale / sdfPx,
+        true
     );
 }
 
@@ -136,9 +136,9 @@ SymbolSDFProgram::foregroundUniformValues(const style::SymbolPropertyValues& val
         tile,
         state,
         pixelRatio,
-        values.color,
         (256.0f - 64.0f) / 256.0f,
-        0
+        0,
+        false
     );
 }
 

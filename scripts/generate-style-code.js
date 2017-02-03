@@ -47,7 +47,20 @@ global.evaluatedType = function (property) {
 };
 
 function attributeType(property, type) {
-    const name = property.name.replace(type + '-', '').replace('-', '_');
+    const attributeNameExceptions = {
+      'text-opacity': 'opacity',
+      'icon-opacity': 'opacity',
+      'text-color': 'fill_color',
+      'icon-color': 'fill_color',
+      'text-halo-color': 'halo_color',
+      'icon-halo-color': 'halo_color',
+      'text-halo-blur': 'halo_blur',
+      'icon-halo-blur': 'halo_blur',
+      'text-halo-width': 'halo_width',
+      'icon-halo-width': 'halo_width'
+    }
+    const name = attributeNameExceptions[property.name] ||
+        property.name.replace(type + '-', '').replace(/-/g, '_');
     return `attributes::a_${name}${name === 'offset' ? '<1>' : ''}`;
 }
 
