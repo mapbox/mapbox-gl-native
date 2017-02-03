@@ -164,7 +164,7 @@ extension MGLStyleValueTests {
                 interpolationMode: .identity,
                 sourceStops: nil,
                 attributeName: "size",
-                options: nil
+                options: [.defaultValue: MGLStyleValue<UIColor>(rawValue: .green)]
             )
             circleStyleLayer.circleColor = expectedSourceIdentityValue
             XCTAssertEqual(circleStyleLayer.circleColor, expectedSourceIdentityValue)
