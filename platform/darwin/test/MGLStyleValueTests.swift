@@ -293,6 +293,15 @@ extension MGLStyleValueTests {
             }
         }
 
+        // get value back as base class
+        if let returnedCircleRadius = circleStyleLayer.circleRadius as? MGLStyleFunction<NSNumber> {
+            if let returnedStops = returnedCircleRadius.stops as NSDictionary? as? [NSNumber: [NSNumber: MGLStyleValue<NSNumber>]] {
+                let lhs: MGLStyleValue<NSNumber> = returnedStops[0]!.values.first!
+                let rhs: MGLStyleValue<NSNumber> = radiusCompositeExponentialOrIntervalStops[0]!.values.first!
+                XCTAssertEqual(lhs, rhs)
+            }
+        }
+
         // data-driven, composite function with inner interval color stop values nested in outer camera stops
         let expectedCompositeIntervalValue = MGLStyleValue<NSNumber>(
             interpolationMode: .interval,
