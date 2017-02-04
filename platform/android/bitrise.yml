@@ -34,8 +34,7 @@ workflows:
         - content: |-
             #!/bin/bash
             set -eu -o pipefail
-            curl -sL https://deb.nodesource.com/setup_4.x | sudo -E bash -
-            sudo apt-get install -y pkg-config nodejs cmake
+            sudo apt-get install -y pkg-config cmake
     - script:
         title: Run Checkstyle
         run_if: '{{enveq "SKIPCI" "false"}}'
@@ -171,8 +170,7 @@ workflows:
         - content: |-
             #!/bin/bash
             set -eu -o pipefail
-            curl -sL https://deb.nodesource.com/setup_4.x | sudo -E bash -
-            sudo apt-get install -y pkg-config nodejs cmake
+            sudo apt-get install -y pkg-config cmake
     - script:
         title: Configure AWS-CLI
         inputs:
@@ -232,8 +230,7 @@ workflows:
         - content: |-
             #!/bin/bash
             set -eu -o pipefail
-            curl -sL https://deb.nodesource.com/setup_4.x | sudo -E bash -
-            sudo apt-get install -y pkg-config nodejs cmake
+            sudo apt-get install -y pkg-config cmake
     - script:
         title: Build release
         inputs:
@@ -282,8 +279,7 @@ workflows:
         - content: |-
             #!/bin/bash
             set -eu -o pipefail
-            curl -sL https://deb.nodesource.com/setup_4.x | sudo -E bash -
-            sudo apt-get install -y pkg-config nodejs cmake
+            sudo apt-get install -y pkg-config cmake
     - script:
         title: Configure AWS-CLI
         inputs:
