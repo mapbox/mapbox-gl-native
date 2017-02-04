@@ -1742,7 +1742,7 @@ public class PropertyFactory {
   }
 
   /**
-   * Value to use for a text label. Feature properties are specified using tokens like {field_name}.
+   * Value to use for a text label. Feature properties are specified using tokens like {field_name}.  (Token replacement is only supported for literal text-field values--not for data-driven property functions.)
    *
    * @param value a String value
    * @return property wrapper around String
@@ -1754,13 +1754,13 @@ public class PropertyFactory {
 
 
   /**
-   * Value to use for a text label. Feature properties are specified using tokens like {field_name}.
+   * Value to use for a text label. Feature properties are specified using tokens like {field_name}.  (Token replacement is only supported for literal text-field values--not for data-driven property functions.)
    *
-   * @param <Z> the zoom parameter type
-   * @param function a wrapper {@link CameraFunction} for String
+   * @param <T> the function input type
+   * @param function a wrapper function for String
    * @return property wrapper around a String function
    */
-  public static <Z extends Number> PropertyValue<CameraFunction<Z, String>> textField(CameraFunction<Z, String> function) {
+  public static <T> PropertyValue<Function<T, String>> textField(Function<T, String> function) {
     return new LayoutPropertyValue<>("text-field", function);
   }
 
@@ -2032,11 +2032,11 @@ public class PropertyFactory {
   /**
    * Specifies how to capitalize text, similar to the CSS {@link PropertyFactory#textTransform} property.
    *
-   * @param <Z> the zoom parameter type
-   * @param function a wrapper {@link CameraFunction} for String
+   * @param <T> the function input type
+   * @param function a wrapper function for String
    * @return property wrapper around a String function
    */
-  public static <Z extends Number> PropertyValue<CameraFunction<Z, String>> textTransform(CameraFunction<Z, String> function) {
+  public static <T> PropertyValue<Function<T, String>> textTransform(Function<T, String> function) {
     return new LayoutPropertyValue<>("text-transform", function);
   }
 

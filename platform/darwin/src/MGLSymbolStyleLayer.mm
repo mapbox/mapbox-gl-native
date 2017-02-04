@@ -566,7 +566,7 @@ namespace mbgl {
 - (void)setText:(MGLStyleValue<NSString *> *)text {
     MGLAssertStyleLayerIsValid();
 
-    auto mbglValue = MGLStyleValueTransformer<std::string, NSString *>().toPropertyValue(text);
+    auto mbglValue = MGLStyleValueTransformer<std::string, NSString *>().toDataDrivenPropertyValue(text);
     self.rawLayer->setTextField(mbglValue);
 }
 
@@ -575,9 +575,9 @@ namespace mbgl {
 
     auto propertyValue = self.rawLayer->getTextField();
     if (propertyValue.isUndefined()) {
-        return MGLStyleValueTransformer<std::string, NSString *>().toStyleValue(self.rawLayer->getDefaultTextField());
+        return MGLStyleValueTransformer<std::string, NSString *>().toDataDrivenStyleValue(self.rawLayer->getDefaultTextField());
     }
-    return MGLStyleValueTransformer<std::string, NSString *>().toStyleValue(propertyValue);
+    return MGLStyleValueTransformer<std::string, NSString *>().toDataDrivenStyleValue(propertyValue);
 }
 
 - (void)setTextField:(MGLStyleValue<NSString *> *)textField {
@@ -870,7 +870,7 @@ namespace mbgl {
 - (void)setTextTransform:(MGLStyleValue<NSValue *> *)textTransform {
     MGLAssertStyleLayerIsValid();
 
-    auto mbglValue = MGLStyleValueTransformer<mbgl::style::TextTransformType, NSValue *, mbgl::style::TextTransformType, MGLTextTransform>().toEnumPropertyValue(textTransform);
+    auto mbglValue = MGLStyleValueTransformer<mbgl::style::mbgl::style::TextTransformType, NSValue *>().toDataDrivenPropertyValue(textTransform);
     self.rawLayer->setTextTransform(mbglValue);
 }
 
@@ -879,9 +879,9 @@ namespace mbgl {
 
     auto propertyValue = self.rawLayer->getTextTransform();
     if (propertyValue.isUndefined()) {
-        return MGLStyleValueTransformer<mbgl::style::TextTransformType, NSValue *, mbgl::style::TextTransformType, MGLTextTransform>().toEnumStyleValue(self.rawLayer->getDefaultTextTransform());
+        return MGLStyleValueTransformer<mbgl::style::mbgl::style::TextTransformType, NSValue *>().toDataDrivenStyleValue(self.rawLayer->getDefaultTextTransform());
     }
-    return MGLStyleValueTransformer<mbgl::style::TextTransformType, NSValue *, mbgl::style::TextTransformType, MGLTextTransform>().toEnumStyleValue(propertyValue);
+    return MGLStyleValueTransformer<mbgl::style::mbgl::style::TextTransformType, NSValue *>().toDataDrivenStyleValue(propertyValue);
 }
 
 #pragma mark - Accessing the Paint Attributes

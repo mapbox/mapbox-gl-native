@@ -781,7 +781,7 @@
 
         MGLStyleValue<NSString *> *constantStyleValue = [MGLStyleValue<NSString *> valueWithRawValue:@"Text Field"];
         layer.text = constantStyleValue;
-        mbgl::style::PropertyValue<std::string> propertyValue = { "Text Field" };
+        mbgl::style::DataDrivenPropertyValue<std::string> propertyValue = { "Text Field" };
         XCTAssertEqual(rawLayer->getTextField(), propertyValue,
                        @"Setting text to a constant value should update text-field.");
         XCTAssertEqualObjects(layer.text, constantStyleValue,
@@ -798,6 +798,29 @@
         XCTAssertEqualObjects(layer.text, functionStyleValue,
                               @"text should round-trip camera functions.");
 
+        functionStyleValue = [MGLStyleValue<NSString *> valueWithInterpolationMode:MGLInterpolationModeExponential sourceStops:@{@18: constantStyleValue} attributeName:@"keyName" options:nil];
+        layer.text = functionStyleValue;
+
+        mbgl::style::ExponentialStops<std::string> exponentialStops = { {{18, "Text Field"}}, 1.0 };
+        propertyValue = mbgl::style::SourceFunction<std::string> { "keyName", exponentialStops };
+
+        XCTAssertEqual(rawLayer->getTextField(), propertyValue,
+                       @"Setting text to a source function should update text-field.");
+        XCTAssertEqualObjects(layer.text, functionStyleValue,
+                              @"text should round-trip source functions.");
+
+        functionStyleValue = [MGLStyleValue<NSString *> valueWithInterpolationMode:MGLInterpolationModeExponential compositeStops:@{@10: @{@18: constantStyleValue}} attributeName:@"keyName" options:nil];
+        layer.text = functionStyleValue;
+
+        mbgl::style::ExponentialStops<std::string> innerStops = { { {18, "Text Field"}}, 1.0 };
+        std::map<float, mbgl::style::ExponentialStops<std::string>> compositeStops = { {10.0, innerStops} };
+
+        propertyValue = mbgl::style::CompositeFunction<std::string> { "keyName", compositeStops };
+
+        XCTAssertEqual(rawLayer->getTextField(), propertyValue,
+                       @"Setting text to a composite function should update text-field.");
+        XCTAssertEqualObjects(layer.text, functionStyleValue,
+                              @"text should round-trip composite functions.");                                                                                                          
                               
 
         layer.text = nil;
@@ -1351,7 +1374,7 @@
 
         MGLStyleValue<NSValue *> *constantStyleValue = [MGLStyleValue<NSValue *> valueWithRawValue:[NSValue valueWithMGLTextTransform:MGLTextTransformLowercase]];
         layer.textTransform = constantStyleValue;
-        mbgl::style::PropertyValue<mbgl::style::TextTransformType> propertyValue = { mbgl::style::TextTransformType::Lowercase };
+        mbgl::style::DataDrivenPropertyValue<mbgl::style::TextTransformType> propertyValue = { mbgl::style::TextTransformType::Lowercase };
         XCTAssertEqual(rawLayer->getTextTransform(), propertyValue,
                        @"Setting textTransform to a constant value should update text-transform.");
         XCTAssertEqualObjects(layer.textTransform, constantStyleValue,
@@ -1368,6 +1391,29 @@
         XCTAssertEqualObjects(layer.textTransform, functionStyleValue,
                               @"textTransform should round-trip camera functions.");
 
+        functionStyleValue = [MGLStyleValue<NSValue *> valueWithInterpolationMode:MGLInterpolationModeExponential sourceStops:@{@18: constantStyleValue} attributeName:@"keyName" options:nil];
+        layer.textTransform = functionStyleValue;
+
+        mbgl::style::ExponentialStops<mbgl::style::TextTransformType> exponentialStops = { {{18, mbgl::style::TextTransformType::Lowercase}}, 1.0 };
+        propertyValue = mbgl::style::SourceFunction<mbgl::style::TextTransformType> { "keyName", exponentialStops };
+
+        XCTAssertEqual(rawLayer->getTextTransform(), propertyValue,
+                       @"Setting textTransform to a source function should update text-transform.");
+        XCTAssertEqualObjects(layer.textTransform, functionStyleValue,
+                              @"textTransform should round-trip source functions.");
+
+        functionStyleValue = [MGLStyleValue<NSValue *> valueWithInterpolationMode:MGLInterpolationModeExponential compositeStops:@{@10: @{@18: constantStyleValue}} attributeName:@"keyName" options:nil];
+        layer.textTransform = functionStyleValue;
+
+        mbgl::style::ExponentialStops<mbgl::style::TextTransformType> innerStops = { { {18, mbgl::style::TextTransformType::Lowercase}}, 1.0 };
+        std::map<float, mbgl::style::ExponentialStops<mbgl::style::TextTransformType>> compositeStops = { {10.0, innerStops} };
+
+        propertyValue = mbgl::style::CompositeFunction<mbgl::style::TextTransformType> { "keyName", compositeStops };
+
+        XCTAssertEqual(rawLayer->getTextTransform(), propertyValue,
+                       @"Setting textTransform to a composite function should update text-transform.");
+        XCTAssertEqualObjects(layer.textTransform, functionStyleValue,
+                              @"textTransform should round-trip composite functions.");                                                                                                          
                               
 
         layer.textTransform = nil;

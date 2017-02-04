@@ -301,15 +301,15 @@ void SymbolLayer::setTextRotationAlignment(PropertyValue<AlignmentType> value) {
     impl->layout.unevaluated.get<TextRotationAlignment>() = value;
     impl->observer->onLayerLayoutPropertyChanged(*this, "text-rotation-alignment");
 }
-PropertyValue<std::string> SymbolLayer::getDefaultTextField() {
+DataDrivenPropertyValue<std::string> SymbolLayer::getDefaultTextField() {
     return TextField::defaultValue();
 }
 
-PropertyValue<std::string> SymbolLayer::getTextField() const {
+DataDrivenPropertyValue<std::string> SymbolLayer::getTextField() const {
     return impl->layout.unevaluated.get<TextField>();
 }
 
-void SymbolLayer::setTextField(PropertyValue<std::string> value) {
+void SymbolLayer::setTextField(DataDrivenPropertyValue<std::string> value) {
     if (value == getTextField())
         return;
     impl->layout.unevaluated.get<TextField>() = value;
@@ -469,15 +469,15 @@ void SymbolLayer::setTextKeepUpright(PropertyValue<bool> value) {
     impl->layout.unevaluated.get<TextKeepUpright>() = value;
     impl->observer->onLayerLayoutPropertyChanged(*this, "text-keep-upright");
 }
-PropertyValue<TextTransformType> SymbolLayer::getDefaultTextTransform() {
+DataDrivenPropertyValue<TextTransformType> SymbolLayer::getDefaultTextTransform() {
     return TextTransform::defaultValue();
 }
 
-PropertyValue<TextTransformType> SymbolLayer::getTextTransform() const {
+DataDrivenPropertyValue<TextTransformType> SymbolLayer::getTextTransform() const {
     return impl->layout.unevaluated.get<TextTransform>();
 }
 
-void SymbolLayer::setTextTransform(PropertyValue<TextTransformType> value) {
+void SymbolLayer::setTextTransform(DataDrivenPropertyValue<TextTransformType> value) {
     if (value == getTextTransform())
         return;
     impl->layout.unevaluated.get<TextTransform>() = value;

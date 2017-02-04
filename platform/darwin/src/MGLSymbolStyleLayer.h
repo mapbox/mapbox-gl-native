@@ -776,7 +776,8 @@ MGL_EXPORT
 
 /**
  Value to use for a text label. Feature properties are specified using tokens
- like {field_name}.
+ like {field_name}.  (Token replacement is only supported for literal text-field
+ values--not for data-driven property functions.)
  
  The default value of this property is an `MGLStyleValue` object containing the
  empty string. Set this property to `nil` to reset it to the default value.
