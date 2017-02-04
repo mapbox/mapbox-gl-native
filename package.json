@@ -22,7 +22,6 @@
     "ejs": "^2.4.1",
     "express": "^4.11.1",
     "lodash": "^4.16.4",
-    "mkdirp": "^0.5.1",
     "node-cmake": "^1.2.1",
     "pixelmatch": "^4.0.2",
     "pngjs": "^3.0.0",
