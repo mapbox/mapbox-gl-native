@@ -64,7 +64,7 @@ public class CustomLayerActivity extends AppCompatActivity {
       } catch (NoSuchLayerException noSuchLayerException) {
         Timber.e("No custom layer to remove");
       }
-      fab.setImageResource(R.drawable.ic_layers_24dp);
+      fab.setImageResource(R.drawable.ic_layers);
     } else {
       customLayer = new CustomLayer("custom",
         ExampleCustomLayer.createContext(),
@@ -72,7 +72,7 @@ public class CustomLayerActivity extends AppCompatActivity {
         ExampleCustomLayer.RenderFunction,
         ExampleCustomLayer.DeinitializeFunction);
       mapboxMap.addLayer(customLayer, "building");
-      fab.setImageResource(R.drawable.ic_layers_clear_24dp);
+      fab.setImageResource(R.drawable.ic_layers_clear);
     }
   }
 

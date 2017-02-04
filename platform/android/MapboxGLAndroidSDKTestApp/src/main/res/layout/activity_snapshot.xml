@@ -34,7 +34,7 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
         android:layout_margin="@dimen/fab_margin"
-        android:src="@drawable/ic_add_a_photo_black_24dp"
+        android:src="@drawable/ic_add_a_photo_black"
         app:backgroundTint="@android:color/white"/>
 
 </RelativeLayout>

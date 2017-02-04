@@ -42,8 +42,8 @@ public class MyLocationDrawableActivity extends AppCompatActivity implements Loc
     mapboxMapOptions.styleUrl(Style.MAPBOX_STREETS);
 
     // configure MyLocationView drawables
-    mapboxMapOptions.myLocationForegroundDrawable(ContextCompat.getDrawable(this, R.drawable.ic_chelsea));
-    mapboxMapOptions.myLocationBackgroundDrawable(ContextCompat.getDrawable(this, R.drawable.ic_arsenal));
+    mapboxMapOptions.myLocationForegroundDrawable(ContextCompat.getDrawable(this, R.drawable.ic_android));
+    mapboxMapOptions.myLocationBackgroundDrawable(ContextCompat.getDrawable(this, R.drawable.ic_android));
     mapboxMapOptions.myLocationForegroundTintColor(Color.GREEN);
     mapboxMapOptions.myLocationBackgroundTintColor(Color.YELLOW);
     mapboxMapOptions.myLocationBackgroundPadding(new int[] {0, 0,

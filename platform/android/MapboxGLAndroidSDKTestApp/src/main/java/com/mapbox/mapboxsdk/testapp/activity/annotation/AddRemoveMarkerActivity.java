@@ -1,10 +1,10 @@
 package com.mapbox.mapboxsdk.testapp.activity.annotation;
 
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 
 import com.mapbox.mapboxsdk.annotations.Icon;
-import com.mapbox.mapboxsdk.annotations.IconFactory;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
@@ -14,6 +14,7 @@ import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.R;
+import com.mapbox.mapboxsdk.testapp.utils.IconUtils;
 
 import timber.log.Timber;
 
@@ -36,15 +37,20 @@ public class AddRemoveMarkerActivity extends AppCompatActivity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_add_remove_marker);
 
-    final Icon icon1 = IconFactory.getInstance(this).fromResource(R.drawable.ic_arsenal);
-    final Icon icon2 = IconFactory.getInstance(this).fromResource(R.drawable.ic_chelsea);
+    // ShapeDrawable to Icon
+    final Icon shapeDrawableIcon = IconUtils.drawableToIcon(this, R.drawable.ic_circle,
+      ContextCompat.getColor(this, R.color.redAccent));
+
+    // VectorDrawable to Icon
+    final Icon vectorDrawableIcon = IconUtils.drawableToIcon(this, R.drawable.ic_layers,
+      ContextCompat.getColor(this, R.color.blueAccent));
 
     lowThresholdMarker = new MarkerOptions()
-      .icon(icon1)
+      .icon(shapeDrawableIcon)
       .position(new LatLng(-0.1, 0));
 
     highThresholdMarker = new MarkerOptions()
-      .icon(icon2)
+      .icon(vectorDrawableIcon)
       .position(new LatLng(0.1, 0));
 
     mapView = (MapView) findViewById(R.id.mapView);

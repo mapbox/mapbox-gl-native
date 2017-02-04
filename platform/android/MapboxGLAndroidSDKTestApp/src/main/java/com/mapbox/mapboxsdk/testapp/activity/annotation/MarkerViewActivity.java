@@ -156,13 +156,13 @@ public class MarkerViewActivity extends AppCompatActivity {
         movingMarkerOne = MarkerViewActivity.this.mapboxMap.addMarker(new MarkerViewOptions()
           .position(CarLocation.CAR_0_LNGS[0])
           .icon(IconFactory.getInstance(mapView.getContext())
-            .fromResource(R.drawable.ic_chelsea))
+            .fromResource(R.drawable.ic_android))
         );
 
         movingMarkerTwo = mapboxMap.addMarker(new MarkerViewOptions()
           .position(CarLocation.CAR_1_LNGS[0])
           .icon(IconFactory.getInstance(mapView.getContext())
-            .fromResource(R.drawable.ic_arsenal))
+            .fromResource(R.drawable.ic_android_2))
         );
 
         // allow more open infowindows at the same time

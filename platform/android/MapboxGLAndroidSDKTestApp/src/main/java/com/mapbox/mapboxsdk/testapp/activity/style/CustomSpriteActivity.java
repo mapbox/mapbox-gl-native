@@ -79,7 +79,7 @@ public class CustomSpriteActivity extends AppCompatActivity {
               // lets add a circle below labels!
               mapboxMap.addLayer(layer, "waterway-label");
 
-              fab.setImageResource(R.drawable.ic_directions_car_black_24dp);
+              fab.setImageResource(R.drawable.ic_directions_car_black);
             } else {
               // Update point
               point = Point.fromCoordinates(
