@@ -22,6 +22,7 @@
         <attr name="mapbox_uiScrollGestures" format="boolean" />
         <attr name="mapbox_uiRotateGestures" format="boolean" />
         <attr name="mapbox_uiTiltGestures" format="boolean" />
+        <attr name="mapbox_uiDoubleTapGestures" format="boolean" />
 
         <!--UI-Controls-->
         <attr name="mapbox_uiZoomControls" format="boolean" />
