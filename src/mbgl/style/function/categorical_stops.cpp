@@ -1,4 +1,5 @@
 #include <mbgl/style/function/categorical_stops.hpp>
+#include <mbgl/style/types.hpp>
 #include <mbgl/util/color.hpp>
 
 #include <array>
@@ -30,6 +31,8 @@ optional<T> CategoricalStops<T>::evaluate(const Value& value) const {
 template class CategoricalStops<float>;
 template class CategoricalStops<Color>;
 template class CategoricalStops<std::array<float, 2>>;
+template class CategoricalStops<std::string>;
+template class CategoricalStops<TextTransformType>;
 
 } // namespace style
 } // namespace mbgl

@@ -123,7 +123,7 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
                 u8string = util::replaceTokens(u8string, getValue);
             }
             
-            TextTransformType textTransform = layout.evaluate<TextTransform>(zoom, *feature);
+            auto textTransform = layout.evaluate<TextTransform>(zoom, *feature);
 
             if (textTransform == TextTransformType::Uppercase) {
                 u8string = platform::uppercase(u8string);
