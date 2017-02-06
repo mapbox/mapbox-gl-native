@@ -23,7 +23,7 @@ custom_categories:
       - Working with GeoJSON Data
       - For Style Authors
       - Info.plist Keys
-      - Using Gesture Recognizers
+      - Gesture Recognizers
   - name: Maps
     children:
       - MGLAccountManager

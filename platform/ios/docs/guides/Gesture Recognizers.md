@@ -1,12 +1,12 @@
-# User Interactions in the Mapbox iOS SDK
+# User Interactions
 
-The Mapbox iOS SDK provides a set of built-in gesture recognizers to developers. These interactions can be customized to fit your use case. You see what gesture recognizers are on your `MGLMapView` by accessing the `gestureRecognizers` property on your map.
+The Mapbox iOS SDK provides a set of built-in gesture recognizers. You can customize or supplement these gestures according to your use case. You see what gesture recognizers are on your `MGLMapView` by accessing the `gestureRecognizers` property on your map.
 
 ## Configuring user interaction
 
-There are several properties on a `MGLMapView` that are built-in ways to enable or disable a set of gesture recognizers. Boolean values are set to `true` by default.
+Several properties on an `MGLMapView` provide ways to enable or disable a set of gesture recognizers. Boolean values are set to `YES` by default.
 
-- `zoomEnabled` - Allows the user to zoom in and out by pinching two fingers, double tapping, or using "quick zoom". Accepts Boolean values.
+- `zoomEnabled` - Allows the user to zoom in or out by pinching two fingers, double-tapping, tapping with two fingers, or double-tapping then dragging vertically. Accepts Boolean values.
 - `scrollEnabled` - Allows the user to scroll by dragging or swiping one finger. Accepts Boolean values.
 - `rotateEnabled` - Allows the user to rotate by moving two fingers in a circular motion. Accepts Boolean values.
 - `pitchEnabled` - Allows the user to tilt the map by vertically dragging two fingers. Accepts Boolean values.
@@ -14,16 +14,16 @@ There are several properties on a `MGLMapView` that are built-in ways to enable 
 
 ## Individual gestures
 
-|Gesture | name | Description | Related Property |
-|:-------:|:---------|----------------| -----------|
-|Pinch    | `handlePinchGesture:` |Zooms in or out on the map's anchor point | `zoomEnabled` |
-|Rotation | `handleRotateGesture:` | Changes the MGLMapView direction based on the user rotating two fingers in a circular motion | `rotateEnabled` |
-|Single Tap |`handleSingleTapGesture:`  | Selects/Deselects the annotation that you tap. | |
-|Double Tap |`handleDoubleTapGesture:` | Zooms in on the map's anchor point | `zoomEnabled` |
-|Two Finger Tap:| `handleTwoFingerTapGesture:` | Zooms out with the map's anchor point centered | `zoomEnabled` |
-|Pan Gesture| `handlePanGesture:`| Scrolls across mapView (_Note: If_ `MGLUserTrackingModeFollow` _is being used, it will be disabled once the user pans_)| `scrollEnabled` |
-|Two Finger Drag | `handleTwoFingerDragGesture:` | Adjusts the pitch of the `MGLMapView` | `pitchEnabled` |
-|"Quick Zoom" |`handleQuickZoomGesture:` |Tap twice. On second tap, hold your finger on the map and pan up to zoom in, or down to zoom out | `zoomEnabled`|
+|Gesture | Description | Related Property |
+|:-------:|----------------| -----------|
+|Pinch    | Zooms in or out on the map's anchor point | `zoomEnabled` |
+|Rotation | Changes the MGLMapView direction based on the user rotating two fingers in a circular motion | `rotateEnabled` |
+|Single tap | Selects/deselects the annotation that you tap. | |
+|Double tap | Zooms in on the map's anchor point | `zoomEnabled` |
+|Two-finger tap:| Zooms out with the map's anchor point centered | `zoomEnabled` |
+|Pan | Scrolls across mapView (_note: if_ `MGLUserTrackingModeFollow` _is being used, it will be disabled once the user pans_)| `scrollEnabled` |
+|Two-finger drag | Adjusts the pitch of the `MGLMapView` | `pitchEnabled` |
+|One-finger zoom | Tap twice. On second tap, hold your finger on the map and pan up to zoom in, or down to zoom out | `zoomEnabled`|
 
 ![quick zoom](img/user-interaction/quickzoom.gif) ![rotation](img/user-interaction/RotateSydney.gif)
 
@@ -43,5 +43,3 @@ for recognizer in gestureRecognizers where recognizer is UITapGestureRecognizer 
 mapView.addGestureRecognizer(singleTapGestureRecognizer)`
 
 If you would like to disable a specific set of gesture recognizers, such as zoom, you can set the Boolean value for the appropriate property to `false`. You can then add your own gesture recognizers to perform those actions.
-
-With [runtime styling](runtime-styling.html), you can also use user interactions to style the map!
