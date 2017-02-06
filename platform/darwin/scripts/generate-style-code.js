@@ -444,7 +444,7 @@ global.valueTransformerArguments = function (property) {
         case 'string':
             return ['std::string', objCType];
         case 'enum':
-            return [`mbgl::style::${mbglType(property)}`, objCType];
+            return [mbglType(property), objCType];
         case 'color':
             return ['mbgl::Color', objCType];
         case 'array':
