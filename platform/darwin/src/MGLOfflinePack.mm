@@ -4,6 +4,8 @@
 #import "MGLOfflineRegion_Private.h"
 #import "MGLTilePyramidOfflineRegion.h"
 
+#import "NSValue+MGLAdditions.h"
+
 #include <mbgl/storage/default_file_source.hpp>
 
 /**
@@ -37,7 +39,6 @@ private:
 
 @interface MGLOfflinePack ()
 
-@property (nonatomic, weak, nullable) id <MGLOfflinePackDelegate> delegate;
 @property (nonatomic, nullable, readwrite) mbgl::OfflineRegion *mbglOfflineRegion;
 @property (nonatomic, readwrite) MGLOfflinePackProgress progress;
 
@@ -175,7 +176,29 @@ private:
     progress.maximumResourcesExpected = status.requiredResourceCountIsPrecise ? status.requiredResourceCount : UINT64_MAX;
     self.progress = progress;
 
-    [self.delegate offlinePack:self progressDidChange:progress];
+    NSDictionary *userInfo = @{MGLOfflinePackUserInfoKeyState: @(self.state),
+                               MGLOfflinePackUserInfoKeyProgress: [NSValue valueWithMGLOfflinePackProgress:progress]};
+
+    NSNotificationCenter *noteCenter = [NSNotificationCenter defaultCenter];
+    [noteCenter postNotificationName:MGLOfflinePackProgressChangedNotification
+                              object:self
+                            userInfo:userInfo];
+}
+
+- (void)didReceiveError:(NSError *)error {
+    NSDictionary *userInfo = @{ MGLOfflinePackUserInfoKeyError: error };
+    NSNotificationCenter *noteCenter = [NSNotificationCenter defaultCenter];
+    [noteCenter postNotificationName:MGLOfflinePackErrorNotification
+                              object:self
+                            userInfo:userInfo];
+}
+
+- (void)didReceiveMaximumAllowedMapboxTiles:(uint64_t)limit {
+    NSDictionary *userInfo = @{ MGLOfflinePackUserInfoKeyMaximumCount: @(limit) };
+    NSNotificationCenter *noteCenter = [NSNotificationCenter defaultCenter];
+    [noteCenter postNotificationName:MGLOfflinePackMaximumMapboxTilesReachedNotification
+                              object:self
+                            userInfo:userInfo];
 }
 
 NSError *MGLErrorFromResponseError(mbgl::Response::Error error) {
@@ -211,12 +234,12 @@ void MBGLOfflineRegionObserver::statusChanged(mbgl::OfflineRegionStatus status) 
 
 void MBGLOfflineRegionObserver::responseError(mbgl::Response::Error error) {
     dispatch_async(dispatch_get_main_queue(), ^{
-        [pack.delegate offlinePack:pack didReceiveError:MGLErrorFromResponseError(error)];
+        [pack didReceiveError:MGLErrorFromResponseError(error)];
     });
 }
 
 void MBGLOfflineRegionObserver::mapboxTileCountLimitExceeded(uint64_t limit) {
     dispatch_async(dispatch_get_main_queue(), ^{
-        [pack.delegate offlinePack:pack didReceiveMaximumAllowedMapboxTiles:limit];
+        [pack didReceiveMaximumAllowedMapboxTiles:limit];
     });
 }
