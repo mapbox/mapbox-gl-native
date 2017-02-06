@@ -10,6 +10,7 @@
 #include <mbgl/sprite/sprite_image.hpp>
 #include <mbgl/storage/network_status.hpp>
 #include <mbgl/storage/default_file_source.hpp>
+#include <mbgl/storage/online_file_source.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/run_loop.hpp>
@@ -242,6 +243,53 @@ TEST(Map, StyleLoadedSignal) {
     emitted = false;
     map.setStyleJSON("invalid");
     EXPECT_FALSE(emitted);
+}
+
+// Test for https://github.com/mapbox/mapbox-gl-native/issues/7902
+TEST(Map, TEST_REQUIRES_SERVER(StyleNetworkErrorRetry)) {
+    MapTest test;
+    OnlineFileSource fileSource;
+
+    Map map(test.backend, test.view.size, 1, fileSource, test.threadPool, MapMode::Still);
+    map.setStyleURL("http://127.0.0.1:3000/style-fail-once-500");
+
+    test.backend.setMapChangeCallback([&](MapChange change) {
+        if (change == mbgl::MapChangeDidFinishLoadingStyle) {
+            test.runLoop.stop();
+        }
+    });
+
+    test.runLoop.run();
+}
+
+TEST(Map, TEST_REQUIRES_SERVER(StyleNotFound)) {
+    MapTest test;
+    OnlineFileSource fileSource;
+
+    Map map(test.backend, test.view.size, 1, fileSource, test.threadPool, MapMode::Still);
+    map.setStyleURL("http://127.0.0.1:3000/style-fail-once-404");
+
+    using namespace std::chrono_literals;
+    util::Timer timer;
+
+    // Not found errors should not trigger a retry like other errors.
+    test.backend.setMapChangeCallback([&](MapChange change) {
+        if (change == mbgl::MapChangeDidFinishLoadingStyle) {
+            FAIL() << "Should not retry on not found!";
+        }
+
+        if (change == mbgl::MapChangeDidFailLoadingMap) {
+            timer.start(Milliseconds(1100), 0s, [&] {
+                test.runLoop.stop();
+            });
+        }
+    });
+
+    test.runLoop.run();
+
+    // Should also not retry if the response has cache headers.
+    map.setStyleURL("http://127.0.0.1:3000/style-fail-once-404-cache");
+    test.runLoop.run();
 }
 
 TEST(Map, AddLayer) {
