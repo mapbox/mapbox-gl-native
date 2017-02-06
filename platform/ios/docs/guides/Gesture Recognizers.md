@@ -33,13 +33,6 @@ You can add `UIGestureRecognizers` to your map programmatically or via storyboar
 
 The gesture recognizers that you add will take priority over the built-in gesture recognizer. You can also set up your own gesture recognizer to work simultaneously with built-in gesture recognizers by using `-gestureRecognizer:shouldRecognizeSimultaneouslyWithGestureRecognizer:`, allowing you to enhance already existing gesture recognizers.
 
-You can also add gesture recognizers that are only called when the default gesture recognizer fails (and vice versa), such as when a user taps on a part of the map that is not an annotation. For example:
-
-`let gestureRecognizers = mapView.gestureRecognizers
-let singleTapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(myCustomFunction))
-for recognizer in gestureRecognizers where recognizer is UITapGestureRecognizer {
-    singleTapGestureRecognizer.require(toFail: recognizer)
-}
-mapView.addGestureRecognizer(singleTapGestureRecognizer)`
+You can also add gesture recognizers that are only called when the default gesture recognizer fails (and vice versa), such as when a user taps on a part of the map that is not an annotation. The documentation for [MGLMapView](Classes/MGLMapView.html) includes an example of how to create a fallback gesture recognizer.
 
 If you would like to disable a specific set of gesture recognizers, such as zoom, you can set the Boolean value for the appropriate property to `false`. You can then add your own gesture recognizers to perform those actions.
