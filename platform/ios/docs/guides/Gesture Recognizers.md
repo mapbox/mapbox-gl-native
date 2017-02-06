@@ -20,10 +20,10 @@ Several properties on an `MGLMapView` provide ways to enable or disable a set of
 |Rotation | Changes the MGLMapView direction based on the user rotating two fingers in a circular motion | `rotateEnabled` |
 |Single tap | Selects/deselects the annotation that you tap. | |
 |Double tap | Zooms in on the map's anchor point | `zoomEnabled` |
-|Two-finger tap:| Zooms out with the map's anchor point centered | `zoomEnabled` |
+|Two-finger tap | Zooms out with the map's anchor point centered | `zoomEnabled` |
 |Pan | Scrolls across mapView (_note: if_ `MGLUserTrackingModeFollow` _is being used, it will be disabled once the user pans_)| `scrollEnabled` |
 |Two-finger drag | Adjusts the pitch of the `MGLMapView` | `pitchEnabled` |
-|One-finger zoom | Tap twice. On second tap, hold your finger on the map and pan up to zoom in, or down to zoom out | `zoomEnabled`|
+|One-finger zoom | Tap twice; on second tap, hold your finger on the map and pan up to zoom in, or down to zoom out | `zoomEnabled`|
 
 ![quick zoom](img/user-interaction/quickzoom.gif) ![rotation](img/user-interaction/RotateSydney.gif)
 
@@ -35,4 +35,4 @@ The gesture recognizers that you add will take priority over the built-in gestur
 
 You can also add gesture recognizers that are only called when the default gesture recognizer fails (and vice versa), such as when a user taps on a part of the map that is not an annotation. The documentation for [MGLMapView](Classes/MGLMapView.html) includes an example of how to create a fallback gesture recognizer.
 
-If you would like to disable a specific set of gesture recognizers, such as zoom, you can set the Boolean value for the appropriate property to `false`. You can then add your own gesture recognizers to perform those actions.
+If you would like to disable a specific set of gesture recognizers, such as zoom, you can set the Boolean value for the appropriate property to `NO`. You can then add your own gesture recognizers to perform those actions.
