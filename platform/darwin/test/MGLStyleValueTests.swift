@@ -92,11 +92,11 @@ extension MGLStyleValueTests {
         var circleTranslationTwo = CGVector(dx: 0, dy: 0)
         let circleTranslationValueTwo = NSValue(bytes: &circleTranslationTwo, objCType: "{CGVector=dd}")
 
-        let circleTranslationStops = [
+        let circleTranslationStops: [NSNumber: MGLStyleValue<NSValue>] = [
             0: MGLStyleValue<NSValue>(rawValue: circleTranslationValueOne),
             10: MGLStyleValue<NSValue>(rawValue: circleTranslationValueTwo)
         ]
-        let circleTranslationFunction = MGLStyleFunction(
+        let circleTranslationFunction = MGLStyleFunction<NSValue>(
             interpolationBase: 1.0,
             stops: circleTranslationStops
         )

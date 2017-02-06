@@ -204,7 +204,7 @@ MGL_EXPORT
  @param stops A dictionary associating zoom levels with style values.
  @return An `MGLStyleFunction` object with the given stops.
  */
-+ (instancetype)functionWithStops:(NSDictionary<id, MGLStyleValue<T> *> *)stops __attribute__((deprecated("Use +[MGLStyleValue valueWithInterpolationMode:cameraStops:options:]")));
++ (instancetype)functionWithStops:(NS_DICTIONARY_OF(NSNumber *, MGLStyleValue<T> *) *)stops __attribute__((deprecated("Use +[MGLStyleValue valueWithInterpolationMode:cameraStops:options:]")));
 
 /**
  Creates and returns an `MGLStyleFunction` object representing a camera function.
@@ -221,7 +221,7 @@ MGL_EXPORT
  @param stops A dictionary associating zoom levels with style values.
  @return An `MGLStyleFunction` object with the given interpolation base and stops.
  */
-+ (instancetype)functionWithInterpolationBase:(CGFloat)interpolationBase stops:(NSDictionary<id, MGLStyleValue<T> *> *)stops __attribute__((deprecated("Use +[MGLStyleValue valueWithInterpolationMode:cameraStops:options:]")));
++ (instancetype)functionWithInterpolationBase:(CGFloat)interpolationBase stops:(NS_DICTIONARY_OF(NSNumber *, MGLStyleValue<T> *) *)stops __attribute__((deprecated("Use +[MGLStyleValue valueWithInterpolationMode:cameraStops:options:]")));
 
 #pragma mark Initializing a Style Function
 
@@ -240,7 +240,7 @@ MGL_EXPORT
  @param stops A dictionary associating zoom levels with style values.
  @return An `MGLStyleFunction` object with the given interpolation base and stops.
  */
-- (instancetype)initWithInterpolationBase:(CGFloat)interpolationBase stops:(NSDictionary<id, MGLStyleValue<T> *> *)stops NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithInterpolationBase:(CGFloat)interpolationBase stops:(NS_DICTIONARY_OF(NSNumber *, MGLStyleValue<T> *) *)stops NS_DESIGNATED_INITIALIZER;
 
 #pragma mark Accessing the Parameters of a Function
 
