@@ -200,14 +200,11 @@ MGL_EXPORT
 /**
  A dictionary associating zoom levels with style values.
  */
-@property (nonatomic, copy) NSDictionary *stops;
+@property (nonatomic, copy, nullable) NSDictionary *stops;
 
 /**
  The exponential interpolation base of the function’s interpolation curve.
  
- @note This property only applies to `MGLCameraStyleFunction` and 
-    `MGLSourceStyleFunction` functions that use a `MGLInterpolationModeExponential`
-    `interpolationMode`.
  @note This property specifies the exponential base of the interpolation curve 
     of `MGLCameraStyleFunction` and `MGLSourceStyleFunction` functions that use 
     a `MGLInterpolationModeExponential` `interpolationMode`.
