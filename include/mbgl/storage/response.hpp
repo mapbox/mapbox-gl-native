@@ -35,7 +35,7 @@ public:
     optional<std::string> etag;
 
     bool isFresh() const {
-        return !expires || *expires > util::now();
+        return expires ? *expires > util::now() : !error;
     }
 };
 
