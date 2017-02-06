@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Toast;
 
+import com.mapbox.mapboxsdk.maps.Callback;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
@@ -77,17 +78,20 @@ public class QueryRenderedFeaturesBoxSymbolCountActivity extends AppCompatActivi
             int left = selectionBox.getLeft() - mapView.getLeft();
             RectF box = new RectF(left, top, left + selectionBox.getWidth(), top + selectionBox.getHeight());
             Timber.i(String.format("Querying box %s", box));
-            List<Feature> features = mapboxMap.queryRenderedFeatures(box, "symbols-layer");
-
-            // Show count
-            if (toast != null) {
-              toast.cancel();
-            }
-            toast = Toast.makeText(
-              QueryRenderedFeaturesBoxSymbolCountActivity.this,
-              String.format("%s features in box", features.size()),
-              Toast.LENGTH_SHORT);
-            toast.show();
+            mapboxMap.queryRenderedFeatures(box, new Callback<List<Feature>>() {
+              @Override
+              public void onResult(List<Feature> features) {
+                // Show count
+                if (toast != null) {
+                  toast.cancel();
+                }
+                toast = Toast.makeText(
+                  QueryRenderedFeaturesBoxSymbolCountActivity.this,
+                  String.format("%s features in box", features.size()),
+                  Toast.LENGTH_SHORT);
+                toast.show();
+              }
+            }, "symbols-layer");
           }
         });
       }

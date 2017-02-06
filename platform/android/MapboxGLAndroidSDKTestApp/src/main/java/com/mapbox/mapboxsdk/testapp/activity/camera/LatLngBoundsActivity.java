@@ -3,11 +3,14 @@ package com.mapbox.mapboxsdk.testapp.activity.camera;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
+import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
+import com.mapbox.mapboxsdk.geometry.VisibleRegion;
+import com.mapbox.mapboxsdk.maps.Callback;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
@@ -45,14 +48,26 @@ public class LatLngBoundsActivity extends AppCompatActivity implements OnMapRead
     uiSettings.setAllGesturesEnabled(false);
 
     mapboxMap.addMarker(new MarkerOptions()
-      .title("Los Angeles")
-      .snippet("City Hall")
-      .position(LOS_ANGELES));
+        .title("Los Angeles")
+        .snippet("City Hall")
+        .position(LOS_ANGELES),
+      new Callback<Marker>() {
+        @Override
+        public void onResult(Marker marker) {
+          Timber.i("Marker added", marker);
+        }
+      });
 
     mapboxMap.addMarker(new MarkerOptions()
-      .title("New York")
-      .snippet("City Hall")
-      .position(NEW_YORK));
+        .title("New York")
+        .snippet("City Hall")
+        .position(NEW_YORK),
+      new Callback<Marker>() {
+        @Override
+        public void onResult(Marker marker) {
+          Timber.i("Marker added", marker);
+        }
+      });
 
     List<LatLng> points = new ArrayList<>();
     points.add(NEW_YORK);
@@ -73,7 +88,12 @@ public class LatLngBoundsActivity extends AppCompatActivity implements OnMapRead
 
     // Log data
     Timber.e("Move to bounds: " + bounds.toString());
-    Timber.e("Resulting bounds:" + mapboxMap.getProjection().getVisibleRegion().latLngBounds.toString());
+    mapboxMap.getProjection().getVisibleRegion(new Callback<VisibleRegion>() {
+      @Override
+      public void onResult(VisibleRegion visibleRegion) {
+        Timber.e("Resulting bounds:" + visibleRegion.latLngBounds.toString());
+      }
+    });
   }
 
   @Override

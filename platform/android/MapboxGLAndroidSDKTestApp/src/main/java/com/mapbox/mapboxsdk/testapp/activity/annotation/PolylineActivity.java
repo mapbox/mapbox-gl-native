@@ -15,6 +15,7 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
+import com.mapbox.mapboxsdk.maps.Callback;
 import com.mapbox.mapboxsdk.testapp.R;
 
 import java.util.ArrayList;
@@ -63,7 +64,12 @@ public class PolylineActivity extends AppCompatActivity {
       @Override
       public void onMapReady(@NonNull MapboxMap mapboxMap) {
         PolylineActivity.this.mapboxMap = mapboxMap;
-        polylines = mapboxMap.addPolylines(polylineOptions);
+        mapboxMap.addPolylines(polylineOptions, new Callback<List<Polyline>>() {
+          @Override
+          public void onResult(List<Polyline> polylines) {
+            PolylineActivity.this.polylines = polylines;
+          }
+        });
       }
     });
 
@@ -84,8 +90,12 @@ public class PolylineActivity extends AppCompatActivity {
             }
             polylineOptions.clear();
             polylineOptions.addAll(getRandomLine());
-            polylines = mapboxMap.addPolylines(polylineOptions);
-
+            mapboxMap.addPolylines(polylineOptions, new Callback<List<Polyline>>() {
+              @Override
+              public void onResult(List<Polyline> polylines) {
+                PolylineActivity.this.polylines = polylines;
+              }
+            });
           }
         }
       });

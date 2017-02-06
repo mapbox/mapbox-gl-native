@@ -21,7 +21,7 @@ public class MyLocationViewSettings {
   private FocalPointChangeListener focalPointChangeListener;
 
   //
-  // State
+  // MapThreadExecutor
   //
 
   private boolean enabled;

@@ -578,10 +578,15 @@ final class NativeMapView {
    *
    * @param bitmap the snapshot as a bitmap
    */
-  protected void onSnapshotReady(Bitmap bitmap) {
-    if (snapshotReadyCallback != null && bitmap != null) {
-      snapshotReadyCallback.onSnapshotReady(bitmap);
-    }
+  protected void onSnapshotReady(final Bitmap bitmap) {
+    mapView.post(new Runnable() {
+      @Override
+      public void run() {
+        if (snapshotReadyCallback != null && bitmap != null) {
+          snapshotReadyCallback.onSnapshotReady(bitmap);
+        }
+      }
+    });
   }
 
   native void setReachability(boolean status);

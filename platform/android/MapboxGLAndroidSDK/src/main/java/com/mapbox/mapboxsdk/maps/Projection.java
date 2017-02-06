@@ -15,25 +15,34 @@ import com.mapbox.mapboxsdk.geometry.VisibleRegion;
  */
 public class Projection {
 
-  private final NativeMapView nativeMapView;
-  private int[] contentPadding;
+  private final MapState mapState;
+  private final float height;
+  private final float width;
 
-  Projection(@NonNull NativeMapView nativeMapView) {
-    this.nativeMapView = nativeMapView;
-    this.contentPadding = new int[] {0, 0, 0, 0};
+  private int[] contentPadding = new int[] {0, 0, 0, 0};
+
+  Projection(@NonNull MapState mapState, float width, float height) {
+    this.mapState = mapState;
+    this.width = width;
+    this.height = height;
   }
 
   void setContentPadding(int[] contentPadding, int[] userLocationViewPadding) {
     this.contentPadding = contentPadding;
 
-    int[] padding = new int[] {
+    final int[] padding = new int[] {
       contentPadding[0] + userLocationViewPadding[0],
       contentPadding[1] + userLocationViewPadding[1],
       contentPadding[2] + userLocationViewPadding[2],
       contentPadding[3] + userLocationViewPadding[3]
     };
 
-    nativeMapView.setContentPadding(padding);
+    mapState.queueRenderEvent(new MapRunnable() {
+      @Override
+      public void execute(@NonNull NativeMapView nativeMapView) {
+        nativeMapView.setContentPadding(padding);
+      }
+    });
   }
 
   int[] getContentPadding() {
@@ -54,8 +63,20 @@ public class Projection {
    * @param latitude The latitude for which to return the value.
    * @return The distance measured in meters.
    */
-  public double getMetersPerPixelAtLatitude(@FloatRange(from = -90, to = 90) double latitude) {
-    return nativeMapView.getMetersPerPixelAtLatitude(latitude);
+  public void getMetersPerPixelAtLatitude(@FloatRange(from = -90, to = 90) final double latitude,
+                                          final Callback<Double> listener) {
+    mapState.queueRenderEvent(new MapRunnable() {
+      @Override
+      public void execute(@NonNull NativeMapView nativeMapView) {
+        final double metersPerPixel = nativeMapView.getMetersPerPixelAtLatitude(latitude);
+        mapState.queueUiEvent(new Runnable() {
+          @Override
+          public void run() {
+            listener.onResult(metersPerPixel);
+          }
+        });
+      }
+    });
   }
 
   /**
@@ -67,8 +88,19 @@ public class Projection {
    * @return The LatLng corresponding to the point on the screen, or null if the ray through
    * the given screen point does not intersect the ground plane.
    */
-  public LatLng fromScreenLocation(PointF point) {
-    return nativeMapView.latLngForPixel(point);
+  public void fromScreenLocation(final PointF point, final Callback<LatLng> listener) {
+    mapState.queueRenderEvent(new MapRunnable() {
+      @Override
+      public void execute(@NonNull NativeMapView nativeMapView) {
+        final LatLng latLng = nativeMapView.latLngForPixel(point);
+        mapState.queueUiEvent(new Runnable() {
+          @Override
+          public void run() {
+            listener.onResult(latLng);
+          }
+        });
+      }
+    });
   }
 
   /**
@@ -77,25 +109,37 @@ public class Projection {
    *
    * @return The projection of the viewing frustum in its current state.
    */
-  public VisibleRegion getVisibleRegion() {
-    LatLngBounds.Builder builder = new LatLngBounds.Builder();
+  public void getVisibleRegion(final Callback<VisibleRegion> listener) {
+    mapState.queueRenderEvent(new MapRunnable() {
+      @Override
+      public void execute(@NonNull NativeMapView nativeMapView) {
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
 
-    float left = contentPadding[0];
-    float right = nativeMapView.getWidth() - contentPadding[2];
-    float top = contentPadding[1];
-    float bottom = nativeMapView.getHeight() - contentPadding[3];
+        final float left = contentPadding[0];
+        float right = nativeMapView.getWidth() - contentPadding[2];
+        float top = contentPadding[1];
+        float bottom = nativeMapView.getHeight() - contentPadding[3];
 
-    LatLng topLeft = fromScreenLocation(new PointF(left, top));
-    LatLng topRight = fromScreenLocation(new PointF(right, top));
-    LatLng bottomRight = fromScreenLocation(new PointF(right, bottom));
-    LatLng bottomLeft = fromScreenLocation(new PointF(left, bottom));
+        LatLng topLeft = nativeMapView.latLngForPixel(new PointF(left, top));
+        LatLng topRight = nativeMapView.latLngForPixel(new PointF(right, top));
+        LatLng bottomRight = nativeMapView.latLngForPixel(new PointF(right, bottom));
+        LatLng bottomLeft = nativeMapView.latLngForPixel(new PointF(left, bottom));
 
-    builder.include(topLeft)
-      .include(topRight)
-      .include(bottomRight)
-      .include(bottomLeft);
+        LatLngBounds bounds = builder.include(topLeft)
+          .include(topRight)
+          .include(bottomRight)
+          .include(bottomLeft)
+          .build();
 
-    return new VisibleRegion(topLeft, topRight, bottomLeft, bottomRight, builder.build());
+        final VisibleRegion visibleRegion = new VisibleRegion(topLeft, topRight, bottomLeft, bottomRight, bounds);
+        mapState.queueUiEvent(new Runnable() {
+          @Override
+          public void run() {
+            listener.onResult(visibleRegion);
+          }
+        });
+      }
+    });
   }
 
   /**
@@ -106,15 +150,26 @@ public class Projection {
    * @param location A LatLng on the map to convert to a screen location.
    * @return A Point representing the screen location in screen pixels.
    */
-  public PointF toScreenLocation(LatLng location) {
-    return nativeMapView.pixelForLatLng(location);
+  public void toScreenLocation(final LatLng location, final Callback<PointF> listener) {
+    mapState.queueRenderEvent(new MapRunnable() {
+      @Override
+      public void execute(@NonNull NativeMapView nativeMapView) {
+        final PointF pointF = nativeMapView.pixelForLatLng(location);
+        mapState.queueUiEvent(new Runnable() {
+          @Override
+          public void run() {
+            listener.onResult(pointF);
+          }
+        });
+      }
+    });
   }
 
   float getHeight() {
-    return nativeMapView.getHeight();
+    return height;
   }
 
   float getWidth() {
-    return nativeMapView.getWidth();
+    return width;
   }
 }

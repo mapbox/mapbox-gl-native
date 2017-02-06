@@ -14,6 +14,7 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
+import com.mapbox.mapboxsdk.maps.Callback;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.utils.IconUtils;
 
@@ -45,7 +46,12 @@ public class DynamicMarkerChangeActivity extends AppCompatActivity {
             ResourcesCompat.getColor(getResources(), R.color.blueAccent, getTheme())))
           .title(getString(R.string.dynamic_marker_chelsea_title))
           .snippet(getString(R.string.dynamic_marker_chelsea_snippet));
-        marker = mapboxMap.addMarker(markerOptions);
+        mapboxMap.addMarker(markerOptions, new Callback<Marker>() {
+          @Override
+          public void onResult(Marker marker) {
+            DynamicMarkerChangeActivity.this.marker = marker;
+          }
+        });
       }
     });
 
@@ -54,7 +60,7 @@ public class DynamicMarkerChangeActivity extends AppCompatActivity {
     fab.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
-        if (mapboxMap != null) {
+        if (mapboxMap != null && marker != null) {
           updateMarker();
         }
       }

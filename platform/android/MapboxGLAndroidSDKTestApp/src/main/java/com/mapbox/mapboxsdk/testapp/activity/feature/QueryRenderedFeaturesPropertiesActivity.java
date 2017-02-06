@@ -15,6 +15,7 @@ import com.google.gson.JsonElement;
 import com.mapbox.mapboxsdk.annotations.BaseMarkerOptions;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.maps.Callback;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
@@ -56,26 +57,38 @@ public class QueryRenderedFeaturesPropertiesActivity extends AppCompatActivity {
         // Add a click listener
         mapboxMap.setOnMapClickListener(new MapboxMap.OnMapClickListener() {
           @Override
-          public void onMapClick(@NonNull LatLng point) {
-            // Query
-            final PointF pixel = mapboxMap.getProjection().toScreenLocation(point);
-            Timber.i(String.format(
-              "Requesting features for %sx%s (%sx%s adjusted for density)",
-              pixel.x, pixel.y, pixel.x / density, pixel.y / density)
-            );
-            List<Feature> features = mapboxMap.queryRenderedFeatures(pixel);
+          public void onMapClick(@NonNull final LatLng point) {
+            mapboxMap.getProjection().toScreenLocation(point, new Callback<PointF>() {
+              @Override
+              public void onResult(final PointF pixel) {
+                Timber.i(String.format(
+                  "Requesting features for %sx%s (%sx%s adjusted for density)",
+                  pixel.x, pixel.y, pixel.x / density, pixel.y / density)
+                );
+                mapboxMap.queryRenderedFeatures(pixel, new Callback<List<Feature>>() {
+                  @Override
+                  public void onResult(List<Feature> features) {
+                    // Debug output
+                    debugOutput(features);
 
-            // Debug output
-            debugOutput(features);
+                    // Remove any previous markers
+                    if (marker != null) {
+                      mapboxMap.removeMarker(marker);
+                    }
 
-            // Remove any previous markers
-            if (marker != null) {
-              mapboxMap.removeMarker(marker);
-            }
-
-            // Add a marker on the clicked point
-            marker = mapboxMap.addMarker(new CustomMarkerOptions().position(point).features(features));
-            mapboxMap.selectMarker(marker);
+                    // Add a marker on the clicked point
+                    mapboxMap.addMarker(new CustomMarkerOptions().position(point).features(features),
+                      new Callback<Marker>() {
+                        @Override
+                        public void onResult(Marker marker) {
+                          QueryRenderedFeaturesPropertiesActivity.this.marker = marker;
+                          mapboxMap.selectMarker(marker);
+                        }
+                      });
+                  }
+                });
+              }
+            });
           }
         });
       }

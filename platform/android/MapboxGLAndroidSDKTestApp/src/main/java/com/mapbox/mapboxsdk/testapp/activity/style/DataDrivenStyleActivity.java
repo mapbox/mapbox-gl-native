@@ -10,6 +10,7 @@ import android.widget.Toast;
 
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.maps.Callback;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
@@ -161,194 +162,231 @@ public class DataDrivenStyleActivity extends AppCompatActivity {
 
   private void addExponentialZoomFunction() {
     Timber.i("Add exponential zoom function");
-    FillLayer layer = mapboxMap.getLayerAs("water");
-    assert layer != null;
-    layer.setProperties(
-      fillColor(
-        zoom(
-          exponential(
-            stop(1, fillColor(Color.RED)),
-            stop(5, fillColor(Color.BLUE)),
-            stop(10, fillColor(Color.GREEN))
-          ).withBase(0.5f)
-        )
-      )
-    );
+    mapboxMap.getLayerAs("water", new Callback.LayerCallback<FillLayer>() {
+      @Override
+      public void onResult(FillLayer layer) {
+        assert layer != null;
+        layer.setProperties(
+          fillColor(
+            zoom(
+              exponential(
+                stop(1, fillColor(Color.RED)),
+                stop(5, fillColor(Color.BLUE)),
+                stop(10, fillColor(Color.GREEN))
+              ).withBase(0.5f)
+            )
+          )
+        );
 
-    Timber.i("Fill color: %s", layer.getFillColor());
+        Timber.i("Fill color: %s", layer.getFillColor());
+      }
+    });
   }
 
   private void addIntervalZoomFunction() {
     Timber.i("Add interval zoom function");
-    FillLayer layer = mapboxMap.getLayerAs("water");
-    assert layer != null;
-    layer.setProperties(
-      fillColor(
-        zoom(
-          interval(
-            stop(1, fillColor(Color.RED)),
-            stop(5, fillColor(Color.BLUE)),
-            stop(10, fillColor(Color.GREEN))
+    mapboxMap.getLayerAs("water", new Callback.LayerCallback<FillLayer>() {
+      @Override
+      public void onResult(FillLayer layer) {
+        assert layer != null;
+        layer.setProperties(
+          fillColor(
+            zoom(
+              interval(
+                stop(1, fillColor(Color.RED)),
+                stop(5, fillColor(Color.BLUE)),
+                stop(10, fillColor(Color.GREEN))
+              )
+            )
           )
-        )
-      )
-    );
+        );
 
-    Timber.i("Fill color: %s", layer.getFillColor());
+        Timber.i("Fill color: %s", layer.getFillColor());
+      }
+    });
   }
 
   private void addExponentialSourceFunction() {
     Timber.i("Add exponential source function");
-    FillLayer layer = mapboxMap.getLayerAs(AMSTERDAM_PARKS_LAYER);
-    assert layer != null;
-    layer.setProperties(
-      fillColor(
-        property(
-          "stroke-width",
-          exponential(
-            stop(1f, fillColor(Color.RED)),
-            stop(5f, fillColor(Color.BLUE)),
-            stop(10f, fillColor(Color.GREEN))
-          ).withBase(0.5f)
-        )
-      )
-    );
+    mapboxMap.getLayerAs(AMSTERDAM_PARKS_LAYER, new Callback.LayerCallback<FillLayer>() {
+      @Override
+      public void onResult(FillLayer layer) {
+        assert layer != null;
+        layer.setProperties(
+          fillColor(
+            property(
+              "stroke-width",
+              exponential(
+                stop(1f, fillColor(Color.RED)),
+                stop(5f, fillColor(Color.BLUE)),
+                stop(10f, fillColor(Color.GREEN))
+              ).withBase(0.5f)
+            )
+          )
+        );
 
-    Timber.i("Fill color: %s", layer.getFillColor());
+        Timber.i("Fill color: %s", layer.getFillColor());
+      }
+    });
   }
 
   private void addCategoricalSourceFunction() {
     Timber.i("Add categorical source function");
-    FillLayer layer = mapboxMap.getLayerAs(AMSTERDAM_PARKS_LAYER);
-    assert layer != null;
-    layer.setProperties(
-      fillColor(
-        property(
-          "name",
-          categorical(
-            stop("Westerpark", fillColor(Color.RED)),
-            stop("Jordaan", fillColor(Color.BLUE)),
-            stop("Prinseneiland", fillColor(Color.GREEN))
-          ))
-      )
-    );
+    mapboxMap.getLayerAs(AMSTERDAM_PARKS_LAYER, new Callback.LayerCallback<FillLayer>() {
+      @Override
+      public void onResult(FillLayer layer) {
+        assert layer != null;
+        layer.setProperties(
+          fillColor(
+            property(
+              "name",
+              categorical(
+                stop("Westerpark", fillColor(Color.RED)),
+                stop("Jordaan", fillColor(Color.BLUE)),
+                stop("Prinseneiland", fillColor(Color.GREEN))
+              ))
+          )
+        );
 
-    Timber.i("Fill color: %s", layer.getFillColor());
+        Timber.i("Fill color: %s", layer.getFillColor());
+      }
+    });
   }
 
   private void addIdentitySourceFunction() {
     Timber.i("Add identity source function");
-    FillLayer layer = mapboxMap.getLayerAs(AMSTERDAM_PARKS_LAYER);
-    assert layer != null;
-    layer.setProperties(
-      fillOpacity(
-        property(
-          "fill-opacity",
-          Stops.<Float>identity())
-      )
-    );
+    mapboxMap.getLayerAs(AMSTERDAM_PARKS_LAYER, new Callback.LayerCallback<FillLayer>() {
+      @Override
+      public void onResult(FillLayer layer) {
+        assert layer != null;
+        layer.setProperties(
 
-    Timber.i("Fill opacity: %s", layer.getFillOpacity());
+          fillOpacity(
+            property(
+              "fill-opacity",
+              Stops.<Float>identity())
+          )
+        );
+
+        Timber.i("Fill opacity: %s", layer.getFillOpacity());
+      }
+    });
   }
 
   private void addIntervalSourceFunction() {
     Timber.i("Add interval source function");
-    FillLayer layer = mapboxMap.getLayerAs(AMSTERDAM_PARKS_LAYER);
-    assert layer != null;
-    layer.setProperties(
-      fillColor(
-        property(
-          "stroke-width",
-          interval(
-            stop(1f, fillColor(Color.RED)),
-            stop(5f, fillColor(Color.BLUE)),
-            stop(10f, fillColor(Color.GREEN))
-          ))
-      )
-    );
+    mapboxMap.getLayerAs(AMSTERDAM_PARKS_LAYER, new Callback.LayerCallback<FillLayer>() {
+      @Override
+      public void onResult(FillLayer layer) {
+        assert layer != null;
+        layer.setProperties(
+          fillColor(
+            property(
+              "stroke-width",
+              interval(
+                stop(1f, fillColor(Color.RED)),
+                stop(5f, fillColor(Color.BLUE)),
+                stop(10f, fillColor(Color.GREEN))
+              ))
+          )
+        );
 
-    Timber.i("Fill color: %s", layer.getFillColor());
+        Timber.i("Fill color: %s", layer.getFillColor());
+      }
+    });
   }
 
   private void addCompositeExponentialFunction() {
     Timber.i("Add composite exponential function");
-    FillLayer layer = mapboxMap.getLayerAs(AMSTERDAM_PARKS_LAYER);
-    assert layer != null;
-    layer.setProperties(
-      fillColor(
-        composite(
-          "stroke-width",
-          exponential(
-            stop(1, 1, fillColor(Color.RED)),
-            stop(10, 2, fillColor(Color.BLUE)),
-            stop(22, 3, fillColor(Color.GREEN)),
-            stop(1, 1, fillColor(Color.CYAN)),
-            stop(10, 2, fillColor(Color.GRAY)),
-            stop(22, 3, fillColor(Color.YELLOW))
-          ).withBase(1f)
-        )
-      )
-    );
+    mapboxMap.getLayerAs(AMSTERDAM_PARKS_LAYER, new Callback.LayerCallback<FillLayer>() {
+      @Override
+      public void onResult(FillLayer layer) {
+        assert layer != null;
+        layer.setProperties(
+          fillColor(
+            composite(
+              "stroke-width",
+              exponential(
+                stop(1, 1, fillColor(Color.RED)),
+                stop(10, 2, fillColor(Color.BLUE)),
+                stop(22, 3, fillColor(Color.GREEN)),
+                stop(1, 1, fillColor(Color.CYAN)),
+                stop(10, 2, fillColor(Color.GRAY)),
+                stop(22, 3, fillColor(Color.YELLOW))
+              ).withBase(1f)
+            )
+          )
+        );
 
-    Timber.i("Fill color: %s", layer.getFillColor());
+        Timber.i("Fill color: %s", layer.getFillColor());
+      }
+    });
   }
 
   private void addCompositeIntervalFunction() {
     Timber.i("Add composite exponential function");
-    FillLayer layer = mapboxMap.getLayerAs(AMSTERDAM_PARKS_LAYER);
-    assert layer != null;
-    layer.setProperties(
-      fillColor(
-        composite(
-          "stroke-width",
-          interval(
-            stop(1, 1, fillColor(Color.RED)),
-            stop(10, 2, fillColor(Color.BLUE)),
-            stop(22, 3, fillColor(Color.GREEN)),
-            stop(1, 1, fillColor(Color.CYAN)),
-            stop(10, 2, fillColor(Color.GRAY)),
-            stop(22, 3, fillColor(Color.YELLOW))
-          ))
-      )
-    );
+    mapboxMap.getLayerAs(AMSTERDAM_PARKS_LAYER, new Callback.LayerCallback<FillLayer>() {
+      @Override
+      public void onResult(FillLayer layer) {
+        assert layer != null;
+        layer.setProperties(
+          fillColor(
+            composite(
+              "stroke-width",
+              interval(
+                stop(1, 1, fillColor(Color.RED)),
+                stop(10, 2, fillColor(Color.BLUE)),
+                stop(22, 3, fillColor(Color.GREEN)),
+                stop(1, 1, fillColor(Color.CYAN)),
+                stop(10, 2, fillColor(Color.GRAY)),
+                stop(22, 3, fillColor(Color.YELLOW))
+              ))
+          )
+        );
 
-    Timber.i("Fill color: %s", layer.getFillColor());
+        Timber.i("Fill color: %s", layer.getFillColor());
+      }
+    });
   }
 
   private void addCompositeCategoricalFunction() {
     Timber.i("Add composite categorical function");
-    FillLayer layer = mapboxMap.getLayerAs(AMSTERDAM_PARKS_LAYER);
-    assert layer != null;
-    layer.setProperties(
-      fillColor(
-        composite(
-          "name",
-          categorical(
-            stop(7f, "Westerpark", fillColor(Color.RED)),
-            stop(8f, "Westerpark", fillColor(Color.BLUE)),
-            stop(9f, "Westerpark", fillColor(Color.RED)),
-            stop(10f, "Westerpark", fillColor(Color.BLUE)),
-            stop(11f, "Westerpark", fillColor(Color.RED)),
-            stop(12f, "Westerpark", fillColor(Color.BLUE)),
-            stop(13f, "Westerpark", fillColor(Color.RED)),
-            stop(14f, "Westerpark", fillColor(Color.BLUE)),
-            stop(15f, "Westerpark", fillColor(Color.RED)),
-            stop(16f, "Westerpark", fillColor(Color.BLUE)),
-            stop(17f, "Westerpark", fillColor(Color.RED)),
-            stop(18f, "Westerpark", fillColor(Color.BLUE)),
-            stop(19f, "Westerpark", fillColor(Color.RED)),
-            stop(20f, "Westerpark", fillColor(Color.BLUE)),
-            stop(21f, "Westerpark", fillColor(Color.RED)),
-            stop(22f, "Westerpark", fillColor(Color.BLUE)),
-            stop(14f, "Jordaan", fillColor(Color.GREEN)),
-            stop(18f, "Jordaan", fillColor(Color.CYAN)),
-            stop(14f, "Prinseneiland", fillColor(Color.WHITE)),
-            stop(18f, "Prinseneiland", fillColor(Color.BLACK))
-          ))
-      )
-    );
+    mapboxMap.getLayerAs(AMSTERDAM_PARKS_LAYER, new Callback.LayerCallback<FillLayer>() {
+      @Override
+      public void onResult(FillLayer layer) {
+        assert layer != null;
+        layer.setProperties(
+          fillColor(
+            composite(
+              "name",
+              categorical(
+                stop(7f, "Westerpark", fillColor(Color.RED)),
+                stop(8f, "Westerpark", fillColor(Color.BLUE)),
+                stop(9f, "Westerpark", fillColor(Color.RED)),
+                stop(10f, "Westerpark", fillColor(Color.BLUE)),
+                stop(11f, "Westerpark", fillColor(Color.RED)),
+                stop(12f, "Westerpark", fillColor(Color.BLUE)),
+                stop(13f, "Westerpark", fillColor(Color.RED)),
+                stop(14f, "Westerpark", fillColor(Color.BLUE)),
+                stop(15f, "Westerpark", fillColor(Color.RED)),
+                stop(16f, "Westerpark", fillColor(Color.BLUE)),
+                stop(17f, "Westerpark", fillColor(Color.RED)),
+                stop(18f, "Westerpark", fillColor(Color.BLUE)),
+                stop(19f, "Westerpark", fillColor(Color.RED)),
+                stop(20f, "Westerpark", fillColor(Color.BLUE)),
+                stop(21f, "Westerpark", fillColor(Color.RED)),
+                stop(22f, "Westerpark", fillColor(Color.BLUE)),
+                stop(14f, "Jordaan", fillColor(Color.GREEN)),
+                stop(18f, "Jordaan", fillColor(Color.CYAN)),
+                stop(14f, "Prinseneiland", fillColor(Color.WHITE)),
+                stop(18f, "Prinseneiland", fillColor(Color.BLACK))
+              ))
+          )
+        );
 
-    Timber.i("Fill color: %s", layer.getFillColor());
+        Timber.i("Fill color: %s", layer.getFillColor());
+      }
+    });
   }
 
   private void addParksLayer() {

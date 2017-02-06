@@ -1,6 +1,7 @@
 package com.mapbox.mapboxsdk.maps;
 
 import android.graphics.Bitmap;
+import android.support.annotation.WorkerThread;
 import android.util.DisplayMetrics;
 
 import com.mapbox.mapboxsdk.annotations.Icon;
@@ -92,10 +93,12 @@ class IconManager {
     return icon;
   }
 
+  @WorkerThread
   int getTopOffsetPixelsForIcon(Icon icon) {
     return (int) (nativeMapView.getTopOffsetPixelsForAnnotationSymbol(icon.getId()) * nativeMapView.getPixelRatio());
   }
 
+  @WorkerThread
   void loadIcon(Icon icon) {
     Bitmap bitmap = icon.getBitmap();
     String id = icon.getId();

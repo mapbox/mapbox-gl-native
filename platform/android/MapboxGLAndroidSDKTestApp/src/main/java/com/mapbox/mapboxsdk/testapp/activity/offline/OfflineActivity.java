@@ -16,9 +16,11 @@ import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
+import com.mapbox.mapboxsdk.geometry.VisibleRegion;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
+import com.mapbox.mapboxsdk.maps.Callback;
 import com.mapbox.mapboxsdk.offline.OfflineManager;
 import com.mapbox.mapboxsdk.offline.OfflineRegion;
 import com.mapbox.mapboxsdk.offline.OfflineRegionError;
@@ -221,30 +223,36 @@ public class OfflineActivity extends AppCompatActivity
     startProgress();
 
     // Definition
-    LatLngBounds bounds = mapboxMap.getProjection().getVisibleRegion().latLngBounds;
-    double minZoom = mapboxMap.getCameraPosition().zoom;
-    double maxZoom = mapboxMap.getMaxZoomLevel();
-    float pixelRatio = this.getResources().getDisplayMetrics().density;
-    OfflineTilePyramidRegionDefinition definition = new OfflineTilePyramidRegionDefinition(
-      STYLE_URL, bounds, minZoom, maxZoom, pixelRatio);
-
-    // Sample way of encoding metadata from a JSONObject
-    byte[] metadata = OfflineUtils.convertRegionName(regionName);
-
-    // Create region
-    offlineManager.createOfflineRegion(definition, metadata, new OfflineManager.CreateOfflineRegionCallback() {
+    mapboxMap.getProjection().getVisibleRegion(new Callback<VisibleRegion>() {
       @Override
-      public void onCreate(OfflineRegion offlineRegion) {
-        Timber.d("Offline region created: " + regionName);
-        OfflineActivity.this.offlineRegion = offlineRegion;
-        launchDownload();
-      }
+      public void onResult(VisibleRegion visibleRegion) {
+        LatLngBounds bounds = visibleRegion.latLngBounds;
+        double minZoom = mapboxMap.getCameraPosition().zoom;
+        double maxZoom = mapboxMap.getMaxZoomLevel();
+        float pixelRatio = OfflineActivity.this.getResources().getDisplayMetrics().density;
+        OfflineTilePyramidRegionDefinition definition = new OfflineTilePyramidRegionDefinition(
+          STYLE_URL, bounds, minZoom, maxZoom, pixelRatio);
 
-      @Override
-      public void onError(String error) {
-        Timber.e("Error: " + error);
+        // Sample way of encoding metadata from a JSONObject
+        byte[] metadata = OfflineUtils.convertRegionName(regionName);
+
+        // Create region
+        offlineManager.createOfflineRegion(definition, metadata, new OfflineManager.CreateOfflineRegionCallback() {
+          @Override
+          public void onCreate(OfflineRegion offlineRegion) {
+            Timber.d("Offline region created: " + regionName);
+            OfflineActivity.this.offlineRegion = offlineRegion;
+            launchDownload();
+          }
+
+          @Override
+          public void onError(String error) {
+            Timber.e("Error: " + error);
+          }
+        });
       }
     });
+
   }
 
   private void launchDownload() {

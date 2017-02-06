@@ -8,8 +8,10 @@ import android.support.v7.app.AppCompatActivity;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
+import com.mapbox.mapboxsdk.maps.Callback;
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
+import com.mapbox.mapboxsdk.style.sources.Source;
 import com.mapbox.mapboxsdk.testapp.R;
 
 import java.net.MalformedURLException;
@@ -118,7 +120,15 @@ public class RealTimeGeoJsonActivity extends AppCompatActivity implements OnMapR
 
     @Override
     public void run() {
-      ((GeoJsonSource) mapboxMap.getSource(ID_GEOJSON_SOURCE)).setUrl(URL_GEOJSON_SOURCE);
+      mapboxMap.getSource(ID_GEOJSON_SOURCE, new Callback<Source>() {
+
+
+
+        @Override
+        public void onResult(Source source) {
+          ((GeoJsonSource) source).setUrl(URL_GEOJSON_SOURCE);
+        }
+      });
       handler.postDelayed(this, 2000);
     }
   }

@@ -32,6 +32,7 @@ import com.mapbox.mapboxsdk.constants.MyBearingTracking;
 import com.mapbox.mapboxsdk.constants.MyLocationTracking;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.location.LocationSource;
+import com.mapbox.mapboxsdk.maps.Callback;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.Projection;
 import com.mapbox.services.android.telemetry.location.LocationEngine;
@@ -60,6 +61,7 @@ public class MyLocationView extends View {
   private Location location;
   private long locationUpdateTimestamp;
   private float previousDirection;
+  private float metersPerPixel;
 
   private float accuracy;
   private Paint accuracyPaint;
@@ -256,7 +258,6 @@ public class MyLocationView extends View {
     }
 
     final PointF pointF = screenLocation;
-    float metersPerPixel = (float) projection.getMetersPerPixelAtLatitude(location.getLatitude());
     float accuracyPixels = (Float) accuracyAnimator.getAnimatedValue() / metersPerPixel / 2;
     float maxRadius = getWidth() / 2;
     accuracyPixels = accuracyPixels <= maxRadius ? accuracyPixels : maxRadius;
@@ -332,6 +333,15 @@ public class MyLocationView extends View {
     if (position != null) {
       setBearing(position.bearing);
       setTilt(position.tilt);
+    }
+
+    if (location != null) {
+      projection.getMetersPerPixelAtLatitude(location.getLatitude(), new Callback<Double>() {
+        @Override
+        public void onResult(Double aDouble) {
+          metersPerPixel = (float) aDouble.doubleValue();
+        }
+      });
     }
   }
 
@@ -837,9 +847,14 @@ public class MyLocationView extends View {
     @Override
     void invalidate() {
       if (latLng != null) {
-        screenLocation = projection.toScreenLocation(latLng);
+        projection.toScreenLocation(latLng, new Callback<PointF>() {
+          @Override
+          public void onResult(PointF pointF) {
+            screenLocation = pointF;
+            MyLocationView.this.invalidate();
+          }
+        });
       }
-      MyLocationView.this.invalidate();
     }
   }
 }

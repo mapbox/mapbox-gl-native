@@ -13,6 +13,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.maps.Callback;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
@@ -94,37 +95,59 @@ public class SymbolLayerActivity extends AppCompatActivity implements MapboxMap.
   @Override
   public void onMapClick(@NonNull LatLng point) {
     // Query which features are clicked
-    PointF screenLoc = mapboxMap.getProjection().toScreenLocation(point);
-    List<Feature> features = mapboxMap.queryRenderedFeatures(screenLoc, MARKER_LAYER);
-
-    SymbolLayer layer = mapboxMap.getLayerAs(MARKER_LAYER);
-    if (features.size() == 0) {
-      // Reset
-      layer.setProperties(iconSize(1f));
-    } else {
-      layer.setProperties(iconSize(3f));
-    }
+    mapboxMap.getProjection().toScreenLocation(point, new Callback<PointF>() {
+      @Override
+      public void onResult(PointF pointF) {
+        mapboxMap.queryRenderedFeatures(pointF, new Callback<List<Feature>>() {
+          @Override
+          public void onResult(final List<Feature> features) {
+            mapboxMap.getLayerAs(MARKER_LAYER, new LayerCallback<SymbolLayer>() {
+              @Override
+              public void onResult(SymbolLayer layer) {
+                if (features.size() == 0) {
+                  // Reset
+                  layer.setProperties(iconSize(1f));
+                } else {
+                  layer.setProperties(iconSize(3f));
+                }
+              }
+            });
+          }
+        }, MARKER_LAYER);
+      }
+    });
   }
 
   private void toggleTextSize() {
-    SymbolLayer layer = mapboxMap.getLayerAs(MARKER_LAYER);
-    layer.setProperties(layer.getTextSize().getValue() > 10 ? textSize(10f) : textSize(20f));
+    mapboxMap.getLayerAs(MARKER_LAYER, new Callback.LayerCallback<SymbolLayer>() {
+      @Override
+      public void onResult(SymbolLayer layer) {
+        layer.setProperties(layer.getTextSize().getValue() > 10 ? textSize(10f) : textSize(20f));
+      }
+    });
   }
 
   private void toggleTextField() {
-    SymbolLayer layer = mapboxMap.getLayerAs(MARKER_LAYER);
-    layer.setProperties("{title}".equals(layer.getTextField().getValue()) ? textField("āA") : textField("{title}"));
+    mapboxMap.getLayerAs(MARKER_LAYER, new Callback.LayerCallback<SymbolLayer>() {
+      @Override
+      public void onResult(SymbolLayer layer) {
+        layer.setProperties("{title}".equals(layer.getTextField().getValue()) ? textField("āA") : textField("{title}"));
+      }
+    });
   }
 
   private void toggleTextFont() {
-    SymbolLayer layer = mapboxMap.getLayerAs(MARKER_LAYER);
-
-    String[] fonts = layer.getTextFont().getValue();
-    if (fonts == null || fonts.length == 0 || Arrays.asList(fonts).contains("Arial Unicode MS Regular")) {
-      layer.setProperties(textFont(new String[] {"DIN Offc Pro Bold", "Arial Unicode MS Bold"}));
-    } else {
-      layer.setProperties(textFont(new String[] {"DIN Offc Pro Medium", "Arial Unicode MS Regular"}));
-    }
+    mapboxMap.getLayerAs(MARKER_LAYER, new Callback.LayerCallback<SymbolLayer>() {
+      @Override
+      public void onResult(SymbolLayer layer) {
+        String[] fonts = layer.getTextFont().getValue();
+        if (fonts == null || fonts.length == 0 || Arrays.asList(fonts).contains("Arial Unicode MS Regular")) {
+          layer.setProperties(textFont(new String[] {"DIN Offc Pro Bold", "Arial Unicode MS Bold"}));
+        } else {
+          layer.setProperties(textFont(new String[] {"DIN Offc Pro Medium", "Arial Unicode MS Regular"}));
+        }
+      }
+    });
   }
 
   private JsonObject featureProperties(String title) {

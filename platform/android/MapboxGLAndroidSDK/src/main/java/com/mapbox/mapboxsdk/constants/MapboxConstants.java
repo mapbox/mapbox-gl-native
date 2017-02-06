@@ -105,6 +105,12 @@ public class MapboxConstants {
   // Save instance state keys
   public static final String STATE_HAS_SAVED_STATE = "savedState";
   public static final String STATE_CAMERA_POSITION = "cameraPosition";
+  public static final String STATE_CAMERA_LAT = "cameraPositionLat";
+  public static final String STATE_CAMERA_LNG = "cameraPositionLng";
+  public static final String STATE_CAMERA_BEARING = "cameraPositionBearing";
+  public static final String STATE_CAMERA_TILT = "cameraPositionTilt";
+  public static final String STATE_CAMERA_ZOOM = "cameraPositionZoom";
+
   public static final String STATE_ZOOM_ENABLED = "zoomEnabled";
   public static final String STATE_ZOOM_ENABLED_CHANGE = "zoomEnabledChange";
   public static final String STATE_SCROLL_ENABLED = "scrollEnabled";
@@ -118,6 +124,7 @@ public class MapboxConstants {
   public static final String STATE_DOUBLE_TAP_ENABLED_CHANGE = "doubleTapEnabledChange";
   public static final String STATE_DEBUG_ACTIVE = "debugActive";
   public static final String STATE_STYLE_URL = "styleUrl";
+  public static final String STATE_API_BASE_URL = "apiBaseUrl";
   public static final String STATE_MY_LOCATION_ENABLED = "myLocationEnabled";
   public static final String STATE_MY_LOCATION_TRACKING_MODE = "myLocationTracking";
   public static final String STATE_MY_BEARING_TRACKING_MODE = "myBearingTracking";
@@ -150,4 +157,6 @@ public class MapboxConstants {
   public static final String MAPBOX_SHARED_PREFERENCE_KEY_TELEMETRY_STAGING_URL = "mapboxTelemetryStagingUrl";
   public static final String MAPBOX_SHARED_PREFERENCE_KEY_TELEMETRY_STAGING_ACCESS_TOKEN =
     "mapboxTelemetryStagingAccessToken";
+  public static final String STATE_TRANSITION_DELAY = "transitionDelay";
+  public static final String STATE_TRANSITION_DURATION = "transitionDuration";
 }
