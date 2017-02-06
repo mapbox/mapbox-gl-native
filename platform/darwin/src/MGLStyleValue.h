@@ -112,8 +112,6 @@ MGL_EXPORT
 
 /**
  Creates and returns an `MGLCompositeStyleFunction` object representing a composite
- function made up of one or more outer stops interpreted as a camera function 
- with a single inner stop at each zoom level that is interpreted as a source 
  function.
 
  @param interpolationMode The mode used to interpolate property values over a 
@@ -332,10 +330,10 @@ MGL_EXPORT
 
  Each of the function’s stops is represented by one key-value pair in the
  dictionary. Each key in the dictionary is an object representing a feature 
- attribute key. Each value in the dictionary is an `MGLStyleValue` object 
- containing the value to use when the function is given the associated
- attribute key. An `MGLStyleFunction` object may not be used recursively
- as a stop value.
+ attribute key or interpolation stop. Each value in the dictionary is an 
+ `MGLStyleValue` object containing the value to use when the function is given 
+ the associated attribute key. An `MGLStyleFunction` object may not be used 
+ recursively as a stop value.
  */
 @property (nonatomic, copy, nullable) NS_DICTIONARY_OF(id, MGLStyleValue<T> *) *stops;
 
@@ -365,8 +363,6 @@ MGL_EXPORT
 
 /**
  Creates and returns an `MGLCompositeStyleFunction` object representing a composite
- function made up of one or more outer stops interpreted as a camera function
- with a single inner stop at each zoom level that is interpreted as a source
  function.
 
  @param interpolationMode The mode used to interpolate property values over a
@@ -385,8 +381,6 @@ MGL_EXPORT
 
 /**
  Returns an `MGLCompositeStyleFunction` object representing a composite
- function made up of one or more outer stops interpreted as a camera function
- with a single inner stop at each zoom level that is interpreted as a source
  function.
 
  @param interpolationMode The mode used to interpolate property values over a
@@ -415,10 +409,10 @@ MGL_EXPORT
  Each of the function’s stops is represented by one key-value pair in the
  dictionary. Each key in the dictionary is an `NSNumber` object containing a
  floating-point zoom level. Each value in the dictionary is an inner nested 
- dictionary. The nested dictionary key is an object representing a feature 
- attribute key. The nested dictionary value is an `MGLStyleValue` object 
- containing the value to use when the function is given the associated attribute 
- key at the outer zoom level. An `MGLStyleFunction` object may not be used 
+ dictionary. Each key in the nested dictionary is an object representing a feature
+ attribute key or interpolation stop. Each value in the nested dictionary is an
+ `MGLStyleValue` object containing the value to use when the function is given
+ the associated attribute key. An `MGLStyleFunction` object may not be used
  recursively as a value inside the nested dictionary.
  */
 @property (nonatomic, copy) NS_DICTIONARY_OF(id, NS_DICTIONARY_OF(id, MGLStyleValue<T> *) *) *stops;
