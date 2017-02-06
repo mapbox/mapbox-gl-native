@@ -11,6 +11,11 @@ TEST(HttpRetry, OtherError) {
     ASSERT_EQ(Duration::max(), errorRetryTimeout(Response::Error::Reason::Other, 1));
 }
 
+TEST(HttpRetry, NotFound) {
+    // Non-retryable
+    ASSERT_EQ(Duration::max(), errorRetryTimeout(Response::Error::Reason::NotFound, 1));
+}
+
 TEST(HttpRetry, ServerError) {
     // 1-3 failures -> 1 sec
     ASSERT_EQ(Seconds(1), errorRetryTimeout(Response::Error::Reason::Server, 1));
