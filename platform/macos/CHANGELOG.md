@@ -84,6 +84,7 @@ This version of the Mapbox macOS SDK corresponds to version 3.4.0 of the Mapbox 
 
 ### Networking and offline maps
 
+* Fixed a leak of MGLReachability objects and threads in MGLMapView. ([#7956](https://github.com/mapbox/mapbox-gl-native/pull/7956))
 * Fixed an issue preventing an MGLMapView from loading tiles while an offline pack is downloading. ([#6446](https://github.com/mapbox/mapbox-gl-native/pull/6446))
 * Fixed an issue causing an MGLOfflinePack’s progress to continue to update after calling `-suspend`. ([#6186](https://github.com/mapbox/mapbox-gl-native/pull/6186))
 * Fixed an issue preventing cached annotation images from displaying while the device is offline. ([#6358](https://github.com/mapbox/mapbox-gl-native/pull/6358))
