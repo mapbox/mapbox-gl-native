@@ -182,18 +182,31 @@ set(MBGL_CORE_FILES
     src/mbgl/renderer/symbol_bucket.hpp
 
     # shaders
+    src/mbgl/shaders/circle.cpp
     src/mbgl/shaders/circle.hpp
+    src/mbgl/shaders/collision_box.cpp
     src/mbgl/shaders/collision_box.hpp
+    src/mbgl/shaders/debug.cpp
     src/mbgl/shaders/debug.hpp
+    src/mbgl/shaders/fill.cpp
     src/mbgl/shaders/fill.hpp
+    src/mbgl/shaders/fill_outline.cpp
     src/mbgl/shaders/fill_outline.hpp
+    src/mbgl/shaders/fill_outline_pattern.cpp
     src/mbgl/shaders/fill_outline_pattern.hpp
+    src/mbgl/shaders/fill_pattern.cpp
     src/mbgl/shaders/fill_pattern.hpp
+    src/mbgl/shaders/line.cpp
     src/mbgl/shaders/line.hpp
+    src/mbgl/shaders/line_pattern.cpp
     src/mbgl/shaders/line_pattern.hpp
+    src/mbgl/shaders/line_sdf.cpp
     src/mbgl/shaders/line_sdf.hpp
+    src/mbgl/shaders/raster.cpp
     src/mbgl/shaders/raster.hpp
+    src/mbgl/shaders/symbol_icon.cpp
     src/mbgl/shaders/symbol_icon.hpp
+    src/mbgl/shaders/symbol_sdf.cpp
     src/mbgl/shaders/symbol_sdf.hpp
 
     # sprite

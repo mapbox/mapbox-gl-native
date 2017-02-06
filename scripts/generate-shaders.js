@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 
-var path = require('path');
-var fs = require('fs');
+const path = require('path');
+const fs = require('fs');
 
-var inputPath = 'mapbox-gl-js/shaders';
-var outputPath = 'src/mbgl/shaders';
+const inputPath = 'mapbox-gl-js/shaders';
+const outputPath = 'src/mbgl/shaders';
 
 require('./style-code');
 
@@ -34,8 +34,8 @@ require('./style-code');
     }
 
     function vertexSource() {
-        var prelude = fs.readFileSync(path.join(inputPath, '_prelude.vertex.glsl'));
-        var source = fs.readFileSync(path.join(inputPath, shaderName + '.vertex.glsl'), 'utf8');
+        const prelude = fs.readFileSync(path.join(inputPath, '_prelude.vertex.glsl'));
+        const source = fs.readFileSync(path.join(inputPath, shaderName + '.vertex.glsl'), 'utf8');
         return prelude + applyPragmas(source, {
                 define: [
                     "uniform lowp float a_{name}_t;",
@@ -50,8 +50,8 @@ require('./style-code');
     }
 
     function fragmentSource() {
-        var prelude = fs.readFileSync(path.join(inputPath, '_prelude.fragment.glsl'));
-        var source = fs.readFileSync(path.join(inputPath, shaderName + '.fragment.glsl'), 'utf8');
+        const prelude = fs.readFileSync(path.join(inputPath, '_prelude.fragment.glsl'));
+        const source = fs.readFileSync(path.join(inputPath, shaderName + '.fragment.glsl'), 'utf8');
         return prelude + applyPragmas(source, {
                 define: [
                     "varying {precision} {type} {name};"
@@ -61,24 +61,42 @@ require('./style-code');
             });
     }
 
-    var content = "#pragma once\n" +
-    "\n" +
-    "// NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.\n" +
-    "\n" +
-    "#include <mbgl/gl/gl.hpp>\n" +
-    "\n" +
-    "namespace mbgl {\n" +
-    "namespace shaders {\n" +
-    "\n" +
-    "class " + shaderName + " {\n" +
-    "public:\n" +
-    "    static constexpr const char* name = \"" + shaderName + "\";\n" +
-    "    static constexpr const char* vertexSource = R\"MBGL_SHADER(\n" + vertexSource() + ")MBGL_SHADER\";\n" +
-    "    static constexpr const char* fragmentSource = R\"MBGL_SHADER(\n" + fragmentSource() + ")MBGL_SHADER\";\n" +
-    "};\n" +
-    "\n" +
-    "} // namespace shaders\n" +
-    "} // namespace mbgl\n";
+    writeIfModified(path.join(outputPath, `${shaderName}.hpp`), `// NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.
 
-    writeIfModified(path.join(outputPath, shaderName + '.hpp'), content);
+#pragma once
+
+#include <mbgl/gl/gl.hpp>
+
+namespace mbgl {
+namespace shaders {
+
+class ${shaderName} {
+public:
+    static const char* name;
+    static const char* vertexSource;
+    static const char* fragmentSource;
+};
+
+} // namespace shaders
+} // namespace mbgl
+`);
+
+    writeIfModified(path.join(outputPath, `${shaderName}.cpp`), `// NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.
+
+#include <mbgl/shaders/${shaderName}.hpp>
+
+namespace mbgl {
+namespace shaders {
+
+const char* ${shaderName}::name = "${shaderName}";
+const char* ${shaderName}::vertexSource = R"MBGL_SHADER(
+${vertexSource()}
+)MBGL_SHADER";
+const char* ${shaderName}::fragmentSource = R"MBGL_SHADER(
+${fragmentSource()}
+)MBGL_SHADER";
+
+} // namespace shaders
+} // namespace mbgl
+`);
 });
