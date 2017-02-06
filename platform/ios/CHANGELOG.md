@@ -24,6 +24,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 
 ### Other changes
 
+* `MGLOfflinePack` and `MGLOfflineStorage` now conform to standard notification posting patterns. Notifications are posted by `MGLOfflinePack` instances. `userInfo` dictionary still contains values with pack's `state` and `progress` properties for backwards compatibility. ([#7952](https://github.com/mapbox/mapbox-gl-native/pull/7952))
 * Fixed an issue where translucent, non-view-backed point annotations along tile boundaries would be drawn darker than expected. ([#6832](https://github.com/mapbox/mapbox-gl-native/pull/6832))
 * Fixed flickering that occurred when panning past the antimeridian. ([#7574](https://github.com/mapbox/mapbox-gl-native/pull/7574))
 * Fixed an issue that could prevent a cached style from appearing while the device is offline. ([#7770](https://github.com/mapbox/mapbox-gl-native/pull/7770))
