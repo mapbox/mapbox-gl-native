@@ -149,6 +149,9 @@ public class MapView extends FrameLayout {
 
         // Create native Map object
         nativeMapView = new NativeMapView(MapView.this);
+        if (TextUtils.isEmpty(nativeMapView.getAccessToken())) {
+          nativeMapView.setAccessToken(Mapbox.getAccessToken());
+        }
 
         //Continue configuring the map view on the main thread
         MapView.this.post(new Runnable() {
@@ -173,7 +176,6 @@ public class MapView extends FrameLayout {
         nativeMapView.render();
       }
     });
-
   }
 
   private void setupViewProperties() {
@@ -187,19 +189,6 @@ public class MapView extends FrameLayout {
     setFocusableInTouchMode(true);
     requestDisallowInterceptTouchEvent(true);
   }
-
-//  private void loopRender() {
-//    postDelayed(new Runnable() {
-//      @Override
-//      public void run() {
-//        //glSurfaceView.queueEvent(renderRunnable);
-//        onInvalidate();
-////        nativeMapView.update();
-//        //onInvalidate();
-//        loopRender();
-//      }
-//    }, 500);
-//  }
 
   protected void onNativeMapViewReady() {
 
@@ -336,9 +325,6 @@ public class MapView extends FrameLayout {
     }
 
     destroyed = true;
-    //nativeMapView.terminateContext();
-    //nativeMapView.terminateDisplay();
-    //nativeMapView.destroySurface();
 
     glSurfaceView.queueEvent(new Runnable() {
       @Override
@@ -506,8 +492,6 @@ public class MapView extends FrameLayout {
     if (isInEditMode()) {
       return;
     }
-
-    //glSurfaceView.queueEvent(renderRunnable);
   }
 
   @Override

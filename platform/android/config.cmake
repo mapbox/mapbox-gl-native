@@ -15,7 +15,7 @@ if ((ANDROID_ABI STREQUAL "armeabi") OR (ANDROID_ABI STREQUAL "armeabi-v7a") OR 
     set(CMAKE_SHARED_LINKER_FLAGS "-fuse-ld=gold -Wl,--icf=safe ${CMAKE_SHARED_LINKER_FLAGS}")
 endif()
 
-mason_use(jni.hpp VERSION 2.0.0-1 HEADER_ONLY)
+mason_use(jni.hpp VERSION 3.0.0 HEADER_ONLY)
 mason_use(libzip VERSION 1.1.3)
 mason_use(nunicode VERSION 1.7.1)
 mason_use(sqlite VERSION 3.14.2)
@@ -136,6 +136,32 @@ macro(mbgl_platform_core)
         # Native map
         platform/android/src/native_map_view.cpp
         platform/android/src/native_map_view.hpp
+
+        # Java core classes
+        platform/android/src/java/util.cpp
+        platform/android/src/java/util.hpp
+
+        # Graphics
+        platform/android/src/graphics/pointf.cpp
+        platform/android/src/graphics/pointf.hpp
+        platform/android/src/graphics/rectf.cpp
+        platform/android/src/graphics/rectf.hpp
+
+        # Geometry
+        platform/android/src/geometry/feature.cpp
+        platform/android/src/geometry/feature.hpp
+        platform/android/src/geometry/lat_lng.cpp
+        platform/android/src/geometry/lat_lng.hpp
+        platform/android/src/geometry/projected_meters.cpp
+        platform/android/src/geometry/projected_meters.hpp
+
+        # Annotation
+        platform/android/src/annotation/marker.cpp
+        platform/android/src/annotation/marker.hpp
+        platform/android/src/annotation/polygon.cpp
+        platform/android/src/annotation/polygon.hpp
+        platform/android/src/annotation/polyline.cpp
+        platform/android/src/annotation/polyline.hpp
 
         # Main jni bindings
         platform/android/src/attach_env.cpp
