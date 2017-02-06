@@ -281,6 +281,19 @@ global.propertyDoc = function (propertyName, property, layerType, kind) {
             doc += `\n\nThis attribute corresponds to the <a href="https://www.mapbox.com/mapbox-gl-style-spec/#${anchor}"><code>${property.original}</code></a> layout property in the Mapbox Style Specification.`;
         }
     }
+    doc += '`\n\nThis property can be set to one of the following values:\n\n' +
+           '- `MGLStyleConstantValue`\n';
+    if (property["property-function"]) {
+        doc += '- `MGLCameraStyleFunction` with an interpolation mode of `MGLInterpolationModeExponential` or `MGLInterpolationModeInterval`\n' +
+               '- `MGLSourceStyleFunction` with an interpolation mode of `MGLInterpolationModeExponential`, `MGLInterpolationModeInterval`, `MGLInterpolationModeCategorical`, or `MGLInterpolationModeIdentity`\n' + 
+               '- `MGLCompositeStyleFunction` with an interpolation mode of `MGLInterpolationModeExponential`, `MGLInterpolationModeInterval` or `MGLInterpolationModeCategorical`\n';
+    } else {
+        if (property.function === "interpolated") {
+            doc += '- `MGLCameraStyleFunction` with an interpolation mode of `MGLInterpolationModeExponential` or `MGLInterpolationModeInterval`\n';
+        } else {
+            doc += '- `MGLCameraStyleFunction` with an interpolation mode of `MGLInterpolationModeInterval`\n';
+        }
+    }
     return doc;
 };
 
