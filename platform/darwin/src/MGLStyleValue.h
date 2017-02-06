@@ -216,8 +216,8 @@ MGL_EXPORT
 /**
  An `MGLCameraStyleFunction` is a value function defining a style value that changes
  as the zoom level changes. The layout and paint attribute properties of an
- `MGLStyleLayer` object can be set to `MGLCameraStyleFunction` objects. Use a zoom
- level function to create the illusion of depth and control data density.
+ `MGLStyleLayer` object can be set to `MGLCameraStyleFunction` objects. Use a camera
+ function to create the illusion of depth and control data density.
 
  The `MGLCameraStyleFunction` class takes a generic parameter `T` that indicates the
  Foundation class being wrapped by this class.
@@ -228,7 +228,7 @@ MGL_EXPORT
 #pragma mark Creating a Camera Function
 
 /**
- Creates and returns an `MGLCameraStyleFunction` object representing a zoom level 
+ Creates and returns an `MGLCameraStyleFunction` object representing a camera
  function with one or more stops.
 
  @param interpolationMode The mode used to interpolate property values between
@@ -244,8 +244,8 @@ MGL_EXPORT
 #pragma mark Initializing a Camera Function
 
 /**
- Returns an `MGLCameraStyleFunction` object representing a zoom level
- function with one or more stops.
+ Returns an `MGLCameraStyleFunction` object representing a camera function with 
+ one or more stops.
 
  @param interpolationMode The mode used to interpolate property values between
     map zoom level changes.
