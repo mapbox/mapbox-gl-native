@@ -189,6 +189,59 @@ MGL_EXPORT
 MGL_EXPORT
 @interface MGLStyleFunction<T> : MGLStyleValue<T>
 
+#pragma mark Creating a Style Function
+
+/**
+ Creates and returns an `MGLStyleFunction` object representing a camera function. 
+ If the function is set as a style layer property value, it will be interpreted 
+ as a camera function with a linear interpolation curve.
+
+ @note Do not create instances of `MGLStyleFunction` unless it is required for
+    backwards compatiblity with your application code. You should create and use
+    instances of `MGLCameraStyleFunction` to specify how properties will
+    be visualized at different zoom levels.
+
+ @param stops A dictionary associating zoom levels with style values.
+ @return An `MGLStyleFunction` object with the given stops.
+ */
++ (instancetype)functionWithStops:(NSDictionary<id, MGLStyleValue<T> *> *)stops __attribute__((deprecated("Use +[MGLStyleValue valueWithInterpolationMode:cameraStops:options:]")));
+
+/**
+ Creates and returns an `MGLStyleFunction` object representing a camera function.
+ If the function is set as a style layer property value, it will be interpreted 
+ as a camera function with an interpolation curve controlled by the provided 
+ interpolation base.
+
+ @note Do not create instances of `MGLStyleFunction` unless it is required for
+    backwards compatiblity with your application code. You should create and use
+    instances of `MGLCameraStyleFunction` to specify how properties will
+    be visualized at different zoom levels.
+
+ @param interpolationBase The exponential base of the interpolation curve.
+ @param stops A dictionary associating zoom levels with style values.
+ @return An `MGLStyleFunction` object with the given interpolation base and stops.
+ */
++ (instancetype)functionWithInterpolationBase:(CGFloat)interpolationBase stops:(NSDictionary<id, MGLStyleValue<T> *> *)stops __attribute__((deprecated("Use +[MGLStyleValue valueWithInterpolationMode:cameraStops:options:]")));
+
+#pragma mark Initializing a Style Function
+
+/**
+ Returns an `MGLStyleFunction` object representing a camera function. If the 
+ function is set as a style layer property value, it will be interpreted
+ as a camera function with an interpolation curve controlled by the provided
+ interpolation base.
+ 
+ @note Do not create instances of `MGLStyleFunction` unless it is required for
+    backwards compatiblity with your application code. You should create and use
+    instances of `MGLCameraStyleFunction` to specify how properties will
+    be visualized at different zoom levels.
+
+ @param interpolationBase The exponential base of the interpolation curve.
+ @param stops A dictionary associating zoom levels with style values.
+ @return An `MGLStyleFunction` object with the given interpolation base and stops.
+ */
+- (instancetype)initWithInterpolationBase:(CGFloat)interpolationBase stops:(NSDictionary<id, MGLStyleValue<T> *> *)stops NS_DESIGNATED_INITIALIZER;
+
 #pragma mark Accessing the Parameters of a Function
 
 /**
@@ -207,7 +260,8 @@ MGL_EXPORT
  
  @note This property specifies the exponential base of the interpolation curve 
     of `MGLCameraStyleFunction` and `MGLSourceStyleFunction` functions that use 
-    a `MGLInterpolationModeExponential` `interpolationMode`.
+    a `MGLInterpolationModeExponential` `interpolationMode`. Otherwise, it is
+    ignored.
  */
 @property (nonatomic) CGFloat interpolationBase;
 
