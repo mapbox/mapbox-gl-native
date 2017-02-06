@@ -3,8 +3,8 @@
 var path = require('path');
 var fs = require('fs');
 var util = require('util');
-var mkdirp = require('mkdirp');
 var execSync = require('child_process').execSync;
+var tools = require('./tools');
 
 const DEFAULT_TAG = [0, 0, 0];
 const DEFAULT_REV = 'unknown';
@@ -76,6 +76,7 @@ var header = '// NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.\n
     '} // namespace version\n' +
     '} // namespace mbgl\n';
 
-var header_path = path.join(output_dir, 'include/mbgl/util/version.hpp')
-mkdirp.sync(path.dirname(header_path));
-fs.writeFileSync(header_path, header);
+var headerPath = path.join(output_dir, 'include/mbgl/util/version.hpp')
+
+tools.mkdirRecursive(path.dirname(headerPath));
+fs.writeFileSync(headerPath, header);

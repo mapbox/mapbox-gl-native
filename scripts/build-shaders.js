@@ -2,7 +2,7 @@
 
 var path = require('path');
 var fs = require('fs');
-var mkdirp = require('mkdirp');
+var tools = require('./tools');
 
 var shaderName = process.argv[2];
 var inputPath = process.argv[3];
@@ -71,5 +71,5 @@ var content = "#pragma once\n" +
 "} // namespace shaders\n" +
 "} // namespace mbgl\n";
 
-mkdirp.sync(outputPath);
+tools.mkdirRecursive(outputPath);
 fs.writeFileSync(path.join(outputPath, shaderName + '.hpp'), content);
