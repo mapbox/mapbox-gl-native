@@ -258,6 +258,30 @@ void MapWindow::keyPressEvent(QKeyEvent *ev)
             }
         }
         break;
+    case Qt::Key_5: {
+            if (m_map->layerExists("circleLayer")) {
+                m_map->removeLayer("circleLayer");
+                m_map->removeSource("circleSource");
+            } else {
+                QMapbox::CoordinatesCollections geometry { { { m_map->coordinate() } } };
+                QMapbox::Feature feature { QMapbox::Feature::PointType, geometry, {}, {} };
+
+                QVariantMap circleSource;
+                circleSource["type"] = "geojson";
+                circleSource["data"] = QVariant::fromValue<QMapbox::Feature>(feature);
+                m_map->addSource("circleSource", circleSource);
+
+                QVariantMap circle;
+                circle["id"] = "circleLayer";
+                circle["type"] = "circle";
+                circle["source"] = "circleSource";
+                m_map->addLayer(circle);
+
+                m_map->setPaintProperty("circleLayer", "circle-radius", 10.0);
+                m_map->setPaintProperty("circleLayer", "circle-color", QColor("black"));
+            }
+        }
+        break;
     case Qt::Key_Tab:
         m_map->cycleDebugOptions();
         break;
