@@ -1,8 +1,8 @@
 #pragma once
 
-#include <mbgl/style/function/exponential_stops.hpp>
-#include <mbgl/style/function/interval_stops.hpp>
-#include <mbgl/style/function/categorical_stops.hpp>
+#include <mbgl/style/function/composite_exponential_stops.hpp>
+#include <mbgl/style/function/composite_interval_stops.hpp>
+#include <mbgl/style/function/composite_categorical_stops.hpp>
 #include <mbgl/util/interpolate.hpp>
 #include <mbgl/util/range.hpp>
 #include <mbgl/util/variant.hpp>
@@ -36,12 +36,12 @@ public:
     using Stops = std::conditional_t<
         util::Interpolatable<T>,
         variant<
-            std::map<float, ExponentialStops<T>>,
-            std::map<float, IntervalStops<T>>,
-            std::map<float, CategoricalStops<T>>>,
+            CompositeExponentialStops<T>,
+            CompositeIntervalStops<T>,
+            CompositeCategoricalStops<T>>,
         variant<
-            std::map<float, IntervalStops<T>>,
-            std::map<float, CategoricalStops<T>>>>;
+            CompositeIntervalStops<T>,
+            CompositeCategoricalStops<T>>>;
 
     CompositeFunction(std::string property_, Stops stops_, optional<T> defaultValue_ = {})
         : property(std::move(property_)),
@@ -53,20 +53,20 @@ public:
     coveringRanges(float zoom) const {
         return stops.match(
             [&] (const auto& s) {
-                assert(!s.empty());
-                auto minIt = s.lower_bound(zoom);
-                auto maxIt = s.upper_bound(zoom);
-                if (minIt != s.begin()) {
+                assert(!s.stops.empty());
+                auto minIt = s.stops.lower_bound(zoom);
+                auto maxIt = s.stops.upper_bound(zoom);
+                if (minIt != s.stops.begin()) {
                     minIt--;
                 }
                 return std::make_tuple(
                     Range<float> {
-                        minIt == s.end() ? s.rbegin()->first : minIt->first,
-                        maxIt == s.end() ? s.rbegin()->first : maxIt->first
+                        minIt == s.stops.end() ? s.stops.rbegin()->first : minIt->first,
+                        maxIt == s.stops.end() ? s.stops.rbegin()->first : maxIt->first
                     },
                     Range<InnerStops> {
-                        minIt == s.end() ? s.rbegin()->second : minIt->second,
-                        maxIt == s.end() ? s.rbegin()->second : maxIt->second
+                        s.innerStops(minIt == s.stops.end() ? s.stops.rbegin()->second : minIt->second),
+                        s.innerStops(maxIt == s.stops.end() ? s.stops.rbegin()->second : maxIt->second)
                     }
                 );
             }

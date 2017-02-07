@@ -257,31 +257,29 @@ public:
     }
 
     template <class T>
-    void operator()(const std::map<float, ExponentialStops<T>>& f) {
+    void operator()(const CompositeExponentialStops<T>& f) {
         writer.Key("type");
         writer.String("exponential");
-        if (!f.empty()) {
-            writer.Key("base");
-            writer.Double(f.begin()->second.base);
-        }
+        writer.Key("base");
+        writer.Double(f.base);
         writer.Key("stops");
-        stringifyCompositeStops(f);
+        stringifyCompositeStops(f.stops);
     }
 
     template <class T>
-    void operator()(const std::map<float, IntervalStops<T>>& f) {
+    void operator()(const CompositeIntervalStops<T>& f) {
         writer.Key("type");
         writer.String("interval");
         writer.Key("stops");
-        stringifyCompositeStops(f);
+        stringifyCompositeStops(f.stops);
     }
 
     template <class T>
-    void operator()(const std::map<float, CategoricalStops<T>>& f) {
+    void operator()(const CompositeCategoricalStops<T>& f) {
         writer.Key("type");
         writer.String("categorical");
         writer.Key("stops");
-        stringifyCompositeStops(f);
+        stringifyCompositeStops(f.stops);
     }
 
 private:
@@ -301,7 +299,7 @@ private:
     void stringifyCompositeStops(const std::map<float, InnerStops>& stops) {
         writer.StartArray();
         for (const auto& outer : stops) {
-            for (const auto& inner : outer.second.stops) {
+            for (const auto& inner : outer.second) {
                 writer.StartArray();
                 writer.StartObject();
                 writer.Key("zoom");
