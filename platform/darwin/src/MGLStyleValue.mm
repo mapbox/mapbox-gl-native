@@ -65,11 +65,11 @@ const MGLStyleFunctionOption MGLStyleFunctionOptionDefaultValue = @"MGLStyleFunc
 @implementation MGLStyleFunction
 
 + (instancetype)functionWithStops:(NSDictionary *)stops {
-    return [[self alloc] initWithInterpolationBase:1.0 stops:stops];
+    return [MGLCameraStyleFunction functionWithInterpolationMode:MGLInterpolationModeExponential stops:stops options:nil];
 }
 
 + (instancetype)functionWithInterpolationBase:(CGFloat)interpolationBase stops:(NSDictionary *)stops {
-    return [[self alloc] initWithInterpolationBase:interpolationBase stops:stops];
+    return [MGLCameraStyleFunction functionWithInterpolationMode:MGLInterpolationModeExponential stops:stops options:@{MGLStyleFunctionOptionInterpolationBase: @(interpolationBase)}];
 }
 
 - (instancetype)init {
