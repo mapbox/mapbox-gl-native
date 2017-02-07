@@ -4,6 +4,8 @@
 #include <mbgl/util/feature.hpp>
 #include <mbgl/util/optional.hpp>
 
+#include <QMapbox>
+
 #include <QColor>
 #include <QVariant>
 
