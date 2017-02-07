@@ -104,7 +104,7 @@ const MGLStyleFunctionOption MGLStyleFunctionOptionDefaultValue = @"MGLStyleFunc
 }
 
 - (NSUInteger)hash {
-    return  self.stops.hash + self.interpolationBase;
+    return  self.stops.hash + @(self.interpolationBase).hash;
 }
 
 @end
@@ -163,7 +163,7 @@ const MGLStyleFunctionOption MGLStyleFunctionOptionDefaultValue = @"MGLStyleFunc
 }
 
 - (NSUInteger)hash {
-    return  self.interpolationMode + self.stops.hash + self.interpolationBase;
+    return  @(self.interpolationMode).hash + self.stops.hash + @(self.interpolationBase).hash;
 }
 
 @end
@@ -233,7 +233,7 @@ const MGLStyleFunctionOption MGLStyleFunctionOptionDefaultValue = @"MGLStyleFunc
 }
 
 - (NSUInteger)hash {
-    return self.interpolationMode + self.stops.hash + self.attributeName.hash + self.defaultValue.hash + self.interpolationBase;
+    return @(self.interpolationMode).hash + self.stops.hash + self.attributeName.hash + self.defaultValue.hash + @(self.interpolationBase).hash;
 }
 
 @end
@@ -302,7 +302,7 @@ const MGLStyleFunctionOption MGLStyleFunctionOptionDefaultValue = @"MGLStyleFunc
 }
 
 - (NSUInteger)hash {
-    return  self.interpolationMode + self.stops.hash + self.attributeName.hash + self.interpolationBase;
+    return  @(self.interpolationMode).hash + self.stops.hash + self.attributeName.hash + @(self.interpolationBase).hash;
 }
 
 @end
