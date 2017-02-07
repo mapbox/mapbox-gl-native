@@ -125,6 +125,14 @@ public class MarkerViewManager implements MapView.OnMapChangedListener {
     }
   }
 
+  public void setRotation(@NonNull MarkerView marker, float rotation) {
+    View convertView = markerViewMap.get(marker);
+    if (convertView != null) {
+      convertView.animate().cancel();
+      convertView.setRotation(rotation);
+    }
+  }
+
   /**
    * Animate a MarkerView to a given alpha value.
    * <p>

@@ -266,18 +266,9 @@ public class MarkerView extends Marker {
    * @param rotation the rotation value to animate to.
    */
   public void setRotation(float rotation) {
-    // limit to 0 - 360 degrees
-    float newRotation = rotation;
-    while (newRotation > 360) {
-      newRotation -= 360;
-    }
-    while (newRotation < 0) {
-      newRotation += 360;
-    }
-
-    this.rotation = newRotation;
+    this.rotation = rotation;
     if (markerViewManager != null) {
-      markerViewManager.animateRotationBy(this, newRotation);
+      markerViewManager.setRotation(this, rotation);
     }
   }
 
