@@ -103,6 +103,29 @@ void stringify(Writer& writer, const Value& v) {
 }
 
 template <class Writer>
+void stringify(Writer& writer, FeatureType type) {
+    switch (type) {
+    case FeatureType::Unknown:
+        writer.String("Unknown");
+        break;
+    case FeatureType::Point:
+        writer.String("Point");
+        break;
+    case FeatureType::LineString:
+        writer.String("LineString");
+        break;
+    case FeatureType::Polygon:
+        writer.String("Polygon");
+        break;
+    }
+}
+
+template <class Writer>
+void stringify(Writer& writer, const FeatureIdentifier& id) {
+    FeatureIdentifier::visit(id, [&] (const auto& id_) { stringify(writer, id_); });
+}
+
+template <class Writer>
 class StringifyFilter {
 public:
     Writer& writer;
@@ -156,28 +179,78 @@ public:
     }
 
     void operator()(const HasFilter& f) {
-        stringifyUnaryFilter(f, "has");
+        stringifyUnaryFilter("has", f.key);
     }
 
     void operator()(const NotHasFilter& f) {
-        stringifyUnaryFilter(f, "!has");
+        stringifyUnaryFilter("!has", f.key);
+    }
+
+    void operator()(const TypeEqualsFilter& f) {
+        stringifyBinaryFilter(f, "==", "$type");
+    }
+
+    void operator()(const TypeNotEqualsFilter& f) {
+        stringifyBinaryFilter(f, "!=", "$type");
+    }
+
+    void operator()(const TypeInFilter& f) {
+        stringifySetFilter(f, "in", "$type");
+    }
+
+    void operator()(const TypeNotInFilter& f) {
+        stringifySetFilter(f, "!in", "$type");
+    }
+
+    void operator()(const IdentifierEqualsFilter& f) {
+        stringifyBinaryFilter(f, "==", "$id");
+    }
+
+    void operator()(const IdentifierNotEqualsFilter& f) {
+        stringifyBinaryFilter(f, "!=", "$id");
+    }
+
+    void operator()(const IdentifierInFilter& f) {
+        stringifySetFilter(f, "in", "$id");
+    }
+
+    void operator()(const IdentifierNotInFilter& f) {
+        stringifySetFilter(f, "!in", "$id");
+    }
+
+    void operator()(const HasIdentifierFilter&) {
+        stringifyUnaryFilter("has", "$id");
+    }
+
+    void operator()(const NotHasIdentifierFilter&) {
+        stringifyUnaryFilter("!has", "$id");
     }
 
 private:
     template <class F>
     void stringifyBinaryFilter(const F& f, const char * op) {
+        stringifyBinaryFilter(f, op, f.key);
+    }
+
+    template <class F>
+    void stringifyBinaryFilter(const F& f, const char * op, const std::string& key) {
         writer.StartArray();
         writer.String(op);
-        writer.String(f.key);
+        writer.String(key);
         stringify(writer, f.value);
         writer.EndArray();
     }
 
     template <class F>
     void stringifySetFilter(const F& f, const char * op) {
+        stringifySetFilter(f, op, f.key);
+    }
+
+    template <class F>
+    void stringifySetFilter(const F& f, const char * op, const std::string& key) {
         writer.StartArray();
         writer.String(op);
-        writer.String(f.key);
+        writer.String(key);
         for (const auto& value : f.values) {
             stringify(writer, value);
         }
@@ -194,11 +267,10 @@ private:
         writer.EndArray();
     }
 
-    template <class F>
-    void stringifyUnaryFilter(const F& f, const char * op) {
+    void stringifyUnaryFilter(const char * op, const std::string& key) {
         writer.StartArray();
         writer.String(op);
-        writer.String(f.key);
+        writer.String(key);
         writer.EndArray();
     }
 };
