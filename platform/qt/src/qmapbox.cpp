@@ -4,6 +4,7 @@
 #include <mbgl/map/change.hpp>
 #include <mbgl/storage/network_status.hpp>
 #include <mbgl/util/default_styles.hpp>
+#include <mbgl/util/geometry.hpp>
 #include <mbgl/util/traits.hpp>
 
 #if QT_VERSION >= 0x050000
@@ -15,6 +16,11 @@
 // mbgl::NetworkStatus::Status
 static_assert(mbgl::underlying_type(QMapbox::Online) == mbgl::underlying_type(mbgl::NetworkStatus::Status::Online), "error");
 static_assert(mbgl::underlying_type(QMapbox::Offline) == mbgl::underlying_type(mbgl::NetworkStatus::Status::Offline), "error");
+
+// mbgl::FeatureType
+static_assert(mbgl::underlying_type(QMapbox::Feature::PointType) == mbgl::underlying_type(mbgl::FeatureType::Point), "error");
+static_assert(mbgl::underlying_type(QMapbox::Feature::LineStringType) == mbgl::underlying_type(mbgl::FeatureType::LineString), "error");
+static_assert(mbgl::underlying_type(QMapbox::Feature::PolygonType) == mbgl::underlying_type(mbgl::FeatureType::Polygon), "error");
 
 namespace QMapbox {
 
