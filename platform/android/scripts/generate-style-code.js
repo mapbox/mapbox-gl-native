@@ -2,7 +2,7 @@
 
 const fs = require('fs');
 const ejs = require('ejs');
-const spec = require('../../../mapbox-gl-js/js/style-spec').latest;
+const spec = require('../../../mapbox-gl-js/src/style-spec/reference/latest');
 const _ = require('lodash');
 
 require('../../../scripts/style-code');
