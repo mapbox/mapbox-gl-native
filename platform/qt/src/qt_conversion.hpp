@@ -30,7 +30,13 @@ inline QVariant arrayMember(const QVariant& value, std::size_t i) {
 }
 
 inline bool isObject(const QVariant& value) {
-    return value.canConvert(QVariant::Map) || value.type() == QVariant::ByteArray;
+    return value.canConvert(QVariant::Map)
+        || value.type() == QVariant::ByteArray
+#if QT_VERSION >= 0x050000
+        || QString(value.typeName()) == QStringLiteral("QMapbox::Feature");
+#else
+        || QString(value.typeName()) == QString("QMapbox::Feature");
+#endif
 }
 
 inline optional<QVariant> objectMember(const QVariant& value, const char* key) {
