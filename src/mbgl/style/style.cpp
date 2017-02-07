@@ -231,7 +231,7 @@ std::unique_ptr<Layer> Style::removeLayer(const std::string& id) {
     });
 
     if (it == layers.end())
-        throw std::runtime_error("no such layer");
+        return nullptr;
 
     auto layer = std::move(*it);
 
