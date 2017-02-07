@@ -73,7 +73,11 @@ const MGLStyleFunctionOption MGLStyleFunctionOptionDefaultValue = @"MGLStyleFunc
 }
 
 - (instancetype)init {
-    return [self initWithInterpolationBase:1.0 stops:@{}];
+    if (self = [super init]) {
+        self.interpolationBase = 1.0;
+        self.stops = @{};
+    }
+    return self;
 }
 
 - (instancetype)initWithInterpolationBase:(CGFloat)interpolationBase stops:(NSDictionary *)stops {
@@ -124,8 +128,9 @@ const MGLStyleFunctionOption MGLStyleFunctionOptionDefaultValue = @"MGLStyleFunc
         return {};
     }
 
-    if (self == [super initWithInterpolationBase:1.0 stops:stops]) {
+    if (self == [super init]) {
         self.interpolationMode = interpolationMode;
+        self.stops = stops;
 
         if ([options.allKeys containsObject:MGLStyleFunctionOptionInterpolationBase]) {
             if ([options[MGLStyleFunctionOptionInterpolationBase] isKindOfClass:[NSNumber class]]) {
@@ -176,8 +181,9 @@ const MGLStyleFunctionOption MGLStyleFunctionOptionDefaultValue = @"MGLStyleFunc
 }
 
 - (instancetype)initWithInterpolationMode:(MGLInterpolationMode)interpolationMode stops:(NSDictionary *)stops attributeName:(NSString *)attributeName options:(NSDictionary *)options {
-    if (self == [super initWithInterpolationBase:1.0 stops:stops]) {
+    if (self == [super init]) {
         self.interpolationMode = interpolationMode;
+        self.stops = stops;
         _attributeName = attributeName;
 
         if ([options.allKeys containsObject:MGLStyleFunctionOptionDefaultValue]) {
@@ -245,8 +251,9 @@ const MGLStyleFunctionOption MGLStyleFunctionOptionDefaultValue = @"MGLStyleFunc
 }
 
 - (instancetype)initWithInterpolationMode:(MGLInterpolationMode)interpolationMode stops:(NSDictionary *)stops attributeName:(NSString *)attributeName options:(NSDictionary *)options {
-    if (self == [super initWithInterpolationBase:1.0 stops:stops]) {
+    if (self == [super init]) {
         self.interpolationMode = interpolationMode;
+        self.stops = stops;
         _attributeName = attributeName;
 
         if ([options.allKeys containsObject:MGLStyleFunctionOptionDefaultValue]) {

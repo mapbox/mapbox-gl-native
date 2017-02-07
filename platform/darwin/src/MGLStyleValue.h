@@ -240,7 +240,7 @@ MGL_EXPORT
  @param stops A dictionary associating zoom levels with style values.
  @return An `MGLStyleFunction` object with the given interpolation base and stops.
  */
-- (instancetype)initWithInterpolationBase:(CGFloat)interpolationBase stops:(NS_DICTIONARY_OF(NSNumber *, MGLStyleValue<T> *) *)stops NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithInterpolationBase:(CGFloat)interpolationBase stops:(NS_DICTIONARY_OF(NSNumber *, MGLStyleValue<T> *) *)stops __attribute__((deprecated("Use +[MGLStyleValue valueWithInterpolationMode:cameraStops:options:]")));
 
 #pragma mark Accessing the Parameters of a Function
 
@@ -295,22 +295,6 @@ MGL_EXPORT
  */
 + (instancetype)functionWithInterpolationMode:(MGLInterpolationMode)interpolationMode stops:(NS_DICTIONARY_OF(id, MGLStyleValue<T> *) *)stops options:(nullable NS_DICTIONARY_OF(MGLStyleFunctionOption, id) *)options;
 
-#pragma mark Initializing a Camera Function
-
-/**
- Returns an `MGLCameraStyleFunction` object representing a camera function with 
- one or more stops.
-
- @param interpolationMode The mode used to interpolate property values between
-    map zoom level changes.
- @param stops A dictionary associating zoom levels with style values.
- @param options A dictionary containing `MGLStyleFunctionOption` values that
-    specify how a function is applied.
- @return An `MGLCameraStyleFunction` object with the given interpolation mode,
-    camera stops, and options.
- */
-- (instancetype)initWithInterpolationMode:(MGLInterpolationMode)interpolationMode stops:(NS_DICTIONARY_OF(id, MGLStyleValue<T> *) *)stops options:(nullable NS_DICTIONARY_OF(MGLStyleFunctionOption, id) *)options NS_DESIGNATED_INITIALIZER;
-
 #pragma mark Accessing the Parameters of a Camera Function
 
 /**
@@ -357,23 +341,6 @@ MGL_EXPORT
     source stops, attribute name, and options.
 */
 + (instancetype)functionWithInterpolationMode:(MGLInterpolationMode)interpolationMode stops:(nullable NS_DICTIONARY_OF(id, MGLStyleValue<T> *) *)stops attributeName:(NSString *)attributeName options:(nullable NS_DICTIONARY_OF(MGLStyleFunctionOption, id) *)options;
-
-#pragma mark Initializing a Source Function
-
-/**
- Returns an `MGLSourceStyleFunction` object representing a source function.
-
- @param interpolationMode The mode used to interpolate property values over a
-    range of feature attribute values.
- @param sourceStops A dictionary associating feature attributes with style values.
- @param attributeName Specifies the feature attribute to take as the function
-    input.
- @param options A dictionary containing `MGLStyleFunctionOption` values that
-    specify how a function is applied.
- @return An `MGLSourceStyleFunction` object with the given interpolation mode,
-    source stops, attribute name, and options.
- */
-- (instancetype)initWithInterpolationMode:(MGLInterpolationMode)interpolationMode stops:(nullable NS_DICTIONARY_OF(id, MGLStyleValue<T> *) *)stops attributeName:(NSString *)attributeName options:(nullable NS_DICTIONARY_OF(MGLStyleFunctionOption, id) *)options NS_DESIGNATED_INITIALIZER;
 
 #pragma mark Accessing the Parameters of a Source Function
 
@@ -434,24 +401,6 @@ MGL_EXPORT
     composite stops, attribute name, and options.
  */
 + (instancetype)functionWithInterpolationMode:(MGLInterpolationMode)interpolationMode stops:(NS_DICTIONARY_OF(id, NS_DICTIONARY_OF(id, MGLStyleValue<T> *) *) *)stops attributeName:(NSString *)attributeName options:(nullable NS_DICTIONARY_OF(MGLStyleFunctionOption, id) *)options;
-
-#pragma mark Initializing a Composite Function
-
-/**
- Returns an `MGLCompositeStyleFunction` object representing a composite
- function.
-
- @param interpolationMode The mode used to interpolate property values over a
-    range of feature attribute values for each outer zoom level.
- @param sourceStops A dictionary associating feature attributes with style values.
- @param attributeName Specifies the feature attribute to take as the function
-    input.
- @param options A dictionary containing `MGLStyleFunctionOption` values that
-    specify how a function is applied.
- @return An `MGLCompositeStyleFunction` object with the given interpolation mode,
-    composite stops, attribute name, and options.
- */
-- (instancetype)initWithInterpolationMode:(MGLInterpolationMode)interpolationMode stops:(NS_DICTIONARY_OF(id, NS_DICTIONARY_OF(id, MGLStyleValue<T> *) *) *)stops attributeName:(NSString *)attributeName options:(nullable NS_DICTIONARY_OF(MGLStyleFunctionOption, id) *)options NS_DESIGNATED_INITIALIZER;
 
 #pragma mark Accessing the Parameters of a Composite Function
 
