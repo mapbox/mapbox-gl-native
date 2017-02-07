@@ -112,10 +112,10 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
         let layer = MGLCircleStyleLayer(identifier: "circles", source: population)
         layer.sourceLayerIdentifier = "population"
         layer.circleColor = MGLStyleValue(rawValue: .green)
-        layer.circleRadius = MGLStyleValue(interpolationBase: 1.75, stops: [
-            12: MGLStyleValue(rawValue: 2),
-            22: MGLStyleValue(rawValue: 180)
-        ])
+        layer.circleRadius = MGLStyleValue(interpolationMode: .exponential,
+                                           cameraStops: [12: MGLStyleValue(rawValue: 2),
+                                                         22: MGLStyleValue(rawValue: 180)],
+                                           options: [.interpolationBase: 1.75])
         layer.circleOpacity = MGLStyleValue(rawValue: 0.7)
         layer.predicate = NSPredicate(format: "%K == %@", "marital-status", "married")
         mapView.style?.addLayer(layer)
@@ -131,10 +131,10 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
         //#-example-code
         let layer = MGLLineStyleLayer(identifier: "trails-path", source: trails)
         layer.sourceLayerIdentifier = "trails"
-        layer.lineWidth = MGLStyleValue(interpolationBase: 1.5, stops: [
-            14: MGLStyleValue(rawValue: 2),
-            18: MGLStyleValue(rawValue: 20),
-        ])
+        layer.lineWidth = MGLStyleValue(interpolationMode: .exponential,
+                                        cameraStops: [14: MGLStyleValue(rawValue: 2),
+                                                      18: MGLStyleValue(rawValue: 20)],
+                                        options: [.interpolationBase: 1.5])
         layer.lineColor = MGLStyleValue(rawValue: .brown)
         layer.lineCap = MGLStyleValue(rawValue: NSValue(mglLineCap: .round))
         layer.predicate = NSPredicate(format: "%K == %@", "trail-type", "mountain-biking")
