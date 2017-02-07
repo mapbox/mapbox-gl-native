@@ -7,12 +7,13 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- Options for `MGLStyleValue` function objects.
+ Options for `MGLStyleFunction` objects.
  */
 typedef NSString *MGLStyleFunctionOption NS_STRING_ENUM;
 
 /**
- An `NSNumber` object containing an integer.
+ An `NSNumber` object containing an integer that determines the style function's 
+ exponential interpolation base.
  
  The exponential interpolation base controls the rate at which the function’s 
  output values increase. A value of 1 causes the function to increase linearly 
@@ -32,7 +33,8 @@ typedef NSString *MGLStyleFunctionOption NS_STRING_ENUM;
 extern MGL_EXPORT const MGLStyleFunctionOption MGLStyleFunctionOptionInterpolationBase;
 
 /**
- An `MGLStyleConstantValue` object.
+ An `MGLStyleConstantValue` object that specifies a default value that a style
+ function can use when it can't otherwise determine a value.
 
  A default value can be used to set the value of a style layer property that
  is not otherwise set by a function. For example, a source function with a
