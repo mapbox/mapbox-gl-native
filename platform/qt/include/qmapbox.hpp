@@ -11,18 +11,42 @@
 
 namespace QMapbox {
 
-// Reflects mapbox::geometry::point<double>.
+// Reflects mbgl::Point<double>.
 typedef QPair<double, double> Coordinate;
 typedef QPair<Coordinate, double> CoordinateZoom;
 
-// Reflects mapbox::geometry::line_string<double> and mapbox::geometry::linear_ring<double>.
+// Reflects mbgl::{LineString,LinearRing,MultiPoint}<double>.
 typedef QList<Coordinate> Coordinates;
 
-// Reflects mapbox::geometry::multi_line_string<double> and mapbox::geometry::polygon<double>.
+// Reflects mbgl::{MultiLineString,Polygon}<double>.
 typedef QList<Coordinates> CoordinatesCollection;
 
-// Reflects mapbox::geometry::multi_polygon<double>.
+// Reflects mbgl::MultiPolygon<double>.
 typedef QList<CoordinatesCollection> CoordinatesCollections;
+
+// Reflects mbgl::Feature.
+struct Q_DECL_EXPORT Feature {
+    enum Type {
+        PointType = 1,
+        LineStringType,
+        PolygonType
+    };
+
+    Feature() {}
+    Feature(Type type_,
+            const CoordinatesCollections& geometry_,
+            const QVariantMap &properties_,
+            const QVariant& id_)
+        : type(type_)
+        , geometry(geometry_)
+        , properties(properties_)
+        , id(id_) {}
+
+    Type type;
+    CoordinatesCollections geometry;
+    QVariantMap properties;
+    QVariant id;
+};
 
 // Reflects mbgl::ShapeAnnotationGeometry.
 struct Q_DECL_EXPORT ShapeAnnotationGeometry {
@@ -126,6 +150,7 @@ Q_DECLARE_METATYPE(QMapbox::Coordinate);
 Q_DECLARE_METATYPE(QMapbox::Coordinates);
 Q_DECLARE_METATYPE(QMapbox::CoordinatesCollection);
 Q_DECLARE_METATYPE(QMapbox::CoordinatesCollections);
+Q_DECLARE_METATYPE(QMapbox::Feature);
 
 Q_DECLARE_METATYPE(QMapbox::SymbolAnnotation);
 Q_DECLARE_METATYPE(QMapbox::ShapeAnnotationGeometry);
