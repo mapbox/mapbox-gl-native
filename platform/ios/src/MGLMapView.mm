@@ -314,6 +314,8 @@ public:
     MGLCompassDirectionFormatter *_accessibilityCompassFormatter;
 
     NS_ARRAY_OF(MGLAttributionInfo *) *_attributionInfos;
+
+    MGLReachability *_reachability;
 }
 
 #pragma mark - Setup & Teardown -
@@ -440,12 +442,12 @@ public:
                                                  name:kMGLReachabilityChangedNotification
                                                object:nil];
 
-    MGLReachability* reachability = [MGLReachability reachabilityForInternetConnection];
-    if ([reachability isReachable])
+    _reachability = [MGLReachability reachabilityForInternetConnection];
+    if ([_reachability isReachable])
     {
         _isWaitingForRedundantReachableNotification = YES;
     }
-    [reachability startNotifier];
+    [_reachability startNotifier];
 
     // Set up annotation management and selection state.
     _annotationImagesByIdentifier = [NSMutableDictionary dictionary];
@@ -664,6 +666,8 @@ public:
 
 - (void)dealloc
 {
+    [_reachability stopNotifier];
+
     [[UIDevice currentDevice] endGeneratingDeviceOrientationNotifications];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [_attributionButton removeObserver:self forKeyPath:@"hidden"];

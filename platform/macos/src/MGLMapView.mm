@@ -193,6 +193,9 @@ public:
 
     /// True if the view is currently printing itself.
     BOOL _isPrinting;
+
+    /// reachability instance
+    MGLReachability *_reachability;
 }
 
 #pragma mark Lifecycle
@@ -273,11 +276,11 @@ public:
     self.layer = _isTargetingInterfaceBuilder ? [CALayer layer] : [MGLOpenGLLayer layer];
 
     // Notify map object when network reachability status changes.
-    MGLReachability *reachability = [MGLReachability reachabilityForInternetConnection];
-    reachability.reachableBlock = ^(MGLReachability *) {
+    _reachability = [MGLReachability reachabilityForInternetConnection];
+    _reachability.reachableBlock = ^(MGLReachability *) {
         mbgl::NetworkStatus::Reachable();
     };
-    [reachability startNotifier];
+    [_reachability startNotifier];
 
     // Install ornaments and gesture recognizers.
     [self installZoomControls];
@@ -497,6 +500,10 @@ public:
 }
 
 - (void)dealloc {
+
+    [_reachability stopNotifier];
+
+
     [self.window removeObserver:self forKeyPath:@"contentLayoutRect"];
     [self.window removeObserver:self forKeyPath:@"titlebarAppearsTransparent"];
 
