@@ -1575,14 +1575,10 @@ public:
     {
         MGLMapCamera *oldCamera = self.camera;
         
-        mbgl::EdgeInsets padding = MGLEdgeInsetsFromNSEdgeInsets(self.contentInset);
-        mbgl::CameraOptions currentCameraOptions = _mbglMap->getCameraOptions(padding);
-        double zoom = 0.0;
-        if (currentCameraOptions.zoom) {
-            zoom = *currentCameraOptions.zoom + 1.0;
-        }
-        currentCameraOptions.zoom = mbgl::util::clamp(zoom, self.minimumZoomLevel, self.maximumZoomLevel);
-        MGLMapCamera *toCamera = [self cameraForCameraOptions:currentCameraOptions];
+        double zoom = [self currentCameraZoom];
+        double newZoom = zoom + 1.0;
+        
+        MGLMapCamera *toCamera = [self currentCameraWithEstimatedZoom:newZoom];
         
         if ([self.delegate respondsToSelector:@selector(mapView:shouldChangeFromCamera:toCamera:)]
             && ![self.delegate mapView:self shouldChangeFromCamera:oldCamera toCamera:toCamera])
@@ -1621,15 +1617,11 @@ public:
     else if (twoFingerTap.state == UIGestureRecognizerStateEnded)
     {
         MGLMapCamera *oldCamera = self.camera;
+
+        double zoom = [self currentCameraZoom];
+        double newZoom = zoom - 1.0;
         
-        mbgl::EdgeInsets padding = MGLEdgeInsetsFromNSEdgeInsets(self.contentInset);
-        mbgl::CameraOptions currentCameraOptions = _mbglMap->getCameraOptions(padding);
-        double zoom = 0.0;
-        if (currentCameraOptions.zoom) {
-            zoom = *currentCameraOptions.zoom - 1.0;
-        }
-        currentCameraOptions.zoom = mbgl::util::clamp(zoom, self.minimumZoomLevel, self.maximumZoomLevel);
-        MGLMapCamera *toCamera = [self cameraForCameraOptions:currentCameraOptions];
+        MGLMapCamera *toCamera = [self currentCameraWithEstimatedZoom:newZoom];
         
         if ([self.delegate respondsToSelector:@selector(mapView:shouldChangeFromCamera:toCamera:)]
             && ![self.delegate mapView:self shouldChangeFromCamera:oldCamera toCamera:toCamera])
@@ -1680,16 +1672,12 @@ public:
         
         MGLMapCamera *oldCamera = self.camera;
         
-        mbgl::EdgeInsets padding = MGLEdgeInsetsFromNSEdgeInsets(self.contentInset);
-        mbgl::CameraOptions currentCameraOptions = _mbglMap->getCameraOptions(padding);
-        double zoom = 0.0;
+        double zoom = [self currentCameraZoom];
         double scale = powf(2, newZoom) / _mbglMap->getScale();
         
-        if (currentCameraOptions.zoom) {
-            zoom = *currentCameraOptions.zoom * scale;
-        }
-        currentCameraOptions.zoom = mbgl::util::clamp(zoom, self.minimumZoomLevel, self.maximumZoomLevel);
-        MGLMapCamera *toCamera = [self cameraForCameraOptions:currentCameraOptions];
+        double estimatedZoom = zoom * scale;
+        
+        MGLMapCamera *toCamera = [self currentCameraWithEstimatedZoom:estimatedZoom];
         
         if ([self.delegate respondsToSelector:@selector(mapView:shouldChangeFromCamera:toCamera:)]
             && ![self.delegate mapView:self shouldChangeFromCamera:oldCamera toCamera:toCamera])
@@ -1815,6 +1803,19 @@ public:
     camera = [self cameraForCameraOptions:currentCameraOptions];
     
     return camera;
+}
+
+- (double)currentCameraZoom
+{
+    mbgl::EdgeInsets padding = MGLEdgeInsetsFromNSEdgeInsets(self.contentInset);
+    mbgl::CameraOptions currentCameraOptions = _mbglMap->getCameraOptions(padding);
+    double zoom = 0.0;
+    
+    if (currentCameraOptions.zoom) {
+        zoom = *currentCameraOptions.zoom;
+    }
+    
+    return zoom;
 }
 
 - (CGPoint)anchorPointForGesture:(UIGestureRecognizer *)gesture {
