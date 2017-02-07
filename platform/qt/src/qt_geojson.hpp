@@ -149,6 +149,7 @@ mbgl::Feature asMapboxGLFeature(const QMapbox::Feature &feature) {
 
     mbgl::FeatureIdentifier id = asMapboxGLFeatureIdentifier(feature.id);
 
+#if !defined(__GNUC__) || __GNUC__ >= 5
     if (feature.type == QMapbox::Feature::PointType) {
         const QMapbox::Coordinates &points = feature.geometry.first().first();
         if (points.size() == 1) {
@@ -171,6 +172,34 @@ mbgl::Feature asMapboxGLFeature(const QMapbox::Feature &feature) {
             return { asMapboxGLMultiPolygon(polygons), std::move(properties), std::move(id) };
         }
     }
+#else
+    mbgl::Feature mbglFeature;
+    mbglFeature.properties = std::move(properties);
+    mbglFeature.id = std::move(id);
+    if (feature.type == QMapbox::Feature::PointType) {
+        const QMapbox::Coordinates &points = feature.geometry.first().first();
+        if (points.size() == 1) {
+            mbglFeature.geometry = asMapboxGLPoint(points.first());
+        } else {
+            mbglFeature.geometry = asMapboxGLMultiPoint(points);
+        }
+    } else if (feature.type == QMapbox::Feature::LineStringType) {
+        const QMapbox::CoordinatesCollection &lineStrings = feature.geometry.first();
+        if (lineStrings.size() == 1) {
+            mbglFeature.geometry = asMapboxGLLineString(lineStrings.first());
+        } else {
+            mbglFeature.geometry = asMapboxGLMultiLineString(lineStrings);
+        }
+    } else { // PolygonType
+        const QMapbox::CoordinatesCollections &polygons = feature.geometry;
+        if (polygons.size() == 1) {
+            mbglFeature.geometry = asMapboxGLPolygon(polygons.first());
+        } else {
+            mbglFeature.geometry = asMapboxGLMultiPolygon(polygons);
+        }
+    }
+    return mbglFeature;
+#endif
 };
 
 } // namespace QMapbox
@@ -180,8 +209,19 @@ namespace style {
 namespace conversion {
 
 template <>
+Result<GeoJSON> convertGeoJSON(const QMapbox::Feature& feature) {
+    return Result<GeoJSON> { GeoJSON { asMapboxGLFeature(feature) } };
+}
+
+template <>
 Result<GeoJSON> convertGeoJSON(const QVariant& value) {
-    if (value.type() != QVariant::ByteArray) {
+#if QT_VERSION >= 0x050000
+    if (value.typeName() == QStringLiteral("QMapbox::Feature")) {
+#else
+    if (value.typeName() == QString("QMapbox::Feature")) {
+#endif
+        return convertGeoJSON(value.value<QMapbox::Feature>());
+    } else if (value.type() != QVariant::ByteArray) {
         return Error { "JSON data must be in QByteArray" };
     }
 
@@ -201,7 +241,7 @@ Result<GeoJSON> convertGeoJSON(const QVariant& value) {
         return Error { message.str() };
     }
 
-    conversion::Result<GeoJSON> geoJSON = conversion::convertGeoJSON<JSValue>(d);
+    Result<GeoJSON> geoJSON = convertGeoJSON<JSValue>(d);
     if (!geoJSON) {
         return Error { geoJSON.error().message };
     }
