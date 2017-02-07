@@ -3,7 +3,7 @@
 //
 
 task accessToken {
-    def tokenFile = new File("MapboxGLAndroidSDKTestApp/src/main/res/values/developer-config.xml")
+    def tokenFile = new File("${projectDir}/src/main/res/values/developer-config.xml")
     if (!tokenFile.exists()) {
         String tokenFileContents = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
                 "<resources>\n" +
