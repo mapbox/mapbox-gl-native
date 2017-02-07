@@ -283,6 +283,72 @@ struct Converter<CompositeValue<S>> {
 };
 
 template <class T>
+struct Converter<CompositeExponentialStops<T>> {
+    static constexpr const char * type = "exponential";
+
+    template <class V>
+    Result<CompositeExponentialStops<T>> operator()(const V& value) const {
+        auto stops = convertStops<CompositeValue<float>, T>(value);
+        if (!stops) {
+            return stops.error();
+        }
+
+        auto base = 1.0f;
+        auto baseValue = objectMember(value, "base");
+        if (baseValue && toNumber(*baseValue)) {
+            base = *toNumber(*baseValue);
+        }
+
+        std::map<float, std::map<float, T>> convertedStops;
+        for (const auto& stop : *stops) {
+            convertedStops[stop.first.first].emplace(stop.first.second, stop.second);
+        }
+
+        return CompositeExponentialStops<T>(convertedStops, base);
+    }
+};
+
+template <class T>
+struct Converter<CompositeIntervalStops<T>> {
+    static constexpr const char * type = "interval";
+
+    template <class V>
+    Result<CompositeIntervalStops<T>> operator()(const V& value) const {
+        auto stops = convertStops<CompositeValue<float>, T>(value);
+        if (!stops) {
+            return stops.error();
+        }
+
+        std::map<float, std::map<float, T>> convertedStops;
+        for (const auto& stop : *stops) {
+            convertedStops[stop.first.first].emplace(stop.first.second, stop.second);
+        }
+
+        return CompositeIntervalStops<T>(convertedStops);
+    }
+};
+
+template <class T>
+struct Converter<CompositeCategoricalStops<T>> {
+    static constexpr const char * type = "categorical";
+
+    template <class V>
+    Result<CompositeCategoricalStops<T>> operator()(const V& value) const {
+        auto stops = convertStops<CompositeValue<CategoricalValue>, T>(value);
+        if (!stops) {
+            return stops.error();
+        }
+
+        std::map<float, std::map<CategoricalValue, T>> convertedStops;
+        for (const auto& stop : *stops) {
+            convertedStops[stop.first.first].emplace(stop.first.second, stop.second);
+        }
+
+        return CompositeCategoricalStops<T>(convertedStops);
+    }
+};
+
+template <class T>
 struct Converter<CompositeFunction<T>> {
     template <class V>
     Result<CompositeFunction<T>> operator()(const V& value) const {
@@ -300,66 +366,17 @@ struct Converter<CompositeFunction<T>> {
             return Error { "function property must be a string" };
         }
 
+        auto stops = StopsConverter<T, typename CompositeFunction<T>::Stops>()(value);
+        if (!stops) {
+            return stops.error();
+        }
+
         auto defaultValue = convertDefaultValue<T>(value);
         if (!defaultValue) {
             return defaultValue.error();
         }
 
-        std::string type = "exponential";
-        auto typeValue = objectMember(value, "type");
-        if (typeValue && toString(*typeValue)) {
-            type = *toString(*typeValue);
-        }
-
-        if (type == "exponential") {
-            auto stops = convertStops<CompositeValue<float>, T>(value);
-            if (!stops) {
-                return stops.error();
-            }
-
-            auto base = 1.0f;
-            auto baseValue = objectMember(value, "base");
-            if (baseValue && toNumber(*baseValue)) {
-                base = *toNumber(*baseValue);
-            }
-
-            std::map<float, ExponentialStops<T>> convertedStops;
-            for (const auto& stop : *stops) {
-                auto& inner = convertedStops[stop.first.first];
-                inner.base = base;
-                inner.stops.emplace(stop.first.second, stop.second);
-            }
-
-            return CompositeFunction<T>(*propertyString, convertedStops, *defaultValue);
-        } else if (type == "interval") {
-            auto stops = convertStops<CompositeValue<float>, T>(value);
-            if (!stops) {
-                return stops.error();
-            }
-
-            std::map<float, IntervalStops<T>> convertedStops;
-            for (const auto& stop : *stops) {
-                auto& inner = convertedStops[stop.first.first];
-                inner.stops.emplace(stop.first.second, stop.second);
-            }
-
-            return CompositeFunction<T>(*propertyString, convertedStops, *defaultValue);
-        } else if (type == "categorical") {
-            auto stops = convertStops<CompositeValue<CategoricalValue>, T>(value);
-            if (!stops) {
-                return stops.error();
-            }
-
-            std::map<float, CategoricalStops<T>> convertedStops;
-            for (const auto& stop : *stops) {
-                auto& inner = convertedStops[stop.first.first];
-                inner.stops.emplace(stop.first.second, stop.second);
-            }
-
-            return CompositeFunction<T>(*propertyString, convertedStops, *defaultValue);
-        } else {
-            return Error { "unsupported function type" };
-        }
+        return CompositeFunction<T>(*propertyString, *stops, *defaultValue);
     }
 };
 

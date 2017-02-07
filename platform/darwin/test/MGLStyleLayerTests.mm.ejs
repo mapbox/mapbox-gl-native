@@ -99,8 +99,8 @@
         functionStyleValue = [MGLStyleValue<<%- propertyType(property) %>> valueWithInterpolationMode:MGLInterpolationModeExponential compositeStops:@{@10: @{@18: constantStyleValue}} attributeName:@"keyName" options:nil];
         layer.<%- objCName(property) %> = functionStyleValue;
 
-        mbgl::style::ExponentialStops<<%- mbglType(property) %>> innerStops = { { {18, <%- mbglTestValue(property, type) %>}}, 1.0 };
-        std::map<float, mbgl::style::ExponentialStops<<%- mbglType(property) %>>> compositeStops = { {10.0, innerStops} };
+        std::map<float, <%- mbglType(property) %>> innerStops { {18, <%- mbglTestValue(property, type) %>} };
+        mbgl::style::CompositeExponentialStops<<%- mbglType(property) %>> compositeStops { { {10.0, innerStops} }, 1.0 };
 
         propertyValue = mbgl::style::CompositeFunction<<%- mbglType(property) %>> { "keyName", compositeStops };
 

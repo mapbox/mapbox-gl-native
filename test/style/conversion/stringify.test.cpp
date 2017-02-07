@@ -101,9 +101,12 @@ TEST(Stringify, SourceFunction) {
 
 TEST(Stringify, CompositeFunction) {
     ASSERT_EQ(stringify(CompositeFunction<float>("property",
-        std::map<float, ExponentialStops<float>> {
-            { 0, ExponentialStops<float> { {{0, 1}}, 2 } },
-            { 1, ExponentialStops<float> { {{0, 1}}, 2 } }
+        CompositeExponentialStops<float> {
+            {
+                { 0, {{0, 1}} },
+                { 1, {{0, 1}} }
+            },
+            2
         }, 0.0f)),
         "{\"property\":\"property\",\"type\":\"exponential\",\"base\":2.0,"
         "\"stops\":["

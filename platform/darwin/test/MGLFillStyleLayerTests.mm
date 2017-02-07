@@ -122,8 +122,8 @@
         functionStyleValue = [MGLStyleValue<MGLColor *> valueWithInterpolationMode:MGLInterpolationModeExponential compositeStops:@{@10: @{@18: constantStyleValue}} attributeName:@"keyName" options:nil];
         layer.fillColor = functionStyleValue;
 
-        mbgl::style::ExponentialStops<mbgl::Color> innerStops = { { {18, { 1, 0, 0, 1 }}}, 1.0 };
-        std::map<float, mbgl::style::ExponentialStops<mbgl::Color>> compositeStops = { {10.0, innerStops} };
+        std::map<float, mbgl::Color> innerStops { {18, { 1, 0, 0, 1 }} };
+        mbgl::style::CompositeExponentialStops<mbgl::Color> compositeStops { { {10.0, innerStops} }, 1.0 };
 
         propertyValue = mbgl::style::CompositeFunction<mbgl::Color> { "keyName", compositeStops };
 
@@ -179,8 +179,8 @@
         functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeExponential compositeStops:@{@10: @{@18: constantStyleValue}} attributeName:@"keyName" options:nil];
         layer.fillOpacity = functionStyleValue;
 
-        mbgl::style::ExponentialStops<float> innerStops = { { {18, 0xff}}, 1.0 };
-        std::map<float, mbgl::style::ExponentialStops<float>> compositeStops = { {10.0, innerStops} };
+        std::map<float, float> innerStops { {18, 0xff} };
+        mbgl::style::CompositeExponentialStops<float> compositeStops { { {10.0, innerStops} }, 1.0 };
 
         propertyValue = mbgl::style::CompositeFunction<float> { "keyName", compositeStops };
 
@@ -236,8 +236,8 @@
         functionStyleValue = [MGLStyleValue<MGLColor *> valueWithInterpolationMode:MGLInterpolationModeExponential compositeStops:@{@10: @{@18: constantStyleValue}} attributeName:@"keyName" options:nil];
         layer.fillOutlineColor = functionStyleValue;
 
-        mbgl::style::ExponentialStops<mbgl::Color> innerStops = { { {18, { 1, 0, 0, 1 }}}, 1.0 };
-        std::map<float, mbgl::style::ExponentialStops<mbgl::Color>> compositeStops = { {10.0, innerStops} };
+        std::map<float, mbgl::Color> innerStops { {18, { 1, 0, 0, 1 }} };
+        mbgl::style::CompositeExponentialStops<mbgl::Color> compositeStops { { {10.0, innerStops} }, 1.0 };
 
         propertyValue = mbgl::style::CompositeFunction<mbgl::Color> { "keyName", compositeStops };
 
