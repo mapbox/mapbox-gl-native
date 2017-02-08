@@ -298,7 +298,6 @@ workflows:
             make android-lib-arm-v7
             make android-lib-arm-v8
             make android-lib-x86
-            make android-lib-x86-64
             cd platform/android && ./gradlew :MapboxGLAndroidSDK:assembleRelease
     - script:
         title: Log metrics
