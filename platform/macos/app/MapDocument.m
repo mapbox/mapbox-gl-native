@@ -689,11 +689,11 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
 
     MGLFillStyleLayer *fillStyleLayer = (MGLFillStyleLayer *)[self.mapView.style layerWithIdentifier:@"water"];
 
-    MGLStyleValue *colorFunction = [MGLStyleValue<NSColor *> valueWithStops:@{
+    MGLStyleValue *colorFunction = [MGLStyleValue<NSColor *> valueWithInterpolationMode:MGLInterpolationModeExponential cameraStops:@{
         @0.0: [MGLStyleValue<NSColor *> valueWithRawValue:[NSColor redColor]],
         @10.0: [MGLStyleValue<NSColor *> valueWithRawValue:[NSColor yellowColor]],
         @20.0: [MGLStyleValue<NSColor *> valueWithRawValue:[NSColor blackColor]],
-    }];
+    } options:nil];
     fillStyleLayer.fillColor = colorFunction;
 
     NSString *filePath = [[NSBundle bundleForClass:self.class] pathForResource:@"amsterdam" ofType:@"geojson"];
@@ -715,11 +715,11 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     theaterLayer.predicate = [NSPredicate predicateWithFormat:@"maki == 'theatre'"];
     theaterLayer.iconImageName = [MGLStyleValue valueWithRawValue:NSImageNameIChatTheaterTemplate];
     theaterLayer.iconScale = [MGLStyleValue valueWithRawValue:@2];
-    theaterLayer.iconColor = [MGLStyleValue valueWithStops:@{
+    theaterLayer.iconColor = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeExponential cameraStops:@{
         @16.0: [MGLStyleValue valueWithRawValue:[NSColor redColor]],
         @18.0: [MGLStyleValue valueWithRawValue:[NSColor yellowColor]],
         @20.0: [MGLStyleValue valueWithRawValue:[NSColor blackColor]],
-    }];
+    } options:nil];
     [self.mapView.style addLayer:theaterLayer];
 }
 
@@ -1080,14 +1080,14 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
 
 - (void)mapView:(MGLMapView *)mapView didSelectAnnotation:(id <MGLAnnotation>)annotation {
     if ([annotation isKindOfClass:[DroppedPinAnnotation class]]) {
-        DroppedPinAnnotation *droppedPin = annotation;
+        DroppedPinAnnotation *droppedPin = (DroppedPinAnnotation *)annotation;
         [droppedPin resume];
     }
 }
 
 - (void)mapView:(MGLMapView *)mapView didDeselectAnnotation:(id <MGLAnnotation>)annotation {
     if ([annotation isKindOfClass:[DroppedPinAnnotation class]]) {
-        DroppedPinAnnotation *droppedPin = annotation;
+        DroppedPinAnnotation *droppedPin = (DroppedPinAnnotation *)annotation;
         [droppedPin pause];
     }
 }
