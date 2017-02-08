@@ -351,6 +351,10 @@ set(MBGL_CORE_FILES
     src/mbgl/text/collision_feature.hpp
     src/mbgl/text/collision_tile.cpp
     src/mbgl/text/collision_tile.hpp
+    src/mbgl/text/default_font.hpp
+    src/mbgl/text/default_font.cpp
+    src/mbgl/text/font_store.cpp
+    src/mbgl/text/font_store.hpp
     src/mbgl/text/get_anchors.cpp
     src/mbgl/text/get_anchors.hpp
     src/mbgl/text/glyph.cpp
@@ -363,6 +367,8 @@ set(MBGL_CORE_FILES
     src/mbgl/text/glyph_range.hpp
     src/mbgl/text/glyph_set.cpp
     src/mbgl/text/glyph_set.hpp
+    src/mbgl/text/harfbuzz_shaper.cpp
+    src/mbgl/text/harfbuzz_shaper.hpp
     src/mbgl/text/placement_config.hpp
     src/mbgl/text/quads.cpp
     src/mbgl/text/quads.hpp

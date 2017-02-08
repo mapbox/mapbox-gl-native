@@ -46,6 +46,9 @@ target_add_mason_package(mbgl-core PRIVATE kdbush)
 target_add_mason_package(mbgl-core PRIVATE earcut)
 target_add_mason_package(mbgl-core PRIVATE protozero)
 target_add_mason_package(mbgl-core PRIVATE polylabel)
+target_add_mason_package(mbgl-core PRIVATE harfbuzz)
+target_add_mason_package(mbgl-core PRIVATE freetype)
+target_add_mason_package(mbgl-core PRIVATE sdf-glyph-foundry)
 
 mbgl_platform_core()
 

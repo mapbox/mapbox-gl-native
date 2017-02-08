@@ -40,6 +40,9 @@ mason_use(protozero VERSION 1.4.2 HEADER_ONLY)
 mason_use(pixelmatch VERSION 0.10.0 HEADER_ONLY)
 mason_use(geojson VERSION 0.4.0 HEADER_ONLY)
 mason_use(polylabel VERSION 1.0.2 HEADER_ONLY)
+mason_use(sdf-glyph-foundry VERSION 0.1.1 HEADER_ONLY)
+mason_use(harfbuzz VERSION 1.3.0)
+mason_use(freetype VERSION 2.6.5)
 
 add_definitions(-DRAPIDJSON_HAS_STDSTRING=1)
 

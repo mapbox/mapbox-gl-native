@@ -1,7 +1,10 @@
 #include <mbgl/math/minmax.hpp>
+#include <mbgl/text/font_store.hpp>
 #include <mbgl/text/glyph_set.hpp>
+#include <mbgl/text/harfbuzz_shaper.hpp>
 #include <mbgl/util/i18n.hpp>
 #include <mbgl/util/logging.hpp>
+#include <mbgl/util/utf.hpp>
 
 #include <boost/algorithm/string.hpp>
 
@@ -42,7 +45,8 @@ const Shaping GlyphSet::getShaping(const std::u16string& logicalInput,
                                    const float justify,
                                    const float spacing,
                                    const Point<float>& translate,
-                                   BiDi& bidi) const {
+                                   BiDi& bidi,
+                                   const FontStore& fontStore) const {
 
     // The string stored in shaping.text is used for finding duplicates, but may end up quite
     // different from the glyphs that get shown
@@ -53,7 +57,7 @@ const Shaping GlyphSet::getShaping(const std::u16string& logicalInput,
                          determineLineBreaks(logicalInput, spacing, maxWidth));
 
     shapeLines(shaping, reorderedLines, spacing, lineHeight, horizontalAlign, verticalAlign,
-               justify, translate);
+               justify, translate, fontStore);
 
     return shaping;
 }
@@ -239,7 +243,8 @@ void GlyphSet::shapeLines(Shaping& shaping,
                           const float horizontalAlign,
                           const float verticalAlign,
                           const float justify,
-                          const Point<float>& translate) const {
+                          const Point<float>& translate,
+                          const FontStore& fontStore) const {
 
     // the y offset *should* be part of the font metadata
     const int32_t yOffset = -17;
@@ -257,18 +262,24 @@ void GlyphSet::shapeLines(Shaping& shaping,
             y += lineHeight; // Still need a line feed after empty line
             continue;
         }
-
+        
         std::size_t lineStartIndex = shaping.positionedGlyphs.size();
-        for (char16_t chr : line) {
-            auto it = sdfs.find(chr);
-            if (it == sdfs.end()) {
-                continue;
-            }
 
-            const SDFGlyph& glyph = it->second;
-            shaping.positionedGlyphs.emplace_back(chr, x, y);
-            x += glyph.metrics.advance + spacing;
+        if (fontStore.UsingDefaultFont()) {
+            harfbuzz::applyShaping(fontStore.GetDefaultHB_Font(), util::utf16_to_utf8::convert(line), shaping.positionedGlyphs, x, y);
+        } else {
+            for (char16_t chr : line) {
+                auto it = sdfs.find(chr);
+                if (it == sdfs.end()) {
+                    continue;
+                }
+                
+                const SDFGlyph& glyph = it->second;
+                shaping.positionedGlyphs.emplace_back(chr, x, y);
+                x += glyph.metrics.advance + spacing;
+            }
         }
+
 
         // Only justify if we placed at least one glyph
         if (shaping.positionedGlyphs.size() != lineStartIndex) {

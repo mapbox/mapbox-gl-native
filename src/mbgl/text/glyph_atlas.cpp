@@ -8,6 +8,8 @@
 #include <cassert>
 #include <algorithm>
 
+#include <mbgl/text/font_store.hpp>
+
 namespace mbgl {
 
 static GlyphAtlasObserver nullObserver;
@@ -63,6 +65,57 @@ bool GlyphAtlas::hasGlyphRanges(const FontStack& fontStack, const GlyphRangeSet&
     return hasRanges;
 }
 
+bool GlyphAtlas::hasLocalGlyphs(const std::set<uint32_t>& glyphIDs) {
+    if (glyphIDs.empty()) {
+        return true;
+    }
+
+    std::lock_guard<std::mutex> lock(localGlyphMutex);
+    auto sdfs = localGlyphs.getSDFs();
+
+    std::set<uint32_t> needUpload;
+
+    for (uint32_t glyphID : glyphIDs) {
+        const auto& sdfIt = sdfs.find(glyphID);
+        if (sdfIt == sdfs.end()) {
+            needUpload.insert(glyphID);
+        }
+
+    }
+
+    addLocalGlyphs(needUpload);
+
+    return true;
+}
+
+const GlyphPositions& GlyphAtlas::getLocalGlyphPositions() {
+    return localGlyphPositions;
+}
+
+void GlyphAtlas::addLocalGlyphs(const std::set<uint32_t>& glyphIDs) {
+    std::lock_guard<std::mutex> lock(mtx);
+    for (uint32_t glyphID : glyphIDs) {
+        SDFGlyph sdf = getSDFGlyph(fontStore.GetDefaultFT_Face(), glyphID);
+        Rect<uint16_t> rect = addLocalGlyph(sdf);
+        localGlyphPositions.emplace(glyphID, Glyph{rect, sdf.metrics});
+
+        localGlyphs.insert(glyphID,std::move(sdf));
+    }
+}
+
+Rect<uint16_t> GlyphAtlas::addLocalGlyph(const SDFGlyph& glyph) {
+    auto it = localGlyphIndex.find(glyph.id);
+
+    // The glyph is already in this texture.
+    if (it != localGlyphIndex.end()) {
+        GlyphValue& value = it->second;
+        return value.rect;
+    }
+    
+    return addGlyphToTexture(glyph, 0, localGlyphIndex);
+}
+
+
 util::exclusive<GlyphSet> GlyphAtlas::getGlyphSet(const FontStack& fontStack) {
     auto lock = std::make_unique<std::lock_guard<std::mutex>>(glyphSetsMutex);
 
@@ -102,6 +155,63 @@ void GlyphAtlas::addGlyphs(uintptr_t tileUID,
         face.emplace(chr, Glyph{rect, sdf.metrics});
     }
 }
+    
+Rect<uint16_t> GlyphAtlas::addGlyphToTexture(const SDFGlyph& glyph, uintptr_t tileUID, std::map<uint32_t, GlyphValue>& face) {
+    // Guard against glyphs that are too large, or that we don't need to place into the atlas since
+    // they don't have any pixels.
+    if (glyph.metrics.width == 0 || glyph.metrics.width >= 256 ||
+        glyph.metrics.height == 0 || glyph.metrics.height >= 256) {
+        return Rect<uint16_t>{ 0, 0, 0, 0 };
+    }
+    
+    uint16_t buffered_width = glyph.metrics.width + SDFGlyph::borderSize * 2;
+    uint16_t buffered_height = glyph.metrics.height + SDFGlyph::borderSize * 2;
+    
+    // Guard against mismatches between the glyph bitmap size and the size mandated by
+    // its metrics.
+    if (size_t(buffered_width * buffered_height) != glyph.bitmap.size()) {
+        return Rect<uint16_t>{ 0, 0, 0, 0 };
+    }
+    
+    // Add a 1px border around every image.
+    const uint16_t padding = 1;
+    uint16_t pack_width = buffered_width + 2 * padding;
+    uint16_t pack_height = buffered_height + 2 * padding;
+    
+    // Increase to next number divisible by 4, but at least 1.
+    // This is so we can scale down the texture coordinates and pack them
+    // into 2 bytes rather than 4 bytes.
+    pack_width += (4 - pack_width % 4);
+    pack_height += (4 - pack_height % 4);
+    
+    Rect<uint16_t> rect = bin.allocate(pack_width, pack_height);
+    if (rect.w == 0) {
+        Log::Error(Event::OpenGL, "glyph bitmap overflow");
+        return rect;
+    }
+    
+    // Verify that binpack didn't produce a rect that goes beyond the size of the image.
+    // This should never happen.
+    assert(rect.x + rect.w <= image.size.width);
+    assert(rect.y + rect.h <= image.size.height);
+    
+    face.emplace(glyph.id, GlyphValue { rect, tileUID });
+    
+    // Copy the bitmap
+    const uint8_t* source = reinterpret_cast<const uint8_t*>(glyph.bitmap.data());
+    for (uint32_t y = 0; y < buffered_height; y++) {
+        uint32_t y1 = image.size.width * (rect.y + y + padding) + rect.x + padding;
+        uint32_t y2 = buffered_width * y;
+        for (uint32_t x = 0; x < buffered_width; x++) {
+            image.data[y1 + x] = source[y2 + x];
+        }
+    }
+    
+    dirty = true;
+    
+    return rect;
+}
+
 
 Rect<uint16_t> GlyphAtlas::addGlyph(uintptr_t tileUID,
                                     const FontStack& fontStack,
@@ -116,60 +226,8 @@ Rect<uint16_t> GlyphAtlas::addGlyph(uintptr_t tileUID,
         value.ids.insert(tileUID);
         return value.rect;
     }
-
-    // Guard against glyphs that are too large, or that we don't need to place into the atlas since
-    // they don't have any pixels.
-    if (glyph.metrics.width == 0 || glyph.metrics.width >= 256 ||
-        glyph.metrics.height == 0 || glyph.metrics.height >= 256) {
-        return Rect<uint16_t>{ 0, 0, 0, 0 };
-    }
-
-    uint16_t buffered_width = glyph.metrics.width + SDFGlyph::borderSize * 2;
-    uint16_t buffered_height = glyph.metrics.height + SDFGlyph::borderSize * 2;
-
-    // Guard against mismatches between the glyph bitmap size and the size mandated by
-    // its metrics.
-    if (size_t(buffered_width * buffered_height) != glyph.bitmap.size()) {
-        return Rect<uint16_t>{ 0, 0, 0, 0 };
-    }
-
-    // Add a 1px border around every image.
-    const uint16_t padding = 1;
-    uint16_t pack_width = buffered_width + 2 * padding;
-    uint16_t pack_height = buffered_height + 2 * padding;
-
-    // Increase to next number divisible by 4, but at least 1.
-    // This is so we can scale down the texture coordinates and pack them
-    // into 2 bytes rather than 4 bytes.
-    pack_width += (4 - pack_width % 4);
-    pack_height += (4 - pack_height % 4);
-
-    Rect<uint16_t> rect = bin.allocate(pack_width, pack_height);
-    if (rect.w == 0) {
-        Log::Error(Event::OpenGL, "glyph bitmap overflow");
-        return rect;
-    }
-
-    // Verify that binpack didn't produce a rect that goes beyond the size of the image.
-    // This should never happen.
-    assert(rect.x + rect.w <= image.size.width);
-    assert(rect.y + rect.h <= image.size.height);
-
-    face.emplace(glyph.id, GlyphValue { rect, tileUID });
-
-    // Copy the bitmap
-    const uint8_t* source = reinterpret_cast<const uint8_t*>(glyph.bitmap.data());
-    for (uint32_t y = 0; y < buffered_height; y++) {
-        uint32_t y1 = image.size.width * (rect.y + y + padding) + rect.x + padding;
-        uint32_t y2 = buffered_width * y;
-        for (uint32_t x = 0; x < buffered_width; x++) {
-            image.data[y1 + x] = source[y2 + x];
-        }
-    }
-
-    dirty = true;
-
-    return rect;
+    
+    return addGlyphToTexture(glyph, tileUID, face);
 }
 
 void GlyphAtlas::removeGlyphs(uintptr_t tileUID) {

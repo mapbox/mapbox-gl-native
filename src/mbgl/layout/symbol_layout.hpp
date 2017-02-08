@@ -5,6 +5,7 @@
 #include <mbgl/layout/symbol_feature.hpp>
 #include <mbgl/layout/symbol_instance.hpp>
 #include <mbgl/text/bidi.hpp>
+#include <mbgl/text/font_store.hpp>
 
 #include <memory>
 #include <map>
@@ -32,12 +33,12 @@ public:
     SymbolLayout(const style::BucketParameters&,
                  const std::vector<const style::Layer*>&,
                  const GeometryTileLayer&,
-                 SpriteAtlas&);
-
-    bool canPrepare(GlyphAtlas&);
-
-    void prepare(uintptr_t tileUID,
+                 SpriteAtlas&,
                  GlyphAtlas&);
+
+    bool canPrepare();
+
+    void prepare(uintptr_t tileUID);
 
     std::unique_ptr<SymbolBucket> place(CollisionTile&);
 
@@ -79,14 +80,16 @@ private:
     float textMaxSize;
 
     SpriteAtlas& spriteAtlas;
+    GlyphAtlas& glyphAtlas;
 
     const uint32_t tileSize;
     const float tilePixelRatio;
 
     bool sdfIcons = false;
     bool iconsNeedLinear = false;
-
+    
     GlyphRangeSet ranges;
+    std::set<uint32_t> localFontGlyphIDs;
     std::vector<SymbolInstance> symbolInstances;
     std::vector<SymbolFeature> features;
 

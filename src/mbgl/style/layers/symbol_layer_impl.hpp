@@ -7,6 +7,7 @@
 namespace mbgl {
 
 class SpriteAtlas;
+class GlyphAtlas;
 class SymbolLayout;
 
 namespace style {
@@ -64,6 +65,7 @@ public:
     float textSize = 16.0f;
 
     SpriteAtlas* spriteAtlas = nullptr;
+    GlyphAtlas* glyphAtlas = nullptr;
 };
 
 } // namespace style

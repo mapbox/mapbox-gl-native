@@ -35,7 +35,8 @@ std::unique_ptr<SymbolLayout> SymbolLayer::Impl::createLayout(const BucketParame
     return std::make_unique<SymbolLayout>(parameters,
                                           group,
                                           layer,
-                                          *spriteAtlas);
+                                          *spriteAtlas,
+                                          *glyphAtlas);
 }
 
 SymbolPropertyValues SymbolLayer::Impl::iconPropertyValues(const SymbolLayoutProperties::Evaluated& layout_) const {

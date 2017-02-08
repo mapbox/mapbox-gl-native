@@ -2,6 +2,7 @@
 
 #include <mbgl/text/glyph.hpp>
 #include <mbgl/text/glyph_set.hpp>
+#include <mbgl/text/font_store.hpp>
 #include <mbgl/geometry/binpack.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/optional.hpp>
@@ -69,7 +70,11 @@ public:
     void upload(gl::Context&, gl::TextureUnit unit);
 
     Size getSize() const;
-
+    
+    bool hasLocalGlyphs(const std::set<uint32_t>& glyphIDs);
+    const GlyphPositions& getLocalGlyphPositions();
+    
+    const FontStore& FontStore() const { return fontStore; }
 private:
     void requestGlyphRange(const FontStack&, const GlyphRange&);
 
@@ -80,6 +85,11 @@ private:
 
     FileSource& fileSource;
     std::string glyphURL;
+
+    std::mutex localGlyphMutex;
+
+    void addLocalGlyphs(const std::set<uint32_t>& glyphIDs);
+    Rect<uint16_t> addLocalGlyph(const SDFGlyph&);
 
     std::unordered_map<FontStack, std::map<GlyphRange, std::unique_ptr<GlyphPBF>>, FontStackHash> ranges;
     std::mutex rangesMutex;
@@ -97,13 +107,23 @@ private:
         Rect<uint16_t> rect;
         std::unordered_set<uintptr_t> ids;
     };
+    
+    Rect<uint16_t> addGlyphToTexture(const SDFGlyph&,
+                                     uintptr_t tileUID,
+                                     std::map<uint32_t, GlyphValue>& face);
 
     std::mutex mtx;
     BinPack<uint16_t> bin;
     std::unordered_map<FontStack, std::map<uint32_t, GlyphValue>, FontStackHash> index;
+
     const AlphaImage image;
     std::atomic<bool> dirty;
     mbgl::optional<gl::Texture> texture;
+    
+    GlyphSet localGlyphs;
+    class FontStore fontStore;
+    GlyphPositions localGlyphPositions;
+    std::map<uint32_t, GlyphValue> localGlyphIndex;
 };
 
 } // namespace mbgl

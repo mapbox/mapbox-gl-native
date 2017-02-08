@@ -313,10 +313,9 @@ void GeometryTileWorker::attemptPlacement() {
         }
 
         if (symbolLayout->state == SymbolLayout::Pending) {
-            if (symbolLayout->canPrepare(glyphAtlas)) {
+            if (symbolLayout->canPrepare()) {
                 symbolLayout->state = SymbolLayout::Prepared;
-                symbolLayout->prepare(reinterpret_cast<uintptr_t>(this),
-                                      glyphAtlas);
+                symbolLayout->prepare(reinterpret_cast<uintptr_t>(this));
             } else {
                 canPlace = false;
             }

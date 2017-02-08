@@ -214,6 +214,9 @@ Layer* Style::addLayer(std::unique_ptr<Layer> layer, optional<std::string> befor
         if (!symbolLayer->impl->spriteAtlas) {
             symbolLayer->impl->spriteAtlas = spriteAtlas.get();
         }
+        if (!symbolLayer->impl->glyphAtlas) {
+            symbolLayer->impl->glyphAtlas = glyphAtlas.get();
+        }
     }
 
     if (CustomLayer* customLayer = layer->as<CustomLayer>()) {

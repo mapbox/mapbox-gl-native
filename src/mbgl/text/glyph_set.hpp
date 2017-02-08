@@ -5,6 +5,8 @@
 #include <mbgl/util/geometry.hpp>
 
 namespace mbgl {
+    
+class FontStore;
 
 class GlyphSet {
 public:
@@ -18,7 +20,8 @@ public:
                              float justify,
                              float spacing,
                              const Point<float>& translate,
-                             BiDi& bidi) const;
+                             BiDi& bidi,
+                             const FontStore& fontStore) const;
 
 private:
     float determineAverageLineWidth(const std::u16string& logicalInput,
@@ -35,7 +38,8 @@ private:
                     float horizontalAlign,
                     float verticalAlign,
                     float justify,
-                    const Point<float>& translate) const;
+                    const Point<float>& translate,
+                    const FontStore& fontStore) const;
 
     std::map<uint32_t, SDFGlyph> sdfs;
 };

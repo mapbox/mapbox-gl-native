@@ -51,6 +51,8 @@
 
 #import <QuartzCore/QuartzCore.h>
 
+#import <mbgl/text/default_font.hpp>
+
 class MGLMapViewImpl;
 class MGLAnnotationContext;
 
@@ -263,6 +265,11 @@ public:
     [[NSFileManager defaultManager] removeItemAtURL:legacyCacheURL error:NULL];
 
     mbgl::DefaultFileSource* mbglFileSource = [MGLOfflineStorage sharedOfflineStorage].mbglFileSource;
+    
+    NSString *defaultFontPath = [[NSBundle mainBundle] pathForResource:@"Arial Unicode" // Or NotoSansTibetan-Regular.ttf, or NotoSansKannada-Regular.ttf
+                                                              ofType:@"ttf"];
+
+    mbgl::SetDefaultFontPath([defaultFontPath UTF8String]);
 
     _mbglThreadPool = new mbgl::ThreadPool(4);
     _mbglMap = new mbgl::Map(*_mbglView, self.size, [NSScreen mainScreen].backingScaleFactor, *mbglFileSource, *_mbglThreadPool, mbgl::MapMode::Continuous, mbgl::GLContextMode::Unique, mbgl::ConstrainMode::None, mbgl::ViewportMode::Default);

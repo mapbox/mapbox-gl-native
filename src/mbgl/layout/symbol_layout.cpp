@@ -10,6 +10,7 @@
 #include <mbgl/text/glyph_atlas.hpp>
 #include <mbgl/text/get_anchors.hpp>
 #include <mbgl/text/glyph_atlas.hpp>
+#include <mbgl/text/harfbuzz_shaper.hpp>
 #include <mbgl/text/collision_tile.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/utf.hpp>
@@ -32,13 +33,15 @@ using namespace style;
 SymbolLayout::SymbolLayout(const BucketParameters& parameters,
                            const std::vector<const Layer*>& layers,
                            const GeometryTileLayer& sourceLayer,
-                           SpriteAtlas& spriteAtlas_)
+                           SpriteAtlas& spriteAtlas_,
+                           GlyphAtlas& glyphAtlas_)
     : sourceLayerName(sourceLayer.getName()),
       bucketName(layers.at(0)->getID()),
       overscaling(parameters.tileID.overscaleFactor()),
       zoom(parameters.tileID.overscaledZ),
       mode(parameters.mode),
       spriteAtlas(spriteAtlas_),
+      glyphAtlas(glyphAtlas_),
       tileSize(util::tileSize * overscaling),
       tilePixelRatio(float(util::EXTENT) / tileSize) {
 
@@ -119,8 +122,16 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
                 u8string = platform::lowercase(u8string);
             }
 
-            ft.text = applyArabicShaping(util::utf8_to_utf16::convert(u8string));
-
+            if (glyphAtlas.FontStore().UsingDefaultFont()) {
+                ft.text = util::utf8_to_utf16::convert(u8string);
+                auto requiredGlyphs = harfbuzz::getGlyphIDs(glyphAtlas.FontStore().GetDefaultHB_Font(), u8string);
+                localFontGlyphIDs.insert(requiredGlyphs.begin(), requiredGlyphs.end());
+            } else {
+                ft.text = applyArabicShaping(util::utf8_to_utf16::convert(u8string));
+            }
+            
+            
+            
             // Loop through all characters of this text and collect unique codepoints.
             for (char16_t chr : *ft.text) {
                 ranges.insert(getGlyphRange(chr));
@@ -149,8 +160,8 @@ bool SymbolLayout::hasSymbolInstances() const {
     return !symbolInstances.empty();
 }
 
-bool SymbolLayout::canPrepare(GlyphAtlas& glyphAtlas) {
-    if (!layout.get<TextField>().empty() && !layout.get<TextFont>().empty() && !glyphAtlas.hasGlyphRanges(layout.get<TextFont>(), ranges)) {
+bool SymbolLayout::canPrepare() {
+    if (!layout.get<TextField>().empty() && !layout.get<TextFont>().empty() && !glyphAtlas.hasGlyphRanges(layout.get<TextFont>(), ranges) && !glyphAtlas.hasLocalGlyphs(localFontGlyphIDs)) {
         return false;
     }
 
@@ -161,8 +172,7 @@ bool SymbolLayout::canPrepare(GlyphAtlas& glyphAtlas) {
     return true;
 }
 
-void SymbolLayout::prepare(uintptr_t tileUID,
-                           GlyphAtlas& glyphAtlas) {
+void SymbolLayout::prepare(uintptr_t tileUID) {
     float horizontalAlign = 0.5;
     float verticalAlign = 0.5;
 
@@ -225,7 +235,8 @@ void SymbolLayout::prepare(uintptr_t tileUID,
                 /* justify */ justify,
                 /* spacing: ems */ layout.get<TextLetterSpacing>() * 24,
                 /* translate */ Point<float>(layout.get<TextOffset>()[0], layout.get<TextOffset>()[1]),
-                /* bidirectional algorithm object */ bidi);
+                /* bidirectional algorithm object */ bidi,
+                /* local fonts */glyphAtlas.FontStore());
 
             // Add the glyphs we need for this label to the glyph atlas.
             if (shapedText) {
@@ -252,7 +263,11 @@ void SymbolLayout::prepare(uintptr_t tileUID,
 
         // if either shapedText or icon position is present, add the feature
         if (shapedText || shapedIcon) {
-            addFeature(feature, shapedText, shapedIcon, face);
+            if (glyphAtlas.FontStore().UsingDefaultFont()) {
+                addFeature(feature, shapedText, shapedIcon, glyphAtlas.getLocalGlyphPositions());
+            } else {
+                addFeature(feature, shapedText, shapedIcon, face);
+            }
         }
     }
 
