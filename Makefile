@@ -32,6 +32,10 @@ else
   BUILD_PLATFORM_VERSION = $(MASON_PLATFORM_VERSION)
 endif
 
+ifeq ($(MASON_PLATFORM),macos)
+	MASON_PLATFORM=osx
+endif
+
 ifeq ($(V), 1)
   export XCPRETTY
   NINJA_ARGS ?= -v
@@ -43,18 +47,10 @@ endif
 .PHONY: default
 default: test
 
-ifneq (,$(wildcard .git/.))
-.mason/mason:
-	git submodule update --init
-else
-.mason/mason: ;
-endif
-
 .NOTPARALLEL: node_modules
 node_modules: package.json
 	npm install --ignore-scripts # Install dependencies but don't run our own install script.
 
-BUILD_DEPS += .mason/mason
 BUILD_DEPS += Makefile
 BUILD_DEPS += node_modules
 BUILD_DEPS += CMakeLists.txt
@@ -190,17 +186,12 @@ $(MACOS_COMPDB_PATH)/Makefile:
 compdb: $(BUILD_DEPS) $(TEST_DEPS) $(MACOS_COMPDB_PATH)/Makefile
 	@$(MAKE) -C $(MACOS_COMPDB_PATH) cmake_check_build_system
 
-.PHONY: clang-tools
-clang-tools: compdb
-	if test -z $(CLANG_TIDY); then .mason/mason install clang-tidy 3.9.1; fi
-	if test -z $(CLANG_FORMAT); then .mason/mason install clang-format 3.9.1; fi
-
 .PHONY: tidy
-tidy: clang-tools
+tidy: compdb
 	scripts/clang-tools.sh $(MACOS_COMPDB_PATH)
 
 .PHONY: check
-check: clang-tools
+check: compdb
 	scripts/clang-tools.sh $(MACOS_COMPDB_PATH) --diff
 
 endif
@@ -225,7 +216,9 @@ $(IOS_PROJ_PATH): $(IOS_USER_DATA_PATH)/WorkspaceSettings.xcsettings $(BUILD_DEP
 	mkdir -p $(IOS_OUTPUT_PATH)
 	(cd $(IOS_OUTPUT_PATH) && cmake -G Xcode ../.. \
 		-DCMAKE_TOOLCHAIN_FILE=../../platform/ios/toolchain.cmake \
-		-DMBGL_PLATFORM=ios)
+		-DMBGL_PLATFORM=ios \
+		-DMASON_PLATFORM=ios \
+		-DMASON_PLATFORM_VERSION=8.0)
 
 $(IOS_USER_DATA_PATH)/WorkspaceSettings.xcsettings: platform/ios/WorkspaceSettings.xcsettings
 	mkdir -p "$(IOS_USER_DATA_PATH)"
@@ -361,17 +354,12 @@ node: $(LINUX_BUILD)
 compdb: $(LINUX_BUILD)
 	# Ninja generator already outputs the file at the right location
 
-.PHONY: clang-tools
-clang-tools: compdb
-	if test -z $(CLANG_TIDY); then .mason/mason install clang-tidy 3.9.1; fi
-	if test -z $(CLANG_FORMAT); then .mason/mason install clang-format 3.9.1; fi
-
 .PHONY: tidy
-tidy: clang-tools
+tidy: compdb
 	scripts/clang-tools.sh $(LINUX_OUTPUT_PATH)
 
 .PHONY: check
-check: clang-tools
+check: compdb
 	scripts/clang-tools.sh $(LINUX_OUTPUT_PATH) --diff
 
 endif
@@ -397,8 +385,8 @@ $(QT_BUILD): $(BUILD_DEPS)
 		-DCMAKE_BUILD_TYPE=$(BUILDTYPE) \
 		-DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
 		-DMBGL_PLATFORM=qt \
-		-DMASON_PLATFORM=$(BUILD_PLATFORM) \
-		-DMASON_PLATFORM_VERSION=$(BUILD_PLATFORM_VERSION) \
+		-DMASON_PLATFORM=$(MASON_PLATFORM) \
+		-DMASON_PLATFORM_VERSION=$(MASON_PLATFORM_VERSION) \
 		-DWITH_QT_DECODERS=${WITH_QT_DECODERS} \
 		-DWITH_QT_I18N=${WITH_QT_I18N} \
 		-DWITH_QT_4=${WITH_QT_4} \
@@ -413,8 +401,8 @@ $(MACOS_QT_PROJ_PATH): $(BUILD_DEPS)
 	mkdir -p $(QT_ROOT_PATH)/xcode
 	(cd $(QT_ROOT_PATH)/xcode && cmake -G Xcode ../../.. \
 		-DMBGL_PLATFORM=qt \
-		-DMASON_PLATFORM=$(BUILD_PLATFORM) \
-		-DMASON_PLATFORM_VERSION=$(BUILD_PLATFORM_VERSION) \
+		-DMASON_PLATFORM=$(MASON_PLATFORM) \
+		-DMASON_PLATFORM_VERSION=$(MASON_PLATFORM_VERSION) \
 		-DWITH_QT_DECODERS=${WITH_QT_DECODERS} \
 		-DWITH_QT_I18N=${WITH_QT_I18N} \
 		-DWITH_QT_4=${WITH_QT_4} \
@@ -480,11 +468,10 @@ test-node: node
 
 #### Android targets ###########################################################
 
-MBGL_ANDROID_ENV = platform/android/scripts/toolchain.sh
-MBGL_ANDROID_ABIS = arm-v5 arm-v7 arm-v8 x86 x86-64 mips
+MBGL_ANDROID_ABIS = arm-v5-9 arm-v7-9 arm-v8-21 x86-9 x86-64-21 mips-9
 MBGL_ANDROID_LOCAL_WORK_DIR = /data/local/tmp/core-tests
-MBGL_ANDROID_LIBDIR = lib$(if $(filter arm-v8 x86-64,$1),64)
-MBGL_ANDROID_DALVIKVM = dalvikvm$(if $(filter arm-v8 x86-64,$1),64,32)
+MBGL_ANDROID_LIBDIR = lib$(if $(filter arm-v8-21 x86-64-21,$1),64)
+MBGL_ANDROID_DALVIKVM = dalvikvm$(if $(filter arm-v8-21 x86-64-21,$1),64,32)
 MBGL_ANDROID_APK_SUFFIX = $(if $(filter Release,$(BUILDTYPE)),release-unsigned,debug)
 MBGL_ANDROID_CORE_TEST_DIR = build/android-$1/$(BUILDTYPE)/core-tests
 
@@ -495,25 +482,24 @@ style-code: android-style-code
 
 define ANDROID_RULES
 
-build/android-$1/$(BUILDTYPE): $(BUILD_DEPS)
-	mkdir -p build/android-$1/$(BUILDTYPE)
-
-build/android-$1/$(BUILDTYPE)/toolchain.cmake: platform/android/scripts/toolchain.sh build/android-$1/$(BUILDTYPE)
-	$(MBGL_ANDROID_ENV) $1 > build/android-$1/$(BUILDTYPE)/toolchain.cmake
-
-build/android-$1/$(BUILDTYPE)/Makefile: build/android-$1/$(BUILDTYPE)/toolchain.cmake platform/android/config.cmake
+build/android-$1/$(BUILDTYPE)/build.ninja: $(BUILD_DEPS) platform/android/config.cmake
+	@mkdir -p build/android-$1/$(BUILDTYPE)
+	export MASON_XC_ROOT=`scripts/mason.sh PREFIX android-ndk VERSION $1-r13b` && \
 	cd build/android-$1/$(BUILDTYPE) && cmake ../../.. -G Ninja \
-		-DCMAKE_TOOLCHAIN_FILE=build/android-$1/$(BUILDTYPE)/toolchain.cmake \
+		-DMASON_XC_ROOT="$$$${MASON_XC_ROOT}" \
+		-DCMAKE_TOOLCHAIN_FILE="$$$${MASON_XC_ROOT}/toolchain.cmake" \
 		-DCMAKE_BUILD_TYPE=$(BUILDTYPE) \
 		-DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
-		-DMBGL_PLATFORM=android
+		-DMBGL_PLATFORM=android \
+		-DMASON_PLATFORM=android \
+		-DMASON_PLATFORM_VERSION=$1
 
 .PHONY: android-test-lib-$1
-android-test-lib-$1: build/android-$1/$(BUILDTYPE)/Makefile
+android-test-lib-$1: build/android-$1/$(BUILDTYPE)/build.ninja
 	$(NINJA) $(NINJA_ARGS) -j$(JOBS) -C build/android-$1/$(BUILDTYPE) mbgl-test
 
 .PHONY: android-lib-$1
-android-lib-$1: build/android-$1/$(BUILDTYPE)/Makefile
+android-lib-$1: build/android-$1/$(BUILDTYPE)/build.ninja
 	$(NINJA) $(NINJA_ARGS) -j$(JOBS) -C build/android-$1/$(BUILDTYPE) mapbox-gl example-custom-layer
 
 .PHONY: android-$1
@@ -570,11 +556,20 @@ endef
 
 $(foreach abi,$(MBGL_ANDROID_ABIS),$(eval $(call ANDROID_RULES,$(abi))))
 
+# Backwards compatibility
+%-arm-v5: %-arm-v5-9 ;
+%-arm-v7: %-arm-v7-9 ;
+%-arm-v8: %-arm-v8-21 ;
+%-mips: %-mips-9 ;
+%-mips-64: %-mips-64-21 ;
+%-x86: %-x86-9 ;
+%-x86-64: %-x86-64-21 ;
+
 .PHONY: android
-android: android-arm-v7
+android: android-arm-v7-9
 
 .PHONY: run-android
-run-android: run-android-arm-v7
+run-android: run-android-arm-v7-9
 
 .PHONY: run-android-unit-test
 run-android-unit-test:
@@ -616,7 +611,7 @@ test-code-android:
 
 .PHONY: android-ndk-stack
 android-ndk-stack:
-	adb logcat | ndk-stack -sym build/android-arm-v7/Debug
+	adb logcat | ndk-stack -sym build/android-arm-v7-9/Debug
 
 .PHONY: android-checkstyle
 android-checkstyle:

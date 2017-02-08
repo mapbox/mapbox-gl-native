@@ -3,12 +3,9 @@
 set -e
 set -o pipefail
 
-mapbox_time "install_lcov" \
-mason install lcov 1.12
-
 # Collect coverage data and save it into coverage.info
 mapbox_time "lcov_capture" \
-`mason prefix lcov 1.12`/usr/bin/lcov \
+`scripts/mason.sh PREFIX lcov VERSION 1.12`/usr/bin/lcov \
     --quiet \
     --capture \
     --no-external \

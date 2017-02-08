@@ -6,10 +6,6 @@ if (NOT MBGL_PLATFORM)
     endif()
 endif()
 
-if (NOT MASON_PLATFORM)
-    set(MASON_PLATFORM "${MBGL_PLATFORM}")
-endif()
-
 if(NOT EXISTS ${CMAKE_SOURCE_DIR}/node_modules/node-cmake/FindNodeJS.cmake)
     message(FATAL_ERROR "Can't find node-cmake")
 endif()
@@ -54,7 +50,7 @@ endfunction()
 # Run submodule update
 message(STATUS "Updating submodules...")
 execute_process(
-    COMMAND git submodule update --init .mason mapbox-gl-js
+    COMMAND git submodule update --init mapbox-gl-js
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 
 if(NOT EXISTS "${CMAKE_SOURCE_DIR}/mapbox-gl-js/node_modules")
@@ -68,7 +64,7 @@ endif()
 # Add target for running submodule update during builds
 add_custom_target(
     update-submodules ALL
-    COMMAND git submodule update --init .mason mapbox-gl-js
+    COMMAND git submodule update --init mapbox-gl-js
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
     COMMENT "Updating submodules..."
 )

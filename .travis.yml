@@ -96,8 +96,7 @@ matrix:
         - nvm install 4
         - nvm use 4
         - make node
-        - mason install apitrace 6a30de1
-        - $(mason prefix apitrace 6a30de1)/bin/apitrace trace --api=egl -v make test-node
+        - $(scripts/mason.sh PREFIX apitrace VERSION 6a30de1)/bin/apitrace trace --api=egl -v make test-node
       after_script:
         - ccache --show-stats
         - ./platform/node/scripts/after_script.sh ${TRAVIS_JOB_NUMBER}
@@ -123,8 +122,7 @@ matrix:
         - nvm install 4
         - nvm use 4
         - make node
-        - mason install apitrace 6a30de1
-        - $(mason prefix apitrace 6a30de1)/bin/apitrace trace --api=egl -v make test-node
+        - $(scripts/mason.sh PREFIX apitrace VERSION 6a30de1)/bin/apitrace trace --api=egl -v make test-node
       after_script:
         - ccache --show-stats
         - ./platform/node/scripts/after_script.sh ${TRAVIS_JOB_NUMBER}
