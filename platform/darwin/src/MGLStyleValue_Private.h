@@ -60,6 +60,9 @@ public:
             // a deprecated MGLStyleValue method (that used to create an MGLStyleFunction) to create a function
             // for properties that are piecewise-constant (i.e. enum, bool, string)
             return toMBGLIntervalCameraFunction(cameraStyleFunction);
+        } else if ([value isMemberOfClass:[MGLStyleFunction class]]) {
+            MGLStyleFunction<ObjCType> *styleFunction = (MGLStyleFunction<ObjCType> *)value;
+            return toMBGLIntervalCameraFunction(styleFunction);
         } else if (value) {
             [NSException raise:@"MGLAbstractClassException" format:
              @"The style value %@ cannot be applied to the style. "
@@ -81,6 +84,9 @@ public:
 
         if ([value isKindOfClass:[MGLStyleConstantValue class]]) {
             return toMBGLConstantValue((MGLStyleConstantValue<ObjCType> *)value);
+        } else if ([value isMemberOfClass:[MGLStyleFunction class]]) {
+            MGLStyleFunction<ObjCType> *styleFunction = (MGLStyleFunction<ObjCType> *)value;
+            return toMBGLExponentialCameraFunction(styleFunction);
         } else if ([value isKindOfClass:[MGLCameraStyleFunction class]]) {
             MGLCameraStyleFunction<ObjCType> *cameraStyleFunction = (MGLCameraStyleFunction<ObjCType> *)value;
             switch (cameraStyleFunction.interpolationMode) {
@@ -247,6 +253,9 @@ public:
                     return {};
             }
             return {};
+        } else if ([value isMemberOfClass:[MGLStyleFunction class]]) {
+            MGLStyleFunction<ObjCType> *styleFunction = (MGLStyleFunction<ObjCType> *)value;
+            return toMBGLExponentialCameraFunction(styleFunction);
         } else if (value) {
             [NSException raise:@"MGLAbstractClassException" format:
              @"The style value %@ cannot be applied to the style. "
@@ -308,9 +317,9 @@ private: // Private utilities for converting from mgl to mbgl values
         return mbglValue;
     }
 
-    mbgl::style::CameraFunction<MBGLType> toMBGLExponentialCameraFunction(MGLCameraStyleFunction<ObjCType> *cameraStyleFunction) {
+    mbgl::style::CameraFunction<MBGLType> toMBGLExponentialCameraFunction(MGLStyleFunction<ObjCType> *styleFunction) {
         __block std::map<float, MBGLType> stops = {};
-        [cameraStyleFunction.stops enumerateKeysAndObjectsUsingBlock:^(NSNumber * _Nonnull zoomKey, MGLStyleValue<ObjCType> * _Nonnull stopValue, BOOL * _Nonnull stop) {
+        [styleFunction.stops enumerateKeysAndObjectsUsingBlock:^(NSNumber * _Nonnull zoomKey, MGLStyleValue<ObjCType> * _Nonnull stopValue, BOOL * _Nonnull stop) {
             NSCAssert([stopValue isKindOfClass:[MGLStyleValue class]], @"Stops should be MGLStyleValues");
             auto mbglStopValue = toPropertyValue(stopValue);
             NSCAssert(mbglStopValue.isConstant(), @"Stops must be constant");
@@ -318,15 +327,15 @@ private: // Private utilities for converting from mgl to mbgl values
         }];
 
         // Camera function with Exponential stops
-        mbgl::style::ExponentialStops<MBGLType> exponentialStops = {stops, (float)cameraStyleFunction.interpolationBase};
+        mbgl::style::ExponentialStops<MBGLType> exponentialStops = {stops, (float)styleFunction.interpolationBase};
         mbgl::style::CameraFunction<MBGLType> cameraFunction = {exponentialStops};
 
         return cameraFunction;
     }
 
-    mbgl::style::CameraFunction<MBGLType> toMBGLIntervalCameraFunction(MGLCameraStyleFunction<ObjCType> *cameraStyleFunction) {
+    mbgl::style::CameraFunction<MBGLType> toMBGLIntervalCameraFunction(MGLStyleFunction<ObjCType> *styleFunction) {
         __block std::map<float, MBGLType> stops = {};
-        [cameraStyleFunction.stops enumerateKeysAndObjectsUsingBlock:^(NSNumber * _Nonnull zoomKey, MGLStyleValue<ObjCType> * _Nonnull stopValue, BOOL * _Nonnull stop) {
+        [styleFunction.stops enumerateKeysAndObjectsUsingBlock:^(NSNumber * _Nonnull zoomKey, MGLStyleValue<ObjCType> * _Nonnull stopValue, BOOL * _Nonnull stop) {
             NSCAssert([stopValue isKindOfClass:[MGLStyleValue class]], @"Stops should be MGLStyleValues");
             auto mbglStopValue = toPropertyValue(stopValue);
             NSCAssert(mbglStopValue.isConstant(), @"Stops must be constant");

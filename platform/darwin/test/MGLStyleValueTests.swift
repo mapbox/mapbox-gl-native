@@ -38,6 +38,7 @@ extension MGLStyleValueTests {
     func testDeprecatedFunctions() {
         let shapeSource = MGLShapeSource(identifier: "test", shape: nil, options: nil)
         let symbolStyleLayer = MGLSymbolStyleLayer(identifier: "symbolLayer", source: shapeSource)
+        let circleStyleLayer = MGLCircleStyleLayer(identifier: "circleLayer", source: shapeSource)
 
         // deprecated function, stops with float values
         let iconHaloBlurStyleValue = MGLStyleValue<NSNumber>(interpolationBase: 1.0, stops: [1: MGLStyleValue(rawValue: 0),
@@ -63,6 +64,66 @@ extension MGLStyleValueTests {
             options: nil
         )
         XCTAssertEqual(symbolStyleLayer.iconAllowsOverlap, expectedIconAllowsOverlapStyleValue)
+
+        ///
+        // creating and using MGLStyleFunctions directly
+        ///
+
+        let circleRadiusStops: [NSNumber: MGLStyleValue<NSNumber>] = [
+            0: MGLStyleValue(rawValue: 10),
+            20: MGLStyleValue(rawValue: 5)
+        ]
+        let circleRadiusFunction = MGLStyleFunction<NSNumber>(
+            interpolationBase: 1.0,
+            stops: circleRadiusStops
+        )
+        circleStyleLayer.circleRadius = circleRadiusFunction
+        let expectedCircleRadiusFunction = MGLStyleValue<NSNumber>(
+            interpolationMode: .exponential,
+            cameraStops:
+            circleRadiusStops,
+            options: nil
+        )
+        // setting a data driven property to an MGLStyleFunction should return an exponential camera function
+        XCTAssertEqual(circleStyleLayer.circleRadius, expectedCircleRadiusFunction)
+
+        var circleTranslationOne = CGVector(dx: 100, dy: 0)
+        let circleTranslationValueOne = NSValue(bytes: &circleTranslationOne, objCType: "{CGVector=dd}")
+        var circleTranslationTwo = CGVector(dx: 0, dy: 0)
+        let circleTranslationValueTwo = NSValue(bytes: &circleTranslationTwo, objCType: "{CGVector=dd}")
+
+        let circleTranslationStops: [NSNumber: MGLStyleValue<NSValue>] = [
+            0: MGLStyleValue<NSValue>(rawValue: circleTranslationValueOne),
+            10: MGLStyleValue<NSValue>(rawValue: circleTranslationValueTwo)
+        ]
+        let circleTranslationFunction = MGLStyleFunction<NSValue>(
+            interpolationBase: 1.0,
+            stops: circleTranslationStops
+        )
+        circleStyleLayer.circleTranslation = circleTranslationFunction
+        let expectedCircleTranslationFunction = MGLStyleValue<NSValue>(
+            interpolationMode: .exponential,
+            cameraStops: circleTranslationStops,
+            options: nil
+        )
+        // setting a non-data driven, interpolatable property to an MGLStyleFunction should return an exponential camera function
+        XCTAssertEqual(circleStyleLayer.circleTranslation, expectedCircleTranslationFunction)
+
+        let iconOptionalStops: [NSNumber: MGLStyleValue<NSNumber>] = [
+            0: MGLStyleValue(rawValue: false),
+            20: MGLStyleValue(rawValue: true)
+        ]
+        let iconOptionalFunction = MGLStyleFunction(
+            interpolationBase: 1.0,
+            stops: iconOptionalStops
+        )
+        symbolStyleLayer.iconOptional = iconOptionalFunction
+        let expectedIconOptionalFunction = MGLStyleValue(
+            interpolationMode: .interval,
+            cameraStops: iconOptionalStops,
+            options: nil
+        )
+        XCTAssertEqual(symbolStyleLayer.iconOptional, expectedIconOptionalFunction)
     }
 
     func testFunctionsWithNonDataDrivenProperties() {
@@ -286,6 +347,15 @@ extension MGLStyleValueTests {
 
         // get a value back
         if let returnedCircleRadius = circleStyleLayer.circleRadius as? MGLCompositeStyleFunction<NSNumber> {
+            if let returnedStops = returnedCircleRadius.stops as NSDictionary? as? [NSNumber: [NSNumber: MGLStyleValue<NSNumber>]] {
+                let lhs: MGLStyleValue<NSNumber> = returnedStops[0]!.values.first!
+                let rhs: MGLStyleValue<NSNumber> = radiusCompositeExponentialOrIntervalStops[0]!.values.first!
+                XCTAssertEqual(lhs, rhs)
+            }
+        }
+
+        // get value back as base class
+        if let returnedCircleRadius = circleStyleLayer.circleRadius as? MGLStyleFunction<NSNumber> {
             if let returnedStops = returnedCircleRadius.stops as NSDictionary? as? [NSNumber: [NSNumber: MGLStyleValue<NSNumber>]] {
                 let lhs: MGLStyleValue<NSNumber> = returnedStops[0]!.values.first!
                 let rhs: MGLStyleValue<NSNumber> = radiusCompositeExponentialOrIntervalStops[0]!.values.first!

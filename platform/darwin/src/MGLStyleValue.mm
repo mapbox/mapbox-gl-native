@@ -17,16 +17,16 @@ const MGLStyleFunctionOption MGLStyleFunctionOptionDefaultValue = @"MGLStyleFunc
     return [MGLCameraStyleFunction functionWithInterpolationMode:MGLInterpolationModeExponential stops:stops options:nil];
 }
 
-+ (instancetype)valueWithInterpolationMode:(MGLInterpolationMode)interpolationMode cameraStops:(NSDictionary *)stops options:(NSDictionary *)options {
-    return [MGLCameraStyleFunction functionWithInterpolationMode:interpolationMode stops:stops options:options];
++ (instancetype)valueWithInterpolationMode:(MGLInterpolationMode)interpolationMode cameraStops:(NSDictionary *)cameraStops options:(NSDictionary *)options {
+    return [MGLCameraStyleFunction functionWithInterpolationMode:interpolationMode stops:cameraStops options:options];
 }
 
-+ (instancetype)valueWithInterpolationMode:(MGLInterpolationMode)interpolationMode sourceStops:(NSDictionary *)stops attributeName:(NSString *)attributeName options:(NSDictionary *)options {
-    return [MGLSourceStyleFunction functionWithInterpolationMode:interpolationMode stops:stops attributeName:attributeName options:options];
++ (instancetype)valueWithInterpolationMode:(MGLInterpolationMode)interpolationMode sourceStops:(NSDictionary *)sourceStops attributeName:(NSString *)attributeName options:(NSDictionary *)options {
+    return [MGLSourceStyleFunction functionWithInterpolationMode:interpolationMode stops:sourceStops attributeName:attributeName options:options];
 }
 
-+ (instancetype)valueWithInterpolationMode:(MGLInterpolationMode)interpolationMode compositeStops:(NSDictionary *)stops attributeName:(NSString *)attributeName options:(NSDictionary *)options {
-    return [MGLCompositeStyleFunction functionWithInterpolationMode:interpolationMode stops:stops attributeName:attributeName options:options];
++ (instancetype)valueWithInterpolationMode:(MGLInterpolationMode)interpolationMode compositeStops:(NSDictionary *)compositeStops attributeName:(NSString *)attributeName options:(NSDictionary *)options {
+    return [MGLCompositeStyleFunction functionWithInterpolationMode:interpolationMode stops:compositeStops attributeName:attributeName options:options];
 }
 
 @end
@@ -62,16 +62,63 @@ const MGLStyleFunctionOption MGLStyleFunctionOptionDefaultValue = @"MGLStyleFunc
 
 @end
 
+@implementation MGLStyleFunction
+
++ (instancetype)functionWithStops:(NSDictionary *)stops {
+    return [MGLCameraStyleFunction functionWithInterpolationMode:MGLInterpolationModeExponential stops:stops options:nil];
+}
+
++ (instancetype)functionWithInterpolationBase:(CGFloat)interpolationBase stops:(NSDictionary *)stops {
+    return [MGLCameraStyleFunction functionWithInterpolationMode:MGLInterpolationModeExponential stops:stops options:@{MGLStyleFunctionOptionInterpolationBase: @(interpolationBase)}];
+}
+
+- (instancetype)init {
+    if (self = [super init]) {
+        self.interpolationBase = 1.0;
+        self.stops = @{};
+    }
+    return self;
+}
+
+- (instancetype)initWithInterpolationBase:(CGFloat)interpolationBase stops:(NSDictionary *)stops {
+    if (self = [super init]) {
+        self.interpolationBase = interpolationBase;
+        self.stops = stops;
+    }
+    return self;
+}
+
+- (NSString *)description {
+    return [NSString stringWithFormat:@"<%@: %p, \
+            stops = %@, \
+            interpolationBase = %f>",
+            NSStringFromClass([self class]), (void *)self,
+            self.stops,
+            self.interpolationBase];
+}
+
+- (BOOL)isEqual:(MGLStyleFunction *)other {
+    return ([other isKindOfClass:[self class]]
+            && [other.stops isEqualToDictionary:self.stops]
+            && other.interpolationBase == self.interpolationBase);
+}
+
+- (NSUInteger)hash {
+    return  self.stops.hash + @(self.interpolationBase).hash;
+}
+
+@end
+
 @implementation MGLCameraStyleFunction
 
-@synthesize interpolationMode = _interpolationMode;
+@dynamic stops;
 
 + (instancetype)functionWithInterpolationMode:(MGLInterpolationMode)interpolationMode stops:(NSDictionary *)stops options:(NSDictionary *)options {
     return [[self alloc] initWithInterpolationMode:interpolationMode stops:stops options:options];
 }
 
-- (instancetype)init {
-    return [self initWithInterpolationMode:MGLInterpolationModeExponential stops:@{} options:nil];
+- (instancetype)initWithInterpolationBase:(CGFloat)interpolationBase stops:(NSDictionary *)stops {
+    return [self initWithInterpolationMode:MGLInterpolationModeExponential stops:stops options:@{MGLStyleFunctionOptionInterpolationBase: @(interpolationBase)}];
 }
 
 - (instancetype)initWithInterpolationMode:(MGLInterpolationMode)interpolationMode stops:(NSDictionary *)stops options:(NSDictionary *)options {
@@ -82,14 +129,13 @@ const MGLStyleFunctionOption MGLStyleFunctionOptionDefaultValue = @"MGLStyleFunc
     }
 
     if (self == [super init]) {
-        _interpolationMode = interpolationMode;
-        _stops = stops;
-        _interpolationBase = 1.0;
+        self.interpolationMode = interpolationMode;
+        self.stops = stops;
 
         if ([options.allKeys containsObject:MGLStyleFunctionOptionInterpolationBase]) {
             if ([options[MGLStyleFunctionOptionInterpolationBase] isKindOfClass:[NSNumber class]]) {
                 NSNumber *value = (NSNumber *)options[MGLStyleFunctionOptionInterpolationBase];
-                _interpolationBase = [value floatValue];
+                self.interpolationBase = [value floatValue];
             } else {
                 [NSException raise:NSInvalidArgumentException format:@"Interpolation base must be an NSNumber that represents a CGFloat."];
             }
@@ -117,29 +163,28 @@ const MGLStyleFunctionOption MGLStyleFunctionOptionDefaultValue = @"MGLStyleFunc
 }
 
 - (NSUInteger)hash {
-    return  self.interpolationMode + self.stops.hash + self.interpolationBase;
+    return  @(self.interpolationMode).hash + self.stops.hash + @(self.interpolationBase).hash;
 }
 
 @end
 
 @implementation MGLSourceStyleFunction
 
-@synthesize interpolationMode = _interpolationMode;
+@dynamic stops;
 
 + (instancetype)functionWithInterpolationMode:(MGLInterpolationMode)interpolationMode stops:(NSDictionary *)stops attributeName:(NSString *)attributeName options:(NSDictionary *)options {
     return [[self alloc] initWithInterpolationMode:interpolationMode stops:stops attributeName:attributeName options:options];
 }
 
-- (instancetype)init {
-    return [self initWithInterpolationMode:MGLInterpolationModeExponential stops:nil attributeName:@"" options:nil];
+- (instancetype)initWithInterpolationBase:(CGFloat)interpolationBase stops:(NSDictionary *)stops {
+    return [self initWithInterpolationMode:MGLInterpolationModeExponential stops:stops attributeName:@"" options:@{MGLStyleFunctionOptionInterpolationBase: @(interpolationBase)}];
 }
 
 - (instancetype)initWithInterpolationMode:(MGLInterpolationMode)interpolationMode stops:(NSDictionary *)stops attributeName:(NSString *)attributeName options:(NSDictionary *)options {
     if (self == [super init]) {
-        _interpolationMode = interpolationMode;
-        _stops = stops;
+        self.interpolationMode = interpolationMode;
+        self.stops = stops;
         _attributeName = attributeName;
-        _interpolationBase = 1.0;
 
         if ([options.allKeys containsObject:MGLStyleFunctionOptionDefaultValue]) {
             if ([options[MGLStyleFunctionOptionDefaultValue] isKindOfClass:[MGLStyleValue class]]) {
@@ -153,7 +198,7 @@ const MGLStyleFunctionOption MGLStyleFunctionOptionDefaultValue = @"MGLStyleFunc
         if ([options.allKeys containsObject:MGLStyleFunctionOptionInterpolationBase]) {
             if ([options[MGLStyleFunctionOptionInterpolationBase] isKindOfClass:[NSNumber class]]) {
                 NSNumber *value = (NSNumber *)options[MGLStyleFunctionOptionInterpolationBase];
-                _interpolationBase = [value floatValue];
+                self.interpolationBase = [value floatValue];
             } else {
                 [NSException raise:NSInvalidArgumentException format:@"Interpolation base must be an NSNumber that represents a CGFloat."];
             }
@@ -188,29 +233,28 @@ const MGLStyleFunctionOption MGLStyleFunctionOptionDefaultValue = @"MGLStyleFunc
 }
 
 - (NSUInteger)hash {
-    return self.interpolationMode + self.stops.hash + self.attributeName.hash + self.defaultValue.hash + self.interpolationBase;
+    return @(self.interpolationMode).hash + self.stops.hash + self.attributeName.hash + self.defaultValue.hash + @(self.interpolationBase).hash;
 }
 
 @end
 
 @implementation MGLCompositeStyleFunction
 
-@synthesize interpolationMode = _interpolationMode;
+@dynamic stops;
 
 + (instancetype)functionWithInterpolationMode:(MGLInterpolationMode)interpolationMode stops:(NSDictionary *)stops attributeName:(NSString *)attributeName options:(NSDictionary *)options {
     return [[self alloc] initWithInterpolationMode:interpolationMode stops:stops attributeName:attributeName options:options];
 }
 
-- (instancetype)init {
-    return [self initWithInterpolationMode:MGLInterpolationModeExponential stops:@{} attributeName:@"" options:nil];
+- (instancetype)initWithInterpolationBase:(CGFloat)interpolationBase stops:(NSDictionary *)stops {
+    return [self initWithInterpolationMode:MGLInterpolationModeExponential stops:stops attributeName:@"" options:@{MGLStyleFunctionOptionInterpolationBase: @(interpolationBase)}];
 }
 
 - (instancetype)initWithInterpolationMode:(MGLInterpolationMode)interpolationMode stops:(NSDictionary *)stops attributeName:(NSString *)attributeName options:(NSDictionary *)options {
     if (self == [super init]) {
-        _interpolationMode = interpolationMode;
-        _stops = stops;
+        self.interpolationMode = interpolationMode;
+        self.stops = stops;
         _attributeName = attributeName;
-        _interpolationBase = 1.0;
 
         if ([options.allKeys containsObject:MGLStyleFunctionOptionDefaultValue]) {
             if ([options[MGLStyleFunctionOptionDefaultValue] isKindOfClass:[MGLStyleValue class]]) {
@@ -224,7 +268,7 @@ const MGLStyleFunctionOption MGLStyleFunctionOptionDefaultValue = @"MGLStyleFunc
         if ([options.allKeys containsObject:MGLStyleFunctionOptionInterpolationBase]) {
             if ([options[MGLStyleFunctionOptionInterpolationBase] isKindOfClass:[NSNumber class]]) {
                 NSNumber *value = (NSNumber *)options[MGLStyleFunctionOptionInterpolationBase];
-                _interpolationBase = [value floatValue];
+                self.interpolationBase = [value floatValue];
             } else {
                 [NSException raise:NSInvalidArgumentException format:@"Interpolation base must be an NSNumber that represents a CGFloat."];
             }
@@ -258,7 +302,7 @@ const MGLStyleFunctionOption MGLStyleFunctionOptionDefaultValue = @"MGLStyleFunc
 }
 
 - (NSUInteger)hash {
-    return  self.interpolationMode + self.stops.hash + self.attributeName.hash + self.interpolationBase;
+    return  @(self.interpolationMode).hash + self.stops.hash + self.attributeName.hash + @(self.interpolationBase).hash;
 }
 
 @end
