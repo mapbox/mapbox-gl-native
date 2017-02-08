@@ -90,13 +90,14 @@ matrix:
       env: BUILDTYPE=Debug _CXX=clang++-3.8 _CC=clang-3.8 WITH_EGL=1
       addons: *clang38
       before_script:
+        - mapbox_install_logbt
         - mapbox_start_xvfb
         - mapbox_export_mesa_library_path
       script:
         - nvm install 4
         - nvm use 4
         - make node
-        - $(scripts/mason.sh PREFIX apitrace VERSION 6a30de1)/bin/apitrace trace --api=egl -v make test-node
+        - ./logbt -- $(scripts/mason.sh PREFIX apitrace VERSION 6a30de1)/bin/apitrace trace --api=egl -v make test-node
       after_script:
         - ccache --show-stats
         - ./platform/node/scripts/after_script.sh ${TRAVIS_JOB_NUMBER}
@@ -116,13 +117,14 @@ matrix:
         - sudo apt-get purge -qq fglrx
         - export PACKAGE_JSON_VERSION=$(node -e "console.log(require('./package.json').version)")
         - export PUBLISH=$([[ "${TRAVIS_TAG:-}" == "node-v${PACKAGE_JSON_VERSION}" ]] && echo true)
+        - mapbox_install_logbt
         - mapbox_start_xvfb
         - mapbox_export_mesa_library_path
       script:
         - nvm install 4
         - nvm use 4
         - make node
-        - $(scripts/mason.sh PREFIX apitrace VERSION 6a30de1)/bin/apitrace trace --api=egl -v make test-node
+        - ./logbt -- $(scripts/mason.sh PREFIX apitrace VERSION 6a30de1)/bin/apitrace trace --api=egl -v make test-node
       after_script:
         - ccache --show-stats
         - ./platform/node/scripts/after_script.sh ${TRAVIS_JOB_NUMBER}
