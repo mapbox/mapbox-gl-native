@@ -48,6 +48,7 @@ void applyShaping(hb_font_t* font, const std::string& u8text, std::vector<Positi
     
     hb_buffer_add_utf8 (hb_buffer, u8text.c_str(), -1, 0, -1);
     hb_buffer_guess_segment_properties (hb_buffer);
+    hb_buffer_set_direction(hb_buffer, HB_DIRECTION_LTR);
     
     /* Shape it! */
     hb_shape (font, hb_buffer, NULL, 0);
