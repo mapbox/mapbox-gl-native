@@ -222,6 +222,10 @@ private:
     std::vector<VertexArrayID> abandonedVertexArrays;
     std::vector<FramebufferID> abandonedFramebuffers;
     std::vector<RenderbufferID> abandonedRenderbuffers;
+
+public:
+    // For testing
+    bool disableVAOExtension = false;
 };
 
 } // namespace gl

@@ -6,6 +6,7 @@
 #include <mbgl/map/map.hpp>
 #include <mbgl/gl/headless_backend.hpp>
 #include <mbgl/gl/offscreen_view.hpp>
+#include <mbgl/gl/context.hpp>
 #include <mbgl/util/default_thread_pool.hpp>
 #include <mbgl/sprite/sprite_image.hpp>
 #include <mbgl/storage/network_status.hpp>
@@ -303,6 +304,24 @@ TEST(Map, AddLayer) {
     map.addLayer(std::move(layer));
 
     test::checkImage("test/fixtures/map/add_layer", test::render(map, test.view));
+}
+
+TEST(Map, WithoutVAOExtension) {
+    MapTest test;
+
+    test.backend.getContext().disableVAOExtension = true;
+
+#ifdef MBGL_ASSET_ZIP
+    // Regenerate with `cd test/fixtures/api/ && zip -r assets.zip assets/`
+    DefaultFileSource fileSource(":memory:", "test/fixtures/api/assets.zip");
+#else
+    DefaultFileSource fileSource(":memory:", "test/fixtures/api/assets");
+#endif
+
+    Map map(test.backend, test.view.size, 1, fileSource, test.threadPool, MapMode::Still);
+    map.setStyleJSON(util::read_file("test/fixtures/api/water.json"));
+
+    test::checkImage("test/fixtures/map/no_vao", test::render(map, test.view), 0.002);
 }
 
 TEST(Map, RemoveLayer) {
