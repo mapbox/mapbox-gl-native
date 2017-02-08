@@ -530,6 +530,13 @@ final class NativeMapView {
     nativeSetBearingXY(nativeMapViewPtr, degrees, cx / pixelRatio, cy / pixelRatio);
   }
 
+  public void setBearing(double degrees, double fx, double fy, long duration) {
+    if (isDestroyedOn("setBearing")) {
+      return;
+    }
+    nativeSetFocalBearing(nativeMapViewPtr, degrees, fx / pixelRatio, fy / pixelRatio, duration);
+  }
+
   public double getBearing() {
     if (isDestroyedOn("getBearing")) {
       return 0;
@@ -1046,6 +1053,9 @@ final class NativeMapView {
 
   private native void nativeSetBearingXY(long nativeMapViewPtr, double degrees,
                                          double cx, double cy);
+
+  private native void nativeSetFocalBearing(long nativeMapViewPtr, double degrees,
+                                            double fx, double fy, long duration);
 
   private native double nativeGetBearing(long nativeMapViewPtr);
 
