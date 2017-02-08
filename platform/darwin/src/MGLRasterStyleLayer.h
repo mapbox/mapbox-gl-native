@@ -48,13 +48,14 @@ MGL_EXPORT
  
  This attribute corresponds to the <a
  href="https://www.mapbox.com/mapbox-gl-style-spec/#paint-raster-brightness-max"><code>raster-brightness-max</code></a>
- layout property in the Mapbox Style Specification.`
+ layout property in the Mapbox Style Specification.
  
  This property can be set to one of the following values:
  
  - `MGLStyleConstantValue`
- - `MGLCameraStyleFunction` with an interpolation mode of
- `MGLInterpolationModeExponential` or `MGLInterpolationModeInterval`
+ - `MGLCameraStyleFunction` with an interpolation mode of:
+   - `MGLInterpolationModeExponential`
+   - `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *maximumRasterBrightness;
 
@@ -70,13 +71,14 @@ MGL_EXPORT
  
  This attribute corresponds to the <a
  href="https://www.mapbox.com/mapbox-gl-style-spec/#paint-raster-brightness-min"><code>raster-brightness-min</code></a>
- layout property in the Mapbox Style Specification.`
+ layout property in the Mapbox Style Specification.
  
  This property can be set to one of the following values:
  
  - `MGLStyleConstantValue`
- - `MGLCameraStyleFunction` with an interpolation mode of
- `MGLInterpolationModeExponential` or `MGLInterpolationModeInterval`
+ - `MGLCameraStyleFunction` with an interpolation mode of:
+   - `MGLInterpolationModeExponential`
+   - `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *minimumRasterBrightness;
 
@@ -87,13 +89,14 @@ MGL_EXPORT
  
  The default value of this property is an `MGLStyleValue` object containing an
  `NSNumber` object containing the float `0`. Set this property to `nil` to reset
- it to the default value.`
+ it to the default value.
  
  This property can be set to one of the following values:
  
  - `MGLStyleConstantValue`
- - `MGLCameraStyleFunction` with an interpolation mode of
- `MGLInterpolationModeExponential` or `MGLInterpolationModeInterval`
+ - `MGLCameraStyleFunction` with an interpolation mode of:
+   - `MGLInterpolationModeExponential`
+   - `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *rasterContrast;
 
@@ -104,13 +107,14 @@ MGL_EXPORT
  
  The default value of this property is an `MGLStyleValue` object containing an
  `NSNumber` object containing the float `300`. Set this property to `nil` to
- reset it to the default value.`
+ reset it to the default value.
  
  This property can be set to one of the following values:
  
  - `MGLStyleConstantValue`
- - `MGLCameraStyleFunction` with an interpolation mode of
- `MGLInterpolationModeExponential` or `MGLInterpolationModeInterval`
+ - `MGLCameraStyleFunction` with an interpolation mode of:
+   - `MGLInterpolationModeExponential`
+   - `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *rasterFadeDuration;
 
@@ -125,13 +129,14 @@ MGL_EXPORT
  
  This attribute corresponds to the <a
  href="https://www.mapbox.com/mapbox-gl-style-spec/#paint-raster-hue-rotate"><code>raster-hue-rotate</code></a>
- layout property in the Mapbox Style Specification.`
+ layout property in the Mapbox Style Specification.
  
  This property can be set to one of the following values:
  
  - `MGLStyleConstantValue`
- - `MGLCameraStyleFunction` with an interpolation mode of
- `MGLInterpolationModeExponential` or `MGLInterpolationModeInterval`
+ - `MGLCameraStyleFunction` with an interpolation mode of:
+   - `MGLInterpolationModeExponential`
+   - `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *rasterHueRotation;
 
@@ -142,13 +147,14 @@ MGL_EXPORT
  
  The default value of this property is an `MGLStyleValue` object containing an
  `NSNumber` object containing the float `1`. Set this property to `nil` to reset
- it to the default value.`
+ it to the default value.
  
  This property can be set to one of the following values:
  
  - `MGLStyleConstantValue`
- - `MGLCameraStyleFunction` with an interpolation mode of
- `MGLInterpolationModeExponential` or `MGLInterpolationModeInterval`
+ - `MGLCameraStyleFunction` with an interpolation mode of:
+   - `MGLInterpolationModeExponential`
+   - `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *rasterOpacity;
 
@@ -157,13 +163,14 @@ MGL_EXPORT
  
  The default value of this property is an `MGLStyleValue` object containing an
  `NSNumber` object containing the float `0`. Set this property to `nil` to reset
- it to the default value.`
+ it to the default value.
  
  This property can be set to one of the following values:
  
  - `MGLStyleConstantValue`
- - `MGLCameraStyleFunction` with an interpolation mode of
- `MGLInterpolationModeExponential` or `MGLInterpolationModeInterval`
+ - `MGLCameraStyleFunction` with an interpolation mode of:
+   - `MGLInterpolationModeExponential`
+   - `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *rasterSaturation;
 
