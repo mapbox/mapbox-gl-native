@@ -239,6 +239,12 @@ MGL_EXPORT
 #pragma mark Accessing the Parameters of a Function
 
 /**
+ The modes used to interpolate property values between map zoom level changes or
+ over a range of feature attribute values.
+ */
+@property (nonatomic) MGLInterpolationMode interpolationMode;
+
+/**
  A dictionary associating zoom levels with style values.
  */
 @property (nonatomic, copy, nullable) NSDictionary *stops;
@@ -286,12 +292,6 @@ MGL_EXPORT
 #pragma mark Accessing the Parameters of a Camera Function
 
 /**
- The modes used to interpolate property values between map zoom level changes or
- over a range of feature attribute values.
- */
-@property (nonatomic) MGLInterpolationMode interpolationMode;
-
-/**
  A dictionary associating zoom levels with style values.
 
  Each of the function’s stops is represented by one key-value pair in the
@@ -337,12 +337,6 @@ MGL_EXPORT
 + (instancetype)functionWithInterpolationMode:(MGLInterpolationMode)interpolationMode stops:(nullable NS_DICTIONARY_OF(id, MGLStyleValue<T> *) *)stops attributeName:(NSString *)attributeName options:(nullable NS_DICTIONARY_OF(MGLStyleFunctionOption, id) *)options;
 
 #pragma mark Accessing the Parameters of a Source Function
-
-/**
- The modes used to interpolate property values between map zoom level changes or
- over a range of feature attribute values.
- */
-@property (nonatomic) MGLInterpolationMode interpolationMode;
 
 /**
  A string that specifies the feature attribute key whose value be used as the function
@@ -403,12 +397,6 @@ MGL_EXPORT
 + (instancetype)functionWithInterpolationMode:(MGLInterpolationMode)interpolationMode stops:(NS_DICTIONARY_OF(id, NS_DICTIONARY_OF(id, MGLStyleValue<T> *) *) *)stops attributeName:(NSString *)attributeName options:(nullable NS_DICTIONARY_OF(MGLStyleFunctionOption, id) *)options;
 
 #pragma mark Accessing the Parameters of a Composite Function
-
-/**
- The modes used to interpolate property values between map zoom level changes or
- over a range of feature attribute values.
- */
-@property (nonatomic) MGLInterpolationMode interpolationMode;
 
 /**
  A string that specifies the feature attribute key whose value be used as the function

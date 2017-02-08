@@ -129,7 +129,7 @@ const MGLStyleFunctionOption MGLStyleFunctionOptionDefaultValue = @"MGLStyleFunc
     }
 
     if (self == [super init]) {
-        _interpolationMode = interpolationMode;
+        self.interpolationMode = interpolationMode;
         self.stops = stops;
 
         if ([options.allKeys containsObject:MGLStyleFunctionOptionInterpolationBase]) {
@@ -182,9 +182,9 @@ const MGLStyleFunctionOption MGLStyleFunctionOptionDefaultValue = @"MGLStyleFunc
 
 - (instancetype)initWithInterpolationMode:(MGLInterpolationMode)interpolationMode stops:(NSDictionary *)stops attributeName:(NSString *)attributeName options:(NSDictionary *)options {
     if (self == [super init]) {
-        _interpolationMode = interpolationMode;
-        _attributeName = attributeName;
+        self.interpolationMode = interpolationMode;
         self.stops = stops;
+        _attributeName = attributeName;
 
         if ([options.allKeys containsObject:MGLStyleFunctionOptionDefaultValue]) {
             if ([options[MGLStyleFunctionOptionDefaultValue] isKindOfClass:[MGLStyleValue class]]) {
@@ -252,9 +252,9 @@ const MGLStyleFunctionOption MGLStyleFunctionOptionDefaultValue = @"MGLStyleFunc
 
 - (instancetype)initWithInterpolationMode:(MGLInterpolationMode)interpolationMode stops:(NSDictionary *)stops attributeName:(NSString *)attributeName options:(NSDictionary *)options {
     if (self == [super init]) {
-        _interpolationMode = interpolationMode;
-        _attributeName = attributeName;
+        self.interpolationMode = interpolationMode;
         self.stops = stops;
+        _attributeName = attributeName;
 
         if ([options.allKeys containsObject:MGLStyleFunctionOptionDefaultValue]) {
             if ([options[MGLStyleFunctionOptionDefaultValue] isKindOfClass:[MGLStyleValue class]]) {
