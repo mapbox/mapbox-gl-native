@@ -33,6 +33,14 @@ fi
 mapbox_time "touch_package_json" \
 touch package.json
 
+function mapbox_install_logbt {
+    scripts/mason.sh INSTALL gdb VERSION 7.12
+    export PATH=$(scripts/mason.sh PREFIX gdb VERSION 7.12)/bin:${PATH}
+    curl -sSfL https://github.com/mapbox/logbt/archive/v2.0.0.tar.gz | tar --gunzip --extract --strip-components=2 --exclude="*md" --exclude="test*" --directory=.
+    sudo ./logbt --setup
+    ./logbt --test
+}
+
 function mapbox_start_xvfb {
     if [ ! -f /etc/init.d/xvfb ]; then
         echo "Error: Could not start Xvfb mock server."
