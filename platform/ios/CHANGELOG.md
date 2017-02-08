@@ -12,6 +12,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 
 ### Styles
 
+* Added support for data-driven styling in the form of source and composite style functions. `MGLStyleFunction` is now an abstract class, with `MGLCameraStyleFunction` providing the behavior of `MGLStyleFunction` in previous releases. New `MGLStyleFunction` subclasses allow you to vary a style attribute by the values of attributes of features in the source. ([#7596](https://github.com/mapbox/mapbox-gl-native/pull/7596))
 * Added `circleStrokeColor`, `circleStrokeWidth`, and `circleStrokeOpacity` properties to MGLCircleStyleLayer and support for corresponding properties in style JSON files. ([#7356](https://github.com/mapbox/mapbox-gl-native/pull/7356))
 * Point-placed labels in symbol style layers are now placed at more optimal locations within polygons. ([#7465](https://github.com/mapbox/mapbox-gl-native/pull/7465))
 * Fixed flickering that occurred when manipulating a style layer. ([#7616](https://github.com/mapbox/mapbox-gl-native/pull/7616))
@@ -30,14 +31,14 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * Fixed an issue that could prevent a cached style from appearing while the device is offline. ([#7770](https://github.com/mapbox/mapbox-gl-native/pull/7770))
 * Added `MGLDistanceFormatter` which can be used to format geographic distances. ([#7888](https://github.com/mapbox/mapbox-gl-native/pull/7888))
 
-## 3.4.1 
+## 3.4.1 - January 25, 2017
 
 * Fixed a build error in the static framework flavor of this SDK caused by a missing header. ([#7844](https://github.com/mapbox/mapbox-gl-native/pull/7844))
 * Fixed an issue causing MGLMapView’s `camera`’s `heading` to be set to a negative value, indicating an undefined heading, when the map view faces northwest. The heading is now wrapped to between zero and 360 degrees, for consistency with MGLMapView’s `direction` property. ([#7724](https://github.com/mapbox/mapbox-gl-native/pull/7724))
 * Fixed an issue where MGLMapView could initially flash black before loading. ([#7859](https://github.com/mapbox/mapbox-gl-native/pull/7859))
 * Deprecated the style class methods in MGLStyle. ([#7785](https://github.com/mapbox/mapbox-gl-native/pull/7785))
 
-## 3.4.0
+## 3.4.0 - January 20, 2017
 
 ### Packaging
 
