@@ -12,17 +12,6 @@ endif()
 
 set(MBGL_GENERATED ${CMAKE_BINARY_DIR}/generated/${CMAKE_CFG_INTDIR})
 
-if(NOT EXISTS ${CMAKE_SOURCE_DIR}/node_modules/node-cmake/FindNodeJS.cmake)
-    message(FATAL_ERROR "Can't find node-cmake")
-endif()
-
-# Load Node.js
-set(NodeJS_CXX_STANDARD 14 CACHE INTERNAL "Use C++14" FORCE)
-set(NodeJS_DOWNLOAD ON CACHE INTERNAL "Download node.js sources" FORCE)
-set(NodeJS_USE_CLANG_STDLIB OFF CACHE BOOL "Don't use libc++ by default" FORCE)
-list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/node_modules/node-cmake)
-find_package(NodeJS)
-
 find_program(npm_EXECUTABLE
     NAMES npm
     PATHS ${NodeJS_ROOT_DIR})
@@ -59,14 +48,6 @@ execute_process(
     COMMAND git submodule update --init .mason mapbox-gl-js
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 
-if(NOT EXISTS "${CMAKE_SOURCE_DIR}/mapbox-gl-js/node_modules")
-    # Symlink mapbox-gl-js/node_modules so that the modules that are
-    # about to be installed get cached between CI runs.
-    execute_process(
-         COMMAND ln -sF ../node_modules .
-         WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/mapbox-gl-js")
-endif()
-
 # Add target for running submodule update during builds
 add_custom_target(
     update-submodules ALL
@@ -77,11 +58,21 @@ add_custom_target(
 
 # Run npm install for both directories, and add custom commands, and a target that depends on them.
 _npm_install("${CMAKE_SOURCE_DIR}" mapbox-gl-native update-submodules)
-_npm_install("${CMAKE_SOURCE_DIR}/mapbox-gl-js" mapbox-gl-js "${CMAKE_SOURCE_DIR}/node_modules/.mapbox-gl-native.stamp")
 add_custom_target(
     npm-install ALL
-    DEPENDS "${CMAKE_SOURCE_DIR}/node_modules/.mapbox-gl-js.stamp"
+    DEPENDS "${CMAKE_SOURCE_DIR}/node_modules/.mapbox-gl-native.stamp"
 )
+
+if(NOT EXISTS ${CMAKE_SOURCE_DIR}/node_modules/node-cmake/FindNodeJS.cmake)
+    message(FATAL_ERROR "Can't find node-cmake")
+endif()
+
+# Load Node.js
+set(NodeJS_CXX_STANDARD 14 CACHE INTERNAL "Use C++14" FORCE)
+set(NodeJS_DOWNLOAD ON CACHE INTERNAL "Download node.js sources" FORCE)
+set(NodeJS_USE_CLANG_STDLIB OFF CACHE BOOL "Don't use libc++ by default" FORCE)
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/node_modules/node-cmake)
+find_package(NodeJS)
 
 # Generate source groups so the files are properly sorted in IDEs like Xcode.
 function(create_source_groups target)
