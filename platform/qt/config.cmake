@@ -1,7 +1,7 @@
 include(platform/qt/qt.cmake)
 
 mason_use(sqlite VERSION 3.14.2)
-mason_use(gtest VERSION 1.7.0${MASON_CXXABI_SUFFIX})
+mason_use(gtest VERSION 1.8.0)
 
 if(NOT WITH_QT_DECODERS)
     mason_use(libjpeg-turbo VERSION 1.5.0)
