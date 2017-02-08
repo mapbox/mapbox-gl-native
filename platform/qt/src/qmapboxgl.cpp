@@ -1244,6 +1244,14 @@ void QMapboxGL::addSource(const QString &id, const QVariantMap &params)
 }
 
 /*!
+    Returns true if the layer with given \a id exists, false otherwise.
+*/
+bool QMapboxGL::sourceExists(const QString& sourceID)
+{
+    return !!d_ptr->mapObj->getSource(sourceID.toStdString());
+}
+
+/*!
     Updates the source \a id with new \a params.
 
     If the source does not exist, it will be added like in addSource(). Only
