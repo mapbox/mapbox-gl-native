@@ -123,12 +123,16 @@ UniqueTexture Context::createTexture() {
 }
 
 UniqueVertexArray Context::createVertexArray() {
-    if (!gl::GenVertexArrays) {
-        throw std::runtime_error("GL_ARB_vertex_array_object extension is required");
-    }
-
     VertexArrayID id = 0;
-    MBGL_CHECK_ERROR(gl::GenVertexArrays(1, &id));
+    if (gl::GenVertexArrays && !disableVAOExtension) {
+        MBGL_CHECK_ERROR(gl::GenVertexArrays(1, &id));
+    } else {
+        static bool reported = false;
+        if (!reported) {
+            Log::Warning(Event::OpenGL, "Not using Vertex Array Objects");
+            reported = true;
+        }
+    }
     return UniqueVertexArray(std::move(id), { this });
 }
 

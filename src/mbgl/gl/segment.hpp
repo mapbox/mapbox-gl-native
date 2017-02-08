@@ -37,12 +37,17 @@ public:
             context.vertexBuffer.setDirty();
         }
 
-        context.vertexArrayObject = *vao;
-
-        if (indexBuffer != indexBuffer_) {
-            indexBuffer = indexBuffer_;
-            context.elementBuffer.setDirty();
+        if (*vao) {
+            context.vertexArrayObject = *vao;
+            if (indexBuffer != indexBuffer_) {
+                indexBuffer = indexBuffer_;
+                context.elementBuffer.setDirty();
+                context.elementBuffer = indexBuffer_;
+            }
+        } else {
+            // No VAO support. Force attributes to be rebound.
             context.elementBuffer = indexBuffer_;
+            variableBindings = {};
         }
 
         Attributes::bind(context,
