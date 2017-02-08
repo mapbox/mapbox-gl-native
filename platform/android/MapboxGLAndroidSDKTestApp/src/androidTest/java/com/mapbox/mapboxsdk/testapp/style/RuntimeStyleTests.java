@@ -1,6 +1,7 @@
 package com.mapbox.mapboxsdk.testapp.style;
 
 import android.graphics.Color;
+import android.graphics.PointF;
 import android.support.test.espresso.Espresso;
 import android.support.test.espresso.UiController;
 import android.support.test.espresso.ViewAction;
@@ -77,17 +78,28 @@ public class RuntimeStyleTests {
     onView(withId(R.id.mapView)).perform(new AddRemoveSourceAction());
   }
 
-  private class AddRemoveLayerAction implements ViewAction {
+  /**
+   * https://github.com/mapbox/mapbox-gl-native/issues/7973
+   */
+  @Test
+  public void testQueryRenderedFeaturesInputHandling() {
+    ViewUtils.checkViewIsDisplayed(R.id.mapView);
+    onView(withId(R.id.mapView)).perform(new BaseViewAction() {
 
-    @Override
-    public Matcher<View> getConstraints() {
-      return isDisplayed();
-    }
+      @Override
+      public void perform(UiController uiController, View view) {
+        MapboxMap mapboxMap = rule.getActivity().getMapboxMap();
+        String[] layerIds = new String[600];
+        for (int i = 0; i < layerIds.length; i++) {
+          layerIds[i] = "layer-" + i;
+        }
+        mapboxMap.queryRenderedFeatures(new PointF(100, 100), layerIds);
+      }
 
-    @Override
-    public String getDescription() {
-      return getClass().getSimpleName();
-    }
+    });
+  }
+
+  private class AddRemoveLayerAction extends BaseViewAction {
 
     @Override
     public void perform(UiController uiController, View view) {
@@ -139,17 +151,7 @@ public class RuntimeStyleTests {
     }
   }
 
-  private class AddRemoveSourceAction implements ViewAction {
-
-    @Override
-    public Matcher<View> getConstraints() {
-      return isDisplayed();
-    }
-
-    @Override
-    public String getDescription() {
-      return getClass().getSimpleName();
-    }
+  private class AddRemoveSourceAction extends BaseViewAction {
 
     @Override
     public void perform(UiController uiController, View view) {
@@ -197,5 +199,19 @@ public class RuntimeStyleTests {
   @After
   public void unregisterIntentServiceIdlingResource() {
     Espresso.unregisterIdlingResources(idlingResource);
+  }
+
+  public abstract class BaseViewAction implements ViewAction {
+
+    @Override
+    public Matcher<View> getConstraints() {
+      return isDisplayed();
+    }
+
+    @Override
+    public String getDescription() {
+      return getClass().getSimpleName();
+    }
+
   }
 }
