@@ -11,23 +11,15 @@
 
 namespace QMapbox {
 
-// Reflects mbgl::Point<double>.
 typedef QPair<double, double> Coordinate;
 typedef QPair<Coordinate, double> CoordinateZoom;
-
-// Reflects mbgl::ProjectedMeters<double>.
 typedef QPair<double, double> ProjectedMeters;
 
-// Reflects mbgl::{LineString,LinearRing,MultiPoint}<double>.
 typedef QList<Coordinate> Coordinates;
-
-// Reflects mbgl::{MultiLineString,Polygon}<double>.
 typedef QList<Coordinates> CoordinatesCollection;
 
-// Reflects mbgl::MultiPolygon<double>.
 typedef QList<CoordinatesCollection> CoordinatesCollections;
 
-// Reflects mbgl::Feature.
 struct Q_DECL_EXPORT Feature {
     enum Type {
         PointType = 1,
@@ -40,7 +32,6 @@ struct Q_DECL_EXPORT Feature {
     QVariant id;
 };
 
-// Reflects mbgl::ShapeAnnotationGeometry.
 struct Q_DECL_EXPORT ShapeAnnotationGeometry {
     enum Type {
         LineStringType,
@@ -52,13 +43,11 @@ struct Q_DECL_EXPORT ShapeAnnotationGeometry {
     CoordinatesCollections geometry;
 };
 
-// Reflects mbgl::SymbolAnnotation.
 struct Q_DECL_EXPORT SymbolAnnotation {
     Coordinate geometry;
     QString icon;
 };
 
-// Reflects mbgl::LineAnnotation.
 struct Q_DECL_EXPORT LineAnnotation {
     ShapeAnnotationGeometry geometry;
     float opacity = 1.0f;
@@ -66,7 +55,6 @@ struct Q_DECL_EXPORT LineAnnotation {
     QColor color = Qt::black;
 };
 
-// Reflects mbgl::FillAnnotation.
 struct Q_DECL_EXPORT FillAnnotation {
     ShapeAnnotationGeometry geometry;
     float opacity = 1.0f;
@@ -74,19 +62,15 @@ struct Q_DECL_EXPORT FillAnnotation {
     QVariant outlineColor;
 };
 
-// Reflects mbgl::StyleSourcedAnnotation.
 struct Q_DECL_EXPORT StyleSourcedAnnotation {
     ShapeAnnotationGeometry geometry;
     QString layerID;
 };
 
-// SymbolAnnotation, LineAnnotation, FillAnnotation, StyleSourcedAnnotation.
 typedef QVariant Annotation;
-
 typedef quint32 AnnotationID;
 typedef QList<AnnotationID> AnnotationIDs;
 
-// Reflects mbgl::NetworkStatus::Status.
 enum NetworkMode {
     Online, // Default
     Offline,
