@@ -13,10 +13,10 @@ import com.mapbox.mapboxsdk.style.functions.CompositeFunction;
 import com.mapbox.mapboxsdk.style.functions.CameraFunction;
 import com.mapbox.mapboxsdk.style.functions.SourceFunction;
 import com.mapbox.mapboxsdk.style.functions.stops.CategoricalStops;
-import com.mapbox.mapboxsdk.style.functions.stops.CompositeStops;
 import com.mapbox.mapboxsdk.style.functions.stops.ExponentialStops;
 import com.mapbox.mapboxsdk.style.functions.stops.IdentityStops;
 import com.mapbox.mapboxsdk.style.functions.stops.IntervalStops;
+import com.mapbox.mapboxsdk.style.functions.stops.Stop;
 import com.mapbox.mapboxsdk.style.functions.stops.Stops;
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.mapbox.mapboxsdk.testapp.R;
@@ -28,8 +28,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import java.util.Map;
 
 import static com.mapbox.mapboxsdk.style.functions.Function.*;
 import static com.mapbox.mapboxsdk.style.functions.stops.Stop.stop;
@@ -614,17 +612,15 @@ public class SymbolLayerTest extends BaseStyleTest {
     assertNotNull(layer.getIconRotate().getFunction());
     assertEquals(CompositeFunction.class, layer.getIconRotate().getFunction().getClass());
     assertEquals("FeaturePropertyA", ((CompositeFunction) layer.getIconRotate().getFunction()).getProperty());
-    assertEquals(CompositeStops.class, layer.getIconRotate().getFunction().getStops().getClass());
-    assertEquals(1, ((CompositeStops) layer.getIconRotate().getFunction().getStops()).size());
+    assertEquals(ExponentialStops.class, layer.getIconRotate().getFunction().getStops().getClass());
+    assertEquals(1, ((ExponentialStops) layer.getIconRotate().getFunction().getStops()).size());
 
-    CompositeStops<Float, Float, Float, ExponentialStops<Float, Float>> stops =
-      (CompositeStops<Float, Float, Float, ExponentialStops<Float, Float>>) layer.getIconRotate().getFunction().getStops();
-    Map.Entry<Float, ExponentialStops<Float, Float>> stop = stops.iterator().next();
-    assertEquals(ExponentialStops.class, stop.getValue().getClass());
-    assertEquals(0f, stop.getKey(), 0.001);
-    assertEquals(1, stop.getValue().size());
-    assertEquals(0.3f, stop.getValue().iterator().next().in, 0.001f);
-    assertEquals(0.9f, stop.getValue().iterator().next().out, 0.001f);
+    ExponentialStops<Stop.CompositeValue<Float, Float>, Float> stops =
+      (ExponentialStops<Stop.CompositeValue<Float, Float>, Float>) layer.getIconRotate().getFunction().getStops();
+    Stop<Stop.CompositeValue<Float, Float>, Float> stop = stops.iterator().next();
+    assertEquals(0f, stop.in.zoom, 0.001);
+    assertEquals(0.3f, stop.in.value, 0.001f);
+    assertEquals(0.9f, stop.out, 0.001f);
   }
 
   @Test

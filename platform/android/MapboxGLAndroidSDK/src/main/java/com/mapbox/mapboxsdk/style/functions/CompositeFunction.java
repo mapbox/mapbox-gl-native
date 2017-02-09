@@ -3,7 +3,10 @@ package com.mapbox.mapboxsdk.style.functions;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.mapbox.mapboxsdk.style.functions.stops.CompositeStops;
+import com.mapbox.mapboxsdk.style.functions.stops.CategoricalStops;
+import com.mapbox.mapboxsdk.style.functions.stops.ExponentialStops;
+import com.mapbox.mapboxsdk.style.functions.stops.IntervalStops;
+import com.mapbox.mapboxsdk.style.functions.stops.Stop;
 import com.mapbox.mapboxsdk.style.functions.stops.Stops;
 
 import java.util.Map;
@@ -21,13 +24,23 @@ import java.util.Map;
  * @param <O> the output type (the property type)
  * @see Function#composite
  */
-public class CompositeFunction<Z extends Number, I, O> extends Function<I, O> {
+public class CompositeFunction<Z extends Number, I, O> extends Function<Stop.CompositeValue<Z, I>, O> {
 
   private final String property;
   private O defaultValue;
 
   CompositeFunction(@NonNull String property,
-                    @NonNull CompositeStops<Z, I, O, ? extends Stops<I, O>> stops) {
+                    @NonNull CategoricalStops<Stop.CompositeValue<Z, I>, O> stops) {
+    this(null, property, stops);
+  }
+
+  CompositeFunction(@NonNull String property,
+                    @NonNull ExponentialStops<Stop.CompositeValue<Z, I>, O> stops) {
+    this(null, property, stops);
+  }
+
+  CompositeFunction(@NonNull String property,
+                    @NonNull IntervalStops<Stop.CompositeValue<Z, I>, O> stops) {
     this(null, property, stops);
   }
 
@@ -36,7 +49,7 @@ public class CompositeFunction<Z extends Number, I, O> extends Function<I, O> {
    * JNI Constructor
    */
   private CompositeFunction(@Nullable O defaultValue, @NonNull String property,
-                            @NonNull CompositeStops<Z, I, O, ? extends Stops<I, O>> stops) {
+                            @NonNull Stops<Stop.CompositeValue<Z, I>, O> stops) {
     super(stops);
     this.defaultValue = defaultValue;
     this.property = property;

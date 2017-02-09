@@ -118,6 +118,16 @@ macro(mbgl_platform_core)
         platform/android/src/style/sources/raster_source.hpp
         platform/android/src/style/sources/vector_source.cpp
         platform/android/src/style/sources/vector_source.hpp
+        platform/android/src/style/functions/stop.cpp
+        platform/android/src/style/functions/stop.hpp
+        platform/android/src/style/functions/categorical_stops.cpp
+        platform/android/src/style/functions/categorical_stops.hpp
+        platform/android/src/style/functions/exponential_stops.cpp
+        platform/android/src/style/functions/exponential_stops.hpp
+        platform/android/src/style/functions/identity_stops.cpp
+        platform/android/src/style/functions/identity_stops.hpp
+        platform/android/src/style/functions/interval_stops.cpp
+        platform/android/src/style/functions/interval_stops.hpp
 
         # Connectivity
         platform/android/src/connectivity_listener.cpp
