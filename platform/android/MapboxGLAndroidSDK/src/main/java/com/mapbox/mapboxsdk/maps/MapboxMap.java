@@ -738,6 +738,21 @@ public final class MapboxMap {
     transform.resetNorth();
   }
 
+  /**
+   * Set focal bearing.
+   */
+  public void setFocalBearing(double bearing, float focalX, float focalY, long duration) {
+    transform.setBearing(bearing, focalX, focalY, duration);
+  }
+
+  public float getHeight() {
+    return nativeMapView.getHeight();
+  }
+
+  public float getWidth() {
+    return nativeMapView.getWidth();
+  }
+
   //
   // Debug
   //

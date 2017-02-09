@@ -618,6 +618,14 @@ void nativeSetBearing(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jd
     nativeMapView->getMap().setBearing(degrees, duration);
 }
 
+void nativeSetFocalBearing(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jdouble degrees, jdouble fx,
+                           jdouble fy, jlong milliseconds) {
+    assert(nativeMapViewPtr != 0);
+    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
+    mbgl::ScreenCoordinate center(fx, fy);
+    nativeMapView->getMap().setBearing(degrees, center, mbgl::Milliseconds(milliseconds));
+}
+
 void nativeSetBearingXY(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jdouble degrees,
                               jdouble cx, jdouble cy) {
     assert(nativeMapViewPtr != 0);
@@ -1894,6 +1902,7 @@ void registerNatives(JavaVM *vm) {
         MAKE_NATIVE_METHOD(nativeSetMaxZoom, "(JD)V"),
         MAKE_NATIVE_METHOD(nativeRotateBy, "(JDDDDJ)V"),
         MAKE_NATIVE_METHOD(nativeSetBearing, "(JDJ)V"),
+        MAKE_NATIVE_METHOD(nativeSetFocalBearing, "(JDDDJ)V"),
         MAKE_NATIVE_METHOD(nativeSetBearingXY, "(JDDD)V"),
         MAKE_NATIVE_METHOD(nativeGetBearing, "(J)D"),
         MAKE_NATIVE_METHOD(nativeResetNorth, "(J)V"),

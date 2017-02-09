@@ -127,7 +127,7 @@ public class MapView extends FrameLayout {
     nativeMapView = new NativeMapView(this);
 
     // callback for focal point invalidation
-    FocalPointInvalidator focalPoint = new FocalPointInvalidator();
+    FocalPointInvalidator focalPoint = new FocalPointInvalidator(compassView);
 
     // callback for registering touch listeners
     RegisterTouchListener registerTouchListener = new RegisterTouchListener();
@@ -944,9 +944,18 @@ public class MapView extends FrameLayout {
 
   private class FocalPointInvalidator implements FocalPointChangeListener {
 
+    private final FocalPointChangeListener[] focalPointChangeListeners;
+
+    FocalPointInvalidator(FocalPointChangeListener... listeners) {
+      focalPointChangeListeners = listeners;
+    }
+
     @Override
     public void onFocalPointChanged(PointF pointF) {
       mapGestureDetector.setFocalPoint(pointF);
+      for (FocalPointChangeListener focalPointChangeListener : focalPointChangeListeners) {
+        focalPointChangeListener.onFocalPointChanged(pointF);
+      }
     }
   }
 

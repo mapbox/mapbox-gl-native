@@ -1,17 +1,20 @@
 package com.mapbox.mapboxsdk.maps.widgets;
 
 import android.content.Context;
+import android.graphics.PointF;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPropertyAnimatorCompat;
 import android.support.v4.view.ViewPropertyAnimatorListenerAdapter;
+import android.support.v7.widget.AppCompatImageView;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 
 import com.mapbox.mapboxsdk.R;
+import com.mapbox.mapboxsdk.maps.FocalPointChangeListener;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 
 import java.lang.ref.WeakReference;
@@ -25,7 +28,7 @@ import java.lang.ref.WeakReference;
  * use {@link com.mapbox.mapboxsdk.maps.UiSettings}.
  * </p>
  */
-public final class CompassView extends ImageView implements Runnable {
+public final class CompassView extends AppCompatImageView implements Runnable, FocalPointChangeListener {
 
   private static final long TIME_WAIT_IDLE = 500;
   private static final long TIME_FADE_ANIMATION = TIME_WAIT_IDLE;
@@ -34,6 +37,7 @@ public final class CompassView extends ImageView implements Runnable {
   private double direction = 0.0;
   private boolean fadeCompassViewFacingNorth = true;
   private ViewPropertyAnimatorCompat fadeAnimator;
+  private PointF focalPoint;
 
   public CompassView(Context context) {
     super(context);
@@ -96,6 +100,11 @@ public final class CompassView extends ImageView implements Runnable {
     }
   }
 
+  @Nullable
+  PointF getFocalPoint() {
+    return focalPoint;
+  }
+
   public void update(final double direction) {
     this.direction = direction;
 
@@ -143,6 +152,11 @@ public final class CompassView extends ImageView implements Runnable {
     }
   }
 
+  @Override
+  public void onFocalPointChanged(PointF pointF) {
+    focalPoint = pointF;
+  }
+
   static class CompassClickListener implements View.OnClickListener {
 
     private WeakReference<MapboxMap> mapboxMap;
@@ -158,7 +172,12 @@ public final class CompassView extends ImageView implements Runnable {
       final MapboxMap mapboxMap = this.mapboxMap.get();
       final CompassView compassView = this.compassView.get();
       if (mapboxMap != null && compassView != null) {
-        mapboxMap.resetNorth();
+        PointF focalPoint = compassView.getFocalPoint();
+        if (focalPoint != null) {
+          mapboxMap.setFocalBearing(0, focalPoint.x, focalPoint.y, TIME_MAP_NORTH_ANIMATION);
+        } else {
+          mapboxMap.setFocalBearing(0, mapboxMap.getWidth() / 2, mapboxMap.getHeight() / 2, TIME_MAP_NORTH_ANIMATION);
+        }
         compassView.postDelayed(compassView, TIME_WAIT_IDLE + TIME_MAP_NORTH_ANIMATION);
       }
     }

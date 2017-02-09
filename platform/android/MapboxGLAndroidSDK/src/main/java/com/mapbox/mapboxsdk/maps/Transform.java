@@ -220,6 +220,13 @@ final class Transform implements MapView.OnMapChangedListener {
     mapView.setBearing(bearing, focalX, focalY);
   }
 
+  void setBearing(double bearing, float focalX, float focalY, long duration) {
+    if (myLocationView != null) {
+      myLocationView.setBearing(bearing);
+    }
+    mapView.setBearing(bearing, focalX, focalY, duration);
+  }
+
 
   //
   // LatLng / CenterCoordinate
