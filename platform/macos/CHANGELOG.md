@@ -8,6 +8,7 @@
 * Improved the line wrapping behavior of point-placed labels, especially labels written in Chinese and Japanese. ([#6828](https://github.com/mapbox/mapbox-gl-native/pull/6828), [#7446](https://github.com/mapbox/mapbox-gl-native/pull/7446))
 * CJK characters now remain upright in vertically oriented labels that have line placement, such as road labels. ([#7114](https://github.com/mapbox/mapbox-gl-native/issues/7114))
 * Added Chinese (Simplified and Traditional), French, German, Japanese, Portuguese (Brazilian), Swedish, and Vietnamese localizations. ([#7316](https://github.com/mapbox/mapbox-gl-native/pull/7316), [#7503](https://github.com/mapbox/mapbox-gl-native/pull/7503), [#7899](https://github.com/mapbox/mapbox-gl-native/pull/7899), [#7999](https://github.com/mapbox/mapbox-gl-native/pull/7999))
+* Fixed an issue that let the app crash when moving the window between screens. ([#8004](https://github.com/mapbox/mapbox-gl-native/pull/8004))
 
 ### Styles
 

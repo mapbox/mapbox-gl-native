@@ -2,7 +2,9 @@
 
 #import "MGLMapView_Private.h"
 
-@implementation MGLOpenGLLayer
+@implementation MGLOpenGLLayer {
+    NSOpenGLContext *_context;
+}
 
 - (MGLMapView *)mapView {
     return (MGLMapView *)super.view;
@@ -18,6 +20,13 @@
 
 - (CGRect)frame {
     return self.view.bounds;
+}
+
+- (NSOpenGLContext *)openGLContextForPixelFormat:(NSOpenGLPixelFormat *)pixelFormat {
+    if (!_context) {
+        _context = [[NSOpenGLContext alloc] initWithFormat:pixelFormat shareContext:nil];
+    }
+    return _context;
 }
 
 - (NSOpenGLPixelFormat *)openGLPixelFormatForDisplayMask:(uint32_t)mask {
