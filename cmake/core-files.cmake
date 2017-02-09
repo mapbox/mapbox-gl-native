@@ -296,12 +296,16 @@ set(MBGL_CORE_FILES
     include/mbgl/style/conversion/property_value.hpp
     include/mbgl/style/conversion/source.hpp
     include/mbgl/style/conversion/tileset.hpp
+    include/mbgl/style/conversion/transition_options.hpp
     src/mbgl/style/conversion/stringify.hpp
 
     # style/function
     include/mbgl/style/function/camera_function.hpp
     include/mbgl/style/function/categorical_stops.hpp
+    include/mbgl/style/function/composite_categorical_stops.hpp
+    include/mbgl/style/function/composite_exponential_stops.hpp
     include/mbgl/style/function/composite_function.hpp
+    include/mbgl/style/function/composite_interval_stops.hpp
     include/mbgl/style/function/exponential_stops.hpp
     include/mbgl/style/function/identity_stops.hpp
     include/mbgl/style/function/interval_stops.hpp

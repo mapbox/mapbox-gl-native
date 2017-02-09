@@ -84,6 +84,10 @@ void CircleLayer::setCircleRadius(DataDrivenPropertyValue<float> value, const op
     }
 }
 
+void CircleLayer::setCircleRadiusTransition(const TransitionOptions& value, const optional<std::string>& klass) {
+    impl->paint.setTransition<CircleRadius>(value, klass);
+}
+
 DataDrivenPropertyValue<Color> CircleLayer::getDefaultCircleColor() {
     return { Color::black() };
 }
@@ -101,6 +105,10 @@ void CircleLayer::setCircleColor(DataDrivenPropertyValue<Color> value, const opt
     } else {
         impl->observer->onLayerPaintPropertyChanged(*this);
     }
+}
+
+void CircleLayer::setCircleColorTransition(const TransitionOptions& value, const optional<std::string>& klass) {
+    impl->paint.setTransition<CircleColor>(value, klass);
 }
 
 DataDrivenPropertyValue<float> CircleLayer::getDefaultCircleBlur() {
@@ -122,6 +130,10 @@ void CircleLayer::setCircleBlur(DataDrivenPropertyValue<float> value, const opti
     }
 }
 
+void CircleLayer::setCircleBlurTransition(const TransitionOptions& value, const optional<std::string>& klass) {
+    impl->paint.setTransition<CircleBlur>(value, klass);
+}
+
 DataDrivenPropertyValue<float> CircleLayer::getDefaultCircleOpacity() {
     return { 1 };
 }
@@ -141,6 +153,10 @@ void CircleLayer::setCircleOpacity(DataDrivenPropertyValue<float> value, const o
     }
 }
 
+void CircleLayer::setCircleOpacityTransition(const TransitionOptions& value, const optional<std::string>& klass) {
+    impl->paint.setTransition<CircleOpacity>(value, klass);
+}
+
 PropertyValue<std::array<float, 2>> CircleLayer::getDefaultCircleTranslate() {
     return { {{ 0, 0 }} };
 }
@@ -154,6 +170,10 @@ void CircleLayer::setCircleTranslate(PropertyValue<std::array<float, 2>> value, 
         return;
     impl->paint.set<CircleTranslate>(value, klass);
     impl->observer->onLayerPaintPropertyChanged(*this);
+}
+
+void CircleLayer::setCircleTranslateTransition(const TransitionOptions& value, const optional<std::string>& klass) {
+    impl->paint.setTransition<CircleTranslate>(value, klass);
 }
 
 PropertyValue<TranslateAnchorType> CircleLayer::getDefaultCircleTranslateAnchor() {
@@ -171,6 +191,10 @@ void CircleLayer::setCircleTranslateAnchor(PropertyValue<TranslateAnchorType> va
     impl->observer->onLayerPaintPropertyChanged(*this);
 }
 
+void CircleLayer::setCircleTranslateAnchorTransition(const TransitionOptions& value, const optional<std::string>& klass) {
+    impl->paint.setTransition<CircleTranslateAnchor>(value, klass);
+}
+
 PropertyValue<CirclePitchScaleType> CircleLayer::getDefaultCirclePitchScale() {
     return { CirclePitchScaleType::Map };
 }
@@ -184,6 +208,10 @@ void CircleLayer::setCirclePitchScale(PropertyValue<CirclePitchScaleType> value,
         return;
     impl->paint.set<CirclePitchScale>(value, klass);
     impl->observer->onLayerPaintPropertyChanged(*this);
+}
+
+void CircleLayer::setCirclePitchScaleTransition(const TransitionOptions& value, const optional<std::string>& klass) {
+    impl->paint.setTransition<CirclePitchScale>(value, klass);
 }
 
 DataDrivenPropertyValue<float> CircleLayer::getDefaultCircleStrokeWidth() {
@@ -205,6 +233,10 @@ void CircleLayer::setCircleStrokeWidth(DataDrivenPropertyValue<float> value, con
     }
 }
 
+void CircleLayer::setCircleStrokeWidthTransition(const TransitionOptions& value, const optional<std::string>& klass) {
+    impl->paint.setTransition<CircleStrokeWidth>(value, klass);
+}
+
 DataDrivenPropertyValue<Color> CircleLayer::getDefaultCircleStrokeColor() {
     return { Color::black() };
 }
@@ -224,6 +256,10 @@ void CircleLayer::setCircleStrokeColor(DataDrivenPropertyValue<Color> value, con
     }
 }
 
+void CircleLayer::setCircleStrokeColorTransition(const TransitionOptions& value, const optional<std::string>& klass) {
+    impl->paint.setTransition<CircleStrokeColor>(value, klass);
+}
+
 DataDrivenPropertyValue<float> CircleLayer::getDefaultCircleStrokeOpacity() {
     return { 1 };
 }
@@ -241,6 +277,10 @@ void CircleLayer::setCircleStrokeOpacity(DataDrivenPropertyValue<float> value, c
     } else {
         impl->observer->onLayerPaintPropertyChanged(*this);
     }
+}
+
+void CircleLayer::setCircleStrokeOpacityTransition(const TransitionOptions& value, const optional<std::string>& klass) {
+    impl->paint.setTransition<CircleStrokeOpacity>(value, klass);
 }
 
 } // namespace style

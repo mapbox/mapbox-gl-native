@@ -36,6 +36,7 @@ auto makePaintPropertySetters() {
 <% for (const layer of locals.layers) { -%>
 <% for (const property of layer.paintProperties) { -%>
     result["<%- property.name %>"] = makePropertySetter<V>(&<%- camelize(layer.type) %>Layer::set<%- camelize(property.name) %>);
+    result["<%- property.name %>-transition"] = makeTransitionSetter<V>(&<%- camelize(layer.type) %>Layer::set<%- camelize(property.name) %>Transition);
 <% } -%>
 
 <% } -%>

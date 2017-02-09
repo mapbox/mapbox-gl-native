@@ -21,6 +21,8 @@
 namespace mbgl {
 namespace style {
 
+class TransitionOptions;
+
 class <%- camelize(type) %>Layer : public Layer {
 public:
 <% if (type === 'background') { -%>
@@ -58,6 +60,7 @@ public:
     static <%- propertyValueType(property) %> getDefault<%- camelize(property.name) %>();
     <%- propertyValueType(property) %> get<%- camelize(property.name) %>(const optional<std::string>& klass = {}) const;
     void set<%- camelize(property.name) %>(<%- propertyValueType(property) %>, const optional<std::string>& klass = {});
+    void set<%- camelize(property.name) %>Transition(const TransitionOptions&, const optional<std::string>& klass = {});
 
 <% } -%>
     // Private implementation

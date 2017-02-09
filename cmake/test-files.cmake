@@ -74,6 +74,7 @@ set(MBGL_TEST_FILES
     # style/conversion
     test/style/conversion/function.test.cpp
     test/style/conversion/geojson_options.test.cpp
+    test/style/conversion/layer.test.cpp
     test/style/conversion/stringify.test.cpp
 
     # style
