@@ -75,7 +75,6 @@
 		354B83991D2E873E005D9406 /* MGLUserLocationAnnotationView.m in Sources */ = {isa = PBXBuildFile; fileRef = 354B83951D2E873E005D9406 /* MGLUserLocationAnnotationView.m */; };
 		354B839C1D2E9B48005D9406 /* MBXUserLocationAnnotationView.m in Sources */ = {isa = PBXBuildFile; fileRef = 354B839B1D2E9B48005D9406 /* MBXUserLocationAnnotationView.m */; };
 		3557F7B01E1D27D300CCA5E6 /* MGLDistanceFormatter.h in Headers */ = {isa = PBXBuildFile; fileRef = 3557F7AE1E1D27D300CCA5E6 /* MGLDistanceFormatter.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		3557F7B11E1D27D300CCA5E6 /* MGLDistanceFormatter.h in Headers */ = {isa = PBXBuildFile; fileRef = 3557F7AE1E1D27D300CCA5E6 /* MGLDistanceFormatter.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3557F7B21E1D27D300CCA5E6 /* MGLDistanceFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 3557F7AF1E1D27D300CCA5E6 /* MGLDistanceFormatter.m */; };
 		35599DED1D46F14E0048254D /* MGLStyleValue.mm in Sources */ = {isa = PBXBuildFile; fileRef = 35599DEA1D46F14E0048254D /* MGLStyleValue.mm */; };
 		35599DEE1D46F14E0048254D /* MGLStyleValue.mm in Sources */ = {isa = PBXBuildFile; fileRef = 35599DEA1D46F14E0048254D /* MGLStyleValue.mm */; };
@@ -629,6 +628,7 @@
 		7E016D7D1D9E86BE00A29A21 /* MGLPolyline+MGLAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "MGLPolyline+MGLAdditions.m"; sourceTree = "<group>"; };
 		7E016D821D9E890300A29A21 /* MGLPolygon+MGLAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "MGLPolygon+MGLAdditions.h"; sourceTree = "<group>"; };
 		7E016D831D9E890300A29A21 /* MGLPolygon+MGLAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "MGLPolygon+MGLAdditions.m"; sourceTree = "<group>"; };
+		968F36B41E4D0FC6003A5522 /* ja */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Localizable.strings; sourceTree = "<group>"; };
 		DA00FC8C1D5EEB0D009AABC8 /* MGLAttributionInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLAttributionInfo.h; sourceTree = "<group>"; };
 		DA00FC8D1D5EEB0D009AABC8 /* MGLAttributionInfo.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLAttributionInfo.mm; sourceTree = "<group>"; };
 		DA0CD58F1CF56F6A00A5F5A5 /* MGLFeatureTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLFeatureTests.mm; path = ../../darwin/test/MGLFeatureTests.mm; sourceTree = "<group>"; };
@@ -2255,6 +2255,7 @@
 				DAA32CB71E4C4ED8006F8D24 /* sv */,
 				DAA32CBC1E4C4F5D006F8D24 /* vi */,
 				DA9C012D1E4C7B1F00C4742A /* pt-BR */,
+				968F36B41E4D0FC6003A5522 /* ja */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
