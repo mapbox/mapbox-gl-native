@@ -1127,7 +1127,7 @@ double QMapboxGL::metersPerPixelAtLatitude(double latitude, double zoom) const
 }
 
 /*!
-    Return the projected meters for a given \a coordinate object.
+    Return the projected meters for a given \a coordinate_ object.
 */
 QMapbox::ProjectedMeters QMapboxGL::projectedMetersForCoordinate(const QMapbox::Coordinate &coordinate_) const
 {
@@ -1271,7 +1271,7 @@ void QMapboxGL::addSource(const QString &id, const QVariantMap &params)
 }
 
 /*!
-    Returns true if the layer with given \a id exists, false otherwise.
+    Returns true if the layer with given \a sourceID exists, false otherwise.
 */
 bool QMapboxGL::sourceExists(const QString& sourceID)
 {
