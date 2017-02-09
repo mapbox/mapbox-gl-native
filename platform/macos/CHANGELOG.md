@@ -20,13 +20,21 @@
 * Fixed incorrect interpolation of style functions in Boolean-typed style attributes. ([#7526](https://github.com/mapbox/mapbox-gl-native/pull/7526))
 * Removed support for the `ref` property in layers in style JSON files. ([#7586](https://github.com/mapbox/mapbox-gl-native/pull/7586))
 * Fixed an issue that collapsed consecutive newlines within text labels. ([#7446](https://github.com/mapbox/mapbox-gl-native/pull/7446))
+* Fixed artifacts when drawing particularly acute line joins. ([#7786](https://github.com/mapbox/mapbox-gl-native/pull/7786))
+* Fixed an issue in which a vector style layer predicate involving the `$id` key path would exclude all features from the layer. ([#7989](https://github.com/mapbox/mapbox-gl-native/pull/7989))
+
+### Networking and offline maps
+
+* Offline pack notifications are now posted by `MGLOfflinePack` instances instead of the shared `MGLOfflineStorage` object. For backwards compatibility, the `userInfo` dictionary still indicates the pack’s state and progress. ([#7952](https://github.com/mapbox/mapbox-gl-native/pull/7952))
+* Fixed a memory leak in MGLMapView. ([#7956](https://github.com/mapbox/mapbox-gl-native/pull/7956))
+* Fixed an issue that could prevent a cached style from appearing while the computer is offline. ([#7770](https://github.com/mapbox/mapbox-gl-native/pull/7770))
+* Fixed an issue that could prevent a style from loading when reestablishing a network connection. ([#7902](https://github.com/mapbox/mapbox-gl-native/pull/7902))
 
 ### Other changes
 
-* `MGLOfflinePack` and `MGLOfflineStorage` now conform to standard notification posting patterns. Notifications are posted by `MGLOfflinePack` instances. `userInfo` dictionary still contains values with pack's `state` and `progress` properties for backwards compatibility. ([#7952](https://github.com/mapbox/mapbox-gl-native/pull/7952))
 * Fixed an issue where translucent point annotations along tile boundaries would be drawn darker than expected. ([#6832](https://github.com/mapbox/mapbox-gl-native/pull/6832))
 * Fixed flickering that occurred when panning past the antimeridian. ([#7574](https://github.com/mapbox/mapbox-gl-native/pull/7574))
-* Fixed an issue that could prevent a cached style from appearing while the computer is offline. ([#7770](https://github.com/mapbox/mapbox-gl-native/pull/7770))
+* Added a `MGLDistanceFormatter` class for formatting geographic distances. ([#7888](https://github.com/mapbox/mapbox-gl-native/pull/7888))
 
 ## 0.3.1
 
@@ -85,7 +93,6 @@ This version of the Mapbox macOS SDK corresponds to version 3.4.0 of the Mapbox 
 
 ### Networking and offline maps
 
-* Fixed a leak of MGLReachability objects and threads in MGLMapView. ([#7956](https://github.com/mapbox/mapbox-gl-native/pull/7956))
 * Fixed an issue preventing an MGLMapView from loading tiles while an offline pack is downloading. ([#6446](https://github.com/mapbox/mapbox-gl-native/pull/6446))
 * Fixed an issue causing an MGLOfflinePack’s progress to continue to update after calling `-suspend`. ([#6186](https://github.com/mapbox/mapbox-gl-native/pull/6186))
 * Fixed an issue preventing cached annotation images from displaying while the device is offline. ([#6358](https://github.com/mapbox/mapbox-gl-native/pull/6358))
