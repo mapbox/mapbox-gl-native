@@ -5,6 +5,7 @@
 #include <mbgl/style/conversion/constant.hpp>
 #include <mbgl/style/conversion/property_value.hpp>
 #include <mbgl/style/conversion/data_driven_property_value.hpp>
+#include <mbgl/style/conversion/transition_options.hpp>
 
 #include <functional>
 #include <string>
@@ -33,6 +34,24 @@ auto makePropertySetter(void (L::*setter)(PropertyValue, const Args&...args)) {
         }
 
         (typedLayer->*setter)(*typedValue, args...);
+        return {};
+    };
+}
+
+template <class V, class L, class...Args>
+auto makeTransitionSetter(void (L::*setter)(const TransitionOptions&, const Args&...args)) {
+    return [setter] (Layer& layer, const V& value, const Args&...args) -> optional<Error> {
+        L* typedLayer = layer.as<L>();
+        if (!typedLayer) {
+            return Error { "layer doesn't support this property" };
+        }
+
+        Result<TransitionOptions> transition = convert<TransitionOptions>(value);
+        if (!transition) {
+            return transition.error();
+        }
+
+        (typedLayer->*setter)(*transition, args...);
         return {};
     };
 }

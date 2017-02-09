@@ -80,6 +80,10 @@ void FillLayer::setFillAntialias(PropertyValue<bool> value, const optional<std::
     impl->observer->onLayerPaintPropertyChanged(*this);
 }
 
+void FillLayer::setFillAntialiasTransition(const TransitionOptions& value, const optional<std::string>& klass) {
+    impl->paint.setTransition<FillAntialias>(value, klass);
+}
+
 DataDrivenPropertyValue<float> FillLayer::getDefaultFillOpacity() {
     return { 1 };
 }
@@ -97,6 +101,10 @@ void FillLayer::setFillOpacity(DataDrivenPropertyValue<float> value, const optio
     } else {
         impl->observer->onLayerPaintPropertyChanged(*this);
     }
+}
+
+void FillLayer::setFillOpacityTransition(const TransitionOptions& value, const optional<std::string>& klass) {
+    impl->paint.setTransition<FillOpacity>(value, klass);
 }
 
 DataDrivenPropertyValue<Color> FillLayer::getDefaultFillColor() {
@@ -118,6 +126,10 @@ void FillLayer::setFillColor(DataDrivenPropertyValue<Color> value, const optiona
     }
 }
 
+void FillLayer::setFillColorTransition(const TransitionOptions& value, const optional<std::string>& klass) {
+    impl->paint.setTransition<FillColor>(value, klass);
+}
+
 DataDrivenPropertyValue<Color> FillLayer::getDefaultFillOutlineColor() {
     return { {} };
 }
@@ -137,6 +149,10 @@ void FillLayer::setFillOutlineColor(DataDrivenPropertyValue<Color> value, const 
     }
 }
 
+void FillLayer::setFillOutlineColorTransition(const TransitionOptions& value, const optional<std::string>& klass) {
+    impl->paint.setTransition<FillOutlineColor>(value, klass);
+}
+
 PropertyValue<std::array<float, 2>> FillLayer::getDefaultFillTranslate() {
     return { {{ 0, 0 }} };
 }
@@ -150,6 +166,10 @@ void FillLayer::setFillTranslate(PropertyValue<std::array<float, 2>> value, cons
         return;
     impl->paint.set<FillTranslate>(value, klass);
     impl->observer->onLayerPaintPropertyChanged(*this);
+}
+
+void FillLayer::setFillTranslateTransition(const TransitionOptions& value, const optional<std::string>& klass) {
+    impl->paint.setTransition<FillTranslate>(value, klass);
 }
 
 PropertyValue<TranslateAnchorType> FillLayer::getDefaultFillTranslateAnchor() {
@@ -167,6 +187,10 @@ void FillLayer::setFillTranslateAnchor(PropertyValue<TranslateAnchorType> value,
     impl->observer->onLayerPaintPropertyChanged(*this);
 }
 
+void FillLayer::setFillTranslateAnchorTransition(const TransitionOptions& value, const optional<std::string>& klass) {
+    impl->paint.setTransition<FillTranslateAnchor>(value, klass);
+}
+
 PropertyValue<std::string> FillLayer::getDefaultFillPattern() {
     return { "" };
 }
@@ -180,6 +204,10 @@ void FillLayer::setFillPattern(PropertyValue<std::string> value, const optional<
         return;
     impl->paint.set<FillPattern>(value, klass);
     impl->observer->onLayerPaintPropertyChanged(*this);
+}
+
+void FillLayer::setFillPatternTransition(const TransitionOptions& value, const optional<std::string>& klass) {
+    impl->paint.setTransition<FillPattern>(value, klass);
 }
 
 } // namespace style

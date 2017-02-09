@@ -80,6 +80,10 @@ void FillExtrusionLayer::setFillExtrusionOpacity(PropertyValue<float> value, con
     impl->observer->onLayerPaintPropertyChanged(*this);
 }
 
+void FillExtrusionLayer::setFillExtrusionOpacityTransition(const TransitionOptions& value, const optional<std::string>& klass) {
+    impl->paint.setTransition<FillExtrusionOpacity>(value, klass);
+}
+
 DataDrivenPropertyValue<Color> FillExtrusionLayer::getDefaultFillExtrusionColor() {
     return { Color::black() };
 }
@@ -99,6 +103,10 @@ void FillExtrusionLayer::setFillExtrusionColor(DataDrivenPropertyValue<Color> va
     }
 }
 
+void FillExtrusionLayer::setFillExtrusionColorTransition(const TransitionOptions& value, const optional<std::string>& klass) {
+    impl->paint.setTransition<FillExtrusionColor>(value, klass);
+}
+
 PropertyValue<std::array<float, 2>> FillExtrusionLayer::getDefaultFillExtrusionTranslate() {
     return { {{ 0, 0 }} };
 }
@@ -112,6 +120,10 @@ void FillExtrusionLayer::setFillExtrusionTranslate(PropertyValue<std::array<floa
         return;
     impl->paint.set<FillExtrusionTranslate>(value, klass);
     impl->observer->onLayerPaintPropertyChanged(*this);
+}
+
+void FillExtrusionLayer::setFillExtrusionTranslateTransition(const TransitionOptions& value, const optional<std::string>& klass) {
+    impl->paint.setTransition<FillExtrusionTranslate>(value, klass);
 }
 
 PropertyValue<TranslateAnchorType> FillExtrusionLayer::getDefaultFillExtrusionTranslateAnchor() {
@@ -129,6 +141,10 @@ void FillExtrusionLayer::setFillExtrusionTranslateAnchor(PropertyValue<Translate
     impl->observer->onLayerPaintPropertyChanged(*this);
 }
 
+void FillExtrusionLayer::setFillExtrusionTranslateAnchorTransition(const TransitionOptions& value, const optional<std::string>& klass) {
+    impl->paint.setTransition<FillExtrusionTranslateAnchor>(value, klass);
+}
+
 PropertyValue<std::string> FillExtrusionLayer::getDefaultFillExtrusionPattern() {
     return { "" };
 }
@@ -142,6 +158,10 @@ void FillExtrusionLayer::setFillExtrusionPattern(PropertyValue<std::string> valu
         return;
     impl->paint.set<FillExtrusionPattern>(value, klass);
     impl->observer->onLayerPaintPropertyChanged(*this);
+}
+
+void FillExtrusionLayer::setFillExtrusionPatternTransition(const TransitionOptions& value, const optional<std::string>& klass) {
+    impl->paint.setTransition<FillExtrusionPattern>(value, klass);
 }
 
 DataDrivenPropertyValue<float> FillExtrusionLayer::getDefaultFillExtrusionHeight() {
@@ -163,6 +183,10 @@ void FillExtrusionLayer::setFillExtrusionHeight(DataDrivenPropertyValue<float> v
     }
 }
 
+void FillExtrusionLayer::setFillExtrusionHeightTransition(const TransitionOptions& value, const optional<std::string>& klass) {
+    impl->paint.setTransition<FillExtrusionHeight>(value, klass);
+}
+
 DataDrivenPropertyValue<float> FillExtrusionLayer::getDefaultFillExtrusionBase() {
     return { 0 };
 }
@@ -180,6 +204,10 @@ void FillExtrusionLayer::setFillExtrusionBase(DataDrivenPropertyValue<float> val
     } else {
         impl->observer->onLayerPaintPropertyChanged(*this);
     }
+}
+
+void FillExtrusionLayer::setFillExtrusionBaseTransition(const TransitionOptions& value, const optional<std::string>& klass) {
+    impl->paint.setTransition<FillExtrusionBase>(value, klass);
 }
 
 } // namespace style

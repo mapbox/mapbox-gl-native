@@ -12,6 +12,8 @@
 namespace mbgl {
 namespace style {
 
+class TransitionOptions;
+
 class FillExtrusionLayer : public Layer {
 public:
     FillExtrusionLayer(const std::string& layerID, const std::string& sourceID);
@@ -30,30 +32,37 @@ public:
     static PropertyValue<float> getDefaultFillExtrusionOpacity();
     PropertyValue<float> getFillExtrusionOpacity(const optional<std::string>& klass = {}) const;
     void setFillExtrusionOpacity(PropertyValue<float>, const optional<std::string>& klass = {});
+    void setFillExtrusionOpacityTransition(const TransitionOptions&, const optional<std::string>& klass = {});
 
     static DataDrivenPropertyValue<Color> getDefaultFillExtrusionColor();
     DataDrivenPropertyValue<Color> getFillExtrusionColor(const optional<std::string>& klass = {}) const;
     void setFillExtrusionColor(DataDrivenPropertyValue<Color>, const optional<std::string>& klass = {});
+    void setFillExtrusionColorTransition(const TransitionOptions&, const optional<std::string>& klass = {});
 
     static PropertyValue<std::array<float, 2>> getDefaultFillExtrusionTranslate();
     PropertyValue<std::array<float, 2>> getFillExtrusionTranslate(const optional<std::string>& klass = {}) const;
     void setFillExtrusionTranslate(PropertyValue<std::array<float, 2>>, const optional<std::string>& klass = {});
+    void setFillExtrusionTranslateTransition(const TransitionOptions&, const optional<std::string>& klass = {});
 
     static PropertyValue<TranslateAnchorType> getDefaultFillExtrusionTranslateAnchor();
     PropertyValue<TranslateAnchorType> getFillExtrusionTranslateAnchor(const optional<std::string>& klass = {}) const;
     void setFillExtrusionTranslateAnchor(PropertyValue<TranslateAnchorType>, const optional<std::string>& klass = {});
+    void setFillExtrusionTranslateAnchorTransition(const TransitionOptions&, const optional<std::string>& klass = {});
 
     static PropertyValue<std::string> getDefaultFillExtrusionPattern();
     PropertyValue<std::string> getFillExtrusionPattern(const optional<std::string>& klass = {}) const;
     void setFillExtrusionPattern(PropertyValue<std::string>, const optional<std::string>& klass = {});
+    void setFillExtrusionPatternTransition(const TransitionOptions&, const optional<std::string>& klass = {});
 
     static DataDrivenPropertyValue<float> getDefaultFillExtrusionHeight();
     DataDrivenPropertyValue<float> getFillExtrusionHeight(const optional<std::string>& klass = {}) const;
     void setFillExtrusionHeight(DataDrivenPropertyValue<float>, const optional<std::string>& klass = {});
+    void setFillExtrusionHeightTransition(const TransitionOptions&, const optional<std::string>& klass = {});
 
     static DataDrivenPropertyValue<float> getDefaultFillExtrusionBase();
     DataDrivenPropertyValue<float> getFillExtrusionBase(const optional<std::string>& klass = {}) const;
     void setFillExtrusionBase(DataDrivenPropertyValue<float>, const optional<std::string>& klass = {});
+    void setFillExtrusionBaseTransition(const TransitionOptions&, const optional<std::string>& klass = {});
 
     // Private implementation
 

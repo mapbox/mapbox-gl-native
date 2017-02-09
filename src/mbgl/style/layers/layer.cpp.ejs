@@ -126,6 +126,10 @@ void <%- camelize(type) %>Layer::set<%- camelize(property.name) %>(<%- propertyV
     impl->observer->onLayerPaintPropertyChanged(*this);
 <% } -%>
 }
+
+void <%- camelize(type) %>Layer::set<%- camelize(property.name) %>Transition(const TransitionOptions& value, const optional<std::string>& klass) {
+    impl->paint.setTransition<<%- camelize(property.name) %>>(value, klass);
+}
 <% } -%>
 
 } // namespace style

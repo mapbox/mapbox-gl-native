@@ -97,6 +97,12 @@ public:
         values[klass ? ClassDictionary::Get().lookup(*klass) : ClassID::Default] = value_;
     }
 
+    const TransitionOptions& getTransition(const optional<std::string>& klass) const {
+        static const TransitionOptions staticValue{};
+        const auto it = transitions.find(klass ? ClassDictionary::Get().lookup(*klass) : ClassID::Default);
+        return it == transitions.end() ? staticValue : it->second;
+    }
+
     void setTransition(const TransitionOptions& transition, const optional<std::string>& klass) {
         transitions[klass ? ClassDictionary::Get().lookup(*klass) : ClassID::Default] = transition;
     }
@@ -207,6 +213,11 @@ public:
     template <class P>
     void set(const typename P::ValueType& value, const optional<std::string>& klass) {
         cascading.template get<P>().set(value, klass);
+    }
+
+    template <class P>
+    void setTransition(const TransitionOptions& value, const optional<std::string>& klass) {
+        cascading.template get<P>().setTransition(value, klass);
     }
 
     void cascade(const CascadeParameters& parameters) {
