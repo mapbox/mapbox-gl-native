@@ -8,14 +8,24 @@
 #include <QOpenGLFramebufferObjectFormat>
 #include <QQuickWindow>
 #include <QThread>
+#include <QStandardPaths>
+#include <QDir>
 
-QQuickMapboxGLRenderer::QQuickMapboxGLRenderer()
+QQuickMapboxGLRenderer::QQuickMapboxGLRenderer(const QString access_token)
 {
     QMapbox::initializeGLExtensions();
 
     QMapboxGLSettings settings;
-    settings.setAccessToken(qgetenv("MAPBOX_ACCESS_TOKEN"));
-    settings.setCacheDatabasePath("/tmp/mbgl-cache.db");
+    settings.setAccessToken(access_token);
+    QStringList cacheDirList = QStandardPaths::standardLocations(QStandardPaths::CacheLocation);
+
+    QString cacheDir = "/tmp/";
+    if (!cacheDirList.isEmpty()) {
+      cacheDir = cacheDirList.at(0);
+    }
+
+    QString cacheDatabasePath = QDir(cacheDir).filePath("mbgl-cache.db");
+    settings.setCacheDatabasePath(cacheDatabasePath);
     settings.setCacheDatabaseMaximumSize(20 * 1024 * 1024);
     settings.setViewportMode(QMapboxGLSettings::FlippedYViewport);
 

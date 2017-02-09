@@ -18,13 +18,14 @@ namespace {
 static const QRegularExpression s_camelCase {"([a-z0-9])([A-Z])"};
 static const QStringList s_parameterTypes = QStringList()
     << "style" << "paint" << "layout" << "layer" << "source" << "filter" << "image"
-    << "bearing" << "pitch";
+    << "bearing" << "pitch" << "access_token";
 
 } // namespace
 
 QQuickMapboxGL::QQuickMapboxGL(QQuickItem *parent_)
     : QQuickFramebufferObject(parent_)
 {
+ 
 }
 
 QQuickMapboxGL::~QQuickMapboxGL()
@@ -32,8 +33,16 @@ QQuickMapboxGL::~QQuickMapboxGL()
 }
 
 QQuickFramebufferObject::Renderer *QQuickMapboxGL::createRenderer() const
-{
-    return new QQuickMapboxGLRenderer;
+{ 
+    QString access_token = "";
+    for (const auto& param_ : m_parameters) {
+        if (param_->property("type").toString() == "access_token") {
+           access_token = param_->property("value").toString();
+           break;
+        }
+    }
+
+    return new QQuickMapboxGLRenderer(access_token);
 }
 
 void QQuickMapboxGL::setPlugin(QDeclarativeGeoServiceProvider *)

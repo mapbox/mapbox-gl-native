@@ -552,6 +552,34 @@ run-android-$1: android-$1
 	cd platform/android && ./gradlew :MapboxGLAndroidSDKTestApp:install$(BUILDTYPE) && adb shell am start -n com.mapbox.mapboxsdk.testapp/.activity.FeatureOverviewActivity
 
 apackage: android-lib-$1
+
+#### Qt Android Targets
+
+build/qt-android-$1/$(BUILDTYPE)/build.ninja: $(BUILD_DEPS) platform/android/config.cmake
+	@mkdir -p build/qt-android-$1/$(BUILDTYPE)
+	export MASON_XC_ROOT=`scripts/mason.sh PREFIX android-ndk VERSION $1-r13b` && \
+	cd build/qt-android-$1/$(BUILDTYPE) && cmake ../../.. -G Ninja \
+		-DMASON_XC_ROOT="$$$${MASON_XC_ROOT}" \
+		-DCMAKE_TOOLCHAIN_FILE="$$$${MASON_XC_ROOT}/toolchain.cmake" \
+		-DCMAKE_BUILD_TYPE=$(BUILDTYPE) \
+		-DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+		-DMBGL_PLATFORM=qt-android \
+		-DWITH_QT_DECODERS=ON\
+		-DWITH_QT_4=${WITH_QT_4} \
+		-DWITH_CXX11ABI=OFF\
+		-DWITH_COVERAGE=${WITH_COVERAGE} \
+		-DIS_CI_BUILD=${CI}  \
+ 		-DMASON_PLATFORM=android \
+ 		-DMASON_PLATFORM_VERSION=$1
+	 	
+				
+.PHONY: qt-android-lib-$1
+qt-android-lib-$1: build/qt-android-$1/$(BUILDTYPE)/build.ninja
+	$(NINJA) $(NINJA_ARGS) -j$(JOBS) -C build/qt-android-$1/$(BUILDTYPE) qmapboxgl
+
+.PHONY: qt-android-$1
+qt-android-$1: qt-android-lib-$1 build/qt-android-$1/$(BUILDTYPE)/build.ninja
+
 endef
 
 $(foreach abi,$(MBGL_ANDROID_ABIS),$(eval $(call ANDROID_RULES,$(abi))))
@@ -621,6 +649,8 @@ android-checkstyle:
 android-javadoc:
 	cd platform/android && ./gradlew :MapboxGLAndroidSDK:javadocrelease
 
+.PHONY: qt-android
+qt-android: qt-android-arm-v7
 #### Miscellaneous targets #####################################################
 
 .PHONY: style-code

@@ -15,7 +15,7 @@ class QQuickMapboxGLRenderer : public QObject, public QQuickFramebufferObject::R
     Q_OBJECT
 
 public:
-    QQuickMapboxGLRenderer();
+    explicit QQuickMapboxGLRenderer(const QString access_token);
     virtual ~QQuickMapboxGLRenderer();
 
     virtual QOpenGLFramebufferObject * createFramebufferObject(const QSize &);
