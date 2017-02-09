@@ -3,14 +3,15 @@ package com.mapbox.mapboxsdk.maps.widgets;
 import android.content.Context;
 import android.graphics.PointF;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPropertyAnimatorCompat;
 import android.support.v4.view.ViewPropertyAnimatorListenerAdapter;
+import android.support.v7.widget.AppCompatImageView;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.maps.FocalPointChangeListener;
@@ -27,7 +28,7 @@ import java.lang.ref.WeakReference;
  * use {@link com.mapbox.mapboxsdk.maps.UiSettings}.
  * </p>
  */
-public final class CompassView extends ImageView implements Runnable, FocalPointChangeListener {
+public final class CompassView extends AppCompatImageView implements Runnable, FocalPointChangeListener {
 
   private static final long TIME_WAIT_IDLE = 500;
   private static final long TIME_FADE_ANIMATION = TIME_WAIT_IDLE;
@@ -36,7 +37,7 @@ public final class CompassView extends ImageView implements Runnable, FocalPoint
   private double direction = 0.0;
   private boolean fadeCompassViewFacingNorth = true;
   private ViewPropertyAnimatorCompat fadeAnimator;
-  private static PointF focalPoint;
+  private PointF focalPoint;
 
   public CompassView(Context context) {
     super(context);
@@ -97,6 +98,11 @@ public final class CompassView extends ImageView implements Runnable, FocalPoint
       setAlpha(0.0f);
       setVisibility(View.INVISIBLE);
     }
+  }
+
+  @Nullable
+  PointF getFocalPoint() {
+    return focalPoint;
   }
 
   public void update(final double direction) {
@@ -166,6 +172,7 @@ public final class CompassView extends ImageView implements Runnable, FocalPoint
       final MapboxMap mapboxMap = this.mapboxMap.get();
       final CompassView compassView = this.compassView.get();
       if (mapboxMap != null && compassView != null) {
+        PointF focalPoint = compassView.getFocalPoint();
         if (focalPoint != null) {
           mapboxMap.setFocalBearing(0, focalPoint.x, focalPoint.y, TIME_MAP_NORTH_ANIMATION);
         } else {
