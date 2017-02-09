@@ -1,0 +1,3 @@
+﻿"TELEMETRY_GROUP_TITLE" = "Configurações de privacidade";
+"TELEMETRY_SWITCH_TITLE" = "Telemetria do Mapbox";
+"TELEMETRY_GROUP_FOOTER" = "Essa configuração permite que o aplicativo compartilhe dados de localização e uso anônimos com o Mapbox.";

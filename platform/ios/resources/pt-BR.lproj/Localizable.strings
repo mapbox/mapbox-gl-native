@@ -1,0 +1,75 @@
+﻿/* Accessibility hint */
+"ANNOTATION_A11Y_HINT" = "Mostrar mais informações";
+
+/* No comment provided by engineer. */
+"API_CLIENT_400_DESC" = "The session data task failed. Original request was: %@";
+
+/* No comment provided by engineer. */
+"API_CLIENT_400_REASON" = "O código de status foi %ld";
+
+/* No comment provided by engineer. */
+"CANCEL" = "Cancelar";
+
+/* Accessibility hint */
+"COMPASS_A11Y_HINT" = "Rotaciona o mapa com face ao norte";
+
+/* Accessibility label */
+"COMPASS_A11Y_LABEL" = "Compasso";
+
+/* Compass abbreviation for north */
+"COMPASS_NORTH" = "N";
+
+/* Instructions in Interface Builder designable; {key}, {plist file name} */
+"DESIGNABLE" = "To display a Mapbox-hosted map here, set %1$@ to your access token in %2$@\n\nFor detailed instructions, see:";
+
+/* Setup documentation URL display string; keep as short as possible */
+"FIRST_STEPS_URL" = "mapbox.com/help/first-steps-ios-sdk";
+
+/* Accessibility hint */
+"INFO_A11Y_HINT" = "Mostra os créditos, um formulário de avaliação, e mais";
+
+/* Accessibility label */
+"INFO_A11Y_LABEL" = "Sobre este mapa";
+
+/* Accessibility label */
+"LOGO_A11Y_LABEL" = "Mapbox";
+
+/* Accessibility label */
+"MAP_A11Y_LABEL" = "Mapa";
+
+/* Map accessibility value */
+"MAP_A11Y_VALUE" = "Zoom %1$dx\n%2$ld anotações visíveis";
+
+/* Action sheet title */
+"SDK_NAME" = "Mapbox iOS SDK";
+
+/* Telemetry prompt message */
+"TELEMETRY_DISABLED_MSG" = "You can help make OpenStreetMap and Mapbox maps better by contributing anonymous usage data.";
+
+/* Telemetry prompt button */
+"TELEMETRY_DISABLED_OFF" = "Não Participar";
+
+/* Telemetry prompt button */
+"TELEMETRY_DISABLED_ON" = "Participar";
+
+/* Telemetry prompt message */
+"TELEMETRY_ENABLED_MSG" = "You are helping to make OpenStreetMap and Mapbox maps better by contributing anonymous usage data.";
+
+/* Telemetry prompt button */
+"TELEMETRY_ENABLED_OFF" = "Parar de Participar";
+
+/* Telemetry prompt button */
+"TELEMETRY_ENABLED_ON" = "Continuar Participando";
+
+/* Telemetry prompt button */
+"TELEMETRY_MORE" = "Me Diga Mais";
+
+/* Action in attribution sheet */
+"TELEMETRY_NAME" = "Telemetria do Mapbox";
+
+/* Telemetry prompt title */
+"TELEMETRY_TITLE" = "Melhorar os Mapas do Mapbox";
+
+/* Default user location annotation title */
+"USER_DOT_TITLE" = "Você Está Aqui";
+

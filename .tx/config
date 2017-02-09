@@ -1,6 +1,6 @@
 [main]
 host = https://www.transifex.com
-lang_map = zh_CN: zh-Hans, zh_TW: zh-Hant
+lang_map = pt_BR: pt-BR, pt_PT: pt-PT, zh_CN: zh-Hans, zh_TW: zh-Hant
 type = STRINGS
 minimum_perc = 80
 
