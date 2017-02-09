@@ -179,6 +179,7 @@
 		7E016D851D9E890300A29A21 /* MGLPolygon+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 7E016D821D9E890300A29A21 /* MGLPolygon+MGLAdditions.h */; };
 		7E016D861D9E890300A29A21 /* MGLPolygon+MGLAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 7E016D831D9E890300A29A21 /* MGLPolygon+MGLAdditions.m */; };
 		7E016D871D9E890300A29A21 /* MGLPolygon+MGLAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 7E016D831D9E890300A29A21 /* MGLPolygon+MGLAdditions.m */; };
+		968F36B51E4D128D003A5522 /* MGLDistanceFormatter.h in Headers */ = {isa = PBXBuildFile; fileRef = 3557F7AE1E1D27D300CCA5E6 /* MGLDistanceFormatter.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DA00FC8E1D5EEB0D009AABC8 /* MGLAttributionInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = DA00FC8C1D5EEB0D009AABC8 /* MGLAttributionInfo.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DA00FC8F1D5EEB0D009AABC8 /* MGLAttributionInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = DA00FC8C1D5EEB0D009AABC8 /* MGLAttributionInfo.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DA00FC901D5EEB0D009AABC8 /* MGLAttributionInfo.mm in Sources */ = {isa = PBXBuildFile; fileRef = DA00FC8D1D5EEB0D009AABC8 /* MGLAttributionInfo.mm */; };
@@ -1661,6 +1662,7 @@
 				354B83971D2E873E005D9406 /* MGLUserLocationAnnotationView.h in Headers */,
 				DAF0D8111DFE0EA000B28378 /* MGLRasterSource_Private.h in Headers */,
 				DABFB86B1CBE99E500D62B32 /* MGLTilePyramidOfflineRegion.h in Headers */,
+				968F36B51E4D128D003A5522 /* MGLDistanceFormatter.h in Headers */,
 				4018B1CB1CDC288E00F666AF /* MGLAnnotationView.h in Headers */,
 				DABFB85F1CBE99E500D62B32 /* MGLGeometry.h in Headers */,
 				7E016D851D9E890300A29A21 /* MGLPolygon+MGLAdditions.h in Headers */,
