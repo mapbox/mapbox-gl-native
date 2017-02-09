@@ -10,6 +10,7 @@
 
 ### Styles
 
+* Added support for data-driven styling in the form of source and composite style functions. `MGLStyleFunction` is now an abstract class, with `MGLCameraStyleFunction` providing the behavior of `MGLStyleFunction` in previous releases. New `MGLStyleFunction` subclasses allow you to vary a style attribute by the values of attributes of features in the source. ([#7596](https://github.com/mapbox/mapbox-gl-native/pull/7596))
 * Added `circleStrokeColor`, `circleStrokeWidth`, and `circleStrokeOpacity` properties to MGLCircleStyleLayer and support for corresponding properties in style JSON files. ([#7356](https://github.com/mapbox/mapbox-gl-native/pull/7356))
 * Point-placed labels in symbol style layers are now placed at more optimal locations within polygons. ([#7465](https://github.com/mapbox/mapbox-gl-native/pull/7465))
 * Fixed flickering that occurred when manipulating a style layer. ([#7616](https://github.com/mapbox/mapbox-gl-native/pull/7616))
@@ -36,7 +37,7 @@ This version of the Mapbox macOS SDK corresponds to version 3.4.1 of the Mapbox 
 * Fixed an issue causing the mouse cursor to jump after shift- or option-dragging a map view if the window opened on a screen with a different size than the screen with keyboard focus. ([#7846](https://github.com/mapbox/mapbox-gl-native/pull/7846))
 * Deprecated the style class methods in MGLStyle. ([#7785](https://github.com/mapbox/mapbox-gl-native/pull/7785))
 
-## 0.3.0
+## 0.3.0 - January 21, 2016
 
 This version of the Mapbox macOS SDK corresponds to version 3.4.0 of the Mapbox iOS SDK. The two SDKs have very similar feature sets. The main differences are the lack of user location tracking and annotation views. Some APIs have been adapted to macOS conventions, particularly the use of NSPopover for callout views.
 
