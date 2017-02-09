@@ -52,8 +52,8 @@ public class Stop<I, O> {
    * @param <V> the feature property input type
    */
   public static class CompositeValue<Z extends Number, V> {
-    Z zoom;
-    V value;
+    public final Z zoom;
+    public final V value;
 
     CompositeValue(Z zoom, V value) {
       this.zoom = zoom;

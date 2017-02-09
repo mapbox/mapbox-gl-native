@@ -4,6 +4,12 @@
 #include "../../conversion/conversion.hpp"
 #include "../../conversion/constant.hpp"
 #include "types.hpp"
+#include "../../java/lang.hpp"
+#include "../functions/stop.hpp"
+#include "../functions/categorical_stops.hpp"
+#include "../functions/exponential_stops.hpp"
+#include "../functions/identity_stops.hpp"
+#include "../functions/interval_stops.hpp"
 
 #include <jni/jni.hpp>
 
@@ -44,7 +50,59 @@ struct Converter<jni::jobject*, mbgl::style::CategoricalValue> {
 };
 
 template <class I, class O>
-inline jni::jobject* toFunctionStopJavaArray(jni::JNIEnv& env, std::map<I, O> value) {
+jni::Array<jni::Object<Stop>> toFunctionStopJavaArray(jni::JNIEnv& env, std::map<I, O> value) {
+
+    auto jarray = jni::Array<jni::Object<Stop>>::New(env, value.size(), Stop::javaClass);
+
+    size_t i = 0;
+    for (auto const& stop : value) {
+        jni::jobject* in = *convert<jni::jobject*, I>(env, stop.first);
+        jni::jobject* out = *convert<jni::jobject*, O>(env, stop.second);
+
+        auto jstop = Stop::New(env, jni::Object<>(in), jni::Object<>(out));
+        jarray.Set(env, i, jstop);
+
+        jni::DeleteLocalRef(env, in);
+        jni::DeleteLocalRef(env, out);
+        jni::DeleteLocalRef(env, jstop);
+
+        i++;
+    }
+
+    return jarray;
+}
+
+template <class I, class O>
+jni::Array<jni::Object<Stop>> toFunctionStopJavaArray(jni::JNIEnv& env, std::map<float, std::map<I, O>> value) {
+
+    auto jarray = jni::Array<jni::Object<Stop>>::New(env, value.size(), Stop::javaClass);
+
+    for (auto const& zoomLevelMap : value) {
+        size_t i = 0;
+        for (auto const& stop: zoomLevelMap.second) {
+            auto zoom = jni::Object<java::lang::Number>(*convert<jni::jobject*>(env, zoomLevelMap.first));
+            auto in = jni::Object<>(*convert<jni::jobject*, I>(env, stop.first));
+            auto out = jni::Object<>(*convert<jni::jobject*, O>(env, stop.second));
+            auto compositeValue = Stop::CompositeValue::New(env, zoom, in);
+
+            auto jstop = Stop::New(env, compositeValue, out);
+            jarray.Set(env, i, jstop);
+
+            jni::DeleteLocalRef(env, zoom);
+            jni::DeleteLocalRef(env, in);
+            jni::DeleteLocalRef(env, out);
+            jni::DeleteLocalRef(env, compositeValue);
+            jni::DeleteLocalRef(env, jstop);
+
+            i++;
+        }
+    }
+
+    return jarray;
+}
+
+template <class I, typename O>
+inline jni::jobject* convertCompositeStopsArray(jni::JNIEnv& env, std::map<float, std::map<I, O>> value) {
     static jni::jclass* javaClass = jni::NewGlobalRef(env, &jni::FindClass(env, "com/mapbox/mapboxsdk/style/functions/stops/Stop")).release();
     static jni::jmethodID* constructor = &jni::GetMethodID(env, *javaClass, "<init>", "(Ljava/lang/Object;Ljava/lang/Object;)V");
 
@@ -73,85 +131,31 @@ public:
     StopsEvaluator(jni::JNIEnv& _env) : env(_env) {}
 
     jni::jobject* operator()(const mbgl::style::CategoricalStops<T> &value) const {
-        static jni::jclass* clazz = jni::NewGlobalRef(env, &jni::FindClass(env, "com/mapbox/mapboxsdk/style/functions/stops/CategoricalStops")).release();
-        static jni::jmethodID* constructor = &jni::GetMethodID(env, *clazz, "<init>", "([Lcom/mapbox/mapboxsdk/style/functions/stops/Stop;)V");
+        return CategoricalStops::New(env, toFunctionStopJavaArray(env, value.stops)).Get();
+    }
 
-        return &jni::NewObject(env, *clazz, *constructor, toFunctionStopJavaArray(env, value.stops));
+    jni::jobject* operator()(const mbgl::style::CompositeCategoricalStops<T> &value) const {
+        return CategoricalStops::New(env, toFunctionStopJavaArray(env, value.stops)).Get();
     }
 
     jni::jobject* operator()(const mbgl::style::ExponentialStops<T> &value) const {
-        static jni::jclass* clazz = jni::NewGlobalRef(env, &jni::FindClass(env, "com/mapbox/mapboxsdk/style/functions/stops/ExponentialStops")).release();
-        static jni::jmethodID* constructor = &jni::GetMethodID(env, *clazz, "<init>", "(Ljava/lang/Float;[Lcom/mapbox/mapboxsdk/style/functions/stops/Stop;)V");
+        return ExponentialStops::New(env, jni::Object<java::lang::Float>(*convert<jni::jobject*>(env, value.base)), toFunctionStopJavaArray(env, value.stops)).Get();
+    }
 
-        return &jni::NewObject(env, *clazz, *constructor,
-            *convert<jni::jobject*>(env, value.base),
-            toFunctionStopJavaArray(env, value.stops));
+    jni::jobject* operator()(const mbgl::style::CompositeExponentialStops<T> &value) const {
+        return ExponentialStops::New(env, jni::Object<java::lang::Float>(*convert<jni::jobject*>(env, value.base)), toFunctionStopJavaArray(env, value.stops)).Get();
     }
 
     jni::jobject* operator()(const mbgl::style::IdentityStops<T> &) const {
-        static jni::jclass* clazz = jni::NewGlobalRef(env, &jni::FindClass(env, "com/mapbox/mapboxsdk/style/functions/stops/IdentityStops")).release();
-        static jni::jmethodID* constructor = &jni::GetMethodID(env, *clazz, "<init>", "()V");
-
-        return &jni::NewObject(env, *clazz, *constructor);
+        return IdentityStops::New(env).Get();
     }
 
     jni::jobject* operator()(const mbgl::style::IntervalStops<T> &value) const {
-        static jni::jclass* clazz = jni::NewGlobalRef(env, &jni::FindClass(env, "com/mapbox/mapboxsdk/style/functions/stops/IntervalStops")).release();
-        static jni::jmethodID* constructor = &jni::GetMethodID(env, *clazz, "<init>", "([Lcom/mapbox/mapboxsdk/style/functions/stops/Stop;)V");
-
-        return &jni::NewObject(env, *clazz, *constructor, toFunctionStopJavaArray(env, value.stops));
+        return IntervalStops::New(env, toFunctionStopJavaArray(env, value.stops)).Get();
     }
 
-private:
-    jni::JNIEnv& env;
-};
-
-template <class T, typename X>
-inline jni::jobject* convertCompositeStopsArray(jni::JNIEnv& env, std::map<float, T> value) {
-    // Create Java Map
-    static jni::jclass* mapClass = jni::NewGlobalRef(env, &jni::FindClass(env, "java/util/HashMap")).release();
-    static jni::jmethodID* mapConstructor = &jni::GetMethodID(env, *mapClass, "<init>", "()V");
-    static jni::jmethodID* mapPutMethod = &jni::GetMethodID(env, *mapClass, "put", "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;");
-    jni::jobject& map = jni::NewObject(env, *mapClass, *mapConstructor);
-
-    // Add converted Stops for each zoom value
-    StopsEvaluator<X> evaluator(env);
-    for (auto const& entry : value) {
-        jni::jobject* zoom = *convert<jni::jobject*, float>(env, entry.first);
-        jni::jobject* stops = evaluator(entry.second);
-        jni::CallMethod<jni::jobject*>(env, &map, *mapPutMethod, zoom, stops);
-        jni::DeleteLocalRef(env, zoom);
-        jni::DeleteLocalRef(env, stops);
-    }
-
-    // Create CompositeStops from Java Map
-    static jni::jclass* compositeStopsClass = jni::NewGlobalRef(env, &jni::FindClass(env, "com/mapbox/mapboxsdk/style/functions/stops/CompositeStops")).release();
-    static jni::jmethodID* compositeStopsConstructor = &jni::GetMethodID(env, *compositeStopsClass, "<init>", "(Ljava/util/Map;)V");
-    jni::jobject& compositeStops = jni::NewObject(env, *compositeStopsClass, *compositeStopsConstructor, &map);
-    jni::DeleteLocalRef(env, &map);
-
-    return &compositeStops;
-}
-
-/**
- * Conversion from core composite function stops to CompositeFunctionStops java type
- */
-template <class T>
-class CompositeStopsEvaluator {
-public:
-
-    CompositeStopsEvaluator(jni::JNIEnv& _env) : env(_env) {}
-
-    jni::jobject* operator()(const std::map<float, mbgl::style::CategoricalStops<T>> &value) const {
-        return convertCompositeStopsArray<mbgl::style::CategoricalStops<T>, T>(env, value);
-    }
-
-    jni::jobject* operator()(const std::map<float, mbgl::style::ExponentialStops<T>> &value) const {
-        return convertCompositeStopsArray<mbgl::style::ExponentialStops<T>, T>(env, value);
-    }
-
-    jni::jobject* operator()(const std::map<float, mbgl::style::IntervalStops<T>> &value) const {
-        return convertCompositeStopsArray<mbgl::style::IntervalStops<T>, T>(env, value);
+    jni::jobject* operator()(const mbgl::style::CompositeIntervalStops<T> &value) const {
+        return IntervalStops::New(env, toFunctionStopJavaArray(env, value.stops)).Get();
     }
 
 private:
@@ -201,10 +205,10 @@ struct Converter<jni::jobject*, mbgl::style::CompositeFunction<T>> {
     Result<jni::jobject*> operator()(jni::JNIEnv& env, const mbgl::style::CompositeFunction<T>& value) const {
         static jni::jclass* clazz = jni::NewGlobalRef(env, &jni::FindClass(env, "com/mapbox/mapboxsdk/style/functions/CompositeFunction")).release();
         static jni::jmethodID* constructor = &jni::GetMethodID(env, *clazz, "<init>",
-                                                                "(Ljava/lang/Object;Ljava/lang/String;Lcom/mapbox/mapboxsdk/style/functions/stops/CompositeStops;)V");
+                                                                "(Ljava/lang/Object;Ljava/lang/String;Lcom/mapbox/mapboxsdk/style/functions/stops/Stops;)V");
 
         // Convert stops
-        CompositeStopsEvaluator<T> evaluator(env);
+        StopsEvaluator<T> evaluator(env);
         jni::jobject* stops = apply_visitor(evaluator, value.stops);
 
 

@@ -13,10 +13,10 @@ import com.mapbox.mapboxsdk.style.functions.CompositeFunction;
 import com.mapbox.mapboxsdk.style.functions.CameraFunction;
 import com.mapbox.mapboxsdk.style.functions.SourceFunction;
 import com.mapbox.mapboxsdk.style.functions.stops.CategoricalStops;
-import com.mapbox.mapboxsdk.style.functions.stops.CompositeStops;
 import com.mapbox.mapboxsdk.style.functions.stops.ExponentialStops;
 import com.mapbox.mapboxsdk.style.functions.stops.IdentityStops;
 import com.mapbox.mapboxsdk.style.functions.stops.IntervalStops;
+import com.mapbox.mapboxsdk.style.functions.stops.Stop;
 import com.mapbox.mapboxsdk.style.functions.stops.Stops;
 import com.mapbox.mapboxsdk.style.layers.LineLayer;
 import com.mapbox.mapboxsdk.testapp.R;
@@ -28,8 +28,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import java.util.Map;
 
 import static com.mapbox.mapboxsdk.style.functions.Function.*;
 import static com.mapbox.mapboxsdk.style.functions.stops.Stop.stop;
@@ -361,17 +359,15 @@ public class LineLayerTest extends BaseStyleTest {
     assertNotNull(layer.getLineOpacity().getFunction());
     assertEquals(CompositeFunction.class, layer.getLineOpacity().getFunction().getClass());
     assertEquals("FeaturePropertyA", ((CompositeFunction) layer.getLineOpacity().getFunction()).getProperty());
-    assertEquals(CompositeStops.class, layer.getLineOpacity().getFunction().getStops().getClass());
-    assertEquals(1, ((CompositeStops) layer.getLineOpacity().getFunction().getStops()).size());
+    assertEquals(ExponentialStops.class, layer.getLineOpacity().getFunction().getStops().getClass());
+    assertEquals(1, ((ExponentialStops) layer.getLineOpacity().getFunction().getStops()).size());
 
-    CompositeStops<Float, Float, Float, ExponentialStops<Float, Float>> stops =
-      (CompositeStops<Float, Float, Float, ExponentialStops<Float, Float>>) layer.getLineOpacity().getFunction().getStops();
-    Map.Entry<Float, ExponentialStops<Float, Float>> stop = stops.iterator().next();
-    assertEquals(ExponentialStops.class, stop.getValue().getClass());
-    assertEquals(0f, stop.getKey(), 0.001);
-    assertEquals(1, stop.getValue().size());
-    assertEquals(0.3f, stop.getValue().iterator().next().in, 0.001f);
-    assertEquals(0.9f, stop.getValue().iterator().next().out, 0.001f);
+    ExponentialStops<Stop.CompositeValue<Float, Float>, Float> stops =
+      (ExponentialStops<Stop.CompositeValue<Float, Float>, Float>) layer.getLineOpacity().getFunction().getStops();
+    Stop<Stop.CompositeValue<Float, Float>, Float> stop = stops.iterator().next();
+    assertEquals(0f, stop.in.zoom, 0.001);
+    assertEquals(0.3f, stop.in.value, 0.001f);
+    assertEquals(0.9f, stop.out, 0.001f);
   }
 
   @Test
@@ -735,17 +731,15 @@ public class LineLayerTest extends BaseStyleTest {
     assertNotNull(layer.getLineGapWidth().getFunction());
     assertEquals(CompositeFunction.class, layer.getLineGapWidth().getFunction().getClass());
     assertEquals("FeaturePropertyA", ((CompositeFunction) layer.getLineGapWidth().getFunction()).getProperty());
-    assertEquals(CompositeStops.class, layer.getLineGapWidth().getFunction().getStops().getClass());
-    assertEquals(1, ((CompositeStops) layer.getLineGapWidth().getFunction().getStops()).size());
+    assertEquals(ExponentialStops.class, layer.getLineGapWidth().getFunction().getStops().getClass());
+    assertEquals(1, ((ExponentialStops) layer.getLineGapWidth().getFunction().getStops()).size());
 
-    CompositeStops<Float, Float, Float, ExponentialStops<Float, Float>> stops =
-      (CompositeStops<Float, Float, Float, ExponentialStops<Float, Float>>) layer.getLineGapWidth().getFunction().getStops();
-    Map.Entry<Float, ExponentialStops<Float, Float>> stop = stops.iterator().next();
-    assertEquals(ExponentialStops.class, stop.getValue().getClass());
-    assertEquals(0f, stop.getKey(), 0.001);
-    assertEquals(1, stop.getValue().size());
-    assertEquals(0.3f, stop.getValue().iterator().next().in, 0.001f);
-    assertEquals(0.9f, stop.getValue().iterator().next().out, 0.001f);
+    ExponentialStops<Stop.CompositeValue<Float, Float>, Float> stops =
+      (ExponentialStops<Stop.CompositeValue<Float, Float>, Float>) layer.getLineGapWidth().getFunction().getStops();
+    Stop<Stop.CompositeValue<Float, Float>, Float> stop = stops.iterator().next();
+    assertEquals(0f, stop.in.zoom, 0.001);
+    assertEquals(0.3f, stop.in.value, 0.001f);
+    assertEquals(0.9f, stop.out, 0.001f);
   }
 
   @Test
@@ -880,17 +874,15 @@ public class LineLayerTest extends BaseStyleTest {
     assertNotNull(layer.getLineOffset().getFunction());
     assertEquals(CompositeFunction.class, layer.getLineOffset().getFunction().getClass());
     assertEquals("FeaturePropertyA", ((CompositeFunction) layer.getLineOffset().getFunction()).getProperty());
-    assertEquals(CompositeStops.class, layer.getLineOffset().getFunction().getStops().getClass());
-    assertEquals(1, ((CompositeStops) layer.getLineOffset().getFunction().getStops()).size());
+    assertEquals(ExponentialStops.class, layer.getLineOffset().getFunction().getStops().getClass());
+    assertEquals(1, ((ExponentialStops) layer.getLineOffset().getFunction().getStops()).size());
 
-    CompositeStops<Float, Float, Float, ExponentialStops<Float, Float>> stops =
-      (CompositeStops<Float, Float, Float, ExponentialStops<Float, Float>>) layer.getLineOffset().getFunction().getStops();
-    Map.Entry<Float, ExponentialStops<Float, Float>> stop = stops.iterator().next();
-    assertEquals(ExponentialStops.class, stop.getValue().getClass());
-    assertEquals(0f, stop.getKey(), 0.001);
-    assertEquals(1, stop.getValue().size());
-    assertEquals(0.3f, stop.getValue().iterator().next().in, 0.001f);
-    assertEquals(0.9f, stop.getValue().iterator().next().out, 0.001f);
+    ExponentialStops<Stop.CompositeValue<Float, Float>, Float> stops =
+      (ExponentialStops<Stop.CompositeValue<Float, Float>, Float>) layer.getLineOffset().getFunction().getStops();
+    Stop<Stop.CompositeValue<Float, Float>, Float> stop = stops.iterator().next();
+    assertEquals(0f, stop.in.zoom, 0.001);
+    assertEquals(0.3f, stop.in.value, 0.001f);
+    assertEquals(0.9f, stop.out, 0.001f);
   }
 
   @Test
@@ -1025,17 +1017,15 @@ public class LineLayerTest extends BaseStyleTest {
     assertNotNull(layer.getLineBlur().getFunction());
     assertEquals(CompositeFunction.class, layer.getLineBlur().getFunction().getClass());
     assertEquals("FeaturePropertyA", ((CompositeFunction) layer.getLineBlur().getFunction()).getProperty());
-    assertEquals(CompositeStops.class, layer.getLineBlur().getFunction().getStops().getClass());
-    assertEquals(1, ((CompositeStops) layer.getLineBlur().getFunction().getStops()).size());
+    assertEquals(ExponentialStops.class, layer.getLineBlur().getFunction().getStops().getClass());
+    assertEquals(1, ((ExponentialStops) layer.getLineBlur().getFunction().getStops()).size());
 
-    CompositeStops<Float, Float, Float, ExponentialStops<Float, Float>> stops =
-      (CompositeStops<Float, Float, Float, ExponentialStops<Float, Float>>) layer.getLineBlur().getFunction().getStops();
-    Map.Entry<Float, ExponentialStops<Float, Float>> stop = stops.iterator().next();
-    assertEquals(ExponentialStops.class, stop.getValue().getClass());
-    assertEquals(0f, stop.getKey(), 0.001);
-    assertEquals(1, stop.getValue().size());
-    assertEquals(0.3f, stop.getValue().iterator().next().in, 0.001f);
-    assertEquals(0.9f, stop.getValue().iterator().next().out, 0.001f);
+    ExponentialStops<Stop.CompositeValue<Float, Float>, Float> stops =
+      (ExponentialStops<Stop.CompositeValue<Float, Float>, Float>) layer.getLineBlur().getFunction().getStops();
+    Stop<Stop.CompositeValue<Float, Float>, Float> stop = stops.iterator().next();
+    assertEquals(0f, stop.in.zoom, 0.001);
+    assertEquals(0.3f, stop.in.value, 0.001f);
+    assertEquals(0.9f, stop.out, 0.001f);
   }
 
   @Test

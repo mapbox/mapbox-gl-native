@@ -14,6 +14,11 @@
 #include "bitmap.hpp"
 #include "bitmap_factory.hpp"
 #include "connectivity_listener.hpp"
+#include "style/functions/categorical_stops.hpp"
+#include "style/functions/exponential_stops.hpp"
+#include "style/functions/identity_stops.hpp"
+#include "style/functions/interval_stops.hpp"
+#include "style/functions/stop.hpp"
 #include "style/layers/layers.hpp"
 #include "style/sources/sources.hpp"
 
@@ -1780,6 +1785,11 @@ void registerNatives(JavaVM *vm) {
     BitmapFactory::registerNative(env);
     registerNativeLayers(env);
     registerNativeSources(env);
+    Stop::registerNative(env);
+    CategoricalStops::registerNative(env);
+    ExponentialStops::registerNative(env);
+    IdentityStops::registerNative(env);
+    IntervalStops::registerNative(env);
     ConnectivityListener::registerNative(env);
 
     latLngClass = &jni::FindClass(env, "com/mapbox/mapboxsdk/geometry/LatLng");

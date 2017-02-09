@@ -4,7 +4,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.mapbox.mapboxsdk.style.functions.stops.CategoricalStops;
-import com.mapbox.mapboxsdk.style.functions.stops.CompositeStops;
 import com.mapbox.mapboxsdk.style.functions.stops.ExponentialStops;
 import com.mapbox.mapboxsdk.style.functions.stops.IdentityStops;
 import com.mapbox.mapboxsdk.style.functions.stops.IntervalStops;
@@ -193,7 +192,7 @@ public class Function<I, O> {
     @NonNull String property,
     @NonNull CategoricalStops<Stop.CompositeValue<Z, I>, O> stops) {
 
-    return new CompositeFunction<>(property, new CompositeStops<>(stops));
+    return new CompositeFunction<>(property, stops);
   }
 
   /**
@@ -219,7 +218,7 @@ public class Function<I, O> {
     @NonNull String property,
     @NonNull ExponentialStops<Stop.CompositeValue<Z, I>, O> stops) {
 
-    return new CompositeFunction<>(property, new CompositeStops<>(stops));
+    return new CompositeFunction<>(property, stops);
   }
 
   /**
@@ -245,7 +244,7 @@ public class Function<I, O> {
     @NonNull String property,
     @NonNull IntervalStops<Stop.CompositeValue<Z, I>, O> stops) {
 
-    return new CompositeFunction<>(property, new CompositeStops<>(stops));
+    return new CompositeFunction<>(property, stops);
   }
 
   // Class definition //
@@ -257,7 +256,7 @@ public class Function<I, O> {
    *
    * @param stops the stops
    */
-  Function(@NonNull Stops stops) {
+  Function(@NonNull Stops<I, O> stops) {
     this.stops = stops;
   }
 

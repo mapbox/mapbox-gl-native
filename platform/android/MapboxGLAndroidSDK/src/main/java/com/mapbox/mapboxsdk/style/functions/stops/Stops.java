@@ -1,5 +1,6 @@
 package com.mapbox.mapboxsdk.style.functions.stops;
 
+import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Size;
 
@@ -77,6 +78,7 @@ public abstract class Stops<I, O> {
    *
    * @return the value object representation for conversion to core
    */
+  @CallSuper
   public Map<String, Object> toValueObject() {
     HashMap<String, Object> map = new HashMap<>();
     map.put("type", getTypeName());
