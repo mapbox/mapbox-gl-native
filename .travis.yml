@@ -104,6 +104,7 @@ matrix:
         - export PATH=$(scripts/mason.sh PREFIX clang++ VERSION 3.9.1)/bin:$PATH
         - export CXXFLAGS="-Wno-undefined-var-template -fsanitize=address,undefined"
         - export LDFLAGS="-fsanitize=address,undefined"
+        - export ASAN_OPTIONS=detect_leaks=0
       before_script:
         - mapbox_start_xvfb
       script:
@@ -128,6 +129,7 @@ matrix:
         - export PATH=$(scripts/mason.sh PREFIX clang++ VERSION 3.9.1)/bin:$PATH
         - export CXXFLAGS="-Wno-undefined-var-template -fsanitize=address,undefined"
         - export LDFLAGS="-fsanitize=address,undefined"
+        - export ASAN_OPTIONS=detect_leaks=0
       before_script:
         - mapbox_start_xvfb
       script:
