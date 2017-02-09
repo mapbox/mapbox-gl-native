@@ -13,11 +13,38 @@ public:
         return predicates;
     }
 
-    NSExpression *getValues(std::vector<mbgl::Value> values) {
+    template <typename MBGLType>
+    NSExpression *getValues(std::vector<MBGLType> values) {
         NSMutableArray *array = [NSMutableArray arrayWithCapacity:values.size()];
         for (auto value : values) {
-            id constantValue = mbgl::Value::visit(value, ValueEvaluator());
+            id constantValue = MBGLType::visit(value, ValueEvaluator());
             [array addObject:[NSExpression expressionForConstantValue:constantValue]];
+        }
+        return [NSExpression expressionForAggregate:array];
+    }
+    
+    NSString *getFeatureTypeString(mbgl::FeatureType type) {
+        switch (type) {
+            case mbgl::FeatureType::Point:
+                return @"Point";
+                
+            case mbgl::FeatureType::LineString:
+                return @"LineString";
+                
+            case mbgl::FeatureType::Polygon:
+                return @"Polygon";
+                
+            default:
+                NSCAssert(NO, @"Unrecognized feature type %hhu", type);
+                return nil;
+        }
+    }
+    
+    NSExpression *getFeatureTypeStrings(std::vector<mbgl::FeatureType> values) {
+        NSMutableArray *array = [NSMutableArray arrayWithCapacity:values.size()];
+        for (auto value : values) {
+            id typeString = getFeatureTypeString(value);
+            [array addObject:[NSExpression expressionForConstantValue:typeString]];
         }
         return [NSExpression expressionForAggregate:array];
     }
@@ -56,6 +83,38 @@ public:
 
     NSPredicate *operator()(mbgl::style::NotInFilter filter) {
         return [NSPredicate predicateWithFormat:@"NOT %K IN %@", @(filter.key.c_str()), getValues(filter.values)];
+    }
+    
+    NSPredicate *operator()(mbgl::style::TypeEqualsFilter filter) {
+        return [NSPredicate predicateWithFormat:@"%K == %@", @"$type", getFeatureTypeString(filter.value)];
+    }
+    
+    NSPredicate *operator()(mbgl::style::TypeNotEqualsFilter filter) {
+        return [NSPredicate predicateWithFormat:@"%K != %@", @"$type", getFeatureTypeString(filter.value)];
+    }
+    
+    NSPredicate *operator()(mbgl::style::TypeInFilter filter) {
+        return [NSPredicate predicateWithFormat:@"%K IN %@", @"$type", getFeatureTypeStrings(filter.values)];
+    }
+    
+    NSPredicate *operator()(mbgl::style::TypeNotInFilter filter) {
+        return [NSPredicate predicateWithFormat:@"NOT %K IN %@", @"$type", getFeatureTypeStrings(filter.values)];
+    }
+    
+    NSPredicate *operator()(mbgl::style::IdentifierEqualsFilter filter) {
+        return [NSPredicate predicateWithFormat:@"%K == %@", @"$id", mbgl::FeatureIdentifier::visit(filter.value, ValueEvaluator())];
+    }
+    
+    NSPredicate *operator()(mbgl::style::IdentifierNotEqualsFilter filter) {
+        return [NSPredicate predicateWithFormat:@"%K != %@", @"$id", mbgl::FeatureIdentifier::visit(filter.value, ValueEvaluator())];
+    }
+    
+    NSPredicate *operator()(mbgl::style::IdentifierInFilter filter) {
+        return [NSPredicate predicateWithFormat:@"%K IN %@", @"$id", getValues(filter.values)];
+    }
+    
+    NSPredicate *operator()(mbgl::style::IdentifierNotInFilter filter) {
+        return [NSPredicate predicateWithFormat:@"NOT %K IN %@", @"$id", getValues(filter.values)];
     }
 
     NSPredicate *operator()(mbgl::style::AnyFilter filter) {
@@ -127,7 +186,14 @@ public:
     NSPredicate *operator()(mbgl::style::NotHasFilter filter) {
         return [NSPredicate predicateWithFormat:@"%K == nil", @(filter.key.c_str())];
     }
-
+    
+    NSPredicate *operator()(mbgl::style::HasIdentifierFilter filter) {
+        return [NSPredicate predicateWithFormat:@"%K != nil", @"$id"];
+    }
+    
+    NSPredicate *operator()(mbgl::style::NotHasIdentifierFilter filter) {
+        return [NSPredicate predicateWithFormat:@"%K == nil", @"$id"];
+    }
 };
 
 @implementation NSPredicate (MGLAdditions)

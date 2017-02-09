@@ -145,6 +145,95 @@ public:
     }
 };
 
+
+class TypeEqualsFilter {
+public:
+    FeatureType value;
+
+    friend bool operator==(const TypeEqualsFilter& lhs, const TypeEqualsFilter& rhs) {
+        return lhs.value == rhs.value;
+    }
+};
+
+class TypeNotEqualsFilter {
+public:
+    FeatureType value;
+
+    friend bool operator==(const TypeNotEqualsFilter& lhs, const TypeNotEqualsFilter& rhs) {
+        return lhs.value == rhs.value;
+    }
+};
+
+class TypeInFilter {
+public:
+    std::vector<FeatureType> values;
+
+    friend bool operator==(const TypeInFilter& lhs, const TypeInFilter& rhs) {
+        return lhs.values == rhs.values;
+    }
+};
+
+class TypeNotInFilter {
+public:
+    std::vector<FeatureType> values;
+
+    friend bool operator==(const TypeNotInFilter& lhs, const TypeNotInFilter& rhs) {
+        return lhs.values == rhs.values;
+    }
+};
+
+
+class IdentifierEqualsFilter {
+public:
+    FeatureIdentifier value;
+
+    friend bool operator==(const IdentifierEqualsFilter& lhs, const IdentifierEqualsFilter& rhs) {
+        return lhs.value == rhs.value;
+    }
+};
+
+class IdentifierNotEqualsFilter {
+public:
+    FeatureIdentifier value;
+
+    friend bool operator==(const IdentifierNotEqualsFilter& lhs, const IdentifierNotEqualsFilter& rhs) {
+        return lhs.value == rhs.value;
+    }
+};
+
+class IdentifierInFilter {
+public:
+    std::vector<FeatureIdentifier> values;
+
+    friend bool operator==(const IdentifierInFilter& lhs, const IdentifierInFilter& rhs) {
+        return lhs.values == rhs.values;
+    }
+};
+
+class IdentifierNotInFilter {
+public:
+    std::vector<FeatureIdentifier> values;
+
+    friend bool operator==(const IdentifierNotInFilter& lhs, const IdentifierNotInFilter& rhs) {
+        return lhs.values == rhs.values;
+    }
+};
+
+class HasIdentifierFilter {
+public:
+    friend bool operator==(const HasIdentifierFilter&, const HasIdentifierFilter&) {
+        return true;
+    }
+};
+
+class NotHasIdentifierFilter {
+public:
+    friend bool operator==(const NotHasIdentifierFilter&, const NotHasIdentifierFilter&) {
+        return true;
+    }
+};
+
+
 using FilterBase = variant<
     class NullFilter,
     class EqualsFilter,
@@ -159,7 +248,17 @@ using FilterBase = variant<
     class AllFilter,
     class NoneFilter,
     class HasFilter,
-    class NotHasFilter>;
+    class NotHasFilter,
+    class TypeEqualsFilter,
+    class TypeNotEqualsFilter,
+    class TypeInFilter,
+    class TypeNotInFilter,
+    class IdentifierEqualsFilter,
+    class IdentifierNotEqualsFilter,
+    class IdentifierInFilter,
+    class IdentifierNotInFilter,
+    class HasIdentifierFilter,
+    class NotHasIdentifierFilter>;
 
 class Filter : public FilterBase {
 public:

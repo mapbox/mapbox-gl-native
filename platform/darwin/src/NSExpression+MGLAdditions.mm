@@ -63,6 +63,67 @@
     return {};
 }
 
+- (std::vector<mbgl::FeatureType>)mgl_aggregateFeatureType {
+    if ([self.constantValue isKindOfClass:[NSArray class]] || [self.constantValue isKindOfClass:[NSSet class]]) {
+        std::vector<mbgl::FeatureType> convertedValues;
+        for (id value in self.constantValue) {
+            NSExpression *expression = value;
+            if (![expression isKindOfClass:[NSExpression class]]) {
+                expression = [NSExpression expressionForConstantValue:expression];
+            }
+            convertedValues.push_back(expression.mgl_featureType);
+        }
+        return convertedValues;
+    }
+    [NSException raise:NSInvalidArgumentException
+                format:@"Constant value expression must contain an array or set."];
+    return {};
+}
+
+- (mbgl::FeatureType)mgl_featureType {
+    id value = self.constantValue;
+    if ([value isKindOfClass:NSString.class]) {
+        if ([value isEqualToString:@"Point"]) {
+            return mbgl::FeatureType::Point;
+        }
+        if ([value isEqualToString:@"LineString"]) {
+            return mbgl::FeatureType::LineString;
+        }
+        if ([value isEqualToString:@"Polygon"]) {
+            return mbgl::FeatureType::Polygon;
+        }
+    } else if ([value isKindOfClass:NSNumber.class]) {
+        switch ([value integerValue]) {
+            case 1:
+                return mbgl::FeatureType::Point;
+            case 2:
+                return mbgl::FeatureType::LineString;
+            case 3:
+                return mbgl::FeatureType::Polygon;
+            default:
+                break;
+        }
+    }
+    return mbgl::FeatureType::Unknown;
+}
+
+- (std::vector<mbgl::FeatureIdentifier>)mgl_aggregateFeatureIdentifier {
+    if ([self.constantValue isKindOfClass:[NSArray class]] || [self.constantValue isKindOfClass:[NSSet class]]) {
+        std::vector<mbgl::FeatureIdentifier> convertedValues;
+        for (id value in self.constantValue) {
+            NSExpression *expression = value;
+            if (![expression isKindOfClass:[NSExpression class]]) {
+                expression = [NSExpression expressionForConstantValue:expression];
+            }
+            convertedValues.push_back(expression.mgl_featureIdentifier);
+        }
+        return convertedValues;
+    }
+    [NSException raise:NSInvalidArgumentException
+                format:@"Constant value expression must contain an array or set."];
+    return {};
+}
+
 - (mbgl::FeatureIdentifier)mgl_featureIdentifier {
     mbgl::Value mbglValue = self.mgl_constantMBGLValue;
 
