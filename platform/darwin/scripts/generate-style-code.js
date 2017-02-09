@@ -280,29 +280,29 @@ global.propertyDoc = function (propertyName, property, layerType, kind) {
             }
             doc += `\n\nThis attribute corresponds to the <a href="https://www.mapbox.com/mapbox-gl-style-spec/#${anchor}"><code>${property.original}</code></a> layout property in the Mapbox Style Specification.`;
         }
-    }
-    doc += '\n\nThis property can be set to one of the following values:\n\n' +
-           '- `MGLStyleConstantValue`\n';
-    if (property["property-function"]) {
-        doc += '- `MGLCameraStyleFunction` with an interpolation mode of:\n' +
-               '  - `MGLInterpolationModeExponential`\n' +
-               '  - `MGLInterpolationModeInterval`\n' +
-               '- `MGLSourceStyleFunction` with an interpolation mode of:\n' +
-               '  - `MGLInterpolationModeExponential`\n' +
-               '  - `MGLInterpolationModeInterval`\n' +
-               '  - `MGLInterpolationModeCategorical`\n' +
-               '  - `MGLInterpolationModeIdentity`\n' +
-               '- `MGLCompositeStyleFunction` with an interpolation mode of:\n' +
-               '  - `MGLInterpolationModeExponential`\n' +
-               '  - `MGLInterpolationModeInterval`\n' +
-               '  - `MGLInterpolationModeCategorical`\n';
-    } else {
-        if (property.function === "interpolated") {
-            doc += '- `MGLCameraStyleFunction` with an interpolation mode of:\n' +
-                   '  - `MGLInterpolationModeExponential`\n' +
-                   '  - `MGLInterpolationModeInterval`\n';
+        doc += '\n\nYou can set this property to an instance of:\n\n' +
+            '* `MGLStyleConstantValue`\n';
+        if (property["property-function"]) {
+            doc += '* `MGLCameraStyleFunction` with an interpolation mode of:\n' +
+                '  * `MGLInterpolationModeExponential`\n' +
+                '  * `MGLInterpolationModeInterval`\n' +
+                '* `MGLSourceStyleFunction` with an interpolation mode of:\n' +
+                '  * `MGLInterpolationModeExponential`\n' +
+                '  * `MGLInterpolationModeInterval`\n' +
+                '  * `MGLInterpolationModeCategorical`\n' +
+                '  * `MGLInterpolationModeIdentity`\n' +
+                '* `MGLCompositeStyleFunction` with an interpolation mode of:\n' +
+                '  * `MGLInterpolationModeExponential`\n' +
+                '  * `MGLInterpolationModeInterval`\n' +
+                '  * `MGLInterpolationModeCategorical`\n';
         } else {
-            doc += '- `MGLCameraStyleFunction` with an interpolation mode of `MGLInterpolationModeInterval`\n';
+            if (property.function === "interpolated") {
+                doc += '* `MGLCameraStyleFunction` with an interpolation mode of:\n' +
+                    '  * `MGLInterpolationModeExponential`\n' +
+                    '  * `MGLInterpolationModeInterval`\n';
+            } else {
+                doc += '* `MGLCameraStyleFunction` with an interpolation mode of `MGLInterpolationModeInterval`\n';
+            }
         }
     }
     return doc;
