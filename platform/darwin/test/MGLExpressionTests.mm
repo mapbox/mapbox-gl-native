@@ -212,4 +212,23 @@
     XCTAssertTrue(convertedValue.is<mbgl::NullValue>());
 }
 
+#pragma mark - Feature type tests
+
+- (void)testFeatureType {
+    XCTAssertEqual([NSExpression expressionWithFormat:@"'Point'"].mgl_featureType, mbgl::FeatureType::Point);
+    XCTAssertEqual([NSExpression expressionWithFormat:@"'LineString'"].mgl_featureType, mbgl::FeatureType::LineString);
+    XCTAssertEqual([NSExpression expressionWithFormat:@"'Polygon'"].mgl_featureType, mbgl::FeatureType::Polygon);
+    XCTAssertEqual([NSExpression expressionWithFormat:@"'Unknown'"].mgl_featureType, mbgl::FeatureType::Unknown);
+    XCTAssertEqual([NSExpression expressionWithFormat:@"''"].mgl_featureType, mbgl::FeatureType::Unknown);
+    
+    XCTAssertEqual([NSExpression expressionWithFormat:@"1"].mgl_featureType, mbgl::FeatureType::Point);
+    XCTAssertEqual([NSExpression expressionWithFormat:@"2"].mgl_featureType, mbgl::FeatureType::LineString);
+    XCTAssertEqual([NSExpression expressionWithFormat:@"3"].mgl_featureType, mbgl::FeatureType::Polygon);
+    XCTAssertEqual([NSExpression expressionWithFormat:@"0"].mgl_featureType, mbgl::FeatureType::Unknown);
+    XCTAssertEqual([NSExpression expressionWithFormat:@"-1"].mgl_featureType, mbgl::FeatureType::Unknown);
+    XCTAssertEqual([NSExpression expressionWithFormat:@"4"].mgl_featureType, mbgl::FeatureType::Unknown);
+    
+    XCTAssertEqual([NSExpression expressionWithFormat:@"nil"].mgl_featureType, mbgl::FeatureType::Unknown);
+}
+
 @end
