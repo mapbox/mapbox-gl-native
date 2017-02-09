@@ -100,11 +100,8 @@ matrix:
       addons: *clang39
       before_install:
         - git submodule update --init
-        - (cd .mason && git checkout master && git pull)
-        - .mason/mason install clang++ 3.9.1
-        - export PATH=$(.mason/mason prefix clang++ 3.9.1)/bin:$PATH
-        - .mason/mason install cmake 3.7.1
-        - export PATH=$(.mason/mason prefix cmake 3.7.1)/bin:$PATH
+        - scripts/mason.sh install clang++ VERSION 3.9.1
+        - export PATH=$(scripts/mason.sh PREFIX clang++ VERSION 3.9.1)/bin:$PATH
         - export CXXFLAGS="-Wno-undefined-var-template -fsanitize=address,undefined"
         - export LDFLAGS="-fsanitize=address,undefined"
       before_script:
@@ -127,11 +124,8 @@ matrix:
       env: BUILDTYPE=Debug _CXX=clang++-3.9 _CC=clang-3.9 WITH_EGL=1
       addons: *clang39
       before_install:
-        - git submodule update --init
-        - .mason/mason install clang++ 3.9.1
-        - export PATH=$(.mason/mason prefix clang++ 3.9.1)/bin:$PATH
-        - .mason/mason install cmake 3.7.1
-        - export PATH=$(.mason/mason prefix cmake 3.7.1)/bin:$PATH
+        - scripts/mason.sh install clang++ VERSION 3.9.1
+        - export PATH=$(scripts/mason.sh PREFIX clang++ VERSION 3.9.1)/bin:$PATH
         - export CXXFLAGS="-Wno-undefined-var-template -fsanitize=address,undefined"
         - export LDFLAGS="-fsanitize=address,undefined"
       before_script:
@@ -140,7 +134,7 @@ matrix:
         - nvm install 4
         - nvm use 4
         - make node
-        - export LD_PRELOAD=$(.mason/mason prefix clang++ 3.9.1)/lib/clang/3.9.1/lib/linux/libclang_rt.asan-x86_64.so
+        - export LD_PRELOAD=$(scripts/mason.sh PREFIX clang++ VERSION 3.9.1)/lib/clang/3.9.1/lib/linux/libclang_rt.asan-x86_64.so
         - make test-node
       after_script:
         - ccache --show-stats
