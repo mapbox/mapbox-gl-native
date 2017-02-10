@@ -270,9 +270,12 @@ public:
                                                               ofType:@"ttf"];
     NSString *notoTibetan = [[NSBundle mainBundle] pathForResource:@"NotoSansTibetan-Regular" // Or NotoSansTibetan-Regular.ttf, or NotoSansKannada-Regular.ttf
                                                              ofType:@"ttf"];
-
+    NSString *notoKannada = [[NSBundle mainBundle] pathForResource:@"NotoSansKannada-Regular" // Or NotoSansTibetan-Regular.ttf, or NotoSansKannada-Regular.ttf
+                                                            ofType:@"ttf"];
+    
 
     mbgl::AddDefaultFontPath([notoTibetan UTF8String]); // Prefer the Tibetan, fall back to Arial Unicode
+    mbgl::AddDefaultFontPath([notoKannada UTF8String]);
     mbgl::AddDefaultFontPath([arialUnicode UTF8String]);
 
     _mbglThreadPool = new mbgl::ThreadPool(1);

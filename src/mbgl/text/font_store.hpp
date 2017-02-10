@@ -17,9 +17,8 @@ struct hb_font_t;
 namespace mbgl {
 
     struct LocalFont {
-        LocalFont(uint32_t id_, FT_Face ft_face_, hb_font_t* hb_font_)
-            : id(id_), ft_face(ft_face_), hb_font(hb_font_)
-        {}
+        LocalFont(uint32_t id_, const std::string& path);
+        ~LocalFont();
         
         uint32_t id;
         FT_Face ft_face;
@@ -36,16 +35,11 @@ namespace mbgl {
     class FontStore : public util::noncopyable {
     public:
         FontStore();
-        ~FontStore();
         
-        bool UsingLocalFonts() const { return !localFonts.empty(); }
-        const std::vector<LocalFont>& GetLocalFonts() const { return localFonts; }
-        FT_Face GetFT_Face(uint32_t font_id) const { return localFonts[font_id].ft_face; } // TODO: Safe access!
-        hb_font_t* GetHB_Font(uint32_t font_id) const { return localFonts[font_id].hb_font; }
-        
-    private:
-        FT_Library library;
-        std::vector<LocalFont> localFonts;
+        bool UsingLocalFonts() const;
+        const std::vector<LocalFont>& GetLocalFonts() const;
+        FT_Face GetFT_Face(uint32_t font_id) const;
+        hb_font_t* GetHB_Font(uint32_t font_id) const;
     };
 
 } // namespace mbgl
