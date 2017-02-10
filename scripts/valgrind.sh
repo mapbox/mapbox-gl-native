@@ -6,6 +6,7 @@ set -o pipefail
 VALGRIND_PREFIX=$(scripts/mason.sh PREFIX valgrind VERSION 3.12.0)
 
 PARAMS="\
+    --track-origins=yes \
     --leak-check=full \
     --show-leak-kinds=definite \
     --errors-for-leak-kinds=definite \
