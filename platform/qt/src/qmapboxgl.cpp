@@ -1119,6 +1119,32 @@ void QMapboxGL::addAnnotationIcon(const QString &name, const QImage &icon)
 }
 
 /*!
+    Returns the amount of meters per pixel from a given \a latitude and \a zoom.
+*/
+double QMapboxGL::metersPerPixelAtLatitude(double latitude, double zoom) const
+{
+    return d_ptr->mapObj->getMetersPerPixelAtLatitude(latitude, zoom);
+}
+
+/*!
+    Return the projected meters for a given \a coordinate object.
+*/
+QMapbox::ProjectedMeters QMapboxGL::projectedMetersForCoordinate(const QMapbox::Coordinate &coordinate_) const
+{
+    auto projectedMeters = d_ptr->mapObj->projectedMetersForLatLng(mbgl::LatLng { coordinate_.first, coordinate_.second });
+    return QMapbox::ProjectedMeters(projectedMeters.northing, projectedMeters.easting);
+}
+
+/*!
+    Returns the coordinate for a given \a projectedMeters object.
+*/
+QMapbox::Coordinate QMapboxGL::coordinateForProjectedMeters(const QMapbox::ProjectedMeters &projectedMeters) const
+{
+    auto latLng = d_ptr->mapObj->latLngForProjectedMeters(mbgl::ProjectedMeters { projectedMeters.first, projectedMeters.second });
+    return QMapbox::Coordinate(latLng.latitude, latLng.longitude);
+}
+
+/*!
     \fn QMapboxGL::pixelForCoordinate(const QMapbox::Coordinate &coordinate) const
 
     Returns the offset in pixels for \a coordinate. The origin pixel coordinate is
