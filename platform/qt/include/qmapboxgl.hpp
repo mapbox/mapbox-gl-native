@@ -198,6 +198,9 @@ public:
 
     void resize(const QSize &size, const QSize &framebufferSize);
 
+    double metersPerPixelAtLatitude(double latitude, double zoom) const;
+    QMapbox::ProjectedMeters projectedMetersForCoordinate(const QMapbox::Coordinate &) const;
+    QMapbox::Coordinate coordinateForProjectedMeters(const QMapbox::ProjectedMeters &) const;
     QPointF pixelForCoordinate(const QMapbox::Coordinate &) const;
     QMapbox::Coordinate coordinateForPixel(const QPointF &) const;
 
