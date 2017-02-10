@@ -89,7 +89,7 @@ private:
     bool iconsNeedLinear = false;
     
     GlyphRangeSet ranges;
-    std::set<uint32_t> localFontGlyphIDs;
+    RequiredGlyphFontMap requiredLocalGlyphs;
     std::vector<SymbolInstance> symbolInstances;
     std::vector<SymbolFeature> features;
 

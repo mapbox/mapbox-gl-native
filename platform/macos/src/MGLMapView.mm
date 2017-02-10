@@ -266,12 +266,16 @@ public:
 
     mbgl::DefaultFileSource* mbglFileSource = [MGLOfflineStorage sharedOfflineStorage].mbglFileSource;
     
-    NSString *defaultFontPath = [[NSBundle mainBundle] pathForResource:@"Arial Unicode" // Or NotoSansTibetan-Regular.ttf, or NotoSansKannada-Regular.ttf
+    NSString *arialUnicode = [[NSBundle mainBundle] pathForResource:@"Arial Unicode" // Or NotoSansTibetan-Regular.ttf, or NotoSansKannada-Regular.ttf
                                                               ofType:@"ttf"];
+    NSString *notoTibetan = [[NSBundle mainBundle] pathForResource:@"NotoSansTibetan-Regular" // Or NotoSansTibetan-Regular.ttf, or NotoSansKannada-Regular.ttf
+                                                             ofType:@"ttf"];
 
-    mbgl::SetDefaultFontPath([defaultFontPath UTF8String]);
 
-    _mbglThreadPool = new mbgl::ThreadPool(4);
+    mbgl::AddDefaultFontPath([notoTibetan UTF8String]); // Prefer the Tibetan, fall back to Arial Unicode
+    mbgl::AddDefaultFontPath([arialUnicode UTF8String]);
+
+    _mbglThreadPool = new mbgl::ThreadPool(1);
     _mbglMap = new mbgl::Map(*_mbglView, self.size, [NSScreen mainScreen].backingScaleFactor, *mbglFileSource, *_mbglThreadPool, mbgl::MapMode::Continuous, mbgl::GLContextMode::Unique, mbgl::ConstrainMode::None, mbgl::ViewportMode::Default);
     [self validateTileCacheSize];
 

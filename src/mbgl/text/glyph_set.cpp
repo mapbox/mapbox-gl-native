@@ -1,5 +1,4 @@
 #include <mbgl/math/minmax.hpp>
-#include <mbgl/text/font_store.hpp>
 #include <mbgl/text/glyph_set.hpp>
 #include <mbgl/text/harfbuzz_shaper.hpp>
 #include <mbgl/util/i18n.hpp>
@@ -46,7 +45,7 @@ const Shaping GlyphSet::getShaping(const std::u16string& logicalInput,
                                    const float spacing,
                                    const Point<float>& translate,
                                    BiDi& bidi,
-                                   const FontStore& fontStore) const {
+                                   hb_font_t* localFont) const {
 
     // The string stored in shaping.text is used for finding duplicates, but may end up quite
     // different from the glyphs that get shown
@@ -57,7 +56,7 @@ const Shaping GlyphSet::getShaping(const std::u16string& logicalInput,
                          determineLineBreaks(logicalInput, spacing, maxWidth));
 
     shapeLines(shaping, reorderedLines, spacing, lineHeight, horizontalAlign, verticalAlign,
-               justify, translate, fontStore);
+               justify, translate, localFont);
 
     return shaping;
 }
@@ -244,13 +243,13 @@ void GlyphSet::shapeLines(Shaping& shaping,
                           const float verticalAlign,
                           const float justify,
                           const Point<float>& translate,
-                          const FontStore& fontStore) const {
+                          hb_font_t* localFont) const {
 
     // the y offset *should* be part of the font metadata
     const int32_t yOffset = -17;
 
     float x = 0;
-    float y = yOffset;
+    float y = localFont ? 0 : yOffset;
 
     float maxLineLength = 0;
 
@@ -265,8 +264,8 @@ void GlyphSet::shapeLines(Shaping& shaping,
         
         std::size_t lineStartIndex = shaping.positionedGlyphs.size();
 
-        if (fontStore.UsingDefaultFont()) {
-            harfbuzz::applyShaping(fontStore.GetDefaultHB_Font(), util::utf16_to_utf8::convert(line), shaping.positionedGlyphs, x, y);
+        if (localFont) {
+            harfbuzz::applyShaping(localFont, util::utf16_to_utf8::convert(line), shaping.positionedGlyphs, x, y);
         } else {
             for (char16_t chr : line) {
                 auto it = sdfs.find(chr);

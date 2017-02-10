@@ -14,36 +14,42 @@
 
 namespace mbgl {
 
-    FontStore::FontStore() : library(nullptr), ft_face(nullptr), hb_font(nullptr) {
-        if (GetDefaultFontPath().empty()) {
+
+    FontStore::FontStore() : library(nullptr) {
+        if (GetDefaultFontPaths().empty()) {
             return;
         }
         FT_Error error = FT_Init_FreeType(&library);
         if (error) {
             throw std::runtime_error("could not open FreeType library");
         }
+        uint32_t fontID = 0;
+        for (auto path : GetDefaultFontPaths()) {
+            FT_Face ft_face = 0;
+            
+            FT_Error face_error = FT_New_Face(library, path.c_str(), 0, &ft_face);
+            if (face_error) {
+                throw std::runtime_error("could not open font");
+            }
 
-        FT_Error face_error = FT_New_Face(library, GetDefaultFontPath().c_str(), 0, &ft_face);
-        if (face_error) {
-            throw std::runtime_error("could not open font");
+            const double scale_factor = 1.0;
+            double size = 24 * scale_factor;
+            FT_Set_Char_Size(ft_face,0,(FT_F26Dot6)(size * (1<<6)),0,0);
+            
+            hb_font_t* hb_font = hb_ft_font_create(ft_face, NULL);
 
+            localFonts.emplace_back(fontID++, ft_face, hb_font);
         }
-
-        const double scale_factor = 1.0;
-
-        // Set character sizes.
-        double size = 24 * scale_factor;
-        FT_Set_Char_Size(ft_face,0,(FT_F26Dot6)(size * (1<<6)),0,0);
-        
-        hb_font = hb_ft_font_create (ft_face, NULL);
     }
 
     FontStore::~FontStore() {
-        if (hb_font) {
-            hb_font_destroy(hb_font);
-        }
-        if (ft_face) {
-            FT_Done_Face(ft_face);
+        for (auto font : localFonts) {
+            if (font.hb_font) {
+                hb_font_destroy(font.hb_font);
+            }
+            if (font.ft_face) {
+                FT_Done_Face(font.ft_face);
+            }
         }
         if (library) {
             FT_Done_FreeType(library);

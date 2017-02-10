@@ -2,14 +2,14 @@
 
 namespace mbgl {
 
-static std::string defaultFontPath;
+static std::vector<std::string> defaultFontPaths;
 
-void SetDefaultFontPath(const std::string& path) {
-    defaultFontPath = path;
+void AddDefaultFontPath(const std::string& path) {
+    defaultFontPaths.push_back(path);
 }
 
-std::string GetDefaultFontPath() {
-    return defaultFontPath;
+std::vector<std::string> GetDefaultFontPaths() {
+    return defaultFontPaths;
 }
 
 }

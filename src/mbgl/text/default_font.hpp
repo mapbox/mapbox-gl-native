@@ -1,8 +1,9 @@
 #include <string>
+#include <vector>
 
 namespace mbgl {
 
-void SetDefaultFontPath(const std::string& path);
-std::string GetDefaultFontPath();
+void AddDefaultFontPath(const std::string& path);
+std::vector<std::string> GetDefaultFontPaths();
 
 }

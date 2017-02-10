@@ -17,6 +17,7 @@ public:
     std::array<float, 2> iconOffset;
     float iconRotation;
     std::size_t index;
+    optional<uint32_t> localFontID;
 };
 
 } // namespace mbgl

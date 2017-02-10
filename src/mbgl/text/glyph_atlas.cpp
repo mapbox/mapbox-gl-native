@@ -64,55 +64,61 @@ bool GlyphAtlas::hasGlyphRanges(const FontStack& fontStack, const GlyphRangeSet&
 
     return hasRanges;
 }
-
-bool GlyphAtlas::hasLocalGlyphs(const std::set<uint32_t>& glyphIDs) {
-    if (glyphIDs.empty()) {
+    
+bool GlyphAtlas::hasLocalGlyphs(const RequiredGlyphFontMap& requiredGlyphs) {
+    if (requiredGlyphs.empty()) {
         return true;
     }
 
     std::lock_guard<std::mutex> lock(localGlyphMutex);
-    auto sdfs = localGlyphs.getSDFs();
-
-    std::set<uint32_t> needUpload;
-
-    for (uint32_t glyphID : glyphIDs) {
-        const auto& sdfIt = sdfs.find(glyphID);
-        if (sdfIt == sdfs.end()) {
-            needUpload.insert(glyphID);
+    RequiredGlyphFontMap needUpload;
+    for (const auto font : requiredGlyphs) {
+        auto it = localGlyphSets.find(font.first);
+        if (it == localGlyphSets.end()) {
+            localGlyphSets.emplace(font.first, std::make_unique<GlyphSet>());
         }
+        auto sdfs = localGlyphSets[font.first]->getSDFs();
 
+        for (uint32_t glyphID : font.second) {
+            const auto& sdfIt = sdfs.find(glyphID);
+            if (sdfIt == sdfs.end()) {
+                needUpload[font.first].insert(glyphID);
+            }
+
+        }
     }
-
     addLocalGlyphs(needUpload);
 
     return true;
 }
 
-const GlyphPositions& GlyphAtlas::getLocalGlyphPositions() {
-    return localGlyphPositions;
+const GlyphPositions& GlyphAtlas::getLocalGlyphPositions(uint32_t font_id) {
+    return localGlyphPositions[font_id];
 }
 
-void GlyphAtlas::addLocalGlyphs(const std::set<uint32_t>& glyphIDs) {
+void GlyphAtlas::addLocalGlyphs(const RequiredGlyphFontMap& requiredGlyphs) {
     std::lock_guard<std::mutex> lock(mtx);
-    for (uint32_t glyphID : glyphIDs) {
-        SDFGlyph sdf = getSDFGlyph(fontStore.GetDefaultFT_Face(), glyphID);
-        Rect<uint16_t> rect = addLocalGlyph(sdf);
-        localGlyphPositions.emplace(glyphID, Glyph{rect, sdf.metrics});
+    for (const auto font : requiredGlyphs) {
+        for (uint32_t glyphID : font.second) {
+            SDFGlyph sdf = getSDFGlyph(fontStore.GetFT_Face(font.first), glyphID);
+            Rect<uint16_t> rect = addLocalGlyph(font.first, sdf);
+            localGlyphPositions[font.first].emplace(glyphID, Glyph{rect, sdf.metrics});
 
-        localGlyphs.insert(glyphID,std::move(sdf));
+            localGlyphSets[font.first]->insert(glyphID,std::move(sdf));
+        }
     }
 }
 
-Rect<uint16_t> GlyphAtlas::addLocalGlyph(const SDFGlyph& glyph) {
-    auto it = localGlyphIndex.find(glyph.id);
+Rect<uint16_t> GlyphAtlas::addLocalGlyph(uint32_t font_id, const SDFGlyph& glyph) {
+    auto it = localGlyphIndex[font_id].find(glyph.id);
 
     // The glyph is already in this texture.
-    if (it != localGlyphIndex.end()) {
+    if (it != localGlyphIndex[font_id].end()) {
         GlyphValue& value = it->second;
         return value.rect;
     }
     
-    return addGlyphToTexture(glyph, 0, localGlyphIndex);
+    return addGlyphToTexture(glyph, 0, localGlyphIndex[font_id]);
 }
 
 

@@ -71,8 +71,8 @@ public:
 
     Size getSize() const;
     
-    bool hasLocalGlyphs(const std::set<uint32_t>& glyphIDs);
-    const GlyphPositions& getLocalGlyphPositions();
+    bool hasLocalGlyphs(const RequiredGlyphFontMap&);
+    const GlyphPositions& getLocalGlyphPositions(uint32_t font_id);
     
     const FontStore& FontStore() const { return fontStore; }
 private:
@@ -88,8 +88,8 @@ private:
 
     std::mutex localGlyphMutex;
 
-    void addLocalGlyphs(const std::set<uint32_t>& glyphIDs);
-    Rect<uint16_t> addLocalGlyph(const SDFGlyph&);
+    void addLocalGlyphs(const RequiredGlyphFontMap& requiredGlyphs);
+    Rect<uint16_t> addLocalGlyph(uint32_t font_id, const SDFGlyph&);
 
     std::unordered_map<FontStack, std::map<GlyphRange, std::unique_ptr<GlyphPBF>>, FontStackHash> ranges;
     std::mutex rangesMutex;
@@ -115,15 +115,16 @@ private:
     std::mutex mtx;
     BinPack<uint16_t> bin;
     std::unordered_map<FontStack, std::map<uint32_t, GlyphValue>, FontStackHash> index;
+    
+    std::map<uint32_t,GlyphPositions> localGlyphPositions;
+    std::map<uint32_t,std::map<uint32_t, GlyphValue>> localGlyphIndex;
+    std::unordered_map<uint32_t, std::unique_ptr<GlyphSet>> localGlyphSets;
 
     const AlphaImage image;
     std::atomic<bool> dirty;
     mbgl::optional<gl::Texture> texture;
     
-    GlyphSet localGlyphs;
     class FontStore fontStore;
-    GlyphPositions localGlyphPositions;
-    std::map<uint32_t, GlyphValue> localGlyphIndex;
 };
 
 } // namespace mbgl

@@ -122,10 +122,11 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
                 u8string = platform::lowercase(u8string);
             }
 
-            if (glyphAtlas.FontStore().UsingDefaultFont()) {
+            if (glyphAtlas.FontStore().UsingLocalFonts()) {
                 ft.text = util::utf8_to_utf16::convert(u8string);
-                auto requiredGlyphs = harfbuzz::getGlyphIDs(glyphAtlas.FontStore().GetDefaultHB_Font(), u8string);
-                localFontGlyphIDs.insert(requiredGlyphs.begin(), requiredGlyphs.end());
+                auto requiredGlyphsForFont = harfbuzz::getGlyphIDs(glyphAtlas.FontStore().GetLocalFonts(), u8string);
+                ft.localFontID = requiredGlyphsForFont.first;
+                requiredLocalGlyphs[requiredGlyphsForFont.first].insert(requiredGlyphsForFont.second.begin(), requiredGlyphsForFont.second.end());
             } else {
                 ft.text = applyArabicShaping(util::utf8_to_utf16::convert(u8string));
             }
@@ -161,7 +162,7 @@ bool SymbolLayout::hasSymbolInstances() const {
 }
 
 bool SymbolLayout::canPrepare() {
-    if (!layout.get<TextField>().empty() && !layout.get<TextFont>().empty() && !glyphAtlas.hasGlyphRanges(layout.get<TextFont>(), ranges) && !glyphAtlas.hasLocalGlyphs(localFontGlyphIDs)) {
+    if (!layout.get<TextField>().empty() && !layout.get<TextFont>().empty() && !glyphAtlas.hasGlyphRanges(layout.get<TextFont>(), ranges) && !glyphAtlas.hasLocalGlyphs(requiredLocalGlyphs)) {
         return false;
     }
 
@@ -236,11 +237,13 @@ void SymbolLayout::prepare(uintptr_t tileUID) {
                 /* spacing: ems */ layout.get<TextLetterSpacing>() * 24,
                 /* translate */ Point<float>(layout.get<TextOffset>()[0], layout.get<TextOffset>()[1]),
                 /* bidirectional algorithm object */ bidi,
-                /* local fonts */glyphAtlas.FontStore());
+                /* local font */ feature.localFontID ? glyphAtlas.FontStore().GetHB_Font(*feature.localFontID) : NULL);
 
             // Add the glyphs we need for this label to the glyph atlas.
             if (shapedText) {
-                glyphAtlas.addGlyphs(tileUID, *feature.text, layout.get<TextFont>(), **glyphSet, face);
+                if (!feature.localFontID) {
+                    glyphAtlas.addGlyphs(tileUID, *feature.text, layout.get<TextFont>(), **glyphSet, face);
+                }
             }
         }
 
@@ -263,8 +266,8 @@ void SymbolLayout::prepare(uintptr_t tileUID) {
 
         // if either shapedText or icon position is present, add the feature
         if (shapedText || shapedIcon) {
-            if (glyphAtlas.FontStore().UsingDefaultFont()) {
-                addFeature(feature, shapedText, shapedIcon, glyphAtlas.getLocalGlyphPositions());
+            if (feature.localFontID) {
+                addFeature(feature, shapedText, shapedIcon, glyphAtlas.getLocalGlyphPositions(*feature.localFontID));
             } else {
                 addFeature(feature, shapedText, shapedIcon, face);
             }

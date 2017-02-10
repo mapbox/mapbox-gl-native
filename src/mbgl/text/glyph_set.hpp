@@ -4,9 +4,9 @@
 #include <mbgl/text/glyph.hpp>
 #include <mbgl/util/geometry.hpp>
 
+struct hb_font_t;
+
 namespace mbgl {
-    
-class FontStore;
 
 class GlyphSet {
 public:
@@ -21,7 +21,7 @@ public:
                              float spacing,
                              const Point<float>& translate,
                              BiDi& bidi,
-                             const FontStore& fontStore) const;
+                             hb_font_t* localFont) const;
 
 private:
     float determineAverageLineWidth(const std::u16string& logicalInput,
@@ -39,7 +39,7 @@ private:
                     float verticalAlign,
                     float justify,
                     const Point<float>& translate,
-                    const FontStore& fontStore) const;
+                    hb_font_t* localFont) const;
 
     std::map<uint32_t, SDFGlyph> sdfs;
 };

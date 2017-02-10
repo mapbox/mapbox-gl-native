@@ -67,6 +67,8 @@
 		558F18221D0B13B100123F46 /* libmbgl-loop.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 558F18211D0B13B000123F46 /* libmbgl-loop.a */; };
 		55D9B4B11D005D3900C1CCE2 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 55D9B4B01D005D3900C1CCE2 /* libz.tbd */; };
 		8392DEE41E4AB60600DD3E10 /* Arial Unicode.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8392DEE31E4AB60600DD3E10 /* Arial Unicode.ttf */; };
+		8392DEE71E4BEDC200DD3E10 /* NotoSansKannada-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8392DEE61E4AD51400DD3E10 /* NotoSansKannada-Regular.ttf */; };
+		8392DEE81E4BEDC500DD3E10 /* NotoSansTibetan-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8392DEE51E4AC53B00DD3E10 /* NotoSansTibetan-Regular.ttf */; };
 		DA00FC8A1D5EEAC3009AABC8 /* MGLAttributionInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = DA00FC881D5EEAC3009AABC8 /* MGLAttributionInfo.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DA00FC8B1D5EEAC3009AABC8 /* MGLAttributionInfo.mm in Sources */ = {isa = PBXBuildFile; fileRef = DA00FC891D5EEAC3009AABC8 /* MGLAttributionInfo.mm */; };
 		DA0CD58E1CF56F5800A5F5A5 /* MGLFeatureTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = DA0CD58D1CF56F5800A5F5A5 /* MGLFeatureTests.mm */; };
@@ -1217,11 +1219,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				DA839EA21CC2E3400062CAFB /* Assets.xcassets in Resources */,
+				8392DEE71E4BEDC200DD3E10 /* NotoSansKannada-Regular.ttf in Resources */,
 				DA839EA01CC2E3400062CAFB /* MapDocument.xib in Resources */,
 				353BAEF81D6463B8009A8DA9 /* amsterdam.geojson in Resources */,
 				DA839EA51CC2E3400062CAFB /* MainMenu.xib in Resources */,
 				DA5589771D320C41006B7F64 /* wms.json in Resources */,
 				DAE6C2E21CC304F900DB3429 /* Credits.rtf in Resources */,
+				8392DEE81E4BEDC500DD3E10 /* NotoSansTibetan-Regular.ttf in Resources */,
 				8392DEE41E4AB60600DD3E10 /* Arial Unicode.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
