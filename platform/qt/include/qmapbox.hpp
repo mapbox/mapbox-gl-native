@@ -15,6 +15,9 @@ namespace QMapbox {
 typedef QPair<double, double> Coordinate;
 typedef QPair<Coordinate, double> CoordinateZoom;
 
+// Reflects mbgl::ProjectedMeters<double>.
+typedef QPair<double, double> ProjectedMeters;
+
 // Reflects mbgl::{LineString,LinearRing,MultiPoint}<double>.
 typedef QList<Coordinate> Coordinates;
 
