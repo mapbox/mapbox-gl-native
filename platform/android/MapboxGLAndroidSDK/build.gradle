@@ -13,12 +13,12 @@ dependencies {
     compile 'com.jakewharton.timber:timber:4.3.1'
 
     // Mapbox Android Services (GeoJSON support)
-    compile('com.mapbox.mapboxsdk:mapbox-java-geojson:2.0.0-SNAPSHOT@jar') {
+    compile('com.mapbox.mapboxsdk:mapbox-java-geojson:2.0.0-beta.1@jar') {
         transitive = true
     }
 
     // Mapbox Android Services (Telemetry support)
-    compile('com.mapbox.mapboxsdk:mapbox-android-telemetry:2.0.0-SNAPSHOT@aar') {
+    compile('com.mapbox.mapboxsdk:mapbox-android-telemetry:2.0.0-beta.1@aar') {
         transitive = true
     }
 }

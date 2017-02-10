@@ -73,7 +73,7 @@ dependencies {
     testCompile "com.squareup.leakcanary:leakcanary-android-no-op:${leakCanaryVersion}"
 
     // Mapbox Android Services (Java component)
-    compile('com.mapbox.mapboxsdk:mapbox-java-services:2.0.0-SNAPSHOT@jar') {
+    compile('com.mapbox.mapboxsdk:mapbox-java-services:2.0.0-beta.1@jar') {
         transitive = true
     }
 
