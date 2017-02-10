@@ -518,6 +518,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		17C4564F1E4E19BB0029C9B1 /* darwin_conversion.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = darwin_conversion.hpp; sourceTree = "<group>"; };
+		17C456501E4E246D0029C9B1 /* MGLConversionValue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLConversionValue.h; sourceTree = "<group>"; };
 		20DABE861DF78148007AC5FF /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Foundation.strings"; sourceTree = "<group>"; };
 		20DABE881DF78148007AC5FF /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		20DABE8A1DF78149007AC5FF /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Root.strings"; sourceTree = "<group>"; };
@@ -947,11 +949,13 @@
 		35599DA21D4682B60048254D /* Styling */ = {
 			isa = PBXGroup;
 			children = (
+				17C456501E4E246D0029C9B1 /* MGLConversionValue.h */,
 				35599DB81D46AD7F0048254D /* Categories */,
 				353933F01D3FB6BA003F57D7 /* Layers */,
 				35136D491D4277EA00C20EFD /* Sources */,
 				DAAF72291DA903C700312FA4 /* MGLStyleValue.h */,
 				DAAF722A1DA903C700312FA4 /* MGLStyleValue_Private.h */,
+				17C4564F1E4E19BB0029C9B1 /* darwin_conversion.hpp */,
 				35599DEA1D46F14E0048254D /* MGLStyleValue.mm */,
 			);
 			name = Styling;
