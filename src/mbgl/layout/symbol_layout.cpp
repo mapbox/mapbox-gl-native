@@ -222,24 +222,10 @@ void SymbolLayout::prepare(uintptr_t tileUID,
 
         // if feature has text, shape the text
         if (feature.text) {
-            const float oneEm = 24.0f;
-            shapedTextOrientations.first = glyphSet->getShaping(
-                /* string */ *feature.text,
-                /* maxWidth: ems */ layout.get<SymbolPlacement>() != SymbolPlacementType::Line ?
-                    layout.get<TextMaxWidth>() * oneEm : 0,
-                /* lineHeight: ems */ layout.get<TextLineHeight>() * oneEm,
-                /* horizontalAlign */ horizontalAlign,
-                /* verticalAlign */ verticalAlign,
-                /* justify */ justify,
-                /* spacing: ems */ layout.get<TextLetterSpacing>() * oneEm,
-                /* translate */ Point<float>(layout.get<TextOffset>()[0], layout.get<TextOffset>()[1]),
-                /* verticalHeight */ oneEm,
-                /* writingMode */ WritingModeType::Horizontal,
-                /* bidirectional algorithm object */ bidi);
-
-            if (util::i18n::allowsVerticalWritingMode(*feature.text) && textAlongLine) {
-                shapedTextOrientations.second = glyphSet->getShaping(
-                    /* string */ *feature.text,
+            auto getShaping = [&] (const std::u16string& text, WritingModeType writingMode) {
+                const float oneEm = 24.0f;
+                const Shaping result = glyphSet->getShaping(
+                    /* string */ text,
                     /* maxWidth: ems */ layout.get<SymbolPlacement>() != SymbolPlacementType::Line ?
                         layout.get<TextMaxWidth>() * oneEm : 0,
                     /* lineHeight: ems */ layout.get<TextLineHeight>() * oneEm,
@@ -249,13 +235,21 @@ void SymbolLayout::prepare(uintptr_t tileUID,
                     /* spacing: ems */ layout.get<TextLetterSpacing>() * oneEm,
                     /* translate */ Point<float>(layout.get<TextOffset>()[0], layout.get<TextOffset>()[1]),
                     /* verticalHeight */ oneEm,
-                    /* writingMode */ WritingModeType::Vertical,
+                    /* writingMode */ writingMode,
                     /* bidirectional algorithm object */ bidi);
-            }
 
-            // Add the glyphs we need for this label to the glyph atlas.
-            if (shapedTextOrientations.first) {
-                glyphAtlas.addGlyphs(tileUID, *feature.text, layout.get<TextFont>(), **glyphSet, face);
+                // Add the glyphs we need for this label to the glyph atlas.
+                if (result) {
+                    glyphAtlas.addGlyphs(tileUID, text, layout.get<TextFont>(), **glyphSet, face);
+                }
+
+                return result;
+            };
+
+            shapedTextOrientations.first = getShaping(*feature.text, WritingModeType::Horizontal);
+
+            if (util::i18n::allowsVerticalWritingMode(*feature.text) && textAlongLine) {
+                shapedTextOrientations.second = getShaping(util::i18n::verticalizePunctuation(*feature.text), WritingModeType::Vertical);
             }
         }
 

@@ -45,17 +45,13 @@ const Shaping GlyphSet::getShaping(const std::u16string& logicalInput,
                                    const float verticalHeight,
                                    const WritingModeType writingMode,
                                    BiDi& bidi) const {
-    const std::u16string& orientedString = writingMode == WritingModeType::Vertical
-        ? util::i18n::verticalizePunctuation(logicalInput)
-        : logicalInput;
-
     // The string stored in shaping.text is used for finding duplicates, but may end up quite
     // different from the glyphs that get shown
-    Shaping shaping(translate.x * 24, translate.y * 24, orientedString, writingMode);
+    Shaping shaping(translate.x * 24, translate.y * 24, logicalInput, writingMode);
 
     std::vector<std::u16string> reorderedLines =
-        bidi.processText(orientedString,
-                         determineLineBreaks(orientedString, spacing, maxWidth, writingMode));
+        bidi.processText(logicalInput,
+                         determineLineBreaks(logicalInput, spacing, maxWidth, writingMode));
 
     shapeLines(shaping, reorderedLines, spacing, lineHeight, horizontalAlign, verticalAlign,
                justify, translate, verticalHeight, writingMode);
