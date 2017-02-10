@@ -43,6 +43,8 @@ SymbolInstance::SymbolInstance(Anchor& anchor, const GeometryCoordinates& line,
         writingModes = WritingModeType::Horizontal;
     } else if (shapedTextOrientations.second) {
         writingModes = WritingModeType::Vertical;
+    } else {
+        writingModes = WritingModeType::None;
     }
 }
 

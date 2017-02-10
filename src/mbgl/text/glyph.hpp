@@ -96,6 +96,7 @@ public:
 };
 
 enum class WritingModeType : uint8_t {
+    None = 0,
     Horizontal = 1 << 0,
     Vertical = 1 << 1,
 };
