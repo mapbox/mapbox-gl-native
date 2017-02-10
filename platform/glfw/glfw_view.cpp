@@ -42,6 +42,8 @@ GLFWView::GLFWView(bool fullscreen_, bool benchmark_)
         height = videoMode->height;
     }
 
+    glfwWindowHint(GLFW_COCOA_GRAPHICS_SWITCHING, GL_TRUE);
+
 #ifdef DEBUG
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 #endif

@@ -1,4 +1,4 @@
-mason_use(glfw VERSION 3.2.1)
+mason_use(glfw VERSION 2017-02-09-77a8f10)
 mason_use(mesa VERSION 13.0.4)
 mason_use(boost_libprogram_options VERSION 1.62.0${MASON_CXXABI_SUFFIX})
 mason_use(sqlite VERSION 3.14.2)
