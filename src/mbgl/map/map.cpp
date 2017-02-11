@@ -537,7 +537,13 @@ double Map::getScale() const {
 
 void Map::setZoom(double zoom, const Duration& duration) {
     impl->cameraMutated = true;
-    setZoom(zoom, {}, duration);
+    setZoom(zoom, optional<EdgeInsets> {}, duration);
+}
+
+void Map::setZoom(double zoom, optional<ScreenCoordinate> anchor, const Duration& duration) {
+    impl->cameraMutated = true;
+    impl->transform.setZoom(zoom, anchor, duration);
+    impl->onUpdate(Update::RecalculateStyle);
 }
 
 void Map::setZoom(double zoom, optional<EdgeInsets> padding, const Duration& duration) {
