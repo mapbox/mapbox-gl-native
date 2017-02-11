@@ -1556,10 +1556,12 @@ public:
     if (doubleTap.state == UIGestureRecognizerStateEnded)
     {
         MGLMapCamera *oldCamera = self.camera;
-        
+
+        double newZoom = round(self.zoomLevel) + 1.0;
+
         CGPoint gesturePoint = [self anchorPointForGesture:doubleTap];
-        
-        MGLMapCamera *toCamera = [self cameraByZoomingToZoomLevel:self.zoomLevel + 1.0 aroundAnchorPoint:gesturePoint];
+
+        MGLMapCamera *toCamera = [self cameraByZoomingToZoomLevel:newZoom aroundAnchorPoint:gesturePoint];
         
         if (![self.delegate respondsToSelector:@selector(mapView:shouldChangeFromCamera:toCamera:)] ||
             [self.delegate mapView:self shouldChangeFromCamera:oldCamera toCamera:toCamera])
@@ -1567,7 +1569,7 @@ public:
             [self trackGestureEvent:MGLEventGestureDoubleTap forRecognizer:doubleTap];
             
             mbgl::ScreenCoordinate center(gesturePoint.x, gesturePoint.y);
-            _mbglMap->scaleBy(2, center, MGLDurationInSecondsFromTimeInterval(MGLAnimationDuration));
+            _mbglMap->setZoom(newZoom, center, MGLDurationInSecondsFromTimeInterval(MGLAnimationDuration));
             
             __weak MGLMapView *weakSelf = self;
             
@@ -1595,16 +1597,17 @@ public:
     {
         MGLMapCamera *oldCamera = self.camera;
 
-        double zoom = self.zoomLevel;
+        double newZoom = round(self.zoomLevel) - 1.0;
+
         CGPoint gesturePoint = [self anchorPointForGesture:twoFingerTap];
-        
-        MGLMapCamera *toCamera = [self cameraByZoomingToZoomLevel:zoom - 1.0 aroundAnchorPoint:gesturePoint];
+
+        MGLMapCamera *toCamera = [self cameraByZoomingToZoomLevel:newZoom aroundAnchorPoint:gesturePoint];
         
         if (![self.delegate respondsToSelector:@selector(mapView:shouldChangeFromCamera:toCamera:)] ||
             [self.delegate mapView:self shouldChangeFromCamera:oldCamera toCamera:toCamera])
         {
             mbgl::ScreenCoordinate center(gesturePoint.x, gesturePoint.y);
-            _mbglMap->scaleBy(0.5, center, MGLDurationInSecondsFromTimeInterval(MGLAnimationDuration));
+            _mbglMap->setZoom(newZoom, center, MGLDurationInSecondsFromTimeInterval(MGLAnimationDuration));
             
             __weak MGLMapView *weakSelf = self;
             
