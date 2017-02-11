@@ -34,17 +34,8 @@ SpriteImagePtr createSpriteImage(const PremultipliedImage& image,
 
     PremultipliedImage dstImage({ width, height });
 
-    auto srcData = reinterpret_cast<const uint32_t*>(image.data.get());
-    auto dstData = reinterpret_cast<uint32_t*>(dstImage.data.get());
-
     // Copy from the source image into our individual sprite image
-    for (uint32_t y = 0; y < height; ++y) {
-        const auto dstRow = y * width;
-        const auto srcRow = (y + srcY) * image.size.width + srcX;
-        for (uint32_t x = 0; x < width; ++x) {
-            dstData[dstRow + x] = srcData[srcRow + x];
-        }
-    }
+    PremultipliedImage::copy(image, dstImage, { srcX, srcY }, { 0, 0 }, { width, height });
 
     return std::make_unique<const SpriteImage>(std::move(dstImage), ratio, sdf);
 }

@@ -124,48 +124,26 @@ Rect<uint16_t> GlyphAtlas::addGlyph(uintptr_t tileUID,
         return Rect<uint16_t>{ 0, 0, 0, 0 };
     }
 
-    uint16_t buffered_width = glyph.metrics.width + SDFGlyph::borderSize * 2;
-    uint16_t buffered_height = glyph.metrics.height + SDFGlyph::borderSize * 2;
-
-    // Guard against mismatches between the glyph bitmap size and the size mandated by
-    // its metrics.
-    if (size_t(buffered_width * buffered_height) != glyph.bitmap.size()) {
-        return Rect<uint16_t>{ 0, 0, 0, 0 };
-    }
-
     // Add a 1px border around every image.
-    const uint16_t padding = 1;
-    uint16_t pack_width = buffered_width + 2 * padding;
-    uint16_t pack_height = buffered_height + 2 * padding;
+    const uint32_t padding = 1;
+    uint16_t width = glyph.bitmap.size.width + 2 * padding;
+    uint16_t height = glyph.bitmap.size.height + 2 * padding;
 
     // Increase to next number divisible by 4, but at least 1.
     // This is so we can scale down the texture coordinates and pack them
     // into 2 bytes rather than 4 bytes.
-    pack_width += (4 - pack_width % 4);
-    pack_height += (4 - pack_height % 4);
+    width += (4 - width % 4);
+    height += (4 - height % 4);
 
-    Rect<uint16_t> rect = bin.allocate(pack_width, pack_height);
+    Rect<uint16_t> rect = bin.allocate(width, height);
     if (rect.w == 0) {
         Log::Error(Event::OpenGL, "glyph bitmap overflow");
         return rect;
     }
 
-    // Verify that binpack didn't produce a rect that goes beyond the size of the image.
-    // This should never happen.
-    assert(rect.x + rect.w <= image.size.width);
-    assert(rect.y + rect.h <= image.size.height);
-
     face.emplace(glyph.id, GlyphValue { rect, tileUID });
 
-    // Copy the bitmap
-    const uint8_t* source = reinterpret_cast<const uint8_t*>(glyph.bitmap.data());
-    for (uint32_t y = 0; y < buffered_height; y++) {
-        uint32_t y1 = image.size.width * (rect.y + y + padding) + rect.x + padding;
-        uint32_t y2 = buffered_width * y;
-        for (uint32_t x = 0; x < buffered_width; x++) {
-            image.data[y1 + x] = source[y2 + x];
-        }
-    }
+    AlphaImage::copy(glyph.bitmap, image, { 0, 0 }, { rect.x + padding, rect.y + padding }, glyph.bitmap.size);
 
     dirty = true;
 

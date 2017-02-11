@@ -101,7 +101,7 @@ private:
     std::mutex mtx;
     BinPack<uint16_t> bin;
     std::unordered_map<FontStack, std::map<uint32_t, GlyphValue>, FontStackHash> index;
-    const AlphaImage image;
+    AlphaImage image;
     std::atomic<bool> dirty;
     mbgl::optional<gl::Texture> texture;
 };
