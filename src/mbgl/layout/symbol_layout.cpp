@@ -17,6 +17,7 @@
 #include <mbgl/util/std.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/string.hpp>
+#include <mbgl/util/i18n.hpp>
 #include <mbgl/math/clamp.hpp>
 #include <mbgl/math/minmax.hpp>
 #include <mbgl/math/log2.hpp>
@@ -124,6 +125,9 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
             // Loop through all characters of this text and collect unique codepoints.
             for (char16_t chr : *ft.text) {
                 ranges.insert(getGlyphRange(chr));
+                if (char16_t verticalChr = util::i18n::verticalizePunctuation(chr)) {
+                    ranges.insert(getGlyphRange(verticalChr));
+                }
             }
         }
 
@@ -206,30 +210,46 @@ void SymbolLayout::prepare(uintptr_t tileUID,
 
     auto glyphSet = glyphAtlas.getGlyphSet(layout.get<TextFont>());
 
+    const bool textAlongLine = layout.get<TextRotationAlignment>() == AlignmentType::Map &&
+        layout.get<SymbolPlacement>() == SymbolPlacementType::Line;
+
     for (const auto& feature : features) {
         if (feature.geometry.empty()) continue;
 
-        Shaping shapedText;
+        std::pair<Shaping, Shaping> shapedTextOrientations;
         PositionedIcon shapedIcon;
         GlyphPositions face;
 
         // if feature has text, shape the text
         if (feature.text) {
-            shapedText = glyphSet->getShaping(
-                /* string */ *feature.text,
-                /* maxWidth: ems */ layout.get<SymbolPlacement>() != SymbolPlacementType::Line ?
-                    layout.get<TextMaxWidth>() * 24 : 0,
-                /* lineHeight: ems */ layout.get<TextLineHeight>() * 24,
-                /* horizontalAlign */ horizontalAlign,
-                /* verticalAlign */ verticalAlign,
-                /* justify */ justify,
-                /* spacing: ems */ layout.get<TextLetterSpacing>() * 24,
-                /* translate */ Point<float>(layout.get<TextOffset>()[0], layout.get<TextOffset>()[1]),
-                /* bidirectional algorithm object */ bidi);
+            auto getShaping = [&] (const std::u16string& text, WritingModeType writingMode) {
+                const float oneEm = 24.0f;
+                const Shaping result = glyphSet->getShaping(
+                    /* string */ text,
+                    /* maxWidth: ems */ layout.get<SymbolPlacement>() != SymbolPlacementType::Line ?
+                        layout.get<TextMaxWidth>() * oneEm : 0,
+                    /* lineHeight: ems */ layout.get<TextLineHeight>() * oneEm,
+                    /* horizontalAlign */ horizontalAlign,
+                    /* verticalAlign */ verticalAlign,
+                    /* justify */ justify,
+                    /* spacing: ems */ layout.get<TextLetterSpacing>() * oneEm,
+                    /* translate */ Point<float>(layout.get<TextOffset>()[0], layout.get<TextOffset>()[1]),
+                    /* verticalHeight */ oneEm,
+                    /* writingMode */ writingMode,
+                    /* bidirectional algorithm object */ bidi);
 
-            // Add the glyphs we need for this label to the glyph atlas.
-            if (shapedText) {
-                glyphAtlas.addGlyphs(tileUID, *feature.text, layout.get<TextFont>(), **glyphSet, face);
+                // Add the glyphs we need for this label to the glyph atlas.
+                if (result) {
+                    glyphAtlas.addGlyphs(tileUID, text, layout.get<TextFont>(), **glyphSet, face);
+                }
+
+                return result;
+            };
+
+            shapedTextOrientations.first = getShaping(*feature.text, WritingModeType::Horizontal);
+
+            if (util::i18n::allowsVerticalWritingMode(*feature.text) && textAlongLine) {
+                shapedTextOrientations.second = getShaping(util::i18n::verticalizePunctuation(*feature.text), WritingModeType::Vertical);
             }
         }
 
@@ -251,8 +271,8 @@ void SymbolLayout::prepare(uintptr_t tileUID,
         }
 
         // if either shapedText or icon position is present, add the feature
-        if (shapedText || shapedIcon) {
-            addFeature(feature, shapedText, shapedIcon, face);
+        if (shapedTextOrientations.first || shapedIcon) {
+            addFeature(feature, shapedTextOrientations, shapedIcon, face);
         }
     }
 
@@ -260,7 +280,7 @@ void SymbolLayout::prepare(uintptr_t tileUID,
 }
 
 void SymbolLayout::addFeature(const SymbolFeature& feature,
-                              const Shaping& shapedText,
+                              const std::pair<Shaping, Shaping>& shapedTextOrientations,
                               const PositionedIcon& shapedIcon,
                               const GlyphPositions& face) {
     const float minScale = 0.5f;
@@ -305,7 +325,7 @@ void SymbolLayout::addFeature(const SymbolFeature& feature,
 
         const bool addToBuffers = mode == MapMode::Still || withinPlus0;
 
-        symbolInstances.emplace_back(anchor, line, shapedText, shapedIcon, layout, addToBuffers, symbolInstances.size(),
+        symbolInstances.emplace_back(anchor, line, shapedTextOrientations, shapedIcon, layout, addToBuffers, symbolInstances.size(),
                 textBoxScale, textPadding, textPlacement,
                 iconBoxScale, iconPadding, iconPlacement,
                 face, indexedFeature);
@@ -317,8 +337,8 @@ void SymbolLayout::addFeature(const SymbolFeature& feature,
             Anchors anchors = getAnchors(line,
                                          symbolSpacing,
                                          textMaxAngle,
-                                         shapedText.left,
-                                         shapedText.right,
+                                         (shapedTextOrientations.second ?: shapedTextOrientations.first).left,
+                                         (shapedTextOrientations.second ?: shapedTextOrientations.first).right,
                                          shapedIcon.left,
                                          shapedIcon.right,
                                          glyphSize,
@@ -326,7 +346,7 @@ void SymbolLayout::addFeature(const SymbolFeature& feature,
                                          overscaling);
 
             for (auto& anchor : anchors) {
-                if (!shapedText || !anchorIsTooClose(shapedText.text, textRepeatDistance, anchor)) {
+                if (!shapedTextOrientations.first || !anchorIsTooClose(shapedTextOrientations.first.text, textRepeatDistance, anchor)) {
                     addSymbolInstance(line, anchor);
                 }
             }
@@ -448,7 +468,7 @@ std::unique_ptr<SymbolBucket> SymbolLayout::place(CollisionTile& collisionTile) 
             if (glyphScale < collisionTile.maxScale) {
                 addSymbols(
                     bucket->text, symbolInstance.glyphQuads, glyphScale,
-                    layout.get<TextKeepUpright>(), textPlacement, collisionTile.config.angle);
+                    layout.get<TextKeepUpright>(), textPlacement, collisionTile.config.angle, symbolInstance.writingModes);
             }
         }
 
@@ -457,7 +477,7 @@ std::unique_ptr<SymbolBucket> SymbolLayout::place(CollisionTile& collisionTile) 
             if (iconScale < collisionTile.maxScale) {
                 addSymbols(
                     bucket->icon, symbolInstance.iconQuads, iconScale,
-                    layout.get<IconKeepUpright>(), iconPlacement, collisionTile.config.angle);
+                    layout.get<IconKeepUpright>(), iconPlacement, collisionTile.config.angle, symbolInstance.writingModes);
             }
         }
     }
@@ -470,7 +490,7 @@ std::unique_ptr<SymbolBucket> SymbolLayout::place(CollisionTile& collisionTile) 
 }
 
 template <typename Buffer>
-void SymbolLayout::addSymbols(Buffer &buffer, const SymbolQuads &symbols, float scale, const bool keepUpright, const style::SymbolPlacementType placement, const float placementAngle) {
+void SymbolLayout::addSymbols(Buffer &buffer, const SymbolQuads &symbols, float scale, const bool keepUpright, const style::SymbolPlacementType placement, const float placementAngle, WritingModeType writingModes) {
     constexpr const uint16_t vertexLength = 4;
     const float placementZoom = util::max(util::log2(scale) + zoom, 0.0f);
 
@@ -485,9 +505,15 @@ void SymbolLayout::addSymbols(Buffer &buffer, const SymbolQuads &symbols, float 
         float maxZoom = util::min(zoom + util::log2(symbol.maxScale), util::MAX_ZOOM_F);
         const auto &anchorPoint = symbol.anchorPoint;
 
-        // drop upside down versions of glyphs
+        // drop incorrectly oriented glyphs
         const float a = std::fmod(symbol.anchorAngle + placementAngle + M_PI, M_PI * 2);
-        if (keepUpright && placement == style::SymbolPlacementType::Line &&
+        if (writingModes & WritingModeType::Vertical) {
+            if (placement == style::SymbolPlacementType::Line && symbol.writingMode == WritingModeType::Vertical) {
+                if (keepUpright && placement == style::SymbolPlacementType::Line && (a <= (M_PI * 5 / 4) || a > (M_PI * 7 / 4)))
+                    continue;
+            } else if (keepUpright && placement == style::SymbolPlacementType::Line && (a <= (M_PI * 3 / 4) || a > (M_PI * 5 / 4)))
+                continue;
+        } else if (keepUpright && placement == style::SymbolPlacementType::Line &&
             (a <= M_PI / 2 || a > M_PI * 3 / 2)) {
             continue;
         }

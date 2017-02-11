@@ -42,18 +42,19 @@ const Shaping GlyphSet::getShaping(const std::u16string& logicalInput,
                                    const float justify,
                                    const float spacing,
                                    const Point<float>& translate,
+                                   const float verticalHeight,
+                                   const WritingModeType writingMode,
                                    BiDi& bidi) const {
-
     // The string stored in shaping.text is used for finding duplicates, but may end up quite
     // different from the glyphs that get shown
-    Shaping shaping(translate.x * 24, translate.y * 24, logicalInput);
+    Shaping shaping(translate.x * 24, translate.y * 24, logicalInput, writingMode);
 
     std::vector<std::u16string> reorderedLines =
         bidi.processText(logicalInput,
-                         determineLineBreaks(logicalInput, spacing, maxWidth));
+                         determineLineBreaks(logicalInput, spacing, maxWidth, writingMode));
 
     shapeLines(shaping, reorderedLines, spacing, lineHeight, horizontalAlign, verticalAlign,
-               justify, translate);
+               justify, translate, verticalHeight, writingMode);
 
     return shaping;
 }
@@ -198,8 +199,9 @@ std::set<std::size_t> leastBadBreaks(const PotentialBreak& lastLineBreak) {
 //  more intuitive, but we can't do that because the visual order may be changed by line breaks!
 std::set<std::size_t> GlyphSet::determineLineBreaks(const std::u16string& logicalInput,
                                                 const float spacing,
-                                                float maxWidth) const {
-    if (!maxWidth) {
+                                                float maxWidth,
+                                                const WritingModeType writingMode) const {
+    if (!maxWidth || writingMode != WritingModeType::Horizontal) {
         return {};
     }
 
@@ -239,7 +241,9 @@ void GlyphSet::shapeLines(Shaping& shaping,
                           const float horizontalAlign,
                           const float verticalAlign,
                           const float justify,
-                          const Point<float>& translate) const {
+                          const Point<float>& translate,
+                          const float verticalHeight,
+                          const WritingModeType writingMode) const {
 
     // the y offset *should* be part of the font metadata
     const int32_t yOffset = -17;
@@ -266,8 +270,14 @@ void GlyphSet::shapeLines(Shaping& shaping,
             }
 
             const SDFGlyph& glyph = it->second;
-            shaping.positionedGlyphs.emplace_back(chr, x, y);
-            x += glyph.metrics.advance + spacing;
+
+            if (writingMode == WritingModeType::Horizontal || !util::i18n::hasUprightVerticalOrientation(chr)) {
+                shaping.positionedGlyphs.emplace_back(chr, x, y, 0);
+                x += glyph.metrics.advance + spacing;
+            } else {
+                shaping.positionedGlyphs.emplace_back(chr, x, 0, -M_PI_2);
+                x += verticalHeight + spacing;
+            }
         }
 
         // Only justify if we placed at least one glyph
