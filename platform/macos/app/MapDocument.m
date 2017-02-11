@@ -217,11 +217,11 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
 }
 
 - (IBAction)zoomIn:(id)sender {
-    [self.mapView setZoomLevel:self.mapView.zoomLevel + 1 animated:YES];
+    [self.mapView setZoomLevel:round(self.mapView.zoomLevel) + 1 animated:YES];
 }
 
 - (IBAction)zoomOut:(id)sender {
-    [self.mapView setZoomLevel:self.mapView.zoomLevel - 1 animated:YES];
+    [self.mapView setZoomLevel:round(self.mapView.zoomLevel) - 1 animated:YES];
 }
 
 - (IBAction)snapToNorth:(id)sender {
