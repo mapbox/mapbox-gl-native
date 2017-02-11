@@ -11,6 +11,8 @@
 
 #include <mbgl/util/interpolate.hpp>
 
+#include <mbgl/style/conversion.hpp>
+
 #if TARGET_OS_IPHONE
     #import "UIColor+MGLAdditions.h"
 #else
@@ -115,7 +117,14 @@ public:
 
     // Convert an mgl style value into a mbgl data driven property value
     mbgl::style::DataDrivenPropertyValue<MBGLType> toDataDrivenPropertyValue(MGLStyleValue<ObjCType> *value) {
-
+        // TODO: check that it's an MGLStyleFunction before casting.
+        NSObject *rawValue = toRawStyleSpecValue((MGLStyleFunction<ObjCType> *) value);
+        mbgl::style::conversion::Result<mbgl::style::DataDrivenPropertyValue<MBGLType>> result = mbgl::style::conversion::convert<mbgl::style::DataDrivenPropertyValue<MBGLType>>(rawValue);
+        if (!result) {
+            // raise an exception?
+        }
+        
+        return *result;
     }
 
     // Convert an mgl style value containing an enum into a mbgl property value containing an enum
@@ -194,7 +203,8 @@ private: // Private utilities for converting from mgl to mbgl values
         
         // interpolationBase => base
         if (styleFunction.interpolationBase) {
-            rawFunction[@"base"] = DO I NEED TO CONVERT TO NSNumber SOMEHOW???
+            // TODO: does this direct cast work?
+            rawFunction[@"base"] = (NSNumber *) styleFunction.interpolationBase;
         }
         
         // stops
