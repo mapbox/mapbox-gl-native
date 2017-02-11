@@ -83,12 +83,21 @@ NS_ASSUME_NONNULL_BEGIN
  `MGLVectorStyleLayer.predicate` to an `NSPredicate` with the format
  `importance > 50`.
 
- You can also configure some attributes of an `MGLSymbolStyleLayer` object to
- include the value of an attribute in this dictionary whenever it renders this
- feature. For example, to label features in an `MGLShapeSource` object by their
- names, you can assign a `name` attribute to each of the source’s features, then
- set `MGLSymbolStyleLayer.textField` to an `MGLStyleValue` object containing the
- string `{name}`.
+ You can also configure many layout and paint attributes of an `MGLStyleLayer`
+ object to match the value of an attribute in this dictionary whenever it
+ renders this feature. For example, if you display features in an
+ `MGLShapeSource` using an `MGLCircleStyleLayer`, you can assign a `halfway`
+ attribute to each of the source’s features, then set
+ `MGLCircleStyleLayer.circleRadius` to an `MGLStyleValue` object with an
+ interpolation mode of `MGLInterpolationModeIdentity` and an attribute name of
+ `halfway`.
+ 
+ The `MGLSymbolStyleLayer.textField` and `MGLSymbolStyleLayer.iconImageName`
+ properties allow you to use attributes yet another way. For example, to label
+ features in an `MGLShapeSource` object by their names, you can assign a `name`
+ attribute to each of the source’s features, then set
+ `MGLSymbolStyleLayer.textField` to an `MGLStyleValue` object containing the
+ raw string value `{name}`.
 
  In vector tiles loaded by `MGLVectorSource` objects, the keys and values of
  each feature’s attribute dictionary are determined by the source. Each
@@ -115,6 +124,15 @@ NS_ASSUME_NONNULL_BEGIN
  and
  <a href="https://www.mapbox.com/vector-tiles/mapbox-terrain/">Mapbox Terrain</a>
  layer references.
+ 
+ When adding a feature to an `MGLShapeSource`, use the same Foundation types
+ listed above for each attribute value. In addition to the Foundation types, you
+ may also set an attribute to an `NSColor` (macOS) or `UIColor` (iOS), which
+ will be converted into its
+ <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#types-color">CSS string representation</a>
+ when the feature is added to an `MGLShapeSource`. This can be convenient when
+ using the attribute to supply a value for a color-typed layout or paint
+ attribute via the `MGLInterpolationModeIdentity` interpolation mode.
 
  Note that while it is possible to change this value on feature
  instances obtained from `-[MGLMapView visibleFeaturesAtPoint:]` and related

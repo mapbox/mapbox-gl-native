@@ -1,5 +1,12 @@
 #import "NSExpression+MGLAdditions.h"
 
+#import "MGLTypes.h"
+#if TARGET_OS_IPHONE
+    #import "UIColor+MGLAdditions.h"
+#else
+    #import "NSColor+MGLAdditions.h"
+#endif
+
 @implementation NSExpression (MGLAdditions)
 
 - (std::vector<mbgl::Value>)mgl_aggregateMBGLValue {
@@ -56,6 +63,9 @@
             // We use long long here to avoid any truncation.
             return { (int64_t)number.longLongValue };
         }
+    } else if ([value isKindOfClass:[MGLColor class]]) {
+        auto hexString = [(MGLColor *)value mgl_color].stringify();
+        return { hexString };
     } else if (value && value != [NSNull null]) {
         [NSException raise:NSInvalidArgumentException
                     format:@"Can’t convert %s:%@ to mbgl::Value", [value objCType], value];
