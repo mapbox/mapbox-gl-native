@@ -2,7 +2,28 @@
 
 #import <string>
 
+#import "MGLTypes.h"
 #import "NSExpression+MGLAdditions.h"
+
+#define MGLAssertEqualValues(actual, expected, ...) \
+    XCTAssertTrue(actual.is<__typeof__(expected)>()); \
+    if (actual.is<__typeof__(expected)>()) { \
+        XCTAssertEqual(actual.get<__typeof__(expected)>(), expected, __VA_ARGS__); \
+    }
+
+#define MGLAssertEqualValuesWithAccuracy(actual, expected, accuracy, ...) \
+    XCTAssertTrue(actual.is<__typeof__(expected)>()); \
+    if (actual.is<__typeof__(expected)>()) { \
+        XCTAssertEqualWithAccuracy(actual.get<__typeof__(expected)>(), expected, accuracy, __VA_ARGS__); \
+    }
+
+#define MGLAssertConstantEqualsValue(constant, value, ...) \
+    MGLAssertEqualValues([NSExpression expressionForConstantValue:constant].mgl_constantMBGLValue, value, __VA_ARGS__);
+
+#define MGLAssertConstantEqualsValueWithAccuracy(constant, value, accuracy, ...) \
+    MGLAssertEqualValuesWithAccuracy([NSExpression expressionForConstantValue:constant].mgl_constantMBGLValue, value, accuracy, __VA_ARGS__);
+
+using namespace std::string_literals;
 
 @interface MGLExpressionTests : XCTestCase
 
@@ -23,212 +44,100 @@
     return predicate;
 }
 
-#pragma mark - String Tests
+#pragma mark - Valuation tests
 
-- (void)testExpressionConversionString
-{
-    NSComparisonPredicate *predicate = [self equalityComparisonPredicateWithRightConstantValue:@"bar"];
-    mbgl::Value convertedValue = predicate.rightExpression.mgl_constantMBGLValue;
-    XCTAssertTrue(convertedValue.is<std::string>());
-    XCTAssertEqualObjects(@(convertedValue.get<std::string>().c_str()), @"bar");
+- (void)testStringValuation {
+    MGLAssertConstantEqualsValue(@"bar", "bar"s, @"NSString should convert to std::string.");
+    MGLAssertConstantEqualsValue(@"🆔🆗🇦🇶", "🆔🆗🇦🇶"s, @"NSString with non-ASCII characters should convert losslessly to std::string.");
 }
 
-- (void)testExpressionConversionStringWithUnicode
-{
-    NSComparisonPredicate *predicate = [self equalityComparisonPredicateWithRightConstantValue:@"🆔🆗🇦🇶"];
-    mbgl::Value convertedValue = predicate.rightExpression.mgl_constantMBGLValue;
-    XCTAssertTrue(convertedValue.is<std::string>());
-    XCTAssertEqual(convertedValue.get<std::string>(), "🆔🆗🇦🇶");
+- (void)testColorValuation {
+    MGLAssertConstantEqualsValue([MGLColor redColor], "rgba(255,0,0,1)"s, @"MGLColor should convert to std::string containing CSS color string.");
 }
 
-#pragma mark - Boolean Tests
-
-- (void)testExpressionConversionBooleanTrue
-{
-    NSComparisonPredicate *predicate = [self equalityComparisonPredicateWithRightConstantValue:@YES];
-    mbgl::Value convertedValue = predicate.rightExpression.mgl_constantMBGLValue;
-    XCTAssertTrue(convertedValue.is<bool>());
-    XCTAssertEqual(convertedValue.get<bool>(), true);
+- (void)testBooleanValuation {
+    MGLAssertConstantEqualsValue(@NO, false, @"Boolean NSNumber should convert to bool.");
+    MGLAssertConstantEqualsValue(@YES, true, @"Boolean NSNumber should convert to bool.");
 }
 
-- (void)testExpressionConversionBooleanFalse
+- (void)testDoubleValuation
 {
-    NSComparisonPredicate *predicate = [self equalityComparisonPredicateWithRightConstantValue:@NO];
-    mbgl::Value convertedValue = predicate.rightExpression.mgl_constantMBGLValue;
-    XCTAssertTrue(convertedValue.is<bool>());
-    XCTAssertEqual(convertedValue.get<bool>(), false);
+    MGLAssertConstantEqualsValue(@DBL_MIN, DBL_MIN, @"Double NSNumber should convert to double.");
+    MGLAssertConstantEqualsValue(@DBL_MAX, DBL_MAX, @"Double NSNumber should convert to double.");
 }
 
-#pragma mark - Floating Point Tests
-
-- (void)testExpressionConversionDouble
-{
-    NSComparisonPredicate *predicate;
-    mbgl::Value convertedValue;
-
-    predicate = [self equalityComparisonPredicateWithRightConstantValue:[NSNumber numberWithDouble:DBL_MIN]];
-    convertedValue = predicate.rightExpression.mgl_constantMBGLValue;
-    XCTAssertTrue(convertedValue.is<double>());
-    XCTAssertEqual(convertedValue.get<double>(), DBL_MIN);
-
-    predicate = [self equalityComparisonPredicateWithRightConstantValue:[NSNumber numberWithDouble:DBL_MAX]];
-    convertedValue = predicate.rightExpression.mgl_constantMBGLValue;
-    XCTAssertTrue(convertedValue.is<double>());
-    XCTAssertEqual(convertedValue.get<double>(), DBL_MAX);
-}
-
-- (void)testExpressionConversionFloat
-{
+- (void)testFloatValuation {
     // Because we can't guarantee precision when using float, and because
     // we warn the user to this effect in -[NSExpression mgl_constantMBGLValue],
     // we just check that things are in the ballpark here with integer values
     // and some lower-precision checks.
-
-    NSComparisonPredicate *predicate;
-    mbgl::Value convertedValue;
-
-    predicate = [self equalityComparisonPredicateWithRightConstantValue:[NSNumber numberWithFloat:-1]];
-    convertedValue = predicate.rightExpression.mgl_constantMBGLValue;
-    XCTAssertTrue(convertedValue.is<double>());
-    XCTAssertEqual(convertedValue.get<double>(), -1);
-
-    predicate = [self equalityComparisonPredicateWithRightConstantValue:[NSNumber numberWithFloat:1]];
-    convertedValue = predicate.rightExpression.mgl_constantMBGLValue;
-    XCTAssertTrue(convertedValue.is<double>());
-    XCTAssertEqual(convertedValue.get<double>(), 1);
-
-    predicate = [self equalityComparisonPredicateWithRightConstantValue:[NSNumber numberWithFloat:-23.232342]];
-    convertedValue = predicate.rightExpression.mgl_constantMBGLValue;
-    XCTAssertTrue(convertedValue.is<double>());
-    XCTAssertEqualWithAccuracy(convertedValue.get<double>(), -23.232342, 0.000001);
-
-    predicate = [self equalityComparisonPredicateWithRightConstantValue:[NSNumber numberWithFloat:23.232342]];
-    convertedValue = predicate.rightExpression.mgl_constantMBGLValue;
-    XCTAssertTrue(convertedValue.is<double>());
-    XCTAssertEqualWithAccuracy(convertedValue.get<double>(), 23.232342, 0.000001);
+    
+    MGLAssertConstantEqualsValue(@-1.0f, -1.0, @"Float NSNumber should convert to double.");
+    MGLAssertConstantEqualsValue(@1.0f, 1.0, @"Float NSNumber should convert to double.");
+    MGLAssertConstantEqualsValueWithAccuracy(@-23.232342f, -23.232342, 0.000001, @"Float NSNumber should convert to double.");
+    MGLAssertConstantEqualsValueWithAccuracy(@23.232342f, 23.232342, 0.000001, @"Float NSNumber should convert to double.");
+    MGLAssertConstantEqualsValueWithAccuracy(@-FLT_MAX, static_cast<double>(-FLT_MAX), 0.000001, @"Float NSNumber should convert to double.");
+    MGLAssertConstantEqualsValueWithAccuracy(@FLT_MAX, static_cast<double>(FLT_MAX), 0.000001, @"Float NSNumber should convert to double.");
 }
 
-#pragma mark - Integer Tests
-
-- (void)testExpressionNegativeIntegers
-{
-    NSComparisonPredicate *predicate;
-    mbgl::Value convertedValue;
-
-    NSArray<NSNumber *> *minValues = @[
-        [NSNumber numberWithShort:    SHRT_MIN],
-        [NSNumber numberWithInt:      INT_MIN],
-        [NSNumber numberWithLong:     LONG_MIN],
-        [NSNumber numberWithLongLong: LLONG_MIN],
-        [NSNumber numberWithInteger:  NSIntegerMin]
-    ];
-
-    NSArray<NSNumber *> *maxValues = @[
-        [NSNumber numberWithShort:    SHRT_MAX],
-        [NSNumber numberWithInt:      INT_MAX],
-        [NSNumber numberWithLong:     LONG_MAX],
-        [NSNumber numberWithLongLong: LLONG_MAX],
-        [NSNumber numberWithInteger:  NSIntegerMax]
-    ];
-
+- (void)testIntegerValuation {
     // Negative integers should always come back as int64_t per mbgl::Value definition.
-    // We use the long long value because it can store the highest number on both 32-
-    // and 64-bit and won't overflow.
-
-    for (NSNumber *min in minValues)
-    {
-        predicate = [self equalityComparisonPredicateWithRightConstantValue:min];
-        convertedValue = predicate.rightExpression.mgl_constantMBGLValue;
-        XCTAssertTrue(convertedValue.is<int64_t>());
-        XCTAssertEqual(convertedValue.get<int64_t>(), min.longLongValue);
-    }
+    MGLAssertConstantEqualsValue(@SHRT_MIN, static_cast<int64_t>(SHRT_MIN), @"Negative short NSNumber should convert to int64_t.");
+    MGLAssertConstantEqualsValue(@INT_MIN, static_cast<int64_t>(INT_MIN), @"Negative int NSNumber should convert to int64_t.");
+    MGLAssertConstantEqualsValue(@LONG_MIN, static_cast<int64_t>(LONG_MIN), @"Negative long NSNumber should convert to int64_t.");
+    MGLAssertConstantEqualsValue(@LLONG_MIN, static_cast<int64_t>(LLONG_MIN), @"Negative long long NSNumber should convert to int64_t.");
+    MGLAssertConstantEqualsValue(@NSIntegerMin, static_cast<int64_t>(NSIntegerMin), @"Negative NSInteger NSNumber should convert to int64_t.");
 
     // Positive integers should always come back as uint64_t per mbgl::Value definition.
-    // We use the unsigned long long value because it can store the highest number on
-    // both 32- and 64-bit and won't overflow.
-
-    for (NSNumber *max in maxValues)
-    {
-        predicate = [self equalityComparisonPredicateWithRightConstantValue:max];
-        convertedValue = predicate.rightExpression.mgl_constantMBGLValue;
-        XCTAssertTrue(convertedValue.is<uint64_t>());
-        XCTAssertEqual(convertedValue.get<uint64_t>(), max.unsignedLongLongValue);
-    }
-
+    MGLAssertConstantEqualsValue(@SHRT_MAX, static_cast<uint64_t>(SHRT_MAX), @"Positive short NSNumber should convert to uint64_t.");
+    MGLAssertConstantEqualsValue(@INT_MAX, static_cast<uint64_t>(INT_MAX), @"Positive int NSNumber should convert to uint64_t.");
+    MGLAssertConstantEqualsValue(@LONG_MAX, static_cast<uint64_t>(LONG_MAX), @"Positive long NSNumber should convert to uint64_t.");
+    MGLAssertConstantEqualsValue(@LLONG_MAX, static_cast<uint64_t>(LLONG_MAX), @"Positive long long NSNumber should convert to uint64_t.");
+    MGLAssertConstantEqualsValue(@NSIntegerMax, static_cast<uint64_t>(NSIntegerMax), @"Positive NSInteger NSNumber should convert to uint64_t.");
 }
 
-- (void)testExpressionPositiveAndZeroIntegers
-{
-    NSComparisonPredicate *predicate;
-    mbgl::Value convertedValue;
-
-    NSArray<NSNumber *> *minValues = @[
-        [NSNumber numberWithUnsignedShort:    0],
-        [NSNumber numberWithUnsignedInt:      0],
-        [NSNumber numberWithUnsignedLong:     0],
-        [NSNumber numberWithUnsignedLongLong: 0],
-        [NSNumber numberWithUnsignedInteger:  0]
-    ];
-
-    NSArray<NSNumber *> *maxValues = @[
-        [NSNumber numberWithUnsignedShort:    USHRT_MAX],
-        [NSNumber numberWithUnsignedInt:      UINT_MAX],
-        [NSNumber numberWithUnsignedLong:     ULONG_MAX],
-        [NSNumber numberWithUnsignedLongLong: ULLONG_MAX],
-        [NSNumber numberWithUnsignedInteger:  NSUIntegerMax]
-    ];
-
+- (void)testUnsignedIntegerValuation {
     // Zero-value integers should always come back as uint64_t per mbgl::Value definition
     // (using the interpretation that zero is not negative). We use the unsigned long long
     // value just for parity with the positive integer test.
-
-    for (NSNumber *min in minValues)
-    {
-        predicate = [self equalityComparisonPredicateWithRightConstantValue:min];
-        convertedValue = predicate.rightExpression.mgl_constantMBGLValue;
-        XCTAssertTrue(convertedValue.is<uint64_t>());
-        XCTAssertEqual(convertedValue.get<uint64_t>(), min.unsignedLongLongValue);
-    }
+    MGLAssertConstantEqualsValue(@(static_cast<unsigned short>(0)), static_cast<uint64_t>(0), @"Unsigned short NSNumber should convert to uint64_t.");
+    MGLAssertConstantEqualsValue(@0u, static_cast<uint64_t>(0), @"Unsigned int NSNumber should convert to uint64_t.");
+    MGLAssertConstantEqualsValue(@0UL, static_cast<uint64_t>(0), @"Unsigned long NSNumber should convert to uint64_t.");
+    MGLAssertConstantEqualsValue(@0ULL, static_cast<uint64_t>(0), @"Unsigned long long NSNumber should convert to uint64_t.");
+    MGLAssertConstantEqualsValue(@(static_cast<NSUInteger>(0)), static_cast<uint64_t>(0), @"Unsigned NSUInteger NSNumber should convert to uint64_t.");
 
     // Positive integers should always come back as uint64_t per mbgl::Value definition.
     // We use the unsigned long long value because it can store the highest number on
     // both 32- and 64-bit and won't overflow.
-
-    for (NSNumber *max in maxValues)
-    {
-        predicate = [self equalityComparisonPredicateWithRightConstantValue:max];
-        convertedValue = predicate.rightExpression.mgl_constantMBGLValue;
-        XCTAssertTrue(convertedValue.is<uint64_t>());
-        XCTAssertEqual(convertedValue.get<uint64_t>(), max.unsignedLongLongValue);
-    }
+    MGLAssertConstantEqualsValue(@USHRT_MAX, static_cast<uint64_t>(USHRT_MAX), @"Unsigned short NSNumber should convert to uint64_t.");
+    MGLAssertConstantEqualsValue(@UINT_MAX, static_cast<uint64_t>(UINT_MAX), @"Unsigned int NSNumber should convert to uint64_t.");
+    MGLAssertConstantEqualsValue(@ULONG_MAX, static_cast<uint64_t>(ULONG_MAX), @"Unsigned long NSNumber should convert to uint64_t.");
+    MGLAssertConstantEqualsValue(@ULLONG_MAX, static_cast<uint64_t>(ULLONG_MAX), @"Unsigned long long NSNumber should convert to uint64_t.");
+    MGLAssertConstantEqualsValue(@NSUIntegerMax, static_cast<uint64_t>(NSUIntegerMax), @"Unsigned NSUInteger NSNumber should convert to uint64_t.");
 }
 
-#pragma mark - Null Tests
-
-- (void)testExpressionConversionNull
-{
-    NSComparisonPredicate *predicate = [self equalityComparisonPredicateWithRightConstantValue:[NSNull null]];
-    mbgl::Value convertedValue = predicate.rightExpression.mgl_constantMBGLValue;
-    XCTAssertTrue(convertedValue.is<mbgl::NullValue>());
+- (void)testNullValuation {
+    mbgl::NullValue nullValue;
+    MGLAssertConstantEqualsValue([NSNull null], nullValue, @"NSNull should convert to mbgl::NullValue.");
 }
 
 #pragma mark - Feature type tests
 
 - (void)testFeatureType {
-    XCTAssertEqual([NSExpression expressionWithFormat:@"'Point'"].mgl_featureType, mbgl::FeatureType::Point);
-    XCTAssertEqual([NSExpression expressionWithFormat:@"'LineString'"].mgl_featureType, mbgl::FeatureType::LineString);
-    XCTAssertEqual([NSExpression expressionWithFormat:@"'Polygon'"].mgl_featureType, mbgl::FeatureType::Polygon);
-    XCTAssertEqual([NSExpression expressionWithFormat:@"'Unknown'"].mgl_featureType, mbgl::FeatureType::Unknown);
-    XCTAssertEqual([NSExpression expressionWithFormat:@"''"].mgl_featureType, mbgl::FeatureType::Unknown);
+    XCTAssertEqual([NSExpression expressionForConstantValue:@"Point"].mgl_featureType, mbgl::FeatureType::Point);
+    XCTAssertEqual([NSExpression expressionForConstantValue:@"LineString"].mgl_featureType, mbgl::FeatureType::LineString);
+    XCTAssertEqual([NSExpression expressionForConstantValue:@"Polygon"].mgl_featureType, mbgl::FeatureType::Polygon);
+    XCTAssertEqual([NSExpression expressionForConstantValue:@"Unknown"].mgl_featureType, mbgl::FeatureType::Unknown);
+    XCTAssertEqual([NSExpression expressionForConstantValue:@""].mgl_featureType, mbgl::FeatureType::Unknown);
     
-    XCTAssertEqual([NSExpression expressionWithFormat:@"1"].mgl_featureType, mbgl::FeatureType::Point);
-    XCTAssertEqual([NSExpression expressionWithFormat:@"2"].mgl_featureType, mbgl::FeatureType::LineString);
-    XCTAssertEqual([NSExpression expressionWithFormat:@"3"].mgl_featureType, mbgl::FeatureType::Polygon);
-    XCTAssertEqual([NSExpression expressionWithFormat:@"0"].mgl_featureType, mbgl::FeatureType::Unknown);
-    XCTAssertEqual([NSExpression expressionWithFormat:@"-1"].mgl_featureType, mbgl::FeatureType::Unknown);
-    XCTAssertEqual([NSExpression expressionWithFormat:@"4"].mgl_featureType, mbgl::FeatureType::Unknown);
+    XCTAssertEqual([NSExpression expressionForConstantValue:@1].mgl_featureType, mbgl::FeatureType::Point);
+    XCTAssertEqual([NSExpression expressionForConstantValue:@2].mgl_featureType, mbgl::FeatureType::LineString);
+    XCTAssertEqual([NSExpression expressionForConstantValue:@3].mgl_featureType, mbgl::FeatureType::Polygon);
+    XCTAssertEqual([NSExpression expressionForConstantValue:@0].mgl_featureType, mbgl::FeatureType::Unknown);
+    XCTAssertEqual([NSExpression expressionForConstantValue:@-1].mgl_featureType, mbgl::FeatureType::Unknown);
+    XCTAssertEqual([NSExpression expressionForConstantValue:@4].mgl_featureType, mbgl::FeatureType::Unknown);
     
-    XCTAssertEqual([NSExpression expressionWithFormat:@"nil"].mgl_featureType, mbgl::FeatureType::Unknown);
+    XCTAssertEqual([NSExpression expressionForConstantValue:nil].mgl_featureType, mbgl::FeatureType::Unknown);
 }
 
 @end
