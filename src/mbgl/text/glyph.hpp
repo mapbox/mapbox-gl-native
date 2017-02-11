@@ -3,6 +3,7 @@
 #include <mbgl/text/glyph_range.hpp>
 #include <mbgl/util/rect.hpp>
 #include <mbgl/util/traits.hpp>
+#include <mbgl/util/image.hpp>
 
 #include <cstdint>
 #include <vector>
@@ -89,7 +90,7 @@ public:
     uint32_t id = 0;
 
     // A signed distance field of the glyph with a border (see above).
-    std::string bitmap;
+    AlphaImage bitmap;
 
     // Glyph metrics
     GlyphMetrics metrics;

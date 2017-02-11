@@ -231,52 +231,32 @@ optional<SpriteAtlasPosition> SpriteAtlas::getPosition(const std::string& name,
     };
 }
 
-void copyBitmap(const uint32_t *src, const uint32_t srcStride, const uint32_t srcX, const uint32_t srcY,
-        uint32_t *const dst, const uint32_t dstStride, const uint32_t dstX, const uint32_t dstY, int dstSize,
-        const int width, const int height, const SpritePatternMode mode) {
-
-    int srcI = srcY * srcStride + srcX;
-    int dstI = dstY * dstStride + dstX;
-    int x, y;
-
-    if (mode == SpritePatternMode::Repeating) {
-        // add 1 pixel wrapped padding on each side of the image
-        dstI -= dstStride;
-        for (y = -1; y <= height; y++, srcI = ((y + height) % height + srcY) * srcStride + srcX, dstI += dstStride) {
-            for (x = -1; x <= width; x++) {
-                const int dstIndex = (dstI + x + dstSize) % dstSize;
-                dst[dstIndex] = src[srcI + ((x + width) % width)];
-            }
-        }
-
-    } else {
-        for (y = 0; y < height; y++, srcI += srcStride, dstI += dstStride) {
-            for (x = 0; x < width; x++) {
-                const int dstIndex = (dstI + x + dstSize) % dstSize;
-                dst[dstIndex] = src[srcI + x];
-            }
-        }
-    }
-}
-
 void SpriteAtlas::copy(const Holder& holder, const SpritePatternMode mode) {
     if (!image.valid()) {
         image = PremultipliedImage({ static_cast<uint32_t>(std::ceil(size.width * pixelRatio)),
                                      static_cast<uint32_t>(std::ceil(size.height * pixelRatio)) });
-        std::fill(image.data.get(), image.data.get() + image.bytes(), 0);
+        image.fill(0);
     }
 
-    const uint32_t* srcData =
-        reinterpret_cast<const uint32_t*>(holder.spriteImage->image.data.get());
-    if (!srcData) return;
-    uint32_t* const dstData = reinterpret_cast<uint32_t*>(image.data.get());
+    if (!holder.spriteImage->image.valid()) {
+        return;
+    }
 
-    const int padding = 1;
+    const uint32_t padding = 1;
+    const uint32_t x = (holder.pos.x + padding) * pixelRatio;
+    const uint32_t y = (holder.pos.y + padding) * pixelRatio;
+    const uint32_t w = holder.spriteImage->image.size.width;
+    const uint32_t h = holder.spriteImage->image.size.height;
 
-    copyBitmap(srcData, holder.spriteImage->image.size.width, 0, 0, dstData, image.size.width,
-               (holder.pos.x + padding) * pixelRatio, (holder.pos.y + padding) * pixelRatio,
-               image.size.width * image.size.height, holder.spriteImage->image.size.width,
-               holder.spriteImage->image.size.height, mode);
+    PremultipliedImage::copy(holder.spriteImage->image, image, { 0, 0 }, { x, y }, { w, h });
+
+    if (mode == SpritePatternMode::Repeating) {
+        // Add 1 pixel wrapped padding on each side of the image.
+        PremultipliedImage::copy(holder.spriteImage->image, image, { 0, h - 1 }, { x, y - 1 }, { w, 1 }); // T
+        PremultipliedImage::copy(holder.spriteImage->image, image, { 0,     0 }, { x, y + h }, { w, 1 }); // B
+        PremultipliedImage::copy(holder.spriteImage->image, image, { w - 1, 0 }, { x - 1, y }, { 1, h }); // L
+        PremultipliedImage::copy(holder.spriteImage->image, image, { 0,     0 }, { x + w, y }, { 1, h }); // R
+    }
 
     dirty = true;
 }

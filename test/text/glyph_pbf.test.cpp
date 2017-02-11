@@ -44,15 +44,17 @@ TEST(GlyphPBF, Parsing) {
     glyphAtlasObserver.glyphsLoaded = [&](const FontStack&, const GlyphRange&) {
         loop.stop();
 
-        auto sdfs = glyphAtlas.getGlyphSet(fontStack)->getSDFs();
+        const auto& sdfs = glyphAtlas.getGlyphSet(fontStack)->getSDFs();
 
         // The fake glyphs don't contain a glyph that has the ID 0; it only contains glyphs with
         // undefined IDs, but the parser should remove them.
 
         EXPECT_TRUE(sdfs.size() == 1);
         EXPECT_TRUE(sdfs.find(69) != sdfs.end());
-        auto& sdf = sdfs[69];
-        EXPECT_EQ("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"s, sdf.bitmap);
+        auto& sdf = sdfs.at(69);
+        AlphaImage expected({7, 7});
+        expected.fill('x');
+        EXPECT_EQ(expected, sdf.bitmap);
         EXPECT_EQ(1u, sdf.metrics.width);
         EXPECT_EQ(1u, sdf.metrics.height);
         EXPECT_EQ(20, sdf.metrics.left);

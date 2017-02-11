@@ -1,6 +1,7 @@
 #pragma once
 
 #include <mbgl/util/noncopyable.hpp>
+#include <mbgl/util/geometry.hpp>
 #include <mbgl/util/size.hpp>
 
 #include <string>
@@ -24,6 +25,15 @@ public:
         : size(std::move(size_)),
           data(std::make_unique<uint8_t[]>(bytes())) {}
 
+    Image(Size size_, const uint8_t* srcData, std::size_t srcLength)
+        : size(std::move(size_)) {
+        if (srcLength != bytes()) {
+            throw std::invalid_argument("mismatched image size");
+        }
+        data = std::make_unique<uint8_t[]>(bytes());
+        std::copy(srcData, srcData + srcLength, data.get());
+    }
+
     Image(Size size_, std::unique_ptr<uint8_t[]> data_)
         : size(std::move(size_)),
           data(std::move(data_)) {}
@@ -38,10 +48,13 @@ public:
         return *this;
     }
 
-    bool operator==(const Image& rhs) const {
-        return size == rhs.size &&
-               std::equal(data.get(), data.get() + bytes(), rhs.data.get(),
-                          rhs.data.get() + rhs.bytes());
+    friend bool operator==(const Image& lhs, const Image& rhs) {
+        return std::equal(lhs.data.get(), lhs.data.get() + lhs.bytes(),
+                          rhs.data.get(), rhs.data.get() + rhs.bytes());
+    }
+
+    friend bool operator!=(const Image& lhs, const Image& rhs) {
+        return !(lhs == rhs);
     }
 
     bool valid() const {
@@ -57,6 +70,50 @@ public:
 
     size_t stride() const { return channels * size.width; }
     size_t bytes() const { return stride() * size.height; }
+
+    void fill(uint8_t value) {
+        std::fill(data.get(), data.get() + bytes(), value);
+    }
+
+    // Copy image data within `rect` from `src` to the rectangle of the same size at `pt`
+    // in `dst`. If the specified bounds exceed the bounds of the source or destination,
+    // throw `std::out_of_range`. Must not be used to move data within a single Image.
+    static void copy(const Image& srcImg, Image& dstImg, const Point<uint32_t>& srcPt, const Point<uint32_t>& dstPt, const Size& size) {
+        if (!srcImg.valid()) {
+            throw std::invalid_argument("invalid source for image copy");
+        }
+
+        if (!dstImg.valid()) {
+            throw std::invalid_argument("invalid destination for image copy");
+        }
+
+        if (size.width > srcImg.size.width ||
+            size.height > srcImg.size.height ||
+            srcPt.x > srcImg.size.width - size.width ||
+            srcPt.y > srcImg.size.height - size.height) {
+            throw std::out_of_range("out of range source coordinates for image copy");
+        }
+
+        if (size.width > dstImg.size.width ||
+            size.height > dstImg.size.height ||
+            dstPt.x > dstImg.size.width - size.width ||
+            dstPt.y > dstImg.size.height - size.height) {
+            throw std::out_of_range("out of range destination coordinates for image copy");
+        }
+
+        const uint8_t* srcData = srcImg.data.get();
+              uint8_t* dstData = dstImg.data.get();
+
+        assert(srcData != dstData);
+
+        for (uint32_t y = 0; y < size.height; y++) {
+            const std::size_t srcOffset = (srcPt.y + y) * srcImg.stride() + srcPt.x * channels;
+            const std::size_t dstOffset = (dstPt.y + y) * dstImg.stride() + dstPt.x * channels;
+            std::copy(srcData + srcOffset,
+                      srcData + srcOffset + size.width * channels,
+                      dstData + dstOffset);
+        }
+    }
 
     Size size;
     static constexpr size_t channels = Mode == ImageAlphaMode::Exclusive ? 1 : 4;
