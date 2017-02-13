@@ -4,16 +4,17 @@
 
 #import "NSValue+MGLStyleAttributeAdditions.h"
 #import "MGLTypes.h"
+
 #import "MGLConversionValue.h"
 #include "darwin_conversion.hpp"
+#include <mbgl/style/conversion/data_driven_property_value.hpp>
+#include <mbgl/style/conversion.hpp>
 
 #import <mbgl/util/enum.hpp>
 
 #include <mbgl/style/data_driven_property_value.hpp>
 
 #include <mbgl/util/interpolate.hpp>
-
-#include <mbgl/style/conversion.hpp>
 
 #if TARGET_OS_IPHONE
     #import "UIColor+MGLAdditions.h"
