@@ -204,7 +204,7 @@ private: // Private utilities for converting from mgl to mbgl values
         // interpolationBase => base
         if (styleFunction.interpolationBase) {
             // TODO: does this direct cast work?
-            rawFunction[@"base"] = (NSNumber *) styleFunction.interpolationBase;
+            rawFunction[@"base"] = @(styleFunction.interpolationBase);
         }
         
         // stops

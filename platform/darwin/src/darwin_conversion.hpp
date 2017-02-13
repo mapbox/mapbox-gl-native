@@ -5,7 +5,7 @@
 #include <mbgl/util/feature.hpp>
 #include <mbgl/util/optional.hpp>
 
-#include "MGLConversionValue.h"
+#import "MGLConversionValue.h"
 
 
 namespace mbgl {
@@ -25,14 +25,14 @@ inline bool isObject(const MGLConversionValue& value) {
 }
 
 inline std::size_t arrayLength(const MGLConversionValue& value) {
-    return value.getLength();;
+    return value.getLength();
 }
 
-inline mbgl::android::Value arrayMember(const MGLConversionValue& value, std::size_t i) {
+inline MGLConversionValue arrayMember(const MGLConversionValue& value, std::size_t i) {
     return value.get(i);
 }
 
-inline optional<mbgl::android::Value> objectMember(const MGLConversionValue& value, const char* key) {
+inline optional<MGLConversionValue> objectMember(const MGLConversionValue& value, const char* key) {
     MGLConversionValue member = value.get(key);
 
     if (!member.isNull()) {
@@ -59,7 +59,7 @@ inline optional<bool> toBool(const MGLConversionValue& value) {
 
 inline optional<float> toNumber(const MGLConversionValue& value) {
     if (value.isNumber()) {
-        return value.toNumber();
+        return static_cast<float> value.toNumber();
     } else {
         return {};
     }
@@ -73,7 +73,7 @@ inline optional<std::string> toString(const MGLConversionValue& value) {
     }
 }
 
-inline optional<Value> toValue(const MGLConversionValue& value) {
+inline optional<mbgl::Value> toValue(const MGLConversionValue& value) {
     if (value.isNull()) {
         return {};
     } else if (value.isBool()) {
@@ -82,7 +82,7 @@ inline optional<Value> toValue(const MGLConversionValue& value) {
         return { value.toString() };
     } else if (value.isNumber()) {
         // Need to cast to a double here as the float is otherwise considered a bool...
-       return { (double) value.toNumber() };
+       return { static_cast<double> value.toNumber() };
     } else {
         return {};
     }
