@@ -133,12 +133,6 @@ TEST(SpriteAtlas, Updates) {
     atlas.setSprite("one", newSprite);
     ASSERT_EQ(newSprite, atlas.getSprite("one"));
 
-    // Atlas texture hasn't changed yet.
-    test::checkImage("test/fixtures/sprite_atlas/updates_before", atlas.getAtlasImage());
-
-    atlas.updateDirty();
-
-    // Now the atlas texture has changed.
     test::checkImage("test/fixtures/sprite_atlas/updates_after", atlas.getAtlasImage());
 }
 
@@ -185,6 +179,25 @@ TEST(SpriteAtlas, AddRemove) {
 
     // Overwriting
     atlas.setSprite("three", sprite1);
+}
+
+TEST(SpriteAtlas, RemoveReleasesBinPackRect) {
+    FixtureLog log;
+
+    SpriteAtlas atlas({ 36, 36 }, 1);
+
+    const auto big = std::make_shared<SpriteImage>(PremultipliedImage({ 32, 32 }), 1);
+
+    atlas.setSprite("big", big);
+    EXPECT_TRUE(atlas.getImage("big", SpritePatternMode::Single));
+
+    atlas.removeSprite("big");
+
+    atlas.setSprite("big", big);
+    EXPECT_TRUE(atlas.getImage("big", SpritePatternMode::Single));
+
+    EXPECT_EQ(big, atlas.getSprite("big"));
+    EXPECT_TRUE(log.empty());
 }
 
 TEST(SpriteAtlas, OtherPixelRatio) {

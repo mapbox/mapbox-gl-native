@@ -924,8 +924,6 @@ void Map::addImage(const std::string& name, std::unique_ptr<const SpriteImage> i
 
     impl->styleMutated = true;
     impl->style->spriteAtlas->setSprite(name, std::move(image));
-    impl->style->spriteAtlas->updateDirty();
-
     impl->onUpdate(Update::Repaint);
 }
 
@@ -936,8 +934,6 @@ void Map::removeImage(const std::string& name) {
 
     impl->styleMutated = true;
     impl->style->spriteAtlas->removeSprite(name);
-    impl->style->spriteAtlas->updateDirty();
-
     impl->onUpdate(Update::Repaint);
 }
 

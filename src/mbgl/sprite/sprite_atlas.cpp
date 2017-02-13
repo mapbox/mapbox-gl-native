@@ -102,56 +102,72 @@ void SpriteAtlas::dumpDebugLogs() const {
 }
 
 void SpriteAtlas::setSprites(const Sprites& newSprites) {
-    std::lock_guard<std::mutex> lock(mutex);
+    std::lock_guard<std::recursive_mutex> lock(mutex);
     for (const auto& pair : newSprites) {
         _setSprite(pair.first, pair.second);
     }
 }
 
 void SpriteAtlas::setSprite(const std::string& name, std::shared_ptr<const SpriteImage> sprite) {
-    std::lock_guard<std::mutex> lock(mutex);
+    std::lock_guard<std::recursive_mutex> lock(mutex);
     _setSprite(name, sprite);
 }
 
 void SpriteAtlas::removeSprite(const std::string& name) {
-    std::lock_guard<std::mutex> lock(mutex);
-    _setSprite(name);
+    std::lock_guard<std::recursive_mutex> lock(mutex);
+
+    auto it = entries.find(name);
+    if (it == entries.end()) {
+        return;
+    }
+
+    Entry& entry = it->second;
+
+    if (entry.iconRect) {
+        bin.release(*entry.iconRect);
+    }
+
+    if (entry.patternRect) {
+        bin.release(*entry.patternRect);
+    }
+
+    entries.erase(it);
 }
 
 void SpriteAtlas::_setSprite(const std::string& name,
                              const std::shared_ptr<const SpriteImage>& sprite) {
-    if (sprite) {
-        auto it = sprites.find(name);
-        if (it != sprites.end()) {
-            // There is already a sprite with that name in our store.
-            if (it->second->image.size != sprite->image.size) {
-                Log::Warning(Event::Sprite, "Can't change sprite dimensions for '%s'", name.c_str());
-                return;
-            }
-            it->second = sprite;
-        } else {
-            sprites.emplace(name, sprite);
-        }
+    auto it = entries.find(name);
+    if (it == entries.end()) {
+        entries.emplace(name, Entry { sprite, {}, {} });
+        return;
+    }
 
-        // Always add/replace the value in the dirty list.
-        auto dirty_it = dirtySprites.find(name);
-        if (dirty_it != dirtySprites.end()) {
-            dirty_it->second = sprite;
-        } else {
-            dirtySprites.emplace(name, sprite);
-        }
-    } else if (sprites.erase(name) > 0) {
-        dirtySprites.emplace(name, nullptr);
+    Entry& entry = it->second;
+
+    // There is already a sprite with that name in our store.
+    if (entry.spriteImage->image.size != sprite->image.size) {
+        Log::Warning(Event::Sprite, "Can't change sprite dimensions for '%s'", name.c_str());
+        return;
+    }
+
+    entry.spriteImage = sprite;
+
+    if (entry.iconRect) {
+        copy(entry.spriteImage->image, *entry.iconRect, SpritePatternMode::Single);
+    }
+
+    if (entry.patternRect) {
+        copy(entry.spriteImage->image, *entry.patternRect, SpritePatternMode::Repeating);
     }
 }
 
 std::shared_ptr<const SpriteImage> SpriteAtlas::getSprite(const std::string& name) {
-    std::lock_guard<std::mutex> lock(mutex);
-    const auto it = sprites.find(name);
-    if (it != sprites.end()) {
-        return it->second;
+    std::lock_guard<std::recursive_mutex> lock(mutex);
+    const auto it = entries.find(name);
+    if (it != entries.end()) {
+        return it->second.spriteImage;
     } else {
-        if (!sprites.empty()) {
+        if (!entries.empty()) {
             Log::Info(Event::Sprite, "Can't find sprite named '%s'", name.c_str());
         }
         return nullptr;
@@ -181,19 +197,35 @@ Rect<uint16_t> SpriteAtlas::allocateImage(const SpriteImage& spriteImage) {
 
 optional<SpriteAtlasElement> SpriteAtlas::getImage(const std::string& name,
                                                    const SpritePatternMode mode) {
-    std::lock_guard<std::recursive_mutex> lock(mtx);
+    std::lock_guard<std::recursive_mutex> lock(mutex);
 
-    auto it = images.find({ name, mode });
-    if (it != images.end()) {
-        return it->second;
-    }
-
-    auto sprite = getSprite(name);
-    if (!sprite) {
+    auto it = entries.find(name);
+    if (it == entries.end()) {
+        if (!entries.empty()) {
+            Log::Info(Event::Sprite, "Can't find sprite named '%s'", name.c_str());
+        }
         return {};
     }
 
-    Rect<uint16_t> rect = allocateImage(*sprite);
+    Entry& entry = it->second;
+
+    if (mode == SpritePatternMode::Single && entry.iconRect) {
+        return SpriteAtlasElement {
+            *entry.iconRect,
+            entry.spriteImage,
+            entry.spriteImage->pixelRatio / pixelRatio
+        };
+    }
+
+    if (mode == SpritePatternMode::Repeating && entry.patternRect) {
+        return SpriteAtlasElement {
+            *entry.patternRect,
+            entry.spriteImage,
+            entry.spriteImage->pixelRatio / pixelRatio
+        };
+    }
+
+    Rect<uint16_t> rect = allocateImage(*entry.spriteImage);
     if (rect.w == 0) {
         if (debug::spriteWarnings) {
             Log::Warning(Event::Sprite, "sprite atlas bitmap overflow");
@@ -201,17 +233,24 @@ optional<SpriteAtlasElement> SpriteAtlas::getImage(const std::string& name,
         return {};
     }
 
-    SpriteAtlasElement element { rect, sprite, sprite->pixelRatio / pixelRatio };
+    copy(entry.spriteImage->image, rect, mode);
 
-    images.emplace(Key{ name, mode }, element);
-    copy(sprite->image, rect, mode);
+    if (mode == SpritePatternMode::Single) {
+        entry.iconRect = rect;
+    } else {
+        entry.patternRect = rect;
+    }
 
-    return element;
+    return SpriteAtlasElement {
+        rect,
+        entry.spriteImage,
+        entry.spriteImage->pixelRatio / pixelRatio
+    };
 }
 
 optional<SpriteAtlasPosition> SpriteAtlas::getPosition(const std::string& name,
                                                        const SpritePatternMode mode) {
-    std::lock_guard<std::recursive_mutex> lock(mtx);
+    std::lock_guard<std::recursive_mutex> lock(mutex);
 
     auto img = getImage(name, mode);
     if (!img) {
@@ -261,34 +300,6 @@ void SpriteAtlas::copy(const PremultipliedImage& src, Rect<uint16_t> pos, const 
     }
 
     dirty = true;
-}
-
-void SpriteAtlas::updateDirty() {
-    std::lock_guard<std::recursive_mutex> lock(mtx);
-
-    auto imageIterator = images.begin();
-    auto spriteIterator = dirtySprites.begin();
-    while (imageIterator != images.end() && spriteIterator != dirtySprites.end()) {
-        if (imageIterator->first.first < spriteIterator->first) {
-            ++imageIterator;
-        } else if (spriteIterator->first < imageIterator->first.first) {
-            ++spriteIterator;
-        } else {
-            // The two names match;
-            auto& element = imageIterator->second;
-            element.spriteImage = spriteIterator->second;
-            if (element.spriteImage != nullptr) {
-                copy(element.spriteImage->image, element.pos, imageIterator->first.second);
-                ++imageIterator;
-            } else {
-                images.erase(imageIterator++);
-            }
-            // Don't advance the spriteIterator because there might be another sprite with the same
-            // name, but a different wrap value.
-        }
-    }
-
-    dirtySprites.clear();
 }
 
 void SpriteAtlas::upload(gl::Context& context, gl::TextureUnit unit) {

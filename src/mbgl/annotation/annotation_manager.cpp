@@ -222,12 +222,10 @@ void AnnotationManager::removeTile(AnnotationTile& tile) {
 
 void AnnotationManager::addIcon(const std::string& name, std::shared_ptr<const SpriteImage> sprite) {
     spriteAtlas.setSprite(name, sprite);
-    spriteAtlas.updateDirty();
 }
 
 void AnnotationManager::removeIcon(const std::string& name) {
     spriteAtlas.removeSprite(name);
-    spriteAtlas.updateDirty();
 }
 
 double AnnotationManager::getTopOffsetPixelsForIcon(const std::string& name) {
