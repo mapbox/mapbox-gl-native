@@ -238,7 +238,7 @@ private: // Private utilities for converting from mgl to mbgl values
                     MGLStyleConstantValue<ObjCType> *outputValue = stopValue[valueKey];
                     NSCAssert([outputValue isKindOfClass:[MGLStyleConstantValue<ObjCType> class]], @"Stop outputs should be MGLStyleConstantValues");
                     NSArray *rawStop = [NSArray arrayWithObjects:stopKey, [outputValue rawValue]];
-                    [stops addObject:rawStop]; // TODO weird: why doesn't stops.addObject(rawStop) work?
+                    [stops addObject:rawStop];
                 }
             }];
             
