@@ -10,6 +10,7 @@
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/storage/network_status.hpp>
 
+#include "file_source.hpp"
 #include "annotation/marker.hpp"
 #include "annotation/polygon.hpp"
 #include "annotation/polyline.hpp"
@@ -37,7 +38,7 @@ public:
 
     static void registerNative(jni::JNIEnv&);
 
-    NativeMapView(jni::JNIEnv&, jni::Object<NativeMapView>, jni::String, jni::String, jni::jfloat, jni::jint, jni::jlong);
+    NativeMapView(jni::JNIEnv&, jni::Object<NativeMapView>, jni::Object<FileSource>, jni::jfloat, jni::jint, jni::jlong);
 
     virtual ~NativeMapView();
 
@@ -225,6 +226,8 @@ private:
     JavaVM *vm = nullptr;
     jni::UniqueWeakObject<NativeMapView> javaPeer;
 
+    mbgl::DefaultFileSource& fileSource;
+
     std::string styleUrl;
     std::string apiKey;
 
@@ -245,7 +248,6 @@ private:
 
     // Ensure these are initialised last
     std::unique_ptr<mbgl::util::RunLoop> runLoop;
-    std::unique_ptr<mbgl::DefaultFileSource> fileSource;
     mbgl::ThreadPool threadPool;
     std::unique_ptr<mbgl::Map> map;
     mbgl::EdgeInsets insets;

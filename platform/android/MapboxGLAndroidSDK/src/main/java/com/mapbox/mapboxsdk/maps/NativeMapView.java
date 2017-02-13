@@ -13,9 +13,9 @@ import android.util.DisplayMetrics;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.Polygon;
 import com.mapbox.mapboxsdk.annotations.Polyline;
+import com.mapbox.mapboxsdk.fs.FileSource;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.ProjectedMeters;
-import com.mapbox.mapboxsdk.offline.OfflineManager;
 import com.mapbox.mapboxsdk.style.layers.CannotAddLayerException;
 import com.mapbox.mapboxsdk.style.layers.Layer;
 import com.mapbox.mapboxsdk.style.layers.NoSuchLayerException;
@@ -41,6 +41,9 @@ final class NativeMapView {
   // Used for callbacks
   private MapView mapView;
 
+  //Hold a reference to prevent it from being GC'd as long as it's used on the native side
+  private final FileSource fileSource;
+
   // Device density
   private final float pixelRatio;
 
@@ -62,14 +65,13 @@ final class NativeMapView {
   // Constructors
   //
 
-  NativeMapView(MapView mapView) {
+  NativeMapView(MapView mapView, FileSource fileSource) {
     this.mapView = mapView;
+    this.fileSource = fileSource;
 
     Context context = mapView.getContext();
-    String cachePath = OfflineManager.getDatabasePath(context);
 
-    pixelRatio = context.getResources().getDisplayMetrics().density;
-    String apkPath = context.getPackageCodePath();
+    this.pixelRatio = context.getResources().getDisplayMetrics().density;
 
     int availableProcessors = Runtime.getRuntime().availableProcessors();
 
@@ -90,14 +92,14 @@ final class NativeMapView {
       throw new IllegalArgumentException("totalMemory cannot be negative.");
     }
 
-    initialize(this, cachePath, apkPath, pixelRatio, availableProcessors, totalMemory);
+    initialize(this, fileSource, pixelRatio, availableProcessors, totalMemory);
   }
 
   //
   // Methods
   //
 
-  private native void initialize(NativeMapView nativeMapView, String cachePath, String apkPath, float pixelRatio,
+  private native void initialize(NativeMapView nativeMapView, FileSource fileSource, float pixelRatio,
                                  int availableProcessors, long totalMemory);
 
   native void destroy();

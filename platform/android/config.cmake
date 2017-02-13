@@ -129,6 +129,10 @@ macro(mbgl_platform_core)
         platform/android/src/style/functions/interval_stops.cpp
         platform/android/src/style/functions/interval_stops.hpp
 
+        # FileSource holder
+        platform/android/src/file_source.cpp
+        platform/android/src/file_source.hpp
+
         # Connectivity
         platform/android/src/connectivity_listener.cpp
         platform/android/src/connectivity_listener.hpp

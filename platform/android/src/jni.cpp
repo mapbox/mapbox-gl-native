@@ -9,6 +9,7 @@
 #include <sys/system_properties.h>
 
 #include "jni.hpp"
+#include "file_source.hpp"
 #include "java_types.hpp"
 #include "native_map_view.hpp"
 #include "bitmap.hpp"
@@ -706,8 +707,9 @@ void registerNatives(JavaVM *vm) {
 
     jni::JNIEnv& env = jni::GetEnv(*vm, jni::jni_version_1_6);
 
-    //For the DefaultFileSource
+    // For the DefaultFileSource
     static mbgl::util::RunLoop mainRunLoop;
+    FileSource::registerNative(env);
 
     //Basic types
     java::registerNatives(env);

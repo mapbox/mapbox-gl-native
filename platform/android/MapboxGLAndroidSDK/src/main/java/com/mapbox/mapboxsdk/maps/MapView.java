@@ -36,6 +36,7 @@ import com.mapbox.mapboxsdk.annotations.MarkerViewManager;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.constants.Style;
+import com.mapbox.mapboxsdk.fs.FileSource;
 import com.mapbox.mapboxsdk.maps.widgets.CompassView;
 import com.mapbox.mapboxsdk.maps.widgets.MyLocationView;
 import com.mapbox.mapboxsdk.maps.widgets.MyLocationViewSettings;
@@ -137,6 +138,9 @@ public class MapView extends FrameLayout {
     attrView = (ImageView) view.findViewById(R.id.attributionView);
     logoView = view.findViewById(R.id.logoView);
 
+    // Get a file source reference on the main thread
+    final FileSource fileSource = FileSource.getInstance(context);
+
     glSurfaceView = (GLSurfaceView) findViewById(R.id.surfaceView);
     glSurfaceView.setEGLConfigChooser(8, 8, 8, 0 /** TODO: What alpha value do we need here?? */, 16, 8);
     glSurfaceView.setEGLContextClientVersion(2);
@@ -148,7 +152,7 @@ public class MapView extends FrameLayout {
         glSurfaceView.setRenderMode(RENDERMODE_WHEN_DIRTY);
 
         // Create native Map object
-        nativeMapView = new NativeMapView(MapView.this);
+        nativeMapView = new NativeMapView(MapView.this, fileSource);
         nativeMapView.setAccessToken(Mapbox.getAccessToken());
         nativeMapView.setReachability(isConnected());
 

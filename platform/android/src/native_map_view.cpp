@@ -39,9 +39,10 @@ namespace android {
 
 using DebugOptions = mbgl::MapDebugOptions;
 
-NativeMapView::NativeMapView(jni::JNIEnv& _env, jni::Object<NativeMapView> _obj, jni::String _cachePath, jni::String _apkPath,
+NativeMapView::NativeMapView(jni::JNIEnv& _env, jni::Object<NativeMapView> _obj, jni::Object<FileSource> jFileSource,
                              jni::jfloat _pixelRatio, jni::jint _availableProcessors, jni::jlong _totalMemory) :
     javaPeer(_obj.NewWeakGlobalRef(_env)),
+    fileSource(mbgl::android::FileSource::getDefaultFileSource(_env, jFileSource)),
     pixelRatio(_pixelRatio),
     availableProcessors(_availableProcessors),
     totalMemory(_totalMemory),
@@ -61,15 +62,10 @@ NativeMapView::NativeMapView(jni::JNIEnv& _env, jni::Object<NativeMapView> _obj,
         return;
     }
 
-    // Create a default file source for this map instance
-    fileSource = std::make_unique<mbgl::DefaultFileSource>(
-        jni::Make<std::string>(_env, _cachePath) + "/mbgl-offline.db",
-        jni::Make<std::string>(_env, _apkPath));
-
     // Create the core map
     map = std::make_unique<mbgl::Map>(
         *this, mbgl::Size{ static_cast<uint32_t>(width), static_cast<uint32_t>(height) },
-        pixelRatio, *fileSource, threadPool, MapMode::Continuous);
+        pixelRatio, fileSource, threadPool, MapMode::Continuous);
 
     //Calculate a fitting cache size based on device parameters
     float zoomFactor   = map->getMaxZoom() - map->getMinZoom() + 1;
@@ -91,8 +87,8 @@ NativeMapView::~NativeMapView() {
     mbgl::util::RunLoop::Impl* loop = reinterpret_cast<mbgl::util::RunLoop::Impl*>(mbgl::util::RunLoop::getLoopHandle());
     loop->setWakeFunction(nullptr);
 
+    //Destroy map instance
     map.reset();
-    fileSource.reset();
 
     vm = nullptr;
 }
@@ -176,7 +172,7 @@ void NativeMapView::render(jni::JNIEnv& env) {
 }
 
 void NativeMapView::setAPIBaseUrl(jni::JNIEnv& env, jni::String url) {
-    fileSource->setAPIBaseURL(jni::Make<std::string>(env, url));
+    fileSource.setAPIBaseURL(jni::Make<std::string>(env, url));
 }
 
 jni::String NativeMapView::getStyleUrl(jni::JNIEnv& env) {
@@ -196,11 +192,11 @@ void NativeMapView::setStyleJson(jni::JNIEnv& env, jni::String json) {
 }
 
 jni::String NativeMapView::getAccessToken(jni::JNIEnv& env) {
-    return jni::Make<jni::String>(env, fileSource->getAccessToken());
+    return jni::Make<jni::String>(env, fileSource.getAccessToken());
 }
 
 void NativeMapView::setAccessToken(jni::JNIEnv& env, jni::String token) {
-    fileSource->setAccessToken(jni::Make<std::string>(env, token));
+    fileSource.setAccessToken(jni::Make<std::string>(env, token));
 }
 
 void NativeMapView::cancelTransitions(jni::JNIEnv&) {
@@ -812,7 +808,7 @@ void NativeMapView::registerNative(jni::JNIEnv& env) {
 
     // Register the peer
     jni::RegisterNativePeer<NativeMapView>(env, NativeMapView::javaClass, "nativePtr",
-            std::make_unique<NativeMapView, JNIEnv&, jni::Object<NativeMapView>, jni::String, jni::String, jni::jfloat, jni::jint, jni::jlong>,
+            std::make_unique<NativeMapView, JNIEnv&, jni::Object<NativeMapView>, jni::Object<FileSource>, jni::jfloat, jni::jint, jni::jlong>,
             "initialize",
             "destroy",
             METHOD(&NativeMapView::render, "render"),
