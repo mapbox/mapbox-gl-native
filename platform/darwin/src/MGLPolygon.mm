@@ -91,7 +91,8 @@
 
 - (NSDictionary *)geoJSONDictionary {
     return @{@"type": @"Polygon",
-             @"coordinates": self.mgl_coordinates};
+             @"coordinates": self.mgl_coordinates,
+             @"bbox": MGLCoordinateBoundsToBBox(self.overlayBounds)};
 }
 
 @end
@@ -179,7 +180,8 @@
         [coordinates addObject: feature.mgl_coordinates];
     }
     return @{@"type": @"MultiPolygon",
-             @"coordinates": coordinates};
+             @"coordinates": coordinates,
+             @"bbox": MGLCoordinateBoundsToBBox(self.overlayBounds)};
 }
 
 @end

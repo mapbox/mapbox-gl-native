@@ -114,7 +114,8 @@ NS_ASSUME_NONNULL_BEGIN
     }
 
     return @{@"type": @"MultiPoint",
-             @"coordinates": coordinates};
+             @"coordinates": coordinates,
+             @"bbox": MGLCoordinateBoundsToBBox(self.overlayBounds)};
 }
 
 - (NSString *)description
