@@ -120,14 +120,18 @@ public:
 
     // Convert an mgl style value into a mbgl data driven property value
     mbgl::style::DataDrivenPropertyValue<MBGLType> toDataDrivenPropertyValue(MGLStyleValue<ObjCType> *value) {
-        // TODO: check that it's an MGLStyleFunction before casting.
-        const MGLConversionValue rawValue = { toRawStyleSpecValue((MGLStyleFunction<ObjCType> *) value) };
-        auto result = mbgl::style::conversion::convert<mbgl::style::DataDrivenPropertyValue<MBGLType>>(rawValue);
-        if (!result) {
-            // raise an exception?
+        if ([value isKindOfClass:[MGLStyleConstantValue class]]) {
+            return toMBGLConstantValue((MGLStyleConstantValue<ObjCType> *)value);
+        } else if ([value isKindOfClass:[MGLStyleFunction class]]) {
+            const MGLConversionValue rawValue = { toRawStyleSpecValue((MGLStyleFunction<ObjCType> *) value) };
+            auto result = mbgl::style::conversion::convert<mbgl::style::DataDrivenPropertyValue<MBGLType>>(rawValue);
+            if (!result) {
+                [NSException raise:NSInvalidArgumentException format:@(result.error().message)];
+            }
+            return *result;
+        } else {
+            return {};
         }
-        
-        return *result;
     }
 
     // Convert an mgl style value containing an enum into a mbgl property value containing an enum
@@ -200,7 +204,6 @@ private: // Private utilities for converting from mgl to mbgl values
         
         // interpolationBase => base
         if (styleFunction.interpolationBase) {
-            // TODO: does this direct cast work?
             rawFunction[@"base"] = @(styleFunction.interpolationBase);
         }
         

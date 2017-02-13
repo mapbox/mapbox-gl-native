@@ -44,8 +44,7 @@ inline optional<MGLConversionValue> objectMember(const MGLConversionValue& value
 
 template <class Fn>
 optional<Error> eachMember(const MGLConversionValue&, Fn&&) {
-    // TODO
-    // mbgl::Log::Warning(mbgl::Event::Android, "eachMember not implemented");
+    mbgl::Log::Warning(mbgl::Event::General, "eachMember not implemented");
     return {};
 }
 
