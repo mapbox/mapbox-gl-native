@@ -78,6 +78,8 @@ public:
 
     void moveBy(jni::JNIEnv&, jni::jdouble, jni::jdouble);
 
+    void setCameraPosition(JNIEnv& env, jdouble, jdouble, jdouble, jdouble, jdouble);
+
     jni::Object<LatLng> getLatLng(JNIEnv&);
 
     void setLatLng(jni::JNIEnv&, jni::jdouble, jni::jdouble);

@@ -191,6 +191,12 @@ final class NativeMapView {
 
   private native void _moveBy(double dx, double dy);
 
+  void setCameraPosition(double angle, LatLng center, double pitch, double zoom) {
+    setCameraPosition(angle, center.getLatitude(), center.getLongitude(), pitch, zoom);
+  }
+
+  private native void setCameraPosition(double angle, double latitude, double longitude, double pitch, double zoom);
+
   @Deprecated
   void moveBy(double dx, double dy, long duration) {
     moveBy(dx, dy);

@@ -215,6 +215,27 @@ void NativeMapView::moveBy(jni::JNIEnv&, jni::jdouble dx, jni::jdouble dy) {
     map->moveBy({dx, dy});
 }
 
+void NativeMapView::setCameraPosition(JNIEnv&, jdouble angle, jdouble latitude, jdouble longitude, jdouble pitch, jdouble zoom) {
+    mbgl::CameraOptions cameraOptions;
+
+    if (angle != -1) {
+        cameraOptions.angle = (-angle * M_PI) / 180;
+    }
+
+    cameraOptions.center = mbgl::LatLng(latitude, longitude);
+    cameraOptions.padding = insets;
+
+    if (pitch != -1) {
+        cameraOptions.pitch = pitch * M_PI / 180;
+    }
+
+    if (zoom != -1) {
+        cameraOptions.zoom = zoom;
+    }
+
+    map->jumpTo(cameraOptions);
+}
+
 jni::Object<LatLng> NativeMapView::getLatLng(JNIEnv& env) {
     mbgl::LatLng latLng = map->getLatLng(insets);
     return LatLng::New(env, latLng.latitude, latLng.longitude);
@@ -806,6 +827,7 @@ void NativeMapView::registerNative(jni::JNIEnv& env) {
             METHOD(&NativeMapView::cancelTransitions, "cancelTransitions"),
             METHOD(&NativeMapView::setGestureInProgress, "setGestureInProgress"),
             METHOD(&NativeMapView::moveBy, "_moveBy"),
+            METHOD(&NativeMapView::setCameraPosition, "setCameraPosition"),
             METHOD(&NativeMapView::getLatLng, "_getLatLng"),
             METHOD(&NativeMapView::setLatLng, "setLatLng"),
             METHOD(&NativeMapView::setReachability, "setReachability"),
