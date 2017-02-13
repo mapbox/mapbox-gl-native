@@ -357,7 +357,7 @@ optional<std::pair<Response, uint64_t>> OfflineDatabase::getTile(const Resource:
     // clang-format on
 
     accessedStmt->bind(1, util::now());
-    accessedStmt->bind(2, tile.urlTemplate);
+    accessedStmt->bind(2, tile.cacheKey);
     accessedStmt->bind(3, tile.pixelRatio);
     accessedStmt->bind(4, tile.x);
     accessedStmt->bind(5, tile.y);
@@ -376,7 +376,7 @@ optional<std::pair<Response, uint64_t>> OfflineDatabase::getTile(const Resource:
         "  AND z            = ?5 ");
     // clang-format on
 
-    stmt->bind(1, tile.urlTemplate);
+    stmt->bind(1, tile.cacheKey);
     stmt->bind(2, tile.pixelRatio);
     stmt->bind(3, tile.x);
     stmt->bind(4, tile.y);
@@ -419,7 +419,7 @@ optional<int64_t> OfflineDatabase::hasTile(const Resource::TileData& tile) {
         "  AND z            = ?5 ");
     // clang-format on
 
-    stmt->bind(1, tile.urlTemplate);
+    stmt->bind(1, tile.cacheKey);
     stmt->bind(2, tile.pixelRatio);
     stmt->bind(3, tile.x);
     stmt->bind(4, tile.y);
@@ -451,7 +451,7 @@ bool OfflineDatabase::putTile(const Resource::TileData& tile,
 
         update->bind(1, util::now());
         update->bind(2, response.expires);
-        update->bind(3, tile.urlTemplate);
+        update->bind(3, tile.cacheKey);
         update->bind(4, tile.pixelRatio);
         update->bind(5, tile.x);
         update->bind(6, tile.y);
@@ -486,7 +486,7 @@ bool OfflineDatabase::putTile(const Resource::TileData& tile,
     update->bind(2, response.etag);
     update->bind(3, response.expires);
     update->bind(4, util::now());
-    update->bind(7, tile.urlTemplate);
+    update->bind(7, tile.cacheKey);
     update->bind(8, tile.pixelRatio);
     update->bind(9, tile.x);
     update->bind(10, tile.y);
@@ -512,7 +512,7 @@ bool OfflineDatabase::putTile(const Resource::TileData& tile,
         "VALUES            (?1,           ?2,          ?3, ?4, ?5, ?6,        ?7,    ?8,       ?9,        ?10,  ?11) ");
     // clang-format on
 
-    insert->bind(1, tile.urlTemplate);
+    insert->bind(1, tile.cacheKey);
     insert->bind(2, tile.pixelRatio);
     insert->bind(3, tile.x);
     insert->bind(4, tile.y);
@@ -648,7 +648,7 @@ bool OfflineDatabase::markUsed(int64_t regionID, const Resource& resource) {
 
         const Resource::TileData& tile = *resource.tileData;
         insert->bind(1, regionID);
-        insert->bind(2, tile.urlTemplate);
+        insert->bind(2, tile.cacheKey);
         insert->bind(3, tile.pixelRatio);
         insert->bind(4, tile.x);
         insert->bind(5, tile.y);
@@ -673,7 +673,7 @@ bool OfflineDatabase::markUsed(int64_t regionID, const Resource& resource) {
         // clang-format on
 
         select->bind(1, regionID);
-        select->bind(2, tile.urlTemplate);
+        select->bind(2, tile.cacheKey);
         select->bind(3, tile.pixelRatio);
         select->bind(4, tile.x);
         select->bind(5, tile.y);

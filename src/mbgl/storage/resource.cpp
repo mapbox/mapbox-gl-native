@@ -83,6 +83,7 @@ Resource Resource::glyphs(const std::string& urlTemplate, const FontStack& fontS
 }
 
 Resource Resource::tile(const std::string& urlTemplate,
+                        const std::string& cacheKey,
                         float pixelRatio,
                         int32_t x,
                         int32_t y,
@@ -119,6 +120,7 @@ Resource Resource::tile(const std::string& urlTemplate,
         }),
         Resource::TileData {
             urlTemplate,
+            cacheKey,
             uint8_t(supportsRatio && pixelRatio > 1.0 ? 2 : 1),
             x,
             y,

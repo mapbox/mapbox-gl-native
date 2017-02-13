@@ -65,6 +65,17 @@ public:
             }
             result.attribution = std::move(*attribution);
         }
+      
+        auto cacheKeyValue = objectMember(value, "cacheKey");
+        if (cacheKeyValue) {
+          optional<std::string> cacheKey = toString(*cacheKeyValue);
+          if (!cacheKey) {
+            return Error { "source cacheKey must be a string" };
+          }
+          result.cacheKey = std::move(*cacheKey);
+        } else {
+          result.cacheKey = result.tiles[0];
+        }
 
         return result;
     }

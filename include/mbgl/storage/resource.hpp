@@ -23,6 +23,7 @@ public:
 
     struct TileData {
         std::string urlTemplate;
+        std::string cacheKey;
         uint8_t pixelRatio;
         int32_t x;
         int32_t y;
@@ -44,6 +45,7 @@ public:
     static Resource style(const std::string& url);
     static Resource source(const std::string& url);
     static Resource tile(const std::string& urlTemplate,
+                         const std::string& cacheKey,
                          float pixelRatio,
                          int32_t x,
                          int32_t y,

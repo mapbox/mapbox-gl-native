@@ -16,6 +16,7 @@ const MGLTileSourceOption MGLTileSourceOptionMaximumZoomLevel = @"MGLTileSourceO
 const MGLTileSourceOption MGLTileSourceOptionAttributionHTMLString = @"MGLTileSourceOptionAttributionHTMLString";
 const MGLTileSourceOption MGLTileSourceOptionAttributionInfos = @"MGLTileSourceOptionAttributionInfos";
 const MGLTileSourceOption MGLTileSourceOptionTileCoordinateSystem = @"MGLTileSourceOptionTileCoordinateSystem";
+const MGLTileSourceOption MGLTileSourceOptionCacheKey = @"MGLTileSourceOptionCacheKey";
 
 @implementation MGLTileSource
 
@@ -123,6 +124,16 @@ mbgl::Tileset MGLTileSetFromTileURLTemplates(NS_ARRAY_OF(NSString *) *tileURLTem
                 tileSet.scheme = mbgl::Tileset::Scheme::TMS;
                 break;
         }
+    }
+
+    if (NSString *cacheKey = options[MGLTileSourceOptionCacheKey]) {
+      if (![cacheKey isKindOfClass:[NSString class]]) {
+        [NSException raise:NSInvalidArgumentException
+                    format:@"MGLTileSourceOptionCacheKey must be set to a string."];
+      }
+      tileSet.cacheKey = cacheKey.UTF8String;
+    } else {
+      tileSet.cacheKey = tileSet.tiles[0];
     }
 
     return tileSet;

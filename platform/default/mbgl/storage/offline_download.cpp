@@ -243,7 +243,7 @@ void OfflineDownload::queueTiles(SourceType type, uint16_t tileSize, const Tiles
     for (const auto& tile : definition.tileCover(type, tileSize, tileset.zoomRange)) {
         status.requiredResourceCount++;
         resourcesRemaining.push_back(
-            Resource::tile(tileset.tiles[0], definition.pixelRatio, tile.x, tile.y, tile.z, tileset.scheme));
+            Resource::tile(tileset.tiles[0], tileset.cacheKey, definition.pixelRatio, tile.x, tile.y, tile.z, tileset.scheme));
     }
 }
 

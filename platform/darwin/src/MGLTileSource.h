@@ -41,6 +41,14 @@ extern MGL_EXPORT const MGLTileSourceOption MGLTileSourceOptionMinimumZoomLevel;
  */
 extern MGL_EXPORT const MGLTileSourceOption MGLTileSourceOptionMaximumZoomLevel;
 
+/**
+ A string to use to cache this source. This is useful
+ if the url for this source may change.
+ 
+ By default, the url template for the source is used
+ */
+extern MGL_EXPORT const MGLTileSourceOption MGLTileSourceOptionCacheKey;
+
 #if TARGET_OS_IPHONE
 /**
  An HTML string defining the buttons to be displayed in an action sheet when the

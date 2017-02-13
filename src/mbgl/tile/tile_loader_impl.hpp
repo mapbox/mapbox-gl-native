@@ -18,6 +18,7 @@ TileLoader<T>::TileLoader(T& tile_,
       necessity(Necessity::Optional),
       resource(Resource::tile(
         tileset.tiles.at(0),
+        tileset.cacheKey,
         parameters.pixelRatio,
         id.canonical.x,
         id.canonical.y,
