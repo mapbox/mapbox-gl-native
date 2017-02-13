@@ -59,7 +59,7 @@ inline optional<bool> toBool(const MGLConversionValue& value) {
 
 inline optional<float> toNumber(const MGLConversionValue& value) {
     if (value.isNumber()) {
-        return static_cast<float> value.toNumber();
+        return static_cast<float>(value.toNumber());
     } else {
         return {};
     }
@@ -82,7 +82,7 @@ inline optional<mbgl::Value> toValue(const MGLConversionValue& value) {
         return { value.toString() };
     } else if (value.isNumber()) {
         // Need to cast to a double here as the float is otherwise considered a bool...
-       return { static_cast<double> value.toNumber() };
+       return { value.toNumber() };
     } else {
         return {};
     }
