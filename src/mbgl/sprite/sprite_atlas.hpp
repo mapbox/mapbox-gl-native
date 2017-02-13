@@ -123,21 +123,14 @@ private:
     // Stores all Sprite IDs that changed since the last invocation.
     Sprites dirtySprites;
 
-    struct Holder : private util::noncopyable {
-        Holder(std::shared_ptr<const SpriteImage>, Rect<uint16_t>);
-        Holder(Holder&&);
-        std::shared_ptr<const SpriteImage> spriteImage;
-        const Rect<uint16_t> pos;
-    };
-
     using Key = std::pair<std::string, SpritePatternMode>;
 
     Rect<uint16_t> allocateImage(const SpriteImage&);
-    void copy(const Holder& holder, SpritePatternMode mode);
+    void copy(const PremultipliedImage&, Rect<uint16_t>, SpritePatternMode);
 
     std::recursive_mutex mtx;
     BinPack<uint16_t> bin;
-    std::map<Key, Holder> images;
+    std::map<Key, SpriteAtlasElement> images;
     std::unordered_set<std::string> uninitialized;
     PremultipliedImage image;
     mbgl::optional<gl::Texture> texture;

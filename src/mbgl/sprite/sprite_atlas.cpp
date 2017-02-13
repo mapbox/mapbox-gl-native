@@ -183,9 +183,9 @@ optional<SpriteAtlasElement> SpriteAtlas::getImage(const std::string& name,
                                                    const SpritePatternMode mode) {
     std::lock_guard<std::recursive_mutex> lock(mtx);
 
-    auto rect_it = images.find({ name, mode });
-    if (rect_it != images.end()) {
-        return SpriteAtlasElement { rect_it->second.pos, rect_it->second.spriteImage, rect_it->second.spriteImage->pixelRatio / pixelRatio };
+    auto it = images.find({ name, mode });
+    if (it != images.end()) {
+        return it->second;
     }
 
     auto sprite = getSprite(name);
@@ -201,10 +201,12 @@ optional<SpriteAtlasElement> SpriteAtlas::getImage(const std::string& name,
         return {};
     }
 
-    const Holder& holder = images.emplace(Key{ name, mode }, Holder{ sprite, rect }).first->second;
-    copy(holder, mode);
+    SpriteAtlasElement element { rect, sprite, sprite->pixelRatio / pixelRatio };
 
-    return SpriteAtlasElement { rect, sprite, sprite->pixelRatio / pixelRatio };
+    images.emplace(Key{ name, mode }, element);
+    copy(sprite->image, rect, mode);
+
+    return element;
 }
 
 optional<SpriteAtlasPosition> SpriteAtlas::getPosition(const std::string& name,
@@ -231,31 +233,31 @@ optional<SpriteAtlasPosition> SpriteAtlas::getPosition(const std::string& name,
     };
 }
 
-void SpriteAtlas::copy(const Holder& holder, const SpritePatternMode mode) {
+void SpriteAtlas::copy(const PremultipliedImage& src, Rect<uint16_t> pos, const SpritePatternMode mode) {
     if (!image.valid()) {
         image = PremultipliedImage({ static_cast<uint32_t>(std::ceil(size.width * pixelRatio)),
                                      static_cast<uint32_t>(std::ceil(size.height * pixelRatio)) });
         image.fill(0);
     }
 
-    if (!holder.spriteImage->image.valid()) {
+    if (!src.valid()) {
         return;
     }
 
     const uint32_t padding = 1;
-    const uint32_t x = (holder.pos.x + padding) * pixelRatio;
-    const uint32_t y = (holder.pos.y + padding) * pixelRatio;
-    const uint32_t w = holder.spriteImage->image.size.width;
-    const uint32_t h = holder.spriteImage->image.size.height;
+    const uint32_t x = (pos.x + padding) * pixelRatio;
+    const uint32_t y = (pos.y + padding) * pixelRatio;
+    const uint32_t w = src.size.width;
+    const uint32_t h = src.size.height;
 
-    PremultipliedImage::copy(holder.spriteImage->image, image, { 0, 0 }, { x, y }, { w, h });
+    PremultipliedImage::copy(src, image, { 0, 0 }, { x, y }, { w, h });
 
     if (mode == SpritePatternMode::Repeating) {
         // Add 1 pixel wrapped padding on each side of the image.
-        PremultipliedImage::copy(holder.spriteImage->image, image, { 0, h - 1 }, { x, y - 1 }, { w, 1 }); // T
-        PremultipliedImage::copy(holder.spriteImage->image, image, { 0,     0 }, { x, y + h }, { w, 1 }); // B
-        PremultipliedImage::copy(holder.spriteImage->image, image, { w - 1, 0 }, { x - 1, y }, { 1, h }); // L
-        PremultipliedImage::copy(holder.spriteImage->image, image, { 0,     0 }, { x + w, y }, { 1, h }); // R
+        PremultipliedImage::copy(src, image, { 0, h - 1 }, { x, y - 1 }, { w, 1 }); // T
+        PremultipliedImage::copy(src, image, { 0,     0 }, { x, y + h }, { w, 1 }); // B
+        PremultipliedImage::copy(src, image, { w - 1, 0 }, { x - 1, y }, { 1, h }); // L
+        PremultipliedImage::copy(src, image, { 0,     0 }, { x + w, y }, { 1, h }); // R
     }
 
     dirty = true;
@@ -273,10 +275,10 @@ void SpriteAtlas::updateDirty() {
             ++spriteIterator;
         } else {
             // The two names match;
-            Holder& holder = imageIterator->second;
-            holder.spriteImage = spriteIterator->second;
-            if (holder.spriteImage != nullptr) {
-                copy(holder, imageIterator->first.second);
+            auto& element = imageIterator->second;
+            element.spriteImage = spriteIterator->second;
+            if (element.spriteImage != nullptr) {
+                copy(element.spriteImage->image, element.pos, imageIterator->first.second);
                 ++imageIterator;
             } else {
                 images.erase(imageIterator++);
@@ -311,13 +313,6 @@ void SpriteAtlas::bind(bool linear, gl::Context& context, gl::TextureUnit unit) 
     upload(context, unit);
     context.bindTexture(*texture, unit,
                         linear ? gl::TextureFilter::Linear : gl::TextureFilter::Nearest);
-}
-
-SpriteAtlas::Holder::Holder(std::shared_ptr<const SpriteImage> spriteImage_, Rect<uint16_t> pos_)
-    : spriteImage(std::move(spriteImage_)), pos(std::move(pos_)) {
-}
-
-SpriteAtlas::Holder::Holder(Holder&& h) : spriteImage(std::move(h.spriteImage)), pos(h.pos) {
 }
 
 } // namespace mbgl
