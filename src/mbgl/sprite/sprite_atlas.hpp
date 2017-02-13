@@ -101,7 +101,6 @@ private:
     void _setSprite(const std::string&, const std::shared_ptr<const SpriteImage>& = nullptr);
     void emitSpriteLoadedIfComplete();
 
-    Rect<uint16_t> allocateImage(const SpriteImage&);
     void copy(const PremultipliedImage&, Rect<uint16_t>, SpritePatternMode);
 
     const Size size;
