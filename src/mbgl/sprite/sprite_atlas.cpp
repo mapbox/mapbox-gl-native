@@ -174,27 +174,6 @@ std::shared_ptr<const SpriteImage> SpriteAtlas::getSprite(const std::string& nam
     }
 }
 
-Rect<uint16_t> SpriteAtlas::allocateImage(const SpriteImage& spriteImage) {
-
-    const uint16_t pixel_width = std::ceil(spriteImage.image.size.width / pixelRatio);
-    const uint16_t pixel_height = std::ceil(spriteImage.image.size.height / pixelRatio);
-
-    // Increase to next number divisible by 4, but at least 1.
-    // This is so we can scale down the texture coordinates and pack them
-    // into 2 bytes rather than 4 bytes.
-    const uint16_t pack_width = (pixel_width + 1) + (4 - (pixel_width + 1) % 4);
-    const uint16_t pack_height = (pixel_height + 1) + (4 - (pixel_height + 1) % 4);
-
-    // We have to allocate a new area in the bin, and store an empty image in it.
-    // Add a 1px border around every image.
-    Rect<uint16_t> rect = bin.allocate(pack_width, pack_height);
-    if (rect.w == 0) {
-        return rect;
-    }
-
-    return rect;
-}
-
 optional<SpriteAtlasElement> SpriteAtlas::getImage(const std::string& name,
                                                    const SpritePatternMode mode) {
     std::lock_guard<std::recursive_mutex> lock(mutex);
@@ -225,7 +204,17 @@ optional<SpriteAtlasElement> SpriteAtlas::getImage(const std::string& name,
         };
     }
 
-    Rect<uint16_t> rect = allocateImage(*entry.spriteImage);
+    const uint16_t pixelWidth = std::ceil(entry.spriteImage->image.size.width / pixelRatio);
+    const uint16_t pixelHeight = std::ceil(entry.spriteImage->image.size.height / pixelRatio);
+
+    // Increase to next number divisible by 4, but at least 1.
+    // This is so we can scale down the texture coordinates and pack them
+    // into 2 bytes rather than 4 bytes.
+    const uint16_t packWidth = (pixelWidth + 1) + (4 - (pixelWidth + 1) % 4);
+    const uint16_t packHeight = (pixelHeight + 1) + (4 - (pixelHeight + 1) % 4);
+
+    // We have to allocate a new area in the bin, and store an empty image in it.
+    Rect<uint16_t> rect = bin.allocate(packWidth, packHeight);
     if (rect.w == 0) {
         if (debug::spriteWarnings) {
             Log::Warning(Event::Sprite, "sprite atlas bitmap overflow");
