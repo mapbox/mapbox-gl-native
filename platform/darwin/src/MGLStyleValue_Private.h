@@ -125,9 +125,7 @@ public:
         } else if ([value isKindOfClass:[MGLStyleFunction class]]) {
             const MGLConversionValue rawValue = { toRawStyleSpecValue((MGLStyleFunction<ObjCType> *) value) };
             auto result = mbgl::style::conversion::convert<mbgl::style::DataDrivenPropertyValue<MBGLType>>(rawValue);
-            if (!result) {
-                [NSException raise:NSInvalidArgumentException format:@(result.error().message)];
-            }
+            NSCAssert(result, @(result.error().message.c_str()));
             return *result;
         } else {
             return {};
@@ -184,8 +182,16 @@ private: // Private utilities for converting from mgl to mbgl values
         return mbglValue;
     }
     
+    NSObject* toRawStyleSpecValue(NSObject *raw) {
+        return raw; // noop pass-through for already NSObject-based items
+    }
+    
+    NSObject* toRawStyleSpecValue(MGLColor *color) {
+        return @(color.mgl_color.stringify().c_str());
+    }
+    
     NSObject* toRawStyleSpecValue(MGLStyleFunction<ObjCType>* styleFunction) {
-        NSMutableDictionary * rawFunction;
+        NSMutableDictionary * rawFunction = [NSMutableDictionary new];
         // interpolationMode => type
         switch (styleFunction.interpolationMode) {
             case MGLInterpolationModeExponential:
@@ -212,7 +218,7 @@ private: // Private utilities for converting from mgl to mbgl values
             // zoom-only function (no default value)
             __block NSMutableArray *stops = [[NSMutableArray alloc] init];
             [styleFunction.stops enumerateKeysAndObjectsUsingBlock:^(NSNumber * _Nonnull zoomKey, MGLStyleConstantValue<ObjCType> * _Nonnull outputValue, BOOL * _Nonnull stop) {
-                NSArray *rawStop = @[zoomKey, [outputValue rawValue]];
+                NSArray *rawStop = @[zoomKey, toRawStyleSpecValue([outputValue rawValue])];
                 [stops addObject:rawStop];
             }];
             rawFunction[@"stops"] = stops;
@@ -223,7 +229,7 @@ private: // Private utilities for converting from mgl to mbgl values
             // property-only function
             __block NSMutableArray *stops = [[NSMutableArray alloc] init];
             [styleFunction.stops enumerateKeysAndObjectsUsingBlock:^(NSObject * _Nonnull propertyKey, MGLStyleConstantValue<ObjCType> * _Nonnull outputValue, BOOL * _Nonnull stop) {
-                NSArray *rawStop = @[propertyKey, [outputValue rawValue]];
+                NSArray *rawStop = @[propertyKey, toRawStyleSpecValue([outputValue rawValue])];
                 [stops addObject:rawStop];
             }];
             rawFunction[@"stops"] = stops;
@@ -231,7 +237,7 @@ private: // Private utilities for converting from mgl to mbgl values
             // defaultValue => default
             if (sourceStyleFunction.defaultValue) {
                 NSCAssert([sourceStyleFunction.defaultValue isKindOfClass:[MGLStyleConstantValue class]], @"Default value must be constant");
-                rawFunction[@"default"] = [(MGLStyleConstantValue<ObjCType> *)sourceStyleFunction.defaultValue rawValue];
+                rawFunction[@"default"] = toRawStyleSpecValue([(MGLStyleConstantValue<ObjCType> *)sourceStyleFunction.defaultValue rawValue]);
             }
         } else if ([styleFunction isKindOfClass:[MGLCompositeStyleFunction class]]) {
             // zoom-and-property function
@@ -247,7 +253,7 @@ private: // Private utilities for converting from mgl to mbgl values
                      };
                     MGLStyleConstantValue<ObjCType> *outputValue = stopValue[valueKey];
                     NSCAssert([outputValue isKindOfClass:[MGLStyleConstantValue<ObjCType> class]], @"Stop outputs should be MGLStyleConstantValues");
-                    NSArray *rawStop = [NSArray arrayWithObjects:stopKey, [outputValue rawValue], nil];
+                    NSArray *rawStop = @[stopKey, toRawStyleSpecValue([outputValue rawValue])];
                     [stops addObject:rawStop];
                 }
             }];
@@ -256,7 +262,7 @@ private: // Private utilities for converting from mgl to mbgl values
             // defaultValue => default
             if (compositeStyleFunction.defaultValue) {
                 NSCAssert([compositeStyleFunction.defaultValue isKindOfClass:[MGLStyleConstantValue class]], @"Default value must be constant");
-                rawFunction[@"default"] = [(MGLStyleConstantValue<ObjCType> *)compositeStyleFunction.defaultValue rawValue];
+                rawFunction[@"default"] = toRawStyleSpecValue([(MGLStyleConstantValue<ObjCType> *)compositeStyleFunction.defaultValue rawValue]);
             }
         }
         

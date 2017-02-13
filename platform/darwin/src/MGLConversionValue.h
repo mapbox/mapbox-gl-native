@@ -52,13 +52,13 @@ public:
     };
     
     size_t getLength() const {
-        NSCAssert([value isKindOfClass:[NSDictionary class]], @"Value must be an NSArray for getLength().");
+        NSCAssert([value isKindOfClass:[NSArray class]], @"Value must be an NSArray for getLength().");
         NSArray * array = (NSArray *)value;
         return [array count];
     };
     
     MGLConversionValue get(const std::size_t index ) const {
-        NSCAssert([value isKindOfClass:[NSDictionary class]], @"Value must be an NSArray for get(int).");
+        NSCAssert([value isKindOfClass:[NSArray class]], @"Value must be an NSArray for get(int).");
         NSArray * array = (NSArray *)value;
         return { array[index] };
     };
