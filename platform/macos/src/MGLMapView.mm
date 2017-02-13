@@ -1635,14 +1635,15 @@ public:
 - (void)keyDown:(NSEvent *)event {
     NSEventModifierFlags modFlags = event.modifierFlags;
     BOOL noModFlags = modFlags == 256;
-    NSUInteger shiftDown = (modFlags & NSShiftKeyMask) == NSShiftKeyMask;
-    if (event.modifierFlags & NSNumericPadKeyMask) {
+    BOOL isZoomEvent = ([@[@"-", @"="] containsObject:[event characters]] && noModFlags) ||
+                        ([@"+" isEqual:[event characters]] && (modFlags & NSShiftKeyMask));
+
+    if (modFlags & NSNumericPadKeyMask) {
         // This is the recommended way to handle arrow key presses, causing
         // methods like -moveUp: and -moveToBeginningOfParagraph: to be called
         // for various standard keybindings.
         [self interpretKeyEvents:@[event]];
-    } else if (([@[@"-", @"="] containsObject:[event characters]] && noModFlags) ||
-               ([@"+" isEqual:[event characters]] && shiftDown)) {
+    } else if (isZoomEvent) {
         [self adjustZoomLevelForKey:[event characters]];
     } else {
         [super keyDown:event];
