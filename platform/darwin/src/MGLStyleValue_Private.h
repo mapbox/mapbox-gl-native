@@ -5,7 +5,6 @@
 #import "NSValue+MGLStyleAttributeAdditions.h"
 #import "MGLTypes.h"
 
-#import "MGLConversionValue.h"
 #include "darwin_conversion.hpp"
 #include <mbgl/style/conversion/data_driven_property_value.hpp>
 #include <mbgl/style/conversion.hpp>
@@ -123,7 +122,7 @@ public:
         if ([value isKindOfClass:[MGLStyleConstantValue class]]) {
             return toMBGLConstantValue((MGLStyleConstantValue<ObjCType> *)value);
         } else if ([value isKindOfClass:[MGLStyleFunction class]]) {
-            const MGLConversionValue rawValue = { toRawStyleSpecValue((MGLStyleFunction<ObjCType> *) value) };
+            auto rawValue = toRawStyleSpecValue((MGLStyleFunction<ObjCType> *) value);
             auto result = mbgl::style::conversion::convert<mbgl::style::DataDrivenPropertyValue<MBGLType>>(rawValue);
             NSCAssert(result, @(result.error().message.c_str()));
             return *result;
