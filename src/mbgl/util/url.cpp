@@ -89,8 +89,10 @@ URL::URL(const std::string& str)
           return { queryPos, (hashPos != std::string::npos ? hashPos : str.size()) - queryPos };
       }()),
       scheme([&]() -> Segment {
-          auto schemeEnd = str.find(':');
-          return { 0, schemeEnd == std::string::npos || schemeEnd > query.first ? 0 : schemeEnd };
+          if (str.empty() || !isAlphaCharacter(str.front())) return { 0, 0 };
+          size_t schemeEnd = 0;
+          while (schemeEnd < query.first && isSchemeCharacter(str[schemeEnd])) ++schemeEnd;
+          return { 0, str[schemeEnd] == ':' ? schemeEnd : 0 };
       }()),
       domain([&]() -> Segment {
           auto domainPos = scheme.first + scheme.second;
