@@ -10,7 +10,7 @@
 #include <string>
 #include <map>
 #include <mutex>
-#include <unordered_set>
+#include <unordered_map>
 #include <array>
 #include <memory>
 
@@ -85,9 +85,6 @@ public:
     // Binds the atlas texture to the GPU, and uploads data if it is out of date.
     void bind(bool linear, gl::Context&, gl::TextureUnit unit);
 
-    // Updates sprites in the atlas texture that may have changed.
-    void updateDirty();
-
     // Uploads the texture to the GPU to be available when we need it. This is a lazy operation;
     // the texture is only bound when the data is out of date (=dirty).
     void upload(gl::Context&, gl::TextureUnit unit);
@@ -104,6 +101,9 @@ private:
     void _setSprite(const std::string&, const std::shared_ptr<const SpriteImage>& = nullptr);
     void emitSpriteLoadedIfComplete();
 
+    Rect<uint16_t> allocateImage(const SpriteImage&);
+    void copy(const PremultipliedImage&, Rect<uint16_t>, SpritePatternMode);
+
     const Size size;
     const float pixelRatio;
 
@@ -114,28 +114,18 @@ private:
 
     SpriteAtlasObserver* observer = nullptr;
 
-    // Lock for sprites and dirty maps.
-    std::mutex mutex;
+    struct Entry {
+        std::shared_ptr<const SpriteImage> spriteImage;
+        optional<Rect<uint16_t>> iconRect;
+        optional<Rect<uint16_t>> patternRect;
+    };
 
-    // Stores all current sprites.
-    Sprites sprites;
-
-    // Stores all Sprite IDs that changed since the last invocation.
-    Sprites dirtySprites;
-
-    using Key = std::pair<std::string, SpritePatternMode>;
-
-    Rect<uint16_t> allocateImage(const SpriteImage&);
-    void copy(const PremultipliedImage&, Rect<uint16_t>, SpritePatternMode);
-
-    std::recursive_mutex mtx;
+    std::recursive_mutex mutex;
+    std::unordered_map<std::string, Entry> entries;
     BinPack<uint16_t> bin;
-    std::map<Key, SpriteAtlasElement> images;
-    std::unordered_set<std::string> uninitialized;
     PremultipliedImage image;
     mbgl::optional<gl::Texture> texture;
     std::atomic<bool> dirty;
-    static const int buffer = 1;
 };
 
 } // namespace mbgl
