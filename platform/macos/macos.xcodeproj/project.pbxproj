@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1769C6201E52476900ADE218 /* darwin_conversion.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 1769C61F1E52476900ADE218 /* darwin_conversion.hpp */; };
+		1769C6221E52477400ADE218 /* MGLConversionValue.h in Headers */ = {isa = PBXBuildFile; fileRef = 1769C6211E52477400ADE218 /* MGLConversionValue.h */; };
 		30E5781B1DAA857E0050F07E /* NSImage+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 30E578141DAA7D920050F07E /* NSImage+MGLAdditions.h */; };
 		3508EC641D749D39009B0EE4 /* NSExpression+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 3508EC621D749D39009B0EE4 /* NSExpression+MGLAdditions.h */; };
 		3508EC651D749D39009B0EE4 /* NSExpression+MGLAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3508EC631D749D39009B0EE4 /* NSExpression+MGLAdditions.mm */; };
@@ -258,6 +260,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		1769C61F1E52476900ADE218 /* darwin_conversion.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = darwin_conversion.hpp; sourceTree = "<group>"; };
+		1769C6211E52477400ADE218 /* MGLConversionValue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLConversionValue.h; sourceTree = "<group>"; };
 		30E578141DAA7D920050F07E /* NSImage+MGLAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSImage+MGLAdditions.h"; path = "src/NSImage+MGLAdditions.h"; sourceTree = SOURCE_ROOT; };
 		3508EC621D749D39009B0EE4 /* NSExpression+MGLAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSExpression+MGLAdditions.h"; sourceTree = "<group>"; };
 		3508EC631D749D39009B0EE4 /* NSExpression+MGLAdditions.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "NSExpression+MGLAdditions.mm"; sourceTree = "<group>"; };
@@ -613,11 +617,13 @@
 		3527429B1D4C259500A1ECE6 /* Styling */ = {
 			isa = PBXGroup;
 			children = (
+				1769C6211E52477400ADE218 /* MGLConversionValue.h */,
 				352742791D4C235C00A1ECE6 /* Categories */,
 				35136D471D42295400C20EFD /* Layers */,
 				3527427E1D4C242B00A1ECE6 /* Sources */,
 				352742771D4C220900A1ECE6 /* MGLStyleValue.h */,
 				DA8F259B1D51CB000010E6B5 /* MGLStyleValue_Private.h */,
+				1769C61F1E52476900ADE218 /* darwin_conversion.hpp */,
 				3527429E1D4C25BD00A1ECE6 /* MGLStyleValue.mm */,
 			);
 			name = Styling;
@@ -1024,8 +1030,10 @@
 				DAE6C35E1CC31E0400DB3429 /* MGLMultiPoint.h in Headers */,
 				35602BFF1D3EA9B40050646F /* MGLStyleLayer_Private.h in Headers */,
 				DAF0D8161DFE6B1800B28378 /* MGLAttributionInfo_Private.h in Headers */,
+				1769C6201E52476900ADE218 /* darwin_conversion.hpp in Headers */,
 				DAE6C3971CC31E2A00DB3429 /* NSBundle+MGLAdditions.h in Headers */,
 				DAED385F1D62CED700D7640F /* NSURL+MGLAdditions.h in Headers */,
+				1769C6221E52477400ADE218 /* MGLConversionValue.h in Headers */,
 				DAD165741CF4CD7A001FF4B9 /* MGLShapeCollection.h in Headers */,
 				DAE6C3631CC31E0400DB3429 /* MGLPointAnnotation.h in Headers */,
 				DAC2ABC51CC6D343006D18C4 /* MGLAnnotationImage_Private.h in Headers */,
