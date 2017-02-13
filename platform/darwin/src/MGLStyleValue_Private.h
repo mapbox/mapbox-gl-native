@@ -182,12 +182,21 @@ private: // Private utilities for converting from mgl to mbgl values
         return mbglValue;
     }
     
-    NSObject* toRawStyleSpecValue(NSObject *raw) {
-        return raw; // noop pass-through for already NSObject-based items
-    }
-    
     NSObject* toRawStyleSpecValue(MGLColor *color) {
         return @(color.mgl_color.stringify().c_str());
+    }
+    
+    NSObject* toRawStyleSpecValue(NSObject *rawMGLValue) {
+        if ([rawMGLValue isKindOfClass:[NSValue class]]) {
+            const auto rawNSValue = (NSValue *)rawMGLValue;
+            if (strcmp([rawNSValue objCType], @encode(CGVector)) == 0) {
+                // offset [x, y]
+                std::array<float, 2> mglValue = rawNSValue.mgl_offsetArrayValue;
+                return [NSArray arrayWithObjects:@(mglValue[0]), @(mglValue[1]), nil];
+            }
+        }
+        // noop pass-through plain NSObject-based items
+        return rawMGLValue;
     }
     
     NSObject* toRawStyleSpecValue(MGLStyleFunction<ObjCType>* styleFunction) {
