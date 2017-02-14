@@ -8,7 +8,7 @@ typealias MGLColor = NSColor
 #endif
     
 extension MGLStyleValueTests {
-    func assertColorsEqualWithAccuracy(_ actual: MGLColor, _ expected: MGLColor, accuracy: Float = 0.005) {
+    func assertColorsEqualWithAccuracy(_ actual: MGLColor, _ expected: MGLColor, accuracy: Float = 1/255) {
         var actualComponents : [CGFloat] = [0, 0, 0, 0]
         var expectedComponents : [CGFloat] = [0, 0, 0, 0]
         actual.getRed(&(actualComponents[0]), green: &(actualComponents[1]), blue: &(actualComponents[2]), alpha: &(actualComponents[3]))
