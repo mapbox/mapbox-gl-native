@@ -53,7 +53,11 @@ macro(mbgl_platform_core)
         PRIVATE platform/default/mbgl/storage/offline_database.hpp
         PRIVATE platform/default/mbgl/storage/offline_download.cpp
         PRIVATE platform/default/mbgl/storage/offline_download.hpp
-        PRIVATE platform/default/sqlite3.cpp
+        PRIVATE platform/android/src/android/database/sqlite/sqlite_database.cpp
+        PRIVATE platform/android/src/android/database/sqlite/sqlite_database.hpp
+        PRIVATE platform/android/src/android/database/sqlite/sqlite_exception.cpp
+        PRIVATE platform/android/src/android/database/sqlite/sqlite_exception.hpp
+        PRIVATE platform/android/src/sqlite3.cpp
         PRIVATE platform/default/sqlite3.hpp
 
         # Misc
@@ -142,6 +146,9 @@ macro(mbgl_platform_core)
         platform/android/src/attach_env.hpp
         platform/android/src/java_types.cpp
         platform/android/src/java_types.hpp
+        platform/android/src/java/lang.hpp
+        platform/android/src/java/lang/throwable.cpp
+        platform/android/src/java/lang/throwable.hpp
 
         # Main entry point
         platform/android/src/jni.hpp
