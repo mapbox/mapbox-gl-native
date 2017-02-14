@@ -515,8 +515,9 @@ RenderData Style::getRenderData(MapDebugOptions debugOptions, float angle) const
             });
         }
 
-        for (auto& tileRef : sortedTiles) {
-            auto& tile = tileRef.get();
+        std::vector<std::reference_wrapper<RenderTile>> sortedTilesForInsertion;
+        for (auto tileIt = sortedTiles.begin(); tileIt != sortedTiles.end(); ++tileIt) {
+            auto& tile = tileIt->get();
             if (!tile.tile.isRenderable()) {
                 continue;
             }
@@ -529,23 +530,22 @@ RenderData Style::getRenderData(MapDebugOptions debugOptions, float angle) const
                 // Look back through the buckets we decided to render to find out whether there is
                 // already a bucket from this layer that is a parent of this tile. Tiles are ordered
                 // by zoom level when we obtain them from getTiles().
-                for (auto it = result.order.rbegin(); it != result.order.rend() && (&it->layer == layer.get()); ++it) {
-                    if (tile.tile.id.isChildOf(it->tile->tile.id)) {
+                for (auto it = sortedTilesForInsertion.rbegin(); it != sortedTilesForInsertion.rend(); ++it) {
+                    if (tile.tile.id.isChildOf(it->get().tile.id)) {
                         skip = true;
                         break;
                     }
                 }
-                if (skip) {
-                    continue;
+                if (!skip) {
+                    sortedTilesForInsertion.emplace_back(tile);
                 }
+            } else {
+                sortedTilesForInsertion.emplace_back(tile);
             }
 
-            auto bucket = tile.tile.getBucket(*layer);
-            if (bucket) {
-                result.order.emplace_back(*layer, &tile, bucket);
-                tile.used = true;
-            }
         }
+
+        result.order.emplace_back(*layer, std::move(sortedTilesForInsertion));
     }
 
     return result;
