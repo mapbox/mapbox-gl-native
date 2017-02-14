@@ -111,7 +111,7 @@ private:
         optional<Rect<uint16_t>> patternRect;
     };
 
-    std::recursive_mutex mutex;
+    std::mutex mutex;
     std::unordered_map<std::string, Entry> entries;
     BinPack<uint16_t> bin;
     PremultipliedImage image;

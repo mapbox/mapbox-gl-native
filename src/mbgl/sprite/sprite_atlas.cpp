@@ -119,19 +119,19 @@ void SpriteAtlas::dumpDebugLogs() const {
 }
 
 void SpriteAtlas::setSprites(const Sprites& newSprites) {
-    std::lock_guard<std::recursive_mutex> lock(mutex);
+    std::lock_guard<std::mutex> lock(mutex);
     for (const auto& pair : newSprites) {
         _setSprite(pair.first, pair.second);
     }
 }
 
 void SpriteAtlas::setSprite(const std::string& name, std::shared_ptr<const SpriteImage> sprite) {
-    std::lock_guard<std::recursive_mutex> lock(mutex);
+    std::lock_guard<std::mutex> lock(mutex);
     _setSprite(name, sprite);
 }
 
 void SpriteAtlas::removeSprite(const std::string& name) {
-    std::lock_guard<std::recursive_mutex> lock(mutex);
+    std::lock_guard<std::mutex> lock(mutex);
 
     auto it = entries.find(name);
     if (it == entries.end()) {
@@ -179,7 +179,7 @@ void SpriteAtlas::_setSprite(const std::string& name,
 }
 
 std::shared_ptr<const SpriteImage> SpriteAtlas::getSprite(const std::string& name) {
-    std::lock_guard<std::recursive_mutex> lock(mutex);
+    std::lock_guard<std::mutex> lock(mutex);
     const auto it = entries.find(name);
     if (it != entries.end()) {
         return it->second.spriteImage;
@@ -193,7 +193,7 @@ std::shared_ptr<const SpriteImage> SpriteAtlas::getSprite(const std::string& nam
 
 optional<SpriteAtlasElement> SpriteAtlas::getImage(const std::string& name,
                                                    const SpritePatternMode mode) {
-    std::lock_guard<std::recursive_mutex> lock(mutex);
+    std::lock_guard<std::mutex> lock(mutex);
 
     auto it = entries.find(name);
     if (it == entries.end()) {
