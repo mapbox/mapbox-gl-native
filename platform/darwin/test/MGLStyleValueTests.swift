@@ -34,14 +34,22 @@ extension MGLStyleValueTests {
             }
             let expectedStops = expectedFunction.stops!
             XCTAssertEqual(actualStops.keys.count, expectedStops.keys.count)
-            for (stopKey, stopValue) in actualStops {
-                if let actualValue = stopValue as? NSNumber {
-                    let expectedValue = expectedStops[stopKey] as? NSNumber
+            let actualKeys = actualStops.keys.sorted(by: { String(describing: $0) < String(describing: $1) })
+            let expectedKeys = expectedStops.keys.sorted(by: { String(describing: $0) < String(describing: $1) })
+            
+            for (ak, ek) in zip(actualKeys, expectedKeys) {
+                XCTAssertEqual(String(describing: ak), String(describing: ek))
+                if let actualValue = actualStops[ak] as? MGLStyleConstantValue<MGLColor> {
+                    guard let expectedValue = expectedStops[ek] as? MGLStyleConstantValue<MGLColor> else {
+                        XCTFail("Unexpected stop \(ak), \(actualValue).  Expected one of \(expectedStops).")
+                        return
+                    }
+                    assertColorsEqualWithAccuracy(actualValue.rawValue, expectedValue.rawValue)
+                } else if let actualValue = actualStops[ak] as? MGLStyleConstantValue<AnyObject> {
+                    let expectedValue = expectedStops[ek] as? MGLStyleConstantValue<AnyObject>
                     XCTAssertEqual(actualValue, expectedValue)
-                } else if let actualValue = stopValue as? MGLColor {
-                    let expectedValue = expectedStops[stopKey] as? MGLColor
-                    XCTAssertNotNil(expectedValue)
-                    assertColorsEqualWithAccuracy(actualValue, expectedValue!)
+                } else {
+                    XCTFail("Unsupported stop value type \(type(of: actualStops[ak])).")
                 }
             }
         } else {
