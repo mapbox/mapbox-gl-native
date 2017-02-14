@@ -52,6 +52,7 @@ inline std::size_t arrayLength(const id value) {
 
 inline NSObject *arrayMember(const id value, std::size_t i) {
     NSCAssert([value isKindOfClass:[NSArray class]], @"Value must be an NSArray for get(int).");
+    NSCAssert(i < NSUIntegerMax, @"Index must be less than NSUIntegerMax");
     NSArray *array = value;
     return array[i];
 }
