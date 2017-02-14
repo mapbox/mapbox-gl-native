@@ -36,7 +36,7 @@ touch package.json
 function mapbox_install_logbt {
     scripts/mason.sh INSTALL gdb VERSION 7.12
     export PATH=$(scripts/mason.sh PREFIX gdb VERSION 7.12)/bin:${PATH}
-    curl -sSfL https://github.com/mapbox/logbt/archive/v2.0.0.tar.gz | tar --gunzip --extract --strip-components=2 --exclude="*md" --exclude="test*" --directory=.
+    curl -sSfL https://github.com/mapbox/logbt/archive/backtrace-for-all-exit-codes.tar.gz | tar --gunzip --extract --strip-components=2 --exclude="*md" --exclude="test*" --directory=.
     sudo ./logbt --setup
     ./logbt --test
 }

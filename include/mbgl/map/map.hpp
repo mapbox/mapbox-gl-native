@@ -98,6 +98,7 @@ public:
     void setScale(double scale, optional<ScreenCoordinate> = {}, const Duration& = Duration::zero());
     double getScale() const;
     void setZoom(double zoom, const Duration& = Duration::zero());
+    void setZoom(double zoom, optional<ScreenCoordinate>, const Duration& = Duration::zero());
     void setZoom(double zoom, optional<EdgeInsets>, const Duration& = Duration::zero());
     double getZoom() const;
     void setLatLngZoom(const LatLng&, double zoom, const Duration& = Duration::zero());

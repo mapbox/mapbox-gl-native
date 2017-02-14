@@ -1042,7 +1042,22 @@ public:
 }
 
 - (void)zoomBy:(double)zoomDelta animated:(BOOL)animated {
-    [self setZoomLevel:self.zoomLevel + zoomDelta animated:animated];
+    [self setZoomLevel:round(self.zoomLevel) + zoomDelta animated:animated];
+}
+
+- (void)zoomBy:(double)zoomDelta atPoint:(NSPoint)point animated:(BOOL)animated {
+    [self willChangeValueForKey:@"centerCoordinate"];
+    [self willChangeValueForKey:@"zoomLevel"];
+    double newZoom = round(self.zoomLevel) + zoomDelta;
+    MGLMapCamera *oldCamera = self.camera;
+    mbgl::ScreenCoordinate center(point.x, self.bounds.size.height - point.y);
+    _mbglMap->setZoom(newZoom, center, MGLDurationInSecondsFromTimeInterval(animated ? MGLAnimationDuration : 0));
+    if ([self.delegate respondsToSelector:@selector(mapView:shouldChangeFromCamera:toCamera:)]
+        && ![self.delegate mapView:self shouldChangeFromCamera:oldCamera toCamera:self.camera]) {
+        self.camera = oldCamera;
+    }
+    [self didChangeValueForKey:@"zoomLevel"];
+    [self didChangeValueForKey:@"centerCoordinate"];
 }
 
 - (void)scaleBy:(double)scaleFactor atPoint:(NSPoint)point animated:(BOOL)animated {
@@ -1500,7 +1515,7 @@ public:
     _mbglMap->cancelTransitions();
 
     NSPoint gesturePoint = [gestureRecognizer locationInView:self];
-    [self scaleBy:2 atPoint:gesturePoint animated:YES];
+    [self zoomBy:1 atPoint:gesturePoint animated:YES];
 }
 
 - (void)smartMagnifyWithEvent:(NSEvent *)event {
@@ -1512,7 +1527,7 @@ public:
 
     // Tap with two fingers (“right-click”) to zoom out on mice but not trackpads.
     NSPoint gesturePoint = [self convertPoint:event.locationInWindow fromView:nil];
-    [self scaleBy:0.5 atPoint:gesturePoint animated:YES];
+    [self zoomBy:-1 atPoint:gesturePoint animated:YES];
 }
 
 /// Rotate fingers to rotate.
