@@ -235,6 +235,44 @@
     XCTAssertThrowsSpecificNamed([self.style insertLayer:[[MGLOpenGLStyleLayer alloc] initWithIdentifier:@"my-layer"] atIndex:0], NSException, @"MGLRedundantLayerIdentifierException");
 }
 
+
+- (void)testRemovingLayerBeforeAddingSameLayer {
+    MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"shape-source-removing-before-adding" shape:nil options:nil];
+
+    // Attempting to find a layer with identifier will trigger an exception if the source associated with the layer is not added
+    [self.style addSource:source];
+
+    MGLFillStyleLayer *fillLayer = [[MGLFillStyleLayer alloc] initWithIdentifier:@"fill-layer" source:source];
+    [self.style removeLayer:fillLayer];
+    [self.style addLayer:fillLayer];
+    XCTAssertNotNil([self.style layerWithIdentifier:fillLayer.identifier]);
+
+    MGLRasterStyleLayer *rasterLayer = [[MGLRasterStyleLayer alloc] initWithIdentifier:@"raster-layer" source:source];
+    [self.style removeLayer:rasterLayer];
+    [self.style addLayer:rasterLayer];
+    XCTAssertNotNil([self.style layerWithIdentifier:rasterLayer.identifier]);
+
+    MGLSymbolStyleLayer *symbolLayer = [[MGLSymbolStyleLayer alloc] initWithIdentifier:@"symbol-layer" source:source];
+    [self.style removeLayer:symbolLayer];
+    [self.style addLayer:symbolLayer];
+    XCTAssertNotNil([self.style layerWithIdentifier:symbolLayer.identifier]);
+
+    MGLLineStyleLayer *lineLayer = [[MGLLineStyleLayer alloc] initWithIdentifier:@"line-layer" source:source];
+    [self.style removeLayer:lineLayer];
+    [self.style addLayer:lineLayer];
+    XCTAssertNotNil([self.style layerWithIdentifier:lineLayer.identifier]);
+
+    MGLCircleStyleLayer *circleLayer = [[MGLCircleStyleLayer alloc] initWithIdentifier:@"circle-layer" source:source];
+    [self.style removeLayer:circleLayer];
+    [self.style addLayer:circleLayer];
+    XCTAssertNotNil([self.style layerWithIdentifier:circleLayer.identifier]);
+
+    MGLBackgroundStyleLayer *backgroundLayer = [[MGLBackgroundStyleLayer alloc] initWithIdentifier:@"circle-layer"];
+    [self.style removeLayer:backgroundLayer];
+    [self.style addLayer:backgroundLayer];
+    XCTAssertNotNil([self.style layerWithIdentifier:backgroundLayer.identifier]);
+}
+
 - (NSString *)stringWithContentsOfStyleHeader {
     NSURL *styleHeaderURL = [[[NSBundle mgl_frameworkBundle].bundleURL
                               URLByAppendingPathComponent:@"Headers" isDirectory:YES]
