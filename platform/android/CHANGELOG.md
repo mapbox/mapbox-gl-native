@@ -4,7 +4,7 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 
 ## 5.0.0-beta.1 - February 14th, 2017
 
-* Suppor for data-driven styles [#7752](https://github.com/mapbox/mapbox-gl-native/pull/7752)
+* Support for data-driven styles [#7752](https://github.com/mapbox/mapbox-gl-native/pull/7752)
 * Consistent double tap zoom acceleration [#7514](https://github.com/mapbox/mapbox-gl-native/issues/7514)
 * Cleanup inconsistencies `float` vs `double` [#4445](https://github.com/mapbox/mapbox-gl-native/issues/4445)
 * Add `mapbox_` prefix to attributes [#6482](https://github.com/mapbox/mapbox-gl-native/issues/6482)
