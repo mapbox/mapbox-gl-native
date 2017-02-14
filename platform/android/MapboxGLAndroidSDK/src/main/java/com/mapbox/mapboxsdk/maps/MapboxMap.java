@@ -1066,8 +1066,14 @@ public class MapboxMap {
                     if(onMarkerViewAddedListener !=null && markerViewManager.getView(marker)!=null){
                         // checking if view is also found in current viewport.
                         onMarkerViewAddedListener.onViewAdded(marker);
+                        //MAPPY: to fix the mapbox bug
+                        mapView.removeOnMapChangedListener(this);
+                    } else if(onMarkerViewAddedListener instanceof MarkerViewManager.OnMarkerViewAddedListenerWithControl) {
+                        //MAPPY: to fix the mapbox bug
+                        if(!((MarkerViewManager.OnMarkerViewAddedListenerWithControl) onMarkerViewAddedListener).isValid()){
+                            mapView.removeOnMapChangedListener(this);
+                        }
                     }
-                    mapView.removeOnMapChangedListener(this);
                 }
             }
         });

@@ -481,7 +481,6 @@ public class MarkerViewManager {
 
         List<MarkerView> markers = mapView.getMarkerViewsInRect(mapViewRect);
         View convertView;
-
         // remove old markers
         Iterator<MarkerView> iterator = markerViewMap.keySet().iterator();
         while (iterator.hasNext()) {
@@ -499,8 +498,6 @@ public class MarkerViewManager {
                 }
             }
         }
-
-
 
         // introduce new markers
         for (final MarkerView marker : markers) {
@@ -693,5 +690,15 @@ public class MarkerViewManager {
          * @param markerView The MarkerView the View was added for
          */
         void onViewAdded(@NonNull  MarkerView markerView);
+    }
+
+    //MAPPY: needed to
+    public interface OnMarkerViewAddedListenerWithControl extends OnMarkerViewAddedListener{
+
+        /**
+         * to verify if the listener is still valid or not
+         *
+         */
+        boolean isValid();
     }
 }
