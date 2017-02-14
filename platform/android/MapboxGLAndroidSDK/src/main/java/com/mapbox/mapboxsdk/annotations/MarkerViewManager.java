@@ -699,6 +699,6 @@ public class MarkerViewManager {
          * to verify if the listener is still valid or not
          *
          */
-        boolean isValid();
+        boolean isMarkerExist();
     }
 }

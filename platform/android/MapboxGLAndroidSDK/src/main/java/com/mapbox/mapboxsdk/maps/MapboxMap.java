@@ -51,7 +51,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Logger;
 
 /**
  * The general class to interact with in the Android Mapbox SDK. It exposes the entry point for all
@@ -1070,7 +1069,7 @@ public class MapboxMap {
                         mapView.removeOnMapChangedListener(this);
                     } else if(onMarkerViewAddedListener instanceof MarkerViewManager.OnMarkerViewAddedListenerWithControl) {
                         //MAPPY: to fix the mapbox bug
-                        if(!((MarkerViewManager.OnMarkerViewAddedListenerWithControl) onMarkerViewAddedListener).isValid()){
+                        if(!((MarkerViewManager.OnMarkerViewAddedListenerWithControl) onMarkerViewAddedListener).isMarkerExist()){
                             mapView.removeOnMapChangedListener(this);
                         }
                     }
