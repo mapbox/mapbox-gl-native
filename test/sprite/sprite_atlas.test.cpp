@@ -42,7 +42,7 @@ TEST(SpriteAtlas, Basic) {
     EXPECT_EQ(63u, atlas.getAtlasImage().size.width);
     EXPECT_EQ(112u, atlas.getAtlasImage().size.height);
 
-    auto pos = *atlas.getPosition("metro", SpritePatternMode::Single);
+    auto pos = *atlas.getImage("metro", SpritePatternMode::Single);
     EXPECT_DOUBLE_EQ(18, pos.size[0]);
     EXPECT_DOUBLE_EQ(18, pos.size[1]);
     EXPECT_DOUBLE_EQ(1.0f / 63, pos.tl[0]);

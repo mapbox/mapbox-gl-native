@@ -24,9 +24,9 @@ void Painter::renderBackground(PaintParameters& parameters, const BackgroundLaye
     const FillProgram::PaintPropertyBinders paintAttibuteData(properties, 0);
 
     if (!background.get<BackgroundPattern>().to.empty()) {
-        optional<SpriteAtlasPosition> imagePosA = spriteAtlas->getPosition(
+        optional<SpriteAtlasElement> imagePosA = spriteAtlas->getImage(
             background.get<BackgroundPattern>().from, SpritePatternMode::Repeating);
-        optional<SpriteAtlasPosition> imagePosB = spriteAtlas->getPosition(
+        optional<SpriteAtlasElement> imagePosB = spriteAtlas->getImage(
             background.get<BackgroundPattern>().to, SpritePatternMode::Repeating);
 
         if (!imagePosA || !imagePosB)

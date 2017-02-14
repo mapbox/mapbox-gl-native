@@ -23,21 +23,17 @@ namespace gl {
 class Context;
 } // namespace gl
 
-class SpriteImage;
-class SpritePosition;
-
-class SpriteAtlasPosition {
-public:
-    std::array<float, 2> size = {{ 0, 0 }};
-    std::array<float, 2> tl = {{ 0, 0 }};
-    std::array<float, 2> br = {{ 0, 0 }};
-};
-
 class SpriteAtlasElement {
 public:
+    SpriteAtlasElement(Rect<uint16_t>, std::shared_ptr<const SpriteImage>, Size size, float pixelRatio);
+
     Rect<uint16_t> pos;
     std::shared_ptr<const SpriteImage> spriteImage;
+
     float relativePixelRatio;
+    std::array<float, 2> size;
+    std::array<float, 2> tl;
+    std::array<float, 2> br;
 };
 
 enum class SpritePatternMode : bool {
@@ -77,10 +73,6 @@ public:
     // If the sprite is loaded, copies the requsted image from it into the atlas and returns
     // the resulting icon measurements. If not, returns an empty optional.
     optional<SpriteAtlasElement> getImage(const std::string& name, SpritePatternMode mode);
-
-    // This function is used for getting the position during render time.
-    optional<SpriteAtlasPosition> getPosition(const std::string& name,
-                                              SpritePatternMode mode = SpritePatternMode::Single);
 
     // Binds the atlas texture to the GPU, and uploads data if it is out of date.
     void bind(bool linear, gl::Context&, gl::TextureUnit unit);

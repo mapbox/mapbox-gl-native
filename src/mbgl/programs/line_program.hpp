@@ -16,7 +16,7 @@ namespace mbgl {
 class RenderTile;
 class TransformState;
 class LinePatternPos;
-class SpriteAtlasPosition;
+class SpriteAtlasElement;
 
 namespace uniforms {
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_ratio);
@@ -123,8 +123,8 @@ public:
                                        const RenderTile&,
                                        const TransformState&,
                                        const std::array<float, 2>& pixelsToGLUnits,
-                                       const SpriteAtlasPosition& posA,
-                                       const SpriteAtlasPosition& posB);
+                                       const SpriteAtlasElement& posA,
+                                       const SpriteAtlasElement& posB);
 };
 
 class LineSDFProgram : public Program<

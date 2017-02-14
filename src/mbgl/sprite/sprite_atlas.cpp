@@ -27,6 +27,23 @@ struct SpriteAtlas::Loader {
     std::unique_ptr<AsyncRequest> spriteRequest;
 };
 
+SpriteAtlasElement::SpriteAtlasElement(Rect<uint16_t> rect_,
+                                       std::shared_ptr<const SpriteImage> image_,
+                                       Size size_, float pixelRatio)
+    : pos(std::move(rect_)),
+      spriteImage(std::move(image_)),
+      relativePixelRatio(spriteImage->pixelRatio / pixelRatio) {
+
+    const float padding = 1;
+
+    const float w = spriteImage->getWidth() * relativePixelRatio;
+    const float h = spriteImage->getHeight() * relativePixelRatio;
+
+    size = {{ float(spriteImage->getWidth()), spriteImage->getHeight() }};
+    tl   = {{ float(pos.x + padding)     / size_.width, float(pos.y + padding)     / size_.height }};
+    br   = {{ float(pos.x + padding + w) / size_.width, float(pos.y + padding + h) / size_.height }};
+}
+
 SpriteAtlas::SpriteAtlas(Size size_, float pixelRatio_)
     : size(std::move(size_)),
       pixelRatio(pixelRatio_),
@@ -192,7 +209,8 @@ optional<SpriteAtlasElement> SpriteAtlas::getImage(const std::string& name,
         return SpriteAtlasElement {
             *entry.iconRect,
             entry.spriteImage,
-            entry.spriteImage->pixelRatio / pixelRatio
+            size,
+            pixelRatio
         };
     }
 
@@ -200,7 +218,8 @@ optional<SpriteAtlasElement> SpriteAtlas::getImage(const std::string& name,
         return SpriteAtlasElement {
             *entry.patternRect,
             entry.spriteImage,
-            entry.spriteImage->pixelRatio / pixelRatio
+            size,
+            pixelRatio
         };
     }
 
@@ -233,31 +252,8 @@ optional<SpriteAtlasElement> SpriteAtlas::getImage(const std::string& name,
     return SpriteAtlasElement {
         rect,
         entry.spriteImage,
-        entry.spriteImage->pixelRatio / pixelRatio
-    };
-}
-
-optional<SpriteAtlasPosition> SpriteAtlas::getPosition(const std::string& name,
-                                                       const SpritePatternMode mode) {
-    std::lock_guard<std::recursive_mutex> lock(mutex);
-
-    auto img = getImage(name, mode);
-    if (!img) {
-        return {};
-    }
-
-    auto rect = (*img).pos;
-
-    const float padding = 1;
-    auto spriteImage = (*img).spriteImage;
-
-    const float w = spriteImage->getWidth() * (*img).relativePixelRatio;
-    const float h = spriteImage->getHeight() * (*img).relativePixelRatio;
-
-    return SpriteAtlasPosition {
-        {{ float(spriteImage->getWidth()), spriteImage->getHeight() }},
-        {{ float(rect.x + padding)     / size.width, float(rect.y + padding)     / size.height }},
-        {{ float(rect.x + padding + w) / size.width, float(rect.y + padding + h) / size.height }}
+        size,
+        pixelRatio
     };
 }
 

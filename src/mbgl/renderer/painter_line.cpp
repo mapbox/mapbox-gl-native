@@ -61,9 +61,9 @@ void Painter::renderLine(PaintParameters& parameters,
                  lineAtlas->getSize().width));
 
     } else if (!properties.get<LinePattern>().from.empty()) {
-        optional<SpriteAtlasPosition> posA = spriteAtlas->getPosition(
+        optional<SpriteAtlasElement> posA = spriteAtlas->getImage(
             properties.get<LinePattern>().from, SpritePatternMode::Repeating);
-        optional<SpriteAtlasPosition> posB = spriteAtlas->getPosition(
+        optional<SpriteAtlasElement> posB = spriteAtlas->getImage(
             properties.get<LinePattern>().to, SpritePatternMode::Repeating);
 
         if (!posA || !posB)
