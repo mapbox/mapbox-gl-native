@@ -255,7 +255,7 @@ void SymbolLayout::prepare(uintptr_t tileUID,
 
         // if feature has icon, get sprite atlas position
         if (feature.icon) {
-            auto image = spriteAtlas.getImage(*feature.icon, SpritePatternMode::Single);
+            auto image = spriteAtlas.getIcon(*feature.icon);
             if (image) {
                 shapedIcon = shapeIcon(*image, feature);
                 assert((*image).spriteImage);

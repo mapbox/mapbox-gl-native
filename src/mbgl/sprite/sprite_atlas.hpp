@@ -36,11 +36,6 @@ public:
     std::array<float, 2> br;
 };
 
-enum class SpritePatternMode : bool {
-    Single = false,
-    Repeating = true,
-};
-
 class SpriteAtlas : public util::noncopyable {
 public:
     using Sprites = std::map<std::string, std::shared_ptr<const SpriteImage>>;
@@ -58,21 +53,13 @@ public:
 
     void setObserver(SpriteAtlasObserver*);
 
-    // Adds/replaces a Sprite image.
     void setSprite(const std::string&, std::shared_ptr<const SpriteImage>);
-
-    // Adds/replaces mutliple Sprite images.
-    void setSprites(const Sprites& sprites);
-
-    // Removes a Sprite.
     void removeSprite(const std::string&);
 
-    // Obtains a Sprite image.
     std::shared_ptr<const SpriteImage> getSprite(const std::string&);
 
-    // If the sprite is loaded, copies the requsted image from it into the atlas and returns
-    // the resulting icon measurements. If not, returns an empty optional.
-    optional<SpriteAtlasElement> getImage(const std::string& name, SpritePatternMode mode);
+    optional<SpriteAtlasElement> getIcon(const std::string& name);
+    optional<SpriteAtlasElement> getPattern(const std::string& name);
 
     // Binds the atlas texture to the GPU, and uploads data if it is out of date.
     void bind(bool linear, gl::Context&, gl::TextureUnit unit);
@@ -85,6 +72,7 @@ public:
     float getPixelRatio() const { return pixelRatio; }
 
     // Only for use in tests.
+    void setSprites(const Sprites& sprites);
     const PremultipliedImage& getAtlasImage() const {
         return image;
     }
@@ -93,7 +81,6 @@ private:
     void _setSprite(const std::string&, const std::shared_ptr<const SpriteImage>& = nullptr);
     void emitSpriteLoadedIfComplete();
 
-    void copy(const PremultipliedImage&, Rect<uint16_t>, SpritePatternMode);
 
     const Size size;
     const float pixelRatio;
@@ -107,9 +94,17 @@ private:
 
     struct Entry {
         std::shared_ptr<const SpriteImage> spriteImage;
+
+        // One sprite image might be used as both an icon image and a pattern image. If so,
+        // it must have two distinct entries in the texture. The one for the icon image has
+        // a single pixel transparent border, and the one for the pattern image has a single
+        // pixel border wrapped from the opposite side.
         optional<Rect<uint16_t>> iconRect;
         optional<Rect<uint16_t>> patternRect;
     };
+
+    optional<SpriteAtlasElement> getImage(const std::string& name, optional<Rect<uint16_t>> Entry::*rect);
+    void copy(const Entry&, optional<Rect<uint16_t>> Entry::*rect);
 
     std::mutex mutex;
     std::unordered_map<std::string, Entry> entries;

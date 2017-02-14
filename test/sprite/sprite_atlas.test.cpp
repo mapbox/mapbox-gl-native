@@ -28,7 +28,7 @@ TEST(SpriteAtlas, Basic) {
     EXPECT_EQ(63u, atlas.getSize().width);
     EXPECT_EQ(112u, atlas.getSize().height);
 
-    auto metro = *atlas.getImage("metro", SpritePatternMode::Single);
+    auto metro = *atlas.getIcon("metro");
     EXPECT_EQ(0, metro.pos.x);
     EXPECT_EQ(0, metro.pos.y);
     EXPECT_EQ(20, metro.pos.w);
@@ -42,7 +42,7 @@ TEST(SpriteAtlas, Basic) {
     EXPECT_EQ(63u, atlas.getAtlasImage().size.width);
     EXPECT_EQ(112u, atlas.getAtlasImage().size.height);
 
-    auto pos = *atlas.getImage("metro", SpritePatternMode::Single);
+    auto pos = *atlas.getIcon("metro");
     EXPECT_DOUBLE_EQ(18, pos.size[0]);
     EXPECT_DOUBLE_EQ(18, pos.size[1]);
     EXPECT_DOUBLE_EQ(1.0f / 63, pos.tl[0]);
@@ -50,7 +50,7 @@ TEST(SpriteAtlas, Basic) {
     EXPECT_DOUBLE_EQ(19.0f / 63, pos.br[0]);
     EXPECT_DOUBLE_EQ(19.0f / 112, pos.br[1]);
 
-    auto missing = atlas.getImage("doesnotexist", SpritePatternMode::Single);
+    auto missing = atlas.getIcon("doesnotexist");
     EXPECT_FALSE(missing);
 
     EXPECT_EQ(1u, log.count({
@@ -61,7 +61,7 @@ TEST(SpriteAtlas, Basic) {
                   }));
 
     // Different wrapping mode produces different image.
-    auto metro2 = *atlas.getImage("metro", SpritePatternMode::Repeating);
+    auto metro2 = *atlas.getPattern("metro");
     EXPECT_EQ(20, metro2.pos.x);
     EXPECT_EQ(0, metro2.pos.y);
     EXPECT_EQ(20, metro2.pos.w);
@@ -81,7 +81,7 @@ TEST(SpriteAtlas, Size) {
     EXPECT_EQ(63u, atlas.getSize().width);
     EXPECT_EQ(112u, atlas.getSize().height);
 
-    auto metro = *atlas.getImage("metro", SpritePatternMode::Single);
+    auto metro = *atlas.getIcon("metro");
     EXPECT_EQ(0, metro.pos.x);
     EXPECT_EQ(0, metro.pos.y);
     EXPECT_EQ(16, metro.pos.w);
@@ -107,7 +107,7 @@ TEST(SpriteAtlas, Updates) {
     EXPECT_EQ(32u, atlas.getSize().height);
 
     atlas.setSprite("one", std::make_shared<SpriteImage>(PremultipliedImage({ 16, 12 }), 1));
-    auto one = *atlas.getImage("one", SpritePatternMode::Single);
+    auto one = *atlas.getIcon("one");
     EXPECT_EQ(0, one.pos.x);
     EXPECT_EQ(0, one.pos.y);
     EXPECT_EQ(20, one.pos.w);
@@ -189,12 +189,12 @@ TEST(SpriteAtlas, RemoveReleasesBinPackRect) {
     const auto big = std::make_shared<SpriteImage>(PremultipliedImage({ 32, 32 }), 1);
 
     atlas.setSprite("big", big);
-    EXPECT_TRUE(atlas.getImage("big", SpritePatternMode::Single));
+    EXPECT_TRUE(atlas.getIcon("big"));
 
     atlas.removeSprite("big");
 
     atlas.setSprite("big", big);
-    EXPECT_TRUE(atlas.getImage("big", SpritePatternMode::Single));
+    EXPECT_TRUE(atlas.getIcon("big"));
 
     EXPECT_EQ(big, atlas.getSprite("big"));
     EXPECT_TRUE(log.empty());

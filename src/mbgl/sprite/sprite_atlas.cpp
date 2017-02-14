@@ -153,6 +153,11 @@ void SpriteAtlas::removeSprite(const std::string& name) {
 
 void SpriteAtlas::_setSprite(const std::string& name,
                              const std::shared_ptr<const SpriteImage>& sprite) {
+    if (!sprite->image.valid()) {
+        Log::Warning(Event::Sprite, "invalid sprite image '%s'", name.c_str());
+        return;
+    }
+
     auto it = entries.find(name);
     if (it == entries.end()) {
         entries.emplace(name, Entry { sprite, {}, {} });
@@ -170,11 +175,11 @@ void SpriteAtlas::_setSprite(const std::string& name,
     entry.spriteImage = sprite;
 
     if (entry.iconRect) {
-        copy(entry.spriteImage->image, *entry.iconRect, SpritePatternMode::Single);
+        copy(entry, &Entry::iconRect);
     }
 
     if (entry.patternRect) {
-        copy(entry.spriteImage->image, *entry.patternRect, SpritePatternMode::Repeating);
+        copy(entry, &Entry::patternRect);
     }
 }
 
@@ -191,8 +196,16 @@ std::shared_ptr<const SpriteImage> SpriteAtlas::getSprite(const std::string& nam
     }
 }
 
+optional<SpriteAtlasElement> SpriteAtlas::getIcon(const std::string& name) {
+    return getImage(name, &Entry::iconRect);
+}
+
+optional<SpriteAtlasElement> SpriteAtlas::getPattern(const std::string& name) {
+    return getImage(name, &Entry::patternRect);
+}
+
 optional<SpriteAtlasElement> SpriteAtlas::getImage(const std::string& name,
-                                                   const SpritePatternMode mode) {
+                                                   optional<Rect<uint16_t>> Entry::*entryRect) {
     std::lock_guard<std::mutex> lock(mutex);
 
     auto it = entries.find(name);
@@ -205,18 +218,9 @@ optional<SpriteAtlasElement> SpriteAtlas::getImage(const std::string& name,
 
     Entry& entry = it->second;
 
-    if (mode == SpritePatternMode::Single && entry.iconRect) {
+    if (entry.*entryRect) {
         return SpriteAtlasElement {
-            *entry.iconRect,
-            entry.spriteImage,
-            size,
-            pixelRatio
-        };
-    }
-
-    if (mode == SpritePatternMode::Repeating && entry.patternRect) {
-        return SpriteAtlasElement {
-            *entry.patternRect,
+            *(entry.*entryRect),
             entry.spriteImage,
             size,
             pixelRatio
@@ -241,13 +245,8 @@ optional<SpriteAtlasElement> SpriteAtlas::getImage(const std::string& name,
         return {};
     }
 
-    copy(entry.spriteImage->image, rect, mode);
-
-    if (mode == SpritePatternMode::Single) {
-        entry.iconRect = rect;
-    } else {
-        entry.patternRect = rect;
-    }
+    entry.*entryRect = rect;
+    copy(entry, entryRect);
 
     return SpriteAtlasElement {
         rect,
@@ -257,26 +256,25 @@ optional<SpriteAtlasElement> SpriteAtlas::getImage(const std::string& name,
     };
 }
 
-void SpriteAtlas::copy(const PremultipliedImage& src, Rect<uint16_t> pos, const SpritePatternMode mode) {
+void SpriteAtlas::copy(const Entry& entry, optional<Rect<uint16_t>> Entry::*entryRect) {
     if (!image.valid()) {
         image = PremultipliedImage({ static_cast<uint32_t>(std::ceil(size.width * pixelRatio)),
                                      static_cast<uint32_t>(std::ceil(size.height * pixelRatio)) });
         image.fill(0);
     }
 
-    if (!src.valid()) {
-        return;
-    }
+    const PremultipliedImage& src = entry.spriteImage->image;
+    const Rect<uint16_t>& rect = *(entry.*entryRect);
 
     const uint32_t padding = 1;
-    const uint32_t x = (pos.x + padding) * pixelRatio;
-    const uint32_t y = (pos.y + padding) * pixelRatio;
+    const uint32_t x = (rect.x + padding) * pixelRatio;
+    const uint32_t y = (rect.y + padding) * pixelRatio;
     const uint32_t w = src.size.width;
     const uint32_t h = src.size.height;
 
     PremultipliedImage::copy(src, image, { 0, 0 }, { x, y }, { w, h });
 
-    if (mode == SpritePatternMode::Repeating) {
+    if (entryRect == &Entry::patternRect) {
         // Add 1 pixel wrapped padding on each side of the image.
         PremultipliedImage::copy(src, image, { 0, h - 1 }, { x, y - 1 }, { w, 1 }); // T
         PremultipliedImage::copy(src, image, { 0,     0 }, { x, y + h }, { w, 1 }); // B
