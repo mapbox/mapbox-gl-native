@@ -14,7 +14,8 @@ TEST(getIconQuads, normal) {
     Anchor anchor(2.0, 3.0, 0.0, 0.5f, 0);
     SpriteAtlasElement image = {
         Rect<uint16_t>( 0, 0, 15, 11 ),
-        std::shared_ptr<const SpriteImage>(),
+        std::make_shared<const SpriteImage>(PremultipliedImage({1,1}), 1.0),
+        { 0, 0 },
         1.0f
     };
     PositionedIcon shapedIcon(image, -5.0, 6.0, -7.0, 8.0, 0);
@@ -44,7 +45,8 @@ TEST(getIconQuads, style) {
     Anchor anchor(0.0, 0.0, 0.0, 0.5f, 0);
     SpriteAtlasElement image = {
         Rect<uint16_t>( 0, 0, 20, 20 ),
-        std::shared_ptr<const SpriteImage>(),
+        std::make_shared<const SpriteImage>(PremultipliedImage({1,1}), 1.0),
+        { 0, 0 },
         1.0f
     };
     PositionedIcon shapedIcon(image, -10.0, 10.0, -10.0, 10.0, 0);

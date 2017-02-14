@@ -88,8 +88,8 @@ LinePatternProgram::uniformValues(const LinePaintProperties::Evaluated& properti
                                   const RenderTile& tile,
                                   const TransformState& state,
                                   const std::array<float, 2>& pixelsToGLUnits,
-                                  const SpriteAtlasPosition& posA,
-                                  const SpriteAtlasPosition& posB) {
+                                  const SpriteAtlasElement& posA,
+                                  const SpriteAtlasElement& posB) {
      std::array<float, 2> sizeA {{
          tile.id.pixelsToTileUnits(posA.size[0] * properties.get<LinePattern>().fromScale, state.getIntegerZoom()),
          posA.size[1]

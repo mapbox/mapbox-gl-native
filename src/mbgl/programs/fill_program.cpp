@@ -13,8 +13,8 @@ static_assert(sizeof(FillLayoutVertex) == 4, "expected FillLayoutVertex size");
 FillPatternUniforms::Values
 FillPatternUniforms::values(mat4 matrix,
                             Size framebufferSize,
-                            const SpriteAtlasPosition& a,
-                            const SpriteAtlasPosition& b,
+                            const SpriteAtlasElement& a,
+                            const SpriteAtlasElement& b,
                             const Faded<std::string>& fading,
                             const UnwrappedTileID& tileID,
                             const TransformState& state)
