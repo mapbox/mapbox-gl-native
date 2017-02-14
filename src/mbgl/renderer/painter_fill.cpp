@@ -24,10 +24,8 @@ void Painter::renderFill(PaintParameters& parameters,
             return;
         }
 
-        optional<SpriteAtlasElement> imagePosA = spriteAtlas->getImage(
-            properties.get<FillPattern>().from, SpritePatternMode::Repeating);
-        optional<SpriteAtlasElement> imagePosB = spriteAtlas->getImage(
-            properties.get<FillPattern>().to, SpritePatternMode::Repeating);
+        optional<SpriteAtlasElement> imagePosA = spriteAtlas->getPattern(properties.get<FillPattern>().from);
+        optional<SpriteAtlasElement> imagePosB = spriteAtlas->getPattern(properties.get<FillPattern>().to);
 
         if (!imagePosA || !imagePosB) {
             return;
