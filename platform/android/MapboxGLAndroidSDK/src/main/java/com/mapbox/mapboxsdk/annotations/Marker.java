@@ -30,6 +30,8 @@ public class Marker extends Annotation {
   private LatLng position;
   private String snippet;
   private Icon icon;
+  //Redundantly stored for JNI access
+  private String iconId;
   private String title;
 
   private InfoWindow infoWindow;
@@ -148,6 +150,7 @@ public class Marker extends Annotation {
    */
   public void setIcon(@Nullable Icon icon) {
     this.icon = icon;
+    this.iconId = icon != null ? icon.getId() : null;
     MapboxMap map = getMapboxMap();
     if (map != null) {
       map.updateMarker(this);

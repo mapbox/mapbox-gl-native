@@ -8,15 +8,20 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
+import com.mapbox.mapboxsdk.maps.Callback;
 import com.mapbox.mapboxsdk.testapp.R;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.List;
+
+import timber.log.Timber;
 
 public class PressForMarkerActivity extends AppCompatActivity {
 
@@ -43,26 +48,39 @@ public class PressForMarkerActivity extends AppCompatActivity {
 
         mapboxMap.setOnMapLongClickListener(new MapboxMap.OnMapLongClickListener() {
           @Override
-          public void onMapLongClick(@NonNull LatLng point) {
-            final PointF pixel = mapboxMap.getProjection().toScreenLocation(point);
+          public void onMapLongClick(@NonNull final LatLng point) {
+            mapboxMap.getProjection().toScreenLocation(point, new Callback<PointF>() {
+              @Override
+              public void onResult(PointF pixel) {
+                String title = LAT_LON_FORMATTER.format(point.getLatitude()) + ", "
+                  + LAT_LON_FORMATTER.format(point.getLongitude());
+                String snippet = "X = " + (int) pixel.x + ", Y = " + (int) pixel.y;
 
-            String title = LAT_LON_FORMATTER.format(point.getLatitude()) + ", "
-              + LAT_LON_FORMATTER.format(point.getLongitude());
-            String snippet = "X = " + (int) pixel.x + ", Y = " + (int) pixel.y;
+                MarkerOptions marker = new MarkerOptions()
+                  .position(point)
+                  .title(title)
+                  .snippet(snippet);
 
-            MarkerOptions marker = new MarkerOptions()
-              .position(point)
-              .title(title)
-              .snippet(snippet);
-
-            markerList.add(marker);
-            mapboxMap.addMarker(marker);
+                markerList.add(marker);
+                mapboxMap.addMarker(marker, new Callback<Marker>() {
+                  @Override
+                  public void onResult(Marker marker) {
+                    Timber.i("Marker added");
+                  }
+                });
+              }
+            });
           }
         });
 
         if (savedInstanceState != null) {
           markerList = savedInstanceState.getParcelableArrayList(STATE_MARKER_LIST);
-          mapboxMap.addMarkers(markerList);
+          mapboxMap.addMarkers(markerList, new Callback<List<Marker>>() {
+            @Override
+            public void onResult(List<Marker> markers) {
+              Timber.i("Markers added with size %d", markers.size());
+            }
+          });
         }
       }
     });

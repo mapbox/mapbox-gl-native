@@ -172,12 +172,14 @@ public final class CompassView extends AppCompatImageView implements Runnable, F
       final MapboxMap mapboxMap = this.mapboxMap.get();
       final CompassView compassView = this.compassView.get();
       if (mapboxMap != null && compassView != null) {
-        PointF focalPoint = compassView.getFocalPoint();
-        if (focalPoint != null) {
-          mapboxMap.setFocalBearing(0, focalPoint.x, focalPoint.y, TIME_MAP_NORTH_ANIMATION);
-        } else {
-          mapboxMap.setFocalBearing(0, mapboxMap.getWidth() / 2, mapboxMap.getHeight() / 2, TIME_MAP_NORTH_ANIMATION);
-        }
+        //PointF focalPoint = compassView.getFocalPoint();
+        //if (focalPoint != null) {
+        //mapboxMap.setFocalBearing(0, focalPoint.x, focalPoint.y, TIME_MAP_NORTH_ANIMATION);
+        //} else {
+        //mapboxMap.setFocalBearing(0, mapboxMap.getWidth() / 2, mapboxMap.getHeight() / 2, TIME_MAP_NORTH_ANIMATION);
+        //}
+        // FIXME: 10/02/2017 with animation and focal point
+        mapboxMap.resetNorth();
         compassView.postDelayed(compassView, TIME_WAIT_IDLE + TIME_MAP_NORTH_ANIMATION);
       }
     }

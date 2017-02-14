@@ -249,6 +249,14 @@ public final class CameraPosition implements Parcelable {
       }
     }
 
+    public Builder(LatLng latLng, double zoom, double tilt, double bearing) {
+      super();
+      this.target = latLng;
+      this.zoom = zoom;
+      this.tilt = tilt;
+      this.bearing = bearing;
+    }
+
     /**
      * Sets the direction that the camera is pointing in, in degrees clockwise from north.
      *

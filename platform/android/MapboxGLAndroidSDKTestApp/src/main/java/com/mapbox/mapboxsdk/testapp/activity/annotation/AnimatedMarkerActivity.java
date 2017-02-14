@@ -8,30 +8,26 @@ import android.animation.ValueAnimator;
 import android.os.Bundle;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
-import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 
 import com.mapbox.mapboxsdk.annotations.Icon;
 import com.mapbox.mapboxsdk.annotations.IconFactory;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerView;
-import com.mapbox.mapboxsdk.annotations.MarkerViewManager;
 import com.mapbox.mapboxsdk.annotations.MarkerViewOptions;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
+import com.mapbox.mapboxsdk.geometry.VisibleRegion;
+import com.mapbox.mapboxsdk.maps.Callback;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.R;
-import com.mapbox.mapboxsdk.testapp.utils.IconUtils;
-import com.mapbox.services.commons.models.Position;
 import com.mapbox.services.api.utils.turf.TurfMeasurement;
+import com.mapbox.services.commons.models.Position;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 public class AnimatedMarkerActivity extends AppCompatActivity {
@@ -45,9 +41,6 @@ public class AnimatedMarkerActivity extends AppCompatActivity {
   private MarkerView carMarker = null;
 
   private Runnable animationRunnable;
-
-  private List<MarkerView> markerViews = new ArrayList<>();
-  private boolean stopped;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -87,51 +80,49 @@ public class AnimatedMarkerActivity extends AppCompatActivity {
   }
 
   private void addPassenger() {
-    if (isActivityStopped()) {
-      return;
-    }
-
-    LatLng randomLatLng = getLatLngInBounds();
-
-    if (passengerMarker == null) {
-      Icon icon = IconUtils.drawableToIcon(this, R.drawable.ic_directions_run_black,
-        ResourcesCompat.getColor(getResources(), R.color.blueAccent, getTheme()));
-      passengerMarker = mapboxMap.addMarker(new MarkerViewOptions()
-        .position(randomLatLng)
-        .icon(icon));
-    } else {
-      passengerMarker.setPosition(randomLatLng);
-    }
+    getLatLngInBounds(new Callback<LatLng>() {
+      @Override
+      public void onResult(LatLng randomLatLng) {
+        if (passengerMarker == null) {
+          Icon icon = IconFactory.getInstance(AnimatedMarkerActivity.this)
+            .fromResource(R.drawable.ic_directions_run_black);
+          mapboxMap.addMarker(new MarkerViewOptions()
+              .position(randomLatLng)
+              .icon(icon),
+            new Callback<MarkerView>() {
+              @Override
+              public void onResult(MarkerView markerView) {
+                passengerMarker = markerView;
+              }
+            });
+        } else {
+          passengerMarker.setPosition(randomLatLng);
+        }
+      }
+    });
   }
 
   private void addMainCar() {
-    if (isActivityStopped()) {
-      return;
-    }
-
-    LatLng randomLatLng = getLatLngInBounds();
-
-    if (carMarker == null) {
-      carMarker = createCarMarker(randomLatLng, R.drawable.ic_taxi_top,
-        new MarkerViewManager.OnMarkerViewAddedListener() {
-          @Override
-          public void onViewAdded(@NonNull MarkerView markerView) {
-            // Make sure the car marker is selected so that it's always brought to the front (#5285)
-            mapboxMap.selectMarker(carMarker);
-            animateMoveToPassenger(carMarker);
-          }
-        });
-      markerViews.add(carMarker);
-    } else {
-      carMarker.setPosition(randomLatLng);
-    }
+    getLatLngInBounds(new Callback<LatLng>() {
+      @Override
+      public void onResult(LatLng randomLatLng) {
+        if (carMarker == null) {
+          createCarMarker(randomLatLng, R.drawable.ic_taxi_top, new Callback<MarkerView>() {
+            @Override
+            public void onResult(MarkerView markerView) {
+              carMarker = markerView;
+              mapboxMap.selectMarker(carMarker);
+              animateMoveToPassenger(carMarker);
+            }
+          });
+        } else {
+          carMarker.setPosition(randomLatLng);
+        }
+      }
+    });
   }
 
   private void animateMoveToPassenger(final MarkerView car) {
-    if (isActivityStopped()) {
-      return;
-    }
-
     ValueAnimator animator = animateMoveMarker(car, passengerMarker.getPosition());
     animator.addListener(new AnimatorListenerAdapter() {
       @Override
@@ -143,27 +134,31 @@ public class AnimatedMarkerActivity extends AppCompatActivity {
   }
 
   protected void addRandomCar() {
-    markerViews.add(createCarMarker(getLatLngInBounds(), R.drawable.ic_car_top,
-      new MarkerViewManager.OnMarkerViewAddedListener() {
-        @Override
-        public void onViewAdded(@NonNull MarkerView markerView) {
-          randomlyMoveMarker(markerView);
-        }
-      }));
+    getLatLngInBounds(new Callback<LatLng>() {
+      @Override
+      public void onResult(LatLng latLng) {
+        createCarMarker(latLng, R.drawable.ic_car_top, new Callback<MarkerView>() {
+          @Override
+          public void onResult(MarkerView markerView) {
+            randomlyMoveMarker(markerView);
+          }
+        });
+      }
+    });
   }
 
   private void randomlyMoveMarker(final MarkerView marker) {
-    if (isActivityStopped()) {
-      return;
-    }
-
-    ValueAnimator animator = animateMoveMarker(marker, getLatLngInBounds());
-
-    // Add listener to restart animation on end
-    animator.addListener(new AnimatorListenerAdapter() {
+    getLatLngInBounds(new Callback<LatLng>() {
       @Override
-      public void onAnimationEnd(Animator animation) {
-        randomlyMoveMarker(marker);
+      public void onResult(LatLng latLng) {
+        ValueAnimator animator = animateMoveMarker(marker, latLng);
+        // Add listener to restart animation on end
+        animator.addListener(new AnimatorListenerAdapter() {
+          @Override
+          public void onAnimationEnd(Animator animation) {
+            randomlyMoveMarker(marker);
+          }
+        });
       }
     });
   }
@@ -182,31 +177,35 @@ public class AnimatedMarkerActivity extends AppCompatActivity {
     return markerAnimator;
   }
 
-  private MarkerView createCarMarker(LatLng start, @DrawableRes int carResource,
-                                     MarkerViewManager.OnMarkerViewAddedListener listener) {
+  private void createCarMarker(LatLng start, @DrawableRes int carResource,
+                               Callback<MarkerView> listener) {
     Icon icon = IconFactory.getInstance(AnimatedMarkerActivity.this)
       .fromResource(carResource);
 
     // View Markers
-    return mapboxMap.addMarker(new MarkerViewOptions()
+    mapboxMap.addMarker(new MarkerViewOptions()
       .position(start)
       .icon(icon), listener);
 
     // GL Markers
-//        return mapboxMap.addMarker(new MarkerOptions()
-//                .position(start)
-//                .icon(icon));
-
+    //return mapboxMap.addMarker(new MarkerOptions()
+    //  .position(start)
+    //  .icon(icon));
   }
 
-  private LatLng getLatLngInBounds() {
-    LatLngBounds bounds = mapboxMap.getProjection().getVisibleRegion().latLngBounds;
-    Random generator = new Random();
-    double randomLat = bounds.getLatSouth() + generator.nextDouble()
-      * (bounds.getLatNorth() - bounds.getLatSouth());
-    double randomLon = bounds.getLonWest() + generator.nextDouble()
-      * (bounds.getLonEast() - bounds.getLonWest());
-    return new LatLng(randomLat, randomLon);
+  private void getLatLngInBounds(final Callback<LatLng> listener) {
+    mapboxMap.getProjection().getVisibleRegion(new Callback<VisibleRegion>() {
+      @Override
+      public void onResult(VisibleRegion visibleRegion) {
+        LatLngBounds bounds = visibleRegion.latLngBounds;
+        Random generator = new Random();
+        double randomLat = bounds.getLatSouth() + generator.nextDouble()
+          * (bounds.getLatNorth() - bounds.getLatSouth());
+        double randomLon = bounds.getLonWest() + generator.nextDouble()
+          * (bounds.getLonEast() - bounds.getLonWest());
+        listener.onResult(new LatLng(randomLat, randomLon));
+      }
+    });
   }
 
   @Override
@@ -230,19 +229,6 @@ public class AnimatedMarkerActivity extends AppCompatActivity {
   @Override
   protected void onStop() {
     super.onStop();
-
-    stopped = true;
-
-    // Stop ongoing animations, prevent memory lekas
-    MarkerViewManager markerViewManager = mapboxMap.getMarkerViewManager();
-    for (MarkerView markerView : markerViews) {
-      View view = markerViewManager.getView(markerView);
-      if (view != null) {
-        view.animate().cancel();
-      }
-    }
-
-    // onStop
     mapView.onStop();
     mapView.removeCallbacks(animationRunnable);
   }
@@ -287,9 +273,5 @@ public class AnimatedMarkerActivity extends AppCompatActivity {
       Position.fromCoordinates(from.getLongitude(), from.getLatitude()),
       Position.fromCoordinates(to.getLongitude(), to.getLatitude())
     );
-  }
-
-  private boolean isActivityStopped() {
-    return stopped;
   }
 }

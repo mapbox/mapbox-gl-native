@@ -11,6 +11,7 @@ import com.mapbox.mapboxsdk.annotations.PolygonOptions;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.maps.Callback;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.MapboxMapOptions;
@@ -52,8 +53,6 @@ public class PolygonActivity extends AppCompatActivity implements OnMapReadyCall
     // configure inital map state
     MapboxMapOptions options = new MapboxMapOptions()
       .attributionTintColor(RED_COLOR)
-      // deprecated feature!
-      .textureMode(true)
       .compassFadesWhenFacingNorth(false)
       .styleUrl(Style.MAPBOX_STREETS)
       .camera(new CameraPosition.Builder()
@@ -74,9 +73,15 @@ public class PolygonActivity extends AppCompatActivity implements OnMapReadyCall
   @Override
   public void onMapReady(MapboxMap map) {
     mapboxMap = map;
-    polygon = mapboxMap.addPolygon(new PolygonOptions()
-      .addAll(STAR_SHAPE_POINTS)
-      .fillColor(BLUE_COLOR));
+    mapboxMap.addPolygon(new PolygonOptions()
+        .addAll(STAR_SHAPE_POINTS)
+        .fillColor(BLUE_COLOR),
+      new Callback<Polygon>() {
+        @Override
+        public void onResult(Polygon polygon) {
+          PolygonActivity.this.polygon = polygon;
+        }
+      });
   }
 
   @Override

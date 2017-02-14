@@ -13,6 +13,7 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
+import com.mapbox.mapboxsdk.maps.Callback;
 import com.mapbox.mapboxsdk.testapp.R;
 
 import java.util.List;
@@ -54,13 +55,16 @@ public class MarkerViewsInRectangleActivity extends AppCompatActivity implements
     int left = selectionBox.getLeft() - mapView.getLeft();
     RectF box = new RectF(left, top, left + selectionBox.getWidth(), top + selectionBox.getHeight());
     Timber.i(String.format("Querying box %s", box));
-    List<MarkerView> markers = mapboxMap.getMarkerViewsInRect(box);
-
-    // Show count
-    Toast.makeText(
-      MarkerViewsInRectangleActivity.this,
-      String.format("%s markers inside box", markers.size()),
-      Toast.LENGTH_SHORT).show();
+    mapboxMap.getMarkerViewsInRect(box, new Callback<List<MarkerView>>() {
+      @Override
+      public void onResult(List<MarkerView> markers) {
+        // Show count
+        Toast.makeText(
+          MarkerViewsInRectangleActivity.this,
+          String.format("%s markers inside box", markers.size()),
+          Toast.LENGTH_SHORT).show();
+      }
+    });
   }
 
   @Override

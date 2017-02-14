@@ -13,7 +13,7 @@ android {
 
     defaultConfig {
         applicationId "com.mapbox.mapboxsdk.testapp"
-        minSdkVersion 15
+        minSdkVersion 16
         targetSdkVersion 25
         versionCode 11
         versionName "5.0.0"
@@ -86,6 +86,11 @@ dependencies {
     androidTestCompile "com.android.support.test:rules:${testRunnerVersion}"
     androidTestCompile "com.android.support.test.espresso:espresso-core:${espressoVersion}"
     androidTestCompile "com.android.support.test.espresso:espresso-intents:${espressoVersion}"
+
+    //FPS Meter
+    debugCompile "com.github.brianPlummer:tinydancer:0.1.0"
+    releaseCompile "com.github.brianPlummer:tinydancer-noop:0.1.0"
+    testCompile "com.github.brianPlummer:tinydancer-noop:0.1.0"
 }
 
 apply from: 'gradle-make.gradle'

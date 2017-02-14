@@ -184,7 +184,7 @@ public class UiSettingsTest {
   public void testRotateGestureChange() {
     assertEquals("Default state should be true", true, uiSettings.isRotateGestureChangeAllowed());
     uiSettings.setRotateGestureChangeAllowed(false);
-    assertEquals("State should have been changed", false, uiSettings.isRotateGestureChangeAllowed());
+    assertEquals("MapThreadExecutor should have been changed", false, uiSettings.isRotateGestureChangeAllowed());
   }
 
   @Test
@@ -219,7 +219,7 @@ public class UiSettingsTest {
   public void testTiltGestureChange() {
     assertEquals("Default state should be true", true, uiSettings.isTiltGestureChangeAllowed());
     uiSettings.setTiltGestureChangeAllowed(false);
-    assertEquals("State should have been changed", false, uiSettings.isTiltGestureChangeAllowed());
+    assertEquals("MapThreadExecutor should have been changed", false, uiSettings.isTiltGestureChangeAllowed());
   }
 
   @Test
@@ -254,7 +254,7 @@ public class UiSettingsTest {
   public void testZoomGestureChange() {
     assertEquals("Default state should be true", true, uiSettings.isZoomGestureChangeAllowed());
     uiSettings.setZoomGestureChangeAllowed(false);
-    assertEquals("State should have been changed", false, uiSettings.isZoomGestureChangeAllowed());
+    assertEquals("MapThreadExecutor should have been changed", false, uiSettings.isZoomGestureChangeAllowed());
   }
 
   @Test
@@ -336,7 +336,7 @@ public class UiSettingsTest {
   public void testScrollGestureChange() {
     assertEquals("Default state should be true", true, uiSettings.isScrollGestureChangeAllowed());
     uiSettings.setScrollGestureChangeAllowed(false);
-    assertEquals("State should have been changed", false, uiSettings.isScrollGestureChangeAllowed());
+    assertEquals("MapThreadExecutor should have been changed", false, uiSettings.isScrollGestureChangeAllowed());
   }
 
   @Test

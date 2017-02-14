@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Toast;
 
+import com.mapbox.mapboxsdk.maps.Callback;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
@@ -53,29 +54,33 @@ public class QueryRenderedFeaturesBoxHighlightActivity extends AppCompatActivity
             int left = selectionBox.getLeft() - mapView.getLeft();
             RectF box = new RectF(left, top, left + selectionBox.getWidth(), top + selectionBox.getHeight());
             Timber.i(String.format("Querying box %s for buildings", box));
-            List<Feature> features = mapboxMap.queryRenderedFeatures(box, "building");
+            mapboxMap.queryRenderedFeatures(box, new Callback<List<Feature>>() {
+              @Override
+              public void onResult(List<Feature> features) {
 
-            // Show count
-            Toast.makeText(
-              QueryRenderedFeaturesBoxHighlightActivity.this,
-              String.format("%s features in box", features.size()),
-              Toast.LENGTH_SHORT).show();
+                // Show count
+                Toast.makeText(
+                  QueryRenderedFeaturesBoxHighlightActivity.this,
+                  String.format("%s features in box", features.size()),
+                  Toast.LENGTH_SHORT).show();
 
-            // remove layer / source if already added
-            try {
-              mapboxMap.removeSource("highlighted-shapes-source");
-              mapboxMap.removeLayer("highlighted-shapes-layer");
-            } catch (Exception exception) {
-              // that's ok
-            }
+                // remove layer / source if already added
+                try {
+                  mapboxMap.removeSource("highlighted-shapes-source");
+                  mapboxMap.removeLayer("highlighted-shapes-layer");
+                } catch (Exception exception) {
+                  // that's ok
+                }
 
-            // Add layer / source
-            mapboxMap.addSource(
-              new GeoJsonSource("highlighted-shapes-source",
-                FeatureCollection.fromFeatures(features))
-            );
-            mapboxMap.addLayer(new FillLayer("highlighted-shapes-layer", "highlighted-shapes-source")
-              .withProperties(fillColor(Color.RED)));
+                // Add layer / source
+                mapboxMap.addSource(
+                  new GeoJsonSource("highlighted-shapes-source",
+                    FeatureCollection.fromFeatures(features))
+                );
+                mapboxMap.addLayer(new FillLayer("highlighted-shapes-layer", "highlighted-shapes-source")
+                  .withProperties(fillColor(Color.RED)));
+              }
+            }, "building");
           }
         });
       }

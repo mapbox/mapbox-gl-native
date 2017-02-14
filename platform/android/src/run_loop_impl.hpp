@@ -33,6 +33,11 @@ public:
     Impl(RunLoop*, RunLoop::Type);
     ~Impl();
 
+    // Optional wake function (for other wake mechanisms than pipes, eg no java run loop present)
+    void setWakeFunction(std::function<void()> callback) {
+        wakeFunction = callback;
+    }
+
     void wake();
 
     void addRunnable(Runnable*);
@@ -49,6 +54,7 @@ private:
     friend RunLoop;
 
     int fds[2];
+    std::function<void()> wakeFunction;
 
     JNIEnv *env = nullptr;
     bool detach = false;

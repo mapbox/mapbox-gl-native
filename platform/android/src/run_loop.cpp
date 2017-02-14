@@ -4,6 +4,7 @@
 #include <mbgl/util/thread_context.hpp>
 #include <mbgl/util/thread_local.hpp>
 #include <mbgl/util/timer.hpp>
+#include <mbgl/util/logging.hpp>
 
 #include <android/looper.h>
 
@@ -129,8 +130,15 @@ RunLoop::Impl::~Impl() {
 }
 
 void RunLoop::Impl::wake() {
+    mbgl::Log::Info(mbgl::Event::Android, "Waking...?");
     if (write(fds[PIPE_IN], "\n", 1) == -1) {
         throw std::runtime_error("Failed to write to file descriptor.");
+    }
+
+    // If the loop has a wake function, call it (assumed to be thread safe)
+    if (wakeFunction) {
+        mbgl::Log::Info(mbgl::Event::Android, "Calling wake function");
+        wakeFunction();
     }
 }
 
@@ -208,6 +216,7 @@ RunLoop::~RunLoop() {
 }
 
 LOOP_HANDLE RunLoop::getLoopHandle() {
+    assert (current.get() != nullptr);
     return current.get()->impl.get();
 }
 

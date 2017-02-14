@@ -13,6 +13,7 @@ import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.Callback;
 
 import java.lang.ref.WeakReference;
 
@@ -113,14 +114,15 @@ public class InfoWindow {
    *                    the view from the object position.
    * @return this {@link InfoWindow}.
    */
-  InfoWindow open(MapView mapView, Marker boundMarker, LatLng position, int offsetX, int offsetY) {
+  InfoWindow open(final MapView mapView, final Marker boundMarker, final LatLng position, final int offsetX,
+                  final int offsetY) {
     setBoundMarker(boundMarker);
 
-    MapView.LayoutParams lp = new MapView.LayoutParams(MapView.LayoutParams.WRAP_CONTENT,
+    final MapView.LayoutParams lp = new MapView.LayoutParams(MapView.LayoutParams.WRAP_CONTENT,
       MapView.LayoutParams.WRAP_CONTENT);
 
     MapboxMap mapboxMap = this.mapboxMap.get();
-    View view = this.view.get();
+    final View view = this.view.get();
     if (view != null && mapboxMap != null) {
       view.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
 
@@ -129,78 +131,83 @@ public class InfoWindow {
       markerWidthOffset = -offsetX;
 
       // Calculate default Android x,y coordinate
-      coordinates = mapboxMap.getProjection().toScreenLocation(position);
-      float x = coordinates.x - (view.getMeasuredWidth() / 2) + offsetX;
-      float y = coordinates.y - view.getMeasuredHeight() + offsetY;
+      mapboxMap.getProjection().toScreenLocation(position, new Callback<PointF>() {
+        @Override
+        public void onResult(PointF pointF) {
+          coordinates = pointF;
+          float x = coordinates.x - (view.getMeasuredWidth() / 2) + offsetX;
+          float y = coordinates.y - view.getMeasuredHeight() + offsetY;
 
-      if (view instanceof InfoWindowView) {
-        // only apply repositioning/margin for InfoWindowView
-        Resources resources = mapView.getContext().getResources();
+          if (view instanceof InfoWindowView) {
+            // only apply repositioning/margin for InfoWindowView
+            Resources resources = mapView.getContext().getResources();
 
-        // get right/left popup window
-        float rightSideInfowWindow = x + view.getMeasuredWidth();
-        float leftSideInfoWindow = x;
+            // get right/left popup window
+            float rightSideInfowWindow = x + view.getMeasuredWidth();
+            float leftSideInfoWindow = x;
 
-        // get right/left map view
-        final float mapRight = mapView.getRight();
-        final float mapLeft = mapView.getLeft();
+            // get right/left map view
+            final float mapRight = mapView.getRight();
+            final float mapLeft = mapView.getLeft();
 
-        float marginHorizontal = resources.getDimension(R.dimen.mapbox_infowindow_margin);
-        float tipViewOffset = resources.getDimension(R.dimen.mapbox_infowindow_tipview_width) / 2;
-        float tipViewMarginLeft = view.getMeasuredWidth() / 2 - tipViewOffset;
+            float marginHorizontal = resources.getDimension(R.dimen.mapbox_infowindow_margin);
+            float tipViewOffset = resources.getDimension(R.dimen.mapbox_infowindow_tipview_width) / 2;
+            float tipViewMarginLeft = view.getMeasuredWidth() / 2 - tipViewOffset;
 
-        boolean outOfBoundsLeft = false;
-        boolean outOfBoundsRight = false;
+            boolean outOfBoundsLeft = false;
+            boolean outOfBoundsRight = false;
 
-        // only optimise margins if view is inside current viewport
-        if (coordinates.x >= 0 && coordinates.x <= mapView.getWidth()
-          && coordinates.y >= 0 && coordinates.y <= mapView.getHeight()) {
+            // only optimise margins if view is inside current viewport
+            if (coordinates.x >= 0 && coordinates.x <= mapView.getWidth()
+              && coordinates.y >= 0 && coordinates.y <= mapView.getHeight()) {
 
-          // if out of bounds right
-          if (rightSideInfowWindow > mapRight) {
-            outOfBoundsRight = true;
-            x -= rightSideInfowWindow - mapRight;
-            tipViewMarginLeft += rightSideInfowWindow - mapRight + tipViewOffset;
-            rightSideInfowWindow = x + view.getMeasuredWidth();
+              // if out of bounds right
+              if (rightSideInfowWindow > mapRight) {
+                outOfBoundsRight = true;
+                x -= rightSideInfowWindow - mapRight;
+                tipViewMarginLeft += rightSideInfowWindow - mapRight + tipViewOffset;
+                rightSideInfowWindow = x + view.getMeasuredWidth();
+              }
+
+              // fit screen left
+              if (leftSideInfoWindow < mapLeft) {
+                outOfBoundsLeft = true;
+                x += mapLeft - leftSideInfoWindow;
+                tipViewMarginLeft -= mapLeft - leftSideInfoWindow + tipViewOffset;
+                leftSideInfoWindow = x;
+              }
+
+              // Add margin right
+              if (outOfBoundsRight && mapRight - rightSideInfowWindow < marginHorizontal) {
+                x -= marginHorizontal - (mapRight - rightSideInfowWindow);
+                tipViewMarginLeft += marginHorizontal - (mapRight - rightSideInfowWindow) - tipViewOffset;
+                leftSideInfoWindow = x;
+              }
+
+              // Add margin left
+              if (outOfBoundsLeft && leftSideInfoWindow - mapLeft < marginHorizontal) {
+                x += marginHorizontal - (leftSideInfoWindow - mapLeft);
+                tipViewMarginLeft -= (marginHorizontal - (leftSideInfoWindow - mapLeft)) - tipViewOffset;
+              }
+            }
+
+            // Adjust tipView
+            InfoWindowView infoWindowView = (InfoWindowView) view;
+            infoWindowView.setTipViewMarginLeft((int) tipViewMarginLeft);
           }
 
-          // fit screen left
-          if (leftSideInfoWindow < mapLeft) {
-            outOfBoundsLeft = true;
-            x += mapLeft - leftSideInfoWindow;
-            tipViewMarginLeft -= mapLeft - leftSideInfoWindow + tipViewOffset;
-            leftSideInfoWindow = x;
-          }
+          // set anchor popupwindowview
+          view.setX(x);
+          view.setY(y);
 
-          // Add margin right
-          if (outOfBoundsRight && mapRight - rightSideInfowWindow < marginHorizontal) {
-            x -= marginHorizontal - (mapRight - rightSideInfowWindow);
-            tipViewMarginLeft += marginHorizontal - (mapRight - rightSideInfowWindow) - tipViewOffset;
-            leftSideInfoWindow = x;
-          }
+          // Calculate x-offset for update method
+          viewWidthOffset = x - coordinates.x - offsetX;
 
-          // Add margin left
-          if (outOfBoundsLeft && leftSideInfoWindow - mapLeft < marginHorizontal) {
-            x += marginHorizontal - (leftSideInfoWindow - mapLeft);
-            tipViewMarginLeft -= (marginHorizontal - (leftSideInfoWindow - mapLeft)) - tipViewOffset;
-          }
+          close(); // if it was already opened
+          mapView.addView(view, lp);
+          isVisible = true;
         }
-
-        // Adjust tipView
-        InfoWindowView infoWindowView = (InfoWindowView) view;
-        infoWindowView.setTipViewMarginLeft((int) tipViewMarginLeft);
-      }
-
-      // set anchor popupwindowview
-      view.setX(x);
-      view.setY(y);
-
-      // Calculate x-offset for update method
-      viewWidthOffset = x - coordinates.x - offsetX;
-
-      close(); // if it was already opened
-      mapView.addView(view, lp);
-      isVisible = true;
+      });
     }
     return this;
   }
@@ -214,9 +221,14 @@ public class InfoWindow {
     MapboxMap mapboxMap = this.mapboxMap.get();
     if (isVisible && mapboxMap != null) {
       isVisible = false;
-      View view = this.view.get();
+      final View view = this.view.get();
       if (view != null && view.getParent() != null) {
-        ((ViewGroup) view.getParent()).removeView(view);
+        view.post(new Runnable() {
+          @Override
+          public void run() {
+            ((ViewGroup) view.getParent()).removeView(view);
+          }
+        });
       }
 
       Marker marker = getBoundMarker();
@@ -280,16 +292,20 @@ public class InfoWindow {
   public void update() {
     MapboxMap mapboxMap = this.mapboxMap.get();
     Marker marker = boundMarker.get();
-    View view = this.view.get();
+    final View view = this.view.get();
     if (mapboxMap != null && marker != null && view != null) {
-      coordinates = mapboxMap.getProjection().toScreenLocation(marker.getPosition());
-
-      if (view instanceof InfoWindowView) {
-        view.setX(coordinates.x + viewWidthOffset - markerWidthOffset);
-      } else {
-        view.setX(coordinates.x - (view.getMeasuredWidth() / 2) - markerWidthOffset);
-      }
-      view.setY(coordinates.y + markerHeightOffset);
+      mapboxMap.getProjection().toScreenLocation(marker.getPosition(), new Callback<PointF>() {
+        @Override
+        public void onResult(PointF pointF) {
+          coordinates = pointF;
+          if (view instanceof InfoWindowView) {
+            view.setX(coordinates.x + viewWidthOffset - markerWidthOffset);
+          } else {
+            view.setX(coordinates.x - (view.getMeasuredWidth() / 2) - markerWidthOffset);
+          }
+          view.setY(coordinates.y + markerHeightOffset);
+        }
+      });
     }
   }
 

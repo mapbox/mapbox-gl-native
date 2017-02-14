@@ -38,6 +38,19 @@ inline std::vector<std::string> toVector(JNIEnv& env, jni::jarray<jni::jobject>&
     return vector;
 }
 
+inline std::vector<std::string> toVector(JNIEnv& env, jni::Array<jni::String> array) {
+    std::vector<std::string> vector;
+    std::size_t len = array.Length(env);
+
+    for (std::size_t i = 0; i < len; i++) {
+        jni::String jstr = array.Get(env, i);
+        vector.push_back(*convert<std::string, jni::String>(env, jstr));
+        jni::DeleteLocalRef(env, jstr);
+    }
+
+    return vector;
+}
+
 }
 }
 }

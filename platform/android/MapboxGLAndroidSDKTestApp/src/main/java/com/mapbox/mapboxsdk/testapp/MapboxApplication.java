@@ -3,6 +3,7 @@ package com.mapbox.mapboxsdk.testapp;
 import android.app.Application;
 import android.os.StrictMode;
 
+import com.codemonkeylabs.fpslibrary.TinyDancer;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.squareup.leakcanary.LeakCanary;
 
@@ -38,6 +39,8 @@ public class MapboxApplication extends Application {
       .build());
 
     Mapbox.getInstance(getApplicationContext(), getString(R.string.mapbox_access_token));
+
+    TinyDancer.create().show(this);
   }
 
   private void initializeLogger() {
