@@ -5,7 +5,7 @@
 #import "NSValue+MGLStyleAttributeAdditions.h"
 #import "MGLTypes.h"
 
-#include "darwin_conversion.hpp"
+#import "MGLConversion.h"
 #include <mbgl/style/conversion/data_driven_property_value.hpp>
 #include <mbgl/style/conversion.hpp>
 
