@@ -1633,13 +1633,14 @@ public:
 #pragma mark Keyboard events
 
 - (void)keyDown:(NSEvent *)event {
-    if (event.modifierFlags & NSNumericPadKeyMask) {
-        // This is the recommended way to handle arrow key presses, causing
-        // methods like -moveUp: and -moveToBeginningOfParagraph: to be called
-        // for various standard keybindings.
-        [self interpretKeyEvents:@[event]];
-    } else {
-        [super keyDown:event];
+    [self interpretKeyEvents:@[event]];
+}
+
+- (void)insertText:(NSString *)text {
+    BOOL textIsZoomCharacter = [@[@"-", @"=", @"+"] containsObject:text];
+
+    if (textIsZoomCharacter) {
+        [self adjustZoomLevelForKey:text];
     }
 }
 
