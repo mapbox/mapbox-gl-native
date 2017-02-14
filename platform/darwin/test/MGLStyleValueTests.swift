@@ -1,10 +1,14 @@
 import XCTest
 import Mapbox
 
-
-extension MGLStyleValueTests {
+#if os(iOS) || os(watchOS) || os(tvOS)
+typealias ColorType = UIColor
+#elseif os(macOS)
+typealias ColorType = NSColor
+#endif
     
-    func assertColorsEqualWithAccuracy(_ actual: UIColor, _ expected: UIColor, accuracy: Float = 0.1) {
+extension MGLStyleValueTests {
+    func assertColorsEqualWithAccuracy(_ actual: ColorType, _ expected: ColorType, accuracy: Float = 0.1) {
         var actualComponents : [CGFloat] = [0, 0, 0, 0]
         var expectedComponents : [CGFloat] = [0, 0, 0, 0]
         actual.getRed(&(actualComponents[0]), green: &(actualComponents[1]), blue: &(actualComponents[2]), alpha: &(actualComponents[3]))
@@ -14,14 +18,14 @@ extension MGLStyleValueTests {
         }
     }
     
-    func assertColorValuesEqual(_ actual: MGLStyleValue<UIColor>, _ expected: MGLStyleValue<UIColor>) {
-        if let actualConstant = actual as? MGLStyleConstantValue<UIColor> {
-            XCTAssertTrue(expected is MGLStyleConstantValue<UIColor>)
-            assertColorsEqualWithAccuracy(actualConstant.rawValue, (expected as! MGLStyleConstantValue<UIColor>).rawValue)
+    func assertColorValuesEqual(_ actual: MGLStyleValue<ColorType>, _ expected: MGLStyleValue<ColorType>) {
+        if let actualConstant = actual as? MGLStyleConstantValue<ColorType> {
+            XCTAssertTrue(expected is MGLStyleConstantValue<ColorType>)
+            assertColorsEqualWithAccuracy(actualConstant.rawValue, (expected as! MGLStyleConstantValue<ColorType>).rawValue)
             return
-        } else if let actualFunction = actual as? MGLStyleFunction<UIColor> {
-            XCTAssertTrue(expected is MGLStyleFunction<UIColor>)
-            let expectedFunction = expected as! MGLStyleFunction<UIColor>
+        } else if let actualFunction = actual as? MGLStyleFunction<ColorType> {
+            XCTAssertTrue(expected is MGLStyleFunction<ColorType>)
+            let expectedFunction = expected as! MGLStyleFunction<ColorType>
             XCTAssertEqual(actualFunction.interpolationBase, expectedFunction.interpolationBase)
             XCTAssertEqual(actualFunction.interpolationMode, expectedFunction.interpolationMode)
             // TODO: assert default values are equal
@@ -36,8 +40,8 @@ extension MGLStyleValueTests {
                 if let actualValue = stopValue as? NSNumber {
                     let expectedValue = expectedStops[stopKey] as? NSNumber
                     XCTAssertEqual(actualValue, expectedValue)
-                } else if let actualValue = stopValue as? UIColor {
-                    let expectedValue = expectedStops[stopKey] as? UIColor
+                } else if let actualValue = stopValue as? ColorType {
+                    let expectedValue = expectedStops[stopKey] as? ColorType
                     XCTAssertNotNil(expectedValue)
                     assertColorsEqualWithAccuracy(actualValue, expectedValue!)
                 }
