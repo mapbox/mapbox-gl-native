@@ -107,6 +107,7 @@ public class MapboxMapTest {
   }
 
   @Test
+  @Ignore
   public void testInitialZoomLevels() {
     ViewUtils.checkViewIsDisplayed(R.id.mapView);
     final MapboxMap mapboxMap = activity.getMapboxMap();

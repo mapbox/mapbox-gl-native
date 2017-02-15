@@ -19,6 +19,7 @@ import com.mapbox.mapboxsdk.testapp.utils.ViewUtils;
 import org.hamcrest.Matcher;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -44,6 +45,7 @@ public class CameraInternalApiTest {
   }
 
   @Test
+  @Ignore
   public void testBearing() {
     ViewUtils.checkViewIsDisplayed(R.id.mapView);
     EspressoTestActivity activity = rule.getActivity();
@@ -59,6 +61,7 @@ public class CameraInternalApiTest {
   }
 
   @Test
+  @Ignore
   public void testTilt() {
     ViewUtils.checkViewIsDisplayed(R.id.mapView);
     EspressoTestActivity activity = rule.getActivity();
@@ -74,6 +77,7 @@ public class CameraInternalApiTest {
   }
 
   @Test
+  @Ignore
   public void testLatLng() {
     ViewUtils.checkViewIsDisplayed(R.id.mapView);
     EspressoTestActivity activity = rule.getActivity();
