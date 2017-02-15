@@ -9,7 +9,6 @@ option(WITH_CXX11ABI "Use cxx11abi mason packages" OFF)
 option(WITH_COVERAGE "Enable coverage reports" OFF)
 option(WITH_OSMESA   "Use OSMesa headless backend" OFF)
 option(WITH_EGL      "Use EGL backend" OFF)
-option(IS_CI_BUILD   "Continuous integration build" OFF)
 
 if(WITH_CXX11ABI)
     set(MASON_CXXABI_SUFFIX -cxx11abi)
@@ -23,7 +22,7 @@ if(WITH_EGL)
     add_definitions(-DMBGL_USE_GLES2=1)
 endif()
 
-if(IS_CI_BUILD)
+if($ENV{CI})
     add_compile_options(-DCI_BUILD=1)
 endif()
 

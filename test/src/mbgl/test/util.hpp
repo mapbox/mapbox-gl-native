@@ -21,7 +21,7 @@
 #define TEST_IS_SIMULATOR 0
 #endif
 
-#if !TEST_IS_SIMULATOR
+#if !TEST_IS_SIMULATOR && !CI_BUILD
 #define TEST_REQUIRES_ACCURATE_TIMING(name) name
 #else
 #define TEST_REQUIRES_ACCURATE_TIMING(name) DISABLED_ ## name
