@@ -27,15 +27,17 @@ extension MGLStyleValueTests {
             let expectedFunction = expected as! MGLStyleFunction<MGLColor>
             XCTAssertEqual(actualFunction.interpolationBase, expectedFunction.interpolationBase)
             XCTAssertEqual(actualFunction.interpolationMode, expectedFunction.interpolationMode)
-            // TODO: assert default values are equal
+            if (actualFunction is MGLSourceStyleFunction<MGLColor> || actualFunction is MGLCompositeStyleFunction<MGLColor>) {
+                XCTAssertEqual(actualFunction.defaultValue, expectedFunction.defaultValue)
+            }
             guard let actualStops = actualFunction.stops else {
                 XCTAssertNil(expectedFunction.stops)
                 return
             }
             let expectedStops = expectedFunction.stops!
-            XCTAssertEqual(actualStops.keys.count, expectedStops.keys.count)
             let actualKeys = actualStops.keys.sorted(by: { String(describing: $0) < String(describing: $1) })
             let expectedKeys = expectedStops.keys.sorted(by: { String(describing: $0) < String(describing: $1) })
+            XCTAssertEqual(actualKeys, expectedKeys)
             
             for (ak, ek) in zip(actualKeys, expectedKeys) {
                 XCTAssertEqual(String(describing: ak), String(describing: ek))

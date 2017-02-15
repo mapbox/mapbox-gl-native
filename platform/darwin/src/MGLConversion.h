@@ -11,9 +11,11 @@ namespace mbgl {
 namespace style {
 namespace conversion {
 
-// A minimal wrapper class conforming to the requirements for `objectMember(v, name)` (see mbgl/style/conversion.hpp)
-// This is necessary because using `NSObject*` as the value type in `optional<NSObject*>` causes problems for the ARC,
-// due to things like `optional(const value_type& __v)`
+/**
+ A minimal wrapper class conforming to the requirements for `objectMember(v, name)` (see mbgl/style/conversion.hpp)
+ This is necessary because using `NSObject*` as the value type in `optional<NSObject*>` causes problems for the ARC,
+ due to things like `optional(const value_type& __v)`
+ */
 class OptionalNSObjectValue {
 public:
     OptionalNSObjectValue(NSObject * _Nullable _value) : value(_value) {}
@@ -46,23 +48,20 @@ inline std::size_t arrayLength(const id value) {
     NSCAssert([value isKindOfClass:[NSArray class]], @"Value must be an NSArray for getLength().");
     NSArray *array = value;
     auto length = [array count];
-    NSCAssert(length < std::numeric_limits<size_t>::max(), @"Array length out of bounds.");
+    NSCAssert(length <= std::numeric_limits<size_t>::max(), @"Array length out of bounds.");
     return length;
 }
 
 inline NSObject *arrayMember(const id value, std::size_t i) {
     NSCAssert([value isKindOfClass:[NSArray class]], @"Value must be an NSArray for get(int).");
     NSCAssert(i < NSUIntegerMax, @"Index must be less than NSUIntegerMax");
-    NSArray *array = value;
-    return array[i];
+    return [value objectAtIndex: i];
 }
 
 inline OptionalNSObjectValue objectMember(const id value, const char *key) {
     NSCAssert([value isKindOfClass:[NSDictionary class]], @"Value must be an NSDictionary for get(string).");
-    NSDictionary *dict = value;
-    NSObject *member = dict[@(key)];
-
-    if (value && value != [NSNull null]) {
+    NSObject *member = [value objectForKey: @(key)];
+    if (member && member != [NSNull null]) {
         return { member };
     } else {
         return { nullptr };
@@ -107,7 +106,7 @@ inline optional<float> toNumber(const id value) {
 
 inline optional<std::string> toString(const id value) {
     if (_isString(value)) {
-        return std::string([((NSString *)value) UTF8String]);
+        return std::string(static_cast<const char *>([value UTF8String]));
     } else {
         return {};
     }
