@@ -474,7 +474,6 @@ public class MarkerViewManager implements MapView.OnMapChangedListener {
           if (adapter.getMarkerClass().equals(marker.getClass())) {
             adapter.prepareViewForReuse(marker, convertView);
             adapter.releaseView(convertView);
-            marker.setMapboxMap(null);
             iterator.remove();
           }
         }
