@@ -13,16 +13,6 @@ public class MapboxConstants {
   public static final Locale MAPBOX_LOCALE = Locale.US;
 
   /**
-   * Key used to store staging data server url in AndroidManifest.xml
-   */
-  public static final String KEY_META_DATA_STAGING_SERVER = "com.mapbox.TestEventsServer";
-
-  /**
-   * Key used to store staging data server access token in AndroidManifest.xml
-   */
-  public static final String KEY_META_DATA_STAGING_ACCESS_TOKEN = "com.mapbox.TestEventsAccessToken";
-
-  /**
    * Key used to switch storage to external in AndroidManifest.xml
    */
   public static final String KEY_META_DATA_SET_STORAGE_EXTERNAL = "com.mapbox.SetStorageExternal";
@@ -144,10 +134,4 @@ public class MapboxConstants {
   public static final String STATE_ATTRIBUTION_MARGIN_BOTTOM = "mapbox_atrrMarginBottom";
   public static final String STATE_ATTRIBUTION_ENABLED = "mapbox_atrrEnabled";
 
-  public static final String MAPBOX_SHARED_PREFERENCES_FILE = "MapboxSharedPreferences";
-  public static final String MAPBOX_SHARED_PREFERENCE_KEY_VENDORID = "mapboxVendorId";
-  public static final String MAPBOX_SHARED_PREFERENCE_KEY_TELEMETRY_ENABLED = "mapboxTelemetryEnabled";
-  public static final String MAPBOX_SHARED_PREFERENCE_KEY_TELEMETRY_STAGING_URL = "mapboxTelemetryStagingUrl";
-  public static final String MAPBOX_SHARED_PREFERENCE_KEY_TELEMETRY_STAGING_ACCESS_TOKEN =
-    "mapboxTelemetryStagingAccessToken";
 }
