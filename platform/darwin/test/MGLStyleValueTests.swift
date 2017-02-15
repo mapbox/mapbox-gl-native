@@ -120,7 +120,7 @@ extension MGLStyleValueTests {
         var circleTranslationTwo = CGVector(dx: 0, dy: 0)
         let circleTranslationValueTwo = NSValue(bytes: &circleTranslationTwo, objCType: "{CGVector=dd}")
 
-        let circleTranslationStops : [Float:MGLStyleValue] = [
+        let circleTranslationStops : [Float:MGLStyleValue<NSValue>] = [
             0.0: MGLStyleValue<NSValue>(rawValue: circleTranslationValueOne),
             10.0: MGLStyleValue<NSValue>(rawValue: circleTranslationValueTwo)
         ]
@@ -135,7 +135,7 @@ extension MGLStyleValueTests {
         XCTAssertEqual(circleStyleLayer.circleTranslation, expectedCircleTranslationValue)
 
         // non-data-driven (enumeration property value), camera function with MGLCircleScaleAlignment enum (NSValue) stop values
-        let scaleAlignmentStops : [Float:MGLStyleValue] = [
+        let scaleAlignmentStops : [Float:MGLStyleValue<NSValue>] = [
             0.0: MGLStyleValue(rawValue: NSValue(mglCircleScaleAlignment: .map)),
             10.0: MGLStyleValue(rawValue: NSValue(mglCircleScaleAlignment: .viewport))
         ]
@@ -153,7 +153,7 @@ extension MGLStyleValueTests {
         let circleStyleLayer = MGLCircleStyleLayer(identifier: "circleLayer", source: shapeSource)
         
         // data-driven, camera function with exponential color stop values
-        let redGreenStops : [Float:MGLStyleValue] = [
+        let redGreenStops : [Float:MGLStyleValue<MGLColor>] = [
             0.0: MGLStyleValue<MGLColor>(rawValue: .red),
             10.0: MGLStyleValue<MGLColor>(rawValue: .red),
             15.0: MGLStyleValue<MGLColor>(rawValue: .green)
@@ -180,7 +180,7 @@ extension MGLStyleValueTests {
         assertColorValuesEqual(circleStyleLayer.circleColor, expectedRedCategoricalValue)
         
         // data-driven, source function with categorical color stop values with integer attribute keys
-        let greenOrangeStops : [Float:MGLStyleValue] = [
+        let greenOrangeStops : [Float:MGLStyleValue<MGLColor>] = [
             0.0: MGLStyleValue<MGLColor>(rawValue: .green),
             100.0: MGLStyleValue<MGLColor>(rawValue: .orange)
         ]
