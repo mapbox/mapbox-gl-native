@@ -68,9 +68,13 @@ extension MGLStyleValueTests {
             
             XCTAssertEqual(actualStops.count, expectedStops.count)
             if let actualStops = actualStops as? [String:Any], let expectedStops = expectedStops as? [String: Any] {
-                actualStops.forEach({ assertStopEqual($1, expectedStops[$0]) })
+                for (key, value) in actualStops {
+                    assertStopEqual(value, expectedStops[key])
+                }
             } else if let actualStops = actualStops as? [Float:Any], let expectedStops = expectedStops as? [Float:Any] {
-                actualStops.forEach({ assertStopEqual($1, expectedStops[$0]) })
+                for (key, value) in actualStops {
+                    assertStopEqual(value, expectedStops[key])
+                }
             } else {
                 XCTFail("Expected stops of type \(type(of: Array(expectedStops.keys)).Index.self), but found \(type(of: Array(actualStops.keys)).Index.self) instead.")
                 return
@@ -121,8 +125,8 @@ extension MGLStyleValueTests {
         let circleTranslationValueTwo = NSValue(bytes: &circleTranslationTwo, objCType: "{CGVector=dd}")
 
         let circleTranslationStops : [Float:MGLStyleValue<NSValue>] = [
-            0.0: MGLStyleValue<NSValue>(rawValue: circleTranslationValueOne),
-            10.0: MGLStyleValue<NSValue>(rawValue: circleTranslationValueTwo)
+            0: MGLStyleValue<NSValue>(rawValue: circleTranslationValueOne),
+            10: MGLStyleValue<NSValue>(rawValue: circleTranslationValueTwo)
         ]
 
         // non-data-driven (interpolatable property value), camera function with CGVector (NSValue) stop values
@@ -136,8 +140,8 @@ extension MGLStyleValueTests {
 
         // non-data-driven (enumeration property value), camera function with MGLCircleScaleAlignment enum (NSValue) stop values
         let scaleAlignmentStops : [Float:MGLStyleValue<NSValue>] = [
-            0.0: MGLStyleValue(rawValue: NSValue(mglCircleScaleAlignment: .map)),
-            10.0: MGLStyleValue(rawValue: NSValue(mglCircleScaleAlignment: .viewport))
+            0: MGLStyleValue(rawValue: NSValue(mglCircleScaleAlignment: .map)),
+            10: MGLStyleValue(rawValue: NSValue(mglCircleScaleAlignment: .viewport))
         ]
         let expectedCircleScaleAlignmentValue = MGLStyleValue<NSValue>(
             interpolationMode: .interval,
@@ -154,9 +158,9 @@ extension MGLStyleValueTests {
         
         // data-driven, camera function with exponential color stop values
         let redGreenStops : [Float:MGLStyleValue<MGLColor>] = [
-            0.0: MGLStyleValue<MGLColor>(rawValue: .red),
-            10.0: MGLStyleValue<MGLColor>(rawValue: .red),
-            15.0: MGLStyleValue<MGLColor>(rawValue: .green)
+            0: MGLStyleValue<MGLColor>(rawValue: .red),
+            10: MGLStyleValue<MGLColor>(rawValue: .red),
+            15: MGLStyleValue<MGLColor>(rawValue: .green)
         ]
         let expectedCircleColorValue = MGLStyleValue<MGLColor>(
             interpolationMode: .exponential,
@@ -181,8 +185,8 @@ extension MGLStyleValueTests {
         
         // data-driven, source function with categorical color stop values with integer attribute keys
         let greenOrangeStops : [Float:MGLStyleValue<MGLColor>] = [
-            0.0: MGLStyleValue<MGLColor>(rawValue: .green),
-            100.0: MGLStyleValue<MGLColor>(rawValue: .orange)
+            0: MGLStyleValue<MGLColor>(rawValue: .green),
+            100: MGLStyleValue<MGLColor>(rawValue: .orange)
         ]
         let expectedGreenOrangeCategoricalValue = MGLStyleValue<MGLColor>(
             interpolationMode: .categorical,
@@ -232,10 +236,10 @@ extension MGLStyleValueTests {
         let mediumRadius = MGLStyleValue<NSNumber>(rawValue: 10)
         let largeRadius = MGLStyleValue<NSNumber>(rawValue: 20)
         let radiusCompositeCategoricalStops: [Float: [String: MGLStyleValue<NSNumber>]] = [
-            0.0: ["green": smallRadius],
-            10.0: ["green": smallRadius],
-            15.0: ["green": largeRadius],
-            20.0: ["green": largeRadius]
+            0: ["green": smallRadius],
+            10: ["green": smallRadius],
+            15: ["green": largeRadius],
+            20: ["green": largeRadius]
         ]
         let defaultRadius = MGLStyleValue<NSNumber>(rawValue: 2)
         let expectedCompositeCategoricalValue = MGLStyleValue<NSNumber>(
@@ -249,9 +253,9 @@ extension MGLStyleValueTests {
 
         // data-driven, composite function with inner exponential color stop values nested in outer camera stops
         let radiusCompositeExponentialOrIntervalStops: [Float: [Float: MGLStyleValue<NSNumber>]] = [
-            0.0: [0: smallRadius],
-            10.0: [200: smallRadius],
-            20.0: [200: largeRadius]
+            0: [0: smallRadius],
+            10: [200: smallRadius],
+            20: [200: largeRadius]
         ]
         let expectedCompositeExponentialValue = MGLStyleValue<NSNumber>(
             interpolationMode: .exponential,
