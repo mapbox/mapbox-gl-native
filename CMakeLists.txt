@@ -50,7 +50,7 @@ else()
     set(MASON_MESA_SUFFIX "-glx")
 endif()
 
-if(IS_CI_BUILD)
+if($ENV{CI})
     add_compile_options(-DCI_BUILD=1)
 endif()
 
