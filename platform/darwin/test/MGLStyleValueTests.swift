@@ -1,8 +1,88 @@
 import XCTest
 import Mapbox
 
-
+#if os(iOS) || os(watchOS) || os(tvOS)
+typealias MGLColor = UIColor
+#elseif os(macOS)
+typealias MGLColor = NSColor
+#endif
+    
 extension MGLStyleValueTests {
+    func assertColorsEqualWithAccuracy(_ actual: MGLColor, _ expected: MGLColor, accuracy: Float = 1/255) {
+        var actualComponents : [CGFloat] = [0, 0, 0, 0]
+        var expectedComponents : [CGFloat] = [0, 0, 0, 0]
+        actual.getRed(&(actualComponents[0]), green: &(actualComponents[1]), blue: &(actualComponents[2]), alpha: &(actualComponents[3]))
+        expected.getRed(&(expectedComponents[0]), green: &(expectedComponents[1]), blue: &(expectedComponents[2]), alpha: &(expectedComponents[3]))
+        for (ac, ec) in zip(actualComponents, expectedComponents) {
+            XCTAssertEqualWithAccuracy(Float(ac), Float(ec), accuracy: accuracy)
+        }
+    }
+    
+    func assertColorValuesEqual(_ actual: MGLStyleValue<MGLColor>, _ expected: MGLStyleValue<MGLColor>) {
+        guard type(of: actual) == type(of: expected) else {
+            XCTFail("Expected \(type(of: expected)), but found \(type(of: actual)) instead.")
+            return
+        }
+        
+        if let actualConstant = actual as? MGLStyleConstantValue<MGLColor> {
+            assertColorsEqualWithAccuracy(actualConstant.rawValue, (expected as! MGLStyleConstantValue<MGLColor>).rawValue)
+        } else if let actualFunction = actual as? MGLStyleFunction<MGLColor>,
+            let expectedFunction = expected as? MGLStyleFunction<MGLColor> {
+            
+            // unless we have stops, there's no need for a custom comparison - default to plain == assertion
+            guard let actualStops = actualFunction.stops, let expectedStops = expectedFunction.stops else {
+                XCTAssertEqual(actualFunction, expectedFunction)
+                return
+            }
+            
+            guard expectedStops is [String: Any] || expectedStops is [Float:Any] else {
+                XCTFail("Stop levels must be String or Float.")
+                return
+            }
+            
+            XCTAssertEqual(actualFunction.interpolationBase, expectedFunction.interpolationBase)
+            XCTAssertEqual(actualFunction.interpolationMode, expectedFunction.interpolationMode)
+            if let actualFunction = actualFunction as? MGLSourceStyleFunction<MGLColor>,
+                let expectedFunction = expectedFunction as? MGLSourceStyleFunction<MGLColor> {
+                XCTAssertEqual(actualFunction.defaultValue, expectedFunction.defaultValue)
+            } else if let actualFunction = actualFunction as? MGLCompositeStyleFunction<MGLColor>,
+                let expectedFunction = expectedFunction as? MGLCompositeStyleFunction<MGLColor> {
+                XCTAssertEqual(actualFunction.defaultValue, expectedFunction.defaultValue)
+            }
+            
+            func assertStopEqual (_ actualValue: Any?, _ expectedValue: Any?) {
+                guard type(of: actualValue) == type(of: expectedValue) else {
+                    XCTFail("Expected stop value of type \(type(of: expectedValue)), but found \(type(of: actualValue)) instead.")
+                    return
+                }
+                if let actualValue = actualValue as? MGLStyleConstantValue<MGLColor>,
+                    let expectedValue = expectedValue as? MGLStyleConstantValue<MGLColor> {
+                    assertColorsEqualWithAccuracy(actualValue.rawValue, expectedValue.rawValue)
+                } else if let actualValue = actualValue as? MGLStyleConstantValue<AnyObject>,
+                    let expectedValue = expectedValue as? MGLStyleConstantValue<AnyObject> {
+                    XCTAssertEqual(actualValue, expectedValue)
+                } else {
+                    XCTFail("Unsupported stop value type \(type(of: actualValue)).")
+                }
+            }
+            
+            XCTAssertEqual(actualStops.count, expectedStops.count)
+            if let actualStops = actualStops as? [String:Any], let expectedStops = expectedStops as? [String: Any] {
+                for (key, value) in actualStops {
+                    assertStopEqual(value, expectedStops[key])
+                }
+            } else if let actualStops = actualStops as? [Float:Any], let expectedStops = expectedStops as? [Float:Any] {
+                for (key, value) in actualStops {
+                    assertStopEqual(value, expectedStops[key])
+                }
+            } else {
+                XCTFail("Expected stops of type \(type(of: Array(expectedStops.keys)).Index.self), but found \(type(of: Array(actualStops.keys)).Index.self) instead.")
+                return
+            }
+        } else {
+            XCTFail("MGLStyleValue<MGLColor> must be either a constant or a style function.")
+        }
+    }
     
     func testConstantValues() {
         let shapeSource = MGLShapeSource(identifier: "source", shape: nil, options: nil)
@@ -44,7 +124,7 @@ extension MGLStyleValueTests {
         var circleTranslationTwo = CGVector(dx: 0, dy: 0)
         let circleTranslationValueTwo = NSValue(bytes: &circleTranslationTwo, objCType: "{CGVector=dd}")
 
-        let circleTranslationStops = [
+        let circleTranslationStops : [Float:MGLStyleValue<NSValue>] = [
             0: MGLStyleValue<NSValue>(rawValue: circleTranslationValueOne),
             10: MGLStyleValue<NSValue>(rawValue: circleTranslationValueTwo)
         ]
@@ -59,7 +139,7 @@ extension MGLStyleValueTests {
         XCTAssertEqual(circleStyleLayer.circleTranslation, expectedCircleTranslationValue)
 
         // non-data-driven (enumeration property value), camera function with MGLCircleScaleAlignment enum (NSValue) stop values
-        let scaleAlignmentStops = [
+        let scaleAlignmentStops : [Float:MGLStyleValue<NSValue>] = [
             0: MGLStyleValue(rawValue: NSValue(mglCircleScaleAlignment: .map)),
             10: MGLStyleValue(rawValue: NSValue(mglCircleScaleAlignment: .viewport))
         ]
@@ -75,135 +155,67 @@ extension MGLStyleValueTests {
     func testFunctionsWithDataDrivenProperties() {
         let shapeSource = MGLShapeSource(identifier: "test", shape: nil, options: nil)
         let circleStyleLayer = MGLCircleStyleLayer(identifier: "circleLayer", source: shapeSource)
-
-        #if os(iOS) || os(watchOS) || os(tvOS)
-
-            // data-driven, camera function with exponential color stop values
-            let redGreenStops = [
-                0: MGLStyleValue<UIColor>(rawValue: .red),
-                10: MGLStyleValue<UIColor>(rawValue: .red),
-                15: MGLStyleValue<UIColor>(rawValue: .green)
-            ]
-            let expectedCircleColorValue = MGLStyleValue<UIColor>(
-                interpolationMode: .exponential,
-                cameraStops: redGreenStops,
-                options: [.interpolationBase: 10.0]
-            )
-            circleStyleLayer.circleColor = expectedCircleColorValue
-            XCTAssertEqual(circleStyleLayer.circleColor, expectedCircleColorValue)
-
-            // data-driven, source function with categorical color stop values with string attribute keys
-            let redOnlyStops = [
-                "red": MGLStyleValue<UIColor>(rawValue: .red)
-            ]
-            let expectedRedCategoricalValue = MGLStyleValue<UIColor>(
-                interpolationMode: .categorical,
-                sourceStops: redOnlyStops,
-                attributeName: "red",
-                options: [.defaultValue: MGLStyleValue<UIColor>(rawValue: .cyan)]
-            )
-            circleStyleLayer.circleColor = expectedRedCategoricalValue
-            XCTAssertEqual(circleStyleLayer.circleColor, expectedRedCategoricalValue)
-
-            // data-driven, source function with categorical color stop values with integer attribute keys
-            let greenOrangeStops = [
-                0: MGLStyleValue<UIColor>(rawValue: .green),
-                100: MGLStyleValue<UIColor>(rawValue: .orange)
-            ]
-            let expectedGreenOrangeCategoricalValue = MGLStyleValue<UIColor>(
-                interpolationMode: .categorical,
-                sourceStops: greenOrangeStops,
-                attributeName: "temp",
-                options: [.defaultValue: MGLStyleValue<UIColor>(rawValue: .red)]
-            )
-            circleStyleLayer.circleColor = expectedGreenOrangeCategoricalValue
-            XCTAssertEqual(circleStyleLayer.circleColor, expectedGreenOrangeCategoricalValue)
-
-            // data-driven, source function with exponential color stop values
-            let expectedRedGreenSourceExponentialValue = MGLStyleValue<UIColor>(
-                interpolationMode: .exponential,
-                sourceStops: redGreenStops,
-                attributeName: "temp",
-                options: nil
-            )
-            circleStyleLayer.circleColor = expectedRedGreenSourceExponentialValue
-            XCTAssertEqual(circleStyleLayer.circleColor, expectedRedGreenSourceExponentialValue)
-
-            // data-driven, identity source function
-            let expectedSourceIdentityValue = MGLStyleValue<UIColor>(
-                interpolationMode: .identity,
-                sourceStops: nil,
-                attributeName: "size",
-                options: [.defaultValue: MGLStyleValue<UIColor>(rawValue: .green)]
-            )
-            circleStyleLayer.circleColor = expectedSourceIdentityValue
-            XCTAssertEqual(circleStyleLayer.circleColor, expectedSourceIdentityValue)
-
-        #elseif os(macOS)
-
-            // data-driven, camera function with exponential color stop values
-            let redGreenStops = [
-                0: MGLStyleValue<NSColor>(rawValue: .red),
-                10: MGLStyleValue<NSColor>(rawValue: .red),
-                15: MGLStyleValue<NSColor>(rawValue: .green)
-            ]
-            let expectedCircleColorValue = MGLStyleValue<NSColor>(
-                interpolationMode: .exponential,
-                cameraStops: redGreenStops,
-                options: [.interpolationBase: 10.0]
-            )
-            circleStyleLayer.circleColor = expectedCircleColorValue
-            XCTAssertEqual(circleStyleLayer.circleColor, expectedCircleColorValue)
-
-            // data-driven, source function with categorical color stop values with string typed keys
-            let redOnlyStops = [
-                "red": MGLStyleValue<NSColor>(rawValue: .red)
-            ]
-            let expectedRedCategoricalValue = MGLStyleValue<NSColor>(
-                interpolationMode: .categorical,
-
-                sourceStops: redOnlyStops,
-                attributeName: "red",
-                options: [.defaultValue: MGLStyleValue<NSColor>(rawValue: .cyan)]
-            )
-            circleStyleLayer.circleColor = expectedRedCategoricalValue
-            XCTAssertEqual(circleStyleLayer.circleColor, expectedRedCategoricalValue)
-
-            // data-driven, source function with categorical color stop values with integer attribute keys
-            let greenOrangeStops = [
-                0: MGLStyleValue<NSColor>(rawValue: .green),
-                100: MGLStyleValue<NSColor>(rawValue: .orange)
-            ]
-            let expectedGreenOrangeCategoricalValue = MGLStyleValue<NSColor>(
-                interpolationMode: .categorical,
-                sourceStops: greenOrangeStops,
-                attributeName: "temp",
-                options: [.defaultValue: MGLStyleValue<NSColor>(rawValue: .red)]
-            )
-            circleStyleLayer.circleColor = expectedGreenOrangeCategoricalValue
-            XCTAssertEqual(circleStyleLayer.circleColor, expectedGreenOrangeCategoricalValue)
-
-            // data-driven, source function with exponential color stop values
-            let expectedRedGreenSourceExponentialValue = MGLStyleValue<NSColor>(
-                interpolationMode: .exponential,
-                sourceStops: redGreenStops,
-                attributeName: "temp",
-                options: nil
-            )
-            circleStyleLayer.circleColor = expectedRedGreenSourceExponentialValue
-            XCTAssertEqual(circleStyleLayer.circleColor, expectedRedGreenSourceExponentialValue)
-
-            // data-driven, identity source function
-            let expectedSourceIdentityValue = MGLStyleValue<NSColor>(
-                interpolationMode: .identity,
-                sourceStops: nil,
-                attributeName: "size",
-                options: nil
-            )
-            circleStyleLayer.circleColor = expectedSourceIdentityValue
-            XCTAssertEqual(circleStyleLayer.circleColor, expectedSourceIdentityValue)
-
-        #endif
+        
+        // data-driven, camera function with exponential color stop values
+        let redGreenStops : [Float:MGLStyleValue<MGLColor>] = [
+            0: MGLStyleValue<MGLColor>(rawValue: .red),
+            10: MGLStyleValue<MGLColor>(rawValue: .red),
+            15: MGLStyleValue<MGLColor>(rawValue: .green)
+        ]
+        let expectedCircleColorValue = MGLStyleValue<MGLColor>(
+            interpolationMode: .exponential,
+            cameraStops: redGreenStops,
+            options: [.interpolationBase: 10.0]
+        )
+        circleStyleLayer.circleColor = expectedCircleColorValue
+        assertColorValuesEqual(circleStyleLayer.circleColor as! MGLStyleFunction<MGLColor>, expectedCircleColorValue as! MGLStyleFunction<MGLColor>)
+        
+        // data-driven, source function with categorical color stop values with string attribute keys
+        let redOnlyStops = [
+            "red": MGLStyleValue<MGLColor>(rawValue: .red)
+        ]
+        let expectedRedCategoricalValue = MGLStyleValue<MGLColor>(
+            interpolationMode: .categorical,
+            sourceStops: redOnlyStops,
+            attributeName: "red",
+            options: [.defaultValue: MGLStyleValue<MGLColor>(rawValue: .cyan)]
+        )
+        circleStyleLayer.circleColor = expectedRedCategoricalValue
+        assertColorValuesEqual(circleStyleLayer.circleColor, expectedRedCategoricalValue)
+        
+        // data-driven, source function with categorical color stop values with integer attribute keys
+        let greenOrangeStops : [Float:MGLStyleValue<MGLColor>] = [
+            0: MGLStyleValue<MGLColor>(rawValue: .green),
+            100: MGLStyleValue<MGLColor>(rawValue: .orange)
+        ]
+        let expectedGreenOrangeCategoricalValue = MGLStyleValue<MGLColor>(
+            interpolationMode: .categorical,
+            sourceStops: greenOrangeStops,
+            attributeName: "temp",
+            options: [.defaultValue: MGLStyleValue<MGLColor>(rawValue: .red)]
+        )
+        circleStyleLayer.circleColor = expectedGreenOrangeCategoricalValue
+        assertColorValuesEqual(circleStyleLayer.circleColor, expectedGreenOrangeCategoricalValue)
+        
+        // data-driven, source function with exponential color stop values
+        let expectedRedGreenSourceExponentialValue = MGLStyleValue<MGLColor>(
+            interpolationMode: .exponential,
+            sourceStops: redGreenStops,
+            attributeName: "temp",
+            options: nil
+        )
+        circleStyleLayer.circleColor = expectedRedGreenSourceExponentialValue
+        assertColorValuesEqual(circleStyleLayer.circleColor, expectedRedGreenSourceExponentialValue)
+        
+        // data-driven, identity source function
+        let expectedSourceIdentityValue = MGLStyleValue<MGLColor>(
+            interpolationMode: .identity,
+            sourceStops: nil,
+            attributeName: "size",
+            options: [.defaultValue: MGLStyleValue<MGLColor>(rawValue: .green)]
+        )
+        circleStyleLayer.circleColor = expectedSourceIdentityValue
+        assertColorValuesEqual(circleStyleLayer.circleColor, expectedSourceIdentityValue)
 
         // data-driven, source function with categorical color stop values with boolean attribute keys
         let booleanCategoricalStops = [
@@ -223,7 +235,7 @@ extension MGLStyleValueTests {
         let smallRadius = MGLStyleValue<NSNumber>(rawValue: 5)
         let mediumRadius = MGLStyleValue<NSNumber>(rawValue: 10)
         let largeRadius = MGLStyleValue<NSNumber>(rawValue: 20)
-        let radiusCompositeCategoricalStops: [NSNumber: [String: MGLStyleValue<NSNumber>]] = [
+        let radiusCompositeCategoricalStops: [Float: [String: MGLStyleValue<NSNumber>]] = [
             0: ["green": smallRadius],
             10: ["green": smallRadius],
             15: ["green": largeRadius],
@@ -240,7 +252,7 @@ extension MGLStyleValueTests {
         XCTAssertEqual(circleStyleLayer.circleRadius, expectedCompositeCategoricalValue)
 
         // data-driven, composite function with inner exponential color stop values nested in outer camera stops
-        let radiusCompositeExponentialOrIntervalStops: [NSNumber: [NSNumber: MGLStyleValue<NSNumber>]] = [
+        let radiusCompositeExponentialOrIntervalStops: [Float: [Float: MGLStyleValue<NSNumber>]] = [
             0: [0: smallRadius],
             10: [200: smallRadius],
             20: [200: largeRadius]

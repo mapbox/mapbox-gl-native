@@ -200,7 +200,7 @@ struct Converter<CameraFunction<T>> {
 
 template <class T, class V>
 Result<optional<T>> convertDefaultValue(const V& value) {
-    auto defaultValueValue = objectMember(value, "defaultValue");
+    auto defaultValueValue = objectMember(value, "default");
     if (!defaultValueValue) {
         return {};
     }

@@ -5,6 +5,10 @@
 #import "NSValue+MGLStyleAttributeAdditions.h"
 #import "MGLTypes.h"
 
+#import "MGLConversion.h"
+#include <mbgl/style/conversion/data_driven_property_value.hpp>
+#include <mbgl/style/conversion.hpp>
+
 #import <mbgl/util/enum.hpp>
 
 #include <mbgl/style/data_driven_property_value.hpp>
@@ -117,157 +121,11 @@ public:
     mbgl::style::DataDrivenPropertyValue<MBGLType> toDataDrivenPropertyValue(MGLStyleValue<ObjCType> *value) {
         if ([value isKindOfClass:[MGLStyleConstantValue class]]) {
             return toMBGLConstantValue((MGLStyleConstantValue<ObjCType> *)value);
-        } else if ([value isKindOfClass:[MGLCameraStyleFunction class]]) {
-            MGLCameraStyleFunction<ObjCType> *cameraStyleFunction = (MGLCameraStyleFunction<ObjCType> *)value;
-            switch (cameraStyleFunction.interpolationMode) {
-                case MGLInterpolationModeExponential:
-                    return toMBGLExponentialCameraFunction(cameraStyleFunction);
-                    break;
-                case MGLInterpolationModeInterval:
-                    return toMBGLIntervalCameraFunction(cameraStyleFunction);
-                    break;
-                default:
-                    [NSException raise:NSInvalidArgumentException
-                                format:@"A camera function must use either exponential or interval stops."];
-                    return {};
-            }
-        } else if ([value isKindOfClass:[MGLSourceStyleFunction class]]) {
-            MGLSourceStyleFunction<ObjCType> *sourceStyleFunction = (MGLSourceStyleFunction<ObjCType> *)value;
-            switch (sourceStyleFunction.interpolationMode) {
-                case MGLInterpolationModeExponential:
-                    return toMBGLExponentialSourceFunction(sourceStyleFunction);
-                    break;
-                case MGLInterpolationModeInterval:
-                    return toMBGLIntervalSourceFunction(sourceStyleFunction);
-                    break;
-                case MGLInterpolationModeCategorical:
-                    return toMBGLCategoricalSourceFunction(sourceStyleFunction);
-                    break;
-                case MGLInterpolationModeIdentity:
-                    return toMBGLIdentitySourceFunction(sourceStyleFunction);
-                    break;
-                default:
-                    [NSException raise:NSInvalidArgumentException
-                                format:@"A camera function must use exponential, interval, categorical, or identity stops."];
-                    return {};
-            }
-        } else if ([value isKindOfClass:[MGLCompositeStyleFunction class]]) {
-            MGLCompositeStyleFunction<ObjCType> *compositeStyleFunction = (MGLCompositeStyleFunction<ObjCType> *)value;
-            switch (compositeStyleFunction.interpolationMode) {
-                case MGLInterpolationModeExponential: {
-                    __block std::map<float, std::map<float, MBGLType>> outerStops = {};
-                    [compositeStyleFunction.stops enumerateKeysAndObjectsUsingBlock:^(NSNumber * _Nonnull zoomKey, NSDictionary * _Nonnull stopValue, BOOL * _Nonnull stop) {
-                        std::map<float, MBGLType> stops = {};
-                        for (NSNumber *key in stopValue.allKeys) {
-                            NSCAssert([key isKindOfClass:[NSNumber class]], @"Stop keys should be NSNumbers");
-                            MGLStyleValue<ObjCType> *value = stopValue[key];
-                            NSCAssert([value isKindOfClass:[MGLStyleValue class]], @"Stops should be MGLStyleValues");
-                            auto mbglStopValue = toPropertyValue(value);
-                            NSCAssert(mbglStopValue.isConstant(), @"Stops must be constant");
-                            stops[key.floatValue] = mbglStopValue.asConstant();
-                        }
-                        outerStops[zoomKey.floatValue] = stops;
-                    }];
-                    mbgl::style::CompositeFunction<MBGLType> compositeFunction {
-                        compositeStyleFunction.attributeName.UTF8String,
-                        mbgl::style::CompositeExponentialStops<MBGLType> { outerStops, (float)compositeStyleFunction.interpolationBase }
-                    };
-                    if (compositeStyleFunction.defaultValue) {
-                        NSCAssert([compositeStyleFunction.defaultValue isKindOfClass:[MGLStyleConstantValue class]], @"Default value must be constant");
-                        MBGLType mbglValue;
-                        id mglValue = [(MGLStyleConstantValue<ObjCType> *)compositeStyleFunction.defaultValue rawValue];
-                        getMBGLValue(mglValue, mbglValue);
-                        compositeFunction.defaultValue = mbglValue;
-                    }
-                    return compositeFunction;
-                }
-                    break;
-                case MGLInterpolationModeInterval: {
-                    __block std::map<float, std::map<float, MBGLType>> outerStops = {};
-                    [compositeStyleFunction.stops enumerateKeysAndObjectsUsingBlock:^(NSNumber * _Nonnull zoomKey, NSDictionary * _Nonnull stopValue, BOOL * _Nonnull stop) {
-                        std::map<float, MBGLType> stops = {};
-                        for (NSNumber *key in stopValue.allKeys) {
-                            NSCAssert([key isKindOfClass:[NSNumber class]], @"Stop keys should be NSNumbers");
-                            MGLStyleValue<ObjCType> *value = stopValue[key];
-                            NSCAssert([value isKindOfClass:[MGLStyleValue class]], @"Stops should be MGLStyleValues");
-                            auto mbglStopValue = toPropertyValue(value);
-                            NSCAssert(mbglStopValue.isConstant(), @"Stops must be constant");
-                            stops[key.floatValue] = mbglStopValue.asConstant();
-                        }
-                        outerStops[zoomKey.floatValue] = stops;
-                    }];
-                    mbgl::style::CompositeFunction<MBGLType> compositeFunction {
-                        compositeStyleFunction.attributeName.UTF8String,
-                        mbgl::style::CompositeIntervalStops<MBGLType> { outerStops }
-                    };
-                    if (compositeStyleFunction.defaultValue) {
-                        NSCAssert([compositeStyleFunction.defaultValue isKindOfClass:[MGLStyleConstantValue class]], @"Default value must be constant");
-                        MBGLType mbglValue;
-                        id mglValue = [(MGLStyleConstantValue<ObjCType> *)compositeStyleFunction.defaultValue rawValue];
-                        getMBGLValue(mglValue, mbglValue);
-                        compositeFunction.defaultValue = mbglValue;
-                    }
-                    return compositeFunction;
-                }
-                    break;
-                case MGLInterpolationModeCategorical: {
-                    __block std::map<float, std::map<mbgl::style::CategoricalValue, MBGLType>> outerStops = {};
-                    [compositeStyleFunction.stops enumerateKeysAndObjectsUsingBlock:^(NSNumber * _Nonnull zoomKey, NSDictionary * _Nonnull stopValue, BOOL * _Nonnull stop) {
-                        __block std::map<mbgl::style::CategoricalValue, MBGLType> stops = {};
-                        [stopValue enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull categoryKey, MGLStyleValue<ObjCType> *  _Nonnull innerValue, BOOL * _Nonnull stop) {
-                            NSCAssert([innerValue isKindOfClass:[MGLStyleValue class]], @"Stops should be MGLStyleValues");
-                            auto mbglStopValue = toPropertyValue(innerValue);
-                            NSCAssert(mbglStopValue.isConstant(), @"Stops must be constant");
-
-                            if ([categoryKey isKindOfClass:[NSString class]]) {
-                                const std::string& convertedValueKey = [((NSString *)categoryKey) UTF8String];
-                                stops[mbgl::style::CategoricalValue(convertedValueKey)] = mbglStopValue.asConstant();
-                            } else if ([categoryKey isKindOfClass:[NSNumber class]]) {
-                                NSNumber *key = (NSNumber *)categoryKey;
-                                if ((strcmp([key objCType], @encode(char)) == 0) ||
-                                    (strcmp([key objCType], @encode(BOOL)) == 0)) {
-                                    stops[mbgl::style::CategoricalValue((bool)[key boolValue])] = mbglStopValue.asConstant();
-                                } else if (strcmp([key objCType], @encode(double)) == 0 ||
-                                           strcmp([key objCType], @encode(float)) == 0) {
-                                    NSCAssert(mbglStopValue.isConstant(), @"Categorical stop keys must be strings, booleans, or integers");
-                                } else if ([key compare:@(0)] == NSOrderedDescending ||
-                                           [key compare:@(0)] == NSOrderedSame ||
-                                           [key compare:@(0)] == NSOrderedAscending) {
-                                    stops[mbgl::style::CategoricalValue((int64_t)[key integerValue])] = mbglStopValue.asConstant();
-                                }
-                            }
-                        }];
-                        outerStops[zoomKey.floatValue] = stops;
-                    }];
-                    mbgl::style::CompositeFunction<MBGLType> compositeFunction {
-                        compositeStyleFunction.attributeName.UTF8String,
-                        mbgl::style::CompositeCategoricalStops<MBGLType> { outerStops }
-                    };
-                    if (compositeStyleFunction.defaultValue) {
-                        NSCAssert([compositeStyleFunction.defaultValue isKindOfClass:[MGLStyleConstantValue class]], @"Default value must be constant");
-                        MBGLType mbglValue;
-                        id mglValue = [(MGLStyleConstantValue<ObjCType> *)compositeStyleFunction.defaultValue rawValue];
-                        getMBGLValue(mglValue, mbglValue);
-                        compositeFunction.defaultValue = mbglValue;
-                    }
-                    return compositeFunction;
-                }
-                    break;
-                default:
-                    [NSException raise:NSInvalidArgumentException
-                                format:@"A composite function must use exponential, interval, or categorical stops."];
-                    return {};
-            }
-            return {};
-        } else if ([value isMemberOfClass:[MGLStyleFunction class]]) {
-            MGLStyleFunction<ObjCType> *styleFunction = (MGLStyleFunction<ObjCType> *)value;
-            return toMBGLExponentialCameraFunction(styleFunction);
-        } else if (value) {
-            [NSException raise:@"MGLAbstractClassException" format:
-             @"The style value %@ cannot be applied to the style. "
-             @"Make sure the style value was created as a member of a concrete subclass of MGLStyleValue.",
-             NSStringFromClass([value class])];
-            return {};
+        } else if ([value isKindOfClass:[MGLStyleFunction class]]) {
+            auto rawValue = toRawStyleSpecValue((MGLStyleFunction<ObjCType> *) value);
+            auto result = mbgl::style::conversion::convert<mbgl::style::DataDrivenPropertyValue<MBGLType>>(rawValue);
+            NSCAssert(result, @(result.error().message.c_str()));
+            return *result;
         } else {
             return {};
         }
@@ -321,6 +179,102 @@ private: // Private utilities for converting from mgl to mbgl values
         MBGLType mbglValue;
         getMBGLValue(value.rawValue, mbglValue);
         return mbglValue;
+    }
+    
+    NSObject* toRawStyleSpecValue(MGLColor *color) {
+        return @(color.mgl_color.stringify().c_str());
+    }
+    
+    NSObject* toRawStyleSpecValue(NSObject *rawMGLValue) {
+        if ([rawMGLValue isKindOfClass:[NSValue class]]) {
+            const auto rawNSValue = (NSValue *)rawMGLValue;
+            if (strcmp([rawNSValue objCType], @encode(CGVector)) == 0) {
+                // offset [x, y]
+                std::array<float, 2> mglValue = rawNSValue.mgl_offsetArrayValue;
+                return [NSArray arrayWithObjects:@(mglValue[0]), @(mglValue[1]), nil];
+            }
+        }
+        // noop pass-through plain NSObject-based items
+        return rawMGLValue;
+    }
+    
+    NSObject* toRawStyleSpecValue(MGLStyleFunction<ObjCType>* styleFunction) {
+        NSMutableDictionary * rawFunction = [NSMutableDictionary new];
+        // interpolationMode => type
+        switch (styleFunction.interpolationMode) {
+            case MGLInterpolationModeExponential:
+                rawFunction[@"type"] = @"exponential";
+                break;
+            case MGLInterpolationModeInterval:
+                rawFunction[@"type"] = @"interval";
+                break;
+            case MGLInterpolationModeCategorical:
+                rawFunction[@"type"] = @"categorical";
+                break;
+            case MGLInterpolationModeIdentity:
+                rawFunction[@"type"] = @"identity";
+                break;
+        }
+        
+        // interpolationBase => base
+        if (styleFunction.interpolationBase) {
+            rawFunction[@"base"] = @(styleFunction.interpolationBase);
+        }
+        
+        // stops and default value
+        if ([styleFunction isKindOfClass:[MGLCameraStyleFunction class]]) {
+            // zoom-only function (no default value)
+            __block NSMutableArray *stops = [[NSMutableArray alloc] init];
+            [styleFunction.stops enumerateKeysAndObjectsUsingBlock:^(NSNumber * _Nonnull zoomKey, MGLStyleConstantValue<ObjCType> * _Nonnull outputValue, BOOL * _Nonnull stop) {
+                NSArray *rawStop = @[zoomKey, toRawStyleSpecValue([outputValue rawValue])];
+                [stops addObject:rawStop];
+            }];
+            rawFunction[@"stops"] = stops;
+
+        } else if ([styleFunction isKindOfClass:[MGLSourceStyleFunction class]]) {
+            auto sourceStyleFunction = (MGLSourceStyleFunction<ObjCType> *)styleFunction;
+            rawFunction[@"property"] = sourceStyleFunction.attributeName;
+            // property-only function
+            __block NSMutableArray *stops = [[NSMutableArray alloc] init];
+            [styleFunction.stops enumerateKeysAndObjectsUsingBlock:^(NSObject * _Nonnull propertyKey, MGLStyleConstantValue<ObjCType> * _Nonnull outputValue, BOOL * _Nonnull stop) {
+                NSArray *rawStop = @[propertyKey, toRawStyleSpecValue([outputValue rawValue])];
+                [stops addObject:rawStop];
+            }];
+            rawFunction[@"stops"] = stops;
+            
+            // defaultValue => default
+            if (sourceStyleFunction.defaultValue) {
+                NSCAssert([sourceStyleFunction.defaultValue isKindOfClass:[MGLStyleConstantValue class]], @"Default value must be constant");
+                rawFunction[@"default"] = toRawStyleSpecValue([(MGLStyleConstantValue<ObjCType> *)sourceStyleFunction.defaultValue rawValue]);
+            }
+        } else if ([styleFunction isKindOfClass:[MGLCompositeStyleFunction class]]) {
+            // zoom-and-property function
+            auto compositeStyleFunction = (MGLCompositeStyleFunction<ObjCType> *)styleFunction;
+            rawFunction[@"property"] = compositeStyleFunction.attributeName;
+            
+            __block NSMutableArray *stops = [[NSMutableArray alloc] init];
+            [compositeStyleFunction.stops enumerateKeysAndObjectsUsingBlock:^(NSNumber * _Nonnull zoomKey, NSDictionary * _Nonnull stopValue, BOOL * _Nonnull stop) {
+                for (NSObject *valueKey in stopValue.allKeys) {
+                    NSDictionary *stopKey = @{
+                         @"zoom": zoomKey,
+                         @"value": valueKey
+                     };
+                    MGLStyleConstantValue<ObjCType> *outputValue = stopValue[valueKey];
+                    NSCAssert([outputValue isKindOfClass:[MGLStyleConstantValue<ObjCType> class]], @"Stop outputs should be MGLStyleConstantValues");
+                    NSArray *rawStop = @[stopKey, toRawStyleSpecValue([outputValue rawValue])];
+                    [stops addObject:rawStop];
+                }
+            }];
+            rawFunction[@"stops"] = stops;
+            
+            // defaultValue => default
+            if (compositeStyleFunction.defaultValue) {
+                NSCAssert([compositeStyleFunction.defaultValue isKindOfClass:[MGLStyleConstantValue class]], @"Default value must be constant");
+                rawFunction[@"default"] = toRawStyleSpecValue([(MGLStyleConstantValue<ObjCType> *)compositeStyleFunction.defaultValue rawValue]);
+            }
+        }
+        
+        return rawFunction;
     }
 
     mbgl::style::CameraFunction<MBGLType> toMBGLExponentialCameraFunction(MGLStyleFunction<ObjCType> *styleFunction) {
