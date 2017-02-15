@@ -65,18 +65,12 @@ attribute vec2 a_pos;
 
 uniform mat4 u_matrix;
 
-uniform lowp float a_color_t;
-attribute lowp vec4 a_color_min;
-attribute lowp vec4 a_color_max;
-varying lowp vec4 color;
-uniform lowp float a_opacity_t;
-attribute lowp float a_opacity_min;
-attribute lowp float a_opacity_max;
-varying lowp float opacity;
+uniform lowp vec4 u_color;
+uniform lowp float u_opacity;
 
 void main() {
-    color = mix(a_color_min, a_color_max, a_color_t);
-    opacity = mix(a_opacity_min, a_opacity_max, a_opacity_t);
+    lowp vec4 color = u_color;
+    lowp float opacity = u_opacity;
 
     gl_Position = u_matrix * vec4(a_pos, 0, 1);
 }
@@ -100,12 +94,12 @@ precision mediump float;
 #endif
 
 #endif
-varying lowp vec4 color;
-varying lowp float opacity;
+uniform lowp vec4 u_color;
+uniform lowp float u_opacity;
 
 void main() {
-    
-    
+    lowp vec4 color = u_color;
+    lowp float opacity = u_opacity;
 
     gl_FragColor = color * opacity;
 

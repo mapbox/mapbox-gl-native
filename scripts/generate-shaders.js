@@ -38,13 +38,10 @@ require('./style-code');
         const source = fs.readFileSync(path.join(inputPath, shaderName + '.vertex.glsl'), 'utf8');
         return prelude + applyPragmas(source, {
                 define: [
-                    "uniform lowp float a_{name}_t;",
-                    "attribute {precision} {type} a_{name}_min;",
-                    "attribute {precision} {type} a_{name}_max;",
-                    "varying {precision} {type} {name};"
+                    "uniform {precision} {type} u_{name};"
                 ],
                 initialize: [
-                    "{name} = mix(a_{name}_min, a_{name}_max, a_{name}_t);"
+                    "{precision} {type} {name} = u_{name};"
                 ]
             });
     }
@@ -54,9 +51,10 @@ require('./style-code');
         const source = fs.readFileSync(path.join(inputPath, shaderName + '.fragment.glsl'), 'utf8');
         return prelude + applyPragmas(source, {
                 define: [
-                    "varying {precision} {type} {name};"
+                    "uniform {precision} {type} u_{name};"
                 ],
                 initialize: [
+                    "{precision} {type} {name} = u_{name};"
                 ]
             });
     }

@@ -67,46 +67,25 @@ uniform vec2 u_extrude_scale;
 
 attribute vec2 a_pos;
 
-uniform lowp float a_color_t;
-attribute lowp vec4 a_color_min;
-attribute lowp vec4 a_color_max;
-varying lowp vec4 color;
-uniform lowp float a_radius_t;
-attribute mediump float a_radius_min;
-attribute mediump float a_radius_max;
-varying mediump float radius;
-uniform lowp float a_blur_t;
-attribute lowp float a_blur_min;
-attribute lowp float a_blur_max;
-varying lowp float blur;
-uniform lowp float a_opacity_t;
-attribute lowp float a_opacity_min;
-attribute lowp float a_opacity_max;
-varying lowp float opacity;
-uniform lowp float a_stroke_color_t;
-attribute lowp vec4 a_stroke_color_min;
-attribute lowp vec4 a_stroke_color_max;
-varying lowp vec4 stroke_color;
-uniform lowp float a_stroke_width_t;
-attribute mediump float a_stroke_width_min;
-attribute mediump float a_stroke_width_max;
-varying mediump float stroke_width;
-uniform lowp float a_stroke_opacity_t;
-attribute lowp float a_stroke_opacity_min;
-attribute lowp float a_stroke_opacity_max;
-varying lowp float stroke_opacity;
+uniform lowp vec4 u_color;
+uniform mediump float u_radius;
+uniform lowp float u_blur;
+uniform lowp float u_opacity;
+uniform lowp vec4 u_stroke_color;
+uniform mediump float u_stroke_width;
+uniform lowp float u_stroke_opacity;
 
 varying vec2 v_extrude;
 varying lowp float v_antialiasblur;
 
 void main(void) {
-    color = mix(a_color_min, a_color_max, a_color_t);
-    radius = mix(a_radius_min, a_radius_max, a_radius_t);
-    blur = mix(a_blur_min, a_blur_max, a_blur_t);
-    opacity = mix(a_opacity_min, a_opacity_max, a_opacity_t);
-    stroke_color = mix(a_stroke_color_min, a_stroke_color_max, a_stroke_color_t);
-    stroke_width = mix(a_stroke_width_min, a_stroke_width_max, a_stroke_width_t);
-    stroke_opacity = mix(a_stroke_opacity_min, a_stroke_opacity_max, a_stroke_opacity_t);
+    lowp vec4 color = u_color;
+    mediump float radius = u_radius;
+    lowp float blur = u_blur;
+    lowp float opacity = u_opacity;
+    lowp vec4 stroke_color = u_stroke_color;
+    mediump float stroke_width = u_stroke_width;
+    lowp float stroke_opacity = u_stroke_opacity;
 
     // unencode the extrusion vector that we snuck into the a_pos vector
     v_extrude = vec2(mod(a_pos, 2.0) * 2.0 - 1.0);
@@ -147,25 +126,25 @@ precision mediump float;
 #endif
 
 #endif
-varying lowp vec4 color;
-varying mediump float radius;
-varying lowp float blur;
-varying lowp float opacity;
-varying lowp vec4 stroke_color;
-varying mediump float stroke_width;
-varying lowp float stroke_opacity;
+uniform lowp vec4 u_color;
+uniform mediump float u_radius;
+uniform lowp float u_blur;
+uniform lowp float u_opacity;
+uniform lowp vec4 u_stroke_color;
+uniform mediump float u_stroke_width;
+uniform lowp float u_stroke_opacity;
 
 varying vec2 v_extrude;
 varying lowp float v_antialiasblur;
 
 void main() {
-    
-    
-    
-    
-    
-    
-    
+    lowp vec4 color = u_color;
+    mediump float radius = u_radius;
+    lowp float blur = u_blur;
+    lowp float opacity = u_opacity;
+    lowp vec4 stroke_color = u_stroke_color;
+    mediump float stroke_width = u_stroke_width;
+    lowp float stroke_opacity = u_stroke_opacity;
 
     float extrude_length = length(v_extrude);
     float antialiased_blur = -max(blur, v_antialiasblur);

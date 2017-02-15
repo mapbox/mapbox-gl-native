@@ -68,18 +68,12 @@ uniform vec2 u_world;
 
 varying vec2 v_pos;
 
-uniform lowp float a_outline_color_t;
-attribute lowp vec4 a_outline_color_min;
-attribute lowp vec4 a_outline_color_max;
-varying lowp vec4 outline_color;
-uniform lowp float a_opacity_t;
-attribute lowp float a_opacity_min;
-attribute lowp float a_opacity_max;
-varying lowp float opacity;
+uniform lowp vec4 u_outline_color;
+uniform lowp float u_opacity;
 
 void main() {
-    outline_color = mix(a_outline_color_min, a_outline_color_max, a_outline_color_t);
-    opacity = mix(a_opacity_min, a_opacity_max, a_opacity_t);
+    lowp vec4 outline_color = u_outline_color;
+    lowp float opacity = u_opacity;
 
     gl_Position = u_matrix * vec4(a_pos, 0, 1);
     v_pos = (gl_Position.xy / gl_Position.w + 1.0) / 2.0 * u_world;
@@ -104,14 +98,14 @@ precision mediump float;
 #endif
 
 #endif
-varying lowp vec4 outline_color;
-varying lowp float opacity;
+uniform lowp vec4 u_outline_color;
+uniform lowp float u_opacity;
 
 varying vec2 v_pos;
 
 void main() {
-    
-    
+    lowp vec4 outline_color = u_outline_color;
+    lowp float opacity = u_opacity;
 
     float dist = length(v_pos - gl_FragCoord.xy);
     float alpha = smoothstep(1.0, 0.0, dist);

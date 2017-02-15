@@ -75,13 +75,10 @@ attribute vec2 a_pos;
 varying vec2 v_pos_a;
 varying vec2 v_pos_b;
 
-uniform lowp float a_opacity_t;
-attribute lowp float a_opacity_min;
-attribute lowp float a_opacity_max;
-varying lowp float opacity;
+uniform lowp float u_opacity;
 
 void main() {
-    opacity = mix(a_opacity_min, a_opacity_max, a_opacity_t);
+    lowp float opacity = u_opacity;
 
     gl_Position = u_matrix * vec4(a_pos, 0, 1);
 
@@ -119,10 +116,10 @@ uniform sampler2D u_image;
 varying vec2 v_pos_a;
 varying vec2 v_pos_b;
 
-varying lowp float opacity;
+uniform lowp float u_opacity;
 
 void main() {
-    
+    lowp float opacity = u_opacity;
 
     vec2 imagecoord = mod(v_pos_a, 1.0);
     vec2 pos = mix(u_pattern_tl_a, u_pattern_br_a, imagecoord);
