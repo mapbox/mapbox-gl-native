@@ -1,20 +1,15 @@
 apply plugin: 'com.android.application'
 
-ext {
-    wearableVersion = '2.0.0-alpha3'
-    leakCanaryVersion = '1.5'
-}
-
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.2"
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
 
     defaultConfig {
         applicationId "com.mapbox.mapboxsdk.testapp"
-        minSdkVersion 21
-        targetSdkVersion 25
-        versionCode 11
-        versionName "5.0.0"
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode rootProject.ext.versionCode
+        versionName rootProject.ext.versionName
     }
 
     buildTypes {
@@ -34,18 +29,17 @@ dependencies {
     }
 
     // Wear
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile "com.google.android.support:wearable:${wearableVersion}"
-    provided "com.google.android.wearable:wearable:${wearableVersion}"
+    compile rootProject.ext.dep.wearCompile
+    provided rootProject.ext.dep.wearProvided
 
     // Leak Canary
-    debugCompile "com.squareup.leakcanary:leakcanary-android:${leakCanaryVersion}"
-    releaseCompile "com.squareup.leakcanary:leakcanary-android-no-op:${leakCanaryVersion}"
-    testCompile "com.squareup.leakcanary:leakcanary-android-no-op:${leakCanaryVersion}"
+    debugCompile rootProject.ext.dep.leakCanaryDebug
+    releaseCompile rootProject.ext.dep.leakCanaryRelease
+    testCompile rootProject.ext.dep.leakCanaryTest
 
     // Testing dependencies
-    testCompile 'junit:junit:4.12'
-    testCompile 'org.mockito:mockito-core:2.2.27'
+    testCompile rootProject.ext.dep.junit
+    testCompile rootProject.ext.dep.mockito
 }
 
 apply from: 'gradle-config.gradle'

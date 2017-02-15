@@ -1,0 +1,48 @@
+ext {
+    minSdkVersion = 15
+    targetSdkVersion = 25
+    compileSdkVersion = 25
+    buildToolsVersion = "25.0.2"
+
+    versionCode = 11
+    versionName = "5.0.0"
+
+    supportLibVersion = "25.1.1"
+    leakCanaryVersion = '1.5'
+    wearableVersion = '2.0.0'
+
+    espressoVersion = '2.2.2'
+    testRunnerVersion = '0.5'
+
+    dep = [
+            // mapbox
+            mapboxJavaServices : 'com.mapbox.mapboxsdk:mapbox-java-services:2.0.0-beta.1@jar',
+
+            // unit test
+            junit              : 'junit:junit:4.12',
+            mockito            : 'org.mockito:mockito-core:2.2.27',
+
+            // instrumentation test
+            testSpoonRunner    : 'com.squareup.spoon:spoon-client:1.6.2',
+            testRunner         : "com.android.support.test:runner:${testRunnerVersion}",
+            testRules          : "com.android.support.test:rules:${testRunnerVersion}",
+            testEspressoCore   : "com.android.support.test.espresso:espresso-core:${espressoVersion}",
+            testEspressoIntents: "com.android.support.test.espresso:espresso-intents:${espressoVersion}",
+
+            // support
+            supportAnnotations : "com.android.support:support-annotations:${supportLibVersion}",
+            supportAppcompatV7 : "com.android.support:appcompat-v7:${supportLibVersion}",
+            supportV4          : "com.android.support:support-v4:${supportLibVersion}",
+            supportDesign      : "com.android.support:design:${supportLibVersion}",
+            supportRecyclerView: "com.android.support:recyclerview-v7:${supportLibVersion}",
+
+            // wear
+            wearCompile        : "com.google.android.support:wearable:${wearableVersion}",
+            wearProvided       : "com.google.android.wearable:wearable:${wearableVersion}",
+
+            // leakCanary
+            leakCanaryDebug    : "com.squareup.leakcanary:leakcanary-android:${leakCanaryVersion}",
+            leakCanaryRelease  : "com.squareup.leakcanary:leakcanary-android-no-op:${leakCanaryVersion}",
+            leakCanaryTest     : "com.squareup.leakcanary:leakcanary-android-no-op:${leakCanaryVersion}"
+    ]
+}
