@@ -24,6 +24,10 @@ if(WITH_OSMESA)
     add_compile_options(-D__OSMESA__)
 endif()
 
+if($ENV{CI})
+    add_compile_options(-DCI_BUILD=1)
+endif()
+
 mason_use(geometry VERSION 0.8.0 HEADER_ONLY)
 mason_use(variant VERSION 1.1.0 HEADER_ONLY)
 mason_use(unique_resource VERSION dev HEADER_ONLY)
