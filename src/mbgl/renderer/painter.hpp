@@ -172,6 +172,7 @@ private:
     gl::SegmentVector<FillAttributes> tileTriangleSegments;
     gl::SegmentVector<DebugAttributes> tileBorderSegments;
     gl::SegmentVector<RasterAttributes> rasterSegments;
+    gl::SegmentVector<ExtrusionTextureAttributes> extrusionTextureSegments;
 };
 
 } // namespace mbgl

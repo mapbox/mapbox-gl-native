@@ -109,6 +109,7 @@ Painter::Painter(gl::Context& context_,
     tileTriangleSegments.emplace_back(0, 0, 4, 6);
     tileBorderSegments.emplace_back(0, 0, 4, 5);
     rasterSegments.emplace_back(0, 0, 4, 6);
+    extrusionTextureSegments.emplace_back(0, 0, 4, 6); // TODO i have no idea what these numbers are
 
     programs = std::make_unique<Programs>(context,
                                           ProgramParameters{ pixelRatio, false, programCacheDir });
@@ -304,6 +305,17 @@ void Painter::renderPass(PaintParameters& parameters,
         if (!layer.baseImpl->hasRenderPass(pass))
             continue;
 
+        auto renderTiles = [this, &item, &layer, &parameters]() {
+            for (auto& tileRef : item.tiles) {
+                auto& tile = tileRef.get();
+                MBGL_DEBUG_GROUP(layer.baseImpl->id + " - " + util::toString(tile.id));
+                auto bucket = tile.tile.getBucket(layer);
+                if (bucket) {
+                    bucket->render(*this, parameters, layer, tile);
+                }
+            }
+        };
+
         if (layer.is<BackgroundLayer>()) {
             MBGL_DEBUG_GROUP(context, "background");
             renderBackground(parameters, *layer.as<BackgroundLayer>());
@@ -322,15 +334,77 @@ void Painter::renderPass(PaintParameters& parameters,
             // the viewport or Framebuffer.
             parameters.view.bind();
             context.setDirtyState();
+        } else if (layer.is<FillExtrusionLayer>()) {
+            const auto size = state.getSize();
+            OffscreenTexture texture(context, size);
+            texture.bind();
+
+            renderTiles();
+
+            parameters.view.bind();
+
+            mat4 mat;
+            matrix::ortho(mat, 0, size.width, size.height, 0, 0, 1);
+
+            const FillExtrusionPaintProperties::Evaluated properties{};
+
+            parameters.programs.extrusionTexture.draw(context,
+                                                      gl::Triangles(),
+                                                      gl::DepthMode::disabled(),
+                                                      gl::StencilMode::disabled(),
+                                                      colorModeForRenderPass(),
+                                                      ExtrusionTextureProgram::UniformValues{
+                                                          uniforms::u_matrix::Value{ mat },
+                                                          uniforms::u_xdim::Value{ static_cast<uint16_t>(size.width) },
+                                                          uniforms::u_ydim::Value{ static_cast<uint16_t>(size.height) },
+                                                          uniforms::u_texture::Value{ 1 }, // view.getTexture() ?
+                                                          uniforms::u_opacity::Value{ 1.0 }
+                                                      },
+                                                      extrusionTextureVertexBuffer,
+                                                      tileTriangleIndexBuffer, // we reuse the same simple index buffer
+                                                      extrusionTextureSegments,
+                                                      ExtrusionTextureProgram::PaintPropertyBinders{ properties, 0 },
+                                                      FillExtrusionPaintProperties::Evaluated{},
+                                                      state.getZoom());
+
+
+
+//            parameters.programs.extrusionTexture.draw(context,
+//                                                      gl::TriangleStrip(),
+//                                                      gl::DepthMode::disabled(),
+//                                                      gl::StencilMode::disabled(),
+//                                                      colorModeForRenderPass(),
+//                                                      ExtrusionTextureProgram::UniformValues{
+//                                                          uniforms::u_matrix::Value{ mat },
+//                                                          uniforms::u_xdim::Value{ size.width },
+//                                                          uniforms::u_ydim::Value{ size.height },
+//                                                          uniforms::u_texture::Value{ 1 }, // view.getTexture() ?
+//                                                          uniforms::u_opacity::Value{ 1.0 }
+//                                                      },
+//                                                      extrusionTextureVertexBuffer,
+//                                                      tileTriangleIndexBuffer,
+//                                                      tileTriangleSegments,
+//                                                      ExtrusionTextureProgram::PaintPropertyBinders{ properties, 0 },
+//                                                      FillExtrusionPaintProperties::Evaluated{},
+//                                                      state.getZoom());
+
+
+
+//            {
+//                gl::DepthMode::disabled(),
+//                gl::StencilMode::disabled(),
+//                gl::ColorMode::unblended(),
+//                parameters.programs.extrusionTexture,
+//                ExtrusionTextureUniforms::Values {
+//                    uniforms::u_matrix::Value{ mat },
+//                    uniforms::u_xdim::Value{ size.width },
+//                    uniforms::u_ydim::Value{ size.height },
+//                    uniforms::u_texture::Value{ 1 }
+//                },
+//                gl::Unindexed<gl::TriangleStrip>(rasterVertexBuffer);
+//            });
         } else {
-            for (auto& tileRef : item.tiles) {
-                auto& tile = tileRef.get();
-                MBGL_DEBUG_GROUP(context, layer.baseImpl->id + " - " + util::toString(tile.id));
-                auto bucket = tile.tile.getBucket(layer);
-                if (bucket) {
-                    bucket->render(*this, parameters, layer, tile);
-                }
-            }
+            renderTiles();
         }
     }
 
