@@ -45,7 +45,8 @@
 
 - (NSDictionary *)geoJSONDictionary {
     return @{@"type": @"LineString",
-             @"coordinates": self.mgl_coordinates};
+             @"coordinates": self.mgl_coordinates,
+             @"bbox": MGLCoordinateBoundsToBBox(self.overlayBounds)};
 }
 
 @end
@@ -129,7 +130,8 @@
         [coordinates addObject: feature.mgl_coordinates];
     }
     return @{@"type": @"MultiLineString",
-             @"coordinates": coordinates};
+             @"coordinates": coordinates,
+             @"bbox": MGLCoordinateBoundsToBBox(self.overlayBounds)};
 }
 
 @end

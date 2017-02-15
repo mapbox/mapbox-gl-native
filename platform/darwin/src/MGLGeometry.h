@@ -127,4 +127,8 @@ NS_INLINE CLLocationDegrees MGLDegreesFromRadians(CGFloat radians) {
     return radians * 180 / M_PI;
 }
 
+NS_INLINE NSArray<NSNumber *>* MGLCoordinateBoundsToBBox(MGLCoordinateBounds bounds) {
+    return @[@(bounds.sw.latitude), @(bounds.sw.longitude), @(bounds.ne.latitude), @(bounds.ne.longitude)];
+}
+
 NS_ASSUME_NONNULL_END

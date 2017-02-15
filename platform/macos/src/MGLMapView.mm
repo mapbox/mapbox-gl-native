@@ -1633,13 +1633,14 @@ public:
 #pragma mark Keyboard events
 
 - (void)keyDown:(NSEvent *)event {
-    if (event.modifierFlags & NSNumericPadKeyMask) {
-        // This is the recommended way to handle arrow key presses, causing
-        // methods like -moveUp: and -moveToBeginningOfParagraph: to be called
-        // for various standard keybindings.
-        [self interpretKeyEvents:@[event]];
-    } else {
-        [super keyDown:event];
+    [self interpretKeyEvents:@[event]];
+}
+
+- (void)insertText:(NSString *)text {
+    BOOL textIsZoomCharacter = [@[@"-", @"=", @"+"] containsObject:text];
+
+    if (textIsZoomCharacter) {
+        [self adjustZoomLevelForKey:text];
     }
 }
 
@@ -1693,6 +1694,21 @@ public:
     _rotateEnabled = rotateEnabled;
     _compass.enabled = rotateEnabled;
     _compass.hidden = !rotateEnabled;
+}
+
+- (void)adjustZoomLevelForKey:(NSString *)key {
+    static NSDictionary<NSString *, void(^)(void)> *zoomOpDict = nil;
+
+    if (zoomOpDict == nil) {
+        void (^zoomOut)(void) = ^ { [self setZoomLevel:(self.zoomLevel - 1) animated:YES]; };
+        void (^zoomIn)(void) = ^ { [self setZoomLevel:(self.zoomLevel + 1) animated:YES]; };
+        zoomOpDict = @{@"-": zoomOut, @"+": zoomIn, @"=": zoomIn};
+    }
+    void (^zoomOp)(void) = zoomOpDict[key];
+    if (zoomOp != nil) {
+        zoomOp();
+    }
+
 }
 
 #pragma mark Ornaments
