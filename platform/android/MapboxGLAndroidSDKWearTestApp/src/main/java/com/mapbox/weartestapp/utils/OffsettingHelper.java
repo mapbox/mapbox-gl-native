@@ -34,7 +34,7 @@ public class OffsettingHelper extends DefaultOffsettingHelper {
   }
 
   @Override
-  protected void adjustAnchorOffsetXY(View child, float[] anchorOffsetXY) {
+  public void adjustAnchorOffsetXY(View child, float[] anchorOffsetXY) {
     anchorOffsetXY[0] = child.getHeight() / 2.0f;
   }
 }

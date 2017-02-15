@@ -1,9 +1,5 @@
 apply plugin: 'com.android.library'
 
-ext {
-    supportLibVersion = '25.1.0'
-}
-
 dependencies {
     compile "com.android.support:support-annotations:${supportLibVersion}"
     compile "com.android.support:support-v4:${supportLibVersion}"
@@ -24,27 +20,21 @@ dependencies {
 }
 
 android {
-    compileSdkVersion Integer.parseInt(project.ANDROID_BUILD_SDK_VERSION)
-    buildToolsVersion project.ANDROID_BUILD_TOOLS_VERSION
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
 
     defaultConfig {
-        minSdkVersion Integer.parseInt(project.ANDROID_MIN_SDK)
-        targetSdkVersion Integer.parseInt(project.ANDROID_BUILD_TARGET_SDK_VERSION)
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
         buildConfigField "String", "GIT_REVISION_SHORT", String.format("\"%s\"", getGitRevision())
     }
 
-    android {
-        // avoid naming conflicts, force usage of prefix
-        resourcePrefix 'mapbox_'
-    }
+    // avoid naming conflicts, force usage of prefix
+    resourcePrefix 'mapbox_'
 
     sourceSets {
         // limit amount of exposed library resources
         main.res.srcDirs += 'src/main/res-public'
-    }
-
-    repositories {
-        mavenCentral()
     }
 
     compileOptions {
