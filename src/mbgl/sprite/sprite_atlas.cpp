@@ -49,7 +49,10 @@ SpriteAtlas::SpriteAtlas(Size size_, float pixelRatio_)
       pixelRatio(pixelRatio_),
       observer(&nullObserver),
       bin(size.width, size.height),
+      image({ static_cast<uint32_t>(std::ceil(size.width * pixelRatio)),
+              static_cast<uint32_t>(std::ceil(size.height * pixelRatio)) }),
       dirty(true) {
+    image.fill(0);
 }
 
 SpriteAtlas::~SpriteAtlas() = default;
@@ -257,12 +260,6 @@ optional<SpriteAtlasElement> SpriteAtlas::getImage(const std::string& name,
 }
 
 void SpriteAtlas::copy(const Entry& entry, optional<Rect<uint16_t>> Entry::*entryRect) {
-    if (!image.valid()) {
-        image = PremultipliedImage({ static_cast<uint32_t>(std::ceil(size.width * pixelRatio)),
-                                     static_cast<uint32_t>(std::ceil(size.height * pixelRatio)) });
-        image.fill(0);
-    }
-
     const PremultipliedImage& src = entry.spriteImage->image;
     const Rect<uint16_t>& rect = *(entry.*entryRect);
 

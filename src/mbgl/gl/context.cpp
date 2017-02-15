@@ -286,24 +286,27 @@ Framebuffer Context::createFramebuffer(const Texture& color) {
 
 UniqueTexture
 Context::createTexture(const Size size, const void* data, TextureFormat format, TextureUnit unit) {
-    auto obj = createTexture();
-    updateTexture(obj, size, data, format, unit);
+    auto id = createTexture();
+    activeTexture = unit;
+    texture[unit] = id;
+    MBGL_CHECK_ERROR(glTexImage2D(GL_TEXTURE_2D, 0, static_cast<GLenum>(format), size.width,
+                                  size.height, 0, static_cast<GLenum>(format), GL_UNSIGNED_BYTE,
+                                  data));
     // We are using clamp to edge here since OpenGL ES doesn't allow GL_REPEAT on NPOT textures.
     // We use those when the pixelRatio isn't a power of two, e.g. on iPhone 6 Plus.
     MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
     MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
     MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
     MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
-    return obj;
+    return id;
 }
 
 void Context::updateTexture(
     TextureID id, const Size size, const void* data, TextureFormat format, TextureUnit unit) {
     activeTexture = unit;
     texture[unit] = id;
-    MBGL_CHECK_ERROR(glTexImage2D(GL_TEXTURE_2D, 0, static_cast<GLenum>(format), size.width,
-                                  size.height, 0, static_cast<GLenum>(format), GL_UNSIGNED_BYTE,
-                                  data));
+    MBGL_CHECK_ERROR(glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, size.width, size.height,
+                                     static_cast<GLenum>(format), GL_UNSIGNED_BYTE, data));
 }
 
 void Context::bindTexture(Texture& obj,

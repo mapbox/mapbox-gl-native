@@ -38,7 +38,6 @@ public:
     UniqueShader createShader(ShaderType type, const std::string& source);
     UniqueProgram createProgram(ShaderID vertexShader, ShaderID fragmentShader);
     void linkProgram(ProgramID);
-    UniqueTexture createTexture();
     UniqueVertexArray createVertexArray();
 
     template <class Vertex, class DrawMode>
@@ -90,12 +89,18 @@ public:
     // Create a texture from an image with data.
     template <typename Image>
     Texture createTexture(const Image& image, TextureUnit unit = 0) {
+        if (!image.valid()) {
+            throw new std::runtime_error("Image texture is invalid");
+        }
         auto format = image.channels == 4 ? TextureFormat::RGBA : TextureFormat::Alpha;
         return { image.size, createTexture(image.size, image.data.get(), format, unit) };
     }
 
     template <typename Image>
     void updateTexture(Texture& obj, const Image& image, TextureUnit unit = 0) {
+        if (!image.valid()) {
+            throw new std::runtime_error("Image texture is invalid");
+        }
         auto format = image.channels == 4 ? TextureFormat::RGBA : TextureFormat::Alpha;
         updateTexture(obj.texture.get(), image.size, image.data.get(), format, unit);
         obj.size = image.size;
@@ -196,6 +201,7 @@ private:
 
     UniqueBuffer createVertexBuffer(const void* data, std::size_t size);
     UniqueBuffer createIndexBuffer(const void* data, std::size_t size);
+    UniqueTexture createTexture();
     UniqueTexture createTexture(Size size, const void* data, TextureFormat, TextureUnit);
     void updateTexture(TextureID, Size size, const void* data, TextureFormat, TextureUnit);
     UniqueFramebuffer createFramebuffer();
