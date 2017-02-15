@@ -1,5 +1,10 @@
 apply plugin: 'com.android.application'
 
+// load keystore for release signing
+def keystorePropertiesFile = rootProject.file("keystore.properties")
+def keystoreProperties = new Properties()
+keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+
 ext {
     supportLibVersion = '25.1.0'
     espressoVersion = '2.2.2'
@@ -18,6 +23,15 @@ android {
         versionCode 11
         versionName "5.0.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+
+    signingConfigs {
+        release {
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+            storeFile file(keystoreProperties['storeFile'])
+            storePassword keystoreProperties['storePassword']
+        }
     }
 
     compileOptions {
@@ -45,11 +59,13 @@ android {
     buildTypes {
         debug {
             testCoverageEnabled = true
-            minifyEnabled false
+        }
+        ci{
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
@@ -69,6 +85,7 @@ dependencies {
 
     // Leak Canary
     debugCompile "com.squareup.leakcanary:leakcanary-android:${leakCanaryVersion}"
+    ciCompile "com.squareup.leakcanary:leakcanary-android-no-op:${leakCanaryVersion}"
     releaseCompile "com.squareup.leakcanary:leakcanary-android-no-op:${leakCanaryVersion}"
     testCompile "com.squareup.leakcanary:leakcanary-android-no-op:${leakCanaryVersion}"
 
