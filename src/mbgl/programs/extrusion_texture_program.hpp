@@ -25,7 +25,9 @@ attributes::a_pos>
 struct ExtrusionTextureUniforms : gl::Uniforms<
 uniforms::u_matrix,
 uniforms::u_xdim,
-uniforms::u_ydim>
+uniforms::u_ydim,
+uniforms::u_texture,
+uniforms::u_opacity>
 {};
 
 class ExtrusionTextureProgram : public Program<
