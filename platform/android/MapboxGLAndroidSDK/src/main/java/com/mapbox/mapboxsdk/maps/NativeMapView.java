@@ -927,7 +927,9 @@ final class NativeMapView {
   //
 
   protected void onInvalidate() {
-    mapView.onInvalidate();
+    if (mapView != null) {
+      mapView.onInvalidate();
+    }
   }
 
   protected void onMapChanged(int rawChange) {
