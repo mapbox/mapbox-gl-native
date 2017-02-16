@@ -5,7 +5,7 @@ import android.os.Looper;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 
-import timber.log.Timber;
+import com.mapbox.mapboxsdk.storage.FileSource;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -25,22 +25,25 @@ public class OfflineRegion {
     System.loadLibrary("mapbox-gl");
   }
 
-  // Parent OfflineManager
-  private OfflineManager offlineManager;
-
   // Members
-  private long mId = 0;
-  private OfflineRegionDefinition mDefinition = null;
+
+  // Holds the pointer to JNI OfflineRegion
+  private long nativePtr;
+
+  // Holds a reference to the FileSource to keep it alive
+  private FileSource fileSource;
+
+  //Region id
+  private long id;
+
+  private OfflineRegionDefinition definition;
 
   /**
    * Arbitrary binary region metadata. The contents are opaque to the SDK implementation;
    * it just stores and retrieves a byte[]. Check the `OfflineActivity` in the TestApp
    * for a sample implementation that uses JSON to store an offline region name.
    */
-  private byte[] mMetadata = null;
-
-  // Holds the pointer to JNI OfflineRegion
-  private long mOfflineRegionPtr = 0;
+  private byte[] metadata;
 
   // Makes sure callbacks come back to the main thread
   private Handler handler;
@@ -197,19 +200,22 @@ public class OfflineRegion {
     if (state == STATE_ACTIVE) {
       return true;
     }
-    if (isDeliveringInactiveMessages()) {
-      return true;
-    }
-    return false;
+    return isDeliveringInactiveMessages();
   }
 
-  /*
+  /**
    * Constructor
+   *
+   * For JNI use only, to create a new offline region, use
+   * {@link OfflineManager#createOfflineRegion} instead.
    */
-
-  private OfflineRegion() {
-    // For JNI use only, to create a new offline region, use
-    // OfflineManager.createOfflineRegion() instead.
+  private OfflineRegion(long offlineRegionPtr, FileSource fileSource, long id,
+                        OfflineRegionDefinition definition, byte[] metadata) {
+    this.fileSource = fileSource;
+    this.id = id;
+    this.definition = definition;
+    this.metadata = metadata;
+    initialize(offlineRegionPtr, fileSource);
   }
 
   /*
@@ -217,15 +223,15 @@ public class OfflineRegion {
    */
 
   public long getID() {
-    return mId;
+    return id;
   }
 
   public OfflineRegionDefinition getDefinition() {
-    return mDefinition;
+    return definition;
   }
 
   public byte[] getMetadata() {
-    return mMetadata;
+    return metadata;
   }
 
   private Handler getHandler() {
@@ -383,7 +389,7 @@ public class OfflineRegion {
         getHandler().post(new Runnable() {
           @Override
           public void run() {
-            mMetadata = metadata;
+            OfflineRegion.this.metadata = metadata;
             callback.onUpdate(metadata);
           }
         });
@@ -401,33 +407,18 @@ public class OfflineRegion {
     });
   }
 
+  private native void initialize(long offlineRegionPtr, FileSource fileSource);
+
   @Override
-  protected void finalize() {
-    try {
-      super.finalize();
-      destroyOfflineRegion();
-    } catch (Throwable throwable) {
-      Timber.e("Failed to finalize OfflineRegion: " + throwable.getMessage());
-    }
-  }
+  protected native void finalize();
 
-  /*
-   * Native methods
-   */
+  private native void setOfflineRegionObserver(OfflineRegionObserver callback);
 
-  private native void destroyOfflineRegion();
+  private native void setOfflineRegionDownloadState(@DownloadState int offlineRegionDownloadState);
 
-  private native void setOfflineRegionObserver(
-    OfflineRegionObserver observerCallback);
+  private native void getOfflineRegionStatus(OfflineRegionStatusCallback callback);
 
-  private native void setOfflineRegionDownloadState(
-    @DownloadState int offlineRegionDownloadState);
-
-  private native void getOfflineRegionStatus(
-    OfflineRegionStatusCallback statusCallback);
-
-  private native void deleteOfflineRegion(
-    OfflineRegionDeleteCallback deleteCallback);
+  private native void deleteOfflineRegion(OfflineRegionDeleteCallback callback);
 
   private native void updateOfflineRegionMetadata(byte[] metadata, OfflineRegionUpdateMetadataCallback callback);
 

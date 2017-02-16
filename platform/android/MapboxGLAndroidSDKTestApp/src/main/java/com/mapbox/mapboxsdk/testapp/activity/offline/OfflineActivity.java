@@ -260,6 +260,7 @@ public class OfflineActivity extends AppCompatActivity
         if (status.isComplete()) {
           // Download complete
           endProgress("Region downloaded successfully.");
+          offlineRegion.setObserver(null);
           return;
         } else if (status.isRequiredResourceCountPrecise()) {
           // Switch to determinate state
@@ -277,6 +278,7 @@ public class OfflineActivity extends AppCompatActivity
       public void onError(OfflineRegionError error) {
         Timber.e("onError reason: " + error.getReason());
         Timber.e("onError message: " + error.getMessage());
+        offlineRegion.setObserver(null);
       }
 
       @Override

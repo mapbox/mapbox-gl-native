@@ -3,6 +3,7 @@
 #include "../../conversion/constant.hpp"
 #include "../../conversion/conversion.hpp"
 #include "geometry.hpp"
+#include "../../gson/json_object.hpp"
 
 #include <mbgl/util/feature.hpp>
 #include <mapbox/variant.hpp>
@@ -10,6 +11,7 @@
 
 #include <jni/jni.hpp>
 #include "../../jni/local_object.hpp"
+#include "../feature.hpp"
 
 #include <string>
 #include <array>
@@ -168,39 +170,45 @@ struct Converter<jni::jobject*, std::unordered_map<std::string, mbgl::Value>> {
 
 
 template <>
-struct Converter<jni::jobject*, mbgl::Feature> {
-    Result<jni::jobject*> operator()(jni::JNIEnv& env, const mbgl::Feature& value) const {
-        static jni::jclass* javaClass = jni::NewGlobalRef(env, &jni::FindClass(env, "com/mapbox/services/commons/geojson/Feature")).release();
-        static jni::jmethodID* fromGeometry = &jni::GetStaticMethodID(env, *javaClass, "fromGeometry", "(Lcom/mapbox/services/commons/geojson/Geometry;Lcom/google/gson/JsonObject;Ljava/lang/String;)Lcom/mapbox/services/commons/geojson/Feature;");
+struct Converter<jni::Object<Feature>, mbgl::Feature> {
+    Result<jni::Object<Feature>> operator()(jni::JNIEnv& env, const mbgl::Feature& value) const {
 
         // Convert Id
         FeatureIdVisitor idEvaluator;
         std::string id = (value.id) ? mapbox::geometry::identifier::visit(value.id.value(), idEvaluator) : "";
-        jni::LocalObject<jni::jobject> jid = jni::NewLocalObject(env, *convert<jni::jobject*>(env, id));
+        auto jid = jni::Make<jni::String>(env, id);
 
         // Convert properties
-        jni::LocalObject<jni::jobject> properties = jni::NewLocalObject(env, *convert<jni::jobject*>(env, value.properties));
+        auto properties = jni::Object<JsonObject>(*convert<jni::jobject*>(env, value.properties));
 
         // Convert geometry
-        jni::LocalObject<jni::jobject> geometry = jni::NewLocalObject(env, *convert<jni::jobject*>(env, value.geometry));
+        auto geometry = jni::Object<Geometry>(*convert<jni::jobject*>(env, value.geometry));
 
         // Create feature
-        return {reinterpret_cast<jni::jobject*>(jni::CallStaticMethod<jni::jobject*>(env, *javaClass, *fromGeometry, geometry.get(), properties.get(), jid.get()))};
+        auto feature = Feature::fromGeometry(env, geometry, properties, jid);
+
+        //Cleanup
+        jni::DeleteLocalRef(env, jid);
+        jni::DeleteLocalRef(env, geometry);
+        jni::DeleteLocalRef(env, properties);
+
+        return feature;
     }
 };
 
 template <>
-struct Converter<jni::jarray<jni::jobject>*, std::vector<mbgl::Feature>> {
-    Result<jni::jarray<jni::jobject>*> operator()(jni::JNIEnv& env, const std::vector<mbgl::Feature>& value) const {
-        static jni::jclass* featureClass = jni::NewGlobalRef(env, &jni::FindClass(env, "com/mapbox/services/commons/geojson/Feature")).release();
-        jni::jarray<jni::jobject>& jarray = jni::NewObjectArray(env, value.size(), *featureClass);
+struct Converter<jni::Array<jni::Object<Feature>>, std::vector<mbgl::Feature>> {
+    Result<jni::Array<jni::Object<Feature>>> operator()(jni::JNIEnv& env, const std::vector<mbgl::Feature>& value) const {
+
+        auto features = jni::Array<jni::Object<Feature>>::New(env, value.size(), Feature::javaClass);
 
         for(size_t i = 0; i < value.size(); i = i + 1) {
-            jni::LocalObject<jni::jobject> converted = jni::NewLocalObject(env, *convert<jni::jobject*, mbgl::Feature>(env, value.at(i)));
-            jni::SetObjectArrayElement(env, jarray, i, converted.get());
+            auto converted = *convert<jni::Object<Feature>, mbgl::Feature>(env, value.at(i));
+            features.Set(env, i, converted);
+            jni::DeleteLocalRef(env, converted);
         }
 
-        return {&jarray};
+        return {features};
     }
 };
 

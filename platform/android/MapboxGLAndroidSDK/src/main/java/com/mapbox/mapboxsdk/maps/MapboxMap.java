@@ -16,7 +16,6 @@ import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.annotations.Annotation;
 import com.mapbox.mapboxsdk.annotations.BaseMarkerOptions;
 import com.mapbox.mapboxsdk.annotations.BaseMarkerViewOptions;
@@ -866,10 +865,6 @@ public final class MapboxMap {
   private void setStyleUrl(@NonNull MapboxMapOptions options) {
     String style = options.getStyle();
     if (!TextUtils.isEmpty(style)) {
-      // stopgap for https://github.com/mapbox/mapbox-gl-native/issues/6242
-      if (TextUtils.isEmpty(nativeMapView.getAccessToken())) {
-        nativeMapView.setAccessToken(Mapbox.getAccessToken());
-      }
       setStyleUrl(style);
     }
   }

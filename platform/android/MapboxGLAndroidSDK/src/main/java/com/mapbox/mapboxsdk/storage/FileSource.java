@@ -1,0 +1,139 @@
+package com.mapbox.mapboxsdk.storage;
+
+import android.content.Context;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
+import android.os.Environment;
+import android.support.annotation.NonNull;
+
+import com.mapbox.mapboxsdk.Mapbox;
+import com.mapbox.mapboxsdk.constants.MapboxConstants;
+
+import java.lang.ref.WeakReference;
+
+import timber.log.Timber;
+
+/**
+ * Holds a central reference to the core's DefaultFileSource for as long as
+ * there are active mapviews / offline managers
+ */
+public class FileSource {
+
+  /**
+   * This callback allows implementors to transform URLs before they are requested
+   * from the internet. This can be used add or remove custom parameters, or reroute
+   * certain requests to other servers or endpoints.
+   */
+  public interface ResourceTransformCallback {
+
+    /**
+     * Called whenever a URL needs to be transformed.
+     *
+     * @param kind The kind of URL to be transformed.
+     * @return A URL that will now be downloaded.
+     */
+    String onURL(@Resource.Kind int kind, String url);
+
+  }
+
+  // Use weak reference to avoid blocking GC on this reference.
+  // Should only block when mapview / Offline manager instances
+  // are alive
+  private static WeakReference<FileSource> INSTANCE;
+
+  public static synchronized FileSource getInstance(Context context) {
+    if (INSTANCE == null || INSTANCE.get() == null) {
+      String cachePath = getCachePath(context);
+      String apkPath = context.getPackageCodePath();
+      INSTANCE = new WeakReference<>(new FileSource(cachePath, apkPath));
+    }
+
+    return INSTANCE.get();
+  }
+
+  public static String getCachePath(Context context) {
+    // Default value
+    boolean setStorageExternal = MapboxConstants.DEFAULT_SET_STORAGE_EXTERNAL;
+
+    try {
+      // Try getting a custom value from the app Manifest
+      ApplicationInfo appInfo = context.getPackageManager().getApplicationInfo(context.getPackageName(),
+        PackageManager.GET_META_DATA);
+      setStorageExternal = appInfo.metaData.getBoolean(
+        MapboxConstants.KEY_META_DATA_SET_STORAGE_EXTERNAL,
+        MapboxConstants.DEFAULT_SET_STORAGE_EXTERNAL);
+    } catch (PackageManager.NameNotFoundException exception) {
+      Timber.e("Failed to read the package metadata: ", exception);
+    } catch (Exception exception) {
+      Timber.e("Failed to read the storage key: ", exception);
+    }
+
+    String cachePath = null;
+    if (setStorageExternal && isExternalStorageReadable()) {
+      try {
+        // Try getting the external storage path
+        cachePath = context.getExternalFilesDir(null).getAbsolutePath();
+      } catch (NullPointerException exception) {
+        Timber.e("Failed to obtain the external storage path: ", exception);
+      }
+    }
+
+    if (cachePath == null) {
+      // Default to internal storage
+      cachePath = context.getFilesDir().getAbsolutePath();
+    }
+
+    return cachePath;
+  }
+
+  /**
+   * Checks if external storage is available to at least read. In order for this to work, make
+   * sure you include &lt;uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" /&gt;
+   * (or WRITE_EXTERNAL_STORAGE) for API level &lt; 18 in your app Manifest.
+   * <p>
+   * Code from https://developer.android.com/guide/topics/data/data-storage.html#filesExternal
+   * </p>
+   *
+   * @return true if external storage is readable
+   */
+  public static boolean isExternalStorageReadable() {
+    String state = Environment.getExternalStorageState();
+    if (Environment.MEDIA_MOUNTED.equals(state) || Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
+      return true;
+    }
+
+    Timber.w("External storage was requested but it isn't readable. For API level < 18"
+      + " make sure you've requested READ_EXTERNAL_STORAGE or WRITE_EXTERNAL_STORAGE"
+      + " permissions in your app Manifest (defaulting to internal storage).");
+
+    return false;
+  }
+
+  private long nativePtr;
+
+  private FileSource(String cachePath, String apkPath) {
+    initialize(Mapbox.getAccessToken(), cachePath, apkPath);
+  }
+
+  public native void setAccessToken(@NonNull String accessToken);
+
+  public native String getAccessToken();
+
+  public native void setApiBaseUrl(String baseUrl);
+
+  /**
+   * Sets a callback for transforming URLs requested from the internet
+   * <p>
+   * The callback will be executed on the main thread once for every requested URL.
+   * </p>
+   *
+   * @param callback the callback to be invoked
+   */
+  public native void setResourceTransform(@NonNull final ResourceTransformCallback callback);
+
+  private native void initialize(String accessToken, String cachePath, String apkPath);
+
+  @Override
+  protected native void finalize() throws Throwable;
+
+}

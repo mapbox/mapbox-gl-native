@@ -21,16 +21,18 @@ public class OfflineTilePyramidRegionDefinition implements OfflineRegionDefiniti
   private double maxZoom;
   private float pixelRatio;
 
-  /*
-   * Constructors
+  /**
+   * Constructor
+   *
+   * @param styleURL   the style
+   * @param bounds     the bounds
+   * @param minZoom    min zoom
+   * @param maxZoom    max zoom
+   * @param pixelRatio pixel ratio of the device
    */
-
-  private OfflineTilePyramidRegionDefinition() {
-    // For JNI use only
-  }
-
   public OfflineTilePyramidRegionDefinition(
     String styleURL, LatLngBounds bounds, double minZoom, double maxZoom, float pixelRatio) {
+    // Note: Also used in JNI
     this.styleURL = styleURL;
     this.bounds = bounds;
     this.minZoom = minZoom;
