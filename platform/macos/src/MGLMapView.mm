@@ -1633,16 +1633,40 @@ public:
 #pragma mark Keyboard events
 
 - (void)keyDown:(NSEvent *)event {
+    // This is the recommended way to handle arrow key presses, causing
+    // methods like -moveUp: and -moveToBeginningOfParagraph: to be called
+    // for various standard keybindings.
     [self interpretKeyEvents:@[event]];
 }
 
-- (void)insertText:(NSString *)text {
-    BOOL textIsZoomCharacter = [@[@"-", @"=", @"+"] containsObject:text];
+// The following action methods are declared in NSResponder.h.
 
-    if (textIsZoomCharacter) {
-        [self adjustZoomLevelForKey:text];
-    } else {
-        [super insertText:text];
+- (void)insertTab:(id)sender {
+    if (self.window.firstResponder == self) {
+        [self.window selectNextKeyView:self];
+    }
+}
+
+- (void)insertBacktab:(id)sender {
+    if (self.window.firstResponder == self) {
+        [self.window selectPreviousKeyView:self];
+    }
+}
+
+- (void)insertText:(NSString *)insertString {
+    switch (insertString.length == 1 ? [insertString characterAtIndex:0] : 0) {
+        case '-':
+            [self moveToEndOfParagraph:nil];
+            break;
+            
+        case '+':
+        case '=':
+            [self moveToBeginningOfParagraph:nil];
+            break;
+            
+        default:
+            [super insertText:insertString];
+            break;
     }
 }
 
@@ -1696,23 +1720,6 @@ public:
     _rotateEnabled = rotateEnabled;
     _compass.enabled = rotateEnabled;
     _compass.hidden = !rotateEnabled;
-}
-
-- (void)adjustZoomLevelForKey:(NSString *)key {
-    double newZoomLevel = self.zoomLevel;
-    unichar keyUnichar = [key characterAtIndex:0];
-    switch(keyUnichar) {
-        case '-': {
-            newZoomLevel -= 1;
-            break;
-        }
-        case '=':
-        case '+': {
-            newZoomLevel += 1;
-        }
-    }
-
-    [self setZoomLevel:newZoomLevel animated:YES];
 }
 
 #pragma mark Ornaments
