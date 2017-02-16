@@ -15,6 +15,10 @@ optional<float> IdentityStops<float>::evaluate(const Value& value) const {
 
 template <>
 optional<std::string> IdentityStops<std::string>::evaluate(const Value& value) const {
+    if (!value.is<std::string>()) {
+        return {};
+    }
+    
     return value.get<std::string>();
 }
 
