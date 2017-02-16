@@ -3,8 +3,8 @@
 #include <mbgl/programs/program.hpp>
 #include <mbgl/programs/attributes.hpp>
 #include <mbgl/programs/uniforms.hpp>
-#include <mbgl/shader/fill_extrusion.hpp>
-#include <mbgl/shader/fill_extrusion_pattern.hpp>
+#include <mbgl/shaders/fill_extrusion.hpp>
+#include <mbgl/shaders/fill_extrusion_pattern.hpp>
 #include <mbgl/util/geometry.hpp>
 #include <mbgl/util/mat4.hpp>
 #include <mbgl/util/size.hpp>
@@ -14,7 +14,7 @@
 
 namespace mbgl {
 
-class SpriteAtlasPosition;
+class SpriteAtlasElement;
 class UnwrappedTileID;
 class TransformState;
 
@@ -63,8 +63,8 @@ uniforms::u_lightpos,
 uniforms::u_lightintensity>
 {
     static Values values(mat4 matrix,
-                         const SpriteAtlasPosition&,
-                         const SpriteAtlasPosition&,
+                         const SpriteAtlasElement&,
+                         const SpriteAtlasElement&,
                          const style::Faded<std::string>&,
                          const UnwrappedTileID&,
                          const TransformState&,

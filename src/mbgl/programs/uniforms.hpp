@@ -17,6 +17,8 @@ MBGL_DEFINE_UNIFORM_SCALAR(float, u_zoom);
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_pitch);
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_bearing);
 
+MBGL_DEFINE_UNIFORM_SCALAR(Size, u_world);
+
 MBGL_DEFINE_UNIFORM_VECTOR(float, 2, u_extrude_scale);
 
 MBGL_DEFINE_UNIFORM_VECTOR(float, 2, u_pattern_tl_a);
