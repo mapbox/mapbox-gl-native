@@ -34,6 +34,7 @@
 #import "MGLGeometry_Private.h"
 #import "MGLMultiPoint_Private.h"
 #import "MGLOfflineStorage_Private.h"
+#import "MGLFoundation_Private.h"
 
 #import "NSBundle+MGLAdditions.h"
 #import "NSDate+MGLAdditions.h"
@@ -134,11 +135,6 @@ typedef std::unordered_map<MGLAnnotationTag, MGLAnnotationContext> MGLAnnotation
 
 /// Mapping from an annotation object to an annotation tag.
 typedef std::map<id<MGLAnnotation>, MGLAnnotationTag> MGLAnnotationObjectTagMap;
-
-/// Initializes the run loop shim that lives on the main thread.
-void MGLinitializeRunLoop() {
-    static mbgl::util::RunLoop mainRunLoop;
-}
 
 mbgl::util::UnitBezier MGLUnitBezierForMediaTimingFunction(CAMediaTimingFunction *function)
 {
@@ -388,8 +384,6 @@ public:
 
 - (void)commonInit
 {
-    MGLinitializeRunLoop();
-
     _isTargetingInterfaceBuilder = NSProcessInfo.processInfo.mgl_isInterfaceBuilderDesignablesAgent;
     _opaque = YES;
 
