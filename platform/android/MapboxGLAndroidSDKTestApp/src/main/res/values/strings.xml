@@ -33,6 +33,7 @@
     <string name="activity_debug_mode">Debug Mode</string>
     <string name="activity_offline">Offline Map</string>
     <string name="activity_update_metadata">Update metadata Map</string>
+    <string name="activity_offline_region_delete">Delete region</string>
     <string name="activity_minmax_zoom">Min/Max Zoom</string>
     <string name="activity_viewpager">ViewPager</string>
     <string name="activity_runtime_style">Runtime Style</string>
@@ -76,6 +77,7 @@
     <string name="description_debug_mode">Debug Mode</string>
     <string name="description_offline">Offline Map example</string>
     <string name="description_update_metadata">Update metadata example</string>
+    <string name="description_offline_region_delete">Delete region example</string>
     <string name="description_animated_marker">Animate the position change of a marker</string>
     <string name="description_polyline">Add a polyline to a map</string>
     <string name="description_polygon">Add a polygon to a map</string>

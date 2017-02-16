@@ -329,6 +329,17 @@
                 android:value=".activity.FeatureOverviewActivity"/>
         </activity>
         <activity
+            android:name=".activity.offline.DeleteRegionActivity"
+            android:description="@string/description_offline_region_delete"
+            android:label="@string/activity_offline_region_delete">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_offline"/>
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.FeatureOverviewActivity"/>
+        </activity>
+        <activity
             android:name=".activity.imagegenerator.SnapshotActivity"
             android:description="@string/description_snapshot"
             android:label="@string/activity_snapshot">
