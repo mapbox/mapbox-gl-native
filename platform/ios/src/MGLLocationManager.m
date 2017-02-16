@@ -46,6 +46,13 @@ static NSString * const MGLLocationManagerRegionIdentifier = @"MGLLocationManage
             [self.delegate locationManagerDidStopLocationUpdates:self];
         }
     }
+    if(self.standardLocationManager.monitoredRegions.count > 0) {
+        for(CLRegion *region in self.standardLocationManager.monitoredRegions) {
+            if([region.identifier isEqualToString:MGLLocationManagerRegionIdentifier]) {
+                [self.standardLocationManager stopMonitoringForRegion:region];
+            }
+        }
+    }
 }
 
 #pragma mark - Utilities
