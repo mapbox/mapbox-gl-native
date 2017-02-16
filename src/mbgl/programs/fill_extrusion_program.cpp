@@ -12,8 +12,8 @@ namespace mbgl {
 
     FillExtrusionPatternUniforms::Values
     FillExtrusionPatternUniforms::values(mat4 matrix,
-                                         const SpriteAtlasPosition& a,
-                                         const SpriteAtlasPosition& b,
+                                         const SpriteAtlasElement& a,
+                                         const SpriteAtlasElement& b,
                                          const Faded<std::string>& fading,
                                          const UnwrappedTileID& tileID,
                                          const TransformState& state,

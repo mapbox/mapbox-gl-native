@@ -339,6 +339,10 @@ void Painter::renderPass(PaintParameters& parameters,
             OffscreenTexture texture(context, size);
             texture.bind();
 
+            context.setStencilMode(gl::StencilMode::disabled());
+            context.setDepthMode(depthModeForSublayer(0, gl::DepthMode::ReadWrite));
+            context.clear(Color{ 0.0f, 0.0f, 0.0f, 0.0f }, 1.0f, {});
+
             renderTiles();
 
             parameters.view.bind();
@@ -355,10 +359,9 @@ void Painter::renderPass(PaintParameters& parameters,
                                                       colorModeForRenderPass(),
                                                       ExtrusionTextureProgram::UniformValues{
                                                           uniforms::u_matrix::Value{ mat },
-                                                          uniforms::u_xdim::Value{ static_cast<uint16_t>(size.width) },
-                                                          uniforms::u_ydim::Value{ static_cast<uint16_t>(size.height) },
-                                                          uniforms::u_texture::Value{ 1 }, // view.getTexture() ?
-                                                          uniforms::u_opacity::Value{ 1.0 }
+                                                          uniforms::u_world::Value{ size },
+                                                          uniforms::u_image::Value{ 0 }, // view.getTexture() ?
+                                                          uniforms::u_opacity::Value{ 0.5 } // TODO
                                                       },
                                                       extrusionTextureVertexBuffer,
                                                       tileTriangleIndexBuffer, // we reuse the same simple index buffer
@@ -367,42 +370,6 @@ void Painter::renderPass(PaintParameters& parameters,
                                                       FillExtrusionPaintProperties::Evaluated{},
                                                       state.getZoom());
 
-
-
-//            parameters.programs.extrusionTexture.draw(context,
-//                                                      gl::TriangleStrip(),
-//                                                      gl::DepthMode::disabled(),
-//                                                      gl::StencilMode::disabled(),
-//                                                      colorModeForRenderPass(),
-//                                                      ExtrusionTextureProgram::UniformValues{
-//                                                          uniforms::u_matrix::Value{ mat },
-//                                                          uniforms::u_xdim::Value{ size.width },
-//                                                          uniforms::u_ydim::Value{ size.height },
-//                                                          uniforms::u_texture::Value{ 1 }, // view.getTexture() ?
-//                                                          uniforms::u_opacity::Value{ 1.0 }
-//                                                      },
-//                                                      extrusionTextureVertexBuffer,
-//                                                      tileTriangleIndexBuffer,
-//                                                      tileTriangleSegments,
-//                                                      ExtrusionTextureProgram::PaintPropertyBinders{ properties, 0 },
-//                                                      FillExtrusionPaintProperties::Evaluated{},
-//                                                      state.getZoom());
-
-
-
-//            {
-//                gl::DepthMode::disabled(),
-//                gl::StencilMode::disabled(),
-//                gl::ColorMode::unblended(),
-//                parameters.programs.extrusionTexture,
-//                ExtrusionTextureUniforms::Values {
-//                    uniforms::u_matrix::Value{ mat },
-//                    uniforms::u_xdim::Value{ size.width },
-//                    uniforms::u_ydim::Value{ size.height },
-//                    uniforms::u_texture::Value{ 1 }
-//                },
-//                gl::Unindexed<gl::TriangleStrip>(rasterVertexBuffer);
-//            });
         } else {
             renderTiles();
         }
