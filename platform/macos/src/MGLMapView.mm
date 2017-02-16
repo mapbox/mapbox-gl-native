@@ -105,11 +105,6 @@ NSImage *MGLDefaultMarkerImage() {
     return [[NSImage alloc] initWithContentsOfFile:path];
 }
 
-/// Initializes the run loop shim that lives on the main thread.
-void MGLinitializeRunLoop() {
-    static mbgl::util::RunLoop mainRunLoop;
-}
-
 /// Converts a media timing function into a unit bezier object usable in mbgl.
 mbgl::util::UnitBezier MGLUnitBezierForMediaTimingFunction(CAMediaTimingFunction *function) {
     if (!function) {
@@ -246,8 +241,6 @@ public:
 }
 
 - (void)commonInit {
-    MGLinitializeRunLoop();
-
     _isTargetingInterfaceBuilder = NSProcessInfo.processInfo.mgl_isInterfaceBuilderDesignablesAgent;
 
     // Set up cross-platform controllers and resources.
