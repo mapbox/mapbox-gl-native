@@ -303,12 +303,6 @@
                       @"Unsetting circleScaleAlignment should return circle-pitch-scale to the default value.");
         XCTAssertEqualObjects(layer.circleScaleAlignment, defaultStyleValue,
                               @"circleScaleAlignment should return the default value after being unset.");
-
-        functionStyleValue = [MGLStyleValue<NSValue *> valueWithInterpolationMode:MGLInterpolationModeIdentity sourceStops:nil attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.circleScaleAlignment = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
-
-        functionStyleValue = [MGLStyleValue<NSValue *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.circleScaleAlignment = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");        
     }
 
     // circle-stroke-color
@@ -554,12 +548,6 @@
                       @"Unsetting circleTranslationAnchor should return circle-translate-anchor to the default value.");
         XCTAssertEqualObjects(layer.circleTranslationAnchor, defaultStyleValue,
                               @"circleTranslationAnchor should return the default value after being unset.");
-
-        functionStyleValue = [MGLStyleValue<NSValue *> valueWithInterpolationMode:MGLInterpolationModeIdentity sourceStops:nil attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.circleTranslationAnchor = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
-
-        functionStyleValue = [MGLStyleValue<NSValue *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.circleTranslationAnchor = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");        
     }
 }
 

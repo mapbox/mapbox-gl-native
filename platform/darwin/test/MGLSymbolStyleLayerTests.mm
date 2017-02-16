@@ -75,12 +75,6 @@
                       @"Unsetting iconAllowsOverlap should return icon-allow-overlap to the default value.");
         XCTAssertEqualObjects(layer.iconAllowsOverlap, defaultStyleValue,
                               @"iconAllowsOverlap should return the default value after being unset.");
-
-        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeIdentity sourceStops:nil attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.iconAllowsOverlap = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
-
-        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.iconAllowsOverlap = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");        
     }
 
     // icon-ignore-placement
@@ -115,12 +109,6 @@
                       @"Unsetting iconIgnoresPlacement should return icon-ignore-placement to the default value.");
         XCTAssertEqualObjects(layer.iconIgnoresPlacement, defaultStyleValue,
                               @"iconIgnoresPlacement should return the default value after being unset.");
-
-        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeIdentity sourceStops:nil attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.iconIgnoresPlacement = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
-
-        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.iconIgnoresPlacement = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");        
     }
 
     // icon-image
@@ -155,12 +143,6 @@
                       @"Unsetting iconImageName should return icon-image to the default value.");
         XCTAssertEqualObjects(layer.iconImageName, defaultStyleValue,
                               @"iconImageName should return the default value after being unset.");
-
-        functionStyleValue = [MGLStyleValue<NSString *> valueWithInterpolationMode:MGLInterpolationModeIdentity sourceStops:nil attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.iconImageName = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
-
-        functionStyleValue = [MGLStyleValue<NSString *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.iconImageName = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");        
     }
 
     // icon-offset
@@ -258,12 +240,6 @@
                       @"Unsetting iconOptional should return icon-optional to the default value.");
         XCTAssertEqualObjects(layer.iconOptional, defaultStyleValue,
                               @"iconOptional should return the default value after being unset.");
-
-        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeIdentity sourceStops:nil attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.iconOptional = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
-
-        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.iconOptional = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");        
     }
 
     // icon-padding
@@ -389,12 +365,6 @@
                       @"Unsetting iconRotationAlignment should return icon-rotation-alignment to the default value.");
         XCTAssertEqualObjects(layer.iconRotationAlignment, defaultStyleValue,
                               @"iconRotationAlignment should return the default value after being unset.");
-
-        functionStyleValue = [MGLStyleValue<NSValue *> valueWithInterpolationMode:MGLInterpolationModeIdentity sourceStops:nil attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.iconRotationAlignment = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
-
-        functionStyleValue = [MGLStyleValue<NSValue *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.iconRotationAlignment = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");        
     }
 
     // icon-size
@@ -463,12 +433,6 @@
                       @"Unsetting iconTextFit should return icon-text-fit to the default value.");
         XCTAssertEqualObjects(layer.iconTextFit, defaultStyleValue,
                               @"iconTextFit should return the default value after being unset.");
-
-        functionStyleValue = [MGLStyleValue<NSValue *> valueWithInterpolationMode:MGLInterpolationModeIdentity sourceStops:nil attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.iconTextFit = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
-
-        functionStyleValue = [MGLStyleValue<NSValue *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.iconTextFit = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");        
     }
 
     // icon-text-fit-padding
@@ -543,12 +507,6 @@
                       @"Unsetting keepsIconUpright should return icon-keep-upright to the default value.");
         XCTAssertEqualObjects(layer.keepsIconUpright, defaultStyleValue,
                               @"keepsIconUpright should return the default value after being unset.");
-
-        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeIdentity sourceStops:nil attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.keepsIconUpright = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
-
-        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.keepsIconUpright = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");        
     }
 
     // text-keep-upright
@@ -583,12 +541,6 @@
                       @"Unsetting keepsTextUpright should return text-keep-upright to the default value.");
         XCTAssertEqualObjects(layer.keepsTextUpright, defaultStyleValue,
                               @"keepsTextUpright should return the default value after being unset.");
-
-        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeIdentity sourceStops:nil attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.keepsTextUpright = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
-
-        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.keepsTextUpright = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");        
     }
 
     // text-max-angle
@@ -691,12 +643,6 @@
                       @"Unsetting symbolAvoidsEdges should return symbol-avoid-edges to the default value.");
         XCTAssertEqualObjects(layer.symbolAvoidsEdges, defaultStyleValue,
                               @"symbolAvoidsEdges should return the default value after being unset.");
-
-        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeIdentity sourceStops:nil attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.symbolAvoidsEdges = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
-
-        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.symbolAvoidsEdges = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");        
     }
 
     // symbol-placement
@@ -731,12 +677,6 @@
                       @"Unsetting symbolPlacement should return symbol-placement to the default value.");
         XCTAssertEqualObjects(layer.symbolPlacement, defaultStyleValue,
                               @"symbolPlacement should return the default value after being unset.");
-
-        functionStyleValue = [MGLStyleValue<NSValue *> valueWithInterpolationMode:MGLInterpolationModeIdentity sourceStops:nil attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.symbolPlacement = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
-
-        functionStyleValue = [MGLStyleValue<NSValue *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.symbolPlacement = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");        
     }
 
     // symbol-spacing
@@ -798,29 +738,6 @@
         XCTAssertEqualObjects(layer.text, functionStyleValue,
                               @"text should round-trip camera functions.");
 
-        functionStyleValue = [MGLStyleValue<NSString *> valueWithInterpolationMode:MGLInterpolationModeExponential sourceStops:@{@18: constantStyleValue} attributeName:@"keyName" options:nil];
-        layer.text = functionStyleValue;
-
-        mbgl::style::ExponentialStops<std::string> exponentialStops = { {{18, "Text Field"}}, 1.0 };
-        propertyValue = mbgl::style::SourceFunction<std::string> { "keyName", exponentialStops };
-
-        XCTAssertEqual(rawLayer->getTextField(), propertyValue,
-                       @"Setting text to a source function should update text-field.");
-        XCTAssertEqualObjects(layer.text, functionStyleValue,
-                              @"text should round-trip source functions.");
-
-        functionStyleValue = [MGLStyleValue<NSString *> valueWithInterpolationMode:MGLInterpolationModeExponential compositeStops:@{@10: @{@18: constantStyleValue}} attributeName:@"keyName" options:nil];
-        layer.text = functionStyleValue;
-
-        std::map<float, std::string> innerStops { {18, "Text Field"} };
-        mbgl::style::CompositeExponentialStops<std::string> compositeStops { { {10.0, innerStops} }, 1.0 };
-
-        propertyValue = mbgl::style::CompositeFunction<std::string> { "keyName", compositeStops };
-
-        XCTAssertEqual(rawLayer->getTextField(), propertyValue,
-                       @"Setting text to a composite function should update text-field.");
-        XCTAssertEqualObjects(layer.text, functionStyleValue,
-                              @"text should round-trip composite functions.");                                                                                                          
                               
 
         layer.text = nil;
@@ -828,12 +745,6 @@
                       @"Unsetting text should return text-field to the default value.");
         XCTAssertEqualObjects(layer.text, defaultStyleValue,
                               @"text should return the default value after being unset.");
-
-        functionStyleValue = [MGLStyleValue<NSString *> valueWithInterpolationMode:MGLInterpolationModeIdentity sourceStops:nil attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.text = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
-
-        functionStyleValue = [MGLStyleValue<NSString *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.text = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");        
     }
 
     // text-allow-overlap
@@ -868,12 +779,6 @@
                       @"Unsetting textAllowsOverlap should return text-allow-overlap to the default value.");
         XCTAssertEqualObjects(layer.textAllowsOverlap, defaultStyleValue,
                               @"textAllowsOverlap should return the default value after being unset.");
-
-        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeIdentity sourceStops:nil attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.textAllowsOverlap = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
-
-        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.textAllowsOverlap = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");        
     }
 
     // text-anchor
@@ -908,12 +813,6 @@
                       @"Unsetting textAnchor should return text-anchor to the default value.");
         XCTAssertEqualObjects(layer.textAnchor, defaultStyleValue,
                               @"textAnchor should return the default value after being unset.");
-
-        functionStyleValue = [MGLStyleValue<NSValue *> valueWithInterpolationMode:MGLInterpolationModeIdentity sourceStops:nil attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.textAnchor = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
-
-        functionStyleValue = [MGLStyleValue<NSValue *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.textAnchor = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");        
     }
 
     // text-font
@@ -948,12 +847,6 @@
                       @"Unsetting textFontNames should return text-font to the default value.");
         XCTAssertEqualObjects(layer.textFontNames, defaultStyleValue,
                               @"textFontNames should return the default value after being unset.");
-
-        functionStyleValue = [MGLStyleValue<NSArray<NSString *> *> valueWithInterpolationMode:MGLInterpolationModeIdentity sourceStops:nil attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.textFontNames = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
-
-        functionStyleValue = [MGLStyleValue<NSArray<NSString *> *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.textFontNames = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");        
     }
 
     // text-size
@@ -1022,12 +915,6 @@
                       @"Unsetting textIgnoresPlacement should return text-ignore-placement to the default value.");
         XCTAssertEqualObjects(layer.textIgnoresPlacement, defaultStyleValue,
                               @"textIgnoresPlacement should return the default value after being unset.");
-
-        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeIdentity sourceStops:nil attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.textIgnoresPlacement = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
-
-        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.textIgnoresPlacement = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");        
     }
 
     // text-justify
@@ -1062,12 +949,6 @@
                       @"Unsetting textJustification should return text-justify to the default value.");
         XCTAssertEqualObjects(layer.textJustification, defaultStyleValue,
                               @"textJustification should return the default value after being unset.");
-
-        functionStyleValue = [MGLStyleValue<NSValue *> valueWithInterpolationMode:MGLInterpolationModeIdentity sourceStops:nil attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.textJustification = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
-
-        functionStyleValue = [MGLStyleValue<NSValue *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.textJustification = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");        
     }
 
     // text-letter-spacing
@@ -1210,12 +1091,6 @@
                       @"Unsetting textOptional should return text-optional to the default value.");
         XCTAssertEqualObjects(layer.textOptional, defaultStyleValue,
                               @"textOptional should return the default value after being unset.");
-
-        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeIdentity sourceStops:nil attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.textOptional = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
-
-        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.textOptional = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");        
     }
 
     // text-padding
@@ -1284,12 +1159,6 @@
                       @"Unsetting textPitchAlignment should return text-pitch-alignment to the default value.");
         XCTAssertEqualObjects(layer.textPitchAlignment, defaultStyleValue,
                               @"textPitchAlignment should return the default value after being unset.");
-
-        functionStyleValue = [MGLStyleValue<NSValue *> valueWithInterpolationMode:MGLInterpolationModeIdentity sourceStops:nil attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.textPitchAlignment = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
-
-        functionStyleValue = [MGLStyleValue<NSValue *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.textPitchAlignment = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");        
     }
 
     // text-rotate
@@ -1358,12 +1227,6 @@
                       @"Unsetting textRotationAlignment should return text-rotation-alignment to the default value.");
         XCTAssertEqualObjects(layer.textRotationAlignment, defaultStyleValue,
                               @"textRotationAlignment should return the default value after being unset.");
-
-        functionStyleValue = [MGLStyleValue<NSValue *> valueWithInterpolationMode:MGLInterpolationModeIdentity sourceStops:nil attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.textRotationAlignment = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
-
-        functionStyleValue = [MGLStyleValue<NSValue *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.textRotationAlignment = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");        
     }
 
     // text-transform
@@ -1391,29 +1254,6 @@
         XCTAssertEqualObjects(layer.textTransform, functionStyleValue,
                               @"textTransform should round-trip camera functions.");
 
-        functionStyleValue = [MGLStyleValue<NSValue *> valueWithInterpolationMode:MGLInterpolationModeExponential sourceStops:@{@18: constantStyleValue} attributeName:@"keyName" options:nil];
-        layer.textTransform = functionStyleValue;
-
-        mbgl::style::ExponentialStops<mbgl::style::TextTransformType> exponentialStops = { {{18, mbgl::style::TextTransformType::Lowercase}}, 1.0 };
-        propertyValue = mbgl::style::SourceFunction<mbgl::style::TextTransformType> { "keyName", exponentialStops };
-
-        XCTAssertEqual(rawLayer->getTextTransform(), propertyValue,
-                       @"Setting textTransform to a source function should update text-transform.");
-        XCTAssertEqualObjects(layer.textTransform, functionStyleValue,
-                              @"textTransform should round-trip source functions.");
-
-        functionStyleValue = [MGLStyleValue<NSValue *> valueWithInterpolationMode:MGLInterpolationModeExponential compositeStops:@{@10: @{@18: constantStyleValue}} attributeName:@"keyName" options:nil];
-        layer.textTransform = functionStyleValue;
-
-        std::map<float, mbgl::style::TextTransformType> innerStops { {18, mbgl::style::TextTransformType::Lowercase} };
-        mbgl::style::CompositeExponentialStops<mbgl::style::TextTransformType> compositeStops { { {10.0, innerStops} }, 1.0 };
-
-        propertyValue = mbgl::style::CompositeFunction<mbgl::style::TextTransformType> { "keyName", compositeStops };
-
-        XCTAssertEqual(rawLayer->getTextTransform(), propertyValue,
-                       @"Setting textTransform to a composite function should update text-transform.");
-        XCTAssertEqualObjects(layer.textTransform, functionStyleValue,
-                              @"textTransform should round-trip composite functions.");                                                                                                          
                               
 
         layer.textTransform = nil;
@@ -1421,12 +1261,6 @@
                       @"Unsetting textTransform should return text-transform to the default value.");
         XCTAssertEqualObjects(layer.textTransform, defaultStyleValue,
                               @"textTransform should return the default value after being unset.");
-
-        functionStyleValue = [MGLStyleValue<NSValue *> valueWithInterpolationMode:MGLInterpolationModeIdentity sourceStops:nil attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.textTransform = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
-
-        functionStyleValue = [MGLStyleValue<NSValue *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.textTransform = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");        
     }
 
     // icon-color
@@ -1671,12 +1505,6 @@
                       @"Unsetting iconTranslationAnchor should return icon-translate-anchor to the default value.");
         XCTAssertEqualObjects(layer.iconTranslationAnchor, defaultStyleValue,
                               @"iconTranslationAnchor should return the default value after being unset.");
-
-        functionStyleValue = [MGLStyleValue<NSValue *> valueWithInterpolationMode:MGLInterpolationModeIdentity sourceStops:nil attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.iconTranslationAnchor = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
-
-        functionStyleValue = [MGLStyleValue<NSValue *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.iconTranslationAnchor = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");        
     }
 
     // text-color
@@ -1921,12 +1749,6 @@
                       @"Unsetting textTranslationAnchor should return text-translate-anchor to the default value.");
         XCTAssertEqualObjects(layer.textTranslationAnchor, defaultStyleValue,
                               @"textTranslationAnchor should return the default value after being unset.");
-
-        functionStyleValue = [MGLStyleValue<NSValue *> valueWithInterpolationMode:MGLInterpolationModeIdentity sourceStops:nil attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.textTranslationAnchor = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
-
-        functionStyleValue = [MGLStyleValue<NSValue *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.textTranslationAnchor = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");        
     }
 }
 

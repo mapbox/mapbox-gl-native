@@ -75,12 +75,6 @@
                       @"Unsetting lineCap should return line-cap to the default value.");
         XCTAssertEqualObjects(layer.lineCap, defaultStyleValue,
                               @"lineCap should return the default value after being unset.");
-
-        functionStyleValue = [MGLStyleValue<NSValue *> valueWithInterpolationMode:MGLInterpolationModeIdentity sourceStops:nil attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.lineCap = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
-
-        functionStyleValue = [MGLStyleValue<NSValue *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.lineCap = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");        
     }
 
     // line-join
@@ -115,12 +109,6 @@
                       @"Unsetting lineJoin should return line-join to the default value.");
         XCTAssertEqualObjects(layer.lineJoin, defaultStyleValue,
                               @"lineJoin should return the default value after being unset.");
-
-        functionStyleValue = [MGLStyleValue<NSValue *> valueWithInterpolationMode:MGLInterpolationModeIdentity sourceStops:nil attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.lineJoin = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
-
-        functionStyleValue = [MGLStyleValue<NSValue *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.lineJoin = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");        
     }
 
     // line-miter-limit
@@ -337,12 +325,6 @@
                       @"Unsetting lineDashPattern should return line-dasharray to the default value.");
         XCTAssertEqualObjects(layer.lineDashPattern, defaultStyleValue,
                               @"lineDashPattern should return the default value after being unset.");
-
-        functionStyleValue = [MGLStyleValue<NSArray<NSNumber *> *> valueWithInterpolationMode:MGLInterpolationModeIdentity sourceStops:nil attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.lineDashPattern = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
-
-        functionStyleValue = [MGLStyleValue<NSArray<NSNumber *> *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.lineDashPattern = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");        
     }
 
     // line-gap-width
@@ -548,12 +530,6 @@
                       @"Unsetting linePattern should return line-pattern to the default value.");
         XCTAssertEqualObjects(layer.linePattern, defaultStyleValue,
                               @"linePattern should return the default value after being unset.");
-
-        functionStyleValue = [MGLStyleValue<NSString *> valueWithInterpolationMode:MGLInterpolationModeIdentity sourceStops:nil attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.linePattern = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
-
-        functionStyleValue = [MGLStyleValue<NSString *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.linePattern = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");        
     }
 
     // line-translate
@@ -628,12 +604,6 @@
                       @"Unsetting lineTranslationAnchor should return line-translate-anchor to the default value.");
         XCTAssertEqualObjects(layer.lineTranslationAnchor, defaultStyleValue,
                               @"lineTranslationAnchor should return the default value after being unset.");
-
-        functionStyleValue = [MGLStyleValue<NSValue *> valueWithInterpolationMode:MGLInterpolationModeIdentity sourceStops:nil attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.lineTranslationAnchor = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
-
-        functionStyleValue = [MGLStyleValue<NSValue *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.lineTranslationAnchor = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");        
     }
 
     // line-width

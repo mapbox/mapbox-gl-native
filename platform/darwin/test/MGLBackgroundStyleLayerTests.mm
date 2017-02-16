@@ -122,12 +122,6 @@
                       @"Unsetting backgroundPattern should return background-pattern to the default value.");
         XCTAssertEqualObjects(layer.backgroundPattern, defaultStyleValue,
                               @"backgroundPattern should return the default value after being unset.");
-
-        functionStyleValue = [MGLStyleValue<NSString *> valueWithInterpolationMode:MGLInterpolationModeIdentity sourceStops:nil attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.backgroundPattern = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
-
-        functionStyleValue = [MGLStyleValue<NSString *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.backgroundPattern = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");        
     }
 }
 
