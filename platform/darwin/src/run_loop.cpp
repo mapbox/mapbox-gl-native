@@ -7,7 +7,11 @@
 namespace mbgl {
 namespace util {
 
-static ThreadLocal<RunLoop>& current = *new ThreadLocal<RunLoop>;
+// Use a static function to avoid the static initialization order fiasco.
+static auto& current() {
+    static ThreadLocal<RunLoop> tl;
+    return tl;
+};
 
 class RunLoop::Impl {
 public:
@@ -15,19 +19,20 @@ public:
 };
 
 RunLoop* RunLoop::Get() {
-    assert(current.get());
-    return current.get();
+    assert(current().get());
+    return current().get();
 }
 
 RunLoop::RunLoop(Type)
   : impl(std::make_unique<Impl>()) {
-    assert(!current.get());
-    current.set(this);
+    assert(!current().get());
+    current().set(this);
     impl->async = std::make_unique<AsyncTask>(std::bind(&RunLoop::process, this));
 }
 
 RunLoop::~RunLoop() {
-    current.set(nullptr);
+    assert(current().get());
+    current().set(nullptr);
 }
 
 void RunLoop::push(std::shared_ptr<WorkTask> task) {
