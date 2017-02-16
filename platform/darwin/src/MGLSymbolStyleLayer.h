@@ -789,8 +789,18 @@ MGL_EXPORT
  You can set this property to an instance of:
  
  * `MGLStyleConstantValue`
- * `MGLCameraStyleFunction` with an interpolation mode of
- `MGLInterpolationModeInterval`
+ * `MGLCameraStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+ * `MGLSourceStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
+   * `MGLInterpolationModeIdentity`
+ * `MGLCompositeStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSString *> *text;
 
@@ -1159,8 +1169,18 @@ MGL_EXPORT
  You can set this property to an instance of:
  
  * `MGLStyleConstantValue`
- * `MGLCameraStyleFunction` with an interpolation mode of
- `MGLInterpolationModeInterval`
+ * `MGLCameraStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+ * `MGLSourceStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
+   * `MGLInterpolationModeIdentity`
+ * `MGLCompositeStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *textTransform;
 

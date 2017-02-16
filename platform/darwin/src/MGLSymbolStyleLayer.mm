@@ -870,7 +870,7 @@ namespace mbgl {
 - (void)setTextTransform:(MGLStyleValue<NSValue *> *)textTransform {
     MGLAssertStyleLayerIsValid();
 
-    auto mbglValue = MGLStyleValueTransformer<mbgl::style::TextTransformType, NSValue *>().toDataDrivenPropertyValue(textTransform);
+    auto mbglValue = MGLStyleValueTransformer<mbgl::style::TextTransformType, NSValue *, mbgl::style::TextTransformType, MGLTextTransform>().toDataDrivenPropertyValue(textTransform);
     self.rawLayer->setTextTransform(mbglValue);
 }
 
@@ -879,9 +879,9 @@ namespace mbgl {
 
     auto propertyValue = self.rawLayer->getTextTransform();
     if (propertyValue.isUndefined()) {
-        return MGLStyleValueTransformer<mbgl::style::TextTransformType, NSValue *>().toDataDrivenStyleValue(self.rawLayer->getDefaultTextTransform());
+        return MGLStyleValueTransformer<mbgl::style::TextTransformType, NSValue *, mbgl::style::TextTransformType, MGLTextTransform>().toDataDrivenStyleValue(self.rawLayer->getDefaultTextTransform());
     }
-    return MGLStyleValueTransformer<mbgl::style::TextTransformType, NSValue *>().toDataDrivenStyleValue(propertyValue);
+    return MGLStyleValueTransformer<mbgl::style::TextTransformType, NSValue *, mbgl::style::TextTransformType, MGLTextTransform>().toDataDrivenStyleValue(propertyValue);
 }
 
 #pragma mark - Accessing the Paint Attributes

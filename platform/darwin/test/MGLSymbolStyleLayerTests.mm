@@ -812,8 +812,8 @@
         functionStyleValue = [MGLStyleValue<NSString *> valueWithInterpolationMode:MGLInterpolationModeExponential compositeStops:@{@10: @{@18: constantStyleValue}} attributeName:@"keyName" options:nil];
         layer.text = functionStyleValue;
 
-        mbgl::style::ExponentialStops<std::string> innerStops = { { {18, "Text Field"}}, 1.0 };
-        std::map<float, mbgl::style::ExponentialStops<std::string>> compositeStops = { {10.0, innerStops} };
+        std::map<float, std::string> innerStops { {18, "Text Field"} };
+        mbgl::style::CompositeExponentialStops<std::string> compositeStops { { {10.0, innerStops} }, 1.0 };
 
         propertyValue = mbgl::style::CompositeFunction<std::string> { "keyName", compositeStops };
 
@@ -1405,8 +1405,8 @@
         functionStyleValue = [MGLStyleValue<NSValue *> valueWithInterpolationMode:MGLInterpolationModeExponential compositeStops:@{@10: @{@18: constantStyleValue}} attributeName:@"keyName" options:nil];
         layer.textTransform = functionStyleValue;
 
-        mbgl::style::ExponentialStops<mbgl::style::TextTransformType> innerStops = { { {18, mbgl::style::TextTransformType::Lowercase}}, 1.0 };
-        std::map<float, mbgl::style::ExponentialStops<mbgl::style::TextTransformType>> compositeStops = { {10.0, innerStops} };
+        std::map<float, mbgl::style::TextTransformType> innerStops { {18, mbgl::style::TextTransformType::Lowercase} };
+        mbgl::style::CompositeExponentialStops<mbgl::style::TextTransformType> compositeStops { { {10.0, innerStops} }, 1.0 };
 
         propertyValue = mbgl::style::CompositeFunction<mbgl::style::TextTransformType> { "keyName", compositeStops };
 
