@@ -434,6 +434,13 @@ global.propertyType = function (property) {
     }
 };
 
+global.isInterpolatable = function (property) {
+    const type = property.type === 'array' ? property.value : property.type;
+    return type !== 'boolean' &&
+        type !== 'enum' &&
+        type !== 'string';
+};
+
 global.valueTransformerArguments = function (property) {
     let objCType = propertyType(property);
     switch (property.type) {
