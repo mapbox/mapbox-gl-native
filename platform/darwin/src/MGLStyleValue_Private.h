@@ -181,10 +181,11 @@ private: // Private utilities for converting from mgl to mbgl values
         return mbglValue;
     }
     
-    NSObject* toRawStyleSpecValue(MGLColor *color) {
-        return @(color.mgl_color.stringify().c_str());
-    }
-    
+    /**
+     As hack to allow converting enum => string values, we accept a second, dummy parameter in
+     the toRawStyleSpecValue() methods for converting 'atomic' (non-style-function) values.
+     This allows us to use `std::enable_if` to test (at compile time) whether or not MBGLType is an Enum.
+     */
     template <typename MBGLEnum = MBGLType,
     class = typename std::enable_if<!std::is_enum<MBGLEnum>::value>::type,
     typename MGLEnum = ObjCEnum,
@@ -202,7 +203,6 @@ private: // Private utilities for converting from mgl to mbgl values
         return rawMGLValue;
     }
     
-    // hack to convert enum => string values, and just pass-through other plain NSObject values.
     template <typename MBGLEnum = MBGLType,
     class = typename std::enable_if<std::is_enum<MBGLEnum>::value>::type,
     typename MGLEnum = ObjCEnum,
@@ -213,6 +213,9 @@ private: // Private utilities for converting from mgl to mbgl values
         return @(mbgl::Enum<MGLEnum>::toString(mglEnum));
     }
     
+    NSObject* toRawStyleSpecValue(MGLColor *color, MBGLType &mbglValue) {
+        return @(color.mgl_color.stringify().c_str());
+    }
 
     
     NSObject* toRawStyleSpecValue(MGLStyleFunction<ObjCType>* styleFunction) {
