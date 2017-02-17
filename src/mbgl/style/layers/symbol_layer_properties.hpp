@@ -180,11 +180,11 @@ struct TextOptional : LayoutProperty<bool> {
     static bool defaultValue() { return false; }
 };
 
-struct IconOpacity : PaintProperty<float> {
+struct IconOpacity : DataDrivenPaintProperty<float, attributes::a_opacity> {
     static float defaultValue() { return 1; }
 };
 
-struct IconColor : DataDrivenPaintProperty<Color, attributes::a_color> {
+struct IconColor : DataDrivenPaintProperty<Color, attributes::a_fill_color> {
     static Color defaultValue() { return Color::black(); }
 };
 
@@ -192,11 +192,11 @@ struct IconHaloColor : DataDrivenPaintProperty<Color, attributes::a_halo_color> 
     static Color defaultValue() { return {}; }
 };
 
-struct IconHaloWidth : PaintProperty<float> {
+struct IconHaloWidth : DataDrivenPaintProperty<float, attributes::a_halo_width> {
     static float defaultValue() { return 0; }
 };
 
-struct IconHaloBlur : PaintProperty<float> {
+struct IconHaloBlur : DataDrivenPaintProperty<float, attributes::a_halo_blur> {
     static float defaultValue() { return 0; }
 };
 
@@ -208,11 +208,11 @@ struct IconTranslateAnchor : PaintProperty<TranslateAnchorType> {
     static TranslateAnchorType defaultValue() { return TranslateAnchorType::Map; }
 };
 
-struct TextOpacity : PaintProperty<float> {
+struct TextOpacity : DataDrivenPaintProperty<float, attributes::a_opacity> {
     static float defaultValue() { return 1; }
 };
 
-struct TextColor : DataDrivenPaintProperty<Color, attributes::a_color> {
+struct TextColor : DataDrivenPaintProperty<Color, attributes::a_fill_color> {
     static Color defaultValue() { return Color::black(); }
 };
 
@@ -220,11 +220,11 @@ struct TextHaloColor : DataDrivenPaintProperty<Color, attributes::a_halo_color> 
     static Color defaultValue() { return {}; }
 };
 
-struct TextHaloWidth : PaintProperty<float> {
+struct TextHaloWidth : DataDrivenPaintProperty<float, attributes::a_halo_width> {
     static float defaultValue() { return 0; }
 };
 
-struct TextHaloBlur : PaintProperty<float> {
+struct TextHaloBlur : DataDrivenPaintProperty<float, attributes::a_halo_blur> {
     static float defaultValue() { return 0; }
 };
 
