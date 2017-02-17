@@ -887,6 +887,51 @@ public class SymbolLayerTest extends BaseStyleTest {
   }
 
   @Test
+  public void testTextFieldAsIdentitySourceFunction() {
+    checkViewIsDisplayed(R.id.mapView);
+    Timber.i("text-field");
+    assertNotNull(layer);
+
+    // Set
+    layer.setProperties(
+      textField(property("FeaturePropertyA", Stops.<String>identity()))
+    );
+
+    // Verify
+    assertNotNull(layer.getTextField());
+    assertNotNull(layer.getTextField().getFunction());
+    assertEquals(SourceFunction.class, layer.getTextField().getFunction().getClass());
+    assertEquals("FeaturePropertyA", ((SourceFunction) layer.getTextField().getFunction()).getProperty());
+    assertEquals(IdentityStops.class, layer.getTextField().getFunction().getStops().getClass());
+  }
+
+  @Test
+  public void testTextFieldAsIntervalSourceFunction() {
+    checkViewIsDisplayed(R.id.mapView);
+    Timber.i("text-field");
+    assertNotNull(layer);
+
+    // Set
+    layer.setProperties(
+      textField(
+        property(
+          "FeaturePropertyA",
+          interval(
+            stop(1, textField(""))
+          )
+        )
+      )
+    );
+
+    // Verify
+    assertNotNull(layer.getTextField());
+    assertNotNull(layer.getTextField().getFunction());
+    assertEquals(SourceFunction.class, layer.getTextField().getFunction().getClass());
+    assertEquals("FeaturePropertyA", ((SourceFunction) layer.getTextField().getFunction()).getProperty());
+    assertEquals(IdentityStops.class, layer.getTextField().getFunction().getStops().getClass());
+  }
+
+  @Test
   public void testTextFontAsConstant() {
     checkViewIsDisplayed(R.id.mapView);
     Timber.i("text-font");
@@ -1323,6 +1368,51 @@ public class SymbolLayerTest extends BaseStyleTest {
     assertEquals(CameraFunction.class, layer.getTextTransform().getFunction().getClass());
     assertEquals(IntervalStops.class, layer.getTextTransform().getFunction().getStops().getClass());
     assertEquals(1, ((IntervalStops) layer.getTextTransform().getFunction().getStops()).size());
+  }
+
+  @Test
+  public void testTextTransformAsIdentitySourceFunction() {
+    checkViewIsDisplayed(R.id.mapView);
+    Timber.i("text-transform");
+    assertNotNull(layer);
+
+    // Set
+    layer.setProperties(
+      textTransform(property("FeaturePropertyA", Stops.<String>identity()))
+    );
+
+    // Verify
+    assertNotNull(layer.getTextTransform());
+    assertNotNull(layer.getTextTransform().getFunction());
+    assertEquals(SourceFunction.class, layer.getTextTransform().getFunction().getClass());
+    assertEquals("FeaturePropertyA", ((SourceFunction) layer.getTextTransform().getFunction()).getProperty());
+    assertEquals(IdentityStops.class, layer.getTextTransform().getFunction().getStops().getClass());
+  }
+
+  @Test
+  public void testTextTransformAsIntervalSourceFunction() {
+    checkViewIsDisplayed(R.id.mapView);
+    Timber.i("text-transform");
+    assertNotNull(layer);
+
+    // Set
+    layer.setProperties(
+      textTransform(
+        property(
+          "FeaturePropertyA",
+          interval(
+            stop(1, textTransform(TEXT_TRANSFORM_NONE))
+          )
+        )
+      )
+    );
+
+    // Verify
+    assertNotNull(layer.getTextTransform());
+    assertNotNull(layer.getTextTransform().getFunction());
+    assertEquals(SourceFunction.class, layer.getTextTransform().getFunction().getClass());
+    assertEquals("FeaturePropertyA", ((SourceFunction) layer.getTextTransform().getFunction()).getProperty());
+    assertEquals(IdentityStops.class, layer.getTextTransform().getFunction().getStops().getClass());
   }
 
   @Test

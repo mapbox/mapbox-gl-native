@@ -776,7 +776,8 @@ MGL_EXPORT
 
 /**
  Value to use for a text label. Feature properties are specified using tokens
- like {field_name}.
+ like {field_name}.  (Token replacement is only supported for literal
+ `textField` values--not for property functions.)
  
  The default value of this property is an `MGLStyleValue` object containing the
  empty string. Set this property to `nil` to reset it to the default value.
@@ -788,8 +789,18 @@ MGL_EXPORT
  You can set this property to an instance of:
  
  * `MGLStyleConstantValue`
- * `MGLCameraStyleFunction` with an interpolation mode of
- `MGLInterpolationModeInterval`
+ * `MGLCameraStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+ * `MGLSourceStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
+   * `MGLInterpolationModeIdentity`
+ * `MGLCompositeStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSString *> *text;
 
@@ -1158,8 +1169,18 @@ MGL_EXPORT
  You can set this property to an instance of:
  
  * `MGLStyleConstantValue`
- * `MGLCameraStyleFunction` with an interpolation mode of
- `MGLInterpolationModeInterval`
+ * `MGLCameraStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+ * `MGLSourceStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
+   * `MGLInterpolationModeIdentity`
+ * `MGLCompositeStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *textTransform;
 

@@ -434,6 +434,13 @@ global.propertyType = function (property) {
     }
 };
 
+global.isInterpolatable = function (property) {
+    const type = property.type === 'array' ? property.value : property.type;
+    return type !== 'boolean' &&
+        type !== 'enum' &&
+        type !== 'string';
+};
+
 global.valueTransformerArguments = function (property) {
     let objCType = propertyType(property);
     switch (property.type) {
@@ -444,7 +451,7 @@ global.valueTransformerArguments = function (property) {
         case 'string':
             return ['std::string', objCType];
         case 'enum':
-            return [`mbgl::style::${mbglType(property)}`, objCType];
+            return [mbglType(property), 'NSValue *', mbglType(property), `MGL${camelize(property.name)}`];
         case 'color':
             return ['mbgl::Color', objCType];
         case 'array':

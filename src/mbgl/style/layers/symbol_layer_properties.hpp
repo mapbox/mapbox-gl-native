@@ -95,7 +95,7 @@ struct TextRotationAlignment : LayoutProperty<AlignmentType> {
     static AlignmentType defaultValue() { return AlignmentType::Auto; }
 };
 
-struct TextField : LayoutProperty<std::string> {
+struct TextField : DataDrivenLayoutProperty<std::string> {
     static constexpr const char * key = "text-field";
     static std::string defaultValue() { return ""; }
 };
@@ -155,7 +155,7 @@ struct TextKeepUpright : LayoutProperty<bool> {
     static bool defaultValue() { return true; }
 };
 
-struct TextTransform : LayoutProperty<TextTransformType> {
+struct TextTransform : DataDrivenLayoutProperty<TextTransformType> {
     static constexpr const char * key = "text-transform";
     static TextTransformType defaultValue() { return TextTransformType::None; }
 };

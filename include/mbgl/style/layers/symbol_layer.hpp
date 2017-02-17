@@ -99,9 +99,9 @@ public:
     PropertyValue<AlignmentType> getTextRotationAlignment() const;
     void setTextRotationAlignment(PropertyValue<AlignmentType>);
 
-    static PropertyValue<std::string> getDefaultTextField();
-    PropertyValue<std::string> getTextField() const;
-    void setTextField(PropertyValue<std::string>);
+    static DataDrivenPropertyValue<std::string> getDefaultTextField();
+    DataDrivenPropertyValue<std::string> getTextField() const;
+    void setTextField(DataDrivenPropertyValue<std::string>);
 
     static PropertyValue<std::vector<std::string>> getDefaultTextFont();
     PropertyValue<std::vector<std::string>> getTextFont() const;
@@ -147,9 +147,9 @@ public:
     PropertyValue<bool> getTextKeepUpright() const;
     void setTextKeepUpright(PropertyValue<bool>);
 
-    static PropertyValue<TextTransformType> getDefaultTextTransform();
-    PropertyValue<TextTransformType> getTextTransform() const;
-    void setTextTransform(PropertyValue<TextTransformType>);
+    static DataDrivenPropertyValue<TextTransformType> getDefaultTextTransform();
+    DataDrivenPropertyValue<TextTransformType> getTextTransform() const;
+    void setTextTransform(DataDrivenPropertyValue<TextTransformType>);
 
     static PropertyValue<std::array<float, 2>> getDefaultTextOffset();
     PropertyValue<std::array<float, 2>> getTextOffset() const;

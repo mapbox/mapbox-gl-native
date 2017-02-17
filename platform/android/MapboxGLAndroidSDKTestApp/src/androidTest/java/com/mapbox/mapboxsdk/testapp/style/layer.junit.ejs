@@ -177,9 +177,9 @@ public class <%- camelize(type) %>LayerTest extends BaseStyleTest {
 <% if (property.type == 'color') { -%>
             stop(Color.RED, <%- camelizeWithLeadingLowercase(property.name) %>(Color.RED))
 <% } else {-%>
-            1, <%- camelizeWithLeadingLowercase(property.name) %>(<%- defaultValueJava(property) %>))
-<% } -%>
+            stop(1, <%- camelizeWithLeadingLowercase(property.name) %>(<%- defaultValueJava(property) %>))
           )
+<% } -%>
         )
       )
     );

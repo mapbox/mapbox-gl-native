@@ -84,7 +84,7 @@
         XCTAssertEqualObjects(layer.<%- objCName(property) %>, functionStyleValue,
                               @"<%- objCName(property) %> should round-trip camera functions.");
 
-<% if (property["property-function"]) { -%>
+<% if (property["property-function"] && isInterpolatable(property)) { -%>
         functionStyleValue = [MGLStyleValue<<%- propertyType(property) %>> valueWithInterpolationMode:MGLInterpolationModeExponential sourceStops:@{@18: constantStyleValue} attributeName:@"keyName" options:nil];
         layer.<%- objCName(property) %> = functionStyleValue;
 
@@ -117,13 +117,12 @@
         XCTAssertEqualObjects(layer.<%- objCName(property) %>, defaultStyleValue,
                               @"<%- objCName(property) %> should return the default value after being unset.");
 <% } -%>
-<% if (property["function"] == "piecewise-constant") { -%>
+<% if (!property["property-function"]) { -%>
 
         functionStyleValue = [MGLStyleValue<<%- propertyType(property) %>> valueWithInterpolationMode:MGLInterpolationModeIdentity sourceStops:nil attributeName:@"" options:nil];
         XCTAssertThrowsSpecificNamed(layer.<%- objCName(property) %> = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
-
         functionStyleValue = [MGLStyleValue<<%- propertyType(property) %>> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.<%- objCName(property) %> = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");        
+        XCTAssertThrowsSpecificNamed(layer.<%- objCName(property) %> = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
 <% } -%>
     }
 <% } -%>

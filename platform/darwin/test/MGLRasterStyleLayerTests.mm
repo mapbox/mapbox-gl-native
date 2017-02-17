@@ -57,6 +57,11 @@
                       @"Unsetting maximumRasterBrightness should return raster-brightness-max to the default value.");
         XCTAssertEqualObjects(layer.maximumRasterBrightness, defaultStyleValue,
                               @"maximumRasterBrightness should return the default value after being unset.");
+
+        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeIdentity sourceStops:nil attributeName:@"" options:nil];
+        XCTAssertThrowsSpecificNamed(layer.maximumRasterBrightness = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
+        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
+        XCTAssertThrowsSpecificNamed(layer.maximumRasterBrightness = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
     }
 
     // raster-brightness-min
@@ -91,6 +96,11 @@
                       @"Unsetting minimumRasterBrightness should return raster-brightness-min to the default value.");
         XCTAssertEqualObjects(layer.minimumRasterBrightness, defaultStyleValue,
                               @"minimumRasterBrightness should return the default value after being unset.");
+
+        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeIdentity sourceStops:nil attributeName:@"" options:nil];
+        XCTAssertThrowsSpecificNamed(layer.minimumRasterBrightness = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
+        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
+        XCTAssertThrowsSpecificNamed(layer.minimumRasterBrightness = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
     }
 
     // raster-contrast
@@ -125,6 +135,11 @@
                       @"Unsetting rasterContrast should return raster-contrast to the default value.");
         XCTAssertEqualObjects(layer.rasterContrast, defaultStyleValue,
                               @"rasterContrast should return the default value after being unset.");
+
+        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeIdentity sourceStops:nil attributeName:@"" options:nil];
+        XCTAssertThrowsSpecificNamed(layer.rasterContrast = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
+        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
+        XCTAssertThrowsSpecificNamed(layer.rasterContrast = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
     }
 
     // raster-fade-duration
@@ -159,6 +174,11 @@
                       @"Unsetting rasterFadeDuration should return raster-fade-duration to the default value.");
         XCTAssertEqualObjects(layer.rasterFadeDuration, defaultStyleValue,
                               @"rasterFadeDuration should return the default value after being unset.");
+
+        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeIdentity sourceStops:nil attributeName:@"" options:nil];
+        XCTAssertThrowsSpecificNamed(layer.rasterFadeDuration = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
+        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
+        XCTAssertThrowsSpecificNamed(layer.rasterFadeDuration = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
     }
 
     // raster-hue-rotate
@@ -193,6 +213,11 @@
                       @"Unsetting rasterHueRotation should return raster-hue-rotate to the default value.");
         XCTAssertEqualObjects(layer.rasterHueRotation, defaultStyleValue,
                               @"rasterHueRotation should return the default value after being unset.");
+
+        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeIdentity sourceStops:nil attributeName:@"" options:nil];
+        XCTAssertThrowsSpecificNamed(layer.rasterHueRotation = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
+        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
+        XCTAssertThrowsSpecificNamed(layer.rasterHueRotation = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
     }
 
     // raster-opacity
@@ -227,6 +252,11 @@
                       @"Unsetting rasterOpacity should return raster-opacity to the default value.");
         XCTAssertEqualObjects(layer.rasterOpacity, defaultStyleValue,
                               @"rasterOpacity should return the default value after being unset.");
+
+        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeIdentity sourceStops:nil attributeName:@"" options:nil];
+        XCTAssertThrowsSpecificNamed(layer.rasterOpacity = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
+        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
+        XCTAssertThrowsSpecificNamed(layer.rasterOpacity = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
     }
 
     // raster-saturation
@@ -261,6 +291,11 @@
                       @"Unsetting rasterSaturation should return raster-saturation to the default value.");
         XCTAssertEqualObjects(layer.rasterSaturation, defaultStyleValue,
                               @"rasterSaturation should return the default value after being unset.");
+
+        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeIdentity sourceStops:nil attributeName:@"" options:nil];
+        XCTAssertThrowsSpecificNamed(layer.rasterSaturation = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
+        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
+        XCTAssertThrowsSpecificNamed(layer.rasterSaturation = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
     }
 }
 

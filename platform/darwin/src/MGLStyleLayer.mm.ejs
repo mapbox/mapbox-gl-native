@@ -180,7 +180,7 @@ namespace mbgl {
     auto mbglValue = MGLStyleValueTransformer<<%- valueTransformerArguments(property).join(', ') %>>().toDataDrivenPropertyValue(<%- objCName(property) %>);
 <% } else { -%>
 <% if (property.type == "enum") { -%>
-    auto mbglValue = MGLStyleValueTransformer<<%- mbglType(property) %>, NSValue *, <%- mbglType(property) %>, MGL<%- camelize(property.name) %>>().toEnumPropertyValue(<%- objCName(property) %>);
+    auto mbglValue = MGLStyleValueTransformer<<%- valueTransformerArguments(property).join(', ') %>>().toEnumPropertyValue(<%- objCName(property) %>);
 <% } else if (property.function == "piecewise-constant") { -%>
     auto mbglValue = MGLStyleValueTransformer<<%- valueTransformerArguments(property).join(', ') %>>().toPropertyValue(<%- objCName(property) %>);
 <% } else { -%>
@@ -236,7 +236,7 @@ namespace mbgl {
     auto mbglValue = MGLStyleValueTransformer<<%- valueTransformerArguments(property).join(', ') %>>().toDataDrivenPropertyValue(<%- objCName(property) %>);
 <% } else { -%>
 <% if (property.type == "enum") { -%>
-    auto mbglValue = MGLStyleValueTransformer<<%- mbglType(property) %>, NSValue *, <%- mbglType(property) %>, MGL<%- camelize(property.name) %>>().toEnumPropertyValue(<%- objCName(property) %>);
+    auto mbglValue = MGLStyleValueTransformer<<%- valueTransformerArguments(property).join(', ') %>>().toEnumPropertyValue(<%- objCName(property) %>);
 <% } else if (property.function == "piecewise-constant") { -%>
     auto mbglValue = MGLStyleValueTransformer<<%- valueTransformerArguments(property).join(', ') %>>().toPropertyValue(<%- objCName(property) %>);
 <% } else { -%>

@@ -72,8 +72,14 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
 
     layout.get<IconSize>() = leader.layout.evaluate<IconSize>(PropertyEvaluationParameters(zoom + 1));
     layout.get<TextSize>() = leader.layout.evaluate<TextSize>(PropertyEvaluationParameters(zoom + 1));
+          
+    const bool hasTextField = layout.get<TextField>().match(
+        [&] (const std::string& s) { return !s.empty(); },
+        [&] (const auto&) { return true; }
+    );
 
-    const bool hasText = !layout.get<TextField>().empty() && !layout.get<TextFont>().empty();
+    const bool hasText = !layout.get<TextFont>().empty() && hasTextField;
+
     const bool hasIcon = !layout.get<IconImage>().empty();
 
     if (!hasText && !hasIcon) {
@@ -110,13 +116,18 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
                 return util::toString(value->get<double>());
             return "null";
         };
-
+        
         if (hasText) {
-            std::string u8string = util::replaceTokens(layout.get<TextField>(), getValue);
+            std::string u8string = layout.evaluate<TextField>(zoom, *feature);
+            if (layout.get<TextField>().isConstant()) {
+                u8string = util::replaceTokens(u8string, getValue);
+            }
+            
+            auto textTransform = layout.evaluate<TextTransform>(zoom, *feature);
 
-            if (layout.get<TextTransform>() == TextTransformType::Uppercase) {
+            if (textTransform == TextTransformType::Uppercase) {
                 u8string = platform::uppercase(u8string);
-            } else if (layout.get<TextTransform>() == TextTransformType::Lowercase) {
+            } else if (textTransform == TextTransformType::Lowercase) {
                 u8string = platform::lowercase(u8string);
             }
 
@@ -154,7 +165,12 @@ bool SymbolLayout::hasSymbolInstances() const {
 }
 
 bool SymbolLayout::canPrepare(GlyphAtlas& glyphAtlas) {
-    if (!layout.get<TextField>().empty() && !layout.get<TextFont>().empty() && !glyphAtlas.hasGlyphRanges(layout.get<TextFont>(), ranges)) {
+    const bool hasTextField = layout.get<TextField>().match(
+        [&] (const std::string& s) { return !s.empty(); },
+        [&] (const auto&) { return true; }
+    );
+
+    if (hasTextField && !layout.get<TextFont>().empty() && !glyphAtlas.hasGlyphRanges(layout.get<TextFont>(), ranges)) {
         return false;
     }
 
