@@ -1,5 +1,6 @@
 #include "native_map_view.hpp"
 #include "jni.hpp"
+#include "default_file_source.hpp"
 
 #include <cstdlib>
 #include <ctime>
@@ -27,6 +28,7 @@ NativeMapView::NativeMapView(JNIEnv *env_, jobject obj_, float pixelRatio, int a
     : env(env_),
       availableProcessors(availableProcessors_),
       totalMemory(totalMemory_),
+      fileSource(defaultFileSource(mbgl::android::cachePath + "/mbgl-offline.db", mbgl::android::apkPath)),
       threadPool(4) {
 
     assert(env_ != nullptr);
@@ -43,13 +45,9 @@ NativeMapView::NativeMapView(JNIEnv *env_, jobject obj_, float pixelRatio, int a
         return;
     }
 
-    fileSource = std::make_unique<mbgl::DefaultFileSource>(
-        mbgl::android::cachePath + "/mbgl-offline.db",
-        mbgl::android::apkPath);
-
     map = std::make_unique<mbgl::Map>(
         *this, mbgl::Size{ static_cast<uint32_t>(width), static_cast<uint32_t>(height) },
-        pixelRatio, *fileSource, threadPool, MapMode::Continuous);
+        pixelRatio, fileSource, threadPool, MapMode::Continuous);
 
     float zoomFactor   = map->getMaxZoom() - map->getMinZoom() + 1;
     float cpuFactor    = availableProcessors;
@@ -71,7 +69,6 @@ NativeMapView::~NativeMapView() {
     assert(obj != nullptr);
 
     map.reset();
-    fileSource.reset();
 
     env->DeleteWeakGlobalRef(obj);
 
@@ -198,7 +195,9 @@ void NativeMapView::render() {
 
 mbgl::Map &NativeMapView::getMap() { return *map; }
 
-mbgl::DefaultFileSource &NativeMapView::getFileSource() { return *fileSource; }
+mbgl::DefaultFileSource& NativeMapView::getFileSource() {
+    return fileSource;
+}
 
 void NativeMapView::initializeDisplay() {
     assert(display == EGL_NO_DISPLAY);
