@@ -15,6 +15,7 @@
 #include "bitmap_factory.hpp"
 #include "connectivity_listener.hpp"
 #include "default_file_source.hpp"
+#include "attach_env.hpp"
 #include "style/functions/categorical_stops.hpp"
 #include "style/functions/exponential_stops.hpp"
 #include "style/functions/identity_stops.hpp"
@@ -144,6 +145,8 @@ jni::jfieldID* offlineRegionDefinitionPixelRatioId = nullptr;
 
 jni::jmethodID* createOnCreateMethodId = nullptr;
 jni::jmethodID* createOnErrorMethodId = nullptr;
+
+jni::jmethodID* transformOnURLMethodId = nullptr;
 
 jni::jmethodID* updateMetadataOnUpdateMethodId = nullptr;
 jni::jmethodID* updateMetadataOnErrorMethodId = nullptr;
@@ -1448,6 +1451,45 @@ void createOfflineRegion(JNIEnv *env, jni::jobject* obj, jlong defaultFileSource
     });
 }
 
+// A deleter that doesn't retain an JNIEnv handle but instead tries to attach the JVM. This means
+// it can be used on any thread to delete a global ref.
+struct GenericGlobalRefDeleter {
+    void operator()(jni::jobject* p) const {
+        if (p) {
+            auto env = AttachEnv();
+            env->DeleteGlobalRef(jni::Unwrap(p));
+        }
+    }
+};
+
+void setResourceTransform(JNIEnv *env, jni::jobject* obj, jlong defaultFileSourcePtr, jni::jobject* transformCallback) {
+    // Checks
+    assert(defaultFileSourcePtr != 0);
+
+    mbgl::DefaultFileSource *defaultFileSource = reinterpret_cast<mbgl::DefaultFileSource *>(defaultFileSourcePtr);
+    if (transformCallback) {
+        // Launch transformCallback
+        defaultFileSource->setResourceTransform([
+            // Capture the OfflineManager and ResourceTransformCallback objects as a managed global into
+            // the lambda. They are released automatically when we're setting a new ResourceTransform in
+            // a subsequent call.
+            // Note: we're converting them to shared_ptrs because this lambda is converted to a std::function,
+            // which requires copyability of its captured variables.
+            offlineManager = std::shared_ptr<jni::jobject>(jni::NewGlobalRef(*env, obj).release(), GenericGlobalRefDeleter()),
+            callback = std::shared_ptr<jni::jobject>(jni::NewGlobalRef(*env, transformCallback).release(), GenericGlobalRefDeleter()),
+            env
+        ](mbgl::Resource::Kind kind, std::string&& url_) {
+            auto url = std_string_to_jstring(env, url_);
+            url = reinterpret_cast<jni::jstring*>(jni::CallMethod<jni::jobject*>(
+                *env, callback.get(), *transformOnURLMethodId, int(kind), url));
+            return std_string_from_jstring(env, url);
+        });
+    } else {
+        // Reset the callback
+        defaultFileSource->setResourceTransform(nullptr);
+    }
+}
+
 void setOfflineMapboxTileCountLimit(JNIEnv *env, jni::jobject* obj, jlong defaultFileSourcePtr, jlong limit) {
     // Checks
     assert(defaultFileSourcePtr != 0);
@@ -1972,6 +2014,10 @@ void registerNatives(JavaVM *vm) {
         struct CreateOfflineRegionsCallback {
             static constexpr auto Name() { return "com/mapbox/mapboxsdk/offline/OfflineManager$CreateOfflineRegionCallback"; }
         };
+
+        struct ResourceTransformCallback {
+            static constexpr auto Name() { return "com/mapbox/mapboxsdk/offline/OfflineManager$ResourceTransformCallback"; }
+        };
     };
 
     struct OfflineRegion {
@@ -1987,6 +2033,7 @@ void registerNatives(JavaVM *vm) {
         MAKE_NATIVE_METHOD(getAccessToken, "(J)Ljava/lang/String;"),
         MAKE_NATIVE_METHOD(listOfflineRegions, "(JLcom/mapbox/mapboxsdk/offline/OfflineManager$ListOfflineRegionsCallback;)V"),
         MAKE_NATIVE_METHOD(createOfflineRegion, "(JLcom/mapbox/mapboxsdk/offline/OfflineRegionDefinition;[BLcom/mapbox/mapboxsdk/offline/OfflineManager$CreateOfflineRegionCallback;)V"),
+        MAKE_NATIVE_METHOD(setResourceTransform, "(JLcom/mapbox/mapboxsdk/offline/OfflineManager$ResourceTransformCallback;)V"),
         MAKE_NATIVE_METHOD(setOfflineMapboxTileCountLimit, "(JJ)V")
     );
 
@@ -1997,6 +2044,9 @@ void registerNatives(JavaVM *vm) {
     jni::Class<OfflineManager::CreateOfflineRegionsCallback> createOfflineRegionCallbackClass = jni::Class<OfflineManager::CreateOfflineRegionsCallback>::Find(env);
     createOnCreateMethodId = &jni::GetMethodID(env, createOfflineRegionCallbackClass, "onCreate", "(Lcom/mapbox/mapboxsdk/offline/OfflineRegion;)V");
     createOnErrorMethodId = &jni::GetMethodID(env, createOfflineRegionCallbackClass, "onError", "(Ljava/lang/String;)V");
+
+    jni::Class<OfflineManager::ResourceTransformCallback> resourceTransformCallbackClass = jni::Class<OfflineManager::ResourceTransformCallback>::Find(env);
+    transformOnURLMethodId = &jni::GetMethodID(env, resourceTransformCallbackClass, "onURL", "(ILjava/lang/String;)Ljava/lang/String;");
 
     offlineRegionClass = &jni::FindClass(env, OfflineRegion::Name());
     offlineRegionClass = jni::NewGlobalRef(env, offlineRegionClass).release();
