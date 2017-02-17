@@ -1742,7 +1742,7 @@ public class PropertyFactory {
   }
 
   /**
-   * Value to use for a text label. Feature properties are specified using tokens like {field_name}.  (Token replacement is only supported for literal text-field values--not for data-driven property functions.)
+   * Value to use for a text label. Feature properties are specified using tokens like {field_name}.  (Token replacement is only supported for literal `textField` values--not for property functions.)
    *
    * @param value a String value
    * @return property wrapper around String
@@ -1754,7 +1754,7 @@ public class PropertyFactory {
 
 
   /**
-   * Value to use for a text label. Feature properties are specified using tokens like {field_name}.  (Token replacement is only supported for literal text-field values--not for data-driven property functions.)
+   * Value to use for a text label. Feature properties are specified using tokens like {field_name}.  (Token replacement is only supported for literal `textField` values--not for property functions.)
    *
    * @param <T> the function input type
    * @param function a wrapper function for String

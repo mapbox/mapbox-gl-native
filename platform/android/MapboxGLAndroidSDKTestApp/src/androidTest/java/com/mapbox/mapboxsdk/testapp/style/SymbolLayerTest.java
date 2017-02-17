@@ -917,7 +917,7 @@ public class SymbolLayerTest extends BaseStyleTest {
         property(
           "FeaturePropertyA",
           interval(
-            1, textField("")
+            stop(1, textField(""))
           )
         )
       )
@@ -1401,7 +1401,7 @@ public class SymbolLayerTest extends BaseStyleTest {
         property(
           "FeaturePropertyA",
           interval(
-            1, textTransform(TEXT_TRANSFORM_NONE)
+            stop(1, textTransform(TEXT_TRANSFORM_NONE))
           )
         )
       )
