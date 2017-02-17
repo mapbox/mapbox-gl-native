@@ -384,6 +384,22 @@ Framebuffer Context::createFramebuffer(const Texture& color) {
     return { color.size, std::move(fbo) };
 }
 
+Framebuffer
+Context::createFramebuffer(const Renderbuffer<RenderbufferType::RGBA>& colorTarget,
+                           const Renderbuffer<RenderbufferType::DepthComponent>& depthTarget,
+                           const Texture& fboTexture) {
+    if (colorTarget.size != depthTarget.size) {
+        throw new std::runtime_error("Renderbuffer size mismatch");
+    }
+    auto fbo = createFramebuffer();
+    bindFramebuffer = fbo;
+    MBGL_CHECK_ERROR(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, colorTarget.renderbuffer));
+    MBGL_CHECK_ERROR(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthTarget.renderbuffer));
+    MBGL_CHECK_ERROR(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, fboTexture.texture, 0));
+    checkFramebuffer();
+    return { colorTarget.size, std::move(fbo) };
+}
+
 UniqueTexture
 Context::createTexture(const Size size, const void* data, TextureFormat format, TextureUnit unit) {
     auto obj = createTexture();

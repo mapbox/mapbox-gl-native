@@ -245,7 +245,8 @@ bool TransformState::isGestureInProgress() const {
 # pragma mark – Light 
 // TODO move elsewhere
 std::array<float, 3> TransformState::getLightPosition() const {
-    return {{ 1.15, 210, 30 }};
+    return {{ 1, 110, 30 }};
+//    return {{ 1.15, 210, 30 }};
     // TODO i'm faking this with all defaults
 }
 
@@ -256,7 +257,7 @@ std::array<float, 3> TransformState::getLightColor() const {
 }
 
 float TransformState::getLightIntensity() const {
-    return 0.5;
+    return 0.4;
     // TODO i'm faking this with all defaults
 }
 
