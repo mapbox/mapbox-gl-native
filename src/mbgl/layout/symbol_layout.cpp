@@ -97,7 +97,7 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
         if (!leader.filter(feature->getType(), feature->getID(), [&] (const auto& key) { return feature->getValue(key); }))
             continue;
 
-        SymbolFeature ft;
+        SymbolFeature ft(feature);
         ft.index = i;
 
         auto getValue = [&feature](const std::string& key) -> std::string {
