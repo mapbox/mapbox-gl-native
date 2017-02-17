@@ -47,18 +47,4 @@ private:
     friend class BackendScope;
 };
 
-class BackendScope {
-public:
-    BackendScope(Backend& backend_) : backend(backend_) {
-        backend.activate();
-    }
-
-    ~BackendScope() {
-        backend.deactivate();
-    }
-
-private:
-    Backend& backend;
-};
-
 } // namespace mbgl

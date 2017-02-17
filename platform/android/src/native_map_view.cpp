@@ -16,6 +16,7 @@
 #include <mbgl/util/logging.hpp>
 #include <mbgl/gl/extension.hpp>
 #include <mbgl/gl/context.hpp>
+#include <mbgl/map/backend_scope.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/shared_thread_pool.hpp>
