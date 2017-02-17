@@ -6,7 +6,7 @@ const MGLStyleFunctionOption MGLStyleFunctionOptionDefaultValue = @"MGLStyleFunc
 @implementation MGLStyleValue
 
 + (instancetype)valueWithRawValue:(id)rawValue {
-    return [MGLStyleConstantValue valueWithRawValue:rawValue];
+    return [MGLConstantStyleValue valueWithRawValue:rawValue];
 }
 
 + (instancetype)valueWithInterpolationBase:(CGFloat)interpolationBase stops:(NSDictionary *)stops {
@@ -31,7 +31,7 @@ const MGLStyleFunctionOption MGLStyleFunctionOptionDefaultValue = @"MGLStyleFunc
 
 @end
 
-@implementation MGLStyleConstantValue
+@implementation MGLConstantStyleValue
 
 + (instancetype)valueWithRawValue:(id)rawValue {
     return [[self alloc] initWithRawValue:rawValue];
@@ -52,7 +52,7 @@ const MGLStyleFunctionOption MGLStyleFunctionOptionDefaultValue = @"MGLStyleFunc
     return [self.rawValue debugDescription];
 }
 
-- (BOOL)isEqual:(MGLStyleConstantValue *)other {
+- (BOOL)isEqual:(MGLConstantStyleValue *)other {
     return [other isKindOfClass:[self class]] && [other.rawValue isEqual:self.rawValue];
 }
 

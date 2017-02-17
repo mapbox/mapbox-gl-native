@@ -369,14 +369,14 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
             return localizedString;
         };
 
-        if ([layer.text isKindOfClass:[MGLStyleConstantValue class]]) {
-            NSString *textField = [(MGLStyleConstantValue<NSString *> *)layer.text rawValue];
+        if ([layer.text isKindOfClass:[MGLConstantStyleValue class]]) {
+            NSString *textField = [(MGLConstantStyleValue<NSString *> *)layer.text rawValue];
             layer.text = [MGLStyleValue<NSString *> valueWithRawValue:stringByLocalizingString(textField)];
         }
         else if ([layer.text isKindOfClass:[MGLCameraStyleFunction class]]) {
             MGLCameraStyleFunction *function = (MGLCameraStyleFunction<NSString *> *)layer.text;
             NSMutableDictionary *stops = function.stops.mutableCopy;
-            [stops enumerateKeysAndObjectsUsingBlock:^(NSNumber *zoomLevel, MGLStyleConstantValue<NSString *> *stop, BOOL *done) {
+            [stops enumerateKeysAndObjectsUsingBlock:^(NSNumber *zoomLevel, MGLConstantStyleValue<NSString *> *stop, BOOL *done) {
                 NSString *textField = stop.rawValue;
                 stops[zoomLevel] = [MGLStyleValue<NSString *> valueWithRawValue:stringByLocalizingString(textField)];
             }];

@@ -1020,8 +1020,8 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
         [self.mapView.style addSource:source];
 
         MGLFillStyleLayer *fillLayer = [[MGLFillStyleLayer alloc] initWithIdentifier:queryLayerID source:source];
-        fillLayer.fillColor = [MGLStyleConstantValue<UIColor *> valueWithRawValue:[UIColor blueColor]];
-        fillLayer.fillOpacity = [MGLStyleConstantValue<NSNumber *> valueWithRawValue:@0.5];
+        fillLayer.fillColor = [MGLConstantStyleValue<UIColor *> valueWithRawValue:[UIColor blueColor]];
+        fillLayer.fillOpacity = [MGLConstantStyleValue<NSNumber *> valueWithRawValue:@0.5];
         [self.mapView.style addLayer:fillLayer];
     });
 }
@@ -1272,19 +1272,19 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     [self.mapView.style addSource:routeSource];
 
     MGLLineStyleLayer *baseRouteLayer = [[MGLLineStyleLayer alloc] initWithIdentifier:@"style-base-route-layer" source:routeSource];
-    baseRouteLayer.lineColor = [MGLStyleConstantValue valueWithRawValue:[UIColor orangeColor]];
-    baseRouteLayer.lineWidth = [MGLStyleConstantValue valueWithRawValue:@20];
-    baseRouteLayer.lineOpacity = [MGLStyleConstantValue valueWithRawValue:@0.5];
-    baseRouteLayer.lineCap = [MGLStyleConstantValue valueWithRawValue:[NSValue valueWithMGLLineCap:MGLLineCapRound]];
-    baseRouteLayer.lineJoin = [MGLStyleConstantValue valueWithRawValue:[NSValue valueWithMGLLineJoin:MGLLineJoinRound]];
+    baseRouteLayer.lineColor = [MGLConstantStyleValue valueWithRawValue:[UIColor orangeColor]];
+    baseRouteLayer.lineWidth = [MGLConstantStyleValue valueWithRawValue:@20];
+    baseRouteLayer.lineOpacity = [MGLConstantStyleValue valueWithRawValue:@0.5];
+    baseRouteLayer.lineCap = [MGLConstantStyleValue valueWithRawValue:[NSValue valueWithMGLLineCap:MGLLineCapRound]];
+    baseRouteLayer.lineJoin = [MGLConstantStyleValue valueWithRawValue:[NSValue valueWithMGLLineJoin:MGLLineJoinRound]];
     [self.mapView.style addLayer:baseRouteLayer];
 
     MGLLineStyleLayer *routeLayer = [[MGLLineStyleLayer alloc] initWithIdentifier:@"style-route-layer" source:routeSource];
-    routeLayer.lineColor = [MGLStyleConstantValue valueWithRawValue:[UIColor whiteColor]];
-    routeLayer.lineWidth = [MGLStyleConstantValue valueWithRawValue:@15];
-    routeLayer.lineOpacity = [MGLStyleConstantValue valueWithRawValue:@0.8];
-    routeLayer.lineCap = [MGLStyleConstantValue valueWithRawValue:[NSValue valueWithMGLLineCap:MGLLineCapRound]];
-    routeLayer.lineJoin = [MGLStyleConstantValue valueWithRawValue:[NSValue valueWithMGLLineJoin:MGLLineJoinRound]];
+    routeLayer.lineColor = [MGLConstantStyleValue valueWithRawValue:[UIColor whiteColor]];
+    routeLayer.lineWidth = [MGLConstantStyleValue valueWithRawValue:@15];
+    routeLayer.lineOpacity = [MGLConstantStyleValue valueWithRawValue:@0.8];
+    routeLayer.lineCap = [MGLConstantStyleValue valueWithRawValue:[NSValue valueWithMGLLineCap:MGLLineCapRound]];
+    routeLayer.lineJoin = [MGLConstantStyleValue valueWithRawValue:[NSValue valueWithMGLLineJoin:MGLLineJoinRound]];
     [self.mapView.style addLayer:routeLayer];
 }
 
@@ -1340,8 +1340,8 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
         MGLSymbolStyleLayer *layer = (MGLSymbolStyleLayer *)[self.mapView.style layerWithIdentifier:layerName];
 
         if ([layer isKindOfClass:[MGLSymbolStyleLayer class]]) {
-            if ([layer.text isKindOfClass:[MGLStyleConstantValue class]]) {
-                MGLStyleConstantValue *label = (MGLStyleConstantValue<NSString *> *)layer.text;
+            if ([layer.text isKindOfClass:[MGLConstantStyleValue class]]) {
+                MGLConstantStyleValue *label = (MGLConstantStyleValue<NSString *> *)layer.text;
                 if ([label.rawValue hasPrefix:@"{name"]) {
                     layer.text = [MGLStyleValue valueWithRawValue:language];
                 }
@@ -1349,7 +1349,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
             else if ([layer.text isKindOfClass:[MGLCameraStyleFunction class]]) {
                 MGLCameraStyleFunction *function = (MGLCameraStyleFunction<NSString *> *)layer.text;
                 NSMutableDictionary *stops = function.stops.mutableCopy;
-                [stops enumerateKeysAndObjectsUsingBlock:^(NSNumber *zoomLevel, MGLStyleConstantValue<NSString *> *stop, BOOL *done) {
+                [stops enumerateKeysAndObjectsUsingBlock:^(NSNumber *zoomLevel, MGLConstantStyleValue<NSString *> *stop, BOOL *done) {
                     if ([stop.rawValue hasPrefix:@"{name"]) {
                         stops[zoomLevel] = [MGLStyleValue<NSString *> valueWithRawValue:language];
                     }

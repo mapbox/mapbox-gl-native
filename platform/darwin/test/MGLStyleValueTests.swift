@@ -24,8 +24,8 @@ extension MGLStyleValueTests {
             return
         }
         
-        if let actualConstant = actual as? MGLStyleConstantValue<MGLColor> {
-            assertColorsEqualWithAccuracy(actualConstant.rawValue, (expected as! MGLStyleConstantValue<MGLColor>).rawValue)
+        if let actualConstant = actual as? MGLConstantStyleValue<MGLColor> {
+            assertColorsEqualWithAccuracy(actualConstant.rawValue, (expected as! MGLConstantStyleValue<MGLColor>).rawValue)
         } else if let actualFunction = actual as? MGLStyleFunction<MGLColor>,
             let expectedFunction = expected as? MGLStyleFunction<MGLColor> {
             
@@ -55,11 +55,11 @@ extension MGLStyleValueTests {
                     XCTFail("Expected stop value of type \(type(of: expectedValue)), but found \(type(of: actualValue)) instead.")
                     return
                 }
-                if let actualValue = actualValue as? MGLStyleConstantValue<MGLColor>,
-                    let expectedValue = expectedValue as? MGLStyleConstantValue<MGLColor> {
+                if let actualValue = actualValue as? MGLConstantStyleValue<MGLColor>,
+                    let expectedValue = expectedValue as? MGLConstantStyleValue<MGLColor> {
                     assertColorsEqualWithAccuracy(actualValue.rawValue, expectedValue.rawValue)
-                } else if let actualValue = actualValue as? MGLStyleConstantValue<AnyObject>,
-                    let expectedValue = expectedValue as? MGLStyleConstantValue<AnyObject> {
+                } else if let actualValue = actualValue as? MGLConstantStyleValue<AnyObject>,
+                    let expectedValue = expectedValue as? MGLConstantStyleValue<AnyObject> {
                     XCTAssertEqual(actualValue, expectedValue)
                 } else {
                     XCTFail("Unsupported stop value type \(type(of: actualValue)).")
@@ -90,16 +90,16 @@ extension MGLStyleValueTests {
         let circleStyleLayer = MGLCircleStyleLayer(identifier: "circleLayer", source: shapeSource)
         
         // Boolean
-        symbolStyleLayer.iconAllowsOverlap = MGLStyleConstantValue(rawValue: true)
-        XCTAssertEqual((symbolStyleLayer.iconAllowsOverlap as! MGLStyleConstantValue<NSNumber>).rawValue, true)
+        symbolStyleLayer.iconAllowsOverlap = MGLConstantStyleValue(rawValue: true)
+        XCTAssertEqual((symbolStyleLayer.iconAllowsOverlap as! MGLConstantStyleValue<NSNumber>).rawValue, true)
         
         // Number
-        symbolStyleLayer.iconHaloWidth = MGLStyleConstantValue(rawValue: 3)
-        XCTAssertEqual((symbolStyleLayer.iconHaloWidth as! MGLStyleConstantValue<NSNumber>).rawValue, 3)
+        symbolStyleLayer.iconHaloWidth = MGLConstantStyleValue(rawValue: 3)
+        XCTAssertEqual((symbolStyleLayer.iconHaloWidth as! MGLConstantStyleValue<NSNumber>).rawValue, 3)
         
         // String
-        symbolStyleLayer.text = MGLStyleConstantValue(rawValue: "{name}")
-        XCTAssertEqual((symbolStyleLayer.text as! MGLStyleConstantValue<NSString>).rawValue, "{name}")
+        symbolStyleLayer.text = MGLConstantStyleValue(rawValue: "{name}")
+        XCTAssertEqual((symbolStyleLayer.text as! MGLConstantStyleValue<NSString>).rawValue, "{name}")
 
         var circleTranslationOne = CGVector(dx: 100, dy: 0)
         let circleTranslationValueOne = NSValue(bytes: &circleTranslationOne, objCType: "{CGVector=dd}")

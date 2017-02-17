@@ -241,7 +241,7 @@ In style JSON | In Objective-C | In Swift
 ## Setting attribute values
 
 Each property representing a layout or paint attribute is set to an
-`MGLStyleValue` object, which is either an `MGLStyleConstantValue` object (for
+`MGLStyleValue` object, which is either an `MGLConstantStyleValue` object (for
 constant values) or an `MGLStyleFunction` object (for zoom level functions). The
 style value object is a container for the raw value or function parameters that
 you want the attribute to be set to.

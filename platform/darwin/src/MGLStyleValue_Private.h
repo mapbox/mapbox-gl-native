@@ -55,8 +55,8 @@ public:
             return {};
         }
 
-        if ([value isKindOfClass:[MGLStyleConstantValue class]]) {
-            return toMBGLConstantValue((MGLStyleConstantValue<ObjCType> *)value);
+        if ([value isKindOfClass:[MGLConstantStyleValue class]]) {
+            return toMBGLConstantValue((MGLConstantStyleValue<ObjCType> *)value);
         } else if ([value isKindOfClass:[MGLCameraStyleFunction class]]) {
             MGLCameraStyleFunction<ObjCType> *cameraStyleFunction = (MGLCameraStyleFunction<ObjCType> *)value;
             // Intentionally ignore the stop type set by the developer becuase non interpolatable property values
@@ -86,8 +86,8 @@ public:
             return {};
         }
 
-        if ([value isKindOfClass:[MGLStyleConstantValue class]]) {
-            return toMBGLConstantValue((MGLStyleConstantValue<ObjCType> *)value);
+        if ([value isKindOfClass:[MGLConstantStyleValue class]]) {
+            return toMBGLConstantValue((MGLConstantStyleValue<ObjCType> *)value);
         } else if ([value isMemberOfClass:[MGLStyleFunction class]]) {
             MGLStyleFunction<ObjCType> *styleFunction = (MGLStyleFunction<ObjCType> *)value;
             return toMBGLExponentialCameraFunction(styleFunction);
@@ -119,8 +119,8 @@ public:
 
     // Convert an mgl style value into a mbgl data driven property value
     mbgl::style::DataDrivenPropertyValue<MBGLType> toDataDrivenPropertyValue(MGLStyleValue<ObjCType> *value) {
-        if ([value isKindOfClass:[MGLStyleConstantValue class]]) {
-            return toMBGLConstantValue((MGLStyleConstantValue<ObjCType> *)value);
+        if ([value isKindOfClass:[MGLConstantStyleValue class]]) {
+            return toMBGLConstantValue((MGLConstantStyleValue<ObjCType> *)value);
         } else if ([value isKindOfClass:[MGLStyleFunction class]]) {
             auto rawValue = toRawStyleSpecValue((MGLStyleFunction<ObjCType> *) value);
             auto result = mbgl::style::conversion::convert<mbgl::style::DataDrivenPropertyValue<MBGLType>>(rawValue);
@@ -143,9 +143,9 @@ public:
             return {};
         }
 
-        if ([value isKindOfClass:[MGLStyleConstantValue class]]) {
+        if ([value isKindOfClass:[MGLConstantStyleValue class]]) {
             MBGLEnum mbglValue;
-            getMBGLValue([(MGLStyleConstantValue<ObjCType> *)value rawValue], mbglValue);
+            getMBGLValue([(MGLConstantStyleValue<ObjCType> *)value rawValue], mbglValue);
             return mbglValue;
         } else if ([value isKindOfClass:[MGLCameraStyleFunction class]]) {
             MGLCameraStyleFunction<NSValue *> *cameraStyleFunction = (MGLCameraStyleFunction<NSValue *> *)value;
@@ -175,7 +175,7 @@ public:
 
 private: // Private utilities for converting from mgl to mbgl values
 
-    MBGLType toMBGLConstantValue(MGLStyleConstantValue<ObjCType> *value) {
+    MBGLType toMBGLConstantValue(MGLConstantStyleValue<ObjCType> *value) {
         MBGLType mbglValue;
         getMBGLValue(value.rawValue, mbglValue);
         return mbglValue;
@@ -245,7 +245,7 @@ private: // Private utilities for converting from mgl to mbgl values
         if ([styleFunction isKindOfClass:[MGLCameraStyleFunction class]]) {
             // zoom-only function (no default value)
             __block NSMutableArray *stops = [[NSMutableArray alloc] init];
-            [styleFunction.stops enumerateKeysAndObjectsUsingBlock:^(NSNumber * _Nonnull zoomKey, MGLStyleConstantValue<ObjCType> * _Nonnull outputValue, BOOL * _Nonnull stop) {
+            [styleFunction.stops enumerateKeysAndObjectsUsingBlock:^(NSNumber * _Nonnull zoomKey, MGLConstantStyleValue<ObjCType> * _Nonnull outputValue, BOOL * _Nonnull stop) {
                 MBGLType dummyMbglValue;
                 NSArray *rawStop = @[zoomKey, toRawStyleSpecValue([outputValue rawValue], dummyMbglValue)];
                 [stops addObject:rawStop];
@@ -257,7 +257,7 @@ private: // Private utilities for converting from mgl to mbgl values
             rawFunction[@"property"] = sourceStyleFunction.attributeName;
             // property-only function
             __block NSMutableArray *stops = [[NSMutableArray alloc] init];
-            [styleFunction.stops enumerateKeysAndObjectsUsingBlock:^(NSObject * _Nonnull propertyKey, MGLStyleConstantValue<ObjCType> * _Nonnull outputValue, BOOL * _Nonnull stop) {
+            [styleFunction.stops enumerateKeysAndObjectsUsingBlock:^(NSObject * _Nonnull propertyKey, MGLConstantStyleValue<ObjCType> * _Nonnull outputValue, BOOL * _Nonnull stop) {
                 MBGLType dummyMbglValue;
                 NSArray *rawStop = @[propertyKey, toRawStyleSpecValue([outputValue rawValue], dummyMbglValue)];
                 [stops addObject:rawStop];
@@ -266,9 +266,9 @@ private: // Private utilities for converting from mgl to mbgl values
             
             // defaultValue => default
             if (sourceStyleFunction.defaultValue) {
-                NSCAssert([sourceStyleFunction.defaultValue isKindOfClass:[MGLStyleConstantValue class]], @"Default value must be constant");
+                NSCAssert([sourceStyleFunction.defaultValue isKindOfClass:[MGLConstantStyleValue class]], @"Default value must be constant");
                 MBGLType dummyMbglValue;
-                rawFunction[@"default"] = toRawStyleSpecValue([(MGLStyleConstantValue<ObjCType> *)sourceStyleFunction.defaultValue rawValue], dummyMbglValue);
+                rawFunction[@"default"] = toRawStyleSpecValue([(MGLConstantStyleValue<ObjCType> *)sourceStyleFunction.defaultValue rawValue], dummyMbglValue);
             }
         } else if ([styleFunction isKindOfClass:[MGLCompositeStyleFunction class]]) {
             // zoom-and-property function
@@ -282,8 +282,8 @@ private: // Private utilities for converting from mgl to mbgl values
                          @"zoom": zoomKey,
                          @"value": valueKey
                      };
-                    MGLStyleConstantValue<ObjCType> *outputValue = stopValue[valueKey];
-                    NSCAssert([outputValue isKindOfClass:[MGLStyleConstantValue<ObjCType> class]], @"Stop outputs should be MGLStyleConstantValues");
+                    MGLConstantStyleValue<ObjCType> *outputValue = stopValue[valueKey];
+                    NSCAssert([outputValue isKindOfClass:[MGLConstantStyleValue<ObjCType> class]], @"Stop outputs should be MGLConstantStyleValues");
                     MBGLType dummyMbglValue;
                     NSArray *rawStop = @[stopKey, toRawStyleSpecValue([outputValue rawValue], dummyMbglValue)];
                     [stops addObject:rawStop];
@@ -293,9 +293,9 @@ private: // Private utilities for converting from mgl to mbgl values
             
             // defaultValue => default
             if (compositeStyleFunction.defaultValue) {
-                NSCAssert([compositeStyleFunction.defaultValue isKindOfClass:[MGLStyleConstantValue class]], @"Default value must be constant");
+                NSCAssert([compositeStyleFunction.defaultValue isKindOfClass:[MGLConstantStyleValue class]], @"Default value must be constant");
                 MBGLType dummyMbglValue;
-                rawFunction[@"default"] = toRawStyleSpecValue([(MGLStyleConstantValue<ObjCType> *)compositeStyleFunction.defaultValue rawValue], dummyMbglValue);
+                rawFunction[@"default"] = toRawStyleSpecValue([(MGLConstantStyleValue<ObjCType> *)compositeStyleFunction.defaultValue rawValue], dummyMbglValue);
             }
         }
         
@@ -367,9 +367,9 @@ private: // Private utilities for converting from mgl to mbgl values
 
     void setDefaultMBGLValue(MGLSourceStyleFunction<ObjCType> *sourceStyleFunction, mbgl::style::SourceFunction<MBGLType> &sourceFunction) {
         if (sourceStyleFunction.defaultValue) {
-            NSCAssert([sourceStyleFunction.defaultValue isKindOfClass:[MGLStyleConstantValue class]], @"Default value must be constant");
+            NSCAssert([sourceStyleFunction.defaultValue isKindOfClass:[MGLConstantStyleValue class]], @"Default value must be constant");
             MBGLType mbglValue;
-            id mglValue = [(MGLStyleConstantValue<ObjCType> *)sourceStyleFunction.defaultValue rawValue];
+            id mglValue = [(MGLConstantStyleValue<ObjCType> *)sourceStyleFunction.defaultValue rawValue];
             getMBGLValue(mglValue, mbglValue);
             sourceFunction.defaultValue = mbglValue;
         }
@@ -518,7 +518,7 @@ private: // Private utilities for converting from mbgl to mgl values
         id operator()(const MBGLEnum &value) const {
             auto str = mbgl::Enum<MBGLEnum>::toString(value);
             MGLEnum mglType = *mbgl::Enum<MGLEnum>::toEnum(str);
-            return [MGLStyleConstantValue<ObjCType> valueWithRawValue:[NSValue value:&mglType withObjCType:@encode(MGLEnum)]];
+            return [MGLConstantStyleValue<ObjCType> valueWithRawValue:[NSValue value:&mglType withObjCType:@encode(MGLEnum)]];
         }
 
         id operator()(const mbgl::style::CameraFunction<MBGLEnum> &mbglValue) const {
@@ -671,7 +671,7 @@ private: // Private utilities for converting from mbgl to mgl values
 
         id operator()(const MBGLType &value) const {
             auto rawValue = toMGLRawStyleValue(value);
-            return [MGLStyleConstantValue<ObjCType> valueWithRawValue:rawValue];
+            return [MGLConstantStyleValue<ObjCType> valueWithRawValue:rawValue];
         }
 
         id operator()(const mbgl::style::CameraFunction<MBGLType> &mbglValue) const {
