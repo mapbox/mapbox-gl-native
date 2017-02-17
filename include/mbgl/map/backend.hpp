@@ -41,8 +41,7 @@ protected:
     virtual void activate() = 0;
     virtual void deactivate() = 0;
 
-private:
-    const std::unique_ptr<gl::Context> context;
+    std::unique_ptr<gl::Context> context;
 
     friend class BackendScope;
 };

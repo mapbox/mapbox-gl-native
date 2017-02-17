@@ -1,5 +1,7 @@
 #include <mbgl/gl/headless_backend.hpp>
 #include <mbgl/gl/headless_display.hpp>
+#include <mbgl/gl/context.hpp>
+#include <mbgl/map/backend_scope.hpp>
 
 #include <cassert>
 #include <stdexcept>
@@ -15,6 +17,8 @@ HeadlessBackend::HeadlessBackend(std::shared_ptr<HeadlessDisplay> display_)
 }
 
 HeadlessBackend::~HeadlessBackend() {
+    BackendScope scope(*this);
+    context.reset();
 }
 
 void HeadlessBackend::activate() {
