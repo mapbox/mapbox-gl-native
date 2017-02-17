@@ -365,41 +365,6 @@ private: // Private utilities for converting from mgl to mbgl values
         return sourceFunction;
     }
 
-    mbgl::style::SourceFunction<MBGLType> toMBGLExponentialSourceFunction(MGLSourceStyleFunction<ObjCType> *sourceStyleFunction) {
-        __block std::map<float, MBGLType> stops = {};
-        [sourceStyleFunction.stops enumerateKeysAndObjectsUsingBlock:^(NSNumber * _Nonnull zoomKey, MGLStyleValue<ObjCType> * _Nonnull stopValue, BOOL * _Nonnull stop) {
-            NSCAssert([stopValue isKindOfClass:[MGLStyleValue class]], @"Stops should be MGLStyleValues");
-            auto mbglStopValue = toPropertyValue(stopValue);
-            NSCAssert(mbglStopValue.isConstant(), @"Stops must be constant");
-            stops[zoomKey.floatValue] = mbglStopValue.asConstant();
-        }];
-        mbgl::style::ExponentialStops<MBGLType> exponentialStops = {stops, (float)sourceStyleFunction.interpolationBase};
-        mbgl::style::SourceFunction<MBGLType> sourceFunction = {sourceStyleFunction.attributeName.UTF8String, exponentialStops};
-        setDefaultMBGLValue(sourceStyleFunction, sourceFunction);
-        return sourceFunction;
-    }
-
-    mbgl::style::SourceFunction<MBGLType> toMBGLIntervalSourceFunction(MGLSourceStyleFunction<ObjCType> *sourceStyleFunction) {
-        __block std::map<float, MBGLType> stops = {};
-        [sourceStyleFunction.stops enumerateKeysAndObjectsUsingBlock:^(NSNumber * _Nonnull zoomKey, MGLStyleValue<ObjCType> * _Nonnull stopValue, BOOL * _Nonnull stop) {
-            NSCAssert([stopValue isKindOfClass:[MGLStyleValue class]], @"Stops should be MGLStyleValues");
-            auto mbglStopValue = toPropertyValue(stopValue);
-            NSCAssert(mbglStopValue.isConstant(), @"Stops must be constant");
-            stops[zoomKey.floatValue] = mbglStopValue.asConstant();
-        }];
-        mbgl::style::IntervalStops<MBGLType> intervalStops = {stops};
-        mbgl::style::SourceFunction<MBGLType> sourceFunction = {sourceStyleFunction.attributeName.UTF8String, intervalStops};
-        setDefaultMBGLValue(sourceStyleFunction, sourceFunction);
-        return sourceFunction;
-    }
-
-    mbgl::style::SourceFunction<MBGLType> toMBGLIdentitySourceFunction(MGLSourceStyleFunction<ObjCType> *sourceStyleFunction) {
-        mbgl::style::IdentityStops<MBGLType> identityStops;
-        mbgl::style::SourceFunction<MBGLType> sourceFunction = {sourceStyleFunction.attributeName.UTF8String, identityStops};
-        setDefaultMBGLValue(sourceStyleFunction, sourceFunction);
-        return sourceFunction;
-    }
-
     void setDefaultMBGLValue(MGLSourceStyleFunction<ObjCType> *sourceStyleFunction, mbgl::style::SourceFunction<MBGLType> &sourceFunction) {
         if (sourceStyleFunction.defaultValue) {
             NSCAssert([sourceStyleFunction.defaultValue isKindOfClass:[MGLStyleConstantValue class]], @"Default value must be constant");
