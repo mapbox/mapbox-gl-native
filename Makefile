@@ -472,6 +472,20 @@ MBGL_ANDROID_DALVIKVM = dalvikvm$(if $(filter arm-v8-21 x86-64-21,$1),64,32)
 MBGL_ANDROID_APK_SUFFIX = $(if $(filter Release,$(BUILDTYPE)),release-unsigned,debug)
 MBGL_ANDROID_CORE_TEST_DIR = build/android-$1/$(BUILDTYPE)/core-tests
 
+.PHONY: android-help
+android-help:
+	@echo
+	@echo "Available Android architecture targets:"
+	@echo
+	@echo "    make android-arm-v5-9 (android-arm-v5)"
+	@echo "    make android-arm-v7-9 (android, android-arm-v7)"
+	@echo "    make android-arm-v8-21 (android-arm-v8)"
+	@echo "    make android-mips-9 (android-mips)"
+	@echo "    make android-mips-64-21 (android-mips-64)"
+	@echo "    make android-x86-9 (android-x86)"
+	@echo "    make android-x86-64-21 (android-x86-64)"
+	@echo
+
 .PHONY: android-style-code
 android-style-code:
 	node platform/android/scripts/generate-style-code.js
