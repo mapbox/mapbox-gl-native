@@ -45,6 +45,8 @@ macro(mbgl_platform_core)
         PRIVATE platform/default/default_file_source.cpp
         PRIVATE platform/default/local_file_source.cpp
         PRIVATE platform/default/online_file_source.cpp
+        PRIVATE platform/android/src/default_file_source.cpp
+        PRIVATE platform/android/src/default_file_source.hpp
 
         # Offline
         # PRIVATE include/mbgl/storage/offline.hpp

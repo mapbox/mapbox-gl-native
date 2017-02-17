@@ -32,13 +32,6 @@ public class OfflineManager {
   // Default database name
   private static final String DATABASE_NAME = "mbgl-offline.db";
 
-  /*
-   * The maximumCacheSize parameter is a limit applied to non-offline resources only,
-   * i.e. resources added to the database for the "ambient use" caching functionality.
-   * There is no size limit for offline resources.
-   */
-  private static final long DEFAULT_MAX_CACHE_SIZE = 50 * 1024 * 1024;
-
   // Holds the pointer to JNI DefaultFileSource
   private long mDefaultFileSourcePtr = 0;
 
@@ -93,9 +86,9 @@ public class OfflineManager {
    */
   private OfflineManager(Context context) {
     // Get a pointer to the DefaultFileSource instance
-    String assetRoot = getDatabasePath(context);
-    String cachePath = assetRoot + File.separator + DATABASE_NAME;
-    mDefaultFileSourcePtr = createDefaultFileSource(cachePath, assetRoot, DEFAULT_MAX_CACHE_SIZE);
+    String cachePath = getDatabasePath(context) + File.separator + DATABASE_NAME;
+    String apkPath = context.getPackageCodePath();
+    mDefaultFileSourcePtr = sharedDefaultFileSource(cachePath, apkPath);
     setAccessToken(mDefaultFileSourcePtr, Mapbox.getAccessToken());
 
     // Delete any existing previous ambient cache database
@@ -284,8 +277,8 @@ public class OfflineManager {
   /*
    * Native methods
    */
-  private native long createDefaultFileSource(
-    String cachePath, String assetRoot, long maximumCacheSize);
+  private native long sharedDefaultFileSource(
+    String cachePath, String assetRoot);
 
   private native void setAccessToken(long defaultFileSourcePtr, String accessToken);
 
