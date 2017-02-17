@@ -1270,14 +1270,13 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
             }
             else if ([layer.text isKindOfClass:[MGLCameraStyleFunction class]]) {
                 MGLCameraStyleFunction *function = (MGLCameraStyleFunction<NSString *> *)layer.text;
-                [function.stops enumerateKeysAndObjectsUsingBlock:^(id zoomLevel, id stop, BOOL *done) {
-                    if ([stop isKindOfClass:[MGLStyleConstantValue class]]) {
-                        MGLStyleConstantValue *label = (MGLStyleConstantValue<NSString *> *)stop;
-                        if ([label.rawValue hasPrefix:@"{name"]) {
-                            [function.stops setValue:[MGLStyleValue valueWithRawValue:language] forKey:zoomLevel];
-                        }
+                NSMutableDictionary *stops = function.stops.mutableCopy;
+                [stops enumerateKeysAndObjectsUsingBlock:^(NSNumber *zoomLevel, MGLStyleConstantValue<NSString *> *stop, BOOL *done) {
+                    if ([stop.rawValue hasPrefix:@"{name"]) {
+                        stops[zoomLevel] = [MGLStyleValue<NSString *> valueWithRawValue:language];
                     }
                 }];
+                function.stops = stops;
                 layer.text = function;
             }
         } else {
