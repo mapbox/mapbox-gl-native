@@ -488,7 +488,14 @@ void nativeMoveBy(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jdoubl
                           jlong duration) {
     assert(nativeMapViewPtr != 0);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    nativeMapView->getMap().moveBy({dx, dy}, mbgl::Milliseconds(duration));
+
+    mbgl::AnimationOptions animationOptions;
+    if (duration > 0) {
+       animationOptions.duration.emplace(mbgl::Milliseconds(duration));
+       animationOptions.easing.emplace(mbgl::util::UnitBezier { 0, 0.3, 0.6, 1.0 });
+    }
+
+    nativeMapView->getMap().moveBy({dx, dy}, animationOptions);
 }
 
 void nativeSetLatLng(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jdouble latitude, jdouble longitude, jlong duration) {

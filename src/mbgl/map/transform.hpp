@@ -44,7 +44,7 @@ public:
     /** Pans the map by the given amount.
         @param offset The distance to pan the map by, measured in pixels from
             top to bottom and from left to right. */
-    void moveBy(const ScreenCoordinate& offset, const Duration& = Duration::zero());
+    void moveBy(const ScreenCoordinate& offset, const AnimationOptions& = {});
     void setLatLng(const LatLng&, const Duration& = Duration::zero());
     void setLatLng(const LatLng&, optional<EdgeInsets>, const Duration& = Duration::zero());
     void setLatLng(const LatLng&, optional<ScreenCoordinate>, const Duration& = Duration::zero());
