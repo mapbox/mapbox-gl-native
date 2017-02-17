@@ -210,12 +210,12 @@ void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &anima
     double w1 = w0 / state.zoomScale(zoom - startZoom);
     /// Length of the flight path as projected onto the ground plane, measured
     /// in pixels from the world image origin at the initial scale.
+    double u1 = ::hypot((endPoint - startPoint).x, (endPoint - startPoint).y);
     //fix: if startpoint and endpoint are too close, we force the distance at 1 px
     //      otherwise r(x) could return inf
-    double deltaStartEndX = (endPoint - startPoint).x;
-    double deltaStartEndY = (endPoint - startPoint).y;
-    double u1 = ::hypot(deltaStartEndX < 1 ? 1:deltaStartEndX, deltaStartEndY < 1 ? 1:deltaStartEndY);
-
+    if(u1<0.5){
+        u1 = 0.5;
+    }
     /** ρ: The relative amount of zooming that takes place along the flight
         path. A high value maximizes zooming for an exaggerated animation, while
         a low value minimizes zooming for something closer to easeTo().
