@@ -4,6 +4,7 @@
 #include <mbgl/test/fixture_log_observer.hpp>
 
 #include <mbgl/map/map.hpp>
+#include <mbgl/map/backend_scope.hpp>
 #include <mbgl/gl/headless_backend.hpp>
 #include <mbgl/gl/offscreen_view.hpp>
 #include <mbgl/gl/context.hpp>
@@ -574,6 +575,7 @@ TEST(Map, TEST_DISABLED_ON_CI(ContinuousRendering)) {
             });
         }
 
+        BackendScope scope(backend);
         map.render(view);
     }};
 
