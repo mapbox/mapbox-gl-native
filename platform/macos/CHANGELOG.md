@@ -6,6 +6,7 @@
 * Improved the line wrapping behavior of point-placed labels written in Chinese, Japanese, and Yi. ([#6828](https://github.com/mapbox/mapbox-gl-native/pull/6828))
 * Fixed an issue where translucent point annotations along tile boundaries would be drawn darker than expected. ([#6832](https://github.com/mapbox/mapbox-gl-native/pull/6832))
 * Added a Simplified Chinese localization. ([#7316](https://github.com/mapbox/mapbox-gl-native/pull/7316), [#7503](https://github.com/mapbox/mapbox-gl-native/pull/7503))
+* `MGLOfflineStorage` instances now support a delegate conforming to `MGLOfflineStorageDelegate`, which allows altering URLs before they are requested from the internet. ([#8084](https://github.com/mapbox/mapbox-gl-native/pull/8084))
 
 ## 0.3.0
 
