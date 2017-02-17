@@ -96,7 +96,7 @@ private:
     size_t totalMemory = 0;
 
     // Ensure these are initialised last
-    std::unique_ptr<mbgl::DefaultFileSource> fileSource;
+    mbgl::DefaultFileSource& fileSource;
     mbgl::ThreadPool threadPool;
     std::unique_ptr<mbgl::Map> map;
     mbgl::EdgeInsets insets;

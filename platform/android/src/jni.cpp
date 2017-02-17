@@ -12,6 +12,7 @@
 #include "java_types.hpp"
 #include "native_map_view.hpp"
 #include "connectivity_listener.hpp"
+#include "default_file_source.hpp"
 #include "style/layers/layers.hpp"
 #include "style/sources/sources.hpp"
 
@@ -1233,12 +1234,9 @@ void nativeScheduleTakeSnapshot(JNIEnv *env, jni::jobject* obj, jlong nativeMapV
 
 // Offline calls begin
 
-jlong createDefaultFileSource(JNIEnv *env, jni::jobject* obj, jni::jstring* cachePath_, jni::jstring* assetRoot_, jlong maximumCacheSize) {
-    std::string cachePath = std_string_from_jstring(env, cachePath_);
-    std::string assetRoot = std_string_from_jstring(env, assetRoot_);
-    mbgl::DefaultFileSource *defaultFileSource = new mbgl::DefaultFileSource(cachePath, assetRoot, maximumCacheSize);
-    jlong defaultFileSourcePtr = reinterpret_cast<jlong>(defaultFileSource);
-    return defaultFileSourcePtr;
+jlong sharedDefaultFileSource(JNIEnv *env, jni::jobject* obj, jni::jstring* cachePath_, jni::jstring* assetRoot_) {
+    return reinterpret_cast<jlong>(&defaultFileSource(std_string_from_jstring(env, cachePath_),
+                                                      std_string_from_jstring(env, assetRoot_)));
 }
 
 void setAccessToken(JNIEnv *env, jni::jobject* obj, jlong defaultFileSourcePtr, jni::jstring* accessToken_) {
@@ -1915,7 +1913,7 @@ void registerNatives(JavaVM *vm) {
     offlineManagerClassPtrId = &jni::GetFieldID(env, offlineManagerClass, "mDefaultFileSourcePtr", "J");
 
     jni::RegisterNatives(env, offlineManagerClass,
-        MAKE_NATIVE_METHOD(createDefaultFileSource, "(Ljava/lang/String;Ljava/lang/String;J)J"),
+        MAKE_NATIVE_METHOD(sharedDefaultFileSource, "(Ljava/lang/String;Ljava/lang/String;)J"),
         MAKE_NATIVE_METHOD(setAccessToken, "(JLjava/lang/String;)V"),
         MAKE_NATIVE_METHOD(getAccessToken, "(J)Ljava/lang/String;"),
         MAKE_NATIVE_METHOD(listOfflineRegions, "(JLcom/mapbox/mapboxsdk/offline/OfflineManager$ListOfflineRegionsCallback;)V"),
