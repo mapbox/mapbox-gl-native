@@ -18,8 +18,6 @@ public:
     ~HeadlessBackend() override;
 
     void invalidate() override;
-    void activate() override;
-    void deactivate() override;
     void notifyMapChange(MapChange) override;
 
     void setMapChangeCallback(std::function<void(MapChange)>&& cb) { mapChangeCallback = std::move(cb); }
@@ -33,6 +31,9 @@ public:
 private:
     // Implementation specific functions
     static gl::glProc initializeExtension(const char*);
+
+    void activate() override;
+    void deactivate() override;
 
     bool hasContext() const { return bool(impl); }
     bool hasDisplay();

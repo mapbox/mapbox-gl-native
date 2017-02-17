@@ -8,16 +8,13 @@
 namespace mbgl {
 
 HeadlessBackend::HeadlessBackend() {
-    activate();
 }
 
 HeadlessBackend::HeadlessBackend(std::shared_ptr<HeadlessDisplay> display_)
         : display(std::move(display_)) {
-    activate();
 }
 
 HeadlessBackend::~HeadlessBackend() {
-    deactivate();
 }
 
 void HeadlessBackend::activate() {
