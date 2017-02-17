@@ -9,6 +9,7 @@
 #include <mbgl/util/size.hpp>
 #include <mbgl/annotation/annotation.hpp>
 #include <mbgl/style/transition_options.hpp>
+#include <mbgl/map/camera.hpp>
 
 #include <cstdint>
 #include <string>
@@ -86,7 +87,7 @@ public:
     void flyTo(const CameraOptions&, const AnimationOptions&);
 
     // Position
-    void moveBy(const ScreenCoordinate&, const Duration& = Duration::zero());
+    void moveBy(const ScreenCoordinate&, const AnimationOptions& = {});
     void setLatLng(const LatLng&, optional<ScreenCoordinate>, const Duration& = Duration::zero());
     void setLatLng(const LatLng&, optional<EdgeInsets>, const Duration& = Duration::zero());
     void setLatLng(const LatLng&, const Duration& = Duration::zero());
