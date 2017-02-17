@@ -33,7 +33,7 @@ typedef NSString *MGLStyleFunctionOption NS_STRING_ENUM;
 extern MGL_EXPORT const MGLStyleFunctionOption MGLStyleFunctionOptionInterpolationBase;
 
 /**
- An `MGLStyleConstantValue` object that specifies a default value that a style
+ An `MGLConstantStyleValue` object that specifies a default value that a style
  function can use when it can't otherwise determine a value.
 
  A default value can be used to set the value of a style layer property that
@@ -81,7 +81,7 @@ typedef NS_ENUM(NSUInteger, MGLInterpolationMode) {
  `MGLStyleValue` objects.
 
  The `MGLStyleValue` class itself represents a class cluster. Under the hood, a
- particular `MGLStyleValue` object may be either an `MGLStyleConstantValue` to
+ particular `MGLStyleValue` object may be either an `MGLConstantStyleValue` to
  represent a constant value or one of the concrete subclasses of 
  `MGLStyleFunction` to represent a value function. Do not initialize an 
  `MGLStyleValue` object directly; instead, use one of the class factory methods 
@@ -104,10 +104,10 @@ MGL_EXPORT
 #pragma mark Creating a Style Value
 
 /**
- Creates and returns an `MGLStyleConstantValue` object containing a raw value.
+ Creates and returns an `MGLConstantStyleValue` object containing a raw value.
 
  @param rawValue The constant value contained by the object.
- @return An `MGLStyleConstantValue` object containing `rawValue`, which is
+ @return An `MGLConstantStyleValue` object containing `rawValue`, which is
     treated as a constant value.
  */
 + (instancetype)valueWithRawValue:(T)rawValue;
@@ -181,24 +181,24 @@ MGL_EXPORT
 @end
 
 /**
- An `MGLStyleConstantValue` object is a generic container for a style attribute
+ An `MGLConstantStyleValue` object is a generic container for a style attribute
  value that remains constant as the zoom level changes. The layout and paint
  attribute properties of `MGLStyleLayer` objects can be set to
- `MGLStyleConstantValue` objects.
+ `MGLConstantStyleValue` objects.
 
- The `MGLStyleConstantValue` class takes a generic parameter `T` that indicates
+ The `MGLConstantStyleValue` class takes a generic parameter `T` that indicates
  the Foundation class being wrapped by this class.
  */
 MGL_EXPORT
-@interface MGLStyleConstantValue<T> : MGLStyleValue<T>
+@interface MGLConstantStyleValue<T> : MGLStyleValue<T>
 
 #pragma mark Creating a Style Constant Value
 
 /**
- Creates and returns an `MGLStyleConstantValue` object containing a raw value.
+ Creates and returns an `MGLConstantStyleValue` object containing a raw value.
 
  @param rawValue The constant value contained by the object.
- @return An `MGLStyleConstantValue` object containing `rawValue`, which is
+ @return An `MGLConstantStyleValue` object containing `rawValue`, which is
     treated as a constant value.
  */
 + (instancetype)valueWithRawValue:(T)rawValue;
@@ -208,10 +208,10 @@ MGL_EXPORT
 - (instancetype)init NS_UNAVAILABLE;
 
 /**
- Returns an `MGLStyleConstantValue` object containing a raw value.
+ Returns an `MGLConstantStyleValue` object containing a raw value.
 
  @param rawValue The value contained by the receiver.
- @return An `MGLStyleConstantValue` object containing `rawValue`.
+ @return An `MGLConstantStyleValue` object containing `rawValue`.
  */
 - (instancetype)initWithRawValue:(T)rawValue NS_DESIGNATED_INITIALIZER;
 

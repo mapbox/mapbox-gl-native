@@ -184,7 +184,7 @@ global.testGetterImplementation = function (property, layerType, isFunction) {
         if (isFunction) {
             return `XCTAssertEqualObjects(gLayer.${objCName(property)}, ${value});`;
         }
-        return `XCTAssert([gLayer.${objCName(property)} isKindOfClass:[MGLStyleConstantValue class]]);
+        return `XCTAssert([gLayer.${objCName(property)} isKindOfClass:[MGLConstantStyleValue class]]);
     XCTAssertEqualObjects(gLayer.${objCName(property)}, ${value});`;
     }
     return `XCTAssertEqualObjects(gLayer.${objCName(property)}, ${value});`;
@@ -281,7 +281,7 @@ global.propertyDoc = function (propertyName, property, layerType, kind) {
             doc += `\n\nThis attribute corresponds to the <a href="https://www.mapbox.com/mapbox-gl-style-spec/#${anchor}"><code>${property.original}</code></a> layout property in the Mapbox Style Specification.`;
         }
         doc += '\n\nYou can set this property to an instance of:\n\n' +
-            '* `MGLStyleConstantValue`\n';
+            '* `MGLConstantStyleValue`\n';
         if (property["property-function"]) {
             doc += '* `MGLCameraStyleFunction` with an interpolation mode of:\n' +
                 '  * `MGLInterpolationModeExponential`\n' +
