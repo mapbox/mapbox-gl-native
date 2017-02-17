@@ -224,6 +224,8 @@ MGL_EXPORT
 
 @end
 
+@compatibility_alias MGLStyleConstantValue MGLConstantStyleValue;
+
 /**
  An `MGLStyleFunction` is a is an abstract superclass for functions that are 
  defined by an `MGLCameraStyleFunction`, `MGLSourceStyleFunction`, or
