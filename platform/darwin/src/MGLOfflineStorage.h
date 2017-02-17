@@ -7,6 +7,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class MGLOfflinePack;
 @protocol MGLOfflineRegion;
+@protocol MGLOfflineStorageDelegate;
 
 /**
  Posted by the shared `MGLOfflineStorage` object when an `MGLOfflinePack`
@@ -132,6 +133,30 @@ typedef void (^MGLOfflinePackAdditionCompletionHandler)(MGLOfflinePack * _Nullab
 typedef void (^MGLOfflinePackRemovalCompletionHandler)(NSError * _Nullable error);
 
 /**
+ The type of resource that is requested.
+ */
+typedef NS_ENUM(NSUInteger, MGLResourceKind) {
+    /** Unknown type */
+    MGLResourceKindUnknown,
+    /** Style sheet JSON file */
+    MGLResourceKindStyle,
+    /** TileJSON file as specified in https://www.mapbox.com/mapbox-gl-js/style-spec/#root-sources */
+    MGLResourceKindSource,
+    /** A vector or raster tile as described in the style sheet at
+        https://www.mapbox.com/mapbox-gl-js/style-spec/#sources */
+    MGLResourceKindTile,
+    /** Signed distance field glyphs for text rendering. These are the URLs specified in the style
+        in https://www.mapbox.com/mapbox-gl-js/style-spec/#root-glyphs */
+    MGLResourceKindGlyphs,
+    /** Image part of a sprite sheet. It is constructed of the prefix in
+        https://www.mapbox.com/mapbox-gl-js/style-spec/#root-sprite and a PNG file extension. */
+    MGLResourceKindSpriteImage,
+    /** JSON part of a sprite sheet. It is constructed of the prefix in
+        https://www.mapbox.com/mapbox-gl-js/style-spec/#root-sprite and a JSON file extension. */
+    MGLResourceKindSpriteJSON,
+};
+
+/**
  MGLOfflineStorage implements a singleton (shared object) that manages offline
  packs. All of this class’s instance methods are asynchronous, reflecting the
  fact that offline resources are stored in a database. The shared object
@@ -144,6 +169,20 @@ MGL_EXPORT
  Returns the shared offline storage object.
  */
 + (instancetype)sharedOfflineStorage;
+
+#pragma mark - Accessing the Delegate
+
+/**
+ The receiver’s delegate.
+
+ An offline storage object sends messages to its delegate to allow it to
+ transform URLs before they are requested from the internet. This can be used
+ add or remove custom parameters, or reroute certain requests to other servers
+ or endpoints.
+ */
+@property(nonatomic, weak, nullable) IBOutlet id<MGLOfflineStorageDelegate> delegate;
+
+#pragma mark - Managing Offline Packs
 
 /**
  An array of all known offline packs, in the order in which they were created.
@@ -247,6 +286,27 @@ MGL_EXPORT
  as part of an offline pack or due to caching during normal use of `MGLMapView`.
  */
 @property (nonatomic, readonly) unsigned long long countOfBytesCompleted;
+
+@end
+
+/**
+ The `MGLOfflineStorageDelegate` protocol defines methods that a delegate of an
+ `MGLOfflineStorage` object can optionally implement to transform various types
+ of URLs before downloading them via the internet.
+ */
+@protocol MGLOfflineStorageDelegate <NSObject>
+
+/**
+ Sent whenever a URL needs to be transformed.
+
+ @param storage The storage object processing the download.
+ @param kind The kind of URL to be transformed.
+ @param url The original URL to be transformed.
+ @return A URL that will now be downloaded.
+ */
+- (NSURL *)offlineStorage:(MGLOfflineStorage *)storage
+     URLForResourceOfKind:(MGLResourceKind)kind
+                  withURL:(NSURL *)url;
 
 @end
 
