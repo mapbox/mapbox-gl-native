@@ -127,17 +127,21 @@ int main(int argc, char *argv[]) {
     // Load settings
     mbgl::Settings_JSON settings;
 
-    if (skipConfig) {
-        map.setLatLngZoom(mbgl::LatLng(latitude, longitude), zoom);
-        map.setBearing(bearing);
-        map.setPitch(pitch);
-        mbgl::Log::Info(mbgl::Event::General, "Location: %f/%f (z%.2f, %.2f deg)", latitude, longitude, zoom, bearing);
-    } else {
-        map.setLatLngZoom(mbgl::LatLng(settings.latitude, settings.longitude), settings.zoom);
-        map.setBearing(settings.bearing);
-        map.setPitch(settings.pitch);
-        map.setDebug(mbgl::MapDebugOptions(settings.debug));
-    }
+//    if (skipConfig) {
+//        map.setLatLngZoom(mbgl::LatLng(latitude, longitude), zoom);
+//        map.setBearing(bearing);
+//        map.setPitch(pitch);
+//        mbgl::Log::Info(mbgl::Event::General, "Location: %f/%f (z%.2f, %.2f deg)", latitude, longitude, zoom, bearing);
+//    } else {
+//        map.setLatLngZoom(mbgl::LatLng(settings.latitude, settings.longitude), settings.zoom);
+//        map.setBearing(settings.bearing);
+//        map.setPitch(settings.pitch);
+//        map.setDebug(mbgl::MapDebugOptions(settings.debug));
+//    }
+
+    map.setLatLngZoom(mbgl::LatLng(40.713, -73.999), 15.03);
+    map.setBearing(0.0);
+    map.setPitch(50.0);
 
     view->setChangeStyleCallback([&map] () {
         static uint8_t currentStyleIndex;
@@ -167,15 +171,18 @@ int main(int argc, char *argv[]) {
 
     // Load style
     if (style.empty()) {
-        const char *url = getenv("MAPBOX_STYLE_URL");
-        if (url == nullptr) {
-            mbgl::util::default_styles::DefaultStyle newStyle = mbgl::util::default_styles::orderedStyles[0];
-            style = newStyle.url;
-            view->setWindowTitle(newStyle.name);
-        } else {
-            style = url;
-            view->setWindowTitle(url);
-        }
+        style = "mapbox://styles/lbud/ciyoshhyf004r2rmqr8bd4g3h";
+        view->setWindowTitle("extrusions");
+//
+//        const char *url = getenv("MAPBOX_STYLE_URL");
+//        if (url == nullptr) {
+//            mbgl::util::default_styles::DefaultStyle newStyle = mbgl::util::default_styles::orderedStyles[0];
+//            style = newStyle.url;
+//            view->setWindowTitle(newStyle.name);
+//        } else {
+//            style = url;
+//            view->setWindowTitle(url);
+//        }
     }
 
     map.setStyleURL(style);
