@@ -322,7 +322,7 @@ void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &anima
 
 #pragma mark - Position
 
-void Transform::moveBy(const ScreenCoordinate& offset, const Duration& duration) {
+void Transform::moveBy(const ScreenCoordinate& offset, const AnimationOptions& animation) {
     ScreenCoordinate centerOffset = {
         offset.x,
         -offset.y,
@@ -331,7 +331,7 @@ void Transform::moveBy(const ScreenCoordinate& offset, const Duration& duration)
 
     CameraOptions camera;
     camera.center = state.screenCoordinateToLatLng(centerPoint);
-    easeTo(camera, duration);
+    easeTo(camera, animation);
 }
 
 void Transform::setLatLng(const LatLng& latLng, const Duration& duration) {
