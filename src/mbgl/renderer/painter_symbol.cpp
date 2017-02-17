@@ -33,7 +33,9 @@ void Painter::renderSymbol(PaintParameters& parameters,
     auto draw = [&] (auto& program,
                      auto&& uniformValues,
                      const auto& buffers,
-                     const SymbolPropertyValues& values_)
+                     const SymbolPropertyValues& values_,
+                     const auto& binders,
+                     const auto& paintPropertyValues)
     {
         // We clip symbols to their tile extent in still mode.
         const bool needsClipping = frame.mapMode == MapMode::Still;
@@ -52,14 +54,15 @@ void Painter::renderSymbol(PaintParameters& parameters,
             *buffers.vertexBuffer,
             *buffers.indexBuffer,
             buffers.segments,
-            bucket.paintPropertyBinders.at(layer.getID()),
-            layer.impl->paint.evaluated,
+            binders,
+            paintPropertyValues,
             state.getZoom()
         );
     };
 
     if (bucket.hasIconData()) {
         auto values = layer.impl->iconPropertyValues(layout);
+        auto paintPropertyValues = layer.impl->iconPaintProperties();
 
         SpriteAtlas& atlas = *layer.impl->spriteAtlas;
         const bool iconScaled = values.paintSize != 1.0f || frame.pixelRatio != atlas.getPixelRatio() || bucket.iconsNeedLinear;
@@ -69,24 +72,30 @@ void Painter::renderSymbol(PaintParameters& parameters,
         const Size texsize = atlas.getSize();
 
         if (bucket.sdfIcons) {
-            if (values.hasHalo()) {
+            if (values.hasHalo) {
                 draw(parameters.programs.symbolIconSDF,
-                     SymbolSDFProgram::haloUniformValues(values, texsize, pixelsToGLUnits, tile, state, frame.pixelRatio),
+                     SymbolSDFIconProgram::haloUniformValues(values, texsize, pixelsToGLUnits, tile, state),
                      bucket.icon,
-                     values);
+                     values,
+                     bucket.paintPropertyBinders.at(layer.getID()).first,
+                     paintPropertyValues);
             }
 
-            if (values.hasForeground()) {
+            if (values.hasFill) {
                 draw(parameters.programs.symbolIconSDF,
-                     SymbolSDFProgram::foregroundUniformValues(values, texsize, pixelsToGLUnits, tile, state, frame.pixelRatio),
+                     SymbolSDFIconProgram::foregroundUniformValues(values, texsize, pixelsToGLUnits, tile, state),
                      bucket.icon,
-                     values);
+                     values,
+                     bucket.paintPropertyBinders.at(layer.getID()).first,
+                     paintPropertyValues);
             }
         } else {
             draw(parameters.programs.symbolIcon,
                  SymbolIconProgram::uniformValues(values, texsize, pixelsToGLUnits, tile, state),
                  bucket.icon,
-                 values);
+                 values,
+                 bucket.paintPropertyBinders.at(layer.getID()).first,
+                 paintPropertyValues);
         }
     }
 
@@ -94,21 +103,26 @@ void Painter::renderSymbol(PaintParameters& parameters,
         glyphAtlas->bind(context, 0);
 
         auto values = layer.impl->textPropertyValues(layout);
+        auto paintPropertyValues = layer.impl->textPaintProperties();
 
         const Size texsize = glyphAtlas->getSize();
 
-        if (values.hasHalo()) {
+        if (values.hasHalo) {
             draw(parameters.programs.symbolGlyph,
-                 SymbolSDFProgram::haloUniformValues(values, texsize, pixelsToGLUnits, tile, state, frame.pixelRatio),
+                 SymbolSDFGlyphProgram::haloUniformValues(values, texsize, pixelsToGLUnits, tile, state),
                  bucket.text,
-                 values);
+                 values,
+                 bucket.paintPropertyBinders.at(layer.getID()).second,
+                 paintPropertyValues);
         }
 
-        if (values.hasForeground()) {
+        if (values.hasFill) {
             draw(parameters.programs.symbolGlyph,
-                 SymbolSDFProgram::foregroundUniformValues(values, texsize, pixelsToGLUnits, tile, state, frame.pixelRatio),
+                 SymbolSDFGlyphProgram::foregroundUniformValues(values, texsize, pixelsToGLUnits, tile, state),
                  bucket.text,
-                 values);
+                 values,
+                 bucket.paintPropertyBinders.at(layer.getID()).second,
+                 paintPropertyValues);
         }
     }
 

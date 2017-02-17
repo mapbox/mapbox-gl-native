@@ -87,7 +87,10 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
     }
 
     for (const auto& layer : layers) {
-        layerPaintProperties.emplace(layer->getID(), layer->as<SymbolLayer>()->impl->paint.evaluated);
+        layerPaintProperties.emplace(layer->getID(), std::make_pair(
+            layer->as<SymbolLayer>()->impl->iconPaintProperties(),
+            layer->as<SymbolLayer>()->impl->textPaintProperties()
+        ));
     }
 
     // Determine and load glyph ranges

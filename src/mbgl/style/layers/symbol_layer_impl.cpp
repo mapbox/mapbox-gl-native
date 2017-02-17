@@ -16,9 +16,14 @@ bool SymbolLayer::Impl::evaluate(const PropertyEvaluationParameters& parameters)
     // text-size and icon-size are layout properties but they also need to be evaluated as paint properties:
     iconSize = layout.evaluate<IconSize>(parameters);
     textSize = layout.evaluate<TextSize>(parameters);
-
-    passes = ((paint.evaluated.get<IconOpacity>() > 0 && (paint.evaluated.get<IconColor>().a > 0 || paint.evaluated.get<IconHaloColor>().a > 0) && iconSize > 0)
-           || (paint.evaluated.get<TextOpacity>() > 0 && (paint.evaluated.get<TextColor>().a > 0 || paint.evaluated.get<TextHaloColor>().a > 0) && textSize > 0))
+    
+    auto hasIconOpacity = paint.evaluated.get<IconColor>().constantOr(Color::black()).a > 0 ||
+        paint.evaluated.get<IconHaloColor>().constantOr(Color::black()).a > 0;
+    auto hasTextOpacity = paint.evaluated.get<TextColor>().constantOr(Color::black()).a > 0 ||
+        paint.evaluated.get<TextHaloColor>().constantOr(Color::black()).a > 0;
+    
+    passes = ((paint.evaluated.get<IconOpacity>().constantOr(1) > 0 && hasIconOpacity && iconSize > 0)
+           || (paint.evaluated.get<TextOpacity>().constantOr(1) > 0 && hasTextOpacity && textSize > 0))
         ? RenderPass::Translucent : RenderPass::None;
 
     return paint.hasTransition();
@@ -38,20 +43,43 @@ std::unique_ptr<SymbolLayout> SymbolLayer::Impl::createLayout(const BucketParame
                                           *spriteAtlas);
 }
 
-SymbolPropertyValues SymbolLayer::Impl::iconPropertyValues(const SymbolLayoutProperties::Evaluated& layout_) const {
-    return SymbolPropertyValues {
-        layout_.get<IconRotationAlignment>(), // icon-pitch-alignment is not yet implemented; inherit the rotation alignment
-        layout_.get<IconRotationAlignment>(),
-        layout_.get<IconSize>(),
+IconPaintProperties::Evaluated SymbolLayer::Impl::iconPaintProperties() const {
+    return IconPaintProperties::Evaluated {
         paint.evaluated.get<IconOpacity>(),
         paint.evaluated.get<IconColor>(),
         paint.evaluated.get<IconHaloColor>(),
         paint.evaluated.get<IconHaloWidth>(),
         paint.evaluated.get<IconHaloBlur>(),
         paint.evaluated.get<IconTranslate>(),
+        paint.evaluated.get<IconTranslateAnchor>()
+    };
+}
+
+TextPaintProperties::Evaluated SymbolLayer::Impl::textPaintProperties() const {
+    return TextPaintProperties::Evaluated {
+        paint.evaluated.get<TextOpacity>(),
+        paint.evaluated.get<TextColor>(),
+        paint.evaluated.get<TextHaloColor>(),
+        paint.evaluated.get<TextHaloWidth>(),
+        paint.evaluated.get<TextHaloBlur>(),
+        paint.evaluated.get<TextTranslate>(),
+        paint.evaluated.get<TextTranslateAnchor>()
+    };
+}
+
+
+SymbolPropertyValues SymbolLayer::Impl::iconPropertyValues(const SymbolLayoutProperties::Evaluated& layout_) const {
+    return SymbolPropertyValues {
+        layout_.get<IconRotationAlignment>(), // icon-pitch-alignment is not yet implemented; inherit the rotation alignment
+        layout_.get<IconRotationAlignment>(),
+        layout_.get<IconSize>(),
+        paint.evaluated.get<IconTranslate>(),
         paint.evaluated.get<IconTranslateAnchor>(),
         iconSize,
-        1.0f
+        1.0f,
+        paint.evaluated.get<IconHaloColor>().constantOr(Color::black()).a > 0 &&
+            paint.evaluated.get<IconHaloWidth>().constantOr(1),
+        paint.evaluated.get<IconColor>().constantOr(Color::black()).a > 0
     };
 }
 
@@ -60,15 +88,13 @@ SymbolPropertyValues SymbolLayer::Impl::textPropertyValues(const SymbolLayoutPro
         layout_.get<TextPitchAlignment>(),
         layout_.get<TextRotationAlignment>(),
         layout_.get<TextSize>(),
-        paint.evaluated.get<TextOpacity>(),
-        paint.evaluated.get<TextColor>(),
-        paint.evaluated.get<TextHaloColor>(),
-        paint.evaluated.get<TextHaloWidth>(),
-        paint.evaluated.get<TextHaloBlur>(),
         paint.evaluated.get<TextTranslate>(),
         paint.evaluated.get<TextTranslateAnchor>(),
         textSize,
-        24.0f
+        24.0f,
+        paint.evaluated.get<TextHaloColor>().constantOr(Color::black()).a > 0 &&
+            paint.evaluated.get<TextHaloWidth>().constantOr(1),
+        paint.evaluated.get<TextColor>().constantOr(Color::black()).a > 0
     };
 }
 

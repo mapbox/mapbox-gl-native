@@ -8,6 +8,7 @@
 #include <mbgl/util/geometry.hpp>
 #include <mbgl/util/size.hpp>
 #include <mbgl/style/layers/symbol_layer_properties.hpp>
+#include <mbgl/style/layers/symbol_layer_impl.hpp>
 
 #include <cmath>
 #include <array>
@@ -27,10 +28,10 @@ MBGL_DEFINE_UNIFORM_SCALAR(bool, u_rotate_with_map);
 MBGL_DEFINE_UNIFORM_SCALAR(bool, u_pitch_with_map);
 MBGL_DEFINE_UNIFORM_SCALAR(gl::TextureUnit, u_texture);
 MBGL_DEFINE_UNIFORM_SCALAR(gl::TextureUnit, u_fadetexture);
-MBGL_DEFINE_UNIFORM_SCALAR(float, u_buffer);
-MBGL_DEFINE_UNIFORM_SCALAR(float, u_gamma);
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_aspect_ratio);
 MBGL_DEFINE_UNIFORM_SCALAR(bool, u_is_halo);
+MBGL_DEFINE_UNIFORM_SCALAR(float, u_font_scale);
+MBGL_DEFINE_UNIFORM_SCALAR(float, u_gamma_scale);
 } // namespace uniforms
 
 struct SymbolLayoutAttributes : gl::Attributes<
@@ -76,14 +77,13 @@ class SymbolIconProgram : public Program<
     SymbolLayoutAttributes,
     gl::Uniforms<
         uniforms::u_matrix,
-        uniforms::u_opacity,
         uniforms::u_extrude_scale,
         uniforms::u_texsize,
         uniforms::u_zoom,
         uniforms::u_rotate_with_map,
         uniforms::u_texture,
         uniforms::u_fadetexture>,
-    style::SymbolPaintProperties>
+    style::IconPaintProperties>
 {
 public:
     using Program::Program;
@@ -95,27 +95,26 @@ public:
                                        const TransformState&);
 };
 
-class SymbolSDFProgram : public Program<
+class SymbolSDFIconProgram : public Program<
     shaders::symbol_sdf,
     gl::Triangle,
     SymbolLayoutAttributes,
     gl::Uniforms<
         uniforms::u_matrix,
-        uniforms::u_opacity,
         uniforms::u_extrude_scale,
         uniforms::u_texsize,
         uniforms::u_zoom,
         uniforms::u_rotate_with_map,
         uniforms::u_texture,
         uniforms::u_fadetexture,
-        uniforms::u_buffer,
-        uniforms::u_gamma,
+        uniforms::u_font_scale,
+        uniforms::u_gamma_scale,
         uniforms::u_pitch,
         uniforms::u_bearing,
         uniforms::u_aspect_ratio,
         uniforms::u_pitch_with_map,
         uniforms::u_is_halo>,
-    style::SymbolPaintProperties>
+    style::IconPaintProperties>
 {
 public:
     using Program::Program;
@@ -124,18 +123,54 @@ public:
                                            const Size& texsize,
                                            const std::array<float, 2>& pixelsToGLUnits,
                                            const RenderTile&,
-                                           const TransformState&,
-                                           float pixelRatio);
+                                           const TransformState&);
 
     static UniformValues foregroundUniformValues(const style::SymbolPropertyValues&,
                                                  const Size& texsize,
                                                  const std::array<float, 2>& pixelsToGLUnits,
                                                  const RenderTile&,
-                                                 const TransformState&,
-                                                 float pixelRatio);
+                                                 const TransformState&);
+};
+
+class SymbolSDFGlyphProgram : public Program<
+    shaders::symbol_sdf,
+    gl::Triangle,
+    SymbolLayoutAttributes,
+    gl::Uniforms<
+        uniforms::u_matrix,
+        uniforms::u_extrude_scale,
+        uniforms::u_texsize,
+        uniforms::u_zoom,
+        uniforms::u_rotate_with_map,
+        uniforms::u_texture,
+        uniforms::u_fadetexture,
+        uniforms::u_font_scale,
+        uniforms::u_gamma_scale,
+        uniforms::u_pitch,
+        uniforms::u_bearing,
+        uniforms::u_aspect_ratio,
+        uniforms::u_pitch_with_map,
+        uniforms::u_is_halo>,
+    style::TextPaintProperties>
+{
+public:
+    using Program::Program;
+
+    static UniformValues haloUniformValues(const style::SymbolPropertyValues&,
+                                           const Size& texsize,
+                                           const std::array<float, 2>& pixelsToGLUnits,
+                                           const RenderTile&,
+                                           const TransformState&);
+
+    static UniformValues foregroundUniformValues(const style::SymbolPropertyValues&,
+                                                 const Size& texsize,
+                                                 const std::array<float, 2>& pixelsToGLUnits,
+                                                 const RenderTile&,
+                                                 const TransformState&);
 };
 
 using SymbolLayoutVertex = SymbolLayoutAttributes::Vertex;
-using SymbolAttributes = SymbolIconProgram::Attributes;
+using SymbolIconAttributes = SymbolIconProgram::Attributes;
+using SymbolGlyphAttributes = SymbolSDFGlyphProgram::Attributes;
 
 } // namespace mbgl

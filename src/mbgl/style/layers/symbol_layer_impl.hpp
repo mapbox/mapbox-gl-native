@@ -1,5 +1,6 @@
 #pragma once
 
+#include <mbgl/util/variant.hpp>
 #include <mbgl/style/layer_impl.hpp>
 #include <mbgl/style/layers/symbol_layer.hpp>
 #include <mbgl/style/layers/symbol_layer_properties.hpp>
@@ -10,6 +11,30 @@ class SpriteAtlas;
 class SymbolLayout;
 
 namespace style {
+    
+
+// {icon,text}-specific paint-property packs for use in the symbol Programs.
+// Since each program deals either with icons or text, using a smaller property set
+// lets us avoid unnecessarily binding attributes for properties the program wouldn't use.
+class IconPaintProperties : public PaintProperties<
+    IconOpacity,
+    IconColor,
+    IconHaloColor,
+    IconHaloWidth,
+    IconHaloBlur,
+    IconTranslate,
+    IconTranslateAnchor
+> {};
+    
+class TextPaintProperties : public PaintProperties<
+    TextOpacity,
+    TextColor,
+    TextHaloColor,
+    TextHaloWidth,
+    TextHaloBlur,
+    TextTranslate,
+    TextTranslateAnchor
+> {};
 
 // Repackaging evaluated values from SymbolLayoutProperties + SymbolPaintProperties
 // for genericity over icons vs. text.
@@ -21,24 +46,14 @@ public:
     float layoutSize;
 
     // Paint
-    float opacity;
-    Color color;
-    Color haloColor;
-    float haloWidth;
-    float haloBlur;
     std::array<float, 2> translate;
     TranslateAnchorType translateAnchor;
     float paintSize;
 
     float sdfScale;   // Constant (1.0 or 24.0)
-
-    bool hasHalo() const {
-        return haloColor.a > 0.0f && haloWidth > 0.0f;
-    }
-
-    bool hasForeground() const {
-        return color.a > 0.0f;
-    }
+    
+    bool hasHalo;
+    bool hasFill;    
 };
 
 class SymbolLayer::Impl : public Layer::Impl {
@@ -54,6 +69,9 @@ public:
     std::unique_ptr<SymbolLayout> createLayout(const BucketParameters&, const std::vector<const Layer*>&,
                                                const GeometryTileLayer&) const;
 
+    IconPaintProperties::Evaluated iconPaintProperties() const;
+    TextPaintProperties::Evaluated textPaintProperties() const;
+    
     SymbolPropertyValues iconPropertyValues(const SymbolLayoutProperties::Evaluated&) const;
     SymbolPropertyValues textPropertyValues(const SymbolLayoutProperties::Evaluated&) const;
 

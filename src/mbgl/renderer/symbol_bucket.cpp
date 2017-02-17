@@ -9,7 +9,8 @@ namespace mbgl {
 using namespace style;
 
 SymbolBucket::SymbolBucket(style::SymbolLayoutProperties::Evaluated layout_,
-                           const std::unordered_map<std::string, style::SymbolPaintProperties::Evaluated>& layerPaintProperties,
+                           const std::unordered_map<std::string, std::pair<
+                               style::IconPaintProperties::Evaluated, style::TextPaintProperties::Evaluated>>& layerPaintProperties,
                            float zoom,
                            bool sdfIcons_,
                            bool iconsNeedLinear_)
@@ -17,8 +18,10 @@ SymbolBucket::SymbolBucket(style::SymbolLayoutProperties::Evaluated layout_,
       sdfIcons(sdfIcons_),
       iconsNeedLinear(iconsNeedLinear_) {
     for (const auto& pair : layerPaintProperties) {
-        paintPropertyBinders.emplace(pair.first,
-            SymbolIconProgram::PaintPropertyBinders(pair.second, zoom));
+        paintPropertyBinders.emplace(pair.first, std::make_pair(
+            SymbolIconProgram::PaintPropertyBinders(pair.second.first, zoom),
+            SymbolSDFGlyphProgram::PaintPropertyBinders(pair.second.second, zoom)
+        ));
     }
 }
 
@@ -39,7 +42,8 @@ void SymbolBucket::upload(gl::Context& context) {
     }
 
     for (auto& pair : paintPropertyBinders) {
-        pair.second.upload(context);
+        pair.second.first.upload(context);
+        pair.second.second.upload(context);
     }
 
     uploaded = true;
