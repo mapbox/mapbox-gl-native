@@ -33,8 +33,6 @@
 
 #include <mbgl/util/offscreen_texture.hpp>
 
-#include <mbgl/util/stopwatch.hpp>
-
 #include <cassert>
 #include <algorithm>
 #include <iostream>
@@ -79,25 +77,16 @@ static gl::VertexVector<RasterLayoutVertex> rasterVertices() {
     return result;
 }
 
-static gl::VertexVector<ExtrusionTextureLayoutVertex>
-extrusionTextureVertices(const TransformState& state) {
+static gl::VertexVector<ExtrusionTextureLayoutVertex> extrusionTextureVertices(const TransformState& state) {
     gl::VertexVector<ExtrusionTextureLayoutVertex> result;
     result.emplace_back(ExtrusionTextureProgram::layoutVertex({ 0, 0 }));
-    result.emplace_back(
-        ExtrusionTextureProgram::layoutVertex({ static_cast<int16_t>(state.getSize().width), 0 }));
-    result.emplace_back(
-        ExtrusionTextureProgram::layoutVertex({ 0, static_cast<int16_t>(state.getSize().height) }));
-    result.emplace_back(
-        ExtrusionTextureProgram::layoutVertex({ static_cast<int16_t>(state.getSize().width),
-                                                static_cast<short>(state.getSize().height) }));
+    result.emplace_back(ExtrusionTextureProgram::layoutVertex({ static_cast<int16_t>(state.getSize().width), 0 }));
+    result.emplace_back(ExtrusionTextureProgram::layoutVertex({ 0, static_cast<int16_t>(state.getSize().height) }));
+    result.emplace_back(ExtrusionTextureProgram::layoutVertex({ static_cast<int16_t>(state.getSize().width), static_cast<short>(state.getSize().height) }));
     return result;
 }
 
-
-Painter::Painter(gl::Context& context_,
-                 const TransformState& state_,
-                 float pixelRatio,
-                 const std::string& programCacheDir)
+Painter::Painter(gl::Context& context_, const TransformState& state_, float pixelRatio)
     : context(context_),
       state(state_),
       tileVertexBuffer(context.createVertexBuffer(tileVertices())),
@@ -111,11 +100,14 @@ Painter::Painter(gl::Context& context_,
     rasterSegments.emplace_back(0, 0, 4, 6);
     extrusionTextureSegments.emplace_back(0, 0, 4, 6); // TODO i have no idea what these numbers are
 
-    programs = std::make_unique<Programs>(context,
-                                          ProgramParameters{ pixelRatio, false, programCacheDir });
+    gl::debugging::enable();
+
+    ProgramParameters programParameters{ pixelRatio, false };
+    programs = std::make_unique<Programs>(context, programParameters);
 #ifndef NDEBUG
-    overdrawPrograms =
-        std::make_unique<Programs>(context, ProgramParameters{ pixelRatio, true, programCacheDir });
+
+    ProgramParameters programParametersOverdraw{ pixelRatio, true };
+    overdrawPrograms = std::make_unique<Programs>(context, programParametersOverdraw);
 #endif
 }
 
@@ -167,7 +159,7 @@ void Painter::render(const Style& style, const FrameData& frame_, View& view, Sp
     // - UPLOAD PASS -------------------------------------------------------------------------------
     // Uploads all required buffers and images before we do any actual rendering.
     {
-        MBGL_DEBUG_GROUP(context, "upload");
+        MBGL_DEBUG_GROUP("upload");
 
         spriteAtlas->upload(context, 0);
 
@@ -190,7 +182,7 @@ void Painter::render(const Style& style, const FrameData& frame_, View& view, Sp
     // Renders the backdrop of the OpenGL view. This also paints in areas where we don't have any
     // tiles whatsoever.
     {
-        MBGL_DEBUG_GROUP(context, "clear");
+        MBGL_DEBUG_GROUP("clear");
         view.bind();
         context.clear(paintMode() == PaintMode::Overdraw
                         ? Color::black()
@@ -202,7 +194,7 @@ void Painter::render(const Style& style, const FrameData& frame_, View& view, Sp
     // - CLIPPING MASKS ----------------------------------------------------------------------------
     // Draws the clipping masks to the stencil buffer.
     {
-        MBGL_DEBUG_GROUP(context, "clip");
+        MBGL_DEBUG_GROUP("clip");
 
         // Update all clipping IDs.
         algorithm::ClipIDGenerator generator;
@@ -210,10 +202,10 @@ void Painter::render(const Style& style, const FrameData& frame_, View& view, Sp
             source->baseImpl->startRender(generator, projMatrix, state);
         }
 
-        MBGL_DEBUG_GROUP(context, "clipping masks");
+        MBGL_DEBUG_GROUP("clipping masks");
 
         for (const auto& stencil : generator.getStencils()) {
-            MBGL_DEBUG_GROUP(context, std::string{ "mask: " } + util::toString(stencil.first));
+            MBGL_DEBUG_GROUP(std::string{ "mask: " } + util::toString(stencil.first));
             renderClippingMask(stencil.first, stencil.second);
         }
     }
@@ -251,7 +243,7 @@ void Painter::render(const Style& style, const FrameData& frame_, View& view, Sp
     // - DEBUG PASS --------------------------------------------------------------------------------
     // Renders debug overlays.
     {
-        MBGL_DEBUG_GROUP(context, "debug");
+        MBGL_DEBUG_GROUP("debug");
 
         // Finalize the rendering, e.g. by calling debug render calls per tile.
         // This guarantees that we have at least one function per tile called.
@@ -271,7 +263,7 @@ void Painter::render(const Style& style, const FrameData& frame_, View& view, Sp
     // TODO: Find a better way to unbind VAOs after we're done with them without introducing
     // unnecessary bind(0)/bind(N) sequences.
     {
-        MBGL_DEBUG_GROUP(context, "cleanup");
+        MBGL_DEBUG_GROUP("cleanup");
 
         context.activeTexture = 1;
         context.texture[1] = 0;
@@ -289,7 +281,7 @@ void Painter::renderPass(PaintParameters& parameters,
                          uint32_t i, int8_t increment) {
     pass = pass_;
 
-    MBGL_DEBUG_GROUP(context, pass == RenderPass::Opaque ? "opaque" : "translucent");
+    MBGL_DEBUG_GROUP(pass == RenderPass::Opaque ? "opaque" : "translucent");
 
     if (debug::renderTree) {
         Log::Info(Event::Render, "%*s%s {", indent++ * 4, "",
@@ -317,10 +309,10 @@ void Painter::renderPass(PaintParameters& parameters,
         };
 
         if (layer.is<BackgroundLayer>()) {
-            MBGL_DEBUG_GROUP(context, "background");
+            MBGL_DEBUG_GROUP("background");
             renderBackground(parameters, *layer.as<BackgroundLayer>());
         } else if (layer.is<CustomLayer>()) {
-            MBGL_DEBUG_GROUP(context, layer.baseImpl->id + " - custom");
+            MBGL_DEBUG_GROUP(layer.baseImpl->id + " - custom");
 
             // Reset GL state to a known state so the CustomLayer always has a clean slate.
             context.vertexArrayObject = 0;
@@ -335,45 +327,44 @@ void Painter::renderPass(PaintParameters& parameters,
             parameters.view.bind();
             context.setDirtyState();
         } else if (layer.is<FillExtrusionLayer>()) {
-            const auto size = state.getSize();
+            const auto _size = state.getSize();
 //            const auto size = Size{ _size.width - (_size.width % 4), _size.height - (_size.height % 4) };
-
-            OffscreenTexture texture(context, size);
-            texture.bindRenderbuffers();
-
-            context.setStencilMode(gl::StencilMode::disabled());
-            context.setDepthMode(depthModeForSublayer(0, gl::DepthMode::ReadWrite));
-
-            context.clear(Color{ 0.0f, 0.0f, 0.0f, 0.0f }, 1.0f, {});
+//
+//            OffscreenTexture texture(context, size);
+//            texture.bindRenderbuffers();
+//
+//            context.setStencilMode(gl::StencilMode::disabled());
+//            context.setDepthMode(depthModeForSublayer(0, gl::DepthMode::ReadWrite));
+//            context.clear(Color{ 0.0f, 0.0f, 0.0f, 0.0f }, 1.0f, {});
 
             renderTiles();
 
-            parameters.view.bind();
+//            parameters.view.bind();
 
-            mat4 mat;
-            matrix::ortho(mat, 0, size.width, size.height, 0, 0, 1);
+//            context.bindFramebuffer = 0;
 
-            const FillExtrusionPaintProperties::Evaluated properties{};
-
-
-
-            parameters.programs.extrusionTexture.draw(context,
-                                                      gl::Triangles(),
-                                                      gl::DepthMode::disabled(),
-                                                      gl::StencilMode::disabled(),
-                                                      colorModeForRenderPass(),
-                                                      ExtrusionTextureProgram::UniformValues{
-                                                          uniforms::u_matrix::Value{ mat },
-                                                          uniforms::u_world::Value{ size },
-                                                          uniforms::u_image::Value{ 0 }, // view.getTexture() ? no — but follow up on whether could be variable or if it's always safe to attach to 0 unit
-                                                          uniforms::u_opacity::Value{ 0.9 } // TODO implement parsing from style
-                                                      },
-                                                      extrusionTextureVertexBuffer,
-                                                      tileTriangleIndexBuffer, // we reuse the same simple index buffer
-                                                      extrusionTextureSegments,
-                                                      ExtrusionTextureProgram::PaintPropertyBinders{ properties, 0 },
-                                                      FillExtrusionPaintProperties::Evaluated{},
-                                                      state.getZoom());
+//            mat4 mat;
+//            matrix::ortho(mat, 0, size.width, size.height, 0, 0, 1);
+//
+//            const FillExtrusionPaintProperties::Evaluated properties{};
+//
+//            parameters.programs.extrusionTexture.draw(context,
+//                                                      gl::Triangles(),
+//                                                      gl::DepthMode::disabled(),
+//                                                      gl::StencilMode::disabled(),
+//                                                      colorModeForRenderPass(),
+//                                                      ExtrusionTextureProgram::UniformValues{
+//                                                          uniforms::u_matrix::Value{ mat },
+//                                                          uniforms::u_world::Value{ size },
+//                                                          uniforms::u_image::Value{ 0 }, // view.getTexture() ? no — but follow up on whether this is variable
+//                                                          uniforms::u_opacity::Value{ 0.9 } // TODO
+//                                                      },
+//                                                      extrusionTextureVertexBuffer,
+//                                                      tileTriangleIndexBuffer, // we reuse the same simple index buffer
+//                                                      extrusionTextureSegments,
+//                                                      ExtrusionTextureProgram::PaintPropertyBinders{ properties, 0 },
+//                                                      FillExtrusionPaintProperties::Evaluated{},
+//                                                      state.getZoom());
 
         } else {
             renderTiles();

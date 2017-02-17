@@ -198,8 +198,14 @@ set(MBGL_CORE_FILES
     src/mbgl/shaders/collision_box.hpp
     src/mbgl/shaders/debug.cpp
     src/mbgl/shaders/debug.hpp
+    src/mbgl/shaders/extrusion_texture.cpp
+    src/mbgl/shaders/extrusion_texture.hpp
     src/mbgl/shaders/fill.cpp
     src/mbgl/shaders/fill.hpp
+    src/mbgl/shaders/fill_extrusion.cpp
+    src/mbgl/shaders/fill_extrusion.hpp
+    src/mbgl/shaders/fill_extrusion_pattern.cpp
+    src/mbgl/shaders/fill_extrusion_pattern.hpp
     src/mbgl/shaders/fill_outline.cpp
     src/mbgl/shaders/fill_outline.hpp
     src/mbgl/shaders/fill_outline_pattern.cpp
