@@ -27,7 +27,7 @@ import timber.log.Timber;
 public class Function<I, O> {
 
   static final String PROPERTY_KEY = "property";
-  static final String DEFAULT_VALUE_KEY = "defaultValue";
+  static final String DEFAULT_VALUE_KEY = "default";
 
   /**
    * Create an exponential {@link CameraFunction}
