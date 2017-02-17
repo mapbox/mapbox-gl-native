@@ -122,17 +122,17 @@ UniqueTexture Context::createTexture() {
     return UniqueTexture{ std::move(id), { this } };
 }
 
+bool Context::supportsVertexArrays() const {
+    return gl::GenVertexArrays &&
+           gl::BindVertexArray &&
+           gl::DeleteVertexArrays &&
+           !disableVAOExtension;
+}
+
 UniqueVertexArray Context::createVertexArray() {
+    assert(supportsVertexArrays());
     VertexArrayID id = 0;
-    if (gl::GenVertexArrays && !disableVAOExtension) {
-        MBGL_CHECK_ERROR(gl::GenVertexArrays(1, &id));
-    } else {
-        static bool reported = false;
-        if (!reported) {
-            Log::Warning(Event::OpenGL, "Not using Vertex Array Objects");
-            reported = true;
-        }
-    }
+    MBGL_CHECK_ERROR(gl::GenVertexArrays(1, &id));
     return UniqueVertexArray(std::move(id), { this });
 }
 
@@ -529,6 +529,7 @@ void Context::performCleanup() {
     }
 
     if (!abandonedVertexArrays.empty()) {
+        assert(supportsVertexArrays());
         for (const auto id : abandonedVertexArrays) {
             if (vertexArrayObject == id) {
                 vertexArrayObject.setDirty();

@@ -39,6 +39,8 @@ public:
     UniqueProgram createProgram(ShaderID vertexShader, ShaderID fragmentShader);
     void linkProgram(ProgramID);
     UniqueTexture createTexture();
+
+    bool supportsVertexArrays() const;
     UniqueVertexArray createVertexArray();
 
     template <class Vertex, class DrawMode>
