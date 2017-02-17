@@ -3,6 +3,7 @@
 #include <mbgl/gl/context.hpp>
 #include <mbgl/gl/vertex_buffer.hpp>
 #include <mbgl/util/optional.hpp>
+#include <mbgl/util/logging.hpp>
 
 #include <cstddef>
 #include <vector>
@@ -32,12 +33,11 @@ public:
               BufferID indexBuffer_,
               const typename Attributes::Locations& attributeLocations,
               const typename Attributes::Bindings& attributeBindings_) const {
-        if (!vao) {
-            vao = context.createVertexArray();
-            context.vertexBuffer.setDirty();
-        }
-
-        if (*vao) {
+        if (context.supportsVertexArrays()) {
+            if (!vao) {
+                vao = context.createVertexArray();
+                context.vertexBuffer.setDirty();
+            }
             context.vertexArrayObject = *vao;
             if (indexBuffer != indexBuffer_) {
                 indexBuffer = indexBuffer_;
@@ -46,6 +46,11 @@ public:
             }
         } else {
             // No VAO support. Force attributes to be rebound.
+            static bool reported = false;
+            if (!reported) {
+                Log::Warning(Event::OpenGL, "Not using Vertex Array Objects");
+                reported = true;
+            }
             context.elementBuffer = indexBuffer_;
             variableBindings = {};
         }
