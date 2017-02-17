@@ -18,7 +18,6 @@ HeadlessBackend::HeadlessBackend(std::shared_ptr<HeadlessDisplay> display_)
 
 HeadlessBackend::~HeadlessBackend() {
     deactivate();
-    destroyContext();
 }
 
 void HeadlessBackend::activate() {
@@ -31,7 +30,8 @@ void HeadlessBackend::activate() {
         createContext();
     }
 
-    activateContext();
+    assert(hasContext());
+    impl->activateContext();
 
     if (!extensionsLoaded) {
         gl::InitializeExtensions(initializeExtension);
@@ -40,27 +40,13 @@ void HeadlessBackend::activate() {
 }
 
 void HeadlessBackend::deactivate() {
-    deactivateContext();
+    assert(hasContext());
+    impl->deactivateContext();
     active = false;
 }
 
 void HeadlessBackend::invalidate() {
     assert(false);
-}
-
-void HeadlessBackend::destroyContext() {
-    assert(hasContext());
-    impl.reset();
-}
-
-void HeadlessBackend::activateContext() {
-    assert(hasContext());
-    impl->activateContext();
-}
-
-void HeadlessBackend::deactivateContext() {
-    assert(hasContext());
-    impl->deactivateContext();
 }
 
 void HeadlessBackend::notifyMapChange(MapChange change) {

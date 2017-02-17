@@ -39,12 +39,6 @@ private:
 
     void createContext();
 
-private:
-    void destroyContext();
-
-    void activateContext();
-    void deactivateContext();
-
     std::unique_ptr<Impl> impl;
     std::shared_ptr<HeadlessDisplay> display;
 
