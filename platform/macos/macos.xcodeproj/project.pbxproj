@@ -70,6 +70,7 @@
 		558F18221D0B13B100123F46 /* libmbgl-loop.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 558F18211D0B13B000123F46 /* libmbgl-loop.a */; };
 		55D9B4B11D005D3900C1CCE2 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 55D9B4B01D005D3900C1CCE2 /* libz.tbd */; };
 		55E2AD111E5B0A6900E8C587 /* MGLOfflineStorageTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 55E2AD101E5B0A6900E8C587 /* MGLOfflineStorageTests.mm */; };
+		96E027311E57C9A7004B8E66 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 96E027331E57C9A7004B8E66 /* Localizable.strings */; };
 		DA00FC8A1D5EEAC3009AABC8 /* MGLAttributionInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = DA00FC881D5EEAC3009AABC8 /* MGLAttributionInfo.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DA00FC8B1D5EEAC3009AABC8 /* MGLAttributionInfo.mm in Sources */ = {isa = PBXBuildFile; fileRef = DA00FC891D5EEAC3009AABC8 /* MGLAttributionInfo.mm */; };
 		DA0CD58E1CF56F5800A5F5A5 /* MGLFeatureTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = DA0CD58D1CF56F5800A5F5A5 /* MGLFeatureTests.mm */; };
@@ -329,6 +330,19 @@
 		55D9B4B01D005D3900C1CCE2 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 		55E2AD101E5B0A6900E8C587 /* MGLOfflineStorageTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLOfflineStorageTests.mm; path = ../../darwin/test/MGLOfflineStorageTests.mm; sourceTree = "<group>"; };
 		55FE0E8D1D100A0900FD240B /* config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = config.xcconfig; path = ../../build/macos/config.xcconfig; sourceTree = "<group>"; };
+		966091701E5BBFF700A9A03B /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
+		966091711E5BBFF900A9A03B /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/Localizable.strings; sourceTree = "<group>"; };
+		966091721E5BBFFA00A9A03B /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/Localizable.strings; sourceTree = "<group>"; };
+		966091731E5BBFFA00A9A03B /* lt */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = lt; path = lt.lproj/Localizable.strings; sourceTree = "<group>"; };
+		96E027321E57C9A7004B8E66 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/Localizable.strings; sourceTree = "<group>"; };
+		96E027341E57C9A9004B8E66 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		96E027351E57C9AB004B8E66 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		96E027361E57C9AC004B8E66 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Localizable.strings; sourceTree = "<group>"; };
+		96E027371E57C9B5004B8E66 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Localizable.strings; sourceTree = "<group>"; };
+		96E027381E57C9B7004B8E66 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Localizable.strings; sourceTree = "<group>"; };
+		96E027391E57C9B9004B8E66 /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/Localizable.strings; sourceTree = "<group>"; };
+		96E0273A1E57C9BB004B8E66 /* vi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = vi; path = vi.lproj/Localizable.strings; sourceTree = "<group>"; };
+		96E0273B1E57C9BC004B8E66 /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		DA00FC881D5EEAC3009AABC8 /* MGLAttributionInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLAttributionInfo.h; sourceTree = "<group>"; };
 		DA00FC891D5EEAC3009AABC8 /* MGLAttributionInfo.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLAttributionInfo.mm; sourceTree = "<group>"; };
 		DA0CD58D1CF56F5800A5F5A5 /* MGLFeatureTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLFeatureTests.mm; path = ../../darwin/test/MGLFeatureTests.mm; sourceTree = "<group>"; };
@@ -689,6 +703,7 @@
 				DA5589761D320C41006B7F64 /* wms.json */,
 				DAE6C2E11CC304F900DB3429 /* Credits.rtf */,
 				DA839EA61CC2E3400062CAFB /* Info.plist */,
+				96E027331E57C9A7004B8E66 /* Localizable.strings */,
 				DA839E981CC2E3400062CAFB /* Supporting Files */,
 			);
 			name = "Demo App";
@@ -1254,6 +1269,7 @@
 				DA839EA21CC2E3400062CAFB /* Assets.xcassets in Resources */,
 				DA839EA01CC2E3400062CAFB /* MapDocument.xib in Resources */,
 				353BAEF81D6463B8009A8DA9 /* amsterdam.geojson in Resources */,
+				96E027311E57C9A7004B8E66 /* Localizable.strings in Resources */,
 				DA839EA51CC2E3400062CAFB /* MainMenu.xib in Resources */,
 				DA5589771D320C41006B7F64 /* wms.json in Resources */,
 				DAE6C2E21CC304F900DB3429 /* Credits.rtf in Resources */,
@@ -1426,6 +1442,26 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
+		96E027331E57C9A7004B8E66 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				96E027321E57C9A7004B8E66 /* Base */,
+				96E027341E57C9A9004B8E66 /* zh-Hans */,
+				96E027351E57C9AB004B8E66 /* zh-Hant */,
+				96E027361E57C9AC004B8E66 /* de */,
+				96E027371E57C9B5004B8E66 /* fr */,
+				96E027381E57C9B7004B8E66 /* ja */,
+				96E027391E57C9B9004B8E66 /* sv */,
+				96E0273A1E57C9BB004B8E66 /* vi */,
+				96E0273B1E57C9BC004B8E66 /* pt-BR */,
+				966091701E5BBFF700A9A03B /* es */,
+				966091711E5BBFF900A9A03B /* pl */,
+				966091721E5BBFFA00A9A03B /* uk */,
+				966091731E5BBFFA00A9A03B /* lt */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
 		DA839E9E1CC2E3400062CAFB /* MapDocument.xib */ = {
 			isa = PBXVariantGroup;
 			children = (

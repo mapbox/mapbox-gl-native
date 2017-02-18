@@ -96,6 +96,7 @@ Once you’ve finished translating the SDK into a new language in Transifex, per
 1. In macos.xcworkspace, open the project editor for macos.xcodeproj. Using the project editor’s sidebar or tab bar dropdown, go to the “macos” project; under the Localizations section of the Info tab, click the + button to add your language to the project.
 1. In the sheet that appears, select all the .strings and .stringsdict files but no .xib file. (Most of the XIBs are part of the macosapp example application, which is not localized, while MGLAnnotationCallout.xib contains no localizable strings.) If your language lacks declension and pluralization, as in the case of Chinese, omit the .stringsdict files.
 1. In the Project navigator, expand each .stringsdict file in the project. An additional version for your localization should be listed; translate it. See Apple’s documentation on the [.stringsdict format](https://developer.apple.com/library/content/documentation/MacOSX/Conceptual/BPInternational/StringsdictFileFormat/StringsdictFileFormat.html).
+1. In the Project navigator, select Demo App/Localizable.strings and then, in the File Inspector, check the box for your new localization.
 1. Repeat the steps above in ios.xcworkspace.
 
 The .strings files should still be in the original English – that’s expected. Now you can pull your translations into this repository:
