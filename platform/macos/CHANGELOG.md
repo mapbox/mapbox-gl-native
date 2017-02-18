@@ -2,14 +2,15 @@
 
 ## 0.3.1
 
-This version of the Mapbox macOS SDK corresponds to version 3.4.1 of the Mapbox iOS SDK. The two SDKs have very similar feature sets. The main differences are the lack of user location tracking and annotation views. Some APIs have been adapted to macOS conventions, particularly the use of NSPopover for callout views.
+This version of the Mapbox macOS SDK corresponds to version 3.4.2 of the Mapbox iOS SDK. The two SDKs have very similar feature sets. The main differences are the lack of user location tracking and annotation views. Some APIs have been adapted to macOS conventions, particularly the use of NSPopover for callout views.
 
 * Fixed an issue causing MGLMapView’s `camera`’s `heading` to be set to a negative value, indicating an undefined heading, when the map view faces northwest. The heading is now wrapped to between zero and 360 degrees, for consistency with MGLMapView’s `direction` property. ([#7724](https://github.com/mapbox/mapbox-gl-native/pull/7724))
-* Allows use of the integrated GPU on machines that have more than one GPU. Follow [Apple’s Technical QA1734](https://developer.apple.com/library/content/qa/qa1734/_index.html) to enable this in your app. ([#7834](https://github.com/mapbox/mapbox-gl-native/pull/7834))
+* Fixed an issue preventing the use of the integrated GPU on machines that have more than one GPU. Follow the instructions in [Technical Q&A 1734](https://developer.apple.com/library/content/qa/qa1734/_index.html) to enable integrated GPU usage in your application. ([#7834](https://github.com/mapbox/mapbox-gl-native/pull/7834))
 * Fixed an issue causing the mouse cursor to jump after shift- or option-dragging a map view if the window opened on a screen with a different size than the screen with keyboard focus. ([#7846](https://github.com/mapbox/mapbox-gl-native/pull/7846))
 * Deprecated the style class methods in MGLStyle. ([#7785](https://github.com/mapbox/mapbox-gl-native/pull/7785))
+* Improved the performance of trivial camera animations. ([#7125](https://github.com/mapbox/mapbox-gl-native/pull/7125))
 
-## 0.3.0
+## 0.3.0 - January 21, 2016
 
 This version of the Mapbox macOS SDK corresponds to version 3.4.0 of the Mapbox iOS SDK. The two SDKs have very similar feature sets. The main differences are the lack of user location tracking and annotation views. Some APIs have been adapted to macOS conventions, particularly the use of NSPopover for callout views.
 
@@ -70,7 +71,6 @@ This version of the Mapbox macOS SDK corresponds to version 3.4.0 of the Mapbox 
 
 * Raster tiles such as those from Mapbox Satellite are now cached, eliminating flashing while panning back and forth. ([#7091](https://github.com/mapbox/mapbox-gl-native/pull/7091))
 * Fixed an issue where the map view’s center would always be calculated as if the view occupied the entire window. ([#6102](https://github.com/mapbox/mapbox-gl-native/pull/6102))
-* Improved the performance of trivial camera animations. ([#7125](https://github.com/mapbox/mapbox-gl-native/pull/7125))
 * Notification names and user info keys are now string enumeration values for ease of use in Swift. ([#6794](https://github.com/mapbox/mapbox-gl-native/pull/6794))
 * Fixed a typo in the documentation for the MGLCompassDirectionFormatter class. ([#5879](https://github.com/mapbox/mapbox-gl-native/pull/5879))
 * The NSClickGestureRecognizer on MGLMapView that is used for selecting annotations now fails if a click does not select an annotation. ([#7246](https://github.com/mapbox/mapbox-gl-native/pull/7246))
