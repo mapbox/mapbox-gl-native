@@ -695,6 +695,16 @@
 		DA6408DA1DA4E7D300908C90 /* MGLVectorStyleLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLVectorStyleLayer.m; sourceTree = "<group>"; };
 		DA7262091DEEE3480043BB89 /* MGLOpenGLStyleLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLOpenGLStyleLayer.h; sourceTree = "<group>"; };
 		DA72620A1DEEE3480043BB89 /* MGLOpenGLStyleLayer.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLOpenGLStyleLayer.mm; sourceTree = "<group>"; };
+		DA737ADA1E59139D00AD2CDE /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = es; path = es.lproj/Foundation.stringsdict; sourceTree = "<group>"; };
+		DA737ADB1E5913BA00AD2CDE /* es */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
+		DA737ADC1E59145700AD2CDE /* es */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Root.strings; sourceTree = "<group>"; };
+		DA737AE01E59150A00AD2CDE /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = pl; path = pl.lproj/Foundation.stringsdict; sourceTree = "<group>"; };
+		DA737AE11E59157600AD2CDE /* pl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/Root.strings; sourceTree = "<group>"; };
+		DA737AE51E5916D400AD2CDE /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = ru; path = ru.lproj/Foundation.stringsdict; sourceTree = "<group>"; };
+		DA737AE61E59171700AD2CDE /* ru */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Root.strings; sourceTree = "<group>"; };
+		DA737AE71E59172C00AD2CDE /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Localizable.strings; sourceTree = "<group>"; };
+		DA737AE91E5917C300AD2CDE /* uk */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/Localizable.strings; sourceTree = "<group>"; };
+		DA737AEA1E5917EF00AD2CDE /* uk */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/Root.strings; sourceTree = "<group>"; };
 		DA737EE01D056A4E005BDA16 /* MGLMapViewDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLMapViewDelegate.h; sourceTree = "<group>"; };
 		DA821D041CCC6D59007508D4 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		DA821D051CCC6D59007508D4 /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
@@ -1878,6 +1888,10 @@
 				sv,
 				vi,
 				"pt-BR",
+				es,
+				pl,
+				ru,
+				uk,
 			);
 			mainGroup = DA1DC9411CB6C1C2006E619F;
 			productRefGroup = DA1DC94B1CB6C1C2006E619F /* Products */;
@@ -2260,6 +2274,10 @@
 				DAA32CB81E4C4EE6006F8D24 /* sv */,
 				DAA32CBE1E4C4F71006F8D24 /* vi */,
 				DA9C012E1E4C7B6100C4742A /* pt-BR */,
+				DA737ADC1E59145700AD2CDE /* es */,
+				DA737AE11E59157600AD2CDE /* pl */,
+				DA737AE61E59171700AD2CDE /* ru */,
+				DA737AEA1E5917EF00AD2CDE /* uk */,
 			);
 			name = Root.strings;
 			sourceTree = "<group>";
@@ -2276,6 +2294,9 @@
 				DAA32CBC1E4C4F5D006F8D24 /* vi */,
 				DA9C012D1E4C7B1F00C4742A /* pt-BR */,
 				968F36B41E4D0FC6003A5522 /* ja */,
+				DA737ADB1E5913BA00AD2CDE /* es */,
+				DA737AE71E59172C00AD2CDE /* ru */,
+				DA737AE91E5917C300AD2CDE /* uk */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -2302,6 +2323,9 @@
 				DAA32CAB1E4C491A006F8D24 /* fr */,
 				DA9C012C1E4C7ADB00C4742A /* pt-BR */,
 				DA6023F21E4CE94800DBFF23 /* sv */,
+				DA737ADA1E59139D00AD2CDE /* es */,
+				DA737AE01E59150A00AD2CDE /* pl */,
+				DA737AE51E5916D400AD2CDE /* ru */,
 			);
 			name = Foundation.stringsdict;
 			sourceTree = "<group>";
