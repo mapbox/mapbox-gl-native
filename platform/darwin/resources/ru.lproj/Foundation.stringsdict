@@ -14,7 +14,9 @@
 			<string>d</string>
 			<key>one</key>
 			<string>%d градус</string>
-			<key>other</key>
+			<key>few</key>
+			<string>%d градуса</string>
+			<key>many</key>
 			<string>%d градусов</string>
 		</dict>
 	</dict>
@@ -30,7 +32,9 @@
 			<string>d</string>
 			<key>one</key>
 			<string>%d минута</string>
-			<key>other</key>
+			<key>few</key>
+			<string>%d минуты</string>
+			<key>many</key>
 			<string>%d минут</string>
 		</dict>
 	</dict>
@@ -46,7 +50,9 @@
 			<string>d</string>
 			<key>one</key>
 			<string>%d секунда</string>
-			<key>other</key>
+			<key>few</key>
+			<string>%d секунды</string>
+			<key>many</key>
 			<string>%d секунд</string>
 		</dict>
 	</dict>
