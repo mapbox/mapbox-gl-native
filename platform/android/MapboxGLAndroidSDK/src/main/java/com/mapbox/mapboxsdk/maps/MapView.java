@@ -106,7 +106,7 @@ public class MapView extends FrameLayout {
   @UiThread
   public MapView(@NonNull Context context, @Nullable MapboxMapOptions options) {
     super(context);
-    initialise(context, options);
+    initialise(context, options == null ? MapboxMapOptions.createFromAttributes(context, null) : options);
   }
 
   private void initialise(@NonNull final Context context, @NonNull final MapboxMapOptions options) {
