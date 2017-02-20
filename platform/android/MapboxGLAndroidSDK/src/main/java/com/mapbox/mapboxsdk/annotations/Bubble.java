@@ -82,8 +82,8 @@ class Bubble extends Drawable {
   }
 
   private void initPath(ArrowDirection arrowDirection, Path path, float strokeWidth) {
-    switch (arrowDirection) {
-      case LEFT:
+    switch (arrowDirection.getValue()) {
+      case ArrowDirection.LEFT:
         if (cornersRadius <= 0) {
           initLeftSquarePath(rect, path, strokeWidth);
           break;
@@ -96,7 +96,7 @@ class Bubble extends Drawable {
 
         initLeftRoundedPath(rect, path, strokeWidth);
         break;
-      case TOP:
+      case ArrowDirection.TOP:
         if (cornersRadius <= 0) {
           initTopSquarePath(rect, path, strokeWidth);
           break;
@@ -109,7 +109,7 @@ class Bubble extends Drawable {
 
         initTopRoundedPath(rect, path, strokeWidth);
         break;
-      case RIGHT:
+      case ArrowDirection.RIGHT:
         if (cornersRadius <= 0) {
           initRightSquarePath(rect, path, strokeWidth);
           break;
@@ -122,7 +122,7 @@ class Bubble extends Drawable {
 
         initRightRoundedPath(rect, path, strokeWidth);
         break;
-      case BOTTOM:
+      case ArrowDirection.BOTTOM:
         if (cornersRadius <= 0) {
           initBottomSquarePath(rect, path, strokeWidth);
           break;

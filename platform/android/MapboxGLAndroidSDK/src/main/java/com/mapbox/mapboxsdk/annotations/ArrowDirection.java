@@ -1,26 +1,29 @@
 package com.mapbox.mapboxsdk.annotations;
 
-public enum ArrowDirection {
-  LEFT(0),
-  RIGHT(1),
-  TOP(2),
-  BOTTOM(3);
+import android.support.annotation.IntDef;
 
-  private int value;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
-  ArrowDirection(int value) {
+class ArrowDirection {
+  @IntDef( {LEFT, RIGHT, TOP, BOTTOM})
+  @Retention(RetentionPolicy.SOURCE)
+  @interface Value {
+  }
+
+  static final int LEFT = 0;
+  static final int RIGHT = 1;
+  static final int TOP = 2;
+  static final int BOTTOM = 3;
+
+  @Value
+  private final int value;
+
+  ArrowDirection(@Value int value) {
     this.value = value;
   }
 
-  public static ArrowDirection fromInt(int value) {
-    for (ArrowDirection arrowDirection : ArrowDirection.values()) {
-      if (value == arrowDirection.getValue()) {
-        return arrowDirection;
-      }
-    }
-    return LEFT;
-  }
-
+  @Value
   public int getValue() {
     return value;
   }

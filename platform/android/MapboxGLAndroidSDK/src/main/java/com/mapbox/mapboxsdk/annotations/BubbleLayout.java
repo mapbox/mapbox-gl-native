@@ -39,8 +39,10 @@ public class BubbleLayout extends LinearLayout {
     super(context, attrs, defStyleAttr);
 
     TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.mapbox_BubbleLayout);
-    int location = a.getInt(R.styleable.mapbox_BubbleLayout_mapbox_bl_arrowDirection, ArrowDirection.LEFT.getValue());
-    arrowDirection = ArrowDirection.fromInt(location);
+    @ArrowDirection.Value
+    int location = a.getInt(R.styleable.mapbox_BubbleLayout_mapbox_bl_arrowDirection,
+      ArrowDirection.LEFT);
+    arrowDirection = new ArrowDirection(location);
     arrowWidth = a.getDimension(R.styleable.mapbox_BubbleLayout_mapbox_bl_arrowWidth,
       convertDpToPixel(8, context));
     arrowHeight = a.getDimension(R.styleable.mapbox_BubbleLayout_mapbox_bl_arrowHeight,
@@ -166,17 +168,17 @@ public class BubbleLayout extends LinearLayout {
     int paddingRight = getPaddingRight();
     int paddingTop = getPaddingTop();
     int paddingBottom = getPaddingBottom();
-    switch (arrowDirection) {
-      case LEFT:
+    switch (arrowDirection.getValue()) {
+      case ArrowDirection.LEFT:
         paddingLeft += arrowWidth;
         break;
-      case RIGHT:
+      case ArrowDirection.RIGHT:
         paddingRight += arrowWidth;
         break;
-      case TOP:
+      case ArrowDirection.TOP:
         paddingTop += arrowHeight;
         break;
-      case BOTTOM:
+      case ArrowDirection.BOTTOM:
         paddingBottom += arrowHeight;
         break;
     }
@@ -204,17 +206,17 @@ public class BubbleLayout extends LinearLayout {
     int paddingRight = getPaddingRight();
     int paddingTop = getPaddingTop();
     int paddingBottom = getPaddingBottom();
-    switch (arrowDirection) {
-      case LEFT:
+    switch (arrowDirection.getValue()) {
+      case ArrowDirection.LEFT:
         paddingLeft -= arrowWidth;
         break;
-      case RIGHT:
+      case ArrowDirection.RIGHT:
         paddingRight -= arrowWidth;
         break;
-      case TOP:
+      case ArrowDirection.TOP:
         paddingTop -= arrowHeight;
         break;
-      case BOTTOM:
+      case ArrowDirection.BOTTOM:
         paddingBottom -= arrowHeight;
         break;
     }
