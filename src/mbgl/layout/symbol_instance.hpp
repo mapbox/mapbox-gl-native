@@ -17,7 +17,7 @@ public:
             const style::SymbolLayoutProperties::Evaluated&, const bool inside, const uint32_t index,
             const float textBoxScale, const float textPadding, style::SymbolPlacementType textPlacement,
             const float iconBoxScale, const float iconPadding, style::SymbolPlacementType iconPlacement,
-            const GlyphPositions& face, const IndexedSubfeature& indexedfeature);
+            const GlyphPositions& face, const IndexedSubfeature& indexedfeature, const std::size_t featureIndex);
 
     Point<float> point;
     uint32_t index;
@@ -28,6 +28,7 @@ public:
     CollisionFeature textCollisionFeature;
     CollisionFeature iconCollisionFeature;
     WritingModeType writingModes;
+    std::size_t featureIndex;
 };
 
 } // namespace mbgl

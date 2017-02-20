@@ -56,7 +56,8 @@ public:
         std::pair<style::IconPaintProperties::Evaluated, style::TextPaintProperties::Evaluated>> layerPaintProperties;
 
 private:
-    void addFeature(const SymbolFeature&,
+    void addFeature(const size_t,
+                    const SymbolFeature&,
                     const std::pair<Shaping, Shaping>& shapedTextOrientations,
                     const PositionedIcon& shapedIcon,
                     const GlyphPositions& face);

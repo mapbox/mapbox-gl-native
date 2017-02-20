@@ -8,7 +8,7 @@
 
 namespace mbgl {
 
-class SymbolFeature : GeometryTileFeature {
+class SymbolFeature : public GeometryTileFeature {
 public:
     SymbolFeature(const std::unique_ptr<GeometryTileFeature>& feature) :
         id(feature->getID()),

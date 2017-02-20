@@ -232,7 +232,8 @@ void SymbolLayout::prepare(uintptr_t tileUID,
     const bool textAlongLine = layout.get<TextRotationAlignment>() == AlignmentType::Map &&
         layout.get<SymbolPlacement>() == SymbolPlacementType::Line;
 
-    for (const auto& feature : features) {
+    for (auto it = features.begin(); it != features.end(); ++it) {
+        const auto feature = *it;
         if (feature.geometry.empty()) continue;
 
         std::pair<Shaping, Shaping> shapedTextOrientations;
@@ -291,15 +292,15 @@ void SymbolLayout::prepare(uintptr_t tileUID,
 
         // if either shapedText or icon position is present, add the feature
         if (shapedTextOrientations.first || shapedIcon) {
-            addFeature(feature, shapedTextOrientations, shapedIcon, face);
+            addFeature(std::distance(features.begin(), it), feature, shapedTextOrientations, shapedIcon, face);
         }
     }
 
-    features.clear();
     compareText.clear();
 }
 
-void SymbolLayout::addFeature(const SymbolFeature& feature,
+void SymbolLayout::addFeature(const std::size_t index,
+                              const SymbolFeature& feature,
                               const std::pair<Shaping, Shaping>& shapedTextOrientations,
                               const PositionedIcon& shapedIcon,
                               const GlyphPositions& face) {
@@ -348,7 +349,7 @@ void SymbolLayout::addFeature(const SymbolFeature& feature,
         symbolInstances.emplace_back(anchor, line, shapedTextOrientations, shapedIcon, layout, addToBuffers, symbolInstances.size(),
                 textBoxScale, textPadding, textPlacement,
                 iconBoxScale, iconPadding, iconPlacement,
-                face, indexedFeature);
+                face, indexedFeature, index);
     };
 
     if (layout.get<SymbolPlacement>() == SymbolPlacementType::Line) {
@@ -505,6 +506,12 @@ std::unique_ptr<SymbolBucket> SymbolLayout::place(CollisionTile& collisionTile) 
                     bucket->icon, *symbolInstance.iconQuad, placementZoom,
                     keepUpright, iconPlacement, collisionTile.config.angle, symbolInstance.writingModes);
             }
+        }
+        
+        const auto feature = features.at(symbolInstance.featureIndex);
+        for (auto& pair : bucket->paintPropertyBinders) {
+            pair.second.first.populateVertexVectors(feature, bucket->icon.vertices.vertexSize());
+            pair.second.second.populateVertexVectors(feature, bucket->text.vertices.vertexSize());
         }
     }
 
