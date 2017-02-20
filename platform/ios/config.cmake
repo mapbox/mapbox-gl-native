@@ -58,6 +58,8 @@ macro(mbgl_platform_core)
         PRIVATE platform/default/mbgl/gl/offscreen_view.hpp
 
         # Thread pool
+        PRIVATE platform/default/mbgl/util/shared_thread_pool.cpp
+        PRIVATE platform/default/mbgl/util/shared_thread_pool.hpp
         PRIVATE platform/default/mbgl/util/default_thread_pool.cpp
         PRIVATE platform/default/mbgl/util/default_thread_pool.cpp
     )

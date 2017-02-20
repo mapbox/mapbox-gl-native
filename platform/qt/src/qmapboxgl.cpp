@@ -22,6 +22,7 @@
 #include <mbgl/util/geo.hpp>
 #include <mbgl/util/geometry.hpp>
 #include <mbgl/util/run_loop.hpp>
+#include <mbgl/util/shared_thread_pool.hpp>
 #include <mbgl/util/traits.hpp>
 
 #if QT_VERSION >= 0x050000
@@ -1532,10 +1533,10 @@ QMapboxGLPrivate::QMapboxGLPrivate(QMapboxGL *q, const QMapboxGLSettings &settin
         settings.cacheDatabasePath().toStdString(),
         settings.assetPath().toStdString(),
         settings.cacheDatabaseMaximumSize()))
-    , threadPool(4)
+    , threadPool(mbgl::sharedThreadPool())
     , mapObj(std::make_unique<mbgl::Map>(
         *this, mbgl::Size{ static_cast<uint32_t>(size.width()), static_cast<uint32_t>(size.height()) },
-        pixelRatio, *fileSourceObj, threadPool,
+        pixelRatio, *fileSourceObj, *threadPool,
         mbgl::MapMode::Continuous,
         static_cast<mbgl::GLContextMode>(settings.contextMode()),
         static_cast<mbgl::ConstrainMode>(settings.constrainMode()),
