@@ -477,13 +477,21 @@ android-help:
 	@echo
 	@echo "Available Android architecture targets:"
 	@echo
-	@echo "    make android-arm-v5-9 (android-arm-v5)"
-	@echo "    make android-arm-v7-9 (android, android-arm-v7)"
-	@echo "    make android-arm-v8-21 (android-arm-v8)"
-	@echo "    make android-mips-9 (android-mips)"
-	@echo "    make android-mips-64-21 (android-mips-64)"
-	@echo "    make android-x86-9 (android-x86)"
-	@echo "    make android-x86-64-21 (android-x86-64)"
+	@echo "    make android-arm-v5-9"
+	@echo "        (android-arm-v5)"
+	@echo "    make android-arm-v7-9"
+	@echo "        (android, android-arm-v7)"
+	@echo "    make android-arm-v8-21"
+	@echo "        (android-arm-v8)"
+	@echo "    make android-mips-9"
+	@echo "        (android-mips)"
+	@echo "    make android-mips-64-21"
+	@echo "        (android-mips-64)"
+	@echo "    make android-x86-9"
+	@echo "        (android-x86)"
+	@echo "    make android-x86-64-21"
+	@echo "        (android-x86-64)"
+	@echo "    make apackage"
 	@echo
 
 .PHONY: android-style-code
