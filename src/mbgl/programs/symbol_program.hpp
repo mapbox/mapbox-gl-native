@@ -95,7 +95,13 @@ public:
                                        const TransformState&);
 };
 
-class SymbolSDFIconProgram : public Program<
+enum class SymbolSDFPart {
+    Fill = 1,
+    Halo = 0
+};
+
+template <class PaintProperties>
+class SymbolSDFProgram : public Program<
     shaders::symbol_sdf,
     gl::Triangle,
     SymbolLayoutAttributes,
@@ -114,63 +120,48 @@ class SymbolSDFIconProgram : public Program<
         uniforms::u_aspect_ratio,
         uniforms::u_pitch_with_map,
         uniforms::u_is_halo>,
-    style::IconPaintProperties>
+    PaintProperties>
 {
 public:
-    using Program::Program;
+    using BaseProgram = Program<shaders::symbol_sdf,
+        gl::Triangle,
+        SymbolLayoutAttributes,
+        gl::Uniforms<
+            uniforms::u_matrix,
+            uniforms::u_extrude_scale,
+            uniforms::u_texsize,
+            uniforms::u_zoom,
+            uniforms::u_rotate_with_map,
+            uniforms::u_texture,
+            uniforms::u_fadetexture,
+            uniforms::u_font_scale,
+            uniforms::u_gamma_scale,
+            uniforms::u_pitch,
+            uniforms::u_bearing,
+            uniforms::u_aspect_ratio,
+            uniforms::u_pitch_with_map,
+            uniforms::u_is_halo>,
+        PaintProperties>;
+    
+    using UniformValues = typename BaseProgram::UniformValues;
+    
 
-    static UniformValues haloUniformValues(const style::SymbolPropertyValues&,
-                                           const Size& texsize,
-                                           const std::array<float, 2>& pixelsToGLUnits,
-                                           const RenderTile&,
-                                           const TransformState&);
+    
+    using BaseProgram::BaseProgram;
 
-    static UniformValues foregroundUniformValues(const style::SymbolPropertyValues&,
-                                                 const Size& texsize,
-                                                 const std::array<float, 2>& pixelsToGLUnits,
-                                                 const RenderTile&,
-                                                 const TransformState&);
+    static UniformValues uniformValues(const style::SymbolPropertyValues&,
+                                       const Size& texsize,
+                                       const std::array<float, 2>& pixelsToGLUnits,
+                                       const RenderTile&,
+                                       const TransformState&,
+                                       const SymbolSDFPart);
 };
 
-class SymbolSDFGlyphProgram : public Program<
-    shaders::symbol_sdf,
-    gl::Triangle,
-    SymbolLayoutAttributes,
-    gl::Uniforms<
-        uniforms::u_matrix,
-        uniforms::u_extrude_scale,
-        uniforms::u_texsize,
-        uniforms::u_zoom,
-        uniforms::u_rotate_with_map,
-        uniforms::u_texture,
-        uniforms::u_fadetexture,
-        uniforms::u_font_scale,
-        uniforms::u_gamma_scale,
-        uniforms::u_pitch,
-        uniforms::u_bearing,
-        uniforms::u_aspect_ratio,
-        uniforms::u_pitch_with_map,
-        uniforms::u_is_halo>,
-    style::TextPaintProperties>
-{
-public:
-    using Program::Program;
-
-    static UniformValues haloUniformValues(const style::SymbolPropertyValues&,
-                                           const Size& texsize,
-                                           const std::array<float, 2>& pixelsToGLUnits,
-                                           const RenderTile&,
-                                           const TransformState&);
-
-    static UniformValues foregroundUniformValues(const style::SymbolPropertyValues&,
-                                                 const Size& texsize,
-                                                 const std::array<float, 2>& pixelsToGLUnits,
-                                                 const RenderTile&,
-                                                 const TransformState&);
-};
+using SymbolSDFIconProgram = SymbolSDFProgram<style::IconPaintProperties>;
+using SymbolSDFTextProgram = SymbolSDFProgram<style::TextPaintProperties>;
 
 using SymbolLayoutVertex = SymbolLayoutAttributes::Vertex;
 using SymbolIconAttributes = SymbolIconProgram::Attributes;
-using SymbolGlyphAttributes = SymbolSDFGlyphProgram::Attributes;
+using SymbolTextAttributes = SymbolSDFTextProgram::Attributes;
 
 } // namespace mbgl

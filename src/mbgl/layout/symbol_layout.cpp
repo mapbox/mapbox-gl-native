@@ -99,12 +99,13 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
         auto feature = sourceLayer.getFeature(i);
         if (!leader.filter(feature->getType(), feature->getID(), [&] (const auto& key) { return feature->getValue(key); }))
             continue;
+        
+        SymbolFeature ft(std::move(feature));
 
-        SymbolFeature ft(feature);
         ft.index = i;
 
-        auto getValue = [&feature](const std::string& key) -> std::string {
-            auto value = feature->getValue(key);
+        auto getValue = [&ft](const std::string& key) -> std::string {
+            auto value = ft.getValue(key);
             if (!value)
                 return std::string();
             if (value->is<std::string>())
@@ -121,12 +122,12 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
         };
         
         if (hasText) {
-            std::string u8string = layout.evaluate<TextField>(zoom, *feature);
+            std::string u8string = layout.evaluate<TextField>(zoom, ft);
             if (layout.get<TextField>().isConstant()) {
                 u8string = util::replaceTokens(u8string, getValue);
             }
             
-            auto textTransform = layout.evaluate<TextTransform>(zoom, *feature);
+            auto textTransform = layout.evaluate<TextTransform>(zoom, ft);
 
             if (textTransform == TextTransformType::Uppercase) {
                 u8string = platform::uppercase(u8string);
@@ -147,13 +148,9 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
 
         if (hasIcon) {
             ft.icon = util::replaceTokens(layout.get<IconImage>(), getValue);
-            ft.iconOffset = layout.evaluate<IconOffset>(zoom, *feature);
-            ft.iconRotation = layout.evaluate<IconRotate>(zoom, *feature) * util::DEG2RAD;
         }
 
         if (ft.text || ft.icon) {
-            ft.type = feature->getType();
-            ft.geometry = feature->getGeometries();
             features.push_back(std::move(ft));
         }
     }
@@ -233,7 +230,7 @@ void SymbolLayout::prepare(uintptr_t tileUID,
         layout.get<SymbolPlacement>() == SymbolPlacementType::Line;
 
     for (auto it = features.begin(); it != features.end(); ++it) {
-        const auto feature = *it;
+        auto& feature = *it;
         if (feature.geometry.empty()) continue;
 
         std::pair<Shaping, Shaping> shapedTextOrientations;
@@ -277,7 +274,9 @@ void SymbolLayout::prepare(uintptr_t tileUID,
         if (feature.icon) {
             auto image = spriteAtlas.getIcon(*feature.icon);
             if (image) {
-                shapedIcon = shapeIcon(*image, feature);
+                shapedIcon = shapeIcon(*image,
+                    layout.evaluate<IconOffset>(zoom, feature),
+                    layout.evaluate<IconRotate>(zoom, feature) * util::DEG2RAD);
                 assert((*image).spriteImage);
                 if ((*image).spriteImage->sdf) {
                     sdfIcons = true;
@@ -294,6 +293,8 @@ void SymbolLayout::prepare(uintptr_t tileUID,
         if (shapedTextOrientations.first || shapedIcon) {
             addFeature(std::distance(features.begin(), it), feature, shapedTextOrientations, shapedIcon, face);
         }
+        
+        feature.geometry.clear();
     }
 
     compareText.clear();
@@ -351,6 +352,8 @@ void SymbolLayout::addFeature(const std::size_t index,
                 iconBoxScale, iconPadding, iconPlacement,
                 face, indexedFeature, index);
     };
+    
+    const auto& type = feature.getType();
 
     if (layout.get<SymbolPlacement>() == SymbolPlacementType::Line) {
         auto clippedLines = util::clipLines(feature.geometry, 0, 0, util::EXTENT, util::EXTENT);
@@ -372,7 +375,7 @@ void SymbolLayout::addFeature(const std::size_t index,
                 }
             }
         }
-    } else if (feature.type == FeatureType::Polygon) {
+    } else if (type == FeatureType::Polygon) {
         for (const auto& polygon : classifyRings(feature.geometry)) {
             Polygon<double> poly;
             for (const auto& ring : polygon) {
@@ -388,12 +391,12 @@ void SymbolLayout::addFeature(const std::size_t index,
             Anchor anchor(poi.x, poi.y, 0, minScale);
             addSymbolInstance(polygon[0], anchor);
         }
-    } else if (feature.type == FeatureType::LineString) {
+    } else if (type == FeatureType::LineString) {
         for (const auto& line : feature.geometry) {
             Anchor anchor(line[0].x, line[0].y, 0, minScale);
             addSymbolInstance(line, anchor);
         }
-    } else if (feature.type == FeatureType::Point) {
+    } else if (type == FeatureType::Point) {
         for (const auto& points : feature.geometry) {
             for (const auto& point : points) {
                 Anchor anchor(point.x, point.y, 0, minScale);
@@ -508,7 +511,7 @@ std::unique_ptr<SymbolBucket> SymbolLayout::place(CollisionTile& collisionTile) 
             }
         }
         
-        const auto feature = features.at(symbolInstance.featureIndex);
+        const auto& feature = features.at(symbolInstance.featureIndex);
         for (auto& pair : bucket->paintPropertyBinders) {
             pair.second.first.populateVertexVectors(feature, bucket->icon.vertices.vertexSize());
             pair.second.second.populateVertexVectors(feature, bucket->text.vertices.vertexSize());

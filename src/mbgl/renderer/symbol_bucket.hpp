@@ -35,12 +35,12 @@ public:
 
     std::unordered_map<std::string, std::pair<
         SymbolIconProgram::PaintPropertyBinders,
-        SymbolSDFGlyphProgram::PaintPropertyBinders>> paintPropertyBinders;
+        SymbolSDFTextProgram::PaintPropertyBinders>> paintPropertyBinders;
 
     struct TextBuffer {
         gl::VertexVector<SymbolLayoutVertex> vertices;
         gl::IndexVector<gl::Triangles> triangles;
-        gl::SegmentVector<SymbolGlyphAttributes> segments;
+        gl::SegmentVector<SymbolTextAttributes> segments;
 
         optional<gl::VertexBuffer<SymbolLayoutVertex>> vertexBuffer;
         optional<gl::IndexBuffer<gl::Triangles>> indexBuffer;

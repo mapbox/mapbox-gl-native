@@ -41,7 +41,7 @@ public:
     RasterProgram raster;
     SymbolIconProgram symbolIcon;
     SymbolSDFIconProgram symbolIconSDF;
-    SymbolSDFGlyphProgram symbolGlyph;
+    SymbolSDFTextProgram symbolGlyph;
 
     DebugProgram debug;
     CollisionBoxProgram collisionBox;

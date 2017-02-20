@@ -35,7 +35,7 @@ void Painter::renderSymbol(PaintParameters& parameters,
                      const auto& buffers,
                      const SymbolPropertyValues& values_,
                      const auto& binders,
-                     const auto& paintPropertyValues)
+                     const auto& paintProperties)
     {
         // We clip symbols to their tile extent in still mode.
         const bool needsClipping = frame.mapMode == MapMode::Still;
@@ -55,7 +55,7 @@ void Painter::renderSymbol(PaintParameters& parameters,
             *buffers.indexBuffer,
             buffers.segments,
             binders,
-            paintPropertyValues,
+            paintProperties,
             state.getZoom()
         );
     };
@@ -74,7 +74,7 @@ void Painter::renderSymbol(PaintParameters& parameters,
         if (bucket.sdfIcons) {
             if (values.hasHalo) {
                 draw(parameters.programs.symbolIconSDF,
-                     SymbolSDFIconProgram::haloUniformValues(values, texsize, pixelsToGLUnits, tile, state),
+                     SymbolSDFIconProgram::uniformValues(values, texsize, pixelsToGLUnits, tile, state, SymbolSDFPart::Halo),
                      bucket.icon,
                      values,
                      bucket.paintPropertyBinders.at(layer.getID()).first,
@@ -83,7 +83,7 @@ void Painter::renderSymbol(PaintParameters& parameters,
 
             if (values.hasFill) {
                 draw(parameters.programs.symbolIconSDF,
-                     SymbolSDFIconProgram::foregroundUniformValues(values, texsize, pixelsToGLUnits, tile, state),
+                     SymbolSDFIconProgram::uniformValues(values, texsize, pixelsToGLUnits, tile, state, SymbolSDFPart::Fill),
                      bucket.icon,
                      values,
                      bucket.paintPropertyBinders.at(layer.getID()).first,
@@ -109,7 +109,7 @@ void Painter::renderSymbol(PaintParameters& parameters,
 
         if (values.hasHalo) {
             draw(parameters.programs.symbolGlyph,
-                 SymbolSDFGlyphProgram::haloUniformValues(values, texsize, pixelsToGLUnits, tile, state),
+                 SymbolSDFTextProgram::uniformValues(values, texsize, pixelsToGLUnits, tile, state, SymbolSDFPart::Halo),
                  bucket.text,
                  values,
                  bucket.paintPropertyBinders.at(layer.getID()).second,
@@ -118,7 +118,7 @@ void Painter::renderSymbol(PaintParameters& parameters,
 
         if (values.hasFill) {
             draw(parameters.programs.symbolGlyph,
-                 SymbolSDFGlyphProgram::foregroundUniformValues(values, texsize, pixelsToGLUnits, tile, state),
+                 SymbolSDFTextProgram::uniformValues(values, texsize, pixelsToGLUnits, tile, state, SymbolSDFPart::Fill),
                  bucket.text,
                  values,
                  bucket.paintPropertyBinders.at(layer.getID()).second,

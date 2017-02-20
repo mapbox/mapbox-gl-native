@@ -10,34 +10,21 @@ namespace mbgl {
 
 class SymbolFeature : public GeometryTileFeature {
 public:
-    SymbolFeature(const std::unique_ptr<GeometryTileFeature>& feature) :
-        id(feature->getID()),
-        type(feature->getType()),
-        geometry(feature->getGeometries()),
-        properties(feature->getProperties())
+    SymbolFeature(std::unique_ptr<GeometryTileFeature> feature_) :
+        feature(std::move(feature_)),
+        geometry(feature->getGeometries()) // we need a mutable copy of the geometry for mergeLines()
     {}
-
-    FeatureType getType() const override { return type; }
-    optional<Value> getValue(const std::string& key) const override {
-        auto it = properties.find(key);
-        if (it != properties.end()) {
-            return it->second;
-        }
-        return {};
-    };
-    std::unordered_map<std::string,Value> getProperties() const override { return properties; };
-    optional<FeatureIdentifier> getID() const override { return id; };
+    
+    FeatureType getType() const override { return feature->getType(); }
+    optional<Value> getValue(const std::string& key) const override { return feature->getValue(key); };
+    std::unordered_map<std::string,Value> getProperties() const override { return feature->getProperties(); };
+    optional<FeatureIdentifier> getID() const override { return feature->getID(); };
     GeometryCollection getGeometries() const override { return geometry; };
 
-    optional<FeatureIdentifier> id;
-    FeatureType type;
+    std::unique_ptr<GeometryTileFeature> feature;
     GeometryCollection geometry;
-    std::unordered_map<std::string,Value> properties;
-    
     optional<std::u16string> text;
     optional<std::string> icon;
-    std::array<float, 2> iconOffset;
-    float iconRotation;
     std::size_t index;
 };
 

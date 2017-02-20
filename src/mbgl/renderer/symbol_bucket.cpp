@@ -20,7 +20,7 @@ SymbolBucket::SymbolBucket(style::SymbolLayoutProperties::Evaluated layout_,
     for (const auto& pair : layerPaintProperties) {
         paintPropertyBinders.emplace(pair.first, std::make_pair(
             SymbolIconProgram::PaintPropertyBinders(pair.second.first, zoom),
-            SymbolSDFGlyphProgram::PaintPropertyBinders(pair.second.second, zoom)
+            SymbolSDFTextProgram::PaintPropertyBinders(pair.second.second, zoom)
         ));
     }
 }
