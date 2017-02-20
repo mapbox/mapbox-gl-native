@@ -1,12 +1,16 @@
 #include <mbgl/util/default_thread_pool.hpp>
 #include <mbgl/actor/mailbox.hpp>
+#include <mbgl/util/platform.hpp>
+#include <mbgl/util/string.hpp>
 
 namespace mbgl {
 
 ThreadPool::ThreadPool(std::size_t count) {
     threads.reserve(count);
     for (std::size_t i = 0; i < count; ++i) {
-        threads.emplace_back([this] () {
+        threads.emplace_back([this, i]() {
+            platform::setCurrentThreadName(std::string{ "Worker " } + util::toString(i + 1));
+
             while (true) {
                 std::unique_lock<std::mutex> lock(mutex);
 

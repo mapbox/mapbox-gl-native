@@ -18,6 +18,7 @@
 #include <mbgl/gl/context.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/image.hpp>
+#include <mbgl/util/shared_thread_pool.hpp>
 
 #include "bitmap.hpp"
 
@@ -29,7 +30,7 @@ NativeMapView::NativeMapView(JNIEnv *env_, jobject obj_, float pixelRatio, int a
       availableProcessors(availableProcessors_),
       totalMemory(totalMemory_),
       fileSource(defaultFileSource(mbgl::android::cachePath + "/mbgl-offline.db", mbgl::android::apkPath)),
-      threadPool(4) {
+      threadPool(sharedThreadPool()) {
 
     assert(env_ != nullptr);
     assert(obj_ != nullptr);
@@ -47,7 +48,7 @@ NativeMapView::NativeMapView(JNIEnv *env_, jobject obj_, float pixelRatio, int a
 
     map = std::make_unique<mbgl::Map>(
         *this, mbgl::Size{ static_cast<uint32_t>(width), static_cast<uint32_t>(height) },
-        pixelRatio, fileSource, threadPool, MapMode::Continuous);
+        pixelRatio, fileSource, *threadPool, MapMode::Continuous);
 
     float zoomFactor   = map->getMaxZoom() - map->getMinZoom() + 1;
     float cpuFactor    = availableProcessors;
