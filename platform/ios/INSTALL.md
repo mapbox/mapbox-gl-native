@@ -4,7 +4,7 @@ This document explains how to build a development version of Mapbox iOS SDK for 
 
 ### Requirements
 
-The Mapbox iOS SDK builds against the iOS 7.0 SDK. It is intended to run on iOS 7.0 and above on the following devices and their simulators:
+The Mapbox iOS SDK is intended to run on iOS 8.0 and above on the following devices and their simulators:
 
 * iPhone 4S and above (5, 5c, 5s, 6, 6 Plus)
 * iPad 2 and above (3, 4, Mini, Air, Mini 2, Air 2)
@@ -36,7 +36,7 @@ There are several ways to install custom builds of the Mapbox iOS SDK:
 
 #### Dynamic framework
 
-This is the recommended workflow for manually integrating custom builds of the SDK into an application targeting iOS 8 and above:
+This is the recommended workflow for manually integrating custom builds of the SDK into an application:
 
 1. Build from source manually, per above.
 
@@ -52,7 +52,7 @@ bash "${BUILT_PRODUCTS_DIR}/${FRAMEWORKS_FOLDER_PATH}/Mapbox.framework/strip-fra
 
 #### Static framework
 
-If your application targets iOS 7.x, you’ll need to install the static framework instead:
+You can alternatively install the SDK as a static framework:
 
 1. Build from source manually, per above.
 

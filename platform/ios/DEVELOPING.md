@@ -4,7 +4,7 @@ This document explains how to build the Mapbox iOS SDK from source. It is intend
 
 ## Requirements
 
-The Mapbox iOS SDK and iosapp demo application build against the iOS 7.0 SDK. The SDK is intended to run on iOS 7.0 and above, while iosapp is intended to run on iOS 8.0 and above due to the use of a dynamic framework. Both require Xcode on a computer running macOS.
+The Mapbox iOS SDK and iosapp demo application require iOS 8.0 or above.
 
 The Mapbox iOS SDK requires Xcode 7.3 or above. The iosapp demo application requires Xcode 8.0 or above to build.
 
@@ -52,7 +52,7 @@ You can customize the build output by passing the following arguments into the `
 
 * `BUILDTYPE=Release` will optimize for distribution. Defaults to `Debug`.
 * `BUILD_DEVICE=false` builds only for the iOS Simulator.
-* `FORMAT=dynamic` builds only a dynamic framework. `FORMAT=static` builds only a static framework, for compatibility with iOS 7.x.
+* `FORMAT=dynamic` builds only a dynamic framework. `FORMAT=static` builds only a static framework, for legacy compatibility.
 * `SYMBOLS=NO` strips the build output of any debug symbols, yielding much smaller binaries. Defaults to `YES`.
 
 An example command that creates a dynamic framework suitable for eventual App Store distribution:

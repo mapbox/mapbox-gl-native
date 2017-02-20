@@ -1,4 +1,4 @@
-  m.ios.deployment_target = '7.0'
+  m.ios.deployment_target = '8.0'
 
   m.requires_arc = true
 
