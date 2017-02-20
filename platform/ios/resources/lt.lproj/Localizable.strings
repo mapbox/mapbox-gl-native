@@ -1,0 +1,75 @@
+﻿/* Accessibility hint */
+"ANNOTATION_A11Y_HINT" = "Rodo daugiau informacijos";
+
+/* No comment provided by engineer. */
+"API_CLIENT_400_DESC" = "Užklausa nepavyko. Pradinė užklausa buvo: %@";
+
+/* No comment provided by engineer. */
+"API_CLIENT_400_REASON" = "Būklės kodas: %ld";
+
+/* No comment provided by engineer. */
+"CANCEL" = "Atšaukti";
+
+/* Accessibility hint */
+"COMPASS_A11Y_HINT" = "Pasuka žemėlapį šiaure į viršų";
+
+/* Accessibility label */
+"COMPASS_A11Y_LABEL" = "Kompasas";
+
+/* Compass abbreviation for north */
+"COMPASS_NORTH" = "Š";
+
+/* Instructions in Interface Builder designable; {key}, {plist file name} */
+"DESIGNABLE" = "Nustatykite %1$@ kaip jūsų prieigos raktą  %2$@ byloje tam, kad atvaizduoti žemėlapį patalpintą Mapbox.\n\nDaugiau informacijos:";
+
+/* Setup documentation URL display string; keep as short as possible */
+"FIRST_STEPS_URL" = "mapbox.com/help/first-steps-ios-sdk";
+
+/* Accessibility hint */
+"INFO_A11Y_HINT" = "Rodo kūrėjų sąrašą, grįžtamo ryšio formą ir daugiau.";
+
+/* Accessibility label */
+"INFO_A11Y_LABEL" = "Apie šį žemėlapį";
+
+/* Accessibility label */
+"LOGO_A11Y_LABEL" = "Mapbox";
+
+/* Accessibility label */
+"MAP_A11Y_LABEL" = "Žemėlapis";
+
+/* Map accessibility value */
+"MAP_A11Y_VALUE" = "Priartinimas: %1$dx\nMatomos anotacijos: %2$ld ";
+
+/* Action sheet title */
+"SDK_NAME" = "Mapbox iOS SDK";
+
+/* Telemetry prompt message */
+"TELEMETRY_DISABLED_MSG" = "Padėkite padaryti OpenStreetMap ir Mapbox žemėlapius geresniais dalindamiesi anoniminiais naudojimosi duomenimis.";
+
+/* Telemetry prompt button */
+"TELEMETRY_DISABLED_OFF" = "Nesidalinti";
+
+/* Telemetry prompt button */
+"TELEMETRY_DISABLED_ON" = "Dalintis";
+
+/* Telemetry prompt message */
+"TELEMETRY_ENABLED_MSG" = "Jūs padedate padaryti OpenStreetMap ir Mapbox žemėlapius geresniais dalindamiesi anoniminiais naudojimosi duomenimis.";
+
+/* Telemetry prompt button */
+"TELEMETRY_ENABLED_OFF" = "Stabdyti dalinimąsi";
+
+/* Telemetry prompt button */
+"TELEMETRY_ENABLED_ON" = "Tęsti dalinimąsi";
+
+/* Telemetry prompt button */
+"TELEMETRY_MORE" = "Daugiau informacijos";
+
+/* Action in attribution sheet */
+"TELEMETRY_NAME" = "Mapbox Telemetrija";
+
+/* Telemetry prompt title */
+"TELEMETRY_TITLE" = "Padaryti Mapbox žemėlapius geresniais";
+
+/* Default user location annotation title */
+"USER_DOT_TITLE" = "Jūs esate čia";
+
