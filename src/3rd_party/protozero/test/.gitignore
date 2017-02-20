@@ -1,6 +1,0 @@
-tests.o
-tests
-writer_tests.o
-writer_tests
-*.gcda
-*.gcno
