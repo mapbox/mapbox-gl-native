@@ -189,7 +189,7 @@ public class <%- camelize(type) %>LayerTest extends BaseStyleTest {
     assertNotNull(layer.get<%- camelize(property.name) %>().getFunction());
     assertEquals(SourceFunction.class, layer.get<%- camelize(property.name) %>().getFunction().getClass());
     assertEquals("FeaturePropertyA", ((SourceFunction) layer.get<%- camelize(property.name) %>().getFunction()).getProperty());
-    assertEquals(IdentityStops.class, layer.get<%- camelize(property.name) %>().getFunction().getStops().getClass());
+    assertEquals(IntervalStops.class, layer.get<%- camelize(property.name) %>().getFunction().getStops().getClass());
   }
 <% } else if (property.type === 'array') { -%>
 

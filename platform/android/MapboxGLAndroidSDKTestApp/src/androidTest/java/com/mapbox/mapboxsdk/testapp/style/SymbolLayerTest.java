@@ -928,7 +928,7 @@ public class SymbolLayerTest extends BaseStyleTest {
     assertNotNull(layer.getTextField().getFunction());
     assertEquals(SourceFunction.class, layer.getTextField().getFunction().getClass());
     assertEquals("FeaturePropertyA", ((SourceFunction) layer.getTextField().getFunction()).getProperty());
-    assertEquals(IdentityStops.class, layer.getTextField().getFunction().getStops().getClass());
+    assertEquals(IntervalStops.class, layer.getTextField().getFunction().getStops().getClass());
   }
 
   @Test
@@ -1412,7 +1412,7 @@ public class SymbolLayerTest extends BaseStyleTest {
     assertNotNull(layer.getTextTransform().getFunction());
     assertEquals(SourceFunction.class, layer.getTextTransform().getFunction().getClass());
     assertEquals("FeaturePropertyA", ((SourceFunction) layer.getTextTransform().getFunction()).getProperty());
-    assertEquals(IdentityStops.class, layer.getTextTransform().getFunction().getStops().getClass());
+    assertEquals(IntervalStops.class, layer.getTextTransform().getFunction().getStops().getClass());
   }
 
   @Test
