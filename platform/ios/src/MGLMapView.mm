@@ -4014,14 +4014,13 @@ public:
     {
         self.locationManager = [[CLLocationManager alloc] init];
 
-#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 80000
         if ([CLLocationManager instancesRespondToSelector:@selector(requestWhenInUseAuthorization)] && [CLLocationManager authorizationStatus] == kCLAuthorizationStatusNotDetermined)
         {
             BOOL hasLocationDescription = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSLocationAlwaysUsageDescription"] || [[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSLocationWhenInUseUsageDescription"];
             if (!hasLocationDescription)
             {
                 [NSException raise:@"Missing Location Services usage description" format:
-                 @"In iOS 8 and above, this app must have a value for NSLocationAlwaysUsageDescription or NSLocationWhenInUseUsageDescription in its Info.plist."];
+                 @"This app must have a value for NSLocationAlwaysUsageDescription or NSLocationWhenInUseUsageDescription in its Info.plist."];
             }
 
             if ([[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSLocationAlwaysUsageDescription"])
@@ -4033,7 +4032,6 @@ public:
                 [self.locationManager requestWhenInUseAuthorization];
             }
         }
-#endif
 
         self.locationManager.headingFilter = 5.0;
         self.locationManager.delegate = self;

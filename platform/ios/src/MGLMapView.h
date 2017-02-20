@@ -252,10 +252,10 @@ IB_DESIGNABLE
  whether the user’s position is visible, use the `userLocationVisible` property.
  The default value of this property is `NO`.
 
- On iOS 8 and above, your app must specify a value for
- `NSLocationWhenInUseUsageDescription` or `NSLocationAlwaysUsageDescription` in
- its `Info.plist` to satisfy the requirements of the underlying Core Location
- framework when enabling this property.
+ Your app must specify a value for `NSLocationWhenInUseUsageDescription` or
+ `NSLocationAlwaysUsageDescription` in its `Info.plist` to satisfy the
+ requirements of the underlying Core Location framework when enabling this
+ property.
  */
 @property (nonatomic, assign) BOOL showsUserLocation;
 
