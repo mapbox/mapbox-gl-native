@@ -58,8 +58,10 @@
 - (void)removeFromMapView:(MGLMapView *)mapView {
     auto removedSource = mapView.mbglMap->removeSource(self.identifier.UTF8String);
 
-    _pendingSource = std::move(reinterpret_cast<std::unique_ptr<mbgl::style::VectorSource> &>(removedSource));
-    self.rawSource = _pendingSource.get();
+    if (removedSource) {
+        _pendingSource = std::move(reinterpret_cast<std::unique_ptr<mbgl::style::VectorSource> &>(removedSource));
+        self.rawSource = _pendingSource.get();
+    }
 }
 
 - (mbgl::style::VectorSource *)rawSource {
