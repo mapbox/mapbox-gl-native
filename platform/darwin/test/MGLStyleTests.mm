@@ -174,6 +174,23 @@
     XCTAssertThrowsSpecificNamed([self.style addSource: source2], NSException, @"MGLRedundantSourceIdentifierException");
 }
 
+- (void)testRemovingSourcesBeforeAddingThem {
+    MGLRasterSource *rasterSource = [[MGLRasterSource alloc] initWithIdentifier:@"raster-source" tileURLTemplates:@[] options:nil];
+    [self.style removeSource:rasterSource];
+    [self.style addSource:rasterSource];
+    XCTAssertNotNil([self.style sourceWithIdentifier:rasterSource.identifier]);
+
+    MGLShapeSource *shapeSource = [[MGLShapeSource alloc] initWithIdentifier:@"shape-source" shape:nil options:nil];
+    [self.style removeSource:shapeSource];
+    [self.style addSource:shapeSource];
+    XCTAssertNotNil([self.style sourceWithIdentifier:shapeSource.identifier]);
+
+    MGLVectorSource *vectorSource = [[MGLVectorSource alloc] initWithIdentifier:@"vector-source" tileURLTemplates:@[] options:nil];
+    [self.style removeSource:vectorSource];
+    [self.style addSource:vectorSource];
+    XCTAssertNotNil([self.style sourceWithIdentifier:vectorSource.identifier]);
+}
+
 - (void)testLayers {
     NSArray<MGLStyleLayer *> *initialLayers = self.style.layers;
     if ([initialLayers.firstObject.identifier isEqualToString:@"com.mapbox.annotations.points"]) {

@@ -159,7 +159,7 @@ std::unique_ptr<Source> Style::removeSource(const std::string& id) {
     });
 
     if (it == sources.end()) {
-        throw std::runtime_error("no such source");
+        return nullptr;
     }
 
     auto source = std::move(*it);
