@@ -79,9 +79,9 @@
 }
 
 - (void)testCoordinateInCoordinateBounds {
-    CLLocationCoordinate2D ne = CLLocationCoordinate2DMake(41, -111);
-    CLLocationCoordinate2D sw = CLLocationCoordinate2DMake(45, -104);
-    MGLCoordinateBounds wyoming = MGLCoordinateBoundsMake(ne, sw);
+    CLLocationCoordinate2D ne = CLLocationCoordinate2DMake(45, -104);
+    CLLocationCoordinate2D sw = CLLocationCoordinate2DMake(41, -111);
+    MGLCoordinateBounds wyoming = MGLCoordinateBoundsMake(sw, ne);
 
     CLLocationCoordinate2D centerOfWyoming = CLLocationCoordinate2DMake(43, -107.5);
 
