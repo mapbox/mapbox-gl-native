@@ -33,6 +33,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsCoreRenderingRows) {
     MBXSettingsCoreRenderingTimestamps,
     MBXSettingsCoreRenderingCollisionBoxes,
     MBXSettingsCoreRenderingOverdrawVisualization,
+    MBXSettingsCoreRenderingToggleTwoMaps,
 };
 
 typedef NS_ENUM(NSInteger, MBXSettingsAnnotationsRows) {
@@ -299,6 +300,8 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                     (debugMask & MGLMapDebugCollisionBoxesMask ? @"Hide" :@"Show")],
                 [NSString stringWithFormat:@"%@ Overdraw Visualization",
                     (debugMask & MGLMapDebugOverdrawVisualizationMask ? @"Hide" :@"Show")],
+                [NSString stringWithFormat:@"%@ Second Map",
+                    ([self.view viewWithTag:2] == nil ? @"Show" : @"Hide")],
             ]];
             break;
         case MBXSettingsAnnotations:
@@ -390,6 +393,81 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                     break;
                 case MBXSettingsCoreRenderingOverdrawVisualization:
                     self.mapView.debugMask ^= MGLMapDebugOverdrawVisualizationMask;
+                    break;
+                case MBXSettingsCoreRenderingToggleTwoMaps:
+                    if ([self.view viewWithTag:2] == nil) {
+                        MGLMapView *secondMapView = [[MGLMapView alloc] initWithFrame:
+                                                        CGRectMake(0, self.view.bounds.size.height / 2,
+                                                                   self.view.bounds.size.width, self.view.bounds.size.height / 2)];
+                        secondMapView.translatesAutoresizingMaskIntoConstraints = false;
+                        secondMapView.tag = 2;
+                        for (NSLayoutConstraint *constraint in self.view.constraints)
+                        {
+                            if ((constraint.firstItem  == self.mapView && constraint.firstAttribute  == NSLayoutAttributeBottom) ||
+                                (constraint.secondItem == self.mapView && constraint.secondAttribute == NSLayoutAttributeBottom))
+                            {
+                                [self.view removeConstraint:constraint];
+                                break;
+                            }
+                        }
+                        [self.view addSubview:secondMapView];
+                        [self.view addConstraints:@[
+                            [NSLayoutConstraint constraintWithItem:self.mapView
+                                                         attribute:NSLayoutAttributeBottom
+                                                         relatedBy:NSLayoutRelationEqual
+                                                            toItem:self.view
+                                                         attribute:NSLayoutAttributeCenterY
+                                                        multiplier:1
+                                                          constant:0],
+                            [NSLayoutConstraint constraintWithItem:secondMapView
+                                                         attribute:NSLayoutAttributeCenterX
+                                                         relatedBy:NSLayoutRelationEqual
+                                                            toItem:self.view
+                                                         attribute:NSLayoutAttributeCenterX
+                                                        multiplier:1
+                                                          constant:0],
+                            [NSLayoutConstraint constraintWithItem:secondMapView
+                                                         attribute:NSLayoutAttributeWidth
+                                                         relatedBy:NSLayoutRelationEqual
+                                                            toItem:self.view
+                                                         attribute:NSLayoutAttributeWidth
+                                                        multiplier:1
+                                                          constant:0],
+                            [NSLayoutConstraint constraintWithItem:secondMapView
+                                                         attribute:NSLayoutAttributeTop
+                                                         relatedBy:NSLayoutRelationEqual
+                                                            toItem:self.view
+                                                         attribute:NSLayoutAttributeCenterY
+                                                        multiplier:1
+                                                          constant:0],
+                            [NSLayoutConstraint constraintWithItem:secondMapView
+                                                         attribute:NSLayoutAttributeBottom
+                                                         relatedBy:NSLayoutRelationEqual
+                                                            toItem:self.bottomLayoutGuide
+                                                         attribute:NSLayoutAttributeTop
+                                                        multiplier:1
+                                                          constant:0],
+                        ]];
+                    } else {
+                        NSMutableArray *constraintsToRemove = [NSMutableArray array];
+                        MGLMapView *secondMapView = (MGLMapView *)[self.view viewWithTag:2];
+                        for (NSLayoutConstraint *constraint in self.view.constraints)
+                        {
+                            if (constraint.firstItem == secondMapView || constraint.secondItem == secondMapView)
+                            {
+                                [constraintsToRemove addObject:constraint];
+                            }
+                        }
+                        [self.view removeConstraints:constraintsToRemove];
+                        [secondMapView removeFromSuperview];
+                        [self.view addConstraint:[NSLayoutConstraint constraintWithItem:self.mapView
+                                                                              attribute:NSLayoutAttributeBottom
+                                                                              relatedBy:NSLayoutRelationEqual
+                                                                                 toItem:self.bottomLayoutGuide
+                                                                              attribute:NSLayoutAttributeTop
+                                                                             multiplier:1
+                                                                               constant:0]];
+                    }
                     break;
                 default:
                     NSAssert(NO, @"All core rendering setting rows should be implemented");
