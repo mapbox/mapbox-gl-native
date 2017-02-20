@@ -1,8 +1,12 @@
 #import <Mapbox/Mapbox.h>
 
+#import "MGLOfflineStorage_Private.h"
+
 #import <XCTest/XCTest.h>
 
-@interface MGLOfflineStorageTests : XCTestCase
+#include <mbgl/util/run_loop.hpp>
+
+@interface MGLOfflineStorageTests : XCTestCase <MGLOfflineStorageDelegate>
 
 @end
 
@@ -14,8 +18,8 @@
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         XCTestExpectation *expectation = [self keyValueObservingExpectationForObject:[MGLOfflineStorage sharedOfflineStorage] keyPath:@"packs" handler:^BOOL(id _Nonnull observedObject, NSDictionary * _Nonnull change) {
-            NSKeyValueChange changeKind = [change[NSKeyValueChangeKindKey] unsignedIntegerValue];
-            return changeKind = NSKeyValueChangeSetting;
+            const auto changeKind = static_cast<NSKeyValueChange>([change[NSKeyValueChangeKindKey] unsignedLongValue]);
+            return changeKind == NSKeyValueChangeSetting;
         }];
         if ([MGLOfflineStorage sharedOfflineStorage].packs) {
             [expectation fulfill];
@@ -53,7 +57,7 @@
 
     __block MGLOfflinePack *pack;
     [self keyValueObservingExpectationForObject:[MGLOfflineStorage sharedOfflineStorage] keyPath:@"packs" handler:^BOOL(id _Nonnull observedObject, NSDictionary * _Nonnull change) {
-        NSKeyValueChange changeKind = [change[NSKeyValueChangeKindKey] unsignedIntegerValue];
+        const auto changeKind = static_cast<NSKeyValueChange>([change[NSKeyValueChangeKindKey] unsignedLongValue]);
         NSIndexSet *indices = change[NSKeyValueChangeIndexesKey];
         return changeKind == NSKeyValueChangeInsertion && indices.count == 1;
     }];
@@ -80,8 +84,8 @@
     XCTAssertEqual(pack.state, MGLOfflinePackStateInactive, @"New pack should initially have inactive state.");
 
     [self keyValueObservingExpectationForObject:pack keyPath:@"state" handler:^BOOL(id _Nonnull observedObject, NSDictionary * _Nonnull change) {
-        NSKeyValueChange changeKind = [change[NSKeyValueChangeKindKey] unsignedIntegerValue];
-        MGLOfflinePackState state = [change[NSKeyValueChangeNewKey] integerValue];
+        const auto changeKind = static_cast<NSKeyValueChange>([change[NSKeyValueChangeKindKey] unsignedLongValue]);
+        const auto state = static_cast<MGLOfflinePackState>([change[NSKeyValueChangeNewKey] longValue]);
         return changeKind == NSKeyValueChangeSetting && state == MGLOfflinePackStateInactive;
     }];
     [self expectationForNotification:MGLOfflinePackProgressChangedNotification object:pack handler:^BOOL(NSNotification * _Nonnull notification) {
@@ -136,9 +140,9 @@
     XCTAssertNotNil(pack, @"Added pack should still exist.");
 
     [self keyValueObservingExpectationForObject:[MGLOfflineStorage sharedOfflineStorage] keyPath:@"packs" handler:^BOOL(id _Nonnull observedObject, NSDictionary * _Nonnull change) {
-        NSKeyValueChange changeKind = [change[NSKeyValueChangeKindKey] unsignedIntegerValue];
+        const auto changeKind = static_cast<NSKeyValueChange>([change[NSKeyValueChangeKindKey] unsignedLongValue]);
         NSIndexSet *indices = change[NSKeyValueChangeIndexesKey];
-        return changeKind = NSKeyValueChangeRemoval && indices.count == 1;
+        return changeKind == NSKeyValueChangeRemoval && indices.count == 1;
     }];
     XCTestExpectation *completionHandlerExpectation = [self expectationWithDescription:@"remove pack completion handler"];
     [[MGLOfflineStorage sharedOfflineStorage] removePack:pack withCompletionHandler:^(NSError * _Nullable error) {
@@ -154,6 +158,38 @@
 
 - (void)testCountOfBytesCompleted {
     XCTAssertGreaterThan([MGLOfflineStorage sharedOfflineStorage].countOfBytesCompleted, 0);
+}
+
+- (NSURL *)offlineStorage:(MGLOfflineStorage *)storage
+     URLForResourceOfKind:(MGLResourceKind)kind
+                  withURL:(NSURL *)url {
+    if ([url.scheme isEqual: @"test"] && [url.host isEqual: @"api"]) {
+        return [NSURL URLWithString:@"https://api.mapbox.com"];
+    } else {
+        return url;
+    }
+}
+
+- (void)testResourceTransform {
+    MGLOfflineStorage *os = [MGLOfflineStorage sharedOfflineStorage];
+    [os setDelegate:self];
+
+    auto fs = os.mbglFileSource;
+
+    // Delegate returns "https://api.mapbox.com" as a replacement URL.
+    const mbgl::Resource resource { mbgl::Resource::Unknown, "test://api" };
+    std::unique_ptr<mbgl::AsyncRequest> req;
+    req = fs->request(resource, [&](mbgl::Response res) {
+        req.reset();
+        XCTAssertFalse(res.error.get(), @"Request should not return an error");
+        XCTAssertTrue(res.data.get(), @"Request should return data");
+        XCTAssertEqual("{\"api\":\"mapbox\"}", *res.data, @"Request did not return expected data");
+        CFRunLoopStop(CFRunLoopGetCurrent());
+    });
+
+    CFRunLoopRun();
+
+    [os setDelegate:nil];
 }
 
 @end
