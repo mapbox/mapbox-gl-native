@@ -10,7 +10,8 @@ public:
     ~BackendScope();
 
 private:
-    Backend* priorBackend;
+    BackendScope* priorScope;
+    BackendScope* nextScope;
     Backend& backend;
 };
 

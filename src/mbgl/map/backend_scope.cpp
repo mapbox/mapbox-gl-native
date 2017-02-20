@@ -2,24 +2,34 @@
 #include <mbgl/map/backend.hpp>
 #include <mbgl/util/thread_local.hpp>
 
+#include <cassert>
+
 namespace mbgl {
 
-static util::ThreadLocal<Backend> currentBackend;
+static util::ThreadLocal<BackendScope> currentScope;
 
 BackendScope::BackendScope(Backend& backend_)
-    : priorBackend(currentBackend.get()),
+    : priorScope(currentScope.get()),
+      nextScope(nullptr),
       backend(backend_) {
+    if (priorScope) {
+        assert(priorScope->nextScope == nullptr);
+        priorScope->nextScope = this;
+    }
     backend.activate();
-    currentBackend.set(&backend);
+    currentScope.set(this);
 }
 
 BackendScope::~BackendScope() {
-    if (priorBackend) {
-        priorBackend->activate();
-        currentBackend.set(priorBackend);
+    assert(nextScope == nullptr);
+    if (priorScope) {
+        priorScope->backend.activate();
+        currentScope.set(priorScope);
+        assert(priorScope->nextScope == this);
+        priorScope->nextScope = nullptr;
     } else {
         backend.deactivate();
-        currentBackend.set(nullptr);
+        currentScope.set(nullptr);
     }
 }
 
