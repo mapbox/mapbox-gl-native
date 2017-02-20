@@ -575,3 +575,6 @@ qtConfig(system-zlib) {
 } else {
     QT_PRIVATE += zlib-private
 }
+
+# QTBUG-59035
+TR_EXCLUDE += $$PWD/*
