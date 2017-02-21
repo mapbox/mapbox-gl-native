@@ -53,43 +53,43 @@ set(MBGL_CORE_FILES
     src/mbgl/geometry/line_atlas.hpp
 
     # gl
+    include/mbgl/gl/attribute.hpp
+    include/mbgl/gl/color_mode.hpp
+    include/mbgl/gl/context.hpp
+    include/mbgl/gl/debugging.hpp
+    include/mbgl/gl/depth_mode.hpp
+    include/mbgl/gl/draw_mode.hpp
+    include/mbgl/gl/extension.hpp
+    include/mbgl/gl/framebuffer.hpp
     include/mbgl/gl/gl.hpp
+    include/mbgl/gl/index_buffer.hpp
+    include/mbgl/gl/normalization.hpp
+    include/mbgl/gl/object.hpp
+    include/mbgl/gl/primitives.hpp
+    include/mbgl/gl/program.hpp
+    include/mbgl/gl/renderbuffer.hpp
+    include/mbgl/gl/segment.hpp
+    include/mbgl/gl/state.hpp
+    include/mbgl/gl/stencil_mode.hpp
+    include/mbgl/gl/texture.hpp
+    include/mbgl/gl/types.hpp
+    include/mbgl/gl/uniform.hpp
+    include/mbgl/gl/value.hpp
+    include/mbgl/gl/vertex_array.hpp
+    include/mbgl/gl/vertex_buffer.hpp
     src/mbgl/gl/attribute.cpp
-    src/mbgl/gl/attribute.hpp
     src/mbgl/gl/color_mode.cpp
-    src/mbgl/gl/color_mode.hpp
     src/mbgl/gl/context.cpp
-    src/mbgl/gl/context.hpp
     src/mbgl/gl/debugging.cpp
-    src/mbgl/gl/debugging.hpp
     src/mbgl/gl/depth_mode.cpp
-    src/mbgl/gl/depth_mode.hpp
-    src/mbgl/gl/draw_mode.hpp
     src/mbgl/gl/extension.cpp
-    src/mbgl/gl/extension.hpp
-    src/mbgl/gl/framebuffer.hpp
     src/mbgl/gl/gl.cpp
-    src/mbgl/gl/index_buffer.hpp
-    src/mbgl/gl/normalization.hpp
     src/mbgl/gl/object.cpp
-    src/mbgl/gl/object.hpp
-    src/mbgl/gl/primitives.hpp
-    src/mbgl/gl/program.hpp
-    src/mbgl/gl/renderbuffer.hpp
     src/mbgl/gl/segment.cpp
-    src/mbgl/gl/segment.hpp
-    src/mbgl/gl/state.hpp
     src/mbgl/gl/stencil_mode.cpp
-    src/mbgl/gl/stencil_mode.hpp
-    src/mbgl/gl/texture.hpp
-    src/mbgl/gl/types.hpp
     src/mbgl/gl/uniform.cpp
-    src/mbgl/gl/uniform.hpp
     src/mbgl/gl/value.cpp
-    src/mbgl/gl/value.hpp
     src/mbgl/gl/vertex_array.cpp
-    src/mbgl/gl/vertex_array.hpp
-    src/mbgl/gl/vertex_buffer.hpp
 
     # layout
     src/mbgl/layout/clip_lines.cpp
