@@ -447,6 +447,7 @@ set(MBGL_CORE_FILES
     include/mbgl/util/geo.hpp
     include/mbgl/util/geojson.hpp
     include/mbgl/util/geometry.hpp
+    include/mbgl/util/ignore.hpp
     include/mbgl/util/image.hpp
     include/mbgl/util/interpolate.hpp
     include/mbgl/util/logging.hpp
@@ -490,7 +491,6 @@ set(MBGL_CORE_FILES
     src/mbgl/util/http_timeout.hpp
     src/mbgl/util/i18n.cpp
     src/mbgl/util/i18n.hpp
-    src/mbgl/util/ignore.hpp
     src/mbgl/util/indexed_tuple.hpp
     src/mbgl/util/interpolate.cpp
     src/mbgl/util/intersection_tests.cpp
