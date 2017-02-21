@@ -1,6 +1,6 @@
 Pod::Spec.new do |m|
 
-  version = '0.3.0'
+  version = '0.3.1'
 
   m.name    = 'Mapbox-macOS-SDK-symbols'
   m.version = "#{version}-symbols"

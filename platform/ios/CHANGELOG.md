@@ -2,7 +2,9 @@
 
 Mapbox welcomes participation and contributions from everyone. Please read [CONTRIBUTING.md](../../CONTRIBUTING.md) to get started.
 
-## 3.4.2
+## 3.4.2 - February 21, 2017
+
+This is the final scheduled version of the Mapbox iOS SDK that supports iOS 7. ([#8129](https://github.com/mapbox/mapbox-gl-native/pull/8129))
 
 * A programmatic change to an MGLMapView’s camera no longer resets the user tracking mode. ([#7856](https://github.com/mapbox/mapbox-gl-native/pull/7856))
 * Improved the performance of trivial camera animations. ([#7125](https://github.com/mapbox/mapbox-gl-native/pull/7125))
