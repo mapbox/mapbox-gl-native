@@ -5,6 +5,7 @@
 #include <mbgl/util/optional.hpp>
 #include <mbgl/util/logging.hpp>
 
+#include <mutex>
 #include <cstddef>
 #include <vector>
 
@@ -46,11 +47,10 @@ public:
             }
         } else {
             // No VAO support. Force attributes to be rebound.
-            static bool reported = false;
-            if (!reported) {
+            static std::once_flag reportedOnce;
+            std::call_once(reportedOnce, [] {
                 Log::Warning(Event::OpenGL, "Not using Vertex Array Objects");
-                reported = true;
-            }
+            });
             context.elementBuffer = indexBuffer_;
             variableBindings = {};
         }
