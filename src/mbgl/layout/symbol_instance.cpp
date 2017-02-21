@@ -5,12 +5,22 @@ namespace mbgl {
 
 using namespace style;
 
-SymbolInstance::SymbolInstance(Anchor& anchor, const GeometryCoordinates& line,
-        const std::pair<Shaping, Shaping>& shapedTextOrientations, const PositionedIcon& shapedIcon,
-        const SymbolLayoutProperties::Evaluated& layout, const bool addToBuffers, const uint32_t index_,
-        const float textBoxScale, const float textPadding, const SymbolPlacementType textPlacement,
-        const float iconBoxScale, const float iconPadding, const SymbolPlacementType iconPlacement,
-        const GlyphPositions& face, const IndexedSubfeature& indexedFeature, const std::size_t featureIndex_) :
+SymbolInstance::SymbolInstance(Anchor& anchor,
+                               const GeometryCoordinates& line,
+                               const std::pair<Shaping, Shaping>& shapedTextOrientations,
+                               const PositionedIcon& shapedIcon,
+                               const SymbolLayoutProperties::Evaluated& layout,
+                               const bool addToBuffers,
+                               const uint32_t index_,
+                               const float textBoxScale,
+                               const float textPadding,
+                               const SymbolPlacementType textPlacement,
+                               const float iconBoxScale,
+                               const float iconPadding,
+                               const SymbolPlacementType iconPlacement,
+                               const GlyphPositions& face,
+                               const IndexedSubfeature& indexedFeature,
+                               const std::size_t featureIndex_) :
     point(anchor.point),
     index(index_),
     hasText(shapedTextOrientations.first || shapedTextOrientations.second),

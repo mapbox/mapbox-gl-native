@@ -3,12 +3,18 @@
 
 namespace mbgl {
 
-CollisionFeature::CollisionFeature(const GeometryCoordinates &line, const Anchor &anchor,
-        const float top, const float bottom, const float left, const float right,
-        const float boxScale, const float padding, const style::SymbolPlacementType placement, IndexedSubfeature indexedFeature_,
-        const bool straight)
+CollisionFeature::CollisionFeature(const GeometryCoordinates& line,
+                                   const Anchor& anchor,
+                                   const float top,
+                                   const float bottom,
+                                   const float left,
+                                   const float right,
+                                   const float boxScale,
+                                   const float padding,
+                                   const style::SymbolPlacementType placement,
+                                   IndexedSubfeature indexedFeature_,
+                                   const bool straight)
         : indexedFeature(std::move(indexedFeature_)) {
-
     if (top == 0 && bottom == 0 && left == 0 && right == 0) return;
 
     const float y1 = top * boxScale - padding;
@@ -40,9 +46,8 @@ CollisionFeature::CollisionFeature(const GeometryCoordinates &line, const Anchor
     }
 }
 
-void CollisionFeature::bboxifyLabel(const GeometryCoordinates &line,
-        GeometryCoordinate &anchorPoint, const int segment, const float labelLength, const float boxSize) {
-
+void CollisionFeature::bboxifyLabel(const GeometryCoordinates& line, GeometryCoordinate& anchorPoint,
+                                    const int segment, const float labelLength, const float boxSize) {
     const float step = boxSize / 2;
     const unsigned int nBoxes = std::floor(labelLength / step);
 
@@ -100,6 +105,5 @@ void CollisionFeature::bboxifyLabel(const GeometryCoordinates &line,
         boxes.emplace_back(boxAnchor, -boxSize / 2, -boxSize / 2, boxSize / 2, boxSize / 2, maxScale);
     }
 }
-
 
 } // namespace mbgl
