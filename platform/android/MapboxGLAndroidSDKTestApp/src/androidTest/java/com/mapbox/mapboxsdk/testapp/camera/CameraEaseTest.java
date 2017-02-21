@@ -118,6 +118,7 @@ public class CameraEaseTest {
   }
 
   @Test
+  @Ignore
   public void testEaseToBounds() {
     ViewUtils.checkViewIsDisplayed(R.id.mapView);
     final MapboxMap mapboxMap = rule.getActivity().getMapboxMap();
