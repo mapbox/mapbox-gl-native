@@ -51,7 +51,7 @@ public:
 
 typedef std::vector<SymbolQuad> SymbolQuads;
 
-SymbolQuad getIconQuad(Anchor& anchor,
+SymbolQuad getIconQuad(const Anchor& anchor,
                        const PositionedIcon& shapedIcon,
                        const GeometryCoordinates& line,
                        const style::SymbolLayoutProperties::Evaluated&,

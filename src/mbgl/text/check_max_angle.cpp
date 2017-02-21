@@ -14,7 +14,7 @@ struct Corner {
 };
 
 bool checkMaxAngle(const GeometryCoordinates& line,
-                   Anchor& anchor,
+                   const Anchor& anchor,
                    const float labelLength,
                    const float windowSize,
                    const float maxAngle) {
