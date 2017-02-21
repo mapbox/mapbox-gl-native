@@ -107,14 +107,14 @@ namespace mbgl {
 
 - (void)removeFromMapView:(MGLMapView *)mapView
 {
+    if (self.rawLayer != mapView.mbglMap->getLayer(self.identifier.UTF8String)) {
+        return;
+    }
+
     auto removedLayer = mapView.mbglMap->removeLayer(self.identifier.UTF8String);
     if (!removedLayer) {
         return;
     }
-    
-    auto originalLayer = std::make_unique<mbgl::style::FillLayer>(self.identifier.UTF8String, self.sourceIdentifier.UTF8String);
-    _pendingLayer = std::move(originalLayer);
-    self.rawLayer = _pendingLayer.get();
 
     mbgl::style::FillLayer *layer = dynamic_cast<mbgl::style::FillLayer *>(removedLayer.get());
     if (!layer) {

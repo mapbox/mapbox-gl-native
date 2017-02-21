@@ -284,10 +284,25 @@
     [self.style addLayer:circleLayer];
     XCTAssertNotNil([self.style layerWithIdentifier:circleLayer.identifier]);
 
-    MGLBackgroundStyleLayer *backgroundLayer = [[MGLBackgroundStyleLayer alloc] initWithIdentifier:@"circle-layer"];
+    MGLBackgroundStyleLayer *backgroundLayer = [[MGLBackgroundStyleLayer alloc] initWithIdentifier:@"background-layer"];
     [self.style removeLayer:backgroundLayer];
     [self.style addLayer:backgroundLayer];
     XCTAssertNotNil([self.style layerWithIdentifier:backgroundLayer.identifier]);
+}
+
+- (void)testAddingLayerOfTypeABeforeRemovingLayerOfTypeBWithSameIdentifier {
+    MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"shape-source-removing-before-adding" shape:nil options:nil];
+    [self.style addSource:source];
+
+    // Add a fill layer with an identifer
+    MGLFillStyleLayer *fillLayer = [[MGLFillStyleLayer alloc] initWithIdentifier:@"some-identifier" source:source];
+    [self.style addLayer:fillLayer];
+
+    // Remove a line layer (before adding it) with the same identifier as the fill layer previously added
+    MGLLineStyleLayer *lineLayer = [[MGLLineStyleLayer alloc] initWithIdentifier:fillLayer.identifier source:source];
+    [self.style removeLayer:lineLayer];
+
+    XCTAssertTrue([[self.style layerWithIdentifier:fillLayer.identifier] isMemberOfClass:[MGLFillStyleLayer class]]);
 }
 
 - (NSString *)stringWithContentsOfStyleHeader {
