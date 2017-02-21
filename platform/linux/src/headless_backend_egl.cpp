@@ -31,9 +31,6 @@ struct EGLImpl : public HeadlessBackend::Impl {
     }
 
     ~EGLImpl() {
-        if (glContext != eglGetCurrentContext()) {
-            activateContext();
-        }
         if (!eglDestroyContext(display, glContext)) {
             throw std::runtime_error("Failed to destroy EGL context.\n");
         }
