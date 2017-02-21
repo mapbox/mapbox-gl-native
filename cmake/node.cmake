@@ -1,6 +1,14 @@
+# Load Node.js
+include(cmake/NodeJS.cmake)
+nodejs_init()
+
 add_nodejs_module(mbgl-node
     platform/node/src/node_mapbox_gl_native.cpp
 )
+
+# NodeJS.cmake forces C++11.
+# https://github.com/cjntaylor/node-cmake/issues/18
+set_target_properties("mbgl-node" PROPERTIES CXX_STANDARD 14)
 
 target_sources(mbgl-node
     PRIVATE platform/node/src/node_logging.hpp

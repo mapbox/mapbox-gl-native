@@ -47,12 +47,7 @@ endif
 .PHONY: default
 default: test
 
-.NOTPARALLEL: node_modules
-node_modules: package.json
-	npm install --ignore-scripts # Install dependencies but don't run our own install script.
-
 BUILD_DEPS += Makefile
-BUILD_DEPS += node_modules
 BUILD_DEPS += CMakeLists.txt
 
 #### macOS targets ##############################################################

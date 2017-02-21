@@ -6,21 +6,12 @@ if (NOT MBGL_PLATFORM)
     endif()
 endif()
 
-if(NOT EXISTS ${CMAKE_SOURCE_DIR}/node_modules/node-cmake/FindNodeJS.cmake)
-    message(FATAL_ERROR "Can't find node-cmake")
+find_program(NodeJS_EXECUTABLE NAMES nodejs node)
+if (NOT NodeJS_EXECUTABLE)
+    message(FATAL_ERROR "Could not find Node.js")
 endif()
 
-# Load Node.js
-set(NodeJS_CXX_STANDARD 14 CACHE INTERNAL "Use C++14" FORCE)
-set(NodeJS_DOWNLOAD ON CACHE INTERNAL "Download node.js sources" FORCE)
-set(NodeJS_USE_CLANG_STDLIB OFF CACHE BOOL "Don't use libc++ by default" FORCE)
-list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/node_modules/node-cmake)
-find_package(NodeJS)
-
-find_program(npm_EXECUTABLE
-    NAMES npm
-    PATHS ${NodeJS_ROOT_DIR})
-
+find_program(npm_EXECUTABLE NAMES npm)
 if (NOT npm_EXECUTABLE)
     message(FATAL_ERROR "Could not find npm")
 endif()
