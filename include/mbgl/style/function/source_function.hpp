@@ -4,7 +4,6 @@
 #include <mbgl/style/function/interval_stops.hpp>
 #include <mbgl/style/function/categorical_stops.hpp>
 #include <mbgl/style/function/identity_stops.hpp>
-#include <mbgl/tile/geometry_tile_data.hpp>
 #include <mbgl/util/interpolate.hpp>
 #include <mbgl/util/variant.hpp>
 
@@ -34,7 +33,8 @@ public:
           defaultValue(std::move(defaultValue_)) {
     }
 
-    T evaluate(const GeometryTileFeature& feature, T finalDefaultValue) const {
+    template <class Feature>
+    T evaluate(const Feature& feature, T finalDefaultValue) const {
         optional<Value> v = feature.getValue(property);
         if (!v) {
             return defaultValue.value_or(finalDefaultValue);
