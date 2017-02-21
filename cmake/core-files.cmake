@@ -516,6 +516,7 @@ set(MBGL_CORE_FILES
     src/mbgl/util/std.hpp
     src/mbgl/util/stopwatch.cpp
     src/mbgl/util/stopwatch.hpp
+    src/mbgl/util/string.cpp
     src/mbgl/util/thread.hpp
     src/mbgl/util/thread_context.cpp
     src/mbgl/util/thread_context.hpp
