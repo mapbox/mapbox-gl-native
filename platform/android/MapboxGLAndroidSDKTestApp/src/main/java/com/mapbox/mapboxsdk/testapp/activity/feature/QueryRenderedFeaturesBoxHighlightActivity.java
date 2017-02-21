@@ -62,12 +62,8 @@ public class QueryRenderedFeaturesBoxHighlightActivity extends AppCompatActivity
               Toast.LENGTH_SHORT).show();
 
             // remove layer / source if already added
-            try {
-              mapboxMap.removeSource("highlighted-shapes-source");
-              mapboxMap.removeLayer("highlighted-shapes-layer");
-            } catch (Exception exception) {
-              // that's ok
-            }
+            mapboxMap.removeSource("highlighted-shapes-source");
+            mapboxMap.removeLayer("highlighted-shapes-layer");
 
             // Add layer / source
             mapboxMap.addSource(

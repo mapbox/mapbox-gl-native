@@ -12,11 +12,9 @@ import android.view.View;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.style.layers.CannotAddLayerException;
 import com.mapbox.mapboxsdk.style.layers.FillLayer;
-import com.mapbox.mapboxsdk.style.layers.NoSuchLayerException;
 import com.mapbox.mapboxsdk.style.layers.Property;
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory;
 import com.mapbox.mapboxsdk.style.sources.CannotAddSourceException;
-import com.mapbox.mapboxsdk.style.sources.NoSuchSourceException;
 import com.mapbox.mapboxsdk.style.sources.Source;
 import com.mapbox.mapboxsdk.style.sources.VectorSource;
 import com.mapbox.mapboxsdk.testapp.R;
@@ -69,11 +67,7 @@ public class RuntimeStyleTests {
 
     MapboxMap mapboxMap = rule.getActivity().getMapboxMap();
     mapboxMap.addSource(new VectorSource("my-source", "mapbox://mapbox.mapbox-terrain-v2"));
-    try {
-      mapboxMap.removeSource("my-source");
-    } catch (NoSuchSourceException noSuchSourceException) {
-      // it's ok..
-    }
+    mapboxMap.removeSource("my-source");
 
     onView(withId(R.id.mapView)).perform(new AddRemoveSourceAction());
   }
@@ -109,11 +103,7 @@ public class RuntimeStyleTests {
       assertNotNull(mapboxMap.getLayer("building"));
 
       // Remove
-      try {
-        mapboxMap.removeLayer("building");
-      } catch (NoSuchLayerException noSuchSourceException) {
-        fail("Definitively exists: " + noSuchSourceException.getMessage());
-      }
+      mapboxMap.removeLayer("building");
       assertNull(mapboxMap.getLayer("building"));
 
       // Add
@@ -126,11 +116,7 @@ public class RuntimeStyleTests {
       layer.setProperties(PropertyFactory.visibility(Property.VISIBLE));
 
       // Remove, preserving the reference
-      try {
-        mapboxMap.removeLayer(layer);
-      } catch (NoSuchLayerException noSuchSourceException) {
-        fail("Definitively exists: " + noSuchSourceException.getMessage());
-      }
+      mapboxMap.removeLayer(layer);
 
       // Property setters should still work
       layer.setProperties(PropertyFactory.fillColor(Color.RED));
@@ -161,11 +147,7 @@ public class RuntimeStyleTests {
       mapboxMap.addSource(new VectorSource("my-source", "mapbox://mapbox.mapbox-terrain-v2"));
 
       // Remove
-      try {
-        mapboxMap.removeSource("my-source");
-      } catch (NoSuchSourceException noSuchSourceException) {
-        fail("Definitively exists: " + noSuchSourceException.getMessage());
-      }
+      mapboxMap.removeSource("my-source");
       assertNull(mapboxMap.getLayer("my-source"));
 
       // Add
@@ -173,11 +155,7 @@ public class RuntimeStyleTests {
       mapboxMap.addSource(source);
 
       // Remove, preserving the reference
-      try {
-        mapboxMap.removeSource(source);
-      } catch (NoSuchSourceException noSuchSourceException) {
-        fail("Definitively exists: " + noSuchSourceException.getMessage());
-      }
+      mapboxMap.removeSource(source);
 
       // Re-add the reference...
       mapboxMap.addSource(source);

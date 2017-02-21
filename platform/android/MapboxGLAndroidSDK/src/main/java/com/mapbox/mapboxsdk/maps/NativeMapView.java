@@ -21,8 +21,6 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.ProjectedMeters;
 import com.mapbox.mapboxsdk.offline.OfflineManager;
 import com.mapbox.mapboxsdk.style.layers.Layer;
-import com.mapbox.mapboxsdk.style.layers.NoSuchLayerException;
-import com.mapbox.mapboxsdk.style.sources.NoSuchSourceException;
 import com.mapbox.mapboxsdk.style.sources.Source;
 import com.mapbox.services.commons.geojson.Feature;
 
@@ -804,14 +802,14 @@ final class NativeMapView {
     nativeAddLayer(nativeMapViewPtr, layer.getNativePtr(), before);
   }
 
-  public void removeLayer(@NonNull String layerId) throws NoSuchLayerException {
+  public void removeLayer(@NonNull String layerId) {
     if (isDestroyedOn("removeLayer")) {
       return;
     }
     nativeRemoveLayerById(nativeMapViewPtr, layerId);
   }
 
-  public void removeLayer(@NonNull Layer layer) throws NoSuchLayerException {
+  public void removeLayer(@NonNull Layer layer) {
     if (isDestroyedOn("removeLayer")) {
       return;
     }
@@ -832,14 +830,14 @@ final class NativeMapView {
     nativeAddSource(nativeMapViewPtr, source.getNativePtr());
   }
 
-  public void removeSource(@NonNull String sourceId) throws NoSuchSourceException {
+  public void removeSource(@NonNull String sourceId)  {
     if (isDestroyedOn("removeSource")) {
       return;
     }
     nativeRemoveSourceById(nativeMapViewPtr, sourceId);
   }
 
-  public void removeSource(@NonNull Source source) throws NoSuchSourceException {
+  public void removeSource(@NonNull Source source) {
     if (isDestroyedOn("removeSource")) {
       return;
     }
@@ -1129,17 +1127,17 @@ final class NativeMapView {
 
   private native void nativeAddLayer(long nativeMapViewPtr, long layerPtr, String before);
 
-  private native void nativeRemoveLayerById(long nativeMapViewPtr, String layerId) throws NoSuchLayerException;
+  private native void nativeRemoveLayerById(long nativeMapViewPtr, String layerId);
 
-  private native void nativeRemoveLayer(long nativeMapViewPtr, long layerId) throws NoSuchLayerException;
+  private native void nativeRemoveLayer(long nativeMapViewPtr, long layerId);
 
   private native Source nativeGetSource(long nativeMapViewPtr, String sourceId);
 
   private native void nativeAddSource(long nativeMapViewPtr, long nativeSourcePtr);
 
-  private native void nativeRemoveSourceById(long nativeMapViewPtr, String sourceId) throws NoSuchSourceException;
+  private native void nativeRemoveSourceById(long nativeMapViewPtr, String sourceId);
 
-  private native void nativeRemoveSource(long nativeMapViewPtr, long sourcePtr) throws NoSuchSourceException;
+  private native void nativeRemoveSource(long nativeMapViewPtr, long sourcePtr);
 
   private native void nativeAddImage(long nativeMapViewPtr, String name, int width, int height, float pixelRatio,
                                      byte[] array);
