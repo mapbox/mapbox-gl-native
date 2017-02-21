@@ -34,7 +34,7 @@ public final class CompassView extends AppCompatImageView implements Runnable, F
   private static final long TIME_FADE_ANIMATION = TIME_WAIT_IDLE;
   private static final long TIME_MAP_NORTH_ANIMATION = 150;
 
-  private double direction = 0.0;
+  private float rotation = 0.0f;
   private boolean fadeCompassViewFacingNorth = true;
   private ViewPropertyAnimatorCompat fadeAnimator;
   private PointF focalPoint;
@@ -82,8 +82,8 @@ public final class CompassView extends AppCompatImageView implements Runnable, F
   }
 
   public boolean isFacingNorth() {
-    // increase range more than just 0.0
-    return direction >= 359.0 || direction <= 1.0;
+    // increase range of facing north to more than only 0.0
+    return Math.abs(rotation) >= 359.0 || Math.abs(rotation) <= 1.0;
   }
 
   @Override
@@ -105,8 +105,14 @@ public final class CompassView extends AppCompatImageView implements Runnable, F
     return focalPoint;
   }
 
-  public void update(final double direction) {
-    this.direction = direction;
+  /**
+   * Updates the direction of the compass.
+   *
+   * @param bearing the direction value of the map
+   */
+  public void update(final double bearing) {
+    // compass needs reverse bearing #8123
+    rotation = (float) -bearing;
 
     if (!isEnabled()) {
       return;
@@ -124,7 +130,7 @@ public final class CompassView extends AppCompatImageView implements Runnable, F
       setVisibility(View.VISIBLE);
     }
 
-    setRotation((float) direction);
+    setRotation(rotation);
   }
 
   public void fadeCompassViewFacingNorth(boolean compassFadeFacingNorth) {
