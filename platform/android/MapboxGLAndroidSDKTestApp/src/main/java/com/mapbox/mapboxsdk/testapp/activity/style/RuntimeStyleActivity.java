@@ -20,7 +20,6 @@ import com.mapbox.mapboxsdk.style.functions.stops.Stop;
 import com.mapbox.mapboxsdk.style.layers.FillLayer;
 import com.mapbox.mapboxsdk.style.layers.Layer;
 import com.mapbox.mapboxsdk.style.layers.LineLayer;
-import com.mapbox.mapboxsdk.style.layers.NoSuchLayerException;
 import com.mapbox.mapboxsdk.style.layers.Property;
 import com.mapbox.mapboxsdk.style.layers.PropertyValue;
 import com.mapbox.mapboxsdk.style.layers.RasterLayer;
@@ -247,11 +246,7 @@ public class RuntimeStyleActivity extends AppCompatActivity {
 
   private void removeBuildings() {
     // Zoom to see buildings first
-    try {
-      mapboxMap.removeLayer("building");
-    } catch (NoSuchLayerException noSuchLayerException) {
-      Toast.makeText(RuntimeStyleActivity.this, noSuchLayerException.getMessage(), Toast.LENGTH_SHORT).show();
-    }
+    mapboxMap.removeLayer("building");
   }
 
   private void addParksLayer() {

@@ -1181,11 +1181,8 @@ void nativeAddLayer(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jlon
 void nativeRemoveLayerById(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jni::jstring* id) {
     assert(nativeMapViewPtr != 0);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    try {
-        nativeMapView->getMap().removeLayer(std_string_from_jstring(env, id));
-    } catch (const std::runtime_error& error) {
-        jni::ThrowNew(*env, jni::FindClass(*env, "com/mapbox/mapboxsdk/style/layers/NoSuchLayerException"), error.what());
-    }
+
+    nativeMapView->getMap().removeLayer(std_string_from_jstring(env, id));
 }
 
 /**
@@ -1195,11 +1192,10 @@ void nativeRemoveLayer(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, j
     assert(nativeMapViewPtr != 0);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
     mbgl::android::Layer *layer = reinterpret_cast<mbgl::android::Layer *>(layerPtr);
-    try {
-        std::unique_ptr<mbgl::style::Layer> coreLayer = nativeMapView->getMap().removeLayer(layer->get().getID());
+
+    std::unique_ptr<mbgl::style::Layer> coreLayer = nativeMapView->getMap().removeLayer(layer->get().getID());
+    if (coreLayer) {
         layer->setLayer(std::move(coreLayer));
-    } catch (const std::runtime_error& error) {
-        jni::ThrowNew(*env, jni::FindClass(*env, "com/mapbox/mapboxsdk/style/layers/NoSuchLayerException"), error.what());
     }
 }
 
@@ -1239,22 +1235,17 @@ void nativeAddSource(JNIEnv *env, jni::jobject* obj, jni::jlong nativeMapViewPtr
 void nativeRemoveSourceById(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jni::jstring* id) {
      assert(nativeMapViewPtr != 0);
      NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-     try {
-         nativeMapView->getMap().removeSource(std_string_from_jstring(env, id));
-     } catch (const std::runtime_error& error) {
-         jni::ThrowNew(*env, jni::FindClass(*env, "com/mapbox/mapboxsdk/style/sources/NoSuchSourceException"), error.what());
-     }
+     nativeMapView->getMap().removeSource(std_string_from_jstring(env, id));
 }
 
 void nativeRemoveSource(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jlong sourcePtr) {
     assert(nativeMapViewPtr != 0);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
     mbgl::android::Source *source = reinterpret_cast<mbgl::android::Source *>(sourcePtr);
-    try {
-        std::unique_ptr<mbgl::style::Source> coreSource = nativeMapView->getMap().removeSource(source->get().getID());
+
+    std::unique_ptr<mbgl::style::Source> coreSource = nativeMapView->getMap().removeSource(source->get().getID());
+    if (coreSource) {
         source->setSource(std::move(coreSource));
-    } catch (const std::runtime_error& error) {
-        jni::ThrowNew(*env, jni::FindClass(*env, "com/mapbox/mapboxsdk/style/sources/NoSuchSourceException"), error.what());
     }
 }
 
