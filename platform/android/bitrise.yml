@@ -198,11 +198,7 @@ workflows:
             #!/bin/bash
             echo "Compile libmapbox-gl.so for all supportd abi's:"
             export BUILDTYPE=Release
-            make android-lib-arm-v5
-            make android-lib-arm-v7
-            make android-lib-arm-v8
-            make android-lib-x86
-            make android-lib-x86-64
+            make apackage
             cd platform/android && ./gradlew :MapboxGLAndroidSDK:assembleRelease
     - script:
         title: Publish to maven
@@ -294,10 +290,7 @@ workflows:
             #!/bin/bash
             echo "Compile libmapbox-gl.so for all supportd abi's:"
             export BUILDTYPE=Release
-            make android-lib-arm-v5
-            make android-lib-arm-v7
-            make android-lib-arm-v8
-            make android-lib-x86
+            make apackage
             cd platform/android && ./gradlew :MapboxGLAndroidSDK:assembleRelease
     - script:
         title: Log metrics
