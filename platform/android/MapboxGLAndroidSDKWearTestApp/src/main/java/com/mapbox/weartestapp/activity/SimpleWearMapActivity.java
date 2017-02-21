@@ -8,7 +8,7 @@ import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.weartestapp.R;
 
-public class SimpleMapViewActivity extends WearableActivity {
+public class SimpleWearMapActivity extends WearableActivity {
 
   private MapView mapView;
 

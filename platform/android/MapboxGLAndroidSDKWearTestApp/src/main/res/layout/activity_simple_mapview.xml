@@ -6,7 +6,7 @@
     android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activity.SimpleMapViewActivity"
+    tools:context=".activity.SimpleWearMapActivity"
     tools:deviceIds="wear">
 
     <com.mapbox.mapboxsdk.maps.MapView

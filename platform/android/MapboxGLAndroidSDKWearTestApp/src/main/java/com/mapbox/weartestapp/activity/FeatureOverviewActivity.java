@@ -32,7 +32,7 @@ public class FeatureOverviewActivity extends WearableActivity implements Feature
 
     exampleItemModels = new ArrayList<>();
     exampleItemModels.add(new Feature(R.string.activity_simple_mapview_title, new Intent(FeatureOverviewActivity.this,
-      SimpleMapViewActivity.class)));
+      SimpleWearMapActivity.class)));
 
     FeatureAdapter exampleAdapter = new FeatureAdapter(FeatureOverviewActivity.this, exampleItemModels);
     wearableRecyclerView.setAdapter(exampleAdapter);

@@ -33,7 +33,7 @@
         </activity>
 
         <activity
-            android:name=".activity.SimpleMapViewActivity"
+            android:name=".activity.SimpleWearMapActivity"
             android:label="@string/activity_simple_mapview_title">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
