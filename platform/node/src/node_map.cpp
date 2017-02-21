@@ -9,7 +9,7 @@
 #include <mbgl/style/conversion/source.hpp>
 #include <mbgl/style/conversion/layer.hpp>
 #include <mbgl/style/conversion/filter.hpp>
-#include <mbgl/sprite/sprite_image.cpp>
+#include <mbgl/sprite/sprite_image.hpp>
 #include <mbgl/map/backend_scope.hpp>
 #include <mbgl/map/query.hpp>
 
