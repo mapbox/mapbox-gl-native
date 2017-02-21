@@ -12,9 +12,6 @@ struct OSMesaImpl : public HeadlessBackend::Impl {
     }
 
     ~OSMesaImpl() {
-        if (glContext != OSMesaGetCurrentContext()) {
-            activateContext();
-        }
         OSMesaDestroyContext(glContext);
     }
 
