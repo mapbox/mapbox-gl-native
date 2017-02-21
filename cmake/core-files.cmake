@@ -445,6 +445,7 @@ set(MBGL_CORE_FILES
     include/mbgl/util/geojson.hpp
     include/mbgl/util/geometry.hpp
     include/mbgl/util/image.hpp
+    include/mbgl/util/interpolate.hpp
     include/mbgl/util/logging.hpp
     include/mbgl/util/noncopyable.hpp
     include/mbgl/util/optional.hpp
@@ -489,7 +490,6 @@ set(MBGL_CORE_FILES
     src/mbgl/util/ignore.hpp
     src/mbgl/util/indexed_tuple.hpp
     src/mbgl/util/interpolate.cpp
-    src/mbgl/util/interpolate.hpp
     src/mbgl/util/intersection_tests.cpp
     src/mbgl/util/intersection_tests.hpp
     src/mbgl/util/io.cpp
