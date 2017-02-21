@@ -1,9 +1,9 @@
 #include <mbgl/renderer/fill_extrusion_bucket.hpp>
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/programs/fill_extrusion_program.hpp>
-#include <mbgl/style/bucket_parameters.hpp>
-#include <mbgl/style/layers/fill_extrusion_layer.hpp>
+#include <mbgl/renderer/bucket_parameters.hpp>
 #include <mbgl/style/layers/fill_extrusion_layer_impl.hpp>
+#include <mbgl/renderer/render_fill_extrusion_layer.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/constants.hpp>
 
@@ -29,12 +29,13 @@ using namespace style;
 
 struct GeometryTooLongException : std::exception {};
 
-FillExtrusionBucket::FillExtrusionBucket(const BucketParameters& parameters, const std::vector<const Layer*>& layers) {
+FillExtrusionBucket::FillExtrusionBucket(const BucketParameters& parameters, const std::vector<const RenderLayer*>& layers) {
     for (const auto& layer : layers) {
-        paintPropertyBinders.emplace(layer->getID(),
-            FillExtrusionProgram::PaintPropertyBinders(
-                layer->as<FillExtrusionLayer>()->impl->paint.evaluated,
-                parameters.tileID.overscaledZ));
+        paintPropertyBinders.emplace(std::piecewise_construct,
+                                     std::forward_as_tuple(layer->getID()),
+                                     std::forward_as_tuple(
+                                                           layer->as<RenderFillExtrusionLayer>()->evaluated,
+                                                           parameters.tileID.overscaledZ));
     }
 }
 
@@ -143,10 +144,11 @@ void FillExtrusionBucket::upload(gl::Context& context) {
 }
 
 void FillExtrusionBucket::render(Painter& painter,
-                        PaintParameters& parameters,
-                        const Layer& layer,
-                        const RenderTile& tile) {
-    painter.renderFillExtrusion(parameters, *this, *layer.as<FillExtrusionLayer>(), tile);
+                                 PaintParameters& parameters,
+                                 const RenderLayer& layer,
+                                 const RenderTile& tile,
+                                 const Style& style) {
+    painter.renderFillExtrusion(parameters, *this, *layer.as<FillExtrusionLayer>(), tile, style);
 }
 
 bool FillExtrusionBucket::hasData() const {

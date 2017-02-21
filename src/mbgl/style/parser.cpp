@@ -4,6 +4,7 @@
 #include <mbgl/style/conversion.hpp>
 #include <mbgl/style/conversion/source.hpp>
 #include <mbgl/style/conversion/layer.hpp>
+#include <mbgl/style/conversion/light.hpp>
 
 #include <mbgl/util/logging.hpp>
 
@@ -117,10 +118,8 @@ void Parser::parseLight(const JSValue& value) {
         return;
     }
 
-//    for (const auto& property : value.GetObject()) {
-////        std::string id = *conversion::toString(property.name);
-//// TODO let there be light how
-//    }
+    conversion::Result<Light> converted = conversion::convert<Light>(value);
+    light = *converted;
 }
 
 void Parser::parseSources(const JSValue& value) {

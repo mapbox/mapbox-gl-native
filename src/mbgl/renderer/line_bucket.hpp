@@ -26,7 +26,7 @@ public:
     bool hasData() const override;
 
     void upload(gl::Context&) override;
-    void render(Painter&, PaintParameters&, const RenderLayer&, const RenderTile&) override;
+    void render(Painter&, PaintParameters&, const RenderLayer&, const RenderTile&, const style::Style&) override;
 
     float getQueryRadius(const RenderLayer&) const override;
 
