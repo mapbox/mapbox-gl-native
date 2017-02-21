@@ -6,8 +6,15 @@
 
 namespace mbgl {
 
-Anchors getAnchors(const GeometryCoordinates &line, float spacing,
-        const float maxAngle, const float textLeft, const float textRight,
-        const float iconLeft, const float iconRight,
-        const float glyphSize, const float boxScale, const float overscaling);
+Anchors getAnchors(const GeometryCoordinates& line,
+                   float spacing,
+                   const float maxAngle,
+                   const float textLeft,
+                   const float textRight,
+                   const float iconLeft,
+                   const float iconRight,
+                   const float glyphSize,
+                   const float boxScale,
+                   const float overscaling);
+
 } // namespace mbgl

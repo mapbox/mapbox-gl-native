@@ -5,6 +5,7 @@
 #include <mbgl/style/layers/symbol_layer_properties.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/constants.hpp>
+
 #include <cassert>
 
 namespace mbgl {
@@ -13,10 +14,12 @@ using namespace style;
 
 const float globalMinScale = 0.5f; // underscale by 1 zoom level
 
-SymbolQuad getIconQuad(Anchor& anchor, const PositionedIcon& shapedIcon,
-        const GeometryCoordinates& line, const SymbolLayoutProperties::Evaluated& layout,
-        const style::SymbolPlacementType placement, const Shaping& shapedText) {
-
+SymbolQuad getIconQuad(Anchor& anchor,
+                       const PositionedIcon& shapedIcon,
+                       const GeometryCoordinates& line,
+                       const SymbolLayoutProperties::Evaluated& layout,
+                       const style::SymbolPlacementType placement, 
+                       const Shaping& shapedText) {
     auto image = *(shapedIcon.image);
 
     const float border = 1.0;
@@ -38,7 +41,7 @@ SymbolQuad getIconQuad(Anchor& anchor, const PositionedIcon& shapedIcon,
         auto textTop = shapedText.top * size;
         auto textBottom = shapedText.bottom * size;
         auto textWidth = textRight - textLeft;
-        auto textHeight = textBottom - textTop;;
+        auto textHeight = textBottom - textTop;
         auto padT = layout.get<IconTextFitPadding>()[0];
         auto padR = layout.get<IconTextFitPadding>()[1];
         auto padB = layout.get<IconTextFitPadding>()[2];
@@ -75,7 +78,6 @@ SymbolQuad getIconQuad(Anchor& anchor, const PositionedIcon& shapedIcon,
         }
     }
 
-
     if (angle) {
         // Compute the transformation matrix.
         float angle_sin = std::sin(angle);
@@ -106,9 +108,12 @@ struct GlyphInstance {
 
 typedef std::vector<GlyphInstance> GlyphInstances;
 
-void getSegmentGlyphs(std::back_insert_iterator<GlyphInstances> glyphs, Anchor &anchor,
-        float offset, const GeometryCoordinates &line, int segment, bool forward) {
-
+void getSegmentGlyphs(std::back_insert_iterator<GlyphInstances> glyphs,
+                      Anchor& anchor,
+                      float offset,
+                      const GeometryCoordinates& line,
+                      int segment,
+                      bool forward) {
     const bool upsideDown = !forward;
 
     if (offset < 0)
@@ -162,10 +167,13 @@ void getSegmentGlyphs(std::back_insert_iterator<GlyphInstances> glyphs, Anchor &
     }
 }
 
-SymbolQuads getGlyphQuads(Anchor& anchor, const Shaping& shapedText,
-        const float boxScale, const GeometryCoordinates& line, const SymbolLayoutProperties::Evaluated& layout,
-        const style::SymbolPlacementType placement, const GlyphPositions& face) {
-
+SymbolQuads getGlyphQuads(Anchor& anchor,
+                          const Shaping& shapedText,
+                          const float boxScale,
+                          const GeometryCoordinates& line,
+                          const SymbolLayoutProperties::Evaluated& layout,
+                          const style::SymbolPlacementType placement,
+                          const GlyphPositions& face) {
     const float textRotate = layout.get<TextRotate>() * util::DEG2RAD;
     const bool keepUpright = layout.get<TextKeepUpright>();
 
@@ -191,7 +199,6 @@ SymbolQuads getGlyphQuads(Anchor& anchor, const Shaping& shapedText,
             getSegmentGlyphs(std::back_inserter(glyphInstances), anchor, centerX, line, anchor.segment, true);
             if (keepUpright)
                 getSegmentGlyphs(std::back_inserter(glyphInstances), anchor, centerX, line, anchor.segment, false);
-
         } else {
             glyphInstances.emplace_back(GlyphInstance{anchor.point});
         }
@@ -220,7 +227,6 @@ SymbolQuads getGlyphQuads(Anchor& anchor, const Shaping& shapedText,
         }
 
         for (const GlyphInstance &instance : glyphInstances) {
-
             Point<float> tl = otl;
             Point<float> tr = otr;
             Point<float> bl = obl;
@@ -244,9 +250,7 @@ SymbolQuads getGlyphQuads(Anchor& anchor, const Shaping& shapedText,
             const float anchorAngle = std::fmod((anchor.angle + instance.offset + 2 * M_PI), (2 * M_PI));
             const float glyphAngle = std::fmod((instance.angle + instance.offset + 2 * M_PI), (2 * M_PI));
             quads.emplace_back(tl, tr, bl, br, rect, anchorAngle, glyphAngle, instance.anchorPoint, glyphMinScale, instance.maxScale, shapedText.writingMode);
-
         }
-
     }
 
     return quads;
