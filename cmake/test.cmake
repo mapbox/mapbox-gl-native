@@ -10,7 +10,7 @@ set_source_files_properties(test/src/mbgl/test/util.cpp PROPERTIES COMPILE_FLAGS
 
 target_include_directories(mbgl-test
     PRIVATE include
-    PRIVATE src # TODO: eliminate
+    PRIVATE src
     PRIVATE test/include
     PRIVATE test/src
     PRIVATE platform/default
