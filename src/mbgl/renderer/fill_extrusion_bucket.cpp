@@ -145,8 +145,9 @@ void FillExtrusionBucket::upload(gl::Context& context) {
 void FillExtrusionBucket::render(Painter& painter,
                         PaintParameters& parameters,
                         const Layer& layer,
-                        const RenderTile& tile) {
-    painter.renderFillExtrusion(parameters, *this, *layer.as<FillExtrusionLayer>(), tile);
+                        const RenderTile& tile,
+                        const Style& style) {
+    painter.renderFillExtrusion(parameters, *this, *layer.as<FillExtrusionLayer>(), tile, style);
 }
 
 bool FillExtrusionBucket::hasData() const {

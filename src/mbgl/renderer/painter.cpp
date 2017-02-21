@@ -236,6 +236,7 @@ void Painter::render(const Style& style, const FrameData& frame_, View& view, Sp
     // Render everything top-to-bottom by using reverse iterators. Render opaque objects first.
     renderPass(parameters,
                RenderPass::Opaque,
+               style,
                order.rbegin(), order.rend(),
                0, 1);
 
@@ -243,6 +244,7 @@ void Painter::render(const Style& style, const FrameData& frame_, View& view, Sp
     // Make a second pass, rendering translucent objects. This time, we render bottom-to-top.
     renderPass(parameters,
                RenderPass::Translucent,
+               style,
                order.begin(), order.end(),
                static_cast<uint32_t>(order.size()) - 1, -1);
 
@@ -285,6 +287,7 @@ void Painter::render(const Style& style, const FrameData& frame_, View& view, Sp
 template <class Iterator>
 void Painter::renderPass(PaintParameters& parameters,
                          RenderPass pass_,
+                         const Style& style,
                          Iterator it, Iterator end,
                          uint32_t i, int8_t increment) {
     pass = pass_;
@@ -305,13 +308,13 @@ void Painter::renderPass(PaintParameters& parameters,
         if (!layer.baseImpl->hasRenderPass(pass))
             continue;
 
-        auto renderTiles = [this, &item, &layer, &parameters]() {
+        auto renderTiles = [this, &item, &layer, &parameters, &style]() {
             for (auto& tileRef : item.tiles) {
                 auto& tile = tileRef.get();
                 MBGL_DEBUG_GROUP(layer.baseImpl->id + " - " + util::toString(tile.id));
                 auto bucket = tile.tile.getBucket(layer);
                 if (bucket) {
-                    bucket->render(*this, parameters, layer, tile);
+                    bucket->render(*this, parameters, layer, tile, style);
                 }
             }
         };
@@ -335,45 +338,50 @@ void Painter::renderPass(PaintParameters& parameters,
             parameters.view.bind();
             context.setDirtyState();
         } else if (layer.is<FillExtrusionLayer>()) {
-            const auto size = state.getSize();
-//            const auto size = Size{ _size.width - (_size.width % 4), _size.height - (_size.height % 4) };
-
-            OffscreenTexture texture(context, size);
-            texture.bindRenderbuffers();
-
-            context.setStencilMode(gl::StencilMode::disabled());
-            context.setDepthMode(depthModeForSublayer(0, gl::DepthMode::ReadWrite));
-
-            context.clear(Color{ 0.0f, 0.0f, 0.0f, 0.0f }, 1.0f, {});
-
+//            const auto size = state.getSize();
+////            const auto size = Size{ _size.width - (_size.width % 4), _size.height - (_size.height % 4) };
+//
+//            OffscreenTexture texture(context, size);
+//            texture.bindRenderbuffers();
+//
+//            context.setStencilMode(gl::StencilMode::disabled());
+//            context.setDepthMode(depthModeForSublayer(0, gl::DepthMode::ReadWrite));
+//
+//            context.clear(Color{ 0.0f, 0.0f, 0.0f, 0.0f }, 1.0f, {});
+//
             renderTiles();
-
-            parameters.view.bind();
-
-            mat4 mat;
-            matrix::ortho(mat, 0, size.width, size.height, 0, 0, 1);
-
-            const FillExtrusionPaintProperties::Evaluated properties{};
-
-
-
-            parameters.programs.extrusionTexture.draw(context,
-                                                      gl::Triangles(),
-                                                      gl::DepthMode::disabled(),
-                                                      gl::StencilMode::disabled(),
-                                                      colorModeForRenderPass(),
-                                                      ExtrusionTextureProgram::UniformValues{
-                                                          uniforms::u_matrix::Value{ mat },
-                                                          uniforms::u_world::Value{ size },
-                                                          uniforms::u_image::Value{ 0 }, // view.getTexture() ? no — but follow up on whether could be variable or if it's always safe to attach to 0 unit
-                                                          uniforms::u_opacity::Value{ 0.9 } // TODO implement parsing from style
-                                                      },
-                                                      extrusionTextureVertexBuffer,
-                                                      tileTriangleIndexBuffer, // we reuse the same simple index buffer
-                                                      extrusionTextureSegments,
-                                                      ExtrusionTextureProgram::PaintPropertyBinders{ properties, 0 },
-                                                      FillExtrusionPaintProperties::Evaluated{},
-                                                      state.getZoom());
+//
+//            parameters.view.bind();
+//
+//            mat4 mat;
+//            matrix::ortho(mat, 0, size.width, size.height, 0, 0, 1);
+//
+//            const FillExtrusionPaintProperties::Evaluated properties{};
+//
+//            // DEBUG: trying to render texture to map
+////            context.activeTexture = 0;
+////            MBGL_CHECK_ERROR(glTexImage2D(GL_TEXTURE_2D, 0, static_cast<GLenum>(GL_RGBA), size.width,
+////                                          size.height, 0, static_cast<GLenum>(GL_RGBA), GL_UNSIGNED_BYTE,
+////                                          &texture.getTexture()));
+//
+//
+//            parameters.programs.extrusionTexture.draw(context,
+//                                                      gl::Triangles(),
+//                                                      gl::DepthMode::disabled(),
+//                                                      gl::StencilMode::disabled(),
+//                                                      colorModeForRenderPass(),
+//                                                      ExtrusionTextureProgram::UniformValues{
+//                                                          uniforms::u_matrix::Value{ mat },
+//                                                          uniforms::u_world::Value{ size },
+//                                                          uniforms::u_image::Value{ 0 }, // view.getTexture() ? no — but follow up on whether could be variable or if it's always safe to attach to 0 unit
+//                                                          uniforms::u_opacity::Value{ 0.9 } // TODO implement parsing from style
+//                                                      },
+//                                                      extrusionTextureVertexBuffer,
+//                                                      tileTriangleIndexBuffer, // we reuse the same simple index buffer
+//                                                      extrusionTextureSegments,
+//                                                      ExtrusionTextureProgram::PaintPropertyBinders{ properties, 0 },
+//                                                      FillExtrusionPaintProperties::Evaluated{},
+//                                                      state.getZoom());
 
         } else {
             renderTiles();

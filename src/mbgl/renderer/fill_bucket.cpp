@@ -124,7 +124,8 @@ void FillBucket::upload(gl::Context& context) {
 void FillBucket::render(Painter& painter,
                         PaintParameters& parameters,
                         const Layer& layer,
-                        const RenderTile& tile) {
+                        const RenderTile& tile,
+                        const Style&) {
     painter.renderFill(parameters, *this, *layer.as<FillLayer>(), tile);
 }
 

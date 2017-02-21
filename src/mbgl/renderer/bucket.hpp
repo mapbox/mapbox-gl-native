@@ -20,6 +20,7 @@ class Context;
 
 namespace style {
 class Layer;
+class Style;
 } // namespace style
 
 class Bucket : private util::noncopyable {
@@ -36,7 +37,7 @@ public:
 
     // Every time this bucket is getting rendered, this function is called. This happens either
     // once or twice (for Opaque and Transparent render passes).
-    virtual void render(Painter&, PaintParameters&, const style::Layer&, const RenderTile&) = 0;
+    virtual void render(Painter&, PaintParameters&, const style::Layer&, const RenderTile&, const style::Style&) = 0;
 
     virtual bool hasData() const = 0;
 

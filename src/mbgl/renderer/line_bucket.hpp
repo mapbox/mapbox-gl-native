@@ -15,6 +15,7 @@ namespace mbgl {
 namespace style {
 class BucketParameters;
 class LineLayer;
+class Style;
 } // namespace style
 
 class LineBucket : public Bucket {
@@ -28,7 +29,7 @@ public:
     bool hasData() const override;
 
     void upload(gl::Context&) override;
-    void render(Painter&, PaintParameters&, const style::Layer&, const RenderTile&) override;
+    void render(Painter&, PaintParameters&, const style::Layer&, const RenderTile&, const style::Style&) override;
 
     float getQueryRadius(const style::Layer&) const override;
 

@@ -2,6 +2,7 @@
 
 #include <mbgl/style/layer.hpp>
 #include <mbgl/style/source.hpp>
+#include <mbgl/style/light.hpp>
 
 #include <mbgl/util/rapidjson.hpp>
 #include <mbgl/util/font_stack.hpp>
@@ -31,7 +32,7 @@ public:
     std::vector<std::unique_ptr<Source>> sources;
     std::vector<std::unique_ptr<Layer>> layers;
 
-//    std::unique_ptr<Light>> light; ?? TODO idk how to do this
+    Light light;
 
     std::string name;
     LatLng latLng;

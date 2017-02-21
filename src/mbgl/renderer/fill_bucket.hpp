@@ -13,6 +13,7 @@
 namespace mbgl {
 
 namespace style {
+class Style;
 class BucketParameters;
 } // namespace style
 
@@ -25,7 +26,7 @@ public:
     bool hasData() const override;
 
     void upload(gl::Context&) override;
-    void render(Painter&, PaintParameters&, const style::Layer&, const RenderTile&) override;
+    void render(Painter&, PaintParameters&, const style::Layer&, const RenderTile&, const style::Style&) override;
 
     float getQueryRadius(const style::Layer&) const override;
 

@@ -84,7 +84,7 @@ public:
     void renderClippingMask(const UnwrappedTileID&, const ClipID&);
     void renderTileDebug(const RenderTile&);
     void renderFill(PaintParameters&, FillBucket&, const style::FillLayer&, const RenderTile&);
-    void renderFillExtrusion(PaintParameters&, FillExtrusionBucket&, const style::FillExtrusionLayer&, const RenderTile&);
+    void renderFillExtrusion(PaintParameters&, FillExtrusionBucket&, const style::FillExtrusionLayer&, const RenderTile&, const style::Style&);
     void renderLine(PaintParameters&, LineBucket&, const style::LineLayer&, const RenderTile&);
     void renderCircle(PaintParameters&, CircleBucket&, const style::CircleLayer&, const RenderTile&);
     void renderSymbol(PaintParameters&, SymbolBucket&, const style::SymbolLayer&, const RenderTile&);
@@ -106,6 +106,7 @@ private:
     template <class Iterator>
     void renderPass(PaintParameters&,
                     RenderPass,
+                    const style::Style&,
                     Iterator it, Iterator end,
                     uint32_t i, int8_t increment);
 

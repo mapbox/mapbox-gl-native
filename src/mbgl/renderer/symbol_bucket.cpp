@@ -62,7 +62,8 @@ void SymbolBucket::upload(gl::Context& context) {
 void SymbolBucket::render(Painter& painter,
                           PaintParameters& parameters,
                           const Layer& layer,
-                          const RenderTile& tile) {
+                          const RenderTile& tile,
+                          const Style&) {
     painter.renderSymbol(parameters, *this, *layer.as<SymbolLayer>(), tile);
 }
 

@@ -8,6 +8,7 @@
 #include <mbgl/programs/programs.hpp>
 #include <mbgl/programs/fill_extrusion_program.hpp>
 #include <mbgl/util/convert.hpp>
+#include <mbgl/util/mat3.hpp>
 
 namespace mbgl {
 
@@ -16,7 +17,8 @@ using namespace style;
 void Painter::renderFillExtrusion(PaintParameters& parameters,
                          FillExtrusionBucket& bucket,
                          const FillExtrusionLayer& layer,
-                         const RenderTile& tile) {
+                         const RenderTile& tile,
+                         const Style& style) {
     const FillExtrusionPaintProperties::Evaluated& properties = layer.impl->paint.evaluated;
 
     if (pass == RenderPass::Opaque) {
@@ -24,6 +26,14 @@ void Painter::renderFillExtrusion(PaintParameters& parameters,
     }
 
     // TODO implement texture
+
+    auto lightpos = style.light.getPosition();
+    vec3 lightvec = vec3{{ lightpos[0], lightpos[1], lightpos[2] }};
+    mat3 lightmat;
+    if (style.light.getAnchor() == LightAnchorType::Viewport) {
+        matrix::rotate(lightmat, lightmat, -state.getAngle());
+    }
+    matrix::transformMat3(lightvec, lightvec, lightmat);
 
     if (!properties.get<FillExtrusionPattern>().from.empty()) {
 
@@ -41,9 +51,9 @@ void Painter::renderFillExtrusion(PaintParameters& parameters,
                                                        properties.get<FillExtrusionTranslateAnchor>(),
                                                        state)
                              },
-                             uniforms::u_lightcolor::Value{ state.getLightColor() },    // TODO these are all placeholders/defaults
-                             uniforms::u_lightpos::Value{ state.getLightPosition() },
-                             uniforms::u_lightintensity::Value{ state.getLightIntensity() }
+                             uniforms::u_lightcolor::Value{ style.light.getColor() },    // TODO these are all placeholders/defaults
+                             uniforms::u_lightpos::Value{ lightpos },
+                             uniforms::u_lightintensity::Value{ style.light.getIntensity() }
                          },
                          *bucket.vertexBuffer,
                          *bucket.indexBuffer,

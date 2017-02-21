@@ -92,5 +92,10 @@ enum class IconTextFitType : uint8_t {
     Height
 };
 
+enum class LightAnchorType: bool {
+    Map,
+    Viewport
+};
+
 } // namespace style
 } // namespace mbgl
