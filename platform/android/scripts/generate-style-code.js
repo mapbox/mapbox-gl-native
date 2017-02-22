@@ -158,7 +158,10 @@ global.defaultValueJava = function(property) {
  * Produces documentation for property factory methods
  */
 global.propertyFactoryMethodDoc = function (property) {
-    let doc = property.doc;
+    var replaceIfPixels = function (doc) {
+      return doc.replace('pixels', 'density-independent pixels')
+    }
+    let doc = replaceIfPixels(property.doc);
     // Match other items in back ticks
     doc = doc.replace(/`(.+?)`/g, function (m, symbol, offset, str) {
         if (str.substr(offset - 4, 3) !== 'CSS' && symbol[0].toUpperCase() != symbol[0] && _(enumProperties).filter({'name': symbol}).value().length > 0) {
