@@ -13,6 +13,7 @@
 #include <mbgl/text/collision_tile.hpp>
 #include <mbgl/map/transform_state.hpp>
 #include <mbgl/util/run_loop.hpp>
+#include <mbgl/map/query.hpp>
 
 namespace mbgl {
 
@@ -141,7 +142,7 @@ void GeometryTile::queryRenderedFeatures(
     std::unordered_map<std::string, std::vector<Feature>>& result,
     const GeometryCoordinates& queryGeometry,
     const TransformState& transformState,
-    const optional<std::vector<std::string>>& layerIDs) {
+    const QueryOptions& options) {
 
     if (!featureIndex || !data) return;
 
@@ -150,7 +151,7 @@ void GeometryTile::queryRenderedFeatures(
                         transformState.getAngle(),
                         util::tileSize * id.overscaleFactor(),
                         std::pow(2, transformState.getZoom() - id.overscaledZ),
-                        layerIDs,
+                        options,
                         *data,
                         id.canonical,
                         style,

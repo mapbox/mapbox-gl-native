@@ -721,7 +721,7 @@ jni::Array<jni::Object<Feature>> NativeMapView::queryRenderedFeaturesForPoint(JN
     }
     point<double> point = {x, y};
 
-    return *convert<jni::Array<jni::Object<Feature>>, std::vector<mbgl::Feature>>(env, map->queryRenderedFeatures(point, layers));
+    return *convert<jni::Array<jni::Object<Feature>>, std::vector<mbgl::Feature>>(env, map->queryRenderedFeatures(point, { layers, {} }));
 }
 
 jni::Array<jni::Object<Feature>> NativeMapView::queryRenderedFeaturesForBox(JNIEnv& env, jni::jfloat left, jni::jfloat top, jni::jfloat right, jni::jfloat bottom, jni::Array<jni::String> layerIds) {
@@ -734,7 +734,7 @@ jni::Array<jni::Object<Feature>> NativeMapView::queryRenderedFeaturesForBox(JNIE
     }
     box<double> box = { point<double>{ left, top}, point<double>{ right, bottom } };
 
-    return *convert<jni::Array<jni::Object<Feature>>, std::vector<mbgl::Feature>>(env, map->queryRenderedFeatures(box, layers));
+    return *convert<jni::Array<jni::Object<Feature>>, std::vector<mbgl::Feature>>(env, map->queryRenderedFeatures(box, { layers, {} }));
 }
 
 jni::Array<jni::Object<Layer>> NativeMapView::getLayers(JNIEnv& env) {

@@ -4621,7 +4621,7 @@ public:
         optionalLayerIDs = layerIDs;
     }
 
-    std::vector<mbgl::Feature> features = _mbglMap->queryRenderedFeatures(screenCoordinate, optionalLayerIDs);
+    std::vector<mbgl::Feature> features = _mbglMap->queryRenderedFeatures(screenCoordinate, { optionalLayerIDs, {} });
     return MGLFeaturesFromMBGLFeatures(features);
 }
 
@@ -4645,7 +4645,7 @@ public:
         optionalLayerIDs = layerIDs;
     }
 
-    std::vector<mbgl::Feature> features = _mbglMap->queryRenderedFeatures(screenBox, optionalLayerIDs);
+    std::vector<mbgl::Feature> features = _mbglMap->queryRenderedFeatures(screenBox, { optionalLayerIDs, {} });
     return MGLFeaturesFromMBGLFeatures(features);
 }
 
