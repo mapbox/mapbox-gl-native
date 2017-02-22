@@ -9,6 +9,7 @@
 #include <mbgl/util/mat4.hpp>
 #include <mbgl/util/size.hpp>
 #include <mbgl/style/layers/fill_extrusion_layer_properties.hpp>
+#include <mbgl/style/style.hpp>
 
 #include <string>
 
@@ -23,8 +24,8 @@ namespace style {
 } // namespace style
 
 namespace uniforms {
-    MBGL_DEFINE_UNIFORM_VECTOR(float, 3, u_lightcolor);
     MBGL_DEFINE_UNIFORM_VECTOR(float, 3, u_lightpos);
+    MBGL_DEFINE_UNIFORM_VECTOR(float, 3, u_lightcolor);
     MBGL_DEFINE_UNIFORM_SCALAR(float,    u_lightintensity);
     MBGL_DEFINE_UNIFORM_SCALAR(float,    u_height_factor);
 } // namespace uniforms
@@ -68,8 +69,8 @@ uniforms::u_lightintensity>
                          const style::Faded<std::string>&,
                          const UnwrappedTileID&,
                          const TransformState&,
-                         const float);
-    // TODO this (here and in fill_extrusion_program.cpp) needs to be modified to take light* uniforms into account (signature + return values)
+                         const float,
+                         const style::Style&);
 };
 
 class FillExtrusionProgram : public Program<

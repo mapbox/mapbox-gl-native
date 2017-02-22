@@ -25,7 +25,6 @@
 #include <cmath>
 
 namespace mbgl {
-
 namespace matrix {
 
 void identity(mat3& out) {
@@ -96,12 +95,11 @@ void scale(mat3& out, const mat3& a, double x, double y) {
     out[8] = a[8];
 }
 
-void transformMat3(vec3& out, const vec3& a, const mat3& m) {
+void transformMat3f(vec3f& out, const vec3f& a, const mat3& m) {
     out[0] = m[0] * a[0] + m[3] * a[1] + m[6] * a[2];
     out[1] = m[1] * a[0] + m[4] * a[1] + m[7] * a[2];
     out[2] = m[2] * a[0] + m[5] * a[1] + m[8] * a[2];
 }
 
-}
-
+} // namespace matrix
 } // namespace mbgl
