@@ -90,6 +90,8 @@ Painter::Painter(gl::Context& context_, const TransformState& state_, float pixe
     rasterSegments.emplace_back(0, 0, 4, 6);
 
     gl::debugging::enable();
+    
+    context.logGlMaxVertexAttribsValue();
 
     ProgramParameters programParameters{ pixelRatio, false };
     programs = std::make_unique<Programs>(context, programParameters);

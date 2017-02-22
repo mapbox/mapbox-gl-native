@@ -7,6 +7,7 @@
 #include <mbgl/util/logging.hpp>
 
 #include <cstring>
+#include <iostream>
 
 namespace mbgl {
 namespace gl {
@@ -37,10 +38,16 @@ static_assert(underlying_type(TextureFormat::Alpha) == GL_ALPHA, "OpenGL type mi
 Context::~Context() {
     reset();
 }
+    
+void Context::logGlMaxVertexAttribsValue() {
+    int glMaxVertexAttribs;
+    glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &glMaxVertexAttribs);
+    std::cout << "GL_MAX_VERTEX_ATTRIBS = " << glMaxVertexAttribs << std::endl;
+}
 
 UniqueShader Context::createShader(ShaderType type, const std::string& source) {
     UniqueShader result { MBGL_CHECK_ERROR(glCreateShader(static_cast<GLenum>(type))), { this } };
-
+    
     const GLchar* sources = source.data();
     const GLsizei lengths = static_cast<GLsizei>(source.length());
     MBGL_CHECK_ERROR(glShaderSource(result, 1, &sources, &lengths));
