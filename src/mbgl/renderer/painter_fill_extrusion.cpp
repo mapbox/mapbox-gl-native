@@ -25,15 +25,13 @@ void Painter::renderFillExtrusion(PaintParameters& parameters,
         return;
     }
 
-    // TODO implement texture
-
     auto lightpos = style.light.getPosition();
-    vec3 lightvec = vec3{{ lightpos[0], lightpos[1], lightpos[2] }};
+    vec3f lightvec{ lightpos };
     mat3 lightmat;
     if (style.light.getAnchor() == LightAnchorType::Viewport) {
         matrix::rotate(lightmat, lightmat, -state.getAngle());
     }
-    matrix::transformMat3(lightvec, lightvec, lightmat);
+    matrix::transformMat3f(lightvec, lightvec, lightmat);
 
     if (!properties.get<FillExtrusionPattern>().from.empty()) {
 
@@ -51,8 +49,8 @@ void Painter::renderFillExtrusion(PaintParameters& parameters,
                                                        properties.get<FillExtrusionTranslateAnchor>(),
                                                        state)
                              },
-                             uniforms::u_lightcolor::Value{ style.light.getColor() },    // TODO these are all placeholders/defaults
-                             uniforms::u_lightpos::Value{ lightpos },
+                             uniforms::u_lightcolor::Value{ style.light.getColor() },
+                             uniforms::u_lightpos::Value{ lightvec },
                              uniforms::u_lightintensity::Value{ style.light.getIntensity() }
                          },
                          *bucket.vertexBuffer,

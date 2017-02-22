@@ -5,6 +5,7 @@
 #include <mbgl/style/types.hpp>
 #include <mbgl/style/property_value.hpp>
 #include <mbgl/util/constants.hpp>
+#include <mbgl/util/mat3.hpp>
 
 #include <memory>
 //#include <string>
