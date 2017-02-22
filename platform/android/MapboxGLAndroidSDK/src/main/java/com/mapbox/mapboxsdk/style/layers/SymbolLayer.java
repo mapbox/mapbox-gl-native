@@ -63,27 +63,7 @@ public class SymbolLayer extends Layer {
    * @param filter the filter to set
    */
   public void setFilter(Filter.Statement filter) {
-    this.setFilter(filter.toArray());
-  }
-
-  /**
-   * Set an array of filters.
-   *
-   * @param filter the filter array to set
-   */
-  public void setFilter(Object[] filter) {
-    nativeSetFilter(filter);
-  }
-
-  /**
-   * Set an array of filters.
-   *
-   * @param filter tthe filter array to set
-   * @return This
-   */
-  public SymbolLayer withFilter(Object[] filter) {
-    setFilter(filter);
-    return this;
+    nativeSetFilter(filter.toArray());
   }
 
   /**
