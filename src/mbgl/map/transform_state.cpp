@@ -241,29 +241,6 @@ bool TransformState::isGestureInProgress() const {
     return gestureInProgress;
 }
 
-
-# pragma mark – Light 
-// TODO move elsewhere
-std::array<float, 3> TransformState::getLightPosition() const {
-    return {{ 1, 110, 30 }};
-//    return {{ 1.15, 210, 30 }};
-    // TODO i'm faking this with all defaults
-}
-
-std::array<float, 3> TransformState::getLightColor() const {
-    const auto &white = Color::white();
-    return {{ white.r, white.g, white.b }};
-    // TODO i'm faking this with all defaults
-}
-
-float TransformState::getLightIntensity() const {
-    return 0.4;
-    // TODO i'm faking this with all defaults
-}
-
-// TODO also light anchor
-
-
 #pragma mark - Projection
 
 double TransformState::zoomScale(double zoom) const {

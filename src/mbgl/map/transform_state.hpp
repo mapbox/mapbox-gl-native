@@ -75,11 +75,6 @@ public:
     bool isPanning() const;
     bool isGestureInProgress() const;
 
-    // Light TODO may move this elsewhere
-    std::array<float, 3> getLightPosition() const;
-    std::array<float, 3> getLightColor() const;
-    float getLightIntensity() const;
-
     // Conversion
     ScreenCoordinate latLngToScreenCoordinate(const LatLng&) const;
     LatLng screenCoordinateToLatLng(const ScreenCoordinate&, LatLng::WrapMode = LatLng::Unwrapped) const;
