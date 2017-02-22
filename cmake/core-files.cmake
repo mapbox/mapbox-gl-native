@@ -272,7 +272,6 @@ set(MBGL_CORE_FILES
     src/mbgl/style/property_evaluator.hpp
     src/mbgl/style/property_parsing.cpp
     src/mbgl/style/property_parsing.hpp
-    src/mbgl/style/query_parameters.hpp
     src/mbgl/style/rapidjson_conversion.hpp
     src/mbgl/style/source.cpp
     src/mbgl/style/source_impl.cpp

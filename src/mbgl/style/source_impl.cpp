@@ -4,7 +4,6 @@
 #include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/style/update_parameters.hpp>
-#include <mbgl/style/query_parameters.hpp>
 #include <mbgl/text/placement_config.hpp>
 #include <mbgl/util/logging.hpp>
 #include <mbgl/math/clamp.hpp>
