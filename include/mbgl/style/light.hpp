@@ -63,7 +63,7 @@ class Light {
 public:
     Light() = default;
     Light(LightAnchorType anchor_, std::array<float, 3> position_, Color color_, float intensity_)
-    : anchor(std::move(anchor_)), position(std::move(position_)), color(std::move(color_)), intensity(intensity_) {  // TODO here i'm not moving float -- right?
+    : anchor(std::move(anchor_)), position(std::move(position_)), color(std::move(color_)), intensity(intensity_) {
     }
 
     static LightAnchorType getDefaultAnchor();
