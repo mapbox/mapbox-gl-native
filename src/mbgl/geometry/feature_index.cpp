@@ -7,6 +7,9 @@
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/math/minmax.hpp>
+#include <mbgl/map/query.hpp>
+#include <mbgl/style/filter.hpp>
+#include <mbgl/style/filter_evaluator.hpp>
 
 #include <mapbox/geometry/envelope.hpp>
 
@@ -49,14 +52,14 @@ static bool topDown(const IndexedSubfeature& a, const IndexedSubfeature& b) {
 static bool topDownSymbols(const IndexedSubfeature& a, const IndexedSubfeature& b) {
     return a.sortIndex < b.sortIndex;
 }
-
+    
 void FeatureIndex::query(
         std::unordered_map<std::string, std::vector<Feature>>& result,
         const GeometryCoordinates& queryGeometry,
         const float bearing,
         const double tileSize,
         const double scale,
-        const optional<std::vector<std::string>>& filterLayerIDs,
+        const QueryOptions& queryOptions,
         const GeometryTileData& geometryTileData,
         const CanonicalTileID& tileID,
         const style::Style& style,
@@ -76,7 +79,7 @@ void FeatureIndex::query(
         if (indexedFeature.sortIndex == previousSortIndex) continue;
         previousSortIndex = indexedFeature.sortIndex;
 
-        addFeature(result, indexedFeature, queryGeometry, filterLayerIDs, geometryTileData, tileID, style, bearing, pixelsToTileUnits);
+        addFeature(result, indexedFeature, queryGeometry, queryOptions, geometryTileData, tileID, style, bearing, pixelsToTileUnits);
     }
 
     // Query symbol features, if they've been placed.
@@ -87,7 +90,7 @@ void FeatureIndex::query(
     std::vector<IndexedSubfeature> symbolFeatures = collisionTile->queryRenderedSymbols(queryGeometry, scale);
     std::sort(symbolFeatures.begin(), symbolFeatures.end(), topDownSymbols);
     for (const auto& symbolFeature : symbolFeatures) {
-        addFeature(result, symbolFeature, queryGeometry, filterLayerIDs, geometryTileData, tileID, style, bearing, pixelsToTileUnits);
+        addFeature(result, symbolFeature, queryGeometry, queryOptions, geometryTileData, tileID, style, bearing, pixelsToTileUnits);
     }
 }
 
@@ -95,7 +98,7 @@ void FeatureIndex::addFeature(
     std::unordered_map<std::string, std::vector<Feature>>& result,
     const IndexedSubfeature& indexedFeature,
     const GeometryCoordinates& queryGeometry,
-    const optional<std::vector<std::string>>& filterLayerIDs,
+    const QueryOptions& options,
     const GeometryTileData& geometryTileData,
     const CanonicalTileID& tileID,
     const style::Style& style,
@@ -103,7 +106,7 @@ void FeatureIndex::addFeature(
     const float pixelsToTileUnits) const {
 
     auto& layerIDs = bucketLayerIDs.at(indexedFeature.bucketName);
-    if (filterLayerIDs && !vectorsIntersect(layerIDs, *filterLayerIDs)) {
+    if (options.layerIDs && !vectorsIntersect(layerIDs, *options.layerIDs)) {
         return;
     }
 
@@ -114,7 +117,7 @@ void FeatureIndex::addFeature(
     assert(geometryTileFeature);
 
     for (const auto& layerID : layerIDs) {
-        if (filterLayerIDs && !vectorContains(*filterLayerIDs, layerID)) {
+        if (options.layerIDs && !vectorContains(*options.layerIDs, layerID)) {
             continue;
         }
 
@@ -125,7 +128,15 @@ void FeatureIndex::addFeature(
             continue;
         }
 
-        result[layerID].push_back(convertFeature(*geometryTileFeature, tileID));
+        bool filterOut = false;
+        
+        filterOut = options.filter &&
+            !(*options.filter)(geometryTileFeature->getType(),
+                    geometryTileFeature->getID(),
+                    [&] (const auto& key) { return geometryTileFeature->getValue(key); });
+        if (!filterOut) {
+            result[layerID].push_back(convertFeature(*geometryTileFeature, tileID));
+        }
     }
 }
 

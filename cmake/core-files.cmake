@@ -108,6 +108,7 @@ set(MBGL_CORE_FILES
     include/mbgl/map/camera.hpp
     include/mbgl/map/map.hpp
     include/mbgl/map/mode.hpp
+    include/mbgl/map/query.hpp
     include/mbgl/map/view.hpp
     src/mbgl/map/backend.cpp
     src/mbgl/map/backend_scope.cpp

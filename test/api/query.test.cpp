@@ -50,15 +50,15 @@ TEST(Query, QueryRenderedFeaturesFilterLayer) {
 
     auto zz = test.map.pixelForLatLng({ 0, 0 });
 
-    auto features1 = test.map.queryRenderedFeatures(zz, {{ "layer1"}});
+    auto features1 = test.map.queryRenderedFeatures(zz, {{{ "layer1"}}, {}});
     EXPECT_EQ(features1.size(), 1u);
-
-    auto features2 = test.map.queryRenderedFeatures(zz, {{ "layer1", "layer2" }});
+    
+    auto features2 = test.map.queryRenderedFeatures(zz, {{{ "layer1", "layer2" }}, {}});
     EXPECT_EQ(features2.size(), 2u);
 
-    auto features3 = test.map.queryRenderedFeatures(zz, {{ "foobar" }});
+    auto features3 = test.map.queryRenderedFeatures(zz, {{{ "foobar" }}, {}});
     EXPECT_EQ(features3.size(), 0u);
 
-    auto features4 = test.map.queryRenderedFeatures(zz, {{ "foobar", "layer3" }});
+    auto features4 = test.map.queryRenderedFeatures(zz, {{{ "foobar", "layer3" }}, {}});
     EXPECT_EQ(features4.size(), 1u);
 }

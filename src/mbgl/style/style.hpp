@@ -28,6 +28,8 @@ class GlyphAtlas;
 class SpriteAtlas;
 class LineAtlas;
 class RenderData;
+class TransformState;
+struct QueryOptions;
 
 namespace style {
 
@@ -95,8 +97,10 @@ public:
 
     RenderData getRenderData(MapDebugOptions, float angle) const;
 
-    std::vector<Feature> queryRenderedFeatures(const QueryParameters&) const;
-
+    std::vector<Feature> queryRenderedFeatures(const ScreenLineString& geometry,
+                                               const TransformState& transformState,
+                                               const QueryOptions& options) const;
+                  
     float getQueryRadius() const;
 
     void setSourceTileCacheSize(size_t);

@@ -810,20 +810,32 @@ void Map::removeAnnotation(AnnotationID annotation) {
 
 #pragma mark - Feature query api
 
-std::vector<Feature> Map::queryRenderedFeatures(const ScreenCoordinate& point, const optional<std::vector<std::string>>& layerIDs) {
-    if (!impl->style) return {};
+//std::vector<Feature> Map::queryRenderedFeatures(const ScreenCoordinate& point, const optional<std::vector<std::string>>& layerIDs) {
+//    if (!impl->style) return {};
+//
+//    return queryRenderedFeatures(point, QueryOptions(layerIDs));
+//}
+//
+//std::vector<Feature> Map::queryRenderedFeatures(const ScreenBox& box, const optional<std::vector<std::string>>& layerIDs) {
+//    if (!impl->style) return {};
+//
+//    return queryRenderedFeatures(box, QueryOptions(layerIDs));
+//}
 
-    return impl->style->queryRenderedFeatures({
+std::vector<Feature> Map::queryRenderedFeatures(const ScreenCoordinate& point, const QueryOptions& options) {
+    if (!impl->style) return {};
+        
+    return impl->style->queryRenderedFeatures(
         { point },
         impl->transform.getState(),
-        layerIDs
-    });
+        options
+    );
 }
-
-std::vector<Feature> Map::queryRenderedFeatures(const ScreenBox& box, const optional<std::vector<std::string>>& layerIDs) {
+    
+std::vector<Feature> Map::queryRenderedFeatures(const ScreenBox& box, const QueryOptions& options) {
     if (!impl->style) return {};
 
-    return impl->style->queryRenderedFeatures({
+    return impl->style->queryRenderedFeatures(
         {
             box.min,
             { box.max.x, box.min.y },
@@ -832,12 +844,15 @@ std::vector<Feature> Map::queryRenderedFeatures(const ScreenBox& box, const opti
             box.min
         },
         impl->transform.getState(),
-        layerIDs
-    });
+        options
+    );
 }
-
+    
+    
 AnnotationIDs Map::queryPointAnnotations(const ScreenBox& box) {
-    auto features = queryRenderedFeatures(box, {{ AnnotationManager::PointLayerID }});
+    const QueryOptions options = {{{AnnotationManager::PointLayerID }}, {
+    NullFilter() }};
+    auto features = queryRenderedFeatures(box, options);
     std::set<AnnotationID> set;
     for (auto &feature : features) {
         assert(feature.id);

@@ -10,6 +10,7 @@
 #include <mbgl/math/clamp.hpp>
 #include <mbgl/util/tile_cover.hpp>
 #include <mbgl/util/enum.hpp>
+#include <mbgl/map/query.hpp>
 
 #include <mbgl/algorithm/update_renderables.hpp>
 #include <mbgl/algorithm/generate_clip_ids.hpp>
@@ -200,17 +201,19 @@ void Source::Impl::reloadTiles() {
     }
 }
 
-std::unordered_map<std::string, std::vector<Feature>> Source::Impl::queryRenderedFeatures(const QueryParameters& parameters) const {
+std::unordered_map<std::string, std::vector<Feature>> Source::Impl::queryRenderedFeatures(const ScreenLineString& geometry,
+                                           const TransformState& transformState,
+                                           const QueryOptions& options) const {
     std::unordered_map<std::string, std::vector<Feature>> result;
-    if (renderTiles.empty() || parameters.geometry.empty()) {
+    if (renderTiles.empty() || geometry.empty()) {
         return result;
     }
 
     LineString<double> queryGeometry;
 
-    for (const auto& p : parameters.geometry) {
+    for (const auto& p : geometry) {
         queryGeometry.push_back(TileCoordinate::fromScreenCoordinate(
-            parameters.transformState, 0, { p.x, parameters.transformState.getSize().height - p.y }).p);
+            transformState, 0, { p.x, transformState.getSize().height - p.y }).p);
     }
 
     mapbox::geometry::box<double> box = mapbox::geometry::envelope(queryGeometry);
@@ -245,8 +248,8 @@ std::unordered_map<std::string, std::vector<Feature>> Source::Impl::queryRendere
 
         renderTile.tile.queryRenderedFeatures(result,
                                               tileSpaceQueryGeometry,
-                                              parameters.transformState,
-                                              parameters.layerIDs);
+                                              transformState,
+                                              options);
     }
 
     return result;
