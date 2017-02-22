@@ -22,12 +22,6 @@ target_sources(mbgl-node
     PRIVATE platform/node/src/node_thread_pool.hpp
     PRIVATE platform/node/src/node_thread_pool.cpp
     PRIVATE platform/node/src/util/async_queue.hpp
-
-    # We are compiling with the uv loop, but since this target already has the headers for libuv,
-    # we don't have to install it manually.
-    PRIVATE platform/default/async_task.cpp
-    PRIVATE platform/default/run_loop.cpp
-    PRIVATE platform/default/timer.cpp
 )
 
 target_compile_options(mbgl-node
@@ -36,12 +30,16 @@ target_compile_options(mbgl-node
 )
 
 target_include_directories(mbgl-node
-    PRIVATE src # TODO: eliminate
     PRIVATE platform/default
 )
 
+# Use node-provided uv.h. This is not part of loop-uv.cmake because loop-uv.cmake is also
+# used by linux/config.cmake, where we need to use headers provided by mason's libuv.
+target_include_directories(mbgl-loop-uv PUBLIC ${NODEJS_INCLUDE_DIRS})
+
 target_link_libraries(mbgl-node
     PRIVATE mbgl-core
+    PRIVATE mbgl-loop-uv
 )
 
 target_add_mason_package(mbgl-node PRIVATE geojson)
