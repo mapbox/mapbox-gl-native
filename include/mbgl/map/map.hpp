@@ -183,10 +183,6 @@ public:
     double getDefaultPitch() const;
 
     // Feature queries
-//    std::vector<Feature> queryRenderedFeatures(const ScreenCoordinate&, const optional<std::vector<std::string>>& layerIDs = {});
-//    std::vector<Feature> queryRenderedFeatures(const ScreenBox&,        const optional<std::vector<std::string>>& layerIDs = {});
-//    
-    // Filtered Feature queries
     std::vector<Feature> queryRenderedFeatures(const ScreenCoordinate&, const QueryOptions& options = {});
     std::vector<Feature> queryRenderedFeatures(const ScreenBox&,        const QueryOptions& options = {});
     

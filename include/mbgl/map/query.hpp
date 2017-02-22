@@ -19,13 +19,13 @@ using namespace style;
         
         optional<Filter> filter;
         
-//        QueryOptions() {}
+        QueryOptions() {}
         
-//        QueryOptions(optional<std::vector<std::string>> l) : layerIDs (l) {}
+        QueryOptions(optional<std::vector<std::string>> l) : layerIDs (l) {}
         
-//        QueryOptions(optional<std::vector<std::string>> l, optional<Filter> f) : layerIDs (l),
-//            filter(f) {
-//        }
+        QueryOptions(optional<std::vector<std::string>> l, optional<Filter> f) : layerIDs (l),
+            filter(f) {
+        }
     };
     
 }

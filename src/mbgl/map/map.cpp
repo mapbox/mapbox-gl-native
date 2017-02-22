@@ -809,18 +809,6 @@ void Map::removeAnnotation(AnnotationID annotation) {
 
 #pragma mark - Feature query api
 
-//std::vector<Feature> Map::queryRenderedFeatures(const ScreenCoordinate& point, const optional<std::vector<std::string>>& layerIDs) {
-//    if (!impl->style) return {};
-//
-//    return queryRenderedFeatures(point, QueryOptions(layerIDs));
-//}
-//
-//std::vector<Feature> Map::queryRenderedFeatures(const ScreenBox& box, const optional<std::vector<std::string>>& layerIDs) {
-//    if (!impl->style) return {};
-//
-//    return queryRenderedFeatures(box, QueryOptions(layerIDs));
-//}
-
 std::vector<Feature> Map::queryRenderedFeatures(const ScreenCoordinate& point, const QueryOptions& options) {
     if (!impl->style) return {};
         
@@ -830,7 +818,7 @@ std::vector<Feature> Map::queryRenderedFeatures(const ScreenCoordinate& point, c
         options
     );
 }
-    
+
 std::vector<Feature> Map::queryRenderedFeatures(const ScreenBox& box, const QueryOptions& options) {
     if (!impl->style) return {};
 
@@ -846,8 +834,7 @@ std::vector<Feature> Map::queryRenderedFeatures(const ScreenBox& box, const Quer
         options
     );
 }
-    
-    
+
 AnnotationIDs Map::queryPointAnnotations(const ScreenBox& box) {
     const QueryOptions options = {{{AnnotationManager::PointLayerID }}, {
     NullFilter() }};
