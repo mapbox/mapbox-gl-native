@@ -3,6 +3,7 @@
 #include <mbgl/renderer/debug_bucket.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/logging.hpp>
+#include <mbgl/map/query.hpp>
 
 namespace mbgl {
 
@@ -32,6 +33,6 @@ void Tile::queryRenderedFeatures(
         std::unordered_map<std::string, std::vector<Feature>>&,
         const GeometryCoordinates&,
         const TransformState&,
-        const optional<std::vector<std::string>>&) {}
+        const QueryOptions&) {}
 
 } // namespace mbgl

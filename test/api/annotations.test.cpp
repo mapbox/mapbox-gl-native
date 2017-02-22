@@ -401,7 +401,7 @@ TEST(Annotations, VisibleFeatures) {
     test.map.setBearing(45);
     test::render(test.map, test.view);
 
-    auto features = test.map.queryRenderedFeatures(box);
+    auto features = test.map.queryRenderedFeatures(box, {});
     auto sortID = [](const Feature& lhs, const Feature& rhs) { return lhs.id < rhs.id; };
     auto sameID = [](const Feature& lhs, const Feature& rhs) { return lhs.id == rhs.id; };
     std::sort(features.begin(), features.end(), sortID);

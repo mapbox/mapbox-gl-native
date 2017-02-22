@@ -30,6 +30,26 @@
           0
         ]
       }
+    },
+    "source4": {
+      "type": "geojson",
+      "data": { 
+        "type": "Feature", 
+        "id": "feature1",
+        "geometry": { 
+          "type": "Point",
+          "coordinates": [
+            0.0,
+            0.0
+          ] 
+        }, 
+        "properties": {
+          "key1": "value1",
+          "key2": 1.5,
+          "key3": false,
+          "key4": 0.5
+        } 
+      }
     }
   },
   "layers": [
@@ -53,6 +73,14 @@
       "id": "layer3",
       "type": "symbol",
       "source": "source3",
+      "layout": {
+        "icon-image": "test-icon"
+      }
+    },
+    {
+      "id": "layer4",
+      "type": "symbol",
+      "source": "source4",
       "layout": {
         "icon-image": "test-icon"
       }
