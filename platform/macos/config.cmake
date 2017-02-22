@@ -81,7 +81,7 @@ endmacro()
 
 macro(mbgl_platform_glfw)
     target_link_libraries(mbgl-glfw
-        PRIVATE mbgl-loop
+        PRIVATE mbgl-loop-darwin
         PRIVATE "-framework OpenGL"
         PRIVATE "-lsqlite3"
     )
@@ -90,7 +90,7 @@ endmacro()
 
 macro(mbgl_platform_render)
     target_link_libraries(mbgl-render
-        PRIVATE mbgl-loop
+        PRIVATE mbgl-loop-darwin
         PRIVATE "-framework Foundation"
         PRIVATE "-framework CoreGraphics"
         PRIVATE "-framework OpenGL"
@@ -103,7 +103,7 @@ endmacro()
 
 macro(mbgl_platform_offline)
     target_link_libraries(mbgl-offline
-        PRIVATE mbgl-loop
+        PRIVATE mbgl-loop-darwin
         PRIVATE "-framework Foundation"
         PRIVATE "-framework CoreGraphics"
         PRIVATE "-framework OpenGL"
@@ -130,7 +130,7 @@ macro(mbgl_platform_test)
     )
 
     target_link_libraries(mbgl-test
-        PRIVATE mbgl-loop
+        PRIVATE mbgl-loop-darwin
         PRIVATE "-framework Foundation"
         PRIVATE "-framework CoreGraphics"
         PRIVATE "-framework OpenGL"
@@ -156,7 +156,7 @@ macro(mbgl_platform_benchmark)
     )
 
     target_link_libraries(mbgl-benchmark
-        PRIVATE mbgl-loop
+        PRIVATE mbgl-loop-darwin
         PRIVATE "-framework Foundation"
         PRIVATE "-framework CoreGraphics"
         PRIVATE "-framework OpenGL"
