@@ -568,6 +568,7 @@ run-android-core-test-$1: run-android-core-test-$1-*
 
 .PHONY: run-android-$1
 run-android-$1: android-$1
+	adb uninstall com.mapbox.mapboxsdk.testapp > /dev/null
 	cd platform/android && ./gradlew :MapboxGLAndroidSDKTestApp:install$(BUILDTYPE) && adb shell am start -n com.mapbox.mapboxsdk.testapp/.activity.FeatureOverviewActivity
 
 apackage: android-lib-$1
@@ -607,10 +608,12 @@ android-ui-test:
 
 .PHONY: run-android-ui-test
 run-android-ui-test:
+	adb uninstall com.mapbox.mapboxsdk.testapp > /dev/null
 	cd platform/android && ./gradlew :MapboxGLAndroidSDKTestApp:connectedAndroidTest -i
 
 run-android-ui-test-%:
-		cd platform/android && ./gradlew :MapboxGLAndroidSDKTestApp:connectedAndroidTest -Pandroid.testInstrumentationRunnerArguments.class="$*"
+	adb uninstall com.mapbox.mapboxsdk.testapp > /dev/null
+	cd platform/android && ./gradlew :MapboxGLAndroidSDKTestApp:connectedAndroidTest -Pandroid.testInstrumentationRunnerArguments.class="$*"
 
 .PHONY: run-android-ui-test-aws
 run-android-ui-test-aws:
