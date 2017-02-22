@@ -199,7 +199,7 @@ MGL_EXPORT
  @note Source identifiers are not guaranteed to exist across styles or different
     versions of the same style. Applications that use this API must first set the
     style URL to an explicitly versioned style using a convenience method like
-    `+[MGLStyle outdoorsStyleURLWithVersion:]`, `MGLMapView`'s “Style URL”
+    `+[MGLStyle outdoorsStyleURLWithVersion:]`, `MGLMapView`’s “Style URL”
     inspectable in Interface Builder, or a manually constructed `NSURL`. This
     approach also avoids source identifer name changes that will occur in the default
     style’s sources over time.
@@ -232,7 +232,7 @@ MGL_EXPORT
  @note Source identifiers are not guaranteed to exist across styles or different
     versions of the same style. Applications that use this API must first set the
     style URL to an explicitly versioned style using a convenience method like
-    `+[MGLStyle outdoorsStyleURLWithVersion:]`, `MGLMapView`'s “Style URL”
+    `+[MGLStyle outdoorsStyleURLWithVersion:]`, `MGLMapView`’s “Style URL”
     inspectable in Interface Builder, or a manually constructed `NSURL`. This
     approach also avoids source identifer name changes that will occur in the default
     style’s sources over time.
@@ -255,7 +255,7 @@ MGL_EXPORT
  @note Layer identifiers are not guaranteed to exist across styles or different
     versions of the same style. Applications that use this API must first set
     the style URL to an explicitly versioned style using a convenience method like
-    `+[MGLStyle outdoorsStyleURLWithVersion:]`, `MGLMapView`'s “Style URL”
+    `+[MGLStyle outdoorsStyleURLWithVersion:]`, `MGLMapView`’s “Style URL”
     inspectable in Interface Builder, or a manually constructed `NSURL`. This
     approach also avoids layer identifer name changes that will occur in the default
     style’s layers over time.
@@ -308,7 +308,7 @@ MGL_EXPORT
  @note Layer identifiers are not guaranteed to exist across styles or different
     versions of the same style. Applications that use this API must first set
     the style URL to an explicitly versioned style using a convenience method like
-    `+[MGLStyle outdoorsStyleURLWithVersion:]`, `MGLMapView`'s “Style URL”
+    `+[MGLStyle outdoorsStyleURLWithVersion:]`, `MGLMapView`’s “Style URL”
     inspectable in Interface Builder, or a manually constructed `NSURL`. This
     approach also avoids layer identifer name changes that will occur in the default
     style’s layers over time.
@@ -328,7 +328,7 @@ MGL_EXPORT
  @note Layer identifiers are not guaranteed to exist across styles or different
     versions of the same style. Applications that use this API must first set
     the style URL to an explicitly versioned style using a convenience method like
-    `+[MGLStyle outdoorsStyleURLWithVersion:]`, `MGLMapView`'s “Style URL”
+    `+[MGLStyle outdoorsStyleURLWithVersion:]`, `MGLMapView`’s “Style URL”
     inspectable in Interface Builder, or a manually constructed `NSURL`. This
     approach also avoids layer identifer name changes that will occur in the default
     style’s layers over time.
@@ -348,7 +348,7 @@ MGL_EXPORT
  @note Layer identifiers are not guaranteed to exist across styles or different
     versions of the same style. Applications that use this API must first set
     the style URL to an explicitly versioned style using a convenience method like
-    `+[MGLStyle outdoorsStyleURLWithVersion:]`, `MGLMapView`'s “Style URL”
+    `+[MGLStyle outdoorsStyleURLWithVersion:]`, `MGLMapView`’s “Style URL”
     inspectable in Interface Builder, or a manually constructed `NSURL`. This
     approach also avoids layer identifer name changes that will occur in the default
     style’s layers over time.
@@ -387,7 +387,7 @@ MGL_EXPORT
  @note Style class names are not guaranteed to exist across styles or different
     versions of the same style. Applications that use this API must first set the
     style URL to an explicitly versioned style using a convenience method like
-    `+[MGLStyle outdoorsStyleURLWithVersion:]`, `MGLMapView`'s “Style URL”
+    `+[MGLStyle outdoorsStyleURLWithVersion:]`, `MGLMapView`’s “Style URL”
     inspectable in Interface Builder, or a manually constructed `NSURL`. This
     approach also avoids style class name changes that will occur in the default
     style over time.
@@ -405,7 +405,7 @@ MGL_EXPORT
     styles or different versions of the same style. Applications that use this
     API must first set the style URL to an explicitly versioned style using a
     convenience method like `+[MGLStyle outdoorsStyleURLWithVersion:]`,
-    `MGLMapView`'s “Style URL” inspectable in Interface Builder, or a manually
+    `MGLMapView`’s “Style URL” inspectable in Interface Builder, or a manually
     constructed `NSURL`. This approach also avoids image name changes that will
     occur in the default style over time.
 
@@ -434,7 +434,7 @@ MGL_EXPORT
     styles or different versions of the same style. Applications that use this
     API must first set the style URL to an explicitly versioned style using a
     convenience method like `+[MGLStyle outdoorsStyleURLWithVersion:]`,
-    `MGLMapView`'s “Style URL” inspectable in Interface Builder, or a manually
+    `MGLMapView`’s “Style URL” inspectable in Interface Builder, or a manually
     constructed `NSURL`. This approach also avoids image name changes that will
     occur in the default style over time.
 

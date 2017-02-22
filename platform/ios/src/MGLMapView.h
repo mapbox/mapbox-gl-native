@@ -147,9 +147,9 @@ IB_DESIGNABLE
 
  @note The default styles provided by Mapbox contain sources and layers with
     identifiers that will change over time. Applications that use APIs that
-    manipulate a style's sources and layers must first set the style URL to an
+    manipulate a style’s sources and layers must first set the style URL to an
     explicitly versioned style using a convenience method like
-    `+[MGLStyle outdoorsStyleURLWithVersion:]`, `MGLMapView`'s “Style URL”
+    `+[MGLStyle outdoorsStyleURLWithVersion:]`, `MGLMapView`’s “Style URL”
     inspectable in Interface Builder, or a manually constructed `NSURL`.
  */
 @property (nonatomic, readonly, nullable) MGLStyle *style;
@@ -1174,7 +1174,7 @@ IB_DESIGNABLE
  @note Layer identifiers are not guaranteed to exist across styles or different
     versions of the same style. Applications that use this API must first set the
     style URL to an explicitly versioned style using a convenience method like
-    `+[MGLStyle outdoorsStyleURLWithVersion:]`, `MGLMapView`'s “Style URL”
+    `+[MGLStyle outdoorsStyleURLWithVersion:]`, `MGLMapView`’s “Style URL”
     inspectable in Interface Builder, or a manually constructed `NSURL`. This
     approach also avoids layer identifer name changes that will occur in the default
     style’s layers over time.
@@ -1245,7 +1245,7 @@ IB_DESIGNABLE
  @note Layer identifiers are not guaranteed to exist across styles or different
     versions of the same style. Applications that use this API must first set the
     style URL to an explicitly versioned style using a convenience method like
-    `+[MGLStyle outdoorsStyleURLWithVersion:]`, `MGLMapView`'s “Style URL”
+    `+[MGLStyle outdoorsStyleURLWithVersion:]`, `MGLMapView`’s “Style URL”
     inspectable in Interface Builder, or a manually constructed `NSURL`. This
     approach also avoids layer identifer name changes that will occur in the default
     style’s layers over time.
