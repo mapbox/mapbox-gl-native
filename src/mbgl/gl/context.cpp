@@ -41,8 +41,8 @@ Context::~Context() {
     
 void Context::logGlMaxVertexAttribsValue() {
     int glMaxVertexAttribs;
-    glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &glMaxVertexAttribs);
-    std::cout << "GL_MAX_VERTEX_ATTRIBS = " << glMaxVertexAttribs << std::endl;
+    MBGL_CHECK_ERROR(glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &glMaxVertexAttribs));
+    mbgl::Log::Info(mbgl::Event::General, "GL_MAX_VERTEX_ATTRIBS = %i", glMaxVertexAttribs);
 }
 
 UniqueShader Context::createShader(ShaderType type, const std::string& source) {
