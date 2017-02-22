@@ -20,6 +20,9 @@ ext {
             mapboxJavaGeoJSON      : 'com.mapbox.mapboxsdk:mapbox-java-geojson:2.0.0-beta.2@jar',
             mapboxAndroidTelemetry : 'com.mapbox.mapboxsdk:mapbox-android-telemetry:2.0.0-beta.2@aar',
 
+            // mapzen lost
+            lost                   : 'com.mapzen.android:lost:2.1.2',
+
             // unit test
             junit                  : 'junit:junit:4.12',
             mockito                : 'org.mockito:mockito-core:2.2.27',
@@ -42,7 +45,9 @@ ext {
             wearCompile            : "com.google.android.support:wearable:${wearableVersion}",
             wearProvided           : "com.google.android.wearable:wearable:${wearableVersion}",
 
-            // leakCanary
+            // square crew
+            timber                 : 'com.jakewharton.timber:timber:4.5.1',
+            okhttp3                : 'com.squareup.okhttp3:okhttp:3.6.0',
             leakCanaryDebug        : "com.squareup.leakcanary:leakcanary-android:${leakCanaryVersion}",
             leakCanaryRelease      : "com.squareup.leakcanary:leakcanary-android-no-op:${leakCanaryVersion}",
             leakCanaryTest         : "com.squareup.leakcanary:leakcanary-android-no-op:${leakCanaryVersion}"
