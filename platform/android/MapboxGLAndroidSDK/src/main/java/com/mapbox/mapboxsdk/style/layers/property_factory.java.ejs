@@ -40,10 +40,8 @@ public class PropertyFactory {
     return new LayoutPropertyValue<>("visibility", function);
   }
 
-<% for (const property of paintProperties) { -%>
-<% if (property.type == 'color') { -%>
-  /**
-   * <%- propertyFactoryMethodDoc(property) %>
+<% for (const property of paintProperties) { -%><% if (property.type == 'color') { -%>  /**<% for(var i = 0; i < wordWrap(propertyFactoryMethodDoc(property), 90).length; i++) { %>
+   * <%- wordWrap(propertyFactoryMethodDoc(property), 90)[i] %><% } %>
    *
    * @param value a int color value
    * @return property wrapper around String color
@@ -52,9 +50,8 @@ public class PropertyFactory {
     return new PaintPropertyValue<>("<%-  property.name %>", colorToRgbaString(value));
   }
 
-<% } -%>
-  /**
-   * <%- propertyFactoryMethodDoc(property) %>
+<% } -%>  /**<% for(var i = 0; i < wordWrap(propertyFactoryMethodDoc(property), 90).length; i++) { %>
+   * <%- wordWrap(propertyFactoryMethodDoc(property), 90)[i] %><% } %>
    *
    * @param value a <%- propertyType(property) %> value
    * @return property wrapper around <%- propertyType(property) %>
@@ -63,10 +60,8 @@ public class PropertyFactory {
     return new PaintPropertyValue<>("<%-  property.name %>", value);
   }
 
-<% if (supportsPropertyFunction(property)) { -%>
-
-  /**
-   * <%- propertyFactoryMethodDoc(property) %>
+<% if (supportsPropertyFunction(property)) { -%>  /**<% for(var i = 0; i < wordWrap(propertyFactoryMethodDoc(property), 90).length; i++) { %>
+   * <%- wordWrap(propertyFactoryMethodDoc(property), 90)[i] %><% } %>
    *
    * @param <T> the function input type
    * @param function a wrapper function for <%- propertyType(property) %>
@@ -76,24 +71,20 @@ public class PropertyFactory {
     return new PaintPropertyValue<>("<%-  property.name %>", function);
   }
 
-<% } else if (supportsZoomFunction(property)) { -%>
-
-  /**
-   * <%- propertyFactoryMethodDoc(property) %>
+<% } else if (supportsZoomFunction(property)) { -%>  /**<% for(var i = 0; i < wordWrap(propertyFactoryMethodDoc(property), 90).length; i++) { %>
+   * <%- wordWrap(propertyFactoryMethodDoc(property), 90)[i] %><% } %>
    *
    * @param <Z> the zoom parameter type
    * @param function a wrapper {@link CameraFunction} for <%- propertyType(property) %>
    * @return property wrapper around a <%- propertyType(property) %> function
    */
-  public static <Z extends Number> PropertyValue<CameraFunction<Z, <%- propertyType(property) %>>> <%- camelizeWithLeadingLowercase(property.name) %>(CameraFunction<Z, <%- propertyType(property) %>> function) {
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, <%- propertyType(property) %>>> <%- camelizeWithLeadingLowercase(property.name) %>(
+    CameraFunction<Z, <%- propertyType(property) %>> function) {
     return new PaintPropertyValue<>("<%-  property.name %>", function);
   }
 
-<% } -%>
-<% } -%>
-<% for (const property of layoutProperties) { -%>
-  /**
-   * <%- propertyFactoryMethodDoc(property) %>
+<% } -%><% } -%><% for (const property of layoutProperties) { -%>  /**<% for(var i = 0; i < wordWrap(propertyFactoryMethodDoc(property), 90).length; i++) { %>
+   * <%- wordWrap(propertyFactoryMethodDoc(property), 90)[i] %><% } %>
    *
    * @param value a <%- propertyType(property) %> value
    * @return property wrapper around <%- propertyType(property) %>
@@ -102,11 +93,8 @@ public class PropertyFactory {
     return new LayoutPropertyValue<>("<%-  property.name %>", value);
   }
 
-
-<% if (supportsPropertyFunction(property)) { -%>
-
-  /**
-   * <%- propertyFactoryMethodDoc(property) %>
+<% if (supportsPropertyFunction(property)) { -%>  /**<% for(var i = 0; i < wordWrap(propertyFactoryMethodDoc(property), 90).length; i++) { %>
+   * <%- wordWrap(propertyFactoryMethodDoc(property), 90)[i] %><% } %>
    *
    * @param <T> the function input type
    * @param function a wrapper function for <%- propertyType(property) %>
@@ -116,24 +104,21 @@ public class PropertyFactory {
     return new LayoutPropertyValue<>("<%-  property.name %>", function);
   }
 
-<% } else if (supportsZoomFunction(property)) { -%>
-
-  /**
-   * <%- propertyFactoryMethodDoc(property) %>
+<% } else if (supportsZoomFunction(property)) { -%>  /**<% for(var i = 0; i < wordWrap(propertyFactoryMethodDoc(property), 90).length; i++) { %>
+   * <%- wordWrap(propertyFactoryMethodDoc(property), 90)[i] %><% } %>
    *
    * @param <Z> the zoom parameter type
    * @param function a wrapper {@link CameraFunction} for <%- propertyType(property) %>
    * @return property wrapper around a <%- propertyType(property) %> function
    */
-  public static <Z extends Number> PropertyValue<CameraFunction<Z, <%- propertyType(property) %>>> <%- camelizeWithLeadingLowercase(property.name) %>(CameraFunction<Z, <%- propertyType(property) %>> function) {
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, <%- propertyType(property) %>>> <%- camelizeWithLeadingLowercase(property.name) %>(
+    CameraFunction<Z, <%- propertyType(property) %>> function) {
     return new LayoutPropertyValue<>("<%-  property.name %>", function);
   }
 
-<% } -%>
-<% } -%>
-  @SuppressLint("DefaultLocale")
+<% } -%><% } -%>  @SuppressLint("DefaultLocale")
   public static String colorToRgbaString(@ColorInt int value) {
-    return String.format("rgba(%d, %d, %d, %d)", (value >> 16) & 0xFF, (value >> 8) & 0xFF, value & 0xFF, (value >> 24) & 0xFF);
+    return String.format("rgba(%d, %d, %d, %d)", (value >> 16) & 0xFF, (value >> 8) & 0xFF, value & 0xFF,
+      (value >> 24) & 0xFF);
   }
-
 }
