@@ -17,7 +17,6 @@ target_compile_options(mbgl-glfw
 
 target_include_directories(mbgl-glfw
     PRIVATE include
-    PRIVATE src # TODO: eliminate
     PRIVATE platform/default
 )
 
