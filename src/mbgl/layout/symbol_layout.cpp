@@ -215,7 +215,7 @@ void SymbolLayout::prepare(uintptr_t tileUID) {
         layout.get<TextJustify>() == TextJustifyType::Left ? 0 :
         0.5;
 
-    auto glyphSet = glyphAtlas.getGlyphSet(layout.get<TextFont>());
+    //util::exclusive<GlyphSet> glyphSet = glyphAtlas.getGlyphSet(layout.get<TextFont>());
 
     for (const auto& feature : features) {
         if (feature.geometry.empty()) continue;
@@ -223,6 +223,8 @@ void SymbolLayout::prepare(uintptr_t tileUID) {
         Shaping shapedText;
         PositionedIcon shapedIcon;
         GlyphPositions face;
+        
+        util::exclusive<GlyphSet> glyphSet = glyphAtlas.getLocalGlyphSet(*feature.localFontID);
 
         // if feature has text, shape the text
         if (feature.text) {

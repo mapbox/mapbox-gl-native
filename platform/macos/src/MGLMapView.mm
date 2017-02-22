@@ -278,7 +278,7 @@ public:
     mbgl::AddDefaultFontPath([notoKannada UTF8String]);
     mbgl::AddDefaultFontPath([arialUnicode UTF8String]);
 
-    _mbglThreadPool = new mbgl::ThreadPool(1);
+    _mbglThreadPool = new mbgl::ThreadPool(4);
     _mbglMap = new mbgl::Map(*_mbglView, self.size, [NSScreen mainScreen].backingScaleFactor, *mbglFileSource, *_mbglThreadPool, mbgl::MapMode::Continuous, mbgl::GLContextMode::Unique, mbgl::ConstrainMode::None, mbgl::ViewportMode::Default);
     [self validateTileCacheSize];
 

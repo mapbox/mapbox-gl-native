@@ -249,7 +249,7 @@ void GlyphSet::shapeLines(Shaping& shaping,
     const int32_t yOffset = -17;
 
     float x = 0;
-    float y = localFont ? 0 : yOffset;
+    float y = localFont ? 9 : yOffset;
 
     float maxLineLength = 0;
 

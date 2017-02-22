@@ -14,6 +14,12 @@
 
 
 namespace mbgl {
+    
+    hb_face_t *
+    hb_coretext_face_create (CGFontRef cg_font)
+    {
+        return hb_face_create_for_tables (reference_table, CGFontRetain (cg_font), (hb_destroy_func_t) CGFontRelease);
+    }
 
     static util::ThreadLocal<FT_Library> library;
     static util::ThreadLocal<std::vector<LocalFont>> localFonts; // TODO: Shouldn't really be global...

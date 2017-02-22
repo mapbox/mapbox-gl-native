@@ -37,6 +37,7 @@ public:
     ~GlyphAtlas();
 
     util::exclusive<GlyphSet> getGlyphSet(const FontStack&);
+    util::exclusive<GlyphSet> getLocalGlyphSet(uint32_t localFontID);
 
     // Returns true if the set of GlyphRanges are available and parsed or false
     // if they are not. For the missing ranges, a request on the FileSource is

@@ -134,6 +134,19 @@ util::exclusive<GlyphSet> GlyphAtlas::getGlyphSet(const FontStack& fontStack) {
     // really do is lock only the one we are returning.
     return { it->second.get(), std::move(lock) };
 }
+    
+util::exclusive<GlyphSet> GlyphAtlas::getLocalGlyphSet(uint32_t localFontID) {
+    auto lock = std::make_unique<std::lock_guard<std::mutex>>(glyphSetsMutex);
+    
+    auto it = localGlyphSets.find(localFontID);
+    if (it == localGlyphSets.end()) {
+        it = localGlyphSets.emplace(localFontID, std::make_unique<GlyphSet>()).first;
+    }
+    
+    // FIXME: We lock all GlyphSets, but what we should
+    // really do is lock only the one we are returning.
+    return { it->second.get(), std::move(lock) };
+}
 
 void GlyphAtlas::setObserver(GlyphAtlasObserver* observer_) {
     observer = observer_;
