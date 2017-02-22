@@ -320,6 +320,23 @@
                                @"setting zoom should take effect");
 }
 
+- (void)testCameraDebouncing {
+    MGLMapCamera *camera = [MGLMapCamera cameraLookingAtCenterCoordinate:CLLocationCoordinate2DMake(45, -122)
+                                                            fromDistance:100
+                                                                   pitch:30
+                                                                 heading:45];
+    tester.mapView.camera = camera;
+    XCTAssertEqualObjects(tester.mapView.camera, camera);
+    
+    [tester.mapView setCamera:camera withDuration:10 animationTimingFunction:nil completionHandler:^{
+        XCTAssert(NO, @"Camera animation should not be canceled by redundantly setting the camera to the current camera.");
+    }];
+    XCTAssertEqualObjects(tester.mapView.camera, camera);
+    
+    tester.mapView.camera = camera;
+    XCTAssertEqualObjects(tester.mapView.camera, camera);
+}
+
 - (void)testMarkerSelection {
     CGPoint point = CGPointMake(100, 100);
     MGLPointAnnotation *marker = [MGLPointAnnotation new];

@@ -2,6 +2,11 @@
 
 #include <mbgl/util/projection.hpp>
 
+BOOL MGLEqualFloatWithAccuracy(CGFloat left, CGFloat right, CGFloat accuracy)
+{
+    return MAX(left, right) - MIN(left, right) <= accuracy;
+}
+
 @implementation MGLMapCamera
 
 + (BOOL)supportsSecureCoding
@@ -114,6 +119,20 @@
             && _centerCoordinate.longitude == otherCamera.centerCoordinate.longitude
             && _altitude == otherCamera.altitude
             && _pitch == otherCamera.pitch && _heading == otherCamera.heading);
+}
+
+- (BOOL)isEqualToMapCamera:(MGLMapCamera *)otherCamera
+{
+    if (otherCamera == self)
+    {
+        return YES;
+    }
+    
+    return (MGLEqualFloatWithAccuracy(_centerCoordinate.latitude, otherCamera.centerCoordinate.latitude, 1e-6)
+            && MGLEqualFloatWithAccuracy(_centerCoordinate.longitude, otherCamera.centerCoordinate.longitude, 1e-6)
+            && MGLEqualFloatWithAccuracy(_altitude, otherCamera.altitude, 1e-6)
+            && MGLEqualFloatWithAccuracy(_pitch, otherCamera.pitch, 1)
+            && MGLEqualFloatWithAccuracy(_heading, otherCamera.heading, 1));
 }
 
 - (NSUInteger)hash

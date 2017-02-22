@@ -51,6 +51,14 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * Added a `MGLDistanceFormatter` class for formatting geographic distances. ([#7888](https://github.com/mapbox/mapbox-gl-native/pull/7888))
 * Fixed an issue that was causing the system location indicator to stay on in background after telemetry was disabled. ([#7833](https://github.com/mapbox/mapbox-gl-native/pull/7833))
 
+## 3.4.2 - February 21, 2017
+
+This is the final scheduled version of the Mapbox iOS SDK that supports iOS 7. ([#8129](https://github.com/mapbox/mapbox-gl-native/pull/8129))
+
+* A programmatic change to an MGLMapView’s camera no longer resets the user tracking mode. ([#7856](https://github.com/mapbox/mapbox-gl-native/pull/7856))
+* Improved the performance of trivial camera animations. ([#7125](https://github.com/mapbox/mapbox-gl-native/pull/7125))
+* Added a guide detailing the built-in gesture recognizers and various ways to configure them. ([#7937](https://github.com/mapbox/mapbox-gl-native/pull/7937))
+
 ## 3.4.1 - January 25, 2017
 
 * Fixed a build error in the static framework flavor of this SDK caused by a missing header. ([#7844](https://github.com/mapbox/mapbox-gl-native/pull/7844))

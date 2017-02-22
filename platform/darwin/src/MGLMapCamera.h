@@ -67,6 +67,20 @@ MGL_EXPORT
                                           pitch:(CGFloat)pitch
                                         heading:(CLLocationDirection)heading;
 
+/**
+ Returns a Boolean value indicating whether the given camera is functionally
+ equivalent to the receiver.
+ 
+ Unlike `-isEqual:`, this method returns `YES` if the difference between the
+ coordinates, altitudes, pitches, or headings of the two camera objects is
+ negligible.
+ 
+ @param otherCamera The camera with which to compare the receiver.
+ @return A Boolean value indicating whether the two cameras are functionally
+    equivalent.
+ */
+- (BOOL)isEqualToMapCamera:(MGLMapCamera *)otherCamera;
+
 @end
 
 NS_ASSUME_NONNULL_END

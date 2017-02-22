@@ -616,12 +616,13 @@ public:
 
     // Default to Streets.
     if (!styleURL) {
-        // An access token is required to load any default style, including
-        // Streets.
-        if (![MGLAccountManager accessToken]) {
-            return;
-        }
         styleURL = [MGLStyle streetsStyleURLWithVersion:MGLStyleDefaultVersion];
+    }
+    
+    // An access token is required to load any default style, including Streets.
+    if (![MGLAccountManager accessToken] && [styleURL.scheme isEqualToString:@"mapbox"]) {
+        NSLog(@"Cannot set the style URL to %@ because no access token has been specified.", styleURL);
+        return;
     }
 
     styleURL = styleURL.mgl_URLByStandardizingScheme;
@@ -1143,12 +1144,6 @@ public:
 }
 
 - (void)setCamera:(MGLMapCamera *)camera withDuration:(NSTimeInterval)duration animationTimingFunction:(nullable CAMediaTimingFunction *)function completionHandler:(nullable void (^)(void))completion {
-    _mbglMap->cancelTransitions();
-    if ([self.camera isEqual:camera]) {
-        return;
-    }
-
-    mbgl::CameraOptions cameraOptions = [self cameraOptionsObjectForAnimatingToCamera:camera];
     mbgl::AnimationOptions animationOptions;
     if (duration > 0) {
         animationOptions.duration.emplace(MGLDurationInSecondsFromTimeInterval(duration));
@@ -1164,8 +1159,19 @@ public:
             });
         };
     }
+    
+    if ([self.camera isEqualToMapCamera:camera]) {
+        if (completion) {
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(duration * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                completion();
+            });
+        }
+        return;
+    }
 
     [self willChangeValueForKey:@"camera"];
+    _mbglMap->cancelTransitions();
+    mbgl::CameraOptions cameraOptions = [self cameraOptionsObjectForAnimatingToCamera:camera];
     _mbglMap->easeTo(cameraOptions, animationOptions);
     [self didChangeValueForKey:@"camera"];
 }
@@ -1179,12 +1185,6 @@ public:
 }
 
 - (void)flyToCamera:(MGLMapCamera *)camera withDuration:(NSTimeInterval)duration peakAltitude:(CLLocationDistance)peakAltitude completionHandler:(nullable void (^)(void))completion {
-    _mbglMap->cancelTransitions();
-    if ([self.camera isEqual:camera]) {
-        return;
-    }
-
-    mbgl::CameraOptions cameraOptions = [self cameraOptionsObjectForAnimatingToCamera:camera];
     mbgl::AnimationOptions animationOptions;
     if (duration >= 0) {
         animationOptions.duration = MGLDurationInSecondsFromTimeInterval(duration);
@@ -1205,8 +1205,19 @@ public:
             });
         };
     }
+    
+    if ([self.camera isEqualToMapCamera:camera]) {
+        if (completion) {
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(duration * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                completion();
+            });
+        }
+        return;
+    }
 
     [self willChangeValueForKey:@"camera"];
+    _mbglMap->cancelTransitions();
+    mbgl::CameraOptions cameraOptions = [self cameraOptionsObjectForAnimatingToCamera:camera];
     _mbglMap->flyTo(cameraOptions, animationOptions);
     [self didChangeValueForKey:@"camera"];
 }
@@ -1254,6 +1265,11 @@ public:
     mbgl::AnimationOptions animationOptions;
     if (animated) {
         animationOptions.duration = MGLDurationInSecondsFromTimeInterval(MGLAnimationDuration);
+    }
+    
+    MGLMapCamera *camera = [self cameraForCameraOptions:cameraOptions];
+    if ([self.camera isEqualToMapCamera:camera]) {
+        return;
     }
 
     [self willChangeValueForKey:@"visibleCoordinateBounds"];
