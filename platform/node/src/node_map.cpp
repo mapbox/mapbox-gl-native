@@ -10,6 +10,7 @@
 #include <mbgl/style/conversion/layer.hpp>
 #include <mbgl/style/conversion/filter.hpp>
 #include <mbgl/sprite/sprite_image.cpp>
+#include <mbgl/map/query.hpp>
 
 #include <unistd.h>
 
@@ -866,6 +867,9 @@ void NodeMap::DumpDebugLogs(const Nan::FunctionCallbackInfo<v8::Value>& info) {
 }
 
 void NodeMap::QueryRenderedFeatures(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+    using namespace mbgl::style;
+    using namespace mbgl::style::conversion;
+
     auto nodeMap = Nan::ObjectWrap::Unwrap<NodeMap>(info.Holder());
     if (!nodeMap->map) return Nan::ThrowError(releasedMessage());
 
@@ -876,6 +880,40 @@ void NodeMap::QueryRenderedFeatures(const Nan::FunctionCallbackInfo<v8::Value>& 
     auto posOrBox = info[0].As<v8::Array>();
     if (posOrBox->Length() != 2) {
         return Nan::ThrowTypeError("First argument must have two components");
+    }
+
+    mbgl::QueryOptions queryOptions;
+    if (!info[1]->IsNull() && !info[1]->IsUndefined()) {
+        if (!info[1]->IsObject()) {
+            return Nan::ThrowTypeError("options argument must be an object");
+        }
+        
+        auto options = Nan::To<v8::Object>(info[1]).ToLocalChecked();
+        
+        //Check if layers is set. If provided, it must be an array of strings
+        if (Nan::Has(options, Nan::New("layers").ToLocalChecked()).FromJust()) {
+            auto layersOption = Nan::Get(options, Nan::New("layers").ToLocalChecked()).ToLocalChecked();
+            if (!layersOption->IsArray()) {
+                return Nan::ThrowTypeError("Requires options.layers property to be an array");
+            }
+            auto layers = layersOption.As<v8::Array>();
+            std::vector<std::string> layersVec;
+            for (uint32_t i=0; i < layers->Length(); i++) {
+                layersVec.push_back(*Nan::Utf8String(Nan::Get(layers,i).ToLocalChecked()));
+            }
+            queryOptions.layerIDs = layersVec;
+        }
+        
+        //Check if filter is provided. If set it must be a valid Filter object
+        if (Nan::Has(options, Nan::New("filter").ToLocalChecked()).FromJust()) {
+            auto filterOption = Nan::Get(options, Nan::New("filter").ToLocalChecked()).ToLocalChecked();
+            Result<Filter> converted = convert<Filter>(filterOption);
+            if (!converted) {
+                return Nan::ThrowTypeError(converted.error().message.c_str());
+            }
+            queryOptions.filter = std::move(*converted);
+        }
+
     }
 
     try {
@@ -894,13 +932,13 @@ void NodeMap::QueryRenderedFeatures(const Nan::FunctionCallbackInfo<v8::Value>& 
                     Nan::Get(pos1, 0).ToLocalChecked()->NumberValue(),
                     Nan::Get(pos1, 1).ToLocalChecked()->NumberValue()
                 }
-            });
+            },  queryOptions);
 
         } else {
             result = nodeMap->map->queryRenderedFeatures(mbgl::ScreenCoordinate {
                 Nan::Get(posOrBox, 0).ToLocalChecked()->NumberValue(),
                 Nan::Get(posOrBox, 1).ToLocalChecked()->NumberValue()
-            });
+            }, queryOptions);
         }
 
         auto array = Nan::New<v8::Array>();

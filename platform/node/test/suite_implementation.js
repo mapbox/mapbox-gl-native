@@ -49,7 +49,7 @@ module.exports = function (style, options, callback) {
     applyOperations(options.operations, function() {
         map.render(options, function (err, pixels) {
             var results = options.queryGeometry ?
-              map.queryRenderedFeatures(options.queryGeometry) :
+              map.queryRenderedFeatures(options.queryGeometry, options.queryOptions ? options.queryOptions : {} ) :
               [];
             map.release();
             if (timedOut) return;
