@@ -162,7 +162,7 @@ bool SymbolLayout::hasSymbolInstances() const {
 }
 
 bool SymbolLayout::canPrepare() {
-    if (!layout.get<TextField>().empty() && !layout.get<TextFont>().empty() && !glyphAtlas.hasGlyphRanges(layout.get<TextFont>(), ranges) && !glyphAtlas.hasLocalGlyphs(requiredLocalGlyphs)) {
+    if (!layout.get<TextField>().empty() && !layout.get<TextFont>().empty() && (!glyphAtlas.hasGlyphRanges(layout.get<TextFont>(), ranges) || !glyphAtlas.hasLocalGlyphs(requiredLocalGlyphs))) {
         return false;
     }
 
