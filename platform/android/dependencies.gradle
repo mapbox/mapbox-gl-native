@@ -16,33 +16,40 @@ ext {
 
     dep = [
             // mapbox
-            mapboxJavaServices : 'com.mapbox.mapboxsdk:mapbox-java-services:2.0.0-beta.1@jar',
+            mapboxJavaServices     : 'com.mapbox.mapboxsdk:mapbox-java-services:2.0.0-beta.2@jar',
+            mapboxJavaGeoJSON      : 'com.mapbox.mapboxsdk:mapbox-java-geojson:2.0.0-beta.2@jar',
+            mapboxAndroidTelemetry : 'com.mapbox.mapboxsdk:mapbox-android-telemetry:2.0.0-beta.2@aar',
+
+            // mapzen lost
+            lost                   : 'com.mapzen.android:lost:2.1.2',
 
             // unit test
-            junit              : 'junit:junit:4.12',
-            mockito            : 'org.mockito:mockito-core:2.2.27',
+            junit                  : 'junit:junit:4.12',
+            mockito                : 'org.mockito:mockito-core:2.2.27',
 
             // instrumentation test
-            testSpoonRunner    : 'com.squareup.spoon:spoon-client:1.6.2',
-            testRunner         : "com.android.support.test:runner:${testRunnerVersion}",
-            testRules          : "com.android.support.test:rules:${testRunnerVersion}",
-            testEspressoCore   : "com.android.support.test.espresso:espresso-core:${espressoVersion}",
-            testEspressoIntents: "com.android.support.test.espresso:espresso-intents:${espressoVersion}",
+            testSpoonRunner        : 'com.squareup.spoon:spoon-client:1.6.2',
+            testRunner             : "com.android.support.test:runner:${testRunnerVersion}",
+            testRules              : "com.android.support.test:rules:${testRunnerVersion}",
+            testEspressoCore       : "com.android.support.test.espresso:espresso-core:${espressoVersion}",
+            testEspressoIntents    : "com.android.support.test.espresso:espresso-intents:${espressoVersion}",
 
             // support
-            supportAnnotations : "com.android.support:support-annotations:${supportLibVersion}",
-            supportAppcompatV7 : "com.android.support:appcompat-v7:${supportLibVersion}",
-            supportV4          : "com.android.support:support-v4:${supportLibVersion}",
-            supportDesign      : "com.android.support:design:${supportLibVersion}",
-            supportRecyclerView: "com.android.support:recyclerview-v7:${supportLibVersion}",
+            supportAnnotations     : "com.android.support:support-annotations:${supportLibVersion}",
+            supportAppcompatV7     : "com.android.support:appcompat-v7:${supportLibVersion}",
+            supportV4              : "com.android.support:support-v4:${supportLibVersion}",
+            supportDesign          : "com.android.support:design:${supportLibVersion}",
+            supportRecyclerView    : "com.android.support:recyclerview-v7:${supportLibVersion}",
 
             // wear
-            wearCompile        : "com.google.android.support:wearable:${wearableVersion}",
-            wearProvided       : "com.google.android.wearable:wearable:${wearableVersion}",
+            wearCompile            : "com.google.android.support:wearable:${wearableVersion}",
+            wearProvided           : "com.google.android.wearable:wearable:${wearableVersion}",
 
-            // leakCanary
-            leakCanaryDebug    : "com.squareup.leakcanary:leakcanary-android:${leakCanaryVersion}",
-            leakCanaryRelease  : "com.squareup.leakcanary:leakcanary-android-no-op:${leakCanaryVersion}",
-            leakCanaryTest     : "com.squareup.leakcanary:leakcanary-android-no-op:${leakCanaryVersion}"
+            // square crew
+            timber                 : 'com.jakewharton.timber:timber:4.5.1',
+            okhttp3                : 'com.squareup.okhttp3:okhttp:3.6.0',
+            leakCanaryDebug        : "com.squareup.leakcanary:leakcanary-android:${leakCanaryVersion}",
+            leakCanaryRelease      : "com.squareup.leakcanary:leakcanary-android-no-op:${leakCanaryVersion}",
+            leakCanaryTest         : "com.squareup.leakcanary:leakcanary-android-no-op:${leakCanaryVersion}"
     ]
 }

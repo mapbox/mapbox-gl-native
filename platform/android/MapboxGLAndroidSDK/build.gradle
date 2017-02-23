@@ -4,17 +4,17 @@ dependencies {
     compile "com.android.support:support-annotations:${supportLibVersion}"
     compile "com.android.support:support-v4:${supportLibVersion}"
     compile "com.android.support:design:${supportLibVersion}"
-    compile 'com.squareup.okhttp3:okhttp:3.5.0'
-    compile 'com.mapzen.android:lost:2.0.0'
-    compile 'com.jakewharton.timber:timber:4.3.1'
+    compile rootProject.ext.dep.timber
+    compile rootProject.ext.dep.okhttp3
+    compile rootProject.ext.dep.lost
 
     // Mapbox Android Services (GeoJSON support)
-    compile('com.mapbox.mapboxsdk:mapbox-java-geojson:2.0.0-beta.1@jar') {
+    compile(rootProject.ext.dep.mapboxJavaGeoJSON) {
         transitive = true
     }
 
     // Mapbox Android Services (Telemetry support)
-    compile('com.mapbox.mapboxsdk:mapbox-android-telemetry:2.0.0-beta.1@aar') {
+    compile(rootProject.ext.dep.mapboxAndroidTelemetry) {
         transitive = true
     }
 }
