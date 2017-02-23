@@ -224,7 +224,7 @@ void SymbolLayout::prepare(uintptr_t tileUID) {
         PositionedIcon shapedIcon;
         GlyphPositions face;
         
-        util::exclusive<GlyphSet> glyphSet = glyphAtlas.getLocalGlyphSet(*feature.localFontID);
+        util::exclusive<GlyphSet> glyphSet = feature.localFontID ? glyphAtlas.getLocalGlyphSet(*feature.localFontID) : glyphAtlas.getGlyphSet(layout.get<TextFont>());
 
         // if feature has text, shape the text
         if (feature.text) {
