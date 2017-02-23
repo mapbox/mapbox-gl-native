@@ -256,7 +256,7 @@ void SymbolLayout::prepare(uintptr_t tileUID,
 
                 // Add the glyphs we need for this label to the glyph atlas.
                 if (result) {
-                    glyphAtlas.addGlyphs(tileUID, text, layout.get<TextFont>(), **glyphSet, face);
+                    glyphAtlas.addGlyphs(tileUID, text, layout.get<TextFont>(), glyphSet, face);
                 }
 
                 return result;

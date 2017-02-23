@@ -17,8 +17,6 @@
 #include <unordered_set>
 #include <unordered_map>
 #include <mutex>
-#include <exception>
-#include <vector>
 
 namespace mbgl {
 
@@ -57,7 +55,7 @@ public:
     void addGlyphs(uintptr_t tileUID,
                    const std::u16string& text,
                    const FontStack&,
-                   const GlyphSet&,
+                   const util::exclusive<GlyphSet>&,
                    GlyphPositions&);
     void removeGlyphs(uintptr_t tileUID);
 
@@ -77,19 +75,8 @@ private:
                             const FontStack&,
                             const SDFGlyph&);
 
-
     FileSource& fileSource;
     std::string glyphURL;
-
-    std::unordered_map<FontStack, std::map<GlyphRange, std::unique_ptr<GlyphPBF>>, FontStackHash> ranges;
-    std::mutex rangesMutex;
-
-    std::unordered_map<FontStack, std::unique_ptr<GlyphSet>, FontStackHash> glyphSets;
-    std::mutex glyphSetsMutex;
-
-    util::WorkQueue workQueue;
-
-    GlyphAtlasObserver* observer = nullptr;
 
     struct GlyphValue {
         GlyphValue(Rect<uint16_t> rect_, uintptr_t id)
@@ -98,9 +85,19 @@ private:
         std::unordered_set<uintptr_t> ids;
     };
 
-    std::mutex mtx;
+    struct Entry {
+        std::map<GlyphRange, GlyphPBF> ranges;
+        GlyphSet glyphSet;
+        std::map<uint32_t, GlyphValue> glyphValues;
+    };
+
+    std::unordered_map<FontStack, Entry, FontStackHash> entries;
+    std::mutex mutex;
+
+    util::WorkQueue workQueue;
+    GlyphAtlasObserver* observer = nullptr;
+
     BinPack<uint16_t> bin;
-    std::unordered_map<FontStack, std::map<uint32_t, GlyphValue>, FontStackHash> index;
     AlphaImage image;
     std::atomic<bool> dirty;
     mbgl::optional<gl::Texture> texture;
