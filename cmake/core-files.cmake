@@ -302,6 +302,7 @@ set(MBGL_CORE_FILES
     include/mbgl/style/conversion/source.hpp
     include/mbgl/style/conversion/tileset.hpp
     include/mbgl/style/conversion/transition_options.hpp
+    src/mbgl/style/conversion/geojson.cpp
     src/mbgl/style/conversion/stringify.hpp
 
     # style/function
