@@ -375,7 +375,7 @@ public class PropertyFactory {
   }
 
   /**
-   * Blur applied to the line, in pixels.
+   * Blur applied to the line, in density-independent pixels.
    *
    * @param value a Float value
    * @return property wrapper around Float
@@ -386,7 +386,7 @@ public class PropertyFactory {
 
 
   /**
-   * Blur applied to the line, in pixels.
+   * Blur applied to the line, in density-independent pixels.
    *
    * @param <T> the function input type
    * @param function a wrapper function for Float
@@ -397,7 +397,7 @@ public class PropertyFactory {
   }
 
   /**
-   * Specifies the lengths of the alternating dashes and gaps that form the dash pattern. The lengths are later scaled by the line width. To convert a dash length to pixels, multiply the length by the current line width.
+   * Specifies the lengths of the alternating dashes and gaps that form the dash pattern. The lengths are later scaled by the line width. To convert a dash length to density-independent pixels, multiply the length by the current line width.
    *
    * @param value a Float[] value
    * @return property wrapper around Float[]
@@ -408,7 +408,7 @@ public class PropertyFactory {
 
 
   /**
-   * Specifies the lengths of the alternating dashes and gaps that form the dash pattern. The lengths are later scaled by the line width. To convert a dash length to pixels, multiply the length by the current line width.
+   * Specifies the lengths of the alternating dashes and gaps that form the dash pattern. The lengths are later scaled by the line width. To convert a dash length to density-independent pixels, multiply the length by the current line width.
    *
    * @param <Z> the zoom parameter type
    * @param function a wrapper {@link CameraFunction} for Float[]
