@@ -49,7 +49,7 @@ target_add_mason_package(mbgl-node PRIVATE geojson)
 add_custom_command(
     TARGET mbgl-node
     POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:mbgl-node> ${CMAKE_SOURCE_DIR}/lib/mapbox-gl-native.node
+    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:mbgl-node> ${CMAKE_SOURCE_DIR}/lib/mapbox_gl_native.node
 )
 
 mbgl_platform_node()
