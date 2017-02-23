@@ -112,13 +112,14 @@ namespace mbgl {
 
 - (void)removeFromMapView:(MGLMapView *)mapView
 {
-    _pendingLayer = nullptr;
-    self.rawLayer = nullptr;
-
     auto removedLayer = mapView.mbglMap->removeLayer(self.identifier.UTF8String);
     if (!removedLayer) {
         return;
     }
+    
+    auto originalLayer = std::make_unique<mbgl::style::CircleLayer>(self.identifier.UTF8String, self.sourceIdentifier.UTF8String);
+    _pendingLayer = std::move(originalLayer);
+    self.rawLayer = _pendingLayer.get();
 
     mbgl::style::CircleLayer *layer = dynamic_cast<mbgl::style::CircleLayer *>(removedLayer.get());
     if (!layer) {
