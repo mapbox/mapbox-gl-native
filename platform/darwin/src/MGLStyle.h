@@ -31,6 +31,22 @@ NS_ASSUME_NONNULL_BEGIN
 static MGL_EXPORT const NSInteger MGLStyleDefaultVersion = 9;
 
 /**
+ A structure containing information about a transition values.
+ */
+typedef struct MGLTransition {
+    /**
+     The duration in seconds to animate any changes to the style URL or to layout and paint attributes.
+     */
+    NSTimeInterval duration;
+    
+    /**
+     The delay in seconds to before applying any changes to the style URL or to layout and paint attributes.
+     */
+    NSTimeInterval delay;
+} MGLTransition;
+
+
+/**
  The proxy object for the current map style.
 
  MGLStyle provides a set of convenience methods for changing Mapbox
@@ -192,6 +208,11 @@ MGL_EXPORT
  A set containing the style’s sources.
  */
 @property (nonatomic, strong) NS_SET_OF(__kindof MGLSource *) *sources;
+
+/**
+ Transition values.
+ */
+@property (nonatomic) MGLTransition transition;
 
 /**
  Returns a source with the given identifier in the current style.
@@ -441,22 +462,6 @@ MGL_EXPORT
  @param name The name of the image to remove.
  */
 - (void)removeImageForName:(NSString *)name;
-
-#pragma mark Managing a Style’s Transition Options
-
-/**
- The duration in seconds to animate any changes to the style URL or to layout and paint attributes.
-
- By default, this property is set to zero seconds, so any changes take effect without animation.
- */
-@property (nonatomic) NSTimeInterval transitionDuration;
-
-/**
- The delay in seconds to before applying any changes to the style URL or to layout and paint attributes.
-
- By default, this property is set to zero seconds, so any changes begin to animate immediately.
- */
-@property (nonatomic) NSTimeInterval transitionDelay;
 
 @end
 

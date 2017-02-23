@@ -683,8 +683,8 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
 }
 
 - (IBAction)manipulateStyle:(id)sender {
-    self.mapView.style.transitionDuration = 5;
-    self.mapView.style.transitionDelay = 1;
+    MGLTransition transition = { .duration = 5, .delay = 1 };
+    self.mapView.style.transition = transition;
 
     MGLFillStyleLayer *fillStyleLayer = (MGLFillStyleLayer *)[self.mapView.style layerWithIdentifier:@"water"];
 

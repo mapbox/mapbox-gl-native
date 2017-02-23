@@ -572,6 +572,20 @@ static NSURL *MGLStyleURL_emerald;
 
 #pragma mark Style transitions
 
+- (void)setTransition:(MGLTransition)transition
+{
+    [self setTransitionDuration:transition.duration];
+    [self setTransitionDelay:transition.delay];
+}
+
+- (MGLTransition)transition
+{
+    MGLTransition transition;
+    transition.delay = [self transitionDelay];
+    transition.duration = [self transitionDuration];
+    
+    return transition;
+}
 - (void)setTransitionDuration:(NSTimeInterval)duration
 {
     auto transitionOptions = self.mapView.mbglMap->getTransitionOptions();
