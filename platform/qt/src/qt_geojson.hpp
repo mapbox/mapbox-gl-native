@@ -2,7 +2,6 @@
 
 #include <mapbox/geojson.hpp>
 #include <mbgl/style/conversion/geojson.hpp>
-#include <mbgl/util/rapidjson.hpp>
 
 #include <QMapbox>
 
@@ -10,7 +9,6 @@
 #include <QDebug>
 #include <QVariant>
 
-#include <sstream>
 #include <string>
 
 namespace QMapbox {
@@ -196,28 +194,8 @@ Result<GeoJSON> convertGeoJSON(const QVariant& value) {
         return Error { "JSON data must be in QByteArray" };
     }
 
-    auto data = value.toByteArray();
-
-    rapidjson::GenericDocument<rapidjson::UTF8<>, rapidjson::CrtAllocator> d;
-    if (data.endsWith(char(0))) {
-        d.Parse<0>(value.toByteArray().data());
-    } else {
-        d.Parse<0>(value.toByteArray().constData());
-    }
-
-    if (d.HasParseError()) {
-        std::stringstream message;
-        message << d.GetErrorOffset() << " - " << rapidjson::GetParseError_En(d.GetParseError());
-
-        return Error { message.str() };
-    }
-
-    Result<GeoJSON> geoJSON = convertGeoJSON<JSValue>(d);
-    if (!geoJSON) {
-        return Error { geoJSON.error().message };
-    }
-
-    return geoJSON;
+    QByteArray data = value.toByteArray();
+    return convertGeoJSON(std::string(data.constData(), data.size()));
 }
 
 } // namespace conversion
