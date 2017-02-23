@@ -75,5 +75,5 @@ TEST(API, RepeatedRender) {
     auto observer = Log::removeObserver();
     auto flo = dynamic_cast<FixtureLogObserver*>(observer.get());
     auto unchecked = flo->unchecked();
-    EXPECT_TRUE(unchecked.empty()) << unchecked;
+    EXPECT_TRUE(unchecked.size() == 1) << unchecked;
 }
