@@ -276,6 +276,7 @@ public:
 
     mbgl::AddDefaultFontPath([notoTibetan UTF8String]); // Prefer the Tibetan, fall back to Arial Unicode
     mbgl::AddDefaultFontPath([notoKannada UTF8String]);
+    mbgl::AddDefaultFontPath("Helvetica Neue");
     mbgl::AddDefaultFontPath([arialUnicode UTF8String]);
 
     _mbglThreadPool = new mbgl::ThreadPool(4);
