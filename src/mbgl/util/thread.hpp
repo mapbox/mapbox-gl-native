@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cassert>
 #include <future>
 #include <thread>
 #include <atomic>
@@ -9,6 +10,7 @@
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/thread_context.hpp>
 #include <mbgl/util/platform.hpp>
+#include <mbgl/util/util.hpp>
 
 namespace mbgl {
 namespace util {
@@ -47,6 +49,8 @@ public:
     // Invoke object->fn(args...) asynchronously, but wait for the result.
     template <typename Fn, class... Args>
     auto invokeSync(Fn fn, Args&&... args) {
+        assert(!paused);
+
         using R = std::result_of_t<Fn(Object, Args&&...)>;
         std::packaged_task<R ()> task(std::bind(fn, object, args...));
         std::future<R> future = task.get_future();
@@ -54,7 +58,39 @@ public:
         return future.get();
     }
 
+    void pause() {
+        MBGL_VERIFY_THREAD(tid);
+
+        assert(!paused);
+
+        paused = std::make_unique<std::promise<void>>();
+        resumed = std::make_unique<std::promise<void>>();
+
+        auto pausing = paused->get_future();
+
+        loop->invoke([this] {
+            auto resuming = resumed->get_future();
+            paused->set_value();
+            resuming.get();
+        });
+
+        pausing.get();
+    }
+
+    void resume() {
+        MBGL_VERIFY_THREAD(tid);
+
+        assert(paused);
+
+        resumed->set_value();
+
+        resumed.reset();
+        paused.reset();
+    }
+
 private:
+    MBGL_STORE_THREAD(tid);
+
     Thread(const Thread&) = delete;
     Thread(Thread&&) = delete;
     Thread& operator=(const Thread&) = delete;
@@ -72,6 +108,9 @@ private:
 
     std::promise<void> running;
     std::promise<void> joinable;
+
+    std::unique_ptr<std::promise<void>> paused;
+    std::unique_ptr<std::promise<void>> resumed;
 
     std::thread thread;
 
@@ -119,6 +158,12 @@ void Thread<Object>::run(P&& params, std::index_sequence<I...>) {
 
 template <class Object>
 Thread<Object>::~Thread() {
+    MBGL_VERIFY_THREAD(tid);
+
+    if (paused) {
+        resume();
+    }
+
     loop->stop();
     joinable.set_value();
     thread.join();
