@@ -11,6 +11,7 @@ import android.view.View;
 
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.style.layers.CannotAddLayerException;
+import com.mapbox.mapboxsdk.style.layers.CircleLayer;
 import com.mapbox.mapboxsdk.style.layers.FillLayer;
 import com.mapbox.mapboxsdk.style.layers.Layer;
 import com.mapbox.mapboxsdk.style.layers.Property;
@@ -37,10 +38,11 @@ import java.util.List;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
-import static junit.framework.Assert.assertTrue;
-import static junit.framework.Assert.fail;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Basic smoke tests for Layer and Source
@@ -86,6 +88,41 @@ public class RuntimeStyleTests {
   }
 
   @Test
+  public void testAddLayerAbove() {
+    ViewUtils.checkViewIsDisplayed(R.id.mapView);
+    onView(withId(R.id.mapView)).perform(new BaseViewAction() {
+      @Override
+      public void perform(UiController uiController, View view) {
+        MapboxMap mapboxMap = rule.getActivity().getMapboxMap();
+
+        List<Layer> layers = mapboxMap.getLayers();
+        Source source = mapboxMap.getSources().get(0);
+
+        // Test inserting with invalid above-id
+        try {
+          mapboxMap.addLayerAbove(new CircleLayer("invalid-id-layer-test", source.getId()), "no-such-layer-here-man");
+          fail("Should have thrown exception");
+        } catch (CannotAddLayerException ex) {
+          // Yeah
+          assertNotNull(ex.getMessage());
+        }
+
+        // Insert as last
+        CircleLayer last = new CircleLayer("this is the last one", source.getId());
+        mapboxMap.addLayerAbove(last, layers.get(layers.size() - 1).getId());
+        layers = mapboxMap.getLayers();
+        assertEquals(last.getId(), layers.get(layers.size() - 1).getId());
+
+        // Insert
+        CircleLayer second = new CircleLayer("this is the second one", source.getId());
+        mapboxMap.addLayerAbove(second, layers.get(0).getId());
+        layers = mapboxMap.getLayers();
+        assertEquals(second.getId(), layers.get(1).getId());
+      }
+    });
+  }
+
+  @Test
   public void testListSources() {
     ViewUtils.checkViewIsDisplayed(R.id.mapView);
     onView(withId(R.id.mapView)).perform(new BaseViewAction() {
@@ -97,7 +134,7 @@ public class RuntimeStyleTests {
         List<Source> sources = mapboxMap.getSources();
         assertNotNull(sources);
         assertTrue(sources.size() > 0);
-        for (Source source: sources) {
+        for (Source source : sources) {
           assertNotNull(source);
         }
       }

@@ -207,6 +207,8 @@ public:
 
     void addLayer(JNIEnv&, jlong, jni::String);
 
+    void addLayerAbove(JNIEnv&, jlong, jni::String);
+
     jni::Object<Layer> removeLayerById(JNIEnv&, jni::String);
 
     void removeLayer(JNIEnv&, jlong);

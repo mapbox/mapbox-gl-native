@@ -91,7 +91,7 @@ public class CircleLayerActivity extends AppCompatActivity {
               Timber.e("That's not an url... ", malformedUrlException);
             }
             LineLayer lineLayer = new LineLayer("route_layer", "bus_route");
-            mapboxMap.addLayer(lineLayer, "stops_layer");
+            mapboxMap.addLayerBelow(lineLayer, "stops_layer");
 
             // move camera to start route
             mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(

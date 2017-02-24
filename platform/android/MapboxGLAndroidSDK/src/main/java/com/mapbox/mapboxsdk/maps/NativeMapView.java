@@ -761,11 +761,25 @@ final class NativeMapView {
     return nativeGetLayer(layerId);
   }
 
-  public void addLayer(@NonNull Layer layer, @Nullable String before) {
-    if (isDestroyedOn("")) {
+  public void addLayer(@NonNull Layer layer) {
+    if (isDestroyedOn("addLayer")) {
       return;
     }
-    nativeAddLayer(layer.getNativePtr(), before);
+    nativeAddLayer(layer.getNativePtr(), null);
+  }
+
+  public void addLayerBelow(@NonNull Layer layer, @NonNull String below) {
+    if (isDestroyedOn("addLayerBelow")) {
+      return;
+    }
+    nativeAddLayer(layer.getNativePtr(), below);
+  }
+
+  public void addLayerAbove(@NonNull Layer layer, @NonNull String above) {
+    if (isDestroyedOn("addLayerAbove")) {
+      return;
+    }
+    nativeAddLayerAbove(layer.getNativePtr(), above);
   }
 
   @Nullable
@@ -1078,6 +1092,8 @@ final class NativeMapView {
   private native Layer nativeGetLayer(String layerId);
 
   private native void nativeAddLayer(long layerPtr, String before) throws CannotAddLayerException;
+
+  private native void nativeAddLayerAbove(long layerPtr, String above) throws CannotAddLayerException;
 
   private native Layer nativeRemoveLayerById(String layerId);
 

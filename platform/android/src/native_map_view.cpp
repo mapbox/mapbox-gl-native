@@ -779,6 +779,43 @@ void NativeMapView::addLayer(JNIEnv& env, jlong nativeLayerPtr, jni::String befo
     }
 }
 
+void NativeMapView::addLayerAbove(JNIEnv& env, jlong nativeLayerPtr, jni::String above) {
+    assert(nativeLayerPtr != 0);
+
+    Layer *layer = reinterpret_cast<Layer *>(nativeLayerPtr);
+
+    // Find the sibling
+    auto layers = map->getLayers();
+    auto siblingId = jni::Make<std::string>(env, above);
+
+    size_t index = 0;
+    for (auto l : layers) {
+        if (l->getID() == siblingId) {
+            break;
+        }
+        index++;
+    }
+
+    // Check if we found a sibling to place before
+    mbgl::optional<std::string> before;
+    if (index + 1 > layers.size()) {
+        // Not found
+        jni::ThrowNew(env, jni::FindClass(env, "com/mapbox/mapboxsdk/style/layers/CannotAddLayerException"),
+            std::string("Could not find layer: ").append(siblingId).c_str());
+        return;
+    } else if (index + 1 < layers.size()) {
+        // Place before the sibling
+        before = { layers.at(index + 1)->getID() };
+    }
+
+    // Add the layer
+    try {
+        layer->addToMap(*map, before);
+    } catch (const std::runtime_error& error) {
+        jni::ThrowNew(env, jni::FindClass(env, "com/mapbox/mapboxsdk/style/layers/CannotAddLayerException"), error.what());
+    }
+}
+
 /**
  * Remove by layer id.
  */
@@ -1380,6 +1417,7 @@ void NativeMapView::registerNative(jni::JNIEnv& env) {
             METHOD(&NativeMapView::getLayers, "nativeGetLayers"),
             METHOD(&NativeMapView::getLayer, "nativeGetLayer"),
             METHOD(&NativeMapView::addLayer, "nativeAddLayer"),
+            METHOD(&NativeMapView::addLayerAbove, "nativeAddLayerAbove"),
             METHOD(&NativeMapView::removeLayerById, "nativeRemoveLayerById"),
             METHOD(&NativeMapView::removeLayer, "nativeRemoveLayer"),
             METHOD(&NativeMapView::getSources, "nativeGetSources"),
