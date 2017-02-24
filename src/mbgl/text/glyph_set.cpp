@@ -45,9 +45,7 @@ const Shaping GlyphSet::getShaping(const std::u16string& logicalInput,
                                    const float verticalHeight,
                                    const WritingModeType writingMode,
                                    BiDi& bidi) const {
-    // The string stored in shaping.text is used for finding duplicates, but may end up quite
-    // different from the glyphs that get shown
-    Shaping shaping(translate.x * 24, translate.y * 24, logicalInput, writingMode);
+    Shaping shaping(translate.x * 24, translate.y * 24, writingMode);
 
     std::vector<std::u16string> reorderedLines =
         bidi.processText(logicalInput,

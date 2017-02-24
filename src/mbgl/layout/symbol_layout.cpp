@@ -363,7 +363,7 @@ void SymbolLayout::addFeature(const SymbolFeature& feature,
                                          overscaling);
 
             for (auto& anchor : anchors) {
-                if (!shapedTextOrientations.first || !anchorIsTooClose(shapedTextOrientations.first.text, textRepeatDistance, anchor)) {
+                if (!feature.text || !anchorIsTooClose(*feature.text, textRepeatDistance, anchor)) {
                     addSymbolInstance(line, anchor);
                 }
             }
