@@ -8,6 +8,7 @@ import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.FloatRange;
+import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
@@ -263,7 +264,7 @@ public final class MapboxMap {
   /**
    * Adds the layer to the map. The layer must be newly created and not added to the map before
    *
-   * @param layer  the layer to add
+   * @param layer the layer to add
    * @param below the layer id to add this layer before
    */
   @UiThread
@@ -274,7 +275,7 @@ public final class MapboxMap {
   /**
    * Adds the layer to the map. The layer must be newly created and not added to the map before
    *
-   * @param layer  the layer to add
+   * @param layer the layer to add
    * @param above the layer id to add this layer above
    */
   @UiThread
@@ -304,6 +305,18 @@ public final class MapboxMap {
   @Nullable
   public Layer removeLayer(@NonNull Layer layer) {
     return nativeMapView.removeLayer(layer);
+  }
+
+  /**
+   * Removes the layer. Any other references to the layer become invalid and should not be used anymore
+   *
+   * @param index the layer index
+   * @return the removed layer or null if not found
+   */
+  @UiThread
+  @Nullable
+  public Layer removeLayerAt(@IntRange(from = 0) int index) {
+    return nativeMapView.removeLayerAt(index);
   }
 
   /**

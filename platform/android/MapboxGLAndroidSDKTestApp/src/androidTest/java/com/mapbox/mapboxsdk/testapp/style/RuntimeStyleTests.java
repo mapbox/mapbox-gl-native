@@ -35,6 +35,8 @@ import org.junit.runner.RunWith;
 
 import java.util.List;
 
+import timber.log.Timber;
+
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
@@ -118,6 +120,29 @@ public class RuntimeStyleTests {
         mapboxMap.addLayerAbove(second, layers.get(0).getId());
         layers = mapboxMap.getLayers();
         assertEquals(second.getId(), layers.get(1).getId());
+      }
+    });
+  }
+
+  @Test
+  public void testRemoveLayerAt() {
+    ViewUtils.checkViewIsDisplayed(R.id.mapView);
+    onView(withId(R.id.mapView)).perform(new BaseViewAction() {
+
+      @Override
+      public void perform(UiController uiController, View view) {
+        MapboxMap mapboxMap = rule.getActivity().getMapboxMap();
+
+        // Remove by index
+        Layer firstLayer = mapboxMap.getLayers().get(0);
+        Layer removed = mapboxMap.removeLayerAt(0);
+        assertNotNull(removed);
+        assertNotNull(removed.getId());
+        assertEquals(firstLayer.getId(), removed.getId());
+
+        // Test remove by index bounds checks
+        Timber.i("Remove layer at index > size");
+        assertNull(mapboxMap.removeLayerAt(Integer.MAX_VALUE));
       }
     });
   }

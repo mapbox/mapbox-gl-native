@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.PointF;
 import android.graphics.RectF;
 import android.os.Build;
+import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -799,6 +800,14 @@ final class NativeMapView {
     return layer;
   }
 
+  @Nullable
+  public Layer removeLayerAt(@IntRange(from = 0) int index) {
+    if (isDestroyedOn("removeLayerAt")) {
+      return null;
+    }
+    return nativeRemoveLayerAt(index);
+  }
+
   public List<Source> getSources() {
     if (isDestroyedOn("getSources")) {
       return null;
@@ -1098,6 +1107,8 @@ final class NativeMapView {
   private native Layer nativeRemoveLayerById(String layerId);
 
   private native void nativeRemoveLayer(long layerId);
+
+  private native Layer nativeRemoveLayerAt(int index);
 
   private native Source[] nativeGetSources();
 

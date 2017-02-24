@@ -211,6 +211,8 @@ public:
 
     jni::Object<Layer> removeLayerById(JNIEnv&, jni::String);
 
+    jni::Object<Layer> removeLayerAt(JNIEnv&, jni::jint);
+
     void removeLayer(JNIEnv&, jlong);
 
     jni::Array<jni::Object<Source>> getSources(JNIEnv&);
