@@ -42,6 +42,7 @@ workflows:
             #!/bin/bash
             set -eu -o pipefail
             export BUILDTYPE=Debug
+            defaults write com.apple.dt.Xcode ExplainWhyBuildCommandsAreRun -bool true
             make xproj
         - is_debug: 'yes'
     - script:
@@ -52,9 +53,15 @@ workflows:
             #!/bin/bash
             set -eu -o pipefail
             export BUILDTYPE=Debug
-            export XCPRETTY="| tee ${BITRISE_DEPLOY_DIR}/raw-xcodebuild-output.txt | xcpretty --color --report html --output ${BITRISE_DEPLOY_DIR}/xcode-test-results.html"
+            export XCPRETTY="| tee -a ${BITRISE_DEPLOY_DIR}/raw-xcodebuild-output.txt | xcpretty --color --report html --output ${BITRISE_DEPLOY_DIR}/xcode-test-results.html"
             make run-test
         - is_debug: 'yes'
+    - deploy-to-bitrise-io:
+        title: Deploy to Bitrise.io
+        run_if: '{{enveq "SKIPCI" "false"}}'
+        inputs:
+        - notify_user_groups: none
+        - is_compress: 'true'
     - deploy-to-bitrise-io:
         title: Deploy to Bitrise.io
         run_if: '{{enveq "SKIPCI" "false"}}'
