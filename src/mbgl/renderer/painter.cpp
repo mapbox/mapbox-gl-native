@@ -31,8 +31,6 @@
 #include <mbgl/util/mat3.hpp>
 #include <mbgl/util/string.hpp>
 
-#include <mbgl/util/offscreen_texture.hpp>
-
 #include <cassert>
 #include <algorithm>
 #include <iostream>
