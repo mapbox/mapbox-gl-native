@@ -261,6 +261,14 @@ void DefaultFileSource::setOfflineMapboxTileCountLimit(uint64_t limit) const {
     thread->invokeSync(&Impl::setOfflineMapboxTileCountLimit, limit);
 }
 
+void DefaultFileSource::pause() {
+    thread->pause();
+}
+
+void DefaultFileSource::resume() {
+    thread->resume();
+}
+
 // For testing only:
 
 void DefaultFileSource::put(const Resource& resource, const Response& response) {
