@@ -275,20 +275,24 @@ public final class MapboxMap {
    * Removes the layer. Any references to the layer become invalid and should not be used anymore
    *
    * @param layerId the layer to remove
+   * @return the removed layer or null if not found
    */
   @UiThread
-  public void removeLayer(@NonNull String layerId) {
-    nativeMapView.removeLayer(layerId);
+  @Nullable
+  public Layer removeLayer(@NonNull String layerId) {
+    return nativeMapView.removeLayer(layerId);
   }
 
   /**
    * Removes the layer. The reference is re-usable after this and can be re-added
    *
    * @param layer the layer to remove
+   * @return the layer
    */
   @UiThread
-  public void removeLayer(@NonNull Layer layer) {
-    nativeMapView.removeLayer(layer);
+  @Nullable
+  public Layer removeLayer(@NonNull Layer layer) {
+    return nativeMapView.removeLayer(layer);
   }
 
   /**
