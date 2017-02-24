@@ -430,6 +430,8 @@ std::unique_ptr<SymbolBucket> SymbolLayout::place(CollisionTile& collisionTile) 
     const bool mayOverlap = layout.get<TextAllowOverlap>() || layout.get<IconAllowOverlap>() ||
         layout.get<TextIgnorePlacement>() || layout.get<IconIgnorePlacement>();
 
+    const bool keepUpright = layout.get<TextKeepUpright>();
+
     // Sort symbols by their y position on the canvas so that they lower symbols
     // are drawn on top of higher symbols.
     // Don't sort symbols that won't overlap because it isn't necessary and
@@ -481,20 +483,24 @@ std::unique_ptr<SymbolBucket> SymbolLayout::place(CollisionTile& collisionTile) 
         // Insert final placement into collision tree and add glyphs/icons to buffers
 
         if (hasText) {
+            const float placementZoom = util::max(util::log2(glyphScale) + zoom, 0.0f);
             collisionTile.insertFeature(symbolInstance.textCollisionFeature, glyphScale, layout.get<TextIgnorePlacement>());
             if (glyphScale < collisionTile.maxScale) {
-                addSymbols(
-                    bucket->text, symbolInstance.glyphQuads, glyphScale,
-                    layout.get<TextKeepUpright>(), textPlacement, collisionTile.config.angle, symbolInstance.writingModes);
+                for (const auto& symbol : symbolInstance.glyphQuads) {
+                    addSymbol(
+                        bucket->text, symbol, placementZoom,
+                        keepUpright, textPlacement, collisionTile.config.angle, symbolInstance.writingModes);
+                }
             }
         }
 
         if (hasIcon) {
+            const float placementZoom = util::max(util::log2(iconScale) + zoom, 0.0f);
             collisionTile.insertFeature(symbolInstance.iconCollisionFeature, iconScale, layout.get<IconIgnorePlacement>());
-            if (iconScale < collisionTile.maxScale) {
-                addSymbols(
-                    bucket->icon, symbolInstance.iconQuads, iconScale,
-                    layout.get<IconKeepUpright>(), iconPlacement, collisionTile.config.angle, symbolInstance.writingModes);
+            if (iconScale < collisionTile.maxScale && symbolInstance.iconQuad) {
+                addSymbol(
+                    bucket->icon, *symbolInstance.iconQuad, placementZoom,
+                    keepUpright, iconPlacement, collisionTile.config.angle, symbolInstance.writingModes);
             }
         }
     }
@@ -507,73 +513,76 @@ std::unique_ptr<SymbolBucket> SymbolLayout::place(CollisionTile& collisionTile) 
 }
 
 template <typename Buffer>
-void SymbolLayout::addSymbols(Buffer &buffer, const SymbolQuads &symbols, float scale, const bool keepUpright, const style::SymbolPlacementType placement, const float placementAngle, WritingModeType writingModes) {
+void SymbolLayout::addSymbol(Buffer& buffer,
+                             const SymbolQuad& symbol,
+                             const float placementZoom,
+                             const bool keepUpright,
+                             const style::SymbolPlacementType placement,
+                             const float placementAngle,
+                             const WritingModeType writingModes) {
     constexpr const uint16_t vertexLength = 4;
-    const float placementZoom = util::max(util::log2(scale) + zoom, 0.0f);
 
-    for (const auto& symbol : symbols) {
-        const auto &tl = symbol.tl;
-        const auto &tr = symbol.tr;
-        const auto &bl = symbol.bl;
-        const auto &br = symbol.br;
-        const auto &tex = symbol.tex;
+    const auto &tl = symbol.tl;
+    const auto &tr = symbol.tr;
+    const auto &bl = symbol.bl;
+    const auto &br = symbol.br;
+    const auto &tex = symbol.tex;
 
-        float minZoom = util::max(zoom + util::log2(symbol.minScale), placementZoom);
-        float maxZoom = util::min(zoom + util::log2(symbol.maxScale), util::MAX_ZOOM_F);
-        const auto &anchorPoint = symbol.anchorPoint;
+    float minZoom = util::max(zoom + util::log2(symbol.minScale), placementZoom);
+    float maxZoom = util::min(zoom + util::log2(symbol.maxScale), util::MAX_ZOOM_F);
+    const auto &anchorPoint = symbol.anchorPoint;
 
-        // drop incorrectly oriented glyphs
-        const float a = std::fmod(symbol.anchorAngle + placementAngle + M_PI, M_PI * 2);
-        if (writingModes & WritingModeType::Vertical) {
-            if (placement == style::SymbolPlacementType::Line && symbol.writingMode == WritingModeType::Vertical) {
-                if (keepUpright && placement == style::SymbolPlacementType::Line && (a <= (M_PI * 5 / 4) || a > (M_PI * 7 / 4)))
-                    continue;
-            } else if (keepUpright && placement == style::SymbolPlacementType::Line && (a <= (M_PI * 3 / 4) || a > (M_PI * 5 / 4)))
-                continue;
-        } else if (keepUpright && placement == style::SymbolPlacementType::Line &&
-            (a <= M_PI / 2 || a > M_PI * 3 / 2)) {
-            continue;
-        }
-
-        if (maxZoom <= minZoom)
-            continue;
-
-        // Lower min zoom so that while fading out the label
-        // it can be shown outside of collision-free zoom levels
-        if (minZoom == placementZoom) {
-            minZoom = 0;
-        }
-
-        if (buffer.segments.empty() || buffer.segments.back().vertexLength + vertexLength > std::numeric_limits<uint16_t>::max()) {
-            buffer.segments.emplace_back(buffer.vertices.vertexSize(), buffer.triangles.indexSize());
-        }
-
-        // We're generating triangle fans, so we always start with the first
-        // coordinate in this polygon.
-        auto& segment = buffer.segments.back();
-        assert(segment.vertexLength <= std::numeric_limits<uint16_t>::max());
-        uint16_t index = segment.vertexLength;
-
-        // Encode angle of glyph
-        uint8_t glyphAngle = std::round((symbol.glyphAngle / (M_PI * 2)) * 256);
-
-        // coordinates (2 triangles)
-        buffer.vertices.emplace_back(SymbolLayoutAttributes::vertex(anchorPoint, tl, tex.x, tex.y,
-                            minZoom, maxZoom, placementZoom, glyphAngle));
-        buffer.vertices.emplace_back(SymbolLayoutAttributes::vertex(anchorPoint, tr, tex.x + tex.w, tex.y,
-                            minZoom, maxZoom, placementZoom, glyphAngle));
-        buffer.vertices.emplace_back(SymbolLayoutAttributes::vertex(anchorPoint, bl, tex.x, tex.y + tex.h,
-                            minZoom, maxZoom, placementZoom, glyphAngle));
-        buffer.vertices.emplace_back(SymbolLayoutAttributes::vertex(anchorPoint, br, tex.x + tex.w, tex.y + tex.h,
-                            minZoom, maxZoom, placementZoom, glyphAngle));
-
-        // add the two triangles, referencing the four coordinates we just inserted.
-        buffer.triangles.emplace_back(index + 0, index + 1, index + 2);
-        buffer.triangles.emplace_back(index + 1, index + 2, index + 3);
-
-        segment.vertexLength += vertexLength;
-        segment.indexLength += 6;
+    // drop incorrectly oriented glyphs
+    const float a = std::fmod(symbol.anchorAngle + placementAngle + M_PI, M_PI * 2);
+    if (writingModes & WritingModeType::Vertical) {
+        if (placement == style::SymbolPlacementType::Line && symbol.writingMode == WritingModeType::Vertical) {
+            if (keepUpright && placement == style::SymbolPlacementType::Line && (a <= (M_PI * 5 / 4) || a > (M_PI * 7 / 4)))
+                return;
+        } else if (keepUpright && placement == style::SymbolPlacementType::Line && (a <= (M_PI * 3 / 4) || a > (M_PI * 5 / 4)))
+            return;
+    } else if (keepUpright && placement == style::SymbolPlacementType::Line &&
+        (a <= M_PI / 2 || a > M_PI * 3 / 2)) {
+        return;
     }
+
+    if (maxZoom <= minZoom)
+        return;
+
+    // Lower min zoom so that while fading out the label
+    // it can be shown outside of collision-free zoom levels
+    if (minZoom == placementZoom) {
+        minZoom = 0;
+    }
+
+    if (buffer.segments.empty() || buffer.segments.back().vertexLength + vertexLength > std::numeric_limits<uint16_t>::max()) {
+        buffer.segments.emplace_back(buffer.vertices.vertexSize(), buffer.triangles.indexSize());
+    }
+
+    // We're generating triangle fans, so we always start with the first
+    // coordinate in this polygon.
+    auto& segment = buffer.segments.back();
+    assert(segment.vertexLength <= std::numeric_limits<uint16_t>::max());
+    uint16_t index = segment.vertexLength;
+
+    // Encode angle of glyph
+    uint8_t glyphAngle = std::round((symbol.glyphAngle / (M_PI * 2)) * 256);
+
+    // coordinates (2 triangles)
+    buffer.vertices.emplace_back(SymbolLayoutAttributes::vertex(anchorPoint, tl, tex.x, tex.y,
+                        minZoom, maxZoom, placementZoom, glyphAngle));
+    buffer.vertices.emplace_back(SymbolLayoutAttributes::vertex(anchorPoint, tr, tex.x + tex.w, tex.y,
+                        minZoom, maxZoom, placementZoom, glyphAngle));
+    buffer.vertices.emplace_back(SymbolLayoutAttributes::vertex(anchorPoint, bl, tex.x, tex.y + tex.h,
+                        minZoom, maxZoom, placementZoom, glyphAngle));
+    buffer.vertices.emplace_back(SymbolLayoutAttributes::vertex(anchorPoint, br, tex.x + tex.w, tex.y + tex.h,
+                        minZoom, maxZoom, placementZoom, glyphAngle));
+
+    // add the two triangles, referencing the four coordinates we just inserted.
+    buffer.triangles.emplace_back(index + 0, index + 1, index + 2);
+    buffer.triangles.emplace_back(index + 1, index + 2, index + 3);
+
+    segment.vertexLength += vertexLength;
+    segment.indexLength += 6;
 }
 
 void SymbolLayout::addToDebugBuffers(CollisionTile& collisionTile, SymbolBucket& bucket) {

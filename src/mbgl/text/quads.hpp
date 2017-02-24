@@ -38,7 +38,7 @@ struct SymbolQuad {
 
 typedef std::vector<SymbolQuad> SymbolQuads;
 
-SymbolQuads getIconQuads(Anchor& anchor, const PositionedIcon& shapedIcon,
+SymbolQuad getIconQuad(Anchor& anchor, const PositionedIcon& shapedIcon,
         const GeometryCoordinates& line, const style::SymbolLayoutProperties::Evaluated&,
         style::SymbolPlacementType placement, const Shaping& shapedText);
 

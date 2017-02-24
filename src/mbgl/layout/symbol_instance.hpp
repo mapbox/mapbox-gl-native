@@ -24,7 +24,7 @@ public:
     bool hasText;
     bool hasIcon;
     SymbolQuads glyphQuads;
-    SymbolQuads iconQuads;
+    optional<SymbolQuad> iconQuad;
     CollisionFeature textCollisionFeature;
     CollisionFeature iconCollisionFeature;
     WritingModeType writingModes;
