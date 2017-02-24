@@ -1,5 +1,6 @@
 #include "layers.hpp"
 
+#include <mbgl/style/layer.hpp>
 #include <mbgl/style/layers/background_layer.hpp>
 #include <mbgl/style/layers/circle_layer.hpp>
 #include <mbgl/style/layers/fill_layer.hpp>
@@ -10,11 +11,12 @@
 
 #include "background_layer.hpp"
 #include "circle_layer.hpp"
+#include "custom_layer.hpp"
 #include "fill_layer.hpp"
 #include "line_layer.hpp"
 #include "raster_layer.hpp"
 #include "symbol_layer.hpp"
-#include "custom_layer.hpp"
+#include "unknown_layer.hpp"
 
 namespace mbgl {
 namespace android {
@@ -36,7 +38,7 @@ Layer* initializeLayerPeer(mbgl::Map& map, mbgl::style::Layer& coreLayer) {
     } else if (coreLayer.is<mbgl::style::CustomLayer>()) {
         layer = new CustomLayer(map, *coreLayer.as<mbgl::style::CustomLayer>());
     } else {
-        throw new std::runtime_error("Layer type not implemented");
+        layer = new UnknownLayer(map, coreLayer);
     }
 
     return layer;
@@ -53,11 +55,12 @@ void registerNativeLayers(jni::JNIEnv& env) {
     Layer::registerNative(env);
     BackgroundLayer::registerNative(env);
     CircleLayer::registerNative(env);
+    CustomLayer::registerNative(env);
     FillLayer::registerNative(env);
     LineLayer::registerNative(env);
     RasterLayer::registerNative(env);
     SymbolLayer::registerNative(env);
-    CustomLayer::registerNative(env);
+    UnknownLayer::registerNative(env);
 }
 
 } // namespace android

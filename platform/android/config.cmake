@@ -114,6 +114,8 @@ macro(mbgl_platform_core)
         platform/android/src/style/layers/raster_layer.hpp
         platform/android/src/style/layers/symbol_layer.cpp
         platform/android/src/style/layers/symbol_layer.hpp
+        platform/android/src/style/layers/unknown_layer.cpp
+        platform/android/src/style/layers/unknown_layer.hpp
         platform/android/src/style/sources/geojson_source.cpp
         platform/android/src/style/sources/geojson_source.hpp
         platform/android/src/style/sources/source.cpp
