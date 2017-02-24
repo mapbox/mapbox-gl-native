@@ -217,7 +217,7 @@ public:
 
     void addSource(JNIEnv&, jni::jlong);
 
-    void removeSourceById(JNIEnv&, jni::String);
+    jni::Object<Source> removeSourceById(JNIEnv&, jni::String);
 
     void removeSource(JNIEnv&, jlong);
 

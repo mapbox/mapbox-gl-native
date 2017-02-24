@@ -844,8 +844,13 @@ void NativeMapView::addSource(JNIEnv& env, jni::jlong sourcePtr) {
     }
 }
 
-void NativeMapView::removeSourceById(JNIEnv& env, jni::String id) {
-     map->removeSource(jni::Make<std::string>(env, id));
+jni::Object<Source> NativeMapView::removeSourceById(JNIEnv& env, jni::String id) {
+    std::unique_ptr<mbgl::style::Source> coreSource = map->removeSource(jni::Make<std::string>(env, id));
+    if (coreSource) {
+        return jni::Object<Source>(createJavaSourcePeer(env, *map, *coreSource));
+    } else {
+        return jni::Object<Source>();
+    }
 }
 
 void NativeMapView::removeSource(JNIEnv&, jlong sourcePtr) {

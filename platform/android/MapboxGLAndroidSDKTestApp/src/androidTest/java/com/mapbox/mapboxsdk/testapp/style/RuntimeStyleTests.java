@@ -192,7 +192,8 @@ public class RuntimeStyleTests {
       mapboxMap.addSource(new VectorSource("my-source", "mapbox://mapbox.mapbox-terrain-v2"));
 
       // Remove
-      mapboxMap.removeSource("my-source");
+      Source mySource = mapboxMap.removeSource("my-source");
+      assertNotNull(mySource);
       assertNull(mapboxMap.getLayer("my-source"));
 
       // Add
