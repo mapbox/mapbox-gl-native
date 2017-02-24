@@ -147,7 +147,8 @@ public class RuntimeStyleTests {
       assertNotNull(mapboxMap.getLayer("building"));
 
       // Remove
-      mapboxMap.removeLayer("building");
+      Layer building = mapboxMap.removeLayer("building");
+      assertNotNull(building);
       assertNull(mapboxMap.getLayer("building"));
 
       // Add

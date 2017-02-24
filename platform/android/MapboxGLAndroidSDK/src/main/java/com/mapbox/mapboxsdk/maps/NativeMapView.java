@@ -768,18 +768,21 @@ final class NativeMapView {
     nativeAddLayer(layer.getNativePtr(), before);
   }
 
-  public void removeLayer(@NonNull String layerId) {
+  @Nullable
+  public Layer removeLayer(@NonNull String layerId) {
     if (isDestroyedOn("removeLayer")) {
-      return;
+      return null;
     }
-    nativeRemoveLayerById(layerId);
+    return nativeRemoveLayerById(layerId);
   }
 
-  public void removeLayer(@NonNull Layer layer) {
+  @Nullable
+  public Layer removeLayer(@NonNull Layer layer) {
     if (isDestroyedOn("removeLayer")) {
-      return;
+      return null;
     }
     nativeRemoveLayer(layer.getNativePtr());
+    return layer;
   }
 
   public List<Source> getSources() {
@@ -1074,7 +1077,7 @@ final class NativeMapView {
 
   private native void nativeAddLayer(long layerPtr, String before) throws CannotAddLayerException;
 
-  private native void nativeRemoveLayerById(String layerId);
+  private native Layer nativeRemoveLayerById(String layerId);
 
   private native void nativeRemoveLayer(long layerId);
 
