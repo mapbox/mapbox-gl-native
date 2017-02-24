@@ -646,6 +646,13 @@ final class NativeMapView {
     nativeAddAnnotationIcon(nativeMapViewPtr, symbol, width, height, scale, pixels);
   }
 
+  public void removeAnnotationIcon(String symbol){
+    if(isDestroyedOn("removeAnnotationIcon")){
+      return;
+    }
+    nativeRemoveAnnotationIcon(nativeMapViewPtr, symbol);
+  }
+
   public void setVisibleCoordinateBounds(LatLng[] coordinates, RectF padding, double direction, long duration) {
     if (isDestroyedOn("setVisibleCoordinateBounds")) {
       return;
@@ -1075,6 +1082,8 @@ final class NativeMapView {
 
   private native void nativeAddAnnotationIcon(long nativeMapViewPtr, String symbol,
                                               int width, int height, float scale, byte[] pixels);
+
+  private native void nativeRemoveAnnotationIcon(long nativeMapViewPtr, String symbol);
 
   private native void nativeSetVisibleCoordinateBounds(long nativeMapViewPtr, LatLng[] coordinates,
                                                        RectF padding, double direction, long duration);

@@ -880,6 +880,16 @@ void nativeAddAnnotationIcon(JNIEnv *env, jni::jobject* obj, jlong nativeMapView
     nativeMapView->getMap().addAnnotationIcon(symbolName, iconImage);
 }
 
+void nativeRemoveAnnotationIcon(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr,
+                                         jni::jstring* symbol) {
+    assert(nativeMapViewPtr != 0);
+    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
+
+    const std::string symbolName = std_string_from_jstring(env, symbol);
+
+    nativeMapView->getMap().removeAnnotationIcon(symbolName);
+}
+
 void nativeSetVisibleCoordinateBounds(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr,
         jni::jarray<jni::jobject>* coordinates, jni::jobject* padding, jdouble direction, jlong duration) {
     assert(nativeMapViewPtr != 0);
@@ -1963,6 +1973,7 @@ void registerNatives(JavaVM *vm) {
         MAKE_NATIVE_METHOD(nativeRemoveAnnotations, "(J[J)V"),
         MAKE_NATIVE_METHOD(nativeQueryPointAnnotations, "(JLandroid/graphics/RectF;)[J"),
         MAKE_NATIVE_METHOD(nativeAddAnnotationIcon, "(JLjava/lang/String;IIF[B)V"),
+        MAKE_NATIVE_METHOD(nativeRemoveAnnotationIcon, "(JLjava/lang/String;)V"),
         MAKE_NATIVE_METHOD(nativeSetVisibleCoordinateBounds, "(J[Lcom/mapbox/mapboxsdk/geometry/LatLng;Landroid/graphics/RectF;DJ)V"),
         MAKE_NATIVE_METHOD(nativeOnLowMemory, "(J)V"),
         MAKE_NATIVE_METHOD(nativeSetDebug, "(JZ)V"),
