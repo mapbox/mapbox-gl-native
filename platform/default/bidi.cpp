@@ -36,8 +36,9 @@ std::u16string applyArabicShaping(const std::u16string& input) {
     // Pre-flighting will always set U_BUFFER_OVERFLOW_ERROR
     errorCode = U_ZERO_ERROR;
 
-    auto outputText = std::make_unique<UChar[]>(outputLength);
-    u_shapeArabic(input.c_str(), static_cast<int32_t>(input.size()), outputText.get(), outputLength,
+    std::u16string outputText(outputLength, 0);
+
+    u_shapeArabic(input.c_str(), static_cast<int32_t>(input.size()), &outputText[0], outputLength,
                   (U_SHAPE_LETTERS_SHAPE & U_SHAPE_LETTERS_MASK) |
                       (U_SHAPE_TEXT_DIRECTION_LOGICAL & U_SHAPE_TEXT_DIRECTION_MASK),
                   &errorCode);
@@ -46,7 +47,7 @@ std::u16string applyArabicShaping(const std::u16string& input) {
     if (U_FAILURE(errorCode))
         return input;
 
-    return std::u16string(outputText.get(), outputLength);
+    return outputText;
 }
 
 void BiDi::mergeParagraphLineBreaks(std::set<size_t>& lineBreakPoints) {
@@ -108,12 +109,12 @@ std::u16string BiDi::getLine(std::size_t start, std::size_t end) {
     //  Setting UBIDI_INSERT_LRM_FOR_NUMERIC would require
     //  ubidi_getLength(pBiDi)+2*ubidi_countRuns(pBiDi)
     const int32_t outputLength = ubidi_getProcessedLength(impl->bidiLine);
-    auto outputText = std::make_unique<UChar[]>(outputLength);
+    std::u16string outputText(outputLength, 0);
 
     // UBIDI_DO_MIRRORING: Apply unicode mirroring of characters like parentheses
     // UBIDI_REMOVE_BIDI_CONTROLS: Now that all the lines are set, remove control characters so that
     // they don't show up on screen (some fonts have glyphs representing them)
-    ubidi_writeReordered(impl->bidiLine, outputText.get(), outputLength,
+    ubidi_writeReordered(impl->bidiLine, &outputText[0], outputLength,
                          UBIDI_DO_MIRRORING | UBIDI_REMOVE_BIDI_CONTROLS, &errorCode);
 
     if (U_FAILURE(errorCode)) {
@@ -121,7 +122,7 @@ std::u16string BiDi::getLine(std::size_t start, std::size_t end) {
                                  u_errorName(errorCode));
     }
 
-    return std::u16string(outputText.get(), outputLength);
+    return outputText;
 }
 
 } // end namespace mbgl
