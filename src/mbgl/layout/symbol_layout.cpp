@@ -293,6 +293,7 @@ void SymbolLayout::prepare(uintptr_t tileUID,
     }
 
     features.clear();
+    compareText.clear();
 }
 
 void SymbolLayout::addFeature(const SymbolFeature& feature,
