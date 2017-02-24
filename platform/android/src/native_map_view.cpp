@@ -829,6 +829,27 @@ jni::Object<Layer> NativeMapView::removeLayerById(JNIEnv& env, jni::String id) {
 }
 
 /**
+ * Remove layer at index.
+ */
+jni::Object<Layer> NativeMapView::removeLayerAt(JNIEnv& env, jni::jint index) {
+    auto layers = map->getLayers();
+
+    // Check index
+    int numLayers = layers.size() - 1;
+    if (index > numLayers || index < 0) {
+        Log::Warning(Event::JNI, "Index out of range: %i", index);
+        return jni::Object<Layer>();
+    }
+
+    std::unique_ptr<mbgl::style::Layer> coreLayer = map->removeLayer(layers.at(index)->getID());
+    if (coreLayer) {
+        return jni::Object<Layer>(createJavaLayerPeer(env, *map, std::move(coreLayer)));
+    } else {
+        return jni::Object<Layer>();
+    }
+}
+
+/**
  * Remove with wrapper object id. Ownership is transferred back to the wrapper
  */
 void NativeMapView::removeLayer(JNIEnv&, jlong layerPtr) {
@@ -1419,6 +1440,7 @@ void NativeMapView::registerNative(jni::JNIEnv& env) {
             METHOD(&NativeMapView::addLayer, "nativeAddLayer"),
             METHOD(&NativeMapView::addLayerAbove, "nativeAddLayerAbove"),
             METHOD(&NativeMapView::removeLayerById, "nativeRemoveLayerById"),
+            METHOD(&NativeMapView::removeLayerAt, "nativeRemoveLayerAt"),
             METHOD(&NativeMapView::removeLayer, "nativeRemoveLayer"),
             METHOD(&NativeMapView::getSources, "nativeGetSources"),
             METHOD(&NativeMapView::getSource, "nativeGetSource"),
