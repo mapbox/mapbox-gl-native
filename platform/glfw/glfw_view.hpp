@@ -27,6 +27,10 @@ public:
     // The expected action is to set a new style, different to the current one.
     void setChangeStyleCallback(std::function<void()> callback);
 
+    void setPauseResumeCallback(std::function<void()> callback) {
+        pauseResumeCallback = callback;
+    };
+
     void setShouldClose();
 
     void setWindowTitle(const std::string&);
@@ -104,6 +108,7 @@ private:
     double lastClick = -1;
 
     std::function<void()> changeStyleCallback;
+    std::function<void()> pauseResumeCallback;
 
     mbgl::util::RunLoop runLoop;
     mbgl::util::Timer frameTick;

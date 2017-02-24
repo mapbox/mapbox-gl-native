@@ -153,6 +153,18 @@ int main(int argc, char *argv[]) {
         mbgl::Log::Info(mbgl::Event::Setup, "Changed style to: %s", newStyle.name);
     });
 
+    view->setPauseResumeCallback([&fileSource] () {
+        static bool isPaused = false;
+
+        if (isPaused) {
+            fileSource.resume();
+        } else {
+            fileSource.pause();
+        }
+
+        isPaused = !isPaused;
+    });
+
     // Load style
     if (style.empty()) {
         const char *url = getenv("MAPBOX_STYLE_URL");

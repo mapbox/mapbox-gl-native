@@ -109,10 +109,11 @@ GLFWView::GLFWView(bool fullscreen_, bool benchmark_)
     printf("- Press `7` through `0` to add increasing numbers of shape annotations for testing\n");
     printf("\n");
     printf("- Press `Q` to remove annotations\n");
-    printf("- Press `P` to add a random custom runtime imagery annotation\n");
+    printf("- Press `K` to add a random custom runtime imagery annotation\n");
     printf("- Press `L` to add a random line annotation\n");
     printf("- Press `W` to pop the last-added annotation off\n");
     printf("\n");
+    printf("- Press `P` to pause tile requests\n");
     printf("- `Control` + mouse drag to rotate\n");
     printf("- `Shift` + mouse drag to tilt\n");
     printf("\n");
@@ -200,10 +201,13 @@ void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, 
             auto result = view->map->queryPointAnnotations({ {}, { double(view->getSize().width), double(view->getSize().height) } });
             printf("visible point annotations: %lu\n", result.size());
         } break;
+        case GLFW_KEY_P:
+            view->pauseResumeCallback();
+            break;
         case GLFW_KEY_C:
             view->clearAnnotations();
             break;
-        case GLFW_KEY_P:
+        case GLFW_KEY_K:
             view->addRandomCustomPointAnnotations(1);
             break;
         case GLFW_KEY_L:
