@@ -13,7 +13,7 @@ using namespace style;
 
 const float globalMinScale = 0.5f; // underscale by 1 zoom level
 
-SymbolQuads getIconQuads(Anchor& anchor, const PositionedIcon& shapedIcon,
+SymbolQuad getIconQuad(Anchor& anchor, const PositionedIcon& shapedIcon,
         const GeometryCoordinates& line, const SymbolLayoutProperties::Evaluated& layout,
         const style::SymbolPlacementType placement, const Shaping& shapedText) {
 
@@ -88,9 +88,7 @@ SymbolQuads getIconQuads(Anchor& anchor, const PositionedIcon& shapedIcon,
         br = util::matrixMultiply(matrix, br);
     }
 
-    SymbolQuads quads;
-    quads.emplace_back(tl, tr, bl, br, image.pos, 0, 0, anchor.point, globalMinScale, std::numeric_limits<float>::infinity(), shapedText.writingMode);
-    return quads;
+    return SymbolQuad { tl, tr, bl, br, image.pos, 0, 0, anchor.point, globalMinScale, std::numeric_limits<float>::infinity(), shapedText.writingMode };
 }
 
 struct GlyphInstance {

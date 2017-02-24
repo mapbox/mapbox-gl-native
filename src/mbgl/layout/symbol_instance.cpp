@@ -16,17 +16,15 @@ SymbolInstance::SymbolInstance(Anchor& anchor, const GeometryCoordinates& line,
     hasText(shapedTextOrientations.first || shapedTextOrientations.second),
     hasIcon(shapedIcon),
 
-    // Create the quad used for rendering the icon.
-    iconQuads(addToBuffers && shapedIcon ?
-            getIconQuads(anchor, shapedIcon, line, layout, iconPlacement, shapedTextOrientations.first) :
-            SymbolQuads()),
-
     // Create the collision features that will be used to check whether this symbol instance can be placed
     textCollisionFeature(line, anchor, shapedTextOrientations.second ?: shapedTextOrientations.first, textBoxScale, textPadding, textPlacement, indexedFeature),
     iconCollisionFeature(line, anchor, shapedIcon, iconBoxScale, iconPadding, iconPlacement, indexedFeature) {
 
-    // Create the quads used for rendering the glyphs.
+    // Create the quads used for rendering the icon and glyphs.
     if (addToBuffers) {
+        if (shapedIcon) {
+            iconQuad = getIconQuad(anchor, shapedIcon, line, layout, iconPlacement, shapedTextOrientations.first);
+        }
         if (shapedTextOrientations.first) {
             auto quads = getGlyphQuads(anchor, shapedTextOrientations.first, textBoxScale, line, layout, textPlacement, face);
             glyphQuads.insert(glyphQuads.end(), quads.begin(), quads.end());
