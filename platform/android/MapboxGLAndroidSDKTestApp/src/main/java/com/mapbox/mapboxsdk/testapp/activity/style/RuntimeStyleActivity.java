@@ -40,6 +40,7 @@ import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import timber.log.Timber;
@@ -150,6 +151,9 @@ public class RuntimeStyleActivity extends AppCompatActivity {
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
     switch (item.getItemId()) {
+      case R.id.action_list_layers:
+        listLayers();
+        return true;
       case R.id.action_water_color:
         setWaterColor();
         return true;
@@ -195,6 +199,16 @@ public class RuntimeStyleActivity extends AppCompatActivity {
       default:
         return super.onOptionsItemSelected(item);
     }
+  }
+
+  private void listLayers() {
+    List<Layer> layers = mapboxMap.getLayers();
+    StringBuilder builder = new StringBuilder("Layers:");
+    for (Layer layer : layers) {
+      builder.append("\n");
+      builder.append(layer.getId());
+    }
+    Toast.makeText(this, builder.toString(), Toast.LENGTH_LONG).show();
   }
 
   private void setLayerInvisible() {

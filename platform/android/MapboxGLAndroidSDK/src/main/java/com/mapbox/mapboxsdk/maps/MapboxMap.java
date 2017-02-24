@@ -209,6 +209,22 @@ public final class MapboxMap {
     nativeMapView.setTransitionDelay(delay);
   }
 
+  /**
+   * Retrieve all the layers in the style
+   *
+   * @return all the layers in the current style
+   */
+  @UiThread
+  public List<Layer> getLayers() {
+    return nativeMapView.getLayers();
+  }
+
+  /**
+   * Get the layer by id
+   *
+   * @param layerId the layer's id
+   * @return the layer, if present in the style
+   */
   @Nullable
   @UiThread
   public Layer getLayer(@NonNull String layerId) {
