@@ -24,12 +24,10 @@ public:
                              hb_font_t* localFont) const;
 
 private:
-    float determineAverageLineWidth(const std::u16string& logicalInput,
-                                        const float spacing,
-                                        float maxWidth) const;
-    std::set<std::size_t> determineLineBreaks(const std::u16string& logicalInput,
-                                          const float spacing,
-                                          float maxWidth) const;
+    std::vector<std::pair<char16_t,double>> getClusterWidths(const std::u16string& logicalInput, const float spacing) const;
+    
+    float determineAverageLineWidth(const std::vector<std::pair<char16_t,double>>& clusters, float maxWidth) const;
+    std::set<std::size_t> determineLineBreaks(const std::vector<std::pair<char16_t,double>>& clusters, float maxWidth) const;
 
     void shapeLines(Shaping& shaping,
                     const std::vector<std::u16string>& lines,

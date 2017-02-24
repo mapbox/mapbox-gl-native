@@ -13,7 +13,8 @@ namespace harfbuzz {
 
 RequiredGlyphsForFont getGlyphIDs(const LocalFonts& fonts, const std::string& u8label);
     
-void applyShaping(hb_font_t* font, const std::string& u8text, std::vector<PositionedGlyph>& positionedGlyphs, float& current_x, float& current_y);
+std::vector<std::pair<char16_t,double>> getClusterWidths(hb_font_t* font, const std::u16string& u16text);
+void applyShaping(hb_font_t* font, const std::u16string& u16text, std::vector<PositionedGlyph>& positionedGlyphs, float& current_x, float& current_y);
     
 }
 }

@@ -9,6 +9,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <numeric>
 
 namespace mbgl {
 
@@ -35,6 +36,8 @@ void GlyphSet::insert(uint32_t id, SDFGlyph&& glyph) {
 const std::map<uint32_t, SDFGlyph>& GlyphSet::getSDFs() const {
     return sdfs;
 }
+    
+
 
 const Shaping GlyphSet::getShaping(const std::u16string& logicalInput,
                                    const float maxWidth,
@@ -50,10 +53,12 @@ const Shaping GlyphSet::getShaping(const std::u16string& logicalInput,
     // The string stored in shaping.text is used for finding duplicates, but may end up quite
     // different from the glyphs that get shown
     Shaping shaping(translate.x * 24, translate.y * 24, logicalInput);
+    
+    std::vector<std::pair<char16_t,double>> clusterWidths = localFont ? harfbuzz::getClusterWidths(localFont, logicalInput) : getClusterWidths(logicalInput, spacing);
 
     std::vector<std::u16string> reorderedLines =
         bidi.processText(logicalInput,
-                         determineLineBreaks(logicalInput, spacing, maxWidth));
+                         determineLineBreaks(clusterWidths, maxWidth));
 
     shapeLines(shaping, reorderedLines, spacing, lineHeight, horizontalAlign, verticalAlign,
                justify, translate, localFont);
@@ -102,16 +107,10 @@ void justifyLine(std::vector<PositionedGlyph>& positionedGlyphs,
     }
 }
 
-float GlyphSet::determineAverageLineWidth(const std::u16string& logicalInput,
-                                              const float spacing,
-                                              float maxWidth) const {
+float GlyphSet::determineAverageLineWidth(const std::vector<std::pair<char16_t,double>>& clusters, float maxWidth) const {
     float totalWidth = 0;
-
-    for (char16_t chr : logicalInput) {
-        auto it = sdfs.find(chr);
-        if (it != sdfs.end()) {
-            totalWidth += it->second.metrics.advance + spacing;
-        }
+    for (auto cluster : clusters) {
+        totalWidth += cluster.second;
     }
 
     int32_t targetLineCount = std::fmax(1, std::ceil(totalWidth / maxWidth));
@@ -196,43 +195,51 @@ std::set<std::size_t> leastBadBreaks(const PotentialBreak& lastLineBreak) {
     return leastBadBreaks;
 }
 
-
-// We determine line breaks based on shaped text in logical order. Working in visual order would be
-//  more intuitive, but we can't do that because the visual order may be changed by line breaks!
-std::set<std::size_t> GlyphSet::determineLineBreaks(const std::u16string& logicalInput,
-                                                const float spacing,
-                                                float maxWidth) const {
-    if (!maxWidth) {
-        return {};
-    }
-
-    if (logicalInput.empty()) {
-        return {};
-    }
-
-    const float targetWidth = determineAverageLineWidth(logicalInput, spacing, maxWidth);
-
-    std::list<PotentialBreak> potentialBreaks;
-    float currentX = 0;
-
+std::vector<std::pair<char16_t,double>> GlyphSet::getClusterWidths(const std::u16string& logicalInput, const float spacing) const {
+    std::vector<std::pair<char16_t,double>> clusterWidths;
     for (std::size_t i = 0; i < logicalInput.size(); i++) {
         const char16_t codePoint = logicalInput[i];
         auto it = sdfs.find(codePoint);
         if (it != sdfs.end() && !boost::algorithm::is_any_of(u" \t\n\v\f\r")(codePoint)) {
-            currentX += it->second.metrics.advance + spacing;
+            clusterWidths.emplace_back(codePoint, it->second.metrics.advance + spacing);
+        } else {
+            clusterWidths.emplace_back(codePoint, 0);
         }
+    }
+    return clusterWidths;
+}
+
+// We determine line breaks based on shaped text in logical order. Working in visual order would be
+//  more intuitive, but we can't do that because the visual order may be changed by line breaks!
+std::set<std::size_t> GlyphSet::determineLineBreaks(const std::vector<std::pair<char16_t,double>>& clusters, float maxWidth) const {
+    if (!maxWidth) {
+        return {};
+    }
+
+    if (clusters.empty()) {
+        return {};
+    }
+
+    const float targetWidth = determineAverageLineWidth(clusters, maxWidth);
+
+    std::list<PotentialBreak> potentialBreaks;
+    float currentX = 0;
+
+    for (std::size_t i = 0; i < clusters.size(); i++) {
+        const char16_t codePoint = clusters[i].first;
+        currentX += clusters[i].second;
 
         // Ideographic characters, spaces, and word-breaking punctuation that often appear without
         // surrounding spaces.
-        if ((i < logicalInput.size() - 1) &&
+        if ((i < clusters.size() - 1) &&
             (util::i18n::allowsWordBreaking(codePoint) || util::i18n::allowsIdeographicBreaking(codePoint))) {
             potentialBreaks.push_back(evaluateBreak(i+1, currentX, targetWidth, potentialBreaks,
-                                                     calculatePenalty(codePoint, logicalInput[i+1]),
+                                                     calculatePenalty(codePoint, clusters[i+1].first),
                                                      false));
         }
     }
 
-    return leastBadBreaks(evaluateBreak(logicalInput.size(), currentX, targetWidth, potentialBreaks, 0, true));
+    return leastBadBreaks(evaluateBreak(clusters.size(), currentX, targetWidth, potentialBreaks, 0, true));
 }
 
 void GlyphSet::shapeLines(Shaping& shaping,
@@ -265,7 +272,7 @@ void GlyphSet::shapeLines(Shaping& shaping,
         std::size_t lineStartIndex = shaping.positionedGlyphs.size();
 
         if (localFont) {
-            harfbuzz::applyShaping(localFont, util::utf16_to_utf8::convert(line), shaping.positionedGlyphs, x, y);
+            harfbuzz::applyShaping(localFont, line, shaping.positionedGlyphs, x, y);
         } else {
             for (char16_t chr : line) {
                 auto it = sdfs.find(chr);
