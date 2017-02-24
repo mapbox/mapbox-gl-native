@@ -40,7 +40,6 @@ import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import timber.log.Timber;
@@ -302,7 +301,7 @@ public class RuntimeStyleActivity extends AppCompatActivity {
     // Only show me parks (except westerpark with stroke-width == 3)
     layer.setFilter(all(eq("type", "park"), eq("stroke-width", 2)));
 
-    mapboxMap.addLayer(layer, "building");
+    mapboxMap.addLayerBelow(layer, "building");
     // layer.setPaintProperty(fillColor(Color.RED)); // XXX But not after the object is attached
 
     // Or get the object later and set it. It's all good.

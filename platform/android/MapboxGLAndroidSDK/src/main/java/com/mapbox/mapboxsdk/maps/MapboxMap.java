@@ -257,18 +257,29 @@ public final class MapboxMap {
    */
   @UiThread
   public void addLayer(@NonNull Layer layer) {
-    addLayer(layer, null);
+    nativeMapView.addLayer(layer);
   }
 
   /**
    * Adds the layer to the map. The layer must be newly created and not added to the map before
    *
    * @param layer  the layer to add
-   * @param before the layer id to add this layer before
+   * @param below the layer id to add this layer before
    */
   @UiThread
-  public void addLayer(@NonNull Layer layer, String before) {
-    nativeMapView.addLayer(layer, before);
+  public void addLayerBelow(@NonNull Layer layer, @NonNull String below) {
+    nativeMapView.addLayerBelow(layer, below);
+  }
+
+  /**
+   * Adds the layer to the map. The layer must be newly created and not added to the map before
+   *
+   * @param layer  the layer to add
+   * @param above the layer id to add this layer above
+   */
+  @UiThread
+  public void addLayerAbove(@NonNull Layer layer, @NonNull String above) {
+    nativeMapView.addLayerAbove(layer, above);
   }
 
   /**

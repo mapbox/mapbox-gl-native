@@ -70,7 +70,7 @@ public class CustomLayerActivity extends AppCompatActivity {
         ExampleCustomLayer.InitializeFunction,
         ExampleCustomLayer.RenderFunction,
         ExampleCustomLayer.DeinitializeFunction);
-      mapboxMap.addLayer(customLayer, "building");
+      mapboxMap.addLayerBelow(customLayer, "building");
       fab.setImageResource(R.drawable.ic_layers_clear);
     }
   }
