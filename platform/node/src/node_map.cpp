@@ -365,7 +365,7 @@ void NodeMap::startRender(NodeMap::RenderOptions options) {
 
     const mbgl::Size fbSize{ static_cast<uint32_t>(options.width * pixelRatio),
                              static_cast<uint32_t>(options.height * pixelRatio) };
-    if (!view || view->size != fbSize) {
+    if (!view || view->getSize() != fbSize) {
         view.reset();
         view = std::make_unique<mbgl::OffscreenView>(backend.getContext(), fbSize);
     }
