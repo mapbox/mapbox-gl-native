@@ -109,6 +109,23 @@ public final class PolygonOptions implements Parcelable {
   }
 
   /**
+   * Adds a hole to the outline of the polygon being built.
+   *
+   * @param points {@link Iterable} list made up of {@link LatLng} points defining the hole
+   * @return This {@link PolygonOptions} object with the given hole added to the outline.
+   */
+  public PolygonOptions addHole(Iterable<LatLng> points) {
+    List<LatLng> hole = new ArrayList<LatLng>();
+    for (LatLng point : points) {
+      hole.add(point);
+    }
+
+    polygon.addHole(hole);
+
+    return this;
+  }
+
+  /**
    * Set the alpha value of the polyline.
    *
    * @param alpha float value between 0 (not visible) and 1.
@@ -183,12 +200,19 @@ public final class PolygonOptions implements Parcelable {
   }
 
   /**
+   * Gets the holes set for this {@link PolygonOptions} object.
+   */
+  public List<List<LatLng>> getHoles() {
+    return polygon.getHoles();
+  }
+
+  /**
    * Compares this {@link PolygonOptions} object with another {@link PolygonOptions} and
-   * determines if their color, alpha, stroke color, and vertices match.
+   * determines if their color, alpha, stroke color, vertices, and holes match.
    *
    * @param o Another {@link PolygonOptions} to compare with this object.
-   * @return True if color, alpha, stroke color, and vertices match this {@link PolygonOptions}
-   * object. Else, false.
+   * @return True if color, alpha, stroke color, vertices, and holes match this
+   * {@link PolygonOptions} object. Else, false.
    */
   @Override
   public boolean equals(Object o) {
@@ -210,7 +234,10 @@ public final class PolygonOptions implements Parcelable {
     if (getStrokeColor() != polygon.getStrokeColor()) {
       return false;
     }
-    return !(getPoints() != null ? !getPoints().equals(polygon.getPoints()) : polygon.getPoints() != null);
+    if (getPoints() != null ? !getPoints().equals(polygon.getPoints()) : polygon.getPoints() != null) {
+      return false;
+    }
+    return !(getHoles() != null ? !getHoles().equals(polygon.getHoles()) : polygon.getHoles() != null);
   }
 
   /**
@@ -228,6 +255,7 @@ public final class PolygonOptions implements Parcelable {
     result = 31 * result + getFillColor();
     result = 31 * result + getStrokeColor();
     result = 31 * result + (getPoints() != null ? getPoints().hashCode() : 0);
+    result = 31 * result + (getHoles() != null ? getHoles().hashCode() : 0);
     return result;
   }
 }

@@ -96,6 +96,7 @@ jni::jfieldID* polygonAlphaId = nullptr;
 jni::jfieldID* polygonFillColorId = nullptr;
 jni::jfieldID* polygonStrokeColorId = nullptr;
 jni::jfieldID* polygonPointsId = nullptr;
+jni::jfieldID* polygonHolesId = nullptr;
 
 jni::jmethodID* listToArrayId = nullptr;
 
@@ -783,7 +784,26 @@ jni::jarray<jlong>* nativeAddPolygons(JNIEnv *env, jni::jobject* obj, jlong nati
         jni::jobject* polygon = jni::GetObjectArrayElement(*env, *jarray, i);
         jni::jobject* points = jni::GetField<jni::jobject*>(*env, polygon, *polygonPointsId);
 
-        mbgl::FillAnnotation annotation { mbgl::Polygon<double> { toGeometry<mbgl::LinearRing<double>>(env, points) } };
+        mbgl::Polygon<double> geometry { toGeometry<mbgl::LinearRing<double>>(env, points) };
+
+        jni::jobject* holes = jni::GetField<jni::jobject*>(*env, polygon, *polygonHolesId);
+        NullCheck(*env, holes);
+        jni::jarray<jni::jobject>* jarrayHoles =
+            reinterpret_cast<jni::jarray<jni::jobject>*>(jni::CallMethod<jni::jobject*>(*env, holes, *listToArrayId));
+        NullCheck(*env, jarrayHoles);
+
+        std::size_t size = jni::GetArrayLength(*env, *jarrayHoles);
+        for (std::size_t j = 0; j < size; j++) {
+            jni::jobject* hole = jni::GetObjectArrayElement(*env, *jarrayHoles, j);
+            NullCheck(*env, hole);
+            geometry.push_back(toGeometry<mbgl::LinearRing<double>>(env, hole));
+            jni::DeleteLocalRef(*env, hole);
+        }
+
+        jni::DeleteLocalRef(*env, jarrayHoles);
+        jni::DeleteLocalRef(*env, holes);
+        
+        mbgl::FillAnnotation annotation { geometry };
         annotation.opacity = { jni::GetField<jfloat>(*env, polygon, *polygonAlphaId) };
         annotation.outlineColor = { toColor(jni::GetField<jint>(*env, polygon, *polygonStrokeColorId)) };
         annotation.color = { toColor(jni::GetField<jint>(*env, polygon, *polygonFillColorId)) };
@@ -1867,6 +1887,7 @@ void registerNatives(JavaVM *vm) {
     polygonFillColorId = &jni::GetFieldID(env, *polygonClass, "fillColor", "I");
     polygonStrokeColorId = &jni::GetFieldID(env, *polygonClass, "strokeColor", "I");
     polygonPointsId = &jni::GetFieldID(env, *polygonClass, "points", "Ljava/util/List;");
+    polygonHolesId = &jni::GetFieldID(env, *polygonClass, "holes", "Ljava/util.List;");
 
     jni::jclass* listClass = &jni::FindClass(env, "java/util/List");
     listToArrayId = &jni::GetMethodID(env, *listClass, "toArray", "()[Ljava/lang/Object;");
