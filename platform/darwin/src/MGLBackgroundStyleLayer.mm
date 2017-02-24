@@ -92,7 +92,7 @@
 - (MGLStyleValue<MGLColor *> *)backgroundColor {
     MGLAssertStyleLayerIsValid();
 
-    auto propertyValue = self.rawLayer->getBackgroundColor() ?: self.rawLayer->getDefaultBackgroundColor();
+    static const auto propertyValue = self.rawLayer->getBackgroundColor() ?: self.rawLayer->getDefaultBackgroundColor();
     return MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toStyleValue(propertyValue);
 }
 
@@ -106,7 +106,7 @@
 - (MGLStyleValue<NSNumber *> *)backgroundOpacity {
     MGLAssertStyleLayerIsValid();
 
-    auto propertyValue = self.rawLayer->getBackgroundOpacity() ?: self.rawLayer->getDefaultBackgroundOpacity();
+    static const auto propertyValue = self.rawLayer->getBackgroundOpacity() ?: self.rawLayer->getDefaultBackgroundOpacity();
     return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(propertyValue);
 }
 
@@ -120,7 +120,7 @@
 - (MGLStyleValue<NSString *> *)backgroundPattern {
     MGLAssertStyleLayerIsValid();
 
-    auto propertyValue = self.rawLayer->getBackgroundPattern() ?: self.rawLayer->getDefaultBackgroundPattern();
+    static const auto propertyValue = self.rawLayer->getBackgroundPattern() ?: self.rawLayer->getDefaultBackgroundPattern();
     return MGLStyleValueTransformer<std::string, NSString *>().toStyleValue(propertyValue);
 }
 

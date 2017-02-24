@@ -136,7 +136,7 @@ namespace mbgl {
 - (MGLStyleValue<NSNumber *> *)isFillAntialiased {
     MGLAssertStyleLayerIsValid();
 
-    auto propertyValue = self.rawLayer->getFillAntialias() ?: self.rawLayer->getDefaultFillAntialias();
+    static const auto propertyValue = self.rawLayer->getFillAntialias() ?: self.rawLayer->getDefaultFillAntialias();
     return MGLStyleValueTransformer<bool, NSNumber *>().toStyleValue(propertyValue);
 }
 
@@ -157,7 +157,7 @@ namespace mbgl {
 - (MGLStyleValue<MGLColor *> *)fillColor {
     MGLAssertStyleLayerIsValid();
 
-    auto propertyValue = self.rawLayer->getFillColor() ?: self.rawLayer->getDefaultFillColor();
+    static const auto propertyValue = self.rawLayer->getFillColor() ?: self.rawLayer->getDefaultFillColor();
     return MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toStyleValue(propertyValue);
 }
 
@@ -171,7 +171,7 @@ namespace mbgl {
 - (MGLStyleValue<NSNumber *> *)fillOpacity {
     MGLAssertStyleLayerIsValid();
 
-    auto propertyValue = self.rawLayer->getFillOpacity() ?: self.rawLayer->getDefaultFillOpacity();
+    static const auto propertyValue = self.rawLayer->getFillOpacity() ?: self.rawLayer->getDefaultFillOpacity();
     return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(propertyValue);
 }
 
@@ -185,7 +185,7 @@ namespace mbgl {
 - (MGLStyleValue<MGLColor *> *)fillOutlineColor {
     MGLAssertStyleLayerIsValid();
 
-    auto propertyValue = self.rawLayer->getFillOutlineColor() ?: self.rawLayer->getDefaultFillOutlineColor();
+    static const auto propertyValue = self.rawLayer->getFillOutlineColor() ?: self.rawLayer->getDefaultFillOutlineColor();
     return MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toStyleValue(propertyValue);
 }
 
@@ -199,7 +199,7 @@ namespace mbgl {
 - (MGLStyleValue<NSString *> *)fillPattern {
     MGLAssertStyleLayerIsValid();
 
-    auto propertyValue = self.rawLayer->getFillPattern() ?: self.rawLayer->getDefaultFillPattern();
+    static const auto propertyValue = self.rawLayer->getFillPattern() ?: self.rawLayer->getDefaultFillPattern();
     return MGLStyleValueTransformer<std::string, NSString *>().toStyleValue(propertyValue);
 }
 
@@ -213,7 +213,7 @@ namespace mbgl {
 - (MGLStyleValue<NSValue *> *)fillTranslation {
     MGLAssertStyleLayerIsValid();
 
-    auto propertyValue = self.rawLayer->getFillTranslate() ?: self.rawLayer->getDefaultFillTranslate();
+    static const auto propertyValue = self.rawLayer->getFillTranslate() ?: self.rawLayer->getDefaultFillTranslate();
     return MGLStyleValueTransformer<std::array<float, 2>, NSValue *>().toStyleValue(propertyValue);
 }
 
@@ -234,7 +234,7 @@ namespace mbgl {
 - (MGLStyleValue<NSValue *> *)fillTranslationAnchor {
     MGLAssertStyleLayerIsValid();
 
-    auto propertyValue = self.rawLayer->getFillTranslateAnchor() ?: self.rawLayer->getDefaultFillTranslateAnchor();
+    static const auto propertyValue = self.rawLayer->getFillTranslateAnchor() ?: self.rawLayer->getDefaultFillTranslateAnchor();
     return MGLStyleValueTransformer<mbgl::style::TranslateAnchorType, NSValue *, mbgl::style::TranslateAnchorType, MGLFillTranslationAnchor>().toEnumStyleValue(propertyValue);
 }
 
