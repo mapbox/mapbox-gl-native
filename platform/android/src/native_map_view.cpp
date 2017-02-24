@@ -737,6 +737,24 @@ jni::Array<jni::Object<Feature>> NativeMapView::queryRenderedFeaturesForBox(JNIE
     return *convert<jni::Array<jni::Object<Feature>>, std::vector<mbgl::Feature>>(env, map->queryRenderedFeatures(box, layers));
 }
 
+jni::Array<jni::Object<Layer>> NativeMapView::getLayers(JNIEnv& env) {
+
+    // Get the core layers
+    std::vector<style::Layer*> layers = map->getLayers();
+
+    // Convert
+    jni::Array<jni::Object<Layer>> jLayers = jni::Array<jni::Object<Layer>>::New(env, layers.size(), Layer::javaClass);
+    int index = 0;
+    for (auto layer : layers) {
+        auto jLayer = jni::Object<Layer>(createJavaLayerPeer(env, *map, *layer));
+        jLayers.Set(env, index, jLayer);
+        jni::DeleteLocalRef(env, jLayer);
+        index++;
+    }
+
+    return jLayers;
+}
+
 jni::Object<Layer> NativeMapView::getLayer(JNIEnv& env, jni::String layerId) {
 
     // Find the layer
@@ -1333,6 +1351,7 @@ void NativeMapView::registerNative(jni::JNIEnv& env) {
             METHOD(&NativeMapView::queryPointAnnotations, "nativeQueryPointAnnotations"),
             METHOD(&NativeMapView::queryRenderedFeaturesForPoint, "nativeQueryRenderedFeaturesForPoint"),
             METHOD(&NativeMapView::queryRenderedFeaturesForBox, "nativeQueryRenderedFeaturesForBox"),
+            METHOD(&NativeMapView::getLayers, "nativeGetLayers"),
             METHOD(&NativeMapView::getLayer, "nativeGetLayer"),
             METHOD(&NativeMapView::addLayer, "nativeAddLayer"),
             METHOD(&NativeMapView::removeLayerById, "nativeRemoveLayerById"),

@@ -747,6 +747,13 @@ final class NativeMapView {
     nativeSetTransitionDelay(delay);
   }
 
+  public List<Layer> getLayers() {
+    if (isDestroyedOn("getLayers")) {
+      return null;
+    }
+    return Arrays.asList(nativeGetLayers());
+  }
+
   public Layer getLayer(String layerId) {
     if (isDestroyedOn("getLayer")) {
       return null;
@@ -1053,6 +1060,8 @@ final class NativeMapView {
   private native long nativeGetTransitionDelay();
 
   private native void nativeSetTransitionDelay(long delay);
+
+  private native Layer[] nativeGetLayers();
 
   private native Layer nativeGetLayer(String layerId);
 

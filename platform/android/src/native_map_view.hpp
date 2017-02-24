@@ -201,6 +201,8 @@ public:
 
     jni::Array<jni::Object<Feature>> queryRenderedFeaturesForBox(JNIEnv&, jni::jfloat, jni::jfloat, jni::jfloat, jni::jfloat, jni::Array<jni::String>);
 
+    jni::Array<jni::Object<Layer>> getLayers(JNIEnv&);
+
     jni::Object<Layer> getLayer(JNIEnv&, jni::String);
 
     void addLayer(JNIEnv&, jlong, jni::String);

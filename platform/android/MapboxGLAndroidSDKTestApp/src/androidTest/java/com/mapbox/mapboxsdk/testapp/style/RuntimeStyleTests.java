@@ -12,6 +12,7 @@ import android.view.View;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.style.layers.CannotAddLayerException;
 import com.mapbox.mapboxsdk.style.layers.FillLayer;
+import com.mapbox.mapboxsdk.style.layers.Layer;
 import com.mapbox.mapboxsdk.style.layers.Property;
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory;
 import com.mapbox.mapboxsdk.style.sources.CannotAddSourceException;
@@ -31,9 +32,12 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.List;
+
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
+import static junit.framework.Assert.assertTrue;
 import static junit.framework.Assert.fail;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -53,6 +57,26 @@ public class RuntimeStyleTests {
   public void registerIdlingResource() {
     idlingResource = new OnMapReadyIdlingResource(rule.getActivity());
     Espresso.registerIdlingResources(idlingResource);
+  }
+
+  @Test
+  public void testListLayers() {
+    ViewUtils.checkViewIsDisplayed(R.id.mapView);
+    onView(withId(R.id.mapView)).perform(new BaseViewAction() {
+
+      @Override
+      public void perform(UiController uiController, View view) {
+        MapboxMap mapboxMap = rule.getActivity().getMapboxMap();
+
+        List<Layer> layers = mapboxMap.getLayers();
+        assertNotNull(layers);
+        assertTrue(layers.size() > 0);
+        for (Layer layer : layers) {
+          assertNotNull(layer);
+        }
+      }
+
+    });
   }
 
   @Test
