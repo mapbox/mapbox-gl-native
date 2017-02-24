@@ -7,6 +7,10 @@
         android:title="List all layers in the style"
         mapbox:showAsAction="never" />
     <item
+        android:id="@+id/action_list_sources"
+        android:title="List all sources in the style"
+        mapbox:showAsAction="never" />
+    <item
         android:id="@+id/action_water_color"
         android:title="Color the water"
         mapbox:showAsAction="never" />

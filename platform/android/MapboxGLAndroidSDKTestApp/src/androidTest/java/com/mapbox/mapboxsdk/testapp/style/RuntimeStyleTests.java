@@ -86,6 +86,26 @@ public class RuntimeStyleTests {
   }
 
   @Test
+  public void testListSources() {
+    ViewUtils.checkViewIsDisplayed(R.id.mapView);
+    onView(withId(R.id.mapView)).perform(new BaseViewAction() {
+
+      @Override
+      public void perform(UiController uiController, View view) {
+        MapboxMap mapboxMap = rule.getActivity().getMapboxMap();
+
+        List<Source> sources = mapboxMap.getSources();
+        assertNotNull(sources);
+        assertTrue(sources.size() > 0);
+        for (Source source: sources) {
+          assertNotNull(source);
+        }
+      }
+
+    });
+  }
+
+  @Test
   public void testAddRemoveSource() {
     ViewUtils.checkViewIsDisplayed(R.id.mapView);
 

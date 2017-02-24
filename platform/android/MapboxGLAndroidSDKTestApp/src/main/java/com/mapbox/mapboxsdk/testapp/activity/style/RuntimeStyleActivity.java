@@ -154,6 +154,9 @@ public class RuntimeStyleActivity extends AppCompatActivity {
       case R.id.action_list_layers:
         listLayers();
         return true;
+      case R.id.action_list_sources:
+        listSources();
+        return true;
       case R.id.action_water_color:
         setWaterColor();
         return true;
@@ -207,6 +210,16 @@ public class RuntimeStyleActivity extends AppCompatActivity {
     for (Layer layer : layers) {
       builder.append("\n");
       builder.append(layer.getId());
+    }
+    Toast.makeText(this, builder.toString(), Toast.LENGTH_LONG).show();
+  }
+
+  private void listSources() {
+    List<Source> sources = mapboxMap.getSources();
+    StringBuilder builder = new StringBuilder("Sources:");
+    for (Source source : sources) {
+      builder.append("\n");
+      builder.append(source.getId());
     }
     Toast.makeText(this, builder.toString(), Toast.LENGTH_LONG).show();
   }
