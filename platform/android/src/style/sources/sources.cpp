@@ -8,6 +8,7 @@
 #include "source.hpp"
 #include "geojson_source.hpp"
 #include "raster_source.hpp"
+#include "unknown_source.hpp"
 #include "vector_source.hpp"
 
 namespace mbgl {
@@ -22,7 +23,7 @@ Source* initializeSourcePeer(mbgl::Map& map, mbgl::style::Source& coreSource) {
     } else if (coreSource.is<mbgl::style::GeoJSONSource>()) {
         source = new GeoJSONSource(map, *coreSource.as<mbgl::style::GeoJSONSource>());
     } else {
-        throw new std::runtime_error("Source type not implemented");
+        source = new UnknownSource(map, coreSource);
     }
 
     return source;
@@ -37,9 +38,10 @@ jni::jobject* createJavaSourcePeer(jni::JNIEnv& env, mbgl::Map& map, mbgl::style
 
 void registerNativeSources(jni::JNIEnv& env) {
     Source::registerNative(env);
-    VectorSource::registerNative(env);
-    RasterSource::registerNative(env);
     GeoJSONSource::registerNative(env);
+    RasterSource::registerNative(env);
+    UnknownSource::registerNative(env);
+    VectorSource::registerNative(env);
 }
 
 }
