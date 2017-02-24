@@ -124,6 +124,8 @@ macro(mbgl_platform_core)
         platform/android/src/style/sources/sources.hpp
         platform/android/src/style/sources/raster_source.cpp
         platform/android/src/style/sources/raster_source.hpp
+        platform/android/src/style/sources/unknown_source.cpp
+        platform/android/src/style/sources/unknown_source.hpp
         platform/android/src/style/sources/vector_source.cpp
         platform/android/src/style/sources/vector_source.hpp
         platform/android/src/style/functions/stop.cpp
