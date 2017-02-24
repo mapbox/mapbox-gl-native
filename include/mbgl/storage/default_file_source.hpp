@@ -115,6 +115,9 @@ public:
      */
     void setOfflineMapboxTileCountLimit(uint64_t) const;
 
+    void pause();
+    void resume();
+
     // For testing only.
     void put(const Resource&, const Response&);
 
