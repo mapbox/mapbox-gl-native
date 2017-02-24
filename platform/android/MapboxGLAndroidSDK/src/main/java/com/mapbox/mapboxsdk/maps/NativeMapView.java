@@ -806,18 +806,20 @@ final class NativeMapView {
     nativeAddSource(source.getNativePtr());
   }
 
-  public void removeSource(@NonNull String sourceId) {
+  @Nullable
+  public Source removeSource(@NonNull String sourceId) {
     if (isDestroyedOn("removeSource")) {
-      return;
+      return null;
     }
-    nativeRemoveSourceById(sourceId);
+    return nativeRemoveSourceById(sourceId);
   }
 
-  public void removeSource(@NonNull Source source) {
+  public Source removeSource(@NonNull Source source) {
     if (isDestroyedOn("removeSource")) {
-      return;
+      return null;
     }
     nativeRemoveSource(source.getNativePtr());
+    return source;
   }
 
   public void addImage(@NonNull String name, @NonNull Bitmap image) {
@@ -1087,7 +1089,7 @@ final class NativeMapView {
 
   private native void nativeAddSource(long nativeSourcePtr) throws CannotAddSourceException;
 
-  private native void nativeRemoveSourceById(String sourceId);
+  private native Source nativeRemoveSourceById(String sourceId);
 
   private native void nativeRemoveSource(long sourcePtr);
 
