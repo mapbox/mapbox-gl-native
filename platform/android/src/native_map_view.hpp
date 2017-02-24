@@ -211,6 +211,8 @@ public:
 
     void removeLayer(JNIEnv&, jlong);
 
+    jni::Array<jni::Object<Source>> getSources(JNIEnv&);
+
     jni::Object<Source> getSource(JNIEnv&, jni::String);
 
     void addSource(JNIEnv&, jni::jlong);

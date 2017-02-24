@@ -782,6 +782,13 @@ final class NativeMapView {
     nativeRemoveLayer(layer.getNativePtr());
   }
 
+  public List<Source> getSources() {
+    if (isDestroyedOn("getSources")) {
+      return null;
+    }
+    return Arrays.asList(nativeGetSources());
+  }
+
   public Source getSource(@NonNull String sourceId) {
     if (isDestroyedOn("getSource")) {
       return null;
@@ -1070,6 +1077,8 @@ final class NativeMapView {
   private native void nativeRemoveLayerById(String layerId);
 
   private native void nativeRemoveLayer(long layerId);
+
+  private native Source[] nativeGetSources();
 
   private native Source nativeGetSource(String sourceId);
 

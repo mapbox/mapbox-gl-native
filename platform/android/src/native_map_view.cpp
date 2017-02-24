@@ -799,6 +799,22 @@ void NativeMapView::removeLayer(JNIEnv&, jlong layerPtr) {
     }
 }
 
+jni::Array<jni::Object<Source>> NativeMapView::getSources(JNIEnv& env) {
+    // Get the core sources
+    std::vector<style::Source*> sources = map->getSources();
+
+    // Convert
+    jni::Array<jni::Object<Source>> jSources = jni::Array<jni::Object<Source>>::New(env, sources.size(), Source::javaClass);
+    int index = 0;
+    for (auto source : sources) {
+        auto jSource = jni::Object<Source>(createJavaSourcePeer(env, *map, *source));
+        jSources.Set(env, index, jSource);
+        jni::DeleteLocalRef(env, jSource);
+        index++;
+    }
+
+    return jSources;
+}
 
 jni::Object<Source> NativeMapView::getSource(JNIEnv& env, jni::String sourceId) {
     // Find the source
@@ -1356,6 +1372,7 @@ void NativeMapView::registerNative(jni::JNIEnv& env) {
             METHOD(&NativeMapView::addLayer, "nativeAddLayer"),
             METHOD(&NativeMapView::removeLayerById, "nativeRemoveLayerById"),
             METHOD(&NativeMapView::removeLayer, "nativeRemoveLayer"),
+            METHOD(&NativeMapView::getSources, "nativeGetSources"),
             METHOD(&NativeMapView::getSource, "nativeGetSource"),
             METHOD(&NativeMapView::addSource, "nativeAddSource"),
             METHOD(&NativeMapView::removeSourceById, "nativeRemoveSourceById"),

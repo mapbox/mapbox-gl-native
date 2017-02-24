@@ -291,6 +291,22 @@ public final class MapboxMap {
     nativeMapView.removeLayer(layer);
   }
 
+  /**
+   * Retrieve all the sources in the style
+   *
+   * @return all the sources in the current style
+   */
+  @UiThread
+  public List<Source> getSources() {
+    return nativeMapView.getSources();
+  }
+
+  /**
+   * Retrieve a source by id
+   *
+   * @param sourceId the source's id
+   * @return the source if present in the current style
+   */
   @Nullable
   @UiThread
   public Source getSource(@NonNull String sourceId) {
