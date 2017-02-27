@@ -40,11 +40,25 @@ NSString * const MGLOfflinePackMaximumCountUserInfoKey = MGLOfflinePackUserInfoK
     static MGLOfflineStorage *sharedOfflineStorage;
     dispatch_once(&onceToken, ^{
         sharedOfflineStorage = [[self alloc] init];
+#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
+        [[NSNotificationCenter defaultCenter] addObserver:sharedOfflineStorage selector:@selector(unpauseFileSource:) name:UIApplicationWillEnterForegroundNotification object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:sharedOfflineStorage selector:@selector(pauseFileSource:) name:UIApplicationDidEnterBackgroundNotification object:nil];
+#endif
         [sharedOfflineStorage reloadPacks];
     });
 
     return sharedOfflineStorage;
 }
+
+#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
+- (void)pauseFileSource:(__unused NSNotification *)notification {
+    _mbglFileSource->pause();
+}
+
+- (void)unpauseFileSource:(__unused NSNotification *)notification {
+    _mbglFileSource->resume();
+}
+#endif
 
 - (void)setDelegate:(id<MGLOfflineStorageDelegate>)newValue {
     _delegate = newValue;
@@ -203,6 +217,7 @@ NSString * const MGLOfflinePackMaximumCountUserInfoKey = MGLOfflinePackUserInfoK
 }
 
 - (void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
     [[MGLNetworkConfiguration sharedManager] removeObserver:self forKeyPath:@"apiBaseURL"];
     [[MGLAccountManager sharedManager] removeObserver:self forKeyPath:@"accessToken"];
 
