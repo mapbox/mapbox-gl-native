@@ -15,7 +15,6 @@
 #include <jni/jni.hpp>
 
 #include <mbgl/gl/context.hpp>
-#include <mbgl/gl/extension.hpp>
 #include <mbgl/map/backend_scope.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/event.hpp>
@@ -108,6 +107,10 @@ void NativeMapView::bind() {
 /**
  * From mbgl::Backend.
  */
+gl::ProcAddress NativeMapView::initializeExtension(const char* name) {
+    return eglGetProcAddress(name);
+}
+
 void NativeMapView::activate() {
     if (active++) {
         return;
@@ -1394,10 +1397,6 @@ void NativeMapView::_createSurface(ANativeWindow *window_) {
                              eglGetError());
             throw std::runtime_error("eglMakeCurrent() failed");
         }
-
-        mbgl::gl::InitializeExtensions([] (const char * name) {
-             return reinterpret_cast<mbgl::gl::glProc>(eglGetProcAddress(name));
-        });
     }
 }
 

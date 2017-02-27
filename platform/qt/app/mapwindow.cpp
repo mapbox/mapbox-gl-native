@@ -372,8 +372,6 @@ void MapWindow::wheelEvent(QWheelEvent *ev)
 
 void MapWindow::initializeGL()
 {
-    QMapbox::initializeGLExtensions();
-
     m_map.reset(new QMapboxGL(nullptr, m_settings, size(), pixelRatio()));
     connect(m_map.data(), SIGNAL(needsRendering()), this, SLOT(update()));
 

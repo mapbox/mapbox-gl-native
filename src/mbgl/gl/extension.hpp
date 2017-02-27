@@ -2,12 +2,13 @@
 
 #include <initializer_list>
 #include <utility>
+#include <functional>
 
 namespace mbgl {
 namespace gl {
 
-using glProc = void (*)();
-void InitializeExtensions(glProc (*getProcAddress)(const char*));
+using ProcAddress = void (*)();
+void initializeExtensions(const std::function<ProcAddress(const char*)>&);
 
 namespace detail {
 
@@ -15,7 +16,7 @@ class ExtensionFunctionBase {
 public:
     using Probe = std::pair<const char*, const char*>;
     ExtensionFunctionBase(std::initializer_list<Probe>);
-    glProc ptr;
+    ProcAddress ptr;
 };
 
 } // namespace detail

@@ -94,8 +94,6 @@ Painter::Painter(gl::Context& context_,
     tileBorderSegments.emplace_back(0, 0, 4, 5);
     rasterSegments.emplace_back(0, 0, 4, 6);
 
-    gl::debugging::enable();
-
     programs = std::make_unique<Programs>(context,
                                           ProgramParameters{ pixelRatio, false, programCacheDir });
 #ifndef NDEBUG

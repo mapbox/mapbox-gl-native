@@ -97,8 +97,6 @@ typedef void (*CustomLayerInitializeFunction)(void* context) ;
 typedef void (*CustomLayerRenderFunction)(void* context, const CustomLayerRenderParameters&);
 typedef void (*CustomLayerDeinitializeFunction)(void* context);
 
-Q_DECL_EXPORT void initializeGLExtensions();
-
 } // namespace QMapbox
 
 Q_DECLARE_METATYPE(QMapbox::Coordinate);
