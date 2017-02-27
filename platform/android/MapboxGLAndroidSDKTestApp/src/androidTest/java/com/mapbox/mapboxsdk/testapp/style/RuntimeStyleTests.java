@@ -147,6 +147,41 @@ public class RuntimeStyleTests {
     });
   }
 
+  public void testAddLayerAt() {
+    ViewUtils.checkViewIsDisplayed(R.id.mapView);
+    onView(withId(R.id.mapView)).perform(new BaseViewAction() {
+      @Override
+      public void perform(UiController uiController, View view) {
+        MapboxMap mapboxMap = rule.getActivity().getMapboxMap();
+
+        List<Layer> layers = mapboxMap.getLayers();
+        Source source = mapboxMap.getSources().get(0);
+
+        // Test inserting out of range
+        try {
+          mapboxMap.addLayerAt(new CircleLayer("invalid-id-layer-test", source.getId()), layers.size());
+          fail("Should have thrown exception");
+        } catch (CannotAddLayerException ex) {
+          // Yeah
+          assertNotNull(ex.getMessage());
+        }
+
+        // Insert at current last position
+        CircleLayer last = new CircleLayer("this is the last one", source.getId());
+        mapboxMap.addLayerAt(last, layers.size() - 1);
+        layers = mapboxMap.getLayers();
+        assertEquals(last.getId(), layers.get(layers.size() - 2).getId());
+
+        // Insert at start
+        CircleLayer second = new CircleLayer("this is the first one", source.getId());
+        mapboxMap.addLayerAt(second, 0);
+        layers = mapboxMap.getLayers();
+        assertEquals(second.getId(), layers.get(0).getId());
+      }
+    });
+  }
+
+
   @Test
   public void testListSources() {
     ViewUtils.checkViewIsDisplayed(R.id.mapView);
