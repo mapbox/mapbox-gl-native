@@ -44,9 +44,13 @@ public:
     mbgl::Size getFramebufferSize() const;
 
     // mbgl::Backend implementation
+    void invalidate() override;
+
+protected:
+    // mbgl::Backend implementation
+    mbgl::gl::ProcAddress initializeExtension(const char*) override;
     void activate() override;
     void deactivate() override;
-    void invalidate() override;
 
 private:
     // Window callbacks

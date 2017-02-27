@@ -20,8 +20,6 @@ public:
                 this, SLOT(onMapChanged(QMapboxGL::MapChange)));
         connect(&map, SIGNAL(needsRendering()),
                 this, SLOT(onNeedsRendering()));
-        QMapbox::initializeGLExtensions();
-
         map.resize(fbo.size(), fbo.size());
         map.setFramebufferObject(fbo.handle());
         map.setCoordinateZoom(QMapbox::Coordinate(60.170448, 24.942046), 14);

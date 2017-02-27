@@ -58,6 +58,9 @@ public:
 
     bool dirty { false };
 
+private:
+    mbgl::gl::ProcAddress initializeExtension(const char*) override;
+
 public slots:
     void connectionEstablished();
 

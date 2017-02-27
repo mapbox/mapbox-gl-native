@@ -1678,6 +1678,20 @@ void QMapboxGLPrivate::onSourceChanged(mbgl::style::Source&)
     emit mapChanged(QMapboxGL::MapChangeSourceDidChange);
 }
 
+/*!
+    Initializes an OpenGL extension function such as Vertex Array Objects (VAOs),
+    required by Mapbox GL Native engine.
+*/
+mbgl::gl::ProcAddress QMapboxGLPrivate::initializeExtension(const char* name) {
+#if QT_VERSION >= 0x050000
+    QOpenGLContext* thisContext = QOpenGLContext::currentContext();
+    return thisContext->getProcAddress(name);
+#else
+    const QGLContext* thisContext = QGLContext::currentContext();
+    return reinterpret_cast<mbgl::gl::ProcAddress>(thisContext->getProcAddress(name));
+#endif
+}
+
 void QMapboxGLPrivate::connectionEstablished()
 {
     mbgl::NetworkStatus::Reachable();
