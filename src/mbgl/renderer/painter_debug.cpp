@@ -18,7 +18,7 @@ void Painter::renderTileDebug(const RenderTile& renderTile) {
     if (frame.debugOptions == MapDebugOptions::NoDebug)
         return;
 
-    MBGL_DEBUG_GROUP(std::string { "debug " } + util::toString(renderTile.id));
+    MBGL_DEBUG_GROUP(context, std::string { "debug " } + util::toString(renderTile.id));
 
     static const style::PaintProperties<>::Evaluated properties {};
     static const DebugProgram::PaintPropertyBinders paintAttibuteData(properties, 0);

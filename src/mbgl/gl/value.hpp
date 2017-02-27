@@ -10,6 +10,9 @@
 
 namespace mbgl {
 namespace gl {
+
+class Context;
+
 namespace value {
 
 struct ClearDepth {
@@ -225,8 +228,8 @@ struct BindElementBuffer {
 struct BindVertexArray {
     using Type = gl::VertexArrayID;
     static const constexpr Type Default = 0;
-    static void Set(const Type&);
-    static Type Get();
+    static void Set(const Type&, const Context&);
+    static Type Get(const Context&);
 };
 
 #if not MBGL_USE_GLES2

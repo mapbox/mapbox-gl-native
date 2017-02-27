@@ -1,6 +1,7 @@
 #include <mbgl/gl/value.hpp>
 #include <mbgl/gl/gl.hpp>
-#include <mbgl/gl/vertex_array.hpp>
+#include <mbgl/gl/context.hpp>
+#include <mbgl/gl/vertex_array_extension.hpp>
 
 namespace mbgl {
 namespace gl {
@@ -328,15 +329,17 @@ BindElementBuffer::Type BindElementBuffer::Get() {
 
 const constexpr BindVertexArray::Type BindVertexArray::Default;
 
-void BindVertexArray::Set(const Type& value) {
-    if (gl::BindVertexArray) {
-        MBGL_CHECK_ERROR(gl::BindVertexArray(value));
+void BindVertexArray::Set(const Type& value, const Context& context) {
+    if (auto vertexArray = context.getVertexArrayExtension()) {
+        if (vertexArray->bindVertexArray) {
+            MBGL_CHECK_ERROR(vertexArray->bindVertexArray(value));
+        }
     }
 }
 
-BindVertexArray::Type BindVertexArray::Get() {
+BindVertexArray::Type BindVertexArray::Get(const Context& context) {
     GLint binding = 0;
-    if (gl::BindVertexArray) {
+    if (context.getVertexArrayExtension()) {
 #ifdef GL_VERTEX_ARRAY_BINDING
         MBGL_CHECK_ERROR(glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &binding));
 #elif GL_VERTEX_ARRAY_BINDING_OES
