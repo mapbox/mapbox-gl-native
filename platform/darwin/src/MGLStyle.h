@@ -30,21 +30,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 static MGL_EXPORT const NSInteger MGLStyleDefaultVersion = 9;
 
-/**
- A structure containing information about a transition values.
- */
-typedef struct MGLTransition {
-    /**
-     The duration in seconds to animate any changes to the style URL or to layout and paint attributes.
-     */
-    NSTimeInterval duration;
-    
-    /**
-     The delay in seconds to before applying any changes to the style URL or to layout and paint attributes.
-     */
-    NSTimeInterval delay;
-} MGLTransition;
-
 
 /**
  The proxy object for the current map style.
