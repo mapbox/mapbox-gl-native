@@ -74,6 +74,8 @@ std::vector<std::u16string> BiDi::applyLineBreaking(std::set<std::size_t> lineBr
     mergeParagraphLineBreaks(lineBreakPoints);
 
     std::vector<std::u16string> transformedLines;
+    transformedLines.reserve(lineBreakPoints.size());
+
     std::size_t start = 0;
     for (std::size_t lineBreakPoint : lineBreakPoints) {
         transformedLines.push_back(getLine(start, lineBreakPoint));
