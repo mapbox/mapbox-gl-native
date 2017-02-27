@@ -69,7 +69,7 @@ public class PressForMarkerActivity extends AppCompatActivity {
     });
   }
 
-  private void addMarker(LatLng point){
+  private void addMarker(LatLng point) {
     final PointF pixel = mapboxMap.getProjection().toScreenLocation(point);
 
     String title = LAT_LON_FORMATTER.format(point.getLatitude()) + ", "
