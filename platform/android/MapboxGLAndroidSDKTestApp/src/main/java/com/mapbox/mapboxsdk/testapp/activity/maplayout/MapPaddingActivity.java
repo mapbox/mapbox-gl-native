@@ -17,6 +17,12 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.TrackingSettings;
 import com.mapbox.mapboxsdk.testapp.R;
 
+/**
+ * Test activity showcasing using the map padding API.
+ * <p>
+ * This activity tests for correct padding around a marker (Bangalore) and correct padding around MyLocationView.
+ * </p>
+ */
 public class MapPaddingActivity extends AppCompatActivity {
 
   private MapView mapView;

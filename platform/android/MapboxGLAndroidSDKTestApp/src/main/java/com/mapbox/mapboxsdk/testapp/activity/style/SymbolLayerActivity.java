@@ -35,7 +35,7 @@ import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textFont;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textSize;
 
 /**
- * Example to test runtime manipulation of symbol layers
+ * Test activity showcasing runtime manipulation of symbol layers.
  */
 public class SymbolLayerActivity extends AppCompatActivity implements MapboxMap.OnMapClickListener {
 

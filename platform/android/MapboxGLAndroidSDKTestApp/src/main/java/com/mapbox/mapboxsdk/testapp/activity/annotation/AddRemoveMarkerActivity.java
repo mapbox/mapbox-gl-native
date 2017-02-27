@@ -18,6 +18,9 @@ import com.mapbox.mapboxsdk.testapp.utils.IconUtils;
 
 import timber.log.Timber;
 
+/**
+ * Test activity showcasing updating a Marker image when changing zoom levels
+ */
 public class AddRemoveMarkerActivity extends AppCompatActivity {
 
   public static final double THRESHOLD = 5.0;

@@ -20,7 +20,7 @@ import timber.log.Timber;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconImage;
 
 /**
- * Use realtime GeoJSON data streams to move a symbol on your map
+ * Test activity showcasing using realtime GeoJSON to move a symbol on your map
  * <p>
  * GL-native equivalent of https://www.mapbox.com/mapbox-gl-js/example/live-geojson/
  * </p>

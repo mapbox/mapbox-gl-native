@@ -24,6 +24,9 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.services.android.telemetry.location.LocationEngineListener;
 
+/**
+ * Test activity showcasing how to change the MyLocationView drawable.
+ */
 public class MyLocationDrawableActivity extends AppCompatActivity implements LocationEngineListener {
 
   private static final int PERMISSIONS_LOCATION = 0;

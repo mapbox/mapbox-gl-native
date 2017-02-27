@@ -17,6 +17,9 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.utils.IconUtils;
 
+/**
+ * Test activity showcasing updating a Marker position, title, icon and snippet.
+ */
 public class DynamicMarkerChangeActivity extends AppCompatActivity {
 
   private static final LatLng LAT_LNG_CHELSEA = new LatLng(51.481670, -0.190849);

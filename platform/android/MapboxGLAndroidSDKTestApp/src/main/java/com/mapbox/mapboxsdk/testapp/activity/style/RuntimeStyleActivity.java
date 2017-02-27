@@ -70,7 +70,7 @@ import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.symbolPlacement;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.visibility;
 
 /**
- * Sample Activity to show off the runtime style api
+ * Test activity showcasing the runtime style API.
  */
 public class RuntimeStyleActivity extends AppCompatActivity {
 

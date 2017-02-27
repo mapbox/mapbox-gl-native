@@ -28,6 +28,12 @@ import static com.mapbox.mapboxsdk.style.layers.Filter.in;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.circleColor;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.circleRadius;
 
+/**
+ * Test activity showcasing adding a Circle Layer to the Map
+ * <p>
+ * Uses bus stop data from Singapore as a source and allows to filter into 1 specific route with a line layer.
+ * </p>
+ */
 public class CircleLayerActivity extends AppCompatActivity {
 
   private static final String[] STOPS_FOR_ROUTE = new String[] {"99009", "99131", "99049", "99039", "99029", "99019",

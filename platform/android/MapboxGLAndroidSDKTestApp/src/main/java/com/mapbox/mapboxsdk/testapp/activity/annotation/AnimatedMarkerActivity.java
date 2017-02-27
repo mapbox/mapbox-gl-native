@@ -27,13 +27,16 @@ import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.utils.IconUtils;
-import com.mapbox.services.commons.models.Position;
 import com.mapbox.services.api.utils.turf.TurfMeasurement;
+import com.mapbox.services.commons.models.Position;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * Test activity showcasing animating MarkerViews.
+ */
 public class AnimatedMarkerActivity extends AppCompatActivity {
 
   private MapView mapView;

@@ -18,6 +18,12 @@ import com.mapbox.mapboxsdk.testapp.R;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
+/**
+ * Test activity showcasing to add a Marker on click.
+ * <p>
+ * Shows how to use a OnMapClickListener and a OnMapLongClickListener
+ * </p>
+ */
 public class PressForMarkerActivity extends AppCompatActivity {
 
   private MapView mapView;
@@ -44,19 +50,14 @@ public class PressForMarkerActivity extends AppCompatActivity {
         mapboxMap.setOnMapLongClickListener(new MapboxMap.OnMapLongClickListener() {
           @Override
           public void onMapLongClick(@NonNull LatLng point) {
-            final PointF pixel = mapboxMap.getProjection().toScreenLocation(point);
+            addMarker(point);
+          }
+        });
 
-            String title = LAT_LON_FORMATTER.format(point.getLatitude()) + ", "
-              + LAT_LON_FORMATTER.format(point.getLongitude());
-            String snippet = "X = " + (int) pixel.x + ", Y = " + (int) pixel.y;
-
-            MarkerOptions marker = new MarkerOptions()
-              .position(point)
-              .title(title)
-              .snippet(snippet);
-
-            markerList.add(marker);
-            mapboxMap.addMarker(marker);
+        mapboxMap.setOnMapClickListener(new MapboxMap.OnMapClickListener() {
+          @Override
+          public void onMapClick(@NonNull LatLng point) {
+            addMarker(point);
           }
         });
 
@@ -66,6 +67,22 @@ public class PressForMarkerActivity extends AppCompatActivity {
         }
       }
     });
+  }
+
+  private void addMarker(LatLng point) {
+    final PointF pixel = mapboxMap.getProjection().toScreenLocation(point);
+
+    String title = LAT_LON_FORMATTER.format(point.getLatitude()) + ", "
+      + LAT_LON_FORMATTER.format(point.getLongitude());
+    String snippet = "X = " + (int) pixel.x + ", Y = " + (int) pixel.y;
+
+    MarkerOptions marker = new MarkerOptions()
+      .position(point)
+      .title(title)
+      .snippet(snippet);
+
+    markerList.add(marker);
+    mapboxMap.addMarker(marker);
   }
 
   private void resetMap() {

@@ -33,7 +33,7 @@ import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textField;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textSize;
 
 /**
- * Sample Activity to show off geojson source clustering and filter usage
+ * Test activity showcasing using a geojson source and visualise that source as a cluster by using filters.
  */
 public class GeoJsonClusteringActivity extends AppCompatActivity {
 

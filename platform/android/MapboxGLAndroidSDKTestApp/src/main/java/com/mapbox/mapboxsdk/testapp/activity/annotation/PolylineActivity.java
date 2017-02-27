@@ -21,6 +21,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Test activity showcasing the Polyline annotations API.
+ * <p>
+ * Shows how to add and remove polylines.
+ * </p>
+ */
 public class PolylineActivity extends AppCompatActivity {
 
   private static final String STATE_POLYLINE_OPTIONS = "polylineOptions";

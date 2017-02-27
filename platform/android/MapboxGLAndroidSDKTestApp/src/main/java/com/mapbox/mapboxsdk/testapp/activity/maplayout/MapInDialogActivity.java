@@ -13,6 +13,12 @@ import android.widget.Button;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.testapp.R;
 
+/**
+ * Test activity showcasing showing a Map inside of a DialogFragment.
+ * <p>
+ * Uses the deprecated TextureView API to workaround the issue of seeing a grey background before the gl surface.
+ * </p>
+ */
 public class MapInDialogActivity extends AppCompatActivity {
 
   @Override

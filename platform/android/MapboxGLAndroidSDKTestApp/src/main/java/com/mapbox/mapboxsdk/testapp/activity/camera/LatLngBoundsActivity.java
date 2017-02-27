@@ -19,6 +19,13 @@ import java.util.List;
 
 import timber.log.Timber;
 
+/**
+ * Test activity showcasing using the LatLngBounds camera API.
+ * <p>
+ * This activity opens the map at zoom level 0 and animates into a bounds set by Los Angeles and New York
+ * with some additional padding and an animation duration of 1500 ms.
+ * </p>
+ */
 public class LatLngBoundsActivity extends AppCompatActivity implements OnMapReadyCallback {
 
   private static final LatLng LOS_ANGELES = new LatLng(34.053940, -118.242622);
@@ -69,7 +76,7 @@ public class LatLngBoundsActivity extends AppCompatActivity implements OnMapRead
 
     // Move camera to the bounds with added padding
     int padding = (int) getResources().getDimension(R.dimen.coordinatebounds_margin);
-    mapboxMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, padding));
+    mapboxMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, padding), 1500);
 
     // Log data
     Timber.e("Move to bounds: " + bounds.toString());

@@ -22,6 +22,13 @@ import com.mapbox.mapboxsdk.maps.TrackingSettings;
 import com.mapbox.mapboxsdk.maps.UiSettings;
 import com.mapbox.mapboxsdk.testapp.R;
 
+/**
+ * Test activity showcasing the different tracking modes the SDK exposes.
+ * <p>
+ * This includes MyLocationTracking/MyLocationBearingTracking and how the components can be configured to be dismissed
+ * using gesture configurations.
+ * </p>
+ */
 public class MyLocationTrackingModeActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
   public static final int TRACKING_NONE_INDEX = 0;

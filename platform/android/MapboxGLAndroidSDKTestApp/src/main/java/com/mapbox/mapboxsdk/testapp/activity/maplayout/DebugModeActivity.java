@@ -14,6 +14,9 @@ import com.mapbox.mapboxsdk.testapp.R;
 
 import timber.log.Timber;
 
+/**
+ * Test Activity showcasing the different debug modes and allows to cycle between the default map styles.
+ */
 public class DebugModeActivity extends AppCompatActivity {
 
   private MapView mapView;
