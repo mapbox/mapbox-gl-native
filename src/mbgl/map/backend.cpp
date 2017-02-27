@@ -14,8 +14,8 @@ gl::Context& Backend::getContext() {
     assert(BackendScope::exists());
     std::call_once(initialized, [this] {
         context = std::make_unique<gl::Context>();
-        gl::debugging::enable();
-        gl::initializeExtensions(
+        context->enableDebugging();
+        context->initializeExtensions(
             std::bind(&Backend::initializeExtension, this, std::placeholders::_1));
     });
     return *context;

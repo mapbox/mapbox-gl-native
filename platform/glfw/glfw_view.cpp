@@ -459,7 +459,7 @@ void GLFWView::run() {
         if (dirty) {
             const double started = glfwGetTime();
 
-            glfwMakeContextCurrent(window);
+            activate();
             mbgl::BackendScope scope { *this, mbgl::BackendScope::ScopeType::Implicit };
 
             updateViewBinding();
