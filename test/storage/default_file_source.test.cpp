@@ -267,6 +267,22 @@ TEST(DefaultFileSource, OptionalExpired) {
     loop.run();
 }
 
+TEST(DefaultFileSource, GetBaseURLAndAccessTokenWhilePaused) {
+    util::RunLoop loop;
+    DefaultFileSource fs(":memory:", ".");
+
+    fs.pause();
+
+    auto baseURL = "http://url";
+    auto accessToken = "access_token";
+
+    fs.setAPIBaseURL(baseURL);
+    fs.setAccessToken(accessToken);
+
+    EXPECT_EQ(fs.getAPIBaseURL(), baseURL);
+    EXPECT_EQ(fs.getAccessToken(), accessToken);
+}
+
 TEST(DefaultFileSource, OptionalNotFound) {
     util::RunLoop loop;
     DefaultFileSource fs(":memory:", ".");
