@@ -15,6 +15,12 @@ import com.mapbox.mapboxsdk.testapp.R;
 
 import timber.log.Timber;
 
+/**
+ * Test activity showcasing the Camera API and listen to camera updates by animating the camera above London.
+ * <p>
+ * Shows how to use animate, ease and move camera update factory methods.
+ * </p>
+ */
 public class CameraAnimationTypeActivity extends AppCompatActivity implements OnMapReadyCallback {
 
   private static final LatLng LAT_LNG_LONDON_EYE = new LatLng(51.50325, -0.11968);

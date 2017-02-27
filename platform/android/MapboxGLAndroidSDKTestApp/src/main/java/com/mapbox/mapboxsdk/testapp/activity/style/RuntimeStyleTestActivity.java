@@ -9,7 +9,7 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.R;
 
 /**
- * Test activity for unit test execution
+ * Test activity used for instrumentation test execution.
  */
 public class RuntimeStyleTestActivity extends AppCompatActivity {
 

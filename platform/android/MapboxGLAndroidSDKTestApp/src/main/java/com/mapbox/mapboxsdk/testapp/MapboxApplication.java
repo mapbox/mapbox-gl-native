@@ -10,6 +10,12 @@ import timber.log.Timber;
 
 import static timber.log.Timber.DebugTree;
 
+/**
+ * Application class of the test application.
+ * <p>
+ * Initialises components as LeakCanary, Strictmode, Timber and Mapbox
+ * </p>
+ */
 public class MapboxApplication extends Application {
 
   @Override

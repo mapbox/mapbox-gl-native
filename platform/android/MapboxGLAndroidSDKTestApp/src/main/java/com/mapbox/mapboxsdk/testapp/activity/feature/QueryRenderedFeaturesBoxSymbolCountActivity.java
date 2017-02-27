@@ -30,7 +30,7 @@ import timber.log.Timber;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconImage;
 
 /**
- * Demo's query rendered features on Symbols
+ * Test activity showcasing using the query rendered features API to count Symbols in a rectangle.
  */
 public class QueryRenderedFeaturesBoxSymbolCountActivity extends AppCompatActivity {
 

@@ -15,6 +15,9 @@ import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.R;
 
+/**
+ * Test activity showcasing the Snapshot API to create and display a bitmap of the current shown Map.
+ */
 public class SnapshotActivity extends AppCompatActivity implements OnMapReadyCallback, View.OnClickListener {
 
   private MapView mapView;

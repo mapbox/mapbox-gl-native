@@ -38,6 +38,13 @@ import com.mapbox.mapboxsdk.testapp.model.annotations.TextMarkerViewOptions;
 
 import java.util.Random;
 
+/**
+ * Test activity showcasing multiple MarkerViews above Washington D.C.
+ * <p>
+ * Shows a couple of open InfoWindows out of current Viewport.
+ * Updates the rotation and location of a couple of MarkerViews.
+ * </p>
+ */
 public class MarkerViewActivity extends AppCompatActivity {
 
   private static final LatLng[] LAT_LNGS = new LatLng[] {

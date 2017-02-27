@@ -33,6 +33,12 @@ import java.util.ArrayList;
 
 import timber.log.Timber;
 
+/**
+ * Test activity showcasing the Offline API.
+ * <p>
+ * Shows a map of Manhattan and allows the user to download and name a region.
+ * </p>
+ */
 public class OfflineActivity extends AppCompatActivity
   implements OfflineDownloadRegionDialog.DownloadRegionDialogListener {
 

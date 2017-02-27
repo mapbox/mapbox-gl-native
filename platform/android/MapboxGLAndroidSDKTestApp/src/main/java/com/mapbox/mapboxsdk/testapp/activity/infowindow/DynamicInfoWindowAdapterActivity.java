@@ -22,7 +22,7 @@ import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.utils.IconUtils;
 
 /**
- * Shows how to dynamically update InfoWindow when Using an MapboxMap.InfoWindowAdapter
+ * Test activity showcasing how to dynamically update InfoWindow when Using an MapboxMap.InfoWindowAdapter.
  */
 public class DynamicInfoWindowAdapterActivity extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -86,8 +86,8 @@ public class DynamicInfoWindowAdapterActivity extends AppCompatActivity implemen
       new MarkerViewOptions()
         .position(paris)
         .icon(IconUtils.drawableToIcon(this, R.drawable.ic_location_city,
-          ResourcesCompat.getColor(getResources(),R.color.mapbox_blue, getTheme()))
-    ));
+          ResourcesCompat.getColor(getResources(), R.color.mapbox_blue, getTheme()))
+        ));
   }
 
   private void addCustomInfoWindowAdapter(final MapboxMap mapboxMap) {

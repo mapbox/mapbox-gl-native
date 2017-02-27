@@ -6,6 +6,9 @@ import android.support.v7.app.AppCompatActivity;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.testapp.R;
 
+/**
+ * Test activity showcasing a simple MapView without any MapboxMap interaction.
+ */
 public class SimpleMapActivity extends AppCompatActivity {
 
   private MapView mapView;

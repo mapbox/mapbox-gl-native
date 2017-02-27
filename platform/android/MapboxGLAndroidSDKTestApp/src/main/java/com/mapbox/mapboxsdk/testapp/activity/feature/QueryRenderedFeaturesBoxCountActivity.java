@@ -19,7 +19,7 @@ import java.util.Map;
 import timber.log.Timber;
 
 /**
- * Demo's query rendered features
+ * Test activity showcasing using the query rendered features API to count features in a rectangle.
  */
 public class QueryRenderedFeaturesBoxCountActivity extends AppCompatActivity {
 

@@ -17,6 +17,12 @@ import com.mapbox.mapboxsdk.style.layers.CustomLayer;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.model.customlayer.ExampleCustomLayer;
 
+/**
+ * Test activity showcasing the Custom Layer API
+ * <p>
+ * Note: experimental API, do not use.
+ * </p>
+ */
 public class CustomLayerActivity extends AppCompatActivity {
 
   private MapboxMap mapboxMap;

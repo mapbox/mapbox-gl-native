@@ -17,6 +17,12 @@ import com.mapbox.mapboxsdk.testapp.R;
 
 import java.text.DecimalFormat;
 
+/**
+ * Test activity showcasing using the InfoWindow API above Washington D.C.
+ * <p>
+ * Allows to test mulitple concurrently open InfoWindows.
+ * </p>
+ */
 public class InfoWindowActivity extends AppCompatActivity
   implements OnMapReadyCallback, MapboxMap.OnInfoWindowCloseListener, MapboxMap.OnMapLongClickListener,
   MapboxMap.OnInfoWindowClickListener, MapboxMap.OnInfoWindowLongClickListener {

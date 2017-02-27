@@ -9,7 +9,7 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.R;
 
 /**
- * Base activity for instrumentation testing
+ * Base activity for instrumentation testing.
  */
 public class EspressoTestActivity extends AppCompatActivity implements OnMapReadyCallback {
 

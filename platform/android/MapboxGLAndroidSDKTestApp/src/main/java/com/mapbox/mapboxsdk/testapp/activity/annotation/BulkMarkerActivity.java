@@ -41,6 +41,9 @@ import java.util.Random;
 
 import timber.log.Timber;
 
+/**
+ * Test activity showcasing adding a large amount of Markers or MarkerViews.
+ */
 public class BulkMarkerActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
   private MapboxMap mapboxMap;

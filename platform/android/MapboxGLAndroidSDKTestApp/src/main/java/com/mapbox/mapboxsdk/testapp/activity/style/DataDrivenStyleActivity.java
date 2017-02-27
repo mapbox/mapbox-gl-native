@@ -42,7 +42,7 @@ import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.fillOpacity;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.fillOutlineColor;
 
 /**
- * Sample Activity to show off the data driven runtime style api
+ * Test activity showcasing the data driven runtime style API.
  */
 public class DataDrivenStyleActivity extends AppCompatActivity {
 

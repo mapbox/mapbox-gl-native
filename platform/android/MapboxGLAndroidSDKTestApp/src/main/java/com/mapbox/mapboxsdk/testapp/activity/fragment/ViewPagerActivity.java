@@ -14,6 +14,9 @@ import com.mapbox.mapboxsdk.maps.MapboxMapOptions;
 import com.mapbox.mapboxsdk.maps.SupportMapFragment;
 import com.mapbox.mapboxsdk.testapp.R;
 
+/**
+ * Test activity showcasing using the Android SDK ViewPager API to show MapFragments.
+ */
 public class ViewPagerActivity extends AppCompatActivity {
 
   @Override

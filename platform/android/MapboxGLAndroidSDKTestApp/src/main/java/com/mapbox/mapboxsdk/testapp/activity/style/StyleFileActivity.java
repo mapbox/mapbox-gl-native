@@ -29,7 +29,7 @@ import java.io.Writer;
 import timber.log.Timber;
 
 /**
- * Example on how to use a file:// resource for the style.json
+ * Test activity showcasing how to use a file:// resource for the style.json
  */
 public class StyleFileActivity extends AppCompatActivity {
 

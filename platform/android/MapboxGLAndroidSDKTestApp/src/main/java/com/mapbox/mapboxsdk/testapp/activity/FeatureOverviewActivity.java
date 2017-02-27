@@ -32,6 +32,13 @@ import java.util.List;
 
 import timber.log.Timber;
 
+/**
+ * Activity shown when application is started
+ * <p>
+ * This activity  will generate data for RecyclerView based on the AndroidManifest entries.
+ * It uses tags as category and description to order the different entries.
+ * </p>
+ */
 public class FeatureOverviewActivity extends AppCompatActivity {
 
   private static final String KEY_STATE_FEATURES = "featureList";

@@ -12,6 +12,9 @@ import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.R;
 
+/**
+ * Test activity showcasing using the Snaphot API to print a Map.
+ */
 public class PrintActivity extends AppCompatActivity implements MapboxMap.SnapshotReadyCallback {
 
   private MapView mapView;

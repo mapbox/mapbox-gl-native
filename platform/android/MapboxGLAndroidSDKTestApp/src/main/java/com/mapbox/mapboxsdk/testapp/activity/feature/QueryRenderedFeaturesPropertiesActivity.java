@@ -27,7 +27,7 @@ import java.util.Map;
 import timber.log.Timber;
 
 /**
- * Demo's query rendered features
+ * Test activity showcasing using the query rendered features API to query feature properties on Map click.
  */
 public class QueryRenderedFeaturesPropertiesActivity extends AppCompatActivity {
 

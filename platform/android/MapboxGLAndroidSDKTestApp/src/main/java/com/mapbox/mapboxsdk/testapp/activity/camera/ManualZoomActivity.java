@@ -16,6 +16,12 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.UiSettings;
 import com.mapbox.mapboxsdk.testapp.R;
 
+/**
+ * Test activity showcasing the zoom Camera API.
+ * <p>
+ * This includes zoomIn, zoomOut, zoomTo, zoomBy (center and custom focal point).
+ * </p>
+ */
 public class ManualZoomActivity extends AppCompatActivity {
 
   private MapboxMap mapboxMap;

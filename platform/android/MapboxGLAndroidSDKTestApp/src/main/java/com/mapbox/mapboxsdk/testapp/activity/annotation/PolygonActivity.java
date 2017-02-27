@@ -29,9 +29,9 @@ import static com.mapbox.mapboxsdk.testapp.activity.annotation.PolygonActivity.C
 import static com.mapbox.mapboxsdk.testapp.activity.annotation.PolygonActivity.Config.STAR_SHAPE_POINTS;
 
 /**
- * Activity to test the Polygon annotation API & programmatically creating a MapView.
+ * Test activity to showcase the Polygon annotation API & programmatically creating a MapView.
  * <p>
- * Showcases changing Polygon features as visibility, alpha, color and points.
+ * Shows how to change Polygon features as visibility, alpha, color and points.
  * </p>
  */
 public class PolygonActivity extends AppCompatActivity implements OnMapReadyCallback {
