@@ -783,6 +783,13 @@ final class NativeMapView {
     nativeAddLayerAbove(layer.getNativePtr(), above);
   }
 
+  public void addLayerAt(@NonNull Layer layer, @IntRange(from = 0) int index) {
+    if (isDestroyedOn("addLayerAt")) {
+      return;
+    }
+    nativeAddLayerAt(layer.getNativePtr(), index);
+  }
+
   @Nullable
   public Layer removeLayer(@NonNull String layerId) {
     if (isDestroyedOn("removeLayer")) {
@@ -1103,6 +1110,8 @@ final class NativeMapView {
   private native void nativeAddLayer(long layerPtr, String before) throws CannotAddLayerException;
 
   private native void nativeAddLayerAbove(long layerPtr, String above) throws CannotAddLayerException;
+
+  private native void nativeAddLayerAt(long layerPtr, int index) throws CannotAddLayerException;
 
   private native Layer nativeRemoveLayerById(String layerId);
 

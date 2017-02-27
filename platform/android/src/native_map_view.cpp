@@ -816,6 +816,29 @@ void NativeMapView::addLayerAbove(JNIEnv& env, jlong nativeLayerPtr, jni::String
     }
 }
 
+void NativeMapView::addLayerAt(JNIEnv& env, jlong nativeLayerPtr, jni::jint index) {
+    assert(nativeLayerPtr != 0);
+
+    Layer *layer = reinterpret_cast<Layer *>(nativeLayerPtr);
+    auto layers = map->getLayers();
+
+    // Check index
+    int numLayers = layers.size() - 1;
+    if (index > numLayers || index < 0) {
+        Log::Error(Event::JNI, "Index out of range: %i", index);
+        jni::ThrowNew(env, jni::FindClass(env, "com/mapbox/mapboxsdk/style/layers/CannotAddLayerException"),
+            std::string("Invalid index").c_str());
+        return;
+    }
+
+    // Insert it below the current at that index
+    try {
+        layer->addToMap(*map, layers.at(index)->getID());
+    } catch (const std::runtime_error& error) {
+        jni::ThrowNew(env, jni::FindClass(env, "com/mapbox/mapboxsdk/style/layers/CannotAddLayerException"), error.what());
+    }
+}
+
 /**
  * Remove by layer id.
  */
@@ -1439,6 +1462,7 @@ void NativeMapView::registerNative(jni::JNIEnv& env) {
             METHOD(&NativeMapView::getLayer, "nativeGetLayer"),
             METHOD(&NativeMapView::addLayer, "nativeAddLayer"),
             METHOD(&NativeMapView::addLayerAbove, "nativeAddLayerAbove"),
+            METHOD(&NativeMapView::addLayerAt, "nativeAddLayerAt"),
             METHOD(&NativeMapView::removeLayerById, "nativeRemoveLayerById"),
             METHOD(&NativeMapView::removeLayerAt, "nativeRemoveLayerAt"),
             METHOD(&NativeMapView::removeLayer, "nativeRemoveLayer"),

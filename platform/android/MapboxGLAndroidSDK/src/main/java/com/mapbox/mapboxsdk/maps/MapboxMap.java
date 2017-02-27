@@ -284,6 +284,18 @@ public final class MapboxMap {
   }
 
   /**
+   * Adds the layer to the map at the specified index. The layer must be newly
+   * created and not added to the map before
+   *
+   * @param layer the layer to add
+   * @param index the index to insert the layer at
+   */
+  @UiThread
+  public void addLayerAt(@NonNull Layer layer, @IntRange(from = 0) int index) {
+    nativeMapView.addLayerAt(layer, index);
+  }
+
+  /**
    * Removes the layer. Any references to the layer become invalid and should not be used anymore
    *
    * @param layerId the layer to remove
