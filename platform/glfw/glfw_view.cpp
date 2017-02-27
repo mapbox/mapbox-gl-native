@@ -10,6 +10,7 @@
 #include <mbgl/util/platform.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/chrono.hpp>
+#include <mbgl/map/backend_scope.hpp>
 #include <mbgl/map/camera.hpp>
 
 #include <mbgl/gl/state.hpp>
@@ -462,6 +463,7 @@ void GLFWView::run() {
             const double started = glfwGetTime();
 
             glfwMakeContextCurrent(window);
+            mbgl::BackendScope scope { *this, mbgl::BackendScope::ScopeType::Implicit };
 
             updateViewBinding();
             map->render(*this);

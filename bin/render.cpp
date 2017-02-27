@@ -1,4 +1,5 @@
 #include <mbgl/map/map.hpp>
+#include <mbgl/map/backend_scope.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/run_loop.hpp>
@@ -85,6 +86,7 @@ int main(int argc, char *argv[]) {
     }
 
     HeadlessBackend backend;
+    BackendScope scope { backend };
     OffscreenView view(backend.getContext(), { width * pixelRatio, height * pixelRatio });
     ThreadPool threadPool(4);
     Map map(backend, mbgl::Size { width, height }, pixelRatio, fileSource, threadPool, MapMode::Still);

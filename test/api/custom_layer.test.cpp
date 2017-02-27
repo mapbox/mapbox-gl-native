@@ -2,6 +2,7 @@
 
 #include <mbgl/gl/gl.hpp>
 #include <mbgl/map/map.hpp>
+#include <mbgl/map/backend_scope.hpp>
 #include <mbgl/gl/headless_backend.hpp>
 #include <mbgl/gl/offscreen_view.hpp>
 #include <mbgl/util/default_thread_pool.hpp>
@@ -86,6 +87,7 @@ TEST(CustomLayer, Basic) {
     util::RunLoop loop;
 
     HeadlessBackend backend { test::sharedDisplay() };
+    BackendScope scope { backend };
     OffscreenView view { backend.getContext() };
 
 #ifdef MBGL_ASSET_ZIP

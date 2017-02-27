@@ -29,6 +29,7 @@
 #import <mbgl/gl/extension.hpp>
 #import <mbgl/gl/context.hpp>
 #import <mbgl/map/backend.hpp>
+#import <mbgl/map/backend_scope.hpp>
 #import <mbgl/sprite/sprite_image.hpp>
 #import <mbgl/storage/default_file_source.hpp>
 #import <mbgl/storage/network_status.hpp>
@@ -780,6 +781,8 @@ public:
 
             return reinterpret_cast<mbgl::gl::glProc>(symbol);
         });
+        // The OpenGL implementation automatically enables the OpenGL context for us.
+        mbgl::BackendScope scope { *_mbglView, mbgl::BackendScope::ScopeType::Implicit };
 
         _mbglView->updateViewBinding();
         _mbglMap->render(*_mbglView);
@@ -2872,7 +2875,8 @@ public:
         fbo = mbgl::gl::value::BindFramebuffer::Get();
         getContext().bindFramebuffer.setCurrentValue(fbo);
         getContext().viewport.setCurrentValue(getViewport());
-        assert(mbgl::gl::value::Viewport::Get() == getContext().viewport.getCurrentValue());
+        auto actualViewport = mbgl::gl::value::Viewport::Get();
+        assert(actualViewport == getContext().viewport.getCurrentValue());
     }
 
     void bind() override {
