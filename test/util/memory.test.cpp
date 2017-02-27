@@ -87,12 +87,31 @@ TEST(Memory, Raster) {
     test::render(map, test.view);
 }
 
+/**
+On CI, we only run the memory footprint test in the Qt build, because it uses
+jemalloc, which yields more consistent memory usage results.  To force it to
+run locally, use `DO_MEMORY_FOOTPRINT=1 make run-test-Memory.Footprint.
+*/
+bool shouldRunFootprint() {
+    const char* preload = getenv("LD_PRELOAD");
+    
+    if (preload) {
+        return std::string(preload).find("libjemalloc.so") != std::string::npos;
+    } else {
+        return getenv("DO_MEMORY_FOOTPRINT");
+    }
+}
+
 // This test will measure the size of a Map object
 // after rendering a raster and a vector style. The
 // idea is to try to keep the memory footprint within
 // reasonable limits, so this test acts more like a
 // safeguard.
 TEST(Memory, Footprint) {
+    if (!shouldRunFootprint()) {
+        return;
+    }
+    
     MemoryTest test;
 
     auto renderMap = [&](Map& map, const char* style){
