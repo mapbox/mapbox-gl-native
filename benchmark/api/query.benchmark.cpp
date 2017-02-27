@@ -2,6 +2,7 @@
 
 #include <mbgl/benchmark/util.hpp>
 #include <mbgl/map/map.hpp>
+#include <mbgl/map/backend_scope.hpp>
 #include <mbgl/gl/headless_backend.hpp>
 #include <mbgl/gl/offscreen_view.hpp>
 #include <mbgl/util/default_thread_pool.hpp>
@@ -34,6 +35,7 @@ public:
 
     util::RunLoop loop;
     HeadlessBackend backend;
+    BackendScope scope { backend };
     OffscreenView view{ backend.getContext(), { 1000, 1000 } };
     DefaultFileSource fileSource{ "benchmark/fixtures/api/cache.db", "." };
     ThreadPool threadPool{ 4 };

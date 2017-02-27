@@ -10,6 +10,7 @@
 #include <mbgl/style/conversion/layer.hpp>
 #include <mbgl/style/conversion/filter.hpp>
 #include <mbgl/sprite/sprite_image.cpp>
+#include <mbgl/map/backend_scope.hpp>
 #include <mbgl/map/query.hpp>
 
 #include <unistd.h>
@@ -369,6 +370,7 @@ void NodeMap::startRender(NodeMap::RenderOptions options) {
                              static_cast<uint32_t>(options.height * pixelRatio) };
     if (!view || view->getSize() != fbSize) {
         view.reset();
+        mbgl::BackendScope scope { backend };
         view = std::make_unique<mbgl::OffscreenView>(backend.getContext(), fbSize);
     }
 

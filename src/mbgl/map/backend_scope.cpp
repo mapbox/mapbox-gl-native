@@ -8,15 +8,19 @@ namespace mbgl {
 
 static util::ThreadLocal<BackendScope> currentScope;
 
-BackendScope::BackendScope(Backend& backend_)
+BackendScope::BackendScope(Backend& backend_, ScopeType scopeType_)
     : priorScope(currentScope.get()),
       nextScope(nullptr),
-      backend(backend_) {
+      backend(backend_),
+      scopeType(scopeType_) {
     if (priorScope) {
         assert(priorScope->nextScope == nullptr);
         priorScope->nextScope = this;
     }
-    backend.activate();
+    if (scopeType == ScopeType::Explicit) {
+        backend.activate();
+    }
+
     currentScope.set(this);
 }
 
@@ -28,9 +32,16 @@ BackendScope::~BackendScope() {
         assert(priorScope->nextScope == this);
         priorScope->nextScope = nullptr;
     } else {
-        backend.deactivate();
+        if (scopeType == ScopeType::Explicit) {
+            backend.deactivate();
+        }
+
         currentScope.set(nullptr);
     }
+}
+
+bool BackendScope::exists() {
+    return currentScope.get();
 }
 
 } // namespace mbgl
