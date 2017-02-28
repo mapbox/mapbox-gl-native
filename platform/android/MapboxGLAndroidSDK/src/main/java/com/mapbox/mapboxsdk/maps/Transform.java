@@ -84,45 +84,50 @@ final class Transform implements MapView.OnMapChangedListener {
 
   @UiThread
   final void moveCamera(MapboxMap mapboxMap, CameraUpdate update, MapboxMap.CancelableCallback callback) {
-    cameraPosition = update.getCameraPosition(mapboxMap);
-    trackingSettings.resetTrackingModesIfRequired(cameraPosition);
-    cancelTransitions();
-    mapView.jumpTo(cameraPosition.bearing, cameraPosition.target, cameraPosition.tilt, cameraPosition.zoom);
-    if (callback != null) {
-      callback.onFinish();
+    CameraPosition cameraPosition = update.getCameraPosition(mapboxMap);
+    if (!cameraPosition.equals(this.cameraPosition)) {
+      trackingSettings.resetTrackingModesIfRequired(cameraPosition);
+      cancelTransitions();
+      mapView.jumpTo(cameraPosition.bearing, cameraPosition.target, cameraPosition.tilt, cameraPosition.zoom);
+      if (callback != null) {
+        callback.onFinish();
+      }
     }
   }
 
   @UiThread
   final void easeCamera(MapboxMap mapboxMap, CameraUpdate update, int durationMs, boolean easingInterpolator,
                         final MapboxMap.CancelableCallback callback) {
-    cameraPosition = update.getCameraPosition(mapboxMap);
-    trackingSettings.resetTrackingModesIfRequired(cameraPosition);
+    CameraPosition cameraPosition = update.getCameraPosition(mapboxMap);
+    if (!cameraPosition.equals(this.cameraPosition)) {
+      trackingSettings.resetTrackingModesIfRequired(cameraPosition);
+      cancelTransitions();
+      if (callback != null) {
+        cameraCancelableCallback = callback;
+        mapView.addOnMapChangedListener(this);
+      }
 
-    cancelTransitions();
-    if (callback != null) {
-      cameraCancelableCallback = callback;
-      mapView.addOnMapChangedListener(this);
+      mapView.easeTo(cameraPosition.bearing, cameraPosition.target, getDurationNano(durationMs), cameraPosition.tilt,
+        cameraPosition.zoom, easingInterpolator);
     }
-
-    mapView.easeTo(cameraPosition.bearing, cameraPosition.target, getDurationNano(durationMs), cameraPosition.tilt,
-      cameraPosition.zoom, easingInterpolator);
   }
 
   @UiThread
   final void animateCamera(MapboxMap mapboxMap, CameraUpdate update, int durationMs,
                            final MapboxMap.CancelableCallback callback) {
-    cameraPosition = update.getCameraPosition(mapboxMap);
-    trackingSettings.resetTrackingModesIfRequired(cameraPosition);
+    CameraPosition cameraPosition = update.getCameraPosition(mapboxMap);
+    if (!cameraPosition.equals(this.cameraPosition)) {
+      trackingSettings.resetTrackingModesIfRequired(cameraPosition);
 
-    cancelTransitions();
-    if (callback != null) {
-      cameraCancelableCallback = callback;
-      mapView.addOnMapChangedListener(this);
+      cancelTransitions();
+      if (callback != null) {
+        cameraCancelableCallback = callback;
+        mapView.addOnMapChangedListener(this);
+      }
+
+      mapView.flyTo(cameraPosition.bearing, cameraPosition.target, getDurationNano(durationMs), cameraPosition.tilt,
+        cameraPosition.zoom);
     }
-
-    mapView.flyTo(cameraPosition.bearing, cameraPosition.target, getDurationNano(durationMs), cameraPosition.tilt,
-      cameraPosition.zoom);
   }
 
   @UiThread
