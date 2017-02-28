@@ -26,7 +26,20 @@ namespace android {
         , layer(*ownedLayer) {
     }
 
+    /**
+     * Takes a non-owning reference. For lookup methods
+     */
     Layer::Layer(mbgl::Map& coreMap, mbgl::style::Layer& coreLayer) : layer(coreLayer) , map(&coreMap) {
+    }
+
+    /**
+     * Takes a owning reference. Ownership is transfered to this peer, eg after removing
+     * from the map
+     */
+    Layer::Layer(mbgl::Map& coreMap, std::unique_ptr<mbgl::style::Layer> coreLayer)
+        : ownedLayer(std::move(coreLayer))
+        , layer(*ownedLayer)
+        , map(&coreMap) {
     }
 
     Layer::~Layer() {

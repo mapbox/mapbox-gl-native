@@ -22,6 +22,8 @@ public:
 
     BackgroundLayer(mbgl::Map&, mbgl::style::BackgroundLayer&);
 
+    BackgroundLayer(mbgl::Map&, std::unique_ptr<mbgl::style::BackgroundLayer>);
+
     ~BackgroundLayer();
 
     // Property getters

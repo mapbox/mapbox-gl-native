@@ -14,16 +14,32 @@ namespace mbgl {
 namespace android {
 
 <% if (type === 'background') { -%>
+    /**
+     * Creates an owning peer object (for layers not attached to the map) from the JVM side
+     */
     <%- camelize(type) %>Layer::<%- camelize(type) %>Layer(jni::JNIEnv& env, jni::String layerId)
         : Layer(env, std::make_unique<mbgl::style::<%- camelize(type) %>Layer>(jni::Make<std::string>(env, layerId))) {
 <% } else { -%>
+    /**
+     * Creates an owning peer object (for layers not attached to the map) from the JVM side
+     */
     <%- camelize(type) %>Layer::<%- camelize(type) %>Layer(jni::JNIEnv& env, jni::String layerId, jni::String sourceId)
         : Layer(env, std::make_unique<mbgl::style::<%- camelize(type) %>Layer>(jni::Make<std::string>(env, layerId), jni::Make<std::string>(env, sourceId))) {
 <% } -%>
     }
 
+    /**
+     * Creates a non-owning peer object (for layers currently attached to the map)
+     */
     <%- camelize(type) %>Layer::<%- camelize(type) %>Layer(mbgl::Map& map, mbgl::style::<%- camelize(type) %>Layer& coreLayer)
         : Layer(map, coreLayer) {
+    }
+
+    /**
+     * Creates an owning peer object (for layers not attached to the map)
+     */
+    <%- camelize(type) %>Layer::<%- camelize(type) %>Layer(mbgl::Map& map, std::unique_ptr<mbgl::style::<%- camelize(type) %>Layer> coreLayer)
+        : Layer(map, std::move(coreLayer)) {
     }
 
     <%- camelize(type) %>Layer::~<%- camelize(type) %>Layer() = default;

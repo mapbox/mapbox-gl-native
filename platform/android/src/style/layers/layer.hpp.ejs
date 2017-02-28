@@ -30,6 +30,8 @@ public:
 
     <%- camelize(type) %>Layer(mbgl::Map&, mbgl::style::<%- camelize(type) %>Layer&);
 
+    <%- camelize(type) %>Layer(mbgl::Map&, std::unique_ptr<mbgl::style::<%- camelize(type) %>Layer>);
+
     ~<%- camelize(type) %>Layer();
 
     // Property getters

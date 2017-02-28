@@ -22,6 +22,8 @@ public:
 
     RasterLayer(mbgl::Map&, mbgl::style::RasterLayer&);
 
+    RasterLayer(mbgl::Map&, std::unique_ptr<mbgl::style::RasterLayer>);
+
     ~RasterLayer();
 
     // Property getters

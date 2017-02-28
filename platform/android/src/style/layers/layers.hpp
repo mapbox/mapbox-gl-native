@@ -10,9 +10,15 @@
 namespace mbgl {
 namespace android {
 
-mbgl::android::Layer* initializeLayerPeer(mbgl::Map&, mbgl::style::Layer&);
-
+/**
+ * Create a non-owning peer
+ */
 jni::jobject* createJavaLayerPeer(jni::JNIEnv&, mbgl::Map&, mbgl::style::Layer&);
+
+/**
+ * Create an owning peer
+ */
+jni::jobject* createJavaLayerPeer(jni::JNIEnv& env, mbgl::Map& map, std::unique_ptr<mbgl::style::Layer>);
 
 void registerNativeLayers(jni::JNIEnv&);
 

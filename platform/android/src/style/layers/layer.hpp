@@ -21,9 +21,14 @@ public:
     static void registerNative(jni::JNIEnv&);
 
     /*
-     * Called when a Java object is created on the c++ side
+     * Called when a non-owning peer object is created on the c++ side
      */
     Layer(mbgl::Map&, mbgl::style::Layer&);
+
+    /*
+     * Called when a owning peer object is created on the c++ side
+     */
+    Layer(mbgl::Map&, std::unique_ptr<mbgl::style::Layer>);
 
     /*
      * Called when a Java object was created from the jvm side
