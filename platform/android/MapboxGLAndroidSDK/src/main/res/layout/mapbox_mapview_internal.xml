@@ -5,30 +5,34 @@
         android:id="@+id/surfaceView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="gone" />
+        android:contentDescription="@null"
+        android:visibility="gone"/>
 
     <FrameLayout
         android:id="@+id/markerViewContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@android:color/transparent" />
+        android:background="@android:color/transparent"
+        android:contentDescription="@null"/>
 
     <com.mapbox.mapboxsdk.maps.widgets.MyLocationView
         android:id="@+id/userLocationView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:contentDescription="@string/mapbox_myLocationViewContentDescription"/>
 
     <com.mapbox.mapboxsdk.maps.widgets.CompassView
         android:id="@+id/compassView"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/mapbox_compassContentDescription"/>
 
     <ImageView
         android:id="@+id/logoView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:contentDescription="@string/mapbox_iconContentDescription"
-        android:src="@drawable/mapbox_logo_icon" />
+        android:contentDescription="@null"
+        android:src="@drawable/mapbox_logo_icon"/>
 
     <ImageView
         android:id="@+id/attributionView"
@@ -39,6 +43,6 @@
         android:clickable="true"
         android:contentDescription="@string/mapbox_attributionsIconContentDescription"
         android:padding="7dp"
-        android:src="@drawable/mapbox_info_bg_selector" />
+        android:src="@drawable/mapbox_info_bg_selector"/>
 
 </merge>

@@ -636,6 +636,7 @@ public class MarkerViewManager implements MapView.OnMapChangedListener {
         viewHolder = (ViewHolder) convertView.getTag();
       }
       viewHolder.imageView.setImageBitmap(marker.getIcon().getBitmap());
+      viewHolder.imageView.setContentDescription(marker.getTitle());
       return convertView;
     }
 
