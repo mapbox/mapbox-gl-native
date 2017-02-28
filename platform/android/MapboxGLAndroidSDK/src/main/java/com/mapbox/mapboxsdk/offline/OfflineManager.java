@@ -5,6 +5,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 
+import com.mapbox.mapboxsdk.LibraryLoader;
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.net.ConnectivityReceiver;
@@ -25,7 +26,7 @@ public class OfflineManager {
   //
 
   static {
-    System.loadLibrary("mapbox-gl");
+    LibraryLoader.load();
   }
 
   // Native peer pointer

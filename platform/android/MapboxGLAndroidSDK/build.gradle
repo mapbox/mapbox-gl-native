@@ -7,6 +7,8 @@ dependencies {
     compile rootProject.ext.dep.timber
     compile rootProject.ext.dep.okhttp3
     compile rootProject.ext.dep.lost
+    testCompile rootProject.ext.dep.junit
+    testCompile rootProject.ext.dep.mockito
 
     // Mapbox Android Services (GeoJSON support)
     compile(rootProject.ext.dep.mapboxJavaGeoJSON) {
@@ -113,6 +115,10 @@ android {
         warningsAsErrors true
     }
 
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
+
     buildTypes {
         debug {
             jniDebuggable true
@@ -141,3 +147,4 @@ configurations {
 apply from: 'gradle-javadoc.gradle'
 apply from: 'gradle-publish.gradle'
 apply from: 'gradle-checkstyle.gradle'
+apply from: 'gradle-tests-staticblockremover.gradle'
