@@ -20,7 +20,7 @@
         <property name="lineSeparator" value="lf" />
     </module> -->
     <module name="FileLength">
-        <property name="max" value="2042"/>
+        <property name="max" value="3000"/>
     </module>
 
     <module name="FileTabCharacter"/>
