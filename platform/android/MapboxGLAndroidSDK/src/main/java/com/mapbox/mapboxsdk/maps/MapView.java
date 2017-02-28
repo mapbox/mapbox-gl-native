@@ -3,16 +3,12 @@ package com.mapbox.mapboxsdk.maps;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.Fragment;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.graphics.Canvas;
 import android.graphics.PointF;
 import android.graphics.SurfaceTexture;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -45,6 +41,7 @@ import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.maps.widgets.CompassView;
 import com.mapbox.mapboxsdk.maps.widgets.MyLocationView;
 import com.mapbox.mapboxsdk.maps.widgets.MyLocationViewSettings;
+import com.mapbox.mapboxsdk.net.ConnectivityReceiver;
 import com.mapbox.services.android.telemetry.MapboxEvent;
 import com.mapbox.services.android.telemetry.MapboxTelemetry;
 
@@ -72,7 +69,7 @@ public class MapView extends FrameLayout {
 
   private NativeMapView nativeMapView;
   private boolean destroyed;
-  private boolean hasSurface = false;
+  private boolean hasSurface;
 
   private MapboxMap mapboxMap;
   private MapCallback mapCallback;
@@ -82,8 +79,6 @@ public class MapView extends FrameLayout {
   private MapGestureDetector mapGestureDetector;
   private MapKeyListener mapKeyListener;
   private MapZoomButtonController mapZoomButtonController;
-
-  private ConnectivityReceiver connectivityReceiver;
 
   @UiThread
   public MapView(@NonNull Context context) {
@@ -167,7 +162,7 @@ public class MapView extends FrameLayout {
     setWillNotDraw(false);
 
     // notify Map object about current connectivity state
-    nativeMapView.setReachability(isConnected());
+    nativeMapView.setReachability(ConnectivityReceiver.instance(context).isConnected(context));
 
     // initialise MapboxMap
     mapboxMap.initialise(context, options);
@@ -235,7 +230,7 @@ public class MapView extends FrameLayout {
   public void onStart() {
     onStartCalled = true;
     mapboxMap.onStart();
-    registerConnectivityReceiver();
+    ConnectivityReceiver.instance(getContext()).activate();
   }
 
   /**
@@ -265,7 +260,7 @@ public class MapView extends FrameLayout {
   public void onStop() {
     onStopCalled = true;
     mapboxMap.onStop();
-    unregisterConnectivityReceiver();
+    ConnectivityReceiver.instance(getContext()).deactivate();
   }
 
   /**
@@ -285,18 +280,6 @@ public class MapView extends FrameLayout {
     nativeMapView.destroySurface();
     nativeMapView.destroy();
     nativeMapView = null;
-  }
-
-  private void registerConnectivityReceiver() {
-    getContext().registerReceiver(connectivityReceiver = new ConnectivityReceiver(),
-      new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
-  }
-
-  private void unregisterConnectivityReceiver() {
-    if (connectivityReceiver != null) {
-      getContext().unregisterReceiver(connectivityReceiver);
-      connectivityReceiver = null;
-    }
   }
 
   @Override
@@ -545,30 +528,6 @@ public class MapView extends FrameLayout {
       return;
     }
     mapZoomButtonController.setVisible(visibility == View.VISIBLE);
-  }
-
-  //
-  // Connectivity events
-  //
-
-  // This class handles connectivity changes
-  private class ConnectivityReceiver extends BroadcastReceiver {
-
-    // Called when an action we are listening to in the manifest has been sent
-    @Override
-    public void onReceive(Context context, Intent intent) {
-      if (!destroyed && intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
-        nativeMapView.setReachability(!intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, false));
-      }
-    }
-  }
-
-  // Called when MapView is being created
-  private boolean isConnected() {
-    ConnectivityManager connectivityManager = (ConnectivityManager)
-      getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
-    NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
-    return (activeNetwork != null) && activeNetwork.isConnectedOrConnecting();
   }
 
   //

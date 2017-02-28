@@ -5,6 +5,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 
+import com.mapbox.mapboxsdk.net.ConnectivityReceiver;
 import com.mapbox.mapboxsdk.storage.FileSource;
 
 import java.io.File;
@@ -38,6 +39,9 @@ public class OfflineManager {
 
   // This object is implemented as a singleton
   private static OfflineManager instance;
+
+  // The application context
+  private Context context;
 
   /**
    * This callback receives an asynchronous response containing a list of all
@@ -83,6 +87,7 @@ public class OfflineManager {
    * Constructor
    */
   private OfflineManager(Context context) {
+    this.context = context.getApplicationContext();
     this.fileSource = FileSource.getInstance(context);
     initialize(fileSource);
 
@@ -180,6 +185,7 @@ public class OfflineManager {
     @NonNull byte[] metadata,
     @NonNull final CreateOfflineRegionCallback callback) {
 
+    ConnectivityReceiver.instance(context).activate();
     createOfflineRegion(fileSource, definition, metadata, new CreateOfflineRegionCallback() {
 
       @Override
@@ -187,6 +193,7 @@ public class OfflineManager {
         getHandler().post(new Runnable() {
           @Override
           public void run() {
+            ConnectivityReceiver.instance(context).deactivate();
             callback.onCreate(offlineRegion);
           }
         });
@@ -197,6 +204,7 @@ public class OfflineManager {
         getHandler().post(new Runnable() {
           @Override
           public void run() {
+            ConnectivityReceiver.instance(context).deactivate();
             callback.onError(error);
           }
         });
