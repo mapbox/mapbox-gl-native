@@ -1,20 +1,19 @@
 #pragma once
 
 #include <mbgl/map/view.hpp>
-#include <mbgl/gl/framebuffer.hpp>
-#include <mbgl/gl/texture.hpp>
-#include <mbgl/util/optional.hpp>
 #include <mbgl/util/image.hpp>
 
 namespace mbgl {
 
 namespace gl {
 class Context;
+class Texture;
 } // namespace gl
 
 class OffscreenTexture : public View {
 public:
     OffscreenTexture(gl::Context&, Size size = { 256, 256 });
+    ~OffscreenTexture();
 
     void bind() override;
 
@@ -22,13 +21,11 @@ public:
 
     gl::Texture& getTexture();
 
-public:
-    const Size size;
+    const Size& getSize() const;
 
 private:
-    gl::Context& context;
-    optional<gl::Framebuffer> framebuffer;
-    optional<gl::Texture> texture;
+    class Impl;
+    const std::unique_ptr<Impl> impl;
 };
 
 } // namespace mbgl
