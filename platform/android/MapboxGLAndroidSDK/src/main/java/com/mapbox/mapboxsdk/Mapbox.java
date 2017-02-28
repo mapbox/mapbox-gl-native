@@ -43,7 +43,7 @@ public final class Mapbox {
     return INSTANCE;
   }
 
-  private Mapbox(@NonNull Context context, @NonNull String accessToken) {
+  Mapbox(@NonNull Context context, @NonNull String accessToken) {
     this.context = context;
     this.accessToken = accessToken;
   }
