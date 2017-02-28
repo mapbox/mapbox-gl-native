@@ -38,7 +38,6 @@ private:
     float z;
 
     void calculateCartesian() {
-        polar = 130;
         auto _a = azimuthal;
         // We abstract "north"/"up" (compass-wise) to be 0º when really this is 90º (π/2): we correct for that here
         _a += 90;

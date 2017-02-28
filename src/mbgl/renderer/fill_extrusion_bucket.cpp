@@ -59,7 +59,7 @@ void FillExtrusionBucket::addFeature(const GeometryTileFeature& feature,
 
         std::size_t startVertices = vertices.vertexSize();
 
-        if (triangleSegments.empty() || triangleSegments.back().vertexLength + totalVertices > std::numeric_limits<uint16_t>::max()) {
+        if (triangleSegments.empty() || triangleSegments.back().vertexLength + (5 * (totalVertices - 1) + 1) > std::numeric_limits<uint16_t>::max()) {
             triangleSegments.emplace_back(startVertices, triangles.indexSize());
         }
 
@@ -87,26 +87,24 @@ void FillExtrusionBucket::addFeature(const GeometryTileFeature& feature,
                 if (i != 0) {
                     const auto& p2 = ring[i - 1];
 
-                    if (!isBoundaryEdge(p1, p2)) {
-                        const auto d1 = convertPoint<double>(p1);
-                        const auto d2 = convertPoint<double>(p2);
+                    const auto d1 = convertPoint<double>(p1);
+                    const auto d2 = convertPoint<double>(p2);
 
-                        const Point<double> perp = util::unit(util::perp(d2 - d1));
+                    const Point<double> perp = util::unit(util::perp(d2 - d1));
 
-                        vertices.emplace_back(FillExtrusionProgram::layoutVertex(p1, perp.x, perp.y, 0, 0, edgeDistance));
-                        vertices.emplace_back(FillExtrusionProgram::layoutVertex(p1, perp.x, perp.y, 0, 1, edgeDistance));
+                    vertices.emplace_back(FillExtrusionProgram::layoutVertex(p1, perp.x, perp.y, 0, 0, edgeDistance));
+                    vertices.emplace_back(FillExtrusionProgram::layoutVertex(p1, perp.x, perp.y, 0, 1, edgeDistance));
 
-                        edgeDistance += util::dist<int16_t>(d1, d2);
+                    edgeDistance += util::dist<int16_t>(d1, d2);
 
-                        vertices.emplace_back(FillExtrusionProgram::layoutVertex(p2, perp.x, perp.y, 0, 0, edgeDistance));
-                        vertices.emplace_back(FillExtrusionProgram::layoutVertex(p2, perp.x, perp.y, 0, 1, edgeDistance));
+                    vertices.emplace_back(FillExtrusionProgram::layoutVertex(p2, perp.x, perp.y, 0, 0, edgeDistance));
+                    vertices.emplace_back(FillExtrusionProgram::layoutVertex(p2, perp.x, perp.y, 0, 1, edgeDistance));
 
-                        triangles.emplace_back(triangleIndex, triangleIndex + 1, triangleIndex + 2);
-                        triangles.emplace_back(triangleIndex + 1, triangleIndex + 2, triangleIndex + 3);
-                        triangleIndex += 4;
-                        triangleSegment.vertexLength += 4;
-                        triangleSegment.indexLength += 2;
-                    }
+                    triangles.emplace_back(triangleIndex, triangleIndex + 1, triangleIndex + 2);
+                    triangles.emplace_back(triangleIndex + 1, triangleIndex + 2, triangleIndex + 3);
+                    triangleIndex += 4;
+                    triangleSegment.vertexLength += 4;
+                    triangleSegment.indexLength += 6;
                 }
             }
         }
@@ -152,13 +150,6 @@ void FillExtrusionBucket::render(Painter& painter,
 
 bool FillExtrusionBucket::hasData() const {
     return !triangleSegments.empty();
-}
-
-bool isBoundaryEdge(const Point<int16_t>& p1,
-                    const Point<int16_t>& p2) {
-    // TODO TODO is this even still necessary now that we (a) render to texture and (b) don't have outlines?? investigate -- it's always been kind of hacky anyway
-    return (p1.x == p2.x && (p1.x < 0 || p1.x > util::EXTENT)) ||
-        (p1.y == p2.y && (p1.y < 0 || p1.y > util::EXTENT));
 }
 
 } // namespace mbgl
