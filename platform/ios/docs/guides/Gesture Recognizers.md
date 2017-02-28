@@ -25,8 +25,6 @@ Several properties on an `MGLMapView` provide ways to enable or disable a set of
 |Two-finger drag | Adjusts the pitch of the `MGLMapView` | `pitchEnabled` |
 |One-finger zoom | Tap twice; on second tap, hold your finger on the map and pan up to zoom in, or down to zoom out | `zoomEnabled`|
 
-![quick zoom](img/user-interaction/quickzoom.gif) ![rotation](img/user-interaction/RotateSydney.gif)
-
 ## Adding custom gesture recognizers
 
 You can add `UIGestureRecognizers` to your map programmatically or via storyboard. Adding custom responses to gesture recognizers can enhance your user's experience, but try to use standard gestures where possible.
