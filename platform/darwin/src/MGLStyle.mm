@@ -574,42 +574,22 @@ static NSURL *MGLStyleURL_emerald;
 
 - (void)setTransition:(MGLTransition)transition
 {
-    [self setTransitionDuration:transition.duration];
-    [self setTransitionDelay:transition.delay];
+    auto transitionOptions = self.mapView.mbglMap->getTransitionOptions();
+    transitionOptions.duration = MGLDurationInSecondsFromTimeInterval(transition.duration);
+    transitionOptions.delay = MGLDurationInSecondsFromTimeInterval(transition.delay);
+    
+    self.mapView.mbglMap->setTransitionOptions(transitionOptions);
 }
 
 - (MGLTransition)transition
 {
     MGLTransition transition;
-    transition.delay = [self transitionDelay];
-    transition.duration = [self transitionDuration];
+    const mbgl::style::TransitionOptions transitionOptions = self.mapView.mbglMap->getTransitionOptions();
+
+    transition.delay = MGLTimeIntervalFromDurationInSeconds(transitionOptions.delay.value_or(mbgl::Duration::zero()));
+    transition.duration = MGLTimeIntervalFromDurationInSeconds(transitionOptions.duration.value_or(mbgl::Duration::zero()));
     
     return transition;
-}
-- (void)setTransitionDuration:(NSTimeInterval)duration
-{
-    auto transitionOptions = self.mapView.mbglMap->getTransitionOptions();
-    transitionOptions.duration = MGLDurationFromTimeInterval(duration);
-    self.mapView.mbglMap->setTransitionOptions(transitionOptions);
-}
-
-- (NSTimeInterval)transitionDuration
-{
-    const mbgl::style::TransitionOptions transitionOptions = self.mapView.mbglMap->getTransitionOptions();
-    return MGLTimeIntervalFromDuration(transitionOptions.duration.value_or(mbgl::Duration::zero()));
-}
-
-- (void)setTransitionDelay:(NSTimeInterval)delay
-{
-    auto transitionOptions = self.mapView.mbglMap->getTransitionOptions();
-    transitionOptions.delay = MGLDurationFromTimeInterval(delay);
-    self.mapView.mbglMap->setTransitionOptions(transitionOptions);
-}
-
-- (NSTimeInterval)transitionDelay
-{
-    const mbgl::style::TransitionOptions transitionOptions = self.mapView.mbglMap->getTransitionOptions();
-    return MGLTimeIntervalFromDuration(transitionOptions.delay.value_or(mbgl::Duration::zero()));
 }
 
 - (NSString *)description

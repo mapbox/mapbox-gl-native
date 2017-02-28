@@ -4,6 +4,7 @@
 #import "MGLSource.h"
 #import "MGLMapView_Private.h"
 #import "NSPredicate+MGLAdditions.h"
+#import "NSDate+MGLAdditions.h"
 #import "MGLStyleLayer_Private.h"
 #import "MGLStyleValue_Private.h"
 #import "MGLCircleStyleLayer.h"
@@ -134,11 +135,41 @@ namespace mbgl {
 
 #pragma mark - Accessing the Paint Attributes
 
+- (NSArray *)transitionKeys
+{
+    NSMutableArray *transitionKeys = [NSMutableArray array];
+    [transitionKeys addObject:@"circleBlur"];
+    [transitionKeys addObject:@"circleColor"];
+    [transitionKeys addObject:@"circleOpacity"];
+    [transitionKeys addObject:@"circleRadius"];
+    [transitionKeys addObject:@"circleScaleAlignment"];
+    [transitionKeys addObject:@"circlePitchScale"];
+    [transitionKeys addObject:@"circleStrokeColor"];
+    [transitionKeys addObject:@"circleStrokeOpacity"];
+    [transitionKeys addObject:@"circleStrokeWidth"];
+    [transitionKeys addObject:@"circleTranslation"];
+    [transitionKeys addObject:@"circleTranslate"];
+    [transitionKeys addObject:@"circleTranslationAnchor"];
+    [transitionKeys addObject:@"circleTranslateAnchor"];
+
+    return transitionKeys;
+}
+
 - (void)setCircleBlur:(MGLStyleValue<NSNumber *> *)circleBlur {
     MGLAssertStyleLayerIsValid();
 
     auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toDataDrivenPropertyValue(circleBlur);
     self.rawLayer->setCircleBlur(mbglValue);
+}
+
+- (void)mbx_setCircleBlurTransition:(NSValue *)transitionValue {
+    MGLAssertStyleLayerIsValid();
+
+    MGLTransition transition;
+    [transitionValue getValue:&transition];
+
+    mbgl::style::TransitionOptions options { { MGLDurationInSecondsFromTimeInterval(transition.duration) }, { MGLDurationInSecondsFromTimeInterval(transition.delay) } };
+    self.rawLayer->setCircleBlurTransition(options);
 }
 
 - (MGLStyleValue<NSNumber *> *)circleBlur {
@@ -158,6 +189,16 @@ namespace mbgl {
     self.rawLayer->setCircleColor(mbglValue);
 }
 
+- (void)mbx_setCircleColorTransition:(NSValue *)transitionValue {
+    MGLAssertStyleLayerIsValid();
+
+    MGLTransition transition;
+    [transitionValue getValue:&transition];
+
+    mbgl::style::TransitionOptions options { { MGLDurationInSecondsFromTimeInterval(transition.duration) }, { MGLDurationInSecondsFromTimeInterval(transition.delay) } };
+    self.rawLayer->setCircleColorTransition(options);
+}
+
 - (MGLStyleValue<MGLColor *> *)circleColor {
     MGLAssertStyleLayerIsValid();
 
@@ -173,6 +214,16 @@ namespace mbgl {
 
     auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toDataDrivenPropertyValue(circleOpacity);
     self.rawLayer->setCircleOpacity(mbglValue);
+}
+
+- (void)mbx_setCircleOpacityTransition:(NSValue *)transitionValue {
+    MGLAssertStyleLayerIsValid();
+
+    MGLTransition transition;
+    [transitionValue getValue:&transition];
+
+    mbgl::style::TransitionOptions options { { MGLDurationInSecondsFromTimeInterval(transition.duration) }, { MGLDurationInSecondsFromTimeInterval(transition.delay) } };
+    self.rawLayer->setCircleOpacityTransition(options);
 }
 
 - (MGLStyleValue<NSNumber *> *)circleOpacity {
@@ -192,6 +243,16 @@ namespace mbgl {
     self.rawLayer->setCircleRadius(mbglValue);
 }
 
+- (void)mbx_setCircleRadiusTransition:(NSValue *)transitionValue {
+    MGLAssertStyleLayerIsValid();
+
+    MGLTransition transition;
+    [transitionValue getValue:&transition];
+
+    mbgl::style::TransitionOptions options { { MGLDurationInSecondsFromTimeInterval(transition.duration) }, { MGLDurationInSecondsFromTimeInterval(transition.delay) } };
+    self.rawLayer->setCircleRadiusTransition(options);
+}
+
 - (MGLStyleValue<NSNumber *> *)circleRadius {
     MGLAssertStyleLayerIsValid();
 
@@ -207,6 +268,16 @@ namespace mbgl {
 
     auto mbglValue = MGLStyleValueTransformer<mbgl::style::CirclePitchScaleType, NSValue *, mbgl::style::CirclePitchScaleType, MGLCircleScaleAlignment>().toEnumPropertyValue(circleScaleAlignment);
     self.rawLayer->setCirclePitchScale(mbglValue);
+}
+
+- (void)mbx_setCircleScaleAlignmentTransition:(NSValue *)transitionValue {
+    MGLAssertStyleLayerIsValid();
+
+    MGLTransition transition;
+    [transitionValue getValue:&transition];
+
+    mbgl::style::TransitionOptions options { { MGLDurationInSecondsFromTimeInterval(transition.duration) }, { MGLDurationInSecondsFromTimeInterval(transition.delay) } };
+    self.rawLayer->setCirclePitchScaleTransition(options);
 }
 
 - (MGLStyleValue<NSValue *> *)circleScaleAlignment {
@@ -233,6 +304,16 @@ namespace mbgl {
     self.rawLayer->setCircleStrokeColor(mbglValue);
 }
 
+- (void)mbx_setCircleStrokeColorTransition:(NSValue *)transitionValue {
+    MGLAssertStyleLayerIsValid();
+
+    MGLTransition transition;
+    [transitionValue getValue:&transition];
+
+    mbgl::style::TransitionOptions options { { MGLDurationInSecondsFromTimeInterval(transition.duration) }, { MGLDurationInSecondsFromTimeInterval(transition.delay) } };
+    self.rawLayer->setCircleStrokeColorTransition(options);
+}
+
 - (MGLStyleValue<MGLColor *> *)circleStrokeColor {
     MGLAssertStyleLayerIsValid();
 
@@ -248,6 +329,16 @@ namespace mbgl {
 
     auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toDataDrivenPropertyValue(circleStrokeOpacity);
     self.rawLayer->setCircleStrokeOpacity(mbglValue);
+}
+
+- (void)mbx_setCircleStrokeOpacityTransition:(NSValue *)transitionValue {
+    MGLAssertStyleLayerIsValid();
+
+    MGLTransition transition;
+    [transitionValue getValue:&transition];
+
+    mbgl::style::TransitionOptions options { { MGLDurationInSecondsFromTimeInterval(transition.duration) }, { MGLDurationInSecondsFromTimeInterval(transition.delay) } };
+    self.rawLayer->setCircleStrokeOpacityTransition(options);
 }
 
 - (MGLStyleValue<NSNumber *> *)circleStrokeOpacity {
@@ -267,6 +358,16 @@ namespace mbgl {
     self.rawLayer->setCircleStrokeWidth(mbglValue);
 }
 
+- (void)mbx_setCircleStrokeWidthTransition:(NSValue *)transitionValue {
+    MGLAssertStyleLayerIsValid();
+
+    MGLTransition transition;
+    [transitionValue getValue:&transition];
+
+    mbgl::style::TransitionOptions options { { MGLDurationInSecondsFromTimeInterval(transition.duration) }, { MGLDurationInSecondsFromTimeInterval(transition.delay) } };
+    self.rawLayer->setCircleStrokeWidthTransition(options);
+}
+
 - (MGLStyleValue<NSNumber *> *)circleStrokeWidth {
     MGLAssertStyleLayerIsValid();
 
@@ -282,6 +383,16 @@ namespace mbgl {
 
     auto mbglValue = MGLStyleValueTransformer<std::array<float, 2>, NSValue *>().toInterpolatablePropertyValue(circleTranslation);
     self.rawLayer->setCircleTranslate(mbglValue);
+}
+
+- (void)mbx_setCircleTranslationTransition:(NSValue *)transitionValue {
+    MGLAssertStyleLayerIsValid();
+
+    MGLTransition transition;
+    [transitionValue getValue:&transition];
+
+    mbgl::style::TransitionOptions options { { MGLDurationInSecondsFromTimeInterval(transition.duration) }, { MGLDurationInSecondsFromTimeInterval(transition.delay) } };
+    self.rawLayer->setCircleTranslateTransition(options);
 }
 
 - (MGLStyleValue<NSValue *> *)circleTranslation {
@@ -306,6 +417,16 @@ namespace mbgl {
 
     auto mbglValue = MGLStyleValueTransformer<mbgl::style::TranslateAnchorType, NSValue *, mbgl::style::TranslateAnchorType, MGLCircleTranslationAnchor>().toEnumPropertyValue(circleTranslationAnchor);
     self.rawLayer->setCircleTranslateAnchor(mbglValue);
+}
+
+- (void)mbx_setCircleTranslationAnchorTransition:(NSValue *)transitionValue {
+    MGLAssertStyleLayerIsValid();
+
+    MGLTransition transition;
+    [transitionValue getValue:&transition];
+
+    mbgl::style::TransitionOptions options { { MGLDurationInSecondsFromTimeInterval(transition.duration) }, { MGLDurationInSecondsFromTimeInterval(transition.delay) } };
+    self.rawLayer->setCircleTranslateAnchorTransition(options);
 }
 
 - (MGLStyleValue<NSValue *> *)circleTranslationAnchor {

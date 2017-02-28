@@ -71,7 +71,7 @@ typedef NS_OPTIONS(NSUInteger, MGLMapDebugMaskOptions) {
 };
 
 /**
- A structure containing information about a transition values.
+ A structure containing information about a transition.
  */
 typedef struct MGLTransition {
     /**
@@ -80,7 +80,7 @@ typedef struct MGLTransition {
     NSTimeInterval duration;
     
     /**
-     The delay in seconds to before applying any changes to the style URL or to layout and paint attributes.
+     The delay in seconds before applying any changes to the style URL or to layout and paint attributes.
      */
     NSTimeInterval delay;
 } MGLTransition;

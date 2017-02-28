@@ -30,7 +30,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 static MGL_EXPORT const NSInteger MGLStyleDefaultVersion = 9;
 
-
 /**
  The proxy object for the current map style.
 
@@ -195,7 +194,8 @@ MGL_EXPORT
 @property (nonatomic, strong) NS_SET_OF(__kindof MGLSource *) *sources;
 
 /**
- Transition values.
+ Values describing animated transitions to styling changes, either to the style URL 
+ or to individual properties.
  */
 @property (nonatomic) MGLTransition transition;
 
