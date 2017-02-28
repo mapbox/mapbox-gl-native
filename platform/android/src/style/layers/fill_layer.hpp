@@ -22,6 +22,8 @@ public:
 
     FillLayer(mbgl::Map&, mbgl::style::FillLayer&);
 
+    FillLayer(mbgl::Map&, std::unique_ptr<mbgl::style::FillLayer>);
+
     ~FillLayer();
 
     // Property getters

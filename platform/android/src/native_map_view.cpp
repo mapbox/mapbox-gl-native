@@ -780,10 +780,15 @@ void NativeMapView::addLayer(JNIEnv& env, jlong nativeLayerPtr, jni::String befo
 }
 
 /**
- * Remove by layer id. Ownership is not transferred back
+ * Remove by layer id.
  */
-void NativeMapView::removeLayerById(JNIEnv& env, jni::String id) {
-    map->removeLayer(jni::Make<std::string>(env, id));
+jni::Object<Layer> NativeMapView::removeLayerById(JNIEnv& env, jni::String id) {
+    std::unique_ptr<mbgl::style::Layer> coreLayer = map->removeLayer(jni::Make<std::string>(env, id));
+    if (coreLayer) {
+        return jni::Object<Layer>(createJavaLayerPeer(env, *map, std::move(coreLayer)));
+    } else {
+        return jni::Object<Layer>();
+    }
 }
 
 /**

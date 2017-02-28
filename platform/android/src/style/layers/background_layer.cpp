@@ -9,12 +9,25 @@
 namespace mbgl {
 namespace android {
 
+    /**
+     * Creates an owning peer object (for layers not attached to the map) from the JVM side
+     */
     BackgroundLayer::BackgroundLayer(jni::JNIEnv& env, jni::String layerId)
         : Layer(env, std::make_unique<mbgl::style::BackgroundLayer>(jni::Make<std::string>(env, layerId))) {
     }
 
+    /**
+     * Creates a non-owning peer object (for layers currently attached to the map)
+     */
     BackgroundLayer::BackgroundLayer(mbgl::Map& map, mbgl::style::BackgroundLayer& coreLayer)
         : Layer(map, coreLayer) {
+    }
+
+    /**
+     * Creates an owning peer object (for layers not attached to the map)
+     */
+    BackgroundLayer::BackgroundLayer(mbgl::Map& map, std::unique_ptr<mbgl::style::BackgroundLayer> coreLayer)
+        : Layer(map, std::move(coreLayer)) {
     }
 
     BackgroundLayer::~BackgroundLayer() = default;

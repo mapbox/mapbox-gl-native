@@ -22,6 +22,8 @@ public:
 
     LineLayer(mbgl::Map&, mbgl::style::LineLayer&);
 
+    LineLayer(mbgl::Map&, std::unique_ptr<mbgl::style::LineLayer>);
+
     ~LineLayer();
 
     // Property getters
