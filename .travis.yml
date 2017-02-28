@@ -132,6 +132,58 @@ matrix:
         - ./platform/node/scripts/after_success.sh
       after_failure:
         - aws s3 cp . s3://mapbox/mapbox-gl-native/render-tests/$TRAVIS_JOB_NUMBER --recursive --exclude "*" --include "*.trace"
+        
+    # EGL - Node 6 - Clang 3.8 - Debug
+    - os: linux
+      sudo: required
+      dist: trusty
+      language: node
+      compiler: "egl-node6-clang38-debug"
+      env: BUILDTYPE=Debug _CXX=clang++-3.8 _CC=clang-3.8 WITH_EGL=1
+      addons: *clang38
+      before_script:
+        - mapbox_install_logbt
+        - mapbox_start_xvfb
+        - mapbox_export_mesa_library_path
+      script:
+        - nvm install 6
+        - nvm use 6
+        - make node
+        - ./logbt -- $(scripts/mason.sh PREFIX apitrace VERSION 6a30de1)/bin/apitrace trace --api=egl -v make test-node
+      after_script:
+        - ccache --show-stats
+        - ./platform/node/scripts/after_script.sh ${TRAVIS_JOB_NUMBER}
+      after_failure:
+        - aws s3 cp . s3://mapbox/mapbox-gl-native/render-tests/$TRAVIS_JOB_NUMBER --recursive --exclude "*" --include "*.trace"
+
+    # EGL - Node 6 - Clang 3.8 - Release
+    - os: linux
+      sudo: required
+      dist: trusty
+      language: node
+      compiler: "egl-node6-clang38-release"
+      env: BUILDTYPE=Release _CXX=clang++-3.8 _CC=clang-3.8 WITH_EGL=1
+      addons: *clang38
+      before_script:
+        # fglrx causes the GLX extension to be unavailable
+        - sudo apt-get purge -qq fglrx
+        - export PACKAGE_JSON_VERSION=$(node -e "console.log(require('./package.json').version)")
+        - export PUBLISH=$([[ "${TRAVIS_TAG:-}" == "node-v${PACKAGE_JSON_VERSION}" ]] && echo true)
+        - mapbox_install_logbt
+        - mapbox_start_xvfb
+        - mapbox_export_mesa_library_path
+      script:
+        - nvm install 6
+        - nvm use 6
+        - make node
+        - ./logbt -- $(scripts/mason.sh PREFIX apitrace VERSION 6a30de1)/bin/apitrace trace --api=egl -v make test-node
+      after_script:
+        - ccache --show-stats
+        - ./platform/node/scripts/after_script.sh ${TRAVIS_JOB_NUMBER}
+      after_success:
+        - ./platform/node/scripts/after_success.sh
+      after_failure:
+        - aws s3 cp . s3://mapbox/mapbox-gl-native/render-tests/$TRAVIS_JOB_NUMBER --recursive --exclude "*" --include "*.trace"
 
     # EGL - GCC 5 - Debug (Coverage)
     - os: linux
