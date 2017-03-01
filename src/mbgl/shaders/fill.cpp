@@ -12,17 +12,15 @@ attribute vec2 a_pos;
 uniform mat4 u_matrix;
 
 uniform lowp float a_color_t;
-attribute lowp vec4 a_color_min;
-attribute lowp vec4 a_color_max;
+attribute lowp vec4 a_color;
 varying lowp vec4 color;
 uniform lowp float a_opacity_t;
-attribute lowp float a_opacity_min;
-attribute lowp float a_opacity_max;
+attribute lowp vec2 a_opacity;
 varying lowp float opacity;
 
 void main() {
-    color = mix(a_color_min, a_color_max, a_color_t);
-    opacity = mix(a_opacity_min, a_opacity_max, a_opacity_t);
+    color = unpack_mix_vec4(a_color, a_color_t);
+    opacity = unpack_mix_vec2(a_opacity, a_opacity_t);
 
     gl_Position = u_matrix * vec4(a_pos, 0, 1);
 }

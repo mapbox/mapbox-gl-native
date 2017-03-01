@@ -14,45 +14,38 @@ uniform vec2 u_extrude_scale;
 attribute vec2 a_pos;
 
 uniform lowp float a_color_t;
-attribute lowp vec4 a_color_min;
-attribute lowp vec4 a_color_max;
+attribute lowp vec4 a_color;
 varying lowp vec4 color;
 uniform lowp float a_radius_t;
-attribute mediump float a_radius_min;
-attribute mediump float a_radius_max;
+attribute mediump vec2 a_radius;
 varying mediump float radius;
 uniform lowp float a_blur_t;
-attribute lowp float a_blur_min;
-attribute lowp float a_blur_max;
+attribute lowp vec2 a_blur;
 varying lowp float blur;
 uniform lowp float a_opacity_t;
-attribute lowp float a_opacity_min;
-attribute lowp float a_opacity_max;
+attribute lowp vec2 a_opacity;
 varying lowp float opacity;
 uniform lowp float a_stroke_color_t;
-attribute lowp vec4 a_stroke_color_min;
-attribute lowp vec4 a_stroke_color_max;
+attribute lowp vec4 a_stroke_color;
 varying lowp vec4 stroke_color;
 uniform lowp float a_stroke_width_t;
-attribute mediump float a_stroke_width_min;
-attribute mediump float a_stroke_width_max;
+attribute mediump vec2 a_stroke_width;
 varying mediump float stroke_width;
 uniform lowp float a_stroke_opacity_t;
-attribute lowp float a_stroke_opacity_min;
-attribute lowp float a_stroke_opacity_max;
+attribute lowp vec2 a_stroke_opacity;
 varying lowp float stroke_opacity;
 
 varying vec2 v_extrude;
 varying lowp float v_antialiasblur;
 
 void main(void) {
-    color = mix(a_color_min, a_color_max, a_color_t);
-    radius = mix(a_radius_min, a_radius_max, a_radius_t);
-    blur = mix(a_blur_min, a_blur_max, a_blur_t);
-    opacity = mix(a_opacity_min, a_opacity_max, a_opacity_t);
-    stroke_color = mix(a_stroke_color_min, a_stroke_color_max, a_stroke_color_t);
-    stroke_width = mix(a_stroke_width_min, a_stroke_width_max, a_stroke_width_t);
-    stroke_opacity = mix(a_stroke_opacity_min, a_stroke_opacity_max, a_stroke_opacity_t);
+    color = unpack_mix_vec4(a_color, a_color_t);
+    radius = unpack_mix_vec2(a_radius, a_radius_t);
+    blur = unpack_mix_vec2(a_blur, a_blur_t);
+    opacity = unpack_mix_vec2(a_opacity, a_opacity_t);
+    stroke_color = unpack_mix_vec4(a_stroke_color, a_stroke_color_t);
+    stroke_width = unpack_mix_vec2(a_stroke_width, a_stroke_width_t);
+    stroke_opacity = unpack_mix_vec2(a_stroke_opacity, a_stroke_opacity_t);
 
     // unencode the extrusion vector that we snuck into the a_pos vector
     v_extrude = vec2(mod(a_pos, 2.0) * 2.0 - 1.0);

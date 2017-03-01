@@ -60,9 +60,11 @@ ${fragmentPrelude}
 ].forEach(function (shaderName) {
     function applyPragmas(source, pragmas) {
         return source.replace(/#pragma mapbox: ([\w]+) ([\w]+) ([\w]+) ([\w]+)/g, (match, operation, precision, type, name) => {
+            const a_type = type === "float" ? "vec2" : "vec4";
             return pragmas[operation]
                 .join("\n")
                 .replace(/\{type\}/g, type)
+                .replace(/\{a_type}/g, a_type)
                 .replace(/\{precision\}/g, precision)
                 .replace(/\{name\}/g, name);
         });
@@ -73,12 +75,11 @@ ${fragmentPrelude}
         return applyPragmas(source, {
                 define: [
                     "uniform lowp float a_{name}_t;",
-                    "attribute {precision} {type} a_{name}_min;",
-                    "attribute {precision} {type} a_{name}_max;",
+                    "attribute {precision} {a_type} a_{name};",
                     "varying {precision} {type} {name};"
                 ],
                 initialize: [
-                    "{name} = mix(a_{name}_min, a_{name}_max, a_{name}_t);"
+                    "{name} = unpack_mix_{a_type}(a_{name}, a_{name}_t);"
                 ]
             });
     }

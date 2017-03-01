@@ -15,17 +15,15 @@ uniform vec2 u_world;
 varying vec2 v_pos;
 
 uniform lowp float a_outline_color_t;
-attribute lowp vec4 a_outline_color_min;
-attribute lowp vec4 a_outline_color_max;
+attribute lowp vec4 a_outline_color;
 varying lowp vec4 outline_color;
 uniform lowp float a_opacity_t;
-attribute lowp float a_opacity_min;
-attribute lowp float a_opacity_max;
+attribute lowp vec2 a_opacity;
 varying lowp float opacity;
 
 void main() {
-    outline_color = mix(a_outline_color_min, a_outline_color_max, a_outline_color_t);
-    opacity = mix(a_opacity_min, a_opacity_max, a_opacity_t);
+    outline_color = unpack_mix_vec4(a_outline_color, a_outline_color_t);
+    opacity = unpack_mix_vec2(a_opacity, a_opacity_t);
 
     gl_Position = u_matrix * vec4(a_pos, 0, 1);
     v_pos = (gl_Position.xy / gl_Position.w + 1.0) / 2.0 * u_world;

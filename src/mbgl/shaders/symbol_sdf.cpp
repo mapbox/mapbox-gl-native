@@ -9,30 +9,24 @@ const char* symbol_sdf::name = "symbol_sdf";
 const char* symbol_sdf::vertexSource = R"MBGL_SHADER(
 const float PI = 3.141592653589793;
 
-attribute vec2 a_pos;
-attribute vec2 a_offset;
+attribute vec4 a_pos_offset;
 attribute vec2 a_texture_pos;
 attribute vec4 a_data;
 
 uniform lowp float a_fill_color_t;
-attribute lowp vec4 a_fill_color_min;
-attribute lowp vec4 a_fill_color_max;
+attribute lowp vec4 a_fill_color;
 varying lowp vec4 fill_color;
 uniform lowp float a_halo_color_t;
-attribute lowp vec4 a_halo_color_min;
-attribute lowp vec4 a_halo_color_max;
+attribute lowp vec4 a_halo_color;
 varying lowp vec4 halo_color;
 uniform lowp float a_opacity_t;
-attribute lowp float a_opacity_min;
-attribute lowp float a_opacity_max;
+attribute lowp vec2 a_opacity;
 varying lowp float opacity;
 uniform lowp float a_halo_width_t;
-attribute lowp float a_halo_width_min;
-attribute lowp float a_halo_width_max;
+attribute lowp vec2 a_halo_width;
 varying lowp float halo_width;
 uniform lowp float a_halo_blur_t;
-attribute lowp float a_halo_blur_min;
-attribute lowp float a_halo_blur_max;
+attribute lowp vec2 a_halo_blur;
 varying lowp float halo_blur;
 
 // matrix is for the vertex position.
@@ -53,11 +47,14 @@ varying vec2 v_fade_tex;
 varying float v_gamma_scale;
 
 void main() {
-    fill_color = mix(a_fill_color_min, a_fill_color_max, a_fill_color_t);
-    halo_color = mix(a_halo_color_min, a_halo_color_max, a_halo_color_t);
-    opacity = mix(a_opacity_min, a_opacity_max, a_opacity_t);
-    halo_width = mix(a_halo_width_min, a_halo_width_max, a_halo_width_t);
-    halo_blur = mix(a_halo_blur_min, a_halo_blur_max, a_halo_blur_t);
+    fill_color = unpack_mix_vec4(a_fill_color, a_fill_color_t);
+    halo_color = unpack_mix_vec4(a_halo_color, a_halo_color_t);
+    opacity = unpack_mix_vec2(a_opacity, a_opacity_t);
+    halo_width = unpack_mix_vec2(a_halo_width, a_halo_width_t);
+    halo_blur = unpack_mix_vec2(a_halo_blur, a_halo_blur_t);
+
+    vec2 a_pos = a_pos_offset.xy;
+    vec2 a_offset = a_pos_offset.zw;
 
     vec2 a_tex = a_texture_pos.xy;
     mediump float a_labelminzoom = a_data[0];
