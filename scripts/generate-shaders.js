@@ -65,8 +65,6 @@ require('./style-code');
 
 #pragma once
 
-#include <mbgl/gl/gl.hpp>
-
 namespace mbgl {
 namespace shaders {
 
