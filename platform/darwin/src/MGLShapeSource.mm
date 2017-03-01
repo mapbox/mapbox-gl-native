@@ -11,7 +11,12 @@
 #include <mbgl/map/map.hpp>
 #include <mbgl/style/sources/geojson_source.hpp>
 
-
+const MGLShapeSourceOption MGLShapeSourceOptionClustered = @"MGLShapeSourceOptionClustered";
+const MGLShapeSourceOption MGLShapeSourceOptionClusterRadius = @"MGLShapeSourceOptionClusterRadius";
+const MGLShapeSourceOption MGLShapeSourceOptionMaximumZoomLevelForClustering = @"MGLShapeSourceOptionMaximumZoomLevelForClustering";
+const MGLShapeSourceOption MGLShapeSourceOptionMaximumZoomLevel = @"MGLShapeSourceOptionMaximumZoomLevel";
+const MGLShapeSourceOption MGLShapeSourceOptionBuffer = @"MGLShapeSourceOptionBuffer";
+const MGLShapeSourceOption MGLShapeSourceOptionSimplificationTolerance = @"MGLShapeSourceOptionSimplificationTolerance";
 
 @interface MGLShapeSource ()
 
@@ -30,10 +35,10 @@
     if (self = [super initWithIdentifier:identifier]) {
         auto geoJSONOptions = MGLGeoJSONOptionsFromDictionary(options);
         auto source = std::make_unique<mbgl::style::GeoJSONSource>(identifier.UTF8String, geoJSONOptions);
-        
+
         _pendingSource = std::move(source);
         self.rawSource = _pendingSource.get();
-        
+
         self.URL = url;
     }
     return self;
@@ -43,10 +48,10 @@
     if (self = [super initWithIdentifier:identifier]) {
         auto geoJSONOptions = MGLGeoJSONOptionsFromDictionary(options);
         auto source = std::make_unique<mbgl::style::GeoJSONSource>(identifier.UTF8String, geoJSONOptions);
-        
+
         _pendingSource = std::move(source);
         self.rawSource = _pendingSource.get();
-        
+
         self.shape = shape;
     }
     return self;
@@ -82,9 +87,20 @@
 }
 
 - (void)removeFromMapView:(MGLMapView *)mapView {
+    if (self.rawSource != mapView.mbglMap->getSource(self.identifier.UTF8String)) {
+        return;
+    }
+
     auto removedSource = mapView.mbglMap->removeSource(self.identifier.UTF8String);
 
-    _pendingSource = std::move(reinterpret_cast<std::unique_ptr<mbgl::style::GeoJSONSource> &>(removedSource));
+    mbgl::style::GeoJSONSource *source = dynamic_cast<mbgl::style::GeoJSONSource *>(removedSource.get());
+    if (!source) {
+        return;
+    }
+
+    removedSource.release();
+
+    _pendingSource = std::unique_ptr<mbgl::style::GeoJSONSource>(source);
     self.rawSource = _pendingSource.get();
 }
 

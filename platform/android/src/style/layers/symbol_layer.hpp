@@ -22,6 +22,8 @@ public:
 
     SymbolLayer(mbgl::Map&, mbgl::style::SymbolLayer&);
 
+    SymbolLayer(mbgl::Map&, std::unique_ptr<mbgl::style::SymbolLayer>);
+
     ~SymbolLayer();
 
     // Property getters

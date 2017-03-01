@@ -20,6 +20,9 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.UiSettings;
 import com.mapbox.mapboxsdk.testapp.R;
 
+/**
+ * Test activity showcasing using the scrollBy Camera API by moving x,y pixels above Grenada, Spain.
+ */
 public class ScrollByActivity extends AppCompatActivity implements OnMapReadyCallback {
 
   public static final int MULTIPLIER_PER_PIXEL = 50;

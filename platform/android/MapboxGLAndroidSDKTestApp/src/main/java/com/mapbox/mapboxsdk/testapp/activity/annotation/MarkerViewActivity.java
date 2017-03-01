@@ -3,17 +3,16 @@ package com.mapbox.mapboxsdk.testapp.activity.annotation;
 import android.animation.Animator;
 import android.animation.AnimatorInflater;
 import android.animation.AnimatorListenerAdapter;
+import android.animation.FloatEvaluator;
 import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -39,6 +38,13 @@ import com.mapbox.mapboxsdk.testapp.model.annotations.TextMarkerViewOptions;
 
 import java.util.Random;
 
+/**
+ * Test activity showcasing multiple MarkerViews above Washington D.C.
+ * <p>
+ * Shows a couple of open InfoWindows out of current Viewport.
+ * Updates the rotation and location of a couple of MarkerViews.
+ * </p>
+ */
 public class MarkerViewActivity extends AppCompatActivity {
 
   private static final LatLng[] LAT_LNGS = new LatLng[] {
@@ -47,7 +53,7 @@ public class MarkerViewActivity extends AppCompatActivity {
     new LatLng(38.907227, -77.036530),
     new LatLng(38.905607, -77.031916),
     new LatLng(38.889441, -77.050134),
-    new LatLng(38.888000, -77.050000) //Slight overlap to show re-ordering on selection
+    new LatLng(38.888000, -77.050000) // Slight overlap to show re-ordering on selection
   };
 
   private MapboxMap mapboxMap;
@@ -70,15 +76,6 @@ public class MarkerViewActivity extends AppCompatActivity {
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_marker_view);
-
-    Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-    setSupportActionBar(toolbar);
-
-    final ActionBar actionBar = getSupportActionBar();
-    if (actionBar != null) {
-      actionBar.setDisplayHomeAsUpEnabled(true);
-      actionBar.setDisplayShowHomeEnabled(true);
-    }
 
     final TextView viewCountView = (TextView) findViewById(R.id.countView);
     mapView = (MapView) findViewById(R.id.mapView);
@@ -110,7 +107,12 @@ public class MarkerViewActivity extends AppCompatActivity {
         options.title("Hello");
         options.position(new LatLng(38.899774, -77.023237));
         options.flat(true);
-        mapboxMap.addMarker(options);
+        MarkerView markerView = mapboxMap.addMarker(options);
+
+        // Use object animator to rotate MarkerView
+        ValueAnimator markerAnimator = ObjectAnimator.ofObject(markerView, "rotation", new FloatEvaluator(), -90, 90);
+        markerAnimator.setDuration(5000);
+        markerAnimator.start();
 
         MarkerViewActivity.this.mapboxMap.addMarker(new MarkerOptions()
           .title("United States")
@@ -168,13 +170,13 @@ public class MarkerViewActivity extends AppCompatActivity {
         movingMarkerOne = MarkerViewActivity.this.mapboxMap.addMarker(new MarkerViewOptions()
           .position(CarLocation.CAR_0_LNGS[0])
           .icon(IconFactory.getInstance(mapView.getContext())
-            .fromResource(R.drawable.ic_chelsea))
+            .fromResource(R.drawable.ic_android))
         );
 
         movingMarkerTwo = mapboxMap.addMarker(new MarkerViewOptions()
           .position(CarLocation.CAR_1_LNGS[0])
           .icon(IconFactory.getInstance(mapView.getContext())
-            .fromResource(R.drawable.ic_arsenal))
+            .fromResource(R.drawable.ic_android_2))
         );
 
         // allow more open infowindows at the same time
@@ -456,17 +458,6 @@ public class MarkerViewActivity extends AppCompatActivity {
   public void onLowMemory() {
     super.onLowMemory();
     mapView.onLowMemory();
-  }
-
-  @Override
-  public boolean onOptionsItemSelected(MenuItem item) {
-    switch (item.getItemId()) {
-      case android.R.id.home:
-        onBackPressed();
-        return true;
-      default:
-        return super.onOptionsItemSelected(item);
-    }
   }
 
   private static class CarLocation {

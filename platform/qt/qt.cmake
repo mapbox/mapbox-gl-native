@@ -25,15 +25,16 @@ set(MBGL_QT_FILES
     PRIVATE platform/default/mbgl/storage/offline_database.hpp
     PRIVATE platform/default/mbgl/storage/offline_download.cpp
     PRIVATE platform/default/mbgl/storage/offline_download.hpp
-    PRIVATE platform/default/sqlite3.cpp
     PRIVATE platform/default/sqlite3.hpp
 
     # Misc
     PRIVATE platform/default/logging_stderr.cpp
 
     # Thread pool
+    PRIVATE platform/default/mbgl/util/shared_thread_pool.cpp
+    PRIVATE platform/default/mbgl/util/shared_thread_pool.hpp
     PRIVATE platform/default/mbgl/util/default_thread_pool.cpp
-    PRIVATE platform/default/mbgl/util/default_thread_pool.cpp
+    PRIVATE platform/default/mbgl/util/default_thread_pool.hpp
 
     # Platform integration
     PRIVATE platform/qt/src/async_task.cpp
@@ -45,6 +46,7 @@ set(MBGL_QT_FILES
     PRIVATE platform/qt/src/image.cpp
     PRIVATE platform/qt/src/run_loop.cpp
     PRIVATE platform/qt/src/run_loop_impl.hpp
+    PRIVATE platform/qt/src/sqlite3.cpp
     PRIVATE platform/qt/src/string_stdlib.cpp
     PRIVATE platform/qt/src/timer.cpp
     PRIVATE platform/qt/src/timer_impl.hpp

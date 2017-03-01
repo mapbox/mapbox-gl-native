@@ -160,8 +160,8 @@ public class GeoJsonSource extends Source {
   }
 
   protected void setRawJson(String geoJson) {
-    //Wrap the String in a map as an Object is expected by the
-    //style conversion template
+    // Wrap the String in a map as an Object is expected by the
+    // style conversion template
     HashMap<String, String> wrapper = new HashMap<>();
     wrapper.put("data", geoJson);
     nativeSetGeoJson(wrapper);

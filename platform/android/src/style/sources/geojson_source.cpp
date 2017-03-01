@@ -27,19 +27,19 @@ namespace android {
     void GeoJSONSource::setGeoJSON(jni::JNIEnv& env, jni::Object<> json) {
         using namespace mbgl::style::conversion;
 
-        //Convert the jni object
+        // Convert the jni object
         Result<GeoJSON> converted = convert<GeoJSON>(Value(env, json));
         if(!converted) {
             mbgl::Log::Error(mbgl::Event::JNI, "Error setting geo json: " + converted.error().message);
             return;
         }
 
-        //Update the core source
+        // Update the core source
         source.as<mbgl::style::GeoJSONSource>()->GeoJSONSource::setGeoJSON(*converted);
     }
 
     void GeoJSONSource::setURL(jni::JNIEnv& env, jni::String url) {
-        //Update the core source
+        // Update the core source
         source.as<mbgl::style::GeoJSONSource>()->GeoJSONSource::setURL(jni::Make<std::string>(env, url));
     }
 
@@ -51,12 +51,12 @@ namespace android {
     }
 
     void GeoJSONSource::registerNative(jni::JNIEnv& env) {
-        //Lookup the class
+        // Lookup the class
         GeoJSONSource::javaClass = *jni::Class<GeoJSONSource>::Find(env).NewGlobalRef(env).release();
 
         #define METHOD(MethodPtr, name) jni::MakeNativePeerMethod<decltype(MethodPtr), (MethodPtr)>(name)
 
-        //Register the peer
+        // Register the peer
         jni::RegisterNativePeer<GeoJSONSource>(
             env, GeoJSONSource::javaClass, "nativePtr",
             std::make_unique<GeoJSONSource, JNIEnv&, jni::String, jni::Object<>>,

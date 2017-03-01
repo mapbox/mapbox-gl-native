@@ -56,23 +56,28 @@ public class OfflineRegionStatus {
 
   /*
    * Use setObserver(OfflineRegionObserver observer) to obtain a OfflineRegionStatus object.
+   *
+   * For JNI use only
    */
-
-  private OfflineRegionStatus() {
-    // For JNI use only
+  private OfflineRegionStatus(int downloadState, long completedResourceCount,
+                              long completedResourceSize, long completedTileCount,
+                              long completedTileSize, long requiredResourceCount,
+                              boolean requiredResourceCountIsPrecise) {
+    this.downloadState = downloadState;
+    this.completedResourceCount = completedResourceCount;
+    this.completedResourceSize = completedResourceSize;
+    this.completedTileCount = completedTileCount;
+    this.completedTileSize = completedTileSize;
+    this.requiredResourceCount = requiredResourceCount;
+    this.requiredResourceCountIsPrecise = requiredResourceCountIsPrecise;
   }
 
-  /*
+  /**
    * Is the region complete?
    */
-
   public boolean isComplete() {
     return (completedResourceCount == requiredResourceCount);
   }
-
-  /*
-   * Getters
-   */
 
   @OfflineRegion.DownloadState
   public int getDownloadState() {

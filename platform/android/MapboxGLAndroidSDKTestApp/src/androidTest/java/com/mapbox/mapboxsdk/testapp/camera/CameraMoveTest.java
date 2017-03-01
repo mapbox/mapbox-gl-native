@@ -22,6 +22,7 @@ import com.mapbox.mapboxsdk.testapp.utils.ViewUtils;
 import org.hamcrest.Matcher;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -44,6 +45,7 @@ public class CameraMoveTest {
   }
 
   @Test
+  @Ignore
   public void testMoveToCameraPositionTarget() {
     ViewUtils.checkViewIsDisplayed(R.id.mapView);
     final MapboxMap mapboxMap = rule.getActivity().getMapboxMap();
@@ -66,6 +68,7 @@ public class CameraMoveTest {
   }
 
   @Test
+  @Ignore
   public void testMoveToCameraPositionTargetZoom() {
     ViewUtils.checkViewIsDisplayed(R.id.mapView);
     final MapboxMap mapboxMap = rule.getActivity().getMapboxMap();
@@ -84,6 +87,7 @@ public class CameraMoveTest {
   }
 
   @Test
+  @Ignore
   public void testMoveToCameraPosition() {
     ViewUtils.checkViewIsDisplayed(R.id.mapView);
     final MapboxMap mapboxMap = rule.getActivity().getMapboxMap();
@@ -114,6 +118,7 @@ public class CameraMoveTest {
   }
 
   @Test
+  @Ignore
   public void testMoveToBounds() {
     ViewUtils.checkViewIsDisplayed(R.id.mapView);
     final MapboxMap mapboxMap = rule.getActivity().getMapboxMap();
@@ -142,6 +147,7 @@ public class CameraMoveTest {
   }
 
   @Test
+  @Ignore
   public void testMoveToMoveBy() {
     ViewUtils.checkViewIsDisplayed(R.id.mapView);
     final MapboxMap mapboxMap = rule.getActivity().getMapboxMap();
@@ -161,6 +167,7 @@ public class CameraMoveTest {
   }
 
   @Test
+  @Ignore
   public void testMoveToZoomIn() {
     ViewUtils.checkViewIsDisplayed(R.id.mapView);
     final MapboxMap mapboxMap = rule.getActivity().getMapboxMap();
@@ -175,6 +182,7 @@ public class CameraMoveTest {
   }
 
   @Test
+  @Ignore
   public void testMoveToZoomOut() {
     ViewUtils.checkViewIsDisplayed(R.id.mapView);
     final MapboxMap mapboxMap = rule.getActivity().getMapboxMap();
@@ -190,6 +198,7 @@ public class CameraMoveTest {
   }
 
   @Test
+  @Ignore
   public void testMoveToZoomBy() {
     ViewUtils.checkViewIsDisplayed(R.id.mapView);
     final MapboxMap mapboxMap = rule.getActivity().getMapboxMap();
@@ -205,6 +214,7 @@ public class CameraMoveTest {
   }
 
   @Test
+  @Ignore
   public void testMoveToZoomTo() {
     ViewUtils.checkViewIsDisplayed(R.id.mapView);
     final MapboxMap mapboxMap = rule.getActivity().getMapboxMap();

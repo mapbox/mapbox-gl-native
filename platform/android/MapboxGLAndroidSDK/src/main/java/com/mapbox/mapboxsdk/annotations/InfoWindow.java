@@ -133,7 +133,7 @@ public class InfoWindow {
       float x = coordinates.x - (view.getMeasuredWidth() / 2) + offsetX;
       float y = coordinates.y - view.getMeasuredHeight() + offsetY;
 
-      if (view instanceof InfoWindowView) {
+      if (view instanceof BubbleLayout) {
         // only apply repositioning/margin for InfoWindowView
         Resources resources = mapView.getContext().getResources();
 
@@ -187,8 +187,7 @@ public class InfoWindow {
         }
 
         // Adjust tipView
-        InfoWindowView infoWindowView = (InfoWindowView) view;
-        infoWindowView.setTipViewMarginLeft((int) tipViewMarginLeft);
+        ((BubbleLayout) view).setArrowPosition(tipViewMarginLeft);
       }
 
       // set anchor popupwindowview
@@ -198,7 +197,7 @@ public class InfoWindow {
       // Calculate x-offset for update method
       viewWidthOffset = x - coordinates.x - offsetX;
 
-      close(); //if it was already opened
+      close(); // if it was already opened
       mapView.addView(view, lp);
       isVisible = true;
     }
@@ -284,7 +283,7 @@ public class InfoWindow {
     if (mapboxMap != null && marker != null && view != null) {
       coordinates = mapboxMap.getProjection().toScreenLocation(marker.getPosition());
 
-      if (view instanceof InfoWindowView) {
+      if (view instanceof BubbleLayout) {
         view.setX(coordinates.x + viewWidthOffset - markerWidthOffset);
       } else {
         view.setX(coordinates.x - (view.getMeasuredWidth() / 2) - markerWidthOffset);

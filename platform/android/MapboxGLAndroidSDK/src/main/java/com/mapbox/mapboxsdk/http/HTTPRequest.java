@@ -123,7 +123,7 @@ class HTTPRequest implements Callback {
       body = response.body().bytes();
     } catch (IOException ioException) {
       onFailure(ioException);
-      //throw ioException;
+      // throw ioException;
       return;
     } finally {
       response.body().close();
@@ -183,7 +183,7 @@ class HTTPRequest implements Callback {
       return USER_AGENT_STRING = Util.toHumanReadableAscii(
         String.format("%s %s (%s) Android/%s (%s)",
           getApplicationIdentifier(),
-          BuildConfig.MAPBOX_VERSION_STRING,
+          com.mapbox.services.android.telemetry.BuildConfig.MAPBOX_VERSION_STRING,
           BuildConfig.GIT_REVISION_SHORT,
           Build.VERSION.SDK_INT,
           Build.CPU_ABI)

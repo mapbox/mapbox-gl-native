@@ -364,7 +364,7 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(NetworkStatusOnlineOffline)) {
 TEST(OnlineFileSource, TEST_REQUIRES_SERVER(RateLimitStandard)) {
     util::RunLoop loop;
     OnlineFileSource fs;
-    
+
     auto req = fs.request({ Resource::Unknown, "http://127.0.0.1:3000/rate-limit?std=true" }, [&](Response res) {
         ASSERT_NE(nullptr, res.error);
         EXPECT_EQ(Response::Error::Reason::RateLimit, res.error->reason);
@@ -372,14 +372,14 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(RateLimitStandard)) {
         ASSERT_LT(util::now(), res.error->retryAfter);
         loop.stop();
     });
-    
+
     loop.run();
 }
 
 TEST(OnlineFileSource, TEST_REQUIRES_SERVER(RateLimitMBX)) {
     util::RunLoop loop;
     OnlineFileSource fs;
-    
+
     auto req = fs.request({ Resource::Unknown, "http://127.0.0.1:3000/rate-limit?mbx=true" }, [&](Response res) {
         ASSERT_NE(nullptr, res.error);
         EXPECT_EQ(Response::Error::Reason::RateLimit, res.error->reason);
@@ -387,28 +387,28 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(RateLimitMBX)) {
         ASSERT_LT(util::now(), res.error->retryAfter);
         loop.stop();
     });
-    
+
     loop.run();
 }
 
 TEST(OnlineFileSource, TEST_REQUIRES_SERVER(RateLimitDefault)) {
     util::RunLoop loop;
     OnlineFileSource fs;
-    
+
     auto req = fs.request({ Resource::Unknown, "http://127.0.0.1:3000/rate-limit" }, [&](Response res) {
         ASSERT_NE(nullptr, res.error);
         EXPECT_EQ(Response::Error::Reason::RateLimit, res.error->reason);
         ASSERT_FALSE(res.error->retryAfter);
         loop.stop();
     });
-    
+
     loop.run();
 }
 
 TEST(OnlineFileSource, ChangeAPIBaseURL){
     util::RunLoop loop;
     OnlineFileSource fs;
-    
+
     EXPECT_EQ(mbgl::util::API_BASE_URL, fs.getAPIBaseURL());
     const std::string customURL = "test.domain";
     fs.setAPIBaseURL(customURL);

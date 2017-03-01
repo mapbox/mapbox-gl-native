@@ -48,6 +48,9 @@ public final class UiSettings {
 
   private boolean zoomControlsEnabled;
 
+  private boolean doubleTapGesturesEnabled = true;
+  private boolean doubleTapGestureChangeAllowed = true;
+
   private boolean deselectMarkersOnTap = true;
 
   private PointF userProvidedFocalPoint;
@@ -99,6 +102,8 @@ public final class UiSettings {
     setTiltGesturesEnabled(options.getTiltGesturesEnabled());
     setTiltGestureChangeAllowed(options.getTiltGesturesEnabled());
     setZoomControlsEnabled(options.getZoomControlsEnabled());
+    setDoubleTapGesturesEnabled(options.getDoubleTapGesturesEnabled());
+    setDoubleTapGestureChangeAllowed(options.getDoubleTapGesturesEnabled());
   }
 
   private void saveGestures(Bundle outState) {
@@ -110,6 +115,8 @@ public final class UiSettings {
     outState.putBoolean(MapboxConstants.STATE_ROTATE_ENABLED_CHANGE, isRotateGestureChangeAllowed());
     outState.putBoolean(MapboxConstants.STATE_TILT_ENABLED, isTiltGesturesEnabled());
     outState.putBoolean(MapboxConstants.STATE_TILT_ENABLED_CHANGE, isTiltGestureChangeAllowed());
+    outState.putBoolean(MapboxConstants.STATE_DOUBLE_TAP_ENABLED, isDoubleTapGesturesEnabled());
+    outState.putBoolean(MapboxConstants.STATE_DOUBLE_TAP_ENABLED_CHANGE, isDoubleTapGestureChangeAllowed());
   }
 
   private void restoreGestures(Bundle savedInstanceState) {
@@ -121,6 +128,8 @@ public final class UiSettings {
     setRotateGestureChangeAllowed(savedInstanceState.getBoolean(MapboxConstants.STATE_ROTATE_ENABLED_CHANGE));
     setTiltGesturesEnabled(savedInstanceState.getBoolean(MapboxConstants.STATE_TILT_ENABLED));
     setTiltGestureChangeAllowed(savedInstanceState.getBoolean(MapboxConstants.STATE_TILT_ENABLED_CHANGE));
+    setDoubleTapGesturesEnabled(savedInstanceState.getBoolean(MapboxConstants.STATE_DOUBLE_TAP_ENABLED));
+    setDoubleTapGestureChangeAllowed(savedInstanceState.getBoolean(MapboxConstants.STATE_DOUBLE_TAP_ENABLED_CHANGE));
   }
 
   private void initialiseCompass(MapboxMapOptions options, Resources resources) {
@@ -696,6 +705,41 @@ public final class UiSettings {
   }
 
   /**
+   * <p>
+   * Changes whether the user may zoom the map with a double tap.
+   * </p>
+   * <p>
+   * This setting controls only user interactions with the map. If you set the value to false,
+   * you may still change the map location programmatically.
+   * </p>
+   * The default value is true.
+   *
+   * @param doubleTapGesturesEnabled If true, zooming with a double tap is enabled.
+   */
+  public void setDoubleTapGesturesEnabled(boolean doubleTapGesturesEnabled) {
+    if (doubleTapGestureChangeAllowed) {
+      this.doubleTapGesturesEnabled = doubleTapGesturesEnabled;
+    }
+  }
+
+  /**
+   * Returns whether the user may zoom the map with a double tap.
+   *
+   * @return If true, zooming with a double tap is enabled.
+   */
+  public boolean isDoubleTapGesturesEnabled() {
+    return doubleTapGesturesEnabled;
+  }
+
+  void setDoubleTapGestureChangeAllowed(boolean doubleTapGestureChangeAllowed) {
+    this.doubleTapGestureChangeAllowed = doubleTapGestureChangeAllowed;
+  }
+
+  boolean isDoubleTapGestureChangeAllowed() {
+    return doubleTapGestureChangeAllowed;
+  }
+
+  /**
    * Gets whether the markers are automatically deselected (and therefore, their infowindows
    * closed) when a map tap is detected.
    *
@@ -771,6 +815,7 @@ public final class UiSettings {
     setRotateGesturesEnabled(enabled);
     setTiltGesturesEnabled(enabled);
     setZoomGesturesEnabled(enabled);
+    setDoubleTapGesturesEnabled(enabled);
   }
 
   /**

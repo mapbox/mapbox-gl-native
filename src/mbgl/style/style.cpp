@@ -134,12 +134,12 @@ void Style::setJSON(const std::string& json) {
     spriteAtlas->load(parser.spriteURL, fileSource);
 
     loaded = true;
-    
+
     observer->onStyleLoaded();
 }
 
 void Style::addSource(std::unique_ptr<Source> source) {
-    //Guard against duplicate source ids
+    // Guard against duplicate source ids
     auto it = std::find_if(sources.begin(), sources.end(), [&](const auto& existing) {
         return existing->getID() == source->getID();
     });
@@ -159,7 +159,7 @@ std::unique_ptr<Source> Style::removeSource(const std::string& id) {
     });
 
     if (it == sources.end()) {
-        throw std::runtime_error("no such source");
+        return nullptr;
     }
 
     auto source = std::move(*it);
@@ -231,7 +231,7 @@ std::unique_ptr<Layer> Style::removeLayer(const std::string& id) {
     });
 
     if (it == layers.end())
-        throw std::runtime_error("no such layer");
+        return nullptr;
 
     auto layer = std::move(*it);
 
@@ -662,12 +662,17 @@ void Style::onLayerPaintPropertyChanged(Layer&) {
     observer->onUpdate(Update::RecalculateStyle | Update::Classes);
 }
 
+void Style::onLayerDataDrivenPaintPropertyChanged(Layer& layer) {
+    layer.accept(QueueSourceReloadVisitor { updateBatch });
+    observer->onUpdate(Update::RecalculateStyle | Update::Classes | Update::Layout);
+}
+
 void Style::onLayerLayoutPropertyChanged(Layer& layer, const char * property) {
     layer.accept(QueueSourceReloadVisitor { updateBatch });
 
     auto update = Update::Layout;
 
-    //Recalculate the style for certain properties
+    // Recalculate the style for certain properties
     bool needsRecalculation = strcmp(property, "icon-size") == 0 || strcmp(property, "text-size") == 0;
     if (needsRecalculation) {
         update |= Update::RecalculateStyle;

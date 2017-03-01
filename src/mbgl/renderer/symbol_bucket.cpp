@@ -1,19 +1,28 @@
 #include <mbgl/renderer/symbol_bucket.hpp>
 #include <mbgl/renderer/painter.hpp>
+#include <mbgl/style/bucket_parameters.hpp>
 #include <mbgl/style/layers/symbol_layer.hpp>
+#include <mbgl/style/layers/symbol_layer_impl.hpp>
 
 namespace mbgl {
 
 using namespace style;
 
-SymbolBucket::SymbolBucket(const MapMode mode_,
-                           style::SymbolLayoutProperties::Evaluated layout_,
+SymbolBucket::SymbolBucket(style::SymbolLayoutProperties::Evaluated layout_,
+                           const std::unordered_map<std::string, std::pair<
+                               style::IconPaintProperties::Evaluated, style::TextPaintProperties::Evaluated>>& layerPaintProperties,
+                           float zoom,
                            bool sdfIcons_,
                            bool iconsNeedLinear_)
-    : mode(mode_),
-      layout(std::move(layout_)),
+    : layout(std::move(layout_)),
       sdfIcons(sdfIcons_),
       iconsNeedLinear(iconsNeedLinear_) {
+    for (const auto& pair : layerPaintProperties) {
+        paintPropertyBinders.emplace(pair.first, std::make_pair(
+            SymbolIconProgram::PaintPropertyBinders(pair.second.first, zoom),
+            SymbolSDFTextProgram::PaintPropertyBinders(pair.second.second, zoom)
+        ));
+    }
 }
 
 void SymbolBucket::upload(gl::Context& context) {
@@ -30,6 +39,11 @@ void SymbolBucket::upload(gl::Context& context) {
     if (!collisionBox.vertices.empty()) {
         collisionBox.vertexBuffer = context.createVertexBuffer(std::move(collisionBox.vertices));
         collisionBox.indexBuffer = context.createIndexBuffer(std::move(collisionBox.lines));
+    }
+
+    for (auto& pair : paintPropertyBinders) {
+        pair.second.first.upload(context);
+        pair.second.second.upload(context);
     }
 
     uploaded = true;

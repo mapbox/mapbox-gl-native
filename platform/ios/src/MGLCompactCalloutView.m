@@ -25,7 +25,7 @@
 - (void)setRepresentedObject:(id <MGLAnnotation>)representedObject
 {
     _representedObject = representedObject;
-    
+
     if ([representedObject respondsToSelector:@selector(title)])
     {
         self.title = representedObject.title;

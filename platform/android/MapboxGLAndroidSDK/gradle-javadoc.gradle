@@ -1,6 +1,6 @@
 android.libraryVariants.all { variant ->
     def name = variant.name
-    //noinspection GroovyAssignabilityCheck
+    // noinspection GroovyAssignabilityCheck
     task "javadoc$name"(type: Javadoc) {
         description = "Generates javadoc for build $name"
         failOnError = false

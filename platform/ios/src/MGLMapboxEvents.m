@@ -94,12 +94,12 @@ const NSTimeInterval MGLFlushInterval = 180;
 - (NSString *)sysInfoByName:(char *)typeSpecifier {
     size_t size;
     sysctlbyname(typeSpecifier, NULL, &size, NULL, 0);
-    
+
     char *answer = malloc(size);
     sysctlbyname(typeSpecifier, answer, &size, NULL, 0);
-    
+
     NSString *results = [NSString stringWithCString:answer encoding: NSUTF8StringEncoding];
-    
+
     free(answer);
     return results;
 }
@@ -180,11 +180,11 @@ const NSTimeInterval MGLFlushInterval = 180;
 
         // Events Control
         _eventQueue = [[NSMutableArray alloc] init];
-        
+
         // Setup Date Format
         _rfc3339DateFormatter = [[NSDateFormatter alloc] init];
         NSLocale *enUSPOSIXLocale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"];
-        
+
         [_rfc3339DateFormatter setLocale:enUSPOSIXLocale];
         [_rfc3339DateFormatter setDateFormat:@"yyyy'-'MM'-'dd'T'HH':'mm':'ssZ"];
         // Clear Any System TimeZone Cache
@@ -201,10 +201,10 @@ const NSTimeInterval MGLFlushInterval = 180;
         } else {
             self.canEnableDebugLogging = YES;
         }
-        
+
         // Watch for changes to telemetry settings by the user
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(userDefaultsDidChange:) name:NSUserDefaultsDidChangeNotification object:nil];
-       
+
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(pauseOrResumeMetricsCollectionIfRequired) name:UIApplicationDidEnterBackgroundNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(pauseOrResumeMetricsCollectionIfRequired) name:UIApplicationDidBecomeActiveNotification object:nil];
 
@@ -256,11 +256,11 @@ const NSTimeInterval MGLFlushInterval = 180;
 
 - (void)pauseOrResumeMetricsCollectionIfRequired {
     UIApplication *application = [UIApplication sharedApplication];
-    
+
     // Prevent blue status bar when host app has `when in use` permission only and it is not in foreground
     if ([CLLocationManager authorizationStatus] == kCLAuthorizationStatusAuthorizedWhenInUse &&
         application.applicationState == UIApplicationStateBackground) {
-        
+
         if (_backgroundTaskIdentifier == UIBackgroundTaskInvalid) {
             _backgroundTaskIdentifier = [application beginBackgroundTaskWithExpirationHandler:^{
                 [application endBackgroundTask:_backgroundTaskIdentifier];
@@ -268,11 +268,11 @@ const NSTimeInterval MGLFlushInterval = 180;
             }];
             [self flush];
         }
-        
+
         [self pauseMetricsCollection];
         return;
     }
-    
+
     // Toggle pause based on current pause state, user opt-out state, and low-power state.
     BOOL enabled = [[self class] isEnabled];
     if (self.paused && enabled) {
@@ -287,13 +287,13 @@ const NSTimeInterval MGLFlushInterval = 180;
     if (self.paused) {
         return;
     }
-    
+
     self.paused = YES;
     [self.timer invalidate];
     self.timer = nil;
     [self.eventQueue removeAllObjects];
     self.data = nil;
-    
+
     [self.locationManager stopUpdatingLocation];
 }
 
@@ -304,7 +304,7 @@ const NSTimeInterval MGLFlushInterval = 180;
 
     self.paused = NO;
     self.data = [[MGLMapboxEventsData alloc] init];
-    
+
     [self.locationManager startUpdatingLocation];
 }
 
@@ -316,24 +316,24 @@ const NSTimeInterval MGLFlushInterval = 180;
     if ([MGLAccountManager accessToken] == nil) {
         return;
     }
-    
+
     if ([self.eventQueue count] <= 1) {
         [self.eventQueue removeAllObjects];
         [[UIApplication sharedApplication] endBackgroundTask:_backgroundTaskIdentifier];
         _backgroundTaskIdentifier = UIBackgroundTaskInvalid;
         return;
     }
-    
+
     NSArray *events = [NSArray arrayWithArray:self.eventQueue];
     [self.eventQueue removeAllObjects];
-    
+
     [self postEvents:events];
-    
+
     if (self.timer) {
         [self.timer invalidate];
         self.timer = nil;
     }
-    
+
     [self pushDebugEvent:MGLEventTypeLocalDebug withAttributes:@{MGLEventKeyLocalDebugDescription:@"flush"}];
 }
 
@@ -341,21 +341,21 @@ const NSTimeInterval MGLFlushInterval = 180;
     if (self.nextTurnstileSendDate && [[NSDate date] timeIntervalSinceDate:self.nextTurnstileSendDate] < 0) {
         return;
     }
-    
+
     NSString *vendorID = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
     if (!vendorID) {
         return;
     }
-    
+
     NSDictionary *turnstileEventAttributes = @{MGLEventKeyEvent: MGLEventTypeAppUserTurnstile,
                                                MGLEventKeyCreated: [self.rfc3339DateFormatter stringFromDate:[NSDate date]],
                                                MGLEventKeyVendorID: vendorID,
                                                MGLEventKeyEnabledTelemetry: @([[self class] isEnabled])};
-    
+
     if ([MGLAccountManager accessToken] == nil) {
         return;
     }
-    
+
     __weak __typeof__(self) weakSelf = self;
     [self.apiClient postEvent:turnstileEventAttributes completionHandler:^(NSError * _Nullable error) {
         __strong __typeof__(weakSelf) strongSelf = weakSelf;
@@ -375,7 +375,7 @@ const NSTimeInterval MGLFlushInterval = 180;
     NSDateComponents *dayComponent = [[NSDateComponents alloc] init];
     dayComponent.day = 1;
     NSDate *sometimeTomorrow = [calendar dateByAddingComponents:dayComponent toDate:[NSDate date] options:0];
-   
+
     // Find the start of tomorrow and use that as the next turnstile send date. The effect of this is that
     // turnstile events can be sent as much as once per calendar day and always at the start of a session
     // when a map load happens.
@@ -392,15 +392,15 @@ const NSTimeInterval MGLFlushInterval = 180;
     if (!event) {
         return;
     }
-    
+
     if ([event isEqualToString:MGLEventTypeMapLoad]) {
         [self pushTurnstileEvent];
     }
-    
+
     if (self.paused) {
         return;
     }
-    
+
     MGLMapboxEventAttributes *fullyFormedEvent = [self fullyFormedEventForEvent:event withAttributes:attributeDictionary];
     if (fullyFormedEvent) {
         [self.eventQueue addObject:fullyFormedEvent];
@@ -497,7 +497,7 @@ const NSTimeInterval MGLFlushInterval = 180;
     if (self.paused) {
         return;
     }
-    
+
     __weak __typeof__(self) weakSelf = self;
     dispatch_async(self.serialQueue, ^{
         __strong __typeof__(weakSelf) strongSelf = weakSelf;
@@ -553,7 +553,7 @@ const NSTimeInterval MGLFlushInterval = 180;
             result = @"Default - Unknown";
             break;
     }
-    
+
     return result;
 }
 
@@ -572,9 +572,9 @@ const NSTimeInterval MGLFlushInterval = 180;
 
 - (NSInteger)contentSizeScale {
     NSInteger result = -9999;
-    
+
     NSString *sc = [UIApplication sharedApplication].preferredContentSizeCategory;
-    
+
     if ([sc isEqualToString:UIContentSizeCategoryExtraSmall]) {
         result = -3;
     } else if ([sc isEqualToString:UIContentSizeCategorySmall]) {
@@ -600,7 +600,7 @@ const NSTimeInterval MGLFlushInterval = 180;
     } else if ([sc isEqualToString:UIContentSizeCategoryAccessibilityExtraExtraExtraLarge]) {
         result = 13;
     }
-    
+
     return result;
 }
 
@@ -675,18 +675,18 @@ const NSTimeInterval MGLFlushInterval = 180;
     if (![self debugLoggingEnabled]) {
         return;
     }
-    
+
     if (!event) {
         return;
     }
-    
+
     MGLMutableMapboxEventAttributes *evt = [MGLMutableMapboxEventAttributes dictionaryWithDictionary:attributeDictionary];
     [evt setObject:event forKey:@"event"];
     [evt setObject:[self.rfc3339DateFormatter stringFromDate:[NSDate date]] forKey:@"created"];
     [evt setValue:[self applicationState] forKey:@"applicationState"];
     [evt setValue:@([[self class] isEnabled]) forKey:@"telemetryEnabled"];
     [evt setObject:self.instanceID forKey:@"instance"];
-    
+
     MGLMapboxEventAttributes *finalEvent = [NSDictionary dictionaryWithDictionary:evt];
     [self writeEventToLocalDebugLog:finalEvent];
 }
@@ -713,12 +713,12 @@ const NSTimeInterval MGLFlushInterval = 180;
     dispatch_async(self.debugLogSerialQueue, ^{
         if ([NSJSONSerialization isValidJSONObject:event]) {
             NSData *jsonData = [NSJSONSerialization dataWithJSONObject:event options:NSJSONWritingPrettyPrinted error:nil];
-            
+
             NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
             jsonString = [jsonString stringByAppendingString:@",\n"];
-            
+
             NSString *logFilePath = [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) firstObject] stringByAppendingPathComponent:[NSString stringWithFormat:@"telemetry_log-%@.json", self.dateForDebugLogFile]];
-            
+
             NSFileManager *fileManager = [[NSFileManager alloc] init];
             if ([fileManager fileExistsAtPath:logFilePath]) {
                 NSFileHandle *fileHandle = [NSFileHandle fileHandleForWritingAtPath:logFilePath];
@@ -780,7 +780,7 @@ const NSTimeInterval MGLFlushInterval = 180;
     if (mobileProvision[@"ProvisionedDevices"] && [mobileProvision[@"ProvisionedDevices"] count]) {
         return NO; // development or ad-hoc
     }
-    
+
     return YES; // expected development/enterprise/ad-hoc entitlements not found
 #endif
 }

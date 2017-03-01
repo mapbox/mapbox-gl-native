@@ -5,6 +5,7 @@
 #include <mbgl/style/types.hpp>
 #include <mbgl/style/layout_property.hpp>
 #include <mbgl/style/paint_property.hpp>
+#include <mbgl/programs/attributes.hpp>
 
 namespace mbgl {
 namespace style {

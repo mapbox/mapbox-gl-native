@@ -3,12 +3,7 @@ package com.mapbox.mapboxsdk.testapp.activity.style;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.content.res.ResourcesCompat;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-
-import timber.log.Timber;
-
 import android.view.MenuItem;
 
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
@@ -25,6 +20,8 @@ import com.mapbox.mapboxsdk.testapp.R;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import timber.log.Timber;
+
 import static com.mapbox.mapboxsdk.style.layers.Filter.all;
 import static com.mapbox.mapboxsdk.style.layers.Filter.gte;
 import static com.mapbox.mapboxsdk.style.layers.Filter.lt;
@@ -36,7 +33,7 @@ import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textField;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textSize;
 
 /**
- * Sample Activity to show off geojson source clustering and filter usage
+ * Test activity showcasing using a geojson source and visualise that source as a cluster by using filters.
  */
 public class GeoJsonClusteringActivity extends AppCompatActivity {
 
@@ -48,11 +45,9 @@ public class GeoJsonClusteringActivity extends AppCompatActivity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_geojson_clustering);
 
-    setupActionBar();
-
-    //Initialize map as normal
+    // Initialize map as normal
     mapView = (MapView) findViewById(R.id.mapView);
-    //noinspection ConstantConditions
+    // noinspection ConstantConditions
     mapView.onCreate(savedInstanceState);
 
     mapView.getMapAsync(new OnMapReadyCallback() {
@@ -61,7 +56,7 @@ public class GeoJsonClusteringActivity extends AppCompatActivity {
         mapboxMap = map;
         mapboxMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(37.7749, 122.4194), 0));
 
-        //Add a clustered source with some layers
+        // Add a clustered source with some layers
         addClusteredGeoJsonSource();
       }
     });
@@ -121,7 +116,7 @@ public class GeoJsonClusteringActivity extends AppCompatActivity {
   }
 
   private void addClusteredGeoJsonSource() {
-    //Add a clustered source
+    // Add a clustered source
     try {
       mapboxMap.addSource(
         new GeoJsonSource("earthquakes",
@@ -136,11 +131,11 @@ public class GeoJsonClusteringActivity extends AppCompatActivity {
       Timber.e("That's not an url... " + malformedUrlException.getMessage());
     }
 
-    //Add unclustered layer
+    // Add unclustered layer
     int[][] layers = new int[][] {
-      new int[] {150, ResourcesCompat.getColor(getResources(), R.color.red_accent, getTheme())},
-      new int[] {20, ResourcesCompat.getColor(getResources(), R.color.green_accent, getTheme())},
-      new int[] {0, ResourcesCompat.getColor(getResources(), R.color.blue_accent, getTheme())}
+      new int[] {150, ResourcesCompat.getColor(getResources(), R.color.redAccent, getTheme())},
+      new int[] {20, ResourcesCompat.getColor(getResources(), R.color.greenAccent, getTheme())},
+      new int[] {0, ResourcesCompat.getColor(getResources(), R.color.blueAccent, getTheme())}
     };
 
     SymbolLayer unclustered = new SymbolLayer("unclustered-points", "earthquakes");
@@ -148,7 +143,7 @@ public class GeoJsonClusteringActivity extends AppCompatActivity {
     mapboxMap.addLayer(unclustered);
 
     for (int i = 0; i < layers.length; i++) {
-      //Add some nice circles
+      // Add some nice circles
       CircleLayer circles = new CircleLayer("cluster-" + i, "earthquakes");
       circles.setProperties(
         circleColor(layers[i][1]),
@@ -162,7 +157,7 @@ public class GeoJsonClusteringActivity extends AppCompatActivity {
       mapboxMap.addLayer(circles);
     }
 
-    //Add the count labels
+    // Add the count labels
     SymbolLayer count = new SymbolLayer("count", "earthquakes");
     count.setProperties(
       textField("{point_count}"),
@@ -172,18 +167,7 @@ public class GeoJsonClusteringActivity extends AppCompatActivity {
     mapboxMap.addLayer(count);
 
 
-    //Zoom out to start
+    // Zoom out to start
     mapboxMap.animateCamera(CameraUpdateFactory.zoomTo(1));
-  }
-
-  private void setupActionBar() {
-    Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-    setSupportActionBar(toolbar);
-
-    ActionBar actionBar = getSupportActionBar();
-    if (actionBar != null) {
-      actionBar.setDisplayHomeAsUpEnabled(true);
-      actionBar.setDisplayShowHomeEnabled(true);
-    }
   }
 }

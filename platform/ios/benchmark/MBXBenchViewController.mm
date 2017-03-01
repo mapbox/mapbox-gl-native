@@ -52,7 +52,7 @@
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
-    
+
     if ([MGLAccountManager accessToken].length) {
         [self startBenchmarkIteration];
     } else {
@@ -62,7 +62,7 @@
             textField.autocorrectionType = UITextAutocorrectionTypeNo;
             textField.autocapitalizationType = UITextAutocapitalizationTypeNone;
         }];
-        
+
         [alertController addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
             [self startBenchmarkIteration];
         }]];
@@ -72,11 +72,11 @@
             [[NSUserDefaults standardUserDefaults] setObject:accessToken forKey:MBXMapboxAccessTokenDefaultsKey];
             [MGLAccountManager setAccessToken:accessToken];
             [self.mapView reloadStyle:self];
-            
+
             [self startBenchmarkIteration];
         }];
         [alertController addAction:OKAction];
-        
+
         if ([alertController respondsToSelector:@selector(setPreferredAction:)]) {
             alertController.preferredAction = OKAction;
         }

@@ -22,6 +22,7 @@ import com.mapbox.mapboxsdk.testapp.utils.ViewUtils;
 import org.hamcrest.Matcher;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -44,6 +45,7 @@ public class CameraAnimateTest {
   }
 
   @Test
+  @Ignore
   public void testAnimateToCameraPositionTarget() {
     ViewUtils.checkViewIsDisplayed(R.id.mapView);
     final MapboxMap mapboxMap = rule.getActivity().getMapboxMap();
@@ -66,6 +68,7 @@ public class CameraAnimateTest {
   }
 
   @Test
+  @Ignore
   public void testAnimateToCameraPositionTargetZoom() {
     ViewUtils.checkViewIsDisplayed(R.id.mapView);
     final MapboxMap mapboxMap = rule.getActivity().getMapboxMap();
@@ -114,6 +117,7 @@ public class CameraAnimateTest {
   }
 
   @Test
+  @Ignore
   public void testAnimateToBounds() {
     ViewUtils.checkViewIsDisplayed(R.id.mapView);
     final MapboxMap mapboxMap = rule.getActivity().getMapboxMap();
@@ -142,6 +146,7 @@ public class CameraAnimateTest {
   }
 
   @Test
+  @Ignore
   public void testAnimateToMoveBy() {
     ViewUtils.checkViewIsDisplayed(R.id.mapView);
     final MapboxMap mapboxMap = rule.getActivity().getMapboxMap();
@@ -161,6 +166,7 @@ public class CameraAnimateTest {
   }
 
   @Test
+  @Ignore
   public void testAnimateToZoomIn() {
     ViewUtils.checkViewIsDisplayed(R.id.mapView);
     final MapboxMap mapboxMap = rule.getActivity().getMapboxMap();
@@ -175,6 +181,7 @@ public class CameraAnimateTest {
   }
 
   @Test
+  @Ignore
   public void testAnimateToZoomOut() {
     ViewUtils.checkViewIsDisplayed(R.id.mapView);
     final MapboxMap mapboxMap = rule.getActivity().getMapboxMap();
@@ -190,6 +197,7 @@ public class CameraAnimateTest {
   }
 
   @Test
+  @Ignore
   public void testAnimateToZoomBy() {
     ViewUtils.checkViewIsDisplayed(R.id.mapView);
     final MapboxMap mapboxMap = rule.getActivity().getMapboxMap();
@@ -205,6 +213,7 @@ public class CameraAnimateTest {
   }
 
   @Test
+  @Ignore
   public void testAnimateToZoomTo() {
     ViewUtils.checkViewIsDisplayed(R.id.mapView);
     final MapboxMap mapboxMap = rule.getActivity().getMapboxMap();

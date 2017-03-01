@@ -35,7 +35,7 @@ public class RuntimeStyleTimingTests extends BaseStyleTest {
   @Test
   public void testGetAddRemoveLayer() {
     checkViewIsDisplayed(R.id.mapView);
-    //We're good if it didn't crash
+    // We're good if it didn't crash
   }
 
   @After

@@ -224,21 +224,21 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
 
         [self updateFrameWithSize:MGLUserLocationAnnotationDotSize];
     }
-    
+
     BOOL showHeadingIndicator = self.mapView.userTrackingMode == MGLUserTrackingModeFollowWithHeading;
-    
+
     // update heading indicator
     //
     if (showHeadingIndicator)
     {
         _headingIndicatorLayer.hidden = NO;
-        
+
         // heading indicator (tinted, semi-circle)
         //
         if ( ! _headingIndicatorLayer && self.userLocation.heading.headingAccuracy)
         {
             CGFloat headingIndicatorSize = MGLUserLocationAnnotationHaloSize;
-            
+
             _headingIndicatorLayer = [CALayer layer];
             _headingIndicatorLayer.bounds = CGRectMake(0, 0, headingIndicatorSize, headingIndicatorSize);
             _headingIndicatorLayer.position = CGPointMake(super.bounds.size.width / 2.0, super.bounds.size.height / 2.0);
@@ -249,10 +249,10 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
             _headingIndicatorLayer.shouldRasterize = YES;
             _headingIndicatorLayer.rasterizationScale = [UIScreen mainScreen].scale;
             _headingIndicatorLayer.drawsAsynchronously = YES;
-            
+
             [self.layer insertSublayer:_headingIndicatorLayer below:_dotBorderLayer];
         }
-        
+
         // heading indicator accuracy mask (fan-shaped)
         //
         if ( ! _headingIndicatorMaskLayer && self.userLocation.heading.headingAccuracy)
@@ -260,21 +260,21 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
             _headingIndicatorMaskLayer = [CAShapeLayer layer];
             _headingIndicatorMaskLayer.frame = _headingIndicatorLayer.bounds;
             _headingIndicatorMaskLayer.path = [[self headingIndicatorClippingMask] CGPath];
-            
+
             // apply the mask to the halo-radius-sized gradient layer
             _headingIndicatorLayer.mask = _headingIndicatorMaskLayer;
-            
+
             _oldHeadingAccuracy = self.userLocation.heading.headingAccuracy;
-            
+
         }
         else if (_oldHeadingAccuracy != self.userLocation.heading.headingAccuracy)
         {
             // recalculate the clipping mask based on updated accuracy
             _headingIndicatorMaskLayer.path = [[self headingIndicatorClippingMask] CGPath];
-            
+
             _oldHeadingAccuracy = self.userLocation.heading.headingAccuracy;
         }
-        
+
         if (self.userLocation.heading.trueHeading >= 0)
         {
             _headingIndicatorLayer.affineTransform = CGAffineTransformRotate(CGAffineTransformIdentity, -MGLRadiansFromDegrees(self.mapView.direction - self.userLocation.heading.trueHeading));
@@ -294,7 +294,7 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
     if (_accuracyRingLayer && (_oldZoom != self.mapView.zoomLevel || _oldHorizontalAccuracy != self.userLocation.location.horizontalAccuracy))
     {
         CGFloat accuracyRingSize = [self calculateAccuracyRingSize];
-        
+
         // only show the accuracy ring if it won't be obscured by the location dot
         if (accuracyRingSize > MGLUserLocationAnnotationDotSize + 15)
         {
@@ -341,7 +341,7 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
         _accuracyRingLayer.opacity = 0.1;
         _accuracyRingLayer.shouldRasterize = NO;
         _accuracyRingLayer.allowsGroupOpacity = NO;
-        
+
         [self.layer addSublayer:_accuracyRingLayer];
     }
 
@@ -396,7 +396,7 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
 
         [self.layer addSublayer:_dotBorderLayer];
     }
-    
+
     // inner dot (pulsing, tinted)
     //
     if ( ! _dotLayer)

@@ -55,6 +55,10 @@ void BackgroundLayer::setBackgroundColor(PropertyValue<Color> value, const optio
     impl->observer->onLayerPaintPropertyChanged(*this);
 }
 
+void BackgroundLayer::setBackgroundColorTransition(const TransitionOptions& value, const optional<std::string>& klass) {
+    impl->paint.setTransition<BackgroundColor>(value, klass);
+}
+
 PropertyValue<std::string> BackgroundLayer::getDefaultBackgroundPattern() {
     return { "" };
 }
@@ -70,6 +74,10 @@ void BackgroundLayer::setBackgroundPattern(PropertyValue<std::string> value, con
     impl->observer->onLayerPaintPropertyChanged(*this);
 }
 
+void BackgroundLayer::setBackgroundPatternTransition(const TransitionOptions& value, const optional<std::string>& klass) {
+    impl->paint.setTransition<BackgroundPattern>(value, klass);
+}
+
 PropertyValue<float> BackgroundLayer::getDefaultBackgroundOpacity() {
     return { 1 };
 }
@@ -83,6 +91,10 @@ void BackgroundLayer::setBackgroundOpacity(PropertyValue<float> value, const opt
         return;
     impl->paint.set<BackgroundOpacity>(value, klass);
     impl->observer->onLayerPaintPropertyChanged(*this);
+}
+
+void BackgroundLayer::setBackgroundOpacityTransition(const TransitionOptions& value, const optional<std::string>& klass) {
+    impl->paint.setTransition<BackgroundOpacity>(value, klass);
 }
 
 } // namespace style

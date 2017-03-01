@@ -2,6 +2,7 @@
 #include <mbgl/map/camera.hpp>
 #include <mbgl/map/view.hpp>
 #include <mbgl/map/backend.hpp>
+#include <mbgl/map/backend_scope.hpp>
 #include <mbgl/map/transform.hpp>
 #include <mbgl/map/transform_state.hpp>
 #include <mbgl/annotation/annotation_manager.hpp>
@@ -24,6 +25,7 @@
 #include <mbgl/util/tile_coordinate.hpp>
 #include <mbgl/actor/scheduler.hpp>
 #include <mbgl/util/logging.hpp>
+#include <mbgl/util/string.hpp>
 #include <mbgl/math/log2.hpp>
 
 namespace mbgl {
@@ -314,10 +316,15 @@ void Map::Impl::render(View& view) {
                               contextMode,
                               debugOptions };
 
-        painter->render(*style,
-                        frameData,
-                        view,
-                        annotationManager->getSpriteAtlas());
+        try {
+            painter->render(*style,
+                            frameData,
+                            view,
+                            annotationManager->getSpriteAtlas());
+        } catch (...) {
+            Log::Error(Event::General, "Exception in render: %s", util::toString(std::current_exception()).c_str());
+            exit(1);
+        }
 
         auto request = std::move(stillImageRequest);
         request->callback(nullptr);
@@ -471,26 +478,26 @@ void Map::flyTo(const CameraOptions& camera, const AnimationOptions& animation) 
 
 #pragma mark - Position
 
-void Map::moveBy(const ScreenCoordinate& point, const Duration& duration) {
+void Map::moveBy(const ScreenCoordinate& point, const AnimationOptions& animation) {
     impl->cameraMutated = true;
-    impl->transform.moveBy(point, duration);
+    impl->transform.moveBy(point, animation);
     impl->onUpdate(Update::Repaint);
 }
 
-void Map::setLatLng(const LatLng& latLng, const Duration& duration) {
+void Map::setLatLng(const LatLng& latLng, const AnimationOptions& animation) {
     impl->cameraMutated = true;
-    setLatLng(latLng, optional<ScreenCoordinate> {}, duration);
+    setLatLng(latLng, optional<ScreenCoordinate> {}, animation);
 }
 
-void Map::setLatLng(const LatLng& latLng, optional<EdgeInsets> padding, const Duration& duration) {
+void Map::setLatLng(const LatLng& latLng, optional<EdgeInsets> padding, const AnimationOptions& animation) {
     impl->cameraMutated = true;
-    impl->transform.setLatLng(latLng, padding, duration);
+    impl->transform.setLatLng(latLng, padding, animation);
     impl->onUpdate(Update::Repaint);
 }
 
-void Map::setLatLng(const LatLng& latLng, optional<ScreenCoordinate> anchor, const Duration& duration) {
+void Map::setLatLng(const LatLng& latLng, optional<ScreenCoordinate> anchor, const AnimationOptions& animation) {
     impl->cameraMutated = true;
-    impl->transform.setLatLng(latLng, anchor, duration);
+    impl->transform.setLatLng(latLng, anchor, animation);
     impl->onUpdate(Update::Repaint);
 }
 
@@ -513,15 +520,15 @@ void Map::resetPosition(optional<EdgeInsets> padding) {
 
 #pragma mark - Scale
 
-void Map::scaleBy(double ds, optional<ScreenCoordinate> anchor, const Duration& duration) {
+void Map::scaleBy(double ds, optional<ScreenCoordinate> anchor, const AnimationOptions& animation) {
     impl->cameraMutated = true;
-    impl->transform.scaleBy(ds, anchor, duration);
+    impl->transform.scaleBy(ds, anchor, animation);
     impl->onUpdate(Update::RecalculateStyle);
 }
 
-void Map::setScale(double scale, optional<ScreenCoordinate> anchor, const Duration& duration) {
+void Map::setScale(double scale, optional<ScreenCoordinate> anchor, const AnimationOptions& animation) {
     impl->cameraMutated = true;
-    impl->transform.setScale(scale, anchor, duration);
+    impl->transform.setScale(scale, anchor, animation);
     impl->onUpdate(Update::RecalculateStyle);
 }
 
@@ -529,14 +536,20 @@ double Map::getScale() const {
     return impl->transform.getScale();
 }
 
-void Map::setZoom(double zoom, const Duration& duration) {
+void Map::setZoom(double zoom, const AnimationOptions& animation) {
     impl->cameraMutated = true;
-    setZoom(zoom, {}, duration);
+    setZoom(zoom, optional<EdgeInsets> {}, animation);
 }
 
-void Map::setZoom(double zoom, optional<EdgeInsets> padding, const Duration& duration) {
+void Map::setZoom(double zoom, optional<ScreenCoordinate> anchor, const AnimationOptions& animation) {
     impl->cameraMutated = true;
-    impl->transform.setZoom(zoom, padding, duration);
+    impl->transform.setZoom(zoom, anchor, animation);
+    impl->onUpdate(Update::RecalculateStyle);
+}
+
+void Map::setZoom(double zoom, optional<EdgeInsets> padding, const AnimationOptions& animation) {
+    impl->cameraMutated = true;
+    impl->transform.setZoom(zoom, padding, animation);
     impl->onUpdate(Update::RecalculateStyle);
 }
 
@@ -544,14 +557,14 @@ double Map::getZoom() const {
     return impl->transform.getZoom();
 }
 
-void Map::setLatLngZoom(const LatLng& latLng, double zoom, const Duration& duration) {
+void Map::setLatLngZoom(const LatLng& latLng, double zoom, const AnimationOptions& animation) {
     impl->cameraMutated = true;
-    setLatLngZoom(latLng, zoom, {}, duration);
+    setLatLngZoom(latLng, zoom, {}, animation);
 }
 
-void Map::setLatLngZoom(const LatLng& latLng, double zoom, optional<EdgeInsets> padding, const Duration& duration) {
+void Map::setLatLngZoom(const LatLng& latLng, double zoom, optional<EdgeInsets> padding, const AnimationOptions& animation) {
     impl->cameraMutated = true;
-    impl->transform.setLatLngZoom(latLng, zoom, padding, duration);
+    impl->transform.setLatLngZoom(latLng, zoom, padding, animation);
     impl->onUpdate(Update::RecalculateStyle);
 }
 
@@ -661,26 +674,26 @@ Size Map::getSize() const {
 
 #pragma mark - Rotation
 
-void Map::rotateBy(const ScreenCoordinate& first, const ScreenCoordinate& second, const Duration& duration) {
+void Map::rotateBy(const ScreenCoordinate& first, const ScreenCoordinate& second, const AnimationOptions& animation) {
     impl->cameraMutated = true;
-    impl->transform.rotateBy(first, second, duration);
+    impl->transform.rotateBy(first, second, animation);
     impl->onUpdate(Update::Repaint);
 }
 
-void Map::setBearing(double degrees, const Duration& duration) {
+void Map::setBearing(double degrees, const AnimationOptions& animation) {
     impl->cameraMutated = true;
-    setBearing(degrees, EdgeInsets(), duration);
+    setBearing(degrees, EdgeInsets(), animation);
 }
 
-void Map::setBearing(double degrees, optional<ScreenCoordinate> anchor, const Duration& duration) {
+void Map::setBearing(double degrees, optional<ScreenCoordinate> anchor, const AnimationOptions& animation) {
     impl->cameraMutated = true;
-    impl->transform.setAngle(-degrees * util::DEG2RAD, anchor, duration);
+    impl->transform.setAngle(-degrees * util::DEG2RAD, anchor, animation);
     impl->onUpdate(Update::Repaint);
 }
 
-void Map::setBearing(double degrees, optional<EdgeInsets> padding, const Duration& duration) {
+void Map::setBearing(double degrees, optional<EdgeInsets> padding, const AnimationOptions& animation) {
     impl->cameraMutated = true;
-    impl->transform.setAngle(-degrees * util::DEG2RAD, padding, duration);
+    impl->transform.setAngle(-degrees * util::DEG2RAD, padding, animation);
     impl->onUpdate(Update::Repaint);
 }
 
@@ -688,22 +701,22 @@ double Map::getBearing() const {
     return -impl->transform.getAngle() * util::RAD2DEG;
 }
 
-void Map::resetNorth(const Duration& duration) {
+void Map::resetNorth(const AnimationOptions& animation) {
     impl->cameraMutated = true;
-    impl->transform.setAngle(0, duration);
+    impl->transform.setAngle(0, animation);
     impl->onUpdate(Update::Repaint);
 }
 
 #pragma mark - Pitch
 
-void Map::setPitch(double pitch, const Duration& duration) {
+void Map::setPitch(double pitch, const AnimationOptions& animation) {
     impl->cameraMutated = true;
-    setPitch(pitch, {}, duration);
+    setPitch(pitch, {}, animation);
 }
 
-void Map::setPitch(double pitch, optional<ScreenCoordinate> anchor, const Duration& duration) {
+void Map::setPitch(double pitch, optional<ScreenCoordinate> anchor, const AnimationOptions& animation) {
     impl->cameraMutated = true;
-    impl->transform.setPitch(pitch * util::DEG2RAD, anchor, duration);
+    impl->transform.setPitch(pitch * util::DEG2RAD, anchor, animation);
     impl->onUpdate(Update::Repaint);
 }
 
@@ -912,8 +925,6 @@ void Map::addImage(const std::string& name, std::unique_ptr<const SpriteImage> i
 
     impl->styleMutated = true;
     impl->style->spriteAtlas->setSprite(name, std::move(image));
-    impl->style->spriteAtlas->updateDirty();
-
     impl->onUpdate(Update::Repaint);
 }
 
@@ -924,8 +935,6 @@ void Map::removeImage(const std::string& name) {
 
     impl->styleMutated = true;
     impl->style->spriteAtlas->removeSprite(name);
-    impl->style->spriteAtlas->updateDirty();
-
     impl->onUpdate(Update::Repaint);
 }
 

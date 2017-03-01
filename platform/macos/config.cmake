@@ -1,9 +1,9 @@
 set(CMAKE_OSX_DEPLOYMENT_TARGET 10.10)
 
-mason_use(glfw VERSION 3.2.1)
+mason_use(glfw VERSION 2017-02-09-77a8f10)
 mason_use(boost_libprogram_options VERSION 1.62.0)
-mason_use(gtest VERSION 1.7.0${MASON_CXXABI_SUFFIX})
-mason_use(benchmark VERSION 1.0.0)
+mason_use(gtest VERSION 1.8.0)
+mason_use(benchmark VERSION 1.0.0-1)
 mason_use(icu VERSION 58.1)
 
 include(cmake/loop-darwin.cmake)
@@ -40,7 +40,9 @@ macro(mbgl_platform_core)
         PRIVATE platform/default/utf.cpp
 
         # Image handling
+        PRIVATE platform/darwin/mbgl/util/image+MGLAdditions.hpp
         PRIVATE platform/darwin/src/image.mm
+        PRIVATE platform/default/png_writer.cpp
 
         # Headless view
         PRIVATE platform/default/mbgl/gl/headless_backend.cpp
@@ -52,6 +54,8 @@ macro(mbgl_platform_core)
         PRIVATE platform/default/mbgl/gl/offscreen_view.hpp
 
         # Thread pool
+        PRIVATE platform/default/mbgl/util/shared_thread_pool.cpp
+        PRIVATE platform/default/mbgl/util/shared_thread_pool.hpp
         PRIVATE platform/default/mbgl/util/default_thread_pool.cpp
         PRIVATE platform/default/mbgl/util/default_thread_pool.cpp
     )

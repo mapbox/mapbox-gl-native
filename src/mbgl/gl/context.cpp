@@ -122,6 +122,20 @@ UniqueTexture Context::createTexture() {
     return UniqueTexture{ std::move(id), { this } };
 }
 
+bool Context::supportsVertexArrays() const {
+    return gl::GenVertexArrays &&
+           gl::BindVertexArray &&
+           gl::DeleteVertexArrays &&
+           !disableVAOExtension;
+}
+
+UniqueVertexArray Context::createVertexArray() {
+    assert(supportsVertexArrays());
+    VertexArrayID id = 0;
+    MBGL_CHECK_ERROR(gl::GenVertexArrays(1, &id));
+    return UniqueVertexArray(std::move(id), { this });
+}
+
 UniqueFramebuffer Context::createFramebuffer() {
     FramebufferID id = 0;
     MBGL_CHECK_ERROR(glGenFramebuffers(1, &id));
@@ -407,32 +421,26 @@ void Context::clear(optional<mbgl::Color> color,
 }
 
 #if not MBGL_USE_GLES2
-PrimitiveType Context::operator()(const Points& points) {
+void Context::setDrawMode(const Points& points) {
     pointSize = points.pointSize;
-    return PrimitiveType::Points;
 }
 #else
-PrimitiveType Context::operator()(const Points&) {
-    return PrimitiveType::Points;
+void Context::setDrawMode(const Points&) {
 }
 #endif // MBGL_USE_GLES2
 
-PrimitiveType Context::operator()(const Lines& lines) {
+void Context::setDrawMode(const Lines& lines) {
     lineWidth = lines.lineWidth;
-    return PrimitiveType::Lines;
 }
 
-PrimitiveType Context::operator()(const LineStrip& lineStrip) {
+void Context::setDrawMode(const LineStrip& lineStrip) {
     lineWidth = lineStrip.lineWidth;
-    return PrimitiveType::LineStrip;
 }
 
-PrimitiveType Context::operator()(const Triangles&) {
-    return PrimitiveType::Triangles;
+void Context::setDrawMode(const Triangles&) {
 }
 
-PrimitiveType Context::operator()(const TriangleStrip&) {
-    return PrimitiveType::TriangleStrip;
+void Context::setDrawMode(const TriangleStrip&) {
 }
 
 void Context::setDepthMode(const DepthMode& depth) {
@@ -474,57 +482,14 @@ void Context::setColorMode(const ColorMode& color) {
     colorMask = color.mask;
 }
 
-void Context::draw(const Drawable& drawable) {
-    if (drawable.segments.empty()) {
-        return;
-    }
-
-    PrimitiveType primitiveType = apply_visitor([&] (auto m) { return (*this)(m); }, drawable.drawMode);
-
-    setDepthMode(drawable.depthMode);
-    setStencilMode(drawable.stencilMode);
-    setColorMode(drawable.colorMode);
-
-    program = drawable.program;
-
-    drawable.bindUniforms();
-
-    for (const auto& segment : drawable.segments) {
-        auto needAttributeBindings = [&] () {
-            if (!gl::GenVertexArrays || !gl::BindVertexArray) {
-                return true;
-            }
-
-            if (segment.vao) {
-                vertexArrayObject = *segment.vao;
-                return false;
-            }
-
-            VertexArrayID id = 0;
-            MBGL_CHECK_ERROR(gl::GenVertexArrays(1, &id));
-            vertexArrayObject = id;
-            segment.vao = UniqueVertexArray(std::move(id), { this });
-
-            // If we are initializing a new VAO, we need to force the buffers
-            // to be rebound. VAOs don't inherit the existing buffer bindings.
-            vertexBuffer.setDirty();
-            elementBuffer.setDirty();
-
-            return true;
-        };
-
-        if (needAttributeBindings()) {
-            vertexBuffer = drawable.vertexBuffer;
-            elementBuffer = drawable.indexBuffer;
-            drawable.bindAttributes(segment.vertexOffset);
-        }
-
-        MBGL_CHECK_ERROR(glDrawElements(
-            static_cast<GLenum>(primitiveType),
-            static_cast<GLsizei>(segment.indexLength),
-            GL_UNSIGNED_SHORT,
-            reinterpret_cast<GLvoid*>(sizeof(uint16_t) * segment.indexOffset)));
-    }
+void Context::draw(PrimitiveType primitiveType,
+                   std::size_t indexOffset,
+                   std::size_t indexLength) {
+    MBGL_CHECK_ERROR(glDrawElements(
+        static_cast<GLenum>(primitiveType),
+        static_cast<GLsizei>(indexLength),
+        GL_UNSIGNED_SHORT,
+        reinterpret_cast<GLvoid*>(sizeof(uint16_t) * indexOffset)));
 }
 
 void Context::performCleanup() {
@@ -564,6 +529,7 @@ void Context::performCleanup() {
     }
 
     if (!abandonedVertexArrays.empty()) {
+        assert(supportsVertexArrays());
         for (const auto id : abandonedVertexArrays) {
             if (vertexArrayObject == id) {
                 vertexArrayObject.setDirty();

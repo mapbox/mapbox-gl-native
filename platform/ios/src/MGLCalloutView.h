@@ -79,7 +79,7 @@ NS_ASSUME_NONNULL_BEGIN
  Returns a Boolean value indicating whether the entire callout view “highlights”
  when tapped. The default value is `YES`, which means the callout view
  highlights when tapped.
- 
+
  The return value of this method is ignored unless the delegate also responds to
  the `-calloutViewTapped` method.
  */

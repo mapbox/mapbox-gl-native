@@ -9,25 +9,25 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.mapbox.mapboxsdk.location.LocationListener;
-import com.mapbox.mapboxsdk.location.LocationServices;
+import com.mapbox.mapboxsdk.location.LocationSource;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.MapboxMapOptions;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.R;
+import com.mapbox.services.android.telemetry.location.LocationEngineListener;
 
-public class MyLocationDrawableActivity extends AppCompatActivity implements LocationListener {
+/**
+ * Test activity showcasing how to change the MyLocationView drawable.
+ */
+public class MyLocationDrawableActivity extends AppCompatActivity implements LocationEngineListener {
 
   private static final int PERMISSIONS_LOCATION = 0;
 
@@ -38,14 +38,6 @@ public class MyLocationDrawableActivity extends AppCompatActivity implements Loc
   protected void onCreate(@Nullable Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_my_location_customization);
-    Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-    setSupportActionBar(toolbar);
-
-    final ActionBar actionBar = getSupportActionBar();
-    if (actionBar != null) {
-      actionBar.setDisplayHomeAsUpEnabled(true);
-      actionBar.setDisplayShowHomeEnabled(true);
-    }
 
     findViewById(R.id.progress).setVisibility(View.GONE);
 
@@ -53,8 +45,8 @@ public class MyLocationDrawableActivity extends AppCompatActivity implements Loc
     mapboxMapOptions.styleUrl(Style.MAPBOX_STREETS);
 
     // configure MyLocationView drawables
-    mapboxMapOptions.myLocationForegroundDrawable(ContextCompat.getDrawable(this, R.drawable.ic_chelsea));
-    mapboxMapOptions.myLocationBackgroundDrawable(ContextCompat.getDrawable(this, R.drawable.ic_arsenal));
+    mapboxMapOptions.myLocationForegroundDrawable(ContextCompat.getDrawable(this, R.drawable.ic_android));
+    mapboxMapOptions.myLocationBackgroundDrawable(ContextCompat.getDrawable(this, R.drawable.ic_android));
     mapboxMapOptions.myLocationForegroundTintColor(Color.GREEN);
     mapboxMapOptions.myLocationBackgroundTintColor(Color.YELLOW);
     mapboxMapOptions.myLocationBackgroundPadding(new int[] {0, 0,
@@ -103,7 +95,7 @@ public class MyLocationDrawableActivity extends AppCompatActivity implements Loc
       if (location != null) {
         onLocationChanged(location);
       } else {
-        LocationServices.getLocationServices(this).addLocationListener(this);
+        LocationSource.getLocationEngine(this).addLocationEngineListener(this);
       }
     } else {
       mapboxMap.setMyLocationEnabled(false);
@@ -117,6 +109,11 @@ public class MyLocationDrawableActivity extends AppCompatActivity implements Loc
         enableLocation(true);
       }
     }
+  }
+
+  @Override
+  public void onConnected() {
+    // Nothing
   }
 
   @Override
@@ -167,16 +164,4 @@ public class MyLocationDrawableActivity extends AppCompatActivity implements Loc
     super.onLowMemory();
     mapView.onLowMemory();
   }
-
-  @Override
-  public boolean onOptionsItemSelected(MenuItem item) {
-    switch (item.getItemId()) {
-      case android.R.id.home:
-        onBackPressed();
-        return true;
-      default:
-        return super.onOptionsItemSelected(item);
-    }
-  }
-
 }

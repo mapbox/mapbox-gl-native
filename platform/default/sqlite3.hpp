@@ -4,9 +4,7 @@
 #include <vector>
 #include <stdexcept>
 #include <chrono>
-
-typedef struct sqlite3 sqlite3;
-typedef struct sqlite3_stmt sqlite3_stmt;
+#include <memory>
 
 namespace mapbox {
 namespace sqlite {
@@ -22,12 +20,20 @@ enum OpenFlag : int {
 };
 
 struct Exception : std::runtime_error {
+    enum Code : int {
+        OK = 0,
+        CANTOPEN = 14,
+        NOTADB = 26
+    };
+
     Exception(int err, const char *msg) : std::runtime_error(msg), code(err) {}
     Exception(int err, const std::string& msg) : std::runtime_error(msg), code(err) {}
-    const int code = 0;
+    const int code = OK;
 };
 
+class DatabaseImpl;
 class Statement;
+class StatementImpl;
 
 class Database {
 private:
@@ -42,16 +48,14 @@ public:
 
     explicit operator bool() const;
 
-    static void errorLogCallback(void *arg, const int err, const char *msg);
     void setBusyTimeout(std::chrono::milliseconds);
     void exec(const std::string &sql);
     Statement prepare(const char *query);
 
-    int64_t lastInsertRowid() const;
-    uint64_t changes() const;
-
 private:
-    sqlite3 *db = nullptr;
+    std::unique_ptr<DatabaseImpl> impl;
+
+    friend class Statement;
 };
 
 class Statement {
@@ -59,10 +63,8 @@ private:
     Statement(const Statement &) = delete;
     Statement &operator=(const Statement &) = delete;
 
-    void check(int err);
-
 public:
-    Statement(sqlite3 *db, const char *sql);
+    Statement(Database *db, const char *sql);
     Statement(Statement &&);
     ~Statement();
     Statement &operator=(Statement &&);
@@ -85,8 +87,11 @@ public:
     void reset();
     void clearBindings();
 
+    int64_t lastInsertRowId() const;
+    uint64_t changes() const;
+
 private:
-    sqlite3_stmt *stmt = nullptr;
+    std::unique_ptr<StatementImpl> impl;
 };
 
 class Transaction {

@@ -13,6 +13,12 @@ import com.mapbox.mapboxsdk.testapp.utils.FontCache;
 
 import java.util.List;
 
+/**
+ * Adapter used for FeatureOverviewActivity.
+ * <p>
+ * Adapts a Feature to a visual representation to be shown in a RecyclerView.
+ * </p>
+ */
 public class FeatureAdapter extends RecyclerView.Adapter<FeatureAdapter.ViewHolder> {
 
   private List<Feature> features;

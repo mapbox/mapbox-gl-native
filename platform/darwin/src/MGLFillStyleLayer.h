@@ -1,4 +1,4 @@
-// This file is generated. 
+// This file is generated.
 // Edit platform/darwin/scripts/generate-style-code.js, then run `make style-code-darwin`.
 
 #import "MGLFoundation.h"
@@ -9,7 +9,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  Controls the translation reference point.
- 
+
  Values of this type are used in the `MGLFillStyleLayer.fillTranslationAnchor`
  property.
  */
@@ -32,15 +32,15 @@ typedef NS_ENUM(NSUInteger, MGLFillTranslationAnchor) {
  multipolygon features in vector tiles loaded by an `MGLVectorSource` object or
  `MGLPolygon`, `MGLPolygonFeature`, `MGLMultiPolygon`, or
  `MGLMultiPolygonFeature` instances in an `MGLShapeSource` object.
- 
+
  You can access an existing fill style layer using the
  `-[MGLStyle layerWithIdentifier:]` method if you know its identifier;
  otherwise, find it using the `MGLStyle.layers` property. You can also create a
  new fill style layer and add it to the style using a method such as
  `-[MGLStyle addLayer:]`.
- 
+
  ### Example
- 
+
  ```swift
  let layer = MGLFillStyleLayer(identifier: "parks", source: parks)
  layer.sourceLayerIdentifier = "parks"
@@ -64,6 +64,12 @@ MGL_EXPORT
  This attribute corresponds to the <a
  href="https://www.mapbox.com/mapbox-gl-style-spec/#paint-fill-antialias"><code>fill-antialias</code></a>
  layout property in the Mapbox Style Specification.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLStyleConstantValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of
+ `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable, getter=isFillAntialiased) MGLStyleValue<NSNumber *> *fillAntialiased;
 
@@ -79,6 +85,22 @@ MGL_EXPORT
  
  This property is only applied to the style if `fillPattern` is set to `nil`.
  Otherwise, it is ignored.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLStyleConstantValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+ * `MGLSourceStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
+   * `MGLInterpolationModeIdentity`
+ * `MGLCompositeStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<UIColor *> *fillColor;
 #else
@@ -91,6 +113,22 @@ MGL_EXPORT
  
  This property is only applied to the style if `fillPattern` is set to `nil`.
  Otherwise, it is ignored.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLStyleConstantValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+ * `MGLSourceStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
+   * `MGLInterpolationModeIdentity`
+ * `MGLCompositeStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSColor *> *fillColor;
 #endif
@@ -102,6 +140,22 @@ MGL_EXPORT
  The default value of this property is an `MGLStyleValue` object containing an
  `NSNumber` object containing the float `1`. Set this property to `nil` to reset
  it to the default value.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLStyleConstantValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+ * `MGLSourceStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
+   * `MGLInterpolationModeIdentity`
+ * `MGLCompositeStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *fillOpacity;
 
@@ -112,6 +166,22 @@ MGL_EXPORT
  This property is only applied to the style if `fillPattern` is set to `nil`,
  and `fillAntialiased` is set to an `MGLStyleValue` object containing an
  `NSNumber` object containing `YES`. Otherwise, it is ignored.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLStyleConstantValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+ * `MGLSourceStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
+   * `MGLInterpolationModeIdentity`
+ * `MGLCompositeStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<UIColor *> *fillOutlineColor;
 #else
@@ -121,6 +191,22 @@ MGL_EXPORT
  This property is only applied to the style if `fillPattern` is set to `nil`,
  and `fillAntialiased` is set to an `MGLStyleValue` object containing an
  `NSNumber` object containing `YES`. Otherwise, it is ignored.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLStyleConstantValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+ * `MGLSourceStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
+   * `MGLInterpolationModeIdentity`
+ * `MGLCompositeStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSColor *> *fillOutlineColor;
 #endif
@@ -128,6 +214,12 @@ MGL_EXPORT
 /**
  Name of image in sprite to use for drawing image fills. For seamless patterns,
  image width and height must be a factor of two (2, 4, 8, ..., 512).
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLStyleConstantValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of
+ `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSString *> *fillPattern;
 
@@ -144,6 +236,13 @@ MGL_EXPORT
  This attribute corresponds to the <a
  href="https://www.mapbox.com/mapbox-gl-style-spec/#paint-fill-translate"><code>fill-translate</code></a>
  layout property in the Mapbox Style Specification.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLStyleConstantValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *fillTranslation;
 #else
@@ -159,6 +258,13 @@ MGL_EXPORT
  This attribute corresponds to the <a
  href="https://www.mapbox.com/mapbox-gl-style-spec/#paint-fill-translate"><code>fill-translate</code></a>
  layout property in the Mapbox Style Specification.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLStyleConstantValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *fillTranslation;
 #endif
@@ -178,6 +284,12 @@ MGL_EXPORT
  This attribute corresponds to the <a
  href="https://www.mapbox.com/mapbox-gl-style-spec/#paint-fill-translate-anchor"><code>fill-translate-anchor</code></a>
  layout property in the Mapbox Style Specification.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLStyleConstantValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of
+ `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *fillTranslationAnchor;
 

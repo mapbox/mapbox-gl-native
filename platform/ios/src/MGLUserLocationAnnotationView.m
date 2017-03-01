@@ -22,12 +22,12 @@
 {
     self = [super initWithFrame:frame];
     if (self == nil) return nil;
-    
+
     self.accessibilityTraits = UIAccessibilityTraitButton | UIAccessibilityTraitAdjustable | UIAccessibilityTraitUpdatesFrequently;
-    
+
     _accessibilityCoordinateFormatter = [[MGLCoordinateFormatter alloc] init];
     _accessibilityCoordinateFormatter.unitStyle = NSFormattingUnitStyleLong;
-    
+
     return self;
 }
 
@@ -57,13 +57,13 @@
     {
         return self.userLocation.subtitle;
     }
-    
+
     // Each arcminute of longitude is at most about 1 nmi, too small for low zoom levels.
     // Each arcsecond of longitude is at most about 30 m, too small for all but the very highest of zoom levels.
     double zoomLevel = self.mapView.zoomLevel;
     _accessibilityCoordinateFormatter.allowsMinutes = zoomLevel > 8;
     _accessibilityCoordinateFormatter.allowsSeconds = zoomLevel > 20;
-    
+
     return [_accessibilityCoordinateFormatter stringFromCoordinate:self.mapView.centerCoordinate];
 }
 

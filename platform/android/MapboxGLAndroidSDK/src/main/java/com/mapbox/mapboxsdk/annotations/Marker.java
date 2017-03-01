@@ -30,6 +30,8 @@ public class Marker extends Annotation {
   private LatLng position;
   private String snippet;
   private Icon icon;
+  //Redundantly stored for JNI access
+  private String iconId;
   private String title;
 
   private InfoWindow infoWindow;
@@ -51,24 +53,19 @@ public class Marker extends Annotation {
    * @param baseMarkerOptions The builder used to construct the Marker.
    */
   public Marker(BaseMarkerOptions baseMarkerOptions) {
-    position = baseMarkerOptions.position;
-    snippet = baseMarkerOptions.snippet;
-    icon = baseMarkerOptions.icon;
-    title = baseMarkerOptions.title;
+    this(baseMarkerOptions.position, baseMarkerOptions.icon, baseMarkerOptions.title, baseMarkerOptions.snippet);
   }
 
   Marker(BaseMarkerViewOptions baseMarkerViewOptions) {
-    position = baseMarkerViewOptions.position;
-    snippet = baseMarkerViewOptions.snippet;
-    icon = baseMarkerViewOptions.icon;
-    title = baseMarkerViewOptions.title;
+    this(baseMarkerViewOptions.position, baseMarkerViewOptions.icon,
+      baseMarkerViewOptions.title, baseMarkerViewOptions.snippet);
   }
 
   Marker(LatLng position, Icon icon, String title, String snippet) {
     this.position = position;
-    this.icon = icon;
     this.title = title;
     this.snippet = snippet;
+    setIcon(icon);
   }
 
   /**
@@ -148,6 +145,7 @@ public class Marker extends Annotation {
    */
   public void setIcon(@Nullable Icon icon) {
     this.icon = icon;
+    this.iconId = icon != null ? icon.getId() : null;
     MapboxMap map = getMapboxMap();
     if (map != null) {
       map.updateMarker(this);
@@ -240,7 +238,7 @@ public class Marker extends Annotation {
 
   private InfoWindow getInfoWindow(@NonNull MapView mapView) {
     if (infoWindow == null && mapView.getContext() != null) {
-      infoWindow = new InfoWindow(mapView, R.layout.mapbox_infowindow_view, getMapboxMap());
+      infoWindow = new InfoWindow(mapView, R.layout.mapbox_infowindow_content, getMapboxMap());
     }
     return infoWindow;
   }

@@ -33,7 +33,7 @@
 - (instancetype)initWithIdentifier:(NSString *)identifier tileURLTemplates:(NS_ARRAY_OF(NSString *) *)tileURLTemplates options:(nullable NS_DICTIONARY_OF(MGLTileSourceOption, id) *)options {
     if (self = [super initWithIdentifier:identifier tileURLTemplates:tileURLTemplates options:options]) {
         mbgl::Tileset tileSet = MGLTileSetFromTileURLTemplates(tileURLTemplates, options);
-        
+
         auto source = std::make_unique<mbgl::style::VectorSource>(identifier.UTF8String, tileSet);
         _pendingSource = std::move(source);
         self.rawSource = _pendingSource.get();
@@ -56,9 +56,20 @@
 }
 
 - (void)removeFromMapView:(MGLMapView *)mapView {
+    if (self.rawSource != mapView.mbglMap->getSource(self.identifier.UTF8String)) {
+        return;
+    }
+
     auto removedSource = mapView.mbglMap->removeSource(self.identifier.UTF8String);
 
-    _pendingSource = std::move(reinterpret_cast<std::unique_ptr<mbgl::style::VectorSource> &>(removedSource));
+    mbgl::style::VectorSource *source = dynamic_cast<mbgl::style::VectorSource *>(removedSource.get());
+    if (!source) {
+        return;
+    }
+
+    removedSource.release();
+
+    _pendingSource = std::unique_ptr<mbgl::style::VectorSource>(source);
     self.rawSource = _pendingSource.get();
 }
 

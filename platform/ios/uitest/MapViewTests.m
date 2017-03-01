@@ -155,7 +155,7 @@
     XCTAssertEqualObjects(MGLStringFromCoordinateBounds(initialBounds),
                           MGLStringFromCoordinateBounds(tester.mapView.visibleCoordinateBounds),
                           @"setting visible coordinate bounds to currently visible coordinate bounds should be a no-op");
-    
+
     // Roundtrip after zooming
     tester.mapView.zoomLevel -= 3;
     [tester.mapView setVisibleCoordinateBounds:initialBounds animated:NO];
@@ -171,7 +171,7 @@
                           @"after zooming in, setting visible coordinate bounds back to %@ should not leave them at %@",
                           MGLStringFromCoordinateBounds(initialBounds),
                           MGLStringFromCoordinateBounds(tester.mapView.visibleCoordinateBounds));
-    
+
     // Roundtrip after panning
     MGLCoordinateBounds offsetBounds = MGLCoordinateBoundsOffset(initialBounds, MGLCoordinateSpanMake(0, 30));
     [tester.mapView setVisibleCoordinateBounds:offsetBounds animated:NO];
@@ -181,7 +181,7 @@
                           @"after panning 30° to the east, setting visible coordinate bounds back to %@ should not leave them at %@",
                           MGLStringFromCoordinateBounds(initialBounds),
                           MGLStringFromCoordinateBounds(tester.mapView.visibleCoordinateBounds));
-    
+
     // Inscribed shapes with rotation
     tester.mapView.direction = 45;
     // https://en.wikipedia.org/wiki/Boundary_Markers_of_the_Original_District_of_Columbia
@@ -220,7 +220,7 @@
 
 - (void)testSetCenterCancelsTransitions {
     XCTestExpectation *cameraIsInDCExpectation = [self expectationWithDescription:@"camera reset to DC"];
-    
+
     CLLocationCoordinate2D dc = CLLocationCoordinate2DMake(38.894368, -77.036487);
     CLLocationCoordinate2D dc_west = CLLocationCoordinate2DMake(38.894368, -77.076487);
     [tester.mapView setCenterCoordinate:dc animated:NO];
@@ -239,7 +239,7 @@
                                                   @"setting center coordinate should cancel transitions");
                        [cameraIsInDCExpectation fulfill];
                    });
-    
+
     [self waitForExpectationsWithTimeout:1.0 handler:nil];
 }
 
@@ -260,7 +260,7 @@
                                @"disabling pan gesture should disallow horizontal panning");
 }
 
-- (void)testRotate {
+- (void)testRotateClockwise {
     CLLocationDirection startAngle = tester.mapView.direction;
 
     XCTAssertNotEqual(startAngle,
@@ -272,6 +272,21 @@
     XCTAssertGreaterThanOrEqual(fabs(tester.mapView.direction - startAngle),
                                 20,
                                 @"rotating map should change angle");
+}
+
+- (void)testRotateCounterclockwise {
+    CLLocationDirection startAngle = tester.mapView.direction;
+
+    XCTAssertNotEqual(startAngle,
+                      -45,
+                      @"start angle must not be destination angle");
+
+    [tester.mapView twoFingerRotateAtPoint:tester.mapView.center angle:-45];
+
+    XCTAssertGreaterThanOrEqual(fabs(startAngle - tester.mapView.direction),
+                                20,
+                                @"rotating map should change angle");
+    XCTAssertGreaterThan(tester.mapView.camera.heading, 0, @"camera should not go negative");
 }
 
 - (void)testRotateDisabled {
@@ -303,6 +318,23 @@
                                newZoom,
                                0.01,
                                @"setting zoom should take effect");
+}
+
+- (void)testCameraDebouncing {
+    MGLMapCamera *camera = [MGLMapCamera cameraLookingAtCenterCoordinate:CLLocationCoordinate2DMake(45, -122)
+                                                            fromDistance:100
+                                                                   pitch:30
+                                                                 heading:45];
+    tester.mapView.camera = camera;
+    XCTAssertEqualObjects(tester.mapView.camera, camera);
+    
+    [tester.mapView setCamera:camera withDuration:10 animationTimingFunction:nil completionHandler:^{
+        XCTAssert(NO, @"Camera animation should not be canceled by redundantly setting the camera to the current camera.");
+    }];
+    XCTAssertEqualObjects(tester.mapView.camera, camera);
+    
+    tester.mapView.camera = camera;
+    XCTAssertEqualObjects(tester.mapView.camera, camera);
 }
 
 - (void)testMarkerSelection {
@@ -404,20 +436,20 @@
 - (void)testInsetMapView {
     [tester.viewController insetMapView];
     [tester waitForAnimationsToFinish];
-    
+
     UIView *logoBug = (UIView *)[tester waitForViewWithAccessibilityLabel:@"Mapbox"];
     UIView *attributionButton = (UIView *)[tester waitForViewWithAccessibilityLabel:@"About this map"];
-    
+
     CGRect mapViewFrame = [tester.mapView.superview convertRect:tester.mapView.frame toView:nil];
-    
+
     CGRect logoBugFrame = [logoBug.superview convertRect:logoBug.frame toView:nil];
     XCTAssertTrue(CGRectIntersectsRect(logoBugFrame, mapViewFrame),
                   @"logo bug should lie inside shrunken map view");
-    
+
     CGRect attributionButtonFrame = [attributionButton.superview convertRect:attributionButton.frame toView:nil];
     XCTAssertTrue(CGRectIntersectsRect(attributionButtonFrame, mapViewFrame),
                   @"attribution button should lie inside shrunken map view");
-    
+
     CGRect compassFrame = [tester.compass.superview convertRect:tester.compass.frame toView:nil];
     XCTAssertTrue(CGRectIntersectsRect(compassFrame, mapViewFrame),
                   @"compass should lie inside shrunken map view");

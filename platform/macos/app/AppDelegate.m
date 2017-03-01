@@ -20,10 +20,10 @@ NSString * const MGLLastMapDebugMaskDefaultsKey = @"MGLLastMapDebugMask";
     switch (self.state) {
         case MGLOfflinePackStateComplete:
             return [NSImage imageNamed:@"NSMenuOnStateTemplate"];
-            
+
         case MGLOfflinePackStateActive:
             return [NSImage imageNamed:@"NSFollowLinkFreestandingTemplate"];
-            
+
         default:
             return nil;
     }
@@ -71,7 +71,7 @@ NSString * const MGLLastMapDebugMaskDefaultsKey = @"MGLLastMapDebugMask";
 
 @end
 
-@interface AppDelegate ()
+@interface AppDelegate () <NSWindowDelegate>
 
 @property (weak) IBOutlet NSArrayController *offlinePacksArrayController;
 @property (weak) IBOutlet NSPanel *offlinePacksPanel;
@@ -104,7 +104,7 @@ NSString * const MGLLastMapDebugMaskDefaultsKey = @"MGLLastMapDebugMask";
                                                        andSelector:@selector(handleGetURLEvent:withReplyEvent:)
                                                      forEventClass:kInternetEventClass
                                                         andEventID:kAEGetURL];
-    
+
     if (![[NSUserDefaults standardUserDefaults] boolForKey:@"NSQuitAlwaysKeepsWindows"]) {
         NSData *cameraData = [[NSUserDefaults standardUserDefaults] objectForKey:MGLLastMapCameraDefaultsKey];
         if (cameraData) {
@@ -130,7 +130,7 @@ NSString * const MGLLastMapDebugMaskDefaultsKey = @"MGLLastMapDebugMask";
         [alert runModal];
         [self showPreferences:nil];
     }
-    
+
     [self.offlinePacksArrayController bind:@"content" toObject:[MGLOfflineStorage sharedOfflineStorage] withKeyPath:@"packs" options:nil];
 }
 
@@ -148,7 +148,7 @@ NSString * const MGLLastMapDebugMaskDefaultsKey = @"MGLLastMapDebugMask";
             [[NSUserDefaults standardUserDefaults] setInteger:mapView.debugMask forKey:MGLLastMapDebugMaskDefaultsKey];
         }
     }
-    
+
     [self.offlinePacksArrayController unbind:@"content"];
 }
 
@@ -164,16 +164,16 @@ NSString * const MGLLastMapDebugMaskDefaultsKey = @"MGLLastMapDebugMask";
             params[parts[0]] = [parts[1] stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
         }
     }
-    
+
     MGLMapCamera *camera = [MGLMapCamera camera];
     NSString *zoomLevelString = params[@"zoom"];
     self.pendingZoomLevel = zoomLevelString.length ? zoomLevelString.doubleValue : -1;
-    
+
     NSString *directionString = params[@"bearing"];
     if (directionString.length) {
         camera.heading = directionString.doubleValue;
     }
-    
+
     NSString *centerString = params[@"center"];
     if (centerString) {
         NSArray *coordinateValues = [centerString componentsSeparatedByString:@","];
@@ -182,12 +182,12 @@ NSString * const MGLLastMapDebugMaskDefaultsKey = @"MGLLastMapDebugMask";
                                                                  [coordinateValues[1] doubleValue]);
         }
     }
-    
+
     NSString *pitchString = params[@"pitch"];
     if (pitchString.length) {
         camera.pitch = pitchString.doubleValue;
     }
-    
+
     self.pendingCamera = camera;
     [[NSDocumentController sharedDocumentController] openUntitledDocumentAndDisplay:YES error:NULL];
 }
@@ -196,7 +196,7 @@ NSString * const MGLLastMapDebugMaskDefaultsKey = @"MGLLastMapDebugMask";
 
 - (IBAction)showOfflinePacksPanel:(id)sender {
     [self.offlinePacksPanel makeKeyAndOrderFront:sender];
-    
+
     for (MGLOfflinePack *pack in self.offlinePacksArrayController.arrangedObjects) {
         [pack requestProgress];
     }
@@ -226,15 +226,15 @@ NSString * const MGLLastMapDebugMaskDefaultsKey = @"MGLLastMapDebugMask";
                 }
                 break;
             }
-                
+
             case MGLOfflinePackStateInactive:
                 [pack resume];
                 break;
-                
+
             case MGLOfflinePackStateActive:
                 [pack suspend];
                 break;
-                
+
             default:
                 break;
         }
@@ -261,6 +261,14 @@ NSString * const MGLLastMapDebugMaskDefaultsKey = @"MGLLastMapDebugMask";
     [self.preferencesWindow makeKeyAndOrderFront:sender];
 }
 
+- (IBAction)print:(id)sender {
+    NSDocument *currentDocument = [NSDocumentController sharedDocumentController].currentDocument;
+    if ([currentDocument isKindOfClass:[MapDocument class]]) {
+        MGLMapView *mapView = [(MapDocument *)currentDocument mapView];
+        [mapView print:sender];
+    }
+}
+
 - (IBAction)openAccessTokenManager:(id)sender {
     [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"https://www.mapbox.com/studio/account/tokens/"]];
 }
@@ -277,10 +285,22 @@ NSString * const MGLLastMapDebugMaskDefaultsKey = @"MGLLastMapDebugMask";
     if (menuItem.action == @selector(showOfflinePacksPanel:)) {
         return YES;
     }
+    if (menuItem.action == @selector(print:)) {
+        return YES;
+    }
     if (menuItem.action == @selector(delete:)) {
         return self.offlinePacksArrayController.selectedObjects.count;
     }
     return NO;
+}
+
+#pragma mark NSWindowDelegate methods
+
+- (void)windowWillClose:(NSNotification *)notification {
+    NSWindow *window = notification.object;
+    if (window == self.preferencesWindow) {
+        [window makeFirstResponder:nil];
+    }
 }
 
 @end

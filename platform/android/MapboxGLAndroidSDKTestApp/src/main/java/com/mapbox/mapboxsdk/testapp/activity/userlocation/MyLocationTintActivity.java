@@ -12,25 +12,25 @@ import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.view.MenuItem;
 import android.view.View;
 
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.constants.MyLocationTracking;
 import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.mapbox.mapboxsdk.location.LocationListener;
-import com.mapbox.mapboxsdk.location.LocationServices;
+import com.mapbox.mapboxsdk.location.LocationSource;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.TrackingSettings;
 import com.mapbox.mapboxsdk.maps.widgets.MyLocationViewSettings;
 import com.mapbox.mapboxsdk.testapp.R;
+import com.mapbox.services.android.telemetry.location.LocationEngineListener;
 
-public class MyLocationTintActivity extends AppCompatActivity implements LocationListener {
+/**
+ * Test activity showcasing how to tint the MyLocationView.
+ */
+public class MyLocationTintActivity extends AppCompatActivity implements LocationEngineListener {
 
   private MapView mapView;
   private MapboxMap mapboxMap;
@@ -42,15 +42,6 @@ public class MyLocationTintActivity extends AppCompatActivity implements Locatio
   protected void onCreate(@Nullable Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_my_location_dot_color);
-
-    Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-    setSupportActionBar(toolbar);
-
-    ActionBar actionBar = getSupportActionBar();
-    if (actionBar != null) {
-      actionBar.setDisplayHomeAsUpEnabled(true);
-      actionBar.setDisplayShowHomeEnabled(true);
-    }
 
     mapView = (MapView) findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
@@ -94,9 +85,9 @@ public class MyLocationTintActivity extends AppCompatActivity implements Locatio
             @Override
             public void onClick(View view) {
               myLocationViewSettings.setAccuracyTintColor(
-                ContextCompat.getColor(MyLocationTintActivity.this, R.color.mapbox_green));
+                ContextCompat.getColor(MyLocationTintActivity.this, R.color.mapboxGreen));
               myLocationViewSettings.setForegroundTintColor(
-                ContextCompat.getColor(MyLocationTintActivity.this, R.color.mapbox_green));
+                ContextCompat.getColor(MyLocationTintActivity.this, R.color.mapboxGreen));
               myLocationViewSettings.setBackgroundTintColor(Color.WHITE);
             }
           });
@@ -133,6 +124,11 @@ public class MyLocationTintActivity extends AppCompatActivity implements Locatio
   }
 
   @Override
+  public void onConnected() {
+    // Nothing
+  }
+
+  @Override
   public void onLocationChanged(Location location) {
     if (mapboxMap != null && firstRun) {
       mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location), 15));
@@ -144,7 +140,7 @@ public class MyLocationTintActivity extends AppCompatActivity implements Locatio
   protected void onStart() {
     super.onStart();
     mapView.onStart();
-    LocationServices.getLocationServices(this).addLocationListener(this);
+    LocationSource.getLocationEngine(this).addLocationEngineListener(this);
   }
 
   @Override
@@ -162,7 +158,7 @@ public class MyLocationTintActivity extends AppCompatActivity implements Locatio
   @Override
   protected void onStop() {
     super.onStop();
-    LocationServices.getLocationServices(this).removeLocationListener(this);
+    LocationSource.getLocationEngine(this).removeLocationEngineListener(this);
     mapView.onStop();
   }
 
@@ -182,17 +178,6 @@ public class MyLocationTintActivity extends AppCompatActivity implements Locatio
   protected void onSaveInstanceState(Bundle outState) {
     super.onSaveInstanceState(outState);
     mapView.onSaveInstanceState(outState);
-  }
-
-  @Override
-  public boolean onOptionsItemSelected(MenuItem item) {
-    switch (item.getItemId()) {
-      case android.R.id.home:
-        onBackPressed();
-        return true;
-      default:
-        return super.onOptionsItemSelected(item);
-    }
   }
 
   @UiThread

@@ -34,16 +34,6 @@ enum class DataType : uint32_t {
     Float = 0x1406
 };
 
-template <typename T> struct DataTypeOf;
-
-template <> struct DataTypeOf<int8_t>   : std::integral_constant<DataType, DataType::Byte> {};
-template <> struct DataTypeOf<uint8_t>  : std::integral_constant<DataType, DataType::UnsignedByte> {};
-template <> struct DataTypeOf<int16_t>  : std::integral_constant<DataType, DataType::Short> {};
-template <> struct DataTypeOf<uint16_t> : std::integral_constant<DataType, DataType::UnsignedShort> {};
-template <> struct DataTypeOf<int32_t>  : std::integral_constant<DataType, DataType::Integer> {};
-template <> struct DataTypeOf<uint32_t> : std::integral_constant<DataType, DataType::UnsignedInteger> {};
-template <> struct DataTypeOf<float>    : std::integral_constant<DataType, DataType::Float> {};
-
 enum class RenderbufferType : uint32_t {
     RGBA = 0x8058,
     DepthStencil = 0x88F0,

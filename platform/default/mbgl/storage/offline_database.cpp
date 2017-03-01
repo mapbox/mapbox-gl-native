@@ -7,7 +7,6 @@
 #include <mbgl/util/logging.hpp>
 
 #include "sqlite3.hpp"
-#include <sqlite3.h>
 
 namespace mbgl {
 
@@ -57,13 +56,13 @@ void OfflineDatabase::ensureSchema() {
             removeExisting();
             connect(mapbox::sqlite::ReadWrite | mapbox::sqlite::Create);
         } catch (mapbox::sqlite::Exception& ex) {
-            if (ex.code != SQLITE_CANTOPEN && ex.code != SQLITE_NOTADB) {
+            if (ex.code != mapbox::sqlite::Exception::Code::CANTOPEN && ex.code != mapbox::sqlite::Exception::Code::NOTADB) {
                 Log::Error(Event::Database, "Unexpected error connecting to database: %s", ex.what());
                 throw;
             }
 
             try {
-                if (ex.code == SQLITE_NOTADB) {
+                if (ex.code == mapbox::sqlite::Exception::Code::NOTADB) {
                     removeExisting();
                 }
                 connect(mapbox::sqlite::ReadWrite | mapbox::sqlite::Create);
@@ -313,7 +312,7 @@ bool OfflineDatabase::putResource(const Resource& resource,
     }
 
     update->run();
-    if (db->changes() != 0) {
+    if (update->changes() != 0) {
         transaction.commit();
         return false;
     }
@@ -502,7 +501,7 @@ bool OfflineDatabase::putTile(const Resource::TileData& tile,
     }
 
     update->run();
-    if (db->changes() != 0) {
+    if (update->changes() != 0) {
         transaction.commit();
         return false;
     }
@@ -567,7 +566,7 @@ OfflineRegion OfflineDatabase::createRegion(const OfflineRegionDefinition& defin
     stmt->bindBlob(2, metadata);
     stmt->run();
 
-    return OfflineRegion(db->lastInsertRowid(), definition, metadata);
+    return OfflineRegion(stmt->lastInsertRowId(), definition, metadata);
 }
 
 OfflineRegionMetadata OfflineDatabase::updateMetadata(const int64_t regionID, const OfflineRegionMetadata& metadata) {
@@ -579,7 +578,7 @@ OfflineRegionMetadata OfflineDatabase::updateMetadata(const int64_t regionID, co
     stmt->bindBlob(1, metadata);
     stmt->bind(2, regionID);
     stmt->run();
-    
+
     return metadata;
 }
 
@@ -656,7 +655,7 @@ bool OfflineDatabase::markUsed(int64_t regionID, const Resource& resource) {
         insert->bind(6, tile.z);
         insert->run();
 
-        if (db->changes() == 0) {
+        if (insert->changes() == 0) {
             return false;
         }
 
@@ -693,7 +692,7 @@ bool OfflineDatabase::markUsed(int64_t regionID, const Resource& resource) {
         insert->bind(2, resource.url);
         insert->run();
 
-        if (db->changes() == 0) {
+        if (insert->changes() == 0) {
             return false;
         }
 
@@ -816,7 +815,7 @@ bool OfflineDatabase::evict(uint64_t neededFreeSize) {
             return false;
         }
         Timestamp accessed = accessedStmt->get<Timestamp>(0);
-        
+
         // clang-format off
         Statement stmt1 = getStatement(
             "DELETE FROM resources "
@@ -830,7 +829,7 @@ bool OfflineDatabase::evict(uint64_t neededFreeSize) {
         // clang-format on
         stmt1->bind(1, accessed);
         stmt1->run();
-        uint64_t changes1 = db->changes();
+        uint64_t changes1 = stmt1->changes();
 
         // clang-format off
         Statement stmt2 = getStatement(
@@ -845,7 +844,7 @@ bool OfflineDatabase::evict(uint64_t neededFreeSize) {
         // clang-format on
         stmt2->bind(1, accessed);
         stmt2->run();
-        uint64_t changes2 = db->changes();
+        uint64_t changes2 = stmt2->changes();
 
         // The cached value of offlineTileCount does not need to be updated
         // here because only non-offline tiles can be removed by eviction.

@@ -15,7 +15,7 @@ class PositionedIcon;
 struct SymbolQuad {
     explicit SymbolQuad(Point<float> tl_, Point<float> tr_, Point<float> bl_, Point<float> br_,
             Rect<uint16_t> tex_, float anchorAngle_, float glyphAngle_, Point<float> anchorPoint_,
-            float minScale_, float maxScale_)
+            float minScale_, float maxScale_, WritingModeType writingMode_)
         : tl(std::move(tl_)),
         tr(std::move(tr_)),
         bl(std::move(bl_)),
@@ -25,18 +25,20 @@ struct SymbolQuad {
         glyphAngle(glyphAngle_),
         anchorPoint(std::move(anchorPoint_)),
         minScale(minScale_),
-        maxScale(maxScale_) {}
+        maxScale(maxScale_),
+        writingMode(writingMode_) {}
 
     Point<float> tl, tr, bl, br;
     Rect<uint16_t> tex;
     float anchorAngle, glyphAngle;
     Point<float> anchorPoint;
     float minScale, maxScale;
+    WritingModeType writingMode;
 };
 
 typedef std::vector<SymbolQuad> SymbolQuads;
 
-SymbolQuads getIconQuads(Anchor& anchor, const PositionedIcon& shapedIcon,
+SymbolQuad getIconQuad(Anchor& anchor, const PositionedIcon& shapedIcon,
         const GeometryCoordinates& line, const style::SymbolLayoutProperties::Evaluated&,
         style::SymbolPlacementType placement, const Shaping& shapedText);
 

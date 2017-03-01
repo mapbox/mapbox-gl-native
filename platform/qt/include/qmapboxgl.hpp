@@ -10,10 +10,6 @@
 #include <QString>
 #include <QStringList>
 
-#if QT_VERSION >= 0x050000
-#include <QOpenGLFramebufferObject>
-#endif
-
 class QMapboxGLPrivate;
 
 // This header follows the Qt coding style: https://wiki.qt.io/Qt_Coding_Style
@@ -183,11 +179,8 @@ public:
 
     void addAnnotationIcon(const QString &name, const QImage &sprite);
 
-    QMapbox::AnnotationID addPointAnnotation(const QMapbox::PointAnnotation &);
-    QMapbox::AnnotationID addShapeAnnotation(const QMapbox::ShapeAnnotation &);
-
-    void updatePointAnnotation(QMapbox::AnnotationID, const QMapbox::PointAnnotation &);
-
+    QMapbox::AnnotationID addAnnotation(const QMapbox::Annotation &);
+    void updateAnnotation(QMapbox::AnnotationID, const QMapbox::Annotation &);
     void removeAnnotation(QMapbox::AnnotationID);
 
     void setLayoutProperty(const QString &layer, const QString &property, const QVariant &value);
@@ -201,6 +194,9 @@ public:
 
     void resize(const QSize &size, const QSize &framebufferSize);
 
+    double metersPerPixelAtLatitude(double latitude, double zoom) const;
+    QMapbox::ProjectedMeters projectedMetersForCoordinate(const QMapbox::Coordinate &) const;
+    QMapbox::Coordinate coordinateForProjectedMeters(const QMapbox::ProjectedMeters &) const;
     QPointF pixelForCoordinate(const QMapbox::Coordinate &) const;
     QMapbox::Coordinate coordinateForPixel(const QPointF &) const;
 
@@ -211,6 +207,7 @@ public:
     QMargins margins() const;
 
     void addSource(const QString &sourceID, const QVariantMap& params);
+    bool sourceExists(const QString &sourceID);
     void updateSource(const QString &sourceID, const QVariantMap& params);
     void removeSource(const QString &sourceID);
 
@@ -224,16 +221,13 @@ public:
         void* context,
         char* before = NULL);
     void addLayer(const QVariantMap &params);
+    bool layerExists(const QString &id);
     void removeLayer(const QString &id);
 
     void setFilter(const QString &layer, const QVariant &filter);
 
 public slots:
-#if QT_VERSION >= 0x050000
-    void render(QOpenGLFramebufferObject *fbo = NULL);
-#else
     void render();
-#endif
     void connectionEstablished();
 
 signals:

@@ -18,7 +18,7 @@ NSString *NumberAndUnitString(NSInteger quantity, NSString *singular, NSString *
     if (![value isKindOfClass:[NSValue class]]) {
         return nil;
     }
-    
+
     NSTimeInterval timeInterval = [value doubleValue];
     NSInteger seconds = floor(timeInterval);
     NSInteger minutes = floor(seconds / 60);
@@ -29,7 +29,7 @@ NSString *NumberAndUnitString(NSInteger quantity, NSString *singular, NSString *
     hours -= days * 24;
     NSInteger weeks = floor(days) / 7;
     days -= weeks * 7;
-    
+
     NSMutableArray *components = [NSMutableArray array];
     if (seconds || timeInterval < 60) {
         [components addObject:NumberAndUnitString(seconds, @"second", @"seconds")];
@@ -46,7 +46,7 @@ NSString *NumberAndUnitString(NSInteger quantity, NSString *singular, NSString *
     if (weeks) {
         [components insertObject:NumberAndUnitString(weeks, @"week", @"weeks") atIndex:0];
     }
-    
+
     return [components componentsJoinedByString:@", "];
 }
 

@@ -4,10 +4,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.RectF;
 import android.os.Bundle;
 import android.support.annotation.RawRes;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
@@ -33,7 +30,7 @@ import timber.log.Timber;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconImage;
 
 /**
- * Demo's query rendered features on Symbols
+ * Test activity showcasing using the query rendered features API to count Symbols in a rectangle.
  */
 public class QueryRenderedFeaturesBoxSymbolCountActivity extends AppCompatActivity {
 
@@ -46,11 +43,10 @@ public class QueryRenderedFeaturesBoxSymbolCountActivity extends AppCompatActivi
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_query_features_box);
-    setupActionBar();
 
     final View selectionBox = findViewById(R.id.selection_box);
 
-    //Initialize map as normal
+    // Initialize map as normal
     mapView = (MapView) findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
     mapView.getMapAsync(new OnMapReadyCallback() {
@@ -59,7 +55,7 @@ public class QueryRenderedFeaturesBoxSymbolCountActivity extends AppCompatActivi
       public void onMapReady(final MapboxMap mapboxMap) {
         QueryRenderedFeaturesBoxSymbolCountActivity.this.mapboxMap = mapboxMap;
 
-        //Add a symbol layer (also works with annotations)
+        // Add a symbol layer (also works with annotations)
         try {
           mapboxMap.addSource(new GeoJsonSource("symbols-source", readRawResource(R.raw.test_points_utrecht)));
         } catch (IOException ioException) {
@@ -76,14 +72,14 @@ public class QueryRenderedFeaturesBoxSymbolCountActivity extends AppCompatActivi
         selectionBox.setOnClickListener(new View.OnClickListener() {
           @Override
           public void onClick(View view) {
-            //Query
+            // Query
             int top = selectionBox.getTop() - mapView.getTop();
             int left = selectionBox.getLeft() - mapView.getLeft();
             RectF box = new RectF(left, top, left + selectionBox.getWidth(), top + selectionBox.getHeight());
             Timber.i(String.format("Querying box %s", box));
             List<Feature> features = mapboxMap.queryRenderedFeatures(box, "symbols-layer");
 
-            //Show count
+            // Show count
             if (toast != null) {
               toast.cancel();
             }
@@ -160,27 +156,4 @@ public class QueryRenderedFeaturesBoxSymbolCountActivity extends AppCompatActivi
     super.onLowMemory();
     mapView.onLowMemory();
   }
-
-  @Override
-  public boolean onOptionsItemSelected(MenuItem item) {
-    switch (item.getItemId()) {
-      case android.R.id.home:
-        onBackPressed();
-        return true;
-      default:
-        return super.onOptionsItemSelected(item);
-    }
-  }
-
-  private void setupActionBar() {
-    Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-    setSupportActionBar(toolbar);
-
-    final ActionBar actionBar = getSupportActionBar();
-    if (actionBar != null) {
-      actionBar.setDisplayHomeAsUpEnabled(true);
-      actionBar.setDisplayShowHomeEnabled(true);
-    }
-  }
-
 }

@@ -26,6 +26,9 @@ TEST(URL, isURL) {
 
 TEST(URL, Scheme) {
     EXPECT_EQ(URL::Segment({ 0, 4 }), URL("http://example.com/test?query=foo").scheme);
+    EXPECT_EQ(URL::Segment({ 0, 4 }), URL("http://127.0.0.1:8080/test?query=foo").scheme);
+    EXPECT_EQ(URL::Segment({ 0, 4 }), URL("http://[2a01:4f8:c17:3680::386a:6f3d]:8080/test?query=foo").scheme);
+    EXPECT_EQ(URL::Segment({ 0, 4 }), URL("http://user:password@example.com.:80/test?query=foo").scheme);
     EXPECT_EQ(URL::Segment({ 0, 0 }), URL("htt").scheme);
     EXPECT_EQ(URL::Segment({ 0, 6 }), URL("mapbox://").scheme);
     EXPECT_EQ(URL::Segment({ 0, 6 }), URL("mapbox:/#").scheme);
@@ -33,12 +36,17 @@ TEST(URL, Scheme) {
     EXPECT_EQ(URL::Segment({ 0, 0 }), URL("").scheme);
     EXPECT_EQ(URL::Segment({ 0, 0 }), URL("http?query://baz").scheme);
     EXPECT_EQ(URL::Segment({ 0, 0 }), URL(":::").scheme);
+    EXPECT_EQ(URL::Segment({ 0, 0 }), URL("127.0.0.1:8080/test?query=foo").scheme);
+    EXPECT_EQ(URL::Segment({ 0, 0 }), URL("[2a01:4f8:c17:3680::386a:6f3d]:8080/test?query=foo").scheme);
     EXPECT_EQ(URL::Segment({ 0, 4 }), URL("data:,Hello%2C%20World!").scheme);
     EXPECT_EQ(URL::Segment({ 0, 4 }), URL("data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D").scheme);
 }
 
 TEST(URL, Query) {
     EXPECT_EQ(URL::Segment({ 23, 10 }), URL("http://example.com/test?query=foo").query);
+    EXPECT_EQ(URL::Segment({ 26, 10 }), URL("http://127.0.0.1:8080/test?query=foo").query);
+    EXPECT_EQ(URL::Segment({ 47, 10 }), URL("http://[2a01:4f8:c17:3680::386a:6f3d]:8080/test?query=foo").query);
+    EXPECT_EQ(URL::Segment({ 41, 10 }), URL("http://user:password@example.com.:80/test?query=foo").query);
     EXPECT_EQ(URL::Segment({ 23, 10 }), URL("http://example.com/test?query=foo#page-2").query);
     EXPECT_EQ(URL::Segment({ 23, 0 }), URL("http://example.com/test#query=foo?page-2").query);
     EXPECT_EQ(URL::Segment({ 0, 10 }), URL("?query=foo").query);
@@ -49,12 +57,17 @@ TEST(URL, Query) {
     EXPECT_EQ(URL::Segment({ 12, 0 }), URL("mapbox://bar").query);
     EXPECT_EQ(URL::Segment({ 0, 0 }), URL("").query);
     EXPECT_EQ(URL::Segment({ 3, 0 }), URL(":::").query);
+    EXPECT_EQ(URL::Segment({ 19, 10 }), URL("127.0.0.1:8080/test?query=foo").query);
+    EXPECT_EQ(URL::Segment({ 40, 10 }), URL("[2a01:4f8:c17:3680::386a:6f3d]:8080/test?query=foo").query);
     EXPECT_EQ(URL::Segment({ 23, 0 }), URL("data:,Hello%2C%20World!").query);
     EXPECT_EQ(URL::Segment({ 47, 0 }), URL("data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D").query);
 }
 
 TEST(URL, Domain) {
     EXPECT_EQ(URL::Segment({ 7, 11 }), URL("http://example.com/test?query=foo").domain);
+    EXPECT_EQ(URL::Segment({ 7, 14 }), URL("http://127.0.0.1:8080/test?query=foo").domain);
+    EXPECT_EQ(URL::Segment({ 7, 35 }), URL("http://[2a01:4f8:c17:3680::386a:6f3d]:8080/test?query=foo").domain);
+    EXPECT_EQ(URL::Segment({ 7, 29 }), URL("http://user:password@example.com.:80/test?query=foo").domain);
     EXPECT_EQ(URL::Segment({ 5, 11 }), URL("http:example.com/test?query=foo").domain);
     EXPECT_EQ(URL::Segment({ 0, 3 }), URL("htt").domain);
     EXPECT_EQ(URL::Segment({ 0, 4 }), URL("http?query://baz").domain);
@@ -71,18 +84,25 @@ TEST(URL, Domain) {
     EXPECT_EQ(URL::Segment({ 7, 6 }), URL("http://domain?").domain);
     EXPECT_EQ(URL::Segment({ 7, 6 }), URL("http://domain?foo").domain);
     EXPECT_EQ(URL::Segment({ 3, 0 }), URL(":::").domain);
+    EXPECT_EQ(URL::Segment({ 0, 14 }), URL("127.0.0.1:8080/test?query=foo").domain);
+    EXPECT_EQ(URL::Segment({ 0, 35 }), URL("[2a01:4f8:c17:3680::386a:6f3d]:8080/test?query=foo").domain);
     EXPECT_EQ(URL::Segment({ 5, 0 }), URL("data:,Hello%2C%20World!").domain);
     EXPECT_EQ(URL::Segment({ 5, 17 }), URL("data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D").domain);
 }
 
 TEST(URL, Path) {
     EXPECT_EQ(URL::Segment({ 18, 5 }), URL("http://example.com/test?query=foo").path);
+    EXPECT_EQ(URL::Segment({ 21, 5 }), URL("http://127.0.0.1:8080/test?query=foo").path);
+    EXPECT_EQ(URL::Segment({ 42, 5 }), URL("http://[2a01:4f8:c17:3680::386a:6f3d]:8080/test?query=foo").path);
+    EXPECT_EQ(URL::Segment({ 36, 5 }), URL("http://user:password@example.com.:80/test?query=foo").path);
     EXPECT_EQ(URL::Segment({ 18, 5 }), URL("http://example.com/test?query=foo#bar").path);
     EXPECT_EQ(URL::Segment({ 18, 5 }), URL("http://example.com/test#bar").path);
     EXPECT_EQ(URL::Segment({ 18, 0 }), URL("http://example.com?query=foo").path);
     EXPECT_EQ(URL::Segment({ 18, 0 }), URL("http://example.com#?query=foo").path);
     EXPECT_EQ(URL::Segment({ 18, 1 }), URL("http://example.com/?query=foo").path);
     EXPECT_EQ(URL::Segment({ 3, 0 }), URL(":::").path);
+    EXPECT_EQ(URL::Segment({ 14, 5 }), URL("127.0.0.1:8080/test?query=foo").path);
+    EXPECT_EQ(URL::Segment({ 35, 5 }), URL("[2a01:4f8:c17:3680::386a:6f3d]:8080/test?query=foo").path);
     EXPECT_EQ(URL::Segment({ 13, 0 }), URL("http://domain").path);
     EXPECT_EQ(URL::Segment({ 6, 4 }), URL("domain/foo?bar").path);
     EXPECT_EQ(URL::Segment({ 6, 17 }), URL("data:,Hello%2C%20World!").path);

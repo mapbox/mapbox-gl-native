@@ -25,6 +25,10 @@ public:
         return feature.properties;
     }
 
+    optional<FeatureIdentifier> getID() const override {
+        return feature.id;
+    }
+
     GeometryCollection getGeometries() const override {
         GeometryCollection geometry = apply_visitor(ToGeometryCollection(), feature.geometry);
 
@@ -80,7 +84,7 @@ GeoJSONTile::GeoJSONTile(const OverscaledTileID& overscaledTileID,
                          const style::UpdateParameters& parameters)
     : GeometryTile(overscaledTileID, sourceID_, parameters) {
 }
-    
+
 void GeoJSONTile::updateData(const mapbox::geometry::feature_collection<int16_t>& features) {
     setData(std::make_unique<GeoJSONTileData>(features));
 }

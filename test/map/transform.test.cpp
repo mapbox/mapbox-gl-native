@@ -343,12 +343,12 @@ TEST(Transform, Padding) {
     ASSERT_DOUBLE_EQ(10, trueCenter.latitude);
     ASSERT_DOUBLE_EQ(-100, trueCenter.longitude);
     ASSERT_DOUBLE_EQ(10, transform.getZoom());
-    
+
     const LatLng manualShiftedCenter = transform.getState().screenCoordinateToLatLng({
         1000.0 / 2.0,
         1000.0 / 4.0,
     });
-    
+
     EdgeInsets padding;
 
     padding.top = 0;
@@ -359,7 +359,7 @@ TEST(Transform, Padding) {
 
     padding.top = 1000.0 / 2.0;
     ASSERT_TRUE(bool(padding));
-    
+
     const LatLng shiftedCenter = transform.getLatLng(padding);
     ASSERT_NE(trueCenter.latitude, shiftedCenter.latitude);
     ASSERT_NEAR(trueCenter.longitude, shiftedCenter.longitude, 1e-9);

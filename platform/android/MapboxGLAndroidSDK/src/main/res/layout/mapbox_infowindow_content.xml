@@ -1,56 +1,55 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<merge xmlns:android="http://schemas.android.com/apk/res/android">
+<com.mapbox.mapboxsdk.annotations.BubbleLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingBottom="16dp"
+    android:paddingLeft="20dp"
+    android:paddingRight="20dp"
+    android:paddingTop="14dp"
+    app:mapbox_bl_arrowDirection="bottom"
+    app:mapbox_bl_arrowHeight="8dp"
+    app:mapbox_bl_arrowPosition="16dp"
+    app:mapbox_bl_arrowWidth="8dp"
+    app:mapbox_bl_bubbleColor="@android:color/white"
+    app:mapbox_bl_cornersRadius="6dp"
+    app:mapbox_bl_strokeColor="@android:color/darker_gray"
+    app:mapbox_bl_strokeWidth="1dp">
 
-    <LinearLayout
-        android:id="@+id/infowindow_content"
+    <TextView
+        android:id="@+id/infowindow_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/mapbox_infowindow_icon_bg"
-        android:orientation="vertical"
-        android:paddingBottom="16dp"
-        android:paddingLeft="20dp"
-        android:paddingRight="20dp"
-        android:paddingTop="14dp">
+        android:layout_marginBottom="2dp"
+        android:maxEms="17"
+        android:text="@string/mapbox_infoWindowTitle"
+        android:textColor="@android:color/black"
+        android:textSize="18sp"
+        android:textStyle="bold"/>
 
-        <TextView
-            android:id="@+id/infowindow_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="2dp"
-            android:maxEms="17"
-            android:text="@string/mapbox_infoWindowTitle"
-            android:textColor="@android:color/black"
-            android:textSize="18sp"
-            android:textStyle="bold" />
+    <TextView
+        android:id="@+id/infowindow_description"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="2dp"
+        android:layout_marginTop="2dp"
+        android:lineSpacingExtra="1dp"
+        android:maxEms="17"
+        android:text="@string/mapbox_infoWindowDescription"
+        android:textColor="@color/mapbox_gray"
+        android:textSize="14sp"/>
 
-        <TextView
-            android:id="@+id/infowindow_description"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="2dp"
-            android:layout_marginTop="2dp"
-            android:lineSpacingExtra="1dp"
-            android:maxEms="17"
-            android:text="@string/mapbox_infoWindowDescription"
-            android:textColor="@color/mapbox_gray"
-            android:textSize="14sp" />
+    <TextView
+        android:id="@+id/infowindow_subdescription"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:maxEms="17"
+        android:text="@string/mapbox_infoWindowAddress"
+        android:textColor="@android:color/black"
+        android:textSize="12sp"
+        android:visibility="gone"/>
 
-        <TextView
-            android:id="@+id/infowindow_subdescription"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:maxEms="17"
-            android:text="@string/mapbox_infoWindowAddress"
-            android:textColor="@android:color/black"
-            android:textSize="12sp"
-            android:visibility="gone" />
-    </LinearLayout>
-
-    <com.mapbox.mapboxsdk.annotations.InfoWindowTipView
-        android:id="@+id/infowindow_tipview"
-        android:layout_width="@dimen/mapbox_infowindow_tipview_width"
-        android:layout_height="14dp"
-        android:layout_below="@+id/infowindow_content" />
-
-</merge>
+</com.mapbox.mapboxsdk.annotations.BubbleLayout>
 

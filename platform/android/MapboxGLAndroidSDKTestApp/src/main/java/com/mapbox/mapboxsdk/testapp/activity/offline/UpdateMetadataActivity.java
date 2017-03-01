@@ -3,13 +3,10 @@ package com.mapbox.mapboxsdk.testapp.activity.offline;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -39,15 +36,6 @@ public class UpdateMetadataActivity extends AppCompatActivity implements Adapter
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_metadata_update);
-
-    Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-    setSupportActionBar(toolbar);
-
-    ActionBar actionBar = getSupportActionBar();
-    if (actionBar != null) {
-      actionBar.setDisplayHomeAsUpEnabled(true);
-      actionBar.setDisplayShowHomeEnabled(true);
-    }
 
     ListView listView = (ListView) findViewById(R.id.listView);
     listView.setAdapter(adapter = new OfflineRegionMetadataAdapter(this));
@@ -123,17 +111,6 @@ public class UpdateMetadataActivity extends AppCompatActivity implements Adapter
         Toast.makeText(UpdateMetadataActivity.this, "Error loading regions " + error, Toast.LENGTH_LONG).show();
       }
     });
-  }
-
-  @Override
-  public boolean onOptionsItemSelected(MenuItem item) {
-    switch (item.getItemId()) {
-      case android.R.id.home:
-        onBackPressed();
-        return true;
-      default:
-        return super.onOptionsItemSelected(item);
-    }
   }
 
   private static class OfflineRegionMetadataAdapter extends BaseAdapter {

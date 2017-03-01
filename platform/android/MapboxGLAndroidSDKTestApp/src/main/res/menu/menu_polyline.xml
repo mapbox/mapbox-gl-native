@@ -3,7 +3,7 @@
     xmlns:mapbox="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/action_id_remove"
-        android:icon="@drawable/ic_delete_24dp"
+        android:icon="@drawable/ic_delete"
         android:title="@string/action_remove_polylines"
         mapbox:showAsAction="ifRoom" />
     <item

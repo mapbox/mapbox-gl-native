@@ -34,7 +34,7 @@ TEST(API, RepeatedRender) {
 
     Log::setObserver(std::make_unique<FixtureLogObserver>());
 
-    Map map(backend, view.size, 1, fileSource, threadPool, MapMode::Still);
+    Map map(backend, view.getSize(), 1, fileSource, threadPool, MapMode::Still);
 
     {
         map.setStyleJSON(style);

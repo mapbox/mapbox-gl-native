@@ -44,7 +44,7 @@
 {
     if (self == other) return YES;
     if (![other isKindOfClass:[MGLMultiPoint class]]) return NO;
-           
+
     MGLMultiPoint *otherMultipoint = other;
     return ([super isEqual:otherMultipoint]
             && _coordinates == otherMultipoint->_coordinates);
@@ -97,7 +97,7 @@
         [NSException raise:NSInvalidArgumentException
                     format:@"A multipoint must have at least one vertex."];
     }
-    
+
     [self willChangeValueForKey:@"coordinates"];
     _coordinates = { coords, coords + count };
     _bounds = {};
@@ -108,13 +108,13 @@
     if (!count) {
         return;
     }
-    
+
     if (index > _coordinates.size()) {
         [NSException raise:NSRangeException
                     format:@"Invalid index %lu for existing coordinate count %ld",
          (unsigned long)index, (unsigned long)[self pointCount]];
     }
-    
+
     [self willChangeValueForKey:@"coordinates"];
     _coordinates.insert(_coordinates.begin() + index, count, *coords);
     _bounds = {};
@@ -135,7 +135,7 @@
     if (!count && !range.length) {
         return;
     }
-    
+
     if (NSMaxRange(range) > _coordinates.size()) {
         [NSException raise:NSRangeException
                     format:@"Invalid range %@ for existing coordinate count %ld",

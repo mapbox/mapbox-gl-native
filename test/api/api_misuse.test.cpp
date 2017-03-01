@@ -27,7 +27,7 @@ TEST(API, RenderWithoutCallback) {
     ThreadPool threadPool(4);
 
     std::unique_ptr<Map> map =
-        std::make_unique<Map>(backend, view.size, 1, fileSource, threadPool, MapMode::Still);
+        std::make_unique<Map>(backend, view.getSize(), 1, fileSource, threadPool, MapMode::Still);
     map->renderStill(view, nullptr);
 
     // Force Map thread to join.
@@ -51,7 +51,7 @@ TEST(API, RenderWithoutStyle) {
     StubFileSource fileSource;
     ThreadPool threadPool(4);
 
-    Map map(backend, view.size, 1, fileSource, threadPool, MapMode::Still);
+    Map map(backend, view.getSize(), 1, fileSource, threadPool, MapMode::Still);
 
     std::exception_ptr error;
     map.renderStill(view, [&](std::exception_ptr error_) {

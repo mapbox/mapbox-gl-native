@@ -29,15 +29,17 @@ if [ -x $(which ${CXX}) ]; then
     ${CXX} --version
 fi
 
-# Ensure mason is on the PATH
-export PATH="`pwd`/.mason:${PATH}" MASON_DIR="`pwd`/.mason"
-
-mapbox_time "checkout_mason" \
-git submodule update --init .mason
-
 # Touch package.json so that we are definitely going to run an npm update action
 mapbox_time "touch_package_json" \
 touch package.json
+
+function mapbox_install_logbt {
+    scripts/mason.sh INSTALL gdb VERSION 7.12
+    export PATH=$(scripts/mason.sh PREFIX gdb VERSION 7.12)/bin:${PATH}
+    curl -sSfL https://github.com/mapbox/logbt/archive/v2.0.1.tar.gz | tar --gunzip --extract --strip-components=2 --exclude="*md" --exclude="test*" --directory=.
+    sudo ./logbt --setup
+    ./logbt --test
+}
 
 function mapbox_start_xvfb {
     if [ ! -f /etc/init.d/xvfb ]; then
@@ -58,8 +60,11 @@ export -f mapbox_start_xvfb
 function mapbox_export_mesa_library_path {
     # Install and set up to load a more recent version of mesa
     mapbox_time "install_mesa" \
-    mason install mesa 13.0.0-glx
-    export LD_LIBRARY_PATH="`mason prefix mesa 13.0.0-glx`/lib:${LD_LIBRARY_PATH:-}"
+    scripts/mason.sh install mesa VERSION 13.0.4
+
+    MESA_PREFIX=`scripts/mason.sh PREFIX mesa VERSION 13.0.4`
+    export LD_LIBRARY_PATH="${MESA_PREFIX}/lib:${LD_LIBRARY_PATH:-}"
+    export LIBGL_DRIVERS_PATH="${MESA_PREFIX}/lib/dri"
 }
 
 export -f mapbox_export_mesa_library_path

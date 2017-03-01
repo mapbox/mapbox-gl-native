@@ -41,24 +41,9 @@ protected:
     virtual void activate() = 0;
     virtual void deactivate() = 0;
 
-private:
-    const std::unique_ptr<gl::Context> context;
+    std::unique_ptr<gl::Context> context;
 
     friend class BackendScope;
-};
-
-class BackendScope {
-public:
-    BackendScope(Backend& backend_) : backend(backend_) {
-        backend.activate();
-    }
-
-    ~BackendScope() {
-        backend.deactivate();
-    }
-
-private:
-    Backend& backend;
 };
 
 } // namespace mbgl

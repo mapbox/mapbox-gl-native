@@ -16,7 +16,8 @@ bool RasterLayer::Impl::evaluate(const PropertyEvaluationParameters& parameters)
     return paint.hasTransition();
 }
 
-std::unique_ptr<Bucket> RasterLayer::Impl::createBucket(BucketParameters&, const GeometryTileLayer&) const {
+std::unique_ptr<Bucket> RasterLayer::Impl::createBucket(const BucketParameters&, const std::vector<const Layer*>&) const {
+    assert(false);
     return nullptr;
 }
 

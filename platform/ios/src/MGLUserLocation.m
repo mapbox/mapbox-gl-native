@@ -48,7 +48,7 @@ NS_ASSUME_NONNULL_END
 - (BOOL)isEqual:(id)other {
     if (self == other) return YES;
     if (![other isKindOfClass:[MGLUserLocation class]]) return NO;
-    
+
     MGLUserLocation *otherUserLocation = other;
     return ((!self.location && !otherUserLocation.location) || [self.location distanceFromLocation:otherUserLocation.location] == 0)
     && ((!self.title && !otherUserLocation.title) || [self.title isEqualToString:otherUserLocation.title])

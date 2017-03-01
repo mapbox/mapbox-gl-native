@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="primary">#1E8CAB</color>
-    <color name="primary_dark">#166B83</color>
+    <color name="primary">#52A1D8</color>
+    <color name="primaryDark">#3887BE</color>
     <color name="accent">#E55E5E</color>
     <color name="white">#F9F9F9</color>
-    <color name="mapbox_green">#56B881</color>
+    <color name="mapboxGreen">#56B881</color>
 
-    <color name="red_accent">#D50000</color>
-    <color name="blue_accent">#2962FF</color>
-    <color name="green_accent">#1B5E20</color>
+    <color name="redAccent">#D50000</color>
+    <color name="blueAccent">#2962FF</color>
+    <color name="greenAccent">#1B5E20</color>
+
 </resources>

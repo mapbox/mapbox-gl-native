@@ -53,9 +53,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  Removes the mbgl style layer that this object represents from the mbgl map.
- 
+
  When a mbgl style layer is removed, ownership of the object is transferred back
- to the `MGLStyleLayer` instance and the unique_ptr reference is valid again. It 
+ to the `MGLStyleLayer` instance and the unique_ptr reference is valid again. It
  is safe to add the layer back to the style after it is removed.
  */
 - (void)removeFromMapView:(MGLMapView *)mapView;

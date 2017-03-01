@@ -45,7 +45,7 @@ NS_INLINE mbgl::EdgeInsets MGLEdgeInsetsFromNSEdgeInsets(NSEdgeInsets insets) {
 #endif
 
 /** Converts a map zoom level to a camera altitude.
-    
+
     @param zoomLevel The zoom level to convert.
     @param pitch The camera pitch, measured in degrees.
     @param latitude The latitude of the point at the center of the viewport.
@@ -54,7 +54,7 @@ NS_INLINE mbgl::EdgeInsets MGLEdgeInsetsFromNSEdgeInsets(NSEdgeInsets insets) {
 CLLocationDistance MGLAltitudeForZoomLevel(double zoomLevel, CGFloat pitch, CLLocationDegrees latitude, CGSize size);
 
 /** Converts a camera altitude to a map zoom level.
-    
+
     @param altitude The altitude to convert, measured in meters.
     @param pitch The camera pitch, measured in degrees.
     @param latitude The latitude of the point at the center of the viewport.

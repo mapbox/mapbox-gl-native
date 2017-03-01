@@ -19,7 +19,7 @@ namespace conversion {
 template <>
 Result<GeoJSON> convertGeoJSON(const mbgl::android::Value& value) {
 
-    //Value should be a string wrapped in an object
+    // Value should be a string wrapped in an object
     mbgl::android::Value jsonValue = value.get("data");
     if(value.isNull()) {
         return Error { "no json data found" };

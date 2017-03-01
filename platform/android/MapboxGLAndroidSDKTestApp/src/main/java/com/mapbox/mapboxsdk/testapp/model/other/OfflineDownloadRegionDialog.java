@@ -37,7 +37,7 @@ public class OfflineDownloadRegionDialog extends DialogFragment {
     final EditText regionNameEdit = new EditText(getActivity());
 
     builder.setTitle("Choose a name for the region")
-      .setIcon(R.drawable.ic_airplanemode_active_black_24dp)
+      .setIcon(R.drawable.ic_airplanemode_active_black)
       .setView(regionNameEdit)
       .setPositiveButton("Start", new DialogInterface.OnClickListener() {
         @Override

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:mapbox="http://schemas.android.com/tools"
     android:id="@+id/map_container"
     android:layout_width="match_parent"
@@ -23,7 +24,7 @@
             mapbox:center_latitude="38.913187"
             mapbox:center_longitude="-77.032546"
             mapbox:style_url="mapbox://styles/mapbox/streets-v9"
-            mapbox:zoom="12" />
+            mapbox:zoom="12"/>
 
         <!-- SF -->
         <fragment
@@ -35,7 +36,7 @@
             mapbox:center_latitude="37.775732"
             mapbox:center_longitude="-122.413985"
             mapbox:style_url="mapbox://styles/mapbox/outdoors-v9"
-            mapbox:zoom="13" />
+            mapbox:zoom="13"/>
     </LinearLayout>
 
     <LinearLayout
@@ -55,7 +56,7 @@
             mapbox:center_latitude="12.97913"
             mapbox:center_longitude="77.59188"
             mapbox:style_url="mapbox://styles/mapbox/light-v9"
-            mapbox:zoom="14" />
+            mapbox:zoom="14"/>
 
         <!-- Ayacucho -->
         <fragment
@@ -67,6 +68,6 @@
             mapbox:center_latitude="-13.155980"
             mapbox:center_longitude="-74.217134"
             mapbox:style_url="mapbox://styles/mapbox/dark-v9"
-            mapbox:zoom="15" />
+            mapbox:zoom="15"/>
     </LinearLayout>
 </LinearLayout>

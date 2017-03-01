@@ -28,15 +28,6 @@ workflows:
                 envman add --key SKIPCI --value false
             fi
     - script:
-        title: Configure GL-native build environement
-        run_if: '{{enveq "SKIPCI" "false"}}'
-        inputs:
-        - content: |-
-            #!/bin/bash
-            set -eu -o pipefail
-            curl -sL https://deb.nodesource.com/setup_4.x | sudo -E bash -
-            sudo apt-get install -y pkg-config nodejs cmake
-    - script:
         title: Run Checkstyle
         run_if: '{{enveq "SKIPCI" "false"}}'
         inputs:
@@ -166,14 +157,6 @@ workflows:
   scheduled:
     steps:
     - script:
-        title: Configure GL-native build environement
-        inputs:
-        - content: |-
-            #!/bin/bash
-            set -eu -o pipefail
-            curl -sL https://deb.nodesource.com/setup_4.x | sudo -E bash -
-            sudo apt-get install -y pkg-config nodejs cmake
-    - script:
         title: Configure AWS-CLI
         inputs:
         - content: |-
@@ -200,11 +183,7 @@ workflows:
             #!/bin/bash
             echo "Compile libmapbox-gl.so for all supportd abi's:"
             export BUILDTYPE=Release
-            make android-lib-arm-v5
-            make android-lib-arm-v7
-            make android-lib-arm-v8
-            make android-lib-x86
-            make android-lib-x86-64
+            make apackage
             cd platform/android && ./gradlew :MapboxGLAndroidSDK:assembleRelease
     - script:
         title: Publish to maven
@@ -226,14 +205,6 @@ workflows:
         - icon_url_on_error: https://bitrise-public-content-production.s3.amazonaws.com/slack/bitrise-slack-error-icon-128.png
   devicefarmUpload:
     steps:
-    - script:
-        title: Configure GL-native build environement
-        inputs:
-        - content: |-
-            #!/bin/bash
-            set -eu -o pipefail
-            curl -sL https://deb.nodesource.com/setup_4.x | sudo -E bash -
-            sudo apt-get install -y pkg-config nodejs cmake
     - script:
         title: Build release
         inputs:
@@ -277,14 +248,6 @@ workflows:
   nightly-release:
     steps:
     - script:
-        title: Configure GL-native build environement
-        inputs:
-        - content: |-
-            #!/bin/bash
-            set -eu -o pipefail
-            curl -sL https://deb.nodesource.com/setup_4.x | sudo -E bash -
-            sudo apt-get install -y pkg-config nodejs cmake
-    - script:
         title: Configure AWS-CLI
         inputs:
         - content: |-
@@ -298,11 +261,7 @@ workflows:
             #!/bin/bash
             echo "Compile libmapbox-gl.so for all supportd abi's:"
             export BUILDTYPE=Release
-            make android-lib-arm-v5
-            make android-lib-arm-v7
-            make android-lib-arm-v8
-            make android-lib-x86
-            make android-lib-x86-64
+            make apackage
             cd platform/android && ./gradlew :MapboxGLAndroidSDK:assembleRelease
     - script:
         title: Log metrics

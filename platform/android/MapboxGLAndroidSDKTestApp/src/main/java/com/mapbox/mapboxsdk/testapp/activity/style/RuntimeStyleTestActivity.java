@@ -9,7 +9,7 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.R;
 
 /**
- * Test activity for unit test execution
+ * Test activity used for instrumentation test execution.
  */
 public class RuntimeStyleTestActivity extends AppCompatActivity {
 
@@ -21,7 +21,7 @@ public class RuntimeStyleTestActivity extends AppCompatActivity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_runtime_style);
 
-    //Initialize map as normal
+    // Initialize map as normal
     mapView = (MapView) findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
     mapView.getMapAsync(new OnMapReadyCallback() {

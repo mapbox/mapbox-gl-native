@@ -35,7 +35,7 @@ static boolean fill_input_buffer(j_decompress_ptr cinfo) {
 }
 
 static void skip(j_decompress_ptr cinfo, long count) {
-    if (count <= 0) return; //A zero or negative skip count should be treated as a no-op.
+    if (count <= 0) return; // A zero or negative skip count should be treated as a no-op.
     jpeg_stream_wrapper* wrap = reinterpret_cast<jpeg_stream_wrapper*>(cinfo->src);
 
     if (wrap->manager.bytes_in_buffer > 0 && count < static_cast<long>(wrap->manager.bytes_in_buffer))
@@ -48,7 +48,7 @@ static void skip(j_decompress_ptr cinfo, long count) {
         wrap->stream->seekg(count - wrap->manager.bytes_in_buffer, std::ios_base::cur);
         // trigger buffer fill
         wrap->manager.next_input_byte = nullptr;
-        wrap->manager.bytes_in_buffer = 0; //bytes_in_buffer may be zero on return.
+        wrap->manager.bytes_in_buffer = 0; // bytes_in_buffer may be zero on return.
     }
 }
 

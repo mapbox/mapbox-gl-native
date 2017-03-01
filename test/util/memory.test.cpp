@@ -1,4 +1,5 @@
 #include <mbgl/test/stub_file_source.hpp>
+#include <mbgl/test/getrss.hpp>
 #include <mbgl/test/util.hpp>
 
 #include <mbgl/map/map.hpp>
@@ -20,29 +21,6 @@
 
 using namespace mbgl;
 using namespace std::literals::string_literals;
-
-long getRSS() {
-    auto statm = util::read_file("/proc/self/statm");
-
-    std::vector<std::string> stats;
-    std::istringstream stream(statm);
-
-    std::copy(std::istream_iterator<std::string>(stream),
-        std::istream_iterator<std::string>(),
-        std::back_inserter(stats));
-
-    return std::stol(stats[1]) * getpagesize();
-}
-
-bool isUsingJemalloc() {
-    const char* preload = getenv("LD_PRELOAD");
-
-    if (preload) {
-        return std::string(preload).find("libjemalloc.so") != std::string::npos;
-    } else {
-        return false;
-    }
-}
 
 class MemoryTest {
 public:
@@ -109,16 +87,31 @@ TEST(Memory, Raster) {
     test::render(map, test.view);
 }
 
+/**
+On CI, we only run the memory footprint test in the Qt build, because it uses
+jemalloc, which yields more consistent memory usage results.  To force it to
+run locally, use `DO_MEMORY_FOOTPRINT=1 make run-test-Memory.Footprint.
+*/
+bool shouldRunFootprint() {
+    const char* preload = getenv("LD_PRELOAD");
+    
+    if (preload) {
+        return std::string(preload).find("libjemalloc.so") != std::string::npos;
+    } else {
+        return getenv("DO_MEMORY_FOOTPRINT");
+    }
+}
+
 // This test will measure the size of a Map object
 // after rendering a raster and a vector style. The
 // idea is to try to keep the memory footprint within
 // reasonable limits, so this test acts more like a
 // safeguard.
 TEST(Memory, Footprint) {
-    if (!isUsingJemalloc()) {
+    if (!shouldRunFootprint()) {
         return;
     }
-
+    
     MemoryTest test;
 
     auto renderMap = [&](Map& map, const char* style){
@@ -141,7 +134,7 @@ TEST(Memory, Footprint) {
     std::vector<std::unique_ptr<Map>> maps;
     unsigned runs = 15;
 
-    long vectorInitialRSS = getRSS();
+    long vectorInitialRSS = mbgl::test::getCurrentRSS();
     for (unsigned i = 0; i < runs; ++i) {
         auto vector = std::make_unique<Map>(test.backend, Size{ 256, 256 }, 2, test.fileSource,
                                             test.threadPool, MapMode::Still);
@@ -149,9 +142,9 @@ TEST(Memory, Footprint) {
         maps.push_back(std::move(vector));
     };
 
-    double vectorFootprint = (getRSS() - vectorInitialRSS) / double(runs);
+    double vectorFootprint = (mbgl::test::getCurrentRSS() - vectorInitialRSS) / double(runs);
 
-    long rasterInitialRSS = getRSS();
+    long rasterInitialRSS = mbgl::test::getCurrentRSS();
     for (unsigned i = 0; i < runs; ++i) {
         auto raster = std::make_unique<Map>(test.backend, Size{ 256, 256 }, 2, test.fileSource,
                                             test.threadPool, MapMode::Still);
@@ -159,7 +152,10 @@ TEST(Memory, Footprint) {
         maps.push_back(std::move(raster));
     };
 
-    double rasterFootprint = (getRSS() - rasterInitialRSS) / double(runs);
+    double rasterFootprint = (mbgl::test::getCurrentRSS() - rasterInitialRSS) / double(runs);
+    
+    RecordProperty("vectorFootprint", vectorFootprint);
+    RecordProperty("rasterFootprint", rasterFootprint);
 
     ASSERT_LT(vectorFootprint, 65 * 1024 * 1024) << "\
         mbgl::Map footprint over 65MB for vector styles.";

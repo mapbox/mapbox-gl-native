@@ -1,6 +1,8 @@
 #include <mbgl/renderer/line_bucket.hpp>
-#include <mbgl/style/layers/line_layer.hpp>
 #include <mbgl/renderer/painter.hpp>
+#include <mbgl/style/layers/line_layer.hpp>
+#include <mbgl/style/bucket_parameters.hpp>
+#include <mbgl/style/layers/line_layer_impl.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/constants.hpp>
 
@@ -10,19 +12,29 @@ namespace mbgl {
 
 using namespace style;
 
-LineBucket::LineBucket(uint32_t overscaling_) : overscaling(overscaling_) {
-}
-
-LineBucket::~LineBucket() {
-    // Do not remove. header file only contains forward definitions to unique pointers.
-}
-
-void LineBucket::addGeometry(const GeometryCollection& geometryCollection) {
-    for (auto& line : geometryCollection) {
-        addGeometry(line);
+LineBucket::LineBucket(const BucketParameters& parameters,
+                       const std::vector<const Layer*>& layers,
+                       const style::LineLayoutProperties& layout_)
+    : layout(layout_.evaluate(PropertyEvaluationParameters(parameters.tileID.overscaledZ))),
+      overscaling(parameters.tileID.overscaleFactor()) {
+    for (const auto& layer : layers) {
+        paintPropertyBinders.emplace(layer->getID(),
+            LineProgram::PaintPropertyBinders(
+                layer->as<LineLayer>()->impl->paint.evaluated,
+                parameters.tileID.overscaledZ));
     }
 }
 
+void LineBucket::addFeature(const GeometryTileFeature& feature,
+                            const GeometryCollection& geometryCollection) {
+    for (auto& line : geometryCollection) {
+        addGeometry(line);
+    }
+
+    for (auto& pair : paintPropertyBinders) {
+        pair.second.populateVertexVectors(feature, vertices.vertexSize());
+    }
+}
 
 /*
  * Sharp corners cause dashed lines to tilt because the distance along the line
@@ -139,7 +151,14 @@ void LineBucket::addGeometry(const GeometryCoordinates& coordinates) {
 
         // Determine the normal of the join extrusion. It is the angle bisector
         // of the segments between the previous line and the next line.
-        Point<double> joinNormal = util::unit(*prevNormal + *nextNormal);
+        // In the case of 180° angles, the prev and next normals cancel each other out:
+        // prevNormal + nextNormal = (0, 0), its magnitude is 0, so the unit vector would be
+        // undefined. In that case, we're keeping the joinNormal at (0, 0), so that the cosHalfAngle
+        // below will also become 0 and miterLength will become Infinity.
+        Point<double> joinNormal = *prevNormal + *nextNormal;
+        if (joinNormal.x != 0 || joinNormal.y != 0) {
+            joinNormal = util::unit(joinNormal);
+        }
 
         /*  joinNormal     prevNormal
          *             ↖      ↑
@@ -155,7 +174,8 @@ void LineBucket::addGeometry(const GeometryCoordinates& coordinates) {
         // Find the cosine of the angle between the next and join normals
         // using dot product. The inverse of that is the miter length.
         const double cosHalfAngle = joinNormal.x * nextNormal->x + joinNormal.y * nextNormal->y;
-        const double miterLength = cosHalfAngle != 0 ? 1 / cosHalfAngle: 1;
+        const double miterLength =
+            cosHalfAngle != 0 ? 1 / cosHalfAngle : std::numeric_limits<double>::infinity();
 
         const bool isSharpCorner = cosHalfAngle < COS_HALF_SHARP_CORNER && prevCoordinate && nextCoordinate;
 
@@ -189,7 +209,7 @@ void LineBucket::addGeometry(const GeometryCoordinates& coordinates) {
 
             if (currentJoin == LineJoinType::Bevel) {
                 // The maximum extrude length is 128 / 63 = 2 times the width of the line
-                // so if miterLength >= 2 we need to draw a different type of bevel where.
+                // so if miterLength >= 2 we need to draw a different type of bevel here.
                 if (miterLength > 2) {
                     currentJoin = LineJoinType::FlipBevel;
                 }
@@ -216,7 +236,7 @@ void LineBucket::addGeometry(const GeometryCoordinates& coordinates) {
 
             if (miterLength > 100) {
                 // Almost parallel lines
-                joinNormal = *nextNormal;
+                joinNormal = *nextNormal * -1.0;
             } else {
                 const double direction = prevNormal->x * nextNormal->y - prevNormal->y * nextNormal->x > 0 ? -1 : 1;
                 const double bevelLength = miterLength * util::mag(*prevNormal + *nextNormal) /
@@ -375,7 +395,7 @@ void LineBucket::addCurrentVertex(const GeometryCoordinate& currentCoordinate,
     Point<double> extrude = normal;
     if (endLeft)
         extrude = extrude - (util::perp(normal) * endLeft);
-    vertices.emplace_back(LineAttributes::vertex(currentCoordinate, extrude, { round, false }, endLeft, distance * LINE_DISTANCE_SCALE));
+    vertices.emplace_back(LineProgram::layoutVertex(currentCoordinate, extrude, { round, false }, endLeft, distance * LINE_DISTANCE_SCALE));
     e3 = vertices.vertexSize() - 1 - startVertex;
     if (e1 >= 0 && e2 >= 0) {
         triangleStore.emplace_back(e1, e2, e3);
@@ -386,7 +406,7 @@ void LineBucket::addCurrentVertex(const GeometryCoordinate& currentCoordinate,
     extrude = normal * -1.0;
     if (endRight)
         extrude = extrude - (util::perp(normal) * endRight);
-    vertices.emplace_back(LineAttributes::vertex(currentCoordinate, extrude, { round, true }, -endRight, distance * LINE_DISTANCE_SCALE));
+    vertices.emplace_back(LineProgram::layoutVertex(currentCoordinate, extrude, { round, true }, -endRight, distance * LINE_DISTANCE_SCALE));
     e3 = vertices.vertexSize() - 1 - startVertex;
     if (e1 >= 0 && e2 >= 0) {
         triangleStore.emplace_back(e1, e2, e3);
@@ -411,7 +431,7 @@ void LineBucket::addPieSliceVertex(const GeometryCoordinate& currentVertex,
                                    std::size_t startVertex,
                                    std::vector<TriangleElement>& triangleStore) {
     Point<double> flippedExtrude = extrude * (lineTurnsLeft ? -1.0 : 1.0);
-    vertices.emplace_back(LineAttributes::vertex(currentVertex, flippedExtrude, { false, lineTurnsLeft }, 0, distance * LINE_DISTANCE_SCALE));
+    vertices.emplace_back(LineProgram::layoutVertex(currentVertex, flippedExtrude, { false, lineTurnsLeft }, 0, distance * LINE_DISTANCE_SCALE));
     e3 = vertices.vertexSize() - 1 - startVertex;
     if (e1 >= 0 && e2 >= 0) {
         triangleStore.emplace_back(e1, e2, e3);
@@ -428,7 +448,10 @@ void LineBucket::upload(gl::Context& context) {
     vertexBuffer = context.createVertexBuffer(std::move(vertices));
     indexBuffer = context.createIndexBuffer(std::move(triangles));
 
-    // From now on, we're only going to render during the translucent pass.
+    for (auto& pair : paintPropertyBinders) {
+        pair.second.upload(context);
+    }
+
     uploaded = true;
 }
 

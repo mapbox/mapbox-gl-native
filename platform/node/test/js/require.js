@@ -1,1 +1,1 @@
-var mbgl = require('../../../../lib/mapbox-gl-native');
+var mbgl = require('../../../../lib/mapbox_gl_native');

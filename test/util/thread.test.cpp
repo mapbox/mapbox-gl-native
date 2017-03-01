@@ -3,6 +3,8 @@
 
 #include <mbgl/test/util.hpp>
 
+#include <atomic>
+
 using namespace mbgl::util;
 
 class TestObject {
@@ -215,4 +217,80 @@ TEST(Thread, WorkRequestDeletionCancelsImmediately) {
 
     started.get_future().get();
     request1.reset();
+}
+
+TEST(Thread, DeletePausedThread) {
+    RunLoop loop;
+
+    std::atomic_bool flag(false);
+
+    auto thread = std::make_unique<Thread<TestWorker>>(ThreadContext{"Test"});
+    thread->pause();
+    thread->invoke(&TestWorker::send, [&] { flag = true; }, [] {});
+
+    // Should not hang.
+    thread.reset();
+
+    // Should process the queue before destruction.
+    ASSERT_TRUE(flag);
+}
+
+TEST(Thread, Pause) {
+    RunLoop loop;
+
+    std::atomic_bool flag(false);
+
+    Thread<TestWorker> thread1({"Test1"});
+    thread1.pause();
+
+    Thread<TestWorker> thread2({"Test2"});
+
+    for (unsigned i = 0; i < 100; ++i) {
+        thread1.invoke(&TestWorker::send, [&] { flag = true; }, [] {});
+        thread2.invoke(&TestWorker::send, [&] { ASSERT_FALSE(flag); }, [] {});
+    }
+
+    // Queue a message at the end of thread2 queue.
+    thread2.invoke(&TestWorker::send, [&] { loop.stop(); }, [] {});
+    loop.run();
+}
+
+TEST(Thread, Resume) {
+    RunLoop loop;
+
+    std::atomic_bool flag(false);
+
+    Thread<TestWorker> thread({"Test"});
+    thread.pause();
+
+    for (unsigned i = 0; i < 100; ++i) {
+        thread.invoke(&TestWorker::send, [&] { flag = true; }, [] {});
+    }
+
+    // Thread messages are ondered, when we resume, this is going
+    // to me the last thing to run on the message queue.
+    thread.invoke(&TestWorker::send, [&] { loop.stop(); }, [] {});
+
+    // This test will be flaky if the thread doesn't get paused.
+    ASSERT_FALSE(flag);
+
+    thread.resume();
+    loop.run();
+
+    ASSERT_TRUE(flag);
+}
+
+TEST(Thread, PauseResume) {
+    RunLoop loop;
+
+    Thread<TestWorker> thread({"Test"});
+
+    // Test if multiple pause/resume work.
+    for (unsigned i = 0; i < 100; ++i) {
+        thread.pause();
+        thread.resume();
+    }
+
+    thread.invoke(&TestWorker::send, [&] { loop.stop(); }, [] {});
+    loop.run();
 }

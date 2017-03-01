@@ -9,12 +9,25 @@
 namespace mbgl {
 namespace android {
 
+    /**
+     * Creates an owning peer object (for layers not attached to the map) from the JVM side
+     */
     LineLayer::LineLayer(jni::JNIEnv& env, jni::String layerId, jni::String sourceId)
         : Layer(env, std::make_unique<mbgl::style::LineLayer>(jni::Make<std::string>(env, layerId), jni::Make<std::string>(env, sourceId))) {
     }
 
+    /**
+     * Creates a non-owning peer object (for layers currently attached to the map)
+     */
     LineLayer::LineLayer(mbgl::Map& map, mbgl::style::LineLayer& coreLayer)
         : Layer(map, coreLayer) {
+    }
+
+    /**
+     * Creates an owning peer object (for layers not attached to the map)
+     */
+    LineLayer::LineLayer(mbgl::Map& map, std::unique_ptr<mbgl::style::LineLayer> coreLayer)
+        : Layer(map, std::move(coreLayer)) {
     }
 
     LineLayer::~LineLayer() = default;
@@ -113,12 +126,12 @@ namespace android {
     }
 
     void LineLayer::registerNative(jni::JNIEnv& env) {
-        //Lookup the class
+        // Lookup the class
         LineLayer::javaClass = *jni::Class<LineLayer>::Find(env).NewGlobalRef(env).release();
 
         #define METHOD(MethodPtr, name) jni::MakeNativePeerMethod<decltype(MethodPtr), (MethodPtr)>(name)
 
-        //Register the peer
+        // Register the peer
         jni::RegisterNativePeer<LineLayer>(
             env, LineLayer::javaClass, "nativePtr",
             std::make_unique<LineLayer, JNIEnv&, jni::String, jni::String>,

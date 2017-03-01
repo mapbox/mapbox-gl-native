@@ -35,7 +35,7 @@
         if (!styleURL) {
             styleURL = [MGLStyle streetsStyleURLWithVersion:MGLStyleDefaultVersion];
         }
-        
+
         if (!styleURL.scheme) {
             [NSException raise:@"Invalid style URL" format:
              @"%@ does not support setting a relative file URL as the style URL. "
@@ -44,7 +44,7 @@
              @"For Mapbox-hosted styles, use the mapbox: scheme.",
              NSStringFromClass([self class])];
         }
-        
+
         _styleURL = styleURL;
         _bounds = bounds;
         _minimumZoomLevel = minimumZoomLevel;
@@ -80,7 +80,7 @@
     MGLCoordinateBounds bounds = MGLCoordinateBoundsMake(sw, ne);
     double minimumZoomLevel = [coder decodeDoubleForKey:@"minimumZoomLevel"];
     double maximumZoomLevel = [coder decodeDoubleForKey:@"maximumZoomLevel"];
-    
+
     return [self initWithStyleURL:styleURL bounds:bounds fromZoomLevel:minimumZoomLevel toZoomLevel:maximumZoomLevel];
 }
 
@@ -106,7 +106,7 @@
     if (![other isKindOfClass:[self class]]) {
         return NO;
     }
-    
+
     MGLTilePyramidOfflineRegion *otherRegion = other;
     return (_minimumZoomLevel == otherRegion->_minimumZoomLevel
             && _maximumZoomLevel == otherRegion->_maximumZoomLevel

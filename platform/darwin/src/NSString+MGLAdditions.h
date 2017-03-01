@@ -13,7 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Returns a title-cased representation of the receiver using the specified
  locale.
- 
+
  @param The locale. For strings presented to users, pass in the current locale
     (`+[NSLocale currentLocale]`). To use the system locale, pass in `nil`.
  */

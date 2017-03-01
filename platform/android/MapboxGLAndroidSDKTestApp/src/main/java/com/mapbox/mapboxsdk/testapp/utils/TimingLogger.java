@@ -106,7 +106,7 @@ public class TimingLogger {
    * dumpToLog call will do nothing.
    */
   public void reset() {
-    disabled = false; //!Log.isLoggable(tag, Log.VERBOSE);
+    disabled = false; // !Log.isLoggable(tag, Log.VERBOSE);
     if (disabled) {
       return;
     }

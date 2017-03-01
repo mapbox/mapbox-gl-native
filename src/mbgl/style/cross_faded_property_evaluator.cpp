@@ -17,21 +17,10 @@ Faded<T> CrossFadedPropertyEvaluator<T>::operator()(const T& constant) const {
 }
 
 template <typename T>
-T getBiggestStopLessThan(const Function<T>& function, float z) {
-    const auto& stops = function.getStops();
-    for (uint32_t i = 0; i < stops.size(); i++) {
-        if (stops[i].first > z) {
-            return stops[i == 0 ? i : i - 1].second;
-        }
-    }
-    return stops.at(stops.size() - 1).second;
-}
-
-template <typename T>
-Faded<T> CrossFadedPropertyEvaluator<T>::operator()(const Function<T>& function) const {
-    return calculate(getBiggestStopLessThan(function, parameters.z - 1.0f),
-                     getBiggestStopLessThan(function, parameters.z),
-                     getBiggestStopLessThan(function, parameters.z + 1.0f));
+Faded<T> CrossFadedPropertyEvaluator<T>::operator()(const CameraFunction<T>& function) const {
+    return calculate(function.evaluate(parameters.z - 1.0f),
+                     function.evaluate(parameters.z),
+                     function.evaluate(parameters.z + 1.0f));
 }
 
 template <typename T>

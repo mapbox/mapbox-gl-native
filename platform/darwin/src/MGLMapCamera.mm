@@ -2,6 +2,11 @@
 
 #include <mbgl/util/projection.hpp>
 
+BOOL MGLEqualFloatWithAccuracy(CGFloat left, CGFloat right, CGFloat accuracy)
+{
+    return MAX(left, right) - MIN(left, right) <= accuracy;
+}
+
 @implementation MGLMapCamera
 
 + (BOOL)supportsSecureCoding
@@ -20,16 +25,16 @@
 {
     mbgl::LatLng centerLatLng = mbgl::LatLng(centerCoordinate.latitude, centerCoordinate.longitude);
     mbgl::LatLng eyeLatLng = mbgl::LatLng(eyeCoordinate.latitude, eyeCoordinate.longitude);
-    
+
     mbgl::ProjectedMeters centerMeters = mbgl::Projection::projectedMetersForLatLng(centerLatLng);
     mbgl::ProjectedMeters eyeMeters = mbgl::Projection::projectedMetersForLatLng(eyeLatLng);
     CLLocationDirection heading = std::atan((centerMeters.northing - eyeMeters.northing) /
                                             (centerMeters.easting - eyeMeters.easting));
-    
+
     double groundDistance = std::hypot(centerMeters.northing - eyeMeters.northing,
                                        centerMeters.easting - eyeMeters.easting);
     CGFloat pitch = std::atan(eyeAltitude / groundDistance);
-    
+
     return [[self alloc] initWithCenterCoordinate:centerCoordinate
                                          altitude:eyeAltitude
                                             pitch:pitch
@@ -108,12 +113,26 @@
     {
         return YES;
     }
-    
+
     MGLMapCamera *otherCamera = other;
     return (_centerCoordinate.latitude == otherCamera.centerCoordinate.latitude
             && _centerCoordinate.longitude == otherCamera.centerCoordinate.longitude
             && _altitude == otherCamera.altitude
             && _pitch == otherCamera.pitch && _heading == otherCamera.heading);
+}
+
+- (BOOL)isEqualToMapCamera:(MGLMapCamera *)otherCamera
+{
+    if (otherCamera == self)
+    {
+        return YES;
+    }
+    
+    return (MGLEqualFloatWithAccuracy(_centerCoordinate.latitude, otherCamera.centerCoordinate.latitude, 1e-6)
+            && MGLEqualFloatWithAccuracy(_centerCoordinate.longitude, otherCamera.centerCoordinate.longitude, 1e-6)
+            && MGLEqualFloatWithAccuracy(_altitude, otherCamera.altitude, 1e-6)
+            && MGLEqualFloatWithAccuracy(_pitch, otherCamera.pitch, 1)
+            && MGLEqualFloatWithAccuracy(_heading, otherCamera.heading, 1));
 }
 
 - (NSUInteger)hash

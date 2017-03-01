@@ -28,13 +28,13 @@ TEST(GeoJSONOptions, RetainsDefaults) {
     Value raw(map);
     GeoJSONOptions converted = *convert<GeoJSONOptions>(raw);
     GeoJSONOptions defaults;
-    
-    //GeoJSON-VT
+
+    // GeoJSON-VT
     ASSERT_EQ(converted.maxzoom, defaults.maxzoom);
     ASSERT_EQ(converted.buffer, defaults.buffer);
     ASSERT_EQ(converted.tolerance, defaults.tolerance);
-    
-    //Supercluster
+
+    // Supercluster
     ASSERT_EQ(converted.cluster, defaults.cluster);
     ASSERT_EQ(converted.clusterRadius, defaults.clusterRadius);
     ASSERT_EQ(converted.clusterMaxZoom, defaults.clusterMaxZoom);
@@ -43,25 +43,25 @@ TEST(GeoJSONOptions, RetainsDefaults) {
 
 TEST(GeoJSONOptions, FullConversion) {
     ValueMap map {
-        //GeoJSON-VT
+        // GeoJSON-VT
         {"maxzoom", 1.0f},
         {"buffer", 2.0f},
         {"tolerance", 3.0f},
-        
-        //Supercluster
+
+        // Supercluster
         {"cluster", true},
         {"clusterRadius", 4.0f},
         {"clusterMaxZoom", 5.0f}
     };
     Value raw(map);
     GeoJSONOptions converted = *convert<GeoJSONOptions>(raw);
-    
-    //GeoJSON-VT
+
+    // GeoJSON-VT
     ASSERT_EQ(converted.maxzoom, 1);
     ASSERT_EQ(converted.buffer, 2);
     ASSERT_EQ(converted.tolerance, 3);
-    
-    //Supercluster
+
+    // Supercluster
     ASSERT_EQ(converted.cluster, true);
     ASSERT_EQ(converted.clusterRadius, 4);
     ASSERT_EQ(converted.clusterMaxZoom, 5);

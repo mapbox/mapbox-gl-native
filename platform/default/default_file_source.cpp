@@ -29,11 +29,11 @@ public:
     Impl(const std::string& cachePath, uint64_t maximumCacheSize)
         : offlineDatabase(cachePath, maximumCacheSize) {
     }
-    
+
     void setAPIBaseURL(const std::string& url) {
         onlineFileSource.setAPIBaseURL(url);
     }
-    
+
     std::string getAPIBaseURL() const{
         return onlineFileSource.getAPIBaseURL();
     }
@@ -44,6 +44,10 @@ public:
 
     std::string getAccessToken() const {
         return onlineFileSource.getAccessToken();
+    }
+
+    void setResourceTransform(OnlineFileSource::ResourceTransform&& transform) {
+        onlineFileSource.setResourceTransform(std::move(transform));
     }
 
     void listRegions(std::function<void (std::exception_ptr, optional<std::vector<OfflineRegion>>)> callback) {
@@ -63,7 +67,7 @@ public:
             callback(std::current_exception(), {});
         }
     }
-    
+
     void updateMetadata(const int64_t regionID,
                       const OfflineRegionMetadata& metadata,
                       std::function<void (std::exception_ptr, optional<OfflineRegionMetadata>)> callback) {
@@ -172,19 +176,30 @@ DefaultFileSource::DefaultFileSource(const std::string& cachePath,
 DefaultFileSource::~DefaultFileSource() = default;
 
 void DefaultFileSource::setAPIBaseURL(const std::string& baseURL) {
-    thread->invokeSync(&Impl::setAPIBaseURL, baseURL);
+    thread->invoke(&Impl::setAPIBaseURL, baseURL);
+    cachedBaseURL = baseURL;
 }
-    
+
 std::string DefaultFileSource::getAPIBaseURL() const {
-    return thread->invokeSync(&Impl::getAPIBaseURL);
+    return cachedBaseURL;
 }
-    
+
 void DefaultFileSource::setAccessToken(const std::string& accessToken) {
-    thread->invokeSync(&Impl::setAccessToken, accessToken);
+    thread->invoke(&Impl::setAccessToken, accessToken);
+    cachedAccessToken = accessToken;
 }
 
 std::string DefaultFileSource::getAccessToken() const {
-    return thread->invokeSync(&Impl::getAccessToken);
+    return cachedAccessToken;
+}
+
+void DefaultFileSource::setResourceTransform(std::function<std::string(Resource::Kind, std::string&&)> transform) {
+    auto loop = util::RunLoop::Get();
+    thread->invoke(&Impl::setResourceTransform, [loop, transform](Resource::Kind kind_, std::string&& url_, auto callback_) {
+        return loop->invokeWithCallback([transform](Resource::Kind kind, std::string&& url, auto callback) {
+            callback(transform(kind, std::move(url)));
+        }, kind_, std::move(url_), callback_);
+    });
 }
 
 std::unique_ptr<AsyncRequest> DefaultFileSource::request(const Resource& resource, Callback callback) {
@@ -246,6 +261,14 @@ void DefaultFileSource::getOfflineRegionStatus(OfflineRegion& region, std::funct
 
 void DefaultFileSource::setOfflineMapboxTileCountLimit(uint64_t limit) const {
     thread->invokeSync(&Impl::setOfflineMapboxTileCountLimit, limit);
+}
+
+void DefaultFileSource::pause() {
+    thread->pause();
+}
+
+void DefaultFileSource::resume() {
+    thread->resume();
 }
 
 // For testing only:

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <mbgl/gl/gl.hpp>
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/view.hpp>
 #include <mbgl/map/backend.hpp>
@@ -25,6 +26,10 @@ public:
     // Callback called when the user presses the key mapped to style change.
     // The expected action is to set a new style, different to the current one.
     void setChangeStyleCallback(std::function<void()> callback);
+
+    void setPauseResumeCallback(std::function<void()> callback) {
+        pauseResumeCallback = callback;
+    };
 
     void setShouldClose();
 
@@ -54,7 +59,7 @@ private:
 
     // Internal
     void report(float duration);
-    
+
     void setMapChangeCallback(std::function<void(mbgl::MapChange)> callback);
     void notifyMapChange(mbgl::MapChange change) override;
 
@@ -103,6 +108,7 @@ private:
     double lastClick = -1;
 
     std::function<void()> changeStyleCallback;
+    std::function<void()> pauseResumeCallback;
 
     mbgl::util::RunLoop runLoop;
     mbgl::util::Timer frameTick;

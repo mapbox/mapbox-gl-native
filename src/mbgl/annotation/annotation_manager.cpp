@@ -90,7 +90,7 @@ void AnnotationManager::add(const AnnotationID& id, const StyleSourcedAnnotation
 
 Update AnnotationManager::update(const AnnotationID& id, const SymbolAnnotation& annotation, const uint8_t maxZoom) {
     Update result = Update::Nothing;
-    
+
     auto it = symbolAnnotations.find(id);
     if (it == symbolAnnotations.end()) {
         assert(false); // Attempt to update a non-existent symbol annotation
@@ -222,12 +222,10 @@ void AnnotationManager::removeTile(AnnotationTile& tile) {
 
 void AnnotationManager::addIcon(const std::string& name, std::shared_ptr<const SpriteImage> sprite) {
     spriteAtlas.setSprite(name, sprite);
-    spriteAtlas.updateDirty();
 }
 
 void AnnotationManager::removeIcon(const std::string& name) {
     spriteAtlas.removeSprite(name);
-    spriteAtlas.updateDirty();
 }
 
 double AnnotationManager::getTopOffsetPixelsForIcon(const std::string& name) {

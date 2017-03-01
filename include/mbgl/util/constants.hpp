@@ -44,11 +44,11 @@ constexpr Duration DEFAULT_FADE_DURATION = Milliseconds(300);
 constexpr Seconds CLOCK_SKEW_RETRY_TIMEOUT { 30 };
 
 constexpr UnitBezier DEFAULT_TRANSITION_EASE = { 0, 0, 0.25, 1 };
-    
+
 constexpr int DEFAULT_RATE_LIMIT_TIMEOUT = 5;
 
 constexpr const char* API_BASE_URL = "https://api.mapbox.com";
-    
+
 } // namespace util
 
 namespace debug {

@@ -3,19 +3,13 @@ package com.mapbox.mapboxsdk.testapp.activity.annotation;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.app.ProgressDialog;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.content.res.ResourcesCompat;
-import android.support.v7.app.ActionBar;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-
-import timber.log.Timber;
-
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -25,7 +19,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.mapbox.mapboxsdk.annotations.Icon;
-import com.mapbox.mapboxsdk.annotations.IconFactory;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.annotations.MarkerViewOptions;
@@ -35,6 +28,7 @@ import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.utils.GeoParseUtil;
+import com.mapbox.mapboxsdk.testapp.utils.IconUtils;
 
 import org.json.JSONException;
 
@@ -42,8 +36,14 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Random;
 
+import timber.log.Timber;
+
+/**
+ * Test activity showcasing adding a large amount of Markers or MarkerViews.
+ */
 public class BulkMarkerActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
   private MapboxMap mapboxMap;
@@ -56,31 +56,12 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_marker_bulk);
 
-    Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-    setSupportActionBar(toolbar);
-
-    final ActionBar actionBar = getSupportActionBar();
-    if (actionBar != null) {
-      actionBar.setDisplayShowTitleEnabled(false);
-      actionBar.setDisplayHomeAsUpEnabled(true);
-      actionBar.setDisplayShowHomeEnabled(true);
-    }
-
     mapView = (MapView) findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
     mapView.getMapAsync(new OnMapReadyCallback() {
       @Override
       public void onMapReady(@NonNull MapboxMap mapboxMap) {
         BulkMarkerActivity.this.mapboxMap = mapboxMap;
-
-        if (actionBar != null) {
-          ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(
-            actionBar.getThemedContext(), R.array.bulk_marker_list, android.R.layout.simple_spinner_item);
-          spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-          Spinner spinner = (Spinner) findViewById(R.id.spinner);
-          spinner.setAdapter(spinnerAdapter);
-          spinner.setOnItemSelectedListener(BulkMarkerActivity.this);
-        }
       }
     });
 
@@ -88,6 +69,19 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
     if (fab != null) {
       fab.setOnClickListener(new FabClickListener());
     }
+  }
+
+  @Override
+  public boolean onCreateOptionsMenu(Menu menu) {
+    ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(
+      this, R.array.bulk_marker_list, android.R.layout.simple_spinner_item);
+    spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+    getMenuInflater().inflate(R.menu.menu_bulk_marker, menu);
+    MenuItem item = menu.findItem(R.id.spinner);
+    Spinner spinner = (Spinner) MenuItemCompat.getActionView(item);
+    spinner.setAdapter(spinnerAdapter);
+    spinner.setOnItemSelectedListener(BulkMarkerActivity.this);
+    return true;
   }
 
   @Override
@@ -124,11 +118,8 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
     Random random = new Random();
     int randomIndex;
 
-    Drawable drawable = ContextCompat.getDrawable(BulkMarkerActivity.this, R.drawable.ic_droppin_24dp);
-
-    int redColor = ResourcesCompat.getColor(getResources(), android.R.color.holo_red_dark, getTheme());
-    drawable.setColorFilter(redColor, PorterDuff.Mode.SRC_IN);
-    Icon icon = IconFactory.getInstance(this).fromDrawable(drawable);
+    int color = ResourcesCompat.getColor(getResources(), R.color.redAccent, getTheme());
+    Icon icon = IconUtils.drawableToIcon(this, R.drawable.ic_droppin, color);
 
     List<MarkerViewOptions> markerOptionsList = new ArrayList<>();
     for (int i = 0; i < amount; i++) {
@@ -209,18 +200,10 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
     mapView.onLowMemory();
   }
 
-  @Override
-  public boolean onOptionsItemSelected(MenuItem item) {
-    switch (item.getItemId()) {
-      case android.R.id.home:
-        onBackPressed();
-        return true;
-      default:
-        return super.onOptionsItemSelected(item);
-    }
-  }
-
   private class FabClickListener implements View.OnClickListener {
+
+    private TextView viewCountView;
+
     @Override
     public void onClick(final View view) {
       if (mapboxMap != null) {
@@ -243,13 +226,15 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
           showMarkers(amount);
         }
 
+        viewCountView = (TextView) findViewById(R.id.countView);
+
         mapView.addOnMapChangedListener(new MapView.OnMapChangedListener() {
           @Override
           public void onMapChanged(@MapView.MapChange int change) {
             if (change == MapView.REGION_IS_CHANGING || change == MapView.REGION_DID_CHANGE) {
               if (!mapboxMap.getMarkerViewManager().getMarkerViewAdapters().isEmpty()) {
-                TextView viewCountView = (TextView) findViewById(R.id.countView);
-                viewCountView.setText("ViewCache size " + (mapView.getChildCount() - 5));
+                viewCountView.setText(String.format(Locale.getDefault(), "ViewCache size %d",
+                  mapboxMap.getMarkerViewManager().getMarkerViewContainer().getChildCount()));
               }
             }
           }

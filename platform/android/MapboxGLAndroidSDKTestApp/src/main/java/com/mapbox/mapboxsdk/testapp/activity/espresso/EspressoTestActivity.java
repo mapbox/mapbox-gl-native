@@ -9,7 +9,7 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.R;
 
 /**
- * Base activity for instrumentation testing
+ * Base activity for instrumentation testing.
  */
 public class EspressoTestActivity extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -21,7 +21,7 @@ public class EspressoTestActivity extends AppCompatActivity implements OnMapRead
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_camera_test);
 
-    //Initialize map as normal
+    // Initialize map as normal
     mapView = (MapView) findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
     mapView.getMapAsync(this);

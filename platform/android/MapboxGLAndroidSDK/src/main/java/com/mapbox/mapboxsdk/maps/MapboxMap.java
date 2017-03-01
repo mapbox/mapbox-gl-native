@@ -8,6 +8,7 @@ import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.FloatRange;
+import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
@@ -16,7 +17,6 @@ import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.annotations.Annotation;
 import com.mapbox.mapboxsdk.annotations.BaseMarkerOptions;
 import com.mapbox.mapboxsdk.annotations.BaseMarkerViewOptions;
@@ -38,8 +38,6 @@ import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.widgets.MyLocationViewSettings;
 import com.mapbox.mapboxsdk.style.layers.Layer;
-import com.mapbox.mapboxsdk.style.layers.NoSuchLayerException;
-import com.mapbox.mapboxsdk.style.sources.NoSuchSourceException;
 import com.mapbox.mapboxsdk.style.sources.Source;
 import com.mapbox.services.commons.geojson.Feature;
 
@@ -212,6 +210,22 @@ public final class MapboxMap {
     nativeMapView.setTransitionDelay(delay);
   }
 
+  /**
+   * Retrieve all the layers in the style
+   *
+   * @return all the layers in the current style
+   */
+  @UiThread
+  public List<Layer> getLayers() {
+    return nativeMapView.getLayers();
+  }
+
+  /**
+   * Get the layer by id
+   *
+   * @param layerId the layer's id
+   * @return the layer, if present in the style
+   */
   @Nullable
   @UiThread
   public Layer getLayer(@NonNull String layerId) {
@@ -229,7 +243,7 @@ public final class MapboxMap {
   @UiThread
   public <T extends Layer> T getLayerAs(@NonNull String layerId) {
     try {
-      //noinspection unchecked
+      // noinspection unchecked
       return (T) nativeMapView.getLayer(layerId);
     } catch (ClassCastException exception) {
       Timber.e(String.format("Layer: %s is a different type: %s", layerId, exception));
@@ -244,42 +258,95 @@ public final class MapboxMap {
    */
   @UiThread
   public void addLayer(@NonNull Layer layer) {
-    addLayer(layer, null);
+    nativeMapView.addLayer(layer);
   }
 
   /**
    * Adds the layer to the map. The layer must be newly created and not added to the map before
    *
-   * @param layer  the layer to add
-   * @param before the layer id to add this layer before
+   * @param layer the layer to add
+   * @param below the layer id to add this layer before
    */
   @UiThread
-  public void addLayer(@NonNull Layer layer, String before) {
-    nativeMapView.addLayer(layer, before);
+  public void addLayerBelow(@NonNull Layer layer, @NonNull String below) {
+    nativeMapView.addLayerBelow(layer, below);
+  }
+
+  /**
+   * Adds the layer to the map. The layer must be newly created and not added to the map before
+   *
+   * @param layer the layer to add
+   * @param above the layer id to add this layer above
+   */
+  @UiThread
+  public void addLayerAbove(@NonNull Layer layer, @NonNull String above) {
+    nativeMapView.addLayerAbove(layer, above);
+  }
+
+  /**
+   * Adds the layer to the map at the specified index. The layer must be newly
+   * created and not added to the map before
+   *
+   * @param layer the layer to add
+   * @param index the index to insert the layer at
+   */
+  @UiThread
+  public void addLayerAt(@NonNull Layer layer, @IntRange(from = 0) int index) {
+    nativeMapView.addLayerAt(layer, index);
   }
 
   /**
    * Removes the layer. Any references to the layer become invalid and should not be used anymore
    *
    * @param layerId the layer to remove
-   * @throws NoSuchLayerException the exception thrown when layer with layerId doesn't exist
+   * @return the removed layer or null if not found
    */
   @UiThread
-  public void removeLayer(@NonNull String layerId) throws NoSuchLayerException {
-    nativeMapView.removeLayer(layerId);
+  @Nullable
+  public Layer removeLayer(@NonNull String layerId) {
+    return nativeMapView.removeLayer(layerId);
   }
 
   /**
    * Removes the layer. The reference is re-usable after this and can be re-added
    *
    * @param layer the layer to remove
-   * @throws NoSuchLayerException the exeption thrown when the layer doesn't exist
+   * @return the layer
    */
   @UiThread
-  public void removeLayer(@NonNull Layer layer) throws NoSuchLayerException {
-    nativeMapView.removeLayer(layer);
+  @Nullable
+  public Layer removeLayer(@NonNull Layer layer) {
+    return nativeMapView.removeLayer(layer);
   }
 
+  /**
+   * Removes the layer. Any other references to the layer become invalid and should not be used anymore
+   *
+   * @param index the layer index
+   * @return the removed layer or null if not found
+   */
+  @UiThread
+  @Nullable
+  public Layer removeLayerAt(@IntRange(from = 0) int index) {
+    return nativeMapView.removeLayerAt(index);
+  }
+
+  /**
+   * Retrieve all the sources in the style
+   *
+   * @return all the sources in the current style
+   */
+  @UiThread
+  public List<Source> getSources() {
+    return nativeMapView.getSources();
+  }
+
+  /**
+   * Retrieve a source by id
+   *
+   * @param sourceId the source's id
+   * @return the source if present in the current style
+   */
   @Nullable
   @UiThread
   public Source getSource(@NonNull String sourceId) {
@@ -297,7 +364,7 @@ public final class MapboxMap {
   @UiThread
   public <T extends Source> T getSourceAs(@NonNull String sourceId) {
     try {
-      //noinspection unchecked
+      // noinspection unchecked
       return (T) nativeMapView.getSource(sourceId);
     } catch (ClassCastException exception) {
       Timber.e(String.format("Source: %s is a different type: %s", sourceId, exception));
@@ -319,22 +386,24 @@ public final class MapboxMap {
    * Removes the source. Any references to the source become invalid and should not be used anymore
    *
    * @param sourceId the source to remove
-   * @throws NoSuchSourceException the exception thrown when the source with sourceId doesn't exist
+   * @return the source handle or null if the source was not present
    */
   @UiThread
-  public void removeSource(@NonNull String sourceId) throws NoSuchSourceException {
-    nativeMapView.removeSource(sourceId);
+  @Nullable
+  public Source removeSource(@NonNull String sourceId) {
+    return nativeMapView.removeSource(sourceId);
   }
 
   /**
    * Removes the source, preserving the reverence for re-use
    *
    * @param source the source to remove
-   * @throws NoSuchSourceException the exception thrown when the source with sourceId doesn't exist
+   * @return the source
    */
   @UiThread
-  public void removeSource(@NonNull Source source) throws NoSuchSourceException {
-    nativeMapView.removeSource(source);
+  @Nullable
+  public Source removeSource(@NonNull Source source) {
+    return nativeMapView.removeSource(source);
   }
 
   /**
@@ -515,9 +584,6 @@ public final class MapboxMap {
   @UiThread
   public final void moveCamera(CameraUpdate update) {
     moveCamera(update, null);
-    // MapChange.REGION_DID_CHANGE_ANIMATED is not called for `jumpTo`
-    // invalidate camera position to provide OnCameraChange event.
-    invalidateCameraPosition();
   }
 
   /**
@@ -534,6 +600,9 @@ public final class MapboxMap {
       @Override
       public void run() {
         transform.moveCamera(MapboxMap.this, update, callback);
+        // MapChange.REGION_DID_CHANGE_ANIMATED is not called for `jumpTo`
+        // invalidate camera position to provide OnCameraChange event.
+        invalidateCameraPosition();
       }
     });
   }
@@ -615,39 +684,14 @@ public final class MapboxMap {
    * easing the camera stops. If {@link #getCameraPosition()} is called during the animation, it
    * will return the current location of the camera in flight.
    * <p>
-   * Note that this will cancel location tracking mode if enabled.
+   * Note that this will cancel location tracking mode if enabled. You can change this behaviour by calling
+   * {@link TrackingSettings#setDismissTrackingModeForCameraPositionChange(boolean)} with false before invoking this
+   * method and calling it with true in the {@link CancelableCallback#onFinish()}.
    * </p>
    *
    * @param update             The change that should be applied to the camera.
    * @param durationMs         The duration of the animation in milliseconds. This must be strictly
    *                           positive, otherwise an IllegalArgumentException will be thrown.
-   * @param easingInterpolator True for easing interpolator, false for linear.
-   * @param callback           An optional callback to be notified from the main thread when the animation
-   *                           stops. If the animation stops due to its natural completion, the callback
-   *                           will be notified with onFinish(). If the animation stops due to interruption
-   *                           by a later camera movement or a user gesture, onCancel() will be called.
-   *                           Do not update or ease the camera from within onCancel().
-   */
-  @UiThread
-  public final void easeCamera(
-    CameraUpdate update, int durationMs, boolean easingInterpolator, final MapboxMap.CancelableCallback callback) {
-    // dismiss tracking, moving camera is equal to a gesture
-    easeCamera(update, durationMs, easingInterpolator, true, callback);
-  }
-
-  /**
-   * Gradually move the camera by a specified duration in milliseconds, zoom will not be affected
-   * unless specified within {@link CameraUpdate}. A callback can be used to be notified when
-   * easing the camera stops. If {@link #getCameraPosition()} is called during the animation, it
-   * will return the current location of the camera in flight.
-   * <p>
-   * Note that this will cancel location tracking mode if enabled.
-   * </p>
-   *
-   * @param update             The change that should be applied to the camera.
-   * @param durationMs         The duration of the animation in milliseconds. This must be strictly
-   *                           positive, otherwise an IllegalArgumentException will be thrown.
-   * @param resetTrackingMode  True to reset tracking modes if required, false to ignore
    * @param easingInterpolator True for easing interpolator, false for linear.
    * @param callback           An optional callback to be notified from the main thread when the animation
    *                           stops. If the animation stops due to its natural completion, the callback
@@ -657,11 +701,11 @@ public final class MapboxMap {
    */
   @UiThread
   public final void easeCamera(final CameraUpdate update, final int durationMs, final boolean easingInterpolator,
-                               final boolean resetTrackingMode, final MapboxMap.CancelableCallback callback) {
+                               final MapboxMap.CancelableCallback callback) {
     new Handler().post(new Runnable() {
       @Override
       public void run() {
-        transform.easeCamera(MapboxMap.this, update, durationMs, easingInterpolator, resetTrackingMode, callback);
+        transform.easeCamera(MapboxMap.this, update, durationMs, easingInterpolator, callback);
       }
     });
   }
@@ -761,6 +805,21 @@ public final class MapboxMap {
    */
   public void resetNorth() {
     transform.resetNorth();
+  }
+
+  /**
+   * Set focal bearing.
+   */
+  public void setFocalBearing(double bearing, float focalX, float focalY, long duration) {
+    transform.setBearing(bearing, focalX, focalY, duration);
+  }
+
+  public float getHeight() {
+    return nativeMapView.getHeight();
+  }
+
+  public float getWidth() {
+    return nativeMapView.getWidth();
   }
 
   //
@@ -882,10 +941,6 @@ public final class MapboxMap {
   private void setStyleUrl(@NonNull MapboxMapOptions options) {
     String style = options.getStyle();
     if (!TextUtils.isEmpty(style)) {
-      // stopgap for https://github.com/mapbox/mapbox-gl-native/issues/6242
-      if (TextUtils.isEmpty(nativeMapView.getAccessToken())) {
-        nativeMapView.setAccessToken(Mapbox.getAccessToken());
-      }
       setStyleUrl(style);
     }
   }
@@ -1604,18 +1659,8 @@ public final class MapboxMap {
    * @param bitmap   A pre-allocated bitmap.
    */
   @UiThread
-  public void snapshot(@NonNull SnapshotReadyCallback callback, @Nullable final Bitmap bitmap) {
-    nativeMapView.addSnapshotCallback(callback, bitmap);
-  }
-
-  /**
-   * Takes a snapshot of the map.
-   *
-   * @param callback Callback method invoked when the snapshot is taken.
-   */
-  @UiThread
   public void snapshot(@NonNull SnapshotReadyCallback callback) {
-    snapshot(callback, null);
+    nativeMapView.addSnapshotCallback(callback);
   }
 
   /**

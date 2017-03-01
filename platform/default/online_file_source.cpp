@@ -31,6 +31,7 @@ public:
     ~OnlineFileRequest() override;
 
     void networkIsReachableAgain();
+    void schedule();
     void schedule(optional<Timestamp> expires);
     void completed(Response);
 
@@ -64,6 +65,19 @@ public:
 
     void add(OnlineFileRequest* request) {
         allRequests.insert(request);
+        if (resourceTransform) {
+            // When there's a Resource transform callback set, replace the resource with the
+            // transformed one before proceeding to schedule the request.
+            request->request =
+                resourceTransform(request->resource.kind, std::move(request->resource.url),
+                                  [request](std::string&& url) {
+                                      request->request.release();
+                                      request->resource.url = std::move(url);
+                                      request->schedule();
+                                  });
+        } else {
+            request->schedule();
+        }
     }
 
     void remove(OnlineFileRequest* request) {
@@ -122,13 +136,17 @@ public:
         activateRequest(request);
         assert(pendingRequestsMap.size() == pendingRequestsList.size());
     }
-    
+
     bool isPending(OnlineFileRequest* request) {
         return pendingRequestsMap.find(request) != pendingRequestsMap.end();
     }
-    
+
     bool isActive(OnlineFileRequest* request) {
         return activeRequests.find(request) != activeRequests.end();
+    }
+
+    void setResourceTransform(ResourceTransform&& transform) {
+        resourceTransform = std::move(transform);
     }
 
 private:
@@ -137,6 +155,8 @@ private:
             request->networkIsReachableAgain();
         }
     }
+
+    ResourceTransform resourceTransform;
 
     /**
      * The lifetime of a request is:
@@ -196,12 +216,18 @@ std::unique_ptr<AsyncRequest> OnlineFileSource::request(const Resource& resource
     return std::make_unique<OnlineFileRequest>(std::move(res), std::move(callback), *impl);
 }
 
+void OnlineFileSource::setResourceTransform(ResourceTransform&& transform) {
+    impl->setResourceTransform(std::move(transform));
+}
+
 OnlineFileRequest::OnlineFileRequest(Resource resource_, Callback callback_, OnlineFileSource::Impl& impl_)
     : impl(impl_),
       resource(std::move(resource_)),
       callback(std::move(callback_)) {
     impl.add(this);
+}
 
+void OnlineFileRequest::schedule() {
     // Force an immediate first request if we don't have an expiration time.
     if (resource.priorExpires) {
         schedule(resource.priorExpires);

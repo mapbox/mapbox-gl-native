@@ -266,3 +266,74 @@
    fun:_ZN4mbgl4util10write_fileERKSsS2_
    ...
 }
+{
+   Ubuntu 14.04 - Travis + mesa 13.0.3
+   Memcheck:Cond
+   fun:_ZN12_GLOBAL__N_117PeepholeOptimizer20runOnMachineFunctionERN4llvm15MachineFunctionE
+   fun:_ZN4llvm19MachineFunctionPass13runOnFunctionERNS_8FunctionE
+   fun:_ZN4llvm13FPPassManager13runOnFunctionERNS_8FunctionE
+   fun:_ZN4llvm13FPPassManager11runOnModuleERNS_6ModuleE
+   fun:_ZN4llvm6legacy15PassManagerImpl3runERNS_6ModuleE
+   fun:_ZN4llvm5MCJIT10emitObjectEPNS_6ModuleE
+   fun:_ZN4llvm5MCJIT21generateCodeForModuleEPNS_6ModuleE
+   fun:_ZN4llvm5MCJIT14finalizeObjectEv
+   fun:LLVMGetPointerToGlobal
+   fun:gallivm_jit_function
+   fun:generate_variant
+   fun:llvmpipe_update_fs
+}
+{
+   Ubuntu 14.04 - Travis + mesa 13.0.3
+   Memcheck:Cond
+   fun:_ZNK4llvm12X86InstrInfo13reMaterializeERNS_17MachineBasicBlockENS1_15bundle_iteratorINS_12MachineInstrENS_14ilist_iteratorIS4_EEEEjjPKS4_RKNS_18TargetRegisterInfoE
+   fun:_ZN12_GLOBAL__N_117RegisterCoalescer23reMaterializeTrivialDefERKN4llvm13CoalescerPairEPNS1_12MachineInstrERb
+   fun:_ZN12_GLOBAL__N_117RegisterCoalescer8joinCopyEPN4llvm12MachineInstrERb
+   fun:_ZN12_GLOBAL__N_117RegisterCoalescer20runOnMachineFunctionERN4llvm15MachineFunctionE
+   fun:_ZN4llvm19MachineFunctionPass13runOnFunctionERNS_8FunctionE
+   fun:_ZN4llvm13FPPassManager13runOnFunctionERNS_8FunctionE
+   fun:_ZN4llvm13FPPassManager11runOnModuleERNS_6ModuleE
+   fun:_ZN4llvm6legacy15PassManagerImpl3runERNS_6ModuleE
+   fun:_ZN4llvm5MCJIT10emitObjectEPNS_6ModuleE
+   fun:_ZN4llvm5MCJIT21generateCodeForModuleEPNS_6ModuleE
+   fun:_ZN4llvm5MCJIT14finalizeObjectEv
+   fun:LLVMGetPointerToGlobal
+}
+{
+   Ubuntu 14.04 - Travis + mesa 13.0.3
+   Memcheck:Cond
+   fun:_ZNK4llvm12X86InstrInfo13reMaterializeERNS_17MachineBasicBlockENS1_15bundle_iteratorINS_12MachineInstrENS_14ilist_iteratorIS4_EEEEjjPKS4_RKNS_18TargetRegisterInfoE
+   fun:_ZN4llvm13LiveRangeEdit15rematerializeAtERNS_17MachineBasicBlockENS1_15bundle_iteratorINS_12MachineInstrENS_14ilist_iteratorIS4_EEEEjRKNS0_5RematERKNS_18TargetRegisterInfoEb
+   fun:_ZN12_GLOBAL__N_113InlineSpiller5spillERN4llvm13LiveRangeEditE
+   fun:_ZN12_GLOBAL__N_18RAGreedy17selectOrSplitImplERN4llvm12LiveIntervalERNS1_15SmallVectorImplIjEERNS1_8SmallSetIjLj16ESt4lessIjEEEj
+   fun:_ZN12_GLOBAL__N_18RAGreedy13selectOrSplitERN4llvm12LiveIntervalERNS1_15SmallVectorImplIjEE
+   fun:_ZN4llvm12RegAllocBase16allocatePhysRegsEv
+   fun:_ZN12_GLOBAL__N_18RAGreedy20runOnMachineFunctionERN4llvm15MachineFunctionE
+   fun:_ZN4llvm19MachineFunctionPass13runOnFunctionERNS_8FunctionE
+   fun:_ZN4llvm13FPPassManager13runOnFunctionERNS_8FunctionE
+   fun:_ZN4llvm13FPPassManager11runOnModuleERNS_6ModuleE
+   fun:_ZN4llvm6legacy15PassManagerImpl3runERNS_6ModuleE
+   fun:_ZN4llvm5MCJIT10emitObjectEPNS_6ModuleE
+}
+{
+   Ubuntu 14.04 - Travis + mesa 13.0.3
+   Memcheck:Cond
+   fun:_ZNK4llvm12X86InstrInfo13reMaterializeERNS_17MachineBasicBlockENS1_15bundle_iteratorINS_12MachineInstrENS_14ilist_iteratorIS4_EEEEjjPKS4_RKNS_18TargetRegisterInfoE
+   fun:_ZN4llvm13LiveRangeEdit15rematerializeAtERNS_17MachineBasicBlockENS1_15bundle_iteratorINS_12MachineInstrENS_14ilist_iteratorIS4_EEEEjRKNS0_5RematERKNS_18TargetRegisterInfoEb
+   fun:_ZN4llvm11SplitEditor13defFromParentEjPNS_6VNInfoENS_9SlotIndexERNS_17MachineBasicBlockENS4_15bundle_iteratorINS_12MachineInstrENS_14ilist_iteratorIS7_EEEE
+   fun:_ZN4llvm11SplitEditor16splitRegOutBlockERKNS_13SplitAnalysis9BlockInfoEjNS_9SlotIndexE
+   fun:_ZN12_GLOBAL__N_18RAGreedy13doRegionSplitERN4llvm12LiveIntervalEjbRNS1_15SmallVectorImplIjEE
+   fun:_ZN12_GLOBAL__N_18RAGreedy17selectOrSplitImplERN4llvm12LiveIntervalERNS1_15SmallVectorImplIjEERNS1_8SmallSetIjLj16ESt4lessIjEEEj
+   fun:_ZN12_GLOBAL__N_18RAGreedy13selectOrSplitERN4llvm12LiveIntervalERNS1_15SmallVectorImplIjEE
+   fun:_ZN4llvm12RegAllocBase16allocatePhysRegsEv
+   fun:_ZN12_GLOBAL__N_18RAGreedy20runOnMachineFunctionERN4llvm15MachineFunctionE
+   fun:_ZN4llvm19MachineFunctionPass13runOnFunctionERNS_8FunctionE
+   fun:_ZN4llvm13FPPassManager13runOnFunctionERNS_8FunctionE
+   fun:_ZN4llvm13FPPassManager11runOnModuleERNS_6ModuleE
+}
+{
+   Ubuntu 14.04 - Travis + mesa 13.0.3
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:_Znwm
+   ...
+}

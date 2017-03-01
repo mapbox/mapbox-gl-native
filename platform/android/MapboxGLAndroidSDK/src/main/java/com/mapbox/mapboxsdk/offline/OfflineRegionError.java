@@ -25,25 +25,23 @@ public class OfflineRegionError {
   public static final String REASON_OTHER = "REASON_OTHER";
 
   @ErrorReason
-  private String reason;
+  private final String reason;
 
   /**
    * /* An error message from the request handler, e.g. a server message or a system message
    * /* informing the user about the reason for the failure.
    */
-  private String message;
+  private final String message;
 
-  /*
-   * Constructors
-   */
+  // Constructors
 
-  private OfflineRegionError() {
+  private OfflineRegionError(String reason, String message) {
     // For JNI use only
+    this.reason = reason;
+    this.message = message;
   }
 
-  /*
-   * Getters
-   */
+  // Getters
 
   @ErrorReason
   public String getReason() {

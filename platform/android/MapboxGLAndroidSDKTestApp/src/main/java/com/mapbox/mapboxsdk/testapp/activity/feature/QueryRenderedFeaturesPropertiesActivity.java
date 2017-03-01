@@ -6,13 +6,7 @@ import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-
-import timber.log.Timber;
-
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -30,8 +24,10 @@ import com.mapbox.services.commons.geojson.Feature;
 import java.util.List;
 import java.util.Map;
 
+import timber.log.Timber;
+
 /**
- * Demo's query rendered features
+ * Test activity showcasing using the query rendered features API to query feature properties on Map click.
  */
 public class QueryRenderedFeaturesPropertiesActivity extends AppCompatActivity {
 
@@ -43,11 +39,10 @@ public class QueryRenderedFeaturesPropertiesActivity extends AppCompatActivity {
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_query_features_point);
-    setupActionBar();
 
     final float density = getResources().getDisplayMetrics().density;
 
-    //Initialize map as normal
+    // Initialize map as normal
     mapView = (MapView) findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
     mapView.getMapAsync(new OnMapReadyCallback() {
@@ -55,14 +50,14 @@ public class QueryRenderedFeaturesPropertiesActivity extends AppCompatActivity {
       public void onMapReady(final MapboxMap mapboxMap) {
         QueryRenderedFeaturesPropertiesActivity.this.mapboxMap = mapboxMap;
 
-        //Add custom window adapter
+        // Add custom window adapter
         addCustomInfoWindowAdapter(mapboxMap);
 
-        //Add a click listener
+        // Add a click listener
         mapboxMap.setOnMapClickListener(new MapboxMap.OnMapClickListener() {
           @Override
           public void onMapClick(@NonNull LatLng point) {
-            //Query
+            // Query
             final PointF pixel = mapboxMap.getProjection().toScreenLocation(point);
             Timber.i(String.format(
               "Requesting features for %sx%s (%sx%s adjusted for density)",
@@ -70,15 +65,15 @@ public class QueryRenderedFeaturesPropertiesActivity extends AppCompatActivity {
             );
             List<Feature> features = mapboxMap.queryRenderedFeatures(pixel);
 
-            //Debug output
+            // Debug output
             debugOutput(features);
 
-            //Remove any previous markers
+            // Remove any previous markers
             if (marker != null) {
               mapboxMap.removeMarker(marker);
             }
 
-            //Add a marker on the clicked point
+            // Add a marker on the clicked point
             marker = mapboxMap.addMarker(new CustomMarkerOptions().position(point).features(features));
             mapboxMap.selectMarker(marker);
           }
@@ -186,28 +181,6 @@ public class QueryRenderedFeaturesPropertiesActivity extends AppCompatActivity {
     mapView.onLowMemory();
   }
 
-  @Override
-  public boolean onOptionsItemSelected(MenuItem item) {
-    switch (item.getItemId()) {
-      case android.R.id.home:
-        onBackPressed();
-        return true;
-      default:
-        return super.onOptionsItemSelected(item);
-    }
-  }
-
-  private void setupActionBar() {
-    Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-    setSupportActionBar(toolbar);
-
-    final ActionBar actionBar = getSupportActionBar();
-    if (actionBar != null) {
-      actionBar.setDisplayHomeAsUpEnabled(true);
-      actionBar.setDisplayShowHomeEnabled(true);
-    }
-  }
-
   private static class CustomMarker extends Marker {
 
     private final List<Feature> features;
@@ -232,7 +205,7 @@ public class QueryRenderedFeaturesPropertiesActivity extends AppCompatActivity {
     }
 
     private CustomMarkerOptions(Parcel in) {
-      //Should implement this
+      // Should implement this
     }
 
     @Override
@@ -245,8 +218,8 @@ public class QueryRenderedFeaturesPropertiesActivity extends AppCompatActivity {
       return new CustomMarker(this, features);
     }
 
-    public static final Parcelable.Creator<CustomMarkerOptions> CREATOR
-      = new Parcelable.Creator<CustomMarkerOptions>() {
+    public static final Parcelable.Creator<CustomMarkerOptions> CREATOR =
+      new Parcelable.Creator<CustomMarkerOptions>() {
         public CustomMarkerOptions createFromParcel(Parcel in) {
           return new CustomMarkerOptions(in);
         }
@@ -263,7 +236,7 @@ public class QueryRenderedFeaturesPropertiesActivity extends AppCompatActivity {
 
     @Override
     public void writeToParcel(Parcel out, int flags) {
-      //Should implement this
+      // Should implement this
     }
   }
 }

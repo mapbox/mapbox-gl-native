@@ -13,14 +13,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  Returns the associated map view.
- 
+
  The value of this property is nil during initialization.
  */
 @property (nonatomic, readonly, weak, nullable) MGLMapView *mapView;
- 
+
 /**
  Returns the annotation object indicating the user’s current location.
- 
+
  The value of this property is nil during initialization and while user tracking
  is inactive.
  */
@@ -28,7 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  Returns the layer that should be used for annotation selection hit testing.
- 
+
  The default value of this property is the presentation layer of the view’s Core
  Animation layer. When subclassing, you may override this property to specify a
  different layer to be used for hit testing. This can be useful when you wish to

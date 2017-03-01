@@ -1,6 +1,14 @@
+# Load Node.js
+include(cmake/NodeJS.cmake)
+nodejs_init()
+
 add_nodejs_module(mbgl-node
     platform/node/src/node_mapbox_gl_native.cpp
 )
+
+# NodeJS.cmake forces C++11.
+# https://github.com/cjntaylor/node-cmake/issues/18
+set_target_properties("mbgl-node" PROPERTIES CXX_STANDARD 14)
 
 target_sources(mbgl-node
     PRIVATE platform/node/src/node_logging.hpp
@@ -41,7 +49,7 @@ target_add_mason_package(mbgl-node PRIVATE geojson)
 add_custom_command(
     TARGET mbgl-node
     POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:mbgl-node> ${CMAKE_SOURCE_DIR}/lib/mapbox-gl-native.node
+    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:mbgl-node> ${CMAKE_SOURCE_DIR}/lib/mapbox_gl_native.node
 )
 
 mbgl_platform_node()

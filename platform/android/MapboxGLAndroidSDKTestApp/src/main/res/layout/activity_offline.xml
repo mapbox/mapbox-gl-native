@@ -1,52 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
-
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="@color/primary"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
+    android:layout_height="match_parent">
 
     <ProgressBar
         android:id="@+id/progress_bar"
         style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="match_parent"
         android:layout_height="25dp"
-        android:layout_below="@+id/toolbar"
         android:indeterminate="true"
-        android:visibility="gone" />
+        android:visibility="gone"/>
 
     <com.mapbox.mapboxsdk.maps.MapView
         android:id="@id/mapView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/progress_bar" />
+        android:layout_below="@+id/progress_bar"/>
 
     <Button
+        android:id="@+id/button_download_region"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="10dp"
-        android:text="@string/button_download_region"
-        android:id="@+id/button_download_region"
-        android:layout_margin="@dimen/fab_margin"
+        android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_alignParentBottom="true"
-        android:background="@color/white"/>
+        android:layout_margin="@dimen/fab_margin"
+        android:background="@color/white"
+        android:padding="10dp"
+        android:text="@string/button_download_region"/>
 
     <Button
+        android:id="@+id/button_list_regions"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="10dp"
-        android:text="@string/button_list_regions"
-        android:id="@+id/button_list_regions"
         android:layout_alignBottom="@+id/button_download_region"
         android:layout_alignParentRight="true"
         android:layout_marginRight="@dimen/fab_margin"
-        android:background="@color/white"/>
+        android:background="@color/white"
+        android:padding="10dp"
+        android:text="@string/button_list_regions"/>
 
 </RelativeLayout>

@@ -38,7 +38,7 @@ TEST(API, TEST_REQUIRES_SERVER(RenderMissingTile)) {
 
     Log::setObserver(std::make_unique<FixtureLogObserver>());
 
-    Map map(backend, view.size, 1, fileSource, threadPool, MapMode::Still);
+    Map map(backend, view.getSize(), 1, fileSource, threadPool, MapMode::Still);
 
     std::string message;
 

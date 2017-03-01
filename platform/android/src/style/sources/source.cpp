@@ -5,11 +5,11 @@
 
 #include <mbgl/util/logging.hpp>
 
-//Java -> C++ conversion
+// Java -> C++ conversion
 #include <mbgl/style/conversion.hpp>
 #include <mbgl/style/conversion/source.hpp>
 
-//C++ -> Java conversion
+// C++ -> Java conversion
 #include "../conversion/property_value.hpp"
 
 #include <string>
@@ -44,15 +44,15 @@ namespace android {
     }
 
     void Source::addToMap(mbgl::Map& _map) {
-        //Check to see if we own the source first
+        // Check to see if we own the source first
         if (!ownedSource) {
             throw std::runtime_error("Cannot add source twice");
         }
 
-        //Add source to map
+        // Add source to map
         _map.addSource(releaseCoreSource());
 
-        //Save pointer to the map
+        // Save pointer to the map
         this->map = &_map;
     }
 
@@ -64,17 +64,17 @@ namespace android {
     jni::Class<Source> Source::javaClass;
 
     void Source::registerNative(jni::JNIEnv& env) {
-        //Lookup the class
+        // Lookup the class
         Source::javaClass = *jni::Class<Source>::Find(env).NewGlobalRef(env).release();
 
         #define METHOD(MethodPtr, name) jni::MakeNativePeerMethod<decltype(MethodPtr), (MethodPtr)>(name)
 
-        //Register the peer
+        // Register the peer
         jni::RegisterNativePeer<Source>(env, Source::javaClass, "nativePtr",
             METHOD(&Source::getId, "nativeGetId")
         );
 
     }
 
-} //android
-} //mbgl
+} // namespace android
+} // namespace mbgl

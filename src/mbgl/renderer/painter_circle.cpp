@@ -37,13 +37,6 @@ void Painter::renderCircle(PaintParameters& parameters,
                                       properties.get<CircleTranslateAnchor>(),
                                       state)
             },
-            uniforms::u_opacity::Value{ properties.get<CircleOpacity>() },
-            uniforms::u_color::Value{ properties.get<CircleColor>() },
-            uniforms::u_radius::Value{ properties.get<CircleRadius>() },
-            uniforms::u_blur::Value{ properties.get<CircleBlur>() },
-            uniforms::u_stroke_color::Value{ properties.get<CircleStrokeColor>() },
-            uniforms::u_stroke_width::Value{ properties.get<CircleStrokeWidth>() },
-            uniforms::u_stroke_opacity::Value{ properties.get<CircleStrokeOpacity>() },
             uniforms::u_scale_with_map::Value{ scaleWithMap },
             uniforms::u_extrude_scale::Value{ scaleWithMap
                 ? std::array<float, 2> {{
@@ -54,7 +47,10 @@ void Painter::renderCircle(PaintParameters& parameters,
         },
         *bucket.vertexBuffer,
         *bucket.indexBuffer,
-        bucket.segments
+        bucket.segments,
+        bucket.paintPropertyBinders.at(layer.getID()),
+        properties,
+        state.getZoom()
     );
 }
 

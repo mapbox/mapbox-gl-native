@@ -117,4 +117,14 @@ public class Projection {
   float getWidth() {
     return nativeMapView.getWidth();
   }
+
+  /**
+   * Calculates a zoom level based on minimum scale and current scale from MapView
+   *
+   * @param minScale The minimum scale to calculate the zoom level.
+   * @return zoom level that fits the MapView.
+   */
+  public double calculateZoom(float minScale) {
+    return Math.log(nativeMapView.getScale() * minScale) / Math.log(2);
+  }
 }

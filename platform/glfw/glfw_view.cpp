@@ -42,6 +42,8 @@ GLFWView::GLFWView(bool fullscreen_, bool benchmark_)
         height = videoMode->height;
     }
 
+    glfwWindowHint(GLFW_COCOA_GRAPHICS_SWITCHING, GL_TRUE);
+
 #ifdef DEBUG
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 #endif
@@ -107,10 +109,11 @@ GLFWView::GLFWView(bool fullscreen_, bool benchmark_)
     printf("- Press `7` through `0` to add increasing numbers of shape annotations for testing\n");
     printf("\n");
     printf("- Press `Q` to remove annotations\n");
-    printf("- Press `P` to add a random custom runtime imagery annotation\n");
+    printf("- Press `K` to add a random custom runtime imagery annotation\n");
     printf("- Press `L` to add a random line annotation\n");
     printf("- Press `W` to pop the last-added annotation off\n");
     printf("\n");
+    printf("- Press `P` to pause tile requests\n");
     printf("- `Control` + mouse drag to rotate\n");
     printf("- `Shift` + mouse drag to tilt\n");
     printf("\n");
@@ -198,10 +201,13 @@ void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, 
             auto result = view->map->queryPointAnnotations({ {}, { double(view->getSize().width), double(view->getSize().height) } });
             printf("visible point annotations: %lu\n", result.size());
         } break;
+        case GLFW_KEY_P:
+            view->pauseResumeCallback();
+            break;
         case GLFW_KEY_C:
             view->clearAnnotations();
             break;
-        case GLFW_KEY_P:
+        case GLFW_KEY_K:
             view->addRandomCustomPointAnnotations(1);
             break;
         case GLFW_KEY_L:
@@ -384,6 +390,7 @@ void GLFWView::onFramebufferResize(GLFWwindow *window, int width, int height) {
     GLFWView *view = reinterpret_cast<GLFWView *>(glfwGetWindowUserPointer(window));
     view->fbWidth = width;
     view->fbHeight = height;
+    view->bind();
 
     // This is only triggered when the framebuffer is resized, but not the window. It can
     // happen when you move the window between screens with a different pixel ratio.
@@ -410,9 +417,9 @@ void GLFWView::onMouseClick(GLFWwindow *window, int button, int action, int modi
             double now = glfwGetTime();
             if (now - view->lastClick < 0.4 /* ms */) {
                 if (modifiers & GLFW_MOD_SHIFT) {
-                    view->map->scaleBy(0.5, mbgl::ScreenCoordinate { view->lastX, view->lastY }, mbgl::Milliseconds(500));
+                    view->map->scaleBy(0.5, mbgl::ScreenCoordinate { view->lastX, view->lastY }, mbgl::AnimationOptions{{mbgl::Milliseconds(500)}});
                 } else {
-                    view->map->scaleBy(2.0, mbgl::ScreenCoordinate { view->lastX, view->lastY }, mbgl::Milliseconds(500));
+                    view->map->scaleBy(2.0, mbgl::ScreenCoordinate { view->lastX, view->lastY }, mbgl::AnimationOptions{{mbgl::Milliseconds(500)}});
                 }
             }
             view->lastClick = now;

@@ -18,6 +18,8 @@ public:
                              float justify,
                              float spacing,
                              const Point<float>& translate,
+                             float verticalHeight,
+                             const WritingModeType,
                              BiDi& bidi) const;
 
 private:
@@ -26,7 +28,8 @@ private:
                                         float maxWidth) const;
     std::set<std::size_t> determineLineBreaks(const std::u16string& logicalInput,
                                           const float spacing,
-                                          float maxWidth) const;
+                                          float maxWidth,
+                                          const WritingModeType) const;
 
     void shapeLines(Shaping& shaping,
                     const std::vector<std::u16string>& lines,
@@ -35,7 +38,9 @@ private:
                     float horizontalAlign,
                     float verticalAlign,
                     float justify,
-                    const Point<float>& translate) const;
+                    const Point<float>& translate,
+                    float verticalHeight,
+                    const WritingModeType) const;
 
     std::map<uint32_t, SDFGlyph> sdfs;
 };

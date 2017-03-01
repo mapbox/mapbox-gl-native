@@ -14,17 +14,11 @@ extern JavaVM* theJVM;
 extern std::string cachePath;
 extern std::string dataPath;
 extern std::string apkPath;
-extern std::string androidRelease;
 
-extern jmethodID onInvalidateId;
-extern jmethodID onMapChangedId;
-extern jmethodID onFpsChangedId;
-extern jmethodID onSnapshotReadyId;
+bool attach_jni_thread(JavaVM* vm, JNIEnv** env, std::string threadName);
+void detach_jni_thread(JavaVM* vm, JNIEnv** env, bool detach);
 
-extern bool attach_jni_thread(JavaVM* vm, JNIEnv** env, std::string threadName);
-extern void detach_jni_thread(JavaVM* vm, JNIEnv** env, bool detach);
-    
 extern void registerNatives(JavaVM* vm);
 
-} //android
-} //mbgl
+} // namespace android
+} // namespace mbgl

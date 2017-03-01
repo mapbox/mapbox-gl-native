@@ -9,12 +9,25 @@
 namespace mbgl {
 namespace android {
 
+    /**
+     * Creates an owning peer object (for layers not attached to the map) from the JVM side
+     */
     RasterLayer::RasterLayer(jni::JNIEnv& env, jni::String layerId, jni::String sourceId)
         : Layer(env, std::make_unique<mbgl::style::RasterLayer>(jni::Make<std::string>(env, layerId), jni::Make<std::string>(env, sourceId))) {
     }
 
+    /**
+     * Creates a non-owning peer object (for layers currently attached to the map)
+     */
     RasterLayer::RasterLayer(mbgl::Map& map, mbgl::style::RasterLayer& coreLayer)
         : Layer(map, coreLayer) {
+    }
+
+    /**
+     * Creates an owning peer object (for layers not attached to the map)
+     */
+    RasterLayer::RasterLayer(mbgl::Map& map, std::unique_ptr<mbgl::style::RasterLayer> coreLayer)
+        : Layer(map, std::move(coreLayer)) {
     }
 
     RasterLayer::~RasterLayer() = default;
@@ -71,12 +84,12 @@ namespace android {
     }
 
     void RasterLayer::registerNative(jni::JNIEnv& env) {
-        //Lookup the class
+        // Lookup the class
         RasterLayer::javaClass = *jni::Class<RasterLayer>::Find(env).NewGlobalRef(env).release();
 
         #define METHOD(MethodPtr, name) jni::MakeNativePeerMethod<decltype(MethodPtr), (MethodPtr)>(name)
 
-        //Register the peer
+        // Register the peer
         jni::RegisterNativePeer<RasterLayer>(
             env, RasterLayer::javaClass, "nativePtr",
             std::make_unique<RasterLayer, JNIEnv&, jni::String, jni::String>,

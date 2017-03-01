@@ -8,14 +8,13 @@ namespace mbgl {
 
 using namespace style;
 
-static_assert(sizeof(FillAttributes::Vertex) == 4, "expected FillVertex size");
+static_assert(sizeof(FillLayoutVertex) == 4, "expected FillLayoutVertex size");
 
 FillPatternUniforms::Values
 FillPatternUniforms::values(mat4 matrix,
-                            float opacity,
                             Size framebufferSize,
-                            const SpriteAtlasPosition& a,
-                            const SpriteAtlasPosition& b,
+                            const SpriteAtlasElement& a,
+                            const SpriteAtlasElement& b,
                             const Faded<std::string>& fading,
                             const UnwrappedTileID& tileID,
                             const TransformState& state)
@@ -26,7 +25,6 @@ FillPatternUniforms::values(mat4 matrix,
 
     return FillPatternUniforms::Values {
         uniforms::u_matrix::Value{ matrix },
-        uniforms::u_opacity::Value{ opacity },
         uniforms::u_world::Value{ framebufferSize },
         uniforms::u_pattern_tl_a::Value{ a.tl },
         uniforms::u_pattern_br_a::Value{ a.br },

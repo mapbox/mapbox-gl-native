@@ -1,5 +1,7 @@
 #include <mbgl/gl/headless_backend.hpp>
 #include <mbgl/gl/headless_display.hpp>
+#include <mbgl/gl/context.hpp>
+#include <mbgl/map/backend_scope.hpp>
 
 #include <cassert>
 #include <stdexcept>
@@ -8,17 +10,15 @@
 namespace mbgl {
 
 HeadlessBackend::HeadlessBackend() {
-    activate();
 }
 
 HeadlessBackend::HeadlessBackend(std::shared_ptr<HeadlessDisplay> display_)
         : display(std::move(display_)) {
-    activate();
 }
 
 HeadlessBackend::~HeadlessBackend() {
-    deactivate();
-    destroyContext();
+    BackendScope scope(*this);
+    context.reset();
 }
 
 void HeadlessBackend::activate() {
@@ -31,7 +31,8 @@ void HeadlessBackend::activate() {
         createContext();
     }
 
-    activateContext();
+    assert(hasContext());
+    impl->activateContext();
 
     if (!extensionsLoaded) {
         gl::InitializeExtensions(initializeExtension);
@@ -40,27 +41,13 @@ void HeadlessBackend::activate() {
 }
 
 void HeadlessBackend::deactivate() {
-    deactivateContext();
+    assert(hasContext());
+    impl->deactivateContext();
     active = false;
 }
 
 void HeadlessBackend::invalidate() {
     assert(false);
-}
-
-void HeadlessBackend::destroyContext() {
-    assert(hasContext());
-    impl.reset();
-}
-
-void HeadlessBackend::activateContext() {
-    assert(hasContext());
-    impl->activateContext();
-}
-
-void HeadlessBackend::deactivateContext() {
-    assert(hasContext());
-    impl->deactivateContext();
 }
 
 void HeadlessBackend::notifyMapChange(MapChange change) {

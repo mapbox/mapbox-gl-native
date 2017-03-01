@@ -11,22 +11,22 @@
 - (void)testProperties {
     MGLPointFeature *feature = [[MGLPointFeature alloc] init];
     MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"sourceID" shape:feature options:nil];
-    
+
     MGLFillStyleLayer *layer = [[MGLFillStyleLayer alloc] initWithIdentifier:@"layerID" source:source];
-    
+
     XCTAssertEqualObjects(layer.identifier, @"layerID");
     XCTAssertEqualObjects(layer.sourceIdentifier, source.identifier);
-    
+
     XCTAssertTrue(layer.visible);
     layer.visible = NO;
     XCTAssertFalse(layer.visible);
     layer.visible = YES;
     XCTAssertTrue(layer.visible);
-    
+
     XCTAssertEqual(layer.minimumZoomLevel, -INFINITY);
     layer.minimumZoomLevel = 22;
     XCTAssertEqual(layer.minimumZoomLevel, 22);
-    
+
     XCTAssertEqual(layer.maximumZoomLevel, INFINITY);
     layer.maximumZoomLevel = 0;
     XCTAssertEqual(layer.maximumZoomLevel, 0);

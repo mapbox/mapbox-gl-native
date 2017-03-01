@@ -10,12 +10,12 @@ NS_ASSUME_NONNULL_BEGIN
  width and height (measured in points) at which the map displays each raster
  image tile when the map’s zoom level is an integer. The raster source scales
  its images up or down when the map’s zoom level falls between two integers.
- 
+
  The default value for this option is 512. Version 4 of the
  <a href="https://www.mapbox.com/api-documentation/#maps">Mapbox Maps API</a>
  requires a value of 256, as do many third-party tile servers, so consult your
  provider’s documentation for the correct value.
- 
+
  This option is only applicable to `MGLRasterSource` objects; it is ignored when
  initializing `MGLVectorSource` objects.
  */
@@ -29,16 +29,16 @@ extern MGL_EXPORT const MGLTileSourceOption MGLTileSourceOptionTileSize;
  A raster source is added to an `MGLStyle` object along with one or more
  `MGLRasterStyleLayer` objects. Use a raster style layer to control the
  appearance of content supplied by the raster source.
- 
+
  Each
  <a href="https://www.mapbox.com/mapbox-gl-style-spec/#sources-raster"><code>raster</code></a>
  source defined by the style JSON file is represented at runtime by an
  `MGLRasterSource` object that you can use to initialize new style layers. You
  can also add and remove sources dynamically using methods such as
  `-[MGLStyle addSource:]` and `-[MGLStyle sourceWithIdentifier:]`.
- 
+
  ### Example
- 
+
  ```swift
  let source = MGLRasterSource(identifier: "clouds", tileURLTemplates: ["https://example.com/raster-tiles/{z}/{x}/{y}.png"], options: [
      .minimumZoomLevel: 9,
@@ -58,21 +58,21 @@ MGL_EXPORT
 
 /**
  Returns a raster source initialized with an identifier and configuration URL.
- 
+
  After initializing and configuring the source, add it to a map view’s style
  using the `-[MGLStyle addSource:]` method.
- 
+
  The URL may be a full HTTP or HTTPS URL or, for tile sets hosted by Mapbox, a
  Mapbox URL indicating a map identifier (`mapbox://<mapid>`). The URL should
  point to a JSON file that conforms to the
  <a href="https://github.com/mapbox/tilejson-spec/">TileJSON specification</a>.
- 
+
  If a Mapbox URL is specified, this source uses a tile size of 256. For all
  other tile sets, the default value is 512. (See the
  `MGLTileSourceOptionTileSize` documentation for more information about tile
  sizes.) If you need to use a tile size other than the default, use the
  `-initWithIdentifier:configurationURL:tileSize:` method.
- 
+
  @param identifier A string that uniquely identifies the source in the style to
     which it is added.
  @param configurationURL A URL to a TileJSON configuration file describing the
@@ -84,15 +84,15 @@ MGL_EXPORT
 /**
  Returns a raster source initialized with an identifier, configuration URL, and
  tile size.
- 
+
  After initializing and configuring the source, add it to a map view’s style
  using the `-[MGLStyle addSource:]` method.
- 
+
  The URL may be a full HTTP or HTTPS URL or, for tile sets hosted by Mapbox, a
  Mapbox URL indicating a map identifier (`mapbox://<mapid>`). The URL should
  point to a JSON file that conforms to the
  <a href="https://github.com/mapbox/tilejson-spec/">TileJSON specification</a>.
- 
+
  @param identifier A string that uniquely identifies the source in the style to
     which it is added.
  @param configurationURL A URL to a TileJSON configuration file describing the

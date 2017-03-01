@@ -2,6 +2,6 @@
 
 namespace mbgl {
 
-static_assert(sizeof(RasterProgram::Vertex) == 8, "expected RasterVertex size");
+static_assert(sizeof(RasterLayoutVertex) == 8, "expected RasterLayoutVertex size");
 
 } // namespace mbgl

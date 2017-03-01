@@ -3,19 +3,20 @@
 #include <mbgl/programs/program.hpp>
 #include <mbgl/programs/attributes.hpp>
 #include <mbgl/programs/uniforms.hpp>
-#include <mbgl/shader/fill.hpp>
-#include <mbgl/shader/fill_pattern.hpp>
-#include <mbgl/shader/fill_outline.hpp>
-#include <mbgl/shader/fill_outline_pattern.hpp>
+#include <mbgl/shaders/fill.hpp>
+#include <mbgl/shaders/fill_pattern.hpp>
+#include <mbgl/shaders/fill_outline.hpp>
+#include <mbgl/shaders/fill_outline_pattern.hpp>
 #include <mbgl/util/geometry.hpp>
 #include <mbgl/util/mat4.hpp>
 #include <mbgl/util/size.hpp>
+#include <mbgl/style/layers/fill_layer_properties.hpp>
 
 #include <string>
 
 namespace mbgl {
 
-class SpriteAtlasPosition;
+class SpriteAtlasElement;
 class UnwrappedTileID;
 class TransformState;
 
@@ -25,7 +26,6 @@ template <class> class Faded;
 
 namespace uniforms {
 MBGL_DEFINE_UNIFORM_SCALAR(Size,     u_world);
-MBGL_DEFINE_UNIFORM_SCALAR(Color,    u_outline_color);
 MBGL_DEFINE_UNIFORM_SCALAR(float,    u_scale_a);
 MBGL_DEFINE_UNIFORM_SCALAR(float,    u_scale_b);
 MBGL_DEFINE_UNIFORM_SCALAR(float,    u_tile_units_to_pixels);
@@ -33,32 +33,17 @@ MBGL_DEFINE_UNIFORM_VECTOR(float, 2, u_pixel_coord_upper);
 MBGL_DEFINE_UNIFORM_VECTOR(float, 2, u_pixel_coord_lower);
 } // namespace uniforms
 
-struct FillAttributes : gl::Attributes<
+struct FillLayoutAttributes : gl::Attributes<
     attributes::a_pos>
-{
-    static Vertex vertex(Point<int16_t> p) {
-        return Vertex {
-            {
-                p.x,
-                p.y
-            }
-        };
-    }
-};
-
-using FillVertex = FillAttributes::Vertex;
+{};
 
 struct FillUniforms : gl::Uniforms<
     uniforms::u_matrix,
-    uniforms::u_opacity,
-    uniforms::u_color,
-    uniforms::u_outline_color,
     uniforms::u_world>
 {};
 
 struct FillPatternUniforms : gl::Uniforms<
     uniforms::u_matrix,
-    uniforms::u_opacity,
     uniforms::u_world,
     uniforms::u_pattern_tl_a,
     uniforms::u_pattern_br_a,
@@ -75,10 +60,9 @@ struct FillPatternUniforms : gl::Uniforms<
     uniforms::u_tile_units_to_pixels>
 {
     static Values values(mat4 matrix,
-                         float opacity,
                          Size framebufferSize,
-                         const SpriteAtlasPosition&,
-                         const SpriteAtlasPosition&,
+                         const SpriteAtlasElement&,
+                         const SpriteAtlasElement&,
                          const style::Faded<std::string>&,
                          const UnwrappedTileID&,
                          const TransformState&);
@@ -87,37 +71,57 @@ struct FillPatternUniforms : gl::Uniforms<
 class FillProgram : public Program<
     shaders::fill,
     gl::Triangle,
-    FillAttributes,
-    FillUniforms>
+    FillLayoutAttributes,
+    FillUniforms,
+    style::FillPaintProperties>
 {
+public:
     using Program::Program;
+
+    static LayoutVertex layoutVertex(Point<int16_t> p) {
+        return LayoutVertex {
+            {{
+                p.x,
+                p.y
+            }}
+        };
+    }
 };
 
 class FillPatternProgram : public Program<
     shaders::fill_pattern,
     gl::Triangle,
-    FillAttributes,
-    FillPatternUniforms>
+    FillLayoutAttributes,
+    FillPatternUniforms,
+    style::FillPaintProperties>
 {
+public:
     using Program::Program;
 };
 
 class FillOutlineProgram : public Program<
     shaders::fill_outline,
     gl::Line,
-    FillAttributes,
-    FillUniforms>
+    FillLayoutAttributes,
+    FillUniforms,
+    style::FillPaintProperties>
 {
+public:
     using Program::Program;
 };
 
 class FillOutlinePatternProgram : public Program<
     shaders::fill_outline_pattern,
     gl::Line,
-    FillAttributes,
-    FillPatternUniforms>
+    FillLayoutAttributes,
+    FillPatternUniforms,
+    style::FillPaintProperties>
 {
+public:
     using Program::Program;
 };
+
+using FillLayoutVertex = FillProgram::LayoutVertex;
+using FillAttributes = FillProgram::Attributes;
 
 } // namespace mbgl

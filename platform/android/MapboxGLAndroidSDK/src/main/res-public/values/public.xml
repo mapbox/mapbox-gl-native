@@ -8,20 +8,31 @@
     <public name="mapbox_AlertDialogStyle" type="style" />
 
     <!-- Exposed attrs.xml -->
-    <public name="mapbox_accessToken" type="attr" />
+    <!--Configuration-->
     <public name="mapbox_styleUrl" type="attr" />
     <public name="mapbox_apiBaseUrl" type="attr" />
 
+    <!--Camera-->
     <public name="mapbox_cameraTargetLng" type="attr" />
     <public name="mapbox_cameraTargetLat" type="attr" />
     <public name="mapbox_cameraZoom_level" type="attr" />
     <public name="mapbox_cameraBearing" type="attr" />
+    <public name="mapbox_cameraTilt" type="attr" />
 
+    <!--Zoom-->
+    <public name="mapbox_cameraZoomMax" ftype="attr" />
+    <public name="mapbox_cameraZoomMin" type="attr" />
+
+    <!--Gestures-->
     <public name="mapbox_uiZoomGestures" type="attr" />
     <public name="mapbox_uiScrollGestures" type="attr" />
     <public name="mapbox_uiRotateGestures" type="attr" />
+    <public name="mapbox_uiTiltGestures" type="attr" />
+
+    <!--UI-Controls-->
     <public name="mapbox_uiZoomControls" type="attr" />
 
+    <!--MyLocation-->
     <public name="mapbox_myLocation" type="attr" />
     <public name="mapbox_myLocationTintColor" type="attr" />
     <public name="mapbox_myLocationDrawable" type="attr" />
@@ -35,6 +46,7 @@
     <public name="mapbox_myLocationAccuracyTintColor" type="attr" />
     <public name="mapbox_myLocationAccuracyAlpha" type="attr" />
 
+    <!--Compass-->
     <public name="mapbox_uiCompass" type="attr" />
     <public name="mapbox_uiCompassGravity" type="attr" />
     <public name="mapbox_uiCompassMarginLeft" type="attr" />
@@ -43,6 +55,7 @@
     <public name="mapbox_uiCompassMarginBottom" type="attr" />
     <public name="mapbox_uiCompassFadeFacingNorth" type="attr" />
 
+    <!--Logo-->
     <public name="mapbox_uiLogo" type="attr" />
     <public name="mapbox_uiLogoGravity" type="attr" />
     <public name="mapbox_uiLogoMarginLeft" type="attr" />
@@ -50,6 +63,7 @@
     <public name="mapbox_uiLogoMarginRight" type="attr" />
     <public name="mapbox_uiLogoMarginBottom" type="attr" />
 
+    <!--Attribution-->
     <public name="mapbox_uiAttribution" type="attr" />
     <public name="mapbox_uiAttributionGravity" type="attr" />
     <public name="mapbox_uiAttributionMarginLeft" type="attr" />
@@ -57,6 +71,7 @@
     <public name="mapbox_uiAttributionMarginRight" type="attr" />
     <public name="mapbox_uiAttributionMarginBottom" type="attr" />
 
+    <!-- Deprecated to use TextureView-->
     <public name="mapbox_renderTextureMode" type="attr" />
 
     <!-- Exposed styles -->

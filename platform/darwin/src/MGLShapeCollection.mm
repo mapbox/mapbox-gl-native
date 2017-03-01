@@ -32,7 +32,7 @@
 - (BOOL)isEqual:(id)other {
     if (self == other) return YES;
     if (![other isKindOfClass:[MGLShapeCollection class]]) return NO;
-    
+
     MGLShapeCollection *otherShapeCollection = other;
     return [super isEqual:otherShapeCollection]
     && [_shapes isEqualToArray:otherShapeCollection.shapes];

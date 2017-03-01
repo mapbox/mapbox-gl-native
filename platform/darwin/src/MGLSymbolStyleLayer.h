@@ -1,4 +1,4 @@
-// This file is generated. 
+// This file is generated.
 // Edit platform/darwin/scripts/generate-style-code.js, then run `make style-code-darwin`.
 
 #import "MGLFoundation.h"
@@ -10,7 +10,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  In combination with `symbolPlacement`, determines the rotation behavior of
  icons.
- 
+
  Values of this type are used in the `MGLSymbolStyleLayer.iconRotationAlignment`
  property.
  */
@@ -37,7 +37,7 @@ typedef NS_ENUM(NSUInteger, MGLIconRotationAlignment) {
 
 /**
  Scales the icon to fit around the associated text.
- 
+
  Values of this type are used in the `MGLSymbolStyleLayer.iconTextFit`
  property.
  */
@@ -62,7 +62,7 @@ typedef NS_ENUM(NSUInteger, MGLIconTextFit) {
 
 /**
  Label placement relative to its geometry.
- 
+
  Values of this type are used in the `MGLSymbolStyleLayer.symbolPlacement`
  property.
  */
@@ -80,7 +80,7 @@ typedef NS_ENUM(NSUInteger, MGLSymbolPlacement) {
 
 /**
  Part of the text placed closest to the anchor.
- 
+
  Values of this type are used in the `MGLSymbolStyleLayer.textAnchor`
  property.
  */
@@ -125,7 +125,7 @@ typedef NS_ENUM(NSUInteger, MGLTextAnchor) {
 
 /**
  Text justification options.
- 
+
  Values of this type are used in the `MGLSymbolStyleLayer.textJustification`
  property.
  */
@@ -146,7 +146,7 @@ typedef NS_ENUM(NSUInteger, MGLTextJustification) {
 
 /**
  Orientation of text when map is pitched.
- 
+
  Values of this type are used in the `MGLSymbolStyleLayer.textPitchAlignment`
  property.
  */
@@ -168,7 +168,7 @@ typedef NS_ENUM(NSUInteger, MGLTextPitchAlignment) {
 /**
  In combination with `symbolPlacement`, determines the rotation behavior of the
  individual glyphs forming the text.
- 
+
  Values of this type are used in the `MGLSymbolStyleLayer.textRotationAlignment`
  property.
  */
@@ -195,7 +195,7 @@ typedef NS_ENUM(NSUInteger, MGLTextRotationAlignment) {
 
 /**
  Specifies how to capitalize text.
- 
+
  Values of this type are used in the `MGLSymbolStyleLayer.textTransform`
  property.
  */
@@ -216,7 +216,7 @@ typedef NS_ENUM(NSUInteger, MGLTextTransform) {
 
 /**
  Controls the translation reference point.
- 
+
  Values of this type are used in the `MGLSymbolStyleLayer.iconTranslationAnchor`
  property.
  */
@@ -233,7 +233,7 @@ typedef NS_ENUM(NSUInteger, MGLIconTranslationAnchor) {
 
 /**
  Controls the translation reference point.
- 
+
  Values of this type are used in the `MGLSymbolStyleLayer.textTranslationAnchor`
  property.
  */
@@ -255,15 +255,15 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslationAnchor) {
  Use a symbol style layer to configure the visual appearance of labels for
  features in vector tiles loaded by an `MGLVectorSource` object or `MGLShape` or
  `MGLFeature` instances in an `MGLShapeSource` object.
- 
+
  You can access an existing symbol style layer using the
  `-[MGLStyle layerWithIdentifier:]` method if you know its identifier;
  otherwise, find it using the `MGLStyle.layers` property. You can also create a
  new symbol style layer and add it to the style using a method such as
  `-[MGLStyle addLayer:]`.
- 
+
  ### Example
- 
+
  ```swift
  let layer = MGLSymbolStyleLayer(identifier: "coffeeshops", source: pois)
  layer.sourceLayerIdentifier = "pois"
@@ -296,6 +296,12 @@ MGL_EXPORT
  This attribute corresponds to the <a
  href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-symbol-icon-allow-overlap"><code>icon-allow-overlap</code></a>
  layout property in the Mapbox Style Specification.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLStyleConstantValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of
+ `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconAllowsOverlap;
 
@@ -315,6 +321,12 @@ MGL_EXPORT
  This attribute corresponds to the <a
  href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-symbol-icon-ignore-placement"><code>icon-ignore-placement</code></a>
  layout property in the Mapbox Style Specification.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLStyleConstantValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of
+ `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconIgnoresPlacement;
 
@@ -327,6 +339,12 @@ MGL_EXPORT
  This attribute corresponds to the <a
  href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-symbol-icon-image"><code>icon-image</code></a>
  layout property in the Mapbox Style Specification.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLStyleConstantValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of
+ `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSString *> *iconImageName;
 
@@ -343,6 +361,22 @@ MGL_EXPORT
  
  This property is only applied to the style if `iconImageName` is non-`nil`.
  Otherwise, it is ignored.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLStyleConstantValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+ * `MGLSourceStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
+   * `MGLInterpolationModeIdentity`
+ * `MGLCompositeStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *iconOffset;
 #else
@@ -355,6 +389,22 @@ MGL_EXPORT
  
  This property is only applied to the style if `iconImageName` is non-`nil`.
  Otherwise, it is ignored.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLStyleConstantValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+ * `MGLSourceStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
+   * `MGLInterpolationModeIdentity`
+ * `MGLCompositeStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *iconOffset;
 #endif
@@ -369,6 +419,12 @@ MGL_EXPORT
  
  This property is only applied to the style if `iconImageName` is non-`nil`, and
  `text` is non-`nil`. Otherwise, it is ignored.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLStyleConstantValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of
+ `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable, getter=isIconOptional) MGLStyleValue<NSNumber *> *iconOptional;
 
@@ -384,6 +440,13 @@ MGL_EXPORT
  
  This property is only applied to the style if `iconImageName` is non-`nil`.
  Otherwise, it is ignored.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLStyleConstantValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconPadding;
 
@@ -402,6 +465,22 @@ MGL_EXPORT
  This attribute corresponds to the <a
  href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-symbol-icon-rotate"><code>icon-rotate</code></a>
  layout property in the Mapbox Style Specification.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLStyleConstantValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+ * `MGLSourceStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
+   * `MGLInterpolationModeIdentity`
+ * `MGLCompositeStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconRotation;
 
@@ -418,6 +497,12 @@ MGL_EXPORT
  
  This property is only applied to the style if `iconImageName` is non-`nil`.
  Otherwise, it is ignored.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLStyleConstantValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of
+ `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *iconRotationAlignment;
 
@@ -434,6 +519,13 @@ MGL_EXPORT
  This attribute corresponds to the <a
  href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-symbol-icon-size"><code>icon-size</code></a>
  layout property in the Mapbox Style Specification.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLStyleConstantValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconScale;
 
@@ -449,6 +541,12 @@ MGL_EXPORT
  
  This property is only applied to the style if `iconImageName` is non-`nil`, and
  `text` is non-`nil`. Otherwise, it is ignored.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLStyleConstantValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of
+ `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *iconTextFit;
 
@@ -466,6 +564,13 @@ MGL_EXPORT
  `text` is non-`nil`, and `iconTextFit` is set to an `MGLStyleValue` object
  containing an `NSValue` object containing `MGLIconTextFitBoth`,
  `MGLIconTextFitWidth`, or `MGLIconTextFitHeight`. Otherwise, it is ignored.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLStyleConstantValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *iconTextFitPadding;
 #else
@@ -482,6 +587,13 @@ MGL_EXPORT
  `text` is non-`nil`, and `iconTextFit` is set to an `MGLStyleValue` object
  containing an `NSValue` object containing `MGLIconTextFitBoth`,
  `MGLIconTextFitWidth`, or `MGLIconTextFitHeight`. Otherwise, it is ignored.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLStyleConstantValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *iconTextFitPadding;
 #endif
@@ -502,6 +614,12 @@ MGL_EXPORT
  This attribute corresponds to the <a
  href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-symbol-icon-keep-upright"><code>icon-keep-upright</code></a>
  layout property in the Mapbox Style Specification.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLStyleConstantValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of
+ `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *keepsIconUpright;
 
@@ -525,6 +643,12 @@ MGL_EXPORT
  This attribute corresponds to the <a
  href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-symbol-text-keep-upright"><code>text-keep-upright</code></a>
  layout property in the Mapbox Style Specification.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLStyleConstantValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of
+ `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *keepsTextUpright;
 
@@ -547,6 +671,13 @@ MGL_EXPORT
  This attribute corresponds to the <a
  href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-symbol-text-max-angle"><code>text-max-angle</code></a>
  layout property in the Mapbox Style Specification.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLStyleConstantValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *maximumTextAngle;
 
@@ -568,6 +699,13 @@ MGL_EXPORT
  This attribute corresponds to the <a
  href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-symbol-text-max-width"><code>text-max-width</code></a>
  layout property in the Mapbox Style Specification.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLStyleConstantValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *maximumTextWidth;
 
@@ -587,6 +725,12 @@ MGL_EXPORT
  This attribute corresponds to the <a
  href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-symbol-symbol-avoid-edges"><code>symbol-avoid-edges</code></a>
  layout property in the Mapbox Style Specification.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLStyleConstantValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of
+ `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *symbolAvoidsEdges;
 
@@ -599,6 +743,12 @@ MGL_EXPORT
  The default value of this property is an `MGLStyleValue` object containing an
  `NSValue` object containing `MGLSymbolPlacementPoint`. Set this property to
  `nil` to reset it to the default value.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLStyleConstantValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of
+ `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *symbolPlacement;
 
@@ -614,12 +764,20 @@ MGL_EXPORT
  This property is only applied to the style if `symbolPlacement` is set to an
  `MGLStyleValue` object containing an `NSValue` object containing
  `MGLSymbolPlacementLine`. Otherwise, it is ignored.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLStyleConstantValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *symbolSpacing;
 
 /**
  Value to use for a text label. Feature properties are specified using tokens
- like {field_name}.
+ like {field_name}.  (Token replacement is only supported for literal
+ `textField` values--not for property functions.)
  
  The default value of this property is an `MGLStyleValue` object containing the
  empty string. Set this property to `nil` to reset it to the default value.
@@ -627,6 +785,22 @@ MGL_EXPORT
  This attribute corresponds to the <a
  href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-symbol-text-field"><code>text-field</code></a>
  layout property in the Mapbox Style Specification.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLStyleConstantValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+ * `MGLSourceStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
+   * `MGLInterpolationModeIdentity`
+ * `MGLCompositeStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSString *> *text;
 
@@ -647,6 +821,12 @@ MGL_EXPORT
  This attribute corresponds to the <a
  href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-symbol-text-allow-overlap"><code>text-allow-overlap</code></a>
  layout property in the Mapbox Style Specification.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLStyleConstantValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of
+ `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textAllowsOverlap;
 
@@ -662,6 +842,12 @@ MGL_EXPORT
  
  This property is only applied to the style if `text` is non-`nil`. Otherwise,
  it is ignored.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLStyleConstantValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of
+ `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *textAnchor;
 
@@ -688,6 +874,12 @@ MGL_EXPORT
  This attribute corresponds to the <a
  href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-symbol-text-font"><code>text-font</code></a>
  layout property in the Mapbox Style Specification.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLStyleConstantValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of
+ `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSArray<NSString *> *> *textFontNames;
 
@@ -709,6 +901,13 @@ MGL_EXPORT
  This attribute corresponds to the <a
  href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-symbol-text-size"><code>text-size</code></a>
  layout property in the Mapbox Style Specification.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLStyleConstantValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textFontSize;
 
@@ -728,6 +927,12 @@ MGL_EXPORT
  This attribute corresponds to the <a
  href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-symbol-text-ignore-placement"><code>text-ignore-placement</code></a>
  layout property in the Mapbox Style Specification.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLStyleConstantValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of
+ `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textIgnoresPlacement;
 
@@ -747,6 +952,12 @@ MGL_EXPORT
  This attribute corresponds to the <a
  href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-symbol-text-justify"><code>text-justify</code></a>
  layout property in the Mapbox Style Specification.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLStyleConstantValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of
+ `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *textJustification;
 
@@ -764,6 +975,13 @@ MGL_EXPORT
  
  This property is only applied to the style if `text` is non-`nil`. Otherwise,
  it is ignored.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLStyleConstantValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textLetterSpacing;
 
@@ -778,6 +996,13 @@ MGL_EXPORT
  
  This property is only applied to the style if `text` is non-`nil`. Otherwise,
  it is ignored.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLStyleConstantValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textLineHeight;
 
@@ -793,6 +1018,13 @@ MGL_EXPORT
  
  This property is only applied to the style if `text` is non-`nil`. Otherwise,
  it is ignored.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLStyleConstantValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *textOffset;
 #else
@@ -807,6 +1039,13 @@ MGL_EXPORT
  
  This property is only applied to the style if `text` is non-`nil`. Otherwise,
  it is ignored.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLStyleConstantValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *textOffset;
 #endif
@@ -821,6 +1060,12 @@ MGL_EXPORT
  
  This property is only applied to the style if `text` is non-`nil`, and
  `iconImageName` is non-`nil`. Otherwise, it is ignored.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLStyleConstantValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of
+ `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable, getter=isTextOptional) MGLStyleValue<NSNumber *> *textOptional;
 
@@ -836,6 +1081,13 @@ MGL_EXPORT
  
  This property is only applied to the style if `text` is non-`nil`. Otherwise,
  it is ignored.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLStyleConstantValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textPadding;
 
@@ -848,6 +1100,12 @@ MGL_EXPORT
  
  This property is only applied to the style if `text` is non-`nil`. Otherwise,
  it is ignored.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLStyleConstantValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of
+ `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *textPitchAlignment;
 
@@ -866,6 +1124,13 @@ MGL_EXPORT
  This attribute corresponds to the <a
  href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-symbol-text-rotate"><code>text-rotate</code></a>
  layout property in the Mapbox Style Specification.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLStyleConstantValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textRotation;
 
@@ -882,6 +1147,12 @@ MGL_EXPORT
  
  This property is only applied to the style if `text` is non-`nil`. Otherwise,
  it is ignored.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLStyleConstantValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of
+ `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *textRotationAlignment;
 
@@ -894,6 +1165,22 @@ MGL_EXPORT
  
  This property is only applied to the style if `text` is non-`nil`. Otherwise,
  it is ignored.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLStyleConstantValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+ * `MGLSourceStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
+   * `MGLInterpolationModeIdentity`
+ * `MGLCompositeStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *textTransform;
 
@@ -910,6 +1197,22 @@ MGL_EXPORT
  
  This property is only applied to the style if `iconImageName` is non-`nil`.
  Otherwise, it is ignored.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLStyleConstantValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+ * `MGLSourceStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
+   * `MGLInterpolationModeIdentity`
+ * `MGLCompositeStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<UIColor *> *iconColor;
 #else
@@ -923,6 +1226,22 @@ MGL_EXPORT
  
  This property is only applied to the style if `iconImageName` is non-`nil`.
  Otherwise, it is ignored.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLStyleConstantValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+ * `MGLSourceStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
+   * `MGLInterpolationModeIdentity`
+ * `MGLCompositeStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSColor *> *iconColor;
 #endif
@@ -938,6 +1257,22 @@ MGL_EXPORT
  
  This property is only applied to the style if `iconImageName` is non-`nil`.
  Otherwise, it is ignored.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLStyleConstantValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+ * `MGLSourceStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
+   * `MGLInterpolationModeIdentity`
+ * `MGLCompositeStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconHaloBlur;
 
@@ -952,6 +1287,22 @@ MGL_EXPORT
  
  This property is only applied to the style if `iconImageName` is non-`nil`.
  Otherwise, it is ignored.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLStyleConstantValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+ * `MGLSourceStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
+   * `MGLInterpolationModeIdentity`
+ * `MGLCompositeStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<UIColor *> *iconHaloColor;
 #else
@@ -965,6 +1316,22 @@ MGL_EXPORT
  
  This property is only applied to the style if `iconImageName` is non-`nil`.
  Otherwise, it is ignored.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLStyleConstantValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+ * `MGLSourceStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
+   * `MGLInterpolationModeIdentity`
+ * `MGLCompositeStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSColor *> *iconHaloColor;
 #endif
@@ -980,6 +1347,22 @@ MGL_EXPORT
  
  This property is only applied to the style if `iconImageName` is non-`nil`.
  Otherwise, it is ignored.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLStyleConstantValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+ * `MGLSourceStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
+   * `MGLInterpolationModeIdentity`
+ * `MGLCompositeStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconHaloWidth;
 
@@ -992,6 +1375,22 @@ MGL_EXPORT
  
  This property is only applied to the style if `iconImageName` is non-`nil`.
  Otherwise, it is ignored.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLStyleConstantValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+ * `MGLSourceStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
+   * `MGLInterpolationModeIdentity`
+ * `MGLCompositeStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconOpacity;
 
@@ -1011,6 +1410,13 @@ MGL_EXPORT
  This attribute corresponds to the <a
  href="https://www.mapbox.com/mapbox-gl-style-spec/#paint-icon-translate"><code>icon-translate</code></a>
  layout property in the Mapbox Style Specification.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLStyleConstantValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *iconTranslation;
 #else
@@ -1029,6 +1435,13 @@ MGL_EXPORT
  This attribute corresponds to the <a
  href="https://www.mapbox.com/mapbox-gl-style-spec/#paint-icon-translate"><code>icon-translate</code></a>
  layout property in the Mapbox Style Specification.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLStyleConstantValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *iconTranslation;
 #endif
@@ -1048,6 +1461,12 @@ MGL_EXPORT
  This attribute corresponds to the <a
  href="https://www.mapbox.com/mapbox-gl-style-spec/#paint-icon-translate-anchor"><code>icon-translate-anchor</code></a>
  layout property in the Mapbox Style Specification.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLStyleConstantValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of
+ `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *iconTranslationAnchor;
 
@@ -1063,6 +1482,22 @@ MGL_EXPORT
  
  This property is only applied to the style if `text` is non-`nil`. Otherwise,
  it is ignored.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLStyleConstantValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+ * `MGLSourceStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
+   * `MGLInterpolationModeIdentity`
+ * `MGLCompositeStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<UIColor *> *textColor;
 #else
@@ -1075,6 +1510,22 @@ MGL_EXPORT
  
  This property is only applied to the style if `text` is non-`nil`. Otherwise,
  it is ignored.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLStyleConstantValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+ * `MGLSourceStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
+   * `MGLInterpolationModeIdentity`
+ * `MGLCompositeStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSColor *> *textColor;
 #endif
@@ -1090,6 +1541,22 @@ MGL_EXPORT
  
  This property is only applied to the style if `text` is non-`nil`. Otherwise,
  it is ignored.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLStyleConstantValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+ * `MGLSourceStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
+   * `MGLInterpolationModeIdentity`
+ * `MGLCompositeStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textHaloBlur;
 
@@ -1103,6 +1570,22 @@ MGL_EXPORT
  
  This property is only applied to the style if `text` is non-`nil`. Otherwise,
  it is ignored.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLStyleConstantValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+ * `MGLSourceStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
+   * `MGLInterpolationModeIdentity`
+ * `MGLCompositeStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<UIColor *> *textHaloColor;
 #else
@@ -1115,6 +1598,22 @@ MGL_EXPORT
  
  This property is only applied to the style if `text` is non-`nil`. Otherwise,
  it is ignored.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLStyleConstantValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+ * `MGLSourceStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
+   * `MGLInterpolationModeIdentity`
+ * `MGLCompositeStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSColor *> *textHaloColor;
 #endif
@@ -1131,6 +1630,22 @@ MGL_EXPORT
  
  This property is only applied to the style if `text` is non-`nil`. Otherwise,
  it is ignored.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLStyleConstantValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+ * `MGLSourceStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
+   * `MGLInterpolationModeIdentity`
+ * `MGLCompositeStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textHaloWidth;
 
@@ -1143,6 +1658,22 @@ MGL_EXPORT
  
  This property is only applied to the style if `text` is non-`nil`. Otherwise,
  it is ignored.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLStyleConstantValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+ * `MGLSourceStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
+   * `MGLInterpolationModeIdentity`
+ * `MGLCompositeStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textOpacity;
 
@@ -1162,6 +1693,13 @@ MGL_EXPORT
  This attribute corresponds to the <a
  href="https://www.mapbox.com/mapbox-gl-style-spec/#paint-text-translate"><code>text-translate</code></a>
  layout property in the Mapbox Style Specification.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLStyleConstantValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *textTranslation;
 #else
@@ -1180,6 +1718,13 @@ MGL_EXPORT
  This attribute corresponds to the <a
  href="https://www.mapbox.com/mapbox-gl-style-spec/#paint-text-translate"><code>text-translate</code></a>
  layout property in the Mapbox Style Specification.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLStyleConstantValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *textTranslation;
 #endif
@@ -1199,6 +1744,12 @@ MGL_EXPORT
  This attribute corresponds to the <a
  href="https://www.mapbox.com/mapbox-gl-style-spec/#paint-text-translate-anchor"><code>text-translate-anchor</code></a>
  layout property in the Mapbox Style Specification.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLStyleConstantValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of
+ `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *textTranslationAnchor;
 

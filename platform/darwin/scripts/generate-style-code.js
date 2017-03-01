@@ -11,7 +11,7 @@ const cocoaConventions = require('./style-spec-cocoa-conventions-v8.json');
 const prefix = 'MGL';
 const suffix = 'StyleLayer';
 
-let spec = _.merge(require('mapbox-gl-style-spec').latest, require('./style-spec-overrides-v8.json'));
+let spec = _.merge(require('../../../mapbox-gl-js/src/style-spec/reference/v8'), require('./style-spec-overrides-v8.json'));
 
 ///
 // Temporarily IGNORE layers that are in the spec yet still not supported in mbgl core
@@ -31,7 +31,7 @@ _.forOwn(cocoaConventions, function (properties, kind) {
         }
         delete spec[kind][oldName];
         spec[kind][newName] = property;
-        
+
         // Update requirements in other properties.
         let updateRequirements = function (property, name) {
             let requires = property.requires || [];
@@ -225,7 +225,7 @@ global.testHelperMessage = function (property, layerType, isFunction) {
 };
 
 global.propertyDoc = function (propertyName, property, layerType, kind) {
-    // Match references to other property names & values. 
+    // Match references to other property names & values.
     // Requires the format 'When `foo` is set to `bar`,'.
     let doc = property.doc.replace(/`([^`]+?)` is set to `([^`]+?)`/g, function (m, peerPropertyName, propertyValue, offset, str) {
         let otherProperty = camelizeWithLeadingLowercase(peerPropertyName);
@@ -279,6 +279,30 @@ global.propertyDoc = function (propertyName, property, layerType, kind) {
                     break;
             }
             doc += `\n\nThis attribute corresponds to the <a href="https://www.mapbox.com/mapbox-gl-style-spec/#${anchor}"><code>${property.original}</code></a> layout property in the Mapbox Style Specification.`;
+        }
+        doc += '\n\nYou can set this property to an instance of:\n\n' +
+            '* `MGLStyleConstantValue`\n';
+        if (property["property-function"]) {
+            doc += '* `MGLCameraStyleFunction` with an interpolation mode of:\n' +
+                '  * `MGLInterpolationModeExponential`\n' +
+                '  * `MGLInterpolationModeInterval`\n' +
+                '* `MGLSourceStyleFunction` with an interpolation mode of:\n' +
+                '  * `MGLInterpolationModeExponential`\n' +
+                '  * `MGLInterpolationModeInterval`\n' +
+                '  * `MGLInterpolationModeCategorical`\n' +
+                '  * `MGLInterpolationModeIdentity`\n' +
+                '* `MGLCompositeStyleFunction` with an interpolation mode of:\n' +
+                '  * `MGLInterpolationModeExponential`\n' +
+                '  * `MGLInterpolationModeInterval`\n' +
+                '  * `MGLInterpolationModeCategorical`\n';
+        } else {
+            if (property.function === "interpolated") {
+                doc += '* `MGLCameraStyleFunction` with an interpolation mode of:\n' +
+                    '  * `MGLInterpolationModeExponential`\n' +
+                    '  * `MGLInterpolationModeInterval`\n';
+            } else {
+                doc += '* `MGLCameraStyleFunction` with an interpolation mode of `MGLInterpolationModeInterval`\n';
+            }
         }
     }
     return doc;
@@ -410,6 +434,13 @@ global.propertyType = function (property) {
     }
 };
 
+global.isInterpolatable = function (property) {
+    const type = property.type === 'array' ? property.value : property.type;
+    return type !== 'boolean' &&
+        type !== 'enum' &&
+        type !== 'string';
+};
+
 global.valueTransformerArguments = function (property) {
     let objCType = propertyType(property);
     switch (property.type) {
@@ -420,7 +451,7 @@ global.valueTransformerArguments = function (property) {
         case 'string':
             return ['std::string', objCType];
         case 'enum':
-            return [`mbgl::style::${mbglType(property)}`, objCType];
+            return [mbglType(property), 'NSValue *', mbglType(property), `MGL${camelize(property.name)}`];
         case 'color':
             return ['mbgl::Color', objCType];
         case 'array':
@@ -561,13 +592,13 @@ for (var layer of layers) {
     if (enumProperties.length) {
         layer.enumProperties = enumProperties;
     }
-    
+
     let renamedProperties = {};
     _.assign(renamedProperties, _.filter(layer.properties, prop => 'original' in prop || 'getter' in prop));
     if (!_.isEmpty(renamedProperties)) {
         renamedPropertiesByLayerType[layer.type] = renamedProperties;
     }
-    
+
     fs.writeFileSync(`platform/darwin/src/${prefix}${camelize(layer.type)}${suffix}.h`, duplicatePlatformDecls(layerH(layer)));
     fs.writeFileSync(`platform/darwin/src/${prefix}${camelize(layer.type)}${suffix}.mm`, layerM(layer));
     fs.writeFileSync(`platform/darwin/test/${prefix}${camelize(layer.type)}${suffix}Tests.mm`, testLayers(layer));

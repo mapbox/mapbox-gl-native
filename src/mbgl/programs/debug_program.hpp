@@ -3,25 +3,25 @@
 #include <mbgl/programs/program.hpp>
 #include <mbgl/programs/attributes.hpp>
 #include <mbgl/programs/uniforms.hpp>
-#include <mbgl/shader/debug.hpp>
+#include <mbgl/shaders/debug.hpp>
 
 namespace mbgl {
-
-using DebugAttributes = gl::Attributes<
-    attributes::a_pos>;
 
 class DebugProgram : public Program<
     shaders::debug,
     gl::Line,
-    DebugAttributes,
+    gl::Attributes<
+        attributes::a_pos>,
     gl::Uniforms<
         uniforms::u_matrix,
-        uniforms::u_color>>
+        uniforms::u_color>,
+    style::PaintProperties<>>
 {
 public:
     using Program::Program;
 };
 
-using DebugVertex = DebugProgram::Vertex;
+using DebugLayoutVertex = DebugProgram::LayoutVertex;
+using DebugAttributes = DebugProgram::Attributes;
 
 } // namespace mbgl

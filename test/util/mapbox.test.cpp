@@ -3,8 +3,7 @@
 #include <mbgl/util/logging.hpp>
 #include <mbgl/util/mapbox.hpp>
 #include <mbgl/util/constants.hpp>
-#include <regex>
-#include <iostream>
+#include <stdexcept>
 
 using namespace mbgl;
 

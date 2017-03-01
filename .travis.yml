@@ -10,7 +10,6 @@ addons:
       - &common_packages [ 'libllvm3.8v4', 'cmake', 'cmake-data' ]
       - &clang38_packages [ 'clang-3.8', 'libstdc++-5-dev', 'libstdc++6' ]
       - &gcc5_packages [ 'gcc-5', 'g++-5' ]
-      - &egl_packages [ 'libgles2-mesa-dev', 'libgbm-dev' ]
       - &glfw_packages [ 'libxrandr-dev', 'libxcursor-dev', 'libxinerama-dev' ]
 
 addons_shortcuts:
@@ -20,7 +19,6 @@ addons_shortcuts:
       packages:
         - *common_packages
         - *clang38_packages
-        - *egl_packages
         - *glfw_packages
   addons_gcc5: &gcc5
     apt:
@@ -28,7 +26,6 @@ addons_shortcuts:
       packages:
         - *common_packages
         - *gcc5_packages
-        - *egl_packages
         - *glfw_packages
   addons_qt4: &qt4
     apt:
@@ -36,14 +33,14 @@ addons_shortcuts:
       packages:
         - *common_packages
         - *gcc5_packages
-        - [ 'libjemalloc-dev', 'mesa-utils', 'qt4-default' ]
+        - [ 'libjemalloc-dev', 'mesa-utils', 'qt4-default', 'libqt4-sql-mysql' ]
   addons_qt5: &qt5
     apt:
       sources: *common_sources
       packages:
         - *common_packages
         - *gcc5_packages
-        - [ 'mesa-utils', 'libc6-dbg', 'qt5-default', 'libqt5opengl5-dev', 'qtdeclarative5-dev', 'qtpositioning5-dev', 'qtlocation5-dev' ]
+        - [ 'mesa-utils', 'libc6-dbg', 'qt5-default', 'libqt5opengl5-dev', 'qtdeclarative5-dev', 'qtpositioning5-dev', 'qtlocation5-dev', 'libqt5sql5-sqlite' ]
 
 env:
   global:
@@ -93,15 +90,19 @@ matrix:
       env: BUILDTYPE=Debug _CXX=clang++-3.8 _CC=clang-3.8 WITH_EGL=1
       addons: *clang38
       before_script:
+        - mapbox_install_logbt
         - mapbox_start_xvfb
+        - mapbox_export_mesa_library_path
       script:
         - nvm install 4
         - nvm use 4
         - make node
-        - make test-node
+        - ./logbt -- $(scripts/mason.sh PREFIX apitrace VERSION 6a30de1)/bin/apitrace trace --api=egl -v make test-node
       after_script:
         - ccache --show-stats
         - ./platform/node/scripts/after_script.sh ${TRAVIS_JOB_NUMBER}
+      after_failure:
+        - aws s3 cp . s3://mapbox/mapbox-gl-native/render-tests/$TRAVIS_JOB_NUMBER --recursive --exclude "*" --include "*.trace"
 
     # EGL - Node - Clang 3.8 - Release
     - os: linux
@@ -112,19 +113,25 @@ matrix:
       env: BUILDTYPE=Release _CXX=clang++-3.8 _CC=clang-3.8 WITH_EGL=1
       addons: *clang38
       before_script:
+        # fglrx causes the GLX extension to be unavailable
+        - sudo apt-get purge -qq fglrx
         - export PACKAGE_JSON_VERSION=$(node -e "console.log(require('./package.json').version)")
         - export PUBLISH=$([[ "${TRAVIS_TAG:-}" == "node-v${PACKAGE_JSON_VERSION}" ]] && echo true)
+        - mapbox_install_logbt
         - mapbox_start_xvfb
+        - mapbox_export_mesa_library_path
       script:
         - nvm install 4
         - nvm use 4
         - make node
-        - make test-node
+        - ./logbt -- $(scripts/mason.sh PREFIX apitrace VERSION 6a30de1)/bin/apitrace trace --api=egl -v make test-node
       after_script:
         - ccache --show-stats
         - ./platform/node/scripts/after_script.sh ${TRAVIS_JOB_NUMBER}
       after_success:
         - ./platform/node/scripts/after_success.sh
+      after_failure:
+        - aws s3 cp . s3://mapbox/mapbox-gl-native/render-tests/$TRAVIS_JOB_NUMBER --recursive --exclude "*" --include "*.trace"
 
     # EGL - GCC 5 - Debug (Coverage)
     - os: linux
@@ -136,20 +143,10 @@ matrix:
       addons: *gcc5
       before_script:
         - mapbox_start_xvfb
+        - mapbox_export_mesa_library_path
       after_script:
         - ccache --show-stats
         - ./platform/linux/scripts/coveralls.sh
-
-    # EGL - GCC 5 - Release
-    - os: linux
-      sudo: required
-      dist: trusty
-      language: cpp
-      compiler: "egl-gcc5-release"
-      env: BUILDTYPE=Release _CXX=g++-5 _CC=gcc-5 WITH_EGL=1
-      addons: *gcc5
-      before_script:
-        - mapbox_start_xvfb
 
     # EGL - Clang 3.8 - Debug
     - os: linux
@@ -161,17 +158,7 @@ matrix:
       addons: *clang38
       before_script:
         - mapbox_start_xvfb
-
-    # EGL - Clang 3.8 - Release
-    - os: linux
-      sudo: required
-      dist: trusty
-      language: cpp
-      compiler: "egl-clang38-release"
-      env: BUILDTYPE=Release _CXX=clang++-3.8 _CC=clang-3.8 WITH_EGL=1
-      addons: *clang38
-      before_script:
-        - mapbox_start_xvfb
+        - mapbox_export_mesa_library_path
 
     # Qt 4 - GCC 5 - Release
     - os: linux
@@ -186,7 +173,8 @@ matrix:
         - mapbox_export_mesa_library_path
       script:
         - make qt-app
-        - LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libjemalloc.so make run-qt-test-Memory.*:*.Load
+        - GTEST_OUTPUT=xml LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libjemalloc.so make run-qt-test-Memory.*:*.Load
+        - scripts/log_memory_benchmarks.sh test_detail.xml "Platform=Linux,Compiler=${_CC},Arch=$(uname -m)"
 
     # Qt 5 - GCC 5 - Release
     - os: linux
@@ -203,7 +191,8 @@ matrix:
         - make qt-app
         - make qt-qml-app
         - make qt-test
-        - scripts/valgrind.sh build/qt-linux-x86_64/Release/mbgl-test --gtest_filter=-*.Load
+        - make qt-docs
+        - scripts/valgrind.sh build/qt-linux-x86_64/Release/mbgl-test --gtest_filter=-*.Load --gtest_filter=-Memory.Vector
 
 cache:
   directories:

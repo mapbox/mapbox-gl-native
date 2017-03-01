@@ -17,15 +17,17 @@
 #include <mbgl/style/transition_options.hpp>
 #include <mbgl/sprite/sprite_image.hpp>
 #include <mbgl/storage/network_status.hpp>
+#include <mbgl/util/color.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/geo.hpp>
+#include <mbgl/util/geometry.hpp>
 #include <mbgl/util/run_loop.hpp>
+#include <mbgl/util/shared_thread_pool.hpp>
 #include <mbgl/util/traits.hpp>
 
 #if QT_VERSION >= 0x050000
 #include <QGuiApplication>
 #include <QWindow>
-#include <QOpenGLFramebufferObject>
 #include <QOpenGLContext>
 #else
 #include <QCoreApplication>
@@ -84,20 +86,6 @@ namespace {
 QThreadStorage<std::shared_ptr<mbgl::util::RunLoop>> loop;
 
 // Conversion helper functions.
-
-auto fromQMapboxGLShapeAnnotation(const ShapeAnnotation &shapeAnnotation) {
-    const LineString &lineString = shapeAnnotation.first;
-    const QString &styleLayer = shapeAnnotation.second;
-
-    mbgl::LineString<double> mbglLineString;
-    mbglLineString.reserve(lineString.size());
-
-    for (const Coordinate &coordinate : lineString) {
-        mbglLineString.emplace_back(mbgl::Point<double> { coordinate.first, coordinate.second });
-    }
-
-    return mbgl::StyleSourcedAnnotation { std::move(mbglLineString), styleLayer.toStdString() };
-}
 
 auto fromQStringList(const QStringList &list)
 {
@@ -848,42 +836,72 @@ void QMapboxGL::setTransitionOptions(qint64 duration, qint64 delay) {
     d_ptr->mapObj->setTransitionOptions(mbgl::style::TransitionOptions{ convert(duration), convert(delay) });
 }
 
-mbgl::Annotation fromPointAnnotation(const PointAnnotation &pointAnnotation) {
-    const Coordinate &coordinate = pointAnnotation.first;
-    const QString &icon = pointAnnotation.second;
-    return mbgl::SymbolAnnotation { mbgl::Point<double> { coordinate.second, coordinate.first }, icon.toStdString() };
+mbgl::Annotation asMapboxGLAnnotation(const QMapbox::Annotation & annotation) {
+    auto asMapboxGLGeometry = [](const QMapbox::ShapeAnnotationGeometry &geometry) {
+        mbgl::ShapeAnnotationGeometry result;
+        switch (geometry.type) {
+        case QMapbox::ShapeAnnotationGeometry::LineStringType:
+            result = { asMapboxGLLineString(geometry.geometry.first().first()) };
+            break;
+        case QMapbox::ShapeAnnotationGeometry::PolygonType:
+            result = { asMapboxGLPolygon(geometry.geometry.first()) };
+            break;
+        case QMapbox::ShapeAnnotationGeometry::MultiLineStringType:
+            result = { asMapboxGLMultiLineString(geometry.geometry.first()) };
+            break;
+        case QMapbox::ShapeAnnotationGeometry::MultiPolygonType:
+            result = { asMapboxGLMultiPolygon(geometry.geometry) };
+            break;
+        }
+        return result;
+    };
+
+    if (annotation.canConvert<QMapbox::SymbolAnnotation>()) {
+        QMapbox::SymbolAnnotation symbolAnnotation = annotation.value<QMapbox::SymbolAnnotation>();
+        QMapbox::Coordinate& pair = symbolAnnotation.geometry;
+        return mbgl::SymbolAnnotation { mbgl::Point<double> { pair.second, pair.first }, symbolAnnotation.icon.toStdString() };
+    } else if (annotation.canConvert<QMapbox::LineAnnotation>()) {
+        QMapbox::LineAnnotation lineAnnotation = annotation.value<QMapbox::LineAnnotation>();
+        auto color = mbgl::Color::parse(lineAnnotation.color.name().toStdString());
+        return mbgl::LineAnnotation { asMapboxGLGeometry(lineAnnotation.geometry), lineAnnotation.opacity, lineAnnotation.width, { *color } };
+    } else if (annotation.canConvert<QMapbox::FillAnnotation>()) {
+        QMapbox::FillAnnotation fillAnnotation = annotation.value<QMapbox::FillAnnotation>();
+        auto color = mbgl::Color::parse(fillAnnotation.color.name().toStdString());
+        if (fillAnnotation.outlineColor.canConvert<QColor>()) {
+            auto outlineColor = mbgl::Color::parse(fillAnnotation.outlineColor.value<QColor>().name().toStdString());
+            return mbgl::FillAnnotation { asMapboxGLGeometry(fillAnnotation.geometry), fillAnnotation.opacity, { *color }, { *outlineColor } };
+        } else {
+            return mbgl::FillAnnotation { asMapboxGLGeometry(fillAnnotation.geometry), fillAnnotation.opacity, { *color }, {} };
+        }
+    } else if (annotation.canConvert<QMapbox::StyleSourcedAnnotation>()) {
+        QMapbox::StyleSourcedAnnotation styleSourcedAnnotation = annotation.value<QMapbox::StyleSourcedAnnotation>();
+        return mbgl::StyleSourcedAnnotation { asMapboxGLGeometry(styleSourcedAnnotation.geometry), styleSourcedAnnotation.layerID.toStdString() };
+    }
+
+    qWarning() << "Unable to convert annotation:" << annotation;
+    return {};
 }
 
 /*!
-    Adds a \a point annotation to the map.
+    Adds an \a annotation to the map.
 
     Returns the unique identifier for the new annotation.
 
     \sa addAnnotationIcon()
 */
-QMapbox::AnnotationID QMapboxGL::addPointAnnotation(const QMapbox::PointAnnotation &point)
+QMapbox::AnnotationID QMapboxGL::addAnnotation(const QMapbox::Annotation &annotation)
 {
-    return d_ptr->mapObj->addAnnotation(fromPointAnnotation(point));
+    return d_ptr->mapObj->addAnnotation(asMapboxGLAnnotation(annotation));
 }
 
 /*!
-    Updates an existing \a point annotation referred by \a id.
+    Updates an existing \a annotation referred by \a id.
 
     \sa addAnnotationIcon()
 */
-void QMapboxGL::updatePointAnnotation(QMapbox::AnnotationID id, const QMapbox::PointAnnotation &point)
+void QMapboxGL::updateAnnotation(QMapbox::AnnotationID id, const QMapbox::Annotation &annotation)
 {
-    d_ptr->mapObj->updateAnnotation(id, fromPointAnnotation(point));
-}
-
-/*!
-    Adds a \a shape annotation to the map.
-
-    Returns the unique identifier for the new annotation.
-*/
-QMapbox::AnnotationID QMapboxGL::addShapeAnnotation(const QMapbox::ShapeAnnotation &shape)
-{
-    return d_ptr->mapObj->addAnnotation(fromQMapboxGLShapeAnnotation(shape));
+    d_ptr->mapObj->updateAnnotation(id, asMapboxGLAnnotation(annotation));
 }
 
 /*!
@@ -1087,16 +1105,42 @@ void QMapboxGL::resize(const QSize& size, const QSize& framebufferSize)
     Adds an \a icon to the annotation icon pool. This can be later used by the annotation
     functions to shown any drawing on the map by referencing its \a name.
 
-    Unlike using addIcon() for runtime styling, annotations added with addPointAnnotation()
+    Unlike using addIcon() for runtime styling, annotations added with addAnnotation()
     will survive style changes.
 
-    \sa addPointAnnotation()
+    \sa addAnnotation()
 */
 void QMapboxGL::addAnnotationIcon(const QString &name, const QImage &icon)
 {
     if (icon.isNull()) return;
 
     d_ptr->mapObj->addAnnotationIcon(name.toStdString(), toSpriteImage(icon));
+}
+
+/*!
+    Returns the amount of meters per pixel from a given \a latitude and \a zoom.
+*/
+double QMapboxGL::metersPerPixelAtLatitude(double latitude, double zoom) const
+{
+    return d_ptr->mapObj->getMetersPerPixelAtLatitude(latitude, zoom);
+}
+
+/*!
+    Return the projected meters for a given \a coordinate_ object.
+*/
+QMapbox::ProjectedMeters QMapboxGL::projectedMetersForCoordinate(const QMapbox::Coordinate &coordinate_) const
+{
+    auto projectedMeters = d_ptr->mapObj->projectedMetersForLatLng(mbgl::LatLng { coordinate_.first, coordinate_.second });
+    return QMapbox::ProjectedMeters(projectedMeters.northing, projectedMeters.easting);
+}
+
+/*!
+    Returns the coordinate for a given \a projectedMeters object.
+*/
+QMapbox::Coordinate QMapboxGL::coordinateForProjectedMeters(const QMapbox::ProjectedMeters &projectedMeters) const
+{
+    auto latLng = d_ptr->mapObj->latLngForProjectedMeters(mbgl::ProjectedMeters { projectedMeters.first, projectedMeters.second });
+    return QMapbox::Coordinate(latLng.latitude, latLng.longitude);
 }
 
 /*!
@@ -1226,6 +1270,14 @@ void QMapboxGL::addSource(const QString &id, const QVariantMap &params)
 }
 
 /*!
+    Returns true if the layer with given \a sourceID exists, false otherwise.
+*/
+bool QMapboxGL::sourceExists(const QString& sourceID)
+{
+    return !!d_ptr->mapObj->getSource(sourceID.toStdString());
+}
+
+/*!
     Updates the source \a id with new \a params.
 
     If the source does not exist, it will be added like in addSource(). Only
@@ -1330,7 +1382,15 @@ void QMapboxGL::addLayer(const QVariantMap &params)
 }
 
 /*!
-    Removes the layer \a id.
+    Returns true if the layer with given \a id exists, false otherwise.
+*/
+bool QMapboxGL::layerExists(const QString& id)
+{
+    return !!d_ptr->mapObj->getLayer(id.toStdString());
+}
+
+/*!
+    Removes the layer with given \a id.
 */
 void QMapboxGL::removeLayer(const QString& id)
 {
@@ -1431,17 +1491,9 @@ void QMapboxGL::setFilter(const QString& layer, const QVariant& filter)
     This function should be called only after the signal needsRendering() is
     emitted at least once.
 */
-#if QT_VERSION >= 0x050000
-void QMapboxGL::render(QOpenGLFramebufferObject *fbo)
-{
-    d_ptr->dirty = false;
-    d_ptr->fbo = fbo;
-    d_ptr->mapObj->render(*d_ptr);
-}
-#else
 void QMapboxGL::render()
 {
-#if defined(__APPLE__)
+#if defined(__APPLE__) && QT_VERSION < 0x050000
     // FIXME Qt 4.x provides an incomplete FBO at start.
     // See https://bugreports.qt.io/browse/QTBUG-36802 for details.
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
@@ -1452,7 +1504,6 @@ void QMapboxGL::render()
     d_ptr->dirty = false;
     d_ptr->mapObj->render(*d_ptr);
 }
-#endif
 
 /*!
     Informs the map that the network connection has been established, causing
@@ -1498,10 +1549,10 @@ QMapboxGLPrivate::QMapboxGLPrivate(QMapboxGL *q, const QMapboxGLSettings &settin
         settings.cacheDatabasePath().toStdString(),
         settings.assetPath().toStdString(),
         settings.cacheDatabaseMaximumSize()))
-    , threadPool(4)
+    , threadPool(mbgl::sharedThreadPool())
     , mapObj(std::make_unique<mbgl::Map>(
         *this, mbgl::Size{ static_cast<uint32_t>(size.width()), static_cast<uint32_t>(size.height()) },
-        pixelRatio, *fileSourceObj, threadPool,
+        pixelRatio, *fileSourceObj, *threadPool,
         mbgl::MapMode::Continuous,
         static_cast<mbgl::GLContextMode>(settings.contextMode()),
         static_cast<mbgl::ConstrainMode>(settings.constrainMode()),
@@ -1521,24 +1572,12 @@ QMapboxGLPrivate::~QMapboxGLPrivate()
 {
 }
 
-#if QT_VERSION >= 0x050000
-void QMapboxGLPrivate::bind() {
-    if (fbo) {
-        fbo->bind();
-        getContext().bindFramebuffer.setDirty();
-        getContext().viewport = {
-            0, 0, { static_cast<uint32_t>(fbo->width()), static_cast<uint32_t>(fbo->height()) }
-        };
-    }
-}
-#else
 void QMapboxGLPrivate::bind() {
     getContext().bindFramebuffer = 0;
     getContext().viewport = {
         0, 0, { static_cast<uint32_t>(fbSize.width()), static_cast<uint32_t>(fbSize.height()) }
     };
 }
-#endif
 
 void QMapboxGLPrivate::invalidate()
 {

@@ -117,14 +117,45 @@ app.get('/temporary-error', function(req, res) {
 });
 
 app.get('/rate-limit', function(req, res) {
-    
+
     if (req.query.std) {
         res.setHeader('Retry-After', 1);
     } else if (req.query.mbx) {
         res.setHeader('x-rate-limit-reset', Math.round(Date.now() / 1000) + 1);
     }
-    
+
     res.status(429).end();
+});
+
+var styleFailOnce500 = true;
+app.get('/style-fail-once-500', function (req, res) {
+    if (styleFailOnce500) {
+        res.status(500).send('Server Error!');
+        styleFailOnce500 = false;
+    } else {
+        res.status(200).send('{ "version": 8, "name": "Teste Style" }');
+    }
+});
+
+var styleFailOnce404 = true;
+app.get('/style-fail-once-404', function (req, res) {
+    if (styleFailOnce404) {
+        res.status(404).send('Not found!');
+        styleFailOnce404 = false;
+    } else {
+        res.status(200).send('{ "version": 8, "name": "Teste Style" }');
+    }
+});
+
+var styleFailOnce404Cache = true;
+app.get('/style-fail-once-404-cache', function (req, res) {
+    if (styleFailOnce404Cache) {
+        res.setHeader('Cache-Control', 'max-age=30');
+        res.status(404).send('Not found!');
+        styleFailOnce404Cache = false;
+    } else {
+        res.status(200).send('{ "version": 8, "name": "Teste Style" }');
+    }
 });
 
 app.get('/delayed', function(req, res) {

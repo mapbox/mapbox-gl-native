@@ -4,13 +4,10 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.ActionBar;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.view.MenuItem;
 import android.view.View;
 
-import com.mapbox.mapboxsdk.annotations.IconFactory;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.geometry.LatLng;
@@ -18,7 +15,11 @@ import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.R;
+import com.mapbox.mapboxsdk.testapp.utils.IconUtils;
 
+/**
+ * Test activity showcasing updating a Marker position, title, icon and snippet.
+ */
 public class DynamicMarkerChangeActivity extends AppCompatActivity {
 
   private static final LatLng LAT_LNG_CHELSEA = new LatLng(51.481670, -0.190849);
@@ -26,24 +27,12 @@ public class DynamicMarkerChangeActivity extends AppCompatActivity {
 
   private MapView mapView;
   private MapboxMap mapboxMap;
-  private IconFactory iconFactory;
   private Marker marker;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_dynamic_marker);
-
-    Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-    setSupportActionBar(toolbar);
-
-    ActionBar actionBar = getSupportActionBar();
-    if (actionBar != null) {
-      actionBar.setDisplayHomeAsUpEnabled(true);
-      actionBar.setDisplayShowHomeEnabled(true);
-    }
-
-    iconFactory = IconFactory.getInstance(this);
 
     mapView = (MapView) findViewById(R.id.mapView);
     mapView.setTag(false);
@@ -55,7 +44,8 @@ public class DynamicMarkerChangeActivity extends AppCompatActivity {
         // Create marker
         MarkerOptions markerOptions = new MarkerOptions()
           .position(LAT_LNG_CHELSEA)
-          .icon(iconFactory.fromResource(R.drawable.ic_chelsea))
+          .icon(IconUtils.drawableToIcon(DynamicMarkerChangeActivity.this, R.drawable.ic_stars,
+            ResourcesCompat.getColor(getResources(), R.color.blueAccent, getTheme())))
           .title(getString(R.string.dynamic_marker_chelsea_title))
           .snippet(getString(R.string.dynamic_marker_chelsea_snippet));
         marker = mapboxMap.addMarker(markerOptions);
@@ -81,7 +71,11 @@ public class DynamicMarkerChangeActivity extends AppCompatActivity {
 
     // update marker
     marker.setPosition(first ? LAT_LNG_CHELSEA : LAT_LNG_ARSENAL);
-    marker.setIcon(iconFactory.fromResource(first ? R.drawable.ic_chelsea : R.drawable.ic_arsenal));
+    marker.setIcon(IconUtils.drawableToIcon(this, R.drawable.ic_stars, first
+      ? ResourcesCompat.getColor(getResources(), R.color.blueAccent, getTheme()) :
+      ResourcesCompat.getColor(getResources(), R.color.redAccent, getTheme())
+    ));
+
     marker.setTitle(first
       ? getString(R.string.dynamic_marker_chelsea_title) : getString(R.string.dynamic_marker_arsenal_title));
     marker.setSnippet(first
@@ -128,16 +122,5 @@ public class DynamicMarkerChangeActivity extends AppCompatActivity {
   public void onLowMemory() {
     super.onLowMemory();
     mapView.onLowMemory();
-  }
-
-  @Override
-  public boolean onOptionsItemSelected(MenuItem item) {
-    switch (item.getItemId()) {
-      case android.R.id.home:
-        onBackPressed();
-        return true;
-      default:
-        return super.onOptionsItemSelected(item);
-    }
   }
 }

@@ -10,12 +10,12 @@ NS_ASSUME_NONNULL_BEGIN
  `MGLStyle` object along with an `MGLForegroundStyleLayer` object. The
  foreground style layer defines the appearance of any content supplied by the
  source.
- 
+
  Each source defined by the style JSON file is represented at runtime by an
  `MGLSource` object that you can use to refine the map’s content. You can also
  add and remove sources dynamically using methods such as
  `-[MGLStyle addSource:]` and `-[MGLStyle sourceWithIdentifier:]`.
- 
+
  Do not create instances of this class directly, and do not create your own
  subclasses of this class. Instead, create instances of `MGLShapeSource` and the
  concrete subclasses of `MGLTileSource`, `MGLVectorSource` and `MGLRasterSource`.
@@ -29,10 +29,10 @@ MGL_EXPORT
 
 /**
  Returns a source initialized with an identifier.
- 
+
  After initializing and configuring the source, add it to a map view’s style
  using the `-[MGLStyle addSource:]` method.
- 
+
  @param identifier A string that uniquely identifies the source in the style to
     which it is added.
  @return An initialized source.

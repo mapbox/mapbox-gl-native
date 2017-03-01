@@ -5,11 +5,14 @@
 #include <mbgl/style/layer.hpp>
 #include <mbgl/style/filter.hpp>
 #include <mbgl/style/property_value.hpp>
+#include <mbgl/style/data_driven_property_value.hpp>
 
 #include <mbgl/util/color.hpp>
 
 namespace mbgl {
 namespace style {
+
+class TransitionOptions;
 
 class RasterLayer : public Layer {
 public:
@@ -24,30 +27,37 @@ public:
     static PropertyValue<float> getDefaultRasterOpacity();
     PropertyValue<float> getRasterOpacity(const optional<std::string>& klass = {}) const;
     void setRasterOpacity(PropertyValue<float>, const optional<std::string>& klass = {});
+    void setRasterOpacityTransition(const TransitionOptions&, const optional<std::string>& klass = {});
 
     static PropertyValue<float> getDefaultRasterHueRotate();
     PropertyValue<float> getRasterHueRotate(const optional<std::string>& klass = {}) const;
     void setRasterHueRotate(PropertyValue<float>, const optional<std::string>& klass = {});
+    void setRasterHueRotateTransition(const TransitionOptions&, const optional<std::string>& klass = {});
 
     static PropertyValue<float> getDefaultRasterBrightnessMin();
     PropertyValue<float> getRasterBrightnessMin(const optional<std::string>& klass = {}) const;
     void setRasterBrightnessMin(PropertyValue<float>, const optional<std::string>& klass = {});
+    void setRasterBrightnessMinTransition(const TransitionOptions&, const optional<std::string>& klass = {});
 
     static PropertyValue<float> getDefaultRasterBrightnessMax();
     PropertyValue<float> getRasterBrightnessMax(const optional<std::string>& klass = {}) const;
     void setRasterBrightnessMax(PropertyValue<float>, const optional<std::string>& klass = {});
+    void setRasterBrightnessMaxTransition(const TransitionOptions&, const optional<std::string>& klass = {});
 
     static PropertyValue<float> getDefaultRasterSaturation();
     PropertyValue<float> getRasterSaturation(const optional<std::string>& klass = {}) const;
     void setRasterSaturation(PropertyValue<float>, const optional<std::string>& klass = {});
+    void setRasterSaturationTransition(const TransitionOptions&, const optional<std::string>& klass = {});
 
     static PropertyValue<float> getDefaultRasterContrast();
     PropertyValue<float> getRasterContrast(const optional<std::string>& klass = {}) const;
     void setRasterContrast(PropertyValue<float>, const optional<std::string>& klass = {});
+    void setRasterContrastTransition(const TransitionOptions&, const optional<std::string>& klass = {});
 
     static PropertyValue<float> getDefaultRasterFadeDuration();
     PropertyValue<float> getRasterFadeDuration(const optional<std::string>& klass = {}) const;
     void setRasterFadeDuration(PropertyValue<float>, const optional<std::string>& klass = {});
+    void setRasterFadeDurationTransition(const TransitionOptions&, const optional<std::string>& klass = {});
 
     // Private implementation
 

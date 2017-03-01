@@ -2,6 +2,7 @@
   const properties = locals.properties;
 -%>
 // This file is generated. Edit android/platform/scripts/generate-style-code.js, then run `make android-style-code`.
+
 package com.mapbox.mapboxsdk.style.layers;
 
 import android.support.annotation.StringDef;
@@ -12,56 +13,49 @@ import java.lang.annotation.RetentionPolicy;
 /**
  * Paint/Layout properties for Layer
  */
-public abstract class Property<T> {
+public final class Property {
 
-    //VISIBILITY: Whether this layer is displayed.
+  // VISIBILITY: Whether this layer is displayed.
 
-    /**
-     * The layer is shown.
-     */
-    public static final String VISIBLE = "visible";
-    /**
-     * The layer is hidden.
-     */
-    public static final String NONE = "none";
+  /**
+   * The layer is shown.
+   */
+  public static final String VISIBLE = "visible";
+  /**
+   * The layer is hidden.
+   */
+  public static final String NONE = "none";
 
-    @StringDef({
-            VISIBLE,
-            NONE
-    })
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface VISIBILITY {}
+  @StringDef({
+        VISIBLE,
+        NONE
+  })
+  @Retention(RetentionPolicy.SOURCE)
+  public @interface VISIBILITY {}
 
 <% for (const property of properties) { -%>
-    //<%- snakeCaseUpper(property.name) %>: <%- property.doc %>
+  // <%- snakeCaseUpper(property.name) %>: <%- property.doc %>
 
 <% for (const value in property.values) { -%>
-    /**
-     * <%- propertyValueDoc(property, value) %>
-     */
-    public static final String <%- snakeCaseUpper(property.name) %>_<%- snakeCaseUpper(value) %> = "<%- value %>";
+  /**
+   * <%- propertyValueDoc(property, value) %>
+   */
+  public static final String <%- snakeCaseUpper(property.name) %>_<%- snakeCaseUpper(value) %> = "<%- value %>";
 <% } -%>
 
-    /**
-     * <%- property.doc %>
-     */
-    @StringDef({
-    <% for (const value of Object.keys(property.values)) { -%>
-        <%- snakeCaseUpper(property.name) %>_<%- snakeCaseUpper(value) %>,
-    <% } -%>
-    })
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface <%- snakeCaseUpper(property.name) %> {}
+  /**
+   * <%- property.doc %>
+   */
+  @StringDef({
+  <% for (const value of Object.keys(property.values)) { -%>
+    <%- snakeCaseUpper(property.name) %>_<%- snakeCaseUpper(value) %>,
+  <% } -%>
+  })
+  @Retention(RetentionPolicy.SOURCE)
+  public @interface <%- snakeCaseUpper(property.name) %> {}
 
 <% } -%>
 
-    //Class definition
-    public final String name;
-    public final T value;
-
-    /* package */ Property(String name, T value) {
-        this.name = name;
-        this.value = value;
-    }
-
+  private Property() {
+  }
 }

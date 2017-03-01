@@ -187,10 +187,10 @@ enum class NorthOrientation : uint8_t {
 /// The distance on each side between a rectangle and a rectangle within.
 class EdgeInsets {
 public:
-    double top = 0;     ///< Number of pixels inset from the top edge.
-    double left = 0;    ///< Number of pixels inset from the left edge.
-    double bottom = 0;  ///< Number of pixels inset from the bottom edge.
-    double right = 0;   ///< Number of pixels inset from the right edge.
+    double top = 0;    // Number of pixels inset from the top edge.
+    double left = 0;   // Number of pixels inset from the left edge.
+    double bottom = 0; // Number of pixels inset from the bottom edge.
+    double right = 0;  // Number of pixels inset from the right edge.
 
     EdgeInsets() {}
 

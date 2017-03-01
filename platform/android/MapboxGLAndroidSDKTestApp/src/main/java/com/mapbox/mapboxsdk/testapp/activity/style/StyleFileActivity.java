@@ -6,10 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.RawRes;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
@@ -32,7 +29,7 @@ import java.io.Writer;
 import timber.log.Timber;
 
 /**
- * Example on how to use a file:// resource for the style.json
+ * Test activity showcasing how to use a file:// resource for the style.json
  */
 public class StyleFileActivity extends AppCompatActivity {
 
@@ -43,15 +40,6 @@ public class StyleFileActivity extends AppCompatActivity {
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_style_file);
-
-    Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-    setSupportActionBar(toolbar);
-
-    ActionBar actionBar = getSupportActionBar();
-    if (actionBar != null) {
-      actionBar.setDisplayHomeAsUpEnabled(true);
-      actionBar.setDisplayShowHomeEnabled(true);
-    }
 
     mapView = (MapView) findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
@@ -93,7 +81,7 @@ public class StyleFileActivity extends AppCompatActivity {
     }
 
     protected void onPostExecute(Long result) {
-      //Actual file:// usage
+      // Actual file:// usage
       mapboxMap.setStyleUrl("file://" + cacheStyleFile.getAbsolutePath());
     }
 
@@ -167,16 +155,5 @@ public class StyleFileActivity extends AppCompatActivity {
   public void onDestroy() {
     super.onDestroy();
     mapView.onDestroy();
-  }
-
-  @Override
-  public boolean onOptionsItemSelected(MenuItem item) {
-    switch (item.getItemId()) {
-      case android.R.id.home:
-        onBackPressed();
-        return true;
-      default:
-        return super.onOptionsItemSelected(item);
-    }
   }
 }

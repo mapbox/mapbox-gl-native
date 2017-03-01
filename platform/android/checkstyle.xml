@@ -20,7 +20,7 @@
         <property name="lineSeparator" value="lf" />
     </module> -->
     <module name="FileLength">
-        <property name="max" value="2042"/>
+        <property name="max" value="3000"/>
     </module>
 
     <module name="FileTabCharacter"/>
@@ -29,6 +29,11 @@
     <module name="RegexpSingleline">
         <property name="format" value="\s+$"/>
         <property name="message" value="Line has trailing spaces."/>
+    </module>
+
+    <module name="RegexpMultiline">
+        <property name="format" value="^;"/>
+        <property name="message" value="Line starts with an empty statement."/>
     </module>
 
     <module name="TreeWalker">
@@ -216,5 +221,6 @@
             <property name="exceptionVariableName" value="expected"/>
         </module>
         <module name="CommentsIndentation"/>
+        <module name="EmptyStatement"/>
     </module>
 </module>

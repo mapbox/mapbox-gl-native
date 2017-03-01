@@ -3,9 +3,7 @@ package com.mapbox.mapboxsdk.testapp.activity.camera;
 import android.graphics.Point;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -18,6 +16,12 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.UiSettings;
 import com.mapbox.mapboxsdk.testapp.R;
 
+/**
+ * Test activity showcasing the zoom Camera API.
+ * <p>
+ * This includes zoomIn, zoomOut, zoomTo, zoomBy (center and custom focal point).
+ * </p>
+ */
 public class ManualZoomActivity extends AppCompatActivity {
 
   private MapboxMap mapboxMap;
@@ -27,15 +31,6 @@ public class ManualZoomActivity extends AppCompatActivity {
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_manual_zoom);
-
-    Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-    setSupportActionBar(toolbar);
-
-    ActionBar actionBar = getSupportActionBar();
-    if (actionBar != null) {
-      actionBar.setDisplayHomeAsUpEnabled(true);
-      actionBar.setDisplayShowHomeEnabled(true);
-    }
 
     mapView = (MapView) findViewById(R.id.mapView);
     mapView.setStyleUrl(Style.SATELLITE);
@@ -60,10 +55,6 @@ public class ManualZoomActivity extends AppCompatActivity {
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
     switch (item.getItemId()) {
-
-      case android.R.id.home:
-        onBackPressed();
-        return true;
 
       case R.id.action_zoom_in:
         mapboxMap.animateCamera(CameraUpdateFactory.zoomIn());

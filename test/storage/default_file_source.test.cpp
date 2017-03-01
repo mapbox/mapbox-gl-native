@@ -267,6 +267,22 @@ TEST(DefaultFileSource, OptionalExpired) {
     loop.run();
 }
 
+TEST(DefaultFileSource, GetBaseURLAndAccessTokenWhilePaused) {
+    util::RunLoop loop;
+    DefaultFileSource fs(":memory:", ".");
+
+    fs.pause();
+
+    auto baseURL = "http://url";
+    auto accessToken = "access_token";
+
+    fs.setAPIBaseURL(baseURL);
+    fs.setAccessToken(accessToken);
+
+    EXPECT_EQ(fs.getAPIBaseURL(), baseURL);
+    EXPECT_EQ(fs.getAccessToken(), accessToken);
+}
+
 TEST(DefaultFileSource, OptionalNotFound) {
     util::RunLoop loop;
     DefaultFileSource fs(":memory:", ".");
@@ -455,6 +471,36 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(NoCacheRefreshModifiedModified)) {
         EXPECT_FALSE(bool(res.expires));
         EXPECT_EQ(Timestamp{ Seconds(1420070400) }, *res.modified);
         EXPECT_FALSE(res.etag);
+        loop.stop();
+    });
+
+    loop.run();
+}
+
+TEST(DefaultFileSource, TEST_REQUIRES_SERVER(SetResourceTransform)) {
+    util::RunLoop loop;
+    DefaultFileSource fs(":memory:", ".");
+
+    // Translates the URL "localhost://test to http://127.0.0.1:3000/test
+    fs.setResourceTransform([](Resource::Kind, std::string&& url) -> std::string {
+        if (url == "localhost://test") {
+            return "http://127.0.0.1:3000/test";
+        } else {
+            return std::move(url);
+        }
+    });
+
+    const Resource resource { Resource::Unknown, "localhost://test" };
+
+    std::unique_ptr<AsyncRequest> req;
+    req = fs.request(resource, [&](Response res) {
+        req.reset();
+        EXPECT_EQ(nullptr, res.error);
+        ASSERT_TRUE(res.data.get());
+        EXPECT_EQ("Hello World!", *res.data);
+        EXPECT_FALSE(bool(res.expires));
+        EXPECT_FALSE(bool(res.modified));
+        EXPECT_FALSE(bool(res.etag));
         loop.stop();
     });
 

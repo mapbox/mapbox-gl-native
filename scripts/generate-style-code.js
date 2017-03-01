@@ -2,7 +2,7 @@
 
 const fs = require('fs');
 const ejs = require('ejs');
-const spec = require('mapbox-gl-style-spec').latest;
+const spec = require('../mapbox-gl-js/src/style-spec/reference/v8');
 const colorParser = require('csscolorparser');
 
 require('./style-code');
@@ -14,7 +14,11 @@ function parseCSSColor(str) {
   ];
 }
 
-global.propertyType = function (property) {
+global.isDataDriven = function (property) {
+  return property['property-function'] === true;
+};
+
+global.evaluatedType = function (property) {
   if (/-translate-anchor$/.test(property.name)) {
     return 'TranslateAnchorType';
   }
@@ -34,11 +38,55 @@ global.propertyType = function (property) {
     return `Color`;
   case 'array':
     if (property.length) {
-      return `std::array<${propertyType({type: property.value})}, ${property.length}>`;
+      return `std::array<${evaluatedType({type: property.value})}, ${property.length}>`;
     } else {
-      return `std::vector<${propertyType({type: property.value})}>`;
+      return `std::vector<${evaluatedType({type: property.value})}>`;
     }
   default: throw new Error(`unknown type for ${property.name}`)
+  }
+};
+
+function attributeType(property, type) {
+    const attributeNameExceptions = {
+      'text-opacity': 'opacity',
+      'icon-opacity': 'opacity',
+      'text-color': 'fill_color',
+      'icon-color': 'fill_color',
+      'text-halo-color': 'halo_color',
+      'icon-halo-color': 'halo_color',
+      'text-halo-blur': 'halo_blur',
+      'icon-halo-blur': 'halo_blur',
+      'text-halo-width': 'halo_width',
+      'icon-halo-width': 'halo_width'
+    }
+    const name = attributeNameExceptions[property.name] ||
+        property.name.replace(type + '-', '').replace(/-/g, '_');
+    return `attributes::a_${name}${name === 'offset' ? '<1>' : ''}`;
+}
+
+global.layoutPropertyType = function (property) {
+  if (isDataDriven(property)) {
+    return `DataDrivenLayoutProperty<${evaluatedType(property)}>`;
+  } else {
+    return `LayoutProperty<${evaluatedType(property)}>`;
+  }
+};
+
+global.paintPropertyType = function (property, type) {
+  if (isDataDriven(property)) {
+    return `DataDrivenPaintProperty<${evaluatedType(property)}, ${attributeType(property, type)}>`;
+  } else if (/-pattern$/.test(property.name) || property.name === 'line-dasharray') {
+    return `CrossFadedPaintProperty<${evaluatedType(property)}>`;
+  } else {
+    return `PaintProperty<${evaluatedType(property)}>`;
+  }
+};
+
+global.propertyValueType = function (property) {
+  if (isDataDriven(property)) {
+    return `DataDrivenPropertyValue<${evaluatedType(property)}>`;
+  } else {
+    return `PropertyValue<${evaluatedType(property)}>`;
   }
 };
 
@@ -59,9 +107,9 @@ global.defaultValue = function (property) {
     return JSON.stringify(property.default || "");
   case 'enum':
     if (property.default === undefined) {
-      return `${propertyType(property)}::Undefined`;
+      return `${evaluatedType(property)}::Undefined`;
     } else {
-      return `${propertyType(property)}::${camelize(property.default)}`;
+      return `${evaluatedType(property)}::${camelize(property.default)}`;
     }
   case 'color':
     const color = parseCSSColor(property.default).join(', ');

@@ -21,9 +21,14 @@ public:
     static void registerNative(jni::JNIEnv&);
 
     /*
-     * Called when a Java object is created on the c++ side
+     * Called when a non-owning peer object is created on the c++ side
      */
     Layer(mbgl::Map&, mbgl::style::Layer&);
+
+    /*
+     * Called when a owning peer object is created on the c++ side
+     */
+    Layer(mbgl::Map&, std::unique_ptr<mbgl::style::Layer>);
 
     /*
      * Called when a Java object was created from the jvm side
@@ -49,7 +54,7 @@ public:
 
     void setPaintProperty(jni::JNIEnv&, jni::String, jni::Object<> value);
 
-    //Zoom
+    // Zoom
 
     jni::jfloat getMinZoom(jni::JNIEnv&);
 
@@ -65,28 +70,24 @@ public:
 
     void setSourceLayer(jni::JNIEnv& env, jni::String sourceLayer);
 
-    //Property getters
+    // Property getters
 
     jni::Object<jni::ObjectTag> getVisibility(jni::JNIEnv&);
 
 protected:
-    //Release the owned view and return it
+    // Release the owned view and return it
     std::unique_ptr<mbgl::style::Layer> releaseCoreLayer();
 
-    //Owned layer is set when creating a new layer, before adding it to the map
+    // Owned layer is set when creating a new layer, before adding it to the map
     std::unique_ptr<mbgl::style::Layer> ownedLayer;
 
-    //Raw reference to the layer
+    // Raw reference to the layer
     mbgl::style::Layer& layer;
 
-    //Map is set when the layer is retrieved or after adding to the map
+    // Map is set when the layer is retrieved or after adding to the map
     mbgl::Map* map;
 
 };
 
-} //android
-} //mbgl
-
-
-
-
+} // namespace android
+} // namespace mbgl

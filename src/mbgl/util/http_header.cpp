@@ -28,7 +28,7 @@ CacheControl CacheControl::parse(const std::string& value) {
 optional<Timestamp> CacheControl::toTimePoint() const {
     return maxAge ? util::now() + Seconds(*maxAge) : optional<Timestamp>{};
 }
-    
+
 optional<Timestamp> parseRetryHeaders(const optional<std::string>& retryAfter,
                                       const optional<std::string>& xRateLimitReset) {
     if (retryAfter) {
@@ -45,7 +45,7 @@ optional<Timestamp> parseRetryHeaders(const optional<std::string>& retryAfter,
             return {};
         }
     }
-    
+
     return {};
 }
 

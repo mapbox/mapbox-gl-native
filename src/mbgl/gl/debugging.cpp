@@ -132,7 +132,7 @@ void enable() {
     }
 
     // This will enable all messages including performance hints
-    //MBGL_CHECK_ERROR(DebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE));
+    // MBGL_CHECK_ERROR(DebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE));
 
     // This will only enable high and medium severity messages
     MBGL_CHECK_ERROR(DebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_HIGH, 0, nullptr, GL_TRUE));

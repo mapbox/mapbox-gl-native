@@ -3,25 +3,21 @@ package com.mapbox.mapboxsdk.maps;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.Fragment;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.graphics.Canvas;
 import android.graphics.PointF;
 import android.graphics.SurfaceTexture;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.CallSuper;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
 import android.support.v7.app.AlertDialog;
-import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -45,8 +41,9 @@ import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.maps.widgets.CompassView;
 import com.mapbox.mapboxsdk.maps.widgets.MyLocationView;
 import com.mapbox.mapboxsdk.maps.widgets.MyLocationViewSettings;
-import com.mapbox.mapboxsdk.telemetry.MapboxEvent;
-import com.mapbox.mapboxsdk.telemetry.MapboxEventManager;
+import com.mapbox.mapboxsdk.net.ConnectivityReceiver;
+import com.mapbox.services.android.telemetry.MapboxEvent;
+import com.mapbox.services.android.telemetry.MapboxTelemetry;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -72,7 +69,7 @@ public class MapView extends FrameLayout {
 
   private NativeMapView nativeMapView;
   private boolean destroyed;
-  private boolean hasSurface = false;
+  private boolean hasSurface;
 
   private MapboxMap mapboxMap;
   private MapCallback mapCallback;
@@ -82,8 +79,6 @@ public class MapView extends FrameLayout {
   private MapGestureDetector mapGestureDetector;
   private MapKeyListener mapKeyListener;
   private MapZoomButtonController mapZoomButtonController;
-
-  private ConnectivityReceiver connectivityReceiver;
 
   @UiThread
   public MapView(@NonNull Context context) {
@@ -106,7 +101,7 @@ public class MapView extends FrameLayout {
   @UiThread
   public MapView(@NonNull Context context, @Nullable MapboxMapOptions options) {
     super(context);
-    initialise(context, options);
+    initialise(context, options == null ? MapboxMapOptions.createFromAttributes(context, null) : options);
   }
 
   private void initialise(@NonNull final Context context, @NonNull final MapboxMapOptions options) {
@@ -127,15 +122,18 @@ public class MapView extends FrameLayout {
     nativeMapView = new NativeMapView(this);
 
     // callback for focal point invalidation
-    FocalPointInvalidator focalPoint = new FocalPointInvalidator();
+    FocalPointInvalidator focalPoint = new FocalPointInvalidator(compassView);
 
     // callback for registering touch listeners
     RegisterTouchListener registerTouchListener = new RegisterTouchListener();
 
+    // callback for zooming in the camera
+    CameraZoomInvalidator zoomInvalidator = new CameraZoomInvalidator();
+
     // setup components for MapboxMap creation
     Projection proj = new Projection(nativeMapView);
     UiSettings uiSettings = new UiSettings(proj, focalPoint, compassView, attrView, view.findViewById(R.id.logoView));
-    TrackingSettings trackingSettings = new TrackingSettings(myLocationView, uiSettings, focalPoint);
+    TrackingSettings trackingSettings = new TrackingSettings(myLocationView, uiSettings, focalPoint, zoomInvalidator);
     MyLocationViewSettings myLocationViewSettings = new MyLocationViewSettings(myLocationView, proj, focalPoint);
     MarkerViewManager markerViewManager = new MarkerViewManager((ViewGroup) findViewById(R.id.markerViewContainer));
     AnnotationManager annotations = new AnnotationManager(nativeMapView, this, markerViewManager);
@@ -164,7 +162,7 @@ public class MapView extends FrameLayout {
     setWillNotDraw(false);
 
     // notify Map object about current connectivity state
-    nativeMapView.setReachability(isConnected());
+    nativeMapView.setReachability(ConnectivityReceiver.instance(context).isConnected(context));
 
     // initialise MapboxMap
     mapboxMap.initialise(context, options);
@@ -199,10 +197,8 @@ public class MapView extends FrameLayout {
    */
   @UiThread
   public void onCreate(@Nullable Bundle savedInstanceState) {
-    nativeMapView.setAccessToken(Mapbox.getAccessToken());
-
     if (savedInstanceState == null) {
-      MapboxEvent.trackMapLoadEvent();
+      MapboxTelemetry.getInstance().pushEvent(MapboxEvent.buildMapLoadEvent());
     } else if (savedInstanceState.getBoolean(MapboxConstants.STATE_HAS_SAVED_STATE)) {
       mapboxMap.onRestoreInstanceState(savedInstanceState);
     }
@@ -234,7 +230,7 @@ public class MapView extends FrameLayout {
   public void onStart() {
     onStartCalled = true;
     mapboxMap.onStart();
-    registerConnectivityReceiver();
+    ConnectivityReceiver.instance(getContext()).activate();
   }
 
   /**
@@ -264,7 +260,7 @@ public class MapView extends FrameLayout {
   public void onStop() {
     onStopCalled = true;
     mapboxMap.onStop();
-    unregisterConnectivityReceiver();
+    ConnectivityReceiver.instance(getContext()).deactivate();
   }
 
   /**
@@ -284,18 +280,6 @@ public class MapView extends FrameLayout {
     nativeMapView.destroySurface();
     nativeMapView.destroy();
     nativeMapView = null;
-  }
-
-  private void registerConnectivityReceiver() {
-    getContext().registerReceiver(connectivityReceiver = new ConnectivityReceiver(),
-      new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
-  }
-
-  private void unregisterConnectivityReceiver() {
-    if (connectivityReceiver != null) {
-      getContext().unregisterReceiver(connectivityReceiver);
-      connectivityReceiver = null;
-    }
   }
 
   @Override
@@ -403,11 +387,6 @@ public class MapView extends FrameLayout {
   public void setStyleUrl(@NonNull String url) {
     if (destroyed) {
       return;
-    }
-
-    // stopgap for https://github.com/mapbox/mapbox-gl-native/issues/6242
-    if (TextUtils.isEmpty(nativeMapView.getAccessToken())) {
-      nativeMapView.setAccessToken(Mapbox.getAccessToken());
     }
 
     nativeMapView.setStyleUrl(url);
@@ -552,30 +531,6 @@ public class MapView extends FrameLayout {
   }
 
   //
-  // Connectivity events
-  //
-
-  // This class handles connectivity changes
-  private class ConnectivityReceiver extends BroadcastReceiver {
-
-    // Called when an action we are listening to in the manifest has been sent
-    @Override
-    public void onReceive(Context context, Intent intent) {
-      if (!destroyed && intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
-        nativeMapView.setReachability(!intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, false));
-      }
-    }
-  }
-
-  // Called when MapView is being created
-  private boolean isConnected() {
-    ConnectivityManager connectivityManager = (ConnectivityManager)
-      getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
-    NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
-    return (activeNetwork != null) && activeNetwork.isConnectedOrConnecting();
-  }
-
-  //
   // Map events
   //
 
@@ -663,7 +618,7 @@ public class MapView extends FrameLayout {
         builder.setPositiveButton(R.string.mapbox_attributionTelemetryPositive, new DialogInterface.OnClickListener() {
           @Override
           public void onClick(DialogInterface dialog, int which) {
-            MapboxEventManager.getMapboxEventManager().setTelemetryEnabled(true);
+            MapboxTelemetry.getInstance().setTelemetryEnabled(true);
             dialog.cancel();
           }
         });
@@ -680,7 +635,7 @@ public class MapView extends FrameLayout {
         builder.setNegativeButton(R.string.mapbox_attributionTelemetryNegative, new DialogInterface.OnClickListener() {
           @Override
           public void onClick(DialogInterface dialog, int which) {
-            MapboxEventManager.getMapboxEventManager().setTelemetryEnabled(false);
+            MapboxTelemetry.getInstance().setTelemetryEnabled(false);
             dialog.cancel();
           }
         });
@@ -941,9 +896,18 @@ public class MapView extends FrameLayout {
 
   private class FocalPointInvalidator implements FocalPointChangeListener {
 
+    private final FocalPointChangeListener[] focalPointChangeListeners;
+
+    FocalPointInvalidator(FocalPointChangeListener... listeners) {
+      focalPointChangeListeners = listeners;
+    }
+
     @Override
     public void onFocalPointChanged(PointF pointF) {
       mapGestureDetector.setFocalPoint(pointF);
+      for (FocalPointChangeListener focalPointChangeListener : focalPointChangeListeners) {
+        focalPointChangeListener.onFocalPointChanged(pointF);
+      }
     }
   }
 
@@ -970,6 +934,16 @@ public class MapView extends FrameLayout {
     }
   }
 
+  private class CameraZoomInvalidator implements TrackingSettings.CameraZoomInvalidator {
+    @Override
+    public void zoomTo(double zoomLevel) {
+      double currentZoomLevel = mapboxMap.getCameraPosition().zoom;
+      if (currentZoomLevel < zoomLevel) {
+        mapboxMap.getTransform().setZoom(zoomLevel);
+      }
+    }
+  }
+
   private static class MapCallback implements OnMapChangedListener {
 
     private final MapboxMap mapboxMap;
@@ -984,9 +958,14 @@ public class MapView extends FrameLayout {
     public void onMapChanged(@MapChange int change) {
       if (change == DID_FINISH_LOADING_STYLE && initialLoad) {
         initialLoad = false;
-        mapboxMap.onPreMapReady();
-        onMapReady();
-        mapboxMap.onPostMapReady();
+        new Handler().post(new Runnable() {
+          @Override
+          public void run() {
+            mapboxMap.onPreMapReady();
+            onMapReady();
+            mapboxMap.onPostMapReady();
+          }
+        });
       } else if (change == REGION_IS_CHANGING || change == REGION_DID_CHANGE || change == DID_FINISH_LOADING_MAP) {
         mapboxMap.onUpdate();
       }

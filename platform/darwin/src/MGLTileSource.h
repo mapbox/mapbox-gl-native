@@ -16,7 +16,7 @@ typedef NSString *MGLTileSourceOption NS_STRING_ENUM;
 /**
  An `NSNumber` object containing an unsigned integer that specifies the minimum
  zoom level at which to display tiles from the source.
- 
+
  The value should be between 0 and 22, inclusive, and less than
  `MGLTileSourceOptionMaximumZoomLevel`, if specified. The default value for this
  option is 0.
@@ -30,7 +30,7 @@ extern MGL_EXPORT const MGLTileSourceOption MGLTileSourceOptionMinimumZoomLevel;
 /**
  An `NSNumber` object containing an unsigned integer that specifies the maximum
  zoom level at which to display tiles from the source.
- 
+
  The value should be between 0 and 22, inclusive, and less than
  `MGLTileSourceOptionMinimumZoomLevel`, if specified. The default value for this
  option is 22.
@@ -46,7 +46,7 @@ extern MGL_EXPORT const MGLTileSourceOption MGLTileSourceOptionMaximumZoomLevel;
  An HTML string defining the buttons to be displayed in an action sheet when the
  source is part of a map view’s style and the map view’s attribution button is
  pressed.
- 
+
  By default, no attribution statements are displayed. If the
  `MGLTileSourceOptionAttributionInfos` option is specified, this option is
  ignored.
@@ -61,7 +61,7 @@ extern MGL_EXPORT const MGLTileSourceOption MGLTileSourceOptionAttributionHTMLSt
  An array of `MGLAttributionInfo` objects defining the buttons to be displayed
  in an action sheet when the source is part of a map view’s style and the map
  view’s attribution button is pressed.
- 
+
  By default, no attribution statements are displayed.
  */
 extern MGL_EXPORT const MGLTileSourceOption MGLTileSourceOptionAttributionInfos;
@@ -69,7 +69,7 @@ extern MGL_EXPORT const MGLTileSourceOption MGLTileSourceOptionAttributionInfos;
 /**
  An HTML string defining the buttons to be displayed in the map view’s
  attribution view when the source is part of the map view’s style.
- 
+
  By default, no attribution statements are displayed. If the
  `MGLTileSourceOptionAttributionInfos` option is specified, this option is
  ignored.
@@ -84,7 +84,7 @@ extern MGL_EXPORT const MGLTileSourceOption MGLTileSourceOptionAttributionHTMLSt
  An array of `MGLAttributionInfo` objects defining the buttons to be displayed
  in the map view’s attribution view when the source is part of the map view’s
  style.
- 
+
  By default, no attribution statements are displayed.
  */
 extern MGL_EXPORT const MGLTileSourceOption MGLTileSourceOptionAttributionInfos;
@@ -94,7 +94,7 @@ extern MGL_EXPORT const MGLTileSourceOption MGLTileSourceOptionAttributionInfos;
  An `NSNumber` object containing an unsigned integer that specifies the tile
  coordinate system for the source’s tile URLs. The integer corresponds to one of
  the constants described in `MGLTileCoordinateSystem`.
- 
+
  The default value for this option is `MGLTileCoordinateSystemXYZ`.
 
  This option corresponds to the `scheme` key in the
@@ -111,16 +111,16 @@ typedef NS_ENUM(NSUInteger, MGLTileCoordinateSystem) {
     /**
      The origin is at the top-left (northwest), and `y` values increase
      southwards.
-     
+
      This tile coordinate system is used by Mapbox and OpenStreetMap tile
      servers.
      */
     MGLTileCoordinateSystemXYZ = 0,
-    
+
     /**
      The origin is at the bottom-left (southwest), and `y` values increase
      northwards.
-     
+
      This tile coordinate system is used by tile servers that conform to the
      <a href="http://wiki.osgeo.org/wiki/Tile_Map_Service_Specification">Tile Map Service Specification</a>.
      */
@@ -135,7 +135,7 @@ typedef NS_ENUM(NSUInteger, MGLTileCoordinateSystem) {
  A tile source is added to an `MGLStyle` object along with one or more
  `MGLRasterStyleLayer` or `MGLVectorStyleLayer` objects. Use a style layer to
  control the appearance of content supplied by the tile source.
- 
+
  Do not create instances of this class directly, and do not create your own
  subclasses of this class. Instead, create instances of `MGLRasterSource` and
  `MGLVectorSource`.
@@ -150,15 +150,15 @@ MGL_EXPORT
 
 /**
  Returns a tile source initialized with an identifier and configuration URL.
- 
+
  After initializing and configuring the source, add it to a map view’s style
  using the `-[MGLStyle addSource:]` method.
- 
+
  The URL may be a full HTTP or HTTPS URL or, for tile sets hosted by Mapbox, a
  Mapbox URL indicating a map identifier (`mapbox://<mapid>`). The URL should
  point to a JSON file that conforms to the
  <a href="https://github.com/mapbox/tilejson-spec/">TileJSON specification</a>.
- 
+
  @param identifier A string that uniquely identifies the source in the style to
     which it is added.
  @param configurationURL A URL to a TileJSON configuration file describing the
@@ -170,27 +170,27 @@ MGL_EXPORT
 /**
  Returns a tile source initialized an identifier, tile URL templates, and
  options.
- 
+
  After initializing and configuring the source, add it to a map view’s style
  using the `-[MGLStyle addSource:]` method.
- 
+
  #### Tile URL templates
- 
+
  Tile URL templates are strings that specify the URLs of the tile images to
  load. Each template resembles an absolute URL, but with any number of
  placeholder strings that the source evaluates based on the tile it needs to
  load. For example:
- 
+
  <ul>
  <li><code>http://www.example.com/tiles/{z}/{x}/{y}.pbf</code> could be
     evaluated as <code>http://www.example.com/tiles/14/6/9.pbf</code>.</li>
  <li><code>http://www.example.com/tiles/{z}/{x}/{y}{ratio}.png</code> could be
     evaluated as <code>http://www.example.com/tiles/14/6/9@2x.png</code>.</li>
  </ul>
- 
+
  Tile sources support the following placeholder strings in tile URL templates,
  all of which are optional:
- 
+
  <table>
  <thead>
  <tr><th>Placeholder string</th><th>Description</th></tr>
@@ -256,11 +256,11 @@ MGL_EXPORT
  </tr>
  </tbody>
  </table>
- 
+
  For more information about the `{x}`, `{y}`, and `{z}` placeholder strings,
  consult the
  <a href="https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames">OpenStreetMap Wiki</a>.
- 
+
  @param identifier A string that uniquely identifies the source in the style to
     which it is added.
  @param tileURLTemplates An array of tile URL template strings. Only the first
@@ -288,7 +288,7 @@ MGL_EXPORT
 /**
  An array of `MGLAttributionInfo` objects that define the attribution
  statements to be displayed when the map is shown to the user.
- 
+
  By default, this array is empty. If the source is initialized with a
  configuration URL, this array is also empty until the configuration JSON file
  is loaded.

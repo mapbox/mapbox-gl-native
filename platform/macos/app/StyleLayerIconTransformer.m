@@ -31,7 +31,7 @@
     if ([layer isKindOfClass:[MGLSymbolStyleLayer class]]) {
         return [NSImage imageNamed:@"symbol"];
     }
-    
+
     return nil;
 }
 

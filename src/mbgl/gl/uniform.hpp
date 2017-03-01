@@ -50,32 +50,49 @@ template <class Tag, class T, size_t N>
 using UniformMatrix = Uniform<Tag, std::array<T, N*N>>;
 
 #define MBGL_DEFINE_UNIFORM_SCALAR(type_, name_) \
-    struct name_ : ::mbgl::gl::UniformScalar<name_, type_> { static constexpr auto name = #name_; }
+    struct name_ : ::mbgl::gl::UniformScalar<name_, type_> { static auto name() { return #name_; } }
 
 #define MBGL_DEFINE_UNIFORM_VECTOR(type_, n_, name_) \
-    struct name_ : ::mbgl::gl::UniformVector<name_, type_, n_> { static constexpr auto name = #name_; }
+    struct name_ : ::mbgl::gl::UniformVector<name_, type_, n_> { static auto name() { return #name_; } }
 
 #define MBGL_DEFINE_UNIFORM_MATRIX(type_, n_, name_) \
-    struct name_ : ::mbgl::gl::UniformMatrix<name_, type_, n_> { static constexpr auto name = #name_; }
+    struct name_ : ::mbgl::gl::UniformMatrix<name_, type_, n_> { static auto name() { return #name_; } }
 
 UniformLocation uniformLocation(ProgramID, const char * name);
 
 template <class... Us>
 class Uniforms {
 public:
+    using Types = TypeList<Us...>;
     using State = IndexedTuple<TypeList<Us...>, TypeList<typename Us::State...>>;
     using Values = IndexedTuple<TypeList<Us...>, TypeList<typename Us::Value...>>;
 
     static State state(const ProgramID& id) {
-        return State { { uniformLocation(id, Us::name) }... };
+        return State { { uniformLocation(id, Us::name()) }... };
     }
 
-    static std::function<void ()> binder(State& state, Values&& values_) {
-        return [&state, values = std::move(values_)] () mutable {
-            util::ignore({ (state.template get<Us>() = values.template get<Us>(), 0)... });
-        };
+    static void bind(State& state, Values&& values) {
+        util::ignore({ (state.template get<Us>() = values.template get<Us>(), 0)... });
     }
 };
+
+
+namespace detail {
+
+template <class...>
+struct ConcatenateUniforms;
+
+template <class... As, class... Bs>
+struct ConcatenateUniforms<TypeList<As...>, TypeList<Bs...>> {
+    using Type = Uniforms<As..., Bs...>;
+};
+
+} // namespace detail
+
+template <class A, class B>
+using ConcatenateUniforms = typename detail::ConcatenateUniforms<
+    typename A::Types,
+    typename B::Types>::Type;
 
 } // namespace gl
 } // namespace mbgl

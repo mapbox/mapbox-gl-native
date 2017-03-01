@@ -31,10 +31,12 @@ import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.constants.MyBearingTracking;
 import com.mapbox.mapboxsdk.constants.MyLocationTracking;
 import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.mapbox.mapboxsdk.location.LocationListener;
-import com.mapbox.mapboxsdk.location.LocationServices;
+import com.mapbox.mapboxsdk.location.LocationSource;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.Projection;
+import com.mapbox.services.android.telemetry.location.LocationEngine;
+import com.mapbox.services.android.telemetry.location.LocationEngineListener;
+import com.mapbox.services.android.telemetry.location.LocationEnginePriority;
 
 import java.lang.ref.WeakReference;
 
@@ -296,7 +298,7 @@ public class MyLocationView extends View {
     }
 
     // draw foreground
-    if (myBearingTrackingMode == MyBearingTracking.NONE) {
+    if (myBearingTrackingMode == MyBearingTracking.NONE || !compassListener.isSensorAvailable()) {
       if (foregroundDrawable != null) {
         foregroundDrawable.draw(canvas);
       }
@@ -308,8 +310,9 @@ public class MyLocationView extends View {
   public void setTilt(@FloatRange(from = 0, to = 60.0f) double tilt) {
     this.tilt = tilt;
     if (myLocationTrackingMode == MyLocationTracking.TRACKING_FOLLOW) {
-      mapboxMap.getUiSettings().setFocalPoint(new PointF(getCenterX(), getCenterY()));
+      mapboxMap.getUiSettings().setFocalPoint(getCenter());
     }
+    invalidate();
   }
 
   public void setBearing(double bearing) {
@@ -319,7 +322,8 @@ public class MyLocationView extends View {
         if (location != null) {
           setCompass(location.getBearing() - bearing);
         }
-      } else if (myBearingTrackingMode == MyBearingTracking.COMPASS) {
+      } else if (myBearingTrackingMode == MyBearingTracking.COMPASS
+              && compassListener.isSensorAvailable()) {
         setCompass(magneticHeading - bearing);
       }
     }
@@ -327,13 +331,14 @@ public class MyLocationView extends View {
 
   public void setCameraPosition(CameraPosition position) {
     if (position != null) {
-      setTilt(position.tilt);
       setBearing(position.bearing);
+      setTilt(position.tilt);
     }
   }
 
   public void onStart() {
-    if (myBearingTrackingMode == MyBearingTracking.COMPASS) {
+    if (myBearingTrackingMode == MyBearingTracking.COMPASS
+            && compassListener.isSensorAvailable()) {
       compassListener.onResume();
     }
     if (isEnabled()) {
@@ -366,8 +371,7 @@ public class MyLocationView extends View {
     }
 
     if (userLocationListener != null) {
-      LocationServices services = LocationServices.getLocationServices(getContext());
-      services.removeLocationListener(userLocationListener);
+      LocationSource.getLocationEngine(getContext()).removeLocationEngineListener(userLocationListener);
       userLocationListener = null;
     }
   }
@@ -417,10 +421,10 @@ public class MyLocationView extends View {
    * @param enableGps true if GPS is to be enabled, false if GPS is to be disabled
    */
   private void toggleGps(boolean enableGps) {
-    LocationServices locationServices = LocationServices.getLocationServices(getContext());
+    LocationEngine locationEngine = LocationSource.getLocationEngine(getContext());
     if (enableGps) {
       // Set an initial location if one available
-      Location lastLocation = locationServices.getLastLocation();
+      Location lastLocation = locationEngine.getLastLocation();
 
       if (lastLocation != null) {
         setLocation(lastLocation);
@@ -430,14 +434,14 @@ public class MyLocationView extends View {
         userLocationListener = new GpsLocationListener(this);
       }
 
-      locationServices.addLocationListener(userLocationListener);
+      locationEngine.addLocationEngineListener(userLocationListener);
     } else {
       // Disable location and user dot
       location = null;
-      locationServices.removeLocationListener(userLocationListener);
+      locationEngine.removeLocationEngineListener(userLocationListener);
     }
 
-    locationServices.toggleGPS(enableGps);
+    locationEngine.setPriority(LocationEnginePriority.HIGH_ACCURACY);
   }
 
   public Location getLocation() {
@@ -456,7 +460,8 @@ public class MyLocationView extends View {
 
   public void setMyBearingTrackingMode(@MyBearingTracking.Mode int myBearingTrackingMode) {
     this.myBearingTrackingMode = myBearingTrackingMode;
-    if (myBearingTrackingMode == MyBearingTracking.COMPASS) {
+    if (myBearingTrackingMode == MyBearingTracking.COMPASS
+            && compassListener.isSensorAvailable()) {
       compassListener.onResume();
     } else {
       compassListener.onPause();
@@ -477,8 +482,19 @@ public class MyLocationView extends View {
     if (location != null) {
       if (myLocationTrackingMode == MyLocationTracking.TRACKING_FOLLOW) {
         // center map directly
+        mapboxMap.getTrackingSettings().setDismissTrackingModeForCameraPositionChange(false);
         mapboxMap.easeCamera(CameraUpdateFactory.newLatLng(new LatLng(location)), 0, false /*linear interpolator*/,
-          false /*do not disable tracking*/, null);
+          new MapboxMap.CancelableCallback() {
+            @Override
+            public void onCancel() {
+
+            }
+
+            @Override
+            public void onFinish() {
+              mapboxMap.getTrackingSettings().setDismissTrackingModeForCameraPositionChange(true);
+            }
+          });
       } else {
         // do not use interpolated location from tracking mode
         latLng = null;
@@ -528,11 +544,15 @@ public class MyLocationView extends View {
     directionAnimator.start();
   }
 
-  public float getCenterX() {
+  public PointF getCenter() {
+    return new PointF(getCenterX(), getCenterY());
+  }
+
+  private float getCenterX() {
     return (getX() + getMeasuredWidth()) / 2 + contentPaddingX - projectedX;
   }
 
-  public float getCenterY() {
+  private float getCenterY() {
     return (getY() + getMeasuredHeight()) / 2 + contentPaddingY - projectedY;
   }
 
@@ -541,12 +561,21 @@ public class MyLocationView extends View {
     contentPaddingY = (padding[1] - padding[3]) / 2;
   }
 
-  private static class GpsLocationListener implements LocationListener {
+  private static class GpsLocationListener implements LocationEngineListener {
 
     private WeakReference<MyLocationView> userLocationView;
 
     GpsLocationListener(MyLocationView myLocationView) {
       userLocationView = new WeakReference<>(myLocationView);
+    }
+
+    @Override
+    public void onConnected() {
+      MyLocationView locationView = userLocationView.get();
+      if (locationView != null) {
+        Location location = LocationSource.getLocationEngine(locationView.getContext()).getLastLocation();
+        locationView.setLocation(location);
+      }
     }
 
     /**
@@ -587,6 +616,10 @@ public class MyLocationView extends View {
       sensorManager.unregisterListener(this, rotationVectorSensor);
     }
 
+    public boolean isSensorAvailable() {
+      return rotationVectorSensor != null;
+    }
+
     @Override
     public void onSensorChanged(SensorEvent event) {
 
@@ -619,8 +652,19 @@ public class MyLocationView extends View {
     private void rotateCamera(float rotation) {
       CameraPosition.Builder builder = new CameraPosition.Builder();
       builder.bearing(rotation);
+      mapboxMap.getTrackingSettings().setDismissTrackingModeForCameraPositionChange(false);
       mapboxMap.easeCamera(CameraUpdateFactory.newCameraPosition(builder.build()), COMPASS_UPDATE_RATE_MS,
-        false /*linear interpolator*/, false /*do not disable tracking*/, null);
+        false /*linear interpolator*/, new MapboxMap.CancelableCallback() {
+          @Override
+          public void onCancel() {
+
+          }
+
+          @Override
+          public void onFinish() {
+            mapboxMap.getTrackingSettings().setDismissTrackingModeForCameraPositionChange(true);
+          }
+        });
     }
 
     @Override
@@ -734,9 +778,20 @@ public class MyLocationView extends View {
       // accuracy
       updateAccuracy(location);
 
+      mapboxMap.getTrackingSettings().setDismissTrackingModeForCameraPositionChange(false);
       // ease to new camera position with a linear interpolator
       mapboxMap.easeCamera(CameraUpdateFactory.newCameraPosition(builder.build()), (int) animationDuration,
-        false /*linear interpolator*/, false /*do not disable tracking*/, null);
+        false /*linear interpolator*/, new MapboxMap.CancelableCallback() {
+          @Override
+          public void onCancel() {
+
+          }
+
+          @Override
+          public void onFinish() {
+            mapboxMap.getTrackingSettings().setDismissTrackingModeForCameraPositionChange(true);
+          }
+        });
     }
 
     @Override

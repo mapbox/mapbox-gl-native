@@ -33,7 +33,10 @@ void Painter::renderLine(PaintParameters& parameters,
             std::move(uniformValues),
             *bucket.vertexBuffer,
             *bucket.indexBuffer,
-            bucket.segments
+            bucket.segments,
+            bucket.paintPropertyBinders.at(layer.getID()),
+            properties,
+            state.getZoom()
         );
     };
 
@@ -58,10 +61,8 @@ void Painter::renderLine(PaintParameters& parameters,
                  lineAtlas->getSize().width));
 
     } else if (!properties.get<LinePattern>().from.empty()) {
-        optional<SpriteAtlasPosition> posA = spriteAtlas->getPosition(
-            properties.get<LinePattern>().from, SpritePatternMode::Repeating);
-        optional<SpriteAtlasPosition> posB = spriteAtlas->getPosition(
-            properties.get<LinePattern>().to, SpritePatternMode::Repeating);
+        optional<SpriteAtlasElement> posA = spriteAtlas->getPattern(properties.get<LinePattern>().from);
+        optional<SpriteAtlasElement> posB = spriteAtlas->getPattern(properties.get<LinePattern>().to);
 
         if (!posA || !posB)
             return;

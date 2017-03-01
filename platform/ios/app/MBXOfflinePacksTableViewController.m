@@ -33,7 +33,7 @@ static NSString * const MBXOfflinePacksTableViewActiveCellReuseIdentifier = @"Ac
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
+
     [[MGLOfflineStorage sharedOfflineStorage] addObserver:self forKeyPath:@"packs" options:NSKeyValueObservingOptionInitial context:NULL];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(offlinePackProgressDidChange:) name:MGLOfflinePackProgressChangedNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(offlinePackDidReceiveError:) name:MGLOfflinePackErrorNotification object:nil];
@@ -60,24 +60,24 @@ static NSString * const MBXOfflinePacksTableViewActiveCellReuseIdentifier = @"Ac
             case NSKeyValueChangeInsertion:
                 [self.tableView insertRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationAutomatic];
                 break;
-                
+
             case NSKeyValueChangeRemoval:
                 [self.tableView deleteRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationAutomatic];
                 break;
-                
+
             case NSKeyValueChangeReplacement:
                 [self.tableView reloadRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationAutomatic];
                 break;
-                
+
             default:
                 [self.tableView reloadData];
-                
+
                 for (MGLOfflinePack *pack in [MGLOfflineStorage sharedOfflineStorage].packs) {
                     if (pack.state == MGLOfflinePackStateUnknown) {
                         [pack requestProgress];
                     }
                 }
-                
+
                 break;
         }
     } else {
@@ -91,22 +91,22 @@ static NSString * const MBXOfflinePacksTableViewActiveCellReuseIdentifier = @"Ac
         textField.placeholder = [NSString stringWithFormat:@"%@", MGLStringFromCoordinateBounds(self.mapView.visibleCoordinateBounds)];
     }];
     [alertController addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
-    
+
     UIAlertAction *downloadAction = [UIAlertAction actionWithTitle:@"Download" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
         MGLMapView *mapView = self.mapView;
         NSAssert(mapView, @"No map view to get the current region from.");
-        
+
         UITextField *nameField = alertController.textFields.firstObject;
         NSString *name = nameField.text;
         if (!name.length) {
             name = nameField.placeholder;
         }
-        
+
         MGLTilePyramidOfflineRegion *region = [[MGLTilePyramidOfflineRegion alloc] initWithStyleURL:mapView.styleURL bounds:mapView.visibleCoordinateBounds fromZoomLevel:mapView.zoomLevel toZoomLevel:mapView.maximumZoomLevel];
         NSData *context = [NSKeyedArchiver archivedDataWithRootObject:@{
             MBXOfflinePackContextNameKey: name,
         }];
-        
+
         [[MGLOfflineStorage sharedOfflineStorage] addPackForRegion:region withContext:context completionHandler:^(MGLOfflinePack *pack, NSError *error) {
             if (error) {
                 NSString *message = [NSString stringWithFormat:@"Mapbox GL was unable to add the offline pack “%@”.", name];
@@ -122,7 +122,7 @@ static NSString * const MBXOfflinePacksTableViewActiveCellReuseIdentifier = @"Ac
     if ([alertController respondsToSelector:@selector(setPreferredAction:)]) {
         alertController.preferredAction = downloadAction;
     }
-    
+
     [self presentViewController:alertController animated:YES completion:nil];
 }
 
@@ -134,11 +134,11 @@ static NSString * const MBXOfflinePacksTableViewActiveCellReuseIdentifier = @"Ac
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     MGLOfflinePack *pack = [MGLOfflineStorage sharedOfflineStorage].packs[indexPath.row];
-    
+
     NSString *reuseIdentifier = pack.state == MGLOfflinePackStateActive ? MBXOfflinePacksTableViewActiveCellReuseIdentifier : MBXOfflinePacksTableViewInactiveCellReuseIdentifier;
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:reuseIdentifier forIndexPath:indexPath];
     [self updateTableViewCell:cell atIndexPath:indexPath forPack:pack];
-    
+
     return cell;
 }
 
@@ -156,17 +156,17 @@ static NSString * const MBXOfflinePacksTableViewActiveCellReuseIdentifier = @"Ac
         case MGLOfflinePackStateUnknown:
             statusString = @"Calculating progress…";
             break;
-            
+
         case MGLOfflinePackStateInactive:
             statusString = [NSString stringWithFormat:@"%@ of %@ resources (%@)",
                             completedString, expectedString, byteCountString];
             break;
-            
+
         case MGLOfflinePackStateComplete:
             statusString = [NSString stringWithFormat:@"%@ resources (%@)",
                             completedString, byteCountString];
             break;
-            
+
         case MGLOfflinePackStateActive:
             if (progress.countOfResourcesExpected) {
                 completedString = [NSNumberFormatter localizedStringFromNumber:@(progress.countOfResourcesCompleted + 1)
@@ -178,7 +178,7 @@ static NSString * const MBXOfflinePacksTableViewActiveCellReuseIdentifier = @"Ac
             statusString = [NSString stringWithFormat:@"Downloading %@ of %@ resources (%@ so far)…",
                             completedString, expectedString, byteCountString];
             break;
-            
+
         case MGLOfflinePackStateInvalid:
             NSAssert(NO, @"Invalid offline pack at index path %@", indexPath);
             break;
@@ -197,27 +197,27 @@ static NSString * const MBXOfflinePacksTableViewActiveCellReuseIdentifier = @"Ac
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
-    
+
     MGLOfflinePack *pack = [MGLOfflineStorage sharedOfflineStorage].packs[indexPath.row];
     switch (pack.state) {
         case MGLOfflinePackStateUnknown:
             break;
-            
+
         case MGLOfflinePackStateComplete:
             if ([pack.region respondsToSelector:@selector(applyToMapView:)]) {
                 [pack.region performSelector:@selector(applyToMapView:) withObject:self.mapView];
             }
             [self performSegueWithIdentifier:@"ReturnToMap" sender:self];
             break;
-            
+
         case MGLOfflinePackStateInactive:
             [pack resume];
             break;
-            
+
         case MGLOfflinePackStateActive:
             [pack suspend];
             break;
-            
+
         case MGLOfflinePackStateInvalid:
             NSAssert(NO, @"Invalid offline pack at index path %@", indexPath);
             break;
@@ -229,12 +229,12 @@ static NSString * const MBXOfflinePacksTableViewActiveCellReuseIdentifier = @"Ac
 - (void)offlinePackProgressDidChange:(NSNotification *)notification {
     MGLOfflinePack *pack = notification.object;
     NSAssert([pack isKindOfClass:[MGLOfflinePack class]], @"MGLOfflineStorage notification has a non-pack object.");
-    
+
     NSUInteger index = [[MGLOfflineStorage sharedOfflineStorage].packs indexOfObject:pack];
     if (index == NSNotFound) {
         return;
     }
-    
+
     NSIndexPath *indexPath = [NSIndexPath indexPathForRow:index inSection:0];
     UITableViewCell *cell = [self.tableView cellForRowAtIndexPath:indexPath];
     [self updateTableViewCell:cell atIndexPath:indexPath forPack:pack];
@@ -243,10 +243,10 @@ static NSString * const MBXOfflinePacksTableViewActiveCellReuseIdentifier = @"Ac
 - (void)offlinePackDidReceiveError:(NSNotification *)notification {
     MGLOfflinePack *pack = notification.object;
     NSAssert([pack isKindOfClass:[MGLOfflinePack class]], @"MGLOfflineStorage notification has a non-pack object.");
-    
+
     NSError *error = notification.userInfo[MGLOfflinePackUserInfoKeyError];
     NSAssert([error isKindOfClass:[NSError class]], @"MGLOfflineStorage notification has a non-error error.");
-    
+
     NSString *message = [NSString stringWithFormat:@"Mapbox GL encountered an error while downloading the offline pack “%@”: %@", pack.name, error.localizedFailureReason];
     if (error.code == MGLErrorCodeConnectionFailed) {
         NSLog(@"%@", message);
@@ -260,7 +260,7 @@ static NSString * const MBXOfflinePacksTableViewActiveCellReuseIdentifier = @"Ac
 - (void)offlinePackDidReceiveMaximumAllowedMapboxTiles:(NSNotification *)notification {
     MGLOfflinePack *pack = notification.object;
     NSAssert([pack isKindOfClass:[MGLOfflinePack class]], @"MGLOfflineStorage notification has a non-pack object.");
-    
+
     uint64_t maximumCount = [notification.userInfo[MGLOfflinePackUserInfoKeyMaximumCount] unsignedLongLongValue];
     NSLog(@"Offline pack “%@” reached limit of %llu tiles.", pack.name, maximumCount);
 }

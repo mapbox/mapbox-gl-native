@@ -15,7 +15,7 @@ MGL_EXPORT
 
 /**
  Determines whether the output may contain minutes of arc when nonzero.
- 
+
  The default value of this property is `YES`, causing the receiver to include
  minutes of arc in its output. If `allowsSeconds` is `YES`, this property is
  ignored and the output always includes minutes of arc.
@@ -24,7 +24,7 @@ MGL_EXPORT
 
 /**
  Determines whether the output may contain seconds of arc when nonzero.
- 
+
  The default value of this property is `YES`, causing the receiver to include
  seconds of arc in its output.
  */
@@ -32,14 +32,14 @@ MGL_EXPORT
 
 /**
  The unit style used by this formatter.
- 
+
  The default value of this property is `NSFormattingUnitStyleMedium`.
  */
 @property (nonatomic) NSFormattingUnitStyle unitStyle;
 
 /**
  Returns a coordinate string for the provided value.
- 
+
  @param coordinate The coordinate’s value.
  @return The coordinate string appropriately formatted for the formatter’s
     locale.

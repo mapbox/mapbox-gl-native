@@ -5,11 +5,14 @@
 #include <mbgl/style/layer.hpp>
 #include <mbgl/style/filter.hpp>
 #include <mbgl/style/property_value.hpp>
+#include <mbgl/style/data_driven_property_value.hpp>
 
 #include <mbgl/util/color.hpp>
 
 namespace mbgl {
 namespace style {
+
+class TransitionOptions;
 
 class CircleLayer : public Layer {
 public:
@@ -26,45 +29,55 @@ public:
 
     // Paint properties
 
-    static PropertyValue<float> getDefaultCircleRadius();
-    PropertyValue<float> getCircleRadius(const optional<std::string>& klass = {}) const;
-    void setCircleRadius(PropertyValue<float>, const optional<std::string>& klass = {});
+    static DataDrivenPropertyValue<float> getDefaultCircleRadius();
+    DataDrivenPropertyValue<float> getCircleRadius(const optional<std::string>& klass = {}) const;
+    void setCircleRadius(DataDrivenPropertyValue<float>, const optional<std::string>& klass = {});
+    void setCircleRadiusTransition(const TransitionOptions&, const optional<std::string>& klass = {});
 
-    static PropertyValue<Color> getDefaultCircleColor();
-    PropertyValue<Color> getCircleColor(const optional<std::string>& klass = {}) const;
-    void setCircleColor(PropertyValue<Color>, const optional<std::string>& klass = {});
+    static DataDrivenPropertyValue<Color> getDefaultCircleColor();
+    DataDrivenPropertyValue<Color> getCircleColor(const optional<std::string>& klass = {}) const;
+    void setCircleColor(DataDrivenPropertyValue<Color>, const optional<std::string>& klass = {});
+    void setCircleColorTransition(const TransitionOptions&, const optional<std::string>& klass = {});
 
-    static PropertyValue<float> getDefaultCircleBlur();
-    PropertyValue<float> getCircleBlur(const optional<std::string>& klass = {}) const;
-    void setCircleBlur(PropertyValue<float>, const optional<std::string>& klass = {});
+    static DataDrivenPropertyValue<float> getDefaultCircleBlur();
+    DataDrivenPropertyValue<float> getCircleBlur(const optional<std::string>& klass = {}) const;
+    void setCircleBlur(DataDrivenPropertyValue<float>, const optional<std::string>& klass = {});
+    void setCircleBlurTransition(const TransitionOptions&, const optional<std::string>& klass = {});
 
-    static PropertyValue<float> getDefaultCircleOpacity();
-    PropertyValue<float> getCircleOpacity(const optional<std::string>& klass = {}) const;
-    void setCircleOpacity(PropertyValue<float>, const optional<std::string>& klass = {});
+    static DataDrivenPropertyValue<float> getDefaultCircleOpacity();
+    DataDrivenPropertyValue<float> getCircleOpacity(const optional<std::string>& klass = {}) const;
+    void setCircleOpacity(DataDrivenPropertyValue<float>, const optional<std::string>& klass = {});
+    void setCircleOpacityTransition(const TransitionOptions&, const optional<std::string>& klass = {});
 
     static PropertyValue<std::array<float, 2>> getDefaultCircleTranslate();
     PropertyValue<std::array<float, 2>> getCircleTranslate(const optional<std::string>& klass = {}) const;
     void setCircleTranslate(PropertyValue<std::array<float, 2>>, const optional<std::string>& klass = {});
+    void setCircleTranslateTransition(const TransitionOptions&, const optional<std::string>& klass = {});
 
     static PropertyValue<TranslateAnchorType> getDefaultCircleTranslateAnchor();
     PropertyValue<TranslateAnchorType> getCircleTranslateAnchor(const optional<std::string>& klass = {}) const;
     void setCircleTranslateAnchor(PropertyValue<TranslateAnchorType>, const optional<std::string>& klass = {});
+    void setCircleTranslateAnchorTransition(const TransitionOptions&, const optional<std::string>& klass = {});
 
     static PropertyValue<CirclePitchScaleType> getDefaultCirclePitchScale();
     PropertyValue<CirclePitchScaleType> getCirclePitchScale(const optional<std::string>& klass = {}) const;
     void setCirclePitchScale(PropertyValue<CirclePitchScaleType>, const optional<std::string>& klass = {});
+    void setCirclePitchScaleTransition(const TransitionOptions&, const optional<std::string>& klass = {});
 
-    static PropertyValue<float> getDefaultCircleStrokeWidth();
-    PropertyValue<float> getCircleStrokeWidth(const optional<std::string>& klass = {}) const;
-    void setCircleStrokeWidth(PropertyValue<float>, const optional<std::string>& klass = {});
+    static DataDrivenPropertyValue<float> getDefaultCircleStrokeWidth();
+    DataDrivenPropertyValue<float> getCircleStrokeWidth(const optional<std::string>& klass = {}) const;
+    void setCircleStrokeWidth(DataDrivenPropertyValue<float>, const optional<std::string>& klass = {});
+    void setCircleStrokeWidthTransition(const TransitionOptions&, const optional<std::string>& klass = {});
 
-    static PropertyValue<Color> getDefaultCircleStrokeColor();
-    PropertyValue<Color> getCircleStrokeColor(const optional<std::string>& klass = {}) const;
-    void setCircleStrokeColor(PropertyValue<Color>, const optional<std::string>& klass = {});
+    static DataDrivenPropertyValue<Color> getDefaultCircleStrokeColor();
+    DataDrivenPropertyValue<Color> getCircleStrokeColor(const optional<std::string>& klass = {}) const;
+    void setCircleStrokeColor(DataDrivenPropertyValue<Color>, const optional<std::string>& klass = {});
+    void setCircleStrokeColorTransition(const TransitionOptions&, const optional<std::string>& klass = {});
 
-    static PropertyValue<float> getDefaultCircleStrokeOpacity();
-    PropertyValue<float> getCircleStrokeOpacity(const optional<std::string>& klass = {}) const;
-    void setCircleStrokeOpacity(PropertyValue<float>, const optional<std::string>& klass = {});
+    static DataDrivenPropertyValue<float> getDefaultCircleStrokeOpacity();
+    DataDrivenPropertyValue<float> getCircleStrokeOpacity(const optional<std::string>& klass = {}) const;
+    void setCircleStrokeOpacity(DataDrivenPropertyValue<float>, const optional<std::string>& klass = {});
+    void setCircleStrokeOpacityTransition(const TransitionOptions&, const optional<std::string>& klass = {});
 
     // Private implementation
 

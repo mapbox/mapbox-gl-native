@@ -27,7 +27,7 @@ var tile_raster   = readFixture('raster.tile');
 var tile_vector   = readFixture('vector.tile');
 
 test('Memory', function(t) {
-    // Trigger garbage collection before starting test, then initialize 
+    // Trigger garbage collection before starting test, then initialize
     // heap size
     if (typeof gc === 'function') gc();
     var lastHeapSize = process.memoryUsage()['heapUsed'];
@@ -86,7 +86,7 @@ test('Memory', function(t) {
             if (renderCount % (testParams.numRenderings / 10) == 0) {
                 // Manually trigger garbage collection
                 if (typeof gc === 'function') gc();
-                
+
                 var currentHeapSize = process.memoryUsage()['heapUsed'];
 
                 // Print some progress, so slow build bots don't timeout.

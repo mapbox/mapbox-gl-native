@@ -2,11 +2,8 @@ package com.mapbox.mapboxsdk.testapp.activity.offline;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
@@ -36,6 +33,12 @@ import java.util.ArrayList;
 
 import timber.log.Timber;
 
+/**
+ * Test activity showcasing the Offline API.
+ * <p>
+ * Shows a map of Manhattan and allows the user to download and name a region.
+ * </p>
+ */
 public class OfflineActivity extends AppCompatActivity
   implements OfflineDownloadRegionDialog.DownloadRegionDialogListener {
 
@@ -68,18 +71,9 @@ public class OfflineActivity extends AppCompatActivity
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_offline);
 
-    Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-    setSupportActionBar(toolbar);
-
-    ActionBar actionBar = getSupportActionBar();
-    if (actionBar != null) {
-      actionBar.setDisplayHomeAsUpEnabled(true);
-      actionBar.setDisplayShowHomeEnabled(true);
-    }
-
     // You can use Mapbox.setConnected(Boolean) to manually set the connectivity
     // state of your app. This will override any checks performed via the ConnectivityManager.
-    //Mapbox.getInstance().setConnected(false);
+    // Mapbox.getInstance().setConnected(false);
     Boolean connected = Mapbox.isConnected();
     Timber.d(String.format(MapboxConstants.MAPBOX_LOCALE,
       "Mapbox is connected: %b", connected));
@@ -169,17 +163,6 @@ public class OfflineActivity extends AppCompatActivity
   public void onLowMemory() {
     super.onLowMemory();
     mapView.onLowMemory();
-  }
-
-  @Override
-  public boolean onOptionsItemSelected(MenuItem item) {
-    switch (item.getItemId()) {
-      case android.R.id.home:
-        onBackPressed();
-        return true;
-      default:
-        return super.onOptionsItemSelected(item);
-    }
   }
 
   /*
@@ -283,6 +266,7 @@ public class OfflineActivity extends AppCompatActivity
         if (status.isComplete()) {
           // Download complete
           endProgress("Region downloaded successfully.");
+          offlineRegion.setObserver(null);
           return;
         } else if (status.isRequiredResourceCountPrecise()) {
           // Switch to determinate state
@@ -300,6 +284,7 @@ public class OfflineActivity extends AppCompatActivity
       public void onError(OfflineRegionError error) {
         Timber.e("onError reason: " + error.getReason());
         Timber.e("onError message: " + error.getMessage());
+        offlineRegion.setObserver(null);
       }
 
       @Override

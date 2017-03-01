@@ -11,7 +11,7 @@ import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.Projection;
 import com.mapbox.mapboxsdk.maps.UiSettings;
-import com.mapbox.mapboxsdk.utils.MathUtils;
+import com.mapbox.services.android.telemetry.utils.MathUtils;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -259,7 +259,7 @@ public final class CameraUpdateFactory {
         float scaleX = (uiSettings.getWidth() - padding.left - padding.right) / width;
         float scaleY = (uiSettings.getHeight() - padding.top - padding.bottom) / height;
         minScale = scaleX < scaleY ? scaleX : scaleY;
-        zoom = calculateZoom(mapboxMap, minScale);
+        zoom = projection.calculateZoom(minScale);
         zoom = MathUtils.clamp(zoom, mapboxMap.getMinZoomLevel(), mapboxMap.getMaxZoomLevel());
       }
 
@@ -276,16 +276,6 @@ public final class CameraUpdateFactory {
         .tilt(0)
         .bearing(0)
         .build();
-    }
-
-    /**
-     * Calculates a zoom level based on minimum scale and current scale from MapView
-     *
-     * @param minScale The minimum scale to calculate the zoom level.
-     * @return zoom level that fits the MapView.
-     */
-    public double calculateZoom(MapboxMap mapboxMap, float minScale) {
-      return Math.log(mapboxMap.getCameraPosition().zoom * minScale) / Math.log(2);
     }
   }
 

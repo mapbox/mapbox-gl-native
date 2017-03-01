@@ -63,7 +63,7 @@ typedef void (^NetworkUnreachable)(MGLReachability * reachability);
 
 +(instancetype)reachabilityWithHostname:(NSString*)hostname;
 // This is identical to the function above, but is here to maintain
-//compatibility with Apples original code. (see .m)
+// compatibility with Apples original code. (see .m)
 +(instancetype)reachabilityWithHostName:(NSString*)hostname;
 +(instancetype)reachabilityForInternetConnection;
 +(instancetype)reachabilityWithAddress:(void *)hostAddress;

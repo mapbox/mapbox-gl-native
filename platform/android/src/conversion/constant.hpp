@@ -76,7 +76,7 @@ struct Converter<jni::jobject*, T, typename std::enable_if<std::is_integral<T>::
     }
 };
 
-//TODO: convert integral types to primitive jni types
+// TODO: convert integral types to primitive jni types
 
 template <>
 struct Converter<jni::jobject*, std::string> {

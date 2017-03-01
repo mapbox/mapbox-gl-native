@@ -14,6 +14,7 @@ FOUNDATION_EXPORT MGL_EXPORT const unsigned char MapboxVersionString[];
 #import "MGLClockDirectionFormatter.h"
 #import "MGLCompassDirectionFormatter.h"
 #import "MGLCoordinateFormatter.h"
+#import "MGLDistanceFormatter.h"
 #import "MGLFeature.h"
 #import "MGLGeometry.h"
 #import "MGLMapCamera.h"

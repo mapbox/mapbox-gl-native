@@ -7,7 +7,7 @@
 
 - (void)layoutSubviews {
     [super layoutSubviews];
-    
+
     self.layer.borderColor = [UIColor blueColor].CGColor;
     self.layer.borderWidth = 1;
     self.layer.cornerRadius = 2;
@@ -16,7 +16,7 @@
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated
 {
     [super setSelected:selected animated:animated];
-    
+
     self.layer.borderColor = selected ? [UIColor blackColor].CGColor : [UIColor whiteColor].CGColor;
     self.layer.borderWidth = selected ? 2.0 : 0;
 }
@@ -24,7 +24,7 @@
 - (void)setDragState:(MGLAnnotationViewDragState)dragState animated:(BOOL)animated
 {
     [super setDragState:dragState animated:NO];
-    
+
     switch (dragState) {
         case MGLAnnotationViewDragStateNone:
             break;
@@ -46,7 +46,7 @@
             break;
         }
     }
-    
+
 }
 
 - (nullable id<CAAction>)actionForLayer:(CALayer *)layer forKey:(NSString *)event

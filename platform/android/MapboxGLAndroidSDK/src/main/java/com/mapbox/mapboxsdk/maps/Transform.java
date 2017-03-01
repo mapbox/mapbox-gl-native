@@ -73,7 +73,7 @@ final class Transform implements MapView.OnMapChangedListener {
   @Override
   public void onMapChanged(@MapView.MapChange int change) {
     if (change == REGION_DID_CHANGE_ANIMATED && cameraCancelableCallback != null) {
-      invalidateCameraPosition();
+      updateCameraPosition(invalidateCameraPosition());
       if (cameraCancelableCallback != null) {
         cameraCancelableCallback.onFinish();
         cameraCancelableCallback = null;
@@ -84,47 +84,50 @@ final class Transform implements MapView.OnMapChangedListener {
 
   @UiThread
   final void moveCamera(MapboxMap mapboxMap, CameraUpdate update, MapboxMap.CancelableCallback callback) {
-    cameraPosition = update.getCameraPosition(mapboxMap);
-    trackingSettings.resetTrackingModesIfRequired(cameraPosition);
-    cancelTransitions();
-    mapView.jumpTo(cameraPosition.bearing, cameraPosition.target, cameraPosition.tilt, cameraPosition.zoom);
-    if (callback != null) {
-      callback.onFinish();
+    CameraPosition cameraPosition = update.getCameraPosition(mapboxMap);
+    if (!cameraPosition.equals(this.cameraPosition)) {
+      trackingSettings.resetTrackingModesIfRequired(cameraPosition);
+      cancelTransitions();
+      mapView.jumpTo(cameraPosition.bearing, cameraPosition.target, cameraPosition.tilt, cameraPosition.zoom);
+      if (callback != null) {
+        callback.onFinish();
+      }
     }
   }
 
   @UiThread
   final void easeCamera(MapboxMap mapboxMap, CameraUpdate update, int durationMs, boolean easingInterpolator,
-                        boolean resetTrackingMode, final MapboxMap.CancelableCallback callback) {
-    cameraPosition = update.getCameraPosition(mapboxMap);
-    if (resetTrackingMode) {
+                        final MapboxMap.CancelableCallback callback) {
+    CameraPosition cameraPosition = update.getCameraPosition(mapboxMap);
+    if (!cameraPosition.equals(this.cameraPosition)) {
       trackingSettings.resetTrackingModesIfRequired(cameraPosition);
-    }
+      cancelTransitions();
+      if (callback != null) {
+        cameraCancelableCallback = callback;
+        mapView.addOnMapChangedListener(this);
+      }
 
-    cancelTransitions();
-    if (callback != null) {
-      cameraCancelableCallback = callback;
-      mapView.addOnMapChangedListener(this);
+      mapView.easeTo(cameraPosition.bearing, cameraPosition.target, getDurationNano(durationMs), cameraPosition.tilt,
+        cameraPosition.zoom, easingInterpolator);
     }
-
-    mapView.easeTo(cameraPosition.bearing, cameraPosition.target, getDurationNano(durationMs), cameraPosition.tilt,
-      cameraPosition.zoom, easingInterpolator);
   }
 
   @UiThread
   final void animateCamera(MapboxMap mapboxMap, CameraUpdate update, int durationMs,
                            final MapboxMap.CancelableCallback callback) {
-    cameraPosition = update.getCameraPosition(mapboxMap);
-    trackingSettings.resetTrackingModesIfRequired(cameraPosition);
+    CameraPosition cameraPosition = update.getCameraPosition(mapboxMap);
+    if (!cameraPosition.equals(this.cameraPosition)) {
+      trackingSettings.resetTrackingModesIfRequired(cameraPosition);
 
-    cancelTransitions();
-    if (callback != null) {
-      cameraCancelableCallback = callback;
-      mapView.addOnMapChangedListener(this);
+      cancelTransitions();
+      if (callback != null) {
+        cameraCancelableCallback = callback;
+        mapView.addOnMapChangedListener(this);
+      }
+
+      mapView.flyTo(cameraPosition.bearing, cameraPosition.target, getDurationNano(durationMs), cameraPosition.tilt,
+        cameraPosition.zoom);
     }
-
-    mapView.flyTo(cameraPosition.bearing, cameraPosition.target, getDurationNano(durationMs), cameraPosition.tilt,
-      cameraPosition.zoom);
   }
 
   @UiThread
@@ -186,6 +189,10 @@ final class Transform implements MapView.OnMapChangedListener {
     }
   }
 
+  void setZoom(double zoom) {
+    mapView.setZoom(zoom);
+  }
+
   // Direction
   double getBearing() {
     double direction = -mapView.getBearing();
@@ -216,6 +223,13 @@ final class Transform implements MapView.OnMapChangedListener {
       myLocationView.setBearing(bearing);
     }
     mapView.setBearing(bearing, focalX, focalY);
+  }
+
+  void setBearing(double bearing, float focalX, float focalY, long duration) {
+    if (myLocationView != null) {
+      myLocationView.setBearing(bearing);
+    }
+    mapView.setBearing(bearing, focalX, focalY, duration);
   }
 
 

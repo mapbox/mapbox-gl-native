@@ -20,7 +20,7 @@ namespace android {
         JNIEnv& env;
     };
 
-    //Instance
+    // Instance
 
     Value::Value(jni::JNIEnv& env, jni::jobject* _value) : jenv(env), value(_value, ObjectDeleter(env)) {}
 

@@ -48,8 +48,11 @@ set(MBGL_TEST_FILES
     test/src/mbgl/test/fake_file_source.hpp
     test/src/mbgl/test/fixture_log_observer.cpp
     test/src/mbgl/test/fixture_log_observer.hpp
+    test/src/mbgl/test/getrss.cpp
+    test/src/mbgl/test/getrss.hpp
     test/src/mbgl/test/stub_file_source.cpp
     test/src/mbgl/test/stub_file_source.hpp
+    test/src/mbgl/test/stub_geometry_tile_feature.hpp
     test/src/mbgl/test/stub_layer_observer.hpp
     test/src/mbgl/test/stub_style_observer.hpp
     test/src/mbgl/test/stub_tile_observer.hpp
@@ -68,15 +71,22 @@ set(MBGL_TEST_FILES
     test/storage/offline_download.test.cpp
     test/storage/online_file_source.test.cpp
     test/storage/resource.test.cpp
+    test/storage/sqlite.test.cpp
 
     # style/conversion
     test/style/conversion/function.test.cpp
     test/style/conversion/geojson_options.test.cpp
+    test/style/conversion/layer.test.cpp
     test/style/conversion/stringify.test.cpp
 
     # style
     test/style/filter.test.cpp
-    test/style/functions.test.cpp
+
+    # style/function
+    test/style/function/camera_function.test.cpp
+    test/style/function/source_function.test.cpp
+
+    # style
     test/style/group_by_layout.test.cpp
     test/style/paint_property.test.cpp
     test/style/source.test.cpp

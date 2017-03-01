@@ -33,7 +33,7 @@ std::string iso8601(Timestamp timestamp) {
 Timestamp parseTimestamp(const char* timestamp) {
     return std::chrono::time_point_cast<Seconds>(std::chrono::system_clock::from_time_t(parse_date(timestamp)));
 }
-    
+
 Timestamp parseTimestamp(const int32_t timestamp) {
     return std::chrono::time_point_cast<Seconds>(std::chrono::system_clock::from_time_t(timestamp));
 }

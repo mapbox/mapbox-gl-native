@@ -1,0 +1,75 @@
+﻿/* Accessibility hint */
+"ANNOTATION_A11Y_HINT" = "Hiển thị thêm thông tin";
+
+/* No comment provided by engineer. */
+"API_CLIENT_400_DESC" = "Tác vụ lấy dữ liệu của phiên làm việc bị thất bại. Yêu cầu ban đầu là: %@";
+
+/* No comment provided by engineer. */
+"API_CLIENT_400_REASON" = "Mã trạng thái là %ld";
+
+/* No comment provided by engineer. */
+"CANCEL" = "Hủy bỏ";
+
+/* Accessibility hint */
+"COMPASS_A11Y_HINT" = "Quay bản đồ về hướng bắc";
+
+/* Accessibility label */
+"COMPASS_A11Y_LABEL" = "La bàn";
+
+/* Compass abbreviation for north */
+"COMPASS_NORTH" = "B";
+
+/* Instructions in Interface Builder designable; {key}, {plist file name} */
+"DESIGNABLE" = "Để hiển thị bản đồ do Mapbox phục vụ tại đây, đặt %1$@ là dấu hiệu truy cập của bạn trong %2$@\n\nXem hướng dẫn chi tiết tại:";
+
+/* Setup documentation URL display string; keep as short as possible */
+"FIRST_STEPS_URL" = "mapbox.com/help/first-steps-ios-sdk";
+
+/* Accessibility hint */
+"INFO_A11Y_HINT" = "Hiển thị lời ghi công, biểu mẫu phản hồi, và thêm nữa";
+
+/* Accessibility label */
+"INFO_A11Y_LABEL" = "Giới thiệu về bản đồ này";
+
+/* Accessibility label */
+"LOGO_A11Y_LABEL" = "Mapbox";
+
+/* Accessibility label */
+"MAP_A11Y_LABEL" = "Bản đồ";
+
+/* Map accessibility value */
+"MAP_A11Y_VALUE" = "Thu phóng gấp %1$d lần\n%2$ld chú thích đang xuất hiện";
+
+/* Action sheet title */
+"SDK_NAME" = "Mapbox iOS SDK";
+
+/* Telemetry prompt message */
+"TELEMETRY_DISABLED_MSG" = "Hãy giúp cải tiến các bản đồ OpenStreetMap và Mapbox bằng cách đóng góp dữ liệu vô danh hóa về cách sử dụng.";
+
+/* Telemetry prompt button */
+"TELEMETRY_DISABLED_OFF" = "Không Tham gia";
+
+/* Telemetry prompt button */
+"TELEMETRY_DISABLED_ON" = "Tham gia";
+
+/* Telemetry prompt message */
+"TELEMETRY_ENABLED_MSG" = "Bạn đang giúp cải tiến các bản đồ OpenStreetMap và Mapbox bằng cách đóng góp dữ liệu vô danh hóa về cách sử dụng.";
+
+/* Telemetry prompt button */
+"TELEMETRY_ENABLED_OFF" = "Ngừng Tham gia";
+
+/* Telemetry prompt button */
+"TELEMETRY_ENABLED_ON" = "Tiếp tục Tham gia";
+
+/* Telemetry prompt button */
+"TELEMETRY_MORE" = "Tìm hiểu Thêm";
+
+/* Action in attribution sheet */
+"TELEMETRY_NAME" = "Trình viễn trắc Mapbox";
+
+/* Telemetry prompt title */
+"TELEMETRY_TITLE" = "Cải tiến các Bản đồ Mapbox";
+
+/* Default user location annotation title */
+"USER_DOT_TITLE" = "Bạn ở Đây";
+

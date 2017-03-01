@@ -125,6 +125,14 @@ public class MarkerViewManager implements MapView.OnMapChangedListener {
     }
   }
 
+  public void setRotation(@NonNull MarkerView marker, float rotation) {
+    View convertView = markerViewMap.get(marker);
+    if (convertView != null) {
+      convertView.animate().cancel();
+      convertView.setRotation(rotation);
+    }
+  }
+
   /**
    * Animate a MarkerView to a given alpha value.
    * <p>
@@ -466,7 +474,6 @@ public class MarkerViewManager implements MapView.OnMapChangedListener {
           if (adapter.getMarkerClass().equals(marker.getClass())) {
             adapter.prepareViewForReuse(marker, convertView);
             adapter.releaseView(convertView);
-            marker.setMapboxMap(null);
             iterator.remove();
           }
         }
@@ -573,7 +580,7 @@ public class MarkerViewManager implements MapView.OnMapChangedListener {
     if (view != null) {
       if (marker.getWidth() == 0) {
         if (view.getMeasuredWidth() == 0) {
-          //Ensure the marker's view is measured first
+          // Ensure the marker's view is measured first
           view.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
         }
         marker.setWidth(view.getMeasuredWidth());

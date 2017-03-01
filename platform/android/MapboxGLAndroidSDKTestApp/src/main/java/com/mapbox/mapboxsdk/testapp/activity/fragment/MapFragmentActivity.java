@@ -2,10 +2,7 @@ package com.mapbox.mapboxsdk.testapp.activity.fragment;
 
 import android.app.FragmentTransaction;
 import android.os.Bundle;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.view.MenuItem;
 
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
@@ -17,6 +14,12 @@ import com.mapbox.mapboxsdk.maps.MapboxMapOptions;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.R;
 
+/**
+ * Test activity showcasing using the MapFragment API using SDK Fragments.
+ * <p>
+ * Uses MapboxMapOptions to initialise the Fragment.
+ * </p>
+ */
 public class MapFragmentActivity extends AppCompatActivity implements OnMapReadyCallback {
 
   private MapboxMap mapboxMap;
@@ -25,15 +28,6 @@ public class MapFragmentActivity extends AppCompatActivity implements OnMapReady
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_map_fragment);
-
-    Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-    setSupportActionBar(toolbar);
-
-    ActionBar actionBar = getSupportActionBar();
-    if (actionBar != null) {
-      actionBar.setDisplayHomeAsUpEnabled(true);
-      actionBar.setDisplayShowHomeEnabled(true);
-    }
 
     MapFragment mapFragment;
     if (savedInstanceState == null) {
@@ -74,16 +68,5 @@ public class MapFragmentActivity extends AppCompatActivity implements OnMapReady
     mapboxMap = map;
     mapboxMap.animateCamera(
       CameraUpdateFactory.newCameraPosition(new CameraPosition.Builder().tilt(45.0).build()), 10000);
-  }
-
-  @Override
-  public boolean onOptionsItemSelected(MenuItem item) {
-    switch (item.getItemId()) {
-      case android.R.id.home:
-        onBackPressed();
-        return true;
-      default:
-        return super.onOptionsItemSelected(item);
-    }
   }
 }

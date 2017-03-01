@@ -35,7 +35,7 @@
     if (!self.mapboxStreets) {
         return @{};
     }
-    
+
     // Replace {name} and {name_*} with the matching localized name tag.
     NSString *localizedKey = preferredLanguage ? [NSString stringWithFormat:@"name_%@", preferredLanguage] : @"name";
     NSMutableDictionary *localizedKeysByKey = [NSMutableDictionary dictionaryWithObject:localizedKey forKey:@"name"];

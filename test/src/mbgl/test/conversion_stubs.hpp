@@ -24,7 +24,7 @@ class Value : public mbgl::variant<std::string,
 };
 
 inline bool isUndefined(const Value&) {
-    //Variant is always intialized
+    // Variant is always intialized
     return false;
 }
 

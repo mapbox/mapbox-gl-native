@@ -2,10 +2,7 @@ package com.mapbox.mapboxsdk.testapp.activity.annotation;
 
 import android.graphics.RectF;
 import android.os.Bundle;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
@@ -33,11 +30,10 @@ public class MarkerViewsInRectangleActivity extends AppCompatActivity implements
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_marker_view_in_rect);
-    setupActionBar();
 
     selectionBox = findViewById(R.id.selection_box);
 
-    //Initialize map as normal
+    // Initialize map as normal
     mapView = (MapView) findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
     mapView.getMapAsync(this);
@@ -53,14 +49,14 @@ public class MarkerViewsInRectangleActivity extends AppCompatActivity implements
 
   @Override
   public void onClick(View view) {
-    //Query
+    // Query
     int top = selectionBox.getTop() - mapView.getTop();
     int left = selectionBox.getLeft() - mapView.getLeft();
     RectF box = new RectF(left, top, left + selectionBox.getWidth(), top + selectionBox.getHeight());
     Timber.i(String.format("Querying box %s", box));
     List<MarkerView> markers = mapboxMap.getMarkerViewsInRect(box);
 
-    //Show count
+    // Show count
     Toast.makeText(
       MarkerViewsInRectangleActivity.this,
       String.format("%s markers inside box", markers.size()),
@@ -107,27 +103,5 @@ public class MarkerViewsInRectangleActivity extends AppCompatActivity implements
   public void onLowMemory() {
     super.onLowMemory();
     mapView.onLowMemory();
-  }
-
-  @Override
-  public boolean onOptionsItemSelected(MenuItem item) {
-    switch (item.getItemId()) {
-      case android.R.id.home:
-        onBackPressed();
-        return true;
-      default:
-        return super.onOptionsItemSelected(item);
-    }
-  }
-
-  private void setupActionBar() {
-    Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-    setSupportActionBar(toolbar);
-
-    final ActionBar actionBar = getSupportActionBar();
-    if (actionBar != null) {
-      actionBar.setDisplayHomeAsUpEnabled(true);
-      actionBar.setDisplayShowHomeEnabled(true);
-    }
   }
 }

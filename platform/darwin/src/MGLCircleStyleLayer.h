@@ -1,4 +1,4 @@
-// This file is generated. 
+// This file is generated.
 // Edit platform/darwin/scripts/generate-style-code.js, then run `make style-code-darwin`.
 
 #import "MGLFoundation.h"
@@ -9,7 +9,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  Controls the scaling behavior of the circle when the map is pitched.
- 
+
  Values of this type are used in the `MGLCircleStyleLayer.circleScaleAlignment`
  property.
  */
@@ -26,7 +26,7 @@ typedef NS_ENUM(NSUInteger, MGLCircleScaleAlignment) {
 
 /**
  Controls the translation reference point.
- 
+
  Values of this type are used in the `MGLCircleStyleLayer.circleTranslationAnchor`
  property.
  */
@@ -54,23 +54,23 @@ typedef NS_ENUM(NSUInteger, MGLCircleTranslationAnchor) {
  To display circles on the map whose radii correspond to real-world distances,
  use many-sided regular polygons and configure their appearance using an
  `MGLFillStyleLayer` object.
- 
+
  You can access an existing circle style layer using the
  `-[MGLStyle layerWithIdentifier:]` method if you know its identifier;
  otherwise, find it using the `MGLStyle.layers` property. You can also create a
  new circle style layer and add it to the style using a method such as
  `-[MGLStyle addLayer:]`.
- 
+
  ### Example
- 
+
  ```swift
  let layer = MGLCircleStyleLayer(identifier: "circles", source: population)
  layer.sourceLayerIdentifier = "population"
  layer.circleColor = MGLStyleValue(rawValue: .green)
- layer.circleRadius = MGLStyleValue(interpolationBase: 1.75, stops: [
-     12: MGLStyleValue(rawValue: 2),
-     22: MGLStyleValue(rawValue: 180)
- ])
+ layer.circleRadius = MGLStyleValue(interpolationMode: .exponential,
+                                    cameraStops: [12: MGLStyleValue(rawValue: 2),
+                                                  22: MGLStyleValue(rawValue: 180)],
+                                    options: [.interpolationBase: 1.75])
  layer.circleOpacity = MGLStyleValue(rawValue: 0.7)
  layer.predicate = NSPredicate(format: "%K == %@", "marital-status", "married")
  mapView.style?.addLayer(layer)
@@ -88,6 +88,22 @@ MGL_EXPORT
  The default value of this property is an `MGLStyleValue` object containing an
  `NSNumber` object containing the float `0`. Set this property to `nil` to reset
  it to the default value.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLStyleConstantValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+ * `MGLSourceStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
+   * `MGLInterpolationModeIdentity`
+ * `MGLCompositeStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *circleBlur;
 
@@ -98,6 +114,22 @@ MGL_EXPORT
  The default value of this property is an `MGLStyleValue` object containing
  `UIColor.blackColor`. Set this property to `nil` to reset it to the default
  value.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLStyleConstantValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+ * `MGLSourceStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
+   * `MGLInterpolationModeIdentity`
+ * `MGLCompositeStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<UIColor *> *circleColor;
 #else
@@ -107,6 +139,22 @@ MGL_EXPORT
  The default value of this property is an `MGLStyleValue` object containing
  `NSColor.blackColor`. Set this property to `nil` to reset it to the default
  value.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLStyleConstantValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+ * `MGLSourceStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
+   * `MGLInterpolationModeIdentity`
+ * `MGLCompositeStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSColor *> *circleColor;
 #endif
@@ -117,6 +165,22 @@ MGL_EXPORT
  The default value of this property is an `MGLStyleValue` object containing an
  `NSNumber` object containing the float `1`. Set this property to `nil` to reset
  it to the default value.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLStyleConstantValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+ * `MGLSourceStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
+   * `MGLInterpolationModeIdentity`
+ * `MGLCompositeStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *circleOpacity;
 
@@ -128,6 +192,22 @@ MGL_EXPORT
  The default value of this property is an `MGLStyleValue` object containing an
  `NSNumber` object containing the float `5`. Set this property to `nil` to reset
  it to the default value.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLStyleConstantValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+ * `MGLSourceStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
+   * `MGLInterpolationModeIdentity`
+ * `MGLCompositeStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *circleRadius;
 
@@ -141,6 +221,12 @@ MGL_EXPORT
  This attribute corresponds to the <a
  href="https://www.mapbox.com/mapbox-gl-style-spec/#paint-circle-pitch-scale"><code>circle-pitch-scale</code></a>
  layout property in the Mapbox Style Specification.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLStyleConstantValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of
+ `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *circleScaleAlignment;
 
@@ -153,6 +239,22 @@ MGL_EXPORT
  The default value of this property is an `MGLStyleValue` object containing
  `UIColor.blackColor`. Set this property to `nil` to reset it to the default
  value.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLStyleConstantValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+ * `MGLSourceStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
+   * `MGLInterpolationModeIdentity`
+ * `MGLCompositeStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<UIColor *> *circleStrokeColor;
 #else
@@ -162,6 +264,22 @@ MGL_EXPORT
  The default value of this property is an `MGLStyleValue` object containing
  `NSColor.blackColor`. Set this property to `nil` to reset it to the default
  value.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLStyleConstantValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+ * `MGLSourceStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
+   * `MGLInterpolationModeIdentity`
+ * `MGLCompositeStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSColor *> *circleStrokeColor;
 #endif
@@ -172,18 +290,50 @@ MGL_EXPORT
  The default value of this property is an `MGLStyleValue` object containing an
  `NSNumber` object containing the float `1`. Set this property to `nil` to reset
  it to the default value.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLStyleConstantValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+ * `MGLSourceStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
+   * `MGLInterpolationModeIdentity`
+ * `MGLCompositeStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *circleStrokeOpacity;
 
 /**
  The width of the circle's stroke. Strokes are placed outside of the
- "circle-radius".
+ `circleRadius`.
  
  This property is measured in points.
  
  The default value of this property is an `MGLStyleValue` object containing an
  `NSNumber` object containing the float `0`. Set this property to `nil` to reset
  it to the default value.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLStyleConstantValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+ * `MGLSourceStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
+   * `MGLInterpolationModeIdentity`
+ * `MGLCompositeStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *circleStrokeWidth;
 
@@ -200,6 +350,13 @@ MGL_EXPORT
  This attribute corresponds to the <a
  href="https://www.mapbox.com/mapbox-gl-style-spec/#paint-circle-translate"><code>circle-translate</code></a>
  layout property in the Mapbox Style Specification.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLStyleConstantValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *circleTranslation;
 #else
@@ -215,6 +372,13 @@ MGL_EXPORT
  This attribute corresponds to the <a
  href="https://www.mapbox.com/mapbox-gl-style-spec/#paint-circle-translate"><code>circle-translate</code></a>
  layout property in the Mapbox Style Specification.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLStyleConstantValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *circleTranslation;
 #endif
@@ -234,6 +398,12 @@ MGL_EXPORT
  This attribute corresponds to the <a
  href="https://www.mapbox.com/mapbox-gl-style-spec/#paint-circle-translate-anchor"><code>circle-translate-anchor</code></a>
  layout property in the Mapbox Style Specification.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLStyleConstantValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of
+ `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *circleTranslationAnchor;
 

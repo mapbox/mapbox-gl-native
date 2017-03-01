@@ -7,6 +7,7 @@ import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
+import android.support.annotation.UiThread;
 
 import com.mapbox.mapboxsdk.Mapbox;
 
@@ -27,11 +28,9 @@ public class ConnectivityReceiver extends BroadcastReceiver {
    */
   public static synchronized ConnectivityReceiver instance(Context context) {
     if (INSTANCE == null) {
-      //Register new instance
-      INSTANCE = new ConnectivityReceiver();
-      context.registerReceiver(INSTANCE, new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE"));
-
-      //Add default listeners
+      // Register new instance
+      INSTANCE = new ConnectivityReceiver(context.getApplicationContext());
+      // Add default listeners
       INSTANCE.addListener(new NativeConnectivityListener());
     }
 
@@ -39,8 +38,39 @@ public class ConnectivityReceiver extends BroadcastReceiver {
   }
 
   private List<ConnectivityListener> listeners = new CopyOnWriteArrayList<>();
+  private Context context;
+  private int activationCounter;
 
-  private ConnectivityReceiver() {
+  private ConnectivityReceiver(@NonNull Context context) {
+    this.context = context;
+  }
+
+  /**
+   * Activates the connectivity receiver.
+   * <p>
+   * if the underlying connectivity receiver isn't active, register the connectivity receiver.
+   * </p>
+   */
+  @UiThread
+  public void activate() {
+    if (activationCounter == 0) {
+      context.registerReceiver(INSTANCE, new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE"));
+    }
+    activationCounter++;
+  }
+
+  /**
+   * Deactivates the connectivity receiver.
+   * <p>
+   * if no other components are listening, unregister the underlying connectivity receiver.
+   * </p>
+   */
+  @UiThread
+  public void deactivate() {
+    activationCounter--;
+    if (activationCounter == 0) {
+      context.unregisterReceiver(INSTANCE);
+    }
   }
 
   /**
@@ -51,7 +81,7 @@ public class ConnectivityReceiver extends BroadcastReceiver {
     boolean connected = isConnected(context);
     Timber.v("Connected: " + connected);
 
-    //Loop over listeners
+    // Loop over listeners
     for (ConnectivityListener listener : listeners) {
       listener.onNetworkStateChanged(connected);
     }
@@ -92,5 +122,4 @@ public class ConnectivityReceiver extends BroadcastReceiver {
     NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
     return (activeNetwork != null && activeNetwork.isConnected());
   }
-
 }

@@ -12,6 +12,9 @@ task checkstyle(type: Checkstyle) {
     source 'src'
     include '**/*.java'
     exclude '**/gen/**'
+    exclude '**/style/layers/Property.java'
+    exclude '**/style/layers/PropertyFactory.java'
+    exclude '**/style/layers/*Layer.java'
     classpath = files()
     ignoreFailures = false
 }

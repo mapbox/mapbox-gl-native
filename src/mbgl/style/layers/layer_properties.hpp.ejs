@@ -10,22 +10,21 @@
 #include <mbgl/style/types.hpp>
 #include <mbgl/style/layout_property.hpp>
 #include <mbgl/style/paint_property.hpp>
+#include <mbgl/programs/attributes.hpp>
 
 namespace mbgl {
 namespace style {
 
 <% for (const property of layoutProperties) { -%>
-struct <%- camelize(property.name) %> : LayoutProperty<<%- propertyType(property) %>> {
+struct <%- camelize(property.name) %> : <%- layoutPropertyType(property, type) %> {
     static constexpr const char * key = "<%- property.name %>";
-    static <%- propertyType(property) %> defaultValue() { return <%- defaultValue(property) %>; }
+    static <%- evaluatedType(property) %> defaultValue() { return <%- defaultValue(property) %>; }
 };
 
 <% } -%>
 <% for (const property of paintProperties) { -%>
-struct <%- camelize(property.name) %> : <%
-if (/-pattern$/.test(property.name) || property.name === 'line-dasharray') {
-%>CrossFaded<% } -%>PaintProperty<<%- propertyType(property) %>> {
-    static <%- propertyType(property) %> defaultValue() { return <%- defaultValue(property) %>; }
+struct <%- camelize(property.name) %> : <%- paintPropertyType(property, type) %> {
+    static <%- evaluatedType(property) %> defaultValue() { return <%- defaultValue(property) %>; }
 };
 
 <% } -%>

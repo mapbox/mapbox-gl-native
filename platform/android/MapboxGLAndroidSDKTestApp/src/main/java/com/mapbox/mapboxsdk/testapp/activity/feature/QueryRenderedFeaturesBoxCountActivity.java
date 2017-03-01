@@ -2,10 +2,7 @@ package com.mapbox.mapboxsdk.testapp.activity.feature;
 
 import android.graphics.RectF;
 import android.os.Bundle;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
@@ -22,7 +19,7 @@ import java.util.Map;
 import timber.log.Timber;
 
 /**
- * Demo's query rendered features
+ * Test activity showcasing using the query rendered features API to count features in a rectangle.
  */
 public class QueryRenderedFeaturesBoxCountActivity extends AppCompatActivity {
 
@@ -33,11 +30,10 @@ public class QueryRenderedFeaturesBoxCountActivity extends AppCompatActivity {
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_query_features_box);
-    setupActionBar();
 
     final View selectionBox = findViewById(R.id.selection_box);
 
-    //Initialize map as normal
+    // Initialize map as normal
     mapView = (MapView) findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
     mapView.getMapAsync(new OnMapReadyCallback() {
@@ -48,20 +44,20 @@ public class QueryRenderedFeaturesBoxCountActivity extends AppCompatActivity {
         selectionBox.setOnClickListener(new View.OnClickListener() {
           @Override
           public void onClick(View view) {
-            //Query
+            // Query
             int top = selectionBox.getTop() - mapView.getTop();
             int left = selectionBox.getLeft() - mapView.getLeft();
             RectF box = new RectF(left, top, left + selectionBox.getWidth(), top + selectionBox.getHeight());
             Timber.i(String.format("Querying box %s", box));
             List<Feature> features = mapboxMap.queryRenderedFeatures(box);
 
-            //Show count
+            // Show count
             Toast.makeText(
               QueryRenderedFeaturesBoxCountActivity.this,
               String.format("%s features in box", features.size()),
               Toast.LENGTH_SHORT).show();
 
-            //Debug output
+            // Debug output
             debugOutput(features);
           }
         });
@@ -135,27 +131,4 @@ public class QueryRenderedFeaturesBoxCountActivity extends AppCompatActivity {
     super.onLowMemory();
     mapView.onLowMemory();
   }
-
-  @Override
-  public boolean onOptionsItemSelected(MenuItem item) {
-    switch (item.getItemId()) {
-      case android.R.id.home:
-        onBackPressed();
-        return true;
-      default:
-        return super.onOptionsItemSelected(item);
-    }
-  }
-
-  private void setupActionBar() {
-    Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-    setSupportActionBar(toolbar);
-
-    final ActionBar actionBar = getSupportActionBar();
-    if (actionBar != null) {
-      actionBar.setDisplayHomeAsUpEnabled(true);
-      actionBar.setDisplayShowHomeEnabled(true);
-    }
-  }
-
 }

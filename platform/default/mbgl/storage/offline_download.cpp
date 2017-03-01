@@ -252,7 +252,7 @@ void OfflineDownload::ensureResource(const Resource& resource,
     auto workRequestsIt = requests.insert(requests.begin(), nullptr);
     *workRequestsIt = util::RunLoop::Get()->invokeCancellable([=]() {
         requests.erase(workRequestsIt);
-        
+
         auto getResourceSizeInDatabase = [&] () -> optional<int64_t> {
             if (!callback) {
                 return offlineDatabase.hasRegionResource(id, resource);
@@ -264,7 +264,7 @@ void OfflineDownload::ensureResource(const Resource& resource,
             callback(response->first);
             return response->second;
         };
-        
+
         optional<int64_t> offlineResponse = getResourceSizeInDatabase();
         if (offlineResponse) {
             status.completedResourceCount++;

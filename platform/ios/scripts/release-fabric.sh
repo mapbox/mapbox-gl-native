@@ -15,7 +15,7 @@ echo "Downloading ${FILE_NAME}:"
 wget -P ${BINARY_DIRECTORY} http://mapbox.s3.amazonaws.com/mapbox-gl-native/ios/builds/${FILE_NAME}
 
 echo "Extracting ${ZIP_ARCHIVE_PATH} to ${BINARY_DIRECTORY}/${ZIP_OUTPUT}"
-unzip -q ${ZIP_ARCHIVE_PATH} -d ${BINARY_DIRECTORY}/${ZIP_OUTPUT}  
+unzip -q ${ZIP_ARCHIVE_PATH} -d ${BINARY_DIRECTORY}/${ZIP_OUTPUT}
 ditto ${BINARY_DIRECTORY}/${ZIP_OUTPUT}/static/Mapbox.framework ${BINARY_DIRECTORY}/Mapbox.framework
 
 echo "Zipping framework:"
@@ -25,7 +25,7 @@ cd $OLDPWD
 
 echo "Validating framework:"
 ./validate-fabric-zip.sh ${BINARY_DIRECTORY}/Mapbox.framework.zip
- 
+
 echo "Uploading ${BINARY_DIRECTORY}/Mapbox.framework.zip to https://kits.fabric.io/manage-api/v1/kit-releases/ios/$BUNDLE_ID/$PUBLISH_VERSION with key ${FABRIC_KIT_API_KEY}"
 curl --fail -v -X PUT -H "X-FabricKits-ApiKey: ${FABRIC_KIT_API_KEY}" \
     -F "release_artifact=@${BINARY_DIRECTORY}/Mapbox.framework.zip;type=application/octet-stream" \

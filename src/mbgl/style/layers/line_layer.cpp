@@ -122,34 +122,50 @@ void LineLayer::setLineRoundLimit(PropertyValue<float> value) {
 
 // Paint properties
 
-PropertyValue<float> LineLayer::getDefaultLineOpacity() {
+DataDrivenPropertyValue<float> LineLayer::getDefaultLineOpacity() {
     return { 1 };
 }
 
-PropertyValue<float> LineLayer::getLineOpacity(const optional<std::string>& klass) const {
+DataDrivenPropertyValue<float> LineLayer::getLineOpacity(const optional<std::string>& klass) const {
     return impl->paint.get<LineOpacity>(klass);
 }
 
-void LineLayer::setLineOpacity(PropertyValue<float> value, const optional<std::string>& klass) {
+void LineLayer::setLineOpacity(DataDrivenPropertyValue<float> value, const optional<std::string>& klass) {
     if (value == getLineOpacity(klass))
         return;
     impl->paint.set<LineOpacity>(value, klass);
-    impl->observer->onLayerPaintPropertyChanged(*this);
+    if (value.isDataDriven()) {
+        impl->observer->onLayerDataDrivenPaintPropertyChanged(*this);
+    } else {
+        impl->observer->onLayerPaintPropertyChanged(*this);
+    }
 }
 
-PropertyValue<Color> LineLayer::getDefaultLineColor() {
+void LineLayer::setLineOpacityTransition(const TransitionOptions& value, const optional<std::string>& klass) {
+    impl->paint.setTransition<LineOpacity>(value, klass);
+}
+
+DataDrivenPropertyValue<Color> LineLayer::getDefaultLineColor() {
     return { Color::black() };
 }
 
-PropertyValue<Color> LineLayer::getLineColor(const optional<std::string>& klass) const {
+DataDrivenPropertyValue<Color> LineLayer::getLineColor(const optional<std::string>& klass) const {
     return impl->paint.get<LineColor>(klass);
 }
 
-void LineLayer::setLineColor(PropertyValue<Color> value, const optional<std::string>& klass) {
+void LineLayer::setLineColor(DataDrivenPropertyValue<Color> value, const optional<std::string>& klass) {
     if (value == getLineColor(klass))
         return;
     impl->paint.set<LineColor>(value, klass);
-    impl->observer->onLayerPaintPropertyChanged(*this);
+    if (value.isDataDriven()) {
+        impl->observer->onLayerDataDrivenPaintPropertyChanged(*this);
+    } else {
+        impl->observer->onLayerPaintPropertyChanged(*this);
+    }
+}
+
+void LineLayer::setLineColorTransition(const TransitionOptions& value, const optional<std::string>& klass) {
+    impl->paint.setTransition<LineColor>(value, klass);
 }
 
 PropertyValue<std::array<float, 2>> LineLayer::getDefaultLineTranslate() {
@@ -167,6 +183,10 @@ void LineLayer::setLineTranslate(PropertyValue<std::array<float, 2>> value, cons
     impl->observer->onLayerPaintPropertyChanged(*this);
 }
 
+void LineLayer::setLineTranslateTransition(const TransitionOptions& value, const optional<std::string>& klass) {
+    impl->paint.setTransition<LineTranslate>(value, klass);
+}
+
 PropertyValue<TranslateAnchorType> LineLayer::getDefaultLineTranslateAnchor() {
     return { TranslateAnchorType::Map };
 }
@@ -180,6 +200,10 @@ void LineLayer::setLineTranslateAnchor(PropertyValue<TranslateAnchorType> value,
         return;
     impl->paint.set<LineTranslateAnchor>(value, klass);
     impl->observer->onLayerPaintPropertyChanged(*this);
+}
+
+void LineLayer::setLineTranslateAnchorTransition(const TransitionOptions& value, const optional<std::string>& klass) {
+    impl->paint.setTransition<LineTranslateAnchor>(value, klass);
 }
 
 PropertyValue<float> LineLayer::getDefaultLineWidth() {
@@ -197,49 +221,77 @@ void LineLayer::setLineWidth(PropertyValue<float> value, const optional<std::str
     impl->observer->onLayerPaintPropertyChanged(*this);
 }
 
-PropertyValue<float> LineLayer::getDefaultLineGapWidth() {
+void LineLayer::setLineWidthTransition(const TransitionOptions& value, const optional<std::string>& klass) {
+    impl->paint.setTransition<LineWidth>(value, klass);
+}
+
+DataDrivenPropertyValue<float> LineLayer::getDefaultLineGapWidth() {
     return { 0 };
 }
 
-PropertyValue<float> LineLayer::getLineGapWidth(const optional<std::string>& klass) const {
+DataDrivenPropertyValue<float> LineLayer::getLineGapWidth(const optional<std::string>& klass) const {
     return impl->paint.get<LineGapWidth>(klass);
 }
 
-void LineLayer::setLineGapWidth(PropertyValue<float> value, const optional<std::string>& klass) {
+void LineLayer::setLineGapWidth(DataDrivenPropertyValue<float> value, const optional<std::string>& klass) {
     if (value == getLineGapWidth(klass))
         return;
     impl->paint.set<LineGapWidth>(value, klass);
-    impl->observer->onLayerPaintPropertyChanged(*this);
+    if (value.isDataDriven()) {
+        impl->observer->onLayerDataDrivenPaintPropertyChanged(*this);
+    } else {
+        impl->observer->onLayerPaintPropertyChanged(*this);
+    }
 }
 
-PropertyValue<float> LineLayer::getDefaultLineOffset() {
+void LineLayer::setLineGapWidthTransition(const TransitionOptions& value, const optional<std::string>& klass) {
+    impl->paint.setTransition<LineGapWidth>(value, klass);
+}
+
+DataDrivenPropertyValue<float> LineLayer::getDefaultLineOffset() {
     return { 0 };
 }
 
-PropertyValue<float> LineLayer::getLineOffset(const optional<std::string>& klass) const {
+DataDrivenPropertyValue<float> LineLayer::getLineOffset(const optional<std::string>& klass) const {
     return impl->paint.get<LineOffset>(klass);
 }
 
-void LineLayer::setLineOffset(PropertyValue<float> value, const optional<std::string>& klass) {
+void LineLayer::setLineOffset(DataDrivenPropertyValue<float> value, const optional<std::string>& klass) {
     if (value == getLineOffset(klass))
         return;
     impl->paint.set<LineOffset>(value, klass);
-    impl->observer->onLayerPaintPropertyChanged(*this);
+    if (value.isDataDriven()) {
+        impl->observer->onLayerDataDrivenPaintPropertyChanged(*this);
+    } else {
+        impl->observer->onLayerPaintPropertyChanged(*this);
+    }
 }
 
-PropertyValue<float> LineLayer::getDefaultLineBlur() {
+void LineLayer::setLineOffsetTransition(const TransitionOptions& value, const optional<std::string>& klass) {
+    impl->paint.setTransition<LineOffset>(value, klass);
+}
+
+DataDrivenPropertyValue<float> LineLayer::getDefaultLineBlur() {
     return { 0 };
 }
 
-PropertyValue<float> LineLayer::getLineBlur(const optional<std::string>& klass) const {
+DataDrivenPropertyValue<float> LineLayer::getLineBlur(const optional<std::string>& klass) const {
     return impl->paint.get<LineBlur>(klass);
 }
 
-void LineLayer::setLineBlur(PropertyValue<float> value, const optional<std::string>& klass) {
+void LineLayer::setLineBlur(DataDrivenPropertyValue<float> value, const optional<std::string>& klass) {
     if (value == getLineBlur(klass))
         return;
     impl->paint.set<LineBlur>(value, klass);
-    impl->observer->onLayerPaintPropertyChanged(*this);
+    if (value.isDataDriven()) {
+        impl->observer->onLayerDataDrivenPaintPropertyChanged(*this);
+    } else {
+        impl->observer->onLayerPaintPropertyChanged(*this);
+    }
+}
+
+void LineLayer::setLineBlurTransition(const TransitionOptions& value, const optional<std::string>& klass) {
+    impl->paint.setTransition<LineBlur>(value, klass);
 }
 
 PropertyValue<std::vector<float>> LineLayer::getDefaultLineDasharray() {
@@ -257,6 +309,10 @@ void LineLayer::setLineDasharray(PropertyValue<std::vector<float>> value, const 
     impl->observer->onLayerPaintPropertyChanged(*this);
 }
 
+void LineLayer::setLineDasharrayTransition(const TransitionOptions& value, const optional<std::string>& klass) {
+    impl->paint.setTransition<LineDasharray>(value, klass);
+}
+
 PropertyValue<std::string> LineLayer::getDefaultLinePattern() {
     return { "" };
 }
@@ -270,6 +326,10 @@ void LineLayer::setLinePattern(PropertyValue<std::string> value, const optional<
         return;
     impl->paint.set<LinePattern>(value, klass);
     impl->observer->onLayerPaintPropertyChanged(*this);
+}
+
+void LineLayer::setLinePatternTransition(const TransitionOptions& value, const optional<std::string>& klass) {
+    impl->paint.setTransition<LinePattern>(value, klass);
 }
 
 } // namespace style

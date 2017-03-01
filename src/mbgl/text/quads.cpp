@@ -13,7 +13,7 @@ using namespace style;
 
 const float globalMinScale = 0.5f; // underscale by 1 zoom level
 
-SymbolQuads getIconQuads(Anchor& anchor, const PositionedIcon& shapedIcon,
+SymbolQuad getIconQuad(Anchor& anchor, const PositionedIcon& shapedIcon,
         const GeometryCoordinates& line, const SymbolLayoutProperties::Evaluated& layout,
         const style::SymbolPlacementType placement, const Shaping& shapedText) {
 
@@ -62,7 +62,7 @@ SymbolQuads getIconQuads(Anchor& anchor, const PositionedIcon& shapedIcon,
         bl = {left, bottom};
     }
 
-    float angle = layout.get<IconRotate>() * util::DEG2RAD;
+    float angle = shapedIcon.angle;
     if (placement == style::SymbolPlacementType::Line) {
         assert(static_cast<unsigned int>(anchor.segment) < line.size());
         const GeometryCoordinate &prev= line[anchor.segment];
@@ -88,9 +88,7 @@ SymbolQuads getIconQuads(Anchor& anchor, const PositionedIcon& shapedIcon,
         br = util::matrixMultiply(matrix, br);
     }
 
-    SymbolQuads quads;
-    quads.emplace_back(tl, tr, bl, br, image.pos, 0, 0, anchor.point, globalMinScale, std::numeric_limits<float>::infinity());
-    return quads;
+    return SymbolQuad { tl, tr, bl, br, image.pos, 0, 0, anchor.point, globalMinScale, std::numeric_limits<float>::infinity(), shapedText.writingMode };
 }
 
 struct GlyphInstance {
@@ -207,10 +205,19 @@ SymbolQuads getGlyphQuads(Anchor& anchor, const Shaping& shapedText,
         const float x2 = x1 + rect.w;
         const float y2 = y1 + rect.h;
 
-        const Point<float> otl{x1, y1};
-        const Point<float> otr{x2, y1};
-        const Point<float> obl{x1, y2};
-        const Point<float> obr{x2, y2};
+        const Point<float> center{positionedGlyph.x, static_cast<float>(static_cast<float>(glyph.metrics.advance) / 2.0)};
+
+        Point<float> otl{x1, y1};
+        Point<float> otr{x2, y1};
+        Point<float> obl{x1, y2};
+        Point<float> obr{x2, y2};
+
+        if (positionedGlyph.angle != 0) {
+            otl = util::rotate(otl - center, positionedGlyph.angle) + center;
+            otr = util::rotate(otr - center, positionedGlyph.angle) + center;
+            obl = util::rotate(obl - center, positionedGlyph.angle) + center;
+            obr = util::rotate(obr - center, positionedGlyph.angle) + center;
+        }
 
         for (const GlyphInstance &instance : glyphInstances) {
 
@@ -236,7 +243,7 @@ SymbolQuads getGlyphQuads(Anchor& anchor, const Shaping& shapedText,
 
             const float anchorAngle = std::fmod((anchor.angle + instance.offset + 2 * M_PI), (2 * M_PI));
             const float glyphAngle = std::fmod((instance.angle + instance.offset + 2 * M_PI), (2 * M_PI));
-            quads.emplace_back(tl, tr, bl, br, rect, anchorAngle, glyphAngle, instance.anchorPoint, glyphMinScale, instance.maxScale);
+            quads.emplace_back(tl, tr, bl, br, rect, anchorAngle, glyphAngle, instance.anchorPoint, glyphMinScale, instance.maxScale, shapedText.writingMode);
 
         }
 

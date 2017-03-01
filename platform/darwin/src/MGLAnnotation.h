@@ -13,7 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
  the visual representation of the annotation but typically coordinate (in
  conjunction with the map view’s delegate) the creation of an appropriate
  objects to handle the display.
- 
+
  An object that adopts this protocol must implement the `coordinate` property.
  The other methods of this protocol are optional.
  */
@@ -33,7 +33,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  The string containing the annotation’s title.
- 
+
  Although this property is optional, if you support the selection of annotations
  in your map view, you are expected to provide this property. This string is
  displayed in the callout for the associated annotation.
@@ -42,7 +42,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  The string containing the annotation’s subtitle.
- 
+
  This string is displayed in the callout for the associated annotation.
  */
 @property (nonatomic, readonly, copy, nullable) NSString *subtitle;

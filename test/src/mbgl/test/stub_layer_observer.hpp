@@ -22,6 +22,10 @@ public:
         if (layerPaintPropertyChanged) layerPaintPropertyChanged(layer);
     }
 
+    void onLayerDataDrivenPaintPropertyChanged(Layer& layer) override {
+        if (layerDataDrivenPaintPropertyChanged) layerDataDrivenPaintPropertyChanged(layer);
+    }
+
     void onLayerLayoutPropertyChanged(Layer& layer, const char * property) override {
         if (layerLayoutPropertyChanged) layerLayoutPropertyChanged(layer, property);
     }
@@ -29,5 +33,6 @@ public:
     std::function<void (Layer&)> layerFilterChanged;
     std::function<void (Layer&)> layerVisibilityChanged;
     std::function<void (Layer&)> layerPaintPropertyChanged;
+    std::function<void (Layer&)> layerDataDrivenPaintPropertyChanged;
     std::function<void (Layer&, const char *)> layerLayoutPropertyChanged;
 };

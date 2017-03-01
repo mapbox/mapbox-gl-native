@@ -42,18 +42,17 @@ const Shaping GlyphSet::getShaping(const std::u16string& logicalInput,
                                    const float justify,
                                    const float spacing,
                                    const Point<float>& translate,
+                                   const float verticalHeight,
+                                   const WritingModeType writingMode,
                                    BiDi& bidi) const {
-
-    // The string stored in shaping.text is used for finding duplicates, but may end up quite
-    // different from the glyphs that get shown
-    Shaping shaping(translate.x * 24, translate.y * 24, logicalInput);
+    Shaping shaping(translate.x * 24, translate.y * 24, writingMode);
 
     std::vector<std::u16string> reorderedLines =
         bidi.processText(logicalInput,
-                         determineLineBreaks(logicalInput, spacing, maxWidth));
+                         determineLineBreaks(logicalInput, spacing, maxWidth, writingMode));
 
     shapeLines(shaping, reorderedLines, spacing, lineHeight, horizontalAlign, verticalAlign,
-               justify, translate);
+               justify, translate, verticalHeight, writingMode);
 
     return shaping;
 }
@@ -114,7 +113,7 @@ float GlyphSet::determineAverageLineWidth(const std::u16string& logicalInput,
     int32_t targetLineCount = std::fmax(1, std::ceil(totalWidth / maxWidth));
     return totalWidth / targetLineCount;
 }
-    
+
 float calculateBadness(const float lineWidth, const float targetWidth, const float penalty, const bool isLastBreak) {
     const float raggedness = std::pow(lineWidth - targetWidth, 2);
     if (isLastBreak) {
@@ -130,7 +129,7 @@ float calculateBadness(const float lineWidth, const float targetWidth, const flo
     }
     return raggedness + std::pow(penalty, 2);
 }
-    
+
 float calculatePenalty(char16_t codePoint, char16_t nextCodePoint) {
     float penalty = 0;
     // Force break on newline
@@ -146,28 +145,28 @@ float calculatePenalty(char16_t codePoint, char16_t nextCodePoint) {
     if (nextCodePoint == 0x29 || nextCodePoint == 0xff09) {
         penalty += 50;
     }
-    
+
     return penalty;
 }
-    
+
 struct PotentialBreak {
     PotentialBreak(const std::size_t p_index, const float p_x, const PotentialBreak* p_priorBreak, const float p_badness)
         : index(p_index), x(p_x), priorBreak(p_priorBreak), badness(p_badness)
     {}
-    
+
     const std::size_t index;
     const float x;
     const PotentialBreak* priorBreak;
     const float badness;
 };
 
-    
+
 PotentialBreak evaluateBreak(const std::size_t breakIndex, const float breakX, const float targetWidth, const std::list<PotentialBreak>& potentialBreaks, const float penalty, const bool isLastBreak) {
     // We could skip evaluating breaks where the line length (breakX - priorBreak.x) > maxWidth
     //  ...but in fact we allow lines longer than maxWidth (if there's no break points)
     //  ...and when targetWidth and maxWidth are close, strictly enforcing maxWidth can give
     //     more lopsided results.
-    
+
     const PotentialBreak* bestPriorBreak = nullptr;
     float bestBreakBadness = calculateBadness(breakX, targetWidth, penalty, isLastBreak);
     for (const auto& potentialBreak : potentialBreaks) {
@@ -182,7 +181,7 @@ PotentialBreak evaluateBreak(const std::size_t breakIndex, const float breakX, c
 
     return PotentialBreak(breakIndex, breakX, bestPriorBreak, bestBreakBadness);
 }
-    
+
 std::set<std::size_t> leastBadBreaks(const PotentialBreak& lastLineBreak) {
     std::set<std::size_t> leastBadBreaks = { lastLineBreak.index };
     const PotentialBreak* priorBreak = lastLineBreak.priorBreak;
@@ -198,17 +197,18 @@ std::set<std::size_t> leastBadBreaks(const PotentialBreak& lastLineBreak) {
 //  more intuitive, but we can't do that because the visual order may be changed by line breaks!
 std::set<std::size_t> GlyphSet::determineLineBreaks(const std::u16string& logicalInput,
                                                 const float spacing,
-                                                float maxWidth) const {
-    if (!maxWidth) {
+                                                float maxWidth,
+                                                const WritingModeType writingMode) const {
+    if (!maxWidth || writingMode != WritingModeType::Horizontal) {
         return {};
     }
 
     if (logicalInput.empty()) {
         return {};
     }
- 
+
     const float targetWidth = determineAverageLineWidth(logicalInput, spacing, maxWidth);
-    
+
     std::list<PotentialBreak> potentialBreaks;
     float currentX = 0;
 
@@ -218,7 +218,7 @@ std::set<std::size_t> GlyphSet::determineLineBreaks(const std::u16string& logica
         if (it != sdfs.end() && !boost::algorithm::is_any_of(u" \t\n\v\f\r")(codePoint)) {
             currentX += it->second.metrics.advance + spacing;
         }
-        
+
         // Ideographic characters, spaces, and word-breaking punctuation that often appear without
         // surrounding spaces.
         if ((i < logicalInput.size() - 1) &&
@@ -239,7 +239,9 @@ void GlyphSet::shapeLines(Shaping& shaping,
                           const float horizontalAlign,
                           const float verticalAlign,
                           const float justify,
-                          const Point<float>& translate) const {
+                          const Point<float>& translate,
+                          const float verticalHeight,
+                          const WritingModeType writingMode) const {
 
     // the y offset *should* be part of the font metadata
     const int32_t yOffset = -17;
@@ -266,15 +268,21 @@ void GlyphSet::shapeLines(Shaping& shaping,
             }
 
             const SDFGlyph& glyph = it->second;
-            shaping.positionedGlyphs.emplace_back(chr, x, y);
-            x += glyph.metrics.advance + spacing;
+
+            if (writingMode == WritingModeType::Horizontal || !util::i18n::hasUprightVerticalOrientation(chr)) {
+                shaping.positionedGlyphs.emplace_back(chr, x, y, 0);
+                x += glyph.metrics.advance + spacing;
+            } else {
+                shaping.positionedGlyphs.emplace_back(chr, x, 0, -M_PI_2);
+                x += verticalHeight + spacing;
+            }
         }
 
         // Only justify if we placed at least one glyph
         if (shaping.positionedGlyphs.size() != lineStartIndex) {
             float lineLength = x - spacing; // Don't count trailing spacing
             maxLineLength = util::max(lineLength, maxLineLength);
-            
+
             justifyLine(shaping.positionedGlyphs, sdfs, lineStartIndex,
                         shaping.positionedGlyphs.size() - 1, justify);
         }

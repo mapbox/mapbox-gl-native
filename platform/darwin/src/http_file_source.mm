@@ -4,7 +4,6 @@
 
 #include <mbgl/util/http_header.hpp>
 #include <mbgl/util/async_task.hpp>
-
 #include <mbgl/util/version.hpp>
 
 #import <Foundation/Foundation.h>
@@ -100,7 +99,7 @@ public:
     NSURLSession* session = nil;
     NSString* userAgent = nil;
     NSInteger accountType = 0;
-    
+
 private:
     NSString* getUserAgent() const;
     NSBundle* getSDKBundle() const;
@@ -108,7 +107,7 @@ private:
 
 NSString *HTTPFileSource::Impl::getUserAgent() const {
     NSMutableArray *userAgentComponents = [NSMutableArray array];
-    
+
     NSBundle *appBundle = [NSBundle mainBundle];
     if (appBundle) {
         NSString *appName = appBundle.infoDictionary[@"CFBundleName"];
@@ -118,7 +117,7 @@ NSString *HTTPFileSource::Impl::getUserAgent() const {
     } else {
         [userAgentComponents addObject:[NSProcessInfo processInfo].processName];
     }
-    
+
     NSBundle *sdkBundle = HTTPFileSource::Impl::getSDKBundle();
     if (sdkBundle) {
         NSString *versionString = sdkBundle.infoDictionary[@"MGLSemanticVersionString"];
@@ -130,12 +129,12 @@ NSString *HTTPFileSource::Impl::getUserAgent() const {
                                             sdkBundle.infoDictionary[@"CFBundleName"], versionString]];
         }
     }
-    
+
     // Avoid %s here because it inserts hidden bidirectional markers on macOS when the system
     // language is set to a right-to-left language.
-    [userAgentComponents addObject:[NSString stringWithFormat:@"MapboxGL/%@ (%@)",
-                                    CFSTR(MBGL_VERSION_STRING), CFSTR(MBGL_VERSION_REV)]];
-    
+    [userAgentComponents addObject:[NSString stringWithFormat:@"MapboxGL/0.0.0 (%@)",
+                                    @(mbgl::version::revision)]];
+
     NSString *systemName = @"Darwin";
 #if TARGET_OS_IPHONE
     systemName = @"iOS";
@@ -158,7 +157,7 @@ NSString *HTTPFileSource::Impl::getUserAgent() const {
     if (systemVersion) {
         [userAgentComponents addObject:[NSString stringWithFormat:@"%@/%@", systemName, systemVersion]];
     }
-    
+
     NSString *cpu = nil;
 #if TARGET_CPU_X86
     cpu = @"x86";
@@ -172,7 +171,7 @@ NSString *HTTPFileSource::Impl::getUserAgent() const {
     if (cpu) {
         [userAgentComponents addObject:[NSString stringWithFormat:@"(%@)", cpu]];
     }
-    
+
     return [userAgentComponents componentsJoinedByString:@" "];
 }
 
@@ -295,20 +294,20 @@ std::unique_ptr<AsyncRequest> HTTPFileSource::request(const Resource& resource, 
                         response.error =
                             std::make_unique<Error>(Error::Reason::NotFound, "HTTP status code 404");
                     } else if (responseCode == 429) {
-                        //Get the standard header
+                        // Get the standard header
                         optional<std::string> retryAfter;
                         NSString *retryAfterHeader = headers[@"Retry-After"];
                         if (retryAfterHeader) {
                             retryAfter = std::string([retryAfterHeader UTF8String]);
                         }
-                        
-                        //Fallback mapbox specific header
+
+                        // Fallback mapbox specific header
                         optional<std::string> xRateLimitReset;
                         NSString *xReset = headers[@"x-rate-limit-reset"];
                         if (xReset) {
                             xRateLimitReset = std::string([xReset UTF8String]);
                         }
-                        
+
                         response.error = std::make_unique<Error>(Error::Reason::RateLimit, "HTTP status code 429", http::parseRetryHeaders(retryAfter, xRateLimitReset));
                     } else if (responseCode >= 500 && responseCode < 600) {
                         response.error =

@@ -1,13 +1,7 @@
 package com.mapbox.mapboxsdk.testapp.activity.camera;
 
 import android.os.Bundle;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-
-import timber.log.Timber;
-
-import android.view.MenuItem;
 
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
@@ -23,6 +17,15 @@ import com.mapbox.mapboxsdk.testapp.R;
 import java.util.ArrayList;
 import java.util.List;
 
+import timber.log.Timber;
+
+/**
+ * Test activity showcasing using the LatLngBounds camera API.
+ * <p>
+ * This activity opens the map at zoom level 0 and animates into a bounds set by Los Angeles and New York
+ * with some additional padding and an animation duration of 1500 ms.
+ * </p>
+ */
 public class LatLngBoundsActivity extends AppCompatActivity implements OnMapReadyCallback {
 
   private static final LatLng LOS_ANGELES = new LatLng(34.053940, -118.242622);
@@ -35,15 +38,6 @@ public class LatLngBoundsActivity extends AppCompatActivity implements OnMapRead
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_visible_bounds);
-
-    Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-    setSupportActionBar(toolbar);
-
-    ActionBar actionBar = getSupportActionBar();
-    if (actionBar != null) {
-      actionBar.setDisplayHomeAsUpEnabled(true);
-      actionBar.setDisplayShowHomeEnabled(true);
-    }
 
     mapView = (MapView) findViewById(R.id.mapView);
     mapView.setStyleUrl(Style.DARK);
@@ -82,7 +76,7 @@ public class LatLngBoundsActivity extends AppCompatActivity implements OnMapRead
 
     // Move camera to the bounds with added padding
     int padding = (int) getResources().getDimension(R.dimen.coordinatebounds_margin);
-    mapboxMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, padding));
+    mapboxMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, padding), 1500);
 
     // Log data
     Timber.e("Move to bounds: " + bounds.toString());
@@ -129,16 +123,5 @@ public class LatLngBoundsActivity extends AppCompatActivity implements OnMapRead
   public void onLowMemory() {
     super.onLowMemory();
     mapView.onLowMemory();
-  }
-
-  @Override
-  public boolean onOptionsItemSelected(MenuItem item) {
-    switch (item.getItemId()) {
-      case android.R.id.home:
-        onBackPressed();
-        return true;
-      default:
-        return super.onOptionsItemSelected(item);
-    }
   }
 }

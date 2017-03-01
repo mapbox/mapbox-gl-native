@@ -46,22 +46,18 @@ public:
     jni::String getId(jni::JNIEnv&);
 
 protected:
-    //Release the owned view and return it
+    // Release the owned view and return it
     std::unique_ptr<mbgl::style::Source> releaseCoreSource();
 
-    //Set on newly created sources until added to the map
+    // Set on newly created sources until added to the map
     std::unique_ptr<mbgl::style::Source> ownedSource;
 
-    //Raw pointer that is valid until the source is removed from the map
+    // Raw pointer that is valid until the source is removed from the map
     mbgl::style::Source& source;
 
-    //Map pointer is valid for newly created sources only after adding to the map
+    // Map pointer is valid for newly created sources only after adding to the map
     mbgl::Map* map;
 };
 
-} //android
-} //mbgl
-
-
-
-
+} // namespace android
+} // namespace mbgl

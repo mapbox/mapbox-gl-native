@@ -80,19 +80,31 @@ void FillExtrusionLayer::setFillExtrusionOpacity(PropertyValue<float> value, con
     impl->observer->onLayerPaintPropertyChanged(*this);
 }
 
-PropertyValue<Color> FillExtrusionLayer::getDefaultFillExtrusionColor() {
+void FillExtrusionLayer::setFillExtrusionOpacityTransition(const TransitionOptions& value, const optional<std::string>& klass) {
+    impl->paint.setTransition<FillExtrusionOpacity>(value, klass);
+}
+
+DataDrivenPropertyValue<Color> FillExtrusionLayer::getDefaultFillExtrusionColor() {
     return { Color::black() };
 }
 
-PropertyValue<Color> FillExtrusionLayer::getFillExtrusionColor(const optional<std::string>& klass) const {
+DataDrivenPropertyValue<Color> FillExtrusionLayer::getFillExtrusionColor(const optional<std::string>& klass) const {
     return impl->paint.get<FillExtrusionColor>(klass);
 }
 
-void FillExtrusionLayer::setFillExtrusionColor(PropertyValue<Color> value, const optional<std::string>& klass) {
+void FillExtrusionLayer::setFillExtrusionColor(DataDrivenPropertyValue<Color> value, const optional<std::string>& klass) {
     if (value == getFillExtrusionColor(klass))
         return;
     impl->paint.set<FillExtrusionColor>(value, klass);
-    impl->observer->onLayerPaintPropertyChanged(*this);
+    if (value.isDataDriven()) {
+        impl->observer->onLayerDataDrivenPaintPropertyChanged(*this);
+    } else {
+        impl->observer->onLayerPaintPropertyChanged(*this);
+    }
+}
+
+void FillExtrusionLayer::setFillExtrusionColorTransition(const TransitionOptions& value, const optional<std::string>& klass) {
+    impl->paint.setTransition<FillExtrusionColor>(value, klass);
 }
 
 PropertyValue<std::array<float, 2>> FillExtrusionLayer::getDefaultFillExtrusionTranslate() {
@@ -110,6 +122,10 @@ void FillExtrusionLayer::setFillExtrusionTranslate(PropertyValue<std::array<floa
     impl->observer->onLayerPaintPropertyChanged(*this);
 }
 
+void FillExtrusionLayer::setFillExtrusionTranslateTransition(const TransitionOptions& value, const optional<std::string>& klass) {
+    impl->paint.setTransition<FillExtrusionTranslate>(value, klass);
+}
+
 PropertyValue<TranslateAnchorType> FillExtrusionLayer::getDefaultFillExtrusionTranslateAnchor() {
     return { TranslateAnchorType::Map };
 }
@@ -123,6 +139,10 @@ void FillExtrusionLayer::setFillExtrusionTranslateAnchor(PropertyValue<Translate
         return;
     impl->paint.set<FillExtrusionTranslateAnchor>(value, klass);
     impl->observer->onLayerPaintPropertyChanged(*this);
+}
+
+void FillExtrusionLayer::setFillExtrusionTranslateAnchorTransition(const TransitionOptions& value, const optional<std::string>& klass) {
+    impl->paint.setTransition<FillExtrusionTranslateAnchor>(value, klass);
 }
 
 PropertyValue<std::string> FillExtrusionLayer::getDefaultFillExtrusionPattern() {
@@ -140,34 +160,54 @@ void FillExtrusionLayer::setFillExtrusionPattern(PropertyValue<std::string> valu
     impl->observer->onLayerPaintPropertyChanged(*this);
 }
 
-PropertyValue<float> FillExtrusionLayer::getDefaultFillExtrusionHeight() {
+void FillExtrusionLayer::setFillExtrusionPatternTransition(const TransitionOptions& value, const optional<std::string>& klass) {
+    impl->paint.setTransition<FillExtrusionPattern>(value, klass);
+}
+
+DataDrivenPropertyValue<float> FillExtrusionLayer::getDefaultFillExtrusionHeight() {
     return { 0 };
 }
 
-PropertyValue<float> FillExtrusionLayer::getFillExtrusionHeight(const optional<std::string>& klass) const {
+DataDrivenPropertyValue<float> FillExtrusionLayer::getFillExtrusionHeight(const optional<std::string>& klass) const {
     return impl->paint.get<FillExtrusionHeight>(klass);
 }
 
-void FillExtrusionLayer::setFillExtrusionHeight(PropertyValue<float> value, const optional<std::string>& klass) {
+void FillExtrusionLayer::setFillExtrusionHeight(DataDrivenPropertyValue<float> value, const optional<std::string>& klass) {
     if (value == getFillExtrusionHeight(klass))
         return;
     impl->paint.set<FillExtrusionHeight>(value, klass);
-    impl->observer->onLayerPaintPropertyChanged(*this);
+    if (value.isDataDriven()) {
+        impl->observer->onLayerDataDrivenPaintPropertyChanged(*this);
+    } else {
+        impl->observer->onLayerPaintPropertyChanged(*this);
+    }
 }
 
-PropertyValue<float> FillExtrusionLayer::getDefaultFillExtrusionBase() {
+void FillExtrusionLayer::setFillExtrusionHeightTransition(const TransitionOptions& value, const optional<std::string>& klass) {
+    impl->paint.setTransition<FillExtrusionHeight>(value, klass);
+}
+
+DataDrivenPropertyValue<float> FillExtrusionLayer::getDefaultFillExtrusionBase() {
     return { 0 };
 }
 
-PropertyValue<float> FillExtrusionLayer::getFillExtrusionBase(const optional<std::string>& klass) const {
+DataDrivenPropertyValue<float> FillExtrusionLayer::getFillExtrusionBase(const optional<std::string>& klass) const {
     return impl->paint.get<FillExtrusionBase>(klass);
 }
 
-void FillExtrusionLayer::setFillExtrusionBase(PropertyValue<float> value, const optional<std::string>& klass) {
+void FillExtrusionLayer::setFillExtrusionBase(DataDrivenPropertyValue<float> value, const optional<std::string>& klass) {
     if (value == getFillExtrusionBase(klass))
         return;
     impl->paint.set<FillExtrusionBase>(value, klass);
-    impl->observer->onLayerPaintPropertyChanged(*this);
+    if (value.isDataDriven()) {
+        impl->observer->onLayerDataDrivenPaintPropertyChanged(*this);
+    } else {
+        impl->observer->onLayerPaintPropertyChanged(*this);
+    }
+}
+
+void FillExtrusionLayer::setFillExtrusionBaseTransition(const TransitionOptions& value, const optional<std::string>& klass) {
+    impl->paint.setTransition<FillExtrusionBase>(value, klass);
 }
 
 } // namespace style

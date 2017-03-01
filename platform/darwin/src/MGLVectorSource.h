@@ -12,22 +12,22 @@ NS_ASSUME_NONNULL_BEGIN
  A vector source is added to an `MGLStyle` object along with one or more
  `MGLVectorStyleLayer` objects. A vector style layer defines the appearance of
  any content supplied by the vector source.
- 
+
  Each
  <a href="https://www.mapbox.com/mapbox-gl-style-spec/#sources-vector"><code>vector</code></a>
  source defined by the style JSON file is represented at runtime by an
  `MGLVectorSource` object that you can use to initialize new style layers. You
  can also add and remove sources dynamically using methods such as
  `-[MGLStyle addSource:]` and `-[MGLStyle sourceWithIdentifier:]`.
- 
+
  Within each vector tile, each geometric coordinate must lie between
  −1&nbsp;×&nbsp;<var>extent</var> and
  (<var>extent</var>&nbsp;×&nbsp;2)&nbsp;−&nbsp;1, inclusive. Any vector style
  layer initialized with a vector source must have a non-`nil` value in its
  `sourceLayerIdentifier` property.
- 
+
  ### Example
- 
+
  ```swift
  let source = MGLVectorSource(identifier: "pois", tileURLTemplates: ["https://example.com/vector-tiles/{z}/{x}/{y}.mvt"], options: [
      .minimumZoomLevel: 9,

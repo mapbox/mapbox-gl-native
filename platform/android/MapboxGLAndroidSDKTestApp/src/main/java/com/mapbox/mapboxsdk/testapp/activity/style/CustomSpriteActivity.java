@@ -5,13 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-
-import timber.log.Timber;
-
-import android.view.MenuItem;
 import android.view.View;
 
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
@@ -28,10 +22,12 @@ import com.mapbox.services.commons.geojson.FeatureCollection;
 import com.mapbox.services.commons.geojson.Point;
 import com.mapbox.services.commons.models.Position;
 
+import timber.log.Timber;
+
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconImage;
 
 /**
- * Example to add a sprite image and use it in a Symbol Layer
+ * Test activity showcasing adding a sprite image and use it in a Symbol Layer
  */
 public class CustomSpriteActivity extends AppCompatActivity {
   private static final String CUSTOM_ICON = "custom-icon";
@@ -46,15 +42,6 @@ public class CustomSpriteActivity extends AppCompatActivity {
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_add_sprite);
-
-    Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-    setSupportActionBar(toolbar);
-
-    ActionBar actionBar = getSupportActionBar();
-    if (actionBar != null) {
-      actionBar.setDisplayHomeAsUpEnabled(true);
-      actionBar.setDisplayShowHomeEnabled(true);
-    }
 
     mapView = (MapView) findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
@@ -74,7 +61,7 @@ public class CustomSpriteActivity extends AppCompatActivity {
               // Add an icon to reference later
               mapboxMap.addImage(CUSTOM_ICON, BitmapFactory.decodeResource(getResources(), R.drawable.ic_car_top));
 
-              //Add a source with a geojson point
+              // Add a source with a geojson point
               point = Point.fromCoordinates(Position.fromCoordinates(13.400972d, 52.519003d));
               source = new GeoJsonSource(
                 "point",
@@ -82,26 +69,26 @@ public class CustomSpriteActivity extends AppCompatActivity {
               );
               mapboxMap.addSource(source);
 
-              //Add a symbol layer that references that point source
+              // Add a symbol layer that references that point source
               layer = new SymbolLayer("layer", "point");
               layer.setProperties(
-                //Set the id of the sprite to use
+                // Set the id of the sprite to use
                 iconImage(CUSTOM_ICON)
               );
 
               // lets add a circle below labels!
-              mapboxMap.addLayer(layer, "waterway-label");
+              mapboxMap.addLayerBelow(layer, "waterway-label");
 
-              fab.setImageResource(R.drawable.ic_directions_car_black_24dp);
+              fab.setImageResource(R.drawable.ic_directions_car_black);
             } else {
-              //Update point
+              // Update point
               point = Point.fromCoordinates(
                 Position.fromCoordinates(point.getCoordinates().getLongitude() + 0.001,
                   point.getCoordinates().getLatitude() + 0.001)
               );
               source.setGeoJson(FeatureCollection.fromFeatures(new Feature[] {Feature.fromGeometry(point)}));
 
-              //Move the camera as well
+              // Move the camera as well
               mapboxMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(
                 point.getCoordinates().getLatitude(), point.getCoordinates().getLongitude())));
             }
@@ -151,16 +138,5 @@ public class CustomSpriteActivity extends AppCompatActivity {
   public void onDestroy() {
     super.onDestroy();
     mapView.onDestroy();
-  }
-
-  @Override
-  public boolean onOptionsItemSelected(MenuItem item) {
-    switch (item.getItemId()) {
-      case android.R.id.home:
-        onBackPressed();
-        return true;
-      default:
-        return super.onOptionsItemSelected(item);
-    }
   }
 }

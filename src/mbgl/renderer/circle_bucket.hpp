@@ -7,25 +7,33 @@
 #include <mbgl/gl/index_buffer.hpp>
 #include <mbgl/gl/segment.hpp>
 #include <mbgl/programs/circle_program.hpp>
+#include <mbgl/style/layers/circle_layer_properties.hpp>
 
 namespace mbgl {
 
+namespace style {
+class BucketParameters;
+} // namespace style
+
 class CircleBucket : public Bucket {
 public:
-    CircleBucket(const MapMode);
+    CircleBucket(const style::BucketParameters&, const std::vector<const style::Layer*>&);
+
+    void addFeature(const GeometryTileFeature&,
+                    const GeometryCollection&) override;
+    bool hasData() const override;
 
     void upload(gl::Context&) override;
     void render(Painter&, PaintParameters&, const style::Layer&, const RenderTile&) override;
 
-    bool hasData() const override;
-    void addGeometry(const GeometryCollection&);
-
-    gl::VertexVector<CircleVertex> vertices;
+    gl::VertexVector<CircleLayoutVertex> vertices;
     gl::IndexVector<gl::Triangles> triangles;
     gl::SegmentVector<CircleAttributes> segments;
 
-    optional<gl::VertexBuffer<CircleVertex>> vertexBuffer;
+    optional<gl::VertexBuffer<CircleLayoutVertex>> vertexBuffer;
     optional<gl::IndexBuffer<gl::Triangles>> indexBuffer;
+
+    std::unordered_map<std::string, CircleProgram::PaintPropertyBinders> paintPropertyBinders;
 
     const MapMode mode;
 };
