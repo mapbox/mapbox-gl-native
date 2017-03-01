@@ -31,6 +31,11 @@
         <property name="message" value="Line has trailing spaces."/>
     </module>
 
+    <module name="RegexpMultiline">
+        <property name="format" value="^;"/>
+        <property name="message" value="Line starts with an empty statement."/>
+    </module>
+
     <module name="TreeWalker">
         <module name="OuterTypeFilename"/>
         <module name="IllegalTokenText">
@@ -216,5 +221,6 @@
             <property name="exceptionVariableName" value="expected"/>
         </module>
         <module name="CommentsIndentation"/>
+        <module name="EmptyStatement"/>
     </module>
 </module>
