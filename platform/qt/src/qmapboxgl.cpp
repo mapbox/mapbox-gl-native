@@ -28,7 +28,6 @@
 #if QT_VERSION >= 0x050000
 #include <QGuiApplication>
 #include <QWindow>
-#include <QOpenGLFramebufferObject>
 #include <QOpenGLContext>
 #else
 #include <QCoreApplication>
@@ -1492,17 +1491,9 @@ void QMapboxGL::setFilter(const QString& layer, const QVariant& filter)
     This function should be called only after the signal needsRendering() is
     emitted at least once.
 */
-#if QT_VERSION >= 0x050000
-void QMapboxGL::render(QOpenGLFramebufferObject *fbo)
-{
-    d_ptr->dirty = false;
-    d_ptr->fbo = fbo;
-    d_ptr->mapObj->render(*d_ptr);
-}
-#else
 void QMapboxGL::render()
 {
-#if defined(__APPLE__)
+#if defined(__APPLE__) && QT_VERSION < 0x050000
     // FIXME Qt 4.x provides an incomplete FBO at start.
     // See https://bugreports.qt.io/browse/QTBUG-36802 for details.
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
@@ -1513,7 +1504,6 @@ void QMapboxGL::render()
     d_ptr->dirty = false;
     d_ptr->mapObj->render(*d_ptr);
 }
-#endif
 
 /*!
     Informs the map that the network connection has been established, causing
@@ -1582,24 +1572,12 @@ QMapboxGLPrivate::~QMapboxGLPrivate()
 {
 }
 
-#if QT_VERSION >= 0x050000
-void QMapboxGLPrivate::bind() {
-    if (fbo) {
-        fbo->bind();
-        getContext().bindFramebuffer.setDirty();
-        getContext().viewport = {
-            0, 0, { static_cast<uint32_t>(fbo->width()), static_cast<uint32_t>(fbo->height()) }
-        };
-    }
-}
-#else
 void QMapboxGLPrivate::bind() {
     getContext().bindFramebuffer = 0;
     getContext().viewport = {
         0, 0, { static_cast<uint32_t>(fbSize.width()), static_cast<uint32_t>(fbSize.height()) }
     };
 }
-#endif
 
 void QMapboxGLPrivate::invalidate()
 {

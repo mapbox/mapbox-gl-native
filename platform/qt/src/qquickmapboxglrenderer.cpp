@@ -38,7 +38,9 @@ QOpenGLFramebufferObject* QQuickMapboxGLRenderer::createFramebufferObject(const 
 
 void QQuickMapboxGLRenderer::render()
 {
-    m_map->render(framebufferObject());
+    framebufferObject()->bind();
+    m_map->render();
+    framebufferObject()->release();
 }
 
 void QQuickMapboxGLRenderer::synchronize(QQuickFramebufferObject *item)
