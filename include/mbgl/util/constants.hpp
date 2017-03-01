@@ -4,6 +4,7 @@
 #include <mbgl/util/unitbezier.hpp>
 
 #include <cmath>
+#include <cstddef>
 #include <string>
 #include <vector>
 
@@ -39,6 +40,7 @@ constexpr float  MIN_ZOOM_F = MIN_ZOOM;
 constexpr float  MAX_ZOOM_F = MAX_ZOOM;
 
 constexpr uint64_t DEFAULT_MAX_CACHE_SIZE = 50 * 1024 * 1024;
+constexpr std::size_t DEFAULT_SHARED_THREAD_POOL_SIZE = 4;
 
 constexpr Duration DEFAULT_FADE_DURATION = Milliseconds(300);
 constexpr Seconds CLOCK_SKEW_RETRY_TIMEOUT { 30 };

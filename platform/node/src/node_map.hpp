@@ -1,9 +1,8 @@
 #pragma once
 
-#include "node_thread_pool.hpp"
-
 #include <mbgl/map/map.hpp>
 #include <mbgl/storage/file_source.hpp>
+#include <mbgl/util/shared_thread_pool.hpp>
 #include <mbgl/gl/headless_backend.hpp>
 #include <mbgl/gl/offscreen_view.hpp>
 
@@ -67,7 +66,7 @@ public:
     const float pixelRatio;
     NodeBackend backend;
     std::unique_ptr<mbgl::OffscreenView> view;
-    NodeThreadPool threadpool;
+    std::shared_ptr<mbgl::ThreadPool> threadPool;
     std::unique_ptr<mbgl::Map> map;
 
     std::exception_ptr error;
