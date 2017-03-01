@@ -56,7 +56,6 @@ public final class CompassView extends AppCompatImageView implements Runnable, F
 
   private void initialize(Context context) {
     setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.mapbox_compass_icon));
-    setContentDescription(getResources().getString(R.string.mapbox_compassContentDescription));
     setEnabled(false);
 
     // Layout params

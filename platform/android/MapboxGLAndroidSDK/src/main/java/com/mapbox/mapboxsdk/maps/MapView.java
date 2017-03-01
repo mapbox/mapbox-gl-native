@@ -118,6 +118,9 @@ public class MapView extends FrameLayout {
     ImageView attrView = (ImageView) view.findViewById(R.id.attributionView);
     initalizeDrawingSurface(context, options);
 
+    // add accessibility support
+    setContentDescription(context.getString(R.string.mapbox_mapActionDescription));
+
     // create native Map object
     nativeMapView = new NativeMapView(this);
 
