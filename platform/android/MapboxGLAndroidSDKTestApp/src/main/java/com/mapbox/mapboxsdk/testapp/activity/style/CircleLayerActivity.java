@@ -80,7 +80,7 @@ public class CircleLayerActivity extends AppCompatActivity {
           public void onClick(View view) {
 
             // filter out stops for our route
-            layer.setFilter(in("number", STOPS_FOR_ROUTE));
+            layer.setFilter(in("number", (Object[]) STOPS_FOR_ROUTE));
 
             // add route as a line
             try {
