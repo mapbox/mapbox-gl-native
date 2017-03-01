@@ -8,6 +8,9 @@
 
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/file_source.hpp>
+#include <mbgl/util/async_task.hpp>
+
+#include <memory>
 
 namespace node_mbgl {
 
@@ -35,9 +38,12 @@ public:
     void Execute();
 
 private:
+    void doExecute();
+
     NodeMap* target;
     mbgl::FileSource::Callback callback;
     NodeAsyncRequest* asyncRequest = nullptr;
+    std::unique_ptr<mbgl::util::AsyncTask> asyncExecute;
 };
 
 }
