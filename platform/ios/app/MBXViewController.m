@@ -583,6 +583,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                     break;
                 case MBXSettingsRuntimeStylingDDSPolygon:
                     [self stylePolygonWithDDS];
+                    break;
                 case MBXSettingsRuntimeStylingCustomLatLonGrid:
                     [self addLatLonGrid];
                     break;
@@ -1375,39 +1376,6 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                         }
                     }
                 }];
-                layer.text = function;
-            }
-        } else {
-            NSLog(@"%@ is not a symbol style layer", layerName);
-        }
-    }
-}
-
-- (void)styleLabelLanguageForLayersNamed:(NSArray<NSString *> *)layers
-{
-    _usingLocaleBasedCountryLabels = !_usingLocaleBasedCountryLabels;
-    NSString *bestLanguageForUser = [NSString stringWithFormat:@"{name_%@}", [self bestLanguageForUser]];
-    NSString *language = _usingLocaleBasedCountryLabels ? bestLanguageForUser : @"{name}";
-
-    for (NSString *layerName in layers) {
-        MGLSymbolStyleLayer *layer = (MGLSymbolStyleLayer *)[self.mapView.style layerWithIdentifier:layerName];
-
-        if ([layer isKindOfClass:[MGLSymbolStyleLayer class]]) {
-            if ([layer.text isKindOfClass:[MGLStyleConstantValue class]]) {
-                MGLStyleConstantValue *label = (MGLStyleConstantValue<NSString *> *)layer.text;
-                if ([label.rawValue hasPrefix:@"{name"]) {
-                    layer.text = [MGLStyleValue valueWithRawValue:language];
-                }
-            }
-            else if ([layer.text isKindOfClass:[MGLCameraStyleFunction class]]) {
-                MGLCameraStyleFunction *function = (MGLCameraStyleFunction<NSString *> *)layer.text;
-                NSMutableDictionary *stops = function.stops.mutableCopy;
-                [stops enumerateKeysAndObjectsUsingBlock:^(NSNumber *zoomLevel, MGLStyleConstantValue<NSString *> *stop, BOOL *done) {
-                    if ([stop.rawValue hasPrefix:@"{name"]) {
-                        stops[zoomLevel] = [MGLStyleValue<NSString *> valueWithRawValue:language];
-                    }
-                }];
-                function.stops = stops;
                 layer.text = function;
             }
         } else {
