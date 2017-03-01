@@ -645,6 +645,12 @@ android-checkstyle:
 android-javadoc:
 	cd platform/android && ./gradlew :MapboxGLAndroidSDK:javadocrelease
 
+ifeq ($(HOST_PLATFORM), macos)
+.PHONY: aproj
+aproj:
+	open -b com.google.android.studio platform/android
+endif
+
 #### Miscellaneous targets #####################################################
 
 .PHONY: style-code
