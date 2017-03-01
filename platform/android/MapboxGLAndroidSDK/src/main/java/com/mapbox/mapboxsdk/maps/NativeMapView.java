@@ -35,7 +35,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import timber.log.Timber;
 
-;
 
 // Class that wraps the native methods for convenience
 final class NativeMapView {
