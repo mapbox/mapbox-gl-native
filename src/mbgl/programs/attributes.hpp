@@ -28,10 +28,24 @@ struct a_offset : gl::Attribute<int16_t, N> {
 // Paint attributes
 
 template <class Attr>
-struct Min : Attr {
+struct MinMax : gl::Attribute<typename Attr::ValueType, Attr::Dimensions> {
+    using Value = typename gl::Attribute<typename Attr::ValueType, Attr::Dimensions>::Value;
+
     static auto name() {
-        static const std::string name = Attr::name() + std::string("_min");
+        static const std::string name = Attr::name() + std::string("_minmax");
         return name.c_str();
+    }
+    
+    static Value value(const typename Attr::ValueType& min, const typename Attr::ValueType& max){
+        auto minValue = Attr::ValueType::value(min);
+        auto maxValue = Attr::ValueType::value(max);
+        Value result = {{}};
+        // TODO: can we do this statically??
+        for (size_t i = 0; i < Attr::Dimensions; i++) {
+            result[i] = minValue[i];
+            result[Attr::Dimensions+i] = maxValue[i];
+        }
+        return result;
     }
 };
 

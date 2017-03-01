@@ -71,6 +71,9 @@ public:
     using Binding = variant<
         ConstantBinding,
         VariableBinding>;
+    
+    using ValueType = T;
+    static constexpr size_t Dimensions = N;
 
     static void bind(Context& context,
                      const Location& location,
