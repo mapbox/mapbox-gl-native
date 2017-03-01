@@ -99,6 +99,18 @@ pod 'Mapbox-iOS-SDK', podspec: 'https://raw.githubusercontent.com/mapbox/mapbox-
 
 If using the static framework, add `$(inherited)` to your target’s Other Linker Flags in the Build Settings tab.
 
+#### Carthage
+
+For instructions on installing stable release versions of the Mapbox iOS SDK with Carthage, see [our website](https://www.mapbox.com/ios-sdk/). If you require a build without symbols pre-stripped, use [this feed URL](https://www.mapbox.com/ios-sdk/Mapbox-iOS-SDK-symbols.json) with Carthage.
+
+##### Testing pre-releases with Carthage
+
+Carthage currently does not support pre-release versions of binaries.
+
+##### Using your own build with Carthage
+
+This project does not support being compiled as a local repository by Carthage.
+
 ### Configuration
 
 1. Mapbox vector tiles require a Mapbox account and API access token. In the project editor, select the application target, then go to the Info tab. Under the “Custom iOS Target Properties” section, set `MGLMapboxAccessToken` to your access token. You can obtain an access token from the [Mapbox account page](https://www.mapbox.com/studio/account/tokens/).
