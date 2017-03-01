@@ -7,14 +7,13 @@ namespace shaders {
 
 const char* symbol_icon::name = "symbol_icon";
 const char* symbol_icon::vertexSource = R"MBGL_SHADER(
-attribute vec2 a_pos;
-attribute vec2 a_offset;
+
+attribute vec4 a_pos_offset;
 attribute vec2 a_texture_pos;
 attribute vec4 a_data;
 
 uniform lowp float a_opacity_t;
-attribute lowp float a_opacity_min;
-attribute lowp float a_opacity_max;
+attribute lowp vec2 a_opacity;
 varying lowp float opacity;
 
 // matrix is for the vertex position.
@@ -30,7 +29,10 @@ varying vec2 v_tex;
 varying vec2 v_fade_tex;
 
 void main() {
-    opacity = mix(a_opacity_min, a_opacity_max, a_opacity_t);
+    opacity = unpack_mix_vec2(a_opacity, a_opacity_t);
+
+    vec2 a_pos = a_pos_offset.xy;
+    vec2 a_offset = a_pos_offset.zw;
 
     vec2 a_tex = a_texture_pos.xy;
     mediump float a_labelminzoom = a_data[0];

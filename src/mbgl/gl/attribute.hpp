@@ -17,10 +17,12 @@ class VariableAttributeBinding {
 public:
     VariableAttributeBinding(BufferID vertexBuffer_,
                              std::size_t vertexSize_,
-                             std::size_t attributeOffset_)
+                             std::size_t attributeOffset_,
+                             std::size_t attributeSize_ = N)
         : vertexBuffer(vertexBuffer_),
           vertexSize(vertexSize_),
-          attributeOffset(attributeOffset_)
+          attributeOffset(attributeOffset_),
+          attributeSize(attributeSize_)
         {}
 
     void bind(Context&, AttributeLocation, optional<VariableAttributeBinding<T, N>>&, std::size_t vertexOffset) const;
@@ -29,13 +31,15 @@ public:
                            const VariableAttributeBinding& rhs) {
         return lhs.vertexBuffer == rhs.vertexBuffer
             && lhs.vertexSize == rhs.vertexSize
-            && lhs.attributeOffset == rhs.attributeOffset;
+            && lhs.attributeOffset == rhs.attributeOffset
+            && lhs.attributeSize == rhs.attributeSize;
     }
 
 private:
     BufferID vertexBuffer;
     std::size_t vertexSize;
     std::size_t attributeOffset;
+    std::size_t attributeSize;
 };
 
 template <class T, std::size_t N>
@@ -58,9 +62,16 @@ private:
     std::array<T, N> value;
 };
 
+/*
+    gl::Attribute<T,N> manages the binding of a constant value or vertex buffer to a GL program attribute.
+      - T is the underlying primitive type (exposed as Attribute<T,N>::ValueType)
+      - N is the number of components in the attribute declared in the shader (exposed as Attribute<T,N>::Dimensions)
+*/
 template <class T, std::size_t N>
 class Attribute {
 public:
+    using ValueType = T;
+    static constexpr size_t Dimensions = N;
     using Value = std::array<T, N>;
 
     using VariableBinding = VariableAttributeBinding<T, N>;
@@ -71,6 +82,25 @@ public:
     using Binding = variant<
         ConstantBinding,
         VariableBinding>;
+
+    /*
+        Create a variable (i.e. data-driven) binding for this attribute.  The `attributeSize`
+        parameter may be used to override the number of components available in the buffer for
+        each vertex.  Thus, a buffer with only one float for each vertex can be bound to a
+        `vec2` attribute
+    */
+    template <class Vertex, class DrawMode>
+    static VariableBinding variableBinding(const VertexBuffer<Vertex, DrawMode>& buffer,
+                                           std::size_t attributeIndex,
+                                           std::size_t attributeSize = N) {
+        static_assert(std::is_standard_layout<Vertex>::value, "vertex type must use standard layout");
+        return VariableBinding {
+            buffer.buffer,
+            sizeof(Vertex),
+            Vertex::attributeOffsets[attributeIndex],
+            attributeSize
+        };
+    }
 
     static void bind(Context& context,
                      const Location& location,
@@ -223,15 +253,7 @@ public:
 
     template <class DrawMode>
     static Bindings allVariableBindings(const VertexBuffer<Vertex, DrawMode>& buffer) {
-        static_assert(std::is_standard_layout<Vertex>::value, "vertex type must use standard layout");
-
-        return Bindings {
-            typename As::VariableBinding {
-                buffer.buffer,
-                sizeof(Vertex),
-                Vertex::attributeOffsets[Index<As>]
-            }...
-        };
+        return Bindings { As::variableBinding(buffer, Index<As>)... };
     }
 
     static void bind(Context& context,

@@ -38,7 +38,7 @@ void VariableAttributeBinding<T, N>::bind(Context& context,
     MBGL_CHECK_ERROR(glEnableVertexAttribArray(location));
     MBGL_CHECK_ERROR(glVertexAttribPointer(
         location,
-        static_cast<GLint>(N),
+        static_cast<GLint>(attributeSize),
         static_cast<GLenum>(DataTypeOf<T>),
         static_cast<GLboolean>(IsNormalized<T>),
         static_cast<GLsizei>(vertexSize),

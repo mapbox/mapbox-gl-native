@@ -37,27 +37,23 @@ varying float v_linesofar;
 varying float v_gamma_scale;
 
 uniform lowp float a_blur_t;
-attribute lowp float a_blur_min;
-attribute lowp float a_blur_max;
+attribute lowp vec2 a_blur;
 varying lowp float blur;
 uniform lowp float a_opacity_t;
-attribute lowp float a_opacity_min;
-attribute lowp float a_opacity_max;
+attribute lowp vec2 a_opacity;
 varying lowp float opacity;
 uniform lowp float a_offset_t;
-attribute lowp float a_offset_min;
-attribute lowp float a_offset_max;
+attribute lowp vec2 a_offset;
 varying lowp float offset;
 uniform lowp float a_gapwidth_t;
-attribute mediump float a_gapwidth_min;
-attribute mediump float a_gapwidth_max;
+attribute mediump vec2 a_gapwidth;
 varying mediump float gapwidth;
 
 void main() {
-    blur = mix(a_blur_min, a_blur_max, a_blur_t);
-    opacity = mix(a_opacity_min, a_opacity_max, a_opacity_t);
-    offset = mix(a_offset_min, a_offset_max, a_offset_t);
-    gapwidth = mix(a_gapwidth_min, a_gapwidth_max, a_gapwidth_t);
+    blur = unpack_mix_vec2(a_blur, a_blur_t);
+    opacity = unpack_mix_vec2(a_opacity, a_opacity_t);
+    offset = unpack_mix_vec2(a_offset, a_offset_t);
+    gapwidth = unpack_mix_vec2(a_gapwidth, a_gapwidth_t);
 
     vec2 a_extrude = a_data.xy - 128.0;
     float a_direction = mod(a_data.z, 4.0) - 1.0;
