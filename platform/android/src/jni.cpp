@@ -494,7 +494,7 @@ void nativeMoveBy(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jdoubl
 void nativeSetLatLng(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jdouble latitude, jdouble longitude, jlong duration) {
     assert(nativeMapViewPtr != 0);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    nativeMapView->getMap().setLatLng(mbgl::LatLng(latitude, longitude), nativeMapView->getInsets(), mbgl::Duration(duration));
+    nativeMapView->getMap().setLatLng(mbgl::LatLng(latitude, longitude), nativeMapView->getInsets(), mbgl::AnimationOptions{mbgl::Milliseconds(duration)});
 }
 
 jni::jobject* nativeGetLatLng(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr) {
@@ -542,8 +542,7 @@ jdouble nativeGetPitch(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr) {
 void nativeSetPitch(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jdouble pitch, jlong milliseconds) {
     assert(nativeMapViewPtr != 0);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    mbgl::Duration duration((mbgl::Milliseconds(milliseconds)));
-    nativeMapView->getMap().setPitch(pitch, duration);
+    nativeMapView->getMap().setPitch(pitch, mbgl::AnimationOptions{mbgl::Milliseconds(milliseconds)});
 }
 
 void nativeScaleBy(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jdouble ds, jdouble cx,
@@ -551,7 +550,7 @@ void nativeScaleBy(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jdoub
     assert(nativeMapViewPtr != 0);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
     mbgl::ScreenCoordinate center(cx, cy);
-    nativeMapView->getMap().scaleBy(ds, center, mbgl::Milliseconds(duration));
+    nativeMapView->getMap().scaleBy(ds, center, mbgl::AnimationOptions{mbgl::Milliseconds(duration)});
 }
 
 void nativeSetScale(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jdouble scale,
@@ -559,7 +558,7 @@ void nativeSetScale(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jdou
     assert(nativeMapViewPtr != 0);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
     mbgl::ScreenCoordinate center(cx, cy);
-    nativeMapView->getMap().setScale(scale, center, mbgl::Milliseconds(duration));
+    nativeMapView->getMap().setScale(scale, center, mbgl::AnimationOptions{mbgl::Milliseconds(duration)});
 }
 
 jdouble nativeGetScale(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr) {
@@ -571,7 +570,7 @@ jdouble nativeGetScale(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr) {
 void nativeSetZoom(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jdouble zoom, jlong duration) {
     assert(nativeMapViewPtr != 0);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    nativeMapView->getMap().setZoom(zoom, mbgl::Milliseconds(duration));
+    nativeMapView->getMap().setZoom(zoom, mbgl::AnimationOptions{mbgl::Milliseconds(duration)});
 }
 
 jdouble nativeGetZoom(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr) {
@@ -616,15 +615,14 @@ void nativeRotateBy(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jdou
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
     mbgl::ScreenCoordinate first(sx, sy);
     mbgl::ScreenCoordinate second(ex, ey);
-    nativeMapView->getMap().rotateBy(first, second, mbgl::Milliseconds(duration));
+    nativeMapView->getMap().rotateBy(first, second, mbgl::AnimationOptions{mbgl::Milliseconds(duration)});
 }
 
 void nativeSetBearing(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jdouble degrees,
                               jlong milliseconds) {
     assert(nativeMapViewPtr != 0);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    mbgl::Duration duration((mbgl::Milliseconds(milliseconds)));
-    nativeMapView->getMap().setBearing(degrees, duration);
+    nativeMapView->getMap().setBearing(degrees, mbgl::AnimationOptions{mbgl::Milliseconds(milliseconds)});
 }
 
 void nativeSetBearingXY(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jdouble degrees,
