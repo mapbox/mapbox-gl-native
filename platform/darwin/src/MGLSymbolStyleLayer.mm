@@ -890,7 +890,7 @@ namespace mbgl {
 - (void)setIconColor:(MGLStyleValue<MGLColor *> *)iconColor {
     MGLAssertStyleLayerIsValid();
 
-    auto mbglValue = MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toInterpolatablePropertyValue(iconColor);
+    auto mbglValue = MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toDataDrivenPropertyValue(iconColor);
     self.rawLayer->setIconColor(mbglValue);
 }
 
@@ -899,15 +899,15 @@ namespace mbgl {
 
     auto propertyValue = self.rawLayer->getIconColor();
     if (propertyValue.isUndefined()) {
-        return MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toStyleValue(self.rawLayer->getDefaultIconColor());
+        return MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toDataDrivenStyleValue(self.rawLayer->getDefaultIconColor());
     }
-    return MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toStyleValue(propertyValue);
+    return MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toDataDrivenStyleValue(propertyValue);
 }
 
 - (void)setIconHaloBlur:(MGLStyleValue<NSNumber *> *)iconHaloBlur {
     MGLAssertStyleLayerIsValid();
 
-    auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toInterpolatablePropertyValue(iconHaloBlur);
+    auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toDataDrivenPropertyValue(iconHaloBlur);
     self.rawLayer->setIconHaloBlur(mbglValue);
 }
 
@@ -916,15 +916,15 @@ namespace mbgl {
 
     auto propertyValue = self.rawLayer->getIconHaloBlur();
     if (propertyValue.isUndefined()) {
-        return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(self.rawLayer->getDefaultIconHaloBlur());
+        return MGLStyleValueTransformer<float, NSNumber *>().toDataDrivenStyleValue(self.rawLayer->getDefaultIconHaloBlur());
     }
-    return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(propertyValue);
+    return MGLStyleValueTransformer<float, NSNumber *>().toDataDrivenStyleValue(propertyValue);
 }
 
 - (void)setIconHaloColor:(MGLStyleValue<MGLColor *> *)iconHaloColor {
     MGLAssertStyleLayerIsValid();
 
-    auto mbglValue = MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toInterpolatablePropertyValue(iconHaloColor);
+    auto mbglValue = MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toDataDrivenPropertyValue(iconHaloColor);
     self.rawLayer->setIconHaloColor(mbglValue);
 }
 
@@ -933,15 +933,15 @@ namespace mbgl {
 
     auto propertyValue = self.rawLayer->getIconHaloColor();
     if (propertyValue.isUndefined()) {
-        return MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toStyleValue(self.rawLayer->getDefaultIconHaloColor());
+        return MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toDataDrivenStyleValue(self.rawLayer->getDefaultIconHaloColor());
     }
-    return MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toStyleValue(propertyValue);
+    return MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toDataDrivenStyleValue(propertyValue);
 }
 
 - (void)setIconHaloWidth:(MGLStyleValue<NSNumber *> *)iconHaloWidth {
     MGLAssertStyleLayerIsValid();
 
-    auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toInterpolatablePropertyValue(iconHaloWidth);
+    auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toDataDrivenPropertyValue(iconHaloWidth);
     self.rawLayer->setIconHaloWidth(mbglValue);
 }
 
@@ -950,15 +950,15 @@ namespace mbgl {
 
     auto propertyValue = self.rawLayer->getIconHaloWidth();
     if (propertyValue.isUndefined()) {
-        return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(self.rawLayer->getDefaultIconHaloWidth());
+        return MGLStyleValueTransformer<float, NSNumber *>().toDataDrivenStyleValue(self.rawLayer->getDefaultIconHaloWidth());
     }
-    return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(propertyValue);
+    return MGLStyleValueTransformer<float, NSNumber *>().toDataDrivenStyleValue(propertyValue);
 }
 
 - (void)setIconOpacity:(MGLStyleValue<NSNumber *> *)iconOpacity {
     MGLAssertStyleLayerIsValid();
 
-    auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toInterpolatablePropertyValue(iconOpacity);
+    auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toDataDrivenPropertyValue(iconOpacity);
     self.rawLayer->setIconOpacity(mbglValue);
 }
 
@@ -967,9 +967,9 @@ namespace mbgl {
 
     auto propertyValue = self.rawLayer->getIconOpacity();
     if (propertyValue.isUndefined()) {
-        return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(self.rawLayer->getDefaultIconOpacity());
+        return MGLStyleValueTransformer<float, NSNumber *>().toDataDrivenStyleValue(self.rawLayer->getDefaultIconOpacity());
     }
-    return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(propertyValue);
+    return MGLStyleValueTransformer<float, NSNumber *>().toDataDrivenStyleValue(propertyValue);
 }
 
 - (void)setIconTranslation:(MGLStyleValue<NSValue *> *)iconTranslation {
@@ -1023,7 +1023,7 @@ namespace mbgl {
 - (void)setTextColor:(MGLStyleValue<MGLColor *> *)textColor {
     MGLAssertStyleLayerIsValid();
 
-    auto mbglValue = MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toInterpolatablePropertyValue(textColor);
+    auto mbglValue = MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toDataDrivenPropertyValue(textColor);
     self.rawLayer->setTextColor(mbglValue);
 }
 
@@ -1032,15 +1032,15 @@ namespace mbgl {
 
     auto propertyValue = self.rawLayer->getTextColor();
     if (propertyValue.isUndefined()) {
-        return MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toStyleValue(self.rawLayer->getDefaultTextColor());
+        return MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toDataDrivenStyleValue(self.rawLayer->getDefaultTextColor());
     }
-    return MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toStyleValue(propertyValue);
+    return MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toDataDrivenStyleValue(propertyValue);
 }
 
 - (void)setTextHaloBlur:(MGLStyleValue<NSNumber *> *)textHaloBlur {
     MGLAssertStyleLayerIsValid();
 
-    auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toInterpolatablePropertyValue(textHaloBlur);
+    auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toDataDrivenPropertyValue(textHaloBlur);
     self.rawLayer->setTextHaloBlur(mbglValue);
 }
 
@@ -1049,15 +1049,15 @@ namespace mbgl {
 
     auto propertyValue = self.rawLayer->getTextHaloBlur();
     if (propertyValue.isUndefined()) {
-        return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(self.rawLayer->getDefaultTextHaloBlur());
+        return MGLStyleValueTransformer<float, NSNumber *>().toDataDrivenStyleValue(self.rawLayer->getDefaultTextHaloBlur());
     }
-    return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(propertyValue);
+    return MGLStyleValueTransformer<float, NSNumber *>().toDataDrivenStyleValue(propertyValue);
 }
 
 - (void)setTextHaloColor:(MGLStyleValue<MGLColor *> *)textHaloColor {
     MGLAssertStyleLayerIsValid();
 
-    auto mbglValue = MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toInterpolatablePropertyValue(textHaloColor);
+    auto mbglValue = MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toDataDrivenPropertyValue(textHaloColor);
     self.rawLayer->setTextHaloColor(mbglValue);
 }
 
@@ -1066,15 +1066,15 @@ namespace mbgl {
 
     auto propertyValue = self.rawLayer->getTextHaloColor();
     if (propertyValue.isUndefined()) {
-        return MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toStyleValue(self.rawLayer->getDefaultTextHaloColor());
+        return MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toDataDrivenStyleValue(self.rawLayer->getDefaultTextHaloColor());
     }
-    return MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toStyleValue(propertyValue);
+    return MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toDataDrivenStyleValue(propertyValue);
 }
 
 - (void)setTextHaloWidth:(MGLStyleValue<NSNumber *> *)textHaloWidth {
     MGLAssertStyleLayerIsValid();
 
-    auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toInterpolatablePropertyValue(textHaloWidth);
+    auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toDataDrivenPropertyValue(textHaloWidth);
     self.rawLayer->setTextHaloWidth(mbglValue);
 }
 
@@ -1083,15 +1083,15 @@ namespace mbgl {
 
     auto propertyValue = self.rawLayer->getTextHaloWidth();
     if (propertyValue.isUndefined()) {
-        return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(self.rawLayer->getDefaultTextHaloWidth());
+        return MGLStyleValueTransformer<float, NSNumber *>().toDataDrivenStyleValue(self.rawLayer->getDefaultTextHaloWidth());
     }
-    return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(propertyValue);
+    return MGLStyleValueTransformer<float, NSNumber *>().toDataDrivenStyleValue(propertyValue);
 }
 
 - (void)setTextOpacity:(MGLStyleValue<NSNumber *> *)textOpacity {
     MGLAssertStyleLayerIsValid();
 
-    auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toInterpolatablePropertyValue(textOpacity);
+    auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toDataDrivenPropertyValue(textOpacity);
     self.rawLayer->setTextOpacity(mbglValue);
 }
 
@@ -1100,9 +1100,9 @@ namespace mbgl {
 
     auto propertyValue = self.rawLayer->getTextOpacity();
     if (propertyValue.isUndefined()) {
-        return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(self.rawLayer->getDefaultTextOpacity());
+        return MGLStyleValueTransformer<float, NSNumber *>().toDataDrivenStyleValue(self.rawLayer->getDefaultTextOpacity());
     }
-    return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(propertyValue);
+    return MGLStyleValueTransformer<float, NSNumber *>().toDataDrivenStyleValue(propertyValue);
 }
 
 - (void)setTextTranslation:(MGLStyleValue<NSValue *> *)textTranslation {

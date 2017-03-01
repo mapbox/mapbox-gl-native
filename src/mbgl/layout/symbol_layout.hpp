@@ -5,6 +5,7 @@
 #include <mbgl/layout/symbol_feature.hpp>
 #include <mbgl/layout/symbol_instance.hpp>
 #include <mbgl/text/bidi.hpp>
+#include <mbgl/style/layers/symbol_layer_impl.hpp>
 
 #include <memory>
 #include <map>
@@ -51,10 +52,12 @@ public:
 
     State state = Pending;
 
-    std::unordered_map<std::string, style::SymbolPaintProperties::Evaluated> layerPaintProperties;
+    std::unordered_map<std::string,
+        std::pair<style::IconPaintProperties::Evaluated, style::TextPaintProperties::Evaluated>> layerPaintProperties;
 
 private:
-    void addFeature(const SymbolFeature&,
+    void addFeature(const size_t,
+                    const SymbolFeature&,
                     const std::pair<Shaping, Shaping>& shapedTextOrientations,
                     const PositionedIcon& shapedIcon,
                     const GlyphPositions& face);

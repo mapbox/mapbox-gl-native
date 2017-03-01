@@ -454,11 +454,11 @@ public class PropertyFactory {
   /**
    * The opacity at which the icon will be drawn.
    *
-   * @param <Z> the zoom parameter type
-   * @param function a wrapper {@link CameraFunction} for Float
+   * @param <T> the function input type
+   * @param function a wrapper function for Float
    * @return property wrapper around a Float function
    */
-  public static <Z extends Number> PropertyValue<CameraFunction<Z, Float>> iconOpacity(CameraFunction<Z, Float> function) {
+  public static <T> PropertyValue<Function<T, Float>> iconOpacity(Function<T, Float> function) {
     return new PaintPropertyValue<>("icon-opacity", function);
   }
 
@@ -486,11 +486,11 @@ public class PropertyFactory {
   /**
    * The color of the icon. This can only be used with sdf icons.
    *
-   * @param <Z> the zoom parameter type
-   * @param function a wrapper {@link CameraFunction} for String
+   * @param <T> the function input type
+   * @param function a wrapper function for String
    * @return property wrapper around a String function
    */
-  public static <Z extends Number> PropertyValue<CameraFunction<Z, String>> iconColor(CameraFunction<Z, String> function) {
+  public static <T> PropertyValue<Function<T, String>> iconColor(Function<T, String> function) {
     return new PaintPropertyValue<>("icon-color", function);
   }
 
@@ -518,11 +518,11 @@ public class PropertyFactory {
   /**
    * The color of the icon's halo. Icon halos can only be used with SDF icons.
    *
-   * @param <Z> the zoom parameter type
-   * @param function a wrapper {@link CameraFunction} for String
+   * @param <T> the function input type
+   * @param function a wrapper function for String
    * @return property wrapper around a String function
    */
-  public static <Z extends Number> PropertyValue<CameraFunction<Z, String>> iconHaloColor(CameraFunction<Z, String> function) {
+  public static <T> PropertyValue<Function<T, String>> iconHaloColor(Function<T, String> function) {
     return new PaintPropertyValue<>("icon-halo-color", function);
   }
 
@@ -540,11 +540,11 @@ public class PropertyFactory {
   /**
    * Distance of halo to the icon outline.
    *
-   * @param <Z> the zoom parameter type
-   * @param function a wrapper {@link CameraFunction} for Float
+   * @param <T> the function input type
+   * @param function a wrapper function for Float
    * @return property wrapper around a Float function
    */
-  public static <Z extends Number> PropertyValue<CameraFunction<Z, Float>> iconHaloWidth(CameraFunction<Z, Float> function) {
+  public static <T> PropertyValue<Function<T, Float>> iconHaloWidth(Function<T, Float> function) {
     return new PaintPropertyValue<>("icon-halo-width", function);
   }
 
@@ -562,11 +562,11 @@ public class PropertyFactory {
   /**
    * Fade out the halo towards the outside.
    *
-   * @param <Z> the zoom parameter type
-   * @param function a wrapper {@link CameraFunction} for Float
+   * @param <T> the function input type
+   * @param function a wrapper function for Float
    * @return property wrapper around a Float function
    */
-  public static <Z extends Number> PropertyValue<CameraFunction<Z, Float>> iconHaloBlur(CameraFunction<Z, Float> function) {
+  public static <T> PropertyValue<Function<T, Float>> iconHaloBlur(Function<T, Float> function) {
     return new PaintPropertyValue<>("icon-halo-blur", function);
   }
 
@@ -628,11 +628,11 @@ public class PropertyFactory {
   /**
    * The opacity at which the text will be drawn.
    *
-   * @param <Z> the zoom parameter type
-   * @param function a wrapper {@link CameraFunction} for Float
+   * @param <T> the function input type
+   * @param function a wrapper function for Float
    * @return property wrapper around a Float function
    */
-  public static <Z extends Number> PropertyValue<CameraFunction<Z, Float>> textOpacity(CameraFunction<Z, Float> function) {
+  public static <T> PropertyValue<Function<T, Float>> textOpacity(Function<T, Float> function) {
     return new PaintPropertyValue<>("text-opacity", function);
   }
 
@@ -660,11 +660,11 @@ public class PropertyFactory {
   /**
    * The color with which the text will be drawn.
    *
-   * @param <Z> the zoom parameter type
-   * @param function a wrapper {@link CameraFunction} for String
+   * @param <T> the function input type
+   * @param function a wrapper function for String
    * @return property wrapper around a String function
    */
-  public static <Z extends Number> PropertyValue<CameraFunction<Z, String>> textColor(CameraFunction<Z, String> function) {
+  public static <T> PropertyValue<Function<T, String>> textColor(Function<T, String> function) {
     return new PaintPropertyValue<>("text-color", function);
   }
 
@@ -692,11 +692,11 @@ public class PropertyFactory {
   /**
    * The color of the text's halo, which helps it stand out from backgrounds.
    *
-   * @param <Z> the zoom parameter type
-   * @param function a wrapper {@link CameraFunction} for String
+   * @param <T> the function input type
+   * @param function a wrapper function for String
    * @return property wrapper around a String function
    */
-  public static <Z extends Number> PropertyValue<CameraFunction<Z, String>> textHaloColor(CameraFunction<Z, String> function) {
+  public static <T> PropertyValue<Function<T, String>> textHaloColor(Function<T, String> function) {
     return new PaintPropertyValue<>("text-halo-color", function);
   }
 
@@ -714,11 +714,11 @@ public class PropertyFactory {
   /**
    * Distance of halo to the font outline. Max text halo width is 1/4 of the font-size.
    *
-   * @param <Z> the zoom parameter type
-   * @param function a wrapper {@link CameraFunction} for Float
+   * @param <T> the function input type
+   * @param function a wrapper function for Float
    * @return property wrapper around a Float function
    */
-  public static <Z extends Number> PropertyValue<CameraFunction<Z, Float>> textHaloWidth(CameraFunction<Z, Float> function) {
+  public static <T> PropertyValue<Function<T, Float>> textHaloWidth(Function<T, Float> function) {
     return new PaintPropertyValue<>("text-halo-width", function);
   }
 
@@ -736,11 +736,11 @@ public class PropertyFactory {
   /**
    * The halo's fadeout distance towards the outside.
    *
-   * @param <Z> the zoom parameter type
-   * @param function a wrapper {@link CameraFunction} for Float
+   * @param <T> the function input type
+   * @param function a wrapper function for Float
    * @return property wrapper around a Float function
    */
-  public static <Z extends Number> PropertyValue<CameraFunction<Z, Float>> textHaloBlur(CameraFunction<Z, Float> function) {
+  public static <T> PropertyValue<Function<T, Float>> textHaloBlur(Function<T, Float> function) {
     return new PaintPropertyValue<>("text-halo-blur", function);
   }
 
@@ -1742,7 +1742,7 @@ public class PropertyFactory {
   }
 
   /**
-   * Value to use for a text label. Feature properties are specified using tokens like {field_name}.  (Token replacement is only supported for literal `textField` values--not for property functions.)
+   * Value to use for a text label. Feature properties are specified using tokens like {field_name}.  (Token replacement is only supported for literal {@link PropertyFactory#textField} values--not for property functions.)
    *
    * @param value a String value
    * @return property wrapper around String
@@ -1754,7 +1754,7 @@ public class PropertyFactory {
 
 
   /**
-   * Value to use for a text label. Feature properties are specified using tokens like {field_name}.  (Token replacement is only supported for literal `textField` values--not for property functions.)
+   * Value to use for a text label. Feature properties are specified using tokens like {field_name}.  (Token replacement is only supported for literal {@link PropertyFactory#textField} values--not for property functions.)
    *
    * @param <T> the function input type
    * @param function a wrapper function for String

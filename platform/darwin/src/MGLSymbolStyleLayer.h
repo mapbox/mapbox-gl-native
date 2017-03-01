@@ -1204,6 +1204,15 @@ MGL_EXPORT
  * `MGLCameraStyleFunction` with an interpolation mode of:
    * `MGLInterpolationModeExponential`
    * `MGLInterpolationModeInterval`
+ * `MGLSourceStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
+   * `MGLInterpolationModeIdentity`
+ * `MGLCompositeStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<UIColor *> *iconColor;
 #else
@@ -1224,6 +1233,15 @@ MGL_EXPORT
  * `MGLCameraStyleFunction` with an interpolation mode of:
    * `MGLInterpolationModeExponential`
    * `MGLInterpolationModeInterval`
+ * `MGLSourceStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
+   * `MGLInterpolationModeIdentity`
+ * `MGLCompositeStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSColor *> *iconColor;
 #endif
@@ -1246,6 +1264,15 @@ MGL_EXPORT
  * `MGLCameraStyleFunction` with an interpolation mode of:
    * `MGLInterpolationModeExponential`
    * `MGLInterpolationModeInterval`
+ * `MGLSourceStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
+   * `MGLInterpolationModeIdentity`
+ * `MGLCompositeStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconHaloBlur;
 
@@ -1267,6 +1294,15 @@ MGL_EXPORT
  * `MGLCameraStyleFunction` with an interpolation mode of:
    * `MGLInterpolationModeExponential`
    * `MGLInterpolationModeInterval`
+ * `MGLSourceStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
+   * `MGLInterpolationModeIdentity`
+ * `MGLCompositeStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<UIColor *> *iconHaloColor;
 #else
@@ -1287,6 +1323,15 @@ MGL_EXPORT
  * `MGLCameraStyleFunction` with an interpolation mode of:
    * `MGLInterpolationModeExponential`
    * `MGLInterpolationModeInterval`
+ * `MGLSourceStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
+   * `MGLInterpolationModeIdentity`
+ * `MGLCompositeStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSColor *> *iconHaloColor;
 #endif
@@ -1309,6 +1354,15 @@ MGL_EXPORT
  * `MGLCameraStyleFunction` with an interpolation mode of:
    * `MGLInterpolationModeExponential`
    * `MGLInterpolationModeInterval`
+ * `MGLSourceStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
+   * `MGLInterpolationModeIdentity`
+ * `MGLCompositeStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconHaloWidth;
 
@@ -1328,6 +1382,15 @@ MGL_EXPORT
  * `MGLCameraStyleFunction` with an interpolation mode of:
    * `MGLInterpolationModeExponential`
    * `MGLInterpolationModeInterval`
+ * `MGLSourceStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
+   * `MGLInterpolationModeIdentity`
+ * `MGLCompositeStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconOpacity;
 
@@ -1426,6 +1489,15 @@ MGL_EXPORT
  * `MGLCameraStyleFunction` with an interpolation mode of:
    * `MGLInterpolationModeExponential`
    * `MGLInterpolationModeInterval`
+ * `MGLSourceStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
+   * `MGLInterpolationModeIdentity`
+ * `MGLCompositeStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<UIColor *> *textColor;
 #else
@@ -1445,6 +1517,15 @@ MGL_EXPORT
  * `MGLCameraStyleFunction` with an interpolation mode of:
    * `MGLInterpolationModeExponential`
    * `MGLInterpolationModeInterval`
+ * `MGLSourceStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
+   * `MGLInterpolationModeIdentity`
+ * `MGLCompositeStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSColor *> *textColor;
 #endif
@@ -1467,6 +1548,15 @@ MGL_EXPORT
  * `MGLCameraStyleFunction` with an interpolation mode of:
    * `MGLInterpolationModeExponential`
    * `MGLInterpolationModeInterval`
+ * `MGLSourceStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
+   * `MGLInterpolationModeIdentity`
+ * `MGLCompositeStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textHaloBlur;
 
@@ -1487,6 +1577,15 @@ MGL_EXPORT
  * `MGLCameraStyleFunction` with an interpolation mode of:
    * `MGLInterpolationModeExponential`
    * `MGLInterpolationModeInterval`
+ * `MGLSourceStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
+   * `MGLInterpolationModeIdentity`
+ * `MGLCompositeStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<UIColor *> *textHaloColor;
 #else
@@ -1506,6 +1605,15 @@ MGL_EXPORT
  * `MGLCameraStyleFunction` with an interpolation mode of:
    * `MGLInterpolationModeExponential`
    * `MGLInterpolationModeInterval`
+ * `MGLSourceStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
+   * `MGLInterpolationModeIdentity`
+ * `MGLCompositeStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSColor *> *textHaloColor;
 #endif
@@ -1529,6 +1637,15 @@ MGL_EXPORT
  * `MGLCameraStyleFunction` with an interpolation mode of:
    * `MGLInterpolationModeExponential`
    * `MGLInterpolationModeInterval`
+ * `MGLSourceStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
+   * `MGLInterpolationModeIdentity`
+ * `MGLCompositeStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textHaloWidth;
 
@@ -1548,6 +1665,15 @@ MGL_EXPORT
  * `MGLCameraStyleFunction` with an interpolation mode of:
    * `MGLInterpolationModeExponential`
    * `MGLInterpolationModeInterval`
+ * `MGLSourceStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
+   * `MGLInterpolationModeIdentity`
+ * `MGLCompositeStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textOpacity;
 

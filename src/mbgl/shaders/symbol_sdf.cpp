@@ -68,6 +68,26 @@ attribute vec2 a_offset;
 attribute vec2 a_texture_pos;
 attribute vec4 a_data;
 
+uniform lowp float a_fill_color_t;
+attribute lowp vec4 a_fill_color_min;
+attribute lowp vec4 a_fill_color_max;
+varying lowp vec4 fill_color;
+uniform lowp float a_halo_color_t;
+attribute lowp vec4 a_halo_color_min;
+attribute lowp vec4 a_halo_color_max;
+varying lowp vec4 halo_color;
+uniform lowp float a_opacity_t;
+attribute lowp float a_opacity_min;
+attribute lowp float a_opacity_max;
+varying lowp float opacity;
+uniform lowp float a_halo_width_t;
+attribute lowp float a_halo_width_min;
+attribute lowp float a_halo_width_max;
+varying lowp float halo_width;
+uniform lowp float a_halo_blur_t;
+attribute lowp float a_halo_blur_min;
+attribute lowp float a_halo_blur_max;
+varying lowp float halo_blur;
 
 // matrix is for the vertex position.
 uniform mat4 u_matrix;
@@ -87,6 +107,12 @@ varying vec2 v_fade_tex;
 varying float v_gamma_scale;
 
 void main() {
+    fill_color = mix(a_fill_color_min, a_fill_color_max, a_fill_color_t);
+    halo_color = mix(a_halo_color_min, a_halo_color_max, a_halo_color_t);
+    opacity = mix(a_opacity_min, a_opacity_max, a_opacity_t);
+    halo_width = mix(a_halo_width_min, a_halo_width_max, a_halo_width_t);
+    halo_blur = mix(a_halo_blur_min, a_halo_blur_max, a_halo_blur_t);
+
     vec2 a_tex = a_texture_pos.xy;
     mediump float a_labelminzoom = a_data[0];
     mediump vec2 a_zoom = a_data.pq;
@@ -163,24 +189,47 @@ precision mediump float;
 #endif
 
 #endif
+#define SDF_PX 8.0
+#define EDGE_GAMMA 0.105/DEVICE_PIXEL_RATIO
+
+uniform bool u_is_halo;
+varying lowp vec4 fill_color;
+varying lowp vec4 halo_color;
+varying lowp float opacity;
+varying lowp float halo_width;
+varying lowp float halo_blur;
+
 uniform sampler2D u_texture;
 uniform sampler2D u_fadetexture;
-uniform lowp vec4 u_color;
-uniform lowp float u_opacity;
-uniform lowp float u_buffer;
-uniform highp float u_gamma;
+uniform lowp float u_font_scale;
+uniform highp float u_gamma_scale;
 
 varying vec2 v_tex;
 varying vec2 v_fade_tex;
 varying float v_gamma_scale;
 
 void main() {
+    
+    
+    
+    
+    
+
+    lowp vec4 color = fill_color;
+    lowp float gamma = EDGE_GAMMA / u_gamma_scale;
+    lowp float buff = (256.0 - 64.0) / 256.0;
+    if (u_is_halo) {
+        color = halo_color;
+        gamma = (halo_blur * 1.19 / SDF_PX + EDGE_GAMMA) / u_gamma_scale;
+        buff = (6.0 - halo_width / u_font_scale) / SDF_PX;
+    }
+
     lowp float dist = texture2D(u_texture, v_tex).a;
     lowp float fade_alpha = texture2D(u_fadetexture, v_fade_tex).a;
-    highp float gamma = u_gamma * v_gamma_scale;
-    highp float alpha = smoothstep(u_buffer - gamma, u_buffer + gamma, dist) * fade_alpha;
+    highp float gamma_scaled = gamma * v_gamma_scale;
+    highp float alpha = smoothstep(buff - gamma_scaled, buff + gamma_scaled, dist) * fade_alpha;
 
-    gl_FragColor = u_color * (alpha * u_opacity);
+    gl_FragColor = color * (alpha * opacity);
 
 #ifdef OVERDRAW_INSPECTOR
     gl_FragColor = vec4(1.0);

@@ -66,6 +66,10 @@ attribute vec2 a_offset;
 attribute vec2 a_texture_pos;
 attribute vec4 a_data;
 
+uniform lowp float a_opacity_t;
+attribute lowp float a_opacity_min;
+attribute lowp float a_opacity_max;
+varying lowp float opacity;
 
 // matrix is for the vertex position.
 uniform mat4 u_matrix;
@@ -80,6 +84,8 @@ varying vec2 v_tex;
 varying vec2 v_fade_tex;
 
 void main() {
+    opacity = mix(a_opacity_min, a_opacity_max, a_opacity_t);
+
     vec2 a_tex = a_texture_pos.xy;
     mediump float a_labelminzoom = a_data[0];
     mediump vec2 a_zoom = a_data.pq;
@@ -122,13 +128,16 @@ precision mediump float;
 #endif
 uniform sampler2D u_texture;
 uniform sampler2D u_fadetexture;
-uniform lowp float u_opacity;
+
+varying lowp float opacity;
 
 varying vec2 v_tex;
 varying vec2 v_fade_tex;
 
 void main() {
-    lowp float alpha = texture2D(u_fadetexture, v_fade_tex).a * u_opacity;
+    
+
+    lowp float alpha = texture2D(u_fadetexture, v_fade_tex).a * opacity;
     gl_FragColor = texture2D(u_texture, v_tex) * alpha;
 
 #ifdef OVERDRAW_INSPECTOR

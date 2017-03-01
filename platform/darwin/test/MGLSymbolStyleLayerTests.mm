@@ -1421,7 +1421,7 @@
 
         MGLStyleValue<MGLColor *> *constantStyleValue = [MGLStyleValue<MGLColor *> valueWithRawValue:[MGLColor redColor]];
         layer.iconColor = constantStyleValue;
-        mbgl::style::PropertyValue<mbgl::Color> propertyValue = { { 1, 0, 0, 1 } };
+        mbgl::style::DataDrivenPropertyValue<mbgl::Color> propertyValue = { { 1, 0, 0, 1 } };
         XCTAssertEqual(rawLayer->getIconColor(), propertyValue,
                        @"Setting iconColor to a constant value should update icon-color.");
         XCTAssertEqualObjects(layer.iconColor, constantStyleValue,
@@ -1438,6 +1438,29 @@
         XCTAssertEqualObjects(layer.iconColor, functionStyleValue,
                               @"iconColor should round-trip camera functions.");
 
+        functionStyleValue = [MGLStyleValue<MGLColor *> valueWithInterpolationMode:MGLInterpolationModeExponential sourceStops:@{@18: constantStyleValue} attributeName:@"keyName" options:nil];
+        layer.iconColor = functionStyleValue;
+
+        mbgl::style::ExponentialStops<mbgl::Color> exponentialStops = { {{18, { 1, 0, 0, 1 }}}, 1.0 };
+        propertyValue = mbgl::style::SourceFunction<mbgl::Color> { "keyName", exponentialStops };
+
+        XCTAssertEqual(rawLayer->getIconColor(), propertyValue,
+                       @"Setting iconColor to a source function should update icon-color.");
+        XCTAssertEqualObjects(layer.iconColor, functionStyleValue,
+                              @"iconColor should round-trip source functions.");
+
+        functionStyleValue = [MGLStyleValue<MGLColor *> valueWithInterpolationMode:MGLInterpolationModeExponential compositeStops:@{@10: @{@18: constantStyleValue}} attributeName:@"keyName" options:nil];
+        layer.iconColor = functionStyleValue;
+
+        std::map<float, mbgl::Color> innerStops { {18, { 1, 0, 0, 1 }} };
+        mbgl::style::CompositeExponentialStops<mbgl::Color> compositeStops { { {10.0, innerStops} }, 1.0 };
+
+        propertyValue = mbgl::style::CompositeFunction<mbgl::Color> { "keyName", compositeStops };
+
+        XCTAssertEqual(rawLayer->getIconColor(), propertyValue,
+                       @"Setting iconColor to a composite function should update icon-color.");
+        XCTAssertEqualObjects(layer.iconColor, functionStyleValue,
+                              @"iconColor should round-trip composite functions.");                                                                                                          
                               
 
         layer.iconColor = nil;
@@ -1445,11 +1468,6 @@
                       @"Unsetting iconColor should return icon-color to the default value.");
         XCTAssertEqualObjects(layer.iconColor, defaultStyleValue,
                               @"iconColor should return the default value after being unset.");
-
-        functionStyleValue = [MGLStyleValue<MGLColor *> valueWithInterpolationMode:MGLInterpolationModeIdentity sourceStops:nil attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.iconColor = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
-        functionStyleValue = [MGLStyleValue<MGLColor *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.iconColor = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
     }
 
     // icon-halo-blur
@@ -1460,7 +1478,7 @@
 
         MGLStyleValue<NSNumber *> *constantStyleValue = [MGLStyleValue<NSNumber *> valueWithRawValue:@0xff];
         layer.iconHaloBlur = constantStyleValue;
-        mbgl::style::PropertyValue<float> propertyValue = { 0xff };
+        mbgl::style::DataDrivenPropertyValue<float> propertyValue = { 0xff };
         XCTAssertEqual(rawLayer->getIconHaloBlur(), propertyValue,
                        @"Setting iconHaloBlur to a constant value should update icon-halo-blur.");
         XCTAssertEqualObjects(layer.iconHaloBlur, constantStyleValue,
@@ -1477,6 +1495,29 @@
         XCTAssertEqualObjects(layer.iconHaloBlur, functionStyleValue,
                               @"iconHaloBlur should round-trip camera functions.");
 
+        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeExponential sourceStops:@{@18: constantStyleValue} attributeName:@"keyName" options:nil];
+        layer.iconHaloBlur = functionStyleValue;
+
+        mbgl::style::ExponentialStops<float> exponentialStops = { {{18, 0xff}}, 1.0 };
+        propertyValue = mbgl::style::SourceFunction<float> { "keyName", exponentialStops };
+
+        XCTAssertEqual(rawLayer->getIconHaloBlur(), propertyValue,
+                       @"Setting iconHaloBlur to a source function should update icon-halo-blur.");
+        XCTAssertEqualObjects(layer.iconHaloBlur, functionStyleValue,
+                              @"iconHaloBlur should round-trip source functions.");
+
+        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeExponential compositeStops:@{@10: @{@18: constantStyleValue}} attributeName:@"keyName" options:nil];
+        layer.iconHaloBlur = functionStyleValue;
+
+        std::map<float, float> innerStops { {18, 0xff} };
+        mbgl::style::CompositeExponentialStops<float> compositeStops { { {10.0, innerStops} }, 1.0 };
+
+        propertyValue = mbgl::style::CompositeFunction<float> { "keyName", compositeStops };
+
+        XCTAssertEqual(rawLayer->getIconHaloBlur(), propertyValue,
+                       @"Setting iconHaloBlur to a composite function should update icon-halo-blur.");
+        XCTAssertEqualObjects(layer.iconHaloBlur, functionStyleValue,
+                              @"iconHaloBlur should round-trip composite functions.");                                                                                                          
                               
 
         layer.iconHaloBlur = nil;
@@ -1484,11 +1525,6 @@
                       @"Unsetting iconHaloBlur should return icon-halo-blur to the default value.");
         XCTAssertEqualObjects(layer.iconHaloBlur, defaultStyleValue,
                               @"iconHaloBlur should return the default value after being unset.");
-
-        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeIdentity sourceStops:nil attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.iconHaloBlur = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
-        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.iconHaloBlur = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
     }
 
     // icon-halo-color
@@ -1499,7 +1535,7 @@
 
         MGLStyleValue<MGLColor *> *constantStyleValue = [MGLStyleValue<MGLColor *> valueWithRawValue:[MGLColor redColor]];
         layer.iconHaloColor = constantStyleValue;
-        mbgl::style::PropertyValue<mbgl::Color> propertyValue = { { 1, 0, 0, 1 } };
+        mbgl::style::DataDrivenPropertyValue<mbgl::Color> propertyValue = { { 1, 0, 0, 1 } };
         XCTAssertEqual(rawLayer->getIconHaloColor(), propertyValue,
                        @"Setting iconHaloColor to a constant value should update icon-halo-color.");
         XCTAssertEqualObjects(layer.iconHaloColor, constantStyleValue,
@@ -1516,6 +1552,29 @@
         XCTAssertEqualObjects(layer.iconHaloColor, functionStyleValue,
                               @"iconHaloColor should round-trip camera functions.");
 
+        functionStyleValue = [MGLStyleValue<MGLColor *> valueWithInterpolationMode:MGLInterpolationModeExponential sourceStops:@{@18: constantStyleValue} attributeName:@"keyName" options:nil];
+        layer.iconHaloColor = functionStyleValue;
+
+        mbgl::style::ExponentialStops<mbgl::Color> exponentialStops = { {{18, { 1, 0, 0, 1 }}}, 1.0 };
+        propertyValue = mbgl::style::SourceFunction<mbgl::Color> { "keyName", exponentialStops };
+
+        XCTAssertEqual(rawLayer->getIconHaloColor(), propertyValue,
+                       @"Setting iconHaloColor to a source function should update icon-halo-color.");
+        XCTAssertEqualObjects(layer.iconHaloColor, functionStyleValue,
+                              @"iconHaloColor should round-trip source functions.");
+
+        functionStyleValue = [MGLStyleValue<MGLColor *> valueWithInterpolationMode:MGLInterpolationModeExponential compositeStops:@{@10: @{@18: constantStyleValue}} attributeName:@"keyName" options:nil];
+        layer.iconHaloColor = functionStyleValue;
+
+        std::map<float, mbgl::Color> innerStops { {18, { 1, 0, 0, 1 }} };
+        mbgl::style::CompositeExponentialStops<mbgl::Color> compositeStops { { {10.0, innerStops} }, 1.0 };
+
+        propertyValue = mbgl::style::CompositeFunction<mbgl::Color> { "keyName", compositeStops };
+
+        XCTAssertEqual(rawLayer->getIconHaloColor(), propertyValue,
+                       @"Setting iconHaloColor to a composite function should update icon-halo-color.");
+        XCTAssertEqualObjects(layer.iconHaloColor, functionStyleValue,
+                              @"iconHaloColor should round-trip composite functions.");                                                                                                          
                               
 
         layer.iconHaloColor = nil;
@@ -1523,11 +1582,6 @@
                       @"Unsetting iconHaloColor should return icon-halo-color to the default value.");
         XCTAssertEqualObjects(layer.iconHaloColor, defaultStyleValue,
                               @"iconHaloColor should return the default value after being unset.");
-
-        functionStyleValue = [MGLStyleValue<MGLColor *> valueWithInterpolationMode:MGLInterpolationModeIdentity sourceStops:nil attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.iconHaloColor = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
-        functionStyleValue = [MGLStyleValue<MGLColor *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.iconHaloColor = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
     }
 
     // icon-halo-width
@@ -1538,7 +1592,7 @@
 
         MGLStyleValue<NSNumber *> *constantStyleValue = [MGLStyleValue<NSNumber *> valueWithRawValue:@0xff];
         layer.iconHaloWidth = constantStyleValue;
-        mbgl::style::PropertyValue<float> propertyValue = { 0xff };
+        mbgl::style::DataDrivenPropertyValue<float> propertyValue = { 0xff };
         XCTAssertEqual(rawLayer->getIconHaloWidth(), propertyValue,
                        @"Setting iconHaloWidth to a constant value should update icon-halo-width.");
         XCTAssertEqualObjects(layer.iconHaloWidth, constantStyleValue,
@@ -1555,6 +1609,29 @@
         XCTAssertEqualObjects(layer.iconHaloWidth, functionStyleValue,
                               @"iconHaloWidth should round-trip camera functions.");
 
+        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeExponential sourceStops:@{@18: constantStyleValue} attributeName:@"keyName" options:nil];
+        layer.iconHaloWidth = functionStyleValue;
+
+        mbgl::style::ExponentialStops<float> exponentialStops = { {{18, 0xff}}, 1.0 };
+        propertyValue = mbgl::style::SourceFunction<float> { "keyName", exponentialStops };
+
+        XCTAssertEqual(rawLayer->getIconHaloWidth(), propertyValue,
+                       @"Setting iconHaloWidth to a source function should update icon-halo-width.");
+        XCTAssertEqualObjects(layer.iconHaloWidth, functionStyleValue,
+                              @"iconHaloWidth should round-trip source functions.");
+
+        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeExponential compositeStops:@{@10: @{@18: constantStyleValue}} attributeName:@"keyName" options:nil];
+        layer.iconHaloWidth = functionStyleValue;
+
+        std::map<float, float> innerStops { {18, 0xff} };
+        mbgl::style::CompositeExponentialStops<float> compositeStops { { {10.0, innerStops} }, 1.0 };
+
+        propertyValue = mbgl::style::CompositeFunction<float> { "keyName", compositeStops };
+
+        XCTAssertEqual(rawLayer->getIconHaloWidth(), propertyValue,
+                       @"Setting iconHaloWidth to a composite function should update icon-halo-width.");
+        XCTAssertEqualObjects(layer.iconHaloWidth, functionStyleValue,
+                              @"iconHaloWidth should round-trip composite functions.");                                                                                                          
                               
 
         layer.iconHaloWidth = nil;
@@ -1562,11 +1639,6 @@
                       @"Unsetting iconHaloWidth should return icon-halo-width to the default value.");
         XCTAssertEqualObjects(layer.iconHaloWidth, defaultStyleValue,
                               @"iconHaloWidth should return the default value after being unset.");
-
-        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeIdentity sourceStops:nil attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.iconHaloWidth = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
-        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.iconHaloWidth = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
     }
 
     // icon-opacity
@@ -1577,7 +1649,7 @@
 
         MGLStyleValue<NSNumber *> *constantStyleValue = [MGLStyleValue<NSNumber *> valueWithRawValue:@0xff];
         layer.iconOpacity = constantStyleValue;
-        mbgl::style::PropertyValue<float> propertyValue = { 0xff };
+        mbgl::style::DataDrivenPropertyValue<float> propertyValue = { 0xff };
         XCTAssertEqual(rawLayer->getIconOpacity(), propertyValue,
                        @"Setting iconOpacity to a constant value should update icon-opacity.");
         XCTAssertEqualObjects(layer.iconOpacity, constantStyleValue,
@@ -1594,6 +1666,29 @@
         XCTAssertEqualObjects(layer.iconOpacity, functionStyleValue,
                               @"iconOpacity should round-trip camera functions.");
 
+        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeExponential sourceStops:@{@18: constantStyleValue} attributeName:@"keyName" options:nil];
+        layer.iconOpacity = functionStyleValue;
+
+        mbgl::style::ExponentialStops<float> exponentialStops = { {{18, 0xff}}, 1.0 };
+        propertyValue = mbgl::style::SourceFunction<float> { "keyName", exponentialStops };
+
+        XCTAssertEqual(rawLayer->getIconOpacity(), propertyValue,
+                       @"Setting iconOpacity to a source function should update icon-opacity.");
+        XCTAssertEqualObjects(layer.iconOpacity, functionStyleValue,
+                              @"iconOpacity should round-trip source functions.");
+
+        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeExponential compositeStops:@{@10: @{@18: constantStyleValue}} attributeName:@"keyName" options:nil];
+        layer.iconOpacity = functionStyleValue;
+
+        std::map<float, float> innerStops { {18, 0xff} };
+        mbgl::style::CompositeExponentialStops<float> compositeStops { { {10.0, innerStops} }, 1.0 };
+
+        propertyValue = mbgl::style::CompositeFunction<float> { "keyName", compositeStops };
+
+        XCTAssertEqual(rawLayer->getIconOpacity(), propertyValue,
+                       @"Setting iconOpacity to a composite function should update icon-opacity.");
+        XCTAssertEqualObjects(layer.iconOpacity, functionStyleValue,
+                              @"iconOpacity should round-trip composite functions.");                                                                                                          
                               
 
         layer.iconOpacity = nil;
@@ -1601,11 +1696,6 @@
                       @"Unsetting iconOpacity should return icon-opacity to the default value.");
         XCTAssertEqualObjects(layer.iconOpacity, defaultStyleValue,
                               @"iconOpacity should return the default value after being unset.");
-
-        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeIdentity sourceStops:nil attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.iconOpacity = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
-        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.iconOpacity = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
     }
 
     // icon-translate
@@ -1700,7 +1790,7 @@
 
         MGLStyleValue<MGLColor *> *constantStyleValue = [MGLStyleValue<MGLColor *> valueWithRawValue:[MGLColor redColor]];
         layer.textColor = constantStyleValue;
-        mbgl::style::PropertyValue<mbgl::Color> propertyValue = { { 1, 0, 0, 1 } };
+        mbgl::style::DataDrivenPropertyValue<mbgl::Color> propertyValue = { { 1, 0, 0, 1 } };
         XCTAssertEqual(rawLayer->getTextColor(), propertyValue,
                        @"Setting textColor to a constant value should update text-color.");
         XCTAssertEqualObjects(layer.textColor, constantStyleValue,
@@ -1717,6 +1807,29 @@
         XCTAssertEqualObjects(layer.textColor, functionStyleValue,
                               @"textColor should round-trip camera functions.");
 
+        functionStyleValue = [MGLStyleValue<MGLColor *> valueWithInterpolationMode:MGLInterpolationModeExponential sourceStops:@{@18: constantStyleValue} attributeName:@"keyName" options:nil];
+        layer.textColor = functionStyleValue;
+
+        mbgl::style::ExponentialStops<mbgl::Color> exponentialStops = { {{18, { 1, 0, 0, 1 }}}, 1.0 };
+        propertyValue = mbgl::style::SourceFunction<mbgl::Color> { "keyName", exponentialStops };
+
+        XCTAssertEqual(rawLayer->getTextColor(), propertyValue,
+                       @"Setting textColor to a source function should update text-color.");
+        XCTAssertEqualObjects(layer.textColor, functionStyleValue,
+                              @"textColor should round-trip source functions.");
+
+        functionStyleValue = [MGLStyleValue<MGLColor *> valueWithInterpolationMode:MGLInterpolationModeExponential compositeStops:@{@10: @{@18: constantStyleValue}} attributeName:@"keyName" options:nil];
+        layer.textColor = functionStyleValue;
+
+        std::map<float, mbgl::Color> innerStops { {18, { 1, 0, 0, 1 }} };
+        mbgl::style::CompositeExponentialStops<mbgl::Color> compositeStops { { {10.0, innerStops} }, 1.0 };
+
+        propertyValue = mbgl::style::CompositeFunction<mbgl::Color> { "keyName", compositeStops };
+
+        XCTAssertEqual(rawLayer->getTextColor(), propertyValue,
+                       @"Setting textColor to a composite function should update text-color.");
+        XCTAssertEqualObjects(layer.textColor, functionStyleValue,
+                              @"textColor should round-trip composite functions.");                                                                                                          
                               
 
         layer.textColor = nil;
@@ -1724,11 +1837,6 @@
                       @"Unsetting textColor should return text-color to the default value.");
         XCTAssertEqualObjects(layer.textColor, defaultStyleValue,
                               @"textColor should return the default value after being unset.");
-
-        functionStyleValue = [MGLStyleValue<MGLColor *> valueWithInterpolationMode:MGLInterpolationModeIdentity sourceStops:nil attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.textColor = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
-        functionStyleValue = [MGLStyleValue<MGLColor *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.textColor = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
     }
 
     // text-halo-blur
@@ -1739,7 +1847,7 @@
 
         MGLStyleValue<NSNumber *> *constantStyleValue = [MGLStyleValue<NSNumber *> valueWithRawValue:@0xff];
         layer.textHaloBlur = constantStyleValue;
-        mbgl::style::PropertyValue<float> propertyValue = { 0xff };
+        mbgl::style::DataDrivenPropertyValue<float> propertyValue = { 0xff };
         XCTAssertEqual(rawLayer->getTextHaloBlur(), propertyValue,
                        @"Setting textHaloBlur to a constant value should update text-halo-blur.");
         XCTAssertEqualObjects(layer.textHaloBlur, constantStyleValue,
@@ -1756,6 +1864,29 @@
         XCTAssertEqualObjects(layer.textHaloBlur, functionStyleValue,
                               @"textHaloBlur should round-trip camera functions.");
 
+        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeExponential sourceStops:@{@18: constantStyleValue} attributeName:@"keyName" options:nil];
+        layer.textHaloBlur = functionStyleValue;
+
+        mbgl::style::ExponentialStops<float> exponentialStops = { {{18, 0xff}}, 1.0 };
+        propertyValue = mbgl::style::SourceFunction<float> { "keyName", exponentialStops };
+
+        XCTAssertEqual(rawLayer->getTextHaloBlur(), propertyValue,
+                       @"Setting textHaloBlur to a source function should update text-halo-blur.");
+        XCTAssertEqualObjects(layer.textHaloBlur, functionStyleValue,
+                              @"textHaloBlur should round-trip source functions.");
+
+        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeExponential compositeStops:@{@10: @{@18: constantStyleValue}} attributeName:@"keyName" options:nil];
+        layer.textHaloBlur = functionStyleValue;
+
+        std::map<float, float> innerStops { {18, 0xff} };
+        mbgl::style::CompositeExponentialStops<float> compositeStops { { {10.0, innerStops} }, 1.0 };
+
+        propertyValue = mbgl::style::CompositeFunction<float> { "keyName", compositeStops };
+
+        XCTAssertEqual(rawLayer->getTextHaloBlur(), propertyValue,
+                       @"Setting textHaloBlur to a composite function should update text-halo-blur.");
+        XCTAssertEqualObjects(layer.textHaloBlur, functionStyleValue,
+                              @"textHaloBlur should round-trip composite functions.");                                                                                                          
                               
 
         layer.textHaloBlur = nil;
@@ -1763,11 +1894,6 @@
                       @"Unsetting textHaloBlur should return text-halo-blur to the default value.");
         XCTAssertEqualObjects(layer.textHaloBlur, defaultStyleValue,
                               @"textHaloBlur should return the default value after being unset.");
-
-        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeIdentity sourceStops:nil attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.textHaloBlur = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
-        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.textHaloBlur = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
     }
 
     // text-halo-color
@@ -1778,7 +1904,7 @@
 
         MGLStyleValue<MGLColor *> *constantStyleValue = [MGLStyleValue<MGLColor *> valueWithRawValue:[MGLColor redColor]];
         layer.textHaloColor = constantStyleValue;
-        mbgl::style::PropertyValue<mbgl::Color> propertyValue = { { 1, 0, 0, 1 } };
+        mbgl::style::DataDrivenPropertyValue<mbgl::Color> propertyValue = { { 1, 0, 0, 1 } };
         XCTAssertEqual(rawLayer->getTextHaloColor(), propertyValue,
                        @"Setting textHaloColor to a constant value should update text-halo-color.");
         XCTAssertEqualObjects(layer.textHaloColor, constantStyleValue,
@@ -1795,6 +1921,29 @@
         XCTAssertEqualObjects(layer.textHaloColor, functionStyleValue,
                               @"textHaloColor should round-trip camera functions.");
 
+        functionStyleValue = [MGLStyleValue<MGLColor *> valueWithInterpolationMode:MGLInterpolationModeExponential sourceStops:@{@18: constantStyleValue} attributeName:@"keyName" options:nil];
+        layer.textHaloColor = functionStyleValue;
+
+        mbgl::style::ExponentialStops<mbgl::Color> exponentialStops = { {{18, { 1, 0, 0, 1 }}}, 1.0 };
+        propertyValue = mbgl::style::SourceFunction<mbgl::Color> { "keyName", exponentialStops };
+
+        XCTAssertEqual(rawLayer->getTextHaloColor(), propertyValue,
+                       @"Setting textHaloColor to a source function should update text-halo-color.");
+        XCTAssertEqualObjects(layer.textHaloColor, functionStyleValue,
+                              @"textHaloColor should round-trip source functions.");
+
+        functionStyleValue = [MGLStyleValue<MGLColor *> valueWithInterpolationMode:MGLInterpolationModeExponential compositeStops:@{@10: @{@18: constantStyleValue}} attributeName:@"keyName" options:nil];
+        layer.textHaloColor = functionStyleValue;
+
+        std::map<float, mbgl::Color> innerStops { {18, { 1, 0, 0, 1 }} };
+        mbgl::style::CompositeExponentialStops<mbgl::Color> compositeStops { { {10.0, innerStops} }, 1.0 };
+
+        propertyValue = mbgl::style::CompositeFunction<mbgl::Color> { "keyName", compositeStops };
+
+        XCTAssertEqual(rawLayer->getTextHaloColor(), propertyValue,
+                       @"Setting textHaloColor to a composite function should update text-halo-color.");
+        XCTAssertEqualObjects(layer.textHaloColor, functionStyleValue,
+                              @"textHaloColor should round-trip composite functions.");                                                                                                          
                               
 
         layer.textHaloColor = nil;
@@ -1802,11 +1951,6 @@
                       @"Unsetting textHaloColor should return text-halo-color to the default value.");
         XCTAssertEqualObjects(layer.textHaloColor, defaultStyleValue,
                               @"textHaloColor should return the default value after being unset.");
-
-        functionStyleValue = [MGLStyleValue<MGLColor *> valueWithInterpolationMode:MGLInterpolationModeIdentity sourceStops:nil attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.textHaloColor = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
-        functionStyleValue = [MGLStyleValue<MGLColor *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.textHaloColor = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
     }
 
     // text-halo-width
@@ -1817,7 +1961,7 @@
 
         MGLStyleValue<NSNumber *> *constantStyleValue = [MGLStyleValue<NSNumber *> valueWithRawValue:@0xff];
         layer.textHaloWidth = constantStyleValue;
-        mbgl::style::PropertyValue<float> propertyValue = { 0xff };
+        mbgl::style::DataDrivenPropertyValue<float> propertyValue = { 0xff };
         XCTAssertEqual(rawLayer->getTextHaloWidth(), propertyValue,
                        @"Setting textHaloWidth to a constant value should update text-halo-width.");
         XCTAssertEqualObjects(layer.textHaloWidth, constantStyleValue,
@@ -1834,6 +1978,29 @@
         XCTAssertEqualObjects(layer.textHaloWidth, functionStyleValue,
                               @"textHaloWidth should round-trip camera functions.");
 
+        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeExponential sourceStops:@{@18: constantStyleValue} attributeName:@"keyName" options:nil];
+        layer.textHaloWidth = functionStyleValue;
+
+        mbgl::style::ExponentialStops<float> exponentialStops = { {{18, 0xff}}, 1.0 };
+        propertyValue = mbgl::style::SourceFunction<float> { "keyName", exponentialStops };
+
+        XCTAssertEqual(rawLayer->getTextHaloWidth(), propertyValue,
+                       @"Setting textHaloWidth to a source function should update text-halo-width.");
+        XCTAssertEqualObjects(layer.textHaloWidth, functionStyleValue,
+                              @"textHaloWidth should round-trip source functions.");
+
+        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeExponential compositeStops:@{@10: @{@18: constantStyleValue}} attributeName:@"keyName" options:nil];
+        layer.textHaloWidth = functionStyleValue;
+
+        std::map<float, float> innerStops { {18, 0xff} };
+        mbgl::style::CompositeExponentialStops<float> compositeStops { { {10.0, innerStops} }, 1.0 };
+
+        propertyValue = mbgl::style::CompositeFunction<float> { "keyName", compositeStops };
+
+        XCTAssertEqual(rawLayer->getTextHaloWidth(), propertyValue,
+                       @"Setting textHaloWidth to a composite function should update text-halo-width.");
+        XCTAssertEqualObjects(layer.textHaloWidth, functionStyleValue,
+                              @"textHaloWidth should round-trip composite functions.");                                                                                                          
                               
 
         layer.textHaloWidth = nil;
@@ -1841,11 +2008,6 @@
                       @"Unsetting textHaloWidth should return text-halo-width to the default value.");
         XCTAssertEqualObjects(layer.textHaloWidth, defaultStyleValue,
                               @"textHaloWidth should return the default value after being unset.");
-
-        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeIdentity sourceStops:nil attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.textHaloWidth = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
-        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.textHaloWidth = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
     }
 
     // text-opacity
@@ -1856,7 +2018,7 @@
 
         MGLStyleValue<NSNumber *> *constantStyleValue = [MGLStyleValue<NSNumber *> valueWithRawValue:@0xff];
         layer.textOpacity = constantStyleValue;
-        mbgl::style::PropertyValue<float> propertyValue = { 0xff };
+        mbgl::style::DataDrivenPropertyValue<float> propertyValue = { 0xff };
         XCTAssertEqual(rawLayer->getTextOpacity(), propertyValue,
                        @"Setting textOpacity to a constant value should update text-opacity.");
         XCTAssertEqualObjects(layer.textOpacity, constantStyleValue,
@@ -1873,6 +2035,29 @@
         XCTAssertEqualObjects(layer.textOpacity, functionStyleValue,
                               @"textOpacity should round-trip camera functions.");
 
+        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeExponential sourceStops:@{@18: constantStyleValue} attributeName:@"keyName" options:nil];
+        layer.textOpacity = functionStyleValue;
+
+        mbgl::style::ExponentialStops<float> exponentialStops = { {{18, 0xff}}, 1.0 };
+        propertyValue = mbgl::style::SourceFunction<float> { "keyName", exponentialStops };
+
+        XCTAssertEqual(rawLayer->getTextOpacity(), propertyValue,
+                       @"Setting textOpacity to a source function should update text-opacity.");
+        XCTAssertEqualObjects(layer.textOpacity, functionStyleValue,
+                              @"textOpacity should round-trip source functions.");
+
+        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeExponential compositeStops:@{@10: @{@18: constantStyleValue}} attributeName:@"keyName" options:nil];
+        layer.textOpacity = functionStyleValue;
+
+        std::map<float, float> innerStops { {18, 0xff} };
+        mbgl::style::CompositeExponentialStops<float> compositeStops { { {10.0, innerStops} }, 1.0 };
+
+        propertyValue = mbgl::style::CompositeFunction<float> { "keyName", compositeStops };
+
+        XCTAssertEqual(rawLayer->getTextOpacity(), propertyValue,
+                       @"Setting textOpacity to a composite function should update text-opacity.");
+        XCTAssertEqualObjects(layer.textOpacity, functionStyleValue,
+                              @"textOpacity should round-trip composite functions.");                                                                                                          
                               
 
         layer.textOpacity = nil;
@@ -1880,11 +2065,6 @@
                       @"Unsetting textOpacity should return text-opacity to the default value.");
         XCTAssertEqualObjects(layer.textOpacity, defaultStyleValue,
                               @"textOpacity should return the default value after being unset.");
-
-        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeIdentity sourceStops:nil attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.textOpacity = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
-        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.textOpacity = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
     }
 
     // text-translate

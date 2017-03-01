@@ -40,8 +40,8 @@ public:
     LinePatternProgram linePattern;
     RasterProgram raster;
     SymbolIconProgram symbolIcon;
-    SymbolSDFProgram symbolIconSDF;
-    SymbolSDFProgram symbolGlyph;
+    SymbolSDFIconProgram symbolIconSDF;
+    SymbolSDFTextProgram symbolGlyph;
 
     DebugProgram debug;
     CollisionBoxProgram collisionBox;
