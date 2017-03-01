@@ -9,8 +9,6 @@ import android.support.annotation.NonNull;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 
-import java.lang.ref.WeakReference;
-
 import timber.log.Timber;
 
 /**
@@ -36,19 +34,17 @@ public class FileSource {
 
   }
 
-  // Use weak reference to avoid blocking GC on this reference.
-  // Should only block when mapview / Offline manager instances
-  // are alive
-  private static WeakReference<FileSource> INSTANCE;
+  // File source instance is kept alive after initialization
+  private static FileSource INSTANCE;
 
   public static synchronized FileSource getInstance(Context context) {
-    if (INSTANCE == null || INSTANCE.get() == null) {
+    if (INSTANCE == null) {
       String cachePath = getCachePath(context);
       String apkPath = context.getPackageCodePath();
-      INSTANCE = new WeakReference<>(new FileSource(cachePath, apkPath));
+      INSTANCE = new FileSource(cachePath, apkPath);
     }
 
-    return INSTANCE.get();
+    return INSTANCE;
   }
 
   public static String getCachePath(Context context) {
