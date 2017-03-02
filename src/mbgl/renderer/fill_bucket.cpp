@@ -29,8 +29,10 @@ struct GeometryTooLongException : std::exception {};
 
 FillBucket::FillBucket(const BucketParameters& parameters, const std::vector<const Layer*>& layers) {
     for (const auto& layer : layers) {
-        paintPropertyBinders.emplace(layer->getID(),
-            FillProgram::PaintPropertyBinders(
+        paintPropertyBinders.emplace(
+            std::piecewise_construct,
+            std::forward_as_tuple(layer->getID()),
+            std::forward_as_tuple(
                 layer->as<FillLayer>()->impl->paint.evaluated,
                 parameters.tileID.overscaledZ));
     }

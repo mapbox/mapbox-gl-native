@@ -13,8 +13,10 @@ using namespace style;
 CircleBucket::CircleBucket(const BucketParameters& parameters, const std::vector<const Layer*>& layers)
     : mode(parameters.mode) {
     for (const auto& layer : layers) {
-        paintPropertyBinders.emplace(layer->getID(),
-            CircleProgram::PaintPropertyBinders(
+        paintPropertyBinders.emplace(
+            std::piecewise_construct,
+            std::forward_as_tuple(layer->getID()),
+            std::forward_as_tuple(
                 layer->as<CircleLayer>()->impl->paint.evaluated,
                 parameters.tileID.overscaledZ));
     }

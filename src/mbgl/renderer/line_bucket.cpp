@@ -18,8 +18,10 @@ LineBucket::LineBucket(const BucketParameters& parameters,
     : layout(layout_.evaluate(PropertyEvaluationParameters(parameters.tileID.overscaledZ))),
       overscaling(parameters.tileID.overscaleFactor()) {
     for (const auto& layer : layers) {
-        paintPropertyBinders.emplace(layer->getID(),
-            LineProgram::PaintPropertyBinders(
+        paintPropertyBinders.emplace(
+            std::piecewise_construct,
+            std::forward_as_tuple(layer->getID()),
+            std::forward_as_tuple(
                 layer->as<LineLayer>()->impl->paint.evaluated,
                 parameters.tileID.overscaledZ));
     }
