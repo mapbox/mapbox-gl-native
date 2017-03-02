@@ -44,6 +44,30 @@ vec4 evaluate_zoom_function_4(const vec4 value0, const vec4 value1, const vec4 v
     }
 }
 
+// Encoding function
+// static std::array<float, 2> encodeColor (const Color& color) {
+//     return {{ static_cast<float>(color.r*256.0 + color.g),static_cast<float>( color.b*256.0 + color.a) }};
+// }
+
+vec4 decode_color(const vec2 encodedColor) {
+    float r = floor(encodedColor[0]/256.0);
+    float g = (encodedColor[0] - r*256.0);
+    float b = floor(encodedColor[1]/256.0);
+    float a = (encodedColor[1] - b*256.0);
+    return vec4(r, g, b, a);
+}
+
+float unpack_mix_vec2(const vec2 packedValue, const float t) {
+    return mix(packedValue[0], packedValue[1], t);
+}
+
+vec4 unpack_mix_vec4(const vec4 packedColors, const float t) {
+    vec4 minColor = decode_color(packedColors.st);
+    vec4 maxColor = decode_color(packedColors.pq);
+    return mix(minColor, maxColor, t);
+}
+
+
 // The offset depends on how many pixels are between the world origin and the edge of the tile:
 // vec2 offset = mod(pixel_coord, size)
 //
@@ -69,24 +93,19 @@ attribute vec2 a_texture_pos;
 attribute vec4 a_data;
 
 uniform lowp float a_fill_color_t;
-attribute lowp vec4 a_fill_color_min;
-attribute lowp vec4 a_fill_color_max;
+attribute lowp vec4 a_fill_color_minmax;
 varying lowp vec4 fill_color;
 uniform lowp float a_halo_color_t;
-attribute lowp vec4 a_halo_color_min;
-attribute lowp vec4 a_halo_color_max;
+attribute lowp vec4 a_halo_color_minmax;
 varying lowp vec4 halo_color;
 uniform lowp float a_opacity_t;
-attribute lowp float a_opacity_min;
-attribute lowp float a_opacity_max;
+attribute lowp vec2 a_opacity_minmax;
 varying lowp float opacity;
 uniform lowp float a_halo_width_t;
-attribute lowp float a_halo_width_min;
-attribute lowp float a_halo_width_max;
+attribute lowp vec2 a_halo_width_minmax;
 varying lowp float halo_width;
 uniform lowp float a_halo_blur_t;
-attribute lowp float a_halo_blur_min;
-attribute lowp float a_halo_blur_max;
+attribute lowp vec2 a_halo_blur_minmax;
 varying lowp float halo_blur;
 
 // matrix is for the vertex position.
@@ -107,11 +126,11 @@ varying vec2 v_fade_tex;
 varying float v_gamma_scale;
 
 void main() {
-    fill_color = mix(a_fill_color_min, a_fill_color_max, a_fill_color_t);
-    halo_color = mix(a_halo_color_min, a_halo_color_max, a_halo_color_t);
-    opacity = mix(a_opacity_min, a_opacity_max, a_opacity_t);
-    halo_width = mix(a_halo_width_min, a_halo_width_max, a_halo_width_t);
-    halo_blur = mix(a_halo_blur_min, a_halo_blur_max, a_halo_blur_t);
+    fill_color = unpack_mix_vec4(a_fill_color_minmax, a_fill_color_t);
+    halo_color = unpack_mix_vec4(a_halo_color_minmax, a_halo_color_t);
+    opacity = unpack_mix_vec2(a_opacity_minmax, a_opacity_t);
+    halo_width = unpack_mix_vec2(a_halo_width_minmax, a_halo_width_t);
+    halo_blur = unpack_mix_vec2(a_halo_blur_minmax, a_halo_blur_t);
 
     vec2 a_tex = a_texture_pos.xy;
     mediump float a_labelminzoom = a_data[0];

@@ -35,6 +35,12 @@ require('./style-code');
         });
     }
 
+    function unpackAttrs(){
+        float
+
+    }
+
+
     function vertexSource() {
         const prelude = fs.readFileSync(path.join(inputPath, '_prelude.vertex.glsl'));
         const source = fs.readFileSync(path.join(inputPath, shaderName + '.vertex.glsl'), 'utf8');
@@ -45,7 +51,7 @@ require('./style-code');
                     "varying {precision} {type} {name};"
                 ],
                 initialize: [
-                    "{name} = unpack_{a_type}(a_{name}_minmax, a_{name}_t);"
+                    "{name} = unpack_mix_{a_type}(a_{name}_minmax, a_{name}_t);"
                 ]
             });
     }

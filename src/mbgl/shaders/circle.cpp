@@ -44,6 +44,30 @@ vec4 evaluate_zoom_function_4(const vec4 value0, const vec4 value1, const vec4 v
     }
 }
 
+// Encoding function
+// static std::array<float, 2> encodeColor (const Color& color) {
+//     return {{ static_cast<float>(color.r*256.0 + color.g),static_cast<float>( color.b*256.0 + color.a) }};
+// }
+
+vec4 decode_color(const vec2 encodedColor) {
+    float r = floor(encodedColor[0]/256.0);
+    float g = (encodedColor[0] - r*256.0);
+    float b = floor(encodedColor[1]/256.0);
+    float a = (encodedColor[1] - b*256.0);
+    return vec4(r, g, b, a);
+}
+
+float unpack_mix_vec2(const vec2 packedValue, const float t) {
+    return mix(packedValue[0], packedValue[1], t);
+}
+
+vec4 unpack_mix_vec4(const vec4 packedColors, const float t) {
+    vec4 minColor = decode_color(packedColors.st);
+    vec4 maxColor = decode_color(packedColors.pq);
+    return mix(minColor, maxColor, t);
+}
+
+
 // The offset depends on how many pixels are between the world origin and the edge of the tile:
 // vec2 offset = mod(pixel_coord, size)
 //
@@ -68,45 +92,38 @@ uniform vec2 u_extrude_scale;
 attribute vec2 a_pos;
 
 uniform lowp float a_color_t;
-attribute lowp vec4 a_color_min;
-attribute lowp vec4 a_color_max;
+attribute lowp vec4 a_color_minmax;
 varying lowp vec4 color;
 uniform lowp float a_radius_t;
-attribute mediump float a_radius_min;
-attribute mediump float a_radius_max;
+attribute mediump vec2 a_radius_minmax;
 varying mediump float radius;
 uniform lowp float a_blur_t;
-attribute lowp float a_blur_min;
-attribute lowp float a_blur_max;
+attribute lowp vec2 a_blur_minmax;
 varying lowp float blur;
 uniform lowp float a_opacity_t;
-attribute lowp float a_opacity_min;
-attribute lowp float a_opacity_max;
+attribute lowp vec2 a_opacity_minmax;
 varying lowp float opacity;
 uniform lowp float a_stroke_color_t;
-attribute lowp vec4 a_stroke_color_min;
-attribute lowp vec4 a_stroke_color_max;
+attribute lowp vec4 a_stroke_color_minmax;
 varying lowp vec4 stroke_color;
 uniform lowp float a_stroke_width_t;
-attribute mediump float a_stroke_width_min;
-attribute mediump float a_stroke_width_max;
+attribute mediump vec2 a_stroke_width_minmax;
 varying mediump float stroke_width;
 uniform lowp float a_stroke_opacity_t;
-attribute lowp float a_stroke_opacity_min;
-attribute lowp float a_stroke_opacity_max;
+attribute lowp vec2 a_stroke_opacity_minmax;
 varying lowp float stroke_opacity;
 
 varying vec2 v_extrude;
 varying lowp float v_antialiasblur;
 
 void main(void) {
-    color = mix(a_color_min, a_color_max, a_color_t);
-    radius = mix(a_radius_min, a_radius_max, a_radius_t);
-    blur = mix(a_blur_min, a_blur_max, a_blur_t);
-    opacity = mix(a_opacity_min, a_opacity_max, a_opacity_t);
-    stroke_color = mix(a_stroke_color_min, a_stroke_color_max, a_stroke_color_t);
-    stroke_width = mix(a_stroke_width_min, a_stroke_width_max, a_stroke_width_t);
-    stroke_opacity = mix(a_stroke_opacity_min, a_stroke_opacity_max, a_stroke_opacity_t);
+    color = unpack_mix_vec4(a_color_minmax, a_color_t);
+    radius = unpack_mix_vec2(a_radius_minmax, a_radius_t);
+    blur = unpack_mix_vec2(a_blur_minmax, a_blur_t);
+    opacity = unpack_mix_vec2(a_opacity_minmax, a_opacity_t);
+    stroke_color = unpack_mix_vec4(a_stroke_color_minmax, a_stroke_color_t);
+    stroke_width = unpack_mix_vec2(a_stroke_width_minmax, a_stroke_width_t);
+    stroke_opacity = unpack_mix_vec2(a_stroke_opacity_minmax, a_stroke_opacity_t);
 
     // unencode the extrusion vector that we snuck into the a_pos vector
     v_extrude = vec2(mod(a_pos, 2.0) * 2.0 - 1.0);
