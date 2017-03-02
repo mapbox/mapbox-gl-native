@@ -218,7 +218,6 @@ macro(mbgl_platform_core)
         PRIVATE -fvisibility=hidden
         PRIVATE -ffunction-sections
         PRIVATE -fdata-sections
-        PRIVATE -Os
     )
 
     target_link_libraries(mbgl-core
@@ -244,7 +243,6 @@ target_compile_options(mapbox-gl
     PRIVATE -fvisibility=hidden
     PRIVATE -ffunction-sections
     PRIVATE -fdata-sections
-    PRIVATE -Os
 )
 
 target_link_libraries(mapbox-gl
@@ -285,7 +283,6 @@ target_sources(mbgl-test
 
 target_compile_options(mbgl-test
     PRIVATE -fvisibility=hidden
-    PRIVATE -Os
 )
 
 target_compile_definitions(mbgl-test
@@ -329,7 +326,6 @@ target_compile_options(example-custom-layer
     PRIVATE -fvisibility=hidden
     PRIVATE -ffunction-sections
     PRIVATE -fdata-sections
-    PRIVATE -Os
 )
 
 target_link_libraries(example-custom-layer

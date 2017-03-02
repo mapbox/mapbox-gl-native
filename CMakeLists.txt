@@ -66,6 +66,7 @@ if(APPLE)
     # -Wno-error=unused-command-line-argument is required due to https://llvm.org/bugs/show_bug.cgi?id=7798
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-error=unused-command-line-argument")
 endif()
+set(CMAKE_CXX_FLAGS_RELEASE "-Os -DNDEBUG")
 
 if(CMAKE_COMPILER_IS_GNUCXX)
     # https://svn.boost.org/trac/boost/ticket/9240
