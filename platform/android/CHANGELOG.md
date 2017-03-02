@@ -2,6 +2,13 @@
 
 Mapbox welcomes participation and contributions from everyone.  If you'd like to do so please see the [`Contributing Guide`](https://github.com/mapbox/mapbox-gl-native/blob/master/CONTRIBUTING.md) first to get started.
 
+## 5.0.0-beta.2 - March 1st, 2017
+
+5.0.0-beta.2 focuses on addressing stability issues and bug fixes. It also includes:
+
+* Data-driven styling for `{text,icon}-{color,opacity,halo-color,halo-blur,halo-width}` [#7939](https://github.com/mapbox/mapbox-gl-native/pull/7939)
+* Additional APIs to manage runtime styling layers [#8195](https://github.com/mapbox/mapbox-gl-native/pull/8195)
+
 ## 5.0.0-beta.1 - February 14th, 2017
 
 * Support for data-driven styles [#7752](https://github.com/mapbox/mapbox-gl-native/pull/7752)
