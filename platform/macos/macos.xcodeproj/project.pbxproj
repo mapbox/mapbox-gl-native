@@ -378,6 +378,8 @@
 		DA618B161E6886E000CB7F44 /* ca */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ca; path = ca.lproj/Localizable.strings; sourceTree = "<group>"; };
 		DA618B171E68876C00CB7F44 /* ca */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ca; path = ca.lproj/Foundation.strings; sourceTree = "<group>"; };
 		DA618B181E6887C600CB7F44 /* ca */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ca; path = ca.lproj/Localizable.strings; sourceTree = "<group>"; };
+		DA618B231E6891ED00CB7F44 /* lt */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = lt; path = lt.lproj/Foundation.strings; sourceTree = "<group>"; };
+		DA618B241E6891F300CB7F44 /* lt */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = lt; path = lt.lproj/Foundation.stringsdict; sourceTree = "<group>"; };
 		DA6408D51DA4E5DA00908C90 /* MGLVectorStyleLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLVectorStyleLayer.h; sourceTree = "<group>"; };
 		DA6408D61DA4E5DA00908C90 /* MGLVectorStyleLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLVectorStyleLayer.m; sourceTree = "<group>"; };
 		DA7262051DEEDD460043BB89 /* MGLOpenGLStyleLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLOpenGLStyleLayer.h; sourceTree = "<group>"; };
@@ -1534,6 +1536,7 @@
 				DAA32CC01E4C4F89006F8D24 /* vi */,
 				DA6023EF1E4CE8E500DBFF23 /* sv */,
 				DA618B171E68876C00CB7F44 /* ca */,
+				DA618B231E6891ED00CB7F44 /* lt */,
 			);
 			name = Foundation.strings;
 			sourceTree = "<group>";
@@ -1551,6 +1554,7 @@
 				DA1AC01F1E5B8904006DF1D6 /* uk */,
 				DAE8CCAA1E6E8605009B5CB0 /* ru */,
 				DA618B151E6886DF00CB7F44 /* ca */,
+				DA618B241E6891F300CB7F44 /* lt */,
 			);
 			name = Foundation.stringsdict;
 			sourceTree = "<group>";
