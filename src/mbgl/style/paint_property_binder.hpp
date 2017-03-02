@@ -25,8 +25,9 @@ public:
     void upload(gl::Context&) {}
 
     AttributeBinding attributeBinding(const PossiblyEvaluatedPropertyValue<T>& currentValue) const {
+        auto val = currentValue.constantOr(constant);
         return typename MinMaxAttribute::ConstantBinding {
-            MinMaxAttribute::value(currentValue.constantOr(constant), currentValue.constantOr(constant))
+            MinMaxAttribute::value(val, val)
         };
     }
 
@@ -57,7 +58,8 @@ public:
     }
 
     void populateVertexVector(const GeometryTileFeature& feature, std::size_t length) {
-        AttributeValue value = Attribute::value(function.evaluate(feature, defaultValue));
+        auto val = function.evaluate(feature, defaultValue);
+        AttributeValue value = MinMaxAttribute::value(val, val);
         for (std::size_t i = vertexVector.vertexSize(); i < length; ++i) {
             vertexVector.emplace_back(Vertex { value });
         }
@@ -186,19 +188,12 @@ public:
         });
     }
 
-    using MinAttribute = attributes::Min<Attribute>;
-    using MaxAttribute = attributes::Max<Attribute>;
-    using AttributeBinding = typename Attribute::Binding;
+    using MinMaxAttribute = attributes::MinMax<Attribute>;
+    using AttributeBinding = typename MinMaxAttribute::Binding;
 
-    AttributeBinding minAttributeBinding(const PropertyValue& currentValue) const {
+    AttributeBinding attributeBinding(const PropertyValue& currentValue) const {
         return binder.match([&] (const auto& b) {
-            return b.minAttributeBinding(currentValue);
-        });
-    }
-
-    AttributeBinding maxAttributeBinding(const PropertyValue& currentValue) const {
-        return binder.match([&] (const auto& b) {
-            return b.maxAttributeBinding(currentValue);
+            return b.attributeBinding(currentValue);
         });
     }
 
@@ -243,21 +238,15 @@ public:
         });
     }
 
-    using MinAttributes = gl::Attributes<typename PaintPropertyBinder<Ps>::MinAttribute...>;
-    using MaxAttributes = gl::Attributes<typename PaintPropertyBinder<Ps>::MaxAttribute...>;
+    using MinMaxAttributes = gl::Attributes<typename PaintPropertyBinder<Ps>::MinMaxAttribute...>;
 
-    using Attributes = gl::ConcatenateAttributes<MinAttributes, MaxAttributes>;
-    using AttributeBindings = typename Attributes::Bindings;
+    using AttributeBindings = typename MinMaxAttributes::Bindings;
 
     template <class EvaluatedProperties>
     AttributeBindings attributeBindings(const EvaluatedProperties& currentProperties) const {
-        const typename MinAttributes::Bindings min {
-            binders.template get<Ps>().minAttributeBinding(currentProperties.template get<Ps>())...
+        return typename MinMaxAttributes::Bindings {
+            binders.template get<Ps>().attributeBinding(currentProperties.template get<Ps>())...
         };
-        const typename MaxAttributes::Bindings max {
-            binders.template get<Ps>().maxAttributeBinding(currentProperties.template get<Ps>())...
-        };
-        return min.concat(max);
     }
 
     using Uniforms = gl::Uniforms<typename PaintPropertyBinder<Ps>::InterpolationUniform...>;

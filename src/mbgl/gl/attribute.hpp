@@ -73,6 +73,7 @@ public:
         VariableBinding>;
     
     using ValueType = T;
+    
     static constexpr size_t Dimensions = N;
 
     static void bind(Context& context,

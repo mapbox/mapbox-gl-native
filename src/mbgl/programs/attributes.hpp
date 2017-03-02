@@ -28,17 +28,18 @@ struct a_offset : gl::Attribute<int16_t, N> {
 // Paint attributes
 
 template <class Attr>
-struct MinMax : gl::Attribute<typename Attr::ValueType, Attr::Dimensions> {
-    using Value = typename gl::Attribute<typename Attr::ValueType, Attr::Dimensions>::Value;
+struct MinMax : gl::Attribute<typename Attr::ValueType, Attr::Dimensions * 2> {
+    using Value = typename gl::Attribute<typename Attr::ValueType, Attr::Dimensions * 2>::Value;
 
     static auto name() {
         static const std::string name = Attr::name() + std::string("_minmax");
         return name.c_str();
     }
     
-    static Value value(const typename Attr::ValueType& min, const typename Attr::ValueType& max){
-        auto minValue = Attr::ValueType::value(min);
-        auto maxValue = Attr::ValueType::value(max);
+    template <class InputType>
+    static Value value(const InputType& min, const InputType& max){
+        static auto minValue = Attr::value(min);
+        static auto maxValue = Attr::value(max);
         Value result = {{}};
         // TODO: can we do this statically??
         for (size_t i = 0; i < Attr::Dimensions; i++) {
@@ -50,14 +51,6 @@ struct MinMax : gl::Attribute<typename Attr::ValueType, Attr::Dimensions> {
 };
 
 template <class Attr>
-struct Max : Attr {
-    static auto name() {
-        static const std::string name = Attr::name() + std::string("_max");
-        return name.c_str();
-    }
-};
-
-template <class Attr>
 struct InterpolationUniform : gl::UniformScalar<InterpolationUniform<Attr>, float> {
     static auto name() {
         static const std::string name = Attr::name() + std::string("_t");
@@ -65,70 +58,50 @@ struct InterpolationUniform : gl::UniformScalar<InterpolationUniform<Attr>, floa
     }
 };
 
-struct a_color : gl::Attribute<gl::Normalized<uint8_t>, 4> {
+static std::array<float, 2> encodeColor (const Color& color) {
+    return {{ static_cast<float>(color.r*256.0 + color.g),static_cast<float>( color.b*256.0 + color.a) }};
+}
+
+struct a_color : gl::Attribute<float, 2> {
     static auto name() { return "a_color"; }
 
     static Value value(const Color& color) {
-        return {{
-            gl::Normalized<uint8_t>(color.r),
-            gl::Normalized<uint8_t>(color.g),
-            gl::Normalized<uint8_t>(color.b),
-            gl::Normalized<uint8_t>(color.a)
-        }};
+        return encodeColor(color);
     }
 };
 
 // used in the symbol sdf shader
-struct a_fill_color : gl::Attribute<gl::Normalized<uint8_t>, 4> {
+struct a_fill_color : gl::Attribute<float, 2> {
     static auto name() { return "a_fill_color"; }
     
     static Value value(const Color& color) {
-        return {{
-            gl::Normalized<uint8_t>(color.r),
-            gl::Normalized<uint8_t>(color.g),
-            gl::Normalized<uint8_t>(color.b),
-            gl::Normalized<uint8_t>(color.a)
-        }};
+        return encodeColor(color);
     }
 };
 
 // used in the symbol sdf shader
-struct a_halo_color : gl::Attribute<gl::Normalized<uint8_t>, 4> {
+struct a_halo_color : gl::Attribute<float, 2> {
     static auto name() { return "a_halo_color"; }
     
-    static Value value(const Color& color) {
-        return {{
-            gl::Normalized<uint8_t>(color.r),
-            gl::Normalized<uint8_t>(color.g),
-            gl::Normalized<uint8_t>(color.b),
-            gl::Normalized<uint8_t>(color.a)
-        }};
+ static Value value(const Color& color) {
+        return encodeColor(color);
     }
 };
 
-struct a_stroke_color : gl::Attribute<gl::Normalized<uint8_t>, 4> {
+struct a_stroke_color : gl::Attribute<float, 2> {
     static auto name() { return "a_stroke_color"; }
-
+ 
     static Value value(const Color& color) {
-        return {{
-            gl::Normalized<uint8_t>(color.r),
-            gl::Normalized<uint8_t>(color.g),
-            gl::Normalized<uint8_t>(color.b),
-            gl::Normalized<uint8_t>(color.a)
-        }};
+        return encodeColor(color);
     }
+
 };
 
-struct a_outline_color : gl::Attribute<gl::Normalized<uint8_t>, 4> {
+struct a_outline_color : gl::Attribute<float, 2> {
     static auto name() { return "a_outline_color"; }
-
+    
     static Value value(const Color& color) {
-        return {{
-            gl::Normalized<uint8_t>(color.r),
-            gl::Normalized<uint8_t>(color.g),
-            gl::Normalized<uint8_t>(color.b),
-            gl::Normalized<uint8_t>(color.a)
-        }};
+        return encodeColor(color);
     }
 };
 
