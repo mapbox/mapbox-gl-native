@@ -374,6 +374,10 @@
 		DA6023F01E4CE8FF00DBFF23 /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = sv; path = sv.lproj/Foundation.stringsdict; sourceTree = "<group>"; };
 		DA618B131E68850300CB7F44 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Localizable.strings; sourceTree = "<group>"; };
 		DA618B141E68852C00CB7F44 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Localizable.strings; sourceTree = "<group>"; };
+		DA618B151E6886DF00CB7F44 /* ca */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = ca; path = ca.lproj/Foundation.stringsdict; sourceTree = "<group>"; };
+		DA618B161E6886E000CB7F44 /* ca */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ca; path = ca.lproj/Localizable.strings; sourceTree = "<group>"; };
+		DA618B171E68876C00CB7F44 /* ca */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ca; path = ca.lproj/Foundation.strings; sourceTree = "<group>"; };
+		DA618B181E6887C600CB7F44 /* ca */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ca; path = ca.lproj/Localizable.strings; sourceTree = "<group>"; };
 		DA6408D51DA4E5DA00908C90 /* MGLVectorStyleLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLVectorStyleLayer.h; sourceTree = "<group>"; };
 		DA6408D61DA4E5DA00908C90 /* MGLVectorStyleLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLVectorStyleLayer.m; sourceTree = "<group>"; };
 		DA7262051DEEDD460043BB89 /* MGLOpenGLStyleLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLOpenGLStyleLayer.h; sourceTree = "<group>"; };
@@ -1254,6 +1258,7 @@
 				uk,
 				lt,
 				ru,
+				ca,
 			);
 			mainGroup = DA839E891CC2E3400062CAFB;
 			productRefGroup = DA839E931CC2E3400062CAFB /* Products */;
@@ -1467,6 +1472,7 @@
 				966091721E5BBFFA00A9A03B /* uk */,
 				966091731E5BBFFA00A9A03B /* lt */,
 				DA618B131E68850300CB7F44 /* ru */,
+				DA618B161E6886E000CB7F44 /* ca */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -1512,6 +1518,7 @@
 				DA737AEC1E59180E00AD2CDE /* uk */,
 				DA1AC01E1E5B8826006DF1D6 /* lt */,
 				DA618B141E68852C00CB7F44 /* ru */,
+				DA618B181E6887C600CB7F44 /* ca */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -1526,6 +1533,7 @@
 				DAA32CB21E4C4CB7006F8D24 /* ja */,
 				DAA32CC01E4C4F89006F8D24 /* vi */,
 				DA6023EF1E4CE8E500DBFF23 /* sv */,
+				DA618B171E68876C00CB7F44 /* ca */,
 			);
 			name = Foundation.strings;
 			sourceTree = "<group>";
@@ -1542,6 +1550,7 @@
 				DA737AE31E5915A500AD2CDE /* pl */,
 				DA1AC01F1E5B8904006DF1D6 /* uk */,
 				DAE8CCAA1E6E8605009B5CB0 /* ru */,
+				DA618B151E6886DF00CB7F44 /* ca */,
 			);
 			name = Foundation.stringsdict;
 			sourceTree = "<group>";
