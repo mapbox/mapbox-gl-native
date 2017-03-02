@@ -18,10 +18,13 @@ SymbolBucket::SymbolBucket(style::SymbolLayoutProperties::Evaluated layout_,
       sdfIcons(sdfIcons_),
       iconsNeedLinear(iconsNeedLinear_) {
     for (const auto& pair : layerPaintProperties) {
-        paintPropertyBinders.emplace(pair.first, std::make_pair(
-            SymbolIconProgram::PaintPropertyBinders(pair.second.first, zoom),
-            SymbolSDFTextProgram::PaintPropertyBinders(pair.second.second, zoom)
-        ));
+        paintPropertyBinders.emplace(
+            std::piecewise_construct,
+            std::forward_as_tuple(pair.first),
+            std::forward_as_tuple(
+                std::piecewise_construct,
+                std::forward_as_tuple(pair.second.first, zoom),
+                std::forward_as_tuple(pair.second.second, zoom)));
     }
 }
 

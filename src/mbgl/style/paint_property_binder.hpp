@@ -188,6 +188,9 @@ public:
         (void)z; // Workaround for https://gcc.gnu.org/bugzilla/show_bug.cgi?id=56958
     }
 
+    PaintPropertyBinders(PaintPropertyBinders&&) = default;
+    PaintPropertyBinders(const PaintPropertyBinders&) = delete;
+
     void populateVertexVectors(const GeometryTileFeature& feature, std::size_t length) {
         util::ignore({
             (binders.template get<Ps>()->populateVertexVector(feature, length), 0)...
