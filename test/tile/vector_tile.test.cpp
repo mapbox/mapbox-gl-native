@@ -61,7 +61,7 @@ TEST(VectorTile, Issue7615) {
     style::SymbolLayer symbolLayer("symbol", "source");
     auto symbolBucket = std::make_shared<SymbolBucket>(
         style::SymbolLayoutProperties::Evaluated(),
-        std::unordered_map<
+        std::map<
             std::string,
             std::pair<style::IconPaintProperties::Evaluated, style::TextPaintProperties::Evaluated>>(),
         0.0f, false, false);
