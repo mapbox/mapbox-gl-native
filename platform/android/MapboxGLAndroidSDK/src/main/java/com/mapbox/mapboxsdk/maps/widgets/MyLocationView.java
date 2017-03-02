@@ -257,9 +257,7 @@ public class MyLocationView extends View {
 
     final PointF pointF = screenLocation;
     float metersPerPixel = (float) projection.getMetersPerPixelAtLatitude(location.getLatitude());
-    float accuracyPixels = (Float) accuracyAnimator.getAnimatedValue() / metersPerPixel / 2;
-    float maxRadius = getWidth() / 2;
-    accuracyPixels = accuracyPixels <= maxRadius ? accuracyPixels : maxRadius;
+    float accuracyPixels = (Float) accuracyAnimator.getAnimatedValue() / metersPerPixel;
 
     // reset
     matrix.reset();
@@ -423,6 +421,12 @@ public class MyLocationView extends View {
   private void toggleGps(boolean enableGps) {
     LocationEngine locationEngine = LocationSource.getLocationEngine(getContext());
     if (enableGps) {
+      // Set an initial location if one available
+      Location lastLocation = locationEngine.getLastLocation();
+
+      if (lastLocation != null) {
+        setLocation(lastLocation);
+      }
 
       if (userLocationListener == null) {
         userLocationListener = new GpsLocationListener(this);
@@ -726,7 +730,7 @@ public class MyLocationView extends View {
         accuracyAnimator.end();
       }
 
-      accuracyAnimator = ValueAnimator.ofFloat(accuracy * 10, location.getAccuracy() * 10);
+      accuracyAnimator = ValueAnimator.ofFloat(accuracy, location.getAccuracy());
       accuracyAnimator.setDuration(750);
       accuracyAnimator.start();
       accuracy = location.getAccuracy();
