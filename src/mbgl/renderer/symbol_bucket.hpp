@@ -9,6 +9,7 @@
 #include <mbgl/programs/collision_box_program.hpp>
 #include <mbgl/text/glyph_range.hpp>
 #include <mbgl/style/layers/symbol_layer_properties.hpp>
+#include <mbgl/util/unordered_vector_map.hpp>
 
 #include <vector>
 
@@ -17,7 +18,7 @@ namespace mbgl {
 class SymbolBucket : public Bucket {
 public:
     SymbolBucket(style::SymbolLayoutProperties::Evaluated,
-                 const std::unordered_map<std::string, std::pair<style::IconPaintProperties::Evaluated, style::TextPaintProperties::Evaluated>>&,
+                 const util::unordered_vector_map<std::string, std::pair<style::IconPaintProperties::Evaluated, style::TextPaintProperties::Evaluated>>&,
                  float zoom,
                  bool sdfIcons,
                  bool iconsNeedLinear);
@@ -33,7 +34,7 @@ public:
     const bool sdfIcons;
     const bool iconsNeedLinear;
 
-    std::unordered_map<std::string, std::pair<
+    util::unordered_vector_map<std::string, std::pair<
         SymbolIconProgram::PaintPropertyBinders,
         SymbolSDFTextProgram::PaintPropertyBinders>> paintPropertyBinders;
 

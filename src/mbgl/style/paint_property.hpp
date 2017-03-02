@@ -14,6 +14,7 @@
 #include <mbgl/util/interpolate.hpp>
 #include <mbgl/util/indexed_tuple.hpp>
 #include <mbgl/util/ignore.hpp>
+#include <mbgl/util/unordered_vector_map.hpp>
 
 #include <unordered_map>
 #include <utility>
@@ -139,8 +140,8 @@ public:
     }
 
 private:
-    std::unordered_map<ClassID, Value> values;
-    std::unordered_map<ClassID, TransitionOptions> transitions;
+    util::unordered_vector_map<ClassID, Value> values;
+    util::unordered_vector_map<ClassID, TransitionOptions> transitions;
 };
 
 template <class T>

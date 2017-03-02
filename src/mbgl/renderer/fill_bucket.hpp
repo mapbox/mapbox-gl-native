@@ -7,6 +7,7 @@
 #include <mbgl/gl/segment.hpp>
 #include <mbgl/programs/fill_program.hpp>
 #include <mbgl/style/layers/fill_layer_properties.hpp>
+#include <mbgl/util/unordered_vector_map.hpp>
 
 #include <vector>
 
@@ -37,7 +38,7 @@ public:
     optional<gl::IndexBuffer<gl::Lines>> lineIndexBuffer;
     optional<gl::IndexBuffer<gl::Triangles>> triangleIndexBuffer;
 
-    std::unordered_map<std::string, FillProgram::PaintPropertyBinders> paintPropertyBinders;
+    util::unordered_vector_map<std::string, FillProgram::PaintPropertyBinders> paintPropertyBinders;
 };
 
 } // namespace mbgl

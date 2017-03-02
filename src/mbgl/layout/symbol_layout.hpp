@@ -6,6 +6,7 @@
 #include <mbgl/layout/symbol_instance.hpp>
 #include <mbgl/text/bidi.hpp>
 #include <mbgl/style/layers/symbol_layer_impl.hpp>
+#include <mbgl/util/unordered_vector_map.hpp>
 
 #include <memory>
 #include <map>
@@ -51,7 +52,7 @@ public:
 
     State state = Pending;
 
-    std::unordered_map<std::string,
+    util::unordered_vector_map<std::string,
         std::pair<style::IconPaintProperties::Evaluated, style::TextPaintProperties::Evaluated>> layerPaintProperties;
 
 private:

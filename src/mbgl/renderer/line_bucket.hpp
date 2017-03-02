@@ -7,6 +7,7 @@
 #include <mbgl/gl/segment.hpp>
 #include <mbgl/programs/line_program.hpp>
 #include <mbgl/style/layers/line_layer_properties.hpp>
+#include <mbgl/util/unordered_vector_map.hpp>
 
 #include <vector>
 
@@ -38,7 +39,7 @@ public:
     optional<gl::VertexBuffer<LineLayoutVertex>> vertexBuffer;
     optional<gl::IndexBuffer<gl::Triangles>> indexBuffer;
 
-    std::unordered_map<std::string, LineProgram::PaintPropertyBinders> paintPropertyBinders;
+    util::unordered_vector_map<std::string, LineProgram::PaintPropertyBinders> paintPropertyBinders;
 
 private:
     void addGeometry(const GeometryCoordinates&, FeatureType);
