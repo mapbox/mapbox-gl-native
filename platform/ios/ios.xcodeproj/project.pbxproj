@@ -720,6 +720,8 @@
 		DA618B1E1E688A3700CB7F44 /* ca */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ca; path = ca.lproj/Root.strings; sourceTree = "<group>"; };
 		DA618B251E68920500CB7F44 /* lt */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = lt; path = lt.lproj/Foundation.strings; sourceTree = "<group>"; };
 		DA618B261E68920D00CB7F44 /* lt */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = lt; path = lt.lproj/Foundation.stringsdict; sourceTree = "<group>"; };
+		DA618B2B1E68932D00CB7F44 /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/Localizable.strings; sourceTree = "<group>"; };
+		DA618B2C1E68933600CB7F44 /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/Root.strings; sourceTree = "<group>"; };
 		DA6408D91DA4E7D300908C90 /* MGLVectorStyleLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLVectorStyleLayer.h; sourceTree = "<group>"; };
 		DA6408DA1DA4E7D300908C90 /* MGLVectorStyleLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLVectorStyleLayer.m; sourceTree = "<group>"; };
 		DA7262091DEEE3480043BB89 /* MGLOpenGLStyleLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLOpenGLStyleLayer.h; sourceTree = "<group>"; };
@@ -1925,6 +1927,7 @@
 				uk,
 				lt,
 				ca,
+				fi,
 			);
 			mainGroup = DA1DC9411CB6C1C2006E619F;
 			productRefGroup = DA1DC94B1CB6C1C2006E619F /* Products */;
@@ -2316,6 +2319,7 @@
 				9660916E1E5BBFDC00A9A03B /* uk */,
 				9660916F1E5BBFDE00A9A03B /* lt */,
 				DA618B1A1E68883900CB7F44 /* ca */,
+				DA618B2B1E68932D00CB7F44 /* fi */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -2337,6 +2341,7 @@
 				DA737AEA1E5917EF00AD2CDE /* uk */,
 				DA1AC01C1E5B87EC006DF1D6 /* lt */,
 				DA618B1E1E688A3700CB7F44 /* ca */,
+				DA618B2C1E68933600CB7F44 /* fi */,
 			);
 			name = Root.strings;
 			sourceTree = "<group>";
