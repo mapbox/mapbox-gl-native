@@ -1,10 +1,18 @@
 package com.mapbox.mapboxsdk.testapp.activity.annotation;
 
+import android.annotation.SuppressLint;
+import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
+import android.support.annotation.DrawableRes;
 import android.support.v7.app.AppCompatActivity;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.mapbox.mapboxsdk.annotations.Icon;
+import com.mapbox.mapboxsdk.annotations.IconFactory;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
@@ -14,7 +22,7 @@ import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.R;
-import com.mapbox.mapboxsdk.testapp.utils.IconUtils;
+import com.mapbox.mapboxsdk.testapp.utils.ViewToBitmapUtil;
 
 import timber.log.Timber;
 
@@ -40,20 +48,20 @@ public class AddRemoveMarkerActivity extends AppCompatActivity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_add_remove_marker);
 
-    // ShapeDrawable to Icon
-    final Icon shapeDrawableIcon = IconUtils.drawableToIcon(this, R.drawable.ic_circle,
-      ContextCompat.getColor(this, R.color.redAccent));
-
-    // VectorDrawable to Icon
-    final Icon vectorDrawableIcon = IconUtils.drawableToIcon(this, R.drawable.ic_layers,
-      ContextCompat.getColor(this, R.color.blueAccent));
+    View lowThresholdView = generateView("Low", R.drawable.ic_circle);
+    Bitmap lowThresholdBitmap = ViewToBitmapUtil.convertToBitmap(lowThresholdView);
+    Icon lowThresholdIcon = IconFactory.getInstance(this).fromBitmap(lowThresholdBitmap);
 
     lowThresholdMarker = new MarkerOptions()
-      .icon(shapeDrawableIcon)
-      .position(new LatLng(-0.1, 0));
+      .icon(lowThresholdIcon)
+      .position(new LatLng(0.1, 0));
+
+    View highThesholdView = generateView("High", R.drawable.ic_circle);
+    Bitmap highThresholdBitmap = ViewToBitmapUtil.convertToBitmap(highThesholdView);
+    Icon highThresholdIcon = IconFactory.getInstance(this).fromBitmap(highThresholdBitmap);
 
     highThresholdMarker = new MarkerOptions()
-      .icon(vectorDrawableIcon)
+      .icon(highThresholdIcon)
       .position(new LatLng(0.1, 0));
 
     mapView = (MapView) findViewById(R.id.mapView);
@@ -72,6 +80,17 @@ public class AddRemoveMarkerActivity extends AppCompatActivity {
         });
       }
     });
+  }
+
+  @SuppressLint("InflateParams")
+  private View generateView(String text, @DrawableRes int drawableRes) {
+    View view = LayoutInflater.from(this).inflate(R.layout.view_custom_marker, null);
+    TextView textView = (TextView) view.findViewById(R.id.textView);
+    textView.setText(text);
+    textView.setTextColor(Color.WHITE);
+    ImageView imageView = (ImageView) view.findViewById(R.id.imageView);
+    imageView.setImageResource(drawableRes);
+    return view;
   }
 
   private void updateZoom(double zoom) {
