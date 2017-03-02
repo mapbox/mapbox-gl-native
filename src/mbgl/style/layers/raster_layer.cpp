@@ -66,6 +66,10 @@ void RasterLayer::setRasterOpacityTransition(const TransitionOptions& value, con
     impl->paint.setTransition<RasterOpacity>(value, klass);
 }
 
+style::TransitionOptions RasterLayer::getRasterOpacityTransition(const optional<std::string>& klass) const {
+    return impl->paint.getTransition<RasterOpacity>(klass);
+}
+
 PropertyValue<float> RasterLayer::getDefaultRasterHueRotate() {
     return { 0 };
 }
@@ -83,6 +87,10 @@ void RasterLayer::setRasterHueRotate(PropertyValue<float> value, const optional<
 
 void RasterLayer::setRasterHueRotateTransition(const TransitionOptions& value, const optional<std::string>& klass) {
     impl->paint.setTransition<RasterHueRotate>(value, klass);
+}
+
+style::TransitionOptions RasterLayer::getRasterHueRotateTransition(const optional<std::string>& klass) const {
+    return impl->paint.getTransition<RasterHueRotate>(klass);
 }
 
 PropertyValue<float> RasterLayer::getDefaultRasterBrightnessMin() {
@@ -104,6 +112,10 @@ void RasterLayer::setRasterBrightnessMinTransition(const TransitionOptions& valu
     impl->paint.setTransition<RasterBrightnessMin>(value, klass);
 }
 
+style::TransitionOptions RasterLayer::getRasterBrightnessMinTransition(const optional<std::string>& klass) const {
+    return impl->paint.getTransition<RasterBrightnessMin>(klass);
+}
+
 PropertyValue<float> RasterLayer::getDefaultRasterBrightnessMax() {
     return { 1 };
 }
@@ -121,6 +133,10 @@ void RasterLayer::setRasterBrightnessMax(PropertyValue<float> value, const optio
 
 void RasterLayer::setRasterBrightnessMaxTransition(const TransitionOptions& value, const optional<std::string>& klass) {
     impl->paint.setTransition<RasterBrightnessMax>(value, klass);
+}
+
+style::TransitionOptions RasterLayer::getRasterBrightnessMaxTransition(const optional<std::string>& klass) const {
+    return impl->paint.getTransition<RasterBrightnessMax>(klass);
 }
 
 PropertyValue<float> RasterLayer::getDefaultRasterSaturation() {
@@ -142,6 +158,10 @@ void RasterLayer::setRasterSaturationTransition(const TransitionOptions& value, 
     impl->paint.setTransition<RasterSaturation>(value, klass);
 }
 
+style::TransitionOptions RasterLayer::getRasterSaturationTransition(const optional<std::string>& klass) const {
+    return impl->paint.getTransition<RasterSaturation>(klass);
+}
+
 PropertyValue<float> RasterLayer::getDefaultRasterContrast() {
     return { 0 };
 }
@@ -161,6 +181,10 @@ void RasterLayer::setRasterContrastTransition(const TransitionOptions& value, co
     impl->paint.setTransition<RasterContrast>(value, klass);
 }
 
+style::TransitionOptions RasterLayer::getRasterContrastTransition(const optional<std::string>& klass) const {
+    return impl->paint.getTransition<RasterContrast>(klass);
+}
+
 PropertyValue<float> RasterLayer::getDefaultRasterFadeDuration() {
     return { 300 };
 }
@@ -178,6 +202,10 @@ void RasterLayer::setRasterFadeDuration(PropertyValue<float> value, const option
 
 void RasterLayer::setRasterFadeDurationTransition(const TransitionOptions& value, const optional<std::string>& klass) {
     impl->paint.setTransition<RasterFadeDuration>(value, klass);
+}
+
+style::TransitionOptions RasterLayer::getRasterFadeDurationTransition(const optional<std::string>& klass) const {
+    return impl->paint.getTransition<RasterFadeDuration>(klass);
 }
 
 } // namespace style

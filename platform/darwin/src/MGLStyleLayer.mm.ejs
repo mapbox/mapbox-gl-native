@@ -295,12 +295,28 @@ namespace mbgl {
 <% } -%>
 }
 
+- (NSValue *)mbx_get<%- camelize(property.name) %>Transition {
+    MGLAssertStyleLayerIsValid();
+
+    mbgl::style::TransitionOptions transitionOptions = self.rawLayer->get<%- camelize(originalPropertyName(property)) %>Transition();
+    MGLTransition transition;
+    transition.duration = MGLTimeIntervalFromDurationInSeconds(transitionOptions.duration.value_or(mbgl::Duration::zero()));
+    transition.delay = MGLTimeIntervalFromDurationInSeconds(transitionOptions.delay.value_or(mbgl::Duration::zero()));
+
+    NSValue *transitionValue = [NSValue value:&transition withObjCType:@encode(MGLTransition)];
+    return transitionValue;
+}
+
 <% if (property.original) { -%>
 - (void)set<%- camelize(originalPropertyName(property)) %>:(MGLStyleValue<<%- propertyType(property, true) %>> *)<%- camelizeWithLeadingLowercase(originalPropertyName(property)) %> {
 }
 
 - (MGLStyleValue<<%- propertyType(property, true) %>> *)<%- camelizeWithLeadingLowercase(originalPropertyName(property)) %> {
     return self.<%- objCGetter(property) %>;
+}
+
+- (NSValue *)mbx_get<%- camelize(originalPropertyName(property)) %> {
+    return [self mbx_get<%- camelize(property.name) %>Transition];
 }
 
 <% } -%>

@@ -174,11 +174,27 @@ namespace mbgl {
     return MGLStyleValueTransformer<bool, NSNumber *>().toStyleValue(propertyValue);
 }
 
+- (NSValue *)mbx_getFillAntialiasedTransition {
+    MGLAssertStyleLayerIsValid();
+
+    mbgl::style::TransitionOptions transitionOptions = self.rawLayer->getFillAntialiasTransition();
+    MGLTransition transition;
+    transition.duration = MGLTimeIntervalFromDurationInSeconds(transitionOptions.duration.value_or(mbgl::Duration::zero()));
+    transition.delay = MGLTimeIntervalFromDurationInSeconds(transitionOptions.delay.value_or(mbgl::Duration::zero()));
+
+    NSValue *transitionValue = [NSValue value:&transition withObjCType:@encode(MGLTransition)];
+    return transitionValue;
+}
+
 - (void)setFillAntialias:(MGLStyleValue<NSNumber *> *)fillAntialias {
 }
 
 - (MGLStyleValue<NSNumber *> *)fillAntialias {
     return self.isFillAntialiased;
+}
+
+- (NSValue *)mbx_getFillAntialias {
+    return [self mbx_getFillAntialiasedTransition];
 }
 
 - (void)setFillColor:(MGLStyleValue<MGLColor *> *)fillColor {
@@ -208,6 +224,18 @@ namespace mbgl {
     return MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toDataDrivenStyleValue(propertyValue);
 }
 
+- (NSValue *)mbx_getFillColorTransition {
+    MGLAssertStyleLayerIsValid();
+
+    mbgl::style::TransitionOptions transitionOptions = self.rawLayer->getFillColorTransition();
+    MGLTransition transition;
+    transition.duration = MGLTimeIntervalFromDurationInSeconds(transitionOptions.duration.value_or(mbgl::Duration::zero()));
+    transition.delay = MGLTimeIntervalFromDurationInSeconds(transitionOptions.delay.value_or(mbgl::Duration::zero()));
+
+    NSValue *transitionValue = [NSValue value:&transition withObjCType:@encode(MGLTransition)];
+    return transitionValue;
+}
+
 - (void)setFillOpacity:(MGLStyleValue<NSNumber *> *)fillOpacity {
     MGLAssertStyleLayerIsValid();
 
@@ -233,6 +261,18 @@ namespace mbgl {
         return MGLStyleValueTransformer<float, NSNumber *>().toDataDrivenStyleValue(self.rawLayer->getDefaultFillOpacity());
     }
     return MGLStyleValueTransformer<float, NSNumber *>().toDataDrivenStyleValue(propertyValue);
+}
+
+- (NSValue *)mbx_getFillOpacityTransition {
+    MGLAssertStyleLayerIsValid();
+
+    mbgl::style::TransitionOptions transitionOptions = self.rawLayer->getFillOpacityTransition();
+    MGLTransition transition;
+    transition.duration = MGLTimeIntervalFromDurationInSeconds(transitionOptions.duration.value_or(mbgl::Duration::zero()));
+    transition.delay = MGLTimeIntervalFromDurationInSeconds(transitionOptions.delay.value_or(mbgl::Duration::zero()));
+
+    NSValue *transitionValue = [NSValue value:&transition withObjCType:@encode(MGLTransition)];
+    return transitionValue;
 }
 
 - (void)setFillOutlineColor:(MGLStyleValue<MGLColor *> *)fillOutlineColor {
@@ -262,6 +302,18 @@ namespace mbgl {
     return MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toDataDrivenStyleValue(propertyValue);
 }
 
+- (NSValue *)mbx_getFillOutlineColorTransition {
+    MGLAssertStyleLayerIsValid();
+
+    mbgl::style::TransitionOptions transitionOptions = self.rawLayer->getFillOutlineColorTransition();
+    MGLTransition transition;
+    transition.duration = MGLTimeIntervalFromDurationInSeconds(transitionOptions.duration.value_or(mbgl::Duration::zero()));
+    transition.delay = MGLTimeIntervalFromDurationInSeconds(transitionOptions.delay.value_or(mbgl::Duration::zero()));
+
+    NSValue *transitionValue = [NSValue value:&transition withObjCType:@encode(MGLTransition)];
+    return transitionValue;
+}
+
 - (void)setFillPattern:(MGLStyleValue<NSString *> *)fillPattern {
     MGLAssertStyleLayerIsValid();
 
@@ -287,6 +339,18 @@ namespace mbgl {
         return MGLStyleValueTransformer<std::string, NSString *>().toStyleValue(self.rawLayer->getDefaultFillPattern());
     }
     return MGLStyleValueTransformer<std::string, NSString *>().toStyleValue(propertyValue);
+}
+
+- (NSValue *)mbx_getFillPatternTransition {
+    MGLAssertStyleLayerIsValid();
+
+    mbgl::style::TransitionOptions transitionOptions = self.rawLayer->getFillPatternTransition();
+    MGLTransition transition;
+    transition.duration = MGLTimeIntervalFromDurationInSeconds(transitionOptions.duration.value_or(mbgl::Duration::zero()));
+    transition.delay = MGLTimeIntervalFromDurationInSeconds(transitionOptions.delay.value_or(mbgl::Duration::zero()));
+
+    NSValue *transitionValue = [NSValue value:&transition withObjCType:@encode(MGLTransition)];
+    return transitionValue;
 }
 
 - (void)setFillTranslation:(MGLStyleValue<NSValue *> *)fillTranslation {
@@ -316,11 +380,27 @@ namespace mbgl {
     return MGLStyleValueTransformer<std::array<float, 2>, NSValue *>().toStyleValue(propertyValue);
 }
 
+- (NSValue *)mbx_getFillTranslationTransition {
+    MGLAssertStyleLayerIsValid();
+
+    mbgl::style::TransitionOptions transitionOptions = self.rawLayer->getFillTranslateTransition();
+    MGLTransition transition;
+    transition.duration = MGLTimeIntervalFromDurationInSeconds(transitionOptions.duration.value_or(mbgl::Duration::zero()));
+    transition.delay = MGLTimeIntervalFromDurationInSeconds(transitionOptions.delay.value_or(mbgl::Duration::zero()));
+
+    NSValue *transitionValue = [NSValue value:&transition withObjCType:@encode(MGLTransition)];
+    return transitionValue;
+}
+
 - (void)setFillTranslate:(MGLStyleValue<NSValue *> *)fillTranslate {
 }
 
 - (MGLStyleValue<NSValue *> *)fillTranslate {
     return self.fillTranslation;
+}
+
+- (NSValue *)mbx_getFillTranslate {
+    return [self mbx_getFillTranslationTransition];
 }
 
 - (void)setFillTranslationAnchor:(MGLStyleValue<NSValue *> *)fillTranslationAnchor {
@@ -350,11 +430,27 @@ namespace mbgl {
     return MGLStyleValueTransformer<mbgl::style::TranslateAnchorType, NSValue *, mbgl::style::TranslateAnchorType, MGLFillTranslationAnchor>().toEnumStyleValue(propertyValue);
 }
 
+- (NSValue *)mbx_getFillTranslationAnchorTransition {
+    MGLAssertStyleLayerIsValid();
+
+    mbgl::style::TransitionOptions transitionOptions = self.rawLayer->getFillTranslateAnchorTransition();
+    MGLTransition transition;
+    transition.duration = MGLTimeIntervalFromDurationInSeconds(transitionOptions.duration.value_or(mbgl::Duration::zero()));
+    transition.delay = MGLTimeIntervalFromDurationInSeconds(transitionOptions.delay.value_or(mbgl::Duration::zero()));
+
+    NSValue *transitionValue = [NSValue value:&transition withObjCType:@encode(MGLTransition)];
+    return transitionValue;
+}
+
 - (void)setFillTranslateAnchor:(MGLStyleValue<NSValue *> *)fillTranslateAnchor {
 }
 
 - (MGLStyleValue<NSValue *> *)fillTranslateAnchor {
     return self.fillTranslationAnchor;
+}
+
+- (NSValue *)mbx_getFillTranslateAnchor {
+    return [self mbx_getFillTranslationAnchorTransition];
 }
 
 

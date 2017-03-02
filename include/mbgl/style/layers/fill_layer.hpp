@@ -33,36 +33,43 @@ public:
     PropertyValue<bool> getFillAntialias(const optional<std::string>& klass = {}) const;
     void setFillAntialias(PropertyValue<bool>, const optional<std::string>& klass = {});
     void setFillAntialiasTransition(const TransitionOptions&, const optional<std::string>& klass = {});
+    style::TransitionOptions getFillAntialiasTransition(const optional<std::string>& klass = {}) const;
 
     static DataDrivenPropertyValue<float> getDefaultFillOpacity();
     DataDrivenPropertyValue<float> getFillOpacity(const optional<std::string>& klass = {}) const;
     void setFillOpacity(DataDrivenPropertyValue<float>, const optional<std::string>& klass = {});
     void setFillOpacityTransition(const TransitionOptions&, const optional<std::string>& klass = {});
+    style::TransitionOptions getFillOpacityTransition(const optional<std::string>& klass = {}) const;
 
     static DataDrivenPropertyValue<Color> getDefaultFillColor();
     DataDrivenPropertyValue<Color> getFillColor(const optional<std::string>& klass = {}) const;
     void setFillColor(DataDrivenPropertyValue<Color>, const optional<std::string>& klass = {});
     void setFillColorTransition(const TransitionOptions&, const optional<std::string>& klass = {});
+    style::TransitionOptions getFillColorTransition(const optional<std::string>& klass = {}) const;
 
     static DataDrivenPropertyValue<Color> getDefaultFillOutlineColor();
     DataDrivenPropertyValue<Color> getFillOutlineColor(const optional<std::string>& klass = {}) const;
     void setFillOutlineColor(DataDrivenPropertyValue<Color>, const optional<std::string>& klass = {});
     void setFillOutlineColorTransition(const TransitionOptions&, const optional<std::string>& klass = {});
+    style::TransitionOptions getFillOutlineColorTransition(const optional<std::string>& klass = {}) const;
 
     static PropertyValue<std::array<float, 2>> getDefaultFillTranslate();
     PropertyValue<std::array<float, 2>> getFillTranslate(const optional<std::string>& klass = {}) const;
     void setFillTranslate(PropertyValue<std::array<float, 2>>, const optional<std::string>& klass = {});
     void setFillTranslateTransition(const TransitionOptions&, const optional<std::string>& klass = {});
+    style::TransitionOptions getFillTranslateTransition(const optional<std::string>& klass = {}) const;
 
     static PropertyValue<TranslateAnchorType> getDefaultFillTranslateAnchor();
     PropertyValue<TranslateAnchorType> getFillTranslateAnchor(const optional<std::string>& klass = {}) const;
     void setFillTranslateAnchor(PropertyValue<TranslateAnchorType>, const optional<std::string>& klass = {});
     void setFillTranslateAnchorTransition(const TransitionOptions&, const optional<std::string>& klass = {});
+    style::TransitionOptions getFillTranslateAnchorTransition(const optional<std::string>& klass = {}) const;
 
     static PropertyValue<std::string> getDefaultFillPattern();
     PropertyValue<std::string> getFillPattern(const optional<std::string>& klass = {}) const;
     void setFillPattern(PropertyValue<std::string>, const optional<std::string>& klass = {});
     void setFillPatternTransition(const TransitionOptions&, const optional<std::string>& klass = {});
+    style::TransitionOptions getFillPatternTransition(const optional<std::string>& klass = {}) const;
 
     // Private implementation
 

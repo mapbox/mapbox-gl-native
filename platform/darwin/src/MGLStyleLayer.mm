@@ -67,7 +67,7 @@
 
 - (void)setTransition:(MGLTransition)transition forKey:(NSString *)key
 {
-    SEL setPropertyTransitionSelector = [self mbx_selectorForKey:key];
+    SEL setPropertyTransitionSelector = [self mbx_selectorForKey:key type:@"set" hasParams:YES];
     
     if ([self respondsToSelector:setPropertyTransitionSelector]) {
 #pragma clang diagnostic push
@@ -81,7 +81,7 @@
 {
     MGLTransition transition;
     
-    SEL getPropertyTransitionSelector = [self mbx_selectorForKey:key];
+    SEL getPropertyTransitionSelector = [self mbx_selectorForKey:key type:@"get" hasParams:NO];
     
     if ([self respondsToSelector:getPropertyTransitionSelector]) {
 #pragma clang diagnostic push
@@ -94,15 +94,16 @@
     return transition;
 }
 
-- (SEL)mbx_selectorForKey:(NSString *)key
+- (SEL)mbx_selectorForKey:(NSString *)key type:(NSString *)type hasParams:(BOOL)params
 {
     NSString *camelCaseKey;
+    NSString *parameters = params ? @":" : @"";
     if ([key length] > 1) {
         camelCaseKey = [NSString stringWithFormat:@"%@%@", [[key substringToIndex:1] uppercaseString], [key substringFromIndex:1]];
     } else {
         camelCaseKey = [key uppercaseString];
     }
-    NSString *setPropertyTransitionString = [NSString stringWithFormat:@"mbx_set%@Transition:", camelCaseKey];
+    NSString *setPropertyTransitionString = [NSString stringWithFormat:@"mbx_%@%@Transition%@", type, camelCaseKey, parameters];
     SEL propertyTransitionSelector = NSSelectorFromString(setPropertyTransitionString);
     
     return propertyTransitionSelector;

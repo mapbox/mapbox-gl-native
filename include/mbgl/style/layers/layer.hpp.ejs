@@ -61,6 +61,7 @@ public:
     <%- propertyValueType(property) %> get<%- camelize(property.name) %>(const optional<std::string>& klass = {}) const;
     void set<%- camelize(property.name) %>(<%- propertyValueType(property) %>, const optional<std::string>& klass = {});
     void set<%- camelize(property.name) %>Transition(const TransitionOptions&, const optional<std::string>& klass = {});
+    style::TransitionOptions get<%- camelize(property.name) %>Transition(const optional<std::string>& klass = {}) const;
 
 <% } -%>
     // Private implementation

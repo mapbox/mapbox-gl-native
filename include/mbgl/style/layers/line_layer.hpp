@@ -53,51 +53,61 @@ public:
     DataDrivenPropertyValue<float> getLineOpacity(const optional<std::string>& klass = {}) const;
     void setLineOpacity(DataDrivenPropertyValue<float>, const optional<std::string>& klass = {});
     void setLineOpacityTransition(const TransitionOptions&, const optional<std::string>& klass = {});
+    style::TransitionOptions getLineOpacityTransition(const optional<std::string>& klass = {}) const;
 
     static DataDrivenPropertyValue<Color> getDefaultLineColor();
     DataDrivenPropertyValue<Color> getLineColor(const optional<std::string>& klass = {}) const;
     void setLineColor(DataDrivenPropertyValue<Color>, const optional<std::string>& klass = {});
     void setLineColorTransition(const TransitionOptions&, const optional<std::string>& klass = {});
+    style::TransitionOptions getLineColorTransition(const optional<std::string>& klass = {}) const;
 
     static PropertyValue<std::array<float, 2>> getDefaultLineTranslate();
     PropertyValue<std::array<float, 2>> getLineTranslate(const optional<std::string>& klass = {}) const;
     void setLineTranslate(PropertyValue<std::array<float, 2>>, const optional<std::string>& klass = {});
     void setLineTranslateTransition(const TransitionOptions&, const optional<std::string>& klass = {});
+    style::TransitionOptions getLineTranslateTransition(const optional<std::string>& klass = {}) const;
 
     static PropertyValue<TranslateAnchorType> getDefaultLineTranslateAnchor();
     PropertyValue<TranslateAnchorType> getLineTranslateAnchor(const optional<std::string>& klass = {}) const;
     void setLineTranslateAnchor(PropertyValue<TranslateAnchorType>, const optional<std::string>& klass = {});
     void setLineTranslateAnchorTransition(const TransitionOptions&, const optional<std::string>& klass = {});
+    style::TransitionOptions getLineTranslateAnchorTransition(const optional<std::string>& klass = {}) const;
 
     static PropertyValue<float> getDefaultLineWidth();
     PropertyValue<float> getLineWidth(const optional<std::string>& klass = {}) const;
     void setLineWidth(PropertyValue<float>, const optional<std::string>& klass = {});
     void setLineWidthTransition(const TransitionOptions&, const optional<std::string>& klass = {});
+    style::TransitionOptions getLineWidthTransition(const optional<std::string>& klass = {}) const;
 
     static DataDrivenPropertyValue<float> getDefaultLineGapWidth();
     DataDrivenPropertyValue<float> getLineGapWidth(const optional<std::string>& klass = {}) const;
     void setLineGapWidth(DataDrivenPropertyValue<float>, const optional<std::string>& klass = {});
     void setLineGapWidthTransition(const TransitionOptions&, const optional<std::string>& klass = {});
+    style::TransitionOptions getLineGapWidthTransition(const optional<std::string>& klass = {}) const;
 
     static DataDrivenPropertyValue<float> getDefaultLineOffset();
     DataDrivenPropertyValue<float> getLineOffset(const optional<std::string>& klass = {}) const;
     void setLineOffset(DataDrivenPropertyValue<float>, const optional<std::string>& klass = {});
     void setLineOffsetTransition(const TransitionOptions&, const optional<std::string>& klass = {});
+    style::TransitionOptions getLineOffsetTransition(const optional<std::string>& klass = {}) const;
 
     static DataDrivenPropertyValue<float> getDefaultLineBlur();
     DataDrivenPropertyValue<float> getLineBlur(const optional<std::string>& klass = {}) const;
     void setLineBlur(DataDrivenPropertyValue<float>, const optional<std::string>& klass = {});
     void setLineBlurTransition(const TransitionOptions&, const optional<std::string>& klass = {});
+    style::TransitionOptions getLineBlurTransition(const optional<std::string>& klass = {}) const;
 
     static PropertyValue<std::vector<float>> getDefaultLineDasharray();
     PropertyValue<std::vector<float>> getLineDasharray(const optional<std::string>& klass = {}) const;
     void setLineDasharray(PropertyValue<std::vector<float>>, const optional<std::string>& klass = {});
     void setLineDasharrayTransition(const TransitionOptions&, const optional<std::string>& klass = {});
+    style::TransitionOptions getLineDasharrayTransition(const optional<std::string>& klass = {}) const;
 
     static PropertyValue<std::string> getDefaultLinePattern();
     PropertyValue<std::string> getLinePattern(const optional<std::string>& klass = {}) const;
     void setLinePattern(PropertyValue<std::string>, const optional<std::string>& klass = {});
     void setLinePatternTransition(const TransitionOptions&, const optional<std::string>& klass = {});
+    style::TransitionOptions getLinePatternTransition(const optional<std::string>& klass = {}) const;
 
     // Private implementation
 

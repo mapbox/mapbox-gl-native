@@ -59,6 +59,10 @@ void BackgroundLayer::setBackgroundColorTransition(const TransitionOptions& valu
     impl->paint.setTransition<BackgroundColor>(value, klass);
 }
 
+style::TransitionOptions BackgroundLayer::getBackgroundColorTransition(const optional<std::string>& klass) const {
+    return impl->paint.getTransition<BackgroundColor>(klass);
+}
+
 PropertyValue<std::string> BackgroundLayer::getDefaultBackgroundPattern() {
     return { "" };
 }
@@ -78,6 +82,10 @@ void BackgroundLayer::setBackgroundPatternTransition(const TransitionOptions& va
     impl->paint.setTransition<BackgroundPattern>(value, klass);
 }
 
+style::TransitionOptions BackgroundLayer::getBackgroundPatternTransition(const optional<std::string>& klass) const {
+    return impl->paint.getTransition<BackgroundPattern>(klass);
+}
+
 PropertyValue<float> BackgroundLayer::getDefaultBackgroundOpacity() {
     return { 1 };
 }
@@ -95,6 +103,10 @@ void BackgroundLayer::setBackgroundOpacity(PropertyValue<float> value, const opt
 
 void BackgroundLayer::setBackgroundOpacityTransition(const TransitionOptions& value, const optional<std::string>& klass) {
     impl->paint.setTransition<BackgroundOpacity>(value, klass);
+}
+
+style::TransitionOptions BackgroundLayer::getBackgroundOpacityTransition(const optional<std::string>& klass) const {
+    return impl->paint.getTransition<BackgroundOpacity>(klass);
 }
 
 } // namespace style
