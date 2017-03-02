@@ -1,8 +1,10 @@
-#include <memory>
-
 #include <mbgl/text/bidi.hpp>
+#include <mbgl/util/traits.hpp>
+
 #include <unicode/ubidi.h>
 #include <unicode/ushape.h>
+
+#include <memory>
 
 namespace mbgl {
 
@@ -28,7 +30,7 @@ std::u16string applyArabicShaping(const std::u16string& input) {
     UErrorCode errorCode = U_ZERO_ERROR;
 
     const int32_t outputLength =
-        u_shapeArabic(input.c_str(), static_cast<int32_t>(input.size()), NULL, 0,
+        u_shapeArabic(mbgl::utf16char_cast<const UChar*>(input.c_str()), static_cast<int32_t>(input.size()), NULL, 0,
                       (U_SHAPE_LETTERS_SHAPE & U_SHAPE_LETTERS_MASK) |
                           (U_SHAPE_TEXT_DIRECTION_LOGICAL & U_SHAPE_TEXT_DIRECTION_MASK),
                       &errorCode);
@@ -38,7 +40,7 @@ std::u16string applyArabicShaping(const std::u16string& input) {
 
     std::u16string outputText(outputLength, 0);
 
-    u_shapeArabic(input.c_str(), static_cast<int32_t>(input.size()), &outputText[0], outputLength,
+    u_shapeArabic(mbgl::utf16char_cast<const UChar*>(input.c_str()), static_cast<int32_t>(input.size()), mbgl::utf16char_cast<UChar*>(&outputText[0]), outputLength,
                   (U_SHAPE_LETTERS_SHAPE & U_SHAPE_LETTERS_MASK) |
                       (U_SHAPE_TEXT_DIRECTION_LOGICAL & U_SHAPE_TEXT_DIRECTION_MASK),
                   &errorCode);
@@ -89,7 +91,7 @@ std::vector<std::u16string> BiDi::processText(const std::u16string& input,
                                               std::set<std::size_t> lineBreakPoints) {
     UErrorCode errorCode = U_ZERO_ERROR;
 
-    ubidi_setPara(impl->bidiText, input.c_str(), static_cast<int32_t>(input.size()),
+    ubidi_setPara(impl->bidiText, mbgl::utf16char_cast<const UChar*>(input.c_str()), static_cast<int32_t>(input.size()),
                   UBIDI_DEFAULT_LTR, NULL, &errorCode);
 
     if (U_FAILURE(errorCode)) {
