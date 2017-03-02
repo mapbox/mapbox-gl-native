@@ -51,7 +51,7 @@ public:
 
     State state = Pending;
 
-    std::unordered_map<std::string,
+    std::map<std::string,
         std::pair<style::IconPaintProperties::Evaluated, style::TextPaintProperties::Evaluated>> layerPaintProperties;
 
 private:

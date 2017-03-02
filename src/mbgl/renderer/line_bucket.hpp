@@ -38,7 +38,7 @@ public:
     optional<gl::VertexBuffer<LineLayoutVertex>> vertexBuffer;
     optional<gl::IndexBuffer<gl::Triangles>> indexBuffer;
 
-    std::unordered_map<std::string, LineProgram::PaintPropertyBinders> paintPropertyBinders;
+    std::map<std::string, LineProgram::PaintPropertyBinders> paintPropertyBinders;
 
 private:
     void addGeometry(const GeometryCoordinates&, FeatureType);

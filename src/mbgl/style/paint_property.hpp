@@ -139,8 +139,8 @@ public:
     }
 
 private:
-    std::unordered_map<ClassID, Value> values;
-    std::unordered_map<ClassID, TransitionOptions> transitions;
+    std::map<ClassID, Value> values;
+    std::map<ClassID, TransitionOptions> transitions;
 };
 
 template <class T>

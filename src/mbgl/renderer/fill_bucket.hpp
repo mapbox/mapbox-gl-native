@@ -37,7 +37,7 @@ public:
     optional<gl::IndexBuffer<gl::Lines>> lineIndexBuffer;
     optional<gl::IndexBuffer<gl::Triangles>> triangleIndexBuffer;
 
-    std::unordered_map<std::string, FillProgram::PaintPropertyBinders> paintPropertyBinders;
+    std::map<std::string, FillProgram::PaintPropertyBinders> paintPropertyBinders;
 };
 
 } // namespace mbgl

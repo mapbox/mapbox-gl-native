@@ -9,7 +9,7 @@ namespace mbgl {
 using namespace style;
 
 SymbolBucket::SymbolBucket(style::SymbolLayoutProperties::Evaluated layout_,
-                           const std::unordered_map<std::string, std::pair<
+                           const std::map<std::string, std::pair<
                                style::IconPaintProperties::Evaluated, style::TextPaintProperties::Evaluated>>& layerPaintProperties,
                            float zoom,
                            bool sdfIcons_,
