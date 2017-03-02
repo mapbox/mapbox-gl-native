@@ -45,6 +45,8 @@ private:
     optional<gl::VertexBuffer<FillVertex>> vertexBuffer;
     optional<gl::IndexBuffer<gl::Line>> lineIndexBuffer;
     optional<gl::IndexBuffer<gl::Triangle>> triangleIndexBuffer;
+
+    const style::Layer* layer;
 };
 
 } // namespace mbgl
