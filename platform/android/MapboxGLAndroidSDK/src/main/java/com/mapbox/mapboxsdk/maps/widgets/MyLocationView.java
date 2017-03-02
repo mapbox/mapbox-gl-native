@@ -423,22 +423,18 @@ public class MyLocationView extends View {
   private void toggleGps(boolean enableGps) {
     LocationEngine locationEngine = LocationSource.getLocationEngine(getContext());
     if (enableGps) {
-      // Set an initial location if one available
-      Location lastLocation = locationEngine.getLastLocation();
-
-      if (lastLocation != null) {
-        setLocation(lastLocation);
-      }
 
       if (userLocationListener == null) {
         userLocationListener = new GpsLocationListener(this);
       }
 
       locationEngine.addLocationEngineListener(userLocationListener);
+      locationEngine.activate();
     } else {
       // Disable location and user dot
       location = null;
       locationEngine.removeLocationEngineListener(userLocationListener);
+      locationEngine.deactivate();
     }
 
     locationEngine.setPriority(LocationEnginePriority.HIGH_ACCURACY);
