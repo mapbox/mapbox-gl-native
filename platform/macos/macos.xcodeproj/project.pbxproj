@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		1753ED401E53CE6100A9FD90 /* MGLConversion.h in Headers */ = {isa = PBXBuildFile; fileRef = 1753ED3F1E53CE5200A9FD90 /* MGLConversion.h */; };
+		1F131E361E6A36170055AF5B /* MGLNSDateAdditionsTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1F131E351E6A36170055AF5B /* MGLNSDateAdditionsTests.mm */; };
 		30E5781B1DAA857E0050F07E /* NSImage+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 30E578141DAA7D920050F07E /* NSImage+MGLAdditions.h */; };
 		3508EC641D749D39009B0EE4 /* NSExpression+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 3508EC621D749D39009B0EE4 /* NSExpression+MGLAdditions.h */; };
 		3508EC651D749D39009B0EE4 /* NSExpression+MGLAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3508EC631D749D39009B0EE4 /* NSExpression+MGLAdditions.mm */; };
@@ -263,6 +264,7 @@
 
 /* Begin PBXFileReference section */
 		1753ED3F1E53CE5200A9FD90 /* MGLConversion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLConversion.h; sourceTree = "<group>"; };
+		1F131E351E6A36170055AF5B /* MGLNSDateAdditionsTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLNSDateAdditionsTests.mm; sourceTree = "<group>"; };
 		30E578141DAA7D920050F07E /* NSImage+MGLAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSImage+MGLAdditions.h"; path = "src/NSImage+MGLAdditions.h"; sourceTree = SOURCE_ROOT; };
 		3508EC621D749D39009B0EE4 /* NSExpression+MGLAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSExpression+MGLAdditions.h"; sourceTree = "<group>"; };
 		3508EC631D749D39009B0EE4 /* NSExpression+MGLAdditions.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "NSExpression+MGLAdditions.mm"; sourceTree = "<group>"; };
@@ -944,6 +946,7 @@
 				DA35A2A71CC9F41600E826B2 /* MGLCoordinateFormatterTests.m */,
 				DA2987591E1A4290002299F5 /* MGLDocumentationExampleTests.swift */,
 				DD58A4C71D822C6200E1F038 /* MGLExpressionTests.mm */,
+				1F131E351E6A36170055AF5B /* MGLNSDateAdditionsTests.mm */,
 				35C6DF861E214C1800ACA483 /* MGLDistanceFormatterTests.m */,
 				DA0CD58D1CF56F5800A5F5A5 /* MGLFeatureTests.mm */,
 				DAE6C3C81CC34BD800DB3429 /* MGLGeometryTests.mm */,
@@ -1403,6 +1406,7 @@
 				DAE6C3D21CC34C9900DB3429 /* MGLGeometryTests.mm in Sources */,
 				DA87A9A41DCACC5000810D09 /* MGLSymbolStyleLayerTests.mm in Sources */,
 				40E1601D1DF217D6005EA6D9 /* MGLStyleLayerTests.m in Sources */,
+				1F131E361E6A36170055AF5B /* MGLNSDateAdditionsTests.mm in Sources */,
 				DA87A9A61DCACC5000810D09 /* MGLCircleStyleLayerTests.mm in Sources */,
 				DA87A99E1DC9DC2100810D09 /* MGLPredicateTests.mm in Sources */,
 				DD58A4C91D822C6700E1F038 /* MGLExpressionTests.mm in Sources */,
