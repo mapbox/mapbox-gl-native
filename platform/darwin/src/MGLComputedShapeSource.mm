@@ -23,6 +23,67 @@
 
 @end
 
+
+@interface MGLComputedShapeSourceFetchOperation : NSOperation
+
+@property (nonatomic, readonly) uint8_t z;
+@property (nonatomic, readonly) uint32_t x;
+@property (nonatomic, readonly) uint32_t y;
+@property (nonatomic, readonly, weak) MGLComputedShapeSource *source;
+
+- (instancetype)initForSource:(MGLComputedShapeSource*)source z:(uint8_t)z x:(uint32_t)x y:(uint32_t)y;
+
+@end
+
+@implementation MGLComputedShapeSourceFetchOperation
+
+
+- (instancetype)initForSource:(MGLComputedShapeSource*)source z:(uint8_t)z x:(uint32_t)x y:(uint32_t)y {
+    self = [super init];
+    _x = x;
+    _y = y;
+    _z = z;
+    _source = source;
+    return self;
+}
+
+- (void)main {
+    if ([self isCancelled]) {
+        return;
+    }
+
+    NSArray<MGLShape <MGLFeature> *> *data;
+    if(!self.source.dataSource) {
+        data = nil;
+    } else if(self.source.dataSourceImplementsFeaturesForTile) {
+        data = [self.source.dataSource featuresInTileAtX:self.x
+                                                y:self.y
+                                        zoomLevel:self.z];
+    } else {
+        mbgl::CanonicalTileID tileID = mbgl::CanonicalTileID(self.z, self.x, self.y);
+        mbgl::LatLngBounds tileBounds = mbgl::LatLngBounds(tileID);
+        data = [self.source.dataSource featuresInCoordinateBounds:MGLCoordinateBoundsFromLatLngBounds(tileBounds)
+                                                 zoomLevel:self.z];
+    }
+    
+    if(![self isCancelled]) {
+        mbgl::FeatureCollection featureCollection;
+        featureCollection.reserve(data.count);
+        for (MGLShape <MGLFeature> * feature in data) {
+            mbgl::Feature geoJsonObject = [feature geoJSONObject].get<mbgl::Feature>();
+            featureCollection.push_back(geoJsonObject);
+        }
+        const auto geojson = mbgl::GeoJSON{featureCollection};
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if(![self isCancelled] && self.source.rawSource) {
+                self.source.rawSource->setTileData(self.z, self.x, self.y, geojson);
+            }
+        });
+    }
+}
+
+@end
+
 @implementation MGLComputedShapeSource
 
 - (instancetype)initWithIdentifier:(NSString *)identifier options:(NS_DICTIONARY_OF(MGLShapeSourceOption, id) *)options {
@@ -34,34 +95,22 @@
         (self.identifier.UTF8String, geoJSONOptions,
          ^void(uint8_t z, uint32_t x, uint32_t y)
          {
-             [self.requestQueue addOperationWithBlock:
-              ^{
-                  NSArray<MGLShape <MGLFeature> *> *data;
-                  if(!self.dataSource) {
-                      data = nil;
-                  } else if(self.dataSourceImplementsFeaturesForTile) {
-                      data = [self.dataSource featuresInTileAtX:x
-                                                              y:y
-                                                      zoomLevel:z];
-                  } else {
-                      mbgl::CanonicalTileID tileID = mbgl::CanonicalTileID(z, x, y);
-                      mbgl::LatLngBounds tileBounds = mbgl::LatLngBounds(tileID);
-                      data = [self.dataSource featuresInCoordinateBounds:MGLCoordinateBoundsFromLatLngBounds(tileBounds)
-                                                               zoomLevel:z];
-                  }
-                  [self processData:data
-                            forTile:z x:x y:y];
-              }];
+             NSOperation *operation = [[MGLComputedShapeSourceFetchOperation alloc] initForSource:self z:z x:x y:y];
+             [self.requestQueue addOperation:operation];
          });
         
         _pendingSource = std::move(source);
         self.rawSource = _pendingSource.get();
-        
     }
     return self;
 }
 
+- (void)dealloc {
+    [self.requestQueue cancelAllOperations];
+}
+
 - (void)setDataSource:(id<MGLComputedShapeSourceDataSource>)dataSource {
+    [self.requestQueue cancelAllOperations];
     //Check which method the datasource implements, to avoid having to check for each tile
     self.dataSourceImplementsFeaturesForTile = [dataSource respondsToSelector:@selector(featuresInTileAtX:y:zoomLevel:)];
     self.dataSourceImplementsFeaturesForBounds = [dataSource respondsToSelector:@selector(featuresInCoordinateBounds:zoomLevel:)];
@@ -86,23 +135,11 @@
 }
 
 - (void)removeFromMapView:(MGLMapView *)mapView {
+    [self.requestQueue cancelAllOperations];
     auto removedSource = mapView.mbglMap->removeSource(self.identifier.UTF8String);
     
     _pendingSource = std::move(reinterpret_cast<std::unique_ptr<mbgl::style::CustomVectorSource> &>(removedSource));
     self.rawSource = _pendingSource.get();
-}
-
-- (void)processData:(NS_ARRAY_OF(MGLShape <MGLFeature> *)*)features forTile:(uint8_t)z x:(uint32_t)x y:(uint32_t)y {
-    mbgl::FeatureCollection featureCollection;
-    featureCollection.reserve(features.count);
-    for (MGLShape <MGLFeature> * feature in features) {
-        mbgl::Feature geoJsonObject = [feature geoJSONObject].get<mbgl::Feature>();
-        featureCollection.push_back(geoJsonObject);
-    }
-    const auto geojson = mbgl::GeoJSON{featureCollection};
-    dispatch_async(dispatch_get_main_queue(), ^{
-        self.rawSource->setTileData(z, x, y, geojson);
-    });
 }
 
 - (void)reloadTileInCoordinateBounds:(MGLCoordinateBounds)bounds zoomLevel:(NSUInteger)zoomLevel {
@@ -114,6 +151,7 @@
 }
 
 - (void)reloadData {
+    [self.requestQueue cancelAllOperations];
     self.rawSource->reload();
 }
 
