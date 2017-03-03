@@ -35,12 +35,6 @@ require('./style-code');
         });
     }
 
-    function unpackAttrs(){
-        float
-
-    }
-
-
     function vertexSource() {
         const prelude = fs.readFileSync(path.join(inputPath, '_prelude.vertex.glsl'));
         const source = fs.readFileSync(path.join(inputPath, shaderName + '.vertex.glsl'), 'utf8');
