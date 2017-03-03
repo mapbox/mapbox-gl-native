@@ -44,6 +44,7 @@ vec4 evaluate_zoom_function_4(const vec4 value0, const vec4 value1, const vec4 v
     }
 }
 
+
 // Encoding function
 // static std::array<float, 2> encodeColor (const Color& color) {
 //     const auto v1 = static_cast<uint16_t>( static_cast<uint16_t>(color.r*255)*256 + color.g*255);
@@ -69,7 +70,6 @@ vec4 unpack_mix_vec4(const vec4 packedColors, const float t) {
     return mix(minColor, maxColor, t);
 }
 
-
 // The offset depends on how many pixels are between the world origin and the edge of the tile:
 // vec2 offset = mod(pixel_coord, size)
 //
@@ -89,10 +89,17 @@ vec2 get_pattern_pos(const vec2 pixel_coord_upper, const vec2 pixel_coord_lower,
 }
 const float PI = 3.141592653589793;
 
-attribute vec2 a_pos;
-attribute vec2 a_offset;
+#ifdef MAPBOX_GL_NATIVE
+  attribute vec4 a_pos_offset;
+#else
+  attribute vec2 a_pos;
+  attribute vec2 a_offset;
+#endif
+
 attribute vec2 a_texture_pos;
 attribute vec4 a_data;
+
+
 
 uniform lowp float a_fill_color_t;
 attribute lowp vec4 a_fill_color_minmax;
@@ -133,6 +140,11 @@ void main() {
     opacity = unpack_mix_vec2(a_opacity_minmax, a_opacity_t);
     halo_width = unpack_mix_vec2(a_halo_width_minmax, a_halo_width_t);
     halo_blur = unpack_mix_vec2(a_halo_blur_minmax, a_halo_blur_t);
+
+#ifdef MAPBOX_GL_NATIVE
+    mediump vec2 a_pos = a_pos_offset.xy;
+    mediump vec2 a_offset = a_pos_offset.zw;
+#endif
 
     vec2 a_tex = a_texture_pos.xy;
     mediump float a_labelminzoom = a_data[0];

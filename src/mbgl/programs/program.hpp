@@ -50,11 +50,11 @@ public:
             assert(source.find("#ifdef OVERDRAW_INSPECTOR") != std::string::npos);
             source.replace(source.find_first_of('\n'), 1, "\n#define OVERDRAW_INSPECTOR\n");
         }
-        return source;
+        return std::string("#define MAPBOX_GL_NATIVE\n") + source;
     }
 
     static std::string vertexSource(const ProgramParameters& parameters) {
-        return pixelRatioDefine(parameters) + Shaders::vertexSource;
+        return std::string("#define MAPBOX_GL_NATIVE\n") + pixelRatioDefine(parameters) + Shaders::vertexSource;
     }
 
     template <class DrawMode>

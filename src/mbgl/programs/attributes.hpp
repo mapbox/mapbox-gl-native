@@ -13,6 +13,7 @@ namespace attributes {
 
 MBGL_DEFINE_ATTRIBUTE(int16_t, 2, a_pos);
 MBGL_DEFINE_ATTRIBUTE(int16_t, 2, a_extrude);
+MBGL_DEFINE_ATTRIBUTE(int16_t, 4, a_pos_offset);
 MBGL_DEFINE_ATTRIBUTE(uint16_t, 2, a_texture_pos);
 
 template <std::size_t N>
