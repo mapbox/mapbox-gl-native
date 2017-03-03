@@ -11,8 +11,14 @@ set(MBGL_QT_LIBRARIES
     PRIVATE Qt5::Core
     PRIVATE Qt5::Gui
     PRIVATE Qt5::Network
-    PRIVATE Qt5::OpenGL
     PRIVATE Qt5::Sql
+)
+
+set(MBGL_QT_TEST_LIBRARIES
+    PRIVATE Qt5::Core
+    PRIVATE Qt5::Gui
+    PRIVATE Qt5::Widgets
+    PRIVATE Qt5::OpenGL
 )
 
 target_sources(qmapboxgl
@@ -29,7 +35,6 @@ target_link_libraries(qmapboxgl
     PRIVATE Qt5::Core
     PRIVATE Qt5::Gui
     PRIVATE Qt5::Location
-    PRIVATE Qt5::OpenGL
     PRIVATE Qt5::Quick
     PRIVATE Qt5::Sql
 )

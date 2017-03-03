@@ -72,7 +72,7 @@ macro(mbgl_platform_test)
 
     target_link_libraries(mbgl-test
         PRIVATE qmapboxgl
-        ${MBGL_QT_LIBRARIES}
+        ${MBGL_QT_TEST_LIBRARIES}
     )
 endmacro()
 
