@@ -2,7 +2,7 @@
 
 Mapbox welcomes participation and contributions from everyone. Please read [CONTRIBUTING.md](../../CONTRIBUTING.md) to get started.
 
-## master
+## 3.5.0
 
 ### Internationalization
 
@@ -48,6 +48,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 
 * The minimum deployment target for this SDK is now iOS 8. ([#8129](https://github.com/mapbox/mapbox-gl-native/pull/8129))
 * Fixed an issue that, among other things, caused various islands to disappear at certain zoom levels. ([#7621](https://github.com/mapbox/mapbox-gl-native/pull/7621))
+* Changing the coordinates of a point annotation no longer deselects the annotation. ([#8269](https://github.com/mapbox/mapbox-gl-native/pull/8269))
 * Fixed an issue where translucent, non-view-backed point annotations along tile boundaries would be drawn darker than expected. ([#6832](https://github.com/mapbox/mapbox-gl-native/pull/6832))
 * Fixed flickering that occurred when panning past the antimeridian. ([#7574](https://github.com/mapbox/mapbox-gl-native/pull/7574))
 * Fixed an issue that sometimes caused crashes when the SDK interacted with the file system in the background. ([#8125](https://github.com/mapbox/mapbox-gl-native/pull/8125))
