@@ -55,6 +55,7 @@
 #import "MGLStyle_Private.h"
 #import "MGLStyleLayer_Private.h"
 #import "MGLMapboxEvents.h"
+#import "MGLSDKUpdateChecker.h"
 #import "MGLCompactCalloutView.h"
 #import "MGLAnnotationContainerView.h"
 #import "MGLAnnotationContainerView_Private.h"
@@ -345,6 +346,14 @@ public:
         self.styleURL = nil;
     }
     return self;
+}
+
++ (void)initialize
+{
+    if (self == [MGLMapView self])
+    {
+        [MGLSDKUpdateChecker checkForUpdates];
+    }
 }
 
 + (NS_SET_OF(NSString *) *)keyPathsForValuesAffectingStyle

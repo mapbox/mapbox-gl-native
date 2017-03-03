@@ -8,6 +8,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 
 * The minimum deployment target for this SDK is now iOS 8. ([#8129](https://github.com/mapbox/mapbox-gl-native/pull/8129))
 * Added support for the Carthage dependency manager. See [our website](https://www.mapbox.com/ios-sdk/) for setup instructions. ([#8257](https://github.com/mapbox/mapbox-gl-native/pull/8257))
+* Added a simulator-only console notification to inform developers if there is a newer version of this SDK available. ([#8282](https://github.com/mapbox/mapbox-gl-native/pull/8282))
 
 ### Internationalization
 
