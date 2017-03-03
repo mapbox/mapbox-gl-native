@@ -45,6 +45,7 @@
 
 ### Other changes
 
+* Added support for the Carthage dependency manager. See [this SDK’s homepage](https://mapbox.github.io/mapbox-gl-native/macos/) for setup instructions. ([#8257](https://github.com/mapbox/mapbox-gl-native/pull/8257))
 * Fixed an issue that, among other things, caused various islands to disappear at certain zoom levels. ([#7621](https://github.com/mapbox/mapbox-gl-native/pull/7621))
 * Fixed an issue where translucent point annotations along tile boundaries would be drawn darker than expected. ([#6832](https://github.com/mapbox/mapbox-gl-native/pull/6832))
 * Fixed flickering that occurred when panning past the antimeridian. ([#7574](https://github.com/mapbox/mapbox-gl-native/pull/7574))

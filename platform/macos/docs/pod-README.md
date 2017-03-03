@@ -14,15 +14,43 @@ The Mapbox macOS SDK is compatible with macOS 10.10.0 and above for Cocoa applic
 
 ## Installation
 
-1. Download the [latest Mapbox macOS SDK release](https://github.com/mapbox/mapbox-gl-native/releases/) from GitHub – look for a release that begins with “macos-”. (Alternatively, you can integrate the Mapbox macOS SDK into your application [using CocoaPods](https://cocoapods.org/pods/Mapbox-macOS-SDK). If you do use CocoaPods, skip the next step.)
+There are three ways to install the Mapbox macOS SDK:
+
+### Manually
+
+1. Download the [latest Mapbox macOS SDK release](https://github.com/mapbox/mapbox-gl-native/releases/) from GitHub – look for a release that begins with “macos-”.
 
 1. Open the project editor, select your application target, then go to the General tab. Drag Mapbox.framework into the “Embedded Binaries” section. (Don’t drag it into the “Linked Frameworks and Libraries” section; Xcode will add it there automatically.) In the sheet that appears, make sure “Copy items if needed” is checked, then click Finish.
 
-1. Mapbox vector tiles require a Mapbox account and API access token. In the project editor, select the application target, then go to the Info tab. Under the “Custom macOS Application Target Properties” section, set `MGLMapboxAccessToken` to your access token. You can obtain an access token from the [Mapbox account page](https://www.mapbox.com/studio/account/tokens/).
+### Via Carthage
+
+The Mapbox macOS SDK is a binary-only dependency, so you’ll need Carthage 0.19 or above. In your [Cartfile](https://github.com/Carthage/Carthage/blob/master/Documentation/Artifacts.md#binary-only-frameworks), specify this dependency (plus an optional version requirement):
+
+```
+binary "https://mapbox.github.io/mapbox-gl-native/macos/Mapbox-macOS-SDK.json"
+```
+
+After running `carthage update`, you’ll find Mapbox.framework in the Carthage/Build/ folder. Follow [these instructions](https://github.com/Carthage/Carthage#if-youre-building-for-os-x) to integrate it into your project.
+
+### Via CocoaPods
+
+Create a [Podfile](https://guides.cocoapods.org/syntax/podfile.html) with the following specification:
+
+```rb
+platform :osx, '10.10'
+
+target 'TargetNameForYourApp' do
+  pod 'Mapbox-iOS-SDK', '~> x.y'
+end
+```
+
+where _x.y_ is the current version. In Terminal, run `pod install`.
 
 ## Usage
 
-In a storyboard or XIB:
+Mapbox vector tiles require a Mapbox account and API access token. In the project editor, select the application target, then go to the Info tab. Under the “Custom macOS Application Target Properties” section, set `MGLMapboxAccessToken` to your access token. You can obtain an access token from the [Mapbox account page](https://www.mapbox.com/studio/account/tokens/).
+
+Then, in a storyboard or XIB:
 
 1. Add a view to your view controller or window. (Drag Custom View from the Object library to the View Controller scene on the Interface Builder canvas. In a XIB, drag it instead to the window on the canvas.)
 2. In the Identity inspector, set the view’s custom class to `MGLMapView`.
