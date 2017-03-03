@@ -145,6 +145,7 @@ private:
     bool parseStyleFilter(QQuickMapboxGLMapParameter *);
     bool parseBearing(QQuickMapboxGLMapParameter *);
     bool parsePitch(QQuickMapboxGLMapParameter *);
+    bool parseAccessToken(QQuickMapboxGLMapParameter *);
 
     qreal m_minimumZoomLevel = 0;
     qreal m_maximumZoomLevel = 20;
