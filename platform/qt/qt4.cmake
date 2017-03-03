@@ -8,6 +8,11 @@ set(MBGL_QT_LIBRARIES
     PRIVATE Qt4::QtSql
 )
 
+set(MBGL_QT_TEST_LIBRARIES
+    PRIVATE Qt4::QtCore
+    PRIVATE Qt4::QtOpenGL
+)
+
 target_link_libraries(qmapboxgl
     PRIVATE mbgl-core
     PRIVATE Qt4::QtCore
