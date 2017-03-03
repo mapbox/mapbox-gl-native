@@ -141,7 +141,7 @@ int main(int argc, char *argv[]) {
 
     map.setLatLngZoom(mbgl::LatLng(40.713, -73.999), 15.03);
     map.setBearing(0.0);
-    map.setPitch(50.0);
+    map.setPitch(60.0);
 
     view->setChangeStyleCallback([&map] () {
         static uint8_t currentStyleIndex;
@@ -171,7 +171,7 @@ int main(int argc, char *argv[]) {
 
     // Load style
     if (style.empty()) {
-        style = "mapbox://styles/lbud/ciyoshhyf004r2rmqr8bd4g3h";
+        style = "mapbox://styles/lbud/ciyoshhyf004r2rmqr8bd4g3h?fresh=true";
         view->setWindowTitle("extrusions");
 //
 //        const char *url = getenv("MAPBOX_STYLE_URL");

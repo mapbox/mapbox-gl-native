@@ -62,15 +62,16 @@ vec2 get_pattern_pos(const vec2 pixel_coord_upper, const vec2 pixel_coord_lower,
     return (tile_units_to_pixels * pos + offset) / pattern_size;
 }
 uniform mat4 u_matrix;
-uniform vec2 u_world;
+uniform int u_xdim;
+uniform int u_ydim;
 attribute vec2 a_pos;
 varying vec2 v_pos;
 
 void main() {
     gl_Position = u_matrix * vec4(a_pos, 0, 1);
 
-    v_pos.x = a_pos.x / u_world.x;
-    v_pos.y = 1.0 - a_pos.y / u_world.y;
+    v_pos.x = a_pos.x / float(u_xdim);
+    v_pos.y = 1.0 - a_pos.y / float(u_ydim);
 }
 
 )MBGL_SHADER";
@@ -92,13 +93,13 @@ precision mediump float;
 #endif
 
 #endif
-uniform sampler2D u_image;
+uniform sampler2D u_texture;
 uniform float u_opacity;
 
 varying vec2 v_pos;
 
 void main() {
-    gl_FragColor = texture2D(u_image, v_pos) * u_opacity;
+    gl_FragColor = texture2D(u_texture, v_pos) * u_opacity;
 
 #ifdef OVERDRAW_INSPECTOR
     gl_FragColor = vec4(0.0);
