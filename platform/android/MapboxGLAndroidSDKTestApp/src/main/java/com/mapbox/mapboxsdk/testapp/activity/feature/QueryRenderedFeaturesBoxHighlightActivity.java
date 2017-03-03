@@ -11,6 +11,7 @@ import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.style.layers.FillLayer;
+import com.mapbox.mapboxsdk.style.layers.Filter;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.services.commons.geojson.Feature;
@@ -53,7 +54,7 @@ public class QueryRenderedFeaturesBoxHighlightActivity extends AppCompatActivity
             int left = selectionBox.getLeft() - mapView.getLeft();
             RectF box = new RectF(left, top, left + selectionBox.getWidth(), top + selectionBox.getHeight());
             Timber.i(String.format("Querying box %s for buildings", box));
-            List<Feature> features = mapboxMap.queryRenderedFeatures(box, "building");
+            List<Feature> features = mapboxMap.queryRenderedFeatures(box, Filter.lt("height", 10), "building");
 
             // Show count
             Toast.makeText(

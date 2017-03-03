@@ -197,9 +197,13 @@ public:
 
     jni::Array<jlong> queryPointAnnotations(JNIEnv&, jni::Object<RectF>);
 
-    jni::Array<jni::Object<Feature>> queryRenderedFeaturesForPoint(JNIEnv&, jni::jfloat, jni::jfloat, jni::Array<jni::String>);
+    jni::Array<jni::Object<Feature>> queryRenderedFeaturesForPoint(JNIEnv&, jni::jfloat, jni::jfloat,
+                                                                   jni::Array<jni::String>,
+                                                                   jni::Array<jni::Object<>> jfilter);
 
-    jni::Array<jni::Object<Feature>> queryRenderedFeaturesForBox(JNIEnv&, jni::jfloat, jni::jfloat, jni::jfloat, jni::jfloat, jni::Array<jni::String>);
+    jni::Array<jni::Object<Feature>> queryRenderedFeaturesForBox(JNIEnv&, jni::jfloat, jni::jfloat, jni::jfloat,
+                                                                 jni::jfloat, jni::Array<jni::String>,
+                                                                 jni::Array<jni::Object<>> jfilter);
 
     jni::Array<jni::Object<Layer>> getLayers(JNIEnv&);
 
