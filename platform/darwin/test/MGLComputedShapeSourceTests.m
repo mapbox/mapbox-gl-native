@@ -9,16 +9,16 @@
 @implementation MGLComputedShapeSourceTests
 
 - (void)testInitializer {
-  MGLComputedShapeSource *source = [[MGLComputedShapeSource alloc] initWithIdentifier:@"id"
-                                                                              options:@{}];
-  XCTAssertNotNil(source);
-  XCTAssertNotNil(source.requestQueue);
-  XCTAssertNil(source.dataSource);
+    MGLComputedShapeSource *source = [[MGLComputedShapeSource alloc] initWithIdentifier:@"id"
+                                                                                options:@{}];
+    XCTAssertNotNil(source);
+    XCTAssertNotNil(source.requestQueue);
+    XCTAssertNil(source.dataSource);
 }
 
 - (void)testNilOptions {
-  MGLComputedShapeSource *source = [[MGLComputedShapeSource alloc] initWithIdentifier:@"id" options:nil];
-  XCTAssertNotNil(source);
+    MGLComputedShapeSource *source = [[MGLComputedShapeSource alloc] initWithIdentifier:@"id" options:nil];
+    XCTAssertNotNil(source);
 }
 
 
