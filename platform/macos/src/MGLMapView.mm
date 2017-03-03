@@ -538,9 +538,7 @@ public:
             const mbgl::Point<double> point = MGLPointFromLocationCoordinate2D(annotation.coordinate);
             MGLAnnotationImage *annotationImage = [self imageOfAnnotationWithTag:annotationTag];
             _mbglMap->updateAnnotation(annotationTag, mbgl::SymbolAnnotation { point, annotationImage.styleIconIdentifier.UTF8String ?: "" });
-            if (annotationTag == _selectedAnnotationTag) {
-                [self deselectAnnotation:annotation];
-            }
+            [self updateAnnotationCallouts];
         }
     } else if ([keyPath isEqualToString:@"coordinates"] &&
                [object isKindOfClass:[MGLMultiPoint class]]) {
@@ -554,12 +552,7 @@ public:
         // but safely updated.
         if (annotation == [self annotationWithTag:annotationTag]) {
             _mbglMap->updateAnnotation(annotationTag, [annotation annotationObjectWithDelegate:self]);
-            // We don't current support shape multipoint annotation selection, but let's make sure
-            // deselection is handled just to avoid problems in the future.
-            if (annotationTag == _selectedAnnotationTag)
-            {
-                [self deselectAnnotation:annotation];
-            }
+            [self updateAnnotationCallouts];
         }
     }
 }

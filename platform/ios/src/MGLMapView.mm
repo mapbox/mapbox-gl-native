@@ -1986,10 +1986,7 @@ public:
 
             // Update the annotation’s backing geometry to match the annotation model object. Any associated annotation view is also moved by side effect. However, -updateAnnotationViews disables the view’s animation actions, because it can’t distinguish between moves due to the viewport changing and moves due to the annotation’s coordinate changing.
             _mbglMap->updateAnnotation(annotationTag, mbgl::SymbolAnnotation { point, symbolName.UTF8String });
-            if (annotationTag == _selectedAnnotationTag)
-            {
-                [self deselectAnnotation:annotation animated:YES];
-            }
+            [self updateCalloutView];
         }
     }
     else if ([keyPath isEqualToString:@"coordinates"] && [object isKindOfClass:[MGLMultiPoint class]])
@@ -2006,13 +2003,7 @@ public:
         {
             // Update the annotation’s backing geometry to match the annotation model object.
             _mbglMap->updateAnnotation(annotationTag, [annotation annotationObjectWithDelegate:self]);
-
-            // We don't current support shape multipoint annotation selection, but let's make sure
-            // deselection is handled just to avoid problems in the future.
-            if (annotationTag == _selectedAnnotationTag)
-            {
-                [self deselectAnnotation:annotation animated:YES];
-            }
+            [self updateCalloutView];
         }
     }
 }
