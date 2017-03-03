@@ -7,7 +7,7 @@
         android:layout_height="match_parent"
         android:visibility="gone" />
 
-    <FrameLayout
+    <com.mapbox.mapboxsdk.annotations.MarkerViewContainer
         android:id="@+id/markerViewContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
