@@ -217,6 +217,17 @@
                 android:value=".activity.FeatureOverviewActivity"/>
         </activity>
         <activity
+            android:name=".activity.userlocation.CameraLocationActivity"
+            android:description="@string/description_user_location_tracking_camera"
+            android:label="@string/activity_user_tracking_mode_camera">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_userlocation"/>
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.FeatureOverviewActivity"/>
+        </activity>
+        <activity
             android:name=".activity.userlocation.MyLocationDrawableActivity"
             android:description="@string/description_user_location_customization"
             android:label="@string/activity_user_tracking_customization">

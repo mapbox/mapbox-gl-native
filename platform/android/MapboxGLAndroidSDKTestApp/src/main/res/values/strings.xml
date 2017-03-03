@@ -25,6 +25,7 @@
     <string name="activity_double_map">Double Map Activity</string>
     <string name="activity_snapshot">Snapshot Activity</string>
     <string name="activity_user_tracking_mode">User tracking mode</string>
+    <string name="activity_user_tracking_mode_camera">User tracking mode (Camera)</string>
     <string name="activity_user_tracking_customization">User location drawable</string>
     <string name="activity_user_dot_color">User location tint color</string>
     <string name="activity_user_location_toggle">User location toggle</string>
@@ -56,6 +57,7 @@
 
     <!--Description-->
     <string name="description_user_location_tracking">Tracks the location of the user</string>
+    <string name="description_user_location_tracking_camera">Tracks the location of the user (Camera)</string>
     <string name="description_user_location_customization">Customize the location of the user</string>
     <string name="description_user_location_dot_color">Customize the user location color</string>
     <string name="description_user_location_toggle">Toggle location of the user on and off</string>
