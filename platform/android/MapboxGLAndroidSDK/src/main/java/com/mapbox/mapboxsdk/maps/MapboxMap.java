@@ -37,6 +37,7 @@ import com.mapbox.mapboxsdk.constants.MyLocationTracking;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.widgets.MyLocationViewSettings;
+import com.mapbox.mapboxsdk.style.layers.Filter;
 import com.mapbox.mapboxsdk.style.layers.Layer;
 import com.mapbox.mapboxsdk.style.sources.Source;
 import com.mapbox.services.commons.geojson.Feature;
@@ -1674,7 +1675,23 @@ public final class MapboxMap {
   @NonNull
   public List<Feature> queryRenderedFeatures(@NonNull PointF coordinates, @Nullable String...
     layerIds) {
-    return nativeMapView.queryRenderedFeatures(coordinates, layerIds);
+    return nativeMapView.queryRenderedFeatures(coordinates, layerIds, null);
+  }
+
+  /**
+   * Queries the map for rendered features
+   *
+   * @param coordinates the point to query
+   * @param filter      filters the returned features
+   * @param layerIds    optionally - only query these layers
+   * @return the list of feature
+   */
+  @UiThread
+  @NonNull
+  public List<Feature> queryRenderedFeatures(@NonNull PointF coordinates,
+                                             @Nullable Filter.Statement filter,
+                                             @Nullable String... layerIds) {
+    return nativeMapView.queryRenderedFeatures(coordinates, layerIds, filter);
   }
 
   /**
@@ -1686,9 +1703,25 @@ public final class MapboxMap {
    */
   @UiThread
   @NonNull
-  public List<Feature> queryRenderedFeatures(@NonNull RectF coordinates, @Nullable String...
-    layerIds) {
-    return nativeMapView.queryRenderedFeatures(coordinates, layerIds);
+  public List<Feature> queryRenderedFeatures(@NonNull RectF coordinates,
+                                             @Nullable String... layerIds) {
+    return nativeMapView.queryRenderedFeatures(coordinates, layerIds, null);
+  }
+
+  /**
+   * Queries the map for rendered features
+   *
+   * @param coordinates the box to query
+   * @param filter      filters the returned features
+   * @param layerIds    optionally - only query these layers
+   * @return the list of feature
+   */
+  @UiThread
+  @NonNull
+  public List<Feature> queryRenderedFeatures(@NonNull RectF coordinates,
+                                             @Nullable Filter.Statement filter,
+                                             @Nullable String... layerIds) {
+    return nativeMapView.queryRenderedFeatures(coordinates, layerIds, filter);
   }
 
   //
