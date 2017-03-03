@@ -338,6 +338,46 @@ void Painter::renderPass(PaintParameters& parameters,
             parameters.view.bind();
             context.setDirtyState();
         } else if (layer.is<FillExtrusionLayer>()) {
+////            const auto size = state.getSize();
+//            const auto size_ = context.viewport.getCurrentValue().size;
+//            Size size{ size_.width / 2, size_.height / 2 };
+//
+//            // i think maybe there's a depth buffering issue at tile boundaries (?) — perhaps not using the same depth buffer?
+//
+//            OffscreenTexture texture(context, size);
+//            texture.bindRenderbuffers();
+//
+//            context.setStencilMode(gl::StencilMode::disabled());
+//            context.setDepthMode(depthModeForSublayer(0, gl::DepthMode::ReadWrite));
+//            context.clear(Color{ 0.0f, 0.0f, 0.0f, 0.0f }, 1.0f, {});
+
+            renderTiles();
+//
+//            parameters.view.bind();
+//
+//            mat4 mat;
+//            matrix::ortho(mat, 0, size.width, size.height, 0, 0, 1);
+//            const FillExtrusionPaintProperties::Evaluated properties{};
+//
+//            parameters.programs.extrusionTexture.draw(context,
+//                                                      gl::Triangles(),
+//                                                      gl::DepthMode::disabled(),
+//                                                      gl::StencilMode::disabled(),
+//                                                      colorModeForRenderPass(),
+//                                                      ExtrusionTextureProgram::UniformValues{
+//                                                          uniforms::u_matrix::Value{ mat },
+//                                                          uniforms::u_world::Value{ size },
+//                                                          uniforms::u_image::Value{ 0 }, // view.getTexture() ? no — but follow up on whether could be variable or if it's always safe to attach to 0 unit
+//                                                          uniforms::u_opacity::Value{ 0.9 } // TODO implement parsing from style
+//                                                      },
+//                                                      extrusionTextureVertexBuffer,
+//                                                      tileTriangleIndexBuffer,
+//                                                      extrusionTextureSegments,
+//                                                      ExtrusionTextureProgram::PaintPropertyBinders{ properties, 0 },
+//                                                      properties,
+//                                                      state.getZoom());
+
+
 //            const auto size = state.getSize();
 ////            const auto size = Size{ _size.width - (_size.width % 4), _size.height - (_size.height % 4) };
 //
@@ -349,7 +389,7 @@ void Painter::renderPass(PaintParameters& parameters,
 //
 //            context.clear(Color{ 0.0f, 0.0f, 0.0f, 0.0f }, 1.0f, {});
 //
-            renderTiles();
+//            renderTiles();
 //
 //            parameters.view.bind();
 //

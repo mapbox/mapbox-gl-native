@@ -90,7 +90,7 @@ void FillExtrusionBucket::addFeature(const GeometryTileFeature& feature,
                     const auto d1 = convertPoint<double>(p1);
                     const auto d2 = convertPoint<double>(p2);
 
-                    const Point<double> perp = util::unit(util::perp(d2 - d1));
+                    const Point<double> perp = util::unit(util::perp(d1 - d2));
 
                     vertices.emplace_back(FillExtrusionProgram::layoutVertex(p1, perp.x, perp.y, 0, 0, edgeDistance));
                     vertices.emplace_back(FillExtrusionProgram::layoutVertex(p1, perp.x, perp.y, 0, 1, edgeDistance));
