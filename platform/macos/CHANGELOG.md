@@ -47,6 +47,7 @@
 * Fixed an issue where translucent point annotations along tile boundaries would be drawn darker than expected. ([#6832](https://github.com/mapbox/mapbox-gl-native/pull/6832))
 * Fixed flickering that occurred when panning past the antimeridian. ([#7574](https://github.com/mapbox/mapbox-gl-native/pull/7574))
 * Added a `MGLDistanceFormatter` class for formatting geographic distances. ([#7888](https://github.com/mapbox/mapbox-gl-native/pull/7888))
+* Added support for predicates in rendered feature querying [8256](https://github.com/mapbox/mapbox-gl-native/pull/8246)
 
 ## 0.3.1 - February 21, 2017
 
