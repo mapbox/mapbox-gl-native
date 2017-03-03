@@ -38,8 +38,8 @@ struct MinMax : gl::Attribute<typename Attr::ValueType, Attr::Dimensions * 2> {
     
     template <class InputType>
     static Value value(const InputType& min, const InputType& max){
-        static auto minValue = Attr::value(min);
-        static auto maxValue = Attr::value(max);
+        auto minValue = Attr::value(min);
+        auto maxValue = Attr::value(max);
         Value result = {{}};
         // TODO: can we do this statically??
         for (size_t i = 0; i < Attr::Dimensions; i++) {
@@ -59,7 +59,9 @@ struct InterpolationUniform : gl::UniformScalar<InterpolationUniform<Attr>, floa
 };
 
 static std::array<float, 2> encodeColor (const Color& color) {
-    return {{ static_cast<float>(color.r*256.0 + color.g),static_cast<float>( color.b*256.0 + color.a) }};
+    const auto v1 = static_cast<uint16_t>( static_cast<uint16_t>(color.r*255)*256 + color.g*255);
+    const auto v2 = static_cast<uint16_t>( static_cast<uint16_t>(color.b*255)*256 + color.a*255);
+    return {{ static_cast<float>(v1), static_cast<float>(v2) }};
 }
 
 struct a_color : gl::Attribute<float, 2> {
