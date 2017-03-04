@@ -14,7 +14,6 @@
 #include <mbgl/style/layers/raster_layer.hpp>
 #include <mbgl/style/layer_impl.hpp>
 #include <mbgl/style/parser.hpp>
-#include <mbgl/style/query_parameters.hpp>
 #include <mbgl/style/transition_options.hpp>
 #include <mbgl/style/class_dictionary.hpp>
 #include <mbgl/style/update_parameters.hpp>
@@ -31,6 +30,7 @@
 #include <mbgl/util/logging.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/math/minmax.hpp>
+#include <mbgl/map/query.hpp>
 
 #include <algorithm>
 
@@ -502,32 +502,34 @@ RenderData Style::getRenderData(MapDebugOptions debugOptions, float angle) const
     return result;
 }
 
-std::vector<Feature> Style::queryRenderedFeatures(const QueryParameters& parameters) const {
+std::vector<Feature> Style::queryRenderedFeatures(const ScreenLineString& geometry,
+                                           const TransformState& transformState,
+                                           const QueryOptions& options) const {
     std::unordered_set<std::string> sourceFilter;
-
-    if (parameters.layerIDs) {
-        for (const auto& layerID : *parameters.layerIDs) {
+    
+    if (options.layerIDs) {
+        for (const auto& layerID : *options.layerIDs) {
             auto layer = getLayer(layerID);
             if (layer) sourceFilter.emplace(layer->baseImpl->source);
         }
     }
-
+    
     std::vector<Feature> result;
     std::unordered_map<std::string, std::vector<Feature>> resultsByLayer;
-
+    
     for (const auto& source : sources) {
         if (!sourceFilter.empty() && sourceFilter.find(source->getID()) == sourceFilter.end()) {
             continue;
         }
-
-        auto sourceResults = source->baseImpl->queryRenderedFeatures(parameters);
+        
+        auto sourceResults = source->baseImpl->queryRenderedFeatures(geometry, transformState, options);
         std::move(sourceResults.begin(), sourceResults.end(), std::inserter(resultsByLayer, resultsByLayer.begin()));
     }
-
+    
     if (resultsByLayer.empty()) {
         return result;
     }
-
+    
     // Combine all results based on the style layer order.
     for (const auto& layer : layers) {
         if (!layer->baseImpl->needsRendering(zoomHistory.lastZoom)) {
@@ -538,9 +540,10 @@ std::vector<Feature> Style::queryRenderedFeatures(const QueryParameters& paramet
             std::move(it->second.begin(), it->second.end(), std::back_inserter(result));
         }
     }
-
+    
     return result;
 }
+
 
 float Style::getQueryRadius() const {
     float additionalRadius = 0;

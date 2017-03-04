@@ -10,6 +10,7 @@
 #include <mbgl/annotation/annotation.hpp>
 #include <mbgl/style/transition_options.hpp>
 #include <mbgl/map/camera.hpp>
+#include <mbgl/map/query.hpp>
 
 #include <cstdint>
 #include <string>
@@ -24,9 +25,8 @@ class View;
 class FileSource;
 class Scheduler;
 class SpriteImage;
-struct CameraOptions;
-struct AnimationOptions;
-
+struct QueryOptions;
+    
 namespace style {
 class Source;
 class Layer;
@@ -183,10 +183,12 @@ public:
     double getDefaultPitch() const;
 
     // Feature queries
-    std::vector<Feature> queryRenderedFeatures(const ScreenCoordinate&, const optional<std::vector<std::string>>& layerIDs = {});
-    std::vector<Feature> queryRenderedFeatures(const ScreenBox&,        const optional<std::vector<std::string>>& layerIDs = {});
+    std::vector<Feature> queryRenderedFeatures(const ScreenCoordinate&, const QueryOptions& options = {});
+    std::vector<Feature> queryRenderedFeatures(const ScreenBox&,        const QueryOptions& options = {});
+    
     AnnotationIDs queryPointAnnotations(const ScreenBox&);
 
+    
     // Memory
     void setSourceTileCacheSize(size_t);
     void onLowMemory();

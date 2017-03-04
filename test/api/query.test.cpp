@@ -39,7 +39,7 @@ TEST(Query, QueryRenderedFeatures) {
     QueryTest test;
 
     auto features1 = test.map.queryRenderedFeatures(test.map.pixelForLatLng({ 0, 0 }));
-    EXPECT_EQ(features1.size(), 3u);
+    EXPECT_EQ(features1.size(), 4u);
 
     auto features2 = test.map.queryRenderedFeatures(test.map.pixelForLatLng({ 9, 9 }));
     EXPECT_EQ(features2.size(), 0u);
@@ -50,15 +50,33 @@ TEST(Query, QueryRenderedFeaturesFilterLayer) {
 
     auto zz = test.map.pixelForLatLng({ 0, 0 });
 
-    auto features1 = test.map.queryRenderedFeatures(zz, {{ "layer1"}});
+    auto features1 = test.map.queryRenderedFeatures(zz, {{{ "layer1"}}});
     EXPECT_EQ(features1.size(), 1u);
-
-    auto features2 = test.map.queryRenderedFeatures(zz, {{ "layer1", "layer2" }});
+    
+    auto features2 = test.map.queryRenderedFeatures(zz, {{{ "layer1", "layer2" }}});
     EXPECT_EQ(features2.size(), 2u);
 
-    auto features3 = test.map.queryRenderedFeatures(zz, {{ "foobar" }});
+    auto features3 = test.map.queryRenderedFeatures(zz, {{{ "foobar" }}});
     EXPECT_EQ(features3.size(), 0u);
 
-    auto features4 = test.map.queryRenderedFeatures(zz, {{ "foobar", "layer3" }});
+    auto features4 = test.map.queryRenderedFeatures(zz, {{{ "foobar", "layer3" }}});
     EXPECT_EQ(features4.size(), 1u);
+}
+
+TEST(Query, QueryRenderedFeaturesFilter) {
+    QueryTest test;
+
+    auto zz = test.map.pixelForLatLng({ 0, 0 });
+
+    const EqualsFilter eqFilter = { "key1", std::string("value1") };
+    auto features1 = test.map.queryRenderedFeatures(zz, {{}, { eqFilter }});
+    EXPECT_EQ(features1.size(), 1u);
+
+    const IdentifierNotEqualsFilter idNotEqFilter = { std::string("feature1") };
+    auto features2 = test.map.queryRenderedFeatures(zz, {{{ "layer4" }}, { idNotEqFilter }});
+    EXPECT_EQ(features2.size(), 0u);
+
+    const GreaterThanFilter gtFilter = { "key2", 1.0 };
+    auto features3 = test.map.queryRenderedFeatures(zz, {{ }, { gtFilter }});
+    EXPECT_EQ(features3.size(), 1u);
 }

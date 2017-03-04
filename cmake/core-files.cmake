@@ -108,6 +108,7 @@ set(MBGL_CORE_FILES
     include/mbgl/map/camera.hpp
     include/mbgl/map/map.hpp
     include/mbgl/map/mode.hpp
+    include/mbgl/map/query.hpp
     include/mbgl/map/view.hpp
     src/mbgl/map/backend.cpp
     src/mbgl/map/backend_scope.cpp
@@ -271,7 +272,6 @@ set(MBGL_CORE_FILES
     src/mbgl/style/property_evaluator.hpp
     src/mbgl/style/property_parsing.cpp
     src/mbgl/style/property_parsing.hpp
-    src/mbgl/style/query_parameters.hpp
     src/mbgl/style/rapidjson_conversion.hpp
     src/mbgl/style/source.cpp
     src/mbgl/style/source_impl.cpp

@@ -11,6 +11,8 @@
 
 namespace mbgl {
 
+struct QueryOptions;
+
 namespace style {
 class Style;
 } // namespace style
@@ -39,12 +41,12 @@ public:
             const float bearing,
             const double tileSize,
             const double scale,
-            const optional<std::vector<std::string>>& layerIDs,
+            const QueryOptions& options,
             const GeometryTileData&,
             const CanonicalTileID&,
             const style::Style&,
             const CollisionTile*) const;
-
+    
     static optional<GeometryCoordinates> translateQueryGeometry(
             const GeometryCoordinates& queryGeometry,
             const std::array<float, 2>& translate,
@@ -59,7 +61,7 @@ private:
             std::unordered_map<std::string, std::vector<Feature>>& result,
             const IndexedSubfeature&,
             const GeometryCoordinates& queryGeometry,
-            const optional<std::vector<std::string>>& filterLayerIDs,
+            const QueryOptions& options,
             const GeometryTileData&,
             const CanonicalTileID&,
             const style::Style&,
