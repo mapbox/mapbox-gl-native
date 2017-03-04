@@ -51,11 +51,30 @@ typedef NS_ENUM(NSUInteger, MGLAnnotationVerticalAlignment) {
 typedef NS_ENUM(NSUInteger, MGLUserTrackingMode) {
     /** The map does not follow the user location. */
     MGLUserTrackingModeNone              = 0,
-    /** The map follows the user location. */
+    /** The map follows the user location. This tracking mode falls back
+        to `MGLUserTrackingModeNone` if the user pans the map view. */
     MGLUserTrackingModeFollow,
-    /** The map follows the user location and rotates when the heading changes. */
+    /**
+        The map follows the user location and rotates when the heading changes.
+        The default user location annotation displays a fan-shaped indicator with
+        the current heading. The heading indicator represents the direction the
+        device is facing, which is sized according to the reported accuracy.
+     
+        This tracking mode is disabled if the user pans the map view, but
+        remains enabled if the user zooms in. If the user rotates the map
+        view, this tracking mode will fall back to `MGLUserTrackingModeFollow`.
+     */
     MGLUserTrackingModeFollowWithHeading,
-    /** The map follows the user location and rotates when the course changes. */
+    /**
+        The map follows the user location and rotates when the course changes.
+        Course represents the direction in which the device is traveling.
+        The default user location annotation shows a puck-shaped indicator
+        that rotates as the course changes.
+     
+        This tracking mode is disabled if the user pans the map view, but
+        remains enabled if the user zooms in. If the user rotates the map view,
+        this tracking mode will fall back to `MGLUserTrackingModeFollow`.
+     */
     MGLUserTrackingModeFollowWithCourse,
 };
 
