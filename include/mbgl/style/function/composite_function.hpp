@@ -73,8 +73,9 @@ public:
         );
     }
 
+    template <class Feature>
     Range<T> evaluate(Range<InnerStops> coveringStops,
-                      const GeometryTileFeature& feature,
+                      const Feature& feature,
                       T finalDefaultValue) const {
         optional<Value> v = feature.getValue(property);
         if (!v) {

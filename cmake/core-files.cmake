@@ -2,12 +2,12 @@
 
 set(MBGL_CORE_FILES
     # actor
+    include/mbgl/actor/mailbox.hpp
+    include/mbgl/actor/scheduler.hpp
     src/mbgl/actor/actor.hpp
     src/mbgl/actor/actor_ref.hpp
     src/mbgl/actor/mailbox.cpp
-    src/mbgl/actor/mailbox.hpp
     src/mbgl/actor/message.hpp
-    src/mbgl/actor/scheduler.hpp
 
     # algorithm
     src/mbgl/algorithm/covered_by_children.hpp
@@ -53,43 +53,43 @@ set(MBGL_CORE_FILES
     src/mbgl/geometry/line_atlas.hpp
 
     # gl
+    include/mbgl/gl/attribute.hpp
+    include/mbgl/gl/color_mode.hpp
+    include/mbgl/gl/context.hpp
+    include/mbgl/gl/debugging.hpp
+    include/mbgl/gl/depth_mode.hpp
+    include/mbgl/gl/draw_mode.hpp
+    include/mbgl/gl/extension.hpp
+    include/mbgl/gl/framebuffer.hpp
     include/mbgl/gl/gl.hpp
+    include/mbgl/gl/index_buffer.hpp
+    include/mbgl/gl/normalization.hpp
+    include/mbgl/gl/object.hpp
+    include/mbgl/gl/primitives.hpp
+    include/mbgl/gl/program.hpp
+    include/mbgl/gl/renderbuffer.hpp
+    include/mbgl/gl/segment.hpp
+    include/mbgl/gl/state.hpp
+    include/mbgl/gl/stencil_mode.hpp
+    include/mbgl/gl/texture.hpp
+    include/mbgl/gl/types.hpp
+    include/mbgl/gl/uniform.hpp
+    include/mbgl/gl/value.hpp
+    include/mbgl/gl/vertex_array.hpp
+    include/mbgl/gl/vertex_buffer.hpp
     src/mbgl/gl/attribute.cpp
-    src/mbgl/gl/attribute.hpp
     src/mbgl/gl/color_mode.cpp
-    src/mbgl/gl/color_mode.hpp
     src/mbgl/gl/context.cpp
-    src/mbgl/gl/context.hpp
     src/mbgl/gl/debugging.cpp
-    src/mbgl/gl/debugging.hpp
     src/mbgl/gl/depth_mode.cpp
-    src/mbgl/gl/depth_mode.hpp
-    src/mbgl/gl/draw_mode.hpp
     src/mbgl/gl/extension.cpp
-    src/mbgl/gl/extension.hpp
-    src/mbgl/gl/framebuffer.hpp
     src/mbgl/gl/gl.cpp
-    src/mbgl/gl/index_buffer.hpp
-    src/mbgl/gl/normalization.hpp
     src/mbgl/gl/object.cpp
-    src/mbgl/gl/object.hpp
-    src/mbgl/gl/primitives.hpp
-    src/mbgl/gl/program.hpp
-    src/mbgl/gl/renderbuffer.hpp
     src/mbgl/gl/segment.cpp
-    src/mbgl/gl/segment.hpp
-    src/mbgl/gl/state.hpp
     src/mbgl/gl/stencil_mode.cpp
-    src/mbgl/gl/stencil_mode.hpp
-    src/mbgl/gl/texture.hpp
-    src/mbgl/gl/types.hpp
     src/mbgl/gl/uniform.cpp
-    src/mbgl/gl/uniform.hpp
     src/mbgl/gl/value.cpp
-    src/mbgl/gl/value.hpp
     src/mbgl/gl/vertex_array.cpp
-    src/mbgl/gl/vertex_array.hpp
-    src/mbgl/gl/vertex_buffer.hpp
 
     # layout
     src/mbgl/layout/clip_lines.cpp
@@ -106,12 +106,12 @@ set(MBGL_CORE_FILES
     include/mbgl/map/backend.hpp
     include/mbgl/map/backend_scope.hpp
     include/mbgl/map/camera.hpp
+    include/mbgl/map/change.hpp
     include/mbgl/map/map.hpp
     include/mbgl/map/mode.hpp
     include/mbgl/map/view.hpp
     src/mbgl/map/backend.cpp
     src/mbgl/map/backend_scope.cpp
-    src/mbgl/map/change.hpp
     src/mbgl/map/map.cpp
     src/mbgl/map/transform.cpp
     src/mbgl/map/transform.hpp
@@ -299,6 +299,7 @@ set(MBGL_CORE_FILES
     include/mbgl/style/conversion/source.hpp
     include/mbgl/style/conversion/tileset.hpp
     include/mbgl/style/conversion/transition_options.hpp
+    src/mbgl/style/conversion/geojson.cpp
     src/mbgl/style/conversion/stringify.hpp
 
     # style/function
@@ -444,7 +445,9 @@ set(MBGL_CORE_FILES
     include/mbgl/util/geo.hpp
     include/mbgl/util/geojson.hpp
     include/mbgl/util/geometry.hpp
+    include/mbgl/util/ignore.hpp
     include/mbgl/util/image.hpp
+    include/mbgl/util/interpolate.hpp
     include/mbgl/util/logging.hpp
     include/mbgl/util/noncopyable.hpp
     include/mbgl/util/optional.hpp
@@ -486,10 +489,8 @@ set(MBGL_CORE_FILES
     src/mbgl/util/http_timeout.hpp
     src/mbgl/util/i18n.cpp
     src/mbgl/util/i18n.hpp
-    src/mbgl/util/ignore.hpp
     src/mbgl/util/indexed_tuple.hpp
     src/mbgl/util/interpolate.cpp
-    src/mbgl/util/interpolate.hpp
     src/mbgl/util/intersection_tests.cpp
     src/mbgl/util/intersection_tests.hpp
     src/mbgl/util/io.cpp
@@ -513,6 +514,7 @@ set(MBGL_CORE_FILES
     src/mbgl/util/std.hpp
     src/mbgl/util/stopwatch.cpp
     src/mbgl/util/stopwatch.hpp
+    src/mbgl/util/string.cpp
     src/mbgl/util/thread.hpp
     src/mbgl/util/thread_context.cpp
     src/mbgl/util/thread_context.hpp
