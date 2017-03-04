@@ -45,6 +45,21 @@ typedef NS_ENUM(NSUInteger, MGLAnnotationVerticalAlignment) {
 };
 
 /**
+ The mode used to track the user location on the map. Used with
+ `MGLMapView.userTrackingMode`.
+ */
+typedef NS_ENUM(NSUInteger, MGLUserTrackingMode) {
+    /** The map does not follow the user location. */
+    MGLUserTrackingModeNone              = 0,
+    /** The map follows the user location. */
+    MGLUserTrackingModeFollow,
+    /** The map follows the user location and rotates when the heading changes. */
+    MGLUserTrackingModeFollowWithHeading,
+    /** The map follows the user location and rotates when the course changes. */
+    MGLUserTrackingModeFollowWithCourse,
+};
+
+/**
  An interactive, customizable map view with an interface similar to the one
  provided by Apple’s MapKit.
 

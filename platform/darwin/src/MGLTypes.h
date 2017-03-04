@@ -44,21 +44,6 @@ typedef NS_ENUM(NSInteger, MGLErrorCode) {
     MGLErrorCodeConnectionFailed = 3,
 };
 
-/**
- The mode used to track the user location on the map. Used with
- `MGLMapView.userTrackingMode`.
- */
-typedef NS_ENUM(NSUInteger, MGLUserTrackingMode) {
-    /** The map does not follow the user location. */
-    MGLUserTrackingModeNone              = 0,
-    /** The map follows the user location. */
-    MGLUserTrackingModeFollow,
-    /** The map follows the user location and rotates when the heading changes. */
-    MGLUserTrackingModeFollowWithHeading,
-    /** The map follows the user location and rotates when the course changes. */
-    MGLUserTrackingModeFollowWithCourse,
-};
-
 /** Options for enabling debugging features in an `MGLMapView` instance. */
 typedef NS_OPTIONS(NSUInteger, MGLMapDebugMaskOptions) {
     /** Edges of tile boundaries are shown as thick, red lines to help diagnose
