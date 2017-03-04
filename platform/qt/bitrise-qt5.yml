@@ -39,7 +39,6 @@ workflows:
             ln -s /usr/local/Cellar/qt5/$HOMEBREW_QT5_VERSION/plugins /usr/local/plugins
             export BUILDTYPE=Debug
             make qt-app
-            make qt-qml-app
             make run-qt-test
         - is_debug: 'yes'
     - deploy-to-bitrise-io:
