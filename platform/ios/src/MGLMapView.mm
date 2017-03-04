@@ -1237,7 +1237,7 @@ public:
             if (![self.delegate respondsToSelector:@selector(mapView:shouldChangeFromCamera:toCamera:)] ||
                 [self.delegate mapView:self shouldChangeFromCamera:oldCamera toCamera:toCamera])
             {
-                _mbglMap->moveBy({ offset.x, offset.y }, MGLDurationInSecondsFromTimeInterval(self.decelerationRate));
+                _mbglMap->moveBy({ offset.x, offset.y }, MGLDurationFromTimeInterval(self.decelerationRate));
             }
         }
 
@@ -1346,7 +1346,7 @@ public:
         } else {
             if (drift)
             {
-                _mbglMap->setScale(newScale, mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y }, MGLDurationInSecondsFromTimeInterval(duration));
+                _mbglMap->setScale(newScale, mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y }, MGLDurationFromTimeInterval(duration));
             }
         }
 
@@ -1418,7 +1418,7 @@ public:
             if (![self.delegate respondsToSelector:@selector(mapView:shouldChangeFromCamera:toCamera:)] ||
                 [self.delegate mapView:self shouldChangeFromCamera:oldCamera toCamera:toCamera])
             {
-                _mbglMap->setBearing(newDegrees, mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y }, MGLDurationInSecondsFromTimeInterval(decelerationRate));
+                _mbglMap->setBearing(newDegrees, mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y }, MGLDurationFromTimeInterval(decelerationRate));
                 
                 [self notifyGestureDidEndWithDrift:YES];
                 
@@ -1558,7 +1558,7 @@ public:
             [self trackGestureEvent:MGLEventGestureDoubleTap forRecognizer:doubleTap];
             
             mbgl::ScreenCoordinate center(gesturePoint.x, gesturePoint.y);
-            _mbglMap->setZoom(newZoom, center, MGLDurationInSecondsFromTimeInterval(MGLAnimationDuration));
+            _mbglMap->setZoom(newZoom, center, MGLDurationFromTimeInterval(MGLAnimationDuration));
             
             __weak MGLMapView *weakSelf = self;
             
@@ -1596,7 +1596,7 @@ public:
             [self.delegate mapView:self shouldChangeFromCamera:oldCamera toCamera:toCamera])
         {
             mbgl::ScreenCoordinate center(gesturePoint.x, gesturePoint.y);
-            _mbglMap->setZoom(newZoom, center, MGLDurationInSecondsFromTimeInterval(MGLAnimationDuration));
+            _mbglMap->setZoom(newZoom, center, MGLDurationFromTimeInterval(MGLAnimationDuration));
             
             __weak MGLMapView *weakSelf = self;
             
@@ -2426,7 +2426,7 @@ public:
     mbgl::AnimationOptions animationOptions;
     if (duration)
     {
-        animationOptions.duration.emplace(MGLDurationInSecondsFromTimeInterval(duration));
+        animationOptions.duration.emplace(MGLDurationFromTimeInterval(duration));
         animationOptions.easing.emplace(MGLUnitBezierForMediaTimingFunction(function));
     }
     if (completion)
@@ -2481,7 +2481,7 @@ public:
 
     _mbglMap->setZoom(zoomLevel,
                       MGLEdgeInsetsFromNSEdgeInsets(self.contentInset),
-                      MGLDurationInSecondsFromTimeInterval(duration));
+                      MGLDurationFromTimeInterval(duration));
 }
 
 - (void)setMinimumZoomLevel:(double)minimumZoomLevel
@@ -2590,7 +2590,7 @@ public:
     mbgl::AnimationOptions animationOptions;
     if (duration > 0)
     {
-        animationOptions.duration.emplace(MGLDurationInSecondsFromTimeInterval(duration));
+        animationOptions.duration.emplace(MGLDurationFromTimeInterval(duration));
         animationOptions.easing.emplace(MGLUnitBezierForMediaTimingFunction(function));
     }
     if (completion)
@@ -2653,13 +2653,13 @@ public:
     {
         _mbglMap->setBearing(direction,
                              MGLEdgeInsetsFromNSEdgeInsets(self.contentInset),
-                             MGLDurationInSecondsFromTimeInterval(duration));
+                             MGLDurationFromTimeInterval(duration));
     }
     else
     {
         CGPoint centerPoint = self.userLocationAnnotationViewCenter;
         _mbglMap->setBearing(direction, mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y },
-                             MGLDurationInSecondsFromTimeInterval(duration));
+                             MGLDurationFromTimeInterval(duration));
     }
 }
 
@@ -2704,7 +2704,7 @@ public:
     mbgl::AnimationOptions animationOptions;
     if (duration > 0)
     {
-        animationOptions.duration.emplace(MGLDurationInSecondsFromTimeInterval(duration));
+        animationOptions.duration.emplace(MGLDurationFromTimeInterval(duration));
         animationOptions.easing.emplace(MGLUnitBezierForMediaTimingFunction(function));
     }
     if (completion)
@@ -2754,7 +2754,7 @@ public:
     mbgl::AnimationOptions animationOptions;
     if (duration >= 0)
     {
-        animationOptions.duration = MGLDurationInSecondsFromTimeInterval(duration);
+        animationOptions.duration = MGLDurationFromTimeInterval(duration);
     }
     if (peakAltitude >= 0)
     {

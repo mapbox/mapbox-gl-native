@@ -980,7 +980,7 @@ public:
     [self willChangeValueForKey:@"centerCoordinate"];
     _mbglMap->setLatLng(MGLLatLngFromLocationCoordinate2D(centerCoordinate),
                         MGLEdgeInsetsFromNSEdgeInsets(self.contentInsets),
-                        MGLDurationInSecondsFromTimeInterval(animated ? MGLAnimationDuration : 0));
+                        MGLDurationFromTimeInterval(animated ? MGLAnimationDuration : 0));
     [self didChangeValueForKey:@"centerCoordinate"];
 }
 
@@ -989,7 +989,7 @@ public:
     _mbglMap->cancelTransitions();
     MGLMapCamera *oldCamera = self.camera;
     _mbglMap->moveBy({ delta.x, delta.y },
-                     MGLDurationInSecondsFromTimeInterval(animated ? MGLAnimationDuration : 0));
+                     MGLDurationFromTimeInterval(animated ? MGLAnimationDuration : 0));
     if ([self.delegate respondsToSelector:@selector(mapView:shouldChangeFromCamera:toCamera:)]
         && ![self.delegate mapView:self shouldChangeFromCamera:oldCamera toCamera:self.camera]) {
         self.camera = oldCamera;
@@ -1029,7 +1029,7 @@ public:
     [self willChangeValueForKey:@"zoomLevel"];
     _mbglMap->setZoom(zoomLevel,
                       MGLEdgeInsetsFromNSEdgeInsets(self.contentInsets),
-                      MGLDurationInSecondsFromTimeInterval(animated ? MGLAnimationDuration : 0));
+                      MGLDurationFromTimeInterval(animated ? MGLAnimationDuration : 0));
     [self didChangeValueForKey:@"zoomLevel"];
 }
 
@@ -1043,7 +1043,7 @@ public:
     double newZoom = round(self.zoomLevel) + zoomDelta;
     MGLMapCamera *oldCamera = self.camera;
     mbgl::ScreenCoordinate center(point.x, self.bounds.size.height - point.y);
-    _mbglMap->setZoom(newZoom, center, MGLDurationInSecondsFromTimeInterval(animated ? MGLAnimationDuration : 0));
+    _mbglMap->setZoom(newZoom, center, MGLDurationFromTimeInterval(animated ? MGLAnimationDuration : 0));
     if ([self.delegate respondsToSelector:@selector(mapView:shouldChangeFromCamera:toCamera:)]
         && ![self.delegate mapView:self shouldChangeFromCamera:oldCamera toCamera:self.camera]) {
         self.camera = oldCamera;
@@ -1057,7 +1057,7 @@ public:
     [self willChangeValueForKey:@"zoomLevel"];
     MGLMapCamera *oldCamera = self.camera;
     mbgl::ScreenCoordinate center(point.x, self.bounds.size.height - point.y);
-    _mbglMap->scaleBy(scaleFactor, center, MGLDurationInSecondsFromTimeInterval(animated ? MGLAnimationDuration : 0));
+    _mbglMap->scaleBy(scaleFactor, center, MGLDurationFromTimeInterval(animated ? MGLAnimationDuration : 0));
     if ([self.delegate respondsToSelector:@selector(mapView:shouldChangeFromCamera:toCamera:)]
         && ![self.delegate mapView:self shouldChangeFromCamera:oldCamera toCamera:self.camera]) {
         self.camera = oldCamera;
@@ -1118,7 +1118,7 @@ public:
     [self willChangeValueForKey:@"direction"];
     _mbglMap->setBearing(direction,
                          MGLEdgeInsetsFromNSEdgeInsets(self.contentInsets),
-                         MGLDurationInSecondsFromTimeInterval(animated ? MGLAnimationDuration : 0));
+                         MGLDurationFromTimeInterval(animated ? MGLAnimationDuration : 0));
     [self didChangeValueForKey:@"direction"];
 }
 
@@ -1146,7 +1146,7 @@ public:
 - (void)setCamera:(MGLMapCamera *)camera withDuration:(NSTimeInterval)duration animationTimingFunction:(nullable CAMediaTimingFunction *)function completionHandler:(nullable void (^)(void))completion {
     mbgl::AnimationOptions animationOptions;
     if (duration > 0) {
-        animationOptions.duration.emplace(MGLDurationInSecondsFromTimeInterval(duration));
+        animationOptions.duration.emplace(MGLDurationFromTimeInterval(duration));
         animationOptions.easing.emplace(MGLUnitBezierForMediaTimingFunction(function));
     }
     if (completion) {
@@ -1187,7 +1187,7 @@ public:
 - (void)flyToCamera:(MGLMapCamera *)camera withDuration:(NSTimeInterval)duration peakAltitude:(CLLocationDistance)peakAltitude completionHandler:(nullable void (^)(void))completion {
     mbgl::AnimationOptions animationOptions;
     if (duration >= 0) {
-        animationOptions.duration = MGLDurationInSecondsFromTimeInterval(duration);
+        animationOptions.duration = MGLDurationFromTimeInterval(duration);
     }
     if (peakAltitude >= 0) {
         CLLocationDegrees peakLatitude = (self.centerCoordinate.latitude + camera.centerCoordinate.latitude) / 2;
@@ -1264,7 +1264,7 @@ public:
     mbgl::CameraOptions cameraOptions = _mbglMap->cameraForLatLngBounds(MGLLatLngBoundsFromCoordinateBounds(bounds), padding);
     mbgl::AnimationOptions animationOptions;
     if (animated) {
-        animationOptions.duration = MGLDurationInSecondsFromTimeInterval(MGLAnimationDuration);
+        animationOptions.duration = MGLDurationFromTimeInterval(MGLAnimationDuration);
     }
     
     MGLMapCamera *camera = [self cameraForCameraOptions:cameraOptions];
