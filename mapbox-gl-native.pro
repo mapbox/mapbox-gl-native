@@ -3,7 +3,7 @@ TARGET = qmapboxgl
 TEMPLATE = lib
 
 QT += network-private \
-      opengl-private \
+      gui-private \
       sql-private
 
 CONFIG += c++14 exceptions static
