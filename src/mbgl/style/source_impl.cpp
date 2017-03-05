@@ -10,6 +10,7 @@
 #include <mbgl/util/tile_cover.hpp>
 #include <mbgl/util/enum.hpp>
 #include <mbgl/map/query.hpp>
+#include <mbgl/style/query.hpp>
 
 #include <mbgl/algorithm/update_renderables.hpp>
 #include <mbgl/algorithm/generate_clip_ids.hpp>
@@ -253,6 +254,23 @@ std::unordered_map<std::string, std::vector<Feature>> Source::Impl::queryRendere
                                               tileSpaceQueryGeometry,
                                               transformState,
                                               options);
+    }
+
+    return result;
+}
+
+std::vector<Feature> Source::Impl::querySourceFeatures(const SourceQueryOptions& options) {
+
+    // Only VectorSource and GeoJSON source supported
+    if (type != SourceType::GeoJSON && type != SourceType::Vector) {
+        Log::Warning(Event::General, "Source type not supported");
+        return {};
+    }
+
+    std::vector<Feature> result;
+
+    for (const auto& pair : tiles) {
+        pair.second->querySourceFeatures(result, options);
     }
 
     return result;

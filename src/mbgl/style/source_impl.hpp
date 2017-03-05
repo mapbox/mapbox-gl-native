@@ -7,6 +7,7 @@
 #include <mbgl/tile/tile.hpp>
 #include <mbgl/tile/tile_cache.hpp>
 #include <mbgl/style/types.hpp>
+#include <mbgl/style/query.hpp>
 
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/mat4.hpp>
@@ -69,6 +70,8 @@ public:
     queryRenderedFeatures(const ScreenLineString& geometry,
                           const TransformState& transformState,
                           const RenderedQueryOptions& options) const;
+
+    std::vector<Feature> querySourceFeatures(const SourceQueryOptions&);
 
     void setCacheSize(size_t);
     void onLowMemory();
