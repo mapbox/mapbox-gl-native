@@ -11,7 +11,7 @@
 
 namespace mbgl {
 
-class QueryOptions;
+class RenderedQueryOptions;
 
 namespace style {
 class Style;
@@ -41,7 +41,7 @@ public:
             const float bearing,
             const double tileSize,
             const double scale,
-            const QueryOptions& options,
+            const RenderedQueryOptions& options,
             const GeometryTileData&,
             const CanonicalTileID&,
             const style::Style&,
@@ -61,7 +61,7 @@ private:
             std::unordered_map<std::string, std::vector<Feature>>& result,
             const IndexedSubfeature&,
             const GeometryCoordinates& queryGeometry,
-            const QueryOptions& options,
+            const RenderedQueryOptions& options,
             const GeometryTileData&,
             const CanonicalTileID&,
             const style::Style&,
