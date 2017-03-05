@@ -206,7 +206,7 @@ void Source::Impl::reloadTiles() {
 
 std::unordered_map<std::string, std::vector<Feature>> Source::Impl::queryRenderedFeatures(const ScreenLineString& geometry,
                                            const TransformState& transformState,
-                                           const QueryOptions& options) const {
+                                           const RenderedQueryOptions& options) const {
     std::unordered_map<std::string, std::vector<Feature>> result;
     if (renderTiles.empty() || geometry.empty()) {
         return result;

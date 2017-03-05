@@ -182,9 +182,9 @@ public:
     double getDefaultPitch() const;
 
     // Feature queries
-    std::vector<Feature> queryRenderedFeatures(const ScreenCoordinate&, const QueryOptions& options = {});
-    std::vector<Feature> queryRenderedFeatures(const ScreenBox&,        const QueryOptions& options = {});
-    
+    std::vector<Feature> queryRenderedFeatures(const ScreenCoordinate&, const RenderedQueryOptions& options = {});
+    std::vector<Feature> queryRenderedFeatures(const ScreenBox&,        const RenderedQueryOptions& options = {});
+
     AnnotationIDs queryPointAnnotations(const ScreenBox&);
 
     // Memory
