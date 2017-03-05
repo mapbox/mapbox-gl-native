@@ -1,3 +1,4 @@
+#import "MGLFeature.h"
 #import "MGLFoundation.h"
 #import "MGLTileSource.h"
 
@@ -42,9 +43,34 @@ NS_ASSUME_NONNULL_BEGIN
 MGL_EXPORT
 @interface MGLVectorSource : MGLTileSource
 
+#pragma mark Initializing a Source
+
 - (instancetype)initWithIdentifier:(NSString *)identifier configurationURL:(NSURL *)configurationURL NS_DESIGNATED_INITIALIZER;
 
 - (instancetype)initWithIdentifier:(NSString *)identifier tileURLTemplates:(NS_ARRAY_OF(NSString *) *)tileURLTemplates options:(nullable NS_DICTIONARY_OF(MGLTileSourceOption, id) *)options NS_DESIGNATED_INITIALIZER;
+
+#pragma mark Accessing a Source’s Content
+
+/**
+ Returns an array of map features loaded by this source, restricted to the
+ given source layers and filtered by the given predicate.
+
+ Each object in the returned array represents a feature for the
+ current style and provides access to attributes specified by the
+ <a href="https://www.mapbox.com/mapbox-gl-style-spec/#sources">source</a>.
+
+ Features come from tiled vector data that is converted to tiles internally,
+ so feature geometries are clipped at tile boundaries and features
+ may appear duplicated across tiles.
+
+ @param sourceLayerIdentifiers The source layers to include in the query. Only the
+    features contained in these source layers are included in the returned array. At
+    least one source layer is required.
+ @param predicate A predicate to filter the returned features.
+ @return An array of objects conforming to the `MGLFeature` protocol that
+    represent features in the sources used by the current style.
+ */
+- (NS_ARRAY_OF(id <MGLFeature>) *)featuresInSourceLayersWithIdentifiers:(NS_SET_OF(NSString *) *)sourceLayerIdentifiers predicate:(nullable NSPredicate *)predicate NS_SWIFT_NAME(features(sourceLayerIdentifiers:predicate:));
 
 @end
 

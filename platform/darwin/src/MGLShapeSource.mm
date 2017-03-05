@@ -5,6 +5,7 @@
 #import "MGLFeature_Private.h"
 #import "MGLShape_Private.h"
 
+#import "NSPredicate+MGLAdditions.h"
 #import "NSURL+MGLAdditions.h"
 
 #include <mbgl/map/map.hpp>
@@ -133,6 +134,17 @@ const MGLShapeSourceOption MGLShapeSourceOptionSimplificationTolerance = @"MGLSh
 - (NSString *)description {
     return [NSString stringWithFormat:@"<%@: %p; identifier = %@; URL = %@; shape = %@>",
             NSStringFromClass([self class]), (void *)self, self.identifier, self.URL, self.shape];
+}
+
+- (NS_ARRAY_OF(id <MGLFeature>) *)featuresMatchingPredicate:(nullable NSPredicate *)predicate {
+    
+    mbgl::optional<mbgl::style::Filter> optionalFilter;
+    if (predicate) {
+        optionalFilter = predicate.mgl_filter;
+    }
+    
+    std::vector<mbgl::Feature> features = self.rawSource->querySourceFeatures({ {}, optionalFilter });
+    return MGLFeaturesFromMBGLFeatures(features);
 }
 
 @end
