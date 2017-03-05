@@ -882,7 +882,7 @@ void NodeMap::QueryRenderedFeatures(const Nan::FunctionCallbackInfo<v8::Value>& 
         return Nan::ThrowTypeError("First argument must have two components");
     }
 
-    mbgl::QueryOptions queryOptions;
+    mbgl::RenderedQueryOptions queryOptions;
     if (!info[1]->IsNull() && !info[1]->IsUndefined()) {
         if (!info[1]->IsObject()) {
             return Nan::ThrowTypeError("options argument must be an object");

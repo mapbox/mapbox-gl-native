@@ -21,7 +21,7 @@ class DebugBucket;
 class TransformState;
 class TileObserver;
 class PlacementConfig;
-class QueryOptions;
+class RenderedQueryOptions;
 
 namespace style {
 class Layer;
@@ -56,7 +56,7 @@ public:
             std::unordered_map<std::string, std::vector<Feature>>& result,
             const GeometryCoordinates& queryGeometry,
             const TransformState&,
-            const QueryOptions& options);
+            const RenderedQueryOptions& options);
 
     void setTriedOptional();
 

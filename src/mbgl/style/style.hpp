@@ -29,7 +29,7 @@ class SpriteAtlas;
 class LineAtlas;
 class RenderData;
 class TransformState;
-class QueryOptions;
+class RenderedQueryOptions;
 
 namespace style {
 
@@ -99,8 +99,8 @@ public:
 
     std::vector<Feature> queryRenderedFeatures(const ScreenLineString& geometry,
                                                const TransformState& transformState,
-                                               const QueryOptions& options) const;
-                  
+                                               const RenderedQueryOptions& options) const;
+
     float getQueryRadius() const;
 
     void setSourceTileCacheSize(size_t);

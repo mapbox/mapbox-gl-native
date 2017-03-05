@@ -44,7 +44,7 @@ public:
             std::unordered_map<std::string, std::vector<Feature>>& result,
             const GeometryCoordinates& queryGeometry,
             const TransformState&,
-            const QueryOptions& options) override;
+            const RenderedQueryOptions& options) override;
 
     void cancel() override;
 
