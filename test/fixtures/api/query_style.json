@@ -50,6 +50,15 @@
           "key4": 0.5
         } 
       }
+    },
+    "source5": {
+      "type": "vector",
+      "url": "mapbox://mapbox.mapbox-streets-v6"
+    },
+    "source6": {
+      "type": "raster",
+      "url": "mapbox://mapbox.satellite",
+      "tileSize": 256
     }
   },
   "layers": [

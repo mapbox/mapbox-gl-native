@@ -25,6 +25,7 @@ class RenderedQueryOptions;
 
 namespace style {
 class Layer;
+class SourceQueryOptions;
 } // namespace style
 
 class Tile : private util::noncopyable {
@@ -57,6 +58,10 @@ public:
             const GeometryCoordinates& queryGeometry,
             const TransformState&,
             const RenderedQueryOptions& options);
+
+    virtual void querySourceFeatures(
+            std::vector<Feature>& result,
+            const style::SourceQueryOptions&);
 
     void setTriedOptional();
 
