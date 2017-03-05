@@ -177,7 +177,7 @@ public class CircleLayerTest extends BaseStyleTest {
           categorical(
             stop(1.0f, circleRadius(0.3f))
           )
-        ).withDefaultValue(0.3f)
+        ).withDefaultValue(circleRadius(0.3f))
       )
     );
 
@@ -187,7 +187,9 @@ public class CircleLayerTest extends BaseStyleTest {
     assertEquals(SourceFunction.class, layer.getCircleRadius().getFunction().getClass());
     assertEquals("FeaturePropertyA", ((SourceFunction) layer.getCircleRadius().getFunction()).getProperty());
     assertEquals(CategoricalStops.class, layer.getCircleRadius().getFunction().getStops().getClass());
-    assertEquals(0.3f, ((SourceFunction) layer.getCircleRadius().getFunction()).getDefaultValue());
+    assertNotNull(((SourceFunction) layer.getCircleRadius().getFunction()).getDefaultValue());
+    assertNotNull(((SourceFunction) layer.getCircleRadius().getFunction()).getDefaultValue().getValue());
+    assertEquals(0.3f, ((SourceFunction) layer.getCircleRadius().getFunction()).getDefaultValue().getValue());
   }
 
   @Test
@@ -204,7 +206,7 @@ public class CircleLayerTest extends BaseStyleTest {
           exponential(
             stop(0, 0.3f, circleRadius(0.9f))
           ).withBase(0.5f)
-        ).withDefaultValue(0.3f)
+        ).withDefaultValue(circleRadius(0.3f))
       )
     );
 
@@ -320,7 +322,7 @@ public class CircleLayerTest extends BaseStyleTest {
           categorical(
             stop("valueA", circleColor(Color.RED))
           )
-        )
+        ).withDefaultValue(circleColor(Color.GREEN))
       )
     );
 
@@ -330,6 +332,9 @@ public class CircleLayerTest extends BaseStyleTest {
     assertEquals(SourceFunction.class, layer.getCircleColor().getFunction().getClass());
     assertEquals("FeaturePropertyA", ((SourceFunction) layer.getCircleColor().getFunction()).getProperty());
     assertEquals(CategoricalStops.class, layer.getCircleColor().getFunction().getStops().getClass());
+    assertNotNull(((SourceFunction) layer.getCircleColor().getFunction()).getDefaultValue());
+    assertNotNull(((SourceFunction) layer.getCircleColor().getFunction()).getDefaultValue().getValue());
+    assertEquals(Color.GREEN, (int) ((SourceFunction) layer.getCircleColor().getFunction()).getDefaultValue().getColorInt());
   }
 
   @Test
@@ -439,7 +444,7 @@ public class CircleLayerTest extends BaseStyleTest {
           categorical(
             stop(1.0f, circleBlur(0.3f))
           )
-        ).withDefaultValue(0.3f)
+        ).withDefaultValue(circleBlur(0.3f))
       )
     );
 
@@ -449,7 +454,9 @@ public class CircleLayerTest extends BaseStyleTest {
     assertEquals(SourceFunction.class, layer.getCircleBlur().getFunction().getClass());
     assertEquals("FeaturePropertyA", ((SourceFunction) layer.getCircleBlur().getFunction()).getProperty());
     assertEquals(CategoricalStops.class, layer.getCircleBlur().getFunction().getStops().getClass());
-    assertEquals(0.3f, ((SourceFunction) layer.getCircleBlur().getFunction()).getDefaultValue());
+    assertNotNull(((SourceFunction) layer.getCircleBlur().getFunction()).getDefaultValue());
+    assertNotNull(((SourceFunction) layer.getCircleBlur().getFunction()).getDefaultValue().getValue());
+    assertEquals(0.3f, ((SourceFunction) layer.getCircleBlur().getFunction()).getDefaultValue().getValue());
   }
 
   @Test
@@ -466,7 +473,7 @@ public class CircleLayerTest extends BaseStyleTest {
           exponential(
             stop(0, 0.3f, circleBlur(0.9f))
           ).withBase(0.5f)
-        ).withDefaultValue(0.3f)
+        ).withDefaultValue(circleBlur(0.3f))
       )
     );
 
@@ -582,7 +589,7 @@ public class CircleLayerTest extends BaseStyleTest {
           categorical(
             stop(1.0f, circleOpacity(0.3f))
           )
-        ).withDefaultValue(0.3f)
+        ).withDefaultValue(circleOpacity(0.3f))
       )
     );
 
@@ -592,7 +599,9 @@ public class CircleLayerTest extends BaseStyleTest {
     assertEquals(SourceFunction.class, layer.getCircleOpacity().getFunction().getClass());
     assertEquals("FeaturePropertyA", ((SourceFunction) layer.getCircleOpacity().getFunction()).getProperty());
     assertEquals(CategoricalStops.class, layer.getCircleOpacity().getFunction().getStops().getClass());
-    assertEquals(0.3f, ((SourceFunction) layer.getCircleOpacity().getFunction()).getDefaultValue());
+    assertNotNull(((SourceFunction) layer.getCircleOpacity().getFunction()).getDefaultValue());
+    assertNotNull(((SourceFunction) layer.getCircleOpacity().getFunction()).getDefaultValue().getValue());
+    assertEquals(0.3f, ((SourceFunction) layer.getCircleOpacity().getFunction()).getDefaultValue().getValue());
   }
 
   @Test
@@ -609,7 +618,7 @@ public class CircleLayerTest extends BaseStyleTest {
           exponential(
             stop(0, 0.3f, circleOpacity(0.9f))
           ).withBase(0.5f)
-        ).withDefaultValue(0.3f)
+        ).withDefaultValue(circleOpacity(0.3f))
       )
     );
 
@@ -834,7 +843,7 @@ public class CircleLayerTest extends BaseStyleTest {
           categorical(
             stop(1.0f, circleStrokeWidth(0.3f))
           )
-        ).withDefaultValue(0.3f)
+        ).withDefaultValue(circleStrokeWidth(0.3f))
       )
     );
 
@@ -844,7 +853,9 @@ public class CircleLayerTest extends BaseStyleTest {
     assertEquals(SourceFunction.class, layer.getCircleStrokeWidth().getFunction().getClass());
     assertEquals("FeaturePropertyA", ((SourceFunction) layer.getCircleStrokeWidth().getFunction()).getProperty());
     assertEquals(CategoricalStops.class, layer.getCircleStrokeWidth().getFunction().getStops().getClass());
-    assertEquals(0.3f, ((SourceFunction) layer.getCircleStrokeWidth().getFunction()).getDefaultValue());
+    assertNotNull(((SourceFunction) layer.getCircleStrokeWidth().getFunction()).getDefaultValue());
+    assertNotNull(((SourceFunction) layer.getCircleStrokeWidth().getFunction()).getDefaultValue().getValue());
+    assertEquals(0.3f, ((SourceFunction) layer.getCircleStrokeWidth().getFunction()).getDefaultValue().getValue());
   }
 
   @Test
@@ -861,7 +872,7 @@ public class CircleLayerTest extends BaseStyleTest {
           exponential(
             stop(0, 0.3f, circleStrokeWidth(0.9f))
           ).withBase(0.5f)
-        ).withDefaultValue(0.3f)
+        ).withDefaultValue(circleStrokeWidth(0.3f))
       )
     );
 
@@ -977,7 +988,7 @@ public class CircleLayerTest extends BaseStyleTest {
           categorical(
             stop("valueA", circleStrokeColor(Color.RED))
           )
-        )
+        ).withDefaultValue(circleStrokeColor(Color.GREEN))
       )
     );
 
@@ -987,6 +998,9 @@ public class CircleLayerTest extends BaseStyleTest {
     assertEquals(SourceFunction.class, layer.getCircleStrokeColor().getFunction().getClass());
     assertEquals("FeaturePropertyA", ((SourceFunction) layer.getCircleStrokeColor().getFunction()).getProperty());
     assertEquals(CategoricalStops.class, layer.getCircleStrokeColor().getFunction().getStops().getClass());
+    assertNotNull(((SourceFunction) layer.getCircleStrokeColor().getFunction()).getDefaultValue());
+    assertNotNull(((SourceFunction) layer.getCircleStrokeColor().getFunction()).getDefaultValue().getValue());
+    assertEquals(Color.GREEN, (int) ((SourceFunction) layer.getCircleStrokeColor().getFunction()).getDefaultValue().getColorInt());
   }
 
   @Test
@@ -1096,7 +1110,7 @@ public class CircleLayerTest extends BaseStyleTest {
           categorical(
             stop(1.0f, circleStrokeOpacity(0.3f))
           )
-        ).withDefaultValue(0.3f)
+        ).withDefaultValue(circleStrokeOpacity(0.3f))
       )
     );
 
@@ -1106,7 +1120,9 @@ public class CircleLayerTest extends BaseStyleTest {
     assertEquals(SourceFunction.class, layer.getCircleStrokeOpacity().getFunction().getClass());
     assertEquals("FeaturePropertyA", ((SourceFunction) layer.getCircleStrokeOpacity().getFunction()).getProperty());
     assertEquals(CategoricalStops.class, layer.getCircleStrokeOpacity().getFunction().getStops().getClass());
-    assertEquals(0.3f, ((SourceFunction) layer.getCircleStrokeOpacity().getFunction()).getDefaultValue());
+    assertNotNull(((SourceFunction) layer.getCircleStrokeOpacity().getFunction()).getDefaultValue());
+    assertNotNull(((SourceFunction) layer.getCircleStrokeOpacity().getFunction()).getDefaultValue().getValue());
+    assertEquals(0.3f, ((SourceFunction) layer.getCircleStrokeOpacity().getFunction()).getDefaultValue().getValue());
   }
 
   @Test
@@ -1123,7 +1139,7 @@ public class CircleLayerTest extends BaseStyleTest {
           exponential(
             stop(0, 0.3f, circleStrokeOpacity(0.9f))
           ).withBase(0.5f)
-        ).withDefaultValue(0.3f)
+        ).withDefaultValue(circleStrokeOpacity(0.3f))
       )
     );
 

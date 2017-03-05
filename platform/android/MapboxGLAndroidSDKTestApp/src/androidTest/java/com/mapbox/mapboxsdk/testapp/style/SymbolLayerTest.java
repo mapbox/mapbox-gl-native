@@ -576,7 +576,7 @@ public class SymbolLayerTest extends BaseStyleTest {
           categorical(
             stop(1.0f, iconRotate(0.3f))
           )
-        ).withDefaultValue(0.3f)
+        ).withDefaultValue(iconRotate(0.3f))
       )
     );
 
@@ -586,7 +586,9 @@ public class SymbolLayerTest extends BaseStyleTest {
     assertEquals(SourceFunction.class, layer.getIconRotate().getFunction().getClass());
     assertEquals("FeaturePropertyA", ((SourceFunction) layer.getIconRotate().getFunction()).getProperty());
     assertEquals(CategoricalStops.class, layer.getIconRotate().getFunction().getStops().getClass());
-    assertEquals(0.3f, ((SourceFunction) layer.getIconRotate().getFunction()).getDefaultValue());
+    assertNotNull(((SourceFunction) layer.getIconRotate().getFunction()).getDefaultValue());
+    assertNotNull(((SourceFunction) layer.getIconRotate().getFunction()).getDefaultValue().getValue());
+    assertEquals(0.3f, ((SourceFunction) layer.getIconRotate().getFunction()).getDefaultValue().getValue());
   }
 
   @Test
@@ -603,7 +605,7 @@ public class SymbolLayerTest extends BaseStyleTest {
           exponential(
             stop(0, 0.3f, iconRotate(0.9f))
           ).withBase(0.5f)
-        ).withDefaultValue(0.3f)
+        ).withDefaultValue(iconRotate(0.3f))
       )
     );
 
@@ -1656,7 +1658,7 @@ public class SymbolLayerTest extends BaseStyleTest {
           categorical(
             stop(1.0f, iconOpacity(0.3f))
           )
-        ).withDefaultValue(0.3f)
+        ).withDefaultValue(iconOpacity(0.3f))
       )
     );
 
@@ -1666,7 +1668,9 @@ public class SymbolLayerTest extends BaseStyleTest {
     assertEquals(SourceFunction.class, layer.getIconOpacity().getFunction().getClass());
     assertEquals("FeaturePropertyA", ((SourceFunction) layer.getIconOpacity().getFunction()).getProperty());
     assertEquals(CategoricalStops.class, layer.getIconOpacity().getFunction().getStops().getClass());
-    assertEquals(0.3f, ((SourceFunction) layer.getIconOpacity().getFunction()).getDefaultValue());
+    assertNotNull(((SourceFunction) layer.getIconOpacity().getFunction()).getDefaultValue());
+    assertNotNull(((SourceFunction) layer.getIconOpacity().getFunction()).getDefaultValue().getValue());
+    assertEquals(0.3f, ((SourceFunction) layer.getIconOpacity().getFunction()).getDefaultValue().getValue());
   }
 
   @Test
@@ -1683,7 +1687,7 @@ public class SymbolLayerTest extends BaseStyleTest {
           exponential(
             stop(0, 0.3f, iconOpacity(0.9f))
           ).withBase(0.5f)
-        ).withDefaultValue(0.3f)
+        ).withDefaultValue(iconOpacity(0.3f))
       )
     );
 
@@ -1799,7 +1803,7 @@ public class SymbolLayerTest extends BaseStyleTest {
           categorical(
             stop("valueA", iconColor(Color.RED))
           )
-        )
+        ).withDefaultValue(iconColor(Color.GREEN))
       )
     );
 
@@ -1809,6 +1813,9 @@ public class SymbolLayerTest extends BaseStyleTest {
     assertEquals(SourceFunction.class, layer.getIconColor().getFunction().getClass());
     assertEquals("FeaturePropertyA", ((SourceFunction) layer.getIconColor().getFunction()).getProperty());
     assertEquals(CategoricalStops.class, layer.getIconColor().getFunction().getStops().getClass());
+    assertNotNull(((SourceFunction) layer.getIconColor().getFunction()).getDefaultValue());
+    assertNotNull(((SourceFunction) layer.getIconColor().getFunction()).getDefaultValue().getValue());
+    assertEquals(Color.GREEN, (int) ((SourceFunction) layer.getIconColor().getFunction()).getDefaultValue().getColorInt());
   }
 
   @Test
@@ -1918,7 +1925,7 @@ public class SymbolLayerTest extends BaseStyleTest {
           categorical(
             stop("valueA", iconHaloColor(Color.RED))
           )
-        )
+        ).withDefaultValue(iconHaloColor(Color.GREEN))
       )
     );
 
@@ -1928,6 +1935,9 @@ public class SymbolLayerTest extends BaseStyleTest {
     assertEquals(SourceFunction.class, layer.getIconHaloColor().getFunction().getClass());
     assertEquals("FeaturePropertyA", ((SourceFunction) layer.getIconHaloColor().getFunction()).getProperty());
     assertEquals(CategoricalStops.class, layer.getIconHaloColor().getFunction().getStops().getClass());
+    assertNotNull(((SourceFunction) layer.getIconHaloColor().getFunction()).getDefaultValue());
+    assertNotNull(((SourceFunction) layer.getIconHaloColor().getFunction()).getDefaultValue().getValue());
+    assertEquals(Color.GREEN, (int) ((SourceFunction) layer.getIconHaloColor().getFunction()).getDefaultValue().getColorInt());
   }
 
   @Test
@@ -2037,7 +2047,7 @@ public class SymbolLayerTest extends BaseStyleTest {
           categorical(
             stop(1.0f, iconHaloWidth(0.3f))
           )
-        ).withDefaultValue(0.3f)
+        ).withDefaultValue(iconHaloWidth(0.3f))
       )
     );
 
@@ -2047,7 +2057,9 @@ public class SymbolLayerTest extends BaseStyleTest {
     assertEquals(SourceFunction.class, layer.getIconHaloWidth().getFunction().getClass());
     assertEquals("FeaturePropertyA", ((SourceFunction) layer.getIconHaloWidth().getFunction()).getProperty());
     assertEquals(CategoricalStops.class, layer.getIconHaloWidth().getFunction().getStops().getClass());
-    assertEquals(0.3f, ((SourceFunction) layer.getIconHaloWidth().getFunction()).getDefaultValue());
+    assertNotNull(((SourceFunction) layer.getIconHaloWidth().getFunction()).getDefaultValue());
+    assertNotNull(((SourceFunction) layer.getIconHaloWidth().getFunction()).getDefaultValue().getValue());
+    assertEquals(0.3f, ((SourceFunction) layer.getIconHaloWidth().getFunction()).getDefaultValue().getValue());
   }
 
   @Test
@@ -2064,7 +2076,7 @@ public class SymbolLayerTest extends BaseStyleTest {
           exponential(
             stop(0, 0.3f, iconHaloWidth(0.9f))
           ).withBase(0.5f)
-        ).withDefaultValue(0.3f)
+        ).withDefaultValue(iconHaloWidth(0.3f))
       )
     );
 
@@ -2180,7 +2192,7 @@ public class SymbolLayerTest extends BaseStyleTest {
           categorical(
             stop(1.0f, iconHaloBlur(0.3f))
           )
-        ).withDefaultValue(0.3f)
+        ).withDefaultValue(iconHaloBlur(0.3f))
       )
     );
 
@@ -2190,7 +2202,9 @@ public class SymbolLayerTest extends BaseStyleTest {
     assertEquals(SourceFunction.class, layer.getIconHaloBlur().getFunction().getClass());
     assertEquals("FeaturePropertyA", ((SourceFunction) layer.getIconHaloBlur().getFunction()).getProperty());
     assertEquals(CategoricalStops.class, layer.getIconHaloBlur().getFunction().getStops().getClass());
-    assertEquals(0.3f, ((SourceFunction) layer.getIconHaloBlur().getFunction()).getDefaultValue());
+    assertNotNull(((SourceFunction) layer.getIconHaloBlur().getFunction()).getDefaultValue());
+    assertNotNull(((SourceFunction) layer.getIconHaloBlur().getFunction()).getDefaultValue().getValue());
+    assertEquals(0.3f, ((SourceFunction) layer.getIconHaloBlur().getFunction()).getDefaultValue().getValue());
   }
 
   @Test
@@ -2207,7 +2221,7 @@ public class SymbolLayerTest extends BaseStyleTest {
           exponential(
             stop(0, 0.3f, iconHaloBlur(0.9f))
           ).withBase(0.5f)
-        ).withDefaultValue(0.3f)
+        ).withDefaultValue(iconHaloBlur(0.3f))
       )
     );
 
@@ -2396,7 +2410,7 @@ public class SymbolLayerTest extends BaseStyleTest {
           categorical(
             stop(1.0f, textOpacity(0.3f))
           )
-        ).withDefaultValue(0.3f)
+        ).withDefaultValue(textOpacity(0.3f))
       )
     );
 
@@ -2406,7 +2420,9 @@ public class SymbolLayerTest extends BaseStyleTest {
     assertEquals(SourceFunction.class, layer.getTextOpacity().getFunction().getClass());
     assertEquals("FeaturePropertyA", ((SourceFunction) layer.getTextOpacity().getFunction()).getProperty());
     assertEquals(CategoricalStops.class, layer.getTextOpacity().getFunction().getStops().getClass());
-    assertEquals(0.3f, ((SourceFunction) layer.getTextOpacity().getFunction()).getDefaultValue());
+    assertNotNull(((SourceFunction) layer.getTextOpacity().getFunction()).getDefaultValue());
+    assertNotNull(((SourceFunction) layer.getTextOpacity().getFunction()).getDefaultValue().getValue());
+    assertEquals(0.3f, ((SourceFunction) layer.getTextOpacity().getFunction()).getDefaultValue().getValue());
   }
 
   @Test
@@ -2423,7 +2439,7 @@ public class SymbolLayerTest extends BaseStyleTest {
           exponential(
             stop(0, 0.3f, textOpacity(0.9f))
           ).withBase(0.5f)
-        ).withDefaultValue(0.3f)
+        ).withDefaultValue(textOpacity(0.3f))
       )
     );
 
@@ -2539,7 +2555,7 @@ public class SymbolLayerTest extends BaseStyleTest {
           categorical(
             stop("valueA", textColor(Color.RED))
           )
-        )
+        ).withDefaultValue(textColor(Color.GREEN))
       )
     );
 
@@ -2549,6 +2565,9 @@ public class SymbolLayerTest extends BaseStyleTest {
     assertEquals(SourceFunction.class, layer.getTextColor().getFunction().getClass());
     assertEquals("FeaturePropertyA", ((SourceFunction) layer.getTextColor().getFunction()).getProperty());
     assertEquals(CategoricalStops.class, layer.getTextColor().getFunction().getStops().getClass());
+    assertNotNull(((SourceFunction) layer.getTextColor().getFunction()).getDefaultValue());
+    assertNotNull(((SourceFunction) layer.getTextColor().getFunction()).getDefaultValue().getValue());
+    assertEquals(Color.GREEN, (int) ((SourceFunction) layer.getTextColor().getFunction()).getDefaultValue().getColorInt());
   }
 
   @Test
@@ -2658,7 +2677,7 @@ public class SymbolLayerTest extends BaseStyleTest {
           categorical(
             stop("valueA", textHaloColor(Color.RED))
           )
-        )
+        ).withDefaultValue(textHaloColor(Color.GREEN))
       )
     );
 
@@ -2668,6 +2687,9 @@ public class SymbolLayerTest extends BaseStyleTest {
     assertEquals(SourceFunction.class, layer.getTextHaloColor().getFunction().getClass());
     assertEquals("FeaturePropertyA", ((SourceFunction) layer.getTextHaloColor().getFunction()).getProperty());
     assertEquals(CategoricalStops.class, layer.getTextHaloColor().getFunction().getStops().getClass());
+    assertNotNull(((SourceFunction) layer.getTextHaloColor().getFunction()).getDefaultValue());
+    assertNotNull(((SourceFunction) layer.getTextHaloColor().getFunction()).getDefaultValue().getValue());
+    assertEquals(Color.GREEN, (int) ((SourceFunction) layer.getTextHaloColor().getFunction()).getDefaultValue().getColorInt());
   }
 
   @Test
@@ -2777,7 +2799,7 @@ public class SymbolLayerTest extends BaseStyleTest {
           categorical(
             stop(1.0f, textHaloWidth(0.3f))
           )
-        ).withDefaultValue(0.3f)
+        ).withDefaultValue(textHaloWidth(0.3f))
       )
     );
 
@@ -2787,7 +2809,9 @@ public class SymbolLayerTest extends BaseStyleTest {
     assertEquals(SourceFunction.class, layer.getTextHaloWidth().getFunction().getClass());
     assertEquals("FeaturePropertyA", ((SourceFunction) layer.getTextHaloWidth().getFunction()).getProperty());
     assertEquals(CategoricalStops.class, layer.getTextHaloWidth().getFunction().getStops().getClass());
-    assertEquals(0.3f, ((SourceFunction) layer.getTextHaloWidth().getFunction()).getDefaultValue());
+    assertNotNull(((SourceFunction) layer.getTextHaloWidth().getFunction()).getDefaultValue());
+    assertNotNull(((SourceFunction) layer.getTextHaloWidth().getFunction()).getDefaultValue().getValue());
+    assertEquals(0.3f, ((SourceFunction) layer.getTextHaloWidth().getFunction()).getDefaultValue().getValue());
   }
 
   @Test
@@ -2804,7 +2828,7 @@ public class SymbolLayerTest extends BaseStyleTest {
           exponential(
             stop(0, 0.3f, textHaloWidth(0.9f))
           ).withBase(0.5f)
-        ).withDefaultValue(0.3f)
+        ).withDefaultValue(textHaloWidth(0.3f))
       )
     );
 
@@ -2920,7 +2944,7 @@ public class SymbolLayerTest extends BaseStyleTest {
           categorical(
             stop(1.0f, textHaloBlur(0.3f))
           )
-        ).withDefaultValue(0.3f)
+        ).withDefaultValue(textHaloBlur(0.3f))
       )
     );
 
@@ -2930,7 +2954,9 @@ public class SymbolLayerTest extends BaseStyleTest {
     assertEquals(SourceFunction.class, layer.getTextHaloBlur().getFunction().getClass());
     assertEquals("FeaturePropertyA", ((SourceFunction) layer.getTextHaloBlur().getFunction()).getProperty());
     assertEquals(CategoricalStops.class, layer.getTextHaloBlur().getFunction().getStops().getClass());
-    assertEquals(0.3f, ((SourceFunction) layer.getTextHaloBlur().getFunction()).getDefaultValue());
+    assertNotNull(((SourceFunction) layer.getTextHaloBlur().getFunction()).getDefaultValue());
+    assertNotNull(((SourceFunction) layer.getTextHaloBlur().getFunction()).getDefaultValue().getValue());
+    assertEquals(0.3f, ((SourceFunction) layer.getTextHaloBlur().getFunction()).getDefaultValue().getValue());
   }
 
   @Test
@@ -2947,7 +2973,7 @@ public class SymbolLayerTest extends BaseStyleTest {
           exponential(
             stop(0, 0.3f, textHaloBlur(0.9f))
           ).withBase(0.5f)
-        ).withDefaultValue(0.3f)
+        ).withDefaultValue(textHaloBlur(0.3f))
       )
     );
 

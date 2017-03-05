@@ -8,6 +8,7 @@ import com.mapbox.mapboxsdk.style.functions.stops.ExponentialStops;
 import com.mapbox.mapboxsdk.style.functions.stops.IntervalStops;
 import com.mapbox.mapboxsdk.style.functions.stops.Stop;
 import com.mapbox.mapboxsdk.style.functions.stops.Stops;
+import com.mapbox.mapboxsdk.style.layers.PropertyValue;
 
 import java.util.Map;
 
@@ -27,7 +28,7 @@ import java.util.Map;
 public class CompositeFunction<Z extends Number, I, O> extends Function<Stop.CompositeValue<Z, I>, O> {
 
   private final String property;
-  private O defaultValue;
+  private PropertyValue<O> defaultValue;
 
   CompositeFunction(@NonNull String property,
                     @NonNull CategoricalStops<Stop.CompositeValue<Z, I>, O> stops) {
@@ -51,7 +52,7 @@ public class CompositeFunction<Z extends Number, I, O> extends Function<Stop.Com
   private CompositeFunction(@Nullable O defaultValue, @NonNull String property,
                             @NonNull Stops<Stop.CompositeValue<Z, I>, O> stops) {
     super(stops);
-    this.defaultValue = defaultValue;
+    this.defaultValue = new PropertyValue<>(property, defaultValue);
     this.property = property;
   }
 
@@ -61,7 +62,7 @@ public class CompositeFunction<Z extends Number, I, O> extends Function<Stop.Com
    * @param defaultValue the default value to use when no other applies
    * @return this (for chaining)
    */
-  public CompositeFunction<Z, I, O> withDefaultValue(O defaultValue) {
+  public CompositeFunction<Z, I, O> withDefaultValue(PropertyValue<O> defaultValue) {
     this.defaultValue = defaultValue;
     return this;
   }
@@ -70,7 +71,7 @@ public class CompositeFunction<Z extends Number, I, O> extends Function<Stop.Com
    * @return the defaultValue
    */
   @Nullable
-  public O getDefaultValue() {
+  public PropertyValue<O> getDefaultValue() {
     return defaultValue;
   }
 
@@ -91,7 +92,7 @@ public class CompositeFunction<Z extends Number, I, O> extends Function<Stop.Com
     Map<String, Object> valueObject = super.toValueObject();
     valueObject.put(PROPERTY_KEY, property);
     if (defaultValue != null) {
-      valueObject.put(DEFAULT_VALUE_KEY, defaultValue);
+      valueObject.put(DEFAULT_VALUE_KEY, defaultValue.value);
     }
     return valueObject;
   }

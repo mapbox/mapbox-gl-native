@@ -269,11 +269,11 @@ public class <%- camelize(type) %>LayerTest extends BaseStyleTest {
 <% if (property.type == 'color') { -%>
             stop("valueA", <%- camelizeWithLeadingLowercase(property.name) %>(Color.RED))
           )
-        )
+        ).withDefaultValue(<%- camelizeWithLeadingLowercase(property.name) %>(Color.GREEN))
 <% } else {-%>
             stop(1.0f, <%- camelizeWithLeadingLowercase(property.name) %>(<%- defaultValueJava(property) %>))
           )
-        ).withDefaultValue(<%- defaultValueJava(property) %>)
+        ).withDefaultValue(<%- camelizeWithLeadingLowercase(property.name) %>(<%- defaultValueJava(property) %>))
 <% } -%>
       )
     );
@@ -284,8 +284,12 @@ public class <%- camelize(type) %>LayerTest extends BaseStyleTest {
     assertEquals(SourceFunction.class, layer.get<%- camelize(property.name) %>().getFunction().getClass());
     assertEquals("FeaturePropertyA", ((SourceFunction) layer.get<%- camelize(property.name) %>().getFunction()).getProperty());
     assertEquals(CategoricalStops.class, layer.get<%- camelize(property.name) %>().getFunction().getStops().getClass());
-<% if (property.type !== 'color') { -%>
-    assertEquals(<%- defaultValueJava(property) %>, ((SourceFunction) layer.get<%- camelize(property.name) %>().getFunction()).getDefaultValue());
+    assertNotNull(((SourceFunction) layer.get<%- camelize(property.name) %>().getFunction()).getDefaultValue());
+    assertNotNull(((SourceFunction) layer.get<%- camelize(property.name) %>().getFunction()).getDefaultValue().getValue());
+<% if (property.type === 'color') { -%>
+    assertEquals(Color.GREEN, (int) ((SourceFunction) layer.get<%- camelize(property.name) %>().getFunction()).getDefaultValue().getColorInt());
+<% } else { -%>
+    assertEquals(<%- defaultValueJava(property) %>, ((SourceFunction) layer.get<%- camelize(property.name) %>().getFunction()).getDefaultValue().getValue());
 <% } -%>
   }
 <% if (property.type !== 'color') { -%>
@@ -305,7 +309,7 @@ public class <%- camelize(type) %>LayerTest extends BaseStyleTest {
             stop(0, 0.3f, <%- camelizeWithLeadingLowercase(property.name) %>(0.9f))
           ).withBase(0.5f)
 <% if (property.type == 'number') { -%>
-        ).withDefaultValue(<%- defaultValueJava(property) %>)
+        ).withDefaultValue(<%- camelizeWithLeadingLowercase(property.name) %>(<%- defaultValueJava(property) %>))
 <% } else { -%>
         )
 <% } -%>
