@@ -24,6 +24,7 @@ class Painter;
 class FileSource;
 class TransformState;
 class RenderTile;
+class RenderedQueryOptions;
 
 namespace algorithm {
 class ClipIDGenerator;
@@ -32,7 +33,6 @@ class ClipIDGenerator;
 namespace style {
 
 class UpdateParameters;
-class QueryParameters;
 class SourceObserver;
 
 class Source::Impl : public TileObserver, private util::noncopyable {
@@ -68,7 +68,7 @@ public:
     std::unordered_map<std::string, std::vector<Feature>>
     queryRenderedFeatures(const ScreenLineString& geometry,
                           const TransformState& transformState,
-                          const QueryOptions& options) const;
+                          const RenderedQueryOptions& options) const;
 
     void setCacheSize(size_t);
     void onLowMemory();

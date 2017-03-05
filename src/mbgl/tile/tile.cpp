@@ -33,6 +33,6 @@ void Tile::queryRenderedFeatures(
         std::unordered_map<std::string, std::vector<Feature>>&,
         const GeometryCoordinates&,
         const TransformState&,
-        const QueryOptions&) {}
+        const RenderedQueryOptions&) {}
 
 } // namespace mbgl
