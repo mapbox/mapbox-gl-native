@@ -47,6 +47,24 @@ buildPackageStyle() {
     fi
 }
 
+bumpVersionForUpdateChecker() {
+    if [[ $( echo ${PUBLISH_VERSION} | awk '/[0-9]-/' ) ]]; then
+        step "Skipping version checker bump because this is a pre-release"
+        return
+    fi
+
+    step "Updating version checker to ${PUBLISH_VERSION}…"
+
+    CHECKER_FILENAME="latest_version"
+    CHECKER_PATH=${BINARY_DIRECTORY}/${CHECKER_FILENAME}
+
+    echo ${PUBLISH_VERSION} > ${CHECKER_PATH}
+    aws s3 cp ${CHECKER_PATH} s3://mapbox/${GITHUB_REPO}/ios/${CHECKER_FILENAME} --acl public-read --content-type text/plain
+
+    verification=$( curl -L http://mapbox.s3.amazonaws.com/${GITHUB_REPO}/ios/${CHECKER_FILENAME} )
+    echo "Updated version checker to ${verification}"
+}
+
 export TRAVIS_REPO_SLUG=mapbox-gl-native
 export GITHUB_USER=mapbox
 export GITHUB_REPO=mapbox-gl-native
@@ -113,5 +131,7 @@ buildPackageStyle "ipackage-strip"
 buildPackageStyle "iframework" "symbols-dynamic"
 buildPackageStyle "iframework SYMBOLS=NO" "dynamic"
 buildPackageStyle "ifabric" "fabric"
+
+bumpVersionForUpdateChecker
 
 step "Finished deploying ${PUBLISH_VERSION} in $(($SECONDS / 60)) minutes and $(($SECONDS % 60)) seconds"
