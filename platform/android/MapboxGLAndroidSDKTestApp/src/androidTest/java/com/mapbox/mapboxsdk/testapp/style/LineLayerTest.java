@@ -323,7 +323,7 @@ public class LineLayerTest extends BaseStyleTest {
           categorical(
             stop(1.0f, lineOpacity(0.3f))
           )
-        ).withDefaultValue(0.3f)
+        ).withDefaultValue(lineOpacity(0.3f))
       )
     );
 
@@ -333,7 +333,9 @@ public class LineLayerTest extends BaseStyleTest {
     assertEquals(SourceFunction.class, layer.getLineOpacity().getFunction().getClass());
     assertEquals("FeaturePropertyA", ((SourceFunction) layer.getLineOpacity().getFunction()).getProperty());
     assertEquals(CategoricalStops.class, layer.getLineOpacity().getFunction().getStops().getClass());
-    assertEquals(0.3f, ((SourceFunction) layer.getLineOpacity().getFunction()).getDefaultValue());
+    assertNotNull(((SourceFunction) layer.getLineOpacity().getFunction()).getDefaultValue());
+    assertNotNull(((SourceFunction) layer.getLineOpacity().getFunction()).getDefaultValue().getValue());
+    assertEquals(0.3f, ((SourceFunction) layer.getLineOpacity().getFunction()).getDefaultValue().getValue());
   }
 
   @Test
@@ -350,7 +352,7 @@ public class LineLayerTest extends BaseStyleTest {
           exponential(
             stop(0, 0.3f, lineOpacity(0.9f))
           ).withBase(0.5f)
-        ).withDefaultValue(0.3f)
+        ).withDefaultValue(lineOpacity(0.3f))
       )
     );
 
@@ -466,7 +468,7 @@ public class LineLayerTest extends BaseStyleTest {
           categorical(
             stop("valueA", lineColor(Color.RED))
           )
-        )
+        ).withDefaultValue(lineColor(Color.GREEN))
       )
     );
 
@@ -476,6 +478,9 @@ public class LineLayerTest extends BaseStyleTest {
     assertEquals(SourceFunction.class, layer.getLineColor().getFunction().getClass());
     assertEquals("FeaturePropertyA", ((SourceFunction) layer.getLineColor().getFunction()).getProperty());
     assertEquals(CategoricalStops.class, layer.getLineColor().getFunction().getStops().getClass());
+    assertNotNull(((SourceFunction) layer.getLineColor().getFunction()).getDefaultValue());
+    assertNotNull(((SourceFunction) layer.getLineColor().getFunction()).getDefaultValue().getValue());
+    assertEquals(Color.GREEN, (int) ((SourceFunction) layer.getLineColor().getFunction()).getDefaultValue().getColorInt());
   }
 
   @Test
@@ -695,7 +700,7 @@ public class LineLayerTest extends BaseStyleTest {
           categorical(
             stop(1.0f, lineGapWidth(0.3f))
           )
-        ).withDefaultValue(0.3f)
+        ).withDefaultValue(lineGapWidth(0.3f))
       )
     );
 
@@ -705,7 +710,9 @@ public class LineLayerTest extends BaseStyleTest {
     assertEquals(SourceFunction.class, layer.getLineGapWidth().getFunction().getClass());
     assertEquals("FeaturePropertyA", ((SourceFunction) layer.getLineGapWidth().getFunction()).getProperty());
     assertEquals(CategoricalStops.class, layer.getLineGapWidth().getFunction().getStops().getClass());
-    assertEquals(0.3f, ((SourceFunction) layer.getLineGapWidth().getFunction()).getDefaultValue());
+    assertNotNull(((SourceFunction) layer.getLineGapWidth().getFunction()).getDefaultValue());
+    assertNotNull(((SourceFunction) layer.getLineGapWidth().getFunction()).getDefaultValue().getValue());
+    assertEquals(0.3f, ((SourceFunction) layer.getLineGapWidth().getFunction()).getDefaultValue().getValue());
   }
 
   @Test
@@ -722,7 +729,7 @@ public class LineLayerTest extends BaseStyleTest {
           exponential(
             stop(0, 0.3f, lineGapWidth(0.9f))
           ).withBase(0.5f)
-        ).withDefaultValue(0.3f)
+        ).withDefaultValue(lineGapWidth(0.3f))
       )
     );
 
@@ -838,7 +845,7 @@ public class LineLayerTest extends BaseStyleTest {
           categorical(
             stop(1.0f, lineOffset(0.3f))
           )
-        ).withDefaultValue(0.3f)
+        ).withDefaultValue(lineOffset(0.3f))
       )
     );
 
@@ -848,7 +855,9 @@ public class LineLayerTest extends BaseStyleTest {
     assertEquals(SourceFunction.class, layer.getLineOffset().getFunction().getClass());
     assertEquals("FeaturePropertyA", ((SourceFunction) layer.getLineOffset().getFunction()).getProperty());
     assertEquals(CategoricalStops.class, layer.getLineOffset().getFunction().getStops().getClass());
-    assertEquals(0.3f, ((SourceFunction) layer.getLineOffset().getFunction()).getDefaultValue());
+    assertNotNull(((SourceFunction) layer.getLineOffset().getFunction()).getDefaultValue());
+    assertNotNull(((SourceFunction) layer.getLineOffset().getFunction()).getDefaultValue().getValue());
+    assertEquals(0.3f, ((SourceFunction) layer.getLineOffset().getFunction()).getDefaultValue().getValue());
   }
 
   @Test
@@ -865,7 +874,7 @@ public class LineLayerTest extends BaseStyleTest {
           exponential(
             stop(0, 0.3f, lineOffset(0.9f))
           ).withBase(0.5f)
-        ).withDefaultValue(0.3f)
+        ).withDefaultValue(lineOffset(0.3f))
       )
     );
 
@@ -981,7 +990,7 @@ public class LineLayerTest extends BaseStyleTest {
           categorical(
             stop(1.0f, lineBlur(0.3f))
           )
-        ).withDefaultValue(0.3f)
+        ).withDefaultValue(lineBlur(0.3f))
       )
     );
 
@@ -991,7 +1000,9 @@ public class LineLayerTest extends BaseStyleTest {
     assertEquals(SourceFunction.class, layer.getLineBlur().getFunction().getClass());
     assertEquals("FeaturePropertyA", ((SourceFunction) layer.getLineBlur().getFunction()).getProperty());
     assertEquals(CategoricalStops.class, layer.getLineBlur().getFunction().getStops().getClass());
-    assertEquals(0.3f, ((SourceFunction) layer.getLineBlur().getFunction()).getDefaultValue());
+    assertNotNull(((SourceFunction) layer.getLineBlur().getFunction()).getDefaultValue());
+    assertNotNull(((SourceFunction) layer.getLineBlur().getFunction()).getDefaultValue().getValue());
+    assertEquals(0.3f, ((SourceFunction) layer.getLineBlur().getFunction()).getDefaultValue().getValue());
   }
 
   @Test
@@ -1008,7 +1019,7 @@ public class LineLayerTest extends BaseStyleTest {
           exponential(
             stop(0, 0.3f, lineBlur(0.9f))
           ).withBase(0.5f)
-        ).withDefaultValue(0.3f)
+        ).withDefaultValue(lineBlur(0.3f))
       )
     );
 
