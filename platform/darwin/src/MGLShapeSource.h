@@ -210,6 +210,22 @@ MGL_EXPORT
  */
 @property (nonatomic, copy, nullable) NSURL *URL;
 
+/**
+ Returns an array of map features for this source, filtered by the given predicate.
+
+ Each object in the returned array represents a feature for the current style
+ and provides access to attributes specified by the source
+
+ Features come from tiled GeoJSON data that is converted to tiles internally,
+ so feature geometries are clipped at tile boundaries and features
+ may appear duplicated across tiles.
+
+ @param predicate A predicate to filter the returned features.
+ @return An array of objects conforming to the `MGLFeature` protocol that
+ represent features in the sources used by the current style.
+ */
+- (NS_ARRAY_OF(id <MGLFeature>) *)featuresMatchingPredicate:(nullable NSPredicate *)predicate;
+
 @end
 
 NS_ASSUME_NONNULL_END
