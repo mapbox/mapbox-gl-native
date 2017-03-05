@@ -247,6 +247,7 @@ set(MBGL_CORE_FILES
     include/mbgl/style/filter_evaluator.hpp
     include/mbgl/style/layer.hpp
     include/mbgl/style/property_value.hpp
+    include/mbgl/style/query.hpp
     include/mbgl/style/source.hpp
     include/mbgl/style/transition_options.hpp
     include/mbgl/style/types.hpp

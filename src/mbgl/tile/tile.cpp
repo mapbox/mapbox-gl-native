@@ -4,6 +4,7 @@
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/logging.hpp>
 #include <mbgl/map/query.hpp>
+#include <mbgl/style/query.hpp>
 
 namespace mbgl {
 
@@ -34,5 +35,9 @@ void Tile::queryRenderedFeatures(
         const GeometryCoordinates&,
         const TransformState&,
         const RenderedQueryOptions&) {}
+
+void Tile::querySourceFeatures(
+        std::vector<Feature>&,
+        const style::SourceQueryOptions&) {}
 
 } // namespace mbgl

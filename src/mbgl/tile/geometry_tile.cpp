@@ -12,8 +12,11 @@
 #include <mbgl/geometry/feature_index.hpp>
 #include <mbgl/text/collision_tile.hpp>
 #include <mbgl/map/transform_state.hpp>
-#include <mbgl/util/run_loop.hpp>
 #include <mbgl/map/query.hpp>
+#include <mbgl/util/run_loop.hpp>
+#include <mbgl/style/filter_evaluator.hpp>
+#include <mbgl/style/query.hpp>
+#include <mbgl/util/logging.hpp>
 
 namespace mbgl {
 
@@ -156,6 +159,37 @@ void GeometryTile::queryRenderedFeatures(
                         id.canonical,
                         style,
                         collisionTile.get());
+}
+
+void GeometryTile::querySourceFeatures(
+    std::vector<Feature>& result,
+    const style::SourceQueryOptions& options) {
+    
+    // No source layers, specified, nothing to do
+    if (!options.sourceLayers) {
+        Log::Warning(Event::General, "At least one sourceLayer required");
+        return;
+    }
+
+    for (auto sourceLayer : *options.sourceLayers) {
+        // Go throught all sourceLayers, if any
+        // to gather all the features
+        auto layer = data->getLayer(sourceLayer);
+        
+        if (layer) {
+            auto featureCount = layer->featureCount();
+            for (std::size_t i = 0; i < featureCount; i++) {
+                auto feature = layer->getFeature(i);
+
+                // Apply filter, if any
+                if (options.filter && !(*options.filter)(*feature)) {
+                    continue;
+                }
+
+                result.push_back(convertFeature(*feature, id.canonical));
+            }
+        }
+    }
 }
 
 } // namespace mbgl

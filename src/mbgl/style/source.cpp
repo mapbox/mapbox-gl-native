@@ -17,6 +17,10 @@ const std::string& Source::getID() const {
 optional<std::string> Source::getAttribution() const {
     return baseImpl->getAttribution();
 }
+    
+std::vector<Feature> Source::querySourceFeatures(const SourceQueryOptions& options) {
+    return baseImpl->querySourceFeatures(options);
+}
 
 } // namespace style
 } // namespace mbgl

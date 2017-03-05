@@ -21,6 +21,7 @@ namespace style {
 class Style;
 class Layer;
 class UpdateParameters;
+class SourceQueryOptions;
 } // namespace style
 
 class GeometryTile : public Tile {
@@ -46,6 +47,10 @@ public:
             const TransformState&,
             const RenderedQueryOptions& options) override;
 
+    void querySourceFeatures(
+        std::vector<Feature>& result,
+        const style::SourceQueryOptions&) override;
+
     void cancel() override;
 
     class LayoutResult {
@@ -66,6 +71,11 @@ public:
     void onPlacement(PlacementResult);
 
     void onError(std::exception_ptr);
+    
+protected:
+    const GeometryTileData* getData() {
+        return data.get();
+    }
 
 private:
     const std::string sourceID;
