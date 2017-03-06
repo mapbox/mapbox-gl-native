@@ -13,7 +13,7 @@
 #include <QQmlListProperty>
 #include <QQuickFramebufferObject>
 #include <QQuickItem>
-
+#include <QTimerEvent>
 class QDeclarativeGeoServiceProvider;
 class QQuickMapboxGLRenderer;
 
@@ -77,10 +77,17 @@ public:
     // Proposed Qt interface implementation.
     QQmlListProperty<QQuickMapboxGLMapParameter> parameters();
 
+    // flush cache after this amount of time (milliseconds)
+    void setBatchTimerInterval(quint32 timeInterval);
+
+    // flush event cache if reach more then this num of events
+    void setBatchSize(qint32 batchSize);
+
 protected:
     // QQmlParserStatus implementation
     void componentComplete() override;
-
+    inline void batchUpdate();
+    void timerEvent(QTimerEvent *e);
 signals:
     // Map QML Type signals.
     void minimumZoomLevelChanged();
@@ -171,6 +178,9 @@ private:
 
     int m_syncState = NothingNeedsSync;
     bool m_styleLoaded = false;
-
+    quint32 m_numBatchUpdates = 0;
+    qint32  m_updateTimerID = -1;
+    quint32 m_updateTimeIntrval = 250; // milliseconds
+    quint32 m_maxUpdateCachedEvents = 10;
     friend class QQuickMapboxGLRenderer;
 };

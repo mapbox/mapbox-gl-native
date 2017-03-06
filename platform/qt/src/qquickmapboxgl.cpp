@@ -12,7 +12,7 @@
 #include <QtGlobal>
 #include <QQmlListProperty>
 #include <QJSValue>
-
+#include <QDebug>
 namespace {
 
 static const QRegularExpression s_camelCase {"([a-z0-9])([A-Z])"};
@@ -109,7 +109,7 @@ void QQuickMapboxGL::setZoomLevel(qreal zoom)
     m_zoomLevel = zoom;
 
     m_syncState |= ZoomNeedsSync;
-    update();
+    batchUpdate();
 
     emit zoomLevelChanged(m_zoomLevel);
 }
@@ -128,7 +128,7 @@ void QQuickMapboxGL::setCenter(const QGeoCoordinate &coordinate)
     m_center = coordinate;
 
     m_syncState |= CenterNeedsSync;
-    update();
+    batchUpdate();
 
     emit centerChanged(m_center);
 }
@@ -183,7 +183,7 @@ void QQuickMapboxGL::setColor(const QColor &color)
     change.value = color;
     m_stylePropertyChanges << change;
 
-    update();
+    batchUpdate();
 
     emit colorChanged(m_color);
 }
@@ -198,14 +198,14 @@ void QQuickMapboxGL::pan(int dx, int dy)
     m_pan += QPointF(dx, -dy);
 
     m_syncState |= PanNeedsSync;
-    update();
+    batchUpdate();
 }
 
 void QQuickMapboxGL::onMapChanged(QMapboxGL::MapChange change)
 {
     if (change == QMapboxGL::MapChangeDidFinishLoadingStyle) {
         m_styleLoaded = true;
-        update();
+        batchUpdate();
     }
 }
 
@@ -322,10 +322,9 @@ bool QQuickMapboxGL::parseBearing(QQuickMapboxGLMapParameter *param)
     if (m_bearing == angle) return false;
     m_bearing = angle;
     m_syncState |= BearingNeedsSync;
-    update();
+    batchUpdate();
     return true;
 }
-
 bool QQuickMapboxGL::parsePitch(QQuickMapboxGLMapParameter *param)
 {
     qreal angle = param->property("angle").toReal();
@@ -335,6 +334,29 @@ bool QQuickMapboxGL::parsePitch(QQuickMapboxGLMapParameter *param)
     m_syncState |= PitchNeedsSync;
     update();
     return true;
+}
+void QQuickMapboxGL::batchUpdate()
+{
+      m_numBatchUpdates++;
+      if (m_updateTimerID < 0) {
+         m_updateTimerID = startTimer(m_updateTimeIntrval);
+      } else if (m_numBatchUpdates > m_maxUpdateCachedEvents) {
+         update();
+         killTimer(m_updateTimerID);
+         m_updateTimerID = -1;
+         m_numBatchUpdates = 0;
+      }
+}
+
+void QQuickMapboxGL::timerEvent(QTimerEvent *te)
+{
+   update();
+   QObject::timerEvent(te);
+   if (te->timerId() == m_updateTimerID) {
+    killTimer(m_updateTimerID);
+    m_updateTimerID = -1;
+    m_numBatchUpdates = 0;
+   }
 }
 
 void QQuickMapboxGL::processMapParameter(QQuickMapboxGLMapParameter *param)
@@ -374,7 +396,7 @@ void QQuickMapboxGL::processMapParameter(QQuickMapboxGLMapParameter *param)
         needsUpdate |= parsePitch(param);
         break;
     }
-    if (needsUpdate) update();
+    if (needsUpdate) batchUpdate();
 }
 
 void QQuickMapboxGL::onParameterPropertyUpdated(const QString &propertyName)
@@ -427,7 +449,7 @@ void QQuickMapboxGL::onParameterPropertyUpdated(const QString &propertyName)
         needsUpdate |= parsePitch(param);
         break;
     }
-    if (needsUpdate) update();
+    if (needsUpdate) batchUpdate();
 }
 
 void QQuickMapboxGL::appendParameter(QQmlListProperty<QQuickMapboxGLMapParameter> *prop, QQuickMapboxGLMapParameter *param)
