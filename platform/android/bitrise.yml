@@ -181,10 +181,8 @@ workflows:
         inputs:
         - content: |-
             #!/bin/bash
-            echo "Compile libmapbox-gl.so for all supportd abi's:"
-            export BUILDTYPE=Release
-            make apackage
-            cd platform/android && ./gradlew :MapboxGLAndroidSDK:assembleRelease
+            echo "Compile libmapbox-gl.so for all supported abi's and create an aar file:"
+            BUILDTYPE=Release make apackage
     - script:
         title: Publish to maven
         inputs:
