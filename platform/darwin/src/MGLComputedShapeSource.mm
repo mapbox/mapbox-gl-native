@@ -29,7 +29,10 @@
 @property (nonatomic, readonly) uint8_t z;
 @property (nonatomic, readonly) uint32_t x;
 @property (nonatomic, readonly) uint32_t y;
-@property (nonatomic, readonly, weak) MGLComputedShapeSource *source;
+@property (nonatomic, assign) BOOL dataSourceImplementsFeaturesForTile;
+@property (nonatomic, assign) BOOL dataSourceImplementsFeaturesForBounds;
+@property (nonatomic, weak, nullable) id<MGLComputedShapeSourceDataSource> dataSource;
+@property (nonatomic, nullable) mbgl::style::CustomVectorSource *rawSource;
 
 - (instancetype)initForSource:(MGLComputedShapeSource*)source z:(uint8_t)z x:(uint32_t)x y:(uint32_t)y;
 
@@ -43,7 +46,11 @@
     _x = x;
     _y = y;
     _z = z;
-    _source = source;
+    _dataSourceImplementsFeaturesForTile = source.dataSourceImplementsFeaturesForTile;
+    _dataSourceImplementsFeaturesForBounds = source.dataSourceImplementsFeaturesForBounds;
+    _dataSource = source.dataSource;
+    mbgl::style::CustomVectorSource *rawSource = (mbgl::style::CustomVectorSource *)source.rawSource;
+    _rawSource = rawSource;
     return self;
 }
 
@@ -53,16 +60,16 @@
     }
 
     NSArray<MGLShape <MGLFeature> *> *data;
-    if(!self.source.dataSource) {
+    if(!self.dataSource) {
         data = nil;
-    } else if(self.source.dataSourceImplementsFeaturesForTile) {
-        data = [self.source.dataSource featuresInTileAtX:self.x
+    } else if(self.dataSourceImplementsFeaturesForTile) {
+        data = [self.dataSource featuresInTileAtX:self.x
                                                 y:self.y
                                         zoomLevel:self.z];
     } else {
         mbgl::CanonicalTileID tileID = mbgl::CanonicalTileID(self.z, self.x, self.y);
         mbgl::LatLngBounds tileBounds = mbgl::LatLngBounds(tileID);
-        data = [self.source.dataSource featuresInCoordinateBounds:MGLCoordinateBoundsFromLatLngBounds(tileBounds)
+        data = [self.dataSource featuresInCoordinateBounds:MGLCoordinateBoundsFromLatLngBounds(tileBounds)
                                                  zoomLevel:self.z];
     }
     
@@ -74,12 +81,17 @@
             featureCollection.push_back(geoJsonObject);
         }
         const auto geojson = mbgl::GeoJSON{featureCollection};
-        dispatch_async(dispatch_get_main_queue(), ^{
-            if(![self isCancelled] && self.source.rawSource) {
-                self.source.rawSource->setTileData(self.z, self.x, self.y, geojson);
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            if(![self isCancelled] && self.rawSource) {
+                self.rawSource->setTileData(self.z, self.x, self.y, geojson);
             }
         });
     }
+}
+
+- (void)cancel {
+    [super cancel];
+    self.rawSource = NULL;
 }
 
 @end
