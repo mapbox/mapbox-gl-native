@@ -100,7 +100,7 @@ attribute vec4 a_data;
 
 
 uniform lowp float a_opacity_t;
-attribute lowp vec2 a_opacity_minmax;
+attribute lowp vec2 a_opacity;
 varying lowp float opacity;
 
 // matrix is for the vertex position.
@@ -116,7 +116,7 @@ varying vec2 v_tex;
 varying vec2 v_fade_tex;
 
 void main() {
-    opacity = unpack_mix_vec2(a_opacity_minmax, a_opacity_t);
+    opacity = unpack_mix_vec2(a_opacity, a_opacity_t);
 
 #ifdef MAPBOX_GL_NATIVE
     mediump vec2 a_pos = a_pos_offset.xy;

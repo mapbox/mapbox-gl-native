@@ -102,19 +102,19 @@ attribute vec4 a_data;
 
 
 uniform lowp float a_fill_color_t;
-attribute lowp vec4 a_fill_color_minmax;
+attribute lowp vec4 a_fill_color;
 varying lowp vec4 fill_color;
 uniform lowp float a_halo_color_t;
-attribute lowp vec4 a_halo_color_minmax;
+attribute lowp vec4 a_halo_color;
 varying lowp vec4 halo_color;
 uniform lowp float a_opacity_t;
-attribute lowp vec2 a_opacity_minmax;
+attribute lowp vec2 a_opacity;
 varying lowp float opacity;
 uniform lowp float a_halo_width_t;
-attribute lowp vec2 a_halo_width_minmax;
+attribute lowp vec2 a_halo_width;
 varying lowp float halo_width;
 uniform lowp float a_halo_blur_t;
-attribute lowp vec2 a_halo_blur_minmax;
+attribute lowp vec2 a_halo_blur;
 varying lowp float halo_blur;
 
 // matrix is for the vertex position.
@@ -135,11 +135,11 @@ varying vec2 v_fade_tex;
 varying float v_gamma_scale;
 
 void main() {
-    fill_color = unpack_mix_vec4(a_fill_color_minmax, a_fill_color_t);
-    halo_color = unpack_mix_vec4(a_halo_color_minmax, a_halo_color_t);
-    opacity = unpack_mix_vec2(a_opacity_minmax, a_opacity_t);
-    halo_width = unpack_mix_vec2(a_halo_width_minmax, a_halo_width_t);
-    halo_blur = unpack_mix_vec2(a_halo_blur_minmax, a_halo_blur_t);
+    fill_color = unpack_mix_vec4(a_fill_color, a_fill_color_t);
+    halo_color = unpack_mix_vec4(a_halo_color, a_halo_color_t);
+    opacity = unpack_mix_vec2(a_opacity, a_opacity_t);
+    halo_width = unpack_mix_vec2(a_halo_width, a_halo_width_t);
+    halo_blur = unpack_mix_vec2(a_halo_blur, a_halo_blur_t);
 
 #ifdef MAPBOX_GL_NATIVE
     mediump vec2 a_pos = a_pos_offset.xy;

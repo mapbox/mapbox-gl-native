@@ -41,11 +41,11 @@ require('./style-code');
         return prelude + applyPragmas(source, {
                 define: [
                     "uniform lowp float a_{name}_t;",
-                    "attribute {precision} {a_type} a_{name}_minmax;",
+                    "attribute {precision} {a_type} a_{name};",
                     "varying {precision} {type} {name};"
                 ],
                 initialize: [
-                    "{name} = unpack_mix_{a_type}(a_{name}_minmax, a_{name}_t);"
+                    "{name} = unpack_mix_{a_type}(a_{name}, a_{name}_t);"
                 ]
             });
     }

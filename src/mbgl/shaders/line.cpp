@@ -114,27 +114,27 @@ varying vec2 v_width2;
 varying float v_gamma_scale;
 
 uniform lowp float a_color_t;
-attribute lowp vec4 a_color_minmax;
+attribute lowp vec4 a_color;
 varying lowp vec4 color;
 uniform lowp float a_blur_t;
-attribute lowp vec2 a_blur_minmax;
+attribute lowp vec2 a_blur;
 varying lowp float blur;
 uniform lowp float a_opacity_t;
-attribute lowp vec2 a_opacity_minmax;
+attribute lowp vec2 a_opacity;
 varying lowp float opacity;
 uniform lowp float a_gapwidth_t;
-attribute mediump vec2 a_gapwidth_minmax;
+attribute mediump vec2 a_gapwidth;
 varying mediump float gapwidth;
 uniform lowp float a_offset_t;
-attribute lowp vec2 a_offset_minmax;
+attribute lowp vec2 a_offset;
 varying lowp float offset;
 
 void main() {
-    color = unpack_mix_vec4(a_color_minmax, a_color_t);
-    blur = unpack_mix_vec2(a_blur_minmax, a_blur_t);
-    opacity = unpack_mix_vec2(a_opacity_minmax, a_opacity_t);
-    gapwidth = unpack_mix_vec2(a_gapwidth_minmax, a_gapwidth_t);
-    offset = unpack_mix_vec2(a_offset_minmax, a_offset_t);
+    color = unpack_mix_vec4(a_color, a_color_t);
+    blur = unpack_mix_vec2(a_blur, a_blur_t);
+    opacity = unpack_mix_vec2(a_opacity, a_opacity_t);
+    gapwidth = unpack_mix_vec2(a_gapwidth, a_gapwidth_t);
+    offset = unpack_mix_vec2(a_offset, a_offset_t);
 
     vec2 a_extrude = a_data.xy - 128.0;
     float a_direction = mod(a_data.z, 4.0) - 1.0;

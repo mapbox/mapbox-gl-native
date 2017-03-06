@@ -21,7 +21,7 @@ public:
     using LayoutVertex = typename LayoutAttributes::Vertex;
 
     using PaintPropertyBinders = typename PaintProperties::Binders;
-    using PaintAttributes = typename PaintPropertyBinders::MinMaxAttributes;
+    using PaintAttributes = typename PaintPropertyBinders::Attributes;
     using Attributes = gl::ConcatenateAttributes<LayoutAttributes, PaintAttributes>;
 
     using UniformValues = typename Uniforms::Values;

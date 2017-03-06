@@ -29,11 +29,11 @@ struct a_offset : gl::Attribute<int16_t, N> {
 // Paint attributes
 
 template <class Attr>
-struct MinMax : gl::Attribute<typename Attr::ValueType, Attr::Dimensions * 2> {
+struct ZoomInterpolatedAttribute : gl::Attribute<typename Attr::ValueType, Attr::Dimensions * 2> {
     using Value = typename gl::Attribute<typename Attr::ValueType, Attr::Dimensions * 2>::Value;
 
     static auto name() {
-        static const std::string name = Attr::name() + std::string("_minmax");
+        static const std::string name = Attr::name();
         return name.c_str();
     }
     

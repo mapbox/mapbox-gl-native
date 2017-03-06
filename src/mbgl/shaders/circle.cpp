@@ -94,38 +94,38 @@ uniform vec2 u_extrude_scale;
 attribute vec2 a_pos;
 
 uniform lowp float a_color_t;
-attribute lowp vec4 a_color_minmax;
+attribute lowp vec4 a_color;
 varying lowp vec4 color;
 uniform lowp float a_radius_t;
-attribute mediump vec2 a_radius_minmax;
+attribute mediump vec2 a_radius;
 varying mediump float radius;
 uniform lowp float a_blur_t;
-attribute lowp vec2 a_blur_minmax;
+attribute lowp vec2 a_blur;
 varying lowp float blur;
 uniform lowp float a_opacity_t;
-attribute lowp vec2 a_opacity_minmax;
+attribute lowp vec2 a_opacity;
 varying lowp float opacity;
 uniform lowp float a_stroke_color_t;
-attribute lowp vec4 a_stroke_color_minmax;
+attribute lowp vec4 a_stroke_color;
 varying lowp vec4 stroke_color;
 uniform lowp float a_stroke_width_t;
-attribute mediump vec2 a_stroke_width_minmax;
+attribute mediump vec2 a_stroke_width;
 varying mediump float stroke_width;
 uniform lowp float a_stroke_opacity_t;
-attribute lowp vec2 a_stroke_opacity_minmax;
+attribute lowp vec2 a_stroke_opacity;
 varying lowp float stroke_opacity;
 
 varying vec2 v_extrude;
 varying lowp float v_antialiasblur;
 
 void main(void) {
-    color = unpack_mix_vec4(a_color_minmax, a_color_t);
-    radius = unpack_mix_vec2(a_radius_minmax, a_radius_t);
-    blur = unpack_mix_vec2(a_blur_minmax, a_blur_t);
-    opacity = unpack_mix_vec2(a_opacity_minmax, a_opacity_t);
-    stroke_color = unpack_mix_vec4(a_stroke_color_minmax, a_stroke_color_t);
-    stroke_width = unpack_mix_vec2(a_stroke_width_minmax, a_stroke_width_t);
-    stroke_opacity = unpack_mix_vec2(a_stroke_opacity_minmax, a_stroke_opacity_t);
+    color = unpack_mix_vec4(a_color, a_color_t);
+    radius = unpack_mix_vec2(a_radius, a_radius_t);
+    blur = unpack_mix_vec2(a_blur, a_blur_t);
+    opacity = unpack_mix_vec2(a_opacity, a_opacity_t);
+    stroke_color = unpack_mix_vec4(a_stroke_color, a_stroke_color_t);
+    stroke_width = unpack_mix_vec2(a_stroke_width, a_stroke_width_t);
+    stroke_opacity = unpack_mix_vec2(a_stroke_opacity, a_stroke_opacity_t);
 
     // unencode the extrusion vector that we snuck into the a_pos vector
     v_extrude = vec2(mod(a_pos, 2.0) * 2.0 - 1.0);

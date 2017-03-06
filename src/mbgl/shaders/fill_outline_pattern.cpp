@@ -104,11 +104,11 @@ varying vec2 v_pos_b;
 varying vec2 v_pos;
 
 uniform lowp float a_opacity_t;
-attribute lowp vec2 a_opacity_minmax;
+attribute lowp vec2 a_opacity;
 varying lowp float opacity;
 
 void main() {
-    opacity = unpack_mix_vec2(a_opacity_minmax, a_opacity_t);
+    opacity = unpack_mix_vec2(a_opacity, a_opacity_t);
 
     gl_Position = u_matrix * vec4(a_pos, 0, 1);
 
