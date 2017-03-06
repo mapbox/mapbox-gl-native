@@ -267,7 +267,7 @@ namespace mbgl {
     MGLTransition transition;
     [transitionValue getValue:&transition];
 
-    mbgl::style::TransitionOptions options { { MGLDurationInSecondsFromTimeInterval(transition.duration) }, { MGLDurationInSecondsFromTimeInterval(transition.delay) } };
+    mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
     self.rawLayer->set<%- camelize(originalPropertyName(property)) %>Transition(options);
 }
 
@@ -300,8 +300,8 @@ namespace mbgl {
 
     mbgl::style::TransitionOptions transitionOptions = self.rawLayer->get<%- camelize(originalPropertyName(property)) %>Transition();
     MGLTransition transition;
-    transition.duration = MGLTimeIntervalFromDurationInSeconds(transitionOptions.duration.value_or(mbgl::Duration::zero()));
-    transition.delay = MGLTimeIntervalFromDurationInSeconds(transitionOptions.delay.value_or(mbgl::Duration::zero()));
+    transition.duration = MGLTimeIntervalFromDuration(transitionOptions.duration.value_or(mbgl::Duration::zero()));
+    transition.delay = MGLTimeIntervalFromDuration(transitionOptions.delay.value_or(mbgl::Duration::zero()));
 
     NSValue *transitionValue = [NSValue value:&transition withObjCType:@encode(MGLTransition)];
     return transitionValue;

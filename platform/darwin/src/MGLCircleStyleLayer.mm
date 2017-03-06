@@ -168,7 +168,7 @@ namespace mbgl {
     MGLTransition transition;
     [transitionValue getValue:&transition];
 
-    mbgl::style::TransitionOptions options { { MGLDurationInSecondsFromTimeInterval(transition.duration) }, { MGLDurationInSecondsFromTimeInterval(transition.delay) } };
+    mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
     self.rawLayer->setCircleBlurTransition(options);
 }
 
@@ -187,8 +187,8 @@ namespace mbgl {
 
     mbgl::style::TransitionOptions transitionOptions = self.rawLayer->getCircleBlurTransition();
     MGLTransition transition;
-    transition.duration = MGLTimeIntervalFromDurationInSeconds(transitionOptions.duration.value_or(mbgl::Duration::zero()));
-    transition.delay = MGLTimeIntervalFromDurationInSeconds(transitionOptions.delay.value_or(mbgl::Duration::zero()));
+    transition.duration = MGLTimeIntervalFromDuration(transitionOptions.duration.value_or(mbgl::Duration::zero()));
+    transition.delay = MGLTimeIntervalFromDuration(transitionOptions.delay.value_or(mbgl::Duration::zero()));
 
     NSValue *transitionValue = [NSValue value:&transition withObjCType:@encode(MGLTransition)];
     return transitionValue;
@@ -207,7 +207,7 @@ namespace mbgl {
     MGLTransition transition;
     [transitionValue getValue:&transition];
 
-    mbgl::style::TransitionOptions options { { MGLDurationInSecondsFromTimeInterval(transition.duration) }, { MGLDurationInSecondsFromTimeInterval(transition.delay) } };
+    mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
     self.rawLayer->setCircleColorTransition(options);
 }
 
@@ -226,8 +226,8 @@ namespace mbgl {
 
     mbgl::style::TransitionOptions transitionOptions = self.rawLayer->getCircleColorTransition();
     MGLTransition transition;
-    transition.duration = MGLTimeIntervalFromDurationInSeconds(transitionOptions.duration.value_or(mbgl::Duration::zero()));
-    transition.delay = MGLTimeIntervalFromDurationInSeconds(transitionOptions.delay.value_or(mbgl::Duration::zero()));
+    transition.duration = MGLTimeIntervalFromDuration(transitionOptions.duration.value_or(mbgl::Duration::zero()));
+    transition.delay = MGLTimeIntervalFromDuration(transitionOptions.delay.value_or(mbgl::Duration::zero()));
 
     NSValue *transitionValue = [NSValue value:&transition withObjCType:@encode(MGLTransition)];
     return transitionValue;
@@ -246,7 +246,7 @@ namespace mbgl {
     MGLTransition transition;
     [transitionValue getValue:&transition];
 
-    mbgl::style::TransitionOptions options { { MGLDurationInSecondsFromTimeInterval(transition.duration) }, { MGLDurationInSecondsFromTimeInterval(transition.delay) } };
+    mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
     self.rawLayer->setCircleOpacityTransition(options);
 }
 
@@ -265,8 +265,8 @@ namespace mbgl {
 
     mbgl::style::TransitionOptions transitionOptions = self.rawLayer->getCircleOpacityTransition();
     MGLTransition transition;
-    transition.duration = MGLTimeIntervalFromDurationInSeconds(transitionOptions.duration.value_or(mbgl::Duration::zero()));
-    transition.delay = MGLTimeIntervalFromDurationInSeconds(transitionOptions.delay.value_or(mbgl::Duration::zero()));
+    transition.duration = MGLTimeIntervalFromDuration(transitionOptions.duration.value_or(mbgl::Duration::zero()));
+    transition.delay = MGLTimeIntervalFromDuration(transitionOptions.delay.value_or(mbgl::Duration::zero()));
 
     NSValue *transitionValue = [NSValue value:&transition withObjCType:@encode(MGLTransition)];
     return transitionValue;
@@ -285,7 +285,7 @@ namespace mbgl {
     MGLTransition transition;
     [transitionValue getValue:&transition];
 
-    mbgl::style::TransitionOptions options { { MGLDurationInSecondsFromTimeInterval(transition.duration) }, { MGLDurationInSecondsFromTimeInterval(transition.delay) } };
+    mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
     self.rawLayer->setCircleRadiusTransition(options);
 }
 
@@ -304,8 +304,8 @@ namespace mbgl {
 
     mbgl::style::TransitionOptions transitionOptions = self.rawLayer->getCircleRadiusTransition();
     MGLTransition transition;
-    transition.duration = MGLTimeIntervalFromDurationInSeconds(transitionOptions.duration.value_or(mbgl::Duration::zero()));
-    transition.delay = MGLTimeIntervalFromDurationInSeconds(transitionOptions.delay.value_or(mbgl::Duration::zero()));
+    transition.duration = MGLTimeIntervalFromDuration(transitionOptions.duration.value_or(mbgl::Duration::zero()));
+    transition.delay = MGLTimeIntervalFromDuration(transitionOptions.delay.value_or(mbgl::Duration::zero()));
 
     NSValue *transitionValue = [NSValue value:&transition withObjCType:@encode(MGLTransition)];
     return transitionValue;
@@ -324,7 +324,7 @@ namespace mbgl {
     MGLTransition transition;
     [transitionValue getValue:&transition];
 
-    mbgl::style::TransitionOptions options { { MGLDurationInSecondsFromTimeInterval(transition.duration) }, { MGLDurationInSecondsFromTimeInterval(transition.delay) } };
+    mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
     self.rawLayer->setCirclePitchScaleTransition(options);
 }
 
@@ -343,8 +343,8 @@ namespace mbgl {
 
     mbgl::style::TransitionOptions transitionOptions = self.rawLayer->getCirclePitchScaleTransition();
     MGLTransition transition;
-    transition.duration = MGLTimeIntervalFromDurationInSeconds(transitionOptions.duration.value_or(mbgl::Duration::zero()));
-    transition.delay = MGLTimeIntervalFromDurationInSeconds(transitionOptions.delay.value_or(mbgl::Duration::zero()));
+    transition.duration = MGLTimeIntervalFromDuration(transitionOptions.duration.value_or(mbgl::Duration::zero()));
+    transition.delay = MGLTimeIntervalFromDuration(transitionOptions.delay.value_or(mbgl::Duration::zero()));
 
     NSValue *transitionValue = [NSValue value:&transition withObjCType:@encode(MGLTransition)];
     return transitionValue;
@@ -374,7 +374,7 @@ namespace mbgl {
     MGLTransition transition;
     [transitionValue getValue:&transition];
 
-    mbgl::style::TransitionOptions options { { MGLDurationInSecondsFromTimeInterval(transition.duration) }, { MGLDurationInSecondsFromTimeInterval(transition.delay) } };
+    mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
     self.rawLayer->setCircleStrokeColorTransition(options);
 }
 
@@ -393,8 +393,8 @@ namespace mbgl {
 
     mbgl::style::TransitionOptions transitionOptions = self.rawLayer->getCircleStrokeColorTransition();
     MGLTransition transition;
-    transition.duration = MGLTimeIntervalFromDurationInSeconds(transitionOptions.duration.value_or(mbgl::Duration::zero()));
-    transition.delay = MGLTimeIntervalFromDurationInSeconds(transitionOptions.delay.value_or(mbgl::Duration::zero()));
+    transition.duration = MGLTimeIntervalFromDuration(transitionOptions.duration.value_or(mbgl::Duration::zero()));
+    transition.delay = MGLTimeIntervalFromDuration(transitionOptions.delay.value_or(mbgl::Duration::zero()));
 
     NSValue *transitionValue = [NSValue value:&transition withObjCType:@encode(MGLTransition)];
     return transitionValue;
@@ -413,7 +413,7 @@ namespace mbgl {
     MGLTransition transition;
     [transitionValue getValue:&transition];
 
-    mbgl::style::TransitionOptions options { { MGLDurationInSecondsFromTimeInterval(transition.duration) }, { MGLDurationInSecondsFromTimeInterval(transition.delay) } };
+    mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
     self.rawLayer->setCircleStrokeOpacityTransition(options);
 }
 
@@ -432,8 +432,8 @@ namespace mbgl {
 
     mbgl::style::TransitionOptions transitionOptions = self.rawLayer->getCircleStrokeOpacityTransition();
     MGLTransition transition;
-    transition.duration = MGLTimeIntervalFromDurationInSeconds(transitionOptions.duration.value_or(mbgl::Duration::zero()));
-    transition.delay = MGLTimeIntervalFromDurationInSeconds(transitionOptions.delay.value_or(mbgl::Duration::zero()));
+    transition.duration = MGLTimeIntervalFromDuration(transitionOptions.duration.value_or(mbgl::Duration::zero()));
+    transition.delay = MGLTimeIntervalFromDuration(transitionOptions.delay.value_or(mbgl::Duration::zero()));
 
     NSValue *transitionValue = [NSValue value:&transition withObjCType:@encode(MGLTransition)];
     return transitionValue;
@@ -452,7 +452,7 @@ namespace mbgl {
     MGLTransition transition;
     [transitionValue getValue:&transition];
 
-    mbgl::style::TransitionOptions options { { MGLDurationInSecondsFromTimeInterval(transition.duration) }, { MGLDurationInSecondsFromTimeInterval(transition.delay) } };
+    mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
     self.rawLayer->setCircleStrokeWidthTransition(options);
 }
 
@@ -471,8 +471,8 @@ namespace mbgl {
 
     mbgl::style::TransitionOptions transitionOptions = self.rawLayer->getCircleStrokeWidthTransition();
     MGLTransition transition;
-    transition.duration = MGLTimeIntervalFromDurationInSeconds(transitionOptions.duration.value_or(mbgl::Duration::zero()));
-    transition.delay = MGLTimeIntervalFromDurationInSeconds(transitionOptions.delay.value_or(mbgl::Duration::zero()));
+    transition.duration = MGLTimeIntervalFromDuration(transitionOptions.duration.value_or(mbgl::Duration::zero()));
+    transition.delay = MGLTimeIntervalFromDuration(transitionOptions.delay.value_or(mbgl::Duration::zero()));
 
     NSValue *transitionValue = [NSValue value:&transition withObjCType:@encode(MGLTransition)];
     return transitionValue;
@@ -491,7 +491,7 @@ namespace mbgl {
     MGLTransition transition;
     [transitionValue getValue:&transition];
 
-    mbgl::style::TransitionOptions options { { MGLDurationInSecondsFromTimeInterval(transition.duration) }, { MGLDurationInSecondsFromTimeInterval(transition.delay) } };
+    mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
     self.rawLayer->setCircleTranslateTransition(options);
 }
 
@@ -510,8 +510,8 @@ namespace mbgl {
 
     mbgl::style::TransitionOptions transitionOptions = self.rawLayer->getCircleTranslateTransition();
     MGLTransition transition;
-    transition.duration = MGLTimeIntervalFromDurationInSeconds(transitionOptions.duration.value_or(mbgl::Duration::zero()));
-    transition.delay = MGLTimeIntervalFromDurationInSeconds(transitionOptions.delay.value_or(mbgl::Duration::zero()));
+    transition.duration = MGLTimeIntervalFromDuration(transitionOptions.duration.value_or(mbgl::Duration::zero()));
+    transition.delay = MGLTimeIntervalFromDuration(transitionOptions.delay.value_or(mbgl::Duration::zero()));
 
     NSValue *transitionValue = [NSValue value:&transition withObjCType:@encode(MGLTransition)];
     return transitionValue;
@@ -541,7 +541,7 @@ namespace mbgl {
     MGLTransition transition;
     [transitionValue getValue:&transition];
 
-    mbgl::style::TransitionOptions options { { MGLDurationInSecondsFromTimeInterval(transition.duration) }, { MGLDurationInSecondsFromTimeInterval(transition.delay) } };
+    mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
     self.rawLayer->setCircleTranslateAnchorTransition(options);
 }
 
@@ -560,8 +560,8 @@ namespace mbgl {
 
     mbgl::style::TransitionOptions transitionOptions = self.rawLayer->getCircleTranslateAnchorTransition();
     MGLTransition transition;
-    transition.duration = MGLTimeIntervalFromDurationInSeconds(transitionOptions.duration.value_or(mbgl::Duration::zero()));
-    transition.delay = MGLTimeIntervalFromDurationInSeconds(transitionOptions.delay.value_or(mbgl::Duration::zero()));
+    transition.duration = MGLTimeIntervalFromDuration(transitionOptions.duration.value_or(mbgl::Duration::zero()));
+    transition.delay = MGLTimeIntervalFromDuration(transitionOptions.delay.value_or(mbgl::Duration::zero()));
 
     NSValue *transitionValue = [NSValue value:&transition withObjCType:@encode(MGLTransition)];
     return transitionValue;

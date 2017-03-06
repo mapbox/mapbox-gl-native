@@ -122,7 +122,7 @@
     MGLTransition transition;
     [transitionValue getValue:&transition];
 
-    mbgl::style::TransitionOptions options { { MGLDurationInSecondsFromTimeInterval(transition.duration) }, { MGLDurationInSecondsFromTimeInterval(transition.delay) } };
+    mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
     self.rawLayer->setRasterBrightnessMaxTransition(options);
 }
 
@@ -141,8 +141,8 @@
 
     mbgl::style::TransitionOptions transitionOptions = self.rawLayer->getRasterBrightnessMaxTransition();
     MGLTransition transition;
-    transition.duration = MGLTimeIntervalFromDurationInSeconds(transitionOptions.duration.value_or(mbgl::Duration::zero()));
-    transition.delay = MGLTimeIntervalFromDurationInSeconds(transitionOptions.delay.value_or(mbgl::Duration::zero()));
+    transition.duration = MGLTimeIntervalFromDuration(transitionOptions.duration.value_or(mbgl::Duration::zero()));
+    transition.delay = MGLTimeIntervalFromDuration(transitionOptions.delay.value_or(mbgl::Duration::zero()));
 
     NSValue *transitionValue = [NSValue value:&transition withObjCType:@encode(MGLTransition)];
     return transitionValue;
@@ -172,7 +172,7 @@
     MGLTransition transition;
     [transitionValue getValue:&transition];
 
-    mbgl::style::TransitionOptions options { { MGLDurationInSecondsFromTimeInterval(transition.duration) }, { MGLDurationInSecondsFromTimeInterval(transition.delay) } };
+    mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
     self.rawLayer->setRasterBrightnessMinTransition(options);
 }
 
@@ -191,8 +191,8 @@
 
     mbgl::style::TransitionOptions transitionOptions = self.rawLayer->getRasterBrightnessMinTransition();
     MGLTransition transition;
-    transition.duration = MGLTimeIntervalFromDurationInSeconds(transitionOptions.duration.value_or(mbgl::Duration::zero()));
-    transition.delay = MGLTimeIntervalFromDurationInSeconds(transitionOptions.delay.value_or(mbgl::Duration::zero()));
+    transition.duration = MGLTimeIntervalFromDuration(transitionOptions.duration.value_or(mbgl::Duration::zero()));
+    transition.delay = MGLTimeIntervalFromDuration(transitionOptions.delay.value_or(mbgl::Duration::zero()));
 
     NSValue *transitionValue = [NSValue value:&transition withObjCType:@encode(MGLTransition)];
     return transitionValue;
@@ -222,7 +222,7 @@
     MGLTransition transition;
     [transitionValue getValue:&transition];
 
-    mbgl::style::TransitionOptions options { { MGLDurationInSecondsFromTimeInterval(transition.duration) }, { MGLDurationInSecondsFromTimeInterval(transition.delay) } };
+    mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
     self.rawLayer->setRasterContrastTransition(options);
 }
 
@@ -241,8 +241,8 @@
 
     mbgl::style::TransitionOptions transitionOptions = self.rawLayer->getRasterContrastTransition();
     MGLTransition transition;
-    transition.duration = MGLTimeIntervalFromDurationInSeconds(transitionOptions.duration.value_or(mbgl::Duration::zero()));
-    transition.delay = MGLTimeIntervalFromDurationInSeconds(transitionOptions.delay.value_or(mbgl::Duration::zero()));
+    transition.duration = MGLTimeIntervalFromDuration(transitionOptions.duration.value_or(mbgl::Duration::zero()));
+    transition.delay = MGLTimeIntervalFromDuration(transitionOptions.delay.value_or(mbgl::Duration::zero()));
 
     NSValue *transitionValue = [NSValue value:&transition withObjCType:@encode(MGLTransition)];
     return transitionValue;
@@ -261,7 +261,7 @@
     MGLTransition transition;
     [transitionValue getValue:&transition];
 
-    mbgl::style::TransitionOptions options { { MGLDurationInSecondsFromTimeInterval(transition.duration) }, { MGLDurationInSecondsFromTimeInterval(transition.delay) } };
+    mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
     self.rawLayer->setRasterFadeDurationTransition(options);
 }
 
@@ -280,8 +280,8 @@
 
     mbgl::style::TransitionOptions transitionOptions = self.rawLayer->getRasterFadeDurationTransition();
     MGLTransition transition;
-    transition.duration = MGLTimeIntervalFromDurationInSeconds(transitionOptions.duration.value_or(mbgl::Duration::zero()));
-    transition.delay = MGLTimeIntervalFromDurationInSeconds(transitionOptions.delay.value_or(mbgl::Duration::zero()));
+    transition.duration = MGLTimeIntervalFromDuration(transitionOptions.duration.value_or(mbgl::Duration::zero()));
+    transition.delay = MGLTimeIntervalFromDuration(transitionOptions.delay.value_or(mbgl::Duration::zero()));
 
     NSValue *transitionValue = [NSValue value:&transition withObjCType:@encode(MGLTransition)];
     return transitionValue;
@@ -300,7 +300,7 @@
     MGLTransition transition;
     [transitionValue getValue:&transition];
 
-    mbgl::style::TransitionOptions options { { MGLDurationInSecondsFromTimeInterval(transition.duration) }, { MGLDurationInSecondsFromTimeInterval(transition.delay) } };
+    mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
     self.rawLayer->setRasterHueRotateTransition(options);
 }
 
@@ -319,8 +319,8 @@
 
     mbgl::style::TransitionOptions transitionOptions = self.rawLayer->getRasterHueRotateTransition();
     MGLTransition transition;
-    transition.duration = MGLTimeIntervalFromDurationInSeconds(transitionOptions.duration.value_or(mbgl::Duration::zero()));
-    transition.delay = MGLTimeIntervalFromDurationInSeconds(transitionOptions.delay.value_or(mbgl::Duration::zero()));
+    transition.duration = MGLTimeIntervalFromDuration(transitionOptions.duration.value_or(mbgl::Duration::zero()));
+    transition.delay = MGLTimeIntervalFromDuration(transitionOptions.delay.value_or(mbgl::Duration::zero()));
 
     NSValue *transitionValue = [NSValue value:&transition withObjCType:@encode(MGLTransition)];
     return transitionValue;
@@ -350,7 +350,7 @@
     MGLTransition transition;
     [transitionValue getValue:&transition];
 
-    mbgl::style::TransitionOptions options { { MGLDurationInSecondsFromTimeInterval(transition.duration) }, { MGLDurationInSecondsFromTimeInterval(transition.delay) } };
+    mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
     self.rawLayer->setRasterOpacityTransition(options);
 }
 
@@ -369,8 +369,8 @@
 
     mbgl::style::TransitionOptions transitionOptions = self.rawLayer->getRasterOpacityTransition();
     MGLTransition transition;
-    transition.duration = MGLTimeIntervalFromDurationInSeconds(transitionOptions.duration.value_or(mbgl::Duration::zero()));
-    transition.delay = MGLTimeIntervalFromDurationInSeconds(transitionOptions.delay.value_or(mbgl::Duration::zero()));
+    transition.duration = MGLTimeIntervalFromDuration(transitionOptions.duration.value_or(mbgl::Duration::zero()));
+    transition.delay = MGLTimeIntervalFromDuration(transitionOptions.delay.value_or(mbgl::Duration::zero()));
 
     NSValue *transitionValue = [NSValue value:&transition withObjCType:@encode(MGLTransition)];
     return transitionValue;
@@ -389,7 +389,7 @@
     MGLTransition transition;
     [transitionValue getValue:&transition];
 
-    mbgl::style::TransitionOptions options { { MGLDurationInSecondsFromTimeInterval(transition.duration) }, { MGLDurationInSecondsFromTimeInterval(transition.delay) } };
+    mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
     self.rawLayer->setRasterSaturationTransition(options);
 }
 
@@ -408,8 +408,8 @@
 
     mbgl::style::TransitionOptions transitionOptions = self.rawLayer->getRasterSaturationTransition();
     MGLTransition transition;
-    transition.duration = MGLTimeIntervalFromDurationInSeconds(transitionOptions.duration.value_or(mbgl::Duration::zero()));
-    transition.delay = MGLTimeIntervalFromDurationInSeconds(transitionOptions.delay.value_or(mbgl::Duration::zero()));
+    transition.duration = MGLTimeIntervalFromDuration(transitionOptions.duration.value_or(mbgl::Duration::zero()));
+    transition.delay = MGLTimeIntervalFromDuration(transitionOptions.delay.value_or(mbgl::Duration::zero()));
 
     NSValue *transitionValue = [NSValue value:&transition withObjCType:@encode(MGLTransition)];
     return transitionValue;

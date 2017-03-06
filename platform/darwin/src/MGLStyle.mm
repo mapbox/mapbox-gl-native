@@ -575,8 +575,8 @@ static NSURL *MGLStyleURL_emerald;
 - (void)setTransition:(MGLTransition)transition
 {
     auto transitionOptions = self.mapView.mbglMap->getTransitionOptions();
-    transitionOptions.duration = MGLDurationInSecondsFromTimeInterval(transition.duration);
-    transitionOptions.delay = MGLDurationInSecondsFromTimeInterval(transition.delay);
+    transitionOptions.duration = MGLDurationFromTimeInterval(transition.duration);
+    transitionOptions.delay = MGLDurationFromTimeInterval(transition.delay);
     
     self.mapView.mbglMap->setTransitionOptions(transitionOptions);
 }
@@ -586,8 +586,8 @@ static NSURL *MGLStyleURL_emerald;
     MGLTransition transition;
     const mbgl::style::TransitionOptions transitionOptions = self.mapView.mbglMap->getTransitionOptions();
 
-    transition.delay = MGLTimeIntervalFromDurationInSeconds(transitionOptions.delay.value_or(mbgl::Duration::zero()));
-    transition.duration = MGLTimeIntervalFromDurationInSeconds(transitionOptions.duration.value_or(mbgl::Duration::zero()));
+    transition.delay = MGLTimeIntervalFromDuration(transitionOptions.delay.value_or(mbgl::Duration::zero()));
+    transition.duration = MGLTimeIntervalFromDuration(transitionOptions.duration.value_or(mbgl::Duration::zero()));
     
     return transition;
 }

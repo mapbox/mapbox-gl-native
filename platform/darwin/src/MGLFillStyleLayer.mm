@@ -160,7 +160,7 @@ namespace mbgl {
     MGLTransition transition;
     [transitionValue getValue:&transition];
 
-    mbgl::style::TransitionOptions options { { MGLDurationInSecondsFromTimeInterval(transition.duration) }, { MGLDurationInSecondsFromTimeInterval(transition.delay) } };
+    mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
     self.rawLayer->setFillAntialiasTransition(options);
 }
 
@@ -179,8 +179,8 @@ namespace mbgl {
 
     mbgl::style::TransitionOptions transitionOptions = self.rawLayer->getFillAntialiasTransition();
     MGLTransition transition;
-    transition.duration = MGLTimeIntervalFromDurationInSeconds(transitionOptions.duration.value_or(mbgl::Duration::zero()));
-    transition.delay = MGLTimeIntervalFromDurationInSeconds(transitionOptions.delay.value_or(mbgl::Duration::zero()));
+    transition.duration = MGLTimeIntervalFromDuration(transitionOptions.duration.value_or(mbgl::Duration::zero()));
+    transition.delay = MGLTimeIntervalFromDuration(transitionOptions.delay.value_or(mbgl::Duration::zero()));
 
     NSValue *transitionValue = [NSValue value:&transition withObjCType:@encode(MGLTransition)];
     return transitionValue;
@@ -210,7 +210,7 @@ namespace mbgl {
     MGLTransition transition;
     [transitionValue getValue:&transition];
 
-    mbgl::style::TransitionOptions options { { MGLDurationInSecondsFromTimeInterval(transition.duration) }, { MGLDurationInSecondsFromTimeInterval(transition.delay) } };
+    mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
     self.rawLayer->setFillColorTransition(options);
 }
 
@@ -229,8 +229,8 @@ namespace mbgl {
 
     mbgl::style::TransitionOptions transitionOptions = self.rawLayer->getFillColorTransition();
     MGLTransition transition;
-    transition.duration = MGLTimeIntervalFromDurationInSeconds(transitionOptions.duration.value_or(mbgl::Duration::zero()));
-    transition.delay = MGLTimeIntervalFromDurationInSeconds(transitionOptions.delay.value_or(mbgl::Duration::zero()));
+    transition.duration = MGLTimeIntervalFromDuration(transitionOptions.duration.value_or(mbgl::Duration::zero()));
+    transition.delay = MGLTimeIntervalFromDuration(transitionOptions.delay.value_or(mbgl::Duration::zero()));
 
     NSValue *transitionValue = [NSValue value:&transition withObjCType:@encode(MGLTransition)];
     return transitionValue;
@@ -249,7 +249,7 @@ namespace mbgl {
     MGLTransition transition;
     [transitionValue getValue:&transition];
 
-    mbgl::style::TransitionOptions options { { MGLDurationInSecondsFromTimeInterval(transition.duration) }, { MGLDurationInSecondsFromTimeInterval(transition.delay) } };
+    mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
     self.rawLayer->setFillOpacityTransition(options);
 }
 
@@ -268,8 +268,8 @@ namespace mbgl {
 
     mbgl::style::TransitionOptions transitionOptions = self.rawLayer->getFillOpacityTransition();
     MGLTransition transition;
-    transition.duration = MGLTimeIntervalFromDurationInSeconds(transitionOptions.duration.value_or(mbgl::Duration::zero()));
-    transition.delay = MGLTimeIntervalFromDurationInSeconds(transitionOptions.delay.value_or(mbgl::Duration::zero()));
+    transition.duration = MGLTimeIntervalFromDuration(transitionOptions.duration.value_or(mbgl::Duration::zero()));
+    transition.delay = MGLTimeIntervalFromDuration(transitionOptions.delay.value_or(mbgl::Duration::zero()));
 
     NSValue *transitionValue = [NSValue value:&transition withObjCType:@encode(MGLTransition)];
     return transitionValue;
@@ -288,7 +288,7 @@ namespace mbgl {
     MGLTransition transition;
     [transitionValue getValue:&transition];
 
-    mbgl::style::TransitionOptions options { { MGLDurationInSecondsFromTimeInterval(transition.duration) }, { MGLDurationInSecondsFromTimeInterval(transition.delay) } };
+    mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
     self.rawLayer->setFillOutlineColorTransition(options);
 }
 
@@ -307,8 +307,8 @@ namespace mbgl {
 
     mbgl::style::TransitionOptions transitionOptions = self.rawLayer->getFillOutlineColorTransition();
     MGLTransition transition;
-    transition.duration = MGLTimeIntervalFromDurationInSeconds(transitionOptions.duration.value_or(mbgl::Duration::zero()));
-    transition.delay = MGLTimeIntervalFromDurationInSeconds(transitionOptions.delay.value_or(mbgl::Duration::zero()));
+    transition.duration = MGLTimeIntervalFromDuration(transitionOptions.duration.value_or(mbgl::Duration::zero()));
+    transition.delay = MGLTimeIntervalFromDuration(transitionOptions.delay.value_or(mbgl::Duration::zero()));
 
     NSValue *transitionValue = [NSValue value:&transition withObjCType:@encode(MGLTransition)];
     return transitionValue;
@@ -327,7 +327,7 @@ namespace mbgl {
     MGLTransition transition;
     [transitionValue getValue:&transition];
 
-    mbgl::style::TransitionOptions options { { MGLDurationInSecondsFromTimeInterval(transition.duration) }, { MGLDurationInSecondsFromTimeInterval(transition.delay) } };
+    mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
     self.rawLayer->setFillPatternTransition(options);
 }
 
@@ -346,8 +346,8 @@ namespace mbgl {
 
     mbgl::style::TransitionOptions transitionOptions = self.rawLayer->getFillPatternTransition();
     MGLTransition transition;
-    transition.duration = MGLTimeIntervalFromDurationInSeconds(transitionOptions.duration.value_or(mbgl::Duration::zero()));
-    transition.delay = MGLTimeIntervalFromDurationInSeconds(transitionOptions.delay.value_or(mbgl::Duration::zero()));
+    transition.duration = MGLTimeIntervalFromDuration(transitionOptions.duration.value_or(mbgl::Duration::zero()));
+    transition.delay = MGLTimeIntervalFromDuration(transitionOptions.delay.value_or(mbgl::Duration::zero()));
 
     NSValue *transitionValue = [NSValue value:&transition withObjCType:@encode(MGLTransition)];
     return transitionValue;
@@ -366,7 +366,7 @@ namespace mbgl {
     MGLTransition transition;
     [transitionValue getValue:&transition];
 
-    mbgl::style::TransitionOptions options { { MGLDurationInSecondsFromTimeInterval(transition.duration) }, { MGLDurationInSecondsFromTimeInterval(transition.delay) } };
+    mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
     self.rawLayer->setFillTranslateTransition(options);
 }
 
@@ -385,8 +385,8 @@ namespace mbgl {
 
     mbgl::style::TransitionOptions transitionOptions = self.rawLayer->getFillTranslateTransition();
     MGLTransition transition;
-    transition.duration = MGLTimeIntervalFromDurationInSeconds(transitionOptions.duration.value_or(mbgl::Duration::zero()));
-    transition.delay = MGLTimeIntervalFromDurationInSeconds(transitionOptions.delay.value_or(mbgl::Duration::zero()));
+    transition.duration = MGLTimeIntervalFromDuration(transitionOptions.duration.value_or(mbgl::Duration::zero()));
+    transition.delay = MGLTimeIntervalFromDuration(transitionOptions.delay.value_or(mbgl::Duration::zero()));
 
     NSValue *transitionValue = [NSValue value:&transition withObjCType:@encode(MGLTransition)];
     return transitionValue;
@@ -416,7 +416,7 @@ namespace mbgl {
     MGLTransition transition;
     [transitionValue getValue:&transition];
 
-    mbgl::style::TransitionOptions options { { MGLDurationInSecondsFromTimeInterval(transition.duration) }, { MGLDurationInSecondsFromTimeInterval(transition.delay) } };
+    mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
     self.rawLayer->setFillTranslateAnchorTransition(options);
 }
 
@@ -435,8 +435,8 @@ namespace mbgl {
 
     mbgl::style::TransitionOptions transitionOptions = self.rawLayer->getFillTranslateAnchorTransition();
     MGLTransition transition;
-    transition.duration = MGLTimeIntervalFromDurationInSeconds(transitionOptions.duration.value_or(mbgl::Duration::zero()));
-    transition.delay = MGLTimeIntervalFromDurationInSeconds(transitionOptions.delay.value_or(mbgl::Duration::zero()));
+    transition.duration = MGLTimeIntervalFromDuration(transitionOptions.duration.value_or(mbgl::Duration::zero()));
+    transition.delay = MGLTimeIntervalFromDuration(transitionOptions.delay.value_or(mbgl::Duration::zero()));
 
     NSValue *transitionValue = [NSValue value:&transition withObjCType:@encode(MGLTransition)];
     return transitionValue;
