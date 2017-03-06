@@ -5,6 +5,9 @@ add_library(mbgl-core STATIC
 target_compile_options(mbgl-core
     PRIVATE -fPIC
     PRIVATE -fvisibility-inlines-hidden
+    -Wno-misleading-indentation
+    -Wno-terminate
+    -Wno-error=terminate
 )
 
 target_include_directories(mbgl-core

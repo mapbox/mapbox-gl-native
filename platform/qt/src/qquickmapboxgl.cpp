@@ -5,20 +5,19 @@
 
 #include <mbgl/util/constants.hpp>
 
-#include <QDebug>
 #include <QQuickItem>
 #include <QRegularExpression>
 #include <QString>
 #include <QtGlobal>
 #include <QQmlListProperty>
 #include <QJSValue>
-#include <QDebug>
+
 namespace {
 
 static const QRegularExpression s_camelCase {"([a-z0-9])([A-Z])"};
 static const QStringList s_parameterTypes = QStringList()
-    << "style" << "paint" << "layout" << "layer" << "source" << "filter" << "image"
-    << "bearing" << "pitch";
+        << "style" << "paint" << "layout" << "layer" << "source" << "filter" << "image"
+        << "bearing" << "pitch";
 
 } // namespace
 
@@ -212,9 +211,9 @@ void QQuickMapboxGL::onMapChanged(QMapboxGL::MapChange change)
 bool QQuickMapboxGL::parseImage(QQuickMapboxGLMapParameter *param)
 {
     m_imageChanges << Image {
-        param->property("name").toString(),
-        QImage(param->property("sprite").toString())
-    };
+                      param->property("name").toString(),
+                      QImage(param->property("sprite").toString())
+};
     return true;
 }
 
@@ -256,12 +255,12 @@ bool QQuickMapboxGL::parseStyleProperty(QQuickMapboxGLMapParameter *param, const
     }
 
     m_stylePropertyChanges << QQuickMapboxGL::StyleProperty {
-        param->property("type").toString().at(0) == 'p' ? StyleProperty::Paint : StyleProperty::Layout,
-        param->property("layer").toString(),
-        formattedName,
-        value,
-        param->property("class").toString()
-    };
+                              param->property("type").toString().at(0) == 'p' ? StyleProperty::Paint : StyleProperty::Layout,
+                              param->property("layer").toString(),
+                              formattedName,
+                              value,
+                              param->property("class").toString()
+};
     return true;
 }
 
@@ -332,31 +331,53 @@ bool QQuickMapboxGL::parsePitch(QQuickMapboxGLMapParameter *param)
     if (m_pitch == angle) return false;
     m_pitch = angle;
     m_syncState |= PitchNeedsSync;
-    update();
+    batchUpdate();
     return true;
 }
+void QQuickMapboxGL::setBatchTimerInterval(qint32 timeInterval)
+{
+    if (m_updateTimeInterval > 0) { // kill old timer if running
+        killTimer(m_updateTimerID);
+        m_updateTimerID = -1;
+    }
+    m_updateTimeInterval = timeInterval;
+    if (m_updateTimeInterval > 0) // only start batch mode for interval > 0
+        m_updateTimerID = startTimer(m_updateTimeInterval);
+
+}
+void QQuickMapboxGL::setBatchSize(qint32 batchSize)
+{
+    m_maxUpdateCachedEvents = batchSize;
+}
+// We update if timer expires OR queue get to big - which ever comes first
 void QQuickMapboxGL::batchUpdate()
 {
-      m_numBatchUpdates++;
-      if (m_updateTimerID < 0) {
-         m_updateTimerID = startTimer(m_updateTimeIntrval);
-      } else if (m_numBatchUpdates > m_maxUpdateCachedEvents) {
-         update();
-         killTimer(m_updateTimerID);
-         m_updateTimerID = -1;
-         m_numBatchUpdates = 0;
-      }
+    if (m_updateTimeInterval < 1)  { // batch update turned off
+        update();
+    } else {
+        m_numBatchUpdates++;
+        if (m_updateTimerID < 0) {
+            m_updateTimerID = startTimer(m_updateTimeInterval);
+        } else if (m_numBatchUpdates > m_maxUpdateCachedEvents) {
+            update();
+            killTimer(m_updateTimerID);
+            m_updateTimerID = -1;
+            m_numBatchUpdates = 0;
+        }
+    }
 }
 
 void QQuickMapboxGL::timerEvent(QTimerEvent *te)
 {
-   update();
-   QObject::timerEvent(te);
-   if (te->timerId() == m_updateTimerID) {
-    killTimer(m_updateTimerID);
-    m_updateTimerID = -1;
-    m_numBatchUpdates = 0;
-   }
+    update();
+    QObject::timerEvent(te);
+    if (te->timerId() == m_updateTimerID) {
+        killTimer(m_updateTimerID);
+        m_updateTimerID = -1;
+        m_numBatchUpdates = 0;
+    }
+    // do we need this for other timers ?
+    // QObject::timerEvent(te);
 }
 
 void QQuickMapboxGL::processMapParameter(QQuickMapboxGLMapParameter *param)
@@ -483,9 +504,9 @@ void QQuickMapboxGL::clearParameter(QQmlListProperty<QQuickMapboxGLMapParameter>
 QQmlListProperty<QQuickMapboxGLMapParameter> QQuickMapboxGL::parameters()
 {
     return QQmlListProperty<QQuickMapboxGLMapParameter>(this,
-            nullptr,
-            appendParameter,
-            countParameters,
-            parameterAt,
-            clearParameter);
+                                                        nullptr,
+                                                        appendParameter,
+                                                        countParameters,
+                                                        parameterAt,
+                                                        clearParameter);
 }
