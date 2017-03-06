@@ -6,6 +6,10 @@ QT += network-private \
       gui-private \
       sql-private
 
+load(qt_build_paths)
+
+DESTDIR = $$MODULE_BASE_OUTDIR/lib
+
 CONFIG += c++14 exceptions static
 
 # Core Mapbox GL
