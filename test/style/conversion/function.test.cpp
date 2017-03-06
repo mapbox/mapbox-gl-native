@@ -13,7 +13,7 @@ using namespace mbgl::style::conversion;
 auto parseFunction(const std::string& src) {
     JSDocument doc;
     doc.Parse<0>(src);
-    return convert<CameraFunction<float>>(doc);
+    return convert<CameraFunction<float>, JSValue>(doc);
 }
 
 TEST(StyleConversion, Function) {

@@ -24,7 +24,7 @@ Tileset TileSourceImpl::parseTileJSON(const std::string& json, const std::string
         throw std::runtime_error(message.str());
     }
 
-    conversion::Result<Tileset> result = conversion::convert<Tileset>(document);
+    conversion::Result<Tileset> result = conversion::convert<Tileset, JSValue>(document);
     if (!result) {
         throw std::runtime_error(result.error().message);
     }
