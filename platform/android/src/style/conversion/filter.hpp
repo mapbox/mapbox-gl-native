@@ -1,0 +1,31 @@
+#pragma once
+
+#include "../android_conversion.hpp"
+#include <mbgl/style/conversion.hpp>
+#include <mbgl/style/conversion/filter.hpp>
+
+#include <jni/jni.hpp>
+
+#include <tuple>
+#include <map>
+
+namespace mbgl {
+namespace android {
+namespace conversion {
+
+inline optional<mbgl::style::Filter> toFilter(jni::JNIEnv& env, jni::Array<jni::Object<>> jfilter) {
+    mbgl::optional<mbgl::style::Filter> filter;
+    if (jfilter) {
+      Value filterValue(env, jfilter);
+      auto converted = mbgl::style::conversion::convert<mbgl::style::Filter>(filterValue);
+      if (!converted) {
+          mbgl::Log::Error(mbgl::Event::JNI, "Error converting filter: " + converted.error().message);
+      }
+      filter = std::move(*converted);
+    }
+    return filter;
+}
+
+} // namespace conversion
+} // namespace android
+} // namespace mbgl

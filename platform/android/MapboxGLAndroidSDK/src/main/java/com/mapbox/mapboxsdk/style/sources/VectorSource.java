@@ -1,12 +1,24 @@
 package com.mapbox.mapboxsdk.style.sources;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.annotation.Size;
+import android.support.annotation.UiThread;
+
+import com.mapbox.mapboxsdk.style.layers.Filter;
+import com.mapbox.services.commons.geojson.Feature;
+
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Vector source enables the use of vector tiles.
  *
  * @see <a href="https://www.mapbox.com/mapbox-gl-style-spec/#sources-vector">the style specification</a>
  */
+@UiThread
 public class VectorSource extends Source {
 
   /**
@@ -48,8 +60,28 @@ public class VectorSource extends Source {
     initialize(id, tileSet.toValueObject());
   }
 
+  /**
+   * Queries the source for features.
+   *
+   * @param sourceLayerIds the source layer identifiers. At least one must be specified.
+   * @param filter         an optional filter statement to filter the returned Features
+   * @return the features
+   */
+  @NonNull
+  public List<Feature> querySourceFeatures(@Size(min = 1) String[] sourceLayerIds,
+                                           @Nullable Filter.Statement filter) {
+    Feature[] features = querySourceFeatures(
+      sourceLayerIds,
+      filter != null ? filter.toArray() : null);
+    return features != null ? Arrays.asList(features) : new ArrayList<Feature>();
+  }
+
   protected native void initialize(String layerId, Object payload);
 
   @Override
   protected native void finalize() throws Throwable;
+
+  private native Feature[] querySourceFeatures(String[] sourceLayerId,
+                                               Object[] filter);
+
 }

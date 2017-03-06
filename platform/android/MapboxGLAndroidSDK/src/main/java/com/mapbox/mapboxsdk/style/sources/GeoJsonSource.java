@@ -1,17 +1,25 @@
 package com.mapbox.mapboxsdk.style.sources;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.annotation.UiThread;
+
+import com.mapbox.mapboxsdk.style.layers.Filter;
 import com.mapbox.services.commons.geojson.Feature;
 import com.mapbox.services.commons.geojson.FeatureCollection;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * A GeoJson source. Exposes a {@link FeatureCollection} from Json.
  *
  * @see <a href="https://www.mapbox.com/mapbox-gl-style-spec/#sources-geojson">the style specification</a>
  */
+@UiThread
 public class GeoJsonSource extends Source {
 
   /**
@@ -159,6 +167,18 @@ public class GeoJsonSource extends Source {
     nativeSetUrl(url);
   }
 
+  /**
+   * Queries the source for features.
+   *
+   * @param filter an optional filter statement to filter the returned Features
+   * @return the features
+   */
+  @NonNull
+  public List<Feature> querySourceFeatures(@Nullable Filter.Statement filter) {
+    Feature[] features = querySourceFeatures(filter != null ? filter.toArray() : null);
+    return features != null ? Arrays.asList(features) : new ArrayList<Feature>();
+  }
+
   protected void setRawJson(String geoJson) {
     // Wrap the String in a map as an Object is expected by the
     // style conversion template
@@ -172,6 +192,8 @@ public class GeoJsonSource extends Source {
   protected native void nativeSetUrl(String url);
 
   private native void nativeSetGeoJson(Object geoJson);
+
+  private native Feature[] querySourceFeatures(Object[] filter);
 
   @Override
   protected native void finalize() throws Throwable;
