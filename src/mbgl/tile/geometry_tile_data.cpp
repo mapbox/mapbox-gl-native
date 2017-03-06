@@ -1,7 +1,7 @@
 #include <mbgl/tile/geometry_tile_data.hpp>
 #include <mbgl/tile/tile_id.hpp>
 
-#include <clipper/clipper.hpp>
+#include <mapbox/geometry/wagyu/wagyu.hpp>
 
 namespace mbgl {
 
@@ -17,8 +17,8 @@ static double signedArea(const GeometryCoordinates& ring) {
     return sum;
 }
 
-static ClipperLib::Path toClipperPath(const GeometryCoordinates& ring) {
-    ClipperLib::Path result;
+static LinearRing<std::int32_t> toWagyuPath(const GeometryCoordinates& ring) {
+    LinearRing<std::int32_t> result;
     result.reserve(ring.size());
     for (const auto& p : ring) {
         result.emplace_back(p.x, p.y);
@@ -26,62 +26,84 @@ static ClipperLib::Path toClipperPath(const GeometryCoordinates& ring) {
     return result;
 }
 
-static GeometryCoordinates fromClipperPath(const ClipperLib::Path& path) {
-    GeometryCoordinates result;
-    result.reserve(path.size() + 1);
-
-    for (const auto& p : path) {
-        using Coordinate = GeometryCoordinates::coordinate_type;
-        assert(p.x >= std::numeric_limits<Coordinate>::min());
-        assert(p.x <= std::numeric_limits<Coordinate>::max());
-        assert(p.y >= std::numeric_limits<Coordinate>::min());
-        assert(p.y <= std::numeric_limits<Coordinate>::max());
-        result.emplace_back(Coordinate(p.x), Coordinate(p.y));
-    }
-
-    // Clipper does not repeat initial point, but our geometry model requires it.
-    if (!result.empty()) {
-        result.push_back(result.front());
-    }
-
-    return result;
+static void pushWagyuRing(GeometryCollection & solution,
+                          mapbox::geometry::wagyu::ring_ptr<std::int32_t> r) {
+    GeometryCoordinates lr;
+    lr.reserve(r->size() + 1);
+    auto firstPt = r->points;
+    auto ptIt = r->points;
+    do {
+        lr.emplace_back(ptIt->x, ptIt->y);
+        ptIt = ptIt->prev;
+    } while (ptIt != firstPt);
+    lr.emplace_back(firstPt->x, firstPt->y); // close the ring
+    solution.push_back(lr);
 }
 
-static void processPolynodeBranch(ClipperLib::PolyNode* polynode, GeometryCollection& rings) {
-    // Exterior ring.
-    rings.push_back(fromClipperPath(polynode->Contour));
-    assert(signedArea(rings.back()) > 0);
-
-    // Interior rings.
-    for (auto * ring : polynode->Childs) {
-        rings.push_back(fromClipperPath(ring->Contour));
-        assert(signedArea(rings.back()) < 0);
-    }
-
-    // PolyNodes may be nested in the case of a polygon inside a hole.
-    for (auto * ring : polynode->Childs) {
-        for (auto * subRing : ring->Childs) {
-            processPolynodeBranch(subRing, rings);
+static void buildWagyuResults(GeometryCollection & solution,
+                              mapbox::geometry::wagyu::ring_vector<std::int32_t>& rings) {
+    for (auto r : rings) {
+        if (r == nullptr) {
+            continue;
+        }
+        assert(r->points);
+        if (r->size() < 3) {
+            continue;
+        }
+        solution.emplace_back();
+        pushWagyuRing(solution, r);
+        for (auto c : r->children) {
+            if (c == nullptr) {
+                continue;
+            }
+            assert(c->points);
+            if (c->size() < 3) {
+                continue;
+            }
+            pushWagyuRing(solution, c);
+        }
+        for (auto c : r->children) {
+            if (c == nullptr) {
+                continue;
+            }
+            if (!c->children.empty()) {
+                buildWagyuResults(solution, c->children);
+            }
         }
     }
 }
 
 GeometryCollection fixupPolygons(const GeometryCollection& rings) {
-    ClipperLib::Clipper clipper;
-    clipper.StrictlySimple(true);
+    using namespace mapbox::geometry::wagyu;
+    
+    // This is code that is pulled from the wagyu main class, we 
+    // are doing this to have our own custom build result,
+    // rather then copying output twice from the wagyu algorithm.
+
+    local_minimum_list<std::int32_t> minima_list;
 
     for (const auto& ring : rings) {
-        clipper.AddPath(toClipperPath(ring), ClipperLib::ptSubject, true);
+        // Convert ring to LinearRing type prior to adding them
+        add_linear_ring(toWagyuPath(ring), minima_list, polygon_type_subject);
     }
 
-    ClipperLib::PolyTree polygons;
-    clipper.Execute(ClipperLib::ctUnion, polygons, ClipperLib::pftEvenOdd, ClipperLib::pftEvenOdd);
-    clipper.Clear();
+    // Core part of wagyu algorithm
+    ring_manager<std::int32_t> manager;
+    
+    build_hot_pixels(minima_list, manager);
+    
+    execute_vatti(minima_list, manager, clip_type_union, fill_type_even_odd, fill_type_even_odd);
+    
+    correct_topology(manager);
 
+    // Finally lets build results
     GeometryCollection result;
-    for (auto * polynode : polygons.Childs) {
-        processPolynodeBranch(polynode, result);
-    }
+ 
+    // This calls code based on wagyu/build_results.hpp
+    // rather then returning a multipolygon however, we are
+    // going to return a GeometryCollection
+    buildWagyuResults(result, manager.children);
+
     return result;
 }
 
