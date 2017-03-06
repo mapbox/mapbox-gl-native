@@ -1,7 +1,15 @@
 #include "geojson_source.hpp"
 
+// Java -> C++ conversion
 #include "../android_conversion.hpp"
+#include "../conversion/filter.hpp"
 #include "../conversion/geojson.hpp"
+
+// C++ -> Java conversion
+#include "../../conversion/conversion.hpp"
+#include "../../conversion/collection.hpp"
+#include "../../geometry/conversion/feature.hpp"
+#include "../conversion/url_or_tileset.hpp"
 #include <mbgl/style/conversion.hpp>
 #include <mbgl/style/conversion/geojson_options.hpp>
 
@@ -43,6 +51,16 @@ namespace android {
         source.as<mbgl::style::GeoJSONSource>()->GeoJSONSource::setURL(jni::Make<std::string>(env, url));
     }
 
+    jni::Array<jni::Object<Feature>> GeoJSONSource::querySourceFeatures(jni::JNIEnv& env,
+                                                                        jni::Array<jni::Object<>> jfilter) {
+        using namespace mbgl::android::conversion;
+        using namespace mapbox::geometry;
+
+        auto filter = toFilter(env, jfilter);
+        auto features = source.querySourceFeatures({ {},  filter });
+        return *convert<jni::Array<jni::Object<Feature>>, std::vector<mbgl::Feature>>(env, features);
+    }
+
     jni::Class<GeoJSONSource> GeoJSONSource::javaClass;
 
     jni::jobject* GeoJSONSource::createJavaPeer(jni::JNIEnv& env) {
@@ -63,7 +81,8 @@ namespace android {
             "initialize",
             "finalize",
             METHOD(&GeoJSONSource::setGeoJSON, "nativeSetGeoJson"),
-            METHOD(&GeoJSONSource::setURL, "nativeSetUrl")
+            METHOD(&GeoJSONSource::setURL, "nativeSetUrl"),
+            METHOD(&GeoJSONSource::querySourceFeatures, "querySourceFeatures")
         );
     }
 

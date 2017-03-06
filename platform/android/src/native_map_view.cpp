@@ -36,6 +36,7 @@
 // C++ -> Java conversion
 #include "conversion/conversion.hpp"
 #include "conversion/collection.hpp"
+#include "style/conversion/filter.hpp"
 #include "geometry/conversion/feature.hpp"
 
 #include "jni.hpp"
@@ -719,22 +720,6 @@ jni::Array<jlong> NativeMapView::queryPointAnnotations(JNIEnv& env, jni::Object<
     result.SetRegion<std::vector<jni::jlong>>(env, 0, longIds);
 
     return result;
-}
-
-static inline optional<mbgl::style::Filter> toFilter(jni::JNIEnv& env, jni::Array<jni::Object<>> jfilter) {
-    using namespace mbgl::style;
-    using namespace mbgl::style::conversion;
-
-    mbgl::optional<Filter> filter;
-    if (jfilter) {
-      Value filterValue(env, jfilter);
-      auto converted = convert<Filter>(filterValue);
-      if (!converted) {
-          mbgl::Log::Error(mbgl::Event::JNI, "Error setting filter: " + converted.error().message);
-      }
-      filter = std::move(*converted);
-    }
-    return filter;
 }
 
 jni::Array<jni::Object<Feature>> NativeMapView::queryRenderedFeaturesForPoint(JNIEnv& env, jni::jfloat x, jni::jfloat y,
