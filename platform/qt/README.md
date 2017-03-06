@@ -24,7 +24,7 @@ For macOS desktop, you can install Qt 5 via [Homebrew](http://brew.sh):
 
 Since Homebrew doesn't add Qt to the path, you'll have to do that manually before running any Make target:
 
-    export PATH=/usr/local/opt/qt5:$PATH
+    export PATH=/usr/local/opt/qt5/bin:$PATH
 
 We provide the following build targets for our Qt SDK:
 
