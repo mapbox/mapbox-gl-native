@@ -16,7 +16,7 @@ using namespace mbgl::style;
 Filter parse(const char * expression) {
     rapidjson::GenericDocument<rapidjson::UTF8<>, rapidjson::CrtAllocator> doc;
     doc.Parse<0>(expression);
-    return *conversion::convert<Filter>(doc);
+    return *conversion::convert<Filter, JSValue>(doc);
 }
 
 Feature feature(const PropertyMap& properties, const Geometry<double>& geometry = Point<double>()) {
