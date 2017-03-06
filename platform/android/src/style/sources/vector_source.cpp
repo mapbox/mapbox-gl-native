@@ -1,12 +1,19 @@
 #include "vector_source.hpp"
 
+// Java -> C++ conversion
 #include "../android_conversion.hpp"
-#include "../value.hpp"
+#include "../conversion/filter.hpp"
+
+// C++ -> Java conversion
+#include "../../conversion/conversion.hpp"
+#include "../../conversion/collection.hpp"
+#include "../../geometry/conversion/feature.hpp"
 #include "../conversion/url_or_tileset.hpp"
 
 #include <mbgl/util/variant.hpp>
 
 #include <string>
+#include <vector>
 
 namespace mbgl {
 namespace android {
@@ -27,6 +34,18 @@ namespace android {
 
     VectorSource::~VectorSource() = default;
 
+    jni::Array<jni::Object<Feature>> VectorSource::querySourceFeatures(jni::JNIEnv& env,
+                                                                             jni::Array<jni::String> jSourceLayerIds,
+                                                                             jni::Array<jni::Object<>> jfilter) {
+        using namespace mbgl::android::conversion;
+        using namespace mapbox::geometry;
+
+        mbgl::optional<std::vector<std::string>> sourceLayerIds = { toVector(env, jSourceLayerIds) };
+        auto filter = toFilter(env, jfilter);
+        auto features = source.querySourceFeatures({ sourceLayerIds,  filter });
+        return *convert<jni::Array<jni::Object<Feature>>, std::vector<mbgl::Feature>>(env, features);
+    }
+
     jni::Class<VectorSource> VectorSource::javaClass;
 
     jni::jobject* VectorSource::createJavaPeer(jni::JNIEnv& env) {
@@ -45,7 +64,8 @@ namespace android {
             env, VectorSource::javaClass, "nativePtr",
             std::make_unique<VectorSource, JNIEnv&, jni::String, jni::Object<>>,
             "initialize",
-            "finalize"
+            "finalize",
+            METHOD(&VectorSource::querySourceFeatures, "querySourceFeatures")
         );
     }
 
