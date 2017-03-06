@@ -39,8 +39,9 @@ inline std::vector<std::string> toVector(JNIEnv& env, jni::jarray<jni::jobject>&
 }
 
 inline std::vector<std::string> toVector(JNIEnv& env, jni::Array<jni::String> array) {
-    std::vector<std::string> vector;
     std::size_t len = array.Length(env);
+    std::vector<std::string> vector;
+    vector.reserve(len);
 
     for (std::size_t i = 0; i < len; i++) {
         jni::String jstr = array.Get(env, i);
