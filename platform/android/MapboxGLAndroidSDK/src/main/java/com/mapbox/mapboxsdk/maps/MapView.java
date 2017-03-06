@@ -85,6 +85,7 @@ import com.mapbox.mapboxsdk.maps.widgets.MyLocationViewSettings;
 import com.mapbox.mapboxsdk.telemetry.MapboxEvent;
 import com.mapbox.mapboxsdk.telemetry.MapboxEventManager;
 import com.mapbox.mapboxsdk.utils.ColorUtils;
+import com.mapbox.mapboxsdk.utils.MathUtils;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -149,6 +150,7 @@ public class MapView extends FrameLayout {
     private boolean dragStarted = false;
     private boolean quickZoom = false;
     private boolean scrollInProgress = false;
+    private boolean scaleGestureOccurred = false;
 
     private int contentPaddingLeft;
     private int contentPaddingTop;
@@ -1789,7 +1791,11 @@ public class MapView extends FrameLayout {
         // Handle two finger tap
         switch (event.getActionMasked()) {
             case MotionEvent.ACTION_DOWN:
-                // First pointer down
+                /* Mappy : on touch down, stop map inertia */
+                cancelTransitions();
+
+                // First pointer down, reset scaleGestureOccurred, used to avoid triggering a fling after a scale gesture #7666
+                scaleGestureOccurred = false;
                 nativeMapView.setGestureInProgress(true);
                 break;
 
@@ -2033,22 +2039,33 @@ public class MapView extends FrameLayout {
         // Called for flings
         @Override
         public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-            if (destroyed || !mapboxMap.getTrackingSettings().isScrollGestureCurrentlyEnabled()) {
+            if (destroyed || !mapboxMap.getTrackingSettings().isScrollGestureCurrentlyEnabled() || scaleGestureOccurred) {
+                return false;
+            }
+
+            // calculate velocity vector for xy dimensions, independent from screen size
+            double velocityXY = Math.hypot(velocityX / screenDensity, velocityY / screenDensity);
+            if (velocityXY < MapboxConstants.VELOCITY_THRESHOLD_IGNORE_FLING) {
+                // ignore short flings, these can occur when other gestures just have finished executing
                 return false;
             }
 
             resetTrackingModesIfRequired(true, false);
 
-/*          Mappy : Don't like new animation when swipe the map/ Back to basics
-            double tilt = getTilt();
-            double limitFactor = 2 + ((tilt != 0) ? (tilt / 10) : 0);
-            double offsetX = velocityX / limitFactor / screenDensity;
-            double offsetY = velocityY / limitFactor / screenDensity;
-
-            // Cancel any animation
-            cancelTransitions();
-
-            nativeMapView.moveBy(offsetX, offsetY, MapboxConstants.ANIMATION_DURATION_FLING);*/
+/*          Mappy : Don't like new animation when swipe the map/ Back to basics     */
+//            // tilt results in a bigger translation, limiting input for #5281
+//            double tilt = getTilt();
+//            double tiltFactor = 1 + ((tilt != 0) ? (tilt / 10) : 0); /* 1 -> 7 */
+//            double offsetX = velocityX / tiltFactor / screenDensity;
+//            double offsetY = velocityY / tiltFactor / screenDensity;
+//
+//            // calculate animation time
+//            long animationTime = (long) (velocityXY / 7 / tiltFactor + MapboxConstants.ANIMATION_DURATION_FLING_BASE);
+//
+//            // Cancel any animation
+//            cancelTransitions();
+//
+//            nativeMapView.moveBy(offsetX, offsetY, MapboxConstants.ANIMATION_DURATION_FLING);
 
             double decelerationRate = 1;
 
@@ -2061,6 +2078,8 @@ public class MapView extends FrameLayout {
             nativeMapView.setGestureInProgress(true);
             nativeMapView.moveBy(offsetX, offsetY, (long) (decelerationRate * 1000.0f));
             nativeMapView.setGestureInProgress(false);
+/*          Mappy : Not used in our animation   */
+//            nativeMapView.moveBy(offsetX / screenDensity, offsetY / screenDensity, animationTime);
 
             MapboxMap.OnFlingListener listener = mapboxMap.getOnFlingListener();
             if (listener != null) {
@@ -2116,6 +2135,7 @@ public class MapView extends FrameLayout {
                 return false;
             }
 
+            scaleGestureOccurred = true;
             beginTime = detector.getEventTime();
             trackGestureEvent(MapboxEvent.GESTURE_PINCH_START, detector.getFocusX(), detector.getFocusY());
             return true;
@@ -2176,8 +2196,12 @@ public class MapView extends FrameLayout {
                 // arround user provided focal point
                 nativeMapView.scaleBy(detector.getScaleFactor(), focalPoint.x / screenDensity, focalPoint.y / screenDensity);
             } else if (quickZoom) {
+                // clamp scale factors we feed to core #7514
+                float scaleFactor = MathUtils.clamp(detector.getScaleFactor(),
+                    MapboxConstants.MINIMUM_SCALE_FACTOR_CLAMP,
+                    MapboxConstants.MAXIMUM_SCALE_FACTOR_CLAMP);
                 // around center map
-                nativeMapView.scaleBy(detector.getScaleFactor(), (getWidth() / 2) / screenDensity, (getHeight() / 2) / screenDensity);
+                nativeMapView.scaleBy(scaleFactor, (getWidth() / 2) / screenDensity, (getHeight() / 2) / screenDensity);
             } else {
                 // around gesture
                 nativeMapView.scaleBy(detector.getScaleFactor(), detector.getFocusX() / screenDensity, detector.getFocusY() / screenDensity);

@@ -51,7 +51,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Logger;
 
 /**
  * The general class to interact with in the Android Mapbox SDK. It exposes the entry point for all
@@ -1066,8 +1065,14 @@ public class MapboxMap {
                     if(onMarkerViewAddedListener !=null && markerViewManager.getView(marker)!=null){
                         // checking if view is also found in current viewport.
                         onMarkerViewAddedListener.onViewAdded(marker);
+                        //MAPPY: to fix the mapbox bug
+                        mapView.removeOnMapChangedListener(this);
+                    } else if(onMarkerViewAddedListener instanceof MarkerViewManager.OnMarkerViewAddedListenerWithControl) {
+                        //MAPPY: to fix the mapbox bug
+                        if(!((MarkerViewManager.OnMarkerViewAddedListenerWithControl) onMarkerViewAddedListener).isMarkerExist()){
+                            mapView.removeOnMapChangedListener(this);
+                        }
                     }
-                    mapView.removeOnMapChangedListener(this);
                 }
             }
         });
@@ -1178,6 +1183,19 @@ public class MapboxMap {
      */
     @UiThread
     public void updateMarker(@NonNull Marker updatedMarker) {
+        if(updatedMarker instanceof MarkerView){
+            // listen for a render event, so we can invalidate MarkerViews
+            mapView.addOnMapChangedListener(new MapView.OnMapChangedListener() {
+                @Override
+                public void onMapChanged(@MapView.MapChange int change) {
+                    if (change == MapView.DID_FINISH_RENDERING_FRAME_FULLY_RENDERED) {
+                        markerViewManager.invalidateViewMarkersInVisibleRegion();
+                        mapView.removeOnMapChangedListener(this);
+                    }
+                }
+            });
+        }
+
         mapView.updateMarker(updatedMarker);
 
         int index = annotations.indexOfKey(updatedMarker.getId());

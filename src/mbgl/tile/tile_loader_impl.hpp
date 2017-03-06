@@ -61,7 +61,7 @@ void TileLoader<T>::loadOptional() {
             // When the optional request could not be satisfied, don't treat it as an error.
             // Instead, we make sure that the next request knows that there has been an optional
             // request before by setting one of the prior* fields.
-            resource.priorExpires = Timestamp{ Seconds::zero() };
+            resource.priorExpires = Timestamp{ util::now() };
         } else {
             loadedData(res);
         }

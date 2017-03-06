@@ -61,17 +61,31 @@ public class Projection {
      * @return The projection of the viewing frustum in its current state.
      */
     public VisibleRegion getVisibleRegion() {
+        return getVisibleRegion(0, 0, 0, 0);
+    }
+
+    /**
+     * Gets a projection of the viewing frustum for converting between screen coordinates and
+     * geo-latitude/longitude coordinates.
+     *
+     * @return The projection of the viewing frustum in its current state.
+     */
+    public VisibleRegion getVisibleRegion(int additionalPaddingLeft, int additionalPaddingTop, int additionalPaddingRight, int additionalPaddingBottom) {
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
 
-        float left = mapView.getContentPaddingLeft();
-        float right = mapView.getWidth() - mapView.getContentPaddingRight();
-        float top = mapView.getContentPaddingTop();
-        float bottom = mapView.getHeight() - mapView.getContentPaddingBottom();
+        float left = mapView.getContentPaddingLeft() + additionalPaddingLeft;
+        float right = mapView.getWidth() - mapView.getContentPaddingRight() - additionalPaddingRight;
+        float top = mapView.getContentPaddingTop() + additionalPaddingTop;
+        float bottom = mapView.getHeight() - mapView.getContentPaddingBottom() - additionalPaddingBottom;
 
-        LatLng topLeft = fromScreenLocation(new PointF(left, top));
-        LatLng topRight = fromScreenLocation(new PointF(right, top));
-        LatLng bottomRight = fromScreenLocation(new PointF(right, bottom));
-        LatLng bottomLeft = fromScreenLocation(new PointF(left, bottom));
+        final PointF pixels = new PointF(left, top);
+        LatLng topLeft = fromScreenLocation(pixels);
+        pixels.set(right, top);
+        LatLng topRight = fromScreenLocation(pixels);
+        pixels.set(right, bottom);
+        LatLng bottomRight = fromScreenLocation(pixels);
+        pixels.set(left, bottom);
+        LatLng bottomLeft = fromScreenLocation(pixels);
 
         builder.include(topLeft)
                 .include(topRight)

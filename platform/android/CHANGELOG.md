@@ -2,6 +2,74 @@
 
 Mapbox welcomes participation and contributions from everyone.  If you'd like to do so please see the [`Contributing Guide`](https://github.com/mapbox/mapbox-gl-native/blob/master/CONTRIBUTING.md) first to get started.
 
+## 5.0.0 - TBA
+
+* Cleanup inconsistencies float vs double [#4445](https://github.com/mapbox/mapbox-gl-native/issues/4445)
+* Add `mapbox_` prefix to attributes [#6482](https://github.com/mapbox/mapbox-gl-native/issues/6482)
+* Update LOST to 2.0.0 [#6573](https://github.com/mapbox/mapbox-gl-native/issues/6537)
+* Support for Android Nougat [#5910](5910-move-listener-logic-for-nougat)
+  - move location listening logic to onStart/onStop Activity lifecylce methods
+* Removal of accesstoken on MapView and MapboxMap [#5621](https://github.com/mapbox/mapbox-gl-native/issues/5621)
+* Introduction of new make targets [#5940](https://github.com/mapbox/mapbox-gl-native/issues/5940)
+  - Targets for testing, running and using external tools directly from the commandline
+* Cleanup gradle files [#6009](https://github.com/mapbox/mapbox-gl-native/issues/6009)
+  - Introducing single purpose .gradle files
+* Checkstyle integration [#7442](https://github.com/mapbox/mapbox-gl-native/pull/7442)
+* Transform refactor [#6532](https://github.com/mapbox/mapbox-gl-native/issues/6532)
+  - All camera related code is moved to a dedicated transfrom class cfr. core architecture
+* Encapsulate Gestures [#6557](https://github.com/mapbox/mapbox-gl-native/issues/6557)
+  - All gesture event code is encapsulated in MapGestureDetector
+  - All key event  code is encapsulated in MapKeyListener
+* Transparent background for MyLocationView [#7116](https://github.com/mapbox/mapbox-gl-native/issues/7116)
+* Update documentation on generate sanity tests [#7147](https://github.com/mapbox/mapbox-gl-native/issues/7147)
+* Update documentation on style templates [#7157](https://github.com/mapbox/mapbox-gl-native/issues/7157)
+* NullPointerException during save instance state [#7157](https://github.com/mapbox/mapbox-gl-native/issues/7157)
+* Move management style to core [#7275](https://github.com/mapbox/mapbox-gl-native/issues/7275)
+* OnCameraChange not called for the final position of animation bug [#7350](https://github.com/mapbox/mapbox-gl-native/issues/7350)
+* MapboxAccountManager refactor [#6534](https://github.com/mapbox/mapbox-gl-native/issues/6534)
+  - Consolidating the location where tokens are set
+  - Rename to reflect the increased responsibilities introduced in prior releases
+* AnnotationManager refactor [#6067](https://github.com/mapbox/mapbox-gl-native/issues/6067)
+  - Extracting all business logic related to annotations into a seperate class cfr. to core and the iOS codebase
+* Gesture handling bugs
+  - Avoid calls to onFling when while pinch zooming [#7666](https://github.com/mapbox/mapbox-gl-native/issues/7666)
+
+## 4.2.2 - January 27, 2017
+
+Mapbox Android 4.2.2 builds further on v4.2.1 and resolves:
+* OnFling gesture improvements
+ - Improve fling by calculating animation time based on velocity [#7676](https://github.com/mapbox/mapbox-gl-native/pull/7676)
+ - Avoid triggering a fling after a scale gesture [#7675](https://github.com/mapbox/mapbox-gl-native/issues/7675)
+* Consistent double tap zoom acceleration [#7514](https://github.com/mapbox/mapbox-gl-native/issues/7514)
+* Deselect marker on infowindow click [#7784](https://github.com/mapbox/mapbox-gl-native/issues/7784)
+* Update build tools to Bitrise supported one [#7729](https://github.com/mapbox/mapbox-gl-native/issues/7729)
+* Removal of redudant log statements in native_map_view.cpp [#7801](https://github.com/mapbox/mapbox-gl-native/issues/7801)
+* Invalidate markersviews when updating their position [#7794](https://github.com/mapbox/mapbox-gl-native/issues/7794)
+* Avoid clustering unclusterable GeoJSON [#7633](https://github.com/mapbox/mapbox-gl-native/pull/7633)
+* Prevent null pointer exceptions when receiving connecitivy change events [#6858](https://github.com/mapbox/mapbox-gl-native/issues/6858)
+
+## 4.2.1 - December 22, 2016
+
+Mapbox Android 4.2.1 is a bugfix release build on top of 4.2.0 and resolves:
+
+* Gesture handling bugs
+  - Reverse fling when tilted [#7383](https://github.com/mapbox/mapbox-gl-native/pull/7383)
+  - Rotation is hard trigger [#7299](https://github.com/mapbox/mapbox-gl-native/pull/7299)
+* Null pointer exception on TrackingSettings [#7505](https://github.com/mapbox/mapbox-gl-native/pull/7505)
+* Patches to our CI integration [#7363](https://github.com/mapbox/mapbox-gl-native/pull/7363) & [#7385](https://github.com/mapbox/mapbox-gl-native/pull/7385)
+* Screen density is now correctly applied for attributes [#7327](https://github.com/mapbox/mapbox-gl-native/pull/7327)
+* Usage of LocalBroadCastReceiver [#7511](https://github.com/mapbox/mapbox-gl-native/pull/7511)
+
+## 4.2.0 - December 14, 2016
+
+Mapbox Android 4.2.0 contains all 4.2.0-beta.5 changes and adds:
+
+* Adds additional documentation to APIs
+* Resolved issue with marker views occasionally not showing up until a gesture was performed on map [#7239](https://github.com/mapbox/mapbox-gl-native/pull/7239)
+* Added horizontal accuracy to location events [#7237](https://github.com/mapbox/mapbox-gl-native/pull/7237)
+* Resolved issue with changing visibility of a layer [#7242](https://github.com/mapbox/mapbox-gl-native/pull/7242)
+* Proguard improvement and fixes
+
 ## 4.2.0-beta.5 - October 25, 2016
 
 Mapbox Android 4.2.0-beta.5 adds no new features, only bug fixes.
