@@ -115,7 +115,7 @@ public:
 
     jni::jdouble getScale(jni::JNIEnv&);
 
-    void setZoom(jni::JNIEnv&, jni::jdouble, jni::jlong);
+    void setZoom(jni::JNIEnv&, jni::jdouble, jni::jdouble, jni::jdouble, jni::jlong);
 
     jni::jdouble getZoom(jni::JNIEnv&);
 

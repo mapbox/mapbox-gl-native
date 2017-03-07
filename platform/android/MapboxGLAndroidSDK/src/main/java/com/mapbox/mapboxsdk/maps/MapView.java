@@ -508,7 +508,7 @@ public class MapView extends FrameLayout {
       if (destroyed) {
         return;
       }
-      mapboxMap.onUpdate();
+      mapboxMap.onUpdateRegionChange();
     }
   }
 
@@ -971,8 +971,10 @@ public class MapView extends FrameLayout {
             mapboxMap.onPostMapReady();
           }
         });
+      } else if (change == DID_FINISH_RENDERING_FRAME || change == DID_FINISH_RENDERING_FRAME_FULLY_RENDERED) {
+        mapboxMap.onUpdateFullyRendered();
       } else if (change == REGION_IS_CHANGING || change == REGION_DID_CHANGE || change == DID_FINISH_LOADING_MAP) {
-        mapboxMap.onUpdate();
+        mapboxMap.onUpdateRegionChange();
       }
     }
 
