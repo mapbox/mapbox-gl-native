@@ -18,6 +18,8 @@
 			<string>%d stopnie</string>
 			<key>many</key>
 			<string>%d stopni</string>
+			<key>other</key>
+			<string>%d stopnia</string>
 		</dict>
 	</dict>
 	<key>COORD_MIN_LONG</key>
@@ -36,6 +38,8 @@
 			<string>%d minuty</string>
 			<key>many</key>
 			<string>%d minut</string>
+			<key>other</key>
+			<string>%d minuty</string>
 		</dict>
 	</dict>
 	<key>COORD_SEC_LONG</key>
@@ -54,6 +58,8 @@
 			<string>%d sekundy</string>
 			<key>many</key>
 			<string>%d sekund</string>
+			<key>other</key>
+			<string>%d sekundy</string>
 		</dict>
 	</dict>
 </dict>
