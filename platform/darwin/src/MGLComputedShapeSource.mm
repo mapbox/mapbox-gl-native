@@ -34,18 +34,18 @@
 @property (nonatomic, weak, nullable) id<MGLComputedShapeSourceDataSource> dataSource;
 @property (nonatomic, nullable) mbgl::style::CustomVectorSource *rawSource;
 
-- (instancetype)initForSource:(MGLComputedShapeSource*)source z:(uint8_t)z x:(uint32_t)x y:(uint32_t)y;
+- (instancetype)initForSource:(MGLComputedShapeSource*)source tile:(const mbgl::CanonicalTileID&)tileId;
 
 @end
 
 @implementation MGLComputedShapeSourceFetchOperation
 
 
-- (instancetype)initForSource:(MGLComputedShapeSource*)source z:(uint8_t)z x:(uint32_t)x y:(uint32_t)y {
+- (instancetype)initForSource:(MGLComputedShapeSource*)source tile:(const mbgl::CanonicalTileID&)tileID {
     self = [super init];
-    _x = x;
-    _y = y;
-    _z = z;
+    _z = tileID.z;
+    _x = tileID.x;
+    _y = tileID.y;
     _dataSourceImplementsFeaturesForTile = source.dataSourceImplementsFeaturesForTile;
     _dataSourceImplementsFeaturesForBounds = source.dataSourceImplementsFeaturesForBounds;
     _dataSource = source.dataSource;
@@ -83,7 +83,7 @@
         const auto geojson = mbgl::GeoJSON{featureCollection};
         dispatch_sync(dispatch_get_main_queue(), ^{
             if(![self isCancelled] && self.rawSource) {
-                self.rawSource->setTileData(self.z, self.x, self.y, geojson);
+                self.rawSource->setTileData(mbgl::CanonicalTileID(self.z, self.x, self.y), geojson);
             }
         });
     }
@@ -105,9 +105,9 @@
         auto geoJSONOptions = MGLGeoJSONOptionsFromDictionary(options);
         auto source = std::make_unique<mbgl::style::CustomVectorSource>
         (self.identifier.UTF8String, geoJSONOptions,
-         ^void(uint8_t z, uint32_t x, uint32_t y)
+         ^void(const mbgl::CanonicalTileID& tileID)
          {
-             NSOperation *operation = [[MGLComputedShapeSourceFetchOperation alloc] initForSource:self z:z x:x y:y];
+             NSOperation *operation = [[MGLComputedShapeSourceFetchOperation alloc] initForSource:self tile:tileID];
              [self.requestQueue addOperation:operation];
          });
         
@@ -170,7 +170,8 @@
 }
 
 - (void)setNeedsUpdateAtZoomLevel:(NSUInteger)z x:(NSUInteger)x y:(NSUInteger)y {
-    self.rawSource->updateTile((uint8_t)z, (uint32_t)x, (uint32_t)y);
+    mbgl::CanonicalTileID tileID = mbgl::CanonicalTileID((uint8_t)z, (uint32_t)x, (uint32_t)y);
+    self.rawSource->reloadTile(tileID);
 }
 
 - (void)reloadData {

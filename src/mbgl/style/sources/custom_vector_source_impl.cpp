@@ -9,7 +9,7 @@
 namespace mbgl {
 namespace style {
     
-CustomVectorSource::Impl::Impl(std::string id, Source& base_, GeoJSONOptions options_, std::function<void(uint8_t, uint32_t, uint32_t)> fetchTile_)
+CustomVectorSource::Impl::Impl(std::string id, Source& base_, GeoJSONOptions options_, std::function<void(const CanonicalTileID&)> fetchTile_)
     : Source::Impl(SourceType::Vector, std::move(id), base_), options(options_), fetchTile(fetchTile_) {
     loaded = true;
 }
@@ -25,17 +25,17 @@ uint16_t CustomVectorSource::Impl::getTileSize() const {
 std::unique_ptr<Tile> CustomVectorSource::Impl::createTile(const OverscaledTileID& tileID,
                                                           const UpdateParameters& parameters) {
     auto tilePointer = std::make_unique<GeoJSONTile>(tileID, base.getID(), parameters);
-    fetchTile(tileID.canonical.z, tileID.canonical.x, tileID.canonical.y);
+    fetchTile(tileID.canonical);
     return std::move(tilePointer);
 }
     
-void CustomVectorSource::Impl::setTileData(uint8_t z, uint32_t x, uint32_t y, const mapbox::geojson::geojson& geoJSON) {
-    double scale = util::EXTENT / util::tileSize;
+void CustomVectorSource::Impl::setTileData(const CanonicalTileID& tileID, const mapbox::geojson::geojson& geoJSON) {
+    constexpr double scale = util::EXTENT / util::tileSize;
     
-    if(geoJSON.is<FeatureCollection>() && geoJSON.get<FeatureCollection>().size() == 0) {
+    if(geoJSON.is<FeatureCollection>() && geoJSON.get<FeatureCollection>().empty()) {
         for (auto const &item : tiles) {
             GeoJSONTile* tile = static_cast<GeoJSONTile*>(item.second.get());
-            if(tile->id.canonical.z == z && tile->id.canonical.x == x && tile->id.canonical.y == y) {
+            if(tile->id.canonical == tileID) {
                 tile->updateData(mapbox::geometry::feature_collection<int16_t>());
             }
         }
@@ -61,33 +61,33 @@ void CustomVectorSource::Impl::setTileData(uint8_t z, uint32_t x, uint32_t y, co
         
         for (auto const &item : tiles) {
             GeoJSONTile* tile = static_cast<GeoJSONTile*>(item.second.get());
-            if(tile->id.canonical.z == z && tile->id.canonical.x == x && tile->id.canonical.y == y) {
+            if(tile->id.canonical == tileID) {
                 if (geoJSONOrSupercluster.is<GeoJSONVTPointer>()) {
-                    tile->updateData(geoJSONOrSupercluster.get<GeoJSONVTPointer>()->getTile(z, x, y).features);
+                    tile->updateData(geoJSONOrSupercluster.get<GeoJSONVTPointer>()->getTile(tileID.z, tileID.x, tileID.y).features);
                 } else {
                     assert(geoJSONOrSupercluster.is<SuperclusterPointer>());
-                    tile->updateData(geoJSONOrSupercluster.get<SuperclusterPointer>()->getTile(z, x, y));
+                    tile->updateData(geoJSONOrSupercluster.get<SuperclusterPointer>()->getTile(tileID.z, tileID.x, tileID.y));
                 }
             }
         }
     }
 }
     
-void CustomVectorSource::Impl::updateTile(uint8_t z, uint32_t x, uint32_t y) {
-    if(cache.has(OverscaledTileID(z, x, y))) {
+void CustomVectorSource::Impl::reloadTile(const CanonicalTileID& tileId) {
+    if(cache.has(OverscaledTileID(tileId.z, tileId.x, tileId.y))) {
         cache.clear();
     }
     for (auto const &item : tiles) {
         GeoJSONTile* tile = static_cast<GeoJSONTile*>(item.second.get());
-        if(tile->id.canonical.z == z && tile->id.canonical.x == x && tile->id.canonical.y == y) {
-            fetchTile(z, x, y);
+        if(tile->id.canonical == tileId) {
+            fetchTile(tileId);
         }
     }
 }
 
 void CustomVectorSource::Impl::reloadRegion(mbgl::LatLngBounds bounds, uint8_t z) {
     for (const auto& tile : mbgl::util::tileCover(bounds, z)) {
-        updateTile(tile.canonical.z, tile.canonical.x, tile.canonical.z);
+        reloadTile(tile.canonical);
     }
 }
 
@@ -95,7 +95,7 @@ void CustomVectorSource::Impl::reload() {
     cache.clear();
     for (auto const &item : tiles) {
         GeoJSONTile* tile = static_cast<GeoJSONTile*>(item.second.get());
-        fetchTile(tile->id.canonical.z, tile->id.canonical.x, tile->id.canonical.y);
+        fetchTile(tile->id.canonical);
     }
 }
     

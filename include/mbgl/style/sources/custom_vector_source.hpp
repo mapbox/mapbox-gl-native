@@ -10,10 +10,10 @@ namespace style {
     
 class CustomVectorSource : public Source {
 public:
-    CustomVectorSource(std::string id, GeoJSONOptions options, std::function<void(uint8_t, uint32_t, uint32_t)> fetchTile);
+    CustomVectorSource(std::string id, GeoJSONOptions options, std::function<void(const CanonicalTileID&)> fetchTile);
   
-    void setTileData(uint8_t, uint32_t, uint32_t, const mapbox::geojson::geojson&);
-    void updateTile(uint8_t, uint32_t, uint32_t);
+    void setTileData(const CanonicalTileID&, const mapbox::geojson::geojson&);
+    void reloadTile(const CanonicalTileID&);
     void reloadRegion(mbgl::LatLngBounds bounds, uint8_t z);
     void reload();
   
