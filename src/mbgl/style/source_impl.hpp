@@ -87,6 +87,9 @@ public:
     // be initialized to true so that Style::isLoaded() does not produce false positives if
     // called before Style::recalculate().
     bool enabled = true;
+    
+    // Detaches from the style
+    void detach();
 
 protected:
     void invalidateTiles();

@@ -44,6 +44,10 @@ bool Source::Impl::isLoaded() const {
 
     return true;
 }
+    
+void Source::Impl::detach() {
+    invalidateTiles();
+}
 
 void Source::Impl::invalidateTiles() {
     tiles.clear();

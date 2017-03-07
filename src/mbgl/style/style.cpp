@@ -166,6 +166,7 @@ std::unique_ptr<Source> Style::removeSource(const std::string& id) {
     sources.erase(it);
     updateBatch.sourceIDs.erase(id);
 
+    source->baseImpl->detach();
     return source;
 }
 
