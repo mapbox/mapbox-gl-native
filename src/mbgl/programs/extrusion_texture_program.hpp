@@ -4,19 +4,11 @@
 #include <mbgl/programs/attributes.hpp>
 #include <mbgl/programs/uniforms.hpp>
 #include <mbgl/shaders/extrusion_texture.hpp>
-//#include <mbgl/util/geometry.hpp>
-#include <mbgl/util/mat4.hpp>
-//#include <mbgl/util/size.hpp>
 #include <mbgl/style/layers/fill_extrusion_layer_properties.hpp>
 
 #include <string>
 
 namespace mbgl {
-
-//namespace uniforms {
-//    MBGL_DEFINE_UNIFORM_SCALAR(uint16_t, u_xdim);
-//    MBGL_DEFINE_UNIFORM_SCALAR(uint16_t, u_ydim);
-//} // namespace uniforms
 
 struct ExtrusionTextureLayoutAttributes : gl::Attributes<
 attributes::a_pos>

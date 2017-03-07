@@ -16,6 +16,8 @@
 #include <mbgl/style/layers/background_layer.hpp>
 #include <mbgl/style/layers/custom_layer.hpp>
 #include <mbgl/style/layers/custom_layer_impl.hpp>
+#include <mbgl/style/layers/fill_extrusion_layer.hpp>
+#include <mbgl/style/layers/fill_extrusion_layer_impl.hpp>
 
 #include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/geometry/line_atlas.hpp>
@@ -346,9 +348,10 @@ void Painter::renderPass(PaintParameters& parameters,
 
             parameters.view.bind();
 
-            mat4 mat;
-            matrix::ortho(mat, 0, size.width, size.height, 0, 0, 1);
-            const FillExtrusionPaintProperties::Evaluated properties{};
+            mat4 viewportMat;
+            matrix::ortho(viewportMat, 0, size.width, size.height, 0, 0, 1);
+
+            const FillExtrusionPaintProperties::Evaluated properties = layer.as<FillExtrusionLayer>()->impl->paint.evaluated;
 
             parameters.programs.extrusionTexture.draw(context,
                                                       gl::Triangles(),
@@ -356,10 +359,10 @@ void Painter::renderPass(PaintParameters& parameters,
                                                       gl::StencilMode::disabled(),
                                                       colorModeForRenderPass(),
                                                       ExtrusionTextureProgram::UniformValues{
-                                                          uniforms::u_matrix::Value{ mat },
+                                                          uniforms::u_matrix::Value{ viewportMat },
                                                           uniforms::u_world::Value{ size },
                                                           uniforms::u_image::Value{ 0 }, // view.getTexture() ? no — but follow up on whether could be variable or if it's always safe to attach to 0 unit
-                                                          uniforms::u_opacity::Value{ 0.3 } // TODO implement parsing from style
+                                                          uniforms::u_opacity::Value{ properties.get<FillExtrusionOpacity>() } // TODO implement parsing from style
                                                       },
                                                       extrusionTextureVertexBuffer,
                                                       tileTriangleIndexBuffer,

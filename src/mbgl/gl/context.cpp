@@ -385,7 +385,7 @@ Framebuffer Context::createFramebuffer(const Texture& color) {
 }
 
 Framebuffer
-Context::createFramebuffer(const Renderbuffer<RenderbufferType::RGBA>& colorTarget,
+Context::createFramebuffer(const Renderbuffer<RenderbufferType::RGBA4>& colorTarget,
                            const Renderbuffer<RenderbufferType::DepthComponent>& depthTarget,
                            const Texture& fboTexture) {
     if (colorTarget.size != depthTarget.size) {
