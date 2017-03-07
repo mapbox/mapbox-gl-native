@@ -28,6 +28,7 @@ void Painter::renderFillExtrusion(PaintParameters& parameters,
     auto lightpos = style.light.getPosition();
     vec3f lightvec{ lightpos };
     mat3 lightmat;
+    matrix::identity(lightmat);
     if (style.light.getAnchor() == LightAnchorType::Viewport) {
         matrix::rotate(lightmat, lightmat, -state.getAngle());
     }

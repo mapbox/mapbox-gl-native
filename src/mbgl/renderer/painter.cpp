@@ -79,17 +79,12 @@ static gl::VertexVector<RasterLayoutVertex> rasterVertices() {
     return result;
 }
 
-static gl::VertexVector<ExtrusionTextureLayoutVertex>
-extrusionTextureVertices(const TransformState& state) {
+static gl::VertexVector<ExtrusionTextureLayoutVertex> extrusionTextureVertices() {
     gl::VertexVector<ExtrusionTextureLayoutVertex> result;
     result.emplace_back(ExtrusionTextureProgram::layoutVertex({ 0, 0 }));
-    result.emplace_back(
-        ExtrusionTextureProgram::layoutVertex({ static_cast<int16_t>(state.getSize().width), 0 }));
-    result.emplace_back(
-        ExtrusionTextureProgram::layoutVertex({ 0, static_cast<int16_t>(state.getSize().height) }));
-    result.emplace_back(
-        ExtrusionTextureProgram::layoutVertex({ static_cast<int16_t>(state.getSize().width),
-                                                static_cast<short>(state.getSize().height) }));
+    result.emplace_back(ExtrusionTextureProgram::layoutVertex({ 1, 0 }));
+    result.emplace_back(ExtrusionTextureProgram::layoutVertex({ 0, 1 }));
+    result.emplace_back(ExtrusionTextureProgram::layoutVertex({ 1, 1 }));
     return result;
 }
 
@@ -102,14 +97,14 @@ Painter::Painter(gl::Context& context_,
       state(state_),
       tileVertexBuffer(context.createVertexBuffer(tileVertices())),
       rasterVertexBuffer(context.createVertexBuffer(rasterVertices())),
-      extrusionTextureVertexBuffer(context.createVertexBuffer(extrusionTextureVertices(state_))),
+      extrusionTextureVertexBuffer(context.createVertexBuffer(extrusionTextureVertices())),
       tileTriangleIndexBuffer(context.createIndexBuffer(tileTriangleIndices())),
       tileBorderIndexBuffer(context.createIndexBuffer(tileLineStripIndices())) {
 
     tileTriangleSegments.emplace_back(0, 0, 4, 6);
     tileBorderSegments.emplace_back(0, 0, 4, 5);
     rasterSegments.emplace_back(0, 0, 4, 6);
-    extrusionTextureSegments.emplace_back(0, 0, 4, 6); // TODO i have no idea what these numbers are
+    extrusionTextureSegments.emplace_back(0, 0, 4, 6);
 
     programs = std::make_unique<Programs>(context,
                                           ProgramParameters{ pixelRatio, false, programCacheDir });
@@ -338,91 +333,40 @@ void Painter::renderPass(PaintParameters& parameters,
             parameters.view.bind();
             context.setDirtyState();
         } else if (layer.is<FillExtrusionLayer>()) {
-////            const auto size = state.getSize();
-//            const auto size_ = context.viewport.getCurrentValue().size;
-//            Size size{ size_.width / 2, size_.height / 2 };
-//
-//            // i think maybe there's a depth buffering issue at tile boundaries (?) — perhaps not using the same depth buffer?
-//
-//            OffscreenTexture texture(context, size);
-//            texture.bindRenderbuffers();
-//
-//            context.setStencilMode(gl::StencilMode::disabled());
-//            context.setDepthMode(depthModeForSublayer(0, gl::DepthMode::ReadWrite));
-//            context.clear(Color{ 0.0f, 0.0f, 0.0f, 0.0f }, 1.0f, {});
+            const auto size = context.viewport.getCurrentValue().size;
+
+            OffscreenTexture texture(context, size);
+            texture.bindRenderbuffers();
+
+            context.setStencilMode(gl::StencilMode::disabled());
+            context.setDepthMode(depthModeForSublayer(0, gl::DepthMode::ReadWrite));
+            context.clear(Color{ 0.0f, 0.0f, 0.0f, 0.0f }, 1.0f, {});
 
             renderTiles();
-//
-//            parameters.view.bind();
-//
-//            mat4 mat;
-//            matrix::ortho(mat, 0, size.width, size.height, 0, 0, 1);
-//            const FillExtrusionPaintProperties::Evaluated properties{};
-//
-//            parameters.programs.extrusionTexture.draw(context,
-//                                                      gl::Triangles(),
-//                                                      gl::DepthMode::disabled(),
-//                                                      gl::StencilMode::disabled(),
-//                                                      colorModeForRenderPass(),
-//                                                      ExtrusionTextureProgram::UniformValues{
-//                                                          uniforms::u_matrix::Value{ mat },
-//                                                          uniforms::u_world::Value{ size },
-//                                                          uniforms::u_image::Value{ 0 }, // view.getTexture() ? no — but follow up on whether could be variable or if it's always safe to attach to 0 unit
-//                                                          uniforms::u_opacity::Value{ 0.9 } // TODO implement parsing from style
-//                                                      },
-//                                                      extrusionTextureVertexBuffer,
-//                                                      tileTriangleIndexBuffer,
-//                                                      extrusionTextureSegments,
-//                                                      ExtrusionTextureProgram::PaintPropertyBinders{ properties, 0 },
-//                                                      properties,
-//                                                      state.getZoom());
 
+            parameters.view.bind();
 
-//            const auto size = state.getSize();
-////            const auto size = Size{ _size.width - (_size.width % 4), _size.height - (_size.height % 4) };
-//
-//            OffscreenTexture texture(context, size);
-//            texture.bindRenderbuffers();
-//
-//            context.setStencilMode(gl::StencilMode::disabled());
-//            context.setDepthMode(depthModeForSublayer(0, gl::DepthMode::ReadWrite));
-//
-//            context.clear(Color{ 0.0f, 0.0f, 0.0f, 0.0f }, 1.0f, {});
-//
-//            renderTiles();
-//
-//            parameters.view.bind();
-//
-//            mat4 mat;
-//            matrix::ortho(mat, 0, size.width, size.height, 0, 0, 1);
-//
-//            const FillExtrusionPaintProperties::Evaluated properties{};
-//
-//            // DEBUG: trying to render texture to map
-////            context.activeTexture = 0;
-////            MBGL_CHECK_ERROR(glTexImage2D(GL_TEXTURE_2D, 0, static_cast<GLenum>(GL_RGBA), size.width,
-////                                          size.height, 0, static_cast<GLenum>(GL_RGBA), GL_UNSIGNED_BYTE,
-////                                          &texture.getTexture()));
-//
-//
-//            parameters.programs.extrusionTexture.draw(context,
-//                                                      gl::Triangles(),
-//                                                      gl::DepthMode::disabled(),
-//                                                      gl::StencilMode::disabled(),
-//                                                      colorModeForRenderPass(),
-//                                                      ExtrusionTextureProgram::UniformValues{
-//                                                          uniforms::u_matrix::Value{ mat },
-//                                                          uniforms::u_world::Value{ size },
-//                                                          uniforms::u_image::Value{ 0 }, // view.getTexture() ? no — but follow up on whether could be variable or if it's always safe to attach to 0 unit
-//                                                          uniforms::u_opacity::Value{ 0.9 } // TODO implement parsing from style
-//                                                      },
-//                                                      extrusionTextureVertexBuffer,
-//                                                      tileTriangleIndexBuffer, // we reuse the same simple index buffer
-//                                                      extrusionTextureSegments,
-//                                                      ExtrusionTextureProgram::PaintPropertyBinders{ properties, 0 },
-//                                                      FillExtrusionPaintProperties::Evaluated{},
-//                                                      state.getZoom());
+            mat4 mat;
+            matrix::ortho(mat, 0, size.width, size.height, 0, 0, 1);
+            const FillExtrusionPaintProperties::Evaluated properties{};
 
+            parameters.programs.extrusionTexture.draw(context,
+                                                      gl::Triangles(),
+                                                      gl::DepthMode::disabled(),
+                                                      gl::StencilMode::disabled(),
+                                                      colorModeForRenderPass(),
+                                                      ExtrusionTextureProgram::UniformValues{
+                                                          uniforms::u_matrix::Value{ mat },
+                                                          uniforms::u_world::Value{ size },
+                                                          uniforms::u_image::Value{ 0 }, // view.getTexture() ? no — but follow up on whether could be variable or if it's always safe to attach to 0 unit
+                                                          uniforms::u_opacity::Value{ 0.3 } // TODO implement parsing from style
+                                                      },
+                                                      extrusionTextureVertexBuffer,
+                                                      tileTriangleIndexBuffer,
+                                                      extrusionTextureSegments,
+                                                      ExtrusionTextureProgram::PaintPropertyBinders{ properties, 0 },
+                                                      properties,
+                                                      state.getZoom());
         } else {
             renderTiles();
         }

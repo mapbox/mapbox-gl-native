@@ -52,7 +52,7 @@ void FillExtrusionBucket::addFeature(const GeometryTileFeature& feature,
                 throw GeometryTooLongException();
         }
 
-        std::vector<GLsizei> flatIndices;
+        std::vector<uint32_t> flatIndices;
         flatIndices.reserve(totalVertices);
 
 // TODO this was all a lot of copying; make sure segment sizing/creation happens correctly
