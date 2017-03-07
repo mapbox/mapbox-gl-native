@@ -214,22 +214,21 @@ namespace mbgl {
 
 + (NSArray *)transitionKeys
 {
-    NSMutableArray *transitionKeys = [NSMutableArray array];
-    [transitionKeys addObject:@"lineBlur"];
-    [transitionKeys addObject:@"lineColor"];
-    [transitionKeys addObject:@"lineDashPattern"];
-    [transitionKeys addObject:@"lineDasharray"];
-    [transitionKeys addObject:@"lineGapWidth"];
-    [transitionKeys addObject:@"lineOffset"];
-    [transitionKeys addObject:@"lineOpacity"];
-    [transitionKeys addObject:@"linePattern"];
-    [transitionKeys addObject:@"lineTranslation"];
-    [transitionKeys addObject:@"lineTranslate"];
-    [transitionKeys addObject:@"lineTranslationAnchor"];
-    [transitionKeys addObject:@"lineTranslateAnchor"];
-    [transitionKeys addObject:@"lineWidth"];
-
-    return transitionKeys;
+    return @[
+        @"lineBlur",
+        @"lineColor",
+        @"lineDashPattern",
+        @"lineDasharray",
+        @"lineGapWidth",
+        @"lineOffset",
+        @"lineOpacity",
+        @"linePattern",
+        @"lineTranslation",
+        @"lineTranslate",
+        @"lineTranslationAnchor",
+        @"lineTranslateAnchor",
+        @"lineWidth",
+    ];
 }
 
 - (void)setLineBlur:(MGLStyleValue<NSNumber *> *)lineBlur {

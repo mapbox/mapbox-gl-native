@@ -890,27 +890,26 @@ namespace mbgl {
 
 + (NSArray *)transitionKeys
 {
-    NSMutableArray *transitionKeys = [NSMutableArray array];
-    [transitionKeys addObject:@"iconColor"];
-    [transitionKeys addObject:@"iconHaloBlur"];
-    [transitionKeys addObject:@"iconHaloColor"];
-    [transitionKeys addObject:@"iconHaloWidth"];
-    [transitionKeys addObject:@"iconOpacity"];
-    [transitionKeys addObject:@"iconTranslation"];
-    [transitionKeys addObject:@"iconTranslate"];
-    [transitionKeys addObject:@"iconTranslationAnchor"];
-    [transitionKeys addObject:@"iconTranslateAnchor"];
-    [transitionKeys addObject:@"textColor"];
-    [transitionKeys addObject:@"textHaloBlur"];
-    [transitionKeys addObject:@"textHaloColor"];
-    [transitionKeys addObject:@"textHaloWidth"];
-    [transitionKeys addObject:@"textOpacity"];
-    [transitionKeys addObject:@"textTranslation"];
-    [transitionKeys addObject:@"textTranslate"];
-    [transitionKeys addObject:@"textTranslationAnchor"];
-    [transitionKeys addObject:@"textTranslateAnchor"];
-
-    return transitionKeys;
+    return @[
+        @"iconColor",
+        @"iconHaloBlur",
+        @"iconHaloColor",
+        @"iconHaloWidth",
+        @"iconOpacity",
+        @"iconTranslation",
+        @"iconTranslate",
+        @"iconTranslationAnchor",
+        @"iconTranslateAnchor",
+        @"textColor",
+        @"textHaloBlur",
+        @"textHaloColor",
+        @"textHaloWidth",
+        @"textOpacity",
+        @"textTranslation",
+        @"textTranslate",
+        @"textTranslationAnchor",
+        @"textTranslateAnchor",
+    ];
 }
 
 - (void)setIconColor:(MGLStyleValue<MGLColor *> *)iconColor {

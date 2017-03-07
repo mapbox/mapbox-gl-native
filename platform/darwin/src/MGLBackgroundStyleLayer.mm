@@ -87,12 +87,11 @@
 
 + (NSArray *)transitionKeys
 {
-    NSMutableArray *transitionKeys = [NSMutableArray array];
-    [transitionKeys addObject:@"backgroundColor"];
-    [transitionKeys addObject:@"backgroundOpacity"];
-    [transitionKeys addObject:@"backgroundPattern"];
-
-    return transitionKeys;
+    return @[
+        @"backgroundColor",
+        @"backgroundOpacity",
+        @"backgroundPattern",
+    ];
 }
 
 - (void)setBackgroundColor:(MGLStyleValue<MGLColor *> *)backgroundColor {

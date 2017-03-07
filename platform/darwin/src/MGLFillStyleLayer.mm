@@ -132,19 +132,18 @@ namespace mbgl {
 
 + (NSArray *)transitionKeys
 {
-    NSMutableArray *transitionKeys = [NSMutableArray array];
-    [transitionKeys addObject:@"fillAntialiased"];
-    [transitionKeys addObject:@"fillAntialias"];
-    [transitionKeys addObject:@"fillColor"];
-    [transitionKeys addObject:@"fillOpacity"];
-    [transitionKeys addObject:@"fillOutlineColor"];
-    [transitionKeys addObject:@"fillPattern"];
-    [transitionKeys addObject:@"fillTranslation"];
-    [transitionKeys addObject:@"fillTranslate"];
-    [transitionKeys addObject:@"fillTranslationAnchor"];
-    [transitionKeys addObject:@"fillTranslateAnchor"];
-
-    return transitionKeys;
+    return @[
+        @"fillAntialiased",
+        @"fillAntialias",
+        @"fillColor",
+        @"fillOpacity",
+        @"fillOutlineColor",
+        @"fillPattern",
+        @"fillTranslation",
+        @"fillTranslate",
+        @"fillTranslationAnchor",
+        @"fillTranslateAnchor",
+    ];
 }
 
 - (void)setFillAntialiased:(MGLStyleValue<NSNumber *> *)fillAntialiased {

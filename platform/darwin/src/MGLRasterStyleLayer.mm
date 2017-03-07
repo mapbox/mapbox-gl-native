@@ -94,19 +94,18 @@
 
 + (NSArray *)transitionKeys
 {
-    NSMutableArray *transitionKeys = [NSMutableArray array];
-    [transitionKeys addObject:@"maximumRasterBrightness"];
-    [transitionKeys addObject:@"rasterBrightnessMax"];
-    [transitionKeys addObject:@"minimumRasterBrightness"];
-    [transitionKeys addObject:@"rasterBrightnessMin"];
-    [transitionKeys addObject:@"rasterContrast"];
-    [transitionKeys addObject:@"rasterFadeDuration"];
-    [transitionKeys addObject:@"rasterHueRotation"];
-    [transitionKeys addObject:@"rasterHueRotate"];
-    [transitionKeys addObject:@"rasterOpacity"];
-    [transitionKeys addObject:@"rasterSaturation"];
-
-    return transitionKeys;
+    return @[
+        @"maximumRasterBrightness",
+        @"rasterBrightnessMax",
+        @"minimumRasterBrightness",
+        @"rasterBrightnessMin",
+        @"rasterContrast",
+        @"rasterFadeDuration",
+        @"rasterHueRotation",
+        @"rasterHueRotate",
+        @"rasterOpacity",
+        @"rasterSaturation",
+    ];
 }
 
 - (void)setMaximumRasterBrightness:(MGLStyleValue<NSNumber *> *)maximumRasterBrightness {

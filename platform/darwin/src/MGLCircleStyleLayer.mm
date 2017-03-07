@@ -137,22 +137,21 @@ namespace mbgl {
 
 + (NSArray *)transitionKeys
 {
-    NSMutableArray *transitionKeys = [NSMutableArray array];
-    [transitionKeys addObject:@"circleBlur"];
-    [transitionKeys addObject:@"circleColor"];
-    [transitionKeys addObject:@"circleOpacity"];
-    [transitionKeys addObject:@"circleRadius"];
-    [transitionKeys addObject:@"circleScaleAlignment"];
-    [transitionKeys addObject:@"circlePitchScale"];
-    [transitionKeys addObject:@"circleStrokeColor"];
-    [transitionKeys addObject:@"circleStrokeOpacity"];
-    [transitionKeys addObject:@"circleStrokeWidth"];
-    [transitionKeys addObject:@"circleTranslation"];
-    [transitionKeys addObject:@"circleTranslate"];
-    [transitionKeys addObject:@"circleTranslationAnchor"];
-    [transitionKeys addObject:@"circleTranslateAnchor"];
-
-    return transitionKeys;
+    return @[
+        @"circleBlur",
+        @"circleColor",
+        @"circleOpacity",
+        @"circleRadius",
+        @"circleScaleAlignment",
+        @"circlePitchScale",
+        @"circleStrokeColor",
+        @"circleStrokeOpacity",
+        @"circleStrokeWidth",
+        @"circleTranslation",
+        @"circleTranslate",
+        @"circleTranslationAnchor",
+        @"circleTranslateAnchor",
+    ];
 }
 
 - (void)setCircleBlur:(MGLStyleValue<NSNumber *> *)circleBlur {

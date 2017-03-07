@@ -232,15 +232,14 @@ namespace mbgl {
 
 + (NSArray *)transitionKeys
 {
-    NSMutableArray *transitionKeys = [NSMutableArray array];
+    return @[
 <% for (const property of paintProperties) { -%>
-    [transitionKeys addObject:@"<%- camelizeWithLeadingLowercase(property.name) %>"];
+        @"<%- camelizeWithLeadingLowercase(property.name) %>",
 <% if (property.original) { -%>
-    [transitionKeys addObject:@"<%- camelizeWithLeadingLowercase(originalPropertyName(property)) %>"];
+        @"<%- camelizeWithLeadingLowercase(originalPropertyName(property)) %>",
 <% } -%>
 <% } -%>
-
-    return transitionKeys;
+    ];
 }
 
 <% for (const property of paintProperties) { -%>
