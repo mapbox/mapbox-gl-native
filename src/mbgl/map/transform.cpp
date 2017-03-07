@@ -241,16 +241,19 @@ void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &anima
         return std::log(std::sqrt(b * b + 1) - b);
     };
 
+    /// r₀: Zoom-out factor during ascent.
+    double r0 = r(0);
+    /// r1: Zoom-in factor during descent
+    double r1 = r(1);
+
     // When u₀ = u₁, the optimal path doesn’t require both ascent and descent.
     bool isClose = std::abs(u1) < 0.000001;
-    // Perform a more or less instantaneous transition if the path is too short.
-    if (isClose && std::abs(w0 - w1) < 0.000001) {
+    // Perform a more or less instantaneous transition if the path is too short or zoom in/out factor is infinte
+    if ((isClose && std::abs(w0 - w1) < 0.000001) || std::isinf(r0) || std::isinf(r1)) {
         easeTo(camera, animation);
         return;
     }
-
-    /// r₀: Zoom-out factor during ascent.
-    double r0 = r(0);
+    
     /** w(s): Returns the visible span on the ground, measured in pixels with
         respect to the initial scale.
 
@@ -268,7 +271,7 @@ void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &anima
     };
     /// S: Total length of the flight path, measured in ρ-screenfuls.
     double S = (isClose ? (std::abs(std::log(w1 / w0)) / rho)
-                : ((r(1) - r0) / rho));
+                : ((r1 - r0) / rho));
 
     Duration duration;
     if (animation.duration) {
