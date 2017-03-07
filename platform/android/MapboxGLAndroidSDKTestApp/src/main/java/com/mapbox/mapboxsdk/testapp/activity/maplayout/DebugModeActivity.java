@@ -5,7 +5,9 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.TextView;
 
+import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
@@ -47,8 +49,20 @@ public class DebugModeActivity extends AppCompatActivity {
       @Override
       public void onMapReady(@NonNull MapboxMap map) {
         mapboxMap = map;
+
+        mapboxMap.getUiSettings().setZoomControlsEnabled(true);
+
+        // show current zoom level on screen
+        final TextView textView = (TextView) findViewById(R.id.textZoom);
+        mapboxMap.setOnCameraChangeListener(new MapboxMap.OnCameraChangeListener() {
+          @Override
+          public void onCameraChange(CameraPosition position) {
+            textView.setText(String.format(getString(R.string.debug_zoom), position.zoom));
+          }
+        });
       }
     });
+
 
     FloatingActionButton fabDebug = (FloatingActionButton) findViewById(R.id.fabDebug);
     fabDebug.setOnClickListener(new View.OnClickListener() {

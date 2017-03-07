@@ -160,4 +160,5 @@
     <string name="dynamic_marker_chelsea_snippet">Stamford Bridge</string>
     <string name="dynamic_marker_arsenal_title">Arsenal</string>
     <string name="dynamic_marker_arsenal_snippet">Emirates Stadium</string>
+    <string name="debug_zoom">Zoom: %s</string>
 </resources>
