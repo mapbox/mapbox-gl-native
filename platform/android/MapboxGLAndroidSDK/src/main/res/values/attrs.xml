@@ -64,6 +64,7 @@
         <attr name="mapbox_uiCompassMarginRight" format="dimension"/>
         <attr name="mapbox_uiCompassMarginBottom" format="dimension"/>
         <attr name="mapbox_uiCompassFadeFacingNorth" format="boolean"/>
+        <attr name="mapbox_uiCompassDrawable" format="reference"/>
 
         <!--Logo-->
         <attr name="mapbox_uiLogo" format="boolean"/>

@@ -2,9 +2,9 @@ package com.mapbox.mapboxsdk.maps.widgets;
 
 import android.content.Context;
 import android.graphics.PointF;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPropertyAnimatorCompat;
 import android.support.v4.view.ViewPropertyAnimatorListenerAdapter;
@@ -13,7 +13,6 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.maps.FocalPointChangeListener;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 
@@ -55,7 +54,6 @@ public final class CompassView extends AppCompatImageView implements Runnable, F
   }
 
   private void initialize(Context context) {
-    setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.mapbox_compass_icon));
     setEnabled(false);
 
     // Layout params
@@ -138,6 +136,24 @@ public final class CompassView extends AppCompatImageView implements Runnable, F
 
   public boolean isFadeCompassViewFacingNorth() {
     return fadeCompassViewFacingNorth;
+  }
+
+  /**
+   * Set the CompassView image.
+   *
+   * @param compass the drawable to use as compass image
+   */
+  public void setCompassImage(Drawable compass) {
+    setImageDrawable(compass);
+  }
+
+  /**
+   * Get the current configured CompassView image.
+   *
+   * @return the drawable used as compass image
+   */
+  public Drawable getCompassImage() {
+    return getDrawable();
   }
 
   @Override
