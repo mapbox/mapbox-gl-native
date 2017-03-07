@@ -36,11 +36,27 @@ public:
         return size;
     }
 
+    void bindRenderbuffers() {
+        if (!framebuffer) {
+            texture = context.createTexture(size);
+            colorTarget = context.createRenderbuffer<gl::RenderbufferType::RGBA>(size);
+            depthTarget = context.createRenderbuffer<gl::RenderbufferType::DepthComponent>(size);
+            framebuffer = context.createFramebuffer(*colorTarget, *depthTarget, *texture);
+        } else {
+            context.bindFramebuffer = framebuffer->framebuffer;
+        }
+
+        context.viewport = { 0, 0, size };
+    }
+
+
 private:
     gl::Context& context;
     const Size size;
     optional<gl::Framebuffer> framebuffer;
     optional<gl::Texture> texture;
+    optional<gl::Renderbuffer<gl::RenderbufferType::RGBA>> colorTarget;
+    optional<gl::Renderbuffer<gl::RenderbufferType::DepthComponent>> depthTarget;
 };
 
 OffscreenTexture::OffscreenTexture(gl::Context& context, const Size size)
@@ -58,25 +74,16 @@ PremultipliedImage OffscreenTexture::readStillImage() {
     return impl->readStillImage();
 }
 
-void OffscreenTexture::bindRenderbuffers() {
-    if (!framebuffer) {
-        texture = context.createTexture(size);
-        colorTarget = context.createRenderbuffer<gl::RenderbufferType::RGBA>(size);
-        depthTarget = context.createRenderbuffer<gl::RenderbufferType::DepthComponent>(size);
-        framebuffer = context.createFramebuffer(*colorTarget, *depthTarget, *texture);
-    } else {
-        context.bindFramebuffer = framebuffer->framebuffer;
-    }
-
-    context.viewport = { 0, 0, size };
-}
-
 gl::Texture& OffscreenTexture::getTexture() {
     return impl->getTexture();
 }
 
 const Size& OffscreenTexture::getSize() const {
     return impl->getSize();
+}
+
+void OffscreenTexture::bindRenderbuffers() {
+    impl->bindRenderbuffers();
 }
 
 } // namespace mbgl
