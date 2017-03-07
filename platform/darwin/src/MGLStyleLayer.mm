@@ -109,9 +109,11 @@
     return propertyTransitionSelector;
 }
 
-- (NSArray *)transitionKeys
++ (NSArray *)transitionKeys
 {
     // This is overridden by subclasses
+    [NSException raise:@"MGLAbstractClassException"
+                format:@"MGLStyleLayer is an abstract class"];
     return nil;
 }
 

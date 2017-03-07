@@ -78,7 +78,7 @@ MGL_EXPORT
 /**
  Returns an array of strings that identify transition keys attached to the layer.
  */
-- (NSArray *)transitionKeys;
++ (NSArray *)transitionKeys;
 
 @end
 

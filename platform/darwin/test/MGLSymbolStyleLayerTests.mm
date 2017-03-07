@@ -43,6 +43,16 @@
     XCTAssertTrue(layer.rawLayer->is<mbgl::style::SymbolLayer>());
     auto rawLayer = layer.rawLayer->as<mbgl::style::SymbolLayer>();
 
+    NSArray *transitionKeys = [MGLSymbolStyleLayer transitionKeys];
+    MGLTransition transitionTest = {.delay = 4, .duration = 5};
+
+    for (NSString *property in transitionKeys) {
+        [layer setTransition:transitionTest forKey:property];
+        MGLTransition transition = [layer transitionForKey:property];
+        XCTAssertEqual(transition.delay, transitionTest.delay);
+        XCTAssertEqual(transition.duration, transitionTest.duration);
+    }
+
     // icon-allow-overlap
     {
         XCTAssertTrue(rawLayer->getIconAllowOverlap().isUndefined(),

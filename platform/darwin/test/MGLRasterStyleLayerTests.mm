@@ -25,6 +25,16 @@
     XCTAssertTrue(layer.rawLayer->is<mbgl::style::RasterLayer>());
     auto rawLayer = layer.rawLayer->as<mbgl::style::RasterLayer>();
 
+    NSArray *transitionKeys = [MGLRasterStyleLayer transitionKeys];
+    MGLTransition transitionTest = {.delay = 4, .duration = 5};
+
+    for (NSString *property in transitionKeys) {
+        [layer setTransition:transitionTest forKey:property];
+        MGLTransition transition = [layer transitionForKey:property];
+        XCTAssertEqual(transition.delay, transitionTest.delay);
+        XCTAssertEqual(transition.duration, transitionTest.duration);
+    }
+
     // raster-brightness-max
     {
         XCTAssertTrue(rawLayer->getRasterBrightnessMax().isUndefined(),

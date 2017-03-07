@@ -53,6 +53,16 @@
     XCTAssertNotEqual(layer.rawLayer, nullptr);
     XCTAssertTrue(layer.rawLayer->is<mbgl::style::<%- camelize(type) %>Layer>());
     auto rawLayer = layer.rawLayer->as<mbgl::style::<%- camelize(type) %>Layer>();
+
+    NSArray *transitionKeys = [MGL<%- camelize(type) %>StyleLayer transitionKeys];
+    MGLTransition transitionTest = {.delay = 4, .duration = 5};
+
+    for (NSString *property in transitionKeys) {
+        [layer setTransition:transitionTest forKey:property];
+        MGLTransition transition = [layer transitionForKey:property];
+        XCTAssertEqual(transition.delay, transitionTest.delay);
+        XCTAssertEqual(transition.duration, transitionTest.duration);
+    }
 <% for (const property of properties) { -%>
 
     // <%- originalPropertyName(property) %>

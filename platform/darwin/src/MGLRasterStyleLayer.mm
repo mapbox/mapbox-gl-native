@@ -92,7 +92,7 @@
 
 #pragma mark - Accessing the Paint Attributes
 
-- (NSArray *)transitionKeys
++ (NSArray *)transitionKeys
 {
     NSMutableArray *transitionKeys = [NSMutableArray array];
     [transitionKeys addObject:@"maximumRasterBrightness"];
