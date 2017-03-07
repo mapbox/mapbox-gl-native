@@ -81,7 +81,10 @@ public:
 
     template <RenderbufferType type>
     Renderbuffer<type> createRenderbuffer(const Size size) {
-        static_assert(type == RenderbufferType::RGBA || type == RenderbufferType::DepthStencil || type == RenderbufferType::DepthComponent,
+        static_assert(type == RenderbufferType::RGBA ||
+                      type == RenderbufferType::DepthStencil ||
+                      type == RenderbufferType::DepthComponent ||
+                      type == RenderbufferType::RGBA4,  // TODO I added RGBA4 because in JS RGBA8 (here 'RGBA') emits a "renderbufferStorage: invalid internalformat" warning (though still renders fine) -- investigate
                       "invalid renderbuffer type");
         return { size, createRenderbuffer(type, size) };
     }
@@ -92,7 +95,7 @@ public:
     Framebuffer createFramebuffer(const Texture&,
                                   const Renderbuffer<RenderbufferType::DepthStencil>&);
     Framebuffer createFramebuffer(const Texture&);
-    Framebuffer createFramebuffer(const Renderbuffer<RenderbufferType::RGBA>&,
+    Framebuffer createFramebuffer(const Renderbuffer<RenderbufferType::RGBA4>&,
                                   const Renderbuffer<RenderbufferType::DepthComponent>&,
                                   const Texture&);
 
