@@ -27,8 +27,6 @@ NS_ASSUME_NONNULL_BEGIN
  This method is called whenever the currently displayed map camera has finished
  changing, after any calls to `-mapViewRegionIsChanging:` due to animation.
  
- This method can be called before the map view has finished loading.
- 
  @param mapView The map view whose viewpoint will change.
  @param animated Whether the change will cause an animated effect on the map.
  */
