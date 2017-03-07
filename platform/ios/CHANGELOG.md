@@ -5,6 +5,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 ## master
 
 * The error passed into `-[MGLMapViewDelegate mapViewDidFailLoadingMap:withError:]` now includes a more specific description and failure reason. ([#8418](https://github.com/mapbox/mapbox-gl-native/pull/8418))
+* Fixed an issue where gesture recognizers associated with map view interactivity were not disabled when their related interactions were disabled. ([#8304](https://github.com/mapbox/mapbox-gl-native/pull/8304))
 
 ## 3.5.0
 

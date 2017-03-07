@@ -240,6 +240,8 @@ public:
 @property (nonatomic) UIActionSheet *attributionSheet;
 @property (nonatomic, readwrite) MGLStyle *style;
 @property (nonatomic) UITapGestureRecognizer *singleTapGestureRecognizer;
+@property (nonatomic) UITapGestureRecognizer *doubleTap;
+@property (nonatomic) UITapGestureRecognizer *twoFingerTap;
 @property (nonatomic) UIPanGestureRecognizer *pan;
 @property (nonatomic) UIPinchGestureRecognizer *pinch;
 @property (nonatomic) UIRotationGestureRecognizer *rotate;
@@ -515,26 +517,26 @@ public:
     [self addGestureRecognizer:_rotate];
     _rotateEnabled = YES;
 
-    UITapGestureRecognizer *doubleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleDoubleTapGesture:)];
-    doubleTap.numberOfTapsRequired = 2;
-    [self addGestureRecognizer:doubleTap];
+    _doubleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleDoubleTapGesture:)];
+    _doubleTap.numberOfTapsRequired = 2;
+    [self addGestureRecognizer:_doubleTap];
 
     _singleTapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleSingleTapGesture:)];
-    [_singleTapGestureRecognizer requireGestureRecognizerToFail:doubleTap];
+    [_singleTapGestureRecognizer requireGestureRecognizerToFail:_doubleTap];
     _singleTapGestureRecognizer.delegate = self;
     [self addGestureRecognizer:_singleTapGestureRecognizer];
 
-    UITapGestureRecognizer *twoFingerTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTwoFingerTapGesture:)];
-    twoFingerTap.numberOfTouchesRequired = 2;
-    [twoFingerTap requireGestureRecognizerToFail:_pinch];
-    [twoFingerTap requireGestureRecognizerToFail:_rotate];
-    [self addGestureRecognizer:twoFingerTap];
+    _twoFingerTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTwoFingerTapGesture:)];
+    _twoFingerTap.numberOfTouchesRequired = 2;
+    [_twoFingerTap requireGestureRecognizerToFail:_pinch];
+    [_twoFingerTap requireGestureRecognizerToFail:_rotate];
+    [self addGestureRecognizer:_twoFingerTap];
 
     _twoFingerDrag = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handleTwoFingerDragGesture:)];
     _twoFingerDrag.minimumNumberOfTouches = 2;
     _twoFingerDrag.maximumNumberOfTouches = 2;
     _twoFingerDrag.delegate = self;
-    [_twoFingerDrag requireGestureRecognizerToFail:twoFingerTap];
+    [_twoFingerDrag requireGestureRecognizerToFail:_twoFingerTap];
     [_twoFingerDrag requireGestureRecognizerToFail:_pan];
     [self addGestureRecognizer:_twoFingerDrag];
     _pitchEnabled = YES;
@@ -544,7 +546,7 @@ public:
     _quickZoom = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleQuickZoomGesture:)];
     _quickZoom.numberOfTapsRequired = 1;
     _quickZoom.minimumPressDuration = 0;
-    [_quickZoom requireGestureRecognizerToFail:doubleTap];
+    [_quickZoom requireGestureRecognizerToFail:_doubleTap];
     [self addGestureRecognizer:_quickZoom];
 
     // observe app activity
@@ -2126,6 +2128,33 @@ public:
 - (void)emptyMemoryCache
 {
     _mbglMap->onLowMemory();
+}
+
+- (void)setZoomEnabled:(BOOL)zoomEnabled
+{
+    _zoomEnabled = zoomEnabled;
+    self.pinch.enabled = zoomEnabled;
+    self.doubleTap.enabled = zoomEnabled;
+    self.quickZoom.enabled = zoomEnabled;
+    self.twoFingerTap.enabled = zoomEnabled;
+}
+
+- (void)setScrollEnabled:(BOOL)scrollEnabled
+{
+    _scrollEnabled = scrollEnabled;
+    self.pan.enabled = scrollEnabled;
+}
+
+- (void)setRotateEnabled:(BOOL)rotateEnabled
+{
+    _rotateEnabled = rotateEnabled;
+    self.rotate.enabled = rotateEnabled;
+}
+
+- (void)setPitchEnabled:(BOOL)pitchEnabled
+{
+    _pitchEnabled = pitchEnabled;
+    self.twoFingerDrag.enabled = pitchEnabled;
 }
 
 #pragma mark - Accessibility -

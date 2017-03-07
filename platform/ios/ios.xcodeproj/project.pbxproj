@@ -176,6 +176,7 @@
 		558DE7A21E5615E400C7916D /* MGLFoundation.mm in Sources */ = {isa = PBXBuildFile; fileRef = 558DE79F1E5615E400C7916D /* MGLFoundation.mm */; };
 		558DE7A31E5615E400C7916D /* MGLFoundation.mm in Sources */ = {isa = PBXBuildFile; fileRef = 558DE79F1E5615E400C7916D /* MGLFoundation.mm */; };
 		55E2AD131E5B125400E8C587 /* MGLOfflineStorageTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 55E2AD121E5B125400E8C587 /* MGLOfflineStorageTests.mm */; };
+		632281DF1E6F855900D75A5D /* MBXEmbeddedMapViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 632281DE1E6F855900D75A5D /* MBXEmbeddedMapViewController.m */; };
 		6407D6701E0085FD00F6A9C3 /* MGLDocumentationExampleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6407D66F1E0085FD00F6A9C3 /* MGLDocumentationExampleTests.swift */; };
 		7E016D7E1D9E86BE00A29A21 /* MGLPolyline+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 7E016D7C1D9E86BE00A29A21 /* MGLPolyline+MGLAdditions.h */; };
 		7E016D7F1D9E86BE00A29A21 /* MGLPolyline+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 7E016D7C1D9E86BE00A29A21 /* MGLPolyline+MGLAdditions.h */; };
@@ -639,6 +640,8 @@
 		55D8C9941D0F133500F42F10 /* config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = config.xcconfig; path = ../../build/ios/config.xcconfig; sourceTree = "<group>"; };
 		55D8C9951D0F18CE00F42F10 /* libsqlite3.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.tbd; path = usr/lib/libsqlite3.tbd; sourceTree = SDKROOT; };
 		55E2AD121E5B125400E8C587 /* MGLOfflineStorageTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLOfflineStorageTests.mm; path = ../../darwin/test/MGLOfflineStorageTests.mm; sourceTree = "<group>"; };
+		632281DD1E6F855900D75A5D /* MBXEmbeddedMapViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MBXEmbeddedMapViewController.h; sourceTree = "<group>"; };
+		632281DE1E6F855900D75A5D /* MBXEmbeddedMapViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MBXEmbeddedMapViewController.m; sourceTree = "<group>"; };
 		6407D66F1E0085FD00F6A9C3 /* MGLDocumentationExampleTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MGLDocumentationExampleTests.swift; path = ../../darwin/test/MGLDocumentationExampleTests.swift; sourceTree = "<group>"; };
 		7E016D7C1D9E86BE00A29A21 /* MGLPolyline+MGLAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "MGLPolyline+MGLAdditions.h"; sourceTree = "<group>"; };
 		7E016D7D1D9E86BE00A29A21 /* MGLPolyline+MGLAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "MGLPolyline+MGLAdditions.m"; sourceTree = "<group>"; };
@@ -1123,6 +1126,8 @@
 				DA1DC9691CB6C6B7006E619F /* MBXOfflinePacksTableViewController.m */,
 				DA1DC9531CB6C1C2006E619F /* MBXViewController.h */,
 				DA1DC99A1CB6E064006E619F /* MBXViewController.m */,
+				632281DD1E6F855900D75A5D /* MBXEmbeddedMapViewController.h */,
+				632281DE1E6F855900D75A5D /* MBXEmbeddedMapViewController.m */,
 				DA821D051CCC6D59007508D4 /* Main.storyboard */,
 				DA821D041CCC6D59007508D4 /* LaunchScreen.storyboard */,
 				DA1DC99E1CB6E088006E619F /* Assets.xcassets */,
@@ -2071,6 +2076,7 @@
 				DA1DC96A1CB6C6B7006E619F /* MBXCustomCalloutView.m in Sources */,
 				DA1DC99B1CB6E064006E619F /* MBXViewController.m in Sources */,
 				40FDA76B1CCAAA6800442548 /* MBXAnnotationView.m in Sources */,
+				632281DF1E6F855900D75A5D /* MBXEmbeddedMapViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
