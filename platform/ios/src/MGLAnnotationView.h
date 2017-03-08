@@ -152,7 +152,7 @@ typedef NS_ENUM(NSUInteger, MGLAnnotationViewDragState) {
  The default value of this property is `NO`. Set this property to `YES` if the
  view’s rotation is important.
  */
-@property (nonatomic, assign) BOOL rotatesWithMap;
+@property (nonatomic, assign) BOOL rotatesToMatchCamera;
 
 #pragma mark Managing the Selection State
 
