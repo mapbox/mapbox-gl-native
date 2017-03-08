@@ -44,7 +44,6 @@ public:
     template <class Evaluator>
     auto evaluate(const Evaluator& evaluator, TimePoint now) {
         auto finalValue = value.evaluate(evaluator);
-        
         if (!prior) {
             // No prior value.
             return finalValue;
@@ -67,7 +66,7 @@ public:
             return util::interpolate(prior->get().evaluate(evaluator, now), finalValue, util::DEFAULT_TRANSITION_EASE.solve(t, 0.001));
         }
     }
-    
+
     bool hasTransition() const {
         return bool(prior);
     }
