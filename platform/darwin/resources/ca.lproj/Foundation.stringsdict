@@ -13,13 +13,9 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>%d градус</string>
-			<key>few</key>
-			<string>%d градуса</string>
-			<key>many</key>
-			<string>%d градусов</string>
+			<string>%d grau</string>
 			<key>other</key>
-			<string>%d градуса</string>
+			<string>%d graus</string>
 		</dict>
 	</dict>
 	<key>COORD_MIN_LONG</key>
@@ -33,13 +29,9 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>%d минута</string>
-			<key>few</key>
-			<string>%d минуты</string>
-			<key>many</key>
-			<string>%d минут</string>
+			<string>%d minut</string>
 			<key>other</key>
-			<string>%d минуты</string>
+			<string>%d minuts</string>
 		</dict>
 	</dict>
 	<key>COORD_SEC_LONG</key>
@@ -53,13 +45,9 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>%d секунда</string>
-			<key>few</key>
-			<string>%d секунды</string>
-			<key>many</key>
-			<string>%d секунд</string>
+			<string>%d segon</string>
 			<key>other</key>
-			<string>%d секунды</string>
+			<string>%d segons</string>
 		</dict>
 	</dict>
 </dict>

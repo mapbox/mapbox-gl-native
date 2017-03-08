@@ -20,7 +20,7 @@
 "COMPASS_NORTH" = "N";
 
 /* Instructions in Interface Builder designable; {key}, {plist file name} */
-"DESIGNABLE" = "To display a Mapbox-hosted map here, set %1$@ to your access token in %2$@\n\nFor detailed instructions, see:";
+"DESIGNABLE" = "Для отображения здесь карт Mapbox задайте %1$@ к вашему токену доступа в %2$@\n\nПодробные инструкции см.:";
 
 /* Setup documentation URL display string; keep as short as possible */
 "FIRST_STEPS_URL" = "mapbox.com/help/first-steps-ios-sdk";
@@ -38,13 +38,13 @@
 "MAP_A11Y_LABEL" = "Карта";
 
 /* Map accessibility value */
-"MAP_A11Y_VALUE" = "Zoom %1$dx\n%2$ld annotation(s) visible";
+"MAP_A11Y_VALUE" = "Масштаб %1$dx\n%2$ld аннотации(й) видны";
 
 /* Action sheet title */
 "SDK_NAME" = "Mapbox iOS SDK";
 
 /* Telemetry prompt message */
-"TELEMETRY_DISABLED_MSG" = "You can help make OpenStreetMap and Mapbox maps better by contributing anonymous usage data.";
+"TELEMETRY_DISABLED_MSG" = "Вы можете помочь сделать карты OpenStreetMap и Mapbox лучше путем предоставления анонимных данных об использовании.";
 
 /* Telemetry prompt button */
 "TELEMETRY_DISABLED_OFF" = "Не участвовать";
@@ -53,7 +53,7 @@
 "TELEMETRY_DISABLED_ON" = "Участвовать";
 
 /* Telemetry prompt message */
-"TELEMETRY_ENABLED_MSG" = "You are helping to make OpenStreetMap and Mapbox maps better by contributing anonymous usage data.";
+"TELEMETRY_ENABLED_MSG" = "Вы помогаете сделать карты OpenStreetMap и Mapbox лучше путем предоставления анонимных данных об использовании.";
 
 /* Telemetry prompt button */
 "TELEMETRY_ENABLED_OFF" = "Прекратить участие";

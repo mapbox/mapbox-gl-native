@@ -13,13 +13,13 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>%d градус</string>
+			<string>%d laipsniai</string>
 			<key>few</key>
-			<string>%d градуса</string>
+			<string>%d laipsniai</string>
 			<key>many</key>
-			<string>%d градусов</string>
+			<string>%d laipsniai</string>
 			<key>other</key>
-			<string>%d градуса</string>
+			<string>%d laipsnių</string>
 		</dict>
 	</dict>
 	<key>COORD_MIN_LONG</key>
@@ -33,13 +33,13 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>%d минута</string>
+			<string>%d minutė</string>
 			<key>few</key>
-			<string>%d минуты</string>
+			<string>%d minutės</string>
 			<key>many</key>
-			<string>%d минут</string>
+			<string>%d minutės</string>
 			<key>other</key>
-			<string>%d минуты</string>
+			<string>%d minučių</string>
 		</dict>
 	</dict>
 	<key>COORD_SEC_LONG</key>
@@ -53,13 +53,13 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>%d секунда</string>
+			<string>%d sekundė</string>
 			<key>few</key>
-			<string>%d секунды</string>
+			<string>%d sekundės</string>
 			<key>many</key>
-			<string>%d секунд</string>
+			<string>%d sekundės</string>
 			<key>other</key>
-			<string>%d секунды</string>
+			<string>%d sekundžių</string>
 		</dict>
 	</dict>
 </dict>
