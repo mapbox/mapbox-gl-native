@@ -17,12 +17,13 @@ namespace style {
 namespace conversion {
 
 template <>
-Result<GeoJSON> convertGeoJSON(const mbgl::android::Value& value) {
+optional<GeoJSON> convertGeoJSON(const mbgl::android::Value& value, Error& error) {
 
     // Value should be a string wrapped in an object
     mbgl::android::Value jsonValue = value.get("data");
     if(value.isNull()) {
-        return Error { "no json data found" };
+        error = { "no json data found" };
+        return {};
     }
     std::string jsonString = value.get("data").toString();
 
@@ -32,12 +33,14 @@ Result<GeoJSON> convertGeoJSON(const mbgl::android::Value& value) {
     if (d.HasParseError()) {
         std::stringstream message;
         message << d.GetErrorOffset() << " - " << rapidjson::GetParseError_En(d.GetParseError());
-        return Error { message.str() };
+        error = { message.str() };
+        return {};
     }
 
-    conversion::Result<GeoJSON> geoJSON = conversion::convertGeoJSON<JSValue>(d);
+    optional<GeoJSON> geoJSON = conversion::convertGeoJSON<JSValue>(d, error);
     if (!geoJSON) {
-        return Error { geoJSON.error().message };
+        error = { error.message };
+        return {};
     }
 
     return geoJSON;
@@ -46,8 +49,8 @@ Result<GeoJSON> convertGeoJSON(const mbgl::android::Value& value) {
 template <>
 struct Converter<GeoJSON> {
 
-    Result<GeoJSON> operator()(const mbgl::android::Value& value) const {
-        return convertGeoJSON(value);
+    optional<GeoJSON> operator()(const mbgl::android::Value& value, Error& error) const {
+        return convertGeoJSON(value, error);
     }
 
 };

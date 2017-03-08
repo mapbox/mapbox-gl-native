@@ -11,10 +11,11 @@ using namespace mbgl::style;
 using namespace mbgl::style::conversion;
 using namespace std::literals::chrono_literals;
 
-auto parseLayer(const std::string& src) {
+std::unique_ptr<Layer> parseLayer(const std::string& src) {
     JSDocument doc;
     doc.Parse<0>(src);
-    return convert<std::unique_ptr<Layer>, JSValue>(doc);
+    Error error;
+    return std::move(*convert<std::unique_ptr<Layer>, JSValue>(doc, error));
 }
 
 TEST(StyleConversion, LayerTransition) {
@@ -34,13 +35,13 @@ TEST(StyleConversion, LayerTransition) {
         }
     })JSON");
 
-    ASSERT_EQ(400ms, *(*layer)->as<BackgroundLayer>()->impl->paint.cascading
+    ASSERT_EQ(400ms, *layer->as<BackgroundLayer>()->impl->paint.cascading
         .get<BackgroundColor>().getTransition({}).duration);
-    ASSERT_EQ(500ms, *(*layer)->as<BackgroundLayer>()->impl->paint.cascading
+    ASSERT_EQ(500ms, *layer->as<BackgroundLayer>()->impl->paint.cascading
         .get<BackgroundColor>().getTransition({}).delay);
 
-    ASSERT_EQ(100ms, *(*layer)->as<BackgroundLayer>()->impl->paint.cascading
+    ASSERT_EQ(100ms, *layer->as<BackgroundLayer>()->impl->paint.cascading
         .get<BackgroundColor>().getTransition({"class"}).duration);
-    ASSERT_FALSE(bool((*layer)->as<BackgroundLayer>()->impl->paint.cascading
+    ASSERT_FALSE(bool(layer->as<BackgroundLayer>()->impl->paint.cascading
         .get<BackgroundColor>().getTransition({"class"}).delay));
 }

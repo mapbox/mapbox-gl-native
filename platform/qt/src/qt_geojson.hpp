@@ -180,20 +180,21 @@ namespace style {
 namespace conversion {
 
 template <>
-Result<GeoJSON> convertGeoJSON(const QMapbox::Feature& feature) {
-    return Result<GeoJSON> { GeoJSON { asMapboxGLFeature(feature) } };
+optional<GeoJSON> convertGeoJSON(const QMapbox::Feature& feature, Error&) {
+    return GeoJSON { asMapboxGLFeature(feature) };
 }
 
 template <>
-Result<GeoJSON> convertGeoJSON(const QVariant& value) {
+optional<GeoJSON> convertGeoJSON(const QVariant& value, Error& error) {
 #if QT_VERSION >= 0x050000
     if (value.typeName() == QStringLiteral("QMapbox::Feature")) {
 #else
     if (value.typeName() == QString("QMapbox::Feature")) {
 #endif
-        return convertGeoJSON(value.value<QMapbox::Feature>());
+        return convertGeoJSON(value.value<QMapbox::Feature>(), error);
     } else if (value.type() != QVariant::ByteArray) {
-        return Error { "JSON data must be in QByteArray" };
+        error = { "JSON data must be in QByteArray" };
+        return {};
     }
 
     auto data = value.toByteArray();
@@ -208,13 +209,14 @@ Result<GeoJSON> convertGeoJSON(const QVariant& value) {
     if (d.HasParseError()) {
         std::stringstream message;
         message << d.GetErrorOffset() << " - " << rapidjson::GetParseError_En(d.GetParseError());
-
-        return Error { message.str() };
+        error = { message.str() };
+        return {};
     }
 
-    Result<GeoJSON> geoJSON = convertGeoJSON<JSValue>(d);
+    optional<GeoJSON> geoJSON = convertGeoJSON<JSValue>(d, error);
     if (!geoJSON) {
-        return Error { geoJSON.error().message };
+        error = { error.message };
+        return {};
     }
 
     return geoJSON;

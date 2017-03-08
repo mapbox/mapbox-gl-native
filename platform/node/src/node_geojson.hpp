@@ -5,8 +5,9 @@ namespace style {
 namespace conversion {
 
 template <>
-Result<GeoJSON> convertGeoJSON(const v8::Local<v8::Value>&) {
-    return Error { "not implemented" };
+optional<GeoJSON> convertGeoJSON(const v8::Local<v8::Value>&, Error& error) {
+    error = { "not implemented" };
+    return {};
 }
 
 } // namespace conversion

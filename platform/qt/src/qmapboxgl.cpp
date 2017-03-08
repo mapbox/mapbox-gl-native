@@ -1250,9 +1250,10 @@ void QMapboxGL::addSource(const QString &id, const QVariantMap &params)
     using namespace mbgl::style;
     using namespace mbgl::style::conversion;
 
-    Result<std::unique_ptr<Source>> source = convert<std::unique_ptr<Source>>(QVariant(params), id.toStdString());
+    Error error;
+    mbgl::optional<std::unique_ptr<Source>> source = convert<std::unique_ptr<Source>>(QVariant(params), error, id.toStdString());
     if (!source) {
-        qWarning() << "Unable to add source:" << source.error().message.c_str();
+        qWarning() << "Unable to add source:" << error.message.c_str();
         return;
     }
 
@@ -1291,7 +1292,8 @@ void QMapboxGL::updateSource(const QString &id, const QVariantMap &params)
     }
 
     if (params.contains("data")) {
-        auto result = convertGeoJSON(params["data"]);
+        Error error;
+        auto result = convertGeoJSON(params["data"], error);
         if (result) {
             sourceGeoJSON->setGeoJSON(*result);
         }
@@ -1362,9 +1364,10 @@ void QMapboxGL::addLayer(const QVariantMap &params)
     using namespace mbgl::style;
     using namespace mbgl::style::conversion;
 
-    Result<std::unique_ptr<Layer>> layer = convert<std::unique_ptr<Layer>>(QVariant(params));
+    Error error;
+    mbgl::optional<std::unique_ptr<Layer>> layer = convert<std::unique_ptr<Layer>>(QVariant(params), error);
     if (!layer) {
-        qWarning() << "Unable to add layer:" << layer.error().message.c_str();
+        qWarning() << "Unable to add layer:" << error.message.c_str();
         return;
     }
 
@@ -1445,9 +1448,10 @@ void QMapboxGL::setFilter(const QString& layer, const QVariant& filter)
 
     Filter filter_;
 
-    Result<Filter> converted = convert<Filter>(filter);
+    Error error;
+    mbgl::optional<Filter> converted = convert<Filter>(filter, error);
     if (!converted) {
-        qWarning() << "Error parsing filter:" << converted.error().message.c_str();
+        qWarning() << "Error parsing filter:" << error.message.c_str();
         return;
     }
     filter_ = std::move(*converted);

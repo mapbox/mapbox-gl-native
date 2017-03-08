@@ -116,10 +116,11 @@ void Parser::parseSources(const JSValue& value) {
     for (const auto& property : value.GetObject()) {
         std::string id = *conversion::toString(property.name);
 
-        conversion::Result<std::unique_ptr<Source>> source =
-            conversion::convert<std::unique_ptr<Source>>(property.value, id);
+        conversion::Error error;
+        optional<std::unique_ptr<Source>> source =
+            conversion::convert<std::unique_ptr<Source>>(property.value, error, id);
         if (!source) {
-            Log::Warning(Event::ParseStyle, source.error().message);
+            Log::Warning(Event::ParseStyle, error.message);
             continue;
         }
 
@@ -222,9 +223,10 @@ void Parser::parseLayer(const std::string& id, const JSValue& value, std::unique
         layer = reference->baseImpl->cloneRef(id);
         conversion::setPaintProperties(*layer, value);
     } else {
-        conversion::Result<std::unique_ptr<Layer>> converted = conversion::convert<std::unique_ptr<Layer>>(value);
+        conversion::Error error;
+        optional<std::unique_ptr<Layer>> converted = conversion::convert<std::unique_ptr<Layer>>(value, error);
         if (!converted) {
-            Log::Warning(Event::ParseStyle, converted.error().message);
+            Log::Warning(Event::ParseStyle, error.message);
             return;
         }
         layer = std::move(*converted);
@@ -232,20 +234,20 @@ void Parser::parseLayer(const std::string& id, const JSValue& value, std::unique
 }
 
 std::vector<FontStack> Parser::fontStacks() const {
-    std::set<FontStack> result;
+    std::set<FontStack> optional;
 
     for (const auto& layer : layers) {
         if (layer->is<SymbolLayer>()) {
             PropertyValue<FontStack> textFont = layer->as<SymbolLayer>()->getTextFont();
             if (textFont.isUndefined()) {
-                result.insert({"Open Sans Regular", "Arial Unicode MS Regular"});
+                optional.insert({"Open Sans Regular", "Arial Unicode MS Regular"});
             } else if (textFont.isConstant()) {
-                result.insert(textFont.asConstant());
+                optional.insert(textFont.asConstant());
             } else if (textFont.isCameraFunction()) {
                 textFont.asCameraFunction().stops.match(
                     [&] (const auto& stops) {
                         for (const auto& stop : stops.stops) {
-                            result.insert(stop.second);
+                            optional.insert(stop.second);
                         }
                     }
                 );
@@ -253,7 +255,7 @@ std::vector<FontStack> Parser::fontStacks() const {
         }
     }
 
-    return std::vector<FontStack>(result.begin(), result.end());
+    return std::vector<FontStack>(optional.begin(), optional.end());
 }
 
 } // namespace style

@@ -58,47 +58,53 @@ template <>
 struct Converter<std::unique_ptr<Layer>> {
 public:
     template <class V>
-    Result<std::unique_ptr<Layer>> operator()(const V& value) const {
+    optional<std::unique_ptr<Layer>> operator()(const V& value, Error& error) const {
         if (!isObject(value)) {
-            return Error { "layer must be an object" };
+            error = { "layer must be an object" };
+            return {};
         }
 
         auto idValue = objectMember(value, "id");
         if (!idValue) {
-            return Error { "layer must have an id" };
+            error = { "layer must have an id" };
+            return {};
         }
 
         optional<std::string> id = toString(*idValue);
         if (!id) {
-            return Error { "layer id must be a string" };
+            error = { "layer id must be a string" };
+            return {};
         }
 
         auto typeValue = objectMember(value, "type");
         if (!typeValue) {
-            return Error { "layer must have a type" };
+            error = { "layer must have a type" };
+            return {};
         }
 
         optional<std::string> type = toString(*typeValue);
         if (!type) {
-            return Error { "layer type must be a string" };
+            error = { "layer type must be a string" };
+            return {};
         }
 
-        Result<std::unique_ptr<Layer>> converted;
+        optional<std::unique_ptr<Layer>> converted;
 
         if (*type == "fill") {
-            converted = convertVectorLayer<FillLayer>(*id, value);
+            converted = convertVectorLayer<FillLayer>(*id, value, error);
         } else if (*type == "line") {
-            converted = convertVectorLayer<LineLayer>(*id, value);
+            converted = convertVectorLayer<LineLayer>(*id, value, error);
         } else if (*type == "circle") {
-            converted = convertVectorLayer<CircleLayer>(*id, value);
+            converted = convertVectorLayer<CircleLayer>(*id, value, error);
         } else if (*type == "symbol") {
-            converted = convertVectorLayer<SymbolLayer>(*id, value);
+            converted = convertVectorLayer<SymbolLayer>(*id, value, error);
         } else if (*type == "raster") {
-            converted = convertRasterLayer(*id, value);
+            converted = convertRasterLayer(*id, value, error);
         } else if (*type == "background") {
-            converted = convertBackgroundLayer(*id, value);
+            converted = convertBackgroundLayer(*id, value, error);
         } else {
-            return Error { "invalid layer type" };
+            error = { "invalid layer type" };
+            return {};
         }
 
         if (!converted) {
@@ -111,7 +117,8 @@ public:
         if (minzoomValue) {
             optional<float> minzoom = toNumber(*minzoomValue);
             if (!minzoom) {
-                return Error { "minzoom must be numeric" };
+                error = { "minzoom must be numeric" };
+                return {};
             }
             layer->setMinZoom(*minzoom);
         }
@@ -120,7 +127,8 @@ public:
         if (maxzoomValue) {
             optional<float> maxzoom = toNumber(*maxzoomValue);
             if (!maxzoom) {
-                return Error { "maxzoom must be numeric" };
+                error = { "maxzoom must be numeric" };
+                return {};
             }
             layer->setMaxZoom(*maxzoom);
         }
@@ -128,19 +136,22 @@ public:
         auto layoutValue = objectMember(value, "layout");
         if (layoutValue) {
             if (!isObject(*layoutValue)) {
-                return Error { "layout must be an object" };
+                error = { "layout must be an object" };
+                return {};
             }
-            optional<Error> error = eachMember(*layoutValue, [&] (const std::string& k, const V& v) {
+            optional<Error> error_ = eachMember(*layoutValue, [&] (const std::string& k, const V& v) {
                 return setLayoutProperty(*layer, k, v);
             });
-            if (error) {
-                return *error;
+            if (error_) {
+                error = *error_;
+                return {};
             }
         }
 
-        optional<Error> error = setPaintProperties(*layer, value);
-        if (error) {
-            return *error;
+        optional<Error> error_ = setPaintProperties(*layer, value);
+        if (error_) {
+            error = *error_;
+            return {};
         }
 
         return std::move(layer);
@@ -148,15 +159,17 @@ public:
 
 private:
     template <class LayerType, class V>
-    Result<std::unique_ptr<Layer>> convertVectorLayer(const std::string& id, const V& value) const {
+    optional<std::unique_ptr<Layer>> convertVectorLayer(const std::string& id, const V& value, Error& error) const {
         auto sourceValue = objectMember(value, "source");
         if (!sourceValue) {
-            return Error { "layer must have a source" };
+            error = { "layer must have a source" };
+            return {};
         }
 
         optional<std::string> source = toString(*sourceValue);
         if (!source) {
-            return Error { "layer source must be a string" };
+            error = { "layer source must be a string" };
+            return {};
         }
 
         std::unique_ptr<LayerType> layer = std::make_unique<LayerType>(id, *source);
@@ -165,41 +178,44 @@ private:
         if (sourceLayerValue) {
             optional<std::string> sourceLayer = toString(*sourceLayerValue);
             if (!sourceLayer) {
-                return Error { "layer source-layer must be a string" };
+                error = { "layer source-layer must be a string" };
+                return {};
             }
             layer->setSourceLayer(*sourceLayer);
         }
 
         auto filterValue = objectMember(value, "filter");
         if (filterValue) {
-            Result<Filter> filter = convert<Filter>(*filterValue);
+            optional<Filter> filter = convert<Filter>(*filterValue, error);
             if (!filter) {
-                return filter.error();
+                return {};
             }
             layer->setFilter(*filter);
         }
 
-        return std::move(layer);
+        return { std::move(layer) };
     }
 
     template <class V>
-    Result<std::unique_ptr<Layer>> convertRasterLayer(const std::string& id, const V& value) const {
+    optional<std::unique_ptr<Layer>> convertRasterLayer(const std::string& id, const V& value, Error& error) const {
         auto sourceValue = objectMember(value, "source");
         if (!sourceValue) {
-            return Error { "layer must have a source" };
+            error = { "layer must have a source" };
+            return {};
         }
 
         optional<std::string> source = toString(*sourceValue);
         if (!source) {
-            return Error { "layer source must be a string" };
+            error = { "layer source must be a string" };
+            return {};
         }
 
-        return std::make_unique<RasterLayer>(id, *source);
+        return { std::make_unique<RasterLayer>(id, *source) };
     }
 
     template <class V>
-    Result<std::unique_ptr<Layer>> convertBackgroundLayer(const std::string& id, const V&) const {
-        return std::make_unique<BackgroundLayer>(id);
+    optional<std::unique_ptr<Layer>> convertBackgroundLayer(const std::string& id, const V&, Error&) const {
+        return { std::make_unique<BackgroundLayer>(id) };
     }
 };
 

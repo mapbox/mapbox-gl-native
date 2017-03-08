@@ -11,9 +11,10 @@ template <>
 struct Converter<TransitionOptions> {
 public:
     template <class V>
-    Result<TransitionOptions> operator()(const V& value) const {
+    optional<TransitionOptions> operator()(const V& value, Error& error) const {
         if (!isObject(value)) {
-            return Error { "transition must be an object" };
+            error = { "transition must be an object" };
+            return {};
         }
 
         TransitionOptions result;
@@ -22,7 +23,8 @@ public:
         if (duration) {
             auto number = toNumber(*duration);
             if (!number) {
-                return Error { "duration must be a number" };
+                error = { "duration must be a number" };
+                return {};
             }
             result.duration = { std::chrono::milliseconds(int64_t(*number)) };
         }
@@ -31,7 +33,8 @@ public:
         if (delay) {
             auto number = toNumber(*delay);
             if (!number) {
-                return Error { "delay must be a number" };
+                error = { "delay must be a number" };
+                return {};
             }
             result.delay = { std::chrono::milliseconds(int64_t(*number)) };
         }

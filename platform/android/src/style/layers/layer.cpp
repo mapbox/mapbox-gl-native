@@ -104,9 +104,10 @@ namespace android {
         Value wrapped(env, jfilter);
         Filter filter;
 
-        Result<Filter> converted = convert<Filter>(wrapped);
+        Error error;
+        optional<Filter> converted = convert<Filter>(wrapped, error);
         if (!converted) {
-            mbgl::Log::Error(mbgl::Event::JNI, "Error setting filter: " + converted.error().message);
+            mbgl::Log::Error(mbgl::Event::JNI, "Error setting filter: " + error.message);
             return;
         }
         filter = std::move(*converted);

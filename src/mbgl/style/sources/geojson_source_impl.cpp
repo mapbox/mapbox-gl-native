@@ -21,11 +21,12 @@ namespace style {
 namespace conversion {
 
 template <>
-Result<GeoJSON> convertGeoJSON(const JSValue& value) {
+optional<GeoJSON> convertGeoJSON(const JSValue& value, Error& error) {
     try {
         return mapbox::geojson::convert(value);
     } catch (const std::exception& ex) {
-        return Error{ ex.what() };
+        error = { ex.what() };
+        return {};
     }
 }
 } // namespace conversion
@@ -136,10 +137,11 @@ void GeoJSONSource::Impl::loadDescription(FileSource& fileSource) {
 
             invalidateTiles();
 
-            conversion::Result<GeoJSON> geoJSON = conversion::convertGeoJSON<JSValue>(d);
+            conversion::Error error;
+            optional<GeoJSON> geoJSON = conversion::convertGeoJSON<JSValue>(d, error);
             if (!geoJSON) {
                 Log::Error(Event::ParseStyle, "Failed to parse GeoJSON data: %s",
-                           geoJSON.error().message.c_str());
+                           error.message.c_str());
                 // Create an empty GeoJSON VT object to make sure we're not infinitely waiting for
                 // tiles to load.
                 _setGeoJSON(GeoJSON{ FeatureCollection{} });

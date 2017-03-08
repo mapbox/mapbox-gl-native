@@ -11,7 +11,7 @@ template <>
 struct Converter<GeoJSONOptions> {
 
     template <class V>
-    Result<GeoJSONOptions> operator()(const V& value) const {
+    optional<GeoJSONOptions> operator()(const V& value, Error& error) const {
         GeoJSONOptions options;
 
         const auto maxzoomValue = objectMember(value, "maxzoom");
@@ -19,7 +19,8 @@ struct Converter<GeoJSONOptions> {
             if (toNumber(*maxzoomValue)) {
                 options.maxzoom = static_cast<uint8_t>(*toNumber(*maxzoomValue));
             } else {
-                return Error{ "GeoJSON source maxzoom value must be a number" };
+                error = { "GeoJSON source maxzoom value must be a number" };
+                return {};
             }
         }
 
@@ -28,7 +29,8 @@ struct Converter<GeoJSONOptions> {
             if (toNumber(*bufferValue)) {
                 options.buffer = static_cast<uint16_t>(*toNumber(*bufferValue));
             } else {
-                return Error{ "GeoJSON source buffer value must be a number" };
+                error = { "GeoJSON source buffer value must be a number" };
+                return {};
             }
         }
 
@@ -37,7 +39,8 @@ struct Converter<GeoJSONOptions> {
             if (toNumber(*toleranceValue)) {
                 options.tolerance = static_cast<double>(*toNumber(*toleranceValue));
             } else {
-                return Error{ "GeoJSON source tolerance value must be a number" };
+                error = { "GeoJSON source tolerance value must be a number" };
+                return {};
             }
         }
 
@@ -46,7 +49,8 @@ struct Converter<GeoJSONOptions> {
             if (toBool(*clusterValue)) {
                 options.cluster = *toBool(*clusterValue);
             } else {
-                return Error{ "GeoJSON source cluster value must be a boolean" };
+                error = { "GeoJSON source cluster value must be a boolean" };
+                return {};
             }
         }
 
@@ -55,7 +59,8 @@ struct Converter<GeoJSONOptions> {
             if (toNumber(*clusterMaxZoomValue)) {
                 options.clusterMaxZoom = static_cast<uint8_t>(*toNumber(*clusterMaxZoomValue));
             } else {
-                return Error{ "GeoJSON source clusterMaxZoom value must be a number" };
+                error = { "GeoJSON source clusterMaxZoom value must be a number" };
+                return {};
             }
         }
 
@@ -64,7 +69,8 @@ struct Converter<GeoJSONOptions> {
             if (toNumber(*clusterRadiusValue)) {
                 options.clusterRadius = static_cast<double>(*toNumber(*clusterRadiusValue));
             } else {
-                return Error{ "GeoJSON source clusterRadius value must be a number" };
+                error = { "GeoJSON source clusterRadius value must be a number" };
+                return {};
             }
         }
 

@@ -12,29 +12,29 @@ namespace conversion {
 template <class T>
 struct Converter<DataDrivenPropertyValue<T>> {
     template <class V>
-    Result<DataDrivenPropertyValue<T>> operator()(const V& value) const {
+    optional<DataDrivenPropertyValue<T>> operator()(const V& value, Error& error) const {
         if (isUndefined(value)) {
-            return {};
+            return DataDrivenPropertyValue<T>();
         } else if (!isObject(value)) {
-            Result<T> constant = convert<T>(value);
+            optional<T> constant = convert<T>(value, error);
             if (!constant) {
-                return constant.error();
+                return {};
             }
             return DataDrivenPropertyValue<T>(*constant);
         } else if (!objectMember(value, "property")) {
-            Result<CameraFunction<T>> function = convert<CameraFunction<T>>(value);
+            optional<CameraFunction<T>> function = convert<CameraFunction<T>>(value, error);
             if (!function) {
-                return function.error();
+                return {};
             }
             return DataDrivenPropertyValue<T>(*function);
         } else {
-            Result<CompositeFunction<T>> composite = convert<CompositeFunction<T>>(value);
+            optional<CompositeFunction<T>> composite = convert<CompositeFunction<T>>(value, error);
             if (composite) {
                 return DataDrivenPropertyValue<T>(*composite);
             }
-            Result<SourceFunction<T>> source = convert<SourceFunction<T>>(value);
+            optional<SourceFunction<T>> source = convert<SourceFunction<T>>(value, error);
             if (!source) {
-                return source.error();
+                return {};
             }
             return DataDrivenPropertyValue<T>(*source);
         }
