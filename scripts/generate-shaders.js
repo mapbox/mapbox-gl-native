@@ -8,6 +8,41 @@ const outputPath = 'src/mbgl/shaders';
 
 require('./style-code');
 
+const vertexPrelude = fs.readFileSync(path.join(inputPath, '_prelude.vertex.glsl'));
+const fragmentPrelude = fs.readFileSync(path.join(inputPath, '_prelude.fragment.glsl'));
+
+writeIfModified(path.join(outputPath, 'preludes.hpp'), `// NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.
+
+#pragma once
+
+namespace mbgl {
+namespace shaders {
+
+extern const char* vertexPrelude;
+extern const char* fragmentPrelude;
+
+} // namespace shaders
+} // namespace mbgl
+`);
+
+writeIfModified(path.join(outputPath, 'preludes.cpp'), `// NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.
+
+#include <mbgl/shaders/preludes.hpp>
+
+namespace mbgl {
+namespace shaders {
+
+const char* vertexPrelude = R"MBGL_SHADER(
+${vertexPrelude}
+)MBGL_SHADER";
+const char* fragmentPrelude = R"MBGL_SHADER(
+${fragmentPrelude}
+)MBGL_SHADER";
+
+} // namespace shaders
+} // namespace mbgl
+`);
+
 [
     'circle',
     'collision_box',
@@ -34,9 +69,8 @@ require('./style-code');
     }
 
     function vertexSource() {
-        const prelude = fs.readFileSync(path.join(inputPath, '_prelude.vertex.glsl'));
         const source = fs.readFileSync(path.join(inputPath, shaderName + '.vertex.glsl'), 'utf8');
-        return prelude + applyPragmas(source, {
+        return applyPragmas(source, {
                 define: [
                     "uniform lowp float a_{name}_t;",
                     "attribute {precision} {type} a_{name}_min;",
@@ -50,9 +84,8 @@ require('./style-code');
     }
 
     function fragmentSource() {
-        const prelude = fs.readFileSync(path.join(inputPath, '_prelude.fragment.glsl'));
         const source = fs.readFileSync(path.join(inputPath, shaderName + '.fragment.glsl'), 'utf8');
-        return prelude + applyPragmas(source, {
+        return applyPragmas(source, {
                 define: [
                     "varying {precision} {type} {name};"
                 ],

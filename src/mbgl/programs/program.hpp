@@ -4,6 +4,7 @@
 #include <mbgl/programs/program_parameters.hpp>
 #include <mbgl/programs/attributes.hpp>
 #include <mbgl/style/paint_property.hpp>
+#include <mbgl/shaders/preludes.hpp>
 
 #include <sstream>
 #include <cassert>
@@ -45,7 +46,7 @@ public:
     }
 
     static std::string fragmentSource(const ProgramParameters& parameters) {
-        std::string source = pixelRatioDefine(parameters) + Shaders::fragmentSource;
+        std::string source = pixelRatioDefine(parameters) + shaders::fragmentPrelude + Shaders::fragmentSource;
         if (parameters.overdraw) {
             assert(source.find("#ifdef OVERDRAW_INSPECTOR") != std::string::npos);
             source.replace(source.find_first_of('\n'), 1, "\n#define OVERDRAW_INSPECTOR\n");
@@ -54,7 +55,7 @@ public:
     }
 
     static std::string vertexSource(const ProgramParameters& parameters) {
-        return pixelRatioDefine(parameters) + Shaders::vertexSource;
+        return pixelRatioDefine(parameters) + shaders::vertexPrelude + Shaders::vertexSource;
     }
 
     template <class DrawMode>
