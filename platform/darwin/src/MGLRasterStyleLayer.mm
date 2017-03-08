@@ -126,12 +126,14 @@
 
     return transition;
 }
+
 - (void)setRasterBrightnessMax:(MGLStyleValue<NSNumber *> *)rasterBrightnessMax {
 }
 
 - (MGLStyleValue<NSNumber *> *)rasterBrightnessMax {
     return self.maximumRasterBrightness;
 }
+
 - (void)setMinimumRasterBrightness:(MGLStyleValue<NSNumber *> *)minimumRasterBrightness {
     MGLAssertStyleLayerIsValid();
 
@@ -166,12 +168,14 @@
 
     return transition;
 }
+
 - (void)setRasterBrightnessMin:(MGLStyleValue<NSNumber *> *)rasterBrightnessMin {
 }
 
 - (MGLStyleValue<NSNumber *> *)rasterBrightnessMin {
     return self.minimumRasterBrightness;
 }
+
 - (void)setRasterContrast:(MGLStyleValue<NSNumber *> *)rasterContrast {
     MGLAssertStyleLayerIsValid();
 
@@ -206,6 +210,7 @@
 
     return transition;
 }
+
 - (void)setRasterFadeDuration:(MGLStyleValue<NSNumber *> *)rasterFadeDuration {
     MGLAssertStyleLayerIsValid();
 
@@ -240,6 +245,7 @@
 
     return transition;
 }
+
 - (void)setRasterHueRotation:(MGLStyleValue<NSNumber *> *)rasterHueRotation {
     MGLAssertStyleLayerIsValid();
 
@@ -274,12 +280,14 @@
 
     return transition;
 }
+
 - (void)setRasterHueRotate:(MGLStyleValue<NSNumber *> *)rasterHueRotate {
 }
 
 - (MGLStyleValue<NSNumber *> *)rasterHueRotate {
     return self.rasterHueRotation;
 }
+
 - (void)setRasterOpacity:(MGLStyleValue<NSNumber *> *)rasterOpacity {
     MGLAssertStyleLayerIsValid();
 
@@ -314,6 +322,7 @@
 
     return transition;
 }
+
 - (void)setRasterSaturation:(MGLStyleValue<NSNumber *> *)rasterSaturation {
     MGLAssertStyleLayerIsValid();
 

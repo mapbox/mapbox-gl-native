@@ -169,6 +169,7 @@ namespace mbgl {
 
     return transition;
 }
+
 - (void)setCircleColor:(MGLStyleValue<MGLColor *> *)circleColor {
     MGLAssertStyleLayerIsValid();
 
@@ -203,6 +204,7 @@ namespace mbgl {
 
     return transition;
 }
+
 - (void)setCircleOpacity:(MGLStyleValue<NSNumber *> *)circleOpacity {
     MGLAssertStyleLayerIsValid();
 
@@ -237,6 +239,7 @@ namespace mbgl {
 
     return transition;
 }
+
 - (void)setCircleRadius:(MGLStyleValue<NSNumber *> *)circleRadius {
     MGLAssertStyleLayerIsValid();
 
@@ -271,6 +274,7 @@ namespace mbgl {
 
     return transition;
 }
+
 - (void)setCircleScaleAlignment:(MGLStyleValue<NSValue *> *)circleScaleAlignment {
     MGLAssertStyleLayerIsValid();
 
@@ -287,12 +291,14 @@ namespace mbgl {
     }
     return MGLStyleValueTransformer<mbgl::style::CirclePitchScaleType, NSValue *, mbgl::style::CirclePitchScaleType, MGLCircleScaleAlignment>().toEnumStyleValue(propertyValue);
 }
+
 - (void)setCirclePitchScale:(MGLStyleValue<NSValue *> *)circlePitchScale {
 }
 
 - (MGLStyleValue<NSValue *> *)circlePitchScale {
     return self.circleScaleAlignment;
 }
+
 - (void)setCircleStrokeColor:(MGLStyleValue<MGLColor *> *)circleStrokeColor {
     MGLAssertStyleLayerIsValid();
 
@@ -327,6 +333,7 @@ namespace mbgl {
 
     return transition;
 }
+
 - (void)setCircleStrokeOpacity:(MGLStyleValue<NSNumber *> *)circleStrokeOpacity {
     MGLAssertStyleLayerIsValid();
 
@@ -361,6 +368,7 @@ namespace mbgl {
 
     return transition;
 }
+
 - (void)setCircleStrokeWidth:(MGLStyleValue<NSNumber *> *)circleStrokeWidth {
     MGLAssertStyleLayerIsValid();
 
@@ -395,6 +403,7 @@ namespace mbgl {
 
     return transition;
 }
+
 - (void)setCircleTranslation:(MGLStyleValue<NSValue *> *)circleTranslation {
     MGLAssertStyleLayerIsValid();
 
@@ -429,12 +438,14 @@ namespace mbgl {
 
     return transition;
 }
+
 - (void)setCircleTranslate:(MGLStyleValue<NSValue *> *)circleTranslate {
 }
 
 - (MGLStyleValue<NSValue *> *)circleTranslate {
     return self.circleTranslation;
 }
+
 - (void)setCircleTranslationAnchor:(MGLStyleValue<NSValue *> *)circleTranslationAnchor {
     MGLAssertStyleLayerIsValid();
 
@@ -451,6 +462,7 @@ namespace mbgl {
     }
     return MGLStyleValueTransformer<mbgl::style::TranslateAnchorType, NSValue *, mbgl::style::TranslateAnchorType, MGLCircleTranslationAnchor>().toEnumStyleValue(propertyValue);
 }
+
 - (void)setCircleTranslateAnchor:(MGLStyleValue<NSValue *> *)circleTranslateAnchor {
 }
 

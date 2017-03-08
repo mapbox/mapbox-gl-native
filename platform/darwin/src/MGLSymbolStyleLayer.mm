@@ -922,6 +922,7 @@ namespace mbgl {
 
     return transition;
 }
+
 - (void)setIconHaloBlur:(MGLStyleValue<NSNumber *> *)iconHaloBlur {
     MGLAssertStyleLayerIsValid();
 
@@ -956,6 +957,7 @@ namespace mbgl {
 
     return transition;
 }
+
 - (void)setIconHaloColor:(MGLStyleValue<MGLColor *> *)iconHaloColor {
     MGLAssertStyleLayerIsValid();
 
@@ -990,6 +992,7 @@ namespace mbgl {
 
     return transition;
 }
+
 - (void)setIconHaloWidth:(MGLStyleValue<NSNumber *> *)iconHaloWidth {
     MGLAssertStyleLayerIsValid();
 
@@ -1024,6 +1027,7 @@ namespace mbgl {
 
     return transition;
 }
+
 - (void)setIconOpacity:(MGLStyleValue<NSNumber *> *)iconOpacity {
     MGLAssertStyleLayerIsValid();
 
@@ -1058,6 +1062,7 @@ namespace mbgl {
 
     return transition;
 }
+
 - (void)setIconTranslation:(MGLStyleValue<NSValue *> *)iconTranslation {
     MGLAssertStyleLayerIsValid();
 
@@ -1092,12 +1097,14 @@ namespace mbgl {
 
     return transition;
 }
+
 - (void)setIconTranslate:(MGLStyleValue<NSValue *> *)iconTranslate {
 }
 
 - (MGLStyleValue<NSValue *> *)iconTranslate {
     return self.iconTranslation;
 }
+
 - (void)setIconTranslationAnchor:(MGLStyleValue<NSValue *> *)iconTranslationAnchor {
     MGLAssertStyleLayerIsValid();
 
@@ -1114,12 +1121,14 @@ namespace mbgl {
     }
     return MGLStyleValueTransformer<mbgl::style::TranslateAnchorType, NSValue *, mbgl::style::TranslateAnchorType, MGLIconTranslationAnchor>().toEnumStyleValue(propertyValue);
 }
+
 - (void)setIconTranslateAnchor:(MGLStyleValue<NSValue *> *)iconTranslateAnchor {
 }
 
 - (MGLStyleValue<NSValue *> *)iconTranslateAnchor {
     return self.iconTranslationAnchor;
 }
+
 - (void)setTextColor:(MGLStyleValue<MGLColor *> *)textColor {
     MGLAssertStyleLayerIsValid();
 
@@ -1154,6 +1163,7 @@ namespace mbgl {
 
     return transition;
 }
+
 - (void)setTextHaloBlur:(MGLStyleValue<NSNumber *> *)textHaloBlur {
     MGLAssertStyleLayerIsValid();
 
@@ -1188,6 +1198,7 @@ namespace mbgl {
 
     return transition;
 }
+
 - (void)setTextHaloColor:(MGLStyleValue<MGLColor *> *)textHaloColor {
     MGLAssertStyleLayerIsValid();
 
@@ -1222,6 +1233,7 @@ namespace mbgl {
 
     return transition;
 }
+
 - (void)setTextHaloWidth:(MGLStyleValue<NSNumber *> *)textHaloWidth {
     MGLAssertStyleLayerIsValid();
 
@@ -1256,6 +1268,7 @@ namespace mbgl {
 
     return transition;
 }
+
 - (void)setTextOpacity:(MGLStyleValue<NSNumber *> *)textOpacity {
     MGLAssertStyleLayerIsValid();
 
@@ -1290,6 +1303,7 @@ namespace mbgl {
 
     return transition;
 }
+
 - (void)setTextTranslation:(MGLStyleValue<NSValue *> *)textTranslation {
     MGLAssertStyleLayerIsValid();
 
@@ -1324,12 +1338,14 @@ namespace mbgl {
 
     return transition;
 }
+
 - (void)setTextTranslate:(MGLStyleValue<NSValue *> *)textTranslate {
 }
 
 - (MGLStyleValue<NSValue *> *)textTranslate {
     return self.textTranslation;
 }
+
 - (void)setTextTranslationAnchor:(MGLStyleValue<NSValue *> *)textTranslationAnchor {
     MGLAssertStyleLayerIsValid();
 
@@ -1346,6 +1362,7 @@ namespace mbgl {
     }
     return MGLStyleValueTransformer<mbgl::style::TranslateAnchorType, NSValue *, mbgl::style::TranslateAnchorType, MGLTextTranslationAnchor>().toEnumStyleValue(propertyValue);
 }
+
 - (void)setTextTranslateAnchor:(MGLStyleValue<NSValue *> *)textTranslateAnchor {
 }
 

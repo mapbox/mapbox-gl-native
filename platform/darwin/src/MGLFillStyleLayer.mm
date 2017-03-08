@@ -146,12 +146,14 @@ namespace mbgl {
     }
     return MGLStyleValueTransformer<bool, NSNumber *>().toStyleValue(propertyValue);
 }
+
 - (void)setFillAntialias:(MGLStyleValue<NSNumber *> *)fillAntialias {
 }
 
 - (MGLStyleValue<NSNumber *> *)fillAntialias {
     return self.isFillAntialiased;
 }
+
 - (void)setFillColor:(MGLStyleValue<MGLColor *> *)fillColor {
     MGLAssertStyleLayerIsValid();
 
@@ -186,6 +188,7 @@ namespace mbgl {
 
     return transition;
 }
+
 - (void)setFillOpacity:(MGLStyleValue<NSNumber *> *)fillOpacity {
     MGLAssertStyleLayerIsValid();
 
@@ -220,6 +223,7 @@ namespace mbgl {
 
     return transition;
 }
+
 - (void)setFillOutlineColor:(MGLStyleValue<MGLColor *> *)fillOutlineColor {
     MGLAssertStyleLayerIsValid();
 
@@ -254,6 +258,7 @@ namespace mbgl {
 
     return transition;
 }
+
 - (void)setFillPattern:(MGLStyleValue<NSString *> *)fillPattern {
     MGLAssertStyleLayerIsValid();
 
@@ -288,6 +293,7 @@ namespace mbgl {
 
     return transition;
 }
+
 - (void)setFillTranslation:(MGLStyleValue<NSValue *> *)fillTranslation {
     MGLAssertStyleLayerIsValid();
 
@@ -322,12 +328,14 @@ namespace mbgl {
 
     return transition;
 }
+
 - (void)setFillTranslate:(MGLStyleValue<NSValue *> *)fillTranslate {
 }
 
 - (MGLStyleValue<NSValue *> *)fillTranslate {
     return self.fillTranslation;
 }
+
 - (void)setFillTranslationAnchor:(MGLStyleValue<NSValue *> *)fillTranslationAnchor {
     MGLAssertStyleLayerIsValid();
 
@@ -344,6 +352,7 @@ namespace mbgl {
     }
     return MGLStyleValueTransformer<mbgl::style::TranslateAnchorType, NSValue *, mbgl::style::TranslateAnchorType, MGLFillTranslationAnchor>().toEnumStyleValue(propertyValue);
 }
+
 - (void)setFillTranslateAnchor:(MGLStyleValue<NSValue *> *)fillTranslateAnchor {
 }
 

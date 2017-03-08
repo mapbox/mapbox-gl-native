@@ -119,6 +119,7 @@
 
     return transition;
 }
+
 - (void)setBackgroundOpacity:(MGLStyleValue<NSNumber *> *)backgroundOpacity {
     MGLAssertStyleLayerIsValid();
 
@@ -153,6 +154,7 @@
 
     return transition;
 }
+
 - (void)setBackgroundPattern:(MGLStyleValue<NSString *> *)backgroundPattern {
     MGLAssertStyleLayerIsValid();
 

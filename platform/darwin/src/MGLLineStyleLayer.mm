@@ -246,6 +246,7 @@ namespace mbgl {
 
     return transition;
 }
+
 - (void)setLineColor:(MGLStyleValue<MGLColor *> *)lineColor {
     MGLAssertStyleLayerIsValid();
 
@@ -280,6 +281,7 @@ namespace mbgl {
 
     return transition;
 }
+
 - (void)setLineDashPattern:(MGLStyleValue<NSArray<NSNumber *> *> *)lineDashPattern {
     MGLAssertStyleLayerIsValid();
 
@@ -314,12 +316,14 @@ namespace mbgl {
 
     return transition;
 }
+
 - (void)setLineDasharray:(MGLStyleValue<NSArray<NSNumber *> *> *)lineDasharray {
 }
 
 - (MGLStyleValue<NSArray<NSNumber *> *> *)lineDasharray {
     return self.lineDashPattern;
 }
+
 - (void)setLineGapWidth:(MGLStyleValue<NSNumber *> *)lineGapWidth {
     MGLAssertStyleLayerIsValid();
 
@@ -354,6 +358,7 @@ namespace mbgl {
 
     return transition;
 }
+
 - (void)setLineOffset:(MGLStyleValue<NSNumber *> *)lineOffset {
     MGLAssertStyleLayerIsValid();
 
@@ -388,6 +393,7 @@ namespace mbgl {
 
     return transition;
 }
+
 - (void)setLineOpacity:(MGLStyleValue<NSNumber *> *)lineOpacity {
     MGLAssertStyleLayerIsValid();
 
@@ -422,6 +428,7 @@ namespace mbgl {
 
     return transition;
 }
+
 - (void)setLinePattern:(MGLStyleValue<NSString *> *)linePattern {
     MGLAssertStyleLayerIsValid();
 
@@ -456,6 +463,7 @@ namespace mbgl {
 
     return transition;
 }
+
 - (void)setLineTranslation:(MGLStyleValue<NSValue *> *)lineTranslation {
     MGLAssertStyleLayerIsValid();
 
@@ -490,12 +498,14 @@ namespace mbgl {
 
     return transition;
 }
+
 - (void)setLineTranslate:(MGLStyleValue<NSValue *> *)lineTranslate {
 }
 
 - (MGLStyleValue<NSValue *> *)lineTranslate {
     return self.lineTranslation;
 }
+
 - (void)setLineTranslationAnchor:(MGLStyleValue<NSValue *> *)lineTranslationAnchor {
     MGLAssertStyleLayerIsValid();
 
@@ -512,12 +522,14 @@ namespace mbgl {
     }
     return MGLStyleValueTransformer<mbgl::style::TranslateAnchorType, NSValue *, mbgl::style::TranslateAnchorType, MGLLineTranslationAnchor>().toEnumStyleValue(propertyValue);
 }
+
 - (void)setLineTranslateAnchor:(MGLStyleValue<NSValue *> *)lineTranslateAnchor {
 }
 
 - (MGLStyleValue<NSValue *> *)lineTranslateAnchor {
     return self.lineTranslationAnchor;
 }
+
 - (void)setLineWidth:(MGLStyleValue<NSNumber *> *)lineWidth {
     MGLAssertStyleLayerIsValid();
 

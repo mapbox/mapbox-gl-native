@@ -229,8 +229,8 @@ namespace mbgl {
 <% } -%>
 <% if (paintProperties.length) { -%>
 #pragma mark - Accessing the Paint Attributes
-
 <% for (const property of paintProperties) { -%>
+
 - (void)set<%- camelize(property.name) %>:(MGLStyleValue<<%- propertyType(property, true) %>> *)<%- objCName(property) %> {
     MGLAssertStyleLayerIsValid();
 
@@ -292,6 +292,7 @@ namespace mbgl {
 }
 <% } -%>
 <% if (property.original) { -%>
+
 - (void)set<%- camelize(originalPropertyName(property)) %>:(MGLStyleValue<<%- propertyType(property, true) %>> *)<%- camelizeWithLeadingLowercase(originalPropertyName(property)) %> {
 }
 
