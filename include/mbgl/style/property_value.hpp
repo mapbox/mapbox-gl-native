@@ -29,6 +29,7 @@ public:
     bool isUndefined()      const { return value.which() == 0; }
     bool isConstant()       const { return value.which() == 1; }
     bool isCameraFunction() const { return value.which() == 2; }
+    bool isDataDriven()     const { return false; }
 
     const                T & asConstant()       const { return value.template get<               T >(); }
     const CameraFunction<T>& asCameraFunction() const { return value.template get<CameraFunction<T>>(); }

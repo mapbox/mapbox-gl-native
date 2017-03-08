@@ -22,6 +22,22 @@ float evaluate(UnevaluatedPaintProperty<PropertyValue<float>>& property, Duratio
     return property.evaluate(evaluator, parameters.now);
 }
 
+PossiblyEvaluatedPropertyValue<float> evaluate(UnevaluatedPaintProperty<DataDrivenPropertyValue<float>>& property, Duration delta = Duration::zero()) {
+    PropertyEvaluationParameters parameters {
+        0,
+        TimePoint::min() + delta,
+        ZoomHistory(),
+        Duration::zero()
+    };
+    
+    DataDrivenPropertyEvaluator<float> evaluator {
+        parameters,
+        0.0f
+    };
+    
+    return property.evaluate(evaluator, parameters.now);
+}
+
 TEST(UnevaluatedPaintProperty, EvaluateDefaultValue) {
     UnevaluatedPaintProperty<PropertyValue<float>> property;
     ASSERT_EQ(0.0f, evaluate(property));
@@ -85,4 +101,33 @@ TEST(UnevaluatedPaintProperty, EvaluateTransitionedConstantWithDelay) {
     ASSERT_FLOAT_EQ(0.0f, evaluate(t1, 612ms));
     ASSERT_FLOAT_EQ(0.823099f, evaluate(t1, 1500ms));
     ASSERT_FLOAT_EQ(1.0f, evaluate(t1, 2500ms));
+}
+
+TEST(UnevaluatedPaintProperty, EvaluateDataDrivenValue) {
+    TransitionOptions transition;
+    transition.delay = { 1000ms };
+    transition.duration = { 1000ms };
+    
+    UnevaluatedPaintProperty<DataDrivenPropertyValue<float>> t0 {
+        DataDrivenPropertyValue<float>(0.0f),
+        UnevaluatedPaintProperty<DataDrivenPropertyValue<float>>(),
+        TransitionOptions(),
+        TimePoint::min()
+    };
+    
+    SourceFunction<float> sourceFunction = {
+        "property_name",
+        IdentityStops<float>()
+    };
+    
+    UnevaluatedPaintProperty<DataDrivenPropertyValue<float>> t1 {
+        DataDrivenPropertyValue<float>(sourceFunction),
+        t0,
+        transition,
+        TimePoint::min()
+    };
+    
+    ASSERT_TRUE(evaluate(t0, 0ms).isConstant());
+    ASSERT_FALSE(evaluate(t1, 0ms).isConstant()) <<
+        "A paint property transition to a data-driven evaluates immediately to the final value (see https://github.com/mapbox/mapbox-gl-native/issues/8237).";
 }
