@@ -59,7 +59,7 @@ void BackgroundLayer::setBackgroundColorTransition(const TransitionOptions& valu
     impl->paint.setTransition<BackgroundColor>(value, klass);
 }
 
-style::TransitionOptions BackgroundLayer::getBackgroundColorTransition(const optional<std::string>& klass) const {
+TransitionOptions BackgroundLayer::getBackgroundColorTransition(const optional<std::string>& klass) const {
     return impl->paint.getTransition<BackgroundColor>(klass);
 }
 
@@ -82,7 +82,7 @@ void BackgroundLayer::setBackgroundPatternTransition(const TransitionOptions& va
     impl->paint.setTransition<BackgroundPattern>(value, klass);
 }
 
-style::TransitionOptions BackgroundLayer::getBackgroundPatternTransition(const optional<std::string>& klass) const {
+TransitionOptions BackgroundLayer::getBackgroundPatternTransition(const optional<std::string>& klass) const {
     return impl->paint.getTransition<BackgroundPattern>(klass);
 }
 
@@ -105,7 +105,7 @@ void BackgroundLayer::setBackgroundOpacityTransition(const TransitionOptions& va
     impl->paint.setTransition<BackgroundOpacity>(value, klass);
 }
 
-style::TransitionOptions BackgroundLayer::getBackgroundOpacityTransition(const optional<std::string>& klass) const {
+TransitionOptions BackgroundLayer::getBackgroundOpacityTransition(const optional<std::string>& klass) const {
     return impl->paint.getTransition<BackgroundOpacity>(klass);
 }
 

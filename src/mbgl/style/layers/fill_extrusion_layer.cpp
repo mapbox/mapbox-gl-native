@@ -84,7 +84,7 @@ void FillExtrusionLayer::setFillExtrusionOpacityTransition(const TransitionOptio
     impl->paint.setTransition<FillExtrusionOpacity>(value, klass);
 }
 
-style::TransitionOptions FillExtrusionLayer::getFillExtrusionOpacityTransition(const optional<std::string>& klass) const {
+TransitionOptions FillExtrusionLayer::getFillExtrusionOpacityTransition(const optional<std::string>& klass) const {
     return impl->paint.getTransition<FillExtrusionOpacity>(klass);
 }
 
@@ -111,7 +111,7 @@ void FillExtrusionLayer::setFillExtrusionColorTransition(const TransitionOptions
     impl->paint.setTransition<FillExtrusionColor>(value, klass);
 }
 
-style::TransitionOptions FillExtrusionLayer::getFillExtrusionColorTransition(const optional<std::string>& klass) const {
+TransitionOptions FillExtrusionLayer::getFillExtrusionColorTransition(const optional<std::string>& klass) const {
     return impl->paint.getTransition<FillExtrusionColor>(klass);
 }
 
@@ -134,7 +134,7 @@ void FillExtrusionLayer::setFillExtrusionTranslateTransition(const TransitionOpt
     impl->paint.setTransition<FillExtrusionTranslate>(value, klass);
 }
 
-style::TransitionOptions FillExtrusionLayer::getFillExtrusionTranslateTransition(const optional<std::string>& klass) const {
+TransitionOptions FillExtrusionLayer::getFillExtrusionTranslateTransition(const optional<std::string>& klass) const {
     return impl->paint.getTransition<FillExtrusionTranslate>(klass);
 }
 
@@ -157,7 +157,7 @@ void FillExtrusionLayer::setFillExtrusionTranslateAnchorTransition(const Transit
     impl->paint.setTransition<FillExtrusionTranslateAnchor>(value, klass);
 }
 
-style::TransitionOptions FillExtrusionLayer::getFillExtrusionTranslateAnchorTransition(const optional<std::string>& klass) const {
+TransitionOptions FillExtrusionLayer::getFillExtrusionTranslateAnchorTransition(const optional<std::string>& klass) const {
     return impl->paint.getTransition<FillExtrusionTranslateAnchor>(klass);
 }
 
@@ -180,7 +180,7 @@ void FillExtrusionLayer::setFillExtrusionPatternTransition(const TransitionOptio
     impl->paint.setTransition<FillExtrusionPattern>(value, klass);
 }
 
-style::TransitionOptions FillExtrusionLayer::getFillExtrusionPatternTransition(const optional<std::string>& klass) const {
+TransitionOptions FillExtrusionLayer::getFillExtrusionPatternTransition(const optional<std::string>& klass) const {
     return impl->paint.getTransition<FillExtrusionPattern>(klass);
 }
 
@@ -207,7 +207,7 @@ void FillExtrusionLayer::setFillExtrusionHeightTransition(const TransitionOption
     impl->paint.setTransition<FillExtrusionHeight>(value, klass);
 }
 
-style::TransitionOptions FillExtrusionLayer::getFillExtrusionHeightTransition(const optional<std::string>& klass) const {
+TransitionOptions FillExtrusionLayer::getFillExtrusionHeightTransition(const optional<std::string>& klass) const {
     return impl->paint.getTransition<FillExtrusionHeight>(klass);
 }
 
@@ -234,7 +234,7 @@ void FillExtrusionLayer::setFillExtrusionBaseTransition(const TransitionOptions&
     impl->paint.setTransition<FillExtrusionBase>(value, klass);
 }
 
-style::TransitionOptions FillExtrusionLayer::getFillExtrusionBaseTransition(const optional<std::string>& klass) const {
+TransitionOptions FillExtrusionLayer::getFillExtrusionBaseTransition(const optional<std::string>& klass) const {
     return impl->paint.getTransition<FillExtrusionBase>(klass);
 }
 

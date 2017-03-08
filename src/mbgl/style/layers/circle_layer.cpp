@@ -88,7 +88,7 @@ void CircleLayer::setCircleRadiusTransition(const TransitionOptions& value, cons
     impl->paint.setTransition<CircleRadius>(value, klass);
 }
 
-style::TransitionOptions CircleLayer::getCircleRadiusTransition(const optional<std::string>& klass) const {
+TransitionOptions CircleLayer::getCircleRadiusTransition(const optional<std::string>& klass) const {
     return impl->paint.getTransition<CircleRadius>(klass);
 }
 
@@ -115,7 +115,7 @@ void CircleLayer::setCircleColorTransition(const TransitionOptions& value, const
     impl->paint.setTransition<CircleColor>(value, klass);
 }
 
-style::TransitionOptions CircleLayer::getCircleColorTransition(const optional<std::string>& klass) const {
+TransitionOptions CircleLayer::getCircleColorTransition(const optional<std::string>& klass) const {
     return impl->paint.getTransition<CircleColor>(klass);
 }
 
@@ -142,7 +142,7 @@ void CircleLayer::setCircleBlurTransition(const TransitionOptions& value, const 
     impl->paint.setTransition<CircleBlur>(value, klass);
 }
 
-style::TransitionOptions CircleLayer::getCircleBlurTransition(const optional<std::string>& klass) const {
+TransitionOptions CircleLayer::getCircleBlurTransition(const optional<std::string>& klass) const {
     return impl->paint.getTransition<CircleBlur>(klass);
 }
 
@@ -169,7 +169,7 @@ void CircleLayer::setCircleOpacityTransition(const TransitionOptions& value, con
     impl->paint.setTransition<CircleOpacity>(value, klass);
 }
 
-style::TransitionOptions CircleLayer::getCircleOpacityTransition(const optional<std::string>& klass) const {
+TransitionOptions CircleLayer::getCircleOpacityTransition(const optional<std::string>& klass) const {
     return impl->paint.getTransition<CircleOpacity>(klass);
 }
 
@@ -192,7 +192,7 @@ void CircleLayer::setCircleTranslateTransition(const TransitionOptions& value, c
     impl->paint.setTransition<CircleTranslate>(value, klass);
 }
 
-style::TransitionOptions CircleLayer::getCircleTranslateTransition(const optional<std::string>& klass) const {
+TransitionOptions CircleLayer::getCircleTranslateTransition(const optional<std::string>& klass) const {
     return impl->paint.getTransition<CircleTranslate>(klass);
 }
 
@@ -215,7 +215,7 @@ void CircleLayer::setCircleTranslateAnchorTransition(const TransitionOptions& va
     impl->paint.setTransition<CircleTranslateAnchor>(value, klass);
 }
 
-style::TransitionOptions CircleLayer::getCircleTranslateAnchorTransition(const optional<std::string>& klass) const {
+TransitionOptions CircleLayer::getCircleTranslateAnchorTransition(const optional<std::string>& klass) const {
     return impl->paint.getTransition<CircleTranslateAnchor>(klass);
 }
 
@@ -238,7 +238,7 @@ void CircleLayer::setCirclePitchScaleTransition(const TransitionOptions& value, 
     impl->paint.setTransition<CirclePitchScale>(value, klass);
 }
 
-style::TransitionOptions CircleLayer::getCirclePitchScaleTransition(const optional<std::string>& klass) const {
+TransitionOptions CircleLayer::getCirclePitchScaleTransition(const optional<std::string>& klass) const {
     return impl->paint.getTransition<CirclePitchScale>(klass);
 }
 
@@ -265,7 +265,7 @@ void CircleLayer::setCircleStrokeWidthTransition(const TransitionOptions& value,
     impl->paint.setTransition<CircleStrokeWidth>(value, klass);
 }
 
-style::TransitionOptions CircleLayer::getCircleStrokeWidthTransition(const optional<std::string>& klass) const {
+TransitionOptions CircleLayer::getCircleStrokeWidthTransition(const optional<std::string>& klass) const {
     return impl->paint.getTransition<CircleStrokeWidth>(klass);
 }
 
@@ -292,7 +292,7 @@ void CircleLayer::setCircleStrokeColorTransition(const TransitionOptions& value,
     impl->paint.setTransition<CircleStrokeColor>(value, klass);
 }
 
-style::TransitionOptions CircleLayer::getCircleStrokeColorTransition(const optional<std::string>& klass) const {
+TransitionOptions CircleLayer::getCircleStrokeColorTransition(const optional<std::string>& klass) const {
     return impl->paint.getTransition<CircleStrokeColor>(klass);
 }
 
@@ -319,7 +319,7 @@ void CircleLayer::setCircleStrokeOpacityTransition(const TransitionOptions& valu
     impl->paint.setTransition<CircleStrokeOpacity>(value, klass);
 }
 
-style::TransitionOptions CircleLayer::getCircleStrokeOpacityTransition(const optional<std::string>& klass) const {
+TransitionOptions CircleLayer::getCircleStrokeOpacityTransition(const optional<std::string>& klass) const {
     return impl->paint.getTransition<CircleStrokeOpacity>(klass);
 }
 

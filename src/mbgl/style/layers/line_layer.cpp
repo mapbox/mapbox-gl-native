@@ -145,7 +145,7 @@ void LineLayer::setLineOpacityTransition(const TransitionOptions& value, const o
     impl->paint.setTransition<LineOpacity>(value, klass);
 }
 
-style::TransitionOptions LineLayer::getLineOpacityTransition(const optional<std::string>& klass) const {
+TransitionOptions LineLayer::getLineOpacityTransition(const optional<std::string>& klass) const {
     return impl->paint.getTransition<LineOpacity>(klass);
 }
 
@@ -172,7 +172,7 @@ void LineLayer::setLineColorTransition(const TransitionOptions& value, const opt
     impl->paint.setTransition<LineColor>(value, klass);
 }
 
-style::TransitionOptions LineLayer::getLineColorTransition(const optional<std::string>& klass) const {
+TransitionOptions LineLayer::getLineColorTransition(const optional<std::string>& klass) const {
     return impl->paint.getTransition<LineColor>(klass);
 }
 
@@ -195,7 +195,7 @@ void LineLayer::setLineTranslateTransition(const TransitionOptions& value, const
     impl->paint.setTransition<LineTranslate>(value, klass);
 }
 
-style::TransitionOptions LineLayer::getLineTranslateTransition(const optional<std::string>& klass) const {
+TransitionOptions LineLayer::getLineTranslateTransition(const optional<std::string>& klass) const {
     return impl->paint.getTransition<LineTranslate>(klass);
 }
 
@@ -218,7 +218,7 @@ void LineLayer::setLineTranslateAnchorTransition(const TransitionOptions& value,
     impl->paint.setTransition<LineTranslateAnchor>(value, klass);
 }
 
-style::TransitionOptions LineLayer::getLineTranslateAnchorTransition(const optional<std::string>& klass) const {
+TransitionOptions LineLayer::getLineTranslateAnchorTransition(const optional<std::string>& klass) const {
     return impl->paint.getTransition<LineTranslateAnchor>(klass);
 }
 
@@ -241,7 +241,7 @@ void LineLayer::setLineWidthTransition(const TransitionOptions& value, const opt
     impl->paint.setTransition<LineWidth>(value, klass);
 }
 
-style::TransitionOptions LineLayer::getLineWidthTransition(const optional<std::string>& klass) const {
+TransitionOptions LineLayer::getLineWidthTransition(const optional<std::string>& klass) const {
     return impl->paint.getTransition<LineWidth>(klass);
 }
 
@@ -268,7 +268,7 @@ void LineLayer::setLineGapWidthTransition(const TransitionOptions& value, const 
     impl->paint.setTransition<LineGapWidth>(value, klass);
 }
 
-style::TransitionOptions LineLayer::getLineGapWidthTransition(const optional<std::string>& klass) const {
+TransitionOptions LineLayer::getLineGapWidthTransition(const optional<std::string>& klass) const {
     return impl->paint.getTransition<LineGapWidth>(klass);
 }
 
@@ -295,7 +295,7 @@ void LineLayer::setLineOffsetTransition(const TransitionOptions& value, const op
     impl->paint.setTransition<LineOffset>(value, klass);
 }
 
-style::TransitionOptions LineLayer::getLineOffsetTransition(const optional<std::string>& klass) const {
+TransitionOptions LineLayer::getLineOffsetTransition(const optional<std::string>& klass) const {
     return impl->paint.getTransition<LineOffset>(klass);
 }
 
@@ -322,7 +322,7 @@ void LineLayer::setLineBlurTransition(const TransitionOptions& value, const opti
     impl->paint.setTransition<LineBlur>(value, klass);
 }
 
-style::TransitionOptions LineLayer::getLineBlurTransition(const optional<std::string>& klass) const {
+TransitionOptions LineLayer::getLineBlurTransition(const optional<std::string>& klass) const {
     return impl->paint.getTransition<LineBlur>(klass);
 }
 
@@ -345,7 +345,7 @@ void LineLayer::setLineDasharrayTransition(const TransitionOptions& value, const
     impl->paint.setTransition<LineDasharray>(value, klass);
 }
 
-style::TransitionOptions LineLayer::getLineDasharrayTransition(const optional<std::string>& klass) const {
+TransitionOptions LineLayer::getLineDasharrayTransition(const optional<std::string>& klass) const {
     return impl->paint.getTransition<LineDasharray>(klass);
 }
 
@@ -368,7 +368,7 @@ void LineLayer::setLinePatternTransition(const TransitionOptions& value, const o
     impl->paint.setTransition<LinePattern>(value, klass);
 }
 
-style::TransitionOptions LineLayer::getLinePatternTransition(const optional<std::string>& klass) const {
+TransitionOptions LineLayer::getLinePatternTransition(const optional<std::string>& klass) const {
     return impl->paint.getTransition<LinePattern>(klass);
 }
 

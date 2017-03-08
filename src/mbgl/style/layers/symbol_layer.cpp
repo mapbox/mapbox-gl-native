@@ -565,7 +565,7 @@ void SymbolLayer::setIconOpacityTransition(const TransitionOptions& value, const
     impl->paint.setTransition<IconOpacity>(value, klass);
 }
 
-style::TransitionOptions SymbolLayer::getIconOpacityTransition(const optional<std::string>& klass) const {
+TransitionOptions SymbolLayer::getIconOpacityTransition(const optional<std::string>& klass) const {
     return impl->paint.getTransition<IconOpacity>(klass);
 }
 
@@ -592,7 +592,7 @@ void SymbolLayer::setIconColorTransition(const TransitionOptions& value, const o
     impl->paint.setTransition<IconColor>(value, klass);
 }
 
-style::TransitionOptions SymbolLayer::getIconColorTransition(const optional<std::string>& klass) const {
+TransitionOptions SymbolLayer::getIconColorTransition(const optional<std::string>& klass) const {
     return impl->paint.getTransition<IconColor>(klass);
 }
 
@@ -619,7 +619,7 @@ void SymbolLayer::setIconHaloColorTransition(const TransitionOptions& value, con
     impl->paint.setTransition<IconHaloColor>(value, klass);
 }
 
-style::TransitionOptions SymbolLayer::getIconHaloColorTransition(const optional<std::string>& klass) const {
+TransitionOptions SymbolLayer::getIconHaloColorTransition(const optional<std::string>& klass) const {
     return impl->paint.getTransition<IconHaloColor>(klass);
 }
 
@@ -646,7 +646,7 @@ void SymbolLayer::setIconHaloWidthTransition(const TransitionOptions& value, con
     impl->paint.setTransition<IconHaloWidth>(value, klass);
 }
 
-style::TransitionOptions SymbolLayer::getIconHaloWidthTransition(const optional<std::string>& klass) const {
+TransitionOptions SymbolLayer::getIconHaloWidthTransition(const optional<std::string>& klass) const {
     return impl->paint.getTransition<IconHaloWidth>(klass);
 }
 
@@ -673,7 +673,7 @@ void SymbolLayer::setIconHaloBlurTransition(const TransitionOptions& value, cons
     impl->paint.setTransition<IconHaloBlur>(value, klass);
 }
 
-style::TransitionOptions SymbolLayer::getIconHaloBlurTransition(const optional<std::string>& klass) const {
+TransitionOptions SymbolLayer::getIconHaloBlurTransition(const optional<std::string>& klass) const {
     return impl->paint.getTransition<IconHaloBlur>(klass);
 }
 
@@ -696,7 +696,7 @@ void SymbolLayer::setIconTranslateTransition(const TransitionOptions& value, con
     impl->paint.setTransition<IconTranslate>(value, klass);
 }
 
-style::TransitionOptions SymbolLayer::getIconTranslateTransition(const optional<std::string>& klass) const {
+TransitionOptions SymbolLayer::getIconTranslateTransition(const optional<std::string>& klass) const {
     return impl->paint.getTransition<IconTranslate>(klass);
 }
 
@@ -719,7 +719,7 @@ void SymbolLayer::setIconTranslateAnchorTransition(const TransitionOptions& valu
     impl->paint.setTransition<IconTranslateAnchor>(value, klass);
 }
 
-style::TransitionOptions SymbolLayer::getIconTranslateAnchorTransition(const optional<std::string>& klass) const {
+TransitionOptions SymbolLayer::getIconTranslateAnchorTransition(const optional<std::string>& klass) const {
     return impl->paint.getTransition<IconTranslateAnchor>(klass);
 }
 
@@ -746,7 +746,7 @@ void SymbolLayer::setTextOpacityTransition(const TransitionOptions& value, const
     impl->paint.setTransition<TextOpacity>(value, klass);
 }
 
-style::TransitionOptions SymbolLayer::getTextOpacityTransition(const optional<std::string>& klass) const {
+TransitionOptions SymbolLayer::getTextOpacityTransition(const optional<std::string>& klass) const {
     return impl->paint.getTransition<TextOpacity>(klass);
 }
 
@@ -773,7 +773,7 @@ void SymbolLayer::setTextColorTransition(const TransitionOptions& value, const o
     impl->paint.setTransition<TextColor>(value, klass);
 }
 
-style::TransitionOptions SymbolLayer::getTextColorTransition(const optional<std::string>& klass) const {
+TransitionOptions SymbolLayer::getTextColorTransition(const optional<std::string>& klass) const {
     return impl->paint.getTransition<TextColor>(klass);
 }
 
@@ -800,7 +800,7 @@ void SymbolLayer::setTextHaloColorTransition(const TransitionOptions& value, con
     impl->paint.setTransition<TextHaloColor>(value, klass);
 }
 
-style::TransitionOptions SymbolLayer::getTextHaloColorTransition(const optional<std::string>& klass) const {
+TransitionOptions SymbolLayer::getTextHaloColorTransition(const optional<std::string>& klass) const {
     return impl->paint.getTransition<TextHaloColor>(klass);
 }
 
@@ -827,7 +827,7 @@ void SymbolLayer::setTextHaloWidthTransition(const TransitionOptions& value, con
     impl->paint.setTransition<TextHaloWidth>(value, klass);
 }
 
-style::TransitionOptions SymbolLayer::getTextHaloWidthTransition(const optional<std::string>& klass) const {
+TransitionOptions SymbolLayer::getTextHaloWidthTransition(const optional<std::string>& klass) const {
     return impl->paint.getTransition<TextHaloWidth>(klass);
 }
 
@@ -854,7 +854,7 @@ void SymbolLayer::setTextHaloBlurTransition(const TransitionOptions& value, cons
     impl->paint.setTransition<TextHaloBlur>(value, klass);
 }
 
-style::TransitionOptions SymbolLayer::getTextHaloBlurTransition(const optional<std::string>& klass) const {
+TransitionOptions SymbolLayer::getTextHaloBlurTransition(const optional<std::string>& klass) const {
     return impl->paint.getTransition<TextHaloBlur>(klass);
 }
 
@@ -877,7 +877,7 @@ void SymbolLayer::setTextTranslateTransition(const TransitionOptions& value, con
     impl->paint.setTransition<TextTranslate>(value, klass);
 }
 
-style::TransitionOptions SymbolLayer::getTextTranslateTransition(const optional<std::string>& klass) const {
+TransitionOptions SymbolLayer::getTextTranslateTransition(const optional<std::string>& klass) const {
     return impl->paint.getTransition<TextTranslate>(klass);
 }
 
@@ -900,7 +900,7 @@ void SymbolLayer::setTextTranslateAnchorTransition(const TransitionOptions& valu
     impl->paint.setTransition<TextTranslateAnchor>(value, klass);
 }
 
-style::TransitionOptions SymbolLayer::getTextTranslateAnchorTransition(const optional<std::string>& klass) const {
+TransitionOptions SymbolLayer::getTextTranslateAnchorTransition(const optional<std::string>& klass) const {
     return impl->paint.getTransition<TextTranslateAnchor>(klass);
 }
 

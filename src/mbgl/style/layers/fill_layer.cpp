@@ -84,7 +84,7 @@ void FillLayer::setFillAntialiasTransition(const TransitionOptions& value, const
     impl->paint.setTransition<FillAntialias>(value, klass);
 }
 
-style::TransitionOptions FillLayer::getFillAntialiasTransition(const optional<std::string>& klass) const {
+TransitionOptions FillLayer::getFillAntialiasTransition(const optional<std::string>& klass) const {
     return impl->paint.getTransition<FillAntialias>(klass);
 }
 
@@ -111,7 +111,7 @@ void FillLayer::setFillOpacityTransition(const TransitionOptions& value, const o
     impl->paint.setTransition<FillOpacity>(value, klass);
 }
 
-style::TransitionOptions FillLayer::getFillOpacityTransition(const optional<std::string>& klass) const {
+TransitionOptions FillLayer::getFillOpacityTransition(const optional<std::string>& klass) const {
     return impl->paint.getTransition<FillOpacity>(klass);
 }
 
@@ -138,7 +138,7 @@ void FillLayer::setFillColorTransition(const TransitionOptions& value, const opt
     impl->paint.setTransition<FillColor>(value, klass);
 }
 
-style::TransitionOptions FillLayer::getFillColorTransition(const optional<std::string>& klass) const {
+TransitionOptions FillLayer::getFillColorTransition(const optional<std::string>& klass) const {
     return impl->paint.getTransition<FillColor>(klass);
 }
 
@@ -165,7 +165,7 @@ void FillLayer::setFillOutlineColorTransition(const TransitionOptions& value, co
     impl->paint.setTransition<FillOutlineColor>(value, klass);
 }
 
-style::TransitionOptions FillLayer::getFillOutlineColorTransition(const optional<std::string>& klass) const {
+TransitionOptions FillLayer::getFillOutlineColorTransition(const optional<std::string>& klass) const {
     return impl->paint.getTransition<FillOutlineColor>(klass);
 }
 
@@ -188,7 +188,7 @@ void FillLayer::setFillTranslateTransition(const TransitionOptions& value, const
     impl->paint.setTransition<FillTranslate>(value, klass);
 }
 
-style::TransitionOptions FillLayer::getFillTranslateTransition(const optional<std::string>& klass) const {
+TransitionOptions FillLayer::getFillTranslateTransition(const optional<std::string>& klass) const {
     return impl->paint.getTransition<FillTranslate>(klass);
 }
 
@@ -211,7 +211,7 @@ void FillLayer::setFillTranslateAnchorTransition(const TransitionOptions& value,
     impl->paint.setTransition<FillTranslateAnchor>(value, klass);
 }
 
-style::TransitionOptions FillLayer::getFillTranslateAnchorTransition(const optional<std::string>& klass) const {
+TransitionOptions FillLayer::getFillTranslateAnchorTransition(const optional<std::string>& klass) const {
     return impl->paint.getTransition<FillTranslateAnchor>(klass);
 }
 
@@ -234,7 +234,7 @@ void FillLayer::setFillPatternTransition(const TransitionOptions& value, const o
     impl->paint.setTransition<FillPattern>(value, klass);
 }
 
-style::TransitionOptions FillLayer::getFillPatternTransition(const optional<std::string>& klass) const {
+TransitionOptions FillLayer::getFillPatternTransition(const optional<std::string>& klass) const {
     return impl->paint.getTransition<FillPattern>(klass);
 }
 

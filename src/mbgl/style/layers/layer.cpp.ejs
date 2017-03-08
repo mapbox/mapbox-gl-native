@@ -131,7 +131,7 @@ void <%- camelize(type) %>Layer::set<%- camelize(property.name) %>Transition(con
     impl->paint.setTransition<<%- camelize(property.name) %>>(value, klass);
 }
 
-style::TransitionOptions <%- camelize(type) %>Layer::get<%- camelize(property.name) %>Transition(const optional<std::string>& klass) const {
+TransitionOptions <%- camelize(type) %>Layer::get<%- camelize(property.name) %>Transition(const optional<std::string>& klass) const {
     return impl->paint.getTransition<<%- camelize(property.name) %>>(klass);
 }
 <% } -%>
