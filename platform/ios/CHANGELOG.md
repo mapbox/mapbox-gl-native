@@ -37,6 +37,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * An exception is no longer thrown if layers or sources are removed from a style before they are added. ([#7962](https://github.com/mapbox/mapbox-gl-native/pull/7962))
 * Renamed MGLStyleConstantValue to MGLConstantStyleValue. For compatibility with previous releases, MGLStyleConstantValue is now an alias of MGLConstantStyleValue. ([#8090](https://github.com/mapbox/mapbox-gl-native/pull/8090))
 * Fixed a crash that could occur when switching styles after adding an MGLSource to the style. ([#8298](https://github.com/mapbox/mapbox-gl-native/pull/8298))
+* Added support for per style property transitions. ([#8010](https://github.com/mapbox/mapbox-gl-native/issues/8010))
 
 ### Annotations and user interaction
 
