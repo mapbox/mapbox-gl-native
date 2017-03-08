@@ -281,7 +281,7 @@ public final class TrackingSettings {
    */
   void resetTrackingModesIfRequired(CameraPosition cameraPosition) {
     if (isDismissTrackingModesForCameraPositionChange()) {
-      resetTrackingModesIfRequired(cameraPosition.target != null, cameraPosition.bearing != -1);
+      resetTrackingModesIfRequired(cameraPosition.target != null, false);
     }
   }
 
