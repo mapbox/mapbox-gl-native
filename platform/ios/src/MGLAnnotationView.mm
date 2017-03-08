@@ -11,6 +11,7 @@
 
 @property (nonatomic, readwrite, nullable) NSString *reuseIdentifier;
 @property (nonatomic, readwrite) CATransform3D lastAppliedScaleTransform;
+@property (nonatomic, readwrite) CATransform3D lastAppliedRotateTransform;
 @property (nonatomic, weak) UIPanGestureRecognizer *panGestureRecognizer;
 @property (nonatomic, weak) UILongPressGestureRecognizer *longPressRecognizer;
 @property (nonatomic, weak) MGLMapView *mapView;
@@ -53,6 +54,7 @@
         _annotation = [decoder decodeObjectOfClass:[NSObject class] forKey:@"annotation"];
         _centerOffset = [decoder decodeCGVectorForKey:@"centerOffset"];
         _scalesWithViewingDistance = [decoder decodeBoolForKey:@"scalesWithViewingDistance"];
+        _rotatesWithMap = [decoder decodeBoolForKey:@"rotatesWithMap"];
         _selected = [decoder decodeBoolForKey:@"selected"];
         _enabled = [decoder decodeBoolForKey:@"enabled"];
         self.draggable = [decoder decodeBoolForKey:@"draggable"];
@@ -66,6 +68,7 @@
     [coder encodeObject:_annotation forKey:@"annotation"];
     [coder encodeCGVector:_centerOffset forKey:@"centerOffset"];
     [coder encodeBool:_scalesWithViewingDistance forKey:@"scalesWithViewingDistance"];
+    [coder encodeBool:_rotatesWithMap forKey:@"rotatesWithMap"];
     [coder encodeBool:_selected forKey:@"selected"];
     [coder encodeBool:_enabled forKey:@"enabled"];
     [coder encodeBool:_draggable forKey:@"draggable"];
@@ -155,6 +158,29 @@
         self.layer.transform = CATransform3DConcat(self.layer.transform, effectiveTransform);
         _lastAppliedScaleTransform = newScaleTransform;
     }
+}
+
+- (void)setRotatesWithMap:(BOOL)rotatesWithMap
+{
+    if (_rotatesWithMap != rotatesWithMap)
+    {
+        _rotatesWithMap = rotatesWithMap;
+        [self updateRotateTransform];
+    }
+}
+
+- (void)updateRotateTransform
+{
+    if (self.rotatesWithMap == NO) return;
+
+    CATransform3D undoOfLastRotateTransform = CATransform3DInvert(_lastAppliedRotateTransform);
+
+    CGFloat directionRad = self.mapView.direction * M_PI / 180.0;
+    CATransform3D newRotateTransform = CATransform3DMakeRotation(-directionRad, 0, 0, 1);
+    CATransform3D effectiveTransform = CATransform3DConcat(undoOfLastRotateTransform, newRotateTransform);
+
+    self.layer.transform = CATransform3DConcat(self.layer.transform, effectiveTransform);
+    _lastAppliedRotateTransform = newRotateTransform;
 }
 
 #pragma mark - Draggable
