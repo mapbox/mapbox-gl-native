@@ -173,7 +173,7 @@ typedef NS_ENUM(NSUInteger, MGLAnnotationViewDragState) {
 
 /**
  A Boolean value that determines whether the annotation view rotates together
- with the mapview.
+ with the map.
 
  When the value of this property is `YES` and the map is rotated, the annotation
  view rotates. This is also the behavior of `MGLAnnotationImage` objects. When the
