@@ -135,7 +135,9 @@ MGL_EXPORT
 #endif
 
 /**
- `fillColor` transition attributes.
+ The transition affecting any changes to this layer’s `fillColor` property.
+
+ This property corresponds to the background-color-transition property in the style JSON file format.
 */
 @property (nonatomic) MGLTransition fillColorTransition;
 
@@ -166,7 +168,9 @@ MGL_EXPORT
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *fillOpacity;
 
 /**
- `fillOpacity` transition attributes.
+ The transition affecting any changes to this layer’s `fillOpacity` property.
+
+ This property corresponds to the background-color-transition property in the style JSON file format.
 */
 @property (nonatomic) MGLTransition fillOpacityTransition;
 
@@ -223,7 +227,9 @@ MGL_EXPORT
 #endif
 
 /**
- `fillOutlineColor` transition attributes.
+ The transition affecting any changes to this layer’s `fillOutlineColor` property.
+
+ This property corresponds to the background-color-transition property in the style JSON file format.
 */
 @property (nonatomic) MGLTransition fillOutlineColorTransition;
 
@@ -240,7 +246,9 @@ MGL_EXPORT
 @property (nonatomic, null_resettable) MGLStyleValue<NSString *> *fillPattern;
 
 /**
- `fillPattern` transition attributes.
+ The transition affecting any changes to this layer’s `fillPattern` property.
+
+ This property corresponds to the background-color-transition property in the style JSON file format.
 */
 @property (nonatomic) MGLTransition fillPatternTransition;
 
@@ -291,7 +299,9 @@ MGL_EXPORT
 #endif
 
 /**
- `fillTranslate` transition attributes.
+ The transition affecting any changes to this layer’s `fillTranslate` property.
+
+ This property corresponds to the background-color-transition property in the style JSON file format.
 */
 @property (nonatomic) MGLTransition fillTranslationTransition;
 

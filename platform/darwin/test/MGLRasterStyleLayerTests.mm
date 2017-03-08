@@ -2,10 +2,12 @@
 // Edit platform/darwin/scripts/generate-style-code.js, then run `make darwin-style-code`.
 
 #import "MGLStyleLayerTests.h"
+#import "../../darwin/src/NSDate+MGLAdditions.h"
 
 #import "MGLStyleLayer_Private.h"
 
 #include <mbgl/style/layers/raster_layer.hpp>
+#include <mbgl/style/transition_options.hpp>
 
 @interface MGLRasterLayerTests : MGLStyleLayerTests
 @end
@@ -145,6 +147,13 @@
         XCTAssertThrowsSpecificNamed(layer.rasterContrast = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
         // Transition property test
         layer.rasterContrastTransition = transitionTest;
+        MGLTransition options;
+        auto toptions = rawLayer->getRasterContrastTransition();
+        options.delay = MGLTimeIntervalFromDuration(toptions.delay.value_or(mbgl::Duration::zero()));
+        options.duration = MGLTimeIntervalFromDuration(toptions.duration.value_or(mbgl::Duration::zero()));
+        XCTAssertEqual(options.delay, transitionTest.delay);
+        XCTAssertEqual(options.duration, transitionTest.duration);
+
         MGLTransition rasterContrastTransition = layer.rasterContrastTransition;
         XCTAssertEqual(rasterContrastTransition.delay, transitionTest.delay);
         XCTAssertEqual(rasterContrastTransition.duration, transitionTest.duration);
@@ -189,6 +198,13 @@
         XCTAssertThrowsSpecificNamed(layer.rasterFadeDuration = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
         // Transition property test
         layer.rasterFadeDurationTransition = transitionTest;
+        MGLTransition options;
+        auto toptions = rawLayer->getRasterFadeDurationTransition();
+        options.delay = MGLTimeIntervalFromDuration(toptions.delay.value_or(mbgl::Duration::zero()));
+        options.duration = MGLTimeIntervalFromDuration(toptions.duration.value_or(mbgl::Duration::zero()));
+        XCTAssertEqual(options.delay, transitionTest.delay);
+        XCTAssertEqual(options.duration, transitionTest.duration);
+
         MGLTransition rasterFadeDurationTransition = layer.rasterFadeDurationTransition;
         XCTAssertEqual(rasterFadeDurationTransition.delay, transitionTest.delay);
         XCTAssertEqual(rasterFadeDurationTransition.duration, transitionTest.duration);
@@ -272,6 +288,13 @@
         XCTAssertThrowsSpecificNamed(layer.rasterOpacity = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
         // Transition property test
         layer.rasterOpacityTransition = transitionTest;
+        MGLTransition options;
+        auto toptions = rawLayer->getRasterOpacityTransition();
+        options.delay = MGLTimeIntervalFromDuration(toptions.delay.value_or(mbgl::Duration::zero()));
+        options.duration = MGLTimeIntervalFromDuration(toptions.duration.value_or(mbgl::Duration::zero()));
+        XCTAssertEqual(options.delay, transitionTest.delay);
+        XCTAssertEqual(options.duration, transitionTest.duration);
+
         MGLTransition rasterOpacityTransition = layer.rasterOpacityTransition;
         XCTAssertEqual(rasterOpacityTransition.delay, transitionTest.delay);
         XCTAssertEqual(rasterOpacityTransition.duration, transitionTest.duration);
@@ -316,6 +339,13 @@
         XCTAssertThrowsSpecificNamed(layer.rasterSaturation = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
         // Transition property test
         layer.rasterSaturationTransition = transitionTest;
+        MGLTransition options;
+        auto toptions = rawLayer->getRasterSaturationTransition();
+        options.delay = MGLTimeIntervalFromDuration(toptions.delay.value_or(mbgl::Duration::zero()));
+        options.duration = MGLTimeIntervalFromDuration(toptions.duration.value_or(mbgl::Duration::zero()));
+        XCTAssertEqual(options.delay, transitionTest.delay);
+        XCTAssertEqual(options.duration, transitionTest.duration);
+
         MGLTransition rasterSaturationTransition = layer.rasterSaturationTransition;
         XCTAssertEqual(rasterSaturationTransition.delay, transitionTest.delay);
         XCTAssertEqual(rasterSaturationTransition.duration, transitionTest.duration);

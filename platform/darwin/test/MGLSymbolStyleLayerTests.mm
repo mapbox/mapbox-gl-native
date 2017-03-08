@@ -2,10 +2,12 @@
 // Edit platform/darwin/scripts/generate-style-code.js, then run `make darwin-style-code`.
 
 #import "MGLStyleLayerTests.h"
+#import "../../darwin/src/NSDate+MGLAdditions.h"
 
 #import "MGLStyleLayer_Private.h"
 
 #include <mbgl/style/layers/symbol_layer.hpp>
+#include <mbgl/style/transition_options.hpp>
 
 @interface MGLSymbolLayerTests : MGLStyleLayerTests
 @end
@@ -1473,6 +1475,13 @@
                               @"iconColor should return the default value after being unset.");
         // Transition property test
         layer.iconColorTransition = transitionTest;
+        MGLTransition options;
+        auto toptions = rawLayer->getIconColorTransition();
+        options.delay = MGLTimeIntervalFromDuration(toptions.delay.value_or(mbgl::Duration::zero()));
+        options.duration = MGLTimeIntervalFromDuration(toptions.duration.value_or(mbgl::Duration::zero()));
+        XCTAssertEqual(options.delay, transitionTest.delay);
+        XCTAssertEqual(options.duration, transitionTest.duration);
+
         MGLTransition iconColorTransition = layer.iconColorTransition;
         XCTAssertEqual(iconColorTransition.delay, transitionTest.delay);
         XCTAssertEqual(iconColorTransition.duration, transitionTest.duration);
@@ -1535,6 +1544,13 @@
                               @"iconHaloBlur should return the default value after being unset.");
         // Transition property test
         layer.iconHaloBlurTransition = transitionTest;
+        MGLTransition options;
+        auto toptions = rawLayer->getIconHaloBlurTransition();
+        options.delay = MGLTimeIntervalFromDuration(toptions.delay.value_or(mbgl::Duration::zero()));
+        options.duration = MGLTimeIntervalFromDuration(toptions.duration.value_or(mbgl::Duration::zero()));
+        XCTAssertEqual(options.delay, transitionTest.delay);
+        XCTAssertEqual(options.duration, transitionTest.duration);
+
         MGLTransition iconHaloBlurTransition = layer.iconHaloBlurTransition;
         XCTAssertEqual(iconHaloBlurTransition.delay, transitionTest.delay);
         XCTAssertEqual(iconHaloBlurTransition.duration, transitionTest.duration);
@@ -1597,6 +1613,13 @@
                               @"iconHaloColor should return the default value after being unset.");
         // Transition property test
         layer.iconHaloColorTransition = transitionTest;
+        MGLTransition options;
+        auto toptions = rawLayer->getIconHaloColorTransition();
+        options.delay = MGLTimeIntervalFromDuration(toptions.delay.value_or(mbgl::Duration::zero()));
+        options.duration = MGLTimeIntervalFromDuration(toptions.duration.value_or(mbgl::Duration::zero()));
+        XCTAssertEqual(options.delay, transitionTest.delay);
+        XCTAssertEqual(options.duration, transitionTest.duration);
+
         MGLTransition iconHaloColorTransition = layer.iconHaloColorTransition;
         XCTAssertEqual(iconHaloColorTransition.delay, transitionTest.delay);
         XCTAssertEqual(iconHaloColorTransition.duration, transitionTest.duration);
@@ -1659,6 +1682,13 @@
                               @"iconHaloWidth should return the default value after being unset.");
         // Transition property test
         layer.iconHaloWidthTransition = transitionTest;
+        MGLTransition options;
+        auto toptions = rawLayer->getIconHaloWidthTransition();
+        options.delay = MGLTimeIntervalFromDuration(toptions.delay.value_or(mbgl::Duration::zero()));
+        options.duration = MGLTimeIntervalFromDuration(toptions.duration.value_or(mbgl::Duration::zero()));
+        XCTAssertEqual(options.delay, transitionTest.delay);
+        XCTAssertEqual(options.duration, transitionTest.duration);
+
         MGLTransition iconHaloWidthTransition = layer.iconHaloWidthTransition;
         XCTAssertEqual(iconHaloWidthTransition.delay, transitionTest.delay);
         XCTAssertEqual(iconHaloWidthTransition.duration, transitionTest.duration);
@@ -1721,6 +1751,13 @@
                               @"iconOpacity should return the default value after being unset.");
         // Transition property test
         layer.iconOpacityTransition = transitionTest;
+        MGLTransition options;
+        auto toptions = rawLayer->getIconOpacityTransition();
+        options.delay = MGLTimeIntervalFromDuration(toptions.delay.value_or(mbgl::Duration::zero()));
+        options.duration = MGLTimeIntervalFromDuration(toptions.duration.value_or(mbgl::Duration::zero()));
+        XCTAssertEqual(options.delay, transitionTest.delay);
+        XCTAssertEqual(options.duration, transitionTest.duration);
+
         MGLTransition iconOpacityTransition = layer.iconOpacityTransition;
         XCTAssertEqual(iconOpacityTransition.delay, transitionTest.delay);
         XCTAssertEqual(iconOpacityTransition.duration, transitionTest.duration);
@@ -1867,6 +1904,13 @@
                               @"textColor should return the default value after being unset.");
         // Transition property test
         layer.textColorTransition = transitionTest;
+        MGLTransition options;
+        auto toptions = rawLayer->getTextColorTransition();
+        options.delay = MGLTimeIntervalFromDuration(toptions.delay.value_or(mbgl::Duration::zero()));
+        options.duration = MGLTimeIntervalFromDuration(toptions.duration.value_or(mbgl::Duration::zero()));
+        XCTAssertEqual(options.delay, transitionTest.delay);
+        XCTAssertEqual(options.duration, transitionTest.duration);
+
         MGLTransition textColorTransition = layer.textColorTransition;
         XCTAssertEqual(textColorTransition.delay, transitionTest.delay);
         XCTAssertEqual(textColorTransition.duration, transitionTest.duration);
@@ -1929,6 +1973,13 @@
                               @"textHaloBlur should return the default value after being unset.");
         // Transition property test
         layer.textHaloBlurTransition = transitionTest;
+        MGLTransition options;
+        auto toptions = rawLayer->getTextHaloBlurTransition();
+        options.delay = MGLTimeIntervalFromDuration(toptions.delay.value_or(mbgl::Duration::zero()));
+        options.duration = MGLTimeIntervalFromDuration(toptions.duration.value_or(mbgl::Duration::zero()));
+        XCTAssertEqual(options.delay, transitionTest.delay);
+        XCTAssertEqual(options.duration, transitionTest.duration);
+
         MGLTransition textHaloBlurTransition = layer.textHaloBlurTransition;
         XCTAssertEqual(textHaloBlurTransition.delay, transitionTest.delay);
         XCTAssertEqual(textHaloBlurTransition.duration, transitionTest.duration);
@@ -1991,6 +2042,13 @@
                               @"textHaloColor should return the default value after being unset.");
         // Transition property test
         layer.textHaloColorTransition = transitionTest;
+        MGLTransition options;
+        auto toptions = rawLayer->getTextHaloColorTransition();
+        options.delay = MGLTimeIntervalFromDuration(toptions.delay.value_or(mbgl::Duration::zero()));
+        options.duration = MGLTimeIntervalFromDuration(toptions.duration.value_or(mbgl::Duration::zero()));
+        XCTAssertEqual(options.delay, transitionTest.delay);
+        XCTAssertEqual(options.duration, transitionTest.duration);
+
         MGLTransition textHaloColorTransition = layer.textHaloColorTransition;
         XCTAssertEqual(textHaloColorTransition.delay, transitionTest.delay);
         XCTAssertEqual(textHaloColorTransition.duration, transitionTest.duration);
@@ -2053,6 +2111,13 @@
                               @"textHaloWidth should return the default value after being unset.");
         // Transition property test
         layer.textHaloWidthTransition = transitionTest;
+        MGLTransition options;
+        auto toptions = rawLayer->getTextHaloWidthTransition();
+        options.delay = MGLTimeIntervalFromDuration(toptions.delay.value_or(mbgl::Duration::zero()));
+        options.duration = MGLTimeIntervalFromDuration(toptions.duration.value_or(mbgl::Duration::zero()));
+        XCTAssertEqual(options.delay, transitionTest.delay);
+        XCTAssertEqual(options.duration, transitionTest.duration);
+
         MGLTransition textHaloWidthTransition = layer.textHaloWidthTransition;
         XCTAssertEqual(textHaloWidthTransition.delay, transitionTest.delay);
         XCTAssertEqual(textHaloWidthTransition.duration, transitionTest.duration);
@@ -2115,6 +2180,13 @@
                               @"textOpacity should return the default value after being unset.");
         // Transition property test
         layer.textOpacityTransition = transitionTest;
+        MGLTransition options;
+        auto toptions = rawLayer->getTextOpacityTransition();
+        options.delay = MGLTimeIntervalFromDuration(toptions.delay.value_or(mbgl::Duration::zero()));
+        options.duration = MGLTimeIntervalFromDuration(toptions.duration.value_or(mbgl::Duration::zero()));
+        XCTAssertEqual(options.delay, transitionTest.delay);
+        XCTAssertEqual(options.duration, transitionTest.duration);
+
         MGLTransition textOpacityTransition = layer.textOpacityTransition;
         XCTAssertEqual(textOpacityTransition.delay, transitionTest.delay);
         XCTAssertEqual(textOpacityTransition.duration, transitionTest.duration);

@@ -7,10 +7,12 @@
 // Edit platform/darwin/scripts/generate-style-code.js, then run `make darwin-style-code`.
 
 #import "MGLStyleLayerTests.h"
+#import "../../darwin/src/NSDate+MGLAdditions.h"
 
 #import "MGLStyleLayer_Private.h"
 
 #include <mbgl/style/layers/<%- type %>_layer.hpp>
+#include <mbgl/style/transition_options.hpp>
 
 @interface MGL<%- camelize(type) %>LayerTests : MGLStyleLayerTests
 @end
@@ -130,6 +132,13 @@
 <% if (property["transition"] && !property.original) { -%>
         // Transition property test
         layer.<%- camelizeWithLeadingLowercase(originalPropertyName(property)) %>Transition = transitionTest;
+        MGLTransition options;
+        auto toptions = rawLayer->get<%- camelize(originalPropertyName(property)) %>Transition();
+        options.delay = MGLTimeIntervalFromDuration(toptions.delay.value_or(mbgl::Duration::zero()));
+        options.duration = MGLTimeIntervalFromDuration(toptions.duration.value_or(mbgl::Duration::zero()));
+        XCTAssertEqual(options.delay, transitionTest.delay);
+        XCTAssertEqual(options.duration, transitionTest.duration);
+
         MGLTransition <%- camelizeWithLeadingLowercase(originalPropertyName(property)) %>Transition = layer.<%- camelizeWithLeadingLowercase(originalPropertyName(property)) %>Transition;
         XCTAssertEqual(<%- camelizeWithLeadingLowercase(originalPropertyName(property)) %>Transition.delay, transitionTest.delay);
         XCTAssertEqual(<%- camelizeWithLeadingLowercase(originalPropertyName(property)) %>Transition.duration, transitionTest.duration);

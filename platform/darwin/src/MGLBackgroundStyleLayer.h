@@ -69,7 +69,9 @@ MGL_EXPORT
 #endif
 
 /**
- `backgroundColor` transition attributes.
+ The transition affecting any changes to this layer’s `backgroundColor` property.
+
+ This property corresponds to the background-color-transition property in the style JSON file format.
 */
 @property (nonatomic) MGLTransition backgroundColorTransition;
 
@@ -90,7 +92,9 @@ MGL_EXPORT
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *backgroundOpacity;
 
 /**
- `backgroundOpacity` transition attributes.
+ The transition affecting any changes to this layer’s `backgroundOpacity` property.
+
+ This property corresponds to the background-color-transition property in the style JSON file format.
 */
 @property (nonatomic) MGLTransition backgroundOpacityTransition;
 
@@ -108,7 +112,9 @@ MGL_EXPORT
 @property (nonatomic, null_resettable) MGLStyleValue<NSString *> *backgroundPattern;
 
 /**
- `backgroundPattern` transition attributes.
+ The transition affecting any changes to this layer’s `backgroundPattern` property.
+
+ This property corresponds to the background-color-transition property in the style JSON file format.
 */
 @property (nonatomic) MGLTransition backgroundPatternTransition;
 

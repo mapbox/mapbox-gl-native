@@ -209,7 +209,9 @@ MGL_EXPORT
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *lineBlur;
 
 /**
- `lineBlur` transition attributes.
+ The transition affecting any changes to this layer’s `lineBlur` property.
+
+ This property corresponds to the background-color-transition property in the style JSON file format.
 */
 @property (nonatomic) MGLTransition lineBlurTransition;
 
@@ -272,7 +274,9 @@ MGL_EXPORT
 #endif
 
 /**
- `lineColor` transition attributes.
+ The transition affecting any changes to this layer’s `lineColor` property.
+
+ This property corresponds to the background-color-transition property in the style JSON file format.
 */
 @property (nonatomic) MGLTransition lineColorTransition;
 
@@ -299,7 +303,9 @@ MGL_EXPORT
 @property (nonatomic, null_resettable) MGLStyleValue<NSArray<NSNumber *> *> *lineDashPattern;
 
 /**
- `lineDasharray` transition attributes.
+ The transition affecting any changes to this layer’s `lineDasharray` property.
+
+ This property corresponds to the background-color-transition property in the style JSON file format.
 */
 @property (nonatomic) MGLTransition lineDashPatternTransition;
 
@@ -334,7 +340,9 @@ MGL_EXPORT
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *lineGapWidth;
 
 /**
- `lineGapWidth` transition attributes.
+ The transition affecting any changes to this layer’s `lineGapWidth` property.
+
+ This property corresponds to the background-color-transition property in the style JSON file format.
 */
 @property (nonatomic) MGLTransition lineGapWidthTransition;
 
@@ -369,7 +377,9 @@ MGL_EXPORT
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *lineOffset;
 
 /**
- `lineOffset` transition attributes.
+ The transition affecting any changes to this layer’s `lineOffset` property.
+
+ This property corresponds to the background-color-transition property in the style JSON file format.
 */
 @property (nonatomic) MGLTransition lineOffsetTransition;
 
@@ -399,7 +409,9 @@ MGL_EXPORT
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *lineOpacity;
 
 /**
- `lineOpacity` transition attributes.
+ The transition affecting any changes to this layer’s `lineOpacity` property.
+
+ This property corresponds to the background-color-transition property in the style JSON file format.
 */
 @property (nonatomic) MGLTransition lineOpacityTransition;
 
@@ -416,7 +428,9 @@ MGL_EXPORT
 @property (nonatomic, null_resettable) MGLStyleValue<NSString *> *linePattern;
 
 /**
- `linePattern` transition attributes.
+ The transition affecting any changes to this layer’s `linePattern` property.
+
+ This property corresponds to the background-color-transition property in the style JSON file format.
 */
 @property (nonatomic) MGLTransition linePatternTransition;
 
@@ -467,7 +481,9 @@ MGL_EXPORT
 #endif
 
 /**
- `lineTranslate` transition attributes.
+ The transition affecting any changes to this layer’s `lineTranslate` property.
+
+ This property corresponds to the background-color-transition property in the style JSON file format.
 */
 @property (nonatomic) MGLTransition lineTranslationTransition;
 
@@ -517,7 +533,9 @@ MGL_EXPORT
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *lineWidth;
 
 /**
- `lineWidth` transition attributes.
+ The transition affecting any changes to this layer’s `lineWidth` property.
+
+ This property corresponds to the background-color-transition property in the style JSON file format.
 */
 @property (nonatomic) MGLTransition lineWidthTransition;
 

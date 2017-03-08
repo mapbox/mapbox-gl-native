@@ -2,10 +2,12 @@
 // Edit platform/darwin/scripts/generate-style-code.js, then run `make darwin-style-code`.
 
 #import "MGLStyleLayerTests.h"
+#import "../../darwin/src/NSDate+MGLAdditions.h"
 
 #import "MGLStyleLayer_Private.h"
 
 #include <mbgl/style/layers/circle_layer.hpp>
+#include <mbgl/style/transition_options.hpp>
 
 @interface MGLCircleLayerTests : MGLStyleLayerTests
 @end
@@ -103,6 +105,13 @@
                               @"circleBlur should return the default value after being unset.");
         // Transition property test
         layer.circleBlurTransition = transitionTest;
+        MGLTransition options;
+        auto toptions = rawLayer->getCircleBlurTransition();
+        options.delay = MGLTimeIntervalFromDuration(toptions.delay.value_or(mbgl::Duration::zero()));
+        options.duration = MGLTimeIntervalFromDuration(toptions.duration.value_or(mbgl::Duration::zero()));
+        XCTAssertEqual(options.delay, transitionTest.delay);
+        XCTAssertEqual(options.duration, transitionTest.duration);
+
         MGLTransition circleBlurTransition = layer.circleBlurTransition;
         XCTAssertEqual(circleBlurTransition.delay, transitionTest.delay);
         XCTAssertEqual(circleBlurTransition.duration, transitionTest.duration);
@@ -165,6 +174,13 @@
                               @"circleColor should return the default value after being unset.");
         // Transition property test
         layer.circleColorTransition = transitionTest;
+        MGLTransition options;
+        auto toptions = rawLayer->getCircleColorTransition();
+        options.delay = MGLTimeIntervalFromDuration(toptions.delay.value_or(mbgl::Duration::zero()));
+        options.duration = MGLTimeIntervalFromDuration(toptions.duration.value_or(mbgl::Duration::zero()));
+        XCTAssertEqual(options.delay, transitionTest.delay);
+        XCTAssertEqual(options.duration, transitionTest.duration);
+
         MGLTransition circleColorTransition = layer.circleColorTransition;
         XCTAssertEqual(circleColorTransition.delay, transitionTest.delay);
         XCTAssertEqual(circleColorTransition.duration, transitionTest.duration);
@@ -227,6 +243,13 @@
                               @"circleOpacity should return the default value after being unset.");
         // Transition property test
         layer.circleOpacityTransition = transitionTest;
+        MGLTransition options;
+        auto toptions = rawLayer->getCircleOpacityTransition();
+        options.delay = MGLTimeIntervalFromDuration(toptions.delay.value_or(mbgl::Duration::zero()));
+        options.duration = MGLTimeIntervalFromDuration(toptions.duration.value_or(mbgl::Duration::zero()));
+        XCTAssertEqual(options.delay, transitionTest.delay);
+        XCTAssertEqual(options.duration, transitionTest.duration);
+
         MGLTransition circleOpacityTransition = layer.circleOpacityTransition;
         XCTAssertEqual(circleOpacityTransition.delay, transitionTest.delay);
         XCTAssertEqual(circleOpacityTransition.duration, transitionTest.duration);
@@ -289,6 +312,13 @@
                               @"circleRadius should return the default value after being unset.");
         // Transition property test
         layer.circleRadiusTransition = transitionTest;
+        MGLTransition options;
+        auto toptions = rawLayer->getCircleRadiusTransition();
+        options.delay = MGLTimeIntervalFromDuration(toptions.delay.value_or(mbgl::Duration::zero()));
+        options.duration = MGLTimeIntervalFromDuration(toptions.duration.value_or(mbgl::Duration::zero()));
+        XCTAssertEqual(options.delay, transitionTest.delay);
+        XCTAssertEqual(options.duration, transitionTest.duration);
+
         MGLTransition circleRadiusTransition = layer.circleRadiusTransition;
         XCTAssertEqual(circleRadiusTransition.delay, transitionTest.delay);
         XCTAssertEqual(circleRadiusTransition.duration, transitionTest.duration);
@@ -390,6 +420,13 @@
                               @"circleStrokeColor should return the default value after being unset.");
         // Transition property test
         layer.circleStrokeColorTransition = transitionTest;
+        MGLTransition options;
+        auto toptions = rawLayer->getCircleStrokeColorTransition();
+        options.delay = MGLTimeIntervalFromDuration(toptions.delay.value_or(mbgl::Duration::zero()));
+        options.duration = MGLTimeIntervalFromDuration(toptions.duration.value_or(mbgl::Duration::zero()));
+        XCTAssertEqual(options.delay, transitionTest.delay);
+        XCTAssertEqual(options.duration, transitionTest.duration);
+
         MGLTransition circleStrokeColorTransition = layer.circleStrokeColorTransition;
         XCTAssertEqual(circleStrokeColorTransition.delay, transitionTest.delay);
         XCTAssertEqual(circleStrokeColorTransition.duration, transitionTest.duration);
@@ -452,6 +489,13 @@
                               @"circleStrokeOpacity should return the default value after being unset.");
         // Transition property test
         layer.circleStrokeOpacityTransition = transitionTest;
+        MGLTransition options;
+        auto toptions = rawLayer->getCircleStrokeOpacityTransition();
+        options.delay = MGLTimeIntervalFromDuration(toptions.delay.value_or(mbgl::Duration::zero()));
+        options.duration = MGLTimeIntervalFromDuration(toptions.duration.value_or(mbgl::Duration::zero()));
+        XCTAssertEqual(options.delay, transitionTest.delay);
+        XCTAssertEqual(options.duration, transitionTest.duration);
+
         MGLTransition circleStrokeOpacityTransition = layer.circleStrokeOpacityTransition;
         XCTAssertEqual(circleStrokeOpacityTransition.delay, transitionTest.delay);
         XCTAssertEqual(circleStrokeOpacityTransition.duration, transitionTest.duration);
@@ -514,6 +558,13 @@
                               @"circleStrokeWidth should return the default value after being unset.");
         // Transition property test
         layer.circleStrokeWidthTransition = transitionTest;
+        MGLTransition options;
+        auto toptions = rawLayer->getCircleStrokeWidthTransition();
+        options.delay = MGLTimeIntervalFromDuration(toptions.delay.value_or(mbgl::Duration::zero()));
+        options.duration = MGLTimeIntervalFromDuration(toptions.duration.value_or(mbgl::Duration::zero()));
+        XCTAssertEqual(options.delay, transitionTest.delay);
+        XCTAssertEqual(options.duration, transitionTest.duration);
+
         MGLTransition circleStrokeWidthTransition = layer.circleStrokeWidthTransition;
         XCTAssertEqual(circleStrokeWidthTransition.delay, transitionTest.delay);
         XCTAssertEqual(circleStrokeWidthTransition.duration, transitionTest.duration);

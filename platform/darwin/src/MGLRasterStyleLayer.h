@@ -60,7 +60,9 @@ MGL_EXPORT
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *maximumRasterBrightness;
 
 /**
- `rasterBrightnessMax` transition attributes.
+ The transition affecting any changes to this layer’s `rasterBrightnessMax` property.
+
+ This property corresponds to the background-color-transition property in the style JSON file format.
 */
 @property (nonatomic) MGLTransition maximumRasterBrightnessTransition;
 
@@ -88,7 +90,9 @@ MGL_EXPORT
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *minimumRasterBrightness;
 
 /**
- `rasterBrightnessMin` transition attributes.
+ The transition affecting any changes to this layer’s `rasterBrightnessMin` property.
+
+ This property corresponds to the background-color-transition property in the style JSON file format.
 */
 @property (nonatomic) MGLTransition minimumRasterBrightnessTransition;
 
@@ -111,7 +115,9 @@ MGL_EXPORT
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *rasterContrast;
 
 /**
- `rasterContrast` transition attributes.
+ The transition affecting any changes to this layer’s `rasterContrast` property.
+
+ This property corresponds to the background-color-transition property in the style JSON file format.
 */
 @property (nonatomic) MGLTransition rasterContrastTransition;
 
@@ -134,7 +140,9 @@ MGL_EXPORT
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *rasterFadeDuration;
 
 /**
- `rasterFadeDuration` transition attributes.
+ The transition affecting any changes to this layer’s `rasterFadeDuration` property.
+
+ This property corresponds to the background-color-transition property in the style JSON file format.
 */
 @property (nonatomic) MGLTransition rasterFadeDurationTransition;
 
@@ -161,7 +169,9 @@ MGL_EXPORT
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *rasterHueRotation;
 
 /**
- `rasterHueRotate` transition attributes.
+ The transition affecting any changes to this layer’s `rasterHueRotate` property.
+
+ This property corresponds to the background-color-transition property in the style JSON file format.
 */
 @property (nonatomic) MGLTransition rasterHueRotationTransition;
 
@@ -184,7 +194,9 @@ MGL_EXPORT
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *rasterOpacity;
 
 /**
- `rasterOpacity` transition attributes.
+ The transition affecting any changes to this layer’s `rasterOpacity` property.
+
+ This property corresponds to the background-color-transition property in the style JSON file format.
 */
 @property (nonatomic) MGLTransition rasterOpacityTransition;
 
@@ -205,7 +217,9 @@ MGL_EXPORT
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *rasterSaturation;
 
 /**
- `rasterSaturation` transition attributes.
+ The transition affecting any changes to this layer’s `rasterSaturation` property.
+
+ This property corresponds to the background-color-transition property in the style JSON file format.
 */
 @property (nonatomic) MGLTransition rasterSaturationTransition;
 
