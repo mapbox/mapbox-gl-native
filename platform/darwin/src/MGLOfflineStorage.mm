@@ -1,5 +1,6 @@
 #import "MGLOfflineStorage_Private.h"
 
+#import "MGLFoundation_Private.h"
 #import "MGLAccountManager_Private.h"
 #import "MGLGeometry_Private.h"
 #import "MGLNetworkConfiguration.h"
@@ -156,6 +157,8 @@ NSString * const MGLOfflinePackMaximumCountUserInfoKey = MGLOfflinePackUserInfoK
 }
 
 - (instancetype)init {
+    MGLInitializeRunLoop();
+
     if (self = [super init]) {
         NSURL *cacheURL = [[self class] cacheURLIncludingSubdirectory:YES];
         NSString *cachePath = cacheURL.path ?: @"";
