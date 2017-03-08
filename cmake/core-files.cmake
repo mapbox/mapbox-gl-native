@@ -205,6 +205,8 @@ set(MBGL_CORE_FILES
     src/mbgl/shaders/line_pattern.hpp
     src/mbgl/shaders/line_sdf.cpp
     src/mbgl/shaders/line_sdf.hpp
+    src/mbgl/shaders/preludes.cpp
+    src/mbgl/shaders/preludes.hpp
     src/mbgl/shaders/raster.cpp
     src/mbgl/shaders/raster.hpp
     src/mbgl/shaders/symbol_icon.cpp
