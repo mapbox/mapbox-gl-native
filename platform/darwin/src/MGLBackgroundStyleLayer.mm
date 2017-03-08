@@ -85,30 +85,11 @@
 
 #pragma mark - Accessing the Paint Attributes
 
-+ (NSArray *)transitionKeys
-{
-    return @[
-        @"backgroundColor",
-        @"backgroundOpacity",
-        @"backgroundPattern",
-    ];
-}
-
 - (void)setBackgroundColor:(MGLStyleValue<MGLColor *> *)backgroundColor {
     MGLAssertStyleLayerIsValid();
 
     auto mbglValue = MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toInterpolatablePropertyValue(backgroundColor);
     self.rawLayer->setBackgroundColor(mbglValue);
-}
-
-- (void)mbx_setBackgroundColorTransition:(NSValue *)transitionValue {
-    MGLAssertStyleLayerIsValid();
-
-    MGLTransition transition;
-    [transitionValue getValue:&transition];
-
-    mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
-    self.rawLayer->setBackgroundColorTransition(options);
 }
 
 - (MGLStyleValue<MGLColor *> *)backgroundColor {
@@ -121,7 +102,14 @@
     return MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toStyleValue(propertyValue);
 }
 
-- (NSValue *)mbx_getBackgroundColorTransition {
+- (void)setBackgroundColorTransition:(MGLTransition )transition {
+    MGLAssertStyleLayerIsValid();
+
+    mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
+    self.rawLayer->setBackgroundColorTransition(options);
+}
+
+- (MGLTransition)backgroundColorTransition {
     MGLAssertStyleLayerIsValid();
 
     mbgl::style::TransitionOptions transitionOptions = self.rawLayer->getBackgroundColorTransition();
@@ -129,25 +117,13 @@
     transition.duration = MGLTimeIntervalFromDuration(transitionOptions.duration.value_or(mbgl::Duration::zero()));
     transition.delay = MGLTimeIntervalFromDuration(transitionOptions.delay.value_or(mbgl::Duration::zero()));
 
-    NSValue *transitionValue = [NSValue value:&transition withObjCType:@encode(MGLTransition)];
-    return transitionValue;
+    return transition;
 }
-
 - (void)setBackgroundOpacity:(MGLStyleValue<NSNumber *> *)backgroundOpacity {
     MGLAssertStyleLayerIsValid();
 
     auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toInterpolatablePropertyValue(backgroundOpacity);
     self.rawLayer->setBackgroundOpacity(mbglValue);
-}
-
-- (void)mbx_setBackgroundOpacityTransition:(NSValue *)transitionValue {
-    MGLAssertStyleLayerIsValid();
-
-    MGLTransition transition;
-    [transitionValue getValue:&transition];
-
-    mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
-    self.rawLayer->setBackgroundOpacityTransition(options);
 }
 
 - (MGLStyleValue<NSNumber *> *)backgroundOpacity {
@@ -160,7 +136,14 @@
     return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(propertyValue);
 }
 
-- (NSValue *)mbx_getBackgroundOpacityTransition {
+- (void)setBackgroundOpacityTransition:(MGLTransition )transition {
+    MGLAssertStyleLayerIsValid();
+
+    mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
+    self.rawLayer->setBackgroundOpacityTransition(options);
+}
+
+- (MGLTransition)backgroundOpacityTransition {
     MGLAssertStyleLayerIsValid();
 
     mbgl::style::TransitionOptions transitionOptions = self.rawLayer->getBackgroundOpacityTransition();
@@ -168,25 +151,13 @@
     transition.duration = MGLTimeIntervalFromDuration(transitionOptions.duration.value_or(mbgl::Duration::zero()));
     transition.delay = MGLTimeIntervalFromDuration(transitionOptions.delay.value_or(mbgl::Duration::zero()));
 
-    NSValue *transitionValue = [NSValue value:&transition withObjCType:@encode(MGLTransition)];
-    return transitionValue;
+    return transition;
 }
-
 - (void)setBackgroundPattern:(MGLStyleValue<NSString *> *)backgroundPattern {
     MGLAssertStyleLayerIsValid();
 
     auto mbglValue = MGLStyleValueTransformer<std::string, NSString *>().toPropertyValue(backgroundPattern);
     self.rawLayer->setBackgroundPattern(mbglValue);
-}
-
-- (void)mbx_setBackgroundPatternTransition:(NSValue *)transitionValue {
-    MGLAssertStyleLayerIsValid();
-
-    MGLTransition transition;
-    [transitionValue getValue:&transition];
-
-    mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
-    self.rawLayer->setBackgroundPatternTransition(options);
 }
 
 - (MGLStyleValue<NSString *> *)backgroundPattern {
@@ -199,7 +170,14 @@
     return MGLStyleValueTransformer<std::string, NSString *>().toStyleValue(propertyValue);
 }
 
-- (NSValue *)mbx_getBackgroundPatternTransition {
+- (void)setBackgroundPatternTransition:(MGLTransition )transition {
+    MGLAssertStyleLayerIsValid();
+
+    mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
+    self.rawLayer->setBackgroundPatternTransition(options);
+}
+
+- (MGLTransition)backgroundPatternTransition {
     MGLAssertStyleLayerIsValid();
 
     mbgl::style::TransitionOptions transitionOptions = self.rawLayer->getBackgroundPatternTransition();
@@ -207,9 +185,7 @@
     transition.duration = MGLTimeIntervalFromDuration(transitionOptions.duration.value_or(mbgl::Duration::zero()));
     transition.delay = MGLTimeIntervalFromDuration(transitionOptions.delay.value_or(mbgl::Duration::zero()));
 
-    NSValue *transitionValue = [NSValue value:&transition withObjCType:@encode(MGLTransition)];
-    return transitionValue;
+    return transition;
 }
-
 
 @end

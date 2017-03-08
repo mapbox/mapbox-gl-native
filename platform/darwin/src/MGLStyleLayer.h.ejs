@@ -111,6 +111,13 @@ MGL_EXPORT
  */
 @property (nonatomic<% if (!property.required) { %>, null_resettable<% } if (property.getter) { %>, getter=<%- objCGetter(property) -%><% } %>) MGLStyleValue<<%- propertyType(property, true) %>> *<%- camelizeWithLeadingLowercase(property.name) %>;
 
+<% if (property["transition"]) { -%>
+/**
+ `<%- camelizeWithLeadingLowercase(originalPropertyName(property)) %>` transition attributes.
+*/
+@property (nonatomic) MGLTransition <%- camelizeWithLeadingLowercase(property.name) %>Transition;
+<% } -%>
+
 <% if (property.original) { -%>
 @property (nonatomic<% if (!property.required) { %>, null_resettable<% } %>) MGLStyleValue<<%- propertyType(property, true) %>> *<%- camelizeWithLeadingLowercase(originalPropertyName(property)) %> __attribute__((unavailable("Use <%- camelizeWithLeadingLowercase(property.name) %> instead.")));
 

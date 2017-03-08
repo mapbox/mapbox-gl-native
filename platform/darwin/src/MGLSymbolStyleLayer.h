@@ -1247,6 +1247,11 @@ MGL_EXPORT
 #endif
 
 /**
+ `iconColor` transition attributes.
+*/
+@property (nonatomic) MGLTransition iconColorTransition;
+
+/**
  Fade out the halo towards the outside.
  
  This property is measured in points.
@@ -1275,6 +1280,11 @@ MGL_EXPORT
    * `MGLInterpolationModeCategorical`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconHaloBlur;
+
+/**
+ `iconHaloBlur` transition attributes.
+*/
+@property (nonatomic) MGLTransition iconHaloBlurTransition;
 
 #if TARGET_OS_IPHONE
 /**
@@ -1337,6 +1347,11 @@ MGL_EXPORT
 #endif
 
 /**
+ `iconHaloColor` transition attributes.
+*/
+@property (nonatomic) MGLTransition iconHaloColorTransition;
+
+/**
  Distance of halo to the icon outline.
  
  This property is measured in points.
@@ -1367,6 +1382,11 @@ MGL_EXPORT
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconHaloWidth;
 
 /**
+ `iconHaloWidth` transition attributes.
+*/
+@property (nonatomic) MGLTransition iconHaloWidthTransition;
+
+/**
  The opacity at which the icon will be drawn.
  
  The default value of this property is an `MGLStyleValue` object containing an
@@ -1393,6 +1413,11 @@ MGL_EXPORT
    * `MGLInterpolationModeCategorical`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconOpacity;
+
+/**
+ `iconOpacity` transition attributes.
+*/
+@property (nonatomic) MGLTransition iconOpacityTransition;
 
 #if TARGET_OS_IPHONE
 /**
@@ -1446,6 +1471,11 @@ MGL_EXPORT
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *iconTranslation;
 #endif
 
+/**
+ `iconTranslate` transition attributes.
+*/
+@property (nonatomic) MGLTransition iconTranslationTransition;
+
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *iconTranslate __attribute__((unavailable("Use iconTranslation instead.")));
 
 /**
@@ -1469,6 +1499,7 @@ MGL_EXPORT
  `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *iconTranslationAnchor;
+
 
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *iconTranslateAnchor __attribute__((unavailable("Use iconTranslationAnchor instead.")));
 
@@ -1531,6 +1562,11 @@ MGL_EXPORT
 #endif
 
 /**
+ `textColor` transition attributes.
+*/
+@property (nonatomic) MGLTransition textColorTransition;
+
+/**
  The halo's fadeout distance towards the outside.
  
  This property is measured in points.
@@ -1559,6 +1595,11 @@ MGL_EXPORT
    * `MGLInterpolationModeCategorical`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textHaloBlur;
+
+/**
+ `textHaloBlur` transition attributes.
+*/
+@property (nonatomic) MGLTransition textHaloBlurTransition;
 
 #if TARGET_OS_IPHONE
 /**
@@ -1619,6 +1660,11 @@ MGL_EXPORT
 #endif
 
 /**
+ `textHaloColor` transition attributes.
+*/
+@property (nonatomic) MGLTransition textHaloColorTransition;
+
+/**
  Distance of halo to the font outline. Max text halo width is 1/4 of the
  font-size.
  
@@ -1650,6 +1696,11 @@ MGL_EXPORT
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textHaloWidth;
 
 /**
+ `textHaloWidth` transition attributes.
+*/
+@property (nonatomic) MGLTransition textHaloWidthTransition;
+
+/**
  The opacity at which the text will be drawn.
  
  The default value of this property is an `MGLStyleValue` object containing an
@@ -1676,6 +1727,11 @@ MGL_EXPORT
    * `MGLInterpolationModeCategorical`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textOpacity;
+
+/**
+ `textOpacity` transition attributes.
+*/
+@property (nonatomic) MGLTransition textOpacityTransition;
 
 #if TARGET_OS_IPHONE
 /**
@@ -1729,6 +1785,11 @@ MGL_EXPORT
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *textTranslation;
 #endif
 
+/**
+ `textTranslate` transition attributes.
+*/
+@property (nonatomic) MGLTransition textTranslationTransition;
+
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *textTranslate __attribute__((unavailable("Use textTranslation instead.")));
 
 /**
@@ -1752,6 +1813,7 @@ MGL_EXPORT
  `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *textTranslationAnchor;
+
 
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *textTranslateAnchor __attribute__((unavailable("Use textTranslationAnchor instead.")));
 

@@ -107,6 +107,11 @@ MGL_EXPORT
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *circleBlur;
 
+/**
+ `circleBlur` transition attributes.
+*/
+@property (nonatomic) MGLTransition circleBlurTransition;
+
 #if TARGET_OS_IPHONE
 /**
  The fill color of the circle.
@@ -160,6 +165,11 @@ MGL_EXPORT
 #endif
 
 /**
+ `circleColor` transition attributes.
+*/
+@property (nonatomic) MGLTransition circleColorTransition;
+
+/**
  The opacity at which the circle will be drawn.
  
  The default value of this property is an `MGLStyleValue` object containing an
@@ -183,6 +193,11 @@ MGL_EXPORT
    * `MGLInterpolationModeCategorical`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *circleOpacity;
+
+/**
+ `circleOpacity` transition attributes.
+*/
+@property (nonatomic) MGLTransition circleOpacityTransition;
 
 /**
  Circle radius.
@@ -212,6 +227,11 @@ MGL_EXPORT
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *circleRadius;
 
 /**
+ `circleRadius` transition attributes.
+*/
+@property (nonatomic) MGLTransition circleRadiusTransition;
+
+/**
  Controls the scaling behavior of the circle when the map is pitched.
  
  The default value of this property is an `MGLStyleValue` object containing an
@@ -229,6 +249,7 @@ MGL_EXPORT
  `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *circleScaleAlignment;
+
 
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *circlePitchScale __attribute__((unavailable("Use circleScaleAlignment instead.")));
 
@@ -285,6 +306,11 @@ MGL_EXPORT
 #endif
 
 /**
+ `circleStrokeColor` transition attributes.
+*/
+@property (nonatomic) MGLTransition circleStrokeColorTransition;
+
+/**
  The opacity of the circle's stroke.
  
  The default value of this property is an `MGLStyleValue` object containing an
@@ -308,6 +334,11 @@ MGL_EXPORT
    * `MGLInterpolationModeCategorical`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *circleStrokeOpacity;
+
+/**
+ `circleStrokeOpacity` transition attributes.
+*/
+@property (nonatomic) MGLTransition circleStrokeOpacityTransition;
 
 /**
  The width of the circle's stroke. Strokes are placed outside of the
@@ -336,6 +367,11 @@ MGL_EXPORT
    * `MGLInterpolationModeCategorical`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *circleStrokeWidth;
+
+/**
+ `circleStrokeWidth` transition attributes.
+*/
+@property (nonatomic) MGLTransition circleStrokeWidthTransition;
 
 #if TARGET_OS_IPHONE
 /**
@@ -383,6 +419,11 @@ MGL_EXPORT
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *circleTranslation;
 #endif
 
+/**
+ `circleTranslate` transition attributes.
+*/
+@property (nonatomic) MGLTransition circleTranslationTransition;
+
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *circleTranslate __attribute__((unavailable("Use circleTranslation instead.")));
 
 /**
@@ -406,6 +447,7 @@ MGL_EXPORT
  `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *circleTranslationAnchor;
+
 
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *circleTranslateAnchor __attribute__((unavailable("Use circleTranslationAnchor instead.")));
 

@@ -25,15 +25,8 @@
     XCTAssertTrue(layer.rawLayer->is<mbgl::style::RasterLayer>());
     auto rawLayer = layer.rawLayer->as<mbgl::style::RasterLayer>();
 
-    NSArray *transitionKeys = [MGLRasterStyleLayer transitionKeys];
     MGLTransition transitionTest = {.delay = 4, .duration = 5};
 
-    for (NSString *property in transitionKeys) {
-        [layer setTransition:transitionTest forKey:property];
-        MGLTransition transition = [layer transitionForKey:property];
-        XCTAssertEqual(transition.delay, transitionTest.delay);
-        XCTAssertEqual(transition.duration, transitionTest.duration);
-    }
 
     // raster-brightness-max
     {
@@ -150,6 +143,11 @@
         XCTAssertThrowsSpecificNamed(layer.rasterContrast = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
         functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
         XCTAssertThrowsSpecificNamed(layer.rasterContrast = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
+        // Transition property test
+        layer.rasterContrastTransition = transitionTest;
+        MGLTransition rasterContrastTransition = layer.rasterContrastTransition;
+        XCTAssertEqual(rasterContrastTransition.delay, transitionTest.delay);
+        XCTAssertEqual(rasterContrastTransition.duration, transitionTest.duration);
     }
 
     // raster-fade-duration
@@ -189,6 +187,11 @@
         XCTAssertThrowsSpecificNamed(layer.rasterFadeDuration = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
         functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
         XCTAssertThrowsSpecificNamed(layer.rasterFadeDuration = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
+        // Transition property test
+        layer.rasterFadeDurationTransition = transitionTest;
+        MGLTransition rasterFadeDurationTransition = layer.rasterFadeDurationTransition;
+        XCTAssertEqual(rasterFadeDurationTransition.delay, transitionTest.delay);
+        XCTAssertEqual(rasterFadeDurationTransition.duration, transitionTest.duration);
     }
 
     // raster-hue-rotate
@@ -267,6 +270,11 @@
         XCTAssertThrowsSpecificNamed(layer.rasterOpacity = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
         functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
         XCTAssertThrowsSpecificNamed(layer.rasterOpacity = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
+        // Transition property test
+        layer.rasterOpacityTransition = transitionTest;
+        MGLTransition rasterOpacityTransition = layer.rasterOpacityTransition;
+        XCTAssertEqual(rasterOpacityTransition.delay, transitionTest.delay);
+        XCTAssertEqual(rasterOpacityTransition.duration, transitionTest.duration);
     }
 
     // raster-saturation
@@ -306,6 +314,11 @@
         XCTAssertThrowsSpecificNamed(layer.rasterSaturation = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
         functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
         XCTAssertThrowsSpecificNamed(layer.rasterSaturation = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
+        // Transition property test
+        layer.rasterSaturationTransition = transitionTest;
+        MGLTransition rasterSaturationTransition = layer.rasterSaturationTransition;
+        XCTAssertEqual(rasterSaturationTransition.delay, transitionTest.delay);
+        XCTAssertEqual(rasterSaturationTransition.duration, transitionTest.duration);
     }
 }
 

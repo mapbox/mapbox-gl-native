@@ -73,6 +73,7 @@ MGL_EXPORT
  */
 @property (nonatomic, null_resettable, getter=isFillAntialiased) MGLStyleValue<NSNumber *> *fillAntialiased;
 
+
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *fillAntialias __attribute__((unavailable("Use fillAntialiased instead.")));
 
 #if TARGET_OS_IPHONE
@@ -134,6 +135,11 @@ MGL_EXPORT
 #endif
 
 /**
+ `fillColor` transition attributes.
+*/
+@property (nonatomic) MGLTransition fillColorTransition;
+
+/**
  The opacity of the entire fill layer. In contrast to the `fillColor`, this
  value will also affect the 1pt stroke around the fill, if the stroke is used.
  
@@ -158,6 +164,11 @@ MGL_EXPORT
    * `MGLInterpolationModeCategorical`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *fillOpacity;
+
+/**
+ `fillOpacity` transition attributes.
+*/
+@property (nonatomic) MGLTransition fillOpacityTransition;
 
 #if TARGET_OS_IPHONE
 /**
@@ -212,6 +223,11 @@ MGL_EXPORT
 #endif
 
 /**
+ `fillOutlineColor` transition attributes.
+*/
+@property (nonatomic) MGLTransition fillOutlineColorTransition;
+
+/**
  Name of image in sprite to use for drawing image fills. For seamless patterns,
  image width and height must be a factor of two (2, 4, 8, ..., 512).
  
@@ -222,6 +238,11 @@ MGL_EXPORT
  `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSString *> *fillPattern;
+
+/**
+ `fillPattern` transition attributes.
+*/
+@property (nonatomic) MGLTransition fillPatternTransition;
 
 #if TARGET_OS_IPHONE
 /**
@@ -269,6 +290,11 @@ MGL_EXPORT
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *fillTranslation;
 #endif
 
+/**
+ `fillTranslate` transition attributes.
+*/
+@property (nonatomic) MGLTransition fillTranslationTransition;
+
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *fillTranslate __attribute__((unavailable("Use fillTranslation instead.")));
 
 /**
@@ -292,6 +318,7 @@ MGL_EXPORT
  `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *fillTranslationAnchor;
+
 
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *fillTranslateAnchor __attribute__((unavailable("Use fillTranslationAnchor instead.")));
 

@@ -59,6 +59,11 @@ MGL_EXPORT
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *maximumRasterBrightness;
 
+/**
+ `rasterBrightnessMax` transition attributes.
+*/
+@property (nonatomic) MGLTransition maximumRasterBrightnessTransition;
+
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *rasterBrightnessMax __attribute__((unavailable("Use maximumRasterBrightness instead.")));
 
 /**
@@ -82,6 +87,11 @@ MGL_EXPORT
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *minimumRasterBrightness;
 
+/**
+ `rasterBrightnessMin` transition attributes.
+*/
+@property (nonatomic) MGLTransition minimumRasterBrightnessTransition;
+
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *rasterBrightnessMin __attribute__((unavailable("Use minimumRasterBrightness instead.")));
 
 /**
@@ -101,6 +111,11 @@ MGL_EXPORT
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *rasterContrast;
 
 /**
+ `rasterContrast` transition attributes.
+*/
+@property (nonatomic) MGLTransition rasterContrastTransition;
+
+/**
  Fade duration when a new tile is added.
  
  This property is measured in milliseconds.
@@ -117,6 +132,11 @@ MGL_EXPORT
    * `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *rasterFadeDuration;
+
+/**
+ `rasterFadeDuration` transition attributes.
+*/
+@property (nonatomic) MGLTransition rasterFadeDurationTransition;
 
 /**
  Rotates hues around the color wheel.
@@ -140,6 +160,11 @@ MGL_EXPORT
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *rasterHueRotation;
 
+/**
+ `rasterHueRotate` transition attributes.
+*/
+@property (nonatomic) MGLTransition rasterHueRotationTransition;
+
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *rasterHueRotate __attribute__((unavailable("Use rasterHueRotation instead.")));
 
 /**
@@ -159,6 +184,11 @@ MGL_EXPORT
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *rasterOpacity;
 
 /**
+ `rasterOpacity` transition attributes.
+*/
+@property (nonatomic) MGLTransition rasterOpacityTransition;
+
+/**
  Increase or reduce the saturation of the image.
  
  The default value of this property is an `MGLStyleValue` object containing an
@@ -173,6 +203,11 @@ MGL_EXPORT
    * `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *rasterSaturation;
+
+/**
+ `rasterSaturation` transition attributes.
+*/
+@property (nonatomic) MGLTransition rasterSaturationTransition;
 
 @end
 

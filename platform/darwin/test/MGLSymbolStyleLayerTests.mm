@@ -43,15 +43,8 @@
     XCTAssertTrue(layer.rawLayer->is<mbgl::style::SymbolLayer>());
     auto rawLayer = layer.rawLayer->as<mbgl::style::SymbolLayer>();
 
-    NSArray *transitionKeys = [MGLSymbolStyleLayer transitionKeys];
     MGLTransition transitionTest = {.delay = 4, .duration = 5};
 
-    for (NSString *property in transitionKeys) {
-        [layer setTransition:transitionTest forKey:property];
-        MGLTransition transition = [layer transitionForKey:property];
-        XCTAssertEqual(transition.delay, transitionTest.delay);
-        XCTAssertEqual(transition.duration, transitionTest.duration);
-    }
 
     // icon-allow-overlap
     {
@@ -1478,6 +1471,11 @@
                       @"Unsetting iconColor should return icon-color to the default value.");
         XCTAssertEqualObjects(layer.iconColor, defaultStyleValue,
                               @"iconColor should return the default value after being unset.");
+        // Transition property test
+        layer.iconColorTransition = transitionTest;
+        MGLTransition iconColorTransition = layer.iconColorTransition;
+        XCTAssertEqual(iconColorTransition.delay, transitionTest.delay);
+        XCTAssertEqual(iconColorTransition.duration, transitionTest.duration);
     }
 
     // icon-halo-blur
@@ -1535,6 +1533,11 @@
                       @"Unsetting iconHaloBlur should return icon-halo-blur to the default value.");
         XCTAssertEqualObjects(layer.iconHaloBlur, defaultStyleValue,
                               @"iconHaloBlur should return the default value after being unset.");
+        // Transition property test
+        layer.iconHaloBlurTransition = transitionTest;
+        MGLTransition iconHaloBlurTransition = layer.iconHaloBlurTransition;
+        XCTAssertEqual(iconHaloBlurTransition.delay, transitionTest.delay);
+        XCTAssertEqual(iconHaloBlurTransition.duration, transitionTest.duration);
     }
 
     // icon-halo-color
@@ -1592,6 +1595,11 @@
                       @"Unsetting iconHaloColor should return icon-halo-color to the default value.");
         XCTAssertEqualObjects(layer.iconHaloColor, defaultStyleValue,
                               @"iconHaloColor should return the default value after being unset.");
+        // Transition property test
+        layer.iconHaloColorTransition = transitionTest;
+        MGLTransition iconHaloColorTransition = layer.iconHaloColorTransition;
+        XCTAssertEqual(iconHaloColorTransition.delay, transitionTest.delay);
+        XCTAssertEqual(iconHaloColorTransition.duration, transitionTest.duration);
     }
 
     // icon-halo-width
@@ -1649,6 +1657,11 @@
                       @"Unsetting iconHaloWidth should return icon-halo-width to the default value.");
         XCTAssertEqualObjects(layer.iconHaloWidth, defaultStyleValue,
                               @"iconHaloWidth should return the default value after being unset.");
+        // Transition property test
+        layer.iconHaloWidthTransition = transitionTest;
+        MGLTransition iconHaloWidthTransition = layer.iconHaloWidthTransition;
+        XCTAssertEqual(iconHaloWidthTransition.delay, transitionTest.delay);
+        XCTAssertEqual(iconHaloWidthTransition.duration, transitionTest.duration);
     }
 
     // icon-opacity
@@ -1706,6 +1719,11 @@
                       @"Unsetting iconOpacity should return icon-opacity to the default value.");
         XCTAssertEqualObjects(layer.iconOpacity, defaultStyleValue,
                               @"iconOpacity should return the default value after being unset.");
+        // Transition property test
+        layer.iconOpacityTransition = transitionTest;
+        MGLTransition iconOpacityTransition = layer.iconOpacityTransition;
+        XCTAssertEqual(iconOpacityTransition.delay, transitionTest.delay);
+        XCTAssertEqual(iconOpacityTransition.duration, transitionTest.duration);
     }
 
     // icon-translate
@@ -1847,6 +1865,11 @@
                       @"Unsetting textColor should return text-color to the default value.");
         XCTAssertEqualObjects(layer.textColor, defaultStyleValue,
                               @"textColor should return the default value after being unset.");
+        // Transition property test
+        layer.textColorTransition = transitionTest;
+        MGLTransition textColorTransition = layer.textColorTransition;
+        XCTAssertEqual(textColorTransition.delay, transitionTest.delay);
+        XCTAssertEqual(textColorTransition.duration, transitionTest.duration);
     }
 
     // text-halo-blur
@@ -1904,6 +1927,11 @@
                       @"Unsetting textHaloBlur should return text-halo-blur to the default value.");
         XCTAssertEqualObjects(layer.textHaloBlur, defaultStyleValue,
                               @"textHaloBlur should return the default value after being unset.");
+        // Transition property test
+        layer.textHaloBlurTransition = transitionTest;
+        MGLTransition textHaloBlurTransition = layer.textHaloBlurTransition;
+        XCTAssertEqual(textHaloBlurTransition.delay, transitionTest.delay);
+        XCTAssertEqual(textHaloBlurTransition.duration, transitionTest.duration);
     }
 
     // text-halo-color
@@ -1961,6 +1989,11 @@
                       @"Unsetting textHaloColor should return text-halo-color to the default value.");
         XCTAssertEqualObjects(layer.textHaloColor, defaultStyleValue,
                               @"textHaloColor should return the default value after being unset.");
+        // Transition property test
+        layer.textHaloColorTransition = transitionTest;
+        MGLTransition textHaloColorTransition = layer.textHaloColorTransition;
+        XCTAssertEqual(textHaloColorTransition.delay, transitionTest.delay);
+        XCTAssertEqual(textHaloColorTransition.duration, transitionTest.duration);
     }
 
     // text-halo-width
@@ -2018,6 +2051,11 @@
                       @"Unsetting textHaloWidth should return text-halo-width to the default value.");
         XCTAssertEqualObjects(layer.textHaloWidth, defaultStyleValue,
                               @"textHaloWidth should return the default value after being unset.");
+        // Transition property test
+        layer.textHaloWidthTransition = transitionTest;
+        MGLTransition textHaloWidthTransition = layer.textHaloWidthTransition;
+        XCTAssertEqual(textHaloWidthTransition.delay, transitionTest.delay);
+        XCTAssertEqual(textHaloWidthTransition.duration, transitionTest.duration);
     }
 
     // text-opacity
@@ -2075,6 +2113,11 @@
                       @"Unsetting textOpacity should return text-opacity to the default value.");
         XCTAssertEqualObjects(layer.textOpacity, defaultStyleValue,
                               @"textOpacity should return the default value after being unset.");
+        // Transition property test
+        layer.textOpacityTransition = transitionTest;
+        MGLTransition textOpacityTransition = layer.textOpacityTransition;
+        XCTAssertEqual(textOpacityTransition.delay, transitionTest.delay);
+        XCTAssertEqual(textOpacityTransition.duration, transitionTest.duration);
     }
 
     // text-translate

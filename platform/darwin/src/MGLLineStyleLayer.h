@@ -208,6 +208,11 @@ MGL_EXPORT
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *lineBlur;
 
+/**
+ `lineBlur` transition attributes.
+*/
+@property (nonatomic) MGLTransition lineBlurTransition;
+
 #if TARGET_OS_IPHONE
 /**
  The color with which the line will be drawn.
@@ -267,6 +272,11 @@ MGL_EXPORT
 #endif
 
 /**
+ `lineColor` transition attributes.
+*/
+@property (nonatomic) MGLTransition lineColorTransition;
+
+/**
  Specifies the lengths of the alternating dashes and gaps that form the dash
  pattern. The lengths are later scaled by the line width. To convert a dash
  length to points, multiply the length by the current line width.
@@ -287,6 +297,11 @@ MGL_EXPORT
  `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSArray<NSNumber *> *> *lineDashPattern;
+
+/**
+ `lineDasharray` transition attributes.
+*/
+@property (nonatomic) MGLTransition lineDashPatternTransition;
 
 @property (nonatomic, null_resettable) MGLStyleValue<NSArray<NSNumber *> *> *lineDasharray __attribute__((unavailable("Use lineDashPattern instead.")));
 
@@ -319,6 +334,11 @@ MGL_EXPORT
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *lineGapWidth;
 
 /**
+ `lineGapWidth` transition attributes.
+*/
+@property (nonatomic) MGLTransition lineGapWidthTransition;
+
+/**
  The line's offset. For linear features, a positive value offsets the line to
  the right, relative to the direction of the line, and a negative value to the
  left. For polygon features, a positive value results in an inset, and a
@@ -349,6 +369,11 @@ MGL_EXPORT
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *lineOffset;
 
 /**
+ `lineOffset` transition attributes.
+*/
+@property (nonatomic) MGLTransition lineOffsetTransition;
+
+/**
  The opacity at which the line will be drawn.
  
  The default value of this property is an `MGLStyleValue` object containing an
@@ -374,6 +399,11 @@ MGL_EXPORT
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *lineOpacity;
 
 /**
+ `lineOpacity` transition attributes.
+*/
+@property (nonatomic) MGLTransition lineOpacityTransition;
+
+/**
  Name of image in style images to use for drawing image lines. For seamless
  patterns, image width must be a factor of two (2, 4, 8, ..., 512).
  
@@ -384,6 +414,11 @@ MGL_EXPORT
  `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSString *> *linePattern;
+
+/**
+ `linePattern` transition attributes.
+*/
+@property (nonatomic) MGLTransition linePatternTransition;
 
 #if TARGET_OS_IPHONE
 /**
@@ -431,6 +466,11 @@ MGL_EXPORT
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *lineTranslation;
 #endif
 
+/**
+ `lineTranslate` transition attributes.
+*/
+@property (nonatomic) MGLTransition lineTranslationTransition;
+
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *lineTranslate __attribute__((unavailable("Use lineTranslation instead.")));
 
 /**
@@ -455,6 +495,7 @@ MGL_EXPORT
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *lineTranslationAnchor;
 
+
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *lineTranslateAnchor __attribute__((unavailable("Use lineTranslationAnchor instead.")));
 
 /**
@@ -474,6 +515,11 @@ MGL_EXPORT
    * `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *lineWidth;
+
+/**
+ `lineWidth` transition attributes.
+*/
+@property (nonatomic) MGLTransition lineWidthTransition;
 
 @end
 

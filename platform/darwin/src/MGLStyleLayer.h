@@ -69,17 +69,6 @@ MGL_EXPORT
  */
 @property (nonatomic, assign) float minimumZoomLevel;
 
-#pragma mark Layer Transitions
-
-- (void)setTransition:(MGLTransition)transition forKey:(NSString *)key;
-
-- (MGLTransition)transitionForKey:(NSString *)key;
-
-/**
- Returns an array of strings that identify transition keys attached to the layer.
- */
-+ (NSArray *)transitionKeys;
-
 @end
 
 NS_ASSUME_NONNULL_END

@@ -230,18 +230,6 @@ namespace mbgl {
 <% if (paintProperties.length) { -%>
 #pragma mark - Accessing the Paint Attributes
 
-+ (NSArray *)transitionKeys
-{
-    return @[
-<% for (const property of paintProperties) { -%>
-        @"<%- camelizeWithLeadingLowercase(property.name) %>",
-<% if (property.original) { -%>
-        @"<%- camelizeWithLeadingLowercase(originalPropertyName(property)) %>",
-<% } -%>
-<% } -%>
-    ];
-}
-
 <% for (const property of paintProperties) { -%>
 - (void)set<%- camelize(property.name) %>:(MGLStyleValue<<%- propertyType(property, true) %>> *)<%- objCName(property) %> {
     MGLAssertStyleLayerIsValid();
@@ -258,16 +246,6 @@ namespace mbgl {
 <% } -%>
 <% } -%>
     self.rawLayer->set<%- camelize(originalPropertyName(property)) %>(mbglValue);
-}
-
-- (void)mbx_set<%- camelize(property.name) %>Transition:(NSValue *)transitionValue {
-    MGLAssertStyleLayerIsValid();
-
-    MGLTransition transition;
-    [transitionValue getValue:&transition];
-
-    mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
-    self.rawLayer->set<%- camelize(originalPropertyName(property)) %>Transition(options);
 }
 
 - (MGLStyleValue<<%- propertyType(property, true) %>> *)<%- objCGetter(property) %> {
@@ -293,8 +271,16 @@ namespace mbgl {
 <% } -%>
 <% } -%>
 }
+<% if (property["transition"]) { -%>
 
-- (NSValue *)mbx_get<%- camelize(property.name) %>Transition {
+- (void)set<%- camelize(property.name) %>Transition:(MGLTransition )transition {
+    MGLAssertStyleLayerIsValid();
+
+    mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
+    self.rawLayer->set<%- camelize(originalPropertyName(property)) %>Transition(options);
+}
+
+- (MGLTransition)<%- objCGetter(property) %>Transition {
     MGLAssertStyleLayerIsValid();
 
     mbgl::style::TransitionOptions transitionOptions = self.rawLayer->get<%- camelize(originalPropertyName(property)) %>Transition();
@@ -302,10 +288,9 @@ namespace mbgl {
     transition.duration = MGLTimeIntervalFromDuration(transitionOptions.duration.value_or(mbgl::Duration::zero()));
     transition.delay = MGLTimeIntervalFromDuration(transitionOptions.delay.value_or(mbgl::Duration::zero()));
 
-    NSValue *transitionValue = [NSValue value:&transition withObjCType:@encode(MGLTransition)];
-    return transitionValue;
+    return transition;
 }
-
+<% } -%>
 <% if (property.original) { -%>
 - (void)set<%- camelize(originalPropertyName(property)) %>:(MGLStyleValue<<%- propertyType(property, true) %>> *)<%- camelizeWithLeadingLowercase(originalPropertyName(property)) %> {
 }
@@ -313,11 +298,6 @@ namespace mbgl {
 - (MGLStyleValue<<%- propertyType(property, true) %>> *)<%- camelizeWithLeadingLowercase(originalPropertyName(property)) %> {
     return self.<%- objCGetter(property) %>;
 }
-
-- (NSValue *)mbx_get<%- camelize(originalPropertyName(property)) %> {
-    return [self mbx_get<%- camelize(property.name) %>Transition];
-}
-
 <% } -%>
 <% } -%>
 <% } -%>

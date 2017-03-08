@@ -22,15 +22,8 @@
     XCTAssertTrue(layer.rawLayer->is<mbgl::style::BackgroundLayer>());
     auto rawLayer = layer.rawLayer->as<mbgl::style::BackgroundLayer>();
 
-    NSArray *transitionKeys = [MGLBackgroundStyleLayer transitionKeys];
     MGLTransition transitionTest = {.delay = 4, .duration = 5};
 
-    for (NSString *property in transitionKeys) {
-        [layer setTransition:transitionTest forKey:property];
-        MGLTransition transition = [layer transitionForKey:property];
-        XCTAssertEqual(transition.delay, transitionTest.delay);
-        XCTAssertEqual(transition.duration, transitionTest.duration);
-    }
 
     // background-color
     {
@@ -69,6 +62,11 @@
         XCTAssertThrowsSpecificNamed(layer.backgroundColor = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
         functionStyleValue = [MGLStyleValue<MGLColor *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
         XCTAssertThrowsSpecificNamed(layer.backgroundColor = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
+        // Transition property test
+        layer.backgroundColorTransition = transitionTest;
+        MGLTransition backgroundColorTransition = layer.backgroundColorTransition;
+        XCTAssertEqual(backgroundColorTransition.delay, transitionTest.delay);
+        XCTAssertEqual(backgroundColorTransition.duration, transitionTest.duration);
     }
 
     // background-opacity
@@ -108,6 +106,11 @@
         XCTAssertThrowsSpecificNamed(layer.backgroundOpacity = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
         functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
         XCTAssertThrowsSpecificNamed(layer.backgroundOpacity = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
+        // Transition property test
+        layer.backgroundOpacityTransition = transitionTest;
+        MGLTransition backgroundOpacityTransition = layer.backgroundOpacityTransition;
+        XCTAssertEqual(backgroundOpacityTransition.delay, transitionTest.delay);
+        XCTAssertEqual(backgroundOpacityTransition.duration, transitionTest.duration);
     }
 
     // background-pattern
@@ -147,6 +150,11 @@
         XCTAssertThrowsSpecificNamed(layer.backgroundPattern = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
         functionStyleValue = [MGLStyleValue<NSString *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
         XCTAssertThrowsSpecificNamed(layer.backgroundPattern = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
+        // Transition property test
+        layer.backgroundPatternTransition = transitionTest;
+        MGLTransition backgroundPatternTransition = layer.backgroundPatternTransition;
+        XCTAssertEqual(backgroundPatternTransition.delay, transitionTest.delay);
+        XCTAssertEqual(backgroundPatternTransition.duration, transitionTest.duration);
     }
 }
 
