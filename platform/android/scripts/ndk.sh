@@ -20,9 +20,12 @@ NDK_ANDROID_VERSION=$1-$3
 ANDROID_NATIVE_API_LEVEL=$3
 ANDROID_ABI=$2
 
+NDK_EXPECTED_VERSION_SHORT=r13b
+NDK_EXPECTED_VERSION_LONG=13.1.3345770
+
 function mason_ndk {
     local CMAKE=${CMAKE:-cmake}
-    MASON_XC_ROOT="`${CMAKE} -P cmake/mason.cmake PREFIX android-ndk VERSION ${NDK_ANDROID_VERSION}-r13b`"
+    MASON_XC_ROOT="`${CMAKE} -P cmake/mason.cmake PREFIX android-ndk VERSION ${NDK_ANDROID_VERSION}-${NDK_EXPECTED_VERSION_SHORT}`"
 
     local TOOLCHAIN="${MASON_XC_ROOT}/toolchain.cmake"
     if [ ! -f "${TOOLCHAIN}" ]; then
@@ -64,6 +67,12 @@ function system_ndk {
         return 1
     fi
 
+    local NDK_VERSION_LONG=$(sed -n 's/^Pkg.Revision *= *//p' "${NDK_DIR}/source.properties")
+    if [ "${NDK_VERSION_LONG}" != "${NDK_EXPECTED_VERSION_LONG}" ]; then
+        warning "Android NDK version '${NDK_VERSION_LONG}' doesn't match required version '${NDK_EXPECTED_VERSION_LONG}'"
+        return 1
+    fi
+
     # Try to install CMake if it's not installed yet.
     mkdir -p "${SDK_DIR}/cmake"
     local CMAKE_VERSION=/$(ls "${SDK_DIR}/cmake" | sort -t. -k 1,1n -k 2,2n -k 3,3n -k 4,4n | tail -n 1)
@@ -93,7 +102,7 @@ function system_ndk {
         return 1
     fi
 
-    info "Using system-provided Android NDK at ${NDK_DIR}"
+    info "Using system-provided Android NDK ${NDK_VERSION_LONG} at ${NDK_DIR}"
     echo CMAKE=\"${CMAKE}\"
     echo CMAKE_GENERATOR=\"Android Gradle - Ninja\"
     echo CMAKE_ARGS=\" \
