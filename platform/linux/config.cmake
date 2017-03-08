@@ -9,7 +9,7 @@ mason_use(libjpeg-turbo VERSION 1.5.0)
 mason_use(webp VERSION 0.5.1)
 mason_use(gtest VERSION 1.8.0${MASON_CXXABI_SUFFIX})
 mason_use(benchmark VERSION 1.0.0-1)
-mason_use(icu VERSION 58.1)
+mason_use(icu VERSION 58.1-min-size)
 
 include(cmake/loop-uv.cmake)
 
