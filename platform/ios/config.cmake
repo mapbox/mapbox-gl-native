@@ -1,6 +1,6 @@
 add_definitions(-DMBGL_USE_GLES2=1)
 
-mason_use(icu VERSION 58.1)
+mason_use(icu VERSION 58.1-min-size)
 
 macro(mbgl_platform_core)
     set_xcode_property(mbgl-core IPHONEOS_DEPLOYMENT_TARGET "8.0")
