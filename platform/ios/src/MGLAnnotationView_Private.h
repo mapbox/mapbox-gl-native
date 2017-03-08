@@ -8,7 +8,6 @@ NS_ASSUME_NONNULL_BEGIN
 @interface MGLAnnotationView (Private)
 
 @property (nonatomic, readwrite, nullable) NSString *reuseIdentifier;
-@property (nonatomic, readwrite, nullable) id <MGLAnnotation> annotation;
 @property (nonatomic, weak) MGLMapView *mapView;
 
 @end
