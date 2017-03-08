@@ -103,6 +103,7 @@
 
     super.center = center;
     [self updateScaleTransformForViewingDistance];
+    [self updateRotateTransform];
 }
 
 - (void)setScalesWithViewingDistance:(BOOL)scalesWithViewingDistance
