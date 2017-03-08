@@ -44,11 +44,18 @@ public:
     template <class Evaluator>
     auto evaluate(const Evaluator& evaluator, TimePoint now) {
         auto finalValue = value.evaluate(evaluator);
+        
         if (!prior) {
             // No prior value.
             return finalValue;
         } else if (now >= end) {
             // Transition from prior value is now complete.
+            prior = {};
+            return finalValue;
+        } else if (value.isDataDriven()) {
+            // Transitions to data-driven properties are not supported.
+            // We snap immediately to the data-driven value so that, when we perform layout,
+            // we see the data-driven function and can use it to populate vertex buffers.
             prior = {};
             return finalValue;
         } else if (now < begin) {
@@ -60,7 +67,7 @@ public:
             return util::interpolate(prior->get().evaluate(evaluator, now), finalValue, util::DEFAULT_TRANSITION_EASE.solve(t, 0.001));
         }
     }
-
+    
     bool hasTransition() const {
         return bool(prior);
     }
