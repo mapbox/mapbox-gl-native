@@ -12,18 +12,21 @@ namespace style {
 namespace conversion {
 
 template <class D, class R, class V>
-Result<std::map<D, R>> convertStops(const V& value) {
+optional<std::map<D, R>> convertStops(const V& value, Error& error) {
     auto stopsValue = objectMember(value, "stops");
     if (!stopsValue) {
-        return Error { "function value must specify stops" };
+        error = { "function value must specify stops" };
+        return {};
     }
 
     if (!isArray(*stopsValue)) {
-        return Error { "function stops must be an array" };
+        error = { "function stops must be an array" };
+        return {};
     }
 
     if (arrayLength(*stopsValue) == 0) {
-        return Error { "function must have at least one stop" };
+        error = { "function must have at least one stop" };
+        return {};
     }
 
     std::map<D, R> stops;
@@ -31,21 +34,23 @@ Result<std::map<D, R>> convertStops(const V& value) {
         const auto& stopValue = arrayMember(*stopsValue, i);
 
         if (!isArray(stopValue)) {
-            return Error { "function stop must be an array" };
+            error = { "function stop must be an array" };
+            return {};
         }
 
         if (arrayLength(stopValue) != 2) {
-            return Error { "function stop must have two elements" };
+            error = { "function stop must have two elements" };
+            return {};
         }
 
-        Result<D> d = convert<D>(arrayMember(stopValue, 0));
+        optional<D> d = convert<D>(arrayMember(stopValue, 0), error);
         if (!d) {
-            return d.error();
+            return {};
         }
 
-        Result<R> r = convert<R>(arrayMember(stopValue, 1));
+        optional<R> r = convert<R>(arrayMember(stopValue, 1), error);
         if (!r) {
-            return r.error();
+            return {};
         }
 
         stops.emplace(*d, *r);
@@ -59,10 +64,10 @@ struct Converter<ExponentialStops<T>> {
     static constexpr const char * type = "exponential";
 
     template <class V>
-    Result<ExponentialStops<T>> operator()(const V& value) const {
-        auto stops = convertStops<float, T>(value);
+    optional<ExponentialStops<T>> operator()(const V& value, Error& error) const {
+        auto stops = convertStops<float, T>(value, error);
         if (!stops) {
-            return stops.error();
+            return {};
         }
 
         auto baseValue = objectMember(value, "base");
@@ -72,7 +77,8 @@ struct Converter<ExponentialStops<T>> {
 
         optional<float> base = toNumber(*baseValue);
         if (!base) {
-            return Error { "function base must be a number"};
+            error = { "function base must be a number"};
+            return {};
         }
 
         return ExponentialStops<T>(*stops, *base);
@@ -84,10 +90,10 @@ struct Converter<IntervalStops<T>> {
     static constexpr const char * type = "interval";
 
     template <class V>
-    Result<IntervalStops<T>> operator()(const V& value) const {
-        auto stops = convertStops<float, T>(value);
+    optional<IntervalStops<T>> operator()(const V& value, Error& error) const {
+        auto stops = convertStops<float, T>(value, error);
         if (!stops) {
-            return stops.error();
+            return {};
         }
         return IntervalStops<T>(*stops);
     }
@@ -96,23 +102,24 @@ struct Converter<IntervalStops<T>> {
 template <>
 struct Converter<CategoricalValue> {
     template <class V>
-    Result<CategoricalValue> operator()(const V& value) const {
+    optional<CategoricalValue> operator()(const V& value, Error& error) const {
         auto b = toBool(value);
         if (b) {
-            return *b;
+            return { *b };
         }
 
         auto n = toNumber(value);
         if (n) {
-            return int64_t(*n);
+            return { int64_t(*n) };
         }
 
         auto s = toString(value);
         if (s) {
-            return *s;
+            return { *s };
         }
 
-        return Error { "stop domain value must be a number, string, or boolean" };
+        error = { "stop domain value must be a number, string, or boolean" };
+        return {};
     }
 };
 
@@ -121,10 +128,10 @@ struct Converter<CategoricalStops<T>> {
     static constexpr const char * type = "categorical";
 
     template <class V>
-    Result<CategoricalStops<T>> operator()(const V& value) const {
-        auto stops = convertStops<CategoricalValue, T>(value);
+    optional<CategoricalStops<T>> operator()(const V& value, Error& error) const {
+        auto stops = convertStops<CategoricalValue, T>(value, error);
         if (!stops) {
-            return stops.error();
+            return {};
         }
         return CategoricalStops<T>(
             std::map<CategoricalValue, T>((*stops).begin(), (*stops).end()));
@@ -136,7 +143,7 @@ struct Converter<IdentityStops<T>> {
     static constexpr const char * type = "identity";
 
     template <class V>
-    Result<IdentityStops<T>> operator()(const V&) const {
+    optional<IdentityStops<T>> operator()(const V&, Error&) const {
         return IdentityStops<T>();
     }
 };
@@ -148,7 +155,7 @@ template <class T, class... Ts>
 struct StopsConverter<T, variant<Ts...>> {
 public:
     template <class V>
-    Result<variant<Ts...>> operator()(const V& value) const {
+    optional<variant<Ts...>> operator()(const V& value, Error& error) const {
         std::string type = util::Interpolatable<T> ? "exponential" : "interval";
 
         auto typeValue = objectMember(value, "type");
@@ -156,16 +163,18 @@ public:
             type = *toString(*typeValue);
         }
 
-        optional<Result<variant<Ts...>>> result;
+        bool matched = false;
+        optional<variant<Ts...>> result;
 
         // Workaround for https://gcc.gnu.org/bugzilla/show_bug.cgi?id=47226
         auto tryConvert = [&] (auto* tp) {
             using Stops = std::decay_t<decltype(*tp)>;
             if (type == Converter<Stops>::type) {
-                auto stops = convert<Stops>(value);
-                result = stops
-                    ? Result<variant<Ts...>>(*stops)
-                    : Result<variant<Ts...>>(stops.error());
+                matched = true;
+                optional<Stops> stops = convert<Stops>(value, error);
+                if (stops) {
+                    result = variant<Ts...>(*stops);
+                }
             }
         };
 
@@ -173,25 +182,27 @@ public:
             (tryConvert((Ts*)nullptr), 0)...
         });
 
-        if (!result) {
-            return Error { "unsupported function type" };
+        if (!matched) {
+            error = { "unsupported function type" };
+            return {};
         }
 
-        return *result;
+        return result;
     }
 };
 
 template <class T>
 struct Converter<CameraFunction<T>> {
     template <class V>
-    Result<CameraFunction<T>> operator()(const V& value) const {
+    optional<CameraFunction<T>> operator()(const V& value, Error& error) const {
         if (!isObject(value)) {
-            return Error { "function must be an object" };
+            error = { "function must be an object" };
+            return {};
         }
 
-        auto stops = StopsConverter<T, typename CameraFunction<T>::Stops>()(value);
+        auto stops = StopsConverter<T, typename CameraFunction<T>::Stops>()(value, error);
         if (!stops) {
-            return stops.error();
+            return {};
         }
 
         return CameraFunction<T>(*stops);
@@ -199,46 +210,50 @@ struct Converter<CameraFunction<T>> {
 };
 
 template <class T, class V>
-Result<optional<T>> convertDefaultValue(const V& value) {
+optional<optional<T>> convertDefaultValue(const V& value, Error& error) {
     auto defaultValueValue = objectMember(value, "default");
     if (!defaultValueValue) {
+        return optional<T>();
+    }
+
+    auto defaultValue = convert<T>(*defaultValueValue, error);
+    if (!defaultValue) {
+        error = { "wrong type for \"default\": " + error.message };
         return {};
     }
 
-    auto defaultValue = convert<T>(*defaultValueValue);
-    if (!defaultValue) {
-        return Error { "wrong type for \"default\": " + defaultValue.error().message };
-    }
-
-    return *defaultValue;
+    return { *defaultValue };
 }
 
 template <class T>
 struct Converter<SourceFunction<T>> {
     template <class V>
-    Result<SourceFunction<T>> operator()(const V& value) const {
+    optional<SourceFunction<T>> operator()(const V& value, Error& error) const {
         if (!isObject(value)) {
-            return Error { "function must be an object" };
+            error = { "function must be an object" };
+            return {};
         }
 
         auto propertyValue = objectMember(value, "property");
         if (!propertyValue) {
-            return Error { "function must specify property" };
+            error = { "function must specify property" };
+            return {};
         }
 
         auto propertyString = toString(*propertyValue);
         if (!propertyString) {
-            return Error { "function property must be a string" };
+            error = { "function property must be a string" };
+            return {};
         }
 
-        auto stops = StopsConverter<T, typename SourceFunction<T>::Stops>()(value);
+        auto stops = StopsConverter<T, typename SourceFunction<T>::Stops>()(value, error);
         if (!stops) {
-            return stops.error();
+            return {};
         }
 
-        auto defaultValue = convertDefaultValue<T>(value);
+        auto defaultValue = convertDefaultValue<T>(value, error);
         if (!defaultValue) {
-            return defaultValue.error();
+            return {};
         }
 
         return SourceFunction<T>(*propertyString, *stops, *defaultValue);
@@ -253,29 +268,32 @@ struct CompositeValue : std::pair<float, S> {
 template <class S>
 struct Converter<CompositeValue<S>> {
     template <class V>
-    Result<CompositeValue<S>> operator()(const V& value) const {
+    optional<CompositeValue<S>> operator()(const V& value, Error& error) const {
         if (!isObject(value)) {
-            return Error { "stop must be an object" };
+            error = { "stop must be an object" };
+            return {};
         }
 
         auto zoomValue = objectMember(value, "zoom");
         if (!zoomValue) {
-            return Error { "stop must specify zoom" };
+            error = { "stop must specify zoom" };
+            return {};
         }
 
         auto propertyValue = objectMember(value, "value");
         if (!propertyValue) {
-            return Error { "stop must specify value" };
+            error = { "stop must specify value" };
+            return {};
         }
 
-        Result<float> z = convert<float>(*zoomValue);
+        optional<float> z = convert<float>(*zoomValue, error);
         if (!z) {
-            return z.error();
+            return {};
         }
 
-        Result<S> s = convert<S>(*propertyValue);
+        optional<S> s = convert<S>(*propertyValue, error);
         if (!s) {
-            return s.error();
+            return {};
         }
 
         return CompositeValue<S> { *z, *s };
@@ -287,10 +305,10 @@ struct Converter<CompositeExponentialStops<T>> {
     static constexpr const char * type = "exponential";
 
     template <class V>
-    Result<CompositeExponentialStops<T>> operator()(const V& value) const {
-        auto stops = convertStops<CompositeValue<float>, T>(value);
+    optional<CompositeExponentialStops<T>> operator()(const V& value, Error& error) const {
+        auto stops = convertStops<CompositeValue<float>, T>(value, error);
         if (!stops) {
-            return stops.error();
+            return {};
         }
 
         auto base = 1.0f;
@@ -313,10 +331,10 @@ struct Converter<CompositeIntervalStops<T>> {
     static constexpr const char * type = "interval";
 
     template <class V>
-    Result<CompositeIntervalStops<T>> operator()(const V& value) const {
-        auto stops = convertStops<CompositeValue<float>, T>(value);
+    optional<CompositeIntervalStops<T>> operator()(const V& value, Error& error) const {
+        auto stops = convertStops<CompositeValue<float>, T>(value, error);
         if (!stops) {
-            return stops.error();
+            return {};
         }
 
         std::map<float, std::map<float, T>> convertedStops;
@@ -333,10 +351,10 @@ struct Converter<CompositeCategoricalStops<T>> {
     static constexpr const char * type = "categorical";
 
     template <class V>
-    Result<CompositeCategoricalStops<T>> operator()(const V& value) const {
-        auto stops = convertStops<CompositeValue<CategoricalValue>, T>(value);
+    optional<CompositeCategoricalStops<T>> operator()(const V& value, Error& error) const {
+        auto stops = convertStops<CompositeValue<CategoricalValue>, T>(value, error);
         if (!stops) {
-            return stops.error();
+            return {};
         }
 
         std::map<float, std::map<CategoricalValue, T>> convertedStops;
@@ -351,29 +369,32 @@ struct Converter<CompositeCategoricalStops<T>> {
 template <class T>
 struct Converter<CompositeFunction<T>> {
     template <class V>
-    Result<CompositeFunction<T>> operator()(const V& value) const {
+    optional<CompositeFunction<T>> operator()(const V& value, Error& error) const {
         if (!isObject(value)) {
-            return Error { "function must be an object" };
+            error = { "function must be an object" };
+            return {};
         }
 
         auto propertyValue = objectMember(value, "property");
         if (!propertyValue) {
-            return Error { "function must specify property" };
+            error = { "function must specify property" };
+            return {};
         }
 
         auto propertyString = toString(*propertyValue);
         if (!propertyString) {
-            return Error { "function property must be a string" };
+            error = { "function property must be a string" };
+            return {};
         }
 
-        auto stops = StopsConverter<T, typename CompositeFunction<T>::Stops>()(value);
+        auto stops = StopsConverter<T, typename CompositeFunction<T>::Stops>()(value, error);
         if (!stops) {
-            return stops.error();
+            return {};
         }
 
-        auto defaultValue = convertDefaultValue<T>(value);
+        auto defaultValue = convertDefaultValue<T>(value, error);
         if (!defaultValue) {
-            return defaultValue.error();
+            return {};
         }
 
         return CompositeFunction<T>(*propertyString, *stops, *defaultValue);

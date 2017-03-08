@@ -12,21 +12,24 @@ using namespace mbgl::style::conversion;
 TEST(GeoJSONOptions, Basic) {
     ValueMap map;
     Value raw(map);
-    Result<GeoJSONOptions> converted = convert<GeoJSONOptions>(raw);
+    Error error;
+    mbgl::optional<GeoJSONOptions> converted = convert<GeoJSONOptions>(raw, error);
     ASSERT_TRUE((bool) converted);
 }
 
 TEST(GeoJSONOptions, ErrorHandling) {
     ValueMap map {{"maxzoom", std::string{"should not be a string"}}};
     Value raw(map);
-    Result<GeoJSONOptions> converted = convert<GeoJSONOptions>(raw);
+    Error error;
+    mbgl::optional<GeoJSONOptions> converted = convert<GeoJSONOptions>(raw, error);
     ASSERT_FALSE((bool) converted);
 }
 
 TEST(GeoJSONOptions, RetainsDefaults) {
     ValueMap map;
     Value raw(map);
-    GeoJSONOptions converted = *convert<GeoJSONOptions>(raw);
+    Error error;
+    GeoJSONOptions converted = *convert<GeoJSONOptions>(raw, error);
     GeoJSONOptions defaults;
 
     // GeoJSON-VT
@@ -54,7 +57,8 @@ TEST(GeoJSONOptions, FullConversion) {
         {"clusterMaxZoom", 5.0f}
     };
     Value raw(map);
-    GeoJSONOptions converted = *convert<GeoJSONOptions>(raw);
+    Error error;
+    GeoJSONOptions converted = *convert<GeoJSONOptions>(raw, error);
 
     // GeoJSON-VT
     ASSERT_EQ(converted.maxzoom, 1);

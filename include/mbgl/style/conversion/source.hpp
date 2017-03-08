@@ -17,59 +17,65 @@ template <>
 struct Converter<std::unique_ptr<Source>> {
 public:
     template <class V>
-    Result<std::unique_ptr<Source>> operator()(const V& value, const std::string& id) const {
+    optional<std::unique_ptr<Source>> operator()(const V& value, Error& error, const std::string& id) const {
         if (!isObject(value)) {
-            return Error{ "source must be an object" };
+            error = { "source must be an object" };
+            return {};
         }
 
         auto typeValue = objectMember(value, "type");
         if (!typeValue) {
-            return Error{ "source must have a type" };
+            error = { "source must have a type" };
+            return {};
         }
 
         optional<std::string> type = toString(*typeValue);
         if (!type) {
-            return Error{ "source type must be a string" };
+            error = { "source type must be a string" };
+            return {};
         }
 
         if (*type == "raster") {
-            return convertRasterSource(id, value);
+            return convertRasterSource(id, value, error);
         } else if (*type == "vector") {
-            return convertVectorSource(id, value);
+            return convertVectorSource(id, value, error);
         } else if (*type == "geojson") {
-            return convertGeoJSONSource(id, value);
+            return convertGeoJSONSource(id, value, error);
         } else {
-            return Error{ "invalid source type" };
+            error = { "invalid source type" };
+            return {};
         }
     }
 
 private:
     // A tile source can either specify a URL to TileJSON, or inline TileJSON.
     template <class V>
-    Result<variant<std::string, Tileset>> convertURLOrTileset(const V& value) const {
+    optional<variant<std::string, Tileset>> convertURLOrTileset(const V& value, Error& error) const {
         auto urlVal = objectMember(value, "url");
         if (!urlVal) {
-            Result<Tileset> tileset = convert<Tileset>(value);
+            optional<Tileset> tileset = convert<Tileset>(value, error);
             if (!tileset) {
-                return tileset.error();
+                return {};
             }
-            return *tileset;
+            return { *tileset };
         }
 
         optional<std::string> url = toString(*urlVal);
         if (!url) {
-            return Error{ "source url must be a string" };
+            error = { "source url must be a string" };
+            return {};
         }
 
-        return *url;
+        return { *url };
     }
 
     template <class V>
-    Result<std::unique_ptr<Source>> convertRasterSource(const std::string& id,
-                                                        const V& value) const {
-        Result<variant<std::string, Tileset>> urlOrTileset = convertURLOrTileset(value);
+    optional<std::unique_ptr<Source>> convertRasterSource(const std::string& id,
+                                                          const V& value,
+                                                          Error& error) const {
+        optional<variant<std::string, Tileset>> urlOrTileset = convertURLOrTileset(value, error);
         if (!urlOrTileset) {
-            return urlOrTileset.error();
+            return {};
         }
 
         uint16_t tileSize = util::tileSize;
@@ -77,53 +83,58 @@ private:
         if (tileSizeValue) {
             optional<float> size = toNumber(*tileSizeValue);
             if (!size || *size < 0 || *size > std::numeric_limits<uint16_t>::max()) {
-                return Error{ "invalid tileSize" };
+                error = { "invalid tileSize" };
+                return {};
             }
             tileSize = *size;
         }
 
-        return std::make_unique<RasterSource>(id, std::move(*urlOrTileset), tileSize);
+        return { std::make_unique<RasterSource>(id, std::move(*urlOrTileset), tileSize) };
     }
 
     template <class V>
-    Result<std::unique_ptr<Source>> convertVectorSource(const std::string& id,
-                                                        const V& value) const {
-        Result<variant<std::string, Tileset>> urlOrTileset = convertURLOrTileset(value);
+    optional<std::unique_ptr<Source>> convertVectorSource(const std::string& id,
+                                                          const V& value,
+                                                          Error& error) const {
+        optional<variant<std::string, Tileset>> urlOrTileset = convertURLOrTileset(value, error);
         if (!urlOrTileset) {
-            return urlOrTileset.error();
+            return {};
         }
 
-        return std::make_unique<VectorSource>(id, std::move(*urlOrTileset));
+        return { std::make_unique<VectorSource>(id, std::move(*urlOrTileset)) };
     }
 
     template <class V>
-    Result<std::unique_ptr<Source>> convertGeoJSONSource(const std::string& id,
-                                                         const V& value) const {
+    optional<std::unique_ptr<Source>> convertGeoJSONSource(const std::string& id,
+                                                           const V& value,
+                                                           Error& error) const {
         auto dataValue = objectMember(value, "data");
         if (!dataValue) {
-            return Error{ "GeoJSON source must have a data value" };
+            error = { "GeoJSON source must have a data value" };
+            return {};
         }
 
-        Result<GeoJSONOptions> options = convert<GeoJSONOptions>(value);
+        optional<GeoJSONOptions> options = convert<GeoJSONOptions>(value, error);
         if (!options) {
-            return options.error();
+            return {};
         }
 
         auto result = std::make_unique<GeoJSONSource>(id, *options);
 
         if (isObject(*dataValue)) {
-            Result<GeoJSON> geoJSON = convertGeoJSON(*dataValue);
+            optional<GeoJSON> geoJSON = convertGeoJSON(*dataValue, error);
             if (!geoJSON) {
-                return geoJSON.error();
+                return {};
             }
             result->setGeoJSON(std::move(*geoJSON));
         } else if (toString(*dataValue)) {
             result->setURL(*toString(*dataValue));
         } else {
-            return Error{ "GeoJSON data must be a URL or an object" };
+            error = { "GeoJSON data must be a URL or an object" };
+            return {};
         }
 
-        return std::move(result);
+        return { std::move(result) };
     }
 };
 

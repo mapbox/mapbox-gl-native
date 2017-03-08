@@ -1,6 +1,6 @@
 #pragma once
 
-#include <mbgl/util/variant.hpp>
+#include <mbgl/util/optional.hpp>
 
 #include <string>
 
@@ -21,11 +21,11 @@ namespace conversion {
    A single template function serves as the public interface:
 
        template <class T, class V>
-       Result<T> convert(const V& value);
+       optional<T> convert(const V& value, Error& error);
 
-   Where `T` is one of the above types. If the conversion fails, the `Error` variant of `Result` is
-   returned, which includes diagnostic text suitable for presentation to a library user. Otherwise,
-   the `T` variant of `Result` is returned.
+   Where `T` is one of the above types. If the conversion fails, the result is empty, and the
+   error parameter includes diagnostic text suitable for presentation to a library user. Otherwise,
+   a filled optional is returned.
 
    The implementation of `convert` requires that the following are legal expressions for a value `v`
    of type `const V&`:
@@ -57,37 +57,12 @@ namespace conversion {
 
 struct Error { std::string message; };
 
-template <class T>
-class Result : private variant<T, Error> {
-public:
-    using variant<T, Error>::variant;
-
-    explicit operator bool() const {
-        return this->template is<T>();
-    }
-
-    T& operator*() {
-        assert(this->template is<T>());
-        return this->template get<T>();
-    }
-
-    const T& operator*() const {
-        assert(this->template is<T>());
-        return this->template get<T>();
-    }
-
-    const Error& error() const {
-        assert(this->template is<Error>());
-        return this->template get<Error>();
-    }
-};
-
 template <class T, class Enable = void>
 struct Converter;
 
 template <class T, class V, class...Args>
-Result<T> convert(const V& value, Args&&...args) {
-    return Converter<T>()(value, std::forward<Args>(args)...);
+optional<T> convert(const V& value, Error& error, Args&&...args) {
+    return Converter<T>()(value, error, std::forward<Args>(args)...);
 }
 
 } // namespace conversion

@@ -16,7 +16,7 @@ namespace android {
             env,
             std::make_unique<mbgl::style::RasterSource>(
                 jni::Make<std::string>(env, sourceId),
-                *style::conversion::convert<variant<std::string, Tileset>>(Value(env, urlOrTileSet)),
+                convertURLOrTileset(Value(env, urlOrTileSet)),
                 tileSize
             )
         ) {

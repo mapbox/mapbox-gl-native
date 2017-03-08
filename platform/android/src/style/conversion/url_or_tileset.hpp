@@ -12,27 +12,25 @@
 #include <string>
 
 namespace mbgl {
-namespace style {
-namespace conversion {
+namespace android {
 
-template <>
-struct Converter<variant<std::string, Tileset>> {
+// This conversion is expected not to fail because it's used only in contexts where
+// the value was originally a String or TileSet object on the Java side. If it fails
+// to convert, it's a bug in our serialization or Java-side static typing.
+inline variant<std::string, Tileset> convertURLOrTileset(const Value& value) {
+    using namespace mbgl::style::conversion;
 
-    template <class V>
-    Result<variant<std::string, Tileset>> operator()(const V& value) const {
-        if (isObject(value)) {
-            Result<Tileset> tileset = convert<Tileset>(value);
-            if (!tileset) {
-                return tileset.error();
-            }
-            return *tileset;
-        } else {
-            return *toString(value);
+    if (isObject(value)) {
+        Error error;
+        optional<Tileset> tileset = convert<Tileset>(value, error);
+        if (!tileset) {
+            throw std::logic_error(error.message);
         }
+        return { *tileset };
+    } else {
+        return { *toString(value) };
     }
-
-};
-
 }
+
 }
 }

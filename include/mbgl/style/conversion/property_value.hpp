@@ -12,21 +12,21 @@ namespace conversion {
 template <class T>
 struct Converter<PropertyValue<T>> {
     template <class V>
-    Result<PropertyValue<T>> operator()(const V& value) const {
+    optional<PropertyValue<T>> operator()(const V& value, Error& error) const {
         if (isUndefined(value)) {
-            return {};
+            return PropertyValue<T>();
         } else if (isObject(value)) {
-            Result<CameraFunction<T>> function = convert<CameraFunction<T>>(value);
+            optional<CameraFunction<T>> function = convert<CameraFunction<T>>(value, error);
             if (!function) {
-                return function.error();
+                return {};
             }
-            return *function;
+            return { *function };
         } else {
-            Result<T> constant = convert<T>(value);
+            optional<T> constant = convert<T>(value, error);
             if (!constant) {
-                return constant.error();
+                return {};
             }
-            return *constant;
+            return { *constant };
         }
     }
 };

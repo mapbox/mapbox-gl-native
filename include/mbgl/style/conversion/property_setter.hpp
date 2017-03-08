@@ -26,9 +26,10 @@ optional<Error> setLayoutProperty(Layer& layer, const V& value) {
         return Error { "layer doesn't support this property" };
     }
 
-    Result<PropertyValue> typedValue = convert<PropertyValue>(value);
+    Error error;
+    optional<PropertyValue> typedValue = convert<PropertyValue>(value, error);
     if (!typedValue) {
-        return typedValue.error();
+        return error;
     }
 
     (typedLayer->*setter)(*typedValue);
@@ -42,9 +43,10 @@ optional<Error> setPaintProperty(Layer& layer, const V& value, const optional<st
         return Error { "layer doesn't support this property" };
     }
 
-    Result<PropertyValue> typedValue = convert<PropertyValue>(value);
+    Error error;
+    optional<PropertyValue> typedValue = convert<PropertyValue>(value, error);
     if (!typedValue) {
-        return typedValue.error();
+        return error;
     }
 
     (typedLayer->*setter)(*typedValue, klass);
@@ -58,9 +60,10 @@ optional<Error> setTransition(Layer& layer, const V& value, const optional<std::
         return Error { "layer doesn't support this property" };
     }
 
-    Result<TransitionOptions> transition = convert<TransitionOptions>(value);
+    Error error;
+    optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
     if (!transition) {
-        return transition.error();
+        return error;
     }
 
     (typedLayer->*setter)(*transition, klass);
@@ -74,9 +77,10 @@ optional<Error> setVisibility(Layer& layer, const V& value) {
         return {};
     }
 
-    Result<VisibilityType> visibility = convert<VisibilityType>(value);
+    Error error;
+    optional<VisibilityType> visibility = convert<VisibilityType>(value, error);
     if (!visibility) {
-        return visibility.error();
+        return error;
     }
 
     layer.setVisibility(*visibility);

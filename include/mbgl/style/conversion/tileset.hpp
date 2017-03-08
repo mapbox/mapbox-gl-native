@@ -11,22 +11,25 @@ template <>
 struct Converter<Tileset> {
 public:
     template <class V>
-    Result<Tileset> operator()(const V& value) const {
+    optional<Tileset> operator()(const V& value, Error& error) const {
         Tileset result;
 
         auto tiles = objectMember(value, "tiles");
         if (!tiles) {
-            return Error { "source must have tiles" };
+            error = { "source must have tiles" };
+            return {};
         }
 
         if (!isArray(*tiles)) {
-            return Error { "source tiles must be an array" };
+            error = { "source tiles must be an array" };
+            return {};
         }
 
         for (std::size_t i = 0; i < arrayLength(*tiles); i++) {
             optional<std::string> urlTemplate = toString(arrayMember(*tiles, i));
             if (!urlTemplate) {
-                return Error { "source tiles member must be a string" };
+                error = { "source tiles member must be a string" };
+                return {};
             }
             result.tiles.push_back(std::move(*urlTemplate));
         }
@@ -43,7 +46,8 @@ public:
         if (minzoomValue) {
             optional<float> minzoom = toNumber(*minzoomValue);
             if (!minzoom || *minzoom < 0 || *minzoom > std::numeric_limits<uint8_t>::max()) {
-                return Error { "invalid minzoom" };
+                error = { "invalid minzoom" };
+                return {};
             }
             result.zoomRange.min = *minzoom;
         }
@@ -52,7 +56,8 @@ public:
         if (maxzoomValue) {
             optional<float> maxzoom = toNumber(*maxzoomValue);
             if (!maxzoom || *maxzoom < 0 || *maxzoom > std::numeric_limits<uint8_t>::max()) {
-                return Error { "invalid maxzoom" };
+                error = { "invalid maxzoom" };
+                return {};
             }
             result.zoomRange.max = *maxzoom;
         }
@@ -61,7 +66,8 @@ public:
         if (attributionValue) {
             optional<std::string> attribution = toString(*attributionValue);
             if (!attribution) {
-                return Error { "source attribution must be a string" };
+                error = { "source attribution must be a string" };
+                return {};
             }
             result.attribution = std::move(*attribution);
         }

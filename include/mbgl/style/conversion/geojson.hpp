@@ -8,7 +8,7 @@ namespace style {
 namespace conversion {
 
 template <class V>
-Result<GeoJSON> convertGeoJSON(const V& value);
+optional<GeoJSON> convertGeoJSON(const V& value, Error& error);
 
 } // namespace conversion
 } // namespace style

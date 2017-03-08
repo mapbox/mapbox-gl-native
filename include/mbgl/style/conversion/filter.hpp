@@ -12,65 +12,71 @@ template <>
 struct Converter<Filter> {
 public:
     template <class V>
-    Result<Filter> operator()(const V& value) const {
+    optional<Filter> operator()(const V& value, Error& error) const {
         if (!isArray(value)) {
-            return Error { "filter expression must be an array" };
+            error = { "filter expression must be an array" };
+            return {};
         }
 
         if (arrayLength(value) < 1) {
-            return Error { "filter expression must have at least 1 element" };
+            error = { "filter expression must have at least 1 element" };
+            return {};
         }
 
         optional<std::string> op = toString(arrayMember(value, 0));
         if (!op) {
-            return Error { "filter operator must be a string" };
+            error = { "filter operator must be a string" };
+            return {};
         }
 
         if (*op == "==") {
-            return convertEqualityFilter<EqualsFilter, TypeEqualsFilter, IdentifierEqualsFilter>(value);
+            return convertEqualityFilter<EqualsFilter, TypeEqualsFilter, IdentifierEqualsFilter>(value, error);
         } else if (*op == "!=") {
-            return convertEqualityFilter<NotEqualsFilter, TypeNotEqualsFilter, IdentifierNotEqualsFilter>(value);
+            return convertEqualityFilter<NotEqualsFilter, TypeNotEqualsFilter, IdentifierNotEqualsFilter>(value, error);
         } else if (*op == ">") {
-            return convertBinaryFilter<GreaterThanFilter>(value);
+            return convertBinaryFilter<GreaterThanFilter>(value, error);
         } else if (*op == ">=") {
-            return convertBinaryFilter<GreaterThanEqualsFilter>(value);
+            return convertBinaryFilter<GreaterThanEqualsFilter>(value, error);
         } else if (*op == "<") {
-            return convertBinaryFilter<LessThanFilter>(value);
+            return convertBinaryFilter<LessThanFilter>(value, error);
         } else if (*op == "<=") {
-            return convertBinaryFilter<LessThanEqualsFilter>(value);
+            return convertBinaryFilter<LessThanEqualsFilter>(value, error);
         } else if (*op == "in") {
-            return convertSetFilter<InFilter, TypeInFilter, IdentifierInFilter>(value);
+            return convertSetFilter<InFilter, TypeInFilter, IdentifierInFilter>(value, error);
         } else if (*op == "!in") {
-            return convertSetFilter<NotInFilter, TypeNotInFilter, IdentifierNotInFilter>(value);
+            return convertSetFilter<NotInFilter, TypeNotInFilter, IdentifierNotInFilter>(value, error);
         } else if (*op == "all") {
-            return convertCompoundFilter<AllFilter>(value);
+            return convertCompoundFilter<AllFilter>(value, error);
         } else if (*op == "any") {
-            return convertCompoundFilter<AnyFilter>(value);
+            return convertCompoundFilter<AnyFilter>(value, error);
         } else if (*op == "none") {
-            return convertCompoundFilter<NoneFilter>(value);
+            return convertCompoundFilter<NoneFilter>(value, error);
         } else if (*op == "has") {
-            return convertUnaryFilter<HasFilter, HasIdentifierFilter>(value);
+            return convertUnaryFilter<HasFilter, HasIdentifierFilter>(value, error);
         } else if (*op == "!has") {
-           return convertUnaryFilter<NotHasFilter, NotHasIdentifierFilter>(value);
+           return convertUnaryFilter<NotHasFilter, NotHasIdentifierFilter>(value, error);
         }
 
-        return Error { "filter operator must be one of \"==\", \"!=\", \">\", \">=\", \"<\", \"<=\", \"in\", \"!in\", \"all\", \"any\", \"none\", \"has\", or \"!has\"" };
+        error = { "filter operator must be one of \"==\", \"!=\", \">\", \">=\", \"<\", \"<=\", \"in\", \"!in\", \"all\", \"any\", \"none\", \"has\", or \"!has\"" };
+        return {};
     }
 
 private:
-    Result<Value> normalizeValue(const optional<Value>& value) const {
+    optional<Value> normalizeValue(const optional<Value>& value, Error& error) const {
         if (!value) {
-            return Error { "filter expression value must be a boolean, number, or string" };
+            error = { "filter expression value must be a boolean, number, or string" };
+            return {};
         } else {
             return *value;
         }
     }
 
     template <class V>
-    Result<FeatureType> toFeatureType(const V& value) const {
+    optional<FeatureType> toFeatureType(const V& value, Error& error) const {
         optional<std::string> type = toString(value);
         if (!type) {
-            return Error { "value for $type filter must be a string" };
+            error = { "value for $type filter must be a string" };
+            return {};
         } else if (*type == "Point") {
             return FeatureType::Point;
         } else if (*type == "LineString") {
@@ -78,162 +84,173 @@ private:
         } else if (*type == "Polygon") {
             return FeatureType::Polygon;
         } else {
-            return Error { "value for $type filter must be Point, LineString, or Polygon" };
+            error = { "value for $type filter must be Point, LineString, or Polygon" };
+            return {};
         }
     }
 
     template <class V>
-    Result<FeatureIdentifier> toFeatureIdentifier(const V& value) const {
+    optional<FeatureIdentifier> toFeatureIdentifier(const V& value, Error& error) const {
         optional<Value> identifier = toValue(value);
         if (!identifier) {
-            return Error { "filter expression value must be a boolean, number, or string" };
+            error = { "filter expression value must be a boolean, number, or string" };
+            return {};
         } else {
             return (*identifier).match(
-                [] (uint64_t t) -> Result<FeatureIdentifier> { return t; },
-                [] ( int64_t t) -> Result<FeatureIdentifier> { return t; },
-                [] (  double t) -> Result<FeatureIdentifier> { return t; },
-                [] (const std::string& t) -> Result<FeatureIdentifier> { return t; },
-                [] (const auto&) -> Result<FeatureIdentifier> {
-                    return Error { "filter expression value must be a boolean, number, or string" };
+                [] (uint64_t t) -> optional<FeatureIdentifier> { return { t }; },
+                [] ( int64_t t) -> optional<FeatureIdentifier> { return { t }; },
+                [] (  double t) -> optional<FeatureIdentifier> { return { t }; },
+                [] (const std::string& t) -> optional<FeatureIdentifier> { return { t }; },
+                [&] (const auto&) -> optional<FeatureIdentifier> {
+                    error = { "filter expression value must be a boolean, number, or string" };
+                    return {};
                 });
         }
     }
 
     template <class FilterType, class IdentifierFilterType, class V>
-    Result<Filter> convertUnaryFilter(const V& value) const {
+    optional<Filter> convertUnaryFilter(const V& value, Error& error) const {
         if (arrayLength(value) < 2) {
-            return Error { "filter expression must have 2 elements" };
+            error = { "filter expression must have 2 elements" };
+            return {};
         }
 
         optional<std::string> key = toString(arrayMember(value, 1));
         if (!key) {
-            return Error { "filter expression key must be a string" };
+            error = { "filter expression key must be a string" };
+            return {};
         }
 
         if (*key == "$id") {
-            return IdentifierFilterType {};
+            return { IdentifierFilterType {} };
         } else {
-            return FilterType { *key };
+            return { FilterType { *key } };
         }
     }
 
     template <class FilterType, class TypeFilterType, class IdentifierFilterType, class V>
-    Result<Filter> convertEqualityFilter(const V& value) const {
+    optional<Filter> convertEqualityFilter(const V& value, Error& error) const {
         if (arrayLength(value) < 3) {
-            return Error { "filter expression must have 3 elements" };
+            error = { "filter expression must have 3 elements" };
+            return {};
         }
 
         optional<std::string> key = toString(arrayMember(value, 1));
         if (!key) {
-            return Error { "filter expression key must be a string" };
+            error = { "filter expression key must be a string" };
+            return {};
         }
 
         if (*key == "$type") {
-            Result<FeatureType> filterValue = toFeatureType(arrayMember(value, 2));
+            optional<FeatureType> filterValue = toFeatureType(arrayMember(value, 2), error);
             if (!filterValue) {
-                return filterValue.error();
+                return {};
             }
 
-            return TypeFilterType { *filterValue };
+            return { TypeFilterType { *filterValue } };
 
         } else if (*key == "$id") {
-            Result<FeatureIdentifier> filterValue = toFeatureIdentifier(arrayMember(value, 2));
+            optional<FeatureIdentifier> filterValue = toFeatureIdentifier(arrayMember(value, 2), error);
             if (!filterValue) {
-                return filterValue.error();
+                return {};
             }
 
-            return IdentifierFilterType { *filterValue };
+            return { IdentifierFilterType { *filterValue } };
 
         } else {
-            Result<Value> filterValue = normalizeValue(toValue(arrayMember(value, 2)));
+            optional<Value> filterValue = normalizeValue(toValue(arrayMember(value, 2)), error);
             if (!filterValue) {
-                return filterValue.error();
+                return {};
             }
 
-            return FilterType { *key, *filterValue };
+            return { FilterType { *key, *filterValue } };
         }
     }
 
     template <class FilterType, class V>
-    Result<Filter> convertBinaryFilter(const V& value) const {
+    optional<Filter> convertBinaryFilter(const V& value, Error& error) const {
         if (arrayLength(value) < 3) {
-            return Error { "filter expression must have 3 elements" };
+            error = { "filter expression must have 3 elements" };
+            return {};
         }
 
         optional<std::string> key = toString(arrayMember(value, 1));
         if (!key) {
-            return Error { "filter expression key must be a string" };
+            error = { "filter expression key must be a string" };
+            return {};
         }
 
-        Result<Value> filterValue = normalizeValue(toValue(arrayMember(value, 2)));
+        optional<Value> filterValue = normalizeValue(toValue(arrayMember(value, 2)), error);
         if (!filterValue) {
-            return filterValue.error();
+            return {};
         }
 
-        return FilterType { *key, *filterValue };
+        return { FilterType { *key, *filterValue } };
     }
 
     template <class FilterType, class TypeFilterType, class IdentifierFilterType, class V>
-    Result<Filter> convertSetFilter(const V& value) const {
+    optional<Filter> convertSetFilter(const V& value, Error& error) const {
         if (arrayLength(value) < 2) {
-            return Error { "filter expression must at least 2 elements" };
+            error = { "filter expression must at least 2 elements" };
+            return {};
         }
 
         optional<std::string> key = toString(arrayMember(value, 1));
         if (!key) {
-            return Error { "filter expression key must be a string" };
+            error = { "filter expression key must be a string" };
+            return {};
         }
 
         if (*key == "$type") {
             std::vector<FeatureType> values;
             for (std::size_t i = 2; i < arrayLength(value); ++i) {
-                Result<FeatureType> filterValue = toFeatureType(arrayMember(value, i));
+                optional<FeatureType> filterValue = toFeatureType(arrayMember(value, i), error);
                 if (!filterValue) {
-                    return filterValue.error();
+                    return {};
                 }
                 values.push_back(*filterValue);
             }
 
-            return TypeFilterType { std::move(values) };
+            return { TypeFilterType { std::move(values) } };
 
         } else if (*key == "$id") {
             std::vector<FeatureIdentifier> values;
             for (std::size_t i = 2; i < arrayLength(value); ++i) {
-                Result<FeatureIdentifier> filterValue = toFeatureIdentifier(arrayMember(value, i));
+                optional<FeatureIdentifier> filterValue = toFeatureIdentifier(arrayMember(value, i), error);
                 if (!filterValue) {
-                    return filterValue.error();
+                    return {};
                 }
                 values.push_back(*filterValue);
             }
 
-            return IdentifierFilterType { std::move(values) };
+            return { IdentifierFilterType { std::move(values) } };
 
         } else {
             std::vector<Value> values;
             for (std::size_t i = 2; i < arrayLength(value); ++i) {
-                Result<Value> filterValue = normalizeValue(toValue(arrayMember(value, i)));
+                optional<Value> filterValue = normalizeValue(toValue(arrayMember(value, i)), error);
                 if (!filterValue) {
-                    return filterValue.error();
+                    return {};
                 }
                 values.push_back(*filterValue);
             }
 
-            return FilterType { *key, std::move(values) };
+            return { FilterType { *key, std::move(values) } };
         }
     }
 
     template <class FilterType, class V>
-    Result<Filter> convertCompoundFilter(const V& value) const {
+    optional<Filter> convertCompoundFilter(const V& value, Error& error) const {
         std::vector<Filter> filters;
         for (std::size_t i = 1; i < arrayLength(value); ++i) {
-            Result<Filter> element = operator()(arrayMember(value, i));
+            optional<Filter> element = operator()(arrayMember(value, i), error);
             if (!element) {
-                return element.error();
+                return {};
             }
             filters.push_back(*element);
         }
 
-        return FilterType { std::move(filters) };
+        return { FilterType { std::move(filters) } };
     }
 };
 
