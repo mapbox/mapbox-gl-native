@@ -5,20 +5,20 @@ git:
 addons:
   apt:
     sources:
-      - &common_sources [ 'ubuntu-toolchain-r-test', 'george-edison55-precise-backports' ]
+      - &common_sources [ 'ubuntu-toolchain-r-test', 'george-edison55-precise-backports', 'llvm-toolchain-trusty-3.9' ]
     packages:
       - &common_packages [ 'libllvm3.8v4', 'cmake', 'cmake-data' ]
-      - &clang38_packages [ 'clang-3.8', 'libstdc++-5-dev', 'libstdc++6' ]
+      - &clang39_packages [ 'clang-3.9', 'libstdc++-5-dev', 'libstdc++6' ]
       - &gcc5_packages [ 'gcc-5', 'g++-5' ]
       - &glfw_packages [ 'libxrandr-dev', 'libxcursor-dev', 'libxinerama-dev' ]
 
 addons_shortcuts:
-  addons_clang38: &clang38
+  addons_clang39: &clang39
     apt:
       sources: *common_sources
       packages:
         - *common_packages
-        - *clang38_packages
+        - *clang39_packages
         - *glfw_packages
   addons_gcc5: &gcc5
     apt:
@@ -81,14 +81,14 @@ matrix:
         - git fetch origin master:refs/remotes/origin/master
         - make check
 
-    # EGL - Node - Clang 3.8 - Debug
+    # EGL - Node - Clang 3.9 - Debug
     - os: linux
       sudo: required
       dist: trusty
       language: node
-      compiler: "egl-node4-clang38-debug"
-      env: BUILDTYPE=Debug _CXX=clang++-3.8 _CC=clang-3.8 WITH_EGL=1
-      addons: *clang38
+      compiler: "egl-node4-clang39-debug"
+      env: BUILDTYPE=Debug _CXX=clang++-3.9 _CC=clang-3.9 WITH_EGL=1
+      addons: *clang39
       before_script:
         - mapbox_install_logbt
         - mapbox_start_xvfb
@@ -104,14 +104,14 @@ matrix:
       after_failure:
         - aws s3 cp . s3://mapbox/mapbox-gl-native/render-tests/$TRAVIS_JOB_NUMBER --recursive --exclude "*" --include "*.trace"
 
-    # EGL - Node - Clang 3.8 - Release
+    # EGL - Node - Clang 3.9 - Release
     - os: linux
       sudo: required
       dist: trusty
       language: node
-      compiler: "egl-node4-clang38-release"
-      env: BUILDTYPE=Release _CXX=clang++-3.8 _CC=clang-3.8 WITH_EGL=1
-      addons: *clang38
+      compiler: "egl-node4-clang39-release"
+      env: BUILDTYPE=Release _CXX=clang++-3.9 _CC=clang-3.9 WITH_EGL=1
+      addons: *clang39
       before_script:
         # fglrx causes the GLX extension to be unavailable
         - sudo apt-get purge -qq fglrx
@@ -148,14 +148,14 @@ matrix:
         - ccache --show-stats
         - ./platform/linux/scripts/coveralls.sh
 
-    # EGL - Clang 3.8 - Debug
+    # EGL - Clang 3.9 - Debug
     - os: linux
       sudo: required
       dist: trusty
       language: cpp
-      compiler: "egl-clang38-debug"
-      env: BUILDTYPE=Debug _CXX=clang++-3.8 _CC=clang-3.8 WITH_EGL=1
-      addons: *clang38
+      compiler: "egl-clang39-debug"
+      env: BUILDTYPE=Debug _CXX=clang++-3.9 _CC=clang-3.9 WITH_EGL=1
+      addons: *clang39
       before_script:
         - mapbox_start_xvfb
         - mapbox_export_mesa_library_path
