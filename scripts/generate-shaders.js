@@ -8,6 +8,41 @@ const outputPath = 'src/mbgl/shaders';
 
 require('./style-code');
 
+const vertexPrelude = fs.readFileSync(path.join(inputPath, '_prelude.vertex.glsl'));
+const fragmentPrelude = fs.readFileSync(path.join(inputPath, '_prelude.fragment.glsl'));
+
+writeIfModified(path.join(outputPath, 'preludes.hpp'), `// NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.
+
+#pragma once
+
+namespace mbgl {
+namespace shaders {
+
+extern const char* vertexPrelude;
+extern const char* fragmentPrelude;
+
+} // namespace shaders
+} // namespace mbgl
+`);
+
+writeIfModified(path.join(outputPath, 'preludes.cpp'), `// NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.
+
+#include <mbgl/shaders/preludes.hpp>
+
+namespace mbgl {
+namespace shaders {
+
+const char* vertexPrelude = R"MBGL_SHADER(
+${vertexPrelude}
+)MBGL_SHADER";
+const char* fragmentPrelude = R"MBGL_SHADER(
+${fragmentPrelude}
+)MBGL_SHADER";
+
+} // namespace shaders
+} // namespace mbgl
+`);
+
 [
     'circle',
     'collision_box',
@@ -25,34 +60,33 @@ require('./style-code');
 ].forEach(function (shaderName) {
     function applyPragmas(source, pragmas) {
         return source.replace(/#pragma mapbox: ([\w]+) ([\w]+) ([\w]+) ([\w]+)/g, (match, operation, precision, type, name) => {
+            const a_type = type === "float" ? "vec2" : "vec4";
             return pragmas[operation]
                 .join("\n")
                 .replace(/\{type\}/g, type)
+                .replace(/\{a_type}/g, a_type)
                 .replace(/\{precision\}/g, precision)
                 .replace(/\{name\}/g, name);
         });
     }
 
     function vertexSource() {
-        const prelude = fs.readFileSync(path.join(inputPath, '_prelude.vertex.glsl'));
         const source = fs.readFileSync(path.join(inputPath, shaderName + '.vertex.glsl'), 'utf8');
-        return prelude + applyPragmas(source, {
+        return applyPragmas(source, {
                 define: [
                     "uniform lowp float a_{name}_t;",
-                    "attribute {precision} {type} a_{name}_min;",
-                    "attribute {precision} {type} a_{name}_max;",
+                    "attribute {precision} {a_type} a_{name};",
                     "varying {precision} {type} {name};"
                 ],
                 initialize: [
-                    "{name} = mix(a_{name}_min, a_{name}_max, a_{name}_t);"
+                    "{name} = unpack_mix_{a_type}(a_{name}, a_{name}_t);"
                 ]
             });
     }
 
     function fragmentSource() {
-        const prelude = fs.readFileSync(path.join(inputPath, '_prelude.fragment.glsl'));
         const source = fs.readFileSync(path.join(inputPath, shaderName + '.fragment.glsl'), 'utf8');
-        return prelude + applyPragmas(source, {
+        return applyPragmas(source, {
                 define: [
                     "varying {precision} {type} {name};"
                 ],

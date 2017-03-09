@@ -22,6 +22,7 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.ProjectedMeters;
 import com.mapbox.mapboxsdk.storage.FileSource;
 import com.mapbox.mapboxsdk.style.layers.CannotAddLayerException;
+import com.mapbox.mapboxsdk.style.layers.Filter;
 import com.mapbox.mapboxsdk.style.layers.Layer;
 import com.mapbox.mapboxsdk.style.sources.CannotAddSourceException;
 import com.mapbox.mapboxsdk.style.sources.Source;
@@ -881,27 +882,31 @@ final class NativeMapView {
   // Feature querying
 
   @NonNull
-  public List<Feature> queryRenderedFeatures(PointF coordinates, String... layerIds) {
+  public List<Feature> queryRenderedFeatures(@NonNull PointF coordinates,
+                                             @Nullable String[] layerIds,
+                                             @Nullable Filter.Statement filter) {
     if (isDestroyedOn("queryRenderedFeatures")) {
       return new ArrayList<>();
     }
     Feature[] features = nativeQueryRenderedFeaturesForPoint(coordinates.x / pixelRatio,
-      coordinates.y / pixelRatio, layerIds);
+      coordinates.y / pixelRatio, layerIds, filter != null ? filter.toArray() : null);
     return features != null ? Arrays.asList(features) : new ArrayList<Feature>();
   }
 
   @NonNull
-  public List<Feature> queryRenderedFeatures(RectF coordinates, String... layerIds) {
+  public List<Feature> queryRenderedFeatures(@NonNull RectF coordinates,
+                                             @Nullable String[] layerIds,
+                                             @Nullable Filter.Statement filter) {
     if (isDestroyedOn("queryRenderedFeatures")) {
       return new ArrayList<>();
     }
     Feature[] features = nativeQueryRenderedFeaturesForBox(
-
       coordinates.left / pixelRatio,
       coordinates.top / pixelRatio,
       coordinates.right / pixelRatio,
       coordinates.bottom / pixelRatio,
-      layerIds);
+      layerIds,
+      filter != null ? filter.toArray() : null);
     return features != null ? Arrays.asList(features) : new ArrayList<Feature>();
   }
 
@@ -1139,12 +1144,14 @@ final class NativeMapView {
 
   private native void nativeTakeSnapshot();
 
-  private native Feature[] nativeQueryRenderedFeaturesForPoint(float x, float y, String[]
-    layerIds);
+  private native Feature[] nativeQueryRenderedFeaturesForPoint(float x, float y,
+                                                               String[] layerIds,
+                                                               Object[] filter);
 
   private native Feature[] nativeQueryRenderedFeaturesForBox(float left, float top,
                                                              float right, float bottom,
-                                                             String[] layerIds);
+                                                             String[] layerIds,
+                                                             Object[] filter);
 
   int getWidth() {
     if (isDestroyedOn("")) {

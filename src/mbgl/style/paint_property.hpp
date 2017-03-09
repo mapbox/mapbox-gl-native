@@ -51,6 +51,12 @@ public:
             // Transition from prior value is now complete.
             prior = {};
             return finalValue;
+        } else if (value.isDataDriven()) {
+            // Transitions to data-driven properties are not supported.
+            // We snap immediately to the data-driven value so that, when we perform layout,
+            // we see the data-driven function and can use it to populate vertex buffers.
+            prior = {};
+            return finalValue;
         } else if (now < begin) {
             // Transition hasn't started yet.
             return prior->get().evaluate(evaluator, now);

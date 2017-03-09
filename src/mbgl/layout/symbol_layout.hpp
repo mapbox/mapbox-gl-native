@@ -19,14 +19,13 @@ class CollisionTile;
 class SpriteAtlas;
 class GlyphAtlas;
 class SymbolBucket;
+class Anchor;
 
 namespace style {
 class BucketParameters;
 class Filter;
 class Layer;
 } // namespace style
-
-struct Anchor;
 
 class SymbolLayout {
 public:

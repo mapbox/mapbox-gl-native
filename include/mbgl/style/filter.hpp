@@ -266,6 +266,9 @@ public:
 
     bool operator()(const Feature&) const;
 
+    template <class GeometryTileFeature>
+    bool operator()(const GeometryTileFeature&) const;
+
     template <class PropertyAccessor>
     bool operator()(FeatureType type, optional<FeatureIdentifier> id, PropertyAccessor accessor) const;
 };

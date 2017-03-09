@@ -213,7 +213,7 @@ public class FillLayerTest extends BaseStyleTest {
           categorical(
             stop(1.0f, fillOpacity(0.3f))
           )
-        ).withDefaultValue(0.3f)
+        ).withDefaultValue(fillOpacity(0.3f))
       )
     );
 
@@ -223,7 +223,9 @@ public class FillLayerTest extends BaseStyleTest {
     assertEquals(SourceFunction.class, layer.getFillOpacity().getFunction().getClass());
     assertEquals("FeaturePropertyA", ((SourceFunction) layer.getFillOpacity().getFunction()).getProperty());
     assertEquals(CategoricalStops.class, layer.getFillOpacity().getFunction().getStops().getClass());
-    assertEquals(0.3f, ((SourceFunction) layer.getFillOpacity().getFunction()).getDefaultValue());
+    assertNotNull(((SourceFunction) layer.getFillOpacity().getFunction()).getDefaultValue());
+    assertNotNull(((SourceFunction) layer.getFillOpacity().getFunction()).getDefaultValue().getValue());
+    assertEquals(0.3f, ((SourceFunction) layer.getFillOpacity().getFunction()).getDefaultValue().getValue());
   }
 
   @Test
@@ -240,7 +242,7 @@ public class FillLayerTest extends BaseStyleTest {
           exponential(
             stop(0, 0.3f, fillOpacity(0.9f))
           ).withBase(0.5f)
-        ).withDefaultValue(0.3f)
+        ).withDefaultValue(fillOpacity(0.3f))
       )
     );
 
@@ -356,7 +358,7 @@ public class FillLayerTest extends BaseStyleTest {
           categorical(
             stop("valueA", fillColor(Color.RED))
           )
-        )
+        ).withDefaultValue(fillColor(Color.GREEN))
       )
     );
 
@@ -366,6 +368,9 @@ public class FillLayerTest extends BaseStyleTest {
     assertEquals(SourceFunction.class, layer.getFillColor().getFunction().getClass());
     assertEquals("FeaturePropertyA", ((SourceFunction) layer.getFillColor().getFunction()).getProperty());
     assertEquals(CategoricalStops.class, layer.getFillColor().getFunction().getStops().getClass());
+    assertNotNull(((SourceFunction) layer.getFillColor().getFunction()).getDefaultValue());
+    assertNotNull(((SourceFunction) layer.getFillColor().getFunction()).getDefaultValue().getValue());
+    assertEquals(Color.GREEN, (int) ((SourceFunction) layer.getFillColor().getFunction()).getDefaultValue().getColorInt());
   }
 
   @Test
@@ -475,7 +480,7 @@ public class FillLayerTest extends BaseStyleTest {
           categorical(
             stop("valueA", fillOutlineColor(Color.RED))
           )
-        )
+        ).withDefaultValue(fillOutlineColor(Color.GREEN))
       )
     );
 
@@ -485,6 +490,9 @@ public class FillLayerTest extends BaseStyleTest {
     assertEquals(SourceFunction.class, layer.getFillOutlineColor().getFunction().getClass());
     assertEquals("FeaturePropertyA", ((SourceFunction) layer.getFillOutlineColor().getFunction()).getProperty());
     assertEquals(CategoricalStops.class, layer.getFillOutlineColor().getFunction().getStops().getClass());
+    assertNotNull(((SourceFunction) layer.getFillOutlineColor().getFunction()).getDefaultValue());
+    assertNotNull(((SourceFunction) layer.getFillOutlineColor().getFunction()).getDefaultValue().getValue());
+    assertEquals(Color.GREEN, (int) ((SourceFunction) layer.getFillOutlineColor().getFunction()).getDefaultValue().getColorInt());
   }
 
   @Test

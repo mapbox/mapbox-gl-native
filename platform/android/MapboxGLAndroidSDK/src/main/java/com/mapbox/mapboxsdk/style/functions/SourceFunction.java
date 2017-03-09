@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.mapbox.mapboxsdk.style.functions.stops.Stops;
+import com.mapbox.mapboxsdk.style.layers.PropertyValue;
 
 import java.util.Map;
 
@@ -25,7 +26,7 @@ import java.util.Map;
 public class SourceFunction<I, O> extends Function<I, O> {
 
   private final String property;
-  private O defaultValue;
+  private PropertyValue<O> defaultValue;
 
   SourceFunction(@NonNull String property, @NonNull Stops<I, O> stops) {
     this(null, property, stops);
@@ -37,7 +38,7 @@ public class SourceFunction<I, O> extends Function<I, O> {
   private SourceFunction(@Nullable O defaultValue, @NonNull String property, @NonNull Stops<I, O> stops) {
     super(stops);
     this.property = property;
-    this.defaultValue = defaultValue;
+    this.defaultValue = defaultValue != null ? new PropertyValue<>(property, defaultValue) : null;
   }
 
 
@@ -56,7 +57,7 @@ public class SourceFunction<I, O> extends Function<I, O> {
    * @param defaultValue the default value to use when no other applies
    * @return this (for chaining)
    */
-  public SourceFunction<I, O> withDefaultValue(O defaultValue) {
+  public SourceFunction<I, O> withDefaultValue(PropertyValue<O> defaultValue) {
     this.defaultValue = defaultValue;
     return this;
   }
@@ -65,7 +66,7 @@ public class SourceFunction<I, O> extends Function<I, O> {
    * @return the defaultValue
    */
   @Nullable
-  public O getDefaultValue() {
+  public PropertyValue<O> getDefaultValue() {
     return defaultValue;
   }
 
@@ -77,7 +78,7 @@ public class SourceFunction<I, O> extends Function<I, O> {
     Map<String, Object> valueObject = super.toValueObject();
     valueObject.put(PROPERTY_KEY, property);
     if (defaultValue != null) {
-      valueObject.put(DEFAULT_VALUE_KEY, defaultValue);
+      valueObject.put(DEFAULT_VALUE_KEY, defaultValue.value);
     }
     return valueObject;
   }

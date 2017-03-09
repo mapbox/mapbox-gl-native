@@ -89,7 +89,7 @@ typedef NS_ENUM(NSUInteger, MGLAnnotationViewDragState) {
  contains a non-`nil` value while the annotation view is visible on the map. If
  the view is queued, waiting to be reused, the value is `nil`.
  */
-@property (nonatomic, readonly, nullable) id <MGLAnnotation> annotation;
+@property (nonatomic, nullable) id <MGLAnnotation> annotation;
 
 /**
  The string that identifies that this annotation view is reusable.

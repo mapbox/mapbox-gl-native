@@ -7,86 +7,26 @@ namespace shaders {
 
 const char* symbol_sdf::name = "symbol_sdf";
 const char* symbol_sdf::vertexSource = R"MBGL_SHADER(
-#ifdef GL_ES
-precision highp float;
-#else
-
-#if !defined(lowp)
-#define lowp
-#endif
-
-#if !defined(mediump)
-#define mediump
-#endif
-
-#if !defined(highp)
-#define highp
-#endif
-
-#endif
-
-float evaluate_zoom_function_1(const vec4 values, const float t) {
-    if (t < 1.0) {
-        return mix(values[0], values[1], t);
-    } else if (t < 2.0) {
-        return mix(values[1], values[2], t - 1.0);
-    } else {
-        return mix(values[2], values[3], t - 2.0);
-    }
-}
-vec4 evaluate_zoom_function_4(const vec4 value0, const vec4 value1, const vec4 value2, const vec4 value3, const float t) {
-    if (t < 1.0) {
-        return mix(value0, value1, t);
-    } else if (t < 2.0) {
-        return mix(value1, value2, t - 1.0);
-    } else {
-        return mix(value2, value3, t - 2.0);
-    }
-}
-
-// The offset depends on how many pixels are between the world origin and the edge of the tile:
-// vec2 offset = mod(pixel_coord, size)
-//
-// At high zoom levels there are a ton of pixels between the world origin and the edge of the tile.
-// The glsl spec only guarantees 16 bits of precision for highp floats. We need more than that.
-//
-// The pixel_coord is passed in as two 16 bit values:
-// pixel_coord_upper = floor(pixel_coord / 2^16)
-// pixel_coord_lower = mod(pixel_coord, 2^16)
-//
-// The offset is calculated in a series of steps that should preserve this precision:
-vec2 get_pattern_pos(const vec2 pixel_coord_upper, const vec2 pixel_coord_lower,
-    const vec2 pattern_size, const float tile_units_to_pixels, const vec2 pos) {
-
-    vec2 offset = mod(mod(mod(pixel_coord_upper, pattern_size) * 256.0, pattern_size) * 256.0 + pixel_coord_lower, pattern_size);
-    return (tile_units_to_pixels * pos + offset) / pattern_size;
-}
 const float PI = 3.141592653589793;
 
-attribute vec2 a_pos;
-attribute vec2 a_offset;
+attribute vec4 a_pos_offset;
 attribute vec2 a_texture_pos;
 attribute vec4 a_data;
 
 uniform lowp float a_fill_color_t;
-attribute lowp vec4 a_fill_color_min;
-attribute lowp vec4 a_fill_color_max;
+attribute lowp vec4 a_fill_color;
 varying lowp vec4 fill_color;
 uniform lowp float a_halo_color_t;
-attribute lowp vec4 a_halo_color_min;
-attribute lowp vec4 a_halo_color_max;
+attribute lowp vec4 a_halo_color;
 varying lowp vec4 halo_color;
 uniform lowp float a_opacity_t;
-attribute lowp float a_opacity_min;
-attribute lowp float a_opacity_max;
+attribute lowp vec2 a_opacity;
 varying lowp float opacity;
 uniform lowp float a_halo_width_t;
-attribute lowp float a_halo_width_min;
-attribute lowp float a_halo_width_max;
+attribute lowp vec2 a_halo_width;
 varying lowp float halo_width;
 uniform lowp float a_halo_blur_t;
-attribute lowp float a_halo_blur_min;
-attribute lowp float a_halo_blur_max;
+attribute lowp vec2 a_halo_blur;
 varying lowp float halo_blur;
 
 // matrix is for the vertex position.
@@ -107,11 +47,14 @@ varying vec2 v_fade_tex;
 varying float v_gamma_scale;
 
 void main() {
-    fill_color = mix(a_fill_color_min, a_fill_color_max, a_fill_color_t);
-    halo_color = mix(a_halo_color_min, a_halo_color_max, a_halo_color_t);
-    opacity = mix(a_opacity_min, a_opacity_max, a_opacity_t);
-    halo_width = mix(a_halo_width_min, a_halo_width_max, a_halo_width_t);
-    halo_blur = mix(a_halo_blur_min, a_halo_blur_max, a_halo_blur_t);
+    fill_color = unpack_mix_vec4(a_fill_color, a_fill_color_t);
+    halo_color = unpack_mix_vec4(a_halo_color, a_halo_color_t);
+    opacity = unpack_mix_vec2(a_opacity, a_opacity_t);
+    halo_width = unpack_mix_vec2(a_halo_width, a_halo_width_t);
+    halo_blur = unpack_mix_vec2(a_halo_blur, a_halo_blur_t);
+
+    vec2 a_pos = a_pos_offset.xy;
+    vec2 a_offset = a_pos_offset.zw;
 
     vec2 a_tex = a_texture_pos.xy;
     mediump float a_labelminzoom = a_data[0];
@@ -172,23 +115,6 @@ void main() {
 
 )MBGL_SHADER";
 const char* symbol_sdf::fragmentSource = R"MBGL_SHADER(
-#ifdef GL_ES
-precision mediump float;
-#else
-
-#if !defined(lowp)
-#define lowp
-#endif
-
-#if !defined(mediump)
-#define mediump
-#endif
-
-#if !defined(highp)
-#define highp
-#endif
-
-#endif
 #define SDF_PX 8.0
 #define EDGE_GAMMA 0.105/DEVICE_PIXEL_RATIO
 

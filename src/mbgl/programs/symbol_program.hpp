@@ -35,8 +35,7 @@ MBGL_DEFINE_UNIFORM_SCALAR(float, u_gamma_scale);
 } // namespace uniforms
 
 struct SymbolLayoutAttributes : gl::Attributes<
-    attributes::a_pos,
-    attributes::a_offset<2>,
+    attributes::a_pos_offset,
     attributes::a_texture_pos,
     attributes::a_data<4>>
 {
@@ -49,11 +48,10 @@ struct SymbolLayoutAttributes : gl::Attributes<
                          float labelminzoom,
                          uint8_t labelangle) {
         return Vertex {
+            // combining pos and offset to reduce number of vertex attributes passed to shader (8 max for some devices)
             {{
                 static_cast<int16_t>(a.x),
-                static_cast<int16_t>(a.y)
-            }},
-            {{
+                static_cast<int16_t>(a.y),
                 static_cast<int16_t>(::round(o.x * 64)),  // use 1/64 pixels for placement
                 static_cast<int16_t>(::round(o.y * 64))
             }},

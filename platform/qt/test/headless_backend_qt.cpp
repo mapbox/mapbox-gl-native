@@ -1,10 +1,11 @@
 #include <mbgl/gl/headless_backend.hpp>
 
-#include <QGLContext>
 #include <QGLWidget>
 
 #if QT_VERSION >= 0x050000
 #include <QOpenGLContext>
+#else
+#include <QGLContext>
 #endif
 
 #include <cassert>

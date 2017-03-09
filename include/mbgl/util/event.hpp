@@ -40,7 +40,7 @@ struct EventPermutation {
 };
 
 constexpr EventSeverity disabledEventSeverities[] = {
-#ifdef NDEBUG
+#ifndef NDEBUG
     EventSeverity(-1) // Avoid zero size array
 #else
     EventSeverity::Debug

@@ -4,7 +4,7 @@ mason_use(glfw VERSION 2017-02-09-77a8f10)
 mason_use(boost_libprogram_options VERSION 1.62.0)
 mason_use(gtest VERSION 1.8.0)
 mason_use(benchmark VERSION 1.0.0-1)
-mason_use(icu VERSION 58.1)
+mason_use(icu VERSION 58.1-min-size)
 
 include(cmake/loop-darwin.cmake)
 

@@ -7,60 +7,6 @@ namespace shaders {
 
 const char* circle::name = "circle";
 const char* circle::vertexSource = R"MBGL_SHADER(
-#ifdef GL_ES
-precision highp float;
-#else
-
-#if !defined(lowp)
-#define lowp
-#endif
-
-#if !defined(mediump)
-#define mediump
-#endif
-
-#if !defined(highp)
-#define highp
-#endif
-
-#endif
-
-float evaluate_zoom_function_1(const vec4 values, const float t) {
-    if (t < 1.0) {
-        return mix(values[0], values[1], t);
-    } else if (t < 2.0) {
-        return mix(values[1], values[2], t - 1.0);
-    } else {
-        return mix(values[2], values[3], t - 2.0);
-    }
-}
-vec4 evaluate_zoom_function_4(const vec4 value0, const vec4 value1, const vec4 value2, const vec4 value3, const float t) {
-    if (t < 1.0) {
-        return mix(value0, value1, t);
-    } else if (t < 2.0) {
-        return mix(value1, value2, t - 1.0);
-    } else {
-        return mix(value2, value3, t - 2.0);
-    }
-}
-
-// The offset depends on how many pixels are between the world origin and the edge of the tile:
-// vec2 offset = mod(pixel_coord, size)
-//
-// At high zoom levels there are a ton of pixels between the world origin and the edge of the tile.
-// The glsl spec only guarantees 16 bits of precision for highp floats. We need more than that.
-//
-// The pixel_coord is passed in as two 16 bit values:
-// pixel_coord_upper = floor(pixel_coord / 2^16)
-// pixel_coord_lower = mod(pixel_coord, 2^16)
-//
-// The offset is calculated in a series of steps that should preserve this precision:
-vec2 get_pattern_pos(const vec2 pixel_coord_upper, const vec2 pixel_coord_lower,
-    const vec2 pattern_size, const float tile_units_to_pixels, const vec2 pos) {
-
-    vec2 offset = mod(mod(mod(pixel_coord_upper, pattern_size) * 256.0, pattern_size) * 256.0 + pixel_coord_lower, pattern_size);
-    return (tile_units_to_pixels * pos + offset) / pattern_size;
-}
 uniform mat4 u_matrix;
 uniform bool u_scale_with_map;
 uniform vec2 u_extrude_scale;
@@ -68,45 +14,38 @@ uniform vec2 u_extrude_scale;
 attribute vec2 a_pos;
 
 uniform lowp float a_color_t;
-attribute lowp vec4 a_color_min;
-attribute lowp vec4 a_color_max;
+attribute lowp vec4 a_color;
 varying lowp vec4 color;
 uniform lowp float a_radius_t;
-attribute mediump float a_radius_min;
-attribute mediump float a_radius_max;
+attribute mediump vec2 a_radius;
 varying mediump float radius;
 uniform lowp float a_blur_t;
-attribute lowp float a_blur_min;
-attribute lowp float a_blur_max;
+attribute lowp vec2 a_blur;
 varying lowp float blur;
 uniform lowp float a_opacity_t;
-attribute lowp float a_opacity_min;
-attribute lowp float a_opacity_max;
+attribute lowp vec2 a_opacity;
 varying lowp float opacity;
 uniform lowp float a_stroke_color_t;
-attribute lowp vec4 a_stroke_color_min;
-attribute lowp vec4 a_stroke_color_max;
+attribute lowp vec4 a_stroke_color;
 varying lowp vec4 stroke_color;
 uniform lowp float a_stroke_width_t;
-attribute mediump float a_stroke_width_min;
-attribute mediump float a_stroke_width_max;
+attribute mediump vec2 a_stroke_width;
 varying mediump float stroke_width;
 uniform lowp float a_stroke_opacity_t;
-attribute lowp float a_stroke_opacity_min;
-attribute lowp float a_stroke_opacity_max;
+attribute lowp vec2 a_stroke_opacity;
 varying lowp float stroke_opacity;
 
 varying vec2 v_extrude;
 varying lowp float v_antialiasblur;
 
 void main(void) {
-    color = mix(a_color_min, a_color_max, a_color_t);
-    radius = mix(a_radius_min, a_radius_max, a_radius_t);
-    blur = mix(a_blur_min, a_blur_max, a_blur_t);
-    opacity = mix(a_opacity_min, a_opacity_max, a_opacity_t);
-    stroke_color = mix(a_stroke_color_min, a_stroke_color_max, a_stroke_color_t);
-    stroke_width = mix(a_stroke_width_min, a_stroke_width_max, a_stroke_width_t);
-    stroke_opacity = mix(a_stroke_opacity_min, a_stroke_opacity_max, a_stroke_opacity_t);
+    color = unpack_mix_vec4(a_color, a_color_t);
+    radius = unpack_mix_vec2(a_radius, a_radius_t);
+    blur = unpack_mix_vec2(a_blur, a_blur_t);
+    opacity = unpack_mix_vec2(a_opacity, a_opacity_t);
+    stroke_color = unpack_mix_vec4(a_stroke_color, a_stroke_color_t);
+    stroke_width = unpack_mix_vec2(a_stroke_width, a_stroke_width_t);
+    stroke_opacity = unpack_mix_vec2(a_stroke_opacity, a_stroke_opacity_t);
 
     // unencode the extrusion vector that we snuck into the a_pos vector
     v_extrude = vec2(mod(a_pos, 2.0) * 2.0 - 1.0);
@@ -130,23 +69,6 @@ void main(void) {
 
 )MBGL_SHADER";
 const char* circle::fragmentSource = R"MBGL_SHADER(
-#ifdef GL_ES
-precision mediump float;
-#else
-
-#if !defined(lowp)
-#define lowp
-#endif
-
-#if !defined(mediump)
-#define mediump
-#endif
-
-#if !defined(highp)
-#define highp
-#endif
-
-#endif
 varying lowp vec4 color;
 varying mediump float radius;
 varying lowp float blur;

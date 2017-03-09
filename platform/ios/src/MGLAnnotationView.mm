@@ -10,7 +10,6 @@
 @interface MGLAnnotationView () <UIGestureRecognizerDelegate>
 
 @property (nonatomic, readwrite, nullable) NSString *reuseIdentifier;
-@property (nonatomic, readwrite, nullable) id <MGLAnnotation> annotation;
 @property (nonatomic, readwrite) CATransform3D lastAppliedScaleTransform;
 @property (nonatomic, weak) UIPanGestureRecognizer *panGestureRecognizer;
 @property (nonatomic, weak) UILongPressGestureRecognizer *longPressRecognizer;
@@ -240,6 +239,7 @@
     }
     else if (dragState == MGLAnnotationViewDragStateCanceling)
     {
+        NSAssert(self.annotation, @"Annotation property should not be nil.");
         self.panGestureRecognizer.enabled = NO;
         self.longPressRecognizer.enabled = NO;
         self.center = [self.mapView convertCoordinate:self.annotation.coordinate toPointToView:self.mapView];

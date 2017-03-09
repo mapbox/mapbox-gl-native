@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="mapbox_compassContentDescription">Map compass. Click to reset the map rotation to North.</string>
-    <string name="mapbox_attributionsIconContentDescription">Attribution icon. Click to show attribution dialog.</string>
+    <string name="mapbox_compassContentDescription">Map compass. Activate to reset the map rotation to North.</string>
+    <string name="mapbox_attributionsIconContentDescription">Attribution icon. Activate to show attribution dialog.</string>
+    <string name="mapbox_myLocationViewContentDescription">Location View. This shows your location on the map.</string>
+    <string name="mapbox_mapActionDescription">Showing a Map created with Mapbox. Scroll by dragging two fingers. Zoom by pinching two fingers.</string>
     <string name="mapbox_attributionsDialogTitle">Mapbox Android SDK</string>
     <string name="mapbox_attributionTelemetryTitle">Make Mapbox Maps Better</string>
     <string name="mapbox_attributionTelemetryMessage">You are helping to make OpenStreetMap and Mapbox maps better by contributing anonymous usage data.</string>
     <string name="mapbox_attributionTelemetryPositive">Agree</string>
     <string name="mapbox_attributionTelemetryNegative">Disagree</string>
     <string name="mapbox_attributionTelemetryNeutral">More info</string>
-    <string name="mapbox_iconContentDescription">The Mapbox logo.</string>
     <string name="mapbox_infoWindowTitle">Title</string>
     <string name="mapbox_infoWindowDescription">Description</string>
     <string name="mapbox_infoWindowAddress">Address</string>

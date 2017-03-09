@@ -22,7 +22,7 @@ auto makeLayoutPropertySetters() {
 
 <% for (const layer of locals.layers) { -%>
 <% for (const property of layer.layoutProperties) { -%>
-    result["<%- property.name %>"] = makePropertySetter<V>(&<%- camelize(layer.type) %>Layer::set<%- camelize(property.name) %>);
+    result["<%- property.name %>"] = &setLayoutProperty<V, <%- camelize(layer.type) %>Layer, <%- propertyValueType(property) %>, &<%- camelize(layer.type) %>Layer::set<%- camelize(property.name) %>>;
 <% } -%>
 
 <% } -%>
@@ -35,8 +35,8 @@ auto makePaintPropertySetters() {
 
 <% for (const layer of locals.layers) { -%>
 <% for (const property of layer.paintProperties) { -%>
-    result["<%- property.name %>"] = makePropertySetter<V>(&<%- camelize(layer.type) %>Layer::set<%- camelize(property.name) %>);
-    result["<%- property.name %>-transition"] = makeTransitionSetter<V>(&<%- camelize(layer.type) %>Layer::set<%- camelize(property.name) %>Transition);
+    result["<%- property.name %>"] = &setPaintProperty<V, <%- camelize(layer.type) %>Layer, <%- propertyValueType(property) %>, &<%- camelize(layer.type) %>Layer::set<%- camelize(property.name) %>>;
+    result["<%- property.name %>-transition"] = &setTransition<V, <%- camelize(layer.type) %>Layer, &<%- camelize(layer.type) %>Layer::set<%- camelize(property.name) %>Transition>;
 <% } -%>
 
 <% } -%>

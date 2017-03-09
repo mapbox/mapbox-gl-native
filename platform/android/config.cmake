@@ -20,7 +20,7 @@ mason_use(libzip VERSION 1.1.3)
 mason_use(nunicode VERSION 1.7.1)
 mason_use(sqlite VERSION 3.14.2)
 mason_use(gtest VERSION 1.8.0)
-mason_use(icu VERSION 58.1)
+mason_use(icu VERSION 58.1-min-size)
 
 set(ANDROID_SDK_PROJECT_DIR ${CMAKE_SOURCE_DIR}/platform/android/MapboxGLAndroidSDK)
 set(ANDROID_JNI_TARGET_DIR ${ANDROID_SDK_PROJECT_DIR}/src/main/jniLibs/${ANDROID_ABI})
@@ -218,7 +218,6 @@ macro(mbgl_platform_core)
         PRIVATE -fvisibility=hidden
         PRIVATE -ffunction-sections
         PRIVATE -fdata-sections
-        PRIVATE -Os
     )
 
     target_link_libraries(mbgl-core
@@ -244,7 +243,6 @@ target_compile_options(mapbox-gl
     PRIVATE -fvisibility=hidden
     PRIVATE -ffunction-sections
     PRIVATE -fdata-sections
-    PRIVATE -Os
 )
 
 target_link_libraries(mapbox-gl
@@ -285,7 +283,6 @@ target_sources(mbgl-test
 
 target_compile_options(mbgl-test
     PRIVATE -fvisibility=hidden
-    PRIVATE -Os
 )
 
 target_compile_definitions(mbgl-test
@@ -329,7 +326,6 @@ target_compile_options(example-custom-layer
     PRIVATE -fvisibility=hidden
     PRIVATE -ffunction-sections
     PRIVATE -fdata-sections
-    PRIVATE -Os
 )
 
 target_link_libraries(example-custom-layer

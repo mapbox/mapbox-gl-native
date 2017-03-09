@@ -189,7 +189,6 @@ matrix:
         - mapbox_export_mesa_library_path
       script:
         - make qt-app
-        - make qt-qml-app
         - make qt-test
         - make qt-docs
         - scripts/valgrind.sh build/qt-linux-x86_64/Release/mbgl-test --gtest_filter=-*.Load --gtest_filter=-Memory.Vector

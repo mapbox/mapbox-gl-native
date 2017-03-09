@@ -405,7 +405,6 @@ $(MACOS_QT_PROJ_PATH): $(BUILD_DEPS)
 	@# Create Xcode schemes so that we can use xcodebuild from the command line. CMake doesn't
 	@# create these automatically.
 	XCODEPROJ=$(MACOS_QT_PROJ_PATH) SCHEME_NAME=mbgl-qt SCHEME_TYPE=executable platform/macos/scripts/create_scheme.sh
-	XCODEPROJ=$(MACOS_QT_PROJ_PATH) SCHEME_NAME=mbgl-qt-qml SCHEME_TYPE=executable platform/macos/scripts/create_scheme.sh
 	XCODEPROJ=$(MACOS_QT_PROJ_PATH) SCHEME_NAME=mbgl-test SCHEME_TYPE=executable platform/macos/scripts/create_scheme.sh
 	XCODEPROJ=$(MACOS_QT_PROJ_PATH) SCHEME_NAME=mbgl-benchmark SCHEME_TYPE=executable platform/macos/scripts/create_scheme.sh
 	XCODEPROJ=$(MACOS_QT_PROJ_PATH) SCHEME_NAME=mbgl-core SCHEME_TYPE=library BUILDABLE_NAME=libmbgl-core.a BLUEPRINT_NAME=mbgl-core platform/macos/scripts/create_scheme.sh
@@ -428,14 +427,6 @@ qt-app: $(QT_BUILD)
 .PHONY: run-qt-app
 run-qt-app: qt-app
 	$(QT_OUTPUT_PATH)/mbgl-qt
-
-.PHONY: qt-qml-app
-qt-qml-app: $(QT_BUILD)
-	$(NINJA) $(NINJA_ARGS) -j$(JOBS) -C $(QT_OUTPUT_PATH) mbgl-qt-qml
-
-.PHONY: run-qt-qml-app
-run-qt-qml-app: qt-qml-app
-	$(QT_OUTPUT_PATH)/mbgl-qt-qml
 
 .PHONY: qt-test
 qt-test: $(QT_BUILD)

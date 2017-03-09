@@ -789,6 +789,33 @@ MGL_EXPORT IB_DESIGNABLE
  Returns an array of rendered map features that intersect with a given point,
  restricted to the given style layers.
 
+ This method may return all features from the specified layers. To filter
+ the returned features, use the
+ `-visibleFeaturesAtPoint:inStyleLayersWithIdentifiers:predicate:` method. For more
+ information about searching for map features, see that method’s documentation.
+
+ @note Layer identifiers are not guaranteed to exist across styles or different
+    versions of the same style. Applications that use this API must first set the
+    style URL to an explicitly versioned style using a convenience method like
+    `+[MGLStyle outdoorsStyleURLWithVersion:]`, `MGLMapView`’s “Style URL”
+    inspectable in Interface Builder, or a manually constructed `NSURL`. This
+    approach also avoids layer identifer name changes that will occur in the default
+    style’s layers over time.
+
+ @param point A point expressed in the map view’s coordinate system.
+ @param styleLayerIdentifiers A set of strings that correspond to the names of
+    layers defined in the current style. Only the features contained in these
+    layers are included in the returned array.
+ @return An array of objects conforming to the `MGLFeature` protocol that
+    represent features in the sources used by the current style.
+ */
+- (NS_ARRAY_OF(id <MGLFeature>) *)visibleFeaturesAtPoint:(NSPoint)point inStyleLayersWithIdentifiers:(nullable NS_SET_OF(NSString *) *)styleLayerIdentifiers NS_SWIFT_NAME(visibleFeatures(at:styleLayerIdentifiers:));
+
+/**
+ Returns an array of rendered map features that intersect with a given point,
+ restricted to the given style layers and filtered by the given
+ predicate.
+ 
  Each object in the returned array represents a feature rendered by the
  current style and provides access to attributes specified by the relevant
  <a href="https://www.mapbox.com/mapbox-gl-style-spec/#sources">tile sources</a>.
@@ -824,21 +851,22 @@ MGL_EXPORT IB_DESIGNABLE
  <a href="https://www.mapbox.com/studio/">Mapbox Studio</a>.
 
  @note Layer identifiers are not guaranteed to exist across styles or different
-    versions of the same style. Applications that use this API must first set the
-    style URL to an explicitly versioned style using a convenience method like
-    `+[MGLStyle outdoorsStyleURLWithVersion:]`, `MGLMapView`’s “Style URL”
-    inspectable in Interface Builder, or a manually constructed `NSURL`. This
-    approach also avoids layer identifer name changes that will occur in the default
-    style’s layers over time.
-
+ versions of the same style. Applications that use this API must first set the
+ style URL to an explicitly versioned style using a convenience method like
+ `+[MGLStyle outdoorsStyleURLWithVersion:]`, `MGLMapView`’s “Style URL”
+ inspectable in Interface Builder, or a manually constructed `NSURL`. This
+ approach also avoids layer identifer name changes that will occur in the default
+ style’s layers over time.
+ 
  @param point A point expressed in the map view’s coordinate system.
  @param styleLayerIdentifiers A set of strings that correspond to the names of
-    layers defined in the current style. Only the features contained in these
-    layers are included in the returned array.
+ layers defined in the current style. Only the features contained in these
+ layers are included in the returned array.
+ @param predicate A predicate to filter the returned features.
  @return An array of objects conforming to the `MGLFeature` protocol that
-    represent features in the sources used by the current style.
+ represent features in the sources used by the current style.
  */
-- (NS_ARRAY_OF(id <MGLFeature>) *)visibleFeaturesAtPoint:(NSPoint)point inStyleLayersWithIdentifiers:(nullable NS_SET_OF(NSString *) *)styleLayerIdentifiers NS_SWIFT_NAME(visibleFeatures(_:styleLayerIdentifiers:));
+- (NS_ARRAY_OF(id <MGLFeature>) *)visibleFeaturesAtPoint:(NSPoint)point inStyleLayersWithIdentifiers:(nullable NS_SET_OF(NSString *) *)styleLayerIdentifiers predicate:(nullable NSPredicate *)predicate NS_SWIFT_NAME(visibleFeatures(at:styleLayerIdentifiers:predicate:));
 
 /**
  Returns an array of rendered map features that intersect with the given
@@ -858,7 +886,28 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  Returns an array of rendered map features that intersect with the given
  rectangle, restricted to the given style layers.
+ 
+ This method may return all features from the specified layers. To filter
+ the returned features, use the
+ `-visibleFeaturesAtPoint:inStyleLayersWithIdentifiers:predicate:` method. For
+ more information about searching for map features, see that method’s
+ documentation.
 
+ @param rect A rectangle expressed in the map view’s coordinate system.
+ @param styleLayerIdentifiers A set of strings that correspond to the names of
+    layers defined in the current style. Only the features contained in these
+    layers are included in the returned array.
+ @return An array of objects conforming to the `MGLFeature` protocol that
+    represent features in the sources used by the current style.
+ */
+- (NS_ARRAY_OF(id <MGLFeature>) *)visibleFeaturesInRect:(NSRect)rect inStyleLayersWithIdentifiers:(nullable NS_SET_OF(NSString *) *)styleLayerIdentifiers NS_SWIFT_NAME(visibleFeatures(at:styleLayerIdentifiers:));
+
+/**
+ Returns an array of rendered map features that intersect with the given
+ rectangle, restricted to the given style layers and filtered by the given
+ predicate.
+
+ 
  Each object in the returned array represents a feature rendered by the
  current style and provides access to attributes specified by the relevant
  <a href="https://www.mapbox.com/mapbox-gl-style-spec/#sources">tile sources</a>.
@@ -895,21 +944,22 @@ MGL_EXPORT IB_DESIGNABLE
  <a href="https://www.mapbox.com/studio/">Mapbox Studio</a>.
 
  @note Layer identifiers are not guaranteed to exist across styles or different
-    versions of the same style. Applications that use this API must first set the
-    style URL to an explicitly versioned style using a convenience method like
-    `+[MGLStyle outdoorsStyleURLWithVersion:]`, `MGLMapView`’s “Style URL”
-    inspectable in Interface Builder, or a manually constructed `NSURL`. This
-    approach also avoids layer identifer name changes that will occur in the default
-    style’s layers over time.
-
+ versions of the same style. Applications that use this API must first set the
+ style URL to an explicitly versioned style using a convenience method like
+ `+[MGLStyle outdoorsStyleURLWithVersion:]`, `MGLMapView`’s “Style URL”
+ inspectable in Interface Builder, or a manually constructed `NSURL`. This
+ approach also avoids layer identifer name changes that will occur in the default
+ style’s layers over time.
+ 
  @param rect A rectangle expressed in the map view’s coordinate system.
  @param styleLayerIdentifiers A set of strings that correspond to the names of
-    layers defined in the current style. Only the features contained in these
-    layers are included in the returned array.
+ layers defined in the current style. Only the features contained in these
+ layers are included in the returned array.
+ @param predicate A predicate to filter the returned features.
  @return An array of objects conforming to the `MGLFeature` protocol that
-    represent features in the sources used by the current style.
+ represent features in the sources used by the current style.
  */
-- (NS_ARRAY_OF(id <MGLFeature>) *)visibleFeaturesInRect:(NSRect)rect inStyleLayersWithIdentifiers:(nullable NS_SET_OF(NSString *) *)styleLayerIdentifiers NS_SWIFT_NAME(visibleFeatures(_:styleLayerIdentifiers:));
+- (NS_ARRAY_OF(id <MGLFeature>) *)visibleFeaturesInRect:(NSRect)rect inStyleLayersWithIdentifiers:(nullable NS_SET_OF(NSString *) *)styleLayerIdentifiers predicate:(nullable NSPredicate *)predicate NS_SWIFT_NAME(visibleFeatures(in:styleLayerIdentifiers:predicate:));
 
 #pragma mark Converting Geographic Coordinates
 

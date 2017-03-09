@@ -66,7 +66,9 @@ public:
     std::map<UnwrappedTileID, RenderTile>& getRenderTiles();
 
     std::unordered_map<std::string, std::vector<Feature>>
-    queryRenderedFeatures(const QueryParameters&) const;
+    queryRenderedFeatures(const ScreenLineString& geometry,
+                          const TransformState& transformState,
+                          const QueryOptions& options) const;
 
     void setCacheSize(size_t);
     void onLowMemory();
@@ -85,6 +87,9 @@ public:
     // be initialized to true so that Style::isLoaded() does not produce false positives if
     // called before Style::recalculate().
     bool enabled = true;
+    
+    // Detaches from the style
+    void detach();
 
 protected:
     void invalidateTiles();

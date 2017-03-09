@@ -17,8 +17,8 @@
         android:layout_alignParentLeft="true"
         android:layout_marginBottom="@dimen/mapbox_eight_dp"
         android:layout_marginLeft="@dimen/mapbox_eight_dp"
-        android:contentDescription="@string/mapbox_iconContentDescription"
-        android:src="@drawable/mapbox_logo_icon" />
+        android:contentDescription="@null"
+        android:src="@drawable/mapbox_logo_icon"/>
 
     <ImageView
         android:layout_width="wrap_content"

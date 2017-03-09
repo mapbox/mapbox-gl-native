@@ -26,7 +26,14 @@
 #include <mbgl/util/logging.hpp>
 #include <mbgl/util/platform.hpp>
 #include <mbgl/sprite/sprite_image.hpp>
+#include <mbgl/style/filter.hpp>
 
+// Java -> C++ conversion
+#include "style/android_conversion.hpp"
+#include <mbgl/style/conversion.hpp>
+#include <mbgl/style/conversion/filter.hpp>
+
+// C++ -> Java conversion
 #include "conversion/conversion.hpp"
 #include "conversion/collection.hpp"
 #include "geometry/conversion/feature.hpp"
@@ -694,6 +701,9 @@ void NativeMapView::setTransitionDelay(JNIEnv&, jlong delay) {
 }
 
 jni::Array<jlong> NativeMapView::queryPointAnnotations(JNIEnv& env, jni::Object<RectF> rect) {
+    using namespace mbgl::style;
+    using namespace mbgl::style::conversion;
+
     // Convert input
     mbgl::ScreenBox box = {
         { RectF::getLeft(env, rect), RectF::getTop(env, rect) },
@@ -711,20 +721,40 @@ jni::Array<jlong> NativeMapView::queryPointAnnotations(JNIEnv& env, jni::Object<
     return result;
 }
 
-jni::Array<jni::Object<Feature>> NativeMapView::queryRenderedFeaturesForPoint(JNIEnv& env, jni::jfloat x, jni::jfloat y, jni::Array<jni::String> layerIds) {
+static inline optional<mbgl::style::Filter> toFilter(jni::JNIEnv& env, jni::Array<jni::Object<>> jfilter) {
+    using namespace mbgl::style;
+    using namespace mbgl::style::conversion;
+
+    mbgl::optional<Filter> filter;
+    if (jfilter) {
+      Value filterValue(env, jfilter);
+      auto converted = convert<Filter>(filterValue);
+      if (!converted) {
+          mbgl::Log::Error(mbgl::Event::JNI, "Error setting filter: " + converted.error().message);
+      }
+      filter = std::move(*converted);
+    }
+    return filter;
+}
+
+jni::Array<jni::Object<Feature>> NativeMapView::queryRenderedFeaturesForPoint(JNIEnv& env, jni::jfloat x, jni::jfloat y,
+                                                                              jni::Array<jni::String> layerIds,
+                                                                              jni::Array<jni::Object<>> jfilter) {
     using namespace mbgl::android::conversion;
     using namespace mapbox::geometry;
 
     mbgl::optional<std::vector<std::string>> layers;
     if (layerIds != nullptr && layerIds.Length(env) > 0) {
-        layers = toVector(env, layerIds);
+        layers = android::conversion::toVector(env, layerIds);
     }
     point<double> point = {x, y};
 
-    return *convert<jni::Array<jni::Object<Feature>>, std::vector<mbgl::Feature>>(env, map->queryRenderedFeatures(point, layers));
+    return *convert<jni::Array<jni::Object<Feature>>, std::vector<mbgl::Feature>>(env, map->queryRenderedFeatures(point, { layers, toFilter(env, jfilter) }));
 }
 
-jni::Array<jni::Object<Feature>> NativeMapView::queryRenderedFeaturesForBox(JNIEnv& env, jni::jfloat left, jni::jfloat top, jni::jfloat right, jni::jfloat bottom, jni::Array<jni::String> layerIds) {
+jni::Array<jni::Object<Feature>> NativeMapView::queryRenderedFeaturesForBox(JNIEnv& env, jni::jfloat left, jni::jfloat top,
+                                                                            jni::jfloat right, jni::jfloat bottom, jni::Array<jni::String> layerIds,
+                                                                            jni::Array<jni::Object<>> jfilter) {
     using namespace mbgl::android::conversion;
     using namespace mapbox::geometry;
 
@@ -734,7 +764,7 @@ jni::Array<jni::Object<Feature>> NativeMapView::queryRenderedFeaturesForBox(JNIE
     }
     box<double> box = { point<double>{ left, top}, point<double>{ right, bottom } };
 
-    return *convert<jni::Array<jni::Object<Feature>>, std::vector<mbgl::Feature>>(env, map->queryRenderedFeatures(box, layers));
+    return *convert<jni::Array<jni::Object<Feature>>, std::vector<mbgl::Feature>>(env, map->queryRenderedFeatures(box, { layers, toFilter(env, jfilter) }));
 }
 
 jni::Array<jni::Object<Layer>> NativeMapView::getLayers(JNIEnv& env) {
