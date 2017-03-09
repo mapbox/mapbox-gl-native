@@ -71,7 +71,7 @@ MGL_EXPORT
 /**
  The transition affecting any changes to this layer’s `backgroundColor` property.
 
- This property corresponds to the background-color-transition property in the style JSON file format.
+ This property corresponds to the `background-color-transition` property in the style JSON file format.
 */
 @property (nonatomic) MGLTransition backgroundColorTransition;
 
@@ -94,7 +94,7 @@ MGL_EXPORT
 /**
  The transition affecting any changes to this layer’s `backgroundOpacity` property.
 
- This property corresponds to the background-color-transition property in the style JSON file format.
+ This property corresponds to the `background-opacity-transition` property in the style JSON file format.
 */
 @property (nonatomic) MGLTransition backgroundOpacityTransition;
 
@@ -114,7 +114,7 @@ MGL_EXPORT
 /**
  The transition affecting any changes to this layer’s `backgroundPattern` property.
 
- This property corresponds to the background-color-transition property in the style JSON file format.
+ This property corresponds to the `background-pattern-transition` property in the style JSON file format.
 */
 @property (nonatomic) MGLTransition backgroundPatternTransition;
 

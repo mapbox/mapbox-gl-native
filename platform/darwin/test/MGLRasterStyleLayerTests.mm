@@ -27,7 +27,7 @@
     XCTAssertTrue(layer.rawLayer->is<mbgl::style::RasterLayer>());
     auto rawLayer = layer.rawLayer->as<mbgl::style::RasterLayer>();
 
-    MGLTransition transitionTest = {.delay = 4, .duration = 5};
+    MGLTransition transitionTest = MGLTransitionMake(5, 4);
 
 
     // raster-brightness-max
@@ -147,12 +147,9 @@
         XCTAssertThrowsSpecificNamed(layer.rasterContrast = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
         // Transition property test
         layer.rasterContrastTransition = transitionTest;
-        MGLTransition options;
         auto toptions = rawLayer->getRasterContrastTransition();
-        options.delay = MGLTimeIntervalFromDuration(toptions.delay.value_or(mbgl::Duration::zero()));
-        options.duration = MGLTimeIntervalFromDuration(toptions.duration.value_or(mbgl::Duration::zero()));
-        XCTAssertEqual(options.delay, transitionTest.delay);
-        XCTAssertEqual(options.duration, transitionTest.duration);
+        XCTAssert(toptions.delay && MGLTimeIntervalFromDuration(*toptions.delay) == transitionTest.delay);
+        XCTAssert(toptions.duration && MGLTimeIntervalFromDuration(*toptions.duration) == transitionTest.duration);
 
         MGLTransition rasterContrastTransition = layer.rasterContrastTransition;
         XCTAssertEqual(rasterContrastTransition.delay, transitionTest.delay);
@@ -198,12 +195,9 @@
         XCTAssertThrowsSpecificNamed(layer.rasterFadeDuration = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
         // Transition property test
         layer.rasterFadeDurationTransition = transitionTest;
-        MGLTransition options;
         auto toptions = rawLayer->getRasterFadeDurationTransition();
-        options.delay = MGLTimeIntervalFromDuration(toptions.delay.value_or(mbgl::Duration::zero()));
-        options.duration = MGLTimeIntervalFromDuration(toptions.duration.value_or(mbgl::Duration::zero()));
-        XCTAssertEqual(options.delay, transitionTest.delay);
-        XCTAssertEqual(options.duration, transitionTest.duration);
+        XCTAssert(toptions.delay && MGLTimeIntervalFromDuration(*toptions.delay) == transitionTest.delay);
+        XCTAssert(toptions.duration && MGLTimeIntervalFromDuration(*toptions.duration) == transitionTest.duration);
 
         MGLTransition rasterFadeDurationTransition = layer.rasterFadeDurationTransition;
         XCTAssertEqual(rasterFadeDurationTransition.delay, transitionTest.delay);
@@ -288,12 +282,9 @@
         XCTAssertThrowsSpecificNamed(layer.rasterOpacity = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
         // Transition property test
         layer.rasterOpacityTransition = transitionTest;
-        MGLTransition options;
         auto toptions = rawLayer->getRasterOpacityTransition();
-        options.delay = MGLTimeIntervalFromDuration(toptions.delay.value_or(mbgl::Duration::zero()));
-        options.duration = MGLTimeIntervalFromDuration(toptions.duration.value_or(mbgl::Duration::zero()));
-        XCTAssertEqual(options.delay, transitionTest.delay);
-        XCTAssertEqual(options.duration, transitionTest.duration);
+        XCTAssert(toptions.delay && MGLTimeIntervalFromDuration(*toptions.delay) == transitionTest.delay);
+        XCTAssert(toptions.duration && MGLTimeIntervalFromDuration(*toptions.duration) == transitionTest.duration);
 
         MGLTransition rasterOpacityTransition = layer.rasterOpacityTransition;
         XCTAssertEqual(rasterOpacityTransition.delay, transitionTest.delay);
@@ -339,12 +330,9 @@
         XCTAssertThrowsSpecificNamed(layer.rasterSaturation = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
         // Transition property test
         layer.rasterSaturationTransition = transitionTest;
-        MGLTransition options;
         auto toptions = rawLayer->getRasterSaturationTransition();
-        options.delay = MGLTimeIntervalFromDuration(toptions.delay.value_or(mbgl::Duration::zero()));
-        options.duration = MGLTimeIntervalFromDuration(toptions.duration.value_or(mbgl::Duration::zero()));
-        XCTAssertEqual(options.delay, transitionTest.delay);
-        XCTAssertEqual(options.duration, transitionTest.duration);
+        XCTAssert(toptions.delay && MGLTimeIntervalFromDuration(*toptions.delay) == transitionTest.delay);
+        XCTAssert(toptions.duration && MGLTimeIntervalFromDuration(*toptions.duration) == transitionTest.duration);
 
         MGLTransition rasterSaturationTransition = layer.rasterSaturationTransition;
         XCTAssertEqual(rasterSaturationTransition.delay, transitionTest.delay);

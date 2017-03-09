@@ -334,7 +334,8 @@ MGL_EXPORT
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconIgnorePlacement __attribute__((unavailable("Use iconIgnoresPlacement instead.")));
 
 /**
- A string with {tokens} replaced, referencing the data property to pull from.
+ Name of image in sprite to use for drawing an image background. A string with
+ {tokens} replaced, referencing the data property to pull from.
  
  This attribute corresponds to the <a
  href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-symbol-icon-image"><code>icon-image</code></a>
@@ -1249,7 +1250,7 @@ MGL_EXPORT
 /**
  The transition affecting any changes to this layer’s `iconColor` property.
 
- This property corresponds to the background-color-transition property in the style JSON file format.
+ This property corresponds to the `icon-color-transition` property in the style JSON file format.
 */
 @property (nonatomic) MGLTransition iconColorTransition;
 
@@ -1286,7 +1287,7 @@ MGL_EXPORT
 /**
  The transition affecting any changes to this layer’s `iconHaloBlur` property.
 
- This property corresponds to the background-color-transition property in the style JSON file format.
+ This property corresponds to the `icon-halo-blur-transition` property in the style JSON file format.
 */
 @property (nonatomic) MGLTransition iconHaloBlurTransition;
 
@@ -1353,7 +1354,7 @@ MGL_EXPORT
 /**
  The transition affecting any changes to this layer’s `iconHaloColor` property.
 
- This property corresponds to the background-color-transition property in the style JSON file format.
+ This property corresponds to the `icon-halo-color-transition` property in the style JSON file format.
 */
 @property (nonatomic) MGLTransition iconHaloColorTransition;
 
@@ -1390,7 +1391,7 @@ MGL_EXPORT
 /**
  The transition affecting any changes to this layer’s `iconHaloWidth` property.
 
- This property corresponds to the background-color-transition property in the style JSON file format.
+ This property corresponds to the `icon-halo-width-transition` property in the style JSON file format.
 */
 @property (nonatomic) MGLTransition iconHaloWidthTransition;
 
@@ -1425,7 +1426,7 @@ MGL_EXPORT
 /**
  The transition affecting any changes to this layer’s `iconOpacity` property.
 
- This property corresponds to the background-color-transition property in the style JSON file format.
+ This property corresponds to the `icon-opacity-transition` property in the style JSON file format.
 */
 @property (nonatomic) MGLTransition iconOpacityTransition;
 
@@ -1482,9 +1483,9 @@ MGL_EXPORT
 #endif
 
 /**
- The transition affecting any changes to this layer’s `iconTranslate` property.
+ The transition affecting any changes to this layer’s `iconTranslation` property.
 
- This property corresponds to the background-color-transition property in the style JSON file format.
+ This property corresponds to the `icon-translate-transition` property in the style JSON file format.
 */
 @property (nonatomic) MGLTransition iconTranslationTransition;
 
@@ -1511,7 +1512,6 @@ MGL_EXPORT
  `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *iconTranslationAnchor;
-
 
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *iconTranslateAnchor __attribute__((unavailable("Use iconTranslationAnchor instead.")));
 
@@ -1576,7 +1576,7 @@ MGL_EXPORT
 /**
  The transition affecting any changes to this layer’s `textColor` property.
 
- This property corresponds to the background-color-transition property in the style JSON file format.
+ This property corresponds to the `text-color-transition` property in the style JSON file format.
 */
 @property (nonatomic) MGLTransition textColorTransition;
 
@@ -1613,7 +1613,7 @@ MGL_EXPORT
 /**
  The transition affecting any changes to this layer’s `textHaloBlur` property.
 
- This property corresponds to the background-color-transition property in the style JSON file format.
+ This property corresponds to the `text-halo-blur-transition` property in the style JSON file format.
 */
 @property (nonatomic) MGLTransition textHaloBlurTransition;
 
@@ -1678,7 +1678,7 @@ MGL_EXPORT
 /**
  The transition affecting any changes to this layer’s `textHaloColor` property.
 
- This property corresponds to the background-color-transition property in the style JSON file format.
+ This property corresponds to the `text-halo-color-transition` property in the style JSON file format.
 */
 @property (nonatomic) MGLTransition textHaloColorTransition;
 
@@ -1716,7 +1716,7 @@ MGL_EXPORT
 /**
  The transition affecting any changes to this layer’s `textHaloWidth` property.
 
- This property corresponds to the background-color-transition property in the style JSON file format.
+ This property corresponds to the `text-halo-width-transition` property in the style JSON file format.
 */
 @property (nonatomic) MGLTransition textHaloWidthTransition;
 
@@ -1751,7 +1751,7 @@ MGL_EXPORT
 /**
  The transition affecting any changes to this layer’s `textOpacity` property.
 
- This property corresponds to the background-color-transition property in the style JSON file format.
+ This property corresponds to the `text-opacity-transition` property in the style JSON file format.
 */
 @property (nonatomic) MGLTransition textOpacityTransition;
 
@@ -1808,9 +1808,9 @@ MGL_EXPORT
 #endif
 
 /**
- The transition affecting any changes to this layer’s `textTranslate` property.
+ The transition affecting any changes to this layer’s `textTranslation` property.
 
- This property corresponds to the background-color-transition property in the style JSON file format.
+ This property corresponds to the `text-translate-transition` property in the style JSON file format.
 */
 @property (nonatomic) MGLTransition textTranslationTransition;
 
@@ -1837,7 +1837,6 @@ MGL_EXPORT
  `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *textTranslationAnchor;
-
 
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *textTranslateAnchor __attribute__((unavailable("Use textTranslationAnchor instead.")));
 

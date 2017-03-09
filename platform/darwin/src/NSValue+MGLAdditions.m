@@ -46,4 +46,16 @@
     return progress;
 }
 
+#pragma mark Working with Transition Values
+
++ (NSValue *)valueWithMGLTransition:(MGLTransition)transition; {
+    return [NSValue value:&transition withObjCType:@encode(MGLTransition)];
+}
+
+- (MGLTransition)MGLTransitionValue {
+    MGLTransition transition;
+    [self getValue:&transition];
+    return transition;
+}
+
 @end

@@ -24,7 +24,7 @@
     XCTAssertTrue(layer.rawLayer->is<mbgl::style::BackgroundLayer>());
     auto rawLayer = layer.rawLayer->as<mbgl::style::BackgroundLayer>();
 
-    MGLTransition transitionTest = {.delay = 4, .duration = 5};
+    MGLTransition transitionTest = MGLTransitionMake(5, 4);
 
 
     // background-color
@@ -66,12 +66,9 @@
         XCTAssertThrowsSpecificNamed(layer.backgroundColor = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
         // Transition property test
         layer.backgroundColorTransition = transitionTest;
-        MGLTransition options;
         auto toptions = rawLayer->getBackgroundColorTransition();
-        options.delay = MGLTimeIntervalFromDuration(toptions.delay.value_or(mbgl::Duration::zero()));
-        options.duration = MGLTimeIntervalFromDuration(toptions.duration.value_or(mbgl::Duration::zero()));
-        XCTAssertEqual(options.delay, transitionTest.delay);
-        XCTAssertEqual(options.duration, transitionTest.duration);
+        XCTAssert(toptions.delay && MGLTimeIntervalFromDuration(*toptions.delay) == transitionTest.delay);
+        XCTAssert(toptions.duration && MGLTimeIntervalFromDuration(*toptions.duration) == transitionTest.duration);
 
         MGLTransition backgroundColorTransition = layer.backgroundColorTransition;
         XCTAssertEqual(backgroundColorTransition.delay, transitionTest.delay);
@@ -117,12 +114,9 @@
         XCTAssertThrowsSpecificNamed(layer.backgroundOpacity = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
         // Transition property test
         layer.backgroundOpacityTransition = transitionTest;
-        MGLTransition options;
         auto toptions = rawLayer->getBackgroundOpacityTransition();
-        options.delay = MGLTimeIntervalFromDuration(toptions.delay.value_or(mbgl::Duration::zero()));
-        options.duration = MGLTimeIntervalFromDuration(toptions.duration.value_or(mbgl::Duration::zero()));
-        XCTAssertEqual(options.delay, transitionTest.delay);
-        XCTAssertEqual(options.duration, transitionTest.duration);
+        XCTAssert(toptions.delay && MGLTimeIntervalFromDuration(*toptions.delay) == transitionTest.delay);
+        XCTAssert(toptions.duration && MGLTimeIntervalFromDuration(*toptions.duration) == transitionTest.duration);
 
         MGLTransition backgroundOpacityTransition = layer.backgroundOpacityTransition;
         XCTAssertEqual(backgroundOpacityTransition.delay, transitionTest.delay);
@@ -168,12 +162,9 @@
         XCTAssertThrowsSpecificNamed(layer.backgroundPattern = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
         // Transition property test
         layer.backgroundPatternTransition = transitionTest;
-        MGLTransition options;
         auto toptions = rawLayer->getBackgroundPatternTransition();
-        options.delay = MGLTimeIntervalFromDuration(toptions.delay.value_or(mbgl::Duration::zero()));
-        options.duration = MGLTimeIntervalFromDuration(toptions.duration.value_or(mbgl::Duration::zero()));
-        XCTAssertEqual(options.delay, transitionTest.delay);
-        XCTAssertEqual(options.duration, transitionTest.duration);
+        XCTAssert(toptions.delay && MGLTimeIntervalFromDuration(*toptions.delay) == transitionTest.delay);
+        XCTAssert(toptions.duration && MGLTimeIntervalFromDuration(*toptions.duration) == transitionTest.duration);
 
         MGLTransition backgroundPatternTransition = layer.backgroundPatternTransition;
         XCTAssertEqual(backgroundPatternTransition.delay, transitionTest.delay);

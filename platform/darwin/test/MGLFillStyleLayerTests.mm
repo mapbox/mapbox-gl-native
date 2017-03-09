@@ -45,7 +45,7 @@
     XCTAssertTrue(layer.rawLayer->is<mbgl::style::FillLayer>());
     auto rawLayer = layer.rawLayer->as<mbgl::style::FillLayer>();
 
-    MGLTransition transitionTest = {.delay = 4, .duration = 5};
+    MGLTransition transitionTest = MGLTransitionMake(5, 4);
 
 
     // fill-antialias
@@ -144,12 +144,9 @@
                               @"fillColor should return the default value after being unset.");
         // Transition property test
         layer.fillColorTransition = transitionTest;
-        MGLTransition options;
         auto toptions = rawLayer->getFillColorTransition();
-        options.delay = MGLTimeIntervalFromDuration(toptions.delay.value_or(mbgl::Duration::zero()));
-        options.duration = MGLTimeIntervalFromDuration(toptions.duration.value_or(mbgl::Duration::zero()));
-        XCTAssertEqual(options.delay, transitionTest.delay);
-        XCTAssertEqual(options.duration, transitionTest.duration);
+        XCTAssert(toptions.delay && MGLTimeIntervalFromDuration(*toptions.delay) == transitionTest.delay);
+        XCTAssert(toptions.duration && MGLTimeIntervalFromDuration(*toptions.duration) == transitionTest.duration);
 
         MGLTransition fillColorTransition = layer.fillColorTransition;
         XCTAssertEqual(fillColorTransition.delay, transitionTest.delay);
@@ -213,12 +210,9 @@
                               @"fillOpacity should return the default value after being unset.");
         // Transition property test
         layer.fillOpacityTransition = transitionTest;
-        MGLTransition options;
         auto toptions = rawLayer->getFillOpacityTransition();
-        options.delay = MGLTimeIntervalFromDuration(toptions.delay.value_or(mbgl::Duration::zero()));
-        options.duration = MGLTimeIntervalFromDuration(toptions.duration.value_or(mbgl::Duration::zero()));
-        XCTAssertEqual(options.delay, transitionTest.delay);
-        XCTAssertEqual(options.duration, transitionTest.duration);
+        XCTAssert(toptions.delay && MGLTimeIntervalFromDuration(*toptions.delay) == transitionTest.delay);
+        XCTAssert(toptions.duration && MGLTimeIntervalFromDuration(*toptions.duration) == transitionTest.duration);
 
         MGLTransition fillOpacityTransition = layer.fillOpacityTransition;
         XCTAssertEqual(fillOpacityTransition.delay, transitionTest.delay);
@@ -282,12 +276,9 @@
                               @"fillOutlineColor should return the default value after being unset.");
         // Transition property test
         layer.fillOutlineColorTransition = transitionTest;
-        MGLTransition options;
         auto toptions = rawLayer->getFillOutlineColorTransition();
-        options.delay = MGLTimeIntervalFromDuration(toptions.delay.value_or(mbgl::Duration::zero()));
-        options.duration = MGLTimeIntervalFromDuration(toptions.duration.value_or(mbgl::Duration::zero()));
-        XCTAssertEqual(options.delay, transitionTest.delay);
-        XCTAssertEqual(options.duration, transitionTest.duration);
+        XCTAssert(toptions.delay && MGLTimeIntervalFromDuration(*toptions.delay) == transitionTest.delay);
+        XCTAssert(toptions.duration && MGLTimeIntervalFromDuration(*toptions.duration) == transitionTest.duration);
 
         MGLTransition fillOutlineColorTransition = layer.fillOutlineColorTransition;
         XCTAssertEqual(fillOutlineColorTransition.delay, transitionTest.delay);
@@ -333,12 +324,9 @@
         XCTAssertThrowsSpecificNamed(layer.fillPattern = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
         // Transition property test
         layer.fillPatternTransition = transitionTest;
-        MGLTransition options;
         auto toptions = rawLayer->getFillPatternTransition();
-        options.delay = MGLTimeIntervalFromDuration(toptions.delay.value_or(mbgl::Duration::zero()));
-        options.duration = MGLTimeIntervalFromDuration(toptions.duration.value_or(mbgl::Duration::zero()));
-        XCTAssertEqual(options.delay, transitionTest.delay);
-        XCTAssertEqual(options.duration, transitionTest.duration);
+        XCTAssert(toptions.delay && MGLTimeIntervalFromDuration(*toptions.delay) == transitionTest.delay);
+        XCTAssert(toptions.duration && MGLTimeIntervalFromDuration(*toptions.duration) == transitionTest.duration);
 
         MGLTransition fillPatternTransition = layer.fillPatternTransition;
         XCTAssertEqual(fillPatternTransition.delay, transitionTest.delay);

@@ -73,7 +73,6 @@ MGL_EXPORT
  */
 @property (nonatomic, null_resettable, getter=isFillAntialiased) MGLStyleValue<NSNumber *> *fillAntialiased;
 
-
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *fillAntialias __attribute__((unavailable("Use fillAntialiased instead.")));
 
 #if TARGET_OS_IPHONE
@@ -137,7 +136,7 @@ MGL_EXPORT
 /**
  The transition affecting any changes to this layer’s `fillColor` property.
 
- This property corresponds to the background-color-transition property in the style JSON file format.
+ This property corresponds to the `fill-color-transition` property in the style JSON file format.
 */
 @property (nonatomic) MGLTransition fillColorTransition;
 
@@ -170,7 +169,7 @@ MGL_EXPORT
 /**
  The transition affecting any changes to this layer’s `fillOpacity` property.
 
- This property corresponds to the background-color-transition property in the style JSON file format.
+ This property corresponds to the `fill-opacity-transition` property in the style JSON file format.
 */
 @property (nonatomic) MGLTransition fillOpacityTransition;
 
@@ -229,7 +228,7 @@ MGL_EXPORT
 /**
  The transition affecting any changes to this layer’s `fillOutlineColor` property.
 
- This property corresponds to the background-color-transition property in the style JSON file format.
+ This property corresponds to the `fill-outline-color-transition` property in the style JSON file format.
 */
 @property (nonatomic) MGLTransition fillOutlineColorTransition;
 
@@ -248,7 +247,7 @@ MGL_EXPORT
 /**
  The transition affecting any changes to this layer’s `fillPattern` property.
 
- This property corresponds to the background-color-transition property in the style JSON file format.
+ This property corresponds to the `fill-pattern-transition` property in the style JSON file format.
 */
 @property (nonatomic) MGLTransition fillPatternTransition;
 
@@ -299,9 +298,9 @@ MGL_EXPORT
 #endif
 
 /**
- The transition affecting any changes to this layer’s `fillTranslate` property.
+ The transition affecting any changes to this layer’s `fillTranslation` property.
 
- This property corresponds to the background-color-transition property in the style JSON file format.
+ This property corresponds to the `fill-translate-transition` property in the style JSON file format.
 */
 @property (nonatomic) MGLTransition fillTranslationTransition;
 
@@ -328,7 +327,6 @@ MGL_EXPORT
  `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *fillTranslationAnchor;
-
 
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *fillTranslateAnchor __attribute__((unavailable("Use fillTranslationAnchor instead.")));
 

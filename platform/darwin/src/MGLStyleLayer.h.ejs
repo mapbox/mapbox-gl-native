@@ -113,13 +113,13 @@ MGL_EXPORT
 
 <% if (property["transition"]) { -%>
 /**
- The transition affecting any changes to this layer’s `<%- camelizeWithLeadingLowercase(originalPropertyName(property)) %>` property.
+ The transition affecting any changes to this layer’s `<%- camelizeWithLeadingLowercase(property.name) %>` property.
 
- This property corresponds to the background-color-transition property in the style JSON file format.
+ This property corresponds to the `<%- originalPropertyName(property) %>-transition` property in the style JSON file format.
 */
 @property (nonatomic) MGLTransition <%- camelizeWithLeadingLowercase(property.name) %>Transition;
-<% } -%>
 
+<% } -%>
 <% if (property.original) { -%>
 @property (nonatomic<% if (!property.required) { %>, null_resettable<% } %>) MGLStyleValue<<%- propertyType(property, true) %>> *<%- camelizeWithLeadingLowercase(originalPropertyName(property)) %> __attribute__((unavailable("Use <%- camelizeWithLeadingLowercase(property.name) %> instead.")));
 

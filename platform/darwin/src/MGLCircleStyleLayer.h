@@ -110,7 +110,7 @@ MGL_EXPORT
 /**
  The transition affecting any changes to this layer’s `circleBlur` property.
 
- This property corresponds to the background-color-transition property in the style JSON file format.
+ This property corresponds to the `circle-blur-transition` property in the style JSON file format.
 */
 @property (nonatomic) MGLTransition circleBlurTransition;
 
@@ -169,7 +169,7 @@ MGL_EXPORT
 /**
  The transition affecting any changes to this layer’s `circleColor` property.
 
- This property corresponds to the background-color-transition property in the style JSON file format.
+ This property corresponds to the `circle-color-transition` property in the style JSON file format.
 */
 @property (nonatomic) MGLTransition circleColorTransition;
 
@@ -201,7 +201,7 @@ MGL_EXPORT
 /**
  The transition affecting any changes to this layer’s `circleOpacity` property.
 
- This property corresponds to the background-color-transition property in the style JSON file format.
+ This property corresponds to the `circle-opacity-transition` property in the style JSON file format.
 */
 @property (nonatomic) MGLTransition circleOpacityTransition;
 
@@ -235,7 +235,7 @@ MGL_EXPORT
 /**
  The transition affecting any changes to this layer’s `circleRadius` property.
 
- This property corresponds to the background-color-transition property in the style JSON file format.
+ This property corresponds to the `circle-radius-transition` property in the style JSON file format.
 */
 @property (nonatomic) MGLTransition circleRadiusTransition;
 
@@ -257,7 +257,6 @@ MGL_EXPORT
  `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *circleScaleAlignment;
-
 
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *circlePitchScale __attribute__((unavailable("Use circleScaleAlignment instead.")));
 
@@ -316,7 +315,7 @@ MGL_EXPORT
 /**
  The transition affecting any changes to this layer’s `circleStrokeColor` property.
 
- This property corresponds to the background-color-transition property in the style JSON file format.
+ This property corresponds to the `circle-stroke-color-transition` property in the style JSON file format.
 */
 @property (nonatomic) MGLTransition circleStrokeColorTransition;
 
@@ -348,7 +347,7 @@ MGL_EXPORT
 /**
  The transition affecting any changes to this layer’s `circleStrokeOpacity` property.
 
- This property corresponds to the background-color-transition property in the style JSON file format.
+ This property corresponds to the `circle-stroke-opacity-transition` property in the style JSON file format.
 */
 @property (nonatomic) MGLTransition circleStrokeOpacityTransition;
 
@@ -383,7 +382,7 @@ MGL_EXPORT
 /**
  The transition affecting any changes to this layer’s `circleStrokeWidth` property.
 
- This property corresponds to the background-color-transition property in the style JSON file format.
+ This property corresponds to the `circle-stroke-width-transition` property in the style JSON file format.
 */
 @property (nonatomic) MGLTransition circleStrokeWidthTransition;
 
@@ -434,9 +433,9 @@ MGL_EXPORT
 #endif
 
 /**
- The transition affecting any changes to this layer’s `circleTranslate` property.
+ The transition affecting any changes to this layer’s `circleTranslation` property.
 
- This property corresponds to the background-color-transition property in the style JSON file format.
+ This property corresponds to the `circle-translate-transition` property in the style JSON file format.
 */
 @property (nonatomic) MGLTransition circleTranslationTransition;
 
@@ -463,7 +462,6 @@ MGL_EXPORT
  `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *circleTranslationAnchor;
-
 
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *circleTranslateAnchor __attribute__((unavailable("Use circleTranslationAnchor instead.")));
 
