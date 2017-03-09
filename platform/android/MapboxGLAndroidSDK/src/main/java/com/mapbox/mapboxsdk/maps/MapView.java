@@ -521,13 +521,15 @@ public class MapView extends FrameLayout {
   @CallSuper
   protected void onDetachedFromWindow() {
     super.onDetachedFromWindow();
-    mapZoomButtonController.setVisible(false);
+    if (mapZoomButtonController != null) {
+      mapZoomButtonController.setVisible(false);
+    }
   }
 
   // Called when view is hidden and shown
   @Override
   protected void onVisibilityChanged(@NonNull View changedView, int visibility) {
-    if (isInEditMode()) {
+    if (isInEditMode() || mapZoomButtonController == null) {
       return;
     }
     mapZoomButtonController.setVisible(visibility == View.VISIBLE);
