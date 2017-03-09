@@ -11,26 +11,26 @@ namespace mbgl {
 template <typename T>
 class Enum {
 public:
-    using Value = std::pair<const T, const char *>;
-
-    static const char * toString(T t) {
-        auto it = std::find_if(begin, end, [&] (const auto& v) { return t == v.first; });
-        assert(it != end); return it->second;
-    }
-
-    static optional<T> toEnum(const std::string& s) {
-        auto it = std::find_if(begin, end, [&] (const auto& v) { return s == v.second; });
-        return it == end ? optional<T>() : it->first;
-    }
-
-private:
-    static const Value* begin;
-    static const Value* end;
+    static const char * toString(T);
+    static optional<T> toEnum(const std::string&);
 };
 
-#define MBGL_DEFINE_ENUM(type, strings...) \
-const constexpr Enum<type>::Value type##_names[] = strings; \
-template <> const Enum<type>::Value* Enum<type>::begin = std::begin(type##_names); \
-template <> const Enum<type>::Value* Enum<type>::end = std::end(type##_names)
+#define MBGL_DEFINE_ENUM(T, values...)                                          \
+                                                                                \
+static const constexpr std::pair<const T, const char *> T##_names[] = values;   \
+                                                                                \
+template <>                                                                     \
+const char * Enum<T>::toString(T t) {                                           \
+    auto it = std::find_if(std::begin(T##_names), std::end(T##_names),          \
+        [&] (const auto& v) { return t == v.first; });                          \
+    assert(it != std::end(T##_names)); return it->second;                       \
+}                                                                               \
+                                                                                \
+template <>                                                                     \
+optional<T> Enum<T>::toEnum(const std::string& s) {                             \
+    auto it = std::find_if(std::begin(T##_names), std::end(T##_names),          \
+        [&] (const auto& v) { return s == v.second; });                         \
+    return it == std::end(T##_names) ? optional<T>() : it->first;               \
+}
 
 } // namespace mbgl
