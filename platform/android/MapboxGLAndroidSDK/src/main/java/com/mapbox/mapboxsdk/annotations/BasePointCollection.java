@@ -8,12 +8,12 @@ import java.util.List;
 /**
  * Multipoint is an abstract annotation for combining geographical locations.
  */
-public abstract class MultiPoint extends Annotation {
+public abstract class BasePointCollection extends Annotation {
 
   private List<LatLng> points;
   private float alpha = 1.0f;
 
-  protected MultiPoint() {
+  protected BasePointCollection() {
     super();
     points = new ArrayList<>();
   }
@@ -58,7 +58,7 @@ public abstract class MultiPoint extends Annotation {
   }
 
   /**
-   * Set this {@link MultiPoint}s alpha.
+   * Set this {@link BasePointCollection}s alpha.
    *
    * @param alpha float value between 0 and 1.
    */

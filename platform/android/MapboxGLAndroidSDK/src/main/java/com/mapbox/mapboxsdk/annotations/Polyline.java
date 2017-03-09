@@ -7,7 +7,7 @@ import com.mapbox.mapboxsdk.maps.MapboxMap;
 /**
  * Polyline is a geometry feature with an unclosed list of coordinates drawn as a line
  */
-public final class Polyline extends MultiPoint {
+public final class Polyline extends BasePointCollection {
 
   private int color = Color.BLACK; // default color is black
   private float width = 10; // As specified by Google API Docs (in pixels)
