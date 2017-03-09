@@ -368,9 +368,13 @@ set(MBGL_CORE_FILES
     src/mbgl/style/layers/symbol_layer_properties.hpp
 
     # style/sources
+    include/mbgl/style/sources/custom_vector_source.hpp
     include/mbgl/style/sources/geojson_source.hpp
     include/mbgl/style/sources/raster_source.hpp
     include/mbgl/style/sources/vector_source.hpp
+    src/mbgl/style/sources/custom_vector_source.cpp
+    src/mbgl/style/sources/custom_vector_source_impl.cpp
+    src/mbgl/style/sources/custom_vector_source_impl.hpp
     src/mbgl/style/sources/geojson_source.cpp
     src/mbgl/style/sources/geojson_source_impl.cpp
     src/mbgl/style/sources/geojson_source_impl.hpp
@@ -425,6 +429,7 @@ set(MBGL_CORE_FILES
     src/mbgl/tile/tile_cache.cpp
     src/mbgl/tile/tile_cache.hpp
     src/mbgl/tile/tile_id.hpp
+    src/mbgl/tile/tile_id_hash.hpp
     src/mbgl/tile/tile_id_io.cpp
     src/mbgl/tile/tile_loader.hpp
     src/mbgl/tile/tile_loader_impl.hpp
