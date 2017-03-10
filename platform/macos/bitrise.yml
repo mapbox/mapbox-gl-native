@@ -12,33 +12,16 @@ workflows:
   primary:
     steps:
     - script:
-        title: Install Dependencies
+        title: Build
         inputs:
         - content: |-
             #!/bin/bash
             set -eu -o pipefail
             brew install cmake
             gem install xcpretty --no-rdoc --no-ri
-        - is_debug: 'yes'
-    - script:
-        title: Generate Workspace
-        inputs:
-        - content: |-
-            #!/bin/bash
-            set -eu -o pipefail
-            export BUILDTYPE=Debug
-            make xproj
-        - is_debug: 'yes'
-    - script:
-        title: Run Core and SDK Unit Tests
-        inputs:
-        - content: |-
-            #!/bin/bash
-            set -eu -o pipefail
             export BUILDTYPE=Debug
             export XCPRETTY="| tee ${BITRISE_DEPLOY_DIR}/raw-xcodebuild-output.txt | xcpretty --color --report html --output ${BITRISE_DEPLOY_DIR}/xcode-test-results.html"
             make run-test
-        - is_debug: 'yes'
     - deploy-to-bitrise-io:
         title: Deploy to Bitrise.io
         inputs:
@@ -65,28 +48,13 @@ workflows:
   nightly-release:
     steps:
     - script:
-        title: Install Dependencies
+        title: Build
         inputs:
         - content: |-
             #!/bin/bash
             set -eu -o pipefail
             brew install cmake
-        - is_debug: 'yes'
-    - script:
-        title: Configure AWS-CLI
-        inputs:
-        - content: |-
-            #!/bin/bash
             apt-get install -y python-pip python-dev build-essential
             pip install awscli
-    - script:
-        title: Build package
-        inputs:
-        - content: |-
-            #!/bin/bash
-            set -eu -o pipefail
-            export BUILDTYPE=Release
-            export SYMBOLS=NO
-            make xpackage
+            BUILDTYPE=Release SYMBOLS=NO make xpackage
             CLOUDWATCH=true platform/macos/scripts/metrics.sh
-        - is_debug: 'yes'
