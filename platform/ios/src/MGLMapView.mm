@@ -1527,7 +1527,7 @@ public:
         if (view.centerOffset.dx != 0 || view.centerOffset.dy != 0) {
             if (CGRectContainsPoint(view.frame, tapPoint)) {
                 if (!view.annotation) {
-                    [NSException raise:@"MGLInvalidAnnotationException"
+                    [NSException raise:NSInvalidArgumentException
                                 format:@"Annotation view's annotation property should not be nil."];
                 }
                 

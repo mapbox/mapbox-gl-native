@@ -240,7 +240,7 @@
     else if (dragState == MGLAnnotationViewDragStateCanceling)
     {
         if (!self.annotation) {
-            [NSException raise:@"MGLInvalidAnnotationException"
+            [NSException raise:NSInvalidArgumentException
                         format:@"Annotation property should not be nil."];
         }
         self.panGestureRecognizer.enabled = NO;
