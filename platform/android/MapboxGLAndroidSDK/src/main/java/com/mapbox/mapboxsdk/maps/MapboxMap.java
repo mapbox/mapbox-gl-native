@@ -881,35 +881,80 @@ public final class MapboxMap {
 
   /**
    * <p>
-   * Loads a new map style from the specified URL.
+   * Loads a new map style asynchronous from the specified URL.
    * </p>
    * {@code url} can take the following forms:
    * <ul>
    * <li>{@code Style.*}: load one of the bundled styles in {@link Style}.</li>
    * <li>{@code mapbox://styles/<user>/<style>}:
-   * retrieves the style from a <a href="https://www.mapbox.com/account/">Mapbox account.</a>
+   * loads the style from a <a href="https://www.mapbox.com/account/">Mapbox account.</a>
    * {@code user} is your username. {@code style} is the ID of your custom
    * style created in <a href="https://www.mapbox.com/studio">Mapbox Studio</a>.</li>
    * <li>{@code http://...} or {@code https://...}:
-   * retrieves the style over the Internet from any web server.</li>
+   * loads the style over the Internet from any web server.</li>
    * <li>{@code asset://...}:
-   * reads the style from the APK {@code assets/} directory.
+   * loads the style from the APK {@code assets/} directory.
    * This is used to load a style bundled with your app.</li>
    * <li>{@code null}: loads the default {@link Style#MAPBOX_STREETS} style.</li>
    * </ul>
    * <p>
-   * This method is asynchronous and will return immediately before the style finishes loading.
-   * If you wish to wait for the map to finish loading listen for the {@link MapView#DID_FINISH_LOADING_MAP} event.
+   * This method is asynchronous and will return before the style finishes loading.
+   * If you wish to wait for the map to finish loading, listen for the {@link MapView#DID_FINISH_LOADING_MAP} event
+   * or use the {@link #setStyleUrl(String, OnStyleLoadedListener)} method instead.
    * </p>
    * If the style fails to load or an invalid style URL is set, the map view will become blank.
    * An error message will be logged in the Android logcat and {@link MapView#DID_FAIL_LOADING_MAP} event will be
-   * sent.
+   * emitted.
    *
    * @param url The URL of the map style
    * @see Style
    */
   @UiThread
   public void setStyleUrl(@NonNull String url) {
+    setStyleUrl(url, null);
+  }
+
+  /**
+   * <p>
+   * Loads a new map style asynchronous from the specified URL.
+   * </p>
+   * {@code url} can take the following forms:
+   * <ul>
+   * <li>{@code Style.*}: load one of the bundled styles in {@link Style}.</li>
+   * <li>{@code mapbox://styles/<user>/<style>}:
+   * loads the style from a <a href="https://www.mapbox.com/account/">Mapbox account.</a>
+   * {@code user} is your username. {@code style} is the ID of your custom
+   * style created in <a href="https://www.mapbox.com/studio">Mapbox Studio</a>.</li>
+   * <li>{@code http://...} or {@code https://...}:
+   * loads the style over the Internet from any web server.</li>
+   * <li>{@code asset://...}:
+   * loads the style from the APK {@code assets/} directory.
+   * This is used to load a style bundled with your app.</li>
+   * <li>{@code null}: loads the default {@link Style#MAPBOX_STREETS} style.</li>
+   * </ul>
+   * <p>
+   * If the style fails to load or an invalid style URL is set, the map view will become blank.
+   * An error message will be logged in the Android logcat and {@link MapView#DID_FAIL_LOADING_MAP} event will be
+   * emitted.
+   * <p>
+   *
+   * @param url      The URL of the map style
+   * @param callback The callback that is invoked when the style has loaded.
+   * @see Style
+   */
+  @UiThread
+  public void setStyleUrl(@NonNull final String url, @Nullable final OnStyleLoadedListener callback) {
+    if (callback != null) {
+      nativeMapView.addOnMapChangedListener(new MapView.OnMapChangedListener() {
+        @Override
+        public void onMapChanged(@MapView.MapChange int change) {
+          if (change == MapView.DID_FINISH_LOADING_STYLE) {
+            callback.onStyleLoaded(url);
+            nativeMapView.removeOnMapChangedListener(this);
+          }
+        }
+      });
+    }
     nativeMapView.setStyleUrl(url);
   }
 
@@ -918,8 +963,9 @@ public final class MapboxMap {
    * Loads a new map style from the specified bundled style.
    * </p>
    * <p>
-   * This method is asynchronous and will return immediately before the style finishes loading.
-   * If you wish to wait for the map to finish loading listen for the {@link MapView#DID_FINISH_LOADING_MAP} event.
+   * This method is asynchronous and will return before the style finishes loading.
+   * If you wish to wait for the map to finish loading, listen for the {@link MapView#DID_FINISH_LOADING_MAP} event
+   * or use the {@link #setStyle(String, OnStyleLoadedListener)} method instead.
    * </p>
    * If the style fails to load or an invalid style URL is set, the map view will become blank.
    * An error message will be logged in the Android logcat and {@link MapView#DID_FAIL_LOADING_MAP} event will be
@@ -927,11 +973,26 @@ public final class MapboxMap {
    *
    * @param style The bundled style. Accepts one of the values from {@link Style}.
    * @see Style
-   * @deprecated use {@link #setStyleUrl(String)} instead with versioned url methods from {@link Style}
    */
   @UiThread
   public void setStyle(@Style.StyleUrl String style) {
     setStyleUrl(style);
+  }
+
+  /**
+   * <p>
+   * Loads a new map style from the specified bundled style.
+   * </p>
+   * If the style fails to load or an invalid style URL is set, the map view will become blank.
+   * An error message will be logged in the Android logcat and {@link MapView#DID_FAIL_LOADING_MAP} event will be
+   * sent.
+   *
+   * @param style The bundled style. Accepts one of the values from {@link Style}.
+   * @see Style
+   */
+  @UiThread
+  public void setStyle(@Style.StyleUrl String style, @Nullable OnStyleLoadedListener callback) {
+    setStyleUrl(style, callback);
   }
 
   /**
@@ -942,20 +1003,17 @@ public final class MapboxMap {
   private void setStyleUrl(@NonNull MapboxMapOptions options) {
     String style = options.getStyle();
     if (!TextUtils.isEmpty(style)) {
-      setStyleUrl(style);
+      setStyleUrl(style, null);
     }
   }
 
   /**
-   * <p>
    * Returns the map style currently displayed in the map view.
-   * </p>
-   * If the default style is currently displayed, a URL will be returned instead of null.
    *
    * @return The URL of the map style.
    */
   @UiThread
-  @NonNull
+  @Nullable
   public String getStyleUrl() {
     return nativeMapView.getStyleUrl();
   }
@@ -2102,6 +2160,16 @@ public final class MapboxMap {
      * @param snapshot the snapshot bitmap
      */
     void onSnapshotReady(Bitmap snapshot);
+  }
+
+  /**
+   * Interface definintion for a callback to be invoked when the style has finished loading.
+   */
+  public interface OnStyleLoadedListener {
+    /**
+     * Invoked when the style has finished loading.
+     */
+    void onStyleLoaded(String style);
   }
 
   //

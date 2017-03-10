@@ -70,7 +70,12 @@ public class DebugModeActivity extends AppCompatActivity {
           if (currentStyleIndex == STYLES.length) {
             currentStyleIndex = 0;
           }
-          mapboxMap.setStyleUrl(STYLES[currentStyleIndex]);
+          mapboxMap.setStyleUrl(STYLES[currentStyleIndex], new MapboxMap.OnStyleLoadedListener() {
+            @Override
+            public void onStyleLoaded(String style) {
+              Timber.d("Style loaded %s", style);
+            }
+          });
         }
       }
     });
