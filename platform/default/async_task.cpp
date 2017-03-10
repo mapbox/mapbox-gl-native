@@ -7,12 +7,6 @@
 
 #include <uv.h>
 
-#if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
-#define UV_ASYNC_PARAMS(handle) uv_async_t *handle, int
-#else
-#define UV_ASYNC_PARAMS(handle) uv_async_t *handle
-#endif
-
 namespace mbgl {
 namespace util {
 
@@ -45,7 +39,7 @@ public:
     }
 
 private:
-    static void asyncCallback(UV_ASYNC_PARAMS(handle)) {
+    static void asyncCallback(uv_async_t* handle) {
         reinterpret_cast<Impl*>(handle->data)->task();
     }
 

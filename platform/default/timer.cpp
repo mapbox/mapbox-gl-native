@@ -4,12 +4,6 @@
 
 #include <uv.h>
 
-#if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
-#define UV_TIMER_PARAMS(timer) uv_timer_t *timer, int
-#else
-#define UV_TIMER_PARAMS(timer) uv_timer_t *timer
-#endif
-
 namespace mbgl {
 namespace util {
 
@@ -46,7 +40,7 @@ public:
     }
 
 private:
-    static void timerCallback(UV_TIMER_PARAMS(handle)) {
+    static void timerCallback(uv_timer_t* handle) {
         reinterpret_cast<Impl*>(handle->data)->cb();
     }
 
