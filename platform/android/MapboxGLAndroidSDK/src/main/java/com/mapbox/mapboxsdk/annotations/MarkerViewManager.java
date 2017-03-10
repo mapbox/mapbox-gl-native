@@ -503,6 +503,21 @@ public class MarkerViewManager implements MapView.OnMapChangedListener {
                 }
               }
 
+              adaptedView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(final View v) {
+                  boolean clickHandled = false;
+                  if (onMarkerViewClickListener != null) {
+                    clickHandled = onMarkerViewClickListener.onMarkerClick(marker, v, adapter);
+                  }
+
+                  if (!clickHandled) {
+                    ensureInfoWindowOffset(marker);
+                    select(marker, v, adapter);
+                  }
+                }
+              });
+
               marker.setMapboxMap(mapboxMap);
               markerViewMap.put(marker, adaptedView);
               if (convertView == null) {
@@ -528,34 +543,6 @@ public class MarkerViewManager implements MapView.OnMapChangedListener {
     // trigger update to make newly added ViewMarker visible,
     // these would only be updated when the map is moved.
     updateMarkerViewsPosition();
-  }
-
-  /**
-   * When the provided {@link MarkerView} is clicked on by a user, we check if a custom click
-   * event has been created and if not, display a {@link InfoWindow}.
-   *
-   * @param markerView that the click event occurred.
-   */
-  public boolean onClickMarkerView(MarkerView markerView) {
-    boolean clickHandled = false;
-
-    MapboxMap.MarkerViewAdapter adapter = getViewAdapter(markerView);
-    View view = getView(markerView);
-    if (adapter == null || view == null) {
-      // not a valid state
-      return true;
-    }
-
-    if (onMarkerViewClickListener != null) {
-      clickHandled = onMarkerViewClickListener.onMarkerClick(markerView, view, adapter);
-    }
-
-    if (!clickHandled) {
-      ensureInfoWindowOffset(markerView);
-      select(markerView, view, adapter);
-    }
-
-    return clickHandled;
   }
 
   /**
