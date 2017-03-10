@@ -172,17 +172,17 @@ then use the `-[MGLShapeSource initWithIdentifier:shape:options:]` method.
 # Style functions and interpolation mode
 
 The runtime styling API introduced `MGLStyleFunction` to the iOS SDK.
-Data-driven styling expands `MGLStyleFunction`. 
+Data-driven styling expands `MGLStyleFunction`.
 
-In style JSON     | In the SDK
-------------------|-----------
-`type`            | `MGLInterpolationMode`
-`exponential`     | `MGLInterpolationModeExponential`
-`interval`        | `MGLInterpolationModeInterval`
-`categorical`     | `MGLInterpolationModeCategorical`
-`identity`        | `MGLInterpolationModeIdentity`
-`zoom function`   | `MGLCameraStyleFunction`
-`property function`| `MGLSourceStyleFunction`
+In style JSON                | In the SDK
+-----------------------------|-----------
+`type`                       | `MGLInterpolationMode`
+`exponential`                | `MGLInterpolationModeExponential`
+`interval`                   | `MGLInterpolationModeInterval`
+`categorical`                | `MGLInterpolationModeCategorical`
+`identity`                   | `MGLInterpolationModeIdentity`
+`zoom function`              | `MGLCameraStyleFunction`
+`property function`          | `MGLSourceStyleFunction`
 `zoom-and-property functions`| `MGLCompositeStyleFunction`
 
 ## Configuring the map content’s appearance
