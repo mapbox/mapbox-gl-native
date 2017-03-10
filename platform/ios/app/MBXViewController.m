@@ -915,8 +915,8 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
 
 - (void)styleBuildingLayer
 {
-    self.mapView.style.transitionDuration = 5;
-    self.mapView.style.transitionDelay = 1;
+    MGLTransition transition =  { 5,  1 };
+    self.mapView.style.transition = transition;
     MGLFillStyleLayer *buildingLayer = (MGLFillStyleLayer *)[self.mapView.style layerWithIdentifier:@"building"];
     buildingLayer.fillColor = [MGLStyleValue<UIColor *> valueWithRawValue:[UIColor purpleColor]];
 }

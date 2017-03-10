@@ -2,10 +2,12 @@
 // Edit platform/darwin/scripts/generate-style-code.js, then run `make darwin-style-code`.
 
 #import "MGLStyleLayerTests.h"
+#import "../../darwin/src/NSDate+MGLAdditions.h"
 
 #import "MGLStyleLayer_Private.h"
 
 #include <mbgl/style/layers/circle_layer.hpp>
+#include <mbgl/style/transition_options.hpp>
 
 @interface MGLCircleLayerTests : MGLStyleLayerTests
 @end
@@ -42,6 +44,9 @@
     XCTAssertNotEqual(layer.rawLayer, nullptr);
     XCTAssertTrue(layer.rawLayer->is<mbgl::style::CircleLayer>());
     auto rawLayer = layer.rawLayer->as<mbgl::style::CircleLayer>();
+
+    MGLTransition transitionTest = MGLTransitionMake(5, 4);
+
 
     // circle-blur
     {
@@ -98,6 +103,15 @@
                       @"Unsetting circleBlur should return circle-blur to the default value.");
         XCTAssertEqualObjects(layer.circleBlur, defaultStyleValue,
                               @"circleBlur should return the default value after being unset.");
+        // Transition property test
+        layer.circleBlurTransition = transitionTest;
+        auto toptions = rawLayer->getCircleBlurTransition();
+        XCTAssert(toptions.delay && MGLTimeIntervalFromDuration(*toptions.delay) == transitionTest.delay);
+        XCTAssert(toptions.duration && MGLTimeIntervalFromDuration(*toptions.duration) == transitionTest.duration);
+
+        MGLTransition circleBlurTransition = layer.circleBlurTransition;
+        XCTAssertEqual(circleBlurTransition.delay, transitionTest.delay);
+        XCTAssertEqual(circleBlurTransition.duration, transitionTest.duration);
     }
 
     // circle-color
@@ -155,6 +169,15 @@
                       @"Unsetting circleColor should return circle-color to the default value.");
         XCTAssertEqualObjects(layer.circleColor, defaultStyleValue,
                               @"circleColor should return the default value after being unset.");
+        // Transition property test
+        layer.circleColorTransition = transitionTest;
+        auto toptions = rawLayer->getCircleColorTransition();
+        XCTAssert(toptions.delay && MGLTimeIntervalFromDuration(*toptions.delay) == transitionTest.delay);
+        XCTAssert(toptions.duration && MGLTimeIntervalFromDuration(*toptions.duration) == transitionTest.duration);
+
+        MGLTransition circleColorTransition = layer.circleColorTransition;
+        XCTAssertEqual(circleColorTransition.delay, transitionTest.delay);
+        XCTAssertEqual(circleColorTransition.duration, transitionTest.duration);
     }
 
     // circle-opacity
@@ -212,6 +235,15 @@
                       @"Unsetting circleOpacity should return circle-opacity to the default value.");
         XCTAssertEqualObjects(layer.circleOpacity, defaultStyleValue,
                               @"circleOpacity should return the default value after being unset.");
+        // Transition property test
+        layer.circleOpacityTransition = transitionTest;
+        auto toptions = rawLayer->getCircleOpacityTransition();
+        XCTAssert(toptions.delay && MGLTimeIntervalFromDuration(*toptions.delay) == transitionTest.delay);
+        XCTAssert(toptions.duration && MGLTimeIntervalFromDuration(*toptions.duration) == transitionTest.duration);
+
+        MGLTransition circleOpacityTransition = layer.circleOpacityTransition;
+        XCTAssertEqual(circleOpacityTransition.delay, transitionTest.delay);
+        XCTAssertEqual(circleOpacityTransition.duration, transitionTest.duration);
     }
 
     // circle-radius
@@ -269,6 +301,15 @@
                       @"Unsetting circleRadius should return circle-radius to the default value.");
         XCTAssertEqualObjects(layer.circleRadius, defaultStyleValue,
                               @"circleRadius should return the default value after being unset.");
+        // Transition property test
+        layer.circleRadiusTransition = transitionTest;
+        auto toptions = rawLayer->getCircleRadiusTransition();
+        XCTAssert(toptions.delay && MGLTimeIntervalFromDuration(*toptions.delay) == transitionTest.delay);
+        XCTAssert(toptions.duration && MGLTimeIntervalFromDuration(*toptions.duration) == transitionTest.duration);
+
+        MGLTransition circleRadiusTransition = layer.circleRadiusTransition;
+        XCTAssertEqual(circleRadiusTransition.delay, transitionTest.delay);
+        XCTAssertEqual(circleRadiusTransition.duration, transitionTest.duration);
     }
 
     // circle-pitch-scale
@@ -365,6 +406,15 @@
                       @"Unsetting circleStrokeColor should return circle-stroke-color to the default value.");
         XCTAssertEqualObjects(layer.circleStrokeColor, defaultStyleValue,
                               @"circleStrokeColor should return the default value after being unset.");
+        // Transition property test
+        layer.circleStrokeColorTransition = transitionTest;
+        auto toptions = rawLayer->getCircleStrokeColorTransition();
+        XCTAssert(toptions.delay && MGLTimeIntervalFromDuration(*toptions.delay) == transitionTest.delay);
+        XCTAssert(toptions.duration && MGLTimeIntervalFromDuration(*toptions.duration) == transitionTest.duration);
+
+        MGLTransition circleStrokeColorTransition = layer.circleStrokeColorTransition;
+        XCTAssertEqual(circleStrokeColorTransition.delay, transitionTest.delay);
+        XCTAssertEqual(circleStrokeColorTransition.duration, transitionTest.duration);
     }
 
     // circle-stroke-opacity
@@ -422,6 +472,15 @@
                       @"Unsetting circleStrokeOpacity should return circle-stroke-opacity to the default value.");
         XCTAssertEqualObjects(layer.circleStrokeOpacity, defaultStyleValue,
                               @"circleStrokeOpacity should return the default value after being unset.");
+        // Transition property test
+        layer.circleStrokeOpacityTransition = transitionTest;
+        auto toptions = rawLayer->getCircleStrokeOpacityTransition();
+        XCTAssert(toptions.delay && MGLTimeIntervalFromDuration(*toptions.delay) == transitionTest.delay);
+        XCTAssert(toptions.duration && MGLTimeIntervalFromDuration(*toptions.duration) == transitionTest.duration);
+
+        MGLTransition circleStrokeOpacityTransition = layer.circleStrokeOpacityTransition;
+        XCTAssertEqual(circleStrokeOpacityTransition.delay, transitionTest.delay);
+        XCTAssertEqual(circleStrokeOpacityTransition.duration, transitionTest.duration);
     }
 
     // circle-stroke-width
@@ -479,6 +538,15 @@
                       @"Unsetting circleStrokeWidth should return circle-stroke-width to the default value.");
         XCTAssertEqualObjects(layer.circleStrokeWidth, defaultStyleValue,
                               @"circleStrokeWidth should return the default value after being unset.");
+        // Transition property test
+        layer.circleStrokeWidthTransition = transitionTest;
+        auto toptions = rawLayer->getCircleStrokeWidthTransition();
+        XCTAssert(toptions.delay && MGLTimeIntervalFromDuration(*toptions.delay) == transitionTest.delay);
+        XCTAssert(toptions.duration && MGLTimeIntervalFromDuration(*toptions.duration) == transitionTest.duration);
+
+        MGLTransition circleStrokeWidthTransition = layer.circleStrokeWidthTransition;
+        XCTAssertEqual(circleStrokeWidthTransition.delay, transitionTest.delay);
+        XCTAssertEqual(circleStrokeWidthTransition.duration, transitionTest.duration);
     }
 
     // circle-translate

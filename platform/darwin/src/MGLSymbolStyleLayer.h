@@ -334,7 +334,8 @@ MGL_EXPORT
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconIgnorePlacement __attribute__((unavailable("Use iconIgnoresPlacement instead.")));
 
 /**
- A string with {tokens} replaced, referencing the data property to pull from.
+ Name of image in sprite to use for drawing an image background. A string with
+ {tokens} replaced, referencing the data property to pull from.
  
  This attribute corresponds to the <a
  href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-symbol-icon-image"><code>icon-image</code></a>
@@ -1247,6 +1248,13 @@ MGL_EXPORT
 #endif
 
 /**
+ The transition affecting any changes to this layer’s `iconColor` property.
+
+ This property corresponds to the `icon-color-transition` property in the style JSON file format.
+*/
+@property (nonatomic) MGLTransition iconColorTransition;
+
+/**
  Fade out the halo towards the outside.
  
  This property is measured in points.
@@ -1275,6 +1283,13 @@ MGL_EXPORT
    * `MGLInterpolationModeCategorical`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconHaloBlur;
+
+/**
+ The transition affecting any changes to this layer’s `iconHaloBlur` property.
+
+ This property corresponds to the `icon-halo-blur-transition` property in the style JSON file format.
+*/
+@property (nonatomic) MGLTransition iconHaloBlurTransition;
 
 #if TARGET_OS_IPHONE
 /**
@@ -1337,6 +1352,13 @@ MGL_EXPORT
 #endif
 
 /**
+ The transition affecting any changes to this layer’s `iconHaloColor` property.
+
+ This property corresponds to the `icon-halo-color-transition` property in the style JSON file format.
+*/
+@property (nonatomic) MGLTransition iconHaloColorTransition;
+
+/**
  Distance of halo to the icon outline.
  
  This property is measured in points.
@@ -1367,6 +1389,13 @@ MGL_EXPORT
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconHaloWidth;
 
 /**
+ The transition affecting any changes to this layer’s `iconHaloWidth` property.
+
+ This property corresponds to the `icon-halo-width-transition` property in the style JSON file format.
+*/
+@property (nonatomic) MGLTransition iconHaloWidthTransition;
+
+/**
  The opacity at which the icon will be drawn.
  
  The default value of this property is an `MGLStyleValue` object containing an
@@ -1393,6 +1422,13 @@ MGL_EXPORT
    * `MGLInterpolationModeCategorical`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconOpacity;
+
+/**
+ The transition affecting any changes to this layer’s `iconOpacity` property.
+
+ This property corresponds to the `icon-opacity-transition` property in the style JSON file format.
+*/
+@property (nonatomic) MGLTransition iconOpacityTransition;
 
 #if TARGET_OS_IPHONE
 /**
@@ -1445,6 +1481,13 @@ MGL_EXPORT
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *iconTranslation;
 #endif
+
+/**
+ The transition affecting any changes to this layer’s `iconTranslation` property.
+
+ This property corresponds to the `icon-translate-transition` property in the style JSON file format.
+*/
+@property (nonatomic) MGLTransition iconTranslationTransition;
 
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *iconTranslate __attribute__((unavailable("Use iconTranslation instead.")));
 
@@ -1531,6 +1574,13 @@ MGL_EXPORT
 #endif
 
 /**
+ The transition affecting any changes to this layer’s `textColor` property.
+
+ This property corresponds to the `text-color-transition` property in the style JSON file format.
+*/
+@property (nonatomic) MGLTransition textColorTransition;
+
+/**
  The halo's fadeout distance towards the outside.
  
  This property is measured in points.
@@ -1559,6 +1609,13 @@ MGL_EXPORT
    * `MGLInterpolationModeCategorical`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textHaloBlur;
+
+/**
+ The transition affecting any changes to this layer’s `textHaloBlur` property.
+
+ This property corresponds to the `text-halo-blur-transition` property in the style JSON file format.
+*/
+@property (nonatomic) MGLTransition textHaloBlurTransition;
 
 #if TARGET_OS_IPHONE
 /**
@@ -1619,6 +1676,13 @@ MGL_EXPORT
 #endif
 
 /**
+ The transition affecting any changes to this layer’s `textHaloColor` property.
+
+ This property corresponds to the `text-halo-color-transition` property in the style JSON file format.
+*/
+@property (nonatomic) MGLTransition textHaloColorTransition;
+
+/**
  Distance of halo to the font outline. Max text halo width is 1/4 of the
  font-size.
  
@@ -1650,6 +1714,13 @@ MGL_EXPORT
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textHaloWidth;
 
 /**
+ The transition affecting any changes to this layer’s `textHaloWidth` property.
+
+ This property corresponds to the `text-halo-width-transition` property in the style JSON file format.
+*/
+@property (nonatomic) MGLTransition textHaloWidthTransition;
+
+/**
  The opacity at which the text will be drawn.
  
  The default value of this property is an `MGLStyleValue` object containing an
@@ -1676,6 +1747,13 @@ MGL_EXPORT
    * `MGLInterpolationModeCategorical`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textOpacity;
+
+/**
+ The transition affecting any changes to this layer’s `textOpacity` property.
+
+ This property corresponds to the `text-opacity-transition` property in the style JSON file format.
+*/
+@property (nonatomic) MGLTransition textOpacityTransition;
 
 #if TARGET_OS_IPHONE
 /**
@@ -1728,6 +1806,13 @@ MGL_EXPORT
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *textTranslation;
 #endif
+
+/**
+ The transition affecting any changes to this layer’s `textTranslation` property.
+
+ This property corresponds to the `text-translate-transition` property in the style JSON file format.
+*/
+@property (nonatomic) MGLTransition textTranslationTransition;
 
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *textTranslate __attribute__((unavailable("Use textTranslation instead.")));
 

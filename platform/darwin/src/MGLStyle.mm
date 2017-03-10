@@ -572,30 +572,24 @@ static NSURL *MGLStyleURL_emerald;
 
 #pragma mark Style transitions
 
-- (void)setTransitionDuration:(NSTimeInterval)duration
+- (void)setTransition:(MGLTransition)transition
 {
     auto transitionOptions = self.mapView.mbglMap->getTransitionOptions();
-    transitionOptions.duration = MGLDurationFromTimeInterval(duration);
+    transitionOptions.duration = MGLDurationFromTimeInterval(transition.duration);
+    transitionOptions.delay = MGLDurationFromTimeInterval(transition.delay);
+    
     self.mapView.mbglMap->setTransitionOptions(transitionOptions);
 }
 
-- (NSTimeInterval)transitionDuration
+- (MGLTransition)transition
 {
+    MGLTransition transition;
     const mbgl::style::TransitionOptions transitionOptions = self.mapView.mbglMap->getTransitionOptions();
-    return MGLTimeIntervalFromDuration(transitionOptions.duration.value_or(mbgl::Duration::zero()));
-}
 
-- (void)setTransitionDelay:(NSTimeInterval)delay
-{
-    auto transitionOptions = self.mapView.mbglMap->getTransitionOptions();
-    transitionOptions.delay = MGLDurationFromTimeInterval(delay);
-    self.mapView.mbglMap->setTransitionOptions(transitionOptions);
-}
-
-- (NSTimeInterval)transitionDelay
-{
-    const mbgl::style::TransitionOptions transitionOptions = self.mapView.mbglMap->getTransitionOptions();
-    return MGLTimeIntervalFromDuration(transitionOptions.delay.value_or(mbgl::Duration::zero()));
+    transition.delay = MGLTimeIntervalFromDuration(transitionOptions.delay.value_or(mbgl::Duration::zero()));
+    transition.duration = MGLTimeIntervalFromDuration(transitionOptions.duration.value_or(mbgl::Duration::zero()));
+    
+    return transition;
 }
 
 - (NSString *)description

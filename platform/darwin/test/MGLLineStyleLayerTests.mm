@@ -2,10 +2,12 @@
 // Edit platform/darwin/scripts/generate-style-code.js, then run `make darwin-style-code`.
 
 #import "MGLStyleLayerTests.h"
+#import "../../darwin/src/NSDate+MGLAdditions.h"
 
 #import "MGLStyleLayer_Private.h"
 
 #include <mbgl/style/layers/line_layer.hpp>
+#include <mbgl/style/transition_options.hpp>
 
 @interface MGLLineLayerTests : MGLStyleLayerTests
 @end
@@ -42,6 +44,9 @@
     XCTAssertNotEqual(layer.rawLayer, nullptr);
     XCTAssertTrue(layer.rawLayer->is<mbgl::style::LineLayer>());
     auto rawLayer = layer.rawLayer->as<mbgl::style::LineLayer>();
+
+    MGLTransition transitionTest = MGLTransitionMake(5, 4);
+
 
     // line-cap
     {
@@ -254,6 +259,15 @@
                       @"Unsetting lineBlur should return line-blur to the default value.");
         XCTAssertEqualObjects(layer.lineBlur, defaultStyleValue,
                               @"lineBlur should return the default value after being unset.");
+        // Transition property test
+        layer.lineBlurTransition = transitionTest;
+        auto toptions = rawLayer->getLineBlurTransition();
+        XCTAssert(toptions.delay && MGLTimeIntervalFromDuration(*toptions.delay) == transitionTest.delay);
+        XCTAssert(toptions.duration && MGLTimeIntervalFromDuration(*toptions.duration) == transitionTest.duration);
+
+        MGLTransition lineBlurTransition = layer.lineBlurTransition;
+        XCTAssertEqual(lineBlurTransition.delay, transitionTest.delay);
+        XCTAssertEqual(lineBlurTransition.duration, transitionTest.duration);
     }
 
     // line-color
@@ -311,6 +325,15 @@
                       @"Unsetting lineColor should return line-color to the default value.");
         XCTAssertEqualObjects(layer.lineColor, defaultStyleValue,
                               @"lineColor should return the default value after being unset.");
+        // Transition property test
+        layer.lineColorTransition = transitionTest;
+        auto toptions = rawLayer->getLineColorTransition();
+        XCTAssert(toptions.delay && MGLTimeIntervalFromDuration(*toptions.delay) == transitionTest.delay);
+        XCTAssert(toptions.duration && MGLTimeIntervalFromDuration(*toptions.duration) == transitionTest.duration);
+
+        MGLTransition lineColorTransition = layer.lineColorTransition;
+        XCTAssertEqual(lineColorTransition.delay, transitionTest.delay);
+        XCTAssertEqual(lineColorTransition.duration, transitionTest.duration);
     }
 
     // line-dasharray
@@ -407,6 +430,15 @@
                       @"Unsetting lineGapWidth should return line-gap-width to the default value.");
         XCTAssertEqualObjects(layer.lineGapWidth, defaultStyleValue,
                               @"lineGapWidth should return the default value after being unset.");
+        // Transition property test
+        layer.lineGapWidthTransition = transitionTest;
+        auto toptions = rawLayer->getLineGapWidthTransition();
+        XCTAssert(toptions.delay && MGLTimeIntervalFromDuration(*toptions.delay) == transitionTest.delay);
+        XCTAssert(toptions.duration && MGLTimeIntervalFromDuration(*toptions.duration) == transitionTest.duration);
+
+        MGLTransition lineGapWidthTransition = layer.lineGapWidthTransition;
+        XCTAssertEqual(lineGapWidthTransition.delay, transitionTest.delay);
+        XCTAssertEqual(lineGapWidthTransition.duration, transitionTest.duration);
     }
 
     // line-offset
@@ -464,6 +496,15 @@
                       @"Unsetting lineOffset should return line-offset to the default value.");
         XCTAssertEqualObjects(layer.lineOffset, defaultStyleValue,
                               @"lineOffset should return the default value after being unset.");
+        // Transition property test
+        layer.lineOffsetTransition = transitionTest;
+        auto toptions = rawLayer->getLineOffsetTransition();
+        XCTAssert(toptions.delay && MGLTimeIntervalFromDuration(*toptions.delay) == transitionTest.delay);
+        XCTAssert(toptions.duration && MGLTimeIntervalFromDuration(*toptions.duration) == transitionTest.duration);
+
+        MGLTransition lineOffsetTransition = layer.lineOffsetTransition;
+        XCTAssertEqual(lineOffsetTransition.delay, transitionTest.delay);
+        XCTAssertEqual(lineOffsetTransition.duration, transitionTest.duration);
     }
 
     // line-opacity
@@ -521,6 +562,15 @@
                       @"Unsetting lineOpacity should return line-opacity to the default value.");
         XCTAssertEqualObjects(layer.lineOpacity, defaultStyleValue,
                               @"lineOpacity should return the default value after being unset.");
+        // Transition property test
+        layer.lineOpacityTransition = transitionTest;
+        auto toptions = rawLayer->getLineOpacityTransition();
+        XCTAssert(toptions.delay && MGLTimeIntervalFromDuration(*toptions.delay) == transitionTest.delay);
+        XCTAssert(toptions.duration && MGLTimeIntervalFromDuration(*toptions.duration) == transitionTest.duration);
+
+        MGLTransition lineOpacityTransition = layer.lineOpacityTransition;
+        XCTAssertEqual(lineOpacityTransition.delay, transitionTest.delay);
+        XCTAssertEqual(lineOpacityTransition.duration, transitionTest.duration);
     }
 
     // line-pattern
@@ -560,6 +610,15 @@
         XCTAssertThrowsSpecificNamed(layer.linePattern = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
         functionStyleValue = [MGLStyleValue<NSString *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
         XCTAssertThrowsSpecificNamed(layer.linePattern = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
+        // Transition property test
+        layer.linePatternTransition = transitionTest;
+        auto toptions = rawLayer->getLinePatternTransition();
+        XCTAssert(toptions.delay && MGLTimeIntervalFromDuration(*toptions.delay) == transitionTest.delay);
+        XCTAssert(toptions.duration && MGLTimeIntervalFromDuration(*toptions.duration) == transitionTest.duration);
+
+        MGLTransition linePatternTransition = layer.linePatternTransition;
+        XCTAssertEqual(linePatternTransition.delay, transitionTest.delay);
+        XCTAssertEqual(linePatternTransition.duration, transitionTest.duration);
     }
 
     // line-translate
@@ -683,6 +742,15 @@
         XCTAssertThrowsSpecificNamed(layer.lineWidth = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
         functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
         XCTAssertThrowsSpecificNamed(layer.lineWidth = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
+        // Transition property test
+        layer.lineWidthTransition = transitionTest;
+        auto toptions = rawLayer->getLineWidthTransition();
+        XCTAssert(toptions.delay && MGLTimeIntervalFromDuration(*toptions.delay) == transitionTest.delay);
+        XCTAssert(toptions.duration && MGLTimeIntervalFromDuration(*toptions.duration) == transitionTest.duration);
+
+        MGLTransition lineWidthTransition = layer.lineWidthTransition;
+        XCTAssertEqual(lineWidthTransition.delay, transitionTest.delay);
+        XCTAssertEqual(lineWidthTransition.duration, transitionTest.duration);
     }
 }
 

@@ -69,6 +69,13 @@ MGL_EXPORT
 #endif
 
 /**
+ The transition affecting any changes to this layer’s `backgroundColor` property.
+
+ This property corresponds to the `background-color-transition` property in the style JSON file format.
+*/
+@property (nonatomic) MGLTransition backgroundColorTransition;
+
+/**
  The opacity at which the background will be drawn.
  
  The default value of this property is an `MGLStyleValue` object containing an
@@ -85,6 +92,13 @@ MGL_EXPORT
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *backgroundOpacity;
 
 /**
+ The transition affecting any changes to this layer’s `backgroundOpacity` property.
+
+ This property corresponds to the `background-opacity-transition` property in the style JSON file format.
+*/
+@property (nonatomic) MGLTransition backgroundOpacityTransition;
+
+/**
  Name of image in style images to use for drawing an image background. For
  seamless patterns, image width and height must be a factor of two (2, 4, 8,
  ..., 512).
@@ -96,6 +110,13 @@ MGL_EXPORT
  `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSString *> *backgroundPattern;
+
+/**
+ The transition affecting any changes to this layer’s `backgroundPattern` property.
+
+ This property corresponds to the `background-pattern-transition` property in the style JSON file format.
+*/
+@property (nonatomic) MGLTransition backgroundPatternTransition;
 
 @end
 

@@ -2,6 +2,7 @@
 
 #import "MGLGeometry.h"
 #import "MGLOfflinePack.h"
+#import "MGLTypes.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -69,6 +70,22 @@ NS_ASSUME_NONNULL_BEGIN
  The `MGLOfflinePackProgress` structure representation of the value.
  */
 @property (readonly) MGLOfflinePackProgress MGLOfflinePackProgressValue;
+
+#pragma mark Working with Transition Values
+
+/**
+ Creates a new value object containing the given `MGLTransition`
+ structure.
+ 
+ @param transition The value for the new object.
+ @return A new value object that contains the transition information.
+ */
++ (NSValue *)valueWithMGLTransition:(MGLTransition)transition;
+
+/**
+ The `MGLTransition` structure representation of the value.
+ */
+@property (readonly) MGLTransition MGLTransitionValue;
 
 @end
 

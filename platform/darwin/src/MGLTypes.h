@@ -70,6 +70,39 @@ typedef NS_OPTIONS(NSUInteger, MGLMapDebugMaskOptions) {
 #endif
 };
 
+/**
+ A structure containing information about a transition.
+ */
+typedef struct MGLTransition {
+    /**
+     The amount of time the animation should take, not including the delay.
+     */
+    NSTimeInterval duration;
+    
+    /**
+     The amount of time in seconds to wait before beginning the animation.
+     */
+    NSTimeInterval delay;
+} MGLTransition;
+
+/**
+ Creates a new `MGLTransition` from the given duration and delay.
+ 
+ @param duration The amount of time the animation should take, not including 
+ the delay.
+ @param delay The amount of time in seconds to wait before beginning the 
+ animation.
+ 
+ @return Returns a `MGLTransition` struct containing the transition attributes.
+ */
+NS_INLINE MGLTransition MGLTransitionMake(NSTimeInterval duration, NSTimeInterval delay) {
+    MGLTransition transition;
+    transition.duration = duration;
+    transition.delay = delay;
+    
+    return transition;
+}
+
 NS_ASSUME_NONNULL_END
 
 #ifndef NS_ARRAY_OF

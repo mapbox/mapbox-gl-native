@@ -59,6 +59,13 @@ MGL_EXPORT
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *maximumRasterBrightness;
 
+/**
+ The transition affecting any changes to this layer’s `maximumRasterBrightness` property.
+
+ This property corresponds to the `raster-brightness-max-transition` property in the style JSON file format.
+*/
+@property (nonatomic) MGLTransition maximumRasterBrightnessTransition;
+
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *rasterBrightnessMax __attribute__((unavailable("Use maximumRasterBrightness instead.")));
 
 /**
@@ -82,6 +89,13 @@ MGL_EXPORT
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *minimumRasterBrightness;
 
+/**
+ The transition affecting any changes to this layer’s `minimumRasterBrightness` property.
+
+ This property corresponds to the `raster-brightness-min-transition` property in the style JSON file format.
+*/
+@property (nonatomic) MGLTransition minimumRasterBrightnessTransition;
+
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *rasterBrightnessMin __attribute__((unavailable("Use minimumRasterBrightness instead.")));
 
 /**
@@ -101,6 +115,13 @@ MGL_EXPORT
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *rasterContrast;
 
 /**
+ The transition affecting any changes to this layer’s `rasterContrast` property.
+
+ This property corresponds to the `raster-contrast-transition` property in the style JSON file format.
+*/
+@property (nonatomic) MGLTransition rasterContrastTransition;
+
+/**
  Fade duration when a new tile is added.
  
  This property is measured in milliseconds.
@@ -117,6 +138,13 @@ MGL_EXPORT
    * `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *rasterFadeDuration;
+
+/**
+ The transition affecting any changes to this layer’s `rasterFadeDuration` property.
+
+ This property corresponds to the `raster-fade-duration-transition` property in the style JSON file format.
+*/
+@property (nonatomic) MGLTransition rasterFadeDurationTransition;
 
 /**
  Rotates hues around the color wheel.
@@ -140,6 +168,13 @@ MGL_EXPORT
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *rasterHueRotation;
 
+/**
+ The transition affecting any changes to this layer’s `rasterHueRotation` property.
+
+ This property corresponds to the `raster-hue-rotate-transition` property in the style JSON file format.
+*/
+@property (nonatomic) MGLTransition rasterHueRotationTransition;
+
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *rasterHueRotate __attribute__((unavailable("Use rasterHueRotation instead.")));
 
 /**
@@ -159,6 +194,13 @@ MGL_EXPORT
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *rasterOpacity;
 
 /**
+ The transition affecting any changes to this layer’s `rasterOpacity` property.
+
+ This property corresponds to the `raster-opacity-transition` property in the style JSON file format.
+*/
+@property (nonatomic) MGLTransition rasterOpacityTransition;
+
+/**
  Increase or reduce the saturation of the image.
  
  The default value of this property is an `MGLStyleValue` object containing an
@@ -173,6 +215,13 @@ MGL_EXPORT
    * `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *rasterSaturation;
+
+/**
+ The transition affecting any changes to this layer’s `rasterSaturation` property.
+
+ This property corresponds to the `raster-saturation-transition` property in the style JSON file format.
+*/
+@property (nonatomic) MGLTransition rasterSaturationTransition;
 
 @end
 

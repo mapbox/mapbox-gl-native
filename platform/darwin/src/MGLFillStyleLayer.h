@@ -134,6 +134,13 @@ MGL_EXPORT
 #endif
 
 /**
+ The transition affecting any changes to this layer’s `fillColor` property.
+
+ This property corresponds to the `fill-color-transition` property in the style JSON file format.
+*/
+@property (nonatomic) MGLTransition fillColorTransition;
+
+/**
  The opacity of the entire fill layer. In contrast to the `fillColor`, this
  value will also affect the 1pt stroke around the fill, if the stroke is used.
  
@@ -158,6 +165,13 @@ MGL_EXPORT
    * `MGLInterpolationModeCategorical`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *fillOpacity;
+
+/**
+ The transition affecting any changes to this layer’s `fillOpacity` property.
+
+ This property corresponds to the `fill-opacity-transition` property in the style JSON file format.
+*/
+@property (nonatomic) MGLTransition fillOpacityTransition;
 
 #if TARGET_OS_IPHONE
 /**
@@ -212,6 +226,13 @@ MGL_EXPORT
 #endif
 
 /**
+ The transition affecting any changes to this layer’s `fillOutlineColor` property.
+
+ This property corresponds to the `fill-outline-color-transition` property in the style JSON file format.
+*/
+@property (nonatomic) MGLTransition fillOutlineColorTransition;
+
+/**
  Name of image in sprite to use for drawing image fills. For seamless patterns,
  image width and height must be a factor of two (2, 4, 8, ..., 512).
  
@@ -222,6 +243,13 @@ MGL_EXPORT
  `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSString *> *fillPattern;
+
+/**
+ The transition affecting any changes to this layer’s `fillPattern` property.
+
+ This property corresponds to the `fill-pattern-transition` property in the style JSON file format.
+*/
+@property (nonatomic) MGLTransition fillPatternTransition;
 
 #if TARGET_OS_IPHONE
 /**
@@ -268,6 +296,13 @@ MGL_EXPORT
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *fillTranslation;
 #endif
+
+/**
+ The transition affecting any changes to this layer’s `fillTranslation` property.
+
+ This property corresponds to the `fill-translate-transition` property in the style JSON file format.
+*/
+@property (nonatomic) MGLTransition fillTranslationTransition;
 
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *fillTranslate __attribute__((unavailable("Use fillTranslation instead.")));
 

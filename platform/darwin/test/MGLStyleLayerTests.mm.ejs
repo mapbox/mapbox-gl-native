@@ -7,10 +7,12 @@
 // Edit platform/darwin/scripts/generate-style-code.js, then run `make darwin-style-code`.
 
 #import "MGLStyleLayerTests.h"
+#import "../../darwin/src/NSDate+MGLAdditions.h"
 
 #import "MGLStyleLayer_Private.h"
 
 #include <mbgl/style/layers/<%- type %>_layer.hpp>
+#include <mbgl/style/transition_options.hpp>
 
 @interface MGL<%- camelize(type) %>LayerTests : MGLStyleLayerTests
 @end
@@ -53,6 +55,9 @@
     XCTAssertNotEqual(layer.rawLayer, nullptr);
     XCTAssertTrue(layer.rawLayer->is<mbgl::style::<%- camelize(type) %>Layer>());
     auto rawLayer = layer.rawLayer->as<mbgl::style::<%- camelize(type) %>Layer>();
+
+    MGLTransition transitionTest = MGLTransitionMake(5, 4);
+
 <% for (const property of properties) { -%>
 
     // <%- originalPropertyName(property) %>
@@ -123,6 +128,17 @@
         XCTAssertThrowsSpecificNamed(layer.<%- objCName(property) %> = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
         functionStyleValue = [MGLStyleValue<<%- propertyType(property) %>> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
         XCTAssertThrowsSpecificNamed(layer.<%- objCName(property) %> = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
+<% } -%>
+<% if (property["transition"] && !property.original) { -%>
+        // Transition property test
+        layer.<%- camelizeWithLeadingLowercase(originalPropertyName(property)) %>Transition = transitionTest;
+        auto toptions = rawLayer->get<%- camelize(originalPropertyName(property)) %>Transition();
+        XCTAssert(toptions.delay && MGLTimeIntervalFromDuration(*toptions.delay) == transitionTest.delay);
+        XCTAssert(toptions.duration && MGLTimeIntervalFromDuration(*toptions.duration) == transitionTest.duration);
+
+        MGLTransition <%- camelizeWithLeadingLowercase(originalPropertyName(property)) %>Transition = layer.<%- camelizeWithLeadingLowercase(originalPropertyName(property)) %>Transition;
+        XCTAssertEqual(<%- camelizeWithLeadingLowercase(originalPropertyName(property)) %>Transition.delay, transitionTest.delay);
+        XCTAssertEqual(<%- camelizeWithLeadingLowercase(originalPropertyName(property)) %>Transition.duration, transitionTest.duration);
 <% } -%>
     }
 <% } -%>
