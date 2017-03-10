@@ -32,12 +32,13 @@ GeometryTile::GeometryTile(const OverscaledTileID& id_,
       worker(parameters.workerScheduler,
              ActorRef<GeometryTile>(*this, mailbox),
              id_,
-             *parameters.style.glyphAtlas,
              obsolete,
-             parameters.mode) {
+             parameters.mode),
+             glyphAtlas(*parameters.style.glyphAtlas) {
 }
 
 GeometryTile::~GeometryTile() {
+    glyphAtlas.removeGlyphs(*this);
     cancel();
 }
 
@@ -129,6 +130,14 @@ void GeometryTile::onPlacement(PlacementResult result) {
 void GeometryTile::onError(std::exception_ptr err) {
     availableData = DataAvailability::All;
     observer->onTileError(*this, err);
+}
+    
+void GeometryTile::onGlyphsAvailable(GlyphPositionMap glyphPositions) {
+    worker.invoke(&GeometryTileWorker::onGlyphsAvailable, std::move(glyphPositions));
+}
+
+void GeometryTile::getGlyphs(GlyphDependencies glyphDependencies) {
+    glyphAtlas.getGlyphs(*this, std::move(glyphDependencies));
 }
 
 Bucket* GeometryTile::getBucket(const Layer& layer) {

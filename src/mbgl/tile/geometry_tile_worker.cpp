@@ -2,7 +2,6 @@
 #include <mbgl/tile/geometry_tile_data.hpp>
 #include <mbgl/tile/geometry_tile.hpp>
 #include <mbgl/text/collision_tile.hpp>
-#include <mbgl/text/glyph_atlas.hpp>
 #include <mbgl/layout/symbol_layout.hpp>
 #include <mbgl/style/bucket_parameters.hpp>
 #include <mbgl/style/group_by_layout.hpp>
@@ -25,19 +24,16 @@ using namespace style;
 GeometryTileWorker::GeometryTileWorker(ActorRef<GeometryTileWorker> self_,
                                        ActorRef<GeometryTile> parent_,
                                        OverscaledTileID id_,
-                                       GlyphAtlas& glyphAtlas_,
                                        const std::atomic<bool>& obsolete_,
                                        const MapMode mode_)
     : self(std::move(self_)),
       parent(std::move(parent_)),
       id(std::move(id_)),
-      glyphAtlas(glyphAtlas_),
       obsolete(obsolete_),
       mode(mode_) {
 }
 
 GeometryTileWorker::~GeometryTileWorker() {
-    glyphAtlas.removeGlyphs(reinterpret_cast<uintptr_t>(this));
 }
 
 /*
@@ -168,6 +164,11 @@ void GeometryTileWorker::symbolDependenciesChanged() {
     }
 }
 
+void GeometryTileWorker::onGlyphsAvailable(GlyphPositionMap glyphs) {
+    glyphPositions = std::move(glyphs);
+    symbolDependenciesChanged(); // TODO: This is a clumsy way to join the "glyphs loaded" and "symbol dependencies changed" signals
+}
+
 void GeometryTileWorker::coalesced() {
     try {
         switch (state) {
@@ -215,6 +216,8 @@ void GeometryTileWorker::redoLayout() {
     std::unordered_map<std::string, std::shared_ptr<Bucket>> buckets;
     auto featureIndex = std::make_unique<FeatureIndex>();
     BucketParameters parameters { id, mode };
+    GlyphDependencies glyphDependencies;
+    glyphPositions.clear();
 
     std::vector<std::vector<const Layer*>> groups = groupByLayout(*layers);
     for (auto& group : groups) {
@@ -242,7 +245,7 @@ void GeometryTileWorker::redoLayout() {
 
         if (leader.is<SymbolLayer>()) {
             symbolLayoutMap.emplace(leader.getID(),
-                leader.as<SymbolLayer>()->impl->createLayout(parameters, group, *geometryLayer));
+                leader.as<SymbolLayer>()->impl->createLayout(parameters, group, *geometryLayer, glyphDependencies));
         } else {
             const Filter& filter = leader.baseImpl->filter;
             const std::string& sourceLayerID = leader.baseImpl->sourceLayer;
@@ -275,6 +278,10 @@ void GeometryTileWorker::redoLayout() {
         if (it != symbolLayoutMap.end()) {
             symbolLayouts.push_back(std::move(it->second));
         }
+    }
+    
+    if (!glyphDependencies.empty()) {
+        parent.invoke(&GeometryTile::getGlyphs, std::move(glyphDependencies));
     }
 
     parent.invoke(&GeometryTile::onLayout, GeometryTile::LayoutResult {
@@ -313,10 +320,9 @@ void GeometryTileWorker::attemptPlacement() {
         }
 
         if (symbolLayout->state == SymbolLayout::Pending) {
-            if (symbolLayout->canPrepare(glyphAtlas)) {
+            if (symbolLayout->canPrepare(glyphPositions)) {
                 symbolLayout->state = SymbolLayout::Prepared;
-                symbolLayout->prepare(reinterpret_cast<uintptr_t>(this),
-                                      glyphAtlas);
+                symbolLayout->prepare(glyphPositions);
             } else {
                 canPlace = false;
             }

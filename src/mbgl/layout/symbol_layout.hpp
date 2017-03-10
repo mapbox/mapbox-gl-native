@@ -32,12 +32,12 @@ public:
     SymbolLayout(const style::BucketParameters&,
                  const std::vector<const style::Layer*>&,
                  const GeometryTileLayer&,
-                 SpriteAtlas&);
+                 SpriteAtlas&,
+                 GlyphDependencies&);
 
-    bool canPrepare(GlyphAtlas&);
+    bool canPrepare(const GlyphPositionMap& glyphs);
 
-    void prepare(uintptr_t tileUID,
-                 GlyphAtlas&);
+    void prepare(const GlyphPositionMap& glyphs);
 
     std::unique_ptr<SymbolBucket> place(CollisionTile&);
 
@@ -89,7 +89,6 @@ private:
     bool sdfIcons = false;
     bool iconsNeedLinear = false;
 
-    GlyphRangeSet ranges;
     std::vector<SymbolInstance> symbolInstances;
     std::vector<SymbolFeature> features;
 

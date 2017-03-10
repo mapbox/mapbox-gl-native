@@ -480,7 +480,6 @@ set(MBGL_CORE_FILES
     src/mbgl/util/dtoa.cpp
     src/mbgl/util/dtoa.hpp
     src/mbgl/util/event.cpp
-    src/mbgl/util/exclusive.hpp
     src/mbgl/util/font_stack.cpp
     src/mbgl/util/geo.cpp
     src/mbgl/util/geojson.cpp

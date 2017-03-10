@@ -36,11 +36,13 @@ std::unique_ptr<Bucket> SymbolLayer::Impl::createBucket(const BucketParameters&,
 
 std::unique_ptr<SymbolLayout> SymbolLayer::Impl::createLayout(const BucketParameters& parameters,
                                                               const std::vector<const Layer*>& group,
-                                                              const GeometryTileLayer& layer) const {
+                                                              const GeometryTileLayer& layer,
+                                                              GlyphDependencies& glyphDependencies) const {
     return std::make_unique<SymbolLayout>(parameters,
                                           group,
                                           layer,
-                                          *spriteAtlas);
+                                          *spriteAtlas,
+                                          glyphDependencies);
 }
 
 IconPaintProperties::Evaluated SymbolLayer::Impl::iconPaintProperties() const {

@@ -16,6 +16,7 @@ namespace mbgl {
 
 namespace {
 
+// Parses a Glyph Protobuf and inserts it into the GlyphAtlas. Must be called from main thread.
 void parseGlyphPBF(GlyphSet& glyphSet, const GlyphRange& glyphRange, const std::string& data) {
     protozero::pbf_reader glyphs_pbf(data);
 
@@ -117,7 +118,7 @@ GlyphPBF::GlyphPBF(GlyphAtlas* atlas,
             observer->onGlyphsLoaded(fontStack, glyphRange);
         } else {
             try {
-                parseGlyphPBF(**atlas->getGlyphSet(fontStack), glyphRange, *res.data);
+                parseGlyphPBF(atlas->getGlyphSet(fontStack), glyphRange, *res.data);
             } catch (...) {
                 observer->onGlyphsError(fontStack, glyphRange, std::current_exception());
                 return;

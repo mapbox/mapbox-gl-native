@@ -1,5 +1,6 @@
 #pragma once
 
+#include <mbgl/text/glyph.hpp>
 #include <mbgl/util/variant.hpp>
 #include <mbgl/style/layer_impl.hpp>
 #include <mbgl/style/layers/symbol_layer.hpp>
@@ -67,7 +68,7 @@ public:
 
     std::unique_ptr<Bucket> createBucket(const BucketParameters&, const std::vector<const Layer*>&) const override;
     std::unique_ptr<SymbolLayout> createLayout(const BucketParameters&, const std::vector<const Layer*>&,
-                                               const GeometryTileLayer&) const;
+                                               const GeometryTileLayer&, GlyphDependencies&) const;
 
     IconPaintProperties::Evaluated iconPaintProperties() const;
     TextPaintProperties::Evaluated textPaintProperties() const;

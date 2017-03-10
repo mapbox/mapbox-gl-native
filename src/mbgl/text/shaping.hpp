@@ -9,6 +9,7 @@ namespace mbgl {
 
 class SpriteAtlasElement;
 class SymbolFeature;
+class BiDi;
 
 class PositionedIcon {
 public:
@@ -37,5 +38,18 @@ public:
 };
 
 PositionedIcon shapeIcon(const SpriteAtlasElement&, const std::array<float, 2>& iconOffset, const float iconRotation);
+    
+const Shaping getShaping(const std::u16string& string,
+                         float maxWidth,
+                         float lineHeight,
+                         float horizontalAlign,
+                         float verticalAlign,
+                         float justify,
+                         float spacing,
+                         const Point<float>& translate,
+                         float verticalHeight,
+                         const WritingModeType,
+                         BiDi& bidi,
+                         const GlyphPositions& glyphs);
 
 } // namespace mbgl
