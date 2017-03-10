@@ -54,6 +54,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * Added a `MGLDistanceFormatter` class for formatting geographic distances. ([#7888](https://github.com/mapbox/mapbox-gl-native/pull/7888))
 * Fixed an issue that was causing the system location indicator to stay on in background after telemetry was disabled. ([#7833](https://github.com/mapbox/mapbox-gl-native/pull/7833))
 * Added support for predicates in rendered feature querying [8256](https://github.com/mapbox/mapbox-gl-native/pull/8246)
+* Added a nightly build of the dynamic framework. ([#8337](https://github.com/mapbox/mapbox-gl-native/pull/8337))
 
 ## 3.4.2 - February 21, 2017
 

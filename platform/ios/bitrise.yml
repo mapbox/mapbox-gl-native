@@ -83,4 +83,5 @@ workflows:
             export FORMAT=dynamic
             make ipackage-strip
             CLOUDWATCH=true platform/ios/scripts/metrics.sh
+            platform/ios/scripts/deploy-nightly.sh
         - is_debug: 'yes'

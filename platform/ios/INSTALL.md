@@ -50,6 +50,10 @@ bash "${BUILT_PRODUCTS_DIR}/${FRAMEWORKS_FOLDER_PATH}/Mapbox.framework/strip-fra
 
 (The last step, courtesy of [Realm](https://github.com/realm/realm-cocoa/), is required for working around an [iOS App Store bug](http://www.openradar.me/radar?id=6409498411401216) when archiving universal binaries.)
 
+##### Nightly builds
+
+A nightly build of the dynamic framework, based on the master branch, is available for download [here](https://mapbox.s3.amazonaws.com/mapbox-gl-native/ios/builds/mapbox-ios-sdk-nightly-dynamic.zip).
+
 #### Static framework
 
 You can alternatively install the SDK as a static framework:
@@ -82,7 +86,15 @@ You can alternatively install the SDK as a static framework:
 To test pre-releases and/or betas, you can reference the pre-release like so in your Podfile:
 
 ```rb
-pod 'Mapbox-iOS-SDK', podspec: 'https://raw.githubusercontent.com/mapbox/mapbox-gl-native/<insert branch or tag>/ios/Mapbox-iOS-SDK.podspec'
+pod 'Mapbox-iOS-SDK', podspec: 'https://raw.githubusercontent.com/mapbox/mapbox-gl-native/<insert branch or tag>/platform/ios/Mapbox-iOS-SDK.podspec'
+```
+
+##### Testing nightly releases with CocoaPods
+
+To test a nightly dynamic framework build, update your app’s `Podfile` to point to:
+
+```rb
+pod 'Mapbox-iOS-SDK-nightly-dynamic', podspec: 'https://raw.githubusercontent.com/mapbox/mapbox-gl-native/master/platform/ios/Mapbox-iOS-SDK-nightly-dynamic.podspec'
 ```
 
 ##### Using your own build with CocoaPods
