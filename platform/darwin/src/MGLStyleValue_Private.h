@@ -51,7 +51,7 @@ public:
     mbgl::style::PropertyValue<MBGLType> toPropertyValue(MGLStyleValue<ObjCType> *value) {
         if ([value isKindOfClass:[MGLSourceStyleFunction class]] || [value isKindOfClass:[MGLCompositeStyleFunction class]]) {
             [NSException raise:NSInvalidArgumentException
-                        format:@"This property can only be set to camera functions. Use +[MGLStyleValue cameraFunctionValueWithinterpolationMode:stops:options:] instead."];
+                        format:@"This property can only be set to camera functions. Use +[MGLStyleValue valueWithInterpolationMode:cameraStops:options:] instead."];
             return {};
         }
 
@@ -82,7 +82,7 @@ public:
     mbgl::style::PropertyValue<MBGLType> toInterpolatablePropertyValue(MGLStyleValue<ObjCType> *value) {
         if ([value isKindOfClass:[MGLSourceStyleFunction class]] || [value isKindOfClass:[MGLCompositeStyleFunction class]]) {
             [NSException raise:NSInvalidArgumentException
-                        format:@"This property can only be set to camera functions. Use +[MGLStyleValue cameraFunctionValueWithinterpolationMode:stops:options:] instead."];
+                        format:@"This property can only be set to camera functions. Use +[MGLStyleValue valueWithInterpolationMode:cameraStops:options:] instead."];
             return {};
         }
 
@@ -139,7 +139,7 @@ public:
     mbgl::style::PropertyValue<MBGLEnum> toEnumPropertyValue(MGLStyleValue<ObjCType> *value) {
         if ([value isKindOfClass:[MGLSourceStyleFunction class]] || [value isKindOfClass:[MGLCompositeStyleFunction class]]) {
             [NSException raise:NSInvalidArgumentException
-                        format:@"This property can only be set to camera functions. Use +[MGLStyleValue cameraFunctionValueWithinterpolationMode:stops:options:] instead."];
+                        format:@"This property can only be set to camera functions. Use +[MGLStyleValue valueWithInterpolationMode:cameraStops:options:] instead."];
             return {};
         }
 
