@@ -8,7 +8,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 
 * The minimum deployment target for this SDK is now iOS 8. ([#8129](https://github.com/mapbox/mapbox-gl-native/pull/8129))
 * Added support for the Carthage dependency manager. See [our website](https://www.mapbox.com/ios-sdk/) for setup instructions. ([#8257](https://github.com/mapbox/mapbox-gl-native/pull/8257))
-* Added a simulator-only console notification to inform developers if there is a newer version of this SDK available. ([#8282](https://github.com/mapbox/mapbox-gl-native/pull/8282))
+* While running your application in the iOS Simulator, you will receive a notice in the console if a newer version of this SDK is available. ([#8282](https://github.com/mapbox/mapbox-gl-native/pull/8282))
 
 ### Internationalization
 
@@ -36,6 +36,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * When setting an `MGLShapeSource`’s shape to an `MGLFeature` instance, any `UIColor` attribute value is now converted to the equivalent CSS string representation for use with `MGLInterpolationModeIdentity` in style functions. ([#8025](https://github.com/mapbox/mapbox-gl-native/pull/8025))
 * An exception is no longer thrown if layers or sources are removed from a style before they are added. ([#7962](https://github.com/mapbox/mapbox-gl-native/pull/7962))
 * Renamed MGLStyleConstantValue to MGLConstantStyleValue. For compatibility with previous releases, MGLStyleConstantValue is now an alias of MGLConstantStyleValue. ([#8090](https://github.com/mapbox/mapbox-gl-native/pull/8090))
+* Fixed a crash that could occur when switching styles after adding an MGLSource to the style. ([#8298](https://github.com/mapbox/mapbox-gl-native/pull/8298))
 
 ### User interaction
 
@@ -54,13 +55,14 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 ### Other changes
 
 * Fixed an issue that, among other things, caused various islands to disappear at certain zoom levels. ([#7621](https://github.com/mapbox/mapbox-gl-native/pull/7621))
+* Added a method to MGLMapView that allows you to specify a predicate when querying for visible features. ([#8256](https://github.com/mapbox/mapbox-gl-native/pull/8246))
 * Changing the coordinates of a point annotation no longer deselects the annotation. ([#8269](https://github.com/mapbox/mapbox-gl-native/pull/8269))
 * Fixed an issue where translucent, non-view-backed point annotations along tile boundaries would be drawn darker than expected. ([#6832](https://github.com/mapbox/mapbox-gl-native/pull/6832))
+* The `MGLAnnotationView.annotation` property is now read-write. ([#8139](https://github.com/mapbox/mapbox-gl-native/pull/8139))
 * Fixed flickering that occurred when panning past the antimeridian. ([#7574](https://github.com/mapbox/mapbox-gl-native/pull/7574))
 * Fixed an issue that sometimes caused crashes when the SDK interacted with the file system in the background. ([#8125](https://github.com/mapbox/mapbox-gl-native/pull/8125))
 * Added a `MGLDistanceFormatter` class for formatting geographic distances. ([#7888](https://github.com/mapbox/mapbox-gl-native/pull/7888))
 * Fixed an issue that was causing the system location indicator to stay on in background after telemetry was disabled. ([#7833](https://github.com/mapbox/mapbox-gl-native/pull/7833))
-* Added support for predicates in rendered feature querying [8256](https://github.com/mapbox/mapbox-gl-native/pull/8246)
 
 ## 3.4.2 - February 21, 2017
 
