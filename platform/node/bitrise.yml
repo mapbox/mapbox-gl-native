@@ -13,21 +13,7 @@ workflows:
   primary:
     steps:
     - script:
-        title: Check for skipping CI
-        inputs:
-        - content: |-
-            #!/bin/bash
-            if [[ -n "$(echo $GIT_CLONE_COMMIT_MESSAGE_SUBJECT | sed -n '/\[skip ci\]/p')"  ||
-                  -n "$(echo $GIT_CLONE_COMMIT_MESSAGE_SUBJECT | sed -n '/\[ci skip\]/p')"  ||
-                  -n "$(echo $GIT_CLONE_COMMIT_MESSAGE_BODY    | sed -n 's/\[skip ci\]/p')" ||
-                  -n "$(echo $GIT_CLONE_COMMIT_MESSAGE_BODY    | sed -n 's/\[ci skip\]/p')" ]]; then
-                envman add --key SKIPCI --value true
-            else
-                envman add --key SKIPCI --value false
-            fi
-    - script:
         title: Check for publishing
-        run_if: '{{enveq "SKIPCI" "false"}}'
         inputs:
         - content: |-
             #!/bin/bash
@@ -37,7 +23,6 @@ workflows:
             fi
     - script:
         title: Run build script
-        run_if: '{{enveq "SKIPCI" "false"}}'
         inputs:
         - content: |-
             #!/bin/bash
@@ -51,7 +36,7 @@ workflows:
             make node
     - script:
         title: Run test script
-        run_if: '{{and (enveq "SKIPCI" "false") (enveq "PUBLISH" "")}}'
+        run_if: '{{enveq "PUBLISH" ""}}'
         inputs:
         - content: |-
             #!/bin/bash
@@ -60,7 +45,6 @@ workflows:
             ./platform/node/scripts/after_script.sh ${BITRISE_BUILD_NUMBER}
     - script:
         title: Run publish script
-        run_if: '{{enveq "SKIPCI" "false"}}'
         inputs:
         - content: |-
             #!/bin/bash
@@ -69,7 +53,6 @@ workflows:
             exit ${RESULT:-0}
     - slack:
         title: Post to Slack
-        run_if: '{{enveq "SKIPCI" "false"}}'
         inputs:
         - webhook_url: "$SLACK_HOOK_URL"
         - channel: "#gl-bots"
