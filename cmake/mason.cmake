@@ -21,11 +21,34 @@ function(mason_detect_platform)
 
     # Determine platform version string
     if(NOT MASON_PLATFORM_VERSION)
-        execute_process(
-            COMMAND uname -m
-            OUTPUT_VARIABLE MASON_PLATFORM_VERSION
-            OUTPUT_STRIP_TRAILING_WHITESPACE)
-        set(MASON_PLATFORM_VERSION "${MASON_PLATFORM_VERSION}" PARENT_SCOPE)
+        # Android Studio only passes ANDROID_ABI, but we need to adjust that to the Mason
+        if(MASON_PLATFORM STREQUAL "android" AND NOT MASON_PLATFORM_VERSION)
+            if (ANDROID_ABI STREQUAL "armeabi")
+                set(MASON_PLATFORM_VERSION "arm-v5-9" PARENT_SCOPE)
+            elseif (ANDROID_ABI STREQUAL "armeabi-v7a")
+                set(MASON_PLATFORM_VERSION "arm-v7-9" PARENT_SCOPE)
+            elseif (ANDROID_ABI STREQUAL "arm64-v8a")
+                set(MASON_PLATFORM_VERSION "arm-v8-21" PARENT_SCOPE)
+            elseif (ANDROID_ABI STREQUAL "x86")
+                set(MASON_PLATFORM_VERSION "x86-9" PARENT_SCOPE)
+            elseif (ANDROID_ABI STREQUAL "x86_64")
+                set(MASON_PLATFORM_VERSION "x86-64-21" PARENT_SCOPE)
+            elseif (ANDROID_ABI STREQUAL "mips")
+                set(MASON_PLATFORM_VERSION "mips-9" PARENT_SCOPE)
+            elseif (ANDROID_ABI STREQUAL "mips64")
+                set(MASON_PLATFORM_VERSION "mips-64-9" PARENT_SCOPE)
+            else()
+                message(FATAL_ERROR "Unknown ANDROID_ABI '${ANDROID_ABI}'.")
+            endif()
+        elseif(MASON_PLATFORM STREQUAL "ios")
+            set(MASON_PLATFORM_VERSION "8.0" PARENT_SCOPE)
+        else()
+            execute_process(
+                COMMAND uname -m
+                OUTPUT_VARIABLE MASON_PLATFORM_VERSION
+                OUTPUT_STRIP_TRAILING_WHITESPACE)
+            set(MASON_PLATFORM_VERSION "${MASON_PLATFORM_VERSION}" PARENT_SCOPE)
+        endif()
     endif()
 endfunction()
 

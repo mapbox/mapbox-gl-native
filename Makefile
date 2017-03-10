@@ -212,8 +212,7 @@ $(IOS_PROJ_PATH): $(IOS_USER_DATA_PATH)/WorkspaceSettings.xcsettings $(BUILD_DEP
 	(cd $(IOS_OUTPUT_PATH) && cmake -G Xcode ../.. \
 		-DCMAKE_TOOLCHAIN_FILE=../../platform/ios/toolchain.cmake \
 		-DMBGL_PLATFORM=ios \
-		-DMASON_PLATFORM=ios \
-		-DMASON_PLATFORM_VERSION=8.0)
+		-DMASON_PLATFORM=ios)
 
 $(IOS_USER_DATA_PATH)/WorkspaceSettings.xcsettings: platform/ios/WorkspaceSettings.xcsettings
 	mkdir -p "$(IOS_USER_DATA_PATH)"
@@ -513,8 +512,7 @@ $(MBGL_ANDROID_BUILD_DIR)/build.ninja: $(MBGL_ANDROID_BUILD_DIR)/env.sh platform
 	    -DCMAKE_BUILD_TYPE=$(BUILDTYPE) \
 	    -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
 	    -DMBGL_PLATFORM=android \
-	    -DMASON_PLATFORM=android \
-	    -DMASON_PLATFORM_VERSION=$1-$3) && \
+	    -DMASON_PLATFORM=android) && \
 	$$$${CMAKE} \
 	    -H. \
 	    -B"$(MBGL_ANDROID_BUILD_DIR)"
