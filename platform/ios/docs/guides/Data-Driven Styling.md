@@ -1,16 +1,19 @@
+<!---
 To do - JK:
 - [ ] Fill it out with more detailed explanations
 - [ ] Add examples for camera or composite style functions
 - [ ] Cluster earthquakes as an example for camera function?
 - [ ] Clean up & optimize screenshots - replace with screenshots showing circles below symbol layer
 - [ ] Link API docs
+---->
+
+
 
 ##Data-Driven Styling
 
-Mapbox's data-driven styling features allow you to use data properties to style your maps. You can style objects within the same layer differently based on their individual attributes.
+Mapbox's data-driven styling features allow you to use data properties to style your maps. You can style objects within the same layer differently based on their individual attributes. This enables you to style icons, routes, parks, and more based on attributes.
 
-
-![dds-ex-opt-1-random](https://cloud.githubusercontent.com/assets/12474734/23806208/a1dd4d5c-0575-11e7-92cf-5ece1d4c3f71.png)
+![available bikes](img/data-driven-styling/citibikes.png)
 
 
 _Insert cool overview of things you can do!_
@@ -63,7 +66,7 @@ The stops dictionary below, for example, shows colors that continuously shift fr
             style.insertLayer(layer, below: symbolLayer)
         }
 ```
-![dds-ex-opt-2-exponential](https://cloud.githubusercontent.com/assets/12474734/23806207/a1dc571c-0575-11e7-8f87-f6122a4a019b.png)
+![exponential mode](img/data-driven-styling/exponential.png)
 
 #####Interval
 
