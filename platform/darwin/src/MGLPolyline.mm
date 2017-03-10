@@ -48,6 +48,10 @@
              @"coordinates": self.mgl_coordinates};
 }
 
+- (BOOL)isEqual:(id)other {
+    return self == other || ([other isKindOfClass:[MGLPolyline class]] && [super isEqual:other]);
+}
+
 @end
 
 @interface MGLMultiPolyline ()
