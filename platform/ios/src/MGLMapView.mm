@@ -3064,7 +3064,7 @@ public:
     return annotationContext.annotation;
 }
 
-/// Returns the annotation tag assigned to the given annotation. Relatively expensive.
+/// Returns the annotation tag assigned to the given annotation.
 - (MGLAnnotationTag)annotationTagForAnnotation:(id <MGLAnnotation>)annotation
 {
     if ( ! annotation || annotation == self.userLocation
@@ -3104,7 +3104,7 @@ public:
         NSAssert([annotation conformsToProtocol:@protocol(MGLAnnotation)], @"annotation should conform to MGLAnnotation");
 
         // adding the same annotation object twice is a no-op
-        if ([self.annotations containsObject:annotation])
+        if (_annotationTagsByAnnotation.count(annotation) != 0)
         {
             continue;
         }

@@ -45,6 +45,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * Added a method to MGLMapViewDelegate, `-mapView:shouldChangeFromCamera:toCamera:`, that you can implement to restrict which parts the user can navigate to using gestures. ([#5584](https://github.com/mapbox/mapbox-gl-native/pull/5584))
 * Annotations are no longer deselected when the map is panned or zoomed, even if the annotation moves out of the visible bounds. ([#8022](https://github.com/mapbox/mapbox-gl-native/pull/8022))
 * Changing the coordinates of a point annotation no longer deselects the annotation. ([#8269](https://github.com/mapbox/mapbox-gl-native/pull/8269))
+* Fixed an issue preventing MGLMapView from adding a polyline annotation with the same coordinates as a polygon annotation. ([#8355](https://github.com/mapbox/mapbox-gl-native/pull/8355))
 * Fixed an issue where translucent, non-view-backed point annotations along tile boundaries would be drawn darker than expected. ([#6832](https://github.com/mapbox/mapbox-gl-native/pull/6832))
 * Double-tap and two-finger tap gestures now zoom to the nearest integer zoom level. ([#8027](https://github.com/mapbox/mapbox-gl-native/pull/8027))
 * The `MGLAnnotationView.annotation` property is now read-write. ([#8139](https://github.com/mapbox/mapbox-gl-native/pull/8139))
