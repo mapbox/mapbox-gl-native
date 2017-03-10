@@ -8,12 +8,6 @@
 #include <queue>
 #include <string>
 
-#if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
-#define UV_ASYNC_PARAMS(handle) uv_async_t *handle, int
-#else
-#define UV_ASYNC_PARAMS(handle) uv_async_t *handle
-#endif
-
 namespace node_mbgl {
 namespace util {
 
@@ -23,7 +17,7 @@ public:
     AsyncQueue(uv_loop_t *loop, std::function<void(T &)> fn) :
           callback(fn) {
         async.data = this;
-        uv_async_init(loop, &async, [](UV_ASYNC_PARAMS(handle)) {
+        uv_async_init(loop, &async, [](uv_async_t* handle) {
             auto q = reinterpret_cast<AsyncQueue *>(handle->data);
             q->process();
         });
