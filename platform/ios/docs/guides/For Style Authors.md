@@ -28,7 +28,7 @@ make sure the contents of these elements remain legible with the map view
 underneath.
 The user location annotation view, the attribution button, any buttons in
 callout views, and any items in the navigation bar are influenced by your
-application’s tint color, so choose a tint color that constrasts well with your
+application’s tint color, so choose a tint color that contrasts well with your
 map style.
 If you intend your style to be used in the dark, consider the impact that Night
 Shift may have on your style’s colors.
@@ -169,6 +169,22 @@ To create a shape source from local GeoJSON data, first
 [convert the GeoJSON data into a shape](working-with-geojson-data.html#converting-geojson-data-into-shape-objects),
 then use the `-[MGLShapeSource initWithIdentifier:shape:options:]` method.
 
+# Style functions and interpolation mode
+
+The runtime styling API introduced `MGLStyleFunction` to the iOS SDK.
+Data-driven styling expands `MGLStyleFunction`. 
+
+In style JSON     | In the SDK
+------------------|-----------
+`type`            | `MGLInterpolationMode`
+`exponential`     | `MGLInterpolationModeExponential`
+`interval`        | `MGLInterpolationModeInterval`
+`categorical`     | `MGLInterpolationModeCategorical`
+`identity`        | `MGLInterpolationModeIdentity`
+`zoom function`   | `MGLCameraStyleFunction`
+`property function`| `MGLSourceStyleFunction`
+`zoom-and-property functions`| `MGLCompositeStyleFunction`
+
 ## Configuring the map content’s appearance
 
 Each layer defined by the style JSON file is represented at runtime by a style
@@ -253,9 +269,9 @@ In style JSON | In Objective-C | In Swift
 
 Each property representing a layout or paint attribute is set to an
 `MGLStyleValue` object, which is either an `MGLConstantStyleValue` object (for
-constant values) or an `MGLStyleFunction` object (for zoom level functions). The
-style value object is a container for the raw value or function parameters that
-you want the attribute to be set to.
+constant values) or an `MGLStyleFunction` subclass. The style value object is a
+container for the raw value or function parameters that you want the attribute
+to be set to.
 
 In contrast to the JSON type that the style specification defines for each
 layout or paint property, the style value object often contains a more specific
