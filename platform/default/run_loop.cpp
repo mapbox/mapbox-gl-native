@@ -121,7 +121,7 @@ RunLoop::~RunLoop() {
     runOnce();
 
     if (uv_loop_close(impl->loop) == UV_EBUSY) {
-        throw std::runtime_error("Failed to close loop.");
+        assert(false && "Failed to close loop.");
     }
     delete impl->loop;
 }
