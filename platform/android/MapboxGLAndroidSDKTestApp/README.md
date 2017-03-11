@@ -1,5 +1,15 @@
 # Mapbox GL Test App
 
+## Building
+
+To be able to run any Gradle commands, you'll need to create the configuration file by running
+
+```
+$ make android-configuration
+```
+
+from the root folder.
+
 ## Testing
 
 ### Running Espresso tests on a device
@@ -28,7 +38,7 @@ On a terminal, within `mapbox-gl-native/android/java`,
 run the tests (`cC` stands for `connectedCheck`):
 
 ```
-$ ./gradlew cC -p MapboxGLAndroidSDKTestApp
+$ ./gradlew -Pmapbox.abis=all cC -p MapboxGLAndroidSDKTestApp
 ```
 
 Then:
@@ -63,7 +73,7 @@ You can also have a run configuration:
 You can also run the tests from the command line with:
 
 ```
-$ ./gradlew test --continue -p MapboxGLAndroidSDKTestApp
+$ ./gradlew -Pmapbox.abis=none test -p MapboxGLAndroidSDKTestApp
 ```
 
 ### Running the UI/Application Exerciser Monkey

@@ -25,7 +25,7 @@ On a terminal, within `mapbox-gl-native/android/java`,
 run the tests (`cC` stands for `connectedCheck`):
 
 ```
-$ ./gradlew cC -p MapboxGLAndroidSDKTestApp
+$ ./gradlew -Pmapbox.abis=all cC -p MapboxGLAndroidSDKTestApp
 ```
 
 Then:
@@ -59,7 +59,7 @@ You can generate JaCoCo reports from espresso tests by
 - running the gradle task `createMockDebugCoverageReport` when executing tests.
 
 ## Running Espresso test automatically on AWS Device Farm
-To run tests on AWS device farm you need to execute `./gradlew devicefarmUpload`.
+To run tests on AWS device farm you need to execute `./gradlew -Pmapbox.abis=none devicefarmUpload`.
 You can configure the different steps in the testapp `build.gradle`.
 AWS credentials are found in bitrise.
 

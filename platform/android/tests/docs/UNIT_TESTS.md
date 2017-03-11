@@ -69,7 +69,7 @@ If you like, you can also run with test coverage enabled. This will show you the
 You can also run the tests from the command line with:
 
 ```
-$ ./gradlew test --continue -p MapboxGLAndroidSDKTestApp
+$ ./gradlew -Pmapbox.abis=none test -p MapboxGLAndroidSDKTestApp
 ```
 
 ## Running Unit tests on CI
@@ -80,7 +80,7 @@ fails, this will fail and stop the build.
 You can find this gradle command in our [buildscript](https://github.com/mapbox/mapbox-gl-native/blob/master/platform/android/bitrise.yml#L48):
 
 ```
-$ ./gradlew testReleaseUnitTest --continue
+$ ./gradlew -Pmapbox.abis=none testReleaseUnitTest
 ```
 
 
