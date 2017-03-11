@@ -21,3 +21,6 @@ task wrapper(type: Wrapper) {
 
 apply from: rootProject.file('dependencies.gradle')
 
+// Load build system information. If this file does not exist, run
+// `make platform/android/configuration.gradle`
+apply from: rootProject.file('configuration.gradle')
