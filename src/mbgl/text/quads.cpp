@@ -107,63 +107,113 @@ struct GlyphInstance {
 };
 
 typedef std::vector<GlyphInstance> GlyphInstances;
+    
+/*
+ Given (1) a glyph positioned relative to an anchor point and (2) a line to follow,
+ calculates which segment of the line the glyph will fall on for each possible
+ scale range, and for each range produces a "virtual" anchor point and an angle that will
+ place the glyph on the right segment and rotated to the correct angle.
+ 
+ Because one glyph quad is made ahead of time for each possible orientation, the
+ symbol_sdf shader can quickly handle changing layout as we zoom in and out
+ 
+ If "forward" is true, text is laid out left-to-right based on the logical order
+ of the line, otherwise order is inverted. Logical order of the line may not have any
+ obvious relationship to "left" or "right" (imagine a curvy line running from north
+ to south). To handle this, if the "keepUpright" property is set, we call
+ getSegmentGlyphs twice (once upright and once "upside down"). This will generate two
+ sets of glyphs following the line in the opposite direction. Later, SymbolLayout::place
+ will look at the glyphs and based on the placement angle determine if their original
+ anchor was "upright" or not -- based on that, it throws away one set of glyphs or the
+ other (this work has to be done in the CPU, but it's just a filter so it's fast)
+ 
+ */
 
 void getSegmentGlyphs(std::back_insert_iterator<GlyphInstances> glyphs,
-                      Anchor& anchor,
-                      float offset,
-                      const GeometryCoordinates& line,
-                      int segment,
-                      bool forward) {
-    const bool upsideDown = !forward;
-
-    if (offset < 0)
-        forward = !forward;
-
+                      Anchor& anchor, // Anchor point in tile coordinates
+                      float offset, // "Horizontal" distance of the middle of this glyph from the anchor point, in tile coordinates (horizontal = along line segment the anchor is on)
+                      const GeometryCoordinates& line, // Set of line segments for us to follow
+                      int segment, // Segment we start on
+                      bool forward) { // Iterate forward on segments (or if false, iterate towards earlier segments)
+    const bool upsideDown = !forward; // "upside down" means we iterate along this line in the opposite direction and rotate each glyph 180 degrees
+    
+    if (offset < 0) // Offset < 0 -> With a centered label, roughly the first half of glyphs in the label will have offset < 0
+        forward = !forward; // Since this glyph is to the left of the anchor, we'll have to move to segments to the left (aka "before") of the starting segment as the label scales up
+    
     if (forward)
-        segment++;
-
+        segment++; // "line[segment++]" means beginning of next segment/end of segment anchor is on. If we're going backwards than "line[segment]" is the beginning of the segment the anchor is on -- and that's the "end" of the segment we start laying out on.
+    
+    // 0     1       2     (Segments)
+    // |-----|---A---|------| (A = "anchor")
+    //     This is my label
+    
     assert((int)line.size() > segment);
-    Point<float> end = convertPoint<float>(line[segment]);
-    Point<float> newAnchorPoint = anchor.point;
-    float prevscale = std::numeric_limits<float>::infinity();
-
-    offset = std::fabs(offset);
-
+    Point<float> end = convertPoint<float>(line[segment]); // End of segment that anchor is on
+    Point<float> newAnchorPoint = anchor.point; // Start at actual anchor point
+    float prevscale = std::numeric_limits<float>::infinity(); // Start at largest possible scale
+    
+    offset = std::fabs(offset); // If offset is negative, we flipped "forward" (and set "end" to be the left side of our starting segment), so that takes care of direction for us, we only care about magnitude
+    
     const float placementScale = anchor.scale;
-
+    
+    // Starting at largest scale, find minimum scale we can still show this glyph on the current segment, then move to next segment until we hit the minimum scale for this anchor (or run out of space on the line)
     while (true) {
+        // newAnchorPoint = "virtual" anchor point for current segment (may be to left or right of the actual segment)
+        // end = end point of current segment
+        
+        // Distance from the virtual anchor point to the end of the segment. So if "dist" = 50, and "offset" = 40, the glyph fits on the segment
+        // If "offset" = 60, the glyph doesn't fit on the segment
         const float dist = util::dist<float>(newAnchorPoint, end);
-        const float scale = offset / dist;
-        float angle = std::atan2(end.y - newAnchorPoint.y, end.x - newAnchorPoint.x);
-        if (!forward)
+        
+        const float scale = offset / dist; // minimum scale at which this glyph can fit on this segment
+        // The way to think about scale starting at infinity is that infinitely zoomed in, each segment will be infinitely wide, and thus have space for all glyphs.
+        
+        float angle = std::atan2(end.y - newAnchorPoint.y, end.x - newAnchorPoint.x); // Angle of this line segment (although this is derived from the virtual anchor point, the anchor point should be along the same line as the line segment)
+        if (!forward) // Rotate glyph 180 -- note that 'angle' calculation above will be implicitly rotated 180 if we're going "backwards"
             angle += M_PI;
-
+        
+        // Insert a glyph rotated at this angle for display in the range from [scale, previous(larger) scale].
         glyphs = GlyphInstance{
-            /* anchor */ newAnchorPoint,
-            /* offset */ static_cast<float>(upsideDown ? M_PI : 0.0),
-            /* minScale */ scale,
-            /* maxScale */ prevscale,
-            /* angle */ static_cast<float>(std::fmod((angle + 2.0 * M_PI), (2.0 * M_PI)))};
-
-        if (scale <= placementScale)
+            /* anchor */ newAnchorPoint, // Draw relative to this point (which is somewhere on the line you would get by extending this line segment out to infinity in both directions)
+            /* offset */ static_cast<float>(upsideDown ? M_PI : 0.0), // This is a different 'offset' -- it just means rotate the glyph 180 if we're in "upside down" mode
+            /* minScale */ scale, // minimum scale this can show at
+            /* maxScale */ prevscale, // maximum scale this version can show at
+            /* angle */ static_cast<float>(std::fmod((angle + 2.0 * M_PI), (2.0 * M_PI)))}; // Orientation of the line segment we're on
+        
+        if (scale <= placementScale) // If the anchor isn't going to show past this scale, don't make any more calculations
             break;
-
-        newAnchorPoint = end;
-
+        
+        // OK, we finished making the glyph for that segment, now let's move on to the next segment.
+        
+        newAnchorPoint = end; // Start by moving our virtual anchor point to the end of this segment (aka beginning of next segment)
+        
         // skip duplicate nodes
-        while (newAnchorPoint == end) {
-            segment += forward ? 1 : -1;
-            if ((int)line.size() <= segment || segment < 0) {
-                anchor.scale = scale;
+        while (newAnchorPoint == end) { // Always true on first iteration, only true after that if there are zero-length segments
+            segment += forward ? 1 : -1; // Move one segment forward or backwards
+            if ((int)line.size() <= segment || segment < 0) { // If we've iterated off the end of the segments for this line, then we can't handle any smaller scale
+                anchor.scale = scale; // Since we can't fit one glyph of the label onto the line, that means we can't show any of the label. Update the anchor with the new minScale
                 return;
             }
-            end = convertPoint<float>(line[segment]);
+            end = convertPoint<float>(line[segment]); // End should now be the end of the "next" segment
         }
-
+        
+        // Imagine:
+        // Prior segement = 1
+        //  prior anchor = (0,30)
+        //  prior end = (20,30)
+        // Current segment = 2 (a 14.14 unit line at a 45 degree angle upwards)
+        //  newAnchorPoint = (20,30)
+        //  end = (30,40)
+        //  "dist" = 20 (based on prior anchor and prior end)
+        //  util::normal( (20,30), (30,40) ) = (30-20) / 14.14, (40-30) / 14.14 = .707, .707 (unit vector for direction: 45%)
+        //   Anand and I (Chris) do not understand the nomenclature here -- it doesn't seem like a normal vector
+        //   normal = unit vector*distance = (.707,.707)*20 = ( 14.14, 14.14 )
         Point<float> normal = util::normal<float>(newAnchorPoint, end) * dist;
+        // New "virtual" anchor point: extended "out" (could be left or right depending on direction we're iterating) from the edge of this line segment by "dist".
+        // As we iterate over segments, "dist" keeps growing (by the length of each statement), so that the virtual anchor point ends up further off the actual line
         newAnchorPoint = newAnchorPoint - normal;
-
-        prevscale = scale;
+        
+        prevscale = scale; // Make minScale for previous segment is maxScale for the next segment
     }
 }
 
