@@ -169,24 +169,6 @@ To create a shape source from local GeoJSON data, first
 [convert the GeoJSON data into a shape](working-with-geojson-data.html#converting-geojson-data-into-shape-objects),
 then use the `-[MGLShapeSource initWithIdentifier:shape:options:]` method.
 
-# Style functions and interpolation mode
-
-The runtime styling API introduced `MGLStyleFunction` to the iOS SDK.
-[Data-driven styling](data-driven-styling.html) expands `MGLStyleFunction` and
-introduces `MGLInterpolationMode`. Individual style property documentation
-includes which subclasses of `MGLStyleFunction` are enabled for that property.
-
-In style JSON                | In the SDK
------------------------------|-----------
-`zoom function`              | `MGLCameraStyleFunction`
-`property function`          | `MGLSourceStyleFunction`
-`zoom-and-property functions`| `MGLCompositeStyleFunction`
-`type`                       | `MGLInterpolationMode`
-`exponential`                | `MGLInterpolationModeExponential`
-`interval`                   | `MGLInterpolationModeInterval`
-`categorical`                | `MGLInterpolationModeCategorical`
-`identity`                   | `MGLInterpolationModeIdentity`
-
 ## Configuring the map content’s appearance
 
 Each layer defined by the style JSON file is represented at runtime by a style
