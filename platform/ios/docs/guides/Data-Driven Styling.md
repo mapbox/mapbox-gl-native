@@ -12,7 +12,7 @@ To do - JK:
 
 ##Data-Driven Styling
 
-Mapbox's data-driven styling features allow you to use data properties to style your maps. You can style objects within the same layer differently based on their individual attributes. This enables you to style icons, routes, parks, and more based on attributes.
+Mapbox’s data-driven styling features allow you to use data properties to style your maps. You can style objects within the same layer differently based on their individual attributes. This enables you to style icons, routes, parks, and more based on attributes.
 
 ![available bikes](img/data-driven-styling/citibikes.png)
 
@@ -84,7 +84,7 @@ layer.circleColor = MGLStyleValue<UIColor>(interpolationMode: .interval,
 
 #####Categorical
 
-Returns the output value that is equal to the stop for the function input. We're going to use a different stops dictionary than we did for the previous two modes.
+Returns the output value that is equal to the stop for the function input. We’re going to use a different stops dictionary than we did for the previous two modes.
 
 There are three main types of events in the dataset: earthquakes, explosions, and quarry blasts. In this case, the color of the circle layer will be determined by the type of event, with a default value of green to catch any events that do not fall into any of those categories.
 
@@ -104,7 +104,7 @@ layer.circleColor = MGLStyleValue<UIColor>(interpolationMode: .categorical,
 
 #####Identity
 
-`MGLInterpolationModeIdentity` uses the attribute's value as the style value. For example, you can set the `circleRadius` to the earthquake's magnitude. Since the attribute value itself will be used as the style value, `sourceStops` can be set to `nil`.
+`MGLInterpolationModeIdentity` uses the attribute’s value as the style value. For example, you can set the `circleRadius` to the earthquake’s magnitude. Since the attribute value itself will be used as the style value, `sourceStops` can be set to `nil`.
 
 ``` swift
 layer.circleRadius = MGLStyleFunction<NSNumber>(interpolationMode: .identity,
