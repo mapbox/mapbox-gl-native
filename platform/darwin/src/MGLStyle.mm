@@ -341,10 +341,10 @@ static NSURL *MGLStyleURL_emerald;
         styleLayer = [[MGLCircleStyleLayer alloc] initWithIdentifier:identifier source:source];
     } else if (mbglLayer->is<mbgl::style::BackgroundLayer>()) {
         styleLayer = [[MGLBackgroundStyleLayer alloc] initWithIdentifier:identifier];
-    } else if (auto customLayer = mbglLayer->as<mbgl::style::CustomLayer>()) {
+    } else if (mbglLayer->is<mbgl::style::CustomLayer>()) {
         styleLayer = self.openGLLayers[identifier];
         if (styleLayer) {
-            NSAssert(styleLayer.rawLayer == customLayer, @"%@ wraps a CustomLayer that differs from the one associated with the underlying style.", styleLayer);
+            NSAssert(styleLayer.rawLayer == mbglLayer->as<mbgl::style::CustomLayer>(), @"%@ wraps a CustomLayer that differs from the one associated with the underlying style.", styleLayer);
             return styleLayer;
         }
         styleLayer = [[MGLOpenGLStyleLayer alloc] initWithIdentifier:identifier];
