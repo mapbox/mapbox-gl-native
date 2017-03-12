@@ -2419,9 +2419,11 @@ public:
 
 - (void)addOverlays:(NS_ARRAY_OF(id <MGLOverlay>) *)overlays
 {
+#if DEBUG
     for (id <MGLOverlay> overlay in overlays) {
         NSAssert([overlay conformsToProtocol:@protocol(MGLOverlay)], @"Overlay does not conform to MGLOverlay");
     }
+#endif
     [self addAnnotations:overlays];
 }
 
@@ -2430,9 +2432,11 @@ public:
 }
 
 - (void)removeOverlays:(NS_ARRAY_OF(id <MGLOverlay>) *)overlays {
+#if DEBUG
     for (id <MGLOverlay> overlay in overlays) {
         NSAssert([overlay conformsToProtocol:@protocol(MGLOverlay)], @"Overlay does not conform to MGLOverlay");
     }
+#endif
     [self removeAnnotations:overlays];
 }
 
