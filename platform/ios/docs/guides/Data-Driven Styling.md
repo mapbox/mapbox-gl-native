@@ -100,7 +100,7 @@ layer.circleColor = MGLStyleValue<UIColor>(interpolationMode: .categorical,
 
 ```
 
-<img width="320" alt="screenshot 2017-03-01 13 05 28" src="https://cloud.githubusercontent.com/assets/12474734/23481308/d7c4d644-fe7f-11e6-9e71-11a6ecb89775.png"> <img width="320" alt="screenshot 2017-03-01 13 06 00" src="https://cloud.githubusercontent.com/assets/12474734/23481311/d90ca586-fe7f-11e6-87b8-e63cdeb1db84.png">
+![categorical mode](img/data-driven-styling/categorical1.png) ![categorical mode](img/data-driven-styling/categorical2.png)
 
 #####Identity
 
@@ -114,7 +114,7 @@ layer.circleRadius = MGLStyleFunction<NSNumber>(interpolationMode: .identity,
 
 ```
 
-<img width="320" alt="screenshot 2017-02-28 09 37 28" src="https://cloud.githubusercontent.com/assets/12474734/23444533/97591ff6-fdea-11e6-9d87-66ae1f205d22.png">
+![identity mode](img/data-driven-styling/identity.png)
 
 _Insert Conclusion_
 
