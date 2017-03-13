@@ -60,9 +60,6 @@ private:
     // Internal
     void report(float duration);
 
-    void setMapChangeCallback(std::function<void(mbgl::MapChange)> callback);
-    void notifyMapChange(mbgl::MapChange change) override;
-
     mbgl::Color makeRandomColor() const;
     mbgl::Point<double> makeRandomPoint() const;
     static std::shared_ptr<const mbgl::SpriteImage>
@@ -80,8 +77,6 @@ private:
 
     mbgl::AnnotationIDs annotationIDs;
     std::vector<std::string> spriteIDs;
-
-    std::function<void(mbgl::MapChange)> mapChangeCallback;
 
 private:
     mbgl::Map* map = nullptr;

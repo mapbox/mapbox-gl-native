@@ -50,10 +50,4 @@ void HeadlessBackend::invalidate() {
     assert(false);
 }
 
-void HeadlessBackend::notifyMapChange(MapChange change) {
-    if (mapChangeCallback) {
-        mapChangeCallback(change);
-    }
-}
-
 } // namespace mbgl
