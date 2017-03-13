@@ -18,9 +18,6 @@ public:
     ~HeadlessBackend() override;
 
     void invalidate() override;
-    void notifyMapChange(MapChange) override;
-
-    void setMapChangeCallback(std::function<void(MapChange)>&& cb) { mapChangeCallback = std::move(cb); }
 
     struct Impl {
         virtual ~Impl() {}
@@ -45,8 +42,6 @@ private:
 
     bool extensionsLoaded = false;
     bool active = false;
-
-    std::function<void(MapChange)> mapChangeCallback;
 };
 
 } // namespace mbgl
