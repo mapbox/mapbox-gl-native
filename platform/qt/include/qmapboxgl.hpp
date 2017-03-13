@@ -94,7 +94,6 @@ class Q_DECL_EXPORT QMapboxGL : public QObject
     Q_PROPERTY(QMargins margins READ margins WRITE setMargins)
 
 public:
-    // Reflects mbgl::MapChange.
     enum MapChange {
         MapChangeRegionWillChange = 0,
         MapChangeRegionWillChangeAnimated,

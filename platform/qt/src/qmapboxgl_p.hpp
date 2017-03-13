@@ -29,7 +29,20 @@ public:
     void activate() final {}
     void deactivate() final {}
     void invalidate() final;
-    void notifyMapChange(mbgl::MapChange) final;
+
+    // mbgl::Backend (mbgl::MapObserver) implementation.
+    void onCameraWillChange(mbgl::MapObserver::CameraChangeMode) final;
+    void onCameraIsChanging() final;
+    void onCameraDidChange(mbgl::MapObserver::CameraChangeMode) final;
+    void onWillStartLoadingMap() final;
+    void onDidFinishLoadingMap() final;
+    void onDidFailLoadingMap() final;
+    void onWillStartRenderingFrame() final;
+    void onDidFinishRenderingFrame(mbgl::MapObserver::RenderMode) final;
+    void onWillStartRenderingMap() final;
+    void onDidFinishRenderingMap(mbgl::MapObserver::RenderMode) final;
+    void onDidFinishLoadingStyle() final;
+    void onSourceDidChange() final;
 
     mbgl::EdgeInsets margins;
     QSize size { 0, 0 };

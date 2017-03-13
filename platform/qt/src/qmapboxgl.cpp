@@ -57,24 +57,6 @@ static_assert(mbgl::underlying_type(QMapboxGLSettings::ConstrainWidthAndHeight) 
 static_assert(mbgl::underlying_type(QMapboxGLSettings::DefaultViewport) == mbgl::underlying_type(mbgl::ViewportMode::Default), "error");
 static_assert(mbgl::underlying_type(QMapboxGLSettings::FlippedYViewport) == mbgl::underlying_type(mbgl::ViewportMode::FlippedY), "error");
 
-// mbgl::MapChange
-static_assert(mbgl::underlying_type(QMapboxGL::MapChangeRegionWillChange) == mbgl::underlying_type(mbgl::MapChangeRegionWillChange), "error");
-static_assert(mbgl::underlying_type(QMapboxGL::MapChangeRegionWillChangeAnimated) == mbgl::underlying_type(mbgl::MapChangeRegionWillChangeAnimated), "error");
-static_assert(mbgl::underlying_type(QMapboxGL::MapChangeRegionIsChanging) == mbgl::underlying_type(mbgl::MapChangeRegionIsChanging), "error");
-static_assert(mbgl::underlying_type(QMapboxGL::MapChangeRegionDidChange) == mbgl::underlying_type(mbgl::MapChangeRegionDidChange), "error");
-static_assert(mbgl::underlying_type(QMapboxGL::MapChangeRegionDidChangeAnimated) == mbgl::underlying_type(mbgl::MapChangeRegionDidChangeAnimated), "error");
-static_assert(mbgl::underlying_type(QMapboxGL::MapChangeWillStartLoadingMap) == mbgl::underlying_type(mbgl::MapChangeWillStartLoadingMap), "error");
-static_assert(mbgl::underlying_type(QMapboxGL::MapChangeDidFinishLoadingMap) == mbgl::underlying_type(mbgl::MapChangeDidFinishLoadingMap), "error");
-static_assert(mbgl::underlying_type(QMapboxGL::MapChangeDidFailLoadingMap) == mbgl::underlying_type(mbgl::MapChangeDidFailLoadingMap), "error");
-static_assert(mbgl::underlying_type(QMapboxGL::MapChangeWillStartRenderingFrame) == mbgl::underlying_type(mbgl::MapChangeWillStartRenderingFrame), "error");
-static_assert(mbgl::underlying_type(QMapboxGL::MapChangeDidFinishRenderingFrame) == mbgl::underlying_type(mbgl::MapChangeDidFinishRenderingFrame), "error");
-static_assert(mbgl::underlying_type(QMapboxGL::MapChangeDidFinishRenderingFrameFullyRendered) == mbgl::underlying_type(mbgl::MapChangeDidFinishRenderingFrameFullyRendered), "error");
-static_assert(mbgl::underlying_type(QMapboxGL::MapChangeWillStartRenderingMap) == mbgl::underlying_type(mbgl::MapChangeWillStartRenderingMap), "error");
-static_assert(mbgl::underlying_type(QMapboxGL::MapChangeDidFinishRenderingMap) == mbgl::underlying_type(mbgl::MapChangeDidFinishRenderingMap), "error");
-static_assert(mbgl::underlying_type(QMapboxGL::MapChangeDidFinishRenderingMapFullyRendered) == mbgl::underlying_type(mbgl::MapChangeDidFinishRenderingMapFullyRendered), "error");
-static_assert(mbgl::underlying_type(QMapboxGL::MapChangeDidFinishLoadingStyle) == mbgl::underlying_type(mbgl::MapChangeDidFinishLoadingStyle), "error");
-static_assert(mbgl::underlying_type(QMapboxGL::MapChangeSourceDidChange) == mbgl::underlying_type(mbgl::MapChangeSourceDidChange), "error");
-
 // mbgl::NorthOrientation
 static_assert(mbgl::underlying_type(QMapboxGL::NorthUpwards) == mbgl::underlying_type(mbgl::NorthOrientation::Upwards), "error");
 static_assert(mbgl::underlying_type(QMapboxGL::NorthRightwards) == mbgl::underlying_type(mbgl::NorthOrientation::Rightwards), "error");
@@ -1587,19 +1569,87 @@ void QMapboxGLPrivate::invalidate()
     }
 }
 
-void QMapboxGLPrivate::notifyMapChange(mbgl::MapChange change)
+void QMapboxGLPrivate::onCameraWillChange(mbgl::MapObserver::CameraChangeMode mode)
 {
-    if (change == mbgl::MapChangeSourceDidChange) {
-        std::string attribution;
-        for (const auto& source : mapObj->getSources()) {
-            // Avoid duplicates by using the most complete attribution HTML snippet.
-            if (source->getAttribution() && (attribution.size() < source->getAttribution()->size()))
-                attribution = *source->getAttribution();
-        }
-        emit copyrightsChanged(QString::fromStdString(attribution));
+    if (mode == mbgl::MapObserver::CameraChangeMode::Immediate) {
+        emit mapChanged(QMapboxGL::MapChangeRegionWillChange);
+    } else {
+        emit mapChanged(QMapboxGL::MapChangeRegionWillChangeAnimated);
     }
+}
 
-    emit mapChanged(static_cast<QMapboxGL::MapChange>(change));
+void QMapboxGLPrivate::onCameraIsChanging()
+{
+    emit mapChanged(QMapboxGL::MapChangeRegionIsChanging);
+}
+
+void QMapboxGLPrivate::onCameraDidChange(mbgl::MapObserver::CameraChangeMode mode)
+{
+    if (mode == mbgl::MapObserver::CameraChangeMode::Immediate) {
+        emit mapChanged(QMapboxGL::MapChangeRegionDidChange);
+    } else {
+        emit mapChanged(QMapboxGL::MapChangeRegionDidChangeAnimated);
+    }
+}
+
+void QMapboxGLPrivate::onWillStartLoadingMap()
+{
+    emit mapChanged(QMapboxGL::MapChangeWillStartLoadingMap);
+}
+
+void QMapboxGLPrivate::onDidFinishLoadingMap()
+{
+    emit mapChanged(QMapboxGL::MapChangeDidFinishLoadingMap);
+}
+
+void QMapboxGLPrivate::onDidFailLoadingMap()
+{
+    emit mapChanged(QMapboxGL::MapChangeDidFailLoadingMap);
+}
+
+void QMapboxGLPrivate::onWillStartRenderingFrame()
+{
+    emit mapChanged(QMapboxGL::MapChangeWillStartRenderingFrame);
+}
+
+void QMapboxGLPrivate::onDidFinishRenderingFrame(mbgl::MapObserver::RenderMode mode)
+{
+    if (mode == mbgl::MapObserver::RenderMode::Partial) {
+        emit mapChanged(QMapboxGL::MapChangeDidFinishRenderingFrame);
+    } else {
+        emit mapChanged(QMapboxGL::MapChangeDidFinishRenderingFrameFullyRendered);
+    }
+}
+
+void QMapboxGLPrivate::onWillStartRenderingMap()
+{
+    emit mapChanged(QMapboxGL::MapChangeWillStartLoadingMap);
+}
+
+void QMapboxGLPrivate::onDidFinishRenderingMap(mbgl::MapObserver::RenderMode mode)
+{
+    if (mode == mbgl::MapObserver::RenderMode::Partial) {
+        emit mapChanged(QMapboxGL::MapChangeDidFinishRenderingMap);
+    } else {
+        emit mapChanged(QMapboxGL::MapChangeDidFinishRenderingMapFullyRendered);
+    }
+}
+
+void QMapboxGLPrivate::onDidFinishLoadingStyle()
+{
+    emit mapChanged(QMapboxGL::MapChangeDidFinishLoadingStyle);
+}
+
+void QMapboxGLPrivate::onSourceDidChange()
+{
+    std::string attribution;
+    for (const auto& source : mapObj->getSources()) {
+        // Avoid duplicates by using the most complete attribution HTML snippet.
+        if (source->getAttribution() && (attribution.size() < source->getAttribution()->size()))
+            attribution = *source->getAttribution();
+    }
+    emit copyrightsChanged(QString::fromStdString(attribution));
+    emit mapChanged(QMapboxGL::MapChangeSourceDidChange);
 }
 
 void QMapboxGLPrivate::connectionEstablished()
