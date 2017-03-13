@@ -8,8 +8,6 @@ To do - JK:
 - [ ] Add cocoaprefix so this can be moved to darwin
 ---->
 
-
-
 ##Data-Driven Styling
 
 Mapbox’s data-driven styling features allow you to use data properties to style your maps. You can style objects within the same layer differently based on their individual attributes. This enables you to style icons, routes, parks, and more based on attributes.
@@ -25,9 +23,11 @@ This guide uses earthquake data from the [U.S. Geological Survey](https://earthq
 
 There are three subclasses of `MGLStyleFunction`:
 
-* `MGLCameraStyleFunction` - For a style value that changes with zoom level. For example, you can make the radius of a circle to increase based on zoom level. In iOS SDK v3.4, a this was a `MGLStyleFunction`.
+* `MGLCameraStyleFunction` - For a style value that changes with zoom level. For example, you can make the radius of a circle to increase based on zoom level. In iOS SDK v3.4, this was a `MGLStyleFunction`.
 * `MGLSourceStyleFunction` - For a style value that changes with the attributes of a feature. You can adjust the radius of a circle based on the magnitude of an earthquake, for example.
 * `MGLCompositeStyleFunction` - For a style value that changes with both zoom level and attribute values. For example, you can add a circle layer where each circle has a radius based on both zoom level and the magnitude of an earthquake.
+
+The documentation for individual style properties will note which style functions are enabled for that property.
 
 ####Stops
 
@@ -81,7 +81,7 @@ layer.circleColor = MGLStyleValue<UIColor>(interpolationMode: .interval,
                                                           options: [.defaultValue: MGLStyleValue<UIColor>(rawValue: .green)])
 ```
 ![interval mode](img/data-driven-styling/interval.png)
-
+<!-- Clarify difference between interval and categorical -->
 #####Categorical
 
 Returns the output value that is equal to the stop for the function input. We’re going to use a different stops dictionary than we did for the previous two modes.
