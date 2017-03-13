@@ -113,6 +113,7 @@ void GeometryTile::onLayout(LayoutResult result) {
     nonSymbolBuckets = std::move(result.nonSymbolBuckets);
     featureIndex = std::move(result.featureIndex);
     data = std::move(result.tileData);
+    collisionTile.reset();
     observer->onTileChanged(*this);
 }
 
