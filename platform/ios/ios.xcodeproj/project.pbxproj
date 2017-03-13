@@ -641,6 +641,13 @@
 		DA72620E1DEEE3480043BB89 /* MGLOpenGLStyleLayer.mm in Sources */ = {isa = PBXBuildFile; fileRef = DA72620A1DEEE3480043BB89 /* MGLOpenGLStyleLayer.mm */; };
 		DA737EE11D056A4E005BDA16 /* MGLMapViewDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = DA737EE01D056A4E005BDA16 /* MGLMapViewDelegate.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DA737EE21D056A4E005BDA16 /* MGLMapViewDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = DA737EE01D056A4E005BDA16 /* MGLMapViewDelegate.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		DA7F8CC71F87486800937243 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = DA7F8CC61F87486800937243 /* AppDelegate.m */; };
+		DA7F8CCA1F87486800937243 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DA7F8CC91F87486800937243 /* ViewController.m */; };
+		DA7F8CCD1F87486800937243 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DA7F8CCB1F87486800937243 /* Main.storyboard */; };
+		DA7F8CCF1F87486800937243 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DA7F8CCE1F87486800937243 /* Assets.xcassets */; };
+		DA7F8CD21F87486800937243 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = DA7F8CD11F87486800937243 /* main.m */; };
+		DA7F8CD61F87497F00937243 /* Mapbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA94B9711E766E6400190EF5 /* Mapbox.framework */; };
+		DA7F8CD71F87497F00937243 /* Mapbox.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DA94B9711E766E6400190EF5 /* Mapbox.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		DA821D061CCC6D59007508D4 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DA821D041CCC6D59007508D4 /* LaunchScreen.storyboard */; };
 		DA821D071CCC6D59007508D4 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DA821D051CCC6D59007508D4 /* Main.storyboard */; };
 		DA8847D91CBAF91600AB86E3 /* Mapbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA8847D21CBAF91600AB86E3 /* Mapbox.framework */; };
@@ -1129,6 +1136,13 @@
 			remoteGlobalIDString = DA8847D11CBAF91600AB86E3;
 			remoteInfo = dynamic;
 		};
+		DA7F8CD81F87497F00937243 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DA1DC9421CB6C1C2006E619F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = DA94B9701E766E6400190EF5;
+			remoteInfo = tv;
+		};
 		DA8847D71CBAF91600AB86E3 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = DA1DC9421CB6C1C2006E619F /* Project object */;
@@ -1171,6 +1185,17 @@
 			dstSubfolderSpec = 10;
 			files = (
 				DA8847DA1CBAF91600AB86E3 /* Mapbox.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DA7F8CDA1F87497F00937243 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				DA7F8CD71F87497F00937243 /* Mapbox.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1634,6 +1659,15 @@
 		DA737AE71E59172C00AD2CDE /* ru */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Localizable.strings; sourceTree = "<group>"; };
 		DA737AE91E5917C300AD2CDE /* uk */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/Localizable.strings; sourceTree = "<group>"; };
 		DA737EE01D056A4E005BDA16 /* MGLMapViewDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLMapViewDelegate.h; sourceTree = "<group>"; };
+		DA7F8CC31F87486800937243 /* Mapbox GL.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Mapbox GL.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		DA7F8CC51F87486800937243 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		DA7F8CC61F87486800937243 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		DA7F8CC81F87486800937243 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
+		DA7F8CC91F87486800937243 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
+		DA7F8CCC1F87486800937243 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		DA7F8CCE1F87486800937243 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		DA7F8CD01F87486800937243 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		DA7F8CD11F87486800937243 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		DA80E9601FE84AD90065FC9B /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/Localizable.strings; sourceTree = "<group>"; };
 		DA80E9611FE84AEF0065FC9B /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = ar; path = ar.lproj/Foundation.stringsdict; sourceTree = "<group>"; };
 		DA821D041CCC6D59007508D4 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -1836,6 +1870,14 @@
 			files = (
 				DAAE5F8820F046FE0089D85B /* libmbgl-core.a in Frameworks */,
 				DA2E88561CC036F400F24E7B /* Mapbox.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DA7F8CC01F87486800937243 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DA7F8CD61F87497F00937243 /* Mapbox.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2296,8 +2338,9 @@
 			isa = PBXGroup;
 			children = (
 				402E9DE21CD3A56500FD4519 /* Playground */,
-				DA1DC94C1CB6C1C2006E619F /* Demo App */,
-				DABCABA91CB80692000A7C39 /* Benchmarking App */,
+				DA1DC94C1CB6C1C2006E619F /* iOS Demo App */,
+				DABCABA91CB80692000A7C39 /* iOS Benchmarking App */,
+				DA7F8CC41F87486800937243 /* tvOS Demo App */,
 				DA8847D31CBAF91600AB86E3 /* SDK */,
 				DA2E88521CC036F400F24E7B /* SDK Tests */,
 				16376B301FFDB4B40000563E /* Integration Test Harness */,
@@ -2322,11 +2365,12 @@
 				16376B2F1FFDB4B40000563E /* Integration Test Harness.app */,
 				DA94B9711E766E6400190EF5 /* Mapbox.framework */,
 				DA94B9791E766E6400190EF5 /* tvtest.xctest */,
+				DA7F8CC31F87486800937243 /* Mapbox GL.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		DA1DC94C1CB6C1C2006E619F /* Demo App */ = {
+		DA1DC94C1CB6C1C2006E619F /* iOS Demo App */ = {
 			isa = PBXGroup;
 			children = (
 				3E6465D52065767A00685536 /* LimeGreenStyleLayer.h */,
@@ -2367,7 +2411,7 @@
 				075AF843227B67C5008D7A4C /* MBXStateManager.h */,
 				075AF844227B67C6008D7A4C /* MBXStateManager.m */,
 			);
-			name = "Demo App";
+			name = "iOS Demo App";
 			path = app;
 			sourceTree = "<group>";
 		};
@@ -2450,6 +2494,22 @@
 			);
 			name = "SDK Tests";
 			path = test;
+			sourceTree = "<group>";
+		};
+		DA7F8CC41F87486800937243 /* tvOS Demo App */ = {
+			isa = PBXGroup;
+			children = (
+				DA7F8CC51F87486800937243 /* AppDelegate.h */,
+				DA7F8CC61F87486800937243 /* AppDelegate.m */,
+				DA7F8CC81F87486800937243 /* ViewController.h */,
+				DA7F8CC91F87486800937243 /* ViewController.m */,
+				DA7F8CCB1F87486800937243 /* Main.storyboard */,
+				DA7F8CCE1F87486800937243 /* Assets.xcassets */,
+				DA7F8CD01F87486800937243 /* Info.plist */,
+				DA7F8CD11F87486800937243 /* main.m */,
+			);
+			name = "tvOS Demo App";
+			path = tvosapp;
 			sourceTree = "<group>";
 		};
 		DA8847D31CBAF91600AB86E3 /* SDK */ = {
@@ -2599,7 +2659,7 @@
 			path = ../../darwin/src;
 			sourceTree = "<group>";
 		};
-		DABCABA91CB80692000A7C39 /* Benchmarking App */ = {
+		DABCABA91CB80692000A7C39 /* iOS Benchmarking App */ = {
 			isa = PBXGroup;
 			children = (
 				DABCABAD1CB80692000A7C39 /* MBXBenchAppDelegate.h */,
@@ -2614,7 +2674,7 @@
 				DABCABBB1CB80692000A7C39 /* Info.plist */,
 				DABCABAA1CB80692000A7C39 /* Supporting Files */,
 			);
-			name = "Benchmarking App";
+			name = "iOS Benchmarking App";
 			path = benchmark;
 			sourceTree = "<group>";
 		};
@@ -3420,6 +3480,25 @@
 			productReference = DA2E88511CC036F400F24E7B /* test.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		DA7F8CC21F87486800937243 /* tvosapp */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DA7F8CD31F87486800937243 /* Build configuration list for PBXNativeTarget "tvosapp" */;
+			buildPhases = (
+				DA7F8CBF1F87486800937243 /* Sources */,
+				DA7F8CC01F87486800937243 /* Frameworks */,
+				DA7F8CC11F87486800937243 /* Resources */,
+				DA7F8CDA1F87497F00937243 /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				DA7F8CD91F87497F00937243 /* PBXTargetDependency */,
+			);
+			name = tvosapp;
+			productName = tvosapp;
+			productReference = DA7F8CC31F87486800937243 /* Mapbox GL.app */;
+			productType = "com.apple.product-type.application";
+		};
 		DA8847D11CBAF91600AB86E3 /* dynamic */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = DA8847DD1CBAF91600AB86E3 /* Build configuration list for PBXNativeTarget "dynamic" */;
@@ -3535,7 +3614,7 @@
 			isa = PBXProject;
 			attributes = {
 				CLASSPREFIX = MBX;
-				LastUpgradeCheck = 0930;
+				LastUpgradeCheck = 1010;
 				ORGANIZATIONNAME = Mapbox;
 				TargetAttributes = {
 					16376B061FFD9DAF0000563E = {
@@ -3558,6 +3637,11 @@
 						CreatedOnToolsVersion = 7.3;
 						LastSwiftMigration = 1010;
 					};
+					DA7F8CC21F87486800937243 = {
+						CreatedOnToolsVersion = 9.0;
+						DevelopmentTeam = GJZR2MEM28;
+						ProvisioningStyle = Automatic;
+					};
 					DA8847D11CBAF91600AB86E3 = {
 						CreatedOnToolsVersion = 7.3;
 						LastSwiftMigration = 0820;
@@ -3567,6 +3651,7 @@
 					};
 					DA94B9701E766E6400190EF5 = {
 						CreatedOnToolsVersion = 8.3;
+						DevelopmentTeam = GJZR2MEM28;
 						ProvisioningStyle = Automatic;
 					};
 					DA94B9781E766E6400190EF5 = {
@@ -3628,6 +3713,7 @@
 				DA2E88501CC036F400F24E7B /* test */,
 				16376B061FFD9DAF0000563E /* integration */,
 				16376B2E1FFDB4B40000563E /* Integration Test Harness */,
+				DA7F8CC21F87486800937243 /* tvosapp */,
 				DA94B9701E766E6400190EF5 /* tv */,
 				DA94B9781E766E6400190EF5 /* tvtest */,
 			);
@@ -3682,6 +3768,15 @@
 				1F8A59F72165326D004DFE75 /* sideload_sat.db in Resources */,
 				353BAEF71D646370009A8DA9 /* amsterdam.geojson in Resources */,
 				DA35D0881E1A6309007DED41 /* one-liner.json in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DA7F8CC11F87486800937243 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DA7F8CCF1F87486800937243 /* Assets.xcassets in Resources */,
+				DA7F8CCD1F87486800937243 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3900,6 +3995,16 @@
 				556660D81E1D085500E2C41B /* MGLVersionNumber.m in Sources */,
 				4031ACFF1E9FD29F00A3EA26 /* MGLSDKTestHelpers.swift in Sources */,
 				16376B491FFEED010000563E /* MGLMapViewLayoutTests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DA7F8CBF1F87486800937243 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DA7F8CCA1F87486800937243 /* ViewController.m in Sources */,
+				DA7F8CD21F87486800937243 /* main.m in Sources */,
+				DA7F8CC71F87486800937243 /* AppDelegate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4355,6 +4460,11 @@
 			target = DA8847D11CBAF91600AB86E3 /* dynamic */;
 			targetProxy = DA2E88571CC036F400F24E7B /* PBXContainerItemProxy */;
 		};
+		DA7F8CD91F87497F00937243 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = DA94B9701E766E6400190EF5 /* tv */;
+			targetProxy = DA7F8CD81F87497F00937243 /* PBXContainerItemProxy */;
+		};
 		DA8847D81CBAF91600AB86E3 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = DA8847D11CBAF91600AB86E3 /* dynamic */;
@@ -4412,6 +4522,14 @@
 				DAE9ED572238990A00C01291 /* gl */,
 			);
 			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+		DA7F8CCB1F87486800937243 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				DA7F8CCC1F87486800937243 /* Base */,
+			);
+			name = Main.storyboard;
 			sourceTree = "<group>";
 		};
 		DA89339F1CCC951200E68420 /* Localizable.strings */ = {
@@ -5155,6 +5273,58 @@
 			};
 			name = Release;
 		};
+		DA7F8CD41F87486800937243 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = "App Icon & Top Shelf Image";
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				DEVELOPMENT_TEAM = GJZR2MEM28;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				INFOPLIST_FILE = tvosapp/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.mapbox.MapboxGL;
+				PRODUCT_NAME = "Mapbox GL";
+				SDKROOT = appletvos;
+				TARGETED_DEVICE_FAMILY = 3;
+				TVOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Debug;
+		};
+		DA7F8CD51F87486800937243 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = "App Icon & Top Shelf Image";
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				DEVELOPMENT_TEAM = GJZR2MEM28;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				INFOPLIST_FILE = tvosapp/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.mapbox.MapboxGL;
+				PRODUCT_NAME = "Mapbox GL";
+				SDKROOT = appletvos;
+				TARGETED_DEVICE_FAMILY = 3;
+				TVOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Release;
+		};
 		DA8847DB1CBAF91600AB86E3 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 55D8C9941D0F133500F42F10 /* config.xcconfig */;
@@ -5282,6 +5452,7 @@
 				CODE_SIGN_IDENTITY = "";
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = GJZR2MEM28;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -5327,6 +5498,7 @@
 				CODE_SIGN_IDENTITY = "";
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = GJZR2MEM28;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -5604,6 +5776,26 @@
 			};
 			name = RelWithDebInfo;
 		};
+		DADCD5D621CD6B02007DF3B2 /* RelWithDebInfo */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = "App Icon & Top Shelf Image";
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				DEVELOPMENT_TEAM = GJZR2MEM28;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				INFOPLIST_FILE = tvosapp/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.mapbox.MapboxGL;
+				PRODUCT_NAME = "Mapbox GL";
+				SDKROOT = appletvos;
+				TARGETED_DEVICE_FAMILY = 3;
+				TVOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = RelWithDebInfo;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -5656,6 +5848,16 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = RelWithDebInfo;
+		};
+		DA7F8CD31F87486800937243 /* Build configuration list for PBXNativeTarget "tvosapp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DA7F8CD41F87486800937243 /* Debug */,
+				DA7F8CD51F87486800937243 /* Release */,
+				DADCD5D621CD6B02007DF3B2 /* RelWithDebInfo */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		DA8847DD1CBAF91600AB86E3 /* Build configuration list for PBXNativeTarget "dynamic" */ = {
 			isa = XCConfigurationList;

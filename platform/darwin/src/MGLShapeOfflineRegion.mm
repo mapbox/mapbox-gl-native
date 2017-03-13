@@ -13,7 +13,7 @@
 #import "MGLStyle.h"
 #import "MGLLoggingConfiguration_Private.h"
 
-#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
+#if TARGET_OS_IOS
 #import "MMEConstants.h"
 #endif
 
@@ -28,15 +28,15 @@
 @synthesize styleURL = _styleURL;
 @synthesize includesIdeographicGlyphs = _includesIdeographicGlyphs;
 
--(NSDictionary *)offlineStartEventAttributes {
+- (NSDictionary *)offlineStartEventAttributes {
     return @{
-             #if TARGET_OS_IOS
-             MMEEventKeyShapeForOfflineRegion: @"shaperegion",
-             MMEEventKeyMinZoomLevel: @(self.minimumZoomLevel),
-             MMEEventKeyMaxZoomLevel: @(self.maximumZoomLevel),
-             MMEEventKeyStyleURL: self.styleURL.absoluteString ?: [NSNull null]
-             #endif
-             };
+#if TARGET_OS_IOS
+        MMEEventKeyShapeForOfflineRegion: @"shaperegion",
+        MMEEventKeyMinZoomLevel: @(self.minimumZoomLevel),
+        MMEEventKeyMaxZoomLevel: @(self.maximumZoomLevel),
+        MMEEventKeyStyleURL: self.styleURL.absoluteString ?: [NSNull null]
+#endif
+    };
 }
 
 + (BOOL)supportsSecureCoding {
