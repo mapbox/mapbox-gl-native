@@ -945,7 +945,11 @@ final class NativeMapView {
   protected void onMapChanged(int rawChange) {
     if (onMapChangedListeners != null) {
       for (MapView.OnMapChangedListener onMapChangedListener : onMapChangedListeners) {
-        onMapChangedListener.onMapChanged(rawChange);
+        try {
+          onMapChangedListener.onMapChanged(rawChange);
+        } catch (RuntimeException err) {
+          Timber.e("Exception (%s) in MapView.OnMapChangedListener: %s", err.getClass(), err.getMessage());
+        }
       }
     }
   }
