@@ -1,6 +1,6 @@
 #pragma once
 
-#include <mbgl/map/change.hpp>
+#include <mbgl/map/map_observer.hpp>
 
 #include <memory>
 
@@ -12,7 +12,7 @@ class Context;
 
 class BackendScope;
 
-class Backend {
+class Backend : public MapObserver {
 public:
     Backend();
     virtual ~Backend();
@@ -23,9 +23,6 @@ public:
     // Called when the map needs to be rendered; the backend should call Map::render() at some point
     // in the near future. (Not called for Map::renderStill() mode.)
     virtual void invalidate() = 0;
-
-    // Notifies a watcher of map x/y/scale/rotation changes.
-    virtual void notifyMapChange(MapChange change);
 
 protected:
     // Called when the backend's GL context needs to be made active or inactive. These are called,

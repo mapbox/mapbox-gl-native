@@ -215,7 +215,7 @@ TEST(Transform, ConstrainHeightOnly) {
 TEST(Transform, ConstrainWidthAndHeight) {
     LatLng loc;
 
-    Transform transform(nullptr, ConstrainMode::WidthAndHeight);
+    Transform transform(MapObserver::nullObserver(), ConstrainMode::WidthAndHeight);
     transform.resize({ 1000, 1000 });
     transform.setScale(std::pow(2, util::MAX_ZOOM));
 

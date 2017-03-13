@@ -14,9 +14,4 @@ gl::Context& Backend::getContext() {
 
 Backend::~Backend() = default;
 
-void Backend::notifyMapChange(MapChange) {
-    // no-op
-}
-
-
 } // namespace mbgl
