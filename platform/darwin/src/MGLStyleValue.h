@@ -168,7 +168,8 @@ MGL_EXPORT
 
  @param interpolationMode The mode used to interpolate property values over a 
     range of feature attribute values for each outer zoom level.
- @param sourceStops A dictionary associating feature attributes with style values.
+ @param compositeStops A dictionary associating feature attributes with style
+    values.
  @param attributeName Specifies the feature attribute to take as the function
     input.
  @param options A dictionary containing `MGLStyleFunctionOption` values that
@@ -380,7 +381,7 @@ MGL_EXPORT
 
  @param interpolationMode The mode used to interpolate property values over a
     range of feature attribute values.
- @param sourceStops A dictionary associating feature attributes with style values.
+ @param stops A dictionary associating feature attributes with style values.
  @param attributeName Specifies the feature attribute to take as the function
     input.
  @param options A dictionary containing `MGLStyleFunctionOption` values that
@@ -440,7 +441,7 @@ MGL_EXPORT
 
  @param interpolationMode The mode used to interpolate property values over a
     range of feature attribute values for each outer zoom level.
- @param sourceStops A dictionary associating feature attributes with style values.
+ @param stops A dictionary associating feature attributes with style values.
  @param attributeName Specifies the feature attribute to take as the function
     input.
  @param options A dictionary containing `MGLStyleFunctionOption` values that
