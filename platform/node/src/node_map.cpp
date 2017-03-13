@@ -39,6 +39,13 @@ static const char* releasedMessage() {
     return "Map resources have already been released";
 }
 
+NodeBackend::NodeBackend()
+    : HeadlessBackend(sharedDisplay()) {}
+
+void NodeBackend::onDidFailLoadingMap() {
+    throw std::runtime_error("Requires a map style to be a valid style JSON");
+}
+
 void NodeMap::Init(v8::Local<v8::Object> target) {
     v8::Local<v8::FunctionTemplate> tpl = Nan::New<v8::FunctionTemplate>(New);
 
@@ -953,7 +960,6 @@ NodeMap::NodeMap(v8::Local<v8::Object> options)
                            ->NumberValue()
                      : 1.0;
       }()),
-      backend(sharedDisplay()),
       map(std::make_unique<mbgl::Map>(backend,
                                       mbgl::Size{ 256, 256 },
                                       pixelRatio,
@@ -961,12 +967,6 @@ NodeMap::NodeMap(v8::Local<v8::Object> options)
                                       threadpool,
                                       mbgl::MapMode::Still)),
       async(new uv_async_t) {
-
-    backend.setMapChangeCallback([&](mbgl::MapChange change) {
-        if (change == mbgl::MapChangeDidFailLoadingMap) {
-            throw std::runtime_error("Requires a map style to be a valid style JSON");
-        }
-    });
 
     async->data = this;
     uv_async_init(uv_default_loop(), async, [](uv_async_t* h) {
