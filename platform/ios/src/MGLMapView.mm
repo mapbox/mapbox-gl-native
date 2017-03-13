@@ -540,14 +540,11 @@ public:
 
     _decelerationRate = MGLMapViewDecelerationRateNormal;
 
-    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
-    {
-        _quickZoom = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleQuickZoomGesture:)];
-        _quickZoom.numberOfTapsRequired = 1;
-        _quickZoom.minimumPressDuration = 0;
-        [_quickZoom requireGestureRecognizerToFail:doubleTap];
-        [self addGestureRecognizer:_quickZoom];
-    }
+    _quickZoom = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleQuickZoomGesture:)];
+    _quickZoom.numberOfTapsRequired = 1;
+    _quickZoom.minimumPressDuration = 0;
+    [_quickZoom requireGestureRecognizerToFail:doubleTap];
+    [self addGestureRecognizer:_quickZoom];
 
     // observe app activity
     //
