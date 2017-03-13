@@ -30,7 +30,6 @@ NS_ASSUME_NONNULL_BEGIN
  redundant to the given object is replaced by the given object.
 
  @param info The info object to add to the receiver.
- @return True if the given info object was added to the receiver.
  */
 - (void)growArrayByAddingAttributionInfo:(MGLAttributionInfo *)info;
 
