@@ -1,6 +1,5 @@
 #include <mbgl/test/util.hpp>
 
-#include <mbgl/map/change.hpp>
 #include <mbgl/map/transform.hpp>
 #include <mbgl/map/transform_state.hpp>
 #include <mbgl/tile/tile.hpp>
@@ -13,17 +12,35 @@
 using namespace mbgl;
 
 TEST(TileCoordinate, FromLatLng) {
+
     size_t changeCount = 0;
-    std::vector<MapChange> changes = {
-        MapChangeRegionWillChange,
-        MapChangeRegionDidChange,
-    };
-    auto onMapChange = [&](MapChange change) {
-        ASSERT_EQ(change, changes[changeCount]);
-        ++changeCount;
+    struct TransformObserver : public mbgl::MapObserver {
+        void onCameraWillChange(MapObserver::CameraChangeMode mode) final {
+            if (mode == MapObserver::CameraChangeMode::Immediate && cameraWillChangeImmediateCallback) {
+                cameraWillChangeImmediateCallback();
+            }
+        }
+
+        void onCameraDidChange(MapObserver::CameraChangeMode mode) final {
+            if (mode == MapObserver::CameraChangeMode::Immediate && cameraDidChangeImmediateCallback) {
+                cameraDidChangeImmediateCallback();
+            }
+        }
+
+        std::function<void()> cameraWillChangeImmediateCallback;
+        std::function<void()> cameraDidChangeImmediateCallback;
     };
 
-    Transform transform(onMapChange);
+    TransformObserver observer;
+    observer.cameraWillChangeImmediateCallback = [&]() {
+        ASSERT_EQ(changeCount, 0u);
+        ++changeCount;
+    };
+    observer.cameraDidChangeImmediateCallback = [&]() {
+        ASSERT_EQ(changeCount, 1u);
+    };
+
+    Transform transform(observer);
 
     const double max = util::tileSize;
     transform.resize({ static_cast<uint32_t>(max), static_cast<uint32_t>(max) });

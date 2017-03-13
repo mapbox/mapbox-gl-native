@@ -37,10 +37,10 @@ static double _normalizeAngle(double angle, double anchorAngle)
     return angle;
 }
 
-Transform::Transform(std::function<void(MapChange)> callback_,
+Transform::Transform(MapObserver& observer_,
                      ConstrainMode constrainMode,
                      ViewportMode viewportMode)
-    : callback(std::move(callback_)), state(constrainMode, viewportMode) {
+    : observer(observer_), state(constrainMode, viewportMode) {
 }
 
 #pragma mark - Map View
@@ -50,16 +50,12 @@ bool Transform::resize(const Size size) {
         return false;
     }
 
-    if (callback) {
-        callback(MapChangeRegionWillChange);
-    }
+    observer.onCameraWillChange(MapObserver::CameraChangeMode::Immediate);
 
     state.size = size;
     state.constrain(state.scale, state.x, state.y);
 
-    if (callback) {
-        callback(MapChangeRegionDidChange);
-    }
+    observer.onCameraDidChange(MapObserver::CameraChangeMode::Immediate);
 
     return true;
 }
@@ -556,9 +552,7 @@ void Transform::startTransition(const CameraOptions& camera,
     }
 
     bool isAnimated = duration != Duration::zero();
-    if (callback) {
-        callback(isAnimated ? MapChangeRegionWillChangeAnimated : MapChangeRegionWillChange);
-    }
+    observer.onCameraWillChange(isAnimated ? MapObserver::CameraChangeMode::Animated : MapObserver::CameraChangeMode::Immediate);
 
     // Associate the anchor, if given, with a coordinate.
     optional<ScreenCoordinate> anchor = camera.anchor;
@@ -588,9 +582,7 @@ void Transform::startTransition(const CameraOptions& camera,
             if (animation.transitionFrameFn) {
                 animation.transitionFrameFn(t);
             }
-            if (callback) {
-                callback(MapChangeRegionIsChanging);
-            }
+            observer.onCameraIsChanging();
         } else {
             transitionFinishFn();
             transitionFinishFn = nullptr;
@@ -609,9 +601,7 @@ void Transform::startTransition(const CameraOptions& camera,
         if (animation.transitionFinishFn) {
             animation.transitionFinishFn();
         }
-        if (callback) {
-            callback(isAnimated ? MapChangeRegionDidChangeAnimated : MapChangeRegionDidChange);
-        }
+        observer.onCameraDidChange(isAnimated ? MapObserver::CameraChangeMode::Animated : MapObserver::CameraChangeMode::Immediate);
     };
 
     if (!isAnimated) {

@@ -24,9 +24,37 @@ using namespace mbgl;
 using namespace mbgl::style;
 using namespace std::literals::string_literals;
 
+class BackendTest : public HeadlessBackend {
+public:
+    BackendTest() : HeadlessBackend(test::sharedDisplay()) {}
+
+    void setDidFailLoadingMapCallback(std::function<void()>&& callback) {
+        didFailLoadingMapCallback = std::move(callback);
+    }
+
+    void setDidFinishLoadingStyleCallback(std::function<void()>&& callback) {
+        didFinishLoadingStyleCallback = std::move(callback);
+    }
+
+    void onDidFailLoadingMap() final {
+        if (didFailLoadingMapCallback) {
+            didFailLoadingMapCallback();
+        }
+    }
+
+    void onDidFinishLoadingStyle() final {
+        if (didFinishLoadingStyleCallback) {
+            didFinishLoadingStyleCallback();
+        }
+    }
+
+    std::function<void()> didFailLoadingMapCallback;
+    std::function<void()> didFinishLoadingStyleCallback;
+};
+
 struct MapTest {
     util::RunLoop runLoop;
-    HeadlessBackend backend { test::sharedDisplay() };
+    BackendTest backend;
     OffscreenView view { backend.getContext() };
     StubFileSource fileSource;
     ThreadPool threadPool { 4 };
@@ -85,10 +113,8 @@ TEST(Map, SetStyleInvalidJSON) {
     Log::setObserver(std::make_unique<FixtureLogObserver>());
 
     bool fail = false;
-    test.backend.setMapChangeCallback([&](MapChange change) {
-        if (change == mbgl::MapChangeDidFailLoadingMap) {
-            fail = true;
-        }
+    test.backend.setDidFailLoadingMapCallback([&]() {
+        fail = true;
     });
 
     {
@@ -118,10 +144,8 @@ TEST(Map, SetStyleInvalidURL) {
         return response;
     };
 
-    test.backend.setMapChangeCallback([&](MapChange change) {
-        if (change == mbgl::MapChangeDidFailLoadingMap) {
-            test.runLoop.stop();
-        }
+    test.backend.setDidFailLoadingMapCallback([&]() {
+        test.runLoop.stop();
     });
 
     Map map(test.backend, test.view.getSize(), 1, test.fileSource, test.threadPool, MapMode::Still);
@@ -233,10 +257,8 @@ TEST(Map, StyleLoadedSignal) {
 
     // The map should emit a signal on style loaded
     bool emitted = false;
-    test.backend.setMapChangeCallback([&](MapChange change) {
-        if (change == mbgl::MapChangeDidFinishLoadingStyle) {
-            emitted = true;
-        }
+    test.backend.setDidFinishLoadingStyleCallback([&]() {
+        emitted = true;
     });
     map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
     EXPECT_TRUE(emitted);
@@ -255,10 +277,8 @@ TEST(Map, TEST_REQUIRES_SERVER(StyleNetworkErrorRetry)) {
     Map map(test.backend, test.view.getSize(), 1, fileSource, test.threadPool, MapMode::Still);
     map.setStyleURL("http://127.0.0.1:3000/style-fail-once-500");
 
-    test.backend.setMapChangeCallback([&](MapChange change) {
-        if (change == mbgl::MapChangeDidFinishLoadingStyle) {
-            test.runLoop.stop();
-        }
+    test.backend.setDidFinishLoadingStyleCallback([&]() {
+        test.runLoop.stop();
     });
 
     test.runLoop.run();
@@ -275,16 +295,14 @@ TEST(Map, TEST_REQUIRES_SERVER(StyleNotFound)) {
     util::Timer timer;
 
     // Not found errors should not trigger a retry like other errors.
-    test.backend.setMapChangeCallback([&](MapChange change) {
-        if (change == mbgl::MapChangeDidFinishLoadingStyle) {
-            FAIL() << "Should not retry on not found!";
-        }
+    test.backend.setDidFinishLoadingStyleCallback([&]() {
+        FAIL() << "Should not retry on not found!";
+    });
 
-        if (change == mbgl::MapChangeDidFailLoadingMap) {
-            timer.start(Milliseconds(1100), 0s, [&] {
-                test.runLoop.stop();
-            });
-        }
+    test.backend.setDidFailLoadingMapCallback([&]() {
+        timer.start(Milliseconds(1100), 0s, [&] {
+            test.runLoop.stop();
+        });
     });
 
     test.runLoop.run();

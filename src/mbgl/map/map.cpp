@@ -70,6 +70,7 @@ public:
     void loadStyleJSON(const std::string&);
 
     Map& map;
+    MapObserver& observer;
     Backend& backend;
     FileSource& fileSource;
     Scheduler& scheduler;
@@ -134,10 +135,11 @@ Map::Impl::Impl(Map& map_,
                 ConstrainMode constrainMode_,
                 ViewportMode viewportMode_)
     : map(map_),
+      observer(backend_),
       backend(backend_),
       fileSource(fileSource_),
       scheduler(scheduler_),
-      transform([this](MapChange change) { backend.notifyMapChange(change); },
+      transform(observer,
                 constrainMode_,
                 viewportMode_),
       mode(mode_),
@@ -264,10 +266,10 @@ void Map::Impl::render(View& view) {
 
     if (mode == MapMode::Continuous) {
         if (renderState == RenderState::Never) {
-            backend.notifyMapChange(MapChangeWillStartRenderingMap);
+            observer.onWillStartRenderingMap();
         }
 
-        backend.notifyMapChange(MapChangeWillStartRenderingFrame);
+        observer.onWillStartRenderingFrame();
 
         FrameData frameData { timePoint,
                               pixelRatio,
@@ -282,18 +284,16 @@ void Map::Impl::render(View& view) {
 
         painter->cleanup();
 
-        backend.notifyMapChange(style->isLoaded() ?
-            MapChangeDidFinishRenderingFrameFullyRendered :
-            MapChangeDidFinishRenderingFrame);
+        observer.onDidFinishRenderingFrame(style->isLoaded() ? MapObserver::RenderMode::Full : MapObserver::RenderMode::Partial);
 
         if (!style->isLoaded()) {
             renderState = RenderState::Partial;
         } else if (renderState != RenderState::Fully) {
             renderState = RenderState::Fully;
-            backend.notifyMapChange(MapChangeDidFinishRenderingMapFullyRendered);
+            observer.onDidFinishRenderingMap(MapObserver::RenderMode::Full);
             if (loading) {
                 loading = false;
-                backend.notifyMapChange(MapChangeDidFinishLoadingMap);
+                observer.onDidFinishLoadingMap();
             }
         }
 
@@ -341,7 +341,7 @@ void Map::setStyleURL(const std::string& url) {
 
     impl->loading = true;
 
-    impl->backend.notifyMapChange(MapChangeWillStartLoadingMap);
+    impl->observer.onWillStartLoadingMap();
 
     impl->styleRequest = nullptr;
     impl->styleURL = url;
@@ -385,7 +385,7 @@ void Map::setStyleJSON(const std::string& json) {
 
     impl->loading = true;
 
-    impl->backend.notifyMapChange(MapChangeWillStartLoadingMap);
+    impl->observer.onWillStartLoadingMap();
 
     impl->styleURL.clear();
     impl->styleJSON.clear();
@@ -1086,7 +1086,7 @@ void Map::onLowMemory() {
 }
 
 void Map::Impl::onSourceAttributionChanged(style::Source&, const std::string&) {
-    backend.notifyMapChange(MapChangeSourceDidChange);
+    observer.onSourceDidChange();
 }
 
 void Map::Impl::onUpdate(Update flags) {
@@ -1095,11 +1095,11 @@ void Map::Impl::onUpdate(Update flags) {
 }
 
 void Map::Impl::onStyleLoaded() {
-    backend.notifyMapChange(MapChangeDidFinishLoadingStyle);
+    observer.onDidFinishLoadingStyle();
 }
 
 void Map::Impl::onStyleError() {
-    backend.notifyMapChange(MapChangeDidFailLoadingMap);
+    observer.onDidFailLoadingMap();
 }
 
 void Map::Impl::onResourceError(std::exception_ptr error) {
