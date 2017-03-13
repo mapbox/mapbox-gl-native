@@ -28,7 +28,7 @@ LineBucket::LineBucket(const BucketParameters& parameters,
 void LineBucket::addFeature(const GeometryTileFeature& feature,
                             const GeometryCollection& geometryCollection) {
     for (auto& line : geometryCollection) {
-        addGeometry(line);
+        addGeometry(line, feature.getType());
     }
 
     for (auto& pair : paintPropertyBinders) {
@@ -61,18 +61,18 @@ const float LINE_DISTANCE_SCALE = 1.0 / 2.0;
 // The maximum line distance, in tile units, that fits in the buffer.
 const float MAX_LINE_DISTANCE = std::pow(2, LINE_DISTANCE_BUFFER_BITS) / LINE_DISTANCE_SCALE;
 
-void LineBucket::addGeometry(const GeometryCoordinates& coordinates) {
+void LineBucket::addGeometry(const GeometryCoordinates& coordinates, FeatureType type) {
     const std::size_t len = [&coordinates] {
         std::size_t l = coordinates.size();
         // If the line has duplicate vertices at the end, adjust length to remove them.
-        while (l > 2 && coordinates[l - 1] == coordinates[l - 2]) {
+        while (l >= 2 && coordinates[l - 1] == coordinates[l - 2]) {
             l--;
         }
         return l;
     }();
 
-    if (len < 2) {
-        // fprintf(stderr, "a line must have at least two vertices\n");
+    // Ignore invalid geometry.
+    if (len < (type == FeatureType::Polygon ? 3 : 2)) {
         return;
     }
 
@@ -81,16 +81,8 @@ void LineBucket::addGeometry(const GeometryCoordinates& coordinates) {
     const double sharpCornerOffset = SHARP_CORNER_OFFSET * (float(util::EXTENT) / (util::tileSize * overscaling));
 
     const GeometryCoordinate firstCoordinate = coordinates.front();
-    const GeometryCoordinate lastCoordinate = coordinates[len - 1];
-    const bool closed = firstCoordinate == lastCoordinate;
-
-    if (len == 2 && closed) {
-        // fprintf(stderr, "a line may not have coincident points\n");
-        return;
-    }
-
     const LineCapType beginCap = layout.get<LineCap>();
-    const LineCapType endCap = closed ? LineCapType::Butt : LineCapType(layout.get<LineCap>());
+    const LineCapType endCap = type == FeatureType::Polygon ? LineCapType::Butt : LineCapType(layout.get<LineCap>());
 
     double distance = 0;
     bool startOfLine = true;
@@ -103,7 +95,7 @@ void LineBucket::addGeometry(const GeometryCoordinates& coordinates) {
     // the last three vertices added
     e1 = e2 = e3 = -1;
 
-    if (closed) {
+    if (type == FeatureType::Polygon) {
         currentCoordinate = coordinates[len - 2];
         nextNormal = util::perp(util::unit(convertPoint<double>(firstCoordinate - *currentCoordinate)));
     }
@@ -112,7 +104,7 @@ void LineBucket::addGeometry(const GeometryCoordinates& coordinates) {
     std::vector<TriangleElement> triangleStore;
 
     for (std::size_t i = 0; i < len; ++i) {
-        if (closed && i == len - 1) {
+        if (type == FeatureType::Polygon && i == len - 1) {
             // if the line is closed, we treat the last vertex like the first
             nextCoordinate = coordinates[1];
         } else if (i + 1 < len) {
