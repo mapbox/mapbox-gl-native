@@ -43,13 +43,26 @@ const CGFloat MGLUserLocationHeadingUpdateThreshold = 0.01;
 {
     if (CGSizeEqualToSize(self.frame.size, CGSizeZero))
     {
-        CGFloat frameSize = (self.mapView.userTrackingMode == MGLUserTrackingModeFollowWithCourse) ? MGLUserLocationAnnotationPuckSize : MGLUserLocationAnnotationDotSize;
+        CGFloat frameSize = MGLUserLocationAnnotationDotSize;
+#if !TARGET_OS_TV
+        if (self.mapView.userTrackingMode == MGLUserTrackingModeFollowWithCourse) {
+            frameSize = MGLUserLocationAnnotationPuckSize;
+        }
+#endif
         [self updateFrameWithSize:frameSize];
     }
 
     if (CLLocationCoordinate2DIsValid(self.userLocation.coordinate))
     {
-        (self.mapView.userTrackingMode == MGLUserTrackingModeFollowWithCourse) ? [self drawPuck] : [self drawDot];
+#if TARGET_OS_TV
+        [self drawDot];
+#else
+        if (self.mapView.userTrackingMode == MGLUserTrackingModeFollowWithCourse) {
+            [self drawPuck];
+        } else {
+            [self drawDot];
+        }
+#endif
         [self updatePitch];
     }
 
@@ -188,10 +201,12 @@ const CGFloat MGLUserLocationHeadingUpdateThreshold = 0.01;
 
         [self.layer addSublayer:_puckArrow];
     }
+#if !TARGET_OS_TV
     if (self.userLocation.location.course >= 0)
     {
         _puckArrow.affineTransform = CGAffineTransformRotate(CGAffineTransformIdentity, -MGLRadiansFromDegrees(self.mapView.direction - self.userLocation.location.course));
     }
+#endif
 
     if ( ! _puckModeActivated)
     {
@@ -228,6 +243,7 @@ const CGFloat MGLUserLocationHeadingUpdateThreshold = 0.01;
         [self updateFrameWithSize:MGLUserLocationAnnotationDotSize];
     }
 
+#if !TARGET_OS_TV
     // heading indicator (tinted, beam or arrow)
     //
     BOOL headingTrackingModeEnabled = self.mapView.userTrackingMode == MGLUserTrackingModeFollowWithHeading;
@@ -288,6 +304,7 @@ const CGFloat MGLUserLocationHeadingUpdateThreshold = 0.01;
         [_headingIndicatorLayer removeFromSuperlayer];
         _headingIndicatorLayer = nil;
     }
+#endif
 
     // update accuracy ring (if zoom or horizontal accuracy have changed)
     //

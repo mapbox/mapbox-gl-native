@@ -11,7 +11,7 @@
 #import "MGLLoggingConfiguration_Private.h"
 #import "MGLNetworkConfiguration_Private.h"
 
-#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
+#if TARGET_OS_IOS
 #import "MGLAccountManager_Private.h"
 #endif
 
@@ -201,7 +201,7 @@ NSURL *resourceURLWithAccountType(const Resource& resource, NSInteger accountTyp
     
     NSURL *url = [NSURL URLWithString:@(resource.url.c_str())];
     
-#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
+#if TARGET_OS_IOS
     if (accountType == 0 &&
         ([url.host isEqualToString:@"mapbox.com"] || [url.host hasSuffix:@".mapbox.com"])) {
         NSURLComponents *components = [NSURLComponents componentsWithURL:url resolvingAgainstBaseURL:NO];

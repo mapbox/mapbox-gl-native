@@ -13,7 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 /// The API base URL that is used to access Mapbox resources. The default base URL is `https://api.mapbox.com`. If `nil`, the Mapbox default base API URL is in use.
 @property (atomic, readwrite, nullable) NSURL *apiBaseURL;
 
-#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
+#if TARGET_OS_IOS
 /// The current global SKU.
 @property (class, atomic, readonly) NSString *skuToken;
 #endif

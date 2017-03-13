@@ -27,7 +27,7 @@
 
 -(NSDictionary *)offlineStartEventAttributes {
     return @{
-             #if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
+             #if TARGET_OS_IOS
              MMEEventKeyShapeForOfflineRegion: @"tileregion",
              MMEEventKeyMinZoomLevel: @(self.minimumZoomLevel),
              MMEEventKeyMaxZoomLevel: @(self.maximumZoomLevel),

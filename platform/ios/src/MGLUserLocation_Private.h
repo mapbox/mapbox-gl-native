@@ -10,7 +10,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, weak) MGLMapView *mapView;
 @property (nonatomic, readwrite, nullable) CLLocation *location;
-@property (nonatomic, readwrite, nullable) CLHeading *heading;
+@property (nonatomic, readwrite, nullable) CLHeading *heading __TVOS_PROHIBITED;
 
 - (instancetype)initWithMapView:(MGLMapView *)mapView;
 

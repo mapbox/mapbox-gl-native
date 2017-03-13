@@ -5,7 +5,7 @@
 #import "NSProcessInfo+MGLAdditions.h"
 #endif
 
-#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
+#if TARGET_OS_IOS
 #import "MGLMapboxEvents.h"
 #import "MBXSKUToken.h"
 
@@ -72,7 +72,7 @@ static NSString * const MGLAccountManagerExternalMethodName = @"skuToken";
 
     [MGLAccountManager sharedManager].accessToken = accessToken;
 
-#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
+#if TARGET_OS_IOS
     dispatch_async(dispatch_get_main_queue(), ^{
         [MGLMapboxEvents setupWithAccessToken:accessToken];
     });
@@ -93,7 +93,7 @@ static NSString * const MGLAccountManagerExternalMethodName = @"skuToken";
 
 #pragma mark - SKU Tokens
 
-#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
+#if TARGET_OS_IOS
 
 + (NSString *)skuToken {
     Class mbx = NSClassFromString(MGLAccountManagerExternalClassName);

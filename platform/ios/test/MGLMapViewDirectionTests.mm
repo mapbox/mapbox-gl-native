@@ -4,16 +4,20 @@
 #import <mbgl/math/wrap.hpp>
 
 @interface MGLMapView (MGLMapViewDirectionTests)
+#if TARGET_OS_IOS
 - (void)handleRotateGesture:(UIRotationGestureRecognizer *)rotate;
+#endif
 - (void)resetNorthAnimated:(BOOL)animated;
 @end
 
+#if TARGET_OS_IOS
 @interface UIRotationGestureRecognizerMock : UIRotationGestureRecognizer
 @end
 
 @implementation UIRotationGestureRecognizerMock
 - (CGPoint)locationInView:(nullable UIView*)view { return view.center; }
 @end
+#endif
 
 @interface MGLMapViewDirectionTests : XCTestCase
 @property (nonatomic) MGLMapView *mapView;
@@ -59,6 +63,7 @@
     XCTAssertEqual(originalCenterCoordinate.longitude, self.mapView.centerCoordinate.longitude, @"Map center coordinate latitude should remain constant when direction is reset.");
 }
 
+#if TARGET_OS_IOS
 - (void)testRotateEnabled {
     self.mapView.zoomLevel = 10;
 
@@ -116,6 +121,7 @@
         XCTAssertEqualWithAccuracy(originalCenterCoordinate.longitude, self.mapView.centerCoordinate.longitude, 0.0000001, @"Map center coordinate longitude should remain constant during rotation of %@°.", degrees);
     }
 }
+#endif
 
 - (void)testResetPosition {
     [self.mapView resetPosition];

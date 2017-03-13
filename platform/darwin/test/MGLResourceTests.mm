@@ -46,7 +46,7 @@ namespace mbgl {
         // For offline, we expect a single offline param and a sku param
         NSInteger foundCount = 0;
         
-#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
+#if TARGET_OS_IOS
         for (NSURLQueryItem *item in components.queryItems) {
             if (([item.name isEqualToString:@"offline"] && [item.value isEqualToString:@"true"]) ||
                 ([item.name isEqualToString:@"a"] && [item.value isEqualToString:@"one"]) ||
@@ -58,7 +58,7 @@ namespace mbgl {
 
         XCTAssert(foundCount == 4);
 #else
-        // NOTE: Currently the macOS SDK does not supply the sku or offline query parameters
+        // NOTE: Currently the macOS and tvOS SDKs do not supply the sku or offline query parameters
         for (NSURLQueryItem *item in components.queryItems) {
             if (([item.name isEqualToString:@"a"] && [item.value isEqualToString:@"one"]) ||
                 ([item.name isEqualToString:@"b"] && [item.value isEqualToString:@"two"])) {

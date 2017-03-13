@@ -18,8 +18,10 @@
 
 @implementation MGLAccountManagerTests
 
+#if TARGET_OS_IOS
 - (void)testSKU {
     XCTAssertTrue([[MGLAccountManager valueForKeyPath:@"skuToken"] isEqualToString:@"foo"]);
 }
+#endif
 
 @end

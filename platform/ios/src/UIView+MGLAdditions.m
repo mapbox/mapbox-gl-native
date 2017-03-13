@@ -21,7 +21,7 @@
 }
 
 - (NSLayoutYAxisAnchor *)mgl_safeTopAnchor {
-    if (@available(iOS 11.0, *)) {
+    if (@available(iOS 11.0, tvOS 11.0, *)) {
         return self.safeAreaLayoutGuide.topAnchor;
     } else {
         UIViewController *viewController = self.mgl_viewControllerForLayoutGuides;
@@ -36,7 +36,7 @@
 }
 
 - (NSLayoutXAxisAnchor *)mgl_safeLeadingAnchor {
-    if (@available(iOS 11.0, *)) {
+    if (@available(iOS 11.0, tvOS 11.0, *)) {
         return self.safeAreaLayoutGuide.leadingAnchor;
     } else {
         return self.leadingAnchor;
@@ -44,7 +44,7 @@
 }
 
 - (NSLayoutYAxisAnchor *)mgl_safeBottomAnchor {
-    if (@available(iOS 11.0, *)) {
+    if (@available(iOS 11.0, tvOS 11.0, *)) {
         return self.safeAreaLayoutGuide.bottomAnchor;
     } else {
         UIViewController *viewController = self.mgl_viewControllerForLayoutGuides;
@@ -59,7 +59,7 @@
 }
 
 - (NSLayoutXAxisAnchor *)mgl_safeTrailingAnchor {
-    if (@available(iOS 11.0, *)) {
+    if (@available(iOS 11.0, tvOS 11.0, *)) {
         return self.safeAreaLayoutGuide.trailingAnchor;
     } else {
         return self.trailingAnchor;

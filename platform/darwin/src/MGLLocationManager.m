@@ -19,6 +19,7 @@
 
 @synthesize delegate;
 
+#if !TARGET_OS_TV
 - (void)setHeadingOrientation:(CLDeviceOrientation)headingOrientation
 {
     self.locationManager.headingOrientation = headingOrientation;
@@ -28,6 +29,7 @@
 {
     return self.locationManager.headingOrientation;
 }
+#endif
 
 - (void)setDesiredAccuracy:(CLLocationAccuracy)desiredAccuracy {
     self.locationManager.desiredAccuracy = desiredAccuracy;
@@ -41,6 +43,7 @@
     return [CLLocationManager authorizationStatus];
 }
 
+#if !TARGET_OS_TV
 - (void)setActivityType:(CLActivityType)activityType {
     self.locationManager.activityType = activityType;
 }
@@ -56,11 +59,13 @@
 - (void)requestAlwaysAuthorization {
     [self.locationManager requestAlwaysAuthorization];
 }
+#endif
 
 - (void)requestWhenInUseAuthorization {
     [self.locationManager requestWhenInUseAuthorization];
 }
 
+#if !TARGET_OS_TV
 - (void)startUpdatingHeading {
     [self.locationManager startUpdatingHeading];
 }
@@ -72,6 +77,7 @@
 - (void)stopUpdatingHeading {
     [self.locationManager stopUpdatingHeading];
 }
+#endif
 
 - (void)stopUpdatingLocation {
     [self.locationManager stopUpdatingLocation];
@@ -80,7 +86,9 @@
 - (void)dealloc
 {
     [self.locationManager stopUpdatingLocation];
+#if !TARGET_OS_TV
     [self.locationManager stopUpdatingHeading];
+#endif
     self.locationManager.delegate = nil;
     self.delegate = nil;
 }
@@ -93,6 +101,7 @@
     }
 }
 
+#if !TARGET_OS_TV
 - (void)locationManager:(CLLocationManager *)manager didUpdateHeading:(CLHeading *)newHeading {
     if ([self.delegate respondsToSelector:@selector(locationManager:didUpdateHeading:)]) {
         [self.delegate locationManager:self didUpdateHeading:newHeading];
@@ -106,6 +115,7 @@
     
     return NO;
 }
+#endif
 
 - (void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error {
     if ([self.delegate respondsToSelector:@selector(locationManager:didFailWithError:)]) {

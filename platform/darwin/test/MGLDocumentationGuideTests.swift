@@ -1,10 +1,10 @@
 import XCTest
 import Foundation
 import Mapbox
-#if os(iOS)
-    import UIKit
-#else
+#if os(macOS)
     import Cocoa
+#else
+    import UIKit
 #endif
 
 /**

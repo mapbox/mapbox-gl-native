@@ -89,6 +89,7 @@ NS_ASSUME_NONNULL_END
     return self.mapView.userTrackingMode != MGLUserTrackingModeNone;
 }
 
+#if !TARGET_OS_TV
 - (void)setHeading:(CLHeading *)newHeading
 {
     if (newHeading.trueHeading != _heading.trueHeading)
@@ -98,6 +99,7 @@ NS_ASSUME_NONNULL_END
         [self didChangeValueForKey:@"heading"];
     }
 }
+#endif
 
 - (CLLocationCoordinate2D)coordinate
 {
@@ -116,7 +118,11 @@ NS_ASSUME_NONNULL_END
             self.location.coordinate.latitude, self.location.coordinate.longitude,
             self.updating ? @"yes" : @"no",
             self.location.altitude,
+#if TARGET_OS_TV
+            -1.0f,
+#else
             self.heading.trueHeading,
+#endif
             self.title ? [NSString stringWithFormat:@"\"%@\"", self.title] : self.title,
             self.subtitle ? [NSString stringWithFormat:@"\"%@\"", self.subtitle] : self.subtitle];
 }

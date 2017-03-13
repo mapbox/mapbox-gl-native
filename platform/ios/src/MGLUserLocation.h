@@ -42,7 +42,7 @@ MGL_EXPORT
  `MGLUserTrackingModeFollowWithHeading` or if
  `MGLMapView.showsUserHeadingIndicator` is disabled.
  */
-@property (nonatomic, readonly, nullable) CLHeading *heading;
+@property (nonatomic, readonly, nullable) CLHeading *heading __TVOS_PROHIBITED;
 
 #pragma mark Accessing the User Annotation Text
 

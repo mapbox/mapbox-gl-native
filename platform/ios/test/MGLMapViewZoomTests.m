@@ -2,9 +2,12 @@
 #import <XCTest/XCTest.h>
 
 @interface MGLMapView (MGLMapViewZoomTests)
+#if TARGET_OS_IOS
 - (void)handlePinchGesture:(UIPinchGestureRecognizer *)pinch;
+#endif
 @end
 
+#if TARGET_OS_IOS
 @interface UIPinchGestureRecognizerMock : UIPinchGestureRecognizer
 @property (nonatomic) CGPoint locationInViewOverride;
 @end
@@ -12,6 +15,7 @@
 @implementation UIPinchGestureRecognizerMock
 - (CGPoint)locationInView:(nullable UIView *)view { return self.locationInViewOverride; }
 @end
+#endif
 
 @interface MGLMapViewZoomTests : XCTestCase
 @property (nonatomic) MGLMapView *mapView;
@@ -45,6 +49,7 @@
     }
 }
 
+#if TARGET_OS_IOS
 - (void)testZoomEnabled {
     UIPinchGestureRecognizerMock *gesture = [[UIPinchGestureRecognizerMock alloc] initWithTarget:nil action:nil];
     gesture.state = UIGestureRecognizerStateBegan;
@@ -136,5 +141,6 @@ NS_INLINE CGFloat MGLScaleFromZoomLevel(double zoom) {
 __unused NS_INLINE double MGLZoomLevelFromScale(CGFloat scale) {
     return log2(scale);
 }
+#endif
 
 @end

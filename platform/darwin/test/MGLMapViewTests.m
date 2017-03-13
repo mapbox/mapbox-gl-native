@@ -48,7 +48,7 @@ static MGLMapView *mapView;
     XCTAssertTrue(CGRectIntersectsRect(spanningBoundsRect, rightAntimeridianBoundsRect), @"Something");
 }
 
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
 - (void)testUserTrackingModeCompletion {
     __block BOOL completed = NO;
     [mapView setUserTrackingMode:MGLUserTrackingModeNone animated:NO completionHandler:^{
