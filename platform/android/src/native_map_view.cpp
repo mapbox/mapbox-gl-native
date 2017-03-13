@@ -181,6 +181,70 @@ void NativeMapView::notifyMapChange(mbgl::MapChange change) {
     javaPeer->Call(*_env, onMapChanged, (int) change);
 }
 
+void NativeMapView::onCameraWillChange(MapObserver::CameraChangeMode mode) {
+    if (mode == MapObserver::CameraChangeMode::Immediate) {
+        notifyMapChange(MapChange::MapChangeRegionWillChange);
+    } else {
+        notifyMapChange(MapChange::MapChangeRegionWillChangeAnimated);
+    }
+}
+
+void NativeMapView::onCameraIsChanging() {
+    notifyMapChange(MapChange::MapChangeRegionIsChanging);
+}
+
+void NativeMapView::onCameraDidChange(MapObserver::CameraChangeMode mode) {
+    if (mode == MapObserver::CameraChangeMode::Immediate) {
+        notifyMapChange(MapChange::MapChangeRegionDidChange);
+    } else {
+        notifyMapChange(MapChange::MapChangeRegionDidChangeAnimated);
+    }
+}
+
+void NativeMapView::onWillStartLoadingMap() {
+    notifyMapChange(MapChange::MapChangeWillStartLoadingMap);
+}
+
+void NativeMapView::onDidFinishLoadingMap() {
+    notifyMapChange(MapChange::MapChangeDidFinishLoadingMap);
+}
+
+void NativeMapView::onDidFailLoadingMap() {
+    notifyMapChange(MapChange::MapChangeDidFailLoadingMap);
+}
+
+void NativeMapView::onWillStartRenderingFrame() {
+    notifyMapChange(MapChange::MapChangeWillStartRenderingFrame);
+}
+
+void NativeMapView::onDidFinishRenderingFrame(MapObserver::RenderMode mode) {
+    if (mode == MapObserver::RenderMode::Partial) {
+        notifyMapChange(MapChange::MapChangeDidFinishRenderingFrame);
+    } else {
+        notifyMapChange(MapChange::MapChangeDidFinishRenderingFrameFullyRendered);
+    }
+}
+
+void NativeMapView::onWillStartRenderingMap() {
+    notifyMapChange(MapChange::MapChangeWillStartRenderingMap);
+}
+
+void NativeMapView::onDidFinishRenderingMap(MapObserver::RenderMode mode) {
+    if (mode == MapObserver::RenderMode::Partial) {
+        notifyMapChange(MapChange::MapChangeDidFinishRenderingMap);
+    } else {
+        notifyMapChange(MapChange::MapChangeDidFinishRenderingMapFullyRendered);
+    }
+}
+
+void NativeMapView::onDidFinishLoadingStyle() {
+    notifyMapChange(MapChange::MapChangeDidFinishLoadingStyle);
+}
+
+void NativeMapView::onSourceDidChange() {
+    notifyMapChange(MapChange::MapChangeSourceDidChange);
+}
+
 // JNI Methods //
 
 void NativeMapView::initializeDisplay(jni::JNIEnv&) {
