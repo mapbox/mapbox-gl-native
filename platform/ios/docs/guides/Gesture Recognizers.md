@@ -23,7 +23,7 @@ Several properties on an `MGLMapView` provide ways to enable or disable a set of
 |Two-finger tap | Zooms out with the map's anchor point centered | `zoomEnabled` |
 |Pan | Scrolls across mapView (_note: if_ `MGLUserTrackingModeFollow` _is being used, it will be disabled once the user pans_)| `scrollEnabled` |
 |Two-finger drag | Adjusts the pitch of the `MGLMapView` | `pitchEnabled` |
-|One-finger zoom | Tap twice; on second tap, hold your finger on the map and pan up to zoom in, or down to zoom out | `zoomEnabled`|
+|One-finger zoom | Tap twice; on second tap, hold your finger on the map and pan up to zoom in, or down to zoom out (unavailable on iPad) | `zoomEnabled`|
 
 ![quick zoom](img/user-interaction/quickzoom.gif) ![rotation](img/user-interaction/RotateSydney.gif)
 
