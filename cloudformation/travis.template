@@ -199,6 +199,26 @@
                                 }
                             ]
                         }
+                    },
+                    {
+                        "PolicyName": "publish-nightlies",
+                        "PolicyDocument": {
+                            "Statement": [
+                                {
+                                    "Action": [
+                                        "s3:DeleteObject",
+                                        "s3:GetObject",
+                                        "s3:GetObjectAcl",
+                                        "s3:PutObject",
+                                        "s3:PutObjectAcl"
+                                    ],
+                                    "Effect": "Allow",
+                                    "Resource": [
+                                        "arn:aws:s3:::mapbox/mapbox-gl-native/ios/builds/*"
+                                    ]
+                                }
+                            ]
+                        }
                     }
                 ]
             }
