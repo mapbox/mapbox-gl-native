@@ -1,7 +1,6 @@
 #include "qmapbox.hpp"
 
 #include <mbgl/gl/extension.hpp>
-#include <mbgl/map/change.hpp>
 #include <mbgl/storage/network_status.hpp>
 #include <mbgl/util/default_styles.hpp>
 #include <mbgl/util/geometry.hpp>
