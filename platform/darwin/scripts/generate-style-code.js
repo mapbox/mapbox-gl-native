@@ -528,6 +528,7 @@ const layerH = ejs.compile(fs.readFileSync('platform/darwin/src/MGLStyleLayer.h.
 const layerM = ejs.compile(fs.readFileSync('platform/darwin/src/MGLStyleLayer.mm.ejs', 'utf8'), { strict: true});
 const testLayers = ejs.compile(fs.readFileSync('platform/darwin/test/MGLStyleLayerTests.mm.ejs', 'utf8'), { strict: true});
 const guideMD = ejs.compile(fs.readFileSync('platform/darwin/docs/guides/For Style Authors.md.ejs', 'utf8'), { strict: true });
+const ddsGuideMD = ejs.compile(fs.readFileSync('platform/darwin/docs/guides/Data-Driven Styling.md', 'utf8'), { strict: true });
 
 const layers = _(spec.layer.type.values).map((value, layerType) => {
     const layoutProperties = Object.keys(spec[`layout_${layerType}`]).reduce((memo, name) => {
@@ -610,6 +611,16 @@ fs.writeFileSync(`platform/ios/docs/guides/For Style Authors.md`, guideMD({
     layers: layers,
 }));
 fs.writeFileSync(`platform/macos/docs/guides/For Style Authors.md`, guideMD({
+    os: 'macOS',
+    renamedProperties: renamedPropertiesByLayerType,
+    layers: layers,
+}));
+fs.writeFileSync(`platform/ios/docs/guides/Data-Driven Styling.md`, ddsGuideMD({
+    os: 'iOS',
+    renamedProperties: renamedPropertiesByLayerType,
+    layers: layers,
+}));
+fs.writeFileSync(`platform/macos/docs/guides/Data-Driven Styling.md`, ddsGuideMD({
     os: 'macOS',
     renamedProperties: renamedPropertiesByLayerType,
     layers: layers,

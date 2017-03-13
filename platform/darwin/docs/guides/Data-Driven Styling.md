@@ -8,6 +8,14 @@ To do - JK:
 - [ ] Add cocoaprefix so this can be moved to darwin
 ---->
 
+<%
+  const os = locals.os;
+  const iOS = os === 'iOS';
+  const macOS = os === 'macOS';
+  const cocoaPrefix = iOS ? 'UI' : 'NS';
+  const layers = locals.layers;
+  const renamedProperties = locals.renamedProperties;
+-%>
 <!--
   This file is generated.
   Edit platform/darwin/scripts/generate-style-code.js, then run `make style-code-darwin`.

@@ -1,6 +1,6 @@
 <!--
   This file is generated.
-  Edit platform/darwin/scripts/generate-style-code.js, then run `make style-code-darwin`.
+  Edit platform/darwin/scripts/generate-style-code.js, then run `make style-code`.
 -->
 # Information for Style Authors
 
@@ -104,6 +104,7 @@ layer                      | style layer
 property                   | attribute
 SDF icon                   | template image
 source                     | content source
+function type              | interpolation mode
 
 ## Specifying the map’s content
 
@@ -178,6 +179,28 @@ layer objects. The property names generally correspond to the style JSON
 properties, except for the use of camelCase instead of kebab-case. Properties
 whose names differ from the style specification are listed below:
 
+### Circle style functions
+
+The runtime styling API introduced `MGLStyleFunction` to the macOS SDK.
+[Data-driven styling](data-driven-styling.html) expands `MGLStyleFunction` and
+introduces `MGLInterpolationMode`. Individual style property documentation
+includes which subclasses of `MGLStyleFunction` are enabled for that property.
+
+In style specification       | In the SDK
+-----------------------------|-----------
+`zoom function`              | `MGLCameraStyleFunction`
+`property function`          | `MGLSourceStyleFunction`
+`zoom-and-property functions`| `MGLCompositeStyleFunction`
+
+### Circle interpolation mode
+
+In style specification       | In the SDK
+-----------------------------|-----------
+`exponential`                | `MGLInterpolationModeExponential`
+`interval`                   | `MGLInterpolationModeInterval`
+`categorical`                | `MGLInterpolationModeCategorical`
+`identity`                   | `MGLInterpolationModeIdentity`
+
 ### Circle style layers
 
 In style JSON | In Objective-C | In Swift
@@ -185,6 +208,28 @@ In style JSON | In Objective-C | In Swift
 `circle-pitch-scale` | `MGLCircleStyleLayer.circleScaleAlignment` | `MGLCircleStyleLayer.circleScaleAlignment`
 `circle-translate` | `MGLCircleStyleLayer.circleTranslation` | `MGLCircleStyleLayer.circleTranslation`
 `circle-translate-anchor` | `MGLCircleStyleLayer.circleTranslationAnchor` | `MGLCircleStyleLayer.circleTranslationAnchor`
+
+### Fill style functions
+
+The runtime styling API introduced `MGLStyleFunction` to the macOS SDK.
+[Data-driven styling](data-driven-styling.html) expands `MGLStyleFunction` and
+introduces `MGLInterpolationMode`. Individual style property documentation
+includes which subclasses of `MGLStyleFunction` are enabled for that property.
+
+In style specification       | In the SDK
+-----------------------------|-----------
+`zoom function`              | `MGLCameraStyleFunction`
+`property function`          | `MGLSourceStyleFunction`
+`zoom-and-property functions`| `MGLCompositeStyleFunction`
+
+### Fill interpolation mode
+
+In style specification       | In the SDK
+-----------------------------|-----------
+`exponential`                | `MGLInterpolationModeExponential`
+`interval`                   | `MGLInterpolationModeInterval`
+`categorical`                | `MGLInterpolationModeCategorical`
+`identity`                   | `MGLInterpolationModeIdentity`
 
 ### Fill style layers
 
@@ -194,6 +239,28 @@ In style JSON | In Objective-C | In Swift
 `fill-translate` | `MGLFillStyleLayer.fillTranslation` | `MGLFillStyleLayer.fillTranslation`
 `fill-translate-anchor` | `MGLFillStyleLayer.fillTranslationAnchor` | `MGLFillStyleLayer.fillTranslationAnchor`
 
+### Line style functions
+
+The runtime styling API introduced `MGLStyleFunction` to the macOS SDK.
+[Data-driven styling](data-driven-styling.html) expands `MGLStyleFunction` and
+introduces `MGLInterpolationMode`. Individual style property documentation
+includes which subclasses of `MGLStyleFunction` are enabled for that property.
+
+In style specification       | In the SDK
+-----------------------------|-----------
+`zoom function`              | `MGLCameraStyleFunction`
+`property function`          | `MGLSourceStyleFunction`
+`zoom-and-property functions`| `MGLCompositeStyleFunction`
+
+### Line interpolation mode
+
+In style specification       | In the SDK
+-----------------------------|-----------
+`exponential`                | `MGLInterpolationModeExponential`
+`interval`                   | `MGLInterpolationModeInterval`
+`categorical`                | `MGLInterpolationModeCategorical`
+`identity`                   | `MGLInterpolationModeIdentity`
+
 ### Line style layers
 
 In style JSON | In Objective-C | In Swift
@@ -202,6 +269,28 @@ In style JSON | In Objective-C | In Swift
 `line-translate` | `MGLLineStyleLayer.lineTranslation` | `MGLLineStyleLayer.lineTranslation`
 `line-translate-anchor` | `MGLLineStyleLayer.lineTranslationAnchor` | `MGLLineStyleLayer.lineTranslationAnchor`
 
+### Raster style functions
+
+The runtime styling API introduced `MGLStyleFunction` to the macOS SDK.
+[Data-driven styling](data-driven-styling.html) expands `MGLStyleFunction` and
+introduces `MGLInterpolationMode`. Individual style property documentation
+includes which subclasses of `MGLStyleFunction` are enabled for that property.
+
+In style specification       | In the SDK
+-----------------------------|-----------
+`zoom function`              | `MGLCameraStyleFunction`
+`property function`          | `MGLSourceStyleFunction`
+`zoom-and-property functions`| `MGLCompositeStyleFunction`
+
+### Raster interpolation mode
+
+In style specification       | In the SDK
+-----------------------------|-----------
+`exponential`                | `MGLInterpolationModeExponential`
+`interval`                   | `MGLInterpolationModeInterval`
+`categorical`                | `MGLInterpolationModeCategorical`
+`identity`                   | `MGLInterpolationModeIdentity`
+
 ### Raster style layers
 
 In style JSON | In Objective-C | In Swift
@@ -209,6 +298,28 @@ In style JSON | In Objective-C | In Swift
 `raster-brightness-max` | `MGLRasterStyleLayer.maximumRasterBrightness` | `MGLRasterStyleLayer.maximumRasterBrightness`
 `raster-brightness-min` | `MGLRasterStyleLayer.minimumRasterBrightness` | `MGLRasterStyleLayer.minimumRasterBrightness`
 `raster-hue-rotate` | `MGLRasterStyleLayer.rasterHueRotation` | `MGLRasterStyleLayer.rasterHueRotation`
+
+### Symbol style functions
+
+The runtime styling API introduced `MGLStyleFunction` to the macOS SDK.
+[Data-driven styling](data-driven-styling.html) expands `MGLStyleFunction` and
+introduces `MGLInterpolationMode`. Individual style property documentation
+includes which subclasses of `MGLStyleFunction` are enabled for that property.
+
+In style specification       | In the SDK
+-----------------------------|-----------
+`zoom function`              | `MGLCameraStyleFunction`
+`property function`          | `MGLSourceStyleFunction`
+`zoom-and-property functions`| `MGLCompositeStyleFunction`
+
+### Symbol interpolation mode
+
+In style specification       | In the SDK
+-----------------------------|-----------
+`exponential`                | `MGLInterpolationModeExponential`
+`interval`                   | `MGLInterpolationModeInterval`
+`categorical`                | `MGLInterpolationModeCategorical`
+`identity`                   | `MGLInterpolationModeIdentity`
 
 ### Symbol style layers
 
