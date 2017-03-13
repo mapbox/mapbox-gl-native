@@ -15,6 +15,12 @@
 
 namespace node_mbgl {
 
+class NodeBackend : public mbgl::HeadlessBackend {
+public:
+    NodeBackend();
+    void onDidFailLoadingMap() final;
+};
+
 class NodeMap : public Nan::ObjectWrap,
                 public mbgl::FileSource {
 public:
@@ -59,7 +65,7 @@ public:
     std::unique_ptr<mbgl::AsyncRequest> request(const mbgl::Resource&, mbgl::FileSource::Callback);
 
     const float pixelRatio;
-    mbgl::HeadlessBackend backend;
+    NodeBackend backend;
     std::unique_ptr<mbgl::OffscreenView> view;
     NodeThreadPool threadpool;
     std::unique_ptr<mbgl::Map> map;
