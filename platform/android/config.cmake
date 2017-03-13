@@ -248,6 +248,7 @@ target_compile_options(mapbox-gl
 target_link_libraries(mapbox-gl
     PUBLIC mbgl-core
     PUBLIC -Wl,--gc-sections
+    PUBLIC -Wl,--version-script=${CMAKE_SOURCE_DIR}/platform/android/version-script
 )
 
 # Create a stripped version of the library and copy it to the JNIDIR.
@@ -331,6 +332,7 @@ target_compile_options(example-custom-layer
 target_link_libraries(example-custom-layer
     PRIVATE mapbox-gl
     PUBLIC -Wl,--gc-sections
+    PUBLIC -Wl,--version-script=${CMAKE_SOURCE_DIR}/platform/android/version-script
 )
 
 add_custom_command(TARGET example-custom-layer POST_BUILD
