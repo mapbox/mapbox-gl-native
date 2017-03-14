@@ -3,8 +3,12 @@ package com.mapbox.mapboxsdk.maps;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.PointF;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
@@ -21,6 +25,8 @@ import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.maps.widgets.CompassView;
 import com.mapbox.mapboxsdk.utils.ColorUtils;
+
+import java.io.ByteArrayOutputStream;
 
 /**
  * Settings for the user interface of a MapboxMap. To obtain this interface, call getUiSettings().
@@ -143,6 +149,7 @@ public final class UiSettings {
       setCompassMargins(tenDp, tenDp, tenDp, tenDp);
     }
     setCompassFadeFacingNorth(options.getCompassFadeFacingNorth());
+    setCompassImage(options.getCompassImage());
   }
 
   private void saveCompass(Bundle outState) {
@@ -153,6 +160,16 @@ public final class UiSettings {
     outState.putInt(MapboxConstants.STATE_COMPASS_MARGIN_BOTTOM, getCompassMarginBottom());
     outState.putInt(MapboxConstants.STATE_COMPASS_MARGIN_RIGHT, getCompassMarginRight());
     outState.putBoolean(MapboxConstants.STATE_COMPASS_FADE_WHEN_FACING_NORTH, isCompassFadeWhenFacingNorth());
+    outState.putByteArray(MapboxConstants.STATE_COMPASS_IMAGE_BITMAP,
+      convert(MapboxMapOptions.getBitmapFromDrawable(getCompassImage())));
+  }
+
+  private byte[] convert(Bitmap resource) {
+    ByteArrayOutputStream stream = new ByteArrayOutputStream();
+    resource.compress(Bitmap.CompressFormat.PNG, 100, stream);
+    byte[] byteArray = stream.toByteArray();
+
+    return byteArray;
   }
 
   private void restoreCompass(Bundle savedInstanceState) {
@@ -163,6 +180,15 @@ public final class UiSettings {
       savedInstanceState.getInt(MapboxConstants.STATE_COMPASS_MARGIN_RIGHT),
       savedInstanceState.getInt(MapboxConstants.STATE_COMPASS_MARGIN_BOTTOM));
     setCompassFadeFacingNorth(savedInstanceState.getBoolean(MapboxConstants.STATE_COMPASS_FADE_WHEN_FACING_NORTH));
+    setCompassImage(decode(savedInstanceState.getByteArray(MapboxConstants.STATE_COMPASS_IMAGE_BITMAP)));
+  }
+
+  private Drawable decode(byte[] bitmap) {
+    Bitmap compass = BitmapFactory.decodeByteArray(bitmap, 0, bitmap.length);
+
+    Drawable compassImage = new BitmapDrawable(compassView.getResources(), compass);
+
+    return compassImage;
   }
 
   private void initialiseLogo(MapboxMapOptions options, Resources resources) {
@@ -297,6 +323,18 @@ public final class UiSettings {
   }
 
   /**
+   * Specifies the CompassView image.
+   * <p>
+   * By default this value is R.drawable.mapbox_compass_icon.
+   * </p>
+   *
+   * @param compass the drawable to show as image compass
+   */
+  public void setCompassImage(Drawable compass) {
+    compassView.setCompassImage(compass);
+  }
+
+  /**
    * Returns whether the compass performs a fading animation out when facing north.
    *
    * @return True if the compass will fade, false if it remains visible
@@ -362,6 +400,15 @@ public final class UiSettings {
    */
   public int getCompassMarginBottom() {
     return ((FrameLayout.LayoutParams) compassView.getLayoutParams()).bottomMargin;
+  }
+
+  /**
+   * Get the current configured CompassView image.
+   *
+   * @return the drawable used as compass image
+   */
+  public Drawable getCompassImage() {
+    return compassView.getCompassImage();
   }
 
   void update(@NonNull CameraPosition cameraPosition) {
