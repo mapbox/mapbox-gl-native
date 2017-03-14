@@ -39,7 +39,7 @@
   },
   "gypfile": true,
   "binary": {
-    "module_name": "mapbox-gl-native",
+    "module_name": "mapbox_gl_native",
     "module_path": "./lib/",
     "host": "https://mapbox-node-binary.s3.amazonaws.com",
     "remote_path": "./{name}/v{version}",

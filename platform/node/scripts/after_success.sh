@@ -4,7 +4,7 @@ set -e
 set -o pipefail
 
 if [[ -n ${PUBLISH:-} ]]; then
-    if [[ "${BUILDTYPE}" == "Debug" ]]; then
+    if [[ "${BUILDTYPE}" != "Release" ]]; then
         echo "Please run this script in release mode (BUILDTYPE=Release)."
         exit 1
     else
