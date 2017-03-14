@@ -22,6 +22,11 @@ const static bool zlibVersionCheck __attribute__((unused)) = []() {
 namespace mbgl {
 namespace util {
 
+// Needed when using a zlib compiled with -DZ_PREFIX
+// because it will mess with this function name and
+// cause a link error.
+#undef z_compress
+
 std::string compress(const std::string &raw) {
     z_stream deflate_stream;
     memset(&deflate_stream, 0, sizeof(deflate_stream));
