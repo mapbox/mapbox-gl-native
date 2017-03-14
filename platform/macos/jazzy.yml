@@ -19,6 +19,7 @@ custom_categories:
     children:
       - Working with GeoJSON Data
       - For Style Authors
+      - Data-Driven Styling
       - Info.plist Keys
   - name: Maps
     children:
