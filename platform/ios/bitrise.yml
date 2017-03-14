@@ -27,13 +27,13 @@ workflows:
             #!/bin/bash
             set -eu -o pipefail
             export BUILDTYPE=Debug
-            make iproj
+            make xproj
         - is_debug: 'yes'
     - xcode-test:
         title: Run SDK Unit Tests
         inputs:
-        - project_path: platform/ios/ios.xcworkspace
-        - scheme: CI
+        - project_path: platform/macos/macos.xcworkspace
+        - scheme: iOS CI
     - deploy-to-bitrise-io:
         title: Deploy to Bitrise.io
         inputs:
