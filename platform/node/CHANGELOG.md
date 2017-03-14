@@ -1,6 +1,11 @@
+# 3.4.6 - March 14, 2017
+
+- Publishes `Release` build on Mac ([#8407](https://github.com/mapbox/mapbox-gl-native/pull/8407))
+- Fixes the publish binary build process ([#8406](https://github.com/mapbox/mapbox-gl-native/pull/8406))
+
 # 3.4.5 - March 14, 2017
 
-- Fixed a memory hang issue after GlyphAtlas was refactored [#8394](https://github.com/mapbox/mapbox-gl-native/pull/8394)
+- Fixed a memory hang issue after GlyphAtlas was refactored ([#8394](https://github.com/mapbox/mapbox-gl-native/pull/8394))
 
 # 3.4.4 - January 10, 2017
 
