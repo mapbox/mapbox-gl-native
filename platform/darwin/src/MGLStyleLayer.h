@@ -19,7 +19,7 @@ NS_ASSUME_NONNULL_BEGIN
  `MGLBackgroundStyleLayer` and the concrete subclasses of
  `MGLForegroundStyleLayer`.
  
- Do not add `MGLStyleLayer` objects to the style property of a `MGLMapView` before
+ Do not add `MGLStyleLayer` objects to the `style` property of a `MGLMapView` before
  `-mapView:didFinishLoadingStyle:` is called.
  */
 MGL_EXPORT
