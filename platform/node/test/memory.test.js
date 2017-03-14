@@ -1,8 +1,7 @@
 'use strict';
 
-var fs = require('fs');
+var mockfs = require('./mockfs');
 var mbgl = require('../index');
-var path = require('path');
 var test = require('tape');
 
 var testParams = {
@@ -12,20 +11,6 @@ var testParams = {
     ratio: 2
 };
 
-function readFixture(file) {
-    return fs.readFileSync(path.join('test/fixtures/resources', file));
-}
-
-var style_raster  = readFixture('style_raster.json').toString('utf8');
-var style_vector  = readFixture('style_vector.json').toString('utf8');
-var sprite_json   = readFixture('sprite.json');
-var sprite_png    = readFixture('sprite.png');
-var glyph         = readFixture('glyphs.pbf');
-var source_raster = readFixture('source_raster.json');
-var source_vector = readFixture('source_vector.json');
-var tile_raster   = readFixture('raster.tile');
-var tile_vector   = readFixture('vector.tile');
-
 test('Memory', function(t) {
     // Trigger garbage collection before starting test, then initialize
     // heap size
@@ -34,25 +19,7 @@ test('Memory', function(t) {
 
     var options = {
         request: function(req, callback) {
-            if (req.url == null) {
-                t.fail('invalid file request');
-            } else if (req.url.indexOf('sprite') > -1 && req.url.endsWith('json')) {
-                callback(null, { data: sprite_json });
-            } else if (req.url.indexOf('sprite') > -1 && req.url.endsWith('png')) {
-                callback(null, { data: sprite_png });
-            } else if (req.url.indexOf('fonts') > -1 && req.url.endsWith('pbf')) {
-                callback(null, { data: glyph });
-            } else if (req.url.endsWith('mapbox.satellite')) {
-                callback(null, { data: source_raster });
-            } else if (req.url.indexOf('satellite') > -1 && (req.url.endsWith('png') || req.url.endsWith('webp'))) {
-                callback(null, { data: tile_raster });
-            } else if (req.url.endsWith('mapbox.mapbox-streets-v7')) {
-                callback(null, { data: source_vector });
-            } else if (req.url.indexOf('streets') > -1 && req.url.endsWith('pbf')) {
-                callback(null, { data: tile_vector });
-            } else {
-                t.fail('unhandled file request: ' + req.url);
-            }
+            callback(null, { data: mockfs.dataForRequest(req) });
         },
         ratio: testParams.ratio,
     };
@@ -75,9 +42,9 @@ test('Memory', function(t) {
         var map = mapPool.shift();
 
         if (Math.floor(Math.random() * 2)) {
-            map.load(style_raster);
+            map.load(mockfs.style_raster);
         } else {
-            map.load(style_vector);
+            map.load(mockfs.style_vector);
         }
 
         map.render({ zoom: 16 }, function(err, pixels) {
