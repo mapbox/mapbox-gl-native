@@ -55,7 +55,7 @@ extern MGL_EXPORT const MGLStyleFunctionOption MGLStyleFunctionOptionDefaultValu
 typedef NS_ENUM(NSUInteger, MGLInterpolationMode) {
     /**
      Values between two stops are interpolated exponentially or linearly if the
-     `MGLStyleFunctionOptionInterpolationBase` is 1. 
+     `MGLStyleFunctionOptionInterpolationBase` is 1.
      */
     MGLInterpolationModeExponential = 0,
     /**
