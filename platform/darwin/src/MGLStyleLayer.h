@@ -18,6 +18,9 @@ NS_ASSUME_NONNULL_BEGIN
  subclasses of this class. Instead, create instances of
  `MGLBackgroundStyleLayer` and the concrete subclasses of
  `MGLForegroundStyleLayer`.
+ 
+ Do not add `MGLStyleLayer` objects to the `style` property of a `MGLMapView` before
+ `-mapView:didFinishLoadingStyle:` is called.
  */
 MGL_EXPORT
 @interface MGLStyleLayer : NSObject
