@@ -135,6 +135,10 @@ typedef NS_ENUM(NSUInteger, MGLTileCoordinateSystem) {
  A tile source is added to an `MGLStyle` object along with one or more
  `MGLRasterStyleLayer` or `MGLVectorStyleLayer` objects. Use a style layer to
  control the appearance of content supplied by the tile source.
+ 
+ A tile source is also known as a tile set. To learn about the structure of a
+ Mapbox-hosted tile set, view it in
+ <a href="https://www.mapbox.com/studio/tilesets/">Mapbox Studio’s Tilesets editor</a>.
 
  Do not create instances of this class directly, and do not create your own
  subclasses of this class. Instead, create instances of `MGLRasterSource` and
