@@ -1,3 +1,7 @@
+# 3.4.5 - March 14, 2017
+
+- Fixed a memory hang issue after GlyphAtlas was refactored [#8394](https://github.com/mapbox/mapbox-gl-native/pull/8394)
+
 # 3.4.4 - January 10, 2017
 
 - Updates the node binary publish location on s3 to reflect new package name ([#7653](https://github.com/mapbox/mapbox-gl-native/pull/7653))
