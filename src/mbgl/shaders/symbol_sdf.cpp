@@ -142,7 +142,7 @@ void main() {
     
 
     lowp vec4 color = fill_color;
-    lowp float gamma = EDGE_GAMMA / u_gamma_scale;
+    highp float gamma = EDGE_GAMMA / u_gamma_scale;
     lowp float buff = (256.0 - 64.0) / 256.0;
     if (u_is_halo) {
         color = halo_color;
