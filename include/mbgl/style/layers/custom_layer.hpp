@@ -65,9 +65,7 @@ public:
 };
 
 template <>
-inline bool Layer::is<CustomLayer>() const {
-    return type == Type::Custom;
-}
+bool Layer::is<CustomLayer>() const;
 
 } // namespace style
 } // namespace mbgl

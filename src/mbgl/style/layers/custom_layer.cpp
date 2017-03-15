@@ -20,5 +20,10 @@ CustomLayer::CustomLayer(const Impl& other)
 
 CustomLayer::~CustomLayer() = default;
 
+template <>
+bool Layer::is<CustomLayer>() const {
+    return type == Type::Custom;
+}
+
 } // namespace style
 } // namespace mbgl
