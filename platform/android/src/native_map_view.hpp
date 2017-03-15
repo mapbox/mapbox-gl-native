@@ -23,6 +23,7 @@
 #include "style/layers/layers.hpp"
 #include "style/sources/sources.hpp"
 
+#include <exception>
 #include <string>
 #include <jni.h>
 #include <android/native_window.h>
@@ -62,7 +63,7 @@ public:
     void onCameraDidChange(MapObserver::CameraChangeMode) override;
     void onWillStartLoadingMap() override;
     void onDidFinishLoadingMap() override;
-    void onDidFailLoadingMap() override;
+    void onDidFailLoadingMap(std::exception_ptr) override;
     void onWillStartRenderingFrame() override;
     void onDidFinishRenderingFrame(MapObserver::RenderMode) override;
     void onWillStartRenderingMap() override;
