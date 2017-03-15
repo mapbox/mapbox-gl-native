@@ -15,7 +15,6 @@
 #include <mbgl/util/indexed_tuple.hpp>
 #include <mbgl/util/ignore.hpp>
 
-#include <unordered_map>
 #include <utility>
 
 namespace mbgl {

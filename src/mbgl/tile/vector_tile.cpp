@@ -5,7 +5,6 @@
 #include <protozero/pbf_reader.hpp>
 
 #include <unordered_map>
-#include <unordered_map>
 #include <functional>
 #include <utility>
 
