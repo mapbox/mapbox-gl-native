@@ -28,15 +28,7 @@ class BackendTest : public HeadlessBackend {
 public:
     BackendTest() : HeadlessBackend(test::sharedDisplay()) {}
 
-    void setDidFailLoadingMapCallback(std::function<void()>&& callback) {
-        didFailLoadingMapCallback = std::move(callback);
-    }
-
-    void setDidFinishLoadingStyleCallback(std::function<void()>&& callback) {
-        didFinishLoadingStyleCallback = std::move(callback);
-    }
-
-    void onDidFailLoadingMap() final {
+    void onDidFailLoadingMap(std::exception_ptr) final {
         if (didFailLoadingMapCallback) {
             didFailLoadingMapCallback();
         }
@@ -113,9 +105,9 @@ TEST(Map, SetStyleInvalidJSON) {
     Log::setObserver(std::make_unique<FixtureLogObserver>());
 
     bool fail = false;
-    test.backend.setDidFailLoadingMapCallback([&]() {
+    test.backend.didFailLoadingMapCallback = [&]() {
         fail = true;
-    });
+    };
 
     {
         Map map(test.backend, test.view.getSize(), 1, test.fileSource, test.threadPool,
@@ -144,9 +136,9 @@ TEST(Map, SetStyleInvalidURL) {
         return response;
     };
 
-    test.backend.setDidFailLoadingMapCallback([&]() {
+    test.backend.didFailLoadingMapCallback = [&]() {
         test.runLoop.stop();
-    });
+    };
 
     Map map(test.backend, test.view.getSize(), 1, test.fileSource, test.threadPool, MapMode::Still);
     map.setStyleURL("mapbox://bar");
@@ -257,9 +249,9 @@ TEST(Map, StyleLoadedSignal) {
 
     // The map should emit a signal on style loaded
     bool emitted = false;
-    test.backend.setDidFinishLoadingStyleCallback([&]() {
+    test.backend.didFinishLoadingStyleCallback = [&]() {
         emitted = true;
-    });
+    };
     map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
     EXPECT_TRUE(emitted);
 
@@ -277,9 +269,9 @@ TEST(Map, TEST_REQUIRES_SERVER(StyleNetworkErrorRetry)) {
     Map map(test.backend, test.view.getSize(), 1, fileSource, test.threadPool, MapMode::Still);
     map.setStyleURL("http://127.0.0.1:3000/style-fail-once-500");
 
-    test.backend.setDidFinishLoadingStyleCallback([&]() {
+    test.backend.didFinishLoadingStyleCallback = [&]() {
         test.runLoop.stop();
-    });
+    };
 
     test.runLoop.run();
 }
@@ -295,15 +287,15 @@ TEST(Map, TEST_REQUIRES_SERVER(StyleNotFound)) {
     util::Timer timer;
 
     // Not found errors should not trigger a retry like other errors.
-    test.backend.setDidFinishLoadingStyleCallback([&]() {
+    test.backend.didFinishLoadingStyleCallback = [&]() {
         FAIL() << "Should not retry on not found!";
-    });
+    };
 
-    test.backend.setDidFailLoadingMapCallback([&]() {
+    test.backend.didFailLoadingMapCallback = [&]() {
         timer.start(Milliseconds(1100), 0s, [&] {
             test.runLoop.stop();
         });
-    });
+    };
 
     test.runLoop.run();
 
