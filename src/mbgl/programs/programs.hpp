@@ -26,8 +26,8 @@ public:
           symbolIcon(context, programParameters),
           symbolIconSDF(context, programParameters),
           symbolGlyph(context, programParameters),
-          debug(context, ProgramParameters(programParameters.pixelRatio, false)),
-          collisionBox(context, ProgramParameters(programParameters.pixelRatio, false)) {
+          debug(context, ProgramParameters(programParameters.pixelRatio, false, programParameters.cacheDir)),
+          collisionBox(context, ProgramParameters(programParameters.pixelRatio, false, programParameters.cacheDir)) {
     }
 
     CircleProgram circle;

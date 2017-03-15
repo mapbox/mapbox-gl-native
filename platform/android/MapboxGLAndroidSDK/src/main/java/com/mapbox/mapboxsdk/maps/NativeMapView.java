@@ -97,7 +97,8 @@ final class NativeMapView {
     onMapChangedListeners = new CopyOnWriteArrayList<>();
     this.mapView = mapView;
 
-    nativeInitialize(this, fileSource, pixelRatio, availableProcessors, totalMemory);
+    String programCacheDir = context.getCacheDir().getAbsolutePath();
+    nativeInitialize(this, fileSource, pixelRatio, programCacheDir, availableProcessors, totalMemory);
   }
 
   //
@@ -957,8 +958,12 @@ final class NativeMapView {
   // JNI methods
   //
 
-  private native void nativeInitialize(NativeMapView nativeMapView, FileSource fileSource,
-                                       float pixelRatio, int availableProcessors, long totalMemory);
+  private native void nativeInitialize(NativeMapView nativeMapView,
+                                       FileSource fileSource,
+                                       float pixelRatio,
+                                       String programCacheDir,
+                                       int availableProcessors,
+                                       long totalMemory);
 
   private native void nativeDestroy();
 

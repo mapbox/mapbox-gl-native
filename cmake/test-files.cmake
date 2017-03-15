@@ -38,6 +38,9 @@ set(MBGL_TEST_FILES
     test/math/minmax.test.cpp
     test/math/wrap.test.cpp
 
+    # programs
+    test/programs/binary_program.test.cpp
+
     # sprite
     test/sprite/sprite_atlas.test.cpp
     test/sprite/sprite_image.test.cpp
