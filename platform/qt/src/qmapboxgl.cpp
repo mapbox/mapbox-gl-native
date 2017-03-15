@@ -1602,7 +1602,7 @@ void QMapboxGLPrivate::onDidFinishLoadingMap()
     emit mapChanged(QMapboxGL::MapChangeDidFinishLoadingMap);
 }
 
-void QMapboxGLPrivate::onDidFailLoadingMap()
+void QMapboxGLPrivate::onDidFailLoadingMap(std::exception_ptr)
 {
     emit mapChanged(QMapboxGL::MapChangeDidFailLoadingMap);
 }
