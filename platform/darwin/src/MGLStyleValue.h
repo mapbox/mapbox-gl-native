@@ -54,11 +54,12 @@ extern MGL_EXPORT const MGLStyleFunctionOption MGLStyleFunctionOptionDefaultValu
  */
 typedef NS_ENUM(NSUInteger, MGLInterpolationMode) {
     /**
-     Values between two stops are interpolated exponentially or linearly if the
-     `MGLStyleFunctionOptionInterpolationBase` is 1. A higher interpolation base
-     causes the function’s output values to vary exponentially, increasing more
-     rapidly towards the high end of the function’s range. Use exponential
-     interpolation mode to show values relative to stop keys.
+     Values between two stops are interpolated linearly, or exponentially based on 
+     the `MGLStyleFunctionOptionInterpolationBase`. The default value of 1 creates 
+     a linear interpolation. A higher interpolation base causes the function’s 
+     output values to vary exponentially, increasing more rapidly towards the high
+     end of the function’s range. Use exponential interpolation mode to show values 
+     relative to stop keys.
      */
     MGLInterpolationModeExponential = 0,
     /**
