@@ -48,13 +48,18 @@
 namespace mbgl {
 namespace android {
 
-NativeMapView::NativeMapView(jni::JNIEnv& _env, jni::Object<NativeMapView> _obj, jni::Object<FileSource> jFileSource,
-                             jni::jfloat _pixelRatio, jni::jint _availableProcessors, jni::jlong _totalMemory) :
-    javaPeer(_obj.NewWeakGlobalRef(_env)),
-    pixelRatio(_pixelRatio),
-    availableProcessors(_availableProcessors),
-    totalMemory(_totalMemory),
-    threadPool(sharedThreadPool()) {
+NativeMapView::NativeMapView(jni::JNIEnv& _env,
+                             jni::Object<NativeMapView> _obj,
+                             jni::Object<FileSource> jFileSource,
+                             jni::jfloat _pixelRatio,
+                             jni::String _programCacheDir,
+                             jni::jint _availableProcessors,
+                             jni::jlong _totalMemory)
+    : javaPeer(_obj.NewWeakGlobalRef(_env)),
+      pixelRatio(_pixelRatio),
+      availableProcessors(_availableProcessors),
+      totalMemory(_totalMemory),
+      threadPool(sharedThreadPool()) {
 
     // Get a reference to the JavaVM for callbacks
     if (_env.GetJavaVM(&vm) < 0) {
@@ -65,8 +70,9 @@ NativeMapView::NativeMapView(jni::JNIEnv& _env, jni::Object<NativeMapView> _obj,
     // Create the core map
     map = std::make_unique<mbgl::Map>(
         *this, mbgl::Size{ static_cast<uint32_t>(width), static_cast<uint32_t>(height) },
-        pixelRatio, mbgl::android::FileSource::getDefaultFileSource(_env, jFileSource)
-        , *threadPool, MapMode::Continuous);
+        pixelRatio, mbgl::android::FileSource::getDefaultFileSource(_env, jFileSource), *threadPool,
+        MapMode::Continuous, GLContextMode::Unique, ConstrainMode::HeightOnly,
+        ViewportMode::Default, jni::Make<std::string>(_env, _programCacheDir));
 
     //Calculate a fitting cache size based on device parameters
     float zoomFactor   = map->getMaxZoom() - map->getMinZoom() + 1;
@@ -1398,7 +1404,7 @@ void NativeMapView::registerNative(jni::JNIEnv& env) {
 
     // Register the peer
     jni::RegisterNativePeer<NativeMapView>(env, NativeMapView::javaClass, "nativePtr",
-            std::make_unique<NativeMapView, JNIEnv&, jni::Object<NativeMapView>, jni::Object<FileSource>, jni::jfloat, jni::jint, jni::jlong>,
+            std::make_unique<NativeMapView, JNIEnv&, jni::Object<NativeMapView>, jni::Object<FileSource>, jni::jfloat, jni::String, jni::jint, jni::jlong>,
             "nativeInitialize",
             "nativeDestroy",
             METHOD(&NativeMapView::render, "nativeRender"),

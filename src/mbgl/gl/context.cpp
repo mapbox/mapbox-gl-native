@@ -2,6 +2,7 @@
 #include <mbgl/gl/context.hpp>
 #include <mbgl/gl/gl.hpp>
 #include <mbgl/gl/vertex_array.hpp>
+#include <mbgl/gl/program_binary.hpp>
 #include <mbgl/util/traits.hpp>
 #include <mbgl/util/std.hpp>
 #include <mbgl/util/logging.hpp>
@@ -33,6 +34,8 @@ static_assert(std::is_same<RenderbufferID, GLuint>::value, "OpenGL type mismatch
 static_assert(std::is_same<std::underlying_type_t<TextureFormat>, GLenum>::value, "OpenGL type mismatch");
 static_assert(underlying_type(TextureFormat::RGBA) == GL_RGBA, "OpenGL type mismatch");
 static_assert(underlying_type(TextureFormat::Alpha) == GL_ALPHA, "OpenGL type mismatch");
+
+static_assert(std::is_same<BinaryProgramFormat, GLenum>::value, "OpenGL type mismatch");
 
 Context::~Context() {
     reset();
@@ -72,9 +75,27 @@ UniqueProgram Context::createProgram(ShaderID vertexShader, ShaderID fragmentSha
     return result;
 }
 
+#if MBGL_HAS_BINARY_PROGRAMS
+UniqueProgram Context::createProgram(BinaryProgramFormat binaryFormat,
+                                     const std::string& binaryProgram) {
+    UniqueProgram result{ MBGL_CHECK_ERROR(glCreateProgram()), { this } };
+    MBGL_CHECK_ERROR(ProgramBinary(result, static_cast<GLenum>(binaryFormat), binaryProgram.data(),
+                                   static_cast<GLint>(binaryProgram.size())));
+    verifyProgramLinkage(result);
+    return result;
+}
+#else
+UniqueProgram Context::createProgram(BinaryProgramFormat, const std::string&) {
+    throw std::runtime_error("binary programs are not supported");
+}
+#endif
+
 void Context::linkProgram(ProgramID program_) {
     MBGL_CHECK_ERROR(glLinkProgram(program_));
+    verifyProgramLinkage(program_);
+}
 
+void Context::verifyProgramLinkage(ProgramID program_) {
     GLint status;
     MBGL_CHECK_ERROR(glGetProgramiv(program_, GL_LINK_STATUS, &status));
     if (status == GL_TRUE) {
@@ -128,6 +149,34 @@ bool Context::supportsVertexArrays() const {
            gl::DeleteVertexArrays &&
            !disableVAOExtension;
 }
+
+#if MBGL_HAS_BINARY_PROGRAMS
+bool Context::supportsProgramBinaries() const {
+    return gl::ProgramBinary && gl::GetProgramBinary;
+}
+
+optional<std::pair<BinaryProgramFormat, std::string>>
+Context::getBinaryProgram(ProgramID program_) const {
+    if (!supportsProgramBinaries()) {
+        return {};
+    }
+    GLint binaryLength;
+    MBGL_CHECK_ERROR(glGetProgramiv(program_, GL_PROGRAM_BINARY_LENGTH, &binaryLength));
+    std::string binary;
+    binary.resize(binaryLength);
+    GLenum binaryFormat;
+    MBGL_CHECK_ERROR(GetProgramBinary(program_, binaryLength, &binaryLength, &binaryFormat,
+                                      const_cast<char*>(binary.data())));
+    if (size_t(binaryLength) != binary.size()) {
+        return {};
+    }
+    return { { binaryFormat, std::move(binary) } };
+}
+#else
+optional<std::pair<BinaryProgramFormat, std::string>> Context::getBinaryProgram(ProgramID) const {
+    return {};
+}
+#endif
 
 UniqueVertexArray Context::createVertexArray() {
     assert(supportsVertexArrays());

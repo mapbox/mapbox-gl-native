@@ -1,5 +1,6 @@
 #pragma once
 
+#include <mbgl/gl/features.hpp>
 #include <mbgl/gl/object.hpp>
 #include <mbgl/gl/state.hpp>
 #include <mbgl/gl/value.hpp>
@@ -37,11 +38,20 @@ public:
 
     UniqueShader createShader(ShaderType type, const std::string& source);
     UniqueProgram createProgram(ShaderID vertexShader, ShaderID fragmentShader);
+    UniqueProgram createProgram(BinaryProgramFormat binaryFormat, const std::string& binaryProgram);
+    void verifyProgramLinkage(ProgramID);
     void linkProgram(ProgramID);
     UniqueTexture createTexture();
 
     bool supportsVertexArrays() const;
     UniqueVertexArray createVertexArray();
+
+#if MBGL_HAS_BINARY_PROGRAMS
+    bool supportsProgramBinaries() const;
+#else
+    constexpr bool supportsProgramBinaries() const { return false; }
+#endif
+    optional<std::pair<BinaryProgramFormat, std::string>> getBinaryProgram(ProgramID) const;
 
     template <class Vertex, class DrawMode>
     VertexBuffer<Vertex, DrawMode> createVertexBuffer(VertexVector<Vertex, DrawMode>&& v) {
