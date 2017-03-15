@@ -1,3 +1,7 @@
+# 3.4.7 - March 15, 2017
+
+- Fixed MacOS Release builds ([8409](https://github.com/mapbox/mapbox-gl-native/pull/8409))
+
 # 3.4.6 - March 14, 2017
 
 - Publishes `Release` build on Mac ([#8407](https://github.com/mapbox/mapbox-gl-native/pull/8407))
