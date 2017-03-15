@@ -55,22 +55,25 @@ extern MGL_EXPORT const MGLStyleFunctionOption MGLStyleFunctionOptionDefaultValu
 typedef NS_ENUM(NSUInteger, MGLInterpolationMode) {
     /**
      Values between two stops are interpolated exponentially or linearly if the
-     `MGLStyleFunctionOptionInterpolationBase` is 1.
+     `MGLStyleFunctionOptionInterpolationBase` is 1. Use exponential interpolation
+     mode to show values relative to stop keys.
      */
     MGLInterpolationModeExponential = 0,
     /**
      Values between two stops are not interpolated. Instead, properties are set
-     to the value of the stop just less than the function input.
+     to the value of the stop just less than the function input. Use interval
+     interpolation mode to show values that fall within a range.
      */
     MGLInterpolationModeInterval,
     /**
      Values between two stops are not interpolated. Instead, properties are set
-     to the value of the stop equal to the function input's key value.
+     to the value of the stop equal to the function input's key value. Use
+     categorical interpolation mode to show values that fit into categories.
      */
     MGLInterpolationModeCategorical,
     /**
      Values between two stops are not interpolated. Instead, values are set 
-     to their input value.
+     to their input value. Use to show values that can be used as style values.
      */
     MGLInterpolationModeIdentity
 };
