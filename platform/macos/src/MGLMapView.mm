@@ -35,8 +35,10 @@
 #import <mbgl/math/wrap.hpp>
 #import <mbgl/util/constants.hpp>
 #import <mbgl/util/chrono.hpp>
+#import <mbgl/util/exception.hpp>
 #import <mbgl/util/run_loop.hpp>
 #import <mbgl/util/shared_thread_pool.hpp>
+#import <mbgl/util/string.hpp>
 
 #import <map>
 #import <unordered_map>
@@ -889,18 +891,17 @@ public:
     }
 }
 
-- (void)mapViewDidFailLoadingMap {
+- (void)mapViewDidFailLoadingMapWithError:(NSError *)error {
     if (!_mbglMap) {
         return;
     }
 
     if ([self.delegate respondsToSelector:@selector(mapViewDidFailLoadingMap:withError:)]) {
-        NSError *error = [NSError errorWithDomain:MGLErrorDomain code:0 userInfo:nil];
         [self.delegate mapViewDidFailLoadingMap:self withError:error];
     }
 }
 
-- (void)MapViewWillStartRenderingFrame {
+- (void)mapViewWillStartRenderingFrame {
     if (!_mbglMap) {
         return;
     }
@@ -2794,12 +2795,31 @@ public:
         [nativeView mapViewDidFinishLoadingMap];
     }
 
-    void onDidFailLoadingMap() override {
-        [nativeView mapViewDidFailLoadingMap];
+    void onDidFailLoadingMap(std::exception_ptr exception) override {
+        NSString *description;
+        MGLErrorCode code;
+        try {
+            std::rethrow_exception(exception);
+        } catch (const mbgl::util::StyleParseException&) {
+            code = MGLErrorCodeParseStyleFailed;
+            description = NSLocalizedStringWithDefaultValue(@"PARSE_STYLE_FAILED_DESC", nil, nil, @"The map failed to load because the style is corrupted.", @"");
+        } catch (const mbgl::util::StyleLoadException&) {
+            code = MGLErrorCodeLoadStyleFailed;
+            description = NSLocalizedStringWithDefaultValue(@"PARSE_STYLE_FAILED_DESC", nil, nil, @"The map failed to load because the style can't be loaded.", @"");
+        } catch (const mbgl::util::NotFoundException&) {
+            code = MGLErrorCodeNotFound;
+            description = NSLocalizedStringWithDefaultValue(@"LOAD_STYLE_FAILED_DESC", nil, nil, @"The map failed to load because the style can’t be found or is incompatible.", @"");
+        } catch (...) {
+            code = MGLErrorCodeUnknown;
+            description = NSLocalizedStringWithDefaultValue(@"LOAD_STYLE_FAILED_DESC", nil, nil, @"The map failed to load because an unknown error occurred.", @"");
+        }
+        NSDictionary *userInfo = @{NSLocalizedDescriptionKey:description, NSLocalizedFailureReasonErrorKey:@(mbgl::util::toString(exception).c_str())};
+        NSError *error = [NSError errorWithDomain:MGLErrorDomain code:code userInfo:userInfo];
+        [nativeView mapViewDidFailLoadingMapWithError:error];
     }
 
     void onWillStartRenderingFrame() override {
-        [nativeView MapViewWillStartRenderingFrame];
+        [nativeView mapViewWillStartRenderingFrame];
     }
 
     void onDidFinishRenderingFrame(mbgl::MapObserver::RenderMode mode) override {
