@@ -16,7 +16,6 @@
 #include <mbgl/util/ignore.hpp>
 #include <mbgl/util/unordered_vector_map.hpp>
 
-#include <unordered_map>
 #include <utility>
 
 namespace mbgl {
