@@ -61,8 +61,6 @@ final class NativeMapView {
   // Listener invoked to return a bitmap of the map
   private MapboxMap.SnapshotReadyCallback snapshotReadyCallback;
 
-  private static final int CENTER_XY_VALUE = -1;
-
   //
   // Static methods
   //
@@ -380,27 +378,11 @@ final class NativeMapView {
     return nativeGetScale();
   }
 
-  public void setZoom(double zoom) {
+  public void setZoom(double zoom, PointF focalPoint, long duration) {
     if (isDestroyedOn("setZoom")) {
       return;
     }
-    setZoom(zoom, CENTER_XY_VALUE, CENTER_XY_VALUE, 0);
-  }
-
-  public void setZoom(double zoom, double cx, double cy, long duration) {
-    if (isDestroyedOn("setZoom")) {
-      return;
-    }
-
-    if (cx != CENTER_XY_VALUE) {
-      cx = cx / pixelRatio;
-    }
-
-    if (cy != CENTER_XY_VALUE) {
-      cy = cy / pixelRatio;
-    }
-
-    nativeSetZoom(zoom, cx, cy, duration);
+    nativeSetZoom(zoom, focalPoint.x / pixelRatio, focalPoint.y / pixelRatio, duration);
   }
 
   public double getZoom() {
