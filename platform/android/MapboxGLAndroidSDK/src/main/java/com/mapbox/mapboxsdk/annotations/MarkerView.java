@@ -59,6 +59,11 @@ public class MarkerView extends Marker {
 
     private boolean selected;
 
+    MarkerViewVisibilityChangedListener mMarkerViewVisibilityChangedListener;
+
+    public interface MarkerViewVisibilityChangedListener {
+        void onVisibilityChanged(int visibility);
+    }
 
     /**
      * Publicly hidden default constructor
@@ -407,6 +412,10 @@ public class MarkerView extends Marker {
             }
 
             markerViewManager = mapboxMap.getMarkerViewManager();
+
+            if(mMarkerViewVisibilityChangedListener != null){
+                mMarkerViewVisibilityChangedListener.onVisibilityChanged(View.GONE);
+            }
         }
     }
 
@@ -453,6 +462,10 @@ public class MarkerView extends Marker {
 
             }
         }
+
+        if(mMarkerViewVisibilityChangedListener !=null){
+            mMarkerViewVisibilityChangedListener.onVisibilityChanged(View.VISIBLE);
+        }
     }
 
     public RectF getDrawRect() {
@@ -498,4 +511,7 @@ public class MarkerView extends Marker {
         return super.compareTo(annotation);
     }
 
+    public void setVisibilityListener(MarkerViewVisibilityChangedListener markerViewVisibilityListener) {
+        mMarkerViewVisibilityChangedListener = markerViewVisibilityListener;
+    }
 }
