@@ -8,7 +8,6 @@
 
 #include <atomic>
 #include <memory>
-#include <unordered_map>
 
 namespace mbgl {
 
