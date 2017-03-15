@@ -42,6 +42,10 @@ typedef NS_ENUM(NSInteger, MGLErrorCode) {
     MGLErrorCodeBadServerResponse = 2,
     /** An attempt to establish a connection failed. */
     MGLErrorCodeConnectionFailed = 3,
+    /** A style parse error occurred while attempting to load the map. */
+    MGLErrorCodeParseStyleFailed = 4,
+    /** An attempt to load the style failed. */
+    MGLErrorCodeLoadStyleFailed = 5,
 };
 
 /**
