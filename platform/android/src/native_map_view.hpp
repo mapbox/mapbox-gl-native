@@ -42,7 +42,13 @@ public:
 
     static void registerNative(jni::JNIEnv&);
 
-    NativeMapView(jni::JNIEnv&, jni::Object<NativeMapView>, jni::Object<FileSource>, jni::jfloat, jni::jint, jni::jlong);
+    NativeMapView(jni::JNIEnv&,
+                  jni::Object<NativeMapView>,
+                  jni::Object<FileSource>,
+                  jni::jfloat pixelRatio,
+                  jni::String programCacheDir,
+                  jni::jint availableProcessors,
+                  jni::jlong totalMemory);
 
     virtual ~NativeMapView();
 
