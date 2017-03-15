@@ -1,0 +1,18 @@
+// Protocol Version 1
+
+package mapboxgl.binary_program;
+
+option optimize_for = LITE_RUNTIME;
+
+message binding {
+    required string name = 1;
+    required uint32 value = 2;
+}
+
+message binary_program {
+    required uint32 format = 1;
+    required bytes code = 2;
+    repeated binding attribute = 3;
+    repeated binding uniform = 4;
+    optional string identifier = 5;
+}

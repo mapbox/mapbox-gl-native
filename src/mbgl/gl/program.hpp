@@ -24,11 +24,29 @@ public:
     using AttributeBindings = typename Attributes::Bindings;
 
     Program(Context& context, const std::string& vertexSource, const std::string& fragmentSource)
-        : vertexShader(context.createShader(ShaderType::Vertex, vertexSource)),
-          fragmentShader(context.createShader(ShaderType::Fragment, fragmentSource)),
-          program(context.createProgram(vertexShader, fragmentShader)),
-          attributeLocations(Attributes::locations(program)),
-          uniformsState((context.linkProgram(program), Uniforms::state(program))) {}
+        : program(
+              context.createProgram(context.createShader(ShaderType::Vertex, vertexSource),
+                                    context.createShader(ShaderType::Fragment, fragmentSource))),
+          attributeLocations(Attributes::bindLocations(program)),
+          uniformsState((context.linkProgram(program), Uniforms::bindLocations(program))) {
+    }
+
+    template <class BinaryProgram>
+    Program(Context& context, const BinaryProgram& binaryProgram)
+        : program(context.createProgram(binaryProgram.format(), binaryProgram.code())),
+          attributeLocations(Attributes::loadNamedLocations(binaryProgram)),
+          uniformsState(Uniforms::loadNamedLocations(binaryProgram)) {
+    }
+
+    template <class BinaryProgram>
+    optional<BinaryProgram> get(Context& context, const std::string& identifier) const {
+        if (auto binaryProgram = context.getBinaryProgram(program)) {
+            return BinaryProgram{ binaryProgram->first, std::move(binaryProgram->second),
+                                  identifier, Attributes::getNamedLocations(attributeLocations),
+                                  Uniforms::getNamedLocations(uniformsState) };
+        }
+        return {};
+    }
 
     template <class DrawMode>
     void draw(Context& context,
@@ -64,8 +82,6 @@ public:
     }
 
 private:
-    UniqueShader vertexShader;
-    UniqueShader fragmentShader;
     UniqueProgram program;
 
     typename Attributes::Locations attributeLocations;

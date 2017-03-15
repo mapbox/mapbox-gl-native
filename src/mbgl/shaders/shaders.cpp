@@ -4,6 +4,7 @@
 
 #include <cassert>
 #include <sstream>
+#include <iomanip>
 
 namespace mbgl {
 namespace shaders {
@@ -27,6 +28,19 @@ std::string fragmentSource(const ProgramParameters& parameters, const char* frag
 
 std::string vertexSource(const ProgramParameters& parameters, const char* vertexSource) {
     return pixelRatioDefine(parameters) + vertexPrelude + vertexSource;
+}
+
+std::string programCachePath(const ProgramParameters& parameters, const char* name) {
+    return parameters.cacheDir + "/com.mapbox.gl.shader." + name +
+           (parameters.overdraw ? ".overdraw.pbf" : ".pbf");
+}
+
+std::string programIdentifier(const std::string& vertexSource, const std::string& fragmentSource) {
+    std::ostringstream ss;
+    ss << std::setfill('0') << std::setw(sizeof(size_t) * 2) << std::hex;
+    ss << std::hash<std::string>()(vertexSource);
+    ss << std::hash<std::string>()(fragmentSource);
+    return ss.str();
 }
 
 } // namespace shaders

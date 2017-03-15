@@ -73,5 +73,7 @@ constexpr bool operator!=(const PixelStorageType& a, const PixelStorageType& b) 
 
 #endif // MBGL_USE_GLES2
 
+using BinaryProgramFormat = uint32_t;
+
 } // namespace gl
 } // namespace mbgl

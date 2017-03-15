@@ -57,7 +57,8 @@ public:
          MapMode,
          GLContextMode,
          ConstrainMode,
-         ViewportMode);
+         ViewportMode,
+         const std::string& programCacheDir);
 
     void onSourceChanged(style::Source&) override;
     void onUpdate(Update) override;
@@ -82,6 +83,7 @@ public:
     const MapMode mode;
     const GLContextMode contextMode;
     const float pixelRatio;
+    const std::string programCacheDir;
 
     MapDebugOptions debugOptions { MapDebugOptions::NoDebug };
 
@@ -113,7 +115,8 @@ Map::Map(Backend& backend,
          MapMode mapMode,
          GLContextMode contextMode,
          ConstrainMode constrainMode,
-         ViewportMode viewportMode)
+         ViewportMode viewportMode,
+         const std::string& programCacheDir)
     : impl(std::make_unique<Impl>(*this,
                                   backend,
                                   pixelRatio,
@@ -122,7 +125,8 @@ Map::Map(Backend& backend,
                                   mapMode,
                                   contextMode,
                                   constrainMode,
-                                  viewportMode)) {
+                                  viewportMode,
+                                  programCacheDir)) {
     impl->transform.resize(size);
 }
 
@@ -134,7 +138,8 @@ Map::Impl::Impl(Map& map_,
                 MapMode mode_,
                 GLContextMode contextMode_,
                 ConstrainMode constrainMode_,
-                ViewportMode viewportMode_)
+                ViewportMode viewportMode_,
+                const std::string& programCacheDir_)
     : map(map_),
       observer(backend_),
       backend(backend_),
@@ -146,6 +151,7 @@ Map::Impl::Impl(Map& map_,
       mode(mode_),
       contextMode(contextMode_),
       pixelRatio(pixelRatio_),
+      programCacheDir(programCacheDir_),
       annotationManager(std::make_unique<AnnotationManager>(pixelRatio)),
       asyncInvalidate([this] {
           if (mode == MapMode::Continuous) {
@@ -262,7 +268,7 @@ void Map::Impl::render(View& view) {
     updateFlags = Update::Nothing;
 
     if (!painter) {
-        painter = std::make_unique<Painter>(backend.getContext(), transform.getState(), pixelRatio);
+        painter = std::make_unique<Painter>(backend.getContext(), transform.getState(), pixelRatio, programCacheDir);
     }
 
     if (mode == MapMode::Continuous) {

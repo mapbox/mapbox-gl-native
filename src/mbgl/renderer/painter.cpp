@@ -33,6 +33,8 @@
 
 #include <mbgl/util/offscreen_texture.hpp>
 
+#include <mbgl/util/stopwatch.hpp>
+
 #include <cassert>
 #include <algorithm>
 #include <iostream>
@@ -77,7 +79,10 @@ static gl::VertexVector<RasterLayoutVertex> rasterVertices() {
     return result;
 }
 
-Painter::Painter(gl::Context& context_, const TransformState& state_, float pixelRatio)
+Painter::Painter(gl::Context& context_,
+                 const TransformState& state_,
+                 float pixelRatio,
+                 const std::string& programCacheDir)
     : context(context_),
       state(state_),
       tileVertexBuffer(context.createVertexBuffer(tileVertices())),
@@ -91,12 +96,11 @@ Painter::Painter(gl::Context& context_, const TransformState& state_, float pixe
 
     gl::debugging::enable();
 
-    ProgramParameters programParameters{ pixelRatio, false };
-    programs = std::make_unique<Programs>(context, programParameters);
+    programs = std::make_unique<Programs>(context,
+                                          ProgramParameters{ pixelRatio, false, programCacheDir });
 #ifndef NDEBUG
-
-    ProgramParameters programParametersOverdraw{ pixelRatio, true };
-    overdrawPrograms = std::make_unique<Programs>(context, programParametersOverdraw);
+    overdrawPrograms =
+        std::make_unique<Programs>(context, ProgramParameters{ pixelRatio, true, programCacheDir });
 #endif
 }
 
