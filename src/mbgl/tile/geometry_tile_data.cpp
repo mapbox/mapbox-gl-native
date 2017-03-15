@@ -17,8 +17,8 @@ static double signedArea(const GeometryCoordinates& ring) {
     return sum;
 }
 
-static LinearRing<std::int32_t> toWagyuPath(const GeometryCoordinates& ring) {
-    LinearRing<std::int32_t> result;
+static LinearRing<int32_t> toWagyuPath(const GeometryCoordinates& ring) {
+    LinearRing<int32_t> result;
     result.reserve(ring.size());
     for (const auto& p : ring) {
         result.emplace_back(p.x, p.y);
@@ -26,85 +26,29 @@ static LinearRing<std::int32_t> toWagyuPath(const GeometryCoordinates& ring) {
     return result;
 }
 
-static void pushWagyuRing(GeometryCollection & solution,
-                          mapbox::geometry::wagyu::ring_ptr<std::int32_t> r) {
-    GeometryCoordinates lr;
-    lr.reserve(r->size() + 1);
-    auto firstPt = r->points;
-    auto ptIt = r->points;
-    do {
-        lr.emplace_back(ptIt->x, ptIt->y);
-        ptIt = ptIt->prev;
-    } while (ptIt != firstPt);
-    lr.emplace_back(firstPt->x, firstPt->y); // close the ring
-    solution.push_back(lr);
-}
-
-static void buildWagyuResults(GeometryCollection & solution,
-                              mapbox::geometry::wagyu::ring_vector<std::int32_t>& rings) {
-    for (auto r : rings) {
-        if (r == nullptr) {
-            continue;
-        }
-        assert(r->points);
-        if (r->size() < 3) {
-            continue;
-        }
-        solution.emplace_back();
-        pushWagyuRing(solution, r);
-        for (auto c : r->children) {
-            if (c == nullptr) {
-                continue;
-            }
-            assert(c->points);
-            if (c->size() < 3) {
-                continue;
-            }
-            pushWagyuRing(solution, c);
-        }
-        for (auto c : r->children) {
-            if (c == nullptr) {
-                continue;
-            }
-            if (!c->children.empty()) {
-                buildWagyuResults(solution, c->children);
-            }
+static GeometryCollection toGeometryCollection(MultiPolygon<int16_t>&& multipolygon) {
+    GeometryCollection result;
+    for (auto& polygon : multipolygon) {
+        for (auto& ring : polygon) {
+            result.emplace_back(std::move(ring));
         }
     }
+    return result;
 }
 
 GeometryCollection fixupPolygons(const GeometryCollection& rings) {
     using namespace mapbox::geometry::wagyu;
-    
-    // This is code that is pulled from the wagyu main class, we 
-    // are doing this to have our own custom build result,
-    // rather then copying output twice from the wagyu algorithm.
 
-    local_minimum_list<std::int32_t> minima_list;
+    wagyu<int32_t> clipper;
 
     for (const auto& ring : rings) {
-        // Convert ring to LinearRing type prior to adding them
-        add_linear_ring(toWagyuPath(ring), minima_list, polygon_type_subject);
+        clipper.add_ring(toWagyuPath(ring));
     }
 
-    // Core part of wagyu algorithm
-    ring_manager<std::int32_t> manager;
-    
-    build_hot_pixels(minima_list, manager);
-    
-    execute_vatti(minima_list, manager, clip_type_union, fill_type_even_odd, fill_type_even_odd);
-    
-    correct_topology(manager);
+    MultiPolygon<int16_t> multipolygon;
+    clipper.execute(clip_type_union, multipolygon, fill_type_even_odd, fill_type_even_odd);
 
-    // Finally lets build results
-    GeometryCollection result;
- 
-    // This calls code based on wagyu/build_results.hpp
-    // rather then returning a multipolygon however, we are
-    // going to return a GeometryCollection
-    buildWagyuResults(result, manager.children);
-
-    return result;
+    return toGeometryCollection(std::move(multipolygon));
 }
 
 std::vector<GeometryCollection> classifyRings(const GeometryCollection& rings) {

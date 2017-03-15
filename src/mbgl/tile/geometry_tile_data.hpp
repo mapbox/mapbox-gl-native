@@ -21,6 +21,13 @@ using GeometryCoordinate = Point<int16_t>;
 class GeometryCoordinates : public std::vector<GeometryCoordinate> {
 public:
     using coordinate_type = int16_t;
+
+    GeometryCoordinates() = default;
+    GeometryCoordinates(const std::vector<GeometryCoordinate>& v)
+        : std::vector<GeometryCoordinate>(v) {}
+    GeometryCoordinates(std::vector<GeometryCoordinate>&& v)
+        : std::vector<GeometryCoordinate>(std::move(v)) {}
+
     using std::vector<GeometryCoordinate>::vector;
 };
 
