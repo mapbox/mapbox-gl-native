@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <exception>
 
 namespace mbgl {
 
@@ -26,7 +27,7 @@ public:
     virtual void onCameraDidChange(CameraChangeMode) {}
     virtual void onWillStartLoadingMap() {}
     virtual void onDidFinishLoadingMap() {}
-    virtual void onDidFailLoadingMap() {}
+    virtual void onDidFailLoadingMap(std::exception_ptr) {}
     virtual void onWillStartRenderingFrame() {}
     virtual void onDidFinishRenderingFrame(RenderMode) {}
     virtual void onWillStartRenderingMap() {}
