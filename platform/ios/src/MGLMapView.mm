@@ -22,6 +22,7 @@
 #include <mbgl/style/layers/custom_layer.hpp>
 #include <mbgl/map/backend.hpp>
 #include <mbgl/math/wrap.hpp>
+#include <mbgl/util/exception.hpp>
 #include <mbgl/util/geo.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/image.hpp>
@@ -30,6 +31,7 @@
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/shared_thread_pool.hpp>
+#include <mbgl/util/string.hpp>
 
 #import "Mapbox.h"
 #import "MGLFeature_Private.h"
@@ -4794,7 +4796,7 @@ public:
     }
 }
 
-- (void)willStartLoadingMap {
+- (void)mapViewWillStartLoadingMap {
     if (!_mbglMap) {
         return;
     }
@@ -4805,7 +4807,7 @@ public:
     }
 }
 
-- (void)didFinishLoadingMap {
+- (void)mapViewDidFinishLoadingMap {
     if (!_mbglMap) {
         return;
     }
@@ -4820,19 +4822,18 @@ public:
     }
 }
 
-- (void)didFailLoadingMap {
+- (void)mapViewDidFailLoadingMapWithError:(NSError *)error {
     if (!_mbglMap) {
         return;
     }
 
     if ([self.delegate respondsToSelector:@selector(mapViewDidFailLoadingMap:withError:)])
     {
-        NSError *error = [NSError errorWithDomain:MGLErrorDomain code:0 userInfo:nil];
         [self.delegate mapViewDidFailLoadingMap:self withError:error];
     }
 }
 
-- (void)willStartRenderingFrame {
+- (void)mapViewWillStartRenderingFrame {
     if (!_mbglMap) {
         return;
     }
@@ -4843,7 +4844,7 @@ public:
     }
 }
 
-- (void)didFinishRenderingFrameFullyRendered:(BOOL)fullyRendered {
+- (void)mapViewDidFinishRenderingFrameFullyRendered:(BOOL)fullyRendered {
     if (!_mbglMap) {
         return;
     }
@@ -4861,7 +4862,7 @@ public:
     }
 }
 
-- (void)willStartRenderingMap {
+- (void)mapViewWillStartRenderingMap {
     if (!_mbglMap) {
         return;
     }
@@ -4872,7 +4873,7 @@ public:
     }
 }
 
-- (void)didFinishRenderingMapFullyRendered:(BOOL)fullyRendered {
+- (void)mapViewDidFinishRenderingMapFullyRendered:(BOOL)fullyRendered {
     if (!_mbglMap) {
         return;
     }
@@ -5375,33 +5376,52 @@ public:
     }
 
     void onWillStartLoadingMap() override {
-        [nativeView willStartLoadingMap];
+        [nativeView mapViewWillStartLoadingMap];
     }
 
     void onDidFinishLoadingMap() override {
-        [nativeView didFinishLoadingMap];
+        [nativeView mapViewDidFinishLoadingMap];
     }
 
-    void onDidFailLoadingMap() override {
-        [nativeView didFailLoadingMap];
+    void onDidFailLoadingMap(std::exception_ptr exception) override {
+        NSString *description;
+        MGLErrorCode code;
+        try {
+            std::rethrow_exception(exception);
+        } catch (const mbgl::util::StyleParseException&) {
+            code = MGLErrorCodeParseStyleFailed;
+            description = NSLocalizedStringWithDefaultValue(@"PARSE_STYLE_FAILED_DESC", nil, nil, @"The map failed to load because the style is corrupted.", @"");
+        } catch (const mbgl::util::StyleLoadException&) {
+            code = MGLErrorCodeLoadStyleFailed;
+            description = NSLocalizedStringWithDefaultValue(@"PARSE_STYLE_FAILED_DESC", nil, nil, @"The map failed to load because the style can't be loaded.", @"");
+        } catch (const mbgl::util::NotFoundException&) {
+            code = MGLErrorCodeNotFound;
+            description = NSLocalizedStringWithDefaultValue(@"LOAD_STYLE_FAILED_DESC", nil, nil, @"The map failed to load because the style can’t be found or is incompatible.", @"");
+        } catch (...) {
+            code = MGLErrorCodeUnknown;
+            description = NSLocalizedStringWithDefaultValue(@"LOAD_STYLE_FAILED_DESC", nil, nil, @"The map failed to load because an unknown error occurred.", @"");
+        }
+        NSDictionary *userInfo = @{NSLocalizedDescriptionKey:description, NSLocalizedFailureReasonErrorKey:@(mbgl::util::toString(exception).c_str())};
+        NSError *error = [NSError errorWithDomain:MGLErrorDomain code:code userInfo:userInfo];
+        [nativeView mapViewDidFailLoadingMapWithError:error];
     }
 
     void onWillStartRenderingFrame() override {
-        [nativeView willStartRenderingFrame];
+        [nativeView mapViewWillStartRenderingFrame];
     }
 
     void onDidFinishRenderingFrame(mbgl::MapObserver::RenderMode mode) override {
         bool fullyRendered = mode == mbgl::MapObserver::RenderMode::Full;
-        [nativeView didFinishRenderingFrameFullyRendered:fullyRendered];
+        [nativeView mapViewDidFinishRenderingFrameFullyRendered:fullyRendered];
     }
 
     void onWillStartRenderingMap() override {
-        [nativeView willStartRenderingMap];
+        [nativeView mapViewWillStartRenderingMap];
     }
 
     void onDidFinishRenderingMap(mbgl::MapObserver::RenderMode mode) override {
         bool fullyRendered = mode == mbgl::MapObserver::RenderMode::Full;
-        [nativeView didFinishRenderingMapFullyRendered:fullyRendered];
+        [nativeView mapViewDidFinishRenderingMapFullyRendered:fullyRendered];
     }
 
     void onDidFinishLoadingStyle() override {
