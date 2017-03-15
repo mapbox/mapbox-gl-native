@@ -16,6 +16,7 @@
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
+#include <mbgl/util/exception.hpp>
 #include <mbgl/util/projection.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/exception.hpp>
@@ -61,7 +62,7 @@ public:
     void onSourceAttributionChanged(style::Source&, const std::string&) override;
     void onUpdate(Update) override;
     void onStyleLoaded() override;
-    void onStyleError() override;
+    void onStyleError(std::exception_ptr) override;
     void onResourceError(std::exception_ptr) override;
 
     void render(View&);
@@ -364,11 +365,14 @@ void Map::setStyleURL(const std::string& url) {
         if (res.error) {
             if (res.error->reason == Response::Error::Reason::NotFound &&
                 util::mapbox::isMapboxURL(impl->styleURL)) {
-                Log::Error(Event::Setup, "style %s could not be found or is an incompatible legacy map or style", impl->styleURL.c_str());
+                const std::string message = "style " + impl->styleURL + " could not be found or is an incompatible legacy map or style";
+                Log::Error(Event::Setup, message.c_str());
+                impl->onStyleError(std::make_exception_ptr(util::NotFoundException(message)));
             } else {
-                Log::Error(Event::Setup, "loading style failed: %s", res.error->message.c_str());
+                const std::string message = "loading style failed: " + res.error->message;
+                Log::Error(Event::Setup, message.c_str());
+                impl->onStyleError(std::make_exception_ptr(util::StyleLoadException(message)));
             }
-            impl->onStyleError();
             impl->onResourceError(std::make_exception_ptr(std::runtime_error(res.error->message)));
         } else if (res.notModified || res.noContent) {
             return;
@@ -1098,7 +1102,7 @@ void Map::Impl::onStyleLoaded() {
     observer.onDidFinishLoadingStyle();
 }
 
-void Map::Impl::onStyleError() {
+void Map::Impl::onStyleError(std::exception_ptr) {
     observer.onDidFailLoadingMap();
 }
 

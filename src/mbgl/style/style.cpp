@@ -25,6 +25,7 @@
 #include <mbgl/renderer/render_item.hpp>
 #include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/util/constants.hpp>
+#include <mbgl/util/exception.hpp>
 #include <mbgl/util/geometry.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/logging.hpp>
@@ -110,8 +111,9 @@ void Style::setJSON(const std::string& json) {
     auto error = parser.parse(json);
 
     if (error) {
-        Log::Error(Event::ParseStyle, "Failed to parse style: %s", util::toString(error).c_str());
-        observer->onStyleError();
+        std::string message = "Failed to parse style: " + util::toString(error);
+        Log::Error(Event::ParseStyle, message.c_str());
+        observer->onStyleError(std::make_exception_ptr(util::StyleParseException(message)));
         observer->onResourceError(error);
         return;
     }
