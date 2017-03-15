@@ -209,7 +209,7 @@ void NativeMapView::onDidFinishLoadingMap() {
     notifyMapChange(MapChange::MapChangeDidFinishLoadingMap);
 }
 
-void NativeMapView::onDidFailLoadingMap() {
+void NativeMapView::onDidFailLoadingMap(std::exception_ptr) {
     notifyMapChange(MapChange::MapChangeDidFailLoadingMap);
 }
 
