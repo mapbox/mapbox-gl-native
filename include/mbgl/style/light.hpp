@@ -39,7 +39,7 @@ private:
 
     void calculateCartesian() {
         auto _a = azimuthal;
-        // We abstract "north"/"up" (compass-wise) to be 0º when really this is 90º (π/2): we correct for that here
+        // We abstract "north"/"up" (compass-wise) to be 0° when really this is 90° (π/2): we correct for that here
         _a += 90;
         _a *= util::DEG2RAD;
         auto _p = polar;
@@ -98,10 +98,10 @@ public:
     }
 
 private:
-    LightAnchorType anchor;
-    Position position;
-    Color color;
-    float intensity;
+    LightAnchorType anchor{ LightAnchorType::Viewport };
+    Position position{ 1.15, 210, 30 };
+    Color color{ Color::white() };
+    float intensity{ 0.5 };
 };
 
 } // namespace style

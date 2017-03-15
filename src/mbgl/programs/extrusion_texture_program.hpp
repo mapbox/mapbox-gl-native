@@ -26,7 +26,7 @@ shaders::extrusion_texture,
 gl::Triangle,
 ExtrusionTextureLayoutAttributes,
 ExtrusionTextureUniforms,
-style::FillExtrusionPaintProperties>
+style::PaintProperties<>>
 {
 public:
     using Program::Program;

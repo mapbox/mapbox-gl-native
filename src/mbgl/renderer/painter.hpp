@@ -169,6 +169,7 @@ private:
 
     gl::IndexBuffer<gl::Triangles> tileTriangleIndexBuffer;
     gl::IndexBuffer<gl::LineStrip> tileBorderIndexBuffer;
+    gl::IndexBuffer<gl::Triangles> extrusionTextureTriangleIndexBuffer;
 
     gl::SegmentVector<FillAttributes> tileTriangleSegments;
     gl::SegmentVector<DebugAttributes> tileBorderSegments;

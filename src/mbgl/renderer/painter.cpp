@@ -101,7 +101,8 @@ Painter::Painter(gl::Context& context_,
       rasterVertexBuffer(context.createVertexBuffer(rasterVertices())),
       extrusionTextureVertexBuffer(context.createVertexBuffer(extrusionTextureVertices())),
       tileTriangleIndexBuffer(context.createIndexBuffer(tileTriangleIndices())),
-      tileBorderIndexBuffer(context.createIndexBuffer(tileLineStripIndices())) {
+      tileBorderIndexBuffer(context.createIndexBuffer(tileLineStripIndices())),
+      extrusionTextureTriangleIndexBuffer(context.createIndexBuffer(tileTriangleIndices())) {
 
     tileTriangleSegments.emplace_back(0, 0, 4, 6);
     tileBorderSegments.emplace_back(0, 0, 4, 5);
@@ -351,7 +352,7 @@ void Painter::renderPass(PaintParameters& parameters,
             mat4 viewportMat;
             matrix::ortho(viewportMat, 0, size.width, size.height, 0, 0, 1);
 
-            const FillExtrusionPaintProperties::Evaluated properties = layer.as<FillExtrusionLayer>()->impl->paint.evaluated;
+            const PaintProperties<>::Evaluated properties{};
 
             parameters.programs.extrusionTexture.draw(context,
                                                       gl::Triangles(),
@@ -362,10 +363,10 @@ void Painter::renderPass(PaintParameters& parameters,
                                                           uniforms::u_matrix::Value{ viewportMat },
                                                           uniforms::u_world::Value{ size },
                                                           uniforms::u_image::Value{ 0 }, // view.getTexture() ? no — but follow up on whether could be variable or if it's always safe to attach to 0 unit
-                                                          uniforms::u_opacity::Value{ properties.get<FillExtrusionOpacity>() } // TODO implement parsing from style
+                                                          uniforms::u_opacity::Value{ layer.as<FillExtrusionLayer>()->impl->paint.evaluated.get<FillExtrusionOpacity>() }
                                                       },
                                                       extrusionTextureVertexBuffer,
-                                                      tileTriangleIndexBuffer,
+                                                      extrusionTextureTriangleIndexBuffer,
                                                       extrusionTextureSegments,
                                                       ExtrusionTextureProgram::PaintPropertyBinders{ properties, 0 },
                                                       properties,
