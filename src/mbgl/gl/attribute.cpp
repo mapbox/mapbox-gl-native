@@ -1,12 +1,9 @@
 #include <mbgl/gl/attribute.hpp>
 #include <mbgl/gl/context.hpp>
 #include <mbgl/gl/gl.hpp>
-#include <mbgl/gl/normalization.hpp>
 
 namespace mbgl {
 namespace gl {
-
-static_assert(offsetof(Normalized<uint8_t>, value) == 0, "unexpected normalized offset");
 
 AttributeLocation bindAttributeLocation(ProgramID id, AttributeLocation location, const char* name) {
     MBGL_CHECK_ERROR(glBindAttribLocation(id, location, name));
@@ -22,10 +19,6 @@ template <> DataType DataTypeOf< int32_t> = DataType::Integer;
 template <> DataType DataTypeOf<uint32_t> = DataType::UnsignedInteger;
 template <> DataType DataTypeOf<float>    = DataType::Float;
 
-template <class T> bool IsNormalized                  = false;
-template <class T> bool IsNormalized<Normalized<T>>   = true;
-template <class T> DataType DataTypeOf<Normalized<T>> = DataTypeOf<T>;
-
 template <class T, std::size_t N>
 void VariableAttributeBinding<T, N>::bind(Context& context,
                                           AttributeLocation location,
@@ -40,7 +33,7 @@ void VariableAttributeBinding<T, N>::bind(Context& context,
         location,
         static_cast<GLint>(attributeSize),
         static_cast<GLenum>(DataTypeOf<T>),
-        static_cast<GLboolean>(IsNormalized<T>),
+        static_cast<GLboolean>(false),
         static_cast<GLsizei>(vertexSize),
         reinterpret_cast<GLvoid*>(attributeOffset + (vertexSize * vertexOffset))));
 }
@@ -49,11 +42,6 @@ template class VariableAttributeBinding<uint8_t, 1>;
 template class VariableAttributeBinding<uint8_t, 2>;
 template class VariableAttributeBinding<uint8_t, 3>;
 template class VariableAttributeBinding<uint8_t, 4>;
-
-template class VariableAttributeBinding<Normalized<uint8_t>, 1>;
-template class VariableAttributeBinding<Normalized<uint8_t>, 2>;
-template class VariableAttributeBinding<Normalized<uint8_t>, 3>;
-template class VariableAttributeBinding<Normalized<uint8_t>, 4>;
 
 template class VariableAttributeBinding<uint16_t, 1>;
 template class VariableAttributeBinding<uint16_t, 2>;
@@ -100,39 +88,6 @@ void ConstantAttributeBinding<uint8_t, 4>::bind(Context&, AttributeLocation loca
     oldBinding = {};
     MBGL_CHECK_ERROR(glDisableVertexAttribArray(location));
     MBGL_CHECK_ERROR(glVertexAttrib4f(location, value[0], value[1], value[2], value[3]));
-}
-
-
-template <>
-void ConstantAttributeBinding<Normalized<uint8_t>, 1>::bind(Context&, AttributeLocation location, optional<VariableAttributeBinding<Normalized<uint8_t>, 1>>& oldBinding, std::size_t) const {
-    assert(location != 0);
-    oldBinding = {};
-    MBGL_CHECK_ERROR(glDisableVertexAttribArray(location));
-    MBGL_CHECK_ERROR(glVertexAttrib1f(location, value[0].denormalized()));
-}
-
-template <>
-void ConstantAttributeBinding<Normalized<uint8_t>, 2>::bind(Context&, AttributeLocation location, optional<VariableAttributeBinding<Normalized<uint8_t>, 2>>& oldBinding, std::size_t) const {
-    assert(location != 0);
-    oldBinding = {};
-    MBGL_CHECK_ERROR(glDisableVertexAttribArray(location));
-    MBGL_CHECK_ERROR(glVertexAttrib2f(location, value[0].denormalized(), value[1].denormalized()));
-}
-
-template <>
-void ConstantAttributeBinding<Normalized<uint8_t>, 3>::bind(Context&, AttributeLocation location, optional<VariableAttributeBinding<Normalized<uint8_t>, 3>>& oldBinding, std::size_t) const {
-    assert(location != 0);
-    oldBinding = {};
-    MBGL_CHECK_ERROR(glDisableVertexAttribArray(location));
-    MBGL_CHECK_ERROR(glVertexAttrib3f(location, value[0].denormalized(), value[1].denormalized(), value[2].denormalized()));
-}
-
-template <>
-void ConstantAttributeBinding<Normalized<uint8_t>, 4>::bind(Context&, AttributeLocation location, optional<VariableAttributeBinding<Normalized<uint8_t>, 4>>& oldBinding, std::size_t) const {
-    assert(location != 0);
-    oldBinding = {};
-    MBGL_CHECK_ERROR(glDisableVertexAttribArray(location));
-    MBGL_CHECK_ERROR(glVertexAttrib4f(location, value[0].denormalized(), value[1].denormalized(), value[2].denormalized(), value[3].denormalized()));
 }
 
 

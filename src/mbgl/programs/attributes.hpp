@@ -2,7 +2,6 @@
 
 #include <mbgl/gl/attribute.hpp>
 #include <mbgl/gl/uniform.hpp>
-#include <mbgl/gl/normalization.hpp>
 
 #include <cstdint>
 
@@ -122,19 +121,19 @@ struct a_outline_color : gl::Attribute<float, 2> {
     }
 };
 
-struct a_opacity : gl::Attribute<gl::Normalized<uint8_t>, 1> {
+struct a_opacity : gl::Attribute<float, 1> {
     static auto name() { return "a_opacity"; }
 
     static Value value(float opacity) {
-        return {{ gl::Normalized<uint8_t>(opacity) }};
+        return {{ opacity }};
     }
 };
 
-struct a_stroke_opacity : gl::Attribute<gl::Normalized<uint8_t>, 1> {
+struct a_stroke_opacity : gl::Attribute<float, 1> {
     static auto name() { return "a_stroke_opacity"; }
 
     static Value value(float opacity) {
-        return {{ gl::Normalized<uint8_t>(opacity) }};
+        return {{ opacity }};
     }
 };
 
