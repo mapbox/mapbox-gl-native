@@ -1,5 +1,8 @@
 package com.mapbox.mapboxsdk.exceptions;
 
+/**
+ * A InvalidMarkerPositionException is thrown when a Marker object is created with an invalid LatLng position.
+ */
 public class InvalidMarkerPositionException extends RuntimeException {
 
   public InvalidMarkerPositionException() {

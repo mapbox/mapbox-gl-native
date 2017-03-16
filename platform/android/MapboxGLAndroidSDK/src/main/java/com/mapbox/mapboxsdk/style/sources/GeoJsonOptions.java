@@ -3,8 +3,9 @@ package com.mapbox.mapboxsdk.style.sources;
 import java.util.HashMap;
 
 /**
- * Options for the {@link GeoJsonSource}
+ * Builder class for composing GeoJsonSource objects.
  *
+ * @see GeoJsonSource
  * @see <a href="https://www.mapbox.com/mapbox-gl-style-spec/#sources-geojson">The online documentation</a>
  */
 public class GeoJsonOptions extends HashMap<String, Object> {

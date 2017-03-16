@@ -14,7 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Vector source enables the use of vector tiles.
+ * Vector source, allows the use of vector tiles.
  *
  * @see <a href="https://www.mapbox.com/mapbox-gl-style-spec/#sources-vector">the style specification</a>
  */
