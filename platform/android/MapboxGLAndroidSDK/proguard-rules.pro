@@ -17,10 +17,10 @@
 # Package camera
 -keep class com.mapbox.mapboxsdk.camera.** { *; }
 
-# Package: geometry
+# Package geometry
 -keep class com.mapbox.mapboxsdk.geometry.** { *; }
 
-# Package: http
+# Package http
 -keep class com.mapbox.mapboxsdk.http.** { *; }
 
 # Package maps
@@ -32,9 +32,13 @@
 # Package offline
 -keep class com.mapbox.mapboxsdk.offline.** { *; }
 
+# Package storage
+-keep class com.mapbox.mapboxsdk.storage.** { *; }
+
 # Package style
 -keep class com.mapbox.mapboxsdk.style.layers.** { *; }
 -keep class com.mapbox.mapboxsdk.style.sources.** { *; }
+-keep class com.mapbox.mapboxsdk.style.functions.** { *; }
 
 # Package telemetry
 -keep class com.mapbox.mapboxsdk.telemetry.** { *; }
