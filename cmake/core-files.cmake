@@ -70,7 +70,6 @@ set(MBGL_CORE_FILES
     src/mbgl/gl/framebuffer.hpp
     src/mbgl/gl/gl.cpp
     src/mbgl/gl/index_buffer.hpp
-    src/mbgl/gl/normalization.hpp
     src/mbgl/gl/object.cpp
     src/mbgl/gl/object.hpp
     src/mbgl/gl/primitives.hpp
