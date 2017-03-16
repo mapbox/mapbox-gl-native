@@ -627,7 +627,7 @@ run-android-ui-test-spoon:
 
 .PHONY: apackage
 apackage:
-	cd platform/android && ./gradlew --parallel --max-workers=$(JOBS) assemble$(BUILDTYPE)
+	cd platform/android && ./gradlew --parallel --max-workers=$(JOBS) :MapboxGLAndroidSDK:assemble$(BUILDTYPE)
 
 .PHONY: test-code-android
 test-code-android:
