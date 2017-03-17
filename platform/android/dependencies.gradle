@@ -16,9 +16,9 @@ ext {
 
     dep = [
             // mapbox
-            mapboxJavaServices     : 'com.mapbox.mapboxsdk:mapbox-java-services:2.0.0-beta.3@jar',
-            mapboxJavaGeoJSON      : 'com.mapbox.mapboxsdk:mapbox-java-geojson:2.0.0-beta.3@jar',
-            mapboxAndroidTelemetry : 'com.mapbox.mapboxsdk:mapbox-android-telemetry:2.0.0-beta.3@aar',
+            mapboxJavaServices     : 'com.mapbox.mapboxsdk:mapbox-java-services:2.0.0@jar',
+            mapboxJavaGeoJSON      : 'com.mapbox.mapboxsdk:mapbox-java-geojson:2.0.0@jar',
+            mapboxAndroidTelemetry : 'com.mapbox.mapboxsdk:mapbox-android-telemetry:2.0.0@aar',
 
             // mapzen lost
             lost                   : 'com.mapzen.android:lost:2.1.2',
