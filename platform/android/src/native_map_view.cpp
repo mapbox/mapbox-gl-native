@@ -241,7 +241,7 @@ void NativeMapView::onDidFinishLoadingStyle() {
     notifyMapChange(MapChange::MapChangeDidFinishLoadingStyle);
 }
 
-void NativeMapView::onSourceDidChange() {
+void NativeMapView::onSourceChanged(mbgl::style::Source&) {
     notifyMapChange(MapChange::MapChangeSourceDidChange);
 }
 
