@@ -17,10 +17,10 @@ typedef NSString *MGLStyleFunctionOption NS_STRING_ENUM;
  
  The exponential interpolation base controls the rate at which the function’s 
  output values increase. A value of 1 causes the function to increase linearly 
- by zoom level. A higher exponential interpolation base causes the function’s 
- output values to vary exponentially, increasing more rapidly towards the high 
- end of the function’s range. The default value of this property is 1, for a 
- linear curve.
+ based on zoom level or attribute value. A higher exponential interpolation base
+ causes the function’s output values to vary exponentially, increasing more rapidly
+ towards the high end of the function’s range. The default value of this property 
+ is 1, for a linear curve.
 
  This attribute corresponds to the
  <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#function-base"><code>base</code></a>
