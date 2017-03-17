@@ -1640,7 +1640,7 @@ void QMapboxGLPrivate::onDidFinishLoadingStyle()
     emit mapChanged(QMapboxGL::MapChangeDidFinishLoadingStyle);
 }
 
-void QMapboxGLPrivate::onSourceDidChange()
+void QMapboxGLPrivate::onSourceChanged(mbgl::style::Source&)
 {
     std::string attribution;
     for (const auto& source : mapObj->getSources()) {
