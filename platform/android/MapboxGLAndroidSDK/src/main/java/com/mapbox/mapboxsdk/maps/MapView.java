@@ -31,6 +31,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.ZoomButtonsController;
 
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.R;
@@ -147,7 +148,9 @@ public class MapView extends FrameLayout {
     // user input
     mapGestureDetector = new MapGestureDetector(context, transform, proj, uiSettings, trackingSettings, annotations);
     mapKeyListener = new MapKeyListener(transform, trackingSettings, uiSettings);
-    mapZoomButtonController = new MapZoomButtonController(this, uiSettings, transform);
+
+    MapZoomControllerListener zoomListener = new MapZoomControllerListener(mapGestureDetector, uiSettings, transform);
+    mapZoomButtonController = new MapZoomButtonController(this, uiSettings, zoomListener);
 
     // inject widgets with MapboxMap
     compassView.setMapboxMap(mapboxMap);
@@ -939,12 +942,59 @@ public class MapView extends FrameLayout {
     }
   }
 
+  private class MapZoomControllerListener implements ZoomButtonsController.OnZoomListener {
+
+    private final MapGestureDetector mapGestureDetector;
+    private final UiSettings uiSettings;
+    private final Transform transform;
+
+    MapZoomControllerListener(MapGestureDetector detector, UiSettings uiSettings, Transform transform) {
+      this.mapGestureDetector = detector;
+      this.uiSettings = uiSettings;
+      this.transform = transform;
+    }
+
+    // Not used
+    @Override
+    public void onVisibilityChanged(boolean visible) {
+      // Ignore
+    }
+
+    // Called when user pushes a zoom button on the ZoomButtonController
+    @Override
+    public void onZoom(boolean zoomIn) {
+      if (uiSettings.isZoomGesturesEnabled()) {
+        onZoom(zoomIn, mapGestureDetector.getFocalPoint());
+      }
+    }
+
+    private void onZoom(boolean zoomIn, @Nullable PointF focalPoint) {
+      if (focalPoint != null) {
+        transform.zoom(zoomIn, focalPoint);
+      } else {
+        PointF centerPoint = new PointF(getMeasuredWidth() / 2, getMeasuredHeight() / 2);
+        transform.zoom(zoomIn, centerPoint);
+      }
+    }
+  }
+
   private class CameraZoomInvalidator implements TrackingSettings.CameraZoomInvalidator {
+
     @Override
     public void zoomTo(double zoomLevel) {
-      double currentZoomLevel = mapboxMap.getCameraPosition().zoom;
+      Transform transform = mapboxMap.getTransform();
+      double currentZoomLevel = transform.getCameraPosition().zoom;
       if (currentZoomLevel < zoomLevel) {
-        mapboxMap.getTransform().setZoom(zoomLevel);
+        setZoom(zoomLevel, mapGestureDetector.getFocalPoint(), transform);
+      }
+    }
+
+    private void setZoom(double zoomLevel, @Nullable PointF focalPoint, @NonNull Transform transform) {
+      if (focalPoint != null) {
+        transform.setZoom(zoomLevel, focalPoint);
+      } else {
+        PointF centerPoint = new PointF(getMeasuredWidth() / 2, getMeasuredHeight() / 2);
+        transform.setZoom(zoomLevel, centerPoint);
       }
     }
   }

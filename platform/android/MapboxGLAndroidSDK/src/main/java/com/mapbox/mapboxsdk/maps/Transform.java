@@ -1,5 +1,6 @@
 package com.mapbox.mapboxsdk.maps;
 
+import android.graphics.PointF;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
@@ -174,27 +175,23 @@ final class Transform implements MapView.OnMapChangedListener {
     return cameraPosition.zoom;
   }
 
-  void zoom(boolean zoomIn) {
-    zoom(zoomIn, -1.0f, -1.0f);
-  }
-
-  void zoom(boolean zoomIn, float x, float y) {
+  void zoom(boolean zoomIn, @NonNull PointF focalPoint) {
     // Cancel any animation
     cancelTransitions();
 
     CameraPosition cameraPosition = invalidateCameraPosition();
     if (cameraPosition != null) {
-      zoom(cameraPosition, zoomIn, x, y);
+      int newZoom = (int) Math.round(cameraPosition.zoom + (zoomIn ? 1 : -1));
+      setZoom(newZoom, focalPoint, MapboxConstants.ANIMATION_DURATION);
     }
   }
 
-  private void zoom(@NonNull CameraPosition cameraPosition, boolean zoomIn, float x, float y) {
-    int newZoom = (int) Math.round(cameraPosition.zoom + (zoomIn ? 1 : -1));
-    mapView.setZoom(newZoom, x, y, MapboxConstants.ANIMATION_DURATION);
+  void setZoom(double zoom, @NonNull PointF focalPoint) {
+    setZoom(zoom, focalPoint, 0);
   }
 
-  void setZoom(double zoom) {
-    mapView.setZoom(zoom);
+  void setZoom(double zoom, @NonNull PointF focalPoint, long duration) {
+    mapView.setZoom(zoom, focalPoint, duration);
   }
 
   // Direction

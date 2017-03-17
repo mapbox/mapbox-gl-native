@@ -16,44 +16,17 @@ final class MapZoomButtonController extends ZoomButtonsController {
 
   private UiSettings uiSettings;
 
-  MapZoomButtonController(@NonNull View ownerView, @NonNull UiSettings uiSettings, @NonNull Transform transform) {
+  MapZoomButtonController(@NonNull View ownerView, @NonNull UiSettings uiSettings, @NonNull OnZoomListener listener) {
     super(ownerView);
     this.uiSettings = uiSettings;
     setZoomSpeed(MapboxConstants.ANIMATION_DURATION);
-    setOnZoomListener(new OnZoomListener(uiSettings, transform));
+    setOnZoomListener(listener);
   }
 
   @Override
   public void setVisible(boolean visible) {
     if (uiSettings.isZoomControlsEnabled()) {
       super.setVisible(visible);
-    }
-  }
-
-  // Zoom controls allow single touch only devices to zoom in and out
-  private static class OnZoomListener implements ZoomButtonsController.OnZoomListener {
-
-    private final UiSettings uiSettings;
-    private final Transform transform;
-
-    OnZoomListener(UiSettings uiSettings, Transform transform) {
-      this.uiSettings = uiSettings;
-      this.transform = transform;
-    }
-
-    // Not used
-    @Override
-    public void onVisibilityChanged(boolean visible) {
-      // Ignore
-    }
-
-    // Called when user pushes a zoom button
-    @Override
-    public void onZoom(boolean zoomIn) {
-      if (!uiSettings.isZoomGesturesEnabled()) {
-        return;
-      }
-      transform.zoom(zoomIn);
     }
   }
 }
