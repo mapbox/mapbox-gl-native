@@ -1,7 +1,10 @@
 #pragma once
 
+#include <mbgl/style/source.hpp>
+
 #include <cstdint>
 #include <exception>
+#include <string>
 
 namespace mbgl {
 
@@ -33,7 +36,7 @@ public:
     virtual void onWillStartRenderingMap() {}
     virtual void onDidFinishRenderingMap(RenderMode) {}
     virtual void onDidFinishLoadingStyle() {}
-    virtual void onSourceDidChange() {}
+    virtual void onSourceChanged(style::Source&) {}
 };
 
 } // namespace mbgl

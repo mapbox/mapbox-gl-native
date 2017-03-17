@@ -107,7 +107,7 @@ void TileSourceImpl::loadDescription(FileSource& fileSource) {
 
             observer->onSourceLoaded(base);
             if (attributionChanged) {
-                observer->onSourceAttributionChanged(base, newTileset.attribution);
+                observer->onSourceChanged(base);
             }
         }
     });

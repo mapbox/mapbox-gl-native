@@ -30,8 +30,8 @@ public:
         if (sourceLoaded) sourceLoaded(source);
     }
 
-    void onSourceAttributionChanged(Source& source, const std::string& attribution) override {
-        if (sourceAttributionChanged) sourceAttributionChanged(source, attribution);
+    void onSourceChanged(Source& source) override {
+        if (sourceChanged) sourceChanged(source);
     }
 
     void onSourceError(Source& source, std::exception_ptr error) override {
@@ -60,7 +60,7 @@ public:
     std::function<void ()> spriteLoaded;
     std::function<void (std::exception_ptr)> spriteError;
     std::function<void (Source&)> sourceLoaded;
-    std::function<void (Source&, std::string)> sourceAttributionChanged;
+    std::function<void (Source&)> sourceChanged;
     std::function<void (Source&, std::exception_ptr)> sourceError;
     std::function<void (Source&)> sourceDescriptionChanged;
     std::function<void (Source&, const OverscaledTileID&)> tileChanged;
