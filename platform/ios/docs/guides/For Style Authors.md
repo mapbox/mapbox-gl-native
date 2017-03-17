@@ -109,13 +109,13 @@ In the style specification | In the SDK
 ---------------------------|---------
 class                      | style class
 filter                     | predicate
+function type              | interpolation mode
 id                         | identifier
 image                      | style image
 layer                      | style layer
 property                   | attribute
 SDF icon                   | template image
 source                     | content source
-function type              | interpolation mode
 
 ## Specifying the map’s content
 
@@ -203,7 +203,8 @@ In style specification       | In the SDK
 `property function`          | `MGLSourceStyleFunction`
 `zoom-and-property functions`| `MGLCompositeStyleFunction`
 
-### Circle interpolation mode
+Interpolation mode defines the relationship between style values and attributes
+or zoom levels.
 
 In style specification       | In the SDK
 -----------------------------|-----------
@@ -233,7 +234,8 @@ In style specification       | In the SDK
 `property function`          | `MGLSourceStyleFunction`
 `zoom-and-property functions`| `MGLCompositeStyleFunction`
 
-### Fill interpolation mode
+Interpolation mode defines the relationship between style values and attributes
+or zoom levels.
 
 In style specification       | In the SDK
 -----------------------------|-----------
@@ -263,7 +265,8 @@ In style specification       | In the SDK
 `property function`          | `MGLSourceStyleFunction`
 `zoom-and-property functions`| `MGLCompositeStyleFunction`
 
-### Line interpolation mode
+Interpolation mode defines the relationship between style values and attributes
+or zoom levels.
 
 In style specification       | In the SDK
 -----------------------------|-----------
@@ -293,7 +296,8 @@ In style specification       | In the SDK
 `property function`          | `MGLSourceStyleFunction`
 `zoom-and-property functions`| `MGLCompositeStyleFunction`
 
-### Raster interpolation mode
+Interpolation mode defines the relationship between style values and attributes
+or zoom levels.
 
 In style specification       | In the SDK
 -----------------------------|-----------
@@ -323,7 +327,8 @@ In style specification       | In the SDK
 `property function`          | `MGLSourceStyleFunction`
 `zoom-and-property functions`| `MGLCompositeStyleFunction`
 
-### Symbol interpolation mode
+Interpolation mode defines the relationship between style values and attributes
+or zoom levels.
 
 In style specification       | In the SDK
 -----------------------------|-----------

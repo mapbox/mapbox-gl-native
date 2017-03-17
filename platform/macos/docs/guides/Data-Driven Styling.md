@@ -1,12 +1,3 @@
-<!---
-To do - JK:
-- [ ] Fill it out with more detailed explanations
-- [ ] Add examples for camera or composite style functions
-- [ ] Cluster earthquakes as an example for camera function?
-- [ ] Clean up & optimize screenshots - replace with screenshots showing circles below symbol layer
-- [ ] Link API docs
-- [ ] Add cocoaprefix so this can be moved to darwin
----->
 
 <!--
   This file is generated.
@@ -61,10 +52,10 @@ The stops dictionary below, for example, shows colors that continuously shift fr
                  10 : MGLStyleValue(rawValue: NSColor.white)]
 
     let layer = MGLCircleStyleLayer(identifier: "circles", source: source)
-    layer.circleColor = MGLStyleValue<NSColor>(interpolationMode: .exponential,
-                                               sourceStops: stops,
-                                               attributeName: "mag",
-                                               options: [.defaultValue: MGLStyleValue<NSColor>(rawValue: .green)])
+    layer.circleColor = MGLStyleValue(interpolationMode: .exponential,
+                                      sourceStops: stops,
+                                      attributeName: "mag",
+                                      options: [.defaultValue: MGLStyleValue<NSColor>(rawValue: .green)])
     layer.circleRadius = MGLStyleValue(rawValue: 10)
     style.insertLayer(layer, below: symbolLayer)
 ```
@@ -78,10 +69,10 @@ The stops dictionary below, for example, shows colors that continuously shift fr
 When we use the stops dictionary given above with an interval interpolation mode, we create ranges where earthquakes with a magnitude of 0 to just less than 2.5 would be yellow, 2.5 to just less than 5 would be orange, and so on.
 
 ``` swift
-layer.circleColor = MGLStyleValue<NSColor>(interpolationMode: .interval,
-                                                          sourceStops: stops,
-                                                          attributeName: "mag",
-                                                          options: [.defaultValue: MGLStyleValue<NSColor>(rawValue: .green)])
+layer.circleColor = MGLStyleValue(interpolationMode: .interval,
+                                  sourceStops: stops,
+                                  attributeName: "mag",
+                                  options: [.defaultValue: MGLStyleValue<NSColor>(rawValue: .green)])
 ```
 
 ![interval mode](img/data-driven-styling/interval.png)
@@ -97,10 +88,10 @@ let categoricalStops = ["earthquake" : MGLStyleValue(rawValue: NSColor.orange),
                                     "explosion" : MGLStyleValue(rawValue: NSColor.red),
                                     "quarry blast": MGLStyleValue(rawValue: NSColor.yellow)]
 
-layer.circleColor = MGLStyleValue<NSColor>(interpolationMode: .categorical,
-                                           sourceStops: categoricalStops,
-                                           attributeName: "type",
-                                           options: [.defaultValue: MGLStyleValue(rawValue: NSColor.blue)])
+layer.circleColor = MGLStyleValue(interpolationMode: .categorical,
+                                  sourceStops: categoricalStops,
+                                  attributeName: "type",
+                                  options: [.defaultValue: MGLStyleValue(rawValue: NSColor.blue)])
 
 ```
 
@@ -111,10 +102,10 @@ layer.circleColor = MGLStyleValue<NSColor>(interpolationMode: .categorical,
 `MGLInterpolationModeIdentity` uses the attribute’s value as the style value. For example, you can set the `circleRadius` to the earthquake’s magnitude. Since the attribute value itself will be used as the style value, `sourceStops` can be set to `nil`.
 
 ``` swift
-layer.circleRadius = MGLStyleFunction<NSNumber>(interpolationMode: .identity,
-                                                sourceStops: nil,
-                                                attributeName: "mag",
-                                                options: [.defaultValue: MGLStyleValue<NSNumber>(rawValue: 0)])
+layer.circleRadius = MGLStyleValue(interpolationMode: .identity,
+                                   sourceStops: nil,
+                                   attributeName: "mag",
+                                   options: [.defaultValue: MGLStyleValue<NSNumber>(rawValue: 0)])
 
 ```
 
