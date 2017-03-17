@@ -181,10 +181,10 @@ whose names differ from the style specification are listed below:
 
 ### Circle style functions
 
-The runtime styling API introduced `MGLStyleFunction` to the macOS SDK.
-[Data-driven styling](data-driven-styling.html) expands `MGLStyleFunction` and
-introduces `MGLInterpolationMode`. Individual style property documentation
-includes which subclasses of `MGLStyleFunction` are enabled for that property.
+The runtime styling API introduces `MGLStyleFunction` to the macOS SDK.
+[Data-driven styling](data-driven-styling.html) expands `MGLStyleFunction`.
+Individual style property documentation includes which subclasses of
+`MGLStyleFunction` are enabled for that property.
 
 In style specification       | In the SDK
 -----------------------------|-----------
@@ -192,8 +192,8 @@ In style specification       | In the SDK
 `property function`          | `MGLSourceStyleFunction`
 `zoom-and-property functions`| `MGLCompositeStyleFunction`
 
-Interpolation mode defines the relationship between style values and attributes
-or zoom levels.
+Data-driven styling also introduces interpolation mode, which defines the
+relationship between style values and attributes or zoom levels.
 
 In style specification       | In the SDK
 -----------------------------|-----------
@@ -212,10 +212,10 @@ In style JSON | In Objective-C | In Swift
 
 ### Fill style functions
 
-The runtime styling API introduced `MGLStyleFunction` to the macOS SDK.
-[Data-driven styling](data-driven-styling.html) expands `MGLStyleFunction` and
-introduces `MGLInterpolationMode`. Individual style property documentation
-includes which subclasses of `MGLStyleFunction` are enabled for that property.
+The runtime styling API introduces `MGLStyleFunction` to the macOS SDK.
+[Data-driven styling](data-driven-styling.html) expands `MGLStyleFunction`.
+Individual style property documentation includes which subclasses of
+`MGLStyleFunction` are enabled for that property.
 
 In style specification       | In the SDK
 -----------------------------|-----------
@@ -223,8 +223,8 @@ In style specification       | In the SDK
 `property function`          | `MGLSourceStyleFunction`
 `zoom-and-property functions`| `MGLCompositeStyleFunction`
 
-Interpolation mode defines the relationship between style values and attributes
-or zoom levels.
+Data-driven styling also introduces interpolation mode, which defines the
+relationship between style values and attributes or zoom levels.
 
 In style specification       | In the SDK
 -----------------------------|-----------
@@ -243,10 +243,10 @@ In style JSON | In Objective-C | In Swift
 
 ### Line style functions
 
-The runtime styling API introduced `MGLStyleFunction` to the macOS SDK.
-[Data-driven styling](data-driven-styling.html) expands `MGLStyleFunction` and
-introduces `MGLInterpolationMode`. Individual style property documentation
-includes which subclasses of `MGLStyleFunction` are enabled for that property.
+The runtime styling API introduces `MGLStyleFunction` to the macOS SDK.
+[Data-driven styling](data-driven-styling.html) expands `MGLStyleFunction`.
+Individual style property documentation includes which subclasses of
+`MGLStyleFunction` are enabled for that property.
 
 In style specification       | In the SDK
 -----------------------------|-----------
@@ -254,8 +254,8 @@ In style specification       | In the SDK
 `property function`          | `MGLSourceStyleFunction`
 `zoom-and-property functions`| `MGLCompositeStyleFunction`
 
-Interpolation mode defines the relationship between style values and attributes
-or zoom levels.
+Data-driven styling also introduces interpolation mode, which defines the
+relationship between style values and attributes or zoom levels.
 
 In style specification       | In the SDK
 -----------------------------|-----------
@@ -274,10 +274,10 @@ In style JSON | In Objective-C | In Swift
 
 ### Raster style functions
 
-The runtime styling API introduced `MGLStyleFunction` to the macOS SDK.
-[Data-driven styling](data-driven-styling.html) expands `MGLStyleFunction` and
-introduces `MGLInterpolationMode`. Individual style property documentation
-includes which subclasses of `MGLStyleFunction` are enabled for that property.
+The runtime styling API introduces `MGLStyleFunction` to the macOS SDK.
+[Data-driven styling](data-driven-styling.html) expands `MGLStyleFunction`.
+Individual style property documentation includes which subclasses of
+`MGLStyleFunction` are enabled for that property.
 
 In style specification       | In the SDK
 -----------------------------|-----------
@@ -285,8 +285,8 @@ In style specification       | In the SDK
 `property function`          | `MGLSourceStyleFunction`
 `zoom-and-property functions`| `MGLCompositeStyleFunction`
 
-Interpolation mode defines the relationship between style values and attributes
-or zoom levels.
+Data-driven styling also introduces interpolation mode, which defines the
+relationship between style values and attributes or zoom levels.
 
 In style specification       | In the SDK
 -----------------------------|-----------
@@ -305,10 +305,10 @@ In style JSON | In Objective-C | In Swift
 
 ### Symbol style functions
 
-The runtime styling API introduced `MGLStyleFunction` to the macOS SDK.
-[Data-driven styling](data-driven-styling.html) expands `MGLStyleFunction` and
-introduces `MGLInterpolationMode`. Individual style property documentation
-includes which subclasses of `MGLStyleFunction` are enabled for that property.
+The runtime styling API introduces `MGLStyleFunction` to the macOS SDK.
+[Data-driven styling](data-driven-styling.html) expands `MGLStyleFunction`.
+Individual style property documentation includes which subclasses of
+`MGLStyleFunction` are enabled for that property.
 
 In style specification       | In the SDK
 -----------------------------|-----------
@@ -316,8 +316,8 @@ In style specification       | In the SDK
 `property function`          | `MGLSourceStyleFunction`
 `zoom-and-property functions`| `MGLCompositeStyleFunction`
 
-Interpolation mode defines the relationship between style values and attributes
-or zoom levels.
+Data-driven styling also introduces interpolation mode, which defines the
+relationship between style values and attributes or zoom levels.
 
 In style specification       | In the SDK
 -----------------------------|-----------

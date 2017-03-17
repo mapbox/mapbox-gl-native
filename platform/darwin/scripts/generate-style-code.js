@@ -617,11 +617,7 @@ fs.writeFileSync(`platform/macos/docs/guides/For Style Authors.md`, guideMD({
 }));
 fs.writeFileSync(`platform/ios/docs/guides/Data-Driven Styling.md`, ddsGuideMD({
     os: 'iOS',
-    renamedProperties: renamedPropertiesByLayerType,
-    layers: layers,
 }));
 fs.writeFileSync(`platform/macos/docs/guides/Data-Driven Styling.md`, ddsGuideMD({
     os: 'macOS',
-    renamedProperties: renamedPropertiesByLayerType,
-    layers: layers,
 }));
