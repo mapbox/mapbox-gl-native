@@ -69,7 +69,7 @@ public:
     void onWillStartRenderingMap() override;
     void onDidFinishRenderingMap(MapObserver::RenderMode) override;
     void onDidFinishLoadingStyle() override;
-    void onSourceDidChange() override;
+    void onSourceChanged(mbgl::style::Source&) override;
 
     // JNI //
 
