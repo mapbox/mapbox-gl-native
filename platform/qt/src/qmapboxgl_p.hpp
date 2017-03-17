@@ -42,7 +42,7 @@ public:
     void onWillStartRenderingMap() final;
     void onDidFinishRenderingMap(mbgl::MapObserver::RenderMode) final;
     void onDidFinishLoadingStyle() final;
-    void onSourceDidChange() final;
+    void onSourceChanged(mbgl::style::Source&) final;
 
     mbgl::EdgeInsets margins;
     QSize size { 0, 0 };
