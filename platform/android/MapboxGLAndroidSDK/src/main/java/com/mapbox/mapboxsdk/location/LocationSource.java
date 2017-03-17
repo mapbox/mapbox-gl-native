@@ -102,6 +102,7 @@ public class LocationSource extends LocationEngine implements
   public void requestLocationUpdates() {
     // Common params
     LocationRequest request = LocationRequest.create()
+      .setInterval(1000)
       .setFastestInterval(1000)
       .setSmallestDisplacement(3.0f);
 

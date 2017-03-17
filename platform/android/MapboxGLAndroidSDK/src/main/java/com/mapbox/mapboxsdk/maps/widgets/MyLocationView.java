@@ -573,8 +573,10 @@ public class MyLocationView extends View {
     public void onConnected() {
       MyLocationView locationView = userLocationView.get();
       if (locationView != null) {
-        Location location = LocationSource.getLocationEngine(locationView.getContext()).getLastLocation();
+        LocationEngine locationSource = LocationSource.getLocationEngine(locationView.getContext());
+        Location location = locationSource.getLastLocation();
         locationView.setLocation(location);
+        locationSource.requestLocationUpdates();
       }
     }
 
