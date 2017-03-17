@@ -388,8 +388,8 @@ TEST(Source, RasterTileAttribution) {
         return response;
     };
 
-    test.observer.sourceAttributionChanged = [&] (Source&, std::string attribution) {
-        EXPECT_EQ(mapboxOSM, attribution);
+    test.observer.sourceChanged = [&] (Source& source) {
+        EXPECT_EQ(mapboxOSM, source.getAttribution());
         EXPECT_FALSE(mapboxOSM.find("©️ OpenStreetMap") == std::string::npos);
         test.end();
     };

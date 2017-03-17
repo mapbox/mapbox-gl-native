@@ -17,7 +17,7 @@ public:
     virtual ~SourceObserver() = default;
 
     virtual void onSourceLoaded(Source&) {}
-    virtual void onSourceAttributionChanged(Source&, const std::string&) {}
+    virtual void onSourceChanged(Source&) {}
     virtual void onSourceError(Source&, std::exception_ptr) {}
 
     // Source description needs to be reloaded

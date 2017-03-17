@@ -59,7 +59,7 @@ public:
          ConstrainMode,
          ViewportMode);
 
-    void onSourceAttributionChanged(style::Source&, const std::string&) override;
+    void onSourceChanged(style::Source&) override;
     void onUpdate(Update) override;
     void onStyleLoaded() override;
     void onStyleError(std::exception_ptr) override;
@@ -1089,8 +1089,8 @@ void Map::onLowMemory() {
     }
 }
 
-void Map::Impl::onSourceAttributionChanged(style::Source&, const std::string&) {
-    observer.onSourceDidChange();
+void Map::Impl::onSourceChanged(style::Source& source) {
+    observer.onSourceChanged(source);
 }
 
 void Map::Impl::onUpdate(Update flags) {
