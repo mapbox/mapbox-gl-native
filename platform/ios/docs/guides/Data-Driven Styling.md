@@ -10,7 +10,7 @@ Mapbox’s data-driven styling features allow you to use data properties to styl
 
 ![available bikes](img/data-driven-styling/citibikes.png) ![subway lines](img/data-driven-styling/polylineExample.png)
 
-## How to use Data-Driven Styling
+# How to use Data-Driven Styling
 This guide uses earthquake data from the [U.S. Geological Survey](https://earthquake.usgs.gov/earthquakes/feed/v1.0/geojson.php) to style a map based on attributes. For more information about how to work with GeoJSON data in our iOS SDK, please see our [working with GeoJSON data](working-with-geojson-data.html) guide.
 
 `MGLStyleFunction`
@@ -23,15 +23,15 @@ There are three subclasses of `MGLStyleFunction`:
 
 The documentation for individual style properties will note which style functions are enabled for that property.
 
-### Stops
+## Stops
 
 Stops are key-value pairs that that determine a style value. With a `MGLCameraSourceFunction` stop, you can use a dictionary with a zoom level for a key and a `MGLStyleValue` for the value. For example, you can use a stops dictionary with zoom levels 0, 10, and 20 as keys, and yellow, orange, and red as the values. A `MGLSourceStyleFunction` uses the relevant attribute value as the key.
 
-### Interpolation Mode
+## Interpolation Mode
 
 The effect a key has on the style value is determined by the interpolation mode. There are four interpolation modes that can be used with a source style function: exponential, interval, categorical, and identity. You can also use exponential and interval interpolation modes with a camera style function.
 
-#### Exponential (or Linear)
+### Exponential (or Linear)
 
 `MGLInterpolationModelExponential` creates a linear or exponential effect based on the values. The key value is the starting point for interpolation, and the style value is based on where an attribute value falls between two keys. By default, `MGLInterpolationModeExponential` uses an interpolation base of 1. This causes a linear relationship between the style value and stop key.
 
@@ -62,7 +62,7 @@ The stops dictionary below, for example, shows colors that continuously shift fr
 
 ![exponential mode](img/data-driven-styling/exponential.png)
 
-#### Interval
+### Interval
 
 `MGLInterpolationModeInterval` creates a range using the keys from the stops dictionary. The range is from the given key to just less than the next key. The attribute values that fall into that range are then styled using the style value assigned to that key.
 
@@ -77,7 +77,7 @@ layer.circleColor = MGLStyleValue(interpolationMode: .interval,
 
 ![interval mode](img/data-driven-styling/interval.png)
 
-#### Categorical
+### Categorical
 
 Returns the output value that is equal to the stop for the function input. We’re going to use a different stops dictionary than we did for the previous two modes.
 
@@ -97,7 +97,7 @@ layer.circleColor = MGLStyleValue(interpolationMode: .categorical,
 
 ![categorical mode](img/data-driven-styling/categorical1.png) ![categorical mode](img/data-driven-styling/categorical2.png)
 
-#### Identity
+### Identity
 
 `MGLInterpolationModeIdentity` uses the attribute’s value as the style value. For example, you can set the `circleRadius` to the earthquake’s magnitude. Since the attribute value itself will be used as the style value, `sourceStops` can be set to `nil`.
 
