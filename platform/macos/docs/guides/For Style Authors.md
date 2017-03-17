@@ -184,13 +184,14 @@ whose names differ from the style specification are listed below:
 The runtime styling API introduces `MGLStyleFunction` to the macOS SDK.
 [Data-driven styling](data-driven-styling.html) expands `MGLStyleFunction`.
 Individual style property documentation includes which subclasses of
-`MGLStyleFunction` are enabled for that property.
+`MGLStyleFunction` are enabled for that property. You can use `MGLStyleValue`
+methods to create a `MGLStyleFunction`.
 
-In style specification       | In the SDK
------------------------------|-----------
-`zoom function`              | `MGLCameraStyleFunction`
-`property function`          | `MGLSourceStyleFunction`
-`zoom-and-property functions`| `MGLCompositeStyleFunction`
+In style specification | In the SDK                    | [MGLStyleValue valueWithInterpolationMode:...]
+-----------------------|-------------------------------|-------------
+`zoom function`        | `MGLCameraStyleFunction`      | `cameraStops:options:`
+`property function`    | `MGLSourceStyleFunction`      | `sourceStops:attributeName:options:`
+`zoom-and-property functions`| `MGLCompositeStyleFunction` | `compositeStops:attributeName:options:`
 
 Data-driven styling also introduces interpolation mode, which defines the
 relationship between style values and attributes or zoom levels.
@@ -215,13 +216,14 @@ In style JSON | In Objective-C | In Swift
 The runtime styling API introduces `MGLStyleFunction` to the macOS SDK.
 [Data-driven styling](data-driven-styling.html) expands `MGLStyleFunction`.
 Individual style property documentation includes which subclasses of
-`MGLStyleFunction` are enabled for that property.
+`MGLStyleFunction` are enabled for that property. You can use `MGLStyleValue`
+methods to create a `MGLStyleFunction`.
 
-In style specification       | In the SDK
------------------------------|-----------
-`zoom function`              | `MGLCameraStyleFunction`
-`property function`          | `MGLSourceStyleFunction`
-`zoom-and-property functions`| `MGLCompositeStyleFunction`
+In style specification | In the SDK                    | [MGLStyleValue valueWithInterpolationMode:...]
+-----------------------|-------------------------------|-------------
+`zoom function`        | `MGLCameraStyleFunction`      | `cameraStops:options:`
+`property function`    | `MGLSourceStyleFunction`      | `sourceStops:attributeName:options:`
+`zoom-and-property functions`| `MGLCompositeStyleFunction` | `compositeStops:attributeName:options:`
 
 Data-driven styling also introduces interpolation mode, which defines the
 relationship between style values and attributes or zoom levels.
@@ -246,13 +248,14 @@ In style JSON | In Objective-C | In Swift
 The runtime styling API introduces `MGLStyleFunction` to the macOS SDK.
 [Data-driven styling](data-driven-styling.html) expands `MGLStyleFunction`.
 Individual style property documentation includes which subclasses of
-`MGLStyleFunction` are enabled for that property.
+`MGLStyleFunction` are enabled for that property. You can use `MGLStyleValue`
+methods to create a `MGLStyleFunction`.
 
-In style specification       | In the SDK
------------------------------|-----------
-`zoom function`              | `MGLCameraStyleFunction`
-`property function`          | `MGLSourceStyleFunction`
-`zoom-and-property functions`| `MGLCompositeStyleFunction`
+In style specification | In the SDK                    | [MGLStyleValue valueWithInterpolationMode:...]
+-----------------------|-------------------------------|-------------
+`zoom function`        | `MGLCameraStyleFunction`      | `cameraStops:options:`
+`property function`    | `MGLSourceStyleFunction`      | `sourceStops:attributeName:options:`
+`zoom-and-property functions`| `MGLCompositeStyleFunction` | `compositeStops:attributeName:options:`
 
 Data-driven styling also introduces interpolation mode, which defines the
 relationship between style values and attributes or zoom levels.
@@ -277,13 +280,14 @@ In style JSON | In Objective-C | In Swift
 The runtime styling API introduces `MGLStyleFunction` to the macOS SDK.
 [Data-driven styling](data-driven-styling.html) expands `MGLStyleFunction`.
 Individual style property documentation includes which subclasses of
-`MGLStyleFunction` are enabled for that property.
+`MGLStyleFunction` are enabled for that property. You can use `MGLStyleValue`
+methods to create a `MGLStyleFunction`.
 
-In style specification       | In the SDK
------------------------------|-----------
-`zoom function`              | `MGLCameraStyleFunction`
-`property function`          | `MGLSourceStyleFunction`
-`zoom-and-property functions`| `MGLCompositeStyleFunction`
+In style specification | In the SDK                    | [MGLStyleValue valueWithInterpolationMode:...]
+-----------------------|-------------------------------|-------------
+`zoom function`        | `MGLCameraStyleFunction`      | `cameraStops:options:`
+`property function`    | `MGLSourceStyleFunction`      | `sourceStops:attributeName:options:`
+`zoom-and-property functions`| `MGLCompositeStyleFunction` | `compositeStops:attributeName:options:`
 
 Data-driven styling also introduces interpolation mode, which defines the
 relationship between style values and attributes or zoom levels.
@@ -308,13 +312,14 @@ In style JSON | In Objective-C | In Swift
 The runtime styling API introduces `MGLStyleFunction` to the macOS SDK.
 [Data-driven styling](data-driven-styling.html) expands `MGLStyleFunction`.
 Individual style property documentation includes which subclasses of
-`MGLStyleFunction` are enabled for that property.
+`MGLStyleFunction` are enabled for that property. You can use `MGLStyleValue`
+methods to create a `MGLStyleFunction`.
 
-In style specification       | In the SDK
------------------------------|-----------
-`zoom function`              | `MGLCameraStyleFunction`
-`property function`          | `MGLSourceStyleFunction`
-`zoom-and-property functions`| `MGLCompositeStyleFunction`
+In style specification | In the SDK                    | [MGLStyleValue valueWithInterpolationMode:...]
+-----------------------|-------------------------------|-------------
+`zoom function`        | `MGLCameraStyleFunction`      | `cameraStops:options:`
+`property function`    | `MGLSourceStyleFunction`      | `sourceStops:attributeName:options:`
+`zoom-and-property functions`| `MGLCompositeStyleFunction` | `compositeStops:attributeName:options:`
 
 Data-driven styling also introduces interpolation mode, which defines the
 relationship between style values and attributes or zoom levels.
