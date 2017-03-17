@@ -806,7 +806,7 @@ public class MapView extends FrameLayout {
   public static final int DID_FINISH_RENDERING_FRAME = 9;
 
   /**
-   * This event is triggered when the map finished rendeirng the frame fully.
+   * This event is triggered when the map finished rendering the frame fully.
    * <p>
    * Register to {@link MapChange} events with {@link MapView#addOnMapChangedListener(OnMapChangedListener)}.
    * </p>

@@ -3,7 +3,7 @@ package com.mapbox.mapboxsdk.style.sources;
 import java.net.URL;
 
 /**
- * Raster Source enables the use of raster tiles.
+ * Raster source, allows using raster tiles as source.
  *
  * @see <a href="https://www.mapbox.com/mapbox-gl-style-spec/#sources-raster">The style specification</a>
  */

@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Tile set
+ * Tile set, allows using TileJson specification as source.
  *
  * @see <a href="https://github.com/mapbox/tilejson-spec/tree/master/2.1.0">The tileset specification</a>
  */

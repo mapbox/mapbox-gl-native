@@ -6,10 +6,12 @@ import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 
 /**
- * Annotation is an overlay on top of a {@link MapView},
- * from which {@link Polygon}, {@link Polyline} and {@link Marker} are derived.
+ * Annotation is an overlay on top of a Map.
  * <p>
- * it manages attachment to a map and identification, but does not require
+ * Known subclasses are {@link Polygon}, {@link Polyline} and {@link Marker}.
+ * </p>
+ * <p>
+ * This class manages attachment to a map and identification, but does not require
  * content to be placed at a geographical point.
  * </p>
  */
@@ -96,6 +98,12 @@ public abstract class Annotation implements Comparable<Annotation> {
     return mapView;
   }
 
+  /**
+   * Compares this Annotation object with another Annotation.
+   *
+   * @param annotation Another Annotation to compare with this object.
+   * @return returns 0 if id's match, 1 if id is lower, -1 if id is higher of another Annotation
+   */
   @Override
   public int compareTo(@NonNull Annotation annotation) {
     if (id < annotation.getId()) {
@@ -107,12 +115,10 @@ public abstract class Annotation implements Comparable<Annotation> {
   }
 
   /**
-   * Compares this {@link PolylineOptions} object with another {@link PolylineOptions} and
-   * determines if their color, alpha, width, and vertices match.
+   * Checks if this Annotation object is equal to another Annotation.
    *
-   * @param object Another {@link PolylineOptions} to compare with this object.
-   * @return True if color, alpha, width, and vertices match this {@link PolylineOptions} object.
-   * Else, false.
+   * @param object Another Annotation to check equality with this object.
+   * @return returns true both id's match else returns false.
    */
   @Override
   public boolean equals(Object object) {
