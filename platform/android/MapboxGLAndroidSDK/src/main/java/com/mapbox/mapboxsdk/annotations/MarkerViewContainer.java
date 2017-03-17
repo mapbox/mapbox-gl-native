@@ -17,14 +17,18 @@ public class MarkerViewContainer extends FrameLayout {
 
   public MarkerViewContainer(Context context, AttributeSet attrs) {
     super(context, attrs);
+    setTag(false);
   }
 
   @Override
   public boolean dispatchTouchEvent(MotionEvent ev) {
-    final boolean childResult = super.dispatchTouchEvent(ev);
-    if (childResult) {
+    super.dispatchTouchEvent(ev);
+    boolean actionUp = (boolean) getTag();
+    if (!actionUp) {
       ((ViewGroup) getParent()).onTouchEvent(ev);
+    } else {
+      setTag(false);
     }
-    return childResult;
+    return true;
   }
 }
