@@ -38,33 +38,33 @@ The effect a key has on the style value is determined by the interpolation mode.
 The stops dictionary below, for example, shows colors that continuously shift from yellow to orange to red to blue to white based on the attribute value.
 
 ``` swift
-    let url = URL(string: "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson")
-    let symbolSource = MGLSource(identifier: "source")
-    let symbolLayer = MGLSymbolStyleLayer(identifier: "place-city-sm", source: symbolSource)
+  let url = URL(string: "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson")
+  let symbolSource = MGLSource(identifier: "source")
+  let symbolLayer = MGLSymbolStyleLayer(identifier: "place-city-sm", source: symbolSource)
 
-    let source = MGLShapeSource(identifier: "earthquakes", url: url, options: nil)
-    style.addSource(source)
+  let source = MGLShapeSource(identifier: "earthquakes", url: url, options: nil)
+  style.addSource(source)
 
-    let stops = [0 : MGLStyleValue(rawValue: NSColor.yellow),
-                 2.5 : MGLStyleValue(rawValue: NSColor.orange),
-                 5: MGLStyleValue(rawValue: NSColor.red),
-                 7.5 : MGLStyleValue(rawValue: NSColor.blue),
-                 10 : MGLStyleValue(rawValue: NSColor.white)]
+  let stops = [0 : MGLStyleValue(rawValue: NSColor.yellow),
+               2.5 : MGLStyleValue(rawValue: NSColor.orange),
+               5: MGLStyleValue(rawValue: NSColor.red),
+               7.5 : MGLStyleValue(rawValue: NSColor.blue),
+               10 : MGLStyleValue(rawValue: NSColor.white)]
 
-    let layer = MGLCircleStyleLayer(identifier: "circles", source: source)
-    layer.circleColor = MGLStyleValue(interpolationMode: .exponential,
-                                      sourceStops: stops,
-                                      attributeName: "mag",
-                                      options: [.defaultValue: MGLStyleValue<NSColor>(rawValue: .green)])
-    layer.circleRadius = MGLStyleValue(rawValue: 10)
-    style.insertLayer(layer, below: symbolLayer)
+  let layer = MGLCircleStyleLayer(identifier: "circles", source: source)
+  layer.circleColor = MGLStyleValue(interpolationMode: .exponential,
+                                    sourceStops: stops,
+                                    attributeName: "mag",
+                                    options: [.defaultValue: MGLStyleValue<NSColor>(rawValue: .green)])
+  layer.circleRadius = MGLStyleValue(rawValue: 10)
+  style.insertLayer(layer, below: symbolLayer)
 ```
 
 ![exponential mode](img/data-driven-styling/exponential.png)
 
 #### Interval
 
-`MGLInterpolationModeInterval` creates a range using the keys stops dictionary. The range is from the given key to just less than the next key. The attribute values that fall into that range are then styled using the style value assigned to that key.
+`MGLInterpolationModeInterval` creates a range using the keys from the stops dictionary. The range is from the given key to just less than the next key. The attribute values that fall into that range are then styled using the style value assigned to that key.
 
 When we use the stops dictionary given above with an interval interpolation mode, we create ranges where earthquakes with a magnitude of 0 to just less than 2.5 would be yellow, 2.5 to just less than 5 would be orange, and so on.
 
@@ -85,8 +85,8 @@ There are three main types of events in the dataset: earthquakes, explosions, an
 
 ``` swift
 let categoricalStops = ["earthquake" : MGLStyleValue(rawValue: NSColor.orange),
-                                    "explosion" : MGLStyleValue(rawValue: NSColor.red),
-                                    "quarry blast": MGLStyleValue(rawValue: NSColor.yellow)]
+                        "explosion" : MGLStyleValue(rawValue: NSColor.red),
+                        "quarry blast": MGLStyleValue(rawValue: NSColor.yellow)]
 
 layer.circleColor = MGLStyleValue(interpolationMode: .categorical,
                                   sourceStops: categoricalStops,
@@ -111,6 +111,6 @@ layer.circleRadius = MGLStyleValue(interpolationMode: .identity,
 
 ![identity mode](img/data-driven-styling/identity.png)
 
-Resources:
+##Resources:
 [USGS](https://earthquake.usgs.gov/earthquakes/feed/v1.0/geojson.php)
 [For Style Authors](for-style-authors.html)
