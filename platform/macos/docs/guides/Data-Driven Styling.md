@@ -45,11 +45,11 @@ The stops dictionary below, for example, shows colors that continuously shift fr
   let source = MGLShapeSource(identifier: "earthquakes", url: url, options: nil)
   style.addSource(source)
 
-  let stops = [0 : MGLStyleValue(rawValue: NSColor.yellow),
-               2.5 : MGLStyleValue(rawValue: NSColor.orange),
+  let stops = [0: MGLStyleValue(rawValue: NSColor.yellow),
+               2.5: MGLStyleValue(rawValue: NSColor.orange),
                5: MGLStyleValue(rawValue: NSColor.red),
-               7.5 : MGLStyleValue(rawValue: NSColor.blue),
-               10 : MGLStyleValue(rawValue: NSColor.white)]
+               7.5: MGLStyleValue(rawValue: NSColor.blue),
+               10: MGLStyleValue(rawValue: NSColor.white)]
 
   let layer = MGLCircleStyleLayer(identifier: "circles", source: source)
   layer.circleColor = MGLStyleValue(interpolationMode: .exponential,
@@ -84,8 +84,8 @@ Returns the output value that is equal to the stop for the function input. We’
 There are three main types of events in the dataset: earthquakes, explosions, and quarry blasts. In this case, the color of the circle layer will be determined by the type of event, with a default value of green to catch any events that do not fall into any of those categories.
 
 ``` swift
-let categoricalStops = ["earthquake" : MGLStyleValue(rawValue: NSColor.orange),
-                        "explosion" : MGLStyleValue(rawValue: NSColor.red),
+let categoricalStops = ["earthquake": MGLStyleValue(rawValue: NSColor.orange),
+                        "explosion": MGLStyleValue(rawValue: NSColor.red),
                         "quarry blast": MGLStyleValue(rawValue: NSColor.yellow)]
 
 layer.circleColor = MGLStyleValue(interpolationMode: .categorical,
