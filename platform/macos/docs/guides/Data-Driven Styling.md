@@ -111,6 +111,7 @@ layer.circleRadius = MGLStyleValue(interpolationMode: .identity,
 
 ![identity mode](img/data-driven-styling/identity.png)
 
-##Resources:
-[USGS](https://earthquake.usgs.gov/earthquakes/feed/v1.0/geojson.php)
-[For Style Authors](for-style-authors.html)
+##Resources
+
+* [USGS](https://earthquake.usgs.gov/earthquakes/feed/v1.0/geojson.php)
+* [For Style Authors](for-style-authors.html)
