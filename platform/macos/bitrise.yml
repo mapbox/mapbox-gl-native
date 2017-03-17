@@ -54,7 +54,7 @@ workflows:
             #!/bin/bash
             set -eu -o pipefail
             brew install cmake
-            apt-get install -y python-pip python-dev build-essential
             pip install awscli
+            gem install xcpretty --no-rdoc --no-ri
             BUILDTYPE=Release SYMBOLS=NO make xpackage
             CLOUDWATCH=true platform/macos/scripts/metrics.sh
