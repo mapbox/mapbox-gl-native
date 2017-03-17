@@ -113,8 +113,11 @@ public:
     }
 };
 
-#define MBGL_DEFINE_ATTRIBUTE(type_, n_, name_) \
-    struct name_ : ::mbgl::gl::Attribute<type_, n_> { static auto name() { return #name_; } }
+#define MBGL_DEFINE_ATTRIBUTE(type_, n_, name_)        \
+    struct name_ {                                     \
+        static auto name() { return #name_; }          \
+        using Type = ::mbgl::gl::Attribute<type_, n_>; \
+    }
 
 namespace detail {
 
@@ -234,15 +237,15 @@ public:
     using Types = TypeList<As...>;
     using Locations = IndexedTuple<
         TypeList<As...>,
-        TypeList<typename As::Location...>>;
+        TypeList<typename As::Type::Location...>>;
     using Bindings = IndexedTuple<
         TypeList<As...>,
-        TypeList<typename As::Binding...>>;
+        TypeList<typename As::Type::Binding...>>;
     using VariableBindings = IndexedTuple<
         TypeList<As...>,
-        TypeList<optional<typename As::VariableBinding>...>>;
+        TypeList<optional<typename As::Type::VariableBinding>...>>;
 
-    using Vertex = detail::Vertex<As...>;
+    using Vertex = detail::Vertex<typename As::Type...>;
 
     template <class A>
     static constexpr std::size_t Index = TypeIndex<A, As...>::value;
@@ -253,7 +256,7 @@ public:
 
     template <class DrawMode>
     static Bindings allVariableBindings(const VertexBuffer<Vertex, DrawMode>& buffer) {
-        return Bindings { As::variableBinding(buffer, Index<As>)... };
+        return Bindings { As::Type::variableBinding(buffer, Index<As>)... };
     }
 
     static void bind(Context& context,
@@ -261,11 +264,11 @@ public:
                      VariableBindings& oldBindings,
                      const Bindings& newBindings,
                      std::size_t vertexOffset) {
-        util::ignore({ (As::bind(context,
-                                 locations.template get<As>(),
-                                 oldBindings.template get<As>(),
-                                 newBindings.template get<As>(),
-                                 vertexOffset), 0)... });
+        util::ignore({ (As::Type::bind(context,
+                                       locations.template get<As>(),
+                                       oldBindings.template get<As>(),
+                                       newBindings.template get<As>(),
+                                       vertexOffset), 0)... });
     }
 };
 
