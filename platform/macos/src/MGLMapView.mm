@@ -2843,7 +2843,7 @@ public:
         [nativeView mapViewDidFinishLoadingStyle];
     }
 
-    void onSourceDidChange() override {
+    void onSourceChanged(mbgl::style::Source&) override {
         [nativeView sourceDidChange];
     }
 
