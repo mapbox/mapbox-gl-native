@@ -1,7 +1,7 @@
 
 <!--
   This file is generated.
-  Edit platform/darwin/scripts/generate-style-code.js, then run `make style-code`.
+  Edit platform/darwin/scripts/generate-style-code.js, then run `make darwin-style-code`.
 -->
 
 # Data-Driven Styling
