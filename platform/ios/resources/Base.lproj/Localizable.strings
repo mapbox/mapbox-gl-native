@@ -31,6 +31,12 @@
 /* Accessibility label */
 "INFO_A11Y_LABEL" = "About this map";
 
+/* User-friendly error description */
+"LOAD_MAP_FAILED_DESC" = "The map failed to load because an unknown error occurred.";
+
+/* User-friendly error description */
+"LOAD_STYLE_FAILED_DESC" = "The map failed to load because the style can't be loaded.";
+
 /* Accessibility label */
 "LOGO_A11Y_LABEL" = "Mapbox";
 
@@ -40,8 +46,14 @@
 /* Map accessibility value */
 "MAP_A11Y_VALUE" = "Zoom %1$dx\n%2$ld annotation(s) visible";
 
+/* User-friendly error description */
+"PARSE_STYLE_FAILED_DESC" = "The map failed to load because the style is corrupted.";
+
 /* Action sheet title */
 "SDK_NAME" = "Mapbox iOS SDK";
+
+/* User-friendly error description */
+"STYLE_NOT_FOUND_DESC" = "The map failed to load because the style can’t be found or is incompatible.";
 
 /* Telemetry prompt message */
 "TELEMETRY_DISABLED_MSG" = "You can help make OpenStreetMap and Mapbox maps better by contributing anonymous usage data.";

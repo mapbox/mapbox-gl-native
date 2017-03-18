@@ -1,5 +1,17 @@
+/* User-friendly error description */
+"LOAD_MAP_FAILED_DESC" = "The map failed to load because an unknown error occurred.";
+
+/* User-friendly error description */
+"LOAD_STYLE_FAILED_DESC" = "The map failed to load because the style can't be loaded.";
+
 /* Accessibility title */
 "MAP_A11Y_TITLE" = "Mapbox";
+
+/* User-friendly error description */
+"PARSE_STYLE_FAILED_DESC" = "The map failed to load because the style is corrupted.";
+
+/* User-friendly error description */
+"STYLE_NOT_FOUND_DESC" = "The map failed to load because the style can’t be found or is incompatible.";
 
 /* Label of Zoom In button */
 "ZOOM_IN_LABEL" = "+";
