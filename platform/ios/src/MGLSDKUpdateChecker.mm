@@ -20,7 +20,7 @@
         return;
     }
 
-    NSURL *url = [NSURL URLWithString:@"https://mapbox.s3.amazonaws.com/mapbox-gl-native/ios/latest_version"];
+    NSURL *url = [NSURL URLWithString:@"https://www.mapbox.com/ios-sdk/latest_version"];
     [[NSURLSession.sharedSession dataTaskWithURL:url completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
         if (error || ((NSHTTPURLResponse *)response).statusCode != 200) {
             return;
