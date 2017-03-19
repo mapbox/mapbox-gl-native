@@ -120,9 +120,6 @@ public:
      *
      * If pause is called then no revalidation or network request activity
      * will occur.
-     *
-     * Note: Calling pause and then calling getAPIBaseURL or getAccessToken
-     * will lock the thread that those calls are made on.
      */
     void pause();
 
