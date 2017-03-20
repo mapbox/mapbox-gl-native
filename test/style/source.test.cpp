@@ -19,6 +19,7 @@
 #include <mbgl/style/update_parameters.hpp>
 #include <mbgl/style/layers/line_layer.hpp>
 #include <mbgl/annotation/annotation_manager.hpp>
+#include <mbgl/annotation/annotation_source.hpp>
 
 #include <mapbox/geojsonvt.hpp>
 
@@ -64,6 +65,29 @@ public:
         loop.stop();
     }
 };
+
+TEST(Source, DefaultZoomRange) {
+    VectorSource vectorSource("vectorSource", "url");
+    vectorSource.baseImpl->loaded = true;
+    EXPECT_EQ(vectorSource.getZoomRange().min, 0u);
+    EXPECT_EQ(vectorSource.getZoomRange().max, 22u);
+
+    GeoJSONSource geojsonSource("source");
+    geojsonSource.baseImpl->loaded = true;
+    EXPECT_EQ(geojsonSource.getZoomRange().min, 0u);
+    EXPECT_EQ(geojsonSource.getZoomRange().max, 18u);
+
+    Tileset tileset;
+    RasterSource rasterSource("source", tileset, 512);
+    rasterSource.baseImpl->loaded = true;
+    EXPECT_EQ(rasterSource.getZoomRange().min, 0u);
+    EXPECT_EQ(rasterSource.getZoomRange().max, 22u);
+    EXPECT_EQ(rasterSource.getZoomRange(), tileset.zoomRange);
+
+    AnnotationSource annotationSource;
+    EXPECT_EQ(annotationSource.getZoomRange().min, 0u);
+    EXPECT_EQ(annotationSource.getZoomRange().max, 22u);
+}
 
 TEST(Source, LoadingFail) {
     SourceTest test;

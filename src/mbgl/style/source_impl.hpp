@@ -83,6 +83,7 @@ public:
     const std::string id;
 
     virtual optional<std::string> getAttribution() const { return {}; };
+    virtual Range<uint8_t> getZoomRange() const = 0;
 
     bool loaded = false;
 
@@ -109,7 +110,6 @@ private:
     void onTileError(Tile&, std::exception_ptr) override;
 
     virtual uint16_t getTileSize() const = 0;
-    virtual Range<uint8_t> getZoomRange() = 0;
     virtual std::unique_ptr<Tile> createTile(const OverscaledTileID&, const UpdateParameters&) = 0;
 
     std::map<UnwrappedTileID, RenderTile> renderTiles;

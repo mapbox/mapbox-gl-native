@@ -14,7 +14,7 @@ AnnotationSource::Impl::Impl(Source& base_)
     : Source::Impl(SourceType::Annotations, AnnotationManager::SourceID, base_) {
 }
 
-Range<uint8_t> AnnotationSource::Impl::getZoomRange() {
+Range<uint8_t> AnnotationSource::Impl::getZoomRange() const {
     return { 0, 22 };
 }
 
