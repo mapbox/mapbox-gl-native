@@ -153,7 +153,7 @@ void GeoJSONSource::Impl::loadDescription(FileSource& fileSource) {
     });
 }
 
-Range<uint8_t> GeoJSONSource::Impl::getZoomRange() {
+Range<uint8_t> GeoJSONSource::Impl::getZoomRange() const {
     assert(loaded);
     return { 0, options.maxzoom };
 }

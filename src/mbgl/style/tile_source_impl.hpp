@@ -36,9 +36,9 @@ public:
 
     optional<std::string> getAttribution() const override;
 
-protected:
-    Range<uint8_t> getZoomRange() final;
+    Range<uint8_t> getZoomRange() const final;
 
+protected:
     const variant<std::string, Tileset> urlOrTileset;
     const uint16_t tileSize;
 
