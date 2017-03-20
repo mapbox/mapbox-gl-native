@@ -8,6 +8,7 @@
 #include <mbgl/gl/segment.hpp>
 #include <mbgl/programs/circle_program.hpp>
 #include <mbgl/style/layers/circle_layer_properties.hpp>
+#include <mbgl/util/unordered_vector_map.hpp>
 
 namespace mbgl {
 
@@ -33,7 +34,7 @@ public:
     optional<gl::VertexBuffer<CircleLayoutVertex>> vertexBuffer;
     optional<gl::IndexBuffer<gl::Triangles>> indexBuffer;
 
-    std::unordered_map<std::string, CircleProgram::PaintPropertyBinders> paintPropertyBinders;
+    util::unordered_vector_map<std::string, CircleProgram::PaintPropertyBinders> paintPropertyBinders;
 
     const MapMode mode;
 };
