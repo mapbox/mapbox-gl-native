@@ -194,8 +194,11 @@ MGL_EXPORT
 @property (nonatomic, strong) NS_SET_OF(__kindof MGLSource *) *sources;
 
 /**
- Values describing animated transitions to styling changes, either to the style URL 
- or to individual properties.
+ Values describing animated transitions to styling changes on individual 
+ paint properties. 
+ 
+ @note Transitions between styles changed using `-[MGLMapView setStyleURL:]`
+    are not currently supported.
  */
 @property (nonatomic) MGLTransition transition;
 
