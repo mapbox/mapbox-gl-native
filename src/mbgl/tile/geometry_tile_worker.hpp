@@ -2,6 +2,7 @@
 
 #include <mbgl/map/mode.hpp>
 #include <mbgl/tile/tile_id.hpp>
+#include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/text/glyph.hpp>
 #include <mbgl/text/placement_config.hpp>
 #include <mbgl/actor/actor_ref.hpp>
@@ -33,15 +34,17 @@ public:
     void setLayers(std::vector<std::unique_ptr<style::Layer>>, uint64_t correlationID);
     void setData(std::unique_ptr<const GeometryTileData>, uint64_t correlationID);
     void setPlacementConfig(PlacementConfig, uint64_t correlationID);
-    void symbolDependenciesChanged();
     
     void onGlyphsAvailable(GlyphPositionMap glyphs);
+    void onIconsAvailable(IconAtlasMap icons);
 
 private:
     void coalesce();
     void coalesced();
     void redoLayout();
     void attemptPlacement();
+    
+    void symbolDependenciesChanged();
     bool hasPendingSymbolDependencies() const;
 
     ActorRef<GeometryTileWorker> self;
@@ -68,6 +71,9 @@ private:
 
     std::vector<std::unique_ptr<SymbolLayout>> symbolLayouts;
     GlyphPositionMap glyphPositions;
+    bool waitingForGlyphs;
+    IconAtlasMap icons;
+    bool waitingForIcons;
 };
 
 } // namespace mbgl

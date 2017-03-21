@@ -1,5 +1,6 @@
 #pragma once
 
+#include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/tile/tile.hpp>
 #include <mbgl/tile/geometry_tile_worker.hpp>
 #include <mbgl/text/glyph_atlas.hpp>
@@ -25,7 +26,7 @@ class UpdateParameters;
 class SourceQueryOptions;
 } // namespace style
 
-class GeometryTile : public Tile, public GlyphRequestor {
+class GeometryTile : public Tile, public GlyphRequestor, IconRequestor {
 public:
     GeometryTile(const OverscaledTileID&,
                  std::string sourceID,
@@ -37,10 +38,13 @@ public:
     void setData(std::unique_ptr<const GeometryTileData>);
 
     void setPlacementConfig(const PlacementConfig&) override;
-    void symbolDependenciesChanged() override;
     void redoLayout() override;
     
+    void onGlyphsAvailable(GlyphPositionMap) override;
+    void onIconsAvailable(SpriteAtlas*, IconMap) override;
+    
     void getGlyphs(GlyphDependencies);
+    void getIcons(IconDependencyMap);
 
     Bucket* getBucket(const style::Layer&) override;
 
@@ -74,8 +78,6 @@ public:
     void onPlacement(PlacementResult);
 
     void onError(std::exception_ptr);
-
-    virtual void onGlyphsAvailable(GlyphPositionMap) override;
     
 protected:
     const GeometryTileData* getData() {
@@ -93,6 +95,8 @@ private:
     Actor<GeometryTileWorker> worker;
 
     GlyphAtlas& glyphAtlas;
+    std::set<SpriteAtlas*> pendingSpriteAtlases;
+    IconAtlasMap iconAtlasMap;
     
     uint64_t correlationID = 0;
     optional<PlacementConfig> requestedConfig;

@@ -3,6 +3,7 @@
 #include <mbgl/tile/geometry_tile.hpp>
 #include <mbgl/text/collision_tile.hpp>
 #include <mbgl/layout/symbol_layout.hpp>
+#include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/style/bucket_parameters.hpp>
 #include <mbgl/style/group_by_layout.hpp>
 #include <mbgl/style/filter.hpp>
@@ -30,7 +31,9 @@ GeometryTileWorker::GeometryTileWorker(ActorRef<GeometryTileWorker> self_,
       parent(std::move(parent_)),
       id(std::move(id_)),
       obsolete(obsolete_),
-      mode(mode_) {
+      mode(mode_),
+      waitingForGlyphs(false),
+      waitingForIcons(false) {
 }
 
 GeometryTileWorker::~GeometryTileWorker() {
@@ -43,7 +46,7 @@ GeometryTileWorker::~GeometryTileWorker() {
 
                               [idle] <----------------------------.
                                  |                                |
-      set{Data,Layers,Placement}, symbolDependenciesChanged       |
+                       set{Data,Layers,Placement}                 |
                                  |                                |
            (do layout/placement; self-send "coalesced")           |
                                  v                                |
@@ -67,6 +70,9 @@ GeometryTileWorker::~GeometryTileWorker() {
    read all the queued messages until we get to "coalesced", and then redo either
    layout or placement if there were one or more "set"s (with layout taking priority,
    since it will trigger placement when complete), or return to the [idle] state if not.
+   
+   TODO: The transition diagram is complicated by handling symbol dependencies
+   asynchronously (insert link to updated diagram or ASCII-fy it)
 */
 
 void GeometryTileWorker::setData(std::unique_ptr<const GeometryTileData> data_, uint64_t correlationID_) {
@@ -77,13 +83,18 @@ void GeometryTileWorker::setData(std::unique_ptr<const GeometryTileData> data_, 
         switch (state) {
         case Idle:
             redoLayout();
-            coalesce();
+            if (!hasPendingSymbolDependencies()) {
+                coalesce();
+            } else {
+                state = NeedPlacement;
+            }
             break;
 
         case Coalescing:
-        case NeedLayout:
         case NeedPlacement:
             state = NeedLayout;
+            break;
+        case NeedLayout:
             break;
         }
     } catch (...) {
@@ -99,7 +110,11 @@ void GeometryTileWorker::setLayers(std::vector<std::unique_ptr<Layer>> layers_, 
         switch (state) {
         case Idle:
             redoLayout();
-            coalesce();
+            if (!hasPendingSymbolDependencies()) {
+                coalesce();
+            } else {
+                state = NeedPlacement;
+            }
             break;
 
         case Coalescing:
@@ -139,34 +154,51 @@ void GeometryTileWorker::setPlacementConfig(PlacementConfig placementConfig_, ui
     }
 }
 
+void GeometryTileWorker::onGlyphsAvailable(GlyphPositionMap glyphs) {
+    glyphPositions = std::move(glyphs);
+    waitingForGlyphs = false;
+    symbolDependenciesChanged();
+}
+
+void GeometryTileWorker::onIconsAvailable(IconAtlasMap icons_) {
+    icons = std::move(icons_);
+    waitingForIcons = false;
+    symbolDependenciesChanged();
+}
+
+bool GeometryTileWorker::hasPendingSymbolDependencies() const {
+    return waitingForGlyphs || waitingForIcons;
+}
+
 void GeometryTileWorker::symbolDependenciesChanged() {
     try {
         switch (state) {
-        case Idle:
-            if (hasPendingSymbolDependencies()) {
+        case NeedPlacement:
+            if (!hasPendingSymbolDependencies()) {
                 attemptPlacement();
                 coalesce();
             }
             break;
 
-        case Coalescing:
-            if (hasPendingSymbolDependencies()) {
-                state = NeedPlacement;
+        case NeedLayout:
+            if (!hasPendingSymbolDependencies()) {
+                redoLayout();
+                if (!hasPendingSymbolDependencies()) {
+                    coalesce();
+                } else {
+                    state = NeedPlacement;
+                }
             }
             break;
 
-        case NeedPlacement:
-        case NeedLayout:
+        case Idle:
+        case Coalescing:
+            assert(false);
             break;
         }
     } catch (...) {
         parent.invoke(&GeometryTile::onError, std::current_exception());
     }
-}
-
-void GeometryTileWorker::onGlyphsAvailable(GlyphPositionMap glyphs) {
-    glyphPositions = std::move(glyphs);
-    symbolDependenciesChanged(); // TODO: This is a clumsy way to join the "glyphs loaded" and "symbol dependencies changed" signals
 }
 
 void GeometryTileWorker::coalesced() {
@@ -182,12 +214,18 @@ void GeometryTileWorker::coalesced() {
 
         case NeedLayout:
             redoLayout();
-            coalesce();
+            if (!hasPendingSymbolDependencies()) {
+                coalesce();
+            } else {
+                state = NeedPlacement;
+            }
             break;
 
         case NeedPlacement:
             attemptPlacement();
-            coalesce();
+            if (!hasPendingSymbolDependencies()) {
+                coalesce();
+            }
             break;
         }
     } catch (...) {
@@ -216,8 +254,12 @@ void GeometryTileWorker::redoLayout() {
     std::unordered_map<std::string, std::shared_ptr<Bucket>> buckets;
     auto featureIndex = std::make_unique<FeatureIndex>();
     BucketParameters parameters { id, mode };
+    
     GlyphDependencies glyphDependencies;
+    IconDependencyMap iconDependencyMap;
+    
     glyphPositions.clear();
+    icons.clear();
 
     std::vector<std::vector<const Layer*>> groups = groupByLayout(*layers);
     for (auto& group : groups) {
@@ -245,7 +287,7 @@ void GeometryTileWorker::redoLayout() {
 
         if (leader.is<SymbolLayer>()) {
             symbolLayoutMap.emplace(leader.getID(),
-                leader.as<SymbolLayer>()->impl->createLayout(parameters, group, *geometryLayer, glyphDependencies));
+                leader.as<SymbolLayer>()->impl->createLayout(parameters, group, *geometryLayer, glyphDependencies, iconDependencyMap));
         } else {
             const Filter& filter = leader.baseImpl->filter;
             const std::string& sourceLayerID = leader.baseImpl->sourceLayer;
@@ -281,7 +323,13 @@ void GeometryTileWorker::redoLayout() {
     }
     
     if (!glyphDependencies.empty()) {
+        waitingForGlyphs = true;
         parent.invoke(&GeometryTile::getGlyphs, std::move(glyphDependencies));
+    }
+    
+    if (!iconDependencyMap.empty()) {
+        waitingForIcons = true;
+        parent.invoke(&GeometryTile::getIcons, std::move(iconDependencyMap));
     }
 
     parent.invoke(&GeometryTile::onLayout, GeometryTile::LayoutResult {
@@ -294,43 +342,9 @@ void GeometryTileWorker::redoLayout() {
     attemptPlacement();
 }
 
-bool GeometryTileWorker::hasPendingSymbolDependencies() const {
-    bool result = false;
-
-    for (const auto& symbolLayout : symbolLayouts) {
-        if (symbolLayout->state == SymbolLayout::Pending) {
-            result = true;
-        }
-    }
-
-    return result;
-}
-
 void GeometryTileWorker::attemptPlacement() {
-    if (!data || !layers || !placementConfig) {
+    if (!data || !layers || !placementConfig || hasPendingSymbolDependencies()) {
         return;
-    }
-
-    bool canPlace = true;
-
-    // Prepare as many SymbolLayouts as possible.
-    for (auto& symbolLayout : symbolLayouts) {
-        if (obsolete) {
-            return;
-        }
-
-        if (symbolLayout->state == SymbolLayout::Pending) {
-            if (symbolLayout->canPrepare(glyphPositions)) {
-                symbolLayout->state = SymbolLayout::Prepared;
-                symbolLayout->prepare(glyphPositions);
-            } else {
-                canPlace = false;
-            }
-        }
-    }
-
-    if (!canPlace) {
-        return; // We'll be notified (via `setPlacementConfig`) when it's time to try again.
     }
 
     auto collisionTile = std::make_unique<CollisionTile>(*placementConfig);
@@ -339,6 +353,10 @@ void GeometryTileWorker::attemptPlacement() {
     for (auto& symbolLayout : symbolLayouts) {
         if (obsolete) {
             return;
+        }
+        
+        if (symbolLayout->state == SymbolLayout::Pending) {
+            symbolLayout->prepare(glyphPositions,icons);
         }
 
         symbolLayout->state = SymbolLayout::Placed;

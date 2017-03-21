@@ -2,13 +2,13 @@
 
 #include <mbgl/text/glyph.hpp>
 #include <mbgl/util/variant.hpp>
+#include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/style/layer_impl.hpp>
 #include <mbgl/style/layers/symbol_layer.hpp>
 #include <mbgl/style/layers/symbol_layer_properties.hpp>
 
 namespace mbgl {
 
-class SpriteAtlas;
 class SymbolLayout;
 
 namespace style {
@@ -68,7 +68,7 @@ public:
 
     std::unique_ptr<Bucket> createBucket(const BucketParameters&, const std::vector<const Layer*>&) const override;
     std::unique_ptr<SymbolLayout> createLayout(const BucketParameters&, const std::vector<const Layer*>&,
-                                               const GeometryTileLayer&, GlyphDependencies&) const;
+                                               const GeometryTileLayer&, GlyphDependencies&, IconDependencyMap&) const;
 
     IconPaintProperties::Evaluated iconPaintProperties() const;
     TextPaintProperties::Evaluated textPaintProperties() const;

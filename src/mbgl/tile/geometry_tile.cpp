@@ -18,6 +18,8 @@
 #include <mbgl/style/query.hpp>
 #include <mbgl/util/logging.hpp>
 
+#include <iostream>
+
 namespace mbgl {
 
 using namespace style;
@@ -39,6 +41,9 @@ GeometryTile::GeometryTile(const OverscaledTileID& id_,
 
 GeometryTile::~GeometryTile() {
     glyphAtlas.removeGlyphs(*this);
+    for (auto spriteAtlas : pendingSpriteAtlases) {
+        spriteAtlas->removeRequestor(*this);
+    }
     cancel();
 }
 
@@ -76,10 +81,6 @@ void GeometryTile::setPlacementConfig(const PlacementConfig& desiredConfig) {
     ++correlationID;
     requestedConfig = desiredConfig;
     worker.invoke(&GeometryTileWorker::setPlacementConfig, desiredConfig, correlationID);
-}
-
-void GeometryTile::symbolDependenciesChanged() {
-    worker.invoke(&GeometryTileWorker::symbolDependenciesChanged);
 }
 
 void GeometryTile::redoLayout() {
@@ -138,6 +139,23 @@ void GeometryTile::onGlyphsAvailable(GlyphPositionMap glyphPositions) {
 
 void GeometryTile::getGlyphs(GlyphDependencies glyphDependencies) {
     glyphAtlas.getGlyphs(*this, std::move(glyphDependencies));
+}
+
+void GeometryTile::onIconsAvailable(SpriteAtlas* spriteAtlas, IconMap icons) {
+    iconAtlasMap[(uintptr_t)spriteAtlas] = icons;
+    pendingSpriteAtlases.erase(spriteAtlas);
+    if (pendingSpriteAtlases.empty()) {
+        worker.invoke(&GeometryTileWorker::onIconsAvailable, std::move(iconAtlasMap));
+    }
+}
+
+// TODO: If there's any value to be gained by it, we can narrow our request to just the sprites
+//  we need, but SpriteAtlases are just "loaded" or "not loaded"
+void GeometryTile::getIcons(IconDependencyMap iconDependencyMap) {
+    for (auto dependency : iconDependencyMap) {
+        pendingSpriteAtlases.insert(dependency.first);
+        dependency.first->getIcons(*this);
+    }
 }
 
 Bucket* GeometryTile::getBucket(const Layer& layer) {

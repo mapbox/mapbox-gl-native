@@ -29,15 +29,17 @@ TEST(SpriteAtlas, Basic) {
     EXPECT_EQ(112u, atlas.getSize().height);
 
     auto metro = *atlas.getIcon("metro");
+    float imagePixelRatio = metro.relativePixelRatio * atlas.getPixelRatio();
     EXPECT_EQ(0, metro.pos.x);
     EXPECT_EQ(0, metro.pos.y);
     EXPECT_EQ(20, metro.pos.w);
     EXPECT_EQ(20, metro.pos.h);
-    EXPECT_EQ(18, metro.spriteImage->getWidth());
-    EXPECT_EQ(18, metro.spriteImage->getHeight());
-    EXPECT_EQ(18u, metro.spriteImage->image.size.width);
-    EXPECT_EQ(18u, metro.spriteImage->image.size.height);
-    EXPECT_EQ(1.0f, metro.spriteImage->pixelRatio);
+    EXPECT_EQ(18, metro.width);
+    EXPECT_EQ(18, metro.height);
+    EXPECT_EQ(18u, metro.width * imagePixelRatio);
+    EXPECT_EQ(18u, metro.height * imagePixelRatio);
+    EXPECT_EQ(1.0f, imagePixelRatio);
+
 
     EXPECT_EQ(63u, atlas.getAtlasImage().size.width);
     EXPECT_EQ(112u, atlas.getAtlasImage().size.height);
@@ -82,15 +84,16 @@ TEST(SpriteAtlas, Size) {
     EXPECT_EQ(112u, atlas.getSize().height);
 
     auto metro = *atlas.getIcon("metro");
+    float imagePixelRatio = metro.relativePixelRatio * atlas.getPixelRatio();
     EXPECT_EQ(0, metro.pos.x);
     EXPECT_EQ(0, metro.pos.y);
     EXPECT_EQ(16, metro.pos.w);
     EXPECT_EQ(16, metro.pos.h);
-    EXPECT_EQ(18, metro.spriteImage->getWidth());
-    EXPECT_EQ(18, metro.spriteImage->getHeight());
-    EXPECT_EQ(18u, metro.spriteImage->image.size.width);
-    EXPECT_EQ(18u, metro.spriteImage->image.size.height);
-    EXPECT_EQ(1.0f, metro.spriteImage->pixelRatio);
+    EXPECT_EQ(18, metro.width);
+    EXPECT_EQ(18, metro.height);
+    EXPECT_EQ(18u, metro.width * imagePixelRatio);
+    EXPECT_EQ(18u, metro.height * imagePixelRatio);
+    EXPECT_EQ(1.0f, imagePixelRatio);
 
     // Now the image was created lazily.
     EXPECT_EQ(89u, atlas.getAtlasImage().size.width);
@@ -108,15 +111,16 @@ TEST(SpriteAtlas, Updates) {
 
     atlas.setSprite("one", std::make_shared<SpriteImage>(PremultipliedImage({ 16, 12 }), 1));
     auto one = *atlas.getIcon("one");
+    float imagePixelRatio = one.relativePixelRatio * atlas.getPixelRatio();
     EXPECT_EQ(0, one.pos.x);
     EXPECT_EQ(0, one.pos.y);
     EXPECT_EQ(20, one.pos.w);
     EXPECT_EQ(16, one.pos.h);
-    EXPECT_EQ(16, one.spriteImage->getWidth());
-    EXPECT_EQ(12, one.spriteImage->getHeight());
-    EXPECT_EQ(16u, one.spriteImage->image.size.width);
-    EXPECT_EQ(12u, one.spriteImage->image.size.height);
-    EXPECT_EQ(1.0f, one.spriteImage->pixelRatio);
+    EXPECT_EQ(16, one.width);
+    EXPECT_EQ(12, one.height);
+    EXPECT_EQ(16u, one.width * imagePixelRatio);
+    EXPECT_EQ(12u, one.height * imagePixelRatio);
+    EXPECT_EQ(1.0f, imagePixelRatio);
 
     // Now the image was created lazily.
     EXPECT_EQ(32u, atlas.getAtlasImage().size.width);
