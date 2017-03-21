@@ -48,21 +48,6 @@ typedef NS_ENUM(NSInteger, MGLErrorCode) {
     MGLErrorCodeLoadStyleFailed = 5,
 };
 
-/**
- The mode used to track the user location on the map. Used with
- `MGLMapView.userTrackingMode`.
- */
-typedef NS_ENUM(NSUInteger, MGLUserTrackingMode) {
-    /** The map does not follow the user location. */
-    MGLUserTrackingModeNone              = 0,
-    /** The map follows the user location. */
-    MGLUserTrackingModeFollow,
-    /** The map follows the user location and rotates when the heading changes. */
-    MGLUserTrackingModeFollowWithHeading,
-    /** The map follows the user location and rotates when the course changes. */
-    MGLUserTrackingModeFollowWithCourse,
-};
-
 /** Options for enabling debugging features in an `MGLMapView` instance. */
 typedef NS_OPTIONS(NSUInteger, MGLMapDebugMaskOptions) {
     /** Edges of tile boundaries are shown as thick, red lines to help diagnose
@@ -88,6 +73,39 @@ typedef NS_OPTIONS(NSUInteger, MGLMapDebugMaskOptions) {
     MGLMapDebugDepthBufferMask = 1 << 7,
 #endif
 };
+
+/**
+ A structure containing information about a transition.
+ */
+typedef struct MGLTransition {
+    /**
+     The amount of time the animation should take, not including the delay.
+     */
+    NSTimeInterval duration;
+    
+    /**
+     The amount of time in seconds to wait before beginning the animation.
+     */
+    NSTimeInterval delay;
+} MGLTransition;
+
+/**
+ Creates a new `MGLTransition` from the given duration and delay.
+ 
+ @param duration The amount of time the animation should take, not including 
+ the delay.
+ @param delay The amount of time in seconds to wait before beginning the 
+ animation.
+ 
+ @return Returns a `MGLTransition` struct containing the transition attributes.
+ */
+NS_INLINE MGLTransition MGLTransitionMake(NSTimeInterval duration, NSTimeInterval delay) {
+    MGLTransition transition;
+    transition.duration = duration;
+    transition.delay = delay;
+    
+    return transition;
+}
 
 NS_ASSUME_NONNULL_END
 

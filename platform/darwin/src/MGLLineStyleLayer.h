@@ -1,5 +1,5 @@
 // This file is generated.
-// Edit platform/darwin/scripts/generate-style-code.js, then run `make style-code-darwin`.
+// Edit platform/darwin/scripts/generate-style-code.js, then run `make darwin-style-code`.
 
 #import "MGLFoundation.h"
 #import "MGLStyleValue.h"
@@ -118,7 +118,7 @@ MGL_EXPORT
  
  You can set this property to an instance of:
  
- * `MGLStyleConstantValue`
+ * `MGLConstantStyleValue`
  * `MGLCameraStyleFunction` with an interpolation mode of
  `MGLInterpolationModeInterval`
  */
@@ -133,7 +133,7 @@ MGL_EXPORT
  
  You can set this property to an instance of:
  
- * `MGLStyleConstantValue`
+ * `MGLConstantStyleValue`
  * `MGLCameraStyleFunction` with an interpolation mode of
  `MGLInterpolationModeInterval`
  */
@@ -152,7 +152,7 @@ MGL_EXPORT
  
  You can set this property to an instance of:
  
- * `MGLStyleConstantValue`
+ * `MGLConstantStyleValue`
  * `MGLCameraStyleFunction` with an interpolation mode of:
    * `MGLInterpolationModeExponential`
    * `MGLInterpolationModeInterval`
@@ -172,7 +172,7 @@ MGL_EXPORT
  
  You can set this property to an instance of:
  
- * `MGLStyleConstantValue`
+ * `MGLConstantStyleValue`
  * `MGLCameraStyleFunction` with an interpolation mode of:
    * `MGLInterpolationModeExponential`
    * `MGLInterpolationModeInterval`
@@ -192,7 +192,7 @@ MGL_EXPORT
  
  You can set this property to an instance of:
  
- * `MGLStyleConstantValue`
+ * `MGLConstantStyleValue`
  * `MGLCameraStyleFunction` with an interpolation mode of:
    * `MGLInterpolationModeExponential`
    * `MGLInterpolationModeInterval`
@@ -208,6 +208,13 @@ MGL_EXPORT
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *lineBlur;
 
+/**
+ The transition affecting any changes to this layer’s `lineBlur` property.
+
+ This property corresponds to the `line-blur-transition` property in the style JSON file format.
+*/
+@property (nonatomic) MGLTransition lineBlurTransition;
+
 #if TARGET_OS_IPHONE
 /**
  The color with which the line will be drawn.
@@ -221,7 +228,7 @@ MGL_EXPORT
  
  You can set this property to an instance of:
  
- * `MGLStyleConstantValue`
+ * `MGLConstantStyleValue`
  * `MGLCameraStyleFunction` with an interpolation mode of:
    * `MGLInterpolationModeExponential`
    * `MGLInterpolationModeInterval`
@@ -249,7 +256,7 @@ MGL_EXPORT
  
  You can set this property to an instance of:
  
- * `MGLStyleConstantValue`
+ * `MGLConstantStyleValue`
  * `MGLCameraStyleFunction` with an interpolation mode of:
    * `MGLInterpolationModeExponential`
    * `MGLInterpolationModeInterval`
@@ -267,6 +274,13 @@ MGL_EXPORT
 #endif
 
 /**
+ The transition affecting any changes to this layer’s `lineColor` property.
+
+ This property corresponds to the `line-color-transition` property in the style JSON file format.
+*/
+@property (nonatomic) MGLTransition lineColorTransition;
+
+/**
  Specifies the lengths of the alternating dashes and gaps that form the dash
  pattern. The lengths are later scaled by the line width. To convert a dash
  length to points, multiply the length by the current line width.
@@ -282,11 +296,18 @@ MGL_EXPORT
  
  You can set this property to an instance of:
  
- * `MGLStyleConstantValue`
+ * `MGLConstantStyleValue`
  * `MGLCameraStyleFunction` with an interpolation mode of
  `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSArray<NSNumber *> *> *lineDashPattern;
+
+/**
+ The transition affecting any changes to this layer’s `lineDashPattern` property.
+
+ This property corresponds to the `line-dasharray-transition` property in the style JSON file format.
+*/
+@property (nonatomic) MGLTransition lineDashPatternTransition;
 
 @property (nonatomic, null_resettable) MGLStyleValue<NSArray<NSNumber *> *> *lineDasharray __attribute__((unavailable("Use lineDashPattern instead.")));
 
@@ -302,7 +323,7 @@ MGL_EXPORT
  
  You can set this property to an instance of:
  
- * `MGLStyleConstantValue`
+ * `MGLConstantStyleValue`
  * `MGLCameraStyleFunction` with an interpolation mode of:
    * `MGLInterpolationModeExponential`
    * `MGLInterpolationModeInterval`
@@ -319,6 +340,13 @@ MGL_EXPORT
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *lineGapWidth;
 
 /**
+ The transition affecting any changes to this layer’s `lineGapWidth` property.
+
+ This property corresponds to the `line-gap-width-transition` property in the style JSON file format.
+*/
+@property (nonatomic) MGLTransition lineGapWidthTransition;
+
+/**
  The line's offset. For linear features, a positive value offsets the line to
  the right, relative to the direction of the line, and a negative value to the
  left. For polygon features, a positive value results in an inset, and a
@@ -332,7 +360,7 @@ MGL_EXPORT
  
  You can set this property to an instance of:
  
- * `MGLStyleConstantValue`
+ * `MGLConstantStyleValue`
  * `MGLCameraStyleFunction` with an interpolation mode of:
    * `MGLInterpolationModeExponential`
    * `MGLInterpolationModeInterval`
@@ -349,6 +377,13 @@ MGL_EXPORT
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *lineOffset;
 
 /**
+ The transition affecting any changes to this layer’s `lineOffset` property.
+
+ This property corresponds to the `line-offset-transition` property in the style JSON file format.
+*/
+@property (nonatomic) MGLTransition lineOffsetTransition;
+
+/**
  The opacity at which the line will be drawn.
  
  The default value of this property is an `MGLStyleValue` object containing an
@@ -357,7 +392,7 @@ MGL_EXPORT
  
  You can set this property to an instance of:
  
- * `MGLStyleConstantValue`
+ * `MGLConstantStyleValue`
  * `MGLCameraStyleFunction` with an interpolation mode of:
    * `MGLInterpolationModeExponential`
    * `MGLInterpolationModeInterval`
@@ -374,16 +409,30 @@ MGL_EXPORT
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *lineOpacity;
 
 /**
+ The transition affecting any changes to this layer’s `lineOpacity` property.
+
+ This property corresponds to the `line-opacity-transition` property in the style JSON file format.
+*/
+@property (nonatomic) MGLTransition lineOpacityTransition;
+
+/**
  Name of image in style images to use for drawing image lines. For seamless
  patterns, image width must be a factor of two (2, 4, 8, ..., 512).
  
  You can set this property to an instance of:
  
- * `MGLStyleConstantValue`
+ * `MGLConstantStyleValue`
  * `MGLCameraStyleFunction` with an interpolation mode of
  `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSString *> *linePattern;
+
+/**
+ The transition affecting any changes to this layer’s `linePattern` property.
+
+ This property corresponds to the `line-pattern-transition` property in the style JSON file format.
+*/
+@property (nonatomic) MGLTransition linePatternTransition;
 
 #if TARGET_OS_IPHONE
 /**
@@ -401,7 +450,7 @@ MGL_EXPORT
  
  You can set this property to an instance of:
  
- * `MGLStyleConstantValue`
+ * `MGLConstantStyleValue`
  * `MGLCameraStyleFunction` with an interpolation mode of:
    * `MGLInterpolationModeExponential`
    * `MGLInterpolationModeInterval`
@@ -423,13 +472,20 @@ MGL_EXPORT
  
  You can set this property to an instance of:
  
- * `MGLStyleConstantValue`
+ * `MGLConstantStyleValue`
  * `MGLCameraStyleFunction` with an interpolation mode of:
    * `MGLInterpolationModeExponential`
    * `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *lineTranslation;
 #endif
+
+/**
+ The transition affecting any changes to this layer’s `lineTranslation` property.
+
+ This property corresponds to the `line-translate-transition` property in the style JSON file format.
+*/
+@property (nonatomic) MGLTransition lineTranslationTransition;
 
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *lineTranslate __attribute__((unavailable("Use lineTranslation instead.")));
 
@@ -449,7 +505,7 @@ MGL_EXPORT
  
  You can set this property to an instance of:
  
- * `MGLStyleConstantValue`
+ * `MGLConstantStyleValue`
  * `MGLCameraStyleFunction` with an interpolation mode of
  `MGLInterpolationModeInterval`
  */
@@ -468,12 +524,19 @@ MGL_EXPORT
  
  You can set this property to an instance of:
  
- * `MGLStyleConstantValue`
+ * `MGLConstantStyleValue`
  * `MGLCameraStyleFunction` with an interpolation mode of:
    * `MGLInterpolationModeExponential`
    * `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *lineWidth;
+
+/**
+ The transition affecting any changes to this layer’s `lineWidth` property.
+
+ This property corresponds to the `line-width-transition` property in the style JSON file format.
+*/
+@property (nonatomic) MGLTransition lineWidthTransition;
 
 @end
 

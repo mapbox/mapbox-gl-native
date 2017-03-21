@@ -1,5 +1,5 @@
 // This file is generated.
-// Edit platform/darwin/scripts/generate-style-code.js, then run `make style-code-darwin`.
+// Edit platform/darwin/scripts/generate-style-code.js, then run `make darwin-style-code`.
 
 #import "MGLFoundation.h"
 #import "MGLStyleValue.h"
@@ -41,7 +41,7 @@ MGL_EXPORT
  
  You can set this property to an instance of:
  
- * `MGLStyleConstantValue`
+ * `MGLConstantStyleValue`
  * `MGLCameraStyleFunction` with an interpolation mode of:
    * `MGLInterpolationModeExponential`
    * `MGLInterpolationModeInterval`
@@ -60,13 +60,20 @@ MGL_EXPORT
  
  You can set this property to an instance of:
  
- * `MGLStyleConstantValue`
+ * `MGLConstantStyleValue`
  * `MGLCameraStyleFunction` with an interpolation mode of:
    * `MGLInterpolationModeExponential`
    * `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSColor *> *backgroundColor;
 #endif
+
+/**
+ The transition affecting any changes to this layer’s `backgroundColor` property.
+
+ This property corresponds to the `background-color-transition` property in the style JSON file format.
+*/
+@property (nonatomic) MGLTransition backgroundColorTransition;
 
 /**
  The opacity at which the background will be drawn.
@@ -77,12 +84,19 @@ MGL_EXPORT
  
  You can set this property to an instance of:
  
- * `MGLStyleConstantValue`
+ * `MGLConstantStyleValue`
  * `MGLCameraStyleFunction` with an interpolation mode of:
    * `MGLInterpolationModeExponential`
    * `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *backgroundOpacity;
+
+/**
+ The transition affecting any changes to this layer’s `backgroundOpacity` property.
+
+ This property corresponds to the `background-opacity-transition` property in the style JSON file format.
+*/
+@property (nonatomic) MGLTransition backgroundOpacityTransition;
 
 /**
  Name of image in style images to use for drawing an image background. For
@@ -91,11 +105,18 @@ MGL_EXPORT
  
  You can set this property to an instance of:
  
- * `MGLStyleConstantValue`
+ * `MGLConstantStyleValue`
  * `MGLCameraStyleFunction` with an interpolation mode of
  `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSString *> *backgroundPattern;
+
+/**
+ The transition affecting any changes to this layer’s `backgroundPattern` property.
+
+ This property corresponds to the `background-pattern-transition` property in the style JSON file format.
+*/
+@property (nonatomic) MGLTransition backgroundPatternTransition;
 
 @end
 

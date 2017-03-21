@@ -378,18 +378,11 @@ final class NativeMapView {
     return nativeGetScale();
   }
 
-  public void setZoom(double zoom) {
+  public void setZoom(double zoom, PointF focalPoint, long duration) {
     if (isDestroyedOn("setZoom")) {
       return;
     }
-    setZoom(zoom, 0);
-  }
-
-  public void setZoom(double zoom, long duration) {
-    if (isDestroyedOn("setZoom")) {
-      return;
-    }
-    nativeSetZoom(zoom, duration);
+    nativeSetZoom(zoom, focalPoint.x / pixelRatio, focalPoint.y / pixelRatio, duration);
   }
 
   public double getZoom() {
@@ -1023,7 +1016,7 @@ final class NativeMapView {
 
   private native double nativeGetScale();
 
-  private native void nativeSetZoom(double zoom, long duration);
+  private native void nativeSetZoom(double zoom, double cx, double cy, long duration);
 
   private native double nativeGetZoom();
 

@@ -1,13 +1,17 @@
 #import <Foundation/Foundation.h>
 
+#import "MGLFoundation.h"
 #include <mbgl/util/chrono.hpp>
 
-@interface NSDate (MGLAdditions)
+NS_ASSUME_NONNULL_BEGIN
+
 
 /// Converts from a duration in seconds to a duration object usable in mbgl.
-mbgl::Duration MGLDurationInSecondsFromTimeInterval(NSTimeInterval duration);
+MGL_EXPORT
+mbgl::Duration MGLDurationFromTimeInterval(NSTimeInterval duration);
 
 /// Converts from an mbgl duration object to a duration in seconds.
-NSTimeInterval MGLTimeIntervalFromDurationInSeconds(mbgl::Duration duration);
+MGL_EXPORT
+NSTimeInterval MGLTimeIntervalFromDuration(mbgl::Duration duration);
 
-@end
+NS_ASSUME_NONNULL_END

@@ -459,8 +459,8 @@ jni::jdouble NativeMapView::getScale(jni::JNIEnv&) {
     return map->getScale();
 }
 
-void NativeMapView::setZoom(jni::JNIEnv&, jni::jdouble zoom, jni::jlong duration) {
-    map->setZoom(zoom, mbgl::AnimationOptions{mbgl::Milliseconds(duration)});
+void NativeMapView::setZoom(jni::JNIEnv&, jni::jdouble zoom, jni::jdouble x, jni::jdouble y, jni::jlong duration) {
+    map->setZoom(zoom, mbgl::ScreenCoordinate{x,y}, mbgl::AnimationOptions{mbgl::Milliseconds(duration)});
 }
 
 jni::jdouble NativeMapView::getZoom(jni::JNIEnv&) {

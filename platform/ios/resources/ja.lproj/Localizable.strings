@@ -43,6 +43,9 @@
 /* Action sheet title */
 "SDK_NAME" = "Mapbox iOS SDK";
 
+/* Developer-only SDK update notification; {latest version, in format x.x.x} */
+"SDK_UPDATE_AVAILABLE" = "現在Mapbox iOS SDK %1$@が入手できる：";
+
 /* Telemetry prompt message */
 "TELEMETRY_DISABLED_MSG" = "You can help make OpenStreetMap and Mapbox maps better by contributing anonymous usage data.";
 

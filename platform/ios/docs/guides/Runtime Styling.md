@@ -44,6 +44,10 @@ The Mapbox SDK gives you access to all of the same tools we use to render our de
 
 Draw custom shapes on the map the same way you would a custom `UIView` or `CALayer`. These shapes keep their geographic scale and are perfect for visualizing everything from indoor floor plans to metro systems to hurricane tracks.
 
+## Next steps
+
+Check out the [iOS code examples](https://www.mapbox.com/ios-sdk/examples/runtime-toggle-layer/) to learn more about how to use runtime styling in your own apps.
+
 ## Resources
 
 * [Information for style authors](for-style-authors.html)

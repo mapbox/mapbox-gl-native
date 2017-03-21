@@ -14,7 +14,7 @@ import com.mapbox.mapboxsdk.R;
 /**
  * Bubble View for Android with custom stroke width and color, arrow size, position and direction.
  */
-class BubbleLayout extends LinearLayout {
+public class BubbleLayout extends LinearLayout {
 
   public static final float DEFAULT_STROKE_WIDTH = -1;
   private ArrowDirection arrowDirection;

@@ -8,21 +8,30 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 
 ## 3.5.0
 
+### Packaging
+
+* The minimum deployment target for this SDK is now iOS 8. ([#8129](https://github.com/mapbox/mapbox-gl-native/pull/8129))
+* Added support for the Carthage dependency manager. See [our website](https://www.mapbox.com/ios-sdk/) for setup instructions. ([#8257](https://github.com/mapbox/mapbox-gl-native/pull/8257))
+* While running your application in the iOS Simulator, you will receive a notice in the console if a newer version of this SDK is available. ([#8282](https://github.com/mapbox/mapbox-gl-native/pull/8282))
+
 ### Internationalization
 
 * Added support for right-to-left text and Arabic ligatures in labels. ([#6984](https://github.com/mapbox/mapbox-gl-native/pull/6984), [#7123](https://github.com/mapbox/mapbox-gl-native/pull/7123))
 * Improved the line wrapping behavior of point-placed labels, especially labels written in Chinese and Japanese. ([#6828](https://github.com/mapbox/mapbox-gl-native/pull/6828), [#7446](https://github.com/mapbox/mapbox-gl-native/pull/7446))
 * CJK characters now remain upright in vertically oriented labels that have line placement, such as road labels. ([#7114](https://github.com/mapbox/mapbox-gl-native/issues/7114))
-* Added Chinese (Simplified and Traditional), French, German, Japanese, Lithuanian, Polish, Portuguese (Brazilian), Russian, Spanish, Swedish, Ukrainian, and Vietnamese localizations. ([#7316](https://github.com/mapbox/mapbox-gl-native/pull/7316), [#7899](https://github.com/mapbox/mapbox-gl-native/pull/7899), [#7999](https://github.com/mapbox/mapbox-gl-native/pull/7999))
+* Added Catalan, Chinese (Simplified and Traditional), Dutch, Finnish, French, German, Japanese, Lithuanian, Polish, Portuguese (Brazilian), Russian, Spanish, Swedish, Ukrainian, and Vietnamese localizations. ([#7316](https://github.com/mapbox/mapbox-gl-native/pull/7316), [#7899](https://github.com/mapbox/mapbox-gl-native/pull/7899), [#7999](https://github.com/mapbox/mapbox-gl-native/pull/7999),
+[#8113](https://github.com/mapbox/mapbox-gl-native/pull/8113), [#8256](https://github.com/mapbox/mapbox-gl-native/pull/8256))
 
 ### Styles
 
 * Added support for data-driven styling in the form of source and composite style functions. `MGLStyleFunction` is now an abstract class, with `MGLCameraStyleFunction` providing the behavior of `MGLStyleFunction` in previous releases. New `MGLStyleFunction` subclasses allow you to vary a style attribute by the values of attributes of features in the source. ([#7596](https://github.com/mapbox/mapbox-gl-native/pull/7596))
+* Added methods to MGLShapeSource and MGLVectorSource for querying features loaded by the source, whether or not they’re visible on the map. ([#8263](https://github.com/mapbox/mapbox-gl-native/pull/8263))
 * Added `circleStrokeColor`, `circleStrokeWidth`, and `circleStrokeOpacity` properties to MGLCircleStyleLayer and support for corresponding properties in style JSON files. ([#7356](https://github.com/mapbox/mapbox-gl-native/pull/7356))
 * Point-placed labels in symbol style layers are now placed at more optimal locations within polygons. ([#7465](https://github.com/mapbox/mapbox-gl-native/pull/7465))
 * Fixed flickering that occurred when manipulating a style layer. ([#7616](https://github.com/mapbox/mapbox-gl-native/pull/7616))
 * Symbol style layers can now render point collections (known as multipoints in GeoJSON). ([#7445](https://github.com/mapbox/mapbox-gl-native/pull/7445))
-* Added properties to MGLStyle to delay or animate changes to style layers. ([#7711](https://github.com/mapbox/mapbox-gl-native/pull/7711))
+* Added a `transition` property to MGLStyle to customize the timing of changes to style layers. ([#7711](https://github.com/mapbox/mapbox-gl-native/pull/7711))
+* Added properties to MGLStyleLayer subclasses to customize the timing of transitions between values of individual attributes. ([#8225](https://github.com/mapbox/mapbox-gl-native/pull/8225))
 * Fixed an issue causing lines and text labels toward the top of the map view to appear blurry when the map is tilted. ([#7444](https://github.com/mapbox/mapbox-gl-native/pull/7444))
 * Fixed incorrect interpolation of style functions in Boolean-typed style attributes. ([#7526](https://github.com/mapbox/mapbox-gl-native/pull/7526))
 * Removed support for the `ref` property in layers in style JSON files. ([#7586](https://github.com/mapbox/mapbox-gl-native/pull/7586))
@@ -32,13 +41,20 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * Fixed an issue causing vector style layer predicates to be evaluated as if each feature had a `$type` attribute of 1, 2, or 3. The `$type` key path can now be compared to `Point`, `LineString`, or `Polygon`, as described in the documentation. ([#7971](https://github.com/mapbox/mapbox-gl-native/pull/7971))
 * When setting an `MGLShapeSource`’s shape to an `MGLFeature` instance, any `UIColor` attribute value is now converted to the equivalent CSS string representation for use with `MGLInterpolationModeIdentity` in style functions. ([#8025](https://github.com/mapbox/mapbox-gl-native/pull/8025))
 * An exception is no longer thrown if layers or sources are removed from a style before they are added. ([#7962](https://github.com/mapbox/mapbox-gl-native/pull/7962))
-* Added feature querying on vector and GeoJSON sources [#8263](https://github.com/mapbox/mapbox-gl-native/pull/8263)
+* Renamed MGLStyleConstantValue to MGLConstantStyleValue. For compatibility with previous releases, MGLStyleConstantValue is now an alias of MGLConstantStyleValue. ([#8090](https://github.com/mapbox/mapbox-gl-native/pull/8090))
+* Fixed a crash that could occur when switching styles after adding an MGLSource to the style. ([#8298](https://github.com/mapbox/mapbox-gl-native/pull/8298))
 
-### User interaction
+### Annotations and user interaction
 
 * Added a method to MGLMapViewDelegate, `-mapView:shouldChangeFromCamera:toCamera:`, that you can implement to restrict which parts the user can navigate to using gestures. ([#5584](https://github.com/mapbox/mapbox-gl-native/pull/5584))
 * Annotations are no longer deselected when the map is panned or zoomed, even if the annotation moves out of the visible bounds. ([#8022](https://github.com/mapbox/mapbox-gl-native/pull/8022))
+* Changing the coordinates of a point annotation no longer deselects the annotation. ([#8269](https://github.com/mapbox/mapbox-gl-native/pull/8269))
+* Fixed an issue that could cause a crash when point annotations were added and removed while simultaneously querying source features. ([#8374](https://github.com/mapbox/mapbox-gl-native/pull/8374))
+* Fixed an issue preventing MGLMapView from adding a polyline annotation with the same coordinates as a polygon annotation. ([#8355](https://github.com/mapbox/mapbox-gl-native/pull/8355))
+* Fixed an issue where translucent, non-view-backed point annotations along tile boundaries would be drawn darker than expected. ([#6832](https://github.com/mapbox/mapbox-gl-native/pull/6832))
 * Double-tap and two-finger tap gestures now zoom to the nearest integer zoom level. ([#8027](https://github.com/mapbox/mapbox-gl-native/pull/8027))
+* The `MGLAnnotationView.annotation` property is now read-write. ([#8139](https://github.com/mapbox/mapbox-gl-native/pull/8139))
+* Enabled the one-finger zoom gesture on iPad. To execute this gesture, tap twice; on second tap, hold your finger on the map and pan up to zoom in, or down to zoom out. ([#8379](https://github.com/mapbox/mapbox-gl-native/pull/8379))
 
 ### Networking and offline maps
 
@@ -46,13 +62,12 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * Fixed a memory leak in MGLMapView. ([#7956](https://github.com/mapbox/mapbox-gl-native/pull/7956))
 * Fixed an issue that could prevent a cached style from appearing while the device is offline. ([#7770](https://github.com/mapbox/mapbox-gl-native/pull/7770))
 * Fixed an issue that could prevent a style from loading when reestablishing a network connection. ([#7902](https://github.com/mapbox/mapbox-gl-native/pull/7902))
-* `MGLOfflineStorage` instances now support a delegate conforming to `MGLOfflineStorageDelegate`, which allows altering URLs before they are requested from the internet. ([#8084](https://github.com/mapbox/mapbox-gl-native/pull/8084))
+* `MGLOfflineStorage` instances now support a delegate conforming to `MGLOfflineStorageDelegate`, which allows altering URLs before they are requested from the Internet. ([#8084](https://github.com/mapbox/mapbox-gl-native/pull/8084))
 
 ### Other changes
 
-* The minimum deployment target for this SDK is now iOS 8. ([#8129](https://github.com/mapbox/mapbox-gl-native/pull/8129))
 * Fixed an issue that, among other things, caused various islands to disappear at certain zoom levels. ([#7621](https://github.com/mapbox/mapbox-gl-native/pull/7621))
-* Fixed an issue where translucent, non-view-backed point annotations along tile boundaries would be drawn darker than expected. ([#6832](https://github.com/mapbox/mapbox-gl-native/pull/6832))
+* Added a method to MGLMapView that allows you to specify a predicate when querying for visible features. ([#8256](https://github.com/mapbox/mapbox-gl-native/pull/8246))
 * Fixed flickering that occurred when panning past the antimeridian. ([#7574](https://github.com/mapbox/mapbox-gl-native/pull/7574))
 * Fixed an issue that sometimes caused crashes when the SDK interacted with the file system in the background. ([#8125](https://github.com/mapbox/mapbox-gl-native/pull/8125))
 * Added a `MGLDistanceFormatter` class for formatting geographic distances. ([#7888](https://github.com/mapbox/mapbox-gl-native/pull/7888))
@@ -108,7 +123,7 @@ This is the final scheduled version of the Mapbox iOS SDK that supports iOS 7. (
 * A source’s tiles are no longer rendered when the map is outside the source’s supported zoom levels. ([#6345](https://github.com/mapbox/mapbox-gl-native/pull/6345))
 * Improved style parsing performance. ([#6170](https://github.com/mapbox/mapbox-gl-native/pull/6170))
 * Improved feature querying performance. ([#6514](https://github.com/mapbox/mapbox-gl-native/pull/6514))
-* Fixed an issue where shapes that cannot currently be visually represented as annotations were still shown on the map as point annotations. ([#6764](https://github.com/mapbox/mapbox-gl-native/issues/6764)) 
+* Fixed an issue where shapes that cannot currently be visually represented as annotations were still shown on the map as point annotations. ([#6764](https://github.com/mapbox/mapbox-gl-native/issues/6764))
 
 ### User location
 

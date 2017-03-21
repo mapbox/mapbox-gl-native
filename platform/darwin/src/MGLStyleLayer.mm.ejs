@@ -10,6 +10,7 @@
 #import "MGLSource.h"
 #import "MGLMapView_Private.h"
 #import "NSPredicate+MGLAdditions.h"
+#import "NSDate+MGLAdditions.h"
 #import "MGLStyleLayer_Private.h"
 #import "MGLStyleValue_Private.h"
 #import "MGL<%- camelize(type) %>StyleLayer.h"
@@ -228,8 +229,8 @@ namespace mbgl {
 <% } -%>
 <% if (paintProperties.length) { -%>
 #pragma mark - Accessing the Paint Attributes
-
 <% for (const property of paintProperties) { -%>
+
 - (void)set<%- camelize(property.name) %>:(MGLStyleValue<<%- propertyType(property, true) %>> *)<%- objCName(property) %> {
     MGLAssertStyleLayerIsValid();
 
@@ -270,15 +271,34 @@ namespace mbgl {
 <% } -%>
 <% } -%>
 }
+<% if (property["transition"]) { -%>
 
+- (void)set<%- camelize(property.name) %>Transition:(MGLTransition )transition {
+    MGLAssertStyleLayerIsValid();
+
+    mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
+    self.rawLayer->set<%- camelize(originalPropertyName(property)) %>Transition(options);
+}
+
+- (MGLTransition)<%- objCGetter(property) %>Transition {
+    MGLAssertStyleLayerIsValid();
+
+    mbgl::style::TransitionOptions transitionOptions = self.rawLayer->get<%- camelize(originalPropertyName(property)) %>Transition();
+    MGLTransition transition;
+    transition.duration = MGLTimeIntervalFromDuration(transitionOptions.duration.value_or(mbgl::Duration::zero()));
+    transition.delay = MGLTimeIntervalFromDuration(transitionOptions.delay.value_or(mbgl::Duration::zero()));
+
+    return transition;
+}
+<% } -%>
 <% if (property.original) { -%>
+
 - (void)set<%- camelize(originalPropertyName(property)) %>:(MGLStyleValue<<%- propertyType(property, true) %>> *)<%- camelizeWithLeadingLowercase(originalPropertyName(property)) %> {
 }
 
 - (MGLStyleValue<<%- propertyType(property, true) %>> *)<%- camelizeWithLeadingLowercase(originalPropertyName(property)) %> {
     return self.<%- objCGetter(property) %>;
 }
-
 <% } -%>
 <% } -%>
 <% } -%>

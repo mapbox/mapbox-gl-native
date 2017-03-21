@@ -8,4 +8,9 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
 
+    <application>
+        <!-- Include the telemetry service to simplify set up (https://www.mapbox.com/telemetry) -->
+        <service android:name="com.mapbox.services.android.telemetry.service.TelemetryService"/>
+    </application>
+
 </manifest>

@@ -2,10 +2,12 @@
 // Edit platform/darwin/scripts/generate-style-code.js, then run `make darwin-style-code`.
 
 #import "MGLStyleLayerTests.h"
+#import "../../darwin/src/NSDate+MGLAdditions.h"
 
 #import "MGLStyleLayer_Private.h"
 
 #include <mbgl/style/layers/fill_layer.hpp>
+#include <mbgl/style/transition_options.hpp>
 
 @interface MGLFillLayerTests : MGLStyleLayerTests
 @end
@@ -42,6 +44,9 @@
     XCTAssertNotEqual(layer.rawLayer, nullptr);
     XCTAssertTrue(layer.rawLayer->is<mbgl::style::FillLayer>());
     auto rawLayer = layer.rawLayer->as<mbgl::style::FillLayer>();
+
+    MGLTransition transitionTest = MGLTransitionMake(5, 4);
+
 
     // fill-antialias
     {
@@ -137,6 +142,15 @@
                       @"Unsetting fillColor should return fill-color to the default value.");
         XCTAssertEqualObjects(layer.fillColor, defaultStyleValue,
                               @"fillColor should return the default value after being unset.");
+        // Transition property test
+        layer.fillColorTransition = transitionTest;
+        auto toptions = rawLayer->getFillColorTransition();
+        XCTAssert(toptions.delay && MGLTimeIntervalFromDuration(*toptions.delay) == transitionTest.delay);
+        XCTAssert(toptions.duration && MGLTimeIntervalFromDuration(*toptions.duration) == transitionTest.duration);
+
+        MGLTransition fillColorTransition = layer.fillColorTransition;
+        XCTAssertEqual(fillColorTransition.delay, transitionTest.delay);
+        XCTAssertEqual(fillColorTransition.duration, transitionTest.duration);
     }
 
     // fill-opacity
@@ -194,6 +208,15 @@
                       @"Unsetting fillOpacity should return fill-opacity to the default value.");
         XCTAssertEqualObjects(layer.fillOpacity, defaultStyleValue,
                               @"fillOpacity should return the default value after being unset.");
+        // Transition property test
+        layer.fillOpacityTransition = transitionTest;
+        auto toptions = rawLayer->getFillOpacityTransition();
+        XCTAssert(toptions.delay && MGLTimeIntervalFromDuration(*toptions.delay) == transitionTest.delay);
+        XCTAssert(toptions.duration && MGLTimeIntervalFromDuration(*toptions.duration) == transitionTest.duration);
+
+        MGLTransition fillOpacityTransition = layer.fillOpacityTransition;
+        XCTAssertEqual(fillOpacityTransition.delay, transitionTest.delay);
+        XCTAssertEqual(fillOpacityTransition.duration, transitionTest.duration);
     }
 
     // fill-outline-color
@@ -251,6 +274,15 @@
                       @"Unsetting fillOutlineColor should return fill-outline-color to the default value.");
         XCTAssertEqualObjects(layer.fillOutlineColor, defaultStyleValue,
                               @"fillOutlineColor should return the default value after being unset.");
+        // Transition property test
+        layer.fillOutlineColorTransition = transitionTest;
+        auto toptions = rawLayer->getFillOutlineColorTransition();
+        XCTAssert(toptions.delay && MGLTimeIntervalFromDuration(*toptions.delay) == transitionTest.delay);
+        XCTAssert(toptions.duration && MGLTimeIntervalFromDuration(*toptions.duration) == transitionTest.duration);
+
+        MGLTransition fillOutlineColorTransition = layer.fillOutlineColorTransition;
+        XCTAssertEqual(fillOutlineColorTransition.delay, transitionTest.delay);
+        XCTAssertEqual(fillOutlineColorTransition.duration, transitionTest.duration);
     }
 
     // fill-pattern
@@ -290,6 +322,15 @@
         XCTAssertThrowsSpecificNamed(layer.fillPattern = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
         functionStyleValue = [MGLStyleValue<NSString *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
         XCTAssertThrowsSpecificNamed(layer.fillPattern = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
+        // Transition property test
+        layer.fillPatternTransition = transitionTest;
+        auto toptions = rawLayer->getFillPatternTransition();
+        XCTAssert(toptions.delay && MGLTimeIntervalFromDuration(*toptions.delay) == transitionTest.delay);
+        XCTAssert(toptions.duration && MGLTimeIntervalFromDuration(*toptions.duration) == transitionTest.duration);
+
+        MGLTransition fillPatternTransition = layer.fillPatternTransition;
+        XCTAssertEqual(fillPatternTransition.delay, transitionTest.delay);
+        XCTAssertEqual(fillPatternTransition.duration, transitionTest.duration);
     }
 
     // fill-translate

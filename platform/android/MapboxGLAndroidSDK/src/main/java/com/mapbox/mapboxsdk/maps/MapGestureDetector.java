@@ -4,13 +4,13 @@ import android.content.Context;
 import android.graphics.PointF;
 import android.location.Location;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.ScaleGestureDetectorCompat;
 import android.view.InputDevice;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.ViewConfiguration;
-import android.widget.ZoomButtonsController;
 
 import com.almeros.android.multitouch.gesturedetectors.RotateGestureDetector;
 import com.almeros.android.multitouch.gesturedetectors.ShoveGestureDetector;
@@ -93,6 +93,20 @@ final class MapGestureDetector {
   }
 
   /**
+   * Get the current active gesture focal point.
+   * <p>
+   * This could be either the user provided focal point in {@link UiSettings#setFocalPoint(PointF)} or the focal point
+   * defined as a result of {@link TrackingSettings#setMyLocationEnabled(boolean)}.
+   * </p>
+   *
+   * @return the current active gesture focal point.
+   */
+  @Nullable
+  PointF getFocalPoint() {
+    return focalPoint;
+  }
+
+  /**
    * Given coordinates from a gesture, use the current projection to translate it into
    * a Location object.
    *
@@ -159,10 +173,10 @@ final class MapGestureDetector {
 
         if (twoTap && isTap && !inProgress) {
           if (focalPoint != null) {
-            transform.zoom(false, focalPoint.x, focalPoint.y);
+            transform.zoom(false, focalPoint);
           } else {
             PointF focalPoint = TwoFingerGestureDetector.determineFocalPoint(event);
-            transform.zoom(false, focalPoint.x, focalPoint.y);
+            transform.zoom(false, focalPoint);
           }
           twoTap = false;
           return true;
@@ -262,10 +276,10 @@ final class MapGestureDetector {
           // Single finger double tap
           if (focalPoint != null) {
             // User provided focal point
-            transform.zoom(true, focalPoint.x, focalPoint.y);
+            transform.zoom(true, focalPoint);
           } else {
             // Zoom in on gesture
-            transform.zoom(true, e.getX(), e.getY());
+            transform.zoom(true, new PointF(e.getX(), e.getY()));
           }
           break;
       }
@@ -633,34 +647,6 @@ final class MapGestureDetector {
       dragStarted = true;
 
       return true;
-    }
-  }
-
-  // This class handles input events from the zoom control buttons
-  // Zoom controls allow single touch only devices to zoom in and out
-  private static class OnZoomListener implements ZoomButtonsController.OnZoomListener {
-
-    private UiSettings uiSettings;
-    private Transform transform;
-
-    OnZoomListener(UiSettings uiSettings, Transform transform) {
-      this.uiSettings = uiSettings;
-      this.transform = transform;
-    }
-
-    // Not used
-    @Override
-    public void onVisibilityChanged(boolean visible) {
-      // Ignore
-    }
-
-    // Called when user pushes a zoom button
-    @Override
-    public void onZoom(boolean zoomIn) {
-      if (!uiSettings.isZoomGesturesEnabled()) {
-        return;
-      }
-      transform.zoom(zoomIn);
     }
   }
 

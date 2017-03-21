@@ -224,6 +224,11 @@ public:
     void setTransition(const TransitionOptions& value, const optional<std::string>& klass) {
         cascading.template get<P>().setTransition(value, klass);
     }
+    
+    template <class P>
+    auto getTransition(const optional<std::string>& klass) const {
+        return cascading.template get<P>().getTransition(klass);
+    }
 
     void cascade(const CascadeParameters& parameters) {
         unevaluated = Unevaluated {

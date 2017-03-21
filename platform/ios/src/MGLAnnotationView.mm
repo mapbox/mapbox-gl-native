@@ -239,7 +239,10 @@
     }
     else if (dragState == MGLAnnotationViewDragStateCanceling)
     {
-        NSAssert(self.annotation, @"Annotation property should not be nil.");
+        if (!self.annotation) {
+            [NSException raise:NSInvalidArgumentException
+                        format:@"Annotation property should not be nil."];
+        }
         self.panGestureRecognizer.enabled = NO;
         self.longPressRecognizer.enabled = NO;
         self.center = [self.mapView convertCoordinate:self.annotation.coordinate toPointToView:self.mapView];

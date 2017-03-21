@@ -6,7 +6,7 @@
   const enumProperties = locals.enumProperties;
 -%>
 // This file is generated.
-// Edit platform/darwin/scripts/generate-style-code.js, then run `make style-code-darwin`.
+// Edit platform/darwin/scripts/generate-style-code.js, then run `make darwin-style-code`.
 
 #import "MGLFoundation.h"
 #import "MGLStyleValue.h"
@@ -111,6 +111,15 @@ MGL_EXPORT
  */
 @property (nonatomic<% if (!property.required) { %>, null_resettable<% } if (property.getter) { %>, getter=<%- objCGetter(property) -%><% } %>) MGLStyleValue<<%- propertyType(property, true) %>> *<%- camelizeWithLeadingLowercase(property.name) %>;
 
+<% if (property["transition"]) { -%>
+/**
+ The transition affecting any changes to this layer’s `<%- camelizeWithLeadingLowercase(property.name) %>` property.
+
+ This property corresponds to the `<%- originalPropertyName(property) %>-transition` property in the style JSON file format.
+*/
+@property (nonatomic) MGLTransition <%- camelizeWithLeadingLowercase(property.name) %>Transition;
+
+<% } -%>
 <% if (property.original) { -%>
 @property (nonatomic<% if (!property.required) { %>, null_resettable<% } %>) MGLStyleValue<<%- propertyType(property, true) %>> *<%- camelizeWithLeadingLowercase(originalPropertyName(property)) %> __attribute__((unavailable("Use <%- camelizeWithLeadingLowercase(property.name) %> instead.")));
 

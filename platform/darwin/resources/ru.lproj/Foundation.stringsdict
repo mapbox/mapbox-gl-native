@@ -18,6 +18,8 @@
 			<string>%d градуса</string>
 			<key>many</key>
 			<string>%d градусов</string>
+			<key>other</key>
+			<string>%d градуса</string>
 		</dict>
 	</dict>
 	<key>COORD_MIN_LONG</key>
@@ -36,6 +38,8 @@
 			<string>%d минуты</string>
 			<key>many</key>
 			<string>%d минут</string>
+			<key>other</key>
+			<string>%d минуты</string>
 		</dict>
 	</dict>
 	<key>COORD_SEC_LONG</key>
@@ -54,6 +58,8 @@
 			<string>%d секунды</string>
 			<key>many</key>
 			<string>%d секунд</string>
+			<key>other</key>
+			<string>%d секунды</string>
 		</dict>
 	</dict>
 </dict>

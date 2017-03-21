@@ -229,6 +229,12 @@ MGL_EXPORT
 /**
  An `MGLShapeCollectionFeature` object associates a shape collection with an
  optional identifier and attributes.
+ 
+ `MGLShapeCollectionFeature` is most commonly used to add multiple shapes to a single
+ `MGLShapeSource`. Configure the appearance of an `MGLSource`’s shape collection
+ collectively using an `MGLSymbolStyleLayer` object, or use multiple instances of
+ `MGLCircleStyleLayer`, `MGLFillStyleLayer`, and `MGLLineStyleLayer` to
+ configure the appearance of each kind of shape inside the collection.
 
  A shape collection feature is known as a
  <a href="https://tools.ietf.org/html/rfc7946#section-3.3">feature collection</a>

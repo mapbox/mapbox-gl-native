@@ -27,6 +27,8 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         buildConfigField "String", "GIT_REVISION_SHORT", String.format("\"%s\"", getGitRevision())
+        buildConfigField "String", "MAPBOX_VERSION_STRING", String.format("\"Mapbox/%s\"", project.VERSION_NAME)
+        buildConfigField "String", "MAPBOX_EVENTS_USER_AGENT", String.format("\"MapboxEventsAndroid/%s\"", project.VERSION_NAME)
     }
 
     defaultPublishConfig project.hasProperty("mapbox.buildtype") ?  project.getProperty("mapbox.buildtype") : "debug"

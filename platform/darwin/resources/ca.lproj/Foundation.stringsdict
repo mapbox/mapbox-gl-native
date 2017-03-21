@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>COORD_DEG_LONG</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@degrees@</string>
+		<key>degrees</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%d grau</string>
+			<key>other</key>
+			<string>%d graus</string>
+		</dict>
+	</dict>
+	<key>COORD_MIN_LONG</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@minutes@</string>
+		<key>minutes</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%d minut</string>
+			<key>other</key>
+			<string>%d minuts</string>
+		</dict>
+	</dict>
+	<key>COORD_SEC_LONG</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@seconds@</string>
+		<key>seconds</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%d segon</string>
+			<key>other</key>
+			<string>%d segons</string>
+		</dict>
+	</dict>
+</dict>
+</plist>

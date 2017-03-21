@@ -541,9 +541,7 @@ public:
             const mbgl::Point<double> point = MGLPointFromLocationCoordinate2D(annotation.coordinate);
             MGLAnnotationImage *annotationImage = [self imageOfAnnotationWithTag:annotationTag];
             _mbglMap->updateAnnotation(annotationTag, mbgl::SymbolAnnotation { point, annotationImage.styleIconIdentifier.UTF8String ?: "" });
-            if (annotationTag == _selectedAnnotationTag) {
-                [self deselectAnnotation:annotation];
-            }
+            [self updateAnnotationCallouts];
         }
     } else if ([keyPath isEqualToString:@"coordinates"] &&
                [object isKindOfClass:[MGLMultiPoint class]]) {
@@ -557,12 +555,7 @@ public:
         // but safely updated.
         if (annotation == [self annotationWithTag:annotationTag]) {
             _mbglMap->updateAnnotation(annotationTag, [annotation annotationObjectWithDelegate:self]);
-            // We don't current support shape multipoint annotation selection, but let's make sure
-            // deselection is handled just to avoid problems in the future.
-            if (annotationTag == _selectedAnnotationTag)
-            {
-                [self deselectAnnotation:annotation];
-            }
+            [self updateAnnotationCallouts];
         }
     }
 }
@@ -1000,7 +993,7 @@ public:
     [self willChangeValueForKey:@"centerCoordinate"];
     _mbglMap->setLatLng(MGLLatLngFromLocationCoordinate2D(centerCoordinate),
                         MGLEdgeInsetsFromNSEdgeInsets(self.contentInsets),
-                        MGLDurationInSecondsFromTimeInterval(animated ? MGLAnimationDuration : 0));
+                        MGLDurationFromTimeInterval(animated ? MGLAnimationDuration : 0));
     [self didChangeValueForKey:@"centerCoordinate"];
 }
 
@@ -1009,7 +1002,7 @@ public:
     _mbglMap->cancelTransitions();
     MGLMapCamera *oldCamera = self.camera;
     _mbglMap->moveBy({ delta.x, delta.y },
-                     MGLDurationInSecondsFromTimeInterval(animated ? MGLAnimationDuration : 0));
+                     MGLDurationFromTimeInterval(animated ? MGLAnimationDuration : 0));
     if ([self.delegate respondsToSelector:@selector(mapView:shouldChangeFromCamera:toCamera:)]
         && ![self.delegate mapView:self shouldChangeFromCamera:oldCamera toCamera:self.camera]) {
         self.camera = oldCamera;
@@ -1049,7 +1042,7 @@ public:
     [self willChangeValueForKey:@"zoomLevel"];
     _mbglMap->setZoom(zoomLevel,
                       MGLEdgeInsetsFromNSEdgeInsets(self.contentInsets),
-                      MGLDurationInSecondsFromTimeInterval(animated ? MGLAnimationDuration : 0));
+                      MGLDurationFromTimeInterval(animated ? MGLAnimationDuration : 0));
     [self didChangeValueForKey:@"zoomLevel"];
 }
 
@@ -1063,7 +1056,7 @@ public:
     double newZoom = round(self.zoomLevel) + zoomDelta;
     MGLMapCamera *oldCamera = self.camera;
     mbgl::ScreenCoordinate center(point.x, self.bounds.size.height - point.y);
-    _mbglMap->setZoom(newZoom, center, MGLDurationInSecondsFromTimeInterval(animated ? MGLAnimationDuration : 0));
+    _mbglMap->setZoom(newZoom, center, MGLDurationFromTimeInterval(animated ? MGLAnimationDuration : 0));
     if ([self.delegate respondsToSelector:@selector(mapView:shouldChangeFromCamera:toCamera:)]
         && ![self.delegate mapView:self shouldChangeFromCamera:oldCamera toCamera:self.camera]) {
         self.camera = oldCamera;
@@ -1077,7 +1070,7 @@ public:
     [self willChangeValueForKey:@"zoomLevel"];
     MGLMapCamera *oldCamera = self.camera;
     mbgl::ScreenCoordinate center(point.x, self.bounds.size.height - point.y);
-    _mbglMap->scaleBy(scaleFactor, center, MGLDurationInSecondsFromTimeInterval(animated ? MGLAnimationDuration : 0));
+    _mbglMap->scaleBy(scaleFactor, center, MGLDurationFromTimeInterval(animated ? MGLAnimationDuration : 0));
     if ([self.delegate respondsToSelector:@selector(mapView:shouldChangeFromCamera:toCamera:)]
         && ![self.delegate mapView:self shouldChangeFromCamera:oldCamera toCamera:self.camera]) {
         self.camera = oldCamera;
@@ -1138,7 +1131,7 @@ public:
     [self willChangeValueForKey:@"direction"];
     _mbglMap->setBearing(direction,
                          MGLEdgeInsetsFromNSEdgeInsets(self.contentInsets),
-                         MGLDurationInSecondsFromTimeInterval(animated ? MGLAnimationDuration : 0));
+                         MGLDurationFromTimeInterval(animated ? MGLAnimationDuration : 0));
     [self didChangeValueForKey:@"direction"];
 }
 
@@ -1166,7 +1159,7 @@ public:
 - (void)setCamera:(MGLMapCamera *)camera withDuration:(NSTimeInterval)duration animationTimingFunction:(nullable CAMediaTimingFunction *)function completionHandler:(nullable void (^)(void))completion {
     mbgl::AnimationOptions animationOptions;
     if (duration > 0) {
-        animationOptions.duration.emplace(MGLDurationInSecondsFromTimeInterval(duration));
+        animationOptions.duration.emplace(MGLDurationFromTimeInterval(duration));
         animationOptions.easing.emplace(MGLUnitBezierForMediaTimingFunction(function));
     }
     if (completion) {
@@ -1207,7 +1200,7 @@ public:
 - (void)flyToCamera:(MGLMapCamera *)camera withDuration:(NSTimeInterval)duration peakAltitude:(CLLocationDistance)peakAltitude completionHandler:(nullable void (^)(void))completion {
     mbgl::AnimationOptions animationOptions;
     if (duration >= 0) {
-        animationOptions.duration = MGLDurationInSecondsFromTimeInterval(duration);
+        animationOptions.duration = MGLDurationFromTimeInterval(duration);
     }
     if (peakAltitude >= 0) {
         CLLocationDegrees peakLatitude = (self.centerCoordinate.latitude + camera.centerCoordinate.latitude) / 2;
@@ -1284,7 +1277,7 @@ public:
     mbgl::CameraOptions cameraOptions = _mbglMap->cameraForLatLngBounds(MGLLatLngBoundsFromCoordinateBounds(bounds), padding);
     mbgl::AnimationOptions animationOptions;
     if (animated) {
-        animationOptions.duration = MGLDurationInSecondsFromTimeInterval(MGLAnimationDuration);
+        animationOptions.duration = MGLDurationFromTimeInterval(MGLAnimationDuration);
     }
     
     MGLMapCamera *camera = [self cameraForCameraOptions:cameraOptions];
@@ -1846,7 +1839,7 @@ public:
     return annotationContext.annotation;
 }
 
-/// Returns the annotation tag assigned to the given annotation. Relatively expensive.
+/// Returns the annotation tag assigned to the given annotation.
 - (MGLAnnotationTag)annotationTagForAnnotation:(id <MGLAnnotation>)annotation {
     if (!annotation || _annotationTagsByAnnotation.count(annotation) == 0) {
         return MGLAnnotationTagNotFound;
@@ -1874,8 +1867,7 @@ public:
         NSAssert([annotation conformsToProtocol:@protocol(MGLAnnotation)], @"Annotation does not conform to MGLAnnotation");
 
         // adding the same annotation object twice is a no-op
-        if ([self.annotations containsObject:annotation])
-        {
+        if (_annotationTagsByAnnotation.count(annotation) != 0) {
             continue;
         }
 
@@ -2446,9 +2438,11 @@ public:
 
 - (void)addOverlays:(NS_ARRAY_OF(id <MGLOverlay>) *)overlays
 {
+#if DEBUG
     for (id <MGLOverlay> overlay in overlays) {
         NSAssert([overlay conformsToProtocol:@protocol(MGLOverlay)], @"Overlay does not conform to MGLOverlay");
     }
+#endif
     [self addAnnotations:overlays];
 }
 
@@ -2457,9 +2451,11 @@ public:
 }
 
 - (void)removeOverlays:(NS_ARRAY_OF(id <MGLOverlay>) *)overlays {
+#if DEBUG
     for (id <MGLOverlay> overlay in overlays) {
         NSAssert([overlay conformsToProtocol:@protocol(MGLOverlay)], @"Overlay does not conform to MGLOverlay");
     }
+#endif
     [self removeAnnotations:overlays];
 }
 

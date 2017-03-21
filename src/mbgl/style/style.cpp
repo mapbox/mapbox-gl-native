@@ -330,15 +330,13 @@ void Style::recalculate(float z, const TimePoint& timePoint, MapMode mode) {
 
     hasPendingTransitions = false;
     for (const auto& layer : layers) {
-        const bool hasTransitions = layer->baseImpl->evaluate(parameters);
+        hasPendingTransitions |= layer->baseImpl->evaluate(parameters);
 
         // Disable this layer if it doesn't need to be rendered.
         const bool needsRendering = layer->baseImpl->needsRendering(zoomHistory.lastZoom);
         if (!needsRendering) {
             continue;
         }
-
-        hasPendingTransitions |= hasTransitions;
 
         // If this layer has a source, make sure that it gets loaded.
         if (Source* source = getSource(layer->baseImpl->source)) {

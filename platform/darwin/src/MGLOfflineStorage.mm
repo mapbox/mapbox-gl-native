@@ -31,6 +31,7 @@ NSString * const MGLOfflinePackMaximumCountUserInfoKey = MGLOfflinePackUserInfoK
 
 @property (nonatomic, strong, readwrite) NS_MUTABLE_ARRAY_OF(MGLOfflinePack *) *packs;
 @property (nonatomic) mbgl::DefaultFileSource *mbglFileSource;
+@property (nonatomic, getter=isPaused) BOOL paused;
 
 @end
 
@@ -53,11 +54,19 @@ NSString * const MGLOfflinePackMaximumCountUserInfoKey = MGLOfflinePackUserInfoK
 
 #if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
 - (void)pauseFileSource:(__unused NSNotification *)notification {
+    if (self.isPaused) {
+        return;
+    }
     _mbglFileSource->pause();
+    self.paused = YES;
 }
 
 - (void)unpauseFileSource:(__unused NSNotification *)notification {
+    if (!self.isPaused) {
+        return;
+    }
     _mbglFileSource->resume();
+    self.paused = NO;
 }
 #endif
 

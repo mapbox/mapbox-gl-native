@@ -10,7 +10,18 @@
     <com.mapbox.mapboxsdk.maps.MapView
         android:id="@+id/mapView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        app:mapbox_uiAttribution="false"
+        app:mapbox_uiCompass="false"
+        app:mapbox_uiLogo="false"/>
+
+    <TextView
+        android:id="@+id/textZoom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|start"
+        android:layout_margin="8dp"
+        android:textSize="14sp"/>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fabDebug"

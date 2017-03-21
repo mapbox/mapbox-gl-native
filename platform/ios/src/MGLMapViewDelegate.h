@@ -22,12 +22,11 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark Responding to Map Position Changes
 
 /**
- Tells the delegate that the viewpoint depicted by the map view is about to
- change.
-
+ Tells the delegate that the viewpoint depicted by the map view is about to change.
+ 
  This method is called whenever the currently displayed map camera will start
  changing for any reason.
-
+ 
  @param mapView The map view whose viewpoint will change.
  @param animated Whether the change will cause an animated effect on the map.
  */
@@ -38,10 +37,12 @@ NS_ASSUME_NONNULL_BEGIN
 
  This method is called as the currently displayed map camera changes as part of
  an animation, whether due to a user gesture or due to a call to a method such
- as `-[MGLMapView setCamera:animated:]`. During the animation, this method may
- be called many times to report updates to the viewpoint. Therefore, your
- implementation of this method should be as lightweight as possible to avoid
- affecting performance.
+ as `-[MGLMapView setCamera:animated:]`. This method can be called before
+ `-mapViewDidFinishLoadingMap:` is called.
+ 
+ During the animation, this method may be called many times to report updates to 
+ the viewpoint. Therefore, your implementation of this method should be as lightweight 
+ as possible to avoid affecting performance.
 
  @param mapView The map view whose viewpoint is changing.
  */
@@ -52,7 +53,8 @@ NS_ASSUME_NONNULL_BEGIN
  changing.
 
  This method is called whenever the currently displayed map camera has finished
- changing, after any calls to `-mapViewRegionIsChanging:` due to animation.
+ changing, after any calls to `-mapViewRegionIsChanging:` due to animation. Therefore, 
+ this method can be called before `-mapViewDidFinishLoadingMap:` is called.
 
  @param mapView The map view whose viewpoint has changed.
  @param animated Whether the change caused an animated effect on the map.

@@ -2,6 +2,83 @@
 
 Mapbox welcomes participation and contributions from everyone.  If you'd like to do so please see the [`Contributing Guide`](https://github.com/mapbox/mapbox-gl-native/blob/master/CONTRIBUTING.md) first to get started.
 
+## 5.0.0 - March 17th, 2017
+
+5.0.0 final release contains:
+
+* Support for data-driven styles [#7752](https://github.com/mapbox/mapbox-gl-native/pull/7752)
+* Additional APIs to manage runtime styling layers [#8195](https://github.com/mapbox/mapbox-gl-native/pull/8195)
+* Allow query all features in sources (`querySourceFeatures`) [#5792](https://github.com/mapbox/mapbox-gl-native/issues/5792)
+* Improve accessibility TalkBack support by including content description in views [#8230](https://github.com/mapbox/mapbox-gl-native/pull/8230)
+* Consistent double tap zoom acceleration [#7514](https://github.com/mapbox/mapbox-gl-native/issues/7514)
+* Allow zooming/scaling to use `AnimationOptions` [#8181](https://github.com/mapbox/mapbox-gl-native/pull/8181)
+* Cleanup inconsistencies `float` vs `double` [#4445](https://github.com/mapbox/mapbox-gl-native/issues/4445)
+* Add `mapbox_` prefix to attributes [#6482](https://github.com/mapbox/mapbox-gl-native/issues/6482)
+* Update LOST to 2.x [#6573](https://github.com/mapbox/mapbox-gl-native/issues/6537)
+* MAS submodules (`geojson`, `telemetry`) are now smaller to reduce the overall method count [#7642](https://github.com/mapbox/mapbox-gl-native/pull/7642)
+* Telemetry Service is now include automatically via Manifest merge to simplify set up [#8338](https://github.com/mapbox/mapbox-gl-native/pull/8338)
+* Support for Android Nougat [#5910](5910-move-listener-logic-for-nougat)
+  - Move location listening logic to `onStart`/`onStop` activity lifecylce methods
+* Removal of `accessToken` on `MapView` and `MapboxMap` [#5621](https://github.com/mapbox/mapbox-gl-native/issues/5621)
+* Introduction of new make targets [#5940](https://github.com/mapbox/mapbox-gl-native/issues/5940)
+  - Targets for testing, running and using external tools directly from the command line
+* Cleanup Gradle files [#6009](https://github.com/mapbox/mapbox-gl-native/issues/6009)
+  - Introducing single purpose `.gradle` files
+* Checkstyle integration [#7442](https://github.com/mapbox/mapbox-gl-native/pull/7442)
+* Transform refactor [#6532](https://github.com/mapbox/mapbox-gl-native/issues/6532)
+  - All camera related code is moved to a dedicated transform class cfr. core architecture
+* Encapsulate gestures [#6557](https://github.com/mapbox/mapbox-gl-native/issues/6557)
+  - All gesture event code is encapsulated in `MapGestureDetector`
+  - All key event code is encapsulated in `MapKeyListener`
+* Transparent background for `MyLocationView` [#7116](https://github.com/mapbox/mapbox-gl-native/issues/7116)
+* Correctly scale accuracy circle for `MyLocationView` [#8255](https://github.com/mapbox/mapbox-gl-native/pull/8255)
+* Update documentation on generate sanity tests [#7147](https://github.com/mapbox/mapbox-gl-native/issues/7147)
+* Update documentation on style templates [#7157](https://github.com/mapbox/mapbox-gl-native/issues/7157)
+* Fix `NullPointerException` during save instance state [#7157](https://github.com/mapbox/mapbox-gl-native/issues/7157)
+* Move management style to core [#7275](https://github.com/mapbox/mapbox-gl-native/issues/7275)
+* Fix `OnCameraChange` not called for the final position of animation bug [#7350](https://github.com/mapbox/mapbox-gl-native/issues/7350)
+* `MapboxAccountManager` refactor [#6534](https://github.com/mapbox/mapbox-gl-native/issues/6534)
+  - Consolidating the location where tokens are set
+  - Rename to reflect the increased responsibilities introduced in prior releases
+* AnnotationManager refactor [#6067](https://github.com/mapbox/mapbox-gl-native/issues/6067)
+  - Extracting all business logic related to annotations into a separate class cfr. to core and the iOS codebase
+* Gesture handling improvements:
+  - Fix missing call to `onFling` when while pinch zooming [#7666](https://github.com/mapbox/mapbox-gl-native/issues/7666)
+  - Round tap-zoom gestures to nearest integer [#8027](https://github.com/mapbox/mapbox-gl-native/pull/8027)
+* Support for style-wide transition animation duration and delay [#6779](https://github.com/mapbox/mapbox-gl-native/issues/6779)
+* Allow callback parameter for style setting [#8262](https://github.com/mapbox/mapbox-gl-native/issues/8262)
+* Support for all animated camera changes to configure dismissing tracking modes [#7854](https://github.com/mapbox/mapbox-gl-native/issues/7854)
+* Avoid disabling location tracking on all gestures [#7878](https://github.com/mapbox/mapbox-gl-native/issues/7878)
+* `LatLng` objects produced by the SDK are wrapped by default [#4522](https://github.com/mapbox/mapbox-gl-native/issues/4522)
+* Proguard update for new SDK packages [#8437](https://github.com/mapbox/mapbox-gl-native/pull/8437)
+* Javadoc cleanup [#8438](https://github.com/mapbox/mapbox-gl-native/pull/8438)
+* MarkerViewClickListener and MapClickListener called simultaneously [#8447](https://github.com/mapbox/mapbox-gl-native/pull/8447)
+* Fix LOST v2.0.0 integration [#8445](https://github.com/mapbox/mapbox-gl-native/pull/8445)
+* Crash with OnMapChangeListener [#8380](https://github.com/mapbox/mapbox-gl-native/pull/8380)
+* Feature query crash [#8374](https://github.com/mapbox/mapbox-gl-native/pull/8374)
+* flyTo fix [#8302](https://github.com/mapbox/mapbox-gl-native/pull/8302)
+* Don't dispatch MarkerView motion event up to MapView [#8447](https://github.com/mapbox/mapbox-gl-native/pull/8447)
+
+## 5.0.0-beta.3 - March 10th, 2017
+
+5.0.0-beta.3 focuses on addressing stability issues and bug fixes. It also includes:
+
+* Allow query all features in sources (`querySourceFeatures`) [#5792](https://github.com/mapbox/mapbox-gl-native/issues/5792)
+* Improve accessibility TalkBack support by including content description in views [#8230](https://github.com/mapbox/mapbox-gl-native/pull/8230)
+* Allow zooming/scaling to use `AnimationOptions` [#8181](https://github.com/mapbox/mapbox-gl-native/pull/8181)
+* Telemetry Service is now include automatically via Manifest merge to simplify set up [#8338](https://github.com/mapbox/mapbox-gl-native/pull/8338)
+* Correctly scale accuracy circle for `MyLocationView` [#8255](https://github.com/mapbox/mapbox-gl-native/pull/8255)
+* Round tap-zoom gestures to nearest integer [#8027](https://github.com/mapbox/mapbox-gl-native/pull/8027)
+* Allow callback parameter for style setting [#8262](https://github.com/mapbox/mapbox-gl-native/issues/8262)
+* Avoid disabling location tracking on all gestures [#7878](https://github.com/mapbox/mapbox-gl-native/issues/7878)
+
+## 5.0.0-beta.2 - March 1st, 2017
+
+5.0.0-beta.2 focuses on addressing stability issues and bug fixes. It also includes:
+
+* Data-driven styling for `{text,icon}-{color,opacity,halo-color,halo-blur,halo-width}` [#7939](https://github.com/mapbox/mapbox-gl-native/pull/7939)
+* Additional APIs to manage runtime styling layers [#8195](https://github.com/mapbox/mapbox-gl-native/pull/8195)
+
 ## 5.0.0-beta.1 - February 14th, 2017
 
 * Support for data-driven styles [#7752](https://github.com/mapbox/mapbox-gl-native/pull/7752)

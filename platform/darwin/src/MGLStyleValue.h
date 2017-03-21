@@ -17,10 +17,10 @@ typedef NSString *MGLStyleFunctionOption NS_STRING_ENUM;
  
  The exponential interpolation base controls the rate at which the function’s 
  output values increase. A value of 1 causes the function to increase linearly 
- by zoom level. A higher exponential interpolation base causes the function’s 
- output values to vary exponentially, increasing more rapidly towards the high 
- end of the function’s range. The default value of this property is 1, for a 
- linear curve.
+ based on zoom level or attribute value. A higher exponential interpolation base
+ causes the function’s output values to vary exponentially, increasing more rapidly
+ towards the high end of the function’s range. The default value of this property 
+ is 1, for a linear curve.
 
  This attribute corresponds to the
  <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#function-base"><code>base</code></a>
@@ -33,7 +33,7 @@ typedef NSString *MGLStyleFunctionOption NS_STRING_ENUM;
 extern MGL_EXPORT const MGLStyleFunctionOption MGLStyleFunctionOptionInterpolationBase;
 
 /**
- An `MGLStyleConstantValue` object that specifies a default value that a style
+ An `MGLConstantStyleValue` object that specifies a default value that a style
  function can use when it can't otherwise determine a value.
 
  A default value can be used to set the value of a style layer property that
@@ -54,23 +54,30 @@ extern MGL_EXPORT const MGLStyleFunctionOption MGLStyleFunctionOptionDefaultValu
  */
 typedef NS_ENUM(NSUInteger, MGLInterpolationMode) {
     /**
-     Values between two stops are interpolated exponentially or linearly if the
-     `MGLStyleFunctionOptionInterpolationBase` is 1.
+     Values between two stops are interpolated linearly, or exponentially based on 
+     the `MGLStyleFunctionOptionInterpolationBase`. A higher interpolation base 
+     causes the function’s output values to vary exponentially, increasing more rapidly
+     towards the high end of the function’s range. The default interpolation base of 1 
+     creates a linear interpolation. Use exponential interpolation mode to show values
+     relative to stop keys.
      */
     MGLInterpolationModeExponential = 0,
     /**
      Values between two stops are not interpolated. Instead, properties are set
-     to the value of the stop just less than the function input.
+     to the value of the stop just less than the function input. Use interval
+     interpolation mode to show values that fall within a range.
      */
     MGLInterpolationModeInterval,
     /**
      Values between two stops are not interpolated. Instead, properties are set
-     to the value of the stop equal to the function input's key value.
+     to the value of the stop equal to the function input's key value. Use
+     categorical interpolation mode to show values that fit into categories.
      */
     MGLInterpolationModeCategorical,
     /**
-     Values between two stops are not interpolated. Instead, values are set 
-     to their input value.
+     Values between two stops are not interpolated. Instead, values are set to their
+     input value. Use identity interpolation mode to show attribute values that can be
+     used as style values.
      */
     MGLInterpolationModeIdentity
 };
@@ -81,7 +88,7 @@ typedef NS_ENUM(NSUInteger, MGLInterpolationMode) {
  `MGLStyleValue` objects.
 
  The `MGLStyleValue` class itself represents a class cluster. Under the hood, a
- particular `MGLStyleValue` object may be either an `MGLStyleConstantValue` to
+ particular `MGLStyleValue` object may be either an `MGLConstantStyleValue` to
  represent a constant value or one of the concrete subclasses of 
  `MGLStyleFunction` to represent a value function. Do not initialize an 
  `MGLStyleValue` object directly; instead, use one of the class factory methods 
@@ -104,10 +111,10 @@ MGL_EXPORT
 #pragma mark Creating a Style Value
 
 /**
- Creates and returns an `MGLStyleConstantValue` object containing a raw value.
+ Creates and returns an `MGLConstantStyleValue` object containing a raw value.
 
  @param rawValue The constant value contained by the object.
- @return An `MGLStyleConstantValue` object containing `rawValue`, which is
+ @return An `MGLConstantStyleValue` object containing `rawValue`, which is
     treated as a constant value.
  */
 + (instancetype)valueWithRawValue:(T)rawValue;
@@ -168,7 +175,8 @@ MGL_EXPORT
 
  @param interpolationMode The mode used to interpolate property values over a 
     range of feature attribute values for each outer zoom level.
- @param sourceStops A dictionary associating feature attributes with style values.
+ @param compositeStops A dictionary associating feature attributes with style
+    values.
  @param attributeName Specifies the feature attribute to take as the function
     input.
  @param options A dictionary containing `MGLStyleFunctionOption` values that
@@ -181,24 +189,24 @@ MGL_EXPORT
 @end
 
 /**
- An `MGLStyleConstantValue` object is a generic container for a style attribute
+ An `MGLConstantStyleValue` object is a generic container for a style attribute
  value that remains constant as the zoom level changes. The layout and paint
  attribute properties of `MGLStyleLayer` objects can be set to
- `MGLStyleConstantValue` objects.
+ `MGLConstantStyleValue` objects.
 
- The `MGLStyleConstantValue` class takes a generic parameter `T` that indicates
+ The `MGLConstantStyleValue` class takes a generic parameter `T` that indicates
  the Foundation class being wrapped by this class.
  */
 MGL_EXPORT
-@interface MGLStyleConstantValue<T> : MGLStyleValue<T>
+@interface MGLConstantStyleValue<T> : MGLStyleValue<T>
 
 #pragma mark Creating a Style Constant Value
 
 /**
- Creates and returns an `MGLStyleConstantValue` object containing a raw value.
+ Creates and returns an `MGLConstantStyleValue` object containing a raw value.
 
  @param rawValue The constant value contained by the object.
- @return An `MGLStyleConstantValue` object containing `rawValue`, which is
+ @return An `MGLConstantStyleValue` object containing `rawValue`, which is
     treated as a constant value.
  */
 + (instancetype)valueWithRawValue:(T)rawValue;
@@ -208,10 +216,10 @@ MGL_EXPORT
 - (instancetype)init NS_UNAVAILABLE;
 
 /**
- Returns an `MGLStyleConstantValue` object containing a raw value.
+ Returns an `MGLConstantStyleValue` object containing a raw value.
 
  @param rawValue The value contained by the receiver.
- @return An `MGLStyleConstantValue` object containing `rawValue`.
+ @return An `MGLConstantStyleValue` object containing `rawValue`.
  */
 - (instancetype)initWithRawValue:(T)rawValue NS_DESIGNATED_INITIALIZER;
 
@@ -223,6 +231,8 @@ MGL_EXPORT
 @property (nonatomic) T rawValue;
 
 @end
+
+@compatibility_alias MGLStyleConstantValue MGLConstantStyleValue;
 
 /**
  An `MGLStyleFunction` is a is an abstract superclass for functions that are 
@@ -378,7 +388,7 @@ MGL_EXPORT
 
  @param interpolationMode The mode used to interpolate property values over a
     range of feature attribute values.
- @param sourceStops A dictionary associating feature attributes with style values.
+ @param stops A dictionary associating feature attributes with style values.
  @param attributeName Specifies the feature attribute to take as the function
     input.
  @param options A dictionary containing `MGLStyleFunctionOption` values that
@@ -438,7 +448,7 @@ MGL_EXPORT
 
  @param interpolationMode The mode used to interpolate property values over a
     range of feature attribute values for each outer zoom level.
- @param sourceStops A dictionary associating feature attributes with style values.
+ @param stops A dictionary associating feature attributes with style values.
  @param attributeName Specifies the feature attribute to take as the function
     input.
  @param options A dictionary containing `MGLStyleFunctionOption` values that

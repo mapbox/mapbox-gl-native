@@ -341,10 +341,10 @@ static NSURL *MGLStyleURL_emerald;
         styleLayer = [[MGLCircleStyleLayer alloc] initWithIdentifier:identifier source:source];
     } else if (mbglLayer->is<mbgl::style::BackgroundLayer>()) {
         styleLayer = [[MGLBackgroundStyleLayer alloc] initWithIdentifier:identifier];
-    } else if (auto customLayer = mbglLayer->as<mbgl::style::CustomLayer>()) {
+    } else if (mbglLayer->is<mbgl::style::CustomLayer>()) {
         styleLayer = self.openGLLayers[identifier];
         if (styleLayer) {
-            NSAssert(styleLayer.rawLayer == customLayer, @"%@ wraps a CustomLayer that differs from the one associated with the underlying style.", styleLayer);
+            NSAssert(styleLayer.rawLayer == mbglLayer->as<mbgl::style::CustomLayer>(), @"%@ wraps a CustomLayer that differs from the one associated with the underlying style.", styleLayer);
             return styleLayer;
         }
         styleLayer = [[MGLOpenGLStyleLayer alloc] initWithIdentifier:identifier];
@@ -502,7 +502,7 @@ static NSURL *MGLStyleURL_emerald;
         newAppliedClasses.push_back([appliedClass UTF8String]);
     }
 
-    mbgl::style::TransitionOptions transition { { MGLDurationInSecondsFromTimeInterval(transitionDuration) } };
+    mbgl::style::TransitionOptions transition { { MGLDurationFromTimeInterval(transitionDuration) } };
     self.mapView.mbglMap->setTransitionOptions(transition);
     self.mapView.mbglMap->setClasses(newAppliedClasses);
 }
@@ -572,30 +572,24 @@ static NSURL *MGLStyleURL_emerald;
 
 #pragma mark Style transitions
 
-- (void)setTransitionDuration:(NSTimeInterval)duration
+- (void)setTransition:(MGLTransition)transition
 {
     auto transitionOptions = self.mapView.mbglMap->getTransitionOptions();
-    transitionOptions.duration = MGLDurationInSecondsFromTimeInterval(duration);
+    transitionOptions.duration = MGLDurationFromTimeInterval(transition.duration);
+    transitionOptions.delay = MGLDurationFromTimeInterval(transition.delay);
+    
     self.mapView.mbglMap->setTransitionOptions(transitionOptions);
 }
 
-- (NSTimeInterval)transitionDuration
+- (MGLTransition)transition
 {
+    MGLTransition transition;
     const mbgl::style::TransitionOptions transitionOptions = self.mapView.mbglMap->getTransitionOptions();
-    return MGLTimeIntervalFromDurationInSeconds(transitionOptions.duration.value_or(mbgl::Duration::zero()));
-}
 
-- (void)setTransitionDelay:(NSTimeInterval)delay
-{
-    auto transitionOptions = self.mapView.mbglMap->getTransitionOptions();
-    transitionOptions.delay = MGLDurationInSecondsFromTimeInterval(delay);
-    self.mapView.mbglMap->setTransitionOptions(transitionOptions);
-}
-
-- (NSTimeInterval)transitionDelay
-{
-    const mbgl::style::TransitionOptions transitionOptions = self.mapView.mbglMap->getTransitionOptions();
-    return MGLTimeIntervalFromDurationInSeconds(transitionOptions.delay.value_or(mbgl::Duration::zero()));
+    transition.delay = MGLTimeIntervalFromDuration(transitionOptions.delay.value_or(mbgl::Duration::zero()));
+    transition.duration = MGLTimeIntervalFromDuration(transitionOptions.duration.value_or(mbgl::Duration::zero()));
+    
+    return transition;
 }
 
 - (NSString *)description

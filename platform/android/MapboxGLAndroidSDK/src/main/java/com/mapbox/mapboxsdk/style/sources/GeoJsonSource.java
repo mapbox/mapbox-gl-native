@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * A GeoJson source. Exposes a {@link FeatureCollection} from Json.
+ * GeoJson source, allows using FeatureCollections from Json.
  *
  * @see <a href="https://www.mapbox.com/mapbox-gl-style-spec/#sources-geojson">the style specification</a>
  */
