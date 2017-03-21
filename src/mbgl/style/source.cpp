@@ -18,7 +18,7 @@ optional<std::string> Source::getAttribution() const {
     return baseImpl->getAttribution();
 }
 
-Range<uint8_t> Source::getZoomRange() const {
+optional<Range<uint8_t>> Source::getZoomRange() const {
     return baseImpl->getZoomRange();
 }
 

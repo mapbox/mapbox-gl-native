@@ -153,9 +153,11 @@ void GeoJSONSource::Impl::loadDescription(FileSource& fileSource) {
     });
 }
 
-Range<uint8_t> GeoJSONSource::Impl::getZoomRange() const {
-    assert(loaded);
-    return { 0, options.maxzoom };
+optional<Range<uint8_t>> GeoJSONSource::Impl::getZoomRange() const {
+    if (loaded) {
+        return { { 0, options.maxzoom }};
+    }
+    return {};
 }
 
 std::unique_ptr<Tile> GeoJSONSource::Impl::createTile(const OverscaledTileID& tileID,

@@ -113,9 +113,11 @@ void TileSourceImpl::loadDescription(FileSource& fileSource) {
     });
 }
 
-Range<uint8_t> TileSourceImpl::getZoomRange() const {
-    assert(loaded);
-    return tileset.zoomRange;
+optional<Range<uint8_t>> TileSourceImpl::getZoomRange() const {
+    if (loaded) {
+        return tileset.zoomRange;
+    }
+    return {};
 }
 
 optional<std::string> TileSourceImpl::getAttribution() const {
