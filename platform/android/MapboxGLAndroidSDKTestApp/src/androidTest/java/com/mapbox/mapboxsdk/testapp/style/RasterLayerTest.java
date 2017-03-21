@@ -36,6 +36,8 @@ import static org.junit.Assert.*;
 import static com.mapbox.mapboxsdk.style.layers.Property.*;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.*;
 
+import com.mapbox.mapboxsdk.style.layers.TransitionOptions;
+
 /**
  * Basic smoke tests for RasterLayer
  */
@@ -82,6 +84,18 @@ public class RasterLayerTest extends BaseStyleTest {
   }
 
   @Test
+  public void testRasterOpacityTransition() {
+    checkViewIsDisplayed(R.id.mapView);
+    Timber.i("raster-opacityTransitionOptions");
+    assertNotNull(layer);
+
+    // Set and Get
+    TransitionOptions options = new TransitionOptions(300, 100);
+    layer.setRasterOpacityTransition(options);
+    assertEquals(layer.getRasterOpacityTransition(), options);
+  }
+
+  @Test
   public void testRasterOpacityAsConstant() {
     checkViewIsDisplayed(R.id.mapView);
     Timber.i("raster-opacity");
@@ -116,6 +130,18 @@ public class RasterLayerTest extends BaseStyleTest {
     assertEquals(ExponentialStops.class, layer.getRasterOpacity().getFunction().getStops().getClass());
     assertEquals(0.5f, ((ExponentialStops) layer.getRasterOpacity().getFunction().getStops()).getBase(), 0.001);
     assertEquals(1, ((ExponentialStops) layer.getRasterOpacity().getFunction().getStops()).size());
+  }
+
+  @Test
+  public void testRasterHueRotateTransition() {
+    checkViewIsDisplayed(R.id.mapView);
+    Timber.i("raster-hue-rotateTransitionOptions");
+    assertNotNull(layer);
+
+    // Set and Get
+    TransitionOptions options = new TransitionOptions(300, 100);
+    layer.setRasterHueRotateTransition(options);
+    assertEquals(layer.getRasterHueRotateTransition(), options);
   }
 
   @Test
@@ -156,6 +182,18 @@ public class RasterLayerTest extends BaseStyleTest {
   }
 
   @Test
+  public void testRasterBrightnessMinTransition() {
+    checkViewIsDisplayed(R.id.mapView);
+    Timber.i("raster-brightness-minTransitionOptions");
+    assertNotNull(layer);
+
+    // Set and Get
+    TransitionOptions options = new TransitionOptions(300, 100);
+    layer.setRasterBrightnessMinTransition(options);
+    assertEquals(layer.getRasterBrightnessMinTransition(), options);
+  }
+
+  @Test
   public void testRasterBrightnessMinAsConstant() {
     checkViewIsDisplayed(R.id.mapView);
     Timber.i("raster-brightness-min");
@@ -190,6 +228,18 @@ public class RasterLayerTest extends BaseStyleTest {
     assertEquals(ExponentialStops.class, layer.getRasterBrightnessMin().getFunction().getStops().getClass());
     assertEquals(0.5f, ((ExponentialStops) layer.getRasterBrightnessMin().getFunction().getStops()).getBase(), 0.001);
     assertEquals(1, ((ExponentialStops) layer.getRasterBrightnessMin().getFunction().getStops()).size());
+  }
+
+  @Test
+  public void testRasterBrightnessMaxTransition() {
+    checkViewIsDisplayed(R.id.mapView);
+    Timber.i("raster-brightness-maxTransitionOptions");
+    assertNotNull(layer);
+
+    // Set and Get
+    TransitionOptions options = new TransitionOptions(300, 100);
+    layer.setRasterBrightnessMaxTransition(options);
+    assertEquals(layer.getRasterBrightnessMaxTransition(), options);
   }
 
   @Test
@@ -230,6 +280,18 @@ public class RasterLayerTest extends BaseStyleTest {
   }
 
   @Test
+  public void testRasterSaturationTransition() {
+    checkViewIsDisplayed(R.id.mapView);
+    Timber.i("raster-saturationTransitionOptions");
+    assertNotNull(layer);
+
+    // Set and Get
+    TransitionOptions options = new TransitionOptions(300, 100);
+    layer.setRasterSaturationTransition(options);
+    assertEquals(layer.getRasterSaturationTransition(), options);
+  }
+
+  @Test
   public void testRasterSaturationAsConstant() {
     checkViewIsDisplayed(R.id.mapView);
     Timber.i("raster-saturation");
@@ -267,6 +329,18 @@ public class RasterLayerTest extends BaseStyleTest {
   }
 
   @Test
+  public void testRasterContrastTransition() {
+    checkViewIsDisplayed(R.id.mapView);
+    Timber.i("raster-contrastTransitionOptions");
+    assertNotNull(layer);
+
+    // Set and Get
+    TransitionOptions options = new TransitionOptions(300, 100);
+    layer.setRasterContrastTransition(options);
+    assertEquals(layer.getRasterContrastTransition(), options);
+  }
+
+  @Test
   public void testRasterContrastAsConstant() {
     checkViewIsDisplayed(R.id.mapView);
     Timber.i("raster-contrast");
@@ -301,6 +375,18 @@ public class RasterLayerTest extends BaseStyleTest {
     assertEquals(ExponentialStops.class, layer.getRasterContrast().getFunction().getStops().getClass());
     assertEquals(0.5f, ((ExponentialStops) layer.getRasterContrast().getFunction().getStops()).getBase(), 0.001);
     assertEquals(1, ((ExponentialStops) layer.getRasterContrast().getFunction().getStops()).size());
+  }
+
+  @Test
+  public void testRasterFadeDurationTransition() {
+    checkViewIsDisplayed(R.id.mapView);
+    Timber.i("raster-fade-durationTransitionOptions");
+    assertNotNull(layer);
+
+    // Set and Get
+    TransitionOptions options = new TransitionOptions(300, 100);
+    layer.setRasterFadeDurationTransition(options);
+    assertEquals(layer.getRasterFadeDurationTransition(), options);
   }
 
   @Test

@@ -40,6 +40,8 @@ import static org.junit.Assert.*;
 import static com.mapbox.mapboxsdk.style.layers.Property.*;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.*;
 
+import com.mapbox.mapboxsdk.style.layers.TransitionOptions;
+
 /**
  * Basic smoke tests for <%- camelize(type) %>Layer
  */
@@ -91,6 +93,20 @@ public class <%- camelize(type) %>LayerTest extends BaseStyleTest {
   }
 
 <% for (const property of properties) { -%>
+<% if (property.transition) { -%>
+  @Test
+  public void test<%- camelize(property.name) %>Transition() {
+    checkViewIsDisplayed(R.id.mapView);
+    Timber.i("<%- property.name %>TransitionOptions");
+    assertNotNull(layer);
+
+    // Set and Get
+    TransitionOptions options = new TransitionOptions(300, 100);
+    layer.set<%- camelize(property.name) %>Transition(options);
+    assertEquals(layer.get<%- camelize(property.name) %>Transition(), options);
+  }
+<% } -%>
+
   @Test
   public void test<%- camelize(property.name) %>AsConstant() {
     checkViewIsDisplayed(R.id.mapView);

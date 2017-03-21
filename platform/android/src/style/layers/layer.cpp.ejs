@@ -9,6 +9,7 @@
 #include <string>
 
 #include "../conversion/property_value.hpp"
+#include "../conversion/transition_options.hpp"
 
 namespace mbgl {
 namespace android {
@@ -53,7 +54,23 @@ namespace android {
         return jni::Object<jni::ObjectTag>(*converted);
     }
 
+<% if (property.transition) { -%>
+    jni::Object<TransitionOptions> <%- camelize(type) %>Layer::get<%- camelize(property.name) %>Transition(jni::JNIEnv& env) {
+        using namespace mbgl::android::conversion;
+        mbgl::style::TransitionOptions options = layer.as<mbgl::style::<%- camelize(type) %>Layer>()-><%- camelize(type) %>Layer::get<%- camelize(property.name) %>Transition();
+        return *convert<jni::Object<TransitionOptions>>(env, options);
+    }
+
+    void <%- camelize(type) %>Layer::set<%- camelize(property.name) %>Transition(jni::JNIEnv&, jlong duration, jlong delay) {
+        mbgl::style::TransitionOptions options;
+        options.duration.emplace(mbgl::Milliseconds(duration));
+        options.delay.emplace(mbgl::Milliseconds(delay));
+        layer.as<mbgl::style::<%- camelize(type) %>Layer>()-><%- camelize(type) %>Layer::set<%- camelize(property.name) %>Transition(options);
+    }
+
 <% } -%>
+<% } -%>
+
     jni::Class<<%- camelize(type) %>Layer> <%- camelize(type) %>Layer::javaClass;
 
     jni::jobject* <%- camelize(type) %>Layer::createJavaPeer(jni::JNIEnv& env) {
@@ -77,8 +94,11 @@ namespace android {
 <% } -%>
             "initialize",
             "finalize",<% for(var i = 0; i < properties.length; i++) {%>
-            METHOD(&<%- camelize(type) %>Layer::get<%- camelize(properties[i].name) %>, "nativeGet<%- camelize(properties[i].name) %>")<% if(i != (properties.length -1)) {-%>,<% } -%>
-<% } -%>);
+<% if (properties[i].transition) { -%>
+            METHOD(&<%- camelize(type) %>Layer::get<%- camelize(properties[i].name) %>Transition, "nativeGet<%- camelize(properties[i].name) %>Transition"),
+            METHOD(&<%- camelize(type) %>Layer::set<%- camelize(properties[i].name) %>Transition, "nativeSet<%- camelize(properties[i].name) %>Transition"),
+<% } -%>
+            METHOD(&<%- camelize(type) %>Layer::get<%- camelize(properties[i].name) %>, "nativeGet<%- camelize(properties[i].name) %>")<% if(i != (properties.length -1)) {-%>,<% } -%><% } -%>);
     }
 
 } // namespace android

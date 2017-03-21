@@ -5,6 +5,7 @@
 #include <string>
 
 #include "../conversion/property_value.hpp"
+#include "../conversion/transition_options.hpp"
 
 namespace mbgl {
 namespace android {
@@ -46,10 +47,36 @@ namespace android {
         return jni::Object<jni::ObjectTag>(*converted);
     }
 
+    jni::Object<TransitionOptions> FillLayer::getFillOpacityTransition(jni::JNIEnv& env) {
+        using namespace mbgl::android::conversion;
+        mbgl::style::TransitionOptions options = layer.as<mbgl::style::FillLayer>()->FillLayer::getFillOpacityTransition();
+        return *convert<jni::Object<TransitionOptions>>(env, options);
+    }
+
+    void FillLayer::setFillOpacityTransition(jni::JNIEnv&, jlong duration, jlong delay) {
+        mbgl::style::TransitionOptions options;
+        options.duration.emplace(mbgl::Milliseconds(duration));
+        options.delay.emplace(mbgl::Milliseconds(delay));
+        layer.as<mbgl::style::FillLayer>()->FillLayer::setFillOpacityTransition(options);
+    }
+
     jni::Object<jni::ObjectTag> FillLayer::getFillColor(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
         Result<jni::jobject*> converted = convert<jni::jobject*>(env, layer.as<mbgl::style::FillLayer>()->FillLayer::getFillColor());
         return jni::Object<jni::ObjectTag>(*converted);
+    }
+
+    jni::Object<TransitionOptions> FillLayer::getFillColorTransition(jni::JNIEnv& env) {
+        using namespace mbgl::android::conversion;
+        mbgl::style::TransitionOptions options = layer.as<mbgl::style::FillLayer>()->FillLayer::getFillColorTransition();
+        return *convert<jni::Object<TransitionOptions>>(env, options);
+    }
+
+    void FillLayer::setFillColorTransition(jni::JNIEnv&, jlong duration, jlong delay) {
+        mbgl::style::TransitionOptions options;
+        options.duration.emplace(mbgl::Milliseconds(duration));
+        options.delay.emplace(mbgl::Milliseconds(delay));
+        layer.as<mbgl::style::FillLayer>()->FillLayer::setFillColorTransition(options);
     }
 
     jni::Object<jni::ObjectTag> FillLayer::getFillOutlineColor(jni::JNIEnv& env) {
@@ -58,10 +85,36 @@ namespace android {
         return jni::Object<jni::ObjectTag>(*converted);
     }
 
+    jni::Object<TransitionOptions> FillLayer::getFillOutlineColorTransition(jni::JNIEnv& env) {
+        using namespace mbgl::android::conversion;
+        mbgl::style::TransitionOptions options = layer.as<mbgl::style::FillLayer>()->FillLayer::getFillOutlineColorTransition();
+        return *convert<jni::Object<TransitionOptions>>(env, options);
+    }
+
+    void FillLayer::setFillOutlineColorTransition(jni::JNIEnv&, jlong duration, jlong delay) {
+        mbgl::style::TransitionOptions options;
+        options.duration.emplace(mbgl::Milliseconds(duration));
+        options.delay.emplace(mbgl::Milliseconds(delay));
+        layer.as<mbgl::style::FillLayer>()->FillLayer::setFillOutlineColorTransition(options);
+    }
+
     jni::Object<jni::ObjectTag> FillLayer::getFillTranslate(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
         Result<jni::jobject*> converted = convert<jni::jobject*>(env, layer.as<mbgl::style::FillLayer>()->FillLayer::getFillTranslate());
         return jni::Object<jni::ObjectTag>(*converted);
+    }
+
+    jni::Object<TransitionOptions> FillLayer::getFillTranslateTransition(jni::JNIEnv& env) {
+        using namespace mbgl::android::conversion;
+        mbgl::style::TransitionOptions options = layer.as<mbgl::style::FillLayer>()->FillLayer::getFillTranslateTransition();
+        return *convert<jni::Object<TransitionOptions>>(env, options);
+    }
+
+    void FillLayer::setFillTranslateTransition(jni::JNIEnv&, jlong duration, jlong delay) {
+        mbgl::style::TransitionOptions options;
+        options.duration.emplace(mbgl::Milliseconds(duration));
+        options.delay.emplace(mbgl::Milliseconds(delay));
+        layer.as<mbgl::style::FillLayer>()->FillLayer::setFillTranslateTransition(options);
     }
 
     jni::Object<jni::ObjectTag> FillLayer::getFillTranslateAnchor(jni::JNIEnv& env) {
@@ -75,6 +128,20 @@ namespace android {
         Result<jni::jobject*> converted = convert<jni::jobject*>(env, layer.as<mbgl::style::FillLayer>()->FillLayer::getFillPattern());
         return jni::Object<jni::ObjectTag>(*converted);
     }
+
+    jni::Object<TransitionOptions> FillLayer::getFillPatternTransition(jni::JNIEnv& env) {
+        using namespace mbgl::android::conversion;
+        mbgl::style::TransitionOptions options = layer.as<mbgl::style::FillLayer>()->FillLayer::getFillPatternTransition();
+        return *convert<jni::Object<TransitionOptions>>(env, options);
+    }
+
+    void FillLayer::setFillPatternTransition(jni::JNIEnv&, jlong duration, jlong delay) {
+        mbgl::style::TransitionOptions options;
+        options.duration.emplace(mbgl::Milliseconds(duration));
+        options.delay.emplace(mbgl::Milliseconds(delay));
+        layer.as<mbgl::style::FillLayer>()->FillLayer::setFillPatternTransition(options);
+    }
+
 
     jni::Class<FillLayer> FillLayer::javaClass;
 
@@ -96,11 +163,21 @@ namespace android {
             "initialize",
             "finalize",
             METHOD(&FillLayer::getFillAntialias, "nativeGetFillAntialias"),
+            METHOD(&FillLayer::getFillOpacityTransition, "nativeGetFillOpacityTransition"),
+            METHOD(&FillLayer::setFillOpacityTransition, "nativeSetFillOpacityTransition"),
             METHOD(&FillLayer::getFillOpacity, "nativeGetFillOpacity"),
+            METHOD(&FillLayer::getFillColorTransition, "nativeGetFillColorTransition"),
+            METHOD(&FillLayer::setFillColorTransition, "nativeSetFillColorTransition"),
             METHOD(&FillLayer::getFillColor, "nativeGetFillColor"),
+            METHOD(&FillLayer::getFillOutlineColorTransition, "nativeGetFillOutlineColorTransition"),
+            METHOD(&FillLayer::setFillOutlineColorTransition, "nativeSetFillOutlineColorTransition"),
             METHOD(&FillLayer::getFillOutlineColor, "nativeGetFillOutlineColor"),
+            METHOD(&FillLayer::getFillTranslateTransition, "nativeGetFillTranslateTransition"),
+            METHOD(&FillLayer::setFillTranslateTransition, "nativeSetFillTranslateTransition"),
             METHOD(&FillLayer::getFillTranslate, "nativeGetFillTranslate"),
             METHOD(&FillLayer::getFillTranslateAnchor, "nativeGetFillTranslateAnchor"),
+            METHOD(&FillLayer::getFillPatternTransition, "nativeGetFillPatternTransition"),
+            METHOD(&FillLayer::setFillPatternTransition, "nativeSetFillPatternTransition"),
             METHOD(&FillLayer::getFillPattern, "nativeGetFillPattern"));
     }
 

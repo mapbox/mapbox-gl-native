@@ -36,6 +36,8 @@ import static org.junit.Assert.*;
 import static com.mapbox.mapboxsdk.style.layers.Property.*;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.*;
 
+import com.mapbox.mapboxsdk.style.layers.TransitionOptions;
+
 /**
  * Basic smoke tests for FillLayer
  */
@@ -81,6 +83,7 @@ public class FillLayerTest extends BaseStyleTest {
     assertEquals(layer.getVisibility().getValue(), NONE);
   }
 
+
   @Test
   public void testFillAntialiasAsConstant() {
     checkViewIsDisplayed(R.id.mapView);
@@ -115,6 +118,18 @@ public class FillLayerTest extends BaseStyleTest {
     assertEquals(CameraFunction.class, layer.getFillAntialias().getFunction().getClass());
     assertEquals(IntervalStops.class, layer.getFillAntialias().getFunction().getStops().getClass());
     assertEquals(1, ((IntervalStops) layer.getFillAntialias().getFunction().getStops()).size());
+  }
+
+  @Test
+  public void testFillOpacityTransition() {
+    checkViewIsDisplayed(R.id.mapView);
+    Timber.i("fill-opacityTransitionOptions");
+    assertNotNull(layer);
+
+    // Set and Get
+    TransitionOptions options = new TransitionOptions(300, 100);
+    layer.setFillOpacityTransition(options);
+    assertEquals(layer.getFillOpacityTransition(), options);
   }
 
   @Test
@@ -263,6 +278,18 @@ public class FillLayerTest extends BaseStyleTest {
   }
 
   @Test
+  public void testFillColorTransition() {
+    checkViewIsDisplayed(R.id.mapView);
+    Timber.i("fill-colorTransitionOptions");
+    assertNotNull(layer);
+
+    // Set and Get
+    TransitionOptions options = new TransitionOptions(300, 100);
+    layer.setFillColorTransition(options);
+    assertEquals(layer.getFillColorTransition(), options);
+  }
+
+  @Test
   public void testFillColorAsConstant() {
     checkViewIsDisplayed(R.id.mapView);
     Timber.i("fill-color");
@@ -382,6 +409,18 @@ public class FillLayerTest extends BaseStyleTest {
     // Set and Get
     layer.setProperties(fillColor(Color.RED));
     assertEquals(layer.getFillColorAsInt(), Color.RED);
+  }
+
+  @Test
+  public void testFillOutlineColorTransition() {
+    checkViewIsDisplayed(R.id.mapView);
+    Timber.i("fill-outline-colorTransitionOptions");
+    assertNotNull(layer);
+
+    // Set and Get
+    TransitionOptions options = new TransitionOptions(300, 100);
+    layer.setFillOutlineColorTransition(options);
+    assertEquals(layer.getFillOutlineColorTransition(), options);
   }
 
   @Test
@@ -507,6 +546,18 @@ public class FillLayerTest extends BaseStyleTest {
   }
 
   @Test
+  public void testFillTranslateTransition() {
+    checkViewIsDisplayed(R.id.mapView);
+    Timber.i("fill-translateTransitionOptions");
+    assertNotNull(layer);
+
+    // Set and Get
+    TransitionOptions options = new TransitionOptions(300, 100);
+    layer.setFillTranslateTransition(options);
+    assertEquals(layer.getFillTranslateTransition(), options);
+  }
+
+  @Test
   public void testFillTranslateAsConstant() {
     checkViewIsDisplayed(R.id.mapView);
     Timber.i("fill-translate");
@@ -543,6 +594,7 @@ public class FillLayerTest extends BaseStyleTest {
     assertEquals(1, ((ExponentialStops) layer.getFillTranslate().getFunction().getStops()).size());
   }
 
+
   @Test
   public void testFillTranslateAnchorAsConstant() {
     checkViewIsDisplayed(R.id.mapView);
@@ -577,6 +629,18 @@ public class FillLayerTest extends BaseStyleTest {
     assertEquals(CameraFunction.class, layer.getFillTranslateAnchor().getFunction().getClass());
     assertEquals(IntervalStops.class, layer.getFillTranslateAnchor().getFunction().getStops().getClass());
     assertEquals(1, ((IntervalStops) layer.getFillTranslateAnchor().getFunction().getStops()).size());
+  }
+
+  @Test
+  public void testFillPatternTransition() {
+    checkViewIsDisplayed(R.id.mapView);
+    Timber.i("fill-patternTransitionOptions");
+    assertNotNull(layer);
+
+    // Set and Get
+    TransitionOptions options = new TransitionOptions(300, 100);
+    layer.setFillPatternTransition(options);
+    assertEquals(layer.getFillPatternTransition(), options);
   }
 
   @Test

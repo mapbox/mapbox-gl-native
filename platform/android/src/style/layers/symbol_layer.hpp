@@ -3,6 +3,7 @@
 #pragma once
 
 #include "layer.hpp"
+#include "../transition_options.hpp"
 #include <mbgl/style/layers/symbol_layer.hpp>
 #include <jni/jni.hpp>
 
@@ -26,7 +27,8 @@ public:
 
     ~SymbolLayer();
 
-    // Property getters
+    // Properties
+
     jni::Object<jni::ObjectTag> getSymbolPlacement(jni::JNIEnv&);
 
     jni::Object<jni::ObjectTag> getSymbolSpacing(jni::JNIEnv&);
@@ -96,33 +98,56 @@ public:
     jni::Object<jni::ObjectTag> getTextOptional(jni::JNIEnv&);
 
     jni::Object<jni::ObjectTag> getIconOpacity(jni::JNIEnv&);
+    void setIconOpacityTransition(jni::JNIEnv&, jlong duration, jlong delay);
+    jni::Object<TransitionOptions> getIconOpacityTransition(jni::JNIEnv&);
 
     jni::Object<jni::ObjectTag> getIconColor(jni::JNIEnv&);
+    void setIconColorTransition(jni::JNIEnv&, jlong duration, jlong delay);
+    jni::Object<TransitionOptions> getIconColorTransition(jni::JNIEnv&);
 
     jni::Object<jni::ObjectTag> getIconHaloColor(jni::JNIEnv&);
+    void setIconHaloColorTransition(jni::JNIEnv&, jlong duration, jlong delay);
+    jni::Object<TransitionOptions> getIconHaloColorTransition(jni::JNIEnv&);
 
     jni::Object<jni::ObjectTag> getIconHaloWidth(jni::JNIEnv&);
+    void setIconHaloWidthTransition(jni::JNIEnv&, jlong duration, jlong delay);
+    jni::Object<TransitionOptions> getIconHaloWidthTransition(jni::JNIEnv&);
 
     jni::Object<jni::ObjectTag> getIconHaloBlur(jni::JNIEnv&);
+    void setIconHaloBlurTransition(jni::JNIEnv&, jlong duration, jlong delay);
+    jni::Object<TransitionOptions> getIconHaloBlurTransition(jni::JNIEnv&);
 
     jni::Object<jni::ObjectTag> getIconTranslate(jni::JNIEnv&);
+    void setIconTranslateTransition(jni::JNIEnv&, jlong duration, jlong delay);
+    jni::Object<TransitionOptions> getIconTranslateTransition(jni::JNIEnv&);
 
     jni::Object<jni::ObjectTag> getIconTranslateAnchor(jni::JNIEnv&);
 
     jni::Object<jni::ObjectTag> getTextOpacity(jni::JNIEnv&);
+    void setTextOpacityTransition(jni::JNIEnv&, jlong duration, jlong delay);
+    jni::Object<TransitionOptions> getTextOpacityTransition(jni::JNIEnv&);
 
     jni::Object<jni::ObjectTag> getTextColor(jni::JNIEnv&);
+    void setTextColorTransition(jni::JNIEnv&, jlong duration, jlong delay);
+    jni::Object<TransitionOptions> getTextColorTransition(jni::JNIEnv&);
 
     jni::Object<jni::ObjectTag> getTextHaloColor(jni::JNIEnv&);
+    void setTextHaloColorTransition(jni::JNIEnv&, jlong duration, jlong delay);
+    jni::Object<TransitionOptions> getTextHaloColorTransition(jni::JNIEnv&);
 
     jni::Object<jni::ObjectTag> getTextHaloWidth(jni::JNIEnv&);
+    void setTextHaloWidthTransition(jni::JNIEnv&, jlong duration, jlong delay);
+    jni::Object<TransitionOptions> getTextHaloWidthTransition(jni::JNIEnv&);
 
     jni::Object<jni::ObjectTag> getTextHaloBlur(jni::JNIEnv&);
+    void setTextHaloBlurTransition(jni::JNIEnv&, jlong duration, jlong delay);
+    jni::Object<TransitionOptions> getTextHaloBlurTransition(jni::JNIEnv&);
 
     jni::Object<jni::ObjectTag> getTextTranslate(jni::JNIEnv&);
+    void setTextTranslateTransition(jni::JNIEnv&, jlong duration, jlong delay);
+    jni::Object<TransitionOptions> getTextTranslateTransition(jni::JNIEnv&);
 
     jni::Object<jni::ObjectTag> getTextTranslateAnchor(jni::JNIEnv&);
-
     jni::jobject* createJavaPeer(jni::JNIEnv&);
 
 }; // class SymbolLayer

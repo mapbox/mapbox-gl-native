@@ -37,6 +37,7 @@
 #include "offline/offline_region_definition.hpp"
 #include "offline/offline_region_error.hpp"
 #include "offline/offline_region_status.hpp"
+#include "style/transition_options.hpp"
 #include "style/functions/categorical_stops.hpp"
 #include "style/functions/exponential_stops.hpp"
 #include "style/functions/identity_stops.hpp"
@@ -149,6 +150,7 @@ void registerNatives(JavaVM *vm) {
     BitmapFactory::registerNative(env);
 
     // Style
+    TransitionOptions::registerNative(env);
     registerNativeLayers(env);
     registerNativeSources(env);
     Stop::registerNative(env);

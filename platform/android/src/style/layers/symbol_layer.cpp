@@ -5,6 +5,7 @@
 #include <string>
 
 #include "../conversion/property_value.hpp"
+#include "../conversion/transition_options.hpp"
 
 namespace mbgl {
 namespace android {
@@ -244,10 +245,36 @@ namespace android {
         return jni::Object<jni::ObjectTag>(*converted);
     }
 
+    jni::Object<TransitionOptions> SymbolLayer::getIconOpacityTransition(jni::JNIEnv& env) {
+        using namespace mbgl::android::conversion;
+        mbgl::style::TransitionOptions options = layer.as<mbgl::style::SymbolLayer>()->SymbolLayer::getIconOpacityTransition();
+        return *convert<jni::Object<TransitionOptions>>(env, options);
+    }
+
+    void SymbolLayer::setIconOpacityTransition(jni::JNIEnv&, jlong duration, jlong delay) {
+        mbgl::style::TransitionOptions options;
+        options.duration.emplace(mbgl::Milliseconds(duration));
+        options.delay.emplace(mbgl::Milliseconds(delay));
+        layer.as<mbgl::style::SymbolLayer>()->SymbolLayer::setIconOpacityTransition(options);
+    }
+
     jni::Object<jni::ObjectTag> SymbolLayer::getIconColor(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
         Result<jni::jobject*> converted = convert<jni::jobject*>(env, layer.as<mbgl::style::SymbolLayer>()->SymbolLayer::getIconColor());
         return jni::Object<jni::ObjectTag>(*converted);
+    }
+
+    jni::Object<TransitionOptions> SymbolLayer::getIconColorTransition(jni::JNIEnv& env) {
+        using namespace mbgl::android::conversion;
+        mbgl::style::TransitionOptions options = layer.as<mbgl::style::SymbolLayer>()->SymbolLayer::getIconColorTransition();
+        return *convert<jni::Object<TransitionOptions>>(env, options);
+    }
+
+    void SymbolLayer::setIconColorTransition(jni::JNIEnv&, jlong duration, jlong delay) {
+        mbgl::style::TransitionOptions options;
+        options.duration.emplace(mbgl::Milliseconds(duration));
+        options.delay.emplace(mbgl::Milliseconds(delay));
+        layer.as<mbgl::style::SymbolLayer>()->SymbolLayer::setIconColorTransition(options);
     }
 
     jni::Object<jni::ObjectTag> SymbolLayer::getIconHaloColor(jni::JNIEnv& env) {
@@ -256,10 +283,36 @@ namespace android {
         return jni::Object<jni::ObjectTag>(*converted);
     }
 
+    jni::Object<TransitionOptions> SymbolLayer::getIconHaloColorTransition(jni::JNIEnv& env) {
+        using namespace mbgl::android::conversion;
+        mbgl::style::TransitionOptions options = layer.as<mbgl::style::SymbolLayer>()->SymbolLayer::getIconHaloColorTransition();
+        return *convert<jni::Object<TransitionOptions>>(env, options);
+    }
+
+    void SymbolLayer::setIconHaloColorTransition(jni::JNIEnv&, jlong duration, jlong delay) {
+        mbgl::style::TransitionOptions options;
+        options.duration.emplace(mbgl::Milliseconds(duration));
+        options.delay.emplace(mbgl::Milliseconds(delay));
+        layer.as<mbgl::style::SymbolLayer>()->SymbolLayer::setIconHaloColorTransition(options);
+    }
+
     jni::Object<jni::ObjectTag> SymbolLayer::getIconHaloWidth(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
         Result<jni::jobject*> converted = convert<jni::jobject*>(env, layer.as<mbgl::style::SymbolLayer>()->SymbolLayer::getIconHaloWidth());
         return jni::Object<jni::ObjectTag>(*converted);
+    }
+
+    jni::Object<TransitionOptions> SymbolLayer::getIconHaloWidthTransition(jni::JNIEnv& env) {
+        using namespace mbgl::android::conversion;
+        mbgl::style::TransitionOptions options = layer.as<mbgl::style::SymbolLayer>()->SymbolLayer::getIconHaloWidthTransition();
+        return *convert<jni::Object<TransitionOptions>>(env, options);
+    }
+
+    void SymbolLayer::setIconHaloWidthTransition(jni::JNIEnv&, jlong duration, jlong delay) {
+        mbgl::style::TransitionOptions options;
+        options.duration.emplace(mbgl::Milliseconds(duration));
+        options.delay.emplace(mbgl::Milliseconds(delay));
+        layer.as<mbgl::style::SymbolLayer>()->SymbolLayer::setIconHaloWidthTransition(options);
     }
 
     jni::Object<jni::ObjectTag> SymbolLayer::getIconHaloBlur(jni::JNIEnv& env) {
@@ -268,10 +321,36 @@ namespace android {
         return jni::Object<jni::ObjectTag>(*converted);
     }
 
+    jni::Object<TransitionOptions> SymbolLayer::getIconHaloBlurTransition(jni::JNIEnv& env) {
+        using namespace mbgl::android::conversion;
+        mbgl::style::TransitionOptions options = layer.as<mbgl::style::SymbolLayer>()->SymbolLayer::getIconHaloBlurTransition();
+        return *convert<jni::Object<TransitionOptions>>(env, options);
+    }
+
+    void SymbolLayer::setIconHaloBlurTransition(jni::JNIEnv&, jlong duration, jlong delay) {
+        mbgl::style::TransitionOptions options;
+        options.duration.emplace(mbgl::Milliseconds(duration));
+        options.delay.emplace(mbgl::Milliseconds(delay));
+        layer.as<mbgl::style::SymbolLayer>()->SymbolLayer::setIconHaloBlurTransition(options);
+    }
+
     jni::Object<jni::ObjectTag> SymbolLayer::getIconTranslate(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
         Result<jni::jobject*> converted = convert<jni::jobject*>(env, layer.as<mbgl::style::SymbolLayer>()->SymbolLayer::getIconTranslate());
         return jni::Object<jni::ObjectTag>(*converted);
+    }
+
+    jni::Object<TransitionOptions> SymbolLayer::getIconTranslateTransition(jni::JNIEnv& env) {
+        using namespace mbgl::android::conversion;
+        mbgl::style::TransitionOptions options = layer.as<mbgl::style::SymbolLayer>()->SymbolLayer::getIconTranslateTransition();
+        return *convert<jni::Object<TransitionOptions>>(env, options);
+    }
+
+    void SymbolLayer::setIconTranslateTransition(jni::JNIEnv&, jlong duration, jlong delay) {
+        mbgl::style::TransitionOptions options;
+        options.duration.emplace(mbgl::Milliseconds(duration));
+        options.delay.emplace(mbgl::Milliseconds(delay));
+        layer.as<mbgl::style::SymbolLayer>()->SymbolLayer::setIconTranslateTransition(options);
     }
 
     jni::Object<jni::ObjectTag> SymbolLayer::getIconTranslateAnchor(jni::JNIEnv& env) {
@@ -286,10 +365,36 @@ namespace android {
         return jni::Object<jni::ObjectTag>(*converted);
     }
 
+    jni::Object<TransitionOptions> SymbolLayer::getTextOpacityTransition(jni::JNIEnv& env) {
+        using namespace mbgl::android::conversion;
+        mbgl::style::TransitionOptions options = layer.as<mbgl::style::SymbolLayer>()->SymbolLayer::getTextOpacityTransition();
+        return *convert<jni::Object<TransitionOptions>>(env, options);
+    }
+
+    void SymbolLayer::setTextOpacityTransition(jni::JNIEnv&, jlong duration, jlong delay) {
+        mbgl::style::TransitionOptions options;
+        options.duration.emplace(mbgl::Milliseconds(duration));
+        options.delay.emplace(mbgl::Milliseconds(delay));
+        layer.as<mbgl::style::SymbolLayer>()->SymbolLayer::setTextOpacityTransition(options);
+    }
+
     jni::Object<jni::ObjectTag> SymbolLayer::getTextColor(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
         Result<jni::jobject*> converted = convert<jni::jobject*>(env, layer.as<mbgl::style::SymbolLayer>()->SymbolLayer::getTextColor());
         return jni::Object<jni::ObjectTag>(*converted);
+    }
+
+    jni::Object<TransitionOptions> SymbolLayer::getTextColorTransition(jni::JNIEnv& env) {
+        using namespace mbgl::android::conversion;
+        mbgl::style::TransitionOptions options = layer.as<mbgl::style::SymbolLayer>()->SymbolLayer::getTextColorTransition();
+        return *convert<jni::Object<TransitionOptions>>(env, options);
+    }
+
+    void SymbolLayer::setTextColorTransition(jni::JNIEnv&, jlong duration, jlong delay) {
+        mbgl::style::TransitionOptions options;
+        options.duration.emplace(mbgl::Milliseconds(duration));
+        options.delay.emplace(mbgl::Milliseconds(delay));
+        layer.as<mbgl::style::SymbolLayer>()->SymbolLayer::setTextColorTransition(options);
     }
 
     jni::Object<jni::ObjectTag> SymbolLayer::getTextHaloColor(jni::JNIEnv& env) {
@@ -298,10 +403,36 @@ namespace android {
         return jni::Object<jni::ObjectTag>(*converted);
     }
 
+    jni::Object<TransitionOptions> SymbolLayer::getTextHaloColorTransition(jni::JNIEnv& env) {
+        using namespace mbgl::android::conversion;
+        mbgl::style::TransitionOptions options = layer.as<mbgl::style::SymbolLayer>()->SymbolLayer::getTextHaloColorTransition();
+        return *convert<jni::Object<TransitionOptions>>(env, options);
+    }
+
+    void SymbolLayer::setTextHaloColorTransition(jni::JNIEnv&, jlong duration, jlong delay) {
+        mbgl::style::TransitionOptions options;
+        options.duration.emplace(mbgl::Milliseconds(duration));
+        options.delay.emplace(mbgl::Milliseconds(delay));
+        layer.as<mbgl::style::SymbolLayer>()->SymbolLayer::setTextHaloColorTransition(options);
+    }
+
     jni::Object<jni::ObjectTag> SymbolLayer::getTextHaloWidth(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
         Result<jni::jobject*> converted = convert<jni::jobject*>(env, layer.as<mbgl::style::SymbolLayer>()->SymbolLayer::getTextHaloWidth());
         return jni::Object<jni::ObjectTag>(*converted);
+    }
+
+    jni::Object<TransitionOptions> SymbolLayer::getTextHaloWidthTransition(jni::JNIEnv& env) {
+        using namespace mbgl::android::conversion;
+        mbgl::style::TransitionOptions options = layer.as<mbgl::style::SymbolLayer>()->SymbolLayer::getTextHaloWidthTransition();
+        return *convert<jni::Object<TransitionOptions>>(env, options);
+    }
+
+    void SymbolLayer::setTextHaloWidthTransition(jni::JNIEnv&, jlong duration, jlong delay) {
+        mbgl::style::TransitionOptions options;
+        options.duration.emplace(mbgl::Milliseconds(duration));
+        options.delay.emplace(mbgl::Milliseconds(delay));
+        layer.as<mbgl::style::SymbolLayer>()->SymbolLayer::setTextHaloWidthTransition(options);
     }
 
     jni::Object<jni::ObjectTag> SymbolLayer::getTextHaloBlur(jni::JNIEnv& env) {
@@ -310,10 +441,36 @@ namespace android {
         return jni::Object<jni::ObjectTag>(*converted);
     }
 
+    jni::Object<TransitionOptions> SymbolLayer::getTextHaloBlurTransition(jni::JNIEnv& env) {
+        using namespace mbgl::android::conversion;
+        mbgl::style::TransitionOptions options = layer.as<mbgl::style::SymbolLayer>()->SymbolLayer::getTextHaloBlurTransition();
+        return *convert<jni::Object<TransitionOptions>>(env, options);
+    }
+
+    void SymbolLayer::setTextHaloBlurTransition(jni::JNIEnv&, jlong duration, jlong delay) {
+        mbgl::style::TransitionOptions options;
+        options.duration.emplace(mbgl::Milliseconds(duration));
+        options.delay.emplace(mbgl::Milliseconds(delay));
+        layer.as<mbgl::style::SymbolLayer>()->SymbolLayer::setTextHaloBlurTransition(options);
+    }
+
     jni::Object<jni::ObjectTag> SymbolLayer::getTextTranslate(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
         Result<jni::jobject*> converted = convert<jni::jobject*>(env, layer.as<mbgl::style::SymbolLayer>()->SymbolLayer::getTextTranslate());
         return jni::Object<jni::ObjectTag>(*converted);
+    }
+
+    jni::Object<TransitionOptions> SymbolLayer::getTextTranslateTransition(jni::JNIEnv& env) {
+        using namespace mbgl::android::conversion;
+        mbgl::style::TransitionOptions options = layer.as<mbgl::style::SymbolLayer>()->SymbolLayer::getTextTranslateTransition();
+        return *convert<jni::Object<TransitionOptions>>(env, options);
+    }
+
+    void SymbolLayer::setTextTranslateTransition(jni::JNIEnv&, jlong duration, jlong delay) {
+        mbgl::style::TransitionOptions options;
+        options.duration.emplace(mbgl::Milliseconds(duration));
+        options.delay.emplace(mbgl::Milliseconds(delay));
+        layer.as<mbgl::style::SymbolLayer>()->SymbolLayer::setTextTranslateTransition(options);
     }
 
     jni::Object<jni::ObjectTag> SymbolLayer::getTextTranslateAnchor(jni::JNIEnv& env) {
@@ -321,6 +478,7 @@ namespace android {
         Result<jni::jobject*> converted = convert<jni::jobject*>(env, layer.as<mbgl::style::SymbolLayer>()->SymbolLayer::getTextTranslateAnchor());
         return jni::Object<jni::ObjectTag>(*converted);
     }
+
 
     jni::Class<SymbolLayer> SymbolLayer::javaClass;
 
@@ -375,18 +533,42 @@ namespace android {
             METHOD(&SymbolLayer::getTextAllowOverlap, "nativeGetTextAllowOverlap"),
             METHOD(&SymbolLayer::getTextIgnorePlacement, "nativeGetTextIgnorePlacement"),
             METHOD(&SymbolLayer::getTextOptional, "nativeGetTextOptional"),
+            METHOD(&SymbolLayer::getIconOpacityTransition, "nativeGetIconOpacityTransition"),
+            METHOD(&SymbolLayer::setIconOpacityTransition, "nativeSetIconOpacityTransition"),
             METHOD(&SymbolLayer::getIconOpacity, "nativeGetIconOpacity"),
+            METHOD(&SymbolLayer::getIconColorTransition, "nativeGetIconColorTransition"),
+            METHOD(&SymbolLayer::setIconColorTransition, "nativeSetIconColorTransition"),
             METHOD(&SymbolLayer::getIconColor, "nativeGetIconColor"),
+            METHOD(&SymbolLayer::getIconHaloColorTransition, "nativeGetIconHaloColorTransition"),
+            METHOD(&SymbolLayer::setIconHaloColorTransition, "nativeSetIconHaloColorTransition"),
             METHOD(&SymbolLayer::getIconHaloColor, "nativeGetIconHaloColor"),
+            METHOD(&SymbolLayer::getIconHaloWidthTransition, "nativeGetIconHaloWidthTransition"),
+            METHOD(&SymbolLayer::setIconHaloWidthTransition, "nativeSetIconHaloWidthTransition"),
             METHOD(&SymbolLayer::getIconHaloWidth, "nativeGetIconHaloWidth"),
+            METHOD(&SymbolLayer::getIconHaloBlurTransition, "nativeGetIconHaloBlurTransition"),
+            METHOD(&SymbolLayer::setIconHaloBlurTransition, "nativeSetIconHaloBlurTransition"),
             METHOD(&SymbolLayer::getIconHaloBlur, "nativeGetIconHaloBlur"),
+            METHOD(&SymbolLayer::getIconTranslateTransition, "nativeGetIconTranslateTransition"),
+            METHOD(&SymbolLayer::setIconTranslateTransition, "nativeSetIconTranslateTransition"),
             METHOD(&SymbolLayer::getIconTranslate, "nativeGetIconTranslate"),
             METHOD(&SymbolLayer::getIconTranslateAnchor, "nativeGetIconTranslateAnchor"),
+            METHOD(&SymbolLayer::getTextOpacityTransition, "nativeGetTextOpacityTransition"),
+            METHOD(&SymbolLayer::setTextOpacityTransition, "nativeSetTextOpacityTransition"),
             METHOD(&SymbolLayer::getTextOpacity, "nativeGetTextOpacity"),
+            METHOD(&SymbolLayer::getTextColorTransition, "nativeGetTextColorTransition"),
+            METHOD(&SymbolLayer::setTextColorTransition, "nativeSetTextColorTransition"),
             METHOD(&SymbolLayer::getTextColor, "nativeGetTextColor"),
+            METHOD(&SymbolLayer::getTextHaloColorTransition, "nativeGetTextHaloColorTransition"),
+            METHOD(&SymbolLayer::setTextHaloColorTransition, "nativeSetTextHaloColorTransition"),
             METHOD(&SymbolLayer::getTextHaloColor, "nativeGetTextHaloColor"),
+            METHOD(&SymbolLayer::getTextHaloWidthTransition, "nativeGetTextHaloWidthTransition"),
+            METHOD(&SymbolLayer::setTextHaloWidthTransition, "nativeSetTextHaloWidthTransition"),
             METHOD(&SymbolLayer::getTextHaloWidth, "nativeGetTextHaloWidth"),
+            METHOD(&SymbolLayer::getTextHaloBlurTransition, "nativeGetTextHaloBlurTransition"),
+            METHOD(&SymbolLayer::setTextHaloBlurTransition, "nativeSetTextHaloBlurTransition"),
             METHOD(&SymbolLayer::getTextHaloBlur, "nativeGetTextHaloBlur"),
+            METHOD(&SymbolLayer::getTextTranslateTransition, "nativeGetTextTranslateTransition"),
+            METHOD(&SymbolLayer::setTextTranslateTransition, "nativeSetTextTranslateTransition"),
             METHOD(&SymbolLayer::getTextTranslate, "nativeGetTextTranslate"),
             METHOD(&SymbolLayer::getTextTranslateAnchor, "nativeGetTextTranslateAnchor"));
     }

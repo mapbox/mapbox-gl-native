@@ -36,6 +36,8 @@ import static org.junit.Assert.*;
 import static com.mapbox.mapboxsdk.style.layers.Property.*;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.*;
 
+import com.mapbox.mapboxsdk.style.layers.TransitionOptions;
+
 /**
  * Basic smoke tests for CircleLayer
  */
@@ -79,6 +81,18 @@ public class CircleLayerTest extends BaseStyleTest {
     // Set
     layer.setProperties(visibility(NONE));
     assertEquals(layer.getVisibility().getValue(), NONE);
+  }
+
+  @Test
+  public void testCircleRadiusTransition() {
+    checkViewIsDisplayed(R.id.mapView);
+    Timber.i("circle-radiusTransitionOptions");
+    assertNotNull(layer);
+
+    // Set and Get
+    TransitionOptions options = new TransitionOptions(300, 100);
+    layer.setCircleRadiusTransition(options);
+    assertEquals(layer.getCircleRadiusTransition(), options);
   }
 
   @Test
@@ -227,6 +241,18 @@ public class CircleLayerTest extends BaseStyleTest {
   }
 
   @Test
+  public void testCircleColorTransition() {
+    checkViewIsDisplayed(R.id.mapView);
+    Timber.i("circle-colorTransitionOptions");
+    assertNotNull(layer);
+
+    // Set and Get
+    TransitionOptions options = new TransitionOptions(300, 100);
+    layer.setCircleColorTransition(options);
+    assertEquals(layer.getCircleColorTransition(), options);
+  }
+
+  @Test
   public void testCircleColorAsConstant() {
     checkViewIsDisplayed(R.id.mapView);
     Timber.i("circle-color");
@@ -346,6 +372,18 @@ public class CircleLayerTest extends BaseStyleTest {
     // Set and Get
     layer.setProperties(circleColor(Color.RED));
     assertEquals(layer.getCircleColorAsInt(), Color.RED);
+  }
+
+  @Test
+  public void testCircleBlurTransition() {
+    checkViewIsDisplayed(R.id.mapView);
+    Timber.i("circle-blurTransitionOptions");
+    assertNotNull(layer);
+
+    // Set and Get
+    TransitionOptions options = new TransitionOptions(300, 100);
+    layer.setCircleBlurTransition(options);
+    assertEquals(layer.getCircleBlurTransition(), options);
   }
 
   @Test
@@ -494,6 +532,18 @@ public class CircleLayerTest extends BaseStyleTest {
   }
 
   @Test
+  public void testCircleOpacityTransition() {
+    checkViewIsDisplayed(R.id.mapView);
+    Timber.i("circle-opacityTransitionOptions");
+    assertNotNull(layer);
+
+    // Set and Get
+    TransitionOptions options = new TransitionOptions(300, 100);
+    layer.setCircleOpacityTransition(options);
+    assertEquals(layer.getCircleOpacityTransition(), options);
+  }
+
+  @Test
   public void testCircleOpacityAsConstant() {
     checkViewIsDisplayed(R.id.mapView);
     Timber.i("circle-opacity");
@@ -639,6 +689,18 @@ public class CircleLayerTest extends BaseStyleTest {
   }
 
   @Test
+  public void testCircleTranslateTransition() {
+    checkViewIsDisplayed(R.id.mapView);
+    Timber.i("circle-translateTransitionOptions");
+    assertNotNull(layer);
+
+    // Set and Get
+    TransitionOptions options = new TransitionOptions(300, 100);
+    layer.setCircleTranslateTransition(options);
+    assertEquals(layer.getCircleTranslateTransition(), options);
+  }
+
+  @Test
   public void testCircleTranslateAsConstant() {
     checkViewIsDisplayed(R.id.mapView);
     Timber.i("circle-translate");
@@ -674,6 +736,7 @@ public class CircleLayerTest extends BaseStyleTest {
     assertEquals(0.5f, ((ExponentialStops) layer.getCircleTranslate().getFunction().getStops()).getBase(), 0.001);
     assertEquals(1, ((ExponentialStops) layer.getCircleTranslate().getFunction().getStops()).size());
   }
+
 
   @Test
   public void testCircleTranslateAnchorAsConstant() {
@@ -711,6 +774,7 @@ public class CircleLayerTest extends BaseStyleTest {
     assertEquals(1, ((IntervalStops) layer.getCircleTranslateAnchor().getFunction().getStops()).size());
   }
 
+
   @Test
   public void testCirclePitchScaleAsConstant() {
     checkViewIsDisplayed(R.id.mapView);
@@ -745,6 +809,18 @@ public class CircleLayerTest extends BaseStyleTest {
     assertEquals(CameraFunction.class, layer.getCirclePitchScale().getFunction().getClass());
     assertEquals(IntervalStops.class, layer.getCirclePitchScale().getFunction().getStops().getClass());
     assertEquals(1, ((IntervalStops) layer.getCirclePitchScale().getFunction().getStops()).size());
+  }
+
+  @Test
+  public void testCircleStrokeWidthTransition() {
+    checkViewIsDisplayed(R.id.mapView);
+    Timber.i("circle-stroke-widthTransitionOptions");
+    assertNotNull(layer);
+
+    // Set and Get
+    TransitionOptions options = new TransitionOptions(300, 100);
+    layer.setCircleStrokeWidthTransition(options);
+    assertEquals(layer.getCircleStrokeWidthTransition(), options);
   }
 
   @Test
@@ -893,6 +969,18 @@ public class CircleLayerTest extends BaseStyleTest {
   }
 
   @Test
+  public void testCircleStrokeColorTransition() {
+    checkViewIsDisplayed(R.id.mapView);
+    Timber.i("circle-stroke-colorTransitionOptions");
+    assertNotNull(layer);
+
+    // Set and Get
+    TransitionOptions options = new TransitionOptions(300, 100);
+    layer.setCircleStrokeColorTransition(options);
+    assertEquals(layer.getCircleStrokeColorTransition(), options);
+  }
+
+  @Test
   public void testCircleStrokeColorAsConstant() {
     checkViewIsDisplayed(R.id.mapView);
     Timber.i("circle-stroke-color");
@@ -1012,6 +1100,18 @@ public class CircleLayerTest extends BaseStyleTest {
     // Set and Get
     layer.setProperties(circleStrokeColor(Color.RED));
     assertEquals(layer.getCircleStrokeColorAsInt(), Color.RED);
+  }
+
+  @Test
+  public void testCircleStrokeOpacityTransition() {
+    checkViewIsDisplayed(R.id.mapView);
+    Timber.i("circle-stroke-opacityTransitionOptions");
+    assertNotNull(layer);
+
+    // Set and Get
+    TransitionOptions options = new TransitionOptions(300, 100);
+    layer.setCircleStrokeOpacityTransition(options);
+    assertEquals(layer.getCircleStrokeOpacityTransition(), options);
   }
 
   @Test

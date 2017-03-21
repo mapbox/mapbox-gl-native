@@ -23,6 +23,7 @@ import com.mapbox.mapboxsdk.style.layers.LineLayer;
 import com.mapbox.mapboxsdk.style.layers.Property;
 import com.mapbox.mapboxsdk.style.layers.PropertyValue;
 import com.mapbox.mapboxsdk.style.layers.RasterLayer;
+import com.mapbox.mapboxsdk.style.layers.TransitionOptions;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.mapbox.mapboxsdk.style.sources.RasterSource;
 import com.mapbox.mapboxsdk.style.sources.Source;
@@ -95,6 +96,9 @@ public class RuntimeStyleActivity extends AppCompatActivity {
 
         // Center and Zoom (Amsterdam, zoomed to streets)
         mapboxMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(52.379189, 4.899431), 14));
+
+        mapboxMap.setTransitionDuration(250);
+        mapboxMap.setTransitionDelay(50);
       }
     });
   }
@@ -257,10 +261,9 @@ public class RuntimeStyleActivity extends AppCompatActivity {
   }
 
   private void setWaterColor() {
-    Layer water = mapboxMap.getLayer("water");
+    FillLayer water = mapboxMap.getLayerAs("water");
     if (water != null) {
-      mapboxMap.setTransitionDuration(5000);
-      mapboxMap.setTransitionDelay(1000);
+      water.setFillColorTransition(new TransitionOptions(7500, 1000));
       water.setProperties(
         visibility(VISIBLE),
         fillColor(Color.RED)
@@ -510,7 +513,8 @@ public class RuntimeStyleActivity extends AppCompatActivity {
 
         if (states != null) {
           states.setFilter(eq("name", "Texas"));
-
+          states.setFillOpacityTransition(new TransitionOptions(2500, 0));
+          states.setFillColorTransition(new TransitionOptions(2500, 0));
           states.setProperties(
             fillColor(Color.RED),
             fillOpacity(0.25f)
