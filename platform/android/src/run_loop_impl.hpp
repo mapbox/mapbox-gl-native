@@ -4,7 +4,6 @@
 
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/run_loop.hpp>
-#include <mbgl/util/thread.hpp>
 
 #include <atomic>
 #include <list>
@@ -16,6 +15,7 @@ struct ALooper;
 namespace mbgl {
 namespace util {
 
+template <typename T> class Thread;
 class Alarm;
 
 class RunLoop::Impl {
