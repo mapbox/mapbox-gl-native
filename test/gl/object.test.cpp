@@ -26,20 +26,6 @@ struct MockGLObject {
 
 const bool MockGLObject::Default = false;
 
-TEST(GLObject, PreserveState) {
-    getFlag = false;
-    setFlag = false;
-
-    auto object = std::make_unique<gl::PreserveState<MockGLObject>>();
-    EXPECT_TRUE(getFlag);
-    EXPECT_FALSE(setFlag);
-
-    getFlag = false;
-    object.reset();
-    EXPECT_FALSE(getFlag);
-    EXPECT_TRUE(setFlag);
-}
-
 TEST(GLObject, Value) {
     setFlag = false;
 
