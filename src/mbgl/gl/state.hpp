@@ -66,34 +66,5 @@ private:
     const std::tuple<Args...> params;
 };
 
-// Helper struct that stores the current state and restores it upon destruction. You should not use
-// this code normally, except for debugging purposes.
-template <typename T, typename... Args>
-class PreserveState {
-public:
-    PreserveState(Args&&... args)
-        : params(std::forward_as_tuple(std::forward<Args>(args)...)),
-          value(get(std::index_sequence_for<Args...>{})) {
-    }
-    ~PreserveState() {
-        set(std::index_sequence_for<Args...>{});
-    }
-
-private:
-    template <std::size_t... I>
-    typename T::Type get(std::index_sequence<I...>) {
-        return T::Get(std::get<I>(params)...);
-    }
-
-    template <std::size_t... I>
-    void set(std::index_sequence<I...>) {
-        T::Set(value, std::get<I>(params)...);
-    }
-
-private:
-    const std::tuple<Args...> params;
-    const typename T::Type value;
-};
-
 } // namespace gl
 } // namespace mbgl

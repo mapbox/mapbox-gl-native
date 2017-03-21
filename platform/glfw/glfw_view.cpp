@@ -12,9 +12,6 @@
 #include <mbgl/map/backend_scope.hpp>
 #include <mbgl/map/camera.hpp>
 
-#include <mbgl/gl/state.hpp>
-#include <mbgl/gl/value.hpp>
-
 #include <cassert>
 #include <cstdlib>
 
@@ -567,14 +564,9 @@ void showDebugImage(std::string name, const char *data, size_t width, size_t hei
     glfwGetFramebufferSize(debugWindow, &fbWidth, &fbHeight);
     float scale = static_cast<float>(fbWidth) / static_cast<float>(width);
 
-    {
-        gl::PreserveState<gl::value::PixelZoom> pixelZoom;
-        gl::PreserveState<gl::value::RasterPos> rasterPos;
-
-        MBGL_CHECK_ERROR(glPixelZoom(scale, -scale));
-        MBGL_CHECK_ERROR(glRasterPos2f(-1.0f, 1.0f));
-        MBGL_CHECK_ERROR(glDrawPixels(width, height, GL_LUMINANCE, GL_UNSIGNED_BYTE, data));
-    }
+    MBGL_CHECK_ERROR(glPixelZoom(scale, -scale));
+    MBGL_CHECK_ERROR(glRasterPos2f(-1.0f, 1.0f));
+    MBGL_CHECK_ERROR(glDrawPixels(width, height, GL_LUMINANCE, GL_UNSIGNED_BYTE, data));
 
     glfwSwapBuffers(debugWindow);
 
@@ -604,21 +596,13 @@ void showColorDebugImage(std::string name, const char *data, size_t logicalWidth
     float xScale = static_cast<float>(fbWidth) / static_cast<float>(width);
     float yScale = static_cast<float>(fbHeight) / static_cast<float>(height);
 
-    {
-        gl::PreserveState<gl::value::ClearColor> clearColor;
-        gl::PreserveState<gl::value::Blend> blend;
-        gl::PreserveState<gl::value::BlendFunc> blendFunc;
-        gl::PreserveState<gl::value::PixelZoom> pixelZoom;
-        gl::PreserveState<gl::value::RasterPos> rasterPos;
-
-        MBGL_CHECK_ERROR(glClearColor(0.8, 0.8, 0.8, 1));
-        MBGL_CHECK_ERROR(glClear(GL_COLOR_BUFFER_BIT));
-        MBGL_CHECK_ERROR(glEnable(GL_BLEND));
-        MBGL_CHECK_ERROR(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
-        MBGL_CHECK_ERROR(glPixelZoom(xScale, -yScale));
-        MBGL_CHECK_ERROR(glRasterPos2f(-1.0f, 1.0f));
-        MBGL_CHECK_ERROR(glDrawPixels(width, height, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8_REV, data));
-    }
+    MBGL_CHECK_ERROR(glClearColor(0.8, 0.8, 0.8, 1));
+    MBGL_CHECK_ERROR(glClear(GL_COLOR_BUFFER_BIT));
+    MBGL_CHECK_ERROR(glEnable(GL_BLEND));
+    MBGL_CHECK_ERROR(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+    MBGL_CHECK_ERROR(glPixelZoom(xScale, -yScale));
+    MBGL_CHECK_ERROR(glRasterPos2f(-1.0f, 1.0f));
+    MBGL_CHECK_ERROR(glDrawPixels(width, height, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8_REV, data));
 
     glfwSwapBuffers(debugWindow);
 
