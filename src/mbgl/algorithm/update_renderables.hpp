@@ -1,6 +1,7 @@
 #pragma once
 
 #include <mbgl/tile/tile_id.hpp>
+#include <mbgl/tile/tile_id_hash.hpp>
 #include <mbgl/util/range.hpp>
 #include <mbgl/storage/resource.hpp>
 

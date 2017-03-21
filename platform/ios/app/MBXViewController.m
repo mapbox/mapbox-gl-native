@@ -72,6 +72,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsRuntimeStylingRows) {
     MBXSettingsRuntimeStylingCountryLabels,
     MBXSettingsRuntimeStylingRouteLine,
     MBXSettingsRuntimeStylingDDSPolygon,
+    MBXSettingsRuntimeStylingCustomLatLonGrid,
 };
 
 typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
@@ -105,7 +106,8 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
 
 @interface MBXViewController () <UITableViewDelegate,
                                  UITableViewDataSource,
-                                 MGLMapViewDelegate>
+                                 MGLMapViewDelegate,
+                                 MGLComputedShapeSourceDataSource>
 
 
 @property (nonatomic) IBOutlet MGLMapView *mapView;
@@ -342,6 +344,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                 [NSString stringWithFormat:@"Label Countries in %@", (_usingLocaleBasedCountryLabels ? @"Local Language" : [[NSLocale currentLocale] displayNameForKey:NSLocaleIdentifier value:[self bestLanguageForUser]])],
                 @"Add Route Line",
                 @"Dynamically Style Polygon",
+                @"Add Custom Lat/Lon Grid",
             ]];
             break;
         case MBXSettingsMiscellaneous:
@@ -580,6 +583,9 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                     break;
                 case MBXSettingsRuntimeStylingDDSPolygon:
                     [self stylePolygonWithDDS];
+                    break;
+                case MBXSettingsRuntimeStylingCustomLatLonGrid:
+                    [self addLatLonGrid];
                     break;
                 default:
                     NSAssert(NO, @"All runtime styling setting rows should be implemented");
@@ -1330,6 +1336,21 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     [self.mapView.style addLayer:fillStyleLayer];
 }
 
+- (void)addLatLonGrid
+{
+    MGLComputedShapeSource *source = [[MGLComputedShapeSource alloc] initWithIdentifier:@"latlon"
+                                                                              options:@{MGLShapeSourceOptionMaximumZoomLevel:@14}];
+    source.dataSource = self;
+    [self.mapView.style addSource:source];
+    MGLLineStyleLayer *lineLayer = [[MGLLineStyleLayer alloc] initWithIdentifier:@"latlonlines"
+                                                                          source:source];
+    [self.mapView.style addLayer:lineLayer];
+    MGLSymbolStyleLayer *labelLayer = [[MGLSymbolStyleLayer alloc] initWithIdentifier:@"latlonlabels"
+                                                                               source:source];
+    labelLayer.text = [MGLStyleValue valueWithRawValue:@"{value}"];
+    [self.mapView.style addLayer:labelLayer];
+}
+
 - (void)styleLabelLanguageForLayersNamed:(NSArray<NSString *> *)layers
 {
     _usingLocaleBasedCountryLabels = !_usingLocaleBasedCountryLabels;
@@ -1809,6 +1830,54 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     if (self.showZoomLevelEnabled) {
         self.hudLabel.text = [NSString stringWithFormat:@" Zoom: %.2f", self.mapView.zoomLevel];
     }
+}
+
+#pragma mark - MGLComputedShapeSourceDataSource
+
+- (NSArray<id <MGLFeature>>*)featuresInCoordinateBounds:(MGLCoordinateBounds)bounds zoomLevel:(NSUInteger)zoom {
+    double gridSpacing;
+    if(zoom >= 13) {
+        gridSpacing = 0.01;
+    } else if(zoom >= 11) {
+        gridSpacing = 0.05;
+    } else if(zoom == 10) {
+        gridSpacing = .1;
+    } else if(zoom == 9) {
+        gridSpacing = 0.25;
+    } else if(zoom == 8) {
+        gridSpacing = 0.5;
+    } else if (zoom >= 6) {
+        gridSpacing = 1;
+    } else if(zoom == 5) {
+        gridSpacing = 2;
+    } else if(zoom >= 4) {
+        gridSpacing = 5;
+    } else if(zoom == 2) {
+        gridSpacing = 10;
+    } else {
+        gridSpacing = 20;
+    }
+
+    NSMutableArray <id <MGLFeature>> * features = [NSMutableArray array];
+    CLLocationCoordinate2D coords[2];
+
+    for (double y = ceil(bounds.ne.latitude / gridSpacing) * gridSpacing; y >= floor(bounds.sw.latitude / gridSpacing) * gridSpacing; y -= gridSpacing) {
+        coords[0] = CLLocationCoordinate2DMake(y, bounds.sw.longitude);
+        coords[1] = CLLocationCoordinate2DMake(y, bounds.ne.longitude);
+        MGLPolylineFeature *feature = [MGLPolylineFeature polylineWithCoordinates:coords count:2];
+        feature.attributes = @{@"value": @(y)};
+        [features addObject:feature];
+    }
+
+    for (double x = floor(bounds.sw.longitude / gridSpacing) * gridSpacing; x <= ceil(bounds.ne.longitude / gridSpacing) * gridSpacing; x += gridSpacing) {
+        coords[0] = CLLocationCoordinate2DMake(bounds.sw.latitude, x);
+        coords[1] = CLLocationCoordinate2DMake(bounds.ne.latitude, x);
+        MGLPolylineFeature *feature = [MGLPolylineFeature polylineWithCoordinates:coords count:2];
+        feature.attributes = @{@"value": @(x)};
+        [features addObject:feature];
+    }
+
+    return features;
 }
 
 @end

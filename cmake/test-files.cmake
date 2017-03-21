@@ -80,6 +80,7 @@ set(MBGL_TEST_FILES
     test/style/conversion/stringify.test.cpp
 
     # style
+    test/style/custom_vector_source.test.cpp
     test/style/filter.test.cpp
 
     # style/function
