@@ -14,8 +14,6 @@ Alright. So, actually, you may be in the wrong place. From here on in, this READ
 
 [![](https://www.mapbox.com/android-sdk/images/splash.png)](https://www.mapbox.com/android-sdk/)
 
-
-
 ### Setup environment
 
 **These instructions are for developers interested in making code-level contributions to the SDK itself. If you instead want to use the SDK in your app, see above.**
@@ -42,7 +40,6 @@ These dependencies are required for all operating systems and all platform targe
   - NDK
   - LLDB
 
-
 - Modern C++ compiler that supports -std=c++14
   - clang++ 3.5 or later or
   - g++-5 or later
@@ -66,11 +63,18 @@ $ sudo apt-get install -y build-essential curl lib32stdc++6 lib32z1 pkg-config p
 
 #### Open project in Android Studio
 
+##### macOS
+
 Execute the following to generate the required build files and open the project with Android Studio:
 
 ```
 make aproj
 ```
+
+##### linux
+
+Open Android Studio project in `/platform/android`, run `make android-configuration` in the root folder of the project.
+
 
 ##### Setting Mapbox Access Token
 
