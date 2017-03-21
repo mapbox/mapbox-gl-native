@@ -43,7 +43,7 @@ public class MapboxApplication extends Application {
       .penaltyDeath()
       .build());
 
-    Mapbox.getInstance(getApplicationContext(), getString(R.string.mapbox_access_token));
+    Mapbox.initialize(getApplicationContext(), getString(R.string.mapbox_access_token));
   }
 
   private void initializeLogger() {

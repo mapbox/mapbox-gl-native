@@ -8,6 +8,7 @@ import android.text.TextUtils;
 
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.exceptions.InvalidAccessTokenException;
+import com.mapbox.mapboxsdk.exceptions.DuplicateInitializationException;
 import com.mapbox.mapboxsdk.location.LocationSource;
 import com.mapbox.mapboxsdk.net.ConnectivityReceiver;
 import com.mapbox.services.android.telemetry.MapboxTelemetry;
@@ -22,25 +23,26 @@ public final class Mapbox {
   private Boolean connected;
 
   /**
-   * Get an instance of Mapbox.
+   * Initialize the Mapbox object.
    * <p>
    * This class manages the active access token, application context and connectivity state.
    * </p>
    *
    * @param context     Android context which holds or is an application context
    * @param accessToken Mapbox access token
-   * @return the single instance of Mapbox
    */
-  public static synchronized Mapbox getInstance(@NonNull Context context, @NonNull String accessToken) {
-    if (INSTANCE == null) {
-      Context appContext = context.getApplicationContext();
-      INSTANCE = new Mapbox(appContext, accessToken);
-      LocationEngine locationEngine = new LocationSource(appContext);
-      locationEngine.setPriority(LocationEnginePriority.NO_POWER);
-      MapboxTelemetry.getInstance().initialize(appContext, accessToken, locationEngine);
-      ConnectivityReceiver.instance(appContext);
+  public static void initialize(@NonNull Context context, @NonNull String accessToken) {
+    if (INSTANCE != null) {
+      throw new DuplicateInitializationException();
     }
-    return INSTANCE;
+
+    validateAccessToken(accessToken);
+    Context appContext = context.getApplicationContext();
+    INSTANCE = new Mapbox(appContext, accessToken);
+    LocationEngine locationEngine = new LocationSource(appContext);
+    locationEngine.setPriority(LocationEnginePriority.NO_POWER);
+    MapboxTelemetry.getInstance().initialize(appContext, accessToken, locationEngine);
+    ConnectivityReceiver.instance(appContext);
   }
 
   Mapbox(@NonNull Context context, @NonNull String accessToken) {
@@ -54,7 +56,6 @@ public final class Mapbox {
    * @return Mapbox Access Token
    */
   public static String getAccessToken() {
-    validateAccessToken();
     return INSTANCE.accessToken;
   }
 
@@ -63,8 +64,7 @@ public final class Mapbox {
    *
    * @throws InvalidAccessTokenException exception thrown when not using a valid accessToken
    */
-  private static void validateAccessToken() throws InvalidAccessTokenException {
-    String accessToken = INSTANCE.accessToken;
+  public static void validateAccessToken(String accessToken) throws InvalidAccessTokenException {
     if (TextUtils.isEmpty(accessToken) || (!accessToken.toLowerCase(MapboxConstants.MAPBOX_LOCALE).startsWith("pk.")
       && !accessToken.toLowerCase(MapboxConstants.MAPBOX_LOCALE).startsWith("sk."))) {
       throw new InvalidAccessTokenException();
