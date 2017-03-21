@@ -117,7 +117,7 @@ struct VirtualSegment {
     float maxScale;
 };
     
-void insertSegmentGlyph(std::back_insert_iterator<GlyphInstances> glyphs,
+inline void insertSegmentGlyph(std::back_insert_iterator<GlyphInstances> glyphs,
                         const VirtualSegment& virtualSegment,
                         const bool glyphIsLogicallyForward,
                         const bool upsideDown) {
@@ -134,40 +134,61 @@ void insertSegmentGlyph(std::back_insert_iterator<GlyphInstances> glyphs,
         /* angle */ static_cast<float>(std::fmod((glyphAngle + 2.0 * M_PI), (2.0 * M_PI)))};
 }
 
-// Given the distance along the line from the label anchor to the beginning of the current segment,
-//  project a "virtual anchor" point at the same distance along the line extending out from this segment.
-Point<float> getVirtualSegmentAnchor(const Point<float>& segmentBegin, const Point<float>& segmentEnd, float distanceFromAnchorToSegmentBegin) {
+/**
+ Given the distance along the line from the label anchor to the beginning of the current segment,
+ project a "virtual anchor" point at the same distance along the line extending out from this segment.
+ 
+ 
+                     B <-- beginning of current segment
+                    .*-----
+                  .  |
+                .    /
+              .     /
+            .      /
+    ------.*------`
+        .  A
+      .    anchor
+     *
+    VA <- "virtual" anchor
+ 
+ Distance _along line_ from A to B == straight-line distance from V to B.
+ */
+inline Point<float> getVirtualSegmentAnchor(const Point<float>& segmentBegin, const Point<float>& segmentEnd, float distanceFromAnchorToSegmentBegin) {
     Point<float> segmentDirectionUnitVector = util::normal<float>(segmentBegin, segmentEnd);
     return segmentBegin - (segmentDirectionUnitVector * distanceFromAnchorToSegmentBegin);
 }
 
-float getSegmentMinScale(const float glyphDistanceFromAnchor,
+/*
+ Given the segment joining `segmentAnchor` and `segmentEnd` and a desired offset
+ `glyphDistanceFromAnchor` at which a glyph is to be placed, calculate the minimum
+ "scale" at which the glyph will fall on the segment (i.e., not past the end)
+
+ "Scale" here refers to the ratio between the *rendered* zoom level and the text-layout
+ zoom level, which is 1 + (source tile's zoom level).  `glyphDistanceFromAnchor`, although
+ passed in units consistent with the text-layout zoom level, is based on text size.  So
+ when the tile is being rendered at z < text-layout zoom, the glyph's actual distance from
+ the anchor is larger relative to the segment's length than at layout time:
+ 
+ 
+                                                                   GLYPH
+ z == layout-zoom, scale == 1:        segmentAnchor *--------------^-------------* segmentEnd
+ z == layout-zoom - 1, scale == 0.5:  segmentAnchor *--------------^* segmentEnd
+ 
+                                                    <-------------->
+                                                    Anchor-to-glyph distance stays visually fixed,
+                                                    so it changes relative to the segment.
+*/
+inline float getMinScaleForSegment(const float glyphDistanceFromAnchor,
                          const Point<float>& segmentAnchor,
                          const Point<float>& segmentEnd) {
     const float distanceFromAnchorToEnd = util::dist<float>(segmentAnchor, segmentEnd);
     return glyphDistanceFromAnchor / distanceFromAnchorToEnd;
 }
 
-Point<float> getSegmentEnd(const bool glyphIsLogicallyForward,
+inline Point<float> getSegmentEnd(const bool glyphIsLogicallyForward,
                            const GeometryCoordinates& line,
                            const size_t segmentIndex) {
     return convertPoint<float>(glyphIsLogicallyForward ? line[segmentIndex+1] : line[segmentIndex]);
-}
-    
-bool getNextSegment(const GeometryCoordinates& line,
-                    size_t& segmentIndex,
-                    Point<float>& segmentEnd,
-                    const bool glyphIsLogicallyForward) {
-    if (glyphIsLogicallyForward && (segmentIndex + 2 < line.size())) {
-        // +2 because the segment index points to the beginning point and we need an endpoint too
-        segmentIndex += 1;
-    } else if (!glyphIsLogicallyForward && segmentIndex != 0) {
-        segmentIndex -= 1;
-    } else {
-        return false;
-    }
-    segmentEnd = getSegmentEnd(glyphIsLogicallyForward, line, segmentIndex);
-    return true;
 }
 
 optional<VirtualSegment> getNextVirtualSegment(const VirtualSegment& previousVirtualSegment,
@@ -183,16 +204,25 @@ optional<VirtualSegment> getNextVirtualSegment(const VirtualSegment& previousVir
 
     // skip duplicate nodes
     while (nextVirtualSegment.end == nextSegmentBegin) {
-        if (!getNextSegment(line, nextVirtualSegment.index, nextVirtualSegment.end, glyphIsLogicallyForward)) {
-            return optional<VirtualSegment>();
+        // look ahead by 2 points in the line because the segment index refers to the beginning
+        // of the segment, and we need an endpoint too
+        if (glyphIsLogicallyForward && (nextVirtualSegment.index + 2 < line.size())) {
+            nextVirtualSegment.index += 1;
+        } else if (!glyphIsLogicallyForward && nextVirtualSegment.index != 0) {
+            nextVirtualSegment.index -= 1;
+        } else {
+            return {};
         }
+        
+        nextVirtualSegment.end = getSegmentEnd(glyphIsLogicallyForward, line, nextVirtualSegment.index);
     }
+    
     nextVirtualSegment.anchor = getVirtualSegmentAnchor(nextSegmentBegin,
                                                         nextVirtualSegment.end,
                                                         util::dist<float>(previousVirtualSegment.anchor,
                                                                           previousVirtualSegment.end));
     
-    nextVirtualSegment.minScale = getSegmentMinScale(glyphDistanceFromAnchor,
+    nextVirtualSegment.minScale = getMinScaleForSegment(glyphDistanceFromAnchor,
                                                      nextVirtualSegment.anchor,
                                                      nextVirtualSegment.end);
     
@@ -236,7 +266,7 @@ void getLineGlyphs(std::back_insert_iterator<GlyphInstances> glyphs,
     virtualSegment.end = getSegmentEnd(glyphIsLogicallyForward, line, anchorSegment);
     virtualSegment.index = anchorSegment;
     virtualSegment.maxScale = std::numeric_limits<float>::infinity();
-    virtualSegment.minScale = getSegmentMinScale(glyphDistanceFromAnchor, virtualSegment.anchor, virtualSegment.end);
+    virtualSegment.minScale = getMinScaleForSegment(glyphDistanceFromAnchor, virtualSegment.anchor, virtualSegment.end);
     
     while (true) {
         insertSegmentGlyph(glyphs,
