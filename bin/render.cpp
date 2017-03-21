@@ -1,14 +1,12 @@
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/backend_scope.hpp>
 #include <mbgl/util/image.hpp>
-#include <mbgl/util/io.hpp>
 #include <mbgl/util/run_loop.hpp>
 
 #include <mbgl/gl/headless_backend.hpp>
 #include <mbgl/gl/offscreen_view.hpp>
 #include <mbgl/util/default_thread_pool.hpp>
 #include <mbgl/storage/default_file_source.hpp>
-#include <mbgl/util/url.hpp>
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunknown-pragmas"
@@ -21,6 +19,7 @@ namespace po = boost::program_options;
 
 #include <cstdlib>
 #include <iostream>
+#include <fstream>
 
 int main(int argc, char *argv[]) {
     std::string style_path;
@@ -91,11 +90,11 @@ int main(int argc, char *argv[]) {
     ThreadPool threadPool(4);
     Map map(backend, mbgl::Size { width, height }, pixelRatio, fileSource, threadPool, MapMode::Still);
 
-    if (util::isURL(style_path)) {
-        map.setStyleURL(style_path);
-    } else {
-        map.setStyleJSON(mbgl::util::read_file(style_path));
+    if (style_path.find("://") == std::string::npos) {
+        style_path = std::string("file://") + style_path;
     }
+
+    map.setStyleURL(style_path);
 
     map.setClasses(classes);
 
@@ -117,7 +116,9 @@ int main(int argc, char *argv[]) {
             exit(1);
         }
 
-        util::write_file(output, encodePNG(view.readStillImage()));
+        std::ofstream out(output, std::ios::binary);
+        out << encodePNG(view.readStillImage());
+        out.close();
         loop.stop();
     });
 

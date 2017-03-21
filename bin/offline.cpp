@@ -1,7 +1,6 @@
 #include <mbgl/util/default_styles.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/string.hpp>
-#include <mbgl/util/io.hpp>
 
 #include <mbgl/storage/default_file_source.hpp>
 

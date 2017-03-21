@@ -8,7 +8,6 @@ namespace util {
 
 std::string percentEncode(const std::string&);
 std::string percentDecode(const std::string&);
-bool isURL(const std::string&);
 
 // Class that holds position + lenth pairs for scheme, domain, path + query string of a URL.
 class URL {

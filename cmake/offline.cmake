@@ -12,8 +12,6 @@ target_compile_options(mbgl-offline
 )
 
 target_include_directories(mbgl-offline
-    PRIVATE include
-    PRIVATE src # TODO: eliminate
     PRIVATE platform/default
 )
 
