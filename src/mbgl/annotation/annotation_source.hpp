@@ -18,9 +18,10 @@ public:
 
     void loadDescription(FileSource&) final;
 
+    optional<Range<uint8_t>> getZoomRange() const final;
+
 private:
     uint16_t getTileSize() const final { return util::tileSize; }
-    Range<uint8_t> getZoomRange() const final;
 
     std::unique_ptr<Tile> createTile(const OverscaledTileID&, const style::UpdateParameters&) final;
 };

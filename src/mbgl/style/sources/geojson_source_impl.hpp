@@ -28,7 +28,7 @@ public:
         return util::tileSize;
     }
 
-    Range<uint8_t> getZoomRange() const final;
+    optional<Range<uint8_t>> getZoomRange() const final;
 
 private:
     void _setGeoJSON(const GeoJSON&);

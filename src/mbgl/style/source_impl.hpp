@@ -83,7 +83,7 @@ public:
     const std::string id;
 
     virtual optional<std::string> getAttribution() const { return {}; };
-    virtual Range<uint8_t> getZoomRange() const = 0;
+    virtual optional<Range<uint8_t>> getZoomRange() const = 0;
 
     bool loaded = false;
 
