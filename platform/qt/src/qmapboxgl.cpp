@@ -5,10 +5,9 @@
 #include "qt_geojson.hpp"
 
 #include <mbgl/annotation/annotation.hpp>
-#include <mbgl/gl/gl.hpp>
-#include <mbgl/gl/context.hpp>
 #include <mbgl/map/camera.hpp>
 #include <mbgl/map/map.hpp>
+#include <mbgl/gl/context.hpp>
 #include <mbgl/style/conversion.hpp>
 #include <mbgl/style/conversion/layer.hpp>
 #include <mbgl/style/conversion/source.hpp>
@@ -31,6 +30,7 @@
 #include <QOpenGLContext>
 #else
 #include <QCoreApplication>
+#include <QGLContext>
 #endif
 
 #include <QDebug>
@@ -1084,6 +1084,14 @@ void QMapboxGL::resize(const QSize& size, const QSize& framebufferSize)
 }
 
 /*!
+    If Mapbox GL needs to rebind the default framebuffer, it will use the
+    ID supplied here.
+*/
+void QMapboxGL::setFramebufferObject(quint32 fbo) {
+    d_ptr->fbObject = fbo;
+}
+
+/*!
     Adds an \a icon to the annotation icon pool. This can be later used by the annotation
     functions to shown any drawing on the map by referencing its \a name.
 
@@ -1484,6 +1492,7 @@ void QMapboxGL::render()
 #endif
 
     d_ptr->dirty = false;
+    d_ptr->updateViewBinding();
     d_ptr->mapObj->render(*d_ptr);
 }
 
@@ -1554,11 +1563,20 @@ QMapboxGLPrivate::~QMapboxGLPrivate()
 {
 }
 
+mbgl::Size QMapboxGLPrivate::framebufferSize() const {
+    return { static_cast<uint32_t>(fbSize.width()), static_cast<uint32_t>(fbSize.height()) };
+}
+
+void QMapboxGLPrivate::updateViewBinding() {
+    getContext().bindFramebuffer.setCurrentValue(fbObject);
+    assert(mbgl::gl::value::BindFramebuffer::Get() == getContext().bindFramebuffer.getCurrentValue());
+    getContext().viewport.setCurrentValue({ 0, 0, framebufferSize() });
+    assert(mbgl::gl::value::Viewport::Get() == getContext().viewport.getCurrentValue());
+}
+
 void QMapboxGLPrivate::bind() {
-    getContext().bindFramebuffer = 0;
-    getContext().viewport = {
-        0, 0, { static_cast<uint32_t>(fbSize.width()), static_cast<uint32_t>(fbSize.height()) }
-    };
+    getContext().bindFramebuffer = fbObject;
+    getContext().viewport = { 0, 0, framebufferSize() };
 }
 
 void QMapboxGLPrivate::invalidate()
