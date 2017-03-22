@@ -41,6 +41,10 @@ void HeadlessBackend::deactivate() {
     active = false;
 }
 
+void HeadlessBackend::updateAssumedState() {
+    // no-op
+}
+
 void HeadlessBackend::invalidate() {
     assert(false);
 }

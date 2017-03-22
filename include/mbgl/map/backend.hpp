@@ -1,6 +1,8 @@
 #pragma once
 
 #include <mbgl/map/map_observer.hpp>
+#include <mbgl/util/image.hpp>
+#include <mbgl/util/size.hpp>
 
 #include <memory>
 #include <mutex>
@@ -10,6 +12,7 @@ namespace mbgl {
 namespace gl {
 class Context;
 using ProcAddress = void (*)();
+using FramebufferID = uint32_t;
 } // namespace gl
 
 class BackendScope;
@@ -21,6 +24,9 @@ public:
 
     // Returns the backend's context which manages OpenGL state.
     gl::Context& getContext();
+
+    // Called prior to rendering to update the internally assumed OpenGL state.
+    virtual void updateAssumedState() = 0;
 
     // Called when the map needs to be rendered; the backend should call Map::render() at some point
     // in the near future. (Not called for Map::renderStill() mode.)
@@ -44,6 +50,26 @@ protected:
     // activated prior to calling Map::render.
     virtual void activate() = 0;
     virtual void deactivate() = 0;
+
+    // Reads the color pixel data from the currently bound framebuffer.
+    PremultipliedImage readFramebuffer(const Size&) const;
+
+    // A constant to signal that a framebuffer is bound, but with an unknown ID.
+    static constexpr const gl::FramebufferID ImplicitFramebufferBinding =
+        std::numeric_limits<gl::FramebufferID>::max();
+
+    // Tells the renderer that OpenGL state has already been set by the windowing toolkit.
+    // It sets the internal assumed state to the supplied values.
+    void assumeFramebufferBinding(gl::FramebufferID fbo);
+    void assumeViewportSize(const Size&);
+
+    // Returns true when assumed framebuffer binding hasn't changed from the implicit binding.
+    bool implicitFramebufferBound();
+
+    // Triggers an OpenGL state update if the internal assumed state doesn't match the
+    // supplied values.
+    void setFramebufferBinding(gl::FramebufferID fbo);
+    void setViewportSize(const Size&);
 
 protected:
     std::unique_ptr<gl::Context> context;

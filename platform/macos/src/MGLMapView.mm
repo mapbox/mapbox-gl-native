@@ -26,9 +26,9 @@
 #import <mbgl/map/camera.hpp>
 #import <mbgl/storage/reachability.h>
 #import <mbgl/util/default_thread_pool.hpp>
-#import <mbgl/gl/context.hpp>
 #import <mbgl/map/backend.hpp>
 #import <mbgl/map/backend_scope.hpp>
+#import <mbgl/gl/gl.hpp>
 #import <mbgl/sprite/sprite_image.hpp>
 #import <mbgl/storage/default_file_source.hpp>
 #import <mbgl/storage/network_status.hpp>
@@ -770,7 +770,6 @@ public:
         // The OpenGL implementation automatically enables the OpenGL context for us.
         mbgl::BackendScope scope { *_mbglView, mbgl::BackendScope::ScopeType::Implicit };
 
-        _mbglView->updateViewBinding();
         _mbglMap->render(*_mbglView);
 
         if (_isPrinting) {
@@ -2866,25 +2865,19 @@ public:
         [NSOpenGLContext clearCurrentContext];
     }
 
-    mbgl::gl::value::Viewport::Type getViewport() const {
-        return { 0, 0, nativeView.framebufferSize };
-    }
-
-    void updateViewBinding() {
-        fbo = mbgl::gl::value::BindFramebuffer::Get();
-        getContext().bindFramebuffer.setCurrentValue(fbo);
-        getContext().viewport.setCurrentValue(getViewport());
-        auto actualViewport = mbgl::gl::value::Viewport::Get();
-        assert(actualViewport == getContext().viewport.getCurrentValue());
+    void updateAssumedState() override {
+        MBGL_CHECK_ERROR(glGetIntegerv(GL_FRAMEBUFFER_BINDING, &fbo));
+        assumeFramebufferBinding(fbo);
+        assumeViewportSize(nativeView.framebufferSize);
     }
 
     void bind() override {
-        getContext().bindFramebuffer = fbo;
-        getContext().viewport = getViewport();
+        setFramebufferBinding(fbo);
+        setViewportSize(nativeView.framebufferSize);
     }
 
     mbgl::PremultipliedImage readStillImage() {
-        return getContext().readFramebuffer<mbgl::PremultipliedImage>(nativeView.framebufferSize);
+        return readFramebuffer(nativeView.framebufferSize);
     }
 
 private:

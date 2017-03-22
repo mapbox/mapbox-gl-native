@@ -15,6 +15,8 @@ public:
     HeadlessBackend(std::shared_ptr<HeadlessDisplay>);
     ~HeadlessBackend() override;
 
+    void updateAssumedState() override;
+
     void invalidate() override;
 
     struct Impl {

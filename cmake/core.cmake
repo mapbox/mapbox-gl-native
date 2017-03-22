@@ -9,7 +9,7 @@ target_compile_options(mbgl-core
 
 target_include_directories(mbgl-core
     PUBLIC include
-    PUBLIC src # TODO: make private
+    PRIVATE src
 )
 
 target_add_mason_package(mbgl-core PUBLIC geometry)

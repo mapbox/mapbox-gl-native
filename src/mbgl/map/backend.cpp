@@ -21,6 +21,38 @@ gl::Context& Backend::getContext() {
     return *context;
 }
 
+PremultipliedImage Backend::readFramebuffer(const Size& size) const {
+    assert(context);
+    return context->readFramebuffer<PremultipliedImage>(size);
+}
+
+void Backend::assumeFramebufferBinding(const gl::FramebufferID fbo) {
+    getContext().bindFramebuffer.setCurrentValue(fbo);
+    if (fbo != ImplicitFramebufferBinding) {
+        assert(gl::value::BindFramebuffer::Get() == getContext().bindFramebuffer.getCurrentValue());
+    }
+}
+void Backend::assumeViewportSize(const Size& size) {
+    getContext().viewport.setCurrentValue({ 0, 0, size });
+    assert(gl::value::Viewport::Get() == getContext().viewport.getCurrentValue());
+}
+
+bool Backend::implicitFramebufferBound() {
+    return getContext().bindFramebuffer.getCurrentValue() == ImplicitFramebufferBinding;
+}
+
+void Backend::setFramebufferBinding(const gl::FramebufferID fbo) {
+    getContext().bindFramebuffer = fbo;
+    if (fbo != ImplicitFramebufferBinding) {
+        assert(gl::value::BindFramebuffer::Get() == getContext().bindFramebuffer.getCurrentValue());
+    }
+}
+
+void Backend::setViewportSize(const Size& size) {
+    getContext().viewport = { 0, 0, size };
+    assert(gl::value::Viewport::Get() == getContext().viewport.getCurrentValue());
+}
+
 Backend::~Backend() = default;
 
 } // namespace mbgl
