@@ -5,6 +5,7 @@
 #include <mbgl/style/layers/symbol_layer_properties.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/constants.hpp>
+#include <mbgl/util/optional.hpp>
 
 #include <cassert>
 
@@ -95,76 +96,195 @@ SymbolQuad getIconQuad(const Anchor& anchor,
 
 struct GlyphInstance {
     explicit GlyphInstance(Point<float> anchorPoint_) : anchorPoint(std::move(anchorPoint_)) {}
-    explicit GlyphInstance(Point<float> anchorPoint_, float offset_, float minScale_, float maxScale_,
+    explicit GlyphInstance(Point<float> anchorPoint_, bool upsideDown_, float minScale_, float maxScale_,
             float angle_)
-        : anchorPoint(std::move(anchorPoint_)), offset(offset_), minScale(minScale_), maxScale(maxScale_), angle(angle_) {}
+        : anchorPoint(std::move(anchorPoint_)), upsideDown(upsideDown_), minScale(minScale_), maxScale(maxScale_), angle(angle_) {}
 
     const Point<float> anchorPoint;
-    const float offset = 0.0f;
+    const bool upsideDown = false;
     const float minScale = globalMinScale;
     const float maxScale = std::numeric_limits<float>::infinity();
     const float angle = 0.0f;
 };
 
 typedef std::vector<GlyphInstance> GlyphInstances;
+    
+struct VirtualSegment {
+    Point<float> anchor;
+    Point<float> end;
+    size_t index;
+    float minScale;
+    float maxScale;
+};
+    
+inline void insertSegmentGlyph(std::back_insert_iterator<GlyphInstances> glyphs,
+                        const VirtualSegment& virtualSegment,
+                        const bool glyphIsLogicallyForward,
+                        const bool upsideDown) {
+    float segmentAngle = std::atan2(virtualSegment.end.y - virtualSegment.anchor.y, virtualSegment.end.x - virtualSegment.anchor.x);
+    // If !glyphIsLogicallyForward, we're iterating through the segments in reverse logical order as well, so we need to flip the segment angle
+    float glyphAngle = glyphIsLogicallyForward ? segmentAngle : segmentAngle + M_PI;
+    
+    // Insert a glyph rotated at this angle for display in the range from [scale, previous(larger) scale].
+    glyphs = GlyphInstance{
+        /* anchor */ virtualSegment.anchor,
+        /* upsideDown */ upsideDown,
+        /* minScale */ virtualSegment.minScale,
+        /* maxScale */ virtualSegment.maxScale,
+        /* angle */ static_cast<float>(std::fmod((glyphAngle + 2.0 * M_PI), (2.0 * M_PI)))};
+}
 
-void getSegmentGlyphs(std::back_insert_iterator<GlyphInstances> glyphs,
-                      Anchor& anchor,
-                      float offset,
-                      const GeometryCoordinates& line,
-                      int segment,
-                      bool forward) {
-    const bool upsideDown = !forward;
+/**
+ Given the distance along the line from the label anchor to the beginning of the current segment,
+ project a "virtual anchor" point at the same distance along the line extending out from this segment.
+ 
+                B <-- beginning of current segment
+* . . . . . . . *--------* E <-- end of current segment
+VA              |      
+                /        VA = "virtual segment anchor"
+               /
+     ---*-----`
+        A = label anchor
+ 
+ Distance _along line_ from A to B == straight-line distance from VA to B.
+ */
+inline Point<float> getVirtualSegmentAnchor(const Point<float>& segmentBegin, const Point<float>& segmentEnd, float distanceFromAnchorToSegmentBegin) {
+    Point<float> segmentDirectionUnitVector = util::normal<float>(segmentBegin, segmentEnd);
+    return segmentBegin - (segmentDirectionUnitVector * distanceFromAnchorToSegmentBegin);
+}
 
-    if (offset < 0)
-        forward = !forward;
+/*
+ Given the segment joining `segmentAnchor` and `segmentEnd` and a desired offset
+ `glyphDistanceFromAnchor` at which a glyph is to be placed, calculate the minimum
+ "scale" at which the glyph will fall on the segment (i.e., not past the end)
 
-    if (forward)
-        segment++;
+ "Scale" here refers to the ratio between the *rendered* zoom level and the text-layout
+ zoom level, which is 1 + (source tile's zoom level).  `glyphDistanceFromAnchor`, although
+ passed in units consistent with the text-layout zoom level, is based on text size.  So
+ when the tile is being rendered at z < text-layout zoom, the glyph's actual distance from
+ the anchor is larger relative to the segment's length than at layout time:
+ 
+ 
+                                                                   GLYPH
+ z == layout-zoom, scale == 1:        segmentAnchor *--------------^-------------* segmentEnd
+ z == layout-zoom - 1, scale == 0.5:  segmentAnchor *--------------^* segmentEnd
+ 
+                                                    <-------------->
+                                                    Anchor-to-glyph distance stays visually fixed,
+                                                    so it changes relative to the segment.
+*/
+inline float getMinScaleForSegment(const float glyphDistanceFromAnchor,
+                         const Point<float>& segmentAnchor,
+                         const Point<float>& segmentEnd) {
+    const float distanceFromAnchorToEnd = util::dist<float>(segmentAnchor, segmentEnd);
+    return glyphDistanceFromAnchor / distanceFromAnchorToEnd;
+}
 
-    assert((int)line.size() > segment);
-    Point<float> end = convertPoint<float>(line[segment]);
-    Point<float> newAnchorPoint = anchor.point;
-    float prevscale = std::numeric_limits<float>::infinity();
+inline Point<float> getSegmentEnd(const bool glyphIsLogicallyForward,
+                           const GeometryCoordinates& line,
+                           const size_t segmentIndex) {
+    return convertPoint<float>(glyphIsLogicallyForward ? line[segmentIndex+1] : line[segmentIndex]);
+}
 
-    offset = std::fabs(offset);
+optional<VirtualSegment> getNextVirtualSegment(const VirtualSegment& previousVirtualSegment,
+                                               const GeometryCoordinates& line,
+                                               const float glyphDistanceFromAnchor,
+                                               const bool glyphIsLogicallyForward) {
+    auto nextSegmentBegin = previousVirtualSegment.end;
+    
+    auto end = nextSegmentBegin;
+    size_t index = previousVirtualSegment.index;
 
-    const float placementScale = anchor.scale;
-
-    while (true) {
-        const float dist = util::dist<float>(newAnchorPoint, end);
-        const float scale = offset / dist;
-        float angle = std::atan2(end.y - newAnchorPoint.y, end.x - newAnchorPoint.x);
-        if (!forward)
-            angle += M_PI;
-
-        glyphs = GlyphInstance{
-            /* anchor */ newAnchorPoint,
-            /* offset */ static_cast<float>(upsideDown ? M_PI : 0.0),
-            /* minScale */ scale,
-            /* maxScale */ prevscale,
-            /* angle */ static_cast<float>(std::fmod((angle + 2.0 * M_PI), (2.0 * M_PI)))};
-
-        if (scale <= placementScale)
-            break;
-
-        newAnchorPoint = end;
-
-        // skip duplicate nodes
-        while (newAnchorPoint == end) {
-            segment += forward ? 1 : -1;
-            if ((int)line.size() <= segment || segment < 0) {
-                anchor.scale = scale;
-                return;
-            }
-            end = convertPoint<float>(line[segment]);
+    // skip duplicate nodes
+    while (end == nextSegmentBegin) {
+        // look ahead by 2 points in the line because the segment index refers to the beginning
+        // of the segment, and we need an endpoint too
+        if (glyphIsLogicallyForward && (index + 2 < line.size())) {
+            index += 1;
+        } else if (!glyphIsLogicallyForward && index != 0) {
+            index -= 1;
+        } else {
+            return {};
         }
-
-        Point<float> normal = util::normal<float>(newAnchorPoint, end) * dist;
-        newAnchorPoint = newAnchorPoint - normal;
-
-        prevscale = scale;
+        
+        end = getSegmentEnd(glyphIsLogicallyForward, line, index);
     }
+    
+    const auto anchor = getVirtualSegmentAnchor(nextSegmentBegin, end,
+                                                util::dist<float>(previousVirtualSegment.anchor,
+                                                                  previousVirtualSegment.end));
+    return VirtualSegment {
+        anchor,
+        end,
+        index,
+        getMinScaleForSegment(glyphDistanceFromAnchor, anchor, end),
+        previousVirtualSegment.minScale
+    };
+}
+    
+/*
+ Given (1) a glyph positioned relative to an anchor point and (2) a line to follow,
+ calculates which segment of the line the glyph will fall on for each possible
+ scale range, and for each range produces a "virtual" anchor point and an angle that will
+ place the glyph on the right segment and rotated to the correct angle.
+ 
+ Because one glyph quad is made ahead of time for each possible orientation, the
+ symbol_sdf shader can quickly handle changing layout as we zoom in and out
+ 
+ If the "keepUpright" property is set, we call getLineGlyphs twice (once upright and 
+ once "upside down"). This will generate two sets of glyphs following the line in opposite
+ directions. Later, SymbolLayout::place will look at the glyphs and based on the placement
+ angle determine if their original anchor was "upright" or not -- based on that, it throws
+ away one set of glyphs or the other (this work has to be done in the CPU, but it's just a
+ filter so it's fast)
+ */
+void getLineGlyphs(std::back_insert_iterator<GlyphInstances> glyphs,
+                      Anchor& anchor,
+                      float glyphHorizontalOffsetFromAnchor,
+                      const GeometryCoordinates& line,
+                      size_t anchorSegment,
+                      bool upsideDown) {
+    assert(line.size() > anchorSegment+1);
+    
+    // This is true if the glyph is "logically forward" of the anchor point, based on the ordering of line segments
+    //  The actual angle of the line is irrelevant
+    //  If "upsideDown" is set, everything is flipped
+    const bool glyphIsLogicallyForward = (glyphHorizontalOffsetFromAnchor >= 0) ^ upsideDown;
+    const float glyphDistanceFromAnchor = std::fabs(glyphHorizontalOffsetFromAnchor);
+    
+    VirtualSegment virtualSegment = {
+        anchor.point,
+        getSegmentEnd(glyphIsLogicallyForward, line, anchorSegment),
+        anchorSegment,
+        getMinScaleForSegment(glyphDistanceFromAnchor, virtualSegment.anchor, virtualSegment.end),
+        std::numeric_limits<float>::infinity()
+    };
+    
+    while (true) {
+        insertSegmentGlyph(glyphs,
+                           virtualSegment,
+                           glyphIsLogicallyForward,
+                           upsideDown);
+        
+        if (virtualSegment.minScale <= anchor.scale) {
+            // No need to calculate below the scale where the label starts showing
+            return;
+        }
+        
+        optional<VirtualSegment> nextVirtualSegment = getNextVirtualSegment(virtualSegment,
+                                                                            line,
+                                                                            glyphDistanceFromAnchor,
+                                                                            glyphIsLogicallyForward);
+        if (!nextVirtualSegment) {
+            // There are no more segments, so we can't fit this glyph on the line at a lower scale
+            // This implies we can't show the label at all at lower scale, so we update the anchor's min scale
+            anchor.scale = virtualSegment.minScale;
+            return;
+        } else {
+            virtualSegment = *nextVirtualSegment;
+        }
+    }
+    
 }
 
 SymbolQuads getGlyphQuads(Anchor& anchor,
@@ -196,9 +316,9 @@ SymbolQuads getGlyphQuads(Anchor& anchor,
 
         GlyphInstances glyphInstances;
         if (placement == style::SymbolPlacementType::Line) {
-            getSegmentGlyphs(std::back_inserter(glyphInstances), anchor, centerX, line, anchor.segment, true);
+            getLineGlyphs(std::back_inserter(glyphInstances), anchor, centerX, line, anchor.segment, false);
             if (keepUpright)
-                getSegmentGlyphs(std::back_inserter(glyphInstances), anchor, centerX, line, anchor.segment, false);
+                getLineGlyphs(std::back_inserter(glyphInstances), anchor, centerX, line, anchor.segment, true);
         } else {
             glyphInstances.emplace_back(GlyphInstance{anchor.point});
         }
@@ -247,8 +367,10 @@ SymbolQuads getGlyphQuads(Anchor& anchor,
             // Prevent label from extending past the end of the line
             const float glyphMinScale = std::max(instance.minScale, anchor.scale);
 
-            const float anchorAngle = std::fmod((anchor.angle + instance.offset + 2 * M_PI), (2 * M_PI));
-            const float glyphAngle = std::fmod((instance.angle + instance.offset + 2 * M_PI), (2 * M_PI));
+            // All the glyphs for a label are tagged with either the "right side up" or "upside down" anchor angle,
+            //  which is used at placement time to determine which set to show
+            const float anchorAngle = std::fmod((anchor.angle + (instance.upsideDown ? M_PI : 0.0) + 2 * M_PI), (2 * M_PI));
+            const float glyphAngle = std::fmod((instance.angle + (instance.upsideDown ? M_PI : 0.0) + 2 * M_PI), (2 * M_PI));
             quads.emplace_back(tl, tr, bl, br, rect, anchorAngle, glyphAngle, instance.anchorPoint, glyphMinScale, instance.maxScale, shapedText.writingMode);
         }
     }
