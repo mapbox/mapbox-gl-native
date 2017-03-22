@@ -14,11 +14,11 @@ attribute vec2 a_texture_pos;
 attribute vec4 a_data;
 
 uniform lowp float a_fill_color_t;
-attribute lowp vec4 a_fill_color;
-varying lowp vec4 fill_color;
+attribute highp vec4 a_fill_color;
+varying highp vec4 fill_color;
 uniform lowp float a_halo_color_t;
-attribute lowp vec4 a_halo_color;
-varying lowp vec4 halo_color;
+attribute highp vec4 a_halo_color;
+varying highp vec4 halo_color;
 uniform lowp float a_opacity_t;
 attribute lowp vec2 a_opacity;
 varying lowp float opacity;
@@ -119,8 +119,8 @@ const char* symbol_sdf::fragmentSource = R"MBGL_SHADER(
 #define EDGE_GAMMA 0.105/DEVICE_PIXEL_RATIO
 
 uniform bool u_is_halo;
-varying lowp vec4 fill_color;
-varying lowp vec4 halo_color;
+varying highp vec4 fill_color;
+varying highp vec4 halo_color;
 varying lowp float opacity;
 varying lowp float halo_width;
 varying lowp float halo_blur;

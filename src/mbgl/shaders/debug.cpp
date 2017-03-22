@@ -17,7 +17,7 @@ void main() {
 
 )MBGL_SHADER";
 const char* debug::fragmentSource = R"MBGL_SHADER(
-uniform lowp vec4 u_color;
+uniform highp vec4 u_color;
 
 void main() {
     gl_FragColor = u_color;
