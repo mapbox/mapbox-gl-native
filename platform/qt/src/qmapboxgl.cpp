@@ -7,7 +7,6 @@
 #include <mbgl/annotation/annotation.hpp>
 #include <mbgl/map/camera.hpp>
 #include <mbgl/map/map.hpp>
-#include <mbgl/gl/context.hpp>
 #include <mbgl/map/backend_scope.hpp>
 #include <mbgl/style/conversion.hpp>
 #include <mbgl/style/conversion/layer.hpp>
@@ -1500,7 +1499,6 @@ void QMapboxGL::render()
     mbgl::BackendScope scope { *d_ptr, mbgl::BackendScope::ScopeType::Implicit };
 
     d_ptr->dirty = false;
-    d_ptr->updateViewBinding();
     d_ptr->mapObj->render(*d_ptr);
 }
 
@@ -1575,16 +1573,14 @@ mbgl::Size QMapboxGLPrivate::framebufferSize() const {
     return { static_cast<uint32_t>(fbSize.width()), static_cast<uint32_t>(fbSize.height()) };
 }
 
-void QMapboxGLPrivate::updateViewBinding() {
-    getContext().bindFramebuffer.setCurrentValue(fbObject);
-    assert(mbgl::gl::value::BindFramebuffer::Get() == getContext().bindFramebuffer.getCurrentValue());
-    getContext().viewport.setCurrentValue({ 0, 0, framebufferSize() });
-    assert(mbgl::gl::value::Viewport::Get() == getContext().viewport.getCurrentValue());
+void QMapboxGLPrivate::updateAssumedState() {
+    assumeFramebufferBinding(fbObject);
+    assumeViewportSize(framebufferSize());
 }
 
 void QMapboxGLPrivate::bind() {
-    getContext().bindFramebuffer = fbObject;
-    getContext().viewport = { 0, 0, framebufferSize() };
+    setFramebufferBinding(fbObject);
+    setViewportSize(framebufferSize());
 }
 
 void QMapboxGLPrivate::invalidate()

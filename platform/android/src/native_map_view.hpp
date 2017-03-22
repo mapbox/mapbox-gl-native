@@ -58,6 +58,7 @@ public:
 
     // mbgl::Backend //
 
+    void updateAssumedState() override;
     void invalidate() override;
 
     // Deprecated //
@@ -281,7 +282,6 @@ private:
 
     EGLConfig chooseConfig(const EGLConfig configs[], EGLint numConfigs);
 
-    void updateViewBinding();
     mbgl::Size getFramebufferSize() const;
 
     void updateFps();

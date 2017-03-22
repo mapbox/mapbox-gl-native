@@ -7,7 +7,6 @@ target_compile_options(mbgl-benchmark
 )
 
 target_include_directories(mbgl-benchmark
-    PRIVATE include
     PRIVATE src
     PRIVATE benchmark/include
     PRIVATE benchmark/src

@@ -21,12 +21,12 @@ public:
     virtual ~QMapboxGLPrivate();
 
     mbgl::Size framebufferSize() const;
-    void updateViewBinding();
 
     // mbgl::View implementation.
     void bind() final;
 
     // mbgl::Backend implementation.
+    void updateAssumedState() final;
     void invalidate() final;
     void activate() final {}
     void deactivate() final {}

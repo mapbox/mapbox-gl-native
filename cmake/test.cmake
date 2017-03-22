@@ -15,7 +15,6 @@ target_compile_options(mbgl-test
 set_source_files_properties(test/src/mbgl/test/util.cpp PROPERTIES COMPILE_FLAGS -DNODE_EXECUTABLE="${NodeJS_EXECUTABLE}")
 
 target_include_directories(mbgl-test
-    PRIVATE include
     PRIVATE src
     PRIVATE test/include
     PRIVATE test/src

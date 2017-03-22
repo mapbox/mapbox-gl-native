@@ -3,8 +3,6 @@
 #include <mbgl/annotation/annotation.hpp>
 #include <mbgl/sprite/sprite_image.hpp>
 #include <mbgl/style/transition_options.hpp>
-#include <mbgl/gl/gl.hpp>
-#include <mbgl/gl/context.hpp>
 #include <mbgl/util/logging.hpp>
 #include <mbgl/util/platform.hpp>
 #include <mbgl/util/string.hpp>
@@ -129,16 +127,14 @@ void GLFWView::setMap(mbgl::Map *map_) {
     map->addAnnotationIcon("default_marker", makeSpriteImage(22, 22, 1));
 }
 
-void GLFWView::updateViewBinding() {
-    getContext().bindFramebuffer.setCurrentValue(0);
-    assert(mbgl::gl::value::BindFramebuffer::Get() == getContext().bindFramebuffer.getCurrentValue());
-    getContext().viewport.setCurrentValue({ 0, 0, getFramebufferSize() });
-    assert(mbgl::gl::value::Viewport::Get() == getContext().viewport.getCurrentValue());
+void GLFWView::updateAssumedState() {
+    assumeFramebufferBinding(0);
+    assumeViewportSize(getFramebufferSize());
 }
 
 void GLFWView::bind() {
-    getContext().bindFramebuffer = 0;
-    getContext().viewport = { 0, 0, getFramebufferSize() };
+    setFramebufferBinding(0);
+    setViewportSize(getFramebufferSize());
 }
 
 void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, int mods) {
@@ -459,7 +455,6 @@ void GLFWView::run() {
             activate();
             mbgl::BackendScope scope { *this, mbgl::BackendScope::ScopeType::Implicit };
 
-            updateViewBinding();
             map->render(*this);
 
             glfwSwapBuffers(window);

@@ -38,13 +38,13 @@ public:
     void run();
 
     // mbgl::View implementation
-    void updateViewBinding();
     void bind() override;
     mbgl::Size getSize() const;
     mbgl::Size getFramebufferSize() const;
 
     // mbgl::Backend implementation
     void invalidate() override;
+    void updateAssumedState() override;
 
 protected:
     // mbgl::Backend implementation
