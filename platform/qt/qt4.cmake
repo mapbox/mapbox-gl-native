@@ -13,6 +13,10 @@ set(MBGL_QT_TEST_LIBRARIES
     PRIVATE Qt4::QtOpenGL
 )
 
+target_compile_options(qmapboxgl
+    PRIVATE -Wno-inconsistent-missing-override
+)
+
 target_link_libraries(qmapboxgl
     PRIVATE mbgl-core
     PRIVATE Qt4::QtCore
