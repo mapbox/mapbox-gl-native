@@ -14,8 +14,8 @@ uniform vec2 u_extrude_scale;
 attribute vec2 a_pos;
 
 uniform lowp float a_color_t;
-attribute lowp vec4 a_color;
-varying lowp vec4 color;
+attribute highp vec4 a_color;
+varying highp vec4 color;
 uniform lowp float a_radius_t;
 attribute mediump vec2 a_radius;
 varying mediump float radius;
@@ -26,8 +26,8 @@ uniform lowp float a_opacity_t;
 attribute lowp vec2 a_opacity;
 varying lowp float opacity;
 uniform lowp float a_stroke_color_t;
-attribute lowp vec4 a_stroke_color;
-varying lowp vec4 stroke_color;
+attribute highp vec4 a_stroke_color;
+varying highp vec4 stroke_color;
 uniform lowp float a_stroke_width_t;
 attribute mediump vec2 a_stroke_width;
 varying mediump float stroke_width;
@@ -69,11 +69,11 @@ void main(void) {
 
 )MBGL_SHADER";
 const char* circle::fragmentSource = R"MBGL_SHADER(
-varying lowp vec4 color;
+varying highp vec4 color;
 varying mediump float radius;
 varying lowp float blur;
 varying lowp float opacity;
-varying lowp vec4 stroke_color;
+varying highp vec4 stroke_color;
 varying mediump float stroke_width;
 varying lowp float stroke_opacity;
 
