@@ -138,20 +138,15 @@ inline void insertSegmentGlyph(std::back_insert_iterator<GlyphInstances> glyphs,
  Given the distance along the line from the label anchor to the beginning of the current segment,
  project a "virtual anchor" point at the same distance along the line extending out from this segment.
  
+                B <-- beginning of current segment
+* . . . . . . . *--------* E <-- end of current segment
+VA              |      
+                /        VA = "virtual segment anchor"
+               /
+     ---*-----`
+        A = label anchor
  
-                     B <-- beginning of current segment
-                    .*-----
-                  .  |
-                .    /
-              .     /
-            .      /
-    ------.*------`
-        .  A
-      .    anchor
-     *
-    VA <- "virtual" anchor
- 
- Distance _along line_ from A to B == straight-line distance from V to B.
+ Distance _along line_ from A to B == straight-line distance from VA to B.
  */
 inline Point<float> getVirtualSegmentAnchor(const Point<float>& segmentBegin, const Point<float>& segmentEnd, float distanceFromAnchorToSegmentBegin) {
     Point<float> segmentDirectionUnitVector = util::normal<float>(segmentBegin, segmentEnd);
