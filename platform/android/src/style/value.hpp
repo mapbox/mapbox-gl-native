@@ -29,9 +29,7 @@ public:
     int getLength() const;
     Value get(const int index ) const;
 
-private:
-
-    jni::JNIEnv& jenv;
+    jni::JNIEnv& env;
     std::shared_ptr<jni::jobject> value;
 };
 

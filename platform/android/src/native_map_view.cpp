@@ -35,7 +35,7 @@
 #include "conversion/conversion.hpp"
 #include "conversion/collection.hpp"
 #include "style/conversion/filter.hpp"
-#include "geometry/conversion/feature.hpp"
+#include "geojson/conversion/feature.hpp"
 
 #include "jni.hpp"
 #include "attach_env.hpp"
@@ -793,32 +793,35 @@ jni::Array<jlong> NativeMapView::queryPointAnnotations(JNIEnv& env, jni::Object<
     return result;
 }
 
-jni::Array<jni::Object<Feature>> NativeMapView::queryRenderedFeaturesForPoint(JNIEnv& env, jni::jfloat x, jni::jfloat y,
+jni::Array<jni::Object<geojson::Feature>> NativeMapView::queryRenderedFeaturesForPoint(JNIEnv& env, jni::jfloat x, jni::jfloat y,
                                                                               jni::Array<jni::String> layerIds,
                                                                               jni::Array<jni::Object<>> jfilter) {
     using namespace mbgl::android::conversion;
-    using namespace mapbox::geometry;
+    using namespace mbgl::android::geojson;
 
     mbgl::optional<std::vector<std::string>> layers;
     if (layerIds != nullptr && layerIds.Length(env) > 0) {
         layers = android::conversion::toVector(env, layerIds);
     }
-    point<double> point = {x, y};
+    mapbox::geometry::point<double> point = {x, y};
 
     return *convert<jni::Array<jni::Object<Feature>>, std::vector<mbgl::Feature>>(env, map->queryRenderedFeatures(point, { layers, toFilter(env, jfilter) }));
 }
 
-jni::Array<jni::Object<Feature>> NativeMapView::queryRenderedFeaturesForBox(JNIEnv& env, jni::jfloat left, jni::jfloat top,
+jni::Array<jni::Object<geojson::Feature>> NativeMapView::queryRenderedFeaturesForBox(JNIEnv& env, jni::jfloat left, jni::jfloat top,
                                                                             jni::jfloat right, jni::jfloat bottom, jni::Array<jni::String> layerIds,
                                                                             jni::Array<jni::Object<>> jfilter) {
     using namespace mbgl::android::conversion;
-    using namespace mapbox::geometry;
+    using namespace mbgl::android::geojson;
 
     mbgl::optional<std::vector<std::string>> layers;
     if (layerIds != nullptr && layerIds.Length(env) > 0) {
         layers = toVector(env, layerIds);
     }
-    box<double> box = { point<double>{ left, top}, point<double>{ right, bottom } };
+    mapbox::geometry::box<double> box = {
+            mapbox::geometry::point<double>{ left, top},
+            mapbox::geometry::point<double>{ right, bottom }
+    };
 
     return *convert<jni::Array<jni::Object<Feature>>, std::vector<mbgl::Feature>>(env, map->queryRenderedFeatures(box, { layers, toFilter(env, jfilter) }));
 }

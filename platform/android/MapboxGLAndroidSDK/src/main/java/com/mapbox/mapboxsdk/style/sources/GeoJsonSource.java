@@ -11,7 +11,6 @@ import com.mapbox.services.commons.geojson.FeatureCollection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -133,8 +132,7 @@ public class GeoJsonSource extends Source {
    * @param features the GeoJSON {@link FeatureCollection}
    */
   public void setGeoJson(FeatureCollection features) {
-    checkValidity();
-    setGeoJson(features.toJson());
+    nativeSetFeatureCollection(features);
   }
 
   /**
@@ -143,8 +141,7 @@ public class GeoJsonSource extends Source {
    * @param json the raw GeoJson FeatureCollection string
    */
   public void setGeoJson(String json) {
-    checkValidity();
-    setRawJson(json);
+    nativeSetGeoJsonString(json);
   }
 
   /**
@@ -153,7 +150,6 @@ public class GeoJsonSource extends Source {
    * @param url the GeoJSON FeatureCollection url
    */
   public void setUrl(URL url) {
-    checkValidity();
     setUrl(url.toExternalForm());
   }
 
@@ -163,7 +159,6 @@ public class GeoJsonSource extends Source {
    * @param url the GeoJSON FeatureCollection url
    */
   public void setUrl(String url) {
-    checkValidity();
     nativeSetUrl(url);
   }
 
@@ -179,19 +174,13 @@ public class GeoJsonSource extends Source {
     return features != null ? Arrays.asList(features) : new ArrayList<Feature>();
   }
 
-  protected void setRawJson(String geoJson) {
-    // Wrap the String in a map as an Object is expected by the
-    // style conversion template
-    HashMap<String, String> wrapper = new HashMap<>();
-    wrapper.put("data", geoJson);
-    nativeSetGeoJson(wrapper);
-  }
-
   protected native void initialize(String layerId, Object options);
 
   protected native void nativeSetUrl(String url);
 
-  private native void nativeSetGeoJson(Object geoJson);
+  private native void nativeSetGeoJsonString(String geoJson);
+
+  private native void nativeSetFeatureCollection(FeatureCollection geoJson);
 
   private native Feature[] querySourceFeatures(Object[] filter);
 

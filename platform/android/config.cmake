@@ -184,15 +184,45 @@ add_library(mbgl-android STATIC
     platform/android/src/graphics/rectf.cpp
     platform/android/src/graphics/rectf.hpp
 
+    # GeoJSON
+    platform/android/src/geojson/feature.cpp
+    platform/android/src/geojson/feature.hpp
+    platform/android/src/geojson/feature_collection.cpp
+    platform/android/src/geojson/feature_collection.hpp
+    platform/android/src/geojson/geometry.cpp
+    platform/android/src/geojson/geometry.hpp
+    platform/android/src/geojson/line_string.cpp
+    platform/android/src/geojson/line_string.hpp
+    platform/android/src/geojson/multi_line_string.cpp
+    platform/android/src/geojson/multi_line_string.hpp
+    platform/android/src/geojson/multi_point.cpp
+    platform/android/src/geojson/multi_point.hpp
+    platform/android/src/geojson/multi_polygon.cpp
+    platform/android/src/geojson/multi_polygon.hpp
+    platform/android/src/geojson/point.cpp
+    platform/android/src/geojson/point.hpp
+    platform/android/src/geojson/polygon.cpp
+    platform/android/src/geojson/polygon.hpp
+    platform/android/src/geojson/position.cpp
+    platform/android/src/geojson/position.hpp
+
     # Geometry
-    platform/android/src/geometry/feature.cpp
-    platform/android/src/geometry/feature.hpp
     platform/android/src/geometry/lat_lng.cpp
     platform/android/src/geometry/lat_lng.hpp
     platform/android/src/geometry/lat_lng_bounds.cpp
     platform/android/src/geometry/lat_lng_bounds.hpp
     platform/android/src/geometry/projected_meters.cpp
     platform/android/src/geometry/projected_meters.hpp
+
+    # GSon
+    platform/android/src/gson/json_array.cpp
+    platform/android/src/gson/json_array.hpp
+    platform/android/src/gson/json_element.cpp
+    platform/android/src/gson/json_element.hpp
+    platform/android/src/gson/json_object.cpp
+    platform/android/src/gson/json_object.hpp
+    platform/android/src/gson/json_primitive.cpp
+    platform/android/src/gson/json_primitive.hpp
 
     # Annotation
     platform/android/src/annotation/marker.cpp

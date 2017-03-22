@@ -9,13 +9,13 @@ namespace mbgl {
 namespace android {
 namespace gson {
 
-class JsonObject : private mbgl::util::noncopyable {
+class JsonArray : private mbgl::util::noncopyable {
 public:
-    static constexpr auto Name() { return "com/google/gson/JsonObject"; };
+    static constexpr auto Name() { return "com/google/gson/JsonArray"; };
 
-    static mapbox::geometry::property_map convert(JNIEnv&, jni::Object<JsonObject>);
+    static std::vector<mapbox::geometry::value> convert(JNIEnv&, jni::Object<JsonArray>);
 
-    static jni::Class<JsonObject> javaClass;
+    static jni::Class<JsonArray> javaClass;
 
     static void registerNative(jni::JNIEnv&);
 };
