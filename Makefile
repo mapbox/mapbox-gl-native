@@ -361,20 +361,23 @@ endif
 
 #### Qt targets #####################################################
 
-ifeq ($(WITH_QT_4), 1)
-QT_ROOT_PATH = build/qt4-$(BUILD_PLATFORM)-$(BUILD_PLATFORM_VERSION)
-else
-QT_ROOT_PATH = build/qt-$(BUILD_PLATFORM)-$(BUILD_PLATFORM_VERSION)
-endif
-
-ifneq (,$(shell which qmake))
-export QT_INSTALL_DOCS = $(shell qmake -query QT_INSTALL_DOCS)
+QT_QMAKE_FOUND := $(shell command -v qmake 2> /dev/null)
+ifdef QT_QMAKE_FOUND
+  export QT_INSTALL_DOCS = $(shell qmake -query QT_INSTALL_DOCS)
+  ifeq ($(shell qmake -query QT_VERSION | head -c1), 4)
+    QT_ROOT_PATH = build/qt4-$(BUILD_PLATFORM)-$(BUILD_PLATFORM_VERSION)
+    WITH_QT_4=1
+  else
+    QT_ROOT_PATH = build/qt-$(BUILD_PLATFORM)-$(BUILD_PLATFORM_VERSION)
+    WITH_QT_4=0
+  endif
 endif
 
 export QT_OUTPUT_PATH = $(QT_ROOT_PATH)/$(BUILDTYPE)
 QT_BUILD = $(QT_OUTPUT_PATH)/build.ninja
 
 $(QT_BUILD): $(BUILD_DEPS)
+	@scripts/check-qt.sh
 	mkdir -p $(QT_OUTPUT_PATH)
 	(cd $(QT_OUTPUT_PATH) && cmake -G Ninja ../../.. \
 		-DCMAKE_BUILD_TYPE=$(BUILDTYPE) \
@@ -392,6 +395,7 @@ ifeq ($(HOST_PLATFORM), macos)
 
 MACOS_QT_PROJ_PATH = $(QT_ROOT_PATH)/xcode/mbgl.xcodeproj
 $(MACOS_QT_PROJ_PATH): $(BUILD_DEPS)
+	@scripts/check-qt.sh
 	mkdir -p $(QT_ROOT_PATH)/xcode
 	(cd $(QT_ROOT_PATH)/xcode && cmake -G Xcode ../../.. \
 		-DMBGL_PLATFORM=qt \
