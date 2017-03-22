@@ -1,6 +1,12 @@
-add_executable(mbgl-test
-    ${MBGL_TEST_FILES}
-)
+if (MBGL_TEST_TARGET_TYPE STREQUAL "library")
+    add_library(mbgl-test SHARED
+        ${MBGL_TEST_FILES}
+    )
+else()
+    add_executable(mbgl-test
+        ${MBGL_TEST_FILES}
+    )
+endif()
 
 target_compile_options(mbgl-test
     PRIVATE -fvisibility-inlines-hidden
