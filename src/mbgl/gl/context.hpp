@@ -35,6 +35,8 @@ class Context : private util::noncopyable {
 public:
     ~Context();
 
+    void logGlMaxVertexAttribsValue();
+    
     UniqueShader createShader(ShaderType type, const std::string& source);
     UniqueProgram createProgram(ShaderID vertexShader, ShaderID fragmentShader);
     UniqueProgram createProgram(BinaryProgramFormat binaryFormat, const std::string& binaryProgram);

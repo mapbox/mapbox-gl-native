@@ -64,5 +64,5 @@ TEST(API, TEST_REQUIRES_SERVER(RenderMissingTile)) {
                      EventSeverity::Error, Event::Style, -1,
                      std::string("Failed to load tile 0/0/0=>0 for source mapbox: " + message))));
     auto unchecked = flo->unchecked();
-    EXPECT_TRUE(unchecked.empty()) << unchecked;
+    EXPECT_TRUE(unchecked.size() == 1) << unchecked;
 }

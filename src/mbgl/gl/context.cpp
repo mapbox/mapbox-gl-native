@@ -8,6 +8,7 @@
 #include <mbgl/util/logging.hpp>
 
 #include <cstring>
+#include <iostream>
 
 namespace mbgl {
 namespace gl {
@@ -40,10 +41,16 @@ static_assert(std::is_same<BinaryProgramFormat, GLenum>::value, "OpenGL type mis
 Context::~Context() {
     reset();
 }
+    
+void Context::logGlMaxVertexAttribsValue() {
+    int glMaxVertexAttribs;
+    MBGL_CHECK_ERROR(glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &glMaxVertexAttribs));
+    mbgl::Log::Info(mbgl::Event::General, "GL_MAX_VERTEX_ATTRIBS = %i", glMaxVertexAttribs);
+}
 
 UniqueShader Context::createShader(ShaderType type, const std::string& source) {
     UniqueShader result { MBGL_CHECK_ERROR(glCreateShader(static_cast<GLenum>(type))), { this } };
-
+    
     const GLchar* sources = source.data();
     const GLsizei lengths = static_cast<GLsizei>(source.length());
     MBGL_CHECK_ERROR(glShaderSource(result, 1, &sources, &lengths));
