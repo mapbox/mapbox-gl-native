@@ -7,7 +7,7 @@
 // C++ -> Java conversion
 #include "../../conversion/conversion.hpp"
 #include "../../conversion/collection.hpp"
-#include "../../geometry/conversion/feature.hpp"
+#include "../../geojson/conversion/feature.hpp"
 #include "../conversion/url_or_tileset.hpp"
 
 #include <mbgl/util/variant.hpp>
@@ -34,11 +34,11 @@ namespace android {
 
     VectorSource::~VectorSource() = default;
 
-    jni::Array<jni::Object<Feature>> VectorSource::querySourceFeatures(jni::JNIEnv& env,
+    jni::Array<jni::Object<geojson::Feature>> VectorSource::querySourceFeatures(jni::JNIEnv& env,
                                                                              jni::Array<jni::String> jSourceLayerIds,
                                                                              jni::Array<jni::Object<>> jfilter) {
         using namespace mbgl::android::conversion;
-        using namespace mapbox::geometry;
+        using namespace mbgl::android::geojson;
 
         mbgl::optional<std::vector<std::string>> sourceLayerIds = { toVector(env, jSourceLayerIds) };
         auto filter = toFilter(env, jfilter);

@@ -5,7 +5,6 @@ package com.mapbox.mapboxsdk.style.sources;
  */
 public abstract class Source {
   private long nativePtr;
-  private boolean invalidated;
 
   /**
    * Internal use
@@ -25,7 +24,6 @@ public abstract class Source {
    * @return the source id
    */
   public String getId() {
-    checkValidity();
     return nativeGetId();
   }
 
@@ -40,16 +38,4 @@ public abstract class Source {
 
   protected native String nativeGetId();
 
-  protected void checkValidity() {
-    if (invalidated) {
-      throw new RuntimeException("Layer has been invalidated. Request a new reference after adding");
-    }
-  }
-
-  /**
-   * Internal use - invalidates the source for further use (after adding it to the map)
-   */
-  public final void invalidate() {
-    this.invalidated = true;
-  }
 }

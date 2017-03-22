@@ -170,8 +170,8 @@ struct Converter<jni::jobject*, std::unordered_map<std::string, mbgl::Value>> {
 
 
 template <>
-struct Converter<jni::Object<Feature>, mbgl::Feature> {
-    Result<jni::Object<Feature>> operator()(jni::JNIEnv& env, const mbgl::Feature& value) const {
+struct Converter<jni::Object<android::geojson::Feature>, mbgl::Feature> {
+    Result<jni::Object<android::geojson::Feature>> operator()(jni::JNIEnv& env, const mbgl::Feature& value) const {
 
         // Convert Id
         FeatureIdVisitor idEvaluator;
@@ -179,13 +179,13 @@ struct Converter<jni::Object<Feature>, mbgl::Feature> {
         auto jid = jni::Make<jni::String>(env, id);
 
         // Convert properties
-        auto properties = jni::Object<JsonObject>(*convert<jni::jobject*>(env, value.properties));
+        auto properties = jni::Object<gson::JsonObject>(*convert<jni::jobject*>(env, value.properties));
 
         // Convert geometry
-        auto geometry = jni::Object<Geometry>(*convert<jni::jobject*>(env, value.geometry));
+        auto geometry = jni::Object<android::geojson::Geometry>(*convert<jni::jobject*>(env, value.geometry));
 
         // Create feature
-        auto feature = Feature::fromGeometry(env, geometry, properties, jid);
+        auto feature = android::geojson::Feature::fromGeometry(env, geometry, properties, jid);
 
         //Cleanup
         jni::DeleteLocalRef(env, jid);
@@ -197,13 +197,13 @@ struct Converter<jni::Object<Feature>, mbgl::Feature> {
 };
 
 template <>
-struct Converter<jni::Array<jni::Object<Feature>>, std::vector<mbgl::Feature>> {
-    Result<jni::Array<jni::Object<Feature>>> operator()(jni::JNIEnv& env, const std::vector<mbgl::Feature>& value) const {
-
+struct Converter<jni::Array<jni::Object<android::geojson::Feature>>, std::vector<mbgl::Feature>> {
+    Result<jni::Array<jni::Object<android::geojson::Feature>>> operator()(jni::JNIEnv& env, const std::vector<mbgl::Feature>& value) const {
+        using namespace mbgl::android::geojson;
         auto features = jni::Array<jni::Object<Feature>>::New(env, value.size(), Feature::javaClass);
 
         for(size_t i = 0; i < value.size(); i = i + 1) {
-            auto converted = *convert<jni::Object<Feature>, mbgl::Feature>(env, value.at(i));
+            auto converted = *convert<jni::Object<android::geojson::Feature>, mbgl::Feature>(env, value.at(i));
             features.Set(env, i, converted);
             jni::DeleteLocalRef(env, converted);
         }
