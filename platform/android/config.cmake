@@ -25,24 +25,21 @@ mason_use(icu VERSION 58.1-min-size)
 ## mbgl core ##
 
 macro(mbgl_platform_core)
-
     target_sources(mbgl-core
         # Loop
-        PRIVATE platform/android/src/thread.cpp
         PRIVATE platform/android/src/async_task.cpp
         PRIVATE platform/android/src/run_loop.cpp
         PRIVATE platform/android/src/run_loop_impl.hpp
         PRIVATE platform/android/src/timer.cpp
 
         # File source
-        PRIVATE platform/android/src/asset_file_source.cpp
         PRIVATE platform/android/src/http_file_source.cpp
+        PRIVATE platform/android/src/asset_file_source.cpp
         PRIVATE platform/default/default_file_source.cpp
         PRIVATE platform/default/local_file_source.cpp
         PRIVATE platform/default/online_file_source.cpp
 
         # Offline
-        # PRIVATE include/mbgl/storage/offline.hpp
         PRIVATE platform/default/mbgl/storage/offline.cpp
         PRIVATE platform/default/mbgl/storage/offline_database.cpp
         PRIVATE platform/default/mbgl/storage/offline_database.hpp
@@ -53,6 +50,7 @@ macro(mbgl_platform_core)
 
         # Misc
         PRIVATE platform/android/src/logging_android.cpp
+        PRIVATE platform/android/src/thread.cpp
         PRIVATE platform/default/string_stdlib.cpp
         PRIVATE platform/default/bidi.cpp
         PRIVATE platform/default/utf.cpp
@@ -70,127 +68,6 @@ macro(mbgl_platform_core)
         PRIVATE platform/default/mbgl/util/shared_thread_pool.hpp
         PRIVATE platform/default/mbgl/util/default_thread_pool.cpp
         PRIVATE platform/default/mbgl/util/default_thread_pool.hpp
-
-        # Conversion C++ -> Java
-        platform/android/src/conversion/constant.hpp
-        platform/android/src/conversion/conversion.hpp
-        platform/android/src/style/conversion/function.hpp
-        platform/android/src/style/conversion/property_value.hpp
-        platform/android/src/style/conversion/types.hpp
-        platform/android/src/style/conversion/types_string_values.hpp
-
-        # Style conversion Java -> C++
-        platform/android/src/style/android_conversion.hpp
-        platform/android/src/style/conversion/geojson.hpp
-        platform/android/src/style/value.cpp
-        platform/android/src/style/value.hpp
-        platform/android/src/style/conversion/url_or_tileset.hpp
-
-        # Style
-        platform/android/src/style/layers/background_layer.cpp
-        platform/android/src/style/layers/background_layer.hpp
-        platform/android/src/style/layers/circle_layer.cpp
-        platform/android/src/style/layers/circle_layer.hpp
-        platform/android/src/style/layers/custom_layer.cpp
-        platform/android/src/style/layers/custom_layer.hpp
-        platform/android/src/style/layers/fill_layer.cpp
-        platform/android/src/style/layers/fill_layer.hpp
-        platform/android/src/style/layers/layer.cpp
-        platform/android/src/style/layers/layer.hpp
-        platform/android/src/style/layers/layers.cpp
-        platform/android/src/style/layers/layers.hpp
-        platform/android/src/style/layers/line_layer.cpp
-        platform/android/src/style/layers/line_layer.hpp
-        platform/android/src/style/layers/raster_layer.cpp
-        platform/android/src/style/layers/raster_layer.hpp
-        platform/android/src/style/layers/symbol_layer.cpp
-        platform/android/src/style/layers/symbol_layer.hpp
-        platform/android/src/style/layers/unknown_layer.cpp
-        platform/android/src/style/layers/unknown_layer.hpp
-        platform/android/src/style/sources/geojson_source.cpp
-        platform/android/src/style/sources/geojson_source.hpp
-        platform/android/src/style/sources/source.cpp
-        platform/android/src/style/sources/source.hpp
-        platform/android/src/style/sources/sources.cpp
-        platform/android/src/style/sources/sources.hpp
-        platform/android/src/style/sources/raster_source.cpp
-        platform/android/src/style/sources/raster_source.hpp
-        platform/android/src/style/sources/unknown_source.cpp
-        platform/android/src/style/sources/unknown_source.hpp
-        platform/android/src/style/sources/vector_source.cpp
-        platform/android/src/style/sources/vector_source.hpp
-        platform/android/src/style/functions/stop.cpp
-        platform/android/src/style/functions/stop.hpp
-        platform/android/src/style/functions/categorical_stops.cpp
-        platform/android/src/style/functions/categorical_stops.hpp
-        platform/android/src/style/functions/exponential_stops.cpp
-        platform/android/src/style/functions/exponential_stops.hpp
-        platform/android/src/style/functions/identity_stops.cpp
-        platform/android/src/style/functions/identity_stops.hpp
-        platform/android/src/style/functions/interval_stops.cpp
-        platform/android/src/style/functions/interval_stops.hpp
-
-        # FileSource holder
-        platform/android/src/file_source.cpp
-        platform/android/src/file_source.hpp
-
-        # Connectivity
-        platform/android/src/connectivity_listener.cpp
-        platform/android/src/connectivity_listener.hpp
-
-        # Native map
-        platform/android/src/native_map_view.cpp
-        platform/android/src/native_map_view.hpp
-
-        # Java core classes
-        platform/android/src/java/util.cpp
-        platform/android/src/java/util.hpp
-
-        # Graphics
-        platform/android/src/graphics/pointf.cpp
-        platform/android/src/graphics/pointf.hpp
-        platform/android/src/graphics/rectf.cpp
-        platform/android/src/graphics/rectf.hpp
-
-        # Geometry
-        platform/android/src/geometry/feature.cpp
-        platform/android/src/geometry/feature.hpp
-        platform/android/src/geometry/lat_lng.cpp
-        platform/android/src/geometry/lat_lng.hpp
-        platform/android/src/geometry/lat_lng_bounds.cpp
-        platform/android/src/geometry/lat_lng_bounds.hpp
-        platform/android/src/geometry/projected_meters.cpp
-        platform/android/src/geometry/projected_meters.hpp
-
-        # Annotation
-        platform/android/src/annotation/marker.cpp
-        platform/android/src/annotation/marker.hpp
-        platform/android/src/annotation/polygon.cpp
-        platform/android/src/annotation/polygon.hpp
-        platform/android/src/annotation/polyline.cpp
-        platform/android/src/annotation/polyline.hpp
-
-        # Offline
-        platform/android/src/offline/offline_manager.cpp
-        platform/android/src/offline/offline_manager.hpp
-        platform/android/src/offline/offline_region.cpp
-        platform/android/src/offline/offline_region.hpp
-        platform/android/src/offline/offline_region_definition.cpp
-        platform/android/src/offline/offline_region_definition.hpp
-        platform/android/src/offline/offline_region_error.cpp
-        platform/android/src/offline/offline_region_error.hpp
-        platform/android/src/offline/offline_region_status.cpp
-        platform/android/src/offline/offline_region_status.hpp
-
-        # Main jni bindings
-        platform/android/src/attach_env.cpp
-        platform/android/src/attach_env.hpp
-        platform/android/src/java_types.cpp
-        platform/android/src/java_types.hpp
-
-        # Main entry point
-        platform/android/src/jni.hpp
-        platform/android/src/jni.cpp
     )
 
     target_include_directories(mbgl-core
@@ -220,83 +97,190 @@ macro(mbgl_platform_core)
         PUBLIC -lstdc++
         PUBLIC -latomic
         PUBLIC -lz
-        PUBLIC -Wl,--gc-sections
     )
 endmacro()
 
 ## Main library ##
 
-add_library(mapbox-gl SHARED
-    platform/android/src/main.cpp
+add_library(mbgl-android STATIC
+    # Conversion C++ -> Java
+    platform/android/src/conversion/constant.hpp
+    platform/android/src/conversion/conversion.hpp
+    platform/android/src/style/conversion/function.hpp
+    platform/android/src/style/conversion/property_value.hpp
+    platform/android/src/style/conversion/types.hpp
+    platform/android/src/style/conversion/types_string_values.hpp
+
+    # Style conversion Java -> C++
+    platform/android/src/style/android_conversion.hpp
+    platform/android/src/style/conversion/geojson.hpp
+    platform/android/src/style/value.cpp
+    platform/android/src/style/value.hpp
+    platform/android/src/style/conversion/url_or_tileset.hpp
+
+    # Style
+    platform/android/src/style/layers/background_layer.cpp
+    platform/android/src/style/layers/background_layer.hpp
+    platform/android/src/style/layers/circle_layer.cpp
+    platform/android/src/style/layers/circle_layer.hpp
+    platform/android/src/style/layers/custom_layer.cpp
+    platform/android/src/style/layers/custom_layer.hpp
+    platform/android/src/style/layers/fill_layer.cpp
+    platform/android/src/style/layers/fill_layer.hpp
+    platform/android/src/style/layers/layer.cpp
+    platform/android/src/style/layers/layer.hpp
+    platform/android/src/style/layers/layers.cpp
+    platform/android/src/style/layers/layers.hpp
+    platform/android/src/style/layers/line_layer.cpp
+    platform/android/src/style/layers/line_layer.hpp
+    platform/android/src/style/layers/raster_layer.cpp
+    platform/android/src/style/layers/raster_layer.hpp
+    platform/android/src/style/layers/symbol_layer.cpp
+    platform/android/src/style/layers/symbol_layer.hpp
+    platform/android/src/style/layers/unknown_layer.cpp
+    platform/android/src/style/layers/unknown_layer.hpp
+    platform/android/src/style/sources/geojson_source.cpp
+    platform/android/src/style/sources/geojson_source.hpp
+    platform/android/src/style/sources/source.cpp
+    platform/android/src/style/sources/source.hpp
+    platform/android/src/style/sources/sources.cpp
+    platform/android/src/style/sources/sources.hpp
+    platform/android/src/style/sources/raster_source.cpp
+    platform/android/src/style/sources/raster_source.hpp
+    platform/android/src/style/sources/unknown_source.cpp
+    platform/android/src/style/sources/unknown_source.hpp
+    platform/android/src/style/sources/vector_source.cpp
+    platform/android/src/style/sources/vector_source.hpp
+    platform/android/src/style/functions/stop.cpp
+    platform/android/src/style/functions/stop.hpp
+    platform/android/src/style/functions/categorical_stops.cpp
+    platform/android/src/style/functions/categorical_stops.hpp
+    platform/android/src/style/functions/exponential_stops.cpp
+    platform/android/src/style/functions/exponential_stops.hpp
+    platform/android/src/style/functions/identity_stops.cpp
+    platform/android/src/style/functions/identity_stops.hpp
+    platform/android/src/style/functions/interval_stops.cpp
+    platform/android/src/style/functions/interval_stops.hpp
+
+    # FileSource holder
+    platform/android/src/file_source.cpp
+    platform/android/src/file_source.hpp
+
+    # Connectivity
+    platform/android/src/connectivity_listener.cpp
+    platform/android/src/connectivity_listener.hpp
+
+    # Native map
+    platform/android/src/native_map_view.cpp
+    platform/android/src/native_map_view.hpp
+
+    # Java core classes
+    platform/android/src/java/util.cpp
+    platform/android/src/java/util.hpp
+
+    # Graphics
+    platform/android/src/graphics/pointf.cpp
+    platform/android/src/graphics/pointf.hpp
+    platform/android/src/graphics/rectf.cpp
+    platform/android/src/graphics/rectf.hpp
+
+    # Geometry
+    platform/android/src/geometry/feature.cpp
+    platform/android/src/geometry/feature.hpp
+    platform/android/src/geometry/lat_lng.cpp
+    platform/android/src/geometry/lat_lng.hpp
+    platform/android/src/geometry/lat_lng_bounds.cpp
+    platform/android/src/geometry/lat_lng_bounds.hpp
+    platform/android/src/geometry/projected_meters.cpp
+    platform/android/src/geometry/projected_meters.hpp
+
+    # Annotation
+    platform/android/src/annotation/marker.cpp
+    platform/android/src/annotation/marker.hpp
+    platform/android/src/annotation/polygon.cpp
+    platform/android/src/annotation/polygon.hpp
+    platform/android/src/annotation/polyline.cpp
+    platform/android/src/annotation/polyline.hpp
+
+    # Offline
+    platform/android/src/offline/offline_manager.cpp
+    platform/android/src/offline/offline_manager.hpp
+    platform/android/src/offline/offline_region.cpp
+    platform/android/src/offline/offline_region.hpp
+    platform/android/src/offline/offline_region_definition.cpp
+    platform/android/src/offline/offline_region_definition.hpp
+    platform/android/src/offline/offline_region_error.cpp
+    platform/android/src/offline/offline_region_error.hpp
+    platform/android/src/offline/offline_region_status.cpp
+    platform/android/src/offline/offline_region_status.hpp
+
+    # Main jni bindings
+    platform/android/src/attach_env.cpp
+    platform/android/src/attach_env.hpp
+    platform/android/src/java_types.cpp
+    platform/android/src/java_types.hpp
+
+    # Main entry point
+    platform/android/src/jni.hpp
+    platform/android/src/jni.cpp
 )
 
-target_compile_options(mapbox-gl
+target_compile_options(mbgl-android
     PRIVATE -fvisibility=hidden
     PRIVATE -ffunction-sections
     PRIVATE -fdata-sections
 )
 
-target_link_libraries(mapbox-gl
+target_link_libraries(mbgl-android
     PUBLIC mbgl-core
-    PUBLIC -Wl,--gc-sections
-    PUBLIC -Wl,--version-script=${CMAKE_SOURCE_DIR}/platform/android/version-script
+)
+
+## Shared library
+
+add_library(mapbox-gl SHARED
+    platform/android/src/main.cpp
+)
+
+target_link_libraries(mapbox-gl
+    PRIVATE mbgl-android
+    PRIVATE -Wl,--gc-sections
+    PRIVATE -Wl,--version-script=${CMAKE_SOURCE_DIR}/platform/android/version-script
 )
 
 ## Test library ##
 
-add_library(mbgl-test SHARED
-    # Actual tests
-    ${MBGL_TEST_FILES}
+set(MBGL_TEST_TARGET_TYPE "library")
+macro(mbgl_platform_test)
+    target_sources(mbgl-test
+        PRIVATE platform/default/mbgl/test/main.cpp
 
-    # Main test entry point
-    platform/android/src/test/main.jni.cpp
+        # Main test entry point
+        platform/android/src/test/main.jni.cpp
 
-)
+        # Headless view
+        platform/default/mbgl/gl/headless_backend.cpp
+        platform/default/mbgl/gl/headless_backend.hpp
+        platform/default/mbgl/gl/offscreen_view.cpp
+        platform/default/mbgl/gl/offscreen_view.hpp
 
-add_dependencies(mbgl-test
-    mapbox-gl
-)
+        platform/linux/src/headless_backend_egl.cpp
+        platform/linux/src/headless_display_egl.cpp
+    )
 
-target_sources(mbgl-test
-    # Headless view
-    PRIVATE platform/default/mbgl/gl/headless_backend.cpp
-    PRIVATE platform/default/mbgl/gl/headless_backend.hpp
-    PRIVATE platform/default/mbgl/gl/offscreen_view.cpp
-    PRIVATE platform/default/mbgl/gl/offscreen_view.hpp
+    target_compile_options(mbgl-test
+        PRIVATE -fvisibility=hidden
+    )
 
-    PRIVATE platform/linux/src/headless_backend_egl.cpp
-    PRIVATE platform/linux/src/headless_display_egl.cpp
-)
+    target_compile_definitions(mbgl-test
+        PRIVATE MBGL_ASSET_ZIP=1
+    )
 
-target_compile_options(mbgl-test
-    PRIVATE -fvisibility=hidden
-)
-
-target_compile_definitions(mbgl-test
-    PRIVATE MBGL_ASSET_ZIP=1
-)
-
-target_include_directories(mbgl-test
-    PRIVATE include
-    PRIVATE src
-    PRIVATE test/include
-    PRIVATE test/src
-    PRIVATE platform/default
-)
-
-target_link_libraries(mbgl-test
-    PRIVATE mbgl-core
-)
-
-target_add_mason_package(mbgl-test PRIVATE geometry)
-target_add_mason_package(mbgl-test PRIVATE variant)
-target_add_mason_package(mbgl-test PRIVATE unique_resource)
-target_add_mason_package(mbgl-test PRIVATE rapidjson)
-target_add_mason_package(mbgl-test PRIVATE gtest)
-target_add_mason_package(mbgl-test PRIVATE pixelmatch)
-target_add_mason_package(mbgl-test PRIVATE boost)
-target_add_mason_package(mbgl-test PRIVATE geojson)
-target_add_mason_package(mbgl-test PRIVATE geojsonvt)
+    target_link_libraries(mbgl-test
+        PRIVATE mbgl-android
+        PRIVATE -Wl,--gc-sections
+        PRIVATE -Wl,--version-script=${CMAKE_SOURCE_DIR}/platform/android/version-script
+    )
+endmacro()
 
 ## Custom layer example ##
 
@@ -311,7 +295,7 @@ target_compile_options(example-custom-layer
 )
 
 target_link_libraries(example-custom-layer
-    PRIVATE mapbox-gl
-    PUBLIC -Wl,--gc-sections
-    PUBLIC -Wl,--version-script=${CMAKE_SOURCE_DIR}/platform/android/version-script
+    PRIVATE mbgl-core
+    PRIVATE -Wl,--gc-sections
+    PRIVATE -Wl,--version-script=${CMAKE_SOURCE_DIR}/platform/android/version-script
 )
