@@ -28,7 +28,6 @@
 #import <mbgl/util/default_thread_pool.hpp>
 #import <mbgl/map/backend.hpp>
 #import <mbgl/map/backend_scope.hpp>
-#import <mbgl/gl/gl.hpp>
 #import <mbgl/sprite/sprite_image.hpp>
 #import <mbgl/storage/default_file_source.hpp>
 #import <mbgl/storage/network_status.hpp>
@@ -55,6 +54,7 @@
 #import "NSPredicate+MGLAdditions.h"
 
 #import <QuartzCore/QuartzCore.h>
+#import <OpenGL/gl.h>
 
 class MGLMapViewImpl;
 class MGLAnnotationContext;
@@ -2866,7 +2866,7 @@ public:
     }
 
     void updateAssumedState() override {
-        MBGL_CHECK_ERROR(glGetIntegerv(GL_FRAMEBUFFER_BINDING, &fbo));
+        glGetIntegerv(GL_FRAMEBUFFER_BINDING, &fbo);
         assumeFramebufferBinding(fbo);
         assumeViewportSize(nativeView.framebufferSize);
     }

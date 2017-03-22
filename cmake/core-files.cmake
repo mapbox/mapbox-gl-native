@@ -49,7 +49,6 @@ set(MBGL_CORE_FILES
     src/mbgl/geometry/line_atlas.hpp
 
     # gl
-    include/mbgl/gl/gl.hpp
     src/mbgl/gl/attribute.cpp
     src/mbgl/gl/attribute.hpp
     src/mbgl/gl/color_mode.cpp
@@ -67,6 +66,7 @@ set(MBGL_CORE_FILES
     src/mbgl/gl/features.hpp
     src/mbgl/gl/framebuffer.hpp
     src/mbgl/gl/gl.cpp
+    src/mbgl/gl/gl.hpp
     src/mbgl/gl/index_buffer.hpp
     src/mbgl/gl/object.cpp
     src/mbgl/gl/object.hpp
