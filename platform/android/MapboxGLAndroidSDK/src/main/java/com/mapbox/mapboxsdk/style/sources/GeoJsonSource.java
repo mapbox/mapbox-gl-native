@@ -7,6 +7,7 @@ import android.support.annotation.UiThread;
 import com.mapbox.mapboxsdk.style.layers.Filter;
 import com.mapbox.services.commons.geojson.Feature;
 import com.mapbox.services.commons.geojson.FeatureCollection;
+import com.mapbox.services.commons.geojson.Geometry;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -127,6 +128,70 @@ public class GeoJsonSource extends Source {
   }
 
   /**
+   * Create a GeoJsonSource from a {@link Feature}
+   *
+   * @param id      the source id
+   * @param feature the feature
+   */
+  public GeoJsonSource(String id, Feature feature) {
+    initialize(id, null);
+    setGeoJson(feature);
+  }
+
+  /**
+   * Create a GeoJsonSource from a {@link Feature} and non-default {@link GeoJsonOptions}
+   *
+   * @param id      the source id
+   * @param feature the feature
+   * @param options options
+   */
+  public GeoJsonSource(String id, Feature feature, GeoJsonOptions options) {
+    initialize(id, options);
+    setGeoJson(feature);
+  }
+
+  /**
+   * Create a GeoJsonSource from a {@link Geometry}
+   *
+   * @param id       the source id
+   * @param geometry the geometry
+   */
+  public GeoJsonSource(String id, Geometry geometry) {
+    initialize(id, null);
+    setGeoJson(geometry);
+  }
+
+  /**
+   * Create a GeoJsonSource from a {@link Geometry} and non-default {@link GeoJsonOptions}
+   *
+   * @param id       the source id
+   * @param geometry the geometry
+   * @param options  options
+   */
+  public GeoJsonSource(String id, Geometry geometry, GeoJsonOptions options) {
+    initialize(id, options);
+    setGeoJson(geometry);
+  }
+
+  /**
+   * Updates the GeoJson with a single feature
+   *
+   * @param feature the GeoJSON {@link Feature} to set
+   */
+  public void setGeoJson(Feature feature) {
+    nativeSetFeature(feature);
+  }
+
+  /**
+   * Updates the GeoJson with a single geometry
+   *
+   * @param geometry the GeoJSON {@link Geometry} to set
+   */
+  public void setGeoJson(Geometry<?> geometry) {
+    nativeSetGeometry(geometry);
+  }
+
+  /**
    * Updates the GeoJson
    *
    * @param features the GeoJSON {@link FeatureCollection}
@@ -181,6 +246,10 @@ public class GeoJsonSource extends Source {
   private native void nativeSetGeoJsonString(String geoJson);
 
   private native void nativeSetFeatureCollection(FeatureCollection geoJson);
+
+  private native void nativeSetFeature(Feature feature);
+
+  private native void nativeSetGeometry(Geometry<?> geometry);
 
   private native Feature[] querySourceFeatures(Object[] filter);
 

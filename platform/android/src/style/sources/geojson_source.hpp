@@ -2,6 +2,7 @@
 
 #include "source.hpp"
 #include <mbgl/style/sources/geojson_source.hpp>
+#include "../../geojson/geometry.hpp"
 #include "../../geojson/feature.hpp"
 #include "../../geojson/feature_collection.hpp"
 #include <jni/jni.hpp>
@@ -27,6 +28,10 @@ public:
     void setGeoJSONString(jni::JNIEnv&, jni::String);
 
     void setFeatureCollection(jni::JNIEnv&, jni::Object<geojson::FeatureCollection>);
+
+    void setFeature(jni::JNIEnv&, jni::Object<geojson::Feature>);
+
+    void setGeometry(jni::JNIEnv&, jni::Object<geojson::Geometry>);
 
     void setURL(jni::JNIEnv&, jni::String);
 
