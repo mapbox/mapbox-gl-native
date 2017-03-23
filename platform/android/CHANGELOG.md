@@ -2,6 +2,12 @@
 
 Mapbox welcomes participation and contributions from everyone.  If you'd like to do so please see the [`Contributing Guide`](https://github.com/mapbox/mapbox-gl-native/blob/master/CONTRIBUTING.md) first to get started.
 
+## 5.0.1 - March 22nd, 2017
+
+5.0.1 is a patch release that addresses a shader precision issue that created a rendering problem on some devices.
+
+* Use `highp` for color attributes [#8385](https://github.com/mapbox/mapbox-gl-native/issues/8385)
+
 ## 5.0.0 - March 17th, 2017
 
 5.0.0 final release contains:
