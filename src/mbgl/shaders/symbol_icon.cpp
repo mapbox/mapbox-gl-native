@@ -31,7 +31,7 @@ varying vec2 v_fade_tex;
 void main() {
     opacity = unpack_mix_vec2(a_opacity, a_opacity_t);
 
-    vec2 a_pos = vec2(int(a_pos_offset.x),int(a_pos_offset.y));
+    vec2 a_pos = vec2(int(a_pos_offset.x/5.0)*5,int(a_pos_offset.y/5.0)*5);
     vec2 a_offset = a_pos_offset.zw;
 
     vec2 a_tex = a_texture_pos.xy;
