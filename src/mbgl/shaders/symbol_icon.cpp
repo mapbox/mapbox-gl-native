@@ -31,7 +31,7 @@ varying vec2 v_fade_tex;
 void main() {
     opacity = unpack_mix_vec2(a_opacity, a_opacity_t);
 
-    vec2 a_pos = vec2(int(a_pos_offset.x/5.0)*5,int(a_pos_offset.y/5.0)*5);
+    vec2 a_pos = a_pos_offset.xy;
     vec2 a_offset = a_pos_offset.zw;
 
     vec2 a_tex = a_texture_pos.xy;
@@ -50,7 +50,9 @@ void main() {
     } else {
         gl_Position = u_matrix * vec4(a_pos, 0, 1) + vec4(extrude, 0, 0);
     }
-
+    gl_Position.x = float(int(gl_Position.x/2.0))*2.0;
+    gl_Position.y = float(int(gl_Position.y/2.0))*2.0;
+    
     v_tex = a_tex / u_texsize;
     v_fade_tex = vec2(a_labelminzoom / 255.0, 0.0);
 }
