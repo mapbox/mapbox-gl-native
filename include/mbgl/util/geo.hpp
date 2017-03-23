@@ -218,4 +218,12 @@ public:
     ScreenCoordinate getCenter(uint16_t width, uint16_t height) const;
 };
 
+constexpr bool operator==(const EdgeInsets& a, const EdgeInsets& b) {
+    return a.top == b.top && a.left == b.left && a.bottom == b.bottom && a.right == b.right;
+}
+
+constexpr bool operator!=(const EdgeInsets& a, const EdgeInsets& b) {
+    return !(a == b);
+}
+
 } // namespace mbgl

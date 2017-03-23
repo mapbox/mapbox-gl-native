@@ -22,6 +22,8 @@ public:
               ConstrainMode = ConstrainMode::HeightOnly,
               ViewportMode = ViewportMode::Default);
 
+    Transform(const TransformState &state_) : observer(MapObserver::nullObserver()), state(state_) {}
+
     // Map view
     bool resize(Size size);
 
