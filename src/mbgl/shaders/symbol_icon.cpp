@@ -67,9 +67,12 @@ varying vec2 v_fade_tex;
 
 void main() {
     
-
+    
+    float floored_x = float(int(v_tex.x * 2048.0))/2048.0;
+    float floored_y = float(int(v_tex.y * 2048.0))/2048.0;
+    vec2 floored_tex = vec2(floored_x, floored_y);
     lowp float alpha = texture2D(u_fadetexture, v_fade_tex).a * opacity;
-    gl_FragColor = texture2D(u_texture, v_tex) * alpha;
+    gl_FragColor = texture2D(u_texture, floored_tex) * alpha;
 
 #ifdef OVERDRAW_INSPECTOR
     gl_FragColor = vec4(1.0);
