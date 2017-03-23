@@ -1,0 +1,21 @@
+{
+  "type": "Feature",
+  "id": 1,
+  "properties": {
+    "null_prop": null,
+    "integer_prop": 10000,
+    "float_prop": 10000.10,
+    "string_prop": "my_string",
+    "bool_prop": true,
+    "object_prop": {
+      "nested_string_prop": "my_string"
+    }
+  },
+  "geometry": {
+    "type": "Point",
+    "coordinates": [
+      5.112419128417969,
+      52.09622422366772
+    ]
+  }
+}
