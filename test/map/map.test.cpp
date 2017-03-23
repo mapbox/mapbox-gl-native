@@ -69,6 +69,28 @@ TEST(Map, LatLngBehavior) {
     ASSERT_DOUBLE_EQ(latLng1.longitude, latLng2.longitude);
 }
 
+TEST(Map, CameraToLatLngBounds) {
+    MapTest test;
+    Map map(test.backend, test.view.getSize(), 1, test.fileSource, test.threadPool, MapMode::Still);
+
+    map.setLatLngZoom({ 45, 90 }, 16);
+
+    LatLngBounds bounds = LatLngBounds::hull(
+            map.latLngForPixel({}),
+            map.latLngForPixel({ double(map.getSize().width), double(map.getSize().height) }));
+
+    CameraOptions camera = map.getCameraOptions({});
+
+    ASSERT_EQ(bounds, map.latLngBoundsForCamera(camera));
+
+    CameraOptions virtualCamera = map.cameraForLatLngBounds(bounds, {});
+    ASSERT_NEAR(*camera.zoom, *virtualCamera.zoom, 1e-7);
+    ASSERT_NEAR(*camera.angle, *virtualCamera.angle, 1e-10);
+    ASSERT_NEAR(*camera.pitch, *virtualCamera.pitch, 1e-10);
+    ASSERT_NEAR(camera.center->latitude, virtualCamera.center->latitude, 1e-10);
+    ASSERT_NEAR(camera.center->longitude, virtualCamera.center->longitude, 1e-10);
+}
+
 TEST(Map, Offline) {
     MapTest test;
     DefaultFileSource fileSource(":memory:", ".");

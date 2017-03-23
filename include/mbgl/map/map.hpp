@@ -107,6 +107,7 @@ public:
     void setLatLngZoom(const LatLng&, double zoom, optional<EdgeInsets>, const AnimationOptions& = {});
     CameraOptions cameraForLatLngBounds(const LatLngBounds&, optional<EdgeInsets>) const;
     CameraOptions cameraForLatLngs(const std::vector<LatLng>&, optional<EdgeInsets>) const;
+    LatLngBounds latLngBoundsForCamera(const CameraOptions&) const;
     void resetZoom();
     void setMinZoom(const double minZoom);
     double getMinZoom() const;
