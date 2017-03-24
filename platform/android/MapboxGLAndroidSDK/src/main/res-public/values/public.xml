@@ -89,6 +89,9 @@
     <public name="mapbox_style_satellite" type="string" />
     <public name="mapbox_style_satellite_streets" type="string" />
 
+    <!-- Exposed error messages -->
+    <public name="mapbox_offline_error_region_definition_invalid" type="string" />
+
     <!-- Exposed drawables -->
     <public name="mapbox_logo_icon" type="drawable" />
     <public name="mapbox_compass_icon" type="drawable" />

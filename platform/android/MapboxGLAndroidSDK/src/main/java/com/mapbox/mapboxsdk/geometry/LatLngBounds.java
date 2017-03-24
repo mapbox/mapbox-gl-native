@@ -5,12 +5,16 @@ import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
 import com.mapbox.mapboxsdk.exceptions.InvalidLatLngBoundsException;
+import com.mapbox.services.android.telemetry.constants.GeoConstants;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * A geographical area representing a latitude/longitude aligned rectangle.
+ * <p>
+ * This class does not wrap values to the world bounds.
+ * </p>
  */
 public class LatLngBounds implements Parcelable {
 
@@ -37,6 +41,18 @@ public class LatLngBounds implements Parcelable {
   }
 
   /**
+   * Returns the world bounds.
+   *
+   * @return the bounds representing the world
+   */
+  public static LatLngBounds world() {
+    return new LatLngBounds.Builder()
+      .include(new LatLng(GeoConstants.MAX_LATITUDE, GeoConstants.MAX_LONGITUDE))
+      .include(new LatLng(GeoConstants.MIN_LATITUDE, GeoConstants.MIN_LONGITUDE))
+      .build();
+  }
+
+  /**
    * Calculates the centerpoint of this LatLngBounds by simple interpolation and returns
    * it as a point. This is a non-geodesic calculation which is not the geographic center.
    *
@@ -47,20 +63,76 @@ public class LatLngBounds implements Parcelable {
       (this.mLonEast + this.mLonWest) / 2);
   }
 
+  /**
+   * Get the north latitude value of this bounds.
+   *
+   * @return double latitude value for north
+   */
   public double getLatNorth() {
     return this.mLatNorth;
   }
 
+  /**
+   * Get the south latitude value of this bounds.
+   *
+   * @return double latitude value for south
+   */
   public double getLatSouth() {
     return this.mLatSouth;
   }
 
+  /**
+   * Get the east longitude value of this bounds.
+   *
+   * @return double longitude value for east
+   */
   public double getLonEast() {
     return this.mLonEast;
   }
 
+  /**
+   * Get the west longitude value of this bounds.
+   *
+   * @return double longitude value for west
+   */
   public double getLonWest() {
     return this.mLonWest;
+  }
+
+  /**
+   * Get the latitude-longitude pair of the south west corner of this bounds.
+   *
+   * @return LatLng of the south west corner
+   */
+  public LatLng getSouthWest() {
+    return new LatLng(mLatSouth, mLonWest);
+  }
+
+  /**
+   * Get the latitude-longitude paur if the north east corner of this bounds.
+   *
+   * @return LatLng of the north east corner
+   */
+  public LatLng getNorthEast() {
+    return new LatLng(mLatNorth, mLonEast);
+  }
+
+  /**
+   * Get the latitude-longitude pair of the south east corner of this bounds.
+   *
+   * @return LatLng of the south east corner
+   */
+  public LatLng getSouthEast() {
+    return new LatLng(mLatSouth, mLonEast);
+  }
+
+  /**
+   * Get the latitude-longitude pair of the north west corner of this bounds.
+   *
+   * @return LatLng of the north west corner
+   */
+  public LatLng getNorthWest() {
+    return new LatLng(mLatNorth, mLonWest);
   }
 
   /**
@@ -133,8 +205,27 @@ public class LatLngBounds implements Parcelable {
     return new LatLngBounds(maxLat, maxLon, minLat, minLon);
   }
 
+  /**
+   * Return an array of LatLng objects resembling this bounds.
+   *
+   * @return an array of 2 LatLng objects.
+   */
   public LatLng[] toLatLngs() {
-    return new LatLng[] {new LatLng(mLatNorth, mLonEast), new LatLng(mLatSouth, mLonWest)};
+    return new LatLng[] {getNorthEast(), getSouthWest()};
+  }
+
+  /**
+   * Constructs a LatLngBounds from current bounds with an additional latitude-longitude pair.
+   *
+   * @param latLng the latitude lognitude pair to include in the bounds.
+   * @return the newly constructed bounds
+   */
+  public LatLngBounds include(LatLng latLng) {
+    return new LatLngBounds.Builder()
+      .include(getNorthEast())
+      .include(getSouthWest())
+      .include(latLng)
+      .build();
   }
 
   /**
@@ -159,19 +250,28 @@ public class LatLngBounds implements Parcelable {
   }
 
   /**
-   * Determines whether this LatLngBounds contains a point and the point
-   * does not touch its boundary.
+   * Determines whether this LatLngBounds contains a point.
    *
    * @param latLng the point which may be contained
-   * @return true, if the point is contained within the box.
+   * @return true, if the point is contained within the bounds
    */
   public boolean contains(final ILatLng latLng) {
     final double latitude = latLng.getLatitude();
     final double longitude = latLng.getLongitude();
-    return ((latitude < this.mLatNorth)
-      && (latitude > this.mLatSouth))
-      && ((longitude < this.mLonEast)
-      && (longitude > this.mLonWest));
+    return ((latitude <= this.mLatNorth)
+      && (latitude >= this.mLatSouth))
+      && ((longitude <= this.mLonEast)
+      && (longitude >= this.mLonWest));
+  }
+
+  /**
+   * Determines whether this LatLngBounds contains another bounds.
+   *
+   * @param other the bounds which may be contained
+   * @return true, if the bounds is contained within the bounds
+   */
+  public boolean contains(final LatLngBounds other) {
+    return contains(other.getNorthEast()) && contains(other.getSouthWest());
   }
 
   /**
