@@ -14,43 +14,23 @@ workflows:
   primary:
     steps:
     - script:
-        title: Configure Google Cloud SDK
-        inputs:
-        - content: |-
-            #!/bin/bash
-            # Install python tools for pip
-            sudo apt-get install -y gcc python-dev python-setuptools
-            sudo easy_install -U pip
-            sudo pip uninstall crcmod
-            sudo pip install -U crcmod
-
-            # Install Google Cloud SDK for Firebase
-            export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)"
-            echo "deb http://packages.cloud.google.com/apt $CLOUD_SDK_REPO main" | sudo tee /etc/apt/sources.list.d/google-cloud-sdk.list
-            curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
-            sudo apt-get update && sudo apt-get install -y google-cloud-sdk
-
-            # Get authentication secret
-            echo "Downloading Google Cloud authentication:"
-            wget -O secret.json "$BITRISEIO_GCLOUD_SERVICE_ACCOUNT_JSON_URL"
-    - script:
         title: Build libmapbox-gl.so for armeabi-v7a
         inputs:
         - content: |-
             #!/bin/bash
-            # Accept Android SDK license
-            echo "Accepting Android SDK license..."
-            mkdir -p "${ANDROID_HOME}/licenses"
-            echo "8933bad161af4178b1185d1a37fbf41ea5269c55" > "${ANDROID_HOME}/licenses/android-sdk-license"
             echo "Compile libmapbox-gl.so for armeabi-v7a abi:"
+            ccache -z
             BUILDTYPE=Debug make android-lib-arm-v7
+            ccache -s
     - script:
         title: Compile Core tests
         inputs:
         - content: |-
             #!/bin/bash
             echo "Compiling core tests:"
+            ccache -z
             BUILDTYPE=Debug make android-test-lib-arm-v7
+            ccache -s
     - script:
         title: Run local JVM Unit tests on phone module
         inputs:
@@ -81,14 +61,21 @@ workflows:
             make android-checkstyle
     - script:
         title: Run Firebase instrumentation tests
+        run_if: '{{getenv "BITRISEIO_GCLOUD_SERVICE_ACCOUNT_JSON_URL" | ne ""}}'
         inputs:
         - content: |-
             #!/bin/bash
+            set -euo pipefail
+            echo "Downloading Google Cloud authentication:"
+            wget -O secret.json "$BITRISEIO_GCLOUD_SERVICE_ACCOUNT_JSON_URL"
+
             echo "Downloading Mapbox accesstoken for running tests:"
             wget -O platform/android/MapboxGLAndroidSDKTestApp/src/main/res/values/developer-config.xml "$BITRISEIO_TEST_ACCESS_TOKEN_UI_TEST_URL"
 
             echo "Build seperate test apk:"
+            ccache -z
             make android-ui-test-arm-v7
+            ccache -s
 
             echo "Run tests on firebase:"
             gcloud auth activate-service-account --key-file secret.json --project android-gl-native
@@ -97,9 +84,11 @@ workflows:
     - script:
         title: Download Firebase results
         is_always_run: true
+        run_if: '{{getenv "BITRISEIO_GCLOUD_SERVICE_ACCOUNT_JSON_URL" | ne ""}}'
         inputs:
         - content: |-
             #!/bin/bash
+            set -euo pipefail
             mkdir -p platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk
 
             echo "The details from Firebase will be downloaded, zipped and attached as a build artefact."
@@ -135,13 +124,6 @@ workflows:
   scheduled:
     steps:
     - script:
-        title: Configure AWS-CLI
-        inputs:
-        - content: |-
-            #!/bin/bash
-            apt-get install -y python-pip python-dev build-essential
-            pip install awscli
-    - script:
         title: Download maven credentials
         inputs:
         - content: |-
@@ -159,10 +141,6 @@ workflows:
         inputs:
         - content: |-
             #!/bin/bash
-            # Accept Android SDK license
-            echo "Accepting Android SDK license..."
-            mkdir -p "${ANDROID_HOME}/licenses"
-            echo "8933bad161af4178b1185d1a37fbf41ea5269c55" > "${ANDROID_HOME}/licenses/android-sdk-license"
             echo "Compile libmapbox-gl.so for all supportd abi's:"
             export BUILDTYPE=Release make apackage
     - script:
@@ -190,10 +168,6 @@ workflows:
         inputs:
         - content: |-
             #!/bin/bash
-            # Accept Android SDK license
-            echo "Accepting Android SDK license..."
-            mkdir -p "${ANDROID_HOME}/licenses"
-            echo "8933bad161af4178b1185d1a37fbf41ea5269c55" > "${ANDROID_HOME}/licenses/android-sdk-license"
             echo "Compile libmapbox-gl.so for all supportd abi's:"
             export BUILDTYPE=Release
             make apackage
@@ -243,10 +217,6 @@ workflows:
         inputs:
         - content: |-
             #!/bin/bash
-            # Accept Android SDK license
-            echo "Accepting Android SDK license..."
-            mkdir -p "${ANDROID_HOME}/licenses"
-            echo "8933bad161af4178b1185d1a37fbf41ea5269c55" > "${ANDROID_HOME}/licenses/android-sdk-license"
             echo "Compile libmapbox-gl.so for all supportd abi's:"
             export BUILDTYPE=Release
             make apackage
