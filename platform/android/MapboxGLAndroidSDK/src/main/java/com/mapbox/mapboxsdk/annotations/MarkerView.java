@@ -390,6 +390,15 @@ public class MarkerView extends Marker {
   }
 
   /**
+   * Invalidates the MarkerView resulting in remeasuring the View.
+   */
+  void invalidate() {
+    width = height = 0;
+    offsetX = offsetY = MapboxConstants.UNMEASURED;
+    markerViewManager.invalidateViewMarkersInVisibleRegion();
+  }
+
+  /**
    * Get the String representation of a MarkerView.
    *
    * @return the String representation.

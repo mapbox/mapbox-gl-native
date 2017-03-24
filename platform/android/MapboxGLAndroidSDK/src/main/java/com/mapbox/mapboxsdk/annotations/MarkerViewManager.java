@@ -233,6 +233,7 @@ public class MarkerViewManager implements MapView.OnMapChangedListener {
     View convertView = markerViewMap.get(markerView);
     if (convertView != null && convertView instanceof ImageView) {
       ((ImageView) convertView).setImageBitmap(markerView.getIcon().getBitmap());
+      markerView.invalidate();
     }
   }
 
