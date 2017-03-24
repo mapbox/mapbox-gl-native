@@ -4,6 +4,7 @@ import android.os.Parcelable;
 
 import com.mapbox.mapboxsdk.exceptions.InvalidLatLngBoundsException;
 import com.mapbox.mapboxsdk.utils.MockParcel;
+import com.mapbox.services.android.telemetry.constants.GeoConstants;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -11,10 +12,10 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
+import static junit.framework.Assert.assertNotNull;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -42,39 +43,39 @@ public class LatLngBoundsTest {
   }
 
   @Test(expected = InvalidLatLngBoundsException.class)
-  public void testNoLatLngs() {
+  public void noLatLngs() {
     new LatLngBounds.Builder().build();
   }
 
   @Test(expected = InvalidLatLngBoundsException.class)
-  public void testOneLatLngs() {
+  public void oneLatLngs() {
     new LatLngBounds.Builder().include(LAT_LNG_NULL_ISLAND).build();
   }
 
   @Test
-  public void testLatitiudeSpan() {
+  public void latitiudeSpan() {
     assertEquals("Span should be the same", 2, latLngBounds.getLatitudeSpan(), DELTA);
   }
 
   @Test
-  public void testLongitudeSpan() {
+  public void longitudeSpan() {
     assertEquals("Span should be the same", 2, latLngBounds.getLongitudeSpan(), DELTA);
   }
 
   @Test
-  public void testCoordinateSpan() {
+  public void coordinateSpan() {
     LatLngSpan latLngSpan = latLngBounds.getSpan();
     assertEquals("LatLngSpan should be the same", new LatLngSpan(2, 2), latLngSpan);
   }
 
   @Test
-  public void testCenter() {
+  public void center() {
     LatLng center = latLngBounds.getCenter();
     assertEquals("Center should match", new LatLng(1, 1), center);
   }
 
   @Test
-  public void testEmptySpan() {
+  public void emptySpan() {
     latLngBounds = new LatLngBounds.Builder()
       .include(LAT_LNG_NOT_NULL_ISLAND)
       .include(LAT_LNG_NOT_NULL_ISLAND)
@@ -83,7 +84,7 @@ public class LatLngBoundsTest {
   }
 
   @Test
-  public void testNotEmptySpan() {
+  public void notEmptySpan() {
     latLngBounds = new LatLngBounds.Builder()
       .include(LAT_LNG_NOT_NULL_ISLAND)
       .include(LAT_LNG_NULL_ISLAND)
@@ -92,7 +93,7 @@ public class LatLngBoundsTest {
   }
 
   @Test
-  public void testToLatLngs() {
+  public void toLatLngs() {
     latLngBounds = new LatLngBounds.Builder()
       .include(LAT_LNG_NOT_NULL_ISLAND)
       .include(LAT_LNG_NULL_ISLAND)
@@ -104,12 +105,12 @@ public class LatLngBoundsTest {
   }
 
   @Test
-  public void testIncluding() {
+  public void include() {
     assertTrue("LatLng should be included", latLngBounds.contains(new LatLng(1, 1)));
   }
 
   @Test
-  public void testIncludes() {
+  public void includes() {
     List<LatLng> points = new ArrayList<>();
     points.add(LAT_LNG_NULL_ISLAND);
     points.add(LAT_LNG_NOT_NULL_ISLAND);
@@ -127,8 +128,31 @@ public class LatLngBoundsTest {
   }
 
   @Test
-  public void testNoIncluding() {
+  public void containsNot() {
     assertFalse("LatLng should not be included", latLngBounds.contains(new LatLng(3, 1)));
+  }
+
+  @Test
+  public void containsBoundsInWorld() {
+    assertTrue("LatLngBounds should be contained in the world", LatLngBounds.world().contains(latLngBounds));
+  }
+
+  @Test
+  public void containsNotBiggerBoundsInWorld() {
+    LatLngBounds biggerWorldBounds = new LatLngBounds.Builder()
+      .include(new LatLng(GeoConstants.MAX_LATITUDE + 10, GeoConstants.MIN_LONGITUDE - 10))
+      .include(new LatLng(GeoConstants.MIN_LATITUDE - 10, GeoConstants.MAX_LONGITUDE + 10))
+      .build();
+    assertFalse("Bounds should not be contained ", LatLngBounds.world().contains(biggerWorldBounds));
+  }
+
+  @Test
+  public void containsNotBoundsInWorld() {
+    LatLngBounds outSideWorldBounds = new LatLngBounds.Builder()
+      .include(new LatLng(GeoConstants.MAX_LATITUDE + 10, GeoConstants.MAX_LONGITUDE + 10))
+      .include(new LatLng(GeoConstants.MAX_LATITUDE + 20, GeoConstants.MAX_LONGITUDE + 20))
+      .build();
+    assertFalse("Bounds should not be contained ", LatLngBounds.world().contains(outSideWorldBounds));
   }
 
   @Test
@@ -137,7 +161,7 @@ public class LatLngBoundsTest {
   }
 
   @Test
-  public void testEquality() {
+  public void equality() {
     LatLngBounds latLngBounds = new LatLngBounds.Builder()
       .include(LAT_LNG_NULL_ISLAND)
       .include(LAT_LNG_NOT_NULL_ISLAND)
@@ -152,7 +176,7 @@ public class LatLngBoundsTest {
   }
 
   @Test
-  public void testIntersect() {
+  public void intersect() {
     LatLngBounds latLngBounds = new LatLngBounds.Builder()
       .include(new LatLng(1, 1))
       .include(LAT_LNG_NULL_ISLAND)
@@ -162,7 +186,7 @@ public class LatLngBoundsTest {
   }
 
   @Test
-  public void testNoIntersect() {
+  public void intersectNot() {
     LatLngBounds latLngBounds = new LatLngBounds.Builder()
       .include(new LatLng(10, 10))
       .include(new LatLng(9, 8))
@@ -171,7 +195,7 @@ public class LatLngBoundsTest {
   }
 
   @Test
-  public void testInnerUnion() {
+  public void innerUnion() {
     LatLngBounds latLngBounds = new LatLngBounds.Builder()
       .include(new LatLng(1, 1))
       .include(LAT_LNG_NULL_ISLAND)
@@ -180,7 +204,7 @@ public class LatLngBoundsTest {
   }
 
   @Test
-  public void testOuterUnion() {
+  public void outerUnion() {
     LatLngBounds latLngBounds = new LatLngBounds.Builder()
       .include(new LatLng(10, 10))
       .include(new LatLng(9, 8))
@@ -191,6 +215,66 @@ public class LatLngBoundsTest {
         .include(new LatLng(10, 10))
         .include(LAT_LNG_NULL_ISLAND)
         .build());
+  }
+
+  @Test
+  public void northWest() {
+    double minLat = 5;
+    double minLon = 6;
+    double maxLat = 20;
+    double maxLon = 21;
+
+    LatLngBounds latLngBounds = new LatLngBounds.Builder()
+      .include(new LatLng(minLat, minLon))
+      .include(new LatLng(maxLat, maxLon))
+      .build();
+
+    assertEquals("NorthWest should match", latLngBounds.getNorthWest(), new LatLng(maxLat, minLon));
+  }
+
+  @Test
+  public void southWest() {
+    double minLat = 5;
+    double minLon = 6;
+    double maxLat = 20;
+    double maxLon = 21;
+
+    LatLngBounds latLngBounds = new LatLngBounds.Builder()
+      .include(new LatLng(minLat, minLon))
+      .include(new LatLng(maxLat, maxLon))
+      .build();
+
+    assertEquals("SouthWest should match", latLngBounds.getSouthWest(), new LatLng(minLat, minLon));
+  }
+
+  @Test
+  public void northEast() {
+    double minLat = 5;
+    double minLon = 6;
+    double maxLat = 20;
+    double maxLon = 21;
+
+    LatLngBounds latLngBounds = new LatLngBounds.Builder()
+      .include(new LatLng(minLat, minLon))
+      .include(new LatLng(maxLat, maxLon))
+      .build();
+
+    assertEquals("NorthEast should match", latLngBounds.getNorthEast(), new LatLng(maxLat, maxLon));
+  }
+
+  @Test
+  public void southEast() {
+    double minLat = 5;
+    double minLon = 6;
+    double maxLat = 20;
+    double maxLon = 21;
+
+    LatLngBounds latLngBounds = new LatLngBounds.Builder()
+      .include(new LatLng(minLat, minLon))
+      .include(new LatLng(maxLat, maxLon))
+      .build();
+
+    assertEquals("SouthEast should match", latLngBounds.getSouthEast(), new LatLng(minLat, maxLon));
   }
 
   @Test

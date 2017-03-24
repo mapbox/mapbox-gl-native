@@ -13,6 +13,7 @@
     <string name="mapbox_infoWindowTitle">Title</string>
     <string name="mapbox_infoWindowDescription">Description</string>
     <string name="mapbox_infoWindowAddress">Address</string>
+    <string name="mapbox_offline_error_region_definition_invalid">Provided OfflineRegionDefinition doesn\'t fit the world bounds: %s</string>
 
     <!-- these are public -->
     <!-- Using one of these constants means your map style will always use the latest version and
