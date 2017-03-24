@@ -83,12 +83,11 @@ TEST(Map, CameraToLatLngBounds) {
 
     ASSERT_EQ(bounds, map.latLngBoundsForCamera(camera));
 
+    // Map::cameraForLatLngBounds only sets zoom and center.
     CameraOptions virtualCamera = map.cameraForLatLngBounds(bounds, {});
     ASSERT_NEAR(*camera.zoom, *virtualCamera.zoom, 1e-7);
-    ASSERT_NEAR(*camera.angle, *virtualCamera.angle, 1e-10);
-    ASSERT_NEAR(*camera.pitch, *virtualCamera.pitch, 1e-10);
-    ASSERT_NEAR(camera.center->latitude, virtualCamera.center->latitude, 1e-10);
-    ASSERT_NEAR(camera.center->longitude, virtualCamera.center->longitude, 1e-10);
+    ASSERT_NEAR(camera.center->latitude, virtualCamera.center->latitude, 1e-7);
+    ASSERT_NEAR(camera.center->longitude, virtualCamera.center->longitude, 1e-7);
 }
 
 TEST(Map, Offline) {

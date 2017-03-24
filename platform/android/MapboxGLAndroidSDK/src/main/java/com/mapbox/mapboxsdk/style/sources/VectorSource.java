@@ -31,10 +31,10 @@ public class VectorSource extends Source {
   }
 
   /**
-   * Create a vector source from a remote url
+   * Create a vector source from a remote url pointing to a TileJSON resource
    *
    * @param id  the source id
-   * @param url the url
+   * @param url the TileJSON resource url
    */
   public VectorSource(String id, URL url) {
     this(id, url.toExternalForm());
