@@ -41,6 +41,7 @@
 #include <QStringList>
 #include <QThreadStorage>
 
+#include <exception>
 #include <memory>
 
 using namespace QMapbox;
@@ -63,6 +64,14 @@ static_assert(mbgl::underlying_type(QMapboxGL::NorthUpwards) == mbgl::underlying
 static_assert(mbgl::underlying_type(QMapboxGL::NorthRightwards) == mbgl::underlying_type(mbgl::NorthOrientation::Rightwards), "error");
 static_assert(mbgl::underlying_type(QMapboxGL::NorthDownwards) == mbgl::underlying_type(mbgl::NorthOrientation::Downwards), "error");
 static_assert(mbgl::underlying_type(QMapboxGL::NorthLeftwards) == mbgl::underlying_type(mbgl::NorthOrientation::Leftwards), "error");
+
+// mbgl::MapObserver::CameraChangeMode
+static_assert(mbgl::underlying_type(QMapboxGL::Immediate) == mbgl::underlying_type(mbgl::MapObserver::CameraChangeMode::Immediate), "error");
+static_assert(mbgl::underlying_type(QMapboxGL::Animated) == mbgl::underlying_type(mbgl::MapObserver::CameraChangeMode::Animated), "error");
+
+// mbgl::MapObserver::RenderMode
+static_assert(mbgl::underlying_type(QMapboxGL::Partial) == mbgl::underlying_type(mbgl::MapObserver::RenderMode::Partial), "error");
+static_assert(mbgl::underlying_type(QMapboxGL::Full) == mbgl::underlying_type(mbgl::MapObserver::RenderMode::Full), "error");
 
 namespace {
 
@@ -1557,14 +1566,27 @@ QMapboxGLPrivate::QMapboxGLPrivate(QMapboxGL *q, const QMapboxGLSettings &settin
         static_cast<mbgl::ConstrainMode>(settings.constrainMode()),
         static_cast<mbgl::ViewportMode>(settings.viewportMode())))
 {
-    qRegisterMetaType<QMapboxGL::MapChange>("QMapboxGL::MapChange");
+    qRegisterMetaType<QMapboxGL::CameraChangeMode>("QMapboxGL::CameraChangeMode");
+    qRegisterMetaType<QMapboxGL::RenderMode>("QMapboxGL::RenderMode");
 
     fileSourceObj->setAccessToken(settings.accessToken().toStdString());
     fileSourceObj->setAPIBaseURL(settings.apiBaseUrl().toStdString());
 
     connect(this, SIGNAL(needsRendering()), q_ptr, SIGNAL(needsRendering()), Qt::QueuedConnection);
-    connect(this, SIGNAL(mapChanged(QMapboxGL::MapChange)), q_ptr, SIGNAL(mapChanged(QMapboxGL::MapChange)), Qt::QueuedConnection);
     connect(this, SIGNAL(copyrightsChanged(QString)), q_ptr, SIGNAL(copyrightsChanged(QString)), Qt::QueuedConnection);
+
+    connect(this, SIGNAL(cameraWillChange(QMapboxGL::CameraChangeMode)), q_ptr, SIGNAL(cameraWillChange(QMapboxGL::CameraChangeMode)), Qt::QueuedConnection);
+    connect(this, SIGNAL(cameraIsChanging()), q_ptr, SIGNAL(cameraIsChanging()), Qt::QueuedConnection);
+    connect(this, SIGNAL(cameraDidChange(QMapboxGL::CameraChangeMode)), q_ptr, SIGNAL(cameraDidChange(QMapboxGL::CameraChangeMode)), Qt::QueuedConnection);
+    connect(this, SIGNAL(willStartLoadingMap()), q_ptr, SIGNAL(willStartLoadingMap()), Qt::QueuedConnection);
+    connect(this, SIGNAL(didFinishLoadingMap()), q_ptr, SIGNAL(didFinishLoadingMap()), Qt::QueuedConnection);
+    connect(this, SIGNAL(didFailLoadingMap(QString)), q_ptr, SIGNAL(didFailLoadingMap(QString)), Qt::QueuedConnection);
+    connect(this, SIGNAL(willStartRenderingFrame()), q_ptr, SIGNAL(willStartRenderingFrame()), Qt::QueuedConnection);
+    connect(this, SIGNAL(didFinishRenderingFrame(QMapboxGL::RenderMode)), q_ptr, SIGNAL(didFinishRenderingFrame(QMapboxGL::RenderMode)), Qt::QueuedConnection);
+    connect(this, SIGNAL(willStartRenderingMap()), q_ptr, SIGNAL(willStartRenderingMap()), Qt::QueuedConnection);
+    connect(this, SIGNAL(didFinishRenderingMap(QMapboxGL::RenderMode)), q_ptr, SIGNAL(didFinishRenderingMap(QMapboxGL::RenderMode)), Qt::QueuedConnection);
+    connect(this, SIGNAL(didFinishLoadingStyle()), q_ptr, SIGNAL(didFinishLoadingStyle()), Qt::QueuedConnection);
+    connect(this, SIGNAL(sourceChanged(QString)), q_ptr, SIGNAL(sourceChanged(QString)), Qt::QueuedConnection);
 }
 
 QMapboxGLPrivate::~QMapboxGLPrivate()
@@ -1597,85 +1619,73 @@ void QMapboxGLPrivate::invalidate()
 
 void QMapboxGLPrivate::onCameraWillChange(mbgl::MapObserver::CameraChangeMode mode)
 {
-    if (mode == mbgl::MapObserver::CameraChangeMode::Immediate) {
-        emit mapChanged(QMapboxGL::MapChangeRegionWillChange);
-    } else {
-        emit mapChanged(QMapboxGL::MapChangeRegionWillChangeAnimated);
-    }
+    emit cameraWillChange(mode == mbgl::MapObserver::CameraChangeMode::Immediate ? QMapboxGL::Immediate : QMapboxGL::Animated);
 }
 
 void QMapboxGLPrivate::onCameraIsChanging()
 {
-    emit mapChanged(QMapboxGL::MapChangeRegionIsChanging);
+    emit cameraIsChanging();
 }
 
 void QMapboxGLPrivate::onCameraDidChange(mbgl::MapObserver::CameraChangeMode mode)
 {
-    if (mode == mbgl::MapObserver::CameraChangeMode::Immediate) {
-        emit mapChanged(QMapboxGL::MapChangeRegionDidChange);
-    } else {
-        emit mapChanged(QMapboxGL::MapChangeRegionDidChangeAnimated);
-    }
+    emit cameraDidChange(mode == mbgl::MapObserver::CameraChangeMode::Immediate ? QMapboxGL::Immediate : QMapboxGL::Animated);
 }
 
 void QMapboxGLPrivate::onWillStartLoadingMap()
 {
-    emit mapChanged(QMapboxGL::MapChangeWillStartLoadingMap);
+    emit willStartLoadingMap();
 }
 
 void QMapboxGLPrivate::onDidFinishLoadingMap()
 {
-    emit mapChanged(QMapboxGL::MapChangeDidFinishLoadingMap);
+    emit didFinishLoadingMap();
 }
 
-void QMapboxGLPrivate::onDidFailLoadingMap(std::exception_ptr)
+void QMapboxGLPrivate::onDidFailLoadingMap(std::exception_ptr error)
 {
-    emit mapChanged(QMapboxGL::MapChangeDidFailLoadingMap);
+    try {
+        std::rethrow_exception(error);
+    } catch (const std::exception& ex) {
+        emit didFailLoadingMap(QString::fromStdString(ex.what()));
+    }
 }
 
 void QMapboxGLPrivate::onWillStartRenderingFrame()
 {
-    emit mapChanged(QMapboxGL::MapChangeWillStartRenderingFrame);
+    emit willStartRenderingFrame();
 }
 
 void QMapboxGLPrivate::onDidFinishRenderingFrame(mbgl::MapObserver::RenderMode mode)
 {
-    if (mode == mbgl::MapObserver::RenderMode::Partial) {
-        emit mapChanged(QMapboxGL::MapChangeDidFinishRenderingFrame);
-    } else {
-        emit mapChanged(QMapboxGL::MapChangeDidFinishRenderingFrameFullyRendered);
-    }
+    emit didFinishRenderingFrame(mode == mbgl::MapObserver::RenderMode::Partial ? QMapboxGL::Partial : QMapboxGL::Full);
 }
 
 void QMapboxGLPrivate::onWillStartRenderingMap()
 {
-    emit mapChanged(QMapboxGL::MapChangeWillStartLoadingMap);
+    emit willStartRenderingMap();
 }
 
 void QMapboxGLPrivate::onDidFinishRenderingMap(mbgl::MapObserver::RenderMode mode)
 {
-    if (mode == mbgl::MapObserver::RenderMode::Partial) {
-        emit mapChanged(QMapboxGL::MapChangeDidFinishRenderingMap);
-    } else {
-        emit mapChanged(QMapboxGL::MapChangeDidFinishRenderingMapFullyRendered);
-    }
+    emit didFinishRenderingMap(mode == mbgl::MapObserver::RenderMode::Partial ? QMapboxGL::Partial : QMapboxGL::Full);
 }
 
 void QMapboxGLPrivate::onDidFinishLoadingStyle()
 {
-    emit mapChanged(QMapboxGL::MapChangeDidFinishLoadingStyle);
+    emit didFinishLoadingStyle();
 }
 
-void QMapboxGLPrivate::onSourceChanged(mbgl::style::Source&)
+void QMapboxGLPrivate::onSourceChanged(mbgl::style::Source& source_)
 {
     std::string attribution;
-    for (const auto& source : mapObj->getSources()) {
+    for (const auto& source: mapObj->getSources()) {
         // Avoid duplicates by using the most complete attribution HTML snippet.
         if (source->getAttribution() && (attribution.size() < source->getAttribution()->size()))
             attribution = *source->getAttribution();
     }
     emit copyrightsChanged(QString::fromStdString(attribution));
-    emit mapChanged(QMapboxGL::MapChangeSourceDidChange);
+    emit sourceChanged(QString::fromStdString(source_.getID()));
 }
 
 /*!

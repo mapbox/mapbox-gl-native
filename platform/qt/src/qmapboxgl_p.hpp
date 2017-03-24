@@ -66,6 +66,19 @@ public slots:
 
 signals:
     void needsRendering();
-    void mapChanged(QMapboxGL::MapChange);
     void copyrightsChanged(const QString &copyrightsHtml);
+
+signals:
+    void cameraWillChange(QMapboxGL::CameraChangeMode);
+    void cameraIsChanging();
+    void cameraDidChange(QMapboxGL::CameraChangeMode);
+    void willStartLoadingMap();
+    void didFinishLoadingMap();
+    void didFailLoadingMap(const QString& error);
+    void willStartRenderingFrame();
+    void didFinishRenderingFrame(QMapboxGL::RenderMode);
+    void willStartRenderingMap();
+    void didFinishRenderingMap(QMapboxGL::RenderMode);
+    void didFinishLoadingStyle();
+    void sourceChanged(const QString& sourceID);
 };
