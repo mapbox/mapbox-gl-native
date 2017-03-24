@@ -28,6 +28,8 @@ private:
 
     static jni::Object<java::util::List> getPoints(jni::JNIEnv&, jni::Object<Polygon>);
 
+    static jni::Object<java::util::List> getHolePoints(jni::JNIEnv&, jni::Object<Polygon>);
+
     static float getOpacity(jni::JNIEnv&, jni::Object<Polygon>);
 
     static mbgl::Color getFillColor(jni::JNIEnv&, jni::Object<Polygon>);

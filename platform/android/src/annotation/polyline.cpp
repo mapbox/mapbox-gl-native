@@ -10,7 +10,9 @@ jni::Class<Polyline> Polyline::javaClass;
 mbgl::LineAnnotation Polyline::toAnnotation(jni::JNIEnv& env, jni::Object<Polyline> polyline) {
     auto points = Polyline::getPoints(env, polyline);
 
-    mbgl::LineAnnotation annotation { MultiPoint::toGeometry<mbgl::LineString<double>>(env, points) };
+    // TODO Pass an empty hole points list
+    mbgl::LineAnnotation annotation { MultiPoint::toGeometry<mbgl::LineString<double>>(env, points,
+                                                                                       points) };
     annotation.opacity = { Polyline::getOpacity(env, polyline) };
     annotation.color = { Polyline::getColor(env, polyline) };
     annotation.width = { Polyline::getWidth(env, polyline) };

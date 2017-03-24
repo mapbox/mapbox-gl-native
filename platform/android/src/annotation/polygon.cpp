@@ -9,19 +9,26 @@ jni::Class<Polygon> Polygon::javaClass;
 
 mbgl::FillAnnotation Polygon::toAnnotation(jni::JNIEnv& env, jni::Object<Polygon> polygon) {
     auto points = Polygon::getPoints(env, polygon);
+    auto holePoints = Polygon::getHolePoints(env, polygon);
 
-    mbgl::FillAnnotation annotation { mbgl::Polygon<double> { MultiPoint::toGeometry<mbgl::LinearRing<double>>(env, points) } };
+    mbgl::FillAnnotation annotation { mbgl::Polygon<double> { MultiPoint::toGeometry<mbgl::LinearRing<double>>(env, points, holePoints) } };
     annotation.opacity = { Polygon::getOpacity(env, polygon) };
     annotation.color = { Polygon::getFillColor(env, polygon) };
     annotation.outlineColor = { Polygon::getOutlineColor(env, polygon) };
 
     jni::DeleteLocalRef(env, points);
+    jni::DeleteLocalRef(env, holePoints);
 
     return annotation;
 }
 
 jni::Object<java::util::List> Polygon::getPoints(jni::JNIEnv& env, jni::Object<Polygon> polygon) {
     static auto field = Polygon::javaClass.GetField<jni::Object<java::util::List>>(env, "points");
+    return polygon.Get(env, field);
+}
+
+jni::Object<java::util::List> Polygon::getHolePoints(jni::JNIEnv& env, jni::Object<Polygon> polygon) {
+    static auto field = Polygon::javaClass.GetField<jni::Object<java::util::List>>(env, "holePoints");
     return polygon.Get(env, field);
 }
 
