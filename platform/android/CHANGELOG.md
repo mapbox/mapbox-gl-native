@@ -8,6 +8,7 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 
 * Fix resource transform callback [#8582](https://github.com/mapbox/mapbox-gl-native/pull/8582)
 * Restore onTouch behaviour to 4.x version [#8585](https://github.com/mapbox/mapbox-gl-native/pull/8585)
+* Restore anchoring after updating MarkerView Icon [#8519](https://github.com/mapbox/mapbox-gl-native/pull/8519)
 
 ## 5.0.1 - March 22nd, 2017
 
