@@ -6,44 +6,43 @@
 
 # Data-Driven Styling
 
-Mapbox’s data-driven styling features allow you to use data properties to style your maps. You can style map features automatically based on their individual attributes. 
+Mapbox’s data-driven styling features allow you to use attributes in the data to style your maps. You can style map features automatically based on their individual attributes.
 
 Vary POI icons, transit route line colors, city polygon opacity, and more based on any attribute in your data. Need to visualize hotel data by price? You can have your map’s point radii and colors change automatically with your data.
 
 ![available bikes](img/data-driven-styling/citibikes.png) ![subway lines](img/data-driven-styling/polylineExample.png)
 
-# How to use Data-Driven Styling
 This guide uses earthquake data from the [U.S. Geological Survey](https://earthquake.usgs.gov/earthquakes/feed/v1.0/geojson.php) to style a map based on attributes. For more information about how to work with GeoJSON data in our iOS SDK, please see our [working with GeoJSON data](working-with-geojson-data.html) guide.
 
-`MGLStyleFunction`
+## Style functions
 
 There are three subclasses of `MGLStyleFunction`:
 
-* `MGLCameraStyleFunction` - For a style value that changes with zoom level. For example, you can make the radius of a circle increase according to zoom level. 
-* `MGLSourceStyleFunction` - For a style value that changes with the attributes of a feature. For example, you can adjust the radius of a circle based on the magnitude of an earthquake.
-* `MGLCompositeStyleFunction` - For a style value that changes with both zoom level and attribute values. For example, you can add a circle layer where each circle has a radius based on both zoom level and the magnitude of an earthquake.
+* `MGLCameraStyleFunction` is a style value that changes with zoom level. For example, you can make the radius of a circle increase according to zoom level.
+* `MGLSourceStyleFunction` is a style value that changes with the attributes of a feature. For example, you can adjust the radius of a circle based on the magnitude of an earthquake.
+* `MGLCompositeStyleFunction` is a style value that changes with both zoom level and attribute values. For example, you can add a circle layer where each circle has a radius based on both zoom level and the magnitude of an earthquake.
 
-The documentation for individual style properties will note which style functions are enabled for that property.
+The documentation for each individual style layer property notes which style functions are enabled for that property.
 
 ## Stops
 
 Stops are key-value pairs that that determine a style value. With a `MGLCameraSourceFunction` stop, you can use a dictionary with a zoom level for a key and a `MGLStyleValue` for the value. For example, you can use a stops dictionary with zoom levels 0, 10, and 20 as keys, and yellow, orange, and red as the values. A `MGLSourceStyleFunction` uses the relevant attribute value as the key.
 
 ```swift
-let stops = [0: MGLStyleValue(rawValue: UIColor.yellow),
-             2.5: MGLStyleValue(rawValue: UIColor.orange),
-             5: MGLStyleValue(rawValue: UIColor.red),
-             7.5: MGLStyleValue(rawValue: UIColor.blue),
-             10: MGLStyleValue(rawValue: UIColor.white)]
+let stops = [0: MGLStyleValue<UIColor>(rawValue: .yellow),
+             2.5: MGLStyleValue(rawValue: .orange),
+             5: MGLStyleValue(rawValue: .red),
+             7.5: MGLStyleValue(rawValue: .blue),
+             10: MGLStyleValue(rawValue: .white)]
 ```
 
-## Interpolation Mode
+## Interpolation mode
 
 The effect a key has on the style value is determined by the interpolation mode. There are four interpolation modes that can be used with a source style function: exponential, interval, categorical, and identity. You can also use exponential and interval interpolation modes with a camera style function.
 
 ### Linear
 
-`MGLInterpolationModelExponential` interpolates linearly or exponentially between style function stop values. By default, the `MGLStyleFunction` options parameter `MGLStyleFunctionOptionInterpolationBase` equals `1`, which represents linear interpolation, and doesn’t need to be included in the options dictionary.
+`MGLInterpolationModeExponential` interpolates linearly or exponentially between style function stop values. By default, the `MGLStyleFunction` options parameter `MGLStyleFunctionOptionInterpolationBase` equals `1`, which represents linear interpolation and doesn’t need to be included in the options dictionary.
 
 The stops dictionary below, for example, shows colors that continuously shift from yellow to orange to red to blue to white based on the attribute value.
 
@@ -55,11 +54,11 @@ let symbolLayer = MGLSymbolStyleLayer(identifier: "place-city-sm", source: symbo
 let source = MGLShapeSource(identifier: "earthquakes", url: url, options: nil)
 style.addSource(source)
 
-let stops = [0: MGLStyleValue(rawValue: UIColor.yellow),
-             2.5: MGLStyleValue(rawValue: UIColor.orange),
-             5: MGLStyleValue(rawValue: UIColor.red),
-             7.5: MGLStyleValue(rawValue: UIColor.blue),
-             10: MGLStyleValue(rawValue: UIColor.white)]
+let stops = [0: MGLStyleValue<UIColor>(rawValue: .yellow),
+             2.5: MGLStyleValue(rawValue: .orange),
+             5: MGLStyleValue(rawValue: .red),
+             7.5: MGLStyleValue(rawValue: .blue),
+             10: MGLStyleValue(rawValue: .white)]
 
 let layer = MGLCircleStyleLayer(identifier: "circles", source: source)
 layer.circleColor = MGLStyleValue(interpolationMode: .exponential,
@@ -74,7 +73,7 @@ style.insertLayer(layer, below: symbolLayer)
 
 ### Exponential
 
-`MGLInterpolationModelExponential` combined with any `MGLStyleFunctionOptionInterpolationBase` greater than `0`, you can interpolate between values exponentially, create an accelerated ramp effect.
+By combining `MGLInterpolationModeExponential` with an `MGLStyleFunctionOptionInterpolationBase` greater than `0` (other than `1`), you can interpolate between values exponentially, create an accelerated ramp effect.
 
 Here’s a visualization from Mapbox Studio (see [Working with Mapbox Studio](working-with-mapbox-studio.html)) comparing interpolation base values of `1.5` and `0.5` based on zoom.
 
@@ -100,11 +99,11 @@ layer.circleRadius = MGLStyleValue(interpolationMode: .exponential,
 When we use the stops dictionary given above with an interval interpolation mode, we create ranges where earthquakes with a magnitude of 0 to just less than 2.5 would be yellow, 2.5 to just less than 5 would be orange, and so on.
 
 ``` swift
-let stops = [0: MGLStyleValue(rawValue: UIColor.yellow),
-             2.5: MGLStyleValue(rawValue: UIColor.orange),
-             5: MGLStyleValue(rawValue: UIColor.red),
-             7.5: MGLStyleValue(rawValue: UIColor.blue),
-             10: MGLStyleValue(rawValue: UIColor.white)]
+let stops = [0: MGLStyleValue<UIColor>(rawValue: .yellow),
+             2.5: MGLStyleValue(rawValue: .orange),
+             5: MGLStyleValue(rawValue: .red),
+             7.5: MGLStyleValue(rawValue: .blue),
+             10: MGLStyleValue(rawValue: .white)]
 
 layer.circleColor = MGLStyleValue(interpolationMode: .interval,
                                   sourceStops: stops,
@@ -116,19 +115,19 @@ layer.circleColor = MGLStyleValue(interpolationMode: .interval,
 
 ### Categorical
 
-Returns the output value that is equal to the stop for the function input. We’re going to use a different stops dictionary than we did for the previous two modes.
+At each stop, `MGLInterpolationModeCategorical` produces an output value equal to the function input. We’re going to use a different stops dictionary than we did for the previous two modes.
 
 There are three main types of events in the dataset: earthquakes, explosions, and quarry blasts. In this case, the color of the circle layer will be determined by the type of event, with a default value of green to catch any events that do not fall into any of those categories.
 
 ``` swift
-let categoricalStops = ["earthquake": MGLStyleValue(rawValue: UIColor.orange),
-                        "explosion": MGLStyleValue(rawValue: UIColor.red),
-                        "quarry blast": MGLStyleValue(rawValue: UIColor.yellow)]
+let categoricalStops = ["earthquake": MGLStyleValue<UIColor>(rawValue: .orange),
+                        "explosion": MGLStyleValue(rawValue: .red),
+                        "quarry blast": MGLStyleValue(rawValue: .yellow)]
 
 layer.circleColor = MGLStyleValue(interpolationMode: .categorical,
                                   sourceStops: categoricalStops,
                                   attributeName: "type",
-                                  options: [.defaultValue: MGLStyleValue(rawValue: UIColor.blue)])
+                                  options: [.defaultValue: MGLStyleValue<UIColor>(rawValue: .blue)])
 
 ```
 
