@@ -456,7 +456,7 @@ NS_ASSUME_NONNULL_BEGIN
  @return A view conforming to the `MGLCalloutView` protocol, or `nil` to use the
     default callout view.
  */
-- (nullable UIView <MGLCalloutView> *)mapView:(MGLMapView *)mapView calloutViewForAnnotation:(id <MGLAnnotation>)annotation;
+- (nullable id <MGLCalloutView>)mapView:(MGLMapView *)mapView calloutViewForAnnotation:(id <MGLAnnotation>)annotation;
 
 /**
  Returns the view to display on the left side of the standard callout bubble.
