@@ -118,7 +118,13 @@ void Parser::parseLight(const JSValue& value) {
         return;
     }
 
-    conversion::Result<Light> converted = conversion::convert<Light>(value);
+    conversion::Error error;
+    optional<Light> converted = conversion::convert<Light>(value, error);
+    if (!converted) {
+        Log::Warning(Event::ParseStyle, error.message);
+        return;
+    }
+
     light = *converted;
 }
 

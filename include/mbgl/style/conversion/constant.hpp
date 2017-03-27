@@ -96,14 +96,18 @@ struct Converter<Color> {
 template <>
 struct Converter<Position> {
     template <class V>
-    Result<Position> operator()(const V& value) const {
-        Result<std::array<float, 3>> spherical = convert<std::array<float, 3>>(value);
+    optional<Position> operator()(const V& value, Error& error) const {
+        optional<std::array<float, 3>> spherical = convert<std::array<float, 3>>(value, error);
 
         if (!spherical) {
-            return spherical.error();
+            return {};
         }
 
         optional<Position> converted = Position(*spherical);
+        if (!converted) {
+            error = { "value must be a valid position" };
+            return {};
+        }
 
         return *converted;
     }

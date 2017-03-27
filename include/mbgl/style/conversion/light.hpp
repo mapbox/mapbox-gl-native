@@ -14,53 +14,54 @@ template <>
 struct Converter<Light> {
 public:
     template <class V>
-    Result<Light> operator()(const V& value) const {
+    optional<Light> operator()(const V& value, Error& error) const {
         if (!isObject(value)) {
-            return Error{ "light must be an object" };
+            error = { "light must be an object" };
+            return {};
         }
 
         Light light;
 
         const auto anchor = objectMember(value, "anchor");
         if (anchor) {
-            Result<PropertyValue<LightAnchorType>> convertedAnchor =
-                convert<PropertyValue<LightAnchorType>>(*anchor);
+            optional<PropertyValue<LightAnchorType>> convertedAnchor =
+                convert<PropertyValue<LightAnchorType>>(*anchor, error);
             if (convertedAnchor) {
                 light.set<LightAnchor>(*convertedAnchor);
             } else {
-                return convertedAnchor.error();
+                return {};
             }
         }
 
         const auto color = objectMember(value, "color");
         if (color) {
-            Result<PropertyValue<Color>> convertedColor = convert<PropertyValue<Color>>(*color);
+            optional<PropertyValue<Color>> convertedColor = convert<PropertyValue<Color>>(*color, error);
             if (convertedColor) {
                 light.set<LightColor>(*convertedColor);
             } else {
-                return convertedColor.error();
+                return {};
             }
         }
 
         const auto position = objectMember(value, "position");
         if (position) {
-            auto convertedPosition = convert<PropertyValue<Position>>(*position);
+            optional<PropertyValue<Position>> convertedPosition = convert<PropertyValue<Position>>(*position, error);
 
             if (convertedPosition) {
                 light.set<LightPosition>(*convertedPosition);
             } else {
-                return convertedPosition.error();
+                return {};
             }
         }
 
         const auto intensity = objectMember(value, "intensity");
         if (intensity) {
-            Result<PropertyValue<float>> convertedIntensity =
-                convert<PropertyValue<float>>(*intensity);
+            optional<PropertyValue<float>> convertedIntensity =
+                convert<PropertyValue<float>>(*intensity, error);
             if (convertedIntensity) {
                 light.set<LightIntensity>(*convertedIntensity);
             } else {
-                return convertedIntensity.error();
+                return {};
             }
         }
 
