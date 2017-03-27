@@ -30,7 +30,7 @@ public:
 
         const int error = sqlite3_close(db);
         if (error != SQLITE_OK) {
-            throw Exception { error, sqlite3_errmsg(db) };
+            mbgl::Log::Error(mbgl::Event::Database, "%s (Code %i)", sqlite3_errmsg(db), error);
         }
     }
 
