@@ -13,6 +13,8 @@ namespace java {
 
     jni::jclass* Number::jclass;
     jni::jmethodID* Number::floatValueMethodId;
+    jni::jmethodID* Number::doubleValueMethodId;
+    jni::jmethodID* Number::longValueMethodId;
 
     jni::jclass* Map::jclass;
     jni::jmethodID* Map::getMethodId;
@@ -27,6 +29,8 @@ namespace java {
 
         Number::jclass = jni::NewGlobalRef(env, &jni::FindClass(env, "java/lang/Number")).release();
         Number::floatValueMethodId = &jni::GetMethodID(env, *Number::jclass, "floatValue", "()F");
+        Number::doubleValueMethodId = &jni::GetMethodID(env, *Number::jclass, "doubleValue", "()D");
+        Number::longValueMethodId = &jni::GetMethodID(env, *Number::jclass, "longValue", "()J");
 
         Map::jclass = jni::NewGlobalRef(env, &jni::FindClass(env, "java/util/Map")).release();
         Map::getMethodId = &jni::GetMethodID(env, *Map::jclass, "get", "(Ljava/lang/Object;)Ljava/lang/Object;");

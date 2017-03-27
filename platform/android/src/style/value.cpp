@@ -55,8 +55,16 @@ namespace android {
         return jni::Make<std::string>(jenv, jni::String(string));
     }
 
-    float Value::toNumber() const {
+    float Value::toFloat() const {
         return jni::CallMethod<jni::jfloat>(jenv, value.get(), *java::Number::floatValueMethodId);
+    }
+
+    double Value::toDouble() const {
+        return jni::CallMethod<jni::jdouble>(jenv, value.get(), *java::Number::doubleValueMethodId);
+    }
+
+    long Value::toLong() const {
+        return jni::CallMethod<jni::jlong>(jenv, value.get(), *java::Number::longValueMethodId);
     }
 
     bool Value::toBool() const {
