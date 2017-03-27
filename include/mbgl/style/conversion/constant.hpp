@@ -93,6 +93,22 @@ struct Converter<Color> {
     }
 };
 
+template <>
+struct Converter<Position> {
+    template <class V>
+    Result<Position> operator()(const V& value) const {
+        Result<std::array<float, 3>> spherical = convert<std::array<float, 3>>(value);
+
+        if (!spherical) {
+            return spherical.error();
+        }
+
+        optional<Position> converted = Position(*spherical);
+
+        return *converted;
+    }
+};
+
 template <size_t N>
 struct Converter<std::array<float, N>> {
     template <class V>

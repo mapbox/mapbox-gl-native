@@ -25,7 +25,10 @@ void Painter::renderFillExtrusion(PaintParameters& parameters,
         return;
     }
 
-    auto lightpos = style.light.getPosition();
+    const auto light = style.light.evaluated;
+    const auto lightcolor = light.get<LightColor>();
+    const auto lightpos = light.get<LightPosition>().get();
+
     vec3f lightvec{ lightpos };
     mat3 lightmat;
     matrix::identity(lightmat);
@@ -50,9 +53,9 @@ void Painter::renderFillExtrusion(PaintParameters& parameters,
                                                        properties.get<FillExtrusionTranslateAnchor>(),
                                                        state)
                              },
-                             uniforms::u_lightcolor::Value{ style.light.getColor() },
+                             uniforms::u_lightcolor::Value{ {{ lightcolor.r, lightcolor.g, lightcolor.b }} },
                              uniforms::u_lightpos::Value{ lightvec },
-                             uniforms::u_lightintensity::Value{ style.light.getIntensity() }
+                             uniforms::u_lightintensity::Value{ light.get<LightIntensity>() }
                          },
                          *bucket.vertexBuffer,
                          *bucket.indexBuffer,
