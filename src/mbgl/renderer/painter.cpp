@@ -309,7 +309,7 @@ void Painter::renderPass(PaintParameters& parameters,
         auto renderTiles = [this, &item, &layer, &parameters, &style]() {
             for (auto& tileRef : item.tiles) {
                 auto& tile = tileRef.get();
-                MBGL_DEBUG_GROUP(layer.baseImpl->id + " - " + util::toString(tile.id));
+                MBGL_DEBUG_GROUP(context, layer.baseImpl->id + " - " + util::toString(tile.id));
                 auto bucket = tile.tile.getBucket(layer);
                 if (bucket) {
                     bucket->render(*this, parameters, layer, tile, style);
