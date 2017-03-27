@@ -2,6 +2,7 @@
 
 #include <mbgl/util/color.hpp>
 #include <mbgl/util/range.hpp>
+#include <mbgl/util/position.hpp>
 
 #include <array>
 #include <vector>
@@ -43,6 +44,16 @@ private:
 public:
     Array operator()(const Array& a, const Array& b, const double t) {
         return operator()(a, b, t, std::make_index_sequence<N>());
+    }
+};
+
+template <>
+struct Interpolator<style::Position> {
+public:
+    style::Position operator()(const style::Position& a, const style::Position& b, const double t) {
+        return {
+            style::Position(interpolate(a.getSpherical(), b.getSpherical(), t))
+        };
     }
 };
 

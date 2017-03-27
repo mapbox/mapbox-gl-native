@@ -302,7 +302,6 @@ set(MBGL_CORE_FILES
     src/mbgl/style/layer_impl.hpp
     src/mbgl/style/layer_observer.hpp
     src/mbgl/style/layout_property.hpp
-    src/mbgl/style/light.cpp
     src/mbgl/style/observer.hpp
     src/mbgl/style/paint_property.hpp
     src/mbgl/style/paint_property_binder.hpp
@@ -495,6 +494,7 @@ set(MBGL_CORE_FILES
     include/mbgl/util/noncopyable.hpp
     include/mbgl/util/optional.hpp
     include/mbgl/util/platform.hpp
+    include/mbgl/util/position.hpp
     include/mbgl/util/projection.hpp
     include/mbgl/util/range.hpp
     include/mbgl/util/run_loop.hpp
