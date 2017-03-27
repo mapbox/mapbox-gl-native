@@ -30,6 +30,10 @@
     "fill-translate": "fill-translation",
     "fill-translate-anchor": "fill-translation-anchor"
   },
+  "paint_fill-extrusion": {
+    "fill-extrusion-translate": "fill-extrusion-translation",
+    "fill-extrusion-translate-anchor": "fill-extrusion-translation-anchor"
+  },
   "paint_raster": {
     "raster-brightness-min": "minimum-raster-brightness",
     "raster-brightness-max": "maximum-raster-brightness",
