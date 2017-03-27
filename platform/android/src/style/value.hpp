@@ -21,7 +21,9 @@ public:
     bool isNumber() const;
 
     std::string toString() const;
-    float toNumber() const;
+    float toFloat() const;
+    double toDouble() const;
+    long toLong() const;
     bool toBool() const;
     Value get(const char* key) const;
     int getLength() const;

@@ -22,6 +22,8 @@ namespace java {
     struct Number {
         static jni::jclass* jclass;
         static jni::jmethodID* floatValueMethodId;
+        static jni::jmethodID* doubleValueMethodId;
+        static jni::jmethodID* longValueMethodId;
     };
 
     struct Map {
