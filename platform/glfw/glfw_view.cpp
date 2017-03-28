@@ -377,6 +377,8 @@ void GLFWView::onFramebufferResize(GLFWwindow *window, int width, int height) {
     auto *view = reinterpret_cast<GLFWView *>(glfwGetWindowUserPointer(window));
     view->fbWidth = width;
     view->fbHeight = height;
+
+    mbgl::BackendScope scope { *view, mbgl::BackendScope::ScopeType::Implicit };
     view->bind();
 
     // This is only triggered when the framebuffer is resized, but not the window. It can
