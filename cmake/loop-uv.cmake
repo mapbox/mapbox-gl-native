@@ -10,7 +10,7 @@ target_compile_options(mbgl-loop-uv
 )
 
 target_include_directories(mbgl-loop-uv
-    PUBLIC include
+    PRIVATE include
     PRIVATE src
 )
 

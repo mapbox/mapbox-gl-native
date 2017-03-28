@@ -80,7 +80,7 @@ macro(mbgl_platform_core)
     target_add_mason_package(mbgl-core PUBLIC geojson)
     target_add_mason_package(mbgl-core PUBLIC jni.hpp)
     target_add_mason_package(mbgl-core PUBLIC rapidjson)
-    target_add_mason_package(mbgl-core PUBLIC icu)
+    target_add_mason_package(mbgl-core PRIVATE icu)
 
     target_compile_options(mbgl-core
         PRIVATE -fvisibility=hidden
