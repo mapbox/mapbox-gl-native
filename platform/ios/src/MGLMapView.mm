@@ -3044,7 +3044,10 @@ public:
                 continue;
             }
             MGLAnnotationContext annotationContext = _annotationContextsByAnnotationTag.at(annotationTag);
-            [annotations addObject:annotationContext.annotation];
+            if (annotationContext.annotation)
+            {
+                [annotations addObject:annotationContext.annotation];
+            }
         }
 
         return [annotations copy];
