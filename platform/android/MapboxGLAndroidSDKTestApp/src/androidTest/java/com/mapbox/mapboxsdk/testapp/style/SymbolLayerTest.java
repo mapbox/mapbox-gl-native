@@ -1455,6 +1455,51 @@ public class SymbolLayerTest extends BaseStyleTest {
   }
 
   @Test
+  public void testTextOffsetAsIdentitySourceFunction() {
+    checkViewIsDisplayed(R.id.mapView);
+    Timber.i("text-offset");
+    assertNotNull(layer);
+
+    // Set
+    layer.setProperties(
+      textOffset(property("FeaturePropertyA", Stops.<Float[]>identity()))
+    );
+
+    // Verify
+    assertNotNull(layer.getTextOffset());
+    assertNotNull(layer.getTextOffset().getFunction());
+    assertEquals(SourceFunction.class, layer.getTextOffset().getFunction().getClass());
+    assertEquals("FeaturePropertyA", ((SourceFunction) layer.getTextOffset().getFunction()).getProperty());
+    assertEquals(IdentityStops.class, layer.getTextOffset().getFunction().getStops().getClass());
+  }
+
+  @Test
+  public void testTextOffsetAsIntervalSourceFunction() {
+    checkViewIsDisplayed(R.id.mapView);
+    Timber.i("text-offset");
+    assertNotNull(layer);
+
+    // Set
+    layer.setProperties(
+      textOffset(
+        property(
+          "FeaturePropertyA",
+          interval(
+            stop(1, textOffset(new Float[]{0f,0f}))
+          )
+        )
+      )
+    );
+
+    // Verify
+    assertNotNull(layer.getTextOffset());
+    assertNotNull(layer.getTextOffset().getFunction());
+    assertEquals(SourceFunction.class, layer.getTextOffset().getFunction().getClass());
+    assertEquals("FeaturePropertyA", ((SourceFunction) layer.getTextOffset().getFunction()).getProperty());
+    assertEquals(IntervalStops.class, layer.getTextOffset().getFunction().getStops().getClass());
+  }
+
+  @Test
   public void testTextAllowOverlapAsConstant() {
     checkViewIsDisplayed(R.id.mapView);
     Timber.i("text-allow-overlap");

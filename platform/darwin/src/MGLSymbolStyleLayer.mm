@@ -763,7 +763,7 @@ namespace mbgl {
 - (void)setTextOffset:(MGLStyleValue<NSValue *> *)textOffset {
     MGLAssertStyleLayerIsValid();
 
-    auto mbglValue = MGLStyleValueTransformer<std::array<float, 2>, NSValue *>().toInterpolatablePropertyValue(textOffset);
+    auto mbglValue = MGLStyleValueTransformer<std::array<float, 2>, NSValue *>().toDataDrivenPropertyValue(textOffset);
     self.rawLayer->setTextOffset(mbglValue);
 }
 
@@ -772,9 +772,9 @@ namespace mbgl {
 
     auto propertyValue = self.rawLayer->getTextOffset();
     if (propertyValue.isUndefined()) {
-        return MGLStyleValueTransformer<std::array<float, 2>, NSValue *>().toStyleValue(self.rawLayer->getDefaultTextOffset());
+        return MGLStyleValueTransformer<std::array<float, 2>, NSValue *>().toDataDrivenStyleValue(self.rawLayer->getDefaultTextOffset());
     }
-    return MGLStyleValueTransformer<std::array<float, 2>, NSValue *>().toStyleValue(propertyValue);
+    return MGLStyleValueTransformer<std::array<float, 2>, NSValue *>().toDataDrivenStyleValue(propertyValue);
 }
 
 - (void)setTextOptional:(MGLStyleValue<NSNumber *> *)textOptional {

@@ -483,15 +483,15 @@ void SymbolLayer::setTextTransform(DataDrivenPropertyValue<TextTransformType> va
     impl->layout.unevaluated.get<TextTransform>() = value;
     impl->observer->onLayerLayoutPropertyChanged(*this, "text-transform");
 }
-PropertyValue<std::array<float, 2>> SymbolLayer::getDefaultTextOffset() {
+DataDrivenPropertyValue<std::array<float, 2>> SymbolLayer::getDefaultTextOffset() {
     return TextOffset::defaultValue();
 }
 
-PropertyValue<std::array<float, 2>> SymbolLayer::getTextOffset() const {
+DataDrivenPropertyValue<std::array<float, 2>> SymbolLayer::getTextOffset() const {
     return impl->layout.unevaluated.get<TextOffset>();
 }
 
-void SymbolLayer::setTextOffset(PropertyValue<std::array<float, 2>> value) {
+void SymbolLayer::setTextOffset(DataDrivenPropertyValue<std::array<float, 2>> value) {
     if (value == getTextOffset())
         return;
     impl->layout.unevaluated.get<TextOffset>() = value;

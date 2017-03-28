@@ -151,9 +151,9 @@ public:
     DataDrivenPropertyValue<TextTransformType> getTextTransform() const;
     void setTextTransform(DataDrivenPropertyValue<TextTransformType>);
 
-    static PropertyValue<std::array<float, 2>> getDefaultTextOffset();
-    PropertyValue<std::array<float, 2>> getTextOffset() const;
-    void setTextOffset(PropertyValue<std::array<float, 2>>);
+    static DataDrivenPropertyValue<std::array<float, 2>> getDefaultTextOffset();
+    DataDrivenPropertyValue<std::array<float, 2>> getTextOffset() const;
+    void setTextOffset(DataDrivenPropertyValue<std::array<float, 2>>);
 
     static PropertyValue<bool> getDefaultTextAllowOverlap();
     PropertyValue<bool> getTextAllowOverlap() const;

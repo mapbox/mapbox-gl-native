@@ -45,7 +45,7 @@ const Shaping GlyphSet::getShaping(const std::u16string& logicalInput,
                                    const float verticalHeight,
                                    const WritingModeType writingMode,
                                    BiDi& bidi) const {
-    Shaping shaping(translate.x * 24, translate.y * 24, writingMode);
+    Shaping shaping(translate.x, translate.y, writingMode);
 
     std::vector<std::u16string> reorderedLines =
         bidi.processText(logicalInput,
@@ -66,9 +66,9 @@ void align(Shaping& shaping,
            const std::size_t lineCount,
            const Point<float>& translate) {
     const float shiftX =
-        (justify - horizontalAlign) * maxLineLength + ::round(translate.x * 24 /* one em */);
+        (justify - horizontalAlign) * maxLineLength + ::round(translate.x);
     const float shiftY =
-        (-verticalAlign * lineCount + 0.5) * lineHeight + ::round(translate.y * 24 /* one em */);
+        (-verticalAlign * lineCount + 0.5) * lineHeight + ::round(translate.y);
 
     for (auto& glyph : shaping.positionedGlyphs) {
         glyph.x += shiftX;

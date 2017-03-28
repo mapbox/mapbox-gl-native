@@ -2055,11 +2055,11 @@ public class PropertyFactory {
   /**
    * Offset distance of text from its anchor. Positive values indicate right and down, while negative values indicate left and up.
    *
-   * @param <Z> the zoom parameter type
-   * @param function a wrapper {@link CameraFunction} for Float[]
+   * @param <T> the function input type
+   * @param function a wrapper function for Float[]
    * @return property wrapper around a Float[] function
    */
-  public static <Z extends Number> PropertyValue<CameraFunction<Z, Float[]>> textOffset(CameraFunction<Z, Float[]> function) {
+  public static <T> PropertyValue<Function<T, Float[]>> textOffset(Function<T, Float[]> function) {
     return new LayoutPropertyValue<>("text-offset", function);
   }
 
