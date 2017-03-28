@@ -252,11 +252,12 @@ void getLineGlyphs(std::back_insert_iterator<GlyphInstances> glyphs,
     const bool glyphIsLogicallyForward = (glyphHorizontalOffsetFromAnchor >= 0) ^ upsideDown;
     const float glyphDistanceFromAnchor = std::fabs(glyphHorizontalOffsetFromAnchor);
     
+    const auto initialSegmentEnd = getSegmentEnd(glyphIsLogicallyForward, line, anchorSegment);
     VirtualSegment virtualSegment = {
         anchor.point,
-        getSegmentEnd(glyphIsLogicallyForward, line, anchorSegment),
+        initialSegmentEnd,
         anchorSegment,
-        getMinScaleForSegment(glyphDistanceFromAnchor, virtualSegment.anchor, virtualSegment.end),
+        getMinScaleForSegment(glyphDistanceFromAnchor, anchor.point, initialSegmentEnd),
         std::numeric_limits<float>::infinity()
     };
     
