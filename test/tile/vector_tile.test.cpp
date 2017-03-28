@@ -86,3 +86,12 @@ TEST(VectorTile, Issue7615) {
 
     EXPECT_EQ(symbolBucket.get(), tile.getBucket(symbolLayer));
 }
+
+TEST(VectorTile, Issue8542) {
+    VectorTileTest test;
+    VectorTile tile(OverscaledTileID(0, 0, 0), "source", test.updateParameters, test.tileset);
+
+    // Query before data is set
+    std::vector<Feature> result;
+    tile.querySourceFeatures(result, { { {"layer"} }, {} });
+}
