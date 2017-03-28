@@ -110,3 +110,9 @@ endif()
 if(COMMAND mbgl_platform_node)
     include(cmake/node.cmake)
 endif()
+
+if(CMAKE_GENERATOR STREQUAL "Xcode")
+    write_xcconfig_target_properties(
+        mbgl-core
+    )
+endif()

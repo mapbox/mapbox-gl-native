@@ -15,4 +15,3 @@ target_include_directories(mbgl-loop-uv
 )
 
 create_source_groups(mbgl-loop-uv)
-target_append_xcconfig(mbgl-loop-uv)

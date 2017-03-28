@@ -17,4 +17,3 @@ target_include_directories(mbgl-loop-darwin
 )
 
 create_source_groups(mbgl-loop-darwin)
-target_append_xcconfig(mbgl-loop-darwin)
