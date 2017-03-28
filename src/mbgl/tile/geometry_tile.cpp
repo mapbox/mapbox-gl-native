@@ -165,6 +165,11 @@ void GeometryTile::queryRenderedFeatures(
 void GeometryTile::querySourceFeatures(
     std::vector<Feature>& result,
     const style::SourceQueryOptions& options) {
+
+    // Data not yet available
+    if (!data) {
+        return;
+    }
     
     // No source layers, specified, nothing to do
     if (!options.sourceLayers) {
