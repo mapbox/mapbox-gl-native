@@ -160,7 +160,7 @@ struct TextTransform : DataDrivenLayoutProperty<TextTransformType> {
     static TextTransformType defaultValue() { return TextTransformType::None; }
 };
 
-struct TextOffset : LayoutProperty<std::array<float, 2>> {
+struct TextOffset : DataDrivenLayoutProperty<std::array<float, 2>> {
     static constexpr const char * key = "text-offset";
     static std::array<float, 2> defaultValue() { return {{ 0, 0 }}; }
 };

@@ -60,7 +60,7 @@ auto makeLayoutPropertySetters() {
     result["text-padding"] = &setLayoutProperty<V, SymbolLayer, PropertyValue<float>, &SymbolLayer::setTextPadding>;
     result["text-keep-upright"] = &setLayoutProperty<V, SymbolLayer, PropertyValue<bool>, &SymbolLayer::setTextKeepUpright>;
     result["text-transform"] = &setLayoutProperty<V, SymbolLayer, DataDrivenPropertyValue<TextTransformType>, &SymbolLayer::setTextTransform>;
-    result["text-offset"] = &setLayoutProperty<V, SymbolLayer, PropertyValue<std::array<float, 2>>, &SymbolLayer::setTextOffset>;
+    result["text-offset"] = &setLayoutProperty<V, SymbolLayer, DataDrivenPropertyValue<std::array<float, 2>>, &SymbolLayer::setTextOffset>;
     result["text-allow-overlap"] = &setLayoutProperty<V, SymbolLayer, PropertyValue<bool>, &SymbolLayer::setTextAllowOverlap>;
     result["text-ignore-placement"] = &setLayoutProperty<V, SymbolLayer, PropertyValue<bool>, &SymbolLayer::setTextIgnorePlacement>;
     result["text-optional"] = &setLayoutProperty<V, SymbolLayer, PropertyValue<bool>, &SymbolLayer::setTextOptional>;

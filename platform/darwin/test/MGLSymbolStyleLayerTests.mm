@@ -1158,7 +1158,7 @@
 #endif
         ];
         layer.textOffset = constantStyleValue;
-        mbgl::style::PropertyValue<std::array<float, 2>> propertyValue = { { 1, 1 } };
+        mbgl::style::DataDrivenPropertyValue<std::array<float, 2>> propertyValue = { { 1, 1 } };
         XCTAssertEqual(rawLayer->getTextOffset(), propertyValue,
                        @"Setting textOffset to a constant value should update text-offset.");
         XCTAssertEqualObjects(layer.textOffset, constantStyleValue,
@@ -1175,6 +1175,29 @@
         XCTAssertEqualObjects(layer.textOffset, functionStyleValue,
                               @"textOffset should round-trip camera functions.");
 
+        functionStyleValue = [MGLStyleValue<NSValue *> valueWithInterpolationMode:MGLInterpolationModeExponential sourceStops:@{@18: constantStyleValue} attributeName:@"keyName" options:nil];
+        layer.textOffset = functionStyleValue;
+
+        mbgl::style::ExponentialStops<std::array<float, 2>> exponentialStops = { {{18, { 1, 1 }}}, 1.0 };
+        propertyValue = mbgl::style::SourceFunction<std::array<float, 2>> { "keyName", exponentialStops };
+
+        XCTAssertEqual(rawLayer->getTextOffset(), propertyValue,
+                       @"Setting textOffset to a source function should update text-offset.");
+        XCTAssertEqualObjects(layer.textOffset, functionStyleValue,
+                              @"textOffset should round-trip source functions.");
+
+        functionStyleValue = [MGLStyleValue<NSValue *> valueWithInterpolationMode:MGLInterpolationModeExponential compositeStops:@{@10: @{@18: constantStyleValue}} attributeName:@"keyName" options:nil];
+        layer.textOffset = functionStyleValue;
+
+        std::map<float, std::array<float, 2>> innerStops { {18, { 1, 1 }} };
+        mbgl::style::CompositeExponentialStops<std::array<float, 2>> compositeStops { { {10.0, innerStops} }, 1.0 };
+
+        propertyValue = mbgl::style::CompositeFunction<std::array<float, 2>> { "keyName", compositeStops };
+
+        XCTAssertEqual(rawLayer->getTextOffset(), propertyValue,
+                       @"Setting textOffset to a composite function should update text-offset.");
+        XCTAssertEqualObjects(layer.textOffset, functionStyleValue,
+                              @"textOffset should round-trip composite functions.");                                                                                                          
                               
 
         layer.textOffset = nil;
@@ -1182,11 +1205,6 @@
                       @"Unsetting textOffset should return text-offset to the default value.");
         XCTAssertEqualObjects(layer.textOffset, defaultStyleValue,
                               @"textOffset should return the default value after being unset.");
-
-        functionStyleValue = [MGLStyleValue<NSValue *> valueWithInterpolationMode:MGLInterpolationModeIdentity sourceStops:nil attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.textOffset = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
-        functionStyleValue = [MGLStyleValue<NSValue *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.textOffset = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
     }
 
     // text-optional

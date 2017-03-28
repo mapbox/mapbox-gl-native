@@ -250,7 +250,7 @@ void SymbolLayout::prepare(uintptr_t tileUID,
                     /* verticalAlign */ verticalAlign,
                     /* justify */ justify,
                     /* spacing: ems */ layout.get<TextLetterSpacing>() * oneEm,
-                    /* translate */ Point<float>(layout.get<TextOffset>()[0], layout.get<TextOffset>()[1]),
+                    /* translate */ Point<float>(layout.evaluate<TextOffset>(zoom, feature)[0] * oneEm, layout.evaluate<TextOffset>(zoom, feature)[1] * oneEm),
                     /* verticalHeight */ oneEm,
                     /* writingMode */ writingMode,
                     /* bidirectional algorithm object */ bidi);
