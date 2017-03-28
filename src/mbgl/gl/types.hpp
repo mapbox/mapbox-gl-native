@@ -39,7 +39,7 @@ enum class RenderbufferType : uint32_t {
     RGBA = 0x8058,
     RGBA4 = 0x8056,
     DepthStencil = 0x88F0,
-    DepthComponent = 0x81A5,
+    DepthComponent = 0x1902,
 };
 
 enum class TextureMipMap : bool { No = false, Yes = true };
