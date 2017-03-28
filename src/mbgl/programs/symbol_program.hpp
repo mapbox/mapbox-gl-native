@@ -57,13 +57,17 @@ struct SymbolLayoutAttributes : gl::Attributes<
             }},
             {{
                 static_cast<uint16_t>(tx / 4),
-                static_cast<uint16_t>(ty / 4)
+                static_cast<uint16_t>(ty / 4),
+                mbgl::attributes::packUint8Pair(
+                   static_cast<uint8_t>(labelminzoom * 10), // 1/10 zoom levels: z16 == 160
+                   static_cast<uint8_t>(labelangle)
+                ),
+                mbgl::attributes::packUint8Pair(
+                   static_cast<uint8_t>(minzoom * 10),
+                   static_cast<uint8_t>(::fmin(maxzoom, 25) * 10)
+                )
             }},
             {{
-                static_cast<uint8_t>(labelminzoom * 10), // 1/10 zoom levels: z16 == 160
-                static_cast<uint8_t>(labelangle),
-                static_cast<uint8_t>(minzoom * 10),
-                static_cast<uint8_t>(::fmin(maxzoom, 25) * 10)
             }}
         };
     }

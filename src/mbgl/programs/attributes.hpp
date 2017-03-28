@@ -8,6 +8,16 @@
 namespace mbgl {
 namespace attributes {
 
+/*
+ * Pack a pair of values, interpreted as uint8's, into a single float.
+ * Used to conserve vertex attributes. Values are unpacked in the vertex
+ * shader using the `unpack_float()` function, defined in _prelude.vertex.glsl.
+ */
+template <typename T>
+inline uint16_t packUint8Pair(T a, T b) {
+    return static_cast<uint16_t>(a) * 256 + static_cast<uint16_t>(b);
+}
+
 // Layout attributes
 
 MBGL_DEFINE_ATTRIBUTE(int16_t, 2, a_pos);

@@ -26,16 +26,12 @@ inline std::array<float, 1> attributeValue(float v) {
     uses 8-bit precision for each color component, for each float we use the upper 8
     bits for one component (e.g. (color.r * 255) * 256), and the lower 8 for another.
     
-    Also note:
-     - Colors come in as floats 0..1, so we scale by 255.
-     - Casting the scaled values to ints is important: without doing this, e.g., the
-       fractional part of the `r` component would corrupt the lower-8 bits of the encoded
-       value, which must be reserved for the `g` component.
+    Also note that colors come in as floats 0..1, so we scale by 255.
 */
 inline std::array<float, 2> attributeValue(const Color& color) {
     return {{
-        static_cast<float>(static_cast<uint16_t>(color.r * 255) * 256 + static_cast<uint16_t>(color.g * 255)),
-        static_cast<float>(static_cast<uint16_t>(color.b * 255) * 256 + static_cast<uint16_t>(color.a * 255))
+        static_cast<float>(mbgl::attributes::packUint8Pair(255 * color.r, 255 * color.g)),
+        static_cast<float>(mbgl::attributes::packUint8Pair(255 * color.b, 255 * color.a))
     }};
 }
 
