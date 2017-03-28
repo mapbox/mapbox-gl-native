@@ -19,8 +19,6 @@ target_sources(mbgl-node
     PRIVATE platform/node/src/node_request.cpp
     PRIVATE platform/node/src/node_feature.hpp
     PRIVATE platform/node/src/node_feature.cpp
-    PRIVATE platform/node/src/node_thread_pool.hpp
-    PRIVATE platform/node/src/node_thread_pool.cpp
     PRIVATE platform/node/src/util/async_queue.hpp
 
     # We are compiling with the uv loop, but since this target already has the headers for libuv,
@@ -28,6 +26,10 @@ target_sources(mbgl-node
     PRIVATE platform/default/async_task.cpp
     PRIVATE platform/default/run_loop.cpp
     PRIVATE platform/default/timer.cpp
+    PRIVATE platform/default/mbgl/util/default_thread_pool.cpp
+    PRIVATE platform/default/mbgl/util/default_thread_pool.hpp
+    PRIVATE platform/default/mbgl/util/shared_thread_pool.cpp
+    PRIVATE platform/default/mbgl/util/shared_thread_pool.hpp
 )
 
 target_compile_options(mbgl-node
