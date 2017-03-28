@@ -12,7 +12,7 @@ target_compile_options(mbgl-loop-darwin
 )
 
 target_include_directories(mbgl-loop-darwin
-    PUBLIC include
+    PRIVATE include
     PRIVATE src
 )
 
