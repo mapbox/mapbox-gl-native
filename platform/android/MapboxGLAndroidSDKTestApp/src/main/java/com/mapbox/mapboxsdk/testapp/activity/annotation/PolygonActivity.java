@@ -23,11 +23,11 @@ import java.util.List;
 import static com.mapbox.mapboxsdk.testapp.activity.annotation.PolygonActivity.Config.BLUE_COLOR;
 import static com.mapbox.mapboxsdk.testapp.activity.annotation.PolygonActivity.Config.BROKEN_SHAPE_POINTS;
 import static com.mapbox.mapboxsdk.testapp.activity.annotation.PolygonActivity.Config.FULL_ALPHA;
-import static com.mapbox.mapboxsdk.testapp.activity.annotation.PolygonActivity.Config.HOLE_SHAPE_POINTS;
 import static com.mapbox.mapboxsdk.testapp.activity.annotation.PolygonActivity.Config.NO_ALPHA;
 import static com.mapbox.mapboxsdk.testapp.activity.annotation.PolygonActivity.Config.PARTIAL_ALPHA;
 import static com.mapbox.mapboxsdk.testapp.activity.annotation.PolygonActivity.Config.RED_COLOR;
 import static com.mapbox.mapboxsdk.testapp.activity.annotation.PolygonActivity.Config.STAR_SHAPE_POINTS;
+import static com.mapbox.mapboxsdk.testapp.activity.annotation.PolygonActivity.Config.TRIANGLE_HOLE_SHAPE_POINTS;
 
 /**
  * Test activity to showcase the Polygon annotation API & programmatically creating a MapView.
@@ -136,7 +136,7 @@ public class PolygonActivity extends AppCompatActivity implements OnMapReadyCall
       case R.id.action_id_points:
         allPoints = !allPoints;
         polygon.setPoints(allPoints ? STAR_SHAPE_POINTS : BROKEN_SHAPE_POINTS);
-        polygon.setHolePoints(HOLE_SHAPE_POINTS);
+        polygon.setHolePoints(TRIANGLE_HOLE_SHAPE_POINTS);
         return true;
       case R.id.action_id_color:
         color = !color;
@@ -182,13 +182,12 @@ public class PolygonActivity extends AppCompatActivity implements OnMapReadyCall
     static final List<LatLng> BROKEN_SHAPE_POINTS =
       STAR_SHAPE_POINTS.subList(0, STAR_SHAPE_POINTS.size() - 3);
 
-    static final List<LatLng> HOLE_SHAPE_POINTS = new ArrayList<LatLng>() {
+    static final List<LatLng> TRIANGLE_HOLE_SHAPE_POINTS = new ArrayList<LatLng>() {
       {
-        add(new LatLng(45.522584, -122.672653));
-        add(new LatLng(45.532584, -122.672653));
-        add(new LatLng(45.532584, -122.682653));
-        add(new LatLng(45.522584, -122.682653));
-        add(new LatLng(45.522584, -122.672653));
+        add(new LatLng(45.521743, -122.669091));
+        add(new LatLng(45.530483, -122.676833));
+        add(new LatLng(45.520483, -122.676833));
+        add(new LatLng(45.521743, -122.669091));
       }
     };
   }

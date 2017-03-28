@@ -17,6 +17,7 @@ public abstract class BasePointCollection extends Annotation {
   protected BasePointCollection() {
     super();
     points = new ArrayList<>();
+    holePoints = new ArrayList<>();
   }
 
   /**

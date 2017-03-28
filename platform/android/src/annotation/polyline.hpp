@@ -28,6 +28,8 @@ private:
 
     static jni::Object<java::util::List> getPoints(jni::JNIEnv&, jni::Object<Polyline>);
 
+    static jni::Object<java::util::List> getHolePoints(jni::JNIEnv&, jni::Object<Polyline>);
+
     static float getOpacity(jni::JNIEnv&, jni::Object<Polyline>);
 
     static mbgl::Color getColor(jni::JNIEnv&, jni::Object<Polyline>);

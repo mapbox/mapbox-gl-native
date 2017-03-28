@@ -19,14 +19,9 @@ protected:
       auto jarray = java::util::List::toArray<LatLng>(env, pointsList);
       NullCheck(env, &jarray);
 
-      std::size_t jsize = 0;
-      std::size_t ksize = 0;
+      std::size_t jsize = jarray.Length(env);
       auto karray = java::util::List::toArray<LatLng>(env, holePointsList);
-      if (holePointsList) {
-          ksize = karray.Length(env);
-      } else {
-          jsize = jarray.Length(env);
-      }
+      std::size_t ksize = karray.Length(env);
 
       Geometry geometry;
       geometry.reserve(jsize + ksize);
