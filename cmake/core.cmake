@@ -29,4 +29,3 @@ target_add_mason_package(mbgl-core PRIVATE wagyu)
 mbgl_platform_core()
 
 create_source_groups(mbgl-core)
-target_append_xcconfig(mbgl-core)
