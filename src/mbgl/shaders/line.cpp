@@ -34,8 +34,8 @@ varying vec2 v_width2;
 varying float v_gamma_scale;
 
 uniform lowp float a_color_t;
-attribute lowp vec4 a_color;
-varying lowp vec4 color;
+attribute highp vec4 a_color;
+varying highp vec4 color;
 uniform lowp float a_blur_t;
 attribute lowp vec2 a_blur;
 varying lowp float blur;
@@ -105,7 +105,7 @@ void main() {
 
 )MBGL_SHADER";
 const char* line::fragmentSource = R"MBGL_SHADER(
-varying lowp vec4 color;
+varying highp vec4 color;
 varying lowp float blur;
 varying lowp float opacity;
 
