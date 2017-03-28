@@ -356,7 +356,7 @@ namespace mbgl {
 - (void)setIconScale:(MGLStyleValue<NSNumber *> *)iconScale {
     MGLAssertStyleLayerIsValid();
 
-    auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toInterpolatablePropertyValue(iconScale);
+    auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toDataDrivenPropertyValue(iconScale);
     self.rawLayer->setIconSize(mbglValue);
 }
 
@@ -365,9 +365,9 @@ namespace mbgl {
 
     auto propertyValue = self.rawLayer->getIconSize();
     if (propertyValue.isUndefined()) {
-        return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(self.rawLayer->getDefaultIconSize());
+        return MGLStyleValueTransformer<float, NSNumber *>().toDataDrivenStyleValue(self.rawLayer->getDefaultIconSize());
     }
-    return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(propertyValue);
+    return MGLStyleValueTransformer<float, NSNumber *>().toDataDrivenStyleValue(propertyValue);
 }
 
 - (void)setIconSize:(MGLStyleValue<NSNumber *> *)iconSize {
@@ -657,7 +657,7 @@ namespace mbgl {
 - (void)setTextFontSize:(MGLStyleValue<NSNumber *> *)textFontSize {
     MGLAssertStyleLayerIsValid();
 
-    auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toInterpolatablePropertyValue(textFontSize);
+    auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toDataDrivenPropertyValue(textFontSize);
     self.rawLayer->setTextSize(mbglValue);
 }
 
@@ -666,9 +666,9 @@ namespace mbgl {
 
     auto propertyValue = self.rawLayer->getTextSize();
     if (propertyValue.isUndefined()) {
-        return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(self.rawLayer->getDefaultTextSize());
+        return MGLStyleValueTransformer<float, NSNumber *>().toDataDrivenStyleValue(self.rawLayer->getDefaultTextSize());
     }
-    return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(propertyValue);
+    return MGLStyleValueTransformer<float, NSNumber *>().toDataDrivenStyleValue(propertyValue);
 }
 
 - (void)setTextSize:(MGLStyleValue<NSNumber *> *)textSize {

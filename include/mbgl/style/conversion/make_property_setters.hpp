@@ -37,7 +37,7 @@ auto makeLayoutPropertySetters() {
     result["icon-ignore-placement"] = &setLayoutProperty<V, SymbolLayer, PropertyValue<bool>, &SymbolLayer::setIconIgnorePlacement>;
     result["icon-optional"] = &setLayoutProperty<V, SymbolLayer, PropertyValue<bool>, &SymbolLayer::setIconOptional>;
     result["icon-rotation-alignment"] = &setLayoutProperty<V, SymbolLayer, PropertyValue<AlignmentType>, &SymbolLayer::setIconRotationAlignment>;
-    result["icon-size"] = &setLayoutProperty<V, SymbolLayer, PropertyValue<float>, &SymbolLayer::setIconSize>;
+    result["icon-size"] = &setLayoutProperty<V, SymbolLayer, DataDrivenPropertyValue<float>, &SymbolLayer::setIconSize>;
     result["icon-text-fit"] = &setLayoutProperty<V, SymbolLayer, PropertyValue<IconTextFitType>, &SymbolLayer::setIconTextFit>;
     result["icon-text-fit-padding"] = &setLayoutProperty<V, SymbolLayer, PropertyValue<std::array<float, 4>>, &SymbolLayer::setIconTextFitPadding>;
     result["icon-image"] = &setLayoutProperty<V, SymbolLayer, DataDrivenPropertyValue<std::string>, &SymbolLayer::setIconImage>;
@@ -49,7 +49,7 @@ auto makeLayoutPropertySetters() {
     result["text-rotation-alignment"] = &setLayoutProperty<V, SymbolLayer, PropertyValue<AlignmentType>, &SymbolLayer::setTextRotationAlignment>;
     result["text-field"] = &setLayoutProperty<V, SymbolLayer, DataDrivenPropertyValue<std::string>, &SymbolLayer::setTextField>;
     result["text-font"] = &setLayoutProperty<V, SymbolLayer, PropertyValue<std::vector<std::string>>, &SymbolLayer::setTextFont>;
-    result["text-size"] = &setLayoutProperty<V, SymbolLayer, PropertyValue<float>, &SymbolLayer::setTextSize>;
+    result["text-size"] = &setLayoutProperty<V, SymbolLayer, DataDrivenPropertyValue<float>, &SymbolLayer::setTextSize>;
     result["text-max-width"] = &setLayoutProperty<V, SymbolLayer, PropertyValue<float>, &SymbolLayer::setTextMaxWidth>;
     result["text-line-height"] = &setLayoutProperty<V, SymbolLayer, PropertyValue<float>, &SymbolLayer::setTextLineHeight>;
     result["text-letter-spacing"] = &setLayoutProperty<V, SymbolLayer, PropertyValue<float>, &SymbolLayer::setTextLetterSpacing>;

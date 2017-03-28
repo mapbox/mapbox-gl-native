@@ -45,7 +45,7 @@ struct IconRotationAlignment : LayoutProperty<AlignmentType> {
     static AlignmentType defaultValue() { return AlignmentType::Auto; }
 };
 
-struct IconSize : LayoutProperty<float> {
+struct IconSize : DataDrivenLayoutProperty<float> {
     static constexpr const char * key = "icon-size";
     static float defaultValue() { return 1; }
 };
@@ -105,7 +105,7 @@ struct TextFont : LayoutProperty<std::vector<std::string>> {
     static std::vector<std::string> defaultValue() { return { "Open Sans Regular", "Arial Unicode MS Regular" }; }
 };
 
-struct TextSize : LayoutProperty<float> {
+struct TextSize : DataDrivenLayoutProperty<float> {
     static constexpr const char * key = "text-size";
     static float defaultValue() { return 16; }
 };

@@ -36,8 +36,8 @@ MBGL_DEFINE_UNIFORM_SCALAR(float, u_gamma_scale);
 
 struct SymbolLayoutAttributes : gl::Attributes<
     attributes::a_pos_offset,
-    attributes::a_texture_pos,
-    attributes::a_data<4>>
+    attributes::a_data<4, uint16_t>,
+    attributes::a_size>
 {
     static Vertex vertex(Point<float> a,
                          Point<float> o,

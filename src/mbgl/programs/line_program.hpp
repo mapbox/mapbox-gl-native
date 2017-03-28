@@ -32,7 +32,7 @@ MBGL_DEFINE_UNIFORM_VECTOR(float, 2, u_gl_units_to_pixels);
 
 struct LineLayoutAttributes : gl::Attributes<
     attributes::a_pos,
-    attributes::a_data<4>>
+    attributes::a_data<4, uint8_t>>
 {};
 
 class LineProgram : public Program<
