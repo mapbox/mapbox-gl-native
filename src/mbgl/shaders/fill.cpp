@@ -12,8 +12,8 @@ attribute vec2 a_pos;
 uniform mat4 u_matrix;
 
 uniform lowp float a_color_t;
-attribute lowp vec4 a_color;
-varying lowp vec4 color;
+attribute highp vec4 a_color;
+varying highp vec4 color;
 uniform lowp float a_opacity_t;
 attribute lowp vec2 a_opacity;
 varying lowp float opacity;
@@ -27,7 +27,7 @@ void main() {
 
 )MBGL_SHADER";
 const char* fill::fragmentSource = R"MBGL_SHADER(
-varying lowp vec4 color;
+varying highp vec4 color;
 varying lowp float opacity;
 
 void main() {

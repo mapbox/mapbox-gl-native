@@ -42,8 +42,8 @@ varying vec2 v_tex_b;
 varying float v_gamma_scale;
 
 uniform lowp float a_color_t;
-attribute lowp vec4 a_color;
-varying lowp vec4 color;
+attribute highp vec4 a_color;
+varying highp vec4 color;
 uniform lowp float a_blur_t;
 attribute lowp vec2 a_blur;
 varying lowp float blur;
@@ -127,7 +127,7 @@ varying vec2 v_tex_a;
 varying vec2 v_tex_b;
 varying float v_gamma_scale;
 
-varying lowp vec4 color;
+varying highp vec4 color;
 varying lowp float blur;
 varying lowp float opacity;
 

@@ -1581,7 +1581,7 @@ public class PropertyFactory {
   }
 
   /**
-   * A string with {tokens} replaced, referencing the data property to pull from.
+   * Name of image in sprite to use for drawing an image background. A string with {tokens} replaced, referencing the data property to pull from.
    *
    * @param value a String value
    * @return property wrapper around String
@@ -1593,7 +1593,7 @@ public class PropertyFactory {
 
 
   /**
-   * A string with {tokens} replaced, referencing the data property to pull from.
+   * Name of image in sprite to use for drawing an image background. A string with {tokens} replaced, referencing the data property to pull from.
    *
    * @param <Z> the zoom parameter type
    * @param function a wrapper {@link CameraFunction} for String
