@@ -196,6 +196,13 @@ In style JSON | In Objective-C | In Swift
 `fill-translate` | `MGLFillStyleLayer.fillTranslation` | `MGLFillStyleLayer.fillTranslation`
 `fill-translate-anchor` | `MGLFillStyleLayer.fillTranslationAnchor` | `MGLFillStyleLayer.fillTranslationAnchor`
 
+### FillExtrusion style layers
+
+In style JSON | In Objective-C | In Swift
+--------------|----------------|---------
+`fill-extrusion-translate` | `MGLFillExtrusionStyleLayer.fillExtrusionTranslation` | `MGLFillExtrusionStyleLayer.fillExtrusionTranslation`
+`fill-extrusion-translate-anchor` | `MGLFillExtrusionStyleLayer.fillExtrusionTranslationAnchor` | `MGLFillExtrusionStyleLayer.fillExtrusionTranslationAnchor`
+
 ### Line style layers
 
 In style JSON | In Objective-C | In Swift

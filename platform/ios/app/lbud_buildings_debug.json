@@ -1,0 +1,167 @@
+{
+    "version": 8,
+    "name": "buildings",
+    "metadata": {
+        "mapbox:autocomposite": true,
+        "mapbox:type": "default",
+        "mapbox:groups": {},
+        "mapbox:trackposition": false
+    },
+    "center": [
+        -74.00335198896914,
+        40.71014952920291
+    ],
+    "zoom": 15.032371136814405,
+    "bearing": -74.59290123456799,
+    "pitch": 0,
+    "light": {
+        "intensity": 1,
+        "position": [
+            0.5,
+            235,
+            90
+        ],
+        "color": "#00ff00",
+        "anchor": "map"
+    },
+    "sources": {
+        "composite": {
+            "url": "mapbox://mapbox.mapbox-streets-v7",
+            "type": "vector"
+        }
+    },
+    "sprite": "mapbox://sprites/lbud/ciyoshhyf004r2rmqr8bd4g3h",
+    "glyphs": "mapbox://fonts/lbud/{fontstack}/{range}.pbf",
+    "layers": [
+        {
+            "id": "background",
+            "type": "background",
+            "layout": {},
+            "paint": {
+                "background-color": "hsl(55, 11%, 96%)"
+            }
+        },
+        {
+            "id": "water",
+            "type": "fill",
+            "source": "composite",
+            "source-layer": "water",
+            "layout": {},
+            "paint": {
+                "fill-color": "hsl(185, 9%, 81%)"
+            }
+        },
+        {
+            "id": "road-primary",
+            "type": "line",
+            "source": "composite",
+            "source-layer": "road",
+            "filter": [
+                "==",
+                "$type",
+                "LineString"
+            ],
+            "layout": {
+                "line-cap": "round",
+                "line-join": "round"
+            },
+            "paint": {
+                "line-width": {
+                    "base": 1.5,
+                    "stops": [
+                        [
+                            5,
+                            0.75
+                        ],
+                        [
+                            18,
+                            15
+                        ]
+                    ]
+                },
+                "line-color": "#fff",
+                "line-opacity": {
+                    "base": 1.2,
+                    "stops": [
+                        [
+                            5,
+                            0
+                        ],
+                        [
+                            5.5,
+                            1
+                        ]
+                    ]
+                }
+            }
+        },
+        {
+            "id": "extrusions",
+            "type": "fill-extrusion",
+            "source": "composite",
+            "source-layer": "building",
+            "minzoom": 15,
+            "filter": [
+                "all",
+                [
+                    "==",
+                    "extrude",
+                    "true"
+                ],
+                [
+                    "==",
+                    "underground",
+                    "false"
+                ]
+            ],
+            "layout": {},
+            "paint": {
+                "fill-extrusion-height": {
+                    "base": 1,
+                    "type": "exponential",
+                    "property": "height",
+                    "stops": [
+                        [
+                            0,
+                            0
+                        ],
+                        [
+                            1000,
+                            1501
+                        ],
+                        [
+                            1001,
+                            10
+                        ]
+                    ]
+                },
+                "fill-extrusion-color": "hsl(194, 100%, 66%)",
+                "fill-extrusion-base": {
+                    "base": 1,
+                    "type": "exponential",
+                    "property": "min_height",
+                    "stops": [
+                        [
+                            0,
+                            0
+                        ],
+                        [
+                            1000,
+                            1501
+                        ],
+                        [
+                            1001,
+                            10
+                        ]
+                    ]
+                }
+            }
+        }
+    ],
+    "created": "2017-02-02T19:43:09.896Z",
+    "id": "ciyoshhyf004r2rmqr8bd4g3h",
+    "modified": "2017-03-08T03:09:48.377Z",
+    "owner": "lbud",
+    "visibility": "private",
+    "draft": false
+}

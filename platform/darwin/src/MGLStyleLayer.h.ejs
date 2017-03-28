@@ -64,10 +64,10 @@ typedef NS_ENUM(NSUInteger, MGL<%- camelize(property.name) %>) {
 /**
 <%- doc.wrap(80, 1) %>
 
- You can access an existing <%- type %> style layer using the
+ You can access an existing <%- unhyphenate(type) %> style layer using the
  `-[MGLStyle layerWithIdentifier:]` method if you know its identifier;
  otherwise, find it using the `MGLStyle.layers` property. You can also create a
- new <%- type %> style layer and add it to the style using a method such as
+ new <%- unhyphenate(type) %> style layer and add it to the style using a method such as
  `-[MGLStyle addLayer:]`.
 
  ### Example

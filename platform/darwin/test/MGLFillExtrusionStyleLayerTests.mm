@@ -2,10 +2,12 @@
 // Edit platform/darwin/scripts/generate-style-code.js, then run `make darwin-style-code`.
 
 #import "MGLStyleLayerTests.h"
+#import "../../darwin/src/NSDate+MGLAdditions.h"
 
 #import "MGLStyleLayer_Private.h"
 
 #include <mbgl/style/layers/fill-extrusion_layer.hpp>
+#include <mbgl/style/transition_options.hpp>
 
 @interface MGLFillExtrusionLayerTests : MGLStyleLayerTests
 @end
@@ -42,6 +44,9 @@
     XCTAssertNotEqual(layer.rawLayer, nullptr);
     XCTAssertTrue(layer.rawLayer->is<mbgl::style::FillExtrusionLayer>());
     auto rawLayer = layer.rawLayer->as<mbgl::style::FillExtrusionLayer>();
+
+    MGLTransition transitionTest = MGLTransitionMake(5, 4);
+
 
     // fill-extrusion-base
     {
@@ -98,6 +103,15 @@
                       @"Unsetting fillExtrusionBase should return fill-extrusion-base to the default value.");
         XCTAssertEqualObjects(layer.fillExtrusionBase, defaultStyleValue,
                               @"fillExtrusionBase should return the default value after being unset.");
+        // Transition property test
+        layer.fillExtrusionBaseTransition = transitionTest;
+        auto toptions = rawLayer->getFillExtrusionBaseTransition();
+        XCTAssert(toptions.delay && MGLTimeIntervalFromDuration(*toptions.delay) == transitionTest.delay);
+        XCTAssert(toptions.duration && MGLTimeIntervalFromDuration(*toptions.duration) == transitionTest.duration);
+
+        MGLTransition fillExtrusionBaseTransition = layer.fillExtrusionBaseTransition;
+        XCTAssertEqual(fillExtrusionBaseTransition.delay, transitionTest.delay);
+        XCTAssertEqual(fillExtrusionBaseTransition.duration, transitionTest.duration);
     }
 
     // fill-extrusion-color
@@ -155,6 +169,15 @@
                       @"Unsetting fillExtrusionColor should return fill-extrusion-color to the default value.");
         XCTAssertEqualObjects(layer.fillExtrusionColor, defaultStyleValue,
                               @"fillExtrusionColor should return the default value after being unset.");
+        // Transition property test
+        layer.fillExtrusionColorTransition = transitionTest;
+        auto toptions = rawLayer->getFillExtrusionColorTransition();
+        XCTAssert(toptions.delay && MGLTimeIntervalFromDuration(*toptions.delay) == transitionTest.delay);
+        XCTAssert(toptions.duration && MGLTimeIntervalFromDuration(*toptions.duration) == transitionTest.duration);
+
+        MGLTransition fillExtrusionColorTransition = layer.fillExtrusionColorTransition;
+        XCTAssertEqual(fillExtrusionColorTransition.delay, transitionTest.delay);
+        XCTAssertEqual(fillExtrusionColorTransition.duration, transitionTest.duration);
     }
 
     // fill-extrusion-height
@@ -212,6 +235,15 @@
                       @"Unsetting fillExtrusionHeight should return fill-extrusion-height to the default value.");
         XCTAssertEqualObjects(layer.fillExtrusionHeight, defaultStyleValue,
                               @"fillExtrusionHeight should return the default value after being unset.");
+        // Transition property test
+        layer.fillExtrusionHeightTransition = transitionTest;
+        auto toptions = rawLayer->getFillExtrusionHeightTransition();
+        XCTAssert(toptions.delay && MGLTimeIntervalFromDuration(*toptions.delay) == transitionTest.delay);
+        XCTAssert(toptions.duration && MGLTimeIntervalFromDuration(*toptions.duration) == transitionTest.duration);
+
+        MGLTransition fillExtrusionHeightTransition = layer.fillExtrusionHeightTransition;
+        XCTAssertEqual(fillExtrusionHeightTransition.delay, transitionTest.delay);
+        XCTAssertEqual(fillExtrusionHeightTransition.duration, transitionTest.duration);
     }
 
     // fill-extrusion-opacity
@@ -251,6 +283,15 @@
         XCTAssertThrowsSpecificNamed(layer.fillExtrusionOpacity = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
         functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
         XCTAssertThrowsSpecificNamed(layer.fillExtrusionOpacity = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
+        // Transition property test
+        layer.fillExtrusionOpacityTransition = transitionTest;
+        auto toptions = rawLayer->getFillExtrusionOpacityTransition();
+        XCTAssert(toptions.delay && MGLTimeIntervalFromDuration(*toptions.delay) == transitionTest.delay);
+        XCTAssert(toptions.duration && MGLTimeIntervalFromDuration(*toptions.duration) == transitionTest.duration);
+
+        MGLTransition fillExtrusionOpacityTransition = layer.fillExtrusionOpacityTransition;
+        XCTAssertEqual(fillExtrusionOpacityTransition.delay, transitionTest.delay);
+        XCTAssertEqual(fillExtrusionOpacityTransition.duration, transitionTest.duration);
     }
 
     // fill-extrusion-pattern
@@ -290,13 +331,22 @@
         XCTAssertThrowsSpecificNamed(layer.fillExtrusionPattern = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
         functionStyleValue = [MGLStyleValue<NSString *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
         XCTAssertThrowsSpecificNamed(layer.fillExtrusionPattern = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
+        // Transition property test
+        layer.fillExtrusionPatternTransition = transitionTest;
+        auto toptions = rawLayer->getFillExtrusionPatternTransition();
+        XCTAssert(toptions.delay && MGLTimeIntervalFromDuration(*toptions.delay) == transitionTest.delay);
+        XCTAssert(toptions.duration && MGLTimeIntervalFromDuration(*toptions.duration) == transitionTest.duration);
+
+        MGLTransition fillExtrusionPatternTransition = layer.fillExtrusionPatternTransition;
+        XCTAssertEqual(fillExtrusionPatternTransition.delay, transitionTest.delay);
+        XCTAssertEqual(fillExtrusionPatternTransition.duration, transitionTest.duration);
     }
 
     // fill-extrusion-translate
     {
         XCTAssertTrue(rawLayer->getFillExtrusionTranslate().isUndefined(),
                       @"fill-extrusion-translate should be unset initially.");
-        MGLStyleValue<NSValue *> *defaultStyleValue = layer.fillExtrusionTranslate;
+        MGLStyleValue<NSValue *> *defaultStyleValue = layer.fillExtrusionTranslation;
 
         MGLStyleValue<NSValue *> *constantStyleValue = [MGLStyleValue<NSValue *> valueWithRawValue:
 #if TARGET_OS_IPHONE
@@ -305,75 +355,75 @@
             [NSValue valueWithMGLVector:CGVectorMake(1, -1)]
 #endif
         ];
-        layer.fillExtrusionTranslate = constantStyleValue;
+        layer.fillExtrusionTranslation = constantStyleValue;
         mbgl::style::PropertyValue<std::array<float, 2>> propertyValue = { { 1, 1 } };
         XCTAssertEqual(rawLayer->getFillExtrusionTranslate(), propertyValue,
-                       @"Setting fillExtrusionTranslate to a constant value should update fill-extrusion-translate.");
-        XCTAssertEqualObjects(layer.fillExtrusionTranslate, constantStyleValue,
-                              @"fillExtrusionTranslate should round-trip constant values.");
+                       @"Setting fillExtrusionTranslation to a constant value should update fill-extrusion-translate.");
+        XCTAssertEqualObjects(layer.fillExtrusionTranslation, constantStyleValue,
+                              @"fillExtrusionTranslation should round-trip constant values.");
 
         MGLStyleValue<NSValue *> * functionStyleValue = [MGLStyleValue<NSValue *> valueWithInterpolationMode:MGLInterpolationModeInterval cameraStops:@{@18: constantStyleValue} options:nil];
-        layer.fillExtrusionTranslate = functionStyleValue;
+        layer.fillExtrusionTranslation = functionStyleValue;
 
         mbgl::style::IntervalStops<std::array<float, 2>> intervalStops = { {{18, { 1, 1 }}} };
         propertyValue = mbgl::style::CameraFunction<std::array<float, 2>> { intervalStops };
         
         XCTAssertEqual(rawLayer->getFillExtrusionTranslate(), propertyValue,
-                       @"Setting fillExtrusionTranslate to a camera function should update fill-extrusion-translate.");
-        XCTAssertEqualObjects(layer.fillExtrusionTranslate, functionStyleValue,
-                              @"fillExtrusionTranslate should round-trip camera functions.");
+                       @"Setting fillExtrusionTranslation to a camera function should update fill-extrusion-translate.");
+        XCTAssertEqualObjects(layer.fillExtrusionTranslation, functionStyleValue,
+                              @"fillExtrusionTranslation should round-trip camera functions.");
 
                               
 
-        layer.fillExtrusionTranslate = nil;
+        layer.fillExtrusionTranslation = nil;
         XCTAssertTrue(rawLayer->getFillExtrusionTranslate().isUndefined(),
-                      @"Unsetting fillExtrusionTranslate should return fill-extrusion-translate to the default value.");
-        XCTAssertEqualObjects(layer.fillExtrusionTranslate, defaultStyleValue,
-                              @"fillExtrusionTranslate should return the default value after being unset.");
+                      @"Unsetting fillExtrusionTranslation should return fill-extrusion-translate to the default value.");
+        XCTAssertEqualObjects(layer.fillExtrusionTranslation, defaultStyleValue,
+                              @"fillExtrusionTranslation should return the default value after being unset.");
 
         functionStyleValue = [MGLStyleValue<NSValue *> valueWithInterpolationMode:MGLInterpolationModeIdentity sourceStops:nil attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.fillExtrusionTranslate = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
+        XCTAssertThrowsSpecificNamed(layer.fillExtrusionTranslation = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
         functionStyleValue = [MGLStyleValue<NSValue *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.fillExtrusionTranslate = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
+        XCTAssertThrowsSpecificNamed(layer.fillExtrusionTranslation = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
     }
 
     // fill-extrusion-translate-anchor
     {
         XCTAssertTrue(rawLayer->getFillExtrusionTranslateAnchor().isUndefined(),
                       @"fill-extrusion-translate-anchor should be unset initially.");
-        MGLStyleValue<NSValue *> *defaultStyleValue = layer.fillExtrusionTranslateAnchor;
+        MGLStyleValue<NSValue *> *defaultStyleValue = layer.fillExtrusionTranslationAnchor;
 
-        MGLStyleValue<NSValue *> *constantStyleValue = [MGLStyleValue<NSValue *> valueWithRawValue:[NSValue valueWithMGLFillExtrusionTranslateAnchor:MGLFillExtrusionTranslateAnchorViewport]];
-        layer.fillExtrusionTranslateAnchor = constantStyleValue;
+        MGLStyleValue<NSValue *> *constantStyleValue = [MGLStyleValue<NSValue *> valueWithRawValue:[NSValue valueWithMGLFillExtrusionTranslationAnchor:MGLFillExtrusionTranslationAnchorViewport]];
+        layer.fillExtrusionTranslationAnchor = constantStyleValue;
         mbgl::style::PropertyValue<mbgl::style::TranslateAnchorType> propertyValue = { mbgl::style::TranslateAnchorType::Viewport };
         XCTAssertEqual(rawLayer->getFillExtrusionTranslateAnchor(), propertyValue,
-                       @"Setting fillExtrusionTranslateAnchor to a constant value should update fill-extrusion-translate-anchor.");
-        XCTAssertEqualObjects(layer.fillExtrusionTranslateAnchor, constantStyleValue,
-                              @"fillExtrusionTranslateAnchor should round-trip constant values.");
+                       @"Setting fillExtrusionTranslationAnchor to a constant value should update fill-extrusion-translate-anchor.");
+        XCTAssertEqualObjects(layer.fillExtrusionTranslationAnchor, constantStyleValue,
+                              @"fillExtrusionTranslationAnchor should round-trip constant values.");
 
         MGLStyleValue<NSValue *> * functionStyleValue = [MGLStyleValue<NSValue *> valueWithInterpolationMode:MGLInterpolationModeInterval cameraStops:@{@18: constantStyleValue} options:nil];
-        layer.fillExtrusionTranslateAnchor = functionStyleValue;
+        layer.fillExtrusionTranslationAnchor = functionStyleValue;
 
         mbgl::style::IntervalStops<mbgl::style::TranslateAnchorType> intervalStops = { {{18, mbgl::style::TranslateAnchorType::Viewport}} };
         propertyValue = mbgl::style::CameraFunction<mbgl::style::TranslateAnchorType> { intervalStops };
         
         XCTAssertEqual(rawLayer->getFillExtrusionTranslateAnchor(), propertyValue,
-                       @"Setting fillExtrusionTranslateAnchor to a camera function should update fill-extrusion-translate-anchor.");
-        XCTAssertEqualObjects(layer.fillExtrusionTranslateAnchor, functionStyleValue,
-                              @"fillExtrusionTranslateAnchor should round-trip camera functions.");
+                       @"Setting fillExtrusionTranslationAnchor to a camera function should update fill-extrusion-translate-anchor.");
+        XCTAssertEqualObjects(layer.fillExtrusionTranslationAnchor, functionStyleValue,
+                              @"fillExtrusionTranslationAnchor should round-trip camera functions.");
 
                               
 
-        layer.fillExtrusionTranslateAnchor = nil;
+        layer.fillExtrusionTranslationAnchor = nil;
         XCTAssertTrue(rawLayer->getFillExtrusionTranslateAnchor().isUndefined(),
-                      @"Unsetting fillExtrusionTranslateAnchor should return fill-extrusion-translate-anchor to the default value.");
-        XCTAssertEqualObjects(layer.fillExtrusionTranslateAnchor, defaultStyleValue,
-                              @"fillExtrusionTranslateAnchor should return the default value after being unset.");
+                      @"Unsetting fillExtrusionTranslationAnchor should return fill-extrusion-translate-anchor to the default value.");
+        XCTAssertEqualObjects(layer.fillExtrusionTranslationAnchor, defaultStyleValue,
+                              @"fillExtrusionTranslationAnchor should return the default value after being unset.");
 
         functionStyleValue = [MGLStyleValue<NSValue *> valueWithInterpolationMode:MGLInterpolationModeIdentity sourceStops:nil attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.fillExtrusionTranslateAnchor = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
+        XCTAssertThrowsSpecificNamed(layer.fillExtrusionTranslationAnchor = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
         functionStyleValue = [MGLStyleValue<NSValue *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.fillExtrusionTranslateAnchor = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
+        XCTAssertThrowsSpecificNamed(layer.fillExtrusionTranslationAnchor = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
     }
 }
 
@@ -383,13 +433,13 @@
     [self testPropertyName:@"fill-extrusion-height" isBoolean:NO];
     [self testPropertyName:@"fill-extrusion-opacity" isBoolean:NO];
     [self testPropertyName:@"fill-extrusion-pattern" isBoolean:NO];
-    [self testPropertyName:@"fill-extrusion-translate" isBoolean:NO];
-    [self testPropertyName:@"fill-extrusion-translate-anchor" isBoolean:NO];
+    [self testPropertyName:@"fill-extrusion-translation" isBoolean:NO];
+    [self testPropertyName:@"fill-extrusion-translation-anchor" isBoolean:NO];
 }
 
 - (void)testValueAdditions {
-    XCTAssertEqual([NSValue valueWithMGLFillExtrusionTranslateAnchor:MGLFillExtrusionTranslateAnchorMap].MGLFillExtrusionTranslateAnchorValue, MGLFillExtrusionTranslateAnchorMap);
-    XCTAssertEqual([NSValue valueWithMGLFillExtrusionTranslateAnchor:MGLFillExtrusionTranslateAnchorViewport].MGLFillExtrusionTranslateAnchorValue, MGLFillExtrusionTranslateAnchorViewport);
+    XCTAssertEqual([NSValue valueWithMGLFillExtrusionTranslationAnchor:MGLFillExtrusionTranslationAnchorMap].MGLFillExtrusionTranslationAnchorValue, MGLFillExtrusionTranslationAnchorMap);
+    XCTAssertEqual([NSValue valueWithMGLFillExtrusionTranslationAnchor:MGLFillExtrusionTranslationAnchorViewport].MGLFillExtrusionTranslationAnchorValue, MGLFillExtrusionTranslationAnchorViewport);
 }
 
 @end

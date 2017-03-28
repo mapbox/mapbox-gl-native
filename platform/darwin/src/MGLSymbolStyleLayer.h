@@ -552,15 +552,6 @@ MGL_EXPORT
  * `MGLCameraStyleFunction` with an interpolation mode of:
    * `MGLInterpolationModeExponential`
    * `MGLInterpolationModeInterval`
- * `MGLSourceStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
-   * `MGLInterpolationModeCategorical`
-   * `MGLInterpolationModeIdentity`
- * `MGLCompositeStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
-   * `MGLInterpolationModeCategorical`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconScale;
 
@@ -943,15 +934,6 @@ MGL_EXPORT
  * `MGLCameraStyleFunction` with an interpolation mode of:
    * `MGLInterpolationModeExponential`
    * `MGLInterpolationModeInterval`
- * `MGLSourceStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
-   * `MGLInterpolationModeCategorical`
-   * `MGLInterpolationModeIdentity`
- * `MGLCompositeStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
-   * `MGLInterpolationModeCategorical`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textFontSize;
 

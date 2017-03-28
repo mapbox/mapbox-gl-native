@@ -1,5 +1,5 @@
 // This file is generated.
-// Edit platform/darwin/scripts/generate-style-code.js, then run `make style-code-darwin`.
+// Edit platform/darwin/scripts/generate-style-code.js, then run `make darwin-style-code`.
 
 #import "MGLFoundation.h"
 #import "MGLStyleValue.h"
@@ -10,27 +10,33 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Controls the translation reference point.
 
- Values of this type are used in the `MGLFillExtrusionStyleLayer.fillExtrusionTranslateAnchor`
+ Values of this type are used in the `MGLFillExtrusionStyleLayer.fillExtrusionTranslationAnchor`
  property.
  */
-typedef NS_ENUM(NSUInteger, MGLFillExtrusionTranslateAnchor) {
+typedef NS_ENUM(NSUInteger, MGLFillExtrusionTranslationAnchor) {
     /**
      The fill extrusion is translated relative to the map.
      */
-    MGLFillExtrusionTranslateAnchorMap,
+    MGLFillExtrusionTranslationAnchorMap,
     /**
      The fill extrusion is translated relative to the viewport.
      */
-    MGLFillExtrusionTranslateAnchorViewport,
+    MGLFillExtrusionTranslationAnchorViewport,
 };
 
 /**
- An extruded (3D) polygon.
+ An `MGLFillExtrusionStyleLayer` is a style layer that renders one or more 3D
+ extruded polygons on the map.
+ 
+ Use a fill extrusion style layer to configure the visual appearance of polygon
+ or multipolygon features in vector tiles loaded by an `MGLVectorSource` object
+ or `MGLPolygon`, `MGLPolygonFeature`, `MGLMultiPolygon`, or
+ `MGLMultiPolygonFeature` instances in an `MGLShapeSource` object.
 
- You can access an existing fill-extrusion style layer using the
+ You can access an existing fill extrusion style layer using the
  `-[MGLStyle layerWithIdentifier:]` method if you know its identifier;
  otherwise, find it using the `MGLStyle.layers` property. You can also create a
- new fill-extrusion style layer and add it to the style using a method such as
+ new fill extrusion style layer and add it to the style using a method such as
  `-[MGLStyle addLayer:]`.
 
  ### Example
@@ -40,6 +46,21 @@ typedef NS_ENUM(NSUInteger, MGLFillExtrusionTranslateAnchor) {
  */
 MGL_EXPORT
 @interface MGLFillExtrusionStyleLayer : MGLVectorStyleLayer
+
+/**
+ Returns a fill-extrusion style layer initialized with an identifier and source.
+
+ After initializing and configuring the style layer, add it to a map view’s
+ style using the `-[MGLStyle addLayer:]` or
+ `-[MGLStyle insertLayer:belowLayer:]` method.
+
+ @param identifier A string that uniquely identifies the source in the style to
+    which it is added.
+ @param source The source from which to obtain the data to style. If the source
+    has not yet been added to the current style, the behavior is undefined.
+ @return An initialized foreground style layer.
+ */
+- (instancetype)initWithIdentifier:(NSString *)identifier source:(MGLSource *)source;
 
 #pragma mark - Accessing the Paint Attributes
 
@@ -58,7 +79,7 @@ MGL_EXPORT
  
  You can set this property to an instance of:
  
- * `MGLStyleConstantValue`
+ * `MGLConstantStyleValue`
  * `MGLCameraStyleFunction` with an interpolation mode of:
    * `MGLInterpolationModeExponential`
    * `MGLInterpolationModeInterval`
@@ -74,12 +95,19 @@ MGL_EXPORT
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *fillExtrusionBase;
 
+/**
+ The transition affecting any changes to this layer’s `fillExtrusionBase` property.
+
+ This property corresponds to the `fill-extrusion-base-transition` property in the style JSON file format.
+*/
+@property (nonatomic) MGLTransition fillExtrusionBaseTransition;
+
 #if TARGET_OS_IPHONE
 /**
- The base color of the extruded fill. The extrusion's surfaces will be shaded
- differently based on this color in combination with the root `light` settings.
- If this color is specified as `rgba` with an alpha component, the alpha
- component will be ignored; use `fillExtrusionOpacity` to set layer opacity.
+ The base color of this layer. The extrusion's surfaces will be shaded
+ differently based on this color in combination with the `light` settings. If
+ this color is specified with an alpha component, the alpha component will be
+ ignored; use `fillExtrusionOpacity` to set layer opacity.
  
  The default value of this property is an `MGLStyleValue` object containing
  `UIColor.blackColor`. Set this property to `nil` to reset it to the default
@@ -90,7 +118,7 @@ MGL_EXPORT
  
  You can set this property to an instance of:
  
- * `MGLStyleConstantValue`
+ * `MGLConstantStyleValue`
  * `MGLCameraStyleFunction` with an interpolation mode of:
    * `MGLInterpolationModeExponential`
    * `MGLInterpolationModeInterval`
@@ -107,10 +135,10 @@ MGL_EXPORT
 @property (nonatomic, null_resettable) MGLStyleValue<UIColor *> *fillExtrusionColor;
 #else
 /**
- The base color of the extruded fill. The extrusion's surfaces will be shaded
- differently based on this color in combination with the root `light` settings.
- If this color is specified as `rgba` with an alpha component, the alpha
- component will be ignored; use `fillExtrusionOpacity` to set layer opacity.
+ The base color of this layer. The extrusion's surfaces will be shaded
+ differently based on this color in combination with the `light` settings. If
+ this color is specified with an alpha component, the alpha component will be
+ ignored; use `fillExtrusionOpacity` to set layer opacity.
  
  The default value of this property is an `MGLStyleValue` object containing
  `NSColor.blackColor`. Set this property to `nil` to reset it to the default
@@ -121,7 +149,7 @@ MGL_EXPORT
  
  You can set this property to an instance of:
  
- * `MGLStyleConstantValue`
+ * `MGLConstantStyleValue`
  * `MGLCameraStyleFunction` with an interpolation mode of:
    * `MGLInterpolationModeExponential`
    * `MGLInterpolationModeInterval`
@@ -139,6 +167,13 @@ MGL_EXPORT
 #endif
 
 /**
+ The transition affecting any changes to this layer’s `fillExtrusionColor` property.
+
+ This property corresponds to the `fill-extrusion-color-transition` property in the style JSON file format.
+*/
+@property (nonatomic) MGLTransition fillExtrusionColorTransition;
+
+/**
  The height with which to extrude this layer.
  
  This property is measured in meters.
@@ -149,7 +184,7 @@ MGL_EXPORT
  
  You can set this property to an instance of:
  
- * `MGLStyleConstantValue`
+ * `MGLConstantStyleValue`
  * `MGLCameraStyleFunction` with an interpolation mode of:
    * `MGLInterpolationModeExponential`
    * `MGLInterpolationModeInterval`
@@ -166,6 +201,13 @@ MGL_EXPORT
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *fillExtrusionHeight;
 
 /**
+ The transition affecting any changes to this layer’s `fillExtrusionHeight` property.
+
+ This property corresponds to the `fill-extrusion-height-transition` property in the style JSON file format.
+*/
+@property (nonatomic) MGLTransition fillExtrusionHeightTransition;
+
+/**
  The opacity of the entire fill extrusion layer. This is rendered on a
  per-layer, not per-feature, basis, and data-driven styling is not available.
  
@@ -175,7 +217,7 @@ MGL_EXPORT
  
  You can set this property to an instance of:
  
- * `MGLStyleConstantValue`
+ * `MGLConstantStyleValue`
  * `MGLCameraStyleFunction` with an interpolation mode of:
    * `MGLInterpolationModeExponential`
    * `MGLInterpolationModeInterval`
@@ -183,22 +225,35 @@ MGL_EXPORT
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *fillExtrusionOpacity;
 
 /**
- Name of image in sprite to use for drawing images on extruded fills. For
- seamless patterns, image width and height must be a factor of two (2, 4, 8,
- ..., 512).
+ The transition affecting any changes to this layer’s `fillExtrusionOpacity` property.
+
+ This property corresponds to the `fill-extrusion-opacity-transition` property in the style JSON file format.
+*/
+@property (nonatomic) MGLTransition fillExtrusionOpacityTransition;
+
+/**
+ Name of image in style images to use for drawing images to the surfaces of fill
+ extrusions. For seamless patterns, image width and height must be a factor of
+ two (2, 4, 8, ..., 512).
  
  You can set this property to an instance of:
  
- * `MGLStyleConstantValue`
+ * `MGLConstantStyleValue`
  * `MGLCameraStyleFunction` with an interpolation mode of
  `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSString *> *fillExtrusionPattern;
 
+/**
+ The transition affecting any changes to this layer’s `fillExtrusionPattern` property.
+
+ This property corresponds to the `fill-extrusion-pattern-transition` property in the style JSON file format.
+*/
+@property (nonatomic) MGLTransition fillExtrusionPatternTransition;
+
 #if TARGET_OS_IPHONE
 /**
- The geometry's offset. Values are [x, y] where negatives indicate left and up
- (on the flat plane), respectively.
+ The geometry's offset.
  
  This property is measured in points.
  
@@ -206,18 +261,21 @@ MGL_EXPORT
  `NSValue` object containing a `CGVector` struct set to 0 points rightward and 0
  points downward. Set this property to `nil` to reset it to the default value.
  
+ This attribute corresponds to the <a
+ href="https://www.mapbox.com/mapbox-gl-style-spec/#paint-fill-extrusion-translate"><code>fill-extrusion-translate</code></a>
+ layout property in the Mapbox Style Specification.
+ 
  You can set this property to an instance of:
  
- * `MGLStyleConstantValue`
+ * `MGLConstantStyleValue`
  * `MGLCameraStyleFunction` with an interpolation mode of:
    * `MGLInterpolationModeExponential`
    * `MGLInterpolationModeInterval`
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *fillExtrusionTranslate;
+@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *fillExtrusionTranslation;
 #else
 /**
- The geometry's offset. Values are [x, y] where negatives indicate left and up
- (on the flat plane), respectively.
+ The geometry's offset.
  
  This property is measured in points.
  
@@ -225,33 +283,52 @@ MGL_EXPORT
  `NSValue` object containing a `CGVector` struct set to 0 points rightward and 0
  points upward. Set this property to `nil` to reset it to the default value.
  
+ This attribute corresponds to the <a
+ href="https://www.mapbox.com/mapbox-gl-style-spec/#paint-fill-extrusion-translate"><code>fill-extrusion-translate</code></a>
+ layout property in the Mapbox Style Specification.
+ 
  You can set this property to an instance of:
  
- * `MGLStyleConstantValue`
+ * `MGLConstantStyleValue`
  * `MGLCameraStyleFunction` with an interpolation mode of:
    * `MGLInterpolationModeExponential`
    * `MGLInterpolationModeInterval`
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *fillExtrusionTranslate;
+@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *fillExtrusionTranslation;
 #endif
+
+/**
+ The transition affecting any changes to this layer’s `fillExtrusionTranslation` property.
+
+ This property corresponds to the `fill-extrusion-translate-transition` property in the style JSON file format.
+*/
+@property (nonatomic) MGLTransition fillExtrusionTranslationTransition;
+
+@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *fillExtrusionTranslate __attribute__((unavailable("Use fillExtrusionTranslation instead.")));
 
 /**
  Controls the translation reference point.
  
  The default value of this property is an `MGLStyleValue` object containing an
- `NSValue` object containing `MGLFillExtrusionTranslateAnchorMap`. Set this
+ `NSValue` object containing `MGLFillExtrusionTranslationAnchorMap`. Set this
  property to `nil` to reset it to the default value.
  
- This property is only applied to the style if `fillExtrusionTranslate` is
+ This property is only applied to the style if `fillExtrusionTranslation` is
  non-`nil`. Otherwise, it is ignored.
+ 
+ This attribute corresponds to the <a
+ href="https://www.mapbox.com/mapbox-gl-style-spec/#paint-fill-extrusion-translate-anchor"><code>fill-extrusion-translate-anchor</code></a>
+ layout property in the Mapbox Style Specification.
  
  You can set this property to an instance of:
  
- * `MGLStyleConstantValue`
+ * `MGLConstantStyleValue`
  * `MGLCameraStyleFunction` with an interpolation mode of
  `MGLInterpolationModeInterval`
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *fillExtrusionTranslateAnchor;
+@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *fillExtrusionTranslationAnchor;
+
+@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *fillExtrusionTranslateAnchor __attribute__((unavailable("Use fillExtrusionTranslationAnchor instead.")));
 
 @end
 
@@ -264,17 +341,17 @@ MGL_EXPORT
 #pragma mark Working with FillExtrusion Style Layer Attribute Values
 
 /**
- Creates a new value object containing the given `MGLFillExtrusionTranslateAnchor` enumeration.
+ Creates a new value object containing the given `MGLFillExtrusionTranslationAnchor` enumeration.
 
- @param fillExtrusionTranslateAnchor The value for the new object.
+ @param fillExtrusionTranslationAnchor The value for the new object.
  @return A new value object that contains the enumeration value.
  */
-+ (instancetype)valueWithMGLFillExtrusionTranslateAnchor:(MGLFillExtrusionTranslateAnchor)fillExtrusionTranslateAnchor;
++ (instancetype)valueWithMGLFillExtrusionTranslationAnchor:(MGLFillExtrusionTranslationAnchor)fillExtrusionTranslationAnchor;
 
 /**
- The `MGLFillExtrusionTranslateAnchor` enumeration representation of the value.
+ The `MGLFillExtrusionTranslationAnchor` enumeration representation of the value.
  */
-@property (readonly) MGLFillExtrusionTranslateAnchor MGLFillExtrusionTranslateAnchorValue;
+@property (readonly) MGLFillExtrusionTranslationAnchor MGLFillExtrusionTranslationAnchorValue;
 
 @end
 

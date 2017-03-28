@@ -6,7 +6,7 @@
           "doc": "An `MGLFillStyleLayer` is a style layer that renders one or more filled (and optionally stroked) polygons on the map.\n\nUse a fill style layer to configure the visual appearance of polygon or multipolygon features in vector tiles loaded by an `MGLVectorSource` object or `MGLPolygon`, `MGLPolygonFeature`, `MGLMultiPolygon`, or `MGLMultiPolygonFeature` instances in an `MGLShapeSource` object."
         },
         "fill-extrusion": {
-          "doc": "An `MGLFillExtrusionStyleLayer` is a style layer that renders one or more 3D extruded polygons on the map.\n\nUse a fill-extrusion style layer to configure the visual appearance of polygon or multipolygon features in vector tiles loaded by an `MGLVectorSource` object or `MGLPolygon`, `MGLPolygonFeature`, `MGLMultiPolygon`, or `MGLMultiPolygonFeature` instances in an `MGLShapeSource` object."
+          "doc": "An `MGLFillExtrusionStyleLayer` is a style layer that renders one or more 3D extruded polygons on the map.\n\nUse a fill extrusion style layer to configure the visual appearance of polygon or multipolygon features in vector tiles loaded by an `MGLVectorSource` object or `MGLPolygon`, `MGLPolygonFeature`, `MGLMultiPolygon`, or `MGLMultiPolygonFeature` instances in an `MGLShapeSource` object."
         },
         "line": {
           "doc": "An `MGLLineStyleLayer` is a style layer that renders one or more stroked polylines on the map.\n\nUse a line style layer to configure the visual appearance of polyline or multipolyline features in vector tiles loaded by an `MGLVectorSource` object or `MGLPolyline`, `MGLPolylineFeature`, `MGLMultiPolyline`, or `MGLMultiPolylineFeature` instances in an `MGLShapeSource` object."
@@ -55,13 +55,13 @@
   },
   "paint_fill-extrusion": {
     "fill-extrusion-pattern": {
-      "doc": "Name of image in style images to use for drawing image fill-extrusions. For seamless patterns, image width and height must be a factor of two (2, 4, 8, ..., 512)."
+      "doc": "Name of image in style images to use for drawing images to the surfaces of fill extrusions. For seamless patterns, image width and height must be a factor of two (2, 4, 8, ..., 512)."
     },
     "fill-extrusion-translate": {
       "doc": "The geometry's offset."
     },
     "fill-extrusion-color": {
-      "doc": "The base color of this layer. The extrusion's surfaces will be shaded differently based on this color in combination with the `light` settings. If this color is specified with an alpha component, the alpha component will be ignored; use `fill-extrusion-opacity` to set layer opacityco."
+      "doc": "The base color of this layer. The extrusion's surfaces will be shaded differently based on this color in combination with the `light` settings. If this color is specified with an alpha component, the alpha component will be ignored; use `fill-extrusion-opacity` to set layer opacity."
     }
   },
   "paint_line": {
