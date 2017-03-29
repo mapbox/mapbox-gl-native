@@ -70,7 +70,9 @@ uniforms::u_lightintensity>
                          const UnwrappedTileID&,
                          const TransformState&,
                          const float,
-                         const style::Style&);
+                         const std::array<float, 3>&,
+                         const std::array<float, 3>&,
+                         const float);
 };
 
 class FillExtrusionProgram : public Program<

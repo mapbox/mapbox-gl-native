@@ -14,12 +14,13 @@ public:
 
     void bind() {
         if (!framebuffer) {
-            texture = context.createTexture(size);
+            texture = context.createTexture(size, gl::TextureFormat::RGBA, unit);
             framebuffer = context.createFramebuffer(*texture);
         } else {
             context.bindFramebuffer = framebuffer->framebuffer;
         }
 
+        context.activeTexture = unit;
         context.viewport = { 0, 0, size };
     }
 
@@ -38,7 +39,7 @@ public:
 
     void bindRenderbuffers() {
         if (!framebuffer) {
-            texture = context.createTexture(size);
+            texture = context.createTexture(size, gl::TextureFormat::RGBA, unit);
             colorTarget = context.createRenderbuffer<gl::RenderbufferType::RGBA4>(size);
             depthTarget = context.createRenderbuffer<gl::RenderbufferType::DepthComponent>(size);
             framebuffer = context.createFramebuffer(*colorTarget, *depthTarget, *texture);
@@ -49,10 +50,10 @@ public:
         context.viewport = { 0, 0, size };
     }
 
-
 private:
     gl::Context& context;
     const Size size;
+    gl::TextureUnit unit;
     optional<gl::Framebuffer> framebuffer;
     optional<gl::Texture> texture;
     optional<gl::Renderbuffer<gl::RenderbufferType::RGBA4>> colorTarget;

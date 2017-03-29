@@ -338,7 +338,7 @@ void Painter::renderPass(PaintParameters& parameters,
         } else if (layer.is<FillExtrusionLayer>()) {
             const auto size = context.viewport.getCurrentValue().size;
 
-            OffscreenTexture texture(context, size);
+            OffscreenTexture texture(context, size, 1);
             texture.bindRenderbuffers();
 
             context.setStencilMode(gl::StencilMode::disabled());
@@ -354,23 +354,19 @@ void Painter::renderPass(PaintParameters& parameters,
 
             const PaintProperties<>::Evaluated properties{};
 
-            parameters.programs.extrusionTexture.draw(context,
-                                                      gl::Triangles(),
-                                                      gl::DepthMode::disabled(),
-                                                      gl::StencilMode::disabled(),
-                                                      colorModeForRenderPass(),
-                                                      ExtrusionTextureProgram::UniformValues{
-                                                          uniforms::u_matrix::Value{ viewportMat },
-                                                          uniforms::u_world::Value{ size },
-                                                          uniforms::u_image::Value{ 0 }, // view.getTexture() ? no — but follow up on whether could be variable or if it's always safe to attach to 0 unit
-                                                          uniforms::u_opacity::Value{ layer.as<FillExtrusionLayer>()->impl->paint.evaluated.get<FillExtrusionOpacity>() }
-                                                      },
-                                                      extrusionTextureVertexBuffer,
-                                                      extrusionTextureTriangleIndexBuffer,
-                                                      extrusionTextureSegments,
-                                                      ExtrusionTextureProgram::PaintPropertyBinders{ properties, 0 },
-                                                      properties,
-                                                      state.getZoom());
+            parameters.programs.extrusionTexture.draw(
+                context, gl::Triangles(), gl::DepthMode::disabled(), gl::StencilMode::disabled(),
+                colorModeForRenderPass(),
+                ExtrusionTextureProgram::UniformValues{
+                    uniforms::u_matrix::Value{ viewportMat }, uniforms::u_world::Value{ size },
+                    uniforms::u_image::Value{ 1 },
+                    uniforms::u_opacity::Value{
+                        layer.as<FillExtrusionLayer>()
+                            ->impl->paint.evaluated.get<FillExtrusionOpacity>() } },
+                extrusionTextureVertexBuffer, extrusionTextureTriangleIndexBuffer,
+                extrusionTextureSegments,
+                ExtrusionTextureProgram::PaintPropertyBinders{ properties, 0 }, properties,
+                state.getZoom());
         } else {
             renderTiles();
         }

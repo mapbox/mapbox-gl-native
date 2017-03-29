@@ -1,9 +1,11 @@
 #pragma once
 
+#include <mbgl/style/types.hpp>
 #include <mbgl/util/optional.hpp>
+#include <mbgl/util/constants.hpp>
+#include <mbgl/util/mat3.hpp>
 
 #include <array>
-#include <mbgl/util/constants.hpp>
 
 #include <cassert>
 #include <string>
@@ -27,8 +29,16 @@ public:
         return !(lhs == rhs);
     }
 
-    const std::array<float, 3> get() const {
-        return { { x, y, z } };
+    const std::array<float, 3> get(LightAnchorType anchor, float angle) const {
+        vec3f lightvec{ { x, y, z } };
+        mat3 lightmat;
+        matrix::identity(lightmat);
+        if (anchor == LightAnchorType::Viewport) {
+            matrix::rotate(lightmat, lightmat, -angle);
+        }
+        matrix::transformMat3f(lightvec, lightvec, lightmat);
+
+        return lightvec;
     };
 
     const std::array<float, 3> getSpherical() const {
@@ -40,8 +50,7 @@ public:
         azimuthal = position_[1];
         polar = position_[2];
         calculateCartesian();
-    }; // TODO because we only define array-based setter here, should maybe delete 3 floats-based
-    // constructor?
+    };
 
 private:
     float radial;
