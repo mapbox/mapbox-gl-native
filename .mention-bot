@@ -1,5 +1,0 @@
-{
-  "requiredOrgs": ["mapbox"],
-  "message": "@pullRequester, thanks for your PR! By analyzing this pull request, we identified @reviewers to be potential reviewers.",
-  "numFilesToCheck": 10
-}
