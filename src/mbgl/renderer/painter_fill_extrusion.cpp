@@ -7,6 +7,7 @@
 #include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/programs/programs.hpp>
 #include <mbgl/programs/fill_extrusion_program.hpp>
+#include <mbgl/util/constants.hpp>
 #include <mbgl/util/convert.hpp>
 #include <mbgl/util/mat3.hpp>
 
@@ -15,10 +16,10 @@ namespace mbgl {
 using namespace style;
 
 void Painter::renderFillExtrusion(PaintParameters& parameters,
-                         FillExtrusionBucket& bucket,
-                         const FillExtrusionLayer& layer,
-                         const RenderTile& tile,
-                         const Style& style) {
+                                  FillExtrusionBucket& bucket,
+                                  const FillExtrusionLayer& layer,
+                                  const RenderTile& tile,
+                                  const Style& style) {
     const FillExtrusionPaintProperties::Evaluated& properties = layer.impl->paint.evaluated;
 
     if (pass == RenderPass::Opaque) {
@@ -26,48 +27,49 @@ void Painter::renderFillExtrusion(PaintParameters& parameters,
     }
 
     const auto light = style.light.evaluated;
-    const auto lightcolor = light.get<LightColor>();
-    const auto lightpos = light.get<LightPosition>().get();
-
-    vec3f lightvec{ lightpos };
-    mat3 lightmat;
-    matrix::identity(lightmat);
-    if (style.light.getAnchor() == LightAnchorType::Viewport) {
-        matrix::rotate(lightmat, lightmat, -state.getAngle());
-    }
-    matrix::transformMat3f(lightvec, lightvec, lightmat);
+    const auto lightColor = light.get<LightColor>();
+    std::array<float, 3> color3f = { { lightColor.r, lightColor.g, lightColor.b } };
+    const auto lightPos =
+        light.get<LightPosition>().get(light.get<LightAnchor>(), state.getAngle());
+    const auto lightIntensity = light.get<LightIntensity>();
 
     if (!properties.get<FillExtrusionPattern>().from.empty()) {
+        optional<SpriteAtlasElement> imagePosA =
+            spriteAtlas->getPattern(properties.get<FillExtrusionPattern>().from);
+        optional<SpriteAtlasElement> imagePosB =
+            spriteAtlas->getPattern(properties.get<FillExtrusionPattern>().to);
+
+        if (!imagePosA || !imagePosB) {
+            return;
+        }
+
+        spriteAtlas->bind(true, context, 0);
+
+        parameters.programs.fillExtrusionPattern.draw(
+            context, gl::Triangles(), depthModeForSublayer(0, gl::DepthMode::ReadWrite),
+            gl::StencilMode::disabled(), colorModeForRenderPass(),
+            FillExtrusionPatternUniforms::values(
+                tile.translatedMatrix(properties.get<FillExtrusionTranslate>(),
+                                      properties.get<FillExtrusionTranslateAnchor>(), state),
+                *imagePosA, *imagePosB, properties.get<FillExtrusionPattern>(), tile.id, state,
+                -std::pow(2, tile.id.canonical.z) / util::tileSize / 8.0f, color3f, lightPos,
+                lightIntensity),
+            *bucket.vertexBuffer, *bucket.indexBuffer, bucket.triangleSegments,
+            bucket.paintPropertyBinders.at(layer.getID()), properties, state.getZoom());
 
     } else {
-        auto draw = [&] (auto& program) {
-            program.draw(
-                         context,
-                         gl::Triangles(),
-                         depthModeForSublayer(0, gl::DepthMode::ReadWrite),
-                         gl::StencilMode::disabled(),
-                         colorModeForRenderPass(),
-                         FillExtrusionProgram::UniformValues {
-                             uniforms::u_matrix::Value{
-                                 tile.translatedMatrix(properties.get<FillExtrusionTranslate>(),
-                                                       properties.get<FillExtrusionTranslateAnchor>(),
-                                                       state)
-                             },
-                             uniforms::u_lightcolor::Value{ {{ lightcolor.r, lightcolor.g, lightcolor.b }} },
-                             uniforms::u_lightpos::Value{ lightvec },
-                             uniforms::u_lightintensity::Value{ light.get<LightIntensity>() }
-                         },
-                         *bucket.vertexBuffer,
-                         *bucket.indexBuffer,
-                         bucket.triangleSegments,
-                         bucket.paintPropertyBinders.at(layer.getID()),
-                         properties,
-                         state.getZoom()
-                         );
-        };
-
-        draw(parameters.programs.fillExtrusion);
-    }
+        parameters.programs.fillExtrusion.draw(
+            context, gl::Triangles(), depthModeForSublayer(0, gl::DepthMode::ReadWrite),
+            gl::StencilMode::disabled(), colorModeForRenderPass(),
+            FillExtrusionProgram::UniformValues{
+                uniforms::u_matrix::Value{
+                    tile.translatedMatrix(properties.get<FillExtrusionTranslate>(),
+                                          properties.get<FillExtrusionTranslateAnchor>(), state) },
+                uniforms::u_lightcolor::Value{ color3f }, uniforms::u_lightpos::Value{ lightPos },
+                uniforms::u_lightintensity::Value{ lightIntensity } },
+            *bucket.vertexBuffer, *bucket.indexBuffer, bucket.triangleSegments,
+            bucket.paintPropertyBinders.at(layer.getID()), properties, state.getZoom());
+    };
 }
 
 } // namespace mbgl

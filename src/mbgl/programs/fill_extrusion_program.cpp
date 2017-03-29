@@ -18,16 +18,14 @@ FillExtrusionPatternUniforms::values(mat4 matrix,
                                      const UnwrappedTileID& tileID,
                                      const TransformState& state,
                                      const float heightFactor,
-                                     const Style& style) {
+                                     const std::array<float, 3>& lightColor,
+                                     const std::array<float, 3>& lightPos,
+                                     const float lightIntensity) {
     int32_t tileSizeAtNearestZoom =
         util::tileSize * state.zoomScale(state.getIntegerZoom() - tileID.canonical.z);
     int32_t pixelX = tileSizeAtNearestZoom *
                      (tileID.canonical.x + tileID.wrap * state.zoomScale(tileID.canonical.z));
     int32_t pixelY = tileSizeAtNearestZoom * tileID.canonical.y;
-
-    const auto light = style.light.evaluated;
-    const auto color = light.get<LightColor>();
-    const auto position = light.get<LightPosition>();
 
     return FillExtrusionPatternUniforms::Values{
         uniforms::u_matrix::Value{ matrix }, uniforms::u_pattern_tl_a::Value{ a.tl },
@@ -42,9 +40,9 @@ FillExtrusionPatternUniforms::values(mat4 matrix,
         uniforms::u_tile_units_to_pixels::Value{
             1.0f / tileID.pixelsToTileUnits(1.0f, state.getIntegerZoom()) },
         uniforms::u_height_factor::Value{ heightFactor },
-        uniforms::u_lightcolor::Value{ { { color.r, color.g, color.b } } },
-        uniforms::u_lightpos::Value{ position.get() },
-        uniforms::u_lightintensity::Value{ light.get<LightIntensity>() },
+        uniforms::u_lightcolor::Value{ lightColor },
+        uniforms::u_lightpos::Value{ lightPos },
+        uniforms::u_lightintensity::Value{ lightIntensity },
     };
 }
 

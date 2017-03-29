@@ -5,6 +5,7 @@
 #include <mbgl/util/color.hpp>
 #include <mbgl/util/enum.hpp>
 #include <mbgl/util/string.hpp>
+#include <mbgl/util/position.hpp>
 
 #include <array>
 #include <string>
