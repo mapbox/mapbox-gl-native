@@ -209,7 +209,7 @@ public:
     {
         self.accessibilityTraits = UIAccessibilityTraitButton;
         self.accessibilityLabel = [self.accessibilityContainer accessibilityLabel];
-        self.accessibilityHint = @"Returns to the map";
+        self.accessibilityHint = NSLocalizedStringWithDefaultValue(@"CLOSE_CALLOUT_A11Y_HINT", nil, nil, @"Returns to the map", @"Accessibility hint for closing the selected annotation’s callout view and returning to the map");
     }
     return self;
 }

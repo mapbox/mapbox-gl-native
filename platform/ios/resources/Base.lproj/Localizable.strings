@@ -10,6 +10,9 @@
 /* No comment provided by engineer. */
 "CANCEL" = "Cancel";
 
+/* Accessibility hint for closing the selected annotation’s callout view and returning to the map */
+"CLOSE_CALLOUT_A11Y_HINT" = "Returns to the map";
+
 /* Accessibility hint */
 "COMPASS_A11Y_HINT" = "Rotates the map to face due north";
 
@@ -52,12 +55,11 @@
 /* Action sheet title */
 "SDK_NAME" = "Mapbox iOS SDK";
 
+/* Developer-only SDK update notification; {latest version, in format x.x.x} */
+"SDK_UPDATE_AVAILABLE" = "Mapbox iOS SDK version %@ is now available:";
 
 /* User-friendly error description */
 "STYLE_NOT_FOUND_DESC" = "The map failed to load because the style can’t be found or is incompatible.";
-
-/* Developer-only SDK update notification; {latest version, in format x.x.x} */
-"SDK_UPDATE_AVAILABLE" = "Mapbox iOS SDK version %@ is now available:";
 
 /* Telemetry prompt message */
 "TELEMETRY_DISABLED_MSG" = "You can help make OpenStreetMap and Mapbox maps better by contributing anonymous usage data.";
