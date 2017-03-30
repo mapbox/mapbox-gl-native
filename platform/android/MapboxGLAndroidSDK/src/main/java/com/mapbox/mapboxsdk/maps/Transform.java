@@ -13,8 +13,6 @@ import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.widgets.MyLocationView;
 
-import java.util.concurrent.TimeUnit;
-
 import timber.log.Timber;
 
 import static com.mapbox.mapboxsdk.maps.MapView.REGION_DID_CHANGE_ANIMATED;
@@ -108,7 +106,7 @@ final class Transform implements MapView.OnMapChangedListener {
         mapView.addOnMapChangedListener(this);
       }
 
-      mapView.easeTo(cameraPosition.bearing, cameraPosition.target, getDurationNano(durationMs), cameraPosition.tilt,
+      mapView.easeTo(cameraPosition.bearing, cameraPosition.target, durationMs, cameraPosition.tilt,
         cameraPosition.zoom, easingInterpolator);
     }
   }
@@ -126,7 +124,7 @@ final class Transform implements MapView.OnMapChangedListener {
         mapView.addOnMapChangedListener(this);
       }
 
-      mapView.flyTo(cameraPosition.bearing, cameraPosition.target, getDurationNano(durationMs), cameraPosition.tilt,
+      mapView.flyTo(cameraPosition.bearing, cameraPosition.target, durationMs, cameraPosition.tilt,
         cameraPosition.zoom);
     }
   }
@@ -159,10 +157,6 @@ final class Transform implements MapView.OnMapChangedListener {
 
   void setOnCameraChangeListener(@Nullable MapboxMap.OnCameraChangeListener listener) {
     this.onCameraChangeListener = listener;
-  }
-
-  private long getDurationNano(long durationMs) {
-    return durationMs > 0 ? TimeUnit.NANOSECONDS.convert(durationMs, TimeUnit.MILLISECONDS) : 0;
   }
 
   //

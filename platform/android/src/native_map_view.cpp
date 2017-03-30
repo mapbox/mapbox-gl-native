@@ -397,7 +397,7 @@ void NativeMapView::easeTo(jni::JNIEnv&, jni::jdouble angle, jni::jdouble latitu
     }
 
     mbgl::AnimationOptions animationOptions;
-    animationOptions.duration.emplace(mbgl::Duration(duration));
+    animationOptions.duration.emplace(mbgl::Milliseconds(duration));
     if (!easing) {
        // add a linear interpolator instead of easing
        animationOptions.easing.emplace(mbgl::util::UnitBezier { 0, 0, 1, 1 });
@@ -421,7 +421,7 @@ void NativeMapView::flyTo(jni::JNIEnv&, jni::jdouble angle, jni::jdouble latitud
     }
 
     mbgl::AnimationOptions animationOptions;
-    animationOptions.duration.emplace(mbgl::Duration(duration));
+    animationOptions.duration.emplace(mbgl::Milliseconds(duration));
     map->flyTo(cameraOptions, animationOptions);
 }
 
