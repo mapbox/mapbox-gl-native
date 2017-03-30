@@ -534,3 +534,42 @@ TEST(Transform, DefaultTransform) {
     ASSERT_DOUBLE_EQ(point.x, center.x);
     ASSERT_DOUBLE_EQ(point.y, center.y);
 }
+
+TEST(Transform, LatLngBounds) {
+    const LatLng nullIsland {};
+    const LatLng sanFrancisco { 37.7749, -122.4194 };
+
+    Transform transform;
+    transform.resize({ 1000, 1000 });
+    transform.setLatLngZoom({ 0, 0 }, transform.getState().getMaxZoom());
+
+    // Default bounds.
+    ASSERT_EQ(transform.getState().getLatLngBounds(), LatLngBounds::world());
+    ASSERT_EQ(transform.getLatLng(), nullIsland);
+
+    // Invalid bounds.
+    transform.setLatLngBounds(LatLngBounds::empty());
+    ASSERT_EQ(transform.getState().getLatLngBounds(), LatLngBounds::world());
+
+    transform.setLatLng(sanFrancisco);
+    ASSERT_EQ(transform.getLatLng(), sanFrancisco);
+
+    // Single location.
+    transform.setLatLngBounds(LatLngBounds::singleton(sanFrancisco));
+    ASSERT_EQ(transform.getLatLng(), sanFrancisco);
+
+    transform.setLatLngBounds(LatLngBounds::hull({ -90.0, -180.0 }, { 0.0, 180.0 }));
+    transform.setLatLng(sanFrancisco);
+    ASSERT_EQ(transform.getLatLng().latitude(), 0.0);
+    ASSERT_EQ(transform.getLatLng().longitude(), sanFrancisco.longitude());
+
+    transform.setLatLngBounds(LatLngBounds::hull({ -90.0, 0.0 }, { 90.0, 180.0 }));
+    transform.setLatLng(sanFrancisco);
+    ASSERT_EQ(transform.getLatLng().latitude(), sanFrancisco.latitude());
+    ASSERT_EQ(transform.getLatLng().longitude(), 0.0);
+
+    transform.setLatLngBounds(LatLngBounds::hull({ -90.0, 0.0 }, { 0.0, 180.0 }));
+    transform.setLatLng(sanFrancisco);
+    ASSERT_EQ(transform.getLatLng().latitude(), 0.0);
+    ASSERT_EQ(transform.getLatLng().longitude(), 0.0);
+}

@@ -57,6 +57,7 @@ public:
 
     // Bounds
 
+    void setLatLngBounds(const LatLngBounds&);
     void setMinZoom(double);
     void setMaxZoom(double);
 

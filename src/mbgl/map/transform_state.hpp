@@ -51,6 +51,8 @@ public:
     double getZoomFraction() const;
 
     // Bounds
+    void setLatLngBounds(const LatLngBounds&);
+    LatLngBounds getLatLngBounds() const;
     void setMinZoom(double);
     double getMinZoom() const;
     void setMaxZoom(double);
@@ -83,6 +85,8 @@ public:
 private:
     bool rotatedNorth() const;
     void constrain(double& scale, double& x, double& y) const;
+
+    LatLngBounds bounds = LatLngBounds::world();
 
     // Limit the amount of zooming possible on the map.
     double min_scale = std::pow(2, 0);

@@ -142,6 +142,15 @@ double TransformState::getScale() const {
 
 #pragma mark - Bounds
 
+void TransformState::setLatLngBounds(const LatLngBounds& bounds_) {
+    bounds = bounds_;
+    setLatLngZoom(getLatLng(LatLng::Unwrapped), getZoom());
+}
+
+LatLngBounds TransformState::getLatLngBounds() const {
+    return bounds;
+}
+
 void TransformState::setMinZoom(const double minZoom) {
     if (minZoom <= getMaxZoom()) {
         min_scale = zoomScale(util::clamp(minZoom, util::MIN_ZOOM, util::MAX_ZOOM));
@@ -324,16 +333,18 @@ void TransformState::moveLatLng(const LatLng& latLng, const ScreenCoordinate& an
 }
 
 void TransformState::setLatLngZoom(const LatLng &latLng, double zoom) {
+    const LatLng constrained = bounds.constrain(latLng);
+
     double newScale = zoomScale(zoom);
     const double newWorldSize = newScale * util::tileSize;
     Bc = newWorldSize / util::DEGREES_MAX;
     Cc = newWorldSize / util::M2PI;
 
     const double m = 1 - 1e-15;
-    const double f = util::clamp(std::sin(util::DEG2RAD * latLng.latitude()), -m, m);
+    const double f = util::clamp(std::sin(util::DEG2RAD * constrained.latitude()), -m, m);
 
     ScreenCoordinate point = {
-        -latLng.longitude() * Bc,
+        -constrained.longitude() * Bc,
         0.5 * Cc * std::log((1 + f) / (1 - f)),
     };
     setScalePoint(newScale, point);
