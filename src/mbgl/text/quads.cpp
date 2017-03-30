@@ -18,7 +18,7 @@ const float globalMinScale = 0.5f; // underscale by 1 zoom level
 SymbolQuad getIconQuad(const Anchor& anchor,
                        const PositionedIcon& shapedIcon,
                        const GeometryCoordinates& line,
-                       const SymbolLayoutProperties::PossiblyEvaluated& layout,
+                       const SymbolLayoutProperties::Evaluated& layout,
                        const style::SymbolPlacementType placement, 
                        const Shaping& shapedText) {
     auto image = *(shapedIcon.image);
@@ -292,7 +292,7 @@ SymbolQuads getGlyphQuads(Anchor& anchor,
                           const Shaping& shapedText,
                           const float boxScale,
                           const GeometryCoordinates& line,
-                          const SymbolLayoutProperties::PossiblyEvaluated& layout,
+                          const SymbolLayoutProperties::Evaluated& layout,
                           const style::SymbolPlacementType placement,
                           const GlyphPositions& face) {
     const float textRotate = layout.get<TextRotate>() * util::DEG2RAD;

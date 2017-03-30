@@ -54,7 +54,7 @@ typedef std::vector<SymbolQuad> SymbolQuads;
 SymbolQuad getIconQuad(const Anchor& anchor,
                        const PositionedIcon& shapedIcon,
                        const GeometryCoordinates& line,
-                       const style::SymbolLayoutProperties::PossiblyEvaluated&,
+                       const style::SymbolLayoutProperties::Evaluated&,
                        style::SymbolPlacementType placement,
                        const Shaping& shapedText);
 
@@ -62,7 +62,7 @@ SymbolQuads getGlyphQuads(Anchor& anchor,
                           const Shaping& shapedText,
                           const float boxScale,
                           const GeometryCoordinates& line,
-                          const style::SymbolLayoutProperties::PossiblyEvaluated&,
+                          const style::SymbolLayoutProperties::Evaluated&,
                           style::SymbolPlacementType placement,
                           const GlyphPositions& face);
 
