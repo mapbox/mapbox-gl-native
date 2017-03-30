@@ -724,7 +724,8 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
         annot.coordinate = self.mapView.centerCoordinate;
         [self.mapView addAnnotation:annot];
         
-        CGPoint point = CGPointMake(-200, CGRectGetMidY(self.view.frame));
+        // Move the annotation to a point that is offscreen.
+        CGPoint point = CGPointMake(self.view.frame.origin.x - 200, CGRectGetMidY(self.view.frame));
         
         CLLocationCoordinate2D coord = [self.mapView convertPoint:point toCoordinateFromView:self.view];
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
