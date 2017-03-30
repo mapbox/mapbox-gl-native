@@ -1,36 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
-
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="@color/primary"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
 
     <com.mapbox.mapboxsdk.maps.MapView
         android:id="@id/mapView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/toolbar"
         app:mapbox_cameraTargetLat="1.350057"
         app:mapbox_cameraTargetLng="103.849218"
-        app:mapbox_styleUrl="@string/mapbox_style_dark"
-        app:mapbox_cameraZoom="10"/>
+        app:mapbox_cameraZoom="10"
+        app:mapbox_styleUrl="@string/mapbox_style_mapbox_streets"/>
 
     <android.support.design.widget.FloatingActionButton
-        android:id="@id/fab"
+        android:id="@+id/fab_route"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
-        android:layout_margin="@dimen/fab_margin"
+        android:layout_marginBottom="@dimen/fab_margin"
+        android:layout_marginRight="@dimen/fab_margin"
         android:src="@drawable/ic_directions_bus_black"
-        app:backgroundTint="@android:color/white" />
+        app:backgroundTint="@android:color/white"/>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_style"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/fab_route"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginBottom="@dimen/fab_margin"
+        android:layout_marginRight="@dimen/fab_margin"
+        android:src="@drawable/ic_layers"
+        app:backgroundTint="@color/primary"/>
 
 </RelativeLayout>
