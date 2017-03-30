@@ -140,6 +140,8 @@ double TransformState::getScale() const {
     return scale;
 }
 
+#pragma mark - Bounds
+
 void TransformState::setMinZoom(const double minZoom) {
     if (minZoom <= getMaxZoom()) {
         min_scale = zoomScale(util::clamp(minZoom, util::MIN_ZOOM, util::MAX_ZOOM));

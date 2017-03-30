@@ -55,6 +55,11 @@ public:
     LatLng getLatLng(optional<EdgeInsets> = {}) const;
     ScreenCoordinate getScreenCoordinate(optional<EdgeInsets> = {}) const;
 
+    // Bounds
+
+    void setMinZoom(double);
+    void setMaxZoom(double);
+
     // Zoom
 
     /** Scales the map, keeping the given point fixed within the view.
@@ -93,9 +98,6 @@ public:
     double getZoom() const;
     /** Returns the scale factor. */
     double getScale() const;
-
-    void setMinZoom(const double minZoom);
-    void setMaxZoom(const double maxZoom);
 
     // Angle
 

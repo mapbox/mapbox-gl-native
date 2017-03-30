@@ -49,9 +49,11 @@ public:
     double getZoom() const;
     int32_t getIntegerZoom() const;
     double getZoomFraction() const;
-    void setMinZoom(const double minZoom);
+
+    // Bounds
+    void setMinZoom(double);
     double getMinZoom() const;
-    void setMaxZoom(const double maxZoom);
+    void setMaxZoom(double);
     double getMaxZoom() const;
 
     // Rotation
