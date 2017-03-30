@@ -6,6 +6,7 @@
 #include <mbgl/style/conversion/light.hpp>
 #include <mbgl/util/rapidjson.hpp>
 #include <mbgl/util/color.hpp>
+#include <mbgl/util/position.hpp>
 
 #include <array>
 
@@ -46,8 +47,7 @@ TEST(StyleConversion, Light) {
 
         ASSERT_FALSE(light->get<LightPosition>().isUndefined());
         ASSERT_TRUE(light->get<LightPosition>().isConstant());
-        const auto maybeEq = std::array<float, 3>{{ 3.0f, 90.0f, 90.0f }};
-        ASSERT_EQ(light->get<LightPosition>().asConstant(), maybeEq);
+        ASSERT_EQ(light->get<LightPosition>().asConstant(), mbgl::style::Position({{{ 3, 90, 90 }}}));
         ASSERT_FALSE(light->get<LightPosition>().isCameraFunction());
     }
 
