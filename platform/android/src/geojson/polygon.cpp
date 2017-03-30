@@ -2,6 +2,8 @@
 
 #include "multi_line_string.hpp"
 
+#include "util.hpp"
+
 namespace mbgl {
 namespace android {
 namespace geojson {
@@ -24,7 +26,9 @@ mapbox::geojson::polygon Polygon::convert(jni::JNIEnv &env, jni::Object<java::ut
     if (jPositionListsList) {
         auto multiLine = MultiLineString::convert(env, jPositionListsList);
         polygon.reserve(multiLine.size());
-        polygon.insert(std::end(polygon), std::begin(multiLine), std::end(multiLine));
+        for (auto&& line : multiLine) {
+            polygon.emplace_back(convertExplicit<mapbox::geojson::linear_ring>(std::move(line)));
+        }
     }
 
     return polygon;
