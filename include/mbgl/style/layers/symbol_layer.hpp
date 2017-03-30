@@ -135,9 +135,9 @@ public:
     PropertyValue<float> getTextMaxAngle() const;
     void setTextMaxAngle(PropertyValue<float>);
 
-    static PropertyValue<float> getDefaultTextRotate();
-    PropertyValue<float> getTextRotate() const;
-    void setTextRotate(PropertyValue<float>);
+    static DataDrivenPropertyValue<float> getDefaultTextRotate();
+    DataDrivenPropertyValue<float> getTextRotate() const;
+    void setTextRotate(DataDrivenPropertyValue<float>);
 
     static PropertyValue<float> getDefaultTextPadding();
     PropertyValue<float> getTextPadding() const;

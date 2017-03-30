@@ -1294,6 +1294,114 @@ public class SymbolLayerTest extends BaseStyleTest {
 
 
   @Test
+  public void testTextRotateAsIdentitySourceFunction() {
+    checkViewIsDisplayed(R.id.mapView);
+    Timber.i("text-rotate");
+    assertNotNull(layer);
+
+    // Set
+    layer.setProperties(
+      textRotate(property("FeaturePropertyA", Stops.<Float>identity()))
+    );
+
+    // Verify
+    assertNotNull(layer.getTextRotate());
+    assertNotNull(layer.getTextRotate().getFunction());
+    assertEquals(SourceFunction.class, layer.getTextRotate().getFunction().getClass());
+    assertEquals("FeaturePropertyA", ((SourceFunction) layer.getTextRotate().getFunction()).getProperty());
+    assertEquals(IdentityStops.class, layer.getTextRotate().getFunction().getStops().getClass());
+  }
+
+  @Test
+  public void testTextRotateAsExponentialSourceFunction() {
+    checkViewIsDisplayed(R.id.mapView);
+    Timber.i("text-rotate");
+    assertNotNull(layer);
+
+    // Set
+    layer.setProperties(
+      textRotate(
+        property(
+          "FeaturePropertyA",
+          exponential(
+            stop(0.3f, textRotate(0.3f))
+          ).withBase(0.5f)
+        )
+      )
+    );
+
+    // Verify
+    assertNotNull(layer.getTextRotate());
+    assertNotNull(layer.getTextRotate().getFunction());
+    assertEquals(SourceFunction.class, layer.getTextRotate().getFunction().getClass());
+    assertEquals("FeaturePropertyA", ((SourceFunction) layer.getTextRotate().getFunction()).getProperty());
+    assertEquals(ExponentialStops.class, layer.getTextRotate().getFunction().getStops().getClass());
+  }
+
+  @Test
+  public void testTextRotateAsCategoricalSourceFunction() {
+    checkViewIsDisplayed(R.id.mapView);
+    Timber.i("text-rotate");
+    assertNotNull(layer);
+
+    // Set
+    layer.setProperties(
+      textRotate(
+        property(
+          "FeaturePropertyA",
+          categorical(
+            stop(1.0f, textRotate(0.3f))
+          )
+        ).withDefaultValue(textRotate(0.3f))
+      )
+    );
+
+    // Verify
+    assertNotNull(layer.getTextRotate());
+    assertNotNull(layer.getTextRotate().getFunction());
+    assertEquals(SourceFunction.class, layer.getTextRotate().getFunction().getClass());
+    assertEquals("FeaturePropertyA", ((SourceFunction) layer.getTextRotate().getFunction()).getProperty());
+    assertEquals(CategoricalStops.class, layer.getTextRotate().getFunction().getStops().getClass());
+    assertNotNull(((SourceFunction) layer.getTextRotate().getFunction()).getDefaultValue());
+    assertNotNull(((SourceFunction) layer.getTextRotate().getFunction()).getDefaultValue().getValue());
+    assertEquals(0.3f, ((SourceFunction) layer.getTextRotate().getFunction()).getDefaultValue().getValue());
+  }
+
+  @Test
+  public void testTextRotateAsCompositeFunction() {
+    checkViewIsDisplayed(R.id.mapView);
+    Timber.i("text-rotate");
+    assertNotNull(layer);
+
+    // Set
+    layer.setProperties(
+      textRotate(
+        composite(
+          "FeaturePropertyA",
+          exponential(
+            stop(0, 0.3f, textRotate(0.9f))
+          ).withBase(0.5f)
+        ).withDefaultValue(textRotate(0.3f))
+      )
+    );
+
+    // Verify
+    assertNotNull(layer.getTextRotate());
+    assertNotNull(layer.getTextRotate().getFunction());
+    assertEquals(CompositeFunction.class, layer.getTextRotate().getFunction().getClass());
+    assertEquals("FeaturePropertyA", ((CompositeFunction) layer.getTextRotate().getFunction()).getProperty());
+    assertEquals(ExponentialStops.class, layer.getTextRotate().getFunction().getStops().getClass());
+    assertEquals(1, ((ExponentialStops) layer.getTextRotate().getFunction().getStops()).size());
+
+    ExponentialStops<Stop.CompositeValue<Float, Float>, Float> stops =
+      (ExponentialStops<Stop.CompositeValue<Float, Float>, Float>) layer.getTextRotate().getFunction().getStops();
+    Stop<Stop.CompositeValue<Float, Float>, Float> stop = stops.iterator().next();
+    assertEquals(0f, stop.in.zoom, 0.001);
+    assertEquals(0.3f, stop.in.value, 0.001f);
+    assertEquals(0.9f, stop.out, 0.001f);
+  }
+
+  @Test
   public void testTextPaddingAsConstant() {
     checkViewIsDisplayed(R.id.mapView);
     Timber.i("text-padding");

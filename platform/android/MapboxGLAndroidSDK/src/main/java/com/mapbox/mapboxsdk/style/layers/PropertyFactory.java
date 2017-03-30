@@ -1963,11 +1963,11 @@ public class PropertyFactory {
   /**
    * Rotates the text clockwise.
    *
-   * @param <Z> the zoom parameter type
-   * @param function a wrapper {@link CameraFunction} for Float
+   * @param <T> the function input type
+   * @param function a wrapper function for Float
    * @return property wrapper around a Float function
    */
-  public static <Z extends Number> PropertyValue<CameraFunction<Z, Float>> textRotate(CameraFunction<Z, Float> function) {
+  public static <T> PropertyValue<Function<T, Float>> textRotate(Function<T, Float> function) {
     return new LayoutPropertyValue<>("text-rotate", function);
   }
 

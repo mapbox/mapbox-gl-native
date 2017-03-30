@@ -1332,7 +1332,7 @@
 
         MGLStyleValue<NSNumber *> *constantStyleValue = [MGLStyleValue<NSNumber *> valueWithRawValue:@0xff];
         layer.textRotation = constantStyleValue;
-        mbgl::style::PropertyValue<float> propertyValue = { 0xff };
+        mbgl::style::DataDrivenPropertyValue<float> propertyValue = { 0xff };
         XCTAssertEqual(rawLayer->getTextRotate(), propertyValue,
                        @"Setting textRotation to a constant value should update text-rotate.");
         XCTAssertEqualObjects(layer.textRotation, constantStyleValue,
@@ -1349,6 +1349,29 @@
         XCTAssertEqualObjects(layer.textRotation, functionStyleValue,
                               @"textRotation should round-trip camera functions.");
 
+        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeExponential sourceStops:@{@18: constantStyleValue} attributeName:@"keyName" options:nil];
+        layer.textRotation = functionStyleValue;
+
+        mbgl::style::ExponentialStops<float> exponentialStops = { {{18, 0xff}}, 1.0 };
+        propertyValue = mbgl::style::SourceFunction<float> { "keyName", exponentialStops };
+
+        XCTAssertEqual(rawLayer->getTextRotate(), propertyValue,
+                       @"Setting textRotation to a source function should update text-rotate.");
+        XCTAssertEqualObjects(layer.textRotation, functionStyleValue,
+                              @"textRotation should round-trip source functions.");
+
+        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeExponential compositeStops:@{@10: @{@18: constantStyleValue}} attributeName:@"keyName" options:nil];
+        layer.textRotation = functionStyleValue;
+
+        std::map<float, float> innerStops { {18, 0xff} };
+        mbgl::style::CompositeExponentialStops<float> compositeStops { { {10.0, innerStops} }, 1.0 };
+
+        propertyValue = mbgl::style::CompositeFunction<float> { "keyName", compositeStops };
+
+        XCTAssertEqual(rawLayer->getTextRotate(), propertyValue,
+                       @"Setting textRotation to a composite function should update text-rotate.");
+        XCTAssertEqualObjects(layer.textRotation, functionStyleValue,
+                              @"textRotation should round-trip composite functions.");                                                                                                          
                               
 
         layer.textRotation = nil;
@@ -1356,11 +1379,6 @@
                       @"Unsetting textRotation should return text-rotate to the default value.");
         XCTAssertEqualObjects(layer.textRotation, defaultStyleValue,
                               @"textRotation should return the default value after being unset.");
-
-        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeIdentity sourceStops:nil attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.textRotation = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
-        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.textRotation = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
     }
 
     // text-rotation-alignment
