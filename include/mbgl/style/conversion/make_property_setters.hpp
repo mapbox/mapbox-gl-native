@@ -56,7 +56,7 @@ auto makeLayoutPropertySetters() {
     result["text-justify"] = &setLayoutProperty<V, SymbolLayer, PropertyValue<TextJustifyType>, &SymbolLayer::setTextJustify>;
     result["text-anchor"] = &setLayoutProperty<V, SymbolLayer, PropertyValue<TextAnchorType>, &SymbolLayer::setTextAnchor>;
     result["text-max-angle"] = &setLayoutProperty<V, SymbolLayer, PropertyValue<float>, &SymbolLayer::setTextMaxAngle>;
-    result["text-rotate"] = &setLayoutProperty<V, SymbolLayer, PropertyValue<float>, &SymbolLayer::setTextRotate>;
+    result["text-rotate"] = &setLayoutProperty<V, SymbolLayer, DataDrivenPropertyValue<float>, &SymbolLayer::setTextRotate>;
     result["text-padding"] = &setLayoutProperty<V, SymbolLayer, PropertyValue<float>, &SymbolLayer::setTextPadding>;
     result["text-keep-upright"] = &setLayoutProperty<V, SymbolLayer, PropertyValue<bool>, &SymbolLayer::setTextKeepUpright>;
     result["text-transform"] = &setLayoutProperty<V, SymbolLayer, DataDrivenPropertyValue<TextTransformType>, &SymbolLayer::setTextTransform>;

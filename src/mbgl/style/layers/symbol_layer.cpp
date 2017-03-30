@@ -427,15 +427,15 @@ void SymbolLayer::setTextMaxAngle(PropertyValue<float> value) {
     impl->layout.unevaluated.get<TextMaxAngle>() = value;
     impl->observer->onLayerLayoutPropertyChanged(*this, "text-max-angle");
 }
-PropertyValue<float> SymbolLayer::getDefaultTextRotate() {
+DataDrivenPropertyValue<float> SymbolLayer::getDefaultTextRotate() {
     return TextRotate::defaultValue();
 }
 
-PropertyValue<float> SymbolLayer::getTextRotate() const {
+DataDrivenPropertyValue<float> SymbolLayer::getTextRotate() const {
     return impl->layout.unevaluated.get<TextRotate>();
 }
 
-void SymbolLayer::setTextRotate(PropertyValue<float> value) {
+void SymbolLayer::setTextRotate(DataDrivenPropertyValue<float> value) {
     if (value == getTextRotate())
         return;
     impl->layout.unevaluated.get<TextRotate>() = value;

@@ -140,7 +140,7 @@ struct TextMaxAngle : LayoutProperty<float> {
     static float defaultValue() { return 45; }
 };
 
-struct TextRotate : LayoutProperty<float> {
+struct TextRotate : DataDrivenLayoutProperty<float> {
     static constexpr const char * key = "text-rotate";
     static float defaultValue() { return 0; }
 };

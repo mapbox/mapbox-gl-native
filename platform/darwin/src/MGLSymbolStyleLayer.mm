@@ -831,7 +831,7 @@ namespace mbgl {
 - (void)setTextRotation:(MGLStyleValue<NSNumber *> *)textRotation {
     MGLAssertStyleLayerIsValid();
 
-    auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toInterpolatablePropertyValue(textRotation);
+    auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toDataDrivenPropertyValue(textRotation);
     self.rawLayer->setTextRotate(mbglValue);
 }
 
@@ -840,9 +840,9 @@ namespace mbgl {
 
     auto propertyValue = self.rawLayer->getTextRotate();
     if (propertyValue.isUndefined()) {
-        return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(self.rawLayer->getDefaultTextRotate());
+        return MGLStyleValueTransformer<float, NSNumber *>().toDataDrivenStyleValue(self.rawLayer->getDefaultTextRotate());
     }
-    return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(propertyValue);
+    return MGLStyleValueTransformer<float, NSNumber *>().toDataDrivenStyleValue(propertyValue);
 }
 
 - (void)setTextRotate:(MGLStyleValue<NSNumber *> *)textRotate {

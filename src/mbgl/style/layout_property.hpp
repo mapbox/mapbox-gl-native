@@ -40,14 +40,14 @@ public:
     /*
         For layout properties we implement a two step evaluation process: if you have a zoom level,
         you can evaluate a set of unevaluated property values, producing a set of possibly evaluated
-        values, where non-data-driven property values have been fully evaluated, and data-driven values
-        have not.
+        values, where undefined, constant, or camera function values have been fully evaluated, and
+        source or composite function values have not.
 
         Once you also have a particular feature, you can evaluate that set of possibly evaluated values
         fully, producing a set of fully evaluated values.
 
         This is in theory maximally efficient in terms of avoiding repeated evaluation of camera
-        functions, though it's more of a historical accident that a purposeful optimization.
+        functions, though it's more of a historical accident than a purposeful optimization.
     */
 
     using       UnevaluatedTypes = TypeList<typename Ps::UnevaluatedType...>;
