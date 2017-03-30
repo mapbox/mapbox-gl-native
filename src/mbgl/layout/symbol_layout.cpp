@@ -347,7 +347,7 @@ void SymbolLayout::addFeature(const std::size_t index,
 
         const bool addToBuffers = mode == MapMode::Still || withinPlus0;
 
-        symbolInstances.emplace_back(anchor, line, shapedTextOrientations, shapedIcon, layout, addToBuffers, symbolInstances.size(),
+        symbolInstances.emplace_back(anchor, line, shapedTextOrientations, shapedIcon, layout.evaluate(zoom, feature), addToBuffers, symbolInstances.size(),
                 textBoxScale, textPadding, textPlacement,
                 iconBoxScale, iconPadding, iconPlacement,
                 face, indexedFeature, index);

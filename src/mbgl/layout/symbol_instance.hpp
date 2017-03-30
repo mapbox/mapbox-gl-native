@@ -16,7 +16,7 @@ public:
                    const GeometryCoordinates& line,
                    const std::pair<Shaping, Shaping>& shapedTextOrientations,
                    const PositionedIcon& shapedIcon,
-                   const style::SymbolLayoutProperties::PossiblyEvaluated&,
+                   const style::SymbolLayoutProperties::Evaluated&,
                    const bool inside,
                    const uint32_t index,
                    const float textBoxScale,
