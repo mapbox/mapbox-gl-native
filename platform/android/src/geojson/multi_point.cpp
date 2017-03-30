@@ -2,6 +2,8 @@
 
 #include "line_string.hpp"
 
+#include "util.hpp"
+
 namespace mbgl {
 namespace android {
 namespace geojson {
@@ -11,7 +13,7 @@ mapbox::geojson::multi_point MultiPoint::convert(jni::JNIEnv &env, jni::Object<M
 
     if (jMultiPoint) {
         auto jPositionListsList = MultiPoint::getCoordinates(env, jMultiPoint);
-        multiPoint = LineString::convert(env, jPositionListsList);
+        multiPoint = convertExplicit<mapbox::geojson::multi_point>(LineString::convert(env, jPositionListsList));
         jni::DeleteLocalRef(env, jPositionListsList);
     }
 
