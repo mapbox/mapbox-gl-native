@@ -54,6 +54,7 @@
     <string name="activity_simple_map">Simple Map</string>
     <string name="activity_map_in_dialog">Dialog with map</string>
     <string name="activity_marker_view_rectangle">Marker views in rectangle</string>
+    <string name="activity_url_transform">Url transform</string>
 
     <!--Description-->
     <string name="description_user_location_tracking">Tracks the location of the user</string>
@@ -107,6 +108,7 @@
     <string name="description_map_in_dialog">Display a map inside a dialog fragment</string>
     <string name="description_marker_view_rectangle">Marker Views within a rectangle</string>
     <string name="description_circle_layer">Show bus stops and route in Singapore</string>
+    <string name="description_url_transform">Transform urls on the fly</string>
 
     <!--Categories-->
     <string name="category">category</string>
@@ -122,6 +124,7 @@
     <string name="category_userlocation">User Location</string>
     <string name="category_style">Styling</string>
     <string name="category_features">Features</string>
+    <string name="category_storage">Storage</string>
 
     <!--Actions-->
     <string name="action_remove_polylines">Remove polylines</string>
