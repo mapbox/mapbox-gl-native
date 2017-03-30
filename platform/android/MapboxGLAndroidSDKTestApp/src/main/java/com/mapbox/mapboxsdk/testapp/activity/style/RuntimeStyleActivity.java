@@ -259,8 +259,8 @@ public class RuntimeStyleActivity extends AppCompatActivity {
   private void setWaterColor() {
     Layer water = mapboxMap.getLayer("water");
     if (water != null) {
-      mapboxMap.setTransitionDuration(5);
-      mapboxMap.setTransitionDelay(1);
+      mapboxMap.setTransitionDuration(5000);
+      mapboxMap.setTransitionDelay(1000);
       water.setProperties(
         visibility(VISIBLE),
         fillColor(Color.RED)
