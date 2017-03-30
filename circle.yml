@@ -1,0 +1,84 @@
+version: 2
+
+jobs:
+
+# ------------------------------------------------------------------------------
+  build:
+    docker:
+      - image: mbgl/ci:trigger_job
+    working_directory: /
+    steps:
+      - deploy:
+          name: Trigger 'android-debug-arm-v7'
+          command: trigger_job android-debug-arm-v7
+      - deploy:
+          name: Trigger 'android-release-all'
+          command: trigger_job android-release-all
+
+# ------------------------------------------------------------------------------
+  android-debug-arm-v7:
+    docker:
+      - image: mbgl/android-ci:ndk-r13b
+    working_directory: /src
+    environment:
+      LD_PRELOAD: /usr/lib/libsysconfcpus.so
+      LIBSYSCONFCPUS: 8
+      JOBS: 8
+      BUILDTYPE: Debug
+    steps:
+      - checkout
+      - run:
+          name: Build libmapbox-gl.so for arm-v7
+          command: make android-lib-arm-v7
+      - run:
+          name: Compile Core tests for arm-v7
+          command: make android-test-lib-arm-v7
+      - run:
+          name: Test phone module
+          command: make run-android-unit-test
+      - run:
+          name: Test wear module
+          command: make run-android-wear-unit-test
+      - run:
+          name: Generate Espresso sanity tests
+          command: make test-code-android
+      - run:
+          name: Check Java code style
+          command: make android-checkstyle
+
+# ------------------------------------------------------------------------------
+  android-release-all:
+    docker:
+      - image: mbgl/android-ci:ndk-r13b
+    working_directory: /src
+    environment:
+      LD_PRELOAD: /usr/lib/libsysconfcpus.so
+      LIBSYSCONFCPUS: 8
+      JOBS: 8
+      BUILDTYPE: Release
+    steps:
+      - checkout
+      - run:
+          name: Build libmapbox-gl.so for arm-v7
+          command: make android-lib-arm-v7
+      - run:
+          name: Build libmapbox-gl.so for arm-v8
+          command: make android-lib-arm-v8
+      - run:
+          name: Build libmapbox-gl.so for arm-v5
+          command: make android-lib-arm-v5
+      - run:
+          name: Build libmapbox-gl.so for mips
+          command: make android-lib-mips
+      - run:
+          name: Build libmapbox-gl.so for x86
+          command: make android-lib-x86
+      - run:
+          name: Build libmapbox-gl.so for x86-64
+          command: make android-lib-x86-64
+      - run:
+          name: Build package
+          command: make apackage
+      - run:
+          name: Show statistics
+          command: platform/android/scripts/metrics.sh
