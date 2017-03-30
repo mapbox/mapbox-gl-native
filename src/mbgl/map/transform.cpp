@@ -435,6 +435,12 @@ void Transform::setScale(double scale, optional<EdgeInsets> padding, const Anima
 
 #pragma mark - Bounds
 
+void Transform::setLatLngBounds(const LatLngBounds& bounds) {
+    if (bounds.valid()) {
+        state.setLatLngBounds(bounds);
+    }
+}
+
 void Transform::setMinZoom(const double minZoom) {
     if (std::isnan(minZoom)) return;
     state.setMinZoom(minZoom);

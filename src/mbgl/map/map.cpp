@@ -666,6 +666,15 @@ void Map::resetZoom() {
 
 #pragma mark - Bounds
 
+LatLngBounds Map::getLatLngBounds() const {
+    return impl->transform.getState().getLatLngBounds();
+}
+
+void Map::setLatLngBounds(const LatLngBounds& bounds) {
+    impl->cameraMutated = true;
+    impl->transform.setLatLngBounds(bounds);
+    impl->onUpdate(Update::Repaint);
+}
 
 void Map::setMinZoom(const double minZoom) {
     impl->transform.setMinZoom(minZoom);
