@@ -8,7 +8,7 @@ namespace mbgl {
 
 using namespace style;
 
-SymbolBucket::SymbolBucket(style::SymbolLayoutProperties::Evaluated layout_,
+SymbolBucket::SymbolBucket(style::SymbolLayoutProperties::PossiblyEvaluated layout_,
                            const std::map<std::string, std::pair<
                                style::IconPaintProperties::Evaluated, style::TextPaintProperties::Evaluated>>& layerPaintProperties,
                            float zoom,

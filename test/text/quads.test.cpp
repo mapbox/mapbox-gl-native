@@ -10,7 +10,7 @@ using namespace mbgl;
 using namespace mbgl::style;
 
 TEST(getIconQuads, normal) {
-    SymbolLayoutProperties::Evaluated layout;
+    SymbolLayoutProperties::PossiblyEvaluated layout;
     Anchor anchor(2.0, 3.0, 0.0, 0.5f, 0);
     SpriteAtlasElement image = {
         Rect<uint16_t>( 0, 0, 15, 11 ),
@@ -59,7 +59,7 @@ TEST(getIconQuads, style) {
 
     // none
     {
-        SymbolLayoutProperties::Evaluated layout;
+        SymbolLayoutProperties::PossiblyEvaluated layout;
         SymbolQuad quad =
             getIconQuad(anchor, shapedIcon, line, layout, SymbolPlacementType::Point, shapedText);
 
@@ -80,7 +80,7 @@ TEST(getIconQuads, style) {
 
     // width
     {
-        SymbolLayoutProperties::Evaluated layout;
+        SymbolLayoutProperties::PossiblyEvaluated layout;
         layout.get<TextSize>() = 24.0f;
         layout.get<IconTextFit>() = IconTextFitType::Width;
         SymbolQuad quad =
@@ -98,7 +98,7 @@ TEST(getIconQuads, style) {
 
     // width x textSize
     {
-        SymbolLayoutProperties::Evaluated layout;
+        SymbolLayoutProperties::PossiblyEvaluated layout;
         layout.get<TextSize>() = 12.0f;
         layout.get<IconTextFit>() = IconTextFitType::Width;
         SymbolQuad quad =
@@ -116,7 +116,7 @@ TEST(getIconQuads, style) {
 
     // width x textSize + padding
     {
-        SymbolLayoutProperties::Evaluated layout;
+        SymbolLayoutProperties::PossiblyEvaluated layout;
         layout.get<TextSize>() = 12.0f;
         layout.get<IconTextFit>() = IconTextFitType::Width;
         layout.get<IconTextFitPadding>()[0] = 5.0f;
@@ -138,7 +138,7 @@ TEST(getIconQuads, style) {
 
     // height
     {
-        SymbolLayoutProperties::Evaluated layout;
+        SymbolLayoutProperties::PossiblyEvaluated layout;
         layout.get<TextSize>() = 24.0f;
         layout.get<IconTextFit>() = IconTextFitType::Height;
         SymbolQuad quad =
@@ -156,7 +156,7 @@ TEST(getIconQuads, style) {
 
     // height x textSize
     {
-        SymbolLayoutProperties::Evaluated layout;
+        SymbolLayoutProperties::PossiblyEvaluated layout;
         layout.get<TextSize>() = 12.0f;
         layout.get<IconTextFit>() = IconTextFitType::Height;
         SymbolQuad quad =
@@ -174,7 +174,7 @@ TEST(getIconQuads, style) {
 
     // height x textSize + padding
     {
-        SymbolLayoutProperties::Evaluated layout;
+        SymbolLayoutProperties::PossiblyEvaluated layout;
         layout.get<TextSize>() = 12.0f;
         layout.get<IconTextFit>() = IconTextFitType::Height;
         layout.get<IconTextFitPadding>()[0] = 5.0f;
@@ -196,7 +196,7 @@ TEST(getIconQuads, style) {
 
     // both
     {
-        SymbolLayoutProperties::Evaluated layout;
+        SymbolLayoutProperties::PossiblyEvaluated layout;
         layout.get<TextSize>() = 24.0f;
         layout.get<IconTextFit>() = IconTextFitType::Both;
         SymbolQuad quad =
@@ -214,7 +214,7 @@ TEST(getIconQuads, style) {
 
     // both x textSize
     {
-        SymbolLayoutProperties::Evaluated layout;
+        SymbolLayoutProperties::PossiblyEvaluated layout;
         layout.get<TextSize>() = 12.0f;
         layout.get<IconTextFit>() = IconTextFitType::Both;
         SymbolQuad quad =
@@ -232,7 +232,7 @@ TEST(getIconQuads, style) {
 
     // both x textSize + padding
     {
-        SymbolLayoutProperties::Evaluated layout;
+        SymbolLayoutProperties::PossiblyEvaluated layout;
         layout.get<TextSize>() = 12.0f;
         layout.get<IconTextFit>() = IconTextFitType::Both;
         layout.get<IconTextFitPadding>()[0] = 5.0f;
@@ -254,7 +254,7 @@ TEST(getIconQuads, style) {
 
     // both x textSize + padding t/r/b/l
     {
-        SymbolLayoutProperties::Evaluated layout;
+        SymbolLayoutProperties::PossiblyEvaluated layout;
         layout.get<TextSize>() = 12.0f;
         layout.get<IconTextFit>() = IconTextFitType::Both;
         layout.get<IconTextFitPadding>()[0] = 0.0f;

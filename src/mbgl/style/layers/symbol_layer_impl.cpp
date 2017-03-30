@@ -68,7 +68,7 @@ TextPaintProperties::Evaluated SymbolLayer::Impl::textPaintProperties() const {
 }
 
 
-SymbolPropertyValues SymbolLayer::Impl::iconPropertyValues(const SymbolLayoutProperties::Evaluated& layout_) const {
+SymbolPropertyValues SymbolLayer::Impl::iconPropertyValues(const SymbolLayoutProperties::PossiblyEvaluated& layout_) const {
     return SymbolPropertyValues {
         layout_.get<IconRotationAlignment>(), // icon-pitch-alignment is not yet implemented; inherit the rotation alignment
         layout_.get<IconRotationAlignment>(),
@@ -83,7 +83,7 @@ SymbolPropertyValues SymbolLayer::Impl::iconPropertyValues(const SymbolLayoutPro
     };
 }
 
-SymbolPropertyValues SymbolLayer::Impl::textPropertyValues(const SymbolLayoutProperties::Evaluated& layout_) const {
+SymbolPropertyValues SymbolLayer::Impl::textPropertyValues(const SymbolLayoutProperties::PossiblyEvaluated& layout_) const {
     return SymbolPropertyValues {
         layout_.get<TextPitchAlignment>(),
         layout_.get<TextRotationAlignment>(),

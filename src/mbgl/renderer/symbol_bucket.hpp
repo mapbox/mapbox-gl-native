@@ -16,7 +16,7 @@ namespace mbgl {
 
 class SymbolBucket : public Bucket {
 public:
-    SymbolBucket(style::SymbolLayoutProperties::Evaluated,
+    SymbolBucket(style::SymbolLayoutProperties::PossiblyEvaluated,
                  const std::map<std::string, std::pair<style::IconPaintProperties::Evaluated, style::TextPaintProperties::Evaluated>>&,
                  float zoom,
                  bool sdfIcons,
@@ -29,7 +29,7 @@ public:
     bool hasIconData() const;
     bool hasCollisionBoxData() const;
 
-    const style::SymbolLayoutProperties::Evaluated layout;
+    const style::SymbolLayoutProperties::PossiblyEvaluated layout;
     const bool sdfIcons;
     const bool iconsNeedLinear;
 

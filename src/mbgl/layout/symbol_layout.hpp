@@ -78,7 +78,7 @@ private:
     const float zoom;
     const MapMode mode;
 
-    style::SymbolLayoutProperties::Evaluated layout;
+    style::SymbolLayoutProperties::PossiblyEvaluated layout;
     float textMaxSize;
 
     SpriteAtlas& spriteAtlas;

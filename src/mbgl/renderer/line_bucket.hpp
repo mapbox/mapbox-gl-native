@@ -29,7 +29,7 @@ public:
     void upload(gl::Context&) override;
     void render(Painter&, PaintParameters&, const style::Layer&, const RenderTile&) override;
 
-    style::LineLayoutProperties::Evaluated layout;
+    style::LineLayoutProperties::PossiblyEvaluated layout;
 
     gl::VertexVector<LineLayoutVertex> vertices;
     gl::IndexVector<gl::Triangles> triangles;
