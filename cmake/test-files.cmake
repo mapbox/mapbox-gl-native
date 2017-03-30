@@ -124,6 +124,7 @@ set(MBGL_TEST_FILES
     test/util/merge_lines.test.cpp
     test/util/number_conversions.test.cpp
     test/util/offscreen_texture.test.cpp
+    test/util/position.test.cpp
     test/util/projection.test.cpp
     test/util/run_loop.test.cpp
     test/util/text_conversions.test.cpp
