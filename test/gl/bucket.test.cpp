@@ -27,7 +27,7 @@ TEST(Buckets, LineBucket) {
 }
 
 TEST(Buckets, SymbolBucket) {
-    style::SymbolLayoutProperties::Evaluated layout;
+    style::SymbolLayoutProperties::PossiblyEvaluated layout;
     bool sdfIcons = false;
     bool iconsNeedLinear = false;
 

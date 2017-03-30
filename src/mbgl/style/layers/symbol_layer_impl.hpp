@@ -72,8 +72,8 @@ public:
     IconPaintProperties::Evaluated iconPaintProperties() const;
     TextPaintProperties::Evaluated textPaintProperties() const;
     
-    SymbolPropertyValues iconPropertyValues(const SymbolLayoutProperties::Evaluated&) const;
-    SymbolPropertyValues textPropertyValues(const SymbolLayoutProperties::Evaluated&) const;
+    SymbolPropertyValues iconPropertyValues(const SymbolLayoutProperties::PossiblyEvaluated&) const;
+    SymbolPropertyValues textPropertyValues(const SymbolLayoutProperties::PossiblyEvaluated&) const;
 
     SymbolLayoutProperties layout;
     SymbolPaintProperties paint;
