@@ -4,8 +4,6 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 
 ## 3.5.1
 
-### Other changes
-
 * Fixed an issue that caused the return type of a map view delegate method to bridge incorrectly to applications written in Swift. ([#8541](https://github.com/mapbox/mapbox-gl-native/pull/8541))
 
 ## 3.5.0
