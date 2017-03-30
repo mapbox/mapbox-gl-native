@@ -26,6 +26,7 @@ public:
         if (anchor) {
             optional<PropertyValue<LightAnchorType>> convertedAnchor =
                 convert<PropertyValue<LightAnchorType>>(*anchor, error);
+
             if (convertedAnchor) {
                 light.set<LightAnchor>(*convertedAnchor);
             } else {
@@ -35,7 +36,9 @@ public:
 
         const auto color = objectMember(value, "color");
         if (color) {
-            optional<PropertyValue<Color>> convertedColor = convert<PropertyValue<Color>>(*color, error);
+            optional<PropertyValue<Color>> convertedColor =
+                convert<PropertyValue<Color>>(*color, error);
+
             if (convertedColor) {
                 light.set<LightColor>(*convertedColor);
             } else {
@@ -45,7 +48,8 @@ public:
 
         const auto position = objectMember(value, "position");
         if (position) {
-            optional<PropertyValue<Position>> convertedPosition = convert<PropertyValue<Position>>(*position, error);
+            optional<PropertyValue<Position>> convertedPosition =
+                convert<PropertyValue<Position>>(*position, error);
 
             if (convertedPosition) {
                 light.set<LightPosition>(*convertedPosition);
@@ -58,6 +62,7 @@ public:
         if (intensity) {
             optional<PropertyValue<float>> convertedIntensity =
                 convert<PropertyValue<float>>(*intensity, error);
+
             if (convertedIntensity) {
                 light.set<LightIntensity>(*convertedIntensity);
             } else {
