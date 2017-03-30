@@ -76,6 +76,38 @@ public class MapboxMapTest {
   }
 
   //
+  // Style wide transition options
+  //
+
+  @Test
+  public void testTransitionDuration() {
+    ViewUtils.checkViewIsDisplayed(R.id.mapView);
+    final MapboxMap mapboxMap = activity.getMapboxMap();
+    onView(withId(R.id.mapView)).perform(new MapboxMapAction(new InvokeViewAction() {
+      @Override
+      public void onViewAction(UiController uiController, View view) {
+        long transitionDuration = 600;
+        mapboxMap.setTransitionDuration(transitionDuration);
+        assertEquals("TransitionDuration should match", transitionDuration, mapboxMap.getTransitionDuration(), 0);
+      }
+    }));
+  }
+
+  @Test
+  public void testTransitionDelay() {
+    ViewUtils.checkViewIsDisplayed(R.id.mapView);
+    final MapboxMap mapboxMap = activity.getMapboxMap();
+    onView(withId(R.id.mapView)).perform(new MapboxMapAction(new InvokeViewAction() {
+      @Override
+      public void onViewAction(UiController uiController, View view) {
+        long transitionDelay = 50;
+        mapboxMap.setTransitionDelay(transitionDelay);
+        assertEquals("TransitionDelay should match", transitionDelay, mapboxMap.getTransitionDelay(), 0);
+      }
+    }));
+  }
+
+  //
   // MinZoomLevel
   //
 

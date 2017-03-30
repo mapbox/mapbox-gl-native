@@ -752,23 +752,23 @@ jdouble NativeMapView::getTopOffsetPixelsForAnnotationSymbol(JNIEnv& env, jni::S
 
 jlong NativeMapView::getTransitionDuration(JNIEnv&) {
     const auto transitionOptions = map->getTransitionOptions();
-    return transitionOptions.duration.value_or(mbgl::Duration::zero()).count();
+    return std::chrono::duration_cast<std::chrono::milliseconds>(transitionOptions.duration.value_or(mbgl::Duration::zero())).count();
 }
 
 void NativeMapView::setTransitionDuration(JNIEnv&, jlong duration) {
     auto transitionOptions = map->getTransitionOptions();
-    transitionOptions.duration = std::chrono::duration_cast<mbgl::Duration>(std::chrono::duration<jlong>(duration));
+    transitionOptions.duration.emplace(mbgl::Milliseconds(duration));
     map->setTransitionOptions(transitionOptions);
 }
 
 jlong NativeMapView::getTransitionDelay(JNIEnv&) {
     const auto transitionOptions = map->getTransitionOptions();
-    return transitionOptions.delay.value_or(mbgl::Duration::zero()).count();
+    return std::chrono::duration_cast<std::chrono::milliseconds>(transitionOptions.delay.value_or(mbgl::Duration::zero())).count();
 }
 
 void NativeMapView::setTransitionDelay(JNIEnv&, jlong delay) {
     auto transitionOptions = map->getTransitionOptions();
-    transitionOptions.delay = std::chrono::duration_cast<mbgl::Duration>(std::chrono::duration<jlong>(delay));
+    transitionOptions.delay.emplace(mbgl::Milliseconds(delay));
     map->setTransitionOptions(transitionOptions);
 }
 
