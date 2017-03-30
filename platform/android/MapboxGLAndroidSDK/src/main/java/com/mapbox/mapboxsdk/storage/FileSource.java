@@ -123,9 +123,9 @@ public class FileSource {
    * The callback will be executed on the main thread once for every requested URL.
    * </p>
    *
-   * @param callback the callback to be invoked
+   * @param callback the callback to be invoked or null to reset
    */
-  public native void setResourceTransform(@NonNull final ResourceTransformCallback callback);
+  public native void setResourceTransform(final ResourceTransformCallback callback);
 
   private native void initialize(String accessToken, String cachePath, String apkPath);
 
