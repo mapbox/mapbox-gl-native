@@ -3044,6 +3044,7 @@ public:
                 continue;
             }
             MGLAnnotationContext annotationContext = _annotationContextsByAnnotationTag.at(annotationTag);
+            NSAssert(_annotationContextsByAnnotationTag.count(annotationTag), @"Missing annotation for tag %u.", annotationTag);
             if (annotationContext.annotation)
             {
                 [annotations addObject:annotationContext.annotation];
