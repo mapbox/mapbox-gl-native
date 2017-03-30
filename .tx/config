@@ -1,25 +1,35 @@
 [main]
 host = https://www.transifex.com
-lang_map = pt_BR: pt-BR, pt_PT: pt-PT, zh_CN: zh-Hans, zh_TW: zh-Hant
 type = STRINGS
 minimum_perc = 80
 
 [mapbox-gl-native.foundationstrings-darwin]
+lang_map = pt_BR: pt-BR, pt_PT: pt-PT, zh_CN: zh-Hans, zh_TW: zh-Hant
 source_file = platform/darwin/resources/Base.lproj/Foundation.strings
 source_lang = en
 file_filter = platform/darwin/resources/<lang>.lproj/Foundation.strings
 
 [mapbox-gl-native.localizablestrings-ios]
+lang_map = pt_BR: pt-BR, pt_PT: pt-PT, zh_CN: zh-Hans, zh_TW: zh-Hant
 source_file = platform/ios/resources/Base.lproj/Localizable.strings
 source_lang = en
 file_filter = platform/ios/resources/<lang>.lproj/Localizable.strings
 
 [mapbox-gl-native.localizablestrings-macos]
+lang_map = pt_BR: pt-BR, pt_PT: pt-PT, zh_CN: zh-Hans, zh_TW: zh-Hant
 source_file = platform/macos/sdk/Base.lproj/Localizable.strings
 source_lang = en
 file_filter = platform/macos/sdk/<lang>.lproj/Localizable.strings
 
 [mapbox-gl-native.rootstrings-ios]
+lang_map = pt_BR: pt-BR, pt_PT: pt-PT, zh_CN: zh-Hans, zh_TW: zh-Hant
 source_file = platform/ios/framework/Settings.bundle/Base.lproj/Root.strings
 source_lang = en
 file_filter = platform/ios/framework/Settings.bundle/<lang>.lproj/Root.strings
+
+[mapbox-gl-native.stringsxml-android]
+file_filter = platform/android/MapboxGLAndroidSDK/src/main/res/values-<lang>/strings.xml
+source_file = platform/android/MapboxGLAndroidSDK/src/main/res/values/strings.xml
+source_lang = en
+type = ANDROID
+
