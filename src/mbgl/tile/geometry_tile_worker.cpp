@@ -2,8 +2,8 @@
 #include <mbgl/tile/geometry_tile_data.hpp>
 #include <mbgl/tile/geometry_tile.hpp>
 #include <mbgl/text/collision_tile.hpp>
-#include <mbgl/text/glyph_atlas.hpp>
 #include <mbgl/layout/symbol_layout.hpp>
+#include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/style/bucket_parameters.hpp>
 #include <mbgl/style/group_by_layout.hpp>
 #include <mbgl/style/filter.hpp>
@@ -25,19 +25,16 @@ using namespace style;
 GeometryTileWorker::GeometryTileWorker(ActorRef<GeometryTileWorker> self_,
                                        ActorRef<GeometryTile> parent_,
                                        OverscaledTileID id_,
-                                       GlyphAtlas& glyphAtlas_,
                                        const std::atomic<bool>& obsolete_,
                                        const MapMode mode_)
     : self(std::move(self_)),
       parent(std::move(parent_)),
       id(std::move(id_)),
-      glyphAtlas(glyphAtlas_),
       obsolete(obsolete_),
       mode(mode_) {
 }
 
 GeometryTileWorker::~GeometryTileWorker() {
-    glyphAtlas.removeGlyphs(reinterpret_cast<uintptr_t>(this));
 }
 
 /*
@@ -147,14 +144,14 @@ void GeometryTileWorker::symbolDependenciesChanged() {
     try {
         switch (state) {
         case Idle:
-            if (hasPendingSymbolDependencies()) {
+            if (hasPendingSymbolLayouts()) {
                 attemptPlacement();
                 coalesce();
             }
             break;
 
         case Coalescing:
-            if (hasPendingSymbolDependencies()) {
+            if (hasPendingSymbolLayouts()) {
                 state = NeedPlacement;
             }
             break;
@@ -199,6 +196,71 @@ void GeometryTileWorker::coalesce() {
     self.invoke(&GeometryTileWorker::coalesced);
 }
 
+
+void GeometryTileWorker::onGlyphsAvailable(GlyphPositionMap newGlyphPositions, GlyphRangeSet loadedRanges) {
+    GlyphDependencies loadedGlyphs;
+    for (auto& pendingFontGlyphs : pendingGlyphDependencies) {
+        auto newFontGlyphs = newGlyphPositions.find(pendingFontGlyphs.first);
+        for (auto glyphID : pendingFontGlyphs.second) {
+            if (newFontGlyphs != newGlyphPositions.end()) {
+                auto newFontGlyph = newFontGlyphs->second.find(glyphID);
+                if (newFontGlyph != newFontGlyphs->second.end()) {
+                    glyphPositions[pendingFontGlyphs.first].emplace(glyphID, newFontGlyph->second);
+                }
+            }
+            if (loadedRanges.find(getGlyphRange(glyphID)) != loadedRanges.end()) {
+                // Erase the glyph from our pending font set as long as its range is loaded
+                // If the glyph itself is missing, that means we can't get a glyph for
+                // this fontstack, and we go ahead and render with missing glyphs
+                loadedGlyphs[pendingFontGlyphs.first].insert(glyphID);
+            }
+        }
+    }
+    
+    for (auto& loadedFont : loadedGlyphs) {
+        for (auto loadedGlyph : loadedFont.second) {
+            pendingGlyphDependencies[loadedFont.first].erase(loadedGlyph);
+        }
+    }
+    symbolDependenciesChanged();
+}
+
+void GeometryTileWorker::onIconsAvailable(IconAtlasMap newIcons) {
+    for (auto& atlasIcons : newIcons) {
+        auto pendingAtlasIcons = pendingIconDependencies.find((SpriteAtlas*)atlasIcons.first);
+        if (pendingAtlasIcons != pendingIconDependencies.end()) {
+            icons[atlasIcons.first] = std::move(newIcons[atlasIcons.first]);
+            pendingIconDependencies.erase((SpriteAtlas*)atlasIcons.first);
+        }
+    }
+    symbolDependenciesChanged();
+}
+
+void GeometryTileWorker::requestNewGlyphs(const GlyphDependencies& glyphDependencies) {
+    for (auto& fontDependencies : glyphDependencies) {
+        auto fontGlyphs = glyphPositions.find(fontDependencies.first);
+        for (auto glyphID : fontDependencies.second) {
+            if (fontGlyphs == glyphPositions.end() || fontGlyphs->second.find(glyphID) == fontGlyphs->second.end()) {
+                pendingGlyphDependencies[fontDependencies.first].insert(glyphID);
+            }
+        }
+    }
+    if (!pendingGlyphDependencies.empty()) {
+        parent.invoke(&GeometryTile::getGlyphs, pendingGlyphDependencies);
+    }
+}
+
+void GeometryTileWorker::requestNewIcons(const IconDependencyMap &iconDependencies) {
+    for (auto& atlasDependency : iconDependencies) {
+        if (icons.find((uintptr_t)atlasDependency.first) == icons.end()) {
+            pendingIconDependencies[atlasDependency.first] = IconDependencies();
+        }
+    }
+    if (!pendingIconDependencies.empty()) {
+        parent.invoke(&GeometryTile::getIcons, pendingIconDependencies);
+    }
+}
+
 void GeometryTileWorker::redoLayout() {
     if (!data || !layers) {
         return;
@@ -215,6 +277,9 @@ void GeometryTileWorker::redoLayout() {
     std::unordered_map<std::string, std::shared_ptr<Bucket>> buckets;
     auto featureIndex = std::make_unique<FeatureIndex>();
     BucketParameters parameters { id, mode };
+    
+    GlyphDependencies glyphDependencies;
+    IconDependencyMap iconDependencyMap;
 
     std::vector<std::vector<const Layer*>> groups = groupByLayout(*layers);
     for (auto& group : groups) {
@@ -242,7 +307,7 @@ void GeometryTileWorker::redoLayout() {
 
         if (leader.is<SymbolLayer>()) {
             symbolLayoutMap.emplace(leader.getID(),
-                leader.as<SymbolLayer>()->impl->createLayout(parameters, group, *geometryLayer));
+                leader.as<SymbolLayer>()->impl->createLayout(parameters, group, *geometryLayer, glyphDependencies, iconDependencyMap));
         } else {
             const Filter& filter = leader.baseImpl->filter;
             const std::string& sourceLayerID = leader.baseImpl->sourceLayer;
@@ -276,6 +341,9 @@ void GeometryTileWorker::redoLayout() {
             symbolLayouts.push_back(std::move(it->second));
         }
     }
+    
+    requestNewGlyphs(glyphDependencies);
+    requestNewIcons(iconDependencyMap);
 
     parent.invoke(&GeometryTile::onLayout, GeometryTile::LayoutResult {
         std::move(buckets),
@@ -287,46 +355,31 @@ void GeometryTileWorker::redoLayout() {
     attemptPlacement();
 }
 
-bool GeometryTileWorker::hasPendingSymbolDependencies() const {
-    bool result = false;
-
+bool GeometryTileWorker::hasPendingSymbolLayouts() const {
     for (const auto& symbolLayout : symbolLayouts) {
         if (symbolLayout->state == SymbolLayout::Pending) {
-            result = true;
+            return true;
         }
     }
 
-    return result;
+    return false;
 }
 
+bool GeometryTileWorker::hasPendingSymbolDependencies() const {
+    for (auto& glyphDependency : pendingGlyphDependencies) {
+        if (!glyphDependency.second.empty()) {
+            return true;
+        }
+    }
+    return !pendingIconDependencies.empty();
+}
+
+
 void GeometryTileWorker::attemptPlacement() {
-    if (!data || !layers || !placementConfig) {
+    if (!data || !layers || !placementConfig || hasPendingSymbolDependencies()) {
         return;
     }
-
-    bool canPlace = true;
-
-    // Prepare as many SymbolLayouts as possible.
-    for (auto& symbolLayout : symbolLayouts) {
-        if (obsolete) {
-            return;
-        }
-
-        if (symbolLayout->state == SymbolLayout::Pending) {
-            if (symbolLayout->canPrepare(glyphAtlas)) {
-                symbolLayout->state = SymbolLayout::Prepared;
-                symbolLayout->prepare(reinterpret_cast<uintptr_t>(this),
-                                      glyphAtlas);
-            } else {
-                canPlace = false;
-            }
-        }
-    }
-
-    if (!canPlace) {
-        return; // We'll be notified (via `setPlacementConfig`) when it's time to try again.
-    }
-
+    
     auto collisionTile = std::make_unique<CollisionTile>(*placementConfig);
     std::unordered_map<std::string, std::shared_ptr<Bucket>> buckets;
 
@@ -334,8 +387,12 @@ void GeometryTileWorker::attemptPlacement() {
         if (obsolete) {
             return;
         }
-
-        symbolLayout->state = SymbolLayout::Placed;
+        
+        if (symbolLayout->state == SymbolLayout::Pending) {
+            symbolLayout->prepare(glyphPositions,icons);
+            symbolLayout->state = SymbolLayout::Placed;
+        }
+        
         if (!symbolLayout->hasSymbolInstances()) {
             continue;
         }

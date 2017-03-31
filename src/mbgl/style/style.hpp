@@ -128,7 +128,6 @@ private:
 
     std::vector<std::unique_ptr<Layer>>::const_iterator findLayer(const std::string& layerID) const;
     void reloadLayerSource(Layer&);
-    void updateSymbolDependentTiles();
 
     // GlyphStoreObserver implementation.
     void onGlyphsLoaded(const FontStack&, const GlyphRange&) override;

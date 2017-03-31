@@ -1,6 +1,7 @@
 #pragma once
 
 #include <mbgl/text/glyph_range.hpp>
+#include <mbgl/util/font_stack.hpp>
 #include <mbgl/util/rect.hpp>
 #include <mbgl/util/traits.hpp>
 #include <mbgl/util/image.hpp>
@@ -12,8 +13,11 @@
 
 namespace mbgl {
 
+typedef char16_t GlyphID;
+typedef std::set<GlyphID> GlyphIDs;
+    
 // Note: this only works for the BMP
-GlyphRange getGlyphRange(char16_t glyph);
+GlyphRange getGlyphRange(GlyphID glyph);
 
 struct GlyphMetrics {
     explicit operator bool() const {
@@ -50,14 +54,14 @@ struct Glyph {
     const GlyphMetrics metrics;
 };
 
-typedef std::map<uint32_t, Glyph> GlyphPositions;
+typedef std::map<GlyphID, Glyph> GlyphPositions;
 
 class PositionedGlyph {
 public:
-    explicit PositionedGlyph(uint32_t glyph_, float x_, float y_, float angle_)
+    explicit PositionedGlyph(GlyphID glyph_, float x_, float y_, float angle_)
         : glyph(glyph_), x(x_), y(y_), angle(angle_) {}
 
-    uint32_t glyph = 0;
+    GlyphID glyph = 0;
     float x = 0;
     float y = 0;
     float angle = 0;
@@ -86,7 +90,7 @@ public:
     // also need to be reencoded.
     static constexpr const uint8_t borderSize = 3;
 
-    uint32_t id = 0;
+    GlyphID id = 0;
 
     // A signed distance field of the glyph with a border (see above).
     AlphaImage bitmap;
@@ -120,5 +124,10 @@ constexpr WritingModeType& operator&=(WritingModeType& lhs, WritingModeType rhs)
 constexpr WritingModeType operator~(WritingModeType value) {
     return WritingModeType(~mbgl::underlying_type(value));
 }
+
+typedef std::map<FontStack,GlyphIDs> GlyphDependencies;
+typedef std::map<FontStack,GlyphRangeSet> GlyphRangeDependencies;
+typedef std::map<FontStack,GlyphPositions> GlyphPositionMap;
+
 
 } // end namespace mbgl
