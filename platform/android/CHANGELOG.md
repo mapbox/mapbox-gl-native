@@ -2,6 +2,14 @@
 
 Mapbox welcomes participation and contributions from everyone.  If you'd like to do so please see the [`Contributing Guide`](https://github.com/mapbox/mapbox-gl-native/blob/master/CONTRIBUTING.md) first to get started.
 
+## 5.0.2 - April 3, 2017
+
+5.0.2 is a patch release that contains the following changes:
+
+* Fix resource transform callback [#8582](https://github.com/mapbox/mapbox-gl-native/pull/8582)
+* Restore onTouch behaviour to 4.x version [#8585](https://github.com/mapbox/mapbox-gl-native/pull/8585)
+* Restore anchoring after updating MarkerView Icon [#8519](https://github.com/mapbox/mapbox-gl-native/pull/8519)
+
 ## 5.0.1 - March 22nd, 2017
 
 5.0.1 is a patch release that addresses a shader precision issue that created a rendering problem on some devices.
