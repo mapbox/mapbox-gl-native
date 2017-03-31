@@ -33,6 +33,7 @@ void Painter::renderSymbol(PaintParameters& parameters,
     auto draw = [&] (auto& program,
                      auto&& uniformValues,
                      const auto& buffers,
+                     const SymbolSizeAttributes::VertexBuffer& sizeBuffer,
                      const SymbolPropertyValues& values_,
                      const auto& binders,
                      const auto& paintProperties)
@@ -52,6 +53,7 @@ void Painter::renderSymbol(PaintParameters& parameters,
             colorModeForRenderPass(),
             std::move(uniformValues),
             *buffers.vertexBuffer,
+            sizeBuffer,
             *buffers.indexBuffer,
             buffers.segments,
             binders,
@@ -74,8 +76,9 @@ void Painter::renderSymbol(PaintParameters& parameters,
         if (bucket.sdfIcons) {
             if (values.hasHalo) {
                 draw(parameters.programs.symbolIconSDF,
-                     SymbolSDFIconProgram::uniformValues(values, texsize, pixelsToGLUnits, tile, state, SymbolSDFPart::Halo),
+                     SymbolSDFIconProgram::uniformValues(false, values, bucket.iconSizeData, texsize, pixelsToGLUnits, tile, state, SymbolSDFPart::Halo),
                      bucket.icon,
+                     bucket.iconSizeData.vertexBuffer,
                      values,
                      bucket.paintPropertyBinders.at(layer.getID()).first,
                      paintPropertyValues);
@@ -83,16 +86,18 @@ void Painter::renderSymbol(PaintParameters& parameters,
 
             if (values.hasFill) {
                 draw(parameters.programs.symbolIconSDF,
-                     SymbolSDFIconProgram::uniformValues(values, texsize, pixelsToGLUnits, tile, state, SymbolSDFPart::Fill),
+                     SymbolSDFIconProgram::uniformValues(false, values, bucket.iconSizeData, texsize, pixelsToGLUnits, tile, state, SymbolSDFPart::Fill),
                      bucket.icon,
+                     bucket.iconSizeData.vertexBuffer,
                      values,
                      bucket.paintPropertyBinders.at(layer.getID()).first,
                      paintPropertyValues);
             }
         } else {
             draw(parameters.programs.symbolIcon,
-                 SymbolIconProgram::uniformValues(values, texsize, pixelsToGLUnits, tile, state),
+                 SymbolIconProgram::uniformValues(false, values, bucket.iconSizeData, texsize, pixelsToGLUnits, tile, state),
                  bucket.icon,
+                 bucket.iconSizeData.vertexBuffer,
                  values,
                  bucket.paintPropertyBinders.at(layer.getID()).first,
                  paintPropertyValues);
@@ -109,8 +114,9 @@ void Painter::renderSymbol(PaintParameters& parameters,
 
         if (values.hasHalo) {
             draw(parameters.programs.symbolGlyph,
-                 SymbolSDFTextProgram::uniformValues(values, texsize, pixelsToGLUnits, tile, state, SymbolSDFPart::Halo),
+                 SymbolSDFTextProgram::uniformValues(true, values, bucket.textSizeData, texsize, pixelsToGLUnits, tile, state, SymbolSDFPart::Halo),
                  bucket.text,
+                 bucket.textSizeData.vertexBuffer,
                  values,
                  bucket.paintPropertyBinders.at(layer.getID()).second,
                  paintPropertyValues);
@@ -118,8 +124,9 @@ void Painter::renderSymbol(PaintParameters& parameters,
 
         if (values.hasFill) {
             draw(parameters.programs.symbolGlyph,
-                 SymbolSDFTextProgram::uniformValues(values, texsize, pixelsToGLUnits, tile, state, SymbolSDFPart::Fill),
+                 SymbolSDFTextProgram::uniformValues(true, values, bucket.textSizeData, texsize, pixelsToGLUnits, tile, state, SymbolSDFPart::Fill),
                  bucket.text,
+                 bucket.textSizeData.vertexBuffer,
                  values,
                  bucket.paintPropertyBinders.at(layer.getID()).second,
                  paintPropertyValues);

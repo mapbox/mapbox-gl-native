@@ -50,7 +50,10 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
       mode(parameters.mode),
       spriteAtlasMapIndex(_spriteAtlasMapIndex),
       tileSize(util::tileSize * overscaling),
-      tilePixelRatio(float(util::EXTENT) / tileSize) {
+      tilePixelRatio(float(util::EXTENT) / tileSize),
+      textSize(layers.at(0)->as<SymbolLayer>()->impl->layout.unevaluated.get<TextSize>()),
+      iconSize(layers.at(0)->as<SymbolLayer>()->impl->layout.unevaluated.get<IconSize>())
+    {
 
     const SymbolLayer::Impl& leader = *layers.at(0)->as<SymbolLayer>()->impl;
 
@@ -76,11 +79,6 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
     if (layout.get<TextPitchAlignment>() == AlignmentType::Auto) {
         layout.get<TextPitchAlignment>() = layout.get<TextRotationAlignment>();
     }
-
-    textMaxSize = leader.layout.evaluate<TextSize>(PropertyEvaluationParameters(18));
-
-    layout.get<IconSize>() = leader.layout.evaluate<IconSize>(PropertyEvaluationParameters(zoom + 1));
-    layout.get<TextSize>() = leader.layout.evaluate<TextSize>(PropertyEvaluationParameters(zoom + 1));
 
     const bool hasText = has<TextField>(layout) && !layout.get<TextFont>().empty();
     const bool hasIcon = has<IconImage>(layout);
@@ -298,11 +296,20 @@ void SymbolLayout::addFeature(const std::size_t index,
                               const GlyphPositions& glyphs) {
     const float minScale = 0.5f;
     const float glyphSize = 24.0f;
-
-    const float fontScale = layout.get<TextSize>() / glyphSize;
+    
+    const float layoutTextSize = layout.evaluate<TextSize>(zoom + 1, feature);
+    const float layoutIconSize = layout.evaluate<IconSize>(zoom + 1, feature);
+    
+    // To reduce the number of labels that jump around when zooming we need
+    // to use a text-size value that is the same for all zoom levels.
+    // This calculates text-size at a high zoom level so that all tiles can
+    // use the same value when calculating anchor positions.
+    const float textMaxSize = layout.evaluate<TextSize>(18, feature);
+    
+    const float fontScale = layoutTextSize / glyphSize;
     const float textBoxScale = tilePixelRatio * fontScale;
     const float textMaxBoxScale = tilePixelRatio * textMaxSize / glyphSize;
-    const float iconBoxScale = tilePixelRatio * layout.get<IconSize>();
+    const float iconBoxScale = tilePixelRatio * layoutIconSize;
     const float symbolSpacing = tilePixelRatio * layout.get<SymbolSpacing>();
     const bool avoidEdges = layout.get<SymbolAvoidEdges>() && layout.get<SymbolPlacement>() != SymbolPlacementType::Line;
     const float textPadding = layout.get<TextPadding>() * tilePixelRatio;
@@ -316,7 +323,7 @@ void SymbolLayout::addFeature(const std::size_t index,
                                                   : layout.get<SymbolPlacement>();
     const float textRepeatDistance = symbolSpacing / 2;
     IndexedSubfeature indexedFeature = {feature.index, sourceLayerName, bucketName, symbolInstances.size()};
-
+    
     auto addSymbolInstance = [&] (const GeometryCoordinates& line, Anchor& anchor) {
         // https://github.com/mapbox/vector-tile-spec/tree/master/2.1#41-layers
         // +-------------------+ Symbols with anchors located on tile edges
@@ -338,7 +345,9 @@ void SymbolLayout::addFeature(const std::size_t index,
 
         const bool addToBuffers = mode == MapMode::Still || withinPlus0;
 
-        symbolInstances.emplace_back(anchor, line, shapedTextOrientations, shapedIcon, layout.evaluate(zoom, feature), addToBuffers, symbolInstances.size(),
+        symbolInstances.emplace_back(anchor, line, shapedTextOrientations, shapedIcon,
+                layout.evaluate(zoom, feature), layoutTextSize,
+                addToBuffers, symbolInstances.size(),
                 textBoxScale, textPadding, textPlacement,
                 iconBoxScale, iconPadding, iconPlacement,
                 glyphs, indexedFeature, index);
@@ -413,7 +422,7 @@ bool SymbolLayout::anchorIsTooClose(const std::u16string& text, const float repe
 }
 
 std::unique_ptr<SymbolBucket> SymbolLayout::place(CollisionTile& collisionTile) {
-    auto bucket = std::make_unique<SymbolBucket>(layout, layerPaintProperties, zoom, sdfIcons, iconsNeedLinear);
+    auto bucket = std::make_unique<SymbolBucket>(layout, layerPaintProperties, textSize, iconSize, zoom, sdfIcons, iconsNeedLinear);
 
     // Calculate which labels can be shown and when they can be shown and
     // create the bufers used for rendering.
@@ -477,6 +486,7 @@ std::unique_ptr<SymbolBucket> SymbolLayout::place(CollisionTile& collisionTile) 
             iconScale = util::max(iconScale, glyphScale);
         }
 
+        const auto& feature = features.at(symbolInstance.featureIndex);
 
         // Insert final placement into collision tree and add glyphs/icons to buffers
 
@@ -486,7 +496,7 @@ std::unique_ptr<SymbolBucket> SymbolLayout::place(CollisionTile& collisionTile) 
             if (glyphScale < collisionTile.maxScale) {
                 for (const auto& symbol : symbolInstance.glyphQuads) {
                     addSymbol(
-                        bucket->text, symbol, placementZoom,
+                        bucket->text, bucket->textSizeData, symbol, feature, textSize, placementZoom,
                         keepUpright, textPlacement, collisionTile.config.angle, symbolInstance.writingModes);
                 }
             }
@@ -497,12 +507,11 @@ std::unique_ptr<SymbolBucket> SymbolLayout::place(CollisionTile& collisionTile) 
             collisionTile.insertFeature(symbolInstance.iconCollisionFeature, iconScale, layout.get<IconIgnorePlacement>());
             if (iconScale < collisionTile.maxScale && symbolInstance.iconQuad) {
                 addSymbol(
-                    bucket->icon, *symbolInstance.iconQuad, placementZoom,
+                    bucket->icon, bucket->iconSizeData, *symbolInstance.iconQuad, feature, iconSize, placementZoom,
                     keepUpright, iconPlacement, collisionTile.config.angle, symbolInstance.writingModes);
             }
         }
         
-        const auto& feature = features.at(symbolInstance.featureIndex);
         for (auto& pair : bucket->paintPropertyBinders) {
             pair.second.first.populateVertexVectors(feature, bucket->icon.vertices.vertexSize());
             pair.second.second.populateVertexVectors(feature, bucket->text.vertices.vertexSize());
@@ -518,7 +527,10 @@ std::unique_ptr<SymbolBucket> SymbolLayout::place(CollisionTile& collisionTile) 
 
 template <typename Buffer>
 void SymbolLayout::addSymbol(Buffer& buffer,
+                             SymbolSizeData& sizeData,
                              const SymbolQuad& symbol,
+                             const SymbolFeature& feature,
+                             const style::DataDrivenPropertyValue<float>& size,
                              const float placementZoom,
                              const bool keepUpright,
                              const style::SymbolPlacementType placement,
@@ -580,6 +592,37 @@ void SymbolLayout::addSymbol(Buffer& buffer,
                         minZoom, maxZoom, placementZoom, glyphAngle));
     buffer.vertices.emplace_back(SymbolLayoutAttributes::vertex(anchorPoint, br, tex.x + tex.w, tex.y + tex.h,
                         minZoom, maxZoom, placementZoom, glyphAngle));
+    
+    size.match(
+        [&] (const style::CompositeFunction<float>& fn) {
+            const auto sizeVertex = SymbolSizeAttributes::Vertex {
+                {{
+                    static_cast<uint16_t>(fn.evaluate(sizeData.coveringZoomStops->min, feature, sizeData.defaultSize) * 10),
+                    static_cast<uint16_t>(fn.evaluate(sizeData.coveringZoomStops->max, feature, sizeData.defaultSize) * 10),
+                    static_cast<uint16_t>(fn.evaluate(zoom + 1, feature, sizeData.defaultSize) * 10)
+                }}
+            };
+            auto& vertexVector = sizeData.vertices.get<gl::VertexVector<SymbolSizeAttributes::Vertex>>();
+            vertexVector.emplace_back(sizeVertex);
+            vertexVector.emplace_back(sizeVertex);
+            vertexVector.emplace_back(sizeVertex);
+            vertexVector.emplace_back(sizeVertex);
+        },
+        [&] (const style::SourceFunction<float>& fn) {
+            const auto sizeVertex = SymbolSizeAttributes::SourceFunctionVertex {
+                {{ static_cast<uint16_t>(fn.evaluate(feature, sizeData.defaultSize) * 10) }}
+            };
+            
+            auto& vertexVector = sizeData.vertices.get<gl::VertexVector<SymbolSizeAttributes::SourceFunctionVertex>>();
+            vertexVector.emplace_back(sizeVertex);
+            vertexVector.emplace_back(sizeVertex);
+            vertexVector.emplace_back(sizeVertex);
+            vertexVector.emplace_back(sizeVertex);
+        },
+        [] (const auto&) {
+            mbgl::Log::Debug(mbgl::Event::General, "feature-constant symbol");
+        }
+    );
 
     // add the two triangles, referencing the four coordinates we just inserted.
     buffer.triangles.emplace_back(index + 0, index + 1, index + 2);

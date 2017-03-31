@@ -9,6 +9,7 @@
 #include <mbgl/programs/collision_box_program.hpp>
 #include <mbgl/text/glyph_range.hpp>
 #include <mbgl/style/layers/symbol_layer_properties.hpp>
+#include <mbgl/layout/symbol_feature.hpp>
 
 #include <vector>
 
@@ -18,6 +19,8 @@ class SymbolBucket : public Bucket {
 public:
     SymbolBucket(style::SymbolLayoutProperties::PossiblyEvaluated,
                  const std::map<std::string, std::pair<style::IconPaintProperties::Evaluated, style::TextPaintProperties::Evaluated>>&,
+                 const style::DataDrivenPropertyValue<float>& textSize,
+                 const style::DataDrivenPropertyValue<float>& iconSize,
                  float zoom,
                  bool sdfIcons,
                  bool iconsNeedLinear);
@@ -36,6 +39,8 @@ public:
     std::map<std::string, std::pair<
         SymbolIconProgram::PaintPropertyBinders,
         SymbolSDFTextProgram::PaintPropertyBinders>> paintPropertyBinders;
+    
+    SymbolSizeData textSizeData;
 
     struct TextBuffer {
         gl::VertexVector<SymbolLayoutVertex> vertices;
@@ -45,7 +50,9 @@ public:
         optional<gl::VertexBuffer<SymbolLayoutVertex>> vertexBuffer;
         optional<gl::IndexBuffer<gl::Triangles>> indexBuffer;
     } text;
-
+    
+    SymbolSizeData iconSizeData;
+    
     struct IconBuffer {
         gl::VertexVector<SymbolLayoutVertex> vertices;
         gl::IndexVector<gl::Triangles> triangles;

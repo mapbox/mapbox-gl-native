@@ -19,6 +19,7 @@ SymbolQuad getIconQuad(const Anchor& anchor,
                        const PositionedIcon& shapedIcon,
                        const GeometryCoordinates& line,
                        const SymbolLayoutProperties::Evaluated& layout,
+                       const float layoutTextSize,
                        const style::SymbolPlacementType placement, 
                        const Shaping& shapedText) {
     auto image = *(shapedIcon.image);
@@ -36,7 +37,7 @@ SymbolQuad getIconQuad(const Anchor& anchor,
     if (layout.get<IconTextFit>() != IconTextFitType::None && shapedText) {
         auto iconWidth = right - left;
         auto iconHeight = bottom - top;
-        auto size = layout.get<TextSize>() / 24.0f;
+        auto size = layoutTextSize / 24.0f;
         auto textLeft = shapedText.left * size;
         auto textRight = shapedText.right * size;
         auto textTop = shapedText.top * size;

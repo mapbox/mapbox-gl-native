@@ -10,6 +10,7 @@ SymbolInstance::SymbolInstance(Anchor& anchor,
                                const std::pair<Shaping, Shaping>& shapedTextOrientations,
                                const PositionedIcon& shapedIcon,
                                const SymbolLayoutProperties::Evaluated& layout,
+                               const float layoutTextSize,
                                const bool addToBuffers,
                                const uint32_t index_,
                                const float textBoxScale,
@@ -26,15 +27,18 @@ SymbolInstance::SymbolInstance(Anchor& anchor,
     hasText(shapedTextOrientations.first || shapedTextOrientations.second),
     hasIcon(shapedIcon),
 
+
     // Create the collision features that will be used to check whether this symbol instance can be placed
     textCollisionFeature(line, anchor, shapedTextOrientations.second ?: shapedTextOrientations.first, textBoxScale, textPadding, textPlacement, indexedFeature),
     iconCollisionFeature(line, anchor, shapedIcon, iconBoxScale, iconPadding, iconPlacement, indexedFeature),
     featureIndex(featureIndex_) {
+        
+    
 
     // Create the quads used for rendering the icon and glyphs.
     if (addToBuffers) {
         if (shapedIcon) {
-            iconQuad = getIconQuad(anchor, shapedIcon, line, layout, iconPlacement, shapedTextOrientations.first);
+            iconQuad = getIconQuad(anchor, shapedIcon, line, layout, layoutTextSize, iconPlacement, shapedTextOrientations.first);
         }
         if (shapedTextOrientations.first) {
             auto quads = getGlyphQuads(anchor, shapedTextOrientations.first, textBoxScale, line, layout, textPlacement, face);
@@ -55,6 +59,8 @@ SymbolInstance::SymbolInstance(Anchor& anchor,
     } else {
         writingModes = WritingModeType::None;
     }
+    
+    
 }
 
 } // namespace mbgl
