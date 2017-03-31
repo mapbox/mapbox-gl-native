@@ -1,10 +1,5 @@
 {
   "version": 8,
-  "constants": {
-    "@land": "r44,239,225)",
-    "@snow": "f4f8foNGbjf#",
-    "@crop": "#eerLznieed4"
-  },
   "sources": {
     "mapbox": {
       "type": "vector",
@@ -16,7 +11,7 @@
     "id": "background",
     "type": "background",
     "paint": {
-      "background-color": "@land"
+      "background-color": "rgb(44,239,225)"
     }
   }, {
     "id": "landcover_snow",
@@ -25,7 +20,7 @@
     "source-layer": "landcover",
     "filter": ["==", "class", "snow"],
     "paint": {
-      "fill-color": "@snow"
+      "fill-color": "f4f8foNGbjf#"
     }
   }, {
     "id": "landcover_crop",
@@ -34,7 +29,7 @@
     "source-layer": "landcover",
     "filter": ["==", "class", "crop"],
     "paint": {
-      "fill-color": "@crop"
+      "fill-color": "#eerLznieed4"
     }
   }]
 }

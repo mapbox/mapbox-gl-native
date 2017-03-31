@@ -1,6 +1,7 @@
 {
     "default": {
         "log": [
+            [2, "WARNING", "ParseStyle", "value must be a valid color"]
         ]
     }
 }

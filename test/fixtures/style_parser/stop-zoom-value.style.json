@@ -36,7 +36,7 @@
     "source-layer": "landcover",
     "filter": ["==", "class", "wood"],
     "paint": {
-      "fill-color": "@wood",
+      "fill-color": "#001100",
       "fill-opacity": {
         "stops": [[12, 1], [13, 0.8], [16, 0.2]]
       }
