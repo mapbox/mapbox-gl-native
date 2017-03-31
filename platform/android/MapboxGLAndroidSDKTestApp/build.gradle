@@ -27,6 +27,7 @@ android {
     lintOptions {
         checkAllWarnings true
         warningsAsErrors true
+        disable 'MissingTranslation'
         disable 'IconDensities'
         disable 'InvalidPackage'
     }
