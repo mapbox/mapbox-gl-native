@@ -29,8 +29,16 @@ void Painter::renderFillExtrusion(PaintParameters& parameters,
     const auto light = style.light.evaluated;
     const auto lightColor = light.get<LightColor>();
     std::array<float, 3> color3f = { { lightColor.r, lightColor.g, lightColor.b } };
-    const auto lightPos =
-        light.get<LightPosition>().get(light.get<LightAnchor>(), state.getAngle());
+    const auto lightAnchor = light.get<LightAnchor>();
+
+    auto lightPos = light.get<LightPosition>().get();
+    mat3 lightmat;
+    matrix::identity(lightmat);
+    if (lightAnchor == LightAnchorType::Viewport) {
+        matrix::rotate(lightmat, lightmat, -state.getAngle());
+    }
+    matrix::transformMat3f(lightPos, lightPos, lightmat);
+
     const auto lightIntensity = light.get<LightIntensity>();
 
     if (!properties.get<FillExtrusionPattern>().from.empty()) {

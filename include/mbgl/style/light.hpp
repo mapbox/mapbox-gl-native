@@ -7,7 +7,6 @@
 #include <mbgl/style/transition_options.hpp>
 #include <mbgl/style/cascade_parameters.hpp>
 #include <mbgl/util/constants.hpp>
-#include <mbgl/util/mat3.hpp>
 #include <mbgl/util/color.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/interpolate.hpp>

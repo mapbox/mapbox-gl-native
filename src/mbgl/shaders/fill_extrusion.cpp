@@ -26,13 +26,16 @@ attribute lowp vec2 a_height;
 varying lowp float height;
 
 uniform lowp float a_color_t;
-attribute lowp vec4 a_color;
-varying lowp vec4 color;
+attribute highp vec4 a_color;
+varying highp vec4 color;
 
 void main() {
     base = unpack_mix_vec2(a_base, a_base_t);
     height = unpack_mix_vec2(a_height, a_height_t);
     color = unpack_mix_vec4(a_color, a_color_t);
+
+    base = max(0.0, base);
+    height = max(0.0, height);
 
     float ed = a_edgedistance; // use each attrib in order to not trip a VAO assert
     float t = mod(a_normal.x, 2.0);
@@ -75,7 +78,7 @@ const char* fill_extrusion::fragmentSource = R"MBGL_SHADER(
 varying vec4 v_color;
 varying lowp float base;
 varying lowp float height;
-varying lowp vec4 color;
+varying highp vec4 color;
 
 void main() {
     
