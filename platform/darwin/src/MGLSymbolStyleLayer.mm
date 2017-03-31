@@ -240,7 +240,7 @@ namespace mbgl {
 - (void)setIconImageName:(MGLStyleValue<NSString *> *)iconImageName {
     MGLAssertStyleLayerIsValid();
 
-    auto mbglValue = MGLStyleValueTransformer<std::string, NSString *>().toPropertyValue(iconImageName);
+    auto mbglValue = MGLStyleValueTransformer<std::string, NSString *>().toDataDrivenPropertyValue(iconImageName);
     self.rawLayer->setIconImage(mbglValue);
 }
 
@@ -249,9 +249,9 @@ namespace mbgl {
 
     auto propertyValue = self.rawLayer->getIconImage();
     if (propertyValue.isUndefined()) {
-        return MGLStyleValueTransformer<std::string, NSString *>().toStyleValue(self.rawLayer->getDefaultIconImage());
+        return MGLStyleValueTransformer<std::string, NSString *>().toDataDrivenStyleValue(self.rawLayer->getDefaultIconImage());
     }
-    return MGLStyleValueTransformer<std::string, NSString *>().toStyleValue(propertyValue);
+    return MGLStyleValueTransformer<std::string, NSString *>().toDataDrivenStyleValue(propertyValue);
 }
 
 - (void)setIconImage:(MGLStyleValue<NSString *> *)iconImage {

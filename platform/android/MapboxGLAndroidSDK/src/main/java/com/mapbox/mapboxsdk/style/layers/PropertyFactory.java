@@ -1595,11 +1595,11 @@ public class PropertyFactory {
   /**
    * Name of image in sprite to use for drawing an image background. A string with {tokens} replaced, referencing the data property to pull from.
    *
-   * @param <Z> the zoom parameter type
-   * @param function a wrapper {@link CameraFunction} for String
+   * @param <T> the function input type
+   * @param function a wrapper function for String
    * @return property wrapper around a String function
    */
-  public static <Z extends Number> PropertyValue<CameraFunction<Z, String>> iconImage(CameraFunction<Z, String> function) {
+  public static <T> PropertyValue<Function<T, String>> iconImage(Function<T, String> function) {
     return new LayoutPropertyValue<>("icon-image", function);
   }
 

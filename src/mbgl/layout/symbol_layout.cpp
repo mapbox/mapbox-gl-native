@@ -30,6 +30,14 @@ namespace mbgl {
 
 using namespace style;
 
+template <class Property>
+static bool has(const style::SymbolLayoutProperties::PossiblyEvaluated& layout) {
+    return layout.get<Property>().match(
+        [&] (const std::string& s) { return !s.empty(); },
+        [&] (const auto&) { return true; }
+    );
+}
+
 SymbolLayout::SymbolLayout(const BucketParameters& parameters,
                            const std::vector<const Layer*>& layers,
                            const GeometryTileLayer& sourceLayer,
@@ -72,15 +80,9 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
 
     layout.get<IconSize>() = leader.layout.evaluate<IconSize>(PropertyEvaluationParameters(zoom + 1));
     layout.get<TextSize>() = leader.layout.evaluate<TextSize>(PropertyEvaluationParameters(zoom + 1));
-          
-    const bool hasTextField = layout.get<TextField>().match(
-        [&] (const std::string& s) { return !s.empty(); },
-        [&] (const auto&) { return true; }
-    );
 
-    const bool hasText = !layout.get<TextFont>().empty() && hasTextField;
-
-    const bool hasIcon = !layout.get<IconImage>().empty();
+    const bool hasText = has<TextField>(layout) && !layout.get<TextFont>().empty();
+    const bool hasIcon = has<IconImage>(layout);
 
     if (!hasText && !hasIcon) {
         return;
@@ -147,7 +149,11 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
         }
 
         if (hasIcon) {
-            ft.icon = util::replaceTokens(layout.get<IconImage>(), getValue);
+            std::string icon = layout.evaluate<IconImage>(zoom, ft);
+            if (layout.get<IconImage>().isConstant()) {
+                icon = util::replaceTokens(icon, getValue);
+            }
+            ft.icon = icon;
         }
 
         if (ft.text || ft.icon) {
@@ -165,16 +171,11 @@ bool SymbolLayout::hasSymbolInstances() const {
 }
 
 bool SymbolLayout::canPrepare(GlyphAtlas& glyphAtlas) {
-    const bool hasTextField = layout.get<TextField>().match(
-        [&] (const std::string& s) { return !s.empty(); },
-        [&] (const auto&) { return true; }
-    );
-
-    if (hasTextField && !layout.get<TextFont>().empty() && !glyphAtlas.hasGlyphRanges(layout.get<TextFont>(), ranges)) {
+    if (has<TextField>(layout) && !layout.get<TextFont>().empty() && !glyphAtlas.hasGlyphRanges(layout.get<TextFont>(), ranges)) {
         return false;
     }
 
-    if (!layout.get<IconImage>().empty() && !spriteAtlas.isLoaded()) {
+    if (has<IconImage>(layout) && !spriteAtlas.isLoaded()) {
         return false;
     }
 

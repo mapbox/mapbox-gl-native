@@ -71,9 +71,9 @@ public:
     PropertyValue<std::array<float, 4>> getIconTextFitPadding() const;
     void setIconTextFitPadding(PropertyValue<std::array<float, 4>>);
 
-    static PropertyValue<std::string> getDefaultIconImage();
-    PropertyValue<std::string> getIconImage() const;
-    void setIconImage(PropertyValue<std::string>);
+    static DataDrivenPropertyValue<std::string> getDefaultIconImage();
+    DataDrivenPropertyValue<std::string> getIconImage() const;
+    void setIconImage(DataDrivenPropertyValue<std::string>);
 
     static DataDrivenPropertyValue<float> getDefaultIconRotate();
     DataDrivenPropertyValue<float> getIconRotate() const;

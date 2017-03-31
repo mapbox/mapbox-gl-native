@@ -495,6 +495,51 @@ public class SymbolLayerTest extends BaseStyleTest {
 
 
   @Test
+  public void testIconImageAsIdentitySourceFunction() {
+    checkViewIsDisplayed(R.id.mapView);
+    Timber.i("icon-image");
+    assertNotNull(layer);
+
+    // Set
+    layer.setProperties(
+      iconImage(property("FeaturePropertyA", Stops.<String>identity()))
+    );
+
+    // Verify
+    assertNotNull(layer.getIconImage());
+    assertNotNull(layer.getIconImage().getFunction());
+    assertEquals(SourceFunction.class, layer.getIconImage().getFunction().getClass());
+    assertEquals("FeaturePropertyA", ((SourceFunction) layer.getIconImage().getFunction()).getProperty());
+    assertEquals(IdentityStops.class, layer.getIconImage().getFunction().getStops().getClass());
+  }
+
+  @Test
+  public void testIconImageAsIntervalSourceFunction() {
+    checkViewIsDisplayed(R.id.mapView);
+    Timber.i("icon-image");
+    assertNotNull(layer);
+
+    // Set
+    layer.setProperties(
+      iconImage(
+        property(
+          "FeaturePropertyA",
+          interval(
+            stop(1, iconImage("undefined"))
+          )
+        )
+      )
+    );
+
+    // Verify
+    assertNotNull(layer.getIconImage());
+    assertNotNull(layer.getIconImage().getFunction());
+    assertEquals(SourceFunction.class, layer.getIconImage().getFunction().getClass());
+    assertEquals("FeaturePropertyA", ((SourceFunction) layer.getIconImage().getFunction()).getProperty());
+    assertEquals(IntervalStops.class, layer.getIconImage().getFunction().getStops().getClass());
+  }
+
+  @Test
   public void testIconRotateAsConstant() {
     checkViewIsDisplayed(R.id.mapView);
     Timber.i("icon-rotate");

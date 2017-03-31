@@ -40,7 +40,7 @@ auto makeLayoutPropertySetters() {
     result["icon-size"] = &setLayoutProperty<V, SymbolLayer, PropertyValue<float>, &SymbolLayer::setIconSize>;
     result["icon-text-fit"] = &setLayoutProperty<V, SymbolLayer, PropertyValue<IconTextFitType>, &SymbolLayer::setIconTextFit>;
     result["icon-text-fit-padding"] = &setLayoutProperty<V, SymbolLayer, PropertyValue<std::array<float, 4>>, &SymbolLayer::setIconTextFitPadding>;
-    result["icon-image"] = &setLayoutProperty<V, SymbolLayer, PropertyValue<std::string>, &SymbolLayer::setIconImage>;
+    result["icon-image"] = &setLayoutProperty<V, SymbolLayer, DataDrivenPropertyValue<std::string>, &SymbolLayer::setIconImage>;
     result["icon-rotate"] = &setLayoutProperty<V, SymbolLayer, DataDrivenPropertyValue<float>, &SymbolLayer::setIconRotate>;
     result["icon-padding"] = &setLayoutProperty<V, SymbolLayer, PropertyValue<float>, &SymbolLayer::setIconPadding>;
     result["icon-keep-upright"] = &setLayoutProperty<V, SymbolLayer, PropertyValue<bool>, &SymbolLayer::setIconKeepUpright>;

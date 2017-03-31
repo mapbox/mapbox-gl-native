@@ -203,15 +203,15 @@ void SymbolLayer::setIconTextFitPadding(PropertyValue<std::array<float, 4>> valu
     impl->layout.unevaluated.get<IconTextFitPadding>() = value;
     impl->observer->onLayerLayoutPropertyChanged(*this, "icon-text-fit-padding");
 }
-PropertyValue<std::string> SymbolLayer::getDefaultIconImage() {
+DataDrivenPropertyValue<std::string> SymbolLayer::getDefaultIconImage() {
     return IconImage::defaultValue();
 }
 
-PropertyValue<std::string> SymbolLayer::getIconImage() const {
+DataDrivenPropertyValue<std::string> SymbolLayer::getIconImage() const {
     return impl->layout.unevaluated.get<IconImage>();
 }
 
-void SymbolLayer::setIconImage(PropertyValue<std::string> value) {
+void SymbolLayer::setIconImage(DataDrivenPropertyValue<std::string> value) {
     if (value == getIconImage())
         return;
     impl->layout.unevaluated.get<IconImage>() = value;
