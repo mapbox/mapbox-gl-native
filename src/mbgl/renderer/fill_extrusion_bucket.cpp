@@ -13,12 +13,18 @@
 
 namespace mapbox {
 namespace util {
-template <> struct nth<0, mbgl::GeometryCoordinate> {
-    static int64_t get(const mbgl::GeometryCoordinate& t) { return t.x; };
+template <>
+struct nth<0, mbgl::GeometryCoordinate> {
+    static int64_t get(const mbgl::GeometryCoordinate& t) {
+        return t.x;
+    };
 };
 
-template <> struct nth<1, mbgl::GeometryCoordinate> {
-    static int64_t get(const mbgl::GeometryCoordinate& t) { return t.y; };
+template <>
+struct nth<1, mbgl::GeometryCoordinate> {
+    static int64_t get(const mbgl::GeometryCoordinate& t) {
+        return t.y;
+    };
 };
 } // namespace util
 } // namespace mapbox
@@ -29,12 +35,13 @@ using namespace style;
 
 struct GeometryTooLongException : std::exception {};
 
-FillExtrusionBucket::FillExtrusionBucket(const BucketParameters& parameters, const std::vector<const Layer*>& layers) {
+FillExtrusionBucket::FillExtrusionBucket(const BucketParameters& parameters,
+                                         const std::vector<const Layer*>& layers) {
     for (const auto& layer : layers) {
         paintPropertyBinders.emplace(layer->getID(),
-            FillExtrusionProgram::PaintPropertyBinders(
-                layer->as<FillExtrusionLayer>()->impl->paint.evaluated,
-                parameters.tileID.overscaledZ));
+                                     FillExtrusionProgram::PaintPropertyBinders(
+                                         layer->as<FillExtrusionLayer>()->impl->paint.evaluated,
+                                         parameters.tileID.overscaledZ));
     }
 }
 
@@ -55,11 +62,11 @@ void FillExtrusionBucket::addFeature(const GeometryTileFeature& feature,
         std::vector<uint32_t> flatIndices;
         flatIndices.reserve(totalVertices);
 
-// TODO this was all a lot of copying; make sure segment sizing/creation happens correctly
-
         std::size_t startVertices = vertices.vertexSize();
 
-        if (triangleSegments.empty() || triangleSegments.back().vertexLength + (5 * (totalVertices - 1) + 1) > std::numeric_limits<uint16_t>::max()) {
+        if (triangleSegments.empty() ||
+            triangleSegments.back().vertexLength + (5 * (totalVertices - 1) + 1) >
+                std::numeric_limits<uint16_t>::max()) {
             triangleSegments.emplace_back(startVertices, triangles.indexSize());
         }
 
@@ -67,7 +74,8 @@ void FillExtrusionBucket::addFeature(const GeometryTileFeature& feature,
         assert(triangleSegment.vertexLength <= std::numeric_limits<uint16_t>::max());
         uint16_t triangleIndex = triangleSegment.vertexLength;
 
-        assert(triangleIndex + (5 * (totalVertices - 1) + 1) <= std::numeric_limits<uint16_t>::max());
+        assert(triangleIndex + (5 * (totalVertices - 1) + 1) <=
+               std::numeric_limits<uint16_t>::max());
 
         for (const auto& ring : polygon) {
             std::size_t nVertices = ring.size();
@@ -80,7 +88,8 @@ void FillExtrusionBucket::addFeature(const GeometryTileFeature& feature,
             for (uint32_t i = 0; i < nVertices; i++) {
                 const auto& p1 = ring[i];
 
-                vertices.emplace_back(FillExtrusionProgram::layoutVertex(p1, 0, 0, 1, 1, edgeDistance));
+                vertices.emplace_back(
+                    FillExtrusionProgram::layoutVertex(p1, 0, 0, 1, 1, edgeDistance));
                 flatIndices.emplace_back(triangleIndex);
                 triangleIndex++;
 
@@ -92,13 +101,17 @@ void FillExtrusionBucket::addFeature(const GeometryTileFeature& feature,
 
                     const Point<double> perp = util::unit(util::perp(d1 - d2));
 
-                    vertices.emplace_back(FillExtrusionProgram::layoutVertex(p1, perp.x, perp.y, 0, 0, edgeDistance));
-                    vertices.emplace_back(FillExtrusionProgram::layoutVertex(p1, perp.x, perp.y, 0, 1, edgeDistance));
+                    vertices.emplace_back(
+                        FillExtrusionProgram::layoutVertex(p1, perp.x, perp.y, 0, 0, edgeDistance));
+                    vertices.emplace_back(
+                        FillExtrusionProgram::layoutVertex(p1, perp.x, perp.y, 0, 1, edgeDistance));
 
                     edgeDistance += util::dist<int16_t>(d1, d2);
 
-                    vertices.emplace_back(FillExtrusionProgram::layoutVertex(p2, perp.x, perp.y, 0, 0, edgeDistance));
-                    vertices.emplace_back(FillExtrusionProgram::layoutVertex(p2, perp.x, perp.y, 0, 1, edgeDistance));
+                    vertices.emplace_back(
+                        FillExtrusionProgram::layoutVertex(p2, perp.x, perp.y, 0, 0, edgeDistance));
+                    vertices.emplace_back(
+                        FillExtrusionProgram::layoutVertex(p2, perp.x, perp.y, 0, 1, edgeDistance));
 
                     triangles.emplace_back(triangleIndex, triangleIndex + 1, triangleIndex + 2);
                     triangles.emplace_back(triangleIndex + 1, triangleIndex + 2, triangleIndex + 3);
@@ -115,8 +128,7 @@ void FillExtrusionBucket::addFeature(const GeometryTileFeature& feature,
         assert(nIndices % 3 == 0);
 
         for (uint32_t i = 0; i < nIndices; i += 3) {
-            triangles.emplace_back(flatIndices[indices[i]],
-                                   flatIndices[indices[i + 1]],
+            triangles.emplace_back(flatIndices[indices[i]], flatIndices[indices[i + 1]],
                                    flatIndices[indices[i + 2]]);
         }
 
@@ -132,19 +144,19 @@ void FillExtrusionBucket::addFeature(const GeometryTileFeature& feature,
 void FillExtrusionBucket::upload(gl::Context& context) {
     vertexBuffer = context.createVertexBuffer(std::move(vertices));
     indexBuffer = context.createIndexBuffer(std::move(triangles));
-    
+
     for (auto& pair : paintPropertyBinders) {
         pair.second.upload(context);
     }
-    
+
     uploaded = true;
 }
 
 void FillExtrusionBucket::render(Painter& painter,
-                        PaintParameters& parameters,
-                        const Layer& layer,
-                        const RenderTile& tile,
-                        const Style& style) {
+                                 PaintParameters& parameters,
+                                 const Layer& layer,
+                                 const RenderTile& tile,
+                                 const Style& style) {
     painter.renderFillExtrusion(parameters, *this, *layer.as<FillExtrusionLayer>(), tile, style);
 }
 

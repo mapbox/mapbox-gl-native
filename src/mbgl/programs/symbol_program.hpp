@@ -31,7 +31,7 @@ namespace uniforms {
 MBGL_DEFINE_UNIFORM_VECTOR(float, 2, u_texsize);
 MBGL_DEFINE_UNIFORM_SCALAR(bool, u_rotate_with_map);
 MBGL_DEFINE_UNIFORM_SCALAR(bool, u_pitch_with_map);
-//MBGL_DEFINE_UNIFORM_SCALAR(gl::TextureUnit, u_texture);   // TODO see uniforms.hpp TODO -- once done, uncomment this
+MBGL_DEFINE_UNIFORM_SCALAR(gl::TextureUnit, u_texture);
 MBGL_DEFINE_UNIFORM_SCALAR(gl::TextureUnit, u_fadetexture);
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_aspect_ratio);
 MBGL_DEFINE_UNIFORM_SCALAR(bool, u_is_halo);

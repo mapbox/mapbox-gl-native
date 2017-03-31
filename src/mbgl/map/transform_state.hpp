@@ -1,7 +1,6 @@
 #pragma once
 
 #include <mbgl/map/mode.hpp>
-#include <mbgl/util/color.hpp>
 #include <mbgl/util/geo.hpp>
 #include <mbgl/util/geometry.hpp>
 #include <mbgl/util/constants.hpp>

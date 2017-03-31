@@ -24,10 +24,6 @@ namespace style {
 template <class> class Faded;
 } // namespace style
 
-//namespace uniforms {
-//MBGL_DEFINE_UNIFORM_SCALAR(Size,     u_world);
-//} // namespace uniforms
-
 struct FillLayoutAttributes : gl::Attributes<
     attributes::a_pos>
 {};

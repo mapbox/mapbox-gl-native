@@ -14,12 +14,15 @@ void FillExtrusionLayer::Impl::cascade(const CascadeParameters& parameters) {
 bool FillExtrusionLayer::Impl::evaluate(const PropertyEvaluationParameters& parameters) {
     paint.evaluate(parameters);
 
-    passes = (paint.evaluated.get<FillExtrusionOpacity>() > 0) ? RenderPass::Translucent : RenderPass::None;
+    passes = (paint.evaluated.get<FillExtrusionOpacity>() > 0) ? RenderPass::Translucent
+                                                               : RenderPass::None;
 
     return paint.hasTransition();
 }
 
-std::unique_ptr<Bucket> FillExtrusionLayer::Impl::createBucket(const BucketParameters& parameters, const std::vector<const Layer*>& layers) const {
+std::unique_ptr<Bucket>
+FillExtrusionLayer::Impl::createBucket(const BucketParameters& parameters,
+                                       const std::vector<const Layer*>& layers) const {
     return std::make_unique<FillExtrusionBucket>(parameters, layers);
 }
 
@@ -28,16 +31,17 @@ float FillExtrusionLayer::Impl::getQueryRadius() const {
     return util::length(translate[0], translate[1]);
 }
 
-bool FillExtrusionLayer::Impl::queryIntersectsGeometry(
-                                              const GeometryCoordinates& queryGeometry,
-                                              const GeometryCollection& geometry,
-                                              const float bearing,
-                                              const float pixelsToTileUnits) const {
+bool FillExtrusionLayer::Impl::queryIntersectsGeometry(const GeometryCoordinates& queryGeometry,
+                                                       const GeometryCollection& geometry,
+                                                       const float bearing,
+                                                       const float pixelsToTileUnits) const {
 
     auto translatedQueryGeometry = FeatureIndex::translateQueryGeometry(
-                                                                        queryGeometry, paint.evaluated.get<FillExtrusionTranslate>(), paint.evaluated.get<FillExtrusionTranslateAnchor>(), bearing, pixelsToTileUnits);
+        queryGeometry, paint.evaluated.get<FillExtrusionTranslate>(),
+        paint.evaluated.get<FillExtrusionTranslateAnchor>(), bearing, pixelsToTileUnits);
 
-    return util::polygonIntersectsMultiPolygon(translatedQueryGeometry.value_or(queryGeometry), geometry);
+    return util::polygonIntersectsMultiPolygon(translatedQueryGeometry.value_or(queryGeometry),
+                                               geometry);
 }
 
 } // namespace style

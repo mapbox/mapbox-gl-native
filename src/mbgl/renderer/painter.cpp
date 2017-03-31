@@ -226,8 +226,6 @@ void Painter::render(const Style& style, const FrameData& frame_, View& view, Sp
     // Actually render the layers
     if (debug::renderTree) { Log::Info(Event::Render, "{"); indent++; }
 
-    // TODO: Correctly compute the number of layers recursively beforehand.
-    // TODO TODO : this actually sounds like the one-order-item-per-layer might *fix* the above todo. Y/N?
     depthRangeSize = 1 - (order.size() + 2) * numSublayers * depthEpsilon;
 
     // - OPAQUE PASS -------------------------------------------------------------------------------

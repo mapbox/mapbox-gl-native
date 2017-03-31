@@ -114,7 +114,7 @@ public:
     std::unique_ptr<SpriteAtlas> spriteAtlas;
     std::unique_ptr<LineAtlas> lineAtlas;
 
-    Light light;    // TODO make private, add accessors. ??? 
+    Light light;
 
 private:
     std::vector<std::unique_ptr<Source>> sources;
