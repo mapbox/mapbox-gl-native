@@ -41,6 +41,9 @@ void main() {
     base = unpack_mix_vec2(a_base, a_base_t);
     height = unpack_mix_vec2(a_height, a_height_t);
 
+    base = max(0.0, base);
+    height = max(0.0, height);
+
     float t = mod(a_normal.x, 2.0);
     float z = t > 0.0 ? height : base;
 

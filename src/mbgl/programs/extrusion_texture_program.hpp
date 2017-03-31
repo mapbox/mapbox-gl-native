@@ -5,6 +5,7 @@
 #include <mbgl/programs/uniforms.hpp>
 #include <mbgl/shaders/extrusion_texture.hpp>
 #include <mbgl/style/layers/fill_extrusion_layer_properties.hpp>
+#include <mbgl/util/geometry.hpp>
 
 #include <string>
 

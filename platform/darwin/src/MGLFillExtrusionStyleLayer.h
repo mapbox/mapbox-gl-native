@@ -338,7 +338,7 @@ MGL_EXPORT
  */
 @interface NSValue (MGLFillExtrusionStyleLayerAdditions)
 
-#pragma mark Working with FillExtrusion Style Layer Attribute Values
+#pragma mark Working with Fill extrusion Style Layer Attribute Values
 
 /**
  Creates a new value object containing the given `MGLFillExtrusionTranslationAnchor` enumeration.

@@ -161,7 +161,7 @@ which it is added.
  */
 @interface NSValue (MGL<%- camelize(type) %>StyleLayerAdditions)
 
-#pragma mark Working with <%- camelize(type) %> Style Layer Attribute Values
+#pragma mark Working with <%- camelize(unhyphenate(type)) %> Style Layer Attribute Values
 
 <% for (let property of enumProperties) { -%>
 /**
