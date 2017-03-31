@@ -12,6 +12,10 @@ android {
         versionName rootProject.ext.versionName
     }
 
+    lintOptions {
+        disable 'MissingTranslation'
+    }
+
     buildTypes {
         debug {
             testCoverageEnabled = true
