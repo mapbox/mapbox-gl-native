@@ -12,11 +12,6 @@ namespace util {
 template <class T>
 class ThreadLocal : public noncopyable {
 public:
-    ThreadLocal(T* val) {
-        ThreadLocal();
-        set(val);
-    }
-
     ThreadLocal() {
         int ret = pthread_key_create(&key, [](void *ptr) {
             delete reinterpret_cast<T *>(ptr);
