@@ -36,6 +36,8 @@ import static org.junit.Assert.*;
 import static com.mapbox.mapboxsdk.style.layers.Property.*;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.*;
 
+import com.mapbox.mapboxsdk.style.layers.TransitionOptions;
+
 /**
  * Basic smoke tests for BackgroundLayer
  */
@@ -73,6 +75,18 @@ public class BackgroundLayerTest extends BaseStyleTest {
     // Set
     layer.setProperties(visibility(NONE));
     assertEquals(layer.getVisibility().getValue(), NONE);
+  }
+
+  @Test
+  public void testBackgroundColorTransition() {
+    checkViewIsDisplayed(R.id.mapView);
+    Timber.i("background-colorTransitionOptions");
+    assertNotNull(layer);
+
+    // Set and Get
+    TransitionOptions options = new TransitionOptions(300, 100);
+    layer.setBackgroundColorTransition(options);
+    assertEquals(layer.getBackgroundColorTransition(), options);
   }
 
   @Test
@@ -124,6 +138,18 @@ public class BackgroundLayerTest extends BaseStyleTest {
   }
 
   @Test
+  public void testBackgroundPatternTransition() {
+    checkViewIsDisplayed(R.id.mapView);
+    Timber.i("background-patternTransitionOptions");
+    assertNotNull(layer);
+
+    // Set and Get
+    TransitionOptions options = new TransitionOptions(300, 100);
+    layer.setBackgroundPatternTransition(options);
+    assertEquals(layer.getBackgroundPatternTransition(), options);
+  }
+
+  @Test
   public void testBackgroundPatternAsConstant() {
     checkViewIsDisplayed(R.id.mapView);
     Timber.i("background-pattern");
@@ -157,6 +183,18 @@ public class BackgroundLayerTest extends BaseStyleTest {
     assertEquals(CameraFunction.class, layer.getBackgroundPattern().getFunction().getClass());
     assertEquals(IntervalStops.class, layer.getBackgroundPattern().getFunction().getStops().getClass());
     assertEquals(1, ((IntervalStops) layer.getBackgroundPattern().getFunction().getStops()).size());
+  }
+
+  @Test
+  public void testBackgroundOpacityTransition() {
+    checkViewIsDisplayed(R.id.mapView);
+    Timber.i("background-opacityTransitionOptions");
+    assertNotNull(layer);
+
+    // Set and Get
+    TransitionOptions options = new TransitionOptions(300, 100);
+    layer.setBackgroundOpacityTransition(options);
+    assertEquals(layer.getBackgroundOpacityTransition(), options);
   }
 
   @Test

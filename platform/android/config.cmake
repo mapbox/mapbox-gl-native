@@ -119,6 +119,8 @@ add_library(mbgl-android STATIC
     platform/android/src/style/conversion/url_or_tileset.hpp
 
     # Style
+    platform/android/src/style/transition_options.cpp
+    platform/android/src/style/transition_options.hpp
     platform/android/src/style/layers/background_layer.cpp
     platform/android/src/style/layers/background_layer.hpp
     platform/android/src/style/layers/circle_layer.cpp

@@ -3,6 +3,7 @@
 
 #include <jni/jni.hpp>
 
+#include <mbgl/style/transition_options.hpp>
 #include <mbgl/util/logging.hpp>
 
 // Java -> C++ conversion

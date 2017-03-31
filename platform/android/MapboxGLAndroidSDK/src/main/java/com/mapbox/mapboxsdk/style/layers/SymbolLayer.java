@@ -8,6 +8,8 @@ import android.support.annotation.UiThread;
 
 import static com.mapbox.mapboxsdk.utils.ColorUtils.rgbaToColor;
 
+import com.mapbox.mapboxsdk.style.layers.TransitionOptions;
+
 /**
  * An icon or a text label.
  *
@@ -441,6 +443,24 @@ public class SymbolLayer extends Layer {
   }
 
   /**
+   * Get the IconOpacity property transition options
+   *
+   * @return transition options for Float
+   */
+  public TransitionOptions getIconOpacityTransition() {
+    return nativeGetIconOpacityTransition();
+  }
+
+  /**
+   * Set the IconOpacity property transition options
+   *
+   * @param options transition options for Float
+   */
+  public void setIconOpacityTransition(TransitionOptions options) {
+    nativeSetIconOpacityTransition(options.getDuration(), options.getDelay());
+  }
+
+  /**
    * Get the IconColor property
    *
    * @return property wrapper value around String
@@ -466,6 +486,23 @@ public class SymbolLayer extends Layer {
     }
   }
 
+  /**
+   * Get the IconColor property transition options
+   *
+   * @return transition options for String
+   */
+  public TransitionOptions getIconColorTransition() {
+    return nativeGetIconColorTransition();
+  }
+
+  /**
+   * Set the IconColor property transition options
+   *
+   * @param options transition options for String
+   */
+  public void setIconColorTransition(TransitionOptions options) {
+    nativeSetIconColorTransition(options.getDuration(), options.getDelay());
+  }
 
   /**
    * Get the IconHaloColor property
@@ -493,6 +530,23 @@ public class SymbolLayer extends Layer {
     }
   }
 
+  /**
+   * Get the IconHaloColor property transition options
+   *
+   * @return transition options for String
+   */
+  public TransitionOptions getIconHaloColorTransition() {
+    return nativeGetIconHaloColorTransition();
+  }
+
+  /**
+   * Set the IconHaloColor property transition options
+   *
+   * @param options transition options for String
+   */
+  public void setIconHaloColorTransition(TransitionOptions options) {
+    nativeSetIconHaloColorTransition(options.getDuration(), options.getDelay());
+  }
 
   /**
    * Get the IconHaloWidth property
@@ -502,6 +556,24 @@ public class SymbolLayer extends Layer {
   @SuppressWarnings("unchecked")
   public PropertyValue<Float> getIconHaloWidth() {
     return (PropertyValue<Float>) new PropertyValue("icon-halo-width", nativeGetIconHaloWidth());
+  }
+
+  /**
+   * Get the IconHaloWidth property transition options
+   *
+   * @return transition options for Float
+   */
+  public TransitionOptions getIconHaloWidthTransition() {
+    return nativeGetIconHaloWidthTransition();
+  }
+
+  /**
+   * Set the IconHaloWidth property transition options
+   *
+   * @param options transition options for Float
+   */
+  public void setIconHaloWidthTransition(TransitionOptions options) {
+    nativeSetIconHaloWidthTransition(options.getDuration(), options.getDelay());
   }
 
   /**
@@ -515,6 +587,24 @@ public class SymbolLayer extends Layer {
   }
 
   /**
+   * Get the IconHaloBlur property transition options
+   *
+   * @return transition options for Float
+   */
+  public TransitionOptions getIconHaloBlurTransition() {
+    return nativeGetIconHaloBlurTransition();
+  }
+
+  /**
+   * Set the IconHaloBlur property transition options
+   *
+   * @param options transition options for Float
+   */
+  public void setIconHaloBlurTransition(TransitionOptions options) {
+    nativeSetIconHaloBlurTransition(options.getDuration(), options.getDelay());
+  }
+
+  /**
    * Get the IconTranslate property
    *
    * @return property wrapper value around Float[]
@@ -522,6 +612,24 @@ public class SymbolLayer extends Layer {
   @SuppressWarnings("unchecked")
   public PropertyValue<Float[]> getIconTranslate() {
     return (PropertyValue<Float[]>) new PropertyValue("icon-translate", nativeGetIconTranslate());
+  }
+
+  /**
+   * Get the IconTranslate property transition options
+   *
+   * @return transition options for Float[]
+   */
+  public TransitionOptions getIconTranslateTransition() {
+    return nativeGetIconTranslateTransition();
+  }
+
+  /**
+   * Set the IconTranslate property transition options
+   *
+   * @param options transition options for Float[]
+   */
+  public void setIconTranslateTransition(TransitionOptions options) {
+    nativeSetIconTranslateTransition(options.getDuration(), options.getDelay());
   }
 
   /**
@@ -542,6 +650,24 @@ public class SymbolLayer extends Layer {
   @SuppressWarnings("unchecked")
   public PropertyValue<Float> getTextOpacity() {
     return (PropertyValue<Float>) new PropertyValue("text-opacity", nativeGetTextOpacity());
+  }
+
+  /**
+   * Get the TextOpacity property transition options
+   *
+   * @return transition options for Float
+   */
+  public TransitionOptions getTextOpacityTransition() {
+    return nativeGetTextOpacityTransition();
+  }
+
+  /**
+   * Set the TextOpacity property transition options
+   *
+   * @param options transition options for Float
+   */
+  public void setTextOpacityTransition(TransitionOptions options) {
+    nativeSetTextOpacityTransition(options.getDuration(), options.getDelay());
   }
 
   /**
@@ -570,6 +696,23 @@ public class SymbolLayer extends Layer {
     }
   }
 
+  /**
+   * Get the TextColor property transition options
+   *
+   * @return transition options for String
+   */
+  public TransitionOptions getTextColorTransition() {
+    return nativeGetTextColorTransition();
+  }
+
+  /**
+   * Set the TextColor property transition options
+   *
+   * @param options transition options for String
+   */
+  public void setTextColorTransition(TransitionOptions options) {
+    nativeSetTextColorTransition(options.getDuration(), options.getDelay());
+  }
 
   /**
    * Get the TextHaloColor property
@@ -597,6 +740,23 @@ public class SymbolLayer extends Layer {
     }
   }
 
+  /**
+   * Get the TextHaloColor property transition options
+   *
+   * @return transition options for String
+   */
+  public TransitionOptions getTextHaloColorTransition() {
+    return nativeGetTextHaloColorTransition();
+  }
+
+  /**
+   * Set the TextHaloColor property transition options
+   *
+   * @param options transition options for String
+   */
+  public void setTextHaloColorTransition(TransitionOptions options) {
+    nativeSetTextHaloColorTransition(options.getDuration(), options.getDelay());
+  }
 
   /**
    * Get the TextHaloWidth property
@@ -606,6 +766,24 @@ public class SymbolLayer extends Layer {
   @SuppressWarnings("unchecked")
   public PropertyValue<Float> getTextHaloWidth() {
     return (PropertyValue<Float>) new PropertyValue("text-halo-width", nativeGetTextHaloWidth());
+  }
+
+  /**
+   * Get the TextHaloWidth property transition options
+   *
+   * @return transition options for Float
+   */
+  public TransitionOptions getTextHaloWidthTransition() {
+    return nativeGetTextHaloWidthTransition();
+  }
+
+  /**
+   * Set the TextHaloWidth property transition options
+   *
+   * @param options transition options for Float
+   */
+  public void setTextHaloWidthTransition(TransitionOptions options) {
+    nativeSetTextHaloWidthTransition(options.getDuration(), options.getDelay());
   }
 
   /**
@@ -619,6 +797,24 @@ public class SymbolLayer extends Layer {
   }
 
   /**
+   * Get the TextHaloBlur property transition options
+   *
+   * @return transition options for Float
+   */
+  public TransitionOptions getTextHaloBlurTransition() {
+    return nativeGetTextHaloBlurTransition();
+  }
+
+  /**
+   * Set the TextHaloBlur property transition options
+   *
+   * @param options transition options for Float
+   */
+  public void setTextHaloBlurTransition(TransitionOptions options) {
+    nativeSetTextHaloBlurTransition(options.getDuration(), options.getDelay());
+  }
+
+  /**
    * Get the TextTranslate property
    *
    * @return property wrapper value around Float[]
@@ -626,6 +822,24 @@ public class SymbolLayer extends Layer {
   @SuppressWarnings("unchecked")
   public PropertyValue<Float[]> getTextTranslate() {
     return (PropertyValue<Float[]>) new PropertyValue("text-translate", nativeGetTextTranslate());
+  }
+
+  /**
+   * Get the TextTranslate property transition options
+   *
+   * @return transition options for Float[]
+   */
+  public TransitionOptions getTextTranslateTransition() {
+    return nativeGetTextTranslateTransition();
+  }
+
+  /**
+   * Set the TextTranslate property transition options
+   *
+   * @param options transition options for Float[]
+   */
+  public void setTextTranslateTransition(TransitionOptions options) {
+    nativeSetTextTranslateTransition(options.getDuration(), options.getDelay());
   }
 
   /**
@@ -708,32 +922,79 @@ public class SymbolLayer extends Layer {
 
   private native Object nativeGetIconOpacity();
 
+  private native TransitionOptions nativeGetIconOpacityTransition();
+
+  private native void nativeSetIconOpacityTransition(long duration, long delay);
+
   private native Object nativeGetIconColor();
+
+  private native TransitionOptions nativeGetIconColorTransition();
+
+  private native void nativeSetIconColorTransition(long duration, long delay);
 
   private native Object nativeGetIconHaloColor();
 
+  private native TransitionOptions nativeGetIconHaloColorTransition();
+
+  private native void nativeSetIconHaloColorTransition(long duration, long delay);
+
   private native Object nativeGetIconHaloWidth();
+
+  private native TransitionOptions nativeGetIconHaloWidthTransition();
+
+  private native void nativeSetIconHaloWidthTransition(long duration, long delay);
 
   private native Object nativeGetIconHaloBlur();
 
+  private native TransitionOptions nativeGetIconHaloBlurTransition();
+
+  private native void nativeSetIconHaloBlurTransition(long duration, long delay);
+
   private native Object nativeGetIconTranslate();
+
+  private native TransitionOptions nativeGetIconTranslateTransition();
+
+  private native void nativeSetIconTranslateTransition(long duration, long delay);
 
   private native Object nativeGetIconTranslateAnchor();
 
   private native Object nativeGetTextOpacity();
 
+  private native TransitionOptions nativeGetTextOpacityTransition();
+
+  private native void nativeSetTextOpacityTransition(long duration, long delay);
+
   private native Object nativeGetTextColor();
+
+  private native TransitionOptions nativeGetTextColorTransition();
+
+  private native void nativeSetTextColorTransition(long duration, long delay);
 
   private native Object nativeGetTextHaloColor();
 
+  private native TransitionOptions nativeGetTextHaloColorTransition();
+
+  private native void nativeSetTextHaloColorTransition(long duration, long delay);
+
   private native Object nativeGetTextHaloWidth();
+
+  private native TransitionOptions nativeGetTextHaloWidthTransition();
+
+  private native void nativeSetTextHaloWidthTransition(long duration, long delay);
 
   private native Object nativeGetTextHaloBlur();
 
+  private native TransitionOptions nativeGetTextHaloBlurTransition();
+
+  private native void nativeSetTextHaloBlurTransition(long duration, long delay);
+
   private native Object nativeGetTextTranslate();
 
-  private native Object nativeGetTextTranslateAnchor();
+  private native TransitionOptions nativeGetTextTranslateTransition();
 
+  private native void nativeSetTextTranslateTransition(long duration, long delay);
+
+  private native Object nativeGetTextTranslateAnchor();
 
   @Override
   protected native void finalize() throws Throwable;
