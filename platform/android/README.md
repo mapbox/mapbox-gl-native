@@ -4,49 +4,86 @@
 
 A library based on [Mapbox GL Native](../../README.md) for embedding interactive map views with scalable, customizable vector maps into Java applications on Android devices.
 
+## Getting Started 
+
+Alright. So, actually, you may be in the wrong place. From here on in, this README is going to be for people who are interested in working on and improving on Mapbox GL Native for Android.
+
+**To view our current API documentation, see our [JavaDoc](https://www.mapbox.com/android-sdk/api).**
+
 **To install and use the Mapbox Android SDK in an application, see the [Mapbox Android SDK website](https://www.mapbox.com/android-sdk/).**
 
 [![](https://www.mapbox.com/android-sdk/images/splash.png)](https://www.mapbox.com/android-sdk/)
 
-## Contributing to the SDK
+### Setup environment
 
 **These instructions are for developers interested in making code-level contributions to the SDK itself. If you instead want to use the SDK in your app, see above.**
 
-Building the SDK yourself requires [a number of dependencies and steps](../../INSTALL.md) that are unnecessary for developing production applications.
+#### Getting the source
 
-* [Contributing on Linux](CONTRIBUTING_LINUX.md)
-* [Contributing on macOS](CONTRIBUTING_MACOS.md)
+Clone the git repository
 
-### Setting up the Android emulator
+```bash
+git clone https://github.com/mapbox/mapbox-gl-native.git
+cd mapbox-gl-native
+```
 
-The Mapbox Android SDK requires Android 4.0.3+ (API level 15+).
+#### Installing dependencies
 
-If you want to run the test app in the emulator, we recommend the x86 build because it will run a lot faster.
+These dependencies are required for all operating systems and all platform targets.
 
-First ensure you have an `MAPBOX_ACCESS_TOKEN` environment variable set, as described below. Then, create an x86 build:
+- Latest stable [Android Studio](https://developer.android.com/studio/index.html) 
+- Update Android SDK with latest
+  - Android SDK Build-Tools 
+  - Android Platform-Tools
+  - Android SDK Tools
+  - CMake
+  - NDK
+  - LLDB
 
-    make android-lib-x86
+- Modern C++ compiler that supports -std=c++14
+  - clang++ 3.5 or later or
+  - g++-5 or later
+- [cURL](https://curl.haxx.se) (for build only)
+- [Node.js](https://nodejs.org/) or later (for build only)
+- [pkg-config](https://wiki.freedesktop.org/www/Software/pkg-config/) (for build only)
 
-In Android Studio, create an x86 AVD (Android Virtual Device):
+##### Additional Dependencies for Linux
 
-- Open AVD Manager via the Tools menu -> Android -> AVD Manager
-- Click "Create Virtual Device" at the bottom on AVD Manager window
-- Select one of the device profiles, for example the Nexus 4
-- Click "Next"
-- Select a Lollipop or Kitkat release with ABI of x86. If the line is greyed out click Download to download the OS files.
-- Click "Next"
-- Under "Emulated Performance" check "Host GPU" and uncheck "Store a snapshot for faster startup"
-- Click "Finish"
-- Close the AVD Manager
+_These instructions were tested on Ubuntu 16.04 LTS (aka Xenial Xerus)._
 
-Now when you run or debug the Android project you will see a window "Choose Device". Select your new AVD from drop down under "Launch emulator". If you select "Use same device for future launches" Android Studio will remember the selection and not ask again.
+```
+$ sudo apt-get install -y build-essential curl lib32stdc++6 lib32z1 pkg-config python
+```
 
-### Running Mapbox GL Native on a hardware Android device
+##### Additional Dependencies for macOS
 
-The Mapbox Android SDK requires Android 4.0.3+ (API level 15+).
+- Apple Command Line Tools (available at  [Apple Developer](https://developer.apple.com/download/more/))
+- [xcpretty](https://github.com/supermarin/xcpretty) (`gem install xcpretty`)
 
-First read the [Google documentation](http://developer.android.com/tools/device.html) to set up your device and your OS to connect to the device.
 
-When you plug your device in and then run or debug the Android project you will see a window "Choose Device". Choose your device from the "Choose a running device" list.
+#### Open project in Android Studio
 
-If your device does not show up, double check the [Google documentation](http://developer.android.com/tools/device.html).
+##### macOS
+
+Execute the following to generate the required build files and open the project with Android Studio:
+
+```
+make aproj
+```
+
+##### linux
+
+Open Android Studio project in `/platform/android`, run `make android-configuration` in the root folder of the project.
+
+
+##### Setting Mapbox Access Token
+
+_The test application (used for development purposes) uses Mapbox vector tiles, which require a Mapbox account and API access token. Obtain a free access token on the [Mapbox account page](https://www.mapbox.com/studio/account/tokens/)._
+
+With the first gradle invocation, gradle will take the value of the `MAPBOX_ACCESS_TOKEN` environment variable and save it to `MapboxGLAndroidSDKTestApp/src/main/res/values/developer-config.xml`. If the environement variable wasn't set, you can edit `developer-config.xml` manually and add your access token to the `mapbox_access_token` resource.  
+
+#### Running project
+
+Run the configuration for the `MapboxGLAndroidSDKTestApp` module and select a device or emulator to deploy on. Based on the selected device, the c++ code will be compiled for the related processor architecture. You can see the project compiling in the `View > Tool Windows > Gradle Console`. 
+
+More information about building and distributing this project in [DISTRIBUTE.md][https://github.com/mapbox/mapbox-gl-native/blob/master/platform/android/DISTRIBUTE.md].
