@@ -12,8 +12,7 @@ namespace util {
 template <class T>
 class ThreadLocal : public noncopyable {
 public:
-    ThreadLocal(T* val) {
-        ThreadLocal();
+    ThreadLocal(T* val) : ThreadLocal() {
         set(val);
     }
 
