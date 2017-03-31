@@ -36,6 +36,4 @@ public:
     std::unordered_map<std::string, FillExtrusionProgram::PaintPropertyBinders> paintPropertyBinders;
 };
 
-bool isBoundaryEdge(const Point<int16_t>&, const Point<int16_t>&);
-
 } // namespace mbgl
