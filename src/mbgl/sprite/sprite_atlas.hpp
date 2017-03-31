@@ -6,10 +6,9 @@
 #include <mbgl/util/optional.hpp>
 #include <mbgl/sprite/sprite_image.hpp>
 
-#include <atomic>
 #include <string>
 #include <map>
-#include <mutex>
+#include <set>
 #include <unordered_map>
 #include <array>
 #include <memory>
@@ -28,12 +27,26 @@ public:
     SpriteAtlasElement(Rect<uint16_t>, std::shared_ptr<const SpriteImage>, Size size, float pixelRatio);
 
     Rect<uint16_t> pos;
-    std::shared_ptr<const SpriteImage> spriteImage;
+    bool sdf;
 
     float relativePixelRatio;
     std::array<float, 2> size;
     std::array<float, 2> tl;
     std::array<float, 2> br;
+    float width;
+    float height;
+};
+
+class SpriteAtlas;
+
+typedef std::map<std::string,SpriteAtlasElement> IconMap;
+typedef std::set<std::string> IconDependencies;
+typedef std::map<uintptr_t,IconMap> IconAtlasMap;
+typedef std::map<SpriteAtlas*,IconDependencies> IconDependencyMap;
+
+class IconRequestor {
+public:
+    virtual void onIconsAvailable(SpriteAtlas*, IconMap) = 0;
 };
 
 class SpriteAtlas : public util::noncopyable {
@@ -55,8 +68,11 @@ public:
 
     void setSprite(const std::string&, std::shared_ptr<const SpriteImage>);
     void removeSprite(const std::string&);
+    
+    std::shared_ptr<const SpriteImage> getSprite(const std::string& name);
 
-    std::shared_ptr<const SpriteImage> getSprite(const std::string&);
+    void getIcons(IconRequestor& requestor);
+    void removeRequestor(IconRequestor& requestor);
 
     optional<SpriteAtlasElement> getIcon(const std::string& name);
     optional<SpriteAtlasElement> getPattern(const std::string& name);
@@ -105,13 +121,17 @@ private:
 
     optional<SpriteAtlasElement> getImage(const std::string& name, optional<Rect<uint16_t>> Entry::*rect);
     void copy(const Entry&, optional<Rect<uint16_t>> Entry::*rect);
+    
+    IconMap buildIconMap();
 
-    std::mutex mutex;
     std::unordered_map<std::string, Entry> entries;
     BinPack<uint16_t> bin;
     PremultipliedImage image;
     mbgl::optional<gl::Texture> texture;
-    std::atomic<bool> dirty;
+    bool dirty;
+    
+    std::set<IconRequestor*> requestors;
+    IconMap icons;
 };
 
 } // namespace mbgl

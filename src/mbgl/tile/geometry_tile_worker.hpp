@@ -2,6 +2,8 @@
 
 #include <mbgl/map/mode.hpp>
 #include <mbgl/tile/tile_id.hpp>
+#include <mbgl/sprite/sprite_atlas.hpp>
+#include <mbgl/text/glyph.hpp>
 #include <mbgl/text/placement_config.hpp>
 #include <mbgl/actor/actor_ref.hpp>
 #include <mbgl/util/optional.hpp>
@@ -25,7 +27,6 @@ public:
     GeometryTileWorker(ActorRef<GeometryTileWorker> self,
                        ActorRef<GeometryTile> parent,
                        OverscaledTileID,
-                       GlyphAtlas&,
                        const std::atomic<bool>&,
                        const MapMode);
     ~GeometryTileWorker();
@@ -33,20 +34,28 @@ public:
     void setLayers(std::vector<std::unique_ptr<style::Layer>>, uint64_t correlationID);
     void setData(std::unique_ptr<const GeometryTileData>, uint64_t correlationID);
     void setPlacementConfig(PlacementConfig, uint64_t correlationID);
-    void symbolDependenciesChanged();
+    
+    void onGlyphsAvailable(GlyphPositionMap glyphs, GlyphRangeSet loadedRanges);
+    void onIconsAvailable(IconAtlasMap icons);
 
 private:
-    void coalesce();
     void coalesced();
     void redoLayout();
     void attemptPlacement();
+    
+    void coalesce();
+
+    void requestNewGlyphs(const GlyphDependencies&);
+    void requestNewIcons(const IconDependencyMap&);
+   
+    void symbolDependenciesChanged();
     bool hasPendingSymbolDependencies() const;
+    bool hasPendingSymbolLayouts() const;
 
     ActorRef<GeometryTileWorker> self;
     ActorRef<GeometryTile> parent;
 
     const OverscaledTileID id;
-    GlyphAtlas& glyphAtlas;
     const std::atomic<bool>& obsolete;
     const MapMode mode;
 
@@ -66,6 +75,10 @@ private:
     optional<PlacementConfig> placementConfig;
 
     std::vector<std::unique_ptr<SymbolLayout>> symbolLayouts;
+    GlyphDependencies pendingGlyphDependencies;
+    IconDependencyMap pendingIconDependencies;
+    GlyphPositionMap glyphPositions;
+    IconAtlasMap icons;
 };
 
 } // namespace mbgl

@@ -1,7 +1,9 @@
 #pragma once
 
+#include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/tile/tile.hpp>
 #include <mbgl/tile/geometry_tile_worker.hpp>
+#include <mbgl/text/glyph_atlas.hpp>
 #include <mbgl/text/placement_config.hpp>
 #include <mbgl/util/feature.hpp>
 #include <mbgl/actor/actor.hpp>
@@ -24,7 +26,7 @@ class UpdateParameters;
 class SourceQueryOptions;
 } // namespace style
 
-class GeometryTile : public Tile {
+class GeometryTile : public Tile, public GlyphRequestor, IconRequestor {
 public:
     GeometryTile(const OverscaledTileID&,
                  std::string sourceID,
@@ -36,8 +38,13 @@ public:
     void setData(std::unique_ptr<const GeometryTileData>);
 
     void setPlacementConfig(const PlacementConfig&) override;
-    void symbolDependenciesChanged() override;
     void redoLayout() override;
+    
+    void onGlyphsAvailable(GlyphPositionMap, GlyphRangeSet) override;
+    void onIconsAvailable(SpriteAtlas*, IconMap) override;
+    
+    void getGlyphs(GlyphDependencies);
+    void getIcons(IconDependencyMap);
 
     Bucket* getBucket(const style::Layer&) override;
 
@@ -87,6 +94,10 @@ private:
     std::shared_ptr<Mailbox> mailbox;
     Actor<GeometryTileWorker> worker;
 
+    GlyphAtlas& glyphAtlas;
+    std::set<SpriteAtlas*> pendingSpriteAtlases;
+    IconAtlasMap iconAtlasMap;
+    
     uint64_t correlationID = 0;
     optional<PlacementConfig> requestedConfig;
 

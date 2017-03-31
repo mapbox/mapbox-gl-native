@@ -44,7 +44,7 @@ TEST(GlyphPBF, Parsing) {
     glyphAtlasObserver.glyphsLoaded = [&](const FontStack&, const GlyphRange&) {
         loop.stop();
 
-        const auto& sdfs = glyphAtlas.getGlyphSet(fontStack)->getSDFs();
+        const auto& sdfs = glyphAtlas.getGlyphSet(fontStack).getSDFs();
 
         // The fake glyphs don't contain a glyph that has the ID 0; it only contains glyphs with
         // undefined IDs, but the parser should remove them.

@@ -48,10 +48,6 @@ public:
     // trigger re-placement of existing complete tiles.
     void updateTiles(const UpdateParameters&);
 
-    // Called when icons or glyphs are loaded. Triggers further processing of tiles which
-    // were waiting on such dependencies.
-    void updateSymbolDependentTiles();
-
     // Removes all tiles (by putting them into the cache).
     void removeTiles();
 
