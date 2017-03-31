@@ -285,7 +285,7 @@ void Context::drawPixels(const Size size, const void* data, TextureFormat format
     if (format != TextureFormat::RGBA) {
         format = static_cast<TextureFormat>(GL_LUMINANCE);
     }
-    MBGL_CHECK_ERROR(glDrawPixels(size.width, size.height, static_cast<GLenum>(GL_LUMINANCE),
+    MBGL_CHECK_ERROR(glDrawPixels(size.width, size.height, static_cast<GLenum>(format),
                                   GL_UNSIGNED_BYTE, data));
 }
 #endif // MBGL_USE_GLES2
