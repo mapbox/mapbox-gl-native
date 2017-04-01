@@ -174,6 +174,12 @@
 		40F887701D7A1E58008ECB67 /* MGLShapeSource_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 40F8876F1D7A1DB8008ECB67 /* MGLShapeSource_Private.h */; };
 		40F887711D7A1E59008ECB67 /* MGLShapeSource_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 40F8876F1D7A1DB8008ECB67 /* MGLShapeSource_Private.h */; };
 		40FDA76B1CCAAA6800442548 /* MBXAnnotationView.m in Sources */ = {isa = PBXBuildFile; fileRef = 40FDA76A1CCAAA6800442548 /* MBXAnnotationView.m */; };
+		5375F1FF1E9007740003A265 /* MGLUserTrackingBarButtonItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 5375F1FD1E90076B0003A265 /* MGLUserTrackingBarButtonItem.m */; };
+		5375F2001E9031260003A265 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DA1DC99E1CB6E088006E619F /* Assets.xcassets */; };
+		5375F2011E90312C0003A265 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DA1DC99E1CB6E088006E619F /* Assets.xcassets */; };
+		5375F2021E903B000003A265 /* MGLUserTrackingBarButtonItem.h in Headers */ = {isa = PBXBuildFile; fileRef = 5375F1FC1E90076B0003A265 /* MGLUserTrackingBarButtonItem.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		5375F2031E903B010003A265 /* MGLUserTrackingBarButtonItem.h in Headers */ = {isa = PBXBuildFile; fileRef = 5375F1FC1E90076B0003A265 /* MGLUserTrackingBarButtonItem.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		554180421D2E97DE00012372 /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 554180411D2E97DE00012372 /* OpenGLES.framework */; };
 		556660CA1E1BF3A900E2C41B /* MGLFoundation.h in Headers */ = {isa = PBXBuildFile; fileRef = 556660C91E1BF3A900E2C41B /* MGLFoundation.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		556660D81E1D085500E2C41B /* MGLVersionNumber.m in Sources */ = {isa = PBXBuildFile; fileRef = 556660D71E1D085500E2C41B /* MGLVersionNumber.m */; };
 		556660DB1E1D8E8D00E2C41B /* MGLFoundation.h in Headers */ = {isa = PBXBuildFile; fileRef = 556660C91E1BF3A900E2C41B /* MGLFoundation.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -642,6 +648,8 @@
 		40F8876F1D7A1DB8008ECB67 /* MGLShapeSource_Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLShapeSource_Private.h; sourceTree = "<group>"; };
 		40FDA7691CCAAA6800442548 /* MBXAnnotationView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MBXAnnotationView.h; sourceTree = "<group>"; };
 		40FDA76A1CCAAA6800442548 /* MBXAnnotationView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MBXAnnotationView.m; sourceTree = "<group>"; };
+		5375F1FC1E90076B0003A265 /* MGLUserTrackingBarButtonItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLUserTrackingBarButtonItem.h; sourceTree = "<group>"; };
+		5375F1FD1E90076B0003A265 /* MGLUserTrackingBarButtonItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLUserTrackingBarButtonItem.m; sourceTree = "<group>"; };
 		554180411D2E97DE00012372 /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
 		556660C91E1BF3A900E2C41B /* MGLFoundation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLFoundation.h; sourceTree = "<group>"; };
 		556660D71E1D085500E2C41B /* MGLVersionNumber.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = MGLVersionNumber.m; path = ../../darwin/test/MGLVersionNumber.m; sourceTree = "<group>"; };
@@ -1306,6 +1314,8 @@
 			isa = PBXGroup;
 			children = (
 				355ADFF91E9281C300F3939D /* Views */,
+				5375F1FC1E90076B0003A265 /* MGLUserTrackingBarButtonItem.h */,
+				5375F1FD1E90076B0003A265 /* MGLUserTrackingBarButtonItem.m */,
 				35CE617F1D4165C2004F2359 /* Categories */,
 				DAD165841CF4D06B001FF4B9 /* Annotations */,
 				DAD165851CF4D08B001FF4B9 /* Telemetry */,
@@ -1634,6 +1644,7 @@
 				400533011DB0862B0069F638 /* NSArray+MGLAdditions.h in Headers */,
 				4049C29D1DB6CD6C00B3F799 /* MGLPointCollection.h in Headers */,
 				40CF6DBB1DAC3C6600A4D18B /* MGLShape_Private.h in Headers */,
+				5375F2021E903B000003A265 /* MGLUserTrackingBarButtonItem.h in Headers */,
 				4018B1CA1CDC288E00F666AF /* MGLAnnotationView.h in Headers */,
 				35E79F201D41266300957B9E /* MGLStyleLayer_Private.h in Headers */,
 				353933FB1D3FB7C0003F57D7 /* MGLRasterStyleLayer.h in Headers */,
@@ -1754,6 +1765,7 @@
 				DA72620C1DEEE3480043BB89 /* MGLOpenGLStyleLayer.h in Headers */,
 				35CE61831D4165D9004F2359 /* UIColor+MGLAdditions.h in Headers */,
 				DABFB8671CBE99E500D62B32 /* MGLPolygon.h in Headers */,
+				5375F2031E903B010003A265 /* MGLUserTrackingBarButtonItem.h in Headers */,
 				404C26E81D89C55D000AA13D /* MGLTileSource_Private.h in Headers */,
 				DAAF722C1DA903C700312FA4 /* MGLStyleValue.h in Headers */,
 				DABFB8651CBE99E500D62B32 /* MGLOverlay.h in Headers */,
@@ -1936,7 +1948,7 @@
 				TargetAttributes = {
 					DA1DC9491CB6C1C2006E619F = {
 						CreatedOnToolsVersion = 7.3;
-						DevelopmentTeam = GJZR2MEM28;
+						DevelopmentTeam = 3Z9HLNMTA6;
 						LastSwiftMigration = 0820;
 					};
 					DA25D5B81CCD9EDE00607828 = {
@@ -2062,6 +2074,7 @@
 				DA8933BF1CCD2CAD00E68420 /* Foundation.stringsdict in Resources */,
 				408982E91DEE208200754016 /* api_mapbox_staging.der in Resources */,
 				408982EA1DEE208B00754016 /* api_mapbox_com-digicert.der in Resources */,
+				5375F2001E9031260003A265 /* Assets.xcassets in Resources */,
 				408982EB1DEE209100754016 /* api_mapbox_com-geotrust.der in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2076,6 +2089,7 @@
 				DA8933E31CCD31DF00E68420 /* Compass@3x.png in Resources */,
 				DA8933E41CCD31DF00E68420 /* default_marker.png in Resources */,
 				DA8933E51CCD31DF00E68420 /* default_marker@2x.png in Resources */,
+				5375F2011E90312C0003A265 /* Assets.xcassets in Resources */,
 				DA8933E61CCD31DF00E68420 /* default_marker@3x.png in Resources */,
 				DA8933E71CCD31DF00E68420 /* mapbox.png in Resources */,
 				DA8933E81CCD31DF00E68420 /* mapbox@2x.png in Resources */,
@@ -2192,6 +2206,7 @@
 				DA88488C1CBB037E00AB86E3 /* SMCalloutView.m in Sources */,
 				35136D4E1D4277FC00C20EFD /* MGLSource.mm in Sources */,
 				DA35A2B81CCA9A5D00E826B2 /* MGLClockDirectionFormatter.m in Sources */,
+				5375F1FF1E9007740003A265 /* MGLUserTrackingBarButtonItem.m in Sources */,
 				DAD1657A1CF4CDFF001FF4B9 /* MGLShapeCollection.mm in Sources */,
 				35136D451D42275100C20EFD /* MGLSymbolStyleLayer.mm in Sources */,
 				35599DED1D46F14E0048254D /* MGLStyleValue.mm in Sources */,
