@@ -156,6 +156,9 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(restoreState:) name:UIApplicationWillEnterForegroundNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(saveState:) name:UIApplicationWillTerminateNotification object:nil];
 
+    MGLUserTrackingBarButtonItem *trackingButton = [[MGLUserTrackingBarButtonItem alloc] initWithMapView:self.mapView];
+    self.navigationItem.rightBarButtonItem = trackingButton;
+
     [self restoreState:nil];
 
     self.debugLoggingEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:@"MGLMapboxMetricsDebugLoggingEnabled"];
@@ -1581,32 +1584,6 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     [titleButton setTitle:styleNames[self.styleIndex] forState:UIControlStateNormal];
 }
 
-- (IBAction)locateUser:(id)sender
-{
-    MGLUserTrackingMode nextMode;
-    NSString *nextAccessibilityValue;
-    switch (self.mapView.userTrackingMode) {
-        case MGLUserTrackingModeNone:
-            nextMode = MGLUserTrackingModeFollow;
-            nextAccessibilityValue = @"Follow location";
-            break;
-        case MGLUserTrackingModeFollow:
-            nextMode = MGLUserTrackingModeFollowWithHeading;
-            nextAccessibilityValue = @"Follow location and heading";
-            break;
-        case MGLUserTrackingModeFollowWithHeading:
-            nextMode = MGLUserTrackingModeFollowWithCourse;
-            nextAccessibilityValue = @"Follow course";
-            break;
-        case MGLUserTrackingModeFollowWithCourse:
-            nextMode = MGLUserTrackingModeNone;
-            nextAccessibilityValue = @"Off";
-            break;
-    }
-    self.mapView.userTrackingMode = nextMode;
-    [sender setAccessibilityValue:nextAccessibilityValue];
-}
-
 #pragma mark - Map Delegate
 
 - (MGLAnnotationView *)mapView:(MGLMapView *)mapView viewForAnnotation:(id<MGLAnnotation>)annotation
@@ -1742,36 +1719,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     return [color colorWithAlphaComponent:0.5];
 }
 
-- (void)mapView:(__unused MGLMapView *)mapView didChangeUserTrackingMode:(MGLUserTrackingMode)mode animated:(__unused BOOL)animated
-{
-    UIImage *newButtonImage;
-    NSString *newButtonTitle;
-
-    switch (mode) {
-        case MGLUserTrackingModeNone:
-            newButtonImage = [UIImage imageNamed:@"TrackingLocationOffMask.png"];
-            break;
-
-        case MGLUserTrackingModeFollow:
-            newButtonImage = [UIImage imageNamed:@"TrackingLocationMask.png"];
-            break;
-
-        case MGLUserTrackingModeFollowWithHeading:
-            newButtonImage = [UIImage imageNamed:@"TrackingHeadingMask.png"];
-            break;
-        case MGLUserTrackingModeFollowWithCourse:
-            newButtonImage = nil;
-            newButtonTitle = @"Course";
-            break;
-    }
-
-    self.navigationItem.rightBarButtonItem.title = newButtonTitle;
-    [UIView animateWithDuration:0.25 animations:^{
-        self.navigationItem.rightBarButtonItem.image = newButtonImage;
-    }];
-}
-
-- (nullable id <MGLCalloutView>)mapView:(__unused MGLMapView *)mapView calloutViewForAnnotation:(id<MGLAnnotation>)annotation
+- (UIView<MGLCalloutView> *)mapView:(__unused MGLMapView *)mapView calloutViewForAnnotation:(id<MGLAnnotation>)annotation
 {
     if ([annotation respondsToSelector:@selector(title)]
         && [annotation isKindOfClass:[MBXCustomCalloutAnnotation class]])
