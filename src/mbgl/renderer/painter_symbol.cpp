@@ -67,7 +67,10 @@ void Painter::renderSymbol(PaintParameters& parameters,
         auto paintPropertyValues = layer.impl->iconPaintProperties();
 
         SpriteAtlas& atlas = *layer.impl->spriteAtlas;
-        const bool iconScaled = values.paintSize != 1.0f || frame.pixelRatio != atlas.getPixelRatio() || bucket.iconsNeedLinear;
+        const auto iconSize = bucket.iconSizeData.sizePropertyValue;
+        const bool iconSizeScaled = iconSize.isDataDriven() || !iconSize.isZoomConstant() ||
+            *layout.get<IconSize>().constant() != 1.0;
+        const bool iconScaled = iconSizeScaled || frame.pixelRatio != atlas.getPixelRatio() || bucket.iconsNeedLinear;
         const bool iconTransformed = values.rotationAlignment == AlignmentType::Map || state.getPitch() != 0;
         atlas.bind(bucket.sdfIcons || state.isChanging() || iconScaled || iconTransformed, context, 0);
 

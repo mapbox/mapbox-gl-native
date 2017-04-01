@@ -44,8 +44,8 @@ MBGL_DEFINE_UNIFORM_SCALAR(bool, u_is_halo);
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_gamma_scale);
 
 MBGL_DEFINE_UNIFORM_SCALAR(bool, u_is_text);
-MBGL_DEFINE_UNIFORM_SCALAR(bool, u_is_zoom_constant);
-MBGL_DEFINE_UNIFORM_SCALAR(bool, u_is_feature_constant);
+MBGL_DEFINE_UNIFORM_SCALAR(bool, u_is_size_zoom_constant);
+MBGL_DEFINE_UNIFORM_SCALAR(bool, u_is_size_feature_constant);
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_size_t);
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_size);
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_layout_size);
@@ -123,6 +123,7 @@ public:
     SymbolSizeData(float tileZoom, const style::DataDrivenPropertyValue<float>& size, float defaultSize_)
         : sizePropertyValue(size),
           layoutZoom(tileZoom + 1),
+          layoutSize(defaultSize_),
           defaultSize(defaultSize_) {
         size.match(
             [&] (float constantSize) { layoutSize = constantSize; },
@@ -286,8 +287,8 @@ class SymbolIconProgram : public SymbolProgram<
         uniforms::u_texture,
         uniforms::u_fadetexture,
         uniforms::u_is_text,
-        uniforms::u_is_zoom_constant,
-        uniforms::u_is_feature_constant,
+        uniforms::u_is_size_zoom_constant,
+        uniforms::u_is_size_feature_constant,
         uniforms::u_size_t,
         uniforms::u_size,
         uniforms::u_layout_size>,
@@ -324,8 +325,8 @@ class SymbolSDFProgram : public SymbolProgram<
         uniforms::u_texture,
         uniforms::u_fadetexture,
         uniforms::u_is_text,
-        uniforms::u_is_zoom_constant,
-        uniforms::u_is_feature_constant,
+        uniforms::u_is_size_zoom_constant,
+        uniforms::u_is_size_feature_constant,
         uniforms::u_size_t,
         uniforms::u_size,
         uniforms::u_layout_size,
@@ -350,8 +351,8 @@ public:
             uniforms::u_texture,
             uniforms::u_fadetexture,
             uniforms::u_is_text,
-            uniforms::u_is_zoom_constant,
-            uniforms::u_is_feature_constant,
+            uniforms::u_is_size_zoom_constant,
+            uniforms::u_is_size_feature_constant,
             uniforms::u_size_t,
             uniforms::u_size,
             uniforms::u_layout_size,
