@@ -56,9 +56,25 @@ public:
                 assert(!s.stops.empty());
                 auto minIt = s.stops.lower_bound(zoom);
                 auto maxIt = s.stops.upper_bound(zoom);
-                if (minIt != s.stops.begin()) {
+                
+                if (minIt == s.stops.end()) minIt--;
+                if (maxIt == s.stops.end()) maxIt--;
+                
+                // minIt is first element >= zoom. if it's >, back up by one.
+                if (minIt != s.stops.begin() && minIt->first > zoom) {
                     minIt--;
                 }
+
+                // if minIt == maxIt, move one of them so we get two different stops
+                // for interpolation; prefer incrementing the upper stop if it's not
+                // already the last one.
+                if (minIt == maxIt && std::next(maxIt) != s.stops.end()) {
+                    maxIt++;
+                }
+                if (minIt == maxIt && minIt != s.stops.begin()) {
+                    minIt--;
+                }
+                
                 return std::make_tuple(
                     Range<float> {
                         minIt == s.stops.end() ? s.stops.rbegin()->first : minIt->first,
