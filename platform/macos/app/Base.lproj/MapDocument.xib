@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11762" systemVersion="16D32" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="12118" systemVersion="16E195" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11762"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="12118"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -48,7 +48,7 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES" fullSizeContentView="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="388" y="211" width="642" height="480"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1027"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="878"/>
             <view key="contentView" id="TuG-C5-zLS">
                 <rect key="frame" x="0.0" y="0.0" width="642" height="480"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -240,10 +240,15 @@
                 </connections>
             </toolbar>
             <connections>
-                <binding destination="-2" name="displayPatternTitle1" keyPath="mapView.centerCoordinate" id="wtz-AV-bG1">
+                <binding destination="-2" name="displayPatternTitle1" keyPath="mapView.centerCoordinate" id="p1k-yo-4Nb">
                     <dictionary key="options">
-                        <string key="NSDisplayPattern">%{title1}@</string>
+                        <string key="NSDisplayPattern">%{title1}@ @ %{title2}@</string>
                         <string key="NSValueTransformerName">LocationCoordinate2DTransformer</string>
+                    </dictionary>
+                </binding>
+                <binding destination="-2" name="displayPatternTitle2" keyPath="mapView.zoomLevel" previousBinding="p1k-yo-4Nb" id="HBB-y3-89c">
+                    <dictionary key="options">
+                        <string key="NSDisplayPattern">%{title1}@ @ %{title2}@</string>
                     </dictionary>
                 </binding>
                 <outlet property="delegate" destination="-2" id="HEo-Qf-o6o"/>

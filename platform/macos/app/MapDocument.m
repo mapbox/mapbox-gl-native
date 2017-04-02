@@ -156,7 +156,7 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
 #pragma mark View methods
 
 - (IBAction)showStyle:(id)sender {
-    NSInteger tag;
+    NSInteger tag = -1;
     if ([sender isKindOfClass:[NSMenuItem class]]) {
         tag = [sender tag];
     } else if ([sender isKindOfClass:[NSPopUpButton class]]) {
@@ -424,8 +424,11 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     // Temporarily set the display name to the default center coordinate instead
     // of “Untitled” until the binding kicks in.
     NSValue *coordinateValue = [NSValue valueWithMGLCoordinate:self.mapView.centerCoordinate];
-    self.displayName = [[NSValueTransformer valueTransformerForName:@"LocationCoordinate2DTransformer"]
+    NSString *coordinateString = [[NSValueTransformer valueTransformerForName:@"LocationCoordinate2DTransformer"]
                         transformedValue:coordinateValue];
+
+
+    self.displayName = [NSString stringWithFormat:@"%@ @ %f", coordinateString, _mapView.zoomLevel];
 }
 
 #pragma mark Debug methods
