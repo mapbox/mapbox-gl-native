@@ -2414,6 +2414,8 @@ public:
 #pragma mark Overlays
 
 - (nullable NS_ARRAY_OF(id <MGLOverlay>) *)overlays {
+    if (self.annotations == nil) { return nil; }
+
     NS_MUTABLE_ARRAY_OF(id <MGLOverlay>) *mutableOverlays = [NSMutableArray new];
 
     [self.annotations enumerateObjectsUsingBlock:^(id<MGLAnnotation>  _Nonnull annotation, NSUInteger idx, BOOL * _Nonnull stop) {
