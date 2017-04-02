@@ -729,6 +729,8 @@ MGL_EXPORT IB_DESIGNABLE
 
 #pragma mark Overlaying the Map
 
+@property (nonatomic, readonly, nullable) NS_ARRAY_OF(id <MGLOverlay>) *overlays;
+
 /**
  Adds a single overlay to the map.
 
