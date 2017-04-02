@@ -30,7 +30,8 @@ sed -n -e '/^## /{' -e ':a' -e 'n' -e '/^## /q' -e 'p' -e 'ba' -e '}' platform/i
 rm -rf ${OUTPUT}
 mkdir -p ${OUTPUT}
 
-cp -r platform/ios/docs/img "${OUTPUT}/img"
+cp -r platform/darwin/docs/img "${OUTPUT}"
+cp -r platform/ios/docs/img "${OUTPUT}"
 
 DEFAULT_THEME="platform/darwin/docs/theme"
 THEME=${JAZZY_THEME:-$DEFAULT_THEME}
