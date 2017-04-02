@@ -729,6 +729,13 @@ MGL_EXPORT IB_DESIGNABLE
 
 #pragma mark Overlaying the Map
 
+/**
+ The complete list of overlays associated with the receiver. (read-only)
+
+ The objects in this array must adopt the `MGLOverlay` protocol. If no
+ overlays are associated with the map view, the value of this property is
+ `nil`.
+ */
 @property (nonatomic, readonly, nullable) NS_ARRAY_OF(id <MGLOverlay>) *overlays;
 
 /**
