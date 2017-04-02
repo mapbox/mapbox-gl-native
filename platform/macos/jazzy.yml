@@ -27,7 +27,6 @@ custom_categories:
       - MGLMapCamera
       - MGLMapView
       - MGLMapViewDelegate
-      - MGLUserTrackingMode
   - name: Shapes and Annotations
     children:
       - MGLAnnotation
