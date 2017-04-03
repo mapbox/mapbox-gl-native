@@ -2,10 +2,12 @@
 
 #import "MGLScaleBarView_Private.h"
 
+@class MGLScaleBarLabel;
+
 @interface MGLScaleBarView()
 @property (nonatomic, assign, getter=isVisible) BOOL visible;
 @property (nonatomic, assign) CLLocationDistance metersPerPoint;
-@property (nonatomic) NSArray<UILabel *> *labels;
+@property (nonatomic) NSArray<MGLScaleBarLabel *> *labels;
 @property (nonatomic) NSArray<UIView *> *bars;
 @property (nonatomic) UIView *containerView;
 @property (nonatomic) MGLDistanceFormatter *formatter;
@@ -14,14 +16,42 @@
 @property (nonatomic) UIColor *primaryColor;
 @property (nonatomic) UIColor *secondaryColor;
 @property (nonatomic) CALayer *borderLayer;
+@property (nonatomic, assign) CGFloat borderWidth;
 @end
 
-static const CGFloat BAR_HEIGHT = 4;
+static const CGFloat MGLBarHeight = 4;
+
+@interface MGLScaleBarLabel : UILabel
+@end
+
+@implementation MGLScaleBarLabel
+
+- (void)drawTextInRect:(CGRect)rect {
+    CGSize shadowOffset = self.shadowOffset;
+    UIColor *textColor = self.textColor;
+    
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    CGContextSetLineWidth(context, 1);
+    CGContextSetLineJoin(context, kCGLineJoinRound);
+    
+    CGContextSetTextDrawingMode(context, kCGTextStroke);
+    self.textColor = [UIColor whiteColor];
+    [super drawTextInRect:rect];
+    
+    CGContextSetTextDrawingMode(context, kCGTextFill);
+    self.textColor = textColor;
+    self.shadowOffset = CGSizeMake(0, 0);
+    [super drawTextInRect:rect];
+    
+    self.shadowOffset = shadowOffset;
+}
+
+@end
 
 @implementation MGLScaleBarView
 
-- (instancetype)initWithCoder:(NSCoder *)aDecoder {
-    if (self = [super initWithCoder:aDecoder]) {
+- (instancetype)initWithCoder:(NSCoder *)decoder {
+    if (self = [super initWithCoder:decoder]) {
         [self commonInit];
     }
     return self;
@@ -35,20 +65,22 @@ static const CGFloat BAR_HEIGHT = 4;
 }
 
 - (void)commonInit {
+    _visible = NO;
+    _primaryColor = [UIColor colorWithRed:18.0/255.0 green:45.0/255.0 blue:17.0/255.0 alpha:1];
+    _secondaryColor = [UIColor colorWithRed:247.0/255.0 green:247.0/255.0 blue:247.0/255.0 alpha:1];
+    _borderWidth = 1.0f;
+    
     self.clipsToBounds = NO;
     self.alpha = 0;
     
-    _visible = NO;
-    _primaryColor = [UIColor colorWithRed:62.0/255.0 green:62.0/255.0 blue:62.0/255.0 alpha:1];
-    _secondaryColor = [UIColor colorWithRed:247.0/255.0 green:247.0/255.0 blue:247.0/255.0 alpha:1];
-    
     _containerView = [[UIView alloc] init];
     _containerView.clipsToBounds = YES;
+    _containerView.backgroundColor = self.secondaryColor;
     [self addSubview:_containerView];
     
     _borderLayer = [CAShapeLayer layer];
-    _borderLayer.borderColor = [UIColor colorWithRed:177.0/255.0 green:177.0/255.0 blue:177.0/255.0 alpha:1].CGColor;
-    _borderLayer.borderWidth = 1.0 / [[UIScreen mainScreen] scale];
+    _borderLayer.borderColor = [self.primaryColor CGColor];
+    _borderLayer.borderWidth = 1.0f / [[UIScreen mainScreen] scale];
     
     [_containerView.layer addSublayer:_borderLayer];
     
@@ -215,9 +247,10 @@ static const CGFloat BAR_HEIGHT = 4;
     if (!_labels) {
         NSMutableArray *labels = [NSMutableArray array];
         for (NSUInteger i = 0; i <= self.row.lastObject.integerValue; i++) {
-            UILabel *label = [[UILabel alloc] init];
+            UILabel *label = [[MGLScaleBarLabel alloc] init];
+            label.font = [UIFont systemFontOfSize:8 weight:UIFontWeightMedium];
             label.text = @"0";
-            label.font = [UIFont systemFontOfSize:8];
+            [label setNeedsDisplay];
             [label sizeToFit];
             [labels addObject:label];
             [self addSubview:label];
@@ -243,47 +276,53 @@ static const CGFloat BAR_HEIGHT = 4;
 }
 
 - (void)layoutBars {
+    CGFloat barWidth = (CGRectGetWidth(self.bounds) - self.borderWidth * 2.0f) / self.bars.count;
     
-    CGFloat barWidth = floorf(self.bounds.size.width / self.bars.count);
+    NSUInteger i = 0;
+    for (UIView *bar in self.bars) {
+        CGFloat xPos = barWidth * i + self.borderWidth;
+        bar.backgroundColor = (i % 2 == 0) ? self.primaryColor : self.secondaryColor;
+        bar.frame = CGRectMake(xPos, self.borderWidth, barWidth, MGLBarHeight);
+        i++;
+    }
     
-    [self.bars enumerateObjectsUsingBlock:^(UIView * _Nonnull bar, NSUInteger idx, BOOL * _Nonnull stop) {
-        CGFloat xPos = barWidth * idx;
-        bar.backgroundColor = (idx % 2 == 0) ? self.primaryColor : self.secondaryColor;
-        bar.frame = CGRectMake(xPos, 0, barWidth, BAR_HEIGHT);
-    }];
-    
-    self.containerView.backgroundColor = self.bars.lastObject.backgroundColor;
     self.containerView.frame = CGRectMake(CGRectGetMinX(self.bars.firstObject.frame),
-                                          CGRectGetMaxY(self.bounds)-BAR_HEIGHT,
+                                          CGRectGetMaxY(self.bounds)-MGLBarHeight,
                                           self.actualWidth,
-                                          BAR_HEIGHT);
+                                          MGLBarHeight+self.borderWidth*2);
     
-    self.containerView.layer.cornerRadius = CGRectGetMidY(self.containerView.bounds);
+    self.containerView.layer.cornerRadius = 2.0f;
+    self.borderLayer.cornerRadius = 1.0f;
     
     [CATransaction begin];
     [CATransaction setDisableActions:YES];
-    self.borderLayer.frame = self.containerView.bounds;
+    self.borderLayer.frame = CGRectInset(self.containerView.bounds, self.borderWidth, self.borderWidth);
     self.borderLayer.zPosition = FLT_MAX;
     [CATransaction commit];
 }
 
 - (void)layoutLabels {
-    CGFloat barWidth = floorf(self.bounds.size.width / self.bars.count);
-    [self.labels enumerateObjectsUsingBlock:^(UILabel * _Nonnull label, NSUInteger idx, BOOL * _Nonnull stop) {
-        CGFloat xPosition = barWidth * idx - CGRectGetMidX(label.bounds);
+    CGFloat barWidth = self.bounds.size.width / self.bars.count;
+    NSUInteger i = 0;
+    for (MGLScaleBarLabel *label in self.labels) {
+        CGFloat xPosition = barWidth * i - CGRectGetMidX(label.bounds) + self.borderWidth;
         label.frame = CGRectMake(xPosition, 0,
                                  CGRectGetWidth(label.bounds),
                                  CGRectGetHeight(label.bounds));
-    }];
+        i++;
+    }
 }
 
 - (void)updateLabels {
     NSArray *labels = [self.labels subarrayWithRange:NSMakeRange(1, self.labels.count-1)];
-    [labels enumerateObjectsUsingBlock:^(UILabel * _Nonnull label, NSUInteger idx, BOOL * _Nonnull stop) {
-        CLLocationDistance barDistance = (self.row.firstObject.integerValue / self.row.lastObject.integerValue) * (idx + 1);
+    NSUInteger i = 0;
+    for (MGLScaleBarLabel *label in labels) {
+        CLLocationDistance barDistance = (self.row.firstObject.integerValue / self.row.lastObject.integerValue) * (i + 1);
         label.text = [self.formatter stringFromDistance:barDistance];
+        [label setNeedsDisplay];
         [label sizeToFit];
-    }];
+        i++;
+    }
 }
 
 @end
