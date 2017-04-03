@@ -57,21 +57,9 @@ public:
                 auto minIt = s.stops.lower_bound(zoom);
                 auto maxIt = s.stops.upper_bound(zoom);
                 
-                if (minIt == s.stops.end()) minIt--;
-                if (maxIt == s.stops.end()) maxIt--;
-                
-                // minIt is first element >= zoom. if it's >, back up by one.
+                // lower_bound yields first element >= zoom, but we want the *last*
+                // element <= zoom, so if we found a stop > zoom, back up by one.
                 if (minIt != s.stops.begin() && minIt->first > zoom) {
-                    minIt--;
-                }
-
-                // if minIt == maxIt, move one of them so we get two different stops
-                // for interpolation; prefer incrementing the upper stop if it's not
-                // already the last one.
-                if (minIt == maxIt && std::next(maxIt) != s.stops.end()) {
-                    maxIt++;
-                }
-                if (minIt == maxIt && minIt != s.stops.begin()) {
                     minIt--;
                 }
                 
@@ -112,6 +100,9 @@ public:
     T evaluate(float zoom, const GeometryTileFeature& feature, T finalDefaultValue) const {
         std::tuple<Range<float>, Range<InnerStops>> ranges = coveringRanges(zoom);
         Range<T> resultRange = evaluate(std::get<1>(ranges), feature, finalDefaultValue);
+        // If the covering stop range is constant, just return the output value directly.
+        if (resultRange.min == resultRange.max) return resultRange.min;
+        // Otherwise, interpolate between the two stops.
         return util::interpolate(
             resultRange.min,
             resultRange.max,

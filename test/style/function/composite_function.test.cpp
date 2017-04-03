@@ -20,17 +20,17 @@ TEST(CompositeFunction, ZoomInterpolation) {
     }), 0.0f)
     .evaluate(2.0f, oneInteger, -1.0f)) << "Should interpolate between stops";
     
-    EXPECT_EQ(0.0, CompositeFunction<float>("property", CompositeExponentialStops<float>({
+    EXPECT_EQ(33.0, CompositeFunction<float>("property", CompositeExponentialStops<float>({
         {5.0f, {{uint64_t(1), 33.0f}}},
         {10.0f, {{uint64_t(1), 66.0f}}}
     }), 0.0f)
-    .evaluate(0.0f, oneInteger, -1.0f)) << "Should interpolate before the first stop";
+    .evaluate(0.0f, oneInteger, -1.0f)) << "Use first stop output for input values from -inf to first stop";
     
-    EXPECT_EQ(99.0, CompositeFunction<float>("property", CompositeExponentialStops<float>({
+    EXPECT_EQ(66.0, CompositeFunction<float>("property", CompositeExponentialStops<float>({
         {0.0f, {{uint64_t(1), 33.0f}}},
         {10.0f, {{uint64_t(1), 66.0f}}}
     }), 0.0f)
-    .evaluate(20.0f, oneInteger, -1.0f)) << "Should interpolate past the last stop";
+    .evaluate(20.0f, oneInteger, -1.0f)) << "Use last stop output for input values from last stop to +inf";
 
     EXPECT_EQ(66.0f, CompositeFunction<float>("property", CompositeExponentialStops<float>({
         {0.0f, {{uint64_t(1), 33.0f}}},
