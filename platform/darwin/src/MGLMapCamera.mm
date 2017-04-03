@@ -1,4 +1,5 @@
 #import "MGLMapCamera.h"
+#import "MGLGeometry_Private.h"
 
 #include <mbgl/util/projection.hpp>
 
@@ -23,8 +24,8 @@ BOOL MGLEqualFloatWithAccuracy(CGFloat left, CGFloat right, CGFloat accuracy)
                               fromEyeCoordinate:(CLLocationCoordinate2D)eyeCoordinate
                                     eyeAltitude:(CLLocationDistance)eyeAltitude
 {
-    mbgl::LatLng centerLatLng = mbgl::LatLng(centerCoordinate.latitude, centerCoordinate.longitude);
-    mbgl::LatLng eyeLatLng = mbgl::LatLng(eyeCoordinate.latitude, eyeCoordinate.longitude);
+    mbgl::LatLng centerLatLng = MGLLatLngFromLocationCoordinate2D(centerCoordinate);
+    mbgl::LatLng eyeLatLng = MGLLatLngFromLocationCoordinate2D(eyeCoordinate);
 
     mbgl::ProjectedMeters centerMeters = mbgl::Projection::projectedMetersForLatLng(centerLatLng);
     mbgl::ProjectedMeters eyeMeters = mbgl::Projection::projectedMetersForLatLng(eyeLatLng);
