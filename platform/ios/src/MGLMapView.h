@@ -595,6 +595,14 @@ IB_DESIGNABLE
 @property (nonatomic) CLLocationDirection direction;
 
 /**
+ Indicates whether the scale bar should become visible when a user interacts with
+ the map. The scale bar will fade out automatically when the interaction stops.
+ 
+ The default value for this property is `YES`.
+ */
+@property (nonatomic) BOOL showsScale;
+
+/**
  Changes the heading of the map and optionally animates the change.
 
  @param direction The heading of the map, measured in degrees clockwise from

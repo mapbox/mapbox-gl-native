@@ -503,7 +503,8 @@ public:
     _scaleBarView.translatesAutoresizingMaskIntoConstraints = NO;
     [self addSubview:_scaleBarView];
     _scaleControlViewConstraints = [NSMutableArray array];
-
+    _showsScale = YES;
+    
     // setup interaction
     //
     _pan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePanGesture:)];
@@ -4878,7 +4879,10 @@ public:
     }
 
     [self updateCompass];
-    self.scaleBarView.metersPerPoint = [self metersPerPointAtLatitude:self.centerCoordinate.latitude];
+    
+    if (self.showsScale) {
+        self.scaleBarView.metersPerPoint = [self metersPerPointAtLatitude:self.centerCoordinate.latitude];
+    }
     
     if ([self.delegate respondsToSelector:@selector(mapViewRegionIsChanging:)])
     {
