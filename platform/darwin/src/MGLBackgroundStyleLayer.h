@@ -24,6 +24,16 @@ NS_ASSUME_NONNULL_BEGIN
 MGL_EXPORT
 @interface MGLBackgroundStyleLayer : MGLStyleLayer
 
+/**
+Returns a background style layer initialized with an identifier.
+
+After initializing and configuring the style layer, add it to a map view’s
+style using the `-[MGLStyle addLayer:]` or
+`-[MGLStyle insertLayer:belowLayer:]` method.
+
+@param identifier A string that uniquely identifies the source in the style to
+which it is added.
+*/
 - (instancetype)initWithIdentifier:(NSString *)identifier NS_DESIGNATED_INITIALIZER;
 
 #pragma mark - Accessing the Paint Attributes

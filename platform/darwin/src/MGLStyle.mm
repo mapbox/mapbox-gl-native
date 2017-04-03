@@ -12,6 +12,7 @@
 
 #import "MGLStyle_Private.h"
 #import "MGLStyleLayer_Private.h"
+#import "MGLForegroundStyleLayer_Private.h"
 #import "MGLSource_Private.h"
 
 #import "NSDate+MGLAdditions.h"
@@ -323,39 +324,35 @@ static NSURL *MGLStyleURL_emerald;
     NSParameterAssert(mbglLayer);
 
     NSString *identifier = @(mbglLayer->getID().c_str());
-    MGLStyleLayer *styleLayer;
+
     if (auto fillLayer = mbglLayer->as<mbgl::style::FillLayer>()) {
         MGLSource *source = [self sourceWithIdentifier:@(fillLayer->getSourceID().c_str())];
-        styleLayer = [[MGLFillStyleLayer alloc] initWithIdentifier:identifier source:source];
+        return [[MGLFillStyleLayer alloc] initWithRawLayer:fillLayer source:source];
     } else if (auto lineLayer = mbglLayer->as<mbgl::style::LineLayer>()) {
         MGLSource *source = [self sourceWithIdentifier:@(lineLayer->getSourceID().c_str())];
-        styleLayer = [[MGLLineStyleLayer alloc] initWithIdentifier:identifier source:source];
+        return [[MGLLineStyleLayer alloc] initWithRawLayer:lineLayer source:source];
     } else if (auto symbolLayer = mbglLayer->as<mbgl::style::SymbolLayer>()) {
         MGLSource *source = [self sourceWithIdentifier:@(symbolLayer->getSourceID().c_str())];
-        styleLayer = [[MGLSymbolStyleLayer alloc] initWithIdentifier:identifier source:source];
+        return [[MGLSymbolStyleLayer alloc] initWithRawLayer:symbolLayer source:source];
     } else if (auto rasterLayer = mbglLayer->as<mbgl::style::RasterLayer>()) {
         MGLSource *source = [self sourceWithIdentifier:@(rasterLayer->getSourceID().c_str())];
-        styleLayer = [[MGLRasterStyleLayer alloc] initWithIdentifier:identifier source:source];
+        return [[MGLRasterStyleLayer alloc] initWithRawLayer:rasterLayer source:source];
     } else if (auto circleLayer = mbglLayer->as<mbgl::style::CircleLayer>()) {
         MGLSource *source = [self sourceWithIdentifier:@(circleLayer->getSourceID().c_str())];
-        styleLayer = [[MGLCircleStyleLayer alloc] initWithIdentifier:identifier source:source];
-    } else if (mbglLayer->is<mbgl::style::BackgroundLayer>()) {
-        styleLayer = [[MGLBackgroundStyleLayer alloc] initWithIdentifier:identifier];
-    } else if (mbglLayer->is<mbgl::style::CustomLayer>()) {
-        styleLayer = self.openGLLayers[identifier];
+        return [[MGLCircleStyleLayer alloc] initWithRawLayer:circleLayer source:source];
+    } else if (auto backgroundLayer = mbglLayer->as<mbgl::style::BackgroundLayer>()) {
+        return [[MGLBackgroundStyleLayer alloc] initWithRawLayer:backgroundLayer];
+    } else if (auto customLayer = mbglLayer->as<mbgl::style::CustomLayer>()) {
+        MGLStyleLayer *styleLayer = self.openGLLayers[identifier];
         if (styleLayer) {
-            NSAssert(styleLayer.rawLayer == mbglLayer->as<mbgl::style::CustomLayer>(), @"%@ wraps a CustomLayer that differs from the one associated with the underlying style.", styleLayer);
+            NSAssert(styleLayer.rawLayer == customLayer, @"%@ wraps a CustomLayer that differs from the one associated with the underlying style.", styleLayer);
             return styleLayer;
         }
-        styleLayer = [[MGLOpenGLStyleLayer alloc] initWithIdentifier:identifier];
+        return [[MGLOpenGLStyleLayer alloc] initWithRawLayer:customLayer];
     } else {
         NSAssert(NO, @"Unrecognized layer type");
         return nil;
     }
-
-    styleLayer.rawLayer = mbglLayer;
-
-    return styleLayer;
 }
 
 - (MGLStyleLayer *)layerWithIdentifier:(NSString *)identifier

@@ -72,7 +72,7 @@ void MGLFinishCustomStyleLayer(void *context) {
  */
 @interface MGLOpenGLStyleLayer ()
 
-@property (nonatomic) mbgl::style::CustomLayer *rawLayer;
+@property (nonatomic, readonly) mbgl::style::CustomLayer *rawLayer;
 
 /**
  The map view whose style currently contains the layer.
@@ -84,9 +84,7 @@ void MGLFinishCustomStyleLayer(void *context) {
 
 @end
 
-@implementation MGLOpenGLStyleLayer {
-    std::unique_ptr<mbgl::style::CustomLayer> _pendingLayer;
-}
+@implementation MGLOpenGLStyleLayer
 
 /**
  Returns an OpenGL style layer object initialized with the given identifier.
@@ -100,24 +98,16 @@ void MGLFinishCustomStyleLayer(void *context) {
  @return An initialized OpenGL style layer.
  */
 - (instancetype)initWithIdentifier:(NSString *)identifier {
-    if (self = [super initWithIdentifier:identifier]) {
-        auto layer = std::make_unique<mbgl::style::CustomLayer>(identifier.UTF8String,
-                                                                MGLPrepareCustomStyleLayer,
-                                                                MGLDrawCustomStyleLayer,
-                                                                MGLFinishCustomStyleLayer,
-                                                                (__bridge void *)self);
-        _pendingLayer = std::move(layer);
-        self.rawLayer = _pendingLayer.get();
-    }
-    return self;
+    auto layer = std::make_unique<mbgl::style::CustomLayer>(identifier.UTF8String,
+                                                            MGLPrepareCustomStyleLayer,
+                                                            MGLDrawCustomStyleLayer,
+                                                            MGLFinishCustomStyleLayer,
+                                                            (__bridge void *)self);
+    return self = [super initWithPendingLayer:std::move(layer)];
 }
 
 - (mbgl::style::CustomLayer *)rawLayer {
     return (mbgl::style::CustomLayer *)super.rawLayer;
-}
-
-- (void)setRawLayer:(mbgl::style::CustomLayer *)rawLayer {
-    super.rawLayer = rawLayer;
 }
 
 #pragma mark - Adding to and removing from a map view
@@ -134,22 +124,12 @@ void MGLFinishCustomStyleLayer(void *context) {
 
 - (void)addToMapView:(MGLMapView *)mapView belowLayer:(MGLStyleLayer *)otherLayer {
     self.mapView = mapView;
-    if (otherLayer) {
-        const mbgl::optional<std::string> belowLayerId{ otherLayer.identifier.UTF8String };
-        mapView.mbglMap->addLayer(std::move(_pendingLayer), belowLayerId);
-    } else {
-        mapView.mbglMap->addLayer(std::move(_pendingLayer));
-    }
+    [super addToMapView:mapView belowLayer:otherLayer];
 }
 
 - (void)removeFromMapView:(MGLMapView *)mapView {
-    auto removedLayer = mapView.mbglMap->removeLayer(self.identifier.UTF8String);
+    [super removeFromMapView:mapView];
     self.mapView = nil;
-    if (!removedLayer) {
-        return;
-    }
-    _pendingLayer = std::move(reinterpret_cast<std::unique_ptr<mbgl::style::CustomLayer> &>(removedLayer));
-    self.rawLayer = _pendingLayer.get();
 }
 
 /**
