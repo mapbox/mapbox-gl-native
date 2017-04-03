@@ -698,6 +698,28 @@ double Map::getMaxZoom() const {
     return impl->transform.getState().getMaxZoom();
 }
 
+void Map::setMinPitch(double minPitch) {
+    impl->transform.setMinPitch(minPitch * util::DEG2RAD);
+    if (getPitch() < minPitch) {
+        setPitch(minPitch);
+    }
+}
+
+double Map::getMinPitch() const {
+    return impl->transform.getState().getMinPitch() * util::RAD2DEG;
+}
+
+void Map::setMaxPitch(double maxPitch) {
+    impl->transform.setMaxPitch(maxPitch * util::DEG2RAD);
+    if (getPitch() > maxPitch) {
+        setPitch(maxPitch);
+    }
+}
+
+double Map::getMaxPitch() const {
+    return impl->transform.getState().getMaxPitch() * util::RAD2DEG;
+}
+
 #pragma mark - Size
 
 void Map::setSize(const Size size) {

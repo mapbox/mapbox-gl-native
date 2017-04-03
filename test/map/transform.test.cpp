@@ -573,3 +573,21 @@ TEST(Transform, LatLngBounds) {
     ASSERT_EQ(transform.getLatLng().latitude(), 0.0);
     ASSERT_EQ(transform.getLatLng().longitude(), 0.0);
 }
+
+TEST(Transform, PitchBounds) {
+    Transform transform;
+    transform.resize({ 1000, 1000 });
+    transform.setLatLngZoom({ 0, 0 }, transform.getState().getMaxZoom());
+
+    ASSERT_DOUBLE_EQ(transform.getState().getPitch() * util::RAD2DEG, 0.0);
+    ASSERT_DOUBLE_EQ(transform.getState().getMinPitch() * util::RAD2DEG, 0.0);
+    ASSERT_DOUBLE_EQ(transform.getState().getMaxPitch() * util::RAD2DEG, 60.0);
+
+    transform.setMinPitch(45.0 * util::DEG2RAD);
+    transform.setPitch(0.0 * util::DEG2RAD);
+    ASSERT_NEAR(transform.getState().getPitch() * util::RAD2DEG, 45.0, 1e-5);
+
+    transform.setMaxPitch(55.0 * util::DEG2RAD);
+    transform.setPitch(60.0 * util::DEG2RAD);
+    ASSERT_NEAR(transform.getState().getPitch() * util::RAD2DEG, 55.0, 1e-5);
+}
