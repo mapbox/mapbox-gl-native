@@ -27,6 +27,9 @@ void TransformState::matrixFor(mat4& matrix, const UnwrappedTileID& tileID) cons
 }
 
 void TransformState::getProjMatrix(mat4& projMatrix) const {
+    if (size.isEmpty()) {
+        return;
+    }
 
      // Find the distance from the center point [width/2, height/2] to the
     // center top point [width/2, 0] in Z units, using the law of sines.
@@ -216,7 +219,7 @@ double TransformState::scaleZoom(double s) const {
 }
 
 ScreenCoordinate TransformState::latLngToScreenCoordinate(const LatLng& latLng) const {
-    if (!size) {
+    if (size.isEmpty()) {
         return {};
     }
 
@@ -229,7 +232,7 @@ ScreenCoordinate TransformState::latLngToScreenCoordinate(const LatLng& latLng) 
 }
 
 LatLng TransformState::screenCoordinateToLatLng(const ScreenCoordinate& point, LatLng::WrapMode wrapMode) const {
-    if (!size) {
+    if (size.isEmpty()) {
         return {};
     }
 

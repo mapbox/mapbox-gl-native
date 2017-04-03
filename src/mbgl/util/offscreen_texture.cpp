@@ -9,7 +9,7 @@ namespace mbgl {
 class OffscreenTexture::Impl {
 public:
     Impl(gl::Context& context_, const Size size_) : context(context_), size(std::move(size_)) {
-        assert(size);
+        assert(!size.isEmpty());
     }
 
     void bind() {
@@ -45,7 +45,7 @@ private:
 
 OffscreenTexture::OffscreenTexture(gl::Context& context, const Size size)
     : impl(std::make_unique<Impl>(context, std::move(size))) {
-    assert(size);
+    assert(!size.isEmpty());
 }
 
 OffscreenTexture::~OffscreenTexture() = default;
