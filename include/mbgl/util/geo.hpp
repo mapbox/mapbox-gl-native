@@ -1,5 +1,6 @@
 #pragma once
 
+#include <mbgl/math/clamp.hpp>
 #include <mbgl/math/wrap.hpp>
 #include <mbgl/util/constants.hpp>
 
@@ -120,6 +121,10 @@ public:
     // Constructs a LatLngBounds object with the tile's exact boundaries.
     LatLngBounds(const CanonicalTileID&);
 
+    bool valid() const {
+        return (sw.latitude() <= ne.latitude()) && (sw.longitude() <= ne.longitude());
+    }
+
     double south() const { return sw.latitude(); }
     double west()  const { return sw.longitude(); }
     double north() const { return ne.latitude(); }
@@ -133,6 +138,16 @@ public:
     LatLng center() const {
         return LatLng((sw.latitude() + ne.latitude()) / 2,
                       (sw.longitude() + ne.longitude()) / 2);
+    }
+
+    LatLng constrain(const LatLng& p) const {
+        if (contains(p)) {
+            return p;
+        }
+        return LatLng {
+            util::clamp(p.latitude(), sw.latitude(), ne.latitude()),
+            util::clamp(p.longitude(), sw.longitude(), ne.longitude())
+        };
     }
 
     void extend(const LatLng& point) {
