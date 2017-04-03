@@ -60,6 +60,8 @@ public:
     void setLatLngBounds(const LatLngBounds&);
     void setMinZoom(double);
     void setMaxZoom(double);
+    void setMinPitch(double);
+    void setMaxPitch(double);
 
     // Zoom
 

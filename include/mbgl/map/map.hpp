@@ -117,6 +117,10 @@ public:
     double getMinZoom() const;
     void setMaxZoom(double);
     double getMaxZoom() const;
+    void setMinPitch(double);
+    double getMinPitch() const;
+    void setMaxPitch(double);
+    double getMaxPitch() const;
 
     // Rotation
     void rotateBy(const ScreenCoordinate& first, const ScreenCoordinate& second, const AnimationOptions& = {});

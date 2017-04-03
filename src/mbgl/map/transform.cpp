@@ -120,7 +120,7 @@ void Transform::easeTo(const CameraOptions& camera, const AnimationOptions& anim
     // Constrain camera options.
     zoom = util::clamp(zoom, state.getMinZoom(), state.getMaxZoom());
     const double scale = state.zoomScale(zoom);
-    pitch = util::clamp(pitch, 0., util::PITCH_MAX);
+    pitch = util::clamp(pitch, state.min_pitch, state.max_pitch);
 
     Update update = state.getZoom() == zoom ? Update::Repaint : Update::RecalculateStyle;
 
@@ -188,7 +188,7 @@ void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &anima
 
     // Constrain camera options.
     zoom = util::clamp(zoom, state.getMinZoom(), state.getMaxZoom());
-    pitch = util::clamp(pitch, 0., util::PITCH_MAX);
+    pitch = util::clamp(pitch, state.min_pitch, state.max_pitch);
 
     // Minimize rotation by taking the shorter path around the circle.
     angle = _normalizeAngle(angle, state.angle);
@@ -449,6 +449,16 @@ void Transform::setMinZoom(const double minZoom) {
 void Transform::setMaxZoom(const double maxZoom) {
     if (std::isnan(maxZoom)) return;
     state.setMaxZoom(maxZoom);
+}
+
+void Transform::setMinPitch(double minPitch) {
+    if (std::isnan(minPitch)) return;
+    state.setMinPitch(minPitch);
+}
+
+void Transform::setMaxPitch(double maxPitch) {
+    if (std::isnan(maxPitch)) return;
+    state.setMaxPitch(maxPitch);
 }
 
 #pragma mark - Angle
