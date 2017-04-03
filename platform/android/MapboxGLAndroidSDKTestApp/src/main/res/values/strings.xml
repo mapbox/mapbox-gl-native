@@ -55,6 +55,7 @@
     <string name="activity_map_in_dialog">Dialog with map</string>
     <string name="activity_marker_view_rectangle">Marker views in rectangle</string>
     <string name="activity_url_transform">Url transform</string>
+    <string name="activity_restricted_bounds">Restrict camera to a bounds</string>
 
     <!--Description-->
     <string name="description_user_location_tracking">Tracks the location of the user</string>
@@ -109,6 +110,7 @@
     <string name="description_marker_view_rectangle">Marker Views within a rectangle</string>
     <string name="description_circle_layer">Show bus stops and route in Singapore</string>
     <string name="description_url_transform">Transform urls on the fly</string>
+    <string name="description_restricted_bounds">Limit viewport to Iceland</string>
 
     <!--Categories-->
     <string name="category">category</string>

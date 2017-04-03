@@ -43,6 +43,7 @@
 #include "bitmap.hpp"
 #include "run_loop_impl.hpp"
 #include "java/util.hpp"
+#include "geometry/lat_lng_bounds.hpp"
 
 namespace mbgl {
 namespace android {
@@ -352,6 +353,14 @@ jni::String NativeMapView::getStyleJson(jni::JNIEnv& env) {
 
 void NativeMapView::setStyleJson(jni::JNIEnv& env, jni::String json) {
     map->setStyleJSON(jni::Make<std::string>(env, json));
+}
+
+void NativeMapView::setLatLngBounds(jni::JNIEnv& env, jni::Object<mbgl::android::LatLngBounds> jBounds) {
+    if (jBounds) {
+        map->setLatLngBounds(mbgl::android::LatLngBounds::getLatLngBounds(env, jBounds));
+    } else {
+        map->setLatLngBounds(mbgl::LatLngBounds::world());
+    }
 }
 
 void NativeMapView::cancelTransitions(jni::JNIEnv&) {
@@ -1560,7 +1569,8 @@ void NativeMapView::registerNative(jni::JNIEnv& env) {
             METHOD(&NativeMapView::removeSourceById, "nativeRemoveSourceById"),
             METHOD(&NativeMapView::removeSource, "nativeRemoveSource"),
             METHOD(&NativeMapView::addImage, "nativeAddImage"),
-            METHOD(&NativeMapView::removeImage, "nativeRemoveImage")
+            METHOD(&NativeMapView::removeImage, "nativeRemoveImage"),
+            METHOD(&NativeMapView::setLatLngBounds, "nativeSetLatLngBounds")
     );
 }
 

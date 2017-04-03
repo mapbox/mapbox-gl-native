@@ -6,6 +6,7 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 
 5.1.0 builds further on 5.0.1 and adds:
 
+* Limit Viewport [#8622](https://github.com/mapbox/mapbox-gl-native/pull/8622)
 * Transition Properties for Layer attributes [#8509](https://github.com/mapbox/mapbox-gl-native/pull/8509)
 * Style wide transition duration and transition offset in milliseconds [#8576](https://github.com/mapbox/mapbox-gl-native/pull/8576)
 * Transifex integration, Catalan & Dutch translations [#8556](https://github.com/mapbox/mapbox-gl-native/pull/8556)

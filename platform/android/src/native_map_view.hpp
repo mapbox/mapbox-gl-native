@@ -22,6 +22,7 @@
 #include "geometry/projected_meters.hpp"
 #include "style/layers/layers.hpp"
 #include "style/sources/sources.hpp"
+#include "geometry/lat_lng_bounds.hpp"
 
 #include <exception>
 #include <string>
@@ -109,6 +110,8 @@ public:
     jni::String getStyleJson(jni::JNIEnv&);
 
     void setStyleJson(jni::JNIEnv&, jni::String);
+
+    void setLatLngBounds(jni::JNIEnv&, jni::Object<mbgl::android::LatLngBounds>);
 
     void cancelTransitions(jni::JNIEnv&);
 

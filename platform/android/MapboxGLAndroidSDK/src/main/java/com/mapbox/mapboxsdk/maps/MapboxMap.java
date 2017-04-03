@@ -36,6 +36,7 @@ import com.mapbox.mapboxsdk.constants.MyBearingTracking;
 import com.mapbox.mapboxsdk.constants.MyLocationTracking;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.maps.widgets.MyLocationViewSettings;
 import com.mapbox.mapboxsdk.style.layers.Filter;
 import com.mapbox.mapboxsdk.style.layers.Layer;
@@ -1502,6 +1503,22 @@ public final class MapboxMap {
   @UiThread
   public boolean isAllowConcurrentMultipleOpenInfoWindows() {
     return annotationManager.getInfoWindowManager().isAllowConcurrentMultipleOpenInfoWindows();
+  }
+
+  //
+  // LatLngBounds
+  //
+
+  /**
+   * Sets a LatLngBounds that constraints map transformations to this bounds.
+   * <p>
+   * Set to null to clear current bounds, newly set bounds will override previously set bounds.
+   * </p>
+   *
+   * @param latLngBounds the bounds to constrain the map with
+   */
+  public void setLatLngBoundsForCameraTarget(@Nullable LatLngBounds latLngBounds) {
+    nativeMapView.setLatLngBounds(latLngBounds);
   }
 
   //
