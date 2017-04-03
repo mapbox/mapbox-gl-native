@@ -249,7 +249,8 @@ static const CGFloat MGLBarHeight = 4;
         for (NSUInteger i = 0; i <= self.row.lastObject.integerValue; i++) {
             UILabel *label = [[MGLScaleBarLabel alloc] init];
             label.font = [UIFont systemFontOfSize:8 weight:UIFontWeightMedium];
-            label.text = @"0";
+            NSCharacterSet *characterSet = [[NSCharacterSet decimalDigitCharacterSet] invertedSet];
+            label.text = [[[self.formatter stringFromDistance:0] componentsSeparatedByCharactersInSet:characterSet] componentsJoinedByString:@""];
             [label setNeedsDisplay];
             [label sizeToFit];
             [labels addObject:label];
