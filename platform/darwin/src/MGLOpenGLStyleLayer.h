@@ -23,6 +23,8 @@ MGL_EXPORT
 
 @property (nonatomic, weak, readonly) MGLMapView *mapView;
 
+- (instancetype)initWithIdentifier:(NSString *)identifier;
+
 - (void)didMoveToMapView:(MGLMapView *)mapView;
 
 - (void)willMoveFromMapView:(MGLMapView *)mapView;

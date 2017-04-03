@@ -30,6 +30,18 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface MGLStyleLayer (Private)
 
+/**
+ Initializes and returns a layer with a raw pointer to the backing store,
+ associated with a style.
+ */
+- (instancetype)initWithRawLayer:(mbgl::style::Layer *)rawLayer;
+
+/**
+ Initializes and returns a layer with an owning pointer to the backing store,
+ unassociated from a style.
+ */
+- (instancetype)initWithPendingLayer:(std::unique_ptr<mbgl::style::Layer>)pendingLayer;
+
 @property (nonatomic, readwrite, copy) NSString *identifier;
 
 /**
@@ -39,7 +51,7 @@ NS_ASSUME_NONNULL_BEGIN
  pointer value stays even after ownership of the object is transferred via
  `mbgl::Map addLayer`.
  */
-@property (nonatomic) mbgl::style::Layer *rawLayer;
+@property (nonatomic, readonly) mbgl::style::Layer *rawLayer;
 
 /**
  Adds the mbgl style layer that this object represents to the mbgl map below the

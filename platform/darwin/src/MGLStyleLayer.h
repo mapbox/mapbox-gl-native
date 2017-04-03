@@ -27,25 +27,7 @@ MGL_EXPORT
 
 #pragma mark Initializing a Style Layer
 
-- (instancetype)init __attribute__((unavailable("Use -initWithIdentifier: instead.")));
-
-/**
- Returns a style layer object initialized with the given identifier.
-
- The default implementation of this initializer in MGLStyleLayer creates an
- invalid style layer. Call this initializer on `MGLBackgroundStyleLayer` or one of
- the concrete subclasses of `MGLForegroundStyleLayer` to create a valid style
- layer.
-
- After initializing and configuring the style layer, add it to a map view’s
- style using the `-[MGLStyle addLayer:]` or
- `-[MGLStyle insertLayer:belowLayer:]` method.
-
- @param identifier A string that uniquely identifies the layer in the style to
-    which it is added.
- @return An initialized style layer.
- */
-- (instancetype)initWithIdentifier:(NSString *)identifier;
+- (instancetype)init __attribute__((unavailable("Use -init methods of concrete subclasses instead.")));
 
 #pragma mark Identifying a Style Layer
 

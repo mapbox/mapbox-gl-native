@@ -36,6 +36,21 @@ NS_ASSUME_NONNULL_BEGIN
 MGL_EXPORT
 @interface MGLRasterStyleLayer : MGLForegroundStyleLayer
 
+/**
+ Returns a raster style layer initialized with an identifier and source.
+
+ After initializing and configuring the style layer, add it to a map view’s
+ style using the `-[MGLStyle addLayer:]` or
+ `-[MGLStyle insertLayer:belowLayer:]` method.
+
+ @param identifier A string that uniquely identifies the source in the style to
+    which it is added.
+ @param source The source from which to obtain the data to style. If the source
+    has not yet been added to the current style, the behavior is undefined.
+ @return An initialized foreground style layer.
+ */
+- (instancetype)initWithIdentifier:(NSString *)identifier source:(MGLSource *)source NS_DESIGNATED_INITIALIZER;
+
 #pragma mark - Accessing the Paint Attributes
 
 /**
