@@ -1,24 +1,18 @@
 
-<%
-  const os = locals.os;
-  const iOS = os === 'iOS';
-  const macOS = os === 'macOS';
-  const cocoaPrefix = iOS ? 'UI' : 'NS';
--%>
 <!--
   This file is generated.
   Edit platform/darwin/scripts/generate-style-code.js, then run `make darwin-style-code`.
 -->
 
-# Data-Driven Styling
+# Working with Style Functions
 
-Mapbox’s data-driven styling features allow you to use attributes in the data to style your maps. You can style map features automatically based on their individual attributes.
+Mapbox’s runtime and data-driven styling features allow you to style your maps as a function of the current map zoom level, attributes in the map source data, or both. With data-driven styling, you can style map features automatically based on their individual attributes.
 
 Vary POI icons, transit route line colors, city polygon opacity, and more based on any attribute in your data. Need to visualize hotel data by price? You can have your map’s point radii and colors change automatically with your data.
 
 ![available bikes](img/data-driven-styling/citibikes.png) ![subway lines](img/data-driven-styling/polylineExample.png)
 
-This guide uses earthquake data from the [U.S. Geological Survey](https://earthquake.usgs.gov/earthquakes/feed/v1.0/geojson.php) to style a map based on attributes. For more information about how to work with GeoJSON data in our iOS SDK, please see our [working with GeoJSON data](working-with-geojson-data.html) guide.
+This guide uses earthquake data from the [U.S. Geological Survey](https://earthquake.usgs.gov/earthquakes/feed/v1.0/geojson.php) and data-driven styling to style a map based on attributes. For more information about how to work with GeoJSON data in our iOS SDK, please see our [working with GeoJSON data](working-with-geojson-data.html) guide.
 
 ## Style functions
 
@@ -35,7 +29,7 @@ The documentation for each individual style layer property notes which style fun
 Stops are key-value pairs that that determine a style value. With a `MGLCameraSourceFunction` stop, you can use a dictionary with a zoom level for a key and a `MGLStyleValue` for the value. For example, you can use a stops dictionary with zoom levels 0, 10, and 20 as keys, and yellow, orange, and red as the values. A `MGLSourceStyleFunction` uses the relevant attribute value as the key.
 
 ```swift
-let stops = [0: MGLStyleValue<<%- cocoaPrefix %>Color>(rawValue: .yellow),
+let stops = [0: MGLStyleValue<UIColor>(rawValue: .yellow),
              2.5: MGLStyleValue(rawValue: .orange),
              5: MGLStyleValue(rawValue: .red),
              7.5: MGLStyleValue(rawValue: .blue),
@@ -60,7 +54,7 @@ let symbolLayer = MGLSymbolStyleLayer(identifier: "place-city-sm", source: symbo
 let source = MGLShapeSource(identifier: "earthquakes", url: url, options: nil)
 style.addSource(source)
 
-let stops = [0: MGLStyleValue<<%- cocoaPrefix %>Color>(rawValue: .yellow),
+let stops = [0: MGLStyleValue<UIColor>(rawValue: .yellow),
              2.5: MGLStyleValue(rawValue: .orange),
              5: MGLStyleValue(rawValue: .red),
              7.5: MGLStyleValue(rawValue: .blue),
@@ -70,7 +64,7 @@ let layer = MGLCircleStyleLayer(identifier: "circles", source: source)
 layer.circleColor = MGLStyleValue(interpolationMode: .exponential,
                                   sourceStops: stops,
                                   attributeName: "mag",
-                                  options: [.defaultValue: MGLStyleValue<<%- cocoaPrefix %>Color>(rawValue: .green)])
+                                  options: [.defaultValue: MGLStyleValue<UIColor>(rawValue: .green)])
 layer.circleRadius = MGLStyleValue(rawValue: 10)
 style.insertLayer(layer, below: symbolLayer)
 ```
@@ -105,7 +99,7 @@ layer.circleRadius = MGLStyleValue(interpolationMode: .exponential,
 When we use the stops dictionary given above with an interval interpolation mode, we create ranges where earthquakes with a magnitude of 0 to just less than 2.5 would be yellow, 2.5 to just less than 5 would be orange, and so on.
 
 ``` swift
-let stops = [0: MGLStyleValue<<%- cocoaPrefix %>Color>(rawValue: .yellow),
+let stops = [0: MGLStyleValue<UIColor>(rawValue: .yellow),
              2.5: MGLStyleValue(rawValue: .orange),
              5: MGLStyleValue(rawValue: .red),
              7.5: MGLStyleValue(rawValue: .blue),
@@ -114,7 +108,7 @@ let stops = [0: MGLStyleValue<<%- cocoaPrefix %>Color>(rawValue: .yellow),
 layer.circleColor = MGLStyleValue(interpolationMode: .interval,
                                   sourceStops: stops,
                                   attributeName: "mag",
-                                  options: [.defaultValue: MGLStyleValue<<%- cocoaPrefix %>Color>(rawValue: .green)])
+                                  options: [.defaultValue: MGLStyleValue<UIColor>(rawValue: .green)])
 ```
 
 ![interval mode](img/data-driven-styling/interval.png)
@@ -126,14 +120,14 @@ At each stop, `MGLInterpolationModeCategorical` produces an output value equal t
 There are three main types of events in the dataset: earthquakes, explosions, and quarry blasts. In this case, the color of the circle layer will be determined by the type of event, with a default value of green to catch any events that do not fall into any of those categories.
 
 ``` swift
-let categoricalStops = ["earthquake": MGLStyleValue<<%- cocoaPrefix %>Color>(rawValue: .orange),
+let categoricalStops = ["earthquake": MGLStyleValue<UIColor>(rawValue: .orange),
                         "explosion": MGLStyleValue(rawValue: .red),
                         "quarry blast": MGLStyleValue(rawValue: .yellow)]
 
 layer.circleColor = MGLStyleValue(interpolationMode: .categorical,
                                   sourceStops: categoricalStops,
                                   attributeName: "type",
-                                  options: [.defaultValue: MGLStyleValue<<%- cocoaPrefix %>Color>(rawValue: .blue)])
+                                  options: [.defaultValue: MGLStyleValue<UIColor>(rawValue: .blue)])
 
 ```
 

@@ -19,7 +19,7 @@ custom_categories:
     children:
       - Adding Points to a Map
       - Runtime Styling
-      - Data-Driven Styling
+      - Working with Style Functions
       - Working with Mapbox Studio
       - Working with GeoJSON Data
       - For Style Authors
