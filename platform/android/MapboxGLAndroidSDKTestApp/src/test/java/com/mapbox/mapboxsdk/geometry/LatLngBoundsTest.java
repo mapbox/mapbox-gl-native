@@ -4,7 +4,6 @@ import android.os.Parcelable;
 
 import com.mapbox.mapboxsdk.exceptions.InvalidLatLngBoundsException;
 import com.mapbox.mapboxsdk.utils.MockParcel;
-import com.mapbox.services.android.telemetry.constants.GeoConstants;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -138,21 +137,17 @@ public class LatLngBoundsTest {
   }
 
   @Test
-  public void containsNotBiggerBoundsInWorld() {
-    LatLngBounds biggerWorldBounds = new LatLngBounds.Builder()
-      .include(new LatLng(GeoConstants.MAX_LATITUDE + 10, GeoConstants.MIN_LONGITUDE - 10))
-      .include(new LatLng(GeoConstants.MIN_LATITUDE - 10, GeoConstants.MAX_LONGITUDE + 10))
+  public void containsBounds() {
+    LatLngBounds inner = new LatLngBounds.Builder()
+      .include(new LatLng(-5, -5))
+      .include(new LatLng(5, 5))
       .build();
-    assertFalse("Bounds should not be contained ", LatLngBounds.world().contains(biggerWorldBounds));
-  }
-
-  @Test
-  public void containsNotBoundsInWorld() {
-    LatLngBounds outSideWorldBounds = new LatLngBounds.Builder()
-      .include(new LatLng(GeoConstants.MAX_LATITUDE + 10, GeoConstants.MAX_LONGITUDE + 10))
-      .include(new LatLng(GeoConstants.MAX_LATITUDE + 20, GeoConstants.MAX_LONGITUDE + 20))
+    LatLngBounds outer = new LatLngBounds.Builder()
+      .include(new LatLng(-10, -10))
+      .include(new LatLng(10, 10))
       .build();
-    assertFalse("Bounds should not be contained ", LatLngBounds.world().contains(outSideWorldBounds));
+    assertTrue(outer.contains(inner));
+    assertFalse(inner.contains(outer));
   }
 
   @Test

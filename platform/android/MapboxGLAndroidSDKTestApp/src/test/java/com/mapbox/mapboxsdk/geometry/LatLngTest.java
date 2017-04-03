@@ -6,6 +6,8 @@ import android.os.Parcelable;
 import com.mapbox.mapboxsdk.utils.MockParcel;
 
 import org.junit.Test;
+import org.junit.Rule;
+import org.junit.rules.ExpectedException;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
@@ -77,6 +79,79 @@ public class LatLngTest {
     LatLng latLng = new LatLng(1.2, 3.4);
     latLng.setLongitude(3);
     assertEquals("longitude should match", 3, latLng.getLongitude(), DELTA);
+  }
+
+  @Rule
+  public final ExpectedException exception = ExpectedException.none();
+
+  @Test
+  public void testConstructorChecksLatitudeNaN() {
+    exception.expect(IllegalArgumentException.class);
+    exception.expectMessage("latitude must not be NaN");
+    new LatLng(Double.NaN, 0);
+  }
+
+  @Test
+  public void testConstructorChecksLongitudeNaN() {
+    exception.expect(IllegalArgumentException.class);
+    exception.expectMessage("longitude must not be NaN");
+    new LatLng(0, Double.NaN);
+  }
+
+  @Test
+  public void testConstructorChecksLatitudeGreaterThan90() {
+    exception.expect(IllegalArgumentException.class);
+    exception.expectMessage("latitude must be between -90 and 90");
+    new LatLng(95, 0);
+  }
+
+  @Test
+  public void testConstructorChecksLatitudeLessThanThanNegative90() {
+    exception.expect(IllegalArgumentException.class);
+    exception.expectMessage("latitude must be between -90 and 90");
+    new LatLng(-95, 0);
+  }
+
+  @Test
+  public void testConstructorChecksLongitudeInfinity() {
+    exception.expect(IllegalArgumentException.class);
+    exception.expectMessage("longitude must not be infinite");
+    new LatLng(0, Double.POSITIVE_INFINITY);
+  }
+
+  @Test
+  public void testLatitudeSetterChecksNaN() {
+    exception.expect(IllegalArgumentException.class);
+    exception.expectMessage("latitude must not be NaN");
+    new LatLng().setLatitude(Double.NaN);
+  }
+
+  @Test
+  public void testLongitudeSetterChecksNaN() {
+    exception.expect(IllegalArgumentException.class);
+    exception.expectMessage("longitude must not be NaN");
+    new LatLng().setLongitude(Double.NaN);
+  }
+
+  @Test
+  public void testLatitudeSetterChecksGreaterThan90() {
+    exception.expect(IllegalArgumentException.class);
+    exception.expectMessage("latitude must be between -90 and 90");
+    new LatLng().setLatitude(95);
+  }
+
+  @Test
+  public void testLatitudeSetterChecksLessThanThanNegative90() {
+    exception.expect(IllegalArgumentException.class);
+    exception.expectMessage("latitude must be between -90 and 90");
+    new LatLng().setLatitude(-95);
+  }
+
+  @Test
+  public void testLongitudeSetterChecksInfinity() {
+    exception.expect(IllegalArgumentException.class);
+    exception.expectMessage("longitude must not be infinite");
+    new LatLng().setLongitude(Double.NEGATIVE_INFINITY);
   }
 
   @Test
