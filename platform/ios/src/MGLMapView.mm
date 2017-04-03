@@ -3763,8 +3763,10 @@ public:
         {
             id providedCalloutView = [self.delegate mapView:self calloutViewForAnnotation:annotation];
             if (providedCalloutView) {
-                NSAssert([providedCalloutView isKindOfClass:[UIView class]], @"callout view should be a kind of UIView");
-                NSAssert([providedCalloutView conformsToProtocol:@protocol(MGLCalloutView)], @"callout view should conform to MGLCalloutView");
+                if (![providedCalloutView isKindOfClass:[UIView class]]) {
+                    [NSException raise:NSInvalidArgumentException format:@"Callout view must be a kind of UIView"];
+                }
+                NSAssert([providedCalloutView conformsToProtocol:@protocol(MGLCalloutView)], @"callout view must conform to MGLCalloutView");
                 calloutView = providedCalloutView;
             }
         }
