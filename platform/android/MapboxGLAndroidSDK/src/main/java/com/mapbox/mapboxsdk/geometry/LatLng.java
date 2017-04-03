@@ -50,8 +50,8 @@ public class LatLng implements ILatLng, Parcelable {
    * @param longitude Longitude in degrees
    */
   public LatLng(double latitude, double longitude) {
-    this.latitude = latitude;
-    this.longitude = longitude;
+    setLatitude(latitude);
+    setLongitude(longitude);
   }
 
   /**
@@ -62,9 +62,9 @@ public class LatLng implements ILatLng, Parcelable {
    * @param altitude  Altitude in meters
    */
   public LatLng(double latitude, double longitude, double altitude) {
-    this.latitude = latitude;
-    this.longitude = longitude;
-    this.altitude = altitude;
+    setLatitude(latitude);
+    setLongitude(longitude);
+    setAltitude(altitude);
   }
 
   /**
@@ -88,12 +88,18 @@ public class LatLng implements ILatLng, Parcelable {
   }
 
   protected LatLng(Parcel in) {
-    latitude = in.readDouble();
-    longitude = in.readDouble();
-    altitude = in.readDouble();
+    setLatitude(in.readDouble());
+    setLongitude(in.readDouble());
+    setAltitude(in.readDouble());
   }
 
   public void setLatitude(double latitude) {
+    if (Double.isNaN(latitude)) {
+      throw new IllegalArgumentException("latitude must not be NaN");
+    }
+    if (Math.abs(latitude) > 90.0) {
+      throw new IllegalArgumentException("latitude must be between -90 and 90");
+    }
     this.latitude = latitude;
   }
 
@@ -103,6 +109,12 @@ public class LatLng implements ILatLng, Parcelable {
   }
 
   public void setLongitude(double longitude) {
+    if (Double.isNaN(longitude)) {
+      throw new IllegalArgumentException("longitude must not be NaN");
+    }
+    if (Double.isInfinite(longitude)) {
+      throw new IllegalArgumentException("longitude must not be infinite");
+    }
     this.longitude = longitude;
   }
 
