@@ -25,7 +25,7 @@ public:
     Transform(const TransformState &state_) : observer(MapObserver::nullObserver()), state(state_) {}
 
     // Map view
-    bool resize(Size size);
+    void resize(Size size);
 
     // Camera
     /** Returns the current camera options. */

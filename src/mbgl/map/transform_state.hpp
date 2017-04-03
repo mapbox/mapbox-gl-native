@@ -74,6 +74,10 @@ public:
     double zoomScale(double zoom) const;
     double scaleZoom(double scale) const;
 
+    bool valid() const {
+        return !size.isEmpty() && (scale >= min_scale && scale <= max_scale);
+    }
+
 private:
     bool rotatedNorth() const;
     void constrain(double& scale, double& x, double& y) const;

@@ -7,8 +7,7 @@ namespace mbgl {
 
 class Size {
 public:
-    constexpr Size() : width(0), height(0) {
-    }
+    constexpr Size() = default;
 
     constexpr Size(const uint32_t width_, const uint32_t height_) : width(width_), height(height_) {
     }
@@ -17,12 +16,12 @@ public:
         return width * height;
     }
 
-    constexpr explicit operator bool() const {
-        return width > 0 && height > 0;
+    constexpr bool isEmpty() const {
+        return width == 0 || height == 0;
     }
 
-    uint32_t width;
-    uint32_t height;
+    uint32_t width = 0;
+    uint32_t height = 0;
 };
 
 constexpr inline bool operator==(const Size& a, const Size& b) {

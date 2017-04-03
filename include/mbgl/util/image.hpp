@@ -58,7 +58,7 @@ public:
     }
 
     bool valid() const {
-        return size && data.get() != nullptr;
+        return !size.isEmpty() && data.get() != nullptr;
     }
 
     template <typename T = Image>
