@@ -54,7 +54,7 @@ NS_ASSUME_NONNULL_BEGIN
     if (!_bounds) {
         mbgl::LatLngBounds bounds = mbgl::LatLngBounds::empty();
         for (auto coordinate : _coordinates) {
-            bounds.extend(mbgl::LatLng(coordinate.latitude, coordinate.longitude));
+            bounds.extend(MGLLatLngFromLocationCoordinate2D(coordinate));
         }
         _bounds = bounds;
     }
