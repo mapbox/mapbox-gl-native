@@ -9,6 +9,7 @@
 #include <mbgl/style/paint_property.hpp>
 #include <mbgl/shaders/shaders.hpp>
 #include <mbgl/util/io.hpp>
+#include <mbgl/math/clamp.hpp>
 
 
 #include <mbgl/programs/attributes.hpp>
@@ -87,83 +88,199 @@ struct SymbolLayoutAttributes : gl::Attributes<
     }
 };
     
-struct SymbolSizeAttributes : gl::Attributes<attributes::a_size> {
-    using SourceFunctionVertex = gl::detail::Vertex<gl::Attribute<uint16_t, 1>>;
-    struct monostate {};
-    using VertexVector = variant<
-        monostate,
-        gl::VertexVector<SourceFunctionVertex>,
-        gl::VertexVector<Vertex>>;
-    
-    using VertexBuffer = variant<
-        monostate,
-        gl::VertexBuffer<SourceFunctionVertex>,
-        gl::VertexBuffer<Vertex>>;
-    
+class SymbolSizeAttributes : public gl::Attributes<attributes::a_size> {
+public:
     using Attribute = attributes::a_size::Type;
-    
-    static Bindings attributeBindings(const VertexBuffer& buffer) {
-        return buffer.match(
-                [&] (const monostate&) {
-                    return Bindings { Attribute::ConstantBinding {{{0, 0, 0}}} };
-                },
-                [&] (const gl::VertexBuffer<SourceFunctionVertex>& buffer) {
-                    return Bindings { Attribute::variableBinding(buffer, 0, 1) };
-                },
-                [&] (const gl::VertexBuffer<Vertex>& buffer) {
-                    return Bindings { Attribute::variableBinding(buffer, 0) };
-                }
-            );
-        };
 };
 
-
-class SymbolSizeData {
+// Mimic the PaintPropertyBinder technique specifically for the {text,icon}-size layout properties
+// in order to provide a 'custom' scheme for encoding the necessary attribute data.  As with
+// PaintPropertyBinder, SymbolSizeBinder is an abstract class whose implementations handle the
+// particular attribute & uniform logic needed by each possible type of the {Text,Icon}Size properties.
+class SymbolSizeBinder {
 public:
-    SymbolSizeData(float tileZoom, const style::DataDrivenPropertyValue<float>& size, float defaultSize_)
-        : sizePropertyValue(size),
-          layoutZoom(tileZoom + 1),
-          layoutSize(defaultSize_),
-          defaultSize(defaultSize_) {
-        size.match(
-            [&] (float constantSize) { layoutSize = constantSize; },
-            [&] (const style::CameraFunction<float>& fn) {
-                layoutSize = fn.evaluate(layoutZoom);
-                coveringZoomStops = fn.coveringZoomStops(tileZoom, tileZoom + 1);
-            },
-            [&] (const style::SourceFunction<float>&) {
-                vertices = gl::VertexVector<SymbolSizeAttributes::SourceFunctionVertex> {};
-            },
-            [&] (const style::CompositeFunction<float>& fn) {
-                coveringZoomStops = fn.coveringZoomStops(tileZoom, tileZoom + 1);
-                vertices = gl::VertexVector<SymbolSizeAttributes::Vertex> {};
-            },
-            [&] (const auto&) {}
-        );
-    };
+    using Uniforms = gl::Uniforms<
+        uniforms::u_is_size_zoom_constant,
+        uniforms::u_is_size_feature_constant,
+        uniforms::u_size_t,
+        uniforms::u_size,
+        uniforms::u_layout_size>;
+    using UniformValues = Uniforms::Values;
     
+    static std::unique_ptr<SymbolSizeBinder> create(const float tileZoom,
+                                                    const style::DataDrivenPropertyValue<float>& sizeProperty,
+                                                    const float defaultValue);
+
+    virtual SymbolSizeAttributes::Bindings attributeBindings(const style::PossiblyEvaluatedPropertyValue<float> currentValue) const = 0;
+    virtual void populateVertexVector(const GeometryTileFeature& feature) = 0;
+    virtual UniformValues uniformValues(float currentZoom) const = 0;
+    virtual void upload(gl::Context&) = 0;
+};
+
+class ConstantSymbolSizeBinder : public SymbolSizeBinder {
+public:
+    using PropertyValue = variant<float, style::CameraFunction<float>>;
     
-    void upload(gl::Context& context) {
-        vertices.match(
-            // TODO: what's the best way to avoid copying the vertexVector here?
-            [&] (gl::VertexVector<SymbolSizeAttributes::SourceFunctionVertex> vertexVector) {
-                // TODO - why does directly assigning vertexBuffer = context.createVertexBuffer(...) fail?
-                vertexBuffer = SymbolSizeAttributes::VertexBuffer { context.createVertexBuffer(std::move(vertexVector)) };
-            },
-            [&] (gl::VertexVector<SymbolSizeAttributes::Vertex> vertexVector) {
-                vertexBuffer = SymbolSizeAttributes::VertexBuffer { context.createVertexBuffer(std::move(vertexVector)) };
-            },
-            [&] (const auto&) {}
+    ConstantSymbolSizeBinder(const float /*tileZoom*/, const float& size, const float /*defaultValue*/)
+      : layoutSize(size) {}
+    
+    ConstantSymbolSizeBinder(const float /*tileZoom*/, const style::Undefined&, const float defaultValue)
+      : layoutSize(defaultValue) {}
+    
+    ConstantSymbolSizeBinder(const float tileZoom, const style::CameraFunction<float>& function, const float /*defaultValue*/)
+      : layoutSize(function.evaluate(tileZoom + 1)) {
+        coveringRanges = std::make_tuple(
+            function.coveringZoomStops(tileZoom, tileZoom + 1),
+            Range<float> { function.evaluate(tileZoom), function.evaluate(tileZoom + 1) }
         );
     }
     
-    style::DataDrivenPropertyValue<float> sizePropertyValue;
-    float layoutZoom;
+    SymbolSizeAttributes::Bindings attributeBindings(const style::PossiblyEvaluatedPropertyValue<float>) const override {
+        return SymbolSizeAttributes::Bindings { SymbolSizeAttributes::Attribute::ConstantBinding {{{0, 0, 0}}} };
+    }
+    void upload(gl::Context&) override {}
+    void populateVertexVector(const GeometryTileFeature&) override {};
+    
+    UniformValues uniformValues(float currentZoom) const override {
+        float size = layoutSize;
+        bool isZoomConstant = true;
+        if (coveringRanges) {
+            const Range<float>& zoomLevels = std::get<0>(*coveringRanges);
+            const Range<float>& sizeLevels = std::get<1>(*coveringRanges);
+            // TODO: interpolate properly
+            const float t = (currentZoom - zoomLevels.min) / (zoomLevels.max - zoomLevels.min);
+            size = sizeLevels.min + (sizeLevels.max - sizeLevels.min) * util::clamp(t, 0.0f, 1.0f);
+            isZoomConstant = false;
+        }
+        
+        return UniformValues {
+            uniforms::u_is_size_zoom_constant::Value{ isZoomConstant },
+            uniforms::u_is_size_feature_constant::Value{ true },
+            uniforms::u_size_t::Value{ 0.0f },  // unused
+            uniforms::u_size::Value{ size },
+            uniforms::u_layout_size::Value{ layoutSize }
+        };
+    }
+    
     float layoutSize;
-    float defaultSize;
-    optional<Range<float>> coveringZoomStops;
-    SymbolSizeAttributes::VertexVector vertices;
-    SymbolSizeAttributes::VertexBuffer vertexBuffer;
+    optional<std::tuple<Range<float>, Range<float>>> coveringRanges;
+};
+
+class SourceFunctionSymbolSizeBinder : public SymbolSizeBinder {
+public:
+    using Vertex = gl::detail::Vertex<gl::Attribute<uint16_t, 1>>;
+    using VertexVector = gl::VertexVector<Vertex>;
+    using VertexBuffer = gl::VertexBuffer<Vertex>;
+    
+    SourceFunctionSymbolSizeBinder(const float /*tileZoom*/, const style::SourceFunction<float>& function_, const float defaultValue_)
+        : function(function_),
+          defaultValue(defaultValue_) {
+    }
+
+    SymbolSizeAttributes::Bindings attributeBindings(const style::PossiblyEvaluatedPropertyValue<float> currentValue) const override {
+        if (currentValue.isConstant()) {
+            return SymbolSizeAttributes::Bindings { SymbolSizeAttributes::Attribute::ConstantBinding {{{0, 0, 0}}} };
+        }
+        
+        return SymbolSizeAttributes::Bindings { SymbolSizeAttributes::Attribute::variableBinding(*buffer, 0, 1) };
+    }
+    
+    void populateVertexVector(const GeometryTileFeature& feature) override {
+        const auto sizeVertex = Vertex {
+            {{
+                static_cast<uint16_t>(function.evaluate(feature, defaultValue) * 10)
+            }}
+        };
+        
+        vertices.emplace_back(sizeVertex);
+        vertices.emplace_back(sizeVertex);
+        vertices.emplace_back(sizeVertex);
+        vertices.emplace_back(sizeVertex);
+    };
+    
+    UniformValues uniformValues(float) const override {
+        return UniformValues {
+            uniforms::u_is_size_zoom_constant::Value{ true },
+            uniforms::u_is_size_feature_constant::Value{ false },
+            uniforms::u_size_t::Value{ 0.0f },      // unused
+            uniforms::u_size::Value{ 0.0f },        // unused
+            uniforms::u_layout_size::Value{ 0.0f }  // unused
+        };
+    }
+    
+    void upload(gl::Context& context) override {
+        buffer = VertexBuffer { context.createVertexBuffer(std::move(vertices)) };
+    }
+    
+    const style::SourceFunction<float>& function;
+    const float defaultValue;
+    
+    VertexVector vertices;
+    optional<VertexBuffer> buffer;
+};
+
+class CompositeFunctionSymbolSizeBinder: public SymbolSizeBinder {
+public:
+    using Vertex = SymbolSizeAttributes::Vertex;
+    using VertexVector = gl::VertexVector<Vertex>;
+    using VertexBuffer = gl::VertexBuffer<Vertex>;
+    
+    CompositeFunctionSymbolSizeBinder(const float tileZoom, const style::CompositeFunction<float>& function_, const float defaultValue_)
+        : function(function_),
+          defaultValue(defaultValue_),
+          layoutZoom(tileZoom + 1),
+          coveringZoomStops(function.coveringZoomStops(tileZoom, tileZoom + 1)) {
+    }
+
+    SymbolSizeAttributes::Bindings attributeBindings(const style::PossiblyEvaluatedPropertyValue<float> currentValue) const override {
+        if (currentValue.isConstant()) {
+            return SymbolSizeAttributes::Bindings { SymbolSizeAttributes::Attribute::ConstantBinding {{{0, 0, 0}}} };
+        }
+        
+        return SymbolSizeAttributes::Bindings { SymbolSizeAttributes::Attribute::variableBinding(*buffer, 0) };
+    }
+    
+    void populateVertexVector(const GeometryTileFeature& feature) override {
+        const auto sizeVertex = Vertex {
+            {{
+                static_cast<uint16_t>(function.evaluate(coveringZoomStops.min, feature, defaultValue) * 10),
+                static_cast<uint16_t>(function.evaluate(coveringZoomStops.max, feature, defaultValue) * 10),
+                static_cast<uint16_t>(function.evaluate(layoutZoom, feature, defaultValue) * 10)
+            }}
+        };
+        
+        vertices.emplace_back(sizeVertex);
+        vertices.emplace_back(sizeVertex);
+        vertices.emplace_back(sizeVertex);
+        vertices.emplace_back(sizeVertex);
+    };
+    
+    UniformValues uniformValues(float currentZoom) const override {
+        float sizeInterpolationT;
+        // TODO: interpolate properly
+        const float t = (currentZoom - coveringZoomStops.min) / (coveringZoomStops.max - coveringZoomStops.min);
+        sizeInterpolationT = util::clamp(t, 0.0f, 1.0f);
+
+        return UniformValues {
+            uniforms::u_is_size_zoom_constant::Value{ false },
+            uniforms::u_is_size_feature_constant::Value{ false },
+            uniforms::u_size_t::Value{ sizeInterpolationT },
+            uniforms::u_size::Value{ 0.0f },        // unused
+            uniforms::u_layout_size::Value{ 0.0f }  // unused
+        };
+    }
+    
+    void upload(gl::Context& context) override {
+        buffer = VertexBuffer { context.createVertexBuffer(std::move(vertices)) };
+    }
+    
+    const style::CompositeFunction<float>& function;
+    const float defaultValue;
+    float layoutZoom;
+    Range<float> coveringZoomStops;
+
+    VertexVector vertices;
+    optional<VertexBuffer> buffer;
 };
 
 
@@ -184,8 +301,9 @@ public:
     using Attributes = gl::ConcatenateAttributes<LayoutAndSizeAttributes, PaintAttributes>;
 
     using UniformValues = typename Uniforms::Values;
+    using SizeUniforms = typename SymbolSizeBinder::Uniforms;
     using PaintUniforms = typename PaintPropertyBinders::Uniforms;
-    using AllUniforms = gl::ConcatenateUniforms<Uniforms, PaintUniforms>;
+    using AllUniforms = gl::ConcatenateUniforms<Uniforms, gl::ConcatenateUniforms<SizeUniforms, PaintUniforms>>;
 
     using ProgramType = gl::Program<Primitive, Attributes, AllUniforms>;
 
@@ -251,7 +369,8 @@ public:
               gl::ColorMode colorMode,
               UniformValues&& uniformValues,
               const gl::VertexBuffer<LayoutVertex>& layoutVertexBuffer,
-              const SymbolSizeAttributes::VertexBuffer& sizeVertexBuffer,
+              const SymbolSizeBinder& symbolSizeBinder,
+              const style::PossiblyEvaluatedPropertyValue<float>& currentSizeValue,
               const gl::IndexBuffer<DrawMode>& indexBuffer,
               const gl::SegmentVector<Attributes>& segments,
               const PaintPropertyBinders& paintPropertyBinders,
@@ -264,9 +383,10 @@ public:
             std::move(stencilMode),
             std::move(colorMode),
             uniformValues
+                .concat(symbolSizeBinder.uniformValues(currentZoom))
                 .concat(paintPropertyBinders.uniformValues(currentZoom)),
             LayoutAttributes::allVariableBindings(layoutVertexBuffer)
-                .concat(SymbolSizeAttributes::attributeBindings(sizeVertexBuffer))
+                .concat(symbolSizeBinder.attributeBindings(currentSizeValue))
                 .concat(paintPropertyBinders.attributeBindings(currentProperties)),
             indexBuffer,
             segments
@@ -286,12 +406,7 @@ class SymbolIconProgram : public SymbolProgram<
         uniforms::u_rotate_with_map,
         uniforms::u_texture,
         uniforms::u_fadetexture,
-        uniforms::u_is_text,
-        uniforms::u_is_size_zoom_constant,
-        uniforms::u_is_size_feature_constant,
-        uniforms::u_size_t,
-        uniforms::u_size,
-        uniforms::u_layout_size>,
+        uniforms::u_is_text>,
     style::IconPaintProperties>
 {
 public:
@@ -299,7 +414,6 @@ public:
 
     static UniformValues uniformValues(const bool isText,
                                        const style::SymbolPropertyValues&,
-                                       const SymbolSizeData& sizeData,
                                        const Size& texsize,
                                        const std::array<float, 2>& pixelsToGLUnits,
                                        const RenderTile&,
@@ -325,11 +439,6 @@ class SymbolSDFProgram : public SymbolProgram<
         uniforms::u_texture,
         uniforms::u_fadetexture,
         uniforms::u_is_text,
-        uniforms::u_is_size_zoom_constant,
-        uniforms::u_is_size_feature_constant,
-        uniforms::u_size_t,
-        uniforms::u_size,
-        uniforms::u_layout_size,
         uniforms::u_gamma_scale,
         uniforms::u_pitch,
         uniforms::u_bearing,
@@ -351,11 +460,6 @@ public:
             uniforms::u_texture,
             uniforms::u_fadetexture,
             uniforms::u_is_text,
-            uniforms::u_is_size_zoom_constant,
-            uniforms::u_is_size_feature_constant,
-            uniforms::u_size_t,
-            uniforms::u_size,
-            uniforms::u_layout_size,
             uniforms::u_gamma_scale,
             uniforms::u_pitch,
             uniforms::u_bearing,
@@ -372,7 +476,6 @@ public:
 
     static UniformValues uniformValues(const bool isText,
                                        const style::SymbolPropertyValues&,
-                                       const SymbolSizeData& sizeData,
                                        const Size& texsize,
                                        const std::array<float, 2>& pixelsToGLUnits,
                                        const RenderTile&,

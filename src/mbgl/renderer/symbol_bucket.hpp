@@ -40,7 +40,7 @@ public:
         SymbolIconProgram::PaintPropertyBinders,
         SymbolSDFTextProgram::PaintPropertyBinders>> paintPropertyBinders;
     
-    SymbolSizeData textSizeData;
+    std::unique_ptr<SymbolSizeBinder> textSizeBinder;
 
     struct TextBuffer {
         gl::VertexVector<SymbolLayoutVertex> vertices;
@@ -51,7 +51,7 @@ public:
         optional<gl::IndexBuffer<gl::Triangles>> indexBuffer;
     } text;
     
-    SymbolSizeData iconSizeData;
+    std::unique_ptr<SymbolSizeBinder> iconSizeBinder;
     
     struct IconBuffer {
         gl::VertexVector<SymbolLayoutVertex> vertices;

@@ -72,6 +72,7 @@ SymbolPropertyValues SymbolLayer::Impl::iconPropertyValues(const SymbolLayoutPro
     return SymbolPropertyValues {
         layout_.get<IconRotationAlignment>(), // icon-pitch-alignment is not yet implemented; inherit the rotation alignment
         layout_.get<IconRotationAlignment>(),
+        layout_.get<IconSize>(),
         paint.evaluated.get<IconTranslate>(),
         paint.evaluated.get<IconTranslateAnchor>(),
         iconSize,
@@ -86,6 +87,7 @@ SymbolPropertyValues SymbolLayer::Impl::textPropertyValues(const SymbolLayoutPro
     return SymbolPropertyValues {
         layout_.get<TextPitchAlignment>(),
         layout_.get<TextRotationAlignment>(),
+        layout_.get<TextSize>(),
         paint.evaluated.get<TextTranslate>(),
         paint.evaluated.get<TextTranslateAnchor>(),
         textSize,

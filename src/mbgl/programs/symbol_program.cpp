@@ -11,10 +11,25 @@ using namespace style;
 
 static_assert(sizeof(SymbolLayoutVertex) == 16, "expected SymbolLayoutVertex size");
 
+std::unique_ptr<SymbolSizeBinder> SymbolSizeBinder::create(const float tileZoom,
+                                                    const style::DataDrivenPropertyValue<float>& sizeProperty,
+                                                    const float defaultValue) {
+    return sizeProperty.match(
+        [&] (const style::CompositeFunction<float>& function) -> std::unique_ptr<SymbolSizeBinder> {
+            return std::make_unique<CompositeFunctionSymbolSizeBinder>(tileZoom, function, defaultValue);
+        },
+        [&] (const style::SourceFunction<float>& function) {
+            return std::make_unique<SourceFunctionSymbolSizeBinder>(tileZoom, function, defaultValue);
+        },
+        [&] (const auto& value) -> std::unique_ptr<SymbolSizeBinder> {
+            return std::make_unique<ConstantSymbolSizeBinder>(tileZoom, value, defaultValue);
+        }
+    );
+}
+
 template <class Values, class...Args>
 Values makeValues(const bool isText,
                   const style::SymbolPropertyValues& values,
-                  const SymbolSizeData& sizeData,
                   const Size& texsize,
                   const std::array<float, 2>& pixelsToGLUnits,
                   const RenderTile& tile,
@@ -30,25 +45,6 @@ Values makeValues(const bool isText,
             pixelsToGLUnits[1] * state.getCameraToCenterDistance()
         }};
     }
-    
-    float sizeInterpolationT;
-    float renderSize = sizeData.layoutSize;
-    float layoutSize = sizeData.layoutSize;
-    sizeData.sizePropertyValue.match(
-        [&] (const CompositeFunction<float>&) {
-            const auto& coveringStops = *sizeData.coveringZoomStops;
-            const float t = (state.getZoom() - coveringStops.min) / (coveringStops.max - coveringStops.min);
-            sizeInterpolationT = util::clamp(t, 0.0f, 1.0f);
-        },
-        [&] (const CameraFunction<float>& fn) {
-            const auto& coveringStops = *sizeData.coveringZoomStops;
-            const float t = (state.getZoom() - coveringStops.min) / (coveringStops.max - coveringStops.min);
-            const float lowerValue = fn.evaluate(coveringStops.min);
-            const float upperValue = fn.evaluate(coveringStops.max);
-            renderSize = lowerValue + (upperValue - lowerValue) * util::clamp(t, 0.0f, 1.0f);
-        },
-        [&] (const auto&) {}
-    );
         
     return Values {
         uniforms::u_matrix::Value{ tile.translatedMatrix(values.translate,
@@ -61,11 +57,6 @@ Values makeValues(const bool isText,
         uniforms::u_texture::Value{ 0 },
         uniforms::u_fadetexture::Value{ 1 },
         uniforms::u_is_text::Value{ isText },
-        uniforms::u_is_size_zoom_constant::Value{ sizeData.sizePropertyValue.isZoomConstant() },
-        uniforms::u_is_size_feature_constant::Value{ !sizeData.sizePropertyValue.isDataDriven() },
-        uniforms::u_size_t::Value{ sizeInterpolationT },
-        uniforms::u_size::Value{ renderSize },
-        uniforms::u_layout_size::Value{ layoutSize },
         std::forward<Args>(args)...
     };
 }
@@ -73,7 +64,6 @@ Values makeValues(const bool isText,
 SymbolIconProgram::UniformValues
 SymbolIconProgram::uniformValues(const bool isText,
                                  const style::SymbolPropertyValues& values,
-                                 const SymbolSizeData& sizeData,
                                  const Size& texsize,
                                  const std::array<float, 2>& pixelsToGLUnits,
                                  const RenderTile& tile,
@@ -82,7 +72,6 @@ SymbolIconProgram::uniformValues(const bool isText,
     return makeValues<SymbolIconProgram::UniformValues>(
         isText,
         values,
-        sizeData,
         texsize,
         pixelsToGLUnits,
         tile,
@@ -94,7 +83,6 @@ template <class PaintProperties>
 typename SymbolSDFProgram<PaintProperties>::UniformValues SymbolSDFProgram<PaintProperties>::uniformValues(
       const bool isText,
       const style::SymbolPropertyValues& values,
-      const SymbolSizeData& sizeData,
       const Size& texsize,
       const std::array<float, 2>& pixelsToGLUnits,
       const RenderTile& tile,
@@ -108,7 +96,6 @@ typename SymbolSDFProgram<PaintProperties>::UniformValues SymbolSDFProgram<Paint
     return makeValues<SymbolSDFProgram<PaintProperties>::UniformValues>(
         isText,
         values,
-        sizeData,
         texsize,
         pixelsToGLUnits,
         tile,

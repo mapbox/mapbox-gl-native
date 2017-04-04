@@ -65,10 +65,15 @@ private:
 
     // Adds placed items to the buffer.
     template <typename Buffer>
-    void addSymbol(Buffer&, SymbolSizeData& sizeData, const SymbolQuad&, const SymbolFeature& feature,
-                    const style::DataDrivenPropertyValue<float>& size, float scale,
-                    const bool keepUpright, const style::SymbolPlacementType, const float placementAngle,
-                    WritingModeType writingModes);
+    void addSymbol(Buffer&,
+                   SymbolSizeBinder& sizeBinder,
+                   const SymbolQuad&,
+                   const SymbolFeature& feature,
+                   float scale,
+                   const bool keepUpright,
+                   const style::SymbolPlacementType,
+                   const float placementAngle,
+                   WritingModeType writingModes);
 
     const std::string sourceLayerName;
     const std::string bucketName;

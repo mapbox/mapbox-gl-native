@@ -496,7 +496,7 @@ std::unique_ptr<SymbolBucket> SymbolLayout::place(CollisionTile& collisionTile) 
             if (glyphScale < collisionTile.maxScale) {
                 for (const auto& symbol : symbolInstance.glyphQuads) {
                     addSymbol(
-                        bucket->text, bucket->textSizeData, symbol, feature, textSize, placementZoom,
+                        bucket->text, *bucket->textSizeBinder, symbol, feature, placementZoom,
                         keepUpright, textPlacement, collisionTile.config.angle, symbolInstance.writingModes);
                 }
             }
@@ -507,7 +507,7 @@ std::unique_ptr<SymbolBucket> SymbolLayout::place(CollisionTile& collisionTile) 
             collisionTile.insertFeature(symbolInstance.iconCollisionFeature, iconScale, layout.get<IconIgnorePlacement>());
             if (iconScale < collisionTile.maxScale && symbolInstance.iconQuad) {
                 addSymbol(
-                    bucket->icon, bucket->iconSizeData, *symbolInstance.iconQuad, feature, iconSize, placementZoom,
+                    bucket->icon, *bucket->iconSizeBinder, *symbolInstance.iconQuad, feature, placementZoom,
                     keepUpright, iconPlacement, collisionTile.config.angle, symbolInstance.writingModes);
             }
         }
@@ -527,10 +527,9 @@ std::unique_ptr<SymbolBucket> SymbolLayout::place(CollisionTile& collisionTile) 
 
 template <typename Buffer>
 void SymbolLayout::addSymbol(Buffer& buffer,
-                             SymbolSizeData& sizeData,
+                             SymbolSizeBinder& sizeBinder,
                              const SymbolQuad& symbol,
                              const SymbolFeature& feature,
-                             const style::DataDrivenPropertyValue<float>& size,
                              const float placementZoom,
                              const bool keepUpright,
                              const style::SymbolPlacementType placement,
@@ -593,36 +592,7 @@ void SymbolLayout::addSymbol(Buffer& buffer,
     buffer.vertices.emplace_back(SymbolLayoutAttributes::vertex(anchorPoint, br, tex.x + tex.w, tex.y + tex.h,
                         minZoom, maxZoom, placementZoom, glyphAngle));
     
-    size.match(
-        [&] (const style::CompositeFunction<float>& fn) {
-            const auto sizeVertex = SymbolSizeAttributes::Vertex {
-                {{
-                    static_cast<uint16_t>(fn.evaluate(sizeData.coveringZoomStops->min, feature, sizeData.defaultSize) * 10),
-                    static_cast<uint16_t>(fn.evaluate(sizeData.coveringZoomStops->max, feature, sizeData.defaultSize) * 10),
-                    static_cast<uint16_t>(fn.evaluate(zoom + 1, feature, sizeData.defaultSize) * 10)
-                }}
-            };
-            auto& vertexVector = sizeData.vertices.get<gl::VertexVector<SymbolSizeAttributes::Vertex>>();
-            vertexVector.emplace_back(sizeVertex);
-            vertexVector.emplace_back(sizeVertex);
-            vertexVector.emplace_back(sizeVertex);
-            vertexVector.emplace_back(sizeVertex);
-        },
-        [&] (const style::SourceFunction<float>& fn) {
-            const auto sizeVertex = SymbolSizeAttributes::SourceFunctionVertex {
-                {{ static_cast<uint16_t>(fn.evaluate(feature, sizeData.defaultSize) * 10) }}
-            };
-            
-            auto& vertexVector = sizeData.vertices.get<gl::VertexVector<SymbolSizeAttributes::SourceFunctionVertex>>();
-            vertexVector.emplace_back(sizeVertex);
-            vertexVector.emplace_back(sizeVertex);
-            vertexVector.emplace_back(sizeVertex);
-            vertexVector.emplace_back(sizeVertex);
-        },
-        [] (const auto&) {
-            mbgl::Log::Debug(mbgl::Event::General, "feature-constant symbol");
-        }
-    );
+    sizeBinder.populateVertexVector(feature);
 
     // add the two triangles, referencing the four coordinates we just inserted.
     buffer.triangles.emplace_back(index + 0, index + 1, index + 2);

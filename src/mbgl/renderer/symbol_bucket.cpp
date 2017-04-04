@@ -18,9 +18,9 @@ SymbolBucket::SymbolBucket(style::SymbolLayoutProperties::PossiblyEvaluated layo
                            bool iconsNeedLinear_)
     : layout(std::move(layout_)),
       sdfIcons(sdfIcons_),
-      iconsNeedLinear(iconsNeedLinear_),
-      textSizeData(zoom, textSize, TextSize::defaultValue()),
-      iconSizeData(zoom, iconSize, IconSize::defaultValue()) {
+      iconsNeedLinear(iconsNeedLinear_ || iconSize.isDataDriven() || !iconSize.isZoomConstant()),
+      textSizeBinder(SymbolSizeBinder::create(zoom, textSize, TextSize::defaultValue())),
+      iconSizeBinder(SymbolSizeBinder::create(zoom, iconSize, IconSize::defaultValue())) {
     
     for (const auto& pair : layerPaintProperties) {
         paintPropertyBinders.emplace(
@@ -37,13 +37,13 @@ void SymbolBucket::upload(gl::Context& context) {
     if (hasTextData()) {
         text.vertexBuffer = context.createVertexBuffer(std::move(text.vertices));
         text.indexBuffer = context.createIndexBuffer(std::move(text.triangles));
-        textSizeData.upload(context);
+        textSizeBinder->upload(context);
     }
 
     if (hasIconData()) {
         icon.vertexBuffer = context.createVertexBuffer(std::move(icon.vertices));
         icon.indexBuffer = context.createIndexBuffer(std::move(icon.triangles));
-        iconSizeData.upload(context);
+        iconSizeBinder->upload(context);
     }
 
     if (!collisionBox.vertices.empty()) {
