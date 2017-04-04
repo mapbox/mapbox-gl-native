@@ -37,7 +37,7 @@ static const CGFloat MGLRasterSourceRetinaTileSize = 512;
 }
 
 - (instancetype)initWithIdentifier:(NSString *)identifier configurationURL:(NSURL *)configurationURL tileSize:(CGFloat)tileSize {
-    if (self = [super initWithIdentifier:identifier configurationURL:configurationURL]) {
+    if (self = [super initWithIdentifier:identifier]) {
         auto source = std::make_unique<mbgl::style::RasterSource>(identifier.UTF8String,
                                                                   configurationURL.mgl_URLByStandardizingScheme.absoluteString.UTF8String,
                                                                   uint16_t(round(tileSize)));
@@ -48,7 +48,7 @@ static const CGFloat MGLRasterSourceRetinaTileSize = 512;
 }
 
 - (instancetype)initWithIdentifier:(NSString *)identifier tileURLTemplates:(NS_ARRAY_OF(NSString *) *)tileURLTemplates options:(nullable NS_DICTIONARY_OF(MGLTileSourceOption, id) *)options {
-    if (self = [super initWithIdentifier:identifier tileURLTemplates:tileURLTemplates options:options]) {
+    if (self = [super initWithIdentifier:identifier]) {
         mbgl::Tileset tileSet = MGLTileSetFromTileURLTemplates(tileURLTemplates, options);
 
         uint16_t tileSize = MGLRasterSourceRetinaTileSize;
