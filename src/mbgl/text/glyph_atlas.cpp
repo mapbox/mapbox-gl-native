@@ -187,6 +187,13 @@ void GlyphAtlas::upload(gl::Context& context, gl::TextureUnit unit) {
         context.updateTexture(*texture, image, unit);
     }
 
+// #if not MBGL_USE_GLES2
+//     if (dirty) {
+//         platform::showDebugImage("Glyph Atlas", reinterpret_cast<const char*>(image.data.get()),
+//                                  image.size.width, image.size.height);
+//     }
+// #endif // MBGL_USE_GLES2
+
     dirty = false;
 }
 
