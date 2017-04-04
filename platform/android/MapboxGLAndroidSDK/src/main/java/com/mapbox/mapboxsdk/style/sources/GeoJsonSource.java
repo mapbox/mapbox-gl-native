@@ -42,7 +42,7 @@ public class GeoJsonSource extends Source {
   }
 
   /**
-   * Create an empty GeoJsonSource with non-default {@link GeoJsonOptions}
+   * Create an empty GeoJsonSource with non-default GeoJsonOptions.
    *
    * @param id      the source id
    * @param options options
@@ -67,7 +67,7 @@ public class GeoJsonSource extends Source {
   }
 
   /**
-   * Create a GeoJsonSource from a raw json string and non-default {@link GeoJsonOptions}
+   * Create a GeoJsonSource from a raw json string and non-default GeoJsonOptions
    *
    * @param id      the source id
    * @param geoJson raw Json body
@@ -93,7 +93,7 @@ public class GeoJsonSource extends Source {
   }
 
   /**
-   * Create a GeoJsonSource from a remote geo json file and non-default {@link GeoJsonOptions}
+   * Create a GeoJsonSource from a remote geo json file and non-default GeoJsonOptions
    *
    * @param id      the source id
    * @param url     remote json file
@@ -105,7 +105,7 @@ public class GeoJsonSource extends Source {
   }
 
   /**
-   * Create a GeoJsonSource from a {@link FeatureCollection}
+   * Create a GeoJsonSource from a FeatureCollection.
    *
    * @param id       the source id
    * @param features the features
@@ -116,7 +116,7 @@ public class GeoJsonSource extends Source {
   }
 
   /**
-   * Create a GeoJsonSource from a {@link FeatureCollection} and non-default {@link GeoJsonOptions}
+   * Create a GeoJsonSource from a FeatureCollection and non-default GeoJsonOptions.
    *
    * @param id       the source id
    * @param features the features
@@ -130,7 +130,7 @@ public class GeoJsonSource extends Source {
   /**
    * Updates the GeoJson
    *
-   * @param features the GeoJSON {@link FeatureCollection}
+   * @param features the GeoJSON FeatureCollection
    */
   public void setGeoJson(FeatureCollection features) {
     checkValidity();

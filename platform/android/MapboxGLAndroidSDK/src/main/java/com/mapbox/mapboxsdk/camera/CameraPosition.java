@@ -293,7 +293,7 @@ public final class CameraPosition implements Parcelable {
      * Set the tilt in degrees
      * <p>
      * value is clamped to 0 and 60.
-     * <p/>
+     * </p>
      *
      * @param tilt Tilt value
      * @return Builder
