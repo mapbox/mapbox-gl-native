@@ -20,38 +20,26 @@ const MGLShapeSourceOption MGLShapeSourceOptionSimplificationTolerance = @"MGLSh
 
 @interface MGLShapeSource ()
 
-- (instancetype)initWithRawSource:(mbgl::style::GeoJSONSource *)rawSource NS_DESIGNATED_INITIALIZER;
-
 @property (nonatomic, readwrite) NSDictionary *options;
-@property (nonatomic) mbgl::style::GeoJSONSource *rawSource;
+@property (nonatomic, readonly) mbgl::style::GeoJSONSource *rawSource;
 
 @end
 
-@implementation MGLShapeSource {
-    std::unique_ptr<mbgl::style::GeoJSONSource> _pendingSource;
-}
+@implementation MGLShapeSource
 
 - (instancetype)initWithIdentifier:(NSString *)identifier URL:(NSURL *)url options:(NS_DICTIONARY_OF(NSString *, id) *)options {
-    if (self = [super initWithIdentifier:identifier]) {
-        auto geoJSONOptions = MGLGeoJSONOptionsFromDictionary(options);
-        auto source = std::make_unique<mbgl::style::GeoJSONSource>(identifier.UTF8String, geoJSONOptions);
-
-        _pendingSource = std::move(source);
-        self.rawSource = _pendingSource.get();
-
+    auto geoJSONOptions = MGLGeoJSONOptionsFromDictionary(options);
+    auto source = std::make_unique<mbgl::style::GeoJSONSource>(identifier.UTF8String, geoJSONOptions);
+    if (self = [super initWithPendingSource:std::move(source)]) {
         self.URL = url;
     }
     return self;
 }
 
 - (instancetype)initWithIdentifier:(NSString *)identifier shape:(nullable MGLShape *)shape options:(NS_DICTIONARY_OF(MGLShapeSourceOption, id) *)options {
-    if (self = [super initWithIdentifier:identifier]) {
-        auto geoJSONOptions = MGLGeoJSONOptionsFromDictionary(options);
-        auto source = std::make_unique<mbgl::style::GeoJSONSource>(identifier.UTF8String, geoJSONOptions);
-
-        _pendingSource = std::move(source);
-        self.rawSource = _pendingSource.get();
-
+    auto geoJSONOptions = MGLGeoJSONOptionsFromDictionary(options);
+    auto source = std::make_unique<mbgl::style::GeoJSONSource>(identifier.UTF8String, geoJSONOptions);
+    if (self = [super initWithPendingSource:std::move(source)]) {
         self.shape = shape;
     }
     return self;
@@ -72,44 +60,8 @@ const MGLShapeSourceOption MGLShapeSourceOptionSimplificationTolerance = @"MGLSh
     return [self initWithIdentifier:identifier shape:shapeCollection options:options];
 }
 
-- (instancetype)initWithRawSource:(mbgl::style::GeoJSONSource *)rawSource {
-    return [super initWithRawSource:rawSource];
-}
-
-- (void)addToMapView:(MGLMapView *)mapView {
-    if (_pendingSource == nullptr) {
-        [NSException raise:@"MGLRedundantSourceException"
-                    format:@"This instance %@ was already added to %@. Adding the same source instance " \
-                            "to the style more than once is invalid.", self, mapView.style];
-    }
-
-    mapView.mbglMap->addSource(std::move(_pendingSource));
-}
-
-- (void)removeFromMapView:(MGLMapView *)mapView {
-    if (self.rawSource != mapView.mbglMap->getSource(self.identifier.UTF8String)) {
-        return;
-    }
-
-    auto removedSource = mapView.mbglMap->removeSource(self.identifier.UTF8String);
-
-    mbgl::style::GeoJSONSource *source = dynamic_cast<mbgl::style::GeoJSONSource *>(removedSource.get());
-    if (!source) {
-        return;
-    }
-
-    removedSource.release();
-
-    _pendingSource = std::unique_ptr<mbgl::style::GeoJSONSource>(source);
-    self.rawSource = _pendingSource.get();
-}
-
 - (mbgl::style::GeoJSONSource *)rawSource {
     return (mbgl::style::GeoJSONSource *)super.rawSource;
-}
-
-- (void)setRawSource:(mbgl::style::GeoJSONSource *)rawSource {
-    super.rawSource = rawSource;
 }
 
 - (NSURL *)URL {
