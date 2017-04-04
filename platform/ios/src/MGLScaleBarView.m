@@ -11,7 +11,8 @@
 @property (nonatomic) NSArray<UIView *> *bars;
 @property (nonatomic) UIView *containerView;
 @property (nonatomic) MGLDistanceFormatter *formatter;
-@property (nonatomic) NSArray<NSArray<NSNumber*>*> *metricTable;
+@property (nonatomic) NSArray<NSArray<NSNumber *> *> *metricTable;
+@property (nonatomic) NSArray<NSArray<NSNumber *> *> *imperialTable;
 @property (nonatomic) NSArray<NSNumber*> *row;
 @property (nonatomic) UIColor *primaryColor;
 @property (nonatomic) UIColor *secondaryColor;
@@ -20,6 +21,8 @@
 @end
 
 static const CGFloat MGLBarHeight = 4;
+static const CGFloat MGLFeetPerMeter = 3.28084;
+static const CGFloat MGLFeetPerMile = 5280;
 
 @interface MGLScaleBarLabel : UILabel
 @end
@@ -86,7 +89,11 @@ static const CGFloat MGLBarHeight = 4;
     
     _formatter = [[MGLDistanceFormatter alloc] init];
     _row = @[@0, @0];
-    _metricTable = @[@[@4, @2],
+    
+    // @[meters, numberOfBars]
+    _metricTable = @[@[@1, @2],
+                     @[@2, @2],
+                     @[@4, @2],
                      @[@10, @2],
                      @[@20, @2],
                      @[@50, @2],
@@ -117,6 +124,44 @@ static const CGFloat MGLBarHeight = 4;
                      @[@2000000, @2],
                      @[@3500000, @2],
                      @[@5000000, @2]];
+    
+    // @[feet, numberOfBars]
+    _imperialTable = @[@[@4, @2],
+                       @[@6, @3],
+                       @[@10, @2],
+                       @[@20, @2],
+                       @[@30, @3],
+                       @[@50, @2],
+                       @[@75, @3],
+                       @[@100, @2],
+                       @[@200, @2],
+                       @[@300, @3],
+                       @[@400, @2],
+                       @[@600, @3],
+                       @[@800, @2],
+                       @[@1000, @2],
+                       @[@(0.25f*MGLFeetPerMile), @2],
+                       @[@(0.5f*MGLFeetPerMile), @2],
+                       @[@(1*MGLFeetPerMile), @2],
+                       @[@(2*MGLFeetPerMile), @2],
+                       @[@(3*MGLFeetPerMile), @3],
+                       @[@(4*MGLFeetPerMile), @2],
+                       @[@(8*MGLFeetPerMile), @2],
+                       @[@(12*MGLFeetPerMile), @2],
+                       @[@(15*MGLFeetPerMile), @3],
+                       @[@(20*MGLFeetPerMile), @2],
+                       @[@(30*MGLFeetPerMile), @3],
+                       @[@(40*MGLFeetPerMile), @2],
+                       @[@(80*MGLFeetPerMile), @2],
+                       @[@(120*MGLFeetPerMile), @2],
+                       @[@(200*MGLFeetPerMile), @2],
+                       @[@(300*MGLFeetPerMile), @3],
+                       @[@(400*MGLFeetPerMile), @2],
+                       @[@(800*MGLFeetPerMile), @2],
+                       @[@(1000*MGLFeetPerMile), @2],
+                       @[@(2000*MGLFeetPerMile), @2],
+                       @[@(3000*MGLFeetPerMile), @3],
+                       @[@(4000*MGLFeetPerMile), @2]];
 }
 
 #pragma mark - Dimensions
@@ -131,7 +176,7 @@ static const CGFloat MGLBarHeight = 4;
 }
 
 - (CGFloat)actualWidth {
-    return floorf(self.row.firstObject.floatValue / self.metersPerPoint);
+    return floorf(self.row.firstObject.floatValue / [self unitsPerPoint]);
 }
 
 - (CGFloat)minimumWidth {
@@ -147,14 +192,19 @@ static const CGFloat MGLBarHeight = 4;
     return floorf(fullWidth / 2 - padding);
 }
 
+- (CGFloat)unitsPerPoint {
+    return [self usesMetricSystem] ? self.metersPerPoint : self.metersPerPoint * MGLFeetPerMeter;
+}
+
 #pragma mark - Convenient methods
 
-- (NSArray<NSArray<NSNumber*>*> *)validRows {
-    CLLocationDistance minimumDistance = [self minimumWidth] * self.metersPerPoint;
-    CLLocationDistance maximumDistance = [self maximumWidth] * self.metersPerPoint;
+- (NSArray<NSArray<NSNumber *> *> *)validRows {
+    CLLocationDistance minimumDistance = [self minimumWidth] * [self unitsPerPoint];
+    CLLocationDistance maximumDistance = [self maximumWidth] * [self unitsPerPoint];
     
     NSMutableArray *validRows = [NSMutableArray array];
-    for (NSArray<NSNumber *> *row in self.metricTable) {
+    NSArray *table = [self usesMetricSystem] ? self.metricTable : self.imperialTable;
+    for (NSArray<NSNumber *> *row in table) {
         CLLocationDistance distance = row.firstObject.floatValue;
         if (distance >= minimumDistance && distance <= maximumDistance) {
             [validRows addObject:row];
@@ -165,9 +215,9 @@ static const CGFloat MGLBarHeight = 4;
 }
 
 // Find the row closest to -[MGLScaleBarView preferredWidth]
-- (NSArray<NSNumber*> *)preferredRowInRows:(NSArray<NSArray<NSNumber*>*> *)rows {
+- (NSArray<NSNumber *> *)preferredRowInRows:(NSArray<NSArray<NSNumber *> *> *)rows {
     CLLocationDistance diff = CGFLOAT_MAX;
-    CLLocationDistance preferredDistance = [self preferredWidth] * self.metersPerPoint;
+    CLLocationDistance preferredDistance = [self preferredWidth] * [self unitsPerPoint];
     NSArray<NSNumber *> *preferredRow = rows.firstObject;
     for (NSArray<NSNumber *> *row in rows) {
         CLLocationDistance currentDiff = ABS(preferredDistance - row.firstObject.floatValue);
@@ -176,6 +226,11 @@ static const CGFloat MGLBarHeight = 4;
         }
     }
     return preferredRow;
+}
+
+- (BOOL)usesMetricSystem {
+    NSLocale *locale = [NSLocale currentLocale];
+    return [[locale objectForKey:NSLocaleUsesMetricSystem] boolValue];
 }
 
 - (void)fadeIn {
@@ -281,9 +336,9 @@ static const CGFloat MGLBarHeight = 4;
     
     NSUInteger i = 0;
     for (UIView *bar in self.bars) {
-        CGFloat xPos = barWidth * i + self.borderWidth;
+        CGFloat xPosition = barWidth * i + self.borderWidth;
         bar.backgroundColor = (i % 2 == 0) ? self.primaryColor : self.secondaryColor;
-        bar.frame = CGRectMake(xPos, self.borderWidth, barWidth, MGLBarHeight);
+        bar.frame = CGRectMake(xPosition, self.borderWidth, barWidth, MGLBarHeight);
         i++;
     }
     
@@ -316,9 +371,13 @@ static const CGFloat MGLBarHeight = 4;
 
 - (void)updateLabels {
     NSArray *labels = [self.labels subarrayWithRange:NSMakeRange(1, self.labels.count-1)];
+    BOOL useMetric = [self usesMetricSystem];
     NSUInteger i = 0;
+    
     for (MGLScaleBarLabel *label in labels) {
         CLLocationDistance barDistance = (self.row.firstObject.integerValue / self.row.lastObject.integerValue) * (i + 1);
+        if (!useMetric) { barDistance /= MGLFeetPerMeter; }
+        
         label.text = [self.formatter stringFromDistance:barDistance];
         [label setNeedsDisplay];
         [label sizeToFit];
