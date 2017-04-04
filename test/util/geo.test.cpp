@@ -57,80 +57,80 @@ TEST(LatLngBounds, Empty) {
 
 TEST(LatLngBounds, Center) {
     auto result = LatLngBounds::hull({1, 2}, {3, 4}).center();
-    ASSERT_DOUBLE_EQ(2, result.latitude);
-    ASSERT_DOUBLE_EQ(3, result.longitude);
+    ASSERT_DOUBLE_EQ(2, result.latitude());
+    ASSERT_DOUBLE_EQ(3, result.longitude());
 }
 
 TEST(LatLngBounds, Southwest) {
     auto result = LatLngBounds::hull({1, 2}, {3, 4}).southwest();
-    ASSERT_DOUBLE_EQ(1, result.latitude);
-    ASSERT_DOUBLE_EQ(2, result.longitude);
+    ASSERT_DOUBLE_EQ(1, result.latitude());
+    ASSERT_DOUBLE_EQ(2, result.longitude());
 }
 
 TEST(LatLngBounds, Northeast) {
     auto result = LatLngBounds::hull({1, 2}, {3, 4}).northeast();
-    ASSERT_DOUBLE_EQ(3, result.latitude);
-    ASSERT_DOUBLE_EQ(4, result.longitude);
+    ASSERT_DOUBLE_EQ(3, result.latitude());
+    ASSERT_DOUBLE_EQ(4, result.longitude());
 }
 
 TEST(LatLngBounds, Southeast) {
     auto result = LatLngBounds::hull({1, 2}, {3, 4}).southeast();
-    ASSERT_DOUBLE_EQ(1, result.latitude);
-    ASSERT_DOUBLE_EQ(4, result.longitude);
+    ASSERT_DOUBLE_EQ(1, result.latitude());
+    ASSERT_DOUBLE_EQ(4, result.longitude());
 }
 
 TEST(LatLngBounds, Northwest) {
     auto result = LatLngBounds::hull({1, 2}, {3, 4}).northwest();
-    ASSERT_DOUBLE_EQ(3, result.latitude);
-    ASSERT_DOUBLE_EQ(2, result.longitude);
+    ASSERT_DOUBLE_EQ(3, result.latitude());
+    ASSERT_DOUBLE_EQ(2, result.longitude());
 }
 
 TEST(LatLng, FromTileID) {
     for (int i = 0; i < 20; i++) {
         const LatLng ll{ CanonicalTileID(i, 0, 0) };
-        ASSERT_DOUBLE_EQ(-util::LONGITUDE_MAX, ll.longitude);
-        ASSERT_DOUBLE_EQ(util::LATITUDE_MAX, ll.latitude);
+        ASSERT_DOUBLE_EQ(-util::LONGITUDE_MAX, ll.longitude());
+        ASSERT_DOUBLE_EQ(util::LATITUDE_MAX, ll.latitude());
     }
 
     {
         const LatLng ll{ UnwrappedTileID(0, 1, 0) };
-        ASSERT_DOUBLE_EQ(util::LONGITUDE_MAX, ll.longitude);
-        ASSERT_DOUBLE_EQ(util::LATITUDE_MAX, ll.latitude);
+        ASSERT_DOUBLE_EQ(util::LONGITUDE_MAX, ll.longitude());
+        ASSERT_DOUBLE_EQ(util::LATITUDE_MAX, ll.latitude());
     }
 
     {
         const LatLng ll{ UnwrappedTileID(0, -1, 0) };
-        ASSERT_DOUBLE_EQ(-540, ll.longitude);
-        ASSERT_DOUBLE_EQ(util::LATITUDE_MAX, ll.latitude);
+        ASSERT_DOUBLE_EQ(-540, ll.longitude());
+        ASSERT_DOUBLE_EQ(util::LATITUDE_MAX, ll.latitude());
     }
 }
 
 TEST(LatLng, Boundaries) {
     LatLng coordinate;
-    ASSERT_DOUBLE_EQ(0, coordinate.latitude);
-    ASSERT_DOUBLE_EQ(0, coordinate.longitude);
+    ASSERT_DOUBLE_EQ(0, coordinate.latitude());
+    ASSERT_DOUBLE_EQ(0, coordinate.longitude());
 
-    coordinate.longitude = -180.1;
-    ASSERT_DOUBLE_EQ(-180.1, coordinate.longitude);
+    coordinate = LatLng(0, -180.1);
+    ASSERT_DOUBLE_EQ(-180.1, coordinate.longitude());
 
     coordinate.wrap();
-    ASSERT_DOUBLE_EQ(179.90000000000001, coordinate.longitude); // 1E-14
+    ASSERT_DOUBLE_EQ(179.90000000000001, coordinate.longitude()); // 1E-14
 
-    coordinate.longitude = 180.9;
+    coordinate = LatLng(0, 180.9);
     coordinate.wrap();
-    ASSERT_DOUBLE_EQ(-179.09999999999999, coordinate.longitude);
+    ASSERT_DOUBLE_EQ(-179.09999999999999, coordinate.longitude());
 
-    coordinate.longitude = -360.5;
+    coordinate = LatLng(0, -360.5);
     coordinate.wrap();
-    ASSERT_DOUBLE_EQ(-0.5, coordinate.longitude);
+    ASSERT_DOUBLE_EQ(-0.5, coordinate.longitude());
 
-    coordinate.longitude = 360.5;
+    coordinate = LatLng(0, 360.5);
     coordinate.wrap();
-    ASSERT_DOUBLE_EQ(0.5, coordinate.longitude);
+    ASSERT_DOUBLE_EQ(0.5, coordinate.longitude());
 
-    coordinate.longitude = 360000.5;
+    coordinate = LatLng(0, 360000.5);
     coordinate.wrap();
-    ASSERT_DOUBLE_EQ(0.5, coordinate.longitude);
+    ASSERT_DOUBLE_EQ(0.5, coordinate.longitude());
 }
 
 TEST(LatLngBounds, FromTileID) {

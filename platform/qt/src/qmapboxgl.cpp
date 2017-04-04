@@ -514,7 +514,7 @@ void QMapboxGL::setStyleUrl(const QString &url)
 */
 double QMapboxGL::latitude() const
 {
-    return d_ptr->mapObj->getLatLng(d_ptr->margins).latitude;
+    return d_ptr->mapObj->getLatLng(d_ptr->margins).latitude();
 }
 
 void QMapboxGL::setLatitude(double latitude_)
@@ -532,7 +532,7 @@ void QMapboxGL::setLatitude(double latitude_)
 */
 double QMapboxGL::longitude() const
 {
-    return d_ptr->mapObj->getLatLng(d_ptr->margins).longitude;
+    return d_ptr->mapObj->getLatLng(d_ptr->margins).longitude();
 }
 
 void QMapboxGL::setLongitude(double longitude_)
@@ -614,7 +614,7 @@ double QMapboxGL::maximumZoom() const
 Coordinate QMapboxGL::coordinate() const
 {
     const mbgl::LatLng& latLng = d_ptr->mapObj->getLatLng(d_ptr->margins);
-    return Coordinate(latLng.latitude, latLng.longitude);
+    return Coordinate(latLng.latitude(), latLng.longitude());
 }
 
 void QMapboxGL::setCoordinate(const QMapbox::Coordinate &coordinate_)
@@ -1130,7 +1130,7 @@ QMapbox::ProjectedMeters QMapboxGL::projectedMetersForCoordinate(const QMapbox::
 QMapbox::Coordinate QMapboxGL::coordinateForProjectedMeters(const QMapbox::ProjectedMeters &projectedMeters) const
 {
     auto latLng = d_ptr->mapObj->latLngForProjectedMeters(mbgl::ProjectedMeters { projectedMeters.first, projectedMeters.second });
-    return QMapbox::Coordinate(latLng.latitude, latLng.longitude);
+    return QMapbox::Coordinate(latLng.latitude(), latLng.longitude());
 }
 
 /*!
@@ -1160,7 +1160,7 @@ QMapbox::Coordinate QMapboxGL::coordinateForPixel(const QPointF &pixel) const
     const mbgl::LatLng latLng =
         d_ptr->mapObj->latLngForPixel(mbgl::ScreenCoordinate { pixel.x(), pixel.y() });
 
-    return Coordinate(latLng.latitude, latLng.longitude);
+    return Coordinate(latLng.latitude(), latLng.longitude());
 }
 
 /*!
@@ -1172,7 +1172,7 @@ QMapbox::CoordinateZoom QMapboxGL::coordinateZoomForBounds(const QMapbox::Coordi
     auto bounds = mbgl::LatLngBounds::hull(mbgl::LatLng { sw.first, sw.second }, mbgl::LatLng { ne.first, ne.second });
     mbgl::CameraOptions camera = d_ptr->mapObj->cameraForLatLngBounds(bounds, d_ptr->margins);
 
-    return {{ (*camera.center).latitude, (*camera.center).longitude }, *camera.zoom };
+    return {{ (*camera.center).latitude(), (*camera.center).longitude() }, *camera.zoom };
 }
 
 /*!
@@ -1198,7 +1198,7 @@ QMapbox::CoordinateZoom QMapboxGL::coordinateZoomForBounds(const QMapbox::Coordi
     setBearing(currentBearing);
     setPitch(currentPitch);
 
-    return {{ (*camera.center).latitude, (*camera.center).longitude }, *camera.zoom };
+    return {{ (*camera.center).latitude(), (*camera.center).longitude() }, *camera.zoom };
 }
 
 /*!

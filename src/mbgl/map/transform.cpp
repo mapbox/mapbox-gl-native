@@ -103,7 +103,9 @@ void Transform::easeTo(const CameraOptions& camera, const AnimationOptions& anim
     // If gesture in progress, we transfer the world rounds from the end
     // longitude into start, so we can guarantee the "scroll effect" of rounding
     // the world while assuring the end longitude remains wrapped.
-    if (isGestureInProgress()) startLatLng.longitude -= unwrappedLatLng.longitude - latLng.longitude;
+    if (isGestureInProgress()) {
+        startLatLng = LatLng(startLatLng.latitude(), startLatLng.longitude() - (unwrappedLatLng.longitude() - latLng.longitude()));
+    }
     // Find the shortest path otherwise.
     else startLatLng.unwrapForShortestPath(latLng);
 

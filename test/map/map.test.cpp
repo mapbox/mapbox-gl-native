@@ -65,8 +65,8 @@ TEST(Map, LatLngBehavior) {
     map.setLatLng({ 1, 1 });
     auto latLng2 = map.getLatLng();
 
-    ASSERT_DOUBLE_EQ(latLng1.latitude, latLng2.latitude);
-    ASSERT_DOUBLE_EQ(latLng1.longitude, latLng2.longitude);
+    ASSERT_DOUBLE_EQ(latLng1.latitude(), latLng2.latitude());
+    ASSERT_DOUBLE_EQ(latLng1.longitude(), latLng2.longitude());
 }
 
 TEST(Map, CameraToLatLngBounds) {
@@ -86,8 +86,8 @@ TEST(Map, CameraToLatLngBounds) {
     // Map::cameraForLatLngBounds only sets zoom and center.
     CameraOptions virtualCamera = map.cameraForLatLngBounds(bounds, {});
     ASSERT_NEAR(*camera.zoom, *virtualCamera.zoom, 1e-7);
-    ASSERT_NEAR(camera.center->latitude, virtualCamera.center->latitude, 1e-7);
-    ASSERT_NEAR(camera.center->longitude, virtualCamera.center->longitude, 1e-7);
+    ASSERT_NEAR(camera.center->latitude(), virtualCamera.center->latitude(), 1e-7);
+    ASSERT_NEAR(camera.center->longitude(), virtualCamera.center->longitude(), 1e-7);
 }
 
 TEST(Map, Offline) {

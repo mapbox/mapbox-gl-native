@@ -27,7 +27,7 @@
 #pragma GCC diagnostic pop
 
 // Make Boost Geometry aware of our LatLng type
-BOOST_GEOMETRY_REGISTER_POINT_2D(mbgl::LatLng, double, boost::geometry::cs::cartesian, longitude, latitude)
+BOOST_GEOMETRY_REGISTER_POINT_2D_CONST(mbgl::LatLng, double, boost::geometry::cs::cartesian, longitude(), latitude())
 BOOST_GEOMETRY_REGISTER_BOX(mbgl::LatLngBounds, mbgl::LatLng, southwest(), northeast())
 
 namespace mbgl {

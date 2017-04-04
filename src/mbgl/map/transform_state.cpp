@@ -325,10 +325,10 @@ void TransformState::setLatLngZoom(const LatLng &latLng, double zoom) {
     Cc = newWorldSize / util::M2PI;
 
     const double m = 1 - 1e-15;
-    const double f = util::clamp(std::sin(util::DEG2RAD * latLng.latitude), -m, m);
+    const double f = util::clamp(std::sin(util::DEG2RAD * latLng.latitude()), -m, m);
 
     ScreenCoordinate point = {
-        -latLng.longitude * Bc,
+        -latLng.longitude() * Bc,
         0.5 * Cc * std::log((1 + f) / (1 - f)),
     };
     setScalePoint(newScale, point);
