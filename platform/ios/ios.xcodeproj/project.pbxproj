@@ -81,10 +81,6 @@
 		3557F7B21E1D27D300CCA5E6 /* MGLDistanceFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 3557F7AF1E1D27D300CCA5E6 /* MGLDistanceFormatter.m */; };
 		35599DED1D46F14E0048254D /* MGLStyleValue.mm in Sources */ = {isa = PBXBuildFile; fileRef = 35599DEA1D46F14E0048254D /* MGLStyleValue.mm */; };
 		35599DEE1D46F14E0048254D /* MGLStyleValue.mm in Sources */ = {isa = PBXBuildFile; fileRef = 35599DEA1D46F14E0048254D /* MGLStyleValue.mm */; };
-		355ADFFD1E9281DA00F3939D /* MGLScaleBarView_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 355ADFFA1E9281DA00F3939D /* MGLScaleBarView_Private.h */; };
-		355ADFFE1E9281DA00F3939D /* MGLScaleBarView_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 355ADFFA1E9281DA00F3939D /* MGLScaleBarView_Private.h */; };
-		355ADFFF1E9281DA00F3939D /* MGLScaleBarView.h in Headers */ = {isa = PBXBuildFile; fileRef = 355ADFFB1E9281DA00F3939D /* MGLScaleBarView.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		355AE0001E9281DA00F3939D /* MGLScaleBarView.h in Headers */ = {isa = PBXBuildFile; fileRef = 355ADFFB1E9281DA00F3939D /* MGLScaleBarView.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		355AE0011E9281DA00F3939D /* MGLScaleBarView.m in Sources */ = {isa = PBXBuildFile; fileRef = 355ADFFC1E9281DA00F3939D /* MGLScaleBarView.m */; };
 		355AE0021E9281DA00F3939D /* MGLScaleBarView.m in Sources */ = {isa = PBXBuildFile; fileRef = 355ADFFC1E9281DA00F3939D /* MGLScaleBarView.m */; };
 		3566C7661D4A77BA008152BC /* MGLShapeSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 3566C7641D4A77BA008152BC /* MGLShapeSource.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -579,7 +575,6 @@
 		3557F7AE1E1D27D300CCA5E6 /* MGLDistanceFormatter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLDistanceFormatter.h; sourceTree = "<group>"; };
 		3557F7AF1E1D27D300CCA5E6 /* MGLDistanceFormatter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLDistanceFormatter.m; sourceTree = "<group>"; };
 		35599DEA1D46F14E0048254D /* MGLStyleValue.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLStyleValue.mm; sourceTree = "<group>"; };
-		355ADFFA1E9281DA00F3939D /* MGLScaleBarView_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLScaleBarView_Private.h; sourceTree = "<group>"; };
 		355ADFFB1E9281DA00F3939D /* MGLScaleBarView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLScaleBarView.h; sourceTree = "<group>"; };
 		355ADFFC1E9281DA00F3939D /* MGLScaleBarView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLScaleBarView.m; sourceTree = "<group>"; };
 		3566C7641D4A77BA008152BC /* MGLShapeSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLShapeSource.h; sourceTree = "<group>"; };
@@ -1036,7 +1031,6 @@
 		355ADFF91E9281C300F3939D /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				355ADFFA1E9281DA00F3939D /* MGLScaleBarView_Private.h */,
 				355ADFFB1E9281DA00F3939D /* MGLScaleBarView.h */,
 				355ADFFC1E9281DA00F3939D /* MGLScaleBarView.m */,
 			);
@@ -1599,7 +1593,6 @@
 				350098DC1D484E60004B2AF0 /* NSValue+MGLStyleAttributeAdditions.h in Headers */,
 				DA8848231CBAFA6200AB86E3 /* MGLOfflineStorage_Private.h in Headers */,
 				404326891D5B9B27007111BD /* MGLAnnotationContainerView_Private.h in Headers */,
-				355ADFFF1E9281DA00F3939D /* MGLScaleBarView.h in Headers */,
 				DA88483B1CBAFB8500AB86E3 /* MGLCalloutView.h in Headers */,
 				35E0CFE61D3E501500188327 /* MGLStyle_Private.h in Headers */,
 				3510FFF01D6D9D8C00F413B2 /* NSExpression+MGLAdditions.h in Headers */,
@@ -1628,7 +1621,6 @@
 				DD0902AB1DB192A800C5BDCE /* MGLNetworkConfiguration.h in Headers */,
 				DA8848571CBAFB9800AB86E3 /* MGLMapboxEvents.h in Headers */,
 				DA8848311CBAFA6200AB86E3 /* NSString+MGLAdditions.h in Headers */,
-				355ADFFD1E9281DA00F3939D /* MGLScaleBarView_Private.h in Headers */,
 				353933F81D3FB79F003F57D7 /* MGLLineStyleLayer.h in Headers */,
 				DAAF722D1DA903C700312FA4 /* MGLStyleValue_Private.h in Headers */,
 				DA8847F41CBAFA5100AB86E3 /* MGLOfflinePack.h in Headers */,
@@ -1747,12 +1739,10 @@
 				353933F31D3FB753003F57D7 /* MGLCircleStyleLayer.h in Headers */,
 				558DE7A11E5615E400C7916D /* MGLFoundation_Private.h in Headers */,
 				3538AA1E1D542239008EC33D /* MGLForegroundStyleLayer.h in Headers */,
-				355AE0001E9281DA00F3939D /* MGLScaleBarView.h in Headers */,
 				30E578181DAA85520050F07E /* UIImage+MGLAdditions.h in Headers */,
 				40F887711D7A1E59008ECB67 /* MGLShapeSource_Private.h in Headers */,
 				DABFB8631CBE99E500D62B32 /* MGLOfflineRegion.h in Headers */,
 				DA35A2B21CCA141D00E826B2 /* MGLCompassDirectionFormatter.h in Headers */,
-				355ADFFE1E9281DA00F3939D /* MGLScaleBarView_Private.h in Headers */,
 				DAF0D8141DFE0EC500B28378 /* MGLVectorSource_Private.h in Headers */,
 				DABFB8731CBE9A9900D62B32 /* Mapbox.h in Headers */,
 				357FE2DE1E02D2B20068B753 /* NSCoder+MGLAdditions.h in Headers */,

@@ -1,12 +1,11 @@
 #import <Mapbox/Mapbox.h>
+#import "MGLScaleBarView.h"
 
-#import "MGLScaleBarView_Private.h"
 
 @class MGLScaleBarLabel;
 
 @interface MGLScaleBarView()
 @property (nonatomic, assign, getter=isVisible) BOOL visible;
-@property (nonatomic, assign) CLLocationDistance metersPerPoint;
 @property (nonatomic) NSArray<MGLScaleBarLabel *> *labels;
 @property (nonatomic) NSArray<UIView *> *bars;
 @property (nonatomic) UIView *containerView;

@@ -226,6 +226,15 @@ IB_DESIGNABLE
 - (IBAction)reloadStyle:(id)sender;
 
 /**
+ A control indicating the scale of the map.
+ 
+ The scale bar becomes visible when a user interacts with the
+ map and fades out when the interaction stops. It’s positioned
+ in the upper-left corner.
+ */
+@property (nonatomic, readonly) UIView *scaleBarView;
+
+/**
  A control indicating the map’s direction and allowing the user to manipulate
  the direction, positioned in the upper-right corner.
  */
@@ -593,14 +602,6 @@ IB_DESIGNABLE
  want to animate the change, use the `-setDirection:animated:` method instead.
  */
 @property (nonatomic) CLLocationDirection direction;
-
-/**
- Indicates whether the scale bar should become visible when a user interacts with
- the map. The scale bar will fade out automatically when the interaction stops.
- 
- The default value for this property is `YES`.
- */
-@property (nonatomic) BOOL showsScale;
 
 /**
  Changes the heading of the map and optionally animates the change.
