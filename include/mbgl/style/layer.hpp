@@ -1,6 +1,7 @@
 #pragma once
 
 #include <mbgl/util/noncopyable.hpp>
+#include <mbgl/util/any.hpp>
 #include <mbgl/style/types.hpp>
 
 #include <memory>
@@ -117,6 +118,11 @@ public:
 
     // Private implementation
     const std::unique_ptr<Impl> baseImpl;
+
+    // For use in SDK bindings, which store a reference to a platform-native peer
+    // object here, so that separately-obtained references to this object share
+    // identical platform-native peers.
+    any peer;
 
     friend std::string layoutKey(const Layer&);
 };

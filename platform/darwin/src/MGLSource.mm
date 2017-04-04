@@ -29,6 +29,7 @@
     NSString *identifier = @(rawSource->getID().c_str());
     if (self = [self initWithIdentifier:identifier]) {
         _rawSource = rawSource;
+        _rawSource->peer = SourceWrapper { self };
     }
     return self;
 }
