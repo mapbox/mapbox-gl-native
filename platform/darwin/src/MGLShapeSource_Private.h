@@ -6,14 +6,10 @@ NS_ASSUME_NONNULL_BEGIN
 namespace mbgl {
     namespace style {
         class GeoJSONOptions;
-        struct GeoJSONSource;
     }
 }
 
 @interface MGLShapeSource (Private)
-
-- (instancetype)initWithRawSource:(mbgl::style::GeoJSONSource *)rawSource;
-
 @end
 
 MGL_EXPORT

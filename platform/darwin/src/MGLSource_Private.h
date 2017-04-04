@@ -1,5 +1,7 @@
 #import "MGLSource.h"
 
+#include <memory>
+
 NS_ASSUME_NONNULL_BEGIN
 
 namespace mbgl {
@@ -13,9 +15,16 @@ namespace mbgl {
 @interface MGLSource (Private)
 
 /**
- Initializes and returns a source with a raw pointer to the backing store.
+ Initializes and returns a source with a raw pointer to the backing store,
+ associated with a style.
  */
 - (instancetype)initWithRawSource:(mbgl::style::Source *)rawSource;
+
+/**
+ Initializes and returns a source with an owning pointer to the backing store,
+ unassociated from a style.
+ */
+- (instancetype)initWithPendingSource:(std::unique_ptr<mbgl::style::Source>)pendingSource;
 
 /**
  A raw pointer to the mbgl object, which is always initialized, either to the
@@ -24,7 +33,7 @@ namespace mbgl {
  pointer value stays even after ownership of the object is transferred via
  `mbgl::Map addSource`.
  */
-@property (nonatomic) mbgl::style::Source *rawSource;
+@property (nonatomic, readonly) mbgl::style::Source *rawSource;
 
 /**
  Adds the mbgl source that this object represents to the mbgl map.
