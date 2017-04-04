@@ -18,11 +18,10 @@ import java.lang.ref.WeakReference;
 /**
  * Manages locational updates. Contains methods to register and unregister location listeners.
  * <ul>
- * <li>You can register a {@link LocationEngineListener} with
- * {@link #addLocationEngineListener(LocationEngineListener)} to receive
- * location updates.</li>
- * <li> You can unregister a {@link LocationEngineListener} with
- * {@link #removeLocationEngineListener(LocationEngineListener)} to stop receiving location updates.</li>
+ * <li>You can register a LocationEngineListener with LocationSource#addLocationEngineListener(LocationEngineListener)
+ * to receive location updates.</li>
+ * <li> You can unregister a LocationEngineListener with
+ * LocationEngine#removeLocationEngineListener(LocationEngineListener)} to stop receiving location updates.</li>
  * </ul>
  * <p>
  * Note: If registering a listener in your Activity.onStart() implementation, you should unregister it in
