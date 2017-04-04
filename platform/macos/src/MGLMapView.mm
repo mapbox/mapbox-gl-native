@@ -2676,7 +2676,7 @@ public:
             (bounds.south() + bounds.north()) / 2,
             bounds.west() - 1,
         };
-    } else if (bounds.northeast().longitude < 180) {
+    } else if (bounds.northeast().longitude() < 180) {
         outsideLatLng = {
             (bounds.south() + bounds.north()) / 2,
             bounds.east() + 1,

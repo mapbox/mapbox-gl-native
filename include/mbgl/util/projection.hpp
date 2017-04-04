@@ -25,8 +25,8 @@ public:
     }
 
     static ProjectedMeters projectedMetersForLatLng(const LatLng& latLng) {
-        const double constrainedLatitude = util::clamp(latLng.latitude, -util::LATITUDE_MAX, util::LATITUDE_MAX);
-        const double constrainedLongitude = util::clamp(latLng.longitude, -util::LONGITUDE_MAX, util::LONGITUDE_MAX);
+        const double constrainedLatitude = util::clamp(latLng.latitude(), -util::LATITUDE_MAX, util::LATITUDE_MAX);
+        const double constrainedLongitude = util::clamp(latLng.longitude(), -util::LONGITUDE_MAX, util::LONGITUDE_MAX);
 
         const double m = 1 - 1e-15;
         const double f = util::clamp(std::sin(util::DEG2RAD * constrainedLatitude), -m, m);
@@ -49,8 +49,8 @@ public:
 
     static Point<double> project(const LatLng& latLng, double scale) {
         return Point<double> {
-            util::LONGITUDE_MAX + latLng.longitude,
-            util::LONGITUDE_MAX - util::RAD2DEG * std::log(std::tan(M_PI / 4 + latLng.latitude * M_PI / util::DEGREES_MAX))
+            util::LONGITUDE_MAX + latLng.longitude(),
+            util::LONGITUDE_MAX - util::RAD2DEG * std::log(std::tan(M_PI / 4 + latLng.latitude() * M_PI / util::DEGREES_MAX))
         } * worldSize(scale) / util::DEGREES_MAX;
     }
 

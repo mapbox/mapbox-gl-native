@@ -426,8 +426,7 @@ void NativeMapView::flyTo(jni::JNIEnv&, jni::jdouble angle, jni::jdouble latitud
 }
 
 jni::Object<LatLng> NativeMapView::getLatLng(JNIEnv& env) {
-    mbgl::LatLng latLng = map->getLatLng(insets);
-    return LatLng::New(env, latLng.latitude, latLng.longitude);
+    return LatLng::New(env, map->getLatLng(insets));
 }
 
 void NativeMapView::setLatLng(jni::JNIEnv&, jni::jdouble latitude, jni::jdouble longitude, jni::jlong duration) {
@@ -563,8 +562,8 @@ jni::Array<jni::jdouble> NativeMapView::getCameraValues(jni::JNIEnv& env) {
     //Create buffer with values
     jdouble buf[5];
     mbgl::LatLng latLng = map->getLatLng(insets);
-    buf[0] = latLng.latitude;
-    buf[1] = latLng.longitude;
+    buf[0] = latLng.latitude();
+    buf[1] = latLng.longitude();
     buf[2] = -map->getBearing();
     buf[3] = map->getPitch();
     buf[4] = map->getZoom();
@@ -650,13 +649,11 @@ jni::Object<PointF> NativeMapView::pixelForLatLng(JNIEnv& env, jdouble latitude,
 }
 
 jni::Object<LatLng> NativeMapView::latLngForProjectedMeters(JNIEnv& env, jdouble northing, jdouble easting) {
-    mbgl::LatLng latLng = map->latLngForProjectedMeters(mbgl::ProjectedMeters(northing, easting));
-    return LatLng::New(env, latLng.latitude, latLng.longitude);
+    return LatLng::New(env, map->latLngForProjectedMeters(mbgl::ProjectedMeters(northing, easting)));
 }
 
 jni::Object<LatLng> NativeMapView::latLngForPixel(JNIEnv& env, jfloat x, jfloat y) {
-    mbgl::LatLng latLng = map->latLngForPixel(mbgl::ScreenCoordinate(x, y));
-    return LatLng::New(env, latLng.latitude, latLng.longitude);
+    return LatLng::New(env, map->latLngForPixel(mbgl::ScreenCoordinate(x, y)));
 }
 
 jni::Array<jlong> NativeMapView::addPolylines(JNIEnv& env, jni::Array<jni::Object<Polyline>> polylines) {

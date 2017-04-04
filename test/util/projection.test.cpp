@@ -53,11 +53,11 @@ TEST(Projection, ProjectedMeters) {
 
     projectedMeters = ProjectedMeters { std::numeric_limits<double>::lowest(), std::numeric_limits<double>::lowest() };
     latLng = Projection::latLngForProjectedMeters(projectedMeters);
-    EXPECT_EQ(latLng.latitude, -util::LATITUDE_MAX);
-    EXPECT_EQ(latLng.longitude, -util::LONGITUDE_MAX);
+    EXPECT_EQ(latLng.latitude(), -util::LATITUDE_MAX);
+    EXPECT_EQ(latLng.longitude(), -util::LONGITUDE_MAX);
 
     projectedMeters = ProjectedMeters { std::numeric_limits<double>::max(), std::numeric_limits<double>::max() };
     latLng = Projection::latLngForProjectedMeters(projectedMeters);
-    EXPECT_EQ(latLng.latitude, util::LATITUDE_MAX);
-    EXPECT_EQ(latLng.longitude, util::LONGITUDE_MAX);
+    EXPECT_EQ(latLng.latitude(), util::LATITUDE_MAX);
+    EXPECT_EQ(latLng.longitude(), util::LONGITUDE_MAX);
 }

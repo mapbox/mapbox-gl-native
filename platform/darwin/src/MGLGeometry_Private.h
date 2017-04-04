@@ -33,7 +33,7 @@ NS_INLINE mbgl::Point<double> MGLPointFromLocationCoordinate2D(CLLocationCoordin
 }
 
 NS_INLINE CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng) {
-    return CLLocationCoordinate2DMake(latLng.latitude, latLng.longitude);
+    return CLLocationCoordinate2DMake(latLng.latitude(), latLng.longitude());
 }
 
 NS_INLINE MGLCoordinateBounds MGLCoordinateBoundsFromLatLngBounds(mbgl::LatLngBounds latLngBounds) {

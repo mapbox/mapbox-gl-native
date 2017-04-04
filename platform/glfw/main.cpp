@@ -184,8 +184,8 @@ int main(int argc, char *argv[]) {
 
     // Save settings
     mbgl::LatLng latLng = map.getLatLng();
-    settings.latitude = latLng.latitude;
-    settings.longitude = latLng.longitude;
+    settings.latitude = latLng.latitude();
+    settings.longitude = latLng.longitude();
     settings.zoom = map.getZoom();
     settings.bearing = map.getBearing();
     settings.pitch = map.getPitch();

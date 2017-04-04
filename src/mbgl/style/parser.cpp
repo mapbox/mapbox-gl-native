@@ -56,8 +56,8 @@ StyleParseResult Parser::parse(const std::string& json) {
         const JSValue& value = document["center"];
         if (value.IsArray() && value.Size() >= 2) {
             // Style spec uses lon/lat order
-            latLng.longitude = value[0].IsNumber() ? value[0].GetDouble() : 0;
-            latLng.latitude = value[1].IsNumber() ? value[1].GetDouble() : 0;
+            latLng = LatLng(value[1].IsNumber() ? value[1].GetDouble() : 0,
+                            value[0].IsNumber() ? value[0].GetDouble() : 0);
         }
     }
 

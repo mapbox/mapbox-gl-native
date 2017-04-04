@@ -55,8 +55,8 @@ void CustomLayer::Impl::render(const TransformState& state) const {
 
     parameters.width = state.getSize().width;
     parameters.height = state.getSize().height;
-    parameters.latitude = state.getLatLng().latitude;
-    parameters.longitude = state.getLatLng().longitude;
+    parameters.latitude = state.getLatLng().latitude();
+    parameters.longitude = state.getLatLng().longitude();
     parameters.zoom = state.getZoom();
     parameters.bearing = -state.getAngle() * util::RAD2DEG;
     parameters.pitch = state.getPitch();

@@ -64,8 +64,8 @@ TEST(TileCoordinate, FromLatLng) {
             const double zoom = integerZoom;
             const double maxTilesPerAxis = std::pow(2.0, zoom);
             const Point<double> tilePoint = {
-                latLng.longitude == 0 ? 0.5 : latLng.longitude == -util::LONGITUDE_MAX ? 0 : 1.0,
-                latLng.latitude  == 0 ? 0.5 : latLng.latitude  == -util::LATITUDE_MAX  ? 1.0 : 0,
+                latLng.longitude() == 0 ? 0.5 : latLng.longitude() == -util::LONGITUDE_MAX ? 0 : 1.0,
+                latLng.latitude()  == 0 ? 0.5 : latLng.latitude()  == -util::LATITUDE_MAX  ? 1.0 : 0,
             };
 
             const auto fromLatLng = TileCoordinate::fromLatLng(zoom, latLng);

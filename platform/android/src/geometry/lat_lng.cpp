@@ -3,9 +3,9 @@
 namespace mbgl {
 namespace android {
 
-jni::Object<LatLng> LatLng::New(jni::JNIEnv& env, double latitude, double longitude) {
+jni::Object<LatLng> LatLng::New(jni::JNIEnv& env, const mbgl::LatLng& latLng) {
     static auto constructor = LatLng::javaClass.GetConstructor<double, double>(env);
-    return LatLng::javaClass.New(env, constructor, latitude, longitude);
+    return LatLng::javaClass.New(env, constructor, latLng.latitude(), latLng.longitude());
 }
 
 mbgl::Point<double> LatLng::getGeometry(jni::JNIEnv& env, jni::Object<LatLng> latLng) {

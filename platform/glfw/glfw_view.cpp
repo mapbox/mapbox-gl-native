@@ -255,7 +255,7 @@ mbgl::Point<double> GLFWView::makeRandomPoint() const {
     const double x = width * double(std::rand()) / RAND_MAX;
     const double y = height * double(std::rand()) / RAND_MAX;
     mbgl::LatLng latLng = map->latLngForPixel({ x, y });
-    return { latLng.longitude, latLng.latitude };
+    return { latLng.longitude(), latLng.latitude() };
 }
 
 std::shared_ptr<const mbgl::SpriteImage>

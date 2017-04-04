@@ -14,7 +14,7 @@ public:
 
     static constexpr auto Name() { return "com/mapbox/mapboxsdk/geometry/LatLng"; };
 
-    static jni::Object<LatLng> New(jni::JNIEnv&, double, double);
+    static jni::Object<LatLng> New(jni::JNIEnv&, const mbgl::LatLng&);
 
     static mbgl::Point<double> getGeometry(jni::JNIEnv&, jni::Object<LatLng>);
 
