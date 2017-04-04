@@ -15,15 +15,11 @@ static const CGFloat MGLRasterSourceRetinaTileSize = 512;
 
 @interface MGLRasterSource ()
 
-- (instancetype)initWithRawSource:(mbgl::style::RasterSource *)rawSource NS_DESIGNATED_INITIALIZER;
-
-@property (nonatomic) mbgl::style::RasterSource *rawSource;
+@property (nonatomic, readonly) mbgl::style::RasterSource *rawSource;
 
 @end
 
-@implementation MGLRasterSource {
-    std::unique_ptr<mbgl::style::RasterSource> _pendingSource;
-}
+@implementation MGLRasterSource
 
 - (instancetype)initWithIdentifier:(NSString *)identifier configurationURL:(NSURL *)configurationURL {
     // The style specification default is 512, but 256 is the expected value for
@@ -37,74 +33,30 @@ static const CGFloat MGLRasterSourceRetinaTileSize = 512;
 }
 
 - (instancetype)initWithIdentifier:(NSString *)identifier configurationURL:(NSURL *)configurationURL tileSize:(CGFloat)tileSize {
-    if (self = [super initWithIdentifier:identifier]) {
-        auto source = std::make_unique<mbgl::style::RasterSource>(identifier.UTF8String,
-                                                                  configurationURL.mgl_URLByStandardizingScheme.absoluteString.UTF8String,
-                                                                  uint16_t(round(tileSize)));
-        _pendingSource = std::move(source);
-        self.rawSource = _pendingSource.get();
-    }
-    return self;
+    auto source = std::make_unique<mbgl::style::RasterSource>(identifier.UTF8String,
+                                                              configurationURL.mgl_URLByStandardizingScheme.absoluteString.UTF8String,
+                                                              uint16_t(round(tileSize)));
+    return self = [super initWithPendingSource:std::move(source)];
 }
 
 - (instancetype)initWithIdentifier:(NSString *)identifier tileURLTemplates:(NS_ARRAY_OF(NSString *) *)tileURLTemplates options:(nullable NS_DICTIONARY_OF(MGLTileSourceOption, id) *)options {
-    if (self = [super initWithIdentifier:identifier]) {
-        mbgl::Tileset tileSet = MGLTileSetFromTileURLTemplates(tileURLTemplates, options);
+    mbgl::Tileset tileSet = MGLTileSetFromTileURLTemplates(tileURLTemplates, options);
 
-        uint16_t tileSize = MGLRasterSourceRetinaTileSize;
-        if (NSNumber *tileSizeNumber = options[MGLTileSourceOptionTileSize]) {
-            if (![tileSizeNumber isKindOfClass:[NSNumber class]]) {
-                [NSException raise:NSInvalidArgumentException
-                            format:@"MGLTileSourceOptionTileSize must be set to an NSNumber."];
-            }
-            tileSize = static_cast<uint16_t>(round(tileSizeNumber.doubleValue));
+    uint16_t tileSize = MGLRasterSourceRetinaTileSize;
+    if (NSNumber *tileSizeNumber = options[MGLTileSourceOptionTileSize]) {
+        if (![tileSizeNumber isKindOfClass:[NSNumber class]]) {
+            [NSException raise:NSInvalidArgumentException
+                        format:@"MGLTileSourceOptionTileSize must be set to an NSNumber."];
         }
-
-        auto source = std::make_unique<mbgl::style::RasterSource>(identifier.UTF8String, tileSet, tileSize);
-        _pendingSource = std::move(source);
-        self.rawSource = _pendingSource.get();
-    }
-    return self;
-}
-
-- (instancetype)initWithRawSource:(mbgl::style::RasterSource *)rawSource {
-    return [super initWithRawSource:rawSource];
-}
-
-- (void)addToMapView:(MGLMapView *)mapView {
-    if (_pendingSource == nullptr) {
-        [NSException raise:@"MGLRedundantSourceException"
-                    format:@"This instance %@ was already added to %@. Adding the same source instance " \
-                           @"to the style more than once is invalid.", self, mapView.style];
+        tileSize = static_cast<uint16_t>(round(tileSizeNumber.doubleValue));
     }
 
-    mapView.mbglMap->addSource(std::move(_pendingSource));
-}
-
-- (void)removeFromMapView:(MGLMapView *)mapView {
-    if (self.rawSource != mapView.mbglMap->getSource(self.identifier.UTF8String)) {
-        return;
-    }
-
-    auto removedSource = mapView.mbglMap->removeSource(self.identifier.UTF8String);
-
-    mbgl::style::RasterSource *source = dynamic_cast<mbgl::style::RasterSource *>(removedSource.get());
-    if (!source) {
-        return;
-    }
-
-    removedSource.release();
-
-    _pendingSource = std::unique_ptr<mbgl::style::RasterSource>(source);
-    self.rawSource = _pendingSource.get();
+    auto source = std::make_unique<mbgl::style::RasterSource>(identifier.UTF8String, tileSet, tileSize);
+    return self = [super initWithPendingSource:std::move(source)];
 }
 
 - (mbgl::style::RasterSource *)rawSource {
     return (mbgl::style::RasterSource *)super.rawSource;
-}
-
-- (void)setRawSource:(mbgl::style::RasterSource *)rawSource {
-    super.rawSource = rawSource;
 }
 
 - (NSURL *)configurationURL {
