@@ -155,6 +155,13 @@
     return hash;
 }
 
+- (CLLocationCoordinate2D)coordinate {
+    NSAssert(self.polygons.count > 0, @"A multipolygon must have coordinates");
+    
+    MGLPolygon *firstPolygon = [self.polygons firstObject];
+    return firstPolygon.coordinate;
+}
+
 - (BOOL)intersectsOverlayBounds:(MGLCoordinateBounds)overlayBounds {
     return MGLCoordinateBoundsIntersectsCoordinateBounds(_overlayBounds, overlayBounds);
 }
