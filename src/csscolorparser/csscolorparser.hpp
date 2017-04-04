@@ -45,7 +45,7 @@ struct Color {
 };
 
 inline bool operator==(const Color& lhs, const Color& rhs) {
-    return lhs.r == rhs.r && lhs.g == rhs.g && lhs.b == rhs.b && ::fabs(lhs.a - lhs.b) < 0.0001f;
+    return lhs.r == rhs.r && lhs.g == rhs.g && lhs.b == rhs.b && ::fabs(lhs.a - rhs.a) < 0.0001f;
 }
 
 inline bool operator!=(const Color& lhs, const Color& rhs) {
