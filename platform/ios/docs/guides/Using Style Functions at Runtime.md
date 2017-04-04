@@ -6,17 +6,19 @@
 
 # Using Style Functions at Runtime
 
-Mapbox’s runtime and data-driven styling features allow you to style your maps as a function of the current map zoom level, attributes in the map source data, or both. With data-driven styling, you can style map features automatically based on their individual attributes.
+[Runtime Styling](runtime-styling.html) enables you to modify every aspect of the map’s appearance dynamically as a user interacts with your application. Much of the runtime styling API allows you to specify _style functions_ instead of constant values. A style function allows you to specify in advance how a layout or paint attribute will vary as the zoom level changes or how the appearance of individual features vary based on metadata provided by a content source.
 
-Vary POI icons, transit route line colors, city polygon opacity, and more based on any attribute in your data. Need to visualize hotel data by price? You can have your map’s point radii and colors change automatically with your data.
+Style functions spare you the inconvenience of manually calculating intermediate values between different zoom levels or creating a multitude of style layers to handle homogeneous features in the map content. For example, if your content source indicates the prices of hotels in an area, you can color-code the hotels by price, relying on a style function to smoothly interpolate among desired colors without having to specify the color for each exact price.
+
+_Data-driven styling_ specifically refers to the use of style functions to vary the map’s appearance based on data in a content source.
+
+You can also specify style functions in a style JSON file, to be applied automatically when the map loads. See the [Mapbox Style Specification](https://www.mapbox.com/mapbox-gl-js/style-spec/#types-function) for details.
 
 ![available bikes](img/data-driven-styling/citibikes.png) ![subway lines](img/data-driven-styling/polylineExample.png)
 
 This guide uses earthquake data from the [U.S. Geological Survey](https://earthquake.usgs.gov/earthquakes/feed/v1.0/geojson.php) and data-driven styling to style a map based on attributes. For more information about how to work with GeoJSON data in our iOS SDK, please see our [working with GeoJSON data](working-with-geojson-data.html) guide.
 
-## Style functions
-
-There are three subclasses of `MGLStyleFunction`:
+A style function is represented at runtime by the `MGLStyleFunction` class. There are three subclasses of `MGLStyleFunction`:
 
 * `MGLCameraStyleFunction` is a style value that changes with zoom level. For example, you can make the radius of a circle increase according to zoom level.
 * `MGLSourceStyleFunction` is a style value that changes with the attributes of a feature. For example, you can adjust the radius of a circle based on the magnitude of an earthquake.
