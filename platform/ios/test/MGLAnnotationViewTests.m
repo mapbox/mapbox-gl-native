@@ -51,7 +51,7 @@ static NSString * const MGLTestAnnotationReuseIdentifer = @"MGLTestAnnotationReu
 - (void)setUp
 {
     [super setUp];
-    _mapView = [[MGLMapView alloc] initWithFrame:CGRectZero];
+    _mapView = [[MGLMapView alloc] initWithFrame:CGRectMake(0, 0, 64, 64)];
     _mapView.delegate = self;
 }
 
