@@ -19,14 +19,6 @@ const MGLTileSourceOption MGLTileSourceOptionTileCoordinateSystem = @"MGLTileSou
 
 @implementation MGLTileSource
 
-- (instancetype)initWithIdentifier:(NSString *)identifier configurationURL:(NSURL *)configurationURL {
-    return [super initWithIdentifier:identifier];
-}
-
-- (instancetype)initWithIdentifier:(NSString *)identifier tileURLTemplates:(NS_ARRAY_OF(NSString *) *)tileURLTemplates options:(NS_DICTIONARY_OF(MGLTileSourceOption, id) *)options {
-    return [super initWithIdentifier:identifier];
-}
-
 - (NSURL *)configurationURL {
     [NSException raise:@"MGLAbstractClassException"
                 format:@"MGLTileSource is an abstract class"];
