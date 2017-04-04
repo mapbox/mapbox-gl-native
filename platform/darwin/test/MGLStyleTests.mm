@@ -148,6 +148,7 @@
     MGLShapeSource *shapeSource = [[MGLShapeSource alloc] initWithIdentifier:@"shapeSource" shape:nil options:nil];
     [self.style addSource:shapeSource];
     XCTAssertEqual(self.style.sources.count, initialSources.count + 1);
+    XCTAssertEqual(shapeSource, [self.style sourceWithIdentifier:@"shapeSource"]);
     [self.style removeSource:shapeSource];
     XCTAssertEqual(self.style.sources.count, initialSources.count);
 }
@@ -238,6 +239,7 @@
     MGLFillStyleLayer *fillLayer = [[MGLFillStyleLayer alloc] initWithIdentifier:@"fillLayer" source:shapeSource];
     [self.style addLayer:fillLayer];
     XCTAssertEqual(self.style.layers.count, initialLayers.count + 1);
+    XCTAssertEqual(fillLayer, [self.style layerWithIdentifier:@"fillLayer"]);
     [self.style removeLayer:fillLayer];
     XCTAssertEqual(self.style.layers.count, initialLayers.count);
 }

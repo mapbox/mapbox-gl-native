@@ -40,6 +40,7 @@ set_source_files_properties(src/mbgl/util/version.cpp PROPERTIES COMPILE_DEFINIT
 
 mason_use(geometry VERSION 0.9.0 HEADER_ONLY)
 mason_use(variant VERSION 1.1.4 HEADER_ONLY)
+mason_use(any VERSION 8fef1e9 HEADER_ONLY)
 mason_use(unique_resource VERSION cba309e HEADER_ONLY)
 mason_use(rapidjson VERSION 1.1.0 HEADER_ONLY)
 mason_use(boost VERSION 1.62.0 HEADER_ONLY)

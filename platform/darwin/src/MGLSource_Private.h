@@ -10,6 +10,14 @@ namespace mbgl {
     }
 }
 
+// A struct to be stored in the `peer` member of mbgl::style::Source, in order to implement
+// object identity. We don't store a MGLSource pointer directly because that doesn't
+// interoperate with ARC. The inner pointer is weak in order to avoid a reference cycle for
+// "pending" MGLSources, which have a strong owning pointer to the mbgl::style::Source.
+struct SourceWrapper {
+    __weak MGLSource *source;
+};
+
 @class MGLMapView;
 
 @interface MGLSource (Private)

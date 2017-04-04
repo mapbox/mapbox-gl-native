@@ -18,6 +18,7 @@
     if (self = [super init]) {
         _identifier = @(rawLayer->getID().c_str());
         _rawLayer = rawLayer;
+        _rawLayer->peer = LayerWrapper { self };
     }
     return self;
 }

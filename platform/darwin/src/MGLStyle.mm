@@ -166,17 +166,21 @@ static NSURL *MGLStyleURL_emerald;
     return rawSource ? [self sourceFromMBGLSource:rawSource] : nil;
 }
 
-- (MGLSource *)sourceFromMBGLSource:(mbgl::style::Source *)source {
+- (MGLSource *)sourceFromMBGLSource:(mbgl::style::Source *)rawSource {
+    if (MGLSource *source = rawSource->peer.empty() ? nil : mbgl::any_cast<SourceWrapper>(rawSource->peer).source) {
+        return source;
+    }
+
     // TODO: Fill in options specific to the respective source classes
     // https://github.com/mapbox/mapbox-gl-native/issues/6584
-    if (auto vectorSource = source->as<mbgl::style::VectorSource>()) {
+    if (auto vectorSource = rawSource->as<mbgl::style::VectorSource>()) {
         return [[MGLVectorSource alloc] initWithRawSource:vectorSource];
-    } else if (auto geoJSONSource = source->as<mbgl::style::GeoJSONSource>()) {
+    } else if (auto geoJSONSource = rawSource->as<mbgl::style::GeoJSONSource>()) {
         return [[MGLShapeSource alloc] initWithRawSource:geoJSONSource];
-    } else if (auto rasterSource = source->as<mbgl::style::RasterSource>()) {
+    } else if (auto rasterSource = rawSource->as<mbgl::style::RasterSource>()) {
         return [[MGLRasterSource alloc] initWithRawSource:rasterSource];
     } else {
-        return [[MGLSource alloc] initWithRawSource:source];
+        return [[MGLSource alloc] initWithRawSource:rawSource];
     }
 }
 
@@ -319,35 +323,32 @@ static NSURL *MGLStyleURL_emerald;
     [styleLayer removeFromMapView:self.mapView];
 }
 
-- (MGLStyleLayer *)layerFromMBGLLayer:(mbgl::style::Layer *)mbglLayer
+- (MGLStyleLayer *)layerFromMBGLLayer:(mbgl::style::Layer *)rawLayer
 {
-    NSParameterAssert(mbglLayer);
+    NSParameterAssert(rawLayer);
 
-    NSString *identifier = @(mbglLayer->getID().c_str());
+    if (MGLStyleLayer *layer = rawLayer->peer.empty() ? nil : mbgl::any_cast<LayerWrapper>(rawLayer->peer).layer) {
+        return layer;
+    }
 
-    if (auto fillLayer = mbglLayer->as<mbgl::style::FillLayer>()) {
+    if (auto fillLayer = rawLayer->as<mbgl::style::FillLayer>()) {
         MGLSource *source = [self sourceWithIdentifier:@(fillLayer->getSourceID().c_str())];
         return [[MGLFillStyleLayer alloc] initWithRawLayer:fillLayer source:source];
-    } else if (auto lineLayer = mbglLayer->as<mbgl::style::LineLayer>()) {
+    } else if (auto lineLayer = rawLayer->as<mbgl::style::LineLayer>()) {
         MGLSource *source = [self sourceWithIdentifier:@(lineLayer->getSourceID().c_str())];
         return [[MGLLineStyleLayer alloc] initWithRawLayer:lineLayer source:source];
-    } else if (auto symbolLayer = mbglLayer->as<mbgl::style::SymbolLayer>()) {
+    } else if (auto symbolLayer = rawLayer->as<mbgl::style::SymbolLayer>()) {
         MGLSource *source = [self sourceWithIdentifier:@(symbolLayer->getSourceID().c_str())];
         return [[MGLSymbolStyleLayer alloc] initWithRawLayer:symbolLayer source:source];
-    } else if (auto rasterLayer = mbglLayer->as<mbgl::style::RasterLayer>()) {
+    } else if (auto rasterLayer = rawLayer->as<mbgl::style::RasterLayer>()) {
         MGLSource *source = [self sourceWithIdentifier:@(rasterLayer->getSourceID().c_str())];
         return [[MGLRasterStyleLayer alloc] initWithRawLayer:rasterLayer source:source];
-    } else if (auto circleLayer = mbglLayer->as<mbgl::style::CircleLayer>()) {
+    } else if (auto circleLayer = rawLayer->as<mbgl::style::CircleLayer>()) {
         MGLSource *source = [self sourceWithIdentifier:@(circleLayer->getSourceID().c_str())];
         return [[MGLCircleStyleLayer alloc] initWithRawLayer:circleLayer source:source];
-    } else if (auto backgroundLayer = mbglLayer->as<mbgl::style::BackgroundLayer>()) {
+    } else if (auto backgroundLayer = rawLayer->as<mbgl::style::BackgroundLayer>()) {
         return [[MGLBackgroundStyleLayer alloc] initWithRawLayer:backgroundLayer];
-    } else if (auto customLayer = mbglLayer->as<mbgl::style::CustomLayer>()) {
-        MGLStyleLayer *styleLayer = self.openGLLayers[identifier];
-        if (styleLayer) {
-            NSAssert(styleLayer.rawLayer == customLayer, @"%@ wraps a CustomLayer that differs from the one associated with the underlying style.", styleLayer);
-            return styleLayer;
-        }
+    } else if (auto customLayer = rawLayer->as<mbgl::style::CustomLayer>()) {
         return [[MGLOpenGLStyleLayer alloc] initWithRawLayer:customLayer];
     } else {
         NSAssert(NO, @"Unrecognized layer type");
