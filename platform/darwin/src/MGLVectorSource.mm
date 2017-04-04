@@ -23,7 +23,7 @@
 }
 
 - (instancetype)initWithIdentifier:(NSString *)identifier configurationURL:(NSURL *)configurationURL {
-    if (self = [super initWithIdentifier:identifier configurationURL:configurationURL]) {
+    if (self = [super initWithIdentifier:identifier]) {
         auto source = std::make_unique<mbgl::style::VectorSource>(identifier.UTF8String,
                                                                   configurationURL.mgl_URLByStandardizingScheme.absoluteString.UTF8String);
         _pendingSource = std::move(source);
@@ -33,7 +33,7 @@
 }
 
 - (instancetype)initWithIdentifier:(NSString *)identifier tileURLTemplates:(NS_ARRAY_OF(NSString *) *)tileURLTemplates options:(nullable NS_DICTIONARY_OF(MGLTileSourceOption, id) *)options {
-    if (self = [super initWithIdentifier:identifier tileURLTemplates:tileURLTemplates options:options]) {
+    if (self = [super initWithIdentifier:identifier]) {
         mbgl::Tileset tileSet = MGLTileSetFromTileURLTemplates(tileURLTemplates, options);
 
         auto source = std::make_unique<mbgl::style::VectorSource>(identifier.UTF8String, tileSet);
