@@ -45,6 +45,8 @@ public:
 
     jni::String getId(jni::JNIEnv&);
 
+    jni::String getAttribution(jni::JNIEnv&);
+
 protected:
     // Release the owned view and return it
     std::unique_ptr<mbgl::style::Source> releaseCoreSource();

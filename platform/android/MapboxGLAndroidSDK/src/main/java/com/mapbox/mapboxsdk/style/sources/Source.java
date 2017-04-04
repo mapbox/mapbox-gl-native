@@ -28,6 +28,18 @@ public abstract class Source {
   }
 
   /**
+   * Retrieve the source attribution.
+   * <p>
+   * Will return an empty String if no attribution is available.
+   * </p>
+   *
+   * @return the string representation of the attribution in html format
+   */
+  public String getAttribution() {
+    return nativeGetAttribution();
+  }
+
+  /**
    * Internal use
    *
    * @return the native peer pointer
@@ -37,5 +49,7 @@ public abstract class Source {
   }
 
   protected native String nativeGetId();
+
+  protected native String nativeGetAttribution();
 
 }
