@@ -4,7 +4,7 @@
   Edit platform/darwin/scripts/generate-style-code.js, then run `make darwin-style-code`.
 -->
 
-# Working with Style Functions
+# Using Style Functions at Runtime
 
 Mapbox’s runtime and data-driven styling features allow you to style your maps as a function of the current map zoom level, attributes in the map source data, or both. With data-driven styling, you can style map features automatically based on their individual attributes.
 
