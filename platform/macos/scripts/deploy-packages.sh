@@ -37,7 +37,7 @@ buildPackageStyle() {
     step "Compressing ${file_name}…"
     cd build/macos/pkg
     rm -f ../deploy/${file_name}
-    zip -r ../deploy/${file_name} *
+    zip -yr ../deploy/${file_name} *
     cd -
     if [[ "${GITHUB_RELEASE}" == true ]]; then
         echo "Uploading ${file_name} to GitHub"

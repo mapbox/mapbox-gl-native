@@ -27,7 +27,7 @@ cd build/ios/pkg
 ZIP=mapbox-ios-sdk-${PUBLISH_VERSION}${PUBLISH_STYLE}.zip
 step "Compressing ${ZIP}…"
 rm -f ../${ZIP}
-zip -r ../${ZIP} *
+zip -yr ../${ZIP} *
 
 #
 # upload
