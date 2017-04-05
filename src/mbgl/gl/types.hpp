@@ -35,12 +35,14 @@ enum class DataType : uint32_t {
 };
 
 enum class RenderbufferType : uint32_t {
-    // TODO note: this is RGBA8 (can be found in gl.h: RGBA8 is 0x8058, RGBA4 is 0x8056); gl-js FillExtrusionTexture uses RGBA4 -- this likely doesn't matter, but confirm
     RGBA = 0x8058,
     RGBA4 = 0x8056,
     DepthStencil = 0x88F0,
-//    DepthComponent = 0x1902,  // GL_DEPTH_COMPONENT
-    DepthComponent = 0x81A5,    // GL_DEPTH_COMPONENT16
+#if not MBGL_USE_GLES2
+    DepthComponent = 0x1902,     // GL_DEPTH_COMPONENT
+#else
+    DepthComponent = 0x81A5,     //GL_DEPTH_COMPONENT16
+#endif // MBGL_USE_GLES2
 };
 
 enum class TextureMipMap : bool { No = false, Yes = true };
