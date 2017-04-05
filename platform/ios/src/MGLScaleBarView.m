@@ -33,7 +33,7 @@ static const CGFloat MGLFeetPerMile = 5280;
     UIColor *textColor = self.textColor;
     
     CGContextRef context = UIGraphicsGetCurrentContext();
-    CGContextSetLineWidth(context, 1);
+    CGContextSetLineWidth(context, 2);
     CGContextSetLineJoin(context, kCGLineJoinRound);
     
     CGContextSetTextDrawingMode(context, kCGTextStroke);
@@ -169,11 +169,6 @@ static const CGFloat MGLFeetPerMile = 5280;
     return CGSizeMake(self.actualWidth, 16);
 }
 
-- (CGFloat)preferredWidth {
-    CGFloat padding = CGRectGetMinX(self.frame);
-    return ([self maximumWidth] - padding) / 2;
-}
-
 - (CGFloat)actualWidth {
     return floorf(self.row.firstObject.floatValue / [self unitsPerPoint]);
 }
@@ -211,20 +206,6 @@ static const CGFloat MGLFeetPerMile = 5280;
     }
     
     return validRows;
-}
-
-// Find the row closest to -[MGLScaleBarView preferredWidth]
-- (NSArray<NSNumber *> *)preferredRowInRows:(NSArray<NSArray<NSNumber *> *> *)rows {
-    CLLocationDistance diff = CGFLOAT_MAX;
-    CLLocationDistance preferredDistance = [self preferredWidth] * [self unitsPerPoint];
-    NSArray<NSNumber *> *preferredRow = rows.firstObject;
-    for (NSArray<NSNumber *> *row in rows) {
-        CLLocationDistance currentDiff = ABS(preferredDistance - row.firstObject.floatValue);
-        if (currentDiff < diff) {
-            preferredRow = row;
-        }
-    }
-    return preferredRow;
 }
 
 - (BOOL)usesMetricSystem {
@@ -266,7 +247,8 @@ static const CGFloat MGLFeetPerMile = 5280;
     [self fadeIn];
     
     _metersPerPoint = metersPerPoint;
-    self.row = [self preferredRowInRows:[self validRows]];
+    
+    self.row = [self validRows].lastObject;
     
     [self invalidateIntrinsicContentSize];
     [self setNeedsLayout];
@@ -299,12 +281,14 @@ static const CGFloat MGLFeetPerMile = 5280;
 
 - (NSArray<UILabel *> *)labels {
     if (!_labels) {
+        NSCharacterSet *characterSet = [[NSCharacterSet decimalDigitCharacterSet] invertedSet];
         NSMutableArray *labels = [NSMutableArray array];
+        
         for (NSUInteger i = 0; i <= self.row.lastObject.integerValue; i++) {
             UILabel *label = [[MGLScaleBarLabel alloc] init];
             label.font = [UIFont systemFontOfSize:8 weight:UIFontWeightMedium];
-            NSCharacterSet *characterSet = [[NSCharacterSet decimalDigitCharacterSet] invertedSet];
             label.text = [[[self.formatter stringFromDistance:0] componentsSeparatedByCharactersInSet:characterSet] componentsJoinedByString:@""];
+            label.clipsToBounds = NO;
             [label setNeedsDisplay];
             [label sizeToFit];
             [labels addObject:label];
@@ -346,9 +330,6 @@ static const CGFloat MGLFeetPerMile = 5280;
                                           self.actualWidth,
                                           MGLBarHeight+self.borderWidth*2);
     
-    self.containerView.layer.cornerRadius = 2.0f;
-    self.borderLayer.cornerRadius = 1.0f;
-    
     [CATransaction begin];
     [CATransaction setDisableActions:YES];
     self.borderLayer.frame = CGRectInset(self.containerView.bounds, self.borderWidth, self.borderWidth);
@@ -375,7 +356,10 @@ static const CGFloat MGLFeetPerMile = 5280;
     
     for (MGLScaleBarLabel *label in labels) {
         CLLocationDistance barDistance = (self.row.firstObject.integerValue / self.row.lastObject.integerValue) * (i + 1);
-        if (!useMetric) { barDistance /= MGLFeetPerMeter; }
+        
+        if (!useMetric) {
+            barDistance /= MGLFeetPerMeter;
+        }
         
         label.text = [self.formatter stringFromDistance:barDistance];
         [label setNeedsDisplay];
