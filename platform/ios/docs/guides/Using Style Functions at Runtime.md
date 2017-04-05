@@ -119,7 +119,7 @@ layer.circleColor = MGLStyleValue(interpolationMode: .interval,
 
 At each stop, `MGLInterpolationModeCategorical` produces an output value equal to the function input. We’re going to use a different stops dictionary than we did for the previous two modes.
 
-There are three main types of events in the dataset: earthquakes, explosions, and quarry blasts. In this case, the color of the circle layer will be determined by the type of event, with a default value of green to catch any events that do not fall into any of those categories.
+There are three main types of events in the dataset: earthquakes, explosions, and quarry blasts. In this case, the color of the circle layer will be determined by the type of event, with a default value of blue to catch any events that do not fall into any of those categories.
 
 ``` swift
 let categoricalStops = ["earthquake": MGLStyleValue<UIColor>(rawValue: .orange),
