@@ -79,5 +79,5 @@ From there, you can create one or many `MGLSymbolStyleLayer` or `MGLCircleStyleL
 
 **Cons**
 
-* Currently you must implement your own tap gesture recognizer together with `MGLMapView.visibleFeaturesAtPoint` to recognize taps and manually show callouts ([example](https://www.mapbox.com/ios-sdk/examples/select-feature)).
+* Currently you must implement your own tap gesture recognizer together with `MGLMapView.visibleFeaturesAtPoint` to recognize taps and manually show callouts ([example](https://www.mapbox.com/ios-sdk/examples/select-layer/)).
 * Currently no SDK support for animations. If you need animations, consider using an NSTimer and updating the layer properties accordingly.
