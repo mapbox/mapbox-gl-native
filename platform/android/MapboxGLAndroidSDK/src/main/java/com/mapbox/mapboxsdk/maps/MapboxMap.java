@@ -69,6 +69,7 @@ public final class MapboxMap {
   private final Transform transform;
   private final AnnotationManager annotationManager;
   private final MyLocationViewSettings myLocationViewSettings;
+  private final CameraChangeDispatcher cameraChangeDispatcher;
 
   private final OnRegisterTouchListener onRegisterTouchListener;
 
@@ -76,7 +77,7 @@ public final class MapboxMap {
 
   MapboxMap(NativeMapView map, Transform transform, UiSettings ui, TrackingSettings tracking,
             MyLocationViewSettings myLocationView, Projection projection, OnRegisterTouchListener listener,
-            AnnotationManager annotations) {
+            AnnotationManager annotations, CameraChangeDispatcher cameraChangeDispatcher) {
     this.nativeMapView = map;
     this.uiSettings = ui;
     this.trackingSettings = tracking;
@@ -85,6 +86,7 @@ public final class MapboxMap {
     this.annotationManager = annotations.bind(this);
     this.transform = transform;
     this.onRegisterTouchListener = listener;
+    this.cameraChangeDispatcher = cameraChangeDispatcher;
   }
 
   void initialise(@NonNull Context context, @NonNull MapboxMapOptions options) {
@@ -1595,8 +1597,49 @@ public final class MapboxMap {
    *                 To unset the callback, use null.
    */
   @UiThread
+  @Deprecated
   public void setOnCameraChangeListener(@Nullable OnCameraChangeListener listener) {
     transform.setOnCameraChangeListener(listener);
+  }
+
+  /**
+   * Sets a callback that is invoked when camera movement has ended.
+   *
+   * @param listener the listener to notify
+   */
+  @UiThread
+  public void setOnCameraIdleListener(@Nullable OnCameraIdleListener listener) {
+    cameraChangeDispatcher.setOnCameraIdleListener(listener);
+  }
+
+  /**
+   * Sets a callback that is invoked when camera movement was cancelled.
+   *
+   * @param listener the listener to notify
+   */
+  @UiThread
+  public void setOnCameraMoveCancelListener(@Nullable OnCameraMoveCanceledListener listener) {
+    cameraChangeDispatcher.setOnCameraMoveCanceledListener(listener);
+  }
+
+  /**
+   * Sets a callback that is invoked when camera movement has started.
+   *
+   * @param listener the listener to notify
+   */
+  @UiThread
+  public void setOnCameraMoveStartedistener(@Nullable OnCameraMoveStartedListener listener) {
+    cameraChangeDispatcher.setOnCameraMoveStartedListener(listener);
+  }
+
+  /**
+   * Sets a callback that is invoked when camera position changes.
+   *
+   * @param listener the listener to notify
+   */
+  @UiThread
+  public void setOnCameraMoveListener(@Nullable OnCameraMoveListener listener) {
+    cameraChangeDispatcher.setOnCameraMoveListener(listener);
   }
 
   /**
@@ -1913,7 +1956,12 @@ public final class MapboxMap {
 
   /**
    * Interface definition for a callback to be invoked when the camera changes position.
+   *
+   * @deprecated Replaced by MapboxMap.OnCameraMoveStartedListener, MapboxMap.OnCameraMoveListener and
+   * MapboxMap.OnCameraIdleListener. The order in which the deprecated onCameraChange method will be called in relation
+   * to the methods in the new camera change listeners is undefined.
    */
+  @Deprecated
   public interface OnCameraChangeListener {
     /**
      * Called after the camera position has changed. During an animation,
@@ -1923,6 +1971,56 @@ public final class MapboxMap {
      * @param position The CameraPosition at the end of the last camera change.
      */
     void onCameraChange(CameraPosition position);
+  }
+
+  /**
+   * Interface definition for a callback to be invoked for when the camera motion starts.
+   */
+  public interface OnCameraMoveStartedListener {
+    int REASON_API_GESTURE = 1;
+    int REASON_DEVELOPER_ANIMATION = 2;
+    int REASON_API_ANIMATION = 3;
+
+    /**
+     * Called when the camera starts moving after it has been idle or when the reason for camera motion has changed.
+     *
+     * @param reason the reason for the camera change
+     */
+    void onCameraMoveStarted(int reason);
+  }
+
+  /**
+   * Interface definition for a callback to be invoked for when the camera changes position.
+   */
+  public interface OnCameraMoveListener {
+    /**
+     * Called repeatedly as the camera continues to move after an onCameraMoveStarted call.
+     * This may be called as often as once every frame and should not perform expensive operations.
+     */
+    void onCameraMove();
+  }
+
+  /**
+   * Interface definition for a callback to be invoked for when the camera's motion has been stopped or when the camera
+   * starts moving for a new reason.
+   */
+  public interface OnCameraMoveCanceledListener {
+    /**
+     * Called when the developer explicitly calls the cancelTransitions() method or if the reason for camera motion has
+     * changed before the onCameraIdle had a chance to fire after the previous animation.
+     * Do not update or animate the camera from within this method.
+     */
+    void onCameraMoveCanceled();
+  }
+
+  /**
+   * Interface definition for a callback to be invoked for when camera movement has ended.
+   */
+  public interface OnCameraIdleListener {
+    /**
+     * Called when camera movement has ended.
+     */
+    void onCameraIdle();
   }
 
   /**
