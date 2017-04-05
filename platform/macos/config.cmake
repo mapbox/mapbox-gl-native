@@ -74,7 +74,14 @@ macro(mbgl_platform_core)
     )
 
     target_link_libraries(mbgl-core
-        PUBLIC -lz
+        PUBLIC "-lz"
+        PUBLIC "-framework Foundation"
+        PUBLIC "-framework CoreGraphics"
+        PUBLIC "-framework OpenGL"
+        PUBLIC "-framework ImageIO"
+        PUBLIC "-framework CoreServices"
+        PUBLIC "-framework SystemConfiguration"
+        PUBLIC "-lsqlite3"
     )
 endmacro()
 
@@ -82,8 +89,6 @@ endmacro()
 macro(mbgl_platform_glfw)
     target_link_libraries(mbgl-glfw
         PRIVATE mbgl-loop-darwin
-        PRIVATE "-framework OpenGL"
-        PRIVATE "-lsqlite3"
     )
 endmacro()
 
@@ -91,12 +96,6 @@ endmacro()
 macro(mbgl_platform_render)
     target_link_libraries(mbgl-render
         PRIVATE mbgl-loop-darwin
-        PRIVATE "-framework Foundation"
-        PRIVATE "-framework CoreGraphics"
-        PRIVATE "-framework OpenGL"
-        PRIVATE "-framework ImageIO"
-        PRIVATE "-framework CoreServices"
-        PRIVATE "-lsqlite3"
     )
 endmacro()
 
@@ -104,12 +103,6 @@ endmacro()
 macro(mbgl_platform_offline)
     target_link_libraries(mbgl-offline
         PRIVATE mbgl-loop-darwin
-        PRIVATE "-framework Foundation"
-        PRIVATE "-framework CoreGraphics"
-        PRIVATE "-framework OpenGL"
-        PRIVATE "-framework ImageIO"
-        PRIVATE "-framework CoreServices"
-        PRIVATE "-lsqlite3"
     )
 endmacro()
 
@@ -131,12 +124,6 @@ macro(mbgl_platform_test)
 
     target_link_libraries(mbgl-test
         PRIVATE mbgl-loop-darwin
-        PRIVATE "-framework Foundation"
-        PRIVATE "-framework CoreGraphics"
-        PRIVATE "-framework OpenGL"
-        PRIVATE "-framework ImageIO"
-        PRIVATE "-framework CoreServices"
-        PRIVATE "-lsqlite3"
     )
 endmacro()
 
@@ -157,12 +144,6 @@ macro(mbgl_platform_benchmark)
 
     target_link_libraries(mbgl-benchmark
         PRIVATE mbgl-loop-darwin
-        PRIVATE "-framework Foundation"
-        PRIVATE "-framework CoreGraphics"
-        PRIVATE "-framework OpenGL"
-        PRIVATE "-framework ImageIO"
-        PRIVATE "-framework CoreServices"
-        PRIVATE "-lsqlite3"
     )
 endmacro()
 
@@ -172,8 +153,6 @@ macro(mbgl_platform_node)
     )
 
     target_link_libraries(mbgl-node
-        PRIVATE "-framework Foundation"
-        PRIVATE "-framework OpenGL"
         PRIVATE "-Wl,-bind_at_load"
     )
 endmacro()
