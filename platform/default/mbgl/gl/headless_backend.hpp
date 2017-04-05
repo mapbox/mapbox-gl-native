@@ -37,8 +37,8 @@ private:
 
     void createContext();
 
-    std::unique_ptr<Impl> impl;
     std::shared_ptr<HeadlessDisplay> display;
+    std::unique_ptr<Impl> impl;
 
     bool active = false;
 };
