@@ -166,11 +166,11 @@ TEST(GlyphAtlas, InvalidSDFGlyph) {
     GlyphAtlasTest test;
 
     auto& glyphSet = test.glyphAtlas.getGlyphSet(fontStack);
-    glyphSet.insert(66, SDFGlyph{ 66 /* ASCII 'B' */,
+    glyphSet.insert(SDFGlyph{ 66 /* ASCII 'B' */,
                                   AlphaImage({7, 7}), /* correct */
                                   { 1 /* width */, 1 /* height */, 0 /* left */, 0 /* top */,
                                     0 /* advance */ } });
-    glyphSet.insert(67, SDFGlyph{ 67 /* ASCII 'C' */,
+    glyphSet.insert(SDFGlyph{ 67 /* ASCII 'C' */,
                                   AlphaImage({518, 8}), /* correct */
                                   { 512 /* width */, 2 /* height */, 0 /* left */, 0 /* top */,
                                     0 /* advance */ } });

@@ -18,6 +18,8 @@ class GlyphAtlasObserver;
 class AsyncRequest;
 class FileSource;
 
+std::vector<SDFGlyph> parseGlyphPBF(const GlyphRange&, const std::string& data);
+
 class GlyphPBF : private util::noncopyable {
 public:
     GlyphPBF(GlyphAtlas*,

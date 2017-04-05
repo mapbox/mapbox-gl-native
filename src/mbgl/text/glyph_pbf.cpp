@@ -14,10 +14,10 @@
 
 namespace mbgl {
 
-namespace {
+std::vector<SDFGlyph> parseGlyphPBF(const GlyphRange& glyphRange, const std::string& data) {
+    std::vector<SDFGlyph> result;
+    result.reserve(256);
 
-// Parses a Glyph Protobuf and inserts it into the GlyphAtlas. Must be called from main thread.
-void parseGlyphPBF(GlyphSet& glyphSet, const GlyphRange& glyphRange, const std::string& data) {
     protozero::pbf_reader glyphs_pbf(data);
 
     while (glyphs_pbf.next(1)) {
@@ -94,12 +94,12 @@ void parseGlyphPBF(GlyphSet& glyphSet, const GlyphRange& glyphRange, const std::
                 glyph.bitmap = AlphaImage(size, reinterpret_cast<const uint8_t*>(glyphData.data()), glyphData.size());
             }
 
-            glyphSet.insert(glyph.id, std::move(glyph));
+            result.push_back(std::move(glyph));
         }
     }
-}
 
-} // namespace
+    return result;
+}
 
 GlyphPBF::GlyphPBF(GlyphAtlas* atlas,
                    const FontStack& fontStack,
@@ -117,11 +117,18 @@ GlyphPBF::GlyphPBF(GlyphAtlas* atlas,
             parsed = true;
             observer->onGlyphsLoaded(fontStack, glyphRange);
         } else {
+            std::vector<SDFGlyph> glyphs;
+
             try {
-                parseGlyphPBF(atlas->getGlyphSet(fontStack), glyphRange, *res.data);
+                glyphs = parseGlyphPBF(glyphRange, *res.data);
             } catch (...) {
                 observer->onGlyphsError(fontStack, glyphRange, std::current_exception());
                 return;
+            }
+
+            GlyphSet& glyphSet = atlas->getGlyphSet(fontStack);
+            for (auto& glyph : glyphs) {
+                glyphSet.insert(std::move(glyph));
             }
 
             parsed = true;

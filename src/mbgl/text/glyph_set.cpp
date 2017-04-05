@@ -3,11 +3,11 @@
 
 namespace mbgl {
 
-void GlyphSet::insert(uint32_t id, SDFGlyph&& glyph) {
-    auto it = sdfs.find(id);
+void GlyphSet::insert(SDFGlyph&& glyph) {
+    auto it = sdfs.find(glyph.id);
     if (it == sdfs.end()) {
         // Glyph doesn't exist yet.
-        sdfs.emplace(id, std::move(glyph));
+        sdfs.emplace(glyph.id, std::move(glyph));
     } else if (it->second.metrics == glyph.metrics) {
         if (it->second.bitmap != glyph.bitmap) {
             // The actual bitmap was updated; this is unsupported.
