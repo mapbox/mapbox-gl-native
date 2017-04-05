@@ -1452,7 +1452,7 @@ public:
         }
         else
         {
-            nextElement = _annotationContextsByAnnotationTag[_selectedAnnotationTag].accessibilityElement;
+            nextElement = _annotationContextsByAnnotationTag.at(_selectedAnnotationTag).accessibilityElement;
         }
         [self deselectAnnotation:self.selectedAnnotation animated:YES];
         UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, nextElement);
@@ -3082,7 +3082,7 @@ public:
         return nil;
     }
 
-    MGLAnnotationContext &annotationContext = _annotationContextsByAnnotationTag[tag];
+    MGLAnnotationContext &annotationContext = _annotationContextsByAnnotationTag.at(tag);
     return annotationContext.annotation;
 }
 
@@ -3552,8 +3552,12 @@ public:
         {
             id <MGLAnnotation> annotation = [self annotationWithTag:annotationTag];
             NSAssert(annotation, @"Unknown annotation found nearby tap");
+            if ( ! annotation)
+            {
+                return true;
+            }
 
-            MGLAnnotationContext annotationContext = _annotationContextsByAnnotationTag[annotationTag];
+            MGLAnnotationContext annotationContext = _annotationContextsByAnnotationTag.at(annotationTag);
             CGRect annotationRect;
 
             MGLAnnotationView *annotationView = annotationContext.annotationView;
@@ -3867,8 +3871,6 @@ public:
 /// and is appropriate for positioning a popover.
 - (CGRect)positioningRectForCalloutForAnnotationWithTag:(MGLAnnotationTag)annotationTag
 {
-    MGLAnnotationContext annotationContext = _annotationContextsByAnnotationTag[annotationTag];
-
     id <MGLAnnotation> annotation = [self annotationWithTag:annotationTag];
     if ( ! annotation)
     {
