@@ -1801,7 +1801,11 @@ public:
                 continue;
             }
             MGLAnnotationContext annotationContext = _annotationContextsByAnnotationTag.at(annotationTag);
-            [annotations addObject:annotationContext.annotation];
+            NSAssert(annotationContext.annotation, @"Missing annotation for tag %u.", annotationTag);
+            if (annotationContext.annotation)
+            {
+                [annotations addObject:annotationContext.annotation];
+            }
         }
 
         return [annotations copy];
