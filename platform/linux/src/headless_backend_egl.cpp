@@ -14,11 +14,13 @@ struct EGLImpl : public HeadlessBackend::Impl {
             : glContext(glContext_),
               display(display_),
               config(config_) {
-#if __ANDROID__
-        // Create a pixel buffer surface (in conjunction with EGL_SURFACE_TYPE, EGL_PBUFFER_BIT).
+        // Create a dummy pbuffer. We will render to framebuffers anyway, but we need a pbuffer to
+        // activate the context.
+        // Note that to be able to create pbuffer surfaces, we need to choose a config that
+        // includes EGL_SURFACE_TYPE, EGL_PBUFFER_BIT in HeadlessDisplay.
         const EGLint surfAttribs[] = {
-            EGL_WIDTH, 512,
-            EGL_HEIGHT, 512,
+            EGL_WIDTH, 8,
+            EGL_HEIGHT, 8,
             EGL_LARGEST_PBUFFER, EGL_TRUE,
             EGL_NONE
         };
@@ -27,7 +29,6 @@ struct EGLImpl : public HeadlessBackend::Impl {
         if (glSurface == EGL_NO_SURFACE) {
             throw std::runtime_error("Could not create surface: " + std::to_string(eglGetError()));
         }
-#endif // __ANDROID__
     }
 
     ~EGLImpl() {

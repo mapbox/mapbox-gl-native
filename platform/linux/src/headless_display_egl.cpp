@@ -32,11 +32,7 @@ HeadlessDisplay::Impl::Impl() {
     }
 
     const EGLint attribs[] = {
-#if __ANDROID__
-        // Android emulator requires a pixel buffer to generate renderable unit
-        // test results.
         EGL_SURFACE_TYPE, EGL_PBUFFER_BIT,
-#endif // __ANDROID__
         EGL_NONE
     };
 
