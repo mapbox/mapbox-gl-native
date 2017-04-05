@@ -2,15 +2,8 @@
 
 #include <mbgl/gl/context.hpp>
 #include <mbgl/gl/program.hpp>
-#include <mbgl/gl/features.hpp>
-#include <mbgl/programs/binary_program.hpp>
-#include <mbgl/programs/attributes.hpp>
-#include <mbgl/programs/program_parameters.hpp>
-#include <mbgl/style/paint_property.hpp>
-#include <mbgl/shaders/shaders.hpp>
-#include <mbgl/util/io.hpp>
 #include <mbgl/math/clamp.hpp>
-
+#include <mbgl/util/interpolate.hpp>
 
 #include <mbgl/programs/attributes.hpp>
 #include <mbgl/programs/uniforms.hpp>
@@ -127,11 +120,19 @@ public:
     ConstantSymbolSizeBinder(const float /*tileZoom*/, const style::Undefined&, const float defaultValue)
       : layoutSize(defaultValue) {}
     
-    ConstantSymbolSizeBinder(const float tileZoom, const style::CameraFunction<float>& function, const float /*defaultValue*/)
-      : layoutSize(function.evaluate(tileZoom + 1)) {
-        coveringRanges = std::make_tuple(
-            function.coveringZoomStops(tileZoom, tileZoom + 1),
-            Range<float> { function.evaluate(tileZoom), function.evaluate(tileZoom + 1) }
+    ConstantSymbolSizeBinder(const float tileZoom, const style::CameraFunction<float>& function_, const float /*defaultValue*/)
+      : layoutSize(function_.evaluate(tileZoom + 1)) {
+        function_.stops.match(
+            [&] (const style::ExponentialStops<float>& stops) {
+                coveringRanges = std::make_tuple(
+                    function_.coveringZoomStops(tileZoom, tileZoom + 1),
+                    Range<float> { function_.evaluate(tileZoom), function_.evaluate(tileZoom + 1) }
+                );
+                functionInterpolationBase = stops.base;
+            },
+            [&] (const style::IntervalStops<float>&) {
+                function = function_;
+            }
         );
     }
     
@@ -143,14 +144,22 @@ public:
     
     UniformValues uniformValues(float currentZoom) const override {
         float size = layoutSize;
-        bool isZoomConstant = true;
+        bool isZoomConstant = !(coveringRanges || function);
         if (coveringRanges) {
+            // Even though we could get the exact value of the camera function
+            // at z = currentZoom, we intentionally do not: instead, we interpolate
+            // between the camera function values at a pair of zoom stops covering
+            // [tileZoom, tileZoom + 1] in order to be consistent with this
+            // restriction on composite functions.
             const Range<float>& zoomLevels = std::get<0>(*coveringRanges);
             const Range<float>& sizeLevels = std::get<1>(*coveringRanges);
-            // TODO: interpolate properly
-            const float t = (currentZoom - zoomLevels.min) / (zoomLevels.max - zoomLevels.min);
-            size = sizeLevels.min + (sizeLevels.max - sizeLevels.min) * util::clamp(t, 0.0f, 1.0f);
-            isZoomConstant = false;
+            float t = util::clamp(
+                util::interpolationFactor(*functionInterpolationBase, zoomLevels, currentZoom),
+                0.0f, 1.0f
+            );
+            size = sizeLevels.min + t * (sizeLevels.max - sizeLevels.min);
+        } else if (function) {
+            size = function->evaluate(currentZoom);
         }
         
         return UniformValues {
@@ -163,7 +172,11 @@ public:
     }
     
     float layoutSize;
+    // used for exponential functions
     optional<std::tuple<Range<float>, Range<float>>> coveringRanges;
+    optional<float> functionInterpolationBase;
+    // used for interval functions
+    optional<style::CameraFunction<float>> function;
 };
 
 class SourceFunctionSymbolSizeBinder : public SymbolSizeBinder {
@@ -229,8 +242,8 @@ public:
         : function(function_),
           defaultValue(defaultValue_),
           layoutZoom(tileZoom + 1),
-          coveringZoomStops(function.coveringZoomStops(tileZoom, tileZoom + 1)) {
-    }
+          coveringZoomStops(function.coveringZoomStops(tileZoom, tileZoom + 1))
+    {}
 
     SymbolSizeAttributes::Bindings attributeBindings(const style::PossiblyEvaluatedPropertyValue<float> currentValue) const override {
         if (currentValue.isConstant()) {
@@ -256,10 +269,10 @@ public:
     };
     
     UniformValues uniformValues(float currentZoom) const override {
-        float sizeInterpolationT;
-        // TODO: interpolate properly
-        const float t = (currentZoom - coveringZoomStops.min) / (coveringZoomStops.max - coveringZoomStops.min);
-        sizeInterpolationT = util::clamp(t, 0.0f, 1.0f);
+        float sizeInterpolationT = util::clamp(
+            util::interpolationFactor(1.0f, coveringZoomStops, currentZoom),
+            0.0f, 1.0f
+        );
 
         return UniformValues {
             uniforms::u_is_size_zoom_constant::Value{ false },
