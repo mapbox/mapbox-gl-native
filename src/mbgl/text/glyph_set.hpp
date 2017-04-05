@@ -7,7 +7,7 @@ namespace mbgl {
 
 class GlyphSet {
 public:
-    void insert(uint32_t id, SDFGlyph&&);
+    void insert(SDFGlyph&&);
     const std::map<uint32_t, SDFGlyph>& getSDFs() const;
 
 private:
