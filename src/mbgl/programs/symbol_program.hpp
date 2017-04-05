@@ -110,6 +110,24 @@ public:
     virtual void upload(gl::Context&) = 0;
 };
 
+// Return the smallest range of stops that covers the interval [lowerZoom, upperZoom]
+template <class Stops>
+Range<float> getCoveringStops(Stops s, float lowerZoom, float upperZoom) {
+    assert(!s.stops.empty());
+    auto minIt = s.stops.lower_bound(lowerZoom);
+    auto maxIt = s.stops.lower_bound(upperZoom);
+    
+    // lower_bound yields first element >= lowerZoom, but we want the *last*
+    // element <= lowerZoom, so if we found a stop > lowerZoom, back up by one.
+    if (minIt != s.stops.begin() && minIt->first > lowerZoom) {
+        minIt--;
+    }
+    return Range<float> {
+        minIt == s.stops.end() ? s.stops.rbegin()->first : minIt->first,
+        maxIt == s.stops.end() ? s.stops.rbegin()->first : maxIt->first
+    };
+}
+
 class ConstantSymbolSizeBinder : public SymbolSizeBinder {
 public:
     using PropertyValue = variant<float, style::CameraFunction<float>>;
@@ -125,7 +143,7 @@ public:
         function_.stops.match(
             [&] (const style::ExponentialStops<float>& stops) {
                 coveringRanges = std::make_tuple(
-                    function_.coveringZoomStops(tileZoom, tileZoom + 1),
+                    getCoveringStops(stops, tileZoom, tileZoom + 1),
                     Range<float> { function_.evaluate(tileZoom), function_.evaluate(tileZoom + 1) }
                 );
                 functionInterpolationBase = stops.base;
@@ -242,7 +260,9 @@ public:
         : function(function_),
           defaultValue(defaultValue_),
           layoutZoom(tileZoom + 1),
-          coveringZoomStops(function.coveringZoomStops(tileZoom, tileZoom + 1))
+          coveringZoomStops(function.stops.match(
+            [&] (const auto& stops) {
+            return getCoveringStops(stops, tileZoom, tileZoom + 1); }))
     {}
 
     SymbolSizeAttributes::Bindings attributeBindings(const style::PossiblyEvaluatedPropertyValue<float> currentValue) const override {

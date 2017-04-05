@@ -76,27 +76,6 @@ public:
             }
         );
     }
-    
-    Range<float> coveringZoomStops(float lowerZoom, float upperZoom) const {
-        return stops.match(
-            [&] (const auto& s) {
-                assert(!s.stops.empty());
-                auto minIt = s.stops.lower_bound(lowerZoom);
-                // minIt is first element >= lowerZoom. If it's >, back up by one.
-                if (minIt != s.stops.begin() && minIt->first > lowerZoom) {
-                    minIt--;
-                }
-                auto maxIt = s.stops.find(upperZoom);
-                if (maxIt == s.stops.end()) {
-                    maxIt = s.stops.upper_bound(upperZoom);
-                }
-                return Range<float> {
-                    minIt == s.stops.end() ? s.stops.rbegin()->first : minIt->first,
-                    maxIt == s.stops.end() ? s.stops.rbegin()->first : maxIt->first
-                };
-            }
-        );
-    }
 
     template <class Feature>
     Range<T> evaluate(Range<InnerStops> coveringStops,
