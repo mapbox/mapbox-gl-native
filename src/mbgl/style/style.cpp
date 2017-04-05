@@ -279,6 +279,8 @@ void Style::relayout() {
         Source* source = getSource(sourceID);
         if (source && source->baseImpl->enabled) {
             source->baseImpl->reloadTiles();
+        } else if (source) {
+            source->baseImpl->invalidateTiles();
         }
     }
     updateBatch.sourceIDs.clear();
