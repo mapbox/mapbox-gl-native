@@ -11,6 +11,9 @@
 #define GLFW_INCLUDE_ES2
 #endif
 #define GL_GLEXT_PROTOTYPES
+
+#include <mbgl/gl/gl.hpp>
+
 #include <GLFW/glfw3.h>
 
 class GLFWView : public mbgl::View, public mbgl::Backend {
