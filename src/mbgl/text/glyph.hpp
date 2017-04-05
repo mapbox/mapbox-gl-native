@@ -4,7 +4,6 @@
 #include <mbgl/util/font_stack.hpp>
 #include <mbgl/util/rect.hpp>
 #include <mbgl/util/traits.hpp>
-#include <mbgl/util/image.hpp>
 
 #include <cstdint>
 #include <vector>
@@ -82,21 +81,6 @@ class Shaping {
     WritingModeType writingMode;
 
     explicit operator bool() const { return !positionedGlyphs.empty(); }
-};
-
-class SDFGlyph {
-public:
-    // We're using this value throughout the Mapbox GL ecosystem. If this is different, the glyphs
-    // also need to be reencoded.
-    static constexpr const uint8_t borderSize = 3;
-
-    GlyphID id = 0;
-
-    // A signed distance field of the glyph with a border (see above).
-    AlphaImage bitmap;
-
-    // Glyph metrics
-    GlyphMetrics metrics;
 };
 
 enum class WritingModeType : uint8_t {

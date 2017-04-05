@@ -1,7 +1,8 @@
 #pragma once
 
-#include <mbgl/text/glyph.hpp>
-#include <mbgl/util/geometry.hpp>
+#include <mbgl/text/glyph_pbf.hpp>
+
+#include <map>
 
 namespace mbgl {
 

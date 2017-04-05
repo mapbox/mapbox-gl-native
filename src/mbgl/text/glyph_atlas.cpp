@@ -4,6 +4,9 @@
 #include <mbgl/gl/context.hpp>
 #include <mbgl/util/logging.hpp>
 #include <mbgl/util/platform.hpp>
+#include <mbgl/storage/file_source.hpp>
+#include <mbgl/storage/resource.hpp>
+#include <mbgl/storage/response.hpp>
 
 #include <cassert>
 #include <algorithm>
@@ -34,21 +37,15 @@ bool GlyphAtlas::hasGlyphRanges(const FontStack& fontStack, const GlyphRangeSet&
     }
     return true;
 }
-    
-bool rangeIsParsed(const std::map<GlyphRange, GlyphPBF>& ranges, const GlyphRange& range) {
-    auto rangeIt = ranges.find(range);
-    if (rangeIt == ranges.end())
-        return false;
-    
-    return rangeIt->second.isParsed();
+
+bool GlyphAtlas::rangeIsParsed(const std::map<GlyphRange, GlyphRequest>& ranges, const GlyphRange& range) const {
+    auto it = ranges.find(range);
+    return it != ranges.end() && it->second.parsed;
 }
-    
+
 bool GlyphAtlas::hasGlyphRange(const FontStack& fontStack, const GlyphRange& range) const {
-    auto entry = entries.find(fontStack);
-    if (entry == entries.end())
-        return false;
-    
-    return rangeIsParsed(entry->second.ranges, range);
+    auto it = entries.find(fontStack);
+    return it != entries.end() && rangeIsParsed(it->second.ranges, range);
 }
     
 void GlyphAtlas::getGlyphs(GlyphRequestor& requestor, GlyphDependencies glyphDependencies) {
@@ -60,23 +57,19 @@ void GlyphAtlas::getGlyphs(GlyphRequestor& requestor, GlyphDependencies glyphDep
     // for that requestor have been fetched, and can notify it of completion.
     for (const auto& dependency : *dependencies) {
         const FontStack& fontStack = dependency.first;
-        const GlyphIDs& glyphIDs = dependency.second;
-
         Entry& entry = entries[fontStack];
 
-        GlyphRangeSet processedRanges;
+        const GlyphIDs& glyphIDs = dependency.second;
+        GlyphRangeSet ranges;
         for (const auto& glyphID : glyphIDs) {
-            GlyphRange range = getGlyphRange(glyphID);
-            if (processedRanges.find(range) == processedRanges.end() && !rangeIsParsed(entry.ranges, range)) {
-                if (entry.ranges.find(range) == entry.ranges.end()) {
-                    entry.ranges.emplace(std::piecewise_construct,
-                                         std::forward_as_tuple(range),
-                                         std::forward_as_tuple(this, fontStack, range, this, fileSource));
-                }
+            ranges.insert(getGlyphRange(glyphID));
+        }
 
-                entry.ranges.find(range)->second.requestors[&requestor] = dependencies;
+        for (const auto& range : ranges) {
+            if (!rangeIsParsed(entry.ranges, range)) {
+                GlyphRequest& request = requestRange(entry, fontStack, range);
+                request.requestors[&requestor] = dependencies;
             }
-            processedRanges.insert(range);
         }
     }
 
@@ -87,34 +80,56 @@ void GlyphAtlas::getGlyphs(GlyphRequestor& requestor, GlyphDependencies glyphDep
     }
 }
 
-void GlyphAtlas::setObserver(GlyphAtlasObserver* observer_) {
-    observer = observer_;
-}
-    
-void GlyphAtlas::onGlyphsError(const FontStack& fontStack, const GlyphRange& range, std::exception_ptr err) {
-    if (observer) {
-        observer->onGlyphsError(fontStack, range, err);
+GlyphAtlas::GlyphRequest& GlyphAtlas::requestRange(Entry& entry, const FontStack& fontStack, const GlyphRange& range) {
+    GlyphRequest& request = entry.ranges[range];
+
+    if (request.req) {
+        return request;
     }
-}
 
-void GlyphAtlas::onGlyphsLoaded(const FontStack& fontStack, const GlyphRange& range) {
-    Entry& entry = entries[fontStack];
+    request.req = fileSource.request(Resource::glyphs(glyphURL, fontStack, range),
+        [this, &entry, &request, fontStack, range](Response res) {
+            if (res.error) {
+                observer->onGlyphsError(fontStack, range, std::make_exception_ptr(std::runtime_error(res.error->message)));
+            } else if (res.notModified) {
+                return;
+            } else {
+                if (!res.noContent) {
+                    std::vector<SDFGlyph> glyphs;
 
-    auto it = entry.ranges.find(range);
-    if (it != entry.ranges.end()) {
-        for (auto& pair : it->second.requestors) {
-            GlyphRequestor& requestor = *pair.first;
-            const std::shared_ptr<GlyphDependencies>& dependencies = pair.second;
-            if (dependencies.unique()) {
-                addGlyphs(requestor, *dependencies);
+                    try {
+                        glyphs = parseGlyphPBF(range, *res.data);
+                    } catch (...) {
+                        observer->onGlyphsError(fontStack, range, std::current_exception());
+                        return;
+                    }
+
+                    for (auto& glyph : glyphs) {
+                        entry.glyphSet.insert(std::move(glyph));
+                    }
+                }
+
+                request.parsed = true;
+
+                for (auto& pair : request.requestors) {
+                    GlyphRequestor& requestor = *pair.first;
+                    const std::shared_ptr<GlyphDependencies>& dependencies = pair.second;
+                    if (dependencies.unique()) {
+                        addGlyphs(requestor, *dependencies);
+                    }
+                }
+
+                request.requestors.clear();
+
+                observer->onGlyphsLoaded(fontStack, range);
             }
-        }
-        it->second.requestors.clear();
-    }
+        });
 
-    if (observer) {
-        observer->onGlyphsLoaded(fontStack, range);
-    }
+    return request;
+}
+
+void GlyphAtlas::setObserver(GlyphAtlasObserver* observer_) {
+    observer = observer_ ? observer_ : &nullObserver;
 }
 
 void GlyphAtlas::addGlyphs(GlyphRequestor& requestor, const GlyphDependencies& glyphDependencies) {
@@ -228,7 +243,7 @@ void GlyphAtlas::removeGlyphValues(GlyphRequestor& requestor, std::map<uint32_t,
     }
 }
 
-void GlyphAtlas::removePendingRanges(mbgl::GlyphRequestor &requestor, std::map<GlyphRange, GlyphPBF> &ranges) {
+void GlyphAtlas::removePendingRanges(mbgl::GlyphRequestor& requestor, std::map<GlyphRange, GlyphRequest>& ranges) {
     for (auto it = ranges.begin(); it != ranges.end(); it++) {
         it->second.requestors.erase(&requestor);
     }

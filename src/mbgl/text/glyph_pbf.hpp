@@ -1,42 +1,29 @@
 #pragma once
 
 #include <mbgl/text/glyph.hpp>
-#include <mbgl/util/font_stack.hpp>
-#include <mbgl/util/noncopyable.hpp>
+#include <mbgl/text/glyph_range.hpp>
+#include <mbgl/util/image.hpp>
 
-#include <atomic>
-#include <functional>
 #include <string>
-#include <memory>
-#include <unordered_map>
+#include <vector>
 
 namespace mbgl {
 
-class GlyphAtlas;
-class GlyphRequestor;
-class GlyphAtlasObserver;
-class AsyncRequest;
-class FileSource;
+class SDFGlyph {
+public:
+    // We're using this value throughout the Mapbox GL ecosystem. If this is different, the glyphs
+    // also need to be reencoded.
+    static constexpr const uint8_t borderSize = 3;
+
+    GlyphID id = 0;
+
+    // A signed distance field of the glyph with a border (see above).
+    AlphaImage bitmap;
+
+    // Glyph metrics
+    GlyphMetrics metrics;
+};
 
 std::vector<SDFGlyph> parseGlyphPBF(const GlyphRange&, const std::string& data);
-
-class GlyphPBF : private util::noncopyable {
-public:
-    GlyphPBF(GlyphAtlas*,
-             const FontStack&,
-             const GlyphRange&,
-             GlyphAtlasObserver*,
-             FileSource&);
-    ~GlyphPBF();
-
-    bool isParsed() const {
-        return parsed;
-    }
-
-    bool parsed;
-    std::unique_ptr<AsyncRequest> req;
-    GlyphAtlasObserver* observer = nullptr;
-    std::unordered_map<GlyphRequestor*, std::shared_ptr<GlyphDependencies>> requestors;
-};
 
 } // namespace mbgl

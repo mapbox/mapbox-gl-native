@@ -22,7 +22,7 @@ class GlyphAtlasTest;
 namespace mbgl {
 
 class FileSource;
-class GlyphPBF;
+class AsyncRequest;
 
 namespace gl {
 class Context;
@@ -33,13 +33,13 @@ public:
     virtual void onGlyphsAvailable(GlyphPositionMap, GlyphRangeSet) = 0;
 };
     
-class GlyphAtlas : public util::noncopyable, public GlyphAtlasObserver {
+class GlyphAtlas : public util::noncopyable {
 public:
     GlyphAtlas(Size, FileSource&);
     ~GlyphAtlas();
 
     GlyphSet& getGlyphSet(const FontStack&);
-    
+
     // Workers send a `getGlyphs` message to the main thread once they have determined
     // which glyphs they will need. Invoking this method will increment reference
     // counts for all the glyphs in `GlyphDependencies`. If all glyphs are already
@@ -49,19 +49,14 @@ public:
     // Workers are given a copied 'GlyphPositions' map to use for placing their glyphs.
     // The positions specified in this object are guaranteed to be
     // valid for the lifetime of the tile.
-    void getGlyphs(GlyphRequestor& requestor, GlyphDependencies glyphs);
+    void getGlyphs(GlyphRequestor&, GlyphDependencies);
+    void removeGlyphs(GlyphRequestor&);
 
-    void setURL(const std::string &url) {
+    void setURL(const std::string& url) {
         glyphURL = url;
     }
 
-    std::string getURL() const {
-        return glyphURL;
-    }
-
-    void setObserver(GlyphAtlasObserver* observer);
-
-    void removeGlyphs(GlyphRequestor&);
+    void setObserver(GlyphAtlasObserver*);
 
     // Binds the atlas texture to the GPU, and uploads data if it is out of date.
     void bind(gl::Context&, gl::TextureUnit unit);
@@ -71,21 +66,8 @@ public:
     void upload(gl::Context&, gl::TextureUnit unit);
 
     Size getSize() const;
-    
-    virtual void onGlyphsLoaded(const FontStack&, const GlyphRange&);
-    virtual void onGlyphsError(const FontStack&, const GlyphRange&, std::exception_ptr);
-    
-    friend class ::GlyphAtlasTest;
 
 private:
-    void addGlyphs(GlyphRequestor& requestor, const GlyphDependencies& glyphDependencies);
-
-    // Only used by GlyphAtlasTest
-    bool hasGlyphRanges(const FontStack&, const GlyphRangeSet& ranges) const;
-    bool hasGlyphRange(const FontStack&, const GlyphRange& range) const;
-
-    void addGlyph(GlyphRequestor& requestor, const FontStack&, const SDFGlyph&);
-    
     FileSource& fileSource;
     std::string glyphURL;
 
@@ -96,16 +78,33 @@ private:
         std::unordered_set<GlyphRequestor*> ids;
     };
 
+    struct GlyphRequest {
+        bool parsed = false;
+        std::unique_ptr<AsyncRequest> req;
+        std::unordered_map<GlyphRequestor*, std::shared_ptr<GlyphDependencies>> requestors;
+    };
+
     struct Entry {
-        std::map<GlyphRange, GlyphPBF> ranges;
+        std::map<GlyphRange, GlyphRequest> ranges;
         GlyphSet glyphSet;
         std::map<uint32_t, GlyphValue> glyphValues;
     };
 
     std::unordered_map<FontStack, Entry, FontStackHash> entries;
-    
-    void removeGlyphValues(GlyphRequestor& requestor, std::map<uint32_t, GlyphValue>& face);
-    void removePendingRanges(GlyphRequestor& requestor, std::map<GlyphRange, GlyphPBF>& ranges);
+
+    // Only used by GlyphAtlasTest
+    friend class ::GlyphAtlasTest;
+    bool hasGlyphRanges(const FontStack&, const GlyphRangeSet&) const;
+    bool hasGlyphRange(const FontStack&, const GlyphRange&) const;
+    bool rangeIsParsed(const std::map<GlyphRange, GlyphRequest>&, const GlyphRange&) const;
+
+    GlyphRequest& requestRange(Entry&, const FontStack&, const GlyphRange&);
+
+    void addGlyphs(GlyphRequestor&, const GlyphDependencies&);
+    void addGlyph(GlyphRequestor&, const FontStack&, const SDFGlyph&);
+
+    void removeGlyphValues(GlyphRequestor&, std::map<uint32_t, GlyphValue>&);
+    void removePendingRanges(GlyphRequestor&, std::map<GlyphRange, GlyphRequest>&);
 
     GlyphAtlasObserver* observer = nullptr;
 

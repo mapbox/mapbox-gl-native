@@ -1,14 +1,4 @@
 #include <mbgl/text/glyph_pbf.hpp>
-#include <mbgl/text/glyph_atlas.hpp>
-#include <mbgl/text/glyph_atlas_observer.hpp>
-#include <mbgl/text/glyph_set.hpp>
-#include <mbgl/storage/file_source.hpp>
-#include <mbgl/storage/resource.hpp>
-#include <mbgl/storage/response.hpp>
-#include <mbgl/util/exception.hpp>
-#include <mbgl/util/string.hpp>
-#include <mbgl/util/token.hpp>
-#include <mbgl/util/url.hpp>
 
 #include <protozero/pbf_reader.hpp>
 
@@ -100,43 +90,5 @@ std::vector<SDFGlyph> parseGlyphPBF(const GlyphRange& glyphRange, const std::str
 
     return result;
 }
-
-GlyphPBF::GlyphPBF(GlyphAtlas* atlas,
-                   const FontStack& fontStack,
-                   const GlyphRange& glyphRange,
-                   GlyphAtlasObserver* observer_,
-                   FileSource& fileSource)
-    : parsed(false),
-      observer(observer_) {
-    req = fileSource.request(Resource::glyphs(atlas->getURL(), fontStack, glyphRange), [this, atlas, fontStack, glyphRange](Response res) {
-        if (res.error) {
-            observer->onGlyphsError(fontStack, glyphRange, std::make_exception_ptr(std::runtime_error(res.error->message)));
-        } else if (res.notModified) {
-            return;
-        } else if (res.noContent) {
-            parsed = true;
-            observer->onGlyphsLoaded(fontStack, glyphRange);
-        } else {
-            std::vector<SDFGlyph> glyphs;
-
-            try {
-                glyphs = parseGlyphPBF(glyphRange, *res.data);
-            } catch (...) {
-                observer->onGlyphsError(fontStack, glyphRange, std::current_exception());
-                return;
-            }
-
-            GlyphSet& glyphSet = atlas->getGlyphSet(fontStack);
-            for (auto& glyph : glyphs) {
-                glyphSet.insert(std::move(glyph));
-            }
-
-            parsed = true;
-            observer->onGlyphsLoaded(fontStack, glyphRange);
-        }
-    });
-}
-
-GlyphPBF::~GlyphPBF() = default;
 
 } // namespace mbgl
