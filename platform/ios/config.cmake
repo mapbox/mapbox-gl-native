@@ -84,6 +84,13 @@ macro(mbgl_platform_core)
     )
 
     target_link_libraries(mbgl-core
-        PUBLIC -lz
+        PUBLIC "-lz"
+        PUBLIC "-framework Foundation"
+        PUBLIC "-framework CoreGraphics"
+        PUBLIC "-framework OpenGLES"
+        PUBLIC "-framework ImageIO"
+        PUBLIC "-framework MobileCoreServices"
+        PUBLIC "-framework SystemConfiguration"
+        PUBLIC "-lsqlite3"
     )
 endmacro()
