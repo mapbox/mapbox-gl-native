@@ -1816,7 +1816,7 @@ public:
         return nil;
     }
 
-    MGLAnnotationContext &annotationContext = _annotationContextsByAnnotationTag[tag];
+    MGLAnnotationContext &annotationContext = _annotationContextsByAnnotationTag.at(tag);
     return annotationContext.annotation;
 }
 
@@ -2053,8 +2053,8 @@ public:
         // Filter out any annotation whose image is unselectable or for which
         // hit testing fails.
         auto end = std::remove_if(nearbyAnnotations.begin(), nearbyAnnotations.end(), [&](const MGLAnnotationTag annotationTag) {
-            NSAssert(_annotationContextsByAnnotationTag.count(annotationTag) != 0, @"Unknown annotation found nearby click");
             id <MGLAnnotation> annotation = [self annotationWithTag:annotationTag];
+            NSAssert(annotation, @"Unknown annotation found nearby click");
             if (!annotation) {
                 return true;
             }
