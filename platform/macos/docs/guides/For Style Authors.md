@@ -283,8 +283,7 @@ iOS.
 
 A _style function_ allows you to vary the value of a layout or paint attribute
 based on the zoom level, data provided by content sources, or both. For more
-information about style functions that incorporate data from sources, see
-“[Data-Driven Styling](data-driven-styling.html)”.
+information about style functions, see “[Using Style Functions at Runtime](using-style-functions-at-runtime.html)”.
 
 Each kind of style function is represented by a distinct class, but you
 typically create style functions as you create any other style value, using

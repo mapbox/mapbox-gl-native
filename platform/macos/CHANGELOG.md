@@ -3,6 +3,7 @@
 ## 0.4.1
 
 * Fixed an issue causing code signing failures and bloating the framework. ([#8640](https://github.com/mapbox/mapbox-gl-native/pull/8640))
+* Renamed the "Data-Driven Styling" guide to "Using Style Functions at Runtime" and clarified the meaning of data-driven styling in the guide's discussion of runtime style functions. ([#8627](https://github.com/mapbox/mapbox-gl-native/pull/8627))
 
 ## 0.4.0
 

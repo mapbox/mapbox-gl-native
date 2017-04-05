@@ -7,6 +7,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * Fixed an issue that caused the return type of a map view delegate method to bridge incorrectly to applications written in Swift. ([#8541](https://github.com/mapbox/mapbox-gl-native/pull/8541))
 * Fixed a crash that could occur when calling `-[MGLShapeSource featuresMatchingPredicate:]` or `-[MGLVectorSource featuresInSourceLayersWithIdentifiers:predicate:]`. ([#8553](https://github.com/mapbox/mapbox-gl-native/pull/8553))
 * Fixed a crash that could occur after adding view-backed annotations to the map. ([#8513](https://github.com/mapbox/mapbox-gl-native/pull/8513))
+* Renamed the "Data-Driven Styling" guide to "Using Style Functions at Runtime" and clarified the meaning of data-driven styling in the guide's discussion of runtime style functions. ([#8627](https://github.com/mapbox/mapbox-gl-native/pull/8627))
 
 ## 3.5.0
 
