@@ -12,21 +12,7 @@
 /// the given point.
 CGRect MGLExtendRect(CGRect rect, CGPoint point);
 
-NS_INLINE mbgl::LatLng MGLLatLngFromLocationCoordinate2D(CLLocationCoordinate2D coordinate) {
-    if (std::isnan(coordinate.latitude)) {
-        [NSException raise:NSInvalidArgumentException format:@"latitude must not be NaN"];
-    }
-    if (std::isnan(coordinate.longitude)) {
-        [NSException raise:NSInvalidArgumentException format:@"longitude must not be NaN"];
-    }
-    if (std::abs(coordinate.latitude) > 90.0) {
-        [NSException raise:NSInvalidArgumentException format:@"latitude must be between -90 and 90"];
-    }
-    if (!std::isfinite(coordinate.longitude)) {
-        [NSException raise:NSInvalidArgumentException format:@"longitude must not be infinite"];
-    }
-    return mbgl::LatLng(coordinate.latitude, coordinate.longitude);
-}
+mbgl::LatLng MGLLatLngFromLocationCoordinate2D(CLLocationCoordinate2D coordinate);
 
 NS_INLINE mbgl::Point<double> MGLPointFromLocationCoordinate2D(CLLocationCoordinate2D coordinate) {
     return mbgl::Point<double>(coordinate.longitude, coordinate.latitude);
