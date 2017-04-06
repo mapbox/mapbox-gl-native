@@ -15,6 +15,7 @@
 #include <jni/jni.hpp>
 
 #include <mbgl/map/backend_scope.hpp>
+#include <mbgl/math/minmax.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/event.hpp>
 #include <mbgl/util/exception.hpp>
@@ -320,8 +321,8 @@ void NativeMapView::update(jni::JNIEnv&) {
 }
 
 void NativeMapView::resizeView(jni::JNIEnv&, int w, int h) {
-    width = w;
-    height = h;
+    width = util::max(64, w);
+    height = util::max(64, h);
     map->setSize({ static_cast<uint32_t>(width), static_cast<uint32_t>(height) });
 }
 
