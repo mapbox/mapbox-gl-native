@@ -73,6 +73,10 @@ NativeMapView::NativeMapView(jni::JNIEnv& _env,
         MapMode::Continuous, GLContextMode::Unique, ConstrainMode::HeightOnly,
         ViewportMode::Default, jni::Make<std::string>(_env, _programCacheDir));
 
+    recalculateSourceTileCacheSize();
+}
+
+void NativeMapView::recalculateSourceTileCacheSize() {
     //Calculate a fitting cache size based on device parameters
     float zoomFactor   = map->getMaxZoom() - map->getMinZoom() + 1;
     float cpuFactor    = availableProcessors;
@@ -324,6 +328,7 @@ void NativeMapView::resizeView(jni::JNIEnv&, int w, int h) {
     width = util::max(64, w);
     height = util::max(64, h);
     map->setSize({ static_cast<uint32_t>(width), static_cast<uint32_t>(height) });
+    recalculateSourceTileCacheSize();
 }
 
 void NativeMapView::resizeFramebuffer(jni::JNIEnv&, int w, int h) {
@@ -480,6 +485,7 @@ void NativeMapView::resetZoom(jni::JNIEnv&) {
 
 void NativeMapView::setMinZoom(jni::JNIEnv&, jni::jdouble zoom) {
     map->setMinZoom(zoom);
+    recalculateSourceTileCacheSize();
 }
 
 jni::jdouble NativeMapView::getMinZoom(jni::JNIEnv&) {
@@ -488,6 +494,7 @@ jni::jdouble NativeMapView::getMinZoom(jni::JNIEnv&) {
 
 void NativeMapView::setMaxZoom(jni::JNIEnv&, jni::jdouble zoom) {
     map->setMaxZoom(zoom);
+    recalculateSourceTileCacheSize();
 }
 
 jni::jdouble NativeMapView::getMaxZoom(jni::JNIEnv&) {

@@ -287,6 +287,7 @@ private:
     void updateFps();
 
 private:
+    void recalculateSourceTileCacheSize();
 
     JavaVM *vm = nullptr;
     jni::UniqueWeakObject<NativeMapView> javaPeer;
