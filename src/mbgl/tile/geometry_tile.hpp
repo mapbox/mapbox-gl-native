@@ -40,7 +40,7 @@ public:
     void setPlacementConfig(const PlacementConfig&) override;
     void redoLayout() override;
     
-    void onGlyphsAvailable(GlyphPositionMap, GlyphRangeSet) override;
+    void onGlyphsAvailable(GlyphPositionMap) override;
     void onIconsAvailable(SpriteAtlas*, IconMap) override;
     
     void getGlyphs(GlyphDependencies);
