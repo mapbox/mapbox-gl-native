@@ -315,10 +315,12 @@ private:
     bool firstRender = true;
     double fps = 0.0;
 
-    int width = 0;
-    int height = 0;
-    int fbWidth = 0;
-    int fbHeight = 0;
+    // Minimum texture size according to OpenGL ES 2.0 specification.
+    int width = 64;
+    int height = 64;
+    int fbWidth = 64;
+    int fbHeight = 64;
+
     bool framebufferSizeChanged = true;
 
     int availableProcessors = 0;
