@@ -3,7 +3,7 @@
 #include <mbgl/text/glyph.hpp>
 #include <mbgl/text/glyph_atlas_observer.hpp>
 #include <mbgl/text/glyph_range.hpp>
-#include <mbgl/text/glyph_set.hpp>
+#include <mbgl/text/glyph_pbf.hpp>
 #include <mbgl/geometry/binpack.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/optional.hpp>
@@ -23,6 +23,7 @@ namespace mbgl {
 
 class FileSource;
 class AsyncRequest;
+class Response;
 
 namespace gl {
 class Context;
@@ -38,7 +39,7 @@ public:
     GlyphAtlas(Size, FileSource&);
     ~GlyphAtlas();
 
-    GlyphSet& getGlyphSet(const FontStack&);
+    std::map<uint32_t, SDFGlyph>& getGlyphSet(const FontStack&);
 
     // Workers send a `getGlyphs` message to the main thread once they have determined
     // which glyphs they will need. Invoking this method will increment reference
@@ -86,7 +87,7 @@ private:
 
     struct Entry {
         std::map<GlyphRange, GlyphRequest> ranges;
-        GlyphSet glyphSet;
+        std::map<uint32_t, SDFGlyph> sdfs;
         std::map<uint32_t, GlyphValue> glyphValues;
     };
 
@@ -99,6 +100,7 @@ private:
     bool rangeIsParsed(const std::map<GlyphRange, GlyphRequest>&, const GlyphRange&) const;
 
     GlyphRequest& requestRange(Entry&, const FontStack&, const GlyphRange&);
+    void processResponse(const Response&, const FontStack&, const GlyphRange&);
 
     void addGlyphs(GlyphRequestor&, const GlyphDependencies&);
     void addGlyph(GlyphRequestor&, const FontStack&, const SDFGlyph&);

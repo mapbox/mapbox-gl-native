@@ -2,7 +2,6 @@
 #include <mbgl/test/stub_file_source.hpp>
 #include <mbgl/test/stub_style_observer.hpp>
 
-#include <mbgl/text/glyph_set.hpp>
 #include <mbgl/text/glyph_atlas.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/string.hpp>
@@ -73,7 +72,7 @@ TEST(GlyphAtlas, LoadingSuccess) {
             return;
 
         auto& glyphSet = test.glyphAtlas.getGlyphSet({{"Test Stack"}});
-        ASSERT_FALSE(glyphSet.getSDFs().empty());
+        ASSERT_FALSE(glyphSet.empty());
 
         test.end();
     };
@@ -102,7 +101,7 @@ TEST(GlyphAtlas, LoadingFail) {
         EXPECT_TRUE(error != nullptr);
         EXPECT_EQ(util::toString(error), "Failed by the test case");
 
-        ASSERT_TRUE(test.glyphAtlas.getGlyphSet({{"Test Stack"}}).getSDFs().empty());
+        ASSERT_TRUE(test.glyphAtlas.getGlyphSet({{"Test Stack"}}).empty());
         ASSERT_FALSE(test.hasGlyphRanges({{"Test Stack"}}, {{0, 255}}));
 
         test.end();
@@ -130,7 +129,7 @@ TEST(GlyphAtlas, LoadingCorrupted) {
         EXPECT_TRUE(error != nullptr);
         EXPECT_EQ(util::toString(error), "unknown pbf field type exception");
 
-        ASSERT_TRUE(test.glyphAtlas.getGlyphSet({{"Test Stack"}}).getSDFs().empty());
+        ASSERT_TRUE(test.glyphAtlas.getGlyphSet({{"Test Stack"}}).empty());
         ASSERT_FALSE(test.hasGlyphRanges({{"Test Stack"}}, {{0, 255}}));
 
         test.end();
@@ -166,11 +165,11 @@ TEST(GlyphAtlas, InvalidSDFGlyph) {
     GlyphAtlasTest test;
 
     auto& glyphSet = test.glyphAtlas.getGlyphSet(fontStack);
-    glyphSet.insert(SDFGlyph{ 66 /* ASCII 'B' */,
+    glyphSet.emplace(66, SDFGlyph{ 66 /* ASCII 'B' */,
                                   AlphaImage({7, 7}), /* correct */
                                   { 1 /* width */, 1 /* height */, 0 /* left */, 0 /* top */,
                                     0 /* advance */ } });
-    glyphSet.insert(SDFGlyph{ 67 /* ASCII 'C' */,
+    glyphSet.emplace(67, SDFGlyph{ 67 /* ASCII 'C' */,
                                   AlphaImage({518, 8}), /* correct */
                                   { 512 /* width */, 2 /* height */, 0 /* left */, 0 /* top */,
                                     0 /* advance */ } });

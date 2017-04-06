@@ -25,10 +25,10 @@ GlyphAtlas::GlyphAtlas(const Size size, FileSource& fileSource_)
 
 GlyphAtlas::~GlyphAtlas() = default;
 
-GlyphSet& GlyphAtlas::getGlyphSet(const FontStack& fontStack) {
-    return entries[fontStack].glyphSet;
+std::map<uint32_t, SDFGlyph>& GlyphAtlas::getGlyphSet(const FontStack& fontStack) {
+    return entries[fontStack].sdfs;
 }
-    
+
 bool GlyphAtlas::hasGlyphRanges(const FontStack& fontStack, const GlyphRangeSet& ranges) const {
     for (const auto& range : ranges) {
         if (!hasGlyphRange(fontStack,range)) {
@@ -87,45 +87,70 @@ GlyphAtlas::GlyphRequest& GlyphAtlas::requestRange(Entry& entry, const FontStack
         return request;
     }
 
-    request.req = fileSource.request(Resource::glyphs(glyphURL, fontStack, range),
-        [this, &entry, &request, fontStack, range](Response res) {
-            if (res.error) {
-                observer->onGlyphsError(fontStack, range, std::make_exception_ptr(std::runtime_error(res.error->message)));
-            } else if (res.notModified) {
-                return;
-            } else {
-                if (!res.noContent) {
-                    std::vector<SDFGlyph> glyphs;
-
-                    try {
-                        glyphs = parseGlyphPBF(range, *res.data);
-                    } catch (...) {
-                        observer->onGlyphsError(fontStack, range, std::current_exception());
-                        return;
-                    }
-
-                    for (auto& glyph : glyphs) {
-                        entry.glyphSet.insert(std::move(glyph));
-                    }
-                }
-
-                request.parsed = true;
-
-                for (auto& pair : request.requestors) {
-                    GlyphRequestor& requestor = *pair.first;
-                    const std::shared_ptr<GlyphDependencies>& dependencies = pair.second;
-                    if (dependencies.unique()) {
-                        addGlyphs(requestor, *dependencies);
-                    }
-                }
-
-                request.requestors.clear();
-
-                observer->onGlyphsLoaded(fontStack, range);
-            }
-        });
+    request.req = fileSource.request(Resource::glyphs(glyphURL, fontStack, range), [this, fontStack, range](Response res) {
+        processResponse(res, fontStack, range);
+    });
 
     return request;
+}
+
+void GlyphAtlas::processResponse(const Response& res, const FontStack& fontStack, const GlyphRange& range) {
+    if (res.error) {
+        observer->onGlyphsError(fontStack, range, std::make_exception_ptr(std::runtime_error(res.error->message)));
+        return;
+    }
+
+    if (res.notModified) {
+        return;
+    }
+
+    Entry& entry = entries[fontStack];
+    GlyphRequest& request = entry.ranges[range];
+
+    if (!res.noContent) {
+        std::vector<SDFGlyph> glyphs;
+
+        try {
+            glyphs = parseGlyphPBF(range, *res.data);
+        } catch (...) {
+            observer->onGlyphsError(fontStack, range, std::current_exception());
+            return;
+        }
+
+        for (auto& glyph : glyphs) {
+            auto it = entry.sdfs.find(glyph.id);
+            if (it == entry.sdfs.end()) {
+                // Glyph doesn't exist yet.
+                entry.sdfs.emplace(glyph.id, std::move(glyph));
+            } else if (it->second.metrics == glyph.metrics) {
+                if (it->second.bitmap != glyph.bitmap) {
+                    // The actual bitmap was updated; this is unsupported.
+                    Log::Warning(Event::Glyph, "Modified glyph changed bitmap represenation");
+                }
+                // At least try to update it in case it's currently unused.
+                // If it is already used, we won't attempt to update the glyph atlas texture.
+                it->second.bitmap = std::move(glyph.bitmap);
+            } else {
+                // The metrics were updated; this is unsupported.
+                Log::Warning(Event::Glyph, "Modified glyph has different metrics");
+                return;
+            }
+        }
+    }
+
+    request.parsed = true;
+
+    for (auto& pair : request.requestors) {
+        GlyphRequestor& requestor = *pair.first;
+        const std::shared_ptr<GlyphDependencies>& dependencies = pair.second;
+        if (dependencies.unique()) {
+            addGlyphs(requestor, *dependencies);
+        }
+    }
+
+    request.requestors.clear();
+
+    observer->onGlyphsLoaded(fontStack, range);
 }
 
 void GlyphAtlas::setObserver(GlyphAtlasObserver* observer_) {
@@ -142,12 +167,11 @@ void GlyphAtlas::addGlyphs(GlyphRequestor& requestor, const GlyphDependencies& g
 
         GlyphPositions& positions = glyphPositions[fontStack];
         Entry& entry = entries[fontStack];
-        const auto& sdfs = entry.glyphSet.getSDFs();
 
         for (const auto& glyphID : glyphIDs) {
             loadedRanges.insert(getGlyphRange(glyphID));
-            auto it = sdfs.find(glyphID);
-            if (it == sdfs.end())
+            auto it = entry.sdfs.find(glyphID);
+            if (it == entry.sdfs.end())
                 continue;
 
             addGlyph(requestor, fontStack, it->second);
