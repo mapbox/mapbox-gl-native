@@ -71,7 +71,7 @@ void TransformState::getProjMatrix(mat4& projMatrix) const {
                   // Scale vertically to meters per pixel (inverse of ground resolution):
                   // (2^z * tileSize) / (circumferenceOfEarth * cos(lat * PI / 180))
                   (std::pow(2.0, getZoom()) * util::tileSize) /
-                  (circumferenceOfEarth * std::abs(std::cos(getLatLng(LatLng::Unwrapped).latitude * (M_PI / 180.0)))));
+                  (circumferenceOfEarth * std::abs(std::cos(getLatLng(LatLng::Unwrapped).latitude() * (M_PI / 180.0)))));
 }
 
 #pragma mark - Dimensions
