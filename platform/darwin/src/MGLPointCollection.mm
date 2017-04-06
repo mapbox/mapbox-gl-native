@@ -54,6 +54,10 @@ NS_ASSUME_NONNULL_BEGIN
     if (!_bounds) {
         mbgl::LatLngBounds bounds = mbgl::LatLngBounds::empty();
         for (auto coordinate : _coordinates) {
+            if (!CLLocationCoordinate2DIsValid(coordinate)) {
+                bounds = mbgl::LatLngBounds::empty();
+                break;
+            }
             bounds.extend(MGLLatLngFromLocationCoordinate2D(coordinate));
         }
         _bounds = bounds;
@@ -119,8 +123,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"<%@: %p; count = %lu>",
-            NSStringFromClass([self class]), (void *)self, (unsigned long)[self pointCount]];
+    return [NSString stringWithFormat:@"<%@: %p; count = %lu; bounds = %@>",
+            NSStringFromClass([self class]), (void *)self, (unsigned long)[self pointCount],
+            MGLStringFromCoordinateBounds(self.overlayBounds)];
 }
 
 @end
