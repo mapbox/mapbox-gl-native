@@ -22,7 +22,7 @@
     #define GL_GLEXT_PROTOTYPES
     #include <GLES2/gl2.h>
     #include <GLES2/gl2ext.h>
-#elif __QT_ && QT_VERSION >= 0x050000
+#elif __QT__ && QT_VERSION >= 0x050000
     #define GL_GLEXT_PROTOTYPES
     #include <QtGui/qopengl.h>
 #else
