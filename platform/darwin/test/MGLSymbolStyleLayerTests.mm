@@ -405,7 +405,7 @@
 
         MGLStyleValue<NSNumber *> *constantStyleValue = [MGLStyleValue<NSNumber *> valueWithRawValue:@0xff];
         layer.iconScale = constantStyleValue;
-        mbgl::style::PropertyValue<float> propertyValue = { 0xff };
+        mbgl::style::DataDrivenPropertyValue<float> propertyValue = { 0xff };
         XCTAssertEqual(rawLayer->getIconSize(), propertyValue,
                        @"Setting iconScale to a constant value should update icon-size.");
         XCTAssertEqualObjects(layer.iconScale, constantStyleValue,
@@ -422,6 +422,29 @@
         XCTAssertEqualObjects(layer.iconScale, functionStyleValue,
                               @"iconScale should round-trip camera functions.");
 
+        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeExponential sourceStops:@{@18: constantStyleValue} attributeName:@"keyName" options:nil];
+        layer.iconScale = functionStyleValue;
+
+        mbgl::style::ExponentialStops<float> exponentialStops = { {{18, 0xff}}, 1.0 };
+        propertyValue = mbgl::style::SourceFunction<float> { "keyName", exponentialStops };
+
+        XCTAssertEqual(rawLayer->getIconSize(), propertyValue,
+                       @"Setting iconScale to a source function should update icon-size.");
+        XCTAssertEqualObjects(layer.iconScale, functionStyleValue,
+                              @"iconScale should round-trip source functions.");
+
+        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeExponential compositeStops:@{@10: @{@18: constantStyleValue}} attributeName:@"keyName" options:nil];
+        layer.iconScale = functionStyleValue;
+
+        std::map<float, float> innerStops { {18, 0xff} };
+        mbgl::style::CompositeExponentialStops<float> compositeStops { { {10.0, innerStops} }, 1.0 };
+
+        propertyValue = mbgl::style::CompositeFunction<float> { "keyName", compositeStops };
+
+        XCTAssertEqual(rawLayer->getIconSize(), propertyValue,
+                       @"Setting iconScale to a composite function should update icon-size.");
+        XCTAssertEqualObjects(layer.iconScale, functionStyleValue,
+                              @"iconScale should round-trip composite functions.");                                                                                                          
                               
 
         layer.iconScale = nil;
@@ -429,11 +452,6 @@
                       @"Unsetting iconScale should return icon-size to the default value.");
         XCTAssertEqualObjects(layer.iconScale, defaultStyleValue,
                               @"iconScale should return the default value after being unset.");
-
-        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeIdentity sourceStops:nil attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.iconScale = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
-        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.iconScale = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
     }
 
     // icon-text-fit
@@ -952,7 +970,7 @@
 
         MGLStyleValue<NSNumber *> *constantStyleValue = [MGLStyleValue<NSNumber *> valueWithRawValue:@0xff];
         layer.textFontSize = constantStyleValue;
-        mbgl::style::PropertyValue<float> propertyValue = { 0xff };
+        mbgl::style::DataDrivenPropertyValue<float> propertyValue = { 0xff };
         XCTAssertEqual(rawLayer->getTextSize(), propertyValue,
                        @"Setting textFontSize to a constant value should update text-size.");
         XCTAssertEqualObjects(layer.textFontSize, constantStyleValue,
@@ -969,6 +987,29 @@
         XCTAssertEqualObjects(layer.textFontSize, functionStyleValue,
                               @"textFontSize should round-trip camera functions.");
 
+        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeExponential sourceStops:@{@18: constantStyleValue} attributeName:@"keyName" options:nil];
+        layer.textFontSize = functionStyleValue;
+
+        mbgl::style::ExponentialStops<float> exponentialStops = { {{18, 0xff}}, 1.0 };
+        propertyValue = mbgl::style::SourceFunction<float> { "keyName", exponentialStops };
+
+        XCTAssertEqual(rawLayer->getTextSize(), propertyValue,
+                       @"Setting textFontSize to a source function should update text-size.");
+        XCTAssertEqualObjects(layer.textFontSize, functionStyleValue,
+                              @"textFontSize should round-trip source functions.");
+
+        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeExponential compositeStops:@{@10: @{@18: constantStyleValue}} attributeName:@"keyName" options:nil];
+        layer.textFontSize = functionStyleValue;
+
+        std::map<float, float> innerStops { {18, 0xff} };
+        mbgl::style::CompositeExponentialStops<float> compositeStops { { {10.0, innerStops} }, 1.0 };
+
+        propertyValue = mbgl::style::CompositeFunction<float> { "keyName", compositeStops };
+
+        XCTAssertEqual(rawLayer->getTextSize(), propertyValue,
+                       @"Setting textFontSize to a composite function should update text-size.");
+        XCTAssertEqualObjects(layer.textFontSize, functionStyleValue,
+                              @"textFontSize should round-trip composite functions.");                                                                                                          
                               
 
         layer.textFontSize = nil;
@@ -976,11 +1017,6 @@
                       @"Unsetting textFontSize should return text-size to the default value.");
         XCTAssertEqualObjects(layer.textFontSize, defaultStyleValue,
                               @"textFontSize should return the default value after being unset.");
-
-        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeIdentity sourceStops:nil attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.textFontSize = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
-        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.textFontSize = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
     }
 
     // text-ignore-placement

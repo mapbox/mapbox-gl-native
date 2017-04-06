@@ -31,7 +31,7 @@ TEST(Buckets, SymbolBucket) {
     bool sdfIcons = false;
     bool iconsNeedLinear = false;
 
-    SymbolBucket bucket { layout, {}, 0, sdfIcons, iconsNeedLinear };
+    SymbolBucket bucket { layout, {}, 16.0f, 1.0f, 0, sdfIcons, iconsNeedLinear };
     ASSERT_FALSE(bucket.hasIconData());
     ASSERT_FALSE(bucket.hasTextData());
     ASSERT_FALSE(bucket.hasCollisionBoxData());

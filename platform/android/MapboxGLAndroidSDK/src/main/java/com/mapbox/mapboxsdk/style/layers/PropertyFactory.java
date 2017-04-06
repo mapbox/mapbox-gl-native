@@ -1526,11 +1526,11 @@ public class PropertyFactory {
   /**
    * Scale factor for icon. 1 is original size, 3 triples the size.
    *
-   * @param <Z> the zoom parameter type
-   * @param function a wrapper {@link CameraFunction} for Float
+   * @param <T> the function input type
+   * @param function a wrapper function for Float
    * @return property wrapper around a Float function
    */
-  public static <Z extends Number> PropertyValue<CameraFunction<Z, Float>> iconSize(CameraFunction<Z, Float> function) {
+  public static <T> PropertyValue<Function<T, Float>> iconSize(Function<T, Float> function) {
     return new LayoutPropertyValue<>("icon-size", function);
   }
 
@@ -1802,11 +1802,11 @@ public class PropertyFactory {
   /**
    * Font size.
    *
-   * @param <Z> the zoom parameter type
-   * @param function a wrapper {@link CameraFunction} for Float
+   * @param <T> the function input type
+   * @param function a wrapper function for Float
    * @return property wrapper around a Float function
    */
-  public static <Z extends Number> PropertyValue<CameraFunction<Z, Float>> textSize(CameraFunction<Z, Float> function) {
+  public static <T> PropertyValue<Function<T, Float>> textSize(Function<T, Float> function) {
     return new LayoutPropertyValue<>("text-size", function);
   }
 

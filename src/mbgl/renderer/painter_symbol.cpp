@@ -33,6 +33,7 @@ void Painter::renderSymbol(PaintParameters& parameters,
     auto draw = [&] (auto& program,
                      auto&& uniformValues,
                      const auto& buffers,
+                     const auto& symbolSizeBinder,
                      const SymbolPropertyValues& values_,
                      const auto& binders,
                      const auto& paintProperties)
@@ -52,6 +53,8 @@ void Painter::renderSymbol(PaintParameters& parameters,
             colorModeForRenderPass(),
             std::move(uniformValues),
             *buffers.vertexBuffer,
+            *symbolSizeBinder,
+            values_.layoutSize,
             *buffers.indexBuffer,
             buffers.segments,
             binders,
@@ -65,7 +68,9 @@ void Painter::renderSymbol(PaintParameters& parameters,
         auto paintPropertyValues = layer.impl->iconPaintProperties();
 
         SpriteAtlas& atlas = *layer.impl->spriteAtlas;
-        const bool iconScaled = values.paintSize != 1.0f || frame.pixelRatio != atlas.getPixelRatio() || bucket.iconsNeedLinear;
+        const bool iconScaled = layout.get<IconSize>().constantOr(1.0) != 1.0 ||
+            frame.pixelRatio != atlas.getPixelRatio() ||
+            bucket.iconsNeedLinear;
         const bool iconTransformed = values.rotationAlignment == AlignmentType::Map || state.getPitch() != 0;
         atlas.bind(bucket.sdfIcons || state.isChanging() || iconScaled || iconTransformed, context, 0);
 
@@ -74,8 +79,9 @@ void Painter::renderSymbol(PaintParameters& parameters,
         if (bucket.sdfIcons) {
             if (values.hasHalo) {
                 draw(parameters.programs.symbolIconSDF,
-                     SymbolSDFIconProgram::uniformValues(values, texsize, pixelsToGLUnits, tile, state, SymbolSDFPart::Halo),
+                     SymbolSDFIconProgram::uniformValues(false, values, texsize, pixelsToGLUnits, tile, state, SymbolSDFPart::Halo),
                      bucket.icon,
+                     bucket.iconSizeBinder,
                      values,
                      bucket.paintPropertyBinders.at(layer.getID()).first,
                      paintPropertyValues);
@@ -83,16 +89,18 @@ void Painter::renderSymbol(PaintParameters& parameters,
 
             if (values.hasFill) {
                 draw(parameters.programs.symbolIconSDF,
-                     SymbolSDFIconProgram::uniformValues(values, texsize, pixelsToGLUnits, tile, state, SymbolSDFPart::Fill),
+                     SymbolSDFIconProgram::uniformValues(false, values, texsize, pixelsToGLUnits, tile, state, SymbolSDFPart::Fill),
                      bucket.icon,
+                     bucket.iconSizeBinder,
                      values,
                      bucket.paintPropertyBinders.at(layer.getID()).first,
                      paintPropertyValues);
             }
         } else {
             draw(parameters.programs.symbolIcon,
-                 SymbolIconProgram::uniformValues(values, texsize, pixelsToGLUnits, tile, state),
+                 SymbolIconProgram::uniformValues(false, values, texsize, pixelsToGLUnits, tile, state),
                  bucket.icon,
+                 bucket.iconSizeBinder,
                  values,
                  bucket.paintPropertyBinders.at(layer.getID()).first,
                  paintPropertyValues);
@@ -109,8 +117,9 @@ void Painter::renderSymbol(PaintParameters& parameters,
 
         if (values.hasHalo) {
             draw(parameters.programs.symbolGlyph,
-                 SymbolSDFTextProgram::uniformValues(values, texsize, pixelsToGLUnits, tile, state, SymbolSDFPart::Halo),
+                 SymbolSDFTextProgram::uniformValues(true, values, texsize, pixelsToGLUnits, tile, state, SymbolSDFPart::Halo),
                  bucket.text,
+                 bucket.textSizeBinder,
                  values,
                  bucket.paintPropertyBinders.at(layer.getID()).second,
                  paintPropertyValues);
@@ -118,8 +127,9 @@ void Painter::renderSymbol(PaintParameters& parameters,
 
         if (values.hasFill) {
             draw(parameters.programs.symbolGlyph,
-                 SymbolSDFTextProgram::uniformValues(values, texsize, pixelsToGLUnits, tile, state, SymbolSDFPart::Fill),
+                 SymbolSDFTextProgram::uniformValues(true, values, texsize, pixelsToGLUnits, tile, state, SymbolSDFPart::Fill),
                  bucket.text,
+                 bucket.textSizeBinder,
                  values,
                  bucket.paintPropertyBinders.at(layer.getID()).second,
                  paintPropertyValues);

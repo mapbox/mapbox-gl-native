@@ -161,15 +161,15 @@ void SymbolLayer::setIconRotationAlignment(PropertyValue<AlignmentType> value) {
     impl->layout.unevaluated.get<IconRotationAlignment>() = value;
     impl->observer->onLayerLayoutPropertyChanged(*this, "icon-rotation-alignment");
 }
-PropertyValue<float> SymbolLayer::getDefaultIconSize() {
+DataDrivenPropertyValue<float> SymbolLayer::getDefaultIconSize() {
     return IconSize::defaultValue();
 }
 
-PropertyValue<float> SymbolLayer::getIconSize() const {
+DataDrivenPropertyValue<float> SymbolLayer::getIconSize() const {
     return impl->layout.unevaluated.get<IconSize>();
 }
 
-void SymbolLayer::setIconSize(PropertyValue<float> value) {
+void SymbolLayer::setIconSize(DataDrivenPropertyValue<float> value) {
     if (value == getIconSize())
         return;
     impl->layout.unevaluated.get<IconSize>() = value;
@@ -329,15 +329,15 @@ void SymbolLayer::setTextFont(PropertyValue<std::vector<std::string>> value) {
     impl->layout.unevaluated.get<TextFont>() = value;
     impl->observer->onLayerLayoutPropertyChanged(*this, "text-font");
 }
-PropertyValue<float> SymbolLayer::getDefaultTextSize() {
+DataDrivenPropertyValue<float> SymbolLayer::getDefaultTextSize() {
     return TextSize::defaultValue();
 }
 
-PropertyValue<float> SymbolLayer::getTextSize() const {
+DataDrivenPropertyValue<float> SymbolLayer::getTextSize() const {
     return impl->layout.unevaluated.get<TextSize>();
 }
 
-void SymbolLayer::setTextSize(PropertyValue<float> value) {
+void SymbolLayer::setTextSize(DataDrivenPropertyValue<float> value) {
     if (value == getTextSize())
         return;
     impl->layout.unevaluated.get<TextSize>() = value;

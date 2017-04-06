@@ -28,7 +28,7 @@ public:
             return s.evaluate(Value(double(zoom))).value_or(T());
         });
     }
-
+    
     friend bool operator==(const CameraFunction& lhs,
                            const CameraFunction& rhs) {
         return lhs.stops == rhs.stops;

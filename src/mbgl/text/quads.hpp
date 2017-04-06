@@ -55,6 +55,7 @@ SymbolQuad getIconQuad(const Anchor& anchor,
                        const PositionedIcon& shapedIcon,
                        const GeometryCoordinates& line,
                        const style::SymbolLayoutProperties::Evaluated&,
+                       const float layoutTextSize,
                        style::SymbolPlacementType placement,
                        const Shaping& shapedText);
 

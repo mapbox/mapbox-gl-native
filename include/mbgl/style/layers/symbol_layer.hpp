@@ -59,9 +59,9 @@ public:
     PropertyValue<AlignmentType> getIconRotationAlignment() const;
     void setIconRotationAlignment(PropertyValue<AlignmentType>);
 
-    static PropertyValue<float> getDefaultIconSize();
-    PropertyValue<float> getIconSize() const;
-    void setIconSize(PropertyValue<float>);
+    static DataDrivenPropertyValue<float> getDefaultIconSize();
+    DataDrivenPropertyValue<float> getIconSize() const;
+    void setIconSize(DataDrivenPropertyValue<float>);
 
     static PropertyValue<IconTextFitType> getDefaultIconTextFit();
     PropertyValue<IconTextFitType> getIconTextFit() const;
@@ -107,9 +107,9 @@ public:
     PropertyValue<std::vector<std::string>> getTextFont() const;
     void setTextFont(PropertyValue<std::vector<std::string>>);
 
-    static PropertyValue<float> getDefaultTextSize();
-    PropertyValue<float> getTextSize() const;
-    void setTextSize(PropertyValue<float>);
+    static DataDrivenPropertyValue<float> getDefaultTextSize();
+    DataDrivenPropertyValue<float> getTextSize() const;
+    void setTextSize(DataDrivenPropertyValue<float>);
 
     static PropertyValue<float> getDefaultTextMaxWidth();
     PropertyValue<float> getTextMaxWidth() const;

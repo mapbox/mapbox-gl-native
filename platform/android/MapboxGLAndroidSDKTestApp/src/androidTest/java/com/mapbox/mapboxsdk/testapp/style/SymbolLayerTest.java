@@ -383,6 +383,114 @@ public class SymbolLayerTest extends BaseStyleTest {
 
 
   @Test
+  public void testIconSizeAsIdentitySourceFunction() {
+    checkViewIsDisplayed(R.id.mapView);
+    Timber.i("icon-size");
+    assertNotNull(layer);
+
+    // Set
+    layer.setProperties(
+      iconSize(property("FeaturePropertyA", Stops.<Float>identity()))
+    );
+
+    // Verify
+    assertNotNull(layer.getIconSize());
+    assertNotNull(layer.getIconSize().getFunction());
+    assertEquals(SourceFunction.class, layer.getIconSize().getFunction().getClass());
+    assertEquals("FeaturePropertyA", ((SourceFunction) layer.getIconSize().getFunction()).getProperty());
+    assertEquals(IdentityStops.class, layer.getIconSize().getFunction().getStops().getClass());
+  }
+
+  @Test
+  public void testIconSizeAsExponentialSourceFunction() {
+    checkViewIsDisplayed(R.id.mapView);
+    Timber.i("icon-size");
+    assertNotNull(layer);
+
+    // Set
+    layer.setProperties(
+      iconSize(
+        property(
+          "FeaturePropertyA",
+          exponential(
+            stop(0.3f, iconSize(0.3f))
+          ).withBase(0.5f)
+        )
+      )
+    );
+
+    // Verify
+    assertNotNull(layer.getIconSize());
+    assertNotNull(layer.getIconSize().getFunction());
+    assertEquals(SourceFunction.class, layer.getIconSize().getFunction().getClass());
+    assertEquals("FeaturePropertyA", ((SourceFunction) layer.getIconSize().getFunction()).getProperty());
+    assertEquals(ExponentialStops.class, layer.getIconSize().getFunction().getStops().getClass());
+  }
+
+  @Test
+  public void testIconSizeAsCategoricalSourceFunction() {
+    checkViewIsDisplayed(R.id.mapView);
+    Timber.i("icon-size");
+    assertNotNull(layer);
+
+    // Set
+    layer.setProperties(
+      iconSize(
+        property(
+          "FeaturePropertyA",
+          categorical(
+            stop(1.0f, iconSize(0.3f))
+          )
+        ).withDefaultValue(iconSize(0.3f))
+      )
+    );
+
+    // Verify
+    assertNotNull(layer.getIconSize());
+    assertNotNull(layer.getIconSize().getFunction());
+    assertEquals(SourceFunction.class, layer.getIconSize().getFunction().getClass());
+    assertEquals("FeaturePropertyA", ((SourceFunction) layer.getIconSize().getFunction()).getProperty());
+    assertEquals(CategoricalStops.class, layer.getIconSize().getFunction().getStops().getClass());
+    assertNotNull(((SourceFunction) layer.getIconSize().getFunction()).getDefaultValue());
+    assertNotNull(((SourceFunction) layer.getIconSize().getFunction()).getDefaultValue().getValue());
+    assertEquals(0.3f, ((SourceFunction) layer.getIconSize().getFunction()).getDefaultValue().getValue());
+  }
+
+  @Test
+  public void testIconSizeAsCompositeFunction() {
+    checkViewIsDisplayed(R.id.mapView);
+    Timber.i("icon-size");
+    assertNotNull(layer);
+
+    // Set
+    layer.setProperties(
+      iconSize(
+        composite(
+          "FeaturePropertyA",
+          exponential(
+            stop(0, 0.3f, iconSize(0.9f))
+          ).withBase(0.5f)
+        ).withDefaultValue(iconSize(0.3f))
+      )
+    );
+
+    // Verify
+    assertNotNull(layer.getIconSize());
+    assertNotNull(layer.getIconSize().getFunction());
+    assertEquals(CompositeFunction.class, layer.getIconSize().getFunction().getClass());
+    assertEquals("FeaturePropertyA", ((CompositeFunction) layer.getIconSize().getFunction()).getProperty());
+    assertEquals(ExponentialStops.class, layer.getIconSize().getFunction().getStops().getClass());
+    assertEquals(1, ((ExponentialStops) layer.getIconSize().getFunction().getStops()).size());
+
+    ExponentialStops<Stop.CompositeValue<Float, Float>, Float> stops =
+      (ExponentialStops<Stop.CompositeValue<Float, Float>, Float>) layer.getIconSize().getFunction().getStops();
+    Stop<Stop.CompositeValue<Float, Float>, Float> stop = stops.iterator().next();
+    assertEquals(0f, stop.in.zoom, 0.001);
+    assertEquals(0.3f, stop.in.value, 0.001f);
+    assertEquals(0.9f, stop.out, 0.001f);
+  }
+
+  @Test
   public void testIconTextFitAsConstant() {
     checkViewIsDisplayed(R.id.mapView);
     Timber.i("icon-text-fit");
@@ -1073,6 +1181,114 @@ public class SymbolLayerTest extends BaseStyleTest {
     assertEquals(1, ((ExponentialStops) layer.getTextSize().getFunction().getStops()).size());
   }
 
+
+  @Test
+  public void testTextSizeAsIdentitySourceFunction() {
+    checkViewIsDisplayed(R.id.mapView);
+    Timber.i("text-size");
+    assertNotNull(layer);
+
+    // Set
+    layer.setProperties(
+      textSize(property("FeaturePropertyA", Stops.<Float>identity()))
+    );
+
+    // Verify
+    assertNotNull(layer.getTextSize());
+    assertNotNull(layer.getTextSize().getFunction());
+    assertEquals(SourceFunction.class, layer.getTextSize().getFunction().getClass());
+    assertEquals("FeaturePropertyA", ((SourceFunction) layer.getTextSize().getFunction()).getProperty());
+    assertEquals(IdentityStops.class, layer.getTextSize().getFunction().getStops().getClass());
+  }
+
+  @Test
+  public void testTextSizeAsExponentialSourceFunction() {
+    checkViewIsDisplayed(R.id.mapView);
+    Timber.i("text-size");
+    assertNotNull(layer);
+
+    // Set
+    layer.setProperties(
+      textSize(
+        property(
+          "FeaturePropertyA",
+          exponential(
+            stop(0.3f, textSize(0.3f))
+          ).withBase(0.5f)
+        )
+      )
+    );
+
+    // Verify
+    assertNotNull(layer.getTextSize());
+    assertNotNull(layer.getTextSize().getFunction());
+    assertEquals(SourceFunction.class, layer.getTextSize().getFunction().getClass());
+    assertEquals("FeaturePropertyA", ((SourceFunction) layer.getTextSize().getFunction()).getProperty());
+    assertEquals(ExponentialStops.class, layer.getTextSize().getFunction().getStops().getClass());
+  }
+
+  @Test
+  public void testTextSizeAsCategoricalSourceFunction() {
+    checkViewIsDisplayed(R.id.mapView);
+    Timber.i("text-size");
+    assertNotNull(layer);
+
+    // Set
+    layer.setProperties(
+      textSize(
+        property(
+          "FeaturePropertyA",
+          categorical(
+            stop(1.0f, textSize(0.3f))
+          )
+        ).withDefaultValue(textSize(0.3f))
+      )
+    );
+
+    // Verify
+    assertNotNull(layer.getTextSize());
+    assertNotNull(layer.getTextSize().getFunction());
+    assertEquals(SourceFunction.class, layer.getTextSize().getFunction().getClass());
+    assertEquals("FeaturePropertyA", ((SourceFunction) layer.getTextSize().getFunction()).getProperty());
+    assertEquals(CategoricalStops.class, layer.getTextSize().getFunction().getStops().getClass());
+    assertNotNull(((SourceFunction) layer.getTextSize().getFunction()).getDefaultValue());
+    assertNotNull(((SourceFunction) layer.getTextSize().getFunction()).getDefaultValue().getValue());
+    assertEquals(0.3f, ((SourceFunction) layer.getTextSize().getFunction()).getDefaultValue().getValue());
+  }
+
+  @Test
+  public void testTextSizeAsCompositeFunction() {
+    checkViewIsDisplayed(R.id.mapView);
+    Timber.i("text-size");
+    assertNotNull(layer);
+
+    // Set
+    layer.setProperties(
+      textSize(
+        composite(
+          "FeaturePropertyA",
+          exponential(
+            stop(0, 0.3f, textSize(0.9f))
+          ).withBase(0.5f)
+        ).withDefaultValue(textSize(0.3f))
+      )
+    );
+
+    // Verify
+    assertNotNull(layer.getTextSize());
+    assertNotNull(layer.getTextSize().getFunction());
+    assertEquals(CompositeFunction.class, layer.getTextSize().getFunction().getClass());
+    assertEquals("FeaturePropertyA", ((CompositeFunction) layer.getTextSize().getFunction()).getProperty());
+    assertEquals(ExponentialStops.class, layer.getTextSize().getFunction().getStops().getClass());
+    assertEquals(1, ((ExponentialStops) layer.getTextSize().getFunction().getStops()).size());
+
+    ExponentialStops<Stop.CompositeValue<Float, Float>, Float> stops =
+      (ExponentialStops<Stop.CompositeValue<Float, Float>, Float>) layer.getTextSize().getFunction().getStops();
+    Stop<Stop.CompositeValue<Float, Float>, Float> stop = stops.iterator().next();
+    assertEquals(0f, stop.in.zoom, 0.001);
+    assertEquals(0.3f, stop.in.value, 0.001f);
+    assertEquals(0.9f, stop.out, 0.001f);
+  }
 
   @Test
   public void testTextMaxWidthAsConstant() {

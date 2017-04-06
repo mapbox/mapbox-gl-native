@@ -13,10 +13,6 @@ void SymbolLayer::Impl::cascade(const CascadeParameters& parameters) {
 bool SymbolLayer::Impl::evaluate(const PropertyEvaluationParameters& parameters) {
     paint.evaluate(parameters);
 
-    // text-size and icon-size are layout properties but they also need to be evaluated as paint properties:
-    iconSize = layout.evaluate<IconSize>(parameters);
-    textSize = layout.evaluate<TextSize>(parameters);
-    
     auto hasIconOpacity = paint.evaluated.get<IconColor>().constantOr(Color::black()).a > 0 ||
         paint.evaluated.get<IconHaloColor>().constantOr(Color::black()).a > 0;
     auto hasTextOpacity = paint.evaluated.get<TextColor>().constantOr(Color::black()).a > 0 ||
