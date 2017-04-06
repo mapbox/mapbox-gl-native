@@ -196,30 +196,21 @@ void GeometryTileWorker::coalesce() {
     self.invoke(&GeometryTileWorker::coalesced);
 }
 
+void GeometryTileWorker::onGlyphsAvailable(GlyphPositionMap newGlyphPositions) {
+    for (auto& newFontGlyphs : newGlyphPositions) {
+        const FontStack& fontStack = newFontGlyphs.first;
+        GlyphPositions& newPositions = newFontGlyphs.second;
 
-void GeometryTileWorker::onGlyphsAvailable(GlyphPositionMap newGlyphPositions, GlyphRangeSet loadedRanges) {
-    GlyphDependencies loadedGlyphs;
-    for (auto& pendingFontGlyphs : pendingGlyphDependencies) {
-        auto newFontGlyphs = newGlyphPositions.find(pendingFontGlyphs.first);
-        for (auto glyphID : pendingFontGlyphs.second) {
-            if (newFontGlyphs != newGlyphPositions.end()) {
-                auto newFontGlyph = newFontGlyphs->second.find(glyphID);
-                if (newFontGlyph != newFontGlyphs->second.end()) {
-                    glyphPositions[pendingFontGlyphs.first].emplace(glyphID, newFontGlyph->second);
-                }
+        GlyphPositions& positions = glyphPositions[fontStack];
+        GlyphIDs& pendingGlyphIDs = pendingGlyphDependencies[fontStack];
+
+        for (auto& newPosition : newPositions) {
+            const GlyphID& glyphID = newPosition.first;
+            optional<Glyph>& glyph = newPosition.second;
+
+            if (pendingGlyphIDs.erase(glyphID)) {
+                positions.emplace(glyphID, std::move(glyph));
             }
-            if (loadedRanges.find(getGlyphRange(glyphID)) != loadedRanges.end()) {
-                // Erase the glyph from our pending font set as long as its range is loaded
-                // If the glyph itself is missing, that means we can't get a glyph for
-                // this fontstack, and we go ahead and render with missing glyphs
-                loadedGlyphs[pendingFontGlyphs.first].insert(glyphID);
-            }
-        }
-    }
-    
-    for (auto& loadedFont : loadedGlyphs) {
-        for (auto loadedGlyph : loadedFont.second) {
-            pendingGlyphDependencies[loadedFont.first].erase(loadedGlyph);
         }
     }
     symbolDependenciesChanged();

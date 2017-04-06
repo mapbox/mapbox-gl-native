@@ -31,7 +31,7 @@ class Context;
 
 class GlyphRequestor {
 public:
-    virtual void onGlyphsAvailable(GlyphPositionMap, GlyphRangeSet) = 0;
+    virtual void onGlyphsAvailable(GlyphPositionMap) = 0;
 };
     
 class GlyphAtlas : public util::noncopyable {

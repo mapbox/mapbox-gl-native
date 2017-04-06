@@ -35,7 +35,7 @@ public:
     void setData(std::unique_ptr<const GeometryTileData>, uint64_t correlationID);
     void setPlacementConfig(PlacementConfig, uint64_t correlationID);
     
-    void onGlyphsAvailable(GlyphPositionMap glyphs, GlyphRangeSet loadedRanges);
+    void onGlyphsAvailable(GlyphPositionMap glyphs);
     void onIconsAvailable(IconAtlasMap icons);
 
 private:

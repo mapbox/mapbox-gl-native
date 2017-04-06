@@ -12,11 +12,11 @@ using namespace mbgl;
 
 class StubGlyphRequestor : public GlyphRequestor {
 public:
-    void onGlyphsAvailable(GlyphPositionMap positions, GlyphRangeSet ranges) override {
-        if (glyphsAvailable) glyphsAvailable(std::move(positions), std::move(ranges));
+    void onGlyphsAvailable(GlyphPositionMap positions) override {
+        if (glyphsAvailable) glyphsAvailable(std::move(positions));
     }
 
-    std::function<void (GlyphPositionMap, GlyphRangeSet)> glyphsAvailable;
+    std::function<void (GlyphPositionMap)> glyphsAvailable;
 };
 
 class GlyphAtlasTest {
@@ -63,15 +63,14 @@ TEST(GlyphAtlas, LoadingSuccess) {
         ASSERT_EQ(range, GlyphRange(0, 255));
     };
 
-    test.requestor.glyphsAvailable = [&] (GlyphPositionMap positions, GlyphRangeSet ranges) {
+    test.requestor.glyphsAvailable = [&] (GlyphPositionMap positions) {
         const auto& testPositions = positions.at({{"Test Stack"}});
 
-        ASSERT_EQ(testPositions.size(), 2u);
+        ASSERT_EQ(testPositions.size(), 3u);
         ASSERT_EQ(testPositions.count(u'a'), 1u);
         ASSERT_EQ(testPositions.count(u'å'), 1u);
-
-        ASSERT_EQ(ranges.size(), 1u);
-        ASSERT_EQ((ranges.count({0, 255})), 1u);
+        ASSERT_EQ(testPositions.count(u' '), 1u);
+        ASSERT_TRUE(bool(testPositions.at(u' ')));
 
         test.end();
     };
@@ -79,7 +78,7 @@ TEST(GlyphAtlas, LoadingSuccess) {
     test.run(
         "test/fixtures/resources/glyphs.pbf",
         GlyphDependencies {
-            {{{"Test Stack"}}, {u'a', u'å'}}
+            {{{"Test Stack"}}, {u'a', u'å', u' '}}
         });
 }
 
@@ -104,7 +103,7 @@ TEST(GlyphAtlas, LoadingFail) {
         test.end();
     };
 
-    test.requestor.glyphsAvailable = [&] (GlyphPositionMap, GlyphRangeSet) {
+    test.requestor.glyphsAvailable = [&] (GlyphPositionMap) {
         FAIL();
         test.end();
     };
@@ -135,7 +134,7 @@ TEST(GlyphAtlas, LoadingCorrupted) {
         test.end();
     };
 
-    test.requestor.glyphsAvailable = [&] (GlyphPositionMap, GlyphRangeSet) {
+    test.requestor.glyphsAvailable = [&] (GlyphPositionMap) {
         FAIL();
         test.end();
     };
@@ -186,15 +185,12 @@ TEST(GlyphAtlas, LoadingInvalid) {
         ASSERT_EQ(range, GlyphRange(0, 255));
     };
 
-    test.requestor.glyphsAvailable = [&] (GlyphPositionMap positions, GlyphRangeSet ranges) {
+    test.requestor.glyphsAvailable = [&] (GlyphPositionMap positions) {
         const auto& testPositions = positions.at({{"Test Stack"}});
 
-        ASSERT_EQ(testPositions.size(), 1u);
-        ASSERT_EQ(testPositions.count(u'A'), 0u);
-        ASSERT_EQ(testPositions.count(u'E'), 1u);
-
-        ASSERT_EQ(ranges.size(), 1u);
-        ASSERT_EQ((ranges.count({0, 255})), 1u);
+        ASSERT_EQ(testPositions.size(), 2u);
+        ASSERT_FALSE(bool(testPositions.at(u'A')));
+        ASSERT_TRUE(bool(testPositions.at(u'E')));
 
         test.end();
     };

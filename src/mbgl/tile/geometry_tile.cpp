@@ -133,8 +133,8 @@ void GeometryTile::onError(std::exception_ptr err) {
     observer->onTileError(*this, err);
 }
     
-void GeometryTile::onGlyphsAvailable(GlyphPositionMap glyphPositions, GlyphRangeSet loadedRanges) {
-    worker.invoke(&GeometryTileWorker::onGlyphsAvailable, std::move(glyphPositions), std::move(loadedRanges));
+void GeometryTile::onGlyphsAvailable(GlyphPositionMap glyphPositions) {
+    worker.invoke(&GeometryTileWorker::onGlyphsAvailable, std::move(glyphPositions));
 }
 
 void GeometryTile::getGlyphs(GlyphDependencies glyphDependencies) {

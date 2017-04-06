@@ -137,7 +137,6 @@ void GlyphAtlas::setObserver(GlyphAtlasObserver* observer_) {
 
 void GlyphAtlas::addGlyphs(GlyphRequestor& requestor, const GlyphDependencies& glyphDependencies) {
     GlyphPositionMap glyphPositions;
-    GlyphRangeSet loadedRanges;
 
     for (const auto& dependency : glyphDependencies) {
         const FontStack& fontStack = dependency.first;
@@ -147,27 +146,23 @@ void GlyphAtlas::addGlyphs(GlyphRequestor& requestor, const GlyphDependencies& g
         Entry& entry = entries[fontStack];
 
         for (const auto& glyphID : glyphIDs) {
-            loadedRanges.insert(getGlyphRange(glyphID));
+            optional<Glyph>& glyph = positions[glyphID];
+
             auto it = entry.sdfs.find(glyphID);
             if (it == entry.sdfs.end())
                 continue;
 
             addGlyph(requestor, fontStack, it->second);
 
-            // It's possible to have an SDF without a valid position (if the SDF was malformed).
-            // We indicate this case with Rect<uint16_t>(0,0,0,0).
-            auto glyphRect = entry.glyphValues.find(glyphID);
-            const Rect<uint16_t> rect = glyphRect == entry.glyphValues.end()
-                ? Rect<uint16_t>(0,0,0,0)
-                : glyphRect->second.rect;
-
-            positions.emplace(std::piecewise_construct,
-                              std::forward_as_tuple(glyphID),
-                              std::forward_as_tuple(rect, it->second.metrics));
+            auto valueIt = entry.glyphValues.find(glyphID);
+            glyph = Glyph {
+                valueIt == entry.glyphValues.end() ? Rect<uint16_t>() : valueIt->second.rect,
+                it->second.metrics
+            };
         }
     }
 
-    requestor.onGlyphsAvailable(glyphPositions, loadedRanges);
+    requestor.onGlyphsAvailable(glyphPositions);
 }
 
 void GlyphAtlas::addGlyph(GlyphRequestor& requestor,
