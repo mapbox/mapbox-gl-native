@@ -484,21 +484,23 @@ RenderData Style::getRenderData(MapDebugOptions debugOptions, float angle) const
                 // Look back through the buckets we decided to render to find out whether there is
                 // already a bucket from this layer that is a parent of this tile. Tiles are ordered
                 // by zoom level when we obtain them from getTiles().
-                for (auto it = sortedTilesForInsertion.rbegin(); it != sortedTilesForInsertion.rend(); ++it) {
+                for (auto it = sortedTilesForInsertion.rbegin();
+                     it != sortedTilesForInsertion.rend(); ++it) {
                     if (tile.tile.id.isChildOf(it->get().tile.id)) {
                         skip = true;
                         break;
                     }
                 }
-                if (!skip) {
-                    sortedTilesForInsertion.emplace_back(tile);
-                    tile.used = true;
+                if (skip) {
+                    continue;
                 }
-            } else {
+            }
+
+            auto bucket = tile.tile.getBucket(*layer);
+            if (bucket) {
                 sortedTilesForInsertion.emplace_back(tile);
                 tile.used = true;
             }
-
         }
 
         result.order.emplace_back(*layer, std::move(sortedTilesForInsertion));
