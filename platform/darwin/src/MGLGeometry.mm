@@ -32,6 +32,15 @@ CGRect MGLExtendRect(CGRect rect, CGPoint point) {
     return rect;
 }
 
+mbgl::LatLng MGLLatLngFromLocationCoordinate2D(CLLocationCoordinate2D coordinate) {
+    try {
+        return mbgl::LatLng(coordinate.latitude, coordinate.longitude);
+    } catch (std::domain_error &error) {
+        [NSException raise:NSInvalidArgumentException format:@"%s", error.what()];
+        return {};
+    }
+}
+
 MGL_EXPORT
 CLLocationDistance MGLAltitudeForZoomLevel(double zoomLevel, CGFloat pitch, CLLocationDegrees latitude, CGSize size) {
     CLLocationDistance metersPerPixel = mbgl::Projection::getMetersPerPixelAtLatitude(latitude, zoomLevel);
