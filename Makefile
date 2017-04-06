@@ -309,7 +309,7 @@ test: $(LINUX_BUILD)
 benchmark: $(LINUX_BUILD)
 	$(NINJA) $(NINJA_ARGS) -j$(JOBS) -C $(LINUX_OUTPUT_PATH) mbgl-benchmark
 
-ifneq (,$(shell which gdb))
+ifneq (,$(shell command -v gdb))
   GDB = gdb -batch -return-child-result -ex 'set print thread-events off' -ex 'run' -ex 'thread apply all bt' --args
 endif
 
@@ -496,7 +496,7 @@ style-code: android-style-code
 
 # Configuration file for running CMake from Gradle within Android Studio.
 platform/android/configuration.gradle:
-	@echo "ext {\n    node = '`which node`'\n    npm = '`which npm`'\n    ccache = '`which ccache`'\n}" > $@
+	@echo "ext {\n    node = '`command -v node | command -v nodejs`'\n    npm = '`command -v npm`'\n    ccache = '`command -v ccache`'\n}" > $@
 
 define ANDROID_RULES
 # $1 = arm-v7 (short arch)
