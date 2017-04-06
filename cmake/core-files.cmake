@@ -399,8 +399,6 @@ set(MBGL_CORE_FILES
     src/mbgl/text/glyph_pbf.cpp
     src/mbgl/text/glyph_pbf.hpp
     src/mbgl/text/glyph_range.hpp
-    src/mbgl/text/glyph_set.cpp
-    src/mbgl/text/glyph_set.hpp
     src/mbgl/text/placement_config.hpp
     src/mbgl/text/quads.cpp
     src/mbgl/text/quads.hpp
