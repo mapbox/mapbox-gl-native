@@ -24,17 +24,21 @@ BOOL MGLEqualFloatWithAccuracy(CGFloat left, CGFloat right, CGFloat accuracy)
                               fromEyeCoordinate:(CLLocationCoordinate2D)eyeCoordinate
                                     eyeAltitude:(CLLocationDistance)eyeAltitude
 {
-    mbgl::LatLng centerLatLng = MGLLatLngFromLocationCoordinate2D(centerCoordinate);
-    mbgl::LatLng eyeLatLng = MGLLatLngFromLocationCoordinate2D(eyeCoordinate);
-
-    mbgl::ProjectedMeters centerMeters = mbgl::Projection::projectedMetersForLatLng(centerLatLng);
-    mbgl::ProjectedMeters eyeMeters = mbgl::Projection::projectedMetersForLatLng(eyeLatLng);
-    CLLocationDirection heading = std::atan((centerMeters.northing - eyeMeters.northing) /
-                                            (centerMeters.easting - eyeMeters.easting));
-
-    double groundDistance = std::hypot(centerMeters.northing - eyeMeters.northing,
-                                       centerMeters.easting - eyeMeters.easting);
-    CGFloat pitch = std::atan(eyeAltitude / groundDistance);
+    CLLocationDirection heading = -1;
+    CGFloat pitch = -1;
+    if (CLLocationCoordinate2DIsValid(centerCoordinate) && CLLocationCoordinate2DIsValid(eyeCoordinate)) {
+        mbgl::LatLng centerLatLng = MGLLatLngFromLocationCoordinate2D(centerCoordinate);
+        mbgl::LatLng eyeLatLng = MGLLatLngFromLocationCoordinate2D(eyeCoordinate);
+        
+        mbgl::ProjectedMeters centerMeters = mbgl::Projection::projectedMetersForLatLng(centerLatLng);
+        mbgl::ProjectedMeters eyeMeters = mbgl::Projection::projectedMetersForLatLng(eyeLatLng);
+        heading = std::atan((centerMeters.northing - eyeMeters.northing) /
+                            (centerMeters.easting - eyeMeters.easting));
+        
+        double groundDistance = std::hypot(centerMeters.northing - eyeMeters.northing,
+                                           centerMeters.easting - eyeMeters.easting);
+        pitch = std::atan(eyeAltitude / groundDistance);
+    }
 
     return [[self alloc] initWithCenterCoordinate:centerCoordinate
                                          altitude:eyeAltitude
