@@ -18,7 +18,6 @@
 namespace {
 
 GLFWView* view = nullptr;
-
 }
 
 void quit_handler(int) {
@@ -30,7 +29,7 @@ void quit_handler(int) {
     }
 }
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
     bool fullscreen = false;
     bool benchmark = false;
     std::string style;
@@ -38,24 +37,22 @@ int main(int argc, char *argv[]) {
     double bearing = 0, zoom = 1, pitch = 0;
     bool skipConfig = false;
 
-    const struct option long_options[] = {
-        {"fullscreen", no_argument, 0, 'f'},
-        {"benchmark", no_argument, 0, 'b'},
-        {"style", required_argument, 0, 's'},
-        {"lon", required_argument, 0, 'x'},
-        {"lat", required_argument, 0, 'y'},
-        {"zoom", required_argument, 0, 'z'},
-        {"bearing", required_argument, 0, 'r'},
-        {"pitch", required_argument, 0, 'p'},
-        {0, 0, 0, 0}
-    };
+    const struct option long_options[] = { { "fullscreen", no_argument, 0, 'f' },
+                                           { "benchmark", no_argument, 0, 'b' },
+                                           { "style", required_argument, 0, 's' },
+                                           { "lon", required_argument, 0, 'x' },
+                                           { "lat", required_argument, 0, 'y' },
+                                           { "zoom", required_argument, 0, 'z' },
+                                           { "bearing", required_argument, 0, 'r' },
+                                           { "pitch", required_argument, 0, 'p' },
+                                           { 0, 0, 0, 0 } };
 
     while (true) {
         int option_index = 0;
         int opt = getopt_long(argc, argv, "fbs:", long_options, &option_index);
-        if (opt == -1) break;
-        switch (opt)
-        {
+        if (opt == -1)
+            break;
+        switch (opt) {
         case 0:
             if (long_options[option_index].flag != 0)
                 break;
@@ -91,7 +88,6 @@ int main(int argc, char *argv[]) {
         default:
             break;
         }
-
     }
 
     // sigint handling
@@ -111,7 +107,7 @@ int main(int argc, char *argv[]) {
     mbgl::DefaultFileSource fileSource("/tmp/mbgl-cache.db", ".");
 
     // Set access token if present
-    const char *token = getenv("MAPBOX_ACCESS_TOKEN");
+    const char* token = getenv("MAPBOX_ACCESS_TOKEN");
     if (token == nullptr) {
         mbgl::Log::Warning(mbgl::Event::Setup, "no access token set. mapbox.com tiles won't work.");
     } else {
@@ -127,37 +123,35 @@ int main(int argc, char *argv[]) {
     // Load settings
     mbgl::Settings_JSON settings;
 
-//    if (skipConfig) {
-//        map.setLatLngZoom(mbgl::LatLng(latitude, longitude), zoom);
-//        map.setBearing(bearing);
-//        map.setPitch(pitch);
-//        mbgl::Log::Info(mbgl::Event::General, "Location: %f/%f (z%.2f, %.2f deg)", latitude, longitude, zoom, bearing);
-//    } else {
-//        map.setLatLngZoom(mbgl::LatLng(settings.latitude, settings.longitude), settings.zoom);
-//        map.setBearing(settings.bearing);
-//        map.setPitch(settings.pitch);
-//        map.setDebug(mbgl::MapDebugOptions(settings.debug));
-//    }
+    if (skipConfig) {
+        map.setLatLngZoom(mbgl::LatLng(latitude, longitude), zoom);
+        map.setBearing(bearing);
+        map.setPitch(pitch);
+        mbgl::Log::Info(mbgl::Event::General, "Location: %f/%f (z%.2f, %.2f deg)", latitude,
+                        longitude, zoom, bearing);
+    } else {
+        map.setLatLngZoom(mbgl::LatLng(settings.latitude, settings.longitude), settings.zoom);
+        map.setBearing(settings.bearing);
+        map.setPitch(settings.pitch);
+        map.setDebug(mbgl::MapDebugOptions(settings.debug));
+    }
 
-    map.setLatLngZoom(mbgl::LatLng(40.713, -73.999), 15.03);
-    map.setBearing(0.0);
-    map.setPitch(60.0);
-
-    view->setChangeStyleCallback([&map] () {
+    view->setChangeStyleCallback([&map]() {
         static uint8_t currentStyleIndex;
 
         if (++currentStyleIndex == mbgl::util::default_styles::numOrderedStyles) {
             currentStyleIndex = 0;
         }
 
-        mbgl::util::default_styles::DefaultStyle newStyle = mbgl::util::default_styles::orderedStyles[currentStyleIndex];
+        mbgl::util::default_styles::DefaultStyle newStyle =
+            mbgl::util::default_styles::orderedStyles[currentStyleIndex];
         map.setStyleURL(newStyle.url);
         view->setWindowTitle(newStyle.name);
 
         mbgl::Log::Info(mbgl::Event::Setup, "Changed style to: %s", newStyle.name);
     });
 
-    view->setPauseResumeCallback([&fileSource] () {
+    view->setPauseResumeCallback([&fileSource]() {
         static bool isPaused = false;
 
         if (isPaused) {
@@ -171,18 +165,16 @@ int main(int argc, char *argv[]) {
 
     // Load style
     if (style.empty()) {
-        style = "mapbox://styles/lbud/ciyoshhyf004r2rmqr8bd4g3h?fresh=true";
-        view->setWindowTitle("extrusions");
-//
-//        const char *url = getenv("MAPBOX_STYLE_URL");
-//        if (url == nullptr) {
-//            mbgl::util::default_styles::DefaultStyle newStyle = mbgl::util::default_styles::orderedStyles[0];
-//            style = newStyle.url;
-//            view->setWindowTitle(newStyle.name);
-//        } else {
-//            style = url;
-//            view->setWindowTitle(url);
-//        }
+        const char* url = getenv("MAPBOX_STYLE_URL");
+        if (url == nullptr) {
+            mbgl::util::default_styles::DefaultStyle newStyle =
+                mbgl::util::default_styles::orderedStyles[0];
+            style = newStyle.url;
+            view->setWindowTitle(newStyle.name);
+        } else {
+            style = url;
+            view->setWindowTitle(url);
+        }
     }
 
     map.setStyleURL(style);
