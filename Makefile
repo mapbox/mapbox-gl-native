@@ -58,25 +58,28 @@ ifeq ($(HOST_PLATFORM), macos)
 
 export PATH := $(shell pwd)/platform/macos:$(PATH)
 
-MACOS_OUTPUT_PATH = build/macos
-MACOS_PROJ_PATH = $(MACOS_OUTPUT_PATH)/mbgl.xcodeproj
-MACOS_WORK_PATH = platform/macos/macos.xcworkspace
-MACOS_USER_DATA_PATH = $(MACOS_WORK_PATH)/xcuserdata/$(USER).xcuserdatad
+MACOS_XCODEBUILD = xcodebuild -derivedDataPath $(MACOS_OUTPUT_PATH) -configuration $(BUILDTYPE)
 MACOS_COMPDB_PATH = $(MACOS_OUTPUT_PATH)/compdb/$(BUILDTYPE)
-
-MACOS_XCODEBUILD = xcodebuild \
-	  -derivedDataPath $(MACOS_OUTPUT_PATH) \
-	  -configuration $(BUILDTYPE) \
-	  -workspace $(MACOS_WORK_PATH)
-
+ifdef WITH_SWIFTSHADER
+    MACOS_OUTPUT_PATH = build/macos-swiftshader
+    WITH_SWIFTSHADER=ON
+    MACOS_XCODEBUILD += -project $(MACOS_PROJ_PATH)
+else
+    MACOS_OUTPUT_PATH = build/macos
+    MACOS_WORK_PATH = platform/macos/macos.xcworkspace
+    MACOS_XCODEBUILD += -workspace $(MACOS_WORK_PATH)
+    MACOS_USER_DATA_PATH = $(MACOS_WORK_PATH)/xcuserdata/$(USER).xcuserdatad
+    BUILD_DEPS += $(MACOS_USER_DATA_PATH)/WorkspaceSettings.xcsettings
+endif
+export MACOS_PROJ_PATH = $(MACOS_OUTPUT_PATH)/mbgl.xcodeproj
 
 MACOS_XCSCHEMES += platform/macos/scripts/executable.xcscheme
 MACOS_XCSCHEMES += platform/macos/scripts/library.xcscheme
 MACOS_XCSCHEMES += platform/macos/scripts/node.xcscheme
 
-$(MACOS_PROJ_PATH): $(BUILD_DEPS) $(MACOS_USER_DATA_PATH)/WorkspaceSettings.xcsettings $(MACOS_XCSCHEMES)
+$(MACOS_PROJ_PATH): $(BUILD_DEPS) $(MACOS_XCSCHEMES)
 	mkdir -p $(MACOS_OUTPUT_PATH)
-	(cd $(MACOS_OUTPUT_PATH) && cmake -G Xcode ../..)
+	(cd $(MACOS_OUTPUT_PATH) && cmake -G Xcode ../.. -DWITH_SWIFTSHADER=${WITH_SWIFTSHADER})
 
 	@# Create Xcode schemes so that we can use xcodebuild from the command line. CMake doesn't
 	@# create these automatically.
@@ -94,9 +97,11 @@ $(MACOS_PROJ_PATH): $(BUILD_DEPS) $(MACOS_USER_DATA_PATH)/WorkspaceSettings.xcse
 	SCHEME_NAME="node render tests" SCHEME_TYPE=node BUILDABLE_NAME=mbgl-node.node BLUEPRINT_NAME=mbgl-node NODE_ARGUMENT="platform/node/test/render.test.js" platform/macos/scripts/create_scheme.sh
 	SCHEME_NAME="node query tests" SCHEME_TYPE=node BUILDABLE_NAME=mbgl-node.node BLUEPRINT_NAME=mbgl-node NODE_ARGUMENT="platform/node/test/query.test.js" platform/macos/scripts/create_scheme.sh
 
+ifndef WITH_SWIFTSHADER
 $(MACOS_USER_DATA_PATH)/WorkspaceSettings.xcsettings: platform/macos/WorkspaceSettings.xcsettings
 	mkdir -p "$(MACOS_USER_DATA_PATH)"
 	cp platform/macos/WorkspaceSettings.xcsettings "$@"
+endif
 
 .PHONY: macos
 macos: $(MACOS_PROJ_PATH)
@@ -104,7 +109,11 @@ macos: $(MACOS_PROJ_PATH)
 
 .PHONY: xproj
 xproj: $(MACOS_PROJ_PATH)
+ifdef WITH_SWIFTSHADER
+	open $(MACOS_PROJ_PATH)
+else
 	open $(MACOS_WORK_PATH)
+endif
 
 .PHONY: test
 test: $(MACOS_PROJ_PATH)
@@ -296,6 +305,7 @@ $(LINUX_BUILD): $(BUILD_DEPS)
 		-DWITH_CXX11ABI=$(shell scripts/check-cxx11abi.sh) \
 		-DWITH_COVERAGE=${WITH_COVERAGE} \
 		-DWITH_OSMESA=${WITH_OSMESA} \
+		-DWITH_SWIFTSHADER=${WITH_SWIFTSHADER} \
 		-DWITH_EGL=${WITH_EGL})
 
 .PHONY: linux

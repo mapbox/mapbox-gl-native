@@ -2,8 +2,7 @@
 
 set -u
 
-XCODEPROJ=${XCODEPROJ:-build/macos/mbgl.xcodeproj}
-OUTPUT="${XCODEPROJ}/xcshareddata/xcschemes/${SCHEME_NAME}.xcscheme"
+OUTPUT="${MACOS_PROJ_PATH}/xcshareddata/xcschemes/${SCHEME_NAME}.xcscheme"
 
 # Required ENV vars:
 # - SCHEME_TYPE: type of the scheme
@@ -26,13 +25,13 @@ BLUEPRINT_ID=${BLUEPRINT_ID:-$(hexdump -n 12 -v -e '/1 "%02X"' /dev/urandom)}
 BUILDABLE_NAME=${BUILDABLE_NAME:-${SCHEME_NAME}}
 BLUEPRINT_NAME=${BLUEPRINT_NAME:-${SCHEME_NAME}}
 
-mkdir -p "${XCODEPROJ}/xcshareddata/xcschemes"
+mkdir -p "${MACOS_PROJ_PATH}/xcshareddata/xcschemes"
 
 sed "\
 s#{{BLUEPRINT_ID}}#${BLUEPRINT_ID}#;\
 s#{{BLUEPRINT_NAME}}#${BLUEPRINT_NAME}#;\
 s#{{BUILDABLE_NAME}}#${BUILDABLE_NAME}#;\
-s#{{CONTAINER}}#${XCODEPROJ}#;\
+s#{{CONTAINER}}#${MACOS_PROJ_PATH}#;\
 s#{{MAPBOX_ACCESS_TOKEN}}#${MAPBOX_ACCESS_TOKEN}#;\
 s#{{WORKING_DIRECTORY}}#$(pwd)#;\
 s#{{NODE_PATH}}#$(dirname `which node`)#;\

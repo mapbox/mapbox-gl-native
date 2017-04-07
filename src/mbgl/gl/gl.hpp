@@ -3,7 +3,11 @@
 #include <stdexcept>
 #include <limits>
 
-#if __APPLE__
+#if MBGL_USE_GLES2 && (!__APPLE__ || MBGL_WITH_EGL)
+    #define GL_GLEXT_PROTOTYPES
+    #include <GLES2/gl2.h>
+    #include <GLES2/gl2ext.h>
+#elif __APPLE__
     #include "TargetConditionals.h"
     #if TARGET_OS_IPHONE
         #include <OpenGLES/ES2/gl.h>
@@ -18,10 +22,6 @@
     #else
         #error Unsupported Apple platform
     #endif
-#elif __ANDROID__ || MBGL_USE_GLES2
-    #define GL_GLEXT_PROTOTYPES
-    #include <GLES2/gl2.h>
-    #include <GLES2/gl2ext.h>
 #elif __QT__ && QT_VERSION >= 0x050000
     #define GL_GLEXT_PROTOTYPES
     #include <QtGui/qopengl.h>

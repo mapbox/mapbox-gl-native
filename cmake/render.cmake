@@ -19,4 +19,8 @@ target_add_mason_package(mbgl-render PRIVATE boost_libprogram_options)
 
 mbgl_platform_render()
 
+if(WITH_SWIFTSHADER)
+    mbgl_platform_set_swiftshader_rpath(mbgl-render)
+endif()
+
 create_source_groups(mbgl-render)

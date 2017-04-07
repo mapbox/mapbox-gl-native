@@ -59,7 +59,7 @@ ${fragmentPrelude}
     'symbol_sdf'
 ].forEach(function (shaderName) {
     function applyPragmas(source, pragmas) {
-        return source.replace(/#pragma mapbox: ([\w]+) ([\w]+) ([\w]+) ([\w]+)/g, (match, operation, precision, type, name) => {
+        return source.replace(/#pragma mapbox: ([\w_]+) ([\w]+) ([\w]+) ([\w]+)/g, (match, operation, precision, type, name) => {
             const a_type = type === "float" ? "vec2" : "vec4";
             return pragmas[operation]
                 .join("\n")
@@ -78,8 +78,15 @@ ${fragmentPrelude}
                     "attribute {precision} {a_type} a_{name};",
                     "varying {precision} {type} {name};"
                 ],
+                define_in: [
+                    "uniform lowp float a_{name}_t;",
+                    "attribute {precision} {a_type} a_{name};",
+                ],
                 initialize: [
                     "{name} = unpack_mix_{a_type}(a_{name}, a_{name}_t);"
+                ],
+                initialize_in: [
+                    "{precision} {type} {name} = unpack_mix_{a_type}(a_{name}, a_{name}_t);"
                 ]
             });
     }

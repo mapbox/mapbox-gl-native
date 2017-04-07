@@ -37,4 +37,8 @@ target_add_mason_package(mbgl-test PRIVATE geojsonvt)
 
 mbgl_platform_test()
 
+if(WITH_SWIFTSHADER)
+    mbgl_platform_set_swiftshader_rpath(mbgl-test)
+endif()
+
 create_source_groups(mbgl-test)

@@ -27,4 +27,8 @@ target_add_mason_package(mbgl-glfw PRIVATE glfw)
 
 mbgl_platform_glfw()
 
+if(WITH_SWIFTSHADER)
+    mbgl_platform_set_swiftshader_rpath(mbgl-glfw)
+endif()
+
 create_source_groups(mbgl-glfw)

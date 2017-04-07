@@ -5,13 +5,18 @@ set(CMAKE_CXX_STANDARD 14)
 include(cmake/mbgl.cmake)
 include(cmake/mason.cmake)
 
-option(WITH_CXX11ABI "Use cxx11abi mason packages" OFF)
-option(WITH_COVERAGE "Enable coverage reports" OFF)
-option(WITH_OSMESA   "Use OSMesa headless backend" OFF)
-option(WITH_EGL      "Use EGL backend" OFF)
+option(WITH_CXX11ABI    "Use cxx11abi mason packages" OFF)
+option(WITH_COVERAGE    "Enable coverage reports" OFF)
+option(WITH_OSMESA      "Use OSMesa headless backend" OFF)
+option(WITH_SWIFTSHADER "Use Swiftshader (implies WITH_EGL)" OFF)
+option(WITH_EGL         "Use EGL backend" OFF)
 
 if(WITH_CXX11ABI)
     set(MASON_CXXABI_SUFFIX -cxx11abi)
+endif()
+
+if(WITH_SWIFTSHADER)
+    set(WITH_EGL ON)
 endif()
 
 if(WITH_OSMESA AND WITH_EGL)
@@ -19,7 +24,7 @@ if(WITH_OSMESA AND WITH_EGL)
 endif()
 
 if(WITH_EGL)
-    add_definitions(-DMBGL_USE_GLES2=1)
+    set(USE_GLES2 ON)
 endif()
 
 if($ENV{CI})
@@ -81,6 +86,14 @@ endif()
 include(cmake/loop-uv.cmake)
 
 include(platform/${MBGL_PLATFORM}/config.cmake)
+
+if(WITH_EGL)
+    add_definitions(-DMBGL_WITH_EGL=1)
+endif()
+
+if(USE_GLES2)
+    add_definitions(-DMBGL_USE_GLES2=1)
+endif()
 
 include(cmake/core-files.cmake)
 include(cmake/core.cmake)

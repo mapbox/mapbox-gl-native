@@ -44,12 +44,17 @@ target_link_libraries(mbgl-node
 
 target_add_mason_package(mbgl-node PRIVATE geojson)
 
-add_custom_command(
-    TARGET mbgl-node
-    POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:mbgl-node> ${CMAKE_SOURCE_DIR}/lib/mapbox_gl_native.node
+set_target_properties(mbgl-node PROPERTIES
+    OUTPUT_NAME "mapbox_gl_native"
+    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/lib"
+    LIBRARY_OUTPUT_DIRECTORY_DEBUG "${CMAKE_SOURCE_DIR}/lib"
+    LIBRARY_OUTPUT_DIRECTORY_RELEASE "${CMAKE_SOURCE_DIR}/lib"
 )
 
 mbgl_platform_node()
+
+if(WITH_SWIFTSHADER)
+    mbgl_platform_set_swiftshader_rpath(mbgl-node)
+endif()
 
 create_source_groups(mbgl-node)

@@ -1,4 +1,4 @@
-add_definitions(-DMBGL_USE_GLES2=1)
+set(USE_GLES2 ON)
 
 include(cmake/test-files.cmake)
 
@@ -295,8 +295,8 @@ macro(mbgl_platform_test)
         platform/default/mbgl/gl/offscreen_view.cpp
         platform/default/mbgl/gl/offscreen_view.hpp
 
-        platform/linux/src/headless_backend_egl.cpp
-        platform/linux/src/headless_display_egl.cpp
+        platform/default/headless_backend_egl.cpp
+        platform/default/headless_display_egl.cpp
     )
 
     target_compile_options(mbgl-test

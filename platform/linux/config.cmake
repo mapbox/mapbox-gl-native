@@ -1,4 +1,4 @@
-mason_use(glfw VERSION 2017-02-09-77a8f10)
+mason_use(glfw VERSION 2017-04-07-f40d085)
 mason_use(mesa VERSION 13.0.4)
 mason_use(boost_libprogram_options VERSION 1.62.0${MASON_CXXABI_SUFFIX})
 mason_use(sqlite VERSION 3.14.2)
@@ -10,15 +10,17 @@ mason_use(webp VERSION 0.5.1)
 mason_use(gtest VERSION 1.8.0${MASON_CXXABI_SUFFIX})
 mason_use(benchmark VERSION 1.0.0-1)
 mason_use(icu VERSION 58.1-min-size)
+if(WITH_SWIFTSHADER)
+    mason_use(swiftshader VERSION 2017-04-08)
+endif()
 
 # Link with libuv. This is not part of loop-uv.cmake because loop-uv.cmake is also
 # used by node.cmake, where we want to link with the libuv provided by node itself.
 target_add_mason_package(mbgl-loop-uv PUBLIC libuv)
 
 macro(mbgl_platform_core)
-    target_add_mason_package(mbgl-core PUBLIC mesa)
-
     if(WITH_OSMESA)
+        target_add_mason_package(mbgl-core PUBLIC mesa)
         target_sources(mbgl-core
             PRIVATE platform/default/headless_backend_osmesa.cpp
             PRIVATE platform/default/mbgl/gl/headless_display.cpp
@@ -28,15 +30,21 @@ macro(mbgl_platform_core)
         )
     elseif(WITH_EGL)
         target_sources(mbgl-core
-            PRIVATE platform/linux/src/headless_backend_egl.cpp
-            PRIVATE platform/linux/src/headless_display_egl.cpp
+            PRIVATE platform/default/headless_backend_egl.cpp
+            PRIVATE platform/default/headless_display_egl.cpp
         )
-        target_link_libraries(mbgl-core
-            PUBLIC -lGLESv2
-            PUBLIC -lEGL
-            PUBLIC -lgbm
-        )
+        if(WITH_SWIFTSHADER)
+            target_add_mason_package(mbgl-core PRIVATE swiftshader)
+        else()
+            target_add_mason_package(mbgl-core PUBLIC mesa)
+            target_link_libraries(mbgl-core
+                PUBLIC -lGLESv2
+                PUBLIC -lEGL
+                PUBLIC -lgbm
+            )
+        endif()
     else()
+        target_add_mason_package(mbgl-core PUBLIC mesa)
         target_sources(mbgl-core
             PRIVATE platform/linux/src/headless_backend_glx.cpp
             PRIVATE platform/linux/src/headless_display_glx.cpp
@@ -172,4 +180,30 @@ endmacro()
 
 macro(mbgl_platform_node)
     # Enabling node module by defining this macro
+endmacro()
+
+
+macro(mbgl_platform_set_swiftshader_rpath TARGET)
+    # Add the GLES headers to the include path when building with SwiftShader.
+    target_include_directories(${TARGET}
+        PRIVATE "${MASON_PACKAGE_swiftshader_INCLUDE_DIRS}"
+    )
+
+    # Change the embedded rpath so that it looks in the folder where the executable is.
+    # CMake adds an absolute rpath by default and only removes it during the install phase.
+    # Instead, we're forcing it to use the actual "install" rpath. That means we also have to
+    # make sure that libEGL.so and libGLESv2.so actually exist in the binary location, hence the
+    # copy command below.
+    set_target_properties(${TARGET} PROPERTIES
+        BUILD_WITH_INSTALL_RPATH TRUE
+        INSTALL_RPATH "\$ORIGIN/"
+    )
+
+    # Copy libEGL.so and libGLESv2.so over to the executable's folder, because this is
+    # where ld.so will be looking for, given that we've set the rpath above.
+    add_custom_command(
+        TARGET ${TARGET}
+        POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy ${MASON_PACKAGE_swiftshader_PREFIX}/lib/*.so $<TARGET_FILE_DIR:${TARGET}>
+    )
 endmacro()

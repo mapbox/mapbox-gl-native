@@ -24,4 +24,8 @@ target_add_mason_package(mbgl-offline PRIVATE boost_libprogram_options)
 
 mbgl_platform_offline()
 
+if(WITH_SWIFTSHADER)
+    mbgl_platform_set_swiftshader_rpath(mbgl-offline)
+endif()
+
 create_source_groups(mbgl-offline)

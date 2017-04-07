@@ -22,4 +22,8 @@ target_add_mason_package(mbgl-benchmark PRIVATE rapidjson)
 
 mbgl_platform_benchmark()
 
+if(WITH_SWIFTSHADER)
+    mbgl_platform_set_swiftshader_rpath(mbgl-benchmark)
+endif()
+
 create_source_groups(mbgl-benchmark)
