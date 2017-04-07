@@ -635,13 +635,16 @@ void NodeMap::AddImage(const Nan::FunctionCallbackInfo<v8::Value>& info) {
 
     uint32_t pixelRatio = Nan::Get(optionObject, Nan::New("pixelRatio").ToLocalChecked()).ToLocalChecked()->Uint32Value();
     auto imageBuffer = Nan::To<v8::Object>(info[1]).ToLocalChecked()->ToObject();
+    
+    char * imageDataBuffer = node::Buffer::Data(imageBuffer);
+    size_t imageLength = node::Buffer::Length(imageBuffer);
 
-    if (node::Buffer::Length(imageBuffer) != imageHeight * imageWidth * 4) {
+    if (imageLength != imageHeight * imageWidth * 4) {
         return Nan::ThrowTypeError("Image size does not match buffer size");
     }
 
-    std::unique_ptr<uint8_t[]> data = std::make_unique<uint8_t[]>(node::Buffer::Length(imageBuffer));
-    std::copy(node::Buffer::Data(imageBuffer), node::Buffer::Data(imageBuffer) + node::Buffer::Length(imageBuffer), data.get());
+    std::unique_ptr<uint8_t[]> data = std::make_unique<uint8_t[]>(imageLength);
+    std::copy(imageDataBuffer, imageDataBuffer + imageLength, data.get());
     mbgl::PremultipliedImage cPremultipliedImage({ imageWidth, imageHeight}, std::move(data));
 
     nodeMap->map->addImage(*Nan::Utf8String(info[0]), std::make_unique<mbgl::SpriteImage>(std::move(cPremultipliedImage), pixelRatio));
