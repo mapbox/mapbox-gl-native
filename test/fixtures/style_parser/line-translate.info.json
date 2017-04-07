@@ -1,7 +1,7 @@
 {
     "default": {
         "log": [
-            [1, "WARNING", "ParseStyle", "value must be an array of two numbers"]
+            [1, "WARNING", "ParseStyle", "value must be an array of 2 numbers"]
         ]
     }
 }
