@@ -25,7 +25,7 @@ namespace util {
 // Needed when using a zlib compiled with -DZ_PREFIX
 // because it will mess with this function name and
 // cause a link error.
-#undef z_compress
+#undef compress
 
 std::string compress(const std::string &raw) {
     z_stream deflate_stream;
