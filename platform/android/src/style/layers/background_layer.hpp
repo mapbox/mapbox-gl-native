@@ -40,6 +40,7 @@ public:
     jni::Object<jni::ObjectTag> getBackgroundOpacity(jni::JNIEnv&);
     void setBackgroundOpacityTransition(jni::JNIEnv&, jlong duration, jlong delay);
     jni::Object<TransitionOptions> getBackgroundOpacityTransition(jni::JNIEnv&);
+
     jni::jobject* createJavaPeer(jni::JNIEnv&);
 
 }; // class BackgroundLayer

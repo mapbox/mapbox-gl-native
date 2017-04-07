@@ -64,6 +64,7 @@ public:
     jni::Object<jni::ObjectTag> getCircleStrokeOpacity(jni::JNIEnv&);
     void setCircleStrokeOpacityTransition(jni::JNIEnv&, jlong duration, jlong delay);
     jni::Object<TransitionOptions> getCircleStrokeOpacityTransition(jni::JNIEnv&);
+
     jni::jobject* createJavaPeer(jni::JNIEnv&);
 
 }; // class CircleLayer

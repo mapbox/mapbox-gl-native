@@ -148,6 +148,7 @@ public:
     jni::Object<TransitionOptions> getTextTranslateTransition(jni::JNIEnv&);
 
     jni::Object<jni::ObjectTag> getTextTranslateAnchor(jni::JNIEnv&);
+
     jni::jobject* createJavaPeer(jni::JNIEnv&);
 
 }; // class SymbolLayer

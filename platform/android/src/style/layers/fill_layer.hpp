@@ -52,6 +52,7 @@ public:
     jni::Object<jni::ObjectTag> getFillPattern(jni::JNIEnv&);
     void setFillPatternTransition(jni::JNIEnv&, jlong duration, jlong delay);
     jni::Object<TransitionOptions> getFillPatternTransition(jni::JNIEnv&);
+
     jni::jobject* createJavaPeer(jni::JNIEnv&);
 
 }; // class FillLayer
