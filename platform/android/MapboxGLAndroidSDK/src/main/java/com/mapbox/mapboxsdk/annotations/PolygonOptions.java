@@ -30,6 +30,9 @@ public final class PolygonOptions implements Parcelable {
     ArrayList<LatLng> pointsList = new ArrayList<>();
     in.readList(pointsList, LatLng.class.getClassLoader());
     addAll(pointsList);
+    ArrayList<Hole> holes = new ArrayList<>();
+    in.readTypedList(holes, Hole.CREATOR);
+    addAllHoles(holes);
     alpha(in.readFloat());
     fillColor(in.readInt());
     strokeColor(in.readInt());
@@ -56,6 +59,7 @@ public final class PolygonOptions implements Parcelable {
   @Override
   public void writeToParcel(Parcel out, int flags) {
     out.writeList(getPoints());
+    out.writeTypedList(getHoles());
     out.writeFloat(getAlpha());
     out.writeInt(getFillColor());
     out.writeInt(getStrokeColor());
@@ -104,6 +108,43 @@ public final class PolygonOptions implements Parcelable {
   public PolygonOptions addAll(Iterable<LatLng> points) {
     for (LatLng point : points) {
       add(point);
+    }
+    return this;
+  }
+
+  /**
+   * Adds a hole to the outline of the polygon being built.
+   *
+   * @param hole {@link Hole} list made up of {@link LatLng} points defining the hole
+   * @return This {@link PolygonOptions} object with the given hole added to the outline.
+   */
+  public PolygonOptions addHole(Hole hole) {
+    polygon.addHole(hole);
+    return this;
+  }
+
+  /**
+   * Adds holes to the outline of the polygon being built.
+   *
+   * @param holes {@link Hole} holes to be added to polygon geometry.
+   * @return This {@link PolygonOptions} object with the given holes added to the outline.
+   */
+  public PolygonOptions addHole(Hole... holes) {
+    for (Hole hole : holes) {
+      addHole(hole);
+    }
+    return this;
+  }
+
+  /**
+   * Adds holes to the outline of the polygon being built.
+   *
+   * @param holes {@link Iterable} list made up of {@link Hole} holes defining the hole geometry
+   * @return This {@link PolygonOptions} object with the given holes added to the outline.
+   */
+  public PolygonOptions addAllHoles(Iterable<Hole> holes) {
+    for (Hole hole : holes) {
+      addHole(hole);
     }
     return this;
   }
@@ -177,18 +218,33 @@ public final class PolygonOptions implements Parcelable {
     return polygon.getStrokeColor();
   }
 
+  /**
+   * Gets the points set for this {@link PolygonOptions} object.
+   *
+   * @return The list made up of {@link LatLng} points defining the polygon.
+   */
   public List<LatLng> getPoints() {
     // the getter gives us a copy, which is the safe thing to do...
     return polygon.getPoints();
   }
 
   /**
+   * Gets the holes set for this {@link PolygonOptions} object.
+   *
+   * @return The list made up of {@link List} of {@link LatLng} points defining the holes.
+   */
+  public List<Hole> getHoles() {
+    return polygon.getHoles();
+  }
+
+
+  /**
    * Compares this {@link PolygonOptions} object with another {@link PolygonOptions} and
    * determines if their color, alpha, stroke color, and vertices match.
    *
    * @param o Another {@link PolygonOptions} to compare with this object.
-   * @return True if color, alpha, stroke color, and vertices match this {@link PolygonOptions}
-   * object. Else, false.
+   * @return True if color, alpha, stroke color, vertices and holes match this {@link PolygonOptions}
+   * {@link PolygonOptions} object. Else, false.
    */
   @Override
   public boolean equals(Object o) {
@@ -210,7 +266,10 @@ public final class PolygonOptions implements Parcelable {
     if (getStrokeColor() != polygon.getStrokeColor()) {
       return false;
     }
-    return !(getPoints() != null ? !getPoints().equals(polygon.getPoints()) : polygon.getPoints() != null);
+    if (getPoints() != null ? !getPoints().equals(polygon.getPoints()) : polygon.getPoints() != null) {
+      return false;
+    }
+    return !(getHoles() != null ? !getHoles().equals(polygon.getHoles()) : polygon.getHoles() != null);
   }
 
   /**
@@ -228,6 +287,7 @@ public final class PolygonOptions implements Parcelable {
     result = 31 * result + getFillColor();
     result = 31 * result + getStrokeColor();
     result = 31 * result + (getPoints() != null ? getPoints().hashCode() : 0);
+    result = 31 * result + (getHoles() != null ? getHoles().hashCode() : 0);
     return result;
   }
 }

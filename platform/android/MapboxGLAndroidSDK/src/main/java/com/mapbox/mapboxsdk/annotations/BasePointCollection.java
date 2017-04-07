@@ -11,13 +11,11 @@ import java.util.List;
 public abstract class BasePointCollection extends Annotation {
 
   private List<LatLng> points;
-  private List<LatLng> holePoints;
   private float alpha = 1.0f;
 
   protected BasePointCollection() {
     super();
     points = new ArrayList<>();
-    holePoints = new ArrayList<>();
   }
 
   /**
@@ -47,36 +45,6 @@ public abstract class BasePointCollection extends Annotation {
    */
   public void addPoint(LatLng point) {
     points.add(point);
-    update();
-  }
-
-  /**
-   * Returns a copy of the hole points.
-   *
-   * @return A {@link List} of points.
-   */
-  public List<LatLng> getHolePoints() {
-    return new ArrayList<>(holePoints);
-  }
-
-  /**
-   * Sets the points of this polyline hole. This method will take a copy of the points, so further
-   * mutations to points will have no effect on this polyline hole.
-   *
-   * @param holePoints A {@link List} of {@link LatLng} points making up the polyline hole.
-   */
-  public void setHolePoints(List<LatLng> holePoints) {
-    this.holePoints = new ArrayList<>(holePoints);
-    update();
-  }
-
-  /**
-   * Add a point to the polyline hole.
-   *
-   * @param holePoint A {@link LatLng} point to be added.
-   */
-  public void addHolePoint(LatLng holePoint) {
-    holePoints.add(holePoint);
     update();
   }
 
