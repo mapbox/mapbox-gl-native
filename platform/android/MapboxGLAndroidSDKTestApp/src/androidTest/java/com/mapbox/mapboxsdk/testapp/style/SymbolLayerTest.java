@@ -675,6 +675,7 @@ public class SymbolLayerTest extends BaseActivityTest {
     assertEquals(IntervalStops.class, layer.getIconImage().getFunction().getStops().getClass());
   }
 
+
   @Test
   public void testIconRotateAsConstant() {
     validateTestSetup();
@@ -1721,6 +1722,7 @@ public class SymbolLayerTest extends BaseActivityTest {
     assertEquals(0.3f, stop.in.value, 0.001f);
     assertEquals(0.9f, stop.out, 0.001f);
   }
+
 
   @Test
   public void testTextPaddingAsConstant() {

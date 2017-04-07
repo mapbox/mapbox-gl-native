@@ -446,6 +446,27 @@ public final class Property {
   @Retention(RetentionPolicy.SOURCE)
   public @interface CIRCLE_PITCH_SCALE {}
 
+  // FILL_EXTRUSION_TRANSLATE_ANCHOR: Controls the translation reference point.
+
+  /**
+   * The fill extrusion is translated relative to the map.
+   */
+  public static final String FILL_EXTRUSION_TRANSLATE_ANCHOR_MAP = "map";
+  /**
+   * The fill extrusion is translated relative to the viewport.
+   */
+  public static final String FILL_EXTRUSION_TRANSLATE_ANCHOR_VIEWPORT = "viewport";
+
+  /**
+   * Controls the translation reference point.
+   */
+  @StringDef({
+      FILL_EXTRUSION_TRANSLATE_ANCHOR_MAP,
+      FILL_EXTRUSION_TRANSLATE_ANCHOR_VIEWPORT,
+    })
+  @Retention(RetentionPolicy.SOURCE)
+  public @interface FILL_EXTRUSION_TRANSLATE_ANCHOR {}
+
 
   private Property() {
   }

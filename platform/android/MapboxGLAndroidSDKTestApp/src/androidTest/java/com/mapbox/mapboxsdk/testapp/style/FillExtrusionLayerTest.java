@@ -36,6 +36,8 @@ import static org.junit.Assert.*;
 import static com.mapbox.mapboxsdk.style.layers.Property.*;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.*;
 
+import com.mapbox.mapboxsdk.style.layers.TransitionOptions;
+
 /**
  * Basic smoke tests for FillExtrusionLayer
  */
@@ -82,6 +84,18 @@ public class FillExtrusionLayerTest extends BaseStyleTest {
   }
 
   @Test
+  public void testFillExtrusionOpacityTransition() {
+    checkViewIsDisplayed(R.id.mapView);
+    Timber.i("fill-extrusion-opacityTransitionOptions");
+    assertNotNull(layer);
+
+    // Set and Get
+    TransitionOptions options = new TransitionOptions(300, 100);
+    layer.setFillExtrusionOpacityTransition(options);
+    assertEquals(layer.getFillExtrusionOpacityTransition(), options);
+  }
+
+  @Test
   public void testFillExtrusionOpacityAsConstant() {
     checkViewIsDisplayed(R.id.mapView);
     Timber.i("fill-extrusion-opacity");
@@ -116,6 +130,18 @@ public class FillExtrusionLayerTest extends BaseStyleTest {
     assertEquals(ExponentialStops.class, layer.getFillExtrusionOpacity().getFunction().getStops().getClass());
     assertEquals(0.5f, ((ExponentialStops) layer.getFillExtrusionOpacity().getFunction().getStops()).getBase(), 0.001);
     assertEquals(1, ((ExponentialStops) layer.getFillExtrusionOpacity().getFunction().getStops()).size());
+  }
+
+  @Test
+  public void testFillExtrusionColorTransition() {
+    checkViewIsDisplayed(R.id.mapView);
+    Timber.i("fill-extrusion-colorTransitionOptions");
+    assertNotNull(layer);
+
+    // Set and Get
+    TransitionOptions options = new TransitionOptions(300, 100);
+    layer.setFillExtrusionColorTransition(options);
+    assertEquals(layer.getFillExtrusionColorTransition(), options);
   }
 
   @Test
@@ -214,7 +240,7 @@ public class FillExtrusionLayerTest extends BaseStyleTest {
           categorical(
             stop("valueA", fillExtrusionColor(Color.RED))
           )
-        )
+        ).withDefaultValue(fillExtrusionColor(Color.GREEN))
       )
     );
 
@@ -224,6 +250,9 @@ public class FillExtrusionLayerTest extends BaseStyleTest {
     assertEquals(SourceFunction.class, layer.getFillExtrusionColor().getFunction().getClass());
     assertEquals("FeaturePropertyA", ((SourceFunction) layer.getFillExtrusionColor().getFunction()).getProperty());
     assertEquals(CategoricalStops.class, layer.getFillExtrusionColor().getFunction().getStops().getClass());
+    assertNotNull(((SourceFunction) layer.getFillExtrusionColor().getFunction()).getDefaultValue());
+    assertNotNull(((SourceFunction) layer.getFillExtrusionColor().getFunction()).getDefaultValue().getValue());
+    assertEquals(Color.GREEN, (int) ((SourceFunction) layer.getFillExtrusionColor().getFunction()).getDefaultValue().getColorInt());
   }
 
   @Test
@@ -235,6 +264,18 @@ public class FillExtrusionLayerTest extends BaseStyleTest {
     // Set and Get
     layer.setProperties(fillExtrusionColor(Color.RED));
     assertEquals(layer.getFillExtrusionColorAsInt(), Color.RED);
+  }
+
+  @Test
+  public void testFillExtrusionTranslateTransition() {
+    checkViewIsDisplayed(R.id.mapView);
+    Timber.i("fill-extrusion-translateTransitionOptions");
+    assertNotNull(layer);
+
+    // Set and Get
+    TransitionOptions options = new TransitionOptions(300, 100);
+    layer.setFillExtrusionTranslateTransition(options);
+    assertEquals(layer.getFillExtrusionTranslateTransition(), options);
   }
 
   @Test
@@ -274,6 +315,7 @@ public class FillExtrusionLayerTest extends BaseStyleTest {
     assertEquals(1, ((ExponentialStops) layer.getFillExtrusionTranslate().getFunction().getStops()).size());
   }
 
+
   @Test
   public void testFillExtrusionTranslateAnchorAsConstant() {
     checkViewIsDisplayed(R.id.mapView);
@@ -311,6 +353,18 @@ public class FillExtrusionLayerTest extends BaseStyleTest {
   }
 
   @Test
+  public void testFillExtrusionPatternTransition() {
+    checkViewIsDisplayed(R.id.mapView);
+    Timber.i("fill-extrusion-patternTransitionOptions");
+    assertNotNull(layer);
+
+    // Set and Get
+    TransitionOptions options = new TransitionOptions(300, 100);
+    layer.setFillExtrusionPatternTransition(options);
+    assertEquals(layer.getFillExtrusionPatternTransition(), options);
+  }
+
+  @Test
   public void testFillExtrusionPatternAsConstant() {
     checkViewIsDisplayed(R.id.mapView);
     Timber.i("fill-extrusion-pattern");
@@ -344,6 +398,18 @@ public class FillExtrusionLayerTest extends BaseStyleTest {
     assertEquals(CameraFunction.class, layer.getFillExtrusionPattern().getFunction().getClass());
     assertEquals(IntervalStops.class, layer.getFillExtrusionPattern().getFunction().getStops().getClass());
     assertEquals(1, ((IntervalStops) layer.getFillExtrusionPattern().getFunction().getStops()).size());
+  }
+
+  @Test
+  public void testFillExtrusionHeightTransition() {
+    checkViewIsDisplayed(R.id.mapView);
+    Timber.i("fill-extrusion-heightTransitionOptions");
+    assertNotNull(layer);
+
+    // Set and Get
+    TransitionOptions options = new TransitionOptions(300, 100);
+    layer.setFillExtrusionHeightTransition(options);
+    assertEquals(layer.getFillExtrusionHeightTransition(), options);
   }
 
   @Test
@@ -442,7 +508,7 @@ public class FillExtrusionLayerTest extends BaseStyleTest {
           categorical(
             stop(1.0f, fillExtrusionHeight(0.3f))
           )
-        ).withDefaultValue(0.3f)
+        ).withDefaultValue(fillExtrusionHeight(0.3f))
       )
     );
 
@@ -452,7 +518,9 @@ public class FillExtrusionLayerTest extends BaseStyleTest {
     assertEquals(SourceFunction.class, layer.getFillExtrusionHeight().getFunction().getClass());
     assertEquals("FeaturePropertyA", ((SourceFunction) layer.getFillExtrusionHeight().getFunction()).getProperty());
     assertEquals(CategoricalStops.class, layer.getFillExtrusionHeight().getFunction().getStops().getClass());
-    assertEquals(0.3f, ((SourceFunction) layer.getFillExtrusionHeight().getFunction()).getDefaultValue());
+    assertNotNull(((SourceFunction) layer.getFillExtrusionHeight().getFunction()).getDefaultValue());
+    assertNotNull(((SourceFunction) layer.getFillExtrusionHeight().getFunction()).getDefaultValue().getValue());
+    assertEquals(0.3f, ((SourceFunction) layer.getFillExtrusionHeight().getFunction()).getDefaultValue().getValue());
   }
 
   @Test
@@ -469,7 +537,7 @@ public class FillExtrusionLayerTest extends BaseStyleTest {
           exponential(
             stop(0, 0.3f, fillExtrusionHeight(0.9f))
           ).withBase(0.5f)
-        ).withDefaultValue(0.3f)
+        ).withDefaultValue(fillExtrusionHeight(0.3f))
       )
     );
 
@@ -487,6 +555,18 @@ public class FillExtrusionLayerTest extends BaseStyleTest {
     assertEquals(0f, stop.in.zoom, 0.001);
     assertEquals(0.3f, stop.in.value, 0.001f);
     assertEquals(0.9f, stop.out, 0.001f);
+  }
+
+  @Test
+  public void testFillExtrusionBaseTransition() {
+    checkViewIsDisplayed(R.id.mapView);
+    Timber.i("fill-extrusion-baseTransitionOptions");
+    assertNotNull(layer);
+
+    // Set and Get
+    TransitionOptions options = new TransitionOptions(300, 100);
+    layer.setFillExtrusionBaseTransition(options);
+    assertEquals(layer.getFillExtrusionBaseTransition(), options);
   }
 
   @Test
@@ -585,7 +665,7 @@ public class FillExtrusionLayerTest extends BaseStyleTest {
           categorical(
             stop(1.0f, fillExtrusionBase(0.3f))
           )
-        ).withDefaultValue(0.3f)
+        ).withDefaultValue(fillExtrusionBase(0.3f))
       )
     );
 
@@ -595,7 +675,9 @@ public class FillExtrusionLayerTest extends BaseStyleTest {
     assertEquals(SourceFunction.class, layer.getFillExtrusionBase().getFunction().getClass());
     assertEquals("FeaturePropertyA", ((SourceFunction) layer.getFillExtrusionBase().getFunction()).getProperty());
     assertEquals(CategoricalStops.class, layer.getFillExtrusionBase().getFunction().getStops().getClass());
-    assertEquals(0.3f, ((SourceFunction) layer.getFillExtrusionBase().getFunction()).getDefaultValue());
+    assertNotNull(((SourceFunction) layer.getFillExtrusionBase().getFunction()).getDefaultValue());
+    assertNotNull(((SourceFunction) layer.getFillExtrusionBase().getFunction()).getDefaultValue().getValue());
+    assertEquals(0.3f, ((SourceFunction) layer.getFillExtrusionBase().getFunction()).getDefaultValue().getValue());
   }
 
   @Test
@@ -612,7 +694,7 @@ public class FillExtrusionLayerTest extends BaseStyleTest {
           exponential(
             stop(0, 0.3f, fillExtrusionBase(0.9f))
           ).withBase(0.5f)
-        ).withDefaultValue(0.3f)
+        ).withDefaultValue(fillExtrusionBase(0.3f))
       )
     );
 
