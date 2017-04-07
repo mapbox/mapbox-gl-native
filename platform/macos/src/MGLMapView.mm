@@ -1796,10 +1796,12 @@ public:
 
         for (auto const& annotationTag: annotationTags)
         {
-            if (!_annotationContextsByAnnotationTag.count(annotationTag))
+            if (!_annotationContextsByAnnotationTag.count(annotationTag) ||
+                annotationTag == MGLAnnotationTagNotFound)
             {
                 continue;
             }
+
             MGLAnnotationContext annotationContext = _annotationContextsByAnnotationTag.at(annotationTag);
             NSAssert(annotationContext.annotation, @"Missing annotation for tag %u.", annotationTag);
             if (annotationContext.annotation)
@@ -1816,7 +1818,8 @@ public:
 
 /// Returns the annotation assigned the given tag. Cheap.
 - (id <MGLAnnotation>)annotationWithTag:(MGLAnnotationTag)tag {
-    if (!_annotationContextsByAnnotationTag.count(tag)) {
+    if ( ! _annotationContextsByAnnotationTag.count(tag) ||
+        tag == MGLAnnotationTagNotFound) {
         return nil;
     }
 
@@ -2147,9 +2150,11 @@ public:
 }
 
 - (id <MGLAnnotation>)selectedAnnotation {
-    if (!_annotationContextsByAnnotationTag.count(_selectedAnnotationTag)) {
+    if ( ! _annotationContextsByAnnotationTag.count(_selectedAnnotationTag) ||
+        _selectedAnnotationTag == MGLAnnotationTagNotFound) {
         return nil;
     }
+    
     MGLAnnotationContext &annotationContext = _annotationContextsByAnnotationTag.at(_selectedAnnotationTag);
     return annotationContext.annotation;
 }
