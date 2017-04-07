@@ -46,6 +46,7 @@ public:
     void initializeExtensions(const std::function<gl::ProcAddress(const char*)>&);
 
     void enableDebugging();
+    void logGLDiagnostics();
 
     UniqueShader createShader(ShaderType type, const std::string& source);
     UniqueProgram createProgram(ShaderID vertexShader, ShaderID fragmentShader);
