@@ -1452,7 +1452,9 @@ public:
         }
         else
         {
-            nextElement = _annotationContextsByAnnotationTag.at(_selectedAnnotationTag).accessibilityElement;
+            if (_selectedAnnotationTag != MGLAnnotationTagNotFound) {
+                nextElement = _annotationContextsByAnnotationTag.at(_selectedAnnotationTag).accessibilityElement;
+            }
         }
         [self deselectAnnotation:self.selectedAnnotation animated:YES];
         UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, nextElement);
@@ -2002,19 +2004,21 @@ public:
         {
             const mbgl::Point<double> point = MGLPointFromLocationCoordinate2D(annotation.coordinate);
 
-            MGLAnnotationContext &annotationContext = _annotationContextsByAnnotationTag.at(annotationTag);
-            if (annotationContext.annotationView)
-            {
-                // Redundantly move the associated annotation view outside the scope of the animation-less transaction block in -updateAnnotationViews.
-                annotationContext.annotationView.center = [self convertCoordinate:annotationContext.annotation.coordinate toPointToView:self];
+            if (annotationTag != MGLAnnotationTagNotFound) {
+                MGLAnnotationContext &annotationContext = _annotationContextsByAnnotationTag.at(annotationTag);
+                if (annotationContext.annotationView)
+                {
+                    // Redundantly move the associated annotation view outside the scope of the animation-less transaction block in -updateAnnotationViews.
+                    annotationContext.annotationView.center = [self convertCoordinate:annotationContext.annotation.coordinate toPointToView:self];
+                }
+
+                MGLAnnotationImage *annotationImage = [self imageOfAnnotationWithTag:annotationTag];
+                NSString *symbolName = annotationImage.styleIconIdentifier;
+
+                // Update the annotation’s backing geometry to match the annotation model object. Any associated annotation view is also moved by side effect. However, -updateAnnotationViews disables the view’s animation actions, because it can’t distinguish between moves due to the viewport changing and moves due to the annotation’s coordinate changing.
+                _mbglMap->updateAnnotation(annotationTag, mbgl::SymbolAnnotation { point, symbolName.UTF8String });
+                [self updateCalloutView];
             }
-
-            MGLAnnotationImage *annotationImage = [self imageOfAnnotationWithTag:annotationTag];
-            NSString *symbolName = annotationImage.styleIconIdentifier;
-
-            // Update the annotation’s backing geometry to match the annotation model object. Any associated annotation view is also moved by side effect. However, -updateAnnotationViews disables the view’s animation actions, because it can’t distinguish between moves due to the viewport changing and moves due to the annotation’s coordinate changing.
-            _mbglMap->updateAnnotation(annotationTag, mbgl::SymbolAnnotation { point, symbolName.UTF8String });
-            [self updateCalloutView];
         }
     }
     else if ([keyPath isEqualToString:@"coordinates"] && [object isKindOfClass:[MGLMultiPoint class]])
@@ -3055,17 +3059,18 @@ public:
 
         for (auto const& annotationTag: annotationTags)
         {
-            if (!_annotationContextsByAnnotationTag.count(annotationTag))
+            if (!_annotationContextsByAnnotationTag.count(annotationTag) ||
+                annotationTag == MGLAnnotationTagNotFound)
             {
                 continue;
             }
+
             MGLAnnotationContext annotationContext = _annotationContextsByAnnotationTag.at(annotationTag);
             NSAssert(annotationContext.annotation, @"Missing annotation for tag %u.", annotationTag);
             if (annotationContext.annotation)
             {
                 [annotations addObject:annotationContext.annotation];
             }
-
         }
 
         return [annotations copy];
@@ -3077,8 +3082,8 @@ public:
 /// Returns the annotation assigned the given tag. Cheap.
 - (id <MGLAnnotation>)annotationWithTag:(MGLAnnotationTag)tag
 {
-    if ( ! _annotationContextsByAnnotationTag.count(tag))
-    {
+    if ( ! _annotationContextsByAnnotationTag.count(tag) ||
+        tag == MGLAnnotationTagNotFound) {
         return nil;
     }
 
@@ -3680,10 +3685,12 @@ public:
     {
         return self.userLocation;
     }
-    if ( ! _annotationContextsByAnnotationTag.count(_selectedAnnotationTag))
-    {
+
+    if ( ! _annotationContextsByAnnotationTag.count(_selectedAnnotationTag) ||
+        _selectedAnnotationTag == MGLAnnotationTagNotFound) {
         return nil;
     }
+
     MGLAnnotationContext &annotationContext = _annotationContextsByAnnotationTag.at(_selectedAnnotationTag);
     return annotationContext.annotation;
 }
@@ -3749,19 +3756,16 @@ public:
     MGLAnnotationView *annotationView = nil;
 
     if (annotation != self.userLocation)
-    {
-        MGLAnnotationContext &annotationContext = _annotationContextsByAnnotationTag.at(annotationTag);
-
-        annotationView = annotationContext.annotationView;
-
-        if (annotationView && annotationView.enabled)
-        {
-            // Annotations represented by views use the view frame as the positioning rect.
-            positioningRect = annotationView.frame;
-
-            [annotationView.superview bringSubviewToFront:annotationView];
-
-            [annotationView setSelected:YES animated:animated];
+        if (annotationTag != MGLAnnotationTagNotFound) {
+            MGLAnnotationContext &annotationContext = _annotationContextsByAnnotationTag.at(annotationTag);
+            annotationView = annotationContext.annotationView;
+            if (annotationView && annotationView.enabled) {
+            {
+                // Annotations represented by views use the view frame as the positioning rect.
+                positioningRect = annotationView.frame;
+                [annotationView.superview bringSubviewToFront:annotationView];
+                [annotationView setSelected:YES animated:animated];
+            }
         }
     }
 
@@ -5039,8 +5043,12 @@ public:
     if (isAnchoredToAnnotation)
     {
         MGLAnnotationTag tag = [self annotationTagForAnnotation:annotation];
-        MGLAnnotationContext &annotationContext = _annotationContextsByAnnotationTag.at(tag);
-        MGLAnnotationView *annotationView = annotationContext.annotationView;
+        MGLAnnotationView *annotationView = nil;
+
+        if (tag != MGLAnnotationTagNotFound) {
+            MGLAnnotationContext &annotationContext = _annotationContextsByAnnotationTag.at(tag);
+            annotationView = annotationContext.annotationView;
+        }
 
         CGRect rect = [self positioningRectForCalloutForAnnotationWithTag:tag];
 
