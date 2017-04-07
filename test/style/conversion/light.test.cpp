@@ -76,7 +76,7 @@ TEST(StyleConversion, Light) {
         auto light = parseLight("{\"position\":[0,5]}");
 
         ASSERT_FALSE((bool) light);
-        ASSERT_EQ("value must be an array of three numbers", error.message);
+        ASSERT_EQ("value must be an array of 3 numbers", error.message);
     }
 
     {
