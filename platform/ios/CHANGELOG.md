@@ -4,7 +4,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 
 ## 3.5.2
 
-* Fixed an issue that caused a crash when the user annotation was presenting a callout view and the map was moved. ([#8686](https://github.com/mapbox/mapbox-gl-native/pull/8686))
+* Fixed an issue that caused a crash when the user location annotation was presenting a callout view and the map was moved. ([#8686](https://github.com/mapbox/mapbox-gl-native/pull/8686))
 
 ## 3.5.1 - April 5, 2017
 
