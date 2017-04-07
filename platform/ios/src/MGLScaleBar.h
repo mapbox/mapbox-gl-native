@@ -1,7 +1,7 @@
 #import <UIKit/UIKit.h>
 #import <CoreLocation/CoreLocation.h>
 
-@interface MGLScaleBarView : UIView
+@interface MGLScaleBar : UIView
 
 // Sets the scale and fades in the scale bar
 @property (nonatomic, assign) CLLocationDistance metersPerPoint;

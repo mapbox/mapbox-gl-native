@@ -232,7 +232,7 @@ IB_DESIGNABLE
  when the interaction stops. The scale bar is positioned in the upper-left
  corner.
  */
-@property (nonatomic, readonly) UIView *scaleBarView;
+@property (nonatomic, readonly) UIView *scaleBar;
 
 /**
  A control indicating the map’s direction and allowing the user to manipulate

@@ -1,18 +1,97 @@
 #import <Mapbox/Mapbox.h>
-#import "MGLScaleBarView.h"
+#import "MGLScaleBar.h"
 
+static const CGFloat MGLFeetPerMile = 5280;
+
+struct MGLRow {
+    CLLocationDistance distance;
+    NSUInteger numberOfBars;
+};
+
+static const MGLRow MGLMetricTable[] = {
+    {.distance = 1, .numberOfBars = 2},
+    {.distance = 2, .numberOfBars = 2},
+    {.distance = 4, .numberOfBars = 2},
+    {.distance = 10, .numberOfBars = 2},
+    {.distance = 20, .numberOfBars = 2},
+    {.distance = 50, .numberOfBars = 2},
+    {.distance = 75, .numberOfBars = 3},
+    {.distance = 100, .numberOfBars = 2},
+    {.distance = 150, .numberOfBars = 2},
+    {.distance = 200, .numberOfBars = 2},
+    {.distance = 300, .numberOfBars = 3},
+    {.distance = 500, .numberOfBars = 2},
+    {.distance = 1000, .numberOfBars = 2},
+    {.distance = 1500, .numberOfBars = 2},
+    {.distance = 3000, .numberOfBars = 3},
+    {.distance = 5000, .numberOfBars = 2},
+    {.distance = 10000, .numberOfBars = 2},
+    {.distance = 20000, .numberOfBars = 2},
+    {.distance = 30000, .numberOfBars = 3},
+    {.distance = 50000, .numberOfBars = 2},
+    {.distance = 100000, .numberOfBars = 2},
+    {.distance = 200000, .numberOfBars = 2},
+    {.distance = 300000, .numberOfBars = 3},
+    {.distance = 400000, .numberOfBars = 2},
+    {.distance = 500000, .numberOfBars = 2},
+    {.distance = 600000, .numberOfBars = 3},
+    {.distance = 800000, .numberOfBars = 2},
+    {.distance = 1000000, .numberOfBars = 2},
+    {.distance = 1200000, .numberOfBars = 2},
+    {.distance = 1600000, .numberOfBars = 2},
+    {.distance = 2000000, .numberOfBars = 2},
+    {.distance = 3500000, .numberOfBars = 2},
+    {.distance = 5000000, .numberOfBars = 2},
+};
+
+static const MGLRow MGLImperialTable[] ={
+    {.distance = 4, .numberOfBars = 2},
+    {.distance = 6, .numberOfBars = 2},
+    {.distance = 10, .numberOfBars = 2},
+    {.distance = 20, .numberOfBars = 2},
+    {.distance = 30, .numberOfBars = 2},
+    {.distance = 50, .numberOfBars = 2},
+    {.distance = 75, .numberOfBars = 3},
+    {.distance = 100, .numberOfBars = 2},
+    {.distance = 200, .numberOfBars = 2},
+    {.distance = 300, .numberOfBars = 3},
+    {.distance = 400, .numberOfBars = 2},
+    {.distance = 600, .numberOfBars = 3},
+    {.distance = 800, .numberOfBars = 2},
+    {.distance = 1000, .numberOfBars = 2},
+    {.distance = 0.25f*MGLFeetPerMile, .numberOfBars = 2},
+    {.distance = 0.5f*MGLFeetPerMile, .numberOfBars = 2},
+    {.distance = 1*MGLFeetPerMile, .numberOfBars = 2},
+    {.distance = 2*MGLFeetPerMile, .numberOfBars = 2},
+    {.distance = 3*MGLFeetPerMile, .numberOfBars = 3},
+    {.distance = 4*MGLFeetPerMile, .numberOfBars = 2},
+    {.distance = 8*MGLFeetPerMile, .numberOfBars = 2},
+    {.distance = 12*MGLFeetPerMile, .numberOfBars = 2},
+    {.distance = 15*MGLFeetPerMile, .numberOfBars = 3},
+    {.distance = 20*MGLFeetPerMile, .numberOfBars = 2},
+    {.distance = 30*MGLFeetPerMile, .numberOfBars = 3},
+    {.distance = 40*MGLFeetPerMile, .numberOfBars = 2},
+    {.distance = 80*MGLFeetPerMile, .numberOfBars = 2},
+    {.distance = 120*MGLFeetPerMile, .numberOfBars = 2},
+    {.distance = 200*MGLFeetPerMile, .numberOfBars = 2},
+    {.distance = 300*MGLFeetPerMile, .numberOfBars = 3},
+    {.distance = 400*MGLFeetPerMile, .numberOfBars = 2},
+    {.distance = 800*MGLFeetPerMile, .numberOfBars = 2},
+    {.distance = 1000*MGLFeetPerMile, .numberOfBars = 2},
+    {.distance = 2000*MGLFeetPerMile, .numberOfBars = 2},
+    {.distance = 3000*MGLFeetPerMile, .numberOfBars = 3},
+    {.distance = 4000*MGLFeetPerMile, .numberOfBars = 2},
+};
 
 @class MGLScaleBarLabel;
 
-@interface MGLScaleBarView()
+@interface MGLScaleBar()
 @property (nonatomic, assign, getter=isVisible) BOOL visible;
 @property (nonatomic) NSArray<MGLScaleBarLabel *> *labels;
 @property (nonatomic) NSArray<UIView *> *bars;
 @property (nonatomic) UIView *containerView;
 @property (nonatomic) MGLDistanceFormatter *formatter;
-@property (nonatomic) NSArray<NSArray<NSNumber *> *> *metricTable;
-@property (nonatomic) NSArray<NSArray<NSNumber *> *> *imperialTable;
-@property (nonatomic) NSArray<NSNumber*> *row;
+@property (nonatomic, assign) MGLRow row;
 @property (nonatomic) UIColor *primaryColor;
 @property (nonatomic) UIColor *secondaryColor;
 @property (nonatomic) CALayer *borderLayer;
@@ -21,7 +100,6 @@
 
 static const CGFloat MGLBarHeight = 4;
 static const CGFloat MGLFeetPerMeter = 3.28084;
-static const CGFloat MGLFeetPerMile = 5280;
 
 @interface MGLScaleBarLabel : UILabel
 @end
@@ -50,7 +128,7 @@ static const CGFloat MGLFeetPerMile = 5280;
 
 @end
 
-@implementation MGLScaleBarView
+@implementation MGLScaleBar
 
 - (instancetype)initWithCoder:(NSCoder *)decoder {
     if (self = [super initWithCoder:decoder]) {
@@ -87,80 +165,6 @@ static const CGFloat MGLFeetPerMile = 5280;
     [_containerView.layer addSublayer:_borderLayer];
     
     _formatter = [[MGLDistanceFormatter alloc] init];
-    _row = @[@0, @0];
-    
-    // @[meters, numberOfBars]
-    _metricTable = @[@[@1, @2],
-                     @[@2, @2],
-                     @[@4, @2],
-                     @[@10, @2],
-                     @[@20, @2],
-                     @[@50, @2],
-                     @[@75, @3],
-                     @[@100, @2],
-                     @[@150, @3],
-                     @[@200, @2],
-                     @[@300, @3],
-                     @[@500, @2],
-                     @[@1000, @2],
-                     @[@1500, @3],
-                     @[@3000, @3],
-                     @[@5000, @2],
-                     @[@10000, @2],
-                     @[@20000, @2],
-                     @[@30000, @3],
-                     @[@50000, @2],
-                     @[@100000, @2],
-                     @[@200000, @2],
-                     @[@300000, @3],
-                     @[@400000, @2],
-                     @[@500000, @2],
-                     @[@600000, @3],
-                     @[@800000, @2],
-                     @[@1000000, @2],
-                     @[@1200000, @2],
-                     @[@1600000, @2],
-                     @[@2000000, @2],
-                     @[@3500000, @2],
-                     @[@5000000, @2]];
-    
-    // @[feet, numberOfBars]
-    _imperialTable = @[@[@4, @2],
-                       @[@6, @3],
-                       @[@10, @2],
-                       @[@20, @2],
-                       @[@30, @3],
-                       @[@50, @2],
-                       @[@75, @3],
-                       @[@100, @2],
-                       @[@200, @2],
-                       @[@300, @3],
-                       @[@400, @2],
-                       @[@600, @3],
-                       @[@800, @2],
-                       @[@1000, @2],
-                       @[@(0.25f*MGLFeetPerMile), @2],
-                       @[@(0.5f*MGLFeetPerMile), @2],
-                       @[@(1*MGLFeetPerMile), @2],
-                       @[@(2*MGLFeetPerMile), @2],
-                       @[@(3*MGLFeetPerMile), @3],
-                       @[@(4*MGLFeetPerMile), @2],
-                       @[@(8*MGLFeetPerMile), @2],
-                       @[@(12*MGLFeetPerMile), @2],
-                       @[@(15*MGLFeetPerMile), @3],
-                       @[@(20*MGLFeetPerMile), @2],
-                       @[@(30*MGLFeetPerMile), @3],
-                       @[@(40*MGLFeetPerMile), @2],
-                       @[@(80*MGLFeetPerMile), @2],
-                       @[@(120*MGLFeetPerMile), @2],
-                       @[@(200*MGLFeetPerMile), @2],
-                       @[@(300*MGLFeetPerMile), @3],
-                       @[@(400*MGLFeetPerMile), @2],
-                       @[@(800*MGLFeetPerMile), @2],
-                       @[@(1000*MGLFeetPerMile), @2],
-                       @[@(2000*MGLFeetPerMile), @2],
-                       @[@(3000*MGLFeetPerMile), @3],
-                       @[@(4000*MGLFeetPerMile), @2]];
 }
 
 #pragma mark - Dimensions
@@ -170,7 +174,7 @@ static const CGFloat MGLFeetPerMile = 5280;
 }
 
 - (CGFloat)actualWidth {
-    return floorf(self.row.firstObject.floatValue / [self unitsPerPoint]);
+    return self.row.distance / [self unitsPerPoint];
 }
 
 - (CGFloat)minimumWidth {
@@ -192,20 +196,25 @@ static const CGFloat MGLFeetPerMile = 5280;
 
 #pragma mark - Convenient methods
 
-- (NSArray<NSArray<NSNumber *> *> *)validRows {
-    CLLocationDistance minimumDistance = [self minimumWidth] * [self unitsPerPoint];
+- (MGLRow)preferredRow {
     CLLocationDistance maximumDistance = [self maximumWidth] * [self unitsPerPoint];
+    MGLRow row;
     
-    NSMutableArray *validRows = [NSMutableArray array];
-    NSArray *table = [self usesMetricSystem] ? self.metricTable : self.imperialTable;
-    for (NSArray<NSNumber *> *row in table) {
-        CLLocationDistance distance = row.firstObject.floatValue;
-        if (distance >= minimumDistance && distance <= maximumDistance) {
-            [validRows addObject:row];
+    BOOL useMetric = [self usesMetricSystem];
+    NSUInteger count = useMetric
+    ? sizeof(MGLMetricTable) / sizeof(MGLMetricTable[0])
+    : sizeof(MGLImperialTable) / sizeof(MGLImperialTable[0]);
+    
+    for (NSUInteger i = 0; i < count; i++) {
+        CLLocationDistance distance = useMetric ? MGLMetricTable[i].distance : MGLImperialTable[i].distance;
+        if (distance <= maximumDistance) {
+            row = useMetric ? MGLMetricTable[i] : MGLImperialTable[i];
+        } else {
+            break;
         }
     }
     
-    return validRows;
+    return row;
 }
 
 - (BOOL)usesMetricSystem {
@@ -248,14 +257,14 @@ static const CGFloat MGLFeetPerMile = 5280;
     
     _metersPerPoint = metersPerPoint;
     
-    self.row = [self validRows].lastObject;
+    self.row = [self preferredRow];
     
     [self invalidateIntrinsicContentSize];
     [self setNeedsLayout];
 }
 
-- (void)setRow:(NSArray<NSNumber *> *)row {
-    if (![row isEqualToArray:_row]) {
+- (void)setRow:(MGLRow)row {
+    if (_row.distance != row.distance) {
         [_bars makeObjectsPerformSelector:@selector(removeFromSuperview)];
         [_labels makeObjectsPerformSelector:@selector(removeFromSuperview)];
         _bars = nil;
@@ -269,7 +278,7 @@ static const CGFloat MGLFeetPerMile = 5280;
 - (NSArray<UIView *> *)bars {
     if (!_bars) {
         NSMutableArray *bars = [NSMutableArray array];
-        for (NSUInteger i = 0; i < self.row.lastObject.integerValue; i++) {
+        for (NSUInteger i = 0; i < self.row.numberOfBars; i++) {
             UIView *bar = [[UIView alloc] init];
             [bars addObject:bar];
             [self.containerView addSubview:bar];
@@ -284,7 +293,7 @@ static const CGFloat MGLFeetPerMile = 5280;
         NSCharacterSet *characterSet = [[NSCharacterSet decimalDigitCharacterSet] invertedSet];
         NSMutableArray *labels = [NSMutableArray array];
         
-        for (NSUInteger i = 0; i <= self.row.lastObject.integerValue; i++) {
+        for (NSUInteger i = 0; i <= self.row.numberOfBars; i++) {
             UILabel *label = [[MGLScaleBarLabel alloc] init];
             label.font = [UIFont systemFontOfSize:8 weight:UIFontWeightMedium];
             label.text = [[[self.formatter stringFromDistance:0] componentsSeparatedByCharactersInSet:characterSet] componentsJoinedByString:@""];
@@ -304,7 +313,7 @@ static const CGFloat MGLFeetPerMile = 5280;
 - (void)layoutSubviews {
     [super layoutSubviews];
     
-    if (!self.row.lastObject || !self.row.lastObject.integerValue) {
+    if (!self.row.numberOfBars) {
         // Current distance is not within allowed range
         return;
     }
@@ -355,7 +364,7 @@ static const CGFloat MGLFeetPerMile = 5280;
     NSUInteger i = 0;
     
     for (MGLScaleBarLabel *label in labels) {
-        CLLocationDistance barDistance = (self.row.firstObject.integerValue / self.row.lastObject.integerValue) * (i + 1);
+        CLLocationDistance barDistance = (self.row.distance / self.row.numberOfBars) * (i + 1);
         
         if (!useMetric) {
             barDistance /= MGLFeetPerMeter;
