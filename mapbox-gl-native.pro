@@ -1,16 +1,12 @@
 TARGET = qmapboxgl
 
-TEMPLATE = lib
+load(qt_helper_lib)
+
+CONFIG += qt c++14 exceptions warn_off staticlib
 
 QT += network-private \
       gui-private \
       sql-private
-
-load(qt_build_paths)
-
-DESTDIR = $$MODULE_BASE_OUTDIR/lib
-
-CONFIG += c++14 exceptions static
 
 # Core Mapbox GL
 SOURCES += \
