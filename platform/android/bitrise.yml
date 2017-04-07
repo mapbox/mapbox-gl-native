@@ -142,12 +142,12 @@ workflows:
         - content: |-
             #!/bin/bash
             echo "Compile libmapbox-gl.so for all supportd abi's:"
-            make android-lib-arm-v5
-            make android-lib-arm-v7
-            make android-lib-arm-v8
-            make android-lib-x86
-            make android-lib-mips
-            cd platform/android && ./gradlew :MapboxGLAndroidSDK:assembleRelease
+            BUILDTYPE=Release make android-lib-arm-v5
+            BUILDTYPE=Release make android-lib-arm-v7
+            BUILDTYPE=Release make android-lib-arm-v8
+            BUILDTYPE=Release make android-lib-x86
+            BUILDTYPE=Release make android-lib-mips
+            cd platform/android && ./gradlew -Pmapbox.abis=armeabi-v7a MapboxGLAndroidSDK:assembleRelease
     - script:
         title: Publish to maven
         inputs:
