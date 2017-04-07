@@ -3555,10 +3555,6 @@ public:
         auto end = std::remove_if(nearbyAnnotations.begin(), nearbyAnnotations.end(),
                                   [&](const MGLAnnotationTag annotationTag)
         {
-            if (annotationTag == MGLAnnotationTagNotFound) {
-                return true;
-            }
-
             id <MGLAnnotation> annotation = [self annotationWithTag:annotationTag];
             NSAssert(annotation, @"Unknown annotation found nearby tap");
             if ( ! annotation)
