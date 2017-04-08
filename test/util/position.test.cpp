@@ -1,8 +1,8 @@
 #include <mbgl/test/util.hpp>
 
 #include <mbgl/style/types.hpp>
+#include <mbgl/style/position.hpp>
 #include <mbgl/util/constants.hpp>
-#include <mbgl/util/position.hpp>
 
 using namespace mbgl;
 using namespace style;

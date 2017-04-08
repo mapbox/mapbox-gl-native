@@ -2,7 +2,7 @@
 
 #include <mbgl/util/color.hpp>
 #include <mbgl/util/range.hpp>
-#include <mbgl/util/position.hpp>
+#include <mbgl/style/position.hpp>
 
 #include <array>
 #include <vector>

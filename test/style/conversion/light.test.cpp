@@ -4,10 +4,10 @@
 #include <mbgl/style/rapidjson_conversion.hpp>
 #include <mbgl/style/conversion/constant.hpp>
 #include <mbgl/style/conversion/light.hpp>
+#include <mbgl/style/position.hpp>
 #include <mbgl/util/rapidjson.hpp>
 #include <mbgl/util/color.hpp>
 #include <mbgl/util/chrono.hpp>
-#include <mbgl/util/position.hpp>
 
 #include <array>
 
