@@ -14,13 +14,13 @@ public:
 
     void bind() {
         if (!framebuffer) {
-            texture = context.createTexture(size, gl::TextureFormat::RGBA, unit);
+            texture = context.createTexture(size, gl::TextureFormat::RGBA);
             framebuffer = context.createFramebuffer(*texture);
         } else {
             context.bindFramebuffer = framebuffer->framebuffer;
         }
 
-        context.activeTexture = unit;
+        context.activeTexture = 0;
         context.viewport = { 0, 0, size };
     }
 
@@ -37,7 +37,7 @@ public:
         return size;
     }
 
-    void bindRenderbuffers() {
+    void bindRenderbuffers(gl::TextureUnit unit) {
         if (!framebuffer) {
             texture = context.createTexture(size, gl::TextureFormat::RGBA, unit);
             colorTarget = context.createRenderbuffer<gl::RenderbufferType::RGBA4>(size);
@@ -47,13 +47,13 @@ public:
             context.bindFramebuffer = framebuffer->framebuffer;
         }
 
+        context.activeTexture = unit;
         context.viewport = { 0, 0, size };
     }
 
 private:
     gl::Context& context;
     const Size size;
-    gl::TextureUnit unit;
     optional<gl::Framebuffer> framebuffer;
     optional<gl::Texture> texture;
     optional<gl::Renderbuffer<gl::RenderbufferType::RGBA4>> colorTarget;
