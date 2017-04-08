@@ -50,7 +50,7 @@ public:
 
     template <class TransitioningProperty>
     TransitioningProperty cascade(const CascadeParameters& params,
-                                     TransitioningProperty prior) const {
+                                  TransitioningProperty prior) const {
         TransitionOptions transition_;
         Value value_;
 
@@ -63,7 +63,7 @@ public:
         }
 
         return TransitioningProperty(std::move(value_), std::move(prior),
-                                        transition_.reverseMerge(params.transition), params.now);
+                                     transition_.reverseMerge(params.transition), params.now);
     }
 
 private:
@@ -162,7 +162,8 @@ struct LightAnchor : LightProperty<LightAnchorType> {
 };
 struct LightPosition : LightProperty<Position> {
     static Position defaultValue() {
-        return Position{ { { 1.15, 210, 30 } } };
+        std::array<float, 3> default_ = { { 1.15, 210, 30 } };
+        return Position{ { default_ } };
     }
 };
 struct LightColor : LightProperty<Color> {
@@ -176,68 +177,7 @@ struct LightIntensity : LightProperty<float> {
     }
 };
 
-class Light : public LightProperties<LightAnchor, LightPosition, LightColor, LightIntensity> {
-public:
-    void setAnchor(PropertyValue<LightAnchorType> value) {
-        if (value == this->getAnchor())
-            return;
-        this->set<LightAnchor>(value);
-        // TODO run observer
-    }
-
-    PropertyValue<LightAnchorType> getAnchor() const {
-        return this->get<LightAnchor>();
-    }
-
-    PropertyValue<LightAnchorType> getDefaultAnchor() const {
-        return LightAnchor::defaultValue();
-    }
-
-    void setPosition(PropertyValue<Position> value) {
-        if (value == this->getPosition())
-            return;
-        this->set<LightPosition>(value);
-        // TODO run observer
-    }
-
-    PropertyValue<Position> getPosition() const {
-        return this->get<LightPosition>();
-    }
-
-    PropertyValue<Position> getDefaultPosition() const {
-        return LightPosition::defaultValue();
-    }
-
-    void setColor(PropertyValue<Color> value) {
-        if (value == this->getColor())
-            return;
-        this->set<LightColor>(value);
-        // TODO run observer
-    }
-
-    PropertyValue<Color> getColor() const {
-        return this->get<LightColor>();
-    }
-
-    PropertyValue<Color> getDefaultColor() const {
-        return LightColor::defaultValue();
-    }
-
-    void setIntensity(PropertyValue<float> value) {
-        if (value == this->getIntensity())
-            return;
-        this->set<LightIntensity>(value);
-        // TODO run observer
-    }
-
-    PropertyValue<float> getIntensity() const {
-        return this->get<LightIntensity>();
-    }
-
-    PropertyValue<float> getDefaultIntensity() const {
-        return LightIntensity::defaultValue();
-    }
-};
+class Light : public LightProperties<LightAnchor, LightPosition, LightColor, LightIntensity> {};
 
 } // namespace style
 } // namespace mbgl
