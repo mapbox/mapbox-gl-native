@@ -48,7 +48,8 @@ TEST(StyleConversion, Light) {
 
         ASSERT_FALSE(light->get<LightPosition>().isUndefined());
         ASSERT_TRUE(light->get<LightPosition>().isConstant());
-        ASSERT_EQ(light->get<LightPosition>().asConstant(), mbgl::style::Position({{{ 3, 90, 90 }}}));
+        std::array<float, 3> expected{{ 3, 90, 90 }};
+        ASSERT_EQ(light->get<LightPosition>().asConstant(), mbgl::style::Position({ expected }));
         ASSERT_FALSE(light->get<LightPosition>().isCameraFunction());
     }
 
