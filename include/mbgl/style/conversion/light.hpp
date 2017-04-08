@@ -2,7 +2,7 @@
 
 #include <mbgl/style/light.hpp>
 #include <mbgl/style/conversion.hpp>
-#include <mbgl/style/conversion/constant.hpp>
+#include <mbgl/style/conversion/position.hpp>
 #include <mbgl/style/conversion/property_value.hpp>
 #include <mbgl/style/conversion/transition_options.hpp>
 
@@ -34,6 +34,17 @@ public:
             }
         }
 
+        const auto anchorTransition = objectMember(value, "anchor-transition");
+        if (anchorTransition) {
+            optional<TransitionOptions> transition =
+                convert<TransitionOptions>(*anchorTransition, error);
+            if (transition) {
+                light.setTransition<LightAnchor>(*transition);
+            } else {
+                return {};
+            }
+        }
+
         const auto color = objectMember(value, "color");
         if (color) {
             optional<PropertyValue<Color>> convertedColor =
@@ -41,6 +52,17 @@ public:
 
             if (convertedColor) {
                 light.set<LightColor>(*convertedColor);
+            } else {
+                return {};
+            }
+        }
+
+        const auto colorTransition = objectMember(value, "color-transition");
+        if (colorTransition) {
+            optional<TransitionOptions> transition =
+                convert<TransitionOptions>(*colorTransition, error);
+            if (transition) {
+                light.setTransition<LightColor>(*transition);
             } else {
                 return {};
             }
@@ -58,6 +80,17 @@ public:
             }
         }
 
+        const auto positionTransition = objectMember(value, "position-transition");
+        if (positionTransition) {
+            optional<TransitionOptions> transition =
+                convert<TransitionOptions>(*positionTransition, error);
+            if (transition) {
+                light.setTransition<LightPosition>(*transition);
+            } else {
+                return {};
+            }
+        }
+
         const auto intensity = objectMember(value, "intensity");
         if (intensity) {
             optional<PropertyValue<float>> convertedIntensity =
@@ -70,8 +103,18 @@ public:
             }
         }
 
+        const auto intensityTransition = objectMember(value, "intensity-transition");
+        if (intensityTransition) {
+            optional<TransitionOptions> transition =
+                convert<TransitionOptions>(*intensityTransition, error);
+            if (transition) {
+                light.setTransition<LightIntensity>(*transition);
+            } else {
+                return {};
+            }
+        }
         return { light };
-    }
+    };
 };
 
 } // namespace conversion

@@ -6,6 +6,7 @@
 #include <mbgl/style/conversion/light.hpp>
 #include <mbgl/util/rapidjson.hpp>
 #include <mbgl/util/color.hpp>
+#include <mbgl/util/chrono.hpp>
 #include <mbgl/util/position.hpp>
 
 #include <array>
@@ -49,6 +50,16 @@ TEST(StyleConversion, Light) {
         ASSERT_TRUE(light->get<LightPosition>().isConstant());
         ASSERT_EQ(light->get<LightPosition>().asConstant(), mbgl::style::Position({{{ 3, 90, 90 }}}));
         ASSERT_FALSE(light->get<LightPosition>().isCameraFunction());
+    }
+
+    {
+        auto light = parseLight("{\"color\":\"blue\",\"intensity\":0.3,\"color-transition\":{\"duration\":1000}}");
+        ASSERT_TRUE((bool) light);
+
+        ASSERT_FALSE(light->get<LightColor>().isUndefined());
+        ASSERT_TRUE(light->get<LightColor>().isConstant());
+        ASSERT_FALSE(light->get<LightColor>().isCameraFunction());
+        ASSERT_EQ(light->getTransition<LightColor>().duration, mbgl::Duration(mbgl::Milliseconds(1000)));
     }
 
     {

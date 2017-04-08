@@ -5,7 +5,6 @@
 #include <mbgl/util/color.hpp>
 #include <mbgl/util/enum.hpp>
 #include <mbgl/util/string.hpp>
-#include <mbgl/util/position.hpp>
 
 #include <array>
 #include <string>
@@ -91,26 +90,6 @@ struct Converter<Color> {
         }
 
         return *color;
-    }
-};
-
-template <>
-struct Converter<Position> {
-    template <class V>
-    optional<Position> operator()(const V& value, Error& error) const {
-        optional<std::array<float, 3>> spherical = convert<std::array<float, 3>>(value, error);
-
-        if (!spherical) {
-            return {};
-        }
-
-        optional<Position> converted = Position(*spherical);
-        if (!converted) {
-            error = { "value must be a valid position" };
-            return {};
-        }
-
-        return *converted;
     }
 };
 
