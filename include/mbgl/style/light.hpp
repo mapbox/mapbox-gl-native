@@ -175,6 +175,11 @@ public:
     }
 
     template <class P>
+    TransitionOptions getTransition() {
+        return cascading.template get<P>().getTransition();
+    }
+
+    template <class P>
     void setTransition(const TransitionOptions& value) {
         cascading.template get<P>().setTransition(value);
     }
@@ -213,7 +218,7 @@ struct LightAnchor : LightProperty<LightAnchorType> {
 };
 struct LightPosition : LightProperty<Position> {
     static Position defaultValue() {
-        return Position{{{ 1.15, 210, 30 }}};
+        return Position{ { { 1.15, 210, 30 } } };
     }
 };
 struct LightColor : LightProperty<Color> {

@@ -336,6 +336,7 @@ set(MBGL_CORE_FILES
     include/mbgl/style/conversion/layer.hpp
     include/mbgl/style/conversion/light.hpp
     include/mbgl/style/conversion/make_property_setters.hpp
+    include/mbgl/style/conversion/position.hpp
     include/mbgl/style/conversion/property_setter.hpp
     include/mbgl/style/conversion/property_value.hpp
     include/mbgl/style/conversion/source.hpp
