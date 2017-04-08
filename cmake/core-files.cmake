@@ -284,6 +284,7 @@ set(MBGL_CORE_FILES
     include/mbgl/style/layer.hpp
     include/mbgl/style/layer_type.hpp
     include/mbgl/style/light.hpp
+    include/mbgl/style/position.hpp
     include/mbgl/style/property_value.hpp
     include/mbgl/style/query.hpp
     include/mbgl/style/source.hpp
@@ -496,7 +497,6 @@ set(MBGL_CORE_FILES
     include/mbgl/util/noncopyable.hpp
     include/mbgl/util/optional.hpp
     include/mbgl/util/platform.hpp
-    include/mbgl/util/position.hpp
     include/mbgl/util/projection.hpp
     include/mbgl/util/range.hpp
     include/mbgl/util/run_loop.hpp

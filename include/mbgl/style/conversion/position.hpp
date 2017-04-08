@@ -1,8 +1,8 @@
 #pragma once
 
 #include <mbgl/style/conversion.hpp>
+#include <mbgl/style/position.hpp>
 #include <mbgl/util/optional.hpp>
-#include <mbgl/util/position.hpp>
 
 #include <array>
 
