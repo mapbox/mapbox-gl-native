@@ -51,8 +51,9 @@ template <>
 struct Interpolator<style::Position> {
 public:
     style::Position operator()(const style::Position& a, const style::Position& b, const double t) {
+        auto interpolated = interpolate(a.getSpherical(), b.getSpherical(), t);
         return {
-            style::Position(interpolate(a.getSpherical(), b.getSpherical(), t))
+            style::Position(interpolated)
         };
     }
 };

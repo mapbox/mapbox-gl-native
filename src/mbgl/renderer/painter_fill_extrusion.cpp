@@ -31,7 +31,7 @@ void Painter::renderFillExtrusion(PaintParameters& parameters,
     std::array<float, 3> color3f = { { lightColor.r, lightColor.g, lightColor.b } };
     const auto lightAnchor = light.get<LightAnchor>();
 
-    auto lightPos = light.get<LightPosition>().get();
+    auto lightPos = light.get<LightPosition>().getCartesian();
     mat3 lightmat;
     matrix::identity(lightmat);
     if (lightAnchor == LightAnchorType::Viewport) {

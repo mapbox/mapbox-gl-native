@@ -1,20 +1,15 @@
 #pragma once
 
-#include <mbgl/style/types.hpp>
-#include <mbgl/util/optional.hpp>
 #include <mbgl/util/constants.hpp>
 
 #include <array>
-
-#include <cassert>
-#include <string>
 
 namespace mbgl {
 namespace style {
 class Position {
 public:
     Position() = default;
-    Position(std::array<float, 3> position_)
+    Position(std::array<float, 3>& position_)
         : radial(position_[0]), azimuthal(position_[1]), polar(position_[2]) {
         calculateCartesian();
     };
@@ -28,7 +23,7 @@ public:
         return !(lhs == rhs);
     }
 
-    const std::array<float, 3> get() const {
+    const std::array<float, 3> getCartesian() const {
         return { { x, y, z } };
     };
 
@@ -36,7 +31,7 @@ public:
         return { { radial, azimuthal, polar } };
     };
 
-    void set(std::array<float, 3> position_) {
+    void set(std::array<float, 3>& position_) {
         radial = position_[0];
         azimuthal = position_[1];
         polar = position_[2];
@@ -52,13 +47,10 @@ private:
     float z;
 
     void calculateCartesian() {
-        auto _a = azimuthal;
         // We abstract "north"/"up" (compass-wise) to be 0° when really this is 90° (π/2): we
         // correct for that here
-        _a += 90;
-        _a *= util::DEG2RAD;
-        auto _p = polar;
-        _p *= util::DEG2RAD;
+        const float _a = (azimuthal + 90) * util::DEG2RAD;
+        const float _p = polar * util::DEG2RAD;
 
         x = radial * std::cos(_a) * std::sin(_p);
         y = radial * std::sin(_a) * std::sin(_p);
