@@ -1,5 +1,6 @@
 #pragma once
 
+#include <mbgl/style/transitioning_property.hpp>
 #include <mbgl/style/types.hpp>
 #include <mbgl/style/property_value.hpp>
 #include <mbgl/style/property_evaluator.hpp>
@@ -17,63 +18,6 @@
 
 namespace mbgl {
 namespace style {
-
-template <class Value>
-class UnevaluatedLightProperty {
-public:
-    UnevaluatedLightProperty() = default;
-
-    UnevaluatedLightProperty(Value value_,
-                             UnevaluatedLightProperty<Value> prior_,
-                             TransitionOptions transition,
-                             TimePoint now)
-        : begin(now + transition.delay.value_or(Duration::zero())),
-          end(begin + transition.duration.value_or(Duration::zero())),
-          value(std::move(value_)) {
-        if (transition) {
-            prior = { std::move(prior_) };
-        }
-    }
-
-    template <class Evaluator>
-    auto evaluate(const Evaluator& evaluator, TimePoint now) {
-        auto finalValue = value.evaluate(evaluator);
-        if (!prior) {
-            // No prior value.
-            return finalValue;
-        } else if (now >= end) {
-            // Transition from prior value is now complete.
-            prior = {};
-            return finalValue;
-        } else if (now < begin) {
-            // Transition hasn't started yet.
-            return prior->get().evaluate(evaluator, now);
-        } else {
-            // Interpolate between recursively-calculated prior value and final.
-            float t = std::chrono::duration<float>(now - begin) / (end - begin);
-            return util::interpolate(prior->get().evaluate(evaluator, now), finalValue,
-                                     util::DEFAULT_TRANSITION_EASE.solve(t, 0.001));
-        }
-    }
-
-    bool hasTransition() const {
-        return bool(prior);
-    }
-
-    bool isUndefined() const {
-        return value.isUndefined();
-    }
-
-    const Value& getValue() const {
-        return value;
-    }
-
-private:
-    optional<mapbox::util::recursive_wrapper<UnevaluatedLightProperty<Value>>> prior;
-    TimePoint begin;
-    TimePoint end;
-    Value value;
-};
 
 template <class Value>
 class CascadingLightProperty {
@@ -104,9 +48,9 @@ public:
         transition = transition_;
     }
 
-    template <class UnevaluatedLightProperty>
-    UnevaluatedLightProperty cascade(const CascadeParameters& params,
-                                     UnevaluatedLightProperty prior) const {
+    template <class TransitioningProperty>
+    TransitioningProperty cascade(const CascadeParameters& params,
+                                     TransitioningProperty prior) const {
         TransitionOptions transition_;
         Value value_;
 
@@ -118,7 +62,7 @@ public:
             transition_ = transition;
         }
 
-        return UnevaluatedLightProperty(std::move(value_), std::move(prior),
+        return TransitioningProperty(std::move(value_), std::move(prior),
                                         transition_.reverseMerge(params.transition), params.now);
     }
 
@@ -132,7 +76,7 @@ class LightProperty {
 public:
     using ValueType = PropertyValue<T>;
     using CascadingType = CascadingLightProperty<ValueType>;
-    using UnevaluatedType = UnevaluatedLightProperty<ValueType>;
+    using UnevaluatedType = TransitioningProperty<ValueType>;
     using EvaluatorType = PropertyEvaluator<T>;
     using EvaluatedType = T;
 };

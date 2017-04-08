@@ -1,12 +1,13 @@
 #include <mbgl/test/util.hpp>
 
 #include <mbgl/style/paint_property.hpp>
+#include <mbgl/style/transitioning_property.hpp>
 
 using namespace mbgl;
 using namespace mbgl::style;
 using namespace std::literals::chrono_literals;
 
-float evaluate(UnevaluatedPaintProperty<PropertyValue<float>>& property, Duration delta = Duration::zero()) {
+float evaluate(TransitioningProperty<PropertyValue<float>>& property, Duration delta = Duration::zero()) {
     PropertyEvaluationParameters parameters {
         0,
         TimePoint::min() + delta,
@@ -22,7 +23,7 @@ float evaluate(UnevaluatedPaintProperty<PropertyValue<float>>& property, Duratio
     return property.evaluate(evaluator, parameters.now);
 }
 
-PossiblyEvaluatedPropertyValue<float> evaluate(UnevaluatedPaintProperty<DataDrivenPropertyValue<float>>& property, Duration delta = Duration::zero()) {
+PossiblyEvaluatedPropertyValue<float> evaluate(TransitioningProperty<DataDrivenPropertyValue<float>>& property, Duration delta = Duration::zero()) {
     PropertyEvaluationParameters parameters {
         0,
         TimePoint::min() + delta,
@@ -38,15 +39,15 @@ PossiblyEvaluatedPropertyValue<float> evaluate(UnevaluatedPaintProperty<DataDriv
     return property.evaluate(evaluator, parameters.now);
 }
 
-TEST(UnevaluatedPaintProperty, EvaluateDefaultValue) {
-    UnevaluatedPaintProperty<PropertyValue<float>> property;
+TEST(TransitioningProperty, EvaluateDefaultValue) {
+    TransitioningProperty<PropertyValue<float>> property;
     ASSERT_EQ(0.0f, evaluate(property));
 }
 
-TEST(UnevaluatedPaintProperty, EvaluateUntransitionedConstant) {
-    UnevaluatedPaintProperty<PropertyValue<float>> property {
+TEST(TransitioningProperty, EvaluateUntransitionedConstant) {
+    TransitioningProperty<PropertyValue<float>> property {
         PropertyValue<float>(1.0f),
-        UnevaluatedPaintProperty<PropertyValue<float>>(),
+        TransitioningProperty<PropertyValue<float>>(),
         TransitionOptions(),
         TimePoint::min()
     };
@@ -54,18 +55,18 @@ TEST(UnevaluatedPaintProperty, EvaluateUntransitionedConstant) {
     ASSERT_EQ(1.0f, evaluate(property));
 }
 
-TEST(UnevaluatedPaintProperty, EvaluateTransitionedConstantWithoutDelay) {
+TEST(TransitioningProperty, EvaluateTransitionedConstantWithoutDelay) {
     TransitionOptions transition;
     transition.duration = { 1000ms };
 
-    UnevaluatedPaintProperty<PropertyValue<float>> t0 {
+    TransitioningProperty<PropertyValue<float>> t0 {
         PropertyValue<float>(0.0f),
-        UnevaluatedPaintProperty<PropertyValue<float>>(),
+        TransitioningProperty<PropertyValue<float>>(),
         TransitionOptions(),
         TimePoint::min()
     };
 
-    UnevaluatedPaintProperty<PropertyValue<float>> t1 {
+    TransitioningProperty<PropertyValue<float>> t1 {
         PropertyValue<float>(1.0f),
         t0,
         transition,
@@ -77,19 +78,19 @@ TEST(UnevaluatedPaintProperty, EvaluateTransitionedConstantWithoutDelay) {
     ASSERT_FLOAT_EQ(1.0f, evaluate(t1, 1500ms));
 }
 
-TEST(UnevaluatedPaintProperty, EvaluateTransitionedConstantWithDelay) {
+TEST(TransitioningProperty, EvaluateTransitionedConstantWithDelay) {
     TransitionOptions transition;
     transition.delay = { 1000ms };
     transition.duration = { 1000ms };
 
-    UnevaluatedPaintProperty<PropertyValue<float>> t0 {
+    TransitioningProperty<PropertyValue<float>> t0 {
         PropertyValue<float>(0.0f),
-        UnevaluatedPaintProperty<PropertyValue<float>>(),
+        TransitioningProperty<PropertyValue<float>>(),
         TransitionOptions(),
         TimePoint::min()
     };
 
-    UnevaluatedPaintProperty<PropertyValue<float>> t1 {
+    TransitioningProperty<PropertyValue<float>> t1 {
         PropertyValue<float>(1.0f),
         t0,
         transition,
@@ -103,14 +104,14 @@ TEST(UnevaluatedPaintProperty, EvaluateTransitionedConstantWithDelay) {
     ASSERT_FLOAT_EQ(1.0f, evaluate(t1, 2500ms));
 }
 
-TEST(UnevaluatedPaintProperty, EvaluateDataDrivenValue) {
+TEST(TransitioningProperty, EvaluateDataDrivenValue) {
     TransitionOptions transition;
     transition.delay = { 1000ms };
     transition.duration = { 1000ms };
     
-    UnevaluatedPaintProperty<DataDrivenPropertyValue<float>> t0 {
+    TransitioningProperty<DataDrivenPropertyValue<float>> t0 {
         DataDrivenPropertyValue<float>(0.0f),
-        UnevaluatedPaintProperty<DataDrivenPropertyValue<float>>(),
+        TransitioningProperty<DataDrivenPropertyValue<float>>(),
         TransitionOptions(),
         TimePoint::min()
     };
@@ -120,7 +121,7 @@ TEST(UnevaluatedPaintProperty, EvaluateDataDrivenValue) {
         IdentityStops<float>()
     };
     
-    UnevaluatedPaintProperty<DataDrivenPropertyValue<float>> t1 {
+    TransitioningProperty<DataDrivenPropertyValue<float>> t1 {
         DataDrivenPropertyValue<float>(sourceFunction),
         t0,
         transition,

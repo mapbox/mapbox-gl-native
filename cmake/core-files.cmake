@@ -265,6 +265,7 @@ set(MBGL_CORE_FILES
     include/mbgl/style/query.hpp
     include/mbgl/style/source.hpp
     include/mbgl/style/transition_options.hpp
+    include/mbgl/style/transitioning_property.hpp
     include/mbgl/style/types.hpp
     include/mbgl/style/undefined.hpp
     src/mbgl/style/bucket_parameters.cpp
