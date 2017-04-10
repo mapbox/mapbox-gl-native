@@ -9,8 +9,8 @@ var firstRequest = "mapbox://sprites/mapbox/streets-v9@2x.json";
 var params = {
     mapPoolSize: 10,
     numRenderings: 1000,
-    failurePercentage: 0,
-    timeoutPercentage: 0,
+    failurePercentage: 10,
+    timeoutPercentage: 10,
     renderingTimeout: 5000,
     ratio: 2
 };
@@ -20,7 +20,7 @@ test('Benchmark', function(t) {
 
     var renderCount = 0;
     var failureCount = 0;
-    var timeoutCount = 0;
+    var cancelCount = 0;
 
     var options = {
         request: function(req, callback) {
@@ -70,15 +70,13 @@ test('Benchmark', function(t) {
             t.end();
             console.timeEnd('Time');
             console.log('Failures: ' + failureCount);
-            console.log('Timeouts: ' + timeoutCount);
+            console.log('Canceled: ' + cancelCount);
 
             return;
         }
 
         var mapTimeout = setTimeout(function() {
-            map.release();
-            mapPool.push(new mbgl.Map(options));
-            timeoutCount += 1;
+            map.cancel();
         }, params.renderingTimeout);
 
         map.render({ zoom: 16 }, function(err, pixels) {
@@ -89,13 +87,15 @@ test('Benchmark', function(t) {
                     failureCount += 1;
                 }
 
+                if (err.message == 'Canceled') {
+                    cancelCount += 1;
+                }
+
+                // We cancel the request before it gets a
+                // timeout error from the file source.
                 if (err.message == 'Timeout') {
                     t.fail('should never happen');
                 }
-
-                map.release();
-                mapPool.push(new mbgl.Map(options));
-                return;
             }
 
             mapPool.push(map);

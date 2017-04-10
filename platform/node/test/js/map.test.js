@@ -107,6 +107,7 @@ test('Map', function(t) {
             'loaded',
             'render',
             'release',
+            'cancel',
             'addClass',
             'addSource',
             'addLayer',
