@@ -19,9 +19,10 @@ workflows:
             brew install qt
             brew link qt --force
             brew linkapps qt
+            export HOMEBREW_QT5_CELLAR=$(brew --cellar qt)
             export HOMEBREW_QT5_VERSION=$(brew list --versions qt | rev | cut -d' ' -f1 | rev)
-            ln -s /usr/local/Cellar/qt/$HOMEBREW_QT5_VERSION/mkspecs /usr/local/mkspecs
-            ln -s /usr/local/Cellar/qt/$HOMEBREW_QT5_VERSION/plugins /usr/local/plugins
+            ln -s $HOMEBREW_QT5_CELLAR/$HOMEBREW_QT5_VERSION/mkspecs /usr/local/mkspecs
+            ln -s $HOMEBREW_QT5_CELLAR/$HOMEBREW_QT5_VERSION/plugins /usr/local/plugins
             export BUILDTYPE=Debug
             make qt-app
             make run-qt-test
