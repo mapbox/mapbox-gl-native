@@ -57,6 +57,7 @@ void NodeMap::Init(v8::Local<v8::Object> target) {
     Nan::SetPrototypeMethod(tpl, "loaded", Loaded);
     Nan::SetPrototypeMethod(tpl, "render", Render);
     Nan::SetPrototypeMethod(tpl, "release", Release);
+    Nan::SetPrototypeMethod(tpl, "cancel", Cancel);
 
     Nan::SetPrototypeMethod(tpl, "addClass", AddClass);
     Nan::SetPrototypeMethod(tpl, "addSource", AddSource);
@@ -506,6 +507,35 @@ void NodeMap::release() {
     });
 
     map.reset();
+}
+
+/**
+ * Cancel an ongoing render request. The callback will be called with
+ * the error set to "Canceled". Will throw if no rendering is in progress.
+ * @name cancel
+ * @returns {undefined}
+ */
+void NodeMap::Cancel(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+    auto nodeMap = Nan::ObjectWrap::Unwrap<NodeMap>(info.Holder());
+
+    if (!nodeMap->map) return Nan::ThrowError(releasedMessage());
+    if (!nodeMap->callback) return Nan::ThrowError("No render in progress");
+
+    try {
+        nodeMap->cancel();
+    } catch (const std::exception &ex) {
+        return Nan::ThrowError(ex.what());
+    }
+
+    info.GetReturnValue().SetUndefined();
+}
+
+void NodeMap::cancel() {
+    // Set an empty style, forcing ongoing requests to get canceled.
+    map->setStyleJSON("{ \"version\": 8, \"sources\": {}, \"layers\": [] }");
+
+    error = std::make_exception_ptr(std::runtime_error("Canceled"));
+    renderFinished();
 }
 
 void NodeMap::AddClass(const Nan::FunctionCallbackInfo<v8::Value>& info) {
