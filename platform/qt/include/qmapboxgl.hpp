@@ -94,31 +94,24 @@ class Q_DECL_EXPORT QMapboxGL : public QObject
     Q_PROPERTY(QMargins margins READ margins WRITE setMargins)
 
 public:
-    enum MapChange {
-        MapChangeRegionWillChange = 0,
-        MapChangeRegionWillChangeAnimated,
-        MapChangeRegionIsChanging,
-        MapChangeRegionDidChange,
-        MapChangeRegionDidChangeAnimated,
-        MapChangeWillStartLoadingMap,
-        MapChangeDidFinishLoadingMap,
-        MapChangeDidFailLoadingMap,
-        MapChangeWillStartRenderingFrame,
-        MapChangeDidFinishRenderingFrame,
-        MapChangeDidFinishRenderingFrameFullyRendered,
-        MapChangeWillStartRenderingMap,
-        MapChangeDidFinishRenderingMap,
-        MapChangeDidFinishRenderingMapFullyRendered,
-        MapChangeDidFinishLoadingStyle,
-        MapChangeSourceDidChange
-    };
-
     // Determines the orientation of the map.
     enum NorthOrientation {
         NorthUpwards, // Default
         NorthRightwards,
         NorthDownwards,
         NorthLeftwards,
+    };
+
+    // Determines whether a camera change is immediate or animated.
+    enum CameraChangeMode {
+        Immediate,
+        Animated
+    };
+
+    // Determines whether rendering tiles with complete data or not.
+    enum RenderMode {
+        Partial,
+        Full
     };
 
     QMapboxGL(QObject* parent = 0,
@@ -232,8 +225,21 @@ public slots:
 
 signals:
     void needsRendering();
-    void mapChanged(QMapboxGL::MapChange);
     void copyrightsChanged(const QString &copyrightsHtml);
+
+signals:
+    void cameraWillChange(QMapboxGL::CameraChangeMode);
+    void cameraIsChanging();
+    void cameraDidChange(QMapboxGL::CameraChangeMode);
+    void willStartLoadingMap();
+    void didFinishLoadingMap();
+    void didFailLoadingMap(const QString& error);
+    void willStartRenderingFrame();
+    void didFinishRenderingFrame(QMapboxGL::RenderMode);
+    void willStartRenderingMap();
+    void didFinishRenderingMap(QMapboxGL::RenderMode);
+    void didFinishLoadingStyle();
+    void sourceChanged(const QString& sourceID);
 
 private:
     Q_DISABLE_COPY(QMapboxGL)
@@ -241,6 +247,7 @@ private:
     QMapboxGLPrivate *d_ptr;
 };
 
-Q_DECLARE_METATYPE(QMapboxGL::MapChange);
+Q_DECLARE_METATYPE(QMapboxGL::CameraChangeMode);
+Q_DECLARE_METATYPE(QMapboxGL::RenderMode);
 
 #endif // QMAPBOXGL_H
