@@ -4,7 +4,7 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
-import com.mapbox.mapboxsdk.exceptions.InvalidAccessTokenException;
+import com.mapbox.mapboxsdk.exceptions.MapboxConfigurationException;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -39,7 +39,7 @@ public class MapboxTest {
     assertSame(accessToken, Mapbox.getAccessToken());
   }
 
-  @Test(expected = InvalidAccessTokenException.class)
+  @Test(expected = MapboxConfigurationException.class)
   public void testGetInvalidAccessToken() {
     final String accessToken = "dummy";
     injectMapboxSingleton(accessToken);
