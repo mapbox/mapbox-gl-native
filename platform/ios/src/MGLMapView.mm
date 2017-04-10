@@ -576,8 +576,11 @@ public:
 
 - (mbgl::Size)size
 {
-    return { static_cast<uint32_t>(self.bounds.size.width),
-             static_cast<uint32_t>(self.bounds.size.height) };
+    // check for minimum texture size supported by OpenGL ES 2.0
+    //
+    CGSize size = CGSizeMake(MAX(self.bounds.size.width, 64), MAX(self.bounds.size.height, 64));
+    return { static_cast<uint32_t>(size.width),
+             static_cast<uint32_t>(size.height) };
 }
 
 - (mbgl::Size)framebufferSize
