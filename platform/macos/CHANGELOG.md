@@ -2,6 +2,7 @@
 
 ## master
 
+* Fixed an issue causing attribution button text to appear blue instead of black. ([#8701](https://github.com/mapbox/mapbox-gl-native/pull/8701))
 * The error passed into `-[MGLMapViewDelegate mapViewDidFailLoadingMap:withError:]` now includes a more specific description and failure reason. ([#8418](https://github.com/mapbox/mapbox-gl-native/pull/8418))
 
 ## 0.4.0

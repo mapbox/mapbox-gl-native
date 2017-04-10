@@ -68,7 +68,7 @@
     XCTAssertEqual(infos.count, 1);
 
     XCTAssertEqualObjects(infos[0].title.string, @"Mapbox");
-    XCTAssertEqualObjects([infos[0].title attribute:NSLinkAttributeName atIndex:0 effectiveRange:nil], [NSURL URLWithString:@"https://www.mapbox.com/"]);
+    XCTAssertNil([infos[0].title attribute:NSLinkAttributeName atIndex:0 effectiveRange:nil]);
     XCTAssertEqualObjects([infos[0].title attribute:NSUnderlineStyleAttributeName atIndex:0 effectiveRange:nil], @(NSUnderlineStyleSingle));
 
 #if TARGET_OS_IPHONE
