@@ -2,7 +2,7 @@
 
 var mockfs = require('../mockfs');
 var mbgl = require('../../index');
-var test = require('tape');
+var tape = require('tape');
 var timeout = 2000;
 
 function asyncReply(callback, data) {
@@ -36,7 +36,7 @@ function timeoutRequest(t, style, timeoutedResource) {
     }, timeout / 2);
 };
 
-test('Vector', function(t) {
+tape.skip('Vector', function(t) {
     // 1 sprite.png
     // 1 spring.json
     // 1 source
@@ -52,7 +52,7 @@ test('Vector', function(t) {
     timeoutRequest(t, mockfs.style_vector, mockfs.glyph);
 });
 
-test('Raster', function(t) {
+tape.skip('Raster', function(t) {
     // 1 sprite.png
     // 1 spring.json
     // 1 source

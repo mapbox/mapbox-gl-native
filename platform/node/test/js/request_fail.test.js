@@ -2,7 +2,7 @@
 
 var mockfs = require('../mockfs');
 var mbgl = require('../../index');
-var test = require('tape');
+var tape = require('tape');
 
 function asyncReply(callback, data) {
     setTimeout(function() { callback(null, { data: data }); }, 0);
@@ -37,7 +37,7 @@ function failRequest(t, style, failedResource) {
     });
 };
 
-test('Vector', function(t) {
+tape.skip('Vector', function(t) {
     t.plan(5);
 
     failRequest(t, mockfs.style_vector, null);
@@ -48,7 +48,7 @@ test('Vector', function(t) {
     failRequest(t, mockfs.style_vector, mockfs.glyph);
 });
 
-test('Raster', function(t) {
+tape.skip('Raster', function(t) {
     t.plan(4);
 
     failRequest(t, mockfs.style_raster, null);
