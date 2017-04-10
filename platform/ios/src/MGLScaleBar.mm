@@ -177,16 +177,9 @@ static const CGFloat MGLFeetPerMeter = 3.28084;
     return self.row.distance / [self unitsPerPoint];
 }
 
-- (CGFloat)minimumWidth {
-    CGFloat fullWidth = CGRectGetWidth(self.superview.bounds);
-    CGFloat padding = CGRectGetMinX(self.frame);
-    CGFloat width = fullWidth - padding;
-    return floorf((width / 2.0) / 3.0);
-}
-
 - (CGFloat)maximumWidth {
     CGFloat fullWidth = CGRectGetWidth(self.superview.bounds);
-    CGFloat padding = CGRectGetMinX(self.frame);
+    CGFloat padding = [self usesRightToLeftLayout] ? fullWidth - CGRectGetMaxX(self.frame) : CGRectGetMinX(self.frame);
     return floorf(fullWidth / 2 - padding);
 }
 
@@ -195,6 +188,15 @@ static const CGFloat MGLFeetPerMeter = 3.28084;
 }
 
 #pragma mark - Convenient methods
+
+- (BOOL)usesRightToLeftLayout {
+    return [UIView userInterfaceLayoutDirectionForSemanticContentAttribute:self.superview.semanticContentAttribute] == UIUserInterfaceLayoutDirectionRightToLeft;
+}
+
+- (BOOL)usesMetricSystem {
+    NSLocale *locale = [NSLocale currentLocale];
+    return [[locale objectForKey:NSLocaleUsesMetricSystem] boolValue];
+}
 
 - (MGLRow)preferredRow {
     CLLocationDistance maximumDistance = [self maximumWidth] * [self unitsPerPoint];
@@ -215,11 +217,6 @@ static const CGFloat MGLFeetPerMeter = 3.28084;
     }
     
     return row;
-}
-
-- (BOOL)usesMetricSystem {
-    NSLocale *locale = [NSLocale currentLocale];
-    return [[locale objectForKey:NSLocaleUsesMetricSystem] boolValue];
 }
 
 - (void)fadeIn {
@@ -264,13 +261,15 @@ static const CGFloat MGLFeetPerMeter = 3.28084;
 }
 
 - (void)setRow:(MGLRow)row {
-    if (_row.distance != row.distance) {
-        [_bars makeObjectsPerformSelector:@selector(removeFromSuperview)];
-        [_labels makeObjectsPerformSelector:@selector(removeFromSuperview)];
-        _bars = nil;
-        _labels = nil;
-        _row = row;
+    if (_row.distance == row.distance) {
+        return;
     }
+    
+    _row = row;
+    [_bars makeObjectsPerformSelector:@selector(removeFromSuperview)];
+    [_labels makeObjectsPerformSelector:@selector(removeFromSuperview)];
+    _bars = nil;
+    _labels = nil;
 }
 
 #pragma mark - Views
@@ -290,13 +289,14 @@ static const CGFloat MGLFeetPerMeter = 3.28084;
 
 - (NSArray<UILabel *> *)labels {
     if (!_labels) {
-        NSCharacterSet *characterSet = [[NSCharacterSet decimalDigitCharacterSet] invertedSet];
+        NSDecimalNumber *zeroNumber = [NSDecimalNumber decimalNumberWithString:@"0"];
+        NSNumberFormatter *formatter = [[NSNumberFormatter alloc] init];
         NSMutableArray *labels = [NSMutableArray array];
         
         for (NSUInteger i = 0; i <= self.row.numberOfBars; i++) {
             UILabel *label = [[MGLScaleBarLabel alloc] init];
             label.font = [UIFont systemFontOfSize:8 weight:UIFontWeightMedium];
-            label.text = [[[self.formatter stringFromDistance:0] componentsSeparatedByCharactersInSet:characterSet] componentsJoinedByString:@""];
+            label.text = [formatter stringFromNumber:zeroNumber];
             label.clipsToBounds = NO;
             [label setNeedsDisplay];
             [label sizeToFit];
@@ -321,6 +321,25 @@ static const CGFloat MGLFeetPerMeter = 3.28084;
     [self updateLabels];
     [self layoutBars];
     [self layoutLabels];
+}
+
+- (void)updateLabels {
+    NSArray *labels = [self.labels subarrayWithRange:NSMakeRange(1, self.labels.count-1)];
+    BOOL useMetric = [self usesMetricSystem];
+    NSUInteger i = 0;
+    
+    for (MGLScaleBarLabel *label in labels) {
+        CLLocationDistance barDistance = (self.row.distance / self.row.numberOfBars) * (i + 1);
+        
+        if (!useMetric) {
+            barDistance /= MGLFeetPerMeter;
+        }
+        
+        label.text = [self.formatter stringFromDistance:barDistance];
+        [label setNeedsDisplay];
+        [label sizeToFit];
+        i++;
+    }
 }
 
 - (void)layoutBars {
@@ -348,32 +367,14 @@ static const CGFloat MGLFeetPerMeter = 3.28084;
 
 - (void)layoutLabels {
     CGFloat barWidth = self.bounds.size.width / self.bars.count;
-    NSUInteger i = 0;
+    BOOL RTL = [self usesRightToLeftLayout];
+    NSUInteger i = RTL ? self.bars.count : 0;
     for (MGLScaleBarLabel *label in self.labels) {
         CGFloat xPosition = barWidth * i - CGRectGetMidX(label.bounds) + self.borderWidth;
         label.frame = CGRectMake(xPosition, 0,
                                  CGRectGetWidth(label.bounds),
                                  CGRectGetHeight(label.bounds));
-        i++;
-    }
-}
-
-- (void)updateLabels {
-    NSArray *labels = [self.labels subarrayWithRange:NSMakeRange(1, self.labels.count-1)];
-    BOOL useMetric = [self usesMetricSystem];
-    NSUInteger i = 0;
-    
-    for (MGLScaleBarLabel *label in labels) {
-        CLLocationDistance barDistance = (self.row.distance / self.row.numberOfBars) * (i + 1);
-        
-        if (!useMetric) {
-            barDistance /= MGLFeetPerMeter;
-        }
-        
-        label.text = [self.formatter stringFromDistance:barDistance];
-        [label setNeedsDisplay];
-        [label sizeToFit];
-        i++;
+        i = RTL ? i-1 : i+1;
     }
 }
 
