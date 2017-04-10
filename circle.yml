@@ -18,12 +18,11 @@ jobs:
 # ------------------------------------------------------------------------------
   android-debug-arm-v7:
     docker:
-      - image: mbgl/android-ci:ndk-r13b
+      - image: mbgl/ci:r2-android-ndk-r13b-gradle
     working_directory: /src
     environment:
-      LD_PRELOAD: /usr/lib/libsysconfcpus.so
-      LIBSYSCONFCPUS: 8
-      JOBS: 8
+      LIBSYSCONFCPUS: 6
+      JOBS: 6
       BUILDTYPE: Debug
     steps:
       - checkout
@@ -45,19 +44,63 @@ jobs:
       - run:
           name: Check Java code style
           command: make android-checkstyle
+      - run:
+          name: Build Test APK
+          command: |
+            echo "${MAPBOX_DEVELOPER_CONFIG_XML}" > platform/android/MapboxGLAndroidSDKTestApp/src/main/res/values/developer-config.xml
+            make android-ui-test-arm-v7
+      - run:
+          name: Log in to Google Cloud Platform
+          shell: /bin/bash -euo pipefail
+          command: |
+            echo "${GCLOUD_SERVICE_ACCOUNT_JSON}" > secret.json
+            gcloud auth activate-service-account --key-file secret.json --project android-gl-native
+            rm secret.json
+      - run:
+          name: Run instrumentation tests on Firebase
+          shell: /bin/bash -euo pipefail
+          command: |
+            gcloud firebase test android models list
+            (gcloud firebase test android run --type instrumentation \
+              --app platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/MapboxGLAndroidSDKTestApp-debug.apk \
+              --test platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/MapboxGLAndroidSDKTestApp-debug-androidTest.apk \
+              --device-ids shamu --os-version-ids 22 --locales en --orientations portrait --timeout 15m \
+              --test-targets "class com.mapbox.mapboxsdk.testapp.maps.widgets.AttributionTest" 2>&1 | tee firebase.log) || EXIT_CODE=$?
+
+            FIREBASE_TEST_BUCKET=$(sed -n 's|^.*\[https://console.developers.google.com/storage/browser/\([^]]*\).*|gs://\1|p' firebase.log)
+            echo "Downloading from: ${FIREBASE_TEST_BUCKET}"
+            gsutil -m cp -n -R -Z "$FIREBASE_TEST_BUCKET*" platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk
+
+            echo "Try running ndk-stack on downloaded logcat to symbolicate the stacktraces:"
+            find platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk -type f -name "logcat" -print0 | \
+              xargs -0 -I '{}' ${ANDROID_NDK_HOME}/ndk-stack -sym build/android-arm-v7/Debug -dump {}
+
+            exit ${EXIT_CODE:-0}
+      - store_artifacts:
+          path: platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk
+          destination: .
 
 # ------------------------------------------------------------------------------
   android-release-all:
     docker:
-      - image: mbgl/android-ci:ndk-r13b
+      - image: mbgl/ci:r2-android-ndk-r13b-gradle
     working_directory: /src
     environment:
-      LD_PRELOAD: /usr/lib/libsysconfcpus.so
-      LIBSYSCONFCPUS: 8
-      JOBS: 8
+      LIBSYSCONFCPUS: 6
+      JOBS: 6
       BUILDTYPE: Release
     steps:
       - checkout
+      - run:
+          name: Generate Maven credentials
+          shell: /bin/bash -euo pipefail
+          command: |
+            aws s3 cp s3://mapbox/android/signing-credentials/secring.gpg platform/android/MapboxGLAndroidSDK/secring.gpg
+            echo "NEXUS_USERNAME=$PUBLISH_NEXUS_USERNAME
+            NEXUS_PASSWORD=$PUBLISH_NEXUS_PASSWORD
+            signing.keyId=$SIGNING_KEYID
+            signing.password=$SIGNING_PASSWORD
+            signing.secretKeyRingFile=secring.gpg" >> platform/android/MapboxGLAndroidSDK/gradle.properties
       - run:
           name: Build libmapbox-gl.so for arm-v7
           command: make android-lib-arm-v7
@@ -79,6 +122,15 @@ jobs:
       - run:
           name: Build package
           command: make apackage
-      - run:
+      - store_artifacts:
+          path: platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk
+          destination: .
+      - deploy:
           name: Show statistics
-          command: platform/android/scripts/metrics.sh
+          command: |
+            [ "${CIRCLE_BRANCH}" == "master" ] && export CLOUDWATCH=true
+            platform/android/scripts/metrics.sh
+      - deploy:
+          name: Publish to Maven
+          command: |
+            if [ "${CIRCLE_BRANCH}" == release-* ]; then make run-android-upload-archives ; fi
