@@ -93,7 +93,12 @@
             return;
         }
 
-        MGLAttributionInfo *info = [[MGLAttributionInfo alloc] initWithTitle:title URL:value];
+        // Remove the link, because it forces the text to be blue on macOS 10.12
+        // and above.
+        NSMutableAttributedString *unlinkedTitle = [title mutableCopy];
+        [unlinkedTitle removeAttribute:NSLinkAttributeName range:unlinkedTitle.mgl_wholeRange];
+        
+        MGLAttributionInfo *info = [[MGLAttributionInfo alloc] initWithTitle:unlinkedTitle URL:value];
         info.feedbackLink = isFeedbackLink;
         [infos addObject:info];
     }];
