@@ -5,7 +5,6 @@
 #import "NSPredicate+MGLAdditions.h"
 #import "NSDate+MGLAdditions.h"
 #import "MGLStyleLayer_Private.h"
-#import "MGLForegroundStyleLayer_Private.h"
 #import "MGLStyleValue_Private.h"
 #import "MGLBackgroundStyleLayer.h"
 
