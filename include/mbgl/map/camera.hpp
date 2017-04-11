@@ -17,7 +17,7 @@ struct CameraOptions {
 
     /** Padding around the interior of the view that affects the frame of
         reference for `center`. */
-    optional<EdgeInsets> padding;
+    EdgeInsets padding;
 
     /** Point of reference for `zoom` and `angle`, assuming an origin at the
         top-left corner of the view. */

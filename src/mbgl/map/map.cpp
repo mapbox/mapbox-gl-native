@@ -468,7 +468,7 @@ bool Map::isPanning() const {
 
 #pragma mark -
 
-CameraOptions Map::getCameraOptions(optional<EdgeInsets> padding) const {
+CameraOptions Map::getCameraOptions(const EdgeInsets& padding) const {
     return impl->transform.getCameraOptions(padding);
 }
 
@@ -503,7 +503,7 @@ void Map::setLatLng(const LatLng& latLng, const AnimationOptions& animation) {
     setLatLng(latLng, optional<ScreenCoordinate> {}, animation);
 }
 
-void Map::setLatLng(const LatLng& latLng, optional<EdgeInsets> padding, const AnimationOptions& animation) {
+void Map::setLatLng(const LatLng& latLng, const EdgeInsets& padding, const AnimationOptions& animation) {
     impl->cameraMutated = true;
     impl->transform.setLatLng(latLng, padding, animation);
     impl->onUpdate(Update::Repaint);
@@ -515,11 +515,11 @@ void Map::setLatLng(const LatLng& latLng, optional<ScreenCoordinate> anchor, con
     impl->onUpdate(Update::Repaint);
 }
 
-LatLng Map::getLatLng(optional<EdgeInsets> padding) const {
+LatLng Map::getLatLng(const EdgeInsets& padding) const {
     return impl->transform.getLatLng(padding);
 }
 
-void Map::resetPosition(optional<EdgeInsets> padding) {
+void Map::resetPosition(const EdgeInsets& padding) {
     impl->cameraMutated = true;
     CameraOptions camera;
     camera.angle = 0;
@@ -552,7 +552,7 @@ double Map::getScale() const {
 
 void Map::setZoom(double zoom, const AnimationOptions& animation) {
     impl->cameraMutated = true;
-    setZoom(zoom, optional<EdgeInsets> {}, animation);
+    setZoom(zoom, EdgeInsets(), animation);
 }
 
 void Map::setZoom(double zoom, optional<ScreenCoordinate> anchor, const AnimationOptions& animation) {
@@ -561,7 +561,7 @@ void Map::setZoom(double zoom, optional<ScreenCoordinate> anchor, const Animatio
     impl->onUpdate(Update::RecalculateStyle);
 }
 
-void Map::setZoom(double zoom, optional<EdgeInsets> padding, const AnimationOptions& animation) {
+void Map::setZoom(double zoom, const EdgeInsets& padding, const AnimationOptions& animation) {
     impl->cameraMutated = true;
     impl->transform.setZoom(zoom, padding, animation);
     impl->onUpdate(Update::RecalculateStyle);
@@ -576,13 +576,13 @@ void Map::setLatLngZoom(const LatLng& latLng, double zoom, const AnimationOption
     setLatLngZoom(latLng, zoom, {}, animation);
 }
 
-void Map::setLatLngZoom(const LatLng& latLng, double zoom, optional<EdgeInsets> padding, const AnimationOptions& animation) {
+void Map::setLatLngZoom(const LatLng& latLng, double zoom, const EdgeInsets& padding, const AnimationOptions& animation) {
     impl->cameraMutated = true;
     impl->transform.setLatLngZoom(latLng, zoom, padding, animation);
     impl->onUpdate(Update::RecalculateStyle);
 }
 
-CameraOptions Map::cameraForLatLngBounds(const LatLngBounds& bounds, optional<EdgeInsets> padding) const {
+CameraOptions Map::cameraForLatLngBounds(const LatLngBounds& bounds, const EdgeInsets& padding) const {
     return cameraForLatLngs({
         bounds.northwest(),
         bounds.southwest(),
@@ -591,7 +591,7 @@ CameraOptions Map::cameraForLatLngBounds(const LatLngBounds& bounds, optional<Ed
     }, padding);
 }
 
-CameraOptions Map::cameraForLatLngs(const std::vector<LatLng>& latLngs, optional<EdgeInsets> padding) const {
+CameraOptions Map::cameraForLatLngs(const std::vector<LatLng>& latLngs, const EdgeInsets& padding) const {
     CameraOptions options;
     if (latLngs.empty()) {
         return options;
@@ -616,10 +616,8 @@ CameraOptions Map::cameraForLatLngs(const std::vector<LatLng>& latLngs, optional
     if (width > 0 || height > 0) {
         double scaleX = double(getSize().width) / width;
         double scaleY = double(getSize().height) / height;
-        if (padding) {
-            scaleX -= (padding->left + padding->right) / width;
-            scaleY -= (padding->top + padding->bottom) / height;
-        }
+        scaleX -= (padding.left + padding.right) / width;
+        scaleY -= (padding.top + padding.bottom) / height;
         minScale = util::min(scaleX, scaleY);
     }
     double zoom = util::log2(getScale() * minScale);
@@ -627,17 +625,15 @@ CameraOptions Map::cameraForLatLngs(const std::vector<LatLng>& latLngs, optional
 
     // Calculate the center point of a virtual bounds that is extended in all directions by padding.
     ScreenCoordinate centerPixel = nePixel + swPixel;
-    if (padding) {
-        ScreenCoordinate paddedNEPixel = {
-            padding->right / minScale,
-            padding->top / minScale,
-        };
-        ScreenCoordinate paddedSWPixel = {
-            padding->left / minScale,
-            padding->bottom / minScale,
-        };
-        centerPixel = centerPixel + paddedNEPixel - paddedSWPixel;
-    }
+    ScreenCoordinate paddedNEPixel = {
+        padding.right / minScale,
+        padding.top / minScale,
+    };
+    ScreenCoordinate paddedSWPixel = {
+        padding.left / minScale,
+        padding.bottom / minScale,
+    };
+    centerPixel = centerPixel + paddedNEPixel - paddedSWPixel;
     centerPixel /= 2.0;
 
     // CameraOptions origin is at the top-left corner.
@@ -750,7 +746,7 @@ void Map::setBearing(double degrees, optional<ScreenCoordinate> anchor, const An
     impl->onUpdate(Update::Repaint);
 }
 
-void Map::setBearing(double degrees, optional<EdgeInsets> padding, const AnimationOptions& animation) {
+void Map::setBearing(double degrees, const EdgeInsets& padding, const AnimationOptions& animation) {
     impl->cameraMutated = true;
     impl->transform.setAngle(-degrees * util::DEG2RAD, padding, animation);
     impl->onUpdate(Update::Repaint);
