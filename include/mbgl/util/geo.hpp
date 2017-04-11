@@ -70,27 +70,42 @@ public:
     LatLng(const CanonicalTileID& id);
     LatLng(const UnwrappedTileID& id);
 
-    friend constexpr bool operator==(const LatLng& a, const LatLng& b) {
+    friend bool operator==(const LatLng& a, const LatLng& b) {
         return a.lat == b.lat && a.lon == b.lon;
     }
 
-    friend constexpr bool operator!=(const LatLng& a, const LatLng& b) {
+    friend bool operator!=(const LatLng& a, const LatLng& b) {
         return !(a == b);
     }
 };
 
 class ProjectedMeters {
+private:
+    double _northing; // Distance measured northwards.
+    double _easting;  // Distance measured eastwards.
+
 public:
-    double northing;
-    double easting;
+    ProjectedMeters(double n_ = 0, double e_ = 0)
+        : _northing(n_), _easting(e_) {
+        if (std::isnan(_northing)) {
+            throw std::domain_error("northing must not be NaN");
+        }
+        if (std::isnan(_easting)) {
+            throw std::domain_error("easting must not be NaN");
+        }
+    }
 
-    ProjectedMeters(double n = 0, double e = 0)
-        : northing(n), easting(e) {}
+    double northing() const { return _northing; }
+    double easting() const { return _easting; }
+
+    friend bool operator==(const ProjectedMeters& a, const ProjectedMeters& b) {
+        return a._northing == b._northing && a._easting == b._easting;
+    }
+
+    friend bool operator!=(const ProjectedMeters& a, const ProjectedMeters& b) {
+        return !(a == b);
+    }
 };
-
-constexpr bool operator==(const ProjectedMeters& a, const ProjectedMeters& b) {
-    return a.northing == b.northing && a.easting == b.easting;
-}
 
 class LatLngBounds {
 public:
@@ -188,17 +203,14 @@ private:
     LatLngBounds(LatLng sw_, LatLng ne_)
         : sw(std::move(sw_)), ne(std::move(ne_)) {}
 
-    friend constexpr bool operator==(const LatLngBounds&, const LatLngBounds&);
-    friend constexpr bool operator!=(const LatLngBounds&, const LatLngBounds&);
+    friend bool operator==(const LatLngBounds& a, const LatLngBounds& b) {
+        return a.sw == b.sw && a.ne == b.ne;
+    }
+
+    friend bool operator!=(const LatLngBounds& a, const LatLngBounds& b) {
+        return !(a == b);
+    }
 };
-
-constexpr bool operator==(const LatLngBounds& a, const LatLngBounds& b) {
-    return a.sw == b.sw && a.ne == b.ne;
-}
-
-constexpr bool operator!=(const LatLngBounds& a, const LatLngBounds& b) {
-    return !(a == b);
-}
 
 // Determines the orientation of the map.
 enum class NorthOrientation : uint8_t {
@@ -210,43 +222,60 @@ enum class NorthOrientation : uint8_t {
 
 /// The distance on each side between a rectangle and a rectangle within.
 class EdgeInsets {
+private:
+    double _top;    // Number of pixels inset from the top edge.
+    double _left;   // Number of pixels inset from the left edge.
+    double _bottom; // Number of pixels inset from the bottom edge.
+    double _right;  // Number of pixels inset from the right edge.
+
 public:
-    double top = 0;    // Number of pixels inset from the top edge.
-    double left = 0;   // Number of pixels inset from the left edge.
-    double bottom = 0; // Number of pixels inset from the bottom edge.
-    double right = 0;  // Number of pixels inset from the right edge.
+    EdgeInsets(double t_ = 0, double l_ = 0, double b_ = 0, double r_ = 0)
+        : _top(t_), _left(l_), _bottom(b_), _right(r_) {
+        if (std::isnan(_top)) {
+            throw std::domain_error("top must not be NaN");
+        }
+        if (std::isnan(_left)) {
+            throw std::domain_error("left must not be NaN");
+        }
+        if (std::isnan(_bottom)) {
+            throw std::domain_error("bottom must not be NaN");
+        }
+        if (std::isnan(_right)) {
+            throw std::domain_error("right must not be NaN");
+        }
+    }
 
-    EdgeInsets() {}
-
-    EdgeInsets(const double t, const double l, const double b, const double r)
-        : top(t), left(l), bottom(b), right(r) {}
+    double top() const { return _top; }
+    double left() const { return _left; }
+    double bottom() const { return _bottom; }
+    double right() const { return _right; }
 
     bool isFlush() const {
-        return top == 0 && left == 0 && bottom == 0 && right == 0;
+        return _top == 0 && _left == 0 && _bottom == 0 && _right == 0;
     }
 
     void operator+=(const EdgeInsets& o) {
-        top += o.top;
-        left += o.left;
-        bottom += o.bottom;
-        right += o.right;
+        _top += o._top;
+        _left += o._left;
+        _bottom += o._bottom;
+        _right += o._right;
     }
 
     EdgeInsets operator+(const EdgeInsets& o) const {
         return {
-            top + o.top, left + o.left, bottom + o.bottom, right + o.right,
+            _top + o._top, _left + o._left, _bottom + o._bottom, _right + o._right,
         };
     }
 
     ScreenCoordinate getCenter(uint16_t width, uint16_t height) const;
+
+    friend bool operator==(const EdgeInsets& a, const EdgeInsets& b) {
+        return a._top == b._top && a._left == b._left && a._bottom == b._bottom && a._right == b._right;
+    }
+
+    friend bool operator!=(const EdgeInsets& a, const EdgeInsets& b) {
+        return !(a == b);
+    }
 };
-
-constexpr bool operator==(const EdgeInsets& a, const EdgeInsets& b) {
-    return a.top == b.top && a.left == b.left && a.bottom == b.bottom && a.right == b.right;
-}
-
-constexpr bool operator!=(const EdgeInsets& a, const EdgeInsets& b) {
-    return !(a == b);
-}
 
 } // namespace mbgl

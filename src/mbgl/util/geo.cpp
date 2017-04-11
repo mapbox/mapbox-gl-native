@@ -34,8 +34,8 @@ LatLngBounds::LatLngBounds(const CanonicalTileID& id)
 
 ScreenCoordinate EdgeInsets::getCenter(uint16_t width, uint16_t height) const {
     return {
-        (width - left - right) / 2.0f + left,
-        (height - top - bottom) / 2.0f + top,
+        (width - left() - right()) / 2.0 + left(),
+        (height - top() - bottom()) / 2.0 + top(),
     };
 }
 

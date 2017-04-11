@@ -200,8 +200,8 @@ void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &anima
 
     /// w₀: Initial visible span, measured in pixels at the initial scale.
     /// Known henceforth as a <i>screenful</i>.
-    double w0 = std::max(state.size.width - padding.left - padding.right,
-                         state.size.height - padding.top - padding.bottom);
+    double w0 = std::max(state.size.width - padding.left() - padding.right(),
+                         state.size.height - padding.top() - padding.bottom());
     /// w₁: Final visible span, measured in pixels with respect to the initial
     /// scale.
     double w1 = w0 / state.zoomScale(zoom - startZoom);

@@ -38,18 +38,18 @@ TEST(Projection, MetersPerPixelAtLatitude) {
 TEST(Projection, ProjectedMeters) {
     auto latLng = LatLng {};
     auto projectedMeters = Projection::projectedMetersForLatLng(latLng);
-    EXPECT_EQ(projectedMeters.northing, projectedMeters.easting);
+    EXPECT_EQ(projectedMeters.northing(), projectedMeters.easting());
     EXPECT_EQ(latLng, Projection::latLngForProjectedMeters(projectedMeters));
 
     const auto southWest = LatLng { -util::LATITUDE_MAX, -util::LONGITUDE_MAX };
     projectedMeters = Projection::projectedMetersForLatLng(southWest);
-    EXPECT_DOUBLE_EQ(projectedMeters.northing, -20037508.342789274);
-    EXPECT_DOUBLE_EQ(projectedMeters.easting, -20037508.342789244);
+    EXPECT_DOUBLE_EQ(projectedMeters.northing(), -20037508.342789274);
+    EXPECT_DOUBLE_EQ(projectedMeters.easting(), -20037508.342789244);
 
     const auto northEast = LatLng { util::LATITUDE_MAX, util::LONGITUDE_MAX };
     projectedMeters = Projection::projectedMetersForLatLng(northEast);
-    EXPECT_DOUBLE_EQ(projectedMeters.northing, 20037508.342789274);
-    EXPECT_DOUBLE_EQ(projectedMeters.easting, 20037508.342789244);
+    EXPECT_DOUBLE_EQ(projectedMeters.northing(), 20037508.342789274);
+    EXPECT_DOUBLE_EQ(projectedMeters.easting(), 20037508.342789244);
 
     projectedMeters = ProjectedMeters { std::numeric_limits<double>::lowest(), std::numeric_limits<double>::lowest() };
     latLng = Projection::latLngForProjectedMeters(projectedMeters);

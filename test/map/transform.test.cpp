@@ -471,14 +471,12 @@ TEST(Transform, DefaultTransform) {
     // Cannot assign invalid sizes.
     std::vector<Size> invalidSizes = { {}, { min, max }, { max, min } };
     for (const Size& size : invalidSizes) {
-        ASSERT_TRUE(size.isEmpty());
-        bool pass = false;
         try {
             transform.resize(size);
+            ASSERT_TRUE(false) << "Should throw";
         } catch (...) {
-            pass = true;
+            ASSERT_TRUE(size.isEmpty());
         }
-        ASSERT_TRUE(pass) << "Expected to throw";
     }
 
     Size validSize { max, max };

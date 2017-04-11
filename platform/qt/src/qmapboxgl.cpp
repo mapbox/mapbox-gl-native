@@ -1130,7 +1130,7 @@ double QMapboxGL::metersPerPixelAtLatitude(double latitude, double zoom) const
 QMapbox::ProjectedMeters QMapboxGL::projectedMetersForCoordinate(const QMapbox::Coordinate &coordinate_) const
 {
     auto projectedMeters = d_ptr->mapObj->projectedMetersForLatLng(mbgl::LatLng { coordinate_.first, coordinate_.second });
-    return QMapbox::ProjectedMeters(projectedMeters.northing, projectedMeters.easting);
+    return QMapbox::ProjectedMeters(projectedMeters.northing(), projectedMeters.easting());
 }
 
 /*!
@@ -1229,10 +1229,10 @@ void QMapboxGL::setMargins(const QMargins &margins_)
 QMargins QMapboxGL::margins() const
 {
     return QMargins(
-        d_ptr->margins.left,
-        d_ptr->margins.top,
-        d_ptr->margins.right,
-        d_ptr->margins.bottom
+        d_ptr->margins.left(),
+        d_ptr->margins.top(),
+        d_ptr->margins.right(),
+        d_ptr->margins.bottom()
     );
 }
 

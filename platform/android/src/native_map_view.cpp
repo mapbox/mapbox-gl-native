@@ -643,7 +643,7 @@ jni::jdouble NativeMapView::getMetersPerPixelAtLatitude(JNIEnv&, jni::jdouble la
 
 jni::Object<ProjectedMeters> NativeMapView::projectedMetersForLatLng(JNIEnv& env, jni::jdouble latitude, jni::jdouble longitude) {
     mbgl::ProjectedMeters projectedMeters = map->projectedMetersForLatLng(mbgl::LatLng(latitude, longitude));
-    return ProjectedMeters::New(env, projectedMeters.northing, projectedMeters.easting);
+    return ProjectedMeters::New(env, projectedMeters.northing(), projectedMeters.easting());
 }
 
 jni::Object<PointF> NativeMapView::pixelForLatLng(JNIEnv& env, jdouble latitude, jdouble longitude) {

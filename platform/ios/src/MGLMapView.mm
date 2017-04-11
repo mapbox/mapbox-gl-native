@@ -4559,8 +4559,8 @@ public:
             mbgl::LatLng targetLatLng = MGLLatLngFromLocationCoordinate2D(self.targetCoordinate);
             mbgl::ProjectedMeters userMeters = mbgl::Projection::projectedMetersForLatLng(userLatLng);
             mbgl::ProjectedMeters targetMeters = mbgl::Projection::projectedMetersForLatLng(targetLatLng);
-            double angle = atan2(targetMeters.easting - userMeters.easting,
-                                 targetMeters.northing - userMeters.northing);
+            double angle = atan2(targetMeters.easting() - userMeters.easting(),
+                                 targetMeters.northing() - userMeters.northing());
             direction = mbgl::util::wrap(MGLDegreesFromRadians(angle), 0., 360.);
         }
         else
