@@ -91,9 +91,26 @@ public class <%- camelize(type) %>LayerTest extends BaseStyleTest {
     layer.setProperties(visibility(NONE));
     assertEquals(layer.getVisibility().getValue(), NONE);
   }
+<% if (!(type === 'background' || type === 'raster')) { -%>
 
+  @Test
+  public void testSourceLayer() {
+    checkViewIsDisplayed(R.id.mapView);
+    Timber.i("Visibility");
+    assertNotNull(layer);
+
+    // Get initial
+    assertEquals(layer.getSourceLayer(), "composite");
+
+    // Set
+    final String sourceLayer = "test";
+    layer.setSourceLayer(sourceLayer);
+    assertEquals(layer.getSourceLayer(), sourceLayer);
+  }
+<% } -%>
 <% for (const property of properties) { -%>
 <% if (property.transition) { -%>
+
   @Test
   public void test<%- camelize(property.name) %>Transition() {
     checkViewIsDisplayed(R.id.mapView);
@@ -363,7 +380,6 @@ public class <%- camelize(type) %>LayerTest extends BaseStyleTest {
     assertEquals(layer.get<%- camelize(property.name) %>AsInt(), Color.RED);
   }
 <% } -%>
-
 <% } -%>
 
   @After

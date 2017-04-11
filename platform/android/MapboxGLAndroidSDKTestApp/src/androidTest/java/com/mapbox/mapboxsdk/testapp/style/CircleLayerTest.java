@@ -84,6 +84,21 @@ public class CircleLayerTest extends BaseStyleTest {
   }
 
   @Test
+  public void testSourceLayer() {
+    checkViewIsDisplayed(R.id.mapView);
+    Timber.i("Visibility");
+    assertNotNull(layer);
+
+    // Get initial
+    assertEquals(layer.getSourceLayer(), "composite");
+
+    // Set
+    final String sourceLayer = "test";
+    layer.setSourceLayer(sourceLayer);
+    assertEquals(layer.getSourceLayer(), sourceLayer);
+  }
+
+  @Test
   public void testCircleRadiusTransition() {
     checkViewIsDisplayed(R.id.mapView);
     Timber.i("circle-radiusTransitionOptions");
@@ -737,7 +752,6 @@ public class CircleLayerTest extends BaseStyleTest {
     assertEquals(1, ((ExponentialStops) layer.getCircleTranslate().getFunction().getStops()).size());
   }
 
-
   @Test
   public void testCircleTranslateAnchorAsConstant() {
     checkViewIsDisplayed(R.id.mapView);
@@ -773,7 +787,6 @@ public class CircleLayerTest extends BaseStyleTest {
     assertEquals(IntervalStops.class, layer.getCircleTranslateAnchor().getFunction().getStops().getClass());
     assertEquals(1, ((IntervalStops) layer.getCircleTranslateAnchor().getFunction().getStops()).size());
   }
-
 
   @Test
   public void testCirclePitchScaleAsConstant() {
@@ -1258,7 +1271,6 @@ public class CircleLayerTest extends BaseStyleTest {
     assertEquals(0.3f, stop.in.value, 0.001f);
     assertEquals(0.9f, stop.out, 0.001f);
   }
-
 
   @After
   public void unregisterIntentServiceIdlingResource() {

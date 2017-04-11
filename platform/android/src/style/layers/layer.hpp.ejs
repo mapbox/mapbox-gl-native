@@ -44,7 +44,6 @@ public:
     jni::Object<TransitionOptions> get<%- camelize(property.name) %>Transition(jni::JNIEnv&);
 <% } -%>
 <% } -%>
-
     jni::jobject* createJavaPeer(jni::JNIEnv&);
 
 }; // class <%- camelize(type) %>Layer

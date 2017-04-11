@@ -17,12 +17,14 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.style.functions.Function;
 import com.mapbox.mapboxsdk.style.functions.stops.ExponentialStops;
 import com.mapbox.mapboxsdk.style.functions.stops.Stop;
+import com.mapbox.mapboxsdk.style.layers.CircleLayer;
 import com.mapbox.mapboxsdk.style.layers.FillLayer;
 import com.mapbox.mapboxsdk.style.layers.Layer;
 import com.mapbox.mapboxsdk.style.layers.LineLayer;
 import com.mapbox.mapboxsdk.style.layers.Property;
 import com.mapbox.mapboxsdk.style.layers.PropertyValue;
 import com.mapbox.mapboxsdk.style.layers.RasterLayer;
+import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.mapbox.mapboxsdk.style.layers.TransitionOptions;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.mapbox.mapboxsdk.style.sources.RasterSource;
@@ -41,6 +43,7 @@ import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import timber.log.Timber;
@@ -408,7 +411,25 @@ public class RuntimeStyleActivity extends AppCompatActivity {
       lineWidth(20f)
     );
 
-    mapboxMap.addLayer(layer);
+    // adding layers below "road" layers
+    List<Layer> layers = mapboxMap.getLayers();
+    Layer latestLayer = null;
+    Collections.reverse(layers);
+    for (Layer currentLayer : layers) {
+      if (currentLayer instanceof FillLayer && ((FillLayer) currentLayer).getSourceLayer().equals("road")) {
+        latestLayer = currentLayer;
+      } else if (currentLayer instanceof CircleLayer && ((CircleLayer) currentLayer).getSourceLayer().equals("road")) {
+        latestLayer = currentLayer;
+      } else if (currentLayer instanceof SymbolLayer && ((SymbolLayer) currentLayer).getSourceLayer().equals("road")) {
+        latestLayer = currentLayer;
+      } else if (currentLayer instanceof LineLayer && ((LineLayer) currentLayer).getSourceLayer().equals("road")) {
+        latestLayer = currentLayer;
+      }
+    }
+
+    if (latestLayer != null) {
+      mapboxMap.addLayerBelow(layer, latestLayer.getId());
+    }
 
     // Need to get a fresh handle
     layer = mapboxMap.getLayerAs("terrainLayer");
