@@ -496,7 +496,7 @@ style-code: android-style-code
 
 # Configuration file for running CMake from Gradle within Android Studio.
 platform/android/configuration.gradle:
-	@echo "ext {\n    node = '`command -v node | command -v nodejs`'\n    npm = '`command -v npm`'\n    ccache = '`command -v ccache`'\n}" > $@
+	@echo "ext {\n    node = '`command -v node || command -v nodejs`'\n    npm = '`command -v npm`'\n    ccache = '`command -v ccache`'\n}" > $@
 
 define ANDROID_RULES
 # $1 = arm-v7 (short arch)
