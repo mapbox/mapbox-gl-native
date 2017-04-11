@@ -6,6 +6,75 @@
 
 using namespace mbgl;
 
+TEST(LatLng, InvalidLatLng) {
+    try {
+        LatLng { NAN };
+        ASSERT_TRUE(false) << "should throw";
+    } catch (const std::domain_error& error) {
+        ASSERT_EQ(std::string(error.what()), "latitude must not be NaN");
+    }
+    try {
+        LatLng { 0, NAN };
+        ASSERT_TRUE(false) << "should throw";
+    } catch (const std::domain_error& error) {
+        ASSERT_EQ(std::string(error.what()), "longitude must not be NaN");
+    }
+    try {
+        LatLng { 91.0 };
+        ASSERT_TRUE(false) << "should throw";
+    } catch (const std::domain_error& error) {
+        ASSERT_EQ(std::string(error.what()), "latitude must be between -90 and 90");
+    }
+    try {
+        LatLng { 0, std::numeric_limits<double>::infinity() };
+        ASSERT_TRUE(false) << "should throw";
+    } catch (const std::domain_error& error) {
+        ASSERT_EQ(std::string(error.what()), "longitude must not be infinite");
+    }
+}
+
+TEST(ProjectedMeters, InvalidProjectedMeters) {
+    try {
+        ProjectedMeters { NAN };
+        ASSERT_TRUE(false) << "should throw";
+    } catch (const std::domain_error& error) {
+        ASSERT_EQ(std::string(error.what()), "northing must not be NaN");
+    }
+    try {
+        ProjectedMeters { 0, NAN };
+        ASSERT_TRUE(false) << "should throw";
+    } catch (const std::domain_error& error) {
+        ASSERT_EQ(std::string(error.what()), "easting must not be NaN");
+    }
+}
+
+TEST(EdgeInsets, InvalidEdgeInsets) {
+    try {
+        EdgeInsets { NAN };
+        ASSERT_TRUE(false) << "should throw";
+    } catch (const std::domain_error& error) {
+        ASSERT_EQ(std::string(error.what()), "top must not be NaN");
+    }
+    try {
+        EdgeInsets { 0, NAN };
+        ASSERT_TRUE(false) << "should throw";
+    } catch (const std::domain_error& error) {
+        ASSERT_EQ(std::string(error.what()), "left must not be NaN");
+    }
+    try {
+        EdgeInsets { 0, 0, NAN };
+        ASSERT_TRUE(false) << "should throw";
+    } catch (const std::domain_error& error) {
+        ASSERT_EQ(std::string(error.what()), "bottom must not be NaN");
+    }
+    try {
+        EdgeInsets { 0, 0, 0, NAN };
+        ASSERT_TRUE(false) << "should throw";
+    } catch (const std::domain_error& error) {
+        ASSERT_EQ(std::string(error.what()), "right must not be NaN");
+    }
+}
+
 TEST(LatLngBounds, World) {
     auto result = LatLngBounds::world();
     ASSERT_DOUBLE_EQ(-90,  result.south());

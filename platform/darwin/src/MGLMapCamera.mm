@@ -32,11 +32,11 @@ BOOL MGLEqualFloatWithAccuracy(CGFloat left, CGFloat right, CGFloat accuracy)
         
         mbgl::ProjectedMeters centerMeters = mbgl::Projection::projectedMetersForLatLng(centerLatLng);
         mbgl::ProjectedMeters eyeMeters = mbgl::Projection::projectedMetersForLatLng(eyeLatLng);
-        heading = std::atan((centerMeters.northing - eyeMeters.northing) /
-                            (centerMeters.easting - eyeMeters.easting));
+        heading = std::atan((centerMeters.northing() - eyeMeters.northing()) /
+                            (centerMeters.easting() - eyeMeters.easting()));
         
-        double groundDistance = std::hypot(centerMeters.northing - eyeMeters.northing,
-                                           centerMeters.easting - eyeMeters.easting);
+        double groundDistance = std::hypot(centerMeters.northing() - eyeMeters.northing(),
+                                           centerMeters.easting() - eyeMeters.easting());
         pitch = std::atan(eyeAltitude / groundDistance);
     }
 

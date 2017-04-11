@@ -38,8 +38,8 @@ public:
     }
 
     static LatLng latLngForProjectedMeters(const ProjectedMeters& projectedMeters) {
-        double latitude = (2 * std::atan(std::exp(projectedMeters.northing / util::EARTH_RADIUS_M)) - (M_PI / 2.0)) * util::RAD2DEG;
-        double longitude = projectedMeters.easting * util::RAD2DEG / util::EARTH_RADIUS_M;
+        double latitude = (2 * std::atan(std::exp(projectedMeters.northing() / util::EARTH_RADIUS_M)) - (M_PI / 2.0)) * util::RAD2DEG;
+        double longitude = projectedMeters.easting() * util::RAD2DEG / util::EARTH_RADIUS_M;
 
         latitude = util::clamp(latitude, -util::LATITUDE_MAX, util::LATITUDE_MAX);
         longitude = util::clamp(longitude, -util::LONGITUDE_MAX, util::LONGITUDE_MAX);
