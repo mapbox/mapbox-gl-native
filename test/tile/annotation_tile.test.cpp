@@ -58,7 +58,7 @@ TEST(AnnotationTile, Issue8289) {
     auto collisionTile = std::make_unique<CollisionTile>(PlacementConfig());
 
     IndexedSubfeature subfeature { 0, "", "", 0 };
-    CollisionFeature feature(GeometryCoordinates(), Anchor(0, 0, 0, 0), -5, 5, -5, 5, 1, 0, style::SymbolPlacementType::Point, subfeature, false);
+    CollisionFeature feature(GeometryCoordinates(), Anchor(0, 0, 0, 0), -5, 5, -5, 5, 1, 0, style::SymbolPlacementType::Point, subfeature, CollisionFeature::AlignmentType::Curved);
     collisionTile->insertFeature(feature, 0, true);
     collisionTile->placeFeature(feature, false, false);
 

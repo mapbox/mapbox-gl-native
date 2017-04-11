@@ -221,7 +221,7 @@ void SymbolLayout::prepare(const GlyphPositionMap& glyphs, const IconAtlasMap& i
         if (feature.geometry.empty()) continue;
 
         std::pair<Shaping, Shaping> shapedTextOrientations;
-        PositionedIcon shapedIcon;
+        optional<PositionedIcon> shapedIcon;
         GlyphPositions face;
 
         // if feature has text, shape the text
@@ -262,7 +262,7 @@ void SymbolLayout::prepare(const GlyphPositionMap& glyphs, const IconAtlasMap& i
             if (icons != iconMap.end()) {
                 auto image = icons->second.find(*feature.icon);
                 if (image != icons->second.end()) {
-                    shapedIcon = shapeIcon(image->second,
+                    shapedIcon = PositionedIcon::shapeIcon(image->second,
                         layout.evaluate<IconOffset>(zoom, feature),
                         layout.evaluate<IconRotate>(zoom, feature) * util::DEG2RAD);
                     if (image->second.sdf) {
@@ -292,7 +292,7 @@ void SymbolLayout::prepare(const GlyphPositionMap& glyphs, const IconAtlasMap& i
 void SymbolLayout::addFeature(const std::size_t index,
                               const SymbolFeature& feature,
                               const std::pair<Shaping, Shaping>& shapedTextOrientations,
-                              const PositionedIcon& shapedIcon,
+                              optional<PositionedIcon> shapedIcon,
                               const GlyphPositions& glyphs) {
     const float minScale = 0.5f;
     const float glyphSize = 24.0f;
@@ -363,8 +363,8 @@ void SymbolLayout::addFeature(const std::size_t index,
                                          textMaxAngle,
                                          (shapedTextOrientations.second ?: shapedTextOrientations.first).left,
                                          (shapedTextOrientations.second ?: shapedTextOrientations.first).right,
-                                         shapedIcon.left,
-                                         shapedIcon.right,
+                                         (shapedIcon ? shapedIcon->left() : 0),
+                                         (shapedIcon ? shapedIcon->right() : 0),
                                          glyphSize,
                                          textMaxBoxScale,
                                          overscaling);

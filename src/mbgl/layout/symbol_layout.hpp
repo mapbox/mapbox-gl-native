@@ -55,7 +55,7 @@ private:
     void addFeature(const size_t,
                     const SymbolFeature&,
                     const std::pair<Shaping, Shaping>& shapedTextOrientations,
-                    const PositionedIcon& shapedIcon,
+                    optional<PositionedIcon> shapedIcon,
                     const GlyphPositions& face);
 
     bool anchorIsTooClose(const std::u16string& text, const float repeatDistance, const Anchor&);

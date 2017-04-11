@@ -13,7 +13,7 @@ CollisionFeature::CollisionFeature(const GeometryCoordinates& line,
                                    const float padding,
                                    const style::SymbolPlacementType placement,
                                    IndexedSubfeature indexedFeature_,
-                                   const bool straight)
+                                   const AlignmentType alignment)
         : indexedFeature(std::move(indexedFeature_)) {
     if (top == 0 && bottom == 0 && left == 0 && right == 0) return;
 
@@ -32,7 +32,7 @@ CollisionFeature::CollisionFeature(const GeometryCoordinates& line,
 
         GeometryCoordinate anchorPoint = convertPoint<int16_t>(anchor.point);
 
-        if (straight) {
+        if (alignment == AlignmentType::Straight) {
             // used for icon labels that are aligned with the line, but don't curve along it
             const GeometryCoordinate vector = convertPoint<int16_t>(util::unit(convertPoint<double>(line[anchor.segment + 1] - line[anchor.segment])) * length);
             const GeometryCoordinates newLine({ anchorPoint - vector, anchorPoint + vector });

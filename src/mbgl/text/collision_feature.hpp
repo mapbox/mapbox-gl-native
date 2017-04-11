@@ -33,6 +33,11 @@ public:
 
 class CollisionFeature {
 public:
+    enum class AlignmentType : bool {
+        Straight = 0,
+        Curved
+    };
+
     // for text
     CollisionFeature(const GeometryCoordinates& line,
                      const Anchor& anchor,
@@ -41,29 +46,34 @@ public:
                      const float padding,
                      const style::SymbolPlacementType placement,
                      const IndexedSubfeature& indexedFeature_)
-        : CollisionFeature(line, anchor, shapedText.top, shapedText.bottom, shapedText.left, shapedText.right, boxScale, padding, placement, indexedFeature_, false) {}
+        : CollisionFeature(line, anchor, shapedText.top, shapedText.bottom, shapedText.left, shapedText.right, boxScale, padding, placement, indexedFeature_, AlignmentType::Curved) {}
 
     // for icons
     CollisionFeature(const GeometryCoordinates& line,
                      const Anchor& anchor,
-                     const PositionedIcon& shapedIcon,
+                     optional<PositionedIcon> shapedIcon,
                      const float boxScale,
                      const float padding,
                      const style::SymbolPlacementType placement,
                      const IndexedSubfeature& indexedFeature_)
-        : CollisionFeature(line, anchor, shapedIcon.top, shapedIcon.bottom, shapedIcon.left, shapedIcon.right, boxScale, padding, placement, indexedFeature_, true) {}
+        : CollisionFeature(line, anchor,
+                           (shapedIcon ? shapedIcon->top() : 0),
+                           (shapedIcon ? shapedIcon->bottom() : 0),
+                           (shapedIcon ? shapedIcon->left() : 0),
+                           (shapedIcon ? shapedIcon->right() : 0),
+                           boxScale, padding, placement, indexedFeature_, AlignmentType::Straight) {}
 
     CollisionFeature(const GeometryCoordinates& line,
-                     const Anchor& anchor,
+                     const Anchor&,
                      const float top,
                      const float bottom,
                      const float left,
                      const float right,
                      const float boxScale,
                      const float padding,
-                     const style::SymbolPlacementType placement,
+                     const style::SymbolPlacementType,
                      IndexedSubfeature,
-                     const bool straight);
+                     const AlignmentType);
 
     std::vector<CollisionBox> boxes;
     IndexedSubfeature indexedFeature;

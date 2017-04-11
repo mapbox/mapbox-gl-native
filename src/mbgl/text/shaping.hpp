@@ -12,33 +12,38 @@ class SymbolFeature;
 class BiDi;
 
 class PositionedIcon {
-public:
-    PositionedIcon() = default;
+private:
     PositionedIcon(const SpriteAtlasElement& image_,
                    float top_,
                    float bottom_,
                    float left_,
                    float right_,
                    float angle_)
-        : image(image_),
-          top(top_),
-          bottom(bottom_),
-          left(left_),
-          right(right_),
-          angle(angle_) {}
+        : _image(image_),
+          _top(top_),
+          _bottom(bottom_),
+          _left(left_),
+          _right(right_),
+          _angle(angle_) {}
 
-    optional<SpriteAtlasElement> image;
-    float top = 0;
-    float bottom = 0;
-    float left = 0;
-    float right = 0;
-    float angle = 0;
+    optional<SpriteAtlasElement> _image;
+    float _top;
+    float _bottom;
+    float _left;
+    float _right;
+    float _angle;
 
-    explicit operator bool() const { return image && (*image).pos.hasArea(); }
+public:
+    static optional<PositionedIcon> shapeIcon(const class SpriteAtlasElement&, const std::array<float, 2>& iconOffset, const float iconRotation);
+
+    optional<class SpriteAtlasElement> image() const { return _image; }
+    float top() const { return _top; }
+    float bottom() const { return _bottom; }
+    float left() const { return _left; }
+    float right() const { return _right; }
+    float angle() const { return _angle; }
 };
 
-PositionedIcon shapeIcon(const SpriteAtlasElement&, const std::array<float, 2>& iconOffset, const float iconRotation);
-    
 const Shaping getShaping(const std::u16string& string,
                          float maxWidth,
                          float lineHeight,
