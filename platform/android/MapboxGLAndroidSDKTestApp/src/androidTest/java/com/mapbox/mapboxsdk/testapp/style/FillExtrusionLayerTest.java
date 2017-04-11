@@ -22,6 +22,7 @@ import com.mapbox.mapboxsdk.style.layers.FillExtrusionLayer;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.activity.style.RuntimeStyleTestActivity;
 import com.mapbox.mapboxsdk.testapp.utils.OnMapReadyIdlingResource;
+import com.mapbox.mapboxsdk.testapp.activity.BaseActivityTest;
 
 import org.junit.After;
 import org.junit.Before;
@@ -37,28 +38,22 @@ import static com.mapbox.mapboxsdk.style.layers.Property.*;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.*;
 
 import com.mapbox.mapboxsdk.style.layers.TransitionOptions;
+import com.mapbox.mapboxsdk.testapp.activity.espresso.EspressoTestActivity;
 
 /**
  * Basic smoke tests for FillExtrusionLayer
  */
 @RunWith(AndroidJUnit4.class)
-public class FillExtrusionLayerTest extends BaseStyleTest {
-
-  @Rule
-  public final ActivityTestRule<RuntimeStyleTestActivity> rule = new ActivityTestRule<>(RuntimeStyleTestActivity.class);
+public class FillExtrusionLayerTest extends BaseActivityTest {
 
   private FillExtrusionLayer layer;
 
-  private OnMapReadyIdlingResource idlingResource;
+  @Override
+  protected Class getActivityClass() {
+    return EspressoTestActivity.class;
+  }
 
-  private MapboxMap mapboxMap;
-
-  @Before
-  public void setup() {
-    idlingResource = new OnMapReadyIdlingResource(rule.getActivity());
-    Espresso.registerIdlingResources(idlingResource);
-    mapboxMap = rule.getActivity().getMapboxMap();
-
+  private void setupLayer(){
     if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
       Timber.i("Adding layer");
       layer = new FillExtrusionLayer("my-layer", "composite");
@@ -71,7 +66,8 @@ public class FillExtrusionLayerTest extends BaseStyleTest {
 
   @Test
   public void testSetVisibility() {
-    checkViewIsDisplayed(R.id.mapView);
+    validateTestSetup();
+    setupLayer();
     Timber.i("Visibility");
     assertNotNull(layer);
 
@@ -84,8 +80,25 @@ public class FillExtrusionLayerTest extends BaseStyleTest {
   }
 
   @Test
+  public void testSourceLayer() {
+    validateTestSetup();
+    setupLayer();
+    Timber.i("SourceLayer");
+    assertNotNull(layer);
+
+    // Get initial
+    assertEquals(layer.getSourceLayer(), "composite");
+
+    // Set
+    final String sourceLayer = "test";
+    layer.setSourceLayer(sourceLayer);
+    assertEquals(layer.getSourceLayer(), sourceLayer);
+  }
+
+  @Test
   public void testFillExtrusionOpacityTransition() {
-    checkViewIsDisplayed(R.id.mapView);
+    validateTestSetup();
+    setupLayer();
     Timber.i("fill-extrusion-opacityTransitionOptions");
     assertNotNull(layer);
 
@@ -97,7 +110,8 @@ public class FillExtrusionLayerTest extends BaseStyleTest {
 
   @Test
   public void testFillExtrusionOpacityAsConstant() {
-    checkViewIsDisplayed(R.id.mapView);
+    validateTestSetup();
+    setupLayer();
     Timber.i("fill-extrusion-opacity");
     assertNotNull(layer);
 
@@ -108,7 +122,8 @@ public class FillExtrusionLayerTest extends BaseStyleTest {
 
   @Test
   public void testFillExtrusionOpacityAsCameraFunction() {
-    checkViewIsDisplayed(R.id.mapView);
+    validateTestSetup();
+    setupLayer();
     Timber.i("fill-extrusion-opacity");
     assertNotNull(layer);
 
@@ -134,7 +149,8 @@ public class FillExtrusionLayerTest extends BaseStyleTest {
 
   @Test
   public void testFillExtrusionColorTransition() {
-    checkViewIsDisplayed(R.id.mapView);
+    validateTestSetup();
+    setupLayer();
     Timber.i("fill-extrusion-colorTransitionOptions");
     assertNotNull(layer);
 
@@ -146,7 +162,8 @@ public class FillExtrusionLayerTest extends BaseStyleTest {
 
   @Test
   public void testFillExtrusionColorAsConstant() {
-    checkViewIsDisplayed(R.id.mapView);
+    validateTestSetup();
+    setupLayer();
     Timber.i("fill-extrusion-color");
     assertNotNull(layer);
 
@@ -157,7 +174,8 @@ public class FillExtrusionLayerTest extends BaseStyleTest {
 
   @Test
   public void testFillExtrusionColorAsCameraFunction() {
-    checkViewIsDisplayed(R.id.mapView);
+    validateTestSetup();
+    setupLayer();
     Timber.i("fill-extrusion-color");
     assertNotNull(layer);
 
@@ -183,7 +201,8 @@ public class FillExtrusionLayerTest extends BaseStyleTest {
 
   @Test
   public void testFillExtrusionColorAsIdentitySourceFunction() {
-    checkViewIsDisplayed(R.id.mapView);
+    validateTestSetup();
+    setupLayer();
     Timber.i("fill-extrusion-color");
     assertNotNull(layer);
 
@@ -202,7 +221,8 @@ public class FillExtrusionLayerTest extends BaseStyleTest {
 
   @Test
   public void testFillExtrusionColorAsExponentialSourceFunction() {
-    checkViewIsDisplayed(R.id.mapView);
+    validateTestSetup();
+    setupLayer();
     Timber.i("fill-extrusion-color");
     assertNotNull(layer);
 
@@ -228,7 +248,8 @@ public class FillExtrusionLayerTest extends BaseStyleTest {
 
   @Test
   public void testFillExtrusionColorAsCategoricalSourceFunction() {
-    checkViewIsDisplayed(R.id.mapView);
+    validateTestSetup();
+    setupLayer();
     Timber.i("fill-extrusion-color");
     assertNotNull(layer);
 
@@ -257,7 +278,8 @@ public class FillExtrusionLayerTest extends BaseStyleTest {
 
   @Test
   public void testFillExtrusionColorAsIntConstant() {
-    checkViewIsDisplayed(R.id.mapView);
+    validateTestSetup();
+    setupLayer();
     Timber.i("fill-extrusion-color");
     assertNotNull(layer);
 
@@ -268,7 +290,8 @@ public class FillExtrusionLayerTest extends BaseStyleTest {
 
   @Test
   public void testFillExtrusionTranslateTransition() {
-    checkViewIsDisplayed(R.id.mapView);
+    validateTestSetup();
+    setupLayer();
     Timber.i("fill-extrusion-translateTransitionOptions");
     assertNotNull(layer);
 
@@ -280,7 +303,8 @@ public class FillExtrusionLayerTest extends BaseStyleTest {
 
   @Test
   public void testFillExtrusionTranslateAsConstant() {
-    checkViewIsDisplayed(R.id.mapView);
+    validateTestSetup();
+    setupLayer();
     Timber.i("fill-extrusion-translate");
     assertNotNull(layer);
 
@@ -291,7 +315,8 @@ public class FillExtrusionLayerTest extends BaseStyleTest {
 
   @Test
   public void testFillExtrusionTranslateAsCameraFunction() {
-    checkViewIsDisplayed(R.id.mapView);
+    validateTestSetup();
+    setupLayer();
     Timber.i("fill-extrusion-translate");
     assertNotNull(layer);
 
@@ -315,10 +340,10 @@ public class FillExtrusionLayerTest extends BaseStyleTest {
     assertEquals(1, ((ExponentialStops) layer.getFillExtrusionTranslate().getFunction().getStops()).size());
   }
 
-
   @Test
   public void testFillExtrusionTranslateAnchorAsConstant() {
-    checkViewIsDisplayed(R.id.mapView);
+    validateTestSetup();
+    setupLayer();
     Timber.i("fill-extrusion-translate-anchor");
     assertNotNull(layer);
 
@@ -329,7 +354,8 @@ public class FillExtrusionLayerTest extends BaseStyleTest {
 
   @Test
   public void testFillExtrusionTranslateAnchorAsCameraFunction() {
-    checkViewIsDisplayed(R.id.mapView);
+    validateTestSetup();
+    setupLayer();
     Timber.i("fill-extrusion-translate-anchor");
     assertNotNull(layer);
 
@@ -354,7 +380,8 @@ public class FillExtrusionLayerTest extends BaseStyleTest {
 
   @Test
   public void testFillExtrusionPatternTransition() {
-    checkViewIsDisplayed(R.id.mapView);
+    validateTestSetup();
+    setupLayer();
     Timber.i("fill-extrusion-patternTransitionOptions");
     assertNotNull(layer);
 
@@ -366,7 +393,8 @@ public class FillExtrusionLayerTest extends BaseStyleTest {
 
   @Test
   public void testFillExtrusionPatternAsConstant() {
-    checkViewIsDisplayed(R.id.mapView);
+    validateTestSetup();
+    setupLayer();
     Timber.i("fill-extrusion-pattern");
     assertNotNull(layer);
 
@@ -377,7 +405,8 @@ public class FillExtrusionLayerTest extends BaseStyleTest {
 
   @Test
   public void testFillExtrusionPatternAsCameraFunction() {
-    checkViewIsDisplayed(R.id.mapView);
+    validateTestSetup();
+    setupLayer();
     Timber.i("fill-extrusion-pattern");
     assertNotNull(layer);
 
@@ -402,7 +431,8 @@ public class FillExtrusionLayerTest extends BaseStyleTest {
 
   @Test
   public void testFillExtrusionHeightTransition() {
-    checkViewIsDisplayed(R.id.mapView);
+    validateTestSetup();
+    setupLayer();
     Timber.i("fill-extrusion-heightTransitionOptions");
     assertNotNull(layer);
 
@@ -414,7 +444,8 @@ public class FillExtrusionLayerTest extends BaseStyleTest {
 
   @Test
   public void testFillExtrusionHeightAsConstant() {
-    checkViewIsDisplayed(R.id.mapView);
+    validateTestSetup();
+    setupLayer();
     Timber.i("fill-extrusion-height");
     assertNotNull(layer);
 
@@ -425,7 +456,8 @@ public class FillExtrusionLayerTest extends BaseStyleTest {
 
   @Test
   public void testFillExtrusionHeightAsCameraFunction() {
-    checkViewIsDisplayed(R.id.mapView);
+    validateTestSetup();
+    setupLayer();
     Timber.i("fill-extrusion-height");
     assertNotNull(layer);
 
@@ -451,7 +483,8 @@ public class FillExtrusionLayerTest extends BaseStyleTest {
 
   @Test
   public void testFillExtrusionHeightAsIdentitySourceFunction() {
-    checkViewIsDisplayed(R.id.mapView);
+    validateTestSetup();
+    setupLayer();
     Timber.i("fill-extrusion-height");
     assertNotNull(layer);
 
@@ -470,7 +503,8 @@ public class FillExtrusionLayerTest extends BaseStyleTest {
 
   @Test
   public void testFillExtrusionHeightAsExponentialSourceFunction() {
-    checkViewIsDisplayed(R.id.mapView);
+    validateTestSetup();
+    setupLayer();
     Timber.i("fill-extrusion-height");
     assertNotNull(layer);
 
@@ -496,7 +530,8 @@ public class FillExtrusionLayerTest extends BaseStyleTest {
 
   @Test
   public void testFillExtrusionHeightAsCategoricalSourceFunction() {
-    checkViewIsDisplayed(R.id.mapView);
+    validateTestSetup();
+    setupLayer();
     Timber.i("fill-extrusion-height");
     assertNotNull(layer);
 
@@ -525,7 +560,8 @@ public class FillExtrusionLayerTest extends BaseStyleTest {
 
   @Test
   public void testFillExtrusionHeightAsCompositeFunction() {
-    checkViewIsDisplayed(R.id.mapView);
+    validateTestSetup();
+    setupLayer();
     Timber.i("fill-extrusion-height");
     assertNotNull(layer);
 
@@ -559,7 +595,8 @@ public class FillExtrusionLayerTest extends BaseStyleTest {
 
   @Test
   public void testFillExtrusionBaseTransition() {
-    checkViewIsDisplayed(R.id.mapView);
+    validateTestSetup();
+    setupLayer();
     Timber.i("fill-extrusion-baseTransitionOptions");
     assertNotNull(layer);
 
@@ -571,7 +608,8 @@ public class FillExtrusionLayerTest extends BaseStyleTest {
 
   @Test
   public void testFillExtrusionBaseAsConstant() {
-    checkViewIsDisplayed(R.id.mapView);
+    validateTestSetup();
+    setupLayer();
     Timber.i("fill-extrusion-base");
     assertNotNull(layer);
 
@@ -582,7 +620,8 @@ public class FillExtrusionLayerTest extends BaseStyleTest {
 
   @Test
   public void testFillExtrusionBaseAsCameraFunction() {
-    checkViewIsDisplayed(R.id.mapView);
+    validateTestSetup();
+    setupLayer();
     Timber.i("fill-extrusion-base");
     assertNotNull(layer);
 
@@ -608,7 +647,8 @@ public class FillExtrusionLayerTest extends BaseStyleTest {
 
   @Test
   public void testFillExtrusionBaseAsIdentitySourceFunction() {
-    checkViewIsDisplayed(R.id.mapView);
+    validateTestSetup();
+    setupLayer();
     Timber.i("fill-extrusion-base");
     assertNotNull(layer);
 
@@ -627,7 +667,8 @@ public class FillExtrusionLayerTest extends BaseStyleTest {
 
   @Test
   public void testFillExtrusionBaseAsExponentialSourceFunction() {
-    checkViewIsDisplayed(R.id.mapView);
+    validateTestSetup();
+    setupLayer();
     Timber.i("fill-extrusion-base");
     assertNotNull(layer);
 
@@ -653,7 +694,8 @@ public class FillExtrusionLayerTest extends BaseStyleTest {
 
   @Test
   public void testFillExtrusionBaseAsCategoricalSourceFunction() {
-    checkViewIsDisplayed(R.id.mapView);
+    validateTestSetup();
+    setupLayer();
     Timber.i("fill-extrusion-base");
     assertNotNull(layer);
 
@@ -682,7 +724,8 @@ public class FillExtrusionLayerTest extends BaseStyleTest {
 
   @Test
   public void testFillExtrusionBaseAsCompositeFunction() {
-    checkViewIsDisplayed(R.id.mapView);
+    validateTestSetup();
+    setupLayer();
     Timber.i("fill-extrusion-base");
     assertNotNull(layer);
 
@@ -714,9 +757,4 @@ public class FillExtrusionLayerTest extends BaseStyleTest {
     assertEquals(0.9f, stop.out, 0.001f);
   }
 
-
-  @After
-  public void unregisterIntentServiceIdlingResource() {
-    Espresso.unregisterIdlingResources(idlingResource);
-  }
 }

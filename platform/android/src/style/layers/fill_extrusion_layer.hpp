@@ -54,7 +54,6 @@ public:
     jni::Object<jni::ObjectTag> getFillExtrusionBase(jni::JNIEnv&);
     void setFillExtrusionBaseTransition(jni::JNIEnv&, jlong duration, jlong delay);
     jni::Object<TransitionOptions> getFillExtrusionBaseTransition(jni::JNIEnv&);
-
     jni::jobject* createJavaPeer(jni::JNIEnv&);
 
 }; // class FillExtrusionLayer
