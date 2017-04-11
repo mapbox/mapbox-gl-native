@@ -466,20 +466,6 @@ void NativeMapView::setPitch(jni::JNIEnv&, jni::jdouble pitch, jni::jlong durati
     map->setPitch(pitch, mbgl::AnimationOptions{mbgl::Milliseconds(duration)});
 }
 
-void NativeMapView::scaleBy(jni::JNIEnv&, jni::jdouble ds, jni::jdouble cx, jni::jdouble cy, jni::jlong duration) {
-    mbgl::ScreenCoordinate center(cx, cy);
-    map->scaleBy(ds, center, mbgl::AnimationOptions{mbgl::Milliseconds(duration)});
-}
-
-void NativeMapView::setScale(jni::JNIEnv&, jni::jdouble scale, jni::jdouble cx, jni::jdouble cy, jni::jlong duration) {
-    mbgl::ScreenCoordinate center(cx, cy);
-    map->setScale(scale, center, mbgl::AnimationOptions{mbgl::Milliseconds(duration)});
-}
-
-jni::jdouble NativeMapView::getScale(jni::JNIEnv&) {
-    return map->getScale();
-}
-
 void NativeMapView::setZoom(jni::JNIEnv&, jni::jdouble zoom, jni::jdouble x, jni::jdouble y, jni::jlong duration) {
     map->setZoom(zoom, mbgl::ScreenCoordinate{x,y}, mbgl::AnimationOptions{mbgl::Milliseconds(duration)});
 }
@@ -1509,9 +1495,6 @@ void NativeMapView::registerNative(jni::JNIEnv& env) {
             METHOD(&NativeMapView::resetPosition, "nativeResetPosition"),
             METHOD(&NativeMapView::getPitch, "nativeGetPitch"),
             METHOD(&NativeMapView::setPitch, "nativeSetPitch"),
-            METHOD(&NativeMapView::scaleBy, "nativeScaleBy"),
-            METHOD(&NativeMapView::getScale, "nativeGetScale"),
-            METHOD(&NativeMapView::setScale, "nativeSetScale"),
             METHOD(&NativeMapView::getZoom, "nativeGetZoom"),
             METHOD(&NativeMapView::setZoom, "nativeSetZoom"),
             METHOD(&NativeMapView::resetZoom, "nativeResetZoom"),

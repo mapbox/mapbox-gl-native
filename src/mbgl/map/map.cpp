@@ -532,23 +532,7 @@ void Map::resetPosition(const EdgeInsets& padding) {
 }
 
 
-#pragma mark - Scale
-
-void Map::scaleBy(double ds, optional<ScreenCoordinate> anchor, const AnimationOptions& animation) {
-    impl->cameraMutated = true;
-    impl->transform.scaleBy(ds, anchor, animation);
-    impl->onUpdate(Update::RecalculateStyle);
-}
-
-void Map::setScale(double scale, optional<ScreenCoordinate> anchor, const AnimationOptions& animation) {
-    impl->cameraMutated = true;
-    impl->transform.setScale(scale, anchor, animation);
-    impl->onUpdate(Update::RecalculateStyle);
-}
-
-double Map::getScale() const {
-    return impl->transform.getScale();
-}
+#pragma mark - Zoom
 
 void Map::setZoom(double zoom, const AnimationOptions& animation) {
     impl->cameraMutated = true;
@@ -620,7 +604,7 @@ CameraOptions Map::cameraForLatLngs(const std::vector<LatLng>& latLngs, const Ed
         scaleY -= (padding.top + padding.bottom) / height;
         minScale = util::min(scaleX, scaleY);
     }
-    double zoom = util::log2(getScale() * minScale);
+    double zoom = getZoom() + util::log2(minScale);
     zoom = util::clamp(zoom, getMinZoom(), getMaxZoom());
 
     // Calculate the center point of a virtual bounds that is extended in all directions by padding.

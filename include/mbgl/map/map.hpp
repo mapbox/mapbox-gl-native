@@ -95,10 +95,7 @@ public:
     LatLng getLatLng(const EdgeInsets& = {}) const;
     void resetPosition(const EdgeInsets& = {});
 
-    // Scale
-    void scaleBy(double ds, optional<ScreenCoordinate> = {}, const AnimationOptions& = {});
-    void setScale(double scale, optional<ScreenCoordinate> = {}, const AnimationOptions& = {});
-    double getScale() const;
+    // Zoom
     void setZoom(double zoom, const AnimationOptions& = {});
     void setZoom(double zoom, optional<ScreenCoordinate>, const AnimationOptions& = {});
     void setZoom(double zoom, const EdgeInsets&, const AnimationOptions& = {});

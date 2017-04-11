@@ -230,7 +230,7 @@ final class MapGestureDetector {
           float scrollDist = event.getAxisValue(MotionEvent.AXIS_VSCROLL);
 
           // Scale the map by the appropriate power of two factor
-          transform.zoomBy(Math.pow(2.0, scrollDist), event.getX(), event.getY());
+          transform.zoomBy(scrollDist, event.getX(), event.getY());
 
           return true;
 
@@ -479,17 +479,17 @@ final class MapGestureDetector {
       // Scale the map
       if (focalPoint != null) {
         // arround user provided focal point
-        transform.zoomBy(detector.getScaleFactor(), focalPoint.x, focalPoint.y);
+        transform.zoomBy(Math.log(detector.getScaleFactor()) / Math.log(2), focalPoint.x, focalPoint.y);
       } else if (quickZoom) {
         // clamp scale factors we feed to core #7514
         float scaleFactor = MathUtils.clamp(detector.getScaleFactor(),
           MapboxConstants.MINIMUM_SCALE_FACTOR_CLAMP,
           MapboxConstants.MAXIMUM_SCALE_FACTOR_CLAMP);
         // around center map
-        transform.zoomBy(scaleFactor, uiSettings.getWidth() / 2, uiSettings.getHeight() / 2);
+        transform.zoomBy(Math.log(scaleFactor) / Math.log(2), uiSettings.getWidth() / 2, uiSettings.getHeight() / 2);
       } else {
         // around gesture
-        transform.zoomBy(detector.getScaleFactor(), detector.getFocusX(), detector.getFocusY());
+        transform.zoomBy(Math.log(detector.getScaleFactor()) / Math.log(2), detector.getFocusX(), detector.getFocusY());
       }
 
       return true;

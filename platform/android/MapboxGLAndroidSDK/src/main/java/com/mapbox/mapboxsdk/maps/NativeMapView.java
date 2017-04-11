@@ -338,55 +338,6 @@ final class NativeMapView {
     nativeSetPitch(pitch, duration);
   }
 
-  public void scaleBy(double ds) {
-    if (isDestroyedOn("scaleBy")) {
-      return;
-    }
-    scaleBy(ds, Double.NaN, Double.NaN);
-  }
-
-  public void scaleBy(double ds, double cx, double cy) {
-    if (isDestroyedOn("scaleBy")) {
-      return;
-    }
-    scaleBy(ds, cx, cy, 0);
-  }
-
-  public void scaleBy(double ds, double cx, double cy, long duration) {
-    if (isDestroyedOn("scaleBy")) {
-      return;
-    }
-    nativeScaleBy(ds, cx / pixelRatio, cy / pixelRatio, duration);
-  }
-
-  public void setScale(double scale) {
-    if (isDestroyedOn("setScale")) {
-      return;
-    }
-    setScale(scale, Double.NaN, Double.NaN);
-  }
-
-  public void setScale(double scale, double cx, double cy) {
-    if (isDestroyedOn("setScale")) {
-      return;
-    }
-    setScale(scale, cx, cy, 0);
-  }
-
-  public void setScale(double scale, double cx, double cy, long duration) {
-    if (isDestroyedOn("setScale")) {
-      return;
-    }
-    nativeSetScale(scale, cx / pixelRatio, cy / pixelRatio, duration);
-  }
-
-  public double getScale() {
-    if (isDestroyedOn("getScale")) {
-      return 0;
-    }
-    return nativeGetScale();
-  }
-
   public void setZoom(double zoom, PointF focalPoint, long duration) {
     if (isDestroyedOn("setZoom")) {
       return;
@@ -1024,12 +975,6 @@ final class NativeMapView {
   private native double nativeGetPitch();
 
   private native void nativeSetPitch(double pitch, long duration);
-
-  private native void nativeScaleBy(double ds, double cx, double cy, long duration);
-
-  private native void nativeSetScale(double scale, double cx, double cy, long duration);
-
-  private native double nativeGetScale();
 
   private native void nativeSetZoom(double zoom, double cx, double cy, long duration);
 

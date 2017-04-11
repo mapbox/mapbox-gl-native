@@ -125,6 +125,6 @@ public class Projection {
    * @return zoom level that fits the MapView.
    */
   public double calculateZoom(float minScale) {
-    return Math.log(nativeMapView.getScale() * minScale) / Math.log(2);
+    return nativeMapView.getZoom() + Math.log(minScale) / Math.log(2);
   }
 }
