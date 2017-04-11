@@ -384,52 +384,28 @@ ScreenCoordinate Transform::getScreenCoordinate(const EdgeInsets& padding) const
 
 #pragma mark - Zoom
 
-void Transform::scaleBy(double ds, const AnimationOptions& animation) {
-    scaleBy(ds, optional<ScreenCoordinate> {}, animation);
-}
-
-void Transform::scaleBy(double ds, optional<ScreenCoordinate> anchor, const AnimationOptions& animation) {
-    if (std::isnan(ds)) return;
-    double scale = util::clamp(state.scale * ds, state.min_scale, state.max_scale);
-    setScale(scale, anchor, animation);
-}
-
 void Transform::setZoom(double zoom, const AnimationOptions& animation) {
-    setZoom(zoom, optional<ScreenCoordinate> {}, animation);
+    CameraOptions camera;
+    camera.zoom = zoom;
+    easeTo(camera, animation);
 }
 
 void Transform::setZoom(double zoom, optional<ScreenCoordinate> anchor, const AnimationOptions& animation) {
-    setScale(state.zoomScale(zoom), anchor, animation);
-}
-
-void Transform::setZoom(double zoom, const EdgeInsets& padding, const AnimationOptions& animation) {
-    setScale(state.zoomScale(zoom), padding, animation);
-}
-
-double Transform::getZoom() const {
-    return state.getZoom();
-}
-
-double Transform::getScale() const {
-    return state.scale;
-}
-
-void Transform::setScale(double scale, const AnimationOptions& animation) {
-    setScale(scale, optional<ScreenCoordinate> {}, animation);
-}
-
-void Transform::setScale(double scale, optional<ScreenCoordinate> anchor, const AnimationOptions& animation) {
-    if (std::isnan(scale)) return;
     CameraOptions camera;
-    camera.zoom = state.scaleZoom(scale);
+    camera.zoom = zoom;
     camera.anchor = anchor;
     easeTo(camera, animation);
 }
 
-void Transform::setScale(double scale, const EdgeInsets& padding, const AnimationOptions& animation) {
-    optional<ScreenCoordinate> anchor;
-    if (!padding.isFlush()) anchor = getScreenCoordinate(padding);
-    setScale(scale, anchor, animation);
+void Transform::setZoom(double zoom, const EdgeInsets& padding, const AnimationOptions& animation) {
+    CameraOptions camera;
+    camera.zoom = zoom;
+    if (!padding.isFlush()) camera.anchor = getScreenCoordinate(padding);
+    easeTo(camera, animation);
+}
+
+double Transform::getZoom() const {
+    return state.getZoom();
 }
 
 #pragma mark - Bounds

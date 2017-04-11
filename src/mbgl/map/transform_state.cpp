@@ -136,10 +136,6 @@ double TransformState::getZoomFraction() const {
     return getZoom() - getIntegerZoom();
 }
 
-double TransformState::getScale() const {
-    return scale;
-}
-
 #pragma mark - Bounds
 
 void TransformState::setLatLngBounds(const LatLngBounds& bounds_) {

@@ -273,8 +273,8 @@ final class Transform implements MapView.OnMapChangedListener {
     }
   }
 
-  void zoomBy(double pow, float x, float y) {
-    mapView.scaleBy(pow, x, y);
+  void zoomBy(double z, float x, float y) {
+    mapView.setZoom(mapView.getZoom() + z, new PointF(x, y), 0);
   }
 
   void moveBy(double offsetX, double offsetY, long duration) {

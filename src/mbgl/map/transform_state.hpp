@@ -45,7 +45,6 @@ public:
     double pixel_y() const;
 
     // Zoom
-    double getScale() const;
     double getZoom() const;
     int32_t getIntegerZoom() const;
     double getZoomFraction() const;

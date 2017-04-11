@@ -5,43 +5,29 @@
 
 using namespace mbgl;
 
-TEST(Transform, InvalidScale) {
+TEST(Transform, InvalidZoom) {
     Transform transform;
 
     ASSERT_DOUBLE_EQ(0, transform.getLatLng().latitude());
     ASSERT_DOUBLE_EQ(0, transform.getLatLng().longitude());
-    ASSERT_DOUBLE_EQ(1, transform.getScale());
+    ASSERT_DOUBLE_EQ(0, transform.getZoom());
 
-    transform.setScale(2 << 0);
-
-    ASSERT_DOUBLE_EQ(0, transform.getLatLng().latitude());
-    ASSERT_DOUBLE_EQ(0, transform.getLatLng().longitude());
-    ASSERT_DOUBLE_EQ(2, transform.getScale());
+    transform.setZoom(1);
+    ASSERT_DOUBLE_EQ(1, transform.getZoom());
 
     const double invalid = std::nan("");
-    transform.setScale(invalid);
-
-    ASSERT_DOUBLE_EQ(0, transform.getLatLng().latitude());
-    ASSERT_DOUBLE_EQ(0, transform.getLatLng().longitude());
-    ASSERT_DOUBLE_EQ(2, transform.getScale());
-
-    transform.scaleBy(invalid);
-
-    ASSERT_DOUBLE_EQ(0, transform.getLatLng().latitude());
-    ASSERT_DOUBLE_EQ(0, transform.getLatLng().longitude());
-    ASSERT_DOUBLE_EQ(2, transform.getScale());
 
     transform.setZoom(invalid);
 
     ASSERT_DOUBLE_EQ(0, transform.getLatLng().latitude());
     ASSERT_DOUBLE_EQ(0, transform.getLatLng().longitude());
-    ASSERT_DOUBLE_EQ(2, transform.getScale());
+    ASSERT_DOUBLE_EQ(1, transform.getZoom());
 
     transform.setLatLngZoom({ 0, 0 }, invalid);
 
     ASSERT_DOUBLE_EQ(0, transform.getLatLng().latitude());
     ASSERT_DOUBLE_EQ(0, transform.getLatLng().longitude());
-    ASSERT_DOUBLE_EQ(2, transform.getScale());
+    ASSERT_DOUBLE_EQ(1, transform.getZoom());
 }
 
 
@@ -50,14 +36,14 @@ TEST(Transform, InvalidBearing) {
 
     ASSERT_DOUBLE_EQ(0, transform.getLatLng().latitude());
     ASSERT_DOUBLE_EQ(0, transform.getLatLng().longitude());
-    ASSERT_DOUBLE_EQ(1, transform.getScale());
+    ASSERT_DOUBLE_EQ(0, transform.getZoom());
 
-    transform.setScale(2 << 0);
+    transform.setZoom(1);
     transform.setAngle(2);
 
     ASSERT_DOUBLE_EQ(0, transform.getLatLng().latitude());
     ASSERT_DOUBLE_EQ(0, transform.getLatLng().longitude());
-    ASSERT_DOUBLE_EQ(2, transform.getScale());
+    ASSERT_DOUBLE_EQ(1, transform.getZoom());
     ASSERT_DOUBLE_EQ(2, transform.getAngle());
 
     const double invalid = std::nan("");
@@ -65,7 +51,7 @@ TEST(Transform, InvalidBearing) {
 
     ASSERT_DOUBLE_EQ(0, transform.getLatLng().latitude());
     ASSERT_DOUBLE_EQ(0, transform.getLatLng().longitude());
-    ASSERT_DOUBLE_EQ(2, transform.getScale());
+    ASSERT_DOUBLE_EQ(1, transform.getZoom());
     ASSERT_DOUBLE_EQ(2, transform.getAngle());
 }
 
@@ -73,15 +59,7 @@ TEST(Transform, IntegerZoom) {
     Transform transform;
 
     auto checkIntegerZoom = [&transform](uint8_t zoomInt, double zoom) {
-        double scale = transform.getState().zoomScale(zoom);
-        transform.setScale(scale);
-#if __ANDROID__
-        // Android uses log(x) / M_LN2 instead of log2(x) because the latter
-        // is _broken in ARMv5 - that approach being less precise than log2(x).
-        ASSERT_NEAR(transform.getScale(), scale, 0.0001);
-#else
-        ASSERT_DOUBLE_EQ(transform.getScale(), scale);
-#endif
+        transform.setZoom(zoom);
         ASSERT_NEAR(transform.getZoom(), zoom, 0.0001);
         ASSERT_EQ(transform.getState().getIntegerZoom(), zoomInt);
         ASSERT_NEAR(transform.getState().getZoomFraction(), zoom - zoomInt, 0.0001);
@@ -103,7 +81,7 @@ TEST(Transform, PerspectiveProjection) {
 
     Transform transform;
     transform.resize({ 1000, 1000 });
-    transform.setScale(2 << 9);
+    transform.setZoom(10);
     transform.setPitch(0.9);
     transform.setLatLng(LatLng(38, -77));
 
@@ -133,7 +111,7 @@ TEST(Transform, PerspectiveProjection) {
 TEST(Transform, UnwrappedLatLng) {
     Transform transform;
     transform.resize({ 1000, 1000 });
-    transform.setScale(2 << 9);
+    transform.setZoom(10);
     transform.setPitch(0.9);
     transform.setLatLng(LatLng(38, -77));
 
@@ -165,7 +143,7 @@ TEST(Transform, ConstrainHeightOnly) {
 
     Transform transform;
     transform.resize({ 1000, 1000 });
-    transform.setScale(std::pow(2, util::MAX_ZOOM));
+    transform.setZoom(util::MAX_ZOOM);
 
     transform.setLatLng(LatLngBounds::world().southwest());
     loc = transform.getLatLng();
@@ -183,7 +161,7 @@ TEST(Transform, ConstrainWidthAndHeight) {
 
     Transform transform(MapObserver::nullObserver(), ConstrainMode::WidthAndHeight);
     transform.resize({ 1000, 1000 });
-    transform.setScale(std::pow(2, util::MAX_ZOOM));
+    transform.setZoom(util::MAX_ZOOM);
 
     transform.setLatLng(LatLngBounds::world().southwest());
     loc = transform.getLatLng();
@@ -216,34 +194,34 @@ TEST(Transform, Anchor) {
     ASSERT_NE(latLng.longitude(), anchorLatLng.longitude());
 
     transform.setLatLngZoom(latLng, 2);
-    transform.scaleBy(1);
-    ASSERT_DOUBLE_EQ(4, transform.getScale());
+    transform.setZoom(3);
+    ASSERT_DOUBLE_EQ(3, transform.getZoom());
     ASSERT_DOUBLE_EQ(latLng.latitude(), transform.getLatLng().latitude());
     ASSERT_DOUBLE_EQ(latLng.longitude(), transform.getLatLng().longitude());
 
-    transform.scaleBy(1.5, invalidAnchorPoint);
-    ASSERT_DOUBLE_EQ(6, transform.getScale());
+    transform.setZoom(3.5, invalidAnchorPoint);
+    ASSERT_DOUBLE_EQ(3.5, transform.getZoom());
     ASSERT_DOUBLE_EQ(latLng.latitude(), transform.getLatLng().latitude());
     ASSERT_DOUBLE_EQ(latLng.longitude(), transform.getLatLng().longitude());
 
-    transform.scaleBy(2, anchorPoint);
-    ASSERT_DOUBLE_EQ(12, transform.getScale());
+    transform.setZoom(5.5, anchorPoint);
+    ASSERT_DOUBLE_EQ(5.5, transform.getZoom());
     ASSERT_NE(latLng.latitude(), transform.getLatLng().latitude());
     ASSERT_NE(latLng.longitude(), transform.getLatLng().longitude());
 
     transform.setLatLngZoom(latLng, 10);
-    transform.setScale(2 << 2);
-    ASSERT_DOUBLE_EQ(2 << 2, transform.getScale());
+    transform.setZoom(3);
+    ASSERT_DOUBLE_EQ(3, transform.getZoom());
     ASSERT_NEAR(latLng.latitude(), transform.getLatLng().latitude(), 0.000001);
     ASSERT_NEAR(latLng.longitude(), transform.getLatLng().longitude(), 0.000001);
 
-    transform.setScale(2 << 4, invalidAnchorPoint);
-    ASSERT_DOUBLE_EQ(2 << 4, transform.getScale());
+    transform.setZoom(5, invalidAnchorPoint);
+    ASSERT_DOUBLE_EQ(5, transform.getZoom());
     ASSERT_NEAR(latLng.latitude(), transform.getLatLng().latitude(), 0.000001);
     ASSERT_NEAR(latLng.longitude(), transform.getLatLng().longitude(), 0.000001);
 
-    transform.setScale(2 << 6, anchorPoint);
-    ASSERT_DOUBLE_EQ(2 << 6, transform.getScale());
+    transform.setZoom(7, anchorPoint);
+    ASSERT_DOUBLE_EQ(7, transform.getZoom());
     ASSERT_NE(latLng.latitude(), transform.getLatLng().latitude());
     ASSERT_NE(latLng.longitude(), transform.getLatLng().longitude());
 
