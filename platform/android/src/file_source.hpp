@@ -2,6 +2,8 @@
 
 #include <mbgl/storage/default_file_source.hpp>
 
+#include "asset_manager.hpp"
+
 #include <jni/jni.hpp>
 
 namespace mbgl {
@@ -23,7 +25,7 @@ public:
         static jni::Class<ResourceTransformCallback> javaClass;
     };
 
-    FileSource(jni::JNIEnv&, jni::String, jni::String, jni::String);
+    FileSource(jni::JNIEnv&, jni::String, jni::String, jni::Object<AssetManager>);
 
     ~FileSource();
 

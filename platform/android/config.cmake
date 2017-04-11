@@ -16,7 +16,6 @@ if ((ANDROID_ABI STREQUAL "armeabi") OR (ANDROID_ABI STREQUAL "armeabi-v7a") OR 
 endif()
 
 mason_use(jni.hpp VERSION 3.0.0 HEADER_ONLY)
-mason_use(libzip VERSION 1.1.3)
 mason_use(nunicode VERSION 1.7.1)
 mason_use(sqlite VERSION 3.14.2)
 mason_use(gtest VERSION 1.8.0)
@@ -34,8 +33,11 @@ macro(mbgl_platform_core)
 
         # File source
         PRIVATE platform/android/src/http_file_source.cpp
-        PRIVATE platform/android/src/asset_file_source.cpp
+        PRIVATE platform/android/src/asset_manager.hpp
+        PRIVATE platform/android/src/asset_manager_file_source.cpp
+        PRIVATE platform/android/src/asset_manager_file_source.hpp
         PRIVATE platform/default/default_file_source.cpp
+        PRIVATE platform/default/asset_file_source.cpp
         PRIVATE platform/default/local_file_source.cpp
         PRIVATE platform/default/online_file_source.cpp
 
@@ -76,7 +78,6 @@ macro(mbgl_platform_core)
 
     target_add_mason_package(mbgl-core PUBLIC sqlite)
     target_add_mason_package(mbgl-core PUBLIC nunicode)
-    target_add_mason_package(mbgl-core PUBLIC libzip)
     target_add_mason_package(mbgl-core PUBLIC geojson)
     target_add_mason_package(mbgl-core PUBLIC jni.hpp)
     target_add_mason_package(mbgl-core PUBLIC rapidjson)
@@ -303,10 +304,6 @@ macro(mbgl_platform_test)
 
     target_compile_options(mbgl-test
         PRIVATE -fvisibility=hidden
-    )
-
-    target_compile_definitions(mbgl-test
-        PRIVATE MBGL_ASSET_ZIP=1
     )
 
     target_link_libraries(mbgl-test
