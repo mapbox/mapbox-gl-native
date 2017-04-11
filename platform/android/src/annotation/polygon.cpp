@@ -9,19 +9,37 @@ jni::Class<Polygon> Polygon::javaClass;
 
 mbgl::FillAnnotation Polygon::toAnnotation(jni::JNIEnv& env, jni::Object<Polygon> polygon) {
     auto points = Polygon::getPoints(env, polygon);
+    auto holes = Polygon::getHoles(env, polygon);
 
-    mbgl::FillAnnotation annotation { mbgl::Polygon<double> { MultiPoint::toGeometry<mbgl::LinearRing<double>>(env, points) } };
+    mbgl::Polygon<double> geometry { MultiPoint::toGeometry<mbgl::LinearRing<double>>(env, points) };
+
+    auto jHoleListsArray = java::util::List::toArray<java::util::List>(env, holes);
+    std::size_t jHoleListsSize = jHoleListsArray.Length(env);
+    for (std::size_t i = 0; i < jHoleListsSize; i++) {
+        auto jHoleList = jHoleListsArray.Get(env, i);
+        geometry.push_back(MultiPoint::toGeometry<mbgl::LinearRing<double>>(env, jHoleList));
+        jni::DeleteLocalRef(env, jHoleList);
+    }
+    jni::DeleteLocalRef(env, jHoleListsArray);
+
+    mbgl::FillAnnotation annotation { geometry };
     annotation.opacity = { Polygon::getOpacity(env, polygon) };
     annotation.color = { Polygon::getFillColor(env, polygon) };
     annotation.outlineColor = { Polygon::getOutlineColor(env, polygon) };
 
     jni::DeleteLocalRef(env, points);
+    jni::DeleteLocalRef(env, holes);
 
     return annotation;
 }
 
 jni::Object<java::util::List> Polygon::getPoints(jni::JNIEnv& env, jni::Object<Polygon> polygon) {
     static auto field = Polygon::javaClass.GetField<jni::Object<java::util::List>>(env, "points");
+    return polygon.Get(env, field);
+}
+
+jni::Object<java::util::List> Polygon::getHoles(jni::JNIEnv& env, jni::Object<Polygon> polygon) {
+    static auto field = Polygon::javaClass.GetField<jni::Object<java::util::List>>(env, "holes");
     return polygon.Get(env, field);
 }
 

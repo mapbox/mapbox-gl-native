@@ -4,6 +4,9 @@ import android.graphics.Color;
 
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Polygon is a geometry annotation that's a closed loop of coordinates.
  */
@@ -11,9 +14,11 @@ public final class Polygon extends BasePointCollection {
 
   private int fillColor = Color.BLACK; // default fillColor is black
   private int strokeColor = Color.BLACK; // default strokeColor is black
+  private List<Hole> holes;
 
   Polygon() {
     super();
+    holes = new ArrayList<>();
   }
 
   /**
@@ -26,12 +31,21 @@ public final class Polygon extends BasePointCollection {
   }
 
   /**
-   * Get the color fo the stroke of the polygon.
+   * Get the color of the stroke of the polygon.
    *
    * @return The color of the stroke.
    */
   public int getStrokeColor() {
     return strokeColor;
+  }
+
+  /**
+   * Returns a copy of the holes.
+   *
+   * @return A {@link List} of holes.
+   */
+  public List<Hole> getHoles() {
+    return new ArrayList<>(holes);
   }
 
   /**
@@ -51,6 +65,27 @@ public final class Polygon extends BasePointCollection {
    */
   public void setStrokeColor(int color) {
     strokeColor = color;
+    update();
+  }
+
+  /**
+   * Sets the holes of this polygon. This method will take a copy of the holes, so further
+   * mutations to holes will have no effect on this polygon.
+   *
+   * @param holes A {@link List} of {@link Hole} points making up the holes.
+   */
+  public void setHoles(List<? extends Hole> holes) {
+    this.holes = new ArrayList<>(holes);
+    update();
+  }
+
+  /**
+   * Add a hole to the polygon.
+   *
+   * @param hole A {@link Hole} hole to be added.
+   */
+  void addHole(Hole hole) {
+    holes.add(hole);
     update();
   }
 

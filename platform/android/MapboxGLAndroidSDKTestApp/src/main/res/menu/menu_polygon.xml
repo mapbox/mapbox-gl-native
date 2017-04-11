@@ -17,4 +17,8 @@
         android:id="@+id/action_id_color"
         android:title="@string/action_color_polygon"
         mapbox:showAsAction="never" />
+    <item
+        android:id="@+id/action_id_holes"
+        android:title="@string/action_holes_polygon"
+        mapbox:showAsAction="never" />
 </menu>
