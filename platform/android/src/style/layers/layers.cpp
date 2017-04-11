@@ -3,6 +3,7 @@
 #include <mbgl/style/layer.hpp>
 #include <mbgl/style/layers/background_layer.hpp>
 #include <mbgl/style/layers/circle_layer.hpp>
+#include <mbgl/style/layers/fill_extrusion_layer.hpp>
 #include <mbgl/style/layers/fill_layer.hpp>
 #include <mbgl/style/layers/line_layer.hpp>
 #include <mbgl/style/layers/raster_layer.hpp>
@@ -12,11 +13,13 @@
 #include "background_layer.hpp"
 #include "circle_layer.hpp"
 #include "custom_layer.hpp"
+#include "fill_extrusion_layer.hpp"
 #include "fill_layer.hpp"
 #include "line_layer.hpp"
 #include "raster_layer.hpp"
 #include "symbol_layer.hpp"
 #include "unknown_layer.hpp"
+#include "fill_extrusion_layer.hpp"
 
 namespace mbgl {
 namespace android {
@@ -26,6 +29,8 @@ static Layer* initializeLayerPeer(mbgl::Map& map, mbgl::style::Layer& coreLayer)
         return new BackgroundLayer(map, *coreLayer.as<mbgl::style::BackgroundLayer>());
     } else if (coreLayer.is<mbgl::style::CircleLayer>()) {
         return new CircleLayer(map, *coreLayer.as<mbgl::style::CircleLayer>());
+    } else if (coreLayer.is<mbgl::style::FillExtrusionLayer>()) {
+        return new FillExtrusionLayer(map, *coreLayer.as<mbgl::style::FillExtrusionLayer>());
     } else if (coreLayer.is<mbgl::style::FillLayer>()) {
         return new FillLayer(map, *coreLayer.as<mbgl::style::FillLayer>());
     } else if (coreLayer.is<mbgl::style::LineLayer>()) {
@@ -51,6 +56,8 @@ static Layer* initializeLayerPeer(Map& map, std::unique_ptr<mbgl::style::Layer> 
         return createPeer<style::BackgroundLayer, BackgroundLayer>(map, std::move(coreLayer));
     } else if (coreLayer->is<style::CircleLayer>()) {
         return createPeer<style::CircleLayer, CircleLayer>(map, std::move(coreLayer));
+    } else if (coreLayer->is<style::FillExtrusionLayer>()) {
+        return createPeer<style::FillExtrusionLayer, FillExtrusionLayer>(map, std::move(coreLayer));
     } else if (coreLayer->is<style::FillLayer>()) {
         return createPeer<style::FillLayer, FillLayer>(map, std::move(coreLayer));
     } else if (coreLayer->is<style::LineLayer>()) {
@@ -85,6 +92,7 @@ void registerNativeLayers(jni::JNIEnv& env) {
     BackgroundLayer::registerNative(env);
     CircleLayer::registerNative(env);
     CustomLayer::registerNative(env);
+    FillExtrusionLayer::registerNative(env);
     FillLayer::registerNative(env);
     LineLayer::registerNative(env);
     RasterLayer::registerNative(env);
