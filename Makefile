@@ -531,10 +531,6 @@ run-android-core-test-$1-%: android-core-test-$1
 	# Ensure clean state on the device
 	adb shell "rm -Rf $(MBGL_ANDROID_LOCAL_WORK_DIR) && mkdir -p $(MBGL_ANDROID_LOCAL_WORK_DIR)/test"
 
-	# Generate zipped asset files
-	cd test/fixtures/api && zip -r assets.zip assets && cd -
-	cd test/fixtures/storage && zip -r assets.zip assets && cd -
-
 	# Push all needed files to the device
 	adb push $(MBGL_ANDROID_CORE_TEST_DIR)/test.jar $(MBGL_ANDROID_LOCAL_WORK_DIR) > /dev/null 2>&1
 	adb push test/fixtures $(MBGL_ANDROID_LOCAL_WORK_DIR)/test > /dev/null 2>&1

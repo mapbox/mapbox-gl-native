@@ -13,7 +13,6 @@ extern JavaVM* theJVM;
 
 extern std::string cachePath;
 extern std::string dataPath;
-extern std::string apkPath;
 
 bool attach_jni_thread(JavaVM* vm, JNIEnv** env, std::string threadName);
 void detach_jni_thread(JavaVM* vm, JNIEnv** env, bool detach);

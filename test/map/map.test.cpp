@@ -356,12 +356,7 @@ TEST(Map, WithoutVAOExtension) {
 
     test.backend.getContext().disableVAOExtension = true;
 
-#ifdef MBGL_ASSET_ZIP
-    // Regenerate with `cd test/fixtures/api/ && zip -r assets.zip assets/`
-    DefaultFileSource fileSource(":memory:", "test/fixtures/api/assets.zip");
-#else
     DefaultFileSource fileSource(":memory:", "test/fixtures/api/assets");
-#endif
 
     Map map(test.backend, test.view.getSize(), 1, fileSource, test.threadPool, MapMode::Still);
     map.setStyleJSON(util::read_file("test/fixtures/api/water.json"));
@@ -589,14 +584,7 @@ TEST(Map, TEST_DISABLED_ON_CI(ContinuousRendering)) {
     BackendScope scope { backend };
     OffscreenView view { backend.getContext() };
     ThreadPool threadPool { 4 };
-
-#ifdef MBGL_ASSET_ZIP
-    // Regenerate with `cd test/fixtures/api/ && zip -r assets.zip assets/`
-    DefaultFileSource fileSource(":memory:", "test/fixtures/api/assets.zip");
-#else
     DefaultFileSource fileSource(":memory:", "test/fixtures/api/assets");
-#endif
-
     Map map(backend, view.getSize(), 1, fileSource, threadPool, MapMode::Continuous);
 
     using namespace std::chrono_literals;

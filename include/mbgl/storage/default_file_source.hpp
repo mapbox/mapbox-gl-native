@@ -24,6 +24,9 @@ public:
     DefaultFileSource(const std::string& cachePath,
                       const std::string& assetRoot,
                       uint64_t maximumCacheSize = util::DEFAULT_MAX_CACHE_SIZE);
+    DefaultFileSource(const std::string& cachePath,
+                      std::unique_ptr<FileSource>&& assetFileSource,
+                      uint64_t maximumCacheSize = util::DEFAULT_MAX_CACHE_SIZE);
     ~DefaultFileSource() override;
 
     bool supportsOptionalRequests() const override {

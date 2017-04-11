@@ -25,13 +25,7 @@ TEST(API, RepeatedRender) {
     HeadlessBackend backend { test::sharedDisplay() };
     BackendScope scope { backend };
     OffscreenView view { backend.getContext(), { 256, 512 } };
-#ifdef MBGL_ASSET_ZIP
-    // Regenerate with `cd test/fixtures/api/ && zip -r assets.zip assets/`
-    DefaultFileSource fileSource(":memory:", "test/fixtures/api/assets.zip");
-#else
     DefaultFileSource fileSource(":memory:", "test/fixtures/api/assets");
-#endif
-
     ThreadPool threadPool(4);
 
     Log::setObserver(std::make_unique<FixtureLogObserver>());
