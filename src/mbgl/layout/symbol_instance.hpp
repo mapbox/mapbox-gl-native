@@ -15,7 +15,7 @@ public:
     SymbolInstance(Anchor& anchor,
                    const GeometryCoordinates& line,
                    const std::pair<Shaping, Shaping>& shapedTextOrientations,
-                   const PositionedIcon& shapedIcon,
+                   optional<PositionedIcon> shapedIcon,
                    const style::SymbolLayoutProperties::Evaluated&,
                    const float layoutTextSize,
                    const bool inside,

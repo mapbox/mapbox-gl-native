@@ -22,12 +22,12 @@ SymbolQuad getIconQuad(const Anchor& anchor,
                        const float layoutTextSize,
                        const style::SymbolPlacementType placement, 
                        const Shaping& shapedText) {
-    auto image = *(shapedIcon.image);
+    auto image = *shapedIcon.image();
 
     const float border = 1.0;
-    auto left = shapedIcon.left - border;
+    auto left = shapedIcon.left() - border;
     auto right = left + image.pos.w / image.relativePixelRatio;
-    auto top = shapedIcon.top - border;
+    auto top = shapedIcon.top() - border;
     auto bottom = top + image.pos.h / image.relativePixelRatio;
     Point<float> tl;
     Point<float> tr;
@@ -67,7 +67,7 @@ SymbolQuad getIconQuad(const Anchor& anchor,
         bl = {left, bottom};
     }
 
-    float angle = shapedIcon.angle;
+    float angle = shapedIcon.angle();
     if (placement == style::SymbolPlacementType::Line) {
         assert(static_cast<unsigned int>(anchor.segment) < line.size());
         const GeometryCoordinate &prev= line[anchor.segment];
