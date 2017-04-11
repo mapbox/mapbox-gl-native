@@ -6,6 +6,7 @@
 #import "MGLPolyline+MGLAdditions.h"
 
 #import <mbgl/util/geojson.hpp>
+#import <mapbox/polylabel.hpp>
 
 @implementation MGLPolyline
 
@@ -50,6 +51,20 @@
 
 - (BOOL)isEqual:(id)other {
     return self == other || ([other isKindOfClass:[MGLPolyline class]] && [super isEqual:other]);
+}
+
+- (CLLocationCoordinate2D)coordinate {
+    CLLocationCoordinate2D centroid;
+    
+    mbgl::Polygon<double> multiLineString;
+    multiLineString.push_back([self lineString]);
+    
+    // pole of inaccessibility
+    auto poi = mapbox::polylabel(multiLineString);
+    centroid.latitude = poi.y;
+    centroid.longitude = poi.x;
+    
+    return centroid;
 }
 
 @end
@@ -112,6 +127,23 @@
         hash += [polyline hash];
     }
     return hash;
+}
+
+- (CLLocationCoordinate2D)coordinate {
+    CLLocationCoordinate2D centroid;
+    
+    mbgl::Polygon<double> multiLineString;
+    multiLineString.reserve(self.polylines.count);
+    for (MGLPolyline *polyline in self.polylines) {
+        multiLineString.push_back([polyline lineString]);
+    }
+    
+    // pole of inaccessibility
+    auto poi = mapbox::polylabel(multiLineString);
+    centroid.latitude = poi.y;
+    centroid.longitude = poi.x;
+    
+    return centroid;
 }
 
 - (BOOL)intersectsOverlayBounds:(MGLCoordinateBounds)overlayBounds {

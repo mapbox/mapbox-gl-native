@@ -66,12 +66,27 @@
     [unarchivedPolyline replaceCoordinatesInRange:NSMakeRange(0, 1) withCoordinates:otherCoordinates];
 
     XCTAssertNotEqualObjects(polyline, unarchivedPolyline);
+    
+    CLLocationCoordinate2D lineCoordinates[] = {
+        CLLocationCoordinate2DMake(100.0, 0.0),
+        CLLocationCoordinate2DMake(101.0, 0.0),
+    };
+    
+    NSUInteger lnc = sizeof(lineCoordinates) / sizeof(CLLocationCoordinate2D);
+    MGLPolyline *line = [MGLPolyline polylineWithCoordinates:lineCoordinates count:lnc];
+    CLLocationCoordinate2D lineCenter = CLLocationCoordinate2DMake(100.0, 0.0);
+    
+    XCTAssert([line coordinate].latitude == lineCenter.latitude &&
+              [line coordinate].longitude == lineCenter.longitude);
+    
 }
 
 - (void)testPolygon {
     CLLocationCoordinate2D coordinates[] = {
-        CLLocationCoordinate2DMake(0.664482398, 1.8865675),
-        CLLocationCoordinate2DMake(2.13224687, 3.9984632)
+        CLLocationCoordinate2DMake(35.090745, -85.300259),
+        CLLocationCoordinate2DMake(35.092035, -85.298885),
+        CLLocationCoordinate2DMake(35.090639, -85.297416),
+        CLLocationCoordinate2DMake(35.089112, -85.298928)
     };
 
     NSUInteger numberOfCoordinates = sizeof(coordinates) / sizeof(CLLocationCoordinate2D);
@@ -84,8 +99,24 @@
     [NSKeyedArchiver archiveRootObject:polygon toFile:filePath];
 
     MGLPolygon *unarchivedPolygon = [NSKeyedUnarchiver unarchiveObjectWithFile:filePath];
+    [unarchivedPolygon coordinate];
 
     XCTAssertEqualObjects(polygon, unarchivedPolygon);
+    
+    CLLocationCoordinate2D squareCoordinates[] = {
+        CLLocationCoordinate2DMake(100.0, 0.0),
+        CLLocationCoordinate2DMake(101.0, 0.0),
+        CLLocationCoordinate2DMake(101.0, 1.0),
+        CLLocationCoordinate2DMake(100.0, 1.0),
+    };
+    
+    NSUInteger snc = sizeof(squareCoordinates) / sizeof(CLLocationCoordinate2D);
+    MGLPolygon *squarePolygon = [MGLPolygon polygonWithCoordinates:squareCoordinates count:snc];
+    CLLocationCoordinate2D squareCenter = CLLocationCoordinate2DMake(100.5, 0.5);
+    
+    XCTAssert([squarePolygon coordinate].latitude == squareCenter.latitude &&
+              [squarePolygon coordinate].longitude == squareCenter.longitude);
+
 }
 
 - (void)testPolygonWithInteriorPolygons {
@@ -248,6 +279,31 @@
         CLLocationCoordinate2DMake(20, 21),
         CLLocationCoordinate2DMake(30, 31),
     };
+    
+    CLLocationCoordinate2D outterSquare[] = {
+        CLLocationCoordinate2DMake(100.0, 0.0),
+        CLLocationCoordinate2DMake(101.0, 0.0),
+        CLLocationCoordinate2DMake(101.0, 1.0),
+        CLLocationCoordinate2DMake(100.0, 1.0),
+    };
+                                    
+    CLLocationCoordinate2D innerSquare[] = {
+        CLLocationCoordinate2DMake(100.35, 0.35),
+        CLLocationCoordinate2DMake(100.65, 0.35),
+        CLLocationCoordinate2DMake(100.65, 0.65),
+        CLLocationCoordinate2DMake(100.35, 0.65),
+    };
+    
+    NSUInteger noc = sizeof(outterSquare) / sizeof(CLLocationCoordinate2D);
+    NSUInteger nic = sizeof(innerSquare) / sizeof(CLLocationCoordinate2D);
+    
+    MGLPolygon *outterPolygonSquare = [MGLPolygon polygonWithCoordinates:outterSquare count:noc];
+    MGLPolygon *innerPolygonSquare = [MGLPolygon polygonWithCoordinates:innerSquare count:nic];
+    MGLMultiPolygon *squares = [MGLMultiPolygon multiPolygonWithPolygons:@[outterPolygonSquare, innerPolygonSquare]];
+    CLLocationCoordinate2D squareCenter = CLLocationCoordinate2DMake(100.5, 0.5);
+    
+    XCTAssert([squares coordinate].latitude == squareCenter.latitude &&
+              [squares coordinate].longitude == squareCenter.longitude);
 
     NSUInteger numberOfCoordinates = sizeof(coordinates) / sizeof(CLLocationCoordinate2D);
 
@@ -265,9 +321,10 @@
 
     MGLMultiPolygon *unarchivedMultiPolygon = [NSKeyedUnarchiver unarchiveObjectWithFile:filePath];
     MGLMultiPolygon *anotherMultiPolygon = [MGLMultiPolygon multiPolygonWithPolygons:[polygons subarrayWithRange:NSMakeRange(0, polygons.count/2)]];
-
+    
     XCTAssertEqualObjects(multiPolygon, unarchivedMultiPolygon);
     XCTAssertNotEqualObjects(anotherMultiPolygon, unarchivedMultiPolygon);
+    
 }
 
 - (void)testShapeCollection {

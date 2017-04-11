@@ -6,6 +6,7 @@
 #import "MGLPolygon+MGLAdditions.h"
 
 #import <mbgl/util/geojson.hpp>
+#import <mapbox/polylabel.hpp>
 
 @implementation MGLPolygon
 
@@ -52,6 +53,17 @@
 
 - (NSUInteger)hash {
     return [super hash] + [[self geoJSONDictionary] hash];
+}
+
+- (CLLocationCoordinate2D)coordinate {
+    CLLocationCoordinate2D centroid;
+    
+    // pole of inaccessibility
+    auto poi = mapbox::polylabel([self polygon]);
+    centroid.latitude = poi.y;
+    centroid.longitude = poi.x;
+    
+    return centroid;
 }
 
 - (mbgl::LinearRing<double>)ring {
@@ -156,10 +168,19 @@
 }
 
 - (CLLocationCoordinate2D)coordinate {
-    NSAssert(self.polygons.count > 0, @"A multipolygon must have coordinates");
+    CLLocationCoordinate2D centroid;
     
-    MGLPolygon *firstPolygon = [self.polygons firstObject];
-    return firstPolygon.coordinate;
+    mbgl::Polygon<double> geometry;
+    for (MGLPolygon *polygon in self.polygons) {
+        geometry.push_back(polygon.ring);
+    }
+    
+    // pole of inaccessibility
+    auto poi = mapbox::polylabel(geometry);
+    centroid.latitude = poi.y;
+    centroid.longitude = poi.x;
+    
+    return centroid;
 }
 
 - (BOOL)intersectsOverlayBounds:(MGLCoordinateBounds)overlayBounds {
