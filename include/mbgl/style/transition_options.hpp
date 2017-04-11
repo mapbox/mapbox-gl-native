@@ -18,7 +18,7 @@ public:
         };
     }
 
-    explicit operator bool() const {
+    bool isDefined() const {
         return duration || delay;
     }
 };
