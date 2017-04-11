@@ -29,7 +29,7 @@ public:
 
     // Camera
     /** Returns the current camera options. */
-    CameraOptions getCameraOptions(optional<EdgeInsets>) const;
+    CameraOptions getCameraOptions(const EdgeInsets&) const;
 
     /** Instantaneously, synchronously applies the given camera options. */
     void jumpTo(const CameraOptions&);
@@ -47,13 +47,13 @@ public:
         @param offset The distance to pan the map by, measured in pixels from
             top to bottom and from left to right. */
     void moveBy(const ScreenCoordinate& offset, const AnimationOptions& = {});
-    void setLatLng(const LatLng&,  const AnimationOptions& = {});
-    void setLatLng(const LatLng&, optional<EdgeInsets>, const AnimationOptions& = {});
+    void setLatLng(const LatLng&, const AnimationOptions& = {});
+    void setLatLng(const LatLng&, const EdgeInsets&, const AnimationOptions& = {});
     void setLatLng(const LatLng&, optional<ScreenCoordinate>, const AnimationOptions& = {});
     void setLatLngZoom(const LatLng&, double zoom, const AnimationOptions& = {});
-    void setLatLngZoom(const LatLng&, double zoom, optional<EdgeInsets>, const AnimationOptions& = {});
-    LatLng getLatLng(optional<EdgeInsets> = {}) const;
-    ScreenCoordinate getScreenCoordinate(optional<EdgeInsets> = {}) const;
+    void setLatLngZoom(const LatLng&, double zoom, const EdgeInsets&, const AnimationOptions& = {});
+    LatLng getLatLng(const EdgeInsets& = {}) const;
+    ScreenCoordinate getScreenCoordinate(const EdgeInsets& = {}) const;
 
     // Bounds
 
@@ -84,7 +84,7 @@ public:
     /** Sets the scale factor, keeping the center point fixed within the inset view.
         @param scale The new scale factor.
         @param padding The viewport padding that affects the fixed center point. */
-    void setScale(double scale, optional<EdgeInsets> padding, const AnimationOptions& = {});
+    void setScale(double scale, const EdgeInsets& padding, const AnimationOptions& = {});
     /** Sets the zoom level, keeping the given point fixed within the view.
         @param zoom The new zoom level. */
     void setZoom(double zoom, const AnimationOptions& = {});
@@ -96,7 +96,7 @@ public:
     /** Sets the zoom level, keeping the center point fixed within the inset view.
         @param zoom The new zoom level.
         @param padding The viewport padding that affects the fixed center point. */
-    void setZoom(double zoom, optional<EdgeInsets> padding, const AnimationOptions& = {});
+    void setZoom(double zoom, const EdgeInsets& padding, const AnimationOptions& = {});
     /** Returns the zoom level. */
     double getZoom() const;
     /** Returns the scale factor. */
@@ -118,7 +118,7 @@ public:
         @param angle The new angle of rotation, measured in radians
             counterclockwise from true north.
         @param padding The viewport padding that affects the fixed center point. */
-    void setAngle(double angle, optional<EdgeInsets> padding, const AnimationOptions& = {});
+    void setAngle(double angle, const EdgeInsets& padding, const AnimationOptions& = {});
     /** Returns the angle of rotation.
         @return The angle of rotation, measured in radians counterclockwise from
             true north. */

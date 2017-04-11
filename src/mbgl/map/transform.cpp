@@ -64,7 +64,7 @@ void Transform::resize(const Size size) {
 
 #pragma mark - Camera
 
-CameraOptions Transform::getCameraOptions(optional<EdgeInsets> padding) const {
+CameraOptions Transform::getCameraOptions(const EdgeInsets& padding) const {
     CameraOptions camera;
     camera.center = getLatLng(padding);
     camera.padding = padding;
@@ -100,7 +100,7 @@ void Transform::easeTo(const CameraOptions& camera, const AnimationOptions& anim
     }
 
     // Determine endpoints.
-    optional<EdgeInsets> padding = camera.padding;
+    EdgeInsets padding = camera.padding;
     LatLng startLatLng = getLatLng(padding);
     // If gesture in progress, we transfer the world rounds from the end
     // longitude into start, so we can guarantee the "scroll effect" of rounding
@@ -150,7 +150,7 @@ void Transform::easeTo(const CameraOptions& camera, const AnimationOptions& anim
             state.pitch = util::interpolate(startPitch, pitch, t);
         }
 
-        if (padding) {
+        if (!padding.isFlush()) {
             state.moveLatLng(frameLatLng, center);
         }
         return update;
@@ -176,7 +176,7 @@ void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &anima
     }
 
     // Determine endpoints.
-    optional<EdgeInsets> padding = camera.padding;
+    EdgeInsets padding = camera.padding;
     LatLng startLatLng = getLatLng(padding).wrapped();
     startLatLng.unwrapForShortestPath(latLng);
 
@@ -200,9 +200,8 @@ void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &anima
 
     /// w₀: Initial visible span, measured in pixels at the initial scale.
     /// Known henceforth as a <i>screenful</i>.
-    double w0 = padding ? std::max(state.size.width - padding->left - padding->right,
-                                   state.size.height - padding->top - padding->bottom)
-                        : std::max(state.size.width, state.size.height);
+    double w0 = std::max(state.size.width - padding.left - padding.right,
+                         state.size.height - padding.top - padding.bottom);
     /// w₁: Final visible span, measured in pixels with respect to the initial
     /// scale.
     double w1 = w0 / state.zoomScale(zoom - startZoom);
@@ -311,7 +310,7 @@ void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &anima
             state.pitch = util::interpolate(startPitch, pitch, k);
         }
 
-        if (padding) {
+        if (!padding.isFlush()) {
             state.moveLatLng(frameLatLng, center);
         }
         return Update::RecalculateStyle;
@@ -336,7 +335,7 @@ void Transform::setLatLng(const LatLng& latLng, const AnimationOptions& animatio
     setLatLng(latLng, optional<ScreenCoordinate> {}, animation);
 }
 
-void Transform::setLatLng(const LatLng& latLng, optional<EdgeInsets> padding, const AnimationOptions& animation) {
+void Transform::setLatLng(const LatLng& latLng, const EdgeInsets& padding, const AnimationOptions& animation) {
     CameraOptions camera;
     camera.center = latLng;
     camera.padding = padding;
@@ -353,10 +352,10 @@ void Transform::setLatLng(const LatLng& latLng, optional<ScreenCoordinate> ancho
 }
 
 void Transform::setLatLngZoom(const LatLng& latLng, double zoom, const AnimationOptions& animation) {
-    setLatLngZoom(latLng, zoom, optional<EdgeInsets> {}, animation);
+    setLatLngZoom(latLng, zoom, EdgeInsets(), animation);
 }
 
-void Transform::setLatLngZoom(const LatLng& latLng, double zoom, optional<EdgeInsets> padding, const AnimationOptions& animation) {
+void Transform::setLatLngZoom(const LatLng& latLng, double zoom, const EdgeInsets& padding, const AnimationOptions& animation) {
     if (std::isnan(zoom)) return;
 
     CameraOptions camera;
@@ -366,19 +365,19 @@ void Transform::setLatLngZoom(const LatLng& latLng, double zoom, optional<EdgeIn
     easeTo(camera, animation);
 }
 
-LatLng Transform::getLatLng(optional<EdgeInsets> padding) const {
-    if (padding) {
-        return screenCoordinateToLatLng(padding->getCenter(state.size.width, state.size.height));
-    } else {
+LatLng Transform::getLatLng(const EdgeInsets& padding) const {
+    if (padding.isFlush()) {
         return state.getLatLng();
+    } else {
+        return screenCoordinateToLatLng(padding.getCenter(state.size.width, state.size.height));
     }
 }
 
-ScreenCoordinate Transform::getScreenCoordinate(optional<EdgeInsets> padding) const {
-    if (padding) {
-        return padding->getCenter(state.size.width, state.size.height);
-    } else {
+ScreenCoordinate Transform::getScreenCoordinate(const EdgeInsets& padding) const {
+    if (padding.isFlush()) {
         return { state.size.width / 2., state.size.height / 2. };
+    } else {
+        return padding.getCenter(state.size.width, state.size.height);
     }
 }
 
@@ -403,7 +402,7 @@ void Transform::setZoom(double zoom, optional<ScreenCoordinate> anchor, const An
     setScale(state.zoomScale(zoom), anchor, animation);
 }
 
-void Transform::setZoom(double zoom, optional<EdgeInsets> padding, const AnimationOptions& animation) {
+void Transform::setZoom(double zoom, const EdgeInsets& padding, const AnimationOptions& animation) {
     setScale(state.zoomScale(zoom), padding, animation);
 }
 
@@ -427,9 +426,9 @@ void Transform::setScale(double scale, optional<ScreenCoordinate> anchor, const 
     easeTo(camera, animation);
 }
 
-void Transform::setScale(double scale, optional<EdgeInsets> padding, const AnimationOptions& animation) {
+void Transform::setScale(double scale, const EdgeInsets& padding, const AnimationOptions& animation) {
     optional<ScreenCoordinate> anchor;
-    if (padding) anchor = getScreenCoordinate(padding);
+    if (!padding.isFlush()) anchor = getScreenCoordinate(padding);
     setScale(scale, anchor, animation);
 }
 
@@ -494,9 +493,9 @@ void Transform::setAngle(double angle, optional<ScreenCoordinate> anchor, const 
     easeTo(camera, animation);
 }
 
-void Transform::setAngle(double angle, optional<EdgeInsets> padding, const AnimationOptions& animation) {
+void Transform::setAngle(double angle, const EdgeInsets& padding, const AnimationOptions& animation) {
     optional<ScreenCoordinate> anchor;
-    if (padding) anchor = getScreenCoordinate(padding);
+    if (!padding.isFlush()) anchor = getScreenCoordinate(padding);
     setAngle(angle, anchor, animation);
 }
 

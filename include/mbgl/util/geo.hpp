@@ -221,6 +221,9 @@ public:
     EdgeInsets(const double t, const double l, const double b, const double r)
         : top(t), left(l), bottom(b), right(r) {}
 
+    bool isFlush() const {
+        return top == 0 && left == 0 && bottom == 0 && right == 0;
+    }
 
     void operator+=(const EdgeInsets& o) {
         top += o.top;

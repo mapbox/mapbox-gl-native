@@ -82,7 +82,7 @@ public:
     bool isPanning() const;
 
     // Camera
-    CameraOptions getCameraOptions(optional<EdgeInsets>) const;
+    CameraOptions getCameraOptions(const EdgeInsets&) const;
     void jumpTo(const CameraOptions&);
     void easeTo(const CameraOptions&, const AnimationOptions&);
     void flyTo(const CameraOptions&, const AnimationOptions&);
@@ -90,10 +90,10 @@ public:
     // Position
     void moveBy(const ScreenCoordinate&, const AnimationOptions& = {});
     void setLatLng(const LatLng&, optional<ScreenCoordinate>, const AnimationOptions& = {});
-    void setLatLng(const LatLng&, optional<EdgeInsets>, const AnimationOptions& = {});
+    void setLatLng(const LatLng&, const EdgeInsets&, const AnimationOptions& = {});
     void setLatLng(const LatLng&, const AnimationOptions& = {});
-    LatLng getLatLng(optional<EdgeInsets> = {}) const;
-    void resetPosition(optional<EdgeInsets> = {});
+    LatLng getLatLng(const EdgeInsets& = {}) const;
+    void resetPosition(const EdgeInsets& = {});
 
     // Scale
     void scaleBy(double ds, optional<ScreenCoordinate> = {}, const AnimationOptions& = {});
@@ -101,12 +101,12 @@ public:
     double getScale() const;
     void setZoom(double zoom, const AnimationOptions& = {});
     void setZoom(double zoom, optional<ScreenCoordinate>, const AnimationOptions& = {});
-    void setZoom(double zoom, optional<EdgeInsets>, const AnimationOptions& = {});
+    void setZoom(double zoom, const EdgeInsets&, const AnimationOptions& = {});
     double getZoom() const;
     void setLatLngZoom(const LatLng&, double zoom, const AnimationOptions& = {});
-    void setLatLngZoom(const LatLng&, double zoom, optional<EdgeInsets>, const AnimationOptions& = {});
-    CameraOptions cameraForLatLngBounds(const LatLngBounds&, optional<EdgeInsets>) const;
-    CameraOptions cameraForLatLngs(const std::vector<LatLng>&, optional<EdgeInsets>) const;
+    void setLatLngZoom(const LatLng&, double zoom, const EdgeInsets&, const AnimationOptions& = {});
+    CameraOptions cameraForLatLngBounds(const LatLngBounds&, const EdgeInsets&) const;
+    CameraOptions cameraForLatLngs(const std::vector<LatLng>&, const EdgeInsets&) const;
     LatLngBounds latLngBoundsForCamera(const CameraOptions&) const;
     void resetZoom();
 
@@ -126,10 +126,10 @@ public:
     void rotateBy(const ScreenCoordinate& first, const ScreenCoordinate& second, const AnimationOptions& = {});
     void setBearing(double degrees, const AnimationOptions& = {});
     void setBearing(double degrees, optional<ScreenCoordinate>, const AnimationOptions& = {});
-    void setBearing(double degrees, optional<EdgeInsets>, const AnimationOptions& = {});
+    void setBearing(double degrees, const EdgeInsets&, const AnimationOptions& = {});
     double getBearing() const;
     void resetNorth(const AnimationOptions& = {{mbgl::Milliseconds(500)}});
-    void resetNorth(optional<EdgeInsets>, const AnimationOptions& = {{mbgl::Milliseconds(500)}});
+    void resetNorth(const EdgeInsets&, const AnimationOptions& = {{mbgl::Milliseconds(500)}});
 
     // Pitch
     void setPitch(double pitch, const AnimationOptions& = {});
