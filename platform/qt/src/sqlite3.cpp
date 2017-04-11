@@ -130,10 +130,6 @@ Database &Database::operator=(Database &&other) {
 Database::~Database() {
 }
 
-Database::operator bool() const {
-    return impl.operator bool();
-}
-
 void Database::setBusyTimeout(std::chrono::milliseconds timeout) {
     assert(impl);
     std::string timeoutStr = mbgl::util::toString(timeout.count());
@@ -189,11 +185,6 @@ Statement &Statement::operator=(Statement &&other) {
 }
 
 Statement::~Statement() {
-}
-
-Statement::operator bool() const {
-    assert(impl);
-    return impl.operator bool();
 }
 
 template void Statement::bind(int, int64_t);
