@@ -12,7 +12,6 @@
 
 #import "MGLStyle_Private.h"
 #import "MGLStyleLayer_Private.h"
-#import "MGLForegroundStyleLayer_Private.h"
 #import "MGLSource_Private.h"
 
 #import "NSDate+MGLAdditions.h"
@@ -332,20 +331,15 @@ static NSURL *MGLStyleURL_emerald;
     }
 
     if (auto fillLayer = rawLayer->as<mbgl::style::FillLayer>()) {
-        MGLSource *source = [self sourceWithIdentifier:@(fillLayer->getSourceID().c_str())];
-        return [[MGLFillStyleLayer alloc] initWithRawLayer:fillLayer source:source];
+        return [[MGLFillStyleLayer alloc] initWithRawLayer:fillLayer];
     } else if (auto lineLayer = rawLayer->as<mbgl::style::LineLayer>()) {
-        MGLSource *source = [self sourceWithIdentifier:@(lineLayer->getSourceID().c_str())];
-        return [[MGLLineStyleLayer alloc] initWithRawLayer:lineLayer source:source];
+        return [[MGLLineStyleLayer alloc] initWithRawLayer:lineLayer];
     } else if (auto symbolLayer = rawLayer->as<mbgl::style::SymbolLayer>()) {
-        MGLSource *source = [self sourceWithIdentifier:@(symbolLayer->getSourceID().c_str())];
-        return [[MGLSymbolStyleLayer alloc] initWithRawLayer:symbolLayer source:source];
+        return [[MGLSymbolStyleLayer alloc] initWithRawLayer:symbolLayer];
     } else if (auto rasterLayer = rawLayer->as<mbgl::style::RasterLayer>()) {
-        MGLSource *source = [self sourceWithIdentifier:@(rasterLayer->getSourceID().c_str())];
-        return [[MGLRasterStyleLayer alloc] initWithRawLayer:rasterLayer source:source];
+        return [[MGLRasterStyleLayer alloc] initWithRawLayer:rasterLayer];
     } else if (auto circleLayer = rawLayer->as<mbgl::style::CircleLayer>()) {
-        MGLSource *source = [self sourceWithIdentifier:@(circleLayer->getSourceID().c_str())];
-        return [[MGLCircleStyleLayer alloc] initWithRawLayer:circleLayer source:source];
+        return [[MGLCircleStyleLayer alloc] initWithRawLayer:circleLayer];
     } else if (auto backgroundLayer = rawLayer->as<mbgl::style::BackgroundLayer>()) {
         return [[MGLBackgroundStyleLayer alloc] initWithRawLayer:backgroundLayer];
     } else if (auto customLayer = rawLayer->as<mbgl::style::CustomLayer>()) {

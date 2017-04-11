@@ -5,7 +5,6 @@
 #import "NSPredicate+MGLAdditions.h"
 #import "NSDate+MGLAdditions.h"
 #import "MGLStyleLayer_Private.h"
-#import "MGLForegroundStyleLayer_Private.h"
 #import "MGLStyleValue_Private.h"
 #import "MGLCircleStyleLayer.h"
 
@@ -37,7 +36,7 @@ namespace mbgl {
 - (instancetype)initWithIdentifier:(NSString *)identifier source:(MGLSource *)source
 {
     auto layer = std::make_unique<mbgl::style::CircleLayer>(identifier.UTF8String, source.identifier.UTF8String);
-    return self = [super initWithPendingLayer:std::move(layer) source:source];
+    return self = [super initWithPendingLayer:std::move(layer)];
 }
 
 - (mbgl::style::CircleLayer *)rawLayer
