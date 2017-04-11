@@ -46,8 +46,6 @@ public:
     ~Database();
     Database &operator=(Database &&);
 
-    explicit operator bool() const;
-
     void setBusyTimeout(std::chrono::milliseconds);
     void exec(const std::string &sql);
     Statement prepare(const char *query);
@@ -68,8 +66,6 @@ public:
     Statement(Statement &&);
     ~Statement();
     Statement &operator=(Statement &&);
-
-    explicit operator bool() const;
 
     template <typename T> void bind(int offset, T value);
 

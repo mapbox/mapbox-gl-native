@@ -110,10 +110,6 @@ Database &Database::operator=(Database &&other) {
 Database::~Database() {
 }
 
-Database::operator bool() const {
-    return impl.operator bool();
-}
-
 void Database::setBusyTimeout(std::chrono::milliseconds timeout) {
     assert(impl);
     const int err = sqlite3_busy_timeout(impl->db,
@@ -156,10 +152,6 @@ Statement &Statement::operator=(Statement &&other) {
 }
 
 Statement::~Statement() {
-}
-
-Statement::operator bool() const {
-    return impl.operator bool();
 }
 
 template <> void Statement::bind(int offset, std::nullptr_t) {

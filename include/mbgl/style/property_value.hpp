@@ -34,8 +34,6 @@ public:
     const                T & asConstant()       const { return value.template get<               T >(); }
     const CameraFunction<T>& asCameraFunction() const { return value.template get<CameraFunction<T>>(); }
 
-    explicit operator bool() const { return !isUndefined(); };
-
     template <typename Evaluator>
     auto evaluate(const Evaluator& evaluator) const {
         return Value::visit(value, evaluator);
