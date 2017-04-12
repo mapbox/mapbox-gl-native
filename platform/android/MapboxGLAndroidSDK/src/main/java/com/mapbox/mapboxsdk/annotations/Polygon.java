@@ -2,6 +2,7 @@ package com.mapbox.mapboxsdk.annotations;
 
 import android.graphics.Color;
 
+import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 
 import java.util.ArrayList;
@@ -14,7 +15,7 @@ public final class Polygon extends BasePointCollection {
 
   private int fillColor = Color.BLACK; // default fillColor is black
   private int strokeColor = Color.BLACK; // default strokeColor is black
-  private List<Hole> holes;
+  private List<List<LatLng>> holes;
 
   Polygon() {
     super();
@@ -42,9 +43,9 @@ public final class Polygon extends BasePointCollection {
   /**
    * Returns a copy of the holes.
    *
-   * @return A {@link List} of holes.
+   * @return A {@link List} of {@link List} of {@link LatLng} points making up the holes.
    */
-  public List<Hole> getHoles() {
+  public List<List<LatLng>> getHoles() {
     return new ArrayList<>(holes);
   }
 
@@ -72,9 +73,9 @@ public final class Polygon extends BasePointCollection {
    * Sets the holes of this polygon. This method will take a copy of the holes, so further
    * mutations to holes will have no effect on this polygon.
    *
-   * @param holes A {@link List} of {@link Hole} points making up the holes.
+   * @param holes A {@link List} of {@link List} of {@link LatLng} points making up the holes.
    */
-  public void setHoles(List<? extends Hole> holes) {
+  public void setHoles(List<? extends List<LatLng>> holes) {
     this.holes = new ArrayList<>(holes);
     update();
   }
@@ -82,9 +83,9 @@ public final class Polygon extends BasePointCollection {
   /**
    * Add a hole to the polygon.
    *
-   * @param hole A {@link Hole} hole to be added.
+   * @param hole A {@link List} of {@link List} of {@link LatLng} points making up the hole to be added.
    */
-  void addHole(Hole hole) {
+  void addHole(List<LatLng> hole) {
     holes.add(hole);
     update();
   }
