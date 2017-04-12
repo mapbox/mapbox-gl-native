@@ -250,6 +250,7 @@ UniqueRenderbuffer Context::createRenderbuffer(const RenderbufferType type, cons
     bindRenderbuffer = renderbuffer;
     MBGL_CHECK_ERROR(
         glRenderbufferStorage(GL_RENDERBUFFER, static_cast<GLenum>(type), size.width, size.height));
+    bindRenderbuffer = 0;
     return renderbuffer;
 }
 
@@ -385,19 +386,14 @@ Framebuffer Context::createFramebuffer(const Texture& color) {
 }
 
 Framebuffer
-Context::createFramebuffer(const Renderbuffer<RenderbufferType::RGBA4>& colorTarget,
-                           const Renderbuffer<RenderbufferType::DepthComponent>& depthTarget,
+Context::createFramebuffer(const Renderbuffer<RenderbufferType::DepthComponent>& depthTarget,
                            const Texture& fboTexture) {
-    if (colorTarget.size != depthTarget.size) {
-        throw new std::runtime_error("Renderbuffer size mismatch");
-    }
     auto fbo = createFramebuffer();
     bindFramebuffer = fbo;
-    MBGL_CHECK_ERROR(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, colorTarget.renderbuffer));
     MBGL_CHECK_ERROR(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthTarget.renderbuffer));
     MBGL_CHECK_ERROR(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, fboTexture.texture, 0));
     checkFramebuffer();
-    return { colorTarget.size, std::move(fbo) };
+    return { depthTarget.size, std::move(fbo) };
 }
 
 UniqueTexture
