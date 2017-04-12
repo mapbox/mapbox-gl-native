@@ -158,7 +158,7 @@ void GeometryTile::getIcons(IconDependencyMap iconDependencyMap) {
     }
 }
 
-Bucket* GeometryTile::getBucket(const Layer& layer) {
+Bucket* GeometryTile::getBucket(const Layer& layer) const {
     const auto& buckets = layer.is<SymbolLayer>() ? symbolBuckets : nonSymbolBuckets;
     const auto it = buckets.find(layer.baseImpl->id);
     if (it == buckets.end()) {
