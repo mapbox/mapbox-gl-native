@@ -113,11 +113,6 @@ StyleParseResult Parser::parse(const std::string& json) {
 }
 
 void Parser::parseLight(const JSValue& value) {
-    if (!value.IsObject()) {
-        Log::Warning(Event::ParseStyle, "light must be an object");
-        return;
-    }
-
     conversion::Error error;
     optional<Light> converted = conversion::convert<Light>(value, error);
     if (!converted) {
