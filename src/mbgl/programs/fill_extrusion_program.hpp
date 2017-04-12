@@ -10,6 +10,7 @@
 #include <mbgl/util/size.hpp>
 #include <mbgl/style/layers/fill_extrusion_layer_properties.hpp>
 #include <mbgl/style/style.hpp>
+#include <mbgl/style/light.hpp>
 
 #include <string>
 
@@ -41,7 +42,11 @@ struct FillExtrusionUniforms : gl::Uniforms<
     uniforms::u_lightcolor,
     uniforms::u_lightpos,
     uniforms::u_lightintensity>
-{};
+{
+    static Values values(mat4,
+                         const TransformState&,
+                         const style::Light::Evaluated&);
+};
 
 struct FillExtrusionPatternUniforms : gl::Uniforms<
     uniforms::u_matrix,
@@ -63,16 +68,14 @@ struct FillExtrusionPatternUniforms : gl::Uniforms<
     uniforms::u_lightpos,
     uniforms::u_lightintensity>
 {
-    static Values values(mat4 matrix,
+    static Values values(mat4,
                          const SpriteAtlasElement&,
                          const SpriteAtlasElement&,
                          const style::Faded<std::string>&,
                          const UnwrappedTileID&,
                          const TransformState&,
                          const float,
-                         const std::array<float, 3>&,
-                         const std::array<float, 3>&,
-                         const float);
+                         const style::Light::Evaluated&);
 };
 
 class FillExtrusionProgram : public Program<

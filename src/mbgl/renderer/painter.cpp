@@ -358,7 +358,7 @@ void Painter::renderPass(PaintParameters& parameters,
                     uniforms::u_opacity::Value{
                         layer.as<FillExtrusionLayer>()
                             ->impl->paint.evaluated.get<FillExtrusionOpacity>() } },
-                extrusionTextureVertexBuffer, extrusionTextureTriangleIndexBuffer,
+                extrusionTextureVertexBuffer, quadTriangleIndexBuffer,
                 extrusionTextureSegments,
                 ExtrusionTextureProgram::PaintPropertyBinders{ properties, 0 }, properties,
                 state.getZoom());
