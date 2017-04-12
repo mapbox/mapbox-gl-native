@@ -34,7 +34,7 @@ style using the `-[MGLStyle addLayer:]` or
 @param identifier A string that uniquely identifies the source in the style to
 which it is added.
 */
-- (instancetype)initWithIdentifier:(NSString *)identifier NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithIdentifier:(NSString *)identifier;
 
 #pragma mark - Accessing the Paint Attributes
 

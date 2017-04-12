@@ -293,7 +293,7 @@ MGL_EXPORT
     has not yet been added to the current style, the behavior is undefined.
  @return An initialized foreground style layer.
  */
-- (instancetype)initWithIdentifier:(NSString *)identifier source:(MGLSource *)source NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithIdentifier:(NSString *)identifier source:(MGLSource *)source;
 
 #pragma mark - Accessing the Layout Attributes
 

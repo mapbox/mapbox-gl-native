@@ -94,7 +94,7 @@ style using the `-[MGLStyle addLayer:]` or
 @param identifier A string that uniquely identifies the source in the style to
 which it is added.
 */
-- (instancetype)initWithIdentifier:(NSString *)identifier NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithIdentifier:(NSString *)identifier;
 <% } else { -%>
 
 /**
@@ -110,7 +110,7 @@ which it is added.
     has not yet been added to the current style, the behavior is undefined.
  @return An initialized foreground style layer.
  */
-- (instancetype)initWithIdentifier:(NSString *)identifier source:(MGLSource *)source NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithIdentifier:(NSString *)identifier source:(MGLSource *)source;
 <% } -%>
 
 <% if (layoutProperties.length) { -%>
