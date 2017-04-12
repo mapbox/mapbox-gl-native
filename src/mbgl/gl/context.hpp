@@ -36,6 +36,7 @@ namespace extension {
 class VertexArray;
 class Debugging;
 class ProgramBinary;
+class TextureFilterAnisotropic;
 } // namespace extension
 
 class Context : private util::noncopyable {
@@ -63,6 +64,8 @@ public:
     constexpr bool supportsProgramBinaries() const { return false; }
 #endif
     optional<std::pair<BinaryProgramFormat, std::string>> getBinaryProgram(ProgramID) const;
+
+    bool supportsAnisotropicTextureFiltering() const;
 
     template <class Vertex, class DrawMode>
     VertexBuffer<Vertex, DrawMode> createVertexBuffer(VertexVector<Vertex, DrawMode>&& v) {
@@ -135,6 +138,7 @@ public:
                      TextureUnit = 0,
                      TextureFilter = TextureFilter::Nearest,
                      TextureMipMap = TextureMipMap::No,
+                     TextureAnisotropic = TextureAnisotropic::Default,
                      TextureWrap wrapX = TextureWrap::Clamp,
                      TextureWrap wrapY = TextureWrap::Clamp);
 
@@ -190,6 +194,7 @@ private:
 #if MBGL_HAS_BINARY_PROGRAMS
     std::unique_ptr<extension::ProgramBinary> programBinary;
 #endif
+    std::unique_ptr<extension::TextureFilterAnisotropic> textureFilterAnisotropic;
 
 public:
     State<value::ActiveTexture> activeTexture;

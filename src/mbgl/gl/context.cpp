@@ -4,6 +4,7 @@
 #include <mbgl/gl/debugging_extension.hpp>
 #include <mbgl/gl/vertex_array_extension.hpp>
 #include <mbgl/gl/program_binary_extension.hpp>
+#include <mbgl/gl/texture_filter_anisotropic_extension.hpp>
 #include <mbgl/util/traits.hpp>
 #include <mbgl/util/std.hpp>
 #include <mbgl/util/logging.hpp>
@@ -38,6 +39,42 @@ static_assert(underlying_type(TextureFormat::Alpha) == GL_ALPHA, "OpenGL type mi
 
 static_assert(std::is_same<BinaryProgramFormat, GLenum>::value, "OpenGL type mismatch");
 
+struct ExtensionLoader {
+public:
+    ExtensionLoader(const std::function<ProcAddress(const char*)>& getProcAddress_)
+        : getProcAddress(getProcAddress_),
+          extensions(reinterpret_cast<const char*>(MBGL_CHECK_ERROR(glGetString(GL_EXTENSIONS)))) {
+    }
+
+    operator bool() const {
+        return getProcAddress && extensions;
+    }
+
+    ProcAddress operator()(std::initializer_list<std::pair<const char*, const char*>> probes) const {
+        for (auto probe : probes) {
+            if (strstr(extensions, probe.first) != nullptr) {
+                if (ProcAddress ptr = getProcAddress(probe.second)) {
+                    return ptr;
+                }
+            }
+        }
+        return nullptr;
+    }
+
+    bool operator()(std::initializer_list<const char*> probes) const {
+        for (auto probe : probes) {
+            if (strstr(extensions, probe) != nullptr) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+private:
+    const std::function<ProcAddress(const char*)>& getProcAddress;
+    const char* extensions;
+};
+
 Context::Context() = default;
 
 Context::~Context() {
@@ -45,21 +82,7 @@ Context::~Context() {
 }
 
 void Context::initializeExtensions(const std::function<gl::ProcAddress(const char*)>& getProcAddress) {
-    if (const char* extensions =
-            reinterpret_cast<const char*>(MBGL_CHECK_ERROR(glGetString(GL_EXTENSIONS)))) {
-
-        auto fn = [&](
-            std::initializer_list<std::pair<const char*, const char*>> probes) -> ProcAddress {
-            for (auto probe : probes) {
-                if (strstr(extensions, probe.first) != nullptr) {
-                    if (ProcAddress ptr = getProcAddress(probe.second)) {
-                        return ptr;
-                    }
-                }
-            }
-            return nullptr;
-        };
-
+    if (ExtensionLoader fn{ getProcAddress }) {
         debugging = std::make_unique<extension::Debugging>(fn);
         if (!disableVAOExtension) {
             vertexArray = std::make_unique<extension::VertexArray>(fn);
@@ -67,6 +90,7 @@ void Context::initializeExtensions(const std::function<gl::ProcAddress(const cha
 #if MBGL_HAS_BINARY_PROGRAMS
         programBinary = std::make_unique<extension::ProgramBinary>(fn);
 #endif
+        textureFilterAnisotropic = std::make_unique<extension::TextureFilterAnisotropic>(fn);
 
         if (!supportsVertexArrays()) {
             Log::Warning(Event::OpenGL, "Not using Vertex Array Objects");
@@ -228,6 +252,10 @@ optional<std::pair<BinaryProgramFormat, std::string>> Context::getBinaryProgram(
     return {};
 }
 #endif
+
+bool Context::supportsAnisotropicTextureFiltering() const {
+    return textureFilterAnisotropic && textureFilterAnisotropic->available;
+}
 
 UniqueVertexArray Context::createVertexArray() {
     assert(supportsVertexArrays());
@@ -410,9 +438,11 @@ void Context::bindTexture(Texture& obj,
                           TextureUnit unit,
                           TextureFilter filter,
                           TextureMipMap mipmap,
+                          TextureAnisotropic anisotropic,
                           TextureWrap wrapX,
                           TextureWrap wrapY) {
-    if (filter != obj.filter || mipmap != obj.mipmap || wrapX != obj.wrapX || wrapY != obj.wrapY) {
+    if (filter != obj.filter || mipmap != obj.mipmap || obj.anisotropic != anisotropic ||
+        wrapX != obj.wrapX || wrapY != obj.wrapY) {
         activeTexture = unit;
         texture[unit] = obj.texture;
 
@@ -427,6 +457,15 @@ void Context::bindTexture(Texture& obj,
                                 filter == TextureFilter::Linear ? GL_LINEAR : GL_NEAREST));
             obj.filter = filter;
             obj.mipmap = mipmap;
+        }
+        if (anisotropic != obj.anisotropic) {
+            if (supportsAnisotropicTextureFiltering()) {
+                glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY,
+                                *(anisotropic == TextureAnisotropic::Max
+                                      ? textureFilterAnisotropic->maximum
+                                      : anisotropic));
+            }
+            obj.anisotropic = anisotropic;
         }
         if (wrapX != obj.wrapX) {
 

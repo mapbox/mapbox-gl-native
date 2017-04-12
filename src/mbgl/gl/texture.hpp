@@ -12,6 +12,7 @@ public:
     UniqueTexture texture;
     TextureFilter filter = TextureFilter::Nearest;
     TextureMipMap mipmap = TextureMipMap::No;
+    TextureAnisotropic anisotropic = TextureAnisotropic::Default;
     TextureWrap wrapX = TextureWrap::Clamp;
     TextureWrap wrapY = TextureWrap::Clamp;
 };

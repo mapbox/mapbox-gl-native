@@ -52,8 +52,10 @@ void Painter::renderRaster(PaintParameters& parameters,
     const RasterProgram::PaintPropertyBinders paintAttributeData(properties, 0);
 
     assert(bucket.texture);
-    context.bindTexture(*bucket.texture, 0, gl::TextureFilter::Linear);
-    context.bindTexture(*bucket.texture, 1, gl::TextureFilter::Linear);
+    context.bindTexture(*bucket.texture, 0, gl::TextureFilter::Linear, gl::TextureMipMap::No,
+                        gl::TextureAnisotropic::Max);
+    context.bindTexture(*bucket.texture, 1, gl::TextureFilter::Linear, gl::TextureMipMap::No,
+                        gl::TextureAnisotropic::Max);
 
     parameters.programs.raster.draw(
         context,

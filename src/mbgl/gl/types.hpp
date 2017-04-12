@@ -41,6 +41,44 @@ enum class RenderbufferType : uint32_t {
 
 enum class TextureMipMap : bool { No = false, Yes = true };
 enum class TextureFilter : bool { Nearest = false, Linear = true };
+
+class TextureAnisotropic {
+public:
+    using Type = float;
+    static constexpr const Type Default = 1.0f;
+    // Values below 1.0 are not allowed, so we treat all values below 1.0 as the
+    // implementation-defined maximum.
+    static constexpr const Type Max = 0.0f;
+
+    TextureAnisotropic(float v) {
+        operator=(v);
+    }
+
+    float operator*() const {
+        return value;
+    }
+
+    bool operator==(const TextureAnisotropic& rhs) const {
+        return value == rhs.value;
+    }
+
+    bool operator!=(const TextureAnisotropic& rhs) const {
+        return value != rhs.value;
+    }
+
+    TextureAnisotropic& operator=(float v) {
+        if (v < Default) {
+            value = Max;
+        } else {
+            value = v;
+        }
+        return *this;
+    }
+
+private:
+    Type value = Default;
+};
+
 enum class TextureWrap : bool { Clamp, Repeat };
 enum class TextureFormat : uint32_t {
     RGBA = 0x1908,
