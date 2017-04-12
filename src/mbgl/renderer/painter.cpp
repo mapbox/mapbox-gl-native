@@ -55,7 +55,7 @@ static gl::VertexVector<FillLayoutVertex> tileVertices() {
     return result;
 }
 
-static gl::IndexVector<gl::Triangles> tileTriangleIndices() {
+static gl::IndexVector<gl::Triangles> quadTriangleIndices() {
     gl::IndexVector<gl::Triangles> result;
     result.emplace_back(0, 1, 2);
     result.emplace_back(1, 2, 3);
@@ -100,9 +100,8 @@ Painter::Painter(gl::Context& context_,
       tileVertexBuffer(context.createVertexBuffer(tileVertices())),
       rasterVertexBuffer(context.createVertexBuffer(rasterVertices())),
       extrusionTextureVertexBuffer(context.createVertexBuffer(extrusionTextureVertices())),
-      tileTriangleIndexBuffer(context.createIndexBuffer(tileTriangleIndices())),
-      tileBorderIndexBuffer(context.createIndexBuffer(tileLineStripIndices())),
-      extrusionTextureTriangleIndexBuffer(context.createIndexBuffer(tileTriangleIndices())) {
+      quadTriangleIndexBuffer(context.createIndexBuffer(quadTriangleIndices())),
+      tileBorderIndexBuffer(context.createIndexBuffer(tileLineStripIndices())) {
 
     tileTriangleSegments.emplace_back(0, 0, 4, 6);
     tileBorderSegments.emplace_back(0, 0, 4, 5);
