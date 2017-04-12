@@ -541,18 +541,6 @@ std::vector<Feature> Style::queryRenderedFeatures(const ScreenLineString& geomet
     return result;
 }
 
-float Style::getQueryRadius() const {
-    float additionalRadius = 0;
-    for (auto& layer : layers) {
-        if (!layer->baseImpl->needsRendering(zoomHistory.lastZoom)) {
-            continue;
-        }
-        additionalRadius = util::max(additionalRadius, layer->baseImpl->getQueryRadius());
-    }
-    return additionalRadius;
-}
-
-
 void Style::setSourceTileCacheSize(size_t size) {
     for (const auto& source : sources) {
         source->baseImpl->setCacheSize(size);

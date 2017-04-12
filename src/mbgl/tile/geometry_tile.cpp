@@ -186,7 +186,8 @@ void GeometryTile::queryRenderedFeatures(
                         *data,
                         id.canonical,
                         style,
-                        collisionTile.get());
+                        collisionTile.get(),
+                        *this);
 }
 
 void GeometryTile::querySourceFeatures(

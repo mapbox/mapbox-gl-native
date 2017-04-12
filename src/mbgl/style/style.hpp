@@ -101,8 +101,6 @@ public:
                                                const TransformState& transformState,
                                                const RenderedQueryOptions& options) const;
 
-    float getQueryRadius() const;
-
     void setSourceTileCacheSize(size_t);
     void onLowMemory();
 

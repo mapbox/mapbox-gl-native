@@ -32,9 +32,10 @@ std::unique_ptr<Bucket> LineLayer::Impl::createBucket(const BucketParameters& pa
     return std::make_unique<LineBucket>(parameters, layers, layout);
 }
 
-float LineLayer::Impl::getLineWidth() const {
+float LineLayer::Impl::getLineWidth(const GeometryTileFeature& feature, const float zoom) const {
     float lineWidth = paint.evaluated.get<LineWidth>();
-    float gapWidth = paint.evaluated.get<LineGapWidth>().constantOr(0);
+    float gapWidth = paint.evaluated.get<LineGapWidth>()
+            .evaluate(feature, zoom, LineGapWidth::defaultValue());
     if (gapWidth) {
         return gapWidth + 2 * lineWidth;
     } else {
@@ -72,29 +73,29 @@ optional<GeometryCollection> offsetLine(const GeometryCollection& rings, const d
     return newRings;
 }
 
-float LineLayer::Impl::getQueryRadius() const {
-    const std::array<float, 2>& translate = paint.evaluated.get<LineTranslate>();
-    auto offset = paint.evaluated.get<LineOffset>().constantOr(LineOffset::defaultValue());
-    return getLineWidth() / 2.0 + std::abs(offset) + util::length(translate[0], translate[1]);
-}
-
-bool LineLayer::Impl::queryIntersectsGeometry(
+bool LineLayer::Impl::queryIntersectsFeature(
         const GeometryCoordinates& queryGeometry,
-        const GeometryCollection& geometry,
+        const GeometryTileFeature& feature,
+        const float zoom,
         const float bearing,
         const float pixelsToTileUnits) const {
 
-    const float halfWidth = getLineWidth() / 2.0 * pixelsToTileUnits;
-
+    // Translate query geometry
     auto translatedQueryGeometry = FeatureIndex::translateQueryGeometry(
             queryGeometry, paint.evaluated.get<LineTranslate>(), paint.evaluated.get<LineTranslateAnchor>(), bearing, pixelsToTileUnits);
 
-    auto offset = paint.evaluated.get<LineOffset>().constantOr(LineOffset::defaultValue());
-    auto offsetGeometry = offsetLine(geometry, offset * pixelsToTileUnits);
 
+    // Evaluate function
+    auto offset = paint.evaluated.get<LineOffset>().evaluate(feature, zoom, LineOffset::defaultValue()) * pixelsToTileUnits;
+
+    // Apply offset to geometry
+    auto offsetGeometry = offsetLine(feature.getGeometries(), offset);
+
+    // Test intersection
+    const float halfWidth = getLineWidth(feature, zoom) / 2.0 * pixelsToTileUnits;
     return util::polygonIntersectsBufferedMultiLine(
             translatedQueryGeometry.value_or(queryGeometry),
-            offsetGeometry.value_or(geometry),
+            offsetGeometry.value_or(feature.getGeometries()),
             halfWidth);
 }
 
