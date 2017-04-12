@@ -35,12 +35,11 @@ public:
     }
 
     const TransitionOptions& getTransition() const {
-        if (bool(transition)) {
+        if (transition) {
             return transition;
         } else {
             static const TransitionOptions staticValue{};
             return staticValue;
-            // TODO write this in one line probably
         }
     }
 

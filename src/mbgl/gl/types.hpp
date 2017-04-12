@@ -36,7 +36,6 @@ enum class DataType : uint32_t {
 
 enum class RenderbufferType : uint32_t {
     RGBA = 0x8058,
-    RGBA4 = 0x8056,
     DepthStencil = 0x88F0,
 #if not MBGL_USE_GLES2
     DepthComponent = 0x1902,     // GL_DEPTH_COMPONENT

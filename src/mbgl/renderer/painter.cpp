@@ -334,8 +334,8 @@ void Painter::renderPass(PaintParameters& parameters,
         } else if (layer.is<FillExtrusionLayer>()) {
             const auto size = context.viewport.getCurrentValue().size;
 
-            OffscreenTexture texture(context, size, 1);
-            texture.bindRenderbuffers();
+            OffscreenTexture texture(context, size);
+            texture.bindRenderbuffers(1);
 
             context.setStencilMode(gl::StencilMode::disabled());
             context.setDepthMode(depthModeForSublayer(0, gl::DepthMode::ReadWrite));
