@@ -36,12 +36,6 @@ static const MGLRow MGLMetricTable[] = {
     {.distance = 500000, .numberOfBars = 2},
     {.distance = 600000, .numberOfBars = 3},
     {.distance = 800000, .numberOfBars = 2},
-    {.distance = 1000000, .numberOfBars = 2},
-    {.distance = 1200000, .numberOfBars = 2},
-    {.distance = 1600000, .numberOfBars = 2},
-    {.distance = 2000000, .numberOfBars = 2},
-    {.distance = 3500000, .numberOfBars = 2},
-    {.distance = 5000000, .numberOfBars = 2},
 };
 
 static const MGLRow MGLImperialTable[] ={
@@ -76,17 +70,11 @@ static const MGLRow MGLImperialTable[] ={
     {.distance = 200*MGLFeetPerMile, .numberOfBars = 2},
     {.distance = 300*MGLFeetPerMile, .numberOfBars = 3},
     {.distance = 400*MGLFeetPerMile, .numberOfBars = 2},
-    {.distance = 800*MGLFeetPerMile, .numberOfBars = 2},
-    {.distance = 1000*MGLFeetPerMile, .numberOfBars = 2},
-    {.distance = 2000*MGLFeetPerMile, .numberOfBars = 2},
-    {.distance = 3000*MGLFeetPerMile, .numberOfBars = 3},
-    {.distance = 4000*MGLFeetPerMile, .numberOfBars = 2},
 };
 
 @class MGLScaleBarLabel;
 
 @interface MGLScaleBar()
-@property (nonatomic, assign, getter=isVisible) BOOL visible;
 @property (nonatomic) NSArray<MGLScaleBarLabel *> *labels;
 @property (nonatomic) NSArray<UIView *> *bars;
 @property (nonatomic) UIView *containerView;
@@ -145,13 +133,12 @@ static const CGFloat MGLFeetPerMeter = 3.28084;
 }
 
 - (void)commonInit {
-    _visible = NO;
     _primaryColor = [UIColor colorWithRed:18.0/255.0 green:45.0/255.0 blue:17.0/255.0 alpha:1];
     _secondaryColor = [UIColor colorWithRed:247.0/255.0 green:247.0/255.0 blue:247.0/255.0 alpha:1];
     _borderWidth = 1.0f;
     
     self.clipsToBounds = NO;
-    self.alpha = 0;
+    self.hidden = YES;
     
     _containerView = [[UIView alloc] init];
     _containerView.clipsToBounds = YES;
@@ -219,30 +206,6 @@ static const CGFloat MGLFeetPerMeter = 3.28084;
     return row;
 }
 
-- (void)fadeIn {
-    if (self.isVisible) {
-        return;
-    }
-
-    self.visible = YES;
-    
-    [UIView animateWithDuration:.2 delay:0 options:UIViewAnimationOptionBeginFromCurrentState animations:^{
-        self.alpha = 1.0;
-    } completion:nil];
-}
-
-- (void)fadeOut {
-    if (!self.isVisible) {
-        return;
-    }
-    
-    self.visible = NO;
-    
-    [UIView animateWithDuration:.3 delay:0.7 options:UIViewAnimationOptionBeginFromCurrentState animations:^{
-        self.alpha = 0.0;
-    } completion:nil];
-}
-
 #pragma mark - Setters
 
 - (void)setMetersPerPoint:(CLLocationDistance)metersPerPoint {
@@ -250,14 +213,29 @@ static const CGFloat MGLFeetPerMeter = 3.28084;
         return;
     }
     
-    [self fadeIn];
-    
     _metersPerPoint = metersPerPoint;
+    
+    [self updateVisibility];
     
     self.row = [self preferredRow];
     
     [self invalidateIntrinsicContentSize];
     [self setNeedsLayout];
+}
+
+- (void)updateVisibility {
+    BOOL metric = [self usesMetricSystem];
+    
+    NSUInteger count = metric
+    ? sizeof(MGLMetricTable) / sizeof(MGLMetricTable[0])
+    : sizeof(MGLImperialTable) / sizeof(MGLImperialTable[0]);
+    
+    CLLocationDistance maximumDistance = [self maximumWidth] * [self unitsPerPoint];
+    CLLocationDistance allowedDistance = metric
+    ? MGLMetricTable[count-1].distance
+    : MGLImperialTable[count-1].distance;
+    
+    self.alpha = maximumDistance > allowedDistance ? 0 : 1;
 }
 
 - (void)setRow:(MGLRow)row {

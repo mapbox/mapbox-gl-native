@@ -226,11 +226,8 @@ IB_DESIGNABLE
 - (IBAction)reloadStyle:(id)sender;
 
 /**
- A control indicating the scale of the map.
- 
- The scale bar becomes visible when a user interacts with the map and fades out
- when the interaction stops. The scale bar is positioned in the upper-left
- corner.
+ A control indicating the scale of the map. The scale bar is positioned in the
+ upper-left corner.
  */
 @property (nonatomic, readonly) UIView *scaleBar;
 

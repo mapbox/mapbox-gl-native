@@ -3,10 +3,7 @@
 
 @interface MGLScaleBar : UIView
 
-// Sets the scale and fades in the scale bar
+// Sets the scale and redraws the scale bar
 @property (nonatomic, assign) CLLocationDistance metersPerPoint;
-
-// Fades out the scale bar
-- (void)fadeOut;
 
 @end
