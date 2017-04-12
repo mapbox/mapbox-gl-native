@@ -5053,6 +5053,9 @@ public:
             }
             else
             {
+                if (annotationView.layer.animationKeys.count > 0) {
+                    continue;
+                }
                 CGRect adjustedFrame = annotationView.frame;
                 if (annotationView.layer.presentationLayer) {
                     adjustedFrame.origin.x = -CGRectGetWidth(annotationView.layer.presentationLayer.frame) * 10.0;

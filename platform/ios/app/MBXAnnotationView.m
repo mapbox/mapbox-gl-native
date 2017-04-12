@@ -49,17 +49,4 @@
 
 }
 
-- (nullable id<CAAction>)actionForLayer:(CALayer *)layer forKey:(NSString *)event
-{
-    if (([event isEqualToString:@"transform"] || [event isEqualToString:@"position"])
-        && self.dragState == MGLAnnotationViewDragStateNone)
-    {
-        CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:event];
-        animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
-        animation.speed = 0.1;
-        return animation;
-    }
-    return [super actionForLayer:layer forKey:event];
-}
-
 @end
