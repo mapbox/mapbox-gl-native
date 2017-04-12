@@ -14,6 +14,7 @@ namespace mbgl {
 
 namespace style {
 class BucketParameters;
+class LineLayer;
 } // namespace style
 
 class LineBucket : public Bucket {
@@ -28,6 +29,8 @@ public:
 
     void upload(gl::Context&) override;
     void render(Painter&, PaintParameters&, const style::Layer&, const RenderTile&) override;
+
+    float getQueryRadius(const style::Layer&) const override;
 
     style::LineLayoutProperties::PossiblyEvaluated layout;
 
@@ -59,6 +62,8 @@ private:
     std::ptrdiff_t e3;
 
     const uint32_t overscaling;
+
+    float getLineWidth(const style::LineLayer& layer) const;
 };
 
 } // namespace mbgl

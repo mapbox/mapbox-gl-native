@@ -5,6 +5,8 @@
 #include <mbgl/tile/geometry_tile_data.hpp>
 
 #include <atomic>
+#include <string>
+#include <unordered_map>
 
 namespace mbgl {
 
@@ -37,6 +39,10 @@ public:
     virtual void render(Painter&, PaintParameters&, const style::Layer&, const RenderTile&) = 0;
 
     virtual bool hasData() const = 0;
+
+    virtual float getQueryRadius(const style::Layer&) const {
+        return 0;
+    };
 
     bool needsUpload() const {
         return !uploaded;

@@ -4,6 +4,7 @@
 #include <mbgl/style/bucket_parameters.hpp>
 #include <mbgl/style/layers/fill_layer.hpp>
 #include <mbgl/style/layers/fill_layer_impl.hpp>
+#include <mbgl/util/math.hpp>
 
 #include <mapbox/earcut.hpp>
 
@@ -129,6 +130,16 @@ void FillBucket::render(Painter& painter,
 
 bool FillBucket::hasData() const {
     return !triangleSegments.empty() || !lineSegments.empty();
+}
+
+float FillBucket::getQueryRadius(const style::Layer& layer) const {
+    if (!layer.is<FillLayer>()) {
+        return 0;
+    }
+
+    const std::array<float, 2>& translate = layer.as<FillLayer>()->impl->paint.evaluated.get<FillTranslate>();
+    return util::length(translate[0], translate[1]);
+
 }
 
 } // namespace mbgl

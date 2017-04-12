@@ -29,25 +29,24 @@ std::unique_ptr<Bucket> CircleLayer::Impl::createBucket(const BucketParameters& 
     return std::make_unique<CircleBucket>(parameters, layers);
 }
 
-float CircleLayer::Impl::getQueryRadius() const {
-    const std::array<float, 2>& translate = paint.evaluated.get<CircleTranslate>();
-    return paint.evaluated.get<CircleRadius>().constantOr(CircleRadius::defaultValue())
-        + util::length(translate[0], translate[1]);
-}
-
-bool CircleLayer::Impl::queryIntersectsGeometry(
+bool CircleLayer::Impl::queryIntersectsFeature(
         const GeometryCoordinates& queryGeometry,
-        const GeometryCollection& geometry,
+        const GeometryTileFeature& feature,
+        const float zoom,
         const float bearing,
         const float pixelsToTileUnits) const {
 
+    // Translate query geometry
     auto translatedQueryGeometry = FeatureIndex::translateQueryGeometry(
             queryGeometry, paint.evaluated.get<CircleTranslate>(), paint.evaluated.get<CircleTranslateAnchor>(), bearing, pixelsToTileUnits);
 
-    auto circleRadius = paint.evaluated.get<CircleRadius>().constantOr(CircleRadius::defaultValue()) * pixelsToTileUnits;
+    // Evaluate function
+    auto circleRadius = paint.evaluated.get<CircleRadius>()
+                                .evaluate(feature, zoom, CircleRadius::defaultValue())
+                        * pixelsToTileUnits;
 
-    return util::polygonIntersectsBufferedMultiPoint(
-            translatedQueryGeometry.value_or(queryGeometry), geometry, circleRadius);
+    // Test intersection
+    return util::polygonIntersectsBufferedMultiPoint(translatedQueryGeometry.value_or(queryGeometry), feature.getGeometries(), circleRadius);
 }
 
 } // namespace style

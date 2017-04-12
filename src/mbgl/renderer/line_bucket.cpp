@@ -460,4 +460,39 @@ bool LineBucket::hasData() const {
     return !segments.empty();
 }
 
+template <class Property>
+static float get(const LineLayer& layer, const std::map<std::string, LineProgram::PaintPropertyBinders>& paintPropertyBinders) {
+    auto it = paintPropertyBinders.find(layer.getID());
+    if (it == paintPropertyBinders.end() || !it->second.statistics<Property>().max()) {
+        return layer.impl->paint.evaluated.get<Property>().constantOr(Property::defaultValue());
+    } else {
+        return *it->second.statistics<Property>().max();
+    }
+}
+
+float LineBucket::getLineWidth(const style::LineLayer& layer) const {
+    float lineWidth = layer.impl->paint.evaluated.get<LineWidth>();
+    float gapWidth = get<LineGapWidth>(layer, paintPropertyBinders);
+
+    if (gapWidth) {
+        return gapWidth + 2 * lineWidth;
+    } else {
+        return lineWidth;
+    }
+}
+
+float LineBucket::getQueryRadius(const style::Layer& layer) const {
+    if (!layer.is<LineLayer>()) {
+        return 0;
+    }
+
+    auto lineLayer = layer.as<LineLayer>();
+    auto paint = lineLayer->impl->paint;
+
+    const std::array<float, 2>& translate = paint.evaluated.get<LineTranslate>();
+    float offset = get<LineOffset>(*lineLayer, paintPropertyBinders);
+    return getLineWidth(*lineLayer) / 2.0 + std::abs(offset) + util::length(translate[0], translate[1]);
+}
+
+
 } // namespace mbgl

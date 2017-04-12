@@ -39,21 +39,17 @@ std::unique_ptr<Bucket> FillLayer::Impl::createBucket(const BucketParameters& pa
     return std::make_unique<FillBucket>(parameters, layers);
 }
 
-float FillLayer::Impl::getQueryRadius() const {
-    const std::array<float, 2>& translate = paint.evaluated.get<FillTranslate>();
-    return util::length(translate[0], translate[1]);
-}
-
-bool FillLayer::Impl::queryIntersectsGeometry(
+bool FillLayer::Impl::queryIntersectsFeature(
         const GeometryCoordinates& queryGeometry,
-        const GeometryCollection& geometry,
+        const GeometryTileFeature& feature,
+        const float,
         const float bearing,
         const float pixelsToTileUnits) const {
 
     auto translatedQueryGeometry = FeatureIndex::translateQueryGeometry(
             queryGeometry, paint.evaluated.get<FillTranslate>(), paint.evaluated.get<FillTranslateAnchor>(), bearing, pixelsToTileUnits);
 
-    return util::polygonIntersectsMultiPolygon(translatedQueryGeometry.value_or(queryGeometry), geometry);
+    return util::polygonIntersectsMultiPolygon(translatedQueryGeometry.value_or(queryGeometry), feature.getGeometries());
 }
 
 } // namespace style
