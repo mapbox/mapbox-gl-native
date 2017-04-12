@@ -3,8 +3,8 @@
 namespace mbgl {
 namespace android {
 
-jni::Object<ExponentialStops> ExponentialStops::New(jni::JNIEnv& env, jni::Object<java::lang::Float> base, jni::Array<jni::Object<Stop>> stops) {
-    static auto constructor = ExponentialStops::javaClass.GetConstructor<jni::Object<java::lang::Float>, jni::Array<jni::Object<Stop>>>(env);
+jni::Object<ExponentialStops> ExponentialStops::New(jni::JNIEnv& env, java::lang::Float base, jni::Array<jni::Object<Stop>> stops) {
+    static auto constructor = ExponentialStops::javaClass.GetConstructor<java::lang::Float, jni::Array<jni::Object<Stop>>>(env);
     return ExponentialStops::javaClass.New(env, constructor, base, stops);
 }
 

@@ -5,8 +5,6 @@
 #include <mbgl/util/geojson.hpp>
 #include <mbgl/util/noncopyable.hpp>
 
-#include <jni/jni.hpp>
-
 namespace mbgl {
 namespace android {
 namespace geojson {
@@ -17,7 +15,7 @@ public:
 
     static mbgl::FeatureCollection convert(jni::JNIEnv&, jni::Object<FeatureCollection>);
 
-    static jni::Object<java::util::List> getFeatures(jni::JNIEnv&, jni::Object<FeatureCollection>);
+    static java::util::List getFeatures(jni::JNIEnv&, jni::Object<FeatureCollection>);
 
     static jni::Class<FeatureCollection> javaClass;
 

@@ -2,8 +2,9 @@
 
 #include "conversion.hpp"
 
+#include "../java/lang.hpp"
+
 #include <mbgl/util/optional.hpp>
-#include <jni/jni.hpp>
 
 #include <string>
 #include <array>

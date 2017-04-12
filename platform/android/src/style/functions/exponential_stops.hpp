@@ -13,7 +13,7 @@ class ExponentialStops : private mbgl::util::noncopyable {
 public:
     static constexpr auto Name() { return "com/mapbox/mapboxsdk/style/functions/stops/ExponentialStops"; };
 
-    static jni::Object<ExponentialStops> New(jni::JNIEnv&, jni::Object<java::lang::Float>, jni::Array<jni::Object<Stop>>);
+    static jni::Object<ExponentialStops> New(jni::JNIEnv&, java::lang::Float, jni::Array<jni::Object<Stop>>);
 
     static jni::Class<ExponentialStops> javaClass;
 

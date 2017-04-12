@@ -12,18 +12,18 @@ namespace gson {
 template <typename F> // void (jni::String, jni::Object<gson::JsonElement>)
 static void iterateEntrySet(jni::JNIEnv& env, jni::Object<JsonObject> jsonObject, F callback) {
     // Get Set<Map.Entry<String, JsonElement>>
-    static auto method = JsonObject::javaClass.GetMethod<jni::Object<java::util::Set> ()>(env, "entrySet");
+    static auto method = JsonObject::javaClass.GetMethod<java::util::Set ()>(env, "entrySet");
     auto entrySet = jsonObject.Call(env, method);
-    jni::Array<jni::Object<java::util::Map::Entry>> entryArray = java::util::Set::toArray<java::util::Map::Entry>(env, entrySet);
+    auto entryArray = (jni::Array<java::util::MapEntry>)java::util::Set_toArray::Call(env, entrySet);
 
     size_t size = entryArray.Length(env);
     for (size_t i = 0; i < size; i++) {
         auto entry = entryArray.Get(env, i);
         if (entry) {
             // Convert
-            auto jKey = java::util::Map::Entry::getKey<jni::ObjectTag>(env, entry);
+            auto jKey = java::util::MapEntry_getKey::Call(env, entry);
             auto jKeyString = jni::String(reinterpret_cast<jni::jstring*>(jKey.Get()));
-            auto jValue = java::util::Map::Entry::getValue<gson::JsonElement>(env, entry);
+            auto jValue = (jni::Object<gson::JsonElement>)java::util::MapEntry_getValue::Call(env, entry);
 
             // Callback
             callback(jKeyString, jValue);

@@ -80,7 +80,7 @@ jni::Array<jni::Object<Stop>> toFunctionStopJavaArray(jni::JNIEnv& env, std::map
     for (auto const& zoomLevelMap : value) {
         size_t i = 0;
         for (auto const& stop: zoomLevelMap.second) {
-            auto zoom = jni::Object<java::lang::Number>(*convert<jni::jobject*>(env, zoomLevelMap.first));
+            auto zoom = java::lang::Number(*convert<jni::jobject*>(env, zoomLevelMap.first));
             auto in = jni::Object<>(*convert<jni::jobject*, I>(env, stop.first));
             auto out = jni::Object<>(*convert<jni::jobject*, O>(env, stop.second));
             auto compositeValue = Stop::CompositeValue::New(env, zoom, in);
@@ -139,11 +139,11 @@ public:
     }
 
     jni::jobject* operator()(const mbgl::style::ExponentialStops<T> &value) const {
-        return ExponentialStops::New(env, jni::Object<java::lang::Float>(*convert<jni::jobject*>(env, value.base)), toFunctionStopJavaArray(env, value.stops)).Get();
+        return ExponentialStops::New(env, java::lang::Float(*convert<jni::jobject*>(env, value.base)), toFunctionStopJavaArray(env, value.stops)).Get();
     }
 
     jni::jobject* operator()(const mbgl::style::CompositeExponentialStops<T> &value) const {
-        return ExponentialStops::New(env, jni::Object<java::lang::Float>(*convert<jni::jobject*>(env, value.base)), toFunctionStopJavaArray(env, value.stops)).Get();
+        return ExponentialStops::New(env, java::lang::Float(*convert<jni::jobject*>(env, value.base)), toFunctionStopJavaArray(env, value.stops)).Get();
     }
 
     jni::jobject* operator()(const mbgl::style::IdentityStops<T> &) const {

@@ -20,8 +20,8 @@ mbgl::LineAnnotation Polyline::toAnnotation(jni::JNIEnv& env, jni::Object<Polyli
     return annotation;
 }
 
-jni::Object<java::util::List> Polyline::getPoints(jni::JNIEnv& env, jni::Object<Polyline> polyline) {
-    static auto field = Polyline::javaClass.GetField<jni::Object<java::util::List>>(env, "points");
+java::util::List Polyline::getPoints(jni::JNIEnv& env, jni::Object<Polyline> polyline) {
+    static auto field = Polyline::javaClass.GetField<java::util::List>(env, "points");
     return polyline.Get(env, field);
 }
 

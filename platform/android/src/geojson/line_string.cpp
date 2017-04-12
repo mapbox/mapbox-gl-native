@@ -18,11 +18,11 @@ mapbox::geojson::line_string LineString::convert(jni::JNIEnv &env, jni::Object<L
     return lineString;
 }
 
-mapbox::geojson::line_string LineString::convert(jni::JNIEnv &env, jni::Object<java::util::List/*<Position>*/> jPositionList) {
+mapbox::geojson::line_string LineString::convert(jni::JNIEnv &env, java::util::List /* <Position> */ jPositionList) {
     mapbox::geojson::line_string lineString;
 
     if (jPositionList) {
-        auto jPositionArray = java::util::List::toArray<Position>(env, jPositionList);
+        auto jPositionArray = (jni::Array<jni::Object<Position>>)java::util::List_toArray::Call(env, jPositionList);
 
         auto size = jPositionArray.Length(env);
         for (std::size_t i = 0; i < size; i++) {
@@ -37,8 +37,8 @@ mapbox::geojson::line_string LineString::convert(jni::JNIEnv &env, jni::Object<j
     return lineString;
 }
 
-jni::Object<java::util::List> LineString::getCoordinates(jni::JNIEnv &env, jni::Object<LineString> jLineString) {
-    static auto method = LineString::javaClass.GetMethod<jni::Object<java::util::List> ()>(env, "getCoordinates");
+java::util::List LineString::getCoordinates(jni::JNIEnv &env, jni::Object<LineString> jLineString) {
+    static auto method = LineString::javaClass.GetMethod<java::util::List ()>(env, "getCoordinates");
     return jLineString.Call(env, method);
 }
 

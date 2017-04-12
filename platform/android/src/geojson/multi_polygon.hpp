@@ -19,7 +19,7 @@ public:
 
     static mapbox::geojson::multi_polygon convert(jni::JNIEnv&, jni::Object<MultiPolygon>);
 
-    static jni::Object<java::util::List> getCoordinates(jni::JNIEnv&, jni::Object<MultiPolygon>);
+    static java::util::List getCoordinates(jni::JNIEnv&, jni::Object<MultiPolygon>);
 
     static jni::Class<MultiPolygon> javaClass;
 

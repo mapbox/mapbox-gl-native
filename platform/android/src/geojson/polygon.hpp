@@ -19,9 +19,9 @@ public:
 
     static mapbox::geojson::polygon convert(jni::JNIEnv &, jni::Object<Polygon>);
 
-    static mapbox::geojson::polygon convert(jni::JNIEnv&, jni::Object<java::util::List/*<java::util::List<Position>>*/>);
+    static mapbox::geojson::polygon convert(jni::JNIEnv&, java::util::List /* java::util::List<Position> */);
 
-    static jni::Object<java::util::List> getCoordinates(jni::JNIEnv&, jni::Object<Polygon>);
+    static java::util::List getCoordinates(jni::JNIEnv&, jni::Object<Polygon>);
 
     static jni::Class<Polygon> javaClass;
 

@@ -26,7 +26,7 @@ public:
     public:
         static constexpr auto Name() { return "com/mapbox/mapboxsdk/style/functions/stops/Stop$CompositeValue"; };
 
-        static jni::Object<Stop::CompositeValue> New(jni::JNIEnv&, jni::Object<java::lang::Number>, jni::Object<>);
+        static jni::Object<Stop::CompositeValue> New(jni::JNIEnv&, java::lang::Number, jni::Object<>);
 
         static jni::Class<Stop::CompositeValue> javaClass;
     };

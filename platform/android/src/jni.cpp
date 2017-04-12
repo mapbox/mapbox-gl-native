@@ -30,7 +30,7 @@
 #include "gson/json_element.hpp"
 #include "gson/json_object.hpp"
 #include "gson/json_primitive.hpp"
-#include "java_types.hpp"
+#include "java/lang.hpp"
 #include "native_map_view.hpp"
 #include "offline/offline_manager.hpp"
 #include "offline/offline_region.hpp"
@@ -101,13 +101,22 @@ void registerNatives(JavaVM *vm) {
 
     jni::JNIEnv& env = jni::GetEnv(*vm, jni::jni_version_1_6);
 
+#ifndef NDEBUG
+    // Register all JNI classes and methods that we'd normally load lazily when they're needed.
+    // This is enabled in Debug builds to quickly discover invalid class names that otherwise
+    // would produce a runtime error when they're registered but can't be found.
+    try {
+        binding::RegisterNative(env);
+    } catch (jni::PendingJavaException& ex) {
+        jni::ExceptionDescribe(env);
+    }
+#endif
+
     // For the DefaultFileSource
     static mbgl::util::RunLoop mainRunLoop;
     FileSource::registerNative(env);
 
     // Basic types
-    java::registerNatives(env);
-    java::util::registerNative(env);
     PointF::registerNative(env);
     RectF::registerNative(env);
 

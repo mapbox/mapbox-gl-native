@@ -180,7 +180,7 @@ add_library(mbgl-android STATIC
     platform/android/src/native_map_view.hpp
 
     # Java core classes
-    platform/android/src/java/util.cpp
+    platform/android/src/java/lang.hpp
     platform/android/src/java/util.hpp
 
     # Graphics
@@ -250,10 +250,11 @@ add_library(mbgl-android STATIC
     platform/android/src/offline/offline_region_status.hpp
 
     # Main jni bindings
+    platform/android/src/jni/binding.cpp
+    platform/android/src/jni/binding.hpp
     platform/android/src/attach_env.cpp
     platform/android/src/attach_env.hpp
-    platform/android/src/java_types.cpp
-    platform/android/src/java_types.hpp
+    platform/android/src/java/lang.hpp
 
     # Main entry point
     platform/android/src/jni.hpp

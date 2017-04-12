@@ -13,7 +13,7 @@ mbgl::FillAnnotation Polygon::toAnnotation(jni::JNIEnv& env, jni::Object<Polygon
 
     mbgl::Polygon<double> geometry { MultiPoint::toGeometry<mbgl::LinearRing<double>>(env, points) };
 
-    auto jHoleListsArray = java::util::List::toArray<java::util::List>(env, holes);
+    auto jHoleListsArray = (jni::Array<java::util::List>)java::util::List_toArray::Call(env, holes);
     std::size_t jHoleListsSize = jHoleListsArray.Length(env);
     for (std::size_t i = 0; i < jHoleListsSize; i++) {
         auto jHoleList = jHoleListsArray.Get(env, i);
@@ -33,13 +33,13 @@ mbgl::FillAnnotation Polygon::toAnnotation(jni::JNIEnv& env, jni::Object<Polygon
     return annotation;
 }
 
-jni::Object<java::util::List> Polygon::getPoints(jni::JNIEnv& env, jni::Object<Polygon> polygon) {
-    static auto field = Polygon::javaClass.GetField<jni::Object<java::util::List>>(env, "points");
+java::util::List Polygon::getPoints(jni::JNIEnv& env, jni::Object<Polygon> polygon) {
+    static auto field = Polygon::javaClass.GetField<java::util::List>(env, "points");
     return polygon.Get(env, field);
 }
 
-jni::Object<java::util::List> Polygon::getHoles(jni::JNIEnv& env, jni::Object<Polygon> polygon) {
-    static auto field = Polygon::javaClass.GetField<jni::Object<java::util::List>>(env, "holes");
+java::util::List Polygon::getHoles(jni::JNIEnv& env, jni::Object<Polygon> polygon) {
+    static auto field = Polygon::javaClass.GetField<java::util::List>(env, "holes");
     return polygon.Get(env, field);
 }
 

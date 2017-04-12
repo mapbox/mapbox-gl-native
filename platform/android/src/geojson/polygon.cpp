@@ -20,7 +20,7 @@ mapbox::geojson::polygon Polygon::convert(jni::JNIEnv &env, jni::Object<Polygon>
     return polygon;
 }
 
-mapbox::geojson::polygon Polygon::convert(jni::JNIEnv &env, jni::Object<java::util::List/*<java::util::List<Position>>*/> jPositionListsList) {
+mapbox::geojson::polygon Polygon::convert(jni::JNIEnv &env, java::util::List /* java::util::List<Position> */ jPositionListsList) {
     mapbox::geojson::polygon polygon;
 
     if (jPositionListsList) {
@@ -35,8 +35,8 @@ mapbox::geojson::polygon Polygon::convert(jni::JNIEnv &env, jni::Object<java::ut
 }
 
 
-jni::Object<java::util::List> Polygon::getCoordinates(jni::JNIEnv &env, jni::Object<Polygon> jPolygon) {
-    static auto method = Polygon::javaClass.GetMethod<jni::Object<java::util::List> ()>(env, "getCoordinates");
+java::util::List Polygon::getCoordinates(jni::JNIEnv &env, jni::Object<Polygon> jPolygon) {
+    static auto method = Polygon::javaClass.GetMethod<java::util::List ()>(env, "getCoordinates");
     return jPolygon.Call(env, method);
 }
 

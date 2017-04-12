@@ -4,6 +4,7 @@
 #include <jni/jni.hpp>
 
 #include "../geometry/lat_lng.hpp"
+#include "../java/lang.hpp"
 #include "../java/util.hpp"
 
 namespace mbgl {
@@ -14,9 +15,10 @@ class MultiPoint : protected mbgl::util::noncopyable {
 protected:
 
   template <class Geometry>
-  static Geometry toGeometry(JNIEnv& env, jni::Object<java::util::List> pointsList) {
+  static Geometry toGeometry(JNIEnv& env, java::util::List pointsList) {
       NullCheck(env, &pointsList);
-      auto jarray = java::util::List::toArray<LatLng>(env, pointsList);
+      auto jarray =
+          (jni::Array<jni::Object<LatLng>>)java::util::List_toArray::Call(env, pointsList);
       NullCheck(env, &jarray);
 
       std::size_t size = jarray.Length(env);

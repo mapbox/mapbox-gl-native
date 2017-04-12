@@ -8,7 +8,7 @@
 #include "multi_point.hpp"
 
 #include "../geometry/lat_lng.hpp"
-#include "../java/util.hpp"
+#include "../java/lang.hpp"
 
 namespace mbgl {
 namespace android {
@@ -26,9 +26,9 @@ public:
 
 private:
 
-    static jni::Object<java::util::List> getPoints(jni::JNIEnv&, jni::Object<Polygon>);
+    static java::util::List getPoints(jni::JNIEnv&, jni::Object<Polygon>);
 
-    static jni::Object<java::util::List> getHoles(jni::JNIEnv&, jni::Object<Polygon>);
+    static java::util::List getHoles(jni::JNIEnv&, jni::Object<Polygon>);
 
     static float getOpacity(jni::JNIEnv&, jni::Object<Polygon>);
 

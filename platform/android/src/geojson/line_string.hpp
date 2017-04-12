@@ -20,9 +20,9 @@ public:
 
     static mapbox::geojson::line_string convert(jni::JNIEnv&, jni::Object<LineString>);
 
-    static mapbox::geojson::line_string convert(jni::JNIEnv&, jni::Object<java::util::List/*<Position>*/>);
+    static mapbox::geojson::line_string convert(jni::JNIEnv&, java::util::List /* <Position> */);
 
-    static jni::Object<java::util::List> getCoordinates(jni::JNIEnv&, jni::Object<LineString>);
+    static java::util::List getCoordinates(jni::JNIEnv&, jni::Object<LineString>);
 
     static jni::Class<LineString> javaClass;
 

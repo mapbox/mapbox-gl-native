@@ -19,7 +19,7 @@ public:
 
     static mapbox::geojson::multi_point convert(jni::JNIEnv&, jni::Object<MultiPoint>);
 
-    static jni::Object<java::util::List> getCoordinates(jni::JNIEnv&, jni::Object<MultiPoint>);
+    static java::util::List getCoordinates(jni::JNIEnv&, jni::Object<MultiPoint>);
 
     static jni::Class<MultiPoint> javaClass;
 

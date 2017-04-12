@@ -8,7 +8,7 @@ namespace geojson {
 
 mbgl::FeatureCollection FeatureCollection::convert(jni::JNIEnv& env, jni::Object<FeatureCollection> jCollection) {
     auto jFeatureList = FeatureCollection::getFeatures(env, jCollection);
-    auto jFeatures = java::util::List::toArray<Feature>(env, jFeatureList);
+    auto jFeatures = (jni::Array<jni::Object<Feature>>)java::util::List_toArray::Call(env, jFeatureList);
     auto size = size_t(jFeatures.Length(env));
 
     auto collection = mbgl::FeatureCollection();
@@ -23,8 +23,8 @@ mbgl::FeatureCollection FeatureCollection::convert(jni::JNIEnv& env, jni::Object
     return collection;
 }
 
-jni::Object<java::util::List> FeatureCollection::getFeatures(jni::JNIEnv& env, jni::Object<FeatureCollection> jCollection) {
-    static auto method = FeatureCollection::javaClass.GetMethod<jni::Object<java::util::List> ()>(env, "getFeatures");
+java::util::List FeatureCollection::getFeatures(jni::JNIEnv& env, jni::Object<FeatureCollection> jCollection) {
+    static auto method = FeatureCollection::javaClass.GetMethod<java::util::List ()>(env, "getFeatures");
     return jCollection.Call(env, method);
 }
 

@@ -20,8 +20,8 @@ mapbox::geojson::multi_point MultiPoint::convert(jni::JNIEnv &env, jni::Object<M
     return multiPoint;
 }
 
-jni::Object<java::util::List> MultiPoint::getCoordinates(jni::JNIEnv &env, jni::Object<MultiPoint> jMultiPoint) {
-    static auto method = MultiPoint::javaClass.GetMethod<jni::Object<java::util::List> ()>(env, "getCoordinates");
+java::util::List MultiPoint::getCoordinates(jni::JNIEnv &env, jni::Object<MultiPoint> jMultiPoint) {
+    static auto method = MultiPoint::javaClass.GetMethod<java::util::List ()>(env, "getCoordinates");
     return jMultiPoint.Call(env, method);
 }
 

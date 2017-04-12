@@ -9,8 +9,7 @@ namespace android {
 
 class Value {
 public:
-
-    Value(jni::JNIEnv&, jni::jobject*);
+    Value(jni::JNIEnv&, jni::Object<>);
     virtual ~Value();
 
     bool isNull() const;
@@ -30,8 +29,8 @@ public:
     Value get(const int index ) const;
 
     jni::JNIEnv& env;
-    std::shared_ptr<jni::jobject> value;
+    jni::Object<> value;
 };
 
-}
-}
+} // namespace android
+} // namespace mbgl

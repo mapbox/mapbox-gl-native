@@ -1,73 +1,35 @@
 #pragma once
 
-#include <mbgl/util/noncopyable.hpp>
+#include "lang.hpp"
 
-#include <jni/jni.hpp>
+#include <mbgl/util/noncopyable.hpp>
 
 namespace mbgl {
 namespace android {
 namespace java {
 namespace util {
 
-class List : private mbgl::util::noncopyable {
-public:
+struct ListTag { static constexpr auto Name() { return "java/util/List"; } };
+using List = jni::Object<ListTag>;
+struct List_toArrayTag { static constexpr auto Name() { return "toArray"; } };
+using List_toArray = binding::Method<ListTag, List_toArrayTag, jni::Array<jni::Object<>>(void)>;
 
-    static constexpr auto Name() { return "java/util/List"; };
+struct MapTag { static constexpr auto Name() { return "java/util/Map"; } };
+using Map = jni::Object<MapTag>;
+struct Map_getTag { static constexpr auto Name() { return "get"; } };
+using Map_get = binding::Method<MapTag, Map_getTag, jni::Object<>(jni::Object<>)>;
 
-    template<class T>
-    static jni::Array<jni::Object<T>> toArray(jni::JNIEnv& env, jni::Object<List> list) {
-        static auto toArray = List::javaClass.GetMethod<jni::Array<jni::Object<>> ()>(env, "toArray");
-        return (jni::Array<jni::Object<T>>) list.Call(env, toArray);
-    };
+struct MapEntryTag { static constexpr auto Name() { return "java/util/Map$Entry"; }; };
+using MapEntry = jni::Object<MapEntryTag>;
+struct MapEntry_getKeyTag { static constexpr auto Name() { return "getKey"; } };
+using MapEntry_getKey = binding::Method<MapEntryTag, MapEntry_getKeyTag, jni::Object<>(void)>;
+struct MapEntry_getValueTag { static constexpr auto Name() { return "getValue"; } };
+using MapEntry_getValue = binding::Method<MapEntryTag, MapEntry_getValueTag, jni::Object<>(void)>;
 
-    static jni::Class<List> javaClass;
-
-};
-
-class Set : private mbgl::util::noncopyable {
-public:
-
-    static constexpr auto Name() { return "java/util/Set"; };
-
-    template<class T>
-    static jni::Array<jni::Object<T>> toArray(jni::JNIEnv& env, jni::Object<Set> list) {
-        static auto toArray = Set::javaClass.GetMethod<jni::Array<jni::Object<>> ()>(env, "toArray");
-        return (jni::Array<jni::Object<T>>) list.Call(env, toArray);
-    };
-
-    static jni::Class<Set> javaClass;
-
-};
-
-class Map : private mbgl::util::noncopyable {
-public:
-
-    class Entry : private mbgl::util::noncopyable {
-    public:
-        static constexpr auto Name() { return "java/util/Map$Entry"; };
-
-        template <class T>
-        static jni::Object<T> getKey(jni::JNIEnv& env, jni::Object<Entry> entry) {
-            static auto method = Entry::javaClass.GetMethod<jni::Object<> ()>(env, "getKey");
-            return (jni::Object<T>) entry.Call(env, method);
-        }
-
-        template <class T>
-        static jni::Object<T> getValue(jni::JNIEnv& env, jni::Object<Entry> entry) {
-            static auto method = Entry::javaClass.GetMethod<jni::Object<> ()>(env, "getValue");
-            return (jni::Object<T>) entry.Call(env, method).Get();
-        }
-
-        static jni::Class<Entry> javaClass;
-    };
-
-    static constexpr auto Name() { return "java/util/Map"; };
-
-    static jni::Class<Map> javaClass;
-};
-
-void registerNative(jni::JNIEnv&);
-
+struct SetTag { static constexpr auto Name() { return "java/util/Set"; } };
+using Set = jni::Object<SetTag>;
+struct Set_toArrayTag { static constexpr auto Name() { return "toArray"; } };
+using Set_toArray = binding::Method<SetTag, Set_toArrayTag, jni::Array<jni::Object<>>(void)>;
 
 } // namespace util
 } // namespace java

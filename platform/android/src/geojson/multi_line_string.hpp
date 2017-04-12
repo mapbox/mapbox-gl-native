@@ -19,9 +19,9 @@ public:
 
     static mapbox::geojson::multi_line_string convert(jni::JNIEnv&, jni::Object<MultiLineString>);
 
-    static mapbox::geojson::multi_line_string convert(jni::JNIEnv&, jni::Object<java::util::List/*<java::util::List<Position>>*/>);
+    static mapbox::geojson::multi_line_string convert(jni::JNIEnv&, java::util::List /* java::util::List<Position> */);
 
-    static jni::Object<java::util::List> getCoordinates(jni::JNIEnv&, jni::Object<MultiLineString>);
+    static java::util::List getCoordinates(jni::JNIEnv&, jni::Object<MultiLineString>);
 
     static jni::Class<MultiLineString> javaClass;
 

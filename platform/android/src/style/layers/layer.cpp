@@ -102,7 +102,7 @@ namespace android {
         using namespace mbgl::style;
         using namespace mbgl::style::conversion;
 
-        Value wrapped(env, jfilter);
+        Value wrapped(env, jni::Object<>(jfilter.Get()));
         Filter filter;
 
         Error error;

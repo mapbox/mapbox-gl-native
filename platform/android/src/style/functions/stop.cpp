@@ -3,8 +3,8 @@
 namespace mbgl {
 namespace android {
 
-jni::Object<Stop::CompositeValue> Stop::CompositeValue::New(jni::JNIEnv& env, jni::Object<java::lang::Number> zoom, jni::Object<> value) {
-    static auto constructor = Stop::CompositeValue::javaClass.GetConstructor<jni::Object<java::lang::Number>, jni::Object<>>(env);
+jni::Object<Stop::CompositeValue> Stop::CompositeValue::New(jni::JNIEnv& env, java::lang::Number zoom, jni::Object<> value) {
+    static auto constructor = Stop::CompositeValue::javaClass.GetConstructor<java::lang::Number, jni::Object<>>(env);
     return Stop::CompositeValue::javaClass.New(env, constructor, zoom, value);
 }
 
