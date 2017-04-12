@@ -27,11 +27,11 @@ public final class PolygonOptions implements Parcelable {
 
   private PolygonOptions(Parcel in) {
     polygon = new Polygon();
-    ArrayList<LatLng> pointsList = new ArrayList<>();
+    List<LatLng> pointsList = new ArrayList<>();
     in.readList(pointsList, LatLng.class.getClassLoader());
     addAll(pointsList);
-    ArrayList<Hole> holes = new ArrayList<>();
-    in.readTypedList(holes, Hole.CREATOR);
+    List<List<LatLng>> holes = new ArrayList<>();
+    in.readList(holes, LatLng.class.getClassLoader());
     addAllHoles(holes);
     alpha(in.readFloat());
     fillColor(in.readInt());
@@ -59,7 +59,7 @@ public final class PolygonOptions implements Parcelable {
   @Override
   public void writeToParcel(Parcel out, int flags) {
     out.writeList(getPoints());
-    out.writeTypedList(getHoles());
+    out.writeList(getHoles());
     out.writeFloat(getAlpha());
     out.writeInt(getFillColor());
     out.writeInt(getStrokeColor());
@@ -115,10 +115,10 @@ public final class PolygonOptions implements Parcelable {
   /**
    * Adds a hole to the outline of the polygon being built.
    *
-   * @param hole {@link Hole} list made up of {@link LatLng} points defining the hole
+   * @param hole {@link List} list made up of {@link LatLng} points defining the hole
    * @return This {@link PolygonOptions} object with the given hole added to the outline.
    */
-  public PolygonOptions addHole(Hole hole) {
+  public PolygonOptions addHole(List<LatLng> hole) {
     polygon.addHole(hole);
     return this;
   }
@@ -126,11 +126,11 @@ public final class PolygonOptions implements Parcelable {
   /**
    * Adds holes to the outline of the polygon being built.
    *
-   * @param holes {@link Hole} holes to be added to polygon geometry.
+   * @param holes {@link List} list made up of {@link LatLng} holes to be added to polygon geometry
    * @return This {@link PolygonOptions} object with the given holes added to the outline.
    */
-  public PolygonOptions addHole(Hole... holes) {
-    for (Hole hole : holes) {
+  public PolygonOptions addHole(List<LatLng>... holes) {
+    for (List<LatLng> hole : holes) {
       addHole(hole);
     }
     return this;
@@ -139,11 +139,11 @@ public final class PolygonOptions implements Parcelable {
   /**
    * Adds holes to the outline of the polygon being built.
    *
-   * @param holes {@link Iterable} list made up of {@link Hole} holes defining the hole geometry
+   * @param holes {@link Iterable} list made up of {@link List} list of {@link LatLng} holes defining the hole geometry
    * @return This {@link PolygonOptions} object with the given holes added to the outline.
    */
-  public PolygonOptions addAllHoles(Iterable<Hole> holes) {
-    for (Hole hole : holes) {
+  public PolygonOptions addAllHoles(Iterable<List<LatLng>> holes) {
+    for (List<LatLng> hole : holes) {
       addHole(hole);
     }
     return this;
@@ -231,9 +231,9 @@ public final class PolygonOptions implements Parcelable {
   /**
    * Gets the holes set for this {@link PolygonOptions} object.
    *
-   * @return The list made up of {@link List} of {@link LatLng} points defining the holes.
+   * @return The list made up of {@link List} of {@link List} of {@link LatLng} points defining the holes.
    */
-  public List<Hole> getHoles() {
+  public List<List<LatLng>> getHoles() {
     return polygon.getHoles();
   }
 

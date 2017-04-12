@@ -6,7 +6,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.mapbox.mapboxsdk.annotations.Hole;
 import com.mapbox.mapboxsdk.annotations.Polygon;
 import com.mapbox.mapboxsdk.annotations.PolygonOptions;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
@@ -46,8 +45,8 @@ public class PolygonActivity extends AppCompatActivity implements OnMapReadyCall
   private boolean fullAlpha = true;
   private boolean visible = true;
   private boolean color = true;
-  private boolean allPoints;
-  private boolean holes;
+  private boolean allPoints = true;
+  private boolean holes = false;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -146,7 +145,7 @@ public class PolygonActivity extends AppCompatActivity implements OnMapReadyCall
         return true;
       case R.id.action_id_holes:
         holes = !holes;
-        polygon.setHoles(holes ? STAR_SHAPE_HOLES : Collections.<Hole>emptyList());
+        polygon.setHoles(holes ? STAR_SHAPE_HOLES : Collections.<List<LatLng>>emptyList());
         return true;
       default:
         return super.onOptionsItemSelected(item);
@@ -188,9 +187,9 @@ public class PolygonActivity extends AppCompatActivity implements OnMapReadyCall
     static final List<LatLng> BROKEN_SHAPE_POINTS =
       STAR_SHAPE_POINTS.subList(0, STAR_SHAPE_POINTS.size() - 3);
 
-    static final List<? extends Hole> STAR_SHAPE_HOLES = new ArrayList<Hole>() {
+    static final List<? extends List<LatLng>> STAR_SHAPE_HOLES = new ArrayList<List<LatLng>>() {
       {
-        add(new Hole(new ArrayList<LatLng>() {
+        add(new ArrayList<>(new ArrayList<LatLng>() {
           {
             add(new LatLng(45.521743, -122.669091));
             add(new LatLng(45.530483, -122.676833));
@@ -198,7 +197,7 @@ public class PolygonActivity extends AppCompatActivity implements OnMapReadyCall
             add(new LatLng(45.521743, -122.669091));
           }
         }));
-        add(new Hole(new ArrayList<LatLng>() {
+        add(new ArrayList<>(new ArrayList<LatLng>() {
           {
             add(new LatLng(45.529743, -122.662791));
             add(new LatLng(45.525543, -122.662791));
