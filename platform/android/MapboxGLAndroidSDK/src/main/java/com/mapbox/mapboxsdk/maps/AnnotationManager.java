@@ -10,7 +10,6 @@ import com.mapbox.mapboxsdk.annotations.Annotation;
 import com.mapbox.mapboxsdk.annotations.BaseMarkerOptions;
 import com.mapbox.mapboxsdk.annotations.BaseMarkerViewOptions;
 import com.mapbox.mapboxsdk.annotations.Icon;
-import com.mapbox.mapboxsdk.annotations.IconFactory;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerView;
 import com.mapbox.mapboxsdk.annotations.MarkerViewManager;
@@ -257,11 +256,7 @@ class AnnotationManager {
 
   private MarkerView prepareViewMarker(BaseMarkerViewOptions markerViewOptions) {
     MarkerView marker = markerViewOptions.getMarker();
-    Icon icon = markerViewOptions.getIcon();
-    if (icon == null) {
-      icon = IconFactory.getInstance(mapView.getContext()).defaultMarkerView();
-    }
-    marker.setIcon(icon);
+    iconManager.loadIconForMarkerView(marker);
     return marker;
   }
 
@@ -665,16 +660,24 @@ class AnnotationManager {
           if (annotation.getId() == newSelectedMarkerId) {
             Marker marker = (Marker) annotation;
 
-            if (!(marker instanceof MarkerView)) {
+            if (marker instanceof MarkerView) {
+              handledDefaultClick = markerViewManager.onClickMarkerView((MarkerView) marker);
+            } else {
               if (onMarkerClickListener != null) {
                 // end developer has provided a custom click listener
                 handledDefaultClick = onMarkerClickListener.onMarkerClick(marker);
               }
+            }
+
+            if (annotation instanceof MarkerView) {
+              markerViewManager.onClickMarkerView((MarkerView) annotation);
+            } else {
               if (!handledDefaultClick) {
                 // only select marker if user didn't handle the click event themselves
                 selectMarker(marker);
               }
             }
+
             return true;
           }
         }

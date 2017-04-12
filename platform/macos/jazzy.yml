@@ -19,7 +19,7 @@ custom_categories:
     children:
       - Working with GeoJSON Data
       - For Style Authors
-      - Data-Driven Styling
+      - Using Style Functions at Runtime
       - Info.plist Keys
   - name: Maps
     children:
@@ -27,7 +27,6 @@ custom_categories:
       - MGLMapCamera
       - MGLMapView
       - MGLMapViewDelegate
-      - MGLUserTrackingMode
   - name: Shapes and Annotations
     children:
       - MGLAnnotation

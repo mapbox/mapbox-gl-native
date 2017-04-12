@@ -196,13 +196,6 @@ public class MarkerViewActivity extends AppCompatActivity {
         // open infowindow offscreen markers
         mapboxMap.selectMarker(markerRightOffScreen);
         mapboxMap.selectMarker(markerRightBottomOffScreen);
-
-        mapboxMap.setOnMapClickListener(new MapboxMap.OnMapClickListener() {
-          @Override
-          public void onMapClick(@NonNull LatLng point) {
-            Toast.makeText(MarkerViewActivity.this, point.toString(), Toast.LENGTH_SHORT).show();
-          }
-        });
       }
     });
   }

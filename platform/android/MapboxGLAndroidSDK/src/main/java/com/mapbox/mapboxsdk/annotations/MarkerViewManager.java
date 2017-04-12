@@ -8,7 +8,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.util.LongSparseArray;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -505,26 +504,6 @@ public class MarkerViewManager implements MapView.OnMapChangedListener {
                 }
               }
 
-              adaptedView.setOnTouchListener(new View.OnTouchListener() {
-
-                @Override
-                public boolean onTouch(View v, MotionEvent event) {
-                  if (event.getAction() == MotionEvent.ACTION_UP) {
-                    boolean clickHandled = false;
-                    if (onMarkerViewClickListener != null) {
-                      clickHandled = onMarkerViewClickListener.onMarkerClick(marker, v, adapter);
-                      markerViewContainer.setTag(true);
-                    }
-
-                    if (!clickHandled) {
-                      ensureInfoWindowOffset(marker);
-                      select(marker, v, adapter);
-                    }
-                  }
-                  return true;
-                }
-              });
-
               marker.setMapboxMap(mapboxMap);
               markerViewMap.put(marker, adaptedView);
               if (convertView == null) {
@@ -550,6 +529,34 @@ public class MarkerViewManager implements MapView.OnMapChangedListener {
     // trigger update to make newly added ViewMarker visible,
     // these would only be updated when the map is moved.
     updateMarkerViewsPosition();
+  }
+
+  /**
+   * When the provided {@link MarkerView} is clicked on by a user, we check if a custom click
+   * event has been created and if not, display a {@link InfoWindow}.
+   *
+   * @param markerView that the click event occurred.
+   */
+  public boolean onClickMarkerView(MarkerView markerView) {
+    boolean clickHandled = false;
+
+    MapboxMap.MarkerViewAdapter adapter = getViewAdapter(markerView);
+    View view = getView(markerView);
+    if (adapter == null || view == null) {
+      // not a valid state
+      return true;
+    }
+
+    if (onMarkerViewClickListener != null) {
+      clickHandled = onMarkerViewClickListener.onMarkerClick(markerView, view, adapter);
+    }
+
+    if (!clickHandled) {
+      ensureInfoWindowOffset(markerView);
+      select(markerView, view, adapter);
+    }
+
+    return clickHandled;
   }
 
   /**

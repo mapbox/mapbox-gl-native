@@ -71,6 +71,27 @@ class IconManager {
     return icon;
   }
 
+  Icon loadIconForMarkerView(MarkerView marker) {
+    Icon icon = marker.getIcon();
+    int iconSize = icons.size() + 1;
+    if (icon == null) {
+      icon = IconFactory.getInstance(nativeMapView.getContext()).defaultMarkerView();
+      marker.setIcon(icon);
+    }
+    Bitmap bitmap = icon.getBitmap();
+    averageIconHeight = averageIconHeight + (bitmap.getHeight() - averageIconHeight) / iconSize;
+    averageIconWidth = averageIconWidth + (bitmap.getWidth() - averageIconWidth) / iconSize;
+    if (!icons.contains(icon)) {
+      icons.add(icon);
+    } else {
+      Icon oldIcon = icons.get(icons.indexOf(icon));
+      if (!oldIcon.getBitmap().sameAs(icon.getBitmap())) {
+        throw new IconBitmapChangedException();
+      }
+    }
+    return icon;
+  }
+
   int getTopOffsetPixelsForIcon(Icon icon) {
     return (int) (nativeMapView.getTopOffsetPixelsForAnnotationSymbol(icon.getId()) * nativeMapView.getPixelRatio());
   }
