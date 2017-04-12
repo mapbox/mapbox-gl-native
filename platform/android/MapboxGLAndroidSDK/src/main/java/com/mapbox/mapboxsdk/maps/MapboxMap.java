@@ -1521,6 +1521,27 @@ public final class MapboxMap {
     nativeMapView.setLatLngBounds(latLngBounds);
   }
 
+  /**
+   * Gets a camera position that would fit a bounds.
+   *
+   * @param latLngBounds the bounds to constrain the map with
+   */
+  public CameraPosition getCameraForLatLngBounds(@Nullable LatLngBounds latLngBounds, int[] padding) {
+    // calculate and set additional bounds padding
+    int[] mapPadding = getPadding();
+    for (int i = 0; i < padding.length; i++) {
+      padding[i] = mapPadding[i] + padding[i];
+    }
+    projection.setContentPadding(padding, myLocationViewSettings.getPadding());
+
+    // get padded camera position from LatLngBounds
+    CameraPosition cameraPosition = nativeMapView.getCameraForLatLngBounds(latLngBounds);
+
+    // reset map padding
+    setPadding(mapPadding);
+    return cameraPosition;
+  }
+
   //
   // Padding
   //
@@ -1544,7 +1565,11 @@ public final class MapboxMap {
    * @param bottom The bottom margin in pixels.
    */
   public void setPadding(int left, int top, int right, int bottom) {
-    projection.setContentPadding(new int[] {left, top, right, bottom}, myLocationViewSettings.getPadding());
+    setPadding(new int[] {left, top, right, bottom});
+  }
+
+  private void setPadding(int[] padding) {
+    projection.setContentPadding(padding, myLocationViewSettings.getPadding());
     uiSettings.invalidate();
   }
 

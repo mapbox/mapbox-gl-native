@@ -135,7 +135,7 @@ final class Transform implements MapView.OnMapChangedListener {
   @Nullable
   CameraPosition invalidateCameraPosition() {
     if (mapView != null) {
-      cameraPosition = new CameraPosition.Builder(mapView.getCameraValues()).build();
+      cameraPosition = mapView.getCameraPosition();
       if (onCameraChangeListener != null) {
         onCameraChangeListener.onCameraChange(this.cameraPosition);
       }
