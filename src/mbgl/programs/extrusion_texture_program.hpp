@@ -4,36 +4,25 @@
 #include <mbgl/programs/attributes.hpp>
 #include <mbgl/programs/uniforms.hpp>
 #include <mbgl/shaders/extrusion_texture.hpp>
-#include <mbgl/style/layers/fill_extrusion_layer_properties.hpp>
 #include <mbgl/util/geometry.hpp>
-
-#include <string>
 
 namespace mbgl {
 
-struct ExtrusionTextureLayoutAttributes : gl::Attributes<
-attributes::a_pos>
-{};
-
-struct ExtrusionTextureUniforms : gl::Uniforms<
-uniforms::u_matrix,
-uniforms::u_world,
-uniforms::u_image,
-uniforms::u_opacity>
-{};
-
 class ExtrusionTextureProgram : public Program<
-shaders::extrusion_texture,
-gl::Triangle,
-ExtrusionTextureLayoutAttributes,
-ExtrusionTextureUniforms,
-style::PaintProperties<>>
-{
+    shaders::extrusion_texture,
+    gl::Triangle,
+    gl::Attributes<attributes::a_pos>,
+    gl::Uniforms<
+        uniforms::u_matrix,
+        uniforms::u_world,
+        uniforms::u_image,
+        uniforms::u_opacity>,
+    style::PaintProperties<>> {
 public:
     using Program::Program;
 
     static LayoutVertex layoutVertex(Point<int16_t> p) {
-        return LayoutVertex {
+        return LayoutVertex{
             {{
                 p.x,
                 p.y

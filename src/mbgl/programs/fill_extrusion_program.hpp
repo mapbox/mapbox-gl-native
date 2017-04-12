@@ -24,44 +24,44 @@ namespace style {
 } // namespace style
 
 namespace uniforms {
-    MBGL_DEFINE_UNIFORM_VECTOR(float, 3, u_lightpos);
-    MBGL_DEFINE_UNIFORM_VECTOR(float, 3, u_lightcolor);
-    MBGL_DEFINE_UNIFORM_SCALAR(float,    u_lightintensity);
-    MBGL_DEFINE_UNIFORM_SCALAR(float,    u_height_factor);
+MBGL_DEFINE_UNIFORM_VECTOR(float, 3, u_lightpos);
+MBGL_DEFINE_UNIFORM_VECTOR(float, 3, u_lightcolor);
+MBGL_DEFINE_UNIFORM_SCALAR(float,    u_lightintensity);
+MBGL_DEFINE_UNIFORM_SCALAR(float,    u_height_factor);
 } // namespace uniforms
 
 struct FillExtrusionLayoutAttributes : gl::Attributes<
-attributes::a_pos,
-attributes::a_normal,
-attributes::a_edgedistance>
+    attributes::a_pos,
+    attributes::a_normal,
+    attributes::a_edgedistance>
 {};
 
 struct FillExtrusionUniforms : gl::Uniforms<
-uniforms::u_matrix,
-uniforms::u_lightcolor,
-uniforms::u_lightpos,
-uniforms::u_lightintensity>
+    uniforms::u_matrix,
+    uniforms::u_lightcolor,
+    uniforms::u_lightpos,
+    uniforms::u_lightintensity>
 {};
 
 struct FillExtrusionPatternUniforms : gl::Uniforms<
-uniforms::u_matrix,
-uniforms::u_pattern_tl_a,
-uniforms::u_pattern_br_a,
-uniforms::u_pattern_tl_b,
-uniforms::u_pattern_br_b,
-uniforms::u_pattern_size_a,
-uniforms::u_pattern_size_b,
-uniforms::u_scale_a,
-uniforms::u_scale_b,
-uniforms::u_mix,
-uniforms::u_image,
-uniforms::u_pixel_coord_upper,
-uniforms::u_pixel_coord_lower,
-uniforms::u_tile_units_to_pixels,
-uniforms::u_height_factor,
-uniforms::u_lightcolor,
-uniforms::u_lightpos,
-uniforms::u_lightintensity>
+    uniforms::u_matrix,
+    uniforms::u_pattern_tl_a,
+    uniforms::u_pattern_br_a,
+    uniforms::u_pattern_tl_b,
+    uniforms::u_pattern_br_b,
+    uniforms::u_pattern_size_a,
+    uniforms::u_pattern_size_b,
+    uniforms::u_scale_a,
+    uniforms::u_scale_b,
+    uniforms::u_mix,
+    uniforms::u_image,
+    uniforms::u_pixel_coord_upper,
+    uniforms::u_pixel_coord_lower,
+    uniforms::u_tile_units_to_pixels,
+    uniforms::u_height_factor,
+    uniforms::u_lightcolor,
+    uniforms::u_lightpos,
+    uniforms::u_lightintensity>
 {
     static Values values(mat4 matrix,
                          const SpriteAtlasElement&,
@@ -76,11 +76,11 @@ uniforms::u_lightintensity>
 };
 
 class FillExtrusionProgram : public Program<
-shaders::fill_extrusion,
-gl::Triangle,
-FillExtrusionLayoutAttributes,
-FillExtrusionUniforms,
-style::FillExtrusionPaintProperties>
+    shaders::fill_extrusion,
+    gl::Triangle,
+    FillExtrusionLayoutAttributes,
+    FillExtrusionUniforms,
+    style::FillExtrusionPaintProperties>
 {
 public:
     using Program::Program;
@@ -110,11 +110,11 @@ public:
 };
 
 class FillExtrusionPatternProgram : public Program<
-shaders::fill_extrusion_pattern,
-gl::Triangle,
-FillExtrusionLayoutAttributes,
-FillExtrusionPatternUniforms,
-style::FillExtrusionPaintProperties>
+    shaders::fill_extrusion_pattern,
+    gl::Triangle,
+    FillExtrusionLayoutAttributes,
+    FillExtrusionPatternUniforms,
+    style::FillExtrusionPaintProperties>
 {
 public:
     using Program::Program;

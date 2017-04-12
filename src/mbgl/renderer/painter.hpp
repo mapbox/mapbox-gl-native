@@ -167,9 +167,8 @@ private:
     gl::VertexBuffer<RasterLayoutVertex> rasterVertexBuffer;
     gl::VertexBuffer<ExtrusionTextureLayoutVertex> extrusionTextureVertexBuffer;
 
-    gl::IndexBuffer<gl::Triangles> tileTriangleIndexBuffer;
+    gl::IndexBuffer<gl::Triangles> quadTriangleIndexBuffer;
     gl::IndexBuffer<gl::LineStrip> tileBorderIndexBuffer;
-    gl::IndexBuffer<gl::Triangles> extrusionTextureTriangleIndexBuffer;
 
     gl::SegmentVector<FillAttributes> tileTriangleSegments;
     gl::SegmentVector<DebugAttributes> tileBorderSegments;
