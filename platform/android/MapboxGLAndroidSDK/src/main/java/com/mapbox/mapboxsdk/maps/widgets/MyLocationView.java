@@ -321,7 +321,7 @@ public class MyLocationView extends View {
           setCompass(location.getBearing() - bearing);
         }
       } else if (myBearingTrackingMode == MyBearingTracking.COMPASS
-              && compassListener.isSensorAvailable()) {
+        && compassListener.isSensorAvailable()) {
         setCompass(magneticHeading - bearing);
       }
     }
@@ -336,7 +336,7 @@ public class MyLocationView extends View {
 
   public void onStart() {
     if (myBearingTrackingMode == MyBearingTracking.COMPASS
-            && compassListener.isSensorAvailable()) {
+      && compassListener.isSensorAvailable()) {
       compassListener.onResume();
     }
     if (isEnabled()) {
@@ -461,7 +461,7 @@ public class MyLocationView extends View {
   public void setMyBearingTrackingMode(@MyBearingTracking.Mode int myBearingTrackingMode) {
     this.myBearingTrackingMode = myBearingTrackingMode;
     if (myBearingTrackingMode == MyBearingTracking.COMPASS
-            && compassListener.isSensorAvailable()) {
+      && compassListener.isSensorAvailable()) {
       compassListener.onResume();
     } else {
       compassListener.onPause();
@@ -741,7 +741,7 @@ public class MyLocationView extends View {
     abstract void invalidate();
   }
 
-  private class MyLocationTrackingBehavior extends MyLocationBehavior {
+  private class MyLocationTrackingBehavior extends MyLocationBehavior implements MapboxMap.CancelableCallback {
 
     @Override
     void updateLatLng(@NonNull Location location) {
@@ -757,11 +757,11 @@ public class MyLocationView extends View {
       locationUpdateTimestamp = SystemClock.elapsedRealtime();
 
       // calculate animation duration
-      float animationDuration;
+      int animationDuration;
       if (previousUpdateTimeStamp == 0) {
         animationDuration = 0;
       } else {
-        animationDuration = (locationUpdateTimestamp - previousUpdateTimeStamp) * 1.1f
+        animationDuration = (int) ((locationUpdateTimestamp - previousUpdateTimeStamp) * 1.1f)
         /*make animation slightly longer*/;
       }
 
@@ -780,20 +780,10 @@ public class MyLocationView extends View {
       // accuracy
       updateAccuracy(location);
 
+      // disable dismiss of tracking settings, enabled in #onFinish
       mapboxMap.getTrackingSettings().setDismissTrackingModeForCameraPositionChange(false);
       // ease to new camera position with a linear interpolator
-      mapboxMap.easeCamera(CameraUpdateFactory.newCameraPosition(builder.build()), (int) animationDuration,
-        false /*linear interpolator*/, new MapboxMap.CancelableCallback() {
-          @Override
-          public void onCancel() {
-
-          }
-
-          @Override
-          public void onFinish() {
-            mapboxMap.getTrackingSettings().setDismissTrackingModeForCameraPositionChange(true);
-          }
-        });
+      mapboxMap.easeCamera(CameraUpdateFactory.newCameraPosition(builder.build()), animationDuration, false, this);
     }
 
     @Override
@@ -803,6 +793,22 @@ public class MyLocationView extends View {
       float y = (getHeight() - mapPadding[3] + mapPadding[1]) / 2 + contentPaddingY;
       screenLocation = new PointF(x, y);
       MyLocationView.this.invalidate();
+    }
+
+    @Override
+    public void onCancel() {
+      //no op
+    }
+
+    @Override
+    public void onFinish() {
+      // Posting to end message queue to avoid race condition #8560
+      post(new Runnable() {
+        @Override
+        public void run() {
+          mapboxMap.getTrackingSettings().setDismissTrackingModeForCameraPositionChange(true);
+        }
+      });
     }
   }
 
