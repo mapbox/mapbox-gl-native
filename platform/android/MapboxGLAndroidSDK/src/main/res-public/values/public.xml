@@ -76,9 +76,6 @@
     <public name="mapbox_renderTextureMode" type="attr" />
 
     <!-- Exposed content descriptions -->
-    <public name="mapbox_compassContentDescription" type="string" />
-    <public name="mapbox_attributionsIconContentDescription" type="string" />
-    <public name="mapbox_myLocationViewContentDescription" type="string" />
     <public name="mapbox_logoContentDescription" type="string" />
 
     <!-- Exposed styles -->
