@@ -921,7 +921,7 @@
 		DD58A4C51D822BD000E1F038 /* MGLExpressionTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLExpressionTests.mm; path = ../../darwin/test/MGLExpressionTests.mm; sourceTree = "<group>"; };
 		FA68F1481E9D656600F9F6C2 /* MGLFillExtrusionStyleLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLFillExtrusionStyleLayer.h; sourceTree = "<group>"; };
 		FA68F1491E9D656600F9F6C2 /* MGLFillExtrusionStyleLayer.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLFillExtrusionStyleLayer.mm; sourceTree = "<group>"; };
-		FAE1CDC81E9D79C600C40B5B /* MGLFillExtrusionStyleLayerTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLFillExtrusionStyleLayerTests.mm; sourceTree = "<group>"; };
+		FAE1CDC81E9D79C600C40B5B /* MGLFillExtrusionStyleLayerTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLFillExtrusionStyleLayerTests.mm; path = ../../darwin/test/MGLFillExtrusionStyleLayerTests.mm; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
