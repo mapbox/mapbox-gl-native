@@ -59,6 +59,8 @@ void FillExtrusionBucket::addFeature(const GeometryTileFeature& feature,
                 throw GeometryTooLongException();
         }
 
+        if (totalVertices == 0) continue;
+
         std::vector<uint32_t> flatIndices;
         flatIndices.reserve(totalVertices);
 
