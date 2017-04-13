@@ -15,6 +15,8 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 * LatLngBounds facility getters/setters for LatLnbg on the edges of the bounds [#8517](https://github.com/mapbox/mapbox-gl-native/pull/8517)
 * Expose world bounds in LatLngBounds [#8517](https://github.com/mapbox/mapbox-gl-native/pull/8517)
 * OfflineRegion are validated if the bounds is found in the world bounds, else onError will be invoked [#8517](https://github.com/mapbox/mapbox-gl-native/pull/8517)
+* Polygon holes [#8557](https://github.com/mapbox/mapbox-gl-native/pull/8557) and [#8722](https://github.com/mapbox/mapbox-gl-native/pull/8722)
+* Custom location source [#8710](https://github.com/mapbox/mapbox-gl-native/pull/8710)
 
 ## 5.0.2 - April 3, 2017
 
