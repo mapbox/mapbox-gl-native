@@ -43,6 +43,11 @@ namespace android {
         return jni::Make<jni::String>(env, source.getID());
     }
 
+    jni::String Source::getAttribution(jni::JNIEnv& env) {
+        auto attribution = source.getAttribution();
+        return attribution ? jni::Make<jni::String>(env, attribution.value()) : jni::Make<jni::String>(env,"");
+    }
+
     void Source::addToMap(mbgl::Map& _map) {
         // Check to see if we own the source first
         if (!ownedSource) {
@@ -71,7 +76,8 @@ namespace android {
 
         // Register the peer
         jni::RegisterNativePeer<Source>(env, Source::javaClass, "nativePtr",
-            METHOD(&Source::getId, "nativeGetId")
+            METHOD(&Source::getId, "nativeGetId"),
+            METHOD(&Source::getAttribution, "nativeGetAttribution")
         );
 
     }

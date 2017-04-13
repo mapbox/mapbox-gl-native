@@ -1,15 +1,11 @@
 package com.mapbox.mapboxsdk.maps;
 
 import android.app.Activity;
-import android.app.Dialog;
 import android.app.Fragment;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.PointF;
 import android.graphics.SurfaceTexture;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.CallSuper;
@@ -17,7 +13,6 @@ import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
-import android.support.v7.app.AlertDialog;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -28,7 +23,6 @@ import android.view.SurfaceView;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ZoomButtonsController;
@@ -36,7 +30,6 @@ import android.widget.ZoomButtonsController;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.annotations.MarkerViewManager;
-import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.maps.widgets.CompassView;
@@ -155,7 +148,7 @@ public class MapView extends FrameLayout {
     // inject widgets with MapboxMap
     compassView.setMapboxMap(mapboxMap);
     myLocationView.setMapboxMap(mapboxMap);
-    attrView.setOnClickListener(new AttributionOnClickListener(context, transform));
+    attrView.setOnClickListener(new AttributionDialogManager(context, mapboxMap));
 
     // Ensure this view is interactable
     setClickable(true);
@@ -591,78 +584,6 @@ public class MapView extends FrameLayout {
 
   void setMapboxMap(MapboxMap mapboxMap) {
     this.mapboxMap = mapboxMap;
-  }
-
-  private static class AttributionOnClickListener implements View.OnClickListener, DialogInterface.OnClickListener {
-
-    private static final int ATTRIBUTION_INDEX_IMPROVE_THIS_MAP = 2;
-    private static final int ATTRIBUTION_INDEX_TELEMETRY_SETTINGS = 3;
-    private Context context;
-    private Transform transform;
-
-    public AttributionOnClickListener(Context context, Transform transform) {
-      this.context = context;
-      this.transform = transform;
-    }
-
-    // Called when someone presses the attribution icon
-    @Override
-    public void onClick(View view) {
-      AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.mapbox_AlertDialogStyle);
-      builder.setTitle(R.string.mapbox_attributionsDialogTitle);
-      String[] items = context.getResources().getStringArray(R.array.mapbox_attribution_names);
-      builder.setAdapter(new ArrayAdapter<>(context, R.layout.mapbox_attribution_list_item, items), this);
-      builder.show();
-    }
-
-    // Called when someone selects an attribution, 'Improve this map' adds location data to the url
-    @Override
-    public void onClick(DialogInterface dialog, int which) {
-      final Context context = ((Dialog) dialog).getContext();
-      if (which == ATTRIBUTION_INDEX_TELEMETRY_SETTINGS) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.mapbox_AlertDialogStyle);
-        builder.setTitle(R.string.mapbox_attributionTelemetryTitle);
-        builder.setMessage(R.string.mapbox_attributionTelemetryMessage);
-        builder.setPositiveButton(R.string.mapbox_attributionTelemetryPositive, new DialogInterface.OnClickListener() {
-          @Override
-          public void onClick(DialogInterface dialog, int which) {
-            MapboxTelemetry.getInstance().setTelemetryEnabled(true);
-            dialog.cancel();
-          }
-        });
-        builder.setNeutralButton(R.string.mapbox_attributionTelemetryNeutral, new DialogInterface.OnClickListener() {
-          @Override
-          public void onClick(DialogInterface dialog, int which) {
-            String url = context.getResources().getStringArray(R.array.mapbox_attribution_links)[3];
-            Intent intent = new Intent(Intent.ACTION_VIEW);
-            intent.setData(Uri.parse(url));
-            context.startActivity(intent);
-            dialog.cancel();
-          }
-        });
-        builder.setNegativeButton(R.string.mapbox_attributionTelemetryNegative, new DialogInterface.OnClickListener() {
-          @Override
-          public void onClick(DialogInterface dialog, int which) {
-            MapboxTelemetry.getInstance().setTelemetryEnabled(false);
-            dialog.cancel();
-          }
-        });
-
-        builder.show();
-        return;
-      }
-      String url = context.getResources().getStringArray(R.array.mapbox_attribution_links)[which];
-      if (which == ATTRIBUTION_INDEX_IMPROVE_THIS_MAP) {
-        CameraPosition cameraPosition = transform.getCameraPosition();
-        if (cameraPosition != null) {
-          url = String.format(url, cameraPosition.target.getLongitude(),
-            cameraPosition.target.getLatitude(), (int) cameraPosition.zoom);
-        }
-      }
-      Intent intent = new Intent(Intent.ACTION_VIEW);
-      intent.setData(Uri.parse(url));
-      context.startActivity(intent);
-    }
   }
 
   /**
