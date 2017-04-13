@@ -25,29 +25,6 @@ GlyphAtlas::GlyphAtlas(const Size size, FileSource& fileSource_)
 
 GlyphAtlas::~GlyphAtlas() = default;
 
-std::map<uint32_t, SDFGlyph>& GlyphAtlas::getGlyphSet(const FontStack& fontStack) {
-    return entries[fontStack].sdfs;
-}
-
-bool GlyphAtlas::hasGlyphRanges(const FontStack& fontStack, const GlyphRangeSet& ranges) const {
-    for (const auto& range : ranges) {
-        if (!hasGlyphRange(fontStack,range)) {
-            return false;
-        }
-    }
-    return true;
-}
-
-bool GlyphAtlas::rangeIsParsed(const std::map<GlyphRange, GlyphRequest>& ranges, const GlyphRange& range) const {
-    auto it = ranges.find(range);
-    return it != ranges.end() && it->second.parsed;
-}
-
-bool GlyphAtlas::hasGlyphRange(const FontStack& fontStack, const GlyphRange& range) const {
-    auto it = entries.find(fontStack);
-    return it != entries.end() && rangeIsParsed(it->second.ranges, range);
-}
-    
 void GlyphAtlas::getGlyphs(GlyphRequestor& requestor, GlyphDependencies glyphDependencies) {
     auto dependencies = std::make_shared<GlyphDependencies>(std::move(glyphDependencies));
 
@@ -66,7 +43,8 @@ void GlyphAtlas::getGlyphs(GlyphRequestor& requestor, GlyphDependencies glyphDep
         }
 
         for (const auto& range : ranges) {
-            if (!rangeIsParsed(entry.ranges, range)) {
+            auto it = entry.ranges.find(range);
+            if (it == entry.ranges.end() || !it->second.parsed) {
                 GlyphRequest& request = requestRange(entry, fontStack, range);
                 request.requestors[&requestor] = dependencies;
             }

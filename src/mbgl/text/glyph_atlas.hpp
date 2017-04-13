@@ -39,8 +39,6 @@ public:
     GlyphAtlas(Size, FileSource&);
     ~GlyphAtlas();
 
-    std::map<uint32_t, SDFGlyph>& getGlyphSet(const FontStack&);
-
     // Workers send a `getGlyphs` message to the main thread once they have determined
     // which glyphs they will need. Invoking this method will increment reference
     // counts for all the glyphs in `GlyphDependencies`. If all glyphs are already
@@ -92,12 +90,6 @@ private:
     };
 
     std::unordered_map<FontStack, Entry, FontStackHash> entries;
-
-    // Only used by GlyphAtlasTest
-    friend class ::GlyphAtlasTest;
-    bool hasGlyphRanges(const FontStack&, const GlyphRangeSet&) const;
-    bool hasGlyphRange(const FontStack&, const GlyphRange&) const;
-    bool rangeIsParsed(const std::map<GlyphRange, GlyphRequest>&, const GlyphRange&) const;
 
     GlyphRequest& requestRange(Entry&, const FontStack&, const GlyphRange&);
     void processResponse(const Response&, const FontStack&, const GlyphRange&);
