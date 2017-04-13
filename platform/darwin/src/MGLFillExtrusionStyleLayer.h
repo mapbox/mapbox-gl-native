@@ -36,6 +36,12 @@ typedef NS_ENUM(NSUInteger, MGLFillExtrusionTranslateAnchor) {
  ### Example
 
  ```swift
+ let layer = MGLFillExtrusionStyleLayer(identifier: "buildings", source: buildings)
+ layer.sourceLayerIdentifier = "building"
+ layer.fillExtrusionHeight = MGLStyleValue(interpolationMode: .identity, sourceStops: nil, attributeName: "height", options: nil)
+ layer.fillExtrusionBase = MGLStyleValue(interpolationMode: .identity, sourceStops: nil, attributeName: "min_height", options: nil)
+ layer.predicate = NSPredicate(format: "extrude == TRUE")
+ mapView.style?.addLayer(layer)
  ```
  */
 MGL_EXPORT
