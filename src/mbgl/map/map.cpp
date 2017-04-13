@@ -586,7 +586,7 @@ CameraOptions Map::cameraForLatLngs(const std::vector<LatLng>& latLngs, const Ed
     ScreenCoordinate swPixel = {INFINITY, INFINITY};
     double viewportHeight = getSize().height;
     for (LatLng latLng : latLngs) {
-        ScreenCoordinate pixel = pixelForLatLng(latLng);
+        ScreenCoordinate pixel = impl->transform.latLngToScreenCoordinate(latLng);
         swPixel.x = std::min(swPixel.x, pixel.x);
         nePixel.x = std::max(nePixel.x, pixel.x);
         swPixel.y = std::min(swPixel.y, viewportHeight - pixel.y);
@@ -811,7 +811,12 @@ LatLng Map::latLngForProjectedMeters(const ProjectedMeters& projectedMeters) con
 }
 
 ScreenCoordinate Map::pixelForLatLng(const LatLng& latLng) const {
-    return impl->transform.latLngToScreenCoordinate(latLng);
+    // If the center and point longitudes are not in the same side of the
+    // antimeridian, we unwrap the point longitude so it would be seen if
+    // e.g. the next antimeridian side is visible.
+    LatLng unwrappedLatLng = latLng.wrapped();
+    unwrappedLatLng.unwrapForShortestPath(getLatLng());
+    return impl->transform.latLngToScreenCoordinate(unwrappedLatLng);
 }
 
 LatLng Map::latLngForPixel(const ScreenCoordinate& pixel) const {
