@@ -55,7 +55,17 @@
 
 - (CLLocationCoordinate2D)coordinate {
     mbgl::Polygon<double> polyline;
-    polyline.push_back([self lineString]);
+    
+    NSUInteger count = self.pointCount;
+    CLLocationCoordinate2D *coordinates = self.coordinates;
+    
+    mbgl::LinearRing<double> geometry;
+    geometry.reserve(self.pointCount);
+    for (NSUInteger i = 0; i < count; i++) {
+        geometry.push_back(mbgl::Point<double>(coordinates[i].longitude, coordinates[i].latitude));
+    }
+    
+    polyline.push_back(geometry);
     
     // pole of inaccessibility
     auto poi = mapbox::polylabel(polyline);
