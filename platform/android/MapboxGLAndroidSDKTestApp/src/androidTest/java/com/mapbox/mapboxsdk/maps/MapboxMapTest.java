@@ -19,6 +19,7 @@ import com.mapbox.mapboxsdk.annotations.PolylineOptions;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.exceptions.InvalidMarkerPositionException;
 import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.activity.espresso.EspressoTestActivity;
 import com.mapbox.mapboxsdk.testapp.utils.OnMapReadyIdlingResource;
@@ -103,6 +104,25 @@ public class MapboxMapTest {
         long transitionDelay = 50;
         mapboxMap.setTransitionDelay(transitionDelay);
         assertEquals("TransitionDelay should match", transitionDelay, mapboxMap.getTransitionDelay(), 0);
+      }
+    }));
+  }
+
+  //
+  // CameraForLatLngBounds
+  //
+  @Test
+  public void testCameraForLatLngBounds() {
+    ViewUtils.checkViewIsDisplayed(R.id.mapView);
+    final MapboxMap mapboxMap = activity.getMapboxMap();
+    onView(withId(R.id.mapView)).perform(new MapboxMapAction(new InvokeViewAction() {
+      @Override
+      public void onViewAction(UiController uiController, View view) {
+        // set
+        mapboxMap.setLatLngBoundsForCameraTarget(
+          new LatLngBounds.Builder().include(new LatLng()).include(new LatLng(1, 1)).build());
+        // reset
+        mapboxMap.setLatLngBoundsForCameraTarget(null);
       }
     }));
   }
