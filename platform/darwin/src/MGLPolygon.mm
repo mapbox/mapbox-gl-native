@@ -56,12 +56,9 @@
 }
 
 - (CLLocationCoordinate2D)coordinate {
-    CLLocationCoordinate2D centroid;
-    
     // pole of inaccessibility
     auto poi = mapbox::polylabel([self polygon]);
-    centroid.latitude = poi.y;
-    centroid.longitude = poi.x;
+    CLLocationCoordinate2D centroid = MGLLocationCoordinate2DFromPoint(poi);
     
     return centroid;
 }
@@ -168,26 +165,16 @@
 }
 
 - (CLLocationCoordinate2D)coordinate {
-    CLLocationCoordinate2D centroid;
+    MGLPolygon *firstPolygon = self.polygons.firstObject;
     
-    mbgl::Polygon<double> geometry;
-    for (MGLPolygon *polygon in self.polygons) {
-        geometry.push_back(polygon.ring);
-    }
-    
-    // pole of inaccessibility
-    auto poi = mapbox::polylabel(geometry);
-    centroid.latitude = poi.y;
-    centroid.longitude = poi.x;
-    
-    return centroid;
+    return firstPolygon.coordinate;
 }
 
 - (BOOL)intersectsOverlayBounds:(MGLCoordinateBounds)overlayBounds {
     return MGLCoordinateBoundsIntersectsCoordinateBounds(_overlayBounds, overlayBounds);
 }
 
-- (mbgl::Geometry<double>)geometryObject {
+- (mbgl::MultiPolygon<double>)multiPolygon {
     mbgl::MultiPolygon<double> multiPolygon;
     multiPolygon.reserve(self.polygons.count);
     for (MGLPolygon *polygon in self.polygons) {
@@ -199,6 +186,10 @@
         multiPolygon.push_back(geometry);
     }
     return multiPolygon;
+}
+
+- (mbgl::Geometry<double>)geometryObject {
+    return [self multiPolygon];
 }
 
 - (NSDictionary *)geoJSONDictionary {

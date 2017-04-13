@@ -18,6 +18,10 @@ NS_INLINE mbgl::Point<double> MGLPointFromLocationCoordinate2D(CLLocationCoordin
     return mbgl::Point<double>(coordinate.longitude, coordinate.latitude);
 }
 
+NS_INLINE CLLocationCoordinate2D MGLLocationCoordinate2DFromPoint(mbgl::Point<double> point) {
+    return CLLocationCoordinate2DMake(point.y, point.x);
+}
+
 NS_INLINE CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng) {
     return CLLocationCoordinate2DMake(latLng.latitude(), latLng.longitude());
 }

@@ -72,12 +72,12 @@
         CLLocationCoordinate2DMake(101.0, 0.0),
     };
     
-    NSUInteger lnc = sizeof(lineCoordinates) / sizeof(CLLocationCoordinate2D);
-    MGLPolyline *line = [MGLPolyline polylineWithCoordinates:lineCoordinates count:lnc];
+    NSUInteger lineCoordinatesCount = sizeof(lineCoordinates) / sizeof(CLLocationCoordinate2D);
+    MGLPolyline *line = [MGLPolyline polylineWithCoordinates:lineCoordinates count:lineCoordinatesCount];
     CLLocationCoordinate2D lineCenter = CLLocationCoordinate2DMake(100.0, 0.0);
     
-    XCTAssert([line coordinate].latitude == lineCenter.latitude &&
-              [line coordinate].longitude == lineCenter.longitude);
+    XCTAssertEqual([line coordinate].latitude, lineCenter.latitude);
+    XCTAssertEqual([line coordinate].longitude, lineCenter.longitude);
     
 }
 
@@ -110,12 +110,12 @@
         CLLocationCoordinate2DMake(100.0, 1.0),
     };
     
-    NSUInteger snc = sizeof(squareCoordinates) / sizeof(CLLocationCoordinate2D);
-    MGLPolygon *squarePolygon = [MGLPolygon polygonWithCoordinates:squareCoordinates count:snc];
+    NSUInteger squareCoordinatesCount = sizeof(squareCoordinates) / sizeof(CLLocationCoordinate2D);
+    MGLPolygon *squarePolygon = [MGLPolygon polygonWithCoordinates:squareCoordinates count:squareCoordinatesCount];
     CLLocationCoordinate2D squareCenter = CLLocationCoordinate2DMake(100.5, 0.5);
     
-    XCTAssert([squarePolygon coordinate].latitude == squareCenter.latitude &&
-              [squarePolygon coordinate].longitude == squareCenter.longitude);
+    XCTAssertEqual([squarePolygon coordinate].latitude, squareCenter.latitude);
+    XCTAssertEqual([squarePolygon coordinate].longitude, squareCenter.longitude);
 
 }
 
@@ -200,6 +200,11 @@
     NSUInteger numberOfCoordinates = sizeof(coordinates) / sizeof(CLLocationCoordinate2D);
 
     MGLPointCollection *pointCollection = [MGLPointCollection pointCollectionWithCoordinates:coordinates count:numberOfCoordinates];
+    CLLocationCoordinate2D pointsCenter = CLLocationCoordinate2DMake(0, 1);
+    
+    XCTAssertEqual([pointCollection coordinate].latitude, pointsCenter.latitude);
+    XCTAssertEqual([pointCollection coordinate].longitude, pointsCenter.longitude);
+    
     NSString *filePath = [self temporaryFilePathForClass:[MGLPointCollection class]];
     [NSKeyedArchiver archiveRootObject:pointCollection toFile:filePath];
 
@@ -249,6 +254,30 @@
         CLLocationCoordinate2DMake(20, 21),
         CLLocationCoordinate2DMake(30, 31),
     };
+    
+    CLLocationCoordinate2D line1[] = {
+        CLLocationCoordinate2DMake(100, 40),
+        CLLocationCoordinate2DMake(105, 45),
+        CLLocationCoordinate2DMake(110, 55)
+    };
+    
+    CLLocationCoordinate2D line2[] = {
+        CLLocationCoordinate2DMake(105, 40),
+        CLLocationCoordinate2DMake(110, 45),
+        CLLocationCoordinate2DMake(115, 55)
+    };
+    
+    NSUInteger road1CoordinatesCount = sizeof(line1) / sizeof(CLLocationCoordinate2D);
+    NSUInteger road2CoordinatesCount = sizeof(line2) / sizeof(CLLocationCoordinate2D);
+    
+    MGLPolyline *road1Polyline = [MGLPolyline polylineWithCoordinates:line1 count:road1CoordinatesCount];
+    MGLPolyline *road2Polyline = [MGLPolyline polylineWithCoordinates:line1 count:road2CoordinatesCount];
+    
+    MGLMultiPolyline *roads = [MGLMultiPolyline multiPolylineWithPolylines:@[road1Polyline, road2Polyline]];
+    CLLocationCoordinate2D roadCenter = CLLocationCoordinate2DMake(100, 40);
+    
+    XCTAssertEqual([roads coordinate].latitude, roadCenter.latitude);
+    XCTAssertEqual([roads coordinate].longitude, roadCenter.longitude);
 
     NSUInteger numberOfCoordinates = sizeof(coordinates) / sizeof(CLLocationCoordinate2D);
 
@@ -280,7 +309,7 @@
         CLLocationCoordinate2DMake(30, 31),
     };
     
-    CLLocationCoordinate2D outterSquare[] = {
+    CLLocationCoordinate2D outerSquare[] = {
         CLLocationCoordinate2DMake(100.0, 0.0),
         CLLocationCoordinate2DMake(101.0, 0.0),
         CLLocationCoordinate2DMake(101.0, 1.0),
@@ -294,16 +323,16 @@
         CLLocationCoordinate2DMake(100.35, 0.65),
     };
     
-    NSUInteger noc = sizeof(outterSquare) / sizeof(CLLocationCoordinate2D);
-    NSUInteger nic = sizeof(innerSquare) / sizeof(CLLocationCoordinate2D);
+    NSUInteger outerCoordinatesCount = sizeof(outerSquare) / sizeof(CLLocationCoordinate2D);
+    NSUInteger innerCoordinatesCount = sizeof(innerSquare) / sizeof(CLLocationCoordinate2D);
     
-    MGLPolygon *outterPolygonSquare = [MGLPolygon polygonWithCoordinates:outterSquare count:noc];
-    MGLPolygon *innerPolygonSquare = [MGLPolygon polygonWithCoordinates:innerSquare count:nic];
-    MGLMultiPolygon *squares = [MGLMultiPolygon multiPolygonWithPolygons:@[outterPolygonSquare, innerPolygonSquare]];
+    MGLPolygon *innerPolygonSquare = [MGLPolygon polygonWithCoordinates:innerSquare count:innerCoordinatesCount];
+    MGLPolygon *outerPolygonSquare = [MGLPolygon polygonWithCoordinates:outerSquare count:outerCoordinatesCount interiorPolygons:@[innerPolygonSquare]];
+    MGLMultiPolygon *squares = [MGLMultiPolygon multiPolygonWithPolygons:@[outerPolygonSquare, innerPolygonSquare]];
     CLLocationCoordinate2D squareCenter = CLLocationCoordinate2DMake(100.5, 0.5);
     
-    XCTAssert([squares coordinate].latitude == squareCenter.latitude &&
-              [squares coordinate].longitude == squareCenter.longitude);
+    XCTAssertEqual([squares coordinate].latitude, squareCenter.latitude);
+    XCTAssertEqual([squares coordinate].longitude, squareCenter.longitude);
 
     NSUInteger numberOfCoordinates = sizeof(coordinates) / sizeof(CLLocationCoordinate2D);
 

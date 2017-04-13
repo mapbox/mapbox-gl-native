@@ -54,15 +54,12 @@
 }
 
 - (CLLocationCoordinate2D)coordinate {
-    CLLocationCoordinate2D centroid;
-    
-    mbgl::Polygon<double> multiLineString;
-    multiLineString.push_back([self lineString]);
+    mbgl::Polygon<double> polyline;
+    polyline.push_back([self lineString]);
     
     // pole of inaccessibility
-    auto poi = mapbox::polylabel(multiLineString);
-    centroid.latitude = poi.y;
-    centroid.longitude = poi.x;
+    auto poi = mapbox::polylabel(polyline);
+    CLLocationCoordinate2D centroid = MGLLocationCoordinate2DFromPoint(poi);
     
     return centroid;
 }
@@ -130,20 +127,12 @@
 }
 
 - (CLLocationCoordinate2D)coordinate {
-    CLLocationCoordinate2D centroid;
-    
-    mbgl::Polygon<double> multiLineString;
-    multiLineString.reserve(self.polylines.count);
-    for (MGLPolyline *polyline in self.polylines) {
-        multiLineString.push_back([polyline lineString]);
-    }
-    
-    // pole of inaccessibility
-    auto poi = mapbox::polylabel(multiLineString);
-    centroid.latitude = poi.y;
-    centroid.longitude = poi.x;
-    
-    return centroid;
+    MGLPolyline *polyline = self.polylines.firstObject;
+    CLLocationCoordinate2D *coordinates = polyline.coordinates;
+    NSAssert([polyline pointCount] > 0, @"Polyline must have coordinates");
+    CLLocationCoordinate2D firstCoordinate = coordinates[0];
+
+    return firstCoordinate;
 }
 
 - (BOOL)intersectsOverlayBounds:(MGLCoordinateBounds)overlayBounds {
