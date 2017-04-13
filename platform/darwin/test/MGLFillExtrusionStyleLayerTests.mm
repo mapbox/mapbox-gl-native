@@ -6,7 +6,7 @@
 
 #import "MGLStyleLayer_Private.h"
 
-#include <mbgl/style/layers/fill-extrusion_layer.hpp>
+#include <mbgl/style/layers/fill_extrusion_layer.hpp>
 #include <mbgl/style/transition_options.hpp>
 
 @interface MGLFillExtrusionLayerTests : MGLStyleLayerTests

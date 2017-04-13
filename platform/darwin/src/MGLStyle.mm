@@ -3,6 +3,7 @@
 #import "MGLMapView_Private.h"
 #import "MGLStyleLayer.h"
 #import "MGLFillStyleLayer.h"
+#import "MGLFillExtrusionStyleLayer.h"
 #import "MGLLineStyleLayer.h"
 #import "MGLCircleStyleLayer.h"
 #import "MGLSymbolStyleLayer.h"

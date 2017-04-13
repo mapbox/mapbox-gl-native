@@ -11,7 +11,7 @@
 
 #import "MGLStyleLayer_Private.h"
 
-#include <mbgl/style/layers/<%- type %>_layer.hpp>
+#include <mbgl/style/layers/<%- type.replace('-', '_') %>_layer.hpp>
 #include <mbgl/style/transition_options.hpp>
 
 @interface MGL<%- camelize(type) %>LayerTests : MGLStyleLayerTests
