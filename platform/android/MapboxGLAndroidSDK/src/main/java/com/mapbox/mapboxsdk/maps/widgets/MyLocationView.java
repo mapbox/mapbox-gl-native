@@ -565,7 +565,6 @@ public class MyLocationView extends View {
 
   public void setLocationSource(LocationEngine locationSource) {
     this.locationSource = locationSource;
-    toggleGps(isEnabled());
   }
 
   private static class GpsLocationListener implements LocationEngineListener {
