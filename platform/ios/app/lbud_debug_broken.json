@@ -1,0 +1,184 @@
+{
+    "version": 8,
+    "name": "Streets-buildings-EXPERIMENT-copy",
+    "metadata": {
+        "mapbox:autocomposite": true,
+        "mapbox:type": "default",
+        "mapbox:groups": {}
+    },
+    "center": [
+        -73.98397807501742,
+        40.766104101767695
+    ],
+    "zoom": 15.421792049978444,
+    "bearing": -88.18120343555876,
+    "pitch": 0,
+
+
+    "sources": {
+        "composite": {
+            "url": "mapbox://mapbox.mapbox-streets-v7",
+            "type": "vector"
+        }
+    },
+    "sprite": "mapbox://sprites/lbud/cj08n65a000152sqv3r0gfkdc",
+    "glyphs": "mapbox://fonts/lbud/{fontstack}/{range}.pbf",
+    "layers": [
+        {
+            "id": "background",
+            "type": "background",
+            "layout": {},
+            "paint": {
+                "background-color": {
+                    "base": 1,
+                    "stops": [
+                        [
+                            11,
+                            "hsl(35, 32%, 91%)"
+                        ],
+                        [
+                            13,
+                            "hsl(35, 12%, 89%)"
+                        ]
+                    ]
+                }
+            }
+        },
+        {
+            "id": "extrusions",
+            "type": "fill-extrusion",
+            "source": "composite",
+            "source-layer": "building",
+            "minzoom": 15,
+            "filter": [
+                "==",
+                "extrude",
+                "true"
+            ],
+            "layout": {
+                "visibility": "visible"
+            },
+            "paint": {
+                "fill-extrusion-height": {
+                    "base": 1,
+                    "type": "exponential",
+                    "property": "height",
+                    "stops": [
+                              [
+                               {
+                               "zoom": 0,
+                               "value": 0
+                               },
+                               0
+                               ],
+                              [
+                               {
+                               "zoom": 0,
+                               "value": 1000
+                               },
+                               0
+                               ],
+
+                        [
+                            {
+                                "zoom": 15,
+                                "value": 0
+                            },
+                            0
+                        ],
+                        [
+                            {
+                                "zoom": 15,
+                                "value": 1000
+                            },
+                            0
+                        ],
+                        [
+                            {
+                                "zoom": 15.2,
+                                "value": 0
+                            },
+                            0
+                        ],
+                        [
+                            {
+                                "value": 600,
+                                "zoom": 15.2
+                            },
+                            600
+                        ],
+                        [
+                            {
+                                "value": 601,
+                                "zoom": 15.2
+                            },
+                            10
+                        ]
+                    ]
+                },
+               "fill-extrusion-base": {
+               "base": 1,
+               "type": "exponential",
+               "property": "min_height",
+               "stops": [
+                         [
+                          {
+                          "zoom": 15,
+                          "value": 0
+                          },
+                          0
+                          ],
+                         [
+                          {
+                          "zoom": 15,
+                          "value": 1000
+                          },
+                          0
+                          ],
+                         [
+                          {
+                          "zoom": 15.2,
+                          "value": 0
+                          },
+                          0
+                          ],
+                         [
+                          {
+                          "value": 1000,
+                          "zoom": 15.2
+                          },
+                          1000
+                          ],
+                         [
+                          {
+                          "zoom": 15.2,
+                          "value": 1001
+                          },
+                          10
+                          ]
+                         ]
+                },
+                "fill-extrusion-color": "hsl(45, 61%, 27%)",
+                "fill-extrusion-opacity": {
+                    "base": 1,
+                    "stops": [
+                        [
+                            15,
+                            0
+                        ],
+                        [
+                            15.1,
+                            0.3
+                        ]
+                    ]
+                }
+            }
+        }
+    ],
+    "created": "2017-03-13T21:49:25.316Z",
+    "id": "cj08n65a000152sqv3r0gfkdc",
+    "modified": "2017-03-13T21:49:25.316Z",
+    "owner": "lbud",
+    "visibility": "private",
+    "draft": false
+}
