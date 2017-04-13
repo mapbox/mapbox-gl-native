@@ -227,7 +227,7 @@ IB_DESIGNABLE
 
 /**
  A control indicating the scale of the map. The scale bar is positioned in the
- upper-left corner.
+ upper-left corner. The scale bar is hidden by default.
  */
 @property (nonatomic, readonly) UIView *scaleBar;
 

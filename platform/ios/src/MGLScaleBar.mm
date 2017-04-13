@@ -235,7 +235,13 @@ static const CGFloat MGLFeetPerMeter = 3.28084;
     ? MGLMetricTable[count-1].distance
     : MGLImperialTable[count-1].distance;
     
-    self.alpha = maximumDistance > allowedDistance ? 0 : 1;
+    CGFloat alpha = maximumDistance > allowedDistance ? .0f : 1.0f;
+    
+    if(self.alpha != alpha) {
+        [UIView animateWithDuration:.2f delay:0 options:UIViewAnimationOptionBeginFromCurrentState animations:^{
+            self.alpha = alpha;
+        } completion:nil];
+    }
 }
 
 - (void)setRow:(MGLRow)row {
