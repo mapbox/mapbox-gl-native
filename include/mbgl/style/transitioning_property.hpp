@@ -16,9 +16,9 @@ public:
     TransitioningProperty() = default;
 
     TransitioningProperty(Value value_,
-                             TransitioningProperty<Value> prior_,
-                             TransitionOptions transition,
-                             TimePoint now)
+                          TransitioningProperty<Value> prior_,
+                          TransitionOptions transition,
+                          TimePoint now)
         : begin(now + transition.delay.value_or(Duration::zero())),
           end(begin + transition.duration.value_or(Duration::zero())),
           value(std::move(value_)) {

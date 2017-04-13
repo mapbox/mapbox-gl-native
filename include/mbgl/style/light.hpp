@@ -6,13 +6,13 @@
 #include <mbgl/style/property_evaluator.hpp>
 #include <mbgl/style/property_evaluation_parameters.hpp>
 #include <mbgl/style/transition_options.hpp>
-#include <mbgl/style/cascade_parameters.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/color.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/interpolate.hpp>
 #include <mbgl/util/indexed_tuple.hpp>
 #include <mbgl/util/ignore.hpp>
+#include <mbgl/util/chrono.hpp>
 
 #include <memory>
 
@@ -20,8 +20,10 @@ namespace mbgl {
 namespace style {
 
 template <class Value>
-class CascadingLightProperty {
+class TransitioningLightProperty {
 public:
+    using UnevaluatedType = TransitioningProperty<Value>;
+
     bool isUndefined() const {
         return bool(value);
     }
@@ -30,8 +32,15 @@ public:
         return value;
     }
 
+    template <class Evaluator>
+    auto evaluate(const Evaluator& evaluator, TimePoint now) {
+        return unevaluated.evaluate(evaluator, now);
+    }
+
     void set(const Value& value_) {
         value = value_;
+        unevaluated =
+            TransitioningProperty<Value>(std::move(value), unevaluated, transition, Clock::now());
     }
 
     const TransitionOptions& getTransition() const {
@@ -45,27 +54,16 @@ public:
 
     void setTransition(const TransitionOptions& transition_) {
         transition = transition_;
+        unevaluated = UnevaluatedType(value, std::move(unevaluated),
+                                      transition_.reverseMerge(transition), Clock::now());
     }
 
-    template <class TransitioningProperty>
-    TransitioningProperty cascade(const CascadeParameters& params,
-                                  TransitioningProperty prior) const {
-        TransitionOptions transition_;
-        Value value_;
-
-        if (bool(value)) {
-            value_ = value;
-        }
-
-        if (bool(transition)) {
-            transition_ = transition;
-        }
-
-        return TransitioningProperty(std::move(value_), std::move(prior),
-                                     transition_.reverseMerge(params.transition), params.now);
+    bool hasTransition() const {
+        return unevaluated.hasTransition();
     }
 
 private:
+    UnevaluatedType unevaluated;
     Value value;
     TransitionOptions transition;
 };
@@ -74,8 +72,7 @@ template <class T>
 class LightProperty {
 public:
     using ValueType = PropertyValue<T>;
-    using CascadingType = CascadingLightProperty<ValueType>;
-    using UnevaluatedType = TransitioningProperty<ValueType>;
+    using TransitioningType = TransitioningLightProperty<ValueType>;
     using EvaluatorType = PropertyEvaluator<T>;
     using EvaluatedType = T;
 };
@@ -86,8 +83,7 @@ public:
     using Properties = TypeList<Ps...>;
 
     using EvaluatedTypes = TypeList<typename Ps::EvaluatedType...>;
-    using UnevaluatedTypes = TypeList<typename Ps::UnevaluatedType...>;
-    using CascadingTypes = TypeList<typename Ps::CascadingType...>;
+    using TransitioningTypes = TypeList<typename Ps::TransitioningType...>;
 
     template <class TypeList>
     using Tuple = IndexedTuple<Properties, TypeList>;
@@ -97,46 +93,36 @@ public:
         using Tuple<EvaluatedTypes>::Tuple;
     };
 
-    class Unevaluated : public Tuple<UnevaluatedTypes> {
+    class Transitioning : public Tuple<TransitioningTypes> {
     public:
-        using Tuple<UnevaluatedTypes>::Tuple;
-    };
-
-    class Cascading : public Tuple<CascadingTypes> {
-    public:
-        using Tuple<CascadingTypes>::Tuple;
+        using Tuple<TransitioningTypes>::Tuple;
     };
 
     template <class P>
     auto get() const {
-        return cascading.template get<P>().get();
+        return transitioning.template get<P>().get();
     }
 
     template <class P>
     void set(const typename P::ValueType& value) {
-        cascading.template get<P>().set(value);
+        transitioning.template get<P>().set(value);
     }
 
     template <class P>
     TransitionOptions getTransition() {
-        return cascading.template get<P>().getTransition();
+        return transitioning.template get<P>().getTransition();
     }
 
     template <class P>
     void setTransition(const TransitionOptions& value) {
-        cascading.template get<P>().setTransition(value);
-    }
-
-    void cascade(const CascadeParameters& parameters) {
-        unevaluated = Unevaluated{ cascading.template get<Ps>().cascade(
-            parameters, std::move(unevaluated.template get<Ps>()))... };
+        transitioning.template get<P>().setTransition(value);
     }
 
     template <class P>
     auto evaluate(const PropertyEvaluationParameters& parameters) {
         using Evaluator = typename P::EvaluatorType;
-        return unevaluated.template get<P>().evaluate(Evaluator(parameters, P::defaultValue()),
-                                                      parameters.now);
+        return transitioning.template get<P>().evaluate(Evaluator(parameters, P::defaultValue()),
+                                                        parameters.now);
     }
 
     void evaluate(const PropertyEvaluationParameters& parameters) {
@@ -145,12 +131,11 @@ public:
 
     bool hasTransition() const {
         bool result = false;
-        util::ignore({ result |= unevaluated.template get<Ps>().hasTransition()... });
+        util::ignore({ result |= transitioning.template get<Ps>().hasTransition()... });
         return result;
     }
 
-    Cascading cascading;
-    Unevaluated unevaluated;
+    Transitioning transitioning;
     Evaluated evaluated;
 };
 
