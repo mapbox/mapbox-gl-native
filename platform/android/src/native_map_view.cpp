@@ -1416,6 +1416,7 @@ void NativeMapView::_destroySurface() {
     }
 
     surface = EGL_NO_SURFACE;
+    firstRender = true;
 
     if (window != nullptr) {
         ANativeWindow_release(window);
