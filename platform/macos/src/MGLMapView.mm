@@ -38,6 +38,7 @@
 #import <mbgl/util/run_loop.hpp>
 #import <mbgl/util/shared_thread_pool.hpp>
 #import <mbgl/util/string.hpp>
+#import <mbgl/util/projection.hpp>
 
 #import <map>
 #import <unordered_map>
@@ -2692,7 +2693,7 @@ public:
 }
 
 - (CLLocationDistance)metersPerPointAtLatitude:(CLLocationDegrees)latitude {
-    return _mbglMap->getMetersPerPixelAtLatitude(latitude, self.zoomLevel);
+    return mbgl::Projection::getMetersPerPixelAtLatitude(latitude, self.zoomLevel);
 }
 
 #pragma mark Debugging
