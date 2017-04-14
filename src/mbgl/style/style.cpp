@@ -308,6 +308,8 @@ void Style::cascade(const TimePoint& timePoint, MapMode mode) {
     for (const auto& layer : layers) {
         layer->baseImpl->cascade(parameters);
     }
+
+    light.cascade(parameters);
 }
 
 void Style::recalculate(float z, const TimePoint& timePoint, MapMode mode) {
