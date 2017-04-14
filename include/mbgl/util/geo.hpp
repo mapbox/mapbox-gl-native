@@ -79,34 +79,6 @@ public:
     }
 };
 
-class ProjectedMeters {
-private:
-    double _northing; // Distance measured northwards.
-    double _easting;  // Distance measured eastwards.
-
-public:
-    ProjectedMeters(double n_ = 0, double e_ = 0)
-        : _northing(n_), _easting(e_) {
-        if (std::isnan(_northing)) {
-            throw std::domain_error("northing must not be NaN");
-        }
-        if (std::isnan(_easting)) {
-            throw std::domain_error("easting must not be NaN");
-        }
-    }
-
-    double northing() const { return _northing; }
-    double easting() const { return _easting; }
-
-    friend bool operator==(const ProjectedMeters& a, const ProjectedMeters& b) {
-        return a._northing == b._northing && a._easting == b._easting;
-    }
-
-    friend bool operator!=(const ProjectedMeters& a, const ProjectedMeters& b) {
-        return !(a == b);
-    }
-};
-
 class LatLngBounds {
 public:
     // Return a bounds covering the entire (unwrapped) world.
