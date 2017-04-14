@@ -28,7 +28,7 @@ public:
                 convert<PropertyValue<LightAnchorType>>(*anchor, error);
 
             if (convertedAnchor) {
-                light.set<LightAnchor>(*convertedAnchor);
+                light.get<LightAnchor>().value = *convertedAnchor;
             } else {
                 return {};
             }
@@ -39,7 +39,7 @@ public:
             optional<TransitionOptions> transition =
                 convert<TransitionOptions>(*anchorTransition, error);
             if (transition) {
-                light.setTransition<LightAnchor>(*transition);
+                light.get<LightAnchor>().transition = *transition;
             } else {
                 return {};
             }
@@ -51,7 +51,7 @@ public:
                 convert<PropertyValue<Color>>(*color, error);
 
             if (convertedColor) {
-                light.set<LightColor>(*convertedColor);
+                light.get<LightColor>().value = *convertedColor;
             } else {
                 return {};
             }
@@ -62,7 +62,7 @@ public:
             optional<TransitionOptions> transition =
                 convert<TransitionOptions>(*colorTransition, error);
             if (transition) {
-                light.setTransition<LightColor>(*transition);
+                light.get<LightColor>().transition = *transition;
             } else {
                 return {};
             }
@@ -74,7 +74,7 @@ public:
                 convert<PropertyValue<Position>>(*position, error);
 
             if (convertedPosition) {
-                light.set<LightPosition>(*convertedPosition);
+                light.get<LightPosition>().value = *convertedPosition;
             } else {
                 return {};
             }
@@ -85,7 +85,7 @@ public:
             optional<TransitionOptions> transition =
                 convert<TransitionOptions>(*positionTransition, error);
             if (transition) {
-                light.setTransition<LightPosition>(*transition);
+                light.get<LightPosition>().transition = *transition;
             } else {
                 return {};
             }
@@ -97,7 +97,7 @@ public:
                 convert<PropertyValue<float>>(*intensity, error);
 
             if (convertedIntensity) {
-                light.set<LightIntensity>(*convertedIntensity);
+                light.get<LightIntensity>().value = *convertedIntensity;
             } else {
                 return {};
             }
@@ -108,7 +108,7 @@ public:
             optional<TransitionOptions> transition =
                 convert<TransitionOptions>(*intensityTransition, error);
             if (transition) {
-                light.setTransition<LightIntensity>(*transition);
+                light.get<LightIntensity>().transition = *transition;
             } else {
                 return {};
             }

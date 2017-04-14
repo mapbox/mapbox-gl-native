@@ -266,7 +266,6 @@ set(MBGL_CORE_FILES
     include/mbgl/style/query.hpp
     include/mbgl/style/source.hpp
     include/mbgl/style/transition_options.hpp
-    include/mbgl/style/transitioning_property.hpp
     include/mbgl/style/types.hpp
     include/mbgl/style/undefined.hpp
     src/mbgl/style/bucket_parameters.cpp
@@ -285,6 +284,7 @@ set(MBGL_CORE_FILES
     src/mbgl/style/layer_impl.hpp
     src/mbgl/style/layer_observer.hpp
     src/mbgl/style/layout_property.hpp
+    src/mbgl/style/light_impl.hpp
     src/mbgl/style/observer.hpp
     src/mbgl/style/paint_property.hpp
     src/mbgl/style/paint_property_binder.hpp
@@ -303,6 +303,7 @@ set(MBGL_CORE_FILES
     src/mbgl/style/style.hpp
     src/mbgl/style/tile_source_impl.cpp
     src/mbgl/style/tile_source_impl.hpp
+    src/mbgl/style/transitioning_property.hpp
     src/mbgl/style/types.cpp
     src/mbgl/style/update_batch.hpp
     src/mbgl/style/update_parameters.hpp
@@ -471,6 +472,7 @@ set(MBGL_CORE_FILES
     include/mbgl/util/geometry.hpp
     include/mbgl/util/ignore.hpp
     include/mbgl/util/image.hpp
+    include/mbgl/util/indexed_tuple.hpp
     include/mbgl/util/interpolate.hpp
     include/mbgl/util/logging.hpp
     include/mbgl/util/noncopyable.hpp
@@ -484,6 +486,7 @@ set(MBGL_CORE_FILES
     include/mbgl/util/tileset.hpp
     include/mbgl/util/timer.hpp
     include/mbgl/util/traits.hpp
+    include/mbgl/util/type_list.hpp
     include/mbgl/util/unitbezier.hpp
     include/mbgl/util/util.hpp
     include/mbgl/util/variant.hpp
@@ -511,7 +514,6 @@ set(MBGL_CORE_FILES
     src/mbgl/util/http_timeout.hpp
     src/mbgl/util/i18n.cpp
     src/mbgl/util/i18n.hpp
-    src/mbgl/util/indexed_tuple.hpp
     src/mbgl/util/interpolate.cpp
     src/mbgl/util/intersection_tests.cpp
     src/mbgl/util/intersection_tests.hpp
@@ -545,7 +547,6 @@ set(MBGL_CORE_FILES
     src/mbgl/util/tile_cover.cpp
     src/mbgl/util/tile_cover.hpp
     src/mbgl/util/token.hpp
-    src/mbgl/util/type_list.hpp
     src/mbgl/util/url.cpp
     src/mbgl/util/url.hpp
     src/mbgl/util/utf.hpp

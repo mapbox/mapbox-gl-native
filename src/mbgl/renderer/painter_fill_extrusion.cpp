@@ -25,8 +25,6 @@ void Painter::renderFillExtrusion(PaintParameters& parameters,
         return;
     }
 
-    const auto light = style.light.evaluated;
-
     if (!properties.get<FillExtrusionPattern>().from.empty()) {
         optional<SpriteAtlasElement> imagePosA =
             spriteAtlas->getPattern(properties.get<FillExtrusionPattern>().from);
@@ -55,7 +53,7 @@ void Painter::renderFillExtrusion(PaintParameters& parameters,
                 tile.id,
                 state,
                 -std::pow(2, tile.id.canonical.z) / util::tileSize / 8.0f,
-                light
+                style.evaluatedLight
             ),
             *bucket.vertexBuffer,
             *bucket.indexBuffer,
@@ -76,7 +74,7 @@ void Painter::renderFillExtrusion(PaintParameters& parameters,
                                       properties.get<FillExtrusionTranslateAnchor>(),
                                       state),
                 state,
-                light
+                style.evaluatedLight
             ),
             *bucket.vertexBuffer,
             *bucket.indexBuffer,
