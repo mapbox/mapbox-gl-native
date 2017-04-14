@@ -150,9 +150,6 @@ public:
     Size getSize() const;
 
     // Projection
-    double getMetersPerPixelAtLatitude(double lat, double zoom) const;
-    ProjectedMeters projectedMetersForLatLng(const LatLng&) const;
-    LatLng latLngForProjectedMeters(const ProjectedMeters&) const;
     ScreenCoordinate pixelForLatLng(const LatLng&) const;
     LatLng latLngForPixel(const ScreenCoordinate&) const;
 

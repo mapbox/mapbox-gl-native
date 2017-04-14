@@ -21,6 +21,7 @@
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/geo.hpp>
 #include <mbgl/util/geometry.hpp>
+#include <mbgl/util/projection.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/shared_thread_pool.hpp>
 #include <mbgl/util/traits.hpp>
@@ -1121,7 +1122,7 @@ void QMapboxGL::addAnnotationIcon(const QString &name, const QImage &icon)
 */
 double QMapboxGL::metersPerPixelAtLatitude(double latitude, double zoom) const
 {
-    return d_ptr->mapObj->getMetersPerPixelAtLatitude(latitude, zoom);
+    return mbgl::Projection::getMetersPerPixelAtLatitude(latitude, zoom);
 }
 
 /*!
@@ -1129,7 +1130,7 @@ double QMapboxGL::metersPerPixelAtLatitude(double latitude, double zoom) const
 */
 QMapbox::ProjectedMeters QMapboxGL::projectedMetersForCoordinate(const QMapbox::Coordinate &coordinate_) const
 {
-    auto projectedMeters = d_ptr->mapObj->projectedMetersForLatLng(mbgl::LatLng { coordinate_.first, coordinate_.second });
+    auto projectedMeters = mbgl::Projection::projectedMetersForLatLng(mbgl::LatLng { coordinate_.first, coordinate_.second });
     return QMapbox::ProjectedMeters(projectedMeters.northing(), projectedMeters.easting());
 }
 
@@ -1138,7 +1139,7 @@ QMapbox::ProjectedMeters QMapboxGL::projectedMetersForCoordinate(const QMapbox::
 */
 QMapbox::Coordinate QMapboxGL::coordinateForProjectedMeters(const QMapbox::ProjectedMeters &projectedMeters) const
 {
-    auto latLng = d_ptr->mapObj->latLngForProjectedMeters(mbgl::ProjectedMeters { projectedMeters.first, projectedMeters.second });
+    auto latLng = mbgl::Projection::latLngForProjectedMeters(mbgl::ProjectedMeters { projectedMeters.first, projectedMeters.second });
     return QMapbox::Coordinate(latLng.latitude(), latLng.longitude());
 }
 

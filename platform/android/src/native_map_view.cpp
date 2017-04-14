@@ -24,6 +24,7 @@
 #include <mbgl/util/shared_thread_pool.hpp>
 #include <mbgl/util/logging.hpp>
 #include <mbgl/util/platform.hpp>
+#include <mbgl/util/projection.hpp>
 #include <mbgl/sprite/sprite_image.hpp>
 #include <mbgl/style/filter.hpp>
 
@@ -638,21 +639,21 @@ jni::jboolean NativeMapView::isFullyLoaded(JNIEnv&) {
 }
 
 jni::jdouble NativeMapView::getMetersPerPixelAtLatitude(JNIEnv&, jni::jdouble lat, jni::jdouble zoom) {
-    return map->getMetersPerPixelAtLatitude(lat, zoom);
+    return mbgl::Projection::getMetersPerPixelAtLatitude(lat, zoom);
 }
 
 jni::Object<ProjectedMeters> NativeMapView::projectedMetersForLatLng(JNIEnv& env, jni::jdouble latitude, jni::jdouble longitude) {
-    mbgl::ProjectedMeters projectedMeters = map->projectedMetersForLatLng(mbgl::LatLng(latitude, longitude));
+    mbgl::ProjectedMeters projectedMeters = mbgl::Projection::projectedMetersForLatLng(mbgl::LatLng(latitude, longitude));
     return ProjectedMeters::New(env, projectedMeters.northing(), projectedMeters.easting());
+}
+
+jni::Object<LatLng> NativeMapView::latLngForProjectedMeters(JNIEnv& env, jdouble northing, jdouble easting) {
+    return LatLng::New(env, mbgl::Projection::latLngForProjectedMeters(mbgl::ProjectedMeters(northing, easting)));
 }
 
 jni::Object<PointF> NativeMapView::pixelForLatLng(JNIEnv& env, jdouble latitude, jdouble longitude) {
     mbgl::ScreenCoordinate pixel = map->pixelForLatLng(mbgl::LatLng(latitude, longitude));
     return PointF::New(env, static_cast<float>(pixel.x), static_cast<float>(pixel.y));
-}
-
-jni::Object<LatLng> NativeMapView::latLngForProjectedMeters(JNIEnv& env, jdouble northing, jdouble easting) {
-    return LatLng::New(env, map->latLngForProjectedMeters(mbgl::ProjectedMeters(northing, easting)));
 }
 
 jni::Object<LatLng> NativeMapView::latLngForPixel(JNIEnv& env, jfloat x, jfloat y) {

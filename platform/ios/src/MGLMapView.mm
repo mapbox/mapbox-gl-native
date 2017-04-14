@@ -31,6 +31,7 @@
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/shared_thread_pool.hpp>
 #include <mbgl/util/string.hpp>
+#include <mbgl/util/projection.hpp>
 
 #import "Mapbox.h"
 #import "MGLFeature_Private.h"
@@ -3002,7 +3003,7 @@ public:
 
 - (CLLocationDistance)metersPerPointAtLatitude:(CLLocationDegrees)latitude
 {
-    return _mbglMap->getMetersPerPixelAtLatitude(latitude, self.zoomLevel);
+    return mbgl::Projection::getMetersPerPixelAtLatitude(latitude, self.zoomLevel);
 }
 
 - (CLLocationDistance)metersPerPixelAtLatitude:(CLLocationDegrees)latitude
