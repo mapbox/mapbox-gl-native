@@ -11,12 +11,12 @@ using namespace style;
 
 static_assert(sizeof(FillExtrusionLayoutVertex) == 12, "expected FillExtrusionLayoutVertex size");
 
-std::array<float, 3> lightColor(const style::Light::Evaluated& light) {
+std::array<float, 3> lightColor(const EvaluatedLight& light) {
     const auto color = light.get<LightColor>();
     return {{ color.r, color.g, color.b }};
 }
 
-std::array<float, 3> lightPosition(const style::Light::Evaluated& light, const TransformState& state) {
+std::array<float, 3> lightPosition(const EvaluatedLight& light, const TransformState& state) {
     auto lightPos = light.get<LightPosition>().getCartesian();
     mat3 lightMat;
     matrix::identity(lightMat);
@@ -27,14 +27,14 @@ std::array<float, 3> lightPosition(const style::Light::Evaluated& light, const T
     return lightPos;
 }
 
-float lightIntensity(const style::Light::Evaluated& light) {
+float lightIntensity(const EvaluatedLight& light) {
     return light.get<LightIntensity>();
 }
 
 FillExtrusionUniforms::Values
 FillExtrusionUniforms::values(mat4 matrix,
                               const TransformState& state,
-                              const style::Light::Evaluated& light) {
+                              const EvaluatedLight& light) {
     return FillExtrusionUniforms::Values{
         uniforms::u_matrix::Value{ matrix },
         uniforms::u_lightcolor::Value{ lightColor(light) },
@@ -51,7 +51,7 @@ FillExtrusionPatternUniforms::values(mat4 matrix,
                                      const UnwrappedTileID& tileID,
                                      const TransformState& state,
                                      const float heightFactor,
-                                     const style::Light::Evaluated& light) {
+                                     const EvaluatedLight& light) {
     int32_t tileSizeAtNearestZoom = util::tileSize * state.zoomScale(state.getIntegerZoom() - tileID.canonical.z);
     int32_t pixelX = tileSizeAtNearestZoom * (tileID.canonical.x + tileID.wrap * state.zoomScale(tileID.canonical.z));
     int32_t pixelY = tileSizeAtNearestZoom * tileID.canonical.y;
