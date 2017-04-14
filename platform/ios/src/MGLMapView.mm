@@ -1159,6 +1159,10 @@ public:
 {
     _changeDelimiterSuppressionDepth = 0;
     _mbglMap->setGestureInProgress(false);
+    if (self.userTrackingState == MGLUserTrackingStateBegan)
+    {
+        [self setUserTrackingMode:MGLUserTrackingModeNone];
+    }
     _mbglMap->cancelTransitions();
 }
 
