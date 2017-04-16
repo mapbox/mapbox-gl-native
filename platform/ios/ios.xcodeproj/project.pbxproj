@@ -81,6 +81,8 @@
 		3557F7B21E1D27D300CCA5E6 /* MGLDistanceFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 3557F7AF1E1D27D300CCA5E6 /* MGLDistanceFormatter.m */; };
 		35599DED1D46F14E0048254D /* MGLStyleValue.mm in Sources */ = {isa = PBXBuildFile; fileRef = 35599DEA1D46F14E0048254D /* MGLStyleValue.mm */; };
 		35599DEE1D46F14E0048254D /* MGLStyleValue.mm in Sources */ = {isa = PBXBuildFile; fileRef = 35599DEA1D46F14E0048254D /* MGLStyleValue.mm */; };
+		355AE0011E9281DA00F3939D /* MGLScaleBar.mm in Sources */ = {isa = PBXBuildFile; fileRef = 355ADFFC1E9281DA00F3939D /* MGLScaleBar.mm */; };
+		355AE0021E9281DA00F3939D /* MGLScaleBar.mm in Sources */ = {isa = PBXBuildFile; fileRef = 355ADFFC1E9281DA00F3939D /* MGLScaleBar.mm */; };
 		3566C7661D4A77BA008152BC /* MGLShapeSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 3566C7641D4A77BA008152BC /* MGLShapeSource.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3566C7671D4A77BA008152BC /* MGLShapeSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 3566C7641D4A77BA008152BC /* MGLShapeSource.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3566C7681D4A77BA008152BC /* MGLShapeSource.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3566C7651D4A77BA008152BC /* MGLShapeSource.mm */; };
@@ -121,6 +123,8 @@
 		35D13AC41D3D19DD00AFB4E0 /* MGLFillStyleLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 35D13AC11D3D19DD00AFB4E0 /* MGLFillStyleLayer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		35D13AC51D3D19DD00AFB4E0 /* MGLFillStyleLayer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 35D13AC21D3D19DD00AFB4E0 /* MGLFillStyleLayer.mm */; };
 		35D13AC61D3D19DD00AFB4E0 /* MGLFillStyleLayer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 35D13AC21D3D19DD00AFB4E0 /* MGLFillStyleLayer.mm */; };
+		35D3A1E61E9BE7EB002B38EE /* MGLScaleBar.h in Headers */ = {isa = PBXBuildFile; fileRef = 355ADFFB1E9281DA00F3939D /* MGLScaleBar.h */; };
+		35D3A1E71E9BE7EC002B38EE /* MGLScaleBar.h in Headers */ = {isa = PBXBuildFile; fileRef = 355ADFFB1E9281DA00F3939D /* MGLScaleBar.h */; };
 		35D9DDE21DA25EEC00DAAD69 /* MGLCodingTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 35D9DDE11DA25EEC00DAAD69 /* MGLCodingTests.m */; };
 		35E0CFE61D3E501500188327 /* MGLStyle_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 35E0CFE51D3E501500188327 /* MGLStyle_Private.h */; };
 		35E0CFE71D3E501500188327 /* MGLStyle_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 35E0CFE51D3E501500188327 /* MGLStyle_Private.h */; };
@@ -575,6 +579,8 @@
 		3557F7AE1E1D27D300CCA5E6 /* MGLDistanceFormatter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLDistanceFormatter.h; sourceTree = "<group>"; };
 		3557F7AF1E1D27D300CCA5E6 /* MGLDistanceFormatter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLDistanceFormatter.m; sourceTree = "<group>"; };
 		35599DEA1D46F14E0048254D /* MGLStyleValue.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLStyleValue.mm; sourceTree = "<group>"; };
+		355ADFFB1E9281DA00F3939D /* MGLScaleBar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLScaleBar.h; sourceTree = "<group>"; };
+		355ADFFC1E9281DA00F3939D /* MGLScaleBar.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLScaleBar.mm; sourceTree = "<group>"; };
 		3566C7641D4A77BA008152BC /* MGLShapeSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLShapeSource.h; sourceTree = "<group>"; };
 		3566C7651D4A77BA008152BC /* MGLShapeSource.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLShapeSource.mm; sourceTree = "<group>"; };
 		3566C76A1D4A8DFA008152BC /* MGLRasterSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLRasterSource.h; sourceTree = "<group>"; };
@@ -1028,6 +1034,15 @@
 			name = Categories;
 			sourceTree = "<group>";
 		};
+		355ADFF91E9281C300F3939D /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				355ADFFB1E9281DA00F3939D /* MGLScaleBar.h */,
+				355ADFFC1E9281DA00F3939D /* MGLScaleBar.mm */,
+			);
+			name = Views;
+			sourceTree = "<group>";
+		};
 		357579811D502AD4000B822E /* Styling */ = {
 			isa = PBXGroup;
 			children = (
@@ -1290,6 +1305,7 @@
 		DA8848331CBAFB2A00AB86E3 /* Kit */ = {
 			isa = PBXGroup;
 			children = (
+				355ADFF91E9281C300F3939D /* Views */,
 				35CE617F1D4165C2004F2359 /* Categories */,
 				DAD165841CF4D06B001FF4B9 /* Annotations */,
 				DAD165851CF4D08B001FF4B9 /* Telemetry */,
@@ -1628,6 +1644,7 @@
 				DA6408DB1DA4E7D300908C90 /* MGLVectorStyleLayer.h in Headers */,
 				DD0902AB1DB192A800C5BDCE /* MGLNetworkConfiguration.h in Headers */,
 				DA8848571CBAFB9800AB86E3 /* MGLMapboxEvents.h in Headers */,
+				35D3A1E61E9BE7EB002B38EE /* MGLScaleBar.h in Headers */,
 				DA8848311CBAFA6200AB86E3 /* NSString+MGLAdditions.h in Headers */,
 				353933F81D3FB79F003F57D7 /* MGLLineStyleLayer.h in Headers */,
 				DAAF722D1DA903C700312FA4 /* MGLStyleValue_Private.h in Headers */,
@@ -1714,6 +1731,7 @@
 				404C26E31D89B877000AA13D /* MGLTileSource.h in Headers */,
 				DABFB8611CBE99E500D62B32 /* MGLMultiPoint.h in Headers */,
 				3510FFF11D6D9D8C00F413B2 /* NSExpression+MGLAdditions.h in Headers */,
+				35D3A1E71E9BE7EC002B38EE /* MGLScaleBar.h in Headers */,
 				35E0CFE71D3E501500188327 /* MGLStyle_Private.h in Headers */,
 				DABFB86D1CBE9A0F00D62B32 /* MGLAnnotationImage.h in Headers */,
 				DABFB8721CBE9A0F00D62B32 /* MGLUserLocation.h in Headers */,
@@ -2199,6 +2217,7 @@
 				DA88482B1CBAFA6200AB86E3 /* MGLTypes.m in Sources */,
 				4018B1C71CDC287F00F666AF /* MGLAnnotationView.mm in Sources */,
 				404C26E41D89B877000AA13D /* MGLTileSource.mm in Sources */,
+				355AE0011E9281DA00F3939D /* MGLScaleBar.mm in Sources */,
 				DA88481D1CBAFA6200AB86E3 /* MGLMapCamera.mm in Sources */,
 				DA8848261CBAFA6200AB86E3 /* MGLPolygon.mm in Sources */,
 				35B82BFA1D6C5F8400B1B721 /* NSPredicate+MGLAdditions.mm in Sources */,
@@ -2277,6 +2296,7 @@
 				DAA4E4321CBB730400178DFB /* MGLMapView.mm in Sources */,
 				DAA4E41E1CBB730400178DFB /* MGLMapCamera.mm in Sources */,
 				404C26E51D89B877000AA13D /* MGLTileSource.mm in Sources */,
+				355AE0021E9281DA00F3939D /* MGLScaleBar.mm in Sources */,
 				4018B1C81CDC287F00F666AF /* MGLAnnotationView.mm in Sources */,
 				DAA4E4341CBB730400178DFB /* MGLFaux3DUserLocationAnnotationView.m in Sources */,
 				35B82BFB1D6C5F8400B1B721 /* NSPredicate+MGLAdditions.mm in Sources */,

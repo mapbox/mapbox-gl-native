@@ -54,6 +54,7 @@
 #import "MGLUserLocation_Private.h"
 #import "MGLAnnotationImage_Private.h"
 #import "MGLAnnotationView_Private.h"
+#import "MGLScaleBar.h"
 #import "MGLStyle_Private.h"
 #import "MGLStyleLayer_Private.h"
 #import "MGLMapboxEvents.h"
@@ -229,6 +230,8 @@ public:
 @property (nonatomic) EAGLContext *context;
 @property (nonatomic) GLKView *glView;
 @property (nonatomic) UIImageView *glSnapshotView;
+@property (nonatomic, readwrite) MGLScaleBar *scaleBar;
+@property (nonatomic) NS_MUTABLE_ARRAY_OF(NSLayoutConstraint *) *scaleBarConstraints;
 @property (nonatomic, readwrite) UIImageView *compassView;
 @property (nonatomic) NS_MUTABLE_ARRAY_OF(NSLayoutConstraint *) *compassViewConstraints;
 @property (nonatomic, readwrite) UIImageView *logoView;
@@ -493,7 +496,14 @@ public:
     _compassView.translatesAutoresizingMaskIntoConstraints = NO;
     [self addSubview:_compassView];
     _compassViewConstraints = [NSMutableArray array];
-
+    
+    // setup scale control
+    //
+    _scaleBar = [[MGLScaleBar alloc] init];
+    _scaleBar.translatesAutoresizingMaskIntoConstraints = NO;
+    [self addSubview:_scaleBar];
+    _scaleBarConstraints = [NSMutableArray array];
+    
     // setup interaction
     //
     _pan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePanGesture:)];
@@ -774,6 +784,31 @@ public:
 
 - (void)updateConstraints
 {
+    // scale control
+    //
+    [self removeConstraints:self.scaleBarConstraints];
+    [self.scaleBarConstraints removeAllObjects];
+    
+    [self.scaleBarConstraints addObject:
+     [NSLayoutConstraint constraintWithItem:self.scaleBar
+                                  attribute:NSLayoutAttributeTop
+                                  relatedBy:NSLayoutRelationEqual
+                                     toItem:self
+                                  attribute:NSLayoutAttributeTop
+                                 multiplier:1
+                                   constant:5+self.contentInset.top]];
+    
+    [self.scaleBarConstraints addObject:
+     [NSLayoutConstraint constraintWithItem:self.scaleBar
+                                  attribute:NSLayoutAttributeLeading
+                                  relatedBy:NSLayoutRelationEqual
+                                     toItem:self
+                                  attribute:NSLayoutAttributeLeading
+                                 multiplier:1
+                                   constant:8 + self.contentInset.left]];
+    
+    [self addConstraints:self.scaleBarConstraints];
+    
     // compass
     //
     [self removeConstraints:self.compassViewConstraints];
@@ -1564,6 +1599,8 @@ public:
              {
                  [weakSelf unrotateIfNeededForGesture];
              }];
+        } else {
+            [self unrotateIfNeededForGesture];
         }
     }
 }
@@ -4827,7 +4864,11 @@ public:
     }
 
     [self updateCompass];
-
+    
+    if (!self.scaleBar.hidden) {
+        [(MGLScaleBar *)self.scaleBar setMetersPerPoint:[self metersPerPointAtLatitude:self.centerCoordinate.latitude]];
+    }
+    
     if ([self.delegate respondsToSelector:@selector(mapViewRegionIsChanging:)])
     {
         [self.delegate mapViewRegionIsChanging:self];

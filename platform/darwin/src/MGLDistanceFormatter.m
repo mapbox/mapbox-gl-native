@@ -24,7 +24,7 @@ static const double FEET_PER_MILE = YARDS_PER_MILE * 3.0;
             return [self stringFromValue:miles unit:unit];
         } else {
             unit = NSLengthFormatterUnitFoot;
-            self.numberFormatter.roundingIncrement = @50;
+            self.numberFormatter.roundingIncrement = @1;
             return [self stringFromValue:feet unit:unit];
         }
     } else {
