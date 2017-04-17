@@ -1542,13 +1542,8 @@ public:
     // of the annotation itself that the view represents
     for (MGLAnnotationView *view in self.annotationContainerView.annotationViews)
     {
-        if (view.centerOffset.dx != 0 || view.centerOffset.dy != 0) {
+        if (view.annotation && (view.centerOffset.dx != 0 || view.centerOffset.dy != 0)) {
             if (CGRectContainsPoint(view.frame, tapPoint)) {
-                if (!view.annotation) {
-                    [NSException raise:NSInvalidArgumentException
-                                format:@"Annotation view's annotation property should not be nil."];
-                }
-                
                 CGPoint annotationPoint = [self convertCoordinate:view.annotation.coordinate toPointToView:self];
                 tapPoint = annotationPoint;
             }
