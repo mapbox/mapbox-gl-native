@@ -5,6 +5,7 @@
 #include <mbgl/style/cascade_parameters.hpp>
 #include <mbgl/style/property_evaluator.hpp>
 #include <mbgl/style/property_evaluation_parameters.hpp>
+#include <mbgl/util/ignore.hpp>
 
 namespace mbgl {
 namespace style {
@@ -34,6 +35,12 @@ public:
                 raw.template get<Ps>().transition.reverseMerge(params.transition),
                 params.now)...
         } {}
+
+    bool hasTransition() const {
+        bool result = false;
+        util::ignore({ result |= this->template get<Ps>().hasTransition()... });
+        return result;
+    }
 };
 
 template <class TypeList>
