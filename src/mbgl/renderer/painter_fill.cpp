@@ -109,7 +109,7 @@ void Painter::renderFill(PaintParameters& parameters,
         };
 
         if (properties.get<FillAntialias>() && !layer.impl->paint.unevaluated.get<FillOutlineColor>().isUndefined() && pass == RenderPass::Translucent) {
-            draw(2,
+            draw(0,
                  parameters.programs.fillOutline,
                  gl::Lines { 2.0f },
                  *bucket.lineIndexBuffer,
