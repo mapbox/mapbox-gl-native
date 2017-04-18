@@ -4,7 +4,44 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 
 ## 5.0.0 - TBA
 
-<<<<<<< HEAD
+5.1.0 builds further on 5.0.1 and adds:
+
+* Limit Viewport [#8622](https://github.com/mapbox/mapbox-gl-native/pull/8622)
+* Transition Properties for Layer attributes [#8509](https://github.com/mapbox/mapbox-gl-native/pull/8509)
+* Style wide transition duration and transition offset in milliseconds [#8576](https://github.com/mapbox/mapbox-gl-native/pull/8576)
+* Transifex integration, Catalan & Dutch translations [#8556](https://github.com/mapbox/mapbox-gl-native/pull/8556)
+* LatLngBounds includes with another bounds [#8517](https://github.com/mapbox/mapbox-gl-native/pull/8517)
+* LatLngBounds includes takes in account LatLng on the edges (cfr. core) [#8517](https://github.com/mapbox/mapbox-gl-native/pull/8517)
+* LatLngBounds facility getters/setters for LatLnbg on the edges of the bounds [#8517](https://github.com/mapbox/mapbox-gl-native/pull/8517)
+* Expose world bounds in LatLngBounds [#8517](https://github.com/mapbox/mapbox-gl-native/pull/8517)
+* OfflineRegion are validated if the bounds is found in the world bounds, else onError will be invoked [#8517](https://github.com/mapbox/mapbox-gl-native/pull/8517)
+* Polygon holes [#8557](https://github.com/mapbox/mapbox-gl-native/pull/8557) and [#8722](https://github.com/mapbox/mapbox-gl-native/pull/8722)
+* Custom location source [#8710](https://github.com/mapbox/mapbox-gl-native/pull/8710)
+* Ensure surface is created after display and context [#8759](https://github.com/mapbox/mapbox-gl-native/pull/8759)
+
+## 5.0.2 - April 3, 2017
+
+5.0.2 is a patch release that contains the following changes:
+
+* Binary shader caching [#8604](https://github.com/mapbox/mapbox-gl-native/pull/8604)
+* Fix resource transform callback [#8582](https://github.com/mapbox/mapbox-gl-native/pull/8582)
+* Restore onTouch behaviour to 4.x version [#8585](https://github.com/mapbox/mapbox-gl-native/pull/8585)
+* Restore anchoring after updating MarkerView Icon [#8519](https://github.com/mapbox/mapbox-gl-native/pull/8519)
+
+## 5.0.1 - March 22nd, 2017
+
+5.0.1 is a patch release that addresses a shader precision issue that created a rendering problem on some devices.
+
+* Use `highp` for color attributes [#8385](https://github.com/mapbox/mapbox-gl-native/issues/8385)
+
+## 5.0.0 - March 17th, 2017
+
+5.0.0 final release contains:
+
+* Support for data-driven styles [#7752](https://github.com/mapbox/mapbox-gl-native/pull/7752)
+* Additional APIs to manage runtime styling layers [#8195](https://github.com/mapbox/mapbox-gl-native/pull/8195)
+* Allow query all features in sources (`querySourceFeatures`) [#5792](https://github.com/mapbox/mapbox-gl-native/issues/5792)
+* Improve accessibility TalkBack support by including content description in views [#8230](https://github.com/mapbox/mapbox-gl-native/pull/8230)
 * Consistent double tap zoom acceleration [#7514](https://github.com/mapbox/mapbox-gl-native/issues/7514)
 * Cleanup inconsistencies float vs double [#4445](https://github.com/mapbox/mapbox-gl-native/issues/4445)
 * Add `mapbox_` prefix to attributes [#6482](https://github.com/mapbox/mapbox-gl-native/issues/6482)

@@ -72,6 +72,7 @@ import java.util.List;
 public class MapView extends FrameLayout {
 
   private NativeMapView nativeMapView;
+  private boolean textureMode;
   private boolean destroyed;
   private boolean hasSurface = false;
 
@@ -117,12 +118,14 @@ public class MapView extends FrameLayout {
       return;
     }
 
+    // determine render surface
+    textureMode = options.getTextureMode();
+
     // inflate view
     View view = LayoutInflater.from(context).inflate(R.layout.mapbox_mapview_internal, this);
     CompassView compassView = (CompassView) view.findViewById(R.id.compassView);
     MyLocationView myLocationView = (MyLocationView) view.findViewById(R.id.userLocationView);
     ImageView attrView = (ImageView) view.findViewById(R.id.attributionView);
-    initalizeDrawingSurface(context, options);
 
     // create native Map object
     nativeMapView = new NativeMapView(this);
@@ -171,18 +174,6 @@ public class MapView extends FrameLayout {
     mapboxMap.initialise(context, options);
   }
 
-  private void initalizeDrawingSurface(Context context, MapboxMapOptions options) {
-    if (options.getTextureMode()) {
-      TextureView textureView = new TextureView(context);
-      textureView.setSurfaceTextureListener(new SurfaceTextureListener());
-      addView(textureView, 0);
-    } else {
-      SurfaceView surfaceView = (SurfaceView) findViewById(R.id.surfaceView);
-      surfaceView.getHolder().addCallback(new SurfaceCallback());
-      surfaceView.setVisibility(View.VISIBLE);
-    }
-  }
-
   //
   // Lifecycle events
   //
@@ -208,11 +199,22 @@ public class MapView extends FrameLayout {
       mapboxMap.onRestoreInstanceState(savedInstanceState);
     }
 
-    // Initialize EGL
+    initialiseDrawingSurface(textureMode);
+    addOnMapChangedListener(mapCallback = new MapCallback(mapboxMap));
+  }
+
+  private void initialiseDrawingSurface(boolean textureMode) {
     nativeMapView.initializeDisplay();
     nativeMapView.initializeContext();
-
-    addOnMapChangedListener(mapCallback = new MapCallback(mapboxMap));
+    if (textureMode) {
+      TextureView textureView = new TextureView(getContext());
+      textureView.setSurfaceTextureListener(new SurfaceTextureListener());
+      addView(textureView, 0);
+    } else {
+      SurfaceView surfaceView = (SurfaceView) findViewById(R.id.surfaceView);
+      surfaceView.getHolder().addCallback(new SurfaceCallback());
+      surfaceView.setVisibility(View.VISIBLE);
+    }
   }
 
   /**
