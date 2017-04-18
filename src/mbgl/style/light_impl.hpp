@@ -53,14 +53,14 @@ class Evaluated<TypeList<Ps...>> : public IndexedTuple<
 {
 private:
     using Properties = TypeList<Ps...>;
-    using Transitioning = Transitioning<Properties>;
+    using TransitioningPs = Transitioning<Properties>;
     using Super = IndexedTuple<
         TypeList<Ps...>,
         TypeList<typename Ps::Type...>>;
 
 public:
     Evaluated() = default;
-    Evaluated(Transitioning& transitioning, const PropertyEvaluationParameters& params)
+    Evaluated(TransitioningPs& transitioning, const PropertyEvaluationParameters& params)
         : Super {
             transitioning.template get<Ps>()
                 .evaluate(PropertyEvaluator<typename Ps::Type>(params, Ps::defaultValue()), params.now)...
