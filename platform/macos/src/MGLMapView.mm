@@ -1456,7 +1456,7 @@ public:
             [self willChangeValueForKey:@"zoomLevel"];
             [self willChangeValueForKey:@"centerCoordinate"];
             MGLMapCamera *oldCamera = self.camera;
-            _mbglMap->setZoom(_zoomAtBeginningOfGesture * (1 + gestureRecognizer.magnification), center);
+            _mbglMap->setZoom(_zoomAtBeginningOfGesture + log2(1 + gestureRecognizer.magnification), center);
             if ([self.delegate respondsToSelector:@selector(mapView:shouldChangeFromCamera:toCamera:)]
                 && ![self.delegate mapView:self shouldChangeFromCamera:oldCamera toCamera:self.camera]) {
                 self.camera = oldCamera;
