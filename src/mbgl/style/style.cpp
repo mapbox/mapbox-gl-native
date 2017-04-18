@@ -328,7 +328,7 @@ void Style::recalculate(float z, const TimePoint& timePoint, MapMode mode) {
         mode == MapMode::Continuous ? util::DEFAULT_FADE_DURATION : Duration::zero()
     };
 
-    hasPendingTransitions = false;
+    hasPendingTransitions = transitioningLight.hasTransition();
     for (const auto& layer : layers) {
         hasPendingTransitions |= layer->baseImpl->evaluate(parameters);
 
