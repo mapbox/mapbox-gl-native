@@ -987,6 +987,14 @@ void Map::setLight(std::unique_ptr<style::Light> light) {
     impl->style->light = *light;
 }
 
+style::Light* Map::getLight() {
+    if (!impl->style) {
+        return nullptr;
+    }
+
+    return &impl->style->light;
+}
+
 #pragma mark - Defaults
 
 std::string Map::getStyleName() const {

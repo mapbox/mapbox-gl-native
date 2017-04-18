@@ -182,6 +182,7 @@ public:
 
     // Light
     void setLight(std::unique_ptr<style::Light>);
+    style::Light* getLight();
 
     // Defaults
     std::string getStyleName() const;
