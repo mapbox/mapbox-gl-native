@@ -1,7 +1,6 @@
 #include <mbgl/test/util.hpp>
 
 #include <mbgl/util/constants.hpp>
-#include <mbgl/util/geo.hpp>
 #include <mbgl/util/projection.hpp>
 
 #include <limits>
@@ -60,4 +59,19 @@ TEST(Projection, ProjectedMeters) {
     latLng = Projection::latLngForProjectedMeters(projectedMeters);
     EXPECT_EQ(latLng.latitude(), util::LATITUDE_MAX);
     EXPECT_EQ(latLng.longitude(), util::LONGITUDE_MAX);
+}
+
+TEST(Projection, InvalidProjectedMeters) {
+    try {
+        ProjectedMeters { NAN };
+        ASSERT_TRUE(false) << "should throw";
+    } catch (const std::domain_error& error) {
+        ASSERT_EQ(std::string(error.what()), "northing must not be NaN");
+    }
+    try {
+        ProjectedMeters { 0, NAN };
+        ASSERT_TRUE(false) << "should throw";
+    } catch (const std::domain_error& error) {
+        ASSERT_EQ(std::string(error.what()), "easting must not be NaN");
+    }
 }

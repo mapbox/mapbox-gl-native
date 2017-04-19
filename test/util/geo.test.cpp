@@ -33,21 +33,6 @@ TEST(LatLng, InvalidLatLng) {
     }
 }
 
-TEST(ProjectedMeters, InvalidProjectedMeters) {
-    try {
-        ProjectedMeters { NAN };
-        ASSERT_TRUE(false) << "should throw";
-    } catch (const std::domain_error& error) {
-        ASSERT_EQ(std::string(error.what()), "northing must not be NaN");
-    }
-    try {
-        ProjectedMeters { 0, NAN };
-        ASSERT_TRUE(false) << "should throw";
-    } catch (const std::domain_error& error) {
-        ASSERT_EQ(std::string(error.what()), "easting must not be NaN");
-    }
-}
-
 TEST(EdgeInsets, InvalidEdgeInsets) {
     try {
         EdgeInsets { NAN };

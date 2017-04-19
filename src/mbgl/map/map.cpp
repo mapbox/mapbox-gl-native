@@ -17,7 +17,6 @@
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
 #include <mbgl/util/exception.hpp>
-#include <mbgl/util/projection.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/exception.hpp>
 #include <mbgl/util/async_task.hpp>
@@ -797,18 +796,6 @@ ViewportMode Map::getViewportMode() const {
 }
 
 #pragma mark - Projection
-
-double Map::getMetersPerPixelAtLatitude(double lat, double zoom) const {
-    return Projection::getMetersPerPixelAtLatitude(lat, zoom);
-}
-
-ProjectedMeters Map::projectedMetersForLatLng(const LatLng& latLng) const {
-    return Projection::projectedMetersForLatLng(latLng);
-}
-
-LatLng Map::latLngForProjectedMeters(const ProjectedMeters& projectedMeters) const {
-    return Projection::latLngForProjectedMeters(projectedMeters);
-}
 
 ScreenCoordinate Map::pixelForLatLng(const LatLng& latLng) const {
     // If the center and point longitudes are not in the same side of the
