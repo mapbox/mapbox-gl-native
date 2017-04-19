@@ -9,7 +9,7 @@
     {
       "size" : "16x16",
       "idiom" : "mac",
-      "filename" : "AppIcon32x32-1.png",
+      "filename" : "AppIcon16x16@2x.png",
       "scale" : "2x"
     },
     {
@@ -21,7 +21,7 @@
     {
       "size" : "32x32",
       "idiom" : "mac",
-      "filename" : "icon-1.png",
+      "filename" : "AppIcon32x32@2x.png",
       "scale" : "2x"
     },
     {
@@ -33,7 +33,7 @@
     {
       "size" : "128x128",
       "idiom" : "mac",
-      "filename" : "AppIcon256x256-1.png",
+      "filename" : "AppIcon128x128@2x.png",
       "scale" : "2x"
     },
     {
@@ -45,7 +45,7 @@
     {
       "size" : "256x256",
       "idiom" : "mac",
-      "filename" : "AppIcon512x512-1.png",
+      "filename" : "AppIcon256x256@2x.png",
       "scale" : "2x"
     },
     {
@@ -57,7 +57,7 @@
     {
       "size" : "512x512",
       "idiom" : "mac",
-      "filename" : "icon.png",
+      "filename" : "AppIcon512x512@2x.png",
       "scale" : "2x"
     }
   ],
