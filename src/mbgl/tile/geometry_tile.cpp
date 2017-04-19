@@ -52,15 +52,15 @@ void GeometryTile::cancel() {
 }
 
 void GeometryTile::setError(std::exception_ptr err) {
+    loaded = true;
+    renderable = false;
     observer->onTileError(*this, err);
 }
 
 void GeometryTile::setData(std::unique_ptr<const GeometryTileData> data_) {
     // Mark the tile as pending again if it was complete before to prevent signaling a complete
     // state despite pending parse operations.
-    if (availableData == DataAvailability::All) {
-        availableData = DataAvailability::Some;
-    }
+    pending = true;
 
     ++correlationID;
     worker.invoke(&GeometryTileWorker::setData, std::move(data_), correlationID);
@@ -74,9 +74,7 @@ void GeometryTile::setPlacementConfig(const PlacementConfig& desiredConfig) {
 
     // Mark the tile as pending again if it was complete before to prevent signaling a complete
     // state despite pending parse operations.
-    if (availableData == DataAvailability::All) {
-        availableData = DataAvailability::Some;
-    }
+    pending = true;
 
     ++correlationID;
     requestedConfig = desiredConfig;
@@ -86,9 +84,7 @@ void GeometryTile::setPlacementConfig(const PlacementConfig& desiredConfig) {
 void GeometryTile::redoLayout() {
     // Mark the tile as pending again if it was complete before to prevent signaling a complete
     // state despite pending parse operations.
-    if (availableData == DataAvailability::All) {
-        availableData = DataAvailability::Some;
-    }
+    pending = true;
 
     std::vector<std::unique_ptr<Layer>> copy;
 
@@ -111,7 +107,8 @@ void GeometryTile::redoLayout() {
 }
 
 void GeometryTile::onLayout(LayoutResult result) {
-    availableData = DataAvailability::Some;
+    loaded = true;
+    renderable = true;
     nonSymbolBuckets = std::move(result.nonSymbolBuckets);
     featureIndex = std::move(result.featureIndex);
     data = std::move(result.tileData);
@@ -120,8 +117,10 @@ void GeometryTile::onLayout(LayoutResult result) {
 }
 
 void GeometryTile::onPlacement(PlacementResult result) {
+    loaded = true;
+    renderable = true;
     if (result.correlationID == correlationID) {
-        availableData = DataAvailability::All;
+        pending = false;
     }
     symbolBuckets = std::move(result.symbolBuckets);
     collisionTile = std::move(result.collisionTile);
@@ -129,7 +128,9 @@ void GeometryTile::onPlacement(PlacementResult result) {
 }
 
 void GeometryTile::onError(std::exception_ptr err) {
-    availableData = DataAvailability::All;
+    loaded = true;
+    pending = false;
+    renderable = false;
     observer->onTileError(*this, err);
 }
     

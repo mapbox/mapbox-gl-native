@@ -46,13 +46,17 @@ TEST(VectorTile, setError) {
     VectorTile tile(OverscaledTileID(0, 0, 0), "source", test.updateParameters, test.tileset);
     tile.setError(std::make_exception_ptr(std::runtime_error("test")));
     EXPECT_FALSE(tile.isRenderable());
+    EXPECT_TRUE(tile.isLoaded());
+    EXPECT_TRUE(tile.isComplete());
 }
 
 TEST(VectorTile, onError) {
     VectorTileTest test;
     VectorTile tile(OverscaledTileID(0, 0, 0), "source", test.updateParameters, test.tileset);
     tile.onError(std::make_exception_ptr(std::runtime_error("test")));
-    EXPECT_TRUE(tile.isRenderable());
+    EXPECT_FALSE(tile.isRenderable());
+    EXPECT_TRUE(tile.isLoaded());
+    EXPECT_TRUE(tile.isComplete());
 }
 
 TEST(VectorTile, Issue7615) {

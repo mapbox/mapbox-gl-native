@@ -74,11 +74,23 @@ public:
     // partial state is still waiting for network resources but can also
     // be rendered, although layers will be missing.
     bool isRenderable() const {
-        return availableData != DataAvailability::None;
+        return renderable;
     }
 
+    // A tile is "Loaded" when we have received a response from a FileSource, and have attempted to
+    // parse the tile (if applicable). Tile implementations should set this to true when a load
+    // error occurred, or after the tile was parsed successfully.
+    bool isLoaded() const {
+        return loaded;
+    }
+
+    // "Completion" of a tile means that we have attempted to load it, and parsed it completely,
+    // i.e. no parsing or placement operations are pending for that tile.
+    // Completeness doesn't mean that the tile can be rendered, but merely that we have exhausted
+    // all options to get this tile to a renderable state. Some tiles may not be renderable, but
+    // complete, e.g. when a raster tile couldn't be loaded, or parsing failed.
     bool isComplete() const {
-        return availableData == DataAvailability::All;
+        return loaded && !pending;
     }
 
     void dumpDebugLogs() const;
@@ -92,21 +104,9 @@ public:
 
 protected:
     bool triedOptional = false;
-
-    enum class DataAvailability : uint8_t {
-        // Still waiting for data to load or parse.
-        None,
-
-        // Tile is partially parsed, some buckets are still waiting for dependencies
-        // to arrive, but it is good for rendering. Partial tiles can also be re-parsed,
-        // but might remain in the same state if dependencies are still missing.
-        Some,
-
-        // Tile is fully parsed, and all buckets are available if they exist.
-        All,
-    };
-
-    DataAvailability availableData = DataAvailability::None;
+    bool renderable = false;
+    bool pending = false;
+    bool loaded = false;
 
     TileObserver* observer = nullptr;
 };

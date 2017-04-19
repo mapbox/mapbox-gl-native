@@ -43,7 +43,9 @@ void updateRenderables(GetTileFn getTile,
             retainTile(*tile, Resource::Necessity::Required);
             renderTile(idealRenderTileID, *tile);
         } else {
-            bool triedPrevious = tile->hasTriedOptional();
+            // We are now attempting to load child and parent tiles.
+            bool parentHasTriedOptional = tile->hasTriedOptional();
+            bool parentIsLoaded = tile->isLoaded();
 
             // The tile isn't loaded yet, but retain it anyway because it's an ideal tile.
             retainTile(*tile, Resource::Necessity::Required);
@@ -91,13 +93,18 @@ void updateRenderables(GetTileFn getTile,
                     }
 
                     tile = getTile(parentDataTileID);
-                    if (!tile && triedPrevious) {
+                    if (!tile && (parentHasTriedOptional || parentIsLoaded)) {
                         tile = createTile(parentDataTileID);
                     }
 
                     if (tile) {
-                        triedPrevious = tile->hasTriedOptional();
-                        retainTile(*tile, Resource::Necessity::Optional);
+                        retainTile(*tile, parentIsLoaded ? Resource::Necessity::Required
+                                                         : Resource::Necessity::Optional);
+
+                        // Save the current values, since they're the parent of the next iteration
+                        // of the parent tile ascent loop.
+                        parentHasTriedOptional = tile->hasTriedOptional();
+                        parentIsLoaded = tile->isLoaded();
 
                         if (tile->isRenderable()) {
                             renderTile(parentRenderTileID, *tile);

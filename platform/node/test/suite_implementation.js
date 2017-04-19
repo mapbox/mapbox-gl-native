@@ -17,6 +17,8 @@ module.exports = function (style, options, callback) {
             request(req.url, {encoding: null}, function (err, response, body) {
                 if (err) {
                     callback(err);
+                } else if (response.statusCode == 404) {
+                    callback();
                 } else if (response.statusCode != 200) {
                     callback(new Error(response.statusMessage));
                 } else {
