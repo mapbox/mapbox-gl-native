@@ -234,7 +234,6 @@ public class BackgroundLayerTest extends BaseStyleTest {
     assertEquals(1, ((ExponentialStops) layer.getBackgroundOpacity().getFunction().getStops()).size());
   }
 
-
   @After
   public void unregisterIntentServiceIdlingResource() {
     Espresso.unregisterIdlingResources(idlingResource);

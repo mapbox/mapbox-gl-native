@@ -144,6 +144,25 @@ namespace android {
         }
     }
 
+    jni::String Layer::getSourceLayer(jni::JNIEnv& env) {
+        using namespace mbgl::style;
+
+        std::string sourceLayerId;
+        if (layer.is<FillLayer>()) {
+            sourceLayerId = layer.as<FillLayer>()->getSourceLayer();
+        } else if (layer.is<LineLayer>()) {
+            sourceLayerId = layer.as<LineLayer>()->getSourceLayer();
+        } else if (layer.is<SymbolLayer>()) {
+            sourceLayerId = layer.as<SymbolLayer>()->getSourceLayer();
+        } else if (layer.is<CircleLayer>()) {
+            sourceLayerId = layer.as<CircleLayer>()->getSourceLayer();
+        } else {
+            mbgl::Log::Warning(mbgl::Event::JNI, "Layer doesn't support source layer");
+        }
+
+        return jni::Make<jni::String>(env, sourceLayerId);
+    }
+
     jni::jfloat Layer::getMinZoom(jni::JNIEnv&){
         return layer.getMinZoom();
     }
@@ -180,6 +199,7 @@ namespace android {
             METHOD(&Layer::setPaintProperty, "nativeSetPaintProperty"),
             METHOD(&Layer::setFilter, "nativeSetFilter"),
             METHOD(&Layer::setSourceLayer, "nativeSetSourceLayer"),
+            METHOD(&Layer::getSourceLayer, "nativeGetSourceLayer"),
             METHOD(&Layer::getMinZoom, "nativeGetMinZoom"),
             METHOD(&Layer::getMaxZoom, "nativeGetMaxZoom"),
             METHOD(&Layer::setMinZoom, "nativeSetMinZoom"),

@@ -426,7 +426,6 @@ public class RasterLayerTest extends BaseStyleTest {
     assertEquals(1, ((ExponentialStops) layer.getRasterFadeDuration().getFunction().getStops()).size());
   }
 
-
   @After
   public void unregisterIntentServiceIdlingResource() {
     Espresso.unregisterIdlingResources(idlingResource);

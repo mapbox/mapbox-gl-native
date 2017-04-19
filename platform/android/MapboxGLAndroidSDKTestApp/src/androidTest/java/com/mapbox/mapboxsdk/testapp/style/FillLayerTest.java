@@ -83,6 +83,20 @@ public class FillLayerTest extends BaseStyleTest {
     assertEquals(layer.getVisibility().getValue(), NONE);
   }
 
+  @Test
+  public void testSourceLayer() {
+    checkViewIsDisplayed(R.id.mapView);
+    Timber.i("Visibility");
+    assertNotNull(layer);
+
+    // Get initial
+    assertEquals(layer.getSourceLayer(), "composite");
+
+    // Set
+    final String sourceLayer = "test";
+    layer.setSourceLayer(sourceLayer);
+    assertEquals(layer.getSourceLayer(), sourceLayer);
+  }
 
   @Test
   public void testFillAntialiasAsConstant() {
@@ -594,7 +608,6 @@ public class FillLayerTest extends BaseStyleTest {
     assertEquals(1, ((ExponentialStops) layer.getFillTranslate().getFunction().getStops()).size());
   }
 
-
   @Test
   public void testFillTranslateAnchorAsConstant() {
     checkViewIsDisplayed(R.id.mapView);
@@ -678,7 +691,6 @@ public class FillLayerTest extends BaseStyleTest {
     assertEquals(IntervalStops.class, layer.getFillPattern().getFunction().getStops().getClass());
     assertEquals(1, ((IntervalStops) layer.getFillPattern().getFunction().getStops()).size());
   }
-
 
   @After
   public void unregisterIntentServiceIdlingResource() {

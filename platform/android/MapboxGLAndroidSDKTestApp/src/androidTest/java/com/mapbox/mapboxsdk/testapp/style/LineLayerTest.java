@@ -83,6 +83,20 @@ public class LineLayerTest extends BaseStyleTest {
     assertEquals(layer.getVisibility().getValue(), NONE);
   }
 
+  @Test
+  public void testSourceLayer() {
+    checkViewIsDisplayed(R.id.mapView);
+    Timber.i("Visibility");
+    assertNotNull(layer);
+
+    // Get initial
+    assertEquals(layer.getSourceLayer(), "composite");
+
+    // Set
+    final String sourceLayer = "test";
+    layer.setSourceLayer(sourceLayer);
+    assertEquals(layer.getSourceLayer(), sourceLayer);
+  }
 
   @Test
   public void testLineCapAsConstant() {
@@ -120,7 +134,6 @@ public class LineLayerTest extends BaseStyleTest {
     assertEquals(1, ((IntervalStops) layer.getLineCap().getFunction().getStops()).size());
   }
 
-
   @Test
   public void testLineJoinAsConstant() {
     checkViewIsDisplayed(R.id.mapView);
@@ -156,7 +169,6 @@ public class LineLayerTest extends BaseStyleTest {
     assertEquals(IntervalStops.class, layer.getLineJoin().getFunction().getStops().getClass());
     assertEquals(1, ((IntervalStops) layer.getLineJoin().getFunction().getStops()).size());
   }
-
 
   @Test
   public void testLineMiterLimitAsConstant() {
@@ -194,7 +206,6 @@ public class LineLayerTest extends BaseStyleTest {
     assertEquals(0.5f, ((ExponentialStops) layer.getLineMiterLimit().getFunction().getStops()).getBase(), 0.001);
     assertEquals(1, ((ExponentialStops) layer.getLineMiterLimit().getFunction().getStops()).size());
   }
-
 
   @Test
   public void testLineRoundLimitAsConstant() {
@@ -572,7 +583,6 @@ public class LineLayerTest extends BaseStyleTest {
     assertEquals(0.5f, ((ExponentialStops) layer.getLineTranslate().getFunction().getStops()).getBase(), 0.001);
     assertEquals(1, ((ExponentialStops) layer.getLineTranslate().getFunction().getStops()).size());
   }
-
 
   @Test
   public void testLineTranslateAnchorAsConstant() {
@@ -1225,7 +1235,6 @@ public class LineLayerTest extends BaseStyleTest {
     assertEquals(IntervalStops.class, layer.getLinePattern().getFunction().getStops().getClass());
     assertEquals(1, ((IntervalStops) layer.getLinePattern().getFunction().getStops()).size());
   }
-
 
   @After
   public void unregisterIntentServiceIdlingResource() {

@@ -60,6 +60,15 @@ public class CircleLayer extends Layer {
   }
 
   /**
+   * Get the source layer.
+   *
+   * @return sourceLayer the source layer to get
+   */
+  public String getSourceLayer() {
+    return nativeGetSourceLayer();
+  }
+
+  /**
    * Set a single filter.
    *
    * @param filter the filter to set

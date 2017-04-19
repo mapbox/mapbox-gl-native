@@ -73,6 +73,8 @@ public abstract class Layer {
 
   protected native void nativeSetSourceLayer(String sourceLayer);
 
+  protected native String nativeGetSourceLayer();
+
   protected native float nativeGetMinZoom();
 
   protected native float nativeGetMaxZoom();
