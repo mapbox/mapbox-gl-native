@@ -18,6 +18,7 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 * Polygon holes [#8557](https://github.com/mapbox/mapbox-gl-native/pull/8557) and [#8722](https://github.com/mapbox/mapbox-gl-native/pull/8722)
 * Custom location source [#8710](https://github.com/mapbox/mapbox-gl-native/pull/8710)
 * Ensure surface is created after display and context [#8759](https://github.com/mapbox/mapbox-gl-native/pull/8759)
+* Harden telemetry event dispatch [#8767](https://github.com/mapbox/mapbox-gl-native/pull/8767)
 
 ## 5.0.2 - April 3, 2017
 
