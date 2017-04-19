@@ -33,34 +33,35 @@ TEST(StyleConversion, Light) {
         auto light = parseLight("{\"color\":{\"stops\":[[14,\"blue\"],[16,\"red\"]]},\"intensity\":0.3,\"position\":[3,90,90]}");
         ASSERT_TRUE((bool) light);
 
-        ASSERT_TRUE(light->get<LightAnchor>().isUndefined());
-        ASSERT_FALSE(light->get<LightAnchor>().isConstant());
-        ASSERT_FALSE(light->get<LightAnchor>().isCameraFunction());
+        ASSERT_TRUE(light->get<LightAnchor>().value.isUndefined());
+        ASSERT_FALSE(light->get<LightAnchor>().value.isConstant());
+        ASSERT_FALSE(light->get<LightAnchor>().value.isCameraFunction());
 
-        ASSERT_FALSE(light->get<LightIntensity>().isUndefined());
-        ASSERT_TRUE(light->get<LightIntensity>().isConstant());
-        ASSERT_EQ(light->get<LightIntensity>().asConstant(), 0.3f);
-        ASSERT_FALSE(light->get<LightAnchor>().isCameraFunction());
+        ASSERT_FALSE(light->get<LightIntensity>().value.isUndefined());
+        ASSERT_TRUE(light->get<LightIntensity>().value.isConstant());
+        ASSERT_EQ(light->get<LightIntensity>().value.asConstant(), 0.3f);
+        ASSERT_FALSE(light->get<LightAnchor>().value.isCameraFunction());
 
-        ASSERT_FALSE(light->get<LightColor>().isUndefined());
-        ASSERT_FALSE(light->get<LightColor>().isConstant());
-        ASSERT_TRUE(light->get<LightColor>().isCameraFunction());
+        ASSERT_FALSE(light->get<LightColor>().value.isUndefined());
+        ASSERT_FALSE(light->get<LightColor>().value.isConstant());
+        ASSERT_TRUE(light->get<LightColor>().value.isCameraFunction());
 
-        ASSERT_FALSE(light->get<LightPosition>().isUndefined());
-        ASSERT_TRUE(light->get<LightPosition>().isConstant());
+        ASSERT_FALSE(light->get<LightPosition>().value.isUndefined());
+        ASSERT_TRUE(light->get<LightPosition>().value.isConstant());
         std::array<float, 3> expected{{ 3, 90, 90 }};
-        ASSERT_EQ(light->get<LightPosition>().asConstant(), mbgl::style::Position({ expected }));
-        ASSERT_FALSE(light->get<LightPosition>().isCameraFunction());
+        ASSERT_EQ(light->get<LightPosition>().value.asConstant(), mbgl::style::Position({ expected }));
+        ASSERT_FALSE(light->get<LightPosition>().value.isCameraFunction());
     }
 
     {
         auto light = parseLight("{\"color\":\"blue\",\"intensity\":0.3,\"color-transition\":{\"duration\":1000}}");
         ASSERT_TRUE((bool) light);
 
-        ASSERT_FALSE(light->get<LightColor>().isUndefined());
-        ASSERT_TRUE(light->get<LightColor>().isConstant());
-        ASSERT_FALSE(light->get<LightColor>().isCameraFunction());
-        ASSERT_EQ(light->getTransition<LightColor>().duration, mbgl::Duration(mbgl::Milliseconds(1000)));
+        ASSERT_FALSE(light->get<LightColor>().value.isUndefined());
+        ASSERT_TRUE(light->get<LightColor>().value.isConstant());
+        ASSERT_FALSE(light->get<LightColor>().value.isCameraFunction());
+        ASSERT_EQ(light->get<LightColor>().transition.duration, mbgl::Duration(mbgl::Milliseconds(1000)));
+        ASSERT_FALSE((bool) light->get<LightColor>().transition.delay);
     }
 
     {
