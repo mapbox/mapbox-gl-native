@@ -40,7 +40,7 @@ dependencies:
 
 ### Additional Dependencies for macOS
 
- - Apple Command Line Tools (available at [Apple Developer](https://developer.apple.com/download/more/))
+ - Apple Command Line Tools (available at [Apple Developer](https://developer.apple.com/download/more/)) with Xcode 7.3 or later.
  - [Homebrew](http://brew.sh)
  - [Cask](http://caskroom.io/) (if building for Android)
  - [xcpretty](https://github.com/supermarin/xcpretty) (`gem install xcpretty`)
