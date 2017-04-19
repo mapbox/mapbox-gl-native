@@ -35,10 +35,10 @@ import java.util.Arrays;
  */
 public class MapboxMapOptions implements Parcelable {
 
+  private static final float DIMENSION_THREE_DP = 3f;
   private static final float DIMENSION_SEVEN_DP = 7f;
-  private static final float DIMENSION_TEN_DP = 10f;
   private static final float DIMENSION_SIXTEEN_DP = 16f;
-  private static final float DIMENSION_SEVENTY_SIX_DP = 76f;
+  private static final float DIMENSION_ONE_HUNDRED_ONE_DP = 101f;
 
   private CameraPosition cameraPosition;
 
@@ -206,13 +206,13 @@ public class MapboxMapOptions implements Parcelable {
         Gravity.TOP | Gravity.END));
       mapboxMapOptions.compassMargins(new int[] {
         (int) (typedArray.getDimension(R.styleable.mapbox_MapView_mapbox_uiCompassMarginLeft,
-          DIMENSION_TEN_DP * pxlRatio)),
+          DIMENSION_SEVEN_DP * pxlRatio)),
         ((int) typedArray.getDimension(R.styleable.mapbox_MapView_mapbox_uiCompassMarginTop,
-          DIMENSION_TEN_DP * pxlRatio)),
+          DIMENSION_SEVEN_DP * pxlRatio)),
         ((int) typedArray.getDimension(R.styleable.mapbox_MapView_mapbox_uiCompassMarginRight,
-          DIMENSION_TEN_DP * pxlRatio)),
+          DIMENSION_SEVEN_DP * pxlRatio)),
         ((int) typedArray.getDimension(R.styleable.mapbox_MapView_mapbox_uiCompassMarginBottom,
-          DIMENSION_TEN_DP * pxlRatio))});
+          DIMENSION_SEVEN_DP * pxlRatio))});
       mapboxMapOptions.compassFadesWhenFacingNorth(typedArray.getBoolean(
         R.styleable.mapbox_MapView_mapbox_uiCompassFadeFacingNorth, true));
       Drawable compassDrawable = typedArray.getDrawable(
@@ -243,11 +243,11 @@ public class MapboxMapOptions implements Parcelable {
         R.styleable.mapbox_MapView_mapbox_uiAttributionGravity, Gravity.BOTTOM));
       mapboxMapOptions.attributionMargins(new int[] {
         (int) (typedArray.getDimension(R.styleable.mapbox_MapView_mapbox_uiAttributionMarginLeft,
-          DIMENSION_SEVENTY_SIX_DP) * pxlRatio),
+          DIMENSION_ONE_HUNDRED_ONE_DP) * pxlRatio),
         (int) (typedArray.getDimension(R.styleable.mapbox_MapView_mapbox_uiAttributionMarginTop,
-          DIMENSION_SEVEN_DP * pxlRatio)),
+          DIMENSION_THREE_DP * pxlRatio)),
         (int) (typedArray.getDimension(R.styleable.mapbox_MapView_mapbox_uiAttributionMarginRight,
-          DIMENSION_SEVEN_DP * pxlRatio)),
+          DIMENSION_THREE_DP * pxlRatio)),
         (int) (typedArray.getDimension(R.styleable.mapbox_MapView_mapbox_uiAttributionMarginBottom,
           DIMENSION_SEVEN_DP * pxlRatio))});
 
