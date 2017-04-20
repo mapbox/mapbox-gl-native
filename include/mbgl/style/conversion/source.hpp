@@ -1,6 +1,7 @@
 #pragma once
 
 #include <mbgl/style/conversion.hpp>
+#include <mbgl/style/conversion/coordinate.hpp>
 #include <mbgl/style/conversion/geojson.hpp>
 #include <mbgl/style/conversion/geojson_options.hpp>
 #include <mbgl/style/conversion/tileset.hpp>
@@ -8,6 +9,8 @@
 #include <mbgl/style/sources/geojson_source.hpp>
 #include <mbgl/style/sources/raster_source.hpp>
 #include <mbgl/style/sources/vector_source.hpp>
+#include <mbgl/style/sources/image_source.hpp>
+#include <mbgl/util/geo.hpp>
 
 namespace mbgl {
 namespace style {
@@ -16,6 +19,7 @@ namespace conversion {
 template <>
 struct Converter<std::unique_ptr<Source>> {
 public:
+    
     template <class V>
     optional<std::unique_ptr<Source>> operator()(const V& value, Error& error, const std::string& id) const {
         if (!isObject(value)) {
@@ -41,6 +45,8 @@ public:
             return convertVectorSource(id, value, error);
         } else if (*type == "geojson") {
             return convertGeoJSONSource(id, value, error);
+        } else if (*type == "image") {
+            return convertImageSource(id, value, error);
         } else {
             error = { "invalid source type" };
             return {};
@@ -133,6 +139,48 @@ private:
             error = { "GeoJSON data must be a URL or an object" };
             return {};
         }
+
+        return { std::move(result) };
+    }
+    
+    template <class V>
+    optional<std::unique_ptr<Source>> convertImageSource(const std::string& id,
+                                                        const V& value,
+                                                        Error& error) const {
+        auto urlValue = objectMember(value, "url");
+        if (!urlValue) {
+            error = { "Image source must have a url value" };
+            return {};
+        }
+        
+        auto urlString = toString(*urlValue);
+        if (!urlString) {
+            error = { "Image url must be a URL string" };
+            return {};
+        }
+        
+        auto coordinatesValue = objectMember(value, "coordinates");
+        if (!coordinatesValue) {
+            error = { "Image source must have a coordinates values" };
+            return {};
+        }
+        
+        if (!isArray(*coordinatesValue) || arrayLength(*coordinatesValue) != 4) {
+            error = { "Image coordinates must be an array of four longitude latitude pairs" };
+            return {};
+        }
+        
+        std::vector<LatLng> coordinates;
+        coordinates.reserve(4);
+        for( std::size_t i=0; i < arrayLength(*coordinatesValue); i++) {
+            auto latLng = conversion::convert<LatLng>(arrayMember(*coordinatesValue,i), error);
+            if (!latLng) {
+                return {};
+            }
+            coordinates.push_back(*latLng);
+        }
+        auto result = std::make_unique<ImageSource>(id, coordinates);
+        result->setURL(*urlString);
 
         return { std::move(result) };
     }

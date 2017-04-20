@@ -1,0 +1,7 @@
+{
+  "default": {
+    "log": [
+      [1, "WARNING", "ParseStyle", "Image coordinates must be an array of four longitude latitude pairs"]
+    ]
+  }
+}
