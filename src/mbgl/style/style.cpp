@@ -310,7 +310,7 @@ void Style::cascade(const TimePoint& timePoint, MapMode mode) {
         layer->baseImpl->cascade(parameters);
     }
 
-    transitioningLight = TransitioningLight(light.get(), std::move(transitioningLight), parameters);
+    transitioningLight = TransitioningLight(*light, std::move(transitioningLight), parameters);
 }
 
 void Style::recalculate(float z, const TimePoint& timePoint, MapMode mode) {
