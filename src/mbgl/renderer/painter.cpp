@@ -13,6 +13,7 @@
 
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/layer_impl.hpp>
+#include <mbgl/style/layers/custom_layer_impl.hpp>
 
 #include <mbgl/tile/tile.hpp>
 #include <mbgl/renderer/layers/render_background_layer.hpp>
@@ -179,12 +180,7 @@ void Painter::render(const Style& style, const FrameData& frame_, View& view, Sp
         annotationSpriteAtlas.upload(context, 0);
 
         for (const auto& item : order) {
-            for (const auto& tileRef : item.tiles) {
-                const auto& bucket = tileRef.get().tile.getBucket(*item.layer.baseImpl);
-                if (bucket && bucket->needsUpload()) {
-                    bucket->upload(context);
-                }
-            }
+            item.layer.uploadBuckets(context, item.source);
         }
     }
 
@@ -336,13 +332,7 @@ void Painter::renderPass(PaintParameters& parameters,
             context.setDepthMode(depthModeForSublayer(0, gl::DepthMode::ReadWrite));
             context.clear(Color{ 0.0f, 0.0f, 0.0f, 0.0f }, 1.0f, {});
 
-            for (auto& tileRef : item.tiles) {
-                auto& tile = tileRef.get();
-
-                MBGL_DEBUG_GROUP(context, layer.baseImpl->id + " - " + util::toString(tile.id));
-                auto bucket = tile.tile.getBucket(*layer.baseImpl);
-                bucket->render(*this, parameters, layer, tile);
-            }
+            renderItem(parameters, item);
 
             parameters.view.bind();
             context.bindTexture(extrusionTexture->getTexture());
@@ -364,18 +354,19 @@ void Painter::renderPass(PaintParameters& parameters,
                 ExtrusionTextureProgram::PaintPropertyBinders{ properties, 0 }, properties,
                 state.getZoom());
         } else {
-            for (auto& tileRef : item.tiles) {
-                auto& tile = tileRef.get();
-                MBGL_DEBUG_GROUP(context, layer.baseImpl->id + " - " + util::toString(tile.id));
-                auto bucket = tile.tile.getBucket(*layer.baseImpl);
-                bucket->render(*this, parameters, layer, tile);
-            }
+            renderItem(parameters, item);
         }
     }
 
     if (debug::renderTree) {
         Log::Info(Event::Render, "%*s%s", --indent * 4, "", "}");
     }
+}
+
+void Painter::renderItem(PaintParameters& parameters, const RenderItem& item) {
+    RenderLayer& layer = item.layer;
+    MBGL_DEBUG_GROUP(context, layer.getID());
+    layer.render(*this, parameters, item.source);
 }
 
 mat4 Painter::matrixForTile(const UnwrappedTileID& tileID) {

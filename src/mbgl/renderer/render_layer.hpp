@@ -14,6 +14,14 @@ class Bucket;
 class BucketParameters;
 class TransitionParameters;
 class PropertyEvaluationParameters;
+class Painter;
+class PaintParameters;
+class RenderSource;
+class RenderTile;
+
+namespace gl {
+class Context;
+}   // namespace gl
 
 class RenderLayer {
 protected:
@@ -58,6 +66,8 @@ public:
     // Checks whether this layer can be rendered.
     bool needsRendering(float zoom) const;
 
+    virtual void uploadBuckets(gl::Context&, RenderSource* source);
+    virtual void render(Painter& , PaintParameters& , RenderSource* source);
     // Check wether the given geometry intersects
     // with the feature
     virtual bool queryIntersectsFeature(
@@ -69,6 +79,7 @@ public:
 
     virtual std::unique_ptr<Bucket> createBucket(const BucketParameters&, const std::vector<const RenderLayer*>&) const = 0;
 
+    void setRenderTiles(std::vector<std::reference_wrapper<RenderTile>>);
     // Private implementation
     Immutable<style::Layer::Impl> baseImpl;
     void setImpl(Immutable<style::Layer::Impl>);
@@ -79,6 +90,10 @@ protected:
     // Stores what render passes this layer is currently enabled for. This depends on the
     // evaluated StyleProperties object and is updated accordingly.
     RenderPass passes = RenderPass::None;
+
+    //Stores current set of tiles to be rendered for this layer.
+    std::vector<std::reference_wrapper<RenderTile>> renderTiles;
+
 };
 
 } // namespace mbgl

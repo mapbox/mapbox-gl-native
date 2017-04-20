@@ -17,13 +17,13 @@ namespace style {
 
 class RenderItem {
 public:
-    RenderItem(const RenderLayer& layer_,
-               std::vector<std::reference_wrapper<RenderTile>> tiles_ = {})
-        : layer(layer_), tiles(std::move(tiles_)) {
+    RenderItem(RenderLayer& layer_,
+               RenderSource* renderSource_)
+        : layer(layer_), source(renderSource_) {
     }
 
-    const RenderLayer& layer;
-    std::vector<std::reference_wrapper<RenderTile>> tiles;
+    RenderLayer& layer;
+    RenderSource* source;
 };
 
 class RenderData {

@@ -94,6 +94,8 @@ public:
     void renderRaster(PaintParameters&, RasterBucket&, const RenderRasterLayer&, const RenderTile&);
     void renderBackground(PaintParameters&, const RenderBackgroundLayer&);
 
+    void renderItem(PaintParameters&, const RenderItem&);
+
 #ifndef NDEBUG
     // Renders tile clip boundaries, using stencil buffer to calculate fill color.
     void renderClipMasks(PaintParameters&);
@@ -104,8 +106,6 @@ public:
     bool needsAnimation() const;
 
 private:
-    std::vector<RenderItem> determineRenderOrder(const style::Style&);
-
     template <class Iterator>
     void renderPass(PaintParameters&,
                     RenderPass,
