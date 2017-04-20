@@ -27,12 +27,12 @@ private:
 
 public:
     Transitioning() = default;
-    Transitioning(const Raw* raw, Transitioning&& prior, const CascadeParameters& params)
+    Transitioning(const Raw& raw, Transitioning&& prior, const CascadeParameters& params)
         : Super {
             TransitioningProperty<typename Ps::ValueType>(
-                raw->template get<Ps>().value,
+                raw.template get<Ps>().value,
                 std::move(prior.template get<Ps>()),
-                raw->template get<Ps>().transition.reverseMerge(params.transition),
+                raw.template get<Ps>().transition.reverseMerge(params.transition),
                 params.now)...
         } {}
 
