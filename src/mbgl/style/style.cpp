@@ -39,8 +39,9 @@ namespace style {
 
 static Observer nullObserver;
 
-Style::Style(FileSource& fileSource_, float pixelRatio)
-    : fileSource(fileSource_),
+Style::Style(Scheduler& scheduler_, FileSource& fileSource_, float pixelRatio)
+    : scheduler(scheduler_),
+      fileSource(fileSource_),
       glyphAtlas(std::make_unique<GlyphAtlas>(Size{ 2048, 2048 }, fileSource)),
       spriteAtlas(std::make_unique<SpriteAtlas>(Size{ 1024, 1024 }, pixelRatio)),
       lineAtlas(std::make_unique<LineAtlas>(Size{ 256, 512 })),
@@ -131,7 +132,7 @@ void Style::setJSON(const std::string& json) {
     defaultPitch = parser.pitch;
 
     glyphAtlas->setURL(parser.glyphURL);
-    spriteAtlas->load(parser.spriteURL, fileSource);
+    spriteAtlas->load(parser.spriteURL, scheduler, fileSource);
 
     loaded = true;
 
