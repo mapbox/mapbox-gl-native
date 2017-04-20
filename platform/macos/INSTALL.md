@@ -4,7 +4,7 @@ This document explains how to build a development version of the Mapbox macOS SD
 
 ### Requirements
 
-The Mapbox macOS SDK requires the macOS 10.10.0 SDK (or above) and Xcode 7.3 (or above).
+The Mapbox macOS SDK requires the macOS 10.10.0 SDK (or above) and Xcode 8.0 (or above).
 
 ### Building the SDK from source
 
