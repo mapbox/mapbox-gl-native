@@ -13,6 +13,8 @@ If you want to contribute code:
   * [Mapbox iOS SDK](platform/ios/CHANGELOG.md)
   * [Mapbox macOS SDK](platform/macos/CHANGELOG.md)
   * [node-mapbox-gl-native](platform/node/CHANGELOG.md)
+ 
+ If you must use the `hub pull-request` command, please use it only on issues that you have opened yourself, preferably on issues that you opened with a fix in hand.
 
 1. Prefix your commit messages with the platform(s) your changes affect: `[core]`, `[android]`, `[ios]`, `[macos]`, `[node]`, or `[qt]`.
 
