@@ -196,7 +196,7 @@ In style JSON | In Objective-C | In Swift
 `fill-translate` | `MGLFillStyleLayer.fillTranslation` | `MGLFillStyleLayer.fillTranslation`
 `fill-translate-anchor` | `MGLFillStyleLayer.fillTranslationAnchor` | `MGLFillStyleLayer.fillTranslationAnchor`
 
-### FillExtrusion style layers
+### Fill extrusion style layers
 
 In style JSON | In Objective-C | In Swift
 --------------|----------------|---------
