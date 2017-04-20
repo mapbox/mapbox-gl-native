@@ -359,7 +359,7 @@ void Map::setStyleURL(const std::string& url) {
     impl->styleJSON.clear();
     impl->styleMutated = false;
 
-    impl->style = std::make_unique<Style>(impl->fileSource, impl->pixelRatio);
+    impl->style = std::make_unique<Style>(impl->scheduler, impl->fileSource, impl->pixelRatio);
 
     impl->styleRequest = impl->fileSource.request(Resource::style(impl->styleURL), [this](Response res) {
         // Once we get a fresh style, or the style is mutated, stop revalidating.
@@ -405,7 +405,7 @@ void Map::setStyleJSON(const std::string& json) {
     impl->styleJSON.clear();
     impl->styleMutated = false;
 
-    impl->style = std::make_unique<Style>(impl->fileSource, impl->pixelRatio);
+    impl->style = std::make_unique<Style>(impl->scheduler, impl->fileSource, impl->pixelRatio);
 
     impl->loadStyleJSON(json);
 }

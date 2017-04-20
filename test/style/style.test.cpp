@@ -7,6 +7,7 @@
 #include <mbgl/style/layer.hpp>
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/run_loop.hpp>
+#include <mbgl/util/default_thread_pool.hpp>
 
 #include <memory>
 
@@ -16,8 +17,9 @@ using namespace mbgl::style;
 TEST(Style, UnusedSource) {
     util::RunLoop loop;
 
+    ThreadPool threadPool{ 1 };
     StubFileSource fileSource;
-    Style style { fileSource, 1.0 };
+    Style style { threadPool, fileSource, 1.0 };
 
     auto now = Clock::now();
 
@@ -53,8 +55,9 @@ TEST(Style, UnusedSource) {
 TEST(Style, UnusedSourceActiveViaClassUpdate) {
     util::RunLoop loop;
 
+    ThreadPool threadPool{ 1 };
     StubFileSource fileSource;
-    Style style { fileSource, 1.0 };
+    Style style { threadPool, fileSource, 1.0 };
 
     style.setJSON(util::read_file("test/fixtures/resources/style-unused-sources.json"));
     EXPECT_TRUE(style.addClass("visible"));
@@ -86,8 +89,9 @@ TEST(Style, UnusedSourceActiveViaClassUpdate) {
 TEST(Style, Properties) {
     util::RunLoop loop;
 
+    ThreadPool threadPool{ 1 };
     StubFileSource fileSource;
-    Style style { fileSource, 1.0 };
+    Style style { threadPool, fileSource, 1.0 };
 
     style.setJSON(R"STYLE({"name": "Test"})STYLE");
     ASSERT_EQ("Test", style.getName());
@@ -120,8 +124,9 @@ TEST(Style, Properties) {
 TEST(Style, DuplicateSource) {
     util::RunLoop loop;
 
+    ThreadPool threadPool{ 1 };
     StubFileSource fileSource;
-    Style style { fileSource, 1.0 };
+    Style style { threadPool, fileSource, 1.0 };
 
     style.setJSON(util::read_file("test/fixtures/resources/style-unused-sources.json"));
 
