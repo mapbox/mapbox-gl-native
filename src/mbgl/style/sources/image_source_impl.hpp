@@ -17,7 +17,7 @@ public:
 
     ~Impl() final;
 
-    void setImage(UnassociatedImage );
+    void setImage(UnassociatedImage&& );
     const mbgl::UnassociatedImage& getImage() const;
     std::vector<LatLng> getCoordinates() const;
 

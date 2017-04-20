@@ -77,6 +77,34 @@ void Painter::renderTileDebug(const RenderTile& renderTile) {
     }
 }
 
+void Painter::renderTileDebug(const mat4& matrix) {
+    if (frame.debugOptions == MapDebugOptions::NoDebug)
+        return;
+
+    static const style::Properties<>::PossiblyEvaluated properties {};
+    static const DebugProgram::PaintPropertyBinders paintAttibuteData(properties, 0);
+
+    if (frame.debugOptions & MapDebugOptions::TileBorders) {
+        programs->debug.draw(
+            context,
+            gl::LineStrip { 4.0f * frame.pixelRatio },
+            gl::DepthMode::disabled(),
+            gl::StencilMode::disabled(),
+            gl::ColorMode::unblended(),
+            DebugProgram::UniformValues {
+             uniforms::u_matrix::Value{ matrix },
+             uniforms::u_color::Value{ Color::red() }
+            },
+            tileVertexBuffer,
+            tileBorderIndexBuffer,
+            tileBorderSegments,
+            paintAttibuteData,
+            properties,
+            state.getZoom()
+        );
+    }
+}
+
 #ifndef NDEBUG
 void Painter::renderClipMasks(PaintParameters&) {
     context.setStencilMode(gl::StencilMode::disabled());

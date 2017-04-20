@@ -22,7 +22,7 @@ ImageSource::Impl::Impl(const Impl& rhs, UnassociatedImage image_)
 }
 ImageSource::Impl::~Impl() = default;
 
-void ImageSource::Impl::setImage(UnassociatedImage image_) {
+void ImageSource::Impl::setImage(UnassociatedImage&& image_) {
     image = std::move(image_);
 }
 

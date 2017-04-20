@@ -242,6 +242,8 @@ set(MBGL_CORE_FILES
     # renderer/sources
     src/mbgl/renderer/sources/render_geojson_source.cpp
     src/mbgl/renderer/sources/render_geojson_source.hpp
+    src/mbgl/renderer/sources/render_image_source.cpp
+    src/mbgl/renderer/sources/render_image_source.hpp
     src/mbgl/renderer/sources/render_raster_source.cpp
     src/mbgl/renderer/sources/render_raster_source.hpp
     src/mbgl/renderer/sources/render_vector_source.cpp
