@@ -11,6 +11,7 @@ MBGL_DEFINE_ENUM(SourceType, {
     { SourceType::GeoJSON, "geojson" },
     { SourceType::Video, "video" },
     { SourceType::Annotations, "annotations" },
+    { SourceType::Image, "image" },
 });
 
 MBGL_DEFINE_ENUM(VisibilityType, {

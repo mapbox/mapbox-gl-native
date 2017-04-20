@@ -7,6 +7,7 @@
 #include <mbgl/style/sources/raster_source.hpp>
 #include <mbgl/style/sources/vector_source.hpp>
 #include <mbgl/style/sources/geojson_source.hpp>
+#include <mbgl/style/sources/image_source.hpp>
 
 #include <mbgl/renderer/sources/render_raster_source.hpp>
 #include <mbgl/renderer/sources/render_vector_source.hpp>
@@ -16,6 +17,9 @@
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/io.hpp>
+#include <mbgl/util/premultiply.hpp>
+#include <mbgl/util/image.hpp>
+
 #include <mbgl/util/tileset.hpp>
 #include <mbgl/util/default_thread_pool.hpp>
 #include <mbgl/util/logging.hpp>
@@ -432,6 +436,42 @@ TEST(Source, GeoJSonSourceUrlUpdate) {
     test.loop.invoke([&] () {
         // Update the url
         source.setURL(std::string("http://source-url.ext"));
+    });
+
+    test.run();
+}
+
+TEST(Source, ImageSourceImageUpdate) {
+    SourceTest test;
+
+    test.fileSource.response = [&] (const Resource& resource) {
+        EXPECT_EQ("http://url", resource.url);
+        Response response;
+        response.data = std::make_unique<std::string>(util::read_file("test/fixtures/image/no_profile.png"));
+        return response;
+    };
+    test.styleObserver.sourceChanged = [&] (Source&) {
+        // Should be called (test will hang if it doesn't)
+        test.end();
+    };
+    std::vector<LatLng> coords;
+
+    ImageSource source("source", coords);
+    source.setURL("http://url");
+    source.setObserver(&test.styleObserver);
+
+    // Load initial, so the source state will be loaded=true
+    source.loadDescription(test.fileSource);
+    UnassociatedImage rgba({ 1, 1 });
+    rgba.data[0] = 255;
+    rgba.data[1] = 254;
+    rgba.data[2] = 253;
+    rgba.data[3] = 128;
+
+    // Schedule an update
+    test.loop.invoke([&] () {
+        // Update the url
+        source.setImage(std::move(rgba));
     });
 
     test.run();

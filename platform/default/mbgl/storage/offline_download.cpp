@@ -120,6 +120,7 @@ OfflineRegionStatus OfflineDownload::getStatus() const {
 
         case SourceType::Video:
         case SourceType::Annotations:
+        case SourceType::Image:
             break;
         }
     }
@@ -197,6 +198,7 @@ void OfflineDownload::activateDownload() {
 
             case SourceType::Video:
             case SourceType::Annotations:
+            case SourceType::Image:
                 break;
             }
         }

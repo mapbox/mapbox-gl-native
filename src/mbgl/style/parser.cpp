@@ -2,6 +2,7 @@
 #include <mbgl/style/layer_impl.hpp>
 #include <mbgl/style/rapidjson_conversion.hpp>
 #include <mbgl/style/conversion.hpp>
+#include <mbgl/style/conversion/coordinate.hpp>
 #include <mbgl/style/conversion/source.hpp>
 #include <mbgl/style/conversion/layer.hpp>
 #include <mbgl/style/conversion/light.hpp>
@@ -55,10 +56,12 @@ StyleParseResult Parser::parse(const std::string& json) {
 
     if (document.HasMember("center")) {
         const JSValue& value = document["center"];
-        if (value.IsArray() && value.Size() >= 2) {
-            // Style spec uses lon/lat order
-            latLng = LatLng(value[1].IsNumber() ? value[1].GetDouble() : 0,
-                            value[0].IsNumber() ? value[0].GetDouble() : 0);
+        conversion::Error error;
+        auto convertedLatLng = conversion::convert<LatLng>(value, error);
+        if (convertedLatLng) {
+            latLng = *convertedLatLng;
+        } else {
+            Log::Warning(Event::ParseStyle, "center coordinate must be a longitude, latitude pair");
         }
     }
 
