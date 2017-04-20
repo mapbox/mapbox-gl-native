@@ -51,10 +51,10 @@ template <>
 struct Interpolator<style::Position> {
 public:
     style::Position operator()(const style::Position& a, const style::Position& b, const double t) {
-        auto interpolated = interpolate(a.getSpherical(), b.getSpherical(), t);
-        return {
-            style::Position(interpolated)
-        };
+        auto pos = style::Position();
+        auto interpolated = interpolate(a.getCartesian(), b.getCartesian(), t);
+        pos.setCartesian(interpolated);
+        return { pos };
     }
 };
 
