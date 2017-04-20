@@ -270,6 +270,7 @@ set(MBGL_CORE_FILES
     src/mbgl/style/observer.hpp
     src/mbgl/style/paint_property.hpp
     src/mbgl/style/paint_property_binder.hpp
+    src/mbgl/style/paint_property_statistics.hpp
     src/mbgl/style/parser.cpp
     src/mbgl/style/parser.hpp
     src/mbgl/style/possibly_evaluated_property_value.hpp
@@ -431,6 +432,7 @@ set(MBGL_CORE_FILES
     src/mbgl/tile/vector_tile.hpp
 
     # util
+    include/mbgl/util/any.hpp
     include/mbgl/util/async_request.hpp
     include/mbgl/util/async_task.hpp
     include/mbgl/util/char_array_buffer.hpp
