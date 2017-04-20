@@ -27,8 +27,8 @@ int main(int argc, char *argv[]) {
     double zoom = 0;
     double bearing = 0;
     double pitch = 0;
+    double pixelRatio = 1;
 
-    uint32_t pixelRatio = 1;
     uint32_t width = 512;
     uint32_t height = 512;
     static std::string output = "out.png";
@@ -84,7 +84,8 @@ int main(int argc, char *argv[]) {
 
     HeadlessBackend backend;
     BackendScope scope { backend };
-    OffscreenView view(backend.getContext(), { width * pixelRatio, height * pixelRatio });
+    OffscreenView view(backend.getContext(), { static_cast<uint32_t>(width * pixelRatio),
+                                               static_cast<uint32_t>(height * pixelRatio) });
     ThreadPool threadPool(4);
     Map map(backend, mbgl::Size { width, height }, pixelRatio, fileSource, threadPool, MapMode::Still);
 
