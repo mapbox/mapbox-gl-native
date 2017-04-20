@@ -1,3 +1,8 @@
+# 3.5.0 - April 20, 2017
+
+- Fixed an issue where raster tiles that were not found caused `map.render()` to hang ([#8769](https://github.com/mapbox/mapbox-gl-native/pull/8769))
+- Adds method `map.cancel()` which cancels an ongoing `render` call. ([#8249](https://github.com/mapbox/mapbox-gl-native/pull/8249))
+
 # 3.4.7 - March 15, 2017
 
 - Fixed MacOS Release builds ([8409](https://github.com/mapbox/mapbox-gl-native/pull/8409))
