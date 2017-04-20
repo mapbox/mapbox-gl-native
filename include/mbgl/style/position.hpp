@@ -16,7 +16,7 @@ public:
 
     friend bool operator==(const Position& lhs, const Position& rhs) {
         return lhs.radial == rhs.radial && lhs.azimuthal == rhs.azimuthal && lhs.polar == rhs.polar;
-        // TODO should this address wrapping? or should somewhere else in Position address wrapping?
+        // TODO this doesn't address wrapping, which would be better addressed by comparing cartesian coordinates but being calculated floats are ont to be trusted.
     }
 
     friend bool operator!=(const Position& lhs, const Position& rhs) {
@@ -37,6 +37,13 @@ public:
         polar = position_[2];
         calculateCartesian();
     };
+
+    // Utility function to be used only during interpolation; this leaves spherical coordinates undefined.
+    void setCartesian(std::array<float, 3>& position_) {
+        x = position_[0];
+        y = position_[1];
+        z = position_[2];
+    }
 
 private:
     float radial;
