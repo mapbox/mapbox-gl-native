@@ -54,6 +54,7 @@ Style::Style(Scheduler& scheduler_, FileSource& fileSource_, float pixelRatio)
       glyphAtlas(std::make_unique<GlyphAtlas>(Size{ 2048, 2048 }, fileSource)),
       spriteAtlas(std::make_unique<SpriteAtlas>(Size{ 1024, 1024 }, pixelRatio)),
       lineAtlas(std::make_unique<LineAtlas>(Size{ 256, 512 })),
+      light(std::make_unique<Light>()),
       observer(&nullObserver) {
     glyphAtlas->setObserver(this);
     spriteAtlas->setObserver(this);
@@ -141,7 +142,7 @@ void Style::setJSON(const std::string& json) {
     defaultZoom = parser.zoom;
     defaultBearing = parser.bearing;
     defaultPitch = parser.pitch;
-    light = parser.light;
+    light = std::make_unique<Light>(parser.light);
 
     glyphAtlas->setURL(parser.glyphURL);
     spriteAtlas->load(parser.spriteURL, scheduler, fileSource);
@@ -360,7 +361,7 @@ void Style::cascade(const TimePoint& timePoint, MapMode mode) {
         layer->cascade(parameters);
     }
 
-    transitioningLight = TransitioningLight(light, std::move(transitioningLight), parameters);
+    transitioningLight = TransitioningLight(light.get(), std::move(transitioningLight), parameters);
 }
 
 void Style::recalculate(float z, const TimePoint& timePoint, MapMode mode) {

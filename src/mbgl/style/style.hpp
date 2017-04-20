@@ -121,7 +121,7 @@ public:
     std::unique_ptr<SpriteAtlas> spriteAtlas;
     std::unique_ptr<LineAtlas> lineAtlas;
 
-    Light light;
+    std::unique_ptr<Light> light;
     TransitioningLight transitioningLight;
     EvaluatedLight evaluatedLight;
 
