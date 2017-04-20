@@ -21,19 +21,9 @@ const std::string AnnotationManager::PointLayerID = "com.mapbox.annotations.poin
 
 AnnotationManager::AnnotationManager(float pixelRatio)
     : spriteAtlas({ 1024, 1024 }, pixelRatio) {
-
-    struct NullFileSource : public FileSource {
-        std::unique_ptr<AsyncRequest> request(const Resource&, Callback) override {
-            assert(false);
-            return nullptr;
-        }
-    };
-
-    NullFileSource nullFileSource;
-
-    // This is a special atlas, holding only images added via addIcon. But we need its isLoaded()
-    // method to return true.
-    spriteAtlas.load("", nullFileSource);
+    // This is a special atlas, holding only images added via addIcon, so we always treat it as
+    // loaded.
+    spriteAtlas.markAsLoaded();
 }
 
 AnnotationManager::~AnnotationManager() = default;

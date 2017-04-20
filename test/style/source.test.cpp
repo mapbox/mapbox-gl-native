@@ -38,7 +38,7 @@ public:
     TransformState transformState;
     ThreadPool threadPool { 1 };
     AnnotationManager annotationManager { 1.0 };
-    style::Style style { fileSource, 1.0 };
+    style::Style style { threadPool, fileSource, 1.0 };
 
     style::UpdateParameters updateParameters {
         1.0,

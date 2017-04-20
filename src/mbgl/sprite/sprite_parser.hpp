@@ -26,12 +26,7 @@ SpriteImagePtr createSpriteImage(const PremultipliedImage&,
 
 using Sprites = std::map<std::string, SpriteImagePtr>;
 
-
-using SpriteParseResult = variant<
-    Sprites,             // success
-    std::exception_ptr>; // error
-
 // Parses an image and an associated JSON file and returns the sprite objects.
-SpriteParseResult parseSprite(const std::string& image, const std::string& json);
+Sprites parseSprite(const std::string& image, const std::string& json);
 
 } // namespace mbgl
