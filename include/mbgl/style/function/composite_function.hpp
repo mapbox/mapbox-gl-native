@@ -100,9 +100,6 @@ public:
     T evaluate(float zoom, const GeometryTileFeature& feature, T finalDefaultValue) const {
         std::tuple<Range<float>, Range<InnerStops>> ranges = coveringRanges(zoom);
         Range<T> resultRange = evaluate(std::get<1>(ranges), feature, finalDefaultValue);
-        // If the covering stop range is constant, just return the output value directly.
-        if (resultRange.min == resultRange.max) return resultRange.min;
-        // Otherwise, interpolate between the two stops.
         return util::interpolate(
             resultRange.min,
             resultRange.max,
