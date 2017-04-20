@@ -30,6 +30,7 @@ class LineAtlas;
 class RenderData;
 class TransformState;
 class RenderedQueryOptions;
+class Scheduler;
 
 namespace style {
 
@@ -43,7 +44,7 @@ class Style : public GlyphAtlasObserver,
               public LayerObserver,
               public util::noncopyable {
 public:
-    Style(FileSource&, float pixelRatio);
+    Style(Scheduler&, FileSource&, float pixelRatio);
     ~Style() override;
 
     void setJSON(const std::string&);
@@ -108,6 +109,7 @@ public:
 
     void dumpDebugLogs() const;
 
+    Scheduler& scheduler;
     FileSource& fileSource;
     std::unique_ptr<GlyphAtlas> glyphAtlas;
     std::unique_ptr<SpriteAtlas> spriteAtlas;

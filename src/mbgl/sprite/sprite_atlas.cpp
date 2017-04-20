@@ -1,4 +1,5 @@
 #include <mbgl/sprite/sprite_atlas.hpp>
+#include <mbgl/sprite/sprite_atlas_worker.hpp>
 #include <mbgl/sprite/sprite_atlas_observer.hpp>
 #include <mbgl/sprite/sprite_parser.hpp>
 #include <mbgl/gl/context.hpp>
@@ -11,6 +12,8 @@
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
+#include <mbgl/util/run_loop.hpp>
+#include <mbgl/actor/actor.hpp>
 
 #include <cassert>
 #include <cmath>
@@ -21,10 +24,17 @@ namespace mbgl {
 static SpriteAtlasObserver nullObserver;
 
 struct SpriteAtlas::Loader {
+    Loader(Scheduler& scheduler, SpriteAtlas& spriteAtlas)
+        : mailbox(std::make_shared<Mailbox>(*util::RunLoop::Get())),
+          worker(scheduler, ActorRef<SpriteAtlas>(spriteAtlas, mailbox)) {
+    }
+
     std::shared_ptr<const std::string> image;
     std::shared_ptr<const std::string> json;
     std::unique_ptr<AsyncRequest> jsonRequest;
     std::unique_ptr<AsyncRequest> spriteRequest;
+    std::shared_ptr<Mailbox> mailbox;
+    Actor<SpriteAtlasWorker> worker;
 };
 
 SpriteAtlasElement::SpriteAtlasElement(Rect<uint16_t> rect_,
@@ -54,14 +64,14 @@ SpriteAtlas::SpriteAtlas(Size size_, float pixelRatio_)
 
 SpriteAtlas::~SpriteAtlas() = default;
 
-void SpriteAtlas::load(const std::string& url, FileSource& fileSource) {
+void SpriteAtlas::load(const std::string& url, Scheduler& scheduler, FileSource& fileSource) {
     if (url.empty()) {
         // Treat a non-existent sprite as a successfully loaded empty sprite.
-        loaded = true;
+        markAsLoaded();
         return;
     }
 
-    loader = std::make_unique<Loader>();
+    loader = std::make_unique<Loader>(scheduler, *this);
 
     loader->jsonRequest = fileSource.request(Resource::spriteJSON(url, pixelRatio), [this](Response res) {
         if (res.error) {
@@ -100,14 +110,18 @@ void SpriteAtlas::emitSpriteLoadedIfComplete() {
         return;
     }
 
-    auto result = parseSprite(*loader->image, *loader->json);
-    if (result.is<Sprites>()) {
-        loaded = true;
-        setSprites(result.get<Sprites>());
-        observer->onSpriteLoaded();
-    } else {
-        observer->onSpriteError(result.get<std::exception_ptr>());
-    }
+    loader->worker.invoke(&SpriteAtlasWorker::parse, loader->image, loader->json);
+    // TODO: delete the loader?
+}
+
+void SpriteAtlas::onParsed(Sprites&& result) {
+    markAsLoaded();
+    setSprites(result);
+    observer->onSpriteLoaded();
+}
+
+void SpriteAtlas::onError(std::exception_ptr err) {
+    observer->onSpriteError(err);
 }
 
 void SpriteAtlas::setObserver(SpriteAtlasObserver* observer_) {

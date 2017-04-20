@@ -226,6 +226,8 @@ set(MBGL_CORE_FILES
     src/mbgl/sprite/sprite_atlas.cpp
     src/mbgl/sprite/sprite_atlas.hpp
     src/mbgl/sprite/sprite_atlas_observer.hpp
+    src/mbgl/sprite/sprite_atlas_worker.cpp
+    src/mbgl/sprite/sprite_atlas_worker.hpp
     src/mbgl/sprite/sprite_image.cpp
     src/mbgl/sprite/sprite_parser.cpp
     src/mbgl/sprite/sprite_parser.hpp

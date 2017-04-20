@@ -18,6 +18,7 @@
 #include <mbgl/style/layers/symbol_layer_impl.hpp>
 #include <mbgl/util/color.hpp>
 #include <mbgl/util/run_loop.hpp>
+#include <mbgl/util/default_thread_pool.hpp>
 #include <mbgl/util/io.hpp>
 
 #include <memory>
@@ -279,8 +280,9 @@ TEST(Layer, DuplicateLayer) {
     util::RunLoop loop;
 
     // Setup style
+    ThreadPool threadPool{ 1 };
     StubFileSource fileSource;
-    Style style { fileSource, 1.0 };
+    Style style { threadPool, fileSource, 1.0 };
     style.setJSON(util::read_file("test/fixtures/resources/style-unused-sources.json"));
 
     // Add initial layer

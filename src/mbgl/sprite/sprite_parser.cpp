@@ -84,26 +84,19 @@ bool getBoolean(const JSValue& value, const char* name, const bool def = false) 
 
 } // namespace
 
-SpriteParseResult parseSprite(const std::string& image, const std::string& json) {
-    Sprites sprites;
-    PremultipliedImage raster;
-
-    try {
-        raster = decodeImage(image);
-    } catch (...) {
-        return std::current_exception();
-    }
+Sprites parseSprite(const std::string& image, const std::string& json) {
+    const PremultipliedImage raster = decodeImage(image);
 
     JSDocument doc;
     doc.Parse<0>(json.c_str());
-
     if (doc.HasParseError()) {
         std::stringstream message;
         message << "Failed to parse JSON: " << rapidjson::GetParseError_En(doc.GetParseError()) << " at offset " << doc.GetErrorOffset();
-        return std::make_exception_ptr(std::runtime_error(message.str()));
+        throw std::runtime_error(message.str());
     } else if (!doc.IsObject()) {
-        return std::make_exception_ptr(std::runtime_error("Sprite JSON root must be an object"));
+        throw std::runtime_error("Sprite JSON root must be an object");
     } else {
+        Sprites sprites;
         for (const auto& property : doc.GetObject()) {
             const std::string name = { property.name.GetString(), property.name.GetStringLength() };
             const JSValue& value = property.value;
@@ -122,9 +115,8 @@ SpriteParseResult parseSprite(const std::string& image, const std::string& json)
                 }
             }
         }
+        return sprites;
     }
-
-    return sprites;
 }
 
 } // namespace mbgl

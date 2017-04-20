@@ -9,6 +9,7 @@
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/run_loop.hpp>
+#include <mbgl/util/default_thread_pool.hpp>
 #include <mbgl/util/string.hpp>
 
 #include <utility>
@@ -22,7 +23,7 @@ TEST(SpriteAtlas, Basic) {
                                          util::read_file("test/fixtures/annotations/emerald.json"));
 
     SpriteAtlas atlas({ 63, 112 }, 1);
-    atlas.setSprites(spriteParseResult.get<Sprites>());
+    atlas.setSprites(spriteParseResult);
 
     EXPECT_EQ(1.0f, atlas.getPixelRatio());
     EXPECT_EQ(63u, atlas.getSize().width);
@@ -75,7 +76,7 @@ TEST(SpriteAtlas, Size) {
                                          util::read_file("test/fixtures/annotations/emerald.json"));
 
     SpriteAtlas atlas({ 63, 112 }, 1.4);
-    atlas.setSprites(spriteParseResult.get<Sprites>());
+    atlas.setSprites(spriteParseResult);
 
     EXPECT_DOUBLE_EQ(1.4f, atlas.getPixelRatio());
     EXPECT_EQ(63u, atlas.getSize().width);
@@ -266,6 +267,7 @@ public:
     util::RunLoop loop;
     StubFileSource fileSource;
     StubStyleObserver observer;
+    ThreadPool threadPool { 1 };
     SpriteAtlas spriteAtlas{ { 32, 32 }, 1 };
 
     void run() {
@@ -273,7 +275,7 @@ public:
         Log::setObserver(std::make_unique<Log::NullObserver>());
 
         spriteAtlas.setObserver(&observer);
-        spriteAtlas.load("test/fixtures/resources/sprite", fileSource);
+        spriteAtlas.load("test/fixtures/resources/sprite", threadPool, fileSource);
 
         loop.run();
     }
