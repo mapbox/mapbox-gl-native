@@ -42,7 +42,8 @@ static std::array<float, 3> spinWeights(float spin) {
 void Painter::renderRaster(PaintParameters& parameters,
                            RasterBucket& bucket,
                            const RenderRasterLayer& layer,
-                           const RenderTile& tile) {
+                           const mat4& matrix,
+                           bool useBucketBuffers = false) {
     if (pass != RenderPass::Translucent)
         return;
     if (!bucket.hasData())
@@ -62,7 +63,7 @@ void Painter::renderRaster(PaintParameters& parameters,
         gl::StencilMode::disabled(),
         colorModeForRenderPass(),
         RasterProgram::UniformValues {
-            uniforms::u_matrix::Value{ tile.matrix },
+            uniforms::u_matrix::Value{ matrix },
             uniforms::u_image0::Value{ 0 },
             uniforms::u_image1::Value{ 1 },
             uniforms::u_opacity::Value{ properties.get<RasterOpacity>() },
@@ -76,9 +77,9 @@ void Painter::renderRaster(PaintParameters& parameters,
             uniforms::u_scale_parent::Value{ 1.0f },
             uniforms::u_tl_parent::Value{ std::array<float, 2> {{ 0.0f, 0.0f }} },
         },
-        rasterVertexBuffer,
-        quadTriangleIndexBuffer,
-        rasterSegments,
+        useBucketBuffers ? *bucket.vertexBuffer : rasterVertexBuffer,
+        useBucketBuffers ? *bucket.indexBuffer : quadTriangleIndexBuffer,
+        useBucketBuffers ? bucket.segments : rasterSegments,
         paintAttributeData,
         properties,
         state.getZoom()

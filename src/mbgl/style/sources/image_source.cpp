@@ -37,7 +37,7 @@ void ImageSource::setURL(const std::string& url_) {
     }
 }
 
-void ImageSource::setImage(mbgl::UnassociatedImage image_) {
+void ImageSource::setImage(mbgl::UnassociatedImage&& image_) {
     url = {};
     if (req) {
         req.reset();

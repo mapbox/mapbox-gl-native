@@ -4,6 +4,7 @@
 #include <mbgl/renderer/sources/render_raster_source.hpp>
 #include <mbgl/renderer/sources/render_vector_source.hpp>
 #include <mbgl/annotation/render_annotation_source.hpp>
+#include <mbgl/renderer/sources/render_image_source.hpp>
 #include <mbgl/tile/tile.hpp>
 
 namespace mbgl {
@@ -23,6 +24,8 @@ std::unique_ptr<RenderSource> RenderSource::create(Immutable<Source::Impl> impl)
         return nullptr;
     case SourceType::Annotations:
         return std::make_unique<RenderAnnotationSource>(staticImmutableCast<AnnotationSource::Impl>(impl));
+    case SourceType::Image:
+        return std::make_unique<RenderImageSource>(staticImmutableCast<ImageSource::Impl>(impl));
     }
 
     // Not reachable, but placate GCC.

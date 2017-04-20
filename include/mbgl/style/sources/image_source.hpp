@@ -18,7 +18,7 @@ public:
     const std::string& getURL() const;
     void setURL(const std::string& url) ;
 
-    void setImage(mbgl::UnassociatedImage);
+    void setImage(mbgl::UnassociatedImage&&);
 
     void setCoordinates(const std::vector<LatLng>&);
     std::vector<LatLng> getCoordinates() const;
