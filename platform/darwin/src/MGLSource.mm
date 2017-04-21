@@ -1,7 +1,7 @@
 #import "MGLSource_Private.h"
-#import "MGLMapView_Private.h"
+#import "MGLStyle_Private.h"
 
-#include <mbgl/map/map.hpp>
+#include <mbgl/style/style.hpp>
 #include <mbgl/style/source.hpp>
 
 @interface MGLSource ()
@@ -10,7 +10,7 @@
 // special internal source types like mbgl::AnnotationSource.
 @property (nonatomic, readonly) mbgl::style::Source *rawSource;
 
-@property (nonatomic, readonly, weak) MGLMapView *mapView;
+@property (nonatomic, readonly, weak) MGLStyle *style;
 
 @end
 
@@ -43,21 +43,21 @@
     return self;
 }
 
-- (void)addToMapView:(MGLMapView *)mapView {
+- (void)addToStyle:(MGLStyle *)style {
     if (_pendingSource == nullptr) {
         [NSException raise:@"MGLRedundantSourceException"
                     format:@"This instance %@ was already added to %@. Adding the same source instance " \
-                            "to the style more than once is invalid.", self, mapView.style];
+                            "to the style more than once is invalid.", self, style];
     }
 
-    _mapView = mapView;
-    mapView.mbglMap->addSource(std::move(_pendingSource));
+    _style = style;
+    style.rawStyle->addSource(std::move(_pendingSource));
 }
 
-- (void)removeFromMapView:(MGLMapView *)mapView {
-    if (self.rawSource == mapView.mbglMap->getSource(self.identifier.UTF8String)) {
-        _pendingSource = mapView.mbglMap->removeSource(self.identifier.UTF8String);
-        _mapView = nil;
+- (void)removeFromStyle:(MGLStyle *)style {
+    if (self.rawSource == style.rawStyle->getSource(self.identifier.UTF8String)) {
+        _pendingSource = style.rawStyle->removeSource(self.identifier.UTF8String);
+        _style = nil;
     }
 }
 

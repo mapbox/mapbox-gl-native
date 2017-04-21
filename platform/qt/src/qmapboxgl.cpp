@@ -9,6 +9,7 @@
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/backend_scope.hpp>
 #include <mbgl/math/minmax.hpp>
+#include <mbgl/style/style.hpp>
 #include <mbgl/style/conversion.hpp>
 #include <mbgl/style/conversion/layer.hpp>
 #include <mbgl/style/conversion/source.hpp>
@@ -751,7 +752,7 @@ void QMapboxGL::setTransitionOptions(qint64 duration, qint64 delay) {
         return std::chrono::duration_cast<mbgl::Duration>(mbgl::Milliseconds(value));
     };
 
-    d_ptr->mapObj->setTransitionOptions(mbgl::style::TransitionOptions{ convert(duration), convert(delay) });
+    d_ptr->mapObj->getStyle().setTransitionOptions(mbgl::style::TransitionOptions{ convert(duration), convert(delay) });
 }
 
 mbgl::Annotation asMapboxGLAnnotation(const QMapbox::Annotation & annotation) {
@@ -866,7 +867,7 @@ void QMapboxGL::setLayoutProperty(const QString& layer, const QString& property,
 {
     using namespace mbgl::style;
 
-    Layer* layer_ = d_ptr->mapObj->getLayer(layer.toStdString());
+    Layer* layer_ = d_ptr->mapObj->getStyle().getLayer(layer.toStdString());
     if (!layer_) {
         qWarning() << "Layer not found:" << layer;
         return;
@@ -932,7 +933,7 @@ void QMapboxGL::setPaintProperty(const QString& layer, const QString& property, 
 {
     using namespace mbgl::style;
 
-    Layer* layer_ = d_ptr->mapObj->getLayer(layer.toStdString());
+    Layer* layer_ = d_ptr->mapObj->getStyle().getLayer(layer.toStdString());
     if (!layer_) {
         qWarning() << "Layer not found:" << layer;
         return;
@@ -1181,7 +1182,7 @@ void QMapboxGL::addSource(const QString &id, const QVariantMap &params)
         return;
     }
 
-    d_ptr->mapObj->addSource(std::move(*source));
+    d_ptr->mapObj->getStyle().addSource(std::move(*source));
 }
 
 /*!
@@ -1189,7 +1190,7 @@ void QMapboxGL::addSource(const QString &id, const QVariantMap &params)
 */
 bool QMapboxGL::sourceExists(const QString& sourceID)
 {
-    return !!d_ptr->mapObj->getSource(sourceID.toStdString());
+    return !!d_ptr->mapObj->getStyle().getSource(sourceID.toStdString());
 }
 
 /*!
@@ -1203,7 +1204,7 @@ void QMapboxGL::updateSource(const QString &id, const QVariantMap &params)
     using namespace mbgl::style;
     using namespace mbgl::style::conversion;
 
-    auto source = d_ptr->mapObj->getSource(id.toStdString());
+    auto source = d_ptr->mapObj->getStyle().getSource(id.toStdString());
     if (!source) {
         addSource(id, params);
         return;
@@ -1233,8 +1234,8 @@ void QMapboxGL::removeSource(const QString& id)
 {
     auto sourceIDStdString = id.toStdString();
 
-    if (d_ptr->mapObj->getSource(sourceIDStdString)) {
-        d_ptr->mapObj->removeSource(sourceIDStdString);
+    if (d_ptr->mapObj->getStyle().getSource(sourceIDStdString)) {
+        d_ptr->mapObj->getStyle().removeSource(sourceIDStdString);
     }
 }
 
@@ -1253,7 +1254,7 @@ void QMapboxGL::addCustomLayer(const QString &id,
         void *context,
         const QString& before)
 {
-    d_ptr->mapObj->addLayer(std::make_unique<mbgl::style::CustomLayer>(
+    d_ptr->mapObj->getStyle().addLayer(std::make_unique<mbgl::style::CustomLayer>(
             id.toStdString(),
             reinterpret_cast<mbgl::style::CustomLayerInitializeFunction>(initFn),
             // This cast is safe as long as both mbgl:: and QMapbox::
@@ -1296,7 +1297,7 @@ void QMapboxGL::addLayer(const QVariantMap &params, const QString& before)
         return;
     }
 
-    d_ptr->mapObj->addLayer(std::move(*layer),
+    d_ptr->mapObj->getStyle().addLayer(std::move(*layer),
         before.isEmpty() ? mbgl::optional<std::string>() : mbgl::optional<std::string>(before.toStdString()));
 }
 
@@ -1305,7 +1306,7 @@ void QMapboxGL::addLayer(const QVariantMap &params, const QString& before)
 */
 bool QMapboxGL::layerExists(const QString& id)
 {
-    return !!d_ptr->mapObj->getLayer(id.toStdString());
+    return !!d_ptr->mapObj->getStyle().getLayer(id.toStdString());
 }
 
 /*!
@@ -1313,7 +1314,7 @@ bool QMapboxGL::layerExists(const QString& id)
 */
 void QMapboxGL::removeLayer(const QString& id)
 {
-    d_ptr->mapObj->removeLayer(id.toStdString());
+    d_ptr->mapObj->getStyle().removeLayer(id.toStdString());
 }
 
 /*!
@@ -1330,7 +1331,7 @@ void QMapboxGL::addImage(const QString &id, const QImage &image)
 {
     if (image.isNull()) return;
 
-    d_ptr->mapObj->addImage(toStyleImage(id, image));
+    d_ptr->mapObj->getStyle().addImage(toStyleImage(id, image));
 }
 
 /*!
@@ -1338,7 +1339,7 @@ void QMapboxGL::addImage(const QString &id, const QImage &image)
 */
 void QMapboxGL::removeImage(const QString &id)
 {
-    d_ptr->mapObj->removeImage(id.toStdString());
+    d_ptr->mapObj->getStyle().removeImage(id.toStdString());
 }
 
 /*!
@@ -1366,7 +1367,7 @@ void QMapboxGL::setFilter(const QString& layer, const QVariant& filter)
     using namespace mbgl::style;
     using namespace mbgl::style::conversion;
 
-    Layer* layer_ = d_ptr->mapObj->getLayer(layer.toStdString());
+    Layer* layer_ = d_ptr->mapObj->getStyle().getLayer(layer.toStdString());
     if (!layer_) {
         qWarning() << "Layer not found:" << layer;
         return;
@@ -1596,7 +1597,7 @@ void QMapboxGLPrivate::onDidFinishLoadingStyle()
 void QMapboxGLPrivate::onSourceChanged(mbgl::style::Source&)
 {
     std::string attribution;
-    for (const auto& source : mapObj->getSources()) {
+    for (const auto& source : mapObj->getStyle().getSources()) {
         // Avoid duplicates by using the most complete attribution HTML snippet.
         if (source->getAttribution() && (attribution.size() < source->getAttribution()->size()))
             attribution = *source->getAttribution();

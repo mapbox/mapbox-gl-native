@@ -6,6 +6,7 @@
 #include <mbgl/gl/headless_backend.hpp>
 #include <mbgl/gl/offscreen_view.hpp>
 #include <mbgl/util/default_thread_pool.hpp>
+#include <mbgl/style/style.hpp>
 #include <mbgl/style/image.hpp>
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/storage/network_status.hpp>
@@ -25,7 +26,7 @@ public:
 
         map.setStyleJSON(util::read_file("benchmark/fixtures/api/query_style.json"));
         map.setLatLngZoom({ 40.726989, -73.992857 }, 15); // Manhattan
-        map.addImage(std::make_unique<style::Image>("test-icon",
+        map.getStyle().addImage(std::make_unique<style::Image>("test-icon",
             decodeImage(util::read_file("benchmark/fixtures/api/default_marker.png")), 1.0));
 
         mbgl::benchmark::render(map, view);

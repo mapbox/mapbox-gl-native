@@ -9,7 +9,7 @@ class LineAnnotationImpl : public ShapeAnnotationImpl {
 public:
     LineAnnotationImpl(AnnotationID, LineAnnotation, uint8_t maxZoom);
 
-    void updateStyle(style::Style&) const final;
+    void updateStyle(style::Style::Impl&) const final;
     const ShapeAnnotationGeometry& geometry() const final;
 
 private:

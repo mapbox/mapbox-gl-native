@@ -5,15 +5,22 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+namespace mbgl {
+    namespace style {
+        class Style;
+    }
+}
+
 @class MGLAttributionInfo;
 @class MGLMapView;
 @class MGLOpenGLStyleLayer;
 
 @interface MGLStyle (Private)
 
-- (instancetype)initWithMapView:(MGLMapView *)mapView;
+- (instancetype)initWithRawStyle:(mbgl::style::Style *)rawStyle mapView:(MGLMapView *)mapView;
 
 @property (nonatomic, readonly, weak) MGLMapView *mapView;
+@property (nonatomic, readonly) mbgl::style::Style *rawStyle;
 
 - (nullable NS_ARRAY_OF(MGLAttributionInfo *) *)attributionInfosWithFontSize:(CGFloat)fontSize linkColor:(nullable MGLColor *)linkColor;
 

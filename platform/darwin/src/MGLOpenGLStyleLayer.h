@@ -8,6 +8,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @class MGLMapView;
+@class MGLStyle;
 
 typedef struct MGLStyleLayerDrawingContext {
     CGSize size;
@@ -21,7 +22,7 @@ typedef struct MGLStyleLayerDrawingContext {
 MGL_EXPORT
 @interface MGLOpenGLStyleLayer : MGLStyleLayer
 
-@property (nonatomic, weak, readonly) MGLMapView *mapView;
+@property (nonatomic, weak, readonly) MGLStyle *style;
 
 - (instancetype)initWithIdentifier:(NSString *)identifier;
 

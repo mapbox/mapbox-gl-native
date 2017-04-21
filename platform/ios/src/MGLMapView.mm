@@ -15,6 +15,7 @@
 #include <mbgl/util/default_thread_pool.hpp>
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/storage/network_status.hpp>
+#include <mbgl/style/style.hpp>
 #include <mbgl/style/image.hpp>
 #include <mbgl/style/transition_options.hpp>
 #include <mbgl/style/layers/custom_layer.hpp>
@@ -2152,10 +2153,10 @@ public:
 
 - (void)resetPosition
 {
-    CGFloat pitch = _mbglMap->getDefaultPitch();
-    CLLocationDirection heading = mbgl::util::wrap(_mbglMap->getDefaultBearing(), 0., 360.);
-    CLLocationDistance distance = MGLAltitudeForZoomLevel(_mbglMap->getDefaultZoom(), pitch, 0, self.frame.size);
-    self.camera = [MGLMapCamera cameraLookingAtCenterCoordinate:MGLLocationCoordinate2DFromLatLng(_mbglMap->getDefaultLatLng())
+    CGFloat pitch = _mbglMap->getStyle().getDefaultPitch();
+    CLLocationDirection heading = mbgl::util::wrap(_mbglMap->getStyle().getDefaultBearing(), 0., 360.);
+    CLLocationDistance distance = MGLAltitudeForZoomLevel(_mbglMap->getStyle().getDefaultZoom(), pitch, 0, self.frame.size);
+    self.camera = [MGLMapCamera cameraLookingAtCenterCoordinate:MGLLocationCoordinate2DFromLatLng(_mbglMap->getStyle().getDefaultLatLng())
                                                    fromDistance:distance
                                                           pitch:pitch
                                                         heading:heading];
@@ -4986,7 +4987,7 @@ public:
         return;
     }
 
-    self.style = [[MGLStyle alloc] initWithMapView:self];
+    self.style = [[MGLStyle alloc] initWithRawStyle:&_mbglMap->getStyle() mapView:self];
     if ([self.delegate respondsToSelector:@selector(mapView:didFinishLoadingStyle:)])
     {
         [self.delegate mapView:self didFinishLoadingStyle:self.style];

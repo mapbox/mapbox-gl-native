@@ -4,6 +4,7 @@
 #include <mbgl/annotation/symbol_annotation_impl.hpp>
 #include <mbgl/style/image.hpp>
 #include <mbgl/map/update.hpp>
+#include <mbgl/style/style.hpp>
 #include <mbgl/util/noncopyable.hpp>
 
 #include <mutex>
@@ -20,10 +21,6 @@ class AnnotationTileData;
 class SymbolAnnotationImpl;
 class ShapeAnnotationImpl;
 
-namespace style {
-class Style;
-} // namespace style
-
 class AnnotationManager : private util::noncopyable {
 public:
     AnnotationManager();
@@ -37,7 +34,7 @@ public:
     void removeImage(const std::string&);
     double getTopOffsetPixelsForImage(const std::string&);
 
-    void updateStyle(style::Style&);
+    void updateStyle(style::Style::Impl&);
     void updateData();
 
     void addTile(AnnotationTile&);

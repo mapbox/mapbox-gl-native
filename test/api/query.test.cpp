@@ -8,6 +8,7 @@
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/run_loop.hpp>
+#include <mbgl/style/style.hpp>
 #include <mbgl/style/image.hpp>
 #include <mbgl/style/source.hpp>
 
@@ -20,7 +21,7 @@ class QueryTest {
 public:
     QueryTest() {
         map.setStyleJSON(util::read_file("test/fixtures/api/query_style.json"));
-        map.addImage(std::make_unique<style::Image>("test-icon",
+        map.getStyle().addImage(std::make_unique<style::Image>("test-icon",
             decodeImage(util::read_file("test/fixtures/sprites/default_marker.png")), 1.0));
 
         test::render(map, view);

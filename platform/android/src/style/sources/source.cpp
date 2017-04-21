@@ -3,6 +3,7 @@
 
 #include <jni/jni.hpp>
 
+#include <mbgl/style/style.hpp>
 #include <mbgl/util/logging.hpp>
 
 // Java -> C++ conversion
@@ -55,7 +56,7 @@ namespace android {
         }
 
         // Add source to map
-        _map.addSource(releaseCoreSource());
+        _map.getStyle().addSource(releaseCoreSource());
 
         // Save pointer to the map
         this->map = &_map;

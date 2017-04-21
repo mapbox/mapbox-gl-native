@@ -1,5 +1,6 @@
 #import "MGLShapeSource_Private.h"
 
+#import "MGLStyle_Private.h"
 #import "MGLMapView_Private.h"
 #import "MGLSource_Private.h"
 #import "MGLFeature_Private.h"
@@ -96,8 +97,8 @@ const MGLShapeSourceOption MGLShapeSourceOptionSimplificationTolerance = @"MGLSh
     }
     
     std::vector<mbgl::Feature> features;
-    if (self.mapView) {
-        features = self.mapView.mbglMap->querySourceFeatures(self.rawSource->getID(), { {}, optionalFilter });
+    if (self.style) {
+        features = self.style.mapView.mbglMap->querySourceFeatures(self.rawSource->getID(), { {}, optionalFilter });
     }
     return MGLFeaturesFromMBGLFeatures(features);
 }
