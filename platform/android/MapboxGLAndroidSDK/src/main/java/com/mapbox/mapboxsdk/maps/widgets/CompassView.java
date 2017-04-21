@@ -108,8 +108,7 @@ public final class CompassView extends AppCompatImageView implements Runnable, F
    * @param bearing the direction value of the map
    */
   public void update(final double bearing) {
-    // compass needs reverse bearing #8123
-    rotation = (float) -bearing;
+    rotation = (float) bearing;
 
     if (!isEnabled()) {
       return;
