@@ -812,16 +812,16 @@ LatLng Map::latLngForPixel(const ScreenCoordinate& pixel) const {
 
 #pragma mark - Annotations
 
-void Map::addAnnotationIcon(const std::string& name, std::shared_ptr<const SpriteImage> sprite) {
-    impl->annotationManager->addIcon(name, sprite);
+void Map::addAnnotationImage(const std::string& id, std::unique_ptr<style::Image> image) {
+    impl->annotationManager->addImage(id, std::move(image));
 }
 
-void Map::removeAnnotationIcon(const std::string& name) {
-    impl->annotationManager->removeIcon(name);
+void Map::removeAnnotationImage(const std::string& id) {
+    impl->annotationManager->removeImage(id);
 }
 
-double Map::getTopOffsetPixelsForAnnotationIcon(const std::string& name) {
-    return impl->annotationManager->getTopOffsetPixelsForIcon(name);
+double Map::getTopOffsetPixelsForAnnotationImage(const std::string& id) {
+    return impl->annotationManager->getTopOffsetPixelsForImage(id);
 }
 
 AnnotationID Map::addAnnotation(const Annotation& annotation) {
@@ -951,29 +951,29 @@ std::unique_ptr<Layer> Map::removeLayer(const std::string& id) {
     return removedLayer;
 }
 
-void Map::addImage(const std::string& name, std::unique_ptr<const SpriteImage> image) {
+void Map::addImage(const std::string& id, std::unique_ptr<style::Image> image) {
     if (!impl->style) {
         return;
     }
 
     impl->styleMutated = true;
-    impl->style->spriteAtlas->setSprite(name, std::move(image));
+    impl->style->spriteAtlas->addImage(id, std::move(image));
     impl->onUpdate(Update::Repaint);
 }
 
-void Map::removeImage(const std::string& name) {
+void Map::removeImage(const std::string& id) {
     if (!impl->style) {
         return;
     }
 
     impl->styleMutated = true;
-    impl->style->spriteAtlas->removeSprite(name);
+    impl->style->spriteAtlas->removeImage(id);
     impl->onUpdate(Update::Repaint);
 }
 
-const SpriteImage* Map::getImage(const std::string& name) {
+const style::Image* Map::getImage(const std::string& id) {
     if (impl->style) {
-        return impl->style->spriteAtlas->getSprite(name).get();
+        return impl->style->spriteAtlas->getImage(id);
     }
     return nullptr;
 }

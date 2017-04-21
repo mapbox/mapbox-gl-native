@@ -43,7 +43,6 @@ set(MBGL_TEST_FILES
 
     # sprite
     test/sprite/sprite_atlas.test.cpp
-    test/sprite/sprite_image.test.cpp
     test/sprite/sprite_parser.test.cpp
 
     # src/mbgl/test
@@ -95,6 +94,7 @@ set(MBGL_TEST_FILES
     test/style/paint_property.test.cpp
     test/style/source.test.cpp
     test/style/style.test.cpp
+    test/style/style_image.test.cpp
     test/style/style_layer.test.cpp
     test/style/style_parser.test.cpp
     test/style/tile_source.test.cpp

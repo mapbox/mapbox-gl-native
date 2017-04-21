@@ -20,6 +20,7 @@ class ShapeAnnotationImpl;
 
 namespace style {
 class Style;
+class Image;
 } // namespace style
 
 class AnnotationManager : private util::noncopyable {
@@ -31,9 +32,9 @@ public:
     Update updateAnnotation(const AnnotationID&, const Annotation&, const uint8_t maxZoom);
     void removeAnnotation(const AnnotationID&);
 
-    void addIcon(const std::string& name, std::shared_ptr<const SpriteImage>);
-    void removeIcon(const std::string& name);
-    double getTopOffsetPixelsForIcon(const std::string& name);
+    void addImage(const std::string&, std::unique_ptr<style::Image>);
+    void removeImage(const std::string&);
+    double getTopOffsetPixelsForImage(const std::string&);
     SpriteAtlas& getSpriteAtlas() { return spriteAtlas; }
 
     void updateStyle(style::Style&);

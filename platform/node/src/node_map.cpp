@@ -9,7 +9,7 @@
 #include <mbgl/style/conversion/source.hpp>
 #include <mbgl/style/conversion/layer.hpp>
 #include <mbgl/style/conversion/filter.hpp>
-#include <mbgl/sprite/sprite_image.hpp>
+#include <mbgl/style/image.hpp>
 #include <mbgl/map/backend_scope.hpp>
 #include <mbgl/map/query.hpp>
 
@@ -684,7 +684,7 @@ void NodeMap::AddImage(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     std::copy(imageDataBuffer, imageDataBuffer + imageLength, data.get());
     mbgl::PremultipliedImage cPremultipliedImage({ imageWidth, imageHeight}, std::move(data));
 
-    nodeMap->map->addImage(*Nan::Utf8String(info[0]), std::make_unique<mbgl::SpriteImage>(std::move(cPremultipliedImage), pixelRatio));
+    nodeMap->map->addImage(*Nan::Utf8String(info[0]), std::make_unique<mbgl::style::Image>(std::move(cPremultipliedImage), pixelRatio));
 }
 
 void NodeMap::RemoveImage(const Nan::FunctionCallbackInfo<v8::Value>& info) {

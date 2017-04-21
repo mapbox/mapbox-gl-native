@@ -1,18 +1,13 @@
 #pragma once
 
-#include <mbgl/util/noncopyable.hpp>
-#include <mbgl/util/geo.hpp>
 #include <mbgl/util/image.hpp>
 
-#include <string>
-#include <memory>
-#include <cstdint>
-
 namespace mbgl {
+namespace style {
 
-class SpriteImage : private util::noncopyable {
+class Image {
 public:
-    SpriteImage(PremultipliedImage&&, float pixelRatio, bool sdf = false);
+    Image(PremultipliedImage&&, float pixelRatio, bool sdf = false);
 
     PremultipliedImage image;
 
@@ -26,4 +21,5 @@ public:
     float getHeight() const { return image.size.height / pixelRatio; }
 };
 
+} // namespace style
 } // namespace mbgl

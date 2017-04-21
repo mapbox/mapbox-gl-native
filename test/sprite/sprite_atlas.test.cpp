@@ -18,12 +18,13 @@ using namespace mbgl;
 
 TEST(SpriteAtlas, Basic) {
     FixtureLog log;
-
-    auto spriteParseResult = parseSprite(util::read_file("test/fixtures/annotations/emerald.png"),
-                                         util::read_file("test/fixtures/annotations/emerald.json"));
-
     SpriteAtlas atlas({ 63, 112 }, 1);
-    atlas.setSprites(spriteParseResult);
+
+    auto images = parseSprite(util::read_file("test/fixtures/annotations/emerald.png"),
+                              util::read_file("test/fixtures/annotations/emerald.json"));
+    for (auto& pair : images) {
+        atlas.addImage(pair.first, std::move(pair.second));
+    }
 
     EXPECT_EQ(1.0f, atlas.getPixelRatio());
     EXPECT_EQ(63u, atlas.getSize().width);
@@ -74,11 +75,13 @@ TEST(SpriteAtlas, Basic) {
 }
 
 TEST(SpriteAtlas, Size) {
-    auto spriteParseResult = parseSprite(util::read_file("test/fixtures/annotations/emerald.png"),
-                                         util::read_file("test/fixtures/annotations/emerald.json"));
-
     SpriteAtlas atlas({ 63, 112 }, 1.4);
-    atlas.setSprites(spriteParseResult);
+
+    auto images = parseSprite(util::read_file("test/fixtures/annotations/emerald.png"),
+                              util::read_file("test/fixtures/annotations/emerald.json"));
+    for (auto& pair : images) {
+        atlas.addImage(pair.first, std::move(pair.second));
+    }
 
     EXPECT_DOUBLE_EQ(1.4f, atlas.getPixelRatio());
     EXPECT_EQ(63u, atlas.getSize().width);
@@ -110,7 +113,7 @@ TEST(SpriteAtlas, Updates) {
     EXPECT_EQ(32u, atlas.getSize().width);
     EXPECT_EQ(32u, atlas.getSize().height);
 
-    atlas.setSprite("one", std::make_shared<SpriteImage>(PremultipliedImage({ 16, 12 }), 1));
+    atlas.addImage("one", std::make_unique<style::Image>(PremultipliedImage({ 16, 12 }), 1));
     auto one = *atlas.getIcon("one");
     float imagePixelRatio = one.relativePixelRatio * atlas.getPixelRatio();
     EXPECT_EQ(0, one.pos.x);
@@ -129,45 +132,30 @@ TEST(SpriteAtlas, Updates) {
 
     test::checkImage("test/fixtures/sprite_atlas/updates_before", atlas.getAtlasImage());
 
-    // Update sprite
+    // Update image
     PremultipliedImage image2({ 16, 12 });
     for (size_t i = 0; i < image2.bytes(); i++) {
         image2.data.get()[i] = 255;
     }
-    auto newSprite = std::make_shared<SpriteImage>(std::move(image2), 1);
-    atlas.setSprite("one", newSprite);
-    ASSERT_EQ(newSprite, atlas.getSprite("one"));
+    atlas.addImage("one", std::make_unique<style::Image>(std::move(image2), 1));
 
     test::checkImage("test/fixtures/sprite_atlas/updates_after", atlas.getAtlasImage());
 }
 
 TEST(SpriteAtlas, AddRemove) {
     FixtureLog log;
-
-    const auto sprite1 = std::make_shared<SpriteImage>(PremultipliedImage({ 16, 16 }), 2);
-    const auto sprite2 = std::make_shared<SpriteImage>(PremultipliedImage({ 16, 16 }), 2);
-    const auto sprite3 = std::make_shared<SpriteImage>(PremultipliedImage({ 16, 16 }), 2);
-
     SpriteAtlas atlas({ 32, 32 }, 1);
 
-    // Adding single
-    atlas.setSprite("one", sprite1);
+    atlas.addImage("one", std::make_unique<style::Image>(PremultipliedImage({ 16, 16 }), 2));
+    atlas.addImage("two", std::make_unique<style::Image>(PremultipliedImage({ 16, 16 }), 2));
+    atlas.addImage("three", std::make_unique<style::Image>(PremultipliedImage({ 16, 16 }), 2));
 
-    // Adding multiple
-    atlas.setSprite("two", sprite2);
-    atlas.setSprite("three", sprite3);
+    atlas.removeImage("one");
+    atlas.removeImage("two");
 
-    // Removing
-    atlas.removeSprite("one");
-    atlas.removeSprite("two");
-
-    // Accessing
-    EXPECT_EQ(sprite3, atlas.getSprite("three"));
-
-    EXPECT_TRUE(log.empty());
-
-    EXPECT_EQ(nullptr, atlas.getSprite("two"));
-    EXPECT_EQ(nullptr, atlas.getSprite("four"));
+    EXPECT_NE(nullptr, atlas.getImage("three"));
+    EXPECT_EQ(nullptr, atlas.getImage("two"));
+    EXPECT_EQ(nullptr, atlas.getImage("four"));
 
     EXPECT_EQ(1u, log.count({
                       EventSeverity::Info,
@@ -181,9 +169,6 @@ TEST(SpriteAtlas, AddRemove) {
                       int64_t(-1),
                       "Can't find sprite named 'four'",
                   }));
-
-    // Overwriting
-    atlas.setSprite("three", sprite1);
 }
 
 TEST(SpriteAtlas, RemoveReleasesBinPackRect) {
@@ -191,68 +176,40 @@ TEST(SpriteAtlas, RemoveReleasesBinPackRect) {
 
     SpriteAtlas atlas({ 36, 36 }, 1);
 
-    const auto big = std::make_shared<SpriteImage>(PremultipliedImage({ 32, 32 }), 1);
-
-    atlas.setSprite("big", big);
+    atlas.addImage("big", std::make_unique<style::Image>(PremultipliedImage({ 32, 32 }), 1));
     EXPECT_TRUE(atlas.getIcon("big"));
 
-    atlas.removeSprite("big");
+    atlas.removeImage("big");
 
-    atlas.setSprite("big", big);
+    atlas.addImage("big", std::make_unique<style::Image>(PremultipliedImage({ 32, 32 }), 1));
     EXPECT_TRUE(atlas.getIcon("big"));
-
-    EXPECT_EQ(big, atlas.getSprite("big"));
     EXPECT_TRUE(log.empty());
 }
 
 TEST(SpriteAtlas, OtherPixelRatio) {
     FixtureLog log;
-
-    const auto sprite1 = std::make_shared<SpriteImage>(PremultipliedImage({ 8, 8 }), 1);
-
     SpriteAtlas atlas({ 32, 32 }, 1);
 
     // Adding mismatched sprite image
-    atlas.setSprite("one", sprite1);
-}
-
-TEST(SpriteAtlas, Multiple) {
-    const auto sprite1 = std::make_shared<SpriteImage>(PremultipliedImage({ 16, 16 }), 2);
-    const auto sprite2 = std::make_shared<SpriteImage>(PremultipliedImage({ 16, 16 }), 2);
-
-    SpriteAtlas atlas({ 32, 32 }, 1);
-
-    atlas.setSprites({
-        { "one", sprite1 }, { "two", sprite2 },
-    });
+    atlas.addImage("one", std::make_unique<style::Image>(PremultipliedImage({ 8, 8 }), 2));
 }
 
 TEST(SpriteAtlas, Replace) {
     FixtureLog log;
-
-    const auto sprite1 = std::make_shared<SpriteImage>(PremultipliedImage({ 16, 16 }), 2);
-    const auto sprite2 = std::make_shared<SpriteImage>(PremultipliedImage({ 16, 16 }), 2);
-
     SpriteAtlas atlas({ 32, 32 }, 1);
 
-    atlas.setSprite("sprite", sprite1);
-    EXPECT_EQ(sprite1, atlas.getSprite("sprite"));
-    atlas.setSprite("sprite", sprite2);
-    EXPECT_EQ(sprite2, atlas.getSprite("sprite"));
+    atlas.addImage("sprite", std::make_unique<style::Image>(PremultipliedImage({ 16, 16 }), 2));
+    auto image = atlas.getImage("sprite");
+    atlas.addImage("sprite", std::make_unique<style::Image>(PremultipliedImage({ 16, 16 }), 2));
+    EXPECT_NE(image, atlas.getImage("sprite"));
 }
 
 TEST(SpriteAtlas, ReplaceWithDifferentDimensions) {
     FixtureLog log;
-
-    PremultipliedImage image({ 16, 16 });
-    PremultipliedImage image2({ 18, 18 });
-    const auto sprite1 = std::make_shared<SpriteImage>(PremultipliedImage({ 16, 16 }), 2);
-    const auto sprite2 = std::make_shared<SpriteImage>(PremultipliedImage({ 18, 18 }), 2);
-
     SpriteAtlas atlas({ 32, 32 }, 1);
 
-    atlas.setSprite("sprite", sprite1);
-    atlas.setSprite("sprite", sprite2);
+    atlas.addImage("sprite", std::make_unique<style::Image>(PremultipliedImage({ 16, 16 }), 2));
+    atlas.addImage("sprite", std::make_unique<style::Image>(PremultipliedImage({ 18, 18 }), 2));
 
     EXPECT_EQ(1u, log.count({
                       EventSeverity::Warning,
@@ -260,8 +217,6 @@ TEST(SpriteAtlas, ReplaceWithDifferentDimensions) {
                       int64_t(-1),
                       "Can't change sprite dimensions for 'sprite'",
                   }));
-
-    EXPECT_EQ(sprite1, atlas.getSprite("sprite"));
 }
 
 class SpriteAtlasTest {
@@ -292,14 +247,14 @@ public:
 Response successfulSpriteImageResponse(const Resource& resource) {
     EXPECT_EQ("test/fixtures/resources/sprite.png", resource.url);
     Response response;
-    response.data = std::make_shared<std::string>(util::read_file(resource.url));
+    response.data = std::make_unique<std::string>(util::read_file(resource.url));
     return response;
 }
 
 Response successfulSpriteJSONResponse(const Resource& resource) {
     EXPECT_EQ("test/fixtures/resources/sprite.json", resource.url);
     Response response;
-    response.data = std::make_shared<std::string>(util::read_file(resource.url));
+    response.data = std::make_unique<std::string>(util::read_file(resource.url));
     return response;
 }
 
@@ -313,7 +268,7 @@ Response failedSpriteResponse(const Resource&) {
 
 Response corruptSpriteResponse(const Resource&) {
     Response response;
-    response.data = std::make_shared<std::string>("CORRUPT");
+    response.data = std::make_unique<std::string>("CORRUPT");
     return response;
 }
 

@@ -15,7 +15,7 @@
 #include <mbgl/style/layers/custom_layer.hpp>
 #include <mbgl/style/sources/geojson_source.hpp>
 #include <mbgl/style/transition_options.hpp>
-#include <mbgl/sprite/sprite_image.hpp>
+#include <mbgl/style/image.hpp>
 #include <mbgl/storage/network_status.hpp>
 #include <mbgl/util/color.hpp>
 #include <mbgl/util/constants.hpp>
@@ -88,7 +88,7 @@ mbgl::Size sanitizedSize(const QSize& size) {
     };
 };
 
-std::unique_ptr<const mbgl::SpriteImage> toSpriteImage(const QImage &sprite) {
+std::unique_ptr<mbgl::style::Image> toStyleImage(const QImage &sprite) {
     const QImage swapped = sprite
         .rgbSwapped()
         .convertToFormat(QImage::Format_ARGB32_Premultiplied);
@@ -96,7 +96,7 @@ std::unique_ptr<const mbgl::SpriteImage> toSpriteImage(const QImage &sprite) {
     auto img = std::make_unique<uint8_t[]>(swapped.byteCount());
     memcpy(img.get(), swapped.constBits(), swapped.byteCount());
 
-    return std::make_unique<mbgl::SpriteImage>(
+    return std::make_unique<mbgl::style::Image>(
         mbgl::PremultipliedImage(
             { static_cast<uint32_t>(swapped.width()), static_cast<uint32_t>(swapped.height()) },
             std::move(img)),
@@ -1114,7 +1114,7 @@ void QMapboxGL::addAnnotationIcon(const QString &name, const QImage &icon)
 {
     if (icon.isNull()) return;
 
-    d_ptr->mapObj->addAnnotationIcon(name.toStdString(), toSpriteImage(icon));
+    d_ptr->mapObj->addAnnotationImage(name.toStdString(), toStyleImage(icon));
 }
 
 /*!
@@ -1414,7 +1414,7 @@ void QMapboxGL::addImage(const QString &id, const QImage &image)
 {
     if (image.isNull()) return;
 
-    d_ptr->mapObj->addImage(id.toStdString(), toSpriteImage(image));
+    d_ptr->mapObj->addImage(id.toStdString(), toStyleImage(image));
 }
 
 /*!

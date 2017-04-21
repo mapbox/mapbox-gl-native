@@ -208,17 +208,17 @@ void AnnotationManager::removeTile(AnnotationTile& tile) {
     tiles.erase(&tile);
 }
 
-void AnnotationManager::addIcon(const std::string& name, std::shared_ptr<const SpriteImage> sprite) {
-    spriteAtlas.setSprite(name, sprite);
+void AnnotationManager::addImage(const std::string& id, std::unique_ptr<style::Image> image) {
+    spriteAtlas.addImage(id, std::move(image));
 }
 
-void AnnotationManager::removeIcon(const std::string& name) {
-    spriteAtlas.removeSprite(name);
+void AnnotationManager::removeImage(const std::string& id) {
+    spriteAtlas.removeImage(id);
 }
 
-double AnnotationManager::getTopOffsetPixelsForIcon(const std::string& name) {
-    auto sprite = spriteAtlas.getSprite(name);
-    return sprite ? -(sprite->image.size.height / sprite->pixelRatio) / 2 : 0;
+double AnnotationManager::getTopOffsetPixelsForImage(const std::string& id) {
+    const style::Image* image = spriteAtlas.getImage(id);
+    return image ? -(image->image.size.height / image->pixelRatio) / 2 : 0;
 }
 
 } // namespace mbgl

@@ -25,9 +25,9 @@ class Backend;
 class View;
 class FileSource;
 class Scheduler;
-class SpriteImage;
 
 namespace style {
+class Image;
 class Source;
 class Layer;
 } // namespace style
@@ -154,9 +154,9 @@ public:
     LatLng latLngForPixel(const ScreenCoordinate&) const;
 
     // Annotations
-    void addAnnotationIcon(const std::string&, std::shared_ptr<const SpriteImage>);
-    void removeAnnotationIcon(const std::string&);
-    double getTopOffsetPixelsForAnnotationIcon(const std::string&);
+    void addAnnotationImage(const std::string&, std::unique_ptr<style::Image>);
+    void removeAnnotationImage(const std::string&);
+    double getTopOffsetPixelsForAnnotationImage(const std::string&);
 
     AnnotationID addAnnotation(const Annotation&);
     void updateAnnotation(AnnotationID, const Annotation&);
@@ -174,10 +174,10 @@ public:
     void addLayer(std::unique_ptr<style::Layer>, const optional<std::string>& beforeLayerID = {});
     std::unique_ptr<style::Layer> removeLayer(const std::string& layerID);
 
-    // Add image, bound to the style
-    void addImage(const std::string&, std::unique_ptr<const SpriteImage>);
+    // Images
+    void addImage(const std::string&, std::unique_ptr<style::Image>);
     void removeImage(const std::string&);
-    const SpriteImage* getImage(const std::string&);
+    const style::Image* getImage(const std::string&);
 
     // Defaults
     std::string getStyleName() const;

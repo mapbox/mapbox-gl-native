@@ -1,14 +1,12 @@
-#include <mbgl/sprite/sprite_image.hpp>
-
+#include <mbgl/style/image.hpp>
 #include <mbgl/util/exception.hpp>
 
-#include <cmath>
-
 namespace mbgl {
+namespace style {
 
-SpriteImage::SpriteImage(PremultipliedImage&& image_,
-                         const float pixelRatio_,
-                         bool sdf_)
+Image::Image(PremultipliedImage&& image_,
+             const float pixelRatio_,
+             bool sdf_)
     : image(std::move(image_)),
       pixelRatio(pixelRatio_),
       sdf(sdf_) {
@@ -20,4 +18,5 @@ SpriteImage::SpriteImage(PremultipliedImage&& image_,
     }
 }
 
+} // namespace style
 } // namespace mbgl

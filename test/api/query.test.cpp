@@ -3,12 +3,12 @@
 #include <mbgl/gl/headless_backend.hpp>
 #include <mbgl/gl/offscreen_view.hpp>
 #include <mbgl/util/default_thread_pool.hpp>
-#include <mbgl/sprite/sprite_image.hpp>
 #include <mbgl/test/stub_file_source.hpp>
 #include <mbgl/test/util.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/run_loop.hpp>
+#include <mbgl/style/image.hpp>
 #include <mbgl/style/source.hpp>
 
 using namespace mbgl;
@@ -19,11 +19,9 @@ namespace {
 class QueryTest {
 public:
     QueryTest() {
-        auto decoded = decodeImage(util::read_file("test/fixtures/sprites/default_marker.png"));
-        auto image = std::make_unique<SpriteImage>(std::move(decoded), 1.0);
-
         map.setStyleJSON(util::read_file("test/fixtures/api/query_style.json"));
-        map.addImage("test-icon", std::move(image));
+        map.addImage("test-icon", std::make_unique<style::Image>(
+            decodeImage(util::read_file("test/fixtures/sprites/default_marker.png")), 1.0));
 
         test::render(map, view);
     }
