@@ -22,6 +22,7 @@ import com.mapbox.mapboxsdk.style.layers.RasterLayer;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.activity.style.RuntimeStyleTestActivity;
 import com.mapbox.mapboxsdk.testapp.utils.OnMapReadyIdlingResource;
+import com.mapbox.mapboxsdk.testapp.activity.BaseActivityTest;
 
 import org.junit.After;
 import org.junit.Before;
@@ -37,28 +38,22 @@ import static com.mapbox.mapboxsdk.style.layers.Property.*;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.*;
 
 import com.mapbox.mapboxsdk.style.layers.TransitionOptions;
+import com.mapbox.mapboxsdk.testapp.activity.espresso.EspressoTestActivity;
 
 /**
  * Basic smoke tests for RasterLayer
  */
 @RunWith(AndroidJUnit4.class)
-public class RasterLayerTest extends BaseStyleTest {
-
-  @Rule
-  public final ActivityTestRule<RuntimeStyleTestActivity> rule = new ActivityTestRule<>(RuntimeStyleTestActivity.class);
+public class RasterLayerTest extends BaseActivityTest {
 
   private RasterLayer layer;
 
-  private OnMapReadyIdlingResource idlingResource;
+  @Override
+  protected Class getActivityClass() {
+    return EspressoTestActivity.class;
+  }
 
-  private MapboxMap mapboxMap;
-
-  @Before
-  public void setup() {
-    idlingResource = new OnMapReadyIdlingResource(rule.getActivity());
-    Espresso.registerIdlingResources(idlingResource);
-    mapboxMap = rule.getActivity().getMapboxMap();
-
+  private void setupLayer(){
     if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
       Timber.i("Adding layer");
       layer = new RasterLayer("my-layer", "composite");
@@ -71,7 +66,8 @@ public class RasterLayerTest extends BaseStyleTest {
 
   @Test
   public void testSetVisibility() {
-    checkViewIsDisplayed(R.id.mapView);
+    validateTestSetup();
+    setupLayer();
     Timber.i("Visibility");
     assertNotNull(layer);
 
@@ -85,7 +81,8 @@ public class RasterLayerTest extends BaseStyleTest {
 
   @Test
   public void testRasterOpacityTransition() {
-    checkViewIsDisplayed(R.id.mapView);
+    validateTestSetup();
+    setupLayer();
     Timber.i("raster-opacityTransitionOptions");
     assertNotNull(layer);
 
@@ -97,7 +94,8 @@ public class RasterLayerTest extends BaseStyleTest {
 
   @Test
   public void testRasterOpacityAsConstant() {
-    checkViewIsDisplayed(R.id.mapView);
+    validateTestSetup();
+    setupLayer();
     Timber.i("raster-opacity");
     assertNotNull(layer);
 
@@ -108,7 +106,8 @@ public class RasterLayerTest extends BaseStyleTest {
 
   @Test
   public void testRasterOpacityAsCameraFunction() {
-    checkViewIsDisplayed(R.id.mapView);
+    validateTestSetup();
+    setupLayer();
     Timber.i("raster-opacity");
     assertNotNull(layer);
 
@@ -134,7 +133,8 @@ public class RasterLayerTest extends BaseStyleTest {
 
   @Test
   public void testRasterHueRotateTransition() {
-    checkViewIsDisplayed(R.id.mapView);
+    validateTestSetup();
+    setupLayer();
     Timber.i("raster-hue-rotateTransitionOptions");
     assertNotNull(layer);
 
@@ -146,7 +146,8 @@ public class RasterLayerTest extends BaseStyleTest {
 
   @Test
   public void testRasterHueRotateAsConstant() {
-    checkViewIsDisplayed(R.id.mapView);
+    validateTestSetup();
+    setupLayer();
     Timber.i("raster-hue-rotate");
     assertNotNull(layer);
 
@@ -157,7 +158,8 @@ public class RasterLayerTest extends BaseStyleTest {
 
   @Test
   public void testRasterHueRotateAsCameraFunction() {
-    checkViewIsDisplayed(R.id.mapView);
+    validateTestSetup();
+    setupLayer();
     Timber.i("raster-hue-rotate");
     assertNotNull(layer);
 
@@ -183,7 +185,8 @@ public class RasterLayerTest extends BaseStyleTest {
 
   @Test
   public void testRasterBrightnessMinTransition() {
-    checkViewIsDisplayed(R.id.mapView);
+    validateTestSetup();
+    setupLayer();
     Timber.i("raster-brightness-minTransitionOptions");
     assertNotNull(layer);
 
@@ -195,7 +198,8 @@ public class RasterLayerTest extends BaseStyleTest {
 
   @Test
   public void testRasterBrightnessMinAsConstant() {
-    checkViewIsDisplayed(R.id.mapView);
+    validateTestSetup();
+    setupLayer();
     Timber.i("raster-brightness-min");
     assertNotNull(layer);
 
@@ -206,7 +210,8 @@ public class RasterLayerTest extends BaseStyleTest {
 
   @Test
   public void testRasterBrightnessMinAsCameraFunction() {
-    checkViewIsDisplayed(R.id.mapView);
+    validateTestSetup();
+    setupLayer();
     Timber.i("raster-brightness-min");
     assertNotNull(layer);
 
@@ -232,7 +237,8 @@ public class RasterLayerTest extends BaseStyleTest {
 
   @Test
   public void testRasterBrightnessMaxTransition() {
-    checkViewIsDisplayed(R.id.mapView);
+    validateTestSetup();
+    setupLayer();
     Timber.i("raster-brightness-maxTransitionOptions");
     assertNotNull(layer);
 
@@ -244,7 +250,8 @@ public class RasterLayerTest extends BaseStyleTest {
 
   @Test
   public void testRasterBrightnessMaxAsConstant() {
-    checkViewIsDisplayed(R.id.mapView);
+    validateTestSetup();
+    setupLayer();
     Timber.i("raster-brightness-max");
     assertNotNull(layer);
 
@@ -255,7 +262,8 @@ public class RasterLayerTest extends BaseStyleTest {
 
   @Test
   public void testRasterBrightnessMaxAsCameraFunction() {
-    checkViewIsDisplayed(R.id.mapView);
+    validateTestSetup();
+    setupLayer();
     Timber.i("raster-brightness-max");
     assertNotNull(layer);
 
@@ -281,7 +289,8 @@ public class RasterLayerTest extends BaseStyleTest {
 
   @Test
   public void testRasterSaturationTransition() {
-    checkViewIsDisplayed(R.id.mapView);
+    validateTestSetup();
+    setupLayer();
     Timber.i("raster-saturationTransitionOptions");
     assertNotNull(layer);
 
@@ -293,7 +302,8 @@ public class RasterLayerTest extends BaseStyleTest {
 
   @Test
   public void testRasterSaturationAsConstant() {
-    checkViewIsDisplayed(R.id.mapView);
+    validateTestSetup();
+    setupLayer();
     Timber.i("raster-saturation");
     assertNotNull(layer);
 
@@ -304,7 +314,8 @@ public class RasterLayerTest extends BaseStyleTest {
 
   @Test
   public void testRasterSaturationAsCameraFunction() {
-    checkViewIsDisplayed(R.id.mapView);
+    validateTestSetup();
+    setupLayer();
     Timber.i("raster-saturation");
     assertNotNull(layer);
 
@@ -330,7 +341,8 @@ public class RasterLayerTest extends BaseStyleTest {
 
   @Test
   public void testRasterContrastTransition() {
-    checkViewIsDisplayed(R.id.mapView);
+    validateTestSetup();
+    setupLayer();
     Timber.i("raster-contrastTransitionOptions");
     assertNotNull(layer);
 
@@ -342,7 +354,8 @@ public class RasterLayerTest extends BaseStyleTest {
 
   @Test
   public void testRasterContrastAsConstant() {
-    checkViewIsDisplayed(R.id.mapView);
+    validateTestSetup();
+    setupLayer();
     Timber.i("raster-contrast");
     assertNotNull(layer);
 
@@ -353,7 +366,8 @@ public class RasterLayerTest extends BaseStyleTest {
 
   @Test
   public void testRasterContrastAsCameraFunction() {
-    checkViewIsDisplayed(R.id.mapView);
+    validateTestSetup();
+    setupLayer();
     Timber.i("raster-contrast");
     assertNotNull(layer);
 
@@ -379,7 +393,8 @@ public class RasterLayerTest extends BaseStyleTest {
 
   @Test
   public void testRasterFadeDurationTransition() {
-    checkViewIsDisplayed(R.id.mapView);
+    validateTestSetup();
+    setupLayer();
     Timber.i("raster-fade-durationTransitionOptions");
     assertNotNull(layer);
 
@@ -391,7 +406,8 @@ public class RasterLayerTest extends BaseStyleTest {
 
   @Test
   public void testRasterFadeDurationAsConstant() {
-    checkViewIsDisplayed(R.id.mapView);
+    validateTestSetup();
+    setupLayer();
     Timber.i("raster-fade-duration");
     assertNotNull(layer);
 
@@ -402,7 +418,8 @@ public class RasterLayerTest extends BaseStyleTest {
 
   @Test
   public void testRasterFadeDurationAsCameraFunction() {
-    checkViewIsDisplayed(R.id.mapView);
+    validateTestSetup();
+    setupLayer();
     Timber.i("raster-fade-duration");
     assertNotNull(layer);
 
@@ -426,8 +443,4 @@ public class RasterLayerTest extends BaseStyleTest {
     assertEquals(1, ((ExponentialStops) layer.getRasterFadeDuration().getFunction().getStops()).size());
   }
 
-  @After
-  public void unregisterIntentServiceIdlingResource() {
-    Espresso.unregisterIdlingResources(idlingResource);
-  }
 }

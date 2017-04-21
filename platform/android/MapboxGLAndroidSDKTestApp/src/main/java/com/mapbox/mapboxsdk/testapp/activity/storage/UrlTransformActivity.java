@@ -19,6 +19,7 @@ import timber.log.Timber;
 public class UrlTransformActivity extends AppCompatActivity {
 
   private MapView mapView;
+  private MapboxMap mapboxMap;
 
   /**
    * Be sure to use an isolated class so the activity is not leaked when
@@ -50,6 +51,7 @@ public class UrlTransformActivity extends AppCompatActivity {
       @Override
       public void onMapReady(MapboxMap map) {
         Timber.i("Map loaded");
+        mapboxMap = map;
       }
     });
   }

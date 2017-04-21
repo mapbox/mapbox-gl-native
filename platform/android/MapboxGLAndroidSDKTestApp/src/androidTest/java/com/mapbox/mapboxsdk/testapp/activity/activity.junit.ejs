@@ -27,7 +27,7 @@ public class <%- activity %>Test extends BaseActivityTest {
 
     @Test
     public void testSanity() {
-        onView(withId(R.id.mapView)).check(matches(isDisplayed()));
+        validateTestSetup();
     }
 
     @Override

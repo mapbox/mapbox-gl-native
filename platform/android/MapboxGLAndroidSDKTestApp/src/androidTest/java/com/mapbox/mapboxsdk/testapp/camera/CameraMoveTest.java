@@ -1,10 +1,8 @@
 package com.mapbox.mapboxsdk.testapp.camera;
 
 import android.graphics.PointF;
-import android.support.test.espresso.Espresso;
 import android.support.test.espresso.UiController;
 import android.support.test.espresso.ViewAction;
-import android.support.test.rule.ActivityTestRule;
 import android.view.View;
 
 import com.mapbox.mapboxsdk.camera.CameraPosition;
@@ -14,16 +12,12 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.testapp.R;
+import com.mapbox.mapboxsdk.testapp.activity.BaseActivityTest;
 import com.mapbox.mapboxsdk.testapp.activity.espresso.EspressoTestActivity;
-import com.mapbox.mapboxsdk.testapp.utils.OnMapReadyIdlingResource;
 import com.mapbox.mapboxsdk.testapp.utils.TestConstants;
-import com.mapbox.mapboxsdk.testapp.utils.ViewUtils;
 
 import org.hamcrest.Matcher;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Ignore;
-import org.junit.Rule;
 import org.junit.Test;
 
 import static android.support.test.espresso.Espresso.onView;
@@ -31,24 +25,17 @@ import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static org.junit.Assert.assertEquals;
 
-public class CameraMoveTest {
+public class CameraMoveTest extends BaseActivityTest {
 
-  @Rule
-  public final ActivityTestRule<EspressoTestActivity> rule = new ActivityTestRule<>(EspressoTestActivity.class);
-
-  private OnMapReadyIdlingResource idlingResource;
-
-  @Before
-  public void registerIdlingResource() {
-    idlingResource = new OnMapReadyIdlingResource(rule.getActivity());
-    Espresso.registerIdlingResources(idlingResource);
+  @Override
+  protected Class getActivityClass() {
+    return EspressoTestActivity.class;
   }
 
   @Test
   @Ignore
   public void testMoveToCameraPositionTarget() {
-    ViewUtils.checkViewIsDisplayed(R.id.mapView);
-    final MapboxMap mapboxMap = rule.getActivity().getMapboxMap();
+    validateTestSetup();
 
     /*TODO remove zoom #6474*/
     float zoom = 1.0f;
@@ -70,8 +57,7 @@ public class CameraMoveTest {
   @Test
   @Ignore
   public void testMoveToCameraPositionTargetZoom() {
-    ViewUtils.checkViewIsDisplayed(R.id.mapView);
-    final MapboxMap mapboxMap = rule.getActivity().getMapboxMap();
+    validateTestSetup();
 
     final float moveZoom = 15.5f;
     final LatLng moveTarget = new LatLng(1.0000000001, 1.0000000003);
@@ -89,8 +75,7 @@ public class CameraMoveTest {
   @Test
   @Ignore
   public void testMoveToCameraPosition() {
-    ViewUtils.checkViewIsDisplayed(R.id.mapView);
-    final MapboxMap mapboxMap = rule.getActivity().getMapboxMap();
+    validateTestSetup();
 
     final LatLng moveTarget = new LatLng(1.0000000001, 1.0000000003);
     final float moveZoom = 15.5f;
@@ -120,8 +105,7 @@ public class CameraMoveTest {
   @Test
   @Ignore
   public void testMoveToBounds() {
-    ViewUtils.checkViewIsDisplayed(R.id.mapView);
-    final MapboxMap mapboxMap = rule.getActivity().getMapboxMap();
+    validateTestSetup();
 
     final LatLng centerBounds = new LatLng(1, 1);
     LatLng cornerOne = new LatLng();
@@ -149,8 +133,7 @@ public class CameraMoveTest {
   @Test
   @Ignore
   public void testMoveToMoveBy() {
-    ViewUtils.checkViewIsDisplayed(R.id.mapView);
-    final MapboxMap mapboxMap = rule.getActivity().getMapboxMap();
+    validateTestSetup();
 
     final PointF centerPoint = mapboxMap.getProjection().toScreenLocation(mapboxMap.getCameraPosition().target);
     final LatLng moveTarget = new LatLng(2, 2);
@@ -169,8 +152,7 @@ public class CameraMoveTest {
   @Test
   @Ignore
   public void testMoveToZoomIn() {
-    ViewUtils.checkViewIsDisplayed(R.id.mapView);
-    final MapboxMap mapboxMap = rule.getActivity().getMapboxMap();
+    validateTestSetup();
 
     /*TODO fix zoom #6474*/
     float zoom = 1.0f;
@@ -184,8 +166,7 @@ public class CameraMoveTest {
   @Test
   @Ignore
   public void testMoveToZoomOut() {
-    ViewUtils.checkViewIsDisplayed(R.id.mapView);
-    final MapboxMap mapboxMap = rule.getActivity().getMapboxMap();
+    validateTestSetup();
 
     /*TODO fix zoom #6474*/
     float zoom = 10.0f;
@@ -200,8 +181,7 @@ public class CameraMoveTest {
   @Test
   @Ignore
   public void testMoveToZoomBy() {
-    ViewUtils.checkViewIsDisplayed(R.id.mapView);
-    final MapboxMap mapboxMap = rule.getActivity().getMapboxMap();
+    validateTestSetup();
 
     /*TODO fix zoom #6474*/
     float zoom = 1.0f;
@@ -216,8 +196,7 @@ public class CameraMoveTest {
   @Test
   @Ignore
   public void testMoveToZoomTo() {
-    ViewUtils.checkViewIsDisplayed(R.id.mapView);
-    final MapboxMap mapboxMap = rule.getActivity().getMapboxMap();
+    validateTestSetup();
 
     /*TODO fix zoom #6474*/
     final float zoomTo = 2.45f;
@@ -226,11 +205,6 @@ public class CameraMoveTest {
     CameraPosition cameraPosition = mapboxMap.getCameraPosition();
     assertEquals("Moved camera zoom should match moved camera zoom", cameraPosition.zoom, zoomTo,
       TestConstants.ZOOM_DELTA);
-  }
-
-  @After
-  public void unregisterIdlingResource() {
-    Espresso.unregisterIdlingResources(idlingResource);
   }
 
   private class MoveCameraAction implements ViewAction {
