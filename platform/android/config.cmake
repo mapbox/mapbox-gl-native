@@ -87,6 +87,8 @@ macro(mbgl_platform_core)
         platform/android/src/style/conversion/property_value.hpp
         platform/android/src/style/conversion/types.hpp
         platform/android/src/style/conversion/types_string_values.hpp
+        platform/android/src/map/camera_position.cpp
+        platform/android/src/map/camera_position.hpp
 
         # Style conversion Java -> C++
         platform/android/src/style/android_conversion.hpp

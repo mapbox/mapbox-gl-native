@@ -643,12 +643,7 @@ void Transform::setGestureInProgress(bool inProgress) {
 #pragma mark Conversion and projection
 
 ScreenCoordinate Transform::latLngToScreenCoordinate(const LatLng& latLng) const {
-    // If the center and point longitudes are not in the same side of the
-    // antimeridian, we unwrap the point longitude so it would be seen if
-    // e.g. the next antimeridian side is visible.
-    LatLng unwrappedLatLng = latLng.wrapped();
-    unwrappedLatLng.unwrapForShortestPath(getLatLng());
-    ScreenCoordinate point = state.latLngToScreenCoordinate(unwrappedLatLng);
+    ScreenCoordinate point = state.latLngToScreenCoordinate(latLng);
     point.y = state.size.height - point.y;
     return point;
 }

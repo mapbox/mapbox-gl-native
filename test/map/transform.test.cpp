@@ -181,17 +181,17 @@ TEST(Transform, UnwrappedLatLng) {
     ASSERT_NEAR(fromScreenCoordinate.latitude,   37.999999999999829, 0.0001); // 1.71E-13
     ASSERT_NEAR(fromScreenCoordinate.longitude, -76.999999999999773, 0.0001); // 2.27E-13
 
-    LatLng wrappedForwards = state.screenCoordinateToLatLng(state.latLngToScreenCoordinate({ 38, 283 }));
-    ASSERT_NEAR(wrappedForwards.latitude, 37.999999999999716, 0.0001); // 2.84E-13
-    ASSERT_NEAR(wrappedForwards.longitude, 282.99999999988751, 0.0001); // 1.1249E-11
-    wrappedForwards.wrap();
-    ASSERT_NEAR(wrappedForwards.longitude, -77.000000000112493, 0.001); // 1.1249E-11
+    LatLng wrappedRightwards = state.screenCoordinateToLatLng(state.latLngToScreenCoordinate({ 38, 283 }));
+    ASSERT_NEAR(wrappedRightwards.latitude, 37.999999999999716, 0.0001); // 2.84E-13
+    ASSERT_NEAR(wrappedRightwards.longitude, 282.99999999988751, 0.0001); // 1.1249E-11
+    wrappedRightwards.wrap();
+    ASSERT_NEAR(wrappedRightwards.longitude, -77.000000000112493, 0.001); // 1.1249E-11
 
-    LatLng wrappedBackwards = state.screenCoordinateToLatLng(state.latLngToScreenCoordinate({ 38, -437 }));
-    ASSERT_NEAR(wrappedBackwards.latitude, wrappedForwards.latitude, 0.001);
-    ASSERT_NEAR(wrappedBackwards.longitude, -436.99999999988728, 0.001); // 1.1272E-11
-    wrappedBackwards.wrap();
-    ASSERT_NEAR(wrappedBackwards.longitude, -76.99999999988728, 0.001); // 1.1272E-11
+    LatLng wrappedLeftwards = state.screenCoordinateToLatLng(state.latLngToScreenCoordinate({ 38, -437 }));
+    ASSERT_NEAR(wrappedLeftwards.latitude, wrappedRightwards.latitude, 0.001);
+    ASSERT_NEAR(wrappedLeftwards.longitude, -436.99999999988728, 0.001); // 1.1272E-11
+    wrappedLeftwards.wrap();
+    ASSERT_NEAR(wrappedLeftwards.longitude, -76.99999999988728, 0.001); // 1.1272E-11
 }
 
 TEST(Transform, ConstrainHeightOnly) {
@@ -399,21 +399,30 @@ TEST(Transform, Antimeridian) {
     transform.resize({ 1000, 1000 });
     transform.setLatLngZoom({ 0, 0 }, 1);
 
+    // San Francisco
     const LatLng coordinateSanFrancisco { 37.7833, -122.4167 };
     ScreenCoordinate pixelSF = transform.latLngToScreenCoordinate(coordinateSanFrancisco);
     ASSERT_NEAR(151.79409149185352, pixelSF.x, 1e-2);
     ASSERT_NEAR(383.76774094913071, pixelSF.y, 1e-2);
 
     transform.setLatLng({ 0, -181 });
-    ScreenCoordinate pixelSFBackwards = transform.latLngToScreenCoordinate(coordinateSanFrancisco);
-    ASSERT_NEAR(666.63617954008976, pixelSFBackwards.x, 1e-2);
-    ASSERT_DOUBLE_EQ(pixelSF.y, pixelSFBackwards.y);
+
+    ScreenCoordinate pixelSFLongest = transform.latLngToScreenCoordinate(coordinateSanFrancisco);
+    ASSERT_NEAR(-357.36306616412816, pixelSFLongest.x, 1e-2);
+    ASSERT_DOUBLE_EQ(pixelSF.y, pixelSFLongest.y);
+    LatLng unwrappedSF = coordinateSanFrancisco.wrapped();
+    unwrappedSF.unwrapForShortestPath(transform.getLatLng());
+
+    ScreenCoordinate pixelSFShortest = transform.latLngToScreenCoordinate(unwrappedSF);
+    ASSERT_NEAR(666.63617954008976, pixelSFShortest.x, 1e-2);
+    ASSERT_DOUBLE_EQ(pixelSF.y, pixelSFShortest.y);
 
     transform.setLatLng({ 0, 179 });
-    ScreenCoordinate pixelSFForwards = transform.latLngToScreenCoordinate(coordinateSanFrancisco);
-    ASSERT_DOUBLE_EQ(pixelSFBackwards.x, pixelSFForwards.x);
-    ASSERT_DOUBLE_EQ(pixelSFBackwards.y, pixelSFForwards.y);
+    pixelSFShortest = transform.latLngToScreenCoordinate(coordinateSanFrancisco);
+    ASSERT_DOUBLE_EQ(pixelSFLongest.x, pixelSFShortest.x);
+    ASSERT_DOUBLE_EQ(pixelSFLongest.y, pixelSFShortest.y);
 
+    // Waikiri
     const LatLng coordinateWaikiri{ -16.9310, 179.9787 };
     transform.setLatLngZoom(coordinateWaikiri, 10);
     ScreenCoordinate pixelWaikiri = transform.latLngToScreenCoordinate(coordinateWaikiri);
@@ -421,18 +430,26 @@ TEST(Transform, Antimeridian) {
     ASSERT_NEAR(500, pixelWaikiri.y, 1e-2);
 
     transform.setLatLng({ coordinateWaikiri.latitude, 180.0213 });
-    ScreenCoordinate pixelWaikiriForwards = transform.latLngToScreenCoordinate(coordinateWaikiri);
-    ASSERT_NEAR(437.95953728819512, pixelWaikiriForwards.x, 1e-2);
-    ASSERT_DOUBLE_EQ(pixelWaikiri.y, pixelWaikiriForwards.y);
-    LatLng coordinateFromPixel = transform.screenCoordinateToLatLng(pixelWaikiriForwards);
+    ScreenCoordinate pixelWaikiriLongest = transform.latLngToScreenCoordinate(coordinateWaikiri);
+    ASSERT_NEAR(524725.96438108233, pixelWaikiriLongest.x, 1e-2);
+    ASSERT_DOUBLE_EQ(pixelWaikiri.y, pixelWaikiriLongest.y);
+
+    LatLng unwrappedWaikiri = coordinateWaikiri.wrapped();
+    unwrappedWaikiri.unwrapForShortestPath(transform.getLatLng());
+    ScreenCoordinate pixelWaikiriShortest = transform.latLngToScreenCoordinate(unwrappedWaikiri);
+    ASSERT_NEAR(437.95953728819512, pixelWaikiriShortest.x, 1e-2);
+    ASSERT_DOUBLE_EQ(pixelWaikiri.y, pixelWaikiriShortest.y);
+
+    LatLng coordinateFromPixel = transform.screenCoordinateToLatLng(pixelWaikiriLongest);
     ASSERT_NEAR(coordinateWaikiri.latitude, coordinateFromPixel.latitude, 0.000001);
     ASSERT_NEAR(coordinateWaikiri.longitude, coordinateFromPixel.longitude, 0.000001);
 
     transform.setLatLng({ coordinateWaikiri.latitude, -179.9787 });
-    ScreenCoordinate pixelWaikiriBackwards = transform.latLngToScreenCoordinate(coordinateWaikiri);
-    ASSERT_DOUBLE_EQ(pixelWaikiriForwards.x, pixelWaikiriBackwards.x);
-    ASSERT_DOUBLE_EQ(pixelWaikiriForwards.y, pixelWaikiriBackwards.y);
-    coordinateFromPixel = transform.screenCoordinateToLatLng(pixelWaikiriBackwards);
+    pixelWaikiriShortest = transform.latLngToScreenCoordinate(coordinateWaikiri);
+    ASSERT_DOUBLE_EQ(pixelWaikiriLongest.x, pixelWaikiriShortest.x);
+    ASSERT_DOUBLE_EQ(pixelWaikiriLongest.y, pixelWaikiriShortest.y);
+
+    coordinateFromPixel = transform.screenCoordinateToLatLng(pixelWaikiriShortest);
     ASSERT_NEAR(coordinateWaikiri.latitude, coordinateFromPixel.latitude, 0.000001);
     ASSERT_NEAR(coordinateWaikiri.longitude, coordinateFromPixel.longitude, 0.000001);
 }

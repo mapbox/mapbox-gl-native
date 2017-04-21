@@ -44,6 +44,8 @@
 #include "bitmap.hpp"
 #include "run_loop_impl.hpp"
 #include "java/util.hpp"
+#include "geometry/lat_lng_bounds.hpp"
+#include "map/camera_position.hpp"
 
 namespace mbgl {
 namespace android {
@@ -369,6 +371,10 @@ void NativeMapView::setLatLng(jni::JNIEnv&, jni::jdouble latitude, jni::jdouble 
     map->setLatLng(mbgl::LatLng(latitude, longitude), insets, mbgl::AnimationOptions{mbgl::Milliseconds(duration)});
 }
 
+jni::Object<CameraPosition> NativeMapView::getCameraForLatLngBounds(jni::JNIEnv& env, jni::Object<LatLngBounds> jBounds) {
+    return CameraPosition::New(env, map->cameraForLatLngBounds(mbgl::android::LatLngBounds::getLatLngBounds(env, jBounds), insets));
+}
+
 void NativeMapView::setReachability(jni::JNIEnv&, jni::jboolean reachable) {
     if (reachable) {
         mbgl::NetworkStatus::Reachable();
@@ -494,21 +500,8 @@ void NativeMapView::enableFps(jni::JNIEnv&, jni::jboolean enable) {
     fpsEnabled = enable;
 }
 
-jni::Array<jni::jdouble> NativeMapView::getCameraValues(jni::JNIEnv& env) {
-    //Create buffer with values
-    jdouble buf[5];
-    mbgl::LatLng latLng = map->getLatLng(insets);
-    buf[0] = latLng.latitude;
-    buf[1] = latLng.longitude;
-    buf[2] = -map->getBearing();
-    buf[3] = map->getPitch();
-    buf[4] = map->getZoom();
-
-    //Convert to Java array
-    auto output = jni::Array<jni::jdouble>::New(env, 5);
-    jni::SetArrayRegion(env, *output, 0, 5, buf);
-
-    return output;
+jni::Object<CameraPosition> NativeMapView::getCameraPosition(jni::JNIEnv& env) {
+    return CameraPosition::New(env, map->getCameraOptions(insets));
 }
 
 void NativeMapView::updateMarker(jni::JNIEnv& env, jni::jlong markerId, jni::jdouble lat, jni::jdouble lon, jni::String jid) {
@@ -1429,6 +1422,7 @@ void NativeMapView::registerNative(jni::JNIEnv& env) {
             METHOD(&NativeMapView::flyTo, "nativeFlyTo"),
             METHOD(&NativeMapView::getLatLng, "nativeGetLatLng"),
             METHOD(&NativeMapView::setLatLng, "nativeSetLatLng"),
+            METHOD(&NativeMapView::getCameraForLatLngBounds, "nativeGetCameraForLatLngBounds"),
             METHOD(&NativeMapView::setReachability, "nativeSetReachability"),
             METHOD(&NativeMapView::resetPosition, "nativeResetPosition"),
             METHOD(&NativeMapView::getPitch, "nativeGetPitch"),
@@ -1452,7 +1446,7 @@ void NativeMapView::registerNative(jni::JNIEnv& env) {
             METHOD(&NativeMapView::setContentPadding, "nativeSetContentPadding"),
             METHOD(&NativeMapView::scheduleSnapshot, "nativeTakeSnapshot"),
             METHOD(&NativeMapView::enableFps, "nativeSetEnableFps"),
-            METHOD(&NativeMapView::getCameraValues, "nativeGetCameraValues"),
+            METHOD(&NativeMapView::getCameraPosition, "nativeGetCameraPosition"),
             METHOD(&NativeMapView::updateMarker, "nativeUpdateMarker"),
             METHOD(&NativeMapView::addMarkers, "nativeAddMarkers"),
             METHOD(&NativeMapView::setDebug, "nativeSetDebug"),
