@@ -170,4 +170,13 @@ bool FillExtrusionBucket::hasData() const {
     return !triangleSegments.empty();
 }
 
+float FillExtrusionBucket::getQueryRadius(const style::Layer& layer) const {
+    if (!layer.is<FillExtrusionLayer>()) {
+        return 0;
+    }
+
+    const std::array<float, 2>& translate = layer.as<FillExtrusionLayer>()->impl->paint.evaluated.get<FillExtrusionTranslate>();
+    return util::length(translate[0], translate[1]);
+}
+
 } // namespace mbgl
