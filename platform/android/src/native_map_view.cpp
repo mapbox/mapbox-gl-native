@@ -25,6 +25,7 @@
 #include <mbgl/util/logging.hpp>
 #include <mbgl/util/platform.hpp>
 #include <mbgl/util/projection.hpp>
+#include <mbgl/style/style.hpp>
 #include <mbgl/style/image.hpp>
 #include <mbgl/style/filter.hpp>
 
@@ -745,25 +746,25 @@ jdouble NativeMapView::getTopOffsetPixelsForAnnotationSymbol(JNIEnv& env, jni::S
 }
 
 jlong NativeMapView::getTransitionDuration(JNIEnv&) {
-    const auto transitionOptions = map->getTransitionOptions();
+    const auto transitionOptions = map->getStyle().getTransitionOptions();
     return std::chrono::duration_cast<std::chrono::milliseconds>(transitionOptions.duration.value_or(mbgl::Duration::zero())).count();
 }
 
 void NativeMapView::setTransitionDuration(JNIEnv&, jlong duration) {
-    auto transitionOptions = map->getTransitionOptions();
+    auto transitionOptions = map->getStyle().getTransitionOptions();
     transitionOptions.duration.emplace(mbgl::Milliseconds(duration));
-    map->setTransitionOptions(transitionOptions);
+    map->getStyle().setTransitionOptions(transitionOptions);
 }
 
 jlong NativeMapView::getTransitionDelay(JNIEnv&) {
-    const auto transitionOptions = map->getTransitionOptions();
+    const auto transitionOptions = map->getStyle().getTransitionOptions();
     return std::chrono::duration_cast<std::chrono::milliseconds>(transitionOptions.delay.value_or(mbgl::Duration::zero())).count();
 }
 
 void NativeMapView::setTransitionDelay(JNIEnv&, jlong delay) {
-    auto transitionOptions = map->getTransitionOptions();
+    auto transitionOptions = map->getStyle().getTransitionOptions();
     transitionOptions.delay.emplace(mbgl::Milliseconds(delay));
-    map->setTransitionOptions(transitionOptions);
+    map->getStyle().setTransitionOptions(transitionOptions);
 }
 
 jni::Array<jlong> NativeMapView::queryPointAnnotations(JNIEnv& env, jni::Object<RectF> rect) {
@@ -821,7 +822,7 @@ jni::Array<jni::Object<geojson::Feature>> NativeMapView::queryRenderedFeaturesFo
 }
 
 jni::Object<Light> NativeMapView::getLight(JNIEnv& env) {
-    mbgl::style::Light* light = map->getLight();
+    mbgl::style::Light* light = map->getStyle().getLight();
     if (light) {
         return jni::Object<Light>(Light::createJavaLightPeer(env, *map, *light));
     } else {
@@ -832,7 +833,7 @@ jni::Object<Light> NativeMapView::getLight(JNIEnv& env) {
 jni::Array<jni::Object<Layer>> NativeMapView::getLayers(JNIEnv& env) {
 
     // Get the core layers
-    std::vector<style::Layer*> layers = map->getLayers();
+    std::vector<style::Layer*> layers = map->getStyle().getLayers();
 
     // Convert
     jni::Array<jni::Object<Layer>> jLayers = jni::Array<jni::Object<Layer>>::New(env, layers.size(), Layer::javaClass);
@@ -850,7 +851,7 @@ jni::Array<jni::Object<Layer>> NativeMapView::getLayers(JNIEnv& env) {
 jni::Object<Layer> NativeMapView::getLayer(JNIEnv& env, jni::String layerId) {
 
     // Find the layer
-    mbgl::style::Layer* coreLayer = map->getLayer(jni::Make<std::string>(env, layerId));
+    mbgl::style::Layer* coreLayer = map->getStyle().getLayer(jni::Make<std::string>(env, layerId));
     if (!coreLayer) {
        mbgl::Log::Debug(mbgl::Event::JNI, "No layer found");
        return jni::Object<Layer>();
@@ -877,7 +878,7 @@ void NativeMapView::addLayerAbove(JNIEnv& env, jlong nativeLayerPtr, jni::String
     Layer *layer = reinterpret_cast<Layer *>(nativeLayerPtr);
 
     // Find the sibling
-    auto layers = map->getLayers();
+    auto layers = map->getStyle().getLayers();
     auto siblingId = jni::Make<std::string>(env, above);
 
     size_t index = 0;
@@ -912,7 +913,7 @@ void NativeMapView::addLayerAt(JNIEnv& env, jlong nativeLayerPtr, jni::jint inde
     assert(nativeLayerPtr != 0);
 
     Layer *layer = reinterpret_cast<Layer *>(nativeLayerPtr);
-    auto layers = map->getLayers();
+    auto layers = map->getStyle().getLayers();
 
     // Check index
     int numLayers = layers.size() - 1;
@@ -935,7 +936,7 @@ void NativeMapView::addLayerAt(JNIEnv& env, jlong nativeLayerPtr, jni::jint inde
  * Remove by layer id.
  */
 jni::Object<Layer> NativeMapView::removeLayerById(JNIEnv& env, jni::String id) {
-    std::unique_ptr<mbgl::style::Layer> coreLayer = map->removeLayer(jni::Make<std::string>(env, id));
+    std::unique_ptr<mbgl::style::Layer> coreLayer = map->getStyle().removeLayer(jni::Make<std::string>(env, id));
     if (coreLayer) {
         return jni::Object<Layer>(createJavaLayerPeer(env, *map, std::move(coreLayer)));
     } else {
@@ -947,7 +948,7 @@ jni::Object<Layer> NativeMapView::removeLayerById(JNIEnv& env, jni::String id) {
  * Remove layer at index.
  */
 jni::Object<Layer> NativeMapView::removeLayerAt(JNIEnv& env, jni::jint index) {
-    auto layers = map->getLayers();
+    auto layers = map->getStyle().getLayers();
 
     // Check index
     int numLayers = layers.size() - 1;
@@ -956,7 +957,7 @@ jni::Object<Layer> NativeMapView::removeLayerAt(JNIEnv& env, jni::jint index) {
         return jni::Object<Layer>();
     }
 
-    std::unique_ptr<mbgl::style::Layer> coreLayer = map->removeLayer(layers.at(index)->getID());
+    std::unique_ptr<mbgl::style::Layer> coreLayer = map->getStyle().removeLayer(layers.at(index)->getID());
     if (coreLayer) {
         return jni::Object<Layer>(createJavaLayerPeer(env, *map, std::move(coreLayer)));
     } else {
@@ -971,7 +972,7 @@ void NativeMapView::removeLayer(JNIEnv&, jlong layerPtr) {
     assert(layerPtr != 0);
 
     mbgl::android::Layer *layer = reinterpret_cast<mbgl::android::Layer *>(layerPtr);
-    std::unique_ptr<mbgl::style::Layer> coreLayer = map->removeLayer(layer->get().getID());
+    std::unique_ptr<mbgl::style::Layer> coreLayer = map->getStyle().removeLayer(layer->get().getID());
     if (coreLayer) {
         layer->setLayer(std::move(coreLayer));
     }
@@ -979,7 +980,7 @@ void NativeMapView::removeLayer(JNIEnv&, jlong layerPtr) {
 
 jni::Array<jni::Object<Source>> NativeMapView::getSources(JNIEnv& env) {
     // Get the core sources
-    std::vector<style::Source*> sources = map->getSources();
+    std::vector<style::Source*> sources = map->getStyle().getSources();
 
     // Convert
     jni::Array<jni::Object<Source>> jSources = jni::Array<jni::Object<Source>>::New(env, sources.size(), Source::javaClass);
@@ -996,7 +997,7 @@ jni::Array<jni::Object<Source>> NativeMapView::getSources(JNIEnv& env) {
 
 jni::Object<Source> NativeMapView::getSource(JNIEnv& env, jni::String sourceId) {
     // Find the source
-    mbgl::style::Source* coreSource = map->getSource(jni::Make<std::string>(env, sourceId));
+    mbgl::style::Source* coreSource = map->getStyle().getSource(jni::Make<std::string>(env, sourceId));
     if (!coreSource) {
        mbgl::Log::Debug(mbgl::Event::JNI, "No source found");
        return jni::Object<Source>();
@@ -1018,7 +1019,7 @@ void NativeMapView::addSource(JNIEnv& env, jni::jlong sourcePtr) {
 }
 
 jni::Object<Source> NativeMapView::removeSourceById(JNIEnv& env, jni::String id) {
-    std::unique_ptr<mbgl::style::Source> coreSource = map->removeSource(jni::Make<std::string>(env, id));
+    std::unique_ptr<mbgl::style::Source> coreSource = map->getStyle().removeSource(jni::Make<std::string>(env, id));
     if (coreSource) {
         return jni::Object<Source>(createJavaSourcePeer(env, *map, *coreSource));
     } else {
@@ -1030,7 +1031,7 @@ void NativeMapView::removeSource(JNIEnv&, jlong sourcePtr) {
     assert(sourcePtr != 0);
 
     mbgl::android::Source *source = reinterpret_cast<mbgl::android::Source *>(sourcePtr);
-    std::unique_ptr<mbgl::style::Source> coreSource = map->removeSource(source->get().getID());
+    std::unique_ptr<mbgl::style::Source> coreSource = map->getStyle().removeSource(source->get().getID());
     if (coreSource) {
         source->setSource(std::move(coreSource));
     }
@@ -1047,14 +1048,14 @@ void NativeMapView::addImage(JNIEnv& env, jni::String name, jni::jint w, jni::ji
 
     jni::GetArrayRegion(env, *pixels, 0, size, reinterpret_cast<jbyte*>(premultipliedImage.data.get()));
 
-    map->addImage(std::make_unique<mbgl::style::Image>(
+    map->getStyle().addImage(std::make_unique<mbgl::style::Image>(
         jni::Make<std::string>(env, name),
         std::move(premultipliedImage),
         float(scale)));
 }
 
 void NativeMapView::removeImage(JNIEnv& env, jni::String name) {
-    map->removeImage(jni::Make<std::string>(env, name));
+    map->getStyle().removeImage(jni::Make<std::string>(env, name));
 }
 
 // Private methods //

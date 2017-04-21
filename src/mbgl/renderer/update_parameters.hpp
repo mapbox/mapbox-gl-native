@@ -3,6 +3,10 @@
 #include <mbgl/map/mode.hpp>
 #include <mbgl/map/transform_state.hpp>
 #include <mbgl/util/chrono.hpp>
+#include <mbgl/style/light.hpp>
+#include <mbgl/style/image.hpp>
+#include <mbgl/style/source.hpp>
+#include <mbgl/style/layer.hpp>
 
 namespace mbgl {
 

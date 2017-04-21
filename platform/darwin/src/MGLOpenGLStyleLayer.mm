@@ -4,7 +4,6 @@
 #import "MGLStyle_Private.h"
 #import "MGLStyleLayer_Private.h"
 
-#include <mbgl/map/map.hpp>
 #include <mbgl/style/layers/custom_layer.hpp>
 #include <mbgl/math/wrap.hpp>
 
@@ -17,7 +16,7 @@
  */
 void MGLPrepareCustomStyleLayer(void *context) {
     MGLOpenGLStyleLayer *layer = (__bridge MGLOpenGLStyleLayer *)context;
-    [layer didMoveToMapView:layer.mapView];
+    [layer didMoveToMapView:layer.style.mapView];
 }
 
 /**
@@ -37,7 +36,7 @@ void MGLDrawCustomStyleLayer(void *context, const mbgl::style::CustomLayerRender
         .pitch = static_cast<CGFloat>(params.pitch),
         .fieldOfView = static_cast<CGFloat>(params.fieldOfView),
     };
-    [layer drawInMapView:layer.mapView withContext:drawingContext];
+    [layer drawInMapView:layer.style.mapView withContext:drawingContext];
 }
 
 /**
@@ -49,7 +48,7 @@ void MGLDrawCustomStyleLayer(void *context, const mbgl::style::CustomLayerRender
  */
 void MGLFinishCustomStyleLayer(void *context) {
     MGLOpenGLStyleLayer *layer = (__bridge MGLOpenGLStyleLayer *)context;
-    [layer willMoveFromMapView:layer.mapView];
+    [layer willMoveFromMapView:layer.style.mapView];
 }
 
 /**
@@ -75,12 +74,12 @@ void MGLFinishCustomStyleLayer(void *context) {
 @property (nonatomic, readonly) mbgl::style::CustomLayer *rawLayer;
 
 /**
- The map view whose style currently contains the layer.
+ The style currently containing the layer.
 
- If the layer is not currently part of any map view’s style, this property is
+ If the layer is not currently part of any style, this property is
  set to `nil`.
  */
-@property (nonatomic, weak, readwrite) MGLMapView *mapView;
+@property (nonatomic, weak, readwrite) MGLStyle *style;
 
 @end
 
@@ -112,24 +111,24 @@ void MGLFinishCustomStyleLayer(void *context) {
 
 #pragma mark - Adding to and removing from a map view
 
-- (void)setMapView:(MGLMapView *)mapView {
-    if (_mapView && mapView) {
+- (void)setStyle:(MGLStyle *)style {
+    if (_style && style) {
         [NSException raise:@"MGLLayerReuseException"
                     format:@"%@ cannot be added to more than one MGLStyle at a time.", self];
     }
-    _mapView.style.openGLLayers[self.identifier] = nil;
-    _mapView = mapView;
-    _mapView.style.openGLLayers[self.identifier] = self;
+    _style.openGLLayers[self.identifier] = nil;
+    _style = style;
+    _style.openGLLayers[self.identifier] = self;
 }
 
-- (void)addToMapView:(MGLMapView *)mapView belowLayer:(MGLStyleLayer *)otherLayer {
-    self.mapView = mapView;
-    [super addToMapView:mapView belowLayer:otherLayer];
+- (void)addToStyle:(MGLStyle *)style belowLayer:(MGLStyleLayer *)otherLayer {
+    self.style = style;
+    [super addToStyle:style belowLayer:otherLayer];
 }
 
-- (void)removeFromMapView:(MGLMapView *)mapView {
-    [super removeFromMapView:mapView];
-    self.mapView = nil;
+- (void)removeFromStyle:(MGLStyle *)style {
+    [super removeFromStyle:style];
+    self.style = nil;
 }
 
 /**
@@ -193,7 +192,7 @@ void MGLFinishCustomStyleLayer(void *context) {
  causing the `-drawInMapView:withContext:` method to be called.
  */
 - (void)setNeedsDisplay {
-    [self.mapView setNeedsGLDisplay];
+    [self.style.mapView setNeedsGLDisplay];
 }
 
 @end

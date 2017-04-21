@@ -2,6 +2,7 @@
 #include "ny_route.hpp"
 
 #include <mbgl/annotation/annotation.hpp>
+#include <mbgl/style/style.hpp>
 #include <mbgl/style/image.hpp>
 #include <mbgl/style/transition_options.hpp>
 #include <mbgl/style/layers/fill_extrusion_layer.hpp>
@@ -585,11 +586,11 @@ void GLFWView::toggle3DExtrusions(bool visible) {
     show3DExtrusions = visible;
 
     // Satellite-only style does not contain building extrusions data.
-    if (!map->getSource("composite")) {
+    if (!map->getStyle().getSource("composite")) {
         return;
     }
 
-    if (auto layer = map->getLayer("3d-buildings")) {
+    if (auto layer = map->getStyle().getLayer("3d-buildings")) {
         layer->setVisibility(mbgl::style::VisibilityType(!show3DExtrusions));
         return;
     }
@@ -617,7 +618,7 @@ void GLFWView::toggle3DExtrusions(bool visible) {
     auto baseSourceFn = mbgl::style::SourceFunction<float> { "min_height", mbgl::style::IdentityStops<float>() };
     extrusionLayer->setFillExtrusionBase({ baseSourceFn });
 
-    map->addLayer(std::move(extrusionLayer));
+    map->getStyle().addLayer(std::move(extrusionLayer));
 }
 
 namespace mbgl {

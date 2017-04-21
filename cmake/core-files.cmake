@@ -332,6 +332,7 @@ set(MBGL_CORE_FILES
     include/mbgl/style/position.hpp
     include/mbgl/style/property_value.hpp
     include/mbgl/style/source.hpp
+    include/mbgl/style/style.hpp
     include/mbgl/style/transition_options.hpp
     include/mbgl/style/types.hpp
     include/mbgl/style/undefined.hpp
@@ -359,7 +360,8 @@ set(MBGL_CORE_FILES
     src/mbgl/style/source_impl.hpp
     src/mbgl/style/source_observer.hpp
     src/mbgl/style/style.cpp
-    src/mbgl/style/style.hpp
+    src/mbgl/style/style_impl.cpp
+    src/mbgl/style/style_impl.hpp
     src/mbgl/style/types.cpp
 
     # style/conversion

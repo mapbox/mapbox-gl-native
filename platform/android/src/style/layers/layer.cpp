@@ -3,6 +3,7 @@
 
 #include <jni/jni.hpp>
 
+#include <mbgl/style/style.hpp>
 #include <mbgl/style/transition_options.hpp>
 #include <mbgl/util/logging.hpp>
 
@@ -53,7 +54,7 @@ namespace android {
         }
 
         // Add layer to map
-        _map.addLayer(releaseCoreLayer(), before);
+        _map.getStyle().addLayer(releaseCoreLayer(), before);
 
         // Save pointer to the map
         this->map = &_map;

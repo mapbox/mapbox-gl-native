@@ -3,6 +3,7 @@
 #include "../../conversion/conversion.hpp"
 
 #include <jni/jni.hpp>
+#include <mbgl/style/transition_options.hpp>
 #include "../../jni/local_object.hpp"
 #include "../transition_options.hpp"
 

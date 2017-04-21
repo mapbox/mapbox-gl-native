@@ -9,6 +9,7 @@
 #include <mbgl/style/conversion/source.hpp>
 #include <mbgl/style/conversion/layer.hpp>
 #include <mbgl/style/conversion/filter.hpp>
+#include <mbgl/style/style.hpp>
 #include <mbgl/style/image.hpp>
 #include <mbgl/map/backend_scope.hpp>
 #include <mbgl/map/query.hpp>
@@ -563,7 +564,7 @@ void NodeMap::AddSource(const Nan::FunctionCallbackInfo<v8::Value>& info) {
         return;
     }
 
-    nodeMap->map->addSource(std::move(*source));
+    nodeMap->map->getStyle().addSource(std::move(*source));
 }
 
 void NodeMap::AddLayer(const Nan::FunctionCallbackInfo<v8::Value>& info) {
@@ -584,7 +585,7 @@ void NodeMap::AddLayer(const Nan::FunctionCallbackInfo<v8::Value>& info) {
         return;
     }
 
-    nodeMap->map->addLayer(std::move(*layer));
+    nodeMap->map->getStyle().addLayer(std::move(*layer));
 }
 
 void NodeMap::RemoveLayer(const Nan::FunctionCallbackInfo<v8::Value>& info) {
@@ -602,7 +603,7 @@ void NodeMap::RemoveLayer(const Nan::FunctionCallbackInfo<v8::Value>& info) {
         return Nan::ThrowTypeError("First argument must be a string");
     }
 
-    nodeMap->map->removeLayer(*Nan::Utf8String(info[0]));
+    nodeMap->map->getStyle().removeLayer(*Nan::Utf8String(info[0]));
 }
 
 void NodeMap::AddImage(const Nan::FunctionCallbackInfo<v8::Value>& info) {
@@ -664,7 +665,7 @@ void NodeMap::AddImage(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     
     mbgl::UnassociatedImage cImage({ imageWidth, imageHeight}, std::move(data));
     mbgl::PremultipliedImage cPremultipliedImage = mbgl::util::premultiply(std::move(cImage));
-    nodeMap->map->addImage(std::make_unique<mbgl::style::Image>(*Nan::Utf8String(info[0]), std::move(cPremultipliedImage), pixelRatio));
+    nodeMap->map->getStyle().addImage(std::make_unique<mbgl::style::Image>(*Nan::Utf8String(info[0]), std::move(cPremultipliedImage), pixelRatio));
 }
 
 void NodeMap::RemoveImage(const Nan::FunctionCallbackInfo<v8::Value>& info) {
@@ -682,7 +683,7 @@ void NodeMap::RemoveImage(const Nan::FunctionCallbackInfo<v8::Value>& info) {
         return Nan::ThrowTypeError("First argument must be a string");
     }
 
-    nodeMap->map->removeImage(*Nan::Utf8String(info[0]));
+    nodeMap->map->getStyle().removeImage(*Nan::Utf8String(info[0]));
 }
 
 void NodeMap::SetLayoutProperty(const Nan::FunctionCallbackInfo<v8::Value>& info) {
@@ -700,7 +701,7 @@ void NodeMap::SetLayoutProperty(const Nan::FunctionCallbackInfo<v8::Value>& info
         return Nan::ThrowTypeError("First argument must be a string");
     }
 
-    mbgl::style::Layer* layer = nodeMap->map->getLayer(*Nan::Utf8String(info[0]));
+    mbgl::style::Layer* layer = nodeMap->map->getStyle().getLayer(*Nan::Utf8String(info[0]));
     if (!layer) {
         return Nan::ThrowTypeError("layer not found");
     }
@@ -732,7 +733,7 @@ void NodeMap::SetPaintProperty(const Nan::FunctionCallbackInfo<v8::Value>& info)
         return Nan::ThrowTypeError("First argument must be a string");
     }
 
-    mbgl::style::Layer* layer = nodeMap->map->getLayer(*Nan::Utf8String(info[0]));
+    mbgl::style::Layer* layer = nodeMap->map->getStyle().getLayer(*Nan::Utf8String(info[0]));
     if (!layer) {
         return Nan::ThrowTypeError("layer not found");
     }
@@ -785,7 +786,7 @@ void NodeMap::SetFilter(const Nan::FunctionCallbackInfo<v8::Value>& info) {
         return Nan::ThrowTypeError("First argument must be a string");
     }
 
-    mbgl::style::Layer* layer = nodeMap->map->getLayer(*Nan::Utf8String(info[0]));
+    mbgl::style::Layer* layer = nodeMap->map->getStyle().getLayer(*Nan::Utf8String(info[0]));
     if (!layer) {
         return Nan::ThrowTypeError("layer not found");
     }

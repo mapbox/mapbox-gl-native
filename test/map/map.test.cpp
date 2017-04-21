@@ -16,6 +16,7 @@
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/async_task.hpp>
+#include <mbgl/style/style.hpp>
 #include <mbgl/style/image.hpp>
 #include <mbgl/style/layers/background_layer.hpp>
 #include <mbgl/util/color.hpp>
@@ -247,12 +248,12 @@ TEST(Map, StyleExpired) {
     fileSource.respond(Resource::Style, response);
     EXPECT_EQ(1u, fileSource.requests.size());
 
-    map.addLayer(std::make_unique<style::BackgroundLayer>("bg"));
+    map.getStyle().addLayer(std::make_unique<style::BackgroundLayer>("bg"));
     EXPECT_EQ(1u, fileSource.requests.size());
 
     fileSource.respond(Resource::Style, response);
     EXPECT_EQ(0u, fileSource.requests.size());
-    EXPECT_NE(nullptr, map.getLayer("bg"));
+    EXPECT_NE(nullptr, map.getStyle().getLayer("bg"));
 }
 
 TEST(Map, StyleExpiredWithAnnotations) {
@@ -289,14 +290,14 @@ TEST(Map, StyleEarlyMutation) {
 
     Map map(test.backend, test.view.getSize(), 1, fileSource, test.threadPool, MapMode::Still);
     map.setStyleURL("mapbox://styles/test");
-    map.addLayer(std::make_unique<style::BackgroundLayer>("bg"));
+    map.getStyle().addLayer(std::make_unique<style::BackgroundLayer>("bg"));
 
     Response response;
     response.data = std::make_shared<std::string>(util::read_file("test/fixtures/api/water.json"));
     fileSource.respond(Resource::Style, response);
 
     EXPECT_EQ(0u, fileSource.requests.size());
-    EXPECT_NE(nullptr, map.getLayer("water"));
+    EXPECT_NE(nullptr, map.getStyle().getLayer("water"));
 }
 
 TEST(Map, MapLoadingSignal) {
@@ -396,7 +397,7 @@ TEST(Map, AddLayer) {
 
     auto layer = std::make_unique<BackgroundLayer>("background");
     layer->setBackgroundColor({ { 1, 0, 0, 1 } });
-    map.addLayer(std::move(layer));
+    map.getStyle().addLayer(std::move(layer));
 
     test::checkImage("test/fixtures/map/add_layer", test::render(map, test.view));
 }
@@ -422,8 +423,8 @@ TEST(Map, RemoveLayer) {
 
     auto layer = std::make_unique<BackgroundLayer>("background");
     layer->setBackgroundColor({{ 1, 0, 0, 1 }});
-    map.addLayer(std::move(layer));
-    map.removeLayer("background");
+    map.getStyle().addLayer(std::move(layer));
+    map.getStyle().removeLayer("background");
 
     test::checkImage("test/fixtures/map/remove_layer", test::render(map, test.view));
 }
@@ -487,48 +488,6 @@ TEST(Map, DisabledSources) {
     test::checkImage("test/fixtures/map/disabled_layers/first", test::render(map, test.view));
     map.setZoom(0.5);
     test::checkImage("test/fixtures/map/disabled_layers/second", test::render(map, test.view));
-}
-
-TEST(Map, AddImage) {
-    MapTest test;
-
-    Map map(test.backend, test.view.getSize(), 1, test.fileSource, test.threadPool, MapMode::Still);
-    auto decoded1 = decodeImage(util::read_file("test/fixtures/sprites/default_marker.png"));
-    auto decoded2 = decodeImage(util::read_file("test/fixtures/sprites/default_marker.png"));
-    auto image1 = std::make_unique<style::Image>("test-icon", std::move(decoded1), 1.0);
-    auto image2 = std::make_unique<style::Image>("test-icon", std::move(decoded2), 1.0);
-
-    // No-op.
-    map.addImage(std::move(image1));
-
-    map.setStyleJSON(util::read_file("test/fixtures/api/icon_style.json"));
-    map.addImage(std::move(image2));
-    test::checkImage("test/fixtures/map/add_icon", test::render(map, test.view));
-}
-
-TEST(Map, RemoveImage) {
-    MapTest test;
-
-    Map map(test.backend, test.view.getSize(), 1, test.fileSource, test.threadPool, MapMode::Still);
-    auto decoded = decodeImage(util::read_file("test/fixtures/sprites/default_marker.png"));
-    auto image = std::make_unique<style::Image>("test-icon", std::move(decoded), 1.0);
-
-    map.setStyleJSON(util::read_file("test/fixtures/api/icon_style.json"));
-    map.addImage(std::move(image));
-    map.removeImage("test-icon");
-    test::checkImage("test/fixtures/map/remove_icon", test::render(map, test.view));
-}
-
-TEST(Map, GetImage) {
-    MapTest test;
-
-    Map map(test.backend, test.view.getSize(), 1, test.fileSource, test.threadPool, MapMode::Still);
-    auto decoded = decodeImage(util::read_file("test/fixtures/sprites/default_marker.png"));
-    auto image = std::make_unique<style::Image>("test-icon", std::move(decoded), 1.0);
-
-    map.setStyleJSON(util::read_file("test/fixtures/api/icon_style.json"));
-    map.addImage(std::move(image));
-    test::checkImage("test/fixtures/map/get_icon", map.getImage("test-icon")->getImage());
 }
 
 TEST(Map, DontLoadUnneededTiles) {

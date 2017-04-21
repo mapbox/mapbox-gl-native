@@ -1,6 +1,6 @@
 #include <mbgl/annotation/line_annotation_impl.hpp>
 #include <mbgl/annotation/annotation_manager.hpp>
-#include <mbgl/style/style.hpp>
+#include <mbgl/style/style_impl.hpp>
 #include <mbgl/style/layers/line_layer.hpp>
 
 namespace mbgl {
@@ -12,7 +12,7 @@ LineAnnotationImpl::LineAnnotationImpl(AnnotationID id_, LineAnnotation annotati
       annotation({ ShapeAnnotationGeometry::visit(annotation_.geometry, CloseShapeAnnotation{}), annotation_.opacity, annotation_.width, annotation_.color }) {
 }
 
-void LineAnnotationImpl::updateStyle(Style& style) const {
+void LineAnnotationImpl::updateStyle(Style::Impl& style) const {
     Layer* layer = style.getLayer(layerID);
 
     if (!layer) {

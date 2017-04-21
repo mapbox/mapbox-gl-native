@@ -2,6 +2,7 @@
 
 #include "value.hpp"
 
+#include <mbgl/util/feature.hpp>
 #include <mbgl/util/logging.hpp>
 #include <mbgl/style/conversion.hpp>
 #include <mbgl/util/optional.hpp>

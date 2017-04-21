@@ -6,12 +6,8 @@
 #include <mbgl/map/transform.hpp>
 #include <mbgl/map/transform_state.hpp>
 #include <mbgl/annotation/annotation_manager.hpp>
-#include <mbgl/style/style.hpp>
-#include <mbgl/style/source.hpp>
-#include <mbgl/style/layer.hpp>
-#include <mbgl/style/light.hpp>
+#include <mbgl/style/style_impl.hpp>
 #include <mbgl/style/observer.hpp>
-#include <mbgl/style/transition_options.hpp>
 #include <mbgl/renderer/update_parameters.hpp>
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/renderer/render_source.hpp>
@@ -101,7 +97,6 @@ public:
 
     std::string styleURL;
     std::string styleJSON;
-    bool styleMutated = false;
     bool cameraMutated = false;
 
     std::unique_ptr<AsyncRequest> styleRequest;
@@ -166,7 +161,7 @@ Map::Impl::Impl(Map& map_,
           }
       }) {
     style = std::make_unique<Style>(scheduler, fileSource, pixelRatio);
-    style->setObserver(this);
+    style->impl->setObserver(this);
 }
 
 Map::~Map() {
@@ -196,8 +191,8 @@ void Map::renderStill(View& view, StillImageCallback callback) {
         return;
     }
 
-    if (impl->style->getLastError()) {
-        callback(impl->style->getLastError());
+    if (impl->style->impl->getLastError()) {
+        callback(impl->style->impl->getLastError());
         return;
     }
 
@@ -228,8 +223,8 @@ void Map::Impl::render(View& view) {
 
     transform.updateTransitions(timePoint);
 
-    if (style->loaded && updateFlags & Update::AnnotationStyle) {
-        annotationManager.updateStyle(*style);
+    if (style->impl->loaded && updateFlags & Update::AnnotationStyle) {
+        annotationManager.updateStyle(*style->impl);
     }
 
     if (updateFlags & Update::AnnotationData) {
@@ -251,19 +246,19 @@ void Map::Impl::render(View& view) {
         debugOptions,
         timePoint,
         transform.getState(),
-        style->getGlyphURL(),
-        style->spriteLoaded,
+        style->impl->getGlyphURL(),
+        style->impl->spriteLoaded,
         style->getTransitionOptions(),
         style->getLight()->impl,
-        style->getImageImpls(),
-        style->getSourceImpls(),
-        style->getLayerImpls(),
+        style->impl->getImageImpls(),
+        style->impl->getSourceImpls(),
+        style->impl->getLayerImpls(),
         scheduler,
         fileSource,
         annotationManager
     });
 
-    bool loaded = style->isLoaded() && renderStyle->isLoaded();
+    bool loaded = style->impl->isLoaded() && renderStyle->isLoaded();
 
     if (mode == MapMode::Continuous) {
         if (renderState == RenderState::Never) {
@@ -334,24 +329,21 @@ void Map::setStyleURL(const std::string& url) {
     }
 
     impl->loading = true;
-
     impl->observer.onWillStartLoadingMap();
 
     impl->styleRequest = nullptr;
     impl->styleURL = url;
     impl->styleJSON.clear();
-
-    impl->style->loaded = false;
-    impl->styleMutated = false;
+    impl->style->impl->loaded = false;
 
     impl->styleRequest = impl->fileSource.request(Resource::style(impl->styleURL), [this](Response res) {
         // Once we get a fresh style, or the style is mutated, stop revalidating.
-        if (res.isFresh() || impl->styleMutated) {
+        if (res.isFresh() || impl->style->impl->mutated) {
             impl->styleRequest.reset();
         }
 
         // Don't allow a loaded, mutated style to be overwritten with a new version.
-        if (impl->styleMutated && impl->style->loaded) {
+        if (impl->style->impl->mutated && impl->style->impl->loaded) {
             return;
         }
 
@@ -381,26 +373,25 @@ void Map::setStyleJSON(const std::string& json) {
     }
 
     impl->loading = true;
-
     impl->observer.onWillStartLoadingMap();
 
     impl->styleURL.clear();
     impl->styleJSON.clear();
-    impl->styleMutated = false;
+    impl->style->impl->mutated = false;
 
     impl->loadStyleJSON(json);
 }
 
 void Map::Impl::loadStyleJSON(const std::string& json) {
-    style->setJSON(json);
+    style->impl->setJSON(json);
     styleJSON = json;
 
     if (!cameraMutated) {
         // Zoom first because it may constrain subsequent operations.
-        map.setZoom(map.getDefaultZoom());
-        map.setLatLng(map.getDefaultLatLng());
-        map.setBearing(map.getDefaultBearing());
-        map.setPitch(map.getDefaultPitch());
+        map.setZoom(style->getDefaultZoom());
+        map.setLatLng(style->getDefaultLatLng());
+        map.setBearing(style->getDefaultBearing());
+        map.setPitch(style->getDefaultPitch());
     }
 
     onUpdate(Update::AnnotationStyle);
@@ -412,6 +403,14 @@ std::string Map::getStyleURL() const {
 
 std::string Map::getStyleJSON() const {
     return impl->styleJSON;
+}
+
+style::Style& Map::getStyle() {
+    return *impl->style;
+}
+
+const style::Style& Map::getStyle() const {
+    return *impl->style;
 }
 
 #pragma mark - Transitions
@@ -872,92 +871,6 @@ AnnotationIDs Map::queryPointAnnotations(const ScreenBox& box) {
     return ids;
 }
 
-#pragma mark - Style API
-
-std::vector<style::Source*> Map::getSources() {
-    return impl->style->getSources();
-}
-
-style::Source* Map::getSource(const std::string& sourceID) {
-    impl->styleMutated = true;
-    return impl->style->getSource(sourceID);
-}
-
-void Map::addSource(std::unique_ptr<style::Source> source) {
-    impl->styleMutated = true;
-    impl->style->addSource(std::move(source));
-}
-
-std::unique_ptr<Source> Map::removeSource(const std::string& sourceID) {
-    impl->styleMutated = true;
-    return impl->style->removeSource(sourceID);
-}
-
-std::vector<style::Layer*> Map::getLayers() {
-    return impl->style->getLayers();
-}
-
-Layer* Map::getLayer(const std::string& layerID) {
-    impl->styleMutated = true;
-    return impl->style->getLayer(layerID);
-}
-
-void Map::addLayer(std::unique_ptr<Layer> layer, const optional<std::string>& before) {
-    impl->styleMutated = true;
-    impl->style->addLayer(std::move(layer), before);
-    impl->onUpdate(Update::Repaint);
-}
-
-std::unique_ptr<Layer> Map::removeLayer(const std::string& id) {
-    impl->styleMutated = true;
-    impl->onUpdate(Update::Repaint);
-    return impl->style->removeLayer(id);
-}
-
-void Map::addImage(std::unique_ptr<style::Image> image) {
-    impl->styleMutated = true;
-    impl->style->addImage(std::move(image));
-}
-
-void Map::removeImage(const std::string& id) {
-    impl->styleMutated = true;
-    impl->style->removeImage(id);
-}
-
-const style::Image* Map::getImage(const std::string& id) {
-    return impl->style->getImage(id);
-}
-
-void Map::setLight(std::unique_ptr<style::Light> light) {
-    impl->style->setLight(std::move(light));
-}
-
-style::Light* Map::getLight() {
-    return impl->style->getLight();
-}
-
-#pragma mark - Defaults
-
-std::string Map::getStyleName() const {
-    return impl->style->getName();
-}
-
-LatLng Map::getDefaultLatLng() const {
-    return impl->style->getDefaultLatLng();
-}
-
-double Map::getDefaultZoom() const {
-    return impl->style->getDefaultZoom();
-}
-
-double Map::getDefaultBearing() const {
-    return impl->style->getDefaultBearing();
-}
-
-double Map::getDefaultPitch() const {
-    return impl->style->getDefaultPitch();
-}
-
 #pragma mark - Toggles
 
 void Map::setDebug(MapDebugOptions debugOptions) {
@@ -994,15 +907,7 @@ MapDebugOptions Map::getDebug() const {
 }
 
 bool Map::isFullyLoaded() const {
-    return impl->style && impl->style->isLoaded() && impl->renderStyle && impl->renderStyle->isLoaded();
-}
-
-style::TransitionOptions Map::getTransitionOptions() const {
-    return impl->style->getTransitionOptions();
-}
-
-void Map::setTransitionOptions(const style::TransitionOptions& options) {
-    impl->style->setTransitionOptions(options);
+    return impl->style->impl->isLoaded() && impl->renderStyle && impl->renderStyle->isLoaded();
 }
 
 void Map::setSourceTileCacheSize(size_t size) {
@@ -1056,7 +961,7 @@ void Map::Impl::onResourceError(std::exception_ptr error) {
 void Map::dumpDebugLogs() const {
     Log::Info(Event::General, "--------------------------------------------------------------------------------");
     Log::Info(Event::General, "MapContext::styleURL: %s", impl->styleURL.c_str());
-    impl->style->dumpDebugLogs();
+    impl->style->impl->dumpDebugLogs();
     if (impl->renderStyle) {
         impl->renderStyle->dumpDebugLogs();
     }

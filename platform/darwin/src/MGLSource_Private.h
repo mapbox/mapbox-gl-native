@@ -18,7 +18,7 @@ struct SourceWrapper {
     __weak MGLSource *source;
 };
 
-@class MGLMapView;
+@class MGLStyle;
 
 @interface MGLSource (Private)
 
@@ -44,33 +44,33 @@ struct SourceWrapper {
 @property (nonatomic, readonly) mbgl::style::Source *rawSource;
 
 /**
- The map view whose style currently contains the source.
+ The style which currently contains the source.
 
- If the source is not currently part of any map view’s style, this property is
+ If the source is not currently part of a style, this property is
  set to `nil`.
  */
-@property (nonatomic, readonly, weak) MGLMapView *mapView;
+@property (nonatomic, readonly, weak) MGLStyle *style;
 
 /**
- Adds the mbgl source that this object represents to the mbgl map.
+ Adds the mbgl source that this object represents to the style.
 
  Once a mbgl source is added, ownership of the object is transferred to the
- `mbgl::Map` and this object no longer has an active unique_ptr reference to the
+ `mbgl::Style` and this object no longer has an active unique_ptr reference to the
  `mbgl::Source`. If this object's mbgl source is in that state, the mbgl source
  can still be changed but the changes will not be visible until the `MGLSource`
- is added back to the map via `-[MGLStyle addSource:]` and styled with a
+ is added back to the style via `-[MGLStyle addSource:]` and styled with a
  `MGLLayer`.
  */
-- (void)addToMapView:(MGLMapView *)mapView;
+- (void)addToStyle:(MGLStyle *)style;
 
 /**
- Removes the mbgl source that this object represents from the mbgl map.
+ Removes the mbgl source that this object represents from the style.
 
  When a mbgl source is removed, ownership of the object is transferred back
  to the `MGLSource` instance and the unique_ptr reference is valid again. It is
  safe to add the source back to the style after it is removed.
  */
-- (void)removeFromMapView:(MGLMapView *)mapView;
+- (void)removeFromStyle:(MGLStyle *)style;
 
 @end
 

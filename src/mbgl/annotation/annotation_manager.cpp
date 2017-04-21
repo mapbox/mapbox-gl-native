@@ -4,7 +4,7 @@
 #include <mbgl/annotation/symbol_annotation_impl.hpp>
 #include <mbgl/annotation/line_annotation_impl.hpp>
 #include <mbgl/annotation/fill_annotation_impl.hpp>
-#include <mbgl/style/style.hpp>
+#include <mbgl/style/style_impl.hpp>
 #include <mbgl/style/layers/symbol_layer.hpp>
 #include <mbgl/style/layers/symbol_layer_impl.hpp>
 #include <mbgl/storage/file_source.hpp>
@@ -149,8 +149,9 @@ std::unique_ptr<AnnotationTileData> AnnotationManager::getTileData(const Canonic
     return tileData;
 }
 
-void AnnotationManager::updateStyle(Style& style) {
-    // Create annotation source, point layer, and point bucket
+void AnnotationManager::updateStyle(Style::Impl& style) {
+    // Create annotation source, point layer, and point bucket. We do everything via Style::Impl
+    // because we don't want annotation mutations to trigger Style::Impl::styleMutated to be set.
     if (!style.getSource(SourceID)) {
         style.addSource(std::make_unique<AnnotationSource>());
 

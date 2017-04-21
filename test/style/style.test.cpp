@@ -2,7 +2,7 @@
 #include <mbgl/test/stub_file_source.hpp>
 #include <mbgl/test/fixture_log_observer.hpp>
 
-#include <mbgl/style/style.hpp>
+#include <mbgl/style/style_impl.hpp>
 #include <mbgl/style/source_impl.hpp>
 #include <mbgl/style/sources/vector_source.hpp>
 #include <mbgl/style/layer.hpp>
@@ -21,7 +21,7 @@ TEST(Style, Properties) {
 
     ThreadPool threadPool{ 1 };
     StubFileSource fileSource;
-    Style style { threadPool, fileSource, 1.0 };
+    Style::Impl style { threadPool, fileSource, 1.0 };
 
     style.setJSON(R"STYLE({"name": "Test"})STYLE");
     ASSERT_EQ("Test", style.getName());
@@ -56,7 +56,7 @@ TEST(Style, DuplicateSource) {
 
     ThreadPool threadPool{ 1 };
     StubFileSource fileSource;
-    Style style { threadPool, fileSource, 1.0 };
+    Style::Impl style { threadPool, fileSource, 1.0 };
 
     style.setJSON(util::read_file("test/fixtures/resources/style-unused-sources.json"));
 
@@ -78,7 +78,7 @@ TEST(Style, RemoveSourceInUse) {
 
     ThreadPool threadPool{ 1 };
     StubFileSource fileSource;
-    Style style { threadPool, fileSource, 1.0 };
+    Style::Impl style { threadPool, fileSource, 1.0 };
 
     style.setJSON(util::read_file("test/fixtures/resources/style-unused-sources.json"));
 
