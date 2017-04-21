@@ -12,7 +12,7 @@ public:
     RasterBucket(UnassociatedImage&&);
 
     void upload(gl::Context&) override;
-    void render(Painter&, PaintParameters&, const style::Layer&, const RenderTile&) override;
+    void render(Painter&, PaintParameters&, const RenderLayer&, const RenderTile&) override;
     bool hasData() const override;
 
     UnassociatedImage image;

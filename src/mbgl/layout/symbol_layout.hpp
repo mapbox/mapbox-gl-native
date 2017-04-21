@@ -15,21 +15,20 @@
 
 namespace mbgl {
 
-class GeometryTileLayer;
+class BucketParameters;
 class CollisionTile;
 class SymbolBucket;
 class Anchor;
+class RenderLayer;
 
 namespace style {
-class BucketParameters;
 class Filter;
-class Layer;
 } // namespace style
 
 class SymbolLayout {
 public:
-    SymbolLayout(const style::BucketParameters&,
-                 const std::vector<const style::Layer*>&,
+    SymbolLayout(const BucketParameters&,
+                 const std::vector<const RenderLayer*>&,
                  const GeometryTileLayer&,
                  IconDependencies&,
                  uintptr_t,

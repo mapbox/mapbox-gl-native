@@ -13,8 +13,8 @@
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/layer_impl.hpp>
 
-#include <mbgl/style/layers/background_layer.hpp>
-#include <mbgl/style/layers/custom_layer.hpp>
+#include <mbgl/renderer/render_background_layer.hpp>
+#include <mbgl/renderer/render_custom_layer.hpp>
 #include <mbgl/style/layers/custom_layer_impl.hpp>
 
 #include <mbgl/sprite/sprite_atlas.hpp>
@@ -279,16 +279,16 @@ void Painter::renderPass(PaintParameters& parameters,
         currentLayer = i;
 
         const auto& item = *it;
-        const Layer& layer = item.layer;
+        const RenderLayer& layer = item.layer;
 
-        if (!layer.baseImpl->hasRenderPass(pass))
+        if (!layer.hasRenderPass(pass))
             continue;
 
-        if (layer.is<BackgroundLayer>()) {
+        if (layer.is<RenderBackgroundLayer>()) {
             MBGL_DEBUG_GROUP(context, "background");
-            renderBackground(parameters, *layer.as<BackgroundLayer>());
-        } else if (layer.is<CustomLayer>()) {
-            MBGL_DEBUG_GROUP(context, layer.baseImpl->id + " - custom");
+            renderBackground(parameters, *layer.as<RenderBackgroundLayer>());
+        } else if (layer.is<RenderCustomLayer>()) {
+            MBGL_DEBUG_GROUP(context, layer.baseImpl.id + " - custom");
 
             // Reset GL state to a known state so the CustomLayer always has a clean slate.
             context.vertexArrayObject = 0;
@@ -296,14 +296,14 @@ void Painter::renderPass(PaintParameters& parameters,
             context.setStencilMode(gl::StencilMode::disabled());
             context.setColorMode(colorModeForRenderPass());
 
-            layer.as<CustomLayer>()->impl->render(state);
+            layer.as<RenderCustomLayer>()->impl->render(state);
 
             // Reset the view back to our original one, just in case the CustomLayer changed
             // the viewport or Framebuffer.
             parameters.view.bind();
             context.setDirtyState();
         } else {
-            MBGL_DEBUG_GROUP(context, layer.baseImpl->id + " - " + util::toString(item.tile->id));
+            MBGL_DEBUG_GROUP(context, layer.baseImpl.id + " - " + util::toString(item.tile->id));
             item.bucket->render(*this, parameters, layer, *item.tile);
         }
     }

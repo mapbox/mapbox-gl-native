@@ -11,22 +11,20 @@
 
 namespace mbgl {
 
-namespace style {
 class BucketParameters;
-} // namespace style
 
 class CircleBucket : public Bucket {
 public:
-    CircleBucket(const style::BucketParameters&, const std::vector<const style::Layer*>&);
+    CircleBucket(const BucketParameters&, const std::vector<const RenderLayer*>&);
 
     void addFeature(const GeometryTileFeature&,
                     const GeometryCollection&) override;
     bool hasData() const override;
 
     void upload(gl::Context&) override;
-    void render(Painter&, PaintParameters&, const style::Layer&, const RenderTile&) override;
+    void render(Painter&, PaintParameters&, const RenderLayer&, const RenderTile&) override;
 
-    float getQueryRadius(const style::Layer&) const override;
+    float getQueryRadius(const RenderLayer&) const override;
 
     gl::VertexVector<CircleLayoutVertex> vertices;
     gl::IndexVector<gl::Triangles> triangles;

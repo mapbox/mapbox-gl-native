@@ -2,7 +2,7 @@
 #include <mbgl/renderer/paint_parameters.hpp>
 #include <mbgl/renderer/fill_bucket.hpp>
 #include <mbgl/renderer/render_tile.hpp>
-#include <mbgl/style/layers/fill_layer.hpp>
+#include <mbgl/renderer/render_fill_layer.hpp>
 #include <mbgl/style/layers/fill_layer_impl.hpp>
 #include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/programs/programs.hpp>
@@ -15,9 +15,9 @@ using namespace style;
 
 void Painter::renderFill(PaintParameters& parameters,
                          FillBucket& bucket,
-                         const FillLayer& layer,
+                         const RenderFillLayer& layer,
                          const RenderTile& tile) {
-    const FillPaintProperties::Evaluated& properties = layer.impl->paint.evaluated;
+    const FillPaintProperties::Evaluated& properties = layer.evaluated;
 
     if (!properties.get<FillPattern>().from.empty()) {
         if (pass != RenderPass::Translucent) {
@@ -70,7 +70,7 @@ void Painter::renderFill(PaintParameters& parameters,
              *bucket.triangleIndexBuffer,
              bucket.triangleSegments);
 
-        if (!properties.get<FillAntialias>() || !layer.impl->paint.unevaluated.get<FillOutlineColor>().isUndefined()) {
+        if (!properties.get<FillAntialias>() || !layer.unevaluated.get<FillOutlineColor>().isUndefined()) {
             return;
         }
 
@@ -108,7 +108,7 @@ void Painter::renderFill(PaintParameters& parameters,
             );
         };
 
-        if (properties.get<FillAntialias>() && !layer.impl->paint.unevaluated.get<FillOutlineColor>().isUndefined() && pass == RenderPass::Translucent) {
+        if (properties.get<FillAntialias>() && !layer.unevaluated.get<FillOutlineColor>().isUndefined() && pass == RenderPass::Translucent) {
             draw(2,
                  parameters.programs.fillOutline,
                  gl::Lines { 2.0f },
@@ -127,7 +127,7 @@ void Painter::renderFill(PaintParameters& parameters,
                  bucket.triangleSegments);
         }
 
-        if (properties.get<FillAntialias>() && layer.impl->paint.unevaluated.get<FillOutlineColor>().isUndefined() && pass == RenderPass::Translucent) {
+        if (properties.get<FillAntialias>() && layer.unevaluated.get<FillOutlineColor>().isUndefined() && pass == RenderPass::Translucent) {
             draw(2,
                  parameters.programs.fillOutline,
                  gl::Lines { 2.0f },

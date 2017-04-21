@@ -82,7 +82,7 @@ public:
 
 template <>
 inline bool Layer::is<FillExtrusionLayer>() const {
-    return type == Type::FillExtrusion;
+    return type == LayerType::FillExtrusion;
 }
 
 } // namespace style

@@ -3,6 +3,7 @@
 #include <mbgl/renderer/render_pass.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
+#include <mbgl/renderer/render_layer.hpp>
 
 #include <atomic>
 #include <string>
@@ -36,11 +37,11 @@ public:
 
     // Every time this bucket is getting rendered, this function is called. This happens either
     // once or twice (for Opaque and Transparent render passes).
-    virtual void render(Painter&, PaintParameters&, const style::Layer&, const RenderTile&) = 0;
+    virtual void render(Painter&, PaintParameters&, const RenderLayer&, const RenderTile&) = 0;
 
     virtual bool hasData() const = 0;
 
-    virtual float getQueryRadius(const style::Layer&) const {
+    virtual float getQueryRadius(const RenderLayer&) const {
         return 0;
     };
 

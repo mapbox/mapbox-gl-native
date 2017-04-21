@@ -8,14 +8,14 @@ namespace mbgl {
 namespace style {
 
 SymbolLayer::SymbolLayer(const std::string& layerID, const std::string& sourceID)
-    : Layer(Type::Symbol, std::make_unique<Impl>())
+    : Layer(LayerType::Symbol, std::make_unique<Impl>())
     , impl(static_cast<Impl*>(baseImpl.get())) {
     impl->id = layerID;
     impl->source = sourceID;
 }
 
 SymbolLayer::SymbolLayer(const Impl& other)
-    : Layer(Type::Symbol, std::make_unique<Impl>(other))
+    : Layer(LayerType::Symbol, std::make_unique<Impl>(other))
     , impl(static_cast<Impl*>(baseImpl.get())) {
 }
 
@@ -28,7 +28,7 @@ std::unique_ptr<Layer> SymbolLayer::Impl::clone() const {
 std::unique_ptr<Layer> SymbolLayer::Impl::cloneRef(const std::string& id_) const {
     auto result = std::make_unique<SymbolLayer>(*this);
     result->impl->id = id_;
-    result->impl->paint = SymbolPaintProperties();
+    result->impl->cascading = SymbolPaintProperties::Cascading();
     return std::move(result);
 }
 
@@ -547,13 +547,13 @@ DataDrivenPropertyValue<float> SymbolLayer::getDefaultIconOpacity() {
 }
 
 DataDrivenPropertyValue<float> SymbolLayer::getIconOpacity(const optional<std::string>& klass) const {
-    return impl->paint.get<IconOpacity>(klass);
+    return impl->cascading.template get<IconOpacity>().get(klass);
 }
 
 void SymbolLayer::setIconOpacity(DataDrivenPropertyValue<float> value, const optional<std::string>& klass) {
     if (value == getIconOpacity(klass))
         return;
-    impl->paint.set<IconOpacity>(value, klass);
+    impl->cascading.template get<IconOpacity>().set(value, klass);
     if (value.isDataDriven()) {
         impl->observer->onLayerDataDrivenPaintPropertyChanged(*this);
     } else {
@@ -562,11 +562,11 @@ void SymbolLayer::setIconOpacity(DataDrivenPropertyValue<float> value, const opt
 }
 
 void SymbolLayer::setIconOpacityTransition(const TransitionOptions& value, const optional<std::string>& klass) {
-    impl->paint.setTransition<IconOpacity>(value, klass);
+    impl->cascading.template get<IconOpacity>().setTransition(value, klass);
 }
 
 TransitionOptions SymbolLayer::getIconOpacityTransition(const optional<std::string>& klass) const {
-    return impl->paint.getTransition<IconOpacity>(klass);
+    return impl->cascading.template get<IconOpacity>().getTransition(klass);
 }
 
 DataDrivenPropertyValue<Color> SymbolLayer::getDefaultIconColor() {
@@ -574,13 +574,13 @@ DataDrivenPropertyValue<Color> SymbolLayer::getDefaultIconColor() {
 }
 
 DataDrivenPropertyValue<Color> SymbolLayer::getIconColor(const optional<std::string>& klass) const {
-    return impl->paint.get<IconColor>(klass);
+    return impl->cascading.template get<IconColor>().get(klass);
 }
 
 void SymbolLayer::setIconColor(DataDrivenPropertyValue<Color> value, const optional<std::string>& klass) {
     if (value == getIconColor(klass))
         return;
-    impl->paint.set<IconColor>(value, klass);
+    impl->cascading.template get<IconColor>().set(value, klass);
     if (value.isDataDriven()) {
         impl->observer->onLayerDataDrivenPaintPropertyChanged(*this);
     } else {
@@ -589,11 +589,11 @@ void SymbolLayer::setIconColor(DataDrivenPropertyValue<Color> value, const optio
 }
 
 void SymbolLayer::setIconColorTransition(const TransitionOptions& value, const optional<std::string>& klass) {
-    impl->paint.setTransition<IconColor>(value, klass);
+    impl->cascading.template get<IconColor>().setTransition(value, klass);
 }
 
 TransitionOptions SymbolLayer::getIconColorTransition(const optional<std::string>& klass) const {
-    return impl->paint.getTransition<IconColor>(klass);
+    return impl->cascading.template get<IconColor>().getTransition(klass);
 }
 
 DataDrivenPropertyValue<Color> SymbolLayer::getDefaultIconHaloColor() {
@@ -601,13 +601,13 @@ DataDrivenPropertyValue<Color> SymbolLayer::getDefaultIconHaloColor() {
 }
 
 DataDrivenPropertyValue<Color> SymbolLayer::getIconHaloColor(const optional<std::string>& klass) const {
-    return impl->paint.get<IconHaloColor>(klass);
+    return impl->cascading.template get<IconHaloColor>().get(klass);
 }
 
 void SymbolLayer::setIconHaloColor(DataDrivenPropertyValue<Color> value, const optional<std::string>& klass) {
     if (value == getIconHaloColor(klass))
         return;
-    impl->paint.set<IconHaloColor>(value, klass);
+    impl->cascading.template get<IconHaloColor>().set(value, klass);
     if (value.isDataDriven()) {
         impl->observer->onLayerDataDrivenPaintPropertyChanged(*this);
     } else {
@@ -616,11 +616,11 @@ void SymbolLayer::setIconHaloColor(DataDrivenPropertyValue<Color> value, const o
 }
 
 void SymbolLayer::setIconHaloColorTransition(const TransitionOptions& value, const optional<std::string>& klass) {
-    impl->paint.setTransition<IconHaloColor>(value, klass);
+    impl->cascading.template get<IconHaloColor>().setTransition(value, klass);
 }
 
 TransitionOptions SymbolLayer::getIconHaloColorTransition(const optional<std::string>& klass) const {
-    return impl->paint.getTransition<IconHaloColor>(klass);
+    return impl->cascading.template get<IconHaloColor>().getTransition(klass);
 }
 
 DataDrivenPropertyValue<float> SymbolLayer::getDefaultIconHaloWidth() {
@@ -628,13 +628,13 @@ DataDrivenPropertyValue<float> SymbolLayer::getDefaultIconHaloWidth() {
 }
 
 DataDrivenPropertyValue<float> SymbolLayer::getIconHaloWidth(const optional<std::string>& klass) const {
-    return impl->paint.get<IconHaloWidth>(klass);
+    return impl->cascading.template get<IconHaloWidth>().get(klass);
 }
 
 void SymbolLayer::setIconHaloWidth(DataDrivenPropertyValue<float> value, const optional<std::string>& klass) {
     if (value == getIconHaloWidth(klass))
         return;
-    impl->paint.set<IconHaloWidth>(value, klass);
+    impl->cascading.template get<IconHaloWidth>().set(value, klass);
     if (value.isDataDriven()) {
         impl->observer->onLayerDataDrivenPaintPropertyChanged(*this);
     } else {
@@ -643,11 +643,11 @@ void SymbolLayer::setIconHaloWidth(DataDrivenPropertyValue<float> value, const o
 }
 
 void SymbolLayer::setIconHaloWidthTransition(const TransitionOptions& value, const optional<std::string>& klass) {
-    impl->paint.setTransition<IconHaloWidth>(value, klass);
+    impl->cascading.template get<IconHaloWidth>().setTransition(value, klass);
 }
 
 TransitionOptions SymbolLayer::getIconHaloWidthTransition(const optional<std::string>& klass) const {
-    return impl->paint.getTransition<IconHaloWidth>(klass);
+    return impl->cascading.template get<IconHaloWidth>().getTransition(klass);
 }
 
 DataDrivenPropertyValue<float> SymbolLayer::getDefaultIconHaloBlur() {
@@ -655,13 +655,13 @@ DataDrivenPropertyValue<float> SymbolLayer::getDefaultIconHaloBlur() {
 }
 
 DataDrivenPropertyValue<float> SymbolLayer::getIconHaloBlur(const optional<std::string>& klass) const {
-    return impl->paint.get<IconHaloBlur>(klass);
+    return impl->cascading.template get<IconHaloBlur>().get(klass);
 }
 
 void SymbolLayer::setIconHaloBlur(DataDrivenPropertyValue<float> value, const optional<std::string>& klass) {
     if (value == getIconHaloBlur(klass))
         return;
-    impl->paint.set<IconHaloBlur>(value, klass);
+    impl->cascading.template get<IconHaloBlur>().set(value, klass);
     if (value.isDataDriven()) {
         impl->observer->onLayerDataDrivenPaintPropertyChanged(*this);
     } else {
@@ -670,11 +670,11 @@ void SymbolLayer::setIconHaloBlur(DataDrivenPropertyValue<float> value, const op
 }
 
 void SymbolLayer::setIconHaloBlurTransition(const TransitionOptions& value, const optional<std::string>& klass) {
-    impl->paint.setTransition<IconHaloBlur>(value, klass);
+    impl->cascading.template get<IconHaloBlur>().setTransition(value, klass);
 }
 
 TransitionOptions SymbolLayer::getIconHaloBlurTransition(const optional<std::string>& klass) const {
-    return impl->paint.getTransition<IconHaloBlur>(klass);
+    return impl->cascading.template get<IconHaloBlur>().getTransition(klass);
 }
 
 PropertyValue<std::array<float, 2>> SymbolLayer::getDefaultIconTranslate() {
@@ -682,22 +682,22 @@ PropertyValue<std::array<float, 2>> SymbolLayer::getDefaultIconTranslate() {
 }
 
 PropertyValue<std::array<float, 2>> SymbolLayer::getIconTranslate(const optional<std::string>& klass) const {
-    return impl->paint.get<IconTranslate>(klass);
+    return impl->cascading.template get<IconTranslate>().get(klass);
 }
 
 void SymbolLayer::setIconTranslate(PropertyValue<std::array<float, 2>> value, const optional<std::string>& klass) {
     if (value == getIconTranslate(klass))
         return;
-    impl->paint.set<IconTranslate>(value, klass);
+    impl->cascading.template get<IconTranslate>().set(value, klass);
     impl->observer->onLayerPaintPropertyChanged(*this);
 }
 
 void SymbolLayer::setIconTranslateTransition(const TransitionOptions& value, const optional<std::string>& klass) {
-    impl->paint.setTransition<IconTranslate>(value, klass);
+    impl->cascading.template get<IconTranslate>().setTransition(value, klass);
 }
 
 TransitionOptions SymbolLayer::getIconTranslateTransition(const optional<std::string>& klass) const {
-    return impl->paint.getTransition<IconTranslate>(klass);
+    return impl->cascading.template get<IconTranslate>().getTransition(klass);
 }
 
 PropertyValue<TranslateAnchorType> SymbolLayer::getDefaultIconTranslateAnchor() {
@@ -705,22 +705,22 @@ PropertyValue<TranslateAnchorType> SymbolLayer::getDefaultIconTranslateAnchor() 
 }
 
 PropertyValue<TranslateAnchorType> SymbolLayer::getIconTranslateAnchor(const optional<std::string>& klass) const {
-    return impl->paint.get<IconTranslateAnchor>(klass);
+    return impl->cascading.template get<IconTranslateAnchor>().get(klass);
 }
 
 void SymbolLayer::setIconTranslateAnchor(PropertyValue<TranslateAnchorType> value, const optional<std::string>& klass) {
     if (value == getIconTranslateAnchor(klass))
         return;
-    impl->paint.set<IconTranslateAnchor>(value, klass);
+    impl->cascading.template get<IconTranslateAnchor>().set(value, klass);
     impl->observer->onLayerPaintPropertyChanged(*this);
 }
 
 void SymbolLayer::setIconTranslateAnchorTransition(const TransitionOptions& value, const optional<std::string>& klass) {
-    impl->paint.setTransition<IconTranslateAnchor>(value, klass);
+    impl->cascading.template get<IconTranslateAnchor>().setTransition(value, klass);
 }
 
 TransitionOptions SymbolLayer::getIconTranslateAnchorTransition(const optional<std::string>& klass) const {
-    return impl->paint.getTransition<IconTranslateAnchor>(klass);
+    return impl->cascading.template get<IconTranslateAnchor>().getTransition(klass);
 }
 
 DataDrivenPropertyValue<float> SymbolLayer::getDefaultTextOpacity() {
@@ -728,13 +728,13 @@ DataDrivenPropertyValue<float> SymbolLayer::getDefaultTextOpacity() {
 }
 
 DataDrivenPropertyValue<float> SymbolLayer::getTextOpacity(const optional<std::string>& klass) const {
-    return impl->paint.get<TextOpacity>(klass);
+    return impl->cascading.template get<TextOpacity>().get(klass);
 }
 
 void SymbolLayer::setTextOpacity(DataDrivenPropertyValue<float> value, const optional<std::string>& klass) {
     if (value == getTextOpacity(klass))
         return;
-    impl->paint.set<TextOpacity>(value, klass);
+    impl->cascading.template get<TextOpacity>().set(value, klass);
     if (value.isDataDriven()) {
         impl->observer->onLayerDataDrivenPaintPropertyChanged(*this);
     } else {
@@ -743,11 +743,11 @@ void SymbolLayer::setTextOpacity(DataDrivenPropertyValue<float> value, const opt
 }
 
 void SymbolLayer::setTextOpacityTransition(const TransitionOptions& value, const optional<std::string>& klass) {
-    impl->paint.setTransition<TextOpacity>(value, klass);
+    impl->cascading.template get<TextOpacity>().setTransition(value, klass);
 }
 
 TransitionOptions SymbolLayer::getTextOpacityTransition(const optional<std::string>& klass) const {
-    return impl->paint.getTransition<TextOpacity>(klass);
+    return impl->cascading.template get<TextOpacity>().getTransition(klass);
 }
 
 DataDrivenPropertyValue<Color> SymbolLayer::getDefaultTextColor() {
@@ -755,13 +755,13 @@ DataDrivenPropertyValue<Color> SymbolLayer::getDefaultTextColor() {
 }
 
 DataDrivenPropertyValue<Color> SymbolLayer::getTextColor(const optional<std::string>& klass) const {
-    return impl->paint.get<TextColor>(klass);
+    return impl->cascading.template get<TextColor>().get(klass);
 }
 
 void SymbolLayer::setTextColor(DataDrivenPropertyValue<Color> value, const optional<std::string>& klass) {
     if (value == getTextColor(klass))
         return;
-    impl->paint.set<TextColor>(value, klass);
+    impl->cascading.template get<TextColor>().set(value, klass);
     if (value.isDataDriven()) {
         impl->observer->onLayerDataDrivenPaintPropertyChanged(*this);
     } else {
@@ -770,11 +770,11 @@ void SymbolLayer::setTextColor(DataDrivenPropertyValue<Color> value, const optio
 }
 
 void SymbolLayer::setTextColorTransition(const TransitionOptions& value, const optional<std::string>& klass) {
-    impl->paint.setTransition<TextColor>(value, klass);
+    impl->cascading.template get<TextColor>().setTransition(value, klass);
 }
 
 TransitionOptions SymbolLayer::getTextColorTransition(const optional<std::string>& klass) const {
-    return impl->paint.getTransition<TextColor>(klass);
+    return impl->cascading.template get<TextColor>().getTransition(klass);
 }
 
 DataDrivenPropertyValue<Color> SymbolLayer::getDefaultTextHaloColor() {
@@ -782,13 +782,13 @@ DataDrivenPropertyValue<Color> SymbolLayer::getDefaultTextHaloColor() {
 }
 
 DataDrivenPropertyValue<Color> SymbolLayer::getTextHaloColor(const optional<std::string>& klass) const {
-    return impl->paint.get<TextHaloColor>(klass);
+    return impl->cascading.template get<TextHaloColor>().get(klass);
 }
 
 void SymbolLayer::setTextHaloColor(DataDrivenPropertyValue<Color> value, const optional<std::string>& klass) {
     if (value == getTextHaloColor(klass))
         return;
-    impl->paint.set<TextHaloColor>(value, klass);
+    impl->cascading.template get<TextHaloColor>().set(value, klass);
     if (value.isDataDriven()) {
         impl->observer->onLayerDataDrivenPaintPropertyChanged(*this);
     } else {
@@ -797,11 +797,11 @@ void SymbolLayer::setTextHaloColor(DataDrivenPropertyValue<Color> value, const o
 }
 
 void SymbolLayer::setTextHaloColorTransition(const TransitionOptions& value, const optional<std::string>& klass) {
-    impl->paint.setTransition<TextHaloColor>(value, klass);
+    impl->cascading.template get<TextHaloColor>().setTransition(value, klass);
 }
 
 TransitionOptions SymbolLayer::getTextHaloColorTransition(const optional<std::string>& klass) const {
-    return impl->paint.getTransition<TextHaloColor>(klass);
+    return impl->cascading.template get<TextHaloColor>().getTransition(klass);
 }
 
 DataDrivenPropertyValue<float> SymbolLayer::getDefaultTextHaloWidth() {
@@ -809,13 +809,13 @@ DataDrivenPropertyValue<float> SymbolLayer::getDefaultTextHaloWidth() {
 }
 
 DataDrivenPropertyValue<float> SymbolLayer::getTextHaloWidth(const optional<std::string>& klass) const {
-    return impl->paint.get<TextHaloWidth>(klass);
+    return impl->cascading.template get<TextHaloWidth>().get(klass);
 }
 
 void SymbolLayer::setTextHaloWidth(DataDrivenPropertyValue<float> value, const optional<std::string>& klass) {
     if (value == getTextHaloWidth(klass))
         return;
-    impl->paint.set<TextHaloWidth>(value, klass);
+    impl->cascading.template get<TextHaloWidth>().set(value, klass);
     if (value.isDataDriven()) {
         impl->observer->onLayerDataDrivenPaintPropertyChanged(*this);
     } else {
@@ -824,11 +824,11 @@ void SymbolLayer::setTextHaloWidth(DataDrivenPropertyValue<float> value, const o
 }
 
 void SymbolLayer::setTextHaloWidthTransition(const TransitionOptions& value, const optional<std::string>& klass) {
-    impl->paint.setTransition<TextHaloWidth>(value, klass);
+    impl->cascading.template get<TextHaloWidth>().setTransition(value, klass);
 }
 
 TransitionOptions SymbolLayer::getTextHaloWidthTransition(const optional<std::string>& klass) const {
-    return impl->paint.getTransition<TextHaloWidth>(klass);
+    return impl->cascading.template get<TextHaloWidth>().getTransition(klass);
 }
 
 DataDrivenPropertyValue<float> SymbolLayer::getDefaultTextHaloBlur() {
@@ -836,13 +836,13 @@ DataDrivenPropertyValue<float> SymbolLayer::getDefaultTextHaloBlur() {
 }
 
 DataDrivenPropertyValue<float> SymbolLayer::getTextHaloBlur(const optional<std::string>& klass) const {
-    return impl->paint.get<TextHaloBlur>(klass);
+    return impl->cascading.template get<TextHaloBlur>().get(klass);
 }
 
 void SymbolLayer::setTextHaloBlur(DataDrivenPropertyValue<float> value, const optional<std::string>& klass) {
     if (value == getTextHaloBlur(klass))
         return;
-    impl->paint.set<TextHaloBlur>(value, klass);
+    impl->cascading.template get<TextHaloBlur>().set(value, klass);
     if (value.isDataDriven()) {
         impl->observer->onLayerDataDrivenPaintPropertyChanged(*this);
     } else {
@@ -851,11 +851,11 @@ void SymbolLayer::setTextHaloBlur(DataDrivenPropertyValue<float> value, const op
 }
 
 void SymbolLayer::setTextHaloBlurTransition(const TransitionOptions& value, const optional<std::string>& klass) {
-    impl->paint.setTransition<TextHaloBlur>(value, klass);
+    impl->cascading.template get<TextHaloBlur>().setTransition(value, klass);
 }
 
 TransitionOptions SymbolLayer::getTextHaloBlurTransition(const optional<std::string>& klass) const {
-    return impl->paint.getTransition<TextHaloBlur>(klass);
+    return impl->cascading.template get<TextHaloBlur>().getTransition(klass);
 }
 
 PropertyValue<std::array<float, 2>> SymbolLayer::getDefaultTextTranslate() {
@@ -863,22 +863,22 @@ PropertyValue<std::array<float, 2>> SymbolLayer::getDefaultTextTranslate() {
 }
 
 PropertyValue<std::array<float, 2>> SymbolLayer::getTextTranslate(const optional<std::string>& klass) const {
-    return impl->paint.get<TextTranslate>(klass);
+    return impl->cascading.template get<TextTranslate>().get(klass);
 }
 
 void SymbolLayer::setTextTranslate(PropertyValue<std::array<float, 2>> value, const optional<std::string>& klass) {
     if (value == getTextTranslate(klass))
         return;
-    impl->paint.set<TextTranslate>(value, klass);
+    impl->cascading.template get<TextTranslate>().set(value, klass);
     impl->observer->onLayerPaintPropertyChanged(*this);
 }
 
 void SymbolLayer::setTextTranslateTransition(const TransitionOptions& value, const optional<std::string>& klass) {
-    impl->paint.setTransition<TextTranslate>(value, klass);
+    impl->cascading.template get<TextTranslate>().setTransition(value, klass);
 }
 
 TransitionOptions SymbolLayer::getTextTranslateTransition(const optional<std::string>& klass) const {
-    return impl->paint.getTransition<TextTranslate>(klass);
+    return impl->cascading.template get<TextTranslate>().getTransition(klass);
 }
 
 PropertyValue<TranslateAnchorType> SymbolLayer::getDefaultTextTranslateAnchor() {
@@ -886,22 +886,22 @@ PropertyValue<TranslateAnchorType> SymbolLayer::getDefaultTextTranslateAnchor() 
 }
 
 PropertyValue<TranslateAnchorType> SymbolLayer::getTextTranslateAnchor(const optional<std::string>& klass) const {
-    return impl->paint.get<TextTranslateAnchor>(klass);
+    return impl->cascading.template get<TextTranslateAnchor>().get(klass);
 }
 
 void SymbolLayer::setTextTranslateAnchor(PropertyValue<TranslateAnchorType> value, const optional<std::string>& klass) {
     if (value == getTextTranslateAnchor(klass))
         return;
-    impl->paint.set<TextTranslateAnchor>(value, klass);
+    impl->cascading.template get<TextTranslateAnchor>().set(value, klass);
     impl->observer->onLayerPaintPropertyChanged(*this);
 }
 
 void SymbolLayer::setTextTranslateAnchorTransition(const TransitionOptions& value, const optional<std::string>& klass) {
-    impl->paint.setTransition<TextTranslateAnchor>(value, klass);
+    impl->cascading.template get<TextTranslateAnchor>().setTransition(value, klass);
 }
 
 TransitionOptions SymbolLayer::getTextTranslateAnchorTransition(const optional<std::string>& klass) const {
-    return impl->paint.getTransition<TextTranslateAnchor>(klass);
+    return impl->cascading.template get<TextTranslateAnchor>().getTransition(klass);
 }
 
 } // namespace style

@@ -2,7 +2,7 @@
 #include <mbgl/renderer/paint_parameters.hpp>
 #include <mbgl/renderer/symbol_bucket.hpp>
 #include <mbgl/renderer/render_tile.hpp>
-#include <mbgl/style/layers/symbol_layer.hpp>
+#include <mbgl/renderer/render_symbol_layer.hpp>
 #include <mbgl/style/layers/symbol_layer_impl.hpp>
 #include <mbgl/text/glyph_atlas.hpp>
 #include <mbgl/sprite/sprite_atlas.hpp>
@@ -20,7 +20,7 @@ using namespace style;
 
 void Painter::renderSymbol(PaintParameters& parameters,
                            SymbolBucket& bucket,
-                           const SymbolLayer& layer,
+                           const RenderSymbolLayer& layer,
                            const RenderTile& tile) {
     if (pass == RenderPass::Opaque) {
         return;
@@ -64,8 +64,8 @@ void Painter::renderSymbol(PaintParameters& parameters,
     };
 
     if (bucket.hasIconData()) {
-        auto values = layer.impl->iconPropertyValues(layout);
-        auto paintPropertyValues = layer.impl->iconPaintProperties();
+        auto values = layer.iconPropertyValues(layout);
+        auto paintPropertyValues = layer.iconPaintProperties();
 
         SpriteAtlas& atlas = *layer.impl->spriteAtlas;
         const bool iconScaled = layout.get<IconSize>().constantOr(1.0) != 1.0 ||
@@ -110,8 +110,8 @@ void Painter::renderSymbol(PaintParameters& parameters,
     if (bucket.hasTextData()) {
         glyphAtlas->bind(context, 0);
 
-        auto values = layer.impl->textPropertyValues(layout);
-        auto paintPropertyValues = layer.impl->textPaintProperties();
+        auto values = layer.textPropertyValues(layout);
+        auto paintPropertyValues = layer.textPaintProperties();
 
         const Size texsize = glyphAtlas->getSize();
 

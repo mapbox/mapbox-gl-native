@@ -264,7 +264,7 @@ public:
 
 template <>
 inline bool Layer::is<SymbolLayer>() const {
-    return type == Type::Symbol;
+    return type == LayerType::Symbol;
 }
 
 } // namespace style

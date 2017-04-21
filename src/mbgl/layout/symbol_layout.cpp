@@ -3,8 +3,8 @@
 #include <mbgl/layout/clip_lines.hpp>
 #include <mbgl/renderer/symbol_bucket.hpp>
 #include <mbgl/style/filter_evaluator.hpp>
-#include <mbgl/style/bucket_parameters.hpp>
-#include <mbgl/style/layers/symbol_layer.hpp>
+#include <mbgl/renderer/bucket_parameters.hpp>
+#include <mbgl/renderer/render_symbol_layer.hpp>
 #include <mbgl/style/layers/symbol_layer_impl.hpp>
 #include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/text/get_anchors.hpp>
@@ -22,6 +22,7 @@
 #include <mbgl/math/log2.hpp>
 #include <mbgl/util/platform.hpp>
 #include <mbgl/util/logging.hpp>
+#include <mbgl/tile/geometry_tile_data.hpp>
 
 #include <mapbox/polylabel.hpp>
 
@@ -38,7 +39,7 @@ static bool has(const style::SymbolLayoutProperties::PossiblyEvaluated& layout) 
 }
 
 SymbolLayout::SymbolLayout(const BucketParameters& parameters,
-                           const std::vector<const Layer*>& layers,
+                           const std::vector<const RenderLayer*>& layers,
                            const GeometryTileLayer& sourceLayer,
                            IconDependencies& iconDependencies,
                            uintptr_t _spriteAtlasMapIndex,
@@ -51,11 +52,11 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
       spriteAtlasMapIndex(_spriteAtlasMapIndex),
       tileSize(util::tileSize * overscaling),
       tilePixelRatio(float(util::EXTENT) / tileSize),
-      textSize(layers.at(0)->as<SymbolLayer>()->impl->layout.unevaluated.get<TextSize>()),
-      iconSize(layers.at(0)->as<SymbolLayer>()->impl->layout.unevaluated.get<IconSize>())
+      textSize(layers.at(0)->as<RenderSymbolLayer>()->impl->layout.unevaluated.get<TextSize>()),
+      iconSize(layers.at(0)->as<RenderSymbolLayer>()->impl->layout.unevaluated.get<IconSize>())
     {
 
-    const SymbolLayer::Impl& leader = *layers.at(0)->as<SymbolLayer>()->impl;
+    const SymbolLayer::Impl& leader = *layers.at(0)->as<RenderSymbolLayer>()->impl;
 
     layout = leader.layout.evaluate(PropertyEvaluationParameters(zoom));
 
@@ -89,8 +90,8 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
 
     for (const auto& layer : layers) {
         layerPaintProperties.emplace(layer->getID(), std::make_pair(
-            layer->as<SymbolLayer>()->impl->iconPaintProperties(),
-            layer->as<SymbolLayer>()->impl->textPaintProperties()
+            layer->as<RenderSymbolLayer>()->iconPaintProperties(),
+            layer->as<RenderSymbolLayer>()->textPaintProperties()
         ));
     }
 

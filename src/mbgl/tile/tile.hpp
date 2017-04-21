@@ -22,9 +22,9 @@ class TransformState;
 class TileObserver;
 class PlacementConfig;
 class RenderedQueryOptions;
+class RenderLayer;
 
 namespace style {
-class Layer;
 class SourceQueryOptions;
 } // namespace style
 
@@ -47,7 +47,7 @@ public:
     // Mark this tile as no longer needed and cancel any pending work.
     virtual void cancel() = 0;
 
-    virtual Bucket* getBucket(const style::Layer&) const = 0;
+    virtual Bucket* getBucket(const RenderLayer&) const = 0;
 
     virtual void setPlacementConfig(const PlacementConfig&) {}
     virtual void redoLayout() {}

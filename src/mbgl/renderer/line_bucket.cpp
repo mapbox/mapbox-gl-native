@@ -1,7 +1,7 @@
 #include <mbgl/renderer/line_bucket.hpp>
 #include <mbgl/renderer/painter.hpp>
-#include <mbgl/style/layers/line_layer.hpp>
-#include <mbgl/style/bucket_parameters.hpp>
+#include <mbgl/renderer/render_line_layer.hpp>
+#include <mbgl/renderer/bucket_parameters.hpp>
 #include <mbgl/style/layers/line_layer_impl.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/constants.hpp>
@@ -13,7 +13,7 @@ namespace mbgl {
 using namespace style;
 
 LineBucket::LineBucket(const BucketParameters& parameters,
-                       const std::vector<const Layer*>& layers,
+                       const std::vector<const RenderLayer*>& layers,
                        const style::LineLayoutProperties& layout_)
     : layout(layout_.evaluate(PropertyEvaluationParameters(parameters.tileID.overscaledZ))),
       overscaling(parameters.tileID.overscaleFactor()) {
@@ -22,7 +22,7 @@ LineBucket::LineBucket(const BucketParameters& parameters,
             std::piecewise_construct,
             std::forward_as_tuple(layer->getID()),
             std::forward_as_tuple(
-                layer->as<LineLayer>()->impl->paint.evaluated,
+                layer->as<RenderLineLayer>()->evaluated,
                 parameters.tileID.overscaledZ));
     }
 }
@@ -460,9 +460,9 @@ void LineBucket::upload(gl::Context& context) {
 
 void LineBucket::render(Painter& painter,
                         PaintParameters& parameters,
-                        const Layer& layer,
+                        const RenderLayer& layer,
                         const RenderTile& tile) {
-    painter.renderLine(parameters, *this, *layer.as<LineLayer>(), tile);
+    painter.renderLine(parameters, *this, *layer.as<RenderLineLayer>(), tile);
 }
 
 bool LineBucket::hasData() const {
@@ -470,17 +470,17 @@ bool LineBucket::hasData() const {
 }
 
 template <class Property>
-static float get(const LineLayer& layer, const std::map<std::string, LineProgram::PaintPropertyBinders>& paintPropertyBinders) {
+static float get(const RenderLineLayer& layer, const std::map<std::string, LineProgram::PaintPropertyBinders>& paintPropertyBinders) {
     auto it = paintPropertyBinders.find(layer.getID());
     if (it == paintPropertyBinders.end() || !it->second.statistics<Property>().max()) {
-        return layer.impl->paint.evaluated.get<Property>().constantOr(Property::defaultValue());
+        return layer.evaluated.get<Property>().constantOr(Property::defaultValue());
     } else {
         return *it->second.statistics<Property>().max();
     }
 }
 
-float LineBucket::getLineWidth(const style::LineLayer& layer) const {
-    float lineWidth = layer.impl->paint.evaluated.get<LineWidth>();
+float LineBucket::getLineWidth(const RenderLineLayer& layer) const {
+    float lineWidth = layer.evaluated.get<LineWidth>();
     float gapWidth = get<LineGapWidth>(layer, paintPropertyBinders);
 
     if (gapWidth) {
@@ -490,15 +490,14 @@ float LineBucket::getLineWidth(const style::LineLayer& layer) const {
     }
 }
 
-float LineBucket::getQueryRadius(const style::Layer& layer) const {
-    if (!layer.is<LineLayer>()) {
+float LineBucket::getQueryRadius(const RenderLayer& layer) const {
+    if (!layer.is<RenderLineLayer>()) {
         return 0;
     }
 
-    auto lineLayer = layer.as<LineLayer>();
-    auto paint = lineLayer->impl->paint;
+    auto lineLayer = layer.as<RenderLineLayer>();
 
-    const std::array<float, 2>& translate = paint.evaluated.get<LineTranslate>();
+    const std::array<float, 2>& translate = lineLayer->evaluated.get<LineTranslate>();
     float offset = get<LineOffset>(*lineLayer, paintPropertyBinders);
     return getLineWidth(*lineLayer) / 2.0 + std::abs(offset) + util::length(translate[0], translate[1]);
 }

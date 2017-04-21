@@ -4,9 +4,7 @@
 #include <mbgl/style/types.hpp>
 #include <mbgl/style/filter.hpp>
 #include <mbgl/style/layer_observer.hpp>
-#include <mbgl/renderer/render_pass.hpp>
 #include <mbgl/util/noncopyable.hpp>
-#include <mbgl/tile/geometry_tile_data.hpp>
 
 #include <rapidjson/writer.h>
 #include <rapidjson/stringbuffer.h>
@@ -17,13 +15,9 @@
 
 namespace mbgl {
 
-class Bucket;
+class RenderLayer;
 
 namespace style {
-
-class CascadeParameters;
-class PropertyEvaluationParameters;
-class BucketParameters;
 
 /**
  * `Layer::Impl` contains the internal implementation of `Layer`: the details that need to be accessible to other parts
@@ -54,27 +48,7 @@ public:
     // Utility function for automatic layer grouping.
     virtual void stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>&) const = 0;
 
-    // Partially evaluate paint properties based on a set of classes.
-    virtual void cascade(const CascadeParameters&) = 0;
-
-    // Fully evaluate cascaded paint properties based on a zoom level.
-    // Returns true if any paint properties have active transitions.
-    virtual bool evaluate(const PropertyEvaluationParameters&) = 0;
-
-    virtual std::unique_ptr<Bucket> createBucket(const BucketParameters&, const std::vector<const Layer*>&) const = 0;
-
-    // Checks whether this layer needs to be rendered in the given render pass.
-    bool hasRenderPass(RenderPass) const;
-
-    // Checks whether this layer can be rendered.
-    bool needsRendering(float zoom) const;
-
-    virtual bool queryIntersectsFeature(
-            const GeometryCoordinates&,
-            const GeometryTileFeature&,
-            const float,
-            const float,
-            const float) const { return false; };
+    virtual std::unique_ptr<RenderLayer> createRenderLayer() const = 0;
 
     void setObserver(LayerObserver*);
 
@@ -94,10 +68,6 @@ protected:
     Impl() = default;
     Impl(const Impl&) = default;
     Impl& operator=(const Impl&) = delete;
-
-    // Stores what render passes this layer is currently enabled for. This depends on the
-    // evaluated StyleProperties object and is updated accordingly.
-    RenderPass passes = RenderPass::None;
 };
 
 } // namespace style

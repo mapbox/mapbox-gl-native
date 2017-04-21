@@ -2,7 +2,7 @@
 #include <mbgl/renderer/paint_parameters.hpp>
 #include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/renderer/raster_bucket.hpp>
-#include <mbgl/style/layers/raster_layer.hpp>
+#include <mbgl/renderer/render_raster_layer.hpp>
 #include <mbgl/style/layers/raster_layer_impl.hpp>
 #include <mbgl/programs/programs.hpp>
 #include <mbgl/programs/raster_program.hpp>
@@ -41,14 +41,14 @@ static std::array<float, 3> spinWeights(float spin) {
 
 void Painter::renderRaster(PaintParameters& parameters,
                            RasterBucket& bucket,
-                           const RasterLayer& layer,
+                           const RenderRasterLayer& layer,
                            const RenderTile& tile) {
     if (pass != RenderPass::Translucent)
         return;
     if (!bucket.hasData())
         return;
 
-    const RasterPaintProperties::Evaluated& properties = layer.impl->paint.evaluated;
+    const RasterPaintProperties::Evaluated& properties = layer.evaluated;
     const RasterProgram::PaintPropertyBinders paintAttributeData(properties, 0);
 
     assert(bucket.texture);

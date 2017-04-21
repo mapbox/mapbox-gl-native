@@ -1,6 +1,6 @@
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/renderer/paint_parameters.hpp>
-#include <mbgl/style/layers/background_layer.hpp>
+#include <mbgl/renderer/render_background_layer.hpp>
 #include <mbgl/style/layers/background_layer_impl.hpp>
 #include <mbgl/programs/programs.hpp>
 #include <mbgl/programs/fill_program.hpp>
@@ -11,10 +11,10 @@ namespace mbgl {
 
 using namespace style;
 
-void Painter::renderBackground(PaintParameters& parameters, const BackgroundLayer& layer) {
+void Painter::renderBackground(PaintParameters& parameters, const RenderBackgroundLayer& layer) {
     // Note that for bottommost layers without a pattern, the background color is drawn with
     // glClear rather than this method.
-    const BackgroundPaintProperties::Evaluated& background = layer.impl->paint.evaluated;
+    const BackgroundPaintProperties::Evaluated& background = layer.evaluated;
 
     style::FillPaintProperties::Evaluated properties;
     properties.get<FillPattern>() = background.get<BackgroundPattern>();

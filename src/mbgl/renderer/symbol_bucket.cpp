@@ -1,7 +1,7 @@
 #include <mbgl/renderer/symbol_bucket.hpp>
 #include <mbgl/renderer/painter.hpp>
-#include <mbgl/style/bucket_parameters.hpp>
-#include <mbgl/style/layers/symbol_layer.hpp>
+#include <mbgl/renderer/render_symbol_layer.hpp>
+#include <mbgl/renderer/bucket_parameters.hpp>
 #include <mbgl/style/layers/symbol_layer_impl.hpp>
 
 namespace mbgl {
@@ -61,9 +61,9 @@ void SymbolBucket::upload(gl::Context& context) {
 
 void SymbolBucket::render(Painter& painter,
                           PaintParameters& parameters,
-                          const Layer& layer,
+                          const RenderLayer& layer,
                           const RenderTile& tile) {
-    painter.renderSymbol(parameters, *this, *layer.as<SymbolLayer>(), tile);
+    painter.renderSymbol(parameters, *this, *layer.as<RenderSymbolLayer>(), tile);
 }
 
 bool SymbolBucket::hasData() const {

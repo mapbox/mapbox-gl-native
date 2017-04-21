@@ -18,10 +18,10 @@ namespace mbgl {
 class GeometryTileData;
 class FeatureIndex;
 class CollisionTile;
+class RenderLayer;
 
 namespace style {
 class Style;
-class Layer;
 class UpdateParameters;
 class SourceQueryOptions;
 } // namespace style
@@ -46,7 +46,7 @@ public:
     void getGlyphs(GlyphDependencies);
     void getIcons(IconDependencyMap);
 
-    Bucket* getBucket(const style::Layer&) const override;
+    Bucket* getBucket(const RenderLayer&) const override;
 
     void queryRenderedFeatures(
             std::unordered_map<std::string, std::vector<Feature>>& result,

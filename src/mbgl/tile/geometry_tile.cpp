@@ -6,7 +6,9 @@
 #include <mbgl/style/layer_impl.hpp>
 #include <mbgl/style/layers/background_layer.hpp>
 #include <mbgl/style/layers/custom_layer.hpp>
-#include <mbgl/style/layers/symbol_layer.hpp>
+#include <mbgl/renderer/render_background_layer.hpp>
+#include <mbgl/renderer/render_custom_layer.hpp>
+#include <mbgl/renderer/render_symbol_layer.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/geometry/feature_index.hpp>
@@ -159,9 +161,9 @@ void GeometryTile::getIcons(IconDependencyMap iconDependencyMap) {
     }
 }
 
-Bucket* GeometryTile::getBucket(const Layer& layer) const {
-    const auto& buckets = layer.is<SymbolLayer>() ? symbolBuckets : nonSymbolBuckets;
-    const auto it = buckets.find(layer.baseImpl->id);
+Bucket* GeometryTile::getBucket(const RenderLayer& layer) const {
+    const auto& buckets = layer.is<RenderSymbolLayer>() ? symbolBuckets : nonSymbolBuckets;
+    const auto it = buckets.find(layer.baseImpl.id);
     if (it == buckets.end()) {
         return nullptr;
     }

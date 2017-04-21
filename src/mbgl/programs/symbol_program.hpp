@@ -13,6 +13,7 @@
 #include <mbgl/util/size.hpp>
 #include <mbgl/style/layers/symbol_layer_properties.hpp>
 #include <mbgl/style/layers/symbol_layer_impl.hpp>
+#include <mbgl/renderer/render_symbol_layer.hpp>
 
 
 #include <cmath>

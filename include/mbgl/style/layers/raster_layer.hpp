@@ -77,7 +77,7 @@ public:
 
 template <>
 inline bool Layer::is<RasterLayer>() const {
-    return type == Type::Raster;
+    return type == LayerType::Raster;
 }
 
 } // namespace style

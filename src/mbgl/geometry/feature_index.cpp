@@ -1,8 +1,7 @@
 #include <mbgl/geometry/feature_index.hpp>
 #include <mbgl/style/style.hpp>
-#include <mbgl/style/layer.hpp>
-#include <mbgl/style/layer_impl.hpp>
-#include <mbgl/style/layers/symbol_layer.hpp>
+#include <mbgl/renderer/render_layer.hpp>
+#include <mbgl/renderer/render_symbol_layer.hpp>
 #include <mbgl/text/collision_tile.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/math.hpp>
@@ -61,7 +60,7 @@ static int16_t getAdditionalQueryRadius(const RenderedQueryOptions& queryOptions
 
     // Determine the additional radius needed factoring in property functions
     float additionalRadius = 0;
-    auto getQueryRadius = [&](const style::Layer& layer) {
+    auto getQueryRadius = [&](const RenderLayer& layer) {
         auto bucket = tile.getBucket(layer);
         if (bucket) {
             additionalRadius = std::max(additionalRadius, bucket->getQueryRadius(layer) * pixelsToTileUnits);
@@ -70,13 +69,13 @@ static int16_t getAdditionalQueryRadius(const RenderedQueryOptions& queryOptions
 
     if (queryOptions.layerIDs) {
         for (const auto& layerID : *queryOptions.layerIDs) {
-            style::Layer* layer = style.getLayer(layerID);
+            RenderLayer* layer = style.getRenderLayer(layerID);
             if (layer) {
                 getQueryRadius(*layer);
             }
         }
     } else {
-        for (const style::Layer* layer : style.getLayers()) {
+        for (const RenderLayer* layer : style.getRenderLayers()) {
             getQueryRadius(*layer);
         }
     }
@@ -156,10 +155,10 @@ void FeatureIndex::addFeature(
             continue;
         }
 
-        auto styleLayer = style.getLayer(layerID);
-        if (!styleLayer ||
-            (!styleLayer->is<style::SymbolLayer>() &&
-             !styleLayer->baseImpl->queryIntersectsFeature(queryGeometry, *geometryTileFeature, tileID.z, bearing, pixelsToTileUnits))) {
+        auto renderLayer = style.getRenderLayer(layerID);
+        if (!renderLayer ||
+            (!renderLayer->is<RenderSymbolLayer>() &&
+             !renderLayer->queryIntersectsFeature(queryGeometry, *geometryTileFeature, tileID.z, bearing, pixelsToTileUnits))) {
             continue;
         }
 

@@ -2,7 +2,7 @@
 #include <mbgl/renderer/paint_parameters.hpp>
 #include <mbgl/renderer/circle_bucket.hpp>
 #include <mbgl/renderer/render_tile.hpp>
-#include <mbgl/style/layers/circle_layer.hpp>
+#include <mbgl/renderer/render_circle_layer.hpp>
 #include <mbgl/style/layers/circle_layer_impl.hpp>
 #include <mbgl/programs/programs.hpp>
 #include <mbgl/programs/circle_program.hpp>
@@ -14,13 +14,13 @@ using namespace style;
 
 void Painter::renderCircle(PaintParameters& parameters,
                            CircleBucket& bucket,
-                           const CircleLayer& layer,
+                           const RenderCircleLayer& layer,
                            const RenderTile& tile) {
     if (pass == RenderPass::Opaque) {
         return;
     }
 
-    const CirclePaintProperties::Evaluated& properties = layer.impl->paint.evaluated;
+    const CirclePaintProperties::Evaluated& properties = layer.evaluated;
     const bool scaleWithMap = properties.get<CirclePitchScale>() == CirclePitchScaleType::Map;
 
     parameters.programs.circle.draw(

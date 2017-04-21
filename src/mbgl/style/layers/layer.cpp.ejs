@@ -14,13 +14,13 @@ namespace style {
 
 <% if (type === 'background') { -%>
 <%- camelize(type) %>Layer::<%- camelize(type) %>Layer(const std::string& layerID)
-    : Layer(Type::<%- camelize(type) %>, std::make_unique<Impl>())
+    : Layer(LayerType::<%- camelize(type) %>, std::make_unique<Impl>())
     , impl(static_cast<Impl*>(baseImpl.get())) {
     impl->id = layerID;
 }
 <% } else { -%>
 <%- camelize(type) %>Layer::<%- camelize(type) %>Layer(const std::string& layerID, const std::string& sourceID)
-    : Layer(Type::<%- camelize(type) %>, std::make_unique<Impl>())
+    : Layer(LayerType::<%- camelize(type) %>, std::make_unique<Impl>())
     , impl(static_cast<Impl*>(baseImpl.get())) {
     impl->id = layerID;
     impl->source = sourceID;
@@ -28,7 +28,7 @@ namespace style {
 <% } -%>
 
 <%- camelize(type) %>Layer::<%- camelize(type) %>Layer(const Impl& other)
-    : Layer(Type::<%- camelize(type) %>, std::make_unique<Impl>(other))
+    : Layer(LayerType::<%- camelize(type) %>, std::make_unique<Impl>(other))
     , impl(static_cast<Impl*>(baseImpl.get())) {
 }
 
@@ -41,7 +41,7 @@ std::unique_ptr<Layer> <%- camelize(type) %>Layer::Impl::clone() const {
 std::unique_ptr<Layer> <%- camelize(type) %>Layer::Impl::cloneRef(const std::string& id_) const {
     auto result = std::make_unique<<%- camelize(type) %>Layer>(*this);
     result->impl->id = id_;
-    result->impl->paint = <%- camelize(type) %>PaintProperties();
+    result->impl->cascading = <%- camelize(type) %>PaintProperties::Cascading();
     return std::move(result);
 }
 
@@ -109,13 +109,13 @@ void <%- camelize(type) %>Layer::set<%- camelize(property.name) %>(<%- propertyV
 }
 
 <%- propertyValueType(property) %> <%- camelize(type) %>Layer::get<%- camelize(property.name) %>(const optional<std::string>& klass) const {
-    return impl->paint.get<<%- camelize(property.name) %>>(klass);
+    return impl->cascading.template get<<%- camelize(property.name) %>>().get(klass);
 }
 
 void <%- camelize(type) %>Layer::set<%- camelize(property.name) %>(<%- propertyValueType(property) %> value, const optional<std::string>& klass) {
     if (value == get<%- camelize(property.name) %>(klass))
         return;
-    impl->paint.set<<%- camelize(property.name) %>>(value, klass);
+    impl->cascading.template get<<%- camelize(property.name) %>>().set(value, klass);
 <% if (isDataDriven(property)) { -%>
     if (value.isDataDriven()) {
         impl->observer->onLayerDataDrivenPaintPropertyChanged(*this);
@@ -128,11 +128,11 @@ void <%- camelize(type) %>Layer::set<%- camelize(property.name) %>(<%- propertyV
 }
 
 void <%- camelize(type) %>Layer::set<%- camelize(property.name) %>Transition(const TransitionOptions& value, const optional<std::string>& klass) {
-    impl->paint.setTransition<<%- camelize(property.name) %>>(value, klass);
+    impl->cascading.template get<<%- camelize(property.name) %>>().setTransition(value, klass);
 }
 
 TransitionOptions <%- camelize(type) %>Layer::get<%- camelize(property.name) %>Transition(const optional<std::string>& klass) const {
-    return impl->paint.getTransition<<%- camelize(property.name) %>>(klass);
+    return impl->cascading.template get<<%- camelize(property.name) %>>().getTransition(klass);
 }
 <% } -%>
 

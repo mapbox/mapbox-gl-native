@@ -29,10 +29,7 @@ private:
     std::unique_ptr<Layer> cloneRef(const std::string& id) const override;
     void stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>&) const override;
 
-    void cascade(const CascadeParameters&) final {}
-    bool evaluate(const PropertyEvaluationParameters&) final;
-
-    std::unique_ptr<Bucket> createBucket(const BucketParameters&, const std::vector<const Layer*>&) const final;
+    std::unique_ptr<RenderLayer> createRenderLayer() const final;
 
     CustomLayerInitializeFunction initializeFn = nullptr;
     CustomLayerRenderFunction renderFn = nullptr;

@@ -1,10 +1,11 @@
 #include <mbgl/style/layer.hpp>
 #include <mbgl/style/layer_impl.hpp>
+#include <mbgl/style/layer_type.hpp>
 
 namespace mbgl {
 namespace style {
 
-Layer::Layer(Type type_, std::unique_ptr<Impl> baseImpl_)
+Layer::Layer(LayerType type_, std::unique_ptr<Impl> baseImpl_)
     : type(type_), baseImpl(std::move(baseImpl_)) {
 }
 
