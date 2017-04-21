@@ -1,6 +1,6 @@
 #include <mbgl/annotation/annotation_source.hpp>
 #include <mbgl/annotation/annotation_manager.hpp>
-#include <mbgl/annotation/annotation_tile.hpp>
+#include <mbgl/annotation/render_annotation_source.hpp>
 
 namespace mbgl {
 
@@ -14,17 +14,12 @@ AnnotationSource::Impl::Impl(Source& base_)
     : Source::Impl(SourceType::Annotations, AnnotationManager::SourceID, base_) {
 }
 
-optional<Range<uint8_t>> AnnotationSource::Impl::getZoomRange() const {
-    return { { 0, 22 } };
-}
-
 void AnnotationSource::Impl::loadDescription(FileSource&) {
     loaded = true;
 }
 
-std::unique_ptr<Tile> AnnotationSource::Impl::createTile(const OverscaledTileID& tileID,
-                                                         const style::UpdateParameters& parameters) {
-    return std::make_unique<AnnotationTile>(tileID, parameters);
+std::unique_ptr<RenderSource> AnnotationSource::Impl::createRenderSource() const {
+    return std::make_unique<RenderAnnotationSource>(*this);
 }
 
 } // namespace mbgl

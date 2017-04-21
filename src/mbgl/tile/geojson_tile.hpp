@@ -13,9 +13,10 @@ class GeoJSONTile : public GeometryTile {
 public:
     GeoJSONTile(const OverscaledTileID&,
                 std::string sourceID,
-                const style::UpdateParameters&);
+                const style::UpdateParameters&,
+                mapbox::geometry::feature_collection<int16_t>);
 
-    void updateData(const mapbox::geometry::feature_collection<int16_t>&);
+    void updateData(mapbox::geometry::feature_collection<int16_t>);
 
     void setNecessity(Necessity) final;
     

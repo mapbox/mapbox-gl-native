@@ -28,6 +28,8 @@ set(MBGL_CORE_FILES
     src/mbgl/annotation/fill_annotation_impl.hpp
     src/mbgl/annotation/line_annotation_impl.cpp
     src/mbgl/annotation/line_annotation_impl.hpp
+    src/mbgl/annotation/render_annotation_source.cpp
+    src/mbgl/annotation/render_annotation_source.hpp
     src/mbgl/annotation/shape_annotation_impl.cpp
     src/mbgl/annotation/shape_annotation_impl.hpp
     src/mbgl/annotation/style_sourced_annotation_impl.cpp
@@ -208,10 +210,23 @@ set(MBGL_CORE_FILES
     src/mbgl/renderer/render_raster_layer.hpp
     src/mbgl/renderer/render_symbol_layer.cpp
     src/mbgl/renderer/render_symbol_layer.hpp
+    src/mbgl/renderer/render_source.cpp
+    src/mbgl/renderer/render_source.hpp
+    src/mbgl/renderer/render_source_observer.hpp
     src/mbgl/renderer/render_tile.cpp
     src/mbgl/renderer/render_tile.hpp
     src/mbgl/renderer/symbol_bucket.cpp
     src/mbgl/renderer/symbol_bucket.hpp
+    src/mbgl/renderer/tile_pyramid.cpp
+    src/mbgl/renderer/tile_pyramid.hpp
+
+    # renderer/sources
+    src/mbgl/renderer/sources/render_geojson_source.cpp
+    src/mbgl/renderer/sources/render_geojson_source.hpp
+    src/mbgl/renderer/sources/render_raster_source.cpp
+    src/mbgl/renderer/sources/render_raster_source.hpp
+    src/mbgl/renderer/sources/render_vector_source.cpp
+    src/mbgl/renderer/sources/render_vector_source.hpp
 
     # shaders
     src/mbgl/shaders/circle.cpp

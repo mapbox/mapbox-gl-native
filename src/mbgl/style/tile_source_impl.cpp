@@ -82,26 +82,7 @@ void TileSourceImpl::loadDescription(FileSource& fileSource) {
                 return;
             }
 
-            // Check whether previous information specifies different tile
-            bool attributionChanged = false;
-            if (tileset.tiles != newTileset.tiles) {
-                // Tile URLs changed: force tiles to be reloaded.
-                invalidateTiles();
-
-                // Tile size changed: We need to recalculate the tiles we need to load because we
-                // might have to load tiles for a different zoom level
-                // This is done automatically when we trigger the onSourceLoaded observer below.
-
-                // Min/Max zoom changed: We need to recalculate what tiles to load, if we have tiles
-                // loaded that are outside the new zoom range
-                // This is done automatically when we trigger the onSourceLoaded observer below.
-
-                // Attribution changed: We need to notify the embedding application that this
-                // changed.
-                attributionChanged = true;
-
-                // Center/bounds changed: We're not using these values currently
-            }
+            bool attributionChanged = tileset.attribution != newTileset.attribution;
 
             tileset = newTileset;
             loaded = true;
@@ -114,9 +95,9 @@ void TileSourceImpl::loadDescription(FileSource& fileSource) {
     });
 }
 
-optional<Range<uint8_t>> TileSourceImpl::getZoomRange() const {
+optional<Tileset> TileSourceImpl::getTileset() const {
     if (loaded) {
-        return tileset.zoomRange;
+        return tileset;
     }
     return {};
 }

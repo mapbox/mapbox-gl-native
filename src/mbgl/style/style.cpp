@@ -22,6 +22,7 @@
 #include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/text/glyph_atlas.hpp>
 #include <mbgl/geometry/line_atlas.hpp>
+#include <mbgl/renderer/render_source.hpp>
 #include <mbgl/renderer/render_item.hpp>
 #include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/renderer/render_background_layer.hpp>
@@ -32,12 +33,14 @@
 #include <mbgl/renderer/render_line_layer.hpp>
 #include <mbgl/renderer/render_raster_layer.hpp>
 #include <mbgl/renderer/render_symbol_layer.hpp>
+#include <mbgl/tile/tile.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/exception.hpp>
 #include <mbgl/util/geometry.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/logging.hpp>
 #include <mbgl/util/math.hpp>
+#include <mbgl/util/std.hpp>
 #include <mbgl/math/minmax.hpp>
 #include <mbgl/map/query.hpp>
 
@@ -112,6 +115,7 @@ TransitionOptions Style::getTransitionOptions() const {
 
 void Style::setJSON(const std::string& json) {
     sources.clear();
+    renderSources.clear();
     layers.clear();
     renderLayers.clear();
     classes.clear();
@@ -166,6 +170,10 @@ void Style::addSource(std::unique_ptr<Source> source) {
     source->baseImpl->setObserver(this);
     source->baseImpl->loadDescription(fileSource);
 
+    std::unique_ptr<RenderSource> renderSource = source->baseImpl->createRenderSource();
+    renderSource->setObserver(this);
+    renderSources.emplace_back(std::move(renderSource));
+
     sources.emplace_back(std::move(source));
 }
 
@@ -178,11 +186,14 @@ std::unique_ptr<Source> Style::removeSource(const std::string& id) {
         return nullptr;
     }
 
+    util::erase_if(renderSources, [&](const auto& source) {
+        return source->baseImpl.id == id;
+    });
+
     auto source = std::move(*it);
     sources.erase(it);
     updateBatch.sourceIDs.erase(id);
 
-    source->baseImpl->detach();
     return source;
 }
 
@@ -317,20 +328,20 @@ double Style::getDefaultPitch() const {
 }
 
 void Style::updateTiles(const UpdateParameters& parameters) {
-    for (const auto& source : sources) {
-        if (source->baseImpl->enabled) {
-            source->baseImpl->updateTiles(parameters);
+    for (const auto& renderSource : renderSources) {
+        if (renderSource->enabled) {
+            renderSource->updateTiles(parameters);
         }
     }
 }
 
 void Style::relayout() {
     for (const auto& sourceID : updateBatch.sourceIDs) {
-        Source* source = getSource(sourceID);
-        if (source && source->baseImpl->enabled) {
-            source->baseImpl->reloadTiles();
-        } else if (source) {
-            source->baseImpl->invalidateTiles();
+        RenderSource* renderSource = getRenderSource(sourceID);
+        if (renderSource && renderSource->enabled) {
+            renderSource->reloadTiles();
+        } else if (renderSource) {
+            renderSource->invalidateTiles();
         }
     }
     updateBatch.sourceIDs.clear();
@@ -363,8 +374,8 @@ void Style::cascade(const TimePoint& timePoint, MapMode mode) {
 void Style::recalculate(float z, const TimePoint& timePoint, MapMode mode) {
     // Disable all sources first. If we find an enabled layer that uses this source, we will
     // re-enable it later.
-    for (const auto& source : sources) {
-        source->baseImpl->enabled = false;
+    for (const auto& renderSource : renderSources) {
+        renderSource->enabled = false;
     }
 
     zoomHistory.update(z, timePoint);
@@ -380,24 +391,19 @@ void Style::recalculate(float z, const TimePoint& timePoint, MapMode mode) {
     for (const auto& layer : renderLayers) {
         hasPendingTransitions |= layer->evaluate(parameters);
 
-        // Disable this layer if it doesn't need to be rendered.
-        const bool needsRendering = layer->needsRendering(zoomHistory.lastZoom);
-        if (!needsRendering) {
-            continue;
-        }
-
-        // If this layer has a source, make sure that it gets loaded.
-        if (Source* source = getSource(layer->baseImpl.source)) {
-            source->baseImpl->enabled = true;
+        if (layer->needsRendering(zoomHistory.lastZoom)) {
+            if (RenderSource* renderSource = getRenderSource(layer->baseImpl.source)) {
+                renderSource->enabled = true;
+            }
         }
     }
 
     evaluatedLight = EvaluatedLight(transitioningLight, parameters);
 
     // Remove the existing tiles if we didn't end up re-enabling the source.
-    for (const auto& source : sources) {
-        if (!source->baseImpl->enabled) {
-            source->baseImpl->removeTiles();
+    for (const auto& renderSource : renderSources) {
+        if (!renderSource->enabled) {
+            renderSource->removeTiles();
         }
     }
 }
@@ -428,6 +434,14 @@ Source* Style::getSource(const std::string& id) const {
     return it != sources.end() ? it->get() : nullptr;
 }
 
+RenderSource* Style::getRenderSource(const std::string& id) const {
+    const auto it = std::find_if(renderSources.begin(), renderSources.end(), [&](const auto& source) {
+        return source->baseImpl.id == id;
+    });
+
+    return it != renderSources.end() ? it->get() : nullptr;
+}
+
 bool Style::hasTransitions() const {
     return hasPendingTransitions;
 }
@@ -438,7 +452,13 @@ bool Style::isLoaded() const {
     }
 
     for (const auto& source: sources) {
-        if (source->baseImpl->enabled && !source->baseImpl->isLoaded()) {
+        if (!source->baseImpl->loaded) {
+            return false;
+        }
+    }
+
+    for (const auto& renderSource: renderSources) {
+        if (!renderSource->isLoaded()) {
             return false;
         }
     }
@@ -453,9 +473,9 @@ bool Style::isLoaded() const {
 RenderData Style::getRenderData(MapDebugOptions debugOptions, float angle) const {
     RenderData result;
 
-    for (const auto& source : sources) {
-        if (source->baseImpl->enabled) {
-            result.sources.insert(source.get());
+    for (const auto& renderSource: renderSources) {
+        if (renderSource->enabled) {
+            result.sources.insert(renderSource.get());
         }
     }
 
@@ -486,13 +506,13 @@ RenderData Style::getRenderData(MapDebugOptions debugOptions, float angle) const
             continue;
         }
 
-        Source* source = getSource(layer->baseImpl.source);
+        RenderSource* source = getRenderSource(layer->baseImpl.source);
         if (!source) {
             Log::Warning(Event::Render, "can't find source for layer '%s'", layer->baseImpl.id.c_str());
             continue;
         }
 
-        auto& renderTiles = source->baseImpl->getRenderTiles();
+        auto& renderTiles = source->getRenderTiles();
         const bool symbolLayer = layer->is<RenderSymbolLayer>();
 
         // Sort symbol tiles in opposite y position, so tiles with overlapping
@@ -557,26 +577,29 @@ RenderData Style::getRenderData(MapDebugOptions debugOptions, float angle) const
 std::vector<Feature> Style::queryRenderedFeatures(const ScreenLineString& geometry,
                                                   const TransformState& transformState,
                                                   const RenderedQueryOptions& options) const {
-    std::unordered_set<std::string> sourceFilter;
+    std::unordered_map<std::string, std::vector<Feature>> resultsByLayer;
 
     if (options.layerIDs) {
+        std::unordered_set<std::string> sourceIDs;
         for (const auto& layerID : *options.layerIDs) {
-            auto layer = getLayer(layerID);
-            if (layer) sourceFilter.emplace(layer->baseImpl->source);
+            if (Layer* layer = getLayer(layerID)) {
+                sourceIDs.emplace(layer->baseImpl->source);
+            }
+        }
+        for (const auto& sourceID : sourceIDs) {
+            if (RenderSource* renderSource = getRenderSource(sourceID)) {
+                auto sourceResults = renderSource->queryRenderedFeatures(geometry, transformState, options);
+                std::move(sourceResults.begin(), sourceResults.end(), std::inserter(resultsByLayer, resultsByLayer.begin()));
+            }
+        }
+    } else {
+        for (const auto& renderSource : renderSources) {
+            auto sourceResults = renderSource->queryRenderedFeatures(geometry, transformState, options);
+            std::move(sourceResults.begin(), sourceResults.end(), std::inserter(resultsByLayer, resultsByLayer.begin()));
         }
     }
 
     std::vector<Feature> result;
-    std::unordered_map<std::string, std::vector<Feature>> resultsByLayer;
-
-    for (const auto& source : sources) {
-        if (!sourceFilter.empty() && sourceFilter.find(source->getID()) == sourceFilter.end()) {
-            continue;
-        }
-
-        auto sourceResults = source->baseImpl->queryRenderedFeatures(geometry, transformState, options);
-        std::move(sourceResults.begin(), sourceResults.end(), std::inserter(resultsByLayer, resultsByLayer.begin()));
-    }
 
     if (resultsByLayer.empty()) {
         return result;
@@ -597,14 +620,14 @@ std::vector<Feature> Style::queryRenderedFeatures(const ScreenLineString& geomet
 }
 
 void Style::setSourceTileCacheSize(size_t size) {
-    for (const auto& source : sources) {
-        source->baseImpl->setCacheSize(size);
+    for (const auto& renderSource : renderSources) {
+        renderSource->setCacheSize(size);
     }
 }
 
 void Style::onLowMemory() {
-    for (const auto& source : sources) {
-        source->baseImpl->onLowMemory();
+    for (const auto& renderSource : renderSources) {
+        renderSource->onLowMemory();
     }
 }
 
@@ -648,16 +671,14 @@ void Style::onSourceDescriptionChanged(Source& source) {
     }
 }
 
-void Style::onTileChanged(Source& source, const OverscaledTileID& tileID) {
-    observer->onTileChanged(source, tileID);
+void Style::onTileChanged(RenderSource&, const OverscaledTileID&) {
     observer->onUpdate(Update::Repaint);
 }
 
-void Style::onTileError(Source& source, const OverscaledTileID& tileID, std::exception_ptr error) {
+void Style::onTileError(RenderSource& source, const OverscaledTileID& tileID, std::exception_ptr error) {
     lastError = error;
     Log::Error(Event::Style, "Failed to load tile %s for source %s: %s",
-               util::toString(tileID).c_str(), source.getID().c_str(), util::toString(error).c_str());
-    observer->onTileError(source, tileID, error);
+               util::toString(tileID).c_str(), source.baseImpl.id.c_str(), util::toString(error).c_str());
     observer->onResourceError(error);
 }
 
@@ -723,6 +744,10 @@ void Style::onLayerLayoutPropertyChanged(Layer& layer, const char * property) {
 void Style::dumpDebugLogs() const {
     for (const auto& source : sources) {
         source->baseImpl->dumpDebugLogs();
+    }
+
+    for (const auto& renderSource : renderSources) {
+        renderSource->dumpDebugLogs();
     }
 
     spriteAtlas->dumpDebugLogs();

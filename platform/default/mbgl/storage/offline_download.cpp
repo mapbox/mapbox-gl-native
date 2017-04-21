@@ -98,9 +98,7 @@ OfflineRegionStatus OfflineDownload::getStatus() const {
         }
 
         case SourceType::GeoJSON: {
-            style::GeoJSONSource::Impl* geojsonSource =
-                static_cast<style::GeoJSONSource::Impl*>(source->baseImpl.get());
-
+            style::GeoJSONSource* geojsonSource = source->as<style::GeoJSONSource>();
             if (geojsonSource->getURL()) {
                 result.requiredResourceCount += 1;
             }
