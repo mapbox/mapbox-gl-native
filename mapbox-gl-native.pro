@@ -564,6 +564,12 @@ win32 {
         -D_USE_MATH_DEFINES
 }
 
+win32:qtConfig(dynamicgl) {
+    QMAKE_CXXFLAGS += \
+        -DMBGL_USE_GLES2 \
+        -DQT_OPENGL_ES_2
+}
+
 qtConfig(opengles2) {
     QMAKE_CXXFLAGS += \
         -DMBGL_USE_GLES2
