@@ -1,6 +1,6 @@
 #import <Cocoa/Cocoa.h>
 
-#include <mbgl/sprite/sprite_image.hpp>
+#include <mbgl/style/image.hpp>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -8,9 +8,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (nullable instancetype)initWithMGLPremultipliedImage:(mbgl::PremultipliedImage&&)image;
 
-- (nullable instancetype)initWithMGLSpriteImage:(const mbgl::SpriteImage *)spriteImage;
+- (nullable instancetype)initWithMGLStyleImage:(const mbgl::style::Image *)image;
 
-- (std::unique_ptr<mbgl::SpriteImage>)mgl_spriteImage;
+- (std::unique_ptr<mbgl::style::Image>)mgl_styleImage;
 
 @end
 

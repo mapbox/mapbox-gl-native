@@ -2,7 +2,7 @@
 
 #include <mbgl/text/glyph.hpp>
 #include <mbgl/sprite/sprite_atlas.hpp>
-#include <mbgl/sprite/sprite_image.hpp>
+#include <mbgl/style/image.hpp>
 #include <mbgl/util/optional.hpp>
 
 namespace mbgl {

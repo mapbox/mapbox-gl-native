@@ -217,13 +217,11 @@ set(MBGL_CORE_FILES
     src/mbgl/shaders/symbol_sdf.hpp
 
     # sprite
-    include/mbgl/sprite/sprite_image.hpp
     src/mbgl/sprite/sprite_atlas.cpp
     src/mbgl/sprite/sprite_atlas.hpp
     src/mbgl/sprite/sprite_atlas_observer.hpp
     src/mbgl/sprite/sprite_atlas_worker.cpp
     src/mbgl/sprite/sprite_atlas_worker.hpp
-    src/mbgl/sprite/sprite_image.cpp
     src/mbgl/sprite/sprite_parser.cpp
     src/mbgl/sprite/sprite_parser.hpp
 
@@ -247,6 +245,7 @@ set(MBGL_CORE_FILES
     include/mbgl/style/data_driven_property_value.hpp
     include/mbgl/style/filter.hpp
     include/mbgl/style/filter_evaluator.hpp
+    include/mbgl/style/image.hpp
     include/mbgl/style/layer.hpp
     include/mbgl/style/property_value.hpp
     include/mbgl/style/query.hpp
@@ -264,6 +263,7 @@ set(MBGL_CORE_FILES
     src/mbgl/style/data_driven_property_evaluator.hpp
     src/mbgl/style/group_by_layout.cpp
     src/mbgl/style/group_by_layout.hpp
+    src/mbgl/style/image.cpp
     src/mbgl/style/layer.cpp
     src/mbgl/style/layer_impl.cpp
     src/mbgl/style/layer_impl.hpp

@@ -26,7 +26,7 @@
 
 #include <mbgl/map/map.hpp>
 #include <mbgl/util/default_styles.hpp>
-#include <mbgl/sprite/sprite_image.hpp>
+#include <mbgl/style/image.hpp>
 #include <mbgl/style/layers/fill_layer.hpp>
 #include <mbgl/style/layers/line_layer.hpp>
 #include <mbgl/style/layers/symbol_layer.hpp>
@@ -538,7 +538,7 @@ static NSURL *MGLStyleURL_emerald;
                     format:@"Cannot assign image %@ to a nil name.", image];
     }
 
-    self.mapView.mbglMap->addImage([name UTF8String], image.mgl_spriteImage);
+    self.mapView.mbglMap->addImage([name UTF8String], image.mgl_styleImage);
 }
 
 - (void)removeImageForName:(NSString *)name
@@ -558,8 +558,8 @@ static NSURL *MGLStyleURL_emerald;
                     format:@"Cannot get image with nil name."];
     }
 
-    auto spriteImage = self.mapView.mbglMap->getImage([name UTF8String]);
-    return spriteImage ? [[MGLImage alloc] initWithMGLSpriteImage:spriteImage] : nil;
+    auto styleImage = self.mapView.mbglMap->getImage([name UTF8String]);
+    return styleImage ? [[MGLImage alloc] initWithMGLStyleImage:styleImage] : nil;
 }
 
 #pragma mark Style transitions

@@ -9,7 +9,6 @@
 #include <mbgl/gl/offscreen_view.hpp>
 #include <mbgl/gl/context.hpp>
 #include <mbgl/util/default_thread_pool.hpp>
-#include <mbgl/sprite/sprite_image.hpp>
 #include <mbgl/storage/network_status.hpp>
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/storage/online_file_source.hpp>
@@ -17,6 +16,7 @@
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/async_task.hpp>
+#include <mbgl/style/image.hpp>
 #include <mbgl/style/layers/background_layer.hpp>
 #include <mbgl/util/color.hpp>
 
@@ -479,8 +479,8 @@ TEST(Map, AddImage) {
     Map map(test.backend, test.view.getSize(), 1, test.fileSource, test.threadPool, MapMode::Still);
     auto decoded1 = decodeImage(util::read_file("test/fixtures/sprites/default_marker.png"));
     auto decoded2 = decodeImage(util::read_file("test/fixtures/sprites/default_marker.png"));
-    auto image1 = std::make_unique<SpriteImage>(std::move(decoded1), 1.0);
-    auto image2 = std::make_unique<SpriteImage>(std::move(decoded2), 1.0);
+    auto image1 = std::make_unique<style::Image>(std::move(decoded1), 1.0);
+    auto image2 = std::make_unique<style::Image>(std::move(decoded2), 1.0);
 
     // No-op.
     map.addImage("test-icon", std::move(image1));
@@ -495,7 +495,7 @@ TEST(Map, RemoveImage) {
 
     Map map(test.backend, test.view.getSize(), 1, test.fileSource, test.threadPool, MapMode::Still);
     auto decoded = decodeImage(util::read_file("test/fixtures/sprites/default_marker.png"));
-    auto image = std::make_unique<SpriteImage>(std::move(decoded), 1.0);
+    auto image = std::make_unique<style::Image>(std::move(decoded), 1.0);
 
     map.setStyleJSON(util::read_file("test/fixtures/api/icon_style.json"));
     map.addImage("test-icon", std::move(image));
@@ -508,7 +508,7 @@ TEST(Map, GetImage) {
 
     Map map(test.backend, test.view.getSize(), 1, test.fileSource, test.threadPool, MapMode::Still);
     auto decoded = decodeImage(util::read_file("test/fixtures/sprites/default_marker.png"));
-    auto image = std::make_unique<SpriteImage>(std::move(decoded), 1.0);
+    auto image = std::make_unique<style::Image>(std::move(decoded), 1.0);
 
     map.setStyleJSON(util::read_file("test/fixtures/api/icon_style.json"));
     map.addImage("test-icon", std::move(image));

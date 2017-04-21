@@ -11,12 +11,12 @@
 
 namespace mbgl {
 
-class SpriteImage;
-
-using SpriteImagePtr = std::shared_ptr<const SpriteImage>;
+namespace style {
+class Image;
+} // namespace style
 
 // Extracts an individual image from a spritesheet from the given location.
-SpriteImagePtr createSpriteImage(const PremultipliedImage&,
+std::unique_ptr<style::Image> createStyleImage(const PremultipliedImage&,
                                  uint32_t srcX,
                                  uint32_t srcY,
                                  uint32_t srcWidth,
@@ -24,9 +24,9 @@ SpriteImagePtr createSpriteImage(const PremultipliedImage&,
                                  double ratio,
                                  bool sdf);
 
-using Sprites = std::map<std::string, SpriteImagePtr>;
+using Images = std::map<std::string, std::unique_ptr<style::Image>>;
 
 // Parses an image and an associated JSON file and returns the sprite objects.
-Sprites parseSprite(const std::string& image, const std::string& json);
+Images parseSprite(const std::string& image, const std::string& json);
 
 } // namespace mbgl

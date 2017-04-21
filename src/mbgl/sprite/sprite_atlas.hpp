@@ -4,7 +4,7 @@
 #include <mbgl/gl/texture.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/optional.hpp>
-#include <mbgl/sprite/sprite_image.hpp>
+#include <mbgl/style/image.hpp>
 
 #include <string>
 #include <map>
@@ -25,7 +25,7 @@ class Context;
 
 class SpriteAtlasElement {
 public:
-    SpriteAtlasElement(Rect<uint16_t>, std::shared_ptr<const SpriteImage>, Size size, float pixelRatio);
+    SpriteAtlasElement(Rect<uint16_t>, const style::Image&, Size size, float pixelRatio);
 
     Rect<uint16_t> pos;
     bool sdf;
@@ -52,7 +52,7 @@ public:
 
 class SpriteAtlas : public util::noncopyable {
 public:
-    using Sprites = std::map<std::string, std::shared_ptr<const SpriteImage>>;
+    using Images = std::map<std::string, std::unique_ptr<style::Image>>;
 
     SpriteAtlas(Size, float pixelRatio);
     ~SpriteAtlas();
@@ -71,10 +71,9 @@ public:
 
     void setObserver(SpriteAtlasObserver*);
 
-    void setSprite(const std::string&, std::shared_ptr<const SpriteImage>);
-    void removeSprite(const std::string&);
-    
-    std::shared_ptr<const SpriteImage> getSprite(const std::string& name);
+    const style::Image* getImage(const std::string&) const;
+    void addImage(const std::string&, std::unique_ptr<style::Image>);
+    void removeImage(const std::string&);
 
     void getIcons(IconRequestor& requestor);
     void removeRequestor(IconRequestor& requestor);
@@ -93,18 +92,16 @@ public:
     float getPixelRatio() const { return pixelRatio; }
 
     // Only for use in tests.
-    void setSprites(const Sprites& sprites);
     const PremultipliedImage& getAtlasImage() const {
         return image;
     }
 
 private:
-    void _setSprite(const std::string&, const std::shared_ptr<const SpriteImage>& = nullptr);
     void emitSpriteLoadedIfComplete();
 
     // Invoked by SpriteAtlasWorker
     friend class SpriteAtlasWorker;
-    void onParsed(Sprites&& result);
+    void onParsed(Images&& result);
     void onError(std::exception_ptr);
 
     const Size size;
@@ -118,7 +115,7 @@ private:
     SpriteAtlasObserver* observer = nullptr;
 
     struct Entry {
-        std::shared_ptr<const SpriteImage> spriteImage;
+        std::unique_ptr<style::Image> image;
 
         // One sprite image might be used as both an icon image and a pattern image. If so,
         // it must have two distinct entries in the texture. The one for the icon image has

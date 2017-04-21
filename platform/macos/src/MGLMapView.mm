@@ -28,7 +28,7 @@
 #import <mbgl/util/default_thread_pool.hpp>
 #import <mbgl/map/backend.hpp>
 #import <mbgl/map/backend_scope.hpp>
-#import <mbgl/sprite/sprite_image.hpp>
+#import <mbgl/style/image.hpp>
 #import <mbgl/storage/default_file_source.hpp>
 #import <mbgl/storage/network_status.hpp>
 #import <mbgl/math/wrap.hpp>
@@ -1949,8 +1949,7 @@ public:
         return;
     }
 
-    std::shared_ptr<mbgl::SpriteImage> sprite(annotationImage.image.mgl_spriteImage);
-    _mbglMap->addAnnotationIcon(iconIdentifier.UTF8String, sprite);
+    _mbglMap->addAnnotationImage(iconIdentifier.UTF8String, annotationImage.image.mgl_styleImage);
 
     // Create a slop area with a “radius” equal to the annotation image’s entire
     // size, allowing the eventual click to be on any point within this image.
