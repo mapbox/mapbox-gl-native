@@ -26,6 +26,8 @@ public:
     void upload(gl::Context&) override;
     void render(Painter&, PaintParameters&, const style::Layer&, const RenderTile&, const style::Style&) override;
 
+    float getQueryRadius(const style::Layer&) const override;
+
     gl::VertexVector<FillExtrusionLayoutVertex> vertices;
     gl::IndexVector<gl::Triangles> triangles;
     gl::SegmentVector<FillExtrusionAttributes> triangleSegments;
