@@ -3,69 +3,56 @@
 package com.mapbox.mapboxsdk.testapp.style;
 
 import android.graphics.Color;
-import android.support.test.espresso.Espresso;
-import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
-import timber.log.Timber;
 
-import com.mapbox.mapboxsdk.maps.MapboxMap;
-import com.mapbox.mapboxsdk.style.functions.CompositeFunction;
 import com.mapbox.mapboxsdk.style.functions.CameraFunction;
-import com.mapbox.mapboxsdk.style.functions.SourceFunction;
-import com.mapbox.mapboxsdk.style.functions.stops.CategoricalStops;
 import com.mapbox.mapboxsdk.style.functions.stops.ExponentialStops;
-import com.mapbox.mapboxsdk.style.functions.stops.IdentityStops;
 import com.mapbox.mapboxsdk.style.functions.stops.IntervalStops;
-import com.mapbox.mapboxsdk.style.functions.stops.Stop;
-import com.mapbox.mapboxsdk.style.functions.stops.Stops;
 import com.mapbox.mapboxsdk.style.layers.BackgroundLayer;
-import com.mapbox.mapboxsdk.testapp.R;
-import com.mapbox.mapboxsdk.testapp.activity.style.RuntimeStyleTestActivity;
-import com.mapbox.mapboxsdk.testapp.utils.OnMapReadyIdlingResource;
+import com.mapbox.mapboxsdk.style.layers.TransitionOptions;
+import com.mapbox.mapboxsdk.testapp.activity.BaseActivityTest;
+import com.mapbox.mapboxsdk.testapp.activity.espresso.EspressoTestActivity;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import static com.mapbox.mapboxsdk.style.functions.Function.*;
-import static com.mapbox.mapboxsdk.style.functions.stops.Stop.stop;
-import static com.mapbox.mapboxsdk.style.functions.stops.Stops.*;
-import static org.junit.Assert.*;
-import static com.mapbox.mapboxsdk.style.layers.Property.*;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.*;
+import timber.log.Timber;
 
-import com.mapbox.mapboxsdk.style.layers.TransitionOptions;
+import static com.mapbox.mapboxsdk.style.functions.Function.zoom;
+import static com.mapbox.mapboxsdk.style.functions.stops.Stop.stop;
+import static com.mapbox.mapboxsdk.style.functions.stops.Stops.exponential;
+import static com.mapbox.mapboxsdk.style.functions.stops.Stops.interval;
+import static com.mapbox.mapboxsdk.style.layers.Property.NONE;
+import static com.mapbox.mapboxsdk.style.layers.Property.VISIBLE;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.backgroundColor;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.backgroundOpacity;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.backgroundPattern;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.visibility;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Basic smoke tests for BackgroundLayer
  */
 @RunWith(AndroidJUnit4.class)
-public class BackgroundLayerTest extends BaseStyleTest {
-
-  @Rule
-  public final ActivityTestRule<RuntimeStyleTestActivity> rule = new ActivityTestRule<>(RuntimeStyleTestActivity.class);
+public class BackgroundLayerTest extends BaseActivityTest {
 
   private BackgroundLayer layer;
 
-  private OnMapReadyIdlingResource idlingResource;
+  @Override
+  protected Class getActivityClass() {
+    return EspressoTestActivity.class;
+  }
 
-  private MapboxMap mapboxMap;
-
-  @Before
-  public void setup() {
-    idlingResource = new OnMapReadyIdlingResource(rule.getActivity());
-    Espresso.registerIdlingResources(idlingResource);
-    mapboxMap = rule.getActivity().getMapboxMap();
-
+  private void setupLayer() {
     Timber.i("Retrieving layer");
     layer = mapboxMap.getLayerAs("background");
   }
 
   @Test
   public void testSetVisibility() {
-    checkViewIsDisplayed(R.id.mapView);
+    validateTestSetup();
+    setupLayer();
     Timber.i("Visibility");
     assertNotNull(layer);
 
@@ -79,7 +66,8 @@ public class BackgroundLayerTest extends BaseStyleTest {
 
   @Test
   public void testBackgroundColorTransition() {
-    checkViewIsDisplayed(R.id.mapView);
+    validateTestSetup();
+    setupLayer();
     Timber.i("background-colorTransitionOptions");
     assertNotNull(layer);
 
@@ -91,7 +79,8 @@ public class BackgroundLayerTest extends BaseStyleTest {
 
   @Test
   public void testBackgroundColorAsConstant() {
-    checkViewIsDisplayed(R.id.mapView);
+    validateTestSetup();
+    setupLayer();
     Timber.i("background-color");
     assertNotNull(layer);
 
@@ -102,7 +91,8 @@ public class BackgroundLayerTest extends BaseStyleTest {
 
   @Test
   public void testBackgroundColorAsCameraFunction() {
-    checkViewIsDisplayed(R.id.mapView);
+    validateTestSetup();
+    setupLayer();
     Timber.i("background-color");
     assertNotNull(layer);
 
@@ -128,7 +118,8 @@ public class BackgroundLayerTest extends BaseStyleTest {
 
   @Test
   public void testBackgroundColorAsIntConstant() {
-    checkViewIsDisplayed(R.id.mapView);
+    validateTestSetup();
+    setupLayer();
     Timber.i("background-color");
     assertNotNull(layer);
 
@@ -139,7 +130,8 @@ public class BackgroundLayerTest extends BaseStyleTest {
 
   @Test
   public void testBackgroundPatternTransition() {
-    checkViewIsDisplayed(R.id.mapView);
+    validateTestSetup();
+    setupLayer();
     Timber.i("background-patternTransitionOptions");
     assertNotNull(layer);
 
@@ -151,7 +143,8 @@ public class BackgroundLayerTest extends BaseStyleTest {
 
   @Test
   public void testBackgroundPatternAsConstant() {
-    checkViewIsDisplayed(R.id.mapView);
+    validateTestSetup();
+    setupLayer();
     Timber.i("background-pattern");
     assertNotNull(layer);
 
@@ -162,7 +155,8 @@ public class BackgroundLayerTest extends BaseStyleTest {
 
   @Test
   public void testBackgroundPatternAsCameraFunction() {
-    checkViewIsDisplayed(R.id.mapView);
+    validateTestSetup();
+    setupLayer();
     Timber.i("background-pattern");
     assertNotNull(layer);
 
@@ -187,7 +181,8 @@ public class BackgroundLayerTest extends BaseStyleTest {
 
   @Test
   public void testBackgroundOpacityTransition() {
-    checkViewIsDisplayed(R.id.mapView);
+    validateTestSetup();
+    setupLayer();
     Timber.i("background-opacityTransitionOptions");
     assertNotNull(layer);
 
@@ -199,7 +194,8 @@ public class BackgroundLayerTest extends BaseStyleTest {
 
   @Test
   public void testBackgroundOpacityAsConstant() {
-    checkViewIsDisplayed(R.id.mapView);
+    validateTestSetup();
+    setupLayer();
     Timber.i("background-opacity");
     assertNotNull(layer);
 
@@ -210,7 +206,8 @@ public class BackgroundLayerTest extends BaseStyleTest {
 
   @Test
   public void testBackgroundOpacityAsCameraFunction() {
-    checkViewIsDisplayed(R.id.mapView);
+    validateTestSetup();
+    setupLayer();
     Timber.i("background-opacity");
     assertNotNull(layer);
 
@@ -234,8 +231,4 @@ public class BackgroundLayerTest extends BaseStyleTest {
     assertEquals(1, ((ExponentialStops) layer.getBackgroundOpacity().getFunction().getStops()).size());
   }
 
-  @After
-  public void unregisterIntentServiceIdlingResource() {
-    Espresso.unregisterIdlingResources(idlingResource);
-  }
 }

@@ -12,7 +12,7 @@ jni::Object<CameraPosition> CameraPosition::New(jni::JNIEnv &env, mbgl::CameraOp
     center.wrap();
 
     // convert bearing, core ranges from [−π rad, π rad], android from 0 to 360 degrees
-    double bearing_degrees = options.angle.value_or(-M_PI) * 180.0 / M_PI;
+    double bearing_degrees = options.angle.value_or(0) * 180.0 / M_PI;
     while (bearing_degrees > 360) {
         bearing_degrees -= 360;
     }

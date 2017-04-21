@@ -1,10 +1,8 @@
 package com.mapbox.mapboxsdk.testapp.annotations;
 
 import android.graphics.Color;
-import android.support.test.espresso.Espresso;
 import android.support.test.espresso.UiController;
 import android.support.test.espresso.ViewAction;
-import android.support.test.rule.ActivityTestRule;
 import android.view.View;
 
 import com.mapbox.mapboxsdk.annotations.Polygon;
@@ -12,15 +10,11 @@ import com.mapbox.mapboxsdk.annotations.PolygonOptions;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.testapp.R;
+import com.mapbox.mapboxsdk.testapp.activity.BaseActivityTest;
 import com.mapbox.mapboxsdk.testapp.activity.espresso.EspressoTestActivity;
-import com.mapbox.mapboxsdk.testapp.utils.OnMapReadyIdlingResource;
-import com.mapbox.mapboxsdk.testapp.utils.ViewUtils;
 
 import org.hamcrest.Matcher;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Ignore;
-import org.junit.Rule;
 import org.junit.Test;
 
 import static android.support.test.espresso.Espresso.onView;
@@ -28,26 +22,20 @@ import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static org.junit.Assert.assertEquals;
 
-public class PolygonTest {
+public class PolygonTest extends BaseActivityTest {
 
-  @Rule
-  public final ActivityTestRule<EspressoTestActivity> rule = new ActivityTestRule<>(EspressoTestActivity.class);
-
-  private OnMapReadyIdlingResource idlingResource;
-  private Polygon polygon;
-
-  @Before
-  public void registerIdlingResource() {
-    idlingResource = new OnMapReadyIdlingResource(rule.getActivity());
-    Espresso.registerIdlingResources(idlingResource);
+  @Override
+  protected Class getActivityClass() {
+    return EspressoTestActivity.class;
   }
+
+  private Polygon polygon;
 
   @Test
   @Ignore
   /** native crash **/
   public void addPolygonTest() {
-    ViewUtils.checkViewIsDisplayed(R.id.mapView);
-    final MapboxMap mapboxMap = rule.getActivity().getMapboxMap();
+    validateTestSetup();
     LatLng latLngOne = new LatLng();
     LatLng latLngTwo = new LatLng(1, 0);
     LatLng latLngThree = new LatLng(1, 1);
@@ -96,10 +84,5 @@ public class PolygonTest {
     public void perform(UiController uiController, View view) {
       polygon = mapboxMap.addPolygon(options);
     }
-  }
-
-  @After
-  public void unregisterIdlingResource() {
-    Espresso.unregisterIdlingResources(idlingResource);
   }
 }

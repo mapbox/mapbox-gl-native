@@ -1,44 +1,15 @@
 package com.mapbox.mapboxsdk.testapp.style;
 
-import android.app.Activity;
-
-import com.mapbox.mapboxsdk.testapp.utils.ScreenshotUtil;
-
-import static android.support.test.espresso.Espresso.onView;
-import static android.support.test.espresso.assertion.ViewAssertions.matches;
-import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
-import static android.support.test.espresso.matcher.ViewMatchers.withId;
+import com.mapbox.mapboxsdk.testapp.activity.BaseActivityTest;
+import com.mapbox.mapboxsdk.testapp.activity.style.RuntimeStyleTestActivity;
 
 /**
  * Base Test class for Style tests
  */
-public class BaseStyleTest {
+public class BaseStyleTest extends BaseActivityTest {
 
-  protected static final String HOME_BUTTON_STRING = "Navigate up";
-
-  /*
-   * Shortcuts for common UI tests
-   */
-
-  protected void checkViewIsDisplayed(int id) {
-    onView(withId(id))
-      .check(matches(isDisplayed()));
+  @Override
+  protected Class getActivityClass() {
+    return RuntimeStyleTestActivity.class;
   }
-
-  /*
-   * Screenshots logic
-   */
-
-  protected void takeNamedScreenshot(final Activity activity, final String name) {
-
-    // Screenshots need to be taken on the UI thread
-    activity.runOnUiThread(new Runnable() {
-      @Override
-      public void run() {
-        ScreenshotUtil.take(activity, name);
-      }
-    });
-
-  }
-
 }
