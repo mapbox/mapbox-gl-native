@@ -53,11 +53,11 @@
     },
     "source5": {
       "type": "vector",
-      "url": "mapbox://mapbox.mapbox-streets-v6"
+      "tiles": ["fake"]
     },
     "source6": {
       "type": "raster",
-      "url": "mapbox://mapbox.satellite",
+      "tiles": ["fake"],
       "tileSize": 256
     }
   },

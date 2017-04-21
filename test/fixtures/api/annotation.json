@@ -3,7 +3,7 @@
   "sources": {
     "fake": {
       "type": "vector",
-      "url": "fake"
+      "tiles": ["fake"]
     }
   },
   "layers": [{

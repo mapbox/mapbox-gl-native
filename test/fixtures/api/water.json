@@ -4,7 +4,7 @@
   "sources": {
     "mapbox": {
       "type": "vector",
-      "url": "asset://streets.json"
+      "tiles": ["asset://streets/{z}-{x}-{y}.vector.pbf"]
     }
   },
   "layers": [{

@@ -164,6 +164,8 @@ void Style::addSource(std::unique_ptr<Source> source) {
     }
 
     source->baseImpl->setObserver(this);
+    source->baseImpl->loadDescription(fileSource);
+
     sources.emplace_back(std::move(source));
 }
 
@@ -387,9 +389,6 @@ void Style::recalculate(float z, const TimePoint& timePoint, MapMode mode) {
         // If this layer has a source, make sure that it gets loaded.
         if (Source* source = getSource(layer->baseImpl.source)) {
             source->baseImpl->enabled = true;
-            if (!source->baseImpl->loaded) {
-                source->baseImpl->loadDescription(fileSource);
-            }
         }
     }
 

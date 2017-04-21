@@ -193,7 +193,6 @@
 		7E016D861D9E890300A29A21 /* MGLPolygon+MGLAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 7E016D831D9E890300A29A21 /* MGLPolygon+MGLAdditions.m */; };
 		7E016D871D9E890300A29A21 /* MGLPolygon+MGLAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 7E016D831D9E890300A29A21 /* MGLPolygon+MGLAdditions.m */; };
 		920A3E5D1E6F995200C16EFC /* MGLSourceQueryTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 920A3E5C1E6F995200C16EFC /* MGLSourceQueryTests.m */; };
-		9221B2F11E6F9D1400A2385E /* query-style.json in Resources */ = {isa = PBXBuildFile; fileRef = 9221B2F01E6F9D1400A2385E /* query-style.json */; };
 		9620BB381E69FE1700705A1D /* MGLSDKUpdateChecker.h in Headers */ = {isa = PBXBuildFile; fileRef = 9620BB361E69FE1700705A1D /* MGLSDKUpdateChecker.h */; };
 		9620BB391E69FE1700705A1D /* MGLSDKUpdateChecker.h in Headers */ = {isa = PBXBuildFile; fileRef = 9620BB361E69FE1700705A1D /* MGLSDKUpdateChecker.h */; };
 		9620BB3A1E69FE1700705A1D /* MGLSDKUpdateChecker.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9620BB371E69FE1700705A1D /* MGLSDKUpdateChecker.mm */; };
@@ -664,7 +663,6 @@
 		7E016D821D9E890300A29A21 /* MGLPolygon+MGLAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "MGLPolygon+MGLAdditions.h"; sourceTree = "<group>"; };
 		7E016D831D9E890300A29A21 /* MGLPolygon+MGLAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "MGLPolygon+MGLAdditions.m"; sourceTree = "<group>"; };
 		920A3E5C1E6F995200C16EFC /* MGLSourceQueryTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MGLSourceQueryTests.m; path = ../../darwin/test/MGLSourceQueryTests.m; sourceTree = "<group>"; };
-		9221B2F01E6F9D1400A2385E /* query-style.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = "query-style.json"; path = "../../darwin/test/query-style.json"; sourceTree = "<group>"; };
 		9620BB361E69FE1700705A1D /* MGLSDKUpdateChecker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLSDKUpdateChecker.h; sourceTree = "<group>"; };
 		9620BB371E69FE1700705A1D /* MGLSDKUpdateChecker.mm */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = MGLSDKUpdateChecker.mm; sourceTree = "<group>"; };
 		9660916B1E5BBFD700A9A03B /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -1259,7 +1257,6 @@
 				DA2E88551CC036F400F24E7B /* Info.plist */,
 				DA2784FB1DF02FF4001D5B8D /* Media.xcassets */,
 				DA35D0871E1A6309007DED41 /* one-liner.json */,
-				9221B2F01E6F9D1400A2385E /* query-style.json */,
 			);
 			name = "SDK Tests";
 			path = test;
@@ -2050,7 +2047,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9221B2F11E6F9D1400A2385E /* query-style.json in Resources */,
 				DA2784FC1DF02FF4001D5B8D /* Media.xcassets in Resources */,
 				353BAEF71D646370009A8DA9 /* amsterdam.geojson in Resources */,
 				DA35D0881E1A6309007DED41 /* one-liner.json in Resources */,
