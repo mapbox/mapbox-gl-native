@@ -84,14 +84,16 @@ public:
 
 GeoJSONTile::GeoJSONTile(const OverscaledTileID& overscaledTileID,
                          std::string sourceID_,
-                         const style::UpdateParameters& parameters)
+                         const style::UpdateParameters& parameters,
+                         mapbox::geometry::feature_collection<int16_t> features)
     : GeometryTile(overscaledTileID, sourceID_, parameters,
                    *parameters.style.glyphAtlas,
                    *parameters.style.spriteAtlas) {
+    updateData(std::move(features));
 }
 
-void GeoJSONTile::updateData(const mapbox::geometry::feature_collection<int16_t>& features) {
-    setData(std::make_unique<GeoJSONTileData>(features));
+void GeoJSONTile::updateData(mapbox::geometry::feature_collection<int16_t> features) {
+    setData(std::make_unique<GeoJSONTileData>(std::move(features)));
 }
 
 void GeoJSONTile::setNecessity(Necessity) {}

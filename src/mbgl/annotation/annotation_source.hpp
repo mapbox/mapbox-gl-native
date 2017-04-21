@@ -17,13 +17,7 @@ public:
     Impl(Source&);
 
     void loadDescription(FileSource&) final;
-
-    optional<Range<uint8_t>> getZoomRange() const final;
-
-private:
-    uint16_t getTileSize() const final { return util::tileSize; }
-
-    std::unique_ptr<Tile> createTile(const OverscaledTileID&, const style::UpdateParameters&) final;
+    std::unique_ptr<RenderSource> createRenderSource() const final;
 };
 
 } // namespace mbgl

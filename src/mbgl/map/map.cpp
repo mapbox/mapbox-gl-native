@@ -7,13 +7,14 @@
 #include <mbgl/map/transform_state.hpp>
 #include <mbgl/annotation/annotation_manager.hpp>
 #include <mbgl/style/style.hpp>
-#include <mbgl/style/source_impl.hpp>
+#include <mbgl/style/source.hpp>
 #include <mbgl/style/layer.hpp>
 #include <mbgl/style/light.hpp>
 #include <mbgl/style/observer.hpp>
 #include <mbgl/style/transition_options.hpp>
 #include <mbgl/style/update_parameters.hpp>
 #include <mbgl/renderer/painter.hpp>
+#include <mbgl/renderer/render_source.hpp>
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
@@ -871,10 +872,10 @@ std::vector<Feature> Map::queryRenderedFeatures(const ScreenBox& box, const Rend
 std::vector<Feature> Map::querySourceFeatures(const std::string& sourceID, const SourceQueryOptions& options) {
     if (!impl->style) return {};
 
-    const style::Source* source = impl->style->getSource(sourceID);
+    const RenderSource* source = impl->style->getRenderSource(sourceID);
     if (!source) return {};
 
-    return source->baseImpl->querySourceFeatures(options);
+    return source->querySourceFeatures(options);
 }
 
 AnnotationIDs Map::queryPointAnnotations(const ScreenBox& box) {

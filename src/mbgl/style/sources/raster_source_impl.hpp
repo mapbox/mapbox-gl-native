@@ -10,8 +10,7 @@ class RasterSource::Impl : public TileSourceImpl {
 public:
     Impl(std::string id, Source&, variant<std::string, Tileset>, uint16_t tileSize);
 
-private:
-    std::unique_ptr<Tile> createTile(const OverscaledTileID&, const UpdateParameters&) final;
+    std::unique_ptr<RenderSource> createRenderSource() const final;
 };
 
 } // namespace style

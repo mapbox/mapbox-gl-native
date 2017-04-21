@@ -54,6 +54,7 @@ class RenderBackgroundLayer;
 
 class Programs;
 class PaintParameters;
+class TilePyramid;
 
 struct ClipID;
 

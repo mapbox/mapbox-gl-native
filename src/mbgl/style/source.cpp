@@ -18,9 +18,5 @@ optional<std::string> Source::getAttribution() const {
     return baseImpl->getAttribution();
 }
 
-optional<Range<uint8_t>> Source::getZoomRange() const {
-    return baseImpl->getZoomRange();
-}
-
 } // namespace style
 } // namespace mbgl

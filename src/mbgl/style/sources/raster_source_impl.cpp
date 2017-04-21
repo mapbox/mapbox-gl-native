@@ -1,5 +1,5 @@
 #include <mbgl/style/sources/raster_source_impl.hpp>
-#include <mbgl/tile/raster_tile.hpp>
+#include <mbgl/renderer/sources/render_raster_source.hpp>
 
 namespace mbgl {
 namespace style {
@@ -10,9 +10,8 @@ RasterSource::Impl::Impl(std::string id_, Source& base_,
     : TileSourceImpl(SourceType::Raster, std::move(id_), base_, std::move(urlOrTileset_), tileSize_) {
 }
 
-std::unique_ptr<Tile> RasterSource::Impl::createTile(const OverscaledTileID& tileID,
-                                               const UpdateParameters& parameters) {
-    return std::make_unique<RasterTile>(tileID, parameters, tileset);
+std::unique_ptr<RenderSource> RasterSource::Impl::createRenderSource() const {
+    return std::make_unique<RenderRasterSource>(*this);
 }
 
 } // namespace style
