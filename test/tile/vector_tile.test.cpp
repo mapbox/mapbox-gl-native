@@ -89,7 +89,7 @@ TEST(VectorTile, Issue7615) {
         0
     });
 
-    EXPECT_EQ(symbolBucket.get(), tile.getBucket(symbolLayer));
+    EXPECT_EQ(symbolBucket.get(), tile.getBucket(*symbolLayer.baseImpl->createRenderLayer()));
 }
 
 TEST(VectorTile, Issue8542) {

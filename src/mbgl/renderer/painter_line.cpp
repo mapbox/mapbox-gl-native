@@ -2,7 +2,7 @@
 #include <mbgl/renderer/paint_parameters.hpp>
 #include <mbgl/renderer/line_bucket.hpp>
 #include <mbgl/renderer/render_tile.hpp>
-#include <mbgl/style/layers/line_layer.hpp>
+#include <mbgl/renderer/render_line_layer.hpp>
 #include <mbgl/style/layers/line_layer_impl.hpp>
 #include <mbgl/programs/programs.hpp>
 #include <mbgl/programs/line_program.hpp>
@@ -15,13 +15,13 @@ using namespace style;
 
 void Painter::renderLine(PaintParameters& parameters,
                          LineBucket& bucket,
-                         const LineLayer& layer,
+                         const RenderLineLayer& layer,
                          const RenderTile& tile) {
     if (pass == RenderPass::Opaque) {
         return;
     }
 
-    const LinePaintProperties::Evaluated& properties = layer.impl->paint.evaluated;
+    const LinePaintProperties::Evaluated& properties = layer.evaluated;
 
     auto draw = [&] (auto& program, auto&& uniformValues) {
         program.draw(
@@ -57,7 +57,7 @@ void Painter::renderLine(PaintParameters& parameters,
                  pixelsToGLUnits,
                  posA,
                  posB,
-                 layer.impl->dashLineWidth,
+                 layer.dashLineWidth,
                  lineAtlas->getSize().width));
 
     } else if (!properties.get<LinePattern>().from.empty()) {

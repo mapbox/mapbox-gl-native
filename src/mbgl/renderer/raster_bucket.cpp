@@ -1,5 +1,5 @@
 #include <mbgl/renderer/raster_bucket.hpp>
-#include <mbgl/style/layers/raster_layer.hpp>
+#include <mbgl/renderer/render_raster_layer.hpp>
 #include <mbgl/programs/raster_program.hpp>
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/gl/context.hpp>
@@ -18,9 +18,9 @@ void RasterBucket::upload(gl::Context& context) {
 
 void RasterBucket::render(Painter& painter,
                           PaintParameters& parameters,
-                          const Layer& layer,
+                          const RenderLayer& layer,
                           const RenderTile& tile) {
-    painter.renderRaster(parameters, *this, *layer.as<RasterLayer>(), tile);
+    painter.renderRaster(parameters, *this, *layer.as<RenderRasterLayer>(), tile);
 }
 
 bool RasterBucket::hasData() const {

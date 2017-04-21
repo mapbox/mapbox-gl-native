@@ -75,7 +75,7 @@ public:
 
 template <>
 inline bool Layer::is<<%- camelize(type) %>Layer>() const {
-    return type == Type::<%- camelize(type) %>;
+    return type == LayerType::<%- camelize(type) %>;
 }
 
 } // namespace style

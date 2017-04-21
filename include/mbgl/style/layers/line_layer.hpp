@@ -120,7 +120,7 @@ public:
 
 template <>
 inline bool Layer::is<LineLayer>() const {
-    return type == Type::Line;
+    return type == LayerType::Line;
 }
 
 } // namespace style

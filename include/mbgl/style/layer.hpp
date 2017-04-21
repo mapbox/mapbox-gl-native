@@ -2,6 +2,7 @@
 
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/any.hpp>
+#include <mbgl/style/layer_type.hpp>
 #include <mbgl/style/types.hpp>
 
 #include <memory>
@@ -36,23 +37,16 @@ class FillExtrusionLayer;
  *     auto circleLayer = std::make_unique<CircleLayer>("my-circle-layer");
  */
 class Layer : public mbgl::util::noncopyable {
-protected:
-    enum class Type {
-        Fill,
-        Line,
-        Circle,
-        Symbol,
-        Raster,
-        Background,
-        Custom,
-        FillExtrusion,
-    };
-
+public:
     class Impl;
-    const Type type;
-    Layer(Type, std::unique_ptr<Impl>);
+
+protected:
+
+    const LayerType type;
+    Layer(LayerType, std::unique_ptr<Impl>);
 
 public:
+
     virtual ~Layer();
 
     // Check whether this layer is of the given subtype.
@@ -85,21 +79,21 @@ public:
     template <class V>
     auto accept(V&& visitor) {
         switch (type) {
-        case Type::Fill:
+        case LayerType::Fill:
             return visitor(*as<FillLayer>());
-        case Type::Line:
+        case LayerType::Line:
             return visitor(*as<LineLayer>());
-        case Type::Circle:
+        case LayerType::Circle:
             return visitor(*as<CircleLayer>());
-        case Type::Symbol:
+        case LayerType::Symbol:
             return visitor(*as<SymbolLayer>());
-        case Type::Raster:
+        case LayerType::Raster:
             return visitor(*as<RasterLayer>());
-        case Type::Background:
+        case LayerType::Background:
             return visitor(*as<BackgroundLayer>());
-        case Type::Custom:
+        case LayerType::Custom:
             return visitor(*as<CustomLayer>());
-        case Type::FillExtrusion:
+        case LayerType::FillExtrusion:
             return visitor(*as<FillExtrusionLayer>());
         }
     }
@@ -123,8 +117,6 @@ public:
     // object here, so that separately-obtained references to this object share
     // identical platform-native peers.
     any peer;
-
-    friend std::string layoutKey(const Layer&);
 };
 
 } // namespace style

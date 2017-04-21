@@ -1,15 +1,20 @@
 #include <mbgl/style/layers/custom_layer_impl.hpp>
-#include <mbgl/renderer/bucket.hpp>
+#include <mbgl/renderer/render_custom_layer.hpp>
 #include <mbgl/map/transform_state.hpp>
-
+#include <mbgl/util/logging.hpp>
 namespace mbgl {
 namespace style {
+
+std::unique_ptr<RenderLayer> CustomLayer::Impl::createRenderLayer() const {
+    return std::make_unique<RenderCustomLayer>(*this);
+}
 
 CustomLayer::Impl::Impl(const std::string& id_,
                          CustomLayerInitializeFunction initializeFn_,
                          CustomLayerRenderFunction renderFn_,
                          CustomLayerDeinitializeFunction deinitializeFn_,
                          void* context_) {
+    Log::Info(Event::General, "New custom layer Impl: %s", id_.c_str());
     id = id_;
     initializeFn = initializeFn_;
     renderFn = renderFn_;
@@ -17,8 +22,8 @@ CustomLayer::Impl::Impl(const std::string& id_,
     context = context_;
 }
 
-CustomLayer::Impl::Impl(const CustomLayer::Impl& other)
-    : Layer::Impl(other) {
+CustomLayer::Impl::Impl(const CustomLayer::Impl &other)
+        : Layer::Impl(other) {
     id = other.id;
     // Don't copy anything else.
 }
@@ -63,16 +68,6 @@ void CustomLayer::Impl::render(const TransformState& state) const {
     parameters.fieldOfView = state.getFieldOfView();
 
     renderFn(context, parameters);
-}
-
-bool CustomLayer::Impl::evaluate(const PropertyEvaluationParameters&) {
-    passes = RenderPass::Translucent;
-    return false;
-}
-
-std::unique_ptr<Bucket> CustomLayer::Impl::createBucket(const BucketParameters&, const std::vector<const Layer*>&) const {
-    assert(false);
-    return nullptr;
 }
 
 } // namespace style

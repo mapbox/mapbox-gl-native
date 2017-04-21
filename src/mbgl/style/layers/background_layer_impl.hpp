@@ -13,12 +13,9 @@ public:
     std::unique_ptr<Layer> cloneRef(const std::string& id) const override;
     void stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>&) const override;
 
-    void cascade(const CascadeParameters&) override;
-    bool evaluate(const PropertyEvaluationParameters&) override;
+    std::unique_ptr<RenderLayer> createRenderLayer() const override;
 
-    std::unique_ptr<Bucket> createBucket(const BucketParameters&, const std::vector<const Layer*>&) const override;
-
-    BackgroundPaintProperties paint;
+    BackgroundPaintProperties::Cascading cascading;
 };
 
 } // namespace style

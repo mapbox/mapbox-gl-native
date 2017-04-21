@@ -82,7 +82,7 @@ public:
 
 template <>
 inline bool Layer::is<FillLayer>() const {
-    return type == Type::Fill;
+    return type == LayerType::Fill;
 }
 
 } // namespace style

@@ -1,18 +1,11 @@
 #include <mbgl/style/layers/fill_extrusion_layer_impl.hpp>
-#include <mbgl/renderer/bucket.hpp>
+#include <mbgl/renderer/render_fill_extrusion_layer.hpp>
 
 namespace mbgl {
 namespace style {
 
-void FillExtrusionLayer::Impl::cascade(const CascadeParameters&) {
-}
-
-bool FillExtrusionLayer::Impl::evaluate(const PropertyEvaluationParameters&) {
-    return false;
-}
-
-std::unique_ptr<Bucket> FillExtrusionLayer::Impl::createBucket(const BucketParameters&, const std::vector<const Layer*>&) const {
-    return nullptr;
+std::unique_ptr<RenderLayer> FillExtrusionLayer::Impl::createRenderLayer() const {
+    return std::make_unique<RenderFillExtrusionLayer>(*this);
 }
 
 } // namespace style

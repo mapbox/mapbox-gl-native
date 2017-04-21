@@ -4,12 +4,12 @@
 #include <mbgl/text/collision_tile.hpp>
 #include <mbgl/layout/symbol_layout.hpp>
 #include <mbgl/sprite/sprite_atlas.hpp>
-#include <mbgl/style/bucket_parameters.hpp>
-#include <mbgl/style/group_by_layout.hpp>
+#include <mbgl/renderer/bucket_parameters.hpp>
+#include <mbgl/renderer/group_by_layout.hpp>
 #include <mbgl/style/filter.hpp>
 #include <mbgl/style/filter_evaluator.hpp>
-#include <mbgl/style/layers/symbol_layer.hpp>
 #include <mbgl/style/layers/symbol_layer_impl.hpp>
+#include <mbgl/renderer/render_symbol_layer.hpp>
 #include <mbgl/renderer/symbol_bucket.hpp>
 #include <mbgl/util/logging.hpp>
 #include <mbgl/util/constants.hpp>
@@ -252,6 +252,28 @@ void GeometryTileWorker::requestNewIcons(const IconDependencyMap &iconDependenci
     }
 }
 
+static std::vector<std::unique_ptr<RenderLayer>> toRenderLayers(const std::vector<std::unique_ptr<style::Layer>>& layers, float zoom) {
+    std::vector<std::unique_ptr<RenderLayer>> renderLayers;
+    renderLayers.reserve(layers.size());
+    for (auto& layer : layers) {
+        renderLayers.push_back(layer->baseImpl->createRenderLayer());
+
+        renderLayers.back()->cascade(style::CascadeParameters {
+            { ClassID::Default },
+            Clock::time_point::max(),
+            TransitionOptions()
+        });
+
+        renderLayers.back()->evaluate(style::PropertyEvaluationParameters {
+            zoom,
+            Clock::time_point::max(),
+            ZoomHistory(),
+            Duration(0)
+        });
+    }
+    return renderLayers;
+}
+
 void GeometryTileWorker::redoLayout() {
     if (!data || !layers) {
         return;
@@ -272,7 +294,10 @@ void GeometryTileWorker::redoLayout() {
     GlyphDependencies glyphDependencies;
     IconDependencyMap iconDependencyMap;
 
-    std::vector<std::vector<const Layer*>> groups = groupByLayout(*layers);
+    // Create render layers and group by layout
+    std::vector<std::unique_ptr<RenderLayer>> renderLayers = toRenderLayers(*layers, id.overscaledZ);
+    std::vector<std::vector<const RenderLayer*>> groups = groupByLayout(renderLayers);
+
     for (auto& group : groups) {
         if (obsolete) {
             return;
@@ -282,9 +307,9 @@ void GeometryTileWorker::redoLayout() {
             continue; // Tile has no data.
         }
 
-        const Layer& leader = *group.at(0);
+        const RenderLayer& leader = *group.at(0);
 
-        auto geometryLayer = (*data)->getLayer(leader.baseImpl->sourceLayer);
+        auto geometryLayer = (*data)->getLayer(leader.baseImpl.sourceLayer);
         if (!geometryLayer) {
             continue;
         }
@@ -296,13 +321,13 @@ void GeometryTileWorker::redoLayout() {
 
         featureIndex->setBucketLayerIDs(leader.getID(), layerIDs);
 
-        if (leader.is<SymbolLayer>()) {
+        if (leader.is<RenderSymbolLayer>()) {
             symbolLayoutMap.emplace(leader.getID(),
-                leader.as<SymbolLayer>()->impl->createLayout(parameters, group, *geometryLayer, glyphDependencies, iconDependencyMap));
+                leader.as<RenderSymbolLayer>()->createLayout(parameters, group, *geometryLayer, glyphDependencies, iconDependencyMap));
         } else {
-            const Filter& filter = leader.baseImpl->filter;
-            const std::string& sourceLayerID = leader.baseImpl->sourceLayer;
-            std::shared_ptr<Bucket> bucket = leader.baseImpl->createBucket(parameters, group);
+            const Filter& filter = leader.baseImpl.filter;
+            const std::string& sourceLayerID = leader.baseImpl.sourceLayer;
+            std::shared_ptr<Bucket> bucket = leader.createBucket(parameters, group);
 
             for (std::size_t i = 0; !obsolete && i < geometryLayer->featureCount(); i++) {
                 std::unique_ptr<GeometryTileFeature> feature = geometryLayer->getFeature(i);

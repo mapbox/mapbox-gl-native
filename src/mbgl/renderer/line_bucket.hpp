@@ -12,15 +12,13 @@
 
 namespace mbgl {
 
-namespace style {
 class BucketParameters;
-class LineLayer;
-} // namespace style
+class RenderLineLayer;
 
 class LineBucket : public Bucket {
 public:
-    LineBucket(const style::BucketParameters&,
-               const std::vector<const style::Layer*>&,
+    LineBucket(const BucketParameters&,
+               const std::vector<const RenderLayer*>&,
                const style::LineLayoutProperties&);
 
     void addFeature(const GeometryTileFeature&,
@@ -28,9 +26,9 @@ public:
     bool hasData() const override;
 
     void upload(gl::Context&) override;
-    void render(Painter&, PaintParameters&, const style::Layer&, const RenderTile&) override;
+    void render(Painter&, PaintParameters&, const RenderLayer&, const RenderTile&) override;
 
-    float getQueryRadius(const style::Layer&) const override;
+    float getQueryRadius(const RenderLayer&) const override;
 
     style::LineLayoutProperties::PossiblyEvaluated layout;
 
@@ -63,7 +61,7 @@ private:
 
     const uint32_t overscaling;
 
-    float getLineWidth(const style::LineLayer& layer) const;
+    float getLineWidth(const RenderLineLayer& layer) const;
 };
 
 } // namespace mbgl

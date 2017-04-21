@@ -8,14 +8,14 @@ namespace mbgl {
 namespace style {
 
 FillLayer::FillLayer(const std::string& layerID, const std::string& sourceID)
-    : Layer(Type::Fill, std::make_unique<Impl>())
+    : Layer(LayerType::Fill, std::make_unique<Impl>())
     , impl(static_cast<Impl*>(baseImpl.get())) {
     impl->id = layerID;
     impl->source = sourceID;
 }
 
 FillLayer::FillLayer(const Impl& other)
-    : Layer(Type::Fill, std::make_unique<Impl>(other))
+    : Layer(LayerType::Fill, std::make_unique<Impl>(other))
     , impl(static_cast<Impl*>(baseImpl.get())) {
 }
 
@@ -28,7 +28,7 @@ std::unique_ptr<Layer> FillLayer::Impl::clone() const {
 std::unique_ptr<Layer> FillLayer::Impl::cloneRef(const std::string& id_) const {
     auto result = std::make_unique<FillLayer>(*this);
     result->impl->id = id_;
-    result->impl->paint = FillPaintProperties();
+    result->impl->cascading = FillPaintProperties::Cascading();
     return std::move(result);
 }
 
@@ -70,22 +70,22 @@ PropertyValue<bool> FillLayer::getDefaultFillAntialias() {
 }
 
 PropertyValue<bool> FillLayer::getFillAntialias(const optional<std::string>& klass) const {
-    return impl->paint.get<FillAntialias>(klass);
+    return impl->cascading.template get<FillAntialias>().get(klass);
 }
 
 void FillLayer::setFillAntialias(PropertyValue<bool> value, const optional<std::string>& klass) {
     if (value == getFillAntialias(klass))
         return;
-    impl->paint.set<FillAntialias>(value, klass);
+    impl->cascading.template get<FillAntialias>().set(value, klass);
     impl->observer->onLayerPaintPropertyChanged(*this);
 }
 
 void FillLayer::setFillAntialiasTransition(const TransitionOptions& value, const optional<std::string>& klass) {
-    impl->paint.setTransition<FillAntialias>(value, klass);
+    impl->cascading.template get<FillAntialias>().setTransition(value, klass);
 }
 
 TransitionOptions FillLayer::getFillAntialiasTransition(const optional<std::string>& klass) const {
-    return impl->paint.getTransition<FillAntialias>(klass);
+    return impl->cascading.template get<FillAntialias>().getTransition(klass);
 }
 
 DataDrivenPropertyValue<float> FillLayer::getDefaultFillOpacity() {
@@ -93,13 +93,13 @@ DataDrivenPropertyValue<float> FillLayer::getDefaultFillOpacity() {
 }
 
 DataDrivenPropertyValue<float> FillLayer::getFillOpacity(const optional<std::string>& klass) const {
-    return impl->paint.get<FillOpacity>(klass);
+    return impl->cascading.template get<FillOpacity>().get(klass);
 }
 
 void FillLayer::setFillOpacity(DataDrivenPropertyValue<float> value, const optional<std::string>& klass) {
     if (value == getFillOpacity(klass))
         return;
-    impl->paint.set<FillOpacity>(value, klass);
+    impl->cascading.template get<FillOpacity>().set(value, klass);
     if (value.isDataDriven()) {
         impl->observer->onLayerDataDrivenPaintPropertyChanged(*this);
     } else {
@@ -108,11 +108,11 @@ void FillLayer::setFillOpacity(DataDrivenPropertyValue<float> value, const optio
 }
 
 void FillLayer::setFillOpacityTransition(const TransitionOptions& value, const optional<std::string>& klass) {
-    impl->paint.setTransition<FillOpacity>(value, klass);
+    impl->cascading.template get<FillOpacity>().setTransition(value, klass);
 }
 
 TransitionOptions FillLayer::getFillOpacityTransition(const optional<std::string>& klass) const {
-    return impl->paint.getTransition<FillOpacity>(klass);
+    return impl->cascading.template get<FillOpacity>().getTransition(klass);
 }
 
 DataDrivenPropertyValue<Color> FillLayer::getDefaultFillColor() {
@@ -120,13 +120,13 @@ DataDrivenPropertyValue<Color> FillLayer::getDefaultFillColor() {
 }
 
 DataDrivenPropertyValue<Color> FillLayer::getFillColor(const optional<std::string>& klass) const {
-    return impl->paint.get<FillColor>(klass);
+    return impl->cascading.template get<FillColor>().get(klass);
 }
 
 void FillLayer::setFillColor(DataDrivenPropertyValue<Color> value, const optional<std::string>& klass) {
     if (value == getFillColor(klass))
         return;
-    impl->paint.set<FillColor>(value, klass);
+    impl->cascading.template get<FillColor>().set(value, klass);
     if (value.isDataDriven()) {
         impl->observer->onLayerDataDrivenPaintPropertyChanged(*this);
     } else {
@@ -135,11 +135,11 @@ void FillLayer::setFillColor(DataDrivenPropertyValue<Color> value, const optiona
 }
 
 void FillLayer::setFillColorTransition(const TransitionOptions& value, const optional<std::string>& klass) {
-    impl->paint.setTransition<FillColor>(value, klass);
+    impl->cascading.template get<FillColor>().setTransition(value, klass);
 }
 
 TransitionOptions FillLayer::getFillColorTransition(const optional<std::string>& klass) const {
-    return impl->paint.getTransition<FillColor>(klass);
+    return impl->cascading.template get<FillColor>().getTransition(klass);
 }
 
 DataDrivenPropertyValue<Color> FillLayer::getDefaultFillOutlineColor() {
@@ -147,13 +147,13 @@ DataDrivenPropertyValue<Color> FillLayer::getDefaultFillOutlineColor() {
 }
 
 DataDrivenPropertyValue<Color> FillLayer::getFillOutlineColor(const optional<std::string>& klass) const {
-    return impl->paint.get<FillOutlineColor>(klass);
+    return impl->cascading.template get<FillOutlineColor>().get(klass);
 }
 
 void FillLayer::setFillOutlineColor(DataDrivenPropertyValue<Color> value, const optional<std::string>& klass) {
     if (value == getFillOutlineColor(klass))
         return;
-    impl->paint.set<FillOutlineColor>(value, klass);
+    impl->cascading.template get<FillOutlineColor>().set(value, klass);
     if (value.isDataDriven()) {
         impl->observer->onLayerDataDrivenPaintPropertyChanged(*this);
     } else {
@@ -162,11 +162,11 @@ void FillLayer::setFillOutlineColor(DataDrivenPropertyValue<Color> value, const 
 }
 
 void FillLayer::setFillOutlineColorTransition(const TransitionOptions& value, const optional<std::string>& klass) {
-    impl->paint.setTransition<FillOutlineColor>(value, klass);
+    impl->cascading.template get<FillOutlineColor>().setTransition(value, klass);
 }
 
 TransitionOptions FillLayer::getFillOutlineColorTransition(const optional<std::string>& klass) const {
-    return impl->paint.getTransition<FillOutlineColor>(klass);
+    return impl->cascading.template get<FillOutlineColor>().getTransition(klass);
 }
 
 PropertyValue<std::array<float, 2>> FillLayer::getDefaultFillTranslate() {
@@ -174,22 +174,22 @@ PropertyValue<std::array<float, 2>> FillLayer::getDefaultFillTranslate() {
 }
 
 PropertyValue<std::array<float, 2>> FillLayer::getFillTranslate(const optional<std::string>& klass) const {
-    return impl->paint.get<FillTranslate>(klass);
+    return impl->cascading.template get<FillTranslate>().get(klass);
 }
 
 void FillLayer::setFillTranslate(PropertyValue<std::array<float, 2>> value, const optional<std::string>& klass) {
     if (value == getFillTranslate(klass))
         return;
-    impl->paint.set<FillTranslate>(value, klass);
+    impl->cascading.template get<FillTranslate>().set(value, klass);
     impl->observer->onLayerPaintPropertyChanged(*this);
 }
 
 void FillLayer::setFillTranslateTransition(const TransitionOptions& value, const optional<std::string>& klass) {
-    impl->paint.setTransition<FillTranslate>(value, klass);
+    impl->cascading.template get<FillTranslate>().setTransition(value, klass);
 }
 
 TransitionOptions FillLayer::getFillTranslateTransition(const optional<std::string>& klass) const {
-    return impl->paint.getTransition<FillTranslate>(klass);
+    return impl->cascading.template get<FillTranslate>().getTransition(klass);
 }
 
 PropertyValue<TranslateAnchorType> FillLayer::getDefaultFillTranslateAnchor() {
@@ -197,22 +197,22 @@ PropertyValue<TranslateAnchorType> FillLayer::getDefaultFillTranslateAnchor() {
 }
 
 PropertyValue<TranslateAnchorType> FillLayer::getFillTranslateAnchor(const optional<std::string>& klass) const {
-    return impl->paint.get<FillTranslateAnchor>(klass);
+    return impl->cascading.template get<FillTranslateAnchor>().get(klass);
 }
 
 void FillLayer::setFillTranslateAnchor(PropertyValue<TranslateAnchorType> value, const optional<std::string>& klass) {
     if (value == getFillTranslateAnchor(klass))
         return;
-    impl->paint.set<FillTranslateAnchor>(value, klass);
+    impl->cascading.template get<FillTranslateAnchor>().set(value, klass);
     impl->observer->onLayerPaintPropertyChanged(*this);
 }
 
 void FillLayer::setFillTranslateAnchorTransition(const TransitionOptions& value, const optional<std::string>& klass) {
-    impl->paint.setTransition<FillTranslateAnchor>(value, klass);
+    impl->cascading.template get<FillTranslateAnchor>().setTransition(value, klass);
 }
 
 TransitionOptions FillLayer::getFillTranslateAnchorTransition(const optional<std::string>& klass) const {
-    return impl->paint.getTransition<FillTranslateAnchor>(klass);
+    return impl->cascading.template get<FillTranslateAnchor>().getTransition(klass);
 }
 
 PropertyValue<std::string> FillLayer::getDefaultFillPattern() {
@@ -220,22 +220,22 @@ PropertyValue<std::string> FillLayer::getDefaultFillPattern() {
 }
 
 PropertyValue<std::string> FillLayer::getFillPattern(const optional<std::string>& klass) const {
-    return impl->paint.get<FillPattern>(klass);
+    return impl->cascading.template get<FillPattern>().get(klass);
 }
 
 void FillLayer::setFillPattern(PropertyValue<std::string> value, const optional<std::string>& klass) {
     if (value == getFillPattern(klass))
         return;
-    impl->paint.set<FillPattern>(value, klass);
+    impl->cascading.template get<FillPattern>().set(value, klass);
     impl->observer->onLayerPaintPropertyChanged(*this);
 }
 
 void FillLayer::setFillPatternTransition(const TransitionOptions& value, const optional<std::string>& klass) {
-    impl->paint.setTransition<FillPattern>(value, klass);
+    impl->cascading.template get<FillPattern>().setTransition(value, klass);
 }
 
 TransitionOptions FillLayer::getFillPatternTransition(const optional<std::string>& klass) const {
-    return impl->paint.getTransition<FillPattern>(klass);
+    return impl->cascading.template get<FillPattern>().getTransition(klass);
 }
 
 } // namespace style

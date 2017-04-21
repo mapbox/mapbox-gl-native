@@ -50,7 +50,7 @@ public:
 
 template <>
 inline bool Layer::is<BackgroundLayer>() const {
-    return type == Type::Background;
+    return type == LayerType::Background;
 }
 
 } // namespace style

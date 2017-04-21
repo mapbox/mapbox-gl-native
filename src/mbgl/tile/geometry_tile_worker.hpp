@@ -17,6 +17,7 @@ class GeometryTile;
 class GeometryTileData;
 class GlyphAtlas;
 class SymbolLayout;
+class RenderLayer;
 
 namespace style {
 class Layer;

@@ -100,7 +100,7 @@ public:
 
 template <>
 inline bool Layer::is<CircleLayer>() const {
-    return type == Type::Circle;
+    return type == LayerType::Circle;
 }
 
 } // namespace style

@@ -4,7 +4,7 @@
 #include <mbgl/renderer/fill_bucket.hpp>
 #include <mbgl/renderer/line_bucket.hpp>
 #include <mbgl/renderer/symbol_bucket.hpp>
-#include <mbgl/style/bucket_parameters.hpp>
+#include <mbgl/renderer/bucket_parameters.hpp>
 #include <mbgl/style/layers/symbol_layer_properties.hpp>
 
 #include <mbgl/map/mode.hpp>

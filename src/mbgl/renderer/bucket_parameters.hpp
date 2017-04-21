@@ -4,7 +4,6 @@
 #include <mbgl/tile/tile_id.hpp>
 
 namespace mbgl {
-namespace style {
 
 class BucketParameters {
 public:
@@ -12,5 +11,4 @@ public:
     const MapMode mode;
 };
 
-} // namespace style
 } // namespace mbgl

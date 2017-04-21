@@ -203,62 +203,44 @@ public:
     class Unevaluated : public Tuple<UnevaluatedTypes> {
     public:
         using Tuple<UnevaluatedTypes>::Tuple;
+
+        bool hasTransition() const {
+            bool result = false;
+            util::ignore({ result |= this->template get<Ps>().hasTransition()... });
+            return result;
+        }
+
+        template <class P>
+        auto evaluate(const PropertyEvaluationParameters& parameters) {
+            using Evaluator = typename P::EvaluatorType;
+
+            return this->template get<P>().evaluate(
+                    Evaluator(parameters, P::defaultValue()),
+                    parameters.now
+            );
+        }
+
+        Evaluated evaluate(const PropertyEvaluationParameters& parameters) {
+            return Evaluated {
+                evaluate<Ps>(parameters)...
+            };
+        }
+
     };
 
     class Cascading : public Tuple<CascadingTypes> {
     public:
         using Tuple<CascadingTypes>::Tuple;
+
+        Unevaluated cascade(const CascadeParameters& parameters, Unevaluated&& prior) const {
+            return Unevaluated {
+                this->template get<Ps>().cascade(
+                        parameters,
+                        std::move(prior.template get<Ps>())
+                )...
+            };
+        }
     };
-
-    template <class P>
-    auto get(const optional<std::string>& klass) const {
-        return cascading.template get<P>().get(klass);
-    }
-
-    template <class P>
-    void set(const typename P::ValueType& value, const optional<std::string>& klass) {
-        cascading.template get<P>().set(value, klass);
-    }
-
-    template <class P>
-    void setTransition(const TransitionOptions& value, const optional<std::string>& klass) {
-        cascading.template get<P>().setTransition(value, klass);
-    }
-    
-    template <class P>
-    auto getTransition(const optional<std::string>& klass) const {
-        return cascading.template get<P>().getTransition(klass);
-    }
-
-    void cascade(const CascadeParameters& parameters) {
-        unevaluated = Unevaluated {
-            cascading.template get<Ps>().cascade(parameters,
-                std::move(unevaluated.template get<Ps>()))...
-        };
-    }
-
-    template <class P>
-    auto evaluate(const PropertyEvaluationParameters& parameters) {
-        using Evaluator = typename P::EvaluatorType;
-        return unevaluated.template get<P>()
-            .evaluate(Evaluator(parameters, P::defaultValue()), parameters.now);
-    }
-
-    void evaluate(const PropertyEvaluationParameters& parameters) {
-        evaluated = Evaluated {
-            evaluate<Ps>(parameters)...
-        };
-    }
-
-    bool hasTransition() const {
-        bool result = false;
-        util::ignore({ result |= unevaluated.template get<Ps>().hasTransition()... });
-        return result;
-    }
-
-    Cascading cascading;
-    Unevaluated unevaluated;
-    Evaluated evaluated;
 };
 
 } // namespace style
