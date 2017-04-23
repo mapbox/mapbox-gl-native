@@ -17,6 +17,7 @@ target_compile_options(mbgl-glfw
 
 target_include_directories(mbgl-glfw
     PRIVATE platform/default
+    PRIVATE src
 )
 
 target_link_libraries(mbgl-glfw
