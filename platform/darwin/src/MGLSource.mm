@@ -41,6 +41,13 @@
     return self;
 }
 
+- (instancetype)initWithPendingSource:(std::unique_ptr<mbgl::style::Source>)pendingSource {
+    if (self = [self initWithRawSource:pendingSource.get()]) {
+        _pendingSource = std::move(pendingSource);
+    }
+    return self;
+}
+
 - (void)addToMapView:(MGLMapView *)mapView {
     if (_pendingSource == nullptr) {
         [NSException raise:@"MGLRedundantSourceException"
