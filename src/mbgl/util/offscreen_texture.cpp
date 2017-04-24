@@ -40,8 +40,18 @@ public:
     void bindRenderbuffers(gl::TextureUnit unit) {
         if (!framebuffer) {
             texture = context.createTexture(size, gl::TextureFormat::RGBA, unit);
-            depthTarget = context.createRenderbuffer<gl::RenderbufferType::DepthComponent>(size);
-            framebuffer = context.createFramebuffer(*depthTarget, *texture);
+
+#if MBGL_USE_GLES2
+            if (context.supportsDepth24) {
+                gl::Renderbuffer<gl::RenderbufferType::DepthComponent24> depthTarget = context.createRenderbuffer<gl::RenderbufferType::DepthComponent24>(size);
+                framebuffer = context.createFramebuffer(*texture, depthTarget);
+            } else
+#endif // MBGL_USE_GLES2
+            {
+                gl::Renderbuffer<gl::RenderbufferType::DepthComponent> depthTarget = context.createRenderbuffer<gl::RenderbufferType::DepthComponent>(size);
+                framebuffer = context.createFramebuffer(*texture, depthTarget);
+            }
+
         } else {
             context.bindFramebuffer = framebuffer->framebuffer;
         }
@@ -55,7 +65,6 @@ private:
     const Size size;
     optional<gl::Framebuffer> framebuffer;
     optional<gl::Texture> texture;
-    optional<gl::Renderbuffer<gl::RenderbufferType::DepthComponent>> depthTarget;
 };
 
 OffscreenTexture::OffscreenTexture(gl::Context& context, const Size size)
