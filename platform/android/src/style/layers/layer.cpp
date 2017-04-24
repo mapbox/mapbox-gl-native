@@ -111,6 +111,23 @@ namespace android {
         }
     };
 
+    jni::Object<jni::ObjectTag> Layer::getFilter(jni::JNIEnv& env) {
+        using namespace mbgl::style;
+        using namespace mbgl::android::conversion;
+
+        if (layer.is<FillLayer>()) {
+            return jni::Object<jni::ObjectTag>(*convert<jni::jobject*>(env, layer.as<FillLayer>()->getFilter()));
+        } else if (layer.is<LineLayer>()) {
+            return jni::Object<jni::ObjectTag>(*convert<jni::jobject*>(env, layer.as<LineLayer>()->getFilter()));
+        } else if (layer.is<SymbolLayer>()) {
+            return jni::Object<jni::ObjectTag>(*convert<jni::jobject*>(env, layer.as<SymbolLayer>()->getFilter()));
+        } else if (layer.is<CircleLayer>()) {
+            return jni::Object<jni::ObjectTag>(*convert<jni::jobject*>(env, layer.as<CircleLayer>()->getFilter()));
+        } else {
+            return jni::Object<jni::ObjectTag>(*convert<jni::jobject*>(env, NullFilter()));
+        }
+    }
+
     void Layer::setFilter(jni::JNIEnv& env, jni::Array<jni::Object<>> jfilter) {
         using namespace mbgl::style;
         using namespace mbgl::style::conversion;
@@ -198,6 +215,7 @@ namespace android {
             METHOD(&Layer::getId, "nativeGetId"),
             METHOD(&Layer::setLayoutProperty, "nativeSetLayoutProperty"),
             METHOD(&Layer::setPaintProperty, "nativeSetPaintProperty"),
+            METHOD(&Layer::getFilter, "nativeGetFilter"),
             METHOD(&Layer::setFilter, "nativeSetFilter"),
             METHOD(&Layer::setSourceLayer, "nativeSetSourceLayer"),
             METHOD(&Layer::getSourceLayer, "nativeGetSourceLayer"),

@@ -89,6 +89,15 @@ public class <%- camelize(type) %>Layer extends Layer {
   }
 
   /**
+   * Gets the filter of the layer.
+   *
+   * @return {@link Filter.Statement} filter layer is using
+   */
+  public Filter.Statement getFilter() {
+    return nativeGetFilter();
+  }
+
+  /**
    * Set a single filter.
    *
    * @param filter the filter to set

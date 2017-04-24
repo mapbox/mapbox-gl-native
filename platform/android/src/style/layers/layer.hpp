@@ -66,6 +66,8 @@ public:
 
     /* common properties, but not shared by all */
 
+    jni::Object<jni::ObjectTag> getFilter(jni::JNIEnv&);
+
     void setFilter(jni::JNIEnv&, jni::Array<jni::Object<>>);
 
     void setSourceLayer(jni::JNIEnv&, jni::String);
