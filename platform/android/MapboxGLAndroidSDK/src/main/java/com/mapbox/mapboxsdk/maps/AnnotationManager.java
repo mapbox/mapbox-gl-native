@@ -669,13 +669,9 @@ class AnnotationManager {
               }
             }
 
-            if (annotation instanceof MarkerView) {
-              markerViewManager.onClickMarkerView((MarkerView) annotation);
-            } else {
-              if (!handledDefaultClick) {
-                // only select marker if user didn't handle the click event themselves
-                selectMarker(marker);
-              }
+            if (!handledDefaultClick) {
+              // only select marker if user didn't handle the click event themselves
+              selectMarker(marker);
             }
 
             return true;
