@@ -73,6 +73,15 @@ void LineBucket::addGeometry(const GeometryCoordinates& coordinates, FeatureType
         return l;
     }();
 
+    const std::size_t first = [&coordinates, &len] {
+        std::size_t i = 0;
+        // If the line has duplicate vertices at the start, adjust index to remove them.
+        while (i < len - 1 && coordinates[i] == coordinates[i + 1]) {
+            i++;
+        }
+        return i;
+    }();
+
     // Ignore invalid geometry.
     if (len < (type == FeatureType::Polygon ? 3 : 2)) {
         return;
@@ -82,7 +91,7 @@ void LineBucket::addGeometry(const GeometryCoordinates& coordinates, FeatureType
 
     const double sharpCornerOffset = SHARP_CORNER_OFFSET * (float(util::EXTENT) / (util::tileSize * overscaling));
 
-    const GeometryCoordinate firstCoordinate = coordinates.front();
+    const GeometryCoordinate firstCoordinate = coordinates[first];
     const LineCapType beginCap = layout.get<LineCap>();
     const LineCapType endCap = type == FeatureType::Polygon ? LineCapType::Butt : LineCapType(layout.get<LineCap>());
 
@@ -105,10 +114,10 @@ void LineBucket::addGeometry(const GeometryCoordinates& coordinates, FeatureType
     const std::size_t startVertex = vertices.vertexSize();
     std::vector<TriangleElement> triangleStore;
 
-    for (std::size_t i = 0; i < len; ++i) {
+    for (std::size_t i = first; i < len; ++i) {
         if (type == FeatureType::Polygon && i == len - 1) {
             // if the line is closed, we treat the last vertex like the first
-            nextCoordinate = coordinates[1];
+            nextCoordinate = coordinates[first + 1];
         } else if (i + 1 < len) {
             // just the next vertex
             nextCoordinate = coordinates[i + 1];
@@ -173,7 +182,7 @@ void LineBucket::addGeometry(const GeometryCoordinates& coordinates, FeatureType
 
         const bool isSharpCorner = cosHalfAngle < COS_HALF_SHARP_CORNER && prevCoordinate && nextCoordinate;
 
-        if (isSharpCorner && i > 0) {
+        if (isSharpCorner && i > first) {
             const double prevSegmentLength = util::dist<double>(*currentCoordinate, *prevCoordinate);
             if (prevSegmentLength > 2.0 * sharpCornerOffset) {
                 GeometryCoordinate newPrevVertex = *currentCoordinate - convertPoint<int16_t>(util::round(convertPoint<double>(*currentCoordinate - *prevCoordinate) * (sharpCornerOffset / prevSegmentLength)));
