@@ -21,7 +21,7 @@ class UnwrappedTileID;
 class TransformState;
 
 namespace style {
-    template <class> class Faded;
+template <class> class Faded;
 } // namespace style
 
 namespace uniforms {
