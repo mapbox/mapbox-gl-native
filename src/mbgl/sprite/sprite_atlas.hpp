@@ -15,6 +15,7 @@
 
 namespace mbgl {
 
+class Scheduler;
 class FileSource;
 class SpriteAtlasObserver;
 
@@ -56,7 +57,11 @@ public:
     SpriteAtlas(Size, float pixelRatio);
     ~SpriteAtlas();
 
-    void load(const std::string& url, FileSource&);
+    void load(const std::string& url, Scheduler&, FileSource&);
+
+    void markAsLoaded() {
+        loaded = true;
+    }
 
     bool isLoaded() const {
         return loaded;
@@ -97,6 +102,10 @@ private:
     void _setSprite(const std::string&, const std::shared_ptr<const SpriteImage>& = nullptr);
     void emitSpriteLoadedIfComplete();
 
+    // Invoked by SpriteAtlasWorker
+    friend class SpriteAtlasWorker;
+    void onParsed(Sprites&& result);
+    void onError(std::exception_ptr);
 
     const Size size;
     const float pixelRatio;

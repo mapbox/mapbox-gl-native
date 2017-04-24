@@ -36,7 +36,6 @@ import com.mapbox.mapboxsdk.maps.widgets.CompassView;
 import com.mapbox.mapboxsdk.maps.widgets.MyLocationView;
 import com.mapbox.mapboxsdk.maps.widgets.MyLocationViewSettings;
 import com.mapbox.mapboxsdk.net.ConnectivityReceiver;
-import com.mapbox.services.android.telemetry.MapboxEvent;
 import com.mapbox.services.android.telemetry.MapboxTelemetry;
 
 import java.lang.annotation.Retention;
@@ -188,7 +187,7 @@ public class MapView extends FrameLayout {
   @UiThread
   public void onCreate(@Nullable Bundle savedInstanceState) {
     if (savedInstanceState == null) {
-      MapboxTelemetry.getInstance().pushEvent(MapboxEvent.buildMapLoadEvent());
+      MapboxTelemetry.getInstance().pushEvent(MapboxEventWrapper.buildMapLoadEvent());
     } else if (savedInstanceState.getBoolean(MapboxConstants.STATE_HAS_SAVED_STATE)) {
       mapboxMap.onRestoreInstanceState(savedInstanceState);
     }

@@ -27,6 +27,8 @@ public:
     void upload(gl::Context&) override;
     void render(Painter&, PaintParameters&, const style::Layer&, const RenderTile&) override;
 
+    float getQueryRadius(const style::Layer&) const override;
+
     gl::VertexVector<FillLayoutVertex> vertices;
     gl::IndexVector<gl::Lines> lines;
     gl::IndexVector<gl::Triangles> triangles;

@@ -37,10 +37,12 @@ import com.mapbox.mapboxsdk.constants.MyLocationTracking;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
+import com.mapbox.mapboxsdk.location.LocationSource;
 import com.mapbox.mapboxsdk.maps.widgets.MyLocationViewSettings;
 import com.mapbox.mapboxsdk.style.layers.Filter;
 import com.mapbox.mapboxsdk.style.layers.Layer;
 import com.mapbox.mapboxsdk.style.sources.Source;
+import com.mapbox.services.android.telemetry.location.LocationEngine;
 import com.mapbox.services.commons.geojson.Feature;
 
 import java.lang.reflect.ParameterizedType;
@@ -1521,6 +1523,27 @@ public final class MapboxMap {
     nativeMapView.setLatLngBounds(latLngBounds);
   }
 
+  /**
+   * Gets a camera position that would fit a bounds.
+   *
+   * @param latLngBounds the bounds to constrain the map with
+   */
+  public CameraPosition getCameraForLatLngBounds(@Nullable LatLngBounds latLngBounds, int[] padding) {
+    // calculate and set additional bounds padding
+    int[] mapPadding = getPadding();
+    for (int i = 0; i < padding.length; i++) {
+      padding[i] = mapPadding[i] + padding[i];
+    }
+    projection.setContentPadding(padding, myLocationViewSettings.getPadding());
+
+    // get padded camera position from LatLngBounds
+    CameraPosition cameraPosition = nativeMapView.getCameraForLatLngBounds(latLngBounds);
+
+    // reset map padding
+    setPadding(mapPadding);
+    return cameraPosition;
+  }
+
   //
   // Padding
   //
@@ -1544,7 +1567,11 @@ public final class MapboxMap {
    * @param bottom The bottom margin in pixels.
    */
   public void setPadding(int left, int top, int right, int bottom) {
-    projection.setContentPadding(new int[] {left, top, right, bottom}, myLocationViewSettings.getPadding());
+    setPadding(new int[] {left, top, right, bottom});
+  }
+
+  private void setPadding(int[] padding) {
+    projection.setContentPadding(padding, myLocationViewSettings.getPadding());
     uiSettings.invalidate();
   }
 
@@ -1745,6 +1772,18 @@ public final class MapboxMap {
   public void setOnMyLocationChangeListener(@Nullable MapboxMap.OnMyLocationChangeListener
                                               listener) {
     trackingSettings.setOnMyLocationChangeListener(listener);
+  }
+
+  /**
+   * Replaces the location source of the my-location layer.
+   *
+   * @param locationSource A {@link LocationEngine} location source to use in the my-location layer.
+   *                       Set to null to use the default {@link LocationSource}
+   *                       location source.
+   */
+  @UiThread
+  public void setLocationSource(@Nullable LocationEngine locationSource) {
+    trackingSettings.setLocationSource(locationSource);
   }
 
   /**

@@ -1226,3 +1226,36 @@ TEST(UpdateRenderables, RepeatedRenderWithMissingOptionals) {
               }),
               log);
 }
+
+TEST(UpdateRenderables, LoadRequiredIfIdealTileCantBeFound) {
+    ActionLog log;
+    MockSource source;
+    auto getTileData = getTileDataFn(log, source.dataTiles);
+    auto createTileData = createTileDataFn(log, source.dataTiles);
+    auto retainTileData = retainTileDataFn(log);
+    auto renderTile = renderTileFn(log);
+
+    source.zoomRange.max = 6;
+    source.idealTiles.emplace(UnwrappedTileID{ 6, 0, 0 });
+
+    auto tile_6_6_0_0 = source.createTileData(OverscaledTileID{ 6, { 6, 0, 0 } });
+    tile_6_6_0_0->triedOptional = true;
+    tile_6_6_0_0->loaded = true;
+
+    algorithm::updateRenderables(getTileData, createTileData, retainTileData, renderTile,
+                                 source.idealTiles, source.zoomRange, 6);
+    EXPECT_EQ(ActionLog({
+                  GetTileDataAction{ { 6, { 6, 0, 0 } }, Found }, // ideal tile, not found
+                  RetainTileDataAction{ { 6, { 6, 0, 0 } }, Resource::Necessity::Required }, //
+                  GetTileDataAction{ { 7, { 6, 0, 0 } }, NotFound }, // overzoomed child
+                  GetTileDataAction{ { 5, { 5, 0, 0 } }, NotFound }, // ascent
+                  CreateTileDataAction{ { 5, { 5, 0, 0 } } },
+                  RetainTileDataAction{ { 5, { 5, 0, 0 } }, Resource::Necessity::Required },
+                  GetTileDataAction{ { 4, { 4, 0, 0 } }, NotFound }, // ...
+                  GetTileDataAction{ { 3, { 3, 0, 0 } }, NotFound }, // ...
+                  GetTileDataAction{ { 2, { 2, 0, 0 } }, NotFound }, // ...
+                  GetTileDataAction{ { 1, { 1, 0, 0 } }, NotFound }, // ...
+                  GetTileDataAction{ { 0, { 0, 0, 0 } }, NotFound }, // ...
+              }),
+              log);
+}

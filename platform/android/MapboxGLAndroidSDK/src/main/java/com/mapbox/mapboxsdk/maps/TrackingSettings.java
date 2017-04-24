@@ -12,6 +12,7 @@ import com.mapbox.mapboxsdk.constants.MyBearingTracking;
 import com.mapbox.mapboxsdk.constants.MyLocationTracking;
 import com.mapbox.mapboxsdk.location.LocationSource;
 import com.mapbox.mapboxsdk.maps.widgets.MyLocationView;
+import com.mapbox.services.android.telemetry.location.LocationEngine;
 import com.mapbox.services.android.telemetry.location.LocationEngineListener;
 import com.mapbox.services.android.telemetry.permissions.PermissionsManager;
 
@@ -26,6 +27,7 @@ public final class TrackingSettings {
   private final UiSettings uiSettings;
   private final FocalPointChangeListener focalPointChangedListener;
   private final CameraZoomInvalidator zoomInvalidator;
+  private LocationEngine locationSource;
   private LocationEngineListener myLocationListener;
 
   private boolean myLocationEnabled;
@@ -45,6 +47,7 @@ public final class TrackingSettings {
   }
 
   void initialise(MapboxMapOptions options) {
+    locationSource = LocationSource.getLocationEngine(myLocationView.getContext());
     setMyLocationEnabled(options.getLocationEnabled());
   }
 
@@ -328,9 +331,9 @@ public final class TrackingSettings {
           }
         }
       };
-      LocationSource.getLocationEngine(myLocationView.getContext()).addLocationEngineListener(myLocationListener);
+      locationSource.addLocationEngineListener(myLocationListener);
     } else {
-      LocationSource.getLocationEngine(myLocationView.getContext()).removeLocationEngineListener(myLocationListener);
+      locationSource.removeLocationEngineListener(myLocationListener);
       myLocationListener = null;
     }
   }
@@ -360,6 +363,11 @@ public final class TrackingSettings {
     }
     myLocationEnabled = locationEnabled;
     myLocationView.setEnabled(locationEnabled);
+  }
+
+  void setLocationSource(LocationEngine locationSource) {
+    this.locationSource = locationSource;
+    myLocationView.setLocationSource(locationSource);
   }
 
   void update() {

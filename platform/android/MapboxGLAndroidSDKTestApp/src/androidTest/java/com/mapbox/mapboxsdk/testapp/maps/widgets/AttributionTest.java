@@ -3,11 +3,9 @@ package com.mapbox.mapboxsdk.testapp.maps.widgets;
 import android.app.Instrumentation;
 import android.content.Intent;
 import android.net.Uri;
-import android.support.test.espresso.Espresso;
 import android.support.test.espresso.UiController;
 import android.support.test.espresso.ViewAction;
 import android.support.test.espresso.intent.Intents;
-import android.support.test.rule.ActivityTestRule;
 import android.text.Html;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
@@ -17,14 +15,12 @@ import android.view.View;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.style.sources.Source;
 import com.mapbox.mapboxsdk.testapp.R;
+import com.mapbox.mapboxsdk.testapp.activity.BaseActivityTest;
 import com.mapbox.mapboxsdk.testapp.activity.espresso.EspressoTestActivity;
-import com.mapbox.mapboxsdk.testapp.utils.OnMapReadyIdlingResource;
-import com.mapbox.mapboxsdk.testapp.utils.ViewUtils;
 
 import org.hamcrest.Matcher;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 
 import static android.support.test.espresso.Espresso.onData;
@@ -42,39 +38,25 @@ import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.anything;
 import static org.hamcrest.core.IsNot.not;
 
-public class AttributionTest {
+public class AttributionTest extends BaseActivityTest {
 
-  @Rule
-  public final ActivityTestRule<EspressoTestActivity> rule = new ActivityTestRule<>(EspressoTestActivity.class);
-
-  private OnMapReadyIdlingResource idlingResource;
-
-  private MapboxMap mapboxMap;
   private URLSpan[] urlSpans;
+
+  @Override
+  protected Class getActivityClass() {
+    return EspressoTestActivity.class;
+  }
 
   @Before
   public void beforeTest() {
-    idlingResource = new OnMapReadyIdlingResource(rule.getActivity());
-    Espresso.registerIdlingResources(idlingResource);
+    super.beforeTest();
     Intents.init();
-    ViewUtils.checkViewIsDisplayed(R.id.mapView);
-    mapboxMap = rule.getActivity().getMapboxMap();
-    onView(withId(R.id.mapView)).perform(new MapboxMapAction(new InvokeViewAction() {
-      @Override
-      public void onViewAction(UiController uiController, View view) {
-        for (Source source : mapboxMap.getSources()) {
-          String attributionSource = source.getAttribution();
-          if (!TextUtils.isEmpty(attributionSource)) {
-            SpannableStringBuilder htmlBuilder = (SpannableStringBuilder) Html.fromHtml(attributionSource);
-            urlSpans = htmlBuilder.getSpans(0, htmlBuilder.length(), URLSpan.class);
-          }
-        }
-      }
-    }));
   }
 
   @Test
   public void testDisabled() {
+    validateTestSetup();
+
     // Default
     onView(withId(R.id.attributionView)).check(matches(isDisplayed()));
 
@@ -86,9 +68,9 @@ public class AttributionTest {
 
   @Test
   public void testMapboxStreetsMapboxAttributionLink() {
-    ViewUtils.checkViewIsDisplayed(R.id.mapView);
+    validateTestSetup();
     if (urlSpans == null) {
-      return;
+      buildUrlSpans();
     }
 
     // click on View to open dialog
@@ -106,10 +88,11 @@ public class AttributionTest {
 
   @Test
   public void testMapboxStreetsOpenStreetMapAttributionLink() {
-    ViewUtils.checkViewIsDisplayed(R.id.mapView);
+    validateTestSetup();
     if (urlSpans == null) {
-      return;
+      buildUrlSpans();
     }
+
     // click on View to open dialog
     onView(withId(R.id.attributionView)).perform(click());
     onView(withText(R.string.mapbox_attributionsDialogTitle)).check(matches(isDisplayed()));
@@ -125,10 +108,11 @@ public class AttributionTest {
 
   @Test
   public void testImproveMapLink() {
-    ViewUtils.checkViewIsDisplayed(R.id.mapView);
+    validateTestSetup();
     if (urlSpans == null) {
-      return;
+      buildUrlSpans();
     }
+
     // click on View to open dialog
     onView(withId(R.id.attributionView)).perform(click());
     onView(withText(R.string.mapbox_attributionsDialogTitle)).check(matches(isDisplayed()));
@@ -144,7 +128,7 @@ public class AttributionTest {
 
   @Test
   public void testTelemetryDialog() {
-    ViewUtils.checkViewIsDisplayed(R.id.mapView);
+    validateTestSetup();
 
     // click on View to open dialog
     onView(withId(R.id.attributionView)).perform(click());
@@ -157,8 +141,23 @@ public class AttributionTest {
 
   @After
   public void afterTest() {
+    super.afterTest();
     Intents.release();
-    Espresso.unregisterIdlingResources(idlingResource);
+  }
+
+  private void buildUrlSpans() {
+    onView(withId(R.id.mapView)).perform(new MapboxMapAction(new InvokeViewAction() {
+      @Override
+      public void onViewAction(UiController uiController, View view) {
+        for (Source source : mapboxMap.getSources()) {
+          String attributionSource = source.getAttribution();
+          if (!TextUtils.isEmpty(attributionSource)) {
+            SpannableStringBuilder htmlBuilder = (SpannableStringBuilder) Html.fromHtml(attributionSource);
+            urlSpans = htmlBuilder.getSpans(0, htmlBuilder.length(), URLSpan.class);
+          }
+        }
+      }
+    }));
   }
 
   private class DisableAction implements ViewAction {

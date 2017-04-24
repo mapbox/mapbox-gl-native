@@ -1,27 +1,21 @@
 package com.mapbox.mapboxsdk.testapp.annotations;
 
-import android.support.test.espresso.Espresso;
 import android.support.test.espresso.UiController;
 import android.support.test.espresso.ViewAction;
-import android.support.test.rule.ActivityTestRule;
 import android.view.View;
 
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.testapp.R;
+import com.mapbox.mapboxsdk.testapp.activity.BaseActivityTest;
 import com.mapbox.mapboxsdk.testapp.activity.annotation.MarkerViewActivity;
 import com.mapbox.mapboxsdk.testapp.activity.espresso.EspressoTestActivity;
 import com.mapbox.mapboxsdk.testapp.model.annotations.TextMarkerViewOptions;
-import com.mapbox.mapboxsdk.testapp.utils.OnMapReadyIdlingResource;
 import com.mapbox.mapboxsdk.testapp.utils.TestConstants;
-import com.mapbox.mapboxsdk.testapp.utils.ViewUtils;
 
 import org.hamcrest.Matcher;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Ignore;
-import org.junit.Rule;
 import org.junit.Test;
 
 import static android.support.test.espresso.Espresso.onView;
@@ -31,25 +25,19 @@ import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static org.junit.Assert.assertEquals;
 
-public class MarkerViewTest {
+public class MarkerViewTest extends BaseActivityTest {
 
-  @Rule
-  public final ActivityTestRule<EspressoTestActivity> rule = new ActivityTestRule<>(EspressoTestActivity.class);
-
-  private OnMapReadyIdlingResource idlingResource;
   private Marker marker;
 
-  @Before
-  public void registerIdlingResource() {
-    idlingResource = new OnMapReadyIdlingResource(rule.getActivity());
-    Espresso.registerIdlingResources(idlingResource);
+  @Override
+  protected Class getActivityClass() {
+    return EspressoTestActivity.class;
   }
 
   @Test
   @Ignore
   public void addMarkerViewTest() {
-    ViewUtils.checkViewIsDisplayed(R.id.mapView);
-    MapboxMap mapboxMap = rule.getActivity().getMapboxMap();
+    validateTestSetup();
     assertEquals("Markers should be empty", 0, mapboxMap.getMarkers().size());
 
     TextMarkerViewOptions options = new TextMarkerViewOptions();
@@ -70,8 +58,7 @@ public class MarkerViewTest {
   @Test
   @Ignore
   public void showInfoWindowTest() {
-    ViewUtils.checkViewIsDisplayed(R.id.mapView);
-    MapboxMap mapboxMap = rule.getActivity().getMapboxMap();
+    validateTestSetup();
 
     final TextMarkerViewOptions options = new TextMarkerViewOptions();
     options.position(new LatLng());
@@ -138,10 +125,5 @@ public class MarkerViewTest {
       mapboxMap.selectMarker(marker);
       uiController.loopMainThreadForAtLeast(250);
     }
-  }
-
-  @After
-  public void unregisterIdlingResource() {
-    Espresso.unregisterIdlingResources(idlingResource);
   }
 }

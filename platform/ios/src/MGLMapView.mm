@@ -466,7 +466,7 @@ public:
 
     // setup logo bug
     //
-    UIImage *logo = [[MGLMapView resourceImageNamed:@"mapbox.png"] imageWithAlignmentRectInsets:UIEdgeInsetsMake(1.5, 4, 3.5, 2)];
+    UIImage *logo = [MGLMapView resourceImageNamed:@"mapbox.png"];
     _logoView = [[UIImageView alloc] initWithImage:logo];
     _logoView.accessibilityTraits = UIAccessibilityTraitStaticText;
     _logoView.accessibilityLabel = NSLocalizedStringWithDefaultValue(@"LOGO_A11Y_LABEL", nil, nil, @"Mapbox", @"Accessibility label");
@@ -1162,6 +1162,9 @@ public:
 
 - (void)updateTintColorForView:(UIView *)view
 {
+    // stop at recursing container & annotation views (#8522)
+    if ([view isEqual:self.annotationContainerView]) return;
+
     if ([view respondsToSelector:@selector(setTintColor:)]) view.tintColor = self.tintColor;
 
     for (UIView *subview in view.subviews) [self updateTintColorForView:subview];

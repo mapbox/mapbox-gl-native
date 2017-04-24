@@ -11,6 +11,7 @@
 
 namespace mbgl {
 
+class GeometryTile;
 class RenderedQueryOptions;
 
 namespace style {
@@ -45,7 +46,8 @@ public:
             const GeometryTileData&,
             const CanonicalTileID&,
             const style::Style&,
-            const CollisionTile*) const;
+            const CollisionTile*,
+            const GeometryTile& tile) const;
 
     static optional<GeometryCoordinates> translateQueryGeometry(
             const GeometryCoordinates& queryGeometry,

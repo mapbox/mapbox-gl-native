@@ -61,22 +61,6 @@ public class CameraPositionTest {
   }
 
   @Test
-  public void testJniBuilder() {
-    double bearing = 180;
-    double zoom = 12;
-    double latitude = 10;
-    double longitude = 11;
-    double tilt = 44;
-
-    double[] cameraVars = new double[]{latitude, longitude, bearing, tilt, zoom};
-    CameraPosition cameraPosition = new CameraPosition.Builder(cameraVars).build();
-    assertEquals("bearing should match", bearing, cameraPosition.bearing, DELTA);
-    assertEquals("latlng should match", new LatLng(latitude, longitude), cameraPosition.target);
-    assertEquals("tilt should match", tilt, cameraPosition.tilt, DELTA);
-    assertEquals("zoom should match", zoom, cameraPosition.zoom, DELTA);
-  }
-
-  @Test
   public void testToString() {
     LatLng latLng = new LatLng(1, 2);
     CameraPosition cameraPosition = new CameraPosition(latLng, 3, 4, 5);

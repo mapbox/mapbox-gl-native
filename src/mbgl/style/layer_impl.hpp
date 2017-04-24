@@ -69,10 +69,10 @@ public:
     // Checks whether this layer can be rendered.
     bool needsRendering(float zoom) const;
 
-    virtual float getQueryRadius() const { return 0; }
-    virtual bool queryIntersectsGeometry(
+    virtual bool queryIntersectsFeature(
             const GeometryCoordinates&,
-            const GeometryCollection&,
+            const GeometryTileFeature&,
+            const float,
             const float,
             const float) const { return false; };
 

@@ -167,9 +167,15 @@ private:
 DefaultFileSource::DefaultFileSource(const std::string& cachePath,
                                      const std::string& assetRoot,
                                      uint64_t maximumCacheSize)
+    : DefaultFileSource(cachePath, std::make_unique<AssetFileSource>(assetRoot), maximumCacheSize) {
+}
+
+DefaultFileSource::DefaultFileSource(const std::string& cachePath,
+                                     std::unique_ptr<FileSource>&& assetFileSource_,
+                                     uint64_t maximumCacheSize)
     : thread(std::make_unique<util::Thread<Impl>>(util::ThreadContext{"DefaultFileSource", util::ThreadPriority::Low},
             cachePath, maximumCacheSize)),
-      assetFileSource(std::make_unique<AssetFileSource>(assetRoot)),
+      assetFileSource(std::move(assetFileSource_)),
       localFileSource(std::make_unique<LocalFileSource>()) {
 }
 

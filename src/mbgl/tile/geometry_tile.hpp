@@ -46,7 +46,7 @@ public:
     void getGlyphs(GlyphDependencies);
     void getIcons(IconDependencyMap);
 
-    Bucket* getBucket(const style::Layer&) override;
+    Bucket* getBucket(const style::Layer&) const override;
 
     void queryRenderedFeatures(
             std::unordered_map<std::string, std::vector<Feature>>& result,

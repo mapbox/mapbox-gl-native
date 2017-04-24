@@ -153,9 +153,9 @@ final class MapGestureDetector {
           && uiSettings.isZoomGesturesEnabled();
         if (twoTap) {
           // Confirmed 2nd Finger Down
-          MapboxTelemetry.getInstance().pushEvent(MapboxEvent.buildMapClickEvent(
+          MapboxTelemetry.getInstance().pushEvent(MapboxEventWrapper.buildMapClickEvent(
             getLocationFromGesture(event.getX(), event.getY()),
-            MapboxEvent.GESTURE_TWO_FINGER_SINGLETAP, transform.getZoom()));
+            MapboxEvent.GESTURE_TWO_FINGER_SINGLETAP, transform));
         }
         break;
 
@@ -184,8 +184,8 @@ final class MapGestureDetector {
 
         // Scroll / Pan Has Stopped
         if (scrollInProgress) {
-          MapboxTelemetry.getInstance().pushEvent(MapboxEvent.buildMapDragEndEvent(
-            getLocationFromGesture(event.getX(), event.getY()), transform.getZoom()));
+          MapboxTelemetry.getInstance().pushEvent(MapboxEventWrapper.buildMapDragEndEvent(
+            getLocationFromGesture(event.getX(), event.getY()), transform));
           scrollInProgress = false;
         }
 
@@ -284,9 +284,9 @@ final class MapGestureDetector {
           break;
       }
 
-      MapboxTelemetry.getInstance().pushEvent(MapboxEvent.buildMapClickEvent(
+      MapboxTelemetry.getInstance().pushEvent(MapboxEventWrapper.buildMapClickEvent(
         getLocationFromGesture(e.getX(), e.getY()),
-        MapboxEvent.GESTURE_DOUBLETAP, transform.getZoom()));
+        MapboxEvent.GESTURE_DOUBLETAP, transform));
 
       return true;
     }
@@ -315,9 +315,9 @@ final class MapGestureDetector {
         }
       }
 
-      MapboxTelemetry.getInstance().pushEvent(MapboxEvent.buildMapClickEvent(
+      MapboxTelemetry.getInstance().pushEvent(MapboxEventWrapper.buildMapClickEvent(
         getLocationFromGesture(motionEvent.getX(), motionEvent.getY()),
-        MapboxEvent.GESTURE_SINGLETAP, transform.getZoom()));
+        MapboxEvent.GESTURE_SINGLETAP, transform));
 
       return true;
     }
@@ -377,9 +377,9 @@ final class MapGestureDetector {
     public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
       if (!scrollInProgress) {
         scrollInProgress = true;
-        MapboxTelemetry.getInstance().pushEvent(MapboxEvent.buildMapClickEvent(
+        MapboxTelemetry.getInstance().pushEvent(MapboxEventWrapper.buildMapClickEvent(
           getLocationFromGesture(e1.getX(), e1.getY()),
-          MapboxEvent.GESTURE_PAN_START, transform.getZoom()));
+          MapboxEvent.GESTURE_PAN_START, transform));
       }
       if (!trackingSettings.isScrollGestureCurrentlyEnabled()) {
         return false;
@@ -421,9 +421,9 @@ final class MapGestureDetector {
 
       scaleGestureOccurred = true;
       beginTime = detector.getEventTime();
-      MapboxTelemetry.getInstance().pushEvent(MapboxEvent.buildMapClickEvent(
+      MapboxTelemetry.getInstance().pushEvent(MapboxEventWrapper.buildMapClickEvent(
         getLocationFromGesture(detector.getFocusX(), detector.getFocusY()),
-        MapboxEvent.GESTURE_PINCH_START, transform.getZoom()));
+        MapboxEvent.GESTURE_PINCH_START, transform));
       return true;
     }
 
@@ -513,9 +513,9 @@ final class MapGestureDetector {
       }
 
       beginTime = detector.getEventTime();
-      MapboxTelemetry.getInstance().pushEvent(MapboxEvent.buildMapClickEvent(
+      MapboxTelemetry.getInstance().pushEvent(MapboxEventWrapper.buildMapClickEvent(
         getLocationFromGesture(detector.getFocusX(), detector.getFocusY()),
-        MapboxEvent.GESTURE_ROTATION_START, transform.getZoom()));
+        MapboxEvent.GESTURE_ROTATION_START, transform));
       return true;
     }
 
@@ -594,9 +594,9 @@ final class MapGestureDetector {
       }
 
       beginTime = detector.getEventTime();
-      MapboxTelemetry.getInstance().pushEvent(MapboxEvent.buildMapClickEvent(
+      MapboxTelemetry.getInstance().pushEvent(MapboxEventWrapper.buildMapClickEvent(
         getLocationFromGesture(detector.getFocusX(), detector.getFocusY()),
-        MapboxEvent.GESTURE_PITCH_START, transform.getZoom()));
+        MapboxEvent.GESTURE_PITCH_START, transform));
       return true;
     }
 

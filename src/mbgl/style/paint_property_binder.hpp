@@ -4,6 +4,7 @@
 #include <mbgl/gl/attribute.hpp>
 #include <mbgl/gl/uniform.hpp>
 #include <mbgl/util/type_list.hpp>
+#include <mbgl/style/paint_property_statistics.hpp>
 
 namespace mbgl {
 namespace style {
@@ -90,6 +91,8 @@ public:
     virtual float interpolationFactor(float currentZoom) const = 0;
 
     static std::unique_ptr<PaintPropertyBinder> create(const PossiblyEvaluatedPropertyValue<T>& value, float zoom, T defaultValue);
+
+    PaintPropertyStatistics<T> statistics;
 };
 
 template <class T, class A>
@@ -136,7 +139,9 @@ public:
     }
 
     void populateVertexVector(const GeometryTileFeature& feature, std::size_t length) override {
-        auto value = attributeValue(function.evaluate(feature, defaultValue));
+        auto evaluated = function.evaluate(feature, defaultValue);
+        this->statistics.add(evaluated);
+        auto value = attributeValue(evaluated);
         for (std::size_t i = vertexVector.vertexSize(); i < length; ++i) {
             vertexVector.emplace_back(BaseVertex { value });
         }
@@ -187,6 +192,8 @@ public:
 
     void populateVertexVector(const GeometryTileFeature& feature, std::size_t length) override {
         Range<T> range = function.evaluate(std::get<1>(coveringRanges), feature, defaultValue);
+        this->statistics.add(range.min);
+        this->statistics.add(range.max);
         AttributeValue value = zoomInterpolatedAttributeValue(
             attributeValue(range.min),
             attributeValue(range.max));
@@ -310,6 +317,11 @@ public:
                 binders.template get<Ps>()->interpolationFactor(currentZoom)
             }...
         };
+    }
+
+    template <class P>
+    const auto& statistics() const {
+        return binders.template get<P>()->statistics;
     }
 
 private:

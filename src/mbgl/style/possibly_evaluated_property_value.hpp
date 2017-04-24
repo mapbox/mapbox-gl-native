@@ -7,8 +7,6 @@
 
 namespace mbgl {
 
-class GeometryTileFeature;
-
 namespace style {
 
 template <class T>
@@ -42,6 +40,19 @@ public:
     template <class... Ts>
     auto match(Ts&&... ts) const {
         return value.match(std::forward<Ts>(ts)...);
+    }
+
+    template <class Feature>
+    T evaluate(const Feature& feature, float zoom, T defaultValue) const {
+        return this->match(
+                [&] (const T& constant) { return constant; },
+                [&] (const SourceFunction<T>& function) {
+                    return function.evaluate(feature, defaultValue);
+                },
+                [&] (const CompositeFunction<T>& function) {
+                    return function.evaluate(zoom, feature, defaultValue);
+                }
+        );
     }
 };
 

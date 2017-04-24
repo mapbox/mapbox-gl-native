@@ -20,7 +20,7 @@ public:
     util::RunLoop loop;
     ThreadPool threadPool { 1 };
     AnnotationManager annotationManager { 1.0 };
-    style::Style style { fileSource, 1.0 };
+    style::Style style { threadPool, fileSource, 1.0 };
     Tileset tileset { { "https://example.com" }, { 0, 22 }, "none" };
 
     style::UpdateParameters updateParameters {
@@ -40,6 +40,8 @@ TEST(RasterTile, setError) {
     RasterTile tile(OverscaledTileID(0, 0, 0), test.updateParameters, test.tileset);
     tile.setError(std::make_exception_ptr(std::runtime_error("test")));
     EXPECT_FALSE(tile.isRenderable());
+    EXPECT_TRUE(tile.isLoaded());
+    EXPECT_TRUE(tile.isComplete());
 }
 
 TEST(RasterTile, onError) {
@@ -47,6 +49,8 @@ TEST(RasterTile, onError) {
     RasterTile tile(OverscaledTileID(0, 0, 0), test.updateParameters, test.tileset);
     tile.onError(std::make_exception_ptr(std::runtime_error("test")));
     EXPECT_FALSE(tile.isRenderable());
+    EXPECT_TRUE(tile.isLoaded());
+    EXPECT_TRUE(tile.isComplete());
 }
 
 TEST(RasterTile, onParsed) {
@@ -54,6 +58,8 @@ TEST(RasterTile, onParsed) {
     RasterTile tile(OverscaledTileID(0, 0, 0), test.updateParameters, test.tileset);
     tile.onParsed(std::make_unique<RasterBucket>(UnassociatedImage{}));
     EXPECT_TRUE(tile.isRenderable());
+    EXPECT_TRUE(tile.isLoaded());
+    EXPECT_TRUE(tile.isComplete());
 }
 
 TEST(RasterTile, onParsedEmpty) {
@@ -61,4 +67,6 @@ TEST(RasterTile, onParsedEmpty) {
     RasterTile tile(OverscaledTileID(0, 0, 0), test.updateParameters, test.tileset);
     tile.onParsed(nullptr);
     EXPECT_FALSE(tile.isRenderable());
+    EXPECT_TRUE(tile.isLoaded());
+    EXPECT_TRUE(tile.isComplete());
 }

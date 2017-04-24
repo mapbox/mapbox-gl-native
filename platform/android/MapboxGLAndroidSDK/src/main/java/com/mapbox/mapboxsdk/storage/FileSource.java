@@ -5,6 +5,7 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Environment;
 import android.support.annotation.NonNull;
+import android.content.res.AssetManager;
 
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
@@ -40,8 +41,7 @@ public class FileSource {
   public static synchronized FileSource getInstance(Context context) {
     if (INSTANCE == null) {
       String cachePath = getCachePath(context);
-      String apkPath = context.getPackageCodePath();
-      INSTANCE = new FileSource(cachePath, apkPath);
+      INSTANCE = new FileSource(cachePath, context.getResources().getAssets());
     }
 
     return INSTANCE;
@@ -107,8 +107,8 @@ public class FileSource {
 
   private long nativePtr;
 
-  private FileSource(String cachePath, String apkPath) {
-    initialize(Mapbox.getAccessToken(), cachePath, apkPath);
+  private FileSource(String cachePath, AssetManager assetManager) {
+    initialize(Mapbox.getAccessToken(), cachePath, assetManager);
   }
 
   public native void setAccessToken(@NonNull String accessToken);
@@ -127,7 +127,7 @@ public class FileSource {
    */
   public native void setResourceTransform(final ResourceTransformCallback callback);
 
-  private native void initialize(String accessToken, String cachePath, String apkPath);
+  private native void initialize(String accessToken, String cachePath, AssetManager assetManager);
 
   @Override
   protected native void finalize() throws Throwable;

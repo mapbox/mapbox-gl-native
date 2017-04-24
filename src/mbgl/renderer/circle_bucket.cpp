@@ -5,6 +5,7 @@
 #include <mbgl/style/layers/circle_layer.hpp>
 #include <mbgl/style/layers/circle_layer_impl.hpp>
 #include <mbgl/util/constants.hpp>
+#include <mbgl/util/math.hpp>
 
 namespace mbgl {
 
@@ -95,6 +96,28 @@ void CircleBucket::addFeature(const GeometryTileFeature& feature,
     for (auto& pair : paintPropertyBinders) {
         pair.second.populateVertexVectors(feature, vertices.vertexSize());
     }
+}
+
+template <class Property>
+static float get(const CircleLayer& layer, const std::map<std::string, CircleProgram::PaintPropertyBinders>& paintPropertyBinders) {
+    auto it = paintPropertyBinders.find(layer.getID());
+    if (it == paintPropertyBinders.end() || !it->second.statistics<Property>().max()) {
+        return layer.impl->paint.evaluated.get<Property>().constantOr(Property::defaultValue());
+    } else {
+        return *it->second.statistics<Property>().max();
+    }
+}
+
+float CircleBucket::getQueryRadius(const style::Layer& layer) const {
+    if (!layer.is<CircleLayer>()) {
+        return 0;
+    }
+
+    auto circleLayer = layer.as<CircleLayer>();
+
+    float radius = get<CircleRadius>(*circleLayer, paintPropertyBinders);
+    auto translate = circleLayer->impl->paint.evaluated.get<CircleTranslate>();
+    return radius + util::length(translate[0], translate[1]);
 }
 
 } // namespace mbgl

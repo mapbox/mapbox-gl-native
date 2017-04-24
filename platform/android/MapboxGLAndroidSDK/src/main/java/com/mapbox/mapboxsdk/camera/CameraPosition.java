@@ -232,24 +232,6 @@ public final class CameraPosition implements Parcelable {
     }
 
     /**
-     * Create Builder from an existing array of doubles.
-     * <p>
-     * These values conform to map.ccp representation of a camera position.
-     * </p>
-     *
-     * @param nativeCameraValues Values containing target, bearing, tilt and zoom
-     */
-    public Builder(double[] nativeCameraValues) {
-      super();
-      if (nativeCameraValues != null && nativeCameraValues.length == 5) {
-        target(new LatLng(nativeCameraValues[0], nativeCameraValues[1]).wrap());
-        bearing(MathUtils.convertNativeBearing(nativeCameraValues[2]));
-        tilt(nativeCameraValues[3]);
-        zoom(nativeCameraValues[4]);
-      }
-    }
-
-    /**
      * Sets the direction that the camera is pointing in, in degrees clockwise from north.
      *
      * @param bearing Bearing

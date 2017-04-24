@@ -1,6 +1,6 @@
 <RCC>
     <qresource prefix="/">
-        <file alias="icon.png">../../../common/icon.png</file>
+        <file alias="icon.png">../../../common/mb-icon-blue-square.png</file>
         <file alias="default_marker.svg">../../../platform/default/resources/default_marker.svg</file>
         <file>source1.geojson</file>
         <file>source2.geojson</file>

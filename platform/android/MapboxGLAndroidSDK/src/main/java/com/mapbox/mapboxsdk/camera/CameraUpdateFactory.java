@@ -2,7 +2,6 @@ package com.mapbox.mapboxsdk.camera;
 
 import android.graphics.Point;
 import android.graphics.PointF;
-import android.graphics.RectF;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 
@@ -11,7 +10,6 @@ import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.Projection;
 import com.mapbox.mapboxsdk.maps.UiSettings;
-import com.mapbox.services.android.telemetry.utils.MathUtils;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -199,15 +197,11 @@ public final class CameraUpdateFactory {
   static final class CameraBoundsUpdate implements CameraUpdate {
 
     private LatLngBounds bounds;
-    private RectF padding;
-
-    CameraBoundsUpdate(LatLngBounds bounds, RectF padding) {
-      this.bounds = bounds;
-      this.padding = padding;
-    }
+    private int[] padding;
 
     CameraBoundsUpdate(LatLngBounds bounds, int[] padding) {
-      this(bounds, new RectF(padding[0], padding[1], padding[2], padding[3]));
+      this.bounds = bounds;
+      this.padding = padding;
     }
 
     CameraBoundsUpdate(LatLngBounds bounds, int paddingLeft, int paddingTop, int paddingRight, int paddingBottom) {
@@ -218,64 +212,13 @@ public final class CameraUpdateFactory {
       return bounds;
     }
 
-    public RectF getPadding() {
+    public int[] getPadding() {
       return padding;
     }
 
     @Override
     public CameraPosition getCameraPosition(@NonNull MapboxMap mapboxMap) {
-      // Get required objects
-      Projection projection = mapboxMap.getProjection();
-      UiSettings uiSettings = mapboxMap.getUiSettings();
-
-      // calculate correct padding
-      int[] mapPadding = mapboxMap.getPadding();
-      RectF latLngPadding = getPadding();
-      RectF padding = new RectF(latLngPadding.left + mapPadding[0],
-        latLngPadding.top + mapPadding[1],
-        latLngPadding.right + mapPadding[2],
-        latLngPadding.bottom + mapPadding[3]);
-
-      // Calculate the bounds of the possibly rotated shape with respect to the viewport
-      PointF nePixel = new PointF(-Float.MAX_VALUE, -Float.MAX_VALUE);
-      PointF swPixel = new PointF(Float.MAX_VALUE, Float.MAX_VALUE);
-      float viewportHeight = uiSettings.getHeight();
-      for (LatLng latLng : getBounds().toLatLngs()) {
-        PointF pixel = projection.toScreenLocation(latLng);
-        swPixel.x = Math.min(swPixel.x, pixel.x);
-        nePixel.x = Math.max(nePixel.x, pixel.x);
-        swPixel.y = Math.min(swPixel.y, viewportHeight - pixel.y);
-        nePixel.y = Math.max(nePixel.y, viewportHeight - pixel.y);
-      }
-
-      // Calculate width/height
-      float width = nePixel.x - swPixel.x;
-      float height = nePixel.y - swPixel.y;
-
-      double zoom = 0;
-      float minScale = 1;
-      // Calculate the zoom level
-      if (padding != null) {
-        float scaleX = (uiSettings.getWidth() - padding.left - padding.right) / width;
-        float scaleY = (uiSettings.getHeight() - padding.top - padding.bottom) / height;
-        minScale = scaleX < scaleY ? scaleX : scaleY;
-        zoom = projection.calculateZoom(minScale);
-        zoom = MathUtils.clamp(zoom, mapboxMap.getMinZoomLevel(), mapboxMap.getMaxZoomLevel());
-      }
-
-      // Calculate the center point
-      PointF paddedNEPixel = new PointF(nePixel.x + padding.right / minScale, nePixel.y + padding.top / minScale);
-      PointF paddedSWPixel = new PointF(swPixel.x - padding.left / minScale, swPixel.y - padding.bottom / minScale);
-      PointF centerPixel = new PointF((paddedNEPixel.x + paddedSWPixel.x) / 2, (paddedNEPixel.y + paddedSWPixel.y) / 2);
-      centerPixel.y = viewportHeight - centerPixel.y;
-      LatLng center = projection.fromScreenLocation(centerPixel);
-
-      return new CameraPosition.Builder()
-        .target(center)
-        .zoom(zoom)
-        .tilt(0)
-        .bearing(0)
-        .build();
+      return mapboxMap.getCameraForLatLngBounds(bounds, padding);
     }
   }
 

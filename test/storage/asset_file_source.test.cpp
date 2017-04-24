@@ -6,28 +6,16 @@
 
 #include <gtest/gtest.h>
 
-namespace {
-
-std::string getFileSourceRoot() {
-#ifdef MBGL_ASSET_ZIP
-    // Regenerate with `cd test/fixtures/storage/ && zip -r assets.zip assets/`
-    return "test/fixtures/storage/assets.zip";
-#else
-    return "test/fixtures/storage/assets";
-#endif
-}
-
-} // namespace
-
 using namespace mbgl;
 
+#if !ANDROID
 TEST(AssetFileSource, Load) {
     util::RunLoop loop;
 
-    AssetFileSource fs(getFileSourceRoot());
+    AssetFileSource fs("test/fixtures/storage/assets");
 
     // iOS seems to run out of file descriptors...
-#if TARGET_OS_IPHONE || __ANDROID__
+#if TARGET_OS_IPHONE
     unsigned numThreads = 30;
 #else
     unsigned numThreads = 50;
@@ -91,7 +79,7 @@ TEST(AssetFileSource, Load) {
 TEST(AssetFileSource, EmptyFile) {
     util::RunLoop loop;
 
-    AssetFileSource fs(getFileSourceRoot());
+    AssetFileSource fs("test/fixtures/storage/assets");
 
     std::unique_ptr<AsyncRequest> req = fs.request({ Resource::Unknown, "asset://empty" }, [&](Response res) {
         req.reset();
@@ -107,7 +95,7 @@ TEST(AssetFileSource, EmptyFile) {
 TEST(AssetFileSource, NonEmptyFile) {
     util::RunLoop loop;
 
-    AssetFileSource fs(getFileSourceRoot());
+    AssetFileSource fs("test/fixtures/storage/assets");
 
     std::unique_ptr<AsyncRequest> req = fs.request({ Resource::Unknown, "asset://nonempty" }, [&](Response res) {
         req.reset();
@@ -123,7 +111,7 @@ TEST(AssetFileSource, NonEmptyFile) {
 TEST(AssetFileSource, NonExistentFile) {
     util::RunLoop loop;
 
-    AssetFileSource fs(getFileSourceRoot());
+    AssetFileSource fs("test/fixtures/storage/assets");
 
     std::unique_ptr<AsyncRequest> req = fs.request({ Resource::Unknown, "asset://does_not_exist" }, [&](Response res) {
         req.reset();
@@ -140,7 +128,7 @@ TEST(AssetFileSource, NonExistentFile) {
 TEST(AssetFileSource, ReadDirectory) {
     util::RunLoop loop;
 
-    AssetFileSource fs(getFileSourceRoot());
+    AssetFileSource fs("test/fixtures/storage/assets");
 
     std::unique_ptr<AsyncRequest> req = fs.request({ Resource::Unknown, "asset://directory" }, [&](Response res) {
         req.reset();
@@ -157,7 +145,7 @@ TEST(AssetFileSource, ReadDirectory) {
 TEST(AssetFileSource, URLEncoding) {
     util::RunLoop loop;
 
-    AssetFileSource fs(getFileSourceRoot());
+    AssetFileSource fs("test/fixtures/storage/assets");
 
     std::unique_ptr<AsyncRequest> req = fs.request({ Resource::Unknown, "asset://%6eonempty" }, [&](Response res) {
         req.reset();
@@ -169,3 +157,4 @@ TEST(AssetFileSource, URLEncoding) {
 
     loop.run();
 }
+#endif

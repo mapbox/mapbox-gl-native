@@ -18,12 +18,12 @@ public:
 
     std::unique_ptr<Bucket> createBucket(const BucketParameters&, const std::vector<const Layer*>&) const override;
 
-    float getQueryRadius() const override;
-    bool queryIntersectsGeometry(
-            const GeometryCoordinates& queryGeometry,
-            const GeometryCollection& geometry,
-            const float bearing,
-            const float pixelsToTileUnits) const override;
+    bool queryIntersectsFeature(
+            const GeometryCoordinates&,
+            const GeometryTileFeature&,
+            const float,
+            const float,
+            const float) const override;
 
     LineLayoutProperties layout;
     LinePaintProperties paint;
@@ -32,7 +32,7 @@ public:
     float dashLineWidth = 1;
 
 private:
-    float getLineWidth() const;
+    float getLineWidth(const GeometryTileFeature&, const float) const;
 };
 
 } // namespace style
