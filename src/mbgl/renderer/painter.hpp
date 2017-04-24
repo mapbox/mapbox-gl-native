@@ -85,7 +85,7 @@ public:
     void renderClippingMask(const UnwrappedTileID&, const ClipID&);
     void renderTileDebug(const RenderTile&);
     void renderFill(PaintParameters&, FillBucket&, const RenderFillLayer&, const RenderTile&);
-    void renderFillExtrusion(PaintParameters&, FillExtrusionBucket&, const RenderFillExtrusionLayer&, const RenderTile&, const style::Style&);
+    void renderFillExtrusion(PaintParameters&, FillExtrusionBucket&, const RenderFillExtrusionLayer&, const RenderTile&);
     void renderLine(PaintParameters&, LineBucket&, const RenderLineLayer&, const RenderTile&);
     void renderCircle(PaintParameters&, CircleBucket&, const RenderCircleLayer&, const RenderTile&);
     void renderSymbol(PaintParameters&, SymbolBucket&, const RenderSymbolLayer&, const RenderTile&);
@@ -107,7 +107,6 @@ private:
     template <class Iterator>
     void renderPass(PaintParameters&,
                     RenderPass,
-                    const style::Style&,
                     Iterator it, Iterator end,
                     uint32_t i, int8_t increment);
 
@@ -156,6 +155,8 @@ private:
     SpriteAtlas* spriteAtlas = nullptr;
     GlyphAtlas* glyphAtlas = nullptr;
     LineAtlas* lineAtlas = nullptr;
+
+    style::EvaluatedLight evaluatedLight;
 
     FrameHistory frameHistory;
 

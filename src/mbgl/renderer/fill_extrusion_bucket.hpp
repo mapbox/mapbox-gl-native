@@ -10,23 +10,20 @@
 
 namespace mbgl {
 
-namespace style {
 class BucketParameters;
-class Style;
-} // namespace style
 
 class FillExtrusionBucket : public Bucket {
 public:
-    FillExtrusionBucket(const style::BucketParameters&, const std::vector<const RenderLayer*>&);
+    FillExtrusionBucket(const BucketParameters&, const std::vector<const RenderLayer*>&);
 
     void addFeature(const GeometryTileFeature&,
                     const GeometryCollection&) override;
     bool hasData() const override;
 
     void upload(gl::Context&) override;
-    void render(Painter&, PaintParameters&, const RenderLayer&, const RenderTile&, const style::Style&) override;
+    void render(Painter&, PaintParameters&, const RenderLayer&, const RenderTile&) override;
 
-    float getQueryRadius(const style::Layer&) const override;
+    float getQueryRadius(const RenderLayer&) const override;
 
     gl::VertexVector<FillExtrusionLayoutVertex> vertices;
     gl::IndexVector<gl::Triangles> triangles;

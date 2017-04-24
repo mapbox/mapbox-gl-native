@@ -156,26 +156,21 @@ void FillExtrusionBucket::upload(gl::Context& context) {
 
 void FillExtrusionBucket::render(Painter& painter,
                                  PaintParameters& parameters,
-<<<<<<< HEAD
                                  const RenderLayer& layer,
-=======
-                                 const Layer& layer,
->>>>>>> Cleanups (TODOs, unused includes, formatting
-                                 const RenderTile& tile,
-                                 const Style& style) {
-    painter.renderFillExtrusion(parameters, *this, *layer.as<FillExtrusionLayer>(), tile, style);
+                                 const RenderTile& tile) {
+    painter.renderFillExtrusion(parameters, *this, *layer.as<RenderFillExtrusionLayer>(), tile);
 }
 
 bool FillExtrusionBucket::hasData() const {
     return !triangleSegments.empty();
 }
 
-float FillExtrusionBucket::getQueryRadius(const style::Layer& layer) const {
-    if (!layer.is<FillExtrusionLayer>()) {
+float FillExtrusionBucket::getQueryRadius(const RenderLayer& layer) const {
+    if (!layer.is<RenderFillExtrusionLayer>()) {
         return 0;
     }
 
-    const std::array<float, 2>& translate = layer.as<FillExtrusionLayer>()->impl->paint.evaluated.get<FillExtrusionTranslate>();
+    const std::array<float, 2>& translate = layer.as<RenderFillExtrusionLayer>()->impl->paint.evaluated.get<FillExtrusionTranslate>();
     return util::length(translate[0], translate[1]);
 }
 

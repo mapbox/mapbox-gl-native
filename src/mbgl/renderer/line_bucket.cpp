@@ -461,8 +461,7 @@ void LineBucket::upload(gl::Context& context) {
 void LineBucket::render(Painter& painter,
                         PaintParameters& parameters,
                         const RenderLayer& layer,
-                        const RenderTile& tile,
-                        const Style&) {
+                        const RenderTile& tile) {
     painter.renderLine(parameters, *this, *layer.as<RenderLineLayer>(), tile);
 }
 

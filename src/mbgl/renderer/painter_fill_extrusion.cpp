@@ -17,8 +17,7 @@ using namespace style;
 void Painter::renderFillExtrusion(PaintParameters& parameters,
                                   FillExtrusionBucket& bucket,
                                   const FillExtrusionLayer& layer,
-                                  const RenderTile& tile,
-                                  const Style& style) {
+                                  const RenderTile& tile) {
     const FillExtrusionPaintProperties::Evaluated& properties = layer.impl->paint.evaluated;
 
     if (pass == RenderPass::Opaque) {
@@ -53,7 +52,7 @@ void Painter::renderFillExtrusion(PaintParameters& parameters,
                 tile.id,
                 state,
                 -std::pow(2, tile.id.canonical.z) / util::tileSize / 8.0f,
-                style.evaluatedLight
+                evaluatedLight
             ),
             *bucket.vertexBuffer,
             *bucket.indexBuffer,
@@ -74,7 +73,7 @@ void Painter::renderFillExtrusion(PaintParameters& parameters,
                                       properties.get<FillExtrusionTranslateAnchor>(),
                                       state),
                 state,
-                style.evaluatedLight
+                evaluatedLight
             ),
             *bucket.vertexBuffer,
             *bucket.indexBuffer,
