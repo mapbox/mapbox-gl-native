@@ -2,6 +2,7 @@
 #include <mbgl/tile/tile_id.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/interpolate.hpp>
+#include <mbgl/util/projection.hpp>
 #include <mbgl/math/log2.hpp>
 #include <mbgl/math/clamp.hpp>
 
@@ -65,13 +66,8 @@ void TransformState::getProjMatrix(mat4& projMatrix) const {
     matrix::translate(projMatrix, projMatrix, pixel_x() - size.width / 2.0f,
                       pixel_y() - size.height / 2.0f, 0);
 
-    const auto circumferenceOfEarth = 2 * M_PI * 6378137;
-
     matrix::scale(projMatrix, projMatrix, 1, 1,
-                  // Scale vertically to meters per pixel (inverse of ground resolution):
-                  // (2^z * tileSize) / (circumferenceOfEarth * cos(lat * PI / 180))
-                  (std::pow(2.0, getZoom()) * util::tileSize) /
-                  (circumferenceOfEarth * std::abs(std::cos(getLatLng(LatLng::Unwrapped).latitude() * (M_PI / 180.0)))));
+                  1.0 / Projection::getMetersPerPixelAtLatitude(getLatLng(LatLng::Unwrapped).latitude(), getZoom()));
 }
 
 #pragma mark - Dimensions
