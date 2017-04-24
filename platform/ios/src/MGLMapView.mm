@@ -466,7 +466,7 @@ public:
 
     // setup logo bug
     //
-    UIImage *logo = [[MGLMapView resourceImageNamed:@"mapbox.png"] imageWithAlignmentRectInsets:UIEdgeInsetsMake(1.5, 4, 3.5, 2)];
+    UIImage *logo = [MGLMapView resourceImageNamed:@"mapbox.png"];
     _logoView = [[UIImageView alloc] initWithImage:logo];
     _logoView.accessibilityTraits = UIAccessibilityTraitStaticText;
     _logoView.accessibilityLabel = NSLocalizedStringWithDefaultValue(@"LOGO_A11Y_LABEL", nil, nil, @"Mapbox", @"Accessibility label");
