@@ -145,6 +145,8 @@ void Painter::render(const Style& style, const FrameData& frame_, View& view, Sp
     spriteAtlas = style.spriteAtlas.get();
     lineAtlas = style.lineAtlas.get();
 
+    evaluatedLight = style.evaluatedLight;
+
     RenderData renderData = style.getRenderData(frame.debugOptions, state.getAngle());
     const std::vector<RenderItem>& order = renderData.order;
     const std::unordered_set<Source*>& sources = renderData.sources;
@@ -231,7 +233,6 @@ void Painter::render(const Style& style, const FrameData& frame_, View& view, Sp
     // Render everything top-to-bottom by using reverse iterators. Render opaque objects first.
     renderPass(parameters,
                RenderPass::Opaque,
-               style,
                order.rbegin(), order.rend(),
                0, 1);
 
@@ -239,7 +240,6 @@ void Painter::render(const Style& style, const FrameData& frame_, View& view, Sp
     // Make a second pass, rendering translucent objects. This time, we render bottom-to-top.
     renderPass(parameters,
                RenderPass::Translucent,
-               style,
                order.begin(), order.end(),
                static_cast<uint32_t>(order.size()) - 1, -1);
 
@@ -282,7 +282,6 @@ void Painter::render(const Style& style, const FrameData& frame_, View& view, Sp
 template <class Iterator>
 void Painter::renderPass(PaintParameters& parameters,
                          RenderPass pass_,
-                         const Style& style,
                          Iterator it, Iterator end,
                          uint32_t i, int8_t increment) {
     pass = pass_;
@@ -303,12 +302,12 @@ void Painter::renderPass(PaintParameters& parameters,
         if (!layer.baseImpl->hasRenderPass(pass))
             continue;
 
-        auto renderTiles = [this, &item, &layer, &parameters, &style]() {
+        auto renderTiles = [this, &item, &layer, &parameters]() {
             for (auto& tileRef : item.tiles) {
                 auto& tile = tileRef.get();
                 MBGL_DEBUG_GROUP(context, layer.baseImpl->id + " - " + util::toString(tile.id));
                 auto bucket = tile.tile.getBucket(layer);
-                bucket->render(*this, parameters, layer, tile, style);
+                bucket->render(*this, parameters, layer, tile);
             }
         };
 

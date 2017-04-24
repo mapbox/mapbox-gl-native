@@ -19,8 +19,7 @@ void RasterBucket::upload(gl::Context& context) {
 void RasterBucket::render(Painter& painter,
                           PaintParameters& parameters,
                           const Layer& layer,
-                          const RenderTile& tile,
-                          const Style&) {
+                          const RenderTile& tile) {
     painter.renderRaster(parameters, *this, *layer.as<RasterLayer>(), tile);
 }
 
