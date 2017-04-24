@@ -68,6 +68,10 @@ void Context::initializeExtensions(const std::function<gl::ProcAddress(const cha
         programBinary = std::make_unique<extension::ProgramBinary>(fn);
 #endif
 
+#if MBGL_USE_GLES2
+        supportsDepth24 = strstr(extensions, "GL_OES_depth24") != nullptr;
+#endif
+
         if (!supportsVertexArrays()) {
             Log::Warning(Event::OpenGL, "Not using Vertex Array Objects");
         }
@@ -386,12 +390,23 @@ Framebuffer Context::createFramebuffer(const Texture& color) {
 }
 
 Framebuffer
-Context::createFramebuffer(const Renderbuffer<RenderbufferType::DepthComponent>& depthTarget,
-                           const Texture& fboTexture) {
+Context::createFramebuffer(const Texture& color,
+                           const Renderbuffer<RenderbufferType::DepthComponent>& depthTarget) {
     auto fbo = createFramebuffer();
     bindFramebuffer = fbo;
+    MBGL_CHECK_ERROR(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, color.texture, 0));
     MBGL_CHECK_ERROR(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthTarget.renderbuffer));
-    MBGL_CHECK_ERROR(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, fboTexture.texture, 0));
+    checkFramebuffer();
+    return { depthTarget.size, std::move(fbo) };
+}
+
+Framebuffer
+Context::createFramebuffer(const Texture& color,
+                           const Renderbuffer<RenderbufferType::DepthComponent24>& depthTarget) {
+    auto fbo = createFramebuffer();
+    bindFramebuffer = fbo;
+    MBGL_CHECK_ERROR(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, color.texture, 0));
+    MBGL_CHECK_ERROR(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthTarget.renderbuffer));
     checkFramebuffer();
     return { depthTarget.size, std::move(fbo) };
 }

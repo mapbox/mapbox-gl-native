@@ -64,6 +64,10 @@ public:
 #endif
     optional<std::pair<BinaryProgramFormat, std::string>> getBinaryProgram(ProgramID) const;
 
+//#if MBGL_USE_GLES2
+    bool supportsDepth24 = false;
+//#endif
+
     template <class Vertex, class DrawMode>
     VertexBuffer<Vertex, DrawMode> createVertexBuffer(VertexVector<Vertex, DrawMode>&& v) {
         return VertexBuffer<Vertex, DrawMode> {
@@ -83,7 +87,8 @@ public:
     Renderbuffer<type> createRenderbuffer(const Size size) {
         static_assert(type == RenderbufferType::RGBA ||
                       type == RenderbufferType::DepthStencil ||
-                      type == RenderbufferType::DepthComponent,
+                      type == RenderbufferType::DepthComponent ||
+                      type == RenderbufferType::DepthComponent24,
                       "invalid renderbuffer type");
         return { size, createRenderbuffer(type, size) };
     }
@@ -94,8 +99,10 @@ public:
     Framebuffer createFramebuffer(const Texture&,
                                   const Renderbuffer<RenderbufferType::DepthStencil>&);
     Framebuffer createFramebuffer(const Texture&);
-    Framebuffer createFramebuffer(const Renderbuffer<RenderbufferType::DepthComponent>&,
-                                  const Texture&);
+    Framebuffer createFramebuffer(const Texture&,
+                                  const Renderbuffer<RenderbufferType::DepthComponent>&);
+    Framebuffer createFramebuffer(const Texture&,
+                                  const Renderbuffer<RenderbufferType::DepthComponent24>&);
 
     template <typename Image,
               TextureFormat format = Image::channels == 4 ? TextureFormat::RGBA
