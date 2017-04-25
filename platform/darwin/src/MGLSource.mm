@@ -10,6 +10,8 @@
 // special internal source types like mbgl::AnnotationSource.
 @property (nonatomic, readonly) mbgl::style::Source *rawSource;
 
+@property (nonatomic, readonly, weak) MGLMapView *mapView;
+
 @end
 
 @implementation MGLSource {
@@ -48,12 +50,14 @@
                             "to the style more than once is invalid.", self, mapView.style];
     }
 
+    _mapView = mapView;
     mapView.mbglMap->addSource(std::move(_pendingSource));
 }
 
 - (void)removeFromMapView:(MGLMapView *)mapView {
     if (self.rawSource == mapView.mbglMap->getSource(self.identifier.UTF8String)) {
         _pendingSource = mapView.mbglMap->removeSource(self.identifier.UTF8String);
+        _mapView = nil;
     }
 }
 

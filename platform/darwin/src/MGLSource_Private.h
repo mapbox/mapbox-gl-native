@@ -44,6 +44,14 @@ struct SourceWrapper {
 @property (nonatomic, readonly) mbgl::style::Source *rawSource;
 
 /**
+ The map view whose style currently contains the source.
+
+ If the source is not currently part of any map view’s style, this property is
+ set to `nil`.
+ */
+@property (nonatomic, readonly, weak) MGLMapView *mapView;
+
+/**
  Adds the mbgl source that this object represents to the mbgl map.
 
  Once a mbgl source is added, ownership of the object is transferred to the

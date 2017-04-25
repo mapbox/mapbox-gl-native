@@ -194,6 +194,7 @@ public:
     // Feature queries
     std::vector<Feature> queryRenderedFeatures(const ScreenCoordinate&, const RenderedQueryOptions& options = {});
     std::vector<Feature> queryRenderedFeatures(const ScreenBox&,        const RenderedQueryOptions& options = {});
+    std::vector<Feature> querySourceFeatures(const std::string& sourceID, const SourceQueryOptions& options = {});
 
     AnnotationIDs queryPointAnnotations(const ScreenBox&);
 

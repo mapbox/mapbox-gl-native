@@ -6,7 +6,6 @@
 #include <mbgl/util/range.hpp>
 #include <mbgl/util/any.hpp>
 #include <mbgl/style/types.hpp>
-#include <mbgl/style/query.hpp>
 
 #include <memory>
 #include <string>
@@ -58,8 +57,6 @@ public:
 
     optional<std::string> getAttribution() const;
     optional<Range<uint8_t>> getZoomRange() const;
-
-    std::vector<Feature> querySourceFeatures(const SourceQueryOptions& options = {});
 
     // Private implementation
     class Impl;
