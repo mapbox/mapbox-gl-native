@@ -400,17 +400,6 @@ Context::createFramebuffer(const Texture& color,
     return { depthTarget.size, std::move(fbo) };
 }
 
-Framebuffer
-Context::createFramebuffer(const Texture& color,
-                           const Renderbuffer<RenderbufferType::DepthComponent24>& depthTarget) {
-    auto fbo = createFramebuffer();
-    bindFramebuffer = fbo;
-    MBGL_CHECK_ERROR(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, color.texture, 0));
-    MBGL_CHECK_ERROR(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthTarget.renderbuffer));
-    checkFramebuffer();
-    return { depthTarget.size, std::move(fbo) };
-}
-
 UniqueTexture
 Context::createTexture(const Size size, const void* data, TextureFormat format, TextureUnit unit) {
     auto obj = createTexture();

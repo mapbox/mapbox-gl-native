@@ -43,14 +43,17 @@ public:
 
 #if MBGL_USE_GLES2
             if (context.supportsDepth24) {
-                gl::Renderbuffer<gl::RenderbufferType::DepthComponent24> depthTarget = context.createRenderbuffer<gl::RenderbufferType::DepthComponent24>(size);
-                framebuffer = context.createFramebuffer(*texture, depthTarget);
-            } else
-#endif // MBGL_USE_GLES2
-            {
                 gl::Renderbuffer<gl::RenderbufferType::DepthComponent> depthTarget = context.createRenderbuffer<gl::RenderbufferType::DepthComponent>(size);
                 framebuffer = context.createFramebuffer(*texture, depthTarget);
+            } else {
+                // We don't actually need the stencil bits here, but we need the depth resolution provided by this buffer if the implementation doesn't support 24-bit depth buffers
+                gl::Renderbuffer<gl::RenderbufferType::DepthStencil> depthTarget = context.createRenderbuffer<gl::RenderbufferType::DepthStencil>(size);
+                framebuffer = context.createFramebuffer(*texture, depthTarget);
             }
+#else
+            gl::Renderbuffer<gl::RenderbufferType::DepthComponent> depthTarget = context.createRenderbuffer<gl::RenderbufferType::DepthComponent>(size);
+            framebuffer = context.createFramebuffer(*texture, depthTarget);
+#endif // MBGL_USE_GLES2
 
         } else {
             context.bindFramebuffer = framebuffer->framebuffer;
