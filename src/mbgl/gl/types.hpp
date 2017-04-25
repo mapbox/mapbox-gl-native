@@ -40,10 +40,8 @@ enum class RenderbufferType : uint32_t {
 #if not MBGL_USE_GLES2
     DepthComponent = 0x1902,     // GL_DEPTH_COMPONENT
 #else
-    DepthComponent = 0x81A5,     // GL_DEPTH_COMPONENT16
+    DepthComponent = 0x81A6,     // GL_DEPTH_COMPONENT24
 #endif // MBGL_USE_GLES2
-    // Note: we only use DepthComponent24 in GL ES but need this for compilation
-    DepthComponent24 = 0x81A6,   // GL_DEPTH_COMPONENT24
 };
 
 enum class TextureMipMap : bool { No = false, Yes = true };
