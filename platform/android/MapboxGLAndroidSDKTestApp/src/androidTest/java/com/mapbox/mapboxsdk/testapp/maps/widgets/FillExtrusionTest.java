@@ -4,10 +4,12 @@ import android.support.test.espresso.UiController;
 import android.support.test.espresso.ViewAction;
 import android.view.View;
 
+import com.mapbox.mapboxsdk.maps.MapViewUtils;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.activity.BaseActivityTest;
 import com.mapbox.mapboxsdk.testapp.activity.espresso.EspressoTestActivity;
+import com.mapbox.mapboxsdk.testapp.activity.style.FillExtrusionActivity;
 
 import org.hamcrest.Matcher;
 import org.junit.Test;
@@ -18,33 +20,24 @@ import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static org.hamcrest.Matchers.not;
 
-public class LogoTest extends BaseActivityTest {
+public class FillExtrusionTest extends BaseActivityTest {
 
   @Override
   protected Class getActivityClass() {
-    return EspressoTestActivity.class;
+    return FillExtrusionActivity.class;
   }
 
   @Test
-  public void testDefault() {
+  public void testRotate() {
     validateTestSetup();
-    onView(withId(R.id.logoView)).check(matches(isDisplayed()));
+    onView(withId(R.id.mapView)).perform(new RotateAction(mapboxMap));
   }
 
-  @Test
-  public void testDisabled() {
-    validateTestSetup();
-
-    onView(withId(R.id.logoView))
-      .perform(new DisableAction(mapboxMap))
-      .check(matches(not(isDisplayed())));
-  }
-
-  private class DisableAction implements ViewAction {
+  private class RotateAction implements ViewAction {
 
     private MapboxMap mapboxMap;
 
-    DisableAction(MapboxMap map) {
+    RotateAction(MapboxMap map) {
       mapboxMap = map;
     }
 
@@ -60,7 +53,12 @@ public class LogoTest extends BaseActivityTest {
 
     @Override
     public void perform(UiController uiController, View view) {
-      mapboxMap.getUiSettings().setLogoEnabled(false);
+      int i = 0;
+      while(i < 360){
+        MapViewUtils.setDirection(mapboxMap, i);
+        i += 5;
+        uiController.loopMainThreadForAtLeast(20);
+      }
     }
   }
 }
