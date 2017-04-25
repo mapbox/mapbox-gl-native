@@ -6,7 +6,7 @@ This document explains how to build the Mapbox iOS SDK from source. It is intend
 
 The Mapbox iOS SDK and iosapp demo application require iOS 8.0 or above.
 
-The Mapbox iOS SDK requires Xcode 7.3 or above. The iosapp demo application requires Xcode 8.0 or above to build.
+The Mapbox iOS SDK requires Xcode 8.0 or above.
 
 ## Building the SDK
 

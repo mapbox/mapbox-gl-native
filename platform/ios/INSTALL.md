@@ -10,7 +10,7 @@ The Mapbox iOS SDK is intended to run on iOS 8.0 and above on the following devi
 * iPad 2 and above (3, 4, Mini, Air, Mini 2, Air 2)
 * iPod touch 5th generation and above
 
-The Mapbox iOS SDK requires Xcode 7.3 or higher.
+The Mapbox iOS SDK requires Xcode 8.0 or higher. To use this SDK with Xcode 7.3.1, download and use a symbols build from the [releases](https://github.com/mapbox/mapbox-gl-native/releases) page.
 
 ### Building the SDK
 
