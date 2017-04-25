@@ -7,7 +7,7 @@
 #include <mbgl/tile/tile.hpp>
 #include <mbgl/tile/tile_cache.hpp>
 #include <mbgl/style/types.hpp>
-#include <mbgl/style/query.hpp>
+#include <mbgl/map/query.hpp>
 
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/mat4.hpp>

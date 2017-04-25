@@ -22,9 +22,5 @@ optional<Range<uint8_t>> Source::getZoomRange() const {
     return baseImpl->getZoomRange();
 }
 
-std::vector<Feature> Source::querySourceFeatures(const SourceQueryOptions& options) {
-    return baseImpl->querySourceFeatures(options);
-}
-
 } // namespace style
 } // namespace mbgl

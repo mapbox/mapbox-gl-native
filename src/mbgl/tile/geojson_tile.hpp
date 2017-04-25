@@ -21,7 +21,7 @@ public:
     
     void querySourceFeatures(
         std::vector<Feature>& result,
-        const style::SourceQueryOptions&) override;
+        const SourceQueryOptions&) override;
 };
 
 } // namespace mbgl

@@ -95,7 +95,10 @@ const MGLShapeSourceOption MGLShapeSourceOptionSimplificationTolerance = @"MGLSh
         optionalFilter = predicate.mgl_filter;
     }
     
-    std::vector<mbgl::Feature> features = self.rawSource->querySourceFeatures({ {}, optionalFilter });
+    std::vector<mbgl::Feature> features;
+    if (self.mapView) {
+        features = self.mapView.mbglMap->querySourceFeatures(self.rawSource->getID(), { {}, optionalFilter });
+    }
     return MGLFeaturesFromMBGLFeatures(features);
 }
 

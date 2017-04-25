@@ -40,9 +40,10 @@ namespace android {
         using namespace mbgl::android::conversion;
         using namespace mbgl::android::geojson;
 
-        mbgl::optional<std::vector<std::string>> sourceLayerIds = { toVector(env, jSourceLayerIds) };
-        auto filter = toFilter(env, jfilter);
-        auto features = source.querySourceFeatures({ sourceLayerIds,  filter });
+        std::vector<mbgl::Feature> features;
+        if (map) {
+            features = map->querySourceFeatures(source.getID(), { toVector(env, jSourceLayerIds), toFilter(env, jfilter) });
+        }
         return *convert<jni::Array<jni::Object<Feature>>, std::vector<mbgl::Feature>>(env, features);
     }
 

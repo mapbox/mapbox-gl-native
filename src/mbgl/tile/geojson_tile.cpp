@@ -1,6 +1,6 @@
 #include <mbgl/tile/geojson_tile.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
-#include <mbgl/style/query.hpp>
+#include <mbgl/map/query.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/update_parameters.hpp>
 
@@ -98,7 +98,7 @@ void GeoJSONTile::setNecessity(Necessity) {}
     
 void GeoJSONTile::querySourceFeatures(
     std::vector<Feature>& result,
-    const style::SourceQueryOptions& options) {
+    const SourceQueryOptions& options) {
     
     // Ignore the sourceLayer, there is only one
     auto layer = getData()->getLayer({});

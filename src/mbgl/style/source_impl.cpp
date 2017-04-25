@@ -10,7 +10,6 @@
 #include <mbgl/util/tile_cover.hpp>
 #include <mbgl/util/enum.hpp>
 #include <mbgl/map/query.hpp>
-#include <mbgl/style/query.hpp>
 
 #include <mbgl/algorithm/update_renderables.hpp>
 #include <mbgl/algorithm/generate_clip_ids.hpp>
