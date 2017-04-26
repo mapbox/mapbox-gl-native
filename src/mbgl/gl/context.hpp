@@ -64,10 +64,6 @@ public:
 #endif
     optional<std::pair<BinaryProgramFormat, std::string>> getBinaryProgram(ProgramID) const;
 
-#if MBGL_USE_GLES2
-    bool supportsDepth24 = false;
-#endif
-
     template <class Vertex, class DrawMode>
     VertexBuffer<Vertex, DrawMode> createVertexBuffer(VertexVector<Vertex, DrawMode>&& v) {
         return VertexBuffer<Vertex, DrawMode> {

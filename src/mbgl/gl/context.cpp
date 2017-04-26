@@ -68,10 +68,6 @@ void Context::initializeExtensions(const std::function<gl::ProcAddress(const cha
         programBinary = std::make_unique<extension::ProgramBinary>(fn);
 #endif
 
-#if MBGL_USE_GLES2
-        supportsDepth24 = strstr(extensions, "GL_OES_depth24") != nullptr;
-#endif
-
         if (!supportsVertexArrays()) {
             Log::Warning(Event::OpenGL, "Not using Vertex Array Objects");
         }
