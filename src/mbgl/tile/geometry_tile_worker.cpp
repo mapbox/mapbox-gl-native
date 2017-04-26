@@ -216,14 +216,9 @@ void GeometryTileWorker::onGlyphsAvailable(GlyphPositionMap newGlyphPositions) {
     symbolDependenciesChanged();
 }
 
-void GeometryTileWorker::onIconsAvailable(IconAtlasMap newIcons) {
-    for (auto& atlasIcons : newIcons) {
-        auto pendingAtlasIcons = pendingIconDependencies.find((SpriteAtlas*)atlasIcons.first);
-        if (pendingAtlasIcons != pendingIconDependencies.end()) {
-            icons[atlasIcons.first] = std::move(newIcons[atlasIcons.first]);
-            pendingIconDependencies.erase((SpriteAtlas*)atlasIcons.first);
-        }
-    }
+void GeometryTileWorker::onIconsAvailable(IconMap newIcons) {
+    icons = std::move(newIcons);
+    pendingIconDependencies.clear();
     symbolDependenciesChanged();
 }
 
@@ -241,12 +236,8 @@ void GeometryTileWorker::requestNewGlyphs(const GlyphDependencies& glyphDependen
     }
 }
 
-void GeometryTileWorker::requestNewIcons(const IconDependencyMap &iconDependencies) {
-    for (auto& atlasDependency : iconDependencies) {
-        if (icons.find((uintptr_t)atlasDependency.first) == icons.end()) {
-            pendingIconDependencies[atlasDependency.first] = IconDependencies();
-        }
-    }
+void GeometryTileWorker::requestNewIcons(const IconDependencies& iconDependencies) {
+    pendingIconDependencies = iconDependencies;
     if (!pendingIconDependencies.empty()) {
         parent.invoke(&GeometryTile::getIcons, pendingIconDependencies);
     }
@@ -290,9 +281,9 @@ void GeometryTileWorker::redoLayout() {
     std::unordered_map<std::string, std::shared_ptr<Bucket>> buckets;
     auto featureIndex = std::make_unique<FeatureIndex>();
     BucketParameters parameters { id, mode };
-    
+
     GlyphDependencies glyphDependencies;
-    IconDependencyMap iconDependencyMap;
+    IconDependencies iconDependencies;
 
     // Create render layers and group by layout
     std::vector<std::unique_ptr<RenderLayer>> renderLayers = toRenderLayers(*layers, id.overscaledZ);
@@ -323,7 +314,7 @@ void GeometryTileWorker::redoLayout() {
 
         if (leader.is<RenderSymbolLayer>()) {
             symbolLayoutMap.emplace(leader.getID(),
-                leader.as<RenderSymbolLayer>()->createLayout(parameters, group, *geometryLayer, glyphDependencies, iconDependencyMap));
+                leader.as<RenderSymbolLayer>()->createLayout(parameters, group, *geometryLayer, glyphDependencies, iconDependencies));
         } else {
             const Filter& filter = leader.baseImpl.filter;
             const std::string& sourceLayerID = leader.baseImpl.sourceLayer;
@@ -357,9 +348,9 @@ void GeometryTileWorker::redoLayout() {
             symbolLayouts.push_back(std::move(it->second));
         }
     }
-    
+
     requestNewGlyphs(glyphDependencies);
-    requestNewIcons(iconDependencyMap);
+    requestNewIcons(iconDependencies);
 
     parent.invoke(&GeometryTile::onLayout, GeometryTile::LayoutResult {
         std::move(buckets),
@@ -403,12 +394,12 @@ void GeometryTileWorker::attemptPlacement() {
         if (obsolete) {
             return;
         }
-        
+
         if (symbolLayout->state == SymbolLayout::Pending) {
-            symbolLayout->prepare(glyphPositions,icons);
+            symbolLayout->prepare(glyphPositions, icons);
             symbolLayout->state = SymbolLayout::Placed;
         }
-        
+
         if (!symbolLayout->hasSymbolInstances()) {
             continue;
         }

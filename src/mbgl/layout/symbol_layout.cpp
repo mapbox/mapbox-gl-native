@@ -42,14 +42,12 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
                            const std::vector<const RenderLayer*>& layers,
                            const GeometryTileLayer& sourceLayer,
                            IconDependencies& iconDependencies,
-                           uintptr_t _spriteAtlasMapIndex,
                            GlyphDependencies& glyphDependencies)
     : sourceLayerName(sourceLayer.getName()),
       bucketName(layers.at(0)->getID()),
       overscaling(parameters.tileID.overscaleFactor()),
       zoom(parameters.tileID.overscaledZ),
       mode(parameters.mode),
-      spriteAtlasMapIndex(_spriteAtlasMapIndex),
       tileSize(util::tileSize * overscaling),
       tilePixelRatio(float(util::EXTENT) / tileSize),
       textSize(layers.at(0)->as<RenderSymbolLayer>()->impl->layout.unevaluated.get<TextSize>()),
@@ -171,7 +169,7 @@ bool SymbolLayout::hasSymbolInstances() const {
     return !symbolInstances.empty();
 }
 
-void SymbolLayout::prepare(const GlyphPositionMap& glyphs, const IconAtlasMap& iconMap) {
+void SymbolLayout::prepare(const GlyphPositionMap& glyphs, const IconMap& icons) {
     float horizontalAlign = 0.5;
     float verticalAlign = 0.5;
 
@@ -259,21 +257,18 @@ void SymbolLayout::prepare(const GlyphPositionMap& glyphs, const IconAtlasMap& i
 
         // if feature has icon, get sprite atlas position
         if (feature.icon) {
-            auto icons = iconMap.find(spriteAtlasMapIndex);
-            if (icons != iconMap.end()) {
-                auto image = icons->second.find(*feature.icon);
-                if (image != icons->second.end()) {
-                    shapedIcon = PositionedIcon::shapeIcon(image->second,
-                        layout.evaluate<IconOffset>(zoom, feature),
-                        layout.evaluate<IconRotate>(zoom, feature) * util::DEG2RAD);
-                    if (image->second.sdf) {
-                        sdfIcons = true;
-                    }
-                    if (image->second.relativePixelRatio != 1.0f) {
-                        iconsNeedLinear = true;
-                    } else if (layout.get<IconRotate>().constantOr(1) != 0) {
-                        iconsNeedLinear = true;
-                    }
+            auto image = icons.find(*feature.icon);
+            if (image != icons.end()) {
+                shapedIcon = PositionedIcon::shapeIcon(image->second,
+                    layout.evaluate<IconOffset>(zoom, feature),
+                    layout.evaluate<IconRotate>(zoom, feature) * util::DEG2RAD);
+                if (image->second.sdf) {
+                    sdfIcons = true;
+                }
+                if (image->second.relativePixelRatio != 1.0f) {
+                    iconsNeedLinear = true;
+                } else if (layout.get<IconRotate>().constantOr(1) != 0) {
+                    iconsNeedLinear = true;
                 }
             }
         }

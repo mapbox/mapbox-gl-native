@@ -123,7 +123,7 @@ void SpriteAtlas::onParsed(Images&& result) {
     }
     observer->onSpriteLoaded();
     for (auto requestor : requestors) {
-        requestor->onIconsAvailable(this, buildIconMap());
+        requestor->onIconsAvailable(buildIconMap());
     }
     requestors.clear();
 }
@@ -202,7 +202,7 @@ const style::Image* SpriteAtlas::getImage(const std::string& id) const {
 
 void SpriteAtlas::getIcons(IconRequestor& requestor) {
     if (isLoaded()) {
-        requestor.onIconsAvailable(this, buildIconMap());
+        requestor.onIconsAvailable(buildIconMap());
     } else {
         requestors.insert(&requestor);
     }

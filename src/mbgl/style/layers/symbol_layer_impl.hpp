@@ -19,8 +19,6 @@ public:
 
     SymbolLayoutProperties layout;
     SymbolPaintProperties::Cascading cascading;
-
-    SpriteAtlas* spriteAtlas = nullptr;
 };
 
 } // namespace style

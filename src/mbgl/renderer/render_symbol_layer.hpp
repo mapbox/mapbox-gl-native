@@ -77,7 +77,7 @@ public:
 
     std::unique_ptr<Bucket> createBucket(const BucketParameters&, const std::vector<const RenderLayer*>&) const override;
     std::unique_ptr<SymbolLayout> createLayout(const BucketParameters&, const std::vector<const RenderLayer*>&,
-                                               const GeometryTileLayer&, GlyphDependencies&, IconDependencyMap&) const;
+                                               const GeometryTileLayer&, GlyphDependencies&, IconDependencies&) const;
 
     // Paint properties
     style::SymbolPaintProperties::Unevaluated unevaluated;
