@@ -58,8 +58,6 @@
 
 #pragma mark Default style URLs
 
-static_assert(mbgl::util::default_styles::currentVersion == MGLStyleDefaultVersion, "mbgl::util::default_styles::currentVersion and MGLStyleDefaultVersion disagree.");
-
 /// @param name The style’s marketing name, written in lower camelCase.
 /// @param fileName The last path component in the style’s URL, excluding the version suffix.
 #define MGL_DEFINE_STYLE(name, fileName) \
@@ -67,17 +65,13 @@ static_assert(mbgl::util::default_styles::currentVersion == MGLStyleDefaultVersi
     + (NSURL *)name##StyleURL { \
         static dispatch_once_t onceToken; \
         dispatch_once(&onceToken, ^{ \
-            MGLStyleURL_##name = [self name##StyleURLWithVersion:8]; \
+            MGLStyleURL_##name = [self name##StyleURLWithVersion:mbgl::util::default_styles::name.currentVersion]; \
         }); \
         return MGLStyleURL_##name; \
     } \
     \
     + (NSURL *)name##StyleURL##WithVersion:(NSInteger)version { \
-        if (mbgl::util::default_styles::currentVersion == version) { \
-            return [NSURL URLWithString:@(mbgl::util::default_styles::name.url)]; \
-        } else { \
-            return [NSURL URLWithString:[@"mapbox://styles/mapbox/" #fileName "-v" stringByAppendingFormat:@"%li", (long)version]]; \
-        } \
+        return [NSURL URLWithString:[@"mapbox://styles/mapbox/" #fileName "-v" stringByAppendingFormat:@"%li", (long)version]]; \
     }
 
 MGL_DEFINE_STYLE(streets, streets)

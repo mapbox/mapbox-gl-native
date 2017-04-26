@@ -55,13 +55,19 @@
 }
 
 - (void)testUnversionedStyleURLs {
+    XCTAssertEqual(mbgl::util::default_styles::streets.currentVersion, MGLStyleDefaultVersion,
+                   "mbgl::util::default_styles::streets.currentVersion and MGLStyleDefaultVersion disagree.");
+    
+    XCTAssertEqualObjects([MGLStyle streetsStyleURL].absoluteString, @(mbgl::util::default_styles::streets.url));
+    XCTAssertEqualObjects([MGLStyle outdoorsStyleURL].absoluteString, @(mbgl::util::default_styles::outdoors.url));
+    XCTAssertEqualObjects([MGLStyle lightStyleURL].absoluteString, @(mbgl::util::default_styles::light.url));
+    XCTAssertEqualObjects([MGLStyle darkStyleURL].absoluteString, @(mbgl::util::default_styles::dark.url));
+    XCTAssertEqualObjects([MGLStyle satelliteStyleURL].absoluteString, @(mbgl::util::default_styles::satellite.url));
+    XCTAssertEqualObjects([MGLStyle satelliteStreetsStyleURL].absoluteString, @(mbgl::util::default_styles::satelliteStreets.url));
+    
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
-    XCTAssertEqualObjects([MGLStyle streetsStyleURL].absoluteString, @"mapbox://styles/mapbox/streets-v8");
     XCTAssertEqualObjects([MGLStyle emeraldStyleURL].absoluteString, @"mapbox://styles/mapbox/emerald-v8");
-    XCTAssertEqualObjects([MGLStyle lightStyleURL].absoluteString, @"mapbox://styles/mapbox/light-v8");
-    XCTAssertEqualObjects([MGLStyle darkStyleURL].absoluteString, @"mapbox://styles/mapbox/dark-v8");
-    XCTAssertEqualObjects([MGLStyle satelliteStyleURL].absoluteString, @"mapbox://styles/mapbox/satellite-v8");
     XCTAssertEqualObjects([MGLStyle hybridStyleURL].absoluteString, @"mapbox://styles/mapbox/satellite-hybrid-v8");
 #pragma clang diagnostic pop
 }
@@ -69,18 +75,30 @@
 - (void)testVersionedStyleURLs {
     // Test that all the default styles have publicly-declared MGLStyle class
     // methods and that the URLs all have the right values.
-    XCTAssertEqualObjects([MGLStyle streetsStyleURLWithVersion:MGLStyleDefaultVersion].absoluteString, @(mbgl::util::default_styles::streets.url));
-    XCTAssertEqualObjects([MGLStyle streetsStyleURLWithVersion:99].absoluteString, @"mapbox://styles/mapbox/streets-v99");
-    XCTAssertEqualObjects([MGLStyle outdoorsStyleURLWithVersion:MGLStyleDefaultVersion].absoluteString, @(mbgl::util::default_styles::outdoors.url));
-    XCTAssertEqualObjects([MGLStyle outdoorsStyleURLWithVersion:99].absoluteString, @"mapbox://styles/mapbox/outdoors-v99");
-    XCTAssertEqualObjects([MGLStyle lightStyleURLWithVersion:MGLStyleDefaultVersion].absoluteString, @(mbgl::util::default_styles::light.url));
-    XCTAssertEqualObjects([MGLStyle lightStyleURLWithVersion:99].absoluteString, @"mapbox://styles/mapbox/light-v99");
-    XCTAssertEqualObjects([MGLStyle darkStyleURLWithVersion:MGLStyleDefaultVersion].absoluteString, @(mbgl::util::default_styles::dark.url));
-    XCTAssertEqualObjects([MGLStyle darkStyleURLWithVersion:99].absoluteString, @"mapbox://styles/mapbox/dark-v99");
-    XCTAssertEqualObjects([MGLStyle satelliteStyleURLWithVersion:MGLStyleDefaultVersion].absoluteString, @(mbgl::util::default_styles::satellite.url));
-    XCTAssertEqualObjects([MGLStyle satelliteStyleURLWithVersion:99].absoluteString, @"mapbox://styles/mapbox/satellite-v99");
-    XCTAssertEqualObjects([MGLStyle satelliteStreetsStyleURLWithVersion:MGLStyleDefaultVersion].absoluteString, @(mbgl::util::default_styles::satelliteStreets.url));
-    XCTAssertEqualObjects([MGLStyle satelliteStreetsStyleURLWithVersion:99].absoluteString, @"mapbox://styles/mapbox/satellite-streets-v99");
+    XCTAssertEqualObjects([MGLStyle streetsStyleURLWithVersion:mbgl::util::default_styles::streets.currentVersion].absoluteString,
+                          @(mbgl::util::default_styles::streets.url));
+    XCTAssertEqualObjects([MGLStyle streetsStyleURLWithVersion:99].absoluteString,
+                          @"mapbox://styles/mapbox/streets-v99");
+    XCTAssertEqualObjects([MGLStyle outdoorsStyleURLWithVersion:mbgl::util::default_styles::outdoors.currentVersion].absoluteString,
+                          @(mbgl::util::default_styles::outdoors.url));
+    XCTAssertEqualObjects([MGLStyle outdoorsStyleURLWithVersion:99].absoluteString,
+                          @"mapbox://styles/mapbox/outdoors-v99");
+    XCTAssertEqualObjects([MGLStyle lightStyleURLWithVersion:mbgl::util::default_styles::light.currentVersion].absoluteString,
+                          @(mbgl::util::default_styles::light.url));
+    XCTAssertEqualObjects([MGLStyle lightStyleURLWithVersion:99].absoluteString,
+                          @"mapbox://styles/mapbox/light-v99");
+    XCTAssertEqualObjects([MGLStyle darkStyleURLWithVersion:mbgl::util::default_styles::dark.currentVersion].absoluteString,
+                          @(mbgl::util::default_styles::dark.url));
+    XCTAssertEqualObjects([MGLStyle darkStyleURLWithVersion:99].absoluteString,
+                          @"mapbox://styles/mapbox/dark-v99");
+    XCTAssertEqualObjects([MGLStyle satelliteStyleURLWithVersion:mbgl::util::default_styles::satellite.currentVersion].absoluteString,
+                          @(mbgl::util::default_styles::satellite.url));
+    XCTAssertEqualObjects([MGLStyle satelliteStyleURLWithVersion:99].absoluteString,
+                          @"mapbox://styles/mapbox/satellite-v99");
+    XCTAssertEqualObjects([MGLStyle satelliteStreetsStyleURLWithVersion:mbgl::util::default_styles::satelliteStreets.currentVersion].absoluteString,
+                          @(mbgl::util::default_styles::satelliteStreets.url));
+    XCTAssertEqualObjects([MGLStyle satelliteStreetsStyleURLWithVersion:99].absoluteString,
+                          @"mapbox://styles/mapbox/satellite-streets-v99");
 
     static_assert(6 == mbgl::util::default_styles::numOrderedStyles,
                   "MGLStyleTests isn’t testing all the styles in mbgl::util::default_styles.");

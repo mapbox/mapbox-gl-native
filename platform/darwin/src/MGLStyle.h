@@ -52,15 +52,22 @@ MGL_EXPORT
 #pragma mark Accessing Default Styles
 
 /**
- Returns the URL to version 8 of the
- <a href="https://www.mapbox.com/maps/streets/">Mapbox Streets</a> style.
+ Returns the URL to the current version of the
+ <a href="https://www.mapbox.com/maps/streets/">Mapbox Streets</a> style as of
+ publication.
 
  Streets is a general-purpose style with detailed road and transit networks.
 
  `MGLMapView` and `MGLTilePyramidOfflineRegion` use Mapbox Streets when no style
  is specified explicitly.
+
+ @warning The return value may change in a future release of the SDK. If you use
+    any feature that depends on a specific aspect of a default style – for
+    instance, the minimum zoom level that includes roads – use the
+    `-streetsStyleURLWithVersion:` method instead. Such details may change
+    significantly from version to version.
  */
-+ (NSURL *)streetsStyleURL __attribute__((deprecated("Use -streetsStyleURLWithVersion:.")));
++ (NSURL *)streetsStyleURL;
 
 /**
  Returns the URL to the given version of the
@@ -71,8 +78,7 @@ MGL_EXPORT
  `MGLMapView` and `MGLTilePyramidOfflineRegion` use Mapbox Streets when no style
  is specified explicitly.
 
- @param version The style’s latest released version. As of publication, the
-    current version is `10`.
+ @param version A specific version of the style.
  */
 + (NSURL *)streetsStyleURLWithVersion:(NSInteger)version;
 
@@ -85,70 +91,102 @@ MGL_EXPORT
 + (NSURL *)emeraldStyleURL __attribute__((deprecated("Create an NSURL object with the string “mapbox://styles/mapbox/emerald-v8”.")));
 
 /**
+ Returns the URL to the current version of the
+ <a href="https://www.mapbox.com/maps/outdoors/">Mapbox Outdoors</a> style as of
+ publication.
+
+ Outdoors is a general-purpose style tailored to outdoor activities.
+
+ @warning The return value may change in a future release of the SDK. If you use
+    any feature that depends on a specific aspect of a default style – for
+    instance, the minimum zoom level that includes roads – use the
+    `-outdoorsStyleURLWithVersion:` method instead. Such details may change
+    significantly from version to version.
+ */
++ (NSURL *)outdoorsStyleURL;
+
+/**
  Returns the URL to the given version of the
  <a href="https://www.mapbox.com/maps/outdoors/">Mapbox Outdoors</a> style.
 
  Outdoors is a general-purpose style tailored to outdoor activities.
 
- @param version The style’s latest released version. As of publication, the
-    current version is `10`.
+ @param version A specific version of the style.
  */
 + (NSURL *)outdoorsStyleURLWithVersion:(NSInteger)version;
 
 /**
- Returns the URL to version 8 of the
+ Returns the URL to the current version of the
  <a href="https://www.mapbox.com/maps/light-dark/">Mapbox Light</a> style.
 
  Light is a subtle, light-colored backdrop for data visualizations.
+
+ @warning The return value may change in a future release of the SDK. If you use
+    any feature that depends on a specific aspect of a default style – for
+    instance, the minimum zoom level that includes roads – use the
+    `-lightStyleURLWithVersion:` method instead. Such details may change
+    significantly from version to version.
  */
-+ (NSURL *)lightStyleURL __attribute__((deprecated("Use -lightStyleURLWithVersion:.")));
++ (NSURL *)lightStyleURL;
 
 /**
  Returns the URL to the given version of the
- <a href="https://www.mapbox.com/maps/light-dark/">Mapbox Light</a> style.
+ <a href="https://www.mapbox.com/maps/light-dark/">Mapbox Light</a> style as of
+ publication.
 
  Light is a subtle, light-colored backdrop for data visualizations.
 
- @param version The style’s latest released version. As of publication, the
-    current version is `9`.
+ @param version A specific version of the style.
  */
 + (NSURL *)lightStyleURLWithVersion:(NSInteger)version;
 
 /**
- Returns the URL to version 8 of the
+ Returns the URL to the current version of the
  <a href="https://www.mapbox.com/maps/light-dark/">Mapbox Dark</a> style.
 
  Dark is a subtle, dark-colored backdrop for data visualizations.
+
+ @warning The return value may change in a future release of the SDK. If you use
+    any feature that depends on a specific aspect of a default style – for
+    instance, the minimum zoom level that includes roads – use the
+    `-darkStyleURLWithVersion:` method instead. Such details may change
+    significantly from version to version.
  */
-+ (NSURL *)darkStyleURL __attribute__((deprecated("Use -darkStyleURLWithVersion:.")));
++ (NSURL *)darkStyleURL;
 
 /**
  Returns the URL to the given version of the
- <a href="https://www.mapbox.com/maps/light-dark/">Mapbox Dark</a> style.
+ <a href="https://www.mapbox.com/maps/light-dark/">Mapbox Dark</a> style as of
+ publication.
 
  Dark is a subtle, dark-colored backdrop for data visualizations.
 
- @param version The style’s latest released version. As of publication, the
-    current version is `9`.
+ @param version A specific version of the style.
  */
 + (NSURL *)darkStyleURLWithVersion:(NSInteger)version;
 
 /**
- Returns the URL to version 8 of the
+ Returns the URL to the current version of the
  <a href="https://www.mapbox.com/maps/satellite/">Mapbox Satellite</a> style.
 
  Satellite is high-resolution satellite and aerial imagery.
+
+ @warning The return value may change in a future release of the SDK. If you use
+    any feature that depends on a specific aspect of a default style – for
+    instance, the raster tile sets included in the style – use the
+    `-satelliteStyleURLWithVersion:` method instead. Such details may change
+    significantly from version to version.
  */
-+ (NSURL *)satelliteStyleURL __attribute__((deprecated("Use -satelliteStyleURLWithVersion:.")));
++ (NSURL *)satelliteStyleURL;
 
 /**
  Returns the URL to the given version of the
- <a href="https://www.mapbox.com/maps/satellite/">Mapbox Satellite</a> style.
+ <a href="https://www.mapbox.com/maps/satellite/">Mapbox Satellite</a> style as
+ of publication.
 
  Satellite is high-resolution satellite and aerial imagery.
 
- @param version The style’s latest released version. As of publication, the
-    current version is `9`.
+ @param version A specific version of the style.
  */
 + (NSURL *)satelliteStyleURLWithVersion:(NSInteger)version;
 
@@ -161,7 +199,24 @@ MGL_EXPORT
  Mapbox Satellite with unobtrusive labels and translucent roads from Mapbox
  Streets.
  */
-+ (NSURL *)hybridStyleURL __attribute__((deprecated("Use -satelliteStreetsStyleURLWithVersion:.")));
++ (NSURL *)hybridStyleURL __attribute__((deprecated("Use -satelliteStreetsStyleURL.")));
+
+/**
+ Returns the URL to the current version of the
+ <a href="https://www.mapbox.com/maps/satellite/">Mapbox Satellite Streets</a>
+ style as of publication.
+
+ Satellite Streets combines the high-resolution satellite and aerial imagery of
+ Mapbox Satellite with unobtrusive labels and translucent roads from Mapbox
+ Streets.
+
+ @warning The return value may change in a future release of the SDK. If you use
+    any feature that depends on a specific aspect of a default style – for
+    instance, the minimum zoom level that includes roads – use the
+    `-satelliteStreetsStyleURLWithVersion:` method instead. Such details may
+    change significantly from version to version.
+ */
++ (NSURL *)satelliteStreetsStyleURL;
 
 /**
  Returns the URL to the given version of the
@@ -172,8 +227,7 @@ MGL_EXPORT
  Mapbox Satellite with unobtrusive labels and translucent roads from Mapbox
  Streets.
 
- @param version The style’s latest released version. As of publication, the
-    current version is `10`.
+ @param version A specific version of the style.
  */
 + (NSURL *)satelliteStreetsStyleURLWithVersion:(NSInteger)version;
 
