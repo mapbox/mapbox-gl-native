@@ -4,6 +4,7 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
+import android.support.annotation.UiThread;
 import android.text.TextUtils;
 
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
@@ -31,11 +32,12 @@ public final class Mapbox {
    * @param accessToken Mapbox access token
    * @return the single instance of Mapbox
    */
+  @UiThread
   public static synchronized Mapbox getInstance(@NonNull Context context, @NonNull String accessToken) {
     if (INSTANCE == null) {
       Context appContext = context.getApplicationContext();
       INSTANCE = new Mapbox(appContext, accessToken);
-      LocationEngine locationEngine = new LocationSource(appContext);
+      LocationEngine locationEngine = LocationSource.getLocationEngine(appContext);
       locationEngine.setPriority(LocationEnginePriority.NO_POWER);
       MapboxTelemetry.getInstance().initialize(
         appContext, accessToken, BuildConfig.MAPBOX_EVENTS_USER_AGENT, locationEngine);

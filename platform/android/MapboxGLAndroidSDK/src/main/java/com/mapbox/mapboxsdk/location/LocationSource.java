@@ -40,7 +40,7 @@ public class LocationSource extends LocationEngine implements
   private WeakReference<Context> context;
   private LostApiClient lostApiClient;
 
-  public LocationSource(Context context) {
+  private LocationSource(Context context) {
     super();
     this.context = new WeakReference<>(context);
     lostApiClient = new LostApiClient.Builder(this.context.get())
