@@ -75,6 +75,8 @@ private:
     std::unordered_set<std::string> obsoleteShapeAnnotationLayers;
     std::unordered_set<AnnotationTile*> tiles;
     SpriteAtlas spriteAtlas;
+
+    friend class AnnotationTile;
 };
 
 } // namespace mbgl

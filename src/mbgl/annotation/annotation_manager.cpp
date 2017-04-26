@@ -175,8 +175,6 @@ void AnnotationManager::updateStyle(Style& style) {
         layer->setIconAllowOverlap(true);
         layer->setIconIgnorePlacement(true);
 
-        layer->impl->spriteAtlas = &spriteAtlas;
-
         style.addLayer(std::move(layer));
     }
 

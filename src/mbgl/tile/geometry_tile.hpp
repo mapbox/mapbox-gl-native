@@ -30,7 +30,9 @@ class GeometryTile : public Tile, public GlyphRequestor, IconRequestor {
 public:
     GeometryTile(const OverscaledTileID&,
                  std::string sourceID,
-                 const style::UpdateParameters&);
+                 const style::UpdateParameters&,
+                 GlyphAtlas&,
+                 SpriteAtlas&);
 
     ~GeometryTile() override;
 
@@ -41,10 +43,10 @@ public:
     void redoLayout() override;
     
     void onGlyphsAvailable(GlyphPositionMap) override;
-    void onIconsAvailable(SpriteAtlas*, IconMap) override;
+    void onIconsAvailable(IconMap) override;
     
     void getGlyphs(GlyphDependencies);
-    void getIcons(IconDependencyMap);
+    void getIcons(IconDependencies);
 
     Bucket* getBucket(const RenderLayer&) const override;
 
@@ -95,9 +97,8 @@ private:
     Actor<GeometryTileWorker> worker;
 
     GlyphAtlas& glyphAtlas;
-    std::set<SpriteAtlas*> pendingSpriteAtlases;
-    IconAtlasMap iconAtlasMap;
-    
+    SpriteAtlas& spriteAtlas;
+
     uint64_t correlationID = 0;
     optional<PlacementConfig> requestedConfig;
 

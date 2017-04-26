@@ -38,16 +38,12 @@ public:
     float height;
 };
 
-class SpriteAtlas;
-
-typedef std::map<std::string,SpriteAtlasElement> IconMap;
+typedef std::map<std::string, SpriteAtlasElement> IconMap;
 typedef std::set<std::string> IconDependencies;
-typedef std::map<uintptr_t,IconMap> IconAtlasMap;
-typedef std::map<SpriteAtlas*,IconDependencies> IconDependencyMap;
 
 class IconRequestor {
 public:
-    virtual void onIconsAvailable(SpriteAtlas*, IconMap) = 0;
+    virtual void onIconsAvailable(IconMap) = 0;
 };
 
 class SpriteAtlas : public util::noncopyable {

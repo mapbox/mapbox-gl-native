@@ -223,12 +223,6 @@ Layer* Style::addLayer(std::unique_ptr<Layer> layer, optional<std::string> befor
         throw std::runtime_error(std::string{"Layer "} + layer->getID() + " already exists");
     }
 
-    if (SymbolLayer* symbolLayer = layer->as<SymbolLayer>()) {
-        if (!symbolLayer->impl->spriteAtlas) {
-            symbolLayer->impl->spriteAtlas = spriteAtlas.get();
-        }
-    }
-
     if (CustomLayer* customLayer = layer->as<CustomLayer>()) {
         customLayer->impl->initialize();
     }

@@ -26,12 +26,11 @@ std::unique_ptr<SymbolLayout> RenderSymbolLayer::createLayout(const BucketParame
                                                               const std::vector<const RenderLayer*>& group,
                                                               const GeometryTileLayer& layer,
                                                               GlyphDependencies& glyphDependencies,
-                                                              IconDependencyMap& iconDependencyMap) const {
+                                                              IconDependencies& iconDependencies) const {
     return std::make_unique<SymbolLayout>(parameters,
                                           group,
                                           layer,
-                                          iconDependencyMap[impl->spriteAtlas],
-                                          (uintptr_t) impl->spriteAtlas,
+                                          iconDependencies,
                                           glyphDependencies);
 }
 

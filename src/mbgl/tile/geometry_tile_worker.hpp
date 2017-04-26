@@ -37,7 +37,7 @@ public:
     void setPlacementConfig(PlacementConfig, uint64_t correlationID);
     
     void onGlyphsAvailable(GlyphPositionMap glyphs);
-    void onIconsAvailable(IconAtlasMap icons);
+    void onIconsAvailable(IconMap icons);
 
 private:
     void coalesced();
@@ -47,7 +47,7 @@ private:
     void coalesce();
 
     void requestNewGlyphs(const GlyphDependencies&);
-    void requestNewIcons(const IconDependencyMap&);
+    void requestNewIcons(const IconDependencies&);
    
     void symbolDependenciesChanged();
     bool hasPendingSymbolDependencies() const;
@@ -77,9 +77,9 @@ private:
 
     std::vector<std::unique_ptr<SymbolLayout>> symbolLayouts;
     GlyphDependencies pendingGlyphDependencies;
-    IconDependencyMap pendingIconDependencies;
+    IconDependencies pendingIconDependencies;
     GlyphPositionMap glyphPositions;
-    IconAtlasMap icons;
+    IconMap icons;
 };
 
 } // namespace mbgl

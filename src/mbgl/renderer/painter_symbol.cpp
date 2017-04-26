@@ -67,7 +67,7 @@ void Painter::renderSymbol(PaintParameters& parameters,
         auto values = layer.iconPropertyValues(layout);
         auto paintPropertyValues = layer.iconPaintProperties();
 
-        SpriteAtlas& atlas = *layer.impl->spriteAtlas;
+        SpriteAtlas& atlas = *bucket.spriteAtlas;
         const bool iconScaled = layout.get<IconSize>().constantOr(1.0) != 1.0 ||
             frame.pixelRatio != atlas.getPixelRatio() ||
             bucket.iconsNeedLinear;
