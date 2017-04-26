@@ -5,7 +5,7 @@ namespace mbgl {
 namespace style {
 
 std::unique_ptr<RenderLayer> FillLayer::Impl::createRenderLayer() const {
-    return std::make_unique<RenderFillLayer>(*this);
+    return std::make_unique<RenderFillLayer>(staticImmutableCast<FillLayer::Impl>(immutableFromThis()));
 }
 
 } // namespace style

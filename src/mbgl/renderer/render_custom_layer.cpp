@@ -4,9 +4,12 @@
 
 namespace mbgl {
 
-RenderCustomLayer::RenderCustomLayer(const style::CustomLayer::Impl& _impl)
-        : RenderLayer(style::LayerType::Custom, _impl),
-          impl(&_impl) {
+RenderCustomLayer::RenderCustomLayer(Immutable<style::CustomLayer::Impl> _impl)
+    : RenderLayer(style::LayerType::Custom, _impl) {
+}
+
+const style::CustomLayer::Impl& RenderCustomLayer::impl() const {
+    return static_cast<const style::CustomLayer::Impl&>(*baseImpl);
 }
 
 std::unique_ptr<RenderLayer> RenderCustomLayer::clone() const {

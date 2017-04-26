@@ -7,9 +7,12 @@
 
 namespace mbgl {
 
-RenderCircleLayer::RenderCircleLayer(const style::CircleLayer::Impl& _impl)
-        : RenderLayer(style::LayerType::Circle, _impl),
-          impl(&_impl) {
+RenderCircleLayer::RenderCircleLayer(Immutable<style::CircleLayer::Impl> _impl)
+    : RenderLayer(style::LayerType::Circle, _impl) {
+}
+
+const style::CircleLayer::Impl& RenderCircleLayer::impl() const {
+    return static_cast<const style::CircleLayer::Impl&>(*baseImpl);
 }
 
 std::unique_ptr<RenderLayer> RenderCircleLayer::clone() const {
@@ -21,7 +24,7 @@ std::unique_ptr<Bucket> RenderCircleLayer::createBucket(const BucketParameters& 
 }
 
 void RenderCircleLayer::cascade(const CascadeParameters& parameters) {
-    unevaluated = impl->cascading.cascade(parameters, std::move(unevaluated));
+    unevaluated = impl().cascading.cascade(parameters, std::move(unevaluated));
 }
 
 void RenderCircleLayer::evaluate(const PropertyEvaluationParameters& parameters) {

@@ -8,8 +8,7 @@ namespace mbgl {
 
 class RenderBackgroundLayer: public RenderLayer {
 public:
-
-    RenderBackgroundLayer(const style::BackgroundLayer::Impl&);
+    RenderBackgroundLayer(Immutable<style::BackgroundLayer::Impl>);
     ~RenderBackgroundLayer() final = default;
 
     std::unique_ptr<RenderLayer> clone() const override;
@@ -24,7 +23,7 @@ public:
     style::BackgroundPaintProperties::Unevaluated unevaluated;
     style::BackgroundPaintProperties::Evaluated evaluated;
 
-    const style::BackgroundLayer::Impl* const impl;
+    const style::BackgroundLayer::Impl& impl() const;
 };
 
 template <>

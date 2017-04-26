@@ -3,10 +3,11 @@
 #include <mbgl/style/transition_options.hpp>
 #include <mbgl/style/observer.hpp>
 #include <mbgl/style/source_observer.hpp>
-#include <mbgl/renderer/render_source_observer.hpp>
 #include <mbgl/style/layer_observer.hpp>
 #include <mbgl/style/light_observer.hpp>
 #include <mbgl/style/update_batch.hpp>
+#include <mbgl/renderer/render_source.hpp>
+#include <mbgl/renderer/render_source_observer.hpp>
 #include <mbgl/renderer/render_layer.hpp>
 #include <mbgl/renderer/render_light.hpp>
 #include <mbgl/text/glyph_atlas_observer.hpp>
@@ -35,8 +36,6 @@ class RenderData;
 class TransformState;
 class RenderedQueryOptions;
 class Scheduler;
-class RenderLayer;
-class RenderSource;
 class UpdateParameters;
 
 namespace style {
@@ -105,7 +104,7 @@ public:
 
     void setLight(std::unique_ptr<Light>);
     Light* getLight() const;
-    RenderLight* getRenderLight() const;
+    const RenderLight& getRenderLight() const;
 
     RenderData getRenderData(MapDebugOptions, float angle) const;
 
@@ -128,15 +127,10 @@ public:
 
 private:
     std::vector<std::unique_ptr<Source>> sources;
-    std::vector<std::unique_ptr<RenderSource>> renderSources;
-
     std::vector<std::unique_ptr<Layer>> layers;
-    std::vector<std::unique_ptr<RenderLayer>> renderLayers;
     std::vector<std::string> classes;
     TransitionOptions transitionOptions;
-
     std::unique_ptr<Light> light;
-    std::unique_ptr<RenderLight> renderLight;
 
     // Defaults
     std::string name;
@@ -145,8 +139,14 @@ private:
     double defaultBearing = 0;
     double defaultPitch = 0;
 
+    std::vector<Immutable<Source::Impl>> sourceImpls;
+    std::vector<Immutable<Layer::Impl>> layerImpls;
+
+    std::unordered_map<std::string, std::unique_ptr<RenderSource>> renderSources;
+    std::unordered_map<std::string, std::unique_ptr<RenderLayer>> renderLayers;
+    RenderLight renderLight;
+
     std::vector<std::unique_ptr<Layer>>::const_iterator findLayer(const std::string& layerID) const;
-    std::vector<std::unique_ptr<RenderLayer>>::const_iterator findRenderLayer(const std::string&) const;
 
     // GlyphStoreObserver implementation.
     void onGlyphsLoaded(const FontStack&, const GlyphRange&) override;
@@ -181,8 +181,6 @@ private:
 
     UpdateBatch updateBatch;
     ZoomHistory zoomHistory;
-
-    void removeRenderLayer(const std::string& layerID);
 
 public:
     bool loaded = false;

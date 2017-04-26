@@ -236,7 +236,7 @@ void Parser::parseLayer(const std::string& id, const JSValue& value, std::unique
             return;
         }
 
-        layer = reference->baseImpl->cloneRef(id);
+        layer = reference->cloneRef(id);
         conversion::setPaintProperties(*layer, value);
     } else {
         conversion::Error error;

@@ -16,14 +16,12 @@ class CascadeParameters;
 class PropertyEvaluationParameters;
 
 class RenderLayer {
-
 protected:
-    RenderLayer(style::LayerType, const style::Layer::Impl&);
+    RenderLayer(style::LayerType, Immutable<style::Layer::Impl>);
 
     const style::LayerType type;
 
 public:
-
     virtual ~RenderLayer() = default;
 
     // Create an identical copy of this layer.
@@ -73,11 +71,12 @@ public:
     virtual std::unique_ptr<Bucket> createBucket(const BucketParameters&, const std::vector<const RenderLayer*>&) const = 0;
 
     // Private implementation
-    const style::Layer::Impl& baseImpl;
+    Immutable<style::Layer::Impl> baseImpl;
+    void setImpl(Immutable<style::Layer::Impl>);
 
     friend std::string layoutKey(const RenderLayer&);
-protected:
 
+protected:
     // Stores what render passes this layer is currently enabled for. This depends on the
     // evaluated StyleProperties object and is updated accordingly.
     RenderPass passes = RenderPass::None;

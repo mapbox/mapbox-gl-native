@@ -7,8 +7,7 @@ namespace mbgl {
 
 class RenderCustomLayer: public RenderLayer {
 public:
-
-    RenderCustomLayer(const style::CustomLayer::Impl&);
+    RenderCustomLayer(Immutable<style::CustomLayer::Impl>);
     ~RenderCustomLayer() final = default;
 
     std::unique_ptr<RenderLayer> clone() const override;
@@ -19,7 +18,7 @@ public:
 
     std::unique_ptr<Bucket> createBucket(const BucketParameters&, const std::vector<const RenderLayer*>&) const final;
 
-    const style::CustomLayer::Impl* const impl;
+    const style::CustomLayer::Impl& impl() const;
 };
 
 template <>

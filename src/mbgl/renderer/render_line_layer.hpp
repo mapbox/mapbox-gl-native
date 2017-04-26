@@ -8,8 +8,7 @@ namespace mbgl {
 
 class RenderLineLayer: public RenderLayer {
 public:
-
-    RenderLineLayer(const style::LineLayer::Impl&);
+    RenderLineLayer(Immutable<style::LineLayer::Impl>);
     ~RenderLineLayer() final = default;
 
     std::unique_ptr<RenderLayer> clone() const override;
@@ -31,14 +30,13 @@ public:
     style::LinePaintProperties::Unevaluated unevaluated;
     style::LinePaintProperties::Evaluated evaluated;
 
-    const style::LineLayer::Impl* const impl;
+    const style::LineLayer::Impl& impl() const;
 
     // Special case
     float dashLineWidth = 1;
 
 private:
     float getLineWidth(const GeometryTileFeature&, const float) const;
-
 };
 
 template <>

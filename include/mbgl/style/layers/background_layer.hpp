@@ -19,6 +19,13 @@ public:
     BackgroundLayer(const std::string& layerID);
     ~BackgroundLayer() final;
 
+    // Visibility
+    void setVisibility(VisibilityType) final;
+
+    // Zoom range
+    void setMinZoom(float) final;
+    void setMaxZoom(float) final;
+
     // Paint properties
 
     static PropertyValue<Color> getDefaultBackgroundColor();
@@ -42,15 +49,16 @@ public:
     // Private implementation
 
     class Impl;
-    Impl* const impl;
+    const Impl& impl() const;
 
-    BackgroundLayer(const Impl&);
-    BackgroundLayer(const BackgroundLayer&) = delete;
+    Mutable<Impl> mutableImpl() const;
+    BackgroundLayer(Immutable<Impl>);
+    std::unique_ptr<Layer> cloneRef(const std::string& id) const final;
 };
 
 template <>
 inline bool Layer::is<BackgroundLayer>() const {
-    return type == LayerType::Background;
+    return getType() == LayerType::Background;
 }
 
 } // namespace style

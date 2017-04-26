@@ -29,6 +29,13 @@ public:
     void setFilter(const Filter&);
     const Filter& getFilter() const;
 
+    // Visibility
+    void setVisibility(VisibilityType) final;
+
+    // Zoom range
+    void setMinZoom(float) final;
+    void setMaxZoom(float) final;
+
     // Layout properties
 
     static PropertyValue<LineCapType> getDefaultLineCap();
@@ -112,15 +119,16 @@ public:
     // Private implementation
 
     class Impl;
-    Impl* const impl;
+    const Impl& impl() const;
 
-    LineLayer(const Impl&);
-    LineLayer(const LineLayer&) = delete;
+    Mutable<Impl> mutableImpl() const;
+    LineLayer(Immutable<Impl>);
+    std::unique_ptr<Layer> cloneRef(const std::string& id) const final;
 };
 
 template <>
 inline bool Layer::is<LineLayer>() const {
-    return type == LayerType::Line;
+    return getType() == LayerType::Line;
 }
 
 } // namespace style

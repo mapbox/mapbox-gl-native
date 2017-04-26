@@ -27,6 +27,13 @@ public:
     void setFilter(const Filter&);
     const Filter& getFilter() const;
 
+    // Visibility
+    void setVisibility(VisibilityType) final;
+
+    // Zoom range
+    void setMinZoom(float) final;
+    void setMaxZoom(float) final;
+
     // Paint properties
 
     static PropertyValue<bool> getDefaultFillAntialias();
@@ -74,15 +81,16 @@ public:
     // Private implementation
 
     class Impl;
-    Impl* const impl;
+    const Impl& impl() const;
 
-    FillLayer(const Impl&);
-    FillLayer(const FillLayer&) = delete;
+    Mutable<Impl> mutableImpl() const;
+    FillLayer(Immutable<Impl>);
+    std::unique_ptr<Layer> cloneRef(const std::string& id) const final;
 };
 
 template <>
 inline bool Layer::is<FillLayer>() const {
-    return type == LayerType::Fill;
+    return getType() == LayerType::Fill;
 }
 
 } // namespace style

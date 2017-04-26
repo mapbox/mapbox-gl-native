@@ -29,7 +29,7 @@ public:
                  optional<Timestamp> expires_);
 
     void cancel() override;
-    Bucket* getBucket(const RenderLayer&) const override;
+    Bucket* getBucket(const style::Layer::Impl&) const override;
 
     void onParsed(std::unique_ptr<Bucket> result);
     void onError(std::exception_ptr);

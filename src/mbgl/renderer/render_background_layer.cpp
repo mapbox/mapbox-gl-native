@@ -4,9 +4,12 @@
 
 namespace mbgl {
 
-RenderBackgroundLayer::RenderBackgroundLayer(const style::BackgroundLayer::Impl& _impl)
-        : RenderLayer(style::LayerType::Background, _impl),
-          impl(&_impl) {
+RenderBackgroundLayer::RenderBackgroundLayer(Immutable<style::BackgroundLayer::Impl> _impl)
+    : RenderLayer(style::LayerType::Background, _impl) {
+}
+
+const style::BackgroundLayer::Impl& RenderBackgroundLayer::impl() const {
+    return static_cast<const style::BackgroundLayer::Impl&>(*baseImpl);
 }
 
 std::unique_ptr<RenderLayer> RenderBackgroundLayer::clone() const {
@@ -20,7 +23,7 @@ std::unique_ptr<Bucket> RenderBackgroundLayer::createBucket(const BucketParamete
 }
 
 void RenderBackgroundLayer::cascade(const CascadeParameters &parameters) {
-    unevaluated = impl->cascading.cascade(parameters, std::move(unevaluated));
+    unevaluated = impl().cascading.cascade(parameters, std::move(unevaluated));
 }
 
 void RenderBackgroundLayer::evaluate(const PropertyEvaluationParameters &parameters) {

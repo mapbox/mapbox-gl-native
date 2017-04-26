@@ -34,6 +34,7 @@
 #include <mbgl/renderer/render_line_layer.hpp>
 #include <mbgl/renderer/render_raster_layer.hpp>
 #include <mbgl/renderer/render_symbol_layer.hpp>
+#include <mbgl/renderer/style_diff.hpp>
 #include <mbgl/tile/tile.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/exception.hpp>
@@ -74,27 +75,19 @@ Style::Style(Scheduler& scheduler_, FileSource& fileSource_, float pixelRatio)
       spriteAtlas(std::make_unique<SpriteAtlas>(Size{ 1024, 1024 }, pixelRatio)),
       lineAtlas(std::make_unique<LineAtlas>(Size{ 256, 512 })),
       light(std::make_unique<Light>()),
-      renderLight(std::make_unique<RenderLight>(light->impl)),
+      renderLight(light->impl),
       observer(&nullObserver) {
     glyphAtlas->setObserver(this);
     spriteAtlas->setObserver(this);
-    light->impl->setObserver(this);
+    light->setObserver(this);
 }
 
 Style::~Style() {
-    for (const auto& source : sources) {
-        source->baseImpl->setObserver(nullptr);
-    }
-
     for (const auto& layer : layers) {
         if (auto* customLayer = layer->as<CustomLayer>()) {
-            customLayer->impl->deinitialize();
+            customLayer->impl().deinitialize();
         }
     }
-
-    glyphAtlas->setObserver(nullptr);
-    spriteAtlas->setObserver(nullptr);
-    light->impl->setObserver(nullptr);
 }
 
 bool Style::addClass(const std::string& className) {
@@ -136,7 +129,6 @@ void Style::setJSON(const std::string& json) {
     sources.clear();
     renderSources.clear();
     layers.clear();
-    renderLayers.clear();
     classes.clear();
     transitionOptions = {};
     updateBatch = {};
@@ -186,12 +178,8 @@ void Style::addSource(std::unique_ptr<Source> source) {
         throw std::runtime_error(msg.c_str());
     }
 
-    source->baseImpl->setObserver(this);
-    source->baseImpl->loadDescription(fileSource);
-
-    std::unique_ptr<RenderSource> renderSource = source->baseImpl->createRenderSource();
-    renderSource->setObserver(this);
-    renderSources.emplace_back(std::move(renderSource));
+    source->setObserver(this);
+    source->loadDescription(fileSource);
 
     sources.emplace_back(std::move(source));
 }
@@ -205,12 +193,8 @@ std::unique_ptr<Source> Style::removeSource(const std::string& id) {
         return nullptr;
     }
 
-    util::erase_if(renderSources, [&](const auto& source) {
-        return source->baseImpl.id == id;
-    });
-
     auto source = std::move(*it);
-    source->baseImpl->setObserver(nullptr);
+    source->setObserver(nullptr);
     sources.erase(it);
     updateBatch.sourceIDs.erase(id);
 
@@ -259,15 +243,13 @@ Layer* Style::addLayer(std::unique_ptr<Layer> layer, optional<std::string> befor
     }
 
     if (auto* customLayer = layer->as<CustomLayer>()) {
-        customLayer->impl->initialize();
+        customLayer->impl().initialize();
     }
 
-    layer->baseImpl->setObserver(this);
+    layer->setObserver(this);
     layer->accept(QueueSourceReloadVisitor { updateBatch });
 
-    auto added = layers.emplace(before ? findLayer(*before) : layers.end(), std::move(layer))->get();
-    renderLayers.emplace(before ? findRenderLayer(*before) : renderLayers.end(), added->baseImpl->createRenderLayer());
-    return std::move(added);
+    return layers.emplace(before ? findLayer(*before) : layers.end(), std::move(layer))->get();
 }
 
 std::unique_ptr<Layer> Style::removeLayer(const std::string& id) {
@@ -281,20 +263,19 @@ std::unique_ptr<Layer> Style::removeLayer(const std::string& id) {
     auto layer = std::move(*it);
 
     if (auto* customLayer = layer->as<CustomLayer>()) {
-        customLayer->impl->deinitialize();
+        customLayer->impl().deinitialize();
     }
 
-    layer->baseImpl->setObserver(nullptr);
+    layer->setObserver(nullptr);
     layers.erase(it);
-    removeRenderLayer(id);
     return layer;
 }
 
 std::vector<const RenderLayer*> Style::getRenderLayers() const {
     std::vector<const RenderLayer*> result;
     result.reserve(renderLayers.size());
-    for (const auto& layer : renderLayers) {
-        result.push_back(layer.get());
+    for (const auto& entry : renderLayers) {
+        result.push_back(entry.second.get());
     }
     return result;
 }
@@ -302,41 +283,20 @@ std::vector<const RenderLayer*> Style::getRenderLayers() const {
 std::vector<RenderLayer*> Style::getRenderLayers() {
     std::vector<RenderLayer*> result;
     result.reserve(renderLayers.size());
-    for (auto& layer : renderLayers) {
-        result.push_back(layer.get());
+    for (auto& entry : renderLayers) {
+        result.push_back(entry.second.get());
     }
     return result;
 }
 
-std::vector<std::unique_ptr<RenderLayer>>::const_iterator Style::findRenderLayer(const std::string& id) const {
-    return std::find_if(renderLayers.begin(), renderLayers.end(), [&](const auto& layer) {
-        return layer->baseImpl.id == id;
-    });
-}
-
 RenderLayer* Style::getRenderLayer(const std::string& id) const {
-    auto it = findRenderLayer(id);
-    return it != renderLayers.end() ? it->get() : nullptr;
-}
-
-void Style::removeRenderLayer(const std::string& id) {
-    auto it = std::find_if(renderLayers.begin(), renderLayers.end(), [&](const auto& layer) {
-        return layer->baseImpl.id == id;
-    });
-
-    if (it != renderLayers.end()) {
-        renderLayers.erase(it);
-    }
+    auto it = renderLayers.find(id);
+    return it != renderLayers.end() ? it->second.get() : nullptr;
 }
 
 void Style::setLight(std::unique_ptr<Light> light_) {
     light = std::move(light_);
-    light->impl->setObserver(this);
-
-    // Copy renderlight to preserve the initialised
-    // transitioning light properties
-    renderLight = renderLight->copy(light->impl);
-
+    light->setObserver(this);
     onLightChanged(*light);
 }
 
@@ -344,8 +304,8 @@ Light* Style::getLight() const {
     return light.get();
 }
 
-RenderLight* Style::getRenderLight() const {
-    return renderLight.get();
+const RenderLight& Style::getRenderLight() const {
+    return renderLight;
 }
 
 std::string Style::getName() const {
@@ -369,7 +329,8 @@ double Style::getDefaultPitch() const {
 }
 
 void Style::update(const UpdateParameters& parameters) {
-    bool zoomChanged = zoomHistory.update(parameters.transformState.getZoom(), parameters.timePoint);
+    const bool zoomChanged = zoomHistory.update(parameters.transformState.getZoom(), parameters.timePoint);
+    const bool classesChanged = parameters.updateFlags & Update::Classes;
 
     std::vector<ClassID> classIDs;
     for (const auto& className : classes) {
@@ -398,48 +359,111 @@ void Style::update(const UpdateParameters& parameters) {
                                         parameters.annotationManager,
                                         *this);
 
-    const bool cascade = parameters.updateFlags & Update::Classes;
-    const bool evaluate = cascade || zoomChanged || parameters.updateFlags & Update::RecalculateStyle;
+    // Update light.
+    const bool lightChanged = renderLight.impl != light->impl;
 
-    if (cascade) {
-        renderLight->transition(cascadeParameters);
+    if (lightChanged) {
+        renderLight.impl = light->impl;
+        renderLight.transition(cascadeParameters);
     }
 
-    if (evaluate || renderLight->hasTransition()) {
-        renderLight->evaluate(evaluationParameters);
+    if (lightChanged || zoomChanged || renderLight.hasTransition()) {
+        renderLight.evaluate(evaluationParameters);
     }
 
-    for (const auto& renderSource : renderSources) {
-        renderSource->enabled = false;
+
+    std::vector<Immutable<Source::Impl>> newSourceImpls;
+    newSourceImpls.reserve(sources.size());
+    for (const auto& source : sources) {
+        newSourceImpls.push_back(source->baseImpl);
     }
 
-    for (const auto& layer : renderLayers) {
-        if (cascade) {
-            layer->cascade(cascadeParameters);
+    const SourceDifference sourceDiff = diffSources(sourceImpls, newSourceImpls);
+    sourceImpls = std::move(newSourceImpls);
+
+    // Remove render layers for removed sources.
+    for (const auto& entry : sourceDiff.removed) {
+        renderLayers.erase(entry.first);
+    }
+
+    // Create render sources for newly added sources.
+    for (const auto& entry : sourceDiff.added) {
+        std::unique_ptr<RenderSource> renderSource = entry.second->createRenderSource();
+        renderSource->setObserver(this);
+        renderSources.emplace(entry.first, std::move(renderSource));
+    }
+
+    // Update render sources for changed sources.
+    for (const auto& entry : sourceDiff.changed) {
+        renderSources.at(entry.first)->setImpl(entry.second);
+    }
+
+
+    std::vector<Immutable<Layer::Impl>> newLayerImpls;
+    newLayerImpls.reserve(layers.size());
+    for (const auto& layer : layers) {
+        newLayerImpls.push_back(layer->baseImpl);
+    }
+
+    const LayerDifference layerDiff = diffLayers(layerImpls, newLayerImpls);
+    layerImpls = std::move(newLayerImpls);
+
+    // Remove render layers for removed layers.
+    for (const auto& entry : layerDiff.removed) {
+        renderLayers.erase(entry.first);
+    }
+
+    // Create render layers for newly added layers.
+    for (const auto& entry : layerDiff.added) {
+        renderLayers.emplace(entry.first, entry.second->createRenderLayer());
+    }
+
+    // Update render layers for changed layers.
+    for (const auto& entry : layerDiff.changed) {
+        renderLayers.at(entry.first)->setImpl(entry.second);
+    }
+
+    // Update layers for class and zoom changes.
+    for (const auto& entry : renderLayers) {
+        RenderLayer& layer = *entry.second;
+        const bool layerAdded = layerDiff.added.count(entry.first);
+        const bool layerChanged = layerDiff.changed.count(entry.first);
+
+        if (classesChanged || layerAdded || layerChanged) {
+            layer.cascade(cascadeParameters);
         }
 
-        if (evaluate || layer->hasTransition()) {
-            layer->evaluate(evaluationParameters);
+        if (classesChanged || layerAdded || layerChanged || zoomChanged || layer.hasTransition()) {
+            layer.evaluate(evaluationParameters);
         }
+    }
 
-        if (layer->needsRendering(zoomHistory.lastZoom)) {
-            if (RenderSource* renderSource = getRenderSource(layer->baseImpl.source)) {
-                renderSource->enabled = true;
+
+    // Update tiles for each source.
+    for (const auto& entry : renderSources) {
+        entry.second->enabled = false;
+    }
+
+    for (const auto& entry : renderLayers) {
+        RenderLayer& layer = *entry.second;
+        if (layer.needsRendering(zoomHistory.lastZoom)) {
+            if (RenderSource* source = getRenderSource(layer.baseImpl->source)) {
+                source->enabled = true;
             }
         }
     }
 
-    for (const auto& renderSource : renderSources) {
-        bool updated = updateBatch.sourceIDs.count(renderSource->baseImpl.id);
-        if (renderSource->enabled) {
+    for (const auto& entry : renderSources) {
+        bool updated = updateBatch.sourceIDs.count(entry.first);
+        if (entry.second->enabled) {
             if (updated) {
-                renderSource->reloadTiles();
+                entry.second->reloadTiles();
             }
-            renderSource->updateTiles(tileParameters);
+            entry.second->updateTiles(tileParameters);
         } else if (updated) {
-            renderSource->invalidateTiles();
+            entry.second->invalidateTiles();
         } else {
-            renderSource->removeTiles();
+            entry.second->removeTiles();
         }
     }
 
@@ -473,20 +497,17 @@ Source* Style::getSource(const std::string& id) const {
 }
 
 RenderSource* Style::getRenderSource(const std::string& id) const {
-    const auto it = std::find_if(renderSources.begin(), renderSources.end(), [&](const auto& source) {
-        return source->baseImpl.id == id;
-    });
-
-    return it != renderSources.end() ? it->get() : nullptr;
+    auto it = renderSources.find(id);
+    return it != renderSources.end() ? it->second.get() : nullptr;
 }
 
 bool Style::hasTransitions() const {
-    if (renderLight->hasTransition()) {
+    if (renderLight.hasTransition()) {
         return true;
     }
 
-    for (const auto& layer : renderLayers) {
-        if (layer->hasTransition()) {
+    for (const auto& entry : renderLayers) {
+        if (entry.second->hasTransition()) {
             return true;
         }
     }
@@ -500,13 +521,13 @@ bool Style::isLoaded() const {
     }
 
     for (const auto& source: sources) {
-        if (!source->baseImpl->loaded) {
+        if (!source->loaded) {
             return false;
         }
     }
 
-    for (const auto& renderSource: renderSources) {
-        if (!renderSource->isLoaded()) {
+    for (const auto& entry: renderSources) {
+        if (!entry.second->isLoaded()) {
             return false;
         }
     }
@@ -521,13 +542,16 @@ bool Style::isLoaded() const {
 RenderData Style::getRenderData(MapDebugOptions debugOptions, float angle) const {
     RenderData result;
 
-    for (const auto& renderSource: renderSources) {
-        if (renderSource->enabled) {
-            result.sources.insert(renderSource.get());
+    for (const auto& entry : renderSources) {
+        if (entry.second->enabled) {
+            result.sources.insert(entry.second.get());
         }
     }
 
-    for (const auto& layer : renderLayers) {
+    for (const auto& layerImpl : layerImpls) {
+        const RenderLayer* layer = getRenderLayer(layerImpl->id);
+        assert(layer);
+
         if (!layer->needsRendering(zoomHistory.lastZoom)) {
             continue;
         }
@@ -539,7 +563,7 @@ RenderData Style::getRenderData(MapDebugOptions debugOptions, float angle) const
                 continue;
             }
             const BackgroundPaintProperties::Evaluated& paint = background->evaluated;
-            if (layer.get() == renderLayers[0].get() && paint.get<BackgroundPattern>().from.empty()) {
+            if (layerImpl.get() == layerImpls[0].get() && paint.get<BackgroundPattern>().from.empty()) {
                 // This is a solid background. We can use glClear().
                 result.backgroundColor = paint.get<BackgroundColor>() * paint.get<BackgroundOpacity>();
             } else {
@@ -554,9 +578,9 @@ RenderData Style::getRenderData(MapDebugOptions debugOptions, float angle) const
             continue;
         }
 
-        RenderSource* source = getRenderSource(layer->baseImpl.source);
+        RenderSource* source = getRenderSource(layer->baseImpl->source);
         if (!source) {
-            Log::Warning(Event::Render, "can't find source for layer '%s'", layer->baseImpl.id.c_str());
+            Log::Warning(Event::Render, "can't find source for layer '%s'", layer->baseImpl->id.c_str());
             continue;
         }
 
@@ -609,7 +633,7 @@ RenderData Style::getRenderData(MapDebugOptions debugOptions, float angle) const
                 }
             }
 
-            auto bucket = tile.tile.getBucket(*layer);
+            auto bucket = tile.tile.getBucket(*layer->baseImpl);
             if (bucket) {
                 sortedTilesForInsertion.emplace_back(tile);
                 tile.used = true;
@@ -641,8 +665,8 @@ std::vector<Feature> Style::queryRenderedFeatures(const ScreenLineString& geomet
             }
         }
     } else {
-        for (const auto& renderSource : renderSources) {
-            auto sourceResults = renderSource->queryRenderedFeatures(geometry, transformState, options);
+        for (const auto& entry : renderSources) {
+            auto sourceResults = entry.second->queryRenderedFeatures(geometry, transformState, options);
             std::move(sourceResults.begin(), sourceResults.end(), std::inserter(resultsByLayer, resultsByLayer.begin()));
         }
     }
@@ -654,11 +678,12 @@ std::vector<Feature> Style::queryRenderedFeatures(const ScreenLineString& geomet
     }
 
     // Combine all results based on the style layer order.
-    for (const auto& layer : renderLayers) {
+    for (const auto& layerImpl : layerImpls) {
+        const RenderLayer* layer = getRenderLayer(layerImpl->id);
         if (!layer->needsRendering(zoomHistory.lastZoom)) {
             continue;
         }
-        auto it = resultsByLayer.find(layer->baseImpl.id);
+        auto it = resultsByLayer.find(layer->baseImpl->id);
         if (it != resultsByLayer.end()) {
             std::move(it->second.begin(), it->second.end(), std::back_inserter(result));
         }
@@ -668,14 +693,14 @@ std::vector<Feature> Style::queryRenderedFeatures(const ScreenLineString& geomet
 }
 
 void Style::setSourceTileCacheSize(size_t size) {
-    for (const auto& renderSource : renderSources) {
-        renderSource->setCacheSize(size);
+    for (const auto& entry : renderSources) {
+        entry.second->setCacheSize(size);
     }
 }
 
 void Style::onLowMemory() {
-    for (const auto& renderSource : renderSources) {
-        renderSource->onLowMemory();
+    for (const auto& entry : renderSources) {
+        entry.second->onLowMemory();
     }
 }
 
@@ -714,8 +739,8 @@ void Style::onSourceError(Source& source, std::exception_ptr error) {
 
 void Style::onSourceDescriptionChanged(Source& source) {
     observer->onSourceDescriptionChanged(source);
-    if (!source.baseImpl->loaded) {
-        source.baseImpl->loadDescription(fileSource);
+    if (!source.loaded) {
+        source.loadDescription(fileSource);
     }
 }
 
@@ -726,7 +751,7 @@ void Style::onTileChanged(RenderSource&, const OverscaledTileID&) {
 void Style::onTileError(RenderSource& source, const OverscaledTileID& tileID, std::exception_ptr error) {
     lastError = error;
     Log::Error(Event::Style, "Failed to load tile %s for source %s: %s",
-               util::toString(tileID).c_str(), source.baseImpl.id.c_str(), util::toString(error).c_str());
+               util::toString(tileID).c_str(), source.baseImpl->id.c_str(), util::toString(error).c_str());
     observer->onResourceError(error);
 }
 
@@ -749,38 +774,34 @@ void Style::onLayerFilterChanged(Layer& layer) {
 
 void Style::onLayerVisibilityChanged(Layer& layer) {
     layer.accept(QueueSourceReloadVisitor { updateBatch });
-    observer->onUpdate(Update::RecalculateStyle);
+    observer->onUpdate(Update::Repaint);
 }
 
 void Style::onLayerPaintPropertyChanged(Layer&) {
-    observer->onUpdate(Update::RecalculateStyle | Update::Classes);
+    observer->onUpdate(Update::Repaint);
 }
 
 void Style::onLayerDataDrivenPaintPropertyChanged(Layer& layer) {
     layer.accept(QueueSourceReloadVisitor { updateBatch });
-    observer->onUpdate(Update::RecalculateStyle | Update::Classes);
+    observer->onUpdate(Update::Repaint);
 }
 
-void Style::onLayerLayoutPropertyChanged(Layer& layer, const char * property) {
+void Style::onLayerLayoutPropertyChanged(Layer& layer, const char *) {
     layer.accept(QueueSourceReloadVisitor { updateBatch });
-
-    // Recalculate the style for certain properties
-    observer->onUpdate((strcmp(property, "icon-size") == 0 || strcmp(property, "text-size") == 0)
-        ? Update::RecalculateStyle
-        : Update::Repaint);
+    observer->onUpdate(Update::Repaint);
 }
 
 void Style::onLightChanged(const Light&) {
-    observer->onUpdate(Update::Classes | Update::RecalculateStyle);
+    observer->onUpdate(Update::Repaint);
 }
 
 void Style::dumpDebugLogs() const {
     for (const auto& source : sources) {
-        source->baseImpl->dumpDebugLogs();
+        source->dumpDebugLogs();
     }
 
-    for (const auto& renderSource : renderSources) {
-        renderSource->dumpDebugLogs();
+    for (const auto& entry : renderSources) {
+        entry.second->dumpDebugLogs();
     }
 
     spriteAtlas->dumpDebugLogs();

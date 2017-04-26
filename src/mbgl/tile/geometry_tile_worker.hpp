@@ -7,6 +7,8 @@
 #include <mbgl/text/placement_config.hpp>
 #include <mbgl/actor/actor_ref.hpp>
 #include <mbgl/util/optional.hpp>
+#include <mbgl/util/immutable.hpp>
+#include <mbgl/style/layer_impl.hpp>
 
 #include <atomic>
 #include <memory>
@@ -32,7 +34,7 @@ public:
                        const MapMode);
     ~GeometryTileWorker();
 
-    void setLayers(std::vector<std::unique_ptr<style::Layer>>, uint64_t correlationID);
+    void setLayers(std::vector<Immutable<style::Layer::Impl>>, uint64_t correlationID);
     void setData(std::unique_ptr<const GeometryTileData>, uint64_t correlationID);
     void setPlacementConfig(PlacementConfig, uint64_t correlationID);
     
@@ -71,7 +73,7 @@ private:
     uint64_t correlationID = 0;
 
     // Outer optional indicates whether we've received it or not.
-    optional<std::vector<std::unique_ptr<style::Layer>>> layers;
+    optional<std::vector<Immutable<style::Layer::Impl>>> layers;
     optional<std::unique_ptr<const GeometryTileData>> data;
     optional<PlacementConfig> placementConfig;
 

@@ -4,9 +4,12 @@
 
 namespace mbgl {
 
-RenderRasterLayer::RenderRasterLayer(const style::RasterLayer::Impl& _impl)
-        : RenderLayer(style::LayerType::Raster, _impl),
-          impl(&_impl) {
+RenderRasterLayer::RenderRasterLayer(Immutable<style::RasterLayer::Impl> _impl)
+    : RenderLayer(style::LayerType::Raster, _impl) {
+}
+
+const style::RasterLayer::Impl& RenderRasterLayer::impl() const {
+    return static_cast<const style::RasterLayer::Impl&>(*baseImpl);
 }
 
 std::unique_ptr<RenderLayer> RenderRasterLayer::clone() const {
@@ -19,7 +22,7 @@ std::unique_ptr<Bucket> RenderRasterLayer::createBucket(const BucketParameters&,
 }
 
 void RenderRasterLayer::cascade(const CascadeParameters& parameters) {
-    unevaluated = impl->cascading.cascade(parameters, std::move(unevaluated));
+    unevaluated = impl().cascading.cascade(parameters, std::move(unevaluated));
 }
 
 void RenderRasterLayer::evaluate(const PropertyEvaluationParameters& parameters) {

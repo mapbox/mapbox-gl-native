@@ -1,20 +1,19 @@
 // This file is generated. Do not edit.
 
 #pragma once
+
 #include <mbgl/style/property_value.hpp>
 #include <mbgl/style/transition_options.hpp>
 #include <mbgl/style/types.hpp>
-
-#include <memory>
+#include <mbgl/util/immutable.hpp>
 
 namespace mbgl {
 namespace style {
 
+class LightObserver;
+
 class Light {
 public:
-
-    class Impl;
-
     Light();
     ~Light();
 
@@ -42,7 +41,12 @@ public:
     void setIntensityTransition(const TransitionOptions&);
     TransitionOptions getIntensityTransition() const;
 
-    std::shared_ptr<Impl> impl;
+    class Impl;
+    Immutable<Impl> impl;
+    Mutable<Impl> mutableImpl() const;
+
+    LightObserver* observer = nullptr;
+    void setObserver(LightObserver*);
 };
 
 } // namespace style

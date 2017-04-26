@@ -74,14 +74,7 @@ using EvaluatedLight     = Evaluated<style::LightProperties>;
 
 class RenderLight {
 public:
-    RenderLight(std::shared_ptr<const style::Light::Impl>);
-
-    // Creates a copy intitalized with previous transitioning light
-    RenderLight(std::shared_ptr<const style::Light::Impl>, const TransitioningLight);
-
-    // creates a copy initialized with previous transitioning
-    // values
-    std::unique_ptr<RenderLight> copy(std::shared_ptr<const style::Light::Impl>) const;
+    RenderLight(Immutable<style::Light::Impl>);
 
     void transition(const CascadeParameters&);
     void evaluate(const PropertyEvaluationParameters&);
@@ -89,10 +82,9 @@ public:
 
     const EvaluatedLight& getEvaluated() const;
 
-    const std::shared_ptr<const style::Light::Impl> impl;
+    Immutable<style::Light::Impl> impl;
 
 private:
-
     TransitioningLight transitioning;
     EvaluatedLight evaluated;
 };

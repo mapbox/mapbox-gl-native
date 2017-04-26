@@ -8,7 +8,7 @@ namespace mbgl {
 
 class RenderVectorSource : public RenderSource {
 public:
-    RenderVectorSource(const style::VectorSource::Impl&);
+    RenderVectorSource(Immutable<style::VectorSource::Impl>);
 
     bool isLoaded() const final;
 
@@ -47,7 +47,8 @@ public:
     void dumpDebugLogs() const final;
 
 private:
-    const style::VectorSource::Impl& impl;
+    const style::VectorSource::Impl& impl() const;
+
     TilePyramid tilePyramid;
     optional<std::vector<std::string>> tileURLTemplates;
 };

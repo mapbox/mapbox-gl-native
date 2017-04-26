@@ -3,33 +3,34 @@
 #include <mbgl/style/layers/raster_layer.hpp>
 #include <mbgl/style/layers/raster_layer_impl.hpp>
 #include <mbgl/style/conversion/stringify.hpp>
+#include <mbgl/style/layer_observer.hpp>
 
 namespace mbgl {
 namespace style {
 
 RasterLayer::RasterLayer(const std::string& layerID, const std::string& sourceID)
-    : Layer(LayerType::Raster, std::make_unique<Impl>())
-    , impl(static_cast<Impl*>(baseImpl.get())) {
-    impl->id = layerID;
-    impl->source = sourceID;
+    : Layer(makeMutable<Impl>(LayerType::Raster, layerID, sourceID)) {
 }
 
-RasterLayer::RasterLayer(const Impl& other)
-    : Layer(LayerType::Raster, std::make_unique<Impl>(other))
-    , impl(static_cast<Impl*>(baseImpl.get())) {
+RasterLayer::RasterLayer(Immutable<Impl> impl_)
+    : Layer(std::move(impl_)) {
 }
 
 RasterLayer::~RasterLayer() = default;
 
-std::unique_ptr<Layer> RasterLayer::Impl::clone() const {
-    return std::make_unique<RasterLayer>(*this);
+const RasterLayer::Impl& RasterLayer::impl() const {
+    return static_cast<const Impl&>(*baseImpl);
 }
 
-std::unique_ptr<Layer> RasterLayer::Impl::cloneRef(const std::string& id_) const {
-    auto result = std::make_unique<RasterLayer>(*this);
-    result->impl->id = id_;
-    result->impl->cascading = RasterPaintProperties::Cascading();
-    return std::move(result);
+Mutable<RasterLayer::Impl> RasterLayer::mutableImpl() const {
+    return makeMutable<Impl>(impl());
+}
+
+std::unique_ptr<Layer> RasterLayer::cloneRef(const std::string& id_) const {
+    auto impl_ = mutableImpl();
+    impl_->id = id_;
+    impl_->cascading = RasterPaintProperties::Cascading();
+    return std::make_unique<RasterLayer>(std::move(impl_));
 }
 
 void RasterLayer::Impl::stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>&) const {
@@ -38,9 +39,34 @@ void RasterLayer::Impl::stringifyLayout(rapidjson::Writer<rapidjson::StringBuffe
 // Source
 
 const std::string& RasterLayer::getSourceID() const {
-    return impl->source;
+    return impl().source;
 }
 
+
+// Visibility
+
+void RasterLayer::setVisibility(VisibilityType value) {
+    if (value == getVisibility())
+        return;
+    auto impl_ = mutableImpl();
+    impl_->visibility = value;
+    baseImpl = std::move(impl_);
+    observer->onLayerVisibilityChanged(*this);
+}
+
+// Zoom range
+
+void RasterLayer::setMinZoom(float minZoom) {
+    auto impl_ = mutableImpl();
+    impl_->minZoom = minZoom;
+    baseImpl = std::move(impl_);
+}
+
+void RasterLayer::setMaxZoom(float maxZoom) {
+    auto impl_ = mutableImpl();
+    impl_->maxZoom = maxZoom;
+    baseImpl = std::move(impl_);
+}
 
 // Layout properties
 
@@ -52,22 +78,26 @@ PropertyValue<float> RasterLayer::getDefaultRasterOpacity() {
 }
 
 PropertyValue<float> RasterLayer::getRasterOpacity(const optional<std::string>& klass) const {
-    return impl->cascading.template get<RasterOpacity>().get(klass);
+    return impl().cascading.template get<RasterOpacity>().get(klass);
 }
 
 void RasterLayer::setRasterOpacity(PropertyValue<float> value, const optional<std::string>& klass) {
     if (value == getRasterOpacity(klass))
         return;
-    impl->cascading.template get<RasterOpacity>().set(value, klass);
-    impl->observer->onLayerPaintPropertyChanged(*this);
+    auto impl_ = mutableImpl();
+    impl_->cascading.template get<RasterOpacity>().set(value, klass);
+    baseImpl = std::move(impl_);
+    observer->onLayerPaintPropertyChanged(*this);
 }
 
 void RasterLayer::setRasterOpacityTransition(const TransitionOptions& value, const optional<std::string>& klass) {
-    impl->cascading.template get<RasterOpacity>().setTransition(value, klass);
+    auto impl_ = mutableImpl();
+    impl_->cascading.template get<RasterOpacity>().setTransition(value, klass);
+    baseImpl = std::move(impl_);
 }
 
 TransitionOptions RasterLayer::getRasterOpacityTransition(const optional<std::string>& klass) const {
-    return impl->cascading.template get<RasterOpacity>().getTransition(klass);
+    return impl().cascading.template get<RasterOpacity>().getTransition(klass);
 }
 
 PropertyValue<float> RasterLayer::getDefaultRasterHueRotate() {
@@ -75,22 +105,26 @@ PropertyValue<float> RasterLayer::getDefaultRasterHueRotate() {
 }
 
 PropertyValue<float> RasterLayer::getRasterHueRotate(const optional<std::string>& klass) const {
-    return impl->cascading.template get<RasterHueRotate>().get(klass);
+    return impl().cascading.template get<RasterHueRotate>().get(klass);
 }
 
 void RasterLayer::setRasterHueRotate(PropertyValue<float> value, const optional<std::string>& klass) {
     if (value == getRasterHueRotate(klass))
         return;
-    impl->cascading.template get<RasterHueRotate>().set(value, klass);
-    impl->observer->onLayerPaintPropertyChanged(*this);
+    auto impl_ = mutableImpl();
+    impl_->cascading.template get<RasterHueRotate>().set(value, klass);
+    baseImpl = std::move(impl_);
+    observer->onLayerPaintPropertyChanged(*this);
 }
 
 void RasterLayer::setRasterHueRotateTransition(const TransitionOptions& value, const optional<std::string>& klass) {
-    impl->cascading.template get<RasterHueRotate>().setTransition(value, klass);
+    auto impl_ = mutableImpl();
+    impl_->cascading.template get<RasterHueRotate>().setTransition(value, klass);
+    baseImpl = std::move(impl_);
 }
 
 TransitionOptions RasterLayer::getRasterHueRotateTransition(const optional<std::string>& klass) const {
-    return impl->cascading.template get<RasterHueRotate>().getTransition(klass);
+    return impl().cascading.template get<RasterHueRotate>().getTransition(klass);
 }
 
 PropertyValue<float> RasterLayer::getDefaultRasterBrightnessMin() {
@@ -98,22 +132,26 @@ PropertyValue<float> RasterLayer::getDefaultRasterBrightnessMin() {
 }
 
 PropertyValue<float> RasterLayer::getRasterBrightnessMin(const optional<std::string>& klass) const {
-    return impl->cascading.template get<RasterBrightnessMin>().get(klass);
+    return impl().cascading.template get<RasterBrightnessMin>().get(klass);
 }
 
 void RasterLayer::setRasterBrightnessMin(PropertyValue<float> value, const optional<std::string>& klass) {
     if (value == getRasterBrightnessMin(klass))
         return;
-    impl->cascading.template get<RasterBrightnessMin>().set(value, klass);
-    impl->observer->onLayerPaintPropertyChanged(*this);
+    auto impl_ = mutableImpl();
+    impl_->cascading.template get<RasterBrightnessMin>().set(value, klass);
+    baseImpl = std::move(impl_);
+    observer->onLayerPaintPropertyChanged(*this);
 }
 
 void RasterLayer::setRasterBrightnessMinTransition(const TransitionOptions& value, const optional<std::string>& klass) {
-    impl->cascading.template get<RasterBrightnessMin>().setTransition(value, klass);
+    auto impl_ = mutableImpl();
+    impl_->cascading.template get<RasterBrightnessMin>().setTransition(value, klass);
+    baseImpl = std::move(impl_);
 }
 
 TransitionOptions RasterLayer::getRasterBrightnessMinTransition(const optional<std::string>& klass) const {
-    return impl->cascading.template get<RasterBrightnessMin>().getTransition(klass);
+    return impl().cascading.template get<RasterBrightnessMin>().getTransition(klass);
 }
 
 PropertyValue<float> RasterLayer::getDefaultRasterBrightnessMax() {
@@ -121,22 +159,26 @@ PropertyValue<float> RasterLayer::getDefaultRasterBrightnessMax() {
 }
 
 PropertyValue<float> RasterLayer::getRasterBrightnessMax(const optional<std::string>& klass) const {
-    return impl->cascading.template get<RasterBrightnessMax>().get(klass);
+    return impl().cascading.template get<RasterBrightnessMax>().get(klass);
 }
 
 void RasterLayer::setRasterBrightnessMax(PropertyValue<float> value, const optional<std::string>& klass) {
     if (value == getRasterBrightnessMax(klass))
         return;
-    impl->cascading.template get<RasterBrightnessMax>().set(value, klass);
-    impl->observer->onLayerPaintPropertyChanged(*this);
+    auto impl_ = mutableImpl();
+    impl_->cascading.template get<RasterBrightnessMax>().set(value, klass);
+    baseImpl = std::move(impl_);
+    observer->onLayerPaintPropertyChanged(*this);
 }
 
 void RasterLayer::setRasterBrightnessMaxTransition(const TransitionOptions& value, const optional<std::string>& klass) {
-    impl->cascading.template get<RasterBrightnessMax>().setTransition(value, klass);
+    auto impl_ = mutableImpl();
+    impl_->cascading.template get<RasterBrightnessMax>().setTransition(value, klass);
+    baseImpl = std::move(impl_);
 }
 
 TransitionOptions RasterLayer::getRasterBrightnessMaxTransition(const optional<std::string>& klass) const {
-    return impl->cascading.template get<RasterBrightnessMax>().getTransition(klass);
+    return impl().cascading.template get<RasterBrightnessMax>().getTransition(klass);
 }
 
 PropertyValue<float> RasterLayer::getDefaultRasterSaturation() {
@@ -144,22 +186,26 @@ PropertyValue<float> RasterLayer::getDefaultRasterSaturation() {
 }
 
 PropertyValue<float> RasterLayer::getRasterSaturation(const optional<std::string>& klass) const {
-    return impl->cascading.template get<RasterSaturation>().get(klass);
+    return impl().cascading.template get<RasterSaturation>().get(klass);
 }
 
 void RasterLayer::setRasterSaturation(PropertyValue<float> value, const optional<std::string>& klass) {
     if (value == getRasterSaturation(klass))
         return;
-    impl->cascading.template get<RasterSaturation>().set(value, klass);
-    impl->observer->onLayerPaintPropertyChanged(*this);
+    auto impl_ = mutableImpl();
+    impl_->cascading.template get<RasterSaturation>().set(value, klass);
+    baseImpl = std::move(impl_);
+    observer->onLayerPaintPropertyChanged(*this);
 }
 
 void RasterLayer::setRasterSaturationTransition(const TransitionOptions& value, const optional<std::string>& klass) {
-    impl->cascading.template get<RasterSaturation>().setTransition(value, klass);
+    auto impl_ = mutableImpl();
+    impl_->cascading.template get<RasterSaturation>().setTransition(value, klass);
+    baseImpl = std::move(impl_);
 }
 
 TransitionOptions RasterLayer::getRasterSaturationTransition(const optional<std::string>& klass) const {
-    return impl->cascading.template get<RasterSaturation>().getTransition(klass);
+    return impl().cascading.template get<RasterSaturation>().getTransition(klass);
 }
 
 PropertyValue<float> RasterLayer::getDefaultRasterContrast() {
@@ -167,22 +213,26 @@ PropertyValue<float> RasterLayer::getDefaultRasterContrast() {
 }
 
 PropertyValue<float> RasterLayer::getRasterContrast(const optional<std::string>& klass) const {
-    return impl->cascading.template get<RasterContrast>().get(klass);
+    return impl().cascading.template get<RasterContrast>().get(klass);
 }
 
 void RasterLayer::setRasterContrast(PropertyValue<float> value, const optional<std::string>& klass) {
     if (value == getRasterContrast(klass))
         return;
-    impl->cascading.template get<RasterContrast>().set(value, klass);
-    impl->observer->onLayerPaintPropertyChanged(*this);
+    auto impl_ = mutableImpl();
+    impl_->cascading.template get<RasterContrast>().set(value, klass);
+    baseImpl = std::move(impl_);
+    observer->onLayerPaintPropertyChanged(*this);
 }
 
 void RasterLayer::setRasterContrastTransition(const TransitionOptions& value, const optional<std::string>& klass) {
-    impl->cascading.template get<RasterContrast>().setTransition(value, klass);
+    auto impl_ = mutableImpl();
+    impl_->cascading.template get<RasterContrast>().setTransition(value, klass);
+    baseImpl = std::move(impl_);
 }
 
 TransitionOptions RasterLayer::getRasterContrastTransition(const optional<std::string>& klass) const {
-    return impl->cascading.template get<RasterContrast>().getTransition(klass);
+    return impl().cascading.template get<RasterContrast>().getTransition(klass);
 }
 
 PropertyValue<float> RasterLayer::getDefaultRasterFadeDuration() {
@@ -190,22 +240,26 @@ PropertyValue<float> RasterLayer::getDefaultRasterFadeDuration() {
 }
 
 PropertyValue<float> RasterLayer::getRasterFadeDuration(const optional<std::string>& klass) const {
-    return impl->cascading.template get<RasterFadeDuration>().get(klass);
+    return impl().cascading.template get<RasterFadeDuration>().get(klass);
 }
 
 void RasterLayer::setRasterFadeDuration(PropertyValue<float> value, const optional<std::string>& klass) {
     if (value == getRasterFadeDuration(klass))
         return;
-    impl->cascading.template get<RasterFadeDuration>().set(value, klass);
-    impl->observer->onLayerPaintPropertyChanged(*this);
+    auto impl_ = mutableImpl();
+    impl_->cascading.template get<RasterFadeDuration>().set(value, klass);
+    baseImpl = std::move(impl_);
+    observer->onLayerPaintPropertyChanged(*this);
 }
 
 void RasterLayer::setRasterFadeDurationTransition(const TransitionOptions& value, const optional<std::string>& klass) {
-    impl->cascading.template get<RasterFadeDuration>().setTransition(value, klass);
+    auto impl_ = mutableImpl();
+    impl_->cascading.template get<RasterFadeDuration>().setTransition(value, klass);
+    baseImpl = std::move(impl_);
 }
 
 TransitionOptions RasterLayer::getRasterFadeDurationTransition(const optional<std::string>& klass) const {
-    return impl->cascading.template get<RasterFadeDuration>().getTransition(klass);
+    return impl().cascading.template get<RasterFadeDuration>().getTransition(klass);
 }
 
 } // namespace style

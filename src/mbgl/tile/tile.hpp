@@ -9,6 +9,7 @@
 #include <mbgl/renderer/bucket.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
 #include <mbgl/storage/resource.hpp>
+#include <mbgl/style/layer_impl.hpp>
 
 #include <string>
 #include <memory>
@@ -23,10 +24,6 @@ class TileObserver;
 class PlacementConfig;
 class RenderedQueryOptions;
 class SourceQueryOptions;
-class RenderLayer;
-
-namespace style {
-} // namespace style
 
 class Tile : private util::noncopyable {
 public:
@@ -47,7 +44,7 @@ public:
     // Mark this tile as no longer needed and cancel any pending work.
     virtual void cancel() = 0;
 
-    virtual Bucket* getBucket(const RenderLayer&) const = 0;
+    virtual Bucket* getBucket(const style::Layer::Impl&) const = 0;
 
     virtual void setPlacementConfig(const PlacementConfig&) {}
     virtual void redoLayout() {}

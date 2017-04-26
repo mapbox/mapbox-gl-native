@@ -55,7 +55,7 @@ TEST(GeoJSONTile, Issue7648) {
     observer.tileChanged = [&] (const Tile&) {
         // Once present, the bucket should never "disappear", which would cause
         // flickering.
-        ASSERT_NE(nullptr, tile.getBucket(*test.style.getRenderLayer("circle")));
+        ASSERT_NE(nullptr, tile.getBucket(*test.style.getLayer("circle")->baseImpl));
     };
 
     tile.setObserver(&observer);

@@ -27,6 +27,13 @@ public:
     void setFilter(const Filter&);
     const Filter& getFilter() const;
 
+    // Visibility
+    void setVisibility(VisibilityType) final;
+
+    // Zoom range
+    void setMinZoom(float) final;
+    void setMaxZoom(float) final;
+
     // Paint properties
 
     static DataDrivenPropertyValue<float> getDefaultCircleRadius();
@@ -92,15 +99,16 @@ public:
     // Private implementation
 
     class Impl;
-    Impl* const impl;
+    const Impl& impl() const;
 
-    CircleLayer(const Impl&);
-    CircleLayer(const CircleLayer&) = delete;
+    Mutable<Impl> mutableImpl() const;
+    CircleLayer(Immutable<Impl>);
+    std::unique_ptr<Layer> cloneRef(const std::string& id) const final;
 };
 
 template <>
 inline bool Layer::is<CircleLayer>() const {
-    return type == LayerType::Circle;
+    return getType() == LayerType::Circle;
 }
 
 } // namespace style

@@ -29,6 +29,13 @@ public:
     void setFilter(const Filter&);
     const Filter& getFilter() const;
 
+    // Visibility
+    void setVisibility(VisibilityType) final;
+
+    // Zoom range
+    void setMinZoom(float) final;
+    void setMaxZoom(float) final;
+
     // Layout properties
 
     static PropertyValue<SymbolPlacementType> getDefaultSymbolPlacement();
@@ -256,15 +263,16 @@ public:
     // Private implementation
 
     class Impl;
-    Impl* const impl;
+    const Impl& impl() const;
 
-    SymbolLayer(const Impl&);
-    SymbolLayer(const SymbolLayer&) = delete;
+    Mutable<Impl> mutableImpl() const;
+    SymbolLayer(Immutable<Impl>);
+    std::unique_ptr<Layer> cloneRef(const std::string& id) const final;
 };
 
 template <>
 inline bool Layer::is<SymbolLayer>() const {
-    return type == LayerType::Symbol;
+    return getType() == LayerType::Symbol;
 }
 
 } // namespace style

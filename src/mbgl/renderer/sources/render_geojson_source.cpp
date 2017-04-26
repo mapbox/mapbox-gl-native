@@ -9,10 +9,13 @@ namespace mbgl {
 
 using namespace style;
 
-RenderGeoJSONSource::RenderGeoJSONSource(const style::GeoJSONSource::Impl& impl_)
-    : RenderSource(impl_),
-      impl(impl_) {
+RenderGeoJSONSource::RenderGeoJSONSource(Immutable<style::GeoJSONSource::Impl> impl_)
+    : RenderSource(impl_) {
     tilePyramid.setObserver(this);
+}
+
+const style::GeoJSONSource::Impl& RenderGeoJSONSource::impl() const {
+    return static_cast<const style::GeoJSONSource::Impl&>(*baseImpl);
 }
 
 bool RenderGeoJSONSource::isLoaded() const {
@@ -37,7 +40,7 @@ std::map<UnwrappedTileID, RenderTile>& RenderGeoJSONSource::getRenderTiles() {
 }
 
 void RenderGeoJSONSource::updateTiles(const TileParameters& parameters) {
-    GeoJSONData* data_ = impl.getData();
+    GeoJSONData* data_ = impl().getData();
 
     if (!data_) {
         return;
@@ -55,9 +58,9 @@ void RenderGeoJSONSource::updateTiles(const TileParameters& parameters) {
     tilePyramid.updateTiles(parameters,
                             SourceType::GeoJSON,
                             util::tileSize,
-                            impl.getZoomRange(),
+                            impl().getZoomRange(),
                             [&] (const OverscaledTileID& tileID) {
-                                return std::make_unique<GeoJSONTile>(tileID, impl.id, parameters, data->getTile(tileID.canonical));
+                                return std::make_unique<GeoJSONTile>(tileID, impl().id, parameters, data->getTile(tileID.canonical));
                             });
 }
 

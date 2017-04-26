@@ -7,9 +7,12 @@
 
 namespace mbgl {
 
-RenderLineLayer::RenderLineLayer(const style::LineLayer::Impl& _impl)
-        : RenderLayer(style::LayerType::Line, _impl),
-          impl(&_impl) {
+RenderLineLayer::RenderLineLayer(Immutable<style::LineLayer::Impl> _impl)
+    : RenderLayer(style::LayerType::Line, _impl) {
+}
+
+const style::LineLayer::Impl& RenderLineLayer::impl() const {
+    return static_cast<const style::LineLayer::Impl&>(*baseImpl);
 }
 
 std::unique_ptr<RenderLayer> RenderLineLayer::clone() const {
@@ -17,11 +20,11 @@ std::unique_ptr<RenderLayer> RenderLineLayer::clone() const {
 }
 
 std::unique_ptr<Bucket> RenderLineLayer::createBucket(const BucketParameters& parameters, const std::vector<const RenderLayer*>& layers) const {
-    return std::make_unique<LineBucket>(parameters, layers, impl->layout);
+    return std::make_unique<LineBucket>(parameters, layers, impl().layout);
 }
 
 void RenderLineLayer::cascade(const CascadeParameters& parameters) {
-    unevaluated = impl->cascading.cascade(parameters, std::move(unevaluated));
+    unevaluated = impl().cascading.cascade(parameters, std::move(unevaluated));
 }
 
 void RenderLineLayer::evaluate(const PropertyEvaluationParameters& parameters) {

@@ -6,13 +6,17 @@ namespace mbgl {
 
 static RenderSourceObserver nullObserver;
 
-RenderSource::RenderSource(const style::Source::Impl& impl)
+RenderSource::RenderSource(Immutable<style::Source::Impl> impl)
     : baseImpl(impl),
       observer(&nullObserver) {
 }
 
 void RenderSource::setObserver(RenderSourceObserver* observer_) {
     observer = observer_;
+}
+
+void RenderSource::setImpl(Immutable<style::Source::Impl> impl) {
+    baseImpl = impl;
 }
 
 void RenderSource::onTileChanged(Tile& tile) {

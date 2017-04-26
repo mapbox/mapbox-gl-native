@@ -8,7 +8,7 @@ namespace mbgl {
 
 class RenderRasterSource : public RenderSource {
 public:
-    RenderRasterSource(const style::RasterSource::Impl&);
+    RenderRasterSource(Immutable<style::RasterSource::Impl>);
 
     bool isLoaded() const final;
 
@@ -47,7 +47,8 @@ public:
     void dumpDebugLogs() const final;
 
 private:
-    const style::RasterSource::Impl& impl;
+    const style::RasterSource::Impl& impl() const;
+
     TilePyramid tilePyramid;
     optional<std::vector<std::string>> tileURLTemplates;
 };

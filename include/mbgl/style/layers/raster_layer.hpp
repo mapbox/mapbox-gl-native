@@ -22,6 +22,13 @@ public:
     // Source
     const std::string& getSourceID() const;
 
+    // Visibility
+    void setVisibility(VisibilityType) final;
+
+    // Zoom range
+    void setMinZoom(float) final;
+    void setMaxZoom(float) final;
+
     // Paint properties
 
     static PropertyValue<float> getDefaultRasterOpacity();
@@ -69,15 +76,16 @@ public:
     // Private implementation
 
     class Impl;
-    Impl* const impl;
+    const Impl& impl() const;
 
-    RasterLayer(const Impl&);
-    RasterLayer(const RasterLayer&) = delete;
+    Mutable<Impl> mutableImpl() const;
+    RasterLayer(Immutable<Impl>);
+    std::unique_ptr<Layer> cloneRef(const std::string& id) const final;
 };
 
 template <>
 inline bool Layer::is<RasterLayer>() const {
-    return type == LayerType::Raster;
+    return getType() == LayerType::Raster;
 }
 
 } // namespace style
