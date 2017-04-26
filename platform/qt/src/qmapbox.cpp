@@ -139,16 +139,6 @@ namespace QMapbox {
 */
 
 /*!
-    \class QMapbox::StyleSourcedAnnotation
-
-    \inmodule Mapbox Qt SDK
-
-    Represents a style sourced annotation object, along with its properties.
-
-    A style sourced annotation comprises of its geometry and a layer identifier.
-*/
-
-/*!
     \typedef QMapbox::Annotation
 
     Alias for QVariant.
