@@ -1,15 +1,10 @@
 package com.mapbox.mapboxsdk.testapp.activity.userlocation;
 
-import android.Manifest;
-import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -27,9 +22,7 @@ import com.mapbox.services.android.telemetry.location.LocationEngineListener;
 /**
  * Test activity showcasing how to change the MyLocationView drawable.
  */
-public class MyLocationDrawableActivity extends AppCompatActivity implements LocationEngineListener {
-
-  private static final int PERMISSIONS_LOCATION = 0;
+public class MyLocationDrawableActivity extends BaseLocationActivity implements LocationEngineListener {
 
   private MapView mapView;
   private MapboxMap mapboxMap;
@@ -71,24 +64,8 @@ public class MyLocationDrawableActivity extends AppCompatActivity implements Loc
     });
   }
 
-  public void toggleGps(boolean enableGps) {
-    if (enableGps) {
-      if ((ContextCompat.checkSelfPermission(this,
-        Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
-        || (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-        != PackageManager.PERMISSION_GRANTED)) {
-        ActivityCompat.requestPermissions(this, new String[] {
-          Manifest.permission.ACCESS_COARSE_LOCATION,
-          Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_LOCATION);
-      } else {
-        enableLocation(true);
-      }
-    } else {
-      enableLocation(false);
-    }
-  }
-
-  private void enableLocation(boolean enabled) {
+  @Override
+  protected void enableLocation(boolean enabled) {
     if (enabled) {
       mapboxMap.setMyLocationEnabled(true);
       Location location = mapboxMap.getMyLocation();
@@ -99,15 +76,6 @@ public class MyLocationDrawableActivity extends AppCompatActivity implements Loc
       }
     } else {
       mapboxMap.setMyLocationEnabled(false);
-    }
-  }
-
-  @Override
-  public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-    if (requestCode == PERMISSIONS_LOCATION) {
-      if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-        enableLocation(true);
-      }
     }
   }
 
