@@ -46,7 +46,7 @@ void TransformState::getProjMatrix(mat4& projMatrix) const {
     // Add a bit extra to avoid precision problems when a fragment's distance is exactly `furthestDistance`
     const double farZ = furthestDistance * 1.01;
 
-    matrix::perspective(projMatrix, getFieldOfView(), double(size.width) / size.height, 1, farZ);
+    matrix::perspective(projMatrix, getFieldOfView(), double(size.width) / size.height, 100, farZ);
 
     const bool flippedY = viewportMode == ViewportMode::FlippedY;
     matrix::scale(projMatrix, projMatrix, 1, flippedY ? 1 : -1, 1);
