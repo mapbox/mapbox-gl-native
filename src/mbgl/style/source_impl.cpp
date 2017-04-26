@@ -67,8 +67,7 @@ void Source::Impl::startRender(algorithm::ClipIDGenerator& generator,
 
     for (auto& pair : renderTiles) {
         auto& tile = pair.second;
-        transform.matrixFor(tile.matrix, tile.id);
-        matrix::multiply(tile.matrix, projMatrix, tile.matrix);
+        tile.recalculateMatrix(projMatrix, transform);
     }
 }
 

@@ -302,15 +302,6 @@ void Painter::renderPass(PaintParameters& parameters,
         if (!layer.hasRenderPass(pass))
             continue;
 
-        auto renderTiles = [this, &item, &layer, &parameters]() {
-            for (auto& tileRef : item.tiles) {
-                auto& tile = tileRef.get();
-                MBGL_DEBUG_GROUP(context, layer.baseImpl->id + " - " + util::toString(tile.id));
-                auto bucket = tile.tile.getBucket(layer);
-                bucket->render(*this, parameters, layer, tile);
-            }
-        };
-
         if (layer.is<RenderBackgroundLayer>()) {
             MBGL_DEBUG_GROUP(context, "background");
             renderBackground(parameters, *layer.as<RenderBackgroundLayer>());
@@ -339,7 +330,30 @@ void Painter::renderPass(PaintParameters& parameters,
             context.setDepthMode(depthModeForSublayer(0, gl::DepthMode::ReadWrite));
             context.clear(Color{ 0.0f, 0.0f, 0.0f, 0.0f }, 1.0f, {});
 
-            renderTiles();
+            // Set the near clip plane to 100 so as not to waste lots of depth buffer precision
+            // on very close empty space. Modifying the near clip plane after the fact is either
+            // impossible or very difficult (fun challenge if you are a person who loves/knows
+            // matrix math?), so we have to initialize a new projection matrix from scratch.
+
+            mat4 clippedProjMatrix;
+            state.getProjMatrix(clippedProjMatrix, 100);
+            mat4 cachedTileMatrix;
+
+            for (auto& tileRef : item.tiles) {
+                auto& tile = tileRef.get();
+
+                // Cache this tile's matrix so we can reset it later, and recalculate it
+                // using the near-clipped projection matrix:
+                cachedTileMatrix = tile.matrix;
+                tile.recalculateMatrix(clippedProjMatrix, state);
+
+                MBGL_DEBUG_GROUP(context, layer.baseImpl->id + " - " + util::toString(tile.id));
+                auto bucket = tile.tile.getBucket(layer);
+                bucket->render(*this, parameters, layer, tile);
+
+                // Reset tile's full projection matrix for all other rendering
+                tile.matrix = cachedTileMatrix;
+            }
 
             parameters.view.bind();
 
@@ -362,7 +376,12 @@ void Painter::renderPass(PaintParameters& parameters,
                 ExtrusionTextureProgram::PaintPropertyBinders{ properties, 0 }, properties,
                 state.getZoom());
         } else {
-            renderTiles();
+            for (auto& tileRef : item.tiles) {
+                auto& tile = tileRef.get();
+                MBGL_DEBUG_GROUP(context, layer.baseImpl->id + " - " + util::toString(tile.id));
+                auto bucket = tile.tile.getBucket(layer);
+                bucket->render(*this, parameters, layer, tile);
+            }
         }
     }
 

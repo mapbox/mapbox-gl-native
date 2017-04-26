@@ -29,6 +29,9 @@ public:
     mat4 translatedMatrix(const std::array<float, 2>& translate,
                           style::TranslateAnchorType anchor,
                           const TransformState&) const;
+
+    void recalculateMatrix(const mat4& projMatrix,
+                           const TransformState&);
 };
 
 } // namespace mbgl

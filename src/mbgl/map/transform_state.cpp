@@ -27,7 +27,7 @@ void TransformState::matrixFor(mat4& matrix, const UnwrappedTileID& tileID) cons
     matrix::scale(matrix, matrix, s / util::EXTENT, s / util::EXTENT, 1);
 }
 
-void TransformState::getProjMatrix(mat4& projMatrix) const {
+void TransformState::getProjMatrix(mat4& projMatrix, uint16_t nearZ) const {
     if (size.isEmpty()) {
         return;
     }
@@ -46,7 +46,7 @@ void TransformState::getProjMatrix(mat4& projMatrix) const {
     // Add a bit extra to avoid precision problems when a fragment's distance is exactly `furthestDistance`
     const double farZ = furthestDistance * 1.01;
 
-    matrix::perspective(projMatrix, getFieldOfView(), double(size.width) / size.height, 100, farZ);
+    matrix::perspective(projMatrix, getFieldOfView(), double(size.width) / size.height, nearZ, farZ);
 
     const bool flippedY = viewportMode == ViewportMode::FlippedY;
     matrix::scale(projMatrix, projMatrix, 1, flippedY ? 1 : -1, 1);

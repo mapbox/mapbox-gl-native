@@ -31,4 +31,10 @@ mat4 RenderTile::translatedMatrix(const std::array<float, 2>& translation,
     return vtxMatrix;
 }
 
+void RenderTile::recalculateMatrix(const mat4& projMatrix,
+                                   const TransformState& transform) {
+    transform.matrixFor(matrix, id);
+    matrix::multiply(matrix, projMatrix, matrix);
+}
+
 } // namespace mbgl
