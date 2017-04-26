@@ -1,14 +1,8 @@
 package com.mapbox.mapboxsdk.testapp.activity.userlocation;
 
-import android.Manifest;
-import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.UiThread;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
@@ -20,9 +14,8 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.services.android.telemetry.location.LocationEngine;
 import com.mapbox.services.android.telemetry.location.LocationEngineListener;
-import com.mapbox.services.android.telemetry.permissions.PermissionsManager;
 
-public class MyLocationToggleActivity extends AppCompatActivity {
+public class MyLocationToggleActivity extends BaseLocationActivity {
 
   private MapView mapView;
   private MapboxMap mapboxMap;
@@ -30,8 +23,6 @@ public class MyLocationToggleActivity extends AppCompatActivity {
 
   private LocationEngine locationServices;
   private LocationEngineListener locationListener;
-
-  private static final int PERMISSIONS_LOCATION = 0;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -107,21 +98,8 @@ public class MyLocationToggleActivity extends AppCompatActivity {
     mapView.onLowMemory();
   }
 
-  @UiThread
-  public void toggleGps(boolean enableGps) {
-    if (enableGps) {
-      if (!PermissionsManager.areLocationPermissionsGranted(this)) {
-        ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.ACCESS_COARSE_LOCATION,
-          Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_LOCATION);
-      } else {
-        enableLocation(true);
-      }
-    } else {
-      enableLocation(false);
-    }
-  }
-
-  private void enableLocation(boolean enabled) {
+  @Override
+  protected void enableLocation(boolean enabled) {
     if (enabled) {
       // To move the camera instantly, we attempt to get the last known location and either
       // ease or animate the camera to that position depending on the zoom level.
@@ -156,14 +134,4 @@ public class MyLocationToggleActivity extends AppCompatActivity {
     }
     mapboxMap.setMyLocationEnabled(enabled);
   }
-
-  @Override
-  public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-    if (requestCode == PERMISSIONS_LOCATION) {
-      if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-        enableLocation(true);
-      }
-    }
-  }
-
 }
