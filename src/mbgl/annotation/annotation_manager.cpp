@@ -4,7 +4,6 @@
 #include <mbgl/annotation/symbol_annotation_impl.hpp>
 #include <mbgl/annotation/line_annotation_impl.hpp>
 #include <mbgl/annotation/fill_annotation_impl.hpp>
-#include <mbgl/annotation/style_sourced_annotation_impl.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/layers/symbol_layer.hpp>
 #include <mbgl/style/layers/symbol_layer_impl.hpp>
@@ -72,12 +71,6 @@ void AnnotationManager::add(const AnnotationID& id, const FillAnnotation& annota
     obsoleteShapeAnnotationLayers.erase(impl.layerID);
 }
 
-void AnnotationManager::add(const AnnotationID& id, const StyleSourcedAnnotation& annotation, const uint8_t maxZoom) {
-    ShapeAnnotationImpl& impl = *shapeAnnotations.emplace(id,
-        std::make_unique<StyleSourcedAnnotationImpl>(id, annotation, maxZoom)).first->second;
-    obsoleteShapeAnnotationLayers.erase(impl.layerID);
-}
-
 Update AnnotationManager::update(const AnnotationID& id, const SymbolAnnotation& annotation, const uint8_t maxZoom) {
     Update result = Update::Nothing;
 
@@ -115,16 +108,6 @@ Update AnnotationManager::update(const AnnotationID& id, const LineAnnotation& a
 }
 
 Update AnnotationManager::update(const AnnotationID& id, const FillAnnotation& annotation, const uint8_t maxZoom) {
-    auto it = shapeAnnotations.find(id);
-    if (it == shapeAnnotations.end()) {
-        assert(false); // Attempt to update a non-existent shape annotation
-        return Update::Nothing;
-    }
-    removeAndAdd(id, annotation, maxZoom);
-    return Update::AnnotationData | Update::AnnotationStyle;
-}
-
-Update AnnotationManager::update(const AnnotationID& id, const StyleSourcedAnnotation& annotation, const uint8_t maxZoom) {
     auto it = shapeAnnotations.find(id);
     if (it == shapeAnnotations.end()) {
         assert(false); // Attempt to update a non-existent shape annotation

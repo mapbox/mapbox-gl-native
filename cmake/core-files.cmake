@@ -32,8 +32,6 @@ set(MBGL_CORE_FILES
     src/mbgl/annotation/render_annotation_source.hpp
     src/mbgl/annotation/shape_annotation_impl.cpp
     src/mbgl/annotation/shape_annotation_impl.hpp
-    src/mbgl/annotation/style_sourced_annotation_impl.cpp
-    src/mbgl/annotation/style_sourced_annotation_impl.hpp
     src/mbgl/annotation/symbol_annotation_impl.cpp
     src/mbgl/annotation/symbol_annotation_impl.hpp
 

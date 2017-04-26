@@ -866,9 +866,6 @@ mbgl::Annotation asMapboxGLAnnotation(const QMapbox::Annotation & annotation) {
         } else {
             return mbgl::FillAnnotation { asMapboxGLGeometry(fillAnnotation.geometry), fillAnnotation.opacity, { *color }, {} };
         }
-    } else if (annotation.canConvert<QMapbox::StyleSourcedAnnotation>()) {
-        QMapbox::StyleSourcedAnnotation styleSourcedAnnotation = annotation.value<QMapbox::StyleSourcedAnnotation>();
-        return mbgl::StyleSourcedAnnotation { asMapboxGLGeometry(styleSourcedAnnotation.geometry), styleSourcedAnnotation.layerID.toStdString() };
     }
 
     qWarning() << "Unable to convert annotation:" << annotation;

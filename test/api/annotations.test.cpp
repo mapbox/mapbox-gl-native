@@ -144,16 +144,6 @@ TEST(Annotations, OverlappingFillAnnotation) {
     test.checkRendering("overlapping_fill_annotation");
 }
 
-TEST(Annotations, StyleSourcedShapeAnnotation) {
-    AnnotationTest test;
-
-    Polygon<double> polygon = { {{ { 0, 0 }, { 0, 45 }, { 45, 45 }, { 45, 0 } }} };
-
-    test.map.setStyleJSON(util::read_file("test/fixtures/api/annotation.json"));
-    test.map.addAnnotation(StyleSourcedAnnotation { polygon, "annotation" });
-    test.checkRendering("style_sourced_shape_annotation");
-}
-
 TEST(Annotations, AddMultiple) {
     AnnotationTest test;
 

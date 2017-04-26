@@ -50,12 +50,10 @@ private:
     void add(const AnnotationID&, const SymbolAnnotation&, const uint8_t);
     void add(const AnnotationID&, const LineAnnotation&, const uint8_t);
     void add(const AnnotationID&, const FillAnnotation&, const uint8_t);
-    void add(const AnnotationID&, const StyleSourcedAnnotation&, const uint8_t);
 
     Update update(const AnnotationID&, const SymbolAnnotation&, const uint8_t);
     Update update(const AnnotationID&, const LineAnnotation&, const uint8_t);
     Update update(const AnnotationID&, const FillAnnotation&, const uint8_t);
-    Update update(const AnnotationID&, const StyleSourcedAnnotation&, const uint8_t);
 
     void removeAndAdd(const AnnotationID&, const Annotation&, const uint8_t);
 

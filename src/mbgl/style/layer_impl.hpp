@@ -34,11 +34,6 @@ class Layer::Impl {
 public:
     virtual ~Impl() = default;
 
-    // Create a new layer with the specified `id` and `sourceID`. All other properties
-    // are copied from this layer.
-    std::unique_ptr<Layer> copy(const std::string& id,
-                                const std::string& sourceID) const;
-
     // Create an identical copy of this layer.
     virtual std::unique_ptr<Layer> clone() const = 0;
 

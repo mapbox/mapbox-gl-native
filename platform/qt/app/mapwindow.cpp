@@ -277,21 +277,6 @@ void MapWindow::keyPressEvent(QKeyEvent *ev)
             }
         }
         break;
-    case Qt::Key_4: {
-            if (m_styleSourcedAnnotationId.isNull()) {
-                QMapbox::Coordinate topLeft     = m_map->coordinateForPixel({ 0, 0 });
-                QMapbox::Coordinate topRight    = m_map->coordinateForPixel({ 0, qreal(size().height()) });
-                QMapbox::Coordinate bottomLeft  = m_map->coordinateForPixel({ qreal(size().width()), 0 });
-                QMapbox::Coordinate bottomRight = m_map->coordinateForPixel({ qreal(size().width()), qreal(size().height()) });
-                QMapbox::CoordinatesCollections geometry { { { bottomLeft, bottomRight, topRight, topLeft, bottomLeft } } };
-                QMapbox::StyleSourcedAnnotation styleSourced { { QMapbox::ShapeAnnotationGeometry::PolygonType, geometry }, "water" };
-                m_styleSourcedAnnotationId = m_map->addAnnotation(QVariant::fromValue<QMapbox::StyleSourcedAnnotation>(styleSourced));
-            } else {
-                m_map->removeAnnotation(m_styleSourcedAnnotationId.toUInt());
-                m_styleSourcedAnnotationId.clear();
-            }
-        }
-        break;
     case Qt::Key_5: {
             if (m_map->layerExists("circleLayer")) {
                 m_map->removeLayer("circleLayer");
