@@ -144,7 +144,7 @@ void Painter::render(const Style& style, const FrameData& frame_, View& view, Sp
     spriteAtlas = style.spriteAtlas.get();
     lineAtlas = style.lineAtlas.get();
 
-    evaluatedLight = style.getRenderLight()->getEvaluated();
+    evaluatedLight = style.getRenderLight().getEvaluated();
 
     RenderData renderData = style.getRenderData(frame.debugOptions, state.getAngle());
     const std::vector<RenderItem>& order = renderData.order;
@@ -180,7 +180,7 @@ void Painter::render(const Style& style, const FrameData& frame_, View& view, Sp
 
         for (const auto& item : order) {
             for (const auto& tileRef : item.tiles) {
-                const auto& bucket = tileRef.get().tile.getBucket(item.layer);
+                const auto& bucket = tileRef.get().tile.getBucket(*item.layer.baseImpl);
                 if (bucket && bucket->needsUpload()) {
                     bucket->upload(context);
                 }
@@ -309,7 +309,7 @@ void Painter::renderPass(PaintParameters& parameters,
             MBGL_DEBUG_GROUP(context, "background");
             renderBackground(parameters, *layer.as<RenderBackgroundLayer>());
         } else if (layer.is<RenderCustomLayer>()) {
-            MBGL_DEBUG_GROUP(context, layer.baseImpl.id + " - custom");
+            MBGL_DEBUG_GROUP(context, layer.baseImpl->id + " - custom");
 
             // Reset GL state to a known state so the CustomLayer always has a clean slate.
             context.vertexArrayObject = 0;
@@ -317,7 +317,7 @@ void Painter::renderPass(PaintParameters& parameters,
             context.setStencilMode(gl::StencilMode::disabled());
             context.setColorMode(colorModeForRenderPass());
 
-            layer.as<RenderCustomLayer>()->impl->render(state);
+            layer.as<RenderCustomLayer>()->impl().render(state);
 
             // Reset the view back to our original one, just in case the CustomLayer changed
             // the viewport or Framebuffer.
@@ -339,8 +339,8 @@ void Painter::renderPass(PaintParameters& parameters,
             for (auto& tileRef : item.tiles) {
                 auto& tile = tileRef.get();
 
-                MBGL_DEBUG_GROUP(context, layer.baseImpl.id + " - " + util::toString(tile.id));
-                auto bucket = tile.tile.getBucket(layer);
+                MBGL_DEBUG_GROUP(context, layer.baseImpl->id + " - " + util::toString(tile.id));
+                auto bucket = tile.tile.getBucket(*layer.baseImpl);
                 bucket->render(*this, parameters, layer, tile);
             }
 
@@ -366,8 +366,8 @@ void Painter::renderPass(PaintParameters& parameters,
         } else {
             for (auto& tileRef : item.tiles) {
                 auto& tile = tileRef.get();
-                MBGL_DEBUG_GROUP(context, layer.baseImpl.id + " - " + util::toString(tile.id));
-                auto bucket = tile.tile.getBucket(layer);
+                MBGL_DEBUG_GROUP(context, layer.baseImpl->id + " - " + util::toString(tile.id));
+                auto bucket = tile.tile.getBucket(*layer.baseImpl);
                 bucket->render(*this, parameters, layer, tile);
             }
         }

@@ -224,6 +224,8 @@ set(MBGL_CORE_FILES
     src/mbgl/renderer/render_symbol_layer.hpp
     src/mbgl/renderer/render_tile.cpp
     src/mbgl/renderer/render_tile.hpp
+    src/mbgl/renderer/style_diff.cpp
+    src/mbgl/renderer/style_diff.hpp
     src/mbgl/renderer/symbol_bucket.cpp
     src/mbgl/renderer/symbol_bucket.hpp
     src/mbgl/renderer/tile_parameters.hpp
@@ -341,8 +343,6 @@ set(MBGL_CORE_FILES
     src/mbgl/style/source_observer.hpp
     src/mbgl/style/style.cpp
     src/mbgl/style/style.hpp
-    src/mbgl/style/tile_source_impl.cpp
-    src/mbgl/style/tile_source_impl.hpp
     src/mbgl/style/types.cpp
     src/mbgl/style/update_batch.hpp
 
@@ -510,6 +510,7 @@ set(MBGL_CORE_FILES
     include/mbgl/util/geometry.hpp
     include/mbgl/util/ignore.hpp
     include/mbgl/util/image.hpp
+    include/mbgl/util/immutable.hpp
     include/mbgl/util/indexed_tuple.hpp
     include/mbgl/util/interpolate.hpp
     include/mbgl/util/logging.hpp
@@ -559,6 +560,7 @@ set(MBGL_CORE_FILES
     src/mbgl/util/io.cpp
     src/mbgl/util/io.hpp
     src/mbgl/util/logging.cpp
+    src/mbgl/util/longest_common_subsequence.hpp
     src/mbgl/util/mapbox.cpp
     src/mbgl/util/mapbox.hpp
     src/mbgl/util/mat2.cpp

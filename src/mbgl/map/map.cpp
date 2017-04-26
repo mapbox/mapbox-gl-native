@@ -402,7 +402,7 @@ void Map::Impl::loadStyleJSON(const std::string& json) {
         map.setPitch(map.getDefaultPitch());
     }
 
-    onUpdate(Update::Classes | Update::AnnotationStyle);
+    onUpdate(Update::AnnotationStyle);
 }
 
 std::string Map::getStyleURL() const {
@@ -919,7 +919,7 @@ void Map::addLayer(std::unique_ptr<Layer> layer, const optional<std::string>& be
     BackendScope guard(impl->backend);
 
     impl->style->addLayer(std::move(layer), before);
-    impl->onUpdate(Update::Classes);
+    impl->onUpdate(Update::Repaint);
 }
 
 std::unique_ptr<Layer> Map::removeLayer(const std::string& id) {

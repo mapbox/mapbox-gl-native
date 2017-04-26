@@ -12,7 +12,7 @@ class GeoJSONData;
 
 class RenderGeoJSONSource : public RenderSource {
 public:
-    RenderGeoJSONSource(const style::GeoJSONSource::Impl&);
+    RenderGeoJSONSource(Immutable<style::GeoJSONSource::Impl>);
 
     bool isLoaded() const final;
 
@@ -51,7 +51,8 @@ public:
     void dumpDebugLogs() const final;
 
 private:
-    const style::GeoJSONSource::Impl& impl;
+    const style::GeoJSONSource::Impl& impl() const;
+
     TilePyramid tilePyramid;
     style::GeoJSONData* data;
 };

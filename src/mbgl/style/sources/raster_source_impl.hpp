@@ -1,16 +1,25 @@
 #pragma once
 
 #include <mbgl/style/sources/raster_source.hpp>
-#include <mbgl/style/tile_source_impl.hpp>
+#include <mbgl/style/source_impl.hpp>
 
 namespace mbgl {
 namespace style {
 
-class RasterSource::Impl : public TileSourceImpl {
+class RasterSource::Impl : public Source::Impl {
 public:
-    Impl(std::string id, Source&, variant<std::string, Tileset>, uint16_t tileSize);
+    Impl(std::string id, uint16_t tileSize);
+    Impl(const Impl&, Tileset);
 
+    optional<Tileset> getTileset() const;
+    uint16_t getTileSize() const;
+
+    optional<std::string> getAttribution() const final;
     std::unique_ptr<RenderSource> createRenderSource() const final;
+
+private:
+    uint16_t tileSize;
+    optional<Tileset> tileset;
 };
 
 } // namespace style

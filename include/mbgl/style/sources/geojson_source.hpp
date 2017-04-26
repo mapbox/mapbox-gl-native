@@ -5,6 +5,9 @@
 #include <mbgl/util/optional.hpp>
 
 namespace mbgl {
+
+class AsyncRequest;
+
 namespace style {
 
 struct GeoJSONOptions {
@@ -22,21 +25,26 @@ struct GeoJSONOptions {
 class GeoJSONSource : public Source {
 public:
     GeoJSONSource(const std::string& id, const GeoJSONOptions& = {});
+    ~GeoJSONSource() final;
 
     void setURL(const std::string& url);
     void setGeoJSON(const GeoJSON&);
 
     optional<std::string> getURL() const;
 
-    // Private implementation
-
     class Impl;
-    Impl* const impl;
+    const Impl& impl() const;
+
+    void loadDescription(FileSource&) final;
+
+private:
+    optional<std::string> url;
+    std::unique_ptr<AsyncRequest> req;
 };
 
 template <>
 inline bool Source::is<GeoJSONSource>() const {
-    return type == SourceType::GeoJSON;
+    return getType() == SourceType::GeoJSON;
 }
 
 } // namespace style

@@ -8,7 +8,7 @@ namespace mbgl {
 
 class RenderAnnotationSource : public RenderSource {
 public:
-    RenderAnnotationSource(const AnnotationSource::Impl&);
+    RenderAnnotationSource(Immutable<AnnotationSource::Impl>);
 
     bool isLoaded() const final;
 
@@ -47,6 +47,8 @@ public:
     void dumpDebugLogs() const final;
 
 private:
+    const AnnotationSource::Impl& impl() const;
+
     TilePyramid tilePyramid;
 };
 

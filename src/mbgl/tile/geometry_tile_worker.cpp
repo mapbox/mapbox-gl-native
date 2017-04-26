@@ -91,7 +91,7 @@ void GeometryTileWorker::setData(std::unique_ptr<const GeometryTileData> data_, 
     }
 }
 
-void GeometryTileWorker::setLayers(std::vector<std::unique_ptr<Layer>> layers_, uint64_t correlationID_) {
+void GeometryTileWorker::setLayers(std::vector<Immutable<Layer::Impl>> layers_, uint64_t correlationID_) {
     try {
         layers = std::move(layers_);
         correlationID = correlationID_;
@@ -242,11 +242,11 @@ void GeometryTileWorker::requestNewIcons(const IconDependencies& iconDependencie
     }
 }
 
-static std::vector<std::unique_ptr<RenderLayer>> toRenderLayers(const std::vector<std::unique_ptr<style::Layer>>& layers, float zoom) {
+static std::vector<std::unique_ptr<RenderLayer>> toRenderLayers(const std::vector<Immutable<style::Layer::Impl>>& layers, float zoom) {
     std::vector<std::unique_ptr<RenderLayer>> renderLayers;
     renderLayers.reserve(layers.size());
     for (auto& layer : layers) {
-        renderLayers.push_back(layer->baseImpl->createRenderLayer());
+        renderLayers.push_back(layer->createRenderLayer());
 
         renderLayers.back()->cascade(CascadeParameters {
             { ClassID::Default },
@@ -268,8 +268,8 @@ void GeometryTileWorker::redoLayout() {
 
     std::vector<std::string> symbolOrder;
     for (auto it = layers->rbegin(); it != layers->rend(); it++) {
-        if ((*it)->is<SymbolLayer>()) {
-            symbolOrder.push_back((*it)->getID());
+        if ((*it)->type == LayerType::Symbol) {
+            symbolOrder.push_back((*it)->id);
         }
     }
 
@@ -296,7 +296,7 @@ void GeometryTileWorker::redoLayout() {
 
         const RenderLayer& leader = *group.at(0);
 
-        auto geometryLayer = (*data)->getLayer(leader.baseImpl.sourceLayer);
+        auto geometryLayer = (*data)->getLayer(leader.baseImpl->sourceLayer);
         if (!geometryLayer) {
             continue;
         }
@@ -312,8 +312,8 @@ void GeometryTileWorker::redoLayout() {
             symbolLayoutMap.emplace(leader.getID(),
                 leader.as<RenderSymbolLayer>()->createLayout(parameters, group, *geometryLayer, glyphDependencies, iconDependencies));
         } else {
-            const Filter& filter = leader.baseImpl.filter;
-            const std::string& sourceLayerID = leader.baseImpl.sourceLayer;
+            const Filter& filter = leader.baseImpl->filter;
+            const std::string& sourceLayerID = leader.baseImpl->sourceLayer;
             std::shared_ptr<Bucket> bucket = leader.createBucket(parameters, group);
 
             for (std::size_t i = 0; !obsolete && i < geometryLayer->featureCount(); i++) {

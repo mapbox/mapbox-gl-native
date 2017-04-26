@@ -50,11 +50,11 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
       mode(parameters.mode),
       tileSize(util::tileSize * overscaling),
       tilePixelRatio(float(util::EXTENT) / tileSize),
-      textSize(layers.at(0)->as<RenderSymbolLayer>()->impl->layout.unevaluated.get<TextSize>()),
-      iconSize(layers.at(0)->as<RenderSymbolLayer>()->impl->layout.unevaluated.get<IconSize>())
+      textSize(layers.at(0)->as<RenderSymbolLayer>()->impl().layout.unevaluated.get<TextSize>()),
+      iconSize(layers.at(0)->as<RenderSymbolLayer>()->impl().layout.unevaluated.get<IconSize>())
     {
 
-    const SymbolLayer::Impl& leader = *layers.at(0)->as<RenderSymbolLayer>()->impl;
+    const SymbolLayer::Impl& leader = layers.at(0)->as<RenderSymbolLayer>()->impl();
 
     layout = leader.layout.evaluate(PropertyEvaluationParameters(zoom));
 

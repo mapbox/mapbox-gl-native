@@ -27,6 +27,13 @@ public:
     void setFilter(const Filter&);
     const Filter& getFilter() const;
 
+    // Visibility
+    void setVisibility(VisibilityType) final;
+
+    // Zoom range
+    void setMinZoom(float) final;
+    void setMaxZoom(float) final;
+
     // Paint properties
 
     static PropertyValue<float> getDefaultFillExtrusionOpacity();
@@ -74,15 +81,16 @@ public:
     // Private implementation
 
     class Impl;
-    Impl* const impl;
+    const Impl& impl() const;
 
-    FillExtrusionLayer(const Impl&);
-    FillExtrusionLayer(const FillExtrusionLayer&) = delete;
+    Mutable<Impl> mutableImpl() const;
+    FillExtrusionLayer(Immutable<Impl>);
+    std::unique_ptr<Layer> cloneRef(const std::string& id) const final;
 };
 
 template <>
 inline bool Layer::is<FillExtrusionLayer>() const {
-    return type == LayerType::FillExtrusion;
+    return getType() == LayerType::FillExtrusion;
 }
 
 } // namespace style

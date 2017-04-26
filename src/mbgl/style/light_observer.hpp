@@ -1,9 +1,9 @@
 #pragma once
 
-#include <mbgl/style/light.hpp>
-
 namespace mbgl {
 namespace style {
+
+class Light;
 
 class LightObserver {
 public:

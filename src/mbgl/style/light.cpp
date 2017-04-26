@@ -2,16 +2,28 @@
 
 #include <mbgl/style/light.hpp>
 #include <mbgl/style/light_impl.hpp>
+#include <mbgl/style/light_observer.hpp>
 #include <mbgl/style/light_properties.hpp>
 
 namespace mbgl {
 namespace style {
 
+static LightObserver nullObserver;
+
 Light::Light()
-        : impl(std::make_unique<Impl>()) {
+    : impl(makeMutable<Impl>()),
+      observer(&nullObserver) {
 }
 
 Light::~Light() = default;
+
+void Light::setObserver(LightObserver* observer_) {
+    observer = observer_ ? observer_ : &nullObserver;
+}
+
+Mutable<Light::Impl> Light::mutableImpl() const {
+    return makeMutable<Impl>(*impl);
+}
 
 LightAnchorType Light::getDefaultAnchor() {
     return LightAnchor::defaultValue();
@@ -22,13 +34,17 @@ PropertyValue<LightAnchorType> Light::getAnchor() const {
 }
 
 void Light::setAnchor(PropertyValue<LightAnchorType> property) {
-    impl->properties.template get<LightAnchor>().value = property;
-    impl->observer->onLightChanged(*this);
+    auto impl_ = mutableImpl();
+    impl_->properties.template get<LightAnchor>().value = property;
+    impl = std::move(impl_);
+    observer->onLightChanged(*this);
 }
 
 void Light::setAnchorTransition(const TransitionOptions& transition) {
-    impl->properties.template get<LightAnchor>().transition = transition;
-    impl->observer->onLightChanged(*this);
+    auto impl_ = mutableImpl();
+    impl_->properties.template get<LightAnchor>().transition = transition;
+    impl = std::move(impl_);
+    observer->onLightChanged(*this);
 }
 
 TransitionOptions Light::getAnchorTransition() const {
@@ -44,13 +60,17 @@ PropertyValue<Position> Light::getPosition() const {
 }
 
 void Light::setPosition(PropertyValue<Position> property) {
-    impl->properties.template get<LightPosition>().value = property;
-    impl->observer->onLightChanged(*this);
+    auto impl_ = mutableImpl();
+    impl_->properties.template get<LightPosition>().value = property;
+    impl = std::move(impl_);
+    observer->onLightChanged(*this);
 }
 
 void Light::setPositionTransition(const TransitionOptions& transition) {
-    impl->properties.template get<LightPosition>().transition = transition;
-    impl->observer->onLightChanged(*this);
+    auto impl_ = mutableImpl();
+    impl_->properties.template get<LightPosition>().transition = transition;
+    impl = std::move(impl_);
+    observer->onLightChanged(*this);
 }
 
 TransitionOptions Light::getPositionTransition() const {
@@ -66,13 +86,17 @@ PropertyValue<Color> Light::getColor() const {
 }
 
 void Light::setColor(PropertyValue<Color> property) {
-    impl->properties.template get<LightColor>().value = property;
-    impl->observer->onLightChanged(*this);
+    auto impl_ = mutableImpl();
+    impl_->properties.template get<LightColor>().value = property;
+    impl = std::move(impl_);
+    observer->onLightChanged(*this);
 }
 
 void Light::setColorTransition(const TransitionOptions& transition) {
-    impl->properties.template get<LightColor>().transition = transition;
-    impl->observer->onLightChanged(*this);
+    auto impl_ = mutableImpl();
+    impl_->properties.template get<LightColor>().transition = transition;
+    impl = std::move(impl_);
+    observer->onLightChanged(*this);
 }
 
 TransitionOptions Light::getColorTransition() const {
@@ -88,13 +112,17 @@ PropertyValue<float> Light::getIntensity() const {
 }
 
 void Light::setIntensity(PropertyValue<float> property) {
-    impl->properties.template get<LightIntensity>().value = property;
-    impl->observer->onLightChanged(*this);
+    auto impl_ = mutableImpl();
+    impl_->properties.template get<LightIntensity>().value = property;
+    impl = std::move(impl_);
+    observer->onLightChanged(*this);
 }
 
 void Light::setIntensityTransition(const TransitionOptions& transition) {
-    impl->properties.template get<LightIntensity>().transition = transition;
-    impl->observer->onLightChanged(*this);
+    auto impl_ = mutableImpl();
+    impl_->properties.template get<LightIntensity>().transition = transition;
+    impl = std::move(impl_);
+    observer->onLightChanged(*this);
 }
 
 TransitionOptions Light::getIntensityTransition() const {

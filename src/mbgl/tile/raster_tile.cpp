@@ -55,7 +55,7 @@ void RasterTile::onError(std::exception_ptr err) {
     observer->onTileError(*this, err);
 }
 
-Bucket* RasterTile::getBucket(const RenderLayer&) const {
+Bucket* RasterTile::getBucket(const style::Layer::Impl&) const {
     return bucket.get();
 }
 

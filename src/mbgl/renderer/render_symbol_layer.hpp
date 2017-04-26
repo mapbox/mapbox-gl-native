@@ -61,7 +61,7 @@ class GeometryTileLayer;
 
 class RenderSymbolLayer: public RenderLayer {
 public:
-    RenderSymbolLayer(const style::SymbolLayer::Impl&);
+    RenderSymbolLayer(Immutable<style::SymbolLayer::Impl>);
     ~RenderSymbolLayer() final = default;
 
     std::unique_ptr<RenderLayer> clone() const override;
@@ -87,7 +87,7 @@ public:
     float iconSize = 1.0f;
     float textSize = 16.0f;
 
-    const style::SymbolLayer::Impl* const impl;
+    const style::SymbolLayer::Impl& impl() const;
 };
 
 template <>

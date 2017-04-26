@@ -17,16 +17,11 @@ public:
          CustomLayerDeinitializeFunction,
          void* context);
 
-    Impl(const Impl&);
-    ~Impl() final;
-
-    void initialize();
-    void deinitialize();
+    void initialize() const;
+    void deinitialize() const;
     void render(const TransformState&) const;
 
 private:
-    std::unique_ptr<Layer> clone() const override;
-    std::unique_ptr<Layer> cloneRef(const std::string& id) const override;
     void stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>&) const override;
 
     std::unique_ptr<RenderLayer> createRenderLayer() const final;

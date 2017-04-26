@@ -10,13 +10,19 @@ public:
     AnnotationSource();
 
     class Impl;
+    const Impl& impl() const;
+
+private:
+    void loadDescription(FileSource&) final;
+
+    Mutable<Impl> mutableImpl() const;
 };
 
 class AnnotationSource::Impl : public style::Source::Impl {
 public:
-    Impl(Source&);
+    Impl();
 
-    void loadDescription(FileSource&) final;
+    optional<std::string> getAttribution() const final;
     std::unique_ptr<RenderSource> createRenderSource() const final;
 };
 

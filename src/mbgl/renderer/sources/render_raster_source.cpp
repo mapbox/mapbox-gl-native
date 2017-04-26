@@ -6,10 +6,13 @@ namespace mbgl {
 
 using namespace style;
 
-RenderRasterSource::RenderRasterSource(const style::RasterSource::Impl& impl_)
-    : RenderSource(impl_),
-      impl(impl_) {
+RenderRasterSource::RenderRasterSource(Immutable<style::RasterSource::Impl> impl_)
+    : RenderSource(impl_) {
     tilePyramid.setObserver(this);
+}
+
+const style::RasterSource::Impl& RenderRasterSource::impl() const {
+    return static_cast<const style::RasterSource::Impl&>(*baseImpl);
 }
 
 bool RenderRasterSource::isLoaded() const {
@@ -33,7 +36,7 @@ std::map<UnwrappedTileID, RenderTile>& RenderRasterSource::getRenderTiles() {
 }
 
 void RenderRasterSource::updateTiles(const TileParameters& parameters) {
-    optional<Tileset> tileset = impl.getTileset();
+    optional<Tileset> tileset = impl().getTileset();
 
     if (!tileset) {
         return;
@@ -46,7 +49,7 @@ void RenderRasterSource::updateTiles(const TileParameters& parameters) {
 
     tilePyramid.updateTiles(parameters,
                             SourceType::Raster,
-                            impl.getTileSize(),
+                            impl().getTileSize(),
                             tileset->zoomRange,
                             [&] (const OverscaledTileID& tileID) {
                                 return std::make_unique<RasterTile>(tileID, parameters, *tileset);

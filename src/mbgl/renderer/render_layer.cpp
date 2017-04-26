@@ -3,12 +3,17 @@
 
 namespace mbgl {
 
-RenderLayer::RenderLayer(style::LayerType type_, const style::Layer::Impl& baseImpl_)
-        : type(type_), baseImpl(baseImpl_) {
+RenderLayer::RenderLayer(style::LayerType type_, Immutable<style::Layer::Impl> baseImpl_)
+        : type(type_),
+          baseImpl(baseImpl_) {
+}
+
+void RenderLayer::setImpl(Immutable<style::Layer::Impl> impl) {
+    baseImpl = impl;
 }
 
 const std::string& RenderLayer::getID() const {
-    return baseImpl.id;
+    return baseImpl->id;
 }
 
 bool RenderLayer::hasRenderPass(RenderPass pass) const {
@@ -17,9 +22,9 @@ bool RenderLayer::hasRenderPass(RenderPass pass) const {
 
 bool RenderLayer::needsRendering(float zoom) const {
     return passes != RenderPass::None
-           && baseImpl.visibility != style::VisibilityType::None
-           && baseImpl.minZoom <= zoom
-           && baseImpl.maxZoom >= zoom;
+           && baseImpl->visibility != style::VisibilityType::None
+           && baseImpl->minZoom <= zoom
+           && baseImpl->maxZoom >= zoom;
 }
 
 } // namespace mbgl

@@ -7,9 +7,12 @@
 
 namespace mbgl {
 
-RenderFillExtrusionLayer::RenderFillExtrusionLayer(const style::FillExtrusionLayer::Impl& _impl)
-        : RenderLayer(style::LayerType::FillExtrusion, _impl),
-          impl(&_impl) {
+RenderFillExtrusionLayer::RenderFillExtrusionLayer(Immutable<style::FillExtrusionLayer::Impl> _impl)
+    : RenderLayer(style::LayerType::FillExtrusion, _impl) {
+}
+
+const style::FillExtrusionLayer::Impl& RenderFillExtrusionLayer::impl() const {
+    return static_cast<const style::FillExtrusionLayer::Impl&>(*baseImpl);
 }
 
 std::unique_ptr<RenderLayer> RenderFillExtrusionLayer::clone() const {
@@ -21,7 +24,7 @@ std::unique_ptr<Bucket> RenderFillExtrusionLayer::createBucket(const BucketParam
 }
 
 void RenderFillExtrusionLayer::cascade(const CascadeParameters& parameters) {
-    unevaluated = impl->cascading.cascade(parameters, std::move(unevaluated));
+    unevaluated = impl().cascading.cascade(parameters, std::move(unevaluated));
 }
 
 void RenderFillExtrusionLayer::evaluate(const PropertyEvaluationParameters& parameters) {

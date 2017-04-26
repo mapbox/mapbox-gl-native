@@ -28,15 +28,6 @@ using namespace mbgl::style;
 
 namespace {
 
-template <class T, class... Params> void testClone(Params... params) {
-    auto layer = std::make_unique<T>(std::forward<Params>(params)...);
-    auto clone = layer->baseImpl->clone();
-    EXPECT_NE(layer.get(), clone.get());
-    EXPECT_TRUE(reinterpret_cast<typename T::Impl*>(clone->baseImpl.get()));
-    layer->impl->id = "test";
-    EXPECT_EQ("test", layer->baseImpl->clone()->getID());
-}
-
 const auto color = Color { 1, 0, 0, 1 };
 const auto opacity = 1.0f;
 const auto radius = 1.0f;
@@ -60,16 +51,6 @@ const auto contrast = 1.0f;
 const auto duration = 1.0f;
 
 } // namespace
-
-TEST(Layer, Clone) {
-    testClone<BackgroundLayer>("background");
-    testClone<CircleLayer>("circle", "source");
-    testClone<CustomLayer>("custom", [](void*){}, [](void*, const CustomLayerRenderParameters&){}, [](void*){}, nullptr),
-    testClone<FillLayer>("fill", "source");
-    testClone<LineLayer>("line", "source");
-    testClone<RasterLayer>("raster", "source");
-    testClone<SymbolLayer>("symbol", "source");
-}
 
 TEST(Layer, BackgroundProperties) {
     auto layer = std::make_unique<BackgroundLayer>("background");
@@ -222,7 +203,7 @@ TEST(Layer, RasterProperties) {
 TEST(Layer, Observer) {
     auto layer = std::make_unique<LineLayer>("line", "source");
     StubLayerObserver observer;
-    layer->baseImpl->setObserver(&observer);
+    layer->setObserver(&observer);
 
     // Notifies observer on filter change.
     bool filterChanged = false;

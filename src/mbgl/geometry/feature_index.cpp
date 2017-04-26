@@ -61,7 +61,7 @@ static int16_t getAdditionalQueryRadius(const RenderedQueryOptions& queryOptions
     // Determine the additional radius needed factoring in property functions
     float additionalRadius = 0;
     auto getQueryRadius = [&](const RenderLayer& layer) {
-        auto bucket = tile.getBucket(layer);
+        auto bucket = tile.getBucket(*layer.baseImpl);
         if (bucket) {
             additionalRadius = std::max(additionalRadius, bucket->getQueryRadius(layer) * pixelsToTileUnits);
         }

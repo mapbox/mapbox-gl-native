@@ -8,8 +8,7 @@ namespace mbgl {
 
 class RenderRasterLayer: public RenderLayer {
 public:
-
-    RenderRasterLayer(const style::RasterLayer::Impl&);
+    RenderRasterLayer(Immutable<style::RasterLayer::Impl>);
     ~RenderRasterLayer() final = default;
 
     std::unique_ptr<RenderLayer> clone() const override;
@@ -24,7 +23,7 @@ public:
     style::RasterPaintProperties::Unevaluated unevaluated;
     style::RasterPaintProperties::Evaluated evaluated;
 
-    const style::RasterLayer::Impl* const impl;
+    const style::RasterLayer::Impl& impl() const;
 };
 
 template <>

@@ -8,9 +8,12 @@
 
 namespace mbgl {
 
-RenderSymbolLayer::RenderSymbolLayer(const style::SymbolLayer::Impl& _impl)
-        : RenderLayer(style::LayerType::Symbol, _impl),
-          impl(&_impl) {
+RenderSymbolLayer::RenderSymbolLayer(Immutable<style::SymbolLayer::Impl> _impl)
+    : RenderLayer(style::LayerType::Symbol, _impl) {
+}
+
+const style::SymbolLayer::Impl& RenderSymbolLayer::impl() const {
+    return static_cast<const style::SymbolLayer::Impl&>(*baseImpl);
 }
 
 std::unique_ptr<RenderLayer> RenderSymbolLayer::clone() const {
@@ -35,7 +38,7 @@ std::unique_ptr<SymbolLayout> RenderSymbolLayer::createLayout(const BucketParame
 }
 
 void RenderSymbolLayer::cascade(const CascadeParameters& parameters) {
-    unevaluated = impl->cascading.cascade(parameters, std::move(unevaluated));
+    unevaluated = impl().cascading.cascade(parameters, std::move(unevaluated));
 }
 
 void RenderSymbolLayer::evaluate(const PropertyEvaluationParameters& parameters) {

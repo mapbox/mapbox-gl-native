@@ -9,9 +9,13 @@ namespace mbgl {
 
 using namespace style;
 
-RenderAnnotationSource::RenderAnnotationSource(const AnnotationSource::Impl& impl_)
+RenderAnnotationSource::RenderAnnotationSource(Immutable<AnnotationSource::Impl> impl_)
     : RenderSource(impl_) {
     tilePyramid.setObserver(this);
+}
+
+const AnnotationSource::Impl& RenderAnnotationSource::impl() const {
+    return static_cast<const AnnotationSource::Impl&>(*baseImpl);
 }
 
 bool RenderAnnotationSource::isLoaded() const {

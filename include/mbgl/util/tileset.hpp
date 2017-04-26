@@ -18,6 +18,11 @@ public:
     Scheme scheme = Scheme::XYZ;
 
     // TileJSON also includes center, zoom, and bounds, but they are not used by mbgl.
+
+    friend bool operator==(const Tileset& lhs, const Tileset& rhs) {
+        return std::tie(lhs.tiles, lhs.zoomRange, lhs.attribution, lhs.scheme)
+            == std::tie(rhs.tiles, rhs.zoomRange, rhs.attribution, rhs.scheme);
+    }
 };
 
 } // namespace mbgl
