@@ -10,6 +10,7 @@ namespace default_styles {
 struct DefaultStyle {
     const char* url;
     const char* name;
+    const unsigned currentVersion;
 };
 
 extern const DefaultStyle streets;
@@ -23,8 +24,6 @@ const DefaultStyle orderedStyles[] = {
     streets, outdoors, light, dark, satellite, satelliteStreets,
 };
 const size_t numOrderedStyles = sizeof(orderedStyles) / sizeof(DefaultStyle);
-
-static const unsigned currentVersion = 10;
 
 } // end namespace default_styles
 } // end namespace util
