@@ -12,6 +12,9 @@ option(WITH_EGL      "Use EGL backend" OFF)
 
 if(WITH_CXX11ABI)
     set(MASON_CXXABI_SUFFIX -cxx11abi)
+    add_definitions(-D_GLIBCXX_USE_CXX11_ABI=1)
+else()
+    add_definitions(-D_GLIBCXX_USE_CXX11_ABI=0)
 endif()
 
 if(WITH_OSMESA AND WITH_EGL)
