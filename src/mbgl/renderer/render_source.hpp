@@ -21,7 +21,7 @@ class RenderedQueryOptions;
 class SourceQueryOptions;
 class Tile;
 class RenderSourceObserver;
-class UpdateParameters;
+class TileParameters;
 
 namespace algorithm {
 class ClipIDGenerator;
@@ -36,7 +36,7 @@ public:
 
     // Called when the camera has changed. May load new tiles, unload obsolete tiles, or
     // trigger re-placement of existing complete tiles.
-    virtual void updateTiles(const UpdateParameters&) = 0;
+    virtual void updateTiles(const TileParameters&) = 0;
 
     // Removes all tiles (by putting them into the cache).
     virtual void removeTiles() = 0;

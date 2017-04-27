@@ -12,7 +12,7 @@
 #include <mbgl/style/light.hpp>
 #include <mbgl/style/observer.hpp>
 #include <mbgl/style/transition_options.hpp>
-#include <mbgl/renderer/update_parameters.hpp>
+#include <mbgl/renderer/tile_parameters.hpp>
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/renderer/render_source.hpp>
 #include <mbgl/storage/file_source.hpp>
@@ -255,14 +255,14 @@ void Map::Impl::render(View& view) {
         style->relayout();
     }
 
-    UpdateParameters parameters(pixelRatio,
-                                       debugOptions,
-                                       transform.getState(),
-                                       scheduler,
-                                       fileSource,
-                                       mode,
-                                       *annotationManager,
-                                       *style);
+    TileParameters parameters(pixelRatio,
+                              debugOptions,
+                              transform.getState(),
+                              scheduler,
+                              fileSource,
+                              mode,
+                              *annotationManager,
+                              *style);
 
     style->updateTiles(parameters);
 

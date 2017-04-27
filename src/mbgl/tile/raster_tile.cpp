@@ -6,14 +6,14 @@
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
 #include <mbgl/storage/file_source.hpp>
-#include <mbgl/renderer/update_parameters.hpp>
+#include <mbgl/renderer/tile_parameters.hpp>
 #include <mbgl/renderer/raster_bucket.hpp>
 #include <mbgl/util/run_loop.hpp>
 
 namespace mbgl {
 
 RasterTile::RasterTile(const OverscaledTileID& id_,
-                       const UpdateParameters& parameters,
+                       const TileParameters& parameters,
                        const Tileset& tileset)
     : Tile(id_),
       loader(*this, id_, parameters, tileset),

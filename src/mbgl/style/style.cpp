@@ -20,7 +20,7 @@
 #include <mbgl/text/glyph_atlas.hpp>
 #include <mbgl/geometry/line_atlas.hpp>
 #include <mbgl/renderer/render_source.hpp>
-#include <mbgl/renderer/update_parameters.hpp>
+#include <mbgl/renderer/tile_parameters.hpp>
 #include <mbgl/renderer/cascade_parameters.hpp>
 #include <mbgl/renderer/property_evaluation_parameters.hpp>
 #include <mbgl/renderer/render_item.hpp>
@@ -327,7 +327,7 @@ double Style::getDefaultPitch() const {
     return defaultPitch;
 }
 
-void Style::updateTiles(const UpdateParameters& parameters) {
+void Style::updateTiles(const TileParameters& parameters) {
     for (const auto& renderSource : renderSources) {
         if (renderSource->enabled) {
             renderSource->updateTiles(parameters);
