@@ -320,8 +320,6 @@ set(MBGL_CORE_FILES
     src/mbgl/style/source_observer.hpp
     src/mbgl/style/style.cpp
     src/mbgl/style/style.hpp
-    src/mbgl/style/style.hpp
-    src/mbgl/style/style.hpp
     src/mbgl/style/tile_source_impl.cpp
     src/mbgl/style/tile_source_impl.hpp
     src/mbgl/style/transitioning_property.hpp
