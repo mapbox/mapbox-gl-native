@@ -139,6 +139,8 @@ namespace android {
             layer.as<SymbolLayer>()->setSourceLayer(layerId);
         } else if (layer.is<CircleLayer>()) {
             layer.as<CircleLayer>()->setSourceLayer(layerId);
+        } else if(layer.is<FillExtrusionLayer>()) {
+            layer.as<FillExtrusionLayer>()->setSourceLayer(layerId);
         } else {
             mbgl::Log::Warning(mbgl::Event::JNI, "Layer doesn't support source layer");
         }
@@ -156,6 +158,8 @@ namespace android {
             sourceLayerId = layer.as<SymbolLayer>()->getSourceLayer();
         } else if (layer.is<CircleLayer>()) {
             sourceLayerId = layer.as<CircleLayer>()->getSourceLayer();
+        } else if (layer.is<FillExtrusionLayer>()) {
+            sourceLayerId = layer.as<FillExtrusionLayer>()->getSourceLayer();
         } else {
             mbgl::Log::Warning(mbgl::Event::JNI, "Layer doesn't support source layer");
         }
