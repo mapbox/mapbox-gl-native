@@ -1,0 +1,13 @@
+{
+    "Id": "mapboxgl",
+    "Name": "Mapbox GL Native",
+    "QDocModule": "qtlocation",
+    "QtUsage": "Used in the Mapbox GL plugin of Qt Location.",
+
+    "Description": "A library for embedding interactive and customizable vector maps.",
+    "Homepage": "https://github.com/mapbox/mapbox-gl-native",
+    "LicenseId": "BSD-2-Clause",
+    "License": "BSD 2-clause \"Simplified\" License",
+    "LicenseFile": "LICENSE.md",
+    "Copyright": "Copyright Mapbox 2014-2017"
+}
