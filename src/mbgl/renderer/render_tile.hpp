@@ -24,14 +24,25 @@ public:
     Tile& tile;
     ClipID clip;
     mat4 matrix;
+    mat4 nearClippedMatrix;
     bool used = false;
 
     mat4 translatedMatrix(const std::array<float, 2>& translate,
                           style::TranslateAnchorType anchor,
                           const TransformState&) const;
 
-    void recalculateMatrix(const mat4& projMatrix,
+    mat4 translatedClipMatrix(const std::array<float, 2>& translate,
+                              style::TranslateAnchorType anchor,
+                              const TransformState&) const;
+
+    void calculateMatrices(const mat4& projMatrix,
+                           const mat4& projClipMatrix,
                            const TransformState&);
+private:
+    mat4 translateVtxMatrix(const mat4& tileMatrix,
+                            const std::array<float, 2>& translation,
+                            style::TranslateAnchorType anchor,
+                            const TransformState& state) const;
 };
 
 } // namespace mbgl

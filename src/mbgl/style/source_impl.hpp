@@ -60,6 +60,7 @@ public:
 
     void startRender(algorithm::ClipIDGenerator&,
                      const mat4& projMatrix,
+                     const mat4& clipMatrix,
                      const TransformState&);
     void finishRender(Painter&);
 

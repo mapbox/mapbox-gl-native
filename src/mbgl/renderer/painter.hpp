@@ -130,6 +130,7 @@ private:
     gl::Context& context;
 
     mat4 projMatrix;
+    mat4 nearClippedProjMatrix;
 
     std::array<float, 2> pixelsToGLUnits;
 

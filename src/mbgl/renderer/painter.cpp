@@ -152,6 +152,10 @@ void Painter::render(const Style& style, const FrameData& frame_, View& view, Sp
 
     // Update the default matrices to the current viewport dimensions.
     state.getProjMatrix(projMatrix);
+    // Calculate a second projection matrix with the near plane clipped to 100 so as
+    // not to waste lots of depth buffer precision on very close empty space, for layer
+    // types (fill-extrusion) that use the depth buffer to emulate real-world space.
+    state.getProjMatrix(nearClippedProjMatrix, 100);
 
     pixelsToGLUnits = {{ 2.0f  / state.getSize().width, -2.0f / state.getSize().height }};
     if (state.getViewportMode() == ViewportMode::FlippedY) {
@@ -205,7 +209,7 @@ void Painter::render(const Style& style, const FrameData& frame_, View& view, Sp
         // Update all clipping IDs.
         algorithm::ClipIDGenerator generator;
         for (const auto& source : sources) {
-            source->baseImpl->startRender(generator, projMatrix, state);
+            source->baseImpl->startRender(generator, projMatrix, nearClippedProjMatrix, state);
         }
 
         MBGL_DEBUG_GROUP(context, "clipping masks");
@@ -329,29 +333,12 @@ void Painter::renderPass(PaintParameters& parameters,
             context.setDepthMode(depthModeForSublayer(0, gl::DepthMode::ReadWrite));
             context.clear(Color{ 0.0f, 0.0f, 0.0f, 0.0f }, 1.0f, {});
 
-            // Set the near clip plane to 100 so as not to waste lots of depth buffer precision
-            // on very close empty space. Modifying the near clip plane after the fact is either
-            // impossible or very difficult (fun challenge if you are a person who loves/knows
-            // matrix math?), so we have to initialize a new projection matrix from scratch.
-
-            mat4 clippedProjMatrix;
-            state.getProjMatrix(clippedProjMatrix, 100);
-            mat4 cachedTileMatrix;
-
             for (auto& tileRef : item.tiles) {
                 auto& tile = tileRef.get();
-
-                // Cache this tile's matrix so we can reset it later, and recalculate it
-                // using the near-clipped projection matrix:
-                cachedTileMatrix = tile.matrix;
-                tile.recalculateMatrix(clippedProjMatrix, state);
 
                 MBGL_DEBUG_GROUP(context, layer.baseImpl.id + " - " + util::toString(tile.id));
                 auto bucket = tile.tile.getBucket(layer);
                 bucket->render(*this, parameters, layer, tile);
-
-                // Reset tile's full projection matrix for all other rendering
-                tile.matrix = cachedTileMatrix;
             }
 
             parameters.view.bind();
