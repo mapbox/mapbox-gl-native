@@ -1,4 +1,5 @@
 export BUILDTYPE ?= Debug
+export WITH_CXX11ABI ?= $(shell scripts/check-cxx11abi.sh)
 
 ifeq ($(BUILDTYPE), Release)
 else ifeq ($(BUILDTYPE), Debug)
@@ -293,7 +294,7 @@ $(LINUX_BUILD): $(BUILD_DEPS)
 	(cd $(LINUX_OUTPUT_PATH) && cmake -G Ninja ../../.. \
 		-DCMAKE_BUILD_TYPE=$(BUILDTYPE) \
 		-DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
-		-DWITH_CXX11ABI=$(shell scripts/check-cxx11abi.sh) \
+		-DWITH_CXX11ABI=${WITH_CXX11ABI} \
 		-DWITH_COVERAGE=${WITH_COVERAGE} \
 		-DWITH_OSMESA=${WITH_OSMESA} \
 		-DWITH_EGL=${WITH_EGL})
