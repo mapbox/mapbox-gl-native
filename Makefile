@@ -302,6 +302,10 @@ $(LINUX_BUILD): $(BUILD_DEPS)
 .PHONY: linux
 linux: glfw-app render offline
 
+.PHONY: linux-core
+linux-core: $(LINUX_BUILD)
+	$(NINJA) $(NINJA_ARGS) -j$(JOBS) -C $(LINUX_OUTPUT_PATH) mbgl-core
+
 .PHONY: test
 test: $(LINUX_BUILD)
 	$(NINJA) $(NINJA_ARGS) -j$(JOBS) -C $(LINUX_OUTPUT_PATH) mbgl-test
