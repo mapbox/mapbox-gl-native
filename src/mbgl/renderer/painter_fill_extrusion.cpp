@@ -2,7 +2,7 @@
 #include <mbgl/renderer/paint_parameters.hpp>
 #include <mbgl/renderer/fill_extrusion_bucket.hpp>
 #include <mbgl/renderer/render_tile.hpp>
-#include <mbgl/style/layers/fill_extrusion_layer.hpp>
+#include <mbgl/renderer/render_fill_extrusion_layer.hpp>
 #include <mbgl/style/layers/fill_extrusion_layer_impl.hpp>
 #include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/programs/programs.hpp>
@@ -16,9 +16,9 @@ using namespace style;
 
 void Painter::renderFillExtrusion(PaintParameters& parameters,
                                   FillExtrusionBucket& bucket,
-                                  const FillExtrusionLayer& layer,
+                                  const RenderFillExtrusionLayer& layer,
                                   const RenderTile& tile) {
-    const FillExtrusionPaintProperties::Evaluated& properties = layer.impl->paint.evaluated;
+    const FillExtrusionPaintProperties::Evaluated& properties = layer.evaluated;
 
     if (pass == RenderPass::Opaque) {
         return;

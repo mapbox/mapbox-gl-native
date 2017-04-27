@@ -16,8 +16,7 @@
 #include <mbgl/renderer/render_background_layer.hpp>
 #include <mbgl/renderer/render_custom_layer.hpp>
 #include <mbgl/style/layers/custom_layer_impl.hpp>
-#include <mbgl/style/layers/fill_extrusion_layer.hpp>
-#include <mbgl/style/layers/fill_extrusion_layer_impl.hpp>
+#include <mbgl/renderer/render_fill_extrusion_layer.hpp>
 
 #include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/geometry/line_atlas.hpp>
@@ -347,7 +346,7 @@ void Painter::renderPass(PaintParameters& parameters,
                 cachedTileMatrix = tile.matrix;
                 tile.recalculateMatrix(clippedProjMatrix, state);
 
-                MBGL_DEBUG_GROUP(context, layer.baseImpl->id + " - " + util::toString(tile.id));
+                MBGL_DEBUG_GROUP(context, layer.baseImpl.id + " - " + util::toString(tile.id));
                 auto bucket = tile.tile.getBucket(layer);
                 bucket->render(*this, parameters, layer, tile);
 
@@ -369,8 +368,7 @@ void Painter::renderPass(PaintParameters& parameters,
                     uniforms::u_matrix::Value{ viewportMat }, uniforms::u_world::Value{ size },
                     uniforms::u_image::Value{ 1 },
                     uniforms::u_opacity::Value{
-                        layer.as<FillExtrusionLayer>()
-                            ->impl->paint.evaluated.get<FillExtrusionOpacity>() } },
+                        layer.as<RenderFillExtrusionLayer>()->evaluated.get<FillExtrusionOpacity>() } },
                 extrusionTextureVertexBuffer, quadTriangleIndexBuffer,
                 extrusionTextureSegments,
                 ExtrusionTextureProgram::PaintPropertyBinders{ properties, 0 }, properties,
@@ -378,7 +376,7 @@ void Painter::renderPass(PaintParameters& parameters,
         } else {
             for (auto& tileRef : item.tiles) {
                 auto& tile = tileRef.get();
-                MBGL_DEBUG_GROUP(context, layer.baseImpl->id + " - " + util::toString(tile.id));
+                MBGL_DEBUG_GROUP(context, layer.baseImpl.id + " - " + util::toString(tile.id));
                 auto bucket = tile.tile.getBucket(layer);
                 bucket->render(*this, parameters, layer, tile);
             }

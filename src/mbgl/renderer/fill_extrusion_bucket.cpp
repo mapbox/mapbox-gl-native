@@ -170,7 +170,7 @@ float FillExtrusionBucket::getQueryRadius(const RenderLayer& layer) const {
         return 0;
     }
 
-    const std::array<float, 2>& translate = layer.as<RenderFillExtrusionLayer>()->impl->paint.evaluated.get<FillExtrusionTranslate>();
+    const std::array<float, 2>& translate = layer.as<RenderFillExtrusionLayer>()->evaluated.get<FillExtrusionTranslate>();
     return util::length(translate[0], translate[1]);
 }
 
