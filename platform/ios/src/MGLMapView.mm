@@ -42,12 +42,13 @@
 
 #import "NSBundle+MGLAdditions.h"
 #import "NSDate+MGLAdditions.h"
-#import "NSString+MGLAdditions.h"
-#import "NSProcessInfo+MGLAdditions.h"
 #import "NSException+MGLAdditions.h"
+#import "NSPredicate+MGLAdditions.h"
+#import "NSProcessInfo+MGLAdditions.h"
+#import "NSString+MGLAdditions.h"
 #import "NSURL+MGLAdditions.h"
 #import "UIImage+MGLAdditions.h"
-#import "NSPredicate+MGLAdditions.h"
+#import "UIViewController+MGLAdditions.h"
 
 #import "MGLFaux3DUserLocationAnnotationView.h"
 #import "MGLUserLocationAnnotationView.h"
@@ -1948,8 +1949,9 @@ public:
     
     UIViewController *viewController = self.window.rootViewController;
     if ([viewController isKindOfClass:[UINavigationController class]]) {
-        viewController = [(UINavigationController *)viewController viewControllers].firstObject;
+        viewController = ((UINavigationController *)viewController).topViewController;
     }
+    viewController = [UIViewController getTopViewControllerFrom:viewController];
     [viewController presentViewController:attributionController
                                  animated:YES
                                completion:NULL];
