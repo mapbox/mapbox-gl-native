@@ -54,6 +54,7 @@ Style::Style(Scheduler& scheduler_, FileSource& fileSource_, float pixelRatio)
       glyphAtlas(std::make_unique<GlyphAtlas>(Size{ 2048, 2048 }, fileSource)),
       spriteAtlas(std::make_unique<SpriteAtlas>(Size{ 1024, 1024 }, pixelRatio)),
       lineAtlas(std::make_unique<LineAtlas>(Size{ 256, 512 })),
+      light(std::make_unique<Light>()),
       observer(&nullObserver) {
     glyphAtlas->setObserver(this);
     spriteAtlas->setObserver(this);
@@ -141,6 +142,7 @@ void Style::setJSON(const std::string& json) {
     defaultZoom = parser.zoom;
     defaultBearing = parser.bearing;
     defaultPitch = parser.pitch;
+    light = std::make_unique<Light>(parser.light);
 
     glyphAtlas->setURL(parser.glyphURL);
     spriteAtlas->load(parser.spriteURL, scheduler, fileSource);
@@ -352,6 +354,8 @@ void Style::cascade(const TimePoint& timePoint, MapMode mode) {
     for (const auto& layer : renderLayers) {
         layer->cascade(parameters);
     }
+
+    transitioningLight = TransitioningLight(*light, std::move(transitioningLight), parameters);
 }
 
 void Style::recalculate(float z, const TimePoint& timePoint, MapMode mode) {
@@ -370,7 +374,7 @@ void Style::recalculate(float z, const TimePoint& timePoint, MapMode mode) {
         mode == MapMode::Continuous ? util::DEFAULT_FADE_DURATION : Duration::zero()
     };
 
-    hasPendingTransitions = false;
+    hasPendingTransitions = transitioningLight.hasTransition();
     for (const auto& layer : renderLayers) {
         hasPendingTransitions |= layer->evaluate(parameters);
 
@@ -388,6 +392,8 @@ void Style::recalculate(float z, const TimePoint& timePoint, MapMode mode) {
             }
         }
     }
+
+    evaluatedLight = EvaluatedLight(transitioningLight, parameters);
 
     // Remove the existing tiles if we didn't end up re-enabling the source.
     for (const auto& source : sources) {
@@ -509,8 +515,9 @@ RenderData Style::getRenderData(MapDebugOptions debugOptions, float angle) const
             });
         }
 
-        for (auto& tileRef : sortedTiles) {
-            auto& tile = tileRef.get();
+        std::vector<std::reference_wrapper<RenderTile>> sortedTilesForInsertion;
+        for (auto tileIt = sortedTiles.begin(); tileIt != sortedTiles.end(); ++tileIt) {
+            auto& tile = tileIt->get();
             if (!tile.tile.isRenderable()) {
                 continue;
             }
@@ -523,8 +530,9 @@ RenderData Style::getRenderData(MapDebugOptions debugOptions, float angle) const
                 // Look back through the buckets we decided to render to find out whether there is
                 // already a bucket from this layer that is a parent of this tile. Tiles are ordered
                 // by zoom level when we obtain them from getTiles().
-                for (auto it = result.order.rbegin(); it != result.order.rend() && (&it->layer == layer.get()); ++it) {
-                    if (tile.tile.id.isChildOf(it->tile->tile.id)) {
+                for (auto it = sortedTilesForInsertion.rbegin();
+                     it != sortedTilesForInsertion.rend(); ++it) {
+                    if (tile.tile.id.isChildOf(it->get().tile.id)) {
                         skip = true;
                         break;
                     }
@@ -536,10 +544,12 @@ RenderData Style::getRenderData(MapDebugOptions debugOptions, float angle) const
 
             auto bucket = tile.tile.getBucket(*layer);
             if (bucket) {
-                result.order.emplace_back(*layer, &tile, bucket);
+                sortedTilesForInsertion.emplace_back(tile);
                 tile.used = true;
             }
         }
+
+        result.order.emplace_back(*layer, std::move(sortedTilesForInsertion));
     }
 
     return result;

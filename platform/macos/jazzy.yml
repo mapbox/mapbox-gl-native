@@ -71,6 +71,7 @@ custom_categories:
       - MGLVectorStyleLayer
       - MGLCircleStyleLayer
       - MGLFillStyleLayer
+      - MGLFillExtrusionStyleLayer
       - MGLLineStyleLayer
       - MGLSymbolStyleLayer
   - name: Offline Maps

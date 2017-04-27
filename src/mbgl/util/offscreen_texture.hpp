@@ -16,6 +16,7 @@ public:
     ~OffscreenTexture();
 
     void bind() override;
+    void bindRenderbuffers(gl::TextureUnit unit = 0);
 
     PremultipliedImage readStillImage();
 

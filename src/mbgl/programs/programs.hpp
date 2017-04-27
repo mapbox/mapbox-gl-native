@@ -1,7 +1,9 @@
 #pragma once
 
 #include <mbgl/programs/circle_program.hpp>
+#include <mbgl/programs/extrusion_texture_program.hpp>
 #include <mbgl/programs/fill_program.hpp>
+#include <mbgl/programs/fill_extrusion_program.hpp>
 #include <mbgl/programs/line_program.hpp>
 #include <mbgl/programs/raster_program.hpp>
 #include <mbgl/programs/symbol_program.hpp>
@@ -15,7 +17,10 @@ class Programs {
 public:
     Programs(gl::Context& context, const ProgramParameters& programParameters)
         : circle(context, programParameters),
+          extrusionTexture(context, programParameters),
           fill(context, programParameters),
+          fillExtrusion(context, programParameters),
+          fillExtrusionPattern(context, programParameters),
           fillPattern(context, programParameters),
           fillOutline(context, programParameters),
           fillOutlinePattern(context, programParameters),
@@ -31,7 +36,10 @@ public:
     }
 
     CircleProgram circle;
+    ExtrusionTextureProgram extrusionTexture;
     FillProgram fill;
+    FillExtrusionProgram fillExtrusion;
+    FillExtrusionPatternProgram fillExtrusionPattern;
     FillPatternProgram fillPattern;
     FillOutlineProgram fillOutline;
     FillOutlinePatternProgram fillOutlinePattern;

@@ -170,6 +170,7 @@ In style JSON | In the SDK
 `background` | `MGLBackgroundStyleLayer`
 `circle` | `MGLCircleStyleLayer`
 `fill` | `MGLFillStyleLayer`
+`fill-extrusion` | `MGLFillExtrusionStyleLayer`
 `line` | `MGLLineStyleLayer`
 `raster` | `MGLRasterStyleLayer`
 `symbol` | `MGLSymbolStyleLayer`
@@ -194,6 +195,13 @@ In style JSON | In Objective-C | In Swift
 `fill-antialias` | `MGLFillStyleLayer.fillAntialiased` | `MGLFillStyleLayer.isFillAntialiased`
 `fill-translate` | `MGLFillStyleLayer.fillTranslation` | `MGLFillStyleLayer.fillTranslation`
 `fill-translate-anchor` | `MGLFillStyleLayer.fillTranslationAnchor` | `MGLFillStyleLayer.fillTranslationAnchor`
+
+### Fill extrusion style layers
+
+In style JSON | In Objective-C | In Swift
+--------------|----------------|---------
+`fill-extrusion-translate` | `MGLFillExtrusionStyleLayer.fillExtrusionTranslation` | `MGLFillExtrusionStyleLayer.fillExtrusionTranslation`
+`fill-extrusion-translate-anchor` | `MGLFillExtrusionStyleLayer.fillExtrusionTranslationAnchor` | `MGLFillExtrusionStyleLayer.fillExtrusionTranslationAnchor`
 
 ### Line style layers
 

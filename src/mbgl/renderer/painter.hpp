@@ -12,6 +12,7 @@
 #include <mbgl/programs/debug_program.hpp>
 #include <mbgl/programs/program_parameters.hpp>
 #include <mbgl/programs/fill_program.hpp>
+#include <mbgl/programs/extrusion_texture_program.hpp>
 #include <mbgl/programs/raster_program.hpp>
 
 #include <mbgl/style/style.hpp>
@@ -37,12 +38,14 @@ class Tile;
 
 class DebugBucket;
 class FillBucket;
+class FillExtrusionBucket;
 class LineBucket;
 class CircleBucket;
 class SymbolBucket;
 class RasterBucket;
 
 class RenderFillLayer;
+class RenderFillExtrusionLayer;
 class RenderLineLayer;
 class RenderCircleLayer;
 class RenderSymbolLayer;
@@ -82,6 +85,7 @@ public:
     void renderClippingMask(const UnwrappedTileID&, const ClipID&);
     void renderTileDebug(const RenderTile&);
     void renderFill(PaintParameters&, FillBucket&, const RenderFillLayer&, const RenderTile&);
+    void renderFillExtrusion(PaintParameters&, FillExtrusionBucket&, const RenderFillExtrusionLayer&, const RenderTile&);
     void renderLine(PaintParameters&, LineBucket&, const RenderLineLayer&, const RenderTile&);
     void renderCircle(PaintParameters&, CircleBucket&, const RenderCircleLayer&, const RenderTile&);
     void renderSymbol(PaintParameters&, SymbolBucket&, const RenderSymbolLayer&, const RenderTile&);
@@ -126,6 +130,7 @@ private:
     gl::Context& context;
 
     mat4 projMatrix;
+    mat4 nearClippedProjMatrix;
 
     std::array<float, 2> pixelsToGLUnits;
 
@@ -152,6 +157,8 @@ private:
     GlyphAtlas* glyphAtlas = nullptr;
     LineAtlas* lineAtlas = nullptr;
 
+    style::EvaluatedLight evaluatedLight;
+
     FrameHistory frameHistory;
 
     std::unique_ptr<Programs> programs;
@@ -161,13 +168,15 @@ private:
 
     gl::VertexBuffer<FillLayoutVertex> tileVertexBuffer;
     gl::VertexBuffer<RasterLayoutVertex> rasterVertexBuffer;
+    gl::VertexBuffer<ExtrusionTextureLayoutVertex> extrusionTextureVertexBuffer;
 
-    gl::IndexBuffer<gl::Triangles> tileTriangleIndexBuffer;
+    gl::IndexBuffer<gl::Triangles> quadTriangleIndexBuffer;
     gl::IndexBuffer<gl::LineStrip> tileBorderIndexBuffer;
 
     gl::SegmentVector<FillAttributes> tileTriangleSegments;
     gl::SegmentVector<DebugAttributes> tileBorderSegments;
     gl::SegmentVector<RasterAttributes> rasterSegments;
+    gl::SegmentVector<ExtrusionTextureAttributes> extrusionTextureSegments;
 };
 
 } // namespace mbgl

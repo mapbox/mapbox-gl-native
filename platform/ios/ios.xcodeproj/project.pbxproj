@@ -453,6 +453,11 @@
 		DD4823761D94AE6C00EB71B7 /* line_filter_style.json in Resources */ = {isa = PBXBuildFile; fileRef = DD4823731D94AE6C00EB71B7 /* line_filter_style.json */; };
 		DD4823771D94AE6C00EB71B7 /* numeric_filter_style.json in Resources */ = {isa = PBXBuildFile; fileRef = DD4823741D94AE6C00EB71B7 /* numeric_filter_style.json */; };
 		DD58A4C61D822BD000E1F038 /* MGLExpressionTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = DD58A4C51D822BD000E1F038 /* MGLExpressionTests.mm */; };
+		FA68F14A1E9D656600F9F6C2 /* MGLFillExtrusionStyleLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = FA68F1481E9D656600F9F6C2 /* MGLFillExtrusionStyleLayer.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		FA68F14B1E9D656600F9F6C2 /* MGLFillExtrusionStyleLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = FA68F1481E9D656600F9F6C2 /* MGLFillExtrusionStyleLayer.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		FA68F14D1E9D656600F9F6C2 /* MGLFillExtrusionStyleLayer.mm in Sources */ = {isa = PBXBuildFile; fileRef = FA68F1491E9D656600F9F6C2 /* MGLFillExtrusionStyleLayer.mm */; };
+		FA68F14E1E9D656600F9F6C2 /* MGLFillExtrusionStyleLayer.mm in Sources */ = {isa = PBXBuildFile; fileRef = FA68F1491E9D656600F9F6C2 /* MGLFillExtrusionStyleLayer.mm */; };
+		FAE1CDCB1E9D79CB00C40B5B /* MGLFillExtrusionStyleLayerTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = FAE1CDC81E9D79C600C40B5B /* MGLFillExtrusionStyleLayerTests.mm */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -914,6 +919,9 @@
 		DD4823731D94AE6C00EB71B7 /* line_filter_style.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = line_filter_style.json; sourceTree = "<group>"; };
 		DD4823741D94AE6C00EB71B7 /* numeric_filter_style.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = numeric_filter_style.json; sourceTree = "<group>"; };
 		DD58A4C51D822BD000E1F038 /* MGLExpressionTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLExpressionTests.mm; path = ../../darwin/test/MGLExpressionTests.mm; sourceTree = "<group>"; };
+		FA68F1481E9D656600F9F6C2 /* MGLFillExtrusionStyleLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLFillExtrusionStyleLayer.h; sourceTree = "<group>"; };
+		FA68F1491E9D656600F9F6C2 /* MGLFillExtrusionStyleLayer.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLFillExtrusionStyleLayer.mm; sourceTree = "<group>"; };
+		FAE1CDC81E9D79C600C40B5B /* MGLFillExtrusionStyleLayerTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLFillExtrusionStyleLayerTests.mm; path = ../../darwin/test/MGLFillExtrusionStyleLayerTests.mm; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -990,6 +998,8 @@
 				35136D381D42271A00C20EFD /* MGLBackgroundStyleLayer.mm */,
 				353933F11D3FB753003F57D7 /* MGLCircleStyleLayer.h */,
 				35136D3B1D42272500C20EFD /* MGLCircleStyleLayer.mm */,
+				FA68F1481E9D656600F9F6C2 /* MGLFillExtrusionStyleLayer.h */,
+				FA68F1491E9D656600F9F6C2 /* MGLFillExtrusionStyleLayer.mm */,
 				35D13AC11D3D19DD00AFB4E0 /* MGLFillStyleLayer.h */,
 				35D13AC21D3D19DD00AFB4E0 /* MGLFillStyleLayer.mm */,
 				3538AA1B1D542239008EC33D /* MGLForegroundStyleLayer.h */,
@@ -1061,6 +1071,7 @@
 				DA2DBBCC1D51E80400D38FF9 /* MGLStyleLayerTests.h */,
 				DA2DBBCD1D51E80400D38FF9 /* MGLStyleLayerTests.m */,
 				DA3C6FF21E2859E700F962BE /* test-Bridging-Header.h */,
+				FAE1CDC81E9D79C600C40B5B /* MGLFillExtrusionStyleLayerTests.mm */,
 				3575797F1D501E09000B822E /* MGLFillStyleLayerTests.mm */,
 				357579821D502AE6000B822E /* MGLRasterStyleLayerTests.mm */,
 				357579841D502AF5000B822E /* MGLSymbolStyleLayerTests.mm */,
@@ -1636,6 +1647,7 @@
 				40CF6DBB1DAC3C6600A4D18B /* MGLShape_Private.h in Headers */,
 				4018B1CA1CDC288E00F666AF /* MGLAnnotationView.h in Headers */,
 				35E79F201D41266300957B9E /* MGLStyleLayer_Private.h in Headers */,
+				FA68F14A1E9D656600F9F6C2 /* MGLFillExtrusionStyleLayer.h in Headers */,
 				353933FB1D3FB7C0003F57D7 /* MGLRasterStyleLayer.h in Headers */,
 				DA8847EF1CBAFA5100AB86E3 /* MGLAccountManager.h in Headers */,
 				DA8848511CBAFB9800AB86E3 /* MGLAPIClient.h in Headers */,
@@ -1719,6 +1731,7 @@
 				35B82BF91D6C5F8400B1B721 /* NSPredicate+MGLAdditions.h in Headers */,
 				DA35A2CA1CCAAAD200E826B2 /* NSValue+MGLAdditions.h in Headers */,
 				350098BC1D480108004B2AF0 /* MGLVectorSource.h in Headers */,
+				FA68F14B1E9D656600F9F6C2 /* MGLFillExtrusionStyleLayer.h in Headers */,
 				353933FC1D3FB7C0003F57D7 /* MGLRasterStyleLayer.h in Headers */,
 				3566C76D1D4A8DFA008152BC /* MGLRasterSource.h in Headers */,
 				DAED38641D62D0FC00D7640F /* NSURL+MGLAdditions.h in Headers */,
@@ -2151,6 +2164,7 @@
 				DA2E88621CC0382C00F24E7B /* MGLOfflinePackTests.m in Sources */,
 				55E2AD131E5B125400E8C587 /* MGLOfflineStorageTests.mm in Sources */,
 				920A3E5D1E6F995200C16EFC /* MGLSourceQueryTests.m in Sources */,
+				FAE1CDCB1E9D79CB00C40B5B /* MGLFillExtrusionStyleLayerTests.mm in Sources */,
 				DA35A2AA1CCA058D00E826B2 /* MGLCoordinateFormatterTests.m in Sources */,
 				357579831D502AE6000B822E /* MGLRasterStyleLayerTests.mm in Sources */,
 				353D23961D0B0DFE002BE09D /* MGLAnnotationViewTests.m in Sources */,
@@ -2216,6 +2230,7 @@
 				DA88481F1CBAFA6200AB86E3 /* MGLMultiPoint.mm in Sources */,
 				DA88482B1CBAFA6200AB86E3 /* MGLTypes.m in Sources */,
 				4018B1C71CDC287F00F666AF /* MGLAnnotationView.mm in Sources */,
+				FA68F14D1E9D656600F9F6C2 /* MGLFillExtrusionStyleLayer.mm in Sources */,
 				404C26E41D89B877000AA13D /* MGLTileSource.mm in Sources */,
 				355AE0011E9281DA00F3939D /* MGLScaleBar.mm in Sources */,
 				DA88481D1CBAFA6200AB86E3 /* MGLMapCamera.mm in Sources */,
@@ -2295,6 +2310,7 @@
 				DAA4E4301CBB730400178DFB /* MGLLocationManager.m in Sources */,
 				DAA4E4321CBB730400178DFB /* MGLMapView.mm in Sources */,
 				DAA4E41E1CBB730400178DFB /* MGLMapCamera.mm in Sources */,
+				FA68F14E1E9D656600F9F6C2 /* MGLFillExtrusionStyleLayer.mm in Sources */,
 				404C26E51D89B877000AA13D /* MGLTileSource.mm in Sources */,
 				355AE0021E9281DA00F3939D /* MGLScaleBar.mm in Sources */,
 				4018B1C81CDC287F00F666AF /* MGLAnnotationView.mm in Sources */,

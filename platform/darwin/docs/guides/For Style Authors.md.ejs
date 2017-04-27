@@ -240,7 +240,7 @@ whose names differ from the style specification are listed below:
 <% for (const type in renamedProperties) { -%>
 <% if (renamedProperties.hasOwnProperty(type)) { -%>
 
-### <%- camelize(type) %> style layers
+### <%- camelize(unhyphenate(type)) %> style layers
 
 In style JSON | In Objective-C | In Swift
 --------------|----------------|---------

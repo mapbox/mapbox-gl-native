@@ -82,6 +82,7 @@ set(MBGL_TEST_FILES
     test/style/conversion/function.test.cpp
     test/style/conversion/geojson_options.test.cpp
     test/style/conversion/layer.test.cpp
+    test/style/conversion/light.test.cpp
     test/style/conversion/stringify.test.cpp
 
     # style
@@ -125,6 +126,7 @@ set(MBGL_TEST_FILES
     test/util/merge_lines.test.cpp
     test/util/number_conversions.test.cpp
     test/util/offscreen_texture.test.cpp
+    test/util/position.test.cpp
     test/util/projection.test.cpp
     test/util/run_loop.test.cpp
     test/util/text_conversions.test.cpp

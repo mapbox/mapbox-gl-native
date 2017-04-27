@@ -6,6 +6,7 @@
 #include <mbgl/style/layer_observer.hpp>
 #include <mbgl/style/update_batch.hpp>
 #include <mbgl/renderer/render_layer.hpp>
+#include <mbgl/style/light_impl.hpp>
 #include <mbgl/text/glyph_atlas_observer.hpp>
 #include <mbgl/sprite/sprite_atlas_observer.hpp>
 #include <mbgl/map/mode.hpp>
@@ -119,6 +120,10 @@ public:
     std::unique_ptr<GlyphAtlas> glyphAtlas;
     std::unique_ptr<SpriteAtlas> spriteAtlas;
     std::unique_ptr<LineAtlas> lineAtlas;
+
+    std::unique_ptr<Light> light;
+    TransitioningLight transitioningLight;
+    EvaluatedLight evaluatedLight;
 
 private:
     std::vector<std::unique_ptr<Source>> sources;

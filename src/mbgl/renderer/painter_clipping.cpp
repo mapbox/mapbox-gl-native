@@ -26,7 +26,7 @@ void Painter::renderClippingMask(const UnwrappedTileID& tileID, const ClipID& cl
             uniforms::u_world::Value{ context.viewport.getCurrentValue().size },
         },
         tileVertexBuffer,
-        tileTriangleIndexBuffer,
+        quadTriangleIndexBuffer,
         tileTriangleSegments,
         paintAttibuteData,
         properties,

@@ -49,7 +49,7 @@ void Painter::renderBackground(PaintParameters& parameters, const RenderBackgrou
                     state
                 ),
                 tileVertexBuffer,
-                tileTriangleIndexBuffer,
+                quadTriangleIndexBuffer,
                 tileTriangleSegments,
                 paintAttibuteData,
                 properties,
@@ -69,7 +69,7 @@ void Painter::renderBackground(PaintParameters& parameters, const RenderBackgrou
                     uniforms::u_world::Value{ context.viewport.getCurrentValue().size },
                 },
                 tileVertexBuffer,
-                tileTriangleIndexBuffer,
+                quadTriangleIndexBuffer,
                 tileTriangleSegments,
                 paintAttibuteData,
                 properties,

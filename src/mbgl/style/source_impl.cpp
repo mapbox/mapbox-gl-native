@@ -57,8 +57,9 @@ void Source::Impl::invalidateTiles() {
 }
 
 void Source::Impl::startRender(algorithm::ClipIDGenerator& generator,
-                         const mat4& projMatrix,
-                         const TransformState& transform) {
+                               const mat4& projMatrix,
+                               const mat4& clipMatrix,
+                               const TransformState& transform) {
     if (type == SourceType::Vector ||
         type == SourceType::GeoJSON ||
         type == SourceType::Annotations) {
@@ -67,8 +68,7 @@ void Source::Impl::startRender(algorithm::ClipIDGenerator& generator,
 
     for (auto& pair : renderTiles) {
         auto& tile = pair.second;
-        transform.matrixFor(tile.matrix, tile.id);
-        matrix::multiply(tile.matrix, projMatrix, tile.matrix);
+        tile.calculateMatrices(projMatrix, clipMatrix, transform);
     }
 }
 

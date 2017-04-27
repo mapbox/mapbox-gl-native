@@ -24,7 +24,7 @@ public:
 
     // Matrix
     void matrixFor(mat4&, const UnwrappedTileID&) const;
-    void getProjMatrix(mat4& matrix) const;
+    void getProjMatrix(mat4& matrix, uint16_t nearZ = 1) const;
 
     // Dimensions
     Size getSize() const;

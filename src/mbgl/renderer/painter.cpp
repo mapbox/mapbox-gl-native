@@ -16,6 +16,7 @@
 #include <mbgl/renderer/render_background_layer.hpp>
 #include <mbgl/renderer/render_custom_layer.hpp>
 #include <mbgl/style/layers/custom_layer_impl.hpp>
+#include <mbgl/renderer/render_fill_extrusion_layer.hpp>
 
 #include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/geometry/line_atlas.hpp>
@@ -53,7 +54,7 @@ static gl::VertexVector<FillLayoutVertex> tileVertices() {
     return result;
 }
 
-static gl::IndexVector<gl::Triangles> tileTriangleIndices() {
+static gl::IndexVector<gl::Triangles> quadTriangleIndices() {
     gl::IndexVector<gl::Triangles> result;
     result.emplace_back(0, 1, 2);
     result.emplace_back(1, 2, 3);
@@ -79,6 +80,16 @@ static gl::VertexVector<RasterLayoutVertex> rasterVertices() {
     return result;
 }
 
+static gl::VertexVector<ExtrusionTextureLayoutVertex> extrusionTextureVertices() {
+    gl::VertexVector<ExtrusionTextureLayoutVertex> result;
+    result.emplace_back(ExtrusionTextureProgram::layoutVertex({ 0, 0 }));
+    result.emplace_back(ExtrusionTextureProgram::layoutVertex({ 1, 0 }));
+    result.emplace_back(ExtrusionTextureProgram::layoutVertex({ 0, 1 }));
+    result.emplace_back(ExtrusionTextureProgram::layoutVertex({ 1, 1 }));
+    return result;
+}
+
+
 Painter::Painter(gl::Context& context_,
                  const TransformState& state_,
                  float pixelRatio,
@@ -87,12 +98,14 @@ Painter::Painter(gl::Context& context_,
       state(state_),
       tileVertexBuffer(context.createVertexBuffer(tileVertices())),
       rasterVertexBuffer(context.createVertexBuffer(rasterVertices())),
-      tileTriangleIndexBuffer(context.createIndexBuffer(tileTriangleIndices())),
+      extrusionTextureVertexBuffer(context.createVertexBuffer(extrusionTextureVertices())),
+      quadTriangleIndexBuffer(context.createIndexBuffer(quadTriangleIndices())),
       tileBorderIndexBuffer(context.createIndexBuffer(tileLineStripIndices())) {
 
     tileTriangleSegments.emplace_back(0, 0, 4, 6);
     tileBorderSegments.emplace_back(0, 0, 4, 5);
     rasterSegments.emplace_back(0, 0, 4, 6);
+    extrusionTextureSegments.emplace_back(0, 0, 4, 6);
 
     programs = std::make_unique<Programs>(context,
                                           ProgramParameters{ pixelRatio, false, programCacheDir });
@@ -131,12 +144,18 @@ void Painter::render(const Style& style, const FrameData& frame_, View& view, Sp
     spriteAtlas = style.spriteAtlas.get();
     lineAtlas = style.lineAtlas.get();
 
+    evaluatedLight = style.evaluatedLight;
+
     RenderData renderData = style.getRenderData(frame.debugOptions, state.getAngle());
     const std::vector<RenderItem>& order = renderData.order;
     const std::unordered_set<Source*>& sources = renderData.sources;
 
     // Update the default matrices to the current viewport dimensions.
     state.getProjMatrix(projMatrix);
+    // Calculate a second projection matrix with the near plane clipped to 100 so as
+    // not to waste lots of depth buffer precision on very close empty space, for layer
+    // types (fill-extrusion) that use the depth buffer to emulate real-world space.
+    state.getProjMatrix(nearClippedProjMatrix, 100);
 
     pixelsToGLUnits = {{ 2.0f  / state.getSize().width, -2.0f / state.getSize().height }};
     if (state.getViewportMode() == ViewportMode::FlippedY) {
@@ -160,8 +179,11 @@ void Painter::render(const Style& style, const FrameData& frame_, View& view, Sp
         annotationSpriteAtlas.upload(context, 0);
 
         for (const auto& item : order) {
-            if (item.bucket && item.bucket->needsUpload()) {
-                item.bucket->upload(context);
+            for (const auto& tileRef : item.tiles) {
+                const auto& bucket = tileRef.get().tile.getBucket(item.layer);
+                if (bucket && bucket->needsUpload()) {
+                    bucket->upload(context);
+                }
             }
         }
     }
@@ -187,7 +209,7 @@ void Painter::render(const Style& style, const FrameData& frame_, View& view, Sp
         // Update all clipping IDs.
         algorithm::ClipIDGenerator generator;
         for (const auto& source : sources) {
-            source->baseImpl->startRender(generator, projMatrix, state);
+            source->baseImpl->startRender(generator, projMatrix, nearClippedProjMatrix, state);
         }
 
         MBGL_DEBUG_GROUP(context, "clipping masks");
@@ -208,7 +230,6 @@ void Painter::render(const Style& style, const FrameData& frame_, View& view, Sp
     // Actually render the layers
     if (debug::renderTree) { Log::Info(Event::Render, "{"); indent++; }
 
-    // TODO: Correctly compute the number of layers recursively beforehand.
     depthRangeSize = 1 - (order.size() + 2) * numSublayers * depthEpsilon;
 
     // - OPAQUE PASS -------------------------------------------------------------------------------
@@ -302,9 +323,50 @@ void Painter::renderPass(PaintParameters& parameters,
             // the viewport or Framebuffer.
             parameters.view.bind();
             context.setDirtyState();
+        } else if (layer.is<RenderFillExtrusionLayer>()) {
+            const auto size = context.viewport.getCurrentValue().size;
+
+            OffscreenTexture texture(context, size);
+            texture.bindRenderbuffers(1);
+
+            context.setStencilMode(gl::StencilMode::disabled());
+            context.setDepthMode(depthModeForSublayer(0, gl::DepthMode::ReadWrite));
+            context.clear(Color{ 0.0f, 0.0f, 0.0f, 0.0f }, 1.0f, {});
+
+            for (auto& tileRef : item.tiles) {
+                auto& tile = tileRef.get();
+
+                MBGL_DEBUG_GROUP(context, layer.baseImpl.id + " - " + util::toString(tile.id));
+                auto bucket = tile.tile.getBucket(layer);
+                bucket->render(*this, parameters, layer, tile);
+            }
+
+            parameters.view.bind();
+
+            mat4 viewportMat;
+            matrix::ortho(viewportMat, 0, size.width, size.height, 0, 0, 1);
+
+            const PaintProperties<>::Evaluated properties{};
+
+            parameters.programs.extrusionTexture.draw(
+                context, gl::Triangles(), gl::DepthMode::disabled(), gl::StencilMode::disabled(),
+                colorModeForRenderPass(),
+                ExtrusionTextureProgram::UniformValues{
+                    uniforms::u_matrix::Value{ viewportMat }, uniforms::u_world::Value{ size },
+                    uniforms::u_image::Value{ 1 },
+                    uniforms::u_opacity::Value{
+                        layer.as<RenderFillExtrusionLayer>()->evaluated.get<FillExtrusionOpacity>() } },
+                extrusionTextureVertexBuffer, quadTriangleIndexBuffer,
+                extrusionTextureSegments,
+                ExtrusionTextureProgram::PaintPropertyBinders{ properties, 0 }, properties,
+                state.getZoom());
         } else {
-            MBGL_DEBUG_GROUP(context, layer.baseImpl.id + " - " + util::toString(item.tile->id));
-            item.bucket->render(*this, parameters, layer, *item.tile);
+            for (auto& tileRef : item.tiles) {
+                auto& tile = tileRef.get();
+                MBGL_DEBUG_GROUP(context, layer.baseImpl.id + " - " + util::toString(tile.id));
+                auto bucket = tile.tile.getBucket(layer);
+                bucket->render(*this, parameters, layer, tile);
+            }
         }
     }
 

@@ -2,6 +2,7 @@
 #include <mbgl/tile/tile_id.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/interpolate.hpp>
+#include <mbgl/util/projection.hpp>
 #include <mbgl/math/log2.hpp>
 #include <mbgl/math/clamp.hpp>
 
@@ -26,7 +27,7 @@ void TransformState::matrixFor(mat4& matrix, const UnwrappedTileID& tileID) cons
     matrix::scale(matrix, matrix, s / util::EXTENT, s / util::EXTENT, 1);
 }
 
-void TransformState::getProjMatrix(mat4& projMatrix) const {
+void TransformState::getProjMatrix(mat4& projMatrix, uint16_t nearZ) const {
     if (size.isEmpty()) {
         return;
     }
@@ -45,7 +46,7 @@ void TransformState::getProjMatrix(mat4& projMatrix) const {
     // Add a bit extra to avoid precision problems when a fragment's distance is exactly `furthestDistance`
     const double farZ = furthestDistance * 1.01;
 
-    matrix::perspective(projMatrix, getFieldOfView(), double(size.width) / size.height, 1, farZ);
+    matrix::perspective(projMatrix, getFieldOfView(), double(size.width) / size.height, nearZ, farZ);
 
     const bool flippedY = viewportMode == ViewportMode::FlippedY;
     matrix::scale(projMatrix, projMatrix, 1, flippedY ? 1 : -1, 1);
@@ -64,6 +65,9 @@ void TransformState::getProjMatrix(mat4& projMatrix) const {
 
     matrix::translate(projMatrix, projMatrix, pixel_x() - size.width / 2.0f,
                       pixel_y() - size.height / 2.0f, 0);
+
+    matrix::scale(projMatrix, projMatrix, 1, 1,
+                  1.0 / Projection::getMetersPerPixelAtLatitude(getLatLng(LatLng::Unwrapped).latitude(), getZoom()));
 }
 
 #pragma mark - Dimensions
@@ -232,7 +236,6 @@ bool TransformState::isPanning() const {
 bool TransformState::isGestureInProgress() const {
     return gestureInProgress;
 }
-
 
 #pragma mark - Projection
 

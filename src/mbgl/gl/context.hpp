@@ -81,7 +81,9 @@ public:
 
     template <RenderbufferType type>
     Renderbuffer<type> createRenderbuffer(const Size size) {
-        static_assert(type == RenderbufferType::RGBA || type == RenderbufferType::DepthStencil,
+        static_assert(type == RenderbufferType::RGBA ||
+                      type == RenderbufferType::DepthStencil ||
+                      type == RenderbufferType::DepthComponent,
                       "invalid renderbuffer type");
         return { size, createRenderbuffer(type, size) };
     }
@@ -92,6 +94,8 @@ public:
     Framebuffer createFramebuffer(const Texture&,
                                   const Renderbuffer<RenderbufferType::DepthStencil>&);
     Framebuffer createFramebuffer(const Texture&);
+    Framebuffer createFramebuffer(const Texture&,
+                                  const Renderbuffer<RenderbufferType::DepthComponent>&);
 
     template <typename Image,
               TextureFormat format = Image::channels == 4 ? TextureFormat::RGBA
