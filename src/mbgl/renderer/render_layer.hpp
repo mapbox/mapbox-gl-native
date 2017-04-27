@@ -12,11 +12,8 @@ namespace mbgl {
 
 class Bucket;
 class BucketParameters;
-
-namespace style {
 class CascadeParameters;
 class PropertyEvaluationParameters;
-} // namespace style
 
 class RenderLayer {
 
@@ -33,11 +30,11 @@ public:
     virtual std::unique_ptr<RenderLayer> clone() const = 0;
 
     // Partially evaluate paint properties based on a set of classes.
-    virtual void cascade(const style::CascadeParameters&) = 0;
+    virtual void cascade(const CascadeParameters&) = 0;
 
     // Fully evaluate cascaded paint properties based on a zoom level.
     // Returns true if any paint properties have active transitions.
-    virtual bool evaluate(const style::PropertyEvaluationParameters&) = 0;
+    virtual bool evaluate(const PropertyEvaluationParameters&) = 0;
 
     // Check whether this layer is of the given subtype.
     template <class T>

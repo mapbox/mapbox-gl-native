@@ -1,16 +1,16 @@
 #pragma once
 
-#include <mbgl/style/transitioning_property.hpp>
 #include <mbgl/style/class_dictionary.hpp>
 #include <mbgl/style/property_value.hpp>
 #include <mbgl/style/data_driven_property_value.hpp>
-#include <mbgl/style/property_evaluator.hpp>
-#include <mbgl/style/cross_faded_property_evaluator.hpp>
-#include <mbgl/style/data_driven_property_evaluator.hpp>
-#include <mbgl/style/property_evaluation_parameters.hpp>
 #include <mbgl/style/transition_options.hpp>
-#include <mbgl/style/cascade_parameters.hpp>
-#include <mbgl/style/paint_property_binder.hpp>
+#include <mbgl/renderer/property_evaluator.hpp>
+#include <mbgl/renderer/cross_faded_property_evaluator.hpp>
+#include <mbgl/renderer/data_driven_property_evaluator.hpp>
+#include <mbgl/renderer/property_evaluation_parameters.hpp>
+#include <mbgl/renderer/cascade_parameters.hpp>
+#include <mbgl/renderer/transitioning_property.hpp>
+#include <mbgl/renderer/paint_property_binder.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/interpolate.hpp>
 #include <mbgl/util/indexed_tuple.hpp>

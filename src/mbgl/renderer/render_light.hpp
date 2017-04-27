@@ -1,14 +1,13 @@
 #pragma once
 
 #include <mbgl/style/light.hpp>
-#include <mbgl/style/transitioning_property.hpp>
-#include <mbgl/style/cascade_parameters.hpp>
-#include <mbgl/style/property_evaluator.hpp>
-#include <mbgl/style/property_evaluation_parameters.hpp>
+#include <mbgl/renderer/transitioning_property.hpp>
+#include <mbgl/renderer/cascade_parameters.hpp>
+#include <mbgl/renderer/property_evaluator.hpp>
+#include <mbgl/renderer/property_evaluation_parameters.hpp>
 #include <mbgl/util/ignore.hpp>
 
 namespace mbgl {
-namespace style {
 
 template <class TypeList>
 class Transitioning;
@@ -67,8 +66,7 @@ public:
         } {}
 };
 
-using TransitioningLight = Transitioning<LightProperties>;
-using EvaluatedLight     = Evaluated<LightProperties>;
+using TransitioningLight = Transitioning<style::LightProperties>;
+using EvaluatedLight     = Evaluated<style::LightProperties>;
 
-} // namespace style
 } // namespace mbgl

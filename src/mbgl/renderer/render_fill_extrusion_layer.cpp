@@ -20,11 +20,11 @@ std::unique_ptr<Bucket> RenderFillExtrusionLayer::createBucket(const BucketParam
     return std::make_unique<FillExtrusionBucket>(parameters, layers);
 }
 
-void RenderFillExtrusionLayer::cascade(const style::CascadeParameters& parameters) {
+void RenderFillExtrusionLayer::cascade(const CascadeParameters& parameters) {
     unevaluated = impl->cascading.cascade(parameters, std::move(unevaluated));
 }
 
-bool RenderFillExtrusionLayer::evaluate(const style::PropertyEvaluationParameters& parameters) {
+bool RenderFillExtrusionLayer::evaluate(const PropertyEvaluationParameters& parameters) {
     evaluated = unevaluated.evaluate(parameters);
 
     passes = (evaluated.get<style::FillExtrusionOpacity>() > 0) ? RenderPass::Translucent

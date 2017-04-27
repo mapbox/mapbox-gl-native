@@ -7,7 +7,7 @@
 #include <mbgl/style/layer_observer.hpp>
 #include <mbgl/style/update_batch.hpp>
 #include <mbgl/renderer/render_layer.hpp>
-#include <mbgl/style/light_impl.hpp>
+#include <mbgl/renderer/render_light.hpp>
 #include <mbgl/text/glyph_atlas_observer.hpp>
 #include <mbgl/sprite/sprite_atlas_observer.hpp>
 #include <mbgl/map/mode.hpp>
@@ -36,11 +36,11 @@ class RenderedQueryOptions;
 class Scheduler;
 class RenderLayer;
 class RenderSource;
+class UpdateParameters;
 
 namespace style {
 
 class Layer;
-class UpdateParameters;
 class QueryParameters;
 
 class Style : public GlyphAtlasObserver,

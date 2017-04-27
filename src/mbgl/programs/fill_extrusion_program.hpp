@@ -10,7 +10,7 @@
 #include <mbgl/util/size.hpp>
 #include <mbgl/style/layers/fill_extrusion_layer_properties.hpp>
 #include <mbgl/style/style.hpp>
-#include <mbgl/style/light_impl.hpp>
+#include <mbgl/renderer/render_light.hpp>
 
 #include <string>
 
@@ -19,10 +19,7 @@ namespace mbgl {
 class SpriteAtlasElement;
 class UnwrappedTileID;
 class TransformState;
-
-namespace style {
 template <class> class Faded;
-} // namespace style
 
 namespace uniforms {
 MBGL_DEFINE_UNIFORM_VECTOR(float, 3, u_lightpos);
@@ -45,7 +42,7 @@ struct FillExtrusionUniforms : gl::Uniforms<
 {
     static Values values(mat4,
                          const TransformState&,
-                         const style::EvaluatedLight&);
+                         const EvaluatedLight&);
 };
 
 struct FillExtrusionPatternUniforms : gl::Uniforms<
@@ -71,11 +68,11 @@ struct FillExtrusionPatternUniforms : gl::Uniforms<
     static Values values(mat4,
                          const SpriteAtlasElement&,
                          const SpriteAtlasElement&,
-                         const style::Faded<std::string>&,
+                         const Faded<std::string>&,
                          const UnwrappedTileID&,
                          const TransformState&,
                          const float,
-                         const style::EvaluatedLight&);
+                         const EvaluatedLight&);
 };
 
 class FillExtrusionProgram : public Program<

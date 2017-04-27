@@ -7,15 +7,13 @@
 
 namespace mbgl {
 
-namespace style {
-
 template <class T>
 class PossiblyEvaluatedPropertyValue {
 private:
     using Value = variant<
         T,
-        SourceFunction<T>,
-        CompositeFunction<T>>;
+        style::SourceFunction<T>,
+        style::CompositeFunction<T>>;
 
     Value value;
 
@@ -46,25 +44,23 @@ public:
     T evaluate(const Feature& feature, float zoom, T defaultValue) const {
         return this->match(
                 [&] (const T& constant) { return constant; },
-                [&] (const SourceFunction<T>& function) {
+                [&] (const style::SourceFunction<T>& function) {
                     return function.evaluate(feature, defaultValue);
                 },
-                [&] (const CompositeFunction<T>& function) {
+                [&] (const style::CompositeFunction<T>& function) {
                     return function.evaluate(zoom, feature, defaultValue);
                 }
         );
     }
 };
 
-} // namespace style
-
 namespace util {
 
 template <typename T>
-struct Interpolator<style::PossiblyEvaluatedPropertyValue<T>> {
-    style::PossiblyEvaluatedPropertyValue<T> operator()(const style::PossiblyEvaluatedPropertyValue<T>& a,
-                                                        const style::PossiblyEvaluatedPropertyValue<T>& b,
-                                                        const double t) const {
+struct Interpolator<PossiblyEvaluatedPropertyValue<T>> {
+    PossiblyEvaluatedPropertyValue<T> operator()(const PossiblyEvaluatedPropertyValue<T>& a,
+                                                 const PossiblyEvaluatedPropertyValue<T>& b,
+                                                 const double t) const {
         if (a.isConstant() && b.isConstant()) {
             return { interpolate(*a.constant(), *b.constant(), t) };
         } else {

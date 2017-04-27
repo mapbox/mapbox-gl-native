@@ -249,13 +249,13 @@ static std::vector<std::unique_ptr<RenderLayer>> toRenderLayers(const std::vecto
     for (auto& layer : layers) {
         renderLayers.push_back(layer->baseImpl->createRenderLayer());
 
-        renderLayers.back()->cascade(style::CascadeParameters {
+        renderLayers.back()->cascade(CascadeParameters {
             { ClassID::Default },
             Clock::time_point::max(),
             TransitionOptions()
         });
 
-        renderLayers.back()->evaluate(style::PropertyEvaluationParameters {
+        renderLayers.back()->evaluate(PropertyEvaluationParameters {
             zoom,
             Clock::time_point::max(),
             ZoomHistory(),

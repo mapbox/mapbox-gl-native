@@ -3,7 +3,6 @@
 #include <mbgl/util/optional.hpp>
 
 namespace mbgl {
-namespace style {
 
 template <class T>
 class PaintPropertyStatistics {
@@ -27,5 +26,4 @@ private:
     optional<float> _max;
 };
 
-} // namespace style
 } // namespace mbgl

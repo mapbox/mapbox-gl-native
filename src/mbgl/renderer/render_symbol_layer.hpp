@@ -66,8 +66,8 @@ public:
 
     std::unique_ptr<RenderLayer> clone() const override;
 
-    void cascade(const style::CascadeParameters&) override;
-    bool evaluate(const style::PropertyEvaluationParameters&) override;
+    void cascade(const CascadeParameters&) override;
+    bool evaluate(const PropertyEvaluationParameters&) override;
 
     style::IconPaintProperties::Evaluated iconPaintProperties() const;
     style::TextPaintProperties::Evaluated textPaintProperties() const;

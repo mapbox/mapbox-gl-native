@@ -10,8 +10,8 @@ class FileSource;
 class AnnotationManager;
 
 namespace style {
-
 class Style;
+} // namespace style
 
 class UpdateParameters {
 public:
@@ -22,7 +22,7 @@ public:
                           FileSource& fileSource_,
                           const MapMode mode_,
                           AnnotationManager& annotationManager_,
-                          Style& style_)
+                          style::Style& style_)
         : pixelRatio(pixelRatio_),
           debugOptions(debugOptions_),
           transformState(transformState_),
@@ -41,8 +41,7 @@ public:
     AnnotationManager& annotationManager;
 
     // TODO: remove
-    Style& style;
+    style::Style& style;
 };
 
-} // namespace style
 } // namespace mbgl

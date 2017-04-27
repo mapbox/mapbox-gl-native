@@ -23,7 +23,7 @@
 
 #include <mbgl/map/transform.hpp>
 #include <mbgl/style/style.hpp>
-#include <mbgl/style/update_parameters.hpp>
+#include <mbgl/renderer/update_parameters.hpp>
 #include <mbgl/style/layers/line_layer.hpp>
 #include <mbgl/annotation/annotation_manager.hpp>
 #include <mbgl/annotation/annotation_source.hpp>
@@ -46,7 +46,7 @@ public:
     AnnotationManager annotationManager { 1.0 };
     style::Style style { threadPool, fileSource, 1.0 };
 
-    style::UpdateParameters updateParameters {
+    UpdateParameters updateParameters {
         1.0,
         MapDebugOptions(),
         transformState,

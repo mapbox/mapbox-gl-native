@@ -7,14 +7,12 @@
 #include <vector>
 
 namespace mbgl {
-namespace style {
 
 class CascadeParameters {
 public:
-    std::vector<ClassID> classes;
+    std::vector<style::ClassID> classes;
     TimePoint now;
-    TransitionOptions transition;
+    style::TransitionOptions transition;
 };
 
-} // namespace style
 } // namespace mbgl

@@ -1,8 +1,8 @@
 #include <iostream>
 #include <mbgl/test/util.hpp>
 
-#include <mbgl/style/property_evaluator.hpp>
-#include <mbgl/style/property_evaluation_parameters.hpp>
+#include <mbgl/renderer/property_evaluator.hpp>
+#include <mbgl/renderer/property_evaluation_parameters.hpp>
 
 using namespace mbgl;
 using namespace mbgl::style;

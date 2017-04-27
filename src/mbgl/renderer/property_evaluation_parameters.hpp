@@ -4,7 +4,6 @@
 #include <mbgl/util/chrono.hpp>
 
 namespace mbgl {
-namespace style {
 
 class PropertyEvaluationParameters {
 public:
@@ -26,5 +25,4 @@ public:
     Duration defaultFadeDuration;
 };
 
-} // namespace style
 } // namespace mbgl

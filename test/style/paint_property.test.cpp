@@ -1,7 +1,7 @@
 #include <mbgl/test/util.hpp>
 
 #include <mbgl/style/paint_property.hpp>
-#include <mbgl/style/transitioning_property.hpp>
+#include <mbgl/renderer/transitioning_property.hpp>
 
 using namespace mbgl;
 using namespace mbgl::style;

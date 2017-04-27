@@ -12,7 +12,7 @@
 #include <mbgl/style/light.hpp>
 #include <mbgl/style/observer.hpp>
 #include <mbgl/style/transition_options.hpp>
-#include <mbgl/style/update_parameters.hpp>
+#include <mbgl/renderer/update_parameters.hpp>
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/renderer/render_source.hpp>
 #include <mbgl/storage/file_source.hpp>
@@ -253,7 +253,7 @@ void Map::Impl::render(View& view) {
         style->relayout();
     }
 
-    style::UpdateParameters parameters(pixelRatio,
+    UpdateParameters parameters(pixelRatio,
                                        debugOptions,
                                        transform.getState(),
                                        scheduler,
