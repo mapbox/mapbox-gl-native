@@ -20,11 +20,11 @@ std::unique_ptr<Bucket> RenderFillLayer::createBucket(const BucketParameters& pa
     return std::make_unique<FillBucket>(parameters, layers);
 }
 
-void RenderFillLayer::cascade(const style::CascadeParameters& parameters) {
+void RenderFillLayer::cascade(const CascadeParameters& parameters) {
     unevaluated = impl->cascading.cascade(parameters, std::move(unevaluated));
 }
 
-bool RenderFillLayer::evaluate(const style::PropertyEvaluationParameters& parameters) {
+bool RenderFillLayer::evaluate(const PropertyEvaluationParameters& parameters) {
     evaluated = unevaluated.evaluate(parameters);
 
     if (unevaluated.get<style::FillOutlineColor>().isUndefined()) {

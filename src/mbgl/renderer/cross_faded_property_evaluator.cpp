@@ -1,13 +1,12 @@
-#include <mbgl/style/cross_faded_property_evaluator.hpp>
+#include <mbgl/renderer/cross_faded_property_evaluator.hpp>
 #include <mbgl/util/chrono.hpp>
 
 #include <cmath>
 
 namespace mbgl {
-namespace style {
 
 template <typename T>
-Faded<T> CrossFadedPropertyEvaluator<T>::operator()(const Undefined&) const {
+Faded<T> CrossFadedPropertyEvaluator<T>::operator()(const style::Undefined&) const {
     return calculate(defaultValue, defaultValue, defaultValue);
 }
 
@@ -17,7 +16,7 @@ Faded<T> CrossFadedPropertyEvaluator<T>::operator()(const T& constant) const {
 }
 
 template <typename T>
-Faded<T> CrossFadedPropertyEvaluator<T>::operator()(const CameraFunction<T>& function) const {
+Faded<T> CrossFadedPropertyEvaluator<T>::operator()(const style::CameraFunction<T>& function) const {
     return calculate(function.evaluate(parameters.z - 1.0f),
                      function.evaluate(parameters.z),
                      function.evaluate(parameters.z + 1.0f));
@@ -38,5 +37,4 @@ Faded<T> CrossFadedPropertyEvaluator<T>::calculate(const T& min, const T& mid, c
 template class CrossFadedPropertyEvaluator<std::string>;
 template class CrossFadedPropertyEvaluator<std::vector<float>>;
 
-} // namespace style
 } // namespace mbgl

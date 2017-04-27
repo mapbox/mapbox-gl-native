@@ -1,11 +1,10 @@
 #pragma once
 
 #include <mbgl/style/property_value.hpp>
-#include <mbgl/style/property_evaluation_parameters.hpp>
+#include <mbgl/renderer/property_evaluation_parameters.hpp>
 #include <mbgl/util/interpolate.hpp>
 
 namespace mbgl {
-namespace style {
 
 template <typename T>
 class Faded {
@@ -26,9 +25,9 @@ public:
         : parameters(parameters_),
           defaultValue(std::move(defaultValue_)) {}
 
-    Faded<T> operator()(const Undefined&) const;
+    Faded<T> operator()(const style::Undefined&) const;
     Faded<T> operator()(const T& constant) const;
-    Faded<T> operator()(const CameraFunction<T>&) const;
+    Faded<T> operator()(const style::CameraFunction<T>&) const;
 
 private:
     Faded<T> calculate(const T& min, const T& mid, const T& max) const;
@@ -37,11 +36,9 @@ private:
     T defaultValue;
 };
 
-} // namespace style
-
 namespace util {
 template <typename T>
-struct Interpolator<style::Faded<T>>
+struct Interpolator<Faded<T>>
     : Uninterpolated {};
 } // namespace util
 

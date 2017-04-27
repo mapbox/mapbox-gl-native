@@ -2,7 +2,7 @@
 #include <mbgl/tile/geometry_tile_data.hpp>
 #include <mbgl/map/query.hpp>
 #include <mbgl/style/style.hpp>
-#include <mbgl/style/update_parameters.hpp>
+#include <mbgl/renderer/update_parameters.hpp>
 
 #include <mapbox/geojsonvt.hpp>
 #include <supercluster.hpp>
@@ -84,7 +84,7 @@ public:
 
 GeoJSONTile::GeoJSONTile(const OverscaledTileID& overscaledTileID,
                          std::string sourceID_,
-                         const style::UpdateParameters& parameters,
+                         const UpdateParameters& parameters,
                          mapbox::geometry::feature_collection<int16_t> features)
     : GeometryTile(overscaledTileID, sourceID_, parameters,
                    *parameters.style.glyphAtlas,

@@ -2,10 +2,10 @@
 #include <mbgl/tile/geometry_tile_worker.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
 #include <mbgl/tile/tile_observer.hpp>
-#include <mbgl/style/update_parameters.hpp>
 #include <mbgl/style/layer_impl.hpp>
 #include <mbgl/style/layers/background_layer.hpp>
 #include <mbgl/style/layers/custom_layer.hpp>
+#include <mbgl/renderer/update_parameters.hpp>
 #include <mbgl/renderer/render_background_layer.hpp>
 #include <mbgl/renderer/render_custom_layer.hpp>
 #include <mbgl/renderer/render_symbol_layer.hpp>
@@ -28,7 +28,7 @@ using namespace style;
 
 GeometryTile::GeometryTile(const OverscaledTileID& id_,
                            std::string sourceID_,
-                           const style::UpdateParameters& parameters,
+                           const UpdateParameters& parameters,
                            GlyphAtlas& glyphAtlas_,
                            SpriteAtlas& spriteAtlas_)
     : Tile(id_),

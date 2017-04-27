@@ -22,10 +22,7 @@ class TransformState;
 class RenderTile;
 class RenderedQueryOptions;
 class SourceQueryOptions;
-
-namespace style {
 class UpdateParameters;
-} // namespace style
 
 class TilePyramid {
 public:
@@ -36,7 +33,7 @@ public:
 
     // Called when the camera has changed. May load new tiles, unload obsolete tiles, or
     // trigger re-placement of existing complete tiles.
-    void updateTiles(const style::UpdateParameters&,
+    void updateTiles(const UpdateParameters&,
                      SourceType type,
                      uint16_t tileSize,
                      Range<uint8_t> zoomRange,

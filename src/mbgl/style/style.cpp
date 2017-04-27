@@ -16,13 +16,13 @@
 #include <mbgl/style/parser.hpp>
 #include <mbgl/style/transition_options.hpp>
 #include <mbgl/style/class_dictionary.hpp>
-#include <mbgl/style/update_parameters.hpp>
-#include <mbgl/style/cascade_parameters.hpp>
-#include <mbgl/style/property_evaluation_parameters.hpp>
 #include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/text/glyph_atlas.hpp>
 #include <mbgl/geometry/line_atlas.hpp>
 #include <mbgl/renderer/render_source.hpp>
+#include <mbgl/renderer/update_parameters.hpp>
+#include <mbgl/renderer/cascade_parameters.hpp>
+#include <mbgl/renderer/property_evaluation_parameters.hpp>
 #include <mbgl/renderer/render_item.hpp>
 #include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/renderer/render_background_layer.hpp>

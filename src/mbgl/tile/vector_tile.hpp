@@ -6,16 +6,13 @@
 namespace mbgl {
 
 class Tileset;
-
-namespace style {
 class UpdateParameters;
-} // namespace style
 
 class VectorTile : public GeometryTile {
 public:
     VectorTile(const OverscaledTileID&,
                std::string sourceID,
-               const style::UpdateParameters&,
+               const UpdateParameters&,
                const Tileset&);
 
     void setNecessity(Necessity) final;

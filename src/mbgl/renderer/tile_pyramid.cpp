@@ -2,7 +2,7 @@
 #include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/renderer/render_source.hpp>
-#include <mbgl/style/update_parameters.hpp>
+#include <mbgl/renderer/update_parameters.hpp>
 #include <mbgl/map/transform.hpp>
 #include <mbgl/map/query.hpp>
 #include <mbgl/text/placement_config.hpp>

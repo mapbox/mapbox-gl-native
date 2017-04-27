@@ -2,8 +2,8 @@
 #include <mbgl/layout/symbol_layout.hpp>
 #include <mbgl/renderer/bucket.hpp>
 #include <mbgl/renderer/bucket_parameters.hpp>
+#include <mbgl/renderer/property_evaluation_parameters.hpp>
 #include <mbgl/style/layers/symbol_layer_impl.hpp>
-#include <mbgl/style/property_evaluation_parameters.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
 
 namespace mbgl {
@@ -34,11 +34,11 @@ std::unique_ptr<SymbolLayout> RenderSymbolLayer::createLayout(const BucketParame
                                           glyphDependencies);
 }
 
-void RenderSymbolLayer::cascade(const style::CascadeParameters& parameters) {
+void RenderSymbolLayer::cascade(const CascadeParameters& parameters) {
     unevaluated = impl->cascading.cascade(parameters, std::move(unevaluated));
 }
 
-bool RenderSymbolLayer::evaluate(const style::PropertyEvaluationParameters& parameters) {
+bool RenderSymbolLayer::evaluate(const PropertyEvaluationParameters& parameters) {
     evaluated = unevaluated.evaluate(parameters);
 
     auto hasIconOpacity = evaluated.get<style::IconColor>().constantOr(Color::black()).a > 0 ||

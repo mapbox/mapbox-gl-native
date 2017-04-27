@@ -8,7 +8,7 @@
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/map/transform.hpp>
 #include <mbgl/style/style.hpp>
-#include <mbgl/style/update_parameters.hpp>
+#include <mbgl/renderer/update_parameters.hpp>
 #include <mbgl/style/layers/circle_layer.hpp>
 #include <mbgl/annotation/annotation_manager.hpp>
 
@@ -27,7 +27,7 @@ public:
     style::Style style { threadPool, fileSource, 1.0 };
     Tileset tileset { { "https://example.com" }, { 0, 22 }, "none" };
 
-    style::UpdateParameters updateParameters {
+    UpdateParameters updateParameters {
         1.0,
         MapDebugOptions(),
         transformState,

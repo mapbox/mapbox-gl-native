@@ -158,7 +158,7 @@ private:
     GlyphAtlas* glyphAtlas = nullptr;
     LineAtlas* lineAtlas = nullptr;
 
-    style::EvaluatedLight evaluatedLight;
+    EvaluatedLight evaluatedLight;
 
     FrameHistory frameHistory;
 

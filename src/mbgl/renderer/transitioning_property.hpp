@@ -8,7 +8,6 @@
 #include <utility>
 
 namespace mbgl {
-namespace style {
 
 template <class Value>
 class TransitioningProperty {
@@ -17,7 +16,7 @@ public:
 
     TransitioningProperty(Value value_,
                           TransitioningProperty<Value> prior_,
-                          TransitionOptions transition,
+                          style::TransitionOptions transition,
                           TimePoint now)
         : begin(now + transition.delay.value_or(Duration::zero())),
           end(begin + transition.duration.value_or(Duration::zero())),
@@ -73,5 +72,4 @@ private:
     Value value;
 };
 
-} // namespace style
 } // namespace mbgl

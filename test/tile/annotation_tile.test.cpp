@@ -6,7 +6,7 @@
 #include <mbgl/map/transform.hpp>
 #include <mbgl/map/query.hpp>
 #include <mbgl/style/style.hpp>
-#include <mbgl/style/update_parameters.hpp>
+#include <mbgl/renderer/update_parameters.hpp>
 #include <mbgl/map/query.hpp>
 #include <mbgl/text/collision_tile.hpp>
 #include <mbgl/geometry/feature_index.hpp>
@@ -26,7 +26,7 @@ public:
     AnnotationManager annotationManager { 1.0 };
     style::Style style { threadPool, fileSource, 1.0 };
 
-    style::UpdateParameters updateParameters {
+    UpdateParameters updateParameters {
         1.0,
         MapDebugOptions(),
         transformState,

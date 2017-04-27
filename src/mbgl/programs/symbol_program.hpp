@@ -105,7 +105,7 @@ public:
                                                     const style::DataDrivenPropertyValue<float>& sizeProperty,
                                                     const float defaultValue);
 
-    virtual SymbolSizeAttributes::Bindings attributeBindings(const style::PossiblyEvaluatedPropertyValue<float> currentValue) const = 0;
+    virtual SymbolSizeAttributes::Bindings attributeBindings(const PossiblyEvaluatedPropertyValue<float> currentValue) const = 0;
     virtual void populateVertexVector(const GeometryTileFeature& feature) = 0;
     virtual UniformValues uniformValues(float currentZoom) const = 0;
     virtual void upload(gl::Context&) = 0;
@@ -155,7 +155,7 @@ public:
         );
     }
     
-    SymbolSizeAttributes::Bindings attributeBindings(const style::PossiblyEvaluatedPropertyValue<float>) const override {
+    SymbolSizeAttributes::Bindings attributeBindings(const PossiblyEvaluatedPropertyValue<float>) const override {
         return SymbolSizeAttributes::Bindings { SymbolSizeAttributes::Attribute::ConstantBinding {{{0, 0, 0}}} };
     }
     void upload(gl::Context&) override {}
@@ -209,7 +209,7 @@ public:
           defaultValue(defaultValue_) {
     }
 
-    SymbolSizeAttributes::Bindings attributeBindings(const style::PossiblyEvaluatedPropertyValue<float> currentValue) const override {
+    SymbolSizeAttributes::Bindings attributeBindings(const PossiblyEvaluatedPropertyValue<float> currentValue) const override {
         if (currentValue.isConstant()) {
             return SymbolSizeAttributes::Bindings { SymbolSizeAttributes::Attribute::ConstantBinding {{{0, 0, 0}}} };
         }
@@ -266,7 +266,7 @@ public:
             return getCoveringStops(stops, tileZoom, tileZoom + 1); }))
     {}
 
-    SymbolSizeAttributes::Bindings attributeBindings(const style::PossiblyEvaluatedPropertyValue<float> currentValue) const override {
+    SymbolSizeAttributes::Bindings attributeBindings(const PossiblyEvaluatedPropertyValue<float> currentValue) const override {
         if (currentValue.isConstant()) {
             return SymbolSizeAttributes::Bindings { SymbolSizeAttributes::Attribute::ConstantBinding {{{0, 0, 0}}} };
         }
@@ -361,7 +361,7 @@ public:
               UniformValues&& uniformValues,
               const gl::VertexBuffer<LayoutVertex>& layoutVertexBuffer,
               const SymbolSizeBinder& symbolSizeBinder,
-              const style::PossiblyEvaluatedPropertyValue<float>& currentSizeValue,
+              const PossiblyEvaluatedPropertyValue<float>& currentSizeValue,
               const gl::IndexBuffer<DrawMode>& indexBuffer,
               const gl::SegmentVector<Attributes>& segments,
               const PaintPropertyBinders& paintPropertyBinders,

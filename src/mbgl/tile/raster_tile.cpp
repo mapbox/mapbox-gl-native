@@ -3,17 +3,17 @@
 #include <mbgl/tile/tile_observer.hpp>
 #include <mbgl/tile/tile_loader_impl.hpp>
 #include <mbgl/style/source.hpp>
-#include <mbgl/style/update_parameters.hpp>
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
 #include <mbgl/storage/file_source.hpp>
+#include <mbgl/renderer/update_parameters.hpp>
 #include <mbgl/renderer/raster_bucket.hpp>
 #include <mbgl/util/run_loop.hpp>
 
 namespace mbgl {
 
 RasterTile::RasterTile(const OverscaledTileID& id_,
-                       const style::UpdateParameters& parameters,
+                       const UpdateParameters& parameters,
                        const Tileset& tileset)
     : Tile(id_),
       loader(*this, id_, parameters, tileset),

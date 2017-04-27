@@ -1,11 +1,10 @@
 #pragma once
 
 #include <mbgl/style/property_value.hpp>
-#include <mbgl/style/property_evaluation_parameters.hpp>
-#include <mbgl/style/possibly_evaluated_property_value.hpp>
+#include <mbgl/renderer/property_evaluation_parameters.hpp>
+#include <mbgl/renderer/possibly_evaluated_property_value.hpp>
 
 namespace mbgl {
-namespace style {
 
 template <typename T>
 class DataDrivenPropertyEvaluator {
@@ -16,7 +15,7 @@ public:
         : parameters(parameters_),
           defaultValue(std::move(defaultValue_)) {}
 
-    ResultType operator()(const Undefined&) const {
+    ResultType operator()(const style::Undefined&) const {
         return ResultType(defaultValue);
     }
 
@@ -24,7 +23,7 @@ public:
         return ResultType(constant);
     }
 
-    ResultType operator()(const CameraFunction<T>& function) const {
+    ResultType operator()(const style::CameraFunction<T>& function) const {
         return ResultType(function.evaluate(parameters.z));
     }
 
@@ -38,5 +37,4 @@ private:
     T defaultValue;
 };
 
-} // namespace style
 } // namespace mbgl

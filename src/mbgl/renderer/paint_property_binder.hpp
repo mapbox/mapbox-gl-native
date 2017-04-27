@@ -4,10 +4,9 @@
 #include <mbgl/gl/attribute.hpp>
 #include <mbgl/gl/uniform.hpp>
 #include <mbgl/util/type_list.hpp>
-#include <mbgl/style/paint_property_statistics.hpp>
+#include <mbgl/renderer/paint_property_statistics.hpp>
 
 namespace mbgl {
-namespace style {
 
 /*
    ZoomInterpolatedAttribute<Attr> is a 'compound' attribute, representing two values of the
@@ -133,7 +132,7 @@ public:
     using Attribute = ZoomInterpolatedAttributeType<A>;
     using AttributeBinding = typename Attribute::Binding;
 
-    SourceFunctionPaintPropertyBinder(SourceFunction<T> function_, T defaultValue_)
+    SourceFunctionPaintPropertyBinder(style::SourceFunction<T> function_, T defaultValue_)
         : function(std::move(function_)),
           defaultValue(std::move(defaultValue_)) {
     }
@@ -167,7 +166,7 @@ public:
     }
 
 private:
-    SourceFunction<T> function;
+    style::SourceFunction<T> function;
     T defaultValue;
     gl::VertexVector<BaseVertex> vertexVector;
     optional<gl::VertexBuffer<BaseVertex>> vertexBuffer;
@@ -184,7 +183,7 @@ public:
     using AttributeBinding = typename Attribute::Binding;
     using Vertex = gl::detail::Vertex<Attribute>;
 
-    CompositeFunctionPaintPropertyBinder(CompositeFunction<T> function_, float zoom, T defaultValue_)
+    CompositeFunctionPaintPropertyBinder(style::CompositeFunction<T> function_, float zoom, T defaultValue_)
         : function(std::move(function_)),
           defaultValue(std::move(defaultValue_)),
           coveringRanges(function.coveringRanges(zoom)) {
@@ -222,8 +221,8 @@ public:
     }
 
 private:
-    using InnerStops = typename CompositeFunction<T>::InnerStops;
-    CompositeFunction<T> function;
+    using InnerStops = typename style::CompositeFunction<T>::InnerStops;
+    style::CompositeFunction<T> function;
     T defaultValue;
     std::tuple<Range<float>, Range<InnerStops>> coveringRanges;
     gl::VertexVector<Vertex> vertexVector;
@@ -237,10 +236,10 @@ PaintPropertyBinder<T, A>::create(const PossiblyEvaluatedPropertyValue<T>& value
         [&] (const T& constant) -> std::unique_ptr<PaintPropertyBinder<T, A>> {
             return std::make_unique<ConstantPaintPropertyBinder<T, A>>(constant);
         },
-        [&] (const SourceFunction<T>& function) {
+        [&] (const style::SourceFunction<T>& function) {
             return std::make_unique<SourceFunctionPaintPropertyBinder<T, A>>(function, defaultValue);
         },
-        [&] (const CompositeFunction<T>& function) {
+        [&] (const style::CompositeFunction<T>& function) {
             return std::make_unique<CompositeFunctionPaintPropertyBinder<T, A>>(function, zoom, defaultValue);
         }
     );
@@ -328,5 +327,4 @@ private:
     Binders binders;
 };
 
-} // namespace style
 } // namespace mbgl
