@@ -8,7 +8,7 @@
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/map/transform.hpp>
 #include <mbgl/style/style.hpp>
-#include <mbgl/renderer/update_parameters.hpp>
+#include <mbgl/renderer/tile_parameters.hpp>
 #include <mbgl/style/layers/circle_layer.hpp>
 #include <mbgl/annotation/annotation_manager.hpp>
 
@@ -27,7 +27,7 @@ public:
     style::Style style { threadPool, fileSource, 1.0 };
     Tileset tileset { { "https://example.com" }, { 0, 22 }, "none" };
 
-    UpdateParameters updateParameters {
+    TileParameters tileParameters {
         1.0,
         MapDebugOptions(),
         transformState,
@@ -49,7 +49,7 @@ TEST(GeoJSONTile, Issue7648) {
         mapbox::geometry::point<int16_t>(0, 0)
     });
 
-    GeoJSONTile tile(OverscaledTileID(0, 0, 0), "source", test.updateParameters, features);
+    GeoJSONTile tile(OverscaledTileID(0, 0, 0), "source", test.tileParameters, features);
 
     StubTileObserver observer;
     observer.tileChanged = [&] (const Tile&) {

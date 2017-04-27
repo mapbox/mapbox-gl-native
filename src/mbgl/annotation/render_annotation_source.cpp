@@ -35,7 +35,7 @@ std::map<UnwrappedTileID, RenderTile>& RenderAnnotationSource::getRenderTiles() 
     return tilePyramid.getRenderTiles();
 }
 
-void RenderAnnotationSource::updateTiles(const UpdateParameters& parameters) {
+void RenderAnnotationSource::updateTiles(const TileParameters& parameters) {
     tilePyramid.updateTiles(parameters,
                             SourceType::Annotations,
                             util::tileSize,

@@ -36,7 +36,7 @@ std::map<UnwrappedTileID, RenderTile>& RenderVectorSource::getRenderTiles() {
     return tilePyramid.getRenderTiles();
 }
 
-void RenderVectorSource::updateTiles(const UpdateParameters& parameters) {
+void RenderVectorSource::updateTiles(const TileParameters& parameters) {
     optional<Tileset> tileset = impl.getTileset();
 
     if (!tileset) {

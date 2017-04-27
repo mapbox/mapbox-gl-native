@@ -2,7 +2,7 @@
 #include <mbgl/tile/tile_loader_impl.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
 #include <mbgl/style/style.hpp>
-#include <mbgl/renderer/update_parameters.hpp>
+#include <mbgl/renderer/tile_parameters.hpp>
 
 #include <protozero/pbf_reader.hpp>
 
@@ -83,7 +83,7 @@ private:
 
 VectorTile::VectorTile(const OverscaledTileID& id_,
                        std::string sourceID_,
-                       const UpdateParameters& parameters,
+                       const TileParameters& parameters,
                        const Tileset& tileset)
     : GeometryTile(id_, sourceID_, parameters,
                    *parameters.style.glyphAtlas,

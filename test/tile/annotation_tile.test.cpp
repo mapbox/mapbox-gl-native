@@ -6,7 +6,7 @@
 #include <mbgl/map/transform.hpp>
 #include <mbgl/map/query.hpp>
 #include <mbgl/style/style.hpp>
-#include <mbgl/renderer/update_parameters.hpp>
+#include <mbgl/renderer/tile_parameters.hpp>
 #include <mbgl/map/query.hpp>
 #include <mbgl/text/collision_tile.hpp>
 #include <mbgl/geometry/feature_index.hpp>
@@ -26,7 +26,7 @@ public:
     AnnotationManager annotationManager { 1.0 };
     style::Style style { threadPool, fileSource, 1.0 };
 
-    UpdateParameters updateParameters {
+    TileParameters tileParameters {
         1.0,
         MapDebugOptions(),
         transformState,
@@ -41,7 +41,7 @@ public:
 // Don't query stale collision tile
 TEST(AnnotationTile, Issue8289) {
     AnnotationTileTest test;
-    AnnotationTile tile(OverscaledTileID(0, 0, 0), test.updateParameters);
+    AnnotationTile tile(OverscaledTileID(0, 0, 0), test.tileParameters);
 
     auto data = std::make_unique<AnnotationTileData>();
     data->layers.emplace("test", AnnotationTileLayer("test"));

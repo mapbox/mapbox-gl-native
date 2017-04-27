@@ -8,7 +8,7 @@
 #include <mbgl/map/transform.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/annotation/annotation_manager.hpp>
-#include <mbgl/renderer/update_parameters.hpp>
+#include <mbgl/renderer/tile_parameters.hpp>
 #include <mbgl/renderer/raster_bucket.hpp>
 
 using namespace mbgl;
@@ -23,7 +23,7 @@ public:
     style::Style style { threadPool, fileSource, 1.0 };
     Tileset tileset { { "https://example.com" }, { 0, 22 }, "none" };
 
-    UpdateParameters updateParameters {
+    TileParameters tileParameters {
         1.0,
         MapDebugOptions(),
         transformState,
@@ -37,7 +37,7 @@ public:
 
 TEST(RasterTile, setError) {
     RasterTileTest test;
-    RasterTile tile(OverscaledTileID(0, 0, 0), test.updateParameters, test.tileset);
+    RasterTile tile(OverscaledTileID(0, 0, 0), test.tileParameters, test.tileset);
     tile.setError(std::make_exception_ptr(std::runtime_error("test")));
     EXPECT_FALSE(tile.isRenderable());
     EXPECT_TRUE(tile.isLoaded());
@@ -46,7 +46,7 @@ TEST(RasterTile, setError) {
 
 TEST(RasterTile, onError) {
     RasterTileTest test;
-    RasterTile tile(OverscaledTileID(0, 0, 0), test.updateParameters, test.tileset);
+    RasterTile tile(OverscaledTileID(0, 0, 0), test.tileParameters, test.tileset);
     tile.onError(std::make_exception_ptr(std::runtime_error("test")));
     EXPECT_FALSE(tile.isRenderable());
     EXPECT_TRUE(tile.isLoaded());
@@ -55,7 +55,7 @@ TEST(RasterTile, onError) {
 
 TEST(RasterTile, onParsed) {
     RasterTileTest test;
-    RasterTile tile(OverscaledTileID(0, 0, 0), test.updateParameters, test.tileset);
+    RasterTile tile(OverscaledTileID(0, 0, 0), test.tileParameters, test.tileset);
     tile.onParsed(std::make_unique<RasterBucket>(UnassociatedImage{}));
     EXPECT_TRUE(tile.isRenderable());
     EXPECT_TRUE(tile.isLoaded());
@@ -64,7 +64,7 @@ TEST(RasterTile, onParsed) {
 
 TEST(RasterTile, onParsedEmpty) {
     RasterTileTest test;
-    RasterTile tile(OverscaledTileID(0, 0, 0), test.updateParameters, test.tileset);
+    RasterTile tile(OverscaledTileID(0, 0, 0), test.tileParameters, test.tileset);
     tile.onParsed(nullptr);
     EXPECT_FALSE(tile.isRenderable());
     EXPECT_TRUE(tile.isLoaded());

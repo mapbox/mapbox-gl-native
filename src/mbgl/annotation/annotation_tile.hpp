@@ -7,12 +7,12 @@
 namespace mbgl {
 
 class AnnotationManager;
-class UpdateParameters;
+class TileParameters;
 
 class AnnotationTile : public GeometryTile {
 public:
     AnnotationTile(const OverscaledTileID&,
-                   const UpdateParameters&);
+                   const TileParameters&);
     ~AnnotationTile() override;
 
     void setNecessity(Necessity) final;

@@ -11,6 +11,7 @@
 #include <mbgl/renderer/sources/render_raster_source.hpp>
 #include <mbgl/renderer/sources/render_vector_source.hpp>
 #include <mbgl/renderer/sources/render_geojson_source.hpp>
+#include <mbgl/renderer/tile_parameters.hpp>
 
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/string.hpp>
@@ -23,7 +24,6 @@
 
 #include <mbgl/map/transform.hpp>
 #include <mbgl/style/style.hpp>
-#include <mbgl/renderer/update_parameters.hpp>
 #include <mbgl/style/layers/line_layer.hpp>
 #include <mbgl/annotation/annotation_manager.hpp>
 #include <mbgl/annotation/annotation_source.hpp>
@@ -46,7 +46,7 @@ public:
     AnnotationManager annotationManager { 1.0 };
     style::Style style { threadPool, fileSource, 1.0 };
 
-    UpdateParameters updateParameters {
+    TileParameters tileParameters {
         1.0,
         MapDebugOptions(),
         transformState,
@@ -150,7 +150,7 @@ TEST(Source, RasterTileEmpty) {
 
     RenderRasterSource renderSource(*source.impl);
     renderSource.setObserver(&test.renderSourceObserver);
-    renderSource.updateTiles(test.updateParameters);
+    renderSource.updateTiles(test.tileParameters);
 
     test.run();
 }
@@ -181,7 +181,7 @@ TEST(Source, VectorTileEmpty) {
 
     RenderVectorSource renderSource(*source.impl);
     renderSource.setObserver(&test.renderSourceObserver);
-    renderSource.updateTiles(test.updateParameters);
+    renderSource.updateTiles(test.tileParameters);
 
     test.run();
 }
@@ -212,7 +212,7 @@ TEST(Source, RasterTileFail) {
 
     RenderRasterSource renderSource(*source.impl);
     renderSource.setObserver(&test.renderSourceObserver);
-    renderSource.updateTiles(test.updateParameters);
+    renderSource.updateTiles(test.tileParameters);
 
     test.run();
 }
@@ -243,7 +243,7 @@ TEST(Source, VectorTileFail) {
 
     RenderVectorSource renderSource(*source.impl);
     renderSource.setObserver(&test.renderSourceObserver);
-    renderSource.updateTiles(test.updateParameters);
+    renderSource.updateTiles(test.tileParameters);
 
     test.run();
 }
@@ -273,7 +273,7 @@ TEST(Source, RasterTileCorrupt) {
 
     RenderRasterSource renderSource(*source.impl);
     renderSource.setObserver(&test.renderSourceObserver);
-    renderSource.updateTiles(test.updateParameters);
+    renderSource.updateTiles(test.tileParameters);
 
     test.run();
 }
@@ -307,7 +307,7 @@ TEST(Source, VectorTileCorrupt) {
 
     RenderVectorSource renderSource(*source.impl);
     renderSource.setObserver(&test.renderSourceObserver);
-    renderSource.updateTiles(test.updateParameters);
+    renderSource.updateTiles(test.tileParameters);
 
     test.run();
 }
@@ -336,7 +336,7 @@ TEST(Source, RasterTileCancel) {
 
     RenderRasterSource renderSource(*source.impl);
     renderSource.setObserver(&test.renderSourceObserver);
-    renderSource.updateTiles(test.updateParameters);
+    renderSource.updateTiles(test.tileParameters);
 
     test.run();
 }
@@ -365,7 +365,7 @@ TEST(Source, VectorTileCancel) {
 
     RenderVectorSource renderSource(*source.impl);
     renderSource.setObserver(&test.renderSourceObserver);
-    renderSource.updateTiles(test.updateParameters);
+    renderSource.updateTiles(test.tileParameters);
 
     test.run();
 }
@@ -402,7 +402,7 @@ TEST(Source, RasterTileAttribution) {
     source.baseImpl->loadDescription(test.fileSource);
 
     RenderRasterSource renderSource(*source.impl);
-    renderSource.updateTiles(test.updateParameters);
+    renderSource.updateTiles(test.tileParameters);
 
     test.run();
 }

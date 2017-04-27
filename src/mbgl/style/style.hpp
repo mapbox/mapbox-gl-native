@@ -36,7 +36,7 @@ class RenderedQueryOptions;
 class Scheduler;
 class RenderLayer;
 class RenderSource;
-class UpdateParameters;
+class TileParameters;
 
 namespace style {
 
@@ -61,7 +61,7 @@ public:
 
     // Fetch the tiles needed by the current viewport and emit a signal when
     // a tile is ready so observers can render the tile.
-    void updateTiles(const UpdateParameters&);
+    void updateTiles(const TileParameters&);
 
     void relayout();
     void cascade(const TimePoint&, MapMode);

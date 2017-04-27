@@ -20,7 +20,7 @@ class FeatureIndex;
 class CollisionTile;
 class RenderLayer;
 class SourceQueryOptions;
-class UpdateParameters;
+class TileParameters;
 
 namespace style {
 class Style;
@@ -30,7 +30,7 @@ class GeometryTile : public Tile, public GlyphRequestor, IconRequestor {
 public:
     GeometryTile(const OverscaledTileID&,
                  std::string sourceID,
-                 const UpdateParameters&,
+                 const TileParameters&,
                  GlyphAtlas&,
                  SpriteAtlas&);
 

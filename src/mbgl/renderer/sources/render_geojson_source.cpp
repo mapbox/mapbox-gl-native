@@ -36,7 +36,7 @@ std::map<UnwrappedTileID, RenderTile>& RenderGeoJSONSource::getRenderTiles() {
     return tilePyramid.getRenderTiles();
 }
 
-void RenderGeoJSONSource::updateTiles(const UpdateParameters& parameters) {
+void RenderGeoJSONSource::updateTiles(const TileParameters& parameters) {
     GeoJSONData* data_ = impl.getData();
 
     if (!data_) {

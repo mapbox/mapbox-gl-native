@@ -14,7 +14,7 @@ public:
 
     // Called when the camera has changed. May load new tiles, unload obsolete tiles, or
     // trigger re-placement of existing complete tiles.
-    void updateTiles(const UpdateParameters&) final;
+    void updateTiles(const TileParameters&) final;
 
     // Removes all tiles (by putting them into the cache).
     void removeTiles() final;
