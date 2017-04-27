@@ -1951,7 +1951,7 @@ public:
     if ([viewController isKindOfClass:[UINavigationController class]]) {
         viewController = ((UINavigationController *)viewController).topViewController;
     }
-    viewController = [UIViewController getTopViewControllerFrom:viewController];
+    viewController = [UIViewController mgl_topMostViewControllerInHierarchyWith:viewController];
     [viewController presentViewController:attributionController
                                  animated:YES
                                completion:NULL];

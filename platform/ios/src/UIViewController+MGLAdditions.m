@@ -2,19 +2,19 @@
 
 @implementation UIViewController (MGLAdditions)
 
-+ (UIViewController *)getTopViewControllerFrom:(UIViewController *)viewController
++ (UIViewController *)mgl_topMostViewControllerInHierarchyWith:(UIViewController *)viewController
 {
     if ([viewController isKindOfClass:[UINavigationController class]])
     {
-        return [UIViewController getTopViewControllerFrom:[((UINavigationController *)viewController) visibleViewController]];
+        return [UIViewController mgl_topMostViewControllerInHierarchyWith:[((UINavigationController *)viewController) visibleViewController]];
     }
     else if ([viewController isKindOfClass:[UITabBarController class]])
     {
-        return [UIViewController getTopViewControllerFrom:[((UITabBarController *)viewController) selectedViewController]];
+        return [UIViewController mgl_topMostViewControllerInHierarchyWith:[((UITabBarController *)viewController) selectedViewController]];
     }
     else if (viewController.presentedViewController)
     {
-        return [UIViewController getTopViewControllerFrom:viewController.presentedViewController];
+        return [UIViewController mgl_topMostViewControllerInHierarchyWith:viewController.presentedViewController];
     }
     return viewController;
 }

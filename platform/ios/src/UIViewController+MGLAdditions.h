@@ -4,7 +4,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface UIViewController (MGLAdditions)
 
-+ (UIViewController *)getTopViewControllerFrom:(UIViewController *)viewController;
++ (UIViewController *)mgl_topMostViewControllerInHierarchyWith:(UIViewController *)viewController;
 
 @end
 
