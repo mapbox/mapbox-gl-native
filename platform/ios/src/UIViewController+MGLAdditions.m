@@ -6,7 +6,7 @@
 {
     if ([viewController isKindOfClass:[UINavigationController class]])
     {
-        return [UIViewController mgl_topMostViewControllerInHierarchyWith:[((UINavigationController *)viewController) visibleViewController]];
+        return [UIViewController mgl_topMostViewControllerInHierarchyWith:[(UINavigationController *)viewController visibleViewController]];
     }
     else if ([viewController isKindOfClass:[UITabBarController class]])
     {
