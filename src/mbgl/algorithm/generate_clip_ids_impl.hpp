@@ -76,8 +76,13 @@ void ClipIDGenerator::update(Renderables& renderables) {
         bit_offset += bit_count;
     }
 
-    if (bit_offset > 8) {
+    // Prevent this warning from firing on every frame,
+    // which can be expensive in some platforms.
+    static bool warned = false;
+
+    if (!warned && bit_offset > 8) {
         Log::Error(Event::OpenGL, "stencil mask overflow");
+        warned = true;
     }
 }
 
