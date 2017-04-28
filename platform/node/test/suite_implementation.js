@@ -76,7 +76,7 @@ module.exports = function (style, options, callback) {
             map.addImage(operation[1], img.data, {
                 height: img.height,
                 width: img.width,
-                pixelRatio: 1
+                pixelRatio: operation[3] || 1
             });
 
             applyOperations(operations.slice(1), callback);
