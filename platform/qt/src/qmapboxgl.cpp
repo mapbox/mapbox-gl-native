@@ -1482,6 +1482,10 @@ void QMapboxGL::setFilter(const QString& layer, const QVariant& filter)
         layer_->as<CircleLayer>()->setFilter(filter_);
         return;
     }
+    if (layer_->is<FillExtrusionLayer>()) {
+        layer_->as<FillExtrusionLayer>()->setFilter(filter_);
+        return;
+    }
 
     qWarning() << "Layer doesn't support filters";
 }
