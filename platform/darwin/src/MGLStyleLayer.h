@@ -63,12 +63,12 @@ MGL_EXPORT
 @property (nonatomic, assign, getter=isVisible) BOOL visible;
 
 /**
- The exclusive upper bound of the range of zoom levels within which a map would display the layer.
+ The maximum zoom level at which the layer gets parsed and appears. This value is a floating-point number.
  */
 @property (nonatomic, assign) float maximumZoomLevel;
 
 /**
- The inclusive lower bound of the range of zoom levels within which a map would display the layer.
+ The minimum zoom level at which the layer gets parsed and appears. This value is a floating-point number.
  */
 @property (nonatomic, assign) float minimumZoomLevel;
 
