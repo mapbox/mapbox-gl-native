@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="mapbox_compassContentDescription">Žemėlapio kompasas. Spustelk, kad atstatytum žemėlapio pasukimą į šiaurę.</string>
+    <string name="mapbox_attributionsIconContentDescription">Įnašo ikona. Paspausk norėdamas pamatyti dialogą su detalėmis</string>
+    <string name="mapbox_myLocationViewContentDescription">Vartotojo vietos vaizdas. Nurodo tavo poziciją žemėlapyje</string>
+    <string name="mapbox_mapActionDescription">Rodomas Mapbox kurtas žemėlapis. Naviguok tempdamas du pirštus. Valdyk žemėlapio pritraukimą suimdamas/atitolindamas du pirštus.</string>
+    <string name="mapbox_attributionsDialogTitle">Mapbox Android SDK</string>
+    <string name="mapbox_attributionTelemetryTitle">Prisidėk prie Mapbox žemėlapių tobulinimo</string>
+    <string name="mapbox_attributionTelemetryMessage">Jūs padedate padaryti OpenStreetMap ir Mapbox žemėlapius geresniais dalindamiesi anoniminiais naudojimosi duomenimis.</string>
+    <string name="mapbox_attributionTelemetryPositive">Sutikti</string>
+    <string name="mapbox_attributionTelemetryNegative">Nesutikti</string>
+    <string name="mapbox_attributionTelemetryNeutral">Daugiau informacijos</string>
+    <string name="mapbox_offline_error_region_definition_invalid">Pasirinktas OfflineRegionDefinition netalpa į rėžius:  %s</string>
+
+    </resources>
