@@ -6,7 +6,7 @@
 	<dict>
 		<key>NSStringLocalizedFormatKey</key>
 		<string>Zoom %dx
-%#@count@ visible</string>
+%#@count@</string>
 		<key>count</key>
 		<dict>
 			<key>NSStringFormatSpecTypeKey</key>
@@ -14,9 +14,9 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>ld</string>
 			<key>one</key>
-			<string>%d anotació</string>
+			<string>%d anotació visible</string>
 			<key>other</key>
-			<string>%d anotacions</string>
+			<string>%d anotacions visibles</string>
 		</dict>
 	</dict>
 </dict>
