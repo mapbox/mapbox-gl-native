@@ -1947,7 +1947,7 @@ public:
     attributionController.popoverPresentationController.sourceView = self;
     attributionController.popoverPresentationController.sourceRect = self.attributionButton.frame;
     
-    UIViewController *viewController = [UIViewController mgl_topMostViewControllerInHierarchyWith:self.window.rootViewController];
+    UIViewController *viewController = [self.window.rootViewController mgl_topMostViewController];
     [viewController presentViewController:attributionController
                                  animated:YES
                                completion:NULL];
