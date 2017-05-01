@@ -10,6 +10,9 @@
 /* No comment provided by engineer. */
 "CANCEL" = "Cancel·lar";
 
+/* Accessibility hint for closing the selected annotation’s callout view and returning to the map */
+"CLOSE_CALLOUT_A11Y_HINT" = "Torna al mapa";
+
 /* Accessibility hint */
 "COMPASS_A11Y_HINT" = "Orienta el mapa amb rumb nord";
 
@@ -31,6 +34,12 @@
 /* Accessibility label */
 "INFO_A11Y_LABEL" = "Sobre aquest mapa";
 
+/* User-friendly error description */
+"LOAD_MAP_FAILED_DESC" = "El mapa no s’ha carregat a causa d’un error desconegut.";
+
+/* User-friendly error description */
+"LOAD_STYLE_FAILED_DESC" = "El mapa no s’ha carregat perquè l’estil no es pot carregar.";
+
 /* Accessibility label */
 "LOGO_A11Y_LABEL" = "Mapbox";
 
@@ -40,8 +49,17 @@
 /* Map accessibility value */
 "MAP_A11Y_VALUE" = "Zoom %1$dx\n%2$ld anotació (ns) visibles";
 
+/* User-friendly error description */
+"PARSE_STYLE_FAILED_DESC" = "El mapa no s’ha carregat perquè s’ha corromput l’estil.";
+
 /* Action sheet title */
 "SDK_NAME" = "Mapbox iOS SDK";
+
+/* Developer-only SDK update notification; {latest version, in format x.x.x} */
+"SDK_UPDATE_AVAILABLE" = "La versió %@ del Mapbox iOS SDK està disponible:";
+
+/* User-friendly error description */
+"STYLE_NOT_FOUND_DESC" = "El mapa no s’ha carregat perquè no es troba l’estil o bé és incompatible.";
 
 /* Telemetry prompt message */
 "TELEMETRY_DISABLED_MSG" = "Pots ajudar a millorar els mapes d’OpenStreetMap i de Mapbox aportant dades d’ús anònimes.";
