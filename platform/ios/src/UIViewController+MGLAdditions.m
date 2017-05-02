@@ -10,7 +10,7 @@
     }
     else if ([self isKindOfClass:[UITabBarController class]])
     {
-        return [[((UITabBarController *)self) selectedViewController] mgl_topMostViewController];
+        return [[(UITabBarController *)self selectedViewController] mgl_topMostViewController];
     }
     else if (self.presentedViewController)
     {
