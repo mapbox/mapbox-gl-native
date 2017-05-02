@@ -4,24 +4,19 @@
 
 - (UIViewController *)mgl_topMostViewController
 {
-    return [self mgl_topMostViewControllerInHierarchyWith:self];
-}
-
-- (instancetype)mgl_topMostViewControllerInHierarchyWith:(UIViewController *)viewController
-{
-    if ([viewController isKindOfClass:[UINavigationController class]])
+    if ([self isKindOfClass:[UINavigationController class]])
     {
-        return [self mgl_topMostViewControllerInHierarchyWith:[(UINavigationController *)viewController visibleViewController]];
+        return [[(UINavigationController *)self visibleViewController] mgl_topMostViewController];
     }
     else if ([self isKindOfClass:[UITabBarController class]])
     {
-        return [self mgl_topMostViewControllerInHierarchyWith:[((UITabBarController *)viewController) selectedViewController]];
+        return [[((UITabBarController *)self) selectedViewController] mgl_topMostViewController];
     }
-    else if (viewController.presentedViewController)
+    else if (self.presentedViewController)
     {
-        return [self mgl_topMostViewControllerInHierarchyWith:viewController.presentedViewController];
+        return [self.presentedViewController mgl_topMostViewController];
     }
-    return viewController;
+    return self;
 }
 
 @end
