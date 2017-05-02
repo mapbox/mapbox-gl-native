@@ -235,7 +235,6 @@ void Map::Impl::render(View& view) {
 
     if (style->loaded && updateFlags & Update::AnnotationStyle) {
         annotationManager->updateStyle(*style);
-        updateFlags |= Update::Classes;
     }
 
     if (updateFlags & Update::AnnotationData) {
