@@ -231,6 +231,7 @@ set(MBGL_CORE_FILES
     src/mbgl/renderer/tile_pyramid.cpp
     src/mbgl/renderer/tile_pyramid.hpp
     src/mbgl/renderer/transitioning_property.hpp
+    src/mbgl/renderer/update_parameters.hpp
 
     # renderer/sources
     src/mbgl/renderer/sources/render_geojson_source.cpp
