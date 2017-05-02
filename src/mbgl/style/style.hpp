@@ -3,9 +3,11 @@
 #include <mbgl/style/transition_options.hpp>
 #include <mbgl/style/observer.hpp>
 #include <mbgl/style/source_observer.hpp>
+#include <mbgl/renderer/render_source_observer.hpp>
 #include <mbgl/style/layer_observer.hpp>
 #include <mbgl/style/update_batch.hpp>
 #include <mbgl/renderer/render_layer.hpp>
+#include <mbgl/style/light_impl.hpp>
 #include <mbgl/text/glyph_atlas_observer.hpp>
 #include <mbgl/sprite/sprite_atlas_observer.hpp>
 #include <mbgl/map/mode.hpp>
@@ -33,6 +35,7 @@ class TransformState;
 class RenderedQueryOptions;
 class Scheduler;
 class RenderLayer;
+class RenderSource;
 
 namespace style {
 
@@ -43,6 +46,7 @@ class QueryParameters;
 class Style : public GlyphAtlasObserver,
               public SpriteAtlasObserver,
               public SourceObserver,
+              public RenderSourceObserver,
               public LayerObserver,
               public util::noncopyable {
 public:
@@ -120,8 +124,16 @@ public:
     std::unique_ptr<SpriteAtlas> spriteAtlas;
     std::unique_ptr<LineAtlas> lineAtlas;
 
+    std::unique_ptr<Light> light;
+    TransitioningLight transitioningLight;
+    EvaluatedLight evaluatedLight;
+
+    RenderSource* getRenderSource(const std::string& id) const;
+
 private:
     std::vector<std::unique_ptr<Source>> sources;
+    std::vector<std::unique_ptr<RenderSource>> renderSources;
+
     std::vector<std::unique_ptr<Layer>> layers;
     std::vector<std::unique_ptr<RenderLayer>> renderLayers;
     std::vector<std::string> classes;
@@ -151,8 +163,8 @@ private:
     void onSourceChanged(Source&) override;
     void onSourceError(Source&, std::exception_ptr) override;
     void onSourceDescriptionChanged(Source&) override;
-    void onTileChanged(Source&, const OverscaledTileID&) override;
-    void onTileError(Source&, const OverscaledTileID&, std::exception_ptr) override;
+    void onTileChanged(RenderSource&, const OverscaledTileID&) override;
+    void onTileError(RenderSource&, const OverscaledTileID&, std::exception_ptr) override;
 
     // LayerObserver implementation.
     void onLayerFilterChanged(Layer&) override;

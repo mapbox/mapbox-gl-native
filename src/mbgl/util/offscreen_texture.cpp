@@ -14,12 +14,13 @@ public:
 
     void bind() {
         if (!framebuffer) {
-            texture = context.createTexture(size);
+            texture = context.createTexture(size, gl::TextureFormat::RGBA);
             framebuffer = context.createFramebuffer(*texture);
         } else {
             context.bindFramebuffer = framebuffer->framebuffer;
         }
 
+        context.activeTexture = 0;
         context.viewport = { 0, 0, size };
     }
 
@@ -34,6 +35,20 @@ public:
 
     const Size& getSize() const {
         return size;
+    }
+
+    void bindRenderbuffers(gl::TextureUnit unit) {
+        if (!framebuffer) {
+            texture = context.createTexture(size, gl::TextureFormat::RGBA, unit);
+            gl::Renderbuffer<gl::RenderbufferType::DepthComponent> depthTarget = context.createRenderbuffer<gl::RenderbufferType::DepthComponent>(size);
+            framebuffer = context.createFramebuffer(*texture, depthTarget);
+
+        } else {
+            context.bindFramebuffer = framebuffer->framebuffer;
+        }
+
+        context.activeTexture = unit;
+        context.viewport = { 0, 0, size };
     }
 
 private:
@@ -64,6 +79,10 @@ gl::Texture& OffscreenTexture::getTexture() {
 
 const Size& OffscreenTexture::getSize() const {
     return impl->getSize();
+}
+
+void OffscreenTexture::bindRenderbuffers(gl::TextureUnit unit) {
+    impl->bindRenderbuffers(unit);
 }
 
 } // namespace mbgl

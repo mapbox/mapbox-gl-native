@@ -201,6 +201,40 @@ void MapWindow::keyPressEvent(QKeyEvent *ev)
 
             m_map->setLayoutProperty("road-label-small", "text-pitch-alignment", "viewport");
             m_map->setLayoutProperty("road-label-small", "text-size", 30.0);
+
+            // Buildings extrusion
+            QVariantMap buildings;
+            buildings["id"] = "3d-buildings";
+            buildings["source"] = "composite";
+            buildings["source-layer"] = "building";
+            buildings["type"] = "fill-extrusion";
+            buildings["minzoom"] = 15.0;
+            m_map->addLayer(buildings);
+
+            QVariantList buildingsFilterExpression;
+            buildingsFilterExpression.append("==");
+            buildingsFilterExpression.append("extrude");
+            buildingsFilterExpression.append("true");
+
+            QVariantList buildingsFilter;
+            buildingsFilter.append(buildingsFilterExpression);
+
+            m_map->setFilter("3d-buildings", buildingsFilterExpression);
+
+            m_map->setPaintProperty("3d-buildings", "fill-extrusion-color", "#aaa");
+            m_map->setPaintProperty("3d-buildings", "fill-extrusion-opacity", .6);
+
+            QVariantMap extrusionHeight;
+            extrusionHeight["type"] = "identity";
+            extrusionHeight["property"] = "height";
+
+            m_map->setPaintProperty("3d-buildings", "fill-extrusion-height", extrusionHeight);
+
+            QVariantMap extrusionBase;
+            extrusionBase["type"] = "identity";
+            extrusionBase["property"] = "min_height";
+
+            m_map->setPaintProperty("3d-buildings", "fill-extrusion-base", extrusionBase);
         }
         break;
     case Qt::Key_1: {

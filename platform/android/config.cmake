@@ -130,6 +130,8 @@ add_library(mbgl-android STATIC
     platform/android/src/style/layers/circle_layer.hpp
     platform/android/src/style/layers/custom_layer.cpp
     platform/android/src/style/layers/custom_layer.hpp
+    platform/android/src/style/layers/fill_extrusion_layer.cpp
+    platform/android/src/style/layers/fill_extrusion_layer.hpp
     platform/android/src/style/layers/fill_layer.cpp
     platform/android/src/style/layers/fill_layer.hpp
     platform/android/src/style/layers/layer.cpp

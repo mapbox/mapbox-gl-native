@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="mapbox_compassContentDescription">La bàn bản đồ. Kích hoạt để quay bản đồ lại hướng bắc.</string>
+    <string name="mapbox_attributionsIconContentDescription">Biểu tượng ghi công. Kích hoạt để xem hộp thoại ghi công.</string>
+    <string name="mapbox_myLocationViewContentDescription">Cái chỉ vị trí. Cái này chỉ vị trí của bạn trên bản đồ.</string>
+    <string name="mapbox_mapActionDescription">Đang xem bản đồ được xây dựng dùng Mapbox. Kéo hai ngón tay để cuộn. Chụm các ngón tay lại để phóng to. Tách các ngón tay ra để thu nhỏ.</string>
+    <string name="mapbox_attributionsDialogTitle">Mapbox Android SDK</string>
+    <string name="mapbox_attributionTelemetryTitle">Cải tiến các Bản đồ Mapbox</string>
+    <string name="mapbox_attributionTelemetryMessage">Bạn đang giúp cải tiến các bản đồ OpenStreetMap và Mapbox bằng cách đóng góp dữ liệu vô danh hóa về cách sử dụng.</string>
+    <string name="mapbox_attributionTelemetryPositive">Đồng ý</string>
+    <string name="mapbox_attributionTelemetryNegative">Phản đối</string>
+    <string name="mapbox_attributionTelemetryNeutral">Thông tin thêm</string>
+    <string name="mapbox_offline_error_region_definition_invalid">OfflineRegionDefinition được cung cấp không vừa thế giới: %s</string>
+
+    </resources>

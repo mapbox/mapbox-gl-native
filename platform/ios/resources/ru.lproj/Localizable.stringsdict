@@ -5,8 +5,8 @@
 	<key>MAP_A11Y_VALUE</key>
 	<dict>
 		<key>NSStringLocalizedFormatKey</key>
-		<string>Zoom %dx
-%#@count@ visible</string>
+		<string>Масштаб %dx
+%#@count@ видны</string>
 		<key>count</key>
 		<dict>
 			<key>NSStringFormatSpecTypeKey</key>

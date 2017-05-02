@@ -34,9 +34,6 @@ var layers = Object.keys(spec.layer.type.values).map((type) => {
   };
 });
 
-// XXX Remove fill-extrusion layer for now
-layers = _(layers).filter(layer => layer.type != "fill-extrusion").value();
-
 // Process all layer properties
 const layoutProperties = _(layers).map('layoutProperties').flatten().value();
 const paintProperties = _(layers).map('paintProperties').flatten().value();

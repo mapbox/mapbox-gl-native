@@ -89,4 +89,9 @@ MBGL_DEFINE_ENUM(IconTextFitType, {
     { IconTextFitType::Height, "height" },
 });
 
+MBGL_DEFINE_ENUM(LightAnchorType, {
+    { LightAnchorType::Map, "map" },
+    { LightAnchorType::Viewport, "viewport" }
+});
+
 } // namespace mbgl

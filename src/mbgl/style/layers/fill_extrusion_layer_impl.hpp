@@ -16,8 +16,6 @@ public:
     std::unique_ptr<RenderLayer> createRenderLayer() const override;
 
     FillExtrusionPaintProperties::Cascading cascading;
-
-    //style::FillExtrusionLayer::Impl* const impl;
 };
 
 } // namespace style

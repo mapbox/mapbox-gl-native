@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="mapbox_compassContentDescription">Brújula del mapa. Actívala para restablecer la rotación del mapa al norte.</string>
+    <string name="mapbox_attributionsIconContentDescription">Ícono de atribución. Actívalo para mostrar el diálogo de atribución.</string>
+    <string name="mapbox_myLocationViewContentDescription">Vista de ubicación. Muestra tu ubicación en el mapa.</string>
+    <string name="mapbox_mapActionDescription">Se está mostrando un mapa creado con Mapbox. Arrastra dos dedos para desplazarte o pellizca para acercar.</string>
+    <string name="mapbox_attributionsDialogTitle">Mapbox Android SDK</string>
+    <string name="mapbox_attributionTelemetryTitle">Ayúdanos a mejorar los mapas de Mapbox</string>
+    <string name="mapbox_attributionTelemetryMessage">Gracias a tu contribución de datos anónimos de uso, ayudas a mejorar OpenStreetMap y Mapbox.</string>
+    <string name="mapbox_attributionTelemetryPositive">Aceptar</string>
+    <string name="mapbox_attributionTelemetryNegative">Rechazar</string>
+    <string name="mapbox_attributionTelemetryNeutral">Más información</string>
+    <string name="mapbox_offline_error_region_definition_invalid">El parámetro OfflineRegionDefinition que se ingresó no coincide con los límites mundiales: %s</string>
+
+    </resources>

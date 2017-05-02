@@ -4,6 +4,7 @@
 #include <mbgl/util/optional.hpp>
 #include <mbgl/util/color.hpp>
 #include <mbgl/util/enum.hpp>
+#include <mbgl/util/string.hpp>
 
 #include <array>
 #include <string>
@@ -92,45 +93,25 @@ struct Converter<Color> {
     }
 };
 
-template <>
-struct Converter<std::array<float, 2>> {
+template <size_t N>
+struct Converter<std::array<float, N>> {
     template <class V>
-    optional<std::array<float, 2>> operator()(const V& value, Error& error) const {
-        if (!isArray(value) || arrayLength(value) != 2) {
-            error = { "value must be an array of two numbers" };
+    optional<std::array<float, N>> operator()(const V& value, Error& error) const {
+        if (!isArray(value) || arrayLength(value) != N) {
+            error = { "value must be an array of " + util::toString(N) + " numbers" };
             return {};
         }
 
-        optional<float> first = toNumber(arrayMember(value, 0));
-        optional<float> second = toNumber(arrayMember(value, 1));
-        if (!first || !second) {
-            error = { "value must be an array of two numbers" };
-            return {};
+        std::array<float, N> result;
+        for (size_t i = 0; i < N; i++) {
+            optional<float> n = toNumber(arrayMember(value, i));
+            if (!n) {
+                error = { "value must be an array of " + util::toString(N) + " numbers" };
+                return {};
+            }
+            result[i] = *n;
         }
-
-        return std::array<float, 2> {{ *first, *second }};
-    }
-};
-
-template <>
-struct Converter<std::array<float, 4>> {
-    template <class V>
-    optional<std::array<float, 4>> operator()(const V& value, Error& error) const {
-        if (!isArray(value) || arrayLength(value) != 4) {
-            error = { "value must be an array of four numbers" };
-            return {};
-        }
-
-        optional<float> first = toNumber(arrayMember(value, 0));
-        optional<float> second = toNumber(arrayMember(value, 1));
-        optional<float> third = toNumber(arrayMember(value, 2));
-        optional<float> fourth = toNumber(arrayMember(value, 3));
-        if (!first || !second) {
-            error = { "value must be an array of four numbers" };
-            return {};
-        }
-
-        return std::array<float, 4> {{ *first, *second, *third, *fourth }};
+        return result;
     }
 };
 

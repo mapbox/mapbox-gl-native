@@ -19,11 +19,11 @@ class GeometryTileData;
 class FeatureIndex;
 class CollisionTile;
 class RenderLayer;
+class SourceQueryOptions;
 
 namespace style {
 class Style;
 class UpdateParameters;
-class SourceQueryOptions;
 } // namespace style
 
 class GeometryTile : public Tile, public GlyphRequestor, IconRequestor {
@@ -58,7 +58,7 @@ public:
 
     void querySourceFeatures(
         std::vector<Feature>& result,
-        const style::SourceQueryOptions&) override;
+        const SourceQueryOptions&) override;
 
     void cancel() override;
 

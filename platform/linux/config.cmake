@@ -88,6 +88,7 @@ macro(mbgl_platform_core)
         # Thread pool
         PRIVATE platform/default/mbgl/util/default_thread_pool.cpp
         PRIVATE platform/default/mbgl/util/default_thread_pool.cpp
+        PRIVATE platform/default/mbgl/util/shared_thread_pool.cpp
     )
 
     target_include_directories(mbgl-core

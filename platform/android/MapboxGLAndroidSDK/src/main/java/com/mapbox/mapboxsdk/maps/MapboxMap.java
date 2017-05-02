@@ -1179,7 +1179,7 @@ public final class MapboxMap {
    */
   @UiThread
   public void updateMarker(@NonNull Marker updatedMarker) {
-    annotationManager.updateMarker(updatedMarker, this);
+    annotationManager.updateMarker(updatedMarker);
   }
 
   /**

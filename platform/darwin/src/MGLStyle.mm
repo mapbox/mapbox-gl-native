@@ -3,6 +3,7 @@
 #import "MGLMapView_Private.h"
 #import "MGLStyleLayer.h"
 #import "MGLFillStyleLayer.h"
+#import "MGLFillExtrusionStyleLayer.h"
 #import "MGLLineStyleLayer.h"
 #import "MGLCircleStyleLayer.h"
 #import "MGLSymbolStyleLayer.h"
@@ -28,6 +29,7 @@
 #include <mbgl/util/default_styles.hpp>
 #include <mbgl/style/image.hpp>
 #include <mbgl/style/layers/fill_layer.hpp>
+#include <mbgl/style/layers/fill_extrusion_layer.hpp>
 #include <mbgl/style/layers/line_layer.hpp>
 #include <mbgl/style/layers/symbol_layer.hpp>
 #include <mbgl/style/layers/raster_layer.hpp>
@@ -332,6 +334,8 @@ static NSURL *MGLStyleURL_emerald;
 
     if (auto fillLayer = rawLayer->as<mbgl::style::FillLayer>()) {
         return [[MGLFillStyleLayer alloc] initWithRawLayer:fillLayer];
+    } else if (auto fillExtrusionLayer = rawLayer->as<mbgl::style::FillExtrusionLayer>()) {
+        return [[MGLFillExtrusionStyleLayer alloc] initWithRawLayer:fillExtrusionLayer];
     } else if (auto lineLayer = rawLayer->as<mbgl::style::LineLayer>()) {
         return [[MGLLineStyleLayer alloc] initWithRawLayer:lineLayer];
     } else if (auto symbolLayer = rawLayer->as<mbgl::style::SymbolLayer>()) {

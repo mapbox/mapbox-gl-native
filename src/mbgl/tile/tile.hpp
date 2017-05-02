@@ -22,10 +22,10 @@ class TransformState;
 class TileObserver;
 class PlacementConfig;
 class RenderedQueryOptions;
+class SourceQueryOptions;
 class RenderLayer;
 
 namespace style {
-class SourceQueryOptions;
 } // namespace style
 
 class Tile : private util::noncopyable {
@@ -60,7 +60,7 @@ public:
 
     virtual void querySourceFeatures(
             std::vector<Feature>& result,
-            const style::SourceQueryOptions&);
+            const SourceQueryOptions&);
 
     void setTriedOptional();
 

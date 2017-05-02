@@ -158,6 +158,22 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
 
         XCTAssertNotNil(mapView.style?.layer(withIdentifier: "parks"))
     }
+    
+    func testMGLFillExtrusionStyleLayer() {
+        let buildings = MGLVectorSource(identifier: "buildings", configurationURL: URL(string: "https://example.com/style.json")!)
+        mapView.style?.addSource(buildings)
+        
+        //#-example-code
+        let layer = MGLFillExtrusionStyleLayer(identifier: "buildings", source: buildings)
+        layer.sourceLayerIdentifier = "building"
+        layer.fillExtrusionHeight = MGLStyleValue(interpolationMode: .identity, sourceStops: nil, attributeName: "height", options: nil)
+        layer.fillExtrusionBase = MGLStyleValue(interpolationMode: .identity, sourceStops: nil, attributeName: "min_height", options: nil)
+        layer.predicate = NSPredicate(format: "extrude == TRUE")
+        mapView.style?.addLayer(layer)
+        //#-end-example-code
+        
+        XCTAssertNotNil(mapView.style?.layer(withIdentifier: "buildings"))
+    }
 
     func testMGLSymbolStyleLayer() {
         let pois = MGLVectorSource(identifier: "pois", configurationURL: URL(string: "https://example.com/style.json")!)

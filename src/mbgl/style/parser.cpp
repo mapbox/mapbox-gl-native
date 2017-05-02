@@ -4,6 +4,7 @@
 #include <mbgl/style/conversion.hpp>
 #include <mbgl/style/conversion/source.hpp>
 #include <mbgl/style/conversion/layer.hpp>
+#include <mbgl/style/conversion/light.hpp>
 
 #include <mbgl/util/logging.hpp>
 
@@ -82,6 +83,10 @@ StyleParseResult Parser::parse(const std::string& json) {
         }
     }
 
+    if (document.HasMember("light")) {
+        parseLight(document["light"]);
+    }
+
     if (document.HasMember("sources")) {
         parseSources(document["sources"]);
     }
@@ -105,6 +110,17 @@ StyleParseResult Parser::parse(const std::string& json) {
     }
 
     return nullptr;
+}
+
+void Parser::parseLight(const JSValue& value) {
+    conversion::Error error;
+    optional<Light> converted = conversion::convert<Light>(value, error);
+    if (!converted) {
+        Log::Warning(Event::ParseStyle, error.message);
+        return;
+    }
+
+    light = *converted;
 }
 
 void Parser::parseSources(const JSValue& value) {

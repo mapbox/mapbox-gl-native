@@ -1,13 +1,8 @@
 #pragma once
 
-#include <mbgl/tile/tile_observer.hpp>
-
 #include <exception>
 
 namespace mbgl {
-
-class OverscaledTileID;
-
 namespace style {
 
 class Source;
@@ -22,9 +17,6 @@ public:
 
     // Source description needs to be reloaded
     virtual void onSourceDescriptionChanged(Source&) {}
-
-    virtual void onTileChanged(Source&, const OverscaledTileID&) {}
-    virtual void onTileError(Source&, const OverscaledTileID&, std::exception_ptr) {}
 };
 
 } // namespace style

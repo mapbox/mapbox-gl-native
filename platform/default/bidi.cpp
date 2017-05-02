@@ -118,7 +118,7 @@ std::u16string BiDi::getLine(std::size_t start, std::size_t end) {
     // UBIDI_DO_MIRRORING: Apply unicode mirroring of characters like parentheses
     // UBIDI_REMOVE_BIDI_CONTROLS: Now that all the lines are set, remove control characters so that
     // they don't show up on screen (some fonts have glyphs representing them)
-    ubidi_writeReordered(impl->bidiLine, &outputText[0], outputLength,
+    ubidi_writeReordered(impl->bidiLine, mbgl::utf16char_cast<UChar*>(&outputText[0]), outputLength,
                          UBIDI_DO_MIRRORING | UBIDI_REMOVE_BIDI_CONTROLS, &errorCode);
 
     if (U_FAILURE(errorCode)) {

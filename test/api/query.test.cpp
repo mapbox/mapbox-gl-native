@@ -86,7 +86,7 @@ TEST(Query, QueryRenderedFeaturesFilter) {
 TEST(Query, QuerySourceFeatures) {
     QueryTest test;
 
-    auto features1 = test.map.getSource("source3")->querySourceFeatures();
+    auto features1 = test.map.querySourceFeatures("source3");
     EXPECT_EQ(features1.size(), 1u);
 }
 
@@ -94,15 +94,15 @@ TEST(Query, QuerySourceFeaturesOptionValidation) {
     QueryTest test;
 
     // GeoJSONSource, doesn't require a layer id
-    auto features = test.map.getSource("source3")->querySourceFeatures();
+    auto features = test.map.querySourceFeatures("source3");
     ASSERT_EQ(features.size(), 1u);
 
     // VectorSource, requires a layer id
-    features = test.map.getSource("source5")->querySourceFeatures();
+    features = test.map.querySourceFeatures("source5");
     ASSERT_EQ(features.size(), 0u);
     
     // RasterSource, not supported
-    features = test.map.getSource("source6")->querySourceFeatures();
+    features = test.map.querySourceFeatures("source6");
     ASSERT_EQ(features.size(), 0u);
 }
 
@@ -110,15 +110,15 @@ TEST(Query, QuerySourceFeaturesFilter) {
     QueryTest test;
 
     const EqualsFilter eqFilter = { "key1", std::string("value1") };
-    auto features1 = test.map.getSource("source4")->querySourceFeatures({{}, { eqFilter }});
+    auto features1 = test.map.querySourceFeatures("source4", {{}, { eqFilter }});
     EXPECT_EQ(features1.size(), 1u);
 
     const IdentifierNotEqualsFilter idNotEqFilter = { std::string("feature1") };
-    auto features2 = test.map.getSource("source4")->querySourceFeatures({{}, { idNotEqFilter }});
+    auto features2 = test.map.querySourceFeatures("source4", {{}, { idNotEqFilter }});
     EXPECT_EQ(features2.size(), 0u);
 
     const GreaterThanFilter gtFilter = { "key2", 1.0 };
-    auto features3 = test.map.getSource("source4")->querySourceFeatures({{}, { gtFilter }});
+    auto features3 = test.map.querySourceFeatures("source4", {{}, { gtFilter }});
     EXPECT_EQ(features3.size(), 1u);
 }
 

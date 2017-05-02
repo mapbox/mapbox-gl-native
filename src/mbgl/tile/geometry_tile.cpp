@@ -18,7 +18,6 @@
 #include <mbgl/map/query.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/style/filter_evaluator.hpp>
-#include <mbgl/style/query.hpp>
 #include <mbgl/util/logging.hpp>
 
 #include <iostream>
@@ -191,7 +190,7 @@ void GeometryTile::queryRenderedFeatures(
 
 void GeometryTile::querySourceFeatures(
     std::vector<Feature>& result,
-    const style::SourceQueryOptions& options) {
+    const SourceQueryOptions& options) {
 
     // Data not yet available
     if (!data) {

@@ -19,4 +19,15 @@ public:
     optional<style::Filter> filter;
 };
 
+/**
+ * Options for query source features
+ */
+class SourceQueryOptions {
+public:
+    // Required for VectorSource, ignored for GeoJSONSource
+    optional<std::vector<std::string>> sourceLayers;
+
+    optional<style::Filter> filter;
+};
+
 }

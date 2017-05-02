@@ -22,6 +22,10 @@ global.snakeCaseUpper = function snakeCaseUpper(str) {
   return str.replace(/-/g, "_").toUpperCase();
 };
 
+global.unhyphenate = function (str) {
+ return str.replace(/-/g, " ");
+};
+
 global.writeIfModified = function(filename, newContent) {
   try {
     const oldContent = fs.readFileSync(filename, 'utf8');

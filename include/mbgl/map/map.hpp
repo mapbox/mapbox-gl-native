@@ -30,6 +30,7 @@ namespace style {
 class Image;
 class Source;
 class Layer;
+class Light;
 } // namespace style
 
 class Map : private util::noncopyable {
@@ -179,6 +180,10 @@ public:
     void removeImage(const std::string&);
     const style::Image* getImage(const std::string&);
 
+    // Light
+    void setLight(std::unique_ptr<style::Light>);
+    style::Light* getLight();
+
     // Defaults
     std::string getStyleName() const;
     LatLng getDefaultLatLng() const;
@@ -189,6 +194,7 @@ public:
     // Feature queries
     std::vector<Feature> queryRenderedFeatures(const ScreenCoordinate&, const RenderedQueryOptions& options = {});
     std::vector<Feature> queryRenderedFeatures(const ScreenBox&,        const RenderedQueryOptions& options = {});
+    std::vector<Feature> querySourceFeatures(const std::string& sourceID, const SourceQueryOptions& options = {});
 
     AnnotationIDs queryPointAnnotations(const ScreenBox&);
 
