@@ -4,10 +4,9 @@ set -e
 set -o pipefail
 
 if [[ -n ${PUBLISH:-} ]]; then
-    if [[ "${BUILDTYPE}" != "Release" ]]; then
-        echo "Please run this script in release mode (BUILDTYPE=Release)."
-        exit 1
-    else
+    if [[ "${BUILDTYPE}" == "Release" ]]; then
         ./node_modules/.bin/node-pre-gyp package publish info
+    else
+        ./node_modules/.bin/node-pre-gyp package publish info --debug
     fi
 fi
