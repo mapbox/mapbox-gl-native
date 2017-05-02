@@ -115,6 +115,21 @@ TEST(Image, Copy) {
     EXPECT_THROW(PremultipliedImage::copy(src10, dst10, {0, 0}, {0, 1}, {0, max}), std::out_of_range);
 }
 
+TEST(Image, Move) {
+    UnassociatedImage rgba({ 1, 1 });
+    rgba.data[0] = 255;
+    rgba.data[1] = 254;
+    rgba.data[2] = 253;
+    rgba.data[3] = 128;
+
+    auto moved = std::move(rgba);
+
+    EXPECT_EQ(0u, rgba.size.width);
+    EXPECT_EQ(nullptr, rgba.data.get());
+    EXPECT_EQ(254, moved.data[1]);
+    EXPECT_EQ(1u, moved.size.width);
+}
+
 TEST(Image, Premultiply) {
     UnassociatedImage rgba({ 1, 1 });
     rgba.data[0] = 255;

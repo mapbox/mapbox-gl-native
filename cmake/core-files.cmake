@@ -511,6 +511,7 @@ set(MBGL_CORE_FILES
     include/mbgl/util/noncopyable.hpp
     include/mbgl/util/optional.hpp
     include/mbgl/util/platform.hpp
+    include/mbgl/util/premultiply.hpp
     include/mbgl/util/projection.hpp
     include/mbgl/util/range.hpp
     include/mbgl/util/run_loop.hpp
@@ -565,7 +566,6 @@ set(MBGL_CORE_FILES
     src/mbgl/util/offscreen_texture.cpp
     src/mbgl/util/offscreen_texture.hpp
     src/mbgl/util/premultiply.cpp
-    src/mbgl/util/premultiply.hpp
     src/mbgl/util/rapidjson.hpp
     src/mbgl/util/rect.hpp
     src/mbgl/util/std.hpp

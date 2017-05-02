@@ -12,6 +12,7 @@
 #include <mbgl/style/image.hpp>
 #include <mbgl/map/backend_scope.hpp>
 #include <mbgl/map/query.hpp>
+#include <mbgl/util/premultiply.hpp>
 
 #include <unistd.h>
 
@@ -682,8 +683,9 @@ void NodeMap::AddImage(const Nan::FunctionCallbackInfo<v8::Value>& info) {
 
     std::unique_ptr<uint8_t[]> data = std::make_unique<uint8_t[]>(imageLength);
     std::copy(imageDataBuffer, imageDataBuffer + imageLength, data.get());
-    mbgl::PremultipliedImage cPremultipliedImage({ imageWidth, imageHeight}, std::move(data));
-
+    
+    mbgl::UnassociatedImage cImage({ imageWidth, imageHeight}, std::move(data));
+    mbgl::PremultipliedImage cPremultipliedImage = mbgl::util::premultiply(std::move(cImage));
     nodeMap->map->addImage(*Nan::Utf8String(info[0]), std::make_unique<mbgl::style::Image>(std::move(cPremultipliedImage), pixelRatio));
 }
 

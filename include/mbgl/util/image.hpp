@@ -40,11 +40,14 @@ public:
 
     Image(Image&& o)
         : size(o.size),
-          data(std::move(o.data)) {}
+          data(std::move(o.data)) {
+        o.size.width = o.size.height = 0;
+    }
 
     Image& operator=(Image&& o) {
         size = o.size;
         data = std::move(o.data);
+        o.size.width = o.size.height = 0;
         return *this;
     }
 
