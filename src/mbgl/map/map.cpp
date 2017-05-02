@@ -12,7 +12,7 @@
 #include <mbgl/style/light.hpp>
 #include <mbgl/style/observer.hpp>
 #include <mbgl/style/transition_options.hpp>
-#include <mbgl/renderer/tile_parameters.hpp>
+#include <mbgl/renderer/update_parameters.hpp>
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/renderer/render_source.hpp>
 #include <mbgl/storage/file_source.hpp>
@@ -243,28 +243,17 @@ void Map::Impl::render(View& view) {
         annotationManager->updateData();
     }
 
-    if (updateFlags & Update::Classes) {
-        style->cascade(timePoint, mode);
-    }
-
-    if (updateFlags & Update::Classes || updateFlags & Update::RecalculateStyle) {
-        style->recalculate(transform.getZoom(), timePoint, mode);
-    }
-
-    if (updateFlags & Update::Layout) {
-        style->relayout();
-    }
-
-    TileParameters parameters(pixelRatio,
-                              debugOptions,
-                              transform.getState(),
-                              scheduler,
-                              fileSource,
-                              mode,
-                              *annotationManager,
-                              *style);
-
-    style->updateTiles(parameters);
+    style->update({
+        mode,
+        updateFlags,
+        pixelRatio,
+        debugOptions,
+        timePoint,
+        transform.getState(),
+        scheduler,
+        fileSource,
+        *annotationManager
+    });
 
     updateFlags = Update::Nothing;
 

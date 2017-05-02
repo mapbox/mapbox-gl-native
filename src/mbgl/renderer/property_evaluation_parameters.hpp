@@ -8,13 +8,15 @@ namespace mbgl {
 class PropertyEvaluationParameters {
 public:
     explicit PropertyEvaluationParameters(float z_)
-        : z(z_) {}
-
-    PropertyEvaluationParameters(float z_,
-                          TimePoint now_,
-                          ZoomHistory zoomHistory_,
-                          Duration defaultFadeDuration_)
         : z(z_),
+          now(Clock::time_point::max()),
+          zoomHistory(),
+          defaultFadeDuration(0) {}
+
+    PropertyEvaluationParameters(ZoomHistory zoomHistory_,
+                          TimePoint now_,
+                          Duration defaultFadeDuration_)
+        : z(zoomHistory_.lastZoom),
           now(std::move(now_)),
           zoomHistory(std::move(zoomHistory_)),
           defaultFadeDuration(std::move(defaultFadeDuration_)) {}

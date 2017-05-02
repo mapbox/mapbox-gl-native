@@ -36,7 +36,7 @@ class RenderedQueryOptions;
 class Scheduler;
 class RenderLayer;
 class RenderSource;
-class TileParameters;
+class UpdateParameters;
 
 namespace style {
 
@@ -59,13 +59,7 @@ public:
 
     bool isLoaded() const;
 
-    // Fetch the tiles needed by the current viewport and emit a signal when
-    // a tile is ready so observers can render the tile.
-    void updateTiles(const TileParameters&);
-
-    void relayout();
-    void cascade(const TimePoint&, MapMode);
-    void recalculate(float z, const TimePoint&, MapMode);
+    void update(const UpdateParameters&);
 
     bool hasTransitions() const;
 

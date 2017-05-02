@@ -19,10 +19,11 @@
 #include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/text/glyph_atlas.hpp>
 #include <mbgl/geometry/line_atlas.hpp>
-#include <mbgl/renderer/render_source.hpp>
-#include <mbgl/renderer/tile_parameters.hpp>
+#include <mbgl/renderer/update_parameters.hpp>
 #include <mbgl/renderer/cascade_parameters.hpp>
 #include <mbgl/renderer/property_evaluation_parameters.hpp>
+#include <mbgl/renderer/tile_parameters.hpp>
+#include <mbgl/renderer/render_source.hpp>
 #include <mbgl/renderer/render_item.hpp>
 #include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/renderer/render_background_layer.hpp>
@@ -327,30 +328,8 @@ double Style::getDefaultPitch() const {
     return defaultPitch;
 }
 
-void Style::updateTiles(const TileParameters& parameters) {
-    for (const auto& renderSource : renderSources) {
-        if (renderSource->enabled) {
-            renderSource->updateTiles(parameters);
-        }
-    }
-}
-
-void Style::relayout() {
-    for (const auto& sourceID : updateBatch.sourceIDs) {
-        RenderSource* renderSource = getRenderSource(sourceID);
-        if (renderSource && renderSource->enabled) {
-            renderSource->reloadTiles();
-        } else if (renderSource) {
-            renderSource->invalidateTiles();
-        }
-    }
-    updateBatch.sourceIDs.clear();
-}
-
-void Style::cascade(const TimePoint& timePoint, MapMode mode) {
-    // When in continuous mode, we can either have user- or style-defined
-    // transitions. Still mode is always immediate.
-    static const TransitionOptions immediateTransition {};
+void Style::update(const UpdateParameters& parameters) {
+    zoomHistory.update(parameters.transformState.getZoom(), parameters.timePoint);
 
     std::vector<ClassID> classIDs;
     for (const auto& className : classes) {
@@ -358,37 +337,47 @@ void Style::cascade(const TimePoint& timePoint, MapMode mode) {
     }
     classIDs.push_back(ClassID::Default);
 
-    const CascadeParameters parameters {
+    const CascadeParameters cascadeParameters {
         classIDs,
-        timePoint,
-        mode == MapMode::Continuous ? transitionOptions : immediateTransition
+        parameters.timePoint,
+        parameters.mode == MapMode::Continuous ? transitionOptions : TransitionOptions()
     };
 
-    for (const auto& layer : renderLayers) {
-        layer->cascade(parameters);
+    const PropertyEvaluationParameters evaluationParameters {
+        zoomHistory,
+        parameters.timePoint,
+        parameters.mode == MapMode::Continuous ? util::DEFAULT_FADE_DURATION : Duration::zero()
+    };
+
+    const TileParameters tileParameters(parameters.pixelRatio,
+                                        parameters.debugOptions,
+                                        parameters.transformState,
+                                        parameters.scheduler,
+                                        parameters.fileSource,
+                                        parameters.mode,
+                                        parameters.annotationManager,
+                                        *this);
+
+    if (parameters.updateFlags & Update::Classes) {
+        transitioningLight = TransitioningLight(*light, std::move(transitioningLight), cascadeParameters);
     }
 
-    transitioningLight = TransitioningLight(*light, std::move(transitioningLight), parameters);
-}
+    if (parameters.updateFlags & Update::RecalculateStyle) {
+        evaluatedLight = EvaluatedLight(transitioningLight, evaluationParameters);
+    }
 
-void Style::recalculate(float z, const TimePoint& timePoint, MapMode mode) {
-    // Disable all sources first. If we find an enabled layer that uses this source, we will
-    // re-enable it later.
     for (const auto& renderSource : renderSources) {
         renderSource->enabled = false;
     }
 
-    zoomHistory.update(z, timePoint);
-
-    const PropertyEvaluationParameters parameters {
-        z,
-        timePoint,
-        zoomHistory,
-        mode == MapMode::Continuous ? util::DEFAULT_FADE_DURATION : Duration::zero()
-    };
-
     for (const auto& layer : renderLayers) {
-        layer->evaluate(parameters);
+        if (parameters.updateFlags & Update::Classes) {
+            layer->cascade(cascadeParameters);
+        }
+
+        if (parameters.updateFlags & Update::Classes || parameters.updateFlags & Update::RecalculateStyle) {
+            layer->evaluate(evaluationParameters);
+        }
 
         if (layer->needsRendering(zoomHistory.lastZoom)) {
             if (RenderSource* renderSource = getRenderSource(layer->baseImpl.source)) {
@@ -397,14 +386,21 @@ void Style::recalculate(float z, const TimePoint& timePoint, MapMode mode) {
         }
     }
 
-    evaluatedLight = EvaluatedLight(transitioningLight, parameters);
-
-    // Remove the existing tiles if we didn't end up re-enabling the source.
     for (const auto& renderSource : renderSources) {
-        if (!renderSource->enabled) {
+        bool updated = updateBatch.sourceIDs.count(renderSource->baseImpl.id);
+        if (renderSource->enabled) {
+            if (updated) {
+                renderSource->reloadTiles();
+            }
+            renderSource->updateTiles(tileParameters);
+        } else if (updated) {
+            renderSource->invalidateTiles();
+        } else {
             renderSource->removeTiles();
         }
     }
+
+    updateBatch.sourceIDs.clear();
 }
 
 std::vector<const Source*> Style::getSources() const {
@@ -720,12 +716,12 @@ struct QueueSourceReloadVisitor {
 
 void Style::onLayerFilterChanged(Layer& layer) {
     layer.accept(QueueSourceReloadVisitor { updateBatch });
-    observer->onUpdate(Update::Layout);
+    observer->onUpdate(Update::Repaint);
 }
 
 void Style::onLayerVisibilityChanged(Layer& layer) {
     layer.accept(QueueSourceReloadVisitor { updateBatch });
-    observer->onUpdate(Update::RecalculateStyle | Update::Layout);
+    observer->onUpdate(Update::RecalculateStyle);
 }
 
 void Style::onLayerPaintPropertyChanged(Layer&) {
@@ -734,20 +730,16 @@ void Style::onLayerPaintPropertyChanged(Layer&) {
 
 void Style::onLayerDataDrivenPaintPropertyChanged(Layer& layer) {
     layer.accept(QueueSourceReloadVisitor { updateBatch });
-    observer->onUpdate(Update::RecalculateStyle | Update::Classes | Update::Layout);
+    observer->onUpdate(Update::RecalculateStyle | Update::Classes);
 }
 
 void Style::onLayerLayoutPropertyChanged(Layer& layer, const char * property) {
     layer.accept(QueueSourceReloadVisitor { updateBatch });
 
-    auto update = Update::Layout;
-
     // Recalculate the style for certain properties
-    bool needsRecalculation = strcmp(property, "icon-size") == 0 || strcmp(property, "text-size") == 0;
-    if (needsRecalculation) {
-        update |= Update::RecalculateStyle;
-    }
-    observer->onUpdate(update);
+    observer->onUpdate((strcmp(property, "icon-size") == 0 || strcmp(property, "text-size") == 0)
+        ? Update::RecalculateStyle
+        : Update::Repaint);
 }
 
 void Style::dumpDebugLogs() const {

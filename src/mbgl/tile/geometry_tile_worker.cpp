@@ -256,10 +256,7 @@ static std::vector<std::unique_ptr<RenderLayer>> toRenderLayers(const std::vecto
         });
 
         renderLayers.back()->evaluate(PropertyEvaluationParameters {
-            zoom,
-            Clock::time_point::max(),
-            ZoomHistory(),
-            Duration(0)
+            zoom
         });
     }
     return renderLayers;
