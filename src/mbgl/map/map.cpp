@@ -947,7 +947,7 @@ std::unique_ptr<Layer> Map::removeLayer(const std::string& id) {
     BackendScope guard(impl->backend);
 
     auto removedLayer = impl->style->removeLayer(id);
-    impl->onUpdate(Update::Classes);
+    impl->onUpdate(Update::Repaint);
 
     return removedLayer;
 }
