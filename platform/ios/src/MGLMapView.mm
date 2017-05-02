@@ -42,12 +42,13 @@
 
 #import "NSBundle+MGLAdditions.h"
 #import "NSDate+MGLAdditions.h"
-#import "NSString+MGLAdditions.h"
-#import "NSProcessInfo+MGLAdditions.h"
 #import "NSException+MGLAdditions.h"
+#import "NSPredicate+MGLAdditions.h"
+#import "NSProcessInfo+MGLAdditions.h"
+#import "NSString+MGLAdditions.h"
 #import "NSURL+MGLAdditions.h"
 #import "UIImage+MGLAdditions.h"
-#import "NSPredicate+MGLAdditions.h"
+#import "UIViewController+MGLAdditions.h"
 
 #import "MGLFaux3DUserLocationAnnotationView.h"
 #import "MGLUserLocationAnnotationView.h"
@@ -1946,10 +1947,7 @@ public:
     attributionController.popoverPresentationController.sourceView = self;
     attributionController.popoverPresentationController.sourceRect = self.attributionButton.frame;
     
-    UIViewController *viewController = self.window.rootViewController;
-    if ([viewController isKindOfClass:[UINavigationController class]]) {
-        viewController = [(UINavigationController *)viewController viewControllers].firstObject;
-    }
+    UIViewController *viewController = [self.window.rootViewController mgl_topMostViewController];
     [viewController presentViewController:attributionController
                                  animated:YES
                                completion:NULL];
