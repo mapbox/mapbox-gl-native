@@ -2,6 +2,9 @@
 
 Mapbox welcomes participation and contributions from everyone. Please read [CONTRIBUTING.md](../../CONTRIBUTING.md) to get started.
 
+## 3.5.3 - May 2, 2017
+* Fixed an issue that prevented the attribution `UIAlertController` from showing in modal hierarchies. ([#8837](https://github.com/mapbox/mapbox-gl-native/pull/8837))
+
 ## 3.5.2 - April 7, 2017
 
 * Fixed an issue that caused a crash when the user location annotation was presenting a callout view and the map was moved. ([#8686](https://github.com/mapbox/mapbox-gl-native/pull/8686))
@@ -128,7 +131,7 @@ This is the final scheduled version of the Mapbox iOS SDK that supports iOS 7. (
 * A source’s tiles are no longer rendered when the map is outside the source’s supported zoom levels. ([#6345](https://github.com/mapbox/mapbox-gl-native/pull/6345))
 * Improved style parsing performance. ([#6170](https://github.com/mapbox/mapbox-gl-native/pull/6170))
 * Improved feature querying performance. ([#6514](https://github.com/mapbox/mapbox-gl-native/pull/6514))
-* Fixed an issue where shapes that cannot currently be visually represented as annotations were still shown on the map as point annotations. ([#6764](https://github.com/mapbox/mapbox-gl-native/issues/6764)) 
+* Fixed an issue where shapes that cannot currently be visually represented as annotations were still shown on the map as point annotations. ([#6764](https://github.com/mapbox/mapbox-gl-native/issues/6764))
 
 ### User location
 
