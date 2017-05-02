@@ -26,7 +26,6 @@
 #include <mbgl/util/tile_coordinate.hpp>
 #include <mbgl/actor/scheduler.hpp>
 #include <mbgl/util/logging.hpp>
-#include <mbgl/util/string.hpp>
 #include <mbgl/math/log2.hpp>
 
 namespace mbgl {
@@ -328,15 +327,10 @@ void Map::Impl::render(View& view) {
 
         backend.updateAssumedState();
 
-        try {
-            painter->render(*style,
-                            frameData,
-                            view,
-                            annotationManager->getSpriteAtlas());
-        } catch (...) {
-            Log::Error(Event::General, "Exception in render: %s", util::toString(std::current_exception()).c_str());
-            exit(1);
-        }
+        painter->render(*style,
+                        frameData,
+                        view,
+                        annotationManager->getSpriteAtlas());
 
         auto request = std::move(stillImageRequest);
         request->callback(nullptr);
