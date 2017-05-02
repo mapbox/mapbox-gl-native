@@ -411,9 +411,6 @@ void Map::Impl::loadStyleJSON(const std::string& json) {
     style->setJSON(json);
     styleJSON = json;
 
-    // force style cascade, causing all pending transitions to complete.
-    style->cascade(Clock::now(), mode);
-
     if (!cameraMutated) {
         // Zoom first because it may constrain subsequent operations.
         map.setZoom(map.getDefaultZoom());
