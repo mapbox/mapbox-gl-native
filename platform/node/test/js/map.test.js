@@ -117,10 +117,6 @@ test('Map', function(t) {
             'setLayoutProperty',
             'setPaintProperty',
             'setFilter',
-            'setCenter',
-            'setZoom',
-            'setBearing',
-            'setPitch',
             'dumpDebugLogs',
             'queryRenderedFeatures'
         ]);
@@ -272,7 +268,7 @@ test('Map', function(t) {
 
             t.throws(function() {
                 map.removeImage({});
-            }, /First argument must be a string/);
+            }, /Argument must be a string/);
 
             map.release();
             t.end();
