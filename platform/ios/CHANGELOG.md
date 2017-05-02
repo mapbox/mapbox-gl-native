@@ -36,6 +36,9 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * Fixed an issue rendering polylines that contain duplicate vertices. ([#8808](https://github.com/mapbox/mapbox-gl-native/pull/8808))
 * Fixed a bug which caused the compass and other ornaments to underlap navigation and tab bars. ([#7716](https://github.com/mapbox/mapbox-gl-native/pull/7716))
 
+## 3.5.3 - May 2, 2017
+* Fixed an issue that prevented the attribution `UIAlertController` from showing in modal hierarchies. ([#8837](https://github.com/mapbox/mapbox-gl-native/pull/8837))
+
 ## 3.5.2 - April 7, 2017
 
 * Fixed an issue that caused a crash when the user location annotation was presenting a callout view and the map was moved. ([#8686](https://github.com/mapbox/mapbox-gl-native/pull/8686))
