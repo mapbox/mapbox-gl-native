@@ -4,8 +4,12 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 
 ## 5.1.0 - TBA
 
-5.1.0 builds further on 5.0.1 and adds:
 
+## 5.1.0-beta.1 - May 2, 2017
+
+5.1.0 builds further on 5.0.2 and adds:
+
+* Support for FillExtrusionLayer [#8431](https://github.com/mapbox/mapbox-gl-native/pull/8431)
 * Limit Viewport [#8622](https://github.com/mapbox/mapbox-gl-native/pull/8622)
 * Transition Properties for Layer attributes [#8509](https://github.com/mapbox/mapbox-gl-native/pull/8509)
 * Style wide transition duration and transition offset in milliseconds [#8576](https://github.com/mapbox/mapbox-gl-native/pull/8576)
@@ -17,11 +21,21 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 * OfflineRegion are validated if the bounds is found in the world bounds, else onError will be invoked [#8517](https://github.com/mapbox/mapbox-gl-native/pull/8517)
 * Polygon holes [#8557](https://github.com/mapbox/mapbox-gl-native/pull/8557) and [#8722](https://github.com/mapbox/mapbox-gl-native/pull/8722)
 * Custom location source [#8710](https://github.com/mapbox/mapbox-gl-native/pull/8710)
-* Expose source layer identifier [#8709](https://github.com/mapbox/mapbox-gl-native/pull/8709).
+* Expose source layer identifier [#8709](https://github.com/mapbox/mapbox-gl-native/pull/8709)
 * Ensure surface is created after display and context [#8759](https://github.com/mapbox/mapbox-gl-native/pull/8759)
 * Harden telemetry event dispatch [#8767](https://github.com/mapbox/mapbox-gl-native/pull/8767)
 * Move LatLngBounds calculation for CameraUpdateFactory to core [#8765](https://github.com/mapbox/mapbox-gl-native/pull/8765)
 * Spanish, Lithuanian, and Vietnamese localizations [#8852](https://github.com/mapbox/mapbox-gl-native/pull/8852)
+* Warning when updating a non-added annotation [#8832](https://github.com/mapbox/mapbox-gl-native/pull/8832)
+* Share location source between components [#8825](https://github.com/mapbox/mapbox-gl-native/pull/8825)
+* Test application runtime permissions for pre lollipop devices [#8823](https://github.com/mapbox/mapbox-gl-native/pull/8823)
+* Do not call OnMarkerClick listener twice [#8804](https://github.com/mapbox/mapbox-gl-native/pull/8804)
+* Rework instrumentation tests [#8793](https://github.com/mapbox/mapbox-gl-native/pull/8793)
+* Set first render flag to false when destroying the surface [#8739](https://github.com/mapbox/mapbox-gl-native/pull/8739)
+* Post resetting tracking settings to avoid race condition reset [#8738](https://github.com/mapbox/mapbox-gl-native/pull/8738)
+* Expose Source Layer identifier [#8709](https://github.com/mapbox/mapbox-gl-native/pull/8709)
+* Derived source attribution [#8630](https://github.com/mapbox/mapbox-gl-native/pull/8630)
+* Consistent use of duration unit [#8578](https://github.com/mapbox/mapbox-gl-native/pull/8578)
 
 ## 5.0.2 - April 3, 2017
 
