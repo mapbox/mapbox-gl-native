@@ -24,7 +24,7 @@ void RenderFillLayer::cascade(const CascadeParameters& parameters) {
     unevaluated = impl->cascading.cascade(parameters, std::move(unevaluated));
 }
 
-bool RenderFillLayer::evaluate(const PropertyEvaluationParameters& parameters) {
+void RenderFillLayer::evaluate(const PropertyEvaluationParameters& parameters) {
     evaluated = unevaluated.evaluate(parameters);
 
     if (unevaluated.get<style::FillOutlineColor>().isUndefined()) {
@@ -44,10 +44,11 @@ bool RenderFillLayer::evaluate(const PropertyEvaluationParameters& parameters) {
     } else {
         passes |= RenderPass::Opaque;
     }
-
-    return unevaluated.hasTransition();
 }
 
+bool RenderFillLayer::hasTransition() const {
+    return unevaluated.hasTransition();
+}
 
 bool RenderFillLayer::queryIntersectsFeature(
         const GeometryCoordinates& queryGeometry,

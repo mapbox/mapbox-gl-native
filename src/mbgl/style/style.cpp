@@ -387,9 +387,8 @@ void Style::recalculate(float z, const TimePoint& timePoint, MapMode mode) {
         mode == MapMode::Continuous ? util::DEFAULT_FADE_DURATION : Duration::zero()
     };
 
-    hasPendingTransitions = transitioningLight.hasTransition();
     for (const auto& layer : renderLayers) {
-        hasPendingTransitions |= layer->evaluate(parameters);
+        layer->evaluate(parameters);
 
         if (layer->needsRendering(zoomHistory.lastZoom)) {
             if (RenderSource* renderSource = getRenderSource(layer->baseImpl.source)) {
@@ -443,7 +442,17 @@ RenderSource* Style::getRenderSource(const std::string& id) const {
 }
 
 bool Style::hasTransitions() const {
-    return hasPendingTransitions;
+    if (transitioningLight.hasTransition()) {
+        return true;
+    }
+
+    for (const auto& layer : renderLayers) {
+        if (layer->hasTransition()) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 bool Style::isLoaded() const {

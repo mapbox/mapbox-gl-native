@@ -33,8 +33,10 @@ public:
     virtual void cascade(const CascadeParameters&) = 0;
 
     // Fully evaluate cascaded paint properties based on a zoom level.
+    virtual void evaluate(const PropertyEvaluationParameters&) = 0;
+
     // Returns true if any paint properties have active transitions.
-    virtual bool evaluate(const PropertyEvaluationParameters&) = 0;
+    virtual bool hasTransition() const = 0;
 
     // Check whether this layer is of the given subtype.
     template <class T>
