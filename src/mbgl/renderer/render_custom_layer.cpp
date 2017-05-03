@@ -13,8 +13,11 @@ std::unique_ptr<RenderLayer> RenderCustomLayer::clone() const {
     return std::make_unique<RenderCustomLayer>(*this);
 }
 
-bool RenderCustomLayer::evaluate(const PropertyEvaluationParameters&) {
+void RenderCustomLayer::evaluate(const PropertyEvaluationParameters&) {
     passes = RenderPass::Translucent;
+}
+
+bool RenderCustomLayer::hasTransition() const {
     return false;
 }
 

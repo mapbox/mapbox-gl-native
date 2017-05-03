@@ -38,7 +38,7 @@ void RenderSymbolLayer::cascade(const CascadeParameters& parameters) {
     unevaluated = impl->cascading.cascade(parameters, std::move(unevaluated));
 }
 
-bool RenderSymbolLayer::evaluate(const PropertyEvaluationParameters& parameters) {
+void RenderSymbolLayer::evaluate(const PropertyEvaluationParameters& parameters) {
     evaluated = unevaluated.evaluate(parameters);
 
     auto hasIconOpacity = evaluated.get<style::IconColor>().constantOr(Color::black()).a > 0 ||
@@ -49,10 +49,11 @@ bool RenderSymbolLayer::evaluate(const PropertyEvaluationParameters& parameters)
     passes = ((evaluated.get<style::IconOpacity>().constantOr(1) > 0 && hasIconOpacity && iconSize > 0)
               || (evaluated.get<style::TextOpacity>().constantOr(1) > 0 && hasTextOpacity && textSize > 0))
              ? RenderPass::Translucent : RenderPass::None;
-
-    return unevaluated.hasTransition();
 }
 
+bool RenderSymbolLayer::hasTransition() const {
+    return unevaluated.hasTransition();
+}
 
 style::IconPaintProperties::Evaluated RenderSymbolLayer::iconPaintProperties() const {
     return style::IconPaintProperties::Evaluated {

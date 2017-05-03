@@ -24,7 +24,7 @@ void RenderLineLayer::cascade(const CascadeParameters& parameters) {
     unevaluated = impl->cascading.cascade(parameters, std::move(unevaluated));
 }
 
-bool RenderLineLayer::evaluate(const PropertyEvaluationParameters& parameters) {
+void RenderLineLayer::evaluate(const PropertyEvaluationParameters& parameters) {
     // for scaling dasharrays
     auto dashArrayParams = parameters;
     dashArrayParams.z = std::floor(dashArrayParams.z);
@@ -36,9 +36,12 @@ bool RenderLineLayer::evaluate(const PropertyEvaluationParameters& parameters) {
               && evaluated.get<style::LineColor>().constantOr(Color::black()).a > 0
               && evaluated.get<style::LineWidth>() > 0)
              ? RenderPass::Translucent : RenderPass::None;
+}
 
+bool RenderLineLayer::hasTransition() const {
     return unevaluated.hasTransition();
 }
+
 optional<GeometryCollection> offsetLine(const GeometryCollection& rings, const double offset) {
     if (offset == 0) return {};
 

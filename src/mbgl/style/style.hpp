@@ -180,9 +180,9 @@ private:
 
     UpdateBatch updateBatch;
     ZoomHistory zoomHistory;
-    bool hasPendingTransitions = false;
 
     void removeRenderLayer(const std::string& layerID);
+
 public:
     bool loaded = false;
 };

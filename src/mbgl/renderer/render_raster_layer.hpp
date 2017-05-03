@@ -15,7 +15,8 @@ public:
     std::unique_ptr<RenderLayer> clone() const override;
 
     void cascade(const CascadeParameters&) override;
-    bool evaluate(const PropertyEvaluationParameters&) override;
+    void evaluate(const PropertyEvaluationParameters&) override;
+    bool hasTransition() const override;
 
     std::unique_ptr<Bucket> createBucket(const BucketParameters&, const std::vector<const RenderLayer*>&) const override;
 
