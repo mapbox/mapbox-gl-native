@@ -329,7 +329,7 @@ double Style::getDefaultPitch() const {
 }
 
 void Style::update(const UpdateParameters& parameters) {
-    zoomHistory.update(parameters.transformState.getZoom(), parameters.timePoint);
+    bool zoomChanged = zoomHistory.update(parameters.transformState.getZoom(), parameters.timePoint);
 
     std::vector<ClassID> classIDs;
     for (const auto& className : classes) {
@@ -358,11 +358,14 @@ void Style::update(const UpdateParameters& parameters) {
                                         parameters.annotationManager,
                                         *this);
 
-    if (parameters.updateFlags & Update::Classes) {
+    const bool cascade = parameters.updateFlags & Update::Classes;
+    const bool evaluate = cascade || zoomChanged || parameters.updateFlags & Update::RecalculateStyle;
+
+    if (cascade) {
         transitioningLight = TransitioningLight(*light, std::move(transitioningLight), cascadeParameters);
     }
 
-    if (parameters.updateFlags & Update::RecalculateStyle) {
+    if (evaluate || transitioningLight.hasTransition()) {
         evaluatedLight = EvaluatedLight(transitioningLight, evaluationParameters);
     }
 
@@ -371,11 +374,11 @@ void Style::update(const UpdateParameters& parameters) {
     }
 
     for (const auto& layer : renderLayers) {
-        if (parameters.updateFlags & Update::Classes) {
+        if (cascade) {
             layer->cascade(cascadeParameters);
         }
 
-        if (parameters.updateFlags & Update::Classes || parameters.updateFlags & Update::RecalculateStyle) {
+        if (evaluate || layer->hasTransition()) {
             layer->evaluate(evaluationParameters);
         }
 

@@ -122,8 +122,6 @@ void Transform::easeTo(const CameraOptions& camera, const AnimationOptions& anim
     const double scale = state.zoomScale(zoom);
     pitch = util::clamp(pitch, state.min_pitch, state.max_pitch);
 
-    Update update = state.getZoom() == zoom ? Update::Repaint : Update::RecalculateStyle;
-
     // Minimize rotation by taking the shorter path around the circle.
     angle = _normalizeAngle(angle, state.angle);
     state.angle = _normalizeAngle(state.angle, angle);
@@ -153,7 +151,6 @@ void Transform::easeTo(const CameraOptions& camera, const AnimationOptions& anim
         if (!padding.isFlush()) {
             state.moveLatLng(frameLatLng, center);
         }
-        return update;
     }, duration);
 }
 
@@ -313,7 +310,6 @@ void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &anima
         if (!padding.isFlush()) {
             state.moveLatLng(frameLatLng, center);
         }
-        return Update::RecalculateStyle;
     }, duration);
 }
 
@@ -533,7 +529,7 @@ ViewportMode Transform::getViewportMode() const {
 
 void Transform::startTransition(const CameraOptions& camera,
                                 const AnimationOptions& animation,
-                                std::function<Update(double)> frame,
+                                std::function<void(double)> frame,
                                 const Duration& duration) {
     if (transitionFinishFn) {
         transitionFinishFn();
@@ -555,12 +551,11 @@ void Transform::startTransition(const CameraOptions& camera,
 
     transitionFrameFn = [isAnimated, animation, frame, anchor, anchorLatLng, this](const TimePoint now) {
         float t = isAnimated ? (std::chrono::duration<float>(now - transitionStart) / transitionDuration) : 1.0;
-        Update result;
         if (t >= 1.0) {
-            result = frame(1.0);
+            frame(1.0);
         } else {
             util::UnitBezier ease = animation.easing ? *animation.easing : util::DEFAULT_TRANSITION_EASE;
-            result = frame(ease.solve(t, 0.001));
+            frame(ease.solve(t, 0.001));
         }
 
         if (anchor) state.moveLatLng(anchorLatLng, *anchor);
@@ -579,7 +574,6 @@ void Transform::startTransition(const CameraOptions& camera,
             // we can only return after this point.
             transitionFrameFn = nullptr;
         }
-        return result;
     };
 
     transitionFinishFn = [isAnimated, animation, this] {
@@ -601,8 +595,10 @@ bool Transform::inTransition() const {
     return transitionFrameFn != nullptr;
 }
 
-Update Transform::updateTransitions(const TimePoint& now) {
-    return transitionFrameFn ? transitionFrameFn(now) : Update::Nothing;
+void Transform::updateTransitions(const TimePoint& now) {
+    if (transitionFrameFn) {
+        transitionFrameFn(now);
+    }
 }
 
 void Transform::cancelTransitions() {

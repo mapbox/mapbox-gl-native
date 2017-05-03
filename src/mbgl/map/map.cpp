@@ -231,9 +231,7 @@ void Map::Impl::render(View& view) {
         ? Clock::now()
         : Clock::time_point::max();
 
-    auto flags = transform.updateTransitions(timePoint);
-
-    updateFlags |= flags;
+    transform.updateTransitions(timePoint);
 
     if (style->loaded && updateFlags & Update::AnnotationStyle) {
         annotationManager->updateStyle(*style);
@@ -297,16 +295,10 @@ void Map::Impl::render(View& view) {
             }
         }
 
-        if (style->hasTransitions()) {
-            flags |= Update::RecalculateStyle;
-        } else if (painter->needsAnimation()) {
-            flags |= Update::Repaint;
-        }
-
-        // Only schedule an update if we need to paint another frame due to transitions or
+        // Schedule an update if we need to paint another frame due to transitions or
         // animations that are still in progress
-        if (flags != Update::Nothing) {
-            onUpdate(flags);
+        if (style->hasTransitions() || painter->needsAnimation() || transform.inTransition()) {
+            onUpdate(Update::Repaint);
         }
     } else if (stillImageRequest && style->isLoaded()) {
         FrameData frameData { timePoint,
@@ -409,7 +401,7 @@ void Map::Impl::loadStyleJSON(const std::string& json) {
         map.setPitch(map.getDefaultPitch());
     }
 
-    onUpdate(Update::Classes | Update::RecalculateStyle | Update::AnnotationStyle);
+    onUpdate(Update::Classes | Update::AnnotationStyle);
 }
 
 std::string Map::getStyleURL() const {
@@ -457,19 +449,19 @@ CameraOptions Map::getCameraOptions(const EdgeInsets& padding) const {
 void Map::jumpTo(const CameraOptions& camera) {
     impl->cameraMutated = true;
     impl->transform.jumpTo(camera);
-    impl->onUpdate(camera.zoom ? Update::RecalculateStyle : Update::Repaint);
+    impl->onUpdate(Update::Repaint);
 }
 
 void Map::easeTo(const CameraOptions& camera, const AnimationOptions& animation) {
     impl->cameraMutated = true;
     impl->transform.easeTo(camera, animation);
-    impl->onUpdate(camera.zoom ? Update::RecalculateStyle : Update::Repaint);
+    impl->onUpdate(Update::Repaint);
 }
 
 void Map::flyTo(const CameraOptions& camera, const AnimationOptions& animation) {
     impl->cameraMutated = true;
     impl->transform.flyTo(camera, animation);
-    impl->onUpdate(Update::RecalculateStyle);
+    impl->onUpdate(Update::Repaint);
 }
 
 #pragma mark - Position
@@ -510,7 +502,7 @@ void Map::resetPosition(const EdgeInsets& padding) {
     camera.padding = padding;
     camera.zoom = 0;
     impl->transform.jumpTo(camera);
-    impl->onUpdate(Update::RecalculateStyle);
+    impl->onUpdate(Update::Repaint);
 }
 
 
@@ -524,13 +516,13 @@ void Map::setZoom(double zoom, const AnimationOptions& animation) {
 void Map::setZoom(double zoom, optional<ScreenCoordinate> anchor, const AnimationOptions& animation) {
     impl->cameraMutated = true;
     impl->transform.setZoom(zoom, anchor, animation);
-    impl->onUpdate(Update::RecalculateStyle);
+    impl->onUpdate(Update::Repaint);
 }
 
 void Map::setZoom(double zoom, const EdgeInsets& padding, const AnimationOptions& animation) {
     impl->cameraMutated = true;
     impl->transform.setZoom(zoom, padding, animation);
-    impl->onUpdate(Update::RecalculateStyle);
+    impl->onUpdate(Update::Repaint);
 }
 
 double Map::getZoom() const {
@@ -545,7 +537,7 @@ void Map::setLatLngZoom(const LatLng& latLng, double zoom, const AnimationOption
 void Map::setLatLngZoom(const LatLng& latLng, double zoom, const EdgeInsets& padding, const AnimationOptions& animation) {
     impl->cameraMutated = true;
     impl->transform.setLatLngZoom(latLng, zoom, padding, animation);
-    impl->onUpdate(Update::RecalculateStyle);
+    impl->onUpdate(Update::Repaint);
 }
 
 CameraOptions Map::cameraForLatLngBounds(const LatLngBounds& bounds, const EdgeInsets& padding) const {
