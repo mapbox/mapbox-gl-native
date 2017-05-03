@@ -25,9 +25,9 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>ld</string>
 			<key>one</key>
-			<string>%d annotation visible</string>
+			<string>%d anotación visible</string>
 			<key>other</key>
-			<string>%d annotations visibles</string>
+			<string>%d anotaciones visibles</string>
 		</dict>
 	</dict>
 </dict>
