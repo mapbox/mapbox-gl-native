@@ -13,10 +13,8 @@
 			<string>NSStringPluralRuleType</string>
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
-			<key>one</key>
-			<string>Zoom %dx</string>
 			<key>other</key>
-			<string>Zoom %dx</string>
+			<string>Thu phóng gấp %d lần</string>
 		</dict>
 		<key>count</key>
 		<dict>
@@ -24,10 +22,8 @@
 			<string>NSStringPluralRuleType</string>
 			<key>NSStringFormatValueTypeKey</key>
 			<string>ld</string>
-			<key>one</key>
-			<string>%d annotation visible</string>
 			<key>other</key>
-			<string>%d annotations visibles</string>
+			<string>%d chú thích đang xuất hiện</string>
 		</dict>
 	</dict>
 </dict>
