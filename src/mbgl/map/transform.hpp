@@ -4,7 +4,6 @@
 #include <mbgl/map/map_observer.hpp>
 #include <mbgl/map/mode.hpp>
 #include <mbgl/map/transform_state.hpp>
-#include <mbgl/map/update.hpp>
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/geo.hpp>
 #include <mbgl/util/noncopyable.hpp>
@@ -128,7 +127,7 @@ public:
 
     // Transitions
     bool inTransition() const;
-    Update updateTransitions(const TimePoint& now);
+    void updateTransitions(const TimePoint& now);
     TimePoint getTransitionStart() const { return transitionStart; }
     Duration getTransitionDuration() const { return transitionDuration; }
     void cancelTransitions();
@@ -153,12 +152,12 @@ private:
 
     void startTransition(const CameraOptions&,
                          const AnimationOptions&,
-                         std::function<Update(double)>,
+                         std::function<void(double)>,
                          const Duration&);
 
     TimePoint transitionStart;
     Duration transitionDuration;
-    std::function<Update(const TimePoint)> transitionFrameFn;
+    std::function<void(const TimePoint)> transitionFrameFn;
     std::function<void()> transitionFinishFn;
 };
 
