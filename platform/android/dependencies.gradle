@@ -7,21 +7,21 @@ ext {
     versionCode = 11
     versionName = "5.0.0"
 
-    supportLibVersion = "25.3.1"
-    leakCanaryVersion = '1.5'
+    mapboxServicesVersion = "2.2.0-SNAPSHOT"
+    supportLibVersion = "25.1.0"
     wearableVersion = '2.0.0'
-
     espressoVersion = '2.2.2'
     testRunnerVersion = '0.5'
+    leakCanaryVersion = '1.5'
 
     dep = [
             // mapbox
-            mapboxJavaServices     : 'com.mapbox.mapboxsdk:mapbox-java-services:2.1.0@jar',
-            mapboxJavaGeoJSON      : 'com.mapbox.mapboxsdk:mapbox-java-geojson:2.1.0@jar',
-            mapboxAndroidTelemetry : 'com.mapbox.mapboxsdk:mapbox-android-telemetry:2.1.0@aar',
+            mapboxJavaServices     : "com.mapbox.mapboxsdk:mapbox-java-services:${mapboxServicesVersion}@jar",
+            mapboxJavaGeoJSON      : "com.mapbox.mapboxsdk:mapbox-java-geojson:${mapboxServicesVersion}@jar",
+            mapboxAndroidTelemetry : "com.mapbox.mapboxsdk:mapbox-android-telemetry:${mapboxServicesVersion}@aar",
 
             // mapzen lost
-            lost                   : 'com.mapzen.android:lost:2.2.0',
+            lost                   : 'com.mapzen.android:lost:2.3.0-SNAPSHOT',
 
             // unit test
             junit                  : 'junit:junit:4.12',

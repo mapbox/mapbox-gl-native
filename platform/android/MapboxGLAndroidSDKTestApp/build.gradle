@@ -61,10 +61,7 @@ dependencies {
     }
 
     // Support libraries
-    compile rootProject.ext.dep.supportAnnotations
-    compile rootProject.ext.dep.supportV4
     compile rootProject.ext.dep.supportAppcompatV7
-    compile rootProject.ext.dep.supportDesign
     compile rootProject.ext.dep.supportRecyclerView
 
     // Leak Canary
