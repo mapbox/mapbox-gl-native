@@ -121,6 +121,8 @@ namespace android {
             layer.as<SymbolLayer>()->setFilter(filter);
         } else if (layer.is<CircleLayer>()) {
             layer.as<CircleLayer>()->setFilter(filter);
+        } else if (layer.is<FillExtrusionLayer>()){
+            layer.as<FillExtrusionLayer>()->setFilter(filter);
         } else {
             mbgl::Log::Warning(mbgl::Event::JNI, "Layer doesn't support filters");
         }

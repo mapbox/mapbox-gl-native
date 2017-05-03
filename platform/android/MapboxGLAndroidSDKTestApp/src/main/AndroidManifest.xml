@@ -459,6 +459,17 @@
                 android:value=".activity.FeatureOverviewActivity"/>
         </activity>
         <activity
+            android:name=".activity.style.BuildingFillExtrusionActivity"
+            android:description="@string/description_building_fill_extrusion_layer"
+            android:label="@string/activity_building_fill_extrusion_layer">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_style"/>
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.FeatureOverviewActivity"/>
+        </activity>
+        <activity
             android:name=".activity.style.SymbolLayerActivity"
             android:description="@string/description_symbol_layer"
             android:label="@string/activity_symbol_layer">
