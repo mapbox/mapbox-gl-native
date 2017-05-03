@@ -227,7 +227,9 @@ void Map::Impl::render(View& view) {
         return;
     }
 
-    TimePoint timePoint = Clock::now();
+    TimePoint timePoint = mode == MapMode::Continuous
+        ? Clock::now()
+        : Clock::time_point::max();
 
     auto flags = transform.updateTransitions(timePoint);
 
