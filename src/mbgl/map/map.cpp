@@ -800,7 +800,7 @@ void Map::removeAnnotation(AnnotationID annotation) {
 std::vector<Feature> Map::queryRenderedFeatures(const ScreenCoordinate& point, const optional<std::vector<std::string>>& layerIDs) {
     if (!impl->style) return {};
 
-    return impl->style->queryRenderedFeatures({
+    return impl->style->queryRenderedFeatures(QueryParameters{
         { point },
         impl->transform.getState(),
         layerIDs
@@ -810,7 +810,7 @@ std::vector<Feature> Map::queryRenderedFeatures(const ScreenCoordinate& point, c
 std::vector<Feature> Map::queryRenderedFeatures(const ScreenBox& box, const optional<std::vector<std::string>>& layerIDs) {
     if (!impl->style) return {};
 
-    return impl->style->queryRenderedFeatures({
+    return impl->style->queryRenderedFeatures(QueryParameters{
         {
             box.min,
             { box.max.x, box.min.y },
