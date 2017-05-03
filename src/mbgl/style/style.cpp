@@ -360,7 +360,7 @@ void Style::cascade(const TimePoint& timePoint, MapMode mode) {
 
     const CascadeParameters parameters {
         classIDs,
-        mode == MapMode::Continuous ? timePoint : Clock::time_point::max(),
+        timePoint,
         mode == MapMode::Continuous ? transitionOptions : immediateTransition
     };
 
@@ -382,7 +382,7 @@ void Style::recalculate(float z, const TimePoint& timePoint, MapMode mode) {
 
     const PropertyEvaluationParameters parameters {
         z,
-        mode == MapMode::Continuous ? timePoint : Clock::time_point::max(),
+        timePoint,
         zoomHistory,
         mode == MapMode::Continuous ? util::DEFAULT_FADE_DURATION : Duration::zero()
     };
