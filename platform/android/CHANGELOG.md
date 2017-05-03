@@ -36,6 +36,7 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 * Expose Source Layer identifier [#8709](https://github.com/mapbox/mapbox-gl-native/pull/8709)
 * Derived source attribution [#8630](https://github.com/mapbox/mapbox-gl-native/pull/8630)
 * Consistent use of duration unit [#8578](https://github.com/mapbox/mapbox-gl-native/pull/8578)
+* Swedish localization [#8883](https://github.com/mapbox/mapbox-gl-native/pull/8883)
 
 ## 5.0.2 - April 3, 2017
 
