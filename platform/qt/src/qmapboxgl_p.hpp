@@ -55,6 +55,7 @@ public:
     std::unique_ptr<mbgl::DefaultFileSource> fileSourceObj;
     std::shared_ptr<mbgl::ThreadPool> threadPool;
     std::unique_ptr<mbgl::Map> mapObj;
+    std::unique_ptr<mbgl::BackendScope> backendScope;
 
     bool dirty { false };
 
