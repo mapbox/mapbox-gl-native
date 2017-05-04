@@ -6,6 +6,9 @@
 
 namespace mbgl {
 
+OffscreenTexture::OffscreenTexture(OffscreenTexture&&) = default;
+OffscreenTexture& OffscreenTexture::operator=(OffscreenTexture&&) = default;
+
 class OffscreenTexture::Impl {
 public:
     Impl(gl::Context& context_, const Size size_) : context(context_), size(std::move(size_)) {
@@ -40,10 +43,11 @@ public:
     void bindRenderbuffers(gl::TextureUnit unit) {
         if (!framebuffer) {
             texture = context.createTexture(size, gl::TextureFormat::RGBA, unit);
-            gl::Renderbuffer<gl::RenderbufferType::DepthComponent> depthTarget = context.createRenderbuffer<gl::RenderbufferType::DepthComponent>(size);
-            framebuffer = context.createFramebuffer(*texture, depthTarget);
-
+            gl::Renderbuffer<gl::RenderbufferType::DepthComponent> depth =
+                context.createRenderbuffer<gl::RenderbufferType::DepthComponent>(size);
+            framebuffer = context.createFramebuffer(*texture, depth);
         } else {
+            context.bindTexture(*texture, unit);
             context.bindFramebuffer = framebuffer->framebuffer;
         }
 
