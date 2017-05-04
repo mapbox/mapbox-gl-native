@@ -66,10 +66,9 @@ workflows:
             gem install xcpretty --no-rdoc --no-ri
             export BUILDTYPE=Release
             export PUBLISH=true
-            make test-node
+            make test-node && ./platform/node/scripts/after_success.sh
             brew unlink node@4
             brew link --overwrite node@6 --force
             make clean
-            make test-node
-            ./platform/node/scripts/after_success.sh
+            make test-node && ./platform/node/scripts/after_success.sh
     - slack: *slack
