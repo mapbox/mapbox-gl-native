@@ -43,8 +43,8 @@ workflows:
             brew link node@4 --force
             gem install xcpretty --no-rdoc --no-ri
             make test-node || RESULT=$?
-            brew unlink node
-            brew link node@6 --force
+            brew unlink node@4
+            brew link --overwrite node@6
             make test-node || RESULT=$?
             ./platform/node/scripts/after_script.sh ${BITRISE_BUILD_NUMBER}
             exit ${RESULT:-0}
@@ -66,8 +66,8 @@ workflows:
             export BUILDTYPE=Release
             export PUBLISH=true
             make test-node
-            brew unlink node
-            brew link node@6 --force
+            brew unlink node@4
+            brew link --overwrite node@6
             make test-node
             ./platform/node/scripts/after_success.sh
     - slack: *slack
