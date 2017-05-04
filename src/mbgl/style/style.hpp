@@ -101,6 +101,10 @@ public:
     bool hasClass(const std::string&) const;
     std::vector<std::string> getClasses() const;
 
+    void setLight(std::unique_ptr<Light>);
+    Light* getLight() const;
+    RenderLight* getRenderLight() const;
+
     RenderData getRenderData(MapDebugOptions, float angle) const;
 
     std::vector<Feature> queryRenderedFeatures(const ScreenLineString& geometry,
@@ -118,10 +122,6 @@ public:
     std::unique_ptr<SpriteAtlas> spriteAtlas;
     std::unique_ptr<LineAtlas> lineAtlas;
 
-    std::unique_ptr<Light> light;
-    TransitioningLight transitioningLight;
-    EvaluatedLight evaluatedLight;
-
     RenderSource* getRenderSource(const std::string& id) const;
 
 private:
@@ -132,6 +132,9 @@ private:
     std::vector<std::unique_ptr<RenderLayer>> renderLayers;
     std::vector<std::string> classes;
     TransitionOptions transitionOptions;
+
+    std::unique_ptr<Light> light;
+    std::unique_ptr<RenderLight> renderLight;
 
     // Defaults
     std::string name;
