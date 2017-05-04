@@ -142,7 +142,6 @@ private:
 
     std::vector<std::unique_ptr<Layer>>::const_iterator findLayer(const std::string& layerID) const;
     std::vector<std::unique_ptr<RenderLayer>>::const_iterator findRenderLayer(const std::string&) const;
-    void reloadLayerSource(Layer&);
 
     // GlyphStoreObserver implementation.
     void onGlyphsLoaded(const FontStack&, const GlyphRange&) override;
