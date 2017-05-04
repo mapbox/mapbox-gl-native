@@ -119,6 +119,8 @@ matrix:
       env: BUILDTYPE=Debug _CXX=clang++-3.9 _CC=clang-3.9 WITH_EGL=1
       addons: *clang39
       before_script:
+        - export PACKAGE_JSON_VERSION=$(node -e "console.log(require('./package.json').version)")
+        - export PUBLISH=$([[ "${TRAVIS_TAG:-}" == "node-v${PACKAGE_JSON_VERSION}" ]] && echo true)
         - mapbox_install_logbt
         - mapbox_start_xvfb
         - mapbox_export_mesa_library_path
@@ -130,6 +132,8 @@ matrix:
       after_script:
         - ccache --show-stats
         - ./platform/node/scripts/after_script.sh ${TRAVIS_JOB_NUMBER}
+      after_success:
+        - ./platform/node/scripts/after_success.sh
       after_failure:
         - aws s3 cp . s3://mapbox/mapbox-gl-native/render-tests/$TRAVIS_JOB_NUMBER --recursive --exclude "*" --include "*.trace"
 
