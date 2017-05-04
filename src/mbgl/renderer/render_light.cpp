@@ -7,7 +7,7 @@ RenderLight::RenderLight(const style::Light light_)
 }
 
 void RenderLight::transition(const CascadeParameters& parameters) {
-    transitioning = TransitioningLight(light, std::move(transitioning), parameters);
+    transitioning = TransitioningLight(light.properties, std::move(transitioning), parameters);
 }
 
 void RenderLight::evaluate(const PropertyEvaluationParameters& parameters) {

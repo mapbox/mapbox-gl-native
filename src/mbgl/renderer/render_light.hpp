@@ -69,8 +69,6 @@ public:
 using TransitioningLight = Transitioning<style::LightProperties>;
 using EvaluatedLight     = Evaluated<style::LightProperties>;
 
-class Painter;
-
 class RenderLight {
 public:
     RenderLight(const style::Light);
