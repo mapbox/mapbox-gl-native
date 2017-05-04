@@ -50,11 +50,6 @@ public:
     }
 
     const std::string& getID() const;
-
-    // Create a new source with the specified `id`. All other properties
-    // are copied from this source.
-    std::unique_ptr<Source> copy(const std::string& id) const;
-
     optional<std::string> getAttribution() const;
 
     // Private implementation
