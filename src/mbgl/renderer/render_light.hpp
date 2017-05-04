@@ -1,11 +1,14 @@
 #pragma once
 
-#include <mbgl/style/light.hpp>
+#include <mbgl/style/light_impl.hpp>
+#include <mbgl/style/light_properties.hpp>
 #include <mbgl/renderer/transitioning_property.hpp>
 #include <mbgl/renderer/cascade_parameters.hpp>
 #include <mbgl/renderer/property_evaluator.hpp>
 #include <mbgl/renderer/property_evaluation_parameters.hpp>
 #include <mbgl/util/ignore.hpp>
+
+#include <memory>
 
 namespace mbgl {
 
@@ -71,7 +74,14 @@ using EvaluatedLight     = Evaluated<style::LightProperties>;
 
 class RenderLight {
 public:
-    RenderLight(const style::Light);
+    RenderLight(std::shared_ptr<const style::Light::Impl>);
+
+    // Creates a copy intitalized with previous transitioning light
+    RenderLight(std::shared_ptr<const style::Light::Impl>, const TransitioningLight);
+
+    // creates a copy initialized with previous transitioning
+    // values
+    std::unique_ptr<RenderLight> copy(std::shared_ptr<const style::Light::Impl>) const;
 
     void transition(const CascadeParameters&);
     void evaluate(const PropertyEvaluationParameters&);
@@ -79,10 +89,12 @@ public:
 
     const EvaluatedLight& getEvaluated() const;
 
+    const std::shared_ptr<const style::Light::Impl> impl;
+
 private:
+
     TransitioningLight transitioning;
     EvaluatedLight evaluated;
-    style::Light light;
 };
 
 } // namespace mbgl

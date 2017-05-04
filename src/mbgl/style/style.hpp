@@ -5,6 +5,7 @@
 #include <mbgl/style/source_observer.hpp>
 #include <mbgl/renderer/render_source_observer.hpp>
 #include <mbgl/style/layer_observer.hpp>
+#include <mbgl/style/light_observer.hpp>
 #include <mbgl/style/update_batch.hpp>
 #include <mbgl/renderer/render_layer.hpp>
 #include <mbgl/renderer/render_light.hpp>
@@ -48,6 +49,7 @@ class Style : public GlyphAtlasObserver,
               public SourceObserver,
               public RenderSourceObserver,
               public LayerObserver,
+              public LightObserver,
               public util::noncopyable {
 public:
     Style(Scheduler&, FileSource&, float pixelRatio);
@@ -168,6 +170,9 @@ private:
     void onLayerPaintPropertyChanged(Layer&) override;
     void onLayerDataDrivenPaintPropertyChanged(Layer&) override;
     void onLayerLayoutPropertyChanged(Layer&, const char *) override;
+
+    // LightObserver implementation.
+    void onLightChanged(const Light&) override;
 
     Observer nullObserver;
     Observer* observer = &nullObserver;

@@ -113,7 +113,7 @@ public:
                 return {};
             }
         }
-        return { light };
+        return { std::move(light) };
     };
 };
 
