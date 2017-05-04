@@ -69,4 +69,22 @@ public:
 using TransitioningLight = Transitioning<style::LightProperties>;
 using EvaluatedLight     = Evaluated<style::LightProperties>;
 
+class Painter;
+
+class RenderLight {
+public:
+    RenderLight(const style::Light);
+
+    void transition(const CascadeParameters&);
+    void evaluate(const PropertyEvaluationParameters&);
+    bool hasTransition() const;
+
+    const EvaluatedLight& getEvaluated() const;
+
+private:
+    TransitioningLight transitioning;
+    EvaluatedLight evaluated;
+    style::Light light;
+};
+
 } // namespace mbgl

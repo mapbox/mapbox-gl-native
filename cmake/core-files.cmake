@@ -212,6 +212,7 @@ set(MBGL_CORE_FILES
     src/mbgl/renderer/render_item.hpp
     src/mbgl/renderer/render_layer.cpp
     src/mbgl/renderer/render_layer.hpp
+    src/mbgl/renderer/render_light.cpp
     src/mbgl/renderer/render_light.hpp
     src/mbgl/renderer/render_line_layer.cpp
     src/mbgl/renderer/render_line_layer.hpp
