@@ -31,7 +31,7 @@ android {
         buildConfigField "String", "MAPBOX_EVENTS_USER_AGENT", String.format("\"MapboxEventsAndroid/%s\"", project.VERSION_NAME)
     }
 
-    defaultPublishConfig project.hasProperty("mapbox.buildtype") ?  project.getProperty("mapbox.buildtype") : "debug"
+    defaultPublishConfig project.hasProperty("mapbox.buildtype") ? project.getProperty("mapbox.buildtype") : "debug"
 
     // We sometimes want to invoke Gradle without building a native dependency, e.g. when we just want
     // to invoke the Java tests. When we explicitly specify an ABI of 'none', no native dependencies are
@@ -76,7 +76,11 @@ android {
                     }
 
                     targets "mapbox-gl"
-                    targets "example-custom-layer"
+
+                    if (defaultPublishConfig.equalsIgnoreCase("debug")) {
+                        targets "example-custom-layer"
+                    }
+
                     if (project.hasProperty("mapbox.with_test")) {
                         targets "mbgl-test"
                     }
