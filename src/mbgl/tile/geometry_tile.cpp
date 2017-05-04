@@ -126,9 +126,6 @@ void GeometryTile::onPlacement(PlacementResult result) {
         pending = false;
     }
     symbolBuckets = std::move(result.symbolBuckets);
-    for (auto& entry : symbolBuckets) {
-        dynamic_cast<SymbolBucket*>(entry.second.get())->spriteAtlas = &spriteAtlas;
-    }
     collisionTile = std::move(result.collisionTile);
     observer->onTileChanged(*this);
 }
