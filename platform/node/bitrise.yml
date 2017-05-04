@@ -32,16 +32,19 @@ workflows:
   primary:
     steps:
     - script:
-        title: Test node v4
+        title: Test
         inputs:
         - content: |-
             #!/bin/bash
             set -eu -o pipefail
             brew update
             brew unlink node
-            brew install cmake awscli node@4
+            brew install cmake awscli node@4 node@6
             brew link node@4 --force
             gem install xcpretty --no-rdoc --no-ri
+            make test-node || RESULT=$?
+            brew unlink node
+            brew link node@6 --force
             make test-node || RESULT=$?
             ./platform/node/scripts/after_script.sh ${BITRISE_BUILD_NUMBER}
             exit ${RESULT:-0}
@@ -50,55 +53,21 @@ workflows:
   publish:
     steps:
     - script:
-        title: Publish node v4
+        title: Publish
         inputs:
         - content: |-
             #!/bin/bash
             set -eu -o pipefail
             brew update
             brew unlink node
-            brew install cmake awscli node@4
+            brew install cmake awscli node@4 node@6
             brew link node@4 --force
             gem install xcpretty --no-rdoc --no-ri
             export BUILDTYPE=Release
             export PUBLISH=true
             make test-node
-            ./platform/node/scripts/after_success.sh
-    - slack: *slack
-
-  primary:
-    steps:
-    - script:
-        title: Test node v6
-        inputs:
-        - content: |-
-            #!/bin/bash
-            set -eu -o pipefail
-            brew update
             brew unlink node
-            brew install cmake awscli node@6
             brew link node@6 --force
-            gem install xcpretty --no-rdoc --no-ri
-            make test-node || RESULT=$?
-            ./platform/node/scripts/after_script.sh ${BITRISE_BUILD_NUMBER}
-            exit ${RESULT:-0}
-    - slack: *slack
-
-  publish:
-    steps:
-    - script:
-        title: Publish node v6
-        inputs:
-        - content: |-
-            #!/bin/bash
-            set -eu -o pipefail
-            brew update
-            brew unlink node
-            brew install cmake awscli node@6
-            brew link node@6 --force
-            gem install xcpretty --no-rdoc --no-ri
-            export BUILDTYPE=Release
-            export PUBLISH=true
             make test-node
             ./platform/node/scripts/after_success.sh
     - slack: *slack
