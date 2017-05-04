@@ -1,0 +1,35 @@
+<%
+  const properties = locals.properties;
+-%>
+// This file is generated. Do not edit.
+
+#pragma once
+#include <mbgl/style/property_value.hpp>
+#include <mbgl/style/transition_options.hpp>
+#include <mbgl/style/types.hpp>
+
+namespace mbgl {
+
+class RenderLight;
+
+namespace style {
+
+class Light {
+public:
+
+<% for (const property of properties) { -%>
+    static <%- evaluatedType(property) %> getDefault<%- camelize(property.name) %>();
+    <%- propertyValueType(property) %> get<%- camelize(property.name) %>() const;
+    void set<%- camelize(property.name) %>(<%- propertyValueType(property) %>);
+    void set<%- camelize(property.name) %>Transition(const TransitionOptions&);
+    TransitionOptions get<%- camelize(property.name) %>Transition() const;
+
+<% } -%>
+private:
+    IndexedTuple<LightProperties, LightProperties> properties;
+
+    friend class mbgl::RenderLight;
+};
+
+} // namespace style
+} // namespace mbgl
