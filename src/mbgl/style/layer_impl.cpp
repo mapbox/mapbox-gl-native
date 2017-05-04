@@ -12,7 +12,7 @@ std::unique_ptr<Layer> Layer::Impl::copy(const std::string& id_,
 }
 
 void Layer::Impl::setObserver(LayerObserver* observer_) {
-    observer = observer_;
+    observer = observer_ ? observer_ : &nullObserver;
 }
 
 } // namespace style

@@ -20,7 +20,7 @@ void Source::Impl::dumpDebugLogs() const {
 }
 
 void Source::Impl::setObserver(SourceObserver* observer_) {
-    observer = observer_;
+    observer = observer_ ? observer_ : &nullObserver;
 }
 
 } // namespace style

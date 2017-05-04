@@ -192,6 +192,7 @@ std::unique_ptr<Source> Style::removeSource(const std::string& id) {
     });
 
     auto source = std::move(*it);
+    source->baseImpl->setObserver(nullptr);
     sources.erase(it);
     updateBatch.sourceIDs.erase(id);
 
@@ -264,6 +265,7 @@ std::unique_ptr<Layer> Style::removeLayer(const std::string& id) {
         customLayer->impl->deinitialize();
     }
 
+    layer->baseImpl->setObserver(nullptr);
     layers.erase(it);
     removeRenderLayer(id);
     return layer;
