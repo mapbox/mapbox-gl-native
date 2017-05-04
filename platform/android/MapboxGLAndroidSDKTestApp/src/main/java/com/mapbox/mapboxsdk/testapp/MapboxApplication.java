@@ -2,8 +2,11 @@ package com.mapbox.mapboxsdk.testapp;
 
 import android.app.Application;
 import android.os.StrictMode;
+import android.text.TextUtils;
+import android.util.Log;
 
 import com.mapbox.mapboxsdk.Mapbox;
+import com.mapbox.mapboxsdk.testapp.utils.TokenUtils;
 import com.squareup.leakcanary.LeakCanary;
 
 import timber.log.Timber;
@@ -17,6 +20,9 @@ import static timber.log.Timber.DebugTree;
  * </p>
  */
 public class MapboxApplication extends Application {
+
+  private static final String LOG_TAG = MapboxApplication.class.getSimpleName();
+  private static final String DEFAULT_MAPBOX_ACCESS_TOKEN = "YOUR_MAPBOX_ACCESS_TOKEN_GOES_HERE";
 
   @Override
   public void onCreate() {
@@ -43,7 +49,12 @@ public class MapboxApplication extends Application {
       .penaltyDeath()
       .build());
 
-    Mapbox.getInstance(getApplicationContext(), getString(R.string.mapbox_access_token));
+    String mapboxAccessToken = TokenUtils.getMapboxAccessToken(getApplicationContext());
+    if (TextUtils.isEmpty(mapboxAccessToken) || mapboxAccessToken.equals(DEFAULT_MAPBOX_ACCESS_TOKEN)) {
+      Log.w(LOG_TAG, "Warning: access token isn't set.");
+    }
+
+    Mapbox.getInstance(getApplicationContext(), mapboxAccessToken);
   }
 
   private void initializeLogger() {
