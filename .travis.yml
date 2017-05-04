@@ -81,30 +81,7 @@ matrix:
         - git fetch origin master:refs/remotes/origin/master
         - make check
 
-    # EGL - Node - Clang 3.9 - Debug
-    - os: linux
-      sudo: required
-      dist: trusty
-      language: node
-      compiler: "egl-node4-clang39-debug"
-      env: BUILDTYPE=Debug _CXX=clang++-3.9 _CC=clang-3.9 WITH_EGL=1
-      addons: *clang39
-      before_script:
-        - mapbox_install_logbt
-        - mapbox_start_xvfb
-        - mapbox_export_mesa_library_path
-      script:
-        - nvm install 4
-        - nvm use 4
-        - make node
-        - ./logbt -- $(scripts/mason.sh PREFIX apitrace VERSION 6a30de1)/bin/apitrace trace --api=egl -v make test-node
-      after_script:
-        - ccache --show-stats
-        - ./platform/node/scripts/after_script.sh ${TRAVIS_JOB_NUMBER}
-      after_failure:
-        - aws s3 cp . s3://mapbox/mapbox-gl-native/render-tests/$TRAVIS_JOB_NUMBER --recursive --exclude "*" --include "*.trace"
-
-    # EGL - Node - Clang 3.9 - Release
+    # EGL - Node v4 - Clang 3.9 - Release
     - os: linux
       sudo: required
       dist: trusty
@@ -123,6 +100,58 @@ matrix:
       script:
         - nvm install 4
         - nvm use 4
+        - make node
+        - ./logbt -- $(scripts/mason.sh PREFIX apitrace VERSION 6a30de1)/bin/apitrace trace --api=egl -v make test-node
+      after_script:
+        - ccache --show-stats
+        - ./platform/node/scripts/after_script.sh ${TRAVIS_JOB_NUMBER}
+      after_success:
+        - ./platform/node/scripts/after_success.sh
+      after_failure:
+        - aws s3 cp . s3://mapbox/mapbox-gl-native/render-tests/$TRAVIS_JOB_NUMBER --recursive --exclude "*" --include "*.trace"
+
+    # EGL - Node v6 - Clang 3.9 - Debug
+    - os: linux
+      sudo: required
+      dist: trusty
+      language: node
+      compiler: "egl-node6-clang39-debug"
+      env: BUILDTYPE=Debug _CXX=clang++-3.9 _CC=clang-3.9 WITH_EGL=1
+      addons: *clang39
+      before_script:
+        - mapbox_install_logbt
+        - mapbox_start_xvfb
+        - mapbox_export_mesa_library_path
+      script:
+        - nvm install 6
+        - nvm use 6
+        - make node
+        - ./logbt -- $(scripts/mason.sh PREFIX apitrace VERSION 6a30de1)/bin/apitrace trace --api=egl -v make test-node
+      after_script:
+        - ccache --show-stats
+        - ./platform/node/scripts/after_script.sh ${TRAVIS_JOB_NUMBER}
+      after_failure:
+        - aws s3 cp . s3://mapbox/mapbox-gl-native/render-tests/$TRAVIS_JOB_NUMBER --recursive --exclude "*" --include "*.trace"
+
+    # EGL - Node v6 - Clang 3.9 - Release
+    - os: linux
+      sudo: required
+      dist: trusty
+      language: node
+      compiler: "egl-node6-clang39-release"
+      env: BUILDTYPE=Release _CXX=clang++-3.9 _CC=clang-3.9 WITH_EGL=1
+      addons: *clang39
+      before_script:
+        # fglrx causes the GLX extension to be unavailable
+        - sudo apt-get purge -qq fglrx
+        - export PACKAGE_JSON_VERSION=$(node -e "console.log(require('./package.json').version)")
+        - export PUBLISH=$([[ "${TRAVIS_TAG:-}" == "node-v${PACKAGE_JSON_VERSION}" ]] && echo true)
+        - mapbox_install_logbt
+        - mapbox_start_xvfb
+        - mapbox_export_mesa_library_path
+      script:
+        - nvm install 6
+        - nvm use 6
         - make node
         - ./logbt -- $(scripts/mason.sh PREFIX apitrace VERSION 6a30de1)/bin/apitrace trace --api=egl -v make test-node
       after_script:
