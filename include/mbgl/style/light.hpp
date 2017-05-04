@@ -5,14 +5,18 @@
 #include <mbgl/style/transition_options.hpp>
 #include <mbgl/style/types.hpp>
 
+#include <memory>
+
 namespace mbgl {
-
-class RenderLight;
-
 namespace style {
 
 class Light {
 public:
+
+    class Impl;
+
+    Light();
+    ~Light();
 
     static LightAnchorType getDefaultAnchor();
     PropertyValue<LightAnchorType> getAnchor() const;
@@ -38,10 +42,7 @@ public:
     void setIntensityTransition(const TransitionOptions&);
     TransitionOptions getIntensityTransition() const;
 
-private:
-    IndexedTuple<LightProperties, LightProperties> properties;
-
-    friend class mbgl::RenderLight;
+    std::shared_ptr<Impl> impl;
 };
 
 } // namespace style
