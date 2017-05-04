@@ -36,9 +36,9 @@ module.exports = function (style, options, callback) {
     }, 20000);
 
     options.debug = {
-        tileBorders: options.debug,
-        collision: options.collisionDebug,
-        overdraw: options.showOverdrawInspector,
+        tileBorders: !!options.debug,
+        collision: !!options.collisionDebug,
+        overdraw: !!options.showOverdrawInspector,
     };
 
     options.center = style.center || [0, 0];
@@ -82,17 +82,28 @@ module.exports = function (style, options, callback) {
             applyOperations(operations.slice(1), callback);
         } else {
             // Ensure that the next `map.render(options)` does not overwrite this change.
-            if (operation[0] === 'setCenter') {
-                options.center = operation[1];
-            } else if (operation[0] === 'setZoom') {
-                options.zoom = operation[1];
-            } else if (operation[0] === 'setBearing') {
-                options.bearing = operation[1];
-            } else if (operation[0] === 'setPitch') {
-                options.pitch = operation[1];
+            var methods = ['setCenter', 'setZoom', 'setBearing', 'setPitch' ];
+            var index = methods.indexOf(operation[0]);
+
+            if (index >= 0) {
+                switch (index) {
+                    case 0:
+                        options.center = operation[1];
+                        break;
+                    case 1:
+                        options.zoom = operation[1];
+                        break;
+                    case 2:
+                        options.bearing = operation[1];
+                        break;
+                    case 3:
+                        options.pitch = operation[1];
+                        break;
+                }
+            } else {
+                map[operation[0]].apply(map, operation.slice(1));
             }
 
-            map[operation[0]].apply(map, operation.slice(1));
             applyOperations(operations.slice(1), callback);
         }
     }
