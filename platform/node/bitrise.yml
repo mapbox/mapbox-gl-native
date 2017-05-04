@@ -45,6 +45,7 @@ workflows:
             make test-node || RESULT=$?
             brew unlink node@4
             brew link --overwrite node@6  --force
+            make clean
             make test-node || RESULT=$?
             ./platform/node/scripts/after_script.sh ${BITRISE_BUILD_NUMBER}
             exit ${RESULT:-0}
@@ -68,6 +69,7 @@ workflows:
             make test-node
             brew unlink node@4
             brew link --overwrite node@6 --force
+            make clean
             make test-node
             ./platform/node/scripts/after_success.sh
     - slack: *slack
