@@ -341,7 +341,7 @@ Framebuffer
 Context::createFramebuffer(const Renderbuffer<RenderbufferType::RGBA>& color,
                            const Renderbuffer<RenderbufferType::DepthStencil>& depthStencil) {
     if (color.size != depthStencil.size) {
-        throw new std::runtime_error("Renderbuffer size mismatch");
+        throw std::runtime_error("Renderbuffer size mismatch");
     }
     auto fbo = createFramebuffer();
     bindFramebuffer = fbo;
@@ -365,7 +365,7 @@ Framebuffer
 Context::createFramebuffer(const Texture& color,
                            const Renderbuffer<RenderbufferType::DepthStencil>& depthStencil) {
     if (color.size != depthStencil.size) {
-        throw new std::runtime_error("Renderbuffer size mismatch");
+        throw std::runtime_error("Renderbuffer size mismatch");
     }
     auto fbo = createFramebuffer();
     bindFramebuffer = fbo;
