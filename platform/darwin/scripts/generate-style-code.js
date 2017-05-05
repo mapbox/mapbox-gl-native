@@ -600,6 +600,41 @@ for (var layer of layers) {
     fs.writeFileSync(`platform/darwin/test/${prefix}${camelize(layer.type)}${suffix}Tests.mm`, testLayers(layer));
 }
 
+// Extract examples for guides from unit tests.
+let examplesSrc = fs.readFileSync('platform/darwin/test/MGLDocumentationGuideTests.swift', 'utf8');
+const exampleRegex = /func test([\w$]+)\s*\(\)\s*\{[^]*?\n([ \t]+)\/\/#-example-code\n([^]+?)\n\2\/\/#-end-example-code\n/gm;
+
+let examples = {};
+let match;
+while ((match = exampleRegex.exec(examplesSrc)) !== null) {
+    let testMethodName = match[1],
+        indentation = match[2],
+        exampleCode = match[3];
+    
+    // Trim leading whitespace from the example code.
+    exampleCode = exampleCode.replace(new RegExp('^' + indentation, 'gm'), '');
+    
+    examples[testMethodName] = exampleCode;
+}
+
+global.guideExample = function (guide, exampleId, os) {
+    // Get the contents of the test method whose name matches the symbol path.
+    let testMethodName = `${guide}$${exampleId}`;
+    let example = examples[testMethodName];
+    if (!example) {
+        console.error(`MGLDocumentationExampleTests.test${testMethodName}() not found.`);
+        process.exit(1);
+    }
+    
+    // Resolve conditional compilation blocks.
+    example = example.replace(/^(\s*)#if\s+os\((iOS|macOS)\)\n([^]*?)(?:^\1#else\n([^]*?))?^\1#endif\b\n?/gm,
+                              function (m, indentation, ifOs, ifCase, elseCase) {
+      return (os === ifOs ? ifCase : elseCase).replace(new RegExp('^    ', 'gm'), '');
+    }).replace(/\n$/, '');
+    
+    return '```swift\n' + example + '\n```';
+};
+
 fs.writeFileSync(`platform/ios/docs/guides/For Style Authors.md`, guideMD({
     os: 'iOS',
     renamedProperties: renamedPropertiesByLayerType,
