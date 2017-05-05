@@ -49,7 +49,7 @@ The effect a key has on the style value is determined by the interpolation mode.
 The stops dictionary below, for example, shows colors that continuously shift from yellow to orange to red to blue to white based on the attribute value.
 
 ``` swift
-let url = URL(string: "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson")
+let url = URL(string: "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson")!
 let symbolSource = MGLSource(identifier: "source")
 let symbolLayer = MGLSymbolStyleLayer(identifier: "place-city-sm", source: symbolSource)
 
