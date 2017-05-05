@@ -380,45 +380,58 @@ void NodeMap::ApplyOptions(mbgl::Map* map, v8::Local<v8::Object> obj) {
  * @param {Array<string>} [options.classes=[]] style classes
  * @param {Function} callback
  * @returns {undefined} calls callback
- * @throws {Error} if stylesheet is not loaded or if map is already rendering
+ * @throws {Error} On missing parameters
  */
 void NodeMap::Render(const Nan::FunctionCallbackInfo<v8::Value>& info) {
-    auto nodeMap = Nan::ObjectWrap::Unwrap<NodeMap>(info.Holder());
-    if (!nodeMap->map) {
-        return Nan::ThrowError(releasedMessage());
-    }
 
     if (info.Length() <= 0 || !info[0]->IsObject()) {
-        return Nan::ThrowTypeError("First argument must be an options object");
+        Nan::ThrowError("First argument must be an options object");
+        return;
     }
 
     if (info.Length() <= 1 || !info[1]->IsFunction()) {
-        return Nan::ThrowTypeError("Second argument must be a callback function");
+        Nan::ThrowError("Second argument must be a callback function");
+        return;
+    }
+
+    auto nodeMap = Nan::ObjectWrap::Unwrap<NodeMap>(info.Holder());
+    auto callback = std::make_unique<Nan::Callback>(info[1].As<v8::Function>());
+
+    auto errorCallback = [&] (const char* msg) {
+        v8::Local<v8::Value> argv[] = { Nan::Error(msg) };
+        callback->Call(1, argv);
+    };
+
+    if (nodeMap->callback) {
+        errorCallback("Map is currently rendering an image");
+        return;
+    }
+
+    if (!nodeMap->map) {
+        errorCallback(releasedMessage());
+        return;
     }
 
     if (!nodeMap->loaded) {
-        return Nan::ThrowTypeError("Style is not loaded");
-    }
-
-    if (nodeMap->callback) {
-        return Nan::ThrowError("Map is currently rendering an image");
+        errorCallback("Style is not loaded");
+        return;
     }
 
     try {
         ApplyOptions(nodeMap->map.get(), Nan::To<v8::Object>(info[0]).ToLocalChecked());
     } catch (std::exception &ex) {
-        return Nan::ThrowError(ex.what());
+        errorCallback(ex.what());
+        return;
     }
 
     try {
         nodeMap->startRender();
     } catch (std::exception &ex) {
-        return Nan::ThrowError(ex.what());
+        errorCallback(ex.what());
+        return;
     }
 
-    assert(!nodeMap->callback);
-    assert(!nodeMap->image.data);
-    nodeMap->callback = std::make_unique<Nan::Callback>(info[1].As<v8::Function>());
+    nodeMap->callback = std::move(callback);
 
     info.GetReturnValue().SetUndefined();
 }
