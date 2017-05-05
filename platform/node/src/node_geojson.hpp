@@ -5,7 +5,7 @@ namespace style {
 namespace conversion {
 
 template <>
-optional<GeoJSON> convertGeoJSON(const v8::Local<v8::Value>&, Error& error) {
+optional<GeoJSON> Converter<GeoJSON>::operator()(const v8::Local<v8::Value>&, Error& error) const {
     error = { "not implemented" };
     return {};
 }

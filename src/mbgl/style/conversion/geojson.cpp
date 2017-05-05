@@ -1,33 +1,26 @@
 #include <mbgl/style/conversion/geojson.hpp>
-
+#include <mbgl/style/conversion/json.hpp>
 #include <mbgl/util/rapidjson.hpp>
 
-#include <string>
-#include <sstream>
+#include <mapbox/geojson.hpp>
+#include <mapbox/geojson/rapidjson.hpp>
 
 namespace mbgl {
 namespace style {
 namespace conversion {
 
+optional<GeoJSON> Converter<GeoJSON>::operator()(const std::string& value, Error& error) const {
+    return convertJSON<GeoJSON>(value, error);
+}
+
 template <>
-optional<GeoJSON> convertGeoJSON(const std::string& string, Error& error) {
-    rapidjson::GenericDocument<rapidjson::UTF8<>, rapidjson::CrtAllocator> d;
-    d.Parse(string.c_str());
-
-    if (d.HasParseError()) {
-        std::stringstream message;
-        message << d.GetErrorOffset() << " - " << rapidjson::GetParseError_En(d.GetParseError());
-        error = { message.str() };
+optional<GeoJSON> Converter<GeoJSON>::operator()(const JSValue& value, Error& error) const {
+    try {
+        return mapbox::geojson::convert(value);
+    } catch (const std::exception& ex) {
+        error = { ex.what() };
         return {};
     }
-
-    optional<GeoJSON> geoJSON = conversion::convertGeoJSON<JSValue>(d, error);
-    if (!geoJSON) {
-        error = { error.message };
-        return {};
-    }
-
-    return geoJSON;
 }
 
 } // namespace conversion

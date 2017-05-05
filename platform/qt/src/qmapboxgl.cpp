@@ -1303,7 +1303,7 @@ void QMapboxGL::updateSource(const QString &id, const QVariantMap &params)
 
     if (params.contains("data")) {
         Error error;
-        auto result = convertGeoJSON(params["data"], error);
+        auto result = convert<mbgl::GeoJSON>(params["data"], error);
         if (result) {
             sourceGeoJSON->setGeoJSON(*result);
         }

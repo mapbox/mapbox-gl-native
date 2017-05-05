@@ -10,24 +10,14 @@ namespace style {
 namespace conversion {
 
 template <>
-optional<GeoJSON> convertGeoJSON(const mbgl::android::Value& value, Error& error) {
-
+optional<GeoJSON> Converter<GeoJSON>::operator()(const mbgl::android::Value& value, Error& error) const {
     if(value.isNull() || !value.isString()) {
         error = { "no json data found" };
         return {};
     }
 
-    return convertGeoJSON(value.toString(), error);
+    return convert<GeoJSON>(value.toString(), error);
 }
-
-template <>
-struct Converter<GeoJSON> {
-
-    optional<GeoJSON> operator()(const mbgl::android::Value& value, Error& error) const {
-        return convertGeoJSON(value, error);
-    }
-
-};
 
 } // namespace conversion
 } // namespace style
