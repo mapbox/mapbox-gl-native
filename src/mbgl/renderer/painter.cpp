@@ -327,10 +327,10 @@ void Painter::renderPass(PaintParameters& parameters,
             const auto size = context.viewport.getCurrentValue().size;
 
             if (!extrusionTexture || extrusionTexture->getSize() != size) {
-                extrusionTexture = OffscreenTexture(context, size);
+                extrusionTexture = OffscreenTexture(context, size, OffscreenTextureAttachment::Depth);
             }
 
-            extrusionTexture->bindRenderbuffers(2);
+            extrusionTexture->bind();
 
             context.setStencilMode(gl::StencilMode::disabled());
             context.setDepthMode(depthModeForSublayer(0, gl::DepthMode::ReadWrite));
@@ -345,6 +345,7 @@ void Painter::renderPass(PaintParameters& parameters,
             }
 
             parameters.view.bind();
+            context.bindTexture(extrusionTexture->getTexture());
 
             mat4 viewportMat;
             matrix::ortho(viewportMat, 0, size.width, size.height, 0, 0, 1);
@@ -356,7 +357,7 @@ void Painter::renderPass(PaintParameters& parameters,
                 colorModeForRenderPass(),
                 ExtrusionTextureProgram::UniformValues{
                     uniforms::u_matrix::Value{ viewportMat }, uniforms::u_world::Value{ size },
-                    uniforms::u_image::Value{ 2 },
+                    uniforms::u_image::Value{ 0 },
                     uniforms::u_opacity::Value{ layer.as<RenderFillExtrusionLayer>()
                                                     ->evaluated.get<FillExtrusionOpacity>() } },
                 extrusionTextureVertexBuffer, quadTriangleIndexBuffer, extrusionTextureSegments,
