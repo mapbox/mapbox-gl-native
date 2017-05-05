@@ -69,9 +69,8 @@
     
     // pole of inaccessibility
     auto poi = mapbox::polylabel(polyline);
-    CLLocationCoordinate2D centroid = MGLLocationCoordinate2DFromPoint(poi);
     
-    return centroid;
+    return MGLLocationCoordinate2DFromPoint(poi);
 }
 
 @end

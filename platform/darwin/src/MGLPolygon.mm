@@ -58,9 +58,8 @@
 - (CLLocationCoordinate2D)coordinate {
     // pole of inaccessibility
     auto poi = mapbox::polylabel([self polygon]);
-    CLLocationCoordinate2D centroid = MGLLocationCoordinate2DFromPoint(poi);
     
-    return centroid;
+    return MGLLocationCoordinate2DFromPoint(poi);
 }
 
 - (mbgl::LinearRing<double>)ring {
