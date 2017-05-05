@@ -47,7 +47,6 @@ public:
                 context.createRenderbuffer<gl::RenderbufferType::DepthComponent>(size);
             framebuffer = context.createFramebuffer(*texture, depth);
         } else {
-            context.bindTexture(*texture, unit);
             context.bindFramebuffer = framebuffer->framebuffer;
         }
 

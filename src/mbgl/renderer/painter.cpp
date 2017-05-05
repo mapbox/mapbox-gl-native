@@ -330,7 +330,7 @@ void Painter::renderPass(PaintParameters& parameters,
                 extrusionTexture = OffscreenTexture(context, size);
             }
 
-            extrusionTexture->bindRenderbuffers(1);
+            extrusionTexture->bindRenderbuffers(2);
 
             context.setStencilMode(gl::StencilMode::disabled());
             context.setDepthMode(depthModeForSublayer(0, gl::DepthMode::ReadWrite));
@@ -356,7 +356,7 @@ void Painter::renderPass(PaintParameters& parameters,
                 colorModeForRenderPass(),
                 ExtrusionTextureProgram::UniformValues{
                     uniforms::u_matrix::Value{ viewportMat }, uniforms::u_world::Value{ size },
-                    uniforms::u_image::Value{ 1 },
+                    uniforms::u_image::Value{ 2 },
                     uniforms::u_opacity::Value{ layer.as<RenderFillExtrusionLayer>()
                                                     ->evaluated.get<FillExtrusionOpacity>() } },
                 extrusionTextureVertexBuffer, quadTriangleIndexBuffer, extrusionTextureSegments,
