@@ -46,7 +46,7 @@ test('Usage', function(t) {
 
         map.render({}, function(err, pixels) {
             var expected = PNG.sync.read(fs.readFileSync(path.join(__dirname, '../fixtures/options/expected.png'))).data;
-            var numPixels = pixelmatch(pixels, expected, undefined, 512, 512, { threshold: 0.13 });
+            var numPixels = pixelmatch(pixels, expected, undefined, 512, 512, { threshold: 0.2 });
             t.equal(numPixels, 0);
             t.end();
         });
