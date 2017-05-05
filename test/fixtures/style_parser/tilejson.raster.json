@@ -1,8 +1,0 @@
-{
-  "minzoom": 0,
-  "maxzoom": 15,
-  "center": [ 1, 2, 3 ],
-  "bounds": [ 4, 5, 6, 7 ],
-  "attribution": "attribution",
-  "tiles": [ "http://a.tiles.mapbox.com/v4/mapbox.satellite/{z}/{x}/{y}.png?access_token=key" ]
-}

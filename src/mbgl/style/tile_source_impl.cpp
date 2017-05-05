@@ -1,44 +1,12 @@
 #include <mbgl/style/tile_source_impl.hpp>
 #include <mbgl/style/source_observer.hpp>
-#include <mbgl/style/rapidjson_conversion.hpp>
+#include <mbgl/style/conversion/json.hpp>
 #include <mbgl/style/conversion/tileset.hpp>
-#include <mbgl/util/tileset.hpp>
 #include <mbgl/util/mapbox.hpp>
 #include <mbgl/storage/file_source.hpp>
 
-#include <rapidjson/document.h>
-#include <rapidjson/error/en.h>
-
-#include <sstream>
-
 namespace mbgl {
 namespace style {
-
-Tileset TileSourceImpl::parseTileJSON(const std::string& json, const std::string& sourceURL, SourceType type, uint16_t tileSize) {
-    rapidjson::GenericDocument<rapidjson::UTF8<>, rapidjson::CrtAllocator> document;
-    document.Parse<0>(json.c_str());
-
-    if (document.HasParseError()) {
-        std::stringstream message;
-        message << document.GetErrorOffset() << " - " << rapidjson::GetParseError_En(document.GetParseError());
-        throw std::runtime_error(message.str());
-    }
-
-    conversion::Error error;
-    optional<Tileset> result = conversion::convert<Tileset, JSValue>(document, error);
-    if (!result) {
-        throw std::runtime_error(error.message);
-    }
-
-    // TODO: Remove this hack by delivering proper URLs in the TileJSON to begin with.
-    if (util::mapbox::isMapboxURL(sourceURL)) {
-        for (auto& url : (*result).tiles) {
-            url = util::mapbox::canonicalizeTileURL(url, type, tileSize);
-        }
-    }
-
-    return *result;
-}
 
 TileSourceImpl::TileSourceImpl(SourceType type_, std::string id_, Source& base_,
                                variant<std::string, Tileset> urlOrTileset_,
@@ -70,21 +38,17 @@ void TileSourceImpl::loadDescription(FileSource& fileSource) {
         } else if (res.noContent) {
             observer->onSourceError(base, std::make_exception_ptr(std::runtime_error("unexpectedly empty TileJSON")));
         } else {
-            Tileset newTileset;
-
-            // Create a new copy of the Tileset object that holds the base values we've parsed
-            // from the stylesheet. Then merge in the values parsed from the TileJSON we retrieved
-            // via the URL.
-            try {
-                newTileset = parseTileJSON(*res.data, url, type, tileSize);
-            } catch (...) {
-                observer->onSourceError(base, std::current_exception());
+            conversion::Error error;
+            optional<Tileset> newTileset = conversion::convertJSON<Tileset>(*res.data, error);
+            if (!newTileset) {
+                observer->onSourceError(base, std::make_exception_ptr(std::runtime_error(error.message)));
                 return;
             }
 
-            bool attributionChanged = tileset.attribution != newTileset.attribution;
+            util::mapbox::canonicalizeTileset(*newTileset, url, type, tileSize);
+            bool attributionChanged = tileset.attribution != (*newTileset).attribution;
 
-            tileset = newTileset;
+            tileset = *newTileset;
             loaded = true;
 
             observer->onSourceLoaded(base);

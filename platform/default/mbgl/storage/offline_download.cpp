@@ -7,6 +7,8 @@
 #include <mbgl/style/parser.hpp>
 #include <mbgl/style/sources/geojson_source_impl.hpp>
 #include <mbgl/style/tile_source_impl.hpp>
+#include <mbgl/style/conversion/json.hpp>
+#include <mbgl/style/conversion/tileset.hpp>
 #include <mbgl/text/glyph.hpp>
 #include <mbgl/util/mapbox.hpp>
 #include <mbgl/util/run_loop.hpp>
@@ -87,9 +89,12 @@ OfflineRegionStatus OfflineDownload::getStatus() const {
                 const std::string& url = urlOrTileset.get<std::string>();
                 optional<Response> sourceResponse = offlineDatabase.get(Resource::source(url));
                 if (sourceResponse) {
-                    result.requiredResourceCount +=
-                        definition.tileCover(type, tileSize, style::TileSourceImpl::parseTileJSON(
-                            *sourceResponse->data, url, type, tileSize).zoomRange).size();
+                    style::conversion::Error error;
+                    optional<Tileset> tileset = style::conversion::convertJSON<Tileset>(*sourceResponse->data, error);
+                    if (tileset) {
+                        result.requiredResourceCount +=
+                            definition.tileCover(type, tileSize, (*tileset).zoomRange).size();
+                    }
                 } else {
                     result.requiredResourceCountIsPrecise = false;
                 }
@@ -152,12 +157,16 @@ void OfflineDownload::activateDownload() {
                     requiredSourceURLs.insert(url);
 
                     ensureResource(Resource::source(url), [=](Response sourceResponse) {
-                        queueTiles(type, tileSize, style::TileSourceImpl::parseTileJSON(
-                            *sourceResponse.data, url, type, tileSize));
+                        style::conversion::Error error;
+                        optional<Tileset> tileset = style::conversion::convertJSON<Tileset>(*sourceResponse.data, error);
+                        if (tileset) {
+                            util::mapbox::canonicalizeTileset(*tileset, url, type, tileSize);
+                            queueTiles(type, tileSize, *tileset);
 
-                        requiredSourceURLs.erase(url);
-                        if (requiredSourceURLs.empty()) {
-                            status.requiredResourceCountIsPrecise = true;
+                            requiredSourceURLs.erase(url);
+                            if (requiredSourceURLs.empty()) {
+                                status.requiredResourceCountIsPrecise = true;
+                            }
                         }
                     });
                 }

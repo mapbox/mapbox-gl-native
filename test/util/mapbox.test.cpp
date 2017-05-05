@@ -3,6 +3,7 @@
 #include <mbgl/util/logging.hpp>
 #include <mbgl/util/mapbox.hpp>
 #include <mbgl/util/constants.hpp>
+#include <mbgl/util/tileset.hpp>
 #include <stdexcept>
 
 using namespace mbgl;
@@ -209,4 +210,30 @@ TEST(Mapbox, CanonicalURL) {
     EXPECT_EQ(
         "http://api.mapbox.com/v4/a.b/{z}/{x}/{y}/.",
         mbgl::util::mapbox::canonicalizeTileURL("http://api.mapbox.com/v4/a.b/{z}/{x}/{y}/.", SourceType::Raster, 256));
+}
+
+TEST(Mapbox, CanonicalizeRasterTileset) {
+    mbgl::Tileset tileset;
+    tileset.tiles = {
+        "http://a.tiles.mapbox.com/v4/mapbox.satellite/{z}/{x}/{y}.png?access_token=key"
+    };
+
+    mbgl::util::mapbox::canonicalizeTileset(tileset, "mapbox://mapbox.satellite", SourceType::Raster, 256);
+
+#if !defined(__ANDROID__) && !defined(__APPLE__)
+    EXPECT_EQ("mapbox://tiles/mapbox.satellite/{z}/{x}/{y}{ratio}.webp", tileset.tiles[0]);
+#else
+    EXPECT_EQ("mapbox://tiles/mapbox.satellite/{z}/{x}/{y}{ratio}.png", tileset.tiles[0]);
+#endif
+}
+
+TEST(Mapbox, CanonicalizeVectorTileset) {
+    mbgl::Tileset tileset;
+    tileset.tiles = {
+        "http://a.tiles.mapbox.com/v4/mapbox.streets/{z}/{x}/{y}.vector.pbf?access_token=key"
+    };
+
+    mbgl::util::mapbox::canonicalizeTileset(tileset, "mapbox://mapbox.streets", SourceType::Vector, 512);
+
+    EXPECT_EQ("mapbox://tiles/mapbox.streets/{z}/{x}/{y}.vector.pbf", tileset.tiles[0]);
 }
