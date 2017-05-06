@@ -161,7 +161,8 @@ static const CGFloat MGLFeetPerMeter = 3.28084;
 }
 
 - (CGFloat)actualWidth {
-    return self.row.distance / [self unitsPerPoint];
+    CGFloat width = self.row.distance / [self unitsPerPoint];
+    return !isnan(width) ? width : 0;
 }
 
 - (CGFloat)maximumWidth {
