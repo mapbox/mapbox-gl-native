@@ -1261,8 +1261,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
 
 - (void)styleRasterSource
 {
-    // 3rd party raster source requires NSAppTransportSecurity exception for stamen.com
-    NSArray *tileURLTemplates = @[@"http://a.tile.stamen.com/terrain-background/{z}/{x}/{y}.jpg"];
+    NSArray *tileURLTemplates = @[@"https://stamen-tiles.a.ssl.fastly.net/terrain-background/{z}/{x}/{y}.jpg"];
     MGLRasterSource *rasterSource = [[MGLRasterSource alloc] initWithIdentifier:@"style-raster-source-id" tileURLTemplates:tileURLTemplates options:@{
         MGLTileSourceOptionTileSize: @256,
     }];
