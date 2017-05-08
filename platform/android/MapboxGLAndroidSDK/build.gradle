@@ -1,9 +1,9 @@
 apply plugin: 'com.android.library'
 
 dependencies {
-    compile "com.android.support:support-annotations:${supportLibVersion}"
-    compile "com.android.support:support-v4:${supportLibVersion}"
-    compile "com.android.support:design:${supportLibVersion}"
+    compile rootProject.ext.dep.supportAnnotations
+    compile rootProject.ext.dep.supportV4
+    compile rootProject.ext.dep.supportDesign
     compile rootProject.ext.dep.timber
     compile rootProject.ext.dep.okhttp3
     compile rootProject.ext.dep.lost
