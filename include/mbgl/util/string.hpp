@@ -8,7 +8,7 @@
 
 #include <mbgl/util/dtoa.hpp>
 
-#if defined(__ANDROID__) && (__GNUC__ == 4) && (__GNUC_MINOR__ == 9)
+#if defined(__ANDROID__) && defined(__GLIBCXX__)
 
 namespace std {
 
