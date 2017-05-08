@@ -34,8 +34,6 @@
 #include <mbgl/util/mat3.hpp>
 #include <mbgl/util/string.hpp>
 
-#include <mbgl/util/offscreen_texture.hpp>
-
 #include <mbgl/util/stopwatch.hpp>
 
 #include <cassert>
@@ -328,8 +326,11 @@ void Painter::renderPass(PaintParameters& parameters,
         } else if (layer.is<RenderFillExtrusionLayer>()) {
             const auto size = context.viewport.getCurrentValue().size;
 
-            OffscreenTexture texture(context, size);
-            texture.bindRenderbuffers(1);
+            if (!extrusionTexture || extrusionTexture->getSize() != size) {
+                extrusionTexture = OffscreenTexture(context, size, OffscreenTextureAttachment::Depth);
+            }
+
+            extrusionTexture->bind();
 
             context.setStencilMode(gl::StencilMode::disabled());
             context.setDepthMode(depthModeForSublayer(0, gl::DepthMode::ReadWrite));
@@ -344,6 +345,7 @@ void Painter::renderPass(PaintParameters& parameters,
             }
 
             parameters.view.bind();
+            context.bindTexture(extrusionTexture->getTexture());
 
             mat4 viewportMat;
             matrix::ortho(viewportMat, 0, size.width, size.height, 0, 0, 1);
@@ -355,11 +357,10 @@ void Painter::renderPass(PaintParameters& parameters,
                 colorModeForRenderPass(),
                 ExtrusionTextureProgram::UniformValues{
                     uniforms::u_matrix::Value{ viewportMat }, uniforms::u_world::Value{ size },
-                    uniforms::u_image::Value{ 1 },
-                    uniforms::u_opacity::Value{
-                        layer.as<RenderFillExtrusionLayer>()->evaluated.get<FillExtrusionOpacity>() } },
-                extrusionTextureVertexBuffer, quadTriangleIndexBuffer,
-                extrusionTextureSegments,
+                    uniforms::u_image::Value{ 0 },
+                    uniforms::u_opacity::Value{ layer.as<RenderFillExtrusionLayer>()
+                                                    ->evaluated.get<FillExtrusionOpacity>() } },
+                extrusionTextureVertexBuffer, quadTriangleIndexBuffer, extrusionTextureSegments,
                 ExtrusionTextureProgram::PaintPropertyBinders{ properties, 0 }, properties,
                 state.getZoom());
         } else {
