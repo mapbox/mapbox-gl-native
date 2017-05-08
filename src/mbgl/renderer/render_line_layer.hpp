@@ -11,8 +11,6 @@ public:
     RenderLineLayer(Immutable<style::LineLayer::Impl>);
     ~RenderLineLayer() final = default;
 
-    std::unique_ptr<RenderLayer> clone() const override;
-
     void cascade(const CascadeParameters&) override;
     void evaluate(const PropertyEvaluationParameters&) override;
     bool hasTransition() const override;

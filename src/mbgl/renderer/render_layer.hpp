@@ -24,9 +24,6 @@ protected:
 public:
     virtual ~RenderLayer() = default;
 
-    // Create an identical copy of this layer.
-    virtual std::unique_ptr<RenderLayer> clone() const = 0;
-
     // Partially evaluate paint properties based on a set of classes.
     virtual void cascade(const CascadeParameters&) = 0;
 
