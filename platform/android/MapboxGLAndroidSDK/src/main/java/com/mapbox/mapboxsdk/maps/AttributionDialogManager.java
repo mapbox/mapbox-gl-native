@@ -1,5 +1,6 @@
 package com.mapbox.mapboxsdk.maps;
 
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -12,6 +13,7 @@ import android.text.TextUtils;
 import android.text.style.URLSpan;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Toast;
 
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
@@ -66,7 +68,7 @@ class AttributionDialogManager implements View.OnClickListener, DialogInterface.
     if (isLatestEntry(which)) {
       showTelemetryDialog();
     } else {
-      showAttributionWebPage(which);
+      showMapFeedbackWebPage(which);
     }
   }
 
@@ -88,10 +90,7 @@ class AttributionDialogManager implements View.OnClickListener, DialogInterface.
     builder.setNeutralButton(R.string.mapbox_attributionTelemetryNeutral, new DialogInterface.OnClickListener() {
       @Override
       public void onClick(DialogInterface dialog, int which) {
-        String url = context.getResources().getString(R.string.mapbox_telemetryLink);
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setData(Uri.parse(url));
-        context.startActivity(intent);
+        showWebPage(context.getResources().getString(R.string.mapbox_telemetryLink));
         dialog.cancel();
       }
     });
@@ -105,14 +104,12 @@ class AttributionDialogManager implements View.OnClickListener, DialogInterface.
     builder.show();
   }
 
-  private void showAttributionWebPage(int which) {
-    Intent intent = new Intent(Intent.ACTION_VIEW);
+  private void showMapFeedbackWebPage(int which) {
     String url = attributionMap.get(attributionKeys[which]);
     if (url.contains(MAP_FEEDBACK_URL)) {
       url = buildMapFeedbackMapUrl(mapboxMap.getCameraPosition());
     }
-    intent.setData(Uri.parse(url));
-    context.startActivity(intent);
+    showWebPage(url);
   }
 
   private String buildMapFeedbackMapUrl(CameraPosition cameraPosition) {
@@ -120,6 +117,17 @@ class AttributionDialogManager implements View.OnClickListener, DialogInterface.
     return cameraPosition != null ? String.format(Locale.getDefault(),
       MAP_FEEDBACK_LOCATION_FORMAT, cameraPosition.target.getLongitude(), cameraPosition.target.getLatitude(),
       (int) cameraPosition.zoom) : MAP_FEEDBACK_URL;
+  }
+
+  private void showWebPage(@NonNull String url) {
+    try {
+      Intent intent = new Intent(Intent.ACTION_VIEW);
+      intent.setData(Uri.parse(url));
+      context.startActivity(intent);
+    } catch (ActivityNotFoundException exception) {
+      // explicitly handling if the device hasn't have a web browser installed. #8899
+      Toast.makeText(context, R.string.mapbox_attributionErrorNoBrowser, Toast.LENGTH_LONG).show();
+    }
   }
 
   private static class AttributionBuilder {
