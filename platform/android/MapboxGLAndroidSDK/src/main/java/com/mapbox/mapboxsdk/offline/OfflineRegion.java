@@ -36,6 +36,9 @@ public class OfflineRegion {
   //Region id
   private long id;
 
+  // delete status
+  private boolean isDeleted;
+
   private OfflineRegionDefinition definition;
 
   /**
@@ -205,7 +208,7 @@ public class OfflineRegion {
 
   /**
    * Constructor
-   *
+   * <p>
    * For JNI use only, to create a new offline region, use
    * {@link OfflineManager#createOfflineRegion} instead.
    */
@@ -346,28 +349,31 @@ public class OfflineRegion {
    * @param callback the callback to be invoked
    */
   public void delete(@NonNull final OfflineRegionDeleteCallback callback) {
-    deleteOfflineRegion(new OfflineRegionDeleteCallback() {
-      @Override
-      public void onDelete() {
-        getHandler().post(new Runnable() {
-          @Override
-          public void run() {
-            callback.onDelete();
-            OfflineRegion.this.finalize();
-          }
-        });
-      }
+    if (!isDeleted) {
+      deleteOfflineRegion(new OfflineRegionDeleteCallback() {
+        @Override
+        public void onDelete() {
+          isDeleted = true;
+          getHandler().post(new Runnable() {
+            @Override
+            public void run() {
+              callback.onDelete();
+              OfflineRegion.this.finalize();
+            }
+          });
+        }
 
-      @Override
-      public void onError(final String error) {
-        getHandler().post(new Runnable() {
-          @Override
-          public void run() {
-            callback.onError(error);
-          }
-        });
-      }
-    });
+        @Override
+        public void onError(final String error) {
+          getHandler().post(new Runnable() {
+            @Override
+            public void run() {
+              callback.onError(error);
+            }
+          });
+        }
+      });
+    }
   }
 
   /**
