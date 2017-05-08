@@ -12,10 +12,6 @@ const style::BackgroundLayer::Impl& RenderBackgroundLayer::impl() const {
     return static_cast<const style::BackgroundLayer::Impl&>(*baseImpl);
 }
 
-std::unique_ptr<RenderLayer> RenderBackgroundLayer::clone() const {
-    return std::make_unique<RenderBackgroundLayer>(*this);
-}
-
 std::unique_ptr<Bucket> RenderBackgroundLayer::createBucket(const BucketParameters &,
                                                             const std::vector<const RenderLayer *> &) const {
     assert(false);

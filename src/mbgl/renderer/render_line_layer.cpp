@@ -15,10 +15,6 @@ const style::LineLayer::Impl& RenderLineLayer::impl() const {
     return static_cast<const style::LineLayer::Impl&>(*baseImpl);
 }
 
-std::unique_ptr<RenderLayer> RenderLineLayer::clone() const {
-    return std::make_unique<RenderLineLayer>(*this);
-}
-
 std::unique_ptr<Bucket> RenderLineLayer::createBucket(const BucketParameters& parameters, const std::vector<const RenderLayer*>& layers) const {
     return std::make_unique<LineBucket>(parameters, layers, impl().layout);
 }

@@ -10,8 +10,6 @@ public:
     RenderCustomLayer(Immutable<style::CustomLayer::Impl>);
     ~RenderCustomLayer() final = default;
 
-    std::unique_ptr<RenderLayer> clone() const override;
-
     void cascade(const CascadeParameters&) final {}
     void evaluate(const PropertyEvaluationParameters&) override;
     bool hasTransition() const override;

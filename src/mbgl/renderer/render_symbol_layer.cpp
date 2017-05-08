@@ -16,10 +16,6 @@ const style::SymbolLayer::Impl& RenderSymbolLayer::impl() const {
     return static_cast<const style::SymbolLayer::Impl&>(*baseImpl);
 }
 
-std::unique_ptr<RenderLayer> RenderSymbolLayer::clone() const {
-    return std::make_unique<RenderSymbolLayer>(*this);
-}
-
 std::unique_ptr<Bucket> RenderSymbolLayer::createBucket(const BucketParameters&, const std::vector<const RenderLayer*>&) const {
     assert(false); // Should be calling createLayout() instead.
     return nullptr;

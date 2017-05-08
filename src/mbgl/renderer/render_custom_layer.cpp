@@ -12,10 +12,6 @@ const style::CustomLayer::Impl& RenderCustomLayer::impl() const {
     return static_cast<const style::CustomLayer::Impl&>(*baseImpl);
 }
 
-std::unique_ptr<RenderLayer> RenderCustomLayer::clone() const {
-    return std::make_unique<RenderCustomLayer>(*this);
-}
-
 void RenderCustomLayer::evaluate(const PropertyEvaluationParameters&) {
     passes = RenderPass::Translucent;
 }

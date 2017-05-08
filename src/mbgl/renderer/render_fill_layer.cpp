@@ -15,10 +15,6 @@ const style::FillLayer::Impl& RenderFillLayer::impl() const {
     return static_cast<const style::FillLayer::Impl&>(*baseImpl);
 }
 
-std::unique_ptr<RenderLayer> RenderFillLayer::clone() const {
-    return std::make_unique<RenderFillLayer>(*this);
-}
-
 std::unique_ptr<Bucket> RenderFillLayer::createBucket(const BucketParameters& parameters, const std::vector<const RenderLayer*>& layers) const {
     return std::make_unique<FillBucket>(parameters, layers);
 }
