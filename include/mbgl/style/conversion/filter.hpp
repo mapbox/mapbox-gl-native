@@ -57,7 +57,7 @@ public:
            return convertUnaryFilter<NotHasFilter, NotHasIdentifierFilter>(value, error);
         }
 
-        error = { "filter operator must be one of \"==\", \"!=\", \">\", \">=\", \"<\", \"<=\", \"in\", \"!in\", \"all\", \"any\", \"none\", \"has\", or \"!has\"" };
+        error = { R"(filter operator must be one of "==", "!=", ">", ">=", "<", "<=", "in", "!in", "all", "any", "none", "has", or "!has")" };
         return {};
     }
 

@@ -194,7 +194,7 @@ int main(int argc, char *argv[]) {
         settings.save();
     }
     mbgl::Log::Info(mbgl::Event::General,
-                    "Exit location: --lat=\"%f\" --lon=\"%f\" --zoom=\"%f\" --bearing \"%f\"",
+                    R"(Exit location: --lat="%f" --lon="%f" --zoom="%f" --bearing "%f")",
                     settings.latitude, settings.longitude, settings.zoom, settings.bearing);
 
     view = nullptr;

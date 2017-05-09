@@ -30,7 +30,7 @@ TEST(StyleConversion, Light) {
     }
 
     {
-        auto light = parseLight("{\"color\":{\"stops\":[[14,\"blue\"],[16,\"red\"]]},\"intensity\":0.3,\"position\":[3,90,90]}");
+        auto light = parseLight(R"({"color":{"stops":[[14,"blue"],[16,"red"]]},"intensity":0.3,"position":[3,90,90]})");
         ASSERT_TRUE((bool) light);
 
         ASSERT_TRUE(light->getAnchor().isUndefined());
@@ -54,7 +54,7 @@ TEST(StyleConversion, Light) {
     }
 
     {
-        auto light = parseLight("{\"color\":\"blue\",\"intensity\":0.3,\"color-transition\":{\"duration\":1000}}");
+        auto light = parseLight(R"({"color":"blue","intensity":0.3,"color-transition":{"duration":1000}})");
         ASSERT_TRUE((bool) light);
 
         ASSERT_FALSE(light->getColor().isUndefined());
@@ -65,35 +65,35 @@ TEST(StyleConversion, Light) {
     }
 
     {
-        auto light = parseLight("{\"intensity\":false}");
+        auto light = parseLight(R"({"intensity":false})");
 
         ASSERT_FALSE((bool) light);
         ASSERT_EQ("value must be a number", error.message);
     }
 
     {
-        auto light = parseLight("{\"intensity\":{\"stops\":[[15,\"red\"],[17,\"blue\"]]}}");
+        auto light = parseLight(R"({"intensity":{"stops":[[15,"red"],[17,"blue"]]}})");
 
         ASSERT_FALSE((bool) light);
         ASSERT_EQ("value must be a number", error.message);
     }
 
     {
-        auto light = parseLight("{\"color\":5}");
+        auto light = parseLight(R"({"color":5})");
 
         ASSERT_FALSE((bool) light);
         ASSERT_EQ("value must be a string", error.message);
     }
 
     {
-        auto light = parseLight("{\"position\":[0,5]}");
+        auto light = parseLight(R"({"position":[0,5]})");
 
         ASSERT_FALSE((bool) light);
         ASSERT_EQ("value must be an array of 3 numbers", error.message);
     }
 
     {
-        auto light = parseLight("{\"anchor\":\"something\"}");
+        auto light = parseLight(R"({"anchor":"something"})");
 
         ASSERT_FALSE((bool) light);
         ASSERT_EQ("value must be a valid enumeration value", error.message);

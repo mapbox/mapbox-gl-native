@@ -413,7 +413,7 @@ TEST(Source, GeoJSonSourceUrlUpdate) {
     test.fileSource.sourceResponse = [&] (const Resource& resource) {
         EXPECT_EQ("url", resource.url);
         Response response;
-        response.data = std::make_unique<std::string>("{\"geometry\": {\"type\": \"Point\", \"coordinates\": [1.1, 1.1]}, \"type\": \"Feature\", \"properties\": {}}");
+        response.data = std::make_unique<std::string>(R"({"geometry": {"type": "Point", "coordinates": [1.1, 1.1]}, "type": "Feature", "properties": {}})");
         return response;
     };
 
