@@ -2,6 +2,7 @@
 
 #include <mbgl/layout/merge_lines.hpp>
 #include <mbgl/layout/symbol_feature.hpp>
+#include <utility>
 
 const std::u16string aaa = u"a";
 const std::u16string bbb = u"b";
@@ -12,10 +13,10 @@ class GeometryTileFeatureStub : public GeometryTileFeature {
 public:
     GeometryTileFeatureStub(optional<FeatureIdentifier> id_, FeatureType type_, GeometryCollection geometry_,
                   std::unordered_map<std::string, Value> properties_) :
-        id(id_),
+        id(std::move(id_)),
         type(type_),
-        geometry(geometry_),
-        properties(properties_)
+        geometry(std::move(geometry_)),
+        properties(std::move(properties_))
     {}
     
     FeatureType getType() const override { return type; }

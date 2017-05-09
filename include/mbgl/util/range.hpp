@@ -1,3 +1,5 @@
+#include <utility>
+
 #pragma once
 
 namespace mbgl {
@@ -5,8 +7,8 @@ namespace mbgl {
 template <class T>
 class Range {
 public:
-    constexpr Range(const T& min_, const T& max_)
-        : min(min_), max(max_) {}
+    constexpr Range(T min_, T max_)
+        : min(std::move(min_)), max(std::move(max_)) {}
 
     T min;
     T max;

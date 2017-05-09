@@ -14,7 +14,7 @@ public:
 
     BinaryProgram(gl::BinaryProgramFormat,
                   std::string&& binaryCode,
-                  const std::string& binaryIdentifier,
+                  std::string binaryIdentifier,
                   std::vector<std::pair<const std::string, gl::AttributeLocation>>&&,
                   std::vector<std::pair<const std::string, gl::UniformLocation>>&&);
 
