@@ -3,58 +3,62 @@
 set -e
 set -o pipefail
 
-CLANG_TIDY=${CLANG_TIDY:-$(scripts/mason.sh PREFIX clang-tidy VERSION 3.9.1)/bin/clang-tidy}
-CLANG_FORMAT=${CLANG_FORMAT:-$(scripts/mason.sh PREFIX clang-format VERSION 3.9.1)/bin/clang-format}
+CLANG_TIDY_PREFIX=${CLANG_TIDY_PREFIX:-$(scripts/mason.sh PREFIX clang-tidy VERSION 4.0.0)}
+CLANG_TIDY=${CLANG_TIDY:-${CLANG_TIDY_PREFIX}/bin/clang-tidy}
+CLANG_APPLY=${CLANG_APPLY:-${CLANG_TIDY_PREFIX}/bin/clang-apply-replacements}
 
-command -v ${CLANG_TIDY} >/dev/null 2>&1 || {
-    echo "Can't find ${CLANG_TIDY} in PATH."
-    if [ -z ${CLANG_TIDY} ]; then
-        echo "Alternatively, you can set CLANG_TIDY to point to clang-tidy."
-    fi
-    exit 1
-}
+CLANG_FORMAT=${CLANG_FORMAT:-$(scripts/mason.sh PREFIX clang-format VERSION 4.0.0)/bin/clang-format}
+
+for CLANG_FILE in "${CLANG_TIDY} ${CLANG_APPLY} ${CLANG_FORMAT}"; do
+    command -v ${CLANG_TIDY} > /dev/null 2>&1 || {
+        echo "Can't find ${CLANG_FILE} in PATH."
+        if [ -z ${CLANG_FILE} ]; then
+            echo "Alternatively, you can manually set ${!CLANG_FILE@}."
+        fi
+        exit 1
+    }
+done
 
 cd $1
 
-CDUP=$(git rev-parse --show-cdup)
+export CDUP=$(git rev-parse --show-cdup)
+export CLANG_TIDY CLANG_APPLY CLANG_FORMAT
 
-function check_tidy() {
-    echo "Running clang-tidy on $0..."
-    if [[ -n $1 ]] && [[ $1 == "--fix" ]]; then
-        OUTPUT=$(${CLANG_TIDY} -p=$PWD -fix -fix-errors ${0} 2>/dev/null)
-    else
-        OUTPUT=$(${CLANG_TIDY} -p=$PWD ${0} 2>/dev/null)
-    fi
+function run_clang_tidy() {
+    FILES=$(git ls-files "src/mbgl/*.cpp" "platform/*.cpp" "test/*.cpp")
+    ${CLANG_TIDY_PREFIX}/share/run-clang-tidy.py -j ${JOBS} \
+        -clang-tidy-binary ${CLANG_TIDY} \
+        -clang-apply-replacements-binary ${CLANG_APPLY} \
+        -fix ${FILES} 2>/dev/null || exit 1
+}
+
+function run_clang_tidy_diff() {
+    OUTPUT=$(git diff origin/master --src-prefix=${CDUP} --dst-prefix=${CDUP} | \
+                ${CLANG_TIDY_PREFIX}/share/clang-tidy-diff.py \
+                    -clang-tidy-binary ${CLANG_TIDY} \
+                    2>/dev/null)
     if [[ -n $OUTPUT ]]; then
-        echo "Caught clang-tidy warning/error:"
-        echo -e "$OUTPUT"
+        echo -e "${OUTPUT}"
         exit 1
     fi
 }
 
-function check_format() {
+function run_clang_format() {
     echo "Running clang-format on $0..."
-    ${CLANG_FORMAT} -i ${CDUP}/$0
+    DIFF_FILES=$(git diff origin/master --name-only *cpp)
+    echo "${DIFF_FILES}" | xargs -I{} -P ${JOBS} bash -c 'run_clang_format' {}
+    ${CLANG_FORMAT} -i ${CDUP}/$0 || exit 1
 }
 
-export CLANG_TIDY CLANG_FORMAT
-export -f check_tidy check_format
+export -f run_clang_tidy run_clang_tidy_diff run_clang_format
 
-echo "Running clang checks... (this might take a while)"
+echo "Running Clang checks... (this might take a while)"
 
 if [[ -n $2 ]] && [[ $2 == "--diff" ]]; then
-    DIFF_FILES=$(for file in `git diff origin/master --name-only | grep "pp$"`; do echo $file; done)
-    if [[ -n $DIFF_FILES ]]; then
-        echo "${DIFF_FILES}" | xargs -I{} -P ${JOBS} bash -c 'check_tidy --fix' {}
-        # XXX disabled until we run clang-format over the entire codebase.
-        #echo "${DIFF_FILES}" | xargs -I{} -P ${JOBS} bash -c 'check_format' {}
-        git diff --quiet || {
-            echo "Changes were made to source files - please review them before committing."
-            exit 1
-        }
-    fi
-    echo "All looks good!"
+    run_clang_tidy_diff $@
+    # XXX disabled until we run clang-format over the entire codebase.
+    #run_clang_format $@
+    echo "All checks pass!"
 else
-    git ls-files "${CDUP}/src/mbgl/*.cpp" "${CDUP}/platform/*.cpp" "${CDUP}/test/*.cpp" | \
-        xargs -I{} -P ${JOBS} bash -c 'check_tidy' {}
+    run_clang_tidy $@
 fi
