@@ -34,7 +34,7 @@ public:
 class CollisionFeature {
 public:
     enum class AlignmentType : bool {
-        Straight = 0,
+        Straight = false,
         Curved
     };
 
