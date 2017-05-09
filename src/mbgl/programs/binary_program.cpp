@@ -2,6 +2,7 @@
 
 #include <protozero/pbf_reader.hpp>
 #include <protozero/pbf_writer.hpp>
+#include <utility>
 
 template <class Binding>
 static std::pair<const std::string, Binding> parseBinding(protozero::pbf_reader&& pbf) {
@@ -64,12 +65,12 @@ BinaryProgram::BinaryProgram(std::string&& data) {
 BinaryProgram::BinaryProgram(
     gl::BinaryProgramFormat binaryFormat_,
     std::string&& binaryCode_,
-    const std::string& binaryIdentifier_,
+    std::string binaryIdentifier_,
     std::vector<std::pair<const std::string, gl::AttributeLocation>>&& attributes_,
     std::vector<std::pair<const std::string, gl::UniformLocation>>&& uniforms_)
     : binaryFormat(binaryFormat_),
       binaryCode(std::move(binaryCode_)),
-      binaryIdentifier(binaryIdentifier_),
+      binaryIdentifier(std::move(binaryIdentifier_)),
       attributes(std::move(attributes_)),
       uniforms(std::move(uniforms_)) {
 }

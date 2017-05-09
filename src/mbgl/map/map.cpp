@@ -27,6 +27,7 @@
 #include <mbgl/actor/scheduler.hpp>
 #include <mbgl/util/logging.hpp>
 #include <mbgl/math/log2.hpp>
+#include <utility>
 
 namespace mbgl {
 
@@ -58,7 +59,7 @@ public:
          GLContextMode,
          ConstrainMode,
          ViewportMode,
-         const std::string& programCacheDir);
+         std::string programCacheDir);
 
     void onSourceChanged(style::Source&) override;
     void onUpdate(Update) override;
@@ -139,7 +140,7 @@ Map::Impl::Impl(Map& map_,
                 GLContextMode contextMode_,
                 ConstrainMode constrainMode_,
                 ViewportMode viewportMode_,
-                const std::string& programCacheDir_)
+                std::string programCacheDir_)
     : map(map_),
       observer(backend_),
       backend(backend_),
@@ -151,7 +152,7 @@ Map::Impl::Impl(Map& map_,
       mode(mode_),
       contextMode(contextMode_),
       pixelRatio(pixelRatio_),
-      programCacheDir(programCacheDir_),
+      programCacheDir(std::move(programCacheDir_)),
       annotationManager(std::make_unique<AnnotationManager>(pixelRatio)),
       asyncInvalidate([this] {
           if (mode == MapMode::Continuous) {
