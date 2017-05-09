@@ -13,7 +13,7 @@ public:
 
     void stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>&) const override;
 
-    FillExtrusionPaintProperties::Cascading cascading;
+    FillExtrusionPaintProperties::Cascading paint;
 };
 
 } // namespace style

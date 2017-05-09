@@ -35,13 +35,13 @@ TEST(StyleConversion, LayerTransition) {
         }
     })JSON");
 
-    ASSERT_EQ(400ms, *layer->as<BackgroundLayer>()->impl().cascading
+    ASSERT_EQ(400ms, *layer->as<BackgroundLayer>()->impl().paint
         .get<BackgroundColor>().getTransition({}).duration);
-    ASSERT_EQ(500ms, *layer->as<BackgroundLayer>()->impl().cascading
+    ASSERT_EQ(500ms, *layer->as<BackgroundLayer>()->impl().paint
         .get<BackgroundColor>().getTransition({}).delay);
 
-    ASSERT_EQ(100ms, *layer->as<BackgroundLayer>()->impl().cascading
+    ASSERT_EQ(100ms, *layer->as<BackgroundLayer>()->impl().paint
         .get<BackgroundColor>().getTransition({"class"}).duration);
-    ASSERT_FALSE(bool(layer->as<BackgroundLayer>()->impl().cascading
+    ASSERT_FALSE(bool(layer->as<BackgroundLayer>()->impl().paint
         .get<BackgroundColor>().getTransition({"class"}).delay));
 }

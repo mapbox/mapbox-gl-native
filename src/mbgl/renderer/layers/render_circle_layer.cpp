@@ -20,7 +20,7 @@ std::unique_ptr<Bucket> RenderCircleLayer::createBucket(const BucketParameters& 
 }
 
 void RenderCircleLayer::cascade(const CascadeParameters& parameters) {
-    unevaluated = impl().cascading.cascade(parameters, std::move(unevaluated));
+    unevaluated = impl().paint.cascade(parameters, std::move(unevaluated));
 }
 
 void RenderCircleLayer::evaluate(const PropertyEvaluationParameters& parameters) {
