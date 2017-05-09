@@ -12,7 +12,7 @@ class Context;
 class OffscreenView : public View {
 public:
     OffscreenView(gl::Context&, Size size = { 256, 256 });
-    ~OffscreenView();
+    ~OffscreenView() override;
 
     void bind() override;
 

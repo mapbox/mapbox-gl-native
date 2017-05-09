@@ -30,7 +30,7 @@ class ClipIDGenerator;
 class RenderSource : protected TileObserver {
 public:
     RenderSource(const style::Source::Impl&);
-    virtual ~RenderSource() = default;
+    ~RenderSource() override = default;
 
     virtual bool isLoaded() const = 0;
 
