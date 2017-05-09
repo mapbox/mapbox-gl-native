@@ -10,6 +10,8 @@ const DefaultStyle light            = { "mapbox://styles/mapbox/light-v9",      
 const DefaultStyle dark             = { "mapbox://styles/mapbox/dark-v9",               "Dark",               9 };
 const DefaultStyle satellite        = { "mapbox://styles/mapbox/satellite-v9",          "Satellite",          9 };
 const DefaultStyle satelliteStreets = { "mapbox://styles/mapbox/satellite-streets-v10", "Satellite Streets", 10 };
+const DefaultStyle trafficDay       = { "mapbox://styles/mapbox/traffic-day-v2",        "Traffic Day",        2 };
+const DefaultStyle trafficNight     = { "mapbox://styles/mapbox/traffic-night-v2",      "Traffic Night",      2 };
 
 } // namespace default_styles
 } // end namespace util
