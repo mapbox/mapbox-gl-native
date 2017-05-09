@@ -7,11 +7,7 @@
 #include <mbgl/util/timer.hpp>
 #include <mbgl/util/geometry.hpp>
 
-#if MBGL_USE_GLES2
-#define GLFW_INCLUDE_ES2
-#endif
-#define GL_GLEXT_PROTOTYPES
-#include <GLFW/glfw3.h>
+struct GLFWwindow;
 
 class GLFWView : public mbgl::View, public mbgl::Backend {
 public:
