@@ -54,23 +54,62 @@
 }
 
 - (CLLocationCoordinate2D)coordinate {
-    mbgl::Polygon<double> polyline;
+    NSUInteger count = self.pointCount;
+    NSAssert(count > 0, @"Polyline must have coordinates");
+
+    CLLocationCoordinate2D *coordinates = self.coordinates;
+    double middle = [self polylineLongitud] / 2.0;
+    double traveled = 0.0;
+    
+    if (count > 1 || middle > traveled) {
+        for (NSUInteger i = 0; i < count; i++) {
+            
+            MGLRadianCoordinate2D from = MGLRadianCoordinateFromLocationCoordinate(coordinates[i]);
+            MGLRadianCoordinate2D to = MGLRadianCoordinateFromLocationCoordinate(coordinates[i + 1]);
+            
+            if (traveled >= middle) {
+                double overshoot = middle - traveled;
+                if (overshoot == 0) {
+                    return coordinates[i];
+                }
+                to = MGLRadianCoordinateFromLocationCoordinate(coordinates[i - 1]);
+                MGLRadianDirection direction = [self direction:from to:to] - 180;
+                MGLRadianCoordinate2D otherCoordinate = MGLRadianCoordinateAtDistanceFacingDirection(from,
+                                                                                                     overshoot/MGLMetersPerRadian,
+                                                                                                     MGLRadiansFromDegrees(direction));
+                return CLLocationCoordinate2DMake(MGLDegreesFromRadians(otherCoordinate.latitude),
+                                                  MGLDegreesFromRadians(otherCoordinate.longitude));
+            }
+            
+            traveled += (MGLDistanceBetweenRadianCoordinates(from, to) * 6373000.0);
+            
+        }
+    }
+
+    return coordinates[count - 1];
+}
+
+- (double)polylineLongitud
+{
+    double longitude = 0.0;
     
     NSUInteger count = self.pointCount;
     CLLocationCoordinate2D *coordinates = self.coordinates;
     
-    mbgl::LinearRing<double> geometry;
-    geometry.reserve(self.pointCount);
     for (NSUInteger i = 0; i < count; i++) {
-        geometry.push_back(mbgl::Point<double>(coordinates[i].longitude, coordinates[i].latitude));
+        if (i + 1 >= count) {
+            return longitude;
+        }
+        
+        longitude += (MGLDistanceBetweenRadianCoordinates(MGLRadianCoordinateFromLocationCoordinate(coordinates[i]),                                                  MGLRadianCoordinateFromLocationCoordinate(coordinates[i + 1])) * 6373000.0);
     }
     
-    polyline.push_back(geometry);
-    
-    // pole of inaccessibility
-    auto poi = mapbox::polylabel(polyline);
-    
-    return MGLLocationCoordinate2DFromPoint(poi);
+    return longitude;
+}
+
+- (CLLocationDirection)direction:(MGLRadianCoordinate2D)from to:(MGLRadianCoordinate2D)to
+{
+    return MGLDegreesFromRadians(MGLRadianCoordinatesDirection(from, to));
 }
 
 @end

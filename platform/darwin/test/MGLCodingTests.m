@@ -67,17 +67,18 @@
 
     XCTAssertNotEqualObjects(polyline, unarchivedPolyline);
     
-    CLLocationCoordinate2D lineCoordinates[] = {
-        CLLocationCoordinate2DMake(100.0, 0.0),
-        CLLocationCoordinate2DMake(101.0, 0.0),
+    CLLocationCoordinate2D multiLineCoordinates[] = {
+        CLLocationCoordinate2DMake(51.000000, 0.000000),
+        CLLocationCoordinate2DMake(51.000000, 1.000000),
+        CLLocationCoordinate2DMake(51.000000, 2.000000),
     };
     
-    NSUInteger lineCoordinatesCount = sizeof(lineCoordinates) / sizeof(CLLocationCoordinate2D);
-    MGLPolyline *line = [MGLPolyline polylineWithCoordinates:lineCoordinates count:lineCoordinatesCount];
-    CLLocationCoordinate2D lineCenter = CLLocationCoordinate2DMake(100.0, 0.0);
+    NSUInteger multiLineCoordinatesCount = sizeof(multiLineCoordinates) / sizeof(CLLocationCoordinate2D);
+    MGLPolyline *multiLine = [MGLPolyline polylineWithCoordinates:multiLineCoordinates count:multiLineCoordinatesCount];
+    CLLocationCoordinate2D multiLineCenter = CLLocationCoordinate2DMake(51.000000, 1.000000);
     
-    XCTAssertEqual([line coordinate].latitude, lineCenter.latitude);
-    XCTAssertEqual([line coordinate].longitude, lineCenter.longitude);
+    XCTAssertEqual([multiLine coordinate].latitude, multiLineCenter.latitude);
+    XCTAssertEqual([multiLine coordinate].longitude, multiLineCenter.longitude);
     
 }
 
