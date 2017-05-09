@@ -6,6 +6,30 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+
+typedef double MGLLocationRadians;
+typedef double MGLRadianDistance;
+typedef double MGLRadianDirection;
+
+extern double const MGLMetersPerRadian;
+
+/** Defines the coordinate by a `MGLRadianCoordinate2D`. */
+typedef struct MGLRadianCoordinate2D {
+    MGLLocationRadians latitude;
+    MGLLocationRadians longitude;
+} MGLRadianCoordinate2D;
+
+/**
+ Creates a new `MGLRadianCoordinate2D` from the given latitudinal and longitudinal.
+ */
+NS_INLINE MGLRadianCoordinate2D MGLRadianCoordinate2DMake(MGLLocationRadians latitude, MGLLocationRadians longitude) {
+    MGLRadianCoordinate2D radianCoordinate;
+    radianCoordinate.latitude = latitude;
+    radianCoordinate.longitude = longitude;
+    return radianCoordinate;
+}
+
+
 /** Defines the area spanned by an `MGLCoordinateBounds`. */
 typedef struct MGLCoordinateSpan {
     /** Latitudes spanned by an `MGLCoordinateBounds`. */
@@ -126,5 +150,46 @@ NS_INLINE CGFloat MGLRadiansFromDegrees(CLLocationDegrees degrees) {
 NS_INLINE CLLocationDegrees MGLDegreesFromRadians(CGFloat radians) {
     return radians * 180 / M_PI;
 }
+
+/** Returns MGLRadianCoordinate2D, converted from CLLocationCoordinate2D. */
+NS_INLINE MGLRadianCoordinate2D MGLRadianCoordinateFromLocationCoordinate(CLLocationCoordinate2D locationCoordinate) {
+    return MGLRadianCoordinate2DMake(MGLRadiansFromDegrees(locationCoordinate.latitude),
+                                     MGLRadiansFromDegrees(locationCoordinate.longitude));
+}
+
+/*
+ Returns the distance in radians given two coordinates.
+ */
+NS_INLINE MGLRadianDistance MGLDistanceBetweenRadianCoordinates(MGLRadianCoordinate2D from, MGLRadianCoordinate2D to)
+{
+    double a = pow(sin((to.latitude - from.latitude) / 2), 2)
+        + pow(sin((to.longitude - from.longitude) / 2), 2) * cos(from.latitude) * cos(to.latitude);
+    
+    return 2 * atan2(sqrt(a), sqrt(1 - a));
+}
+
+/*
+ Returns direction in radians given two coordinates.
+ */
+NS_INLINE MGLRadianDirection MGLRadianCoordinatesDirection(MGLRadianCoordinate2D from, MGLRadianCoordinate2D to) {
+    double a = sin(to.longitude - from.longitude) * cos(to.latitude);
+    double b = cos(from.latitude) * sin(to.latitude)
+                - sin(from.latitude) * cos(to.latitude) * cos(to.longitude - from.longitude);
+    return atan2(a, b);
+}
+
+/*
+ Returns coordinate at a given distance and direction away from coordinate.
+ */
+NS_INLINE MGLRadianCoordinate2D MGLRadianCoordinateAtDistanceFacingDirection(MGLRadianCoordinate2D coordinate,
+                                                                               MGLRadianDistance distance,
+                                                                               MGLRadianDirection direction) {
+    double otherLatitude = asin(sin(coordinate.latitude) * cos(distance)
+                             + cos(coordinate.latitude) * sin(distance) * cos(direction));
+    double otherLongitude = coordinate.longitude + atan2(sin(direction) * sin(distance) * cos(coordinate.latitude),
+                                           cos(distance) - sin(coordinate.latitude) * sin(otherLatitude));
+    return MGLRadianCoordinate2DMake(otherLatitude, otherLongitude);
+}
+    
 
 NS_ASSUME_NONNULL_END

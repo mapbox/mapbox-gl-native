@@ -14,6 +14,8 @@ const CLLocationDegrees MGLAngularFieldOfView = 30;
 
 const MGLCoordinateSpan MGLCoordinateSpanZero = {0, 0};
 
+const double MGLMetersPerRadian = 6373000.0;
+
 CGRect MGLExtendRect(CGRect rect, CGPoint point) {
     if (point.x < rect.origin.x) {
         rect.size.width += rect.origin.x - point.x;
