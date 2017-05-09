@@ -4935,8 +4935,10 @@ public:
 
     // If the map is pitched consider the viewport to be exactly the same as the bounds.
     // Otherwise, add a small buffer.
-    CGFloat widthAdjustment = self.camera.pitch > 0.0 ? 0.0 : -_largestAnnotationViewSize.width * 2.0;
-    CGFloat heightAdjustment = self.camera.pitch > 0.0 ? 0.0 : -_largestAnnotationViewSize.height * 2.0;
+    CGFloat largestWidth = MAX(_largestAnnotationViewSize.width, CGRectGetWidth(self.frame));
+    CGFloat largestHeight = MAX(_largestAnnotationViewSize.height, CGRectGetHeight(self.frame));
+    CGFloat widthAdjustment = self.camera.pitch > 0.0 ? 0.0 : -largestWidth * 2.0;
+    CGFloat heightAdjustment = self.camera.pitch > 0.0 ? 0.0 : -largestHeight * 2.0;
     CGRect viewPort = CGRectInset(self.bounds, widthAdjustment, heightAdjustment);
 
     NSArray *visibleAnnotations = [self visibleAnnotationsInRect:viewPort];
@@ -5012,13 +5014,9 @@ public:
             }
             else
             {
+                // Move the annotation view far out of view to the left
                 CGRect adjustedFrame = annotationView.frame;
-                if (annotationView.layer.presentationLayer) {
-                    adjustedFrame.origin.x = -CGRectGetWidth(annotationView.layer.presentationLayer.frame) * 10.0;
-                } else {
-                    // views that are added off screen do not have a presentationLayer
-                    adjustedFrame.origin.x = -CGRectGetWidth(adjustedFrame) * 10.0;
-                }
+                adjustedFrame.origin.x = -CGRectGetWidth(self.frame) * 10.0;
                 annotationView.frame = adjustedFrame;
                 [self enqueueAnnotationViewForAnnotationContext:annotationContext];
             }
