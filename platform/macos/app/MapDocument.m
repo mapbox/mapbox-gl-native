@@ -165,22 +165,28 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     NSURL *styleURL;
     switch (tag) {
         case 1:
-            styleURL = [MGLStyle streetsStyleURLWithVersion:MGLStyleDefaultVersion];
+            styleURL = [MGLStyle streetsStyleURL];
             break;
         case 2:
-            styleURL = [MGLStyle outdoorsStyleURLWithVersion:MGLStyleDefaultVersion];
+            styleURL = [MGLStyle outdoorsStyleURL];
             break;
         case 3:
-            styleURL = [MGLStyle lightStyleURLWithVersion:MGLStyleDefaultVersion];
+            styleURL = [MGLStyle lightStyleURL];
             break;
         case 4:
-            styleURL = [MGLStyle darkStyleURLWithVersion:MGLStyleDefaultVersion];
+            styleURL = [MGLStyle darkStyleURL];
             break;
         case 5:
-            styleURL = [MGLStyle satelliteStyleURLWithVersion:MGLStyleDefaultVersion];
+            styleURL = [MGLStyle satelliteStyleURL];
             break;
         case 6:
-            styleURL = [MGLStyle satelliteStreetsStyleURLWithVersion:MGLStyleDefaultVersion];
+            styleURL = [MGLStyle satelliteStreetsStyleURL];
+            break;
+        case 7:
+            styleURL = [MGLStyle trafficDayStyleURL];
+            break;
+        case 8:
+            styleURL = [MGLStyle trafficNightStyleURL];
             break;
         default:
             NSAssert(NO, @"Cannot set style from control with tag %li", (long)tag);
@@ -781,22 +787,25 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
         NSCellStateValue state;
         switch (menuItem.tag) {
             case 1:
-                state = [styleURL isEqual:[MGLStyle streetsStyleURLWithVersion:MGLStyleDefaultVersion]];
+                state = [styleURL isEqual:[MGLStyle streetsStyleURL]];
                 break;
             case 2:
-                state = [styleURL isEqual:[MGLStyle outdoorsStyleURLWithVersion:MGLStyleDefaultVersion]];
+                state = [styleURL isEqual:[MGLStyle outdoorsStyleURL]];
                 break;
             case 3:
-                state = [styleURL isEqual:[MGLStyle lightStyleURLWithVersion:MGLStyleDefaultVersion]];
+                state = [styleURL isEqual:[MGLStyle lightStyleURL]];
                 break;
             case 4:
-                state = [styleURL isEqual:[MGLStyle darkStyleURLWithVersion:MGLStyleDefaultVersion]];
+                state = [styleURL isEqual:[MGLStyle darkStyleURL]];
                 break;
             case 5:
-                state = [styleURL isEqual:[MGLStyle satelliteStyleURLWithVersion:MGLStyleDefaultVersion]];
+                state = [styleURL isEqual:[MGLStyle satelliteStyleURL]];
                 break;
             case 6:
-                state = [styleURL isEqual:[MGLStyle satelliteStreetsStyleURLWithVersion:MGLStyleDefaultVersion]];
+                state = [styleURL isEqual:[MGLStyle satelliteStreetsStyleURL]];
+                break;
+            case 7:
+                state = [styleURL isEqual:[MGLStyle trafficDayStyleURL]];
                 break;
             default:
                 return NO;
@@ -954,12 +963,14 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     }
 
     NSArray *styleURLs = @[
-        [MGLStyle streetsStyleURLWithVersion:MGLStyleDefaultVersion],
-        [MGLStyle outdoorsStyleURLWithVersion:MGLStyleDefaultVersion],
-        [MGLStyle lightStyleURLWithVersion:MGLStyleDefaultVersion],
-        [MGLStyle darkStyleURLWithVersion:MGLStyleDefaultVersion],
-        [MGLStyle satelliteStyleURLWithVersion:MGLStyleDefaultVersion],
-        [MGLStyle satelliteStreetsStyleURLWithVersion:MGLStyleDefaultVersion],
+        [MGLStyle streetsStyleURL],
+        [MGLStyle outdoorsStyleURL],
+        [MGLStyle lightStyleURL],
+        [MGLStyle darkStyleURL],
+        [MGLStyle satelliteStyleURL],
+        [MGLStyle satelliteStreetsStyleURL],
+        [MGLStyle trafficDayStyleURL],
+        [MGLStyle trafficNightStyleURL],
     ];
     return [styleURLs indexOfObject:self.mapView.styleURL];
 }

@@ -80,10 +80,12 @@ MGL_DEFINE_STYLE(light, light)
 MGL_DEFINE_STYLE(dark, dark)
 MGL_DEFINE_STYLE(satellite, satellite)
 MGL_DEFINE_STYLE(satelliteStreets, satellite-streets)
+MGL_DEFINE_STYLE(trafficDay, traffic-day)
+MGL_DEFINE_STYLE(trafficNight, traffic-night)
 
 // Make sure all the styles listed in mbgl::util::default_styles::orderedStyles
 // are defined above and also declared in MGLStyle.h.
-static_assert(6 == mbgl::util::default_styles::numOrderedStyles,
+static_assert(8 == mbgl::util::default_styles::numOrderedStyles,
               "mbgl::util::default_styles::orderedStyles and MGLStyle have different numbers of styles.");
 
 // Hybrid has been renamed Satellite Streets, so the last Hybrid version is hard-coded here.

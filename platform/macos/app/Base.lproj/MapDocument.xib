@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="12118" systemVersion="16E195" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="12120" systemVersion="16E195" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="12118"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="12120"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -48,7 +48,7 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES" fullSizeContentView="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="388" y="211" width="642" height="480"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="878"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1280" height="777"/>
             <view key="contentView" id="TuG-C5-zLS">
                 <rect key="frame" x="0.0" y="0.0" width="642" height="480"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -183,9 +183,9 @@
                     <toolbarItem implicitItemIdentifier="BA3542AF-D63A-4893-9CC7-8F67EF2E82B0" label="Style" paletteLabel="Style" id="u23-0z-Otl" customClass="ValidatedToolbarItem">
                         <nil key="toolTip"/>
                         <size key="minSize" width="100" height="26"/>
-                        <size key="maxSize" width="120" height="26"/>
+                        <size key="maxSize" width="150" height="26"/>
                         <popUpButton key="view" verticalHuggingPriority="750" id="Tzm-Cy-dQg">
-                            <rect key="frame" x="0.0" y="14" width="120" height="26"/>
+                            <rect key="frame" x="0.0" y="14" width="150" height="26"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                             <popUpButtonCell key="cell" type="roundTextured" title="Streets" bezelStyle="texturedRounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="border" tag="1" imageScaling="proportionallyDown" inset="2" selectedItem="wvt-tP-O3a" id="3PJ-qK-Oh3">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -202,6 +202,12 @@
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                         </menuItem>
                                         <menuItem title="Satellite Streets" tag="6" id="7ly-oA-0ND">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                        </menuItem>
+                                        <menuItem title="Traffic Day" tag="7" id="Vz7-9Z-EFq">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                        </menuItem>
+                                        <menuItem title="Traffic Night" tag="8" id="zh7-LM-dmF">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                         </menuItem>
                                     </items>
