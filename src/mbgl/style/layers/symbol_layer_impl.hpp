@@ -14,7 +14,7 @@ public:
     void stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>&) const override;
 
     SymbolLayoutProperties layout;
-    SymbolPaintProperties::Cascading cascading;
+    SymbolPaintProperties::Cascading paint;
 };
 
 } // namespace style

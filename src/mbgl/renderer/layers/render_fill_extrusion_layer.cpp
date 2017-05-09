@@ -20,7 +20,7 @@ std::unique_ptr<Bucket> RenderFillExtrusionLayer::createBucket(const BucketParam
 }
 
 void RenderFillExtrusionLayer::cascade(const CascadeParameters& parameters) {
-    unevaluated = impl().cascading.cascade(parameters, std::move(unevaluated));
+    unevaluated = impl().paint.cascade(parameters, std::move(unevaluated));
 }
 
 void RenderFillExtrusionLayer::evaluate(const PropertyEvaluationParameters& parameters) {

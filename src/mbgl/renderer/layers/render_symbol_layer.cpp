@@ -34,7 +34,7 @@ std::unique_ptr<SymbolLayout> RenderSymbolLayer::createLayout(const BucketParame
 }
 
 void RenderSymbolLayer::cascade(const CascadeParameters& parameters) {
-    unevaluated = impl().cascading.cascade(parameters, std::move(unevaluated));
+    unevaluated = impl().paint.cascade(parameters, std::move(unevaluated));
 }
 
 void RenderSymbolLayer::evaluate(const PropertyEvaluationParameters& parameters) {

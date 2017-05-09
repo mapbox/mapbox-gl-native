@@ -40,7 +40,7 @@ Mutable<<%- camelize(type) %>Layer::Impl> <%- camelize(type) %>Layer::mutableImp
 std::unique_ptr<Layer> <%- camelize(type) %>Layer::cloneRef(const std::string& id_) const {
     auto impl_ = mutableImpl();
     impl_->id = id_;
-    impl_->cascading = <%- camelize(type) %>PaintProperties::Cascading();
+    impl_->paint = <%- camelize(type) %>PaintProperties::Cascading();
     return std::make_unique<<%- camelize(type) %>Layer>(std::move(impl_));
 }
 
@@ -139,14 +139,14 @@ void <%- camelize(type) %>Layer::set<%- camelize(property.name) %>(<%- propertyV
 }
 
 <%- propertyValueType(property) %> <%- camelize(type) %>Layer::get<%- camelize(property.name) %>(const optional<std::string>& klass) const {
-    return impl().cascading.template get<<%- camelize(property.name) %>>().get(klass);
+    return impl().paint.template get<<%- camelize(property.name) %>>().get(klass);
 }
 
 void <%- camelize(type) %>Layer::set<%- camelize(property.name) %>(<%- propertyValueType(property) %> value, const optional<std::string>& klass) {
     if (value == get<%- camelize(property.name) %>(klass))
         return;
     auto impl_ = mutableImpl();
-    impl_->cascading.template get<<%- camelize(property.name) %>>().set(value, klass);
+    impl_->paint.template get<<%- camelize(property.name) %>>().set(value, klass);
     baseImpl = std::move(impl_);
 <% if (isDataDriven(property)) { -%>
     if (value.isDataDriven()) {
@@ -161,12 +161,12 @@ void <%- camelize(type) %>Layer::set<%- camelize(property.name) %>(<%- propertyV
 
 void <%- camelize(type) %>Layer::set<%- camelize(property.name) %>Transition(const TransitionOptions& value, const optional<std::string>& klass) {
     auto impl_ = mutableImpl();
-    impl_->cascading.template get<<%- camelize(property.name) %>>().setTransition(value, klass);
+    impl_->paint.template get<<%- camelize(property.name) %>>().setTransition(value, klass);
     baseImpl = std::move(impl_);
 }
 
 TransitionOptions <%- camelize(type) %>Layer::get<%- camelize(property.name) %>Transition(const optional<std::string>& klass) const {
-    return impl().cascading.template get<<%- camelize(property.name) %>>().getTransition(klass);
+    return impl().paint.template get<<%- camelize(property.name) %>>().getTransition(klass);
 }
 <% } -%>
 
