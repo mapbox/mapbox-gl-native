@@ -4,6 +4,7 @@
 #include <mbgl/annotation/symbol_annotation_impl.hpp>
 #include <mbgl/annotation/line_annotation_impl.hpp>
 #include <mbgl/annotation/fill_annotation_impl.hpp>
+#include <mbgl/sprite/sprite_image_collection.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/layers/symbol_layer.hpp>
 #include <mbgl/style/layers/symbol_layer_impl.hpp>
@@ -19,7 +20,7 @@ const std::string AnnotationManager::SourceID = "com.mapbox.annotations";
 const std::string AnnotationManager::PointLayerID = "com.mapbox.annotations.points";
 
 AnnotationManager::AnnotationManager(float pixelRatio)
-    : spriteAtlas({ 1024, 1024 }, pixelRatio) {
+        : spriteAtlas({ 1024, 1024 }, pixelRatio){
     // This is a special atlas, holding only images added via addIcon, so we always treat it as
     // loaded.
     spriteAtlas.markAsLoaded();
@@ -190,16 +191,20 @@ void AnnotationManager::removeTile(AnnotationTile& tile) {
 }
 
 void AnnotationManager::addImage(const std::string& id, std::unique_ptr<style::Image> image) {
-    spriteAtlas.addImage(id, std::move(image));
+    addSpriteImage(spriteImages, id, std::move(image), [&](style::Image& added) {
+        spriteAtlas.addImage(id, std::make_unique<style::Image>(added));
+    });
 }
 
 void AnnotationManager::removeImage(const std::string& id) {
-    spriteAtlas.removeImage(id);
+    removeSpriteImage(spriteImages, id, [&] () {
+        spriteAtlas.removeImage(id);
+    });
 }
 
 double AnnotationManager::getTopOffsetPixelsForImage(const std::string& id) {
     const style::Image* image = spriteAtlas.getImage(id);
-    return image ? -(image->image.size.height / image->pixelRatio) / 2 : 0;
+    return image ? -(image->getImage().size.height / image->getPixelRatio()) / 2 : 0;
 }
 
 } // namespace mbgl

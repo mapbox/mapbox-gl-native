@@ -1,7 +1,4 @@
 #include <mbgl/sprite/sprite_atlas.hpp>
-#include <mbgl/sprite/sprite_atlas_worker.hpp>
-#include <mbgl/sprite/sprite_atlas_observer.hpp>
-#include <mbgl/sprite/sprite_parser.hpp>
 #include <mbgl/gl/context.hpp>
 #include <mbgl/util/logging.hpp>
 #include <mbgl/util/platform.hpp>
@@ -9,11 +6,6 @@
 #include <mbgl/util/std.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/exception.hpp>
-#include <mbgl/storage/file_source.hpp>
-#include <mbgl/storage/resource.hpp>
-#include <mbgl/storage/response.hpp>
-#include <mbgl/util/run_loop.hpp>
-#include <mbgl/actor/actor.hpp>
 
 #include <cassert>
 #include <cmath>
@@ -21,28 +13,12 @@
 
 namespace mbgl {
 
-static SpriteAtlasObserver nullObserver;
-
-struct SpriteAtlas::Loader {
-    Loader(Scheduler& scheduler, SpriteAtlas& spriteAtlas)
-        : mailbox(std::make_shared<Mailbox>(*util::RunLoop::Get())),
-          worker(scheduler, ActorRef<SpriteAtlas>(spriteAtlas, mailbox)) {
-    }
-
-    std::shared_ptr<const std::string> image;
-    std::shared_ptr<const std::string> json;
-    std::unique_ptr<AsyncRequest> jsonRequest;
-    std::unique_ptr<AsyncRequest> spriteRequest;
-    std::shared_ptr<Mailbox> mailbox;
-    Actor<SpriteAtlasWorker> worker;
-};
-
 SpriteAtlasElement::SpriteAtlasElement(Rect<uint16_t> rect_,
                                        const style::Image& image,
                                        Size size_, float pixelRatio)
     : pos(std::move(rect_)),
-      sdf(image.sdf),
-      relativePixelRatio(image.pixelRatio / pixelRatio),
+      sdf(image.isSdf()),
+      relativePixelRatio(image.getPixelRatio() / pixelRatio),
       width(image.getWidth()),
       height(image.getHeight()) {
 
@@ -59,85 +35,23 @@ SpriteAtlasElement::SpriteAtlasElement(Rect<uint16_t> rect_,
 SpriteAtlas::SpriteAtlas(Size size_, float pixelRatio_)
     : size(std::move(size_)),
       pixelRatio(pixelRatio_),
-      observer(&nullObserver),
       bin(size.width, size.height),
       dirty(true) {
 }
 
 SpriteAtlas::~SpriteAtlas() = default;
 
-void SpriteAtlas::load(const std::string& url, Scheduler& scheduler, FileSource& fileSource) {
-    if (url.empty()) {
-        // Treat a non-existent sprite as a successfully loaded empty sprite.
-        markAsLoaded();
-        return;
-    }
-
-    loader = std::make_unique<Loader>(scheduler, *this);
-
-    loader->jsonRequest = fileSource.request(Resource::spriteJSON(url, pixelRatio), [this](Response res) {
-        if (res.error) {
-            observer->onSpriteError(std::make_exception_ptr(std::runtime_error(res.error->message)));
-        } else if (res.notModified) {
-            return;
-        } else if (res.noContent) {
-            loader->json = std::make_shared<const std::string>();
-            emitSpriteLoadedIfComplete();
-        } else {
-            // Only trigger a sprite loaded event we got new data.
-            loader->json = res.data;
-            emitSpriteLoadedIfComplete();
-        }
-    });
-
-    loader->spriteRequest = fileSource.request(Resource::spriteImage(url, pixelRatio), [this](Response res) {
-        if (res.error) {
-            observer->onSpriteError(std::make_exception_ptr(std::runtime_error(res.error->message)));
-        } else if (res.notModified) {
-            return;
-        } else if (res.noContent) {
-            loader->image = std::make_shared<const std::string>();
-            emitSpriteLoadedIfComplete();
-        } else {
-            loader->image = res.data;
-            emitSpriteLoadedIfComplete();
-        }
-    });
-}
-
-void SpriteAtlas::emitSpriteLoadedIfComplete() {
-    assert(loader);
-
-    if (!loader->image || !loader->json) {
-        return;
-    }
-
-    loader->worker.invoke(&SpriteAtlasWorker::parse, loader->image, loader->json);
-    // TODO: delete the loader?
-}
-
-void SpriteAtlas::onParsed(Images&& result) {
+void SpriteAtlas::onSpriteLoaded(Images&& result) {
     markAsLoaded();
+
     for (auto& pair : result) {
         addImage(pair.first, std::move(pair.second));
     }
-    observer->onSpriteLoaded();
+
     for (auto requestor : requestors) {
         requestor->onIconsAvailable(buildIconMap());
     }
     requestors.clear();
-}
-
-void SpriteAtlas::onError(std::exception_ptr err) {
-    observer->onSpriteError(err);
-}
-
-void SpriteAtlas::setObserver(SpriteAtlasObserver* observer_) {
-    observer = observer_;
-}
-
-void SpriteAtlas::dumpDebugLogs() const {
-    Log::Info(Event::General, "SpriteAtlas::loaded: %d", loaded);
 }
 
 void SpriteAtlas::addImage(const std::string& id, std::unique_ptr<style::Image> image_) {
@@ -152,10 +66,7 @@ void SpriteAtlas::addImage(const std::string& id, std::unique_ptr<style::Image> 
     Entry& entry = it->second;
 
     // There is already a sprite with that name in our store.
-    if (entry.image->image.size != image_->image.size) {
-        Log::Warning(Event::Sprite, "Can't change sprite dimensions for '%s'", id.c_str());
-        return;
-    }
+    assert(entry.image->getImage().size == image_->getImage().size);
 
     entry.image = std::move(image_);
 
@@ -172,9 +83,7 @@ void SpriteAtlas::removeImage(const std::string& id) {
     icons.clear();
 
     auto it = entries.find(id);
-    if (it == entries.end()) {
-        return;
-    }
+    assert(it != entries.end());
 
     Entry& entry = it->second;
 
@@ -243,8 +152,8 @@ optional<SpriteAtlasElement> SpriteAtlas::getImage(const std::string& id,
         };
     }
 
-    const uint16_t pixelWidth = std::ceil(entry.image->image.size.width / pixelRatio);
-    const uint16_t pixelHeight = std::ceil(entry.image->image.size.height / pixelRatio);
+    const uint16_t pixelWidth = std::ceil(entry.image->getImage().size.width / pixelRatio);
+    const uint16_t pixelHeight = std::ceil(entry.image->getImage().size.height / pixelRatio);
 
     // Increase to next number divisible by 4, but at least 1.
     // This is so we can scale down the texture coordinates and pack them
@@ -279,7 +188,7 @@ void SpriteAtlas::copy(const Entry& entry, optional<Rect<uint16_t>> Entry::*entr
         image.fill(0);
     }
 
-    const PremultipliedImage& src = entry.image->image;
+    const PremultipliedImage& src = entry.image->getImage();
     const Rect<uint16_t>& rect = *(entry.*entryRect);
 
     const uint32_t padding = 1;
@@ -335,6 +244,10 @@ void SpriteAtlas::bind(bool linear, gl::Context& context, gl::TextureUnit unit) 
     upload(context, unit);
     context.bindTexture(*texture, unit,
                         linear ? gl::TextureFilter::Linear : gl::TextureFilter::Nearest);
+}
+
+void SpriteAtlas::dumpDebugLogs() const {
+    Log::Info(Event::General, "SpriteAtlas::loaded: %d", loaded);
 }
 
 } // namespace mbgl

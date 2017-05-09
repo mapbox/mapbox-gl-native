@@ -17,6 +17,8 @@
 #include <mbgl/style/transition_options.hpp>
 #include <mbgl/style/class_dictionary.hpp>
 #include <mbgl/sprite/sprite_atlas.hpp>
+#include <mbgl/sprite/sprite_image_collection.hpp>
+#include <mbgl/sprite/sprite_loader.hpp>
 #include <mbgl/text/glyph_atlas.hpp>
 #include <mbgl/geometry/line_atlas.hpp>
 #include <mbgl/renderer/update_parameters.hpp>
@@ -72,13 +74,14 @@ Style::Style(Scheduler& scheduler_, FileSource& fileSource_, float pixelRatio)
     : scheduler(scheduler_),
       fileSource(fileSource_),
       glyphAtlas(std::make_unique<GlyphAtlas>(Size{ 2048, 2048 }, fileSource)),
+      spriteLoader(std::make_unique<SpriteLoader>(pixelRatio)),
       spriteAtlas(std::make_unique<SpriteAtlas>(Size{ 1024, 1024 }, pixelRatio)),
       lineAtlas(std::make_unique<LineAtlas>(Size{ 256, 512 })),
       light(std::make_unique<Light>()),
       renderLight(light->impl),
       observer(&nullObserver) {
     glyphAtlas->setObserver(this);
-    spriteAtlas->setObserver(this);
+    spriteLoader->setObserver(this);
     light->setObserver(this);
 }
 
@@ -160,7 +163,7 @@ void Style::setJSON(const std::string& json) {
     setLight(std::make_unique<Light>(parser.light));
 
     glyphAtlas->setURL(parser.glyphURL);
-    spriteAtlas->load(parser.spriteURL, scheduler, fileSource);
+    spriteLoader->load(parser.spriteURL, scheduler, fileSource);
 
     loaded = true;
 
@@ -539,6 +542,24 @@ bool Style::isLoaded() const {
     return true;
 }
 
+void Style::addImage(const std::string& id, std::unique_ptr<style::Image> image) {
+    addSpriteImage(spriteImages, id, std::move(image), [&](style::Image& added) {
+        spriteAtlas->addImage(id, std::make_unique<style::Image>(added));
+        observer->onUpdate(Update::Repaint);
+    });
+}
+
+void Style::removeImage(const std::string& id) {
+    removeSpriteImage(spriteImages, id, [&] () {
+        spriteAtlas->removeImage(id);
+        observer->onUpdate(Update::Repaint);
+    });
+}
+
+const style::Image* Style::getImage(const std::string& id) const {
+    return spriteAtlas->getImage(id);
+}
+
 RenderData Style::getRenderData(MapDebugOptions debugOptions, float angle) const {
     RenderData result;
 
@@ -755,8 +776,20 @@ void Style::onTileError(RenderSource& source, const OverscaledTileID& tileID, st
     observer->onResourceError(error);
 }
 
-void Style::onSpriteLoaded() {
-    observer->onSpriteLoaded();
+void Style::onSpriteLoaded(SpriteLoader::Images&& images) {
+    // Add images to collection
+    Images addedImages;
+    for (auto& entry : images) {
+        addSpriteImage(spriteImages, entry.first, std::move(entry.second), [&] (style::Image& added) {
+            addedImages.emplace(entry.first, std::make_unique<Image>(added));
+        });
+    }
+
+    // Update render sprite atlas
+    spriteAtlas->onSpriteLoaded(std::move(addedImages));
+
+    // Update observer
+    observer->onSpriteLoaded(std::move(images));
     observer->onUpdate(Update::Repaint); // For *-pattern properties.
 }
 

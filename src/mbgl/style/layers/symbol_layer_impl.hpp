@@ -1,6 +1,5 @@
 #pragma once
 
-#include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/style/layer_impl.hpp>
 #include <mbgl/style/layers/symbol_layer.hpp>
 #include <mbgl/style/layers/symbol_layer_properties.hpp>

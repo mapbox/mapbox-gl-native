@@ -283,9 +283,13 @@ set(MBGL_CORE_FILES
     # sprite
     src/mbgl/sprite/sprite_atlas.cpp
     src/mbgl/sprite/sprite_atlas.hpp
-    src/mbgl/sprite/sprite_atlas_observer.hpp
-    src/mbgl/sprite/sprite_atlas_worker.cpp
-    src/mbgl/sprite/sprite_atlas_worker.hpp
+    src/mbgl/sprite/sprite_image_collection.cpp
+    src/mbgl/sprite/sprite_image_collection.hpp
+    src/mbgl/sprite/sprite_loader.cpp
+    src/mbgl/sprite/sprite_loader.hpp
+    src/mbgl/sprite/sprite_loader_observer.hpp
+    src/mbgl/sprite/sprite_loader_worker.cpp
+    src/mbgl/sprite/sprite_loader_worker.hpp
     src/mbgl/sprite/sprite_parser.cpp
     src/mbgl/sprite/sprite_parser.hpp
 
@@ -322,6 +326,8 @@ set(MBGL_CORE_FILES
     src/mbgl/style/class_dictionary.cpp
     src/mbgl/style/class_dictionary.hpp
     src/mbgl/style/image.cpp
+    src/mbgl/style/image_impl.cpp
+    src/mbgl/style/image_impl.hpp
     src/mbgl/style/layer.cpp
     src/mbgl/style/layer_impl.cpp
     src/mbgl/style/layer_impl.hpp
@@ -363,6 +369,7 @@ set(MBGL_CORE_FILES
     include/mbgl/style/conversion/tileset.hpp
     include/mbgl/style/conversion/transition_options.hpp
     src/mbgl/style/conversion/geojson.cpp
+    src/mbgl/style/conversion/json.hpp
     src/mbgl/style/conversion/stringify.hpp
 
     # style/function

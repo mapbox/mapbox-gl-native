@@ -8,16 +8,16 @@
 
 namespace mbgl {
 
-class SpriteAtlas;
+class SpriteLoader;
 
-class SpriteAtlasWorker {
+class SpriteLoaderWorker {
 public:
-    SpriteAtlasWorker(ActorRef<SpriteAtlasWorker>, ActorRef<SpriteAtlas>);
+    SpriteLoaderWorker(ActorRef<SpriteLoaderWorker>, ActorRef<SpriteLoader>);
 
     void parse(std::shared_ptr<const std::string> image, std::shared_ptr<const std::string> json);
 
 private:
-    ActorRef<SpriteAtlas> parent;
+    ActorRef<SpriteLoader> parent;
 };
 
 } // namespace mbgl

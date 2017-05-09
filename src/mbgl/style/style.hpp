@@ -11,7 +11,7 @@
 #include <mbgl/renderer/render_layer.hpp>
 #include <mbgl/renderer/render_light.hpp>
 #include <mbgl/text/glyph_atlas_observer.hpp>
-#include <mbgl/sprite/sprite_atlas_observer.hpp>
+#include <mbgl/sprite/sprite_loader_observer.hpp>
 #include <mbgl/map/mode.hpp>
 #include <mbgl/map/zoom_history.hpp>
 
@@ -31,6 +31,7 @@ namespace mbgl {
 class FileSource;
 class GlyphAtlas;
 class SpriteAtlas;
+class SpriteLoader;
 class LineAtlas;
 class RenderData;
 class TransformState;
@@ -44,7 +45,7 @@ class Layer;
 class QueryParameters;
 
 class Style : public GlyphAtlasObserver,
-              public SpriteAtlasObserver,
+              public SpriteLoaderObserver,
               public SourceObserver,
               public RenderSourceObserver,
               public LayerObserver,
@@ -106,6 +107,10 @@ public:
     Light* getLight() const;
     const RenderLight& getRenderLight() const;
 
+    const style::Image* getImage(const std::string&) const;
+    void addImage(const std::string&, std::unique_ptr<style::Image>);
+    void removeImage(const std::string&);
+
     RenderData getRenderData(MapDebugOptions, float angle) const;
 
     std::vector<Feature> queryRenderedFeatures(const ScreenLineString& geometry,
@@ -120,6 +125,7 @@ public:
     Scheduler& scheduler;
     FileSource& fileSource;
     std::unique_ptr<GlyphAtlas> glyphAtlas;
+    std::unique_ptr<SpriteLoader> spriteLoader;
     std::unique_ptr<SpriteAtlas> spriteAtlas;
     std::unique_ptr<LineAtlas> lineAtlas;
 
@@ -152,8 +158,9 @@ private:
     void onGlyphsLoaded(const FontStack&, const GlyphRange&) override;
     void onGlyphsError(const FontStack&, const GlyphRange&, std::exception_ptr) override;
 
-    // SpriteStoreObserver implementation.
-    void onSpriteLoaded() override;
+    // SpriteLoaderObserver implementation.
+    std::unordered_map<std::string, std::unique_ptr<style::Image>> spriteImages;
+    void onSpriteLoaded(SpriteLoaderObserver::Images&&) override;
     void onSpriteError(std::exception_ptr) override;
 
     // SourceObserver implementation.

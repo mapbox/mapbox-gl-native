@@ -18,8 +18,8 @@ public:
         if (glyphsError) glyphsError(fontStack, glyphRange, error);
     }
 
-    void onSpriteLoaded() override {
-        if (spriteLoaded) spriteLoaded();
+    void onSpriteLoaded(Images&& images) override {
+        if (spriteLoaded) spriteLoaded(std::move(images));
     }
 
     void onSpriteError(std::exception_ptr error) override {
@@ -48,7 +48,7 @@ public:
 
     std::function<void (const FontStack&, const GlyphRange&)> glyphsLoaded;
     std::function<void (const FontStack&, const GlyphRange&, std::exception_ptr)> glyphsError;
-    std::function<void ()> spriteLoaded;
+    std::function<void (Images&&)> spriteLoaded;
     std::function<void (std::exception_ptr)> spriteError;
     std::function<void (Source&)> sourceLoaded;
     std::function<void (Source&)> sourceChanged;

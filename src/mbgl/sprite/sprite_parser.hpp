@@ -7,7 +7,7 @@
 
 #include <string>
 #include <memory>
-#include <map>
+#include <unordered_map>
 
 namespace mbgl {
 
@@ -24,7 +24,7 @@ std::unique_ptr<style::Image> createStyleImage(const PremultipliedImage&,
                                  double ratio,
                                  bool sdf);
 
-using Images = std::map<std::string, std::unique_ptr<style::Image>>;
+using Images = std::unordered_map<std::string, std::unique_ptr<style::Image>>;
 
 // Parses an image and an associated JSON file and returns the sprite objects.
 Images parseSprite(const std::string& image, const std::string& json);
