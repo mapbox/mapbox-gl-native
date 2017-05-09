@@ -2,7 +2,12 @@
 
 Mapbox welcomes participation and contributions from everyone. Please read [CONTRIBUTING.md](../../CONTRIBUTING.md) to get started.
 
+## 3.5.4 - May 9, 2017
+
+* Fixed an issue that caused view backed annotations to become detached from the map view during pan gestures combined with animations of annotation view size or when the annotation view had no size but contained subviews with a non-zero size. ([#8926](https://github.com/mapbox/mapbox-gl-native/pull/8926))
+
 ## 3.5.3 - May 2, 2017
+
 * Fixed an issue that prevented the attribution `UIAlertController` from showing in modal hierarchies. ([#8837](https://github.com/mapbox/mapbox-gl-native/pull/8837))
 
 ## 3.5.2 - April 7, 2017
