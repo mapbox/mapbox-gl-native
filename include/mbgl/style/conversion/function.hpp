@@ -218,7 +218,7 @@ optional<optional<T>> convertDefaultValue(const V& value, Error& error) {
 
     auto defaultValue = convert<T>(*defaultValueValue, error);
     if (!defaultValue) {
-        error = { "wrong type for \"default\": " + error.message };
+        error = { R"(wrong type for "default": )" + error.message };
         return {};
     }
 
