@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11762" systemVersion="15G1217" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="12120" systemVersion="16E195" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11762"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="12120"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -395,6 +395,16 @@
                                     <action selector="showStyle:" target="-1" id="NTT-Y1-EqU"/>
                                 </connections>
                             </menuItem>
+                            <menuItem title="Traffic Day" tag="7" keyEquivalent="7" id="m9S-sv-Dch">
+                                <connections>
+                                    <action selector="showStyle:" target="-1" id="lXM-BW-dDw"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Traffic Night" tag="8" keyEquivalent="8" id="yVS-VL-Xsy">
+                                <connections>
+                                    <action selector="showStyle:" target="-1" id="eAD-br-oBB"/>
+                                </connections>
+                            </menuItem>
                             <menuItem title="Custom Style…" id="L0h-86-2cU">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
@@ -643,7 +653,7 @@ CA
                 <rect key="frame" x="0.0" y="0.0" width="350" height="84"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="0IK-AW-Gg3">
+                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="0IK-AW-Gg3">
                         <rect key="frame" x="18" y="45" width="89" height="17"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Access token:" id="Ptd-FI-M5A">
                             <font key="font" metaFont="system"/>
@@ -654,7 +664,7 @@ CA
                             <accessibilityConnection property="link" destination="7sb-sf-oJU" id="U0t-jC-oQ7"/>
                         </connections>
                     </textField>
-                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="7sb-sf-oJU">
+                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="7sb-sf-oJU">
                         <rect key="frame" x="113" y="42" width="197" height="22"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="jlV-TC-NUv">
                             <font key="font" metaFont="system"/>
@@ -723,7 +733,7 @@ CA
                         <rect key="frame" x="-1" y="20" width="402" height="281"/>
                         <clipView key="contentView" id="J9U-Yx-o2S">
                             <rect key="frame" x="1" y="0.0" width="400" height="280"/>
-                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            <autoresizingMask key="autoresizingMask"/>
                             <subviews>
                                 <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" autosaveColumns="NO" headerView="MAZ-Iq-hBi" id="Ato-Vu-HYT">
                                     <rect key="frame" x="0.0" y="0.0" width="423" height="257"/>

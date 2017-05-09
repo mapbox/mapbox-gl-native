@@ -1543,14 +1543,18 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
             @"Dark",
             @"Satellite",
             @"Satellite Streets",
+            @"Traffic Day",
+            @"Traffic Night",
         ];
         styleURLs = @[
-            [MGLStyle streetsStyleURLWithVersion:MGLStyleDefaultVersion],
-            [MGLStyle outdoorsStyleURLWithVersion:MGLStyleDefaultVersion],
-            [MGLStyle lightStyleURLWithVersion:MGLStyleDefaultVersion],
-            [MGLStyle darkStyleURLWithVersion:MGLStyleDefaultVersion],
-            [MGLStyle satelliteStyleURLWithVersion:MGLStyleDefaultVersion],
-            [MGLStyle satelliteStreetsStyleURLWithVersion:MGLStyleDefaultVersion],
+            [MGLStyle streetsStyleURL],
+            [MGLStyle outdoorsStyleURL],
+            [MGLStyle lightStyleURL],
+            [MGLStyle darkStyleURL],
+            [MGLStyle satelliteStyleURL],
+            [MGLStyle satelliteStreetsStyleURL],
+            [MGLStyle trafficDayStyleURL],
+            [MGLStyle trafficNightStyleURL],
         ];
         NSAssert(styleNames.count == styleURLs.count, @"Style names and URLs don’t match.");
 

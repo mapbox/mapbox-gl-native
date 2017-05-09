@@ -19,9 +19,12 @@ extern const DefaultStyle light;
 extern const DefaultStyle dark;
 extern const DefaultStyle satellite;
 extern const DefaultStyle satelliteStreets;
+extern const DefaultStyle trafficDay;
+extern const DefaultStyle trafficNight;
 
 const DefaultStyle orderedStyles[] = {
     streets, outdoors, light, dark, satellite, satelliteStreets,
+    trafficDay, trafficNight,
 };
 const size_t numOrderedStyles = sizeof(orderedStyles) / sizeof(DefaultStyle);
 

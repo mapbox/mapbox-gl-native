@@ -99,8 +99,16 @@
                           @(mbgl::util::default_styles::satelliteStreets.url));
     XCTAssertEqualObjects([MGLStyle satelliteStreetsStyleURLWithVersion:99].absoluteString,
                           @"mapbox://styles/mapbox/satellite-streets-v99");
+    XCTAssertEqualObjects([MGLStyle trafficDayStyleURLWithVersion:mbgl::util::default_styles::trafficDay.currentVersion].absoluteString,
+                          @(mbgl::util::default_styles::trafficDay.url));
+    XCTAssertEqualObjects([MGLStyle trafficDayStyleURLWithVersion:99].absoluteString,
+                          @"mapbox://styles/mapbox/traffic-day-v99");
+    XCTAssertEqualObjects([MGLStyle trafficNightStyleURLWithVersion:mbgl::util::default_styles::trafficNight.currentVersion].absoluteString,
+                          @(mbgl::util::default_styles::trafficNight.url));
+    XCTAssertEqualObjects([MGLStyle trafficNightStyleURLWithVersion:99].absoluteString,
+                          @"mapbox://styles/mapbox/traffic-night-v99");
 
-    static_assert(6 == mbgl::util::default_styles::numOrderedStyles,
+    static_assert(8 == mbgl::util::default_styles::numOrderedStyles,
                   "MGLStyleTests isn’t testing all the styles in mbgl::util::default_styles.");
 }
 

@@ -23,7 +23,7 @@ public class Style {
    * constants means your map style will always use the latest version and may change as we
    * improve the style
    */
-  @StringDef( {MAPBOX_STREETS, OUTDOORS, LIGHT, DARK, SATELLITE, SATELLITE_STREETS})
+  @StringDef( {MAPBOX_STREETS, OUTDOORS, LIGHT, DARK, SATELLITE, SATELLITE_STREETS, TRAFFIC_DAY, TRAFFIC_NIGHT})
   @Retention(RetentionPolicy.SOURCE)
   public @interface StyleUrl {
   }
@@ -67,4 +67,22 @@ public class Style {
    * improve the style.
    */
   public static final String SATELLITE_STREETS = "mapbox://styles/mapbox/satellite-streets-v10";
+
+  /**
+   * Traffic Day: Color-coded roads based on live traffic congestion data. Traffic data is currently
+   * available in
+   * <a href="https://www.mapbox.com/api-documentation/pages/traffic-countries.html">these select
+   * countries</a>. Using this constant means your map style will always use the latest version and
+   * may change as we improve the style.
+   */
+  public static final String TRAFFIC_DAY = "mapbox://styles/mapbox/traffic-day-v2";
+
+  /**
+   * Traffic Night: Color-coded roads based on live traffic congestion data, designed to maximize
+   * legibility in low-light situations. Traffic data is currently available in
+   * <a href="https://www.mapbox.com/api-documentation/pages/traffic-countries.html">these select
+   * countries</a>. Using this constant means your map style will always use the latest version and
+   * may change as we improve the style.
+   */
+  public static final String TRAFFIC_NIGHT = "mapbox://styles/mapbox/traffic-night-v2";
 }

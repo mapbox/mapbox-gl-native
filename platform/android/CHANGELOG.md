@@ -37,6 +37,7 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 * Derived source attribution [#8630](https://github.com/mapbox/mapbox-gl-native/pull/8630)
 * Consistent use of duration unit [#8578](https://github.com/mapbox/mapbox-gl-native/pull/8578)
 * Swedish localization [#8883](https://github.com/mapbox/mapbox-gl-native/pull/8883)
+* Streets v10, Outdoors v10, Satellite Streets v10, Traffic Day v2, Traffic Night v2 [#6301](https://github.com/mapbox/mapbox-gl-native/pull/6301)
 
 ## 5.0.2 - April 3, 2017
 
