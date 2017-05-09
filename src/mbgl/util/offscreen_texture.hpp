@@ -20,7 +20,7 @@ public:
     OffscreenTexture(gl::Context&,
                      Size size = { 256, 256 },
                      OffscreenTextureAttachment type = OffscreenTextureAttachment::None);
-    ~OffscreenTexture();
+    ~OffscreenTexture() override;
     OffscreenTexture(OffscreenTexture&&);
     OffscreenTexture& operator=(OffscreenTexture&&);
 

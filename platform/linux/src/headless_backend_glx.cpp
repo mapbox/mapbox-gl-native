@@ -17,7 +17,7 @@ struct GLXImpl : public HeadlessBackend::Impl {
               fbConfigs(fbConfigs_) {
     }
 
-    ~GLXImpl() {
+    ~GLXImpl() override {
         if (glxPbuffer) {
             glXDestroyPbuffer(xDisplay, glxPbuffer);
         }
