@@ -15,9 +15,6 @@ bool FixtureLog::Message::operator==(const Message& rhs) const {
     return severity == rhs.severity && event == rhs.event && code == rhs.code && msg == rhs.msg;
 }
 
-FixtureLog::Message::Message() : severity(), event(), code(), msg() {
-}
-
 FixtureLog::Observer::Observer(FixtureLog* log_) : log(log_) {
 }
 

@@ -12,15 +12,15 @@ namespace mbgl {
 class FixtureLog {
 public:
     struct Message {
+        Message() = default;
         Message(EventSeverity severity_, Event event_, int64_t code_, std::string msg_);
-        Message();
 
         bool operator==(const Message& rhs) const;
 
-        const EventSeverity severity;
-        const Event event;
-        const int64_t code;
-        const std::string msg;
+        const EventSeverity severity {};
+        const Event event {};
+        const int64_t code {};
+        const std::string msg {};
 
         mutable bool checked = false;
     };

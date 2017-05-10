@@ -58,14 +58,14 @@ enum class WritingModeType : uint8_t;
 
 class Shaping {
     public:
-    explicit Shaping() : top(0), bottom(0), left(0), right(0) {}
+    explicit Shaping() = default;
     explicit Shaping(float x, float y, WritingModeType writingMode_)
         : top(y), bottom(y), left(x), right(x), writingMode(writingMode_) {}
     std::vector<PositionedGlyph> positionedGlyphs;
-    int32_t top;
-    int32_t bottom;
-    int32_t left;
-    int32_t right;
+    int32_t top = 0;
+    int32_t bottom = 0;
+    int32_t left = 0;
+    int32_t right = 0;
     WritingModeType writingMode;
 
     explicit operator bool() const { return !positionedGlyphs.empty(); }
