@@ -15,7 +15,7 @@ namespace style {
 template <class T>
 class PaintProperty {
 public:
-    using TransitionableType = Cascading<PropertyValue<T>>;
+    using TransitionableType = Transitionable<PropertyValue<T>>;
     using UnevaluatedType = Transitioning<PropertyValue<T>>;
     using EvaluatorType = PropertyEvaluator<T>;
     using PossiblyEvaluatedType = T;
@@ -26,7 +26,7 @@ public:
 template <class T, class A>
 class DataDrivenPaintProperty {
 public:
-    using TransitionableType = Cascading<DataDrivenPropertyValue<T>>;
+    using TransitionableType = Transitionable<DataDrivenPropertyValue<T>>;
     using UnevaluatedType = Transitioning<DataDrivenPropertyValue<T>>;
     using EvaluatorType = DataDrivenPropertyEvaluator<T>;
     using PossiblyEvaluatedType = PossiblyEvaluatedPropertyValue<T>;
@@ -39,7 +39,7 @@ public:
 template <class T>
 class CrossFadedPaintProperty {
 public:
-    using TransitionableType = Cascading<PropertyValue<T>>;
+    using TransitionableType = Transitionable<PropertyValue<T>>;
     using UnevaluatedType = Transitioning<PropertyValue<T>>;
     using EvaluatorType = CrossFadedPropertyEvaluator<T>;
     using PossiblyEvaluatedType = Faded<T>;

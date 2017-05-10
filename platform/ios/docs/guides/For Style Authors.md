@@ -107,7 +107,6 @@ the following terms for concepts defined in the style specification:
 
 In the style specification | In the SDK
 ---------------------------|---------
-class                      | style class
 filter                     | predicate
 function type              | interpolation mode
 id                         | identifier

@@ -168,12 +168,6 @@ public:
 
     void setGestureInProgress(bool inProgress);
 
-    void addClass(const QString &);
-    void removeClass(const QString &);
-    bool hasClass(const QString &) const;
-    void setClasses(const QStringList &);
-    QStringList getClasses() const;
-
     void setTransitionOptions(qint64 duration, qint64 delay = 0);
 
     void addAnnotationIcon(const QString &name, const QImage &sprite);
@@ -183,7 +177,7 @@ public:
     void removeAnnotation(QMapbox::AnnotationID);
 
     void setLayoutProperty(const QString &layer, const QString &property, const QVariant &value);
-    void setPaintProperty(const QString &layer, const QString &property, const QVariant &value, const QString &klass = QString());
+    void setPaintProperty(const QString &layer, const QString &property, const QVariant &value);
 
     bool isFullyLoaded() const;
 

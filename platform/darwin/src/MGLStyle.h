@@ -483,40 +483,24 @@ MGL_EXPORT
 #pragma mark Managing Style Classes
 
 /**
- Currently active style classes, represented as an array of string identifiers.
+ Support for style classes has been removed. This property always returns an empty array.
  */
-@property (nonatomic) NS_ARRAY_OF(NSString *) *styleClasses __attribute__((deprecated("This property will be removed in a future release.")));
+@property (nonatomic) NS_ARRAY_OF(NSString *) *styleClasses __attribute__((deprecated("This property is non-functional.")));
 
 /**
- Returns a Boolean value indicating whether the style class with the given
- identifier is currently active.
-
- @param styleClass The style class to query for.
- @return Whether the style class is currently active.
+ Support for style classes has been removed. This method always returns NO.
  */
-- (BOOL)hasStyleClass:(NSString *)styleClass __attribute__((deprecated("This method will be removed in a future release.")));
+- (BOOL)hasStyleClass:(NSString *)styleClass __attribute__((deprecated("This method is non-functional.")));
 
 /**
- Activates the style class with the given identifier.
-
- @param styleClass The style class to activate.
+ Support for style classes has been removed. This method is a no-op.
  */
-- (void)addStyleClass:(NSString *)styleClass __attribute__((deprecated("This method will be removed in a future release.")));
+- (void)addStyleClass:(NSString *)styleClass __attribute__((deprecated("This method is non-functional.")));
 
 /**
- Deactivates the style class with the given identifier.
-
- @note Style class names are not guaranteed to exist across styles or different
-    versions of the same style. Applications that use this API must first set the
-    style URL to an explicitly versioned style using a convenience method like
-    `+[MGLStyle outdoorsStyleURLWithVersion:]`, `MGLMapView`’s “Style URL”
-    inspectable in Interface Builder, or a manually constructed `NSURL`. This
-    approach also avoids style class name changes that will occur in the default
-    style over time.
-
- @param styleClass The style class to deactivate.
+ Support for style classes has been removed. This method is a no-op.
  */
-- (void)removeStyleClass:(NSString *)styleClass __attribute__((deprecated("This method will be removed in a future release.")));
+- (void)removeStyleClass:(NSString *)styleClass __attribute__((deprecated("This method is non-functional.")));
 
 #pragma mark Managing a Style’s Images
 

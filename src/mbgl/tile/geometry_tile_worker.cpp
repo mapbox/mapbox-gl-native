@@ -249,7 +249,6 @@ static std::vector<std::unique_ptr<RenderLayer>> toRenderLayers(const std::vecto
         renderLayers.push_back(RenderLayer::create(layer));
 
         renderLayers.back()->transition(TransitionParameters {
-            { ClassID::Default },
             Clock::time_point::max(),
             TransitionOptions()
         });

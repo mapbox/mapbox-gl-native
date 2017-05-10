@@ -177,88 +177,88 @@ public:
     // Paint properties
 
     static DataDrivenPropertyValue<float> getDefaultIconOpacity();
-    DataDrivenPropertyValue<float> getIconOpacity(const optional<std::string>& klass = {}) const;
-    void setIconOpacity(DataDrivenPropertyValue<float>, const optional<std::string>& klass = {});
-    void setIconOpacityTransition(const TransitionOptions&, const optional<std::string>& klass = {});
-    TransitionOptions getIconOpacityTransition(const optional<std::string>& klass = {}) const;
+    DataDrivenPropertyValue<float> getIconOpacity() const;
+    void setIconOpacity(DataDrivenPropertyValue<float>);
+    void setIconOpacityTransition(const TransitionOptions&);
+    TransitionOptions getIconOpacityTransition() const;
 
     static DataDrivenPropertyValue<Color> getDefaultIconColor();
-    DataDrivenPropertyValue<Color> getIconColor(const optional<std::string>& klass = {}) const;
-    void setIconColor(DataDrivenPropertyValue<Color>, const optional<std::string>& klass = {});
-    void setIconColorTransition(const TransitionOptions&, const optional<std::string>& klass = {});
-    TransitionOptions getIconColorTransition(const optional<std::string>& klass = {}) const;
+    DataDrivenPropertyValue<Color> getIconColor() const;
+    void setIconColor(DataDrivenPropertyValue<Color>);
+    void setIconColorTransition(const TransitionOptions&);
+    TransitionOptions getIconColorTransition() const;
 
     static DataDrivenPropertyValue<Color> getDefaultIconHaloColor();
-    DataDrivenPropertyValue<Color> getIconHaloColor(const optional<std::string>& klass = {}) const;
-    void setIconHaloColor(DataDrivenPropertyValue<Color>, const optional<std::string>& klass = {});
-    void setIconHaloColorTransition(const TransitionOptions&, const optional<std::string>& klass = {});
-    TransitionOptions getIconHaloColorTransition(const optional<std::string>& klass = {}) const;
+    DataDrivenPropertyValue<Color> getIconHaloColor() const;
+    void setIconHaloColor(DataDrivenPropertyValue<Color>);
+    void setIconHaloColorTransition(const TransitionOptions&);
+    TransitionOptions getIconHaloColorTransition() const;
 
     static DataDrivenPropertyValue<float> getDefaultIconHaloWidth();
-    DataDrivenPropertyValue<float> getIconHaloWidth(const optional<std::string>& klass = {}) const;
-    void setIconHaloWidth(DataDrivenPropertyValue<float>, const optional<std::string>& klass = {});
-    void setIconHaloWidthTransition(const TransitionOptions&, const optional<std::string>& klass = {});
-    TransitionOptions getIconHaloWidthTransition(const optional<std::string>& klass = {}) const;
+    DataDrivenPropertyValue<float> getIconHaloWidth() const;
+    void setIconHaloWidth(DataDrivenPropertyValue<float>);
+    void setIconHaloWidthTransition(const TransitionOptions&);
+    TransitionOptions getIconHaloWidthTransition() const;
 
     static DataDrivenPropertyValue<float> getDefaultIconHaloBlur();
-    DataDrivenPropertyValue<float> getIconHaloBlur(const optional<std::string>& klass = {}) const;
-    void setIconHaloBlur(DataDrivenPropertyValue<float>, const optional<std::string>& klass = {});
-    void setIconHaloBlurTransition(const TransitionOptions&, const optional<std::string>& klass = {});
-    TransitionOptions getIconHaloBlurTransition(const optional<std::string>& klass = {}) const;
+    DataDrivenPropertyValue<float> getIconHaloBlur() const;
+    void setIconHaloBlur(DataDrivenPropertyValue<float>);
+    void setIconHaloBlurTransition(const TransitionOptions&);
+    TransitionOptions getIconHaloBlurTransition() const;
 
     static PropertyValue<std::array<float, 2>> getDefaultIconTranslate();
-    PropertyValue<std::array<float, 2>> getIconTranslate(const optional<std::string>& klass = {}) const;
-    void setIconTranslate(PropertyValue<std::array<float, 2>>, const optional<std::string>& klass = {});
-    void setIconTranslateTransition(const TransitionOptions&, const optional<std::string>& klass = {});
-    TransitionOptions getIconTranslateTransition(const optional<std::string>& klass = {}) const;
+    PropertyValue<std::array<float, 2>> getIconTranslate() const;
+    void setIconTranslate(PropertyValue<std::array<float, 2>>);
+    void setIconTranslateTransition(const TransitionOptions&);
+    TransitionOptions getIconTranslateTransition() const;
 
     static PropertyValue<TranslateAnchorType> getDefaultIconTranslateAnchor();
-    PropertyValue<TranslateAnchorType> getIconTranslateAnchor(const optional<std::string>& klass = {}) const;
-    void setIconTranslateAnchor(PropertyValue<TranslateAnchorType>, const optional<std::string>& klass = {});
-    void setIconTranslateAnchorTransition(const TransitionOptions&, const optional<std::string>& klass = {});
-    TransitionOptions getIconTranslateAnchorTransition(const optional<std::string>& klass = {}) const;
+    PropertyValue<TranslateAnchorType> getIconTranslateAnchor() const;
+    void setIconTranslateAnchor(PropertyValue<TranslateAnchorType>);
+    void setIconTranslateAnchorTransition(const TransitionOptions&);
+    TransitionOptions getIconTranslateAnchorTransition() const;
 
     static DataDrivenPropertyValue<float> getDefaultTextOpacity();
-    DataDrivenPropertyValue<float> getTextOpacity(const optional<std::string>& klass = {}) const;
-    void setTextOpacity(DataDrivenPropertyValue<float>, const optional<std::string>& klass = {});
-    void setTextOpacityTransition(const TransitionOptions&, const optional<std::string>& klass = {});
-    TransitionOptions getTextOpacityTransition(const optional<std::string>& klass = {}) const;
+    DataDrivenPropertyValue<float> getTextOpacity() const;
+    void setTextOpacity(DataDrivenPropertyValue<float>);
+    void setTextOpacityTransition(const TransitionOptions&);
+    TransitionOptions getTextOpacityTransition() const;
 
     static DataDrivenPropertyValue<Color> getDefaultTextColor();
-    DataDrivenPropertyValue<Color> getTextColor(const optional<std::string>& klass = {}) const;
-    void setTextColor(DataDrivenPropertyValue<Color>, const optional<std::string>& klass = {});
-    void setTextColorTransition(const TransitionOptions&, const optional<std::string>& klass = {});
-    TransitionOptions getTextColorTransition(const optional<std::string>& klass = {}) const;
+    DataDrivenPropertyValue<Color> getTextColor() const;
+    void setTextColor(DataDrivenPropertyValue<Color>);
+    void setTextColorTransition(const TransitionOptions&);
+    TransitionOptions getTextColorTransition() const;
 
     static DataDrivenPropertyValue<Color> getDefaultTextHaloColor();
-    DataDrivenPropertyValue<Color> getTextHaloColor(const optional<std::string>& klass = {}) const;
-    void setTextHaloColor(DataDrivenPropertyValue<Color>, const optional<std::string>& klass = {});
-    void setTextHaloColorTransition(const TransitionOptions&, const optional<std::string>& klass = {});
-    TransitionOptions getTextHaloColorTransition(const optional<std::string>& klass = {}) const;
+    DataDrivenPropertyValue<Color> getTextHaloColor() const;
+    void setTextHaloColor(DataDrivenPropertyValue<Color>);
+    void setTextHaloColorTransition(const TransitionOptions&);
+    TransitionOptions getTextHaloColorTransition() const;
 
     static DataDrivenPropertyValue<float> getDefaultTextHaloWidth();
-    DataDrivenPropertyValue<float> getTextHaloWidth(const optional<std::string>& klass = {}) const;
-    void setTextHaloWidth(DataDrivenPropertyValue<float>, const optional<std::string>& klass = {});
-    void setTextHaloWidthTransition(const TransitionOptions&, const optional<std::string>& klass = {});
-    TransitionOptions getTextHaloWidthTransition(const optional<std::string>& klass = {}) const;
+    DataDrivenPropertyValue<float> getTextHaloWidth() const;
+    void setTextHaloWidth(DataDrivenPropertyValue<float>);
+    void setTextHaloWidthTransition(const TransitionOptions&);
+    TransitionOptions getTextHaloWidthTransition() const;
 
     static DataDrivenPropertyValue<float> getDefaultTextHaloBlur();
-    DataDrivenPropertyValue<float> getTextHaloBlur(const optional<std::string>& klass = {}) const;
-    void setTextHaloBlur(DataDrivenPropertyValue<float>, const optional<std::string>& klass = {});
-    void setTextHaloBlurTransition(const TransitionOptions&, const optional<std::string>& klass = {});
-    TransitionOptions getTextHaloBlurTransition(const optional<std::string>& klass = {}) const;
+    DataDrivenPropertyValue<float> getTextHaloBlur() const;
+    void setTextHaloBlur(DataDrivenPropertyValue<float>);
+    void setTextHaloBlurTransition(const TransitionOptions&);
+    TransitionOptions getTextHaloBlurTransition() const;
 
     static PropertyValue<std::array<float, 2>> getDefaultTextTranslate();
-    PropertyValue<std::array<float, 2>> getTextTranslate(const optional<std::string>& klass = {}) const;
-    void setTextTranslate(PropertyValue<std::array<float, 2>>, const optional<std::string>& klass = {});
-    void setTextTranslateTransition(const TransitionOptions&, const optional<std::string>& klass = {});
-    TransitionOptions getTextTranslateTransition(const optional<std::string>& klass = {}) const;
+    PropertyValue<std::array<float, 2>> getTextTranslate() const;
+    void setTextTranslate(PropertyValue<std::array<float, 2>>);
+    void setTextTranslateTransition(const TransitionOptions&);
+    TransitionOptions getTextTranslateTransition() const;
 
     static PropertyValue<TranslateAnchorType> getDefaultTextTranslateAnchor();
-    PropertyValue<TranslateAnchorType> getTextTranslateAnchor(const optional<std::string>& klass = {}) const;
-    void setTextTranslateAnchor(PropertyValue<TranslateAnchorType>, const optional<std::string>& klass = {});
-    void setTextTranslateAnchorTransition(const TransitionOptions&, const optional<std::string>& klass = {});
-    TransitionOptions getTextTranslateAnchorTransition(const optional<std::string>& klass = {}) const;
+    PropertyValue<TranslateAnchorType> getTextTranslateAnchor() const;
+    void setTextTranslateAnchor(PropertyValue<TranslateAnchorType>);
+    void setTextTranslateAnchorTransition(const TransitionOptions&);
+    TransitionOptions getTextTranslateAnchorTransition() const;
 
     // Private implementation
 

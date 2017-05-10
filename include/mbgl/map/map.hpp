@@ -59,15 +59,8 @@ public:
     void render(View&);
 
     // Styling
-    void addClass(const std::string&);
-    void removeClass(const std::string&);
-    void setClasses(const std::vector<std::string>&);
-
     style::TransitionOptions getTransitionOptions() const;
     void setTransitionOptions(const style::TransitionOptions&);
-
-    bool hasClass(const std::string&) const;
-    std::vector<std::string> getClasses() const;
 
     void setStyleURL(const std::string&);
     void setStyleJSON(const std::string&);

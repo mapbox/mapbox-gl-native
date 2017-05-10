@@ -7,7 +7,6 @@ namespace mbgl {
 enum class Update {
     Nothing                   = 0,
     Repaint                   = 1 << 0,
-    Classes                   = 1 << 2,
     AnnotationStyle           = 1 << 6,
     AnnotationData            = 1 << 7
 };

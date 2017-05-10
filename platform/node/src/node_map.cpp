@@ -60,7 +60,6 @@ void NodeMap::Init(v8::Local<v8::Object> target) {
     Nan::SetPrototypeMethod(tpl, "release", Release);
     Nan::SetPrototypeMethod(tpl, "cancel", Cancel);
 
-    Nan::SetPrototypeMethod(tpl, "addClass", AddClass);
     Nan::SetPrototypeMethod(tpl, "addSource", AddSource);
     Nan::SetPrototypeMethod(tpl, "addLayer", AddLayer);
     Nan::SetPrototypeMethod(tpl, "removeLayer", RemoveLayer);
@@ -376,10 +375,6 @@ void NodeMap::startRender(NodeMap::RenderOptions options) {
         view = std::make_unique<mbgl::OffscreenView>(backend.getContext(), fbSize);
     }
 
-    if (map->getClasses() != options.classes) {
-        map->setClasses(options.classes);
-    }
-
     if (map->getZoom() != options.zoom) {
         map->setZoom(options.zoom);
     }
@@ -544,23 +539,6 @@ void NodeMap::cancel() {
 
     error = std::make_exception_ptr(std::runtime_error("Canceled"));
     renderFinished();
-}
-
-void NodeMap::AddClass(const Nan::FunctionCallbackInfo<v8::Value>& info) {
-    auto nodeMap = Nan::ObjectWrap::Unwrap<NodeMap>(info.Holder());
-    if (!nodeMap->map) return Nan::ThrowError(releasedMessage());
-
-    if (info.Length() <= 0 || !info[0]->IsString()) {
-        return Nan::ThrowTypeError("First argument must be a string");
-    }
-
-    try {
-        nodeMap->map->addClass(*Nan::Utf8String(info[0]));
-    } catch (const std::exception &ex) {
-        return Nan::ThrowError(ex.what());
-    }
-
-    info.GetReturnValue().SetUndefined();
 }
 
 void NodeMap::AddSource(const Nan::FunctionCallbackInfo<v8::Value>& info) {
@@ -763,12 +741,7 @@ void NodeMap::SetPaintProperty(const Nan::FunctionCallbackInfo<v8::Value>& info)
         return Nan::ThrowTypeError("Second argument must be a string");
     }
 
-    mbgl::optional<std::string> klass;
-    if (info.Length() == 4 && info[3]->IsString()) {
-        klass = std::string(*Nan::Utf8String(info[3]));
-    }
-
-    mbgl::optional<Error> error = setPaintProperty(*layer, *Nan::Utf8String(info[1]), info[2], klass);
+    mbgl::optional<Error> error = setPaintProperty(*layer, *Nan::Utf8String(info[1]), info[2]);
     if (error) {
         return Nan::ThrowTypeError(error->message.c_str());
     }

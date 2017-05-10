@@ -98,15 +98,15 @@ DataDrivenPropertyValue<float> CircleLayer::getDefaultCircleRadius() {
     return { 5 };
 }
 
-DataDrivenPropertyValue<float> CircleLayer::getCircleRadius(const optional<std::string>& klass) const {
-    return impl().paint.template get<CircleRadius>().get(klass);
+DataDrivenPropertyValue<float> CircleLayer::getCircleRadius() const {
+    return impl().paint.template get<CircleRadius>().value;
 }
 
-void CircleLayer::setCircleRadius(DataDrivenPropertyValue<float> value, const optional<std::string>& klass) {
-    if (value == getCircleRadius(klass))
+void CircleLayer::setCircleRadius(DataDrivenPropertyValue<float> value) {
+    if (value == getCircleRadius())
         return;
     auto impl_ = mutableImpl();
-    impl_->paint.template get<CircleRadius>().set(value, klass);
+    impl_->paint.template get<CircleRadius>().value = value;
     baseImpl = std::move(impl_);
     if (value.isDataDriven()) {
         observer->onLayerDataDrivenPaintPropertyChanged(*this);
@@ -115,29 +115,29 @@ void CircleLayer::setCircleRadius(DataDrivenPropertyValue<float> value, const op
     }
 }
 
-void CircleLayer::setCircleRadiusTransition(const TransitionOptions& value, const optional<std::string>& klass) {
+void CircleLayer::setCircleRadiusTransition(const TransitionOptions& options) {
     auto impl_ = mutableImpl();
-    impl_->paint.template get<CircleRadius>().setTransition(value, klass);
+    impl_->paint.template get<CircleRadius>().options = options;
     baseImpl = std::move(impl_);
 }
 
-TransitionOptions CircleLayer::getCircleRadiusTransition(const optional<std::string>& klass) const {
-    return impl().paint.template get<CircleRadius>().getTransition(klass);
+TransitionOptions CircleLayer::getCircleRadiusTransition() const {
+    return impl().paint.template get<CircleRadius>().options;
 }
 
 DataDrivenPropertyValue<Color> CircleLayer::getDefaultCircleColor() {
     return { Color::black() };
 }
 
-DataDrivenPropertyValue<Color> CircleLayer::getCircleColor(const optional<std::string>& klass) const {
-    return impl().paint.template get<CircleColor>().get(klass);
+DataDrivenPropertyValue<Color> CircleLayer::getCircleColor() const {
+    return impl().paint.template get<CircleColor>().value;
 }
 
-void CircleLayer::setCircleColor(DataDrivenPropertyValue<Color> value, const optional<std::string>& klass) {
-    if (value == getCircleColor(klass))
+void CircleLayer::setCircleColor(DataDrivenPropertyValue<Color> value) {
+    if (value == getCircleColor())
         return;
     auto impl_ = mutableImpl();
-    impl_->paint.template get<CircleColor>().set(value, klass);
+    impl_->paint.template get<CircleColor>().value = value;
     baseImpl = std::move(impl_);
     if (value.isDataDriven()) {
         observer->onLayerDataDrivenPaintPropertyChanged(*this);
@@ -146,29 +146,29 @@ void CircleLayer::setCircleColor(DataDrivenPropertyValue<Color> value, const opt
     }
 }
 
-void CircleLayer::setCircleColorTransition(const TransitionOptions& value, const optional<std::string>& klass) {
+void CircleLayer::setCircleColorTransition(const TransitionOptions& options) {
     auto impl_ = mutableImpl();
-    impl_->paint.template get<CircleColor>().setTransition(value, klass);
+    impl_->paint.template get<CircleColor>().options = options;
     baseImpl = std::move(impl_);
 }
 
-TransitionOptions CircleLayer::getCircleColorTransition(const optional<std::string>& klass) const {
-    return impl().paint.template get<CircleColor>().getTransition(klass);
+TransitionOptions CircleLayer::getCircleColorTransition() const {
+    return impl().paint.template get<CircleColor>().options;
 }
 
 DataDrivenPropertyValue<float> CircleLayer::getDefaultCircleBlur() {
     return { 0 };
 }
 
-DataDrivenPropertyValue<float> CircleLayer::getCircleBlur(const optional<std::string>& klass) const {
-    return impl().paint.template get<CircleBlur>().get(klass);
+DataDrivenPropertyValue<float> CircleLayer::getCircleBlur() const {
+    return impl().paint.template get<CircleBlur>().value;
 }
 
-void CircleLayer::setCircleBlur(DataDrivenPropertyValue<float> value, const optional<std::string>& klass) {
-    if (value == getCircleBlur(klass))
+void CircleLayer::setCircleBlur(DataDrivenPropertyValue<float> value) {
+    if (value == getCircleBlur())
         return;
     auto impl_ = mutableImpl();
-    impl_->paint.template get<CircleBlur>().set(value, klass);
+    impl_->paint.template get<CircleBlur>().value = value;
     baseImpl = std::move(impl_);
     if (value.isDataDriven()) {
         observer->onLayerDataDrivenPaintPropertyChanged(*this);
@@ -177,29 +177,29 @@ void CircleLayer::setCircleBlur(DataDrivenPropertyValue<float> value, const opti
     }
 }
 
-void CircleLayer::setCircleBlurTransition(const TransitionOptions& value, const optional<std::string>& klass) {
+void CircleLayer::setCircleBlurTransition(const TransitionOptions& options) {
     auto impl_ = mutableImpl();
-    impl_->paint.template get<CircleBlur>().setTransition(value, klass);
+    impl_->paint.template get<CircleBlur>().options = options;
     baseImpl = std::move(impl_);
 }
 
-TransitionOptions CircleLayer::getCircleBlurTransition(const optional<std::string>& klass) const {
-    return impl().paint.template get<CircleBlur>().getTransition(klass);
+TransitionOptions CircleLayer::getCircleBlurTransition() const {
+    return impl().paint.template get<CircleBlur>().options;
 }
 
 DataDrivenPropertyValue<float> CircleLayer::getDefaultCircleOpacity() {
     return { 1 };
 }
 
-DataDrivenPropertyValue<float> CircleLayer::getCircleOpacity(const optional<std::string>& klass) const {
-    return impl().paint.template get<CircleOpacity>().get(klass);
+DataDrivenPropertyValue<float> CircleLayer::getCircleOpacity() const {
+    return impl().paint.template get<CircleOpacity>().value;
 }
 
-void CircleLayer::setCircleOpacity(DataDrivenPropertyValue<float> value, const optional<std::string>& klass) {
-    if (value == getCircleOpacity(klass))
+void CircleLayer::setCircleOpacity(DataDrivenPropertyValue<float> value) {
+    if (value == getCircleOpacity())
         return;
     auto impl_ = mutableImpl();
-    impl_->paint.template get<CircleOpacity>().set(value, klass);
+    impl_->paint.template get<CircleOpacity>().value = value;
     baseImpl = std::move(impl_);
     if (value.isDataDriven()) {
         observer->onLayerDataDrivenPaintPropertyChanged(*this);
@@ -208,110 +208,110 @@ void CircleLayer::setCircleOpacity(DataDrivenPropertyValue<float> value, const o
     }
 }
 
-void CircleLayer::setCircleOpacityTransition(const TransitionOptions& value, const optional<std::string>& klass) {
+void CircleLayer::setCircleOpacityTransition(const TransitionOptions& options) {
     auto impl_ = mutableImpl();
-    impl_->paint.template get<CircleOpacity>().setTransition(value, klass);
+    impl_->paint.template get<CircleOpacity>().options = options;
     baseImpl = std::move(impl_);
 }
 
-TransitionOptions CircleLayer::getCircleOpacityTransition(const optional<std::string>& klass) const {
-    return impl().paint.template get<CircleOpacity>().getTransition(klass);
+TransitionOptions CircleLayer::getCircleOpacityTransition() const {
+    return impl().paint.template get<CircleOpacity>().options;
 }
 
 PropertyValue<std::array<float, 2>> CircleLayer::getDefaultCircleTranslate() {
     return { {{ 0, 0 }} };
 }
 
-PropertyValue<std::array<float, 2>> CircleLayer::getCircleTranslate(const optional<std::string>& klass) const {
-    return impl().paint.template get<CircleTranslate>().get(klass);
+PropertyValue<std::array<float, 2>> CircleLayer::getCircleTranslate() const {
+    return impl().paint.template get<CircleTranslate>().value;
 }
 
-void CircleLayer::setCircleTranslate(PropertyValue<std::array<float, 2>> value, const optional<std::string>& klass) {
-    if (value == getCircleTranslate(klass))
+void CircleLayer::setCircleTranslate(PropertyValue<std::array<float, 2>> value) {
+    if (value == getCircleTranslate())
         return;
     auto impl_ = mutableImpl();
-    impl_->paint.template get<CircleTranslate>().set(value, klass);
+    impl_->paint.template get<CircleTranslate>().value = value;
     baseImpl = std::move(impl_);
     observer->onLayerPaintPropertyChanged(*this);
 }
 
-void CircleLayer::setCircleTranslateTransition(const TransitionOptions& value, const optional<std::string>& klass) {
+void CircleLayer::setCircleTranslateTransition(const TransitionOptions& options) {
     auto impl_ = mutableImpl();
-    impl_->paint.template get<CircleTranslate>().setTransition(value, klass);
+    impl_->paint.template get<CircleTranslate>().options = options;
     baseImpl = std::move(impl_);
 }
 
-TransitionOptions CircleLayer::getCircleTranslateTransition(const optional<std::string>& klass) const {
-    return impl().paint.template get<CircleTranslate>().getTransition(klass);
+TransitionOptions CircleLayer::getCircleTranslateTransition() const {
+    return impl().paint.template get<CircleTranslate>().options;
 }
 
 PropertyValue<TranslateAnchorType> CircleLayer::getDefaultCircleTranslateAnchor() {
     return { TranslateAnchorType::Map };
 }
 
-PropertyValue<TranslateAnchorType> CircleLayer::getCircleTranslateAnchor(const optional<std::string>& klass) const {
-    return impl().paint.template get<CircleTranslateAnchor>().get(klass);
+PropertyValue<TranslateAnchorType> CircleLayer::getCircleTranslateAnchor() const {
+    return impl().paint.template get<CircleTranslateAnchor>().value;
 }
 
-void CircleLayer::setCircleTranslateAnchor(PropertyValue<TranslateAnchorType> value, const optional<std::string>& klass) {
-    if (value == getCircleTranslateAnchor(klass))
+void CircleLayer::setCircleTranslateAnchor(PropertyValue<TranslateAnchorType> value) {
+    if (value == getCircleTranslateAnchor())
         return;
     auto impl_ = mutableImpl();
-    impl_->paint.template get<CircleTranslateAnchor>().set(value, klass);
+    impl_->paint.template get<CircleTranslateAnchor>().value = value;
     baseImpl = std::move(impl_);
     observer->onLayerPaintPropertyChanged(*this);
 }
 
-void CircleLayer::setCircleTranslateAnchorTransition(const TransitionOptions& value, const optional<std::string>& klass) {
+void CircleLayer::setCircleTranslateAnchorTransition(const TransitionOptions& options) {
     auto impl_ = mutableImpl();
-    impl_->paint.template get<CircleTranslateAnchor>().setTransition(value, klass);
+    impl_->paint.template get<CircleTranslateAnchor>().options = options;
     baseImpl = std::move(impl_);
 }
 
-TransitionOptions CircleLayer::getCircleTranslateAnchorTransition(const optional<std::string>& klass) const {
-    return impl().paint.template get<CircleTranslateAnchor>().getTransition(klass);
+TransitionOptions CircleLayer::getCircleTranslateAnchorTransition() const {
+    return impl().paint.template get<CircleTranslateAnchor>().options;
 }
 
 PropertyValue<CirclePitchScaleType> CircleLayer::getDefaultCirclePitchScale() {
     return { CirclePitchScaleType::Map };
 }
 
-PropertyValue<CirclePitchScaleType> CircleLayer::getCirclePitchScale(const optional<std::string>& klass) const {
-    return impl().paint.template get<CirclePitchScale>().get(klass);
+PropertyValue<CirclePitchScaleType> CircleLayer::getCirclePitchScale() const {
+    return impl().paint.template get<CirclePitchScale>().value;
 }
 
-void CircleLayer::setCirclePitchScale(PropertyValue<CirclePitchScaleType> value, const optional<std::string>& klass) {
-    if (value == getCirclePitchScale(klass))
+void CircleLayer::setCirclePitchScale(PropertyValue<CirclePitchScaleType> value) {
+    if (value == getCirclePitchScale())
         return;
     auto impl_ = mutableImpl();
-    impl_->paint.template get<CirclePitchScale>().set(value, klass);
+    impl_->paint.template get<CirclePitchScale>().value = value;
     baseImpl = std::move(impl_);
     observer->onLayerPaintPropertyChanged(*this);
 }
 
-void CircleLayer::setCirclePitchScaleTransition(const TransitionOptions& value, const optional<std::string>& klass) {
+void CircleLayer::setCirclePitchScaleTransition(const TransitionOptions& options) {
     auto impl_ = mutableImpl();
-    impl_->paint.template get<CirclePitchScale>().setTransition(value, klass);
+    impl_->paint.template get<CirclePitchScale>().options = options;
     baseImpl = std::move(impl_);
 }
 
-TransitionOptions CircleLayer::getCirclePitchScaleTransition(const optional<std::string>& klass) const {
-    return impl().paint.template get<CirclePitchScale>().getTransition(klass);
+TransitionOptions CircleLayer::getCirclePitchScaleTransition() const {
+    return impl().paint.template get<CirclePitchScale>().options;
 }
 
 DataDrivenPropertyValue<float> CircleLayer::getDefaultCircleStrokeWidth() {
     return { 0 };
 }
 
-DataDrivenPropertyValue<float> CircleLayer::getCircleStrokeWidth(const optional<std::string>& klass) const {
-    return impl().paint.template get<CircleStrokeWidth>().get(klass);
+DataDrivenPropertyValue<float> CircleLayer::getCircleStrokeWidth() const {
+    return impl().paint.template get<CircleStrokeWidth>().value;
 }
 
-void CircleLayer::setCircleStrokeWidth(DataDrivenPropertyValue<float> value, const optional<std::string>& klass) {
-    if (value == getCircleStrokeWidth(klass))
+void CircleLayer::setCircleStrokeWidth(DataDrivenPropertyValue<float> value) {
+    if (value == getCircleStrokeWidth())
         return;
     auto impl_ = mutableImpl();
-    impl_->paint.template get<CircleStrokeWidth>().set(value, klass);
+    impl_->paint.template get<CircleStrokeWidth>().value = value;
     baseImpl = std::move(impl_);
     if (value.isDataDriven()) {
         observer->onLayerDataDrivenPaintPropertyChanged(*this);
@@ -320,29 +320,29 @@ void CircleLayer::setCircleStrokeWidth(DataDrivenPropertyValue<float> value, con
     }
 }
 
-void CircleLayer::setCircleStrokeWidthTransition(const TransitionOptions& value, const optional<std::string>& klass) {
+void CircleLayer::setCircleStrokeWidthTransition(const TransitionOptions& options) {
     auto impl_ = mutableImpl();
-    impl_->paint.template get<CircleStrokeWidth>().setTransition(value, klass);
+    impl_->paint.template get<CircleStrokeWidth>().options = options;
     baseImpl = std::move(impl_);
 }
 
-TransitionOptions CircleLayer::getCircleStrokeWidthTransition(const optional<std::string>& klass) const {
-    return impl().paint.template get<CircleStrokeWidth>().getTransition(klass);
+TransitionOptions CircleLayer::getCircleStrokeWidthTransition() const {
+    return impl().paint.template get<CircleStrokeWidth>().options;
 }
 
 DataDrivenPropertyValue<Color> CircleLayer::getDefaultCircleStrokeColor() {
     return { Color::black() };
 }
 
-DataDrivenPropertyValue<Color> CircleLayer::getCircleStrokeColor(const optional<std::string>& klass) const {
-    return impl().paint.template get<CircleStrokeColor>().get(klass);
+DataDrivenPropertyValue<Color> CircleLayer::getCircleStrokeColor() const {
+    return impl().paint.template get<CircleStrokeColor>().value;
 }
 
-void CircleLayer::setCircleStrokeColor(DataDrivenPropertyValue<Color> value, const optional<std::string>& klass) {
-    if (value == getCircleStrokeColor(klass))
+void CircleLayer::setCircleStrokeColor(DataDrivenPropertyValue<Color> value) {
+    if (value == getCircleStrokeColor())
         return;
     auto impl_ = mutableImpl();
-    impl_->paint.template get<CircleStrokeColor>().set(value, klass);
+    impl_->paint.template get<CircleStrokeColor>().value = value;
     baseImpl = std::move(impl_);
     if (value.isDataDriven()) {
         observer->onLayerDataDrivenPaintPropertyChanged(*this);
@@ -351,29 +351,29 @@ void CircleLayer::setCircleStrokeColor(DataDrivenPropertyValue<Color> value, con
     }
 }
 
-void CircleLayer::setCircleStrokeColorTransition(const TransitionOptions& value, const optional<std::string>& klass) {
+void CircleLayer::setCircleStrokeColorTransition(const TransitionOptions& options) {
     auto impl_ = mutableImpl();
-    impl_->paint.template get<CircleStrokeColor>().setTransition(value, klass);
+    impl_->paint.template get<CircleStrokeColor>().options = options;
     baseImpl = std::move(impl_);
 }
 
-TransitionOptions CircleLayer::getCircleStrokeColorTransition(const optional<std::string>& klass) const {
-    return impl().paint.template get<CircleStrokeColor>().getTransition(klass);
+TransitionOptions CircleLayer::getCircleStrokeColorTransition() const {
+    return impl().paint.template get<CircleStrokeColor>().options;
 }
 
 DataDrivenPropertyValue<float> CircleLayer::getDefaultCircleStrokeOpacity() {
     return { 1 };
 }
 
-DataDrivenPropertyValue<float> CircleLayer::getCircleStrokeOpacity(const optional<std::string>& klass) const {
-    return impl().paint.template get<CircleStrokeOpacity>().get(klass);
+DataDrivenPropertyValue<float> CircleLayer::getCircleStrokeOpacity() const {
+    return impl().paint.template get<CircleStrokeOpacity>().value;
 }
 
-void CircleLayer::setCircleStrokeOpacity(DataDrivenPropertyValue<float> value, const optional<std::string>& klass) {
-    if (value == getCircleStrokeOpacity(klass))
+void CircleLayer::setCircleStrokeOpacity(DataDrivenPropertyValue<float> value) {
+    if (value == getCircleStrokeOpacity())
         return;
     auto impl_ = mutableImpl();
-    impl_->paint.template get<CircleStrokeOpacity>().set(value, klass);
+    impl_->paint.template get<CircleStrokeOpacity>().value = value;
     baseImpl = std::move(impl_);
     if (value.isDataDriven()) {
         observer->onLayerDataDrivenPaintPropertyChanged(*this);
@@ -382,14 +382,14 @@ void CircleLayer::setCircleStrokeOpacity(DataDrivenPropertyValue<float> value, c
     }
 }
 
-void CircleLayer::setCircleStrokeOpacityTransition(const TransitionOptions& value, const optional<std::string>& klass) {
+void CircleLayer::setCircleStrokeOpacityTransition(const TransitionOptions& options) {
     auto impl_ = mutableImpl();
-    impl_->paint.template get<CircleStrokeOpacity>().setTransition(value, klass);
+    impl_->paint.template get<CircleStrokeOpacity>().options = options;
     baseImpl = std::move(impl_);
 }
 
-TransitionOptions CircleLayer::getCircleStrokeOpacityTransition(const optional<std::string>& klass) const {
-    return impl().paint.template get<CircleStrokeOpacity>().getTransition(klass);
+TransitionOptions CircleLayer::getCircleStrokeOpacityTransition() const {
+    return impl().paint.template get<CircleStrokeOpacity>().options;
 }
 
 } // namespace style
