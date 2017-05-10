@@ -57,7 +57,7 @@ void FillExtrusionLayer::setFilter(const Filter& filter) {
     auto impl_ = mutableImpl();
     impl_->filter = filter;
     baseImpl = std::move(impl_);
-    observer->onLayerFilterChanged(*this);
+    observer->onLayerChanged(*this);
 }
 
 const Filter& FillExtrusionLayer::getFilter() const {
@@ -72,7 +72,7 @@ void FillExtrusionLayer::setVisibility(VisibilityType value) {
     auto impl_ = mutableImpl();
     impl_->visibility = value;
     baseImpl = std::move(impl_);
-    observer->onLayerVisibilityChanged(*this);
+    observer->onLayerChanged(*this);
 }
 
 // Zoom range
@@ -108,7 +108,7 @@ void FillExtrusionLayer::setFillExtrusionOpacity(PropertyValue<float> value) {
     auto impl_ = mutableImpl();
     impl_->paint.template get<FillExtrusionOpacity>().value = value;
     baseImpl = std::move(impl_);
-    observer->onLayerPaintPropertyChanged(*this);
+    observer->onLayerChanged(*this);
 }
 
 void FillExtrusionLayer::setFillExtrusionOpacityTransition(const TransitionOptions& options) {
@@ -135,11 +135,7 @@ void FillExtrusionLayer::setFillExtrusionColor(DataDrivenPropertyValue<Color> va
     auto impl_ = mutableImpl();
     impl_->paint.template get<FillExtrusionColor>().value = value;
     baseImpl = std::move(impl_);
-    if (value.isDataDriven()) {
-        observer->onLayerDataDrivenPaintPropertyChanged(*this);
-    } else {
-        observer->onLayerPaintPropertyChanged(*this);
-    }
+    observer->onLayerChanged(*this);
 }
 
 void FillExtrusionLayer::setFillExtrusionColorTransition(const TransitionOptions& options) {
@@ -166,7 +162,7 @@ void FillExtrusionLayer::setFillExtrusionTranslate(PropertyValue<std::array<floa
     auto impl_ = mutableImpl();
     impl_->paint.template get<FillExtrusionTranslate>().value = value;
     baseImpl = std::move(impl_);
-    observer->onLayerPaintPropertyChanged(*this);
+    observer->onLayerChanged(*this);
 }
 
 void FillExtrusionLayer::setFillExtrusionTranslateTransition(const TransitionOptions& options) {
@@ -193,7 +189,7 @@ void FillExtrusionLayer::setFillExtrusionTranslateAnchor(PropertyValue<Translate
     auto impl_ = mutableImpl();
     impl_->paint.template get<FillExtrusionTranslateAnchor>().value = value;
     baseImpl = std::move(impl_);
-    observer->onLayerPaintPropertyChanged(*this);
+    observer->onLayerChanged(*this);
 }
 
 void FillExtrusionLayer::setFillExtrusionTranslateAnchorTransition(const TransitionOptions& options) {
@@ -220,7 +216,7 @@ void FillExtrusionLayer::setFillExtrusionPattern(PropertyValue<std::string> valu
     auto impl_ = mutableImpl();
     impl_->paint.template get<FillExtrusionPattern>().value = value;
     baseImpl = std::move(impl_);
-    observer->onLayerPaintPropertyChanged(*this);
+    observer->onLayerChanged(*this);
 }
 
 void FillExtrusionLayer::setFillExtrusionPatternTransition(const TransitionOptions& options) {
@@ -247,11 +243,7 @@ void FillExtrusionLayer::setFillExtrusionHeight(DataDrivenPropertyValue<float> v
     auto impl_ = mutableImpl();
     impl_->paint.template get<FillExtrusionHeight>().value = value;
     baseImpl = std::move(impl_);
-    if (value.isDataDriven()) {
-        observer->onLayerDataDrivenPaintPropertyChanged(*this);
-    } else {
-        observer->onLayerPaintPropertyChanged(*this);
-    }
+    observer->onLayerChanged(*this);
 }
 
 void FillExtrusionLayer::setFillExtrusionHeightTransition(const TransitionOptions& options) {
@@ -278,11 +270,7 @@ void FillExtrusionLayer::setFillExtrusionBase(DataDrivenPropertyValue<float> val
     auto impl_ = mutableImpl();
     impl_->paint.template get<FillExtrusionBase>().value = value;
     baseImpl = std::move(impl_);
-    if (value.isDataDriven()) {
-        observer->onLayerDataDrivenPaintPropertyChanged(*this);
-    } else {
-        observer->onLayerPaintPropertyChanged(*this);
-    }
+    observer->onLayerChanged(*this);
 }
 
 void FillExtrusionLayer::setFillExtrusionBaseTransition(const TransitionOptions& options) {

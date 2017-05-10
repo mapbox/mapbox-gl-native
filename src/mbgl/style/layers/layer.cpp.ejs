@@ -76,7 +76,7 @@ void <%- camelize(type) %>Layer::setFilter(const Filter& filter) {
     auto impl_ = mutableImpl();
     impl_->filter = filter;
     baseImpl = std::move(impl_);
-    observer->onLayerFilterChanged(*this);
+    observer->onLayerChanged(*this);
 }
 
 const Filter& <%- camelize(type) %>Layer::getFilter() const {
@@ -93,7 +93,7 @@ void <%- camelize(type) %>Layer::setVisibility(VisibilityType value) {
     auto impl_ = mutableImpl();
     impl_->visibility = value;
     baseImpl = std::move(impl_);
-    observer->onLayerVisibilityChanged(*this);
+    observer->onLayerChanged(*this);
 }
 
 // Zoom range
@@ -127,7 +127,7 @@ void <%- camelize(type) %>Layer::set<%- camelize(property.name) %>(<%- propertyV
     auto impl_ = mutableImpl();
     impl_->layout.get<<%- camelize(property.name) %>>() = value;
     baseImpl = std::move(impl_);
-    observer->onLayerLayoutPropertyChanged(*this, "<%- property.name %>");
+    observer->onLayerChanged(*this);
 }
 <% } -%>
 
@@ -147,15 +147,7 @@ void <%- camelize(type) %>Layer::set<%- camelize(property.name) %>(<%- propertyV
     auto impl_ = mutableImpl();
     impl_->paint.template get<<%- camelize(property.name) %>>().value = value;
     baseImpl = std::move(impl_);
-<% if (isDataDriven(property)) { -%>
-    if (value.isDataDriven()) {
-        observer->onLayerDataDrivenPaintPropertyChanged(*this);
-    } else {
-        observer->onLayerPaintPropertyChanged(*this);
-    }
-<% } else { -%>
-    observer->onLayerPaintPropertyChanged(*this);
-<% } -%>
+    observer->onLayerChanged(*this);
 }
 
 void <%- camelize(type) %>Layer::set<%- camelize(property.name) %>Transition(const TransitionOptions& options) {

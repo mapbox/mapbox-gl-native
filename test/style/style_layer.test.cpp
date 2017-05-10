@@ -207,7 +207,7 @@ TEST(Layer, Observer) {
 
     // Notifies observer on filter change.
     bool filterChanged = false;
-    observer.layerFilterChanged = [&] (Layer& layer_) {
+    observer.layerChanged = [&] (Layer& layer_) {
         EXPECT_EQ(layer.get(), &layer_);
         filterChanged = true;
     };
@@ -216,7 +216,7 @@ TEST(Layer, Observer) {
 
     // Notifies observer on visibility change.
     bool visibilityChanged = false;
-    observer.layerVisibilityChanged = [&] (Layer& layer_) {
+    observer.layerChanged = [&] (Layer& layer_) {
         EXPECT_EQ(layer.get(), &layer_);
         visibilityChanged = true;
     };
@@ -225,7 +225,7 @@ TEST(Layer, Observer) {
 
     // Notifies observer on paint property change.
     bool paintPropertyChanged = false;
-    observer.layerPaintPropertyChanged = [&] (Layer& layer_) {
+    observer.layerChanged = [&] (Layer& layer_) {
         EXPECT_EQ(layer.get(), &layer_);
         paintPropertyChanged = true;
     };
@@ -234,7 +234,7 @@ TEST(Layer, Observer) {
 
     // Notifies observer on layout property change.
     bool layoutPropertyChanged = false;
-    observer.layerLayoutPropertyChanged = [&] (Layer& layer_, const char *) {
+    observer.layerChanged = [&] (Layer& layer_) {
         EXPECT_EQ(layer.get(), &layer_);
         layoutPropertyChanged = true;
     };
@@ -243,16 +243,28 @@ TEST(Layer, Observer) {
 
     // Does not notify observer on no-op visibility change.
     visibilityChanged = false;
+    observer.layerChanged = [&] (Layer& layer_) {
+        EXPECT_EQ(layer.get(), &layer_);
+        visibilityChanged = true;
+    };
     layer->setVisibility(VisibilityType::None);
     EXPECT_FALSE(visibilityChanged);
 
     // Does not notify observer on no-op paint property change.
     paintPropertyChanged = false;
+    observer.layerChanged = [&] (Layer& layer_) {
+        EXPECT_EQ(layer.get(), &layer_);
+        paintPropertyChanged = true;
+    };
     layer->setLineColor(color);
     EXPECT_FALSE(paintPropertyChanged);
 
     // Does not notify observer on no-op layout property change.
     layoutPropertyChanged = false;
+    observer.layerChanged = [&] (Layer& layer_) {
+        EXPECT_EQ(layer.get(), &layer_);
+        layoutPropertyChanged = true;
+    };
     layer->setLineCap(lineCap);
     EXPECT_FALSE(layoutPropertyChanged);
 }
