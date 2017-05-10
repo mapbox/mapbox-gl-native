@@ -23,6 +23,7 @@ custom_categories:
       - Working with Mapbox Studio
       - Working with GeoJSON Data
       - For Style Authors
+      - Tile URL Templates
       - Info.plist Keys
       - Gesture Recognizers
   - name: Maps

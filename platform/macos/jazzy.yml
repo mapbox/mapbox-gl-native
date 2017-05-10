@@ -20,6 +20,7 @@ custom_categories:
       - Working with GeoJSON Data
       - For Style Authors
       - Using Style Functions at Runtime
+      - Tile URL Templates
       - Info.plist Keys
   - name: Maps
     children:

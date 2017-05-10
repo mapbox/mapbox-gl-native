@@ -522,8 +522,9 @@ global.setSourceLayer = function() {
 const layerH = ejs.compile(fs.readFileSync('platform/darwin/src/MGLStyleLayer.h.ejs', 'utf8'), { strict: true });
 const layerM = ejs.compile(fs.readFileSync('platform/darwin/src/MGLStyleLayer.mm.ejs', 'utf8'), { strict: true});
 const testLayers = ejs.compile(fs.readFileSync('platform/darwin/test/MGLStyleLayerTests.mm.ejs', 'utf8'), { strict: true});
-const guideMD = ejs.compile(fs.readFileSync('platform/darwin/docs/guides/For Style Authors.md.ejs', 'utf8'), { strict: true });
+const forStyleAuthorsMD = ejs.compile(fs.readFileSync('platform/darwin/docs/guides/For Style Authors.md.ejs', 'utf8'), { strict: true });
 const ddsGuideMD = ejs.compile(fs.readFileSync('platform/darwin/docs/guides/Using Style Functions at Runtime.md.ejs', 'utf8'), { strict: true });
+const templatesMD = ejs.compile(fs.readFileSync('platform/darwin/docs/guides/Tile URL Templates.md.ejs', 'utf8'), { strict: true });
 
 const layers = _(spec.layer.type.values).map((value, layerType) => {
     const layoutProperties = Object.keys(spec[`layout_${layerType}`]).reduce((memo, name) => {
@@ -635,12 +636,12 @@ global.guideExample = function (guide, exampleId, os) {
     return '```swift\n' + example + '\n```';
 };
 
-fs.writeFileSync(`platform/ios/docs/guides/For Style Authors.md`, guideMD({
+fs.writeFileSync(`platform/ios/docs/guides/For Style Authors.md`, forStyleAuthorsMD({
     os: 'iOS',
     renamedProperties: renamedPropertiesByLayerType,
     layers: layers,
 }));
-fs.writeFileSync(`platform/macos/docs/guides/For Style Authors.md`, guideMD({
+fs.writeFileSync(`platform/macos/docs/guides/For Style Authors.md`, forStyleAuthorsMD({
     os: 'macOS',
     renamedProperties: renamedPropertiesByLayerType,
     layers: layers,
@@ -649,5 +650,11 @@ fs.writeFileSync(`platform/ios/docs/guides/Using Style Functions at Runtime.md`,
     os: 'iOS',
 }));
 fs.writeFileSync(`platform/macos/docs/guides/Using Style Functions at Runtime.md`, ddsGuideMD({
+    os: 'macOS',
+}));
+fs.writeFileSync(`platform/ios/docs/guides/Tile URL Templates.md`, templatesMD({
+    os: 'iOS',
+}));
+fs.writeFileSync(`platform/macos/docs/guides/Tile URL Templates.md`, templatesMD({
     os: 'macOS',
 }));
