@@ -17,7 +17,7 @@ protected:
 };
 } // namespace non_copyable_
 
-typedef non_copyable_::noncopyable noncopyable;
+using noncopyable = non_copyable_::noncopyable;
 
 } // namespace util
 } // namespace mbgl

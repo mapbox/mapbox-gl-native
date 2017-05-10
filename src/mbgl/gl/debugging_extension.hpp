@@ -53,13 +53,13 @@ namespace extension {
 
 class Debugging {
 public:
-    typedef void (*Callback)(GLenum source,
-                             GLenum type,
-                             GLuint id,
-                             GLenum severity,
-                             GLsizei length,
-                             const GLchar* message,
-                             const void* userParam);
+    using Callback = void (*)(GLenum source,
+                              GLenum type,
+                              GLuint id,
+                              GLenum severity,
+                              GLsizei length,
+                              const GLchar* message,
+                              const void* userParam);
 
     static void DebugCallback(GLenum source,
                               GLenum type,
