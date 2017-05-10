@@ -17,6 +17,7 @@ using ValueMap = std::unordered_map<std::string, Value>;
 using ValueVector = std::vector<Value>;
 class Value : public mbgl::variant<std::string,
                                    float,
+                                   double,
                                    bool,
                                    mapbox::util::recursive_wrapper<ValueMap>,
                                    mapbox::util::recursive_wrapper<ValueVector>> {
@@ -86,6 +87,14 @@ inline optional<float> toNumber(const Value& value) {
         return value.get<float>();
     } else {
         return {};
+    }
+    return {};
+}
+
+
+inline optional<double> toDouble(const Value& value) {
+    if (value.is<double>()) {
+        return value.get<double>();
     }
     return {};
 }

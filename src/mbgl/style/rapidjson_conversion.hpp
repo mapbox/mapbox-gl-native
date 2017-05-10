@@ -62,6 +62,13 @@ inline optional<float> toNumber(const JSValue& value) {
     return value.GetDouble();
 }
 
+inline optional<double> toDouble(const JSValue& value) {
+    if (!value.IsNumber()) {
+        return {};
+    }
+    return value.GetDouble();
+}
+
 inline optional<std::string> toString(const JSValue& value) {
     if (!value.IsString()) {
         return {};

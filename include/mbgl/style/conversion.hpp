@@ -46,6 +46,7 @@ namespace conversion {
 
       * `toBool(v)` -- returns `optional<bool>`, absence indicating `v` is not a JSON boolean
       * `toNumber(v)` -- returns `optional<float>`, absence indicating `v` is not a JSON number
+      * `toDouble(v)` -- returns `optional<double>`, absence indicating `v` is not a JSON number
       * `toString(v)` -- returns `optional<std::string>`, absence indicating `v` is not a JSON string
       * `toValue(v)` -- returns `optional<mbgl::Value>`, a variant type, for generic conversion,
         absence indicating `v` is not a boolean, number, or string. Numbers should be converted to

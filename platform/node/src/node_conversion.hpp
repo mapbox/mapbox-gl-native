@@ -82,6 +82,14 @@ inline optional<float> toNumber(v8::Local<v8::Value> value) {
     return value->NumberValue();
 }
 
+inline optional<double> toDouble(v8::Local<v8::Value> value) {
+    Nan::HandleScope scope;
+    if (!value->IsNumber()) {
+        return {};
+    }
+    return value->NumberValue();
+}
+
 inline optional<std::string> toString(v8::Local<v8::Value> value) {
     Nan::HandleScope scope;
     if (!value->IsString()) {

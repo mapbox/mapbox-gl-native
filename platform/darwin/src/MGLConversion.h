@@ -104,6 +104,14 @@ inline optional<float> toNumber(const id value) {
     }
 }
 
+inline optional<double> toDouble(const id value) {
+    if (_isNumber(value)) {
+        return ((NSNumber *)value).doubleValue;
+    } else {
+        return {};
+    }
+}
+
 inline optional<std::string> toString(const id value) {
     if (_isString(value)) {
         return std::string(static_cast<const char *>([value UTF8String]));

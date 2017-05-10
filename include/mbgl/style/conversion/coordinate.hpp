@@ -8,17 +8,17 @@ namespace style {
 namespace conversion {
             
 template<>
-struct Converter<std::unique_ptr<LatLng>> {
+struct Converter<LatLng> {
 public:
     template <class V>
-    optional<std::unique_ptr<LatLng>> operator() (const V& value, Error& error) const {
+    optional<LatLng> operator() (const V& value, Error& error) const {
         if (!isArray(value) || arrayLength(value) < 2 ) {
             error = { "coordinate array must contain numeric longtitude and latitude values" };
             return {};
         }
         //Style spec uses GeoJSON convention for specifying coordinates
-        optional<float> latitude = toNumber(arrayMember(value, 1));
-        optional<float> longitude = toNumber(arrayMember(value, 0));
+        optional<double> latitude = toDouble(arrayMember(value, 1));
+        optional<double> longitude = toDouble(arrayMember(value, 0));
     
         if (!latitude || !longitude) {
             error = { "coordinate array must contain numeric longtitude and latitude values" };
@@ -28,7 +28,7 @@ public:
             error = { "coordinate latitude must be between -90 and 90" };
             return {};
         }
-        return { std::make_unique<LatLng>(*latitude, *longitude) };
+        return LatLng(*latitude, *longitude);
     }
 };
 

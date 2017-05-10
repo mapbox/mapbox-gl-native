@@ -66,6 +66,15 @@ inline optional<float> toNumber(const mbgl::android::Value& value) {
     }
 }
 
+inline optional<double> toDouble(const mbgl::android::Value& value) {
+    if (value.isNumber()) {
+        auto num = value.toDouble();
+        return num;
+    } else {
+        return {};
+    }
+}
+
 inline optional<std::string> toString(const mbgl::android::Value& value) {
     if (value.isString()) {
         return value.toString();
