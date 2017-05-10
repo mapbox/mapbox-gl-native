@@ -58,7 +58,7 @@ void LineLayer::setFilter(const Filter& filter) {
     auto impl_ = mutableImpl();
     impl_->filter = filter;
     baseImpl = std::move(impl_);
-    observer->onLayerFilterChanged(*this);
+    observer->onLayerChanged(*this);
 }
 
 const Filter& LineLayer::getFilter() const {
@@ -73,7 +73,7 @@ void LineLayer::setVisibility(VisibilityType value) {
     auto impl_ = mutableImpl();
     impl_->visibility = value;
     baseImpl = std::move(impl_);
-    observer->onLayerVisibilityChanged(*this);
+    observer->onLayerChanged(*this);
 }
 
 // Zoom range
@@ -106,7 +106,7 @@ void LineLayer::setLineCap(PropertyValue<LineCapType> value) {
     auto impl_ = mutableImpl();
     impl_->layout.get<LineCap>() = value;
     baseImpl = std::move(impl_);
-    observer->onLayerLayoutPropertyChanged(*this, "line-cap");
+    observer->onLayerChanged(*this);
 }
 PropertyValue<LineJoinType> LineLayer::getDefaultLineJoin() {
     return LineJoin::defaultValue();
@@ -122,7 +122,7 @@ void LineLayer::setLineJoin(PropertyValue<LineJoinType> value) {
     auto impl_ = mutableImpl();
     impl_->layout.get<LineJoin>() = value;
     baseImpl = std::move(impl_);
-    observer->onLayerLayoutPropertyChanged(*this, "line-join");
+    observer->onLayerChanged(*this);
 }
 PropertyValue<float> LineLayer::getDefaultLineMiterLimit() {
     return LineMiterLimit::defaultValue();
@@ -138,7 +138,7 @@ void LineLayer::setLineMiterLimit(PropertyValue<float> value) {
     auto impl_ = mutableImpl();
     impl_->layout.get<LineMiterLimit>() = value;
     baseImpl = std::move(impl_);
-    observer->onLayerLayoutPropertyChanged(*this, "line-miter-limit");
+    observer->onLayerChanged(*this);
 }
 PropertyValue<float> LineLayer::getDefaultLineRoundLimit() {
     return LineRoundLimit::defaultValue();
@@ -154,7 +154,7 @@ void LineLayer::setLineRoundLimit(PropertyValue<float> value) {
     auto impl_ = mutableImpl();
     impl_->layout.get<LineRoundLimit>() = value;
     baseImpl = std::move(impl_);
-    observer->onLayerLayoutPropertyChanged(*this, "line-round-limit");
+    observer->onLayerChanged(*this);
 }
 
 // Paint properties
@@ -173,11 +173,7 @@ void LineLayer::setLineOpacity(DataDrivenPropertyValue<float> value) {
     auto impl_ = mutableImpl();
     impl_->paint.template get<LineOpacity>().value = value;
     baseImpl = std::move(impl_);
-    if (value.isDataDriven()) {
-        observer->onLayerDataDrivenPaintPropertyChanged(*this);
-    } else {
-        observer->onLayerPaintPropertyChanged(*this);
-    }
+    observer->onLayerChanged(*this);
 }
 
 void LineLayer::setLineOpacityTransition(const TransitionOptions& options) {
@@ -204,11 +200,7 @@ void LineLayer::setLineColor(DataDrivenPropertyValue<Color> value) {
     auto impl_ = mutableImpl();
     impl_->paint.template get<LineColor>().value = value;
     baseImpl = std::move(impl_);
-    if (value.isDataDriven()) {
-        observer->onLayerDataDrivenPaintPropertyChanged(*this);
-    } else {
-        observer->onLayerPaintPropertyChanged(*this);
-    }
+    observer->onLayerChanged(*this);
 }
 
 void LineLayer::setLineColorTransition(const TransitionOptions& options) {
@@ -235,7 +227,7 @@ void LineLayer::setLineTranslate(PropertyValue<std::array<float, 2>> value) {
     auto impl_ = mutableImpl();
     impl_->paint.template get<LineTranslate>().value = value;
     baseImpl = std::move(impl_);
-    observer->onLayerPaintPropertyChanged(*this);
+    observer->onLayerChanged(*this);
 }
 
 void LineLayer::setLineTranslateTransition(const TransitionOptions& options) {
@@ -262,7 +254,7 @@ void LineLayer::setLineTranslateAnchor(PropertyValue<TranslateAnchorType> value)
     auto impl_ = mutableImpl();
     impl_->paint.template get<LineTranslateAnchor>().value = value;
     baseImpl = std::move(impl_);
-    observer->onLayerPaintPropertyChanged(*this);
+    observer->onLayerChanged(*this);
 }
 
 void LineLayer::setLineTranslateAnchorTransition(const TransitionOptions& options) {
@@ -289,7 +281,7 @@ void LineLayer::setLineWidth(PropertyValue<float> value) {
     auto impl_ = mutableImpl();
     impl_->paint.template get<LineWidth>().value = value;
     baseImpl = std::move(impl_);
-    observer->onLayerPaintPropertyChanged(*this);
+    observer->onLayerChanged(*this);
 }
 
 void LineLayer::setLineWidthTransition(const TransitionOptions& options) {
@@ -316,11 +308,7 @@ void LineLayer::setLineGapWidth(DataDrivenPropertyValue<float> value) {
     auto impl_ = mutableImpl();
     impl_->paint.template get<LineGapWidth>().value = value;
     baseImpl = std::move(impl_);
-    if (value.isDataDriven()) {
-        observer->onLayerDataDrivenPaintPropertyChanged(*this);
-    } else {
-        observer->onLayerPaintPropertyChanged(*this);
-    }
+    observer->onLayerChanged(*this);
 }
 
 void LineLayer::setLineGapWidthTransition(const TransitionOptions& options) {
@@ -347,11 +335,7 @@ void LineLayer::setLineOffset(DataDrivenPropertyValue<float> value) {
     auto impl_ = mutableImpl();
     impl_->paint.template get<LineOffset>().value = value;
     baseImpl = std::move(impl_);
-    if (value.isDataDriven()) {
-        observer->onLayerDataDrivenPaintPropertyChanged(*this);
-    } else {
-        observer->onLayerPaintPropertyChanged(*this);
-    }
+    observer->onLayerChanged(*this);
 }
 
 void LineLayer::setLineOffsetTransition(const TransitionOptions& options) {
@@ -378,11 +362,7 @@ void LineLayer::setLineBlur(DataDrivenPropertyValue<float> value) {
     auto impl_ = mutableImpl();
     impl_->paint.template get<LineBlur>().value = value;
     baseImpl = std::move(impl_);
-    if (value.isDataDriven()) {
-        observer->onLayerDataDrivenPaintPropertyChanged(*this);
-    } else {
-        observer->onLayerPaintPropertyChanged(*this);
-    }
+    observer->onLayerChanged(*this);
 }
 
 void LineLayer::setLineBlurTransition(const TransitionOptions& options) {
@@ -409,7 +389,7 @@ void LineLayer::setLineDasharray(PropertyValue<std::vector<float>> value) {
     auto impl_ = mutableImpl();
     impl_->paint.template get<LineDasharray>().value = value;
     baseImpl = std::move(impl_);
-    observer->onLayerPaintPropertyChanged(*this);
+    observer->onLayerChanged(*this);
 }
 
 void LineLayer::setLineDasharrayTransition(const TransitionOptions& options) {
@@ -436,7 +416,7 @@ void LineLayer::setLinePattern(PropertyValue<std::string> value) {
     auto impl_ = mutableImpl();
     impl_->paint.template get<LinePattern>().value = value;
     baseImpl = std::move(impl_);
-    observer->onLayerPaintPropertyChanged(*this);
+    observer->onLayerChanged(*this);
 }
 
 void LineLayer::setLinePatternTransition(const TransitionOptions& options) {

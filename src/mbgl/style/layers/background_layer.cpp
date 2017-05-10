@@ -44,7 +44,7 @@ void BackgroundLayer::setVisibility(VisibilityType value) {
     auto impl_ = mutableImpl();
     impl_->visibility = value;
     baseImpl = std::move(impl_);
-    observer->onLayerVisibilityChanged(*this);
+    observer->onLayerChanged(*this);
 }
 
 // Zoom range
@@ -80,7 +80,7 @@ void BackgroundLayer::setBackgroundColor(PropertyValue<Color> value) {
     auto impl_ = mutableImpl();
     impl_->paint.template get<BackgroundColor>().value = value;
     baseImpl = std::move(impl_);
-    observer->onLayerPaintPropertyChanged(*this);
+    observer->onLayerChanged(*this);
 }
 
 void BackgroundLayer::setBackgroundColorTransition(const TransitionOptions& options) {
@@ -107,7 +107,7 @@ void BackgroundLayer::setBackgroundPattern(PropertyValue<std::string> value) {
     auto impl_ = mutableImpl();
     impl_->paint.template get<BackgroundPattern>().value = value;
     baseImpl = std::move(impl_);
-    observer->onLayerPaintPropertyChanged(*this);
+    observer->onLayerChanged(*this);
 }
 
 void BackgroundLayer::setBackgroundPatternTransition(const TransitionOptions& options) {
@@ -134,7 +134,7 @@ void BackgroundLayer::setBackgroundOpacity(PropertyValue<float> value) {
     auto impl_ = mutableImpl();
     impl_->paint.template get<BackgroundOpacity>().value = value;
     baseImpl = std::move(impl_);
-    observer->onLayerPaintPropertyChanged(*this);
+    observer->onLayerChanged(*this);
 }
 
 void BackgroundLayer::setBackgroundOpacityTransition(const TransitionOptions& options) {

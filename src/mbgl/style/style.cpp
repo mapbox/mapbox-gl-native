@@ -782,23 +782,7 @@ void Style::onSpriteError(std::exception_ptr error) {
     observer->onResourceError(error);
 }
 
-void Style::onLayerFilterChanged(Layer&) {
-    observer->onUpdate(Update::Repaint);
-}
-
-void Style::onLayerVisibilityChanged(Layer&) {
-    observer->onUpdate(Update::Repaint);
-}
-
-void Style::onLayerPaintPropertyChanged(Layer&) {
-    observer->onUpdate(Update::Repaint);
-}
-
-void Style::onLayerDataDrivenPaintPropertyChanged(Layer&) {
-    observer->onUpdate(Update::Repaint);
-}
-
-void Style::onLayerLayoutPropertyChanged(Layer&, const char *) {
+void Style::onLayerChanged(Layer&) {
     observer->onUpdate(Update::Repaint);
 }
 

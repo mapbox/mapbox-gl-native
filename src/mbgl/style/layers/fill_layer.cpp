@@ -57,7 +57,7 @@ void FillLayer::setFilter(const Filter& filter) {
     auto impl_ = mutableImpl();
     impl_->filter = filter;
     baseImpl = std::move(impl_);
-    observer->onLayerFilterChanged(*this);
+    observer->onLayerChanged(*this);
 }
 
 const Filter& FillLayer::getFilter() const {
@@ -72,7 +72,7 @@ void FillLayer::setVisibility(VisibilityType value) {
     auto impl_ = mutableImpl();
     impl_->visibility = value;
     baseImpl = std::move(impl_);
-    observer->onLayerVisibilityChanged(*this);
+    observer->onLayerChanged(*this);
 }
 
 // Zoom range
@@ -108,7 +108,7 @@ void FillLayer::setFillAntialias(PropertyValue<bool> value) {
     auto impl_ = mutableImpl();
     impl_->paint.template get<FillAntialias>().value = value;
     baseImpl = std::move(impl_);
-    observer->onLayerPaintPropertyChanged(*this);
+    observer->onLayerChanged(*this);
 }
 
 void FillLayer::setFillAntialiasTransition(const TransitionOptions& options) {
@@ -135,11 +135,7 @@ void FillLayer::setFillOpacity(DataDrivenPropertyValue<float> value) {
     auto impl_ = mutableImpl();
     impl_->paint.template get<FillOpacity>().value = value;
     baseImpl = std::move(impl_);
-    if (value.isDataDriven()) {
-        observer->onLayerDataDrivenPaintPropertyChanged(*this);
-    } else {
-        observer->onLayerPaintPropertyChanged(*this);
-    }
+    observer->onLayerChanged(*this);
 }
 
 void FillLayer::setFillOpacityTransition(const TransitionOptions& options) {
@@ -166,11 +162,7 @@ void FillLayer::setFillColor(DataDrivenPropertyValue<Color> value) {
     auto impl_ = mutableImpl();
     impl_->paint.template get<FillColor>().value = value;
     baseImpl = std::move(impl_);
-    if (value.isDataDriven()) {
-        observer->onLayerDataDrivenPaintPropertyChanged(*this);
-    } else {
-        observer->onLayerPaintPropertyChanged(*this);
-    }
+    observer->onLayerChanged(*this);
 }
 
 void FillLayer::setFillColorTransition(const TransitionOptions& options) {
@@ -197,11 +189,7 @@ void FillLayer::setFillOutlineColor(DataDrivenPropertyValue<Color> value) {
     auto impl_ = mutableImpl();
     impl_->paint.template get<FillOutlineColor>().value = value;
     baseImpl = std::move(impl_);
-    if (value.isDataDriven()) {
-        observer->onLayerDataDrivenPaintPropertyChanged(*this);
-    } else {
-        observer->onLayerPaintPropertyChanged(*this);
-    }
+    observer->onLayerChanged(*this);
 }
 
 void FillLayer::setFillOutlineColorTransition(const TransitionOptions& options) {
@@ -228,7 +216,7 @@ void FillLayer::setFillTranslate(PropertyValue<std::array<float, 2>> value) {
     auto impl_ = mutableImpl();
     impl_->paint.template get<FillTranslate>().value = value;
     baseImpl = std::move(impl_);
-    observer->onLayerPaintPropertyChanged(*this);
+    observer->onLayerChanged(*this);
 }
 
 void FillLayer::setFillTranslateTransition(const TransitionOptions& options) {
@@ -255,7 +243,7 @@ void FillLayer::setFillTranslateAnchor(PropertyValue<TranslateAnchorType> value)
     auto impl_ = mutableImpl();
     impl_->paint.template get<FillTranslateAnchor>().value = value;
     baseImpl = std::move(impl_);
-    observer->onLayerPaintPropertyChanged(*this);
+    observer->onLayerChanged(*this);
 }
 
 void FillLayer::setFillTranslateAnchorTransition(const TransitionOptions& options) {
@@ -282,7 +270,7 @@ void FillLayer::setFillPattern(PropertyValue<std::string> value) {
     auto impl_ = mutableImpl();
     impl_->paint.template get<FillPattern>().value = value;
     baseImpl = std::move(impl_);
-    observer->onLayerPaintPropertyChanged(*this);
+    observer->onLayerChanged(*this);
 }
 
 void FillLayer::setFillPatternTransition(const TransitionOptions& options) {

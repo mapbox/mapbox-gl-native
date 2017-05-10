@@ -164,11 +164,7 @@ private:
     void onTileError(RenderSource&, const OverscaledTileID&, std::exception_ptr) override;
 
     // LayerObserver implementation.
-    void onLayerFilterChanged(Layer&) override;
-    void onLayerVisibilityChanged(Layer&) override;
-    void onLayerPaintPropertyChanged(Layer&) override;
-    void onLayerDataDrivenPaintPropertyChanged(Layer&) override;
-    void onLayerLayoutPropertyChanged(Layer&, const char *) override;
+    void onLayerChanged(Layer&) override;
 
     // LightObserver implementation.
     void onLightChanged(const Light&) override;
