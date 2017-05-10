@@ -21,7 +21,7 @@ void Painter::renderLine(PaintParameters& parameters,
         return;
     }
 
-    const LinePaintProperties::Evaluated& properties = layer.evaluated;
+    const LinePaintProperties::PossiblyEvaluated& properties = layer.evaluated;
 
     auto draw = [&] (auto& program, auto&& uniformValues) {
         program.draw(

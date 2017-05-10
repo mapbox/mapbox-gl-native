@@ -5,6 +5,7 @@
 #include <mbgl/style/types.hpp>
 #include <mbgl/style/layout_property.hpp>
 #include <mbgl/style/paint_property.hpp>
+#include <mbgl/style/properties.hpp>
 #include <mbgl/programs/attributes.hpp>
 
 namespace mbgl {
@@ -38,7 +39,7 @@ struct FillExtrusionBase : DataDrivenPaintProperty<float, attributes::a_base> {
     static float defaultValue() { return 0; }
 };
 
-class FillExtrusionPaintProperties : public PaintProperties<
+class FillExtrusionPaintProperties : public Properties<
     FillExtrusionOpacity,
     FillExtrusionColor,
     FillExtrusionTranslate,

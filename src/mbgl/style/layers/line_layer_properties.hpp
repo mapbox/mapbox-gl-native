@@ -5,6 +5,7 @@
 #include <mbgl/style/types.hpp>
 #include <mbgl/style/layout_property.hpp>
 #include <mbgl/style/paint_property.hpp>
+#include <mbgl/style/properties.hpp>
 #include <mbgl/programs/attributes.hpp>
 
 namespace mbgl {
@@ -70,14 +71,14 @@ struct LinePattern : CrossFadedPaintProperty<std::string> {
     static std::string defaultValue() { return ""; }
 };
 
-class LineLayoutProperties : public LayoutProperties<
+class LineLayoutProperties : public Properties<
     LineCap,
     LineJoin,
     LineMiterLimit,
     LineRoundLimit
 > {};
 
-class LinePaintProperties : public PaintProperties<
+class LinePaintProperties : public Properties<
     LineOpacity,
     LineColor,
     LineTranslate,

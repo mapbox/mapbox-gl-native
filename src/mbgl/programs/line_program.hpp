@@ -91,7 +91,7 @@ public:
      */
     static const int8_t extrudeScale = 63;
 
-    static UniformValues uniformValues(const style::LinePaintProperties::Evaluated&,
+    static UniformValues uniformValues(const style::LinePaintProperties::PossiblyEvaluated&,
                                        const RenderTile&,
                                        const TransformState&,
                                        const std::array<float, 2>& pixelsToGLUnits);
@@ -119,7 +119,7 @@ class LinePatternProgram : public Program<
 public:
     using Program::Program;
 
-    static UniformValues uniformValues(const style::LinePaintProperties::Evaluated&,
+    static UniformValues uniformValues(const style::LinePaintProperties::PossiblyEvaluated&,
                                        const RenderTile&,
                                        const TransformState&,
                                        const std::array<float, 2>& pixelsToGLUnits,
@@ -148,7 +148,7 @@ class LineSDFProgram : public Program<
 public:
     using Program::Program;
 
-    static UniformValues uniformValues(const style::LinePaintProperties::Evaluated&,
+    static UniformValues uniformValues(const style::LinePaintProperties::PossiblyEvaluated&,
                                        float pixelRatio,
                                        const RenderTile&,
                                        const TransformState&,

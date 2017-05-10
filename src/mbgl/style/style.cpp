@@ -584,7 +584,7 @@ RenderData Style::getRenderData(MapDebugOptions debugOptions, float angle) const
                 result.order.emplace_back(*layer);
                 continue;
             }
-            const BackgroundPaintProperties::Evaluated& paint = background->evaluated;
+            const BackgroundPaintProperties::PossiblyEvaluated& paint = background->evaluated;
             if (layerImpl.get() == layerImpls[0].get() && paint.get<BackgroundPattern>().from.empty()) {
                 // This is a solid background. We can use glClear().
                 result.backgroundColor = paint.get<BackgroundColor>() * paint.get<BackgroundOpacity>();

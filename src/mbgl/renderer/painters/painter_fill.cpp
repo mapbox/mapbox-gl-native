@@ -17,7 +17,7 @@ void Painter::renderFill(PaintParameters& parameters,
                          FillBucket& bucket,
                          const RenderFillLayer& layer,
                          const RenderTile& tile) {
-    const FillPaintProperties::Evaluated& properties = layer.evaluated;
+    const FillPaintProperties::PossiblyEvaluated& properties = layer.evaluated;
 
     if (!properties.get<FillPattern>().from.empty()) {
         if (pass != RenderPass::Translucent) {

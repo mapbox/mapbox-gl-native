@@ -2,7 +2,6 @@
 
 #include <mbgl/style/layers/line_layer.hpp>
 #include <mbgl/style/layers/line_layer_impl.hpp>
-#include <mbgl/style/conversion/stringify.hpp>
 #include <mbgl/style/layer_observer.hpp>
 
 namespace mbgl {
@@ -34,7 +33,7 @@ std::unique_ptr<Layer> LineLayer::cloneRef(const std::string& id_) const {
 }
 
 void LineLayer::Impl::stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>& writer) const {
-    conversion::stringify(writer, layout);
+    layout.stringify(writer);
 }
 
 // Source
@@ -98,14 +97,14 @@ PropertyValue<LineCapType> LineLayer::getDefaultLineCap() {
 }
 
 PropertyValue<LineCapType> LineLayer::getLineCap() const {
-    return impl().layout.unevaluated.get<LineCap>();
+    return impl().layout.get<LineCap>();
 }
 
 void LineLayer::setLineCap(PropertyValue<LineCapType> value) {
     if (value == getLineCap())
         return;
     auto impl_ = mutableImpl();
-    impl_->layout.unevaluated.get<LineCap>() = value;
+    impl_->layout.get<LineCap>() = value;
     baseImpl = std::move(impl_);
     observer->onLayerLayoutPropertyChanged(*this, "line-cap");
 }
@@ -114,14 +113,14 @@ PropertyValue<LineJoinType> LineLayer::getDefaultLineJoin() {
 }
 
 PropertyValue<LineJoinType> LineLayer::getLineJoin() const {
-    return impl().layout.unevaluated.get<LineJoin>();
+    return impl().layout.get<LineJoin>();
 }
 
 void LineLayer::setLineJoin(PropertyValue<LineJoinType> value) {
     if (value == getLineJoin())
         return;
     auto impl_ = mutableImpl();
-    impl_->layout.unevaluated.get<LineJoin>() = value;
+    impl_->layout.get<LineJoin>() = value;
     baseImpl = std::move(impl_);
     observer->onLayerLayoutPropertyChanged(*this, "line-join");
 }
@@ -130,14 +129,14 @@ PropertyValue<float> LineLayer::getDefaultLineMiterLimit() {
 }
 
 PropertyValue<float> LineLayer::getLineMiterLimit() const {
-    return impl().layout.unevaluated.get<LineMiterLimit>();
+    return impl().layout.get<LineMiterLimit>();
 }
 
 void LineLayer::setLineMiterLimit(PropertyValue<float> value) {
     if (value == getLineMiterLimit())
         return;
     auto impl_ = mutableImpl();
-    impl_->layout.unevaluated.get<LineMiterLimit>() = value;
+    impl_->layout.get<LineMiterLimit>() = value;
     baseImpl = std::move(impl_);
     observer->onLayerLayoutPropertyChanged(*this, "line-miter-limit");
 }
@@ -146,14 +145,14 @@ PropertyValue<float> LineLayer::getDefaultLineRoundLimit() {
 }
 
 PropertyValue<float> LineLayer::getLineRoundLimit() const {
-    return impl().layout.unevaluated.get<LineRoundLimit>();
+    return impl().layout.get<LineRoundLimit>();
 }
 
 void LineLayer::setLineRoundLimit(PropertyValue<float> value) {
     if (value == getLineRoundLimit())
         return;
     auto impl_ = mutableImpl();
-    impl_->layout.unevaluated.get<LineRoundLimit>() = value;
+    impl_->layout.get<LineRoundLimit>() = value;
     baseImpl = std::move(impl_);
     observer->onLayerLayoutPropertyChanged(*this, "line-round-limit");
 }

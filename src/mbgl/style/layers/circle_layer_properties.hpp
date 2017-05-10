@@ -5,6 +5,7 @@
 #include <mbgl/style/types.hpp>
 #include <mbgl/style/layout_property.hpp>
 #include <mbgl/style/paint_property.hpp>
+#include <mbgl/style/properties.hpp>
 #include <mbgl/programs/attributes.hpp>
 
 namespace mbgl {
@@ -50,7 +51,7 @@ struct CircleStrokeOpacity : DataDrivenPaintProperty<float, attributes::a_stroke
     static float defaultValue() { return 1; }
 };
 
-class CirclePaintProperties : public PaintProperties<
+class CirclePaintProperties : public Properties<
     CircleRadius,
     CircleColor,
     CircleBlur,

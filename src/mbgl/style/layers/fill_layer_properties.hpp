@@ -5,6 +5,7 @@
 #include <mbgl/style/types.hpp>
 #include <mbgl/style/layout_property.hpp>
 #include <mbgl/style/paint_property.hpp>
+#include <mbgl/style/properties.hpp>
 #include <mbgl/programs/attributes.hpp>
 
 namespace mbgl {
@@ -38,7 +39,7 @@ struct FillPattern : CrossFadedPaintProperty<std::string> {
     static std::string defaultValue() { return ""; }
 };
 
-class FillPaintProperties : public PaintProperties<
+class FillPaintProperties : public Properties<
     FillAntialias,
     FillOpacity,
     FillColor,

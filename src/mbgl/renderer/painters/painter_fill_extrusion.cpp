@@ -18,7 +18,7 @@ void Painter::renderFillExtrusion(PaintParameters& parameters,
                                   FillExtrusionBucket& bucket,
                                   const RenderFillExtrusionLayer& layer,
                                   const RenderTile& tile) {
-    const FillExtrusionPaintProperties::Evaluated& properties = layer.evaluated;
+    const FillExtrusionPaintProperties::PossiblyEvaluated& properties = layer.evaluated;
 
     if (pass == RenderPass::Opaque) {
         return;

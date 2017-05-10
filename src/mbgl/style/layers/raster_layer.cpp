@@ -2,7 +2,6 @@
 
 #include <mbgl/style/layers/raster_layer.hpp>
 #include <mbgl/style/layers/raster_layer_impl.hpp>
-#include <mbgl/style/conversion/stringify.hpp>
 #include <mbgl/style/layer_observer.hpp>
 
 namespace mbgl {

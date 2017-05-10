@@ -20,7 +20,7 @@ void Painter::renderTileDebug(const RenderTile& renderTile) {
 
     MBGL_DEBUG_GROUP(context, std::string { "debug " } + util::toString(renderTile.id));
 
-    static const style::PaintProperties<>::Evaluated properties {};
+    static const style::Properties<>::PossiblyEvaluated properties {};
     static const DebugProgram::PaintPropertyBinders paintAttibuteData(properties, 0);
 
     auto draw = [&] (Color color, const auto& vertexBuffer, const auto& indexBuffer, const auto& segments, auto drawMode) {

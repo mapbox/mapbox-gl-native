@@ -1,13 +1,14 @@
 #include <mbgl/test/util.hpp>
 
-#include <mbgl/style/paint_property.hpp>
-#include <mbgl/renderer/transitioning_property.hpp>
+#include <mbgl/style/properties.hpp>
+#include <mbgl/renderer/property_evaluator.hpp>
+#include <mbgl/renderer/data_driven_property_evaluator.hpp>
 
 using namespace mbgl;
 using namespace mbgl::style;
 using namespace std::literals::chrono_literals;
 
-float evaluate(TransitioningProperty<PropertyValue<float>>& property, Duration delta = Duration::zero()) {
+float evaluate(Transitioning<PropertyValue<float>>& property, Duration delta = Duration::zero()) {
     ZoomHistory zoomHistory;
     zoomHistory.update(0, TimePoint::min() + delta);
 
@@ -25,7 +26,7 @@ float evaluate(TransitioningProperty<PropertyValue<float>>& property, Duration d
     return property.evaluate(evaluator, parameters.now);
 }
 
-PossiblyEvaluatedPropertyValue<float> evaluate(TransitioningProperty<DataDrivenPropertyValue<float>>& property, Duration delta = Duration::zero()) {
+PossiblyEvaluatedPropertyValue<float> evaluate(Transitioning<DataDrivenPropertyValue<float>>& property, Duration delta = Duration::zero()) {
     ZoomHistory zoomHistory;
     zoomHistory.update(0, TimePoint::min() + delta);
 
@@ -43,15 +44,15 @@ PossiblyEvaluatedPropertyValue<float> evaluate(TransitioningProperty<DataDrivenP
     return property.evaluate(evaluator, parameters.now);
 }
 
-TEST(TransitioningProperty, EvaluateDefaultValue) {
-    TransitioningProperty<PropertyValue<float>> property;
+TEST(TransitioningPropertyValue, EvaluateDefaultValue) {
+    Transitioning<PropertyValue<float>> property;
     ASSERT_EQ(0.0f, evaluate(property));
 }
 
-TEST(TransitioningProperty, EvaluateUntransitionedConstant) {
-    TransitioningProperty<PropertyValue<float>> property {
+TEST(TransitioningPropertyValue, EvaluateUntransitionedConstant) {
+    Transitioning<PropertyValue<float>> property {
         PropertyValue<float>(1.0f),
-        TransitioningProperty<PropertyValue<float>>(),
+        Transitioning<PropertyValue<float>>(),
         TransitionOptions(),
         TimePoint::min()
     };
@@ -59,18 +60,18 @@ TEST(TransitioningProperty, EvaluateUntransitionedConstant) {
     ASSERT_EQ(1.0f, evaluate(property));
 }
 
-TEST(TransitioningProperty, EvaluateTransitionedConstantWithoutDelay) {
+TEST(TransitioningPropertyValue, EvaluateTransitionedConstantWithoutDelay) {
     TransitionOptions transition;
     transition.duration = { 1000ms };
 
-    TransitioningProperty<PropertyValue<float>> t0 {
+    Transitioning<PropertyValue<float>> t0 {
         PropertyValue<float>(0.0f),
-        TransitioningProperty<PropertyValue<float>>(),
+        Transitioning<PropertyValue<float>>(),
         TransitionOptions(),
         TimePoint::min()
     };
 
-    TransitioningProperty<PropertyValue<float>> t1 {
+    Transitioning<PropertyValue<float>> t1 {
         PropertyValue<float>(1.0f),
         t0,
         transition,
@@ -82,19 +83,19 @@ TEST(TransitioningProperty, EvaluateTransitionedConstantWithoutDelay) {
     ASSERT_FLOAT_EQ(1.0f, evaluate(t1, 1500ms));
 }
 
-TEST(TransitioningProperty, EvaluateTransitionedConstantWithDelay) {
+TEST(TransitioningPropertyValue, EvaluateTransitionedConstantWithDelay) {
     TransitionOptions transition;
     transition.delay = { 1000ms };
     transition.duration = { 1000ms };
 
-    TransitioningProperty<PropertyValue<float>> t0 {
+    Transitioning<PropertyValue<float>> t0 {
         PropertyValue<float>(0.0f),
-        TransitioningProperty<PropertyValue<float>>(),
+        Transitioning<PropertyValue<float>>(),
         TransitionOptions(),
         TimePoint::min()
     };
 
-    TransitioningProperty<PropertyValue<float>> t1 {
+    Transitioning<PropertyValue<float>> t1 {
         PropertyValue<float>(1.0f),
         t0,
         transition,
@@ -108,14 +109,14 @@ TEST(TransitioningProperty, EvaluateTransitionedConstantWithDelay) {
     ASSERT_FLOAT_EQ(1.0f, evaluate(t1, 2500ms));
 }
 
-TEST(TransitioningProperty, EvaluateDataDrivenValue) {
+TEST(TransitioningDataDrivenPropertyValue, Evaluate) {
     TransitionOptions transition;
     transition.delay = { 1000ms };
     transition.duration = { 1000ms };
     
-    TransitioningProperty<DataDrivenPropertyValue<float>> t0 {
+    Transitioning<DataDrivenPropertyValue<float>> t0 {
         DataDrivenPropertyValue<float>(0.0f),
-        TransitioningProperty<DataDrivenPropertyValue<float>>(),
+        Transitioning<DataDrivenPropertyValue<float>>(),
         TransitionOptions(),
         TimePoint::min()
     };
@@ -125,7 +126,7 @@ TEST(TransitioningProperty, EvaluateDataDrivenValue) {
         IdentityStops<float>()
     };
     
-    TransitioningProperty<DataDrivenPropertyValue<float>> t1 {
+    Transitioning<DataDrivenPropertyValue<float>> t1 {
         DataDrivenPropertyValue<float>(sourceFunction),
         t0,
         transition,

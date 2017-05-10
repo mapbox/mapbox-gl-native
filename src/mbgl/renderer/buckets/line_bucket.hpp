@@ -19,7 +19,7 @@ class LineBucket : public Bucket {
 public:
     LineBucket(const BucketParameters&,
                const std::vector<const RenderLayer*>&,
-               const style::LineLayoutProperties&);
+               const style::LineLayoutProperties::Unevaluated&);
 
     void addFeature(const GeometryTileFeature&,
                     const GeometryCollection&) override;
