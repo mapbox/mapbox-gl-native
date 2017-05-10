@@ -51,10 +51,11 @@ optional<std::array<float, 2>> IdentityStops<std::array<float, 2>>::evaluate(con
         return {};
     }
 
-    return {{{
+    std::array<float, 2> array {{
         *numericValue<float>(vector[0]),
         *numericValue<float>(vector[1])
-    }}};
+    }};
+    return array;
 }
 
 } // namespace style
