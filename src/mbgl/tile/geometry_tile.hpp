@@ -87,6 +87,8 @@ protected:
     }
 
 private:
+    void markObsolete();
+
     const std::string sourceID;
     style::Style& style;
 
