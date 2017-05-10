@@ -97,7 +97,7 @@ set(MBGL_TEST_FILES
     test/style/function/source_function.test.cpp
 
     # style
-    test/style/paint_property.test.cpp
+    test/style/properties.test.cpp
     test/style/source.test.cpp
     test/style/style.test.cpp
     test/style/style_image.test.cpp

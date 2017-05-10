@@ -13,7 +13,7 @@ public:
 
     void stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>&) const override;
 
-    LineLayoutProperties layout;
+    LineLayoutProperties::Unevaluated layout;
     LinePaintProperties::Cascading paint;
 };
 

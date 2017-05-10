@@ -53,7 +53,7 @@ public:
               const gl::IndexBuffer<DrawMode>& indexBuffer,
               const gl::SegmentVector<Attributes>& segments,
               const PaintPropertyBinders& paintPropertyBinders,
-              const typename PaintProperties::Evaluated& currentProperties,
+              const typename PaintProperties::PossiblyEvaluated& currentProperties,
               float currentZoom) {
         program.draw(
             context,

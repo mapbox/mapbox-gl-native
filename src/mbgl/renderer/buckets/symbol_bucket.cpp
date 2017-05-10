@@ -10,7 +10,8 @@ using namespace style;
 
 SymbolBucket::SymbolBucket(style::SymbolLayoutProperties::PossiblyEvaluated layout_,
                            const std::map<std::string, std::pair<
-                               style::IconPaintProperties::Evaluated, style::TextPaintProperties::Evaluated>>& layerPaintProperties,
+                               style::IconPaintProperties::PossiblyEvaluated,
+                               style::TextPaintProperties::PossiblyEvaluated>>& layerPaintProperties,
                            const style::DataDrivenPropertyValue<float>& textSize,
                            const style::DataDrivenPropertyValue<float>& iconSize,
                            float zoom,

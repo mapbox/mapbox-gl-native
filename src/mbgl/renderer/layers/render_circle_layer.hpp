@@ -26,7 +26,7 @@ public:
 
     // Paint properties
     style::CirclePaintProperties::Unevaluated unevaluated;
-    style::CirclePaintProperties::Evaluated evaluated;
+    style::CirclePaintProperties::PossiblyEvaluated evaluated;
 
     const style::CircleLayer::Impl& impl() const;
 };

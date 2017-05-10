@@ -26,7 +26,7 @@ public:
 
     // Paint properties
     style::FillPaintProperties::Unevaluated unevaluated;
-    style::FillPaintProperties::Evaluated evaluated;
+    style::FillPaintProperties::PossiblyEvaluated evaluated;
 
     const style::FillLayer::Impl& impl() const;
 };

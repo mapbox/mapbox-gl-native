@@ -4,6 +4,7 @@
 #include <mbgl/programs/attributes.hpp>
 #include <mbgl/programs/uniforms.hpp>
 #include <mbgl/shaders/collision_box.hpp>
+#include <mbgl/style/properties.hpp>
 #include <mbgl/util/geometry.hpp>
 
 #include <cmath>
@@ -29,7 +30,7 @@ class CollisionBoxProgram : public Program<
         uniforms::u_scale,
         uniforms::u_zoom,
         uniforms::u_maxzoom>,
-    style::PaintProperties<>>
+    style::Properties<>>
 {
 public:
     using Program::Program;

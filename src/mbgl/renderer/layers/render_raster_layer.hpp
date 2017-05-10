@@ -19,7 +19,7 @@ public:
 
     // Paint properties
     style::RasterPaintProperties::Unevaluated unevaluated;
-    style::RasterPaintProperties::Evaluated evaluated;
+    style::RasterPaintProperties::PossiblyEvaluated evaluated;
 
     const style::RasterLayer::Impl& impl() const;
 };

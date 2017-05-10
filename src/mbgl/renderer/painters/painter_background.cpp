@@ -14,9 +14,9 @@ using namespace style;
 void Painter::renderBackground(PaintParameters& parameters, const RenderBackgroundLayer& layer) {
     // Note that for bottommost layers without a pattern, the background color is drawn with
     // glClear rather than this method.
-    const BackgroundPaintProperties::Evaluated& background = layer.evaluated;
+    const BackgroundPaintProperties::PossiblyEvaluated& background = layer.evaluated;
 
-    style::FillPaintProperties::Evaluated properties;
+    style::FillPaintProperties::PossiblyEvaluated properties;
     properties.get<FillPattern>() = background.get<BackgroundPattern>();
     properties.get<FillOpacity>() = { background.get<BackgroundOpacity>() };
     properties.get<FillColor>() = { background.get<BackgroundColor>() };

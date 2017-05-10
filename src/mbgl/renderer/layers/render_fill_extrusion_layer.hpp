@@ -26,7 +26,7 @@ public:
 
     // Paint properties
     style::FillExtrusionPaintProperties::Unevaluated unevaluated;
-    style::FillExtrusionPaintProperties::Evaluated evaluated;
+    style::FillExtrusionPaintProperties::PossiblyEvaluated evaluated;
 
     const style::FillExtrusionLayer::Impl& impl() const;
 };

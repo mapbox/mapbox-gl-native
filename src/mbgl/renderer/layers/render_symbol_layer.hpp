@@ -13,7 +13,7 @@ namespace style {
 // {icon,text}-specific paint-property packs for use in the symbol Programs.
 // Since each program deals either with icons or text, using a smaller property set
 // lets us avoid unnecessarily binding attributes for properties the program wouldn't use.
-class IconPaintProperties : public PaintProperties<
+class IconPaintProperties : public Properties<
         IconOpacity,
         IconColor,
         IconHaloColor,
@@ -23,7 +23,7 @@ class IconPaintProperties : public PaintProperties<
         IconTranslateAnchor
 > {};
 
-class TextPaintProperties : public PaintProperties<
+class TextPaintProperties : public Properties<
         TextOpacity,
         TextColor,
         TextHaloColor,
@@ -68,8 +68,8 @@ public:
     void evaluate(const PropertyEvaluationParameters&) override;
     bool hasTransition() const override;
 
-    style::IconPaintProperties::Evaluated iconPaintProperties() const;
-    style::TextPaintProperties::Evaluated textPaintProperties() const;
+    style::IconPaintProperties::PossiblyEvaluated iconPaintProperties() const;
+    style::TextPaintProperties::PossiblyEvaluated textPaintProperties() const;
 
     style::SymbolPropertyValues iconPropertyValues(const style::SymbolLayoutProperties::PossiblyEvaluated&) const;
     style::SymbolPropertyValues textPropertyValues(const style::SymbolLayoutProperties::PossiblyEvaluated&) const;
@@ -80,7 +80,7 @@ public:
 
     // Paint properties
     style::SymbolPaintProperties::Unevaluated unevaluated;
-    style::SymbolPaintProperties::Evaluated evaluated;
+    style::SymbolPaintProperties::PossiblyEvaluated evaluated;
 
     float iconSize = 1.0f;
     float textSize = 16.0f;

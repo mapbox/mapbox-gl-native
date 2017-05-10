@@ -2,9 +2,10 @@
 
 #include <mbgl/style/light.hpp>
 #include <mbgl/style/property_value.hpp>
-#include <mbgl/style/transition_options.hpp>
 #include <mbgl/style/types.hpp>
 #include <mbgl/style/position.hpp>
+#include <mbgl/style/properties.hpp>
+#include <mbgl/renderer/property_evaluator.hpp>
 #include <mbgl/util/color.hpp>
 #include <mbgl/util/indexed_tuple.hpp>
 
@@ -14,11 +15,12 @@ namespace style {
 template <class T>
 class LightProperty {
 public:
+    using CascadingType = Transitionable<PropertyValue<T>>;
+    using UnevaluatedType = Transitioning<PropertyValue<T>>;
+    using EvaluatorType = PropertyEvaluator<T>;
+    using PossiblyEvaluatedType = T;
     using Type = T;
-    using ValueType = PropertyValue<T>;
-
-    PropertyValue<T> value;
-    TransitionOptions transition;
+    static constexpr bool IsDataDriven = false;
 };
 
 struct LightAnchor : LightProperty<LightAnchorType> {
@@ -46,11 +48,11 @@ struct LightIntensity : LightProperty<float> {
     }
 };
 
-using LightProperties = TypeList<LightAnchor, LightPosition, LightColor, LightIntensity>;
+using LightProperties = Properties<LightAnchor, LightPosition, LightColor, LightIntensity>;
 
 class Light::Impl {
 public:
-    IndexedTuple<LightProperties, LightProperties> properties;
+    LightProperties::Cascading properties;
 };
 
 } // namespace style

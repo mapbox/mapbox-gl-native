@@ -47,7 +47,7 @@ public:
     State state = Pending;
 
     std::map<std::string,
-        std::pair<style::IconPaintProperties::Evaluated, style::TextPaintProperties::Evaluated>> layerPaintProperties;
+        std::pair<style::IconPaintProperties::PossiblyEvaluated, style::TextPaintProperties::PossiblyEvaluated>> layerPaintProperties;
 
 private:
     void addFeature(const size_t,

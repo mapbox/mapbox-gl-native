@@ -20,7 +20,7 @@ void Painter::renderCircle(PaintParameters& parameters,
         return;
     }
 
-    const CirclePaintProperties::Evaluated& properties = layer.evaluated;
+    const CirclePaintProperties::PossiblyEvaluated& properties = layer.evaluated;
     const bool scaleWithMap = properties.get<CirclePitchScale>() == CirclePitchScaleType::Map;
 
     parameters.programs.circle.draw(

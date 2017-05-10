@@ -26,7 +26,7 @@ public:
 
     // Paint properties
     style::LinePaintProperties::Unevaluated unevaluated;
-    style::LinePaintProperties::Evaluated evaluated;
+    style::LinePaintProperties::PossiblyEvaluated evaluated;
 
     const style::LineLayer::Impl& impl() const;
 

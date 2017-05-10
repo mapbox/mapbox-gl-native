@@ -19,7 +19,7 @@ public:
 
     // Paint properties
     style::BackgroundPaintProperties::Unevaluated unevaluated;
-    style::BackgroundPaintProperties::Evaluated evaluated;
+    style::BackgroundPaintProperties::PossiblyEvaluated evaluated;
 
     const style::BackgroundLayer::Impl& impl() const;
 };

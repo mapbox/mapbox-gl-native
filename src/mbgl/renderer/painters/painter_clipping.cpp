@@ -6,7 +6,7 @@
 namespace mbgl {
 
 void Painter::renderClippingMask(const UnwrappedTileID& tileID, const ClipID& clip) {
-    static const style::FillPaintProperties::Evaluated properties {};
+    static const style::FillPaintProperties::PossiblyEvaluated properties {};
     static const FillProgram::PaintPropertyBinders paintAttibuteData(properties, 0);
     programs->fill.draw(
         context,

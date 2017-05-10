@@ -7,7 +7,6 @@
 
 #include <mbgl/style/layers/<%- type.replace('-', '_') %>_layer.hpp>
 #include <mbgl/style/layers/<%- type.replace('-', '_') %>_layer_impl.hpp>
-#include <mbgl/style/conversion/stringify.hpp>
 #include <mbgl/style/layer_observer.hpp>
 
 namespace mbgl {
@@ -46,7 +45,7 @@ std::unique_ptr<Layer> <%- camelize(type) %>Layer::cloneRef(const std::string& i
 
 <% if (layoutProperties.length) { -%>
 void <%- camelize(type) %>Layer::Impl::stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>& writer) const {
-    conversion::stringify(writer, layout);
+    layout.stringify(writer);
 }
 <% } else { -%>
 void <%- camelize(type) %>Layer::Impl::stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>&) const {
@@ -119,14 +118,14 @@ void <%- camelize(type) %>Layer::setMaxZoom(float maxZoom) {
 }
 
 <%- propertyValueType(property) %> <%- camelize(type) %>Layer::get<%- camelize(property.name) %>() const {
-    return impl().layout.unevaluated.get<<%- camelize(property.name) %>>();
+    return impl().layout.get<<%- camelize(property.name) %>>();
 }
 
 void <%- camelize(type) %>Layer::set<%- camelize(property.name) %>(<%- propertyValueType(property) %> value) {
     if (value == get<%- camelize(property.name) %>())
         return;
     auto impl_ = mutableImpl();
-    impl_->layout.unevaluated.get<<%- camelize(property.name) %>>() = value;
+    impl_->layout.get<<%- camelize(property.name) %>>() = value;
     baseImpl = std::move(impl_);
     observer->onLayerLayoutPropertyChanged(*this, "<%- property.name %>");
 }

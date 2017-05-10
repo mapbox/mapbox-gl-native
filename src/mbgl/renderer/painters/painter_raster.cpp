@@ -48,7 +48,7 @@ void Painter::renderRaster(PaintParameters& parameters,
     if (!bucket.hasData())
         return;
 
-    const RasterPaintProperties::Evaluated& properties = layer.evaluated;
+    const RasterPaintProperties::PossiblyEvaluated& properties = layer.evaluated;
     const RasterProgram::PaintPropertyBinders paintAttributeData(properties, 0);
 
     assert(bucket.texture);

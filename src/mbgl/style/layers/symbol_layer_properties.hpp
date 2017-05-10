@@ -5,6 +5,7 @@
 #include <mbgl/style/types.hpp>
 #include <mbgl/style/layout_property.hpp>
 #include <mbgl/style/paint_property.hpp>
+#include <mbgl/style/properties.hpp>
 #include <mbgl/programs/attributes.hpp>
 
 namespace mbgl {
@@ -236,7 +237,7 @@ struct TextTranslateAnchor : PaintProperty<TranslateAnchorType> {
     static TranslateAnchorType defaultValue() { return TranslateAnchorType::Map; }
 };
 
-class SymbolLayoutProperties : public LayoutProperties<
+class SymbolLayoutProperties : public Properties<
     SymbolPlacement,
     SymbolSpacing,
     SymbolAvoidEdges,
@@ -273,7 +274,7 @@ class SymbolLayoutProperties : public LayoutProperties<
     TextOptional
 > {};
 
-class SymbolPaintProperties : public PaintProperties<
+class SymbolPaintProperties : public Properties<
     IconOpacity,
     IconColor,
     IconHaloColor,

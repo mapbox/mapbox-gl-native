@@ -14,7 +14,7 @@ using namespace style;
 
 LineBucket::LineBucket(const BucketParameters& parameters,
                        const std::vector<const RenderLayer*>& layers,
-                       const style::LineLayoutProperties& layout_)
+                       const style::LineLayoutProperties::Unevaluated& layout_)
     : layout(layout_.evaluate(PropertyEvaluationParameters(parameters.tileID.overscaledZ))),
       overscaling(parameters.tileID.overscaleFactor()) {
     for (const auto& layer : layers) {

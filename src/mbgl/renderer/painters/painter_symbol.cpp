@@ -137,7 +137,7 @@ void Painter::renderSymbol(PaintParameters& parameters,
     }
 
     if (bucket.hasCollisionBoxData()) {
-        static const style::PaintProperties<>::Evaluated properties {};
+        static const style::Properties<>::PossiblyEvaluated properties {};
         static const CollisionBoxProgram::PaintPropertyBinders paintAttributeData(properties, 0);
 
         programs->collisionBox.draw(

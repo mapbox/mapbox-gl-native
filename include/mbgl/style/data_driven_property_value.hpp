@@ -56,7 +56,7 @@ public:
     }
 
     template <typename Evaluator>
-    auto evaluate(const Evaluator& evaluator) const {
+    auto evaluate(const Evaluator& evaluator, TimePoint = {}) const {
         return Value::visit(value, evaluator);
     }
 };
