@@ -7,11 +7,13 @@ namespace non_copyable_
 
 class noncopyable
 {
+public:
+    noncopyable( noncopyable const& ) = delete;
+    noncopyable& operator=(noncopyable const& ) = delete;
+
 protected:
     constexpr noncopyable() = default;
     ~noncopyable() = default;
-    noncopyable( noncopyable const& ) = delete;
-    noncopyable& operator=(noncopyable const& ) = delete;
 };
 } // namespace non_copyable_
 

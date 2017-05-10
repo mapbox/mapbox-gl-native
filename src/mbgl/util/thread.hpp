@@ -26,6 +26,11 @@ namespace util {
 template <class Object>
 class Thread {
 public:
+    Thread(const Thread&) = delete;
+    Thread(Thread&&) = delete;
+    Thread& operator=(const Thread&) = delete;
+    Thread& operator=(Thread&&) = delete;
+
     template <class... Args>
     Thread(const ThreadContext&, Args&&... args);
     ~Thread();
@@ -90,11 +95,6 @@ public:
 
 private:
     MBGL_STORE_THREAD(tid);
-
-    Thread(const Thread&) = delete;
-    Thread(Thread&&) = delete;
-    Thread& operator=(const Thread&) = delete;
-    Thread& operator=(Thread&&) = delete;
 
     template <typename Fn>
     auto bind(Fn fn) {
