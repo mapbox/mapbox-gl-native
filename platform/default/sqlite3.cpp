@@ -314,7 +314,7 @@ template <> std::string Statement::get(int offset) {
 
 template <> std::vector<uint8_t> Statement::get(int offset) {
     assert(impl);
-    const uint8_t* begin = reinterpret_cast<const uint8_t*>(sqlite3_column_blob(impl->stmt, offset));
+    const auto* begin = reinterpret_cast<const uint8_t*>(sqlite3_column_blob(impl->stmt, offset));
     const uint8_t* end   = begin + sqlite3_column_bytes(impl->stmt, offset);
     return { begin, end };
 }

@@ -46,7 +46,7 @@ optional<std::array<float, 2>> IdentityStops<std::array<float, 2>>::evaluate(con
         return {};
     }
 
-    const std::vector<Value>& vector = value.get<std::vector<Value>>();
+    const auto& vector = value.get<std::vector<Value>>();
     if (vector.size() != 2 || !numericValue<float>(vector[0]) || !numericValue<float>(vector[1])) {
         return {};
     }

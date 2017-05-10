@@ -40,7 +40,7 @@ static void user_warning_fn(png_structp, png_const_charp warning_msg) {
 }
 
 static void png_read_data(png_structp png_ptr, png_bytep data, png_size_t length) {
-    std::istream* fin = reinterpret_cast<std::istream*>(png_get_io_ptr(png_ptr));
+    auto* fin = reinterpret_cast<std::istream*>(png_get_io_ptr(png_ptr));
     fin->read(reinterpret_cast<char*>(data), length);
     std::streamsize read_count = fin->gcount();
     if (read_count < 0 || static_cast<png_size_t>(read_count) != length)

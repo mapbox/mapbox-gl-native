@@ -76,8 +76,7 @@ OfflineRegionStatus OfflineDownload::getStatus() const {
         switch (type) {
         case SourceType::Vector:
         case SourceType::Raster: {
-            style::TileSourceImpl* tileSource =
-                static_cast<style::TileSourceImpl*>(source->baseImpl.get());
+            auto* tileSource = static_cast<style::TileSourceImpl*>(source->baseImpl.get());
             const variant<std::string, Tileset>& urlOrTileset = tileSource->getURLOrTileset();
             const uint16_t tileSize = tileSource->getTileSize();
 
@@ -86,7 +85,7 @@ OfflineRegionStatus OfflineDownload::getStatus() const {
                     definition.tileCover(type, tileSize, urlOrTileset.get<Tileset>().zoomRange).size();
             } else {
                 result.requiredResourceCount += 1;
-                const std::string& url = urlOrTileset.get<std::string>();
+                const auto& url = urlOrTileset.get<std::string>();
                 optional<Response> sourceResponse = offlineDatabase.get(Resource::source(url));
                 if (sourceResponse) {
                     style::conversion::Error error;
@@ -103,7 +102,7 @@ OfflineRegionStatus OfflineDownload::getStatus() const {
         }
 
         case SourceType::GeoJSON: {
-            style::GeoJSONSource* geojsonSource = source->as<style::GeoJSONSource>();
+            auto* geojsonSource = source->as<style::GeoJSONSource>();
             if (geojsonSource->getURL()) {
                 result.requiredResourceCount += 1;
             }
@@ -151,7 +150,7 @@ void OfflineDownload::activateDownload() {
                 if (urlOrTileset.is<Tileset>()) {
                     queueTiles(type, tileSize, urlOrTileset.get<Tileset>());
                 } else {
-                    const std::string& url = urlOrTileset.get<std::string>();
+                    const auto& url = urlOrTileset.get<std::string>();
                     status.requiredResourceCountIsPrecise = false;
                     status.requiredResourceCount++;
                     requiredSourceURLs.insert(url);
@@ -174,7 +173,7 @@ void OfflineDownload::activateDownload() {
             }
 
             case SourceType::GeoJSON: {
-                style::GeoJSONSource::Impl* geojsonSource =
+                auto* geojsonSource =
                     static_cast<style::GeoJSONSource::Impl*>(source->baseImpl.get());
 
                 if (geojsonSource->getURL()) {

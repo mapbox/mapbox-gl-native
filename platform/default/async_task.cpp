@@ -16,7 +16,7 @@ public:
         : async(new uv_async_t),
           task(std::move(fn)) {
 
-        uv_loop_t* loop = reinterpret_cast<uv_loop_t*>(RunLoop::getLoopHandle());
+        auto* loop = reinterpret_cast<uv_loop_t*>(RunLoop::getLoopHandle());
         if (uv_async_init(loop, async, asyncCallback) != 0) {
             throw std::runtime_error("Failed to initialize async.");
         }

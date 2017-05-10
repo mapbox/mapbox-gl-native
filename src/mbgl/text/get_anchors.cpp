@@ -34,7 +34,7 @@ static Anchors resample(const GeometryCoordinates& line,
         const GeometryCoordinate& a = *(it);
         const GeometryCoordinate& b = *(it + 1);
 
-        const float segmentDist = util::dist<float>(a, b);
+        const auto segmentDist = util::dist<float>(a, b);
         const float angle = util::angle_to(b, a);
 
         while (markedDistance + spacing < distance + segmentDist) {

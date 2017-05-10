@@ -45,7 +45,7 @@ Context::~Context() {
 }
 
 void Context::initializeExtensions(const std::function<gl::ProcAddress(const char*)>& getProcAddress) {
-    if (const char* extensions =
+    if (const auto* extensions =
             reinterpret_cast<const char*>(MBGL_CHECK_ERROR(glGetString(GL_EXTENSIONS)))) {
 
         auto fn = [&](
@@ -94,7 +94,7 @@ UniqueShader Context::createShader(ShaderType type, const std::string& source) {
     UniqueShader result { MBGL_CHECK_ERROR(glCreateShader(static_cast<GLenum>(type))), { this } };
 
     const GLchar* sources = source.data();
-    const GLsizei lengths = static_cast<GLsizei>(source.length());
+    const auto lengths = static_cast<GLsizei>(source.length());
     MBGL_CHECK_ERROR(glShaderSource(result, 1, &sources, &lengths));
     MBGL_CHECK_ERROR(glCompileShader(result));
 
