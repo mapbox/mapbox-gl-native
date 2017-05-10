@@ -1,7 +1,6 @@
 #pragma once
 
 #include <mbgl/style/light_impl.hpp>
-#include <mbgl/style/light_properties.hpp>
 #include <mbgl/renderer/transitioning_property.hpp>
 #include <mbgl/renderer/cascade_parameters.hpp>
 #include <mbgl/renderer/property_evaluator.hpp>
