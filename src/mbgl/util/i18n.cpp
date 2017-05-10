@@ -310,7 +310,7 @@ const std::map<char16_t, char16_t> verticalPunctuation = {
     { u'｛', u'︷' }, { u'｜', u'―' },  { u'｝', u'︸' }, { u'｟', u'︵' }, { u'｠', u'︶' },
     { u'｡', u'︒' },  { u'｢', u'﹁' },  { u'｣', u'﹂' },
 };
-}
+} // namespace
 
 namespace mbgl {
 namespace util {

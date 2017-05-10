@@ -23,4 +23,4 @@ void RenderSource::onTileError(Tile& tile, std::exception_ptr error) {
     observer->onTileError(*this, tile.id, error);
 }
 
-}
+} // namespace mbgl

@@ -34,4 +34,4 @@ bool RenderBackgroundLayer::hasTransition() const {
     return unevaluated.hasTransition();
 }
 
-}
+} // namespace mbgl
