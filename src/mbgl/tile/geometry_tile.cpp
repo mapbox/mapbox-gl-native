@@ -47,10 +47,14 @@ GeometryTile::GeometryTile(const OverscaledTileID& id_,
 GeometryTile::~GeometryTile() {
     glyphAtlas.removeGlyphs(*this);
     spriteAtlas.removeRequestor(*this);
-    cancel();
+    markObsolete();
 }
 
 void GeometryTile::cancel() {
+    markObsolete();
+}
+
+void GeometryTile::markObsolete() {
     obsolete = true;
 }
 
