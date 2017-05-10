@@ -19,8 +19,8 @@ std::unique_ptr<Bucket> RenderFillExtrusionLayer::createBucket(const BucketParam
     return std::make_unique<FillExtrusionBucket>(parameters, layers);
 }
 
-void RenderFillExtrusionLayer::cascade(const CascadeParameters& parameters) {
-    unevaluated = impl().paint.cascade(parameters, std::move(unevaluated));
+void RenderFillExtrusionLayer::transition(const TransitionParameters& parameters) {
+    unevaluated = impl().paint.transition(parameters, std::move(unevaluated));
 }
 
 void RenderFillExtrusionLayer::evaluate(const PropertyEvaluationParameters& parameters) {

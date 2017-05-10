@@ -2,10 +2,10 @@
 
 #include <mbgl/style/transition_options.hpp>
 #include <mbgl/style/conversion/stringify.hpp>
-#include <mbgl/renderer/cascade_parameters.hpp>
+#include <mbgl/renderer/transition_parameters.hpp>
 #include <mbgl/renderer/paint_property_binder.hpp>
 #include <mbgl/renderer/property_evaluation_parameters.hpp>
-#include <mbgl/renderer/cascade_parameters.hpp>
+#include <mbgl/renderer/transition_parameters.hpp>
 #include <mbgl/util/indexed_tuple.hpp>
 #include <mbgl/util/ignore.hpp>
 
@@ -82,15 +82,16 @@ template <class Value>
 class Transitionable {
 public:
     Value value;
-    TransitionOptions transition;
+    TransitionOptions options;
 
-    Transitioning<Value> cascade(const CascadeParameters& params, Transitioning<Value> prior) const {
+    Transitioning<Value> transition(const TransitionParameters& params, Transitioning<Value> prior) const {
         return Transitioning<Value>(value,
                                     std::move(prior),
-                                    transition.reverseMerge(params.transition),
+                                    options.reverseMerge(params.transition),
                                     params.now);
     }
 };
+
 template <class Value>
 class Cascading {
 public:
@@ -118,7 +119,7 @@ public:
         transitions[klass ? ClassDictionary::Get().lookup(*klass) : ClassID::Default] = transition;
     }
 
-    Transitioning<Value> cascade(const CascadeParameters& params, Transitioning<Value> prior) const {
+    Transitioning<Value> transition(const TransitionParameters& params, Transitioning<Value> prior) const {
         TransitionOptions transition;
         Value value;
 
@@ -168,7 +169,7 @@ public:
     */
 
     using          PropertyTypes = TypeList<Ps...>;
-    using         CascadingTypes = TypeList<typename Ps::CascadingType...>;
+    using    TransitionableTypes = TypeList<typename Ps::TransitionableType...>;
     using       UnevaluatedTypes = TypeList<typename Ps::UnevaluatedType...>;
     using PossiblyEvaluatedTypes = TypeList<typename Ps::PossiblyEvaluatedType...>;
     using         EvaluatedTypes = TypeList<typename Ps::Type...>;
@@ -251,14 +252,14 @@ public:
         }
     };
 
-    class Cascading : public Tuple<CascadingTypes> {
+    class Transitionable : public Tuple<TransitionableTypes> {
     public:
-        using Tuple<CascadingTypes>::Tuple;
+        using Tuple<TransitionableTypes>::Tuple;
 
-        Unevaluated cascade(const CascadeParameters& parameters, Unevaluated&& prior) const {
+        Unevaluated transition(const TransitionParameters& parameters, Unevaluated&& prior) const {
             return Unevaluated {
                 this->template get<Ps>()
-                    .cascade(parameters, std::move(prior.template get<Ps>()))...
+                    .transition(parameters, std::move(prior.template get<Ps>()))...
             };
         }
     };

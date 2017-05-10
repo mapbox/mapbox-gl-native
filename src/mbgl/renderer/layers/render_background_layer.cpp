@@ -18,8 +18,8 @@ std::unique_ptr<Bucket> RenderBackgroundLayer::createBucket(const BucketParamete
     return nullptr;
 }
 
-void RenderBackgroundLayer::cascade(const CascadeParameters &parameters) {
-    unevaluated = impl().paint.cascade(parameters, std::move(unevaluated));
+void RenderBackgroundLayer::transition(const TransitionParameters &parameters) {
+    unevaluated = impl().paint.transition(parameters, std::move(unevaluated));
 }
 
 void RenderBackgroundLayer::evaluate(const PropertyEvaluationParameters &parameters) {

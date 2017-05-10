@@ -39,7 +39,7 @@ Mutable<<%- camelize(type) %>Layer::Impl> <%- camelize(type) %>Layer::mutableImp
 std::unique_ptr<Layer> <%- camelize(type) %>Layer::cloneRef(const std::string& id_) const {
     auto impl_ = mutableImpl();
     impl_->id = id_;
-    impl_->paint = <%- camelize(type) %>PaintProperties::Cascading();
+    impl_->paint = <%- camelize(type) %>PaintProperties::Transitionable();
     return std::make_unique<<%- camelize(type) %>Layer>(std::move(impl_));
 }
 

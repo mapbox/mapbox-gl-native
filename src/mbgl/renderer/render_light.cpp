@@ -6,8 +6,8 @@ RenderLight::RenderLight(Immutable<style::Light::Impl> impl_)
     : impl(std::move(impl_)) {
 }
 
-void RenderLight::transition(const CascadeParameters& parameters) {
-    transitioning = impl->properties.cascade(parameters, std::move(transitioning));
+void RenderLight::transition(const TransitionParameters& parameters) {
+    transitioning = impl->properties.transition(parameters, std::move(transitioning));
 }
 
 void RenderLight::evaluate(const PropertyEvaluationParameters& parameters) {

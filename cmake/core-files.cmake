@@ -160,7 +160,6 @@ set(MBGL_CORE_FILES
     src/mbgl/renderer/bucket.hpp
     src/mbgl/renderer/bucket_parameters.cpp
     src/mbgl/renderer/bucket_parameters.hpp
-    src/mbgl/renderer/cascade_parameters.hpp
     src/mbgl/renderer/cross_faded_property_evaluator.cpp
     src/mbgl/renderer/cross_faded_property_evaluator.hpp
     src/mbgl/renderer/data_driven_property_evaluator.hpp
@@ -192,6 +191,7 @@ set(MBGL_CORE_FILES
     src/mbgl/renderer/tile_parameters.hpp
     src/mbgl/renderer/tile_pyramid.cpp
     src/mbgl/renderer/tile_pyramid.hpp
+    src/mbgl/renderer/transition_parameters.hpp
     src/mbgl/renderer/update_parameters.hpp
 
     # renderer/buckets

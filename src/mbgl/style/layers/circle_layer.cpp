@@ -28,7 +28,7 @@ Mutable<CircleLayer::Impl> CircleLayer::mutableImpl() const {
 std::unique_ptr<Layer> CircleLayer::cloneRef(const std::string& id_) const {
     auto impl_ = mutableImpl();
     impl_->id = id_;
-    impl_->paint = CirclePaintProperties::Cascading();
+    impl_->paint = CirclePaintProperties::Transitionable();
     return std::make_unique<CircleLayer>(std::move(impl_));
 }
 

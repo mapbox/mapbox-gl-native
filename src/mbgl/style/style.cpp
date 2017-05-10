@@ -22,7 +22,7 @@
 #include <mbgl/text/glyph_atlas.hpp>
 #include <mbgl/geometry/line_atlas.hpp>
 #include <mbgl/renderer/update_parameters.hpp>
-#include <mbgl/renderer/cascade_parameters.hpp>
+#include <mbgl/renderer/transition_parameters.hpp>
 #include <mbgl/renderer/property_evaluation_parameters.hpp>
 #include <mbgl/renderer/tile_parameters.hpp>
 #include <mbgl/renderer/render_source.hpp>
@@ -341,7 +341,7 @@ void Style::update(const UpdateParameters& parameters) {
     }
     classIDs.push_back(ClassID::Default);
 
-    const CascadeParameters cascadeParameters {
+    const TransitionParameters transitionParameters {
         classIDs,
         parameters.timePoint,
         parameters.mode == MapMode::Continuous ? transitionOptions : TransitionOptions()
@@ -367,7 +367,7 @@ void Style::update(const UpdateParameters& parameters) {
 
     if (lightChanged) {
         renderLight.impl = light->impl;
-        renderLight.transition(cascadeParameters);
+        renderLight.transition(transitionParameters);
     }
 
     if (lightChanged || zoomChanged || renderLight.hasTransition()) {
@@ -433,7 +433,7 @@ void Style::update(const UpdateParameters& parameters) {
         const bool layerChanged = layerDiff.changed.count(entry.first);
 
         if (classesChanged || layerAdded || layerChanged) {
-            layer.cascade(cascadeParameters);
+            layer.transition(transitionParameters);
         }
 
         if (classesChanged || layerAdded || layerChanged || zoomChanged || layer.hasTransition()) {

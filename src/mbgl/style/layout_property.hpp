@@ -11,7 +11,7 @@ namespace style {
 template <class T>
 class LayoutProperty {
 public:
-    using CascadingType = std::nullptr_t;
+    using TransitionableType = std::nullptr_t;
     using UnevaluatedType = PropertyValue<T>;
     using EvaluatorType = PropertyEvaluator<T>;
     using PossiblyEvaluatedType = T;
@@ -22,7 +22,7 @@ public:
 template <class T>
 class DataDrivenLayoutProperty {
 public:
-    using CascadingType = std::nullptr_t;
+    using TransitionableType = std::nullptr_t;
     using UnevaluatedType = DataDrivenPropertyValue<T>;
     using EvaluatorType = DataDrivenPropertyEvaluator<T>;
     using PossiblyEvaluatedType = PossiblyEvaluatedPropertyValue<T>;

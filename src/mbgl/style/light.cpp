@@ -39,15 +39,15 @@ void Light::setAnchor(PropertyValue<LightAnchorType> property) {
     observer->onLightChanged(*this);
 }
 
-void Light::setAnchorTransition(const TransitionOptions& transition) {
+void Light::setAnchorTransition(const TransitionOptions& options) {
     auto impl_ = mutableImpl();
-    impl_->properties.template get<LightAnchor>().transition = transition;
+    impl_->properties.template get<LightAnchor>().options = options;
     impl = std::move(impl_);
     observer->onLightChanged(*this);
 }
 
 TransitionOptions Light::getAnchorTransition() const {
-    return impl->properties.template get<LightAnchor>().transition;
+    return impl->properties.template get<LightAnchor>().options;
 }
 
 Position Light::getDefaultPosition() {
@@ -65,15 +65,15 @@ void Light::setPosition(PropertyValue<Position> property) {
     observer->onLightChanged(*this);
 }
 
-void Light::setPositionTransition(const TransitionOptions& transition) {
+void Light::setPositionTransition(const TransitionOptions& options) {
     auto impl_ = mutableImpl();
-    impl_->properties.template get<LightPosition>().transition = transition;
+    impl_->properties.template get<LightPosition>().options = options;
     impl = std::move(impl_);
     observer->onLightChanged(*this);
 }
 
 TransitionOptions Light::getPositionTransition() const {
-    return impl->properties.template get<LightPosition>().transition;
+    return impl->properties.template get<LightPosition>().options;
 }
 
 Color Light::getDefaultColor() {
@@ -91,15 +91,15 @@ void Light::setColor(PropertyValue<Color> property) {
     observer->onLightChanged(*this);
 }
 
-void Light::setColorTransition(const TransitionOptions& transition) {
+void Light::setColorTransition(const TransitionOptions& options) {
     auto impl_ = mutableImpl();
-    impl_->properties.template get<LightColor>().transition = transition;
+    impl_->properties.template get<LightColor>().options = options;
     impl = std::move(impl_);
     observer->onLightChanged(*this);
 }
 
 TransitionOptions Light::getColorTransition() const {
-    return impl->properties.template get<LightColor>().transition;
+    return impl->properties.template get<LightColor>().options;
 }
 
 float Light::getDefaultIntensity() {
@@ -117,15 +117,15 @@ void Light::setIntensity(PropertyValue<float> property) {
     observer->onLightChanged(*this);
 }
 
-void Light::setIntensityTransition(const TransitionOptions& transition) {
+void Light::setIntensityTransition(const TransitionOptions& options) {
     auto impl_ = mutableImpl();
-    impl_->properties.template get<LightIntensity>().transition = transition;
+    impl_->properties.template get<LightIntensity>().options = options;
     impl = std::move(impl_);
     observer->onLightChanged(*this);
 }
 
 TransitionOptions Light::getIntensityTransition() const {
-    return impl->properties.template get<LightIntensity>().transition;
+    return impl->properties.template get<LightIntensity>().options;
 }
 
 

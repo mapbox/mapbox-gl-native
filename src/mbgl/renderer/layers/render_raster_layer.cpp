@@ -17,8 +17,8 @@ std::unique_ptr<Bucket> RenderRasterLayer::createBucket(const BucketParameters&,
     return nullptr;
 }
 
-void RenderRasterLayer::cascade(const CascadeParameters& parameters) {
-    unevaluated = impl().paint.cascade(parameters, std::move(unevaluated));
+void RenderRasterLayer::transition(const TransitionParameters& parameters) {
+    unevaluated = impl().paint.transition(parameters, std::move(unevaluated));
 }
 
 void RenderRasterLayer::evaluate(const PropertyEvaluationParameters& parameters) {

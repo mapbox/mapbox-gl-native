@@ -28,7 +28,7 @@ Mutable<FillExtrusionLayer::Impl> FillExtrusionLayer::mutableImpl() const {
 std::unique_ptr<Layer> FillExtrusionLayer::cloneRef(const std::string& id_) const {
     auto impl_ = mutableImpl();
     impl_->id = id_;
-    impl_->paint = FillExtrusionPaintProperties::Cascading();
+    impl_->paint = FillExtrusionPaintProperties::Transitionable();
     return std::make_unique<FillExtrusionLayer>(std::move(impl_));
 }
 

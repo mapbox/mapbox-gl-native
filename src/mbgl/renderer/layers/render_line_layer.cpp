@@ -19,8 +19,8 @@ std::unique_ptr<Bucket> RenderLineLayer::createBucket(const BucketParameters& pa
     return std::make_unique<LineBucket>(parameters, layers, impl().layout);
 }
 
-void RenderLineLayer::cascade(const CascadeParameters& parameters) {
-    unevaluated = impl().paint.cascade(parameters, std::move(unevaluated));
+void RenderLineLayer::transition(const TransitionParameters& parameters) {
+    unevaluated = impl().paint.transition(parameters, std::move(unevaluated));
 }
 
 void RenderLineLayer::evaluate(const PropertyEvaluationParameters& parameters) {
