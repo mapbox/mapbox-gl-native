@@ -19,7 +19,7 @@ namespace {
 
 GLFWView* view = nullptr;
 
-}
+} // namespace
 
 void quit_handler(int) {
     if (view) {

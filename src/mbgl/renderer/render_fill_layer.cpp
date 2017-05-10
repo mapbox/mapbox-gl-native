@@ -68,4 +68,4 @@ bool RenderFillLayer::queryIntersectsFeature(
 }
 
 
-}
+} // namespace mbgl

@@ -32,4 +32,4 @@ inline bool RenderLayer::is<RenderBackgroundLayer>() const {
     return type == style::LayerType::Background;
 }
 
-}
+} // namespace mbgl

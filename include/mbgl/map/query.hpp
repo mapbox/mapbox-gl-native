@@ -30,4 +30,4 @@ public:
     optional<style::Filter> filter;
 };
 
-}
+} // namespace mbgl

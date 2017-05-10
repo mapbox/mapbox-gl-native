@@ -22,4 +22,4 @@ bool RenderLayer::needsRendering(float zoom) const {
            && baseImpl.maxZoom >= zoom;
 }
 
-}
+} // namespace mbgl

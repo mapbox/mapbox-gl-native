@@ -41,5 +41,5 @@ size_t getPeakRSS();
  */
 size_t getCurrentRSS();
 
-}
-}
+} // namespace test
+} // namespace mbgl

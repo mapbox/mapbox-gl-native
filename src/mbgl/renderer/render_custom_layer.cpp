@@ -26,4 +26,4 @@ std::unique_ptr<Bucket> RenderCustomLayer::createBucket(const BucketParameters&,
     return nullptr;
 }
     
-}
+} // namespace mbgl

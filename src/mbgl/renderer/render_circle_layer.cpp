@@ -64,4 +64,4 @@ bool RenderCircleLayer::queryIntersectsFeature(
     return util::polygonIntersectsBufferedMultiPoint(translatedQueryGeometry.value_or(queryGeometry), feature.getGeometries(), circleRadius);
 }
 
-}
+} // namespace mbgl
