@@ -28,7 +28,7 @@ Mutable<SymbolLayer::Impl> SymbolLayer::mutableImpl() const {
 std::unique_ptr<Layer> SymbolLayer::cloneRef(const std::string& id_) const {
     auto impl_ = mutableImpl();
     impl_->id = id_;
-    impl_->paint = SymbolPaintProperties::Cascading();
+    impl_->paint = SymbolPaintProperties::Transitionable();
     return std::make_unique<SymbolLayer>(std::move(impl_));
 }
 

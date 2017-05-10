@@ -28,7 +28,7 @@ Mutable<LineLayer::Impl> LineLayer::mutableImpl() const {
 std::unique_ptr<Layer> LineLayer::cloneRef(const std::string& id_) const {
     auto impl_ = mutableImpl();
     impl_->id = id_;
-    impl_->paint = LinePaintProperties::Cascading();
+    impl_->paint = LinePaintProperties::Transitionable();
     return std::make_unique<LineLayer>(std::move(impl_));
 }
 

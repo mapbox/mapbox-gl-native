@@ -5,7 +5,7 @@
 
 namespace mbgl {
 
-class CascadeParameters;
+class TransitionParameters;
 class PropertyEvaluationParameters;
 
 using TransitioningLight = style::LightProperties::Unevaluated;
@@ -15,7 +15,7 @@ class RenderLight {
 public:
     RenderLight(Immutable<style::Light::Impl>);
 
-    void transition(const CascadeParameters&);
+    void transition(const TransitionParameters&);
     void evaluate(const PropertyEvaluationParameters&);
     bool hasTransition() const;
 

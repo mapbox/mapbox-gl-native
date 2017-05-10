@@ -8,7 +8,7 @@
 
 namespace mbgl {
 
-class CascadeParameters {
+class TransitionParameters {
 public:
     std::vector<style::ClassID> classes;
     TimePoint now;

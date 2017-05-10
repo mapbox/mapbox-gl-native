@@ -19,8 +19,8 @@ std::unique_ptr<Bucket> RenderCircleLayer::createBucket(const BucketParameters& 
     return std::make_unique<CircleBucket>(parameters, layers);
 }
 
-void RenderCircleLayer::cascade(const CascadeParameters& parameters) {
-    unevaluated = impl().paint.cascade(parameters, std::move(unevaluated));
+void RenderCircleLayer::transition(const TransitionParameters& parameters) {
+    unevaluated = impl().paint.transition(parameters, std::move(unevaluated));
 }
 
 void RenderCircleLayer::evaluate(const PropertyEvaluationParameters& parameters) {

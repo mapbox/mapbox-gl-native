@@ -12,7 +12,7 @@ namespace mbgl {
 
 class Bucket;
 class BucketParameters;
-class CascadeParameters;
+class TransitionParameters;
 class PropertyEvaluationParameters;
 
 class RenderLayer {
@@ -26,10 +26,10 @@ public:
 
     virtual ~RenderLayer() = default;
 
-    // Partially evaluate paint properties based on a set of classes.
-    virtual void cascade(const CascadeParameters&) = 0;
+    // Begin transitions for any properties that have changed since the last frame.
+    virtual void transition(const TransitionParameters&) = 0;
 
-    // Fully evaluate cascaded paint properties based on a zoom level.
+    // Fully evaluate possibly-transitioning paint properties based on a zoom level.
     virtual void evaluate(const PropertyEvaluationParameters&) = 0;
 
     // Returns true if any paint properties have active transitions.

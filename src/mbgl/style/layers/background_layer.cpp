@@ -28,7 +28,7 @@ Mutable<BackgroundLayer::Impl> BackgroundLayer::mutableImpl() const {
 std::unique_ptr<Layer> BackgroundLayer::cloneRef(const std::string& id_) const {
     auto impl_ = mutableImpl();
     impl_->id = id_;
-    impl_->paint = BackgroundPaintProperties::Cascading();
+    impl_->paint = BackgroundPaintProperties::Transitionable();
     return std::make_unique<BackgroundLayer>(std::move(impl_));
 }
 

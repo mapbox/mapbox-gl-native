@@ -15,7 +15,7 @@ namespace style {
 template <class T>
 class LightProperty {
 public:
-    using CascadingType = Transitionable<PropertyValue<T>>;
+    using TransitionableType = Transitionable<PropertyValue<T>>;
     using UnevaluatedType = Transitioning<PropertyValue<T>>;
     using EvaluatorType = PropertyEvaluator<T>;
     using PossiblyEvaluatedType = T;
@@ -52,7 +52,7 @@ using LightProperties = Properties<LightAnchor, LightPosition, LightColor, Light
 
 class Light::Impl {
 public:
-    LightProperties::Cascading properties;
+    LightProperties::Transitionable properties;
 };
 
 } // namespace style

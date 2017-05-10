@@ -28,7 +28,7 @@ Mutable<RasterLayer::Impl> RasterLayer::mutableImpl() const {
 std::unique_ptr<Layer> RasterLayer::cloneRef(const std::string& id_) const {
     auto impl_ = mutableImpl();
     impl_->id = id_;
-    impl_->paint = RasterPaintProperties::Cascading();
+    impl_->paint = RasterPaintProperties::Transitionable();
     return std::make_unique<RasterLayer>(std::move(impl_));
 }
 

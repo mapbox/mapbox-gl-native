@@ -33,8 +33,8 @@ std::unique_ptr<SymbolLayout> RenderSymbolLayer::createLayout(const BucketParame
                                           glyphDependencies);
 }
 
-void RenderSymbolLayer::cascade(const CascadeParameters& parameters) {
-    unevaluated = impl().paint.cascade(parameters, std::move(unevaluated));
+void RenderSymbolLayer::transition(const TransitionParameters& parameters) {
+    unevaluated = impl().paint.transition(parameters, std::move(unevaluated));
 }
 
 void RenderSymbolLayer::evaluate(const PropertyEvaluationParameters& parameters) {

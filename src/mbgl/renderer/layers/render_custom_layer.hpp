@@ -10,7 +10,7 @@ public:
     RenderCustomLayer(Immutable<style::CustomLayer::Impl>);
     ~RenderCustomLayer() final = default;
 
-    void cascade(const CascadeParameters&) final {}
+    void transition(const TransitionParameters&) final {}
     void evaluate(const PropertyEvaluationParameters&) override;
     bool hasTransition() const override;
 
