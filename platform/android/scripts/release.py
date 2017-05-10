@@ -1,5 +1,5 @@
 '''
-Utility to schedule SDK builds in CircleCI.
+Utility to schedule SDK builds on CircleCI.
 
 Examples:
 
@@ -49,7 +49,7 @@ ALLOWED_STAGES = ['snapshot', 'beta', 'final']
 # Get the version from GRADLE_PROPERTIES_PATH below
 CURRENT_VERSION_TAG = 'current'
 
-# You can add your API token in https://circleci.com/account/api
+# You can add your API token on https://circleci.com/account/api
 CIRCLECI_API_TOKEN_ENV_VAR = 'CIRCLECI_API_TOKEN'
 
 # In the future we might want to consider alpha, or rc.
