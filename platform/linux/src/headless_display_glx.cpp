@@ -27,7 +27,7 @@ HeadlessDisplay::Impl::Impl() {
         throw std::runtime_error("Failed to open X display.");
     }
 
-    const char *extensions = reinterpret_cast<const char *>(glXQueryServerString(xDisplay, DefaultScreen(xDisplay), GLX_EXTENSIONS));
+    const auto *extensions = reinterpret_cast<const char *>(glXQueryServerString(xDisplay, DefaultScreen(xDisplay), GLX_EXTENSIONS));
     if (!extensions) {
         throw std::runtime_error("Cannot read GLX extensions.");
     }

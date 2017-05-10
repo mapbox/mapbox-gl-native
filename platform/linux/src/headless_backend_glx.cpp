@@ -58,8 +58,8 @@ bool HeadlessBackend::hasDisplay() {
 void HeadlessBackend::createContext() {
     assert(!hasContext());
 
-    Display* xDisplay = display->attribute<Display*>();
-    GLXFBConfig* fbConfigs = display->attribute<GLXFBConfig*>();
+    auto* xDisplay = display->attribute<Display*>();
+    auto* fbConfigs = display->attribute<GLXFBConfig*>();
 
     // Try to create a legacy context.
     GLXContext glContext = glXCreateNewContext(xDisplay, fbConfigs[0], GLX_RGBA_TYPE, None, True);

@@ -71,7 +71,7 @@ void CollisionFeature::bboxifyLabel(const GeometryCoordinates& line, GeometryCoo
         p = line[index];
     } while (anchorDistance > -labelLength / 2);
 
-    float segmentLength = util::dist<float>(line[index], line[index + 1]);
+    auto segmentLength = util::dist<float>(line[index], line[index + 1]);
 
     for (unsigned int i = 0; i < nBoxes; i++) {
         // the distance the box will be from the anchor

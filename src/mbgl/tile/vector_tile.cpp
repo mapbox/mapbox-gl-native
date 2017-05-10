@@ -162,7 +162,7 @@ optional<Value> VectorTileFeature::getValue(const std::string& key) const {
     auto start_itr = tags_iter.begin();
     const auto & end_itr = tags_iter.end();
     while (start_itr != end_itr) {
-        uint32_t tag_key = static_cast<uint32_t>(*start_itr++);
+        auto tag_key = static_cast<uint32_t>(*start_itr++);
 
         if (layerData->keysMap.size() <= tag_key) {
             throw std::runtime_error("feature referenced out of range key");
@@ -172,7 +172,7 @@ optional<Value> VectorTileFeature::getValue(const std::string& key) const {
             throw std::runtime_error("uneven number of feature tag ids");
         }
 
-        uint32_t tag_val = static_cast<uint32_t>(*start_itr++);;
+        auto tag_val = static_cast<uint32_t>(*start_itr++);;
         if (layerData->values.size() <= tag_val) {
             throw std::runtime_error("feature referenced out of range value");
         }
@@ -190,11 +190,11 @@ std::unordered_map<std::string,Value> VectorTileFeature::getProperties() const {
     auto start_itr = tags_iter.begin();
     const auto & end_itr = tags_iter.end();
     while (start_itr != end_itr) {
-        uint32_t tag_key = static_cast<uint32_t>(*start_itr++);
+        auto tag_key = static_cast<uint32_t>(*start_itr++);
         if (start_itr == end_itr) {
             throw std::runtime_error("uneven number of feature tag ids");
         }
-        uint32_t tag_val = static_cast<uint32_t>(*start_itr++);
+        auto tag_val = static_cast<uint32_t>(*start_itr++);
         properties[layerData->keys.at(tag_key)] = layerData->values.at(tag_val);
     }
     return properties;
@@ -219,7 +219,7 @@ GeometryCollection VectorTileFeature::getGeometries() const {
     auto g_itr = geometry_iter.begin();
     while (g_itr != geometry_iter.end()) {
         if (length == 0) {
-            uint32_t cmd_length = static_cast<uint32_t>(*g_itr++);
+            auto cmd_length = static_cast<uint32_t>(*g_itr++);
             cmd = cmd_length & 0x7;
             length = cmd_length >> 3;
         }

@@ -29,7 +29,7 @@ void TileSourceImpl::loadDescription(FileSource& fileSource) {
         return;
     }
 
-    const std::string& url = urlOrTileset.get<std::string>();
+    const auto& url = urlOrTileset.get<std::string>();
     req = fileSource.request(Resource::source(url), [this, url](Response res) {
         if (res.error) {
             observer->onSourceError(base, std::make_exception_ptr(std::runtime_error(res.error->message)));

@@ -145,7 +145,7 @@ void GLFWView::bind() {
 }
 
 void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, int mods) {
-    GLFWView *view = reinterpret_cast<GLFWView *>(glfwGetWindowUserPointer(window));
+    auto *view = reinterpret_cast<GLFWView *>(glfwGetWindowUserPointer(window));
 
     if (action == GLFW_RELEASE) {
         switch (key) {
@@ -356,7 +356,7 @@ void GLFWView::popAnnotation() {
 }
 
 void GLFWView::onScroll(GLFWwindow *window, double /*xOffset*/, double yOffset) {
-    GLFWView *view = reinterpret_cast<GLFWView *>(glfwGetWindowUserPointer(window));
+    auto *view = reinterpret_cast<GLFWView *>(glfwGetWindowUserPointer(window));
     double delta = yOffset * 40;
 
     bool isWheel = delta != 0 && std::fmod(delta, 4.000244140625) == 0;
@@ -378,14 +378,14 @@ void GLFWView::onScroll(GLFWwindow *window, double /*xOffset*/, double yOffset) 
 }
 
 void GLFWView::onWindowResize(GLFWwindow *window, int width, int height) {
-    GLFWView *view = reinterpret_cast<GLFWView *>(glfwGetWindowUserPointer(window));
+    auto *view = reinterpret_cast<GLFWView *>(glfwGetWindowUserPointer(window));
     view->width = width;
     view->height = height;
     view->map->setSize({ static_cast<uint32_t>(view->width), static_cast<uint32_t>(view->height) });
 }
 
 void GLFWView::onFramebufferResize(GLFWwindow *window, int width, int height) {
-    GLFWView *view = reinterpret_cast<GLFWView *>(glfwGetWindowUserPointer(window));
+    auto *view = reinterpret_cast<GLFWView *>(glfwGetWindowUserPointer(window));
     view->fbWidth = width;
     view->fbHeight = height;
     view->bind();
@@ -398,7 +398,7 @@ void GLFWView::onFramebufferResize(GLFWwindow *window, int width, int height) {
 }
 
 void GLFWView::onMouseClick(GLFWwindow *window, int button, int action, int modifiers) {
-    GLFWView *view = reinterpret_cast<GLFWView *>(glfwGetWindowUserPointer(window));
+    auto *view = reinterpret_cast<GLFWView *>(glfwGetWindowUserPointer(window));
 
     if (button == GLFW_MOUSE_BUTTON_RIGHT ||
         (button == GLFW_MOUSE_BUTTON_LEFT && modifiers & GLFW_MOD_CONTROL)) {
@@ -426,7 +426,7 @@ void GLFWView::onMouseClick(GLFWwindow *window, int button, int action, int modi
 }
 
 void GLFWView::onMouseMove(GLFWwindow *window, double x, double y) {
-    GLFWView *view = reinterpret_cast<GLFWView *>(glfwGetWindowUserPointer(window));
+    auto *view = reinterpret_cast<GLFWView *>(glfwGetWindowUserPointer(window));
     if (view->tracking) {
         double dx = x - view->lastX;
         double dy = y - view->lastY;

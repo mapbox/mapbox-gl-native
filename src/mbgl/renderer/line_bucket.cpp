@@ -183,7 +183,7 @@ void LineBucket::addGeometry(const GeometryCoordinates& coordinates, FeatureType
         const bool isSharpCorner = cosHalfAngle < COS_HALF_SHARP_CORNER && prevCoordinate && nextCoordinate;
 
         if (isSharpCorner && i > first) {
-            const double prevSegmentLength = util::dist<double>(*currentCoordinate, *prevCoordinate);
+            const auto prevSegmentLength = util::dist<double>(*currentCoordinate, *prevCoordinate);
             if (prevSegmentLength > 2.0 * sharpCornerOffset) {
                 GeometryCoordinate newPrevVertex = *currentCoordinate - convertPoint<int16_t>(util::round(convertPoint<double>(*currentCoordinate - *prevCoordinate) * (sharpCornerOffset / prevSegmentLength)));
                 distance += util::dist<double>(newPrevVertex, *prevCoordinate);
@@ -356,7 +356,7 @@ void LineBucket::addGeometry(const GeometryCoordinates& coordinates, FeatureType
         }
 
         if (isSharpCorner && i < len - 1) {
-            const double nextSegmentLength = util::dist<double>(*currentCoordinate, *nextCoordinate);
+            const auto nextSegmentLength = util::dist<double>(*currentCoordinate, *nextCoordinate);
             if (nextSegmentLength > 2 * sharpCornerOffset) {
                 GeometryCoordinate newCurrentVertex = *currentCoordinate + convertPoint<int16_t>(util::round(convertPoint<double>(*nextCoordinate - *currentCoordinate) * (sharpCornerOffset / nextSegmentLength)));
                 distance += util::dist<double>(newCurrentVertex, *currentCoordinate);

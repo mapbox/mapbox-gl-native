@@ -87,7 +87,7 @@ Style::~Style() {
     }
 
     for (const auto& layer : layers) {
-        if (CustomLayer* customLayer = layer->as<CustomLayer>()) {
+        if (auto* customLayer = layer->as<CustomLayer>()) {
             customLayer->impl->deinitialize();
         }
     }
@@ -258,7 +258,7 @@ Layer* Style::addLayer(std::unique_ptr<Layer> layer, optional<std::string> befor
         throw std::runtime_error(std::string{"Layer "} + layer->getID() + " already exists");
     }
 
-    if (CustomLayer* customLayer = layer->as<CustomLayer>()) {
+    if (auto* customLayer = layer->as<CustomLayer>()) {
         customLayer->impl->initialize();
     }
 
@@ -280,7 +280,7 @@ std::unique_ptr<Layer> Style::removeLayer(const std::string& id) {
 
     auto layer = std::move(*it);
 
-    if (CustomLayer* customLayer = layer->as<CustomLayer>()) {
+    if (auto* customLayer = layer->as<CustomLayer>()) {
         customLayer->impl->deinitialize();
     }
 

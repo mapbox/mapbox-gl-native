@@ -22,7 +22,7 @@ void LineAnnotationImpl::updateStyle(Style& style) const {
         layer = style.addLayer(std::move(newLayer), AnnotationManager::PointLayerID);
     }
 
-    LineLayer* lineLayer = layer->as<LineLayer>();
+    auto* lineLayer = layer->as<LineLayer>();
     lineLayer->setLineOpacity(annotation.opacity);
     lineLayer->setLineWidth(annotation.width);
     lineLayer->setLineColor(annotation.color);

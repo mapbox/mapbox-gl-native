@@ -10,7 +10,7 @@ namespace util {
 class Timer::Impl {
 public:
     Impl() : timer(new uv_timer_t) {
-        uv_loop_t* loop = reinterpret_cast<uv_loop_t*>(RunLoop::getLoopHandle());
+        auto* loop = reinterpret_cast<uv_loop_t*>(RunLoop::getLoopHandle());
         if (uv_timer_init(loop, timer) != 0) {
             throw std::runtime_error("Failed to initialize timer.");
         }

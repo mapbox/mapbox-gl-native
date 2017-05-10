@@ -21,7 +21,7 @@ using PaintPropertySetter = optional<Error> (*) (Layer&, const V&, const optiona
 
 template <class V, class L, class PropertyValue, void (L::*setter)(PropertyValue)>
 optional<Error> setLayoutProperty(Layer& layer, const V& value) {
-    L* typedLayer = layer.as<L>();
+    auto* typedLayer = layer.as<L>();
     if (!typedLayer) {
         return Error { "layer doesn't support this property" };
     }
@@ -38,7 +38,7 @@ optional<Error> setLayoutProperty(Layer& layer, const V& value) {
 
 template <class V, class L, class PropertyValue, void (L::*setter)(PropertyValue, const optional<std::string>&)>
 optional<Error> setPaintProperty(Layer& layer, const V& value, const optional<std::string>& klass) {
-    L* typedLayer = layer.as<L>();
+    auto* typedLayer = layer.as<L>();
     if (!typedLayer) {
         return Error { "layer doesn't support this property" };
     }
@@ -55,7 +55,7 @@ optional<Error> setPaintProperty(Layer& layer, const V& value, const optional<st
 
 template <class V, class L, void (L::*setter)(const TransitionOptions&, const optional<std::string>&)>
 optional<Error> setTransition(Layer& layer, const V& value, const optional<std::string>& klass) {
-    L* typedLayer = layer.as<L>();
+    auto* typedLayer = layer.as<L>();
     if (!typedLayer) {
         return Error { "layer doesn't support this property" };
     }

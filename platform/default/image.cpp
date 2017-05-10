@@ -12,7 +12,7 @@ PremultipliedImage decodePNG(const uint8_t*, size_t);
 PremultipliedImage decodeJPEG(const uint8_t*, size_t);
 
 PremultipliedImage decodeImage(const std::string& string) {
-    const uint8_t* data = reinterpret_cast<const uint8_t*>(string.data());
+    const auto* data = reinterpret_cast<const uint8_t*>(string.data());
     const size_t size = string.size();
 
 #if !defined(__ANDROID__) && !defined(__APPLE__)

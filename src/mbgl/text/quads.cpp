@@ -177,7 +177,7 @@ inline Point<float> getVirtualSegmentAnchor(const Point<float>& segmentBegin, co
 inline float getMinScaleForSegment(const float glyphDistanceFromAnchor,
                          const Point<float>& segmentAnchor,
                          const Point<float>& segmentEnd) {
-    const float distanceFromAnchorToEnd = util::dist<float>(segmentAnchor, segmentEnd);
+    const auto distanceFromAnchorToEnd = util::dist<float>(segmentAnchor, segmentEnd);
     return glyphDistanceFromAnchor / distanceFromAnchorToEnd;
 }
 

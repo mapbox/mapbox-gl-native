@@ -32,7 +32,7 @@ public:
     }
 
     T* get() {
-        T* ret = reinterpret_cast<T*>(pthread_getspecific(key));
+        auto* ret = reinterpret_cast<T*>(pthread_getspecific(key));
         if (!ret) {
             return nullptr;
         }

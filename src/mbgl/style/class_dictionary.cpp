@@ -18,7 +18,7 @@ ClassDictionary &ClassDictionary::Get() {
         });
     });
 
-    ClassDictionary *ptr = reinterpret_cast<ClassDictionary *>(pthread_getspecific(store_key));
+    auto *ptr = reinterpret_cast<ClassDictionary *>(pthread_getspecific(store_key));
     if (ptr == nullptr) {
         ptr = new ClassDictionary();
         pthread_setspecific(store_key, ptr);
@@ -31,7 +31,7 @@ ClassID ClassDictionary::lookup(const std::string &class_name) {
     auto it = store.find(class_name);
     if (it == store.end()) {
         // Insert the class name into the store.
-        ClassID id = ClassID(uint32_t(ClassID::Named) + offset++);
+        auto id = ClassID(uint32_t(ClassID::Named) + offset++);
         store.emplace(class_name, id);
         return id;
     } else {
