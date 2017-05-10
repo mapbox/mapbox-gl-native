@@ -49,7 +49,7 @@ public:
     WritingModeType writingMode;
 };
 
-typedef std::vector<SymbolQuad> SymbolQuads;
+using SymbolQuads = std::vector<SymbolQuad>;
 
 SymbolQuad getIconQuad(const Anchor& anchor,
                        const PositionedIcon& shapedIcon,

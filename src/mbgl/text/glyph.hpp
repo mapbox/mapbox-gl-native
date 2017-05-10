@@ -13,8 +13,8 @@
 
 namespace mbgl {
 
-typedef char16_t GlyphID;
-typedef std::set<GlyphID> GlyphIDs;
+using GlyphID = char16_t;
+using GlyphIDs = std::set<GlyphID>;
     
 // Note: this only works for the BMP
 GlyphRange getGlyphRange(GlyphID glyph);
@@ -40,8 +40,8 @@ struct Glyph {
     GlyphMetrics metrics;
 };
 
-typedef std::map<GlyphID, optional<Glyph>> GlyphPositions;
-typedef std::map<FontStack, GlyphPositions> GlyphPositionMap;
+using GlyphPositions = std::map<GlyphID, optional<Glyph>>;
+using GlyphPositionMap = std::map<FontStack, GlyphPositions>;
 
 class PositionedGlyph {
 public:
@@ -97,8 +97,7 @@ constexpr WritingModeType operator~(WritingModeType value) {
     return WritingModeType(~mbgl::underlying_type(value));
 }
 
-typedef std::map<FontStack,GlyphIDs> GlyphDependencies;
-typedef std::map<FontStack,GlyphRangeSet> GlyphRangeDependencies;
-
+using GlyphDependencies = std::map<FontStack,GlyphIDs>;
+using GlyphRangeDependencies = std::map<FontStack,GlyphRangeSet>;
 
 } // end namespace mbgl

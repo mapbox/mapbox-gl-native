@@ -17,6 +17,6 @@ public:
         : point(x_, y_), angle(angle_), scale(scale_), segment(segment_) {}
 };
 
-typedef std::vector<Anchor> Anchors;
+using Anchors = std::vector<Anchor>;
 
 } // namespace mbgl

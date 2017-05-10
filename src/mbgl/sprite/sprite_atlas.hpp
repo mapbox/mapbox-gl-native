@@ -38,8 +38,8 @@ public:
     float height;
 };
 
-typedef std::map<std::string, SpriteAtlasElement> IconMap;
-typedef std::set<std::string> IconDependencies;
+using IconMap = std::map<std::string, SpriteAtlasElement>;
+using IconDependencies = std::set<std::string>;
 
 class IconRequestor {
 public:

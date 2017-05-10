@@ -108,7 +108,7 @@ struct GlyphInstance {
     const float angle = 0.0f;
 };
 
-typedef std::vector<GlyphInstance> GlyphInstances;
+using GlyphInstances = std::vector<GlyphInstance>;
     
 struct VirtualSegment {
     Point<float> anchor;

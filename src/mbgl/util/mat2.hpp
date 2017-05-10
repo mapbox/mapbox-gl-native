@@ -26,7 +26,7 @@
 
 namespace mbgl {
 
-typedef std::array<double, 4> mat2;
+using mat2 = std::array<double, 4>;
 
 namespace matrix {
 

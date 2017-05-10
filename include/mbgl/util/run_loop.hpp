@@ -16,7 +16,7 @@
 namespace mbgl {
 namespace util {
 
-typedef void * LOOP_HANDLE;
+using LOOP_HANDLE = void *;
 
 class RunLoop : public Scheduler,
                 private util::noncopyable {
