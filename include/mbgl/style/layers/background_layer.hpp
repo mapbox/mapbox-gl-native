@@ -29,22 +29,22 @@ public:
     // Paint properties
 
     static PropertyValue<Color> getDefaultBackgroundColor();
-    PropertyValue<Color> getBackgroundColor(const optional<std::string>& klass = {}) const;
-    void setBackgroundColor(PropertyValue<Color>, const optional<std::string>& klass = {});
-    void setBackgroundColorTransition(const TransitionOptions&, const optional<std::string>& klass = {});
-    TransitionOptions getBackgroundColorTransition(const optional<std::string>& klass = {}) const;
+    PropertyValue<Color> getBackgroundColor() const;
+    void setBackgroundColor(PropertyValue<Color>);
+    void setBackgroundColorTransition(const TransitionOptions&);
+    TransitionOptions getBackgroundColorTransition() const;
 
     static PropertyValue<std::string> getDefaultBackgroundPattern();
-    PropertyValue<std::string> getBackgroundPattern(const optional<std::string>& klass = {}) const;
-    void setBackgroundPattern(PropertyValue<std::string>, const optional<std::string>& klass = {});
-    void setBackgroundPatternTransition(const TransitionOptions&, const optional<std::string>& klass = {});
-    TransitionOptions getBackgroundPatternTransition(const optional<std::string>& klass = {}) const;
+    PropertyValue<std::string> getBackgroundPattern() const;
+    void setBackgroundPattern(PropertyValue<std::string>);
+    void setBackgroundPatternTransition(const TransitionOptions&);
+    TransitionOptions getBackgroundPatternTransition() const;
 
     static PropertyValue<float> getDefaultBackgroundOpacity();
-    PropertyValue<float> getBackgroundOpacity(const optional<std::string>& klass = {}) const;
-    void setBackgroundOpacity(PropertyValue<float>, const optional<std::string>& klass = {});
-    void setBackgroundOpacityTransition(const TransitionOptions&, const optional<std::string>& klass = {});
-    TransitionOptions getBackgroundOpacityTransition(const optional<std::string>& klass = {}) const;
+    PropertyValue<float> getBackgroundOpacity() const;
+    void setBackgroundOpacity(PropertyValue<float>);
+    void setBackgroundOpacityTransition(const TransitionOptions&);
+    TransitionOptions getBackgroundOpacityTransition() const;
 
     // Private implementation
 

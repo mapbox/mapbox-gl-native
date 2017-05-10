@@ -92,63 +92,6 @@ public:
     }
 };
 
-template <class Value>
-class Cascading {
-public:
-    bool isUndefined() const {
-        return values.find(ClassID::Default) == values.end();
-    }
-
-    const Value& get(const optional<std::string>& klass) const {
-        static const Value staticValue{};
-        const auto it = values.find(klass ? ClassDictionary::Get().lookup(*klass) : ClassID::Default);
-        return it == values.end() ? staticValue : it->second;
-    }
-
-    void set(const Value& value_, const optional<std::string>& klass) {
-        values[klass ? ClassDictionary::Get().lookup(*klass) : ClassID::Default] = value_;
-    }
-
-    const TransitionOptions& getTransition(const optional<std::string>& klass) const {
-        static const TransitionOptions staticValue{};
-        const auto it = transitions.find(klass ? ClassDictionary::Get().lookup(*klass) : ClassID::Default);
-        return it == transitions.end() ? staticValue : it->second;
-    }
-
-    void setTransition(const TransitionOptions& transition, const optional<std::string>& klass) {
-        transitions[klass ? ClassDictionary::Get().lookup(*klass) : ClassID::Default] = transition;
-    }
-
-    Transitioning<Value> transition(const TransitionParameters& params, Transitioning<Value> prior) const {
-        TransitionOptions transition;
-        Value value;
-
-        for (const auto classID : params.classes) {
-            if (values.find(classID) != values.end()) {
-                value = values.at(classID);
-                break;
-            }
-        }
-
-        for (const auto classID : params.classes) {
-            if (transitions.find(classID) != transitions.end()) {
-                transition = transitions.at(classID).reverseMerge(transition);
-                break;
-            }
-        }
-
-        return Transitioning<Value>(std::move(value),
-                                    std::move(prior),
-                                    transition.reverseMerge(params.transition),
-                                    params.now);
-    }
-
-private:
-    std::map<ClassID, Value> values;
-    std::map<ClassID, TransitionOptions> transitions;
-};
-
-
 template <class P>
 struct IsDataDriven : std::integral_constant<bool, P::IsDataDriven> {};
 

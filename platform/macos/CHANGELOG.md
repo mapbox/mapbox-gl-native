@@ -2,6 +2,10 @@
 
 ## master
 
+* The previously-deprecated support for style classes has been removed. For interface compatibility, the API methods remain, but they are now non-functional.
+
+## 0.5.0
+
 ### Styles
 
 * Added support for 3D extrusion of buildings and other polygonal features via the `MGLFillExtrusionStyleLayer` class and the `fill-extrusion` layer type in style JSON. ([#8431](https://github.com/mapbox/mapbox-gl-native/pull/8431))

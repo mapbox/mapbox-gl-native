@@ -27,21 +27,11 @@ TEST(StyleConversion, LayerTransition) {
                 "duration": 400,
                 "delay": 500
             }
-        },
-        "paint.class": {
-            "background-color-transition": {
-                "duration": 100
-            }
         }
     })JSON");
 
     ASSERT_EQ(400ms, *layer->as<BackgroundLayer>()->impl().paint
-        .get<BackgroundColor>().getTransition({}).duration);
+        .get<BackgroundColor>().options.duration);
     ASSERT_EQ(500ms, *layer->as<BackgroundLayer>()->impl().paint
-        .get<BackgroundColor>().getTransition({}).delay);
-
-    ASSERT_EQ(100ms, *layer->as<BackgroundLayer>()->impl().paint
-        .get<BackgroundColor>().getTransition({"class"}).duration);
-    ASSERT_FALSE(bool(layer->as<BackgroundLayer>()->impl().paint
-        .get<BackgroundColor>().getTransition({"class"}).delay));
+        .get<BackgroundColor>().options.delay);
 }

@@ -1053,25 +1053,6 @@ bool Map::isFullyLoaded() const {
     return impl->style ? impl->style->isLoaded() : false;
 }
 
-void Map::addClass(const std::string& className) {
-    if (impl->style && impl->style->addClass(className)) {
-        impl->onUpdate(Update::Classes);
-    }
-}
-
-void Map::removeClass(const std::string& className) {
-    if (impl->style && impl->style->removeClass(className)) {
-        impl->onUpdate(Update::Classes);
-    }
-}
-
-void Map::setClasses(const std::vector<std::string>& classNames) {
-    if (impl->style) {
-        impl->style->setClasses(classNames);
-        impl->onUpdate(Update::Classes);
-    }
-}
-
 style::TransitionOptions Map::getTransitionOptions() const {
     if (impl->style) {
         return impl->style->getTransitionOptions();
@@ -1083,17 +1064,6 @@ void Map::setTransitionOptions(const style::TransitionOptions& options) {
     if (impl->style) {
         impl->style->setTransitionOptions(options);
     }
-}
-
-bool Map::hasClass(const std::string& className) const {
-    return impl->style ? impl->style->hasClass(className) : false;
-}
-
-std::vector<std::string> Map::getClasses() const {
-    if (impl->style) {
-        return impl->style->getClasses();
-    }
-    return {};
 }
 
 void Map::setSourceTileCacheSize(size_t size) {

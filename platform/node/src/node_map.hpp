@@ -42,7 +42,6 @@ public:
     static void Render(const Nan::FunctionCallbackInfo<v8::Value>&);
     static void Release(const Nan::FunctionCallbackInfo<v8::Value>&);
     static void Cancel(const Nan::FunctionCallbackInfo<v8::Value>&);
-    static void AddClass(const Nan::FunctionCallbackInfo<v8::Value>&);
     static void AddSource(const Nan::FunctionCallbackInfo<v8::Value>&);
     static void AddLayer(const Nan::FunctionCallbackInfo<v8::Value>&);
     static void RemoveLayer(const Nan::FunctionCallbackInfo<v8::Value>&);

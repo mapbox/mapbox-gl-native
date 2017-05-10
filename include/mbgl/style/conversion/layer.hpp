@@ -28,30 +28,23 @@ optional<Error> setLayoutProperty(Layer& layer, const std::string& name, const V
 }
 
 template <class V>
-optional<Error> setPaintProperty(Layer& layer, const std::string& name, const V& value, const optional<std::string>& klass) {
+optional<Error> setPaintProperty(Layer& layer, const std::string& name, const V& value) {
     static const auto setters = makePaintPropertySetters<V>();
     auto it = setters.find(name);
     if (it == setters.end()) {
         return Error { "property not found" };
     }
-    return it->second(layer, value, klass);
+    return it->second(layer, value);
 }
 
 template <class V>
 optional<Error> setPaintProperties(Layer& layer, const V& value) {
-    return eachMember(value, [&] (const std::string& paintName, const V& paintValue) -> optional<Error> {
-        if (paintName.compare(0, 5, "paint") != 0) {
-            return {};
-        }
-
-        optional<std::string> klass;
-        if (paintName.compare(0, 6, "paint.") == 0) {
-            klass = paintName.substr(6);
-        }
-
-        return eachMember(paintValue, [&] (const std::string& k, const V& v) {
-            return setPaintProperty(layer, k, v, klass);
-        });
+    auto paintValue = objectMember(value, "paint");
+    if (!paintValue) {
+        return {};
+    }
+    return eachMember(*paintValue, [&] (const std::string& k, const V& v) {
+        return setPaintProperty(layer, k, v);
     });
 }
 

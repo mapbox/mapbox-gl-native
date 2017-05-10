@@ -469,60 +469,32 @@ static NSURL *MGLStyleURL_emerald;
 
 - (NS_ARRAY_OF(NSString *) *)styleClasses
 {
-    const std::vector<std::string> &appliedClasses = self.mapView.mbglMap->getClasses();
-
-    NSMutableArray *returnArray = [NSMutableArray arrayWithCapacity:appliedClasses.size()];
-
-    for (auto appliedClass : appliedClasses) {
-       [returnArray addObject:@(appliedClass.c_str())];
-    }
-
-    return returnArray;
+    return @[];
 }
 
 - (void)setStyleClasses:(NS_ARRAY_OF(NSString *) *)appliedClasses
 {
-    [self setStyleClasses:appliedClasses transitionDuration:0];
 }
 
 - (void)setStyleClasses:(NS_ARRAY_OF(NSString *) *)appliedClasses transitionDuration:(NSTimeInterval)transitionDuration
 {
-    std::vector<std::string> newAppliedClasses;
-
-    for (NSString *appliedClass in appliedClasses)
-    {
-        newAppliedClasses.push_back([appliedClass UTF8String]);
-    }
-
-    mbgl::style::TransitionOptions transition { { MGLDurationFromTimeInterval(transitionDuration) } };
-    self.mapView.mbglMap->setTransitionOptions(transition);
-    self.mapView.mbglMap->setClasses(newAppliedClasses);
 }
 
 - (NSUInteger)countOfStyleClasses {
-    const auto &classes = self.mapView.mbglMap->getClasses();
-    return classes.size();
+    return 0;
 }
 
 - (BOOL)hasStyleClass:(NSString *)styleClass
 {
-    return styleClass && self.mapView.mbglMap->hasClass([styleClass UTF8String]);
+    return NO;
 }
 
 - (void)addStyleClass:(NSString *)styleClass
 {
-    if (styleClass)
-    {
-        self.mapView.mbglMap->addClass([styleClass UTF8String]);
-    }
 }
 
 - (void)removeStyleClass:(NSString *)styleClass
 {
-    if (styleClass)
-    {
-        self.mapView.mbglMap->removeClass([styleClass UTF8String]);
-    }
 }
 
 #pragma mark Style images

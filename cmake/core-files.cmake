@@ -328,8 +328,6 @@ set(MBGL_CORE_FILES
     include/mbgl/style/transition_options.hpp
     include/mbgl/style/types.hpp
     include/mbgl/style/undefined.hpp
-    src/mbgl/style/class_dictionary.cpp
-    src/mbgl/style/class_dictionary.hpp
     src/mbgl/style/image.cpp
     src/mbgl/style/image_impl.cpp
     src/mbgl/style/image_impl.hpp

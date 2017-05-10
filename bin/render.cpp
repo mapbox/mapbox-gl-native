@@ -34,7 +34,6 @@ int main(int argc, char *argv[]) {
     static std::string output = "out.png";
     std::string cache_file = "cache.sqlite";
     std::string asset_root = ".";
-    std::vector<std::string> classes;
     std::string token;
     bool debug = false;
 
@@ -49,7 +48,6 @@ int main(int argc, char *argv[]) {
         ("width,w", po::value(&width)->value_name("pixels")->default_value(width), "Image width")
         ("height,h", po::value(&height)->value_name("pixels")->default_value(height), "Image height")
         ("ratio,r", po::value(&pixelRatio)->value_name("number")->default_value(pixelRatio), "Image scale factor")
-        ("class,c", po::value(&classes)->value_name("name"), "Class name")
         ("token,t", po::value(&token)->value_name("key")->default_value(token), "Mapbox access token")
         ("debug", po::bool_switch(&debug)->default_value(debug), "Debug mode")
         ("output,o", po::value(&output)->value_name("file")->default_value(output), "Output file name")
@@ -95,9 +93,6 @@ int main(int argc, char *argv[]) {
     }
 
     map.setStyleURL(style_path);
-
-    map.setClasses(classes);
-
     map.setLatLngZoom({ lat, lon }, zoom);
     map.setBearing(bearing);
     map.setPitch(pitch);

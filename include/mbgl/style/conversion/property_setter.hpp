@@ -14,13 +14,10 @@ namespace style {
 namespace conversion {
 
 template <class V>
-using LayoutPropertySetter = optional<Error> (*) (Layer&, const V&);
-
-template <class V>
-using PaintPropertySetter = optional<Error> (*) (Layer&, const V&, const optional<std::string>&);
+using PropertySetter = optional<Error> (*) (Layer&, const V&);
 
 template <class V, class L, class PropertyValue, void (L::*setter)(PropertyValue)>
-optional<Error> setLayoutProperty(Layer& layer, const V& value) {
+optional<Error> setProperty(Layer& layer, const V& value) {
     auto* typedLayer = layer.as<L>();
     if (!typedLayer) {
         return Error { "layer doesn't support this property" };
@@ -36,25 +33,8 @@ optional<Error> setLayoutProperty(Layer& layer, const V& value) {
     return {};
 }
 
-template <class V, class L, class PropertyValue, void (L::*setter)(PropertyValue, const optional<std::string>&)>
-optional<Error> setPaintProperty(Layer& layer, const V& value, const optional<std::string>& klass) {
-    auto* typedLayer = layer.as<L>();
-    if (!typedLayer) {
-        return Error { "layer doesn't support this property" };
-    }
-
-    Error error;
-    optional<PropertyValue> typedValue = convert<PropertyValue>(value, error);
-    if (!typedValue) {
-        return error;
-    }
-
-    (typedLayer->*setter)(*typedValue, klass);
-    return {};
-}
-
-template <class V, class L, void (L::*setter)(const TransitionOptions&, const optional<std::string>&)>
-optional<Error> setTransition(Layer& layer, const V& value, const optional<std::string>& klass) {
+template <class V, class L, void (L::*setter)(const TransitionOptions&)>
+optional<Error> setTransition(Layer& layer, const V& value) {
     auto* typedLayer = layer.as<L>();
     if (!typedLayer) {
         return Error { "layer doesn't support this property" };
@@ -66,7 +46,7 @@ optional<Error> setTransition(Layer& layer, const V& value, const optional<std::
         return error;
     }
 
-    (typedLayer->*setter)(*transition, klass);
+    (typedLayer->*setter)(*transition);
     return {};
 }
 

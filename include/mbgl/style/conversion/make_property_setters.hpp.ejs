@@ -16,13 +16,13 @@ namespace conversion {
 
 template <class V>
 auto makeLayoutPropertySetters() {
-    std::unordered_map<std::string, LayoutPropertySetter<V>> result;
+    std::unordered_map<std::string, PropertySetter<V>> result;
 
     result["visibility"] = &setVisibility<V>;
 
 <% for (const layer of locals.layers) { -%>
 <% for (const property of layer.layoutProperties) { -%>
-    result["<%- property.name %>"] = &setLayoutProperty<V, <%- camelize(layer.type) %>Layer, <%- propertyValueType(property) %>, &<%- camelize(layer.type) %>Layer::set<%- camelize(property.name) %>>;
+    result["<%- property.name %>"] = &setProperty<V, <%- camelize(layer.type) %>Layer, <%- propertyValueType(property) %>, &<%- camelize(layer.type) %>Layer::set<%- camelize(property.name) %>>;
 <% } -%>
 
 <% } -%>
@@ -31,11 +31,11 @@ auto makeLayoutPropertySetters() {
 
 template <class V>
 auto makePaintPropertySetters() {
-    std::unordered_map<std::string, PaintPropertySetter<V>> result;
+    std::unordered_map<std::string, PropertySetter<V>> result;
 
 <% for (const layer of locals.layers) { -%>
 <% for (const property of layer.paintProperties) { -%>
-    result["<%- property.name %>"] = &setPaintProperty<V, <%- camelize(layer.type) %>Layer, <%- propertyValueType(property) %>, &<%- camelize(layer.type) %>Layer::set<%- camelize(property.name) %>>;
+    result["<%- property.name %>"] = &setProperty<V, <%- camelize(layer.type) %>Layer, <%- propertyValueType(property) %>, &<%- camelize(layer.type) %>Layer::set<%- camelize(property.name) %>>;
     result["<%- property.name %>-transition"] = &setTransition<V, <%- camelize(layer.type) %>Layer, &<%- camelize(layer.type) %>Layer::set<%- camelize(property.name) %>Transition>;
 <% } -%>
 

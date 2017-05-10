@@ -270,13 +270,25 @@ IB_DESIGNABLE
  */
 @property (nonatomic, readonly) UIButton *attributionButton;
 
-@property (nonatomic) NS_ARRAY_OF(NSString *) *styleClasses __attribute__((deprecated("Use style.styleClasses.")));
+/**
+ Support for style classes has been removed. This property always returns an empty array.
+ */
+@property (nonatomic) NS_ARRAY_OF(NSString *) *styleClasses __attribute__((deprecated("This property is non-functional.")));
 
-- (BOOL)hasStyleClass:(NSString *)styleClass __attribute__((deprecated("Use style.hasStyleClass:.")));
+/**
+ Support for style classes has been removed. This property always returns NO.
+ */
+- (BOOL)hasStyleClass:(NSString *)styleClass __attribute__((deprecated("This method is non-functional.")));
 
-- (void)addStyleClass:(NSString *)styleClass __attribute__((deprecated("Use style.addStyleClass:.")));
+/**
+ Support for style classes has been removed. This property is a no-op.
+ */
+- (void)addStyleClass:(NSString *)styleClass __attribute__((deprecated("This method is non-functional.")));
 
-- (void)removeStyleClass:(NSString *)styleClass __attribute__((deprecated("Use style.removeStyleClass:.")));
+/**
+ Support for style classes has been removed. This property is a no-op.
+ */
+- (void)removeStyleClass:(NSString *)styleClass __attribute__((deprecated("This method is non-functional.")));
 
 #pragma mark Displaying the User’s Location
 
