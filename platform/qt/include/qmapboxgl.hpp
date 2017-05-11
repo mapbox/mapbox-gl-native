@@ -219,8 +219,8 @@ public:
         QMapbox::CustomLayerRenderFunction,
         QMapbox::CustomLayerDeinitializeFunction,
         void* context,
-        char* before = NULL);
-    void addLayer(const QVariantMap &params);
+        const QString& before = QString());
+    void addLayer(const QVariantMap &params, const QString& before = QString());
     bool layerExists(const QString &id);
     void removeLayer(const QString &id);
 
