@@ -76,10 +76,20 @@ public class VectorSource extends Source {
     return features != null ? Arrays.asList(features) : new ArrayList<Feature>();
   }
 
+  /**
+   * @return The url or null
+   */
+  @Nullable
+  public String getUrl() {
+    return nativeGetUrl();
+  }
+
   protected native void initialize(String layerId, Object payload);
 
   @Override
   protected native void finalize() throws Throwable;
+
+  protected native String nativeGetUrl();
 
   private native Feature[] querySourceFeatures(String[] sourceLayerId,
                                                Object[] filter);

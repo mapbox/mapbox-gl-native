@@ -228,6 +228,14 @@ public class GeoJsonSource extends Source {
   }
 
   /**
+   * @return The url or null
+   */
+  @Nullable
+  public String getUrl() {
+    return nativeGetUrl();
+  }
+
+  /**
    * Queries the source for features.
    *
    * @param filter an optional filter statement to filter the returned Features
@@ -242,6 +250,8 @@ public class GeoJsonSource extends Source {
   protected native void initialize(String layerId, Object options);
 
   protected native void nativeSetUrl(String url);
+
+  protected native String nativeGetUrl();
 
   private native void nativeSetGeoJsonString(String geoJson);
 

@@ -34,6 +34,11 @@ namespace android {
 
     VectorSource::~VectorSource() = default;
 
+    jni::String VectorSource::getURL(jni::JNIEnv& env) {
+        optional<std::string> url = source.as<mbgl::style::VectorSource>()->VectorSource::getURL();
+        return url ? jni::Make<jni::String>(env, *url) : jni::String();
+    }
+
     jni::Array<jni::Object<geojson::Feature>> VectorSource::querySourceFeatures(jni::JNIEnv& env,
                                                                              jni::Array<jni::String> jSourceLayerIds,
                                                                              jni::Array<jni::Object<>> jfilter) {
@@ -66,7 +71,8 @@ namespace android {
             std::make_unique<VectorSource, JNIEnv&, jni::String, jni::Object<>>,
             "initialize",
             "finalize",
-            METHOD(&VectorSource::querySourceFeatures, "querySourceFeatures")
+            METHOD(&VectorSource::querySourceFeatures, "querySourceFeatures"),
+            METHOD(&VectorSource::getURL, "nativeGetUrl")
         );
     }
 
