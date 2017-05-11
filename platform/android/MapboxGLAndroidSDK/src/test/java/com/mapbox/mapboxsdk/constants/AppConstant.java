@@ -1,4 +1,4 @@
-package com.mapbox.mapboxsdk.testapp.model.constants;
+package com.mapbox.mapboxsdk.constants;
 
 public class AppConstant {
 

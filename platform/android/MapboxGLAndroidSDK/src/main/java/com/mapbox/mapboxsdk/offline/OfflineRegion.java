@@ -5,6 +5,7 @@ import android.os.Looper;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 
+import com.mapbox.mapboxsdk.LibraryLoader;
 import com.mapbox.mapboxsdk.storage.FileSource;
 
 import java.lang.annotation.Retention;
@@ -22,7 +23,7 @@ public class OfflineRegion {
   //
 
   static {
-    System.loadLibrary("mapbox-gl");
+    LibraryLoader.load();
   }
 
   // Members
@@ -205,7 +206,7 @@ public class OfflineRegion {
 
   /**
    * Constructor
-   *
+   * <p>
    * For JNI use only, to create a new offline region, use
    * {@link OfflineManager#createOfflineRegion} instead.
    */

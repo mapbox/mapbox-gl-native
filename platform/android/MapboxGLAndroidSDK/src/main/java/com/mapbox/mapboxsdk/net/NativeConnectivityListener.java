@@ -1,12 +1,14 @@
 package com.mapbox.mapboxsdk.net;
 
+import com.mapbox.mapboxsdk.LibraryLoader;
+
 /**
  * Updates the native library's connectivity state
  */
 class NativeConnectivityListener implements ConnectivityListener {
 
   static {
-    System.loadLibrary("mapbox-gl");
+    LibraryLoader.load();
   }
 
   private long nativePtr;

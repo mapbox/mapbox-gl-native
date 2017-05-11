@@ -32,10 +32,6 @@ android {
         disable 'InvalidPackage'
     }
 
-    testOptions {
-        unitTests.returnDefaultValues = true
-    }
-
     buildTypes {
         debug {
             testCoverageEnabled = true
@@ -78,8 +74,6 @@ dependencies {
     }
 
     // Testing dependencies
-    testCompile rootProject.ext.dep.junit
-    testCompile rootProject.ext.dep.mockito
     androidTestCompile rootProject.ext.dep.testSpoonRunner
     androidTestCompile rootProject.ext.dep.supportAnnotations
     androidTestCompile rootProject.ext.dep.testRunner
