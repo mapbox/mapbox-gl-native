@@ -39,15 +39,15 @@ int main(int argc, char *argv[]) {
     bool skipConfig = false;
 
     const struct option long_options[] = {
-        {"fullscreen", no_argument, 0, 'f'},
-        {"benchmark", no_argument, 0, 'b'},
-        {"style", required_argument, 0, 's'},
-        {"lon", required_argument, 0, 'x'},
-        {"lat", required_argument, 0, 'y'},
-        {"zoom", required_argument, 0, 'z'},
-        {"bearing", required_argument, 0, 'r'},
-        {"pitch", required_argument, 0, 'p'},
-        {0, 0, 0, 0}
+        {"fullscreen", no_argument, nullptr, 'f'},
+        {"benchmark", no_argument, nullptr, 'b'},
+        {"style", required_argument, nullptr, 's'},
+        {"lon", required_argument, nullptr, 'x'},
+        {"lat", required_argument, nullptr, 'y'},
+        {"zoom", required_argument, nullptr, 'z'},
+        {"bearing", required_argument, nullptr, 'r'},
+        {"pitch", required_argument, nullptr, 'p'},
+        {nullptr, 0, nullptr, 0}
     };
 
     while (true) {
@@ -57,7 +57,7 @@ int main(int argc, char *argv[]) {
         switch (opt)
         {
         case 0:
-            if (long_options[option_index].flag != 0)
+            if (long_options[option_index].flag != nullptr)
                 break;
         case 'f':
             fullscreen = true;
@@ -99,7 +99,7 @@ int main(int argc, char *argv[]) {
     sigIntHandler.sa_handler = quit_handler;
     sigemptyset(&sigIntHandler.sa_mask);
     sigIntHandler.sa_flags = 0;
-    sigaction(SIGINT, &sigIntHandler, NULL);
+    sigaction(SIGINT, &sigIntHandler, nullptr);
 
     if (benchmark) {
         mbgl::Log::Info(mbgl::Event::General, "BENCHMARK MODE: Some optimizations are disabled.");
