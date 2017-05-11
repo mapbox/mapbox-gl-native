@@ -18,7 +18,7 @@ LayerType Layer::getType() const {
     return baseImpl->type;
 }
 
-const std::string& Layer::getID() const {
+std::string Layer::getID() const {
     return baseImpl->id;
 }
 

@@ -19,7 +19,7 @@ SourceType Source::getType() const {
     return baseImpl->type;
 }
 
-const std::string& Source::getID() const {
+std::string Source::getID() const {
     return baseImpl->id;
 }
 
