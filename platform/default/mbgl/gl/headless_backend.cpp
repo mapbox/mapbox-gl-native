@@ -9,8 +9,7 @@
 
 namespace mbgl {
 
-HeadlessBackend::HeadlessBackend() {
-}
+HeadlessBackend::HeadlessBackend() = default;
 
 HeadlessBackend::HeadlessBackend(std::shared_ptr<HeadlessDisplay> display_)
         : display(std::move(display_)) {

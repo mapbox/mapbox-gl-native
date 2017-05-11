@@ -107,8 +107,7 @@ Database &Database::operator=(Database &&other) {
     return *this;
 }
 
-Database::~Database() {
-}
+Database::~Database() = default;
 
 void Database::setBusyTimeout(std::chrono::milliseconds timeout) {
     assert(impl);
@@ -151,8 +150,7 @@ Statement &Statement::operator=(Statement &&other) {
     return *this;
 }
 
-Statement::~Statement() {
-}
+Statement::~Statement() = default;
 
 template <> void Statement::bind(int offset, std::nullptr_t) {
     assert(impl);

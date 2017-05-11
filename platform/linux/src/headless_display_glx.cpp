@@ -73,7 +73,6 @@ HeadlessDisplay::HeadlessDisplay()
     : impl(std::make_unique<Impl>()) {
 }
 
-HeadlessDisplay::~HeadlessDisplay() {
-}
+HeadlessDisplay::~HeadlessDisplay() = default;
 
 } // namespace mbgl
