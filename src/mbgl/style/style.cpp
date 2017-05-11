@@ -52,6 +52,21 @@ namespace style {
 
 static Observer nullObserver;
 
+struct QueueSourceReloadVisitor {
+    UpdateBatch& updateBatch;
+
+    // No need to reload sources for these types; their visibility can change but
+    // they don't participate in layout.
+    void operator()(CustomLayer&) {}
+    void operator()(RasterLayer&) {}
+    void operator()(BackgroundLayer&) {}
+
+    template <class VectorLayer>
+    void operator()(VectorLayer& layer) {
+        updateBatch.sourceIDs.insert(layer.getSourceID());
+    }
+};
+
 Style::Style(Scheduler& scheduler_, FileSource& fileSource_, float pixelRatio)
     : scheduler(scheduler_),
       fileSource(fileSource_),
@@ -248,6 +263,7 @@ Layer* Style::addLayer(std::unique_ptr<Layer> layer, optional<std::string> befor
     }
 
     layer->baseImpl->setObserver(this);
+    layer->accept(QueueSourceReloadVisitor { updateBatch });
 
     auto added = layers.emplace(before ? findLayer(*before) : layers.end(), std::move(layer))->get();
     renderLayers.emplace(before ? findRenderLayer(*before) : renderLayers.end(), added->baseImpl->createRenderLayer());
@@ -725,21 +741,6 @@ void Style::onSpriteError(std::exception_ptr error) {
     observer->onSpriteError(error);
     observer->onResourceError(error);
 }
-
-struct QueueSourceReloadVisitor {
-    UpdateBatch& updateBatch;
-
-    // No need to reload sources for these types; their visibility can change but
-    // they don't participate in layout.
-    void operator()(CustomLayer&) {}
-    void operator()(RasterLayer&) {}
-    void operator()(BackgroundLayer&) {}
-
-    template <class VectorLayer>
-    void operator()(VectorLayer& layer) {
-        updateBatch.sourceIDs.insert(layer.getSourceID());
-    }
-};
 
 void Style::onLayerFilterChanged(Layer& layer) {
     layer.accept(QueueSourceReloadVisitor { updateBatch });
