@@ -1338,7 +1338,7 @@ void QMapboxGL::addCustomLayer(const QString &id,
         QMapbox::CustomLayerRenderFunction renderFn,
         QMapbox::CustomLayerDeinitializeFunction deinitFn,
         void *context,
-        char *before)
+        const QString& before)
 {
     d_ptr->mapObj->addLayer(std::make_unique<mbgl::style::CustomLayer>(
             id.toStdString(),
@@ -1348,13 +1348,14 @@ void QMapboxGL::addCustomLayer(const QString &id,
             (mbgl::style::CustomLayerRenderFunction)renderFn,
             reinterpret_cast<mbgl::style::CustomLayerDeinitializeFunction>(deinitFn),
             context),
-            before ? mbgl::optional<std::string>(before) : mbgl::optional<std::string>());
+            before.isEmpty() ? mbgl::optional<std::string>() : mbgl::optional<std::string>(before.toStdString()));
 }
 
 /*!
     Adds a style layer to the map as specified by the \l
     {https://www.mapbox.com/mapbox-gl-style-spec/#root-layers}{Mapbox style specification} with
-    \a params.
+    \a params. The layer will be added under the layer specified by \a before, if specified.
+    Otherwise it will be added as the topmost layer.
 
     This example shows how to add a layer that will be used to show a route line on the map. Note
     that nothing will be drawn until we set paint properties using setPaintProperty().
@@ -1370,7 +1371,7 @@ void QMapboxGL::addCustomLayer(const QString &id,
 
     /note The source must exist prior to adding a layer.
 */
-void QMapboxGL::addLayer(const QVariantMap &params)
+void QMapboxGL::addLayer(const QVariantMap &params, const QString& before)
 {
     using namespace mbgl::style;
     using namespace mbgl::style::conversion;
@@ -1381,7 +1382,8 @@ void QMapboxGL::addLayer(const QVariantMap &params)
         return;
     }
 
-    d_ptr->mapObj->addLayer(std::move(*layer));
+    d_ptr->mapObj->addLayer(std::move(*layer),
+        before.isEmpty() ? mbgl::optional<std::string>() : mbgl::optional<std::string>(before.toStdString()));
 }
 
 /*!
