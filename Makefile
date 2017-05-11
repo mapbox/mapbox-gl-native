@@ -571,7 +571,7 @@ run-android-ui-test-$1: platform/android/configuration.gradle
 
 run-android-ui-test-$1-%: platform/android/configuration.gradle
 	adb uninstall com.mapbox.mapboxsdk.testapp > /dev/null
-	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=$2 :MapboxGLAndroidSDKTestApp:connectedAndroidTest -Pandroid.testInstrumentationRunnerArguments.class="$*"
+	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=$2 :MapboxGLAndroidSDKTestApp:connectedAndroidTest -Pandroid.testInstrumentationRunnerArguments.class="$$*"
 
 endef
 
