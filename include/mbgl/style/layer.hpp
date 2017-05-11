@@ -92,7 +92,7 @@ public:
     }
 
     LayerType getType() const;
-    const std::string& getID() const;
+    std::string getID() const;
 
     // Visibility
     VisibilityType getVisibility() const;

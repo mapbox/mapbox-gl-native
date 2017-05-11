@@ -56,7 +56,7 @@ public:
     }
 
     SourceType getType() const;
-    const std::string& getID() const;
+    std::string getID() const;
     optional<std::string> getAttribution() const;
 
     // Private implementation
