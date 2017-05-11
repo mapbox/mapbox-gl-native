@@ -12,8 +12,6 @@ typedef double MGLLocationRadians;
 typedef double MGLRadianDistance;
 typedef double MGLRadianDirection;
 
-extern double const MGLMetersPerRadian;
-
 /** Defines the coordinate by a `MGLRadianCoordinate2D`. */
 typedef struct MGLRadianCoordinate2D {
     MGLLocationRadians latitude;

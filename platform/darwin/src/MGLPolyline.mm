@@ -58,8 +58,8 @@
     NSAssert(count > 0, @"Polyline must have coordinates");
 
     CLLocationCoordinate2D *coordinates = self.coordinates;
-    double middle = [self polylineLongitud] / 2.0;
-    double traveled = 0.0;
+    CLLocationDistance middle = [self length] / 2.0;
+    CLLocationDistance traveled = 0.0;
     
     if (count > 1 || middle > traveled) {
         for (NSUInteger i = 0; i < count; i++) {
@@ -73,15 +73,15 @@
                     return coordinates[i];
                 }
                 to = MGLRadianCoordinateFromLocationCoordinate(coordinates[i - 1]);
-                MGLRadianDirection direction = [self direction:from to:to] - 180;
+                CLLocationDirection direction = [self direction:from to:to] - 180;
                 MGLRadianCoordinate2D otherCoordinate = MGLRadianCoordinateAtDistanceFacingDirection(from,
-                                                                                                     overshoot/MGLMetersPerRadian,
+                                                                                                     overshoot/mbgl::util::M2PI * mbgl::util::EARTH_RADIUS_M,
                                                                                                      MGLRadiansFromDegrees(direction));
                 return CLLocationCoordinate2DMake(MGLDegreesFromRadians(otherCoordinate.latitude),
                                                   MGLDegreesFromRadians(otherCoordinate.longitude));
             }
             
-            traveled += (MGLDistanceBetweenRadianCoordinates(from, to) * 6373000.0);
+            traveled += (MGLDistanceBetweenRadianCoordinates(from, to) * mbgl::util::EARTH_RADIUS_M);
             
         }
     }
@@ -89,22 +89,18 @@
     return coordinates[count - 1];
 }
 
-- (double)polylineLongitud
+- (CLLocationDistance)length
 {
-    double longitude = 0.0;
+    CLLocationDistance length = 0.0;
     
     NSUInteger count = self.pointCount;
     CLLocationCoordinate2D *coordinates = self.coordinates;
     
-    for (NSUInteger i = 0; i < count; i++) {
-        if (i + 1 >= count) {
-            return longitude;
-        }
-        
-        longitude += (MGLDistanceBetweenRadianCoordinates(MGLRadianCoordinateFromLocationCoordinate(coordinates[i]),                                                  MGLRadianCoordinateFromLocationCoordinate(coordinates[i + 1])) * 6373000.0);
+    for (NSUInteger i = 0; i < count - 1; i++) {        
+        length += (MGLDistanceBetweenRadianCoordinates(MGLRadianCoordinateFromLocationCoordinate(coordinates[i]),                                                  MGLRadianCoordinateFromLocationCoordinate(coordinates[i + 1])) * mbgl::util::EARTH_RADIUS_M);
     }
     
-    return longitude;
+    return length;
 }
 
 - (CLLocationDirection)direction:(MGLRadianCoordinate2D)from to:(MGLRadianCoordinate2D)to
