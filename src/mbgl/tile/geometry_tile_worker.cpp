@@ -34,8 +34,7 @@ GeometryTileWorker::GeometryTileWorker(ActorRef<GeometryTileWorker> self_,
       mode(mode_) {
 }
 
-GeometryTileWorker::~GeometryTileWorker() {
-}
+GeometryTileWorker::~GeometryTileWorker() = default;
 
 /*
    GeometryTileWorker is a state machine. This is its transition diagram.

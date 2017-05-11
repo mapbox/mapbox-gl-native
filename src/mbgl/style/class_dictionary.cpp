@@ -5,7 +5,7 @@
 namespace mbgl {
 namespace style {
 
-ClassDictionary::ClassDictionary() {}
+ClassDictionary::ClassDictionary() = default;
 
 ClassDictionary &ClassDictionary::Get() {
     static pthread_once_t store_once = PTHREAD_ONCE_INIT;
