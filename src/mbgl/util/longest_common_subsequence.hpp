@@ -103,4 +103,4 @@ OutIt longest_common_subsequence(InIt a, InIt endA,
     return longest_common_subsequence(a, endA, b, endB, outIt, std::equal_to<>());
 }
 
-}
+} // namespace mbgl

@@ -17,6 +17,8 @@ class Source::Impl {
 public:
     virtual ~Impl() = default;
 
+    Impl& operator=(const Impl&) = delete;
+
     virtual optional<std::string> getAttribution() const = 0;
 
     const SourceType type;
@@ -25,7 +27,6 @@ public:
 protected:
     Impl(SourceType, std::string);
     Impl(const Impl&) = default;
-    Impl& operator=(const Impl&) = delete;
 };
 
 } // namespace style
