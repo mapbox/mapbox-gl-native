@@ -96,7 +96,7 @@ NS_INLINE MGLRadianCoordinate2D MGLRadianCoordinateFromLocationCoordinate(CLLoca
 NS_INLINE MGLRadianDistance MGLDistanceBetweenRadianCoordinates(MGLRadianCoordinate2D from, MGLRadianCoordinate2D to)
 {
     double a = pow(sin((to.latitude - from.latitude) / 2), 2)
-    + pow(sin((to.longitude - from.longitude) / 2), 2) * cos(from.latitude) * cos(to.latitude);
+                + pow(sin((to.longitude - from.longitude) / 2), 2) * cos(from.latitude) * cos(to.latitude);
     
     return 2 * atan2(sqrt(a), sqrt(1 - a));
 }
@@ -107,7 +107,7 @@ NS_INLINE MGLRadianDistance MGLDistanceBetweenRadianCoordinates(MGLRadianCoordin
 NS_INLINE MGLRadianDirection MGLRadianCoordinatesDirection(MGLRadianCoordinate2D from, MGLRadianCoordinate2D to) {
     double a = sin(to.longitude - from.longitude) * cos(to.latitude);
     double b = cos(from.latitude) * sin(to.latitude)
-    - sin(from.latitude) * cos(to.latitude) * cos(to.longitude - from.longitude);
+                - sin(from.latitude) * cos(to.latitude) * cos(to.longitude - from.longitude);
     return atan2(a, b);
 }
 
