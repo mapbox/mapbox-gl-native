@@ -75,7 +75,7 @@
                 to = MGLRadianCoordinateFromLocationCoordinate(coordinates[i - 1]);
                 CLLocationDirection direction = [self direction:from to:to] - 180;
                 MGLRadianCoordinate2D otherCoordinate = MGLRadianCoordinateAtDistanceFacingDirection(from,
-                                                                                                     overshoot/mbgl::util::M2PI * mbgl::util::EARTH_RADIUS_M,
+                                                                                                     overshoot/mbgl::util::EARTH_RADIUS_M,
                                                                                                      MGLRadiansFromDegrees(direction));
                 return CLLocationCoordinate2DMake(MGLDegreesFromRadians(otherCoordinate.latitude),
                                                   MGLDegreesFromRadians(otherCoordinate.longitude));
