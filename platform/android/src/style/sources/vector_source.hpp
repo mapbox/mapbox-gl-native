@@ -26,6 +26,8 @@ public:
     jni::Array<jni::Object<geojson::Feature>> querySourceFeatures(jni::JNIEnv&, jni::Array<jni::String>,
                                                                   jni::Array<jni::Object<>> jfilter);
 
+    jni::String getURL(jni::JNIEnv&);
+
     jni::jobject* createJavaPeer(jni::JNIEnv&);
 
 }; // class VectorSource

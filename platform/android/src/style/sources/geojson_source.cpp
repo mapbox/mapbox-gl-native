@@ -97,6 +97,11 @@ namespace android {
         source.as<mbgl::style::GeoJSONSource>()->GeoJSONSource::setURL(jni::Make<std::string>(env, url));
     }
 
+    jni::String GeoJSONSource::getURL(jni::JNIEnv& env) {
+        optional<std::string> url = source.as<mbgl::style::GeoJSONSource>()->GeoJSONSource::getURL();
+        return url ? jni::Make<jni::String>(env, *url) : jni::String();
+    }
+
     jni::Array<jni::Object<geojson::Feature>> GeoJSONSource::querySourceFeatures(jni::JNIEnv& env,
                                                                         jni::Array<jni::Object<>> jfilter) {
         using namespace mbgl::android::conversion;
@@ -133,6 +138,7 @@ namespace android {
             METHOD(&GeoJSONSource::setFeature, "nativeSetFeature"),
             METHOD(&GeoJSONSource::setGeometry, "nativeSetGeometry"),
             METHOD(&GeoJSONSource::setURL, "nativeSetUrl"),
+            METHOD(&GeoJSONSource::getURL, "nativeGetUrl"),
             METHOD(&GeoJSONSource::querySourceFeatures, "querySourceFeatures")
         );
     }
