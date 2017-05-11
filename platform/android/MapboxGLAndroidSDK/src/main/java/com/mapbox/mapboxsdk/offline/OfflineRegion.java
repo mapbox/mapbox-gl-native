@@ -4,6 +4,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.mapbox.mapboxsdk.storage.FileSource;
 
@@ -205,7 +206,7 @@ public class OfflineRegion {
 
   /**
    * Constructor
-   *
+   * <p>
    * For JNI use only, to create a new offline region, use
    * {@link OfflineManager#createOfflineRegion} instead.
    */
@@ -247,7 +248,7 @@ public class OfflineRegion {
    *
    * @param observer the observer to be notified
    */
-  public void setObserver(@NonNull final OfflineRegionObserver observer) {
+  public void setObserver(@Nullable final OfflineRegionObserver observer) {
     setOfflineRegionObserver(new OfflineRegionObserver() {
       @Override
       public void onStatusChanged(final OfflineRegionStatus status) {
@@ -255,7 +256,9 @@ public class OfflineRegion {
           getHandler().post(new Runnable() {
             @Override
             public void run() {
-              observer.onStatusChanged(status);
+              if (observer != null) {
+                observer.onStatusChanged(status);
+              }
             }
           });
         }
@@ -267,7 +270,9 @@ public class OfflineRegion {
           getHandler().post(new Runnable() {
             @Override
             public void run() {
-              observer.onError(error);
+              if (observer != null) {
+                observer.onError(error);
+              }
             }
           });
         }
@@ -279,7 +284,9 @@ public class OfflineRegion {
           getHandler().post(new Runnable() {
             @Override
             public void run() {
-              observer.mapboxTileCountLimitExceeded(limit);
+              if (observer != null) {
+                observer.mapboxTileCountLimitExceeded(limit);
+              }
             }
           });
         }
