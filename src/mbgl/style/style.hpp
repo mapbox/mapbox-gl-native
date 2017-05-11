@@ -5,6 +5,7 @@
 #include <mbgl/style/source_observer.hpp>
 #include <mbgl/renderer/render_source_observer.hpp>
 #include <mbgl/style/layer_observer.hpp>
+#include <mbgl/style/light_observer.hpp>
 #include <mbgl/style/update_batch.hpp>
 #include <mbgl/renderer/render_layer.hpp>
 #include <mbgl/renderer/render_light.hpp>
@@ -48,6 +49,7 @@ class Style : public GlyphAtlasObserver,
               public SourceObserver,
               public RenderSourceObserver,
               public LayerObserver,
+              public LightObserver,
               public util::noncopyable {
 public:
     Style(Scheduler&, FileSource&, float pixelRatio);
@@ -101,6 +103,10 @@ public:
     bool hasClass(const std::string&) const;
     std::vector<std::string> getClasses() const;
 
+    void setLight(std::unique_ptr<Light>);
+    Light* getLight() const;
+    RenderLight* getRenderLight() const;
+
     RenderData getRenderData(MapDebugOptions, float angle) const;
 
     std::vector<Feature> queryRenderedFeatures(const ScreenLineString& geometry,
@@ -118,10 +124,6 @@ public:
     std::unique_ptr<SpriteAtlas> spriteAtlas;
     std::unique_ptr<LineAtlas> lineAtlas;
 
-    std::unique_ptr<Light> light;
-    TransitioningLight transitioningLight;
-    EvaluatedLight evaluatedLight;
-
     RenderSource* getRenderSource(const std::string& id) const;
 
 private:
@@ -132,6 +134,9 @@ private:
     std::vector<std::unique_ptr<RenderLayer>> renderLayers;
     std::vector<std::string> classes;
     TransitionOptions transitionOptions;
+
+    std::unique_ptr<Light> light;
+    std::unique_ptr<RenderLight> renderLight;
 
     // Defaults
     std::string name;
@@ -165,6 +170,9 @@ private:
     void onLayerPaintPropertyChanged(Layer&) override;
     void onLayerDataDrivenPaintPropertyChanged(Layer&) override;
     void onLayerLayoutPropertyChanged(Layer&, const char *) override;
+
+    // LightObserver implementation.
+    void onLightChanged(const Light&) override;
 
     Observer nullObserver;
     Observer* observer = &nullObserver;

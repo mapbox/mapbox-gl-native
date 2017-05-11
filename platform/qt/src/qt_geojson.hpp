@@ -178,25 +178,20 @@ namespace style {
 namespace conversion {
 
 template <>
-optional<GeoJSON> convertGeoJSON(const QMapbox::Feature& feature, Error&) {
-    return GeoJSON { asMapboxGLFeature(feature) };
-}
-
-template <>
-optional<GeoJSON> convertGeoJSON(const QVariant& value, Error& error) {
+optional<GeoJSON> Converter<GeoJSON>::operator()(const QVariant& value, Error& error) const {
 #if QT_VERSION >= 0x050000
     if (value.typeName() == QStringLiteral("QMapbox::Feature")) {
 #else
     if (value.typeName() == QString("QMapbox::Feature")) {
 #endif
-        return convertGeoJSON(value.value<QMapbox::Feature>(), error);
+        return GeoJSON { asMapboxGLFeature(value.value<QMapbox::Feature>()) };
     } else if (value.type() != QVariant::ByteArray) {
         error = { "JSON data must be in QByteArray" };
         return {};
     }
 
     QByteArray data = value.toByteArray();
-    return convertGeoJSON(std::string(data.constData(), data.size()), error);
+    return convert<GeoJSON>(std::string(data.constData(), data.size()), error);
 }
 
 } // namespace conversion

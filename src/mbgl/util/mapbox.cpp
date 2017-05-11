@@ -2,6 +2,7 @@
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/logging.hpp>
 #include <mbgl/util/url.hpp>
+#include <mbgl/util/tileset.hpp>
 
 #include <stdexcept>
 #include <vector>
@@ -168,6 +169,15 @@ canonicalizeTileURL(const std::string& str, const SourceType type, const uint16_
     }
 
     return result;
+}
+
+void canonicalizeTileset(Tileset& tileset, const std::string& sourceURL, SourceType type, uint16_t tileSize) {
+    // TODO: Remove this hack by delivering proper URLs in the TileJSON to begin with.
+    if (isMapboxURL(sourceURL)) {
+        for (auto& url : tileset.tiles) {
+            url = canonicalizeTileURL(url, type, tileSize);
+        }
+    }
 }
 
 const uint64_t DEFAULT_OFFLINE_TILE_COUNT_LIMIT = 6000;

@@ -20,6 +20,7 @@
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/constants.hpp>
+#include <mbgl/util/offscreen_texture.hpp>
 
 #include <array>
 #include <vector>
@@ -157,6 +158,8 @@ private:
     SpriteAtlas* spriteAtlas = nullptr;
     GlyphAtlas* glyphAtlas = nullptr;
     LineAtlas* lineAtlas = nullptr;
+
+    optional<OffscreenTexture> extrusionTexture;
 
     EvaluatedLight evaluatedLight;
 

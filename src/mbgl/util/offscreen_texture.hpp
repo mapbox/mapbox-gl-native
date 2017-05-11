@@ -10,13 +10,21 @@ class Context;
 class Texture;
 } // namespace gl
 
+enum class OffscreenTextureAttachment {
+    None,
+    Depth,
+};
+
 class OffscreenTexture : public View {
 public:
-    OffscreenTexture(gl::Context&, Size size = { 256, 256 });
+    OffscreenTexture(gl::Context&,
+                     Size size = { 256, 256 },
+                     OffscreenTextureAttachment type = OffscreenTextureAttachment::None);
     ~OffscreenTexture();
+    OffscreenTexture(OffscreenTexture&&);
+    OffscreenTexture& operator=(OffscreenTexture&&);
 
     void bind() override;
-    void bindRenderbuffers(gl::TextureUnit unit = 0);
 
     PremultipliedImage readStillImage();
 
@@ -26,7 +34,7 @@ public:
 
 private:
     class Impl;
-    const std::unique_ptr<Impl> impl;
+    std::unique_ptr<Impl> impl;
 };
 
 } // namespace mbgl

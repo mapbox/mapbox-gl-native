@@ -1,0 +1,45 @@
+<%
+  const properties = locals.properties;
+-%>
+// This file is generated. Do not edit.
+
+#include <mbgl/style/light.hpp>
+#include <mbgl/style/light_impl.hpp>
+#include <mbgl/style/light_properties.hpp>
+
+namespace mbgl {
+namespace style {
+
+Light::Light()
+        : impl(std::make_unique<Impl>()) {
+}
+
+Light::~Light() = default;
+
+<% for (const property of properties) { -%>
+<%- evaluatedType(property) %> Light::getDefault<%- camelize(property.name) %>() {
+    return Light<%- camelize(property.name) %>::defaultValue();
+}
+
+<%- propertyValueType(property) %> Light::get<%- camelize(property.name) %>() const {
+    return impl->properties.template get<Light<%- camelize(property.name) %>>().value;
+}
+
+void Light::set<%- camelize(property.name) %>(<%- propertyValueType(property) %> property) {
+    impl->properties.template get<Light<%- camelize(property.name) %>>().value = property;
+    impl->observer->onLightChanged(*this);
+}
+
+void Light::set<%- camelize(property.name) %>Transition(const TransitionOptions& transition) {
+    impl->properties.template get<Light<%- camelize(property.name) %>>().transition = transition;
+    impl->observer->onLightChanged(*this);
+}
+
+TransitionOptions Light::get<%- camelize(property.name) %>Transition() const {
+    return impl->properties.template get<Light<%- camelize(property.name) %>>().transition;
+}
+
+<% } -%>
+
+} // namespace style
+} // namespace mbgl

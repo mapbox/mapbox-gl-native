@@ -103,7 +103,7 @@ function completeExamples(os) {
         let testMethodName = symbolPath.join('$').replace(/\$[+-]/, '$').replace(/:/g, '_');
         let example = examples[testMethodName];
         if (!example) {
-          console.error(`MGLDocumentationExampleTests.${testMethodName}() not found.`);
+          console.error(`MGLDocumentationExampleTests.test${testMethodName}() not found.`);
           process.exit(1);
         }
 

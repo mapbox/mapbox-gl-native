@@ -10,6 +10,13 @@
 #include <mbgl/map/backend_scope.hpp>
 #include <mbgl/map/camera.hpp>
 
+#if MBGL_USE_GLES2
+#define GLFW_INCLUDE_ES2
+#endif // MBGL_USE_GLES2
+
+#define GL_GLEXT_PROTOTYPES
+#include <GLFW/glfw3.h>
+
 #include <cassert>
 #include <cstdlib>
 

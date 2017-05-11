@@ -59,6 +59,7 @@ set(MBGL_TEST_FILES
     test/src/mbgl/test/stub_file_source.hpp
     test/src/mbgl/test/stub_geometry_tile_feature.hpp
     test/src/mbgl/test/stub_layer_observer.hpp
+    test/src/mbgl/test/stub_render_source_observer.hpp
     test/src/mbgl/test/stub_style_observer.hpp
     test/src/mbgl/test/stub_tile_observer.hpp
     test/src/mbgl/test/test.cpp
@@ -100,7 +101,6 @@ set(MBGL_TEST_FILES
     test/style/style_image.test.cpp
     test/style/style_layer.test.cpp
     test/style/style_parser.test.cpp
-    test/style/tile_source.test.cpp
 
     # text
     test/text/glyph_atlas.test.cpp

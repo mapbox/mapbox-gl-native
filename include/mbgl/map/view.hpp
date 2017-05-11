@@ -1,12 +1,10 @@
 #pragma once
 
-#include <mbgl/util/noncopyable.hpp>
-
 namespace mbgl {
 
 class Map;
 
-class View : private util::noncopyable {
+class View {
 public:
     virtual ~View() = default;
 

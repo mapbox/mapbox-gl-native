@@ -5,8 +5,19 @@
 	<key>MAP_A11Y_VALUE</key>
 	<dict>
 		<key>NSStringLocalizedFormatKey</key>
-		<string>Zoom %dx
+		<string>%#@level@
 %#@count@</string>
+		<key>level</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>Zoom %dx</string>
+			<key>other</key>
+			<string>Zoom %dx</string>
+		</dict>
 		<key>count</key>
 		<dict>
 			<key>NSStringFormatSpecTypeKey</key>

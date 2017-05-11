@@ -1,5 +1,17 @@
-﻿/* Accessibility title */
+﻿/* User-friendly error description */
+"LOAD_MAP_FAILED_DESC" = "Nepavyko užkrauti žemėlapio dėl nežinomos klaidos.";
+
+/* User-friendly error description */
+"LOAD_STYLE_FAILED_DESC" = "Nepavyko užkrauti žemėlapio, nes nepavyko užkrauti stiliaus.";
+
+/* Accessibility title */
 "MAP_A11Y_TITLE" = "Mapbox";
+
+/* User-friendly error description */
+"PARSE_STYLE_FAILED_DESC" = "Nepavyko užkrauti žemėlapio, nes stilius yra netinkamo formato.";
+
+/* User-friendly error description */
+"STYLE_NOT_FOUND_DESC" = "Nepavyko užkrauti žemėlapio, nes neįmanoma rasti stiliaus arba jis nėra suderinamas.";
 
 /* Label of Zoom In button */
 "ZOOM_IN_LABEL" = "+";

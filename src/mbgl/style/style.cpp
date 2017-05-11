@@ -59,9 +59,11 @@ Style::Style(Scheduler& scheduler_, FileSource& fileSource_, float pixelRatio)
       spriteAtlas(std::make_unique<SpriteAtlas>(Size{ 1024, 1024 }, pixelRatio)),
       lineAtlas(std::make_unique<LineAtlas>(Size{ 256, 512 })),
       light(std::make_unique<Light>()),
+      renderLight(std::make_unique<RenderLight>(light->impl)),
       observer(&nullObserver) {
     glyphAtlas->setObserver(this);
     spriteAtlas->setObserver(this);
+    light->impl->setObserver(this);
 }
 
 Style::~Style() {
@@ -77,6 +79,7 @@ Style::~Style() {
 
     glyphAtlas->setObserver(nullptr);
     spriteAtlas->setObserver(nullptr);
+    light->impl->setObserver(nullptr);
 }
 
 bool Style::addClass(const std::string& className) {
@@ -147,7 +150,7 @@ void Style::setJSON(const std::string& json) {
     defaultZoom = parser.zoom;
     defaultBearing = parser.bearing;
     defaultPitch = parser.pitch;
-    light = std::make_unique<Light>(parser.light);
+    setLight(std::make_unique<Light>(parser.light));
 
     glyphAtlas->setURL(parser.glyphURL);
     spriteAtlas->load(parser.spriteURL, scheduler, fileSource);
@@ -310,6 +313,25 @@ void Style::removeRenderLayer(const std::string& id) {
     }
 }
 
+void Style::setLight(std::unique_ptr<Light> light_) {
+    light = std::move(light_);
+    light->impl->setObserver(this);
+
+    // Copy renderlight to preserve the initialised
+    // transitioning light properties
+    renderLight = renderLight->copy(light->impl);
+
+    onLightChanged(*light);
+}
+
+Light* Style::getLight() const {
+    return light.get();
+}
+
+RenderLight* Style::getRenderLight() const {
+    return renderLight.get();
+}
+
 std::string Style::getName() const {
     return name;
 }
@@ -364,11 +386,11 @@ void Style::update(const UpdateParameters& parameters) {
     const bool evaluate = cascade || zoomChanged || parameters.updateFlags & Update::RecalculateStyle;
 
     if (cascade) {
-        transitioningLight = TransitioningLight(*light, std::move(transitioningLight), cascadeParameters);
+        renderLight->transition(cascadeParameters);
     }
 
-    if (evaluate || transitioningLight.hasTransition()) {
-        evaluatedLight = EvaluatedLight(transitioningLight, evaluationParameters);
+    if (evaluate || renderLight->hasTransition()) {
+        renderLight->evaluate(evaluationParameters);
     }
 
     for (const auto& renderSource : renderSources) {
@@ -443,7 +465,7 @@ RenderSource* Style::getRenderSource(const std::string& id) const {
 }
 
 bool Style::hasTransitions() const {
-    if (transitioningLight.hasTransition()) {
+    if (renderLight->hasTransition()) {
         return true;
     }
 
@@ -745,6 +767,10 @@ void Style::onLayerLayoutPropertyChanged(Layer& layer, const char * property) {
     observer->onUpdate((strcmp(property, "icon-size") == 0 || strcmp(property, "text-size") == 0)
         ? Update::RecalculateStyle
         : Update::Repaint);
+}
+
+void Style::onLightChanged(const Light&) {
+    observer->onUpdate(Update::Classes | Update::RecalculateStyle);
 }
 
 void Style::dumpDebugLogs() const {

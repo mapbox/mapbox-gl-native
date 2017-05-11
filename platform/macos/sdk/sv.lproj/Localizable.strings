@@ -1,5 +1,17 @@
-﻿/* Accessibility title */
+﻿/* User-friendly error description */
+"LOAD_MAP_FAILED_DESC" = "Kartan kunde inte laddas på grund av ett okänt fel.";
+
+/* User-friendly error description */
+"LOAD_STYLE_FAILED_DESC" = "Kartan kunde inte laddas på grund av att stilen inte kunde laddas.";
+
+/* Accessibility title */
 "MAP_A11Y_TITLE" = "Mapbox";
+
+/* User-friendly error description */
+"PARSE_STYLE_FAILED_DESC" = "Kartan kunde inte laddas på grund av att stilen är skadad.";
+
+/* User-friendly error description */
+"STYLE_NOT_FOUND_DESC" = "Kartan kunde inte laddas på grund av att stilen saknas eller är inkompatibel.";
 
 /* Label of Zoom In button */
 "ZOOM_IN_LABEL" = "+";

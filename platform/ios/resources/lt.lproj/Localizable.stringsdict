@@ -14,9 +14,11 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Zoom %dx</string>
+			<string>Priartinimas: %dx</string>
+			<key>few</key>
+			<string>Priartinimas: %dx</string>
 			<key>other</key>
-			<string>Zoom %dx</string>
+			<string>Priartinimas: %dx</string>
 		</dict>
 		<key>count</key>
 		<dict>
@@ -25,9 +27,11 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>ld</string>
 			<key>one</key>
-			<string>%d annotation visible</string>
+			<string>Matomos anotacijos: %d anotacija</string>
+			<key>few</key>
+			<string>Matomos anotacijos: %d anotacijos</string>
 			<key>other</key>
-			<string>%d annotations visibles</string>
+			<string>Matomos anotacijos: %d anotacijų</string>
 		</dict>
 	</dict>
 </dict>

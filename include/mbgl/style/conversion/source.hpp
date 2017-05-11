@@ -122,7 +122,7 @@ private:
         auto result = std::make_unique<GeoJSONSource>(id, *options);
 
         if (isObject(*dataValue)) {
-            optional<GeoJSON> geoJSON = convertGeoJSON(*dataValue, error);
+            optional<GeoJSON> geoJSON = convert<GeoJSON>(*dataValue, error);
             if (!geoJSON) {
                 return {};
             }
