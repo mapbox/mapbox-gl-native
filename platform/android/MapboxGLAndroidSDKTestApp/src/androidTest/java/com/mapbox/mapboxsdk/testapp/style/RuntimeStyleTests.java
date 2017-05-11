@@ -15,6 +15,8 @@ import com.mapbox.mapboxsdk.style.layers.Layer;
 import com.mapbox.mapboxsdk.style.layers.Property;
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory;
 import com.mapbox.mapboxsdk.style.sources.CannotAddSourceException;
+import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
+import com.mapbox.mapboxsdk.style.sources.RasterSource;
 import com.mapbox.mapboxsdk.style.sources.Source;
 import com.mapbox.mapboxsdk.style.sources.VectorSource;
 import com.mapbox.mapboxsdk.testapp.R;
@@ -28,6 +30,8 @@ import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 
 import timber.log.Timber;
@@ -188,6 +192,35 @@ public class RuntimeStyleTests extends BaseActivityTest {
     mapboxMap.removeSource("my-source");
 
     onView(withId(R.id.mapView)).perform(new AddRemoveSourceAction());
+  }
+
+  @Test
+  public void testVectorSourceUrlGetter() {
+    validateTestSetup();
+
+    VectorSource source = new VectorSource("my-source", "mapbox://mapbox.mapbox-terrain-v2");
+    mapboxMap.addSource(source);
+    assertEquals("mapbox://mapbox.mapbox-terrain-v2", source.getUrl());
+  }
+
+  @Test
+  public void testRasterSourceUrlGetter() {
+    validateTestSetup();
+
+    RasterSource source = new RasterSource("my-source", "mapbox://mapbox.mapbox-terrain-v2");
+    mapboxMap.addSource(source);
+    assertEquals("mapbox://mapbox.mapbox-terrain-v2", source.getUrl());
+  }
+
+  @Test
+  public void testGeoJsonSourceUrlGetter() throws MalformedURLException {
+    validateTestSetup();
+
+    GeoJsonSource source = new GeoJsonSource("my-source");
+    mapboxMap.addSource(source);
+    assertNull(source.getUrl());
+    source.setUrl(new URL("http://mapbox.com/my-file.json"));
+    assertEquals("http://mapbox.com/my-file.json", source.getUrl());
   }
 
   /**

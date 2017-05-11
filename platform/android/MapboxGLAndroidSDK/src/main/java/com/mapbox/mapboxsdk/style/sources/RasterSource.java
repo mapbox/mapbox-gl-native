@@ -1,5 +1,7 @@
 package com.mapbox.mapboxsdk.style.sources;
 
+import android.support.annotation.Nullable;
+
 import java.net.URL;
 
 /**
@@ -72,8 +74,19 @@ public class RasterSource extends Source {
     initialize(id, tileSet.toValueObject(), tileSize);
   }
 
+  /**
+   * @return The url or null
+   */
+  @Nullable
+  public String getUrl() {
+    return nativeGetUrl();
+  }
+
   protected native void initialize(String layerId, Object payload, int tileSize);
 
   @Override
   protected native void finalize() throws Throwable;
+
+  protected native String nativeGetUrl();
+
 }
