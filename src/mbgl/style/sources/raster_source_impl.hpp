@@ -15,7 +15,6 @@ public:
     uint16_t getTileSize() const;
 
     optional<std::string> getAttribution() const final;
-    std::unique_ptr<RenderSource> createRenderSource() const final;
 
 private:
     uint16_t tileSize;

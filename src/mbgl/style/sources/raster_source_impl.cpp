@@ -1,5 +1,4 @@
 #include <mbgl/style/sources/raster_source_impl.hpp>
-#include <mbgl/renderer/sources/render_raster_source.hpp>
 
 namespace mbgl {
 namespace style {
@@ -28,10 +27,6 @@ optional<std::string> RasterSource::Impl::getAttribution() const {
         return {};
     }
     return tileset->attribution;
-}
-
-std::unique_ptr<RenderSource> RasterSource::Impl::createRenderSource() const {
-    return std::make_unique<RenderRasterSource>(staticImmutableCast<RasterSource::Impl>(immutableFromThis()));
 }
 
 } // namespace style

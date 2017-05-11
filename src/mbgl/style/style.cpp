@@ -388,7 +388,7 @@ void Style::update(const UpdateParameters& parameters) {
 
     // Create render sources for newly added sources.
     for (const auto& entry : sourceDiff.added) {
-        std::unique_ptr<RenderSource> renderSource = entry.second->createRenderSource();
+        std::unique_ptr<RenderSource> renderSource = RenderSource::create(entry.second);
         renderSource->setObserver(this);
         renderSources.emplace(entry.first, std::move(renderSource));
     }
@@ -415,7 +415,7 @@ void Style::update(const UpdateParameters& parameters) {
 
     // Create render layers for newly added layers.
     for (const auto& entry : layerDiff.added) {
-        renderLayers.emplace(entry.first, entry.second->createRenderLayer());
+        renderLayers.emplace(entry.first, RenderLayer::create(entry.second));
     }
 
     // Update render layers for changed layers.

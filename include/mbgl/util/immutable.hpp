@@ -107,16 +107,7 @@ private:
     std::shared_ptr<const T> ptr;
 
     template <class S> friend class Immutable;
-    template <class S> friend class EnableImmutableFromThis;
     template <class S, class U> friend Immutable<S> staticImmutableCast(const Immutable<U>&);
-};
-
-template <class T>
-class EnableImmutableFromThis : public std::enable_shared_from_this<const T> {
-public:
-    Immutable<T> immutableFromThis() const {
-        return Immutable<T>(this->shared_from_this());
-    }
 };
 
 template <class S, class U>

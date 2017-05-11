@@ -246,7 +246,7 @@ static std::vector<std::unique_ptr<RenderLayer>> toRenderLayers(const std::vecto
     std::vector<std::unique_ptr<RenderLayer>> renderLayers;
     renderLayers.reserve(layers.size());
     for (auto& layer : layers) {
-        renderLayers.push_back(layer->createRenderLayer());
+        renderLayers.push_back(RenderLayer::create(layer));
 
         renderLayers.back()->cascade(CascadeParameters {
             { ClassID::Default },

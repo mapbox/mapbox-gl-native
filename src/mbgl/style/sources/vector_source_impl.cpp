@@ -1,5 +1,4 @@
 #include <mbgl/style/sources/vector_source_impl.hpp>
-#include <mbgl/renderer/sources/render_vector_source.hpp>
 
 namespace mbgl {
 namespace style {
@@ -22,10 +21,6 @@ optional<std::string> VectorSource::Impl::getAttribution() const {
         return {};
     }
     return tileset->attribution;
-}
-
-std::unique_ptr<RenderSource> VectorSource::Impl::createRenderSource() const {
-    return std::make_unique<RenderVectorSource>(staticImmutableCast<VectorSource::Impl>(immutableFromThis()));
 }
 
 } // namespace style

@@ -1,6 +1,6 @@
 #include <mbgl/style/sources/geojson_source_impl.hpp>
-#include <mbgl/renderer/sources/render_geojson_source.hpp>
-#include <mbgl/util/constants.cpp>
+#include <mbgl/util/constants.hpp>
+#include <mbgl/tile/tile_id.hpp>
 
 #include <mapbox/geojsonvt.hpp>
 #include <supercluster.hpp>
@@ -77,10 +77,6 @@ GeoJSONData* GeoJSONSource::Impl::getData() const {
 
 optional<std::string> GeoJSONSource::Impl::getAttribution() const {
     return {};
-}
-
-std::unique_ptr<RenderSource> GeoJSONSource::Impl::createRenderSource() const {
-    return std::make_unique<RenderGeoJSONSource>(staticImmutableCast<GeoJSONSource::Impl>(immutableFromThis()));
 }
 
 } // namespace style

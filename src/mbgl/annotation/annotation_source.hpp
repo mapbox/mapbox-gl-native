@@ -23,7 +23,6 @@ public:
     Impl();
 
     optional<std::string> getAttribution() const final;
-    std::unique_ptr<RenderSource> createRenderSource() const final;
 };
 
 } // namespace mbgl

@@ -13,12 +13,11 @@ namespace style {
 
 class SourceObserver;
 
-class Source::Impl : public EnableImmutableFromThis<Source::Impl> {
+class Source::Impl {
 public:
     virtual ~Impl() = default;
 
     virtual optional<std::string> getAttribution() const = 0;
-    virtual std::unique_ptr<RenderSource> createRenderSource() const = 0;
 
     const SourceType type;
     const std::string id;

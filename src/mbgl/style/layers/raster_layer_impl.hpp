@@ -13,8 +13,6 @@ public:
 
     void stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>&) const override;
 
-    std::unique_ptr<RenderLayer> createRenderLayer() const override;
-
     RasterPaintProperties::Cascading cascading;
 };
 

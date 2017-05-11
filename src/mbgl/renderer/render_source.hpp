@@ -29,7 +29,8 @@ class ClipIDGenerator;
 
 class RenderSource : protected TileObserver {
 public:
-    RenderSource(Immutable<style::Source::Impl>);
+    static std::unique_ptr<RenderSource> create(Immutable<style::Source::Impl>);
+
     ~RenderSource() override = default;
 
     virtual bool isLoaded() const = 0;
@@ -77,6 +78,7 @@ public:
     bool enabled = false;
 
 protected:
+    RenderSource(Immutable<style::Source::Impl>);
     RenderSourceObserver* observer;
 
     void onTileChanged(Tile&) final;

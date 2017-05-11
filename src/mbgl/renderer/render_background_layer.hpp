@@ -1,7 +1,7 @@
 #pragma once
 
 #include <mbgl/renderer/render_layer.hpp>
-#include <mbgl/style/layers/background_layer.hpp>
+#include <mbgl/style/layers/background_layer_impl.hpp>
 #include <mbgl/style/layers/background_layer_properties.hpp>
 
 namespace mbgl {
