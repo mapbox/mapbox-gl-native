@@ -200,12 +200,16 @@ std::string DefaultFileSource::getAccessToken() const {
 }
 
 void DefaultFileSource::setResourceTransform(std::function<std::string(Resource::Kind, std::string&&)> transform) {
-    auto loop = util::RunLoop::Get();
-    thread->invoke(&Impl::setResourceTransform, [loop, transform](Resource::Kind kind_, std::string&& url_, auto callback_) {
-        return loop->invokeWithCallback([transform](Resource::Kind kind, std::string&& url, auto callback) {
-            callback(transform(kind, std::move(url)));
-        }, kind_, std::move(url_), callback_);
-    });
+    if (transform) {
+        auto loop = util::RunLoop::Get();
+        thread->invoke(&Impl::setResourceTransform, [loop, transform](Resource::Kind kind_, std::string&& url_, auto callback_) {
+            return loop->invokeWithCallback([transform](Resource::Kind kind, std::string&& url, auto callback) {
+                callback(transform(kind, std::move(url)));
+            }, kind_, std::move(url_), callback_);
+        });
+    } else {
+        thread->invoke(&Impl::setResourceTransform, nullptr);
+    }
 }
 
 std::unique_ptr<AsyncRequest> DefaultFileSource::request(const Resource& resource, Callback callback) {
