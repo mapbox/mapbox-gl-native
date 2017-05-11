@@ -92,6 +92,9 @@ void MapWindow::keyPressEvent(QKeyEvent *ev)
 
             m_sourceAdded = true;
 
+            // Not in all styles, but will work on streets
+            QString before = "waterway-label";
+
             QFile geojson(":source1.geojson");
             geojson.open(QIODevice::ReadOnly);
 
@@ -106,7 +109,7 @@ void MapWindow::keyPressEvent(QKeyEvent *ev)
             routeCase["id"] = "routeCase";
             routeCase["type"] = "line";
             routeCase["source"] = "routeSource";
-            m_map->addLayer(routeCase);
+            m_map->addLayer(routeCase, before);
 
             m_map->setPaintProperty("routeCase", "line-color", QColor("white"));
             m_map->setPaintProperty("routeCase", "line-width", 20.0);
@@ -118,7 +121,7 @@ void MapWindow::keyPressEvent(QKeyEvent *ev)
             route["id"] = "route";
             route["type"] = "line";
             route["source"] = "routeSource";
-            m_map->addLayer(route);
+            m_map->addLayer(route, before);
 
             m_map->setPaintProperty("route", "line-color", QColor("blue"));
             m_map->setPaintProperty("route", "line-width", 8.0);
