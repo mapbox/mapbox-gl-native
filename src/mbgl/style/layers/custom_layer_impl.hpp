@@ -24,8 +24,6 @@ public:
 private:
     void stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>&) const override;
 
-    std::unique_ptr<RenderLayer> createRenderLayer() const final;
-
     CustomLayerInitializeFunction initializeFn = nullptr;
     CustomLayerRenderFunction renderFn = nullptr;
     CustomLayerDeinitializeFunction deinitializeFn = nullptr;

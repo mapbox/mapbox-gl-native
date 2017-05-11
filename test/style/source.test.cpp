@@ -148,7 +148,7 @@ TEST(Source, RasterTileEmpty) {
         FAIL() << "Should never be called";
     };
 
-    auto renderSource = source.baseImpl->createRenderSource();
+    auto renderSource = RenderSource::create(source.baseImpl);
     renderSource->setObserver(&test.renderSourceObserver);
     renderSource->updateTiles(test.tileParameters);
 
@@ -179,7 +179,7 @@ TEST(Source, VectorTileEmpty) {
         FAIL() << "Should never be called";
     };
 
-    auto renderSource = source.baseImpl->createRenderSource();
+    auto renderSource = RenderSource::create(source.baseImpl);
     renderSource->setObserver(&test.renderSourceObserver);
     renderSource->updateTiles(test.tileParameters);
 
@@ -210,7 +210,7 @@ TEST(Source, RasterTileFail) {
         test.end();
     };
 
-    auto renderSource = source.baseImpl->createRenderSource();
+    auto renderSource = RenderSource::create(source.baseImpl);
     renderSource->setObserver(&test.renderSourceObserver);
     renderSource->updateTiles(test.tileParameters);
 
@@ -241,7 +241,7 @@ TEST(Source, VectorTileFail) {
         test.end();
     };
 
-    auto renderSource = source.baseImpl->createRenderSource();
+    auto renderSource = RenderSource::create(source.baseImpl);
     renderSource->setObserver(&test.renderSourceObserver);
     renderSource->updateTiles(test.tileParameters);
 
@@ -271,7 +271,7 @@ TEST(Source, RasterTileCorrupt) {
         test.end();
     };
 
-    auto renderSource = source.baseImpl->createRenderSource();
+    auto renderSource = RenderSource::create(source.baseImpl);
     renderSource->setObserver(&test.renderSourceObserver);
     renderSource->updateTiles(test.tileParameters);
 
@@ -305,7 +305,7 @@ TEST(Source, VectorTileCorrupt) {
         test.end();
     };
 
-    auto renderSource = source.baseImpl->createRenderSource();
+    auto renderSource = RenderSource::create(source.baseImpl);
     renderSource->setObserver(&test.renderSourceObserver);
     renderSource->updateTiles(test.tileParameters);
 
@@ -334,7 +334,7 @@ TEST(Source, RasterTileCancel) {
         FAIL() << "Should never be called";
     };
 
-    auto renderSource = source.baseImpl->createRenderSource();
+    auto renderSource = RenderSource::create(source.baseImpl);
     renderSource->setObserver(&test.renderSourceObserver);
     renderSource->updateTiles(test.tileParameters);
 
@@ -363,7 +363,7 @@ TEST(Source, VectorTileCancel) {
         FAIL() << "Should never be called";
     };
 
-    auto renderSource = source.baseImpl->createRenderSource();
+    auto renderSource = RenderSource::create(source.baseImpl);
     renderSource->setObserver(&test.renderSourceObserver);
     renderSource->updateTiles(test.tileParameters);
 
@@ -401,7 +401,7 @@ TEST(Source, RasterTileAttribution) {
     source.setObserver(&test.styleObserver);
     source.loadDescription(test.fileSource);
 
-    auto renderSource = source.baseImpl->createRenderSource();
+    auto renderSource = RenderSource::create(source.baseImpl);
     renderSource->updateTiles(test.tileParameters);
 
     test.run();

@@ -1,8 +1,34 @@
 #include <mbgl/renderer/render_source.hpp>
 #include <mbgl/renderer/render_source_observer.hpp>
+#include <mbgl/renderer/sources/render_geojson_source.hpp>
+#include <mbgl/renderer/sources/render_raster_source.hpp>
+#include <mbgl/renderer/sources/render_vector_source.hpp>
+#include <mbgl/annotation/render_annotation_source.hpp>
 #include <mbgl/tile/tile.hpp>
 
 namespace mbgl {
+
+using namespace style;
+
+std::unique_ptr<RenderSource> RenderSource::create(Immutable<Source::Impl> impl) {
+    switch (impl->type) {
+    case SourceType::Vector:
+        return std::make_unique<RenderVectorSource>(staticImmutableCast<VectorSource::Impl>(impl));
+    case SourceType::Raster:
+        return std::make_unique<RenderRasterSource>(staticImmutableCast<RasterSource::Impl>(impl));
+    case SourceType::GeoJSON:
+        return std::make_unique<RenderGeoJSONSource>(staticImmutableCast<GeoJSONSource::Impl>(impl));
+    case SourceType::Video:
+        assert(false);
+        return nullptr;
+    case SourceType::Annotations:
+        return std::make_unique<RenderAnnotationSource>(staticImmutableCast<AnnotationSource::Impl>(impl));
+    }
+
+    // Not reachable, but placate GCC.
+    assert(false);
+    return nullptr;
+}
 
 static RenderSourceObserver nullObserver;
 

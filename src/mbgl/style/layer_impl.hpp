@@ -27,7 +27,7 @@ namespace style {
  * Members that are public in `FooLayer::Impl` are part of the internal API for "foo" layers.
  * Members that are private in `FooLayer::Impl` are internal to "foo" layers.
  */
-class Layer::Impl : public EnableImmutableFromThis<Layer::Impl> {
+class Layer::Impl {
 public:
     Impl(LayerType, std::string layerID, std::string sourceID);
     virtual ~Impl() = default;
@@ -36,8 +36,6 @@ public:
 
     // Utility function for automatic layer grouping.
     virtual void stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>&) const = 0;
-
-    virtual std::unique_ptr<RenderLayer> createRenderLayer() const = 0;
 
     const LayerType type;
     std::string id;

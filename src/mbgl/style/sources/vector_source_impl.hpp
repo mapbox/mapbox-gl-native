@@ -14,7 +14,6 @@ public:
     optional<Tileset> getTileset() const;
 
     optional<std::string> getAttribution() const final;
-    std::unique_ptr<RenderSource> createRenderSource() const final;
 
 private:
     optional<Tileset> tileset;

@@ -1,6 +1,5 @@
 #include <mbgl/annotation/annotation_source.hpp>
 #include <mbgl/annotation/annotation_manager.hpp>
-#include <mbgl/annotation/render_annotation_source.hpp>
 
 namespace mbgl {
 
@@ -20,10 +19,6 @@ void AnnotationSource::loadDescription(FileSource&) {
 
 optional<std::string> AnnotationSource::Impl::getAttribution() const {
     return {};
-}
-
-std::unique_ptr<RenderSource> AnnotationSource::Impl::createRenderSource() const {
-    return std::make_unique<RenderAnnotationSource>(staticImmutableCast<AnnotationSource::Impl>(immutableFromThis()));
 }
 
 } // namespace mbgl

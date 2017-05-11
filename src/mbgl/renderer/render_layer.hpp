@@ -22,6 +22,8 @@ protected:
     const style::LayerType type;
 
 public:
+    static std::unique_ptr<RenderLayer> create(Immutable<style::Layer::Impl>);
+
     virtual ~RenderLayer() = default;
 
     // Partially evaluate paint properties based on a set of classes.

@@ -1,14 +1,9 @@
 #include <mbgl/style/layers/custom_layer_impl.hpp>
-#include <mbgl/renderer/render_custom_layer.hpp>
 #include <mbgl/map/transform_state.hpp>
 #include <mbgl/util/logging.hpp>
 
 namespace mbgl {
 namespace style {
-
-std::unique_ptr<RenderLayer> CustomLayer::Impl::createRenderLayer() const {
-    return std::make_unique<RenderCustomLayer>(staticImmutableCast<CustomLayer::Impl>(immutableFromThis()));
-}
 
 CustomLayer::Impl::Impl(const std::string& id_,
                          CustomLayerInitializeFunction initializeFn_,

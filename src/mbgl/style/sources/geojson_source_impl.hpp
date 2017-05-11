@@ -26,7 +26,6 @@ public:
     GeoJSONData* getData() const;
 
     optional<std::string> getAttribution() const final;
-    std::unique_ptr<RenderSource> createRenderSource() const final;
 
 private:
     GeoJSONOptions options;
