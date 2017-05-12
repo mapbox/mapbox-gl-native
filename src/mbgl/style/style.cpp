@@ -583,8 +583,8 @@ RenderData Style::getRenderData(MapDebugOptions debugOptions, float angle) const
         }
 
         std::vector<std::reference_wrapper<RenderTile>> sortedTilesForInsertion;
-        for (auto tileIt = sortedTiles.begin(); tileIt != sortedTiles.end(); ++tileIt) {
-            auto& tile = tileIt->get();
+        for (auto& sortedTile : sortedTiles) {
+            auto& tile = sortedTile.get();
             if (!tile.tile.isRenderable()) {
                 continue;
             }

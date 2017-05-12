@@ -207,8 +207,8 @@ Rect<uint16_t> GlyphAtlas::addGlyph(GlyphValue& value) {
 }
 
 void GlyphAtlas::removeGlyphValues(GlyphRequestor& requestor, std::map<GlyphID, GlyphValue>& values) {
-    for (auto it = values.begin(); it != values.end(); it++) {
-        GlyphValue& value = it->second;
+    for (auto& it : values) {
+        GlyphValue& value = it.second;
         if (value.ids.erase(&requestor) && value.ids.empty() && value.rect) {
             const Rect<uint16_t>& rect = *value.rect;
 
@@ -228,8 +228,8 @@ void GlyphAtlas::removeGlyphValues(GlyphRequestor& requestor, std::map<GlyphID, 
 }
 
 void GlyphAtlas::removePendingRanges(mbgl::GlyphRequestor& requestor, std::map<GlyphRange, GlyphRequest>& ranges) {
-    for (auto it = ranges.begin(); it != ranges.end(); it++) {
-        it->second.requestors.erase(&requestor);
+    for (auto& range : ranges) {
+        range.second.requestors.erase(&requestor);
     }
 }
 
