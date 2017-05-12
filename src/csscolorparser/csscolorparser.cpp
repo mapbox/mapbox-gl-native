@@ -186,9 +186,9 @@ optional<Color> parse(const std::string& css_str) {
     std::transform(str.begin(), str.end(), str.begin(), ::tolower);
 
 
-    for (size_t i = 0; i < namedColorCount; i++) {
-        if (str == namedColors[i].name) {
-            return { namedColors[i].color };
+    for (const auto& namedColor : namedColors) {
+        if (str == namedColor.name) {
+            return { namedColor.color };
         }
     }
 
