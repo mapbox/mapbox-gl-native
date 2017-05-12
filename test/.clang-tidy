@@ -1,0 +1,2 @@
+Checks: 'modernize-*,-modernize-use-equals-delete,-modernize-use-equals-default,misc-static-assert,llvm-namespace-comment,-clang-analyzer-security.insecureAPI.rand,-clang-analyzer-core.uninitialized.UndefReturn,-clang-analyzer-core.StackAddressEscape,-clang-analyzer-core.CallAndMessage,-clang-diagnostic-unused-command-line-argument,-clang-analyzer-core.uninitialized.*,-clang-analyzer-core.NullDereference,-clang-analyzer-core.NonNullParamChecker'
+HeaderFilterRegex: '\/mbgl\/'
