@@ -33,7 +33,7 @@ template <>
 struct Converter<jni::Object<mbgl::android::style::Filter>, mbgl::style::Filter> {
     Result<jni::Object<mbgl::android::style::Filter>> operator()(jni::JNIEnv& env, const mbgl::style::Filter& value) const {
         using namespace mbgl::android::style;
-        auto filter = mbgl::android::style::Filter::fromFilter(env, value);
+        auto filter = Filter::fromFilter(env, value);
 
         return filter;
     }
