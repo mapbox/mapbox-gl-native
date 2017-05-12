@@ -70,8 +70,6 @@ public:
         optional<gl::VertexBuffer<CollisionBoxVertex>> vertexBuffer;
         optional<gl::IndexBuffer<gl::Lines>> indexBuffer;
     } collisionBox;
-
-    SpriteAtlas* spriteAtlas = nullptr;
 };
 
 } // namespace mbgl

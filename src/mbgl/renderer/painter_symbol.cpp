@@ -67,14 +67,13 @@ void Painter::renderSymbol(PaintParameters& parameters,
         auto values = layer.iconPropertyValues(layout);
         auto paintPropertyValues = layer.iconPaintProperties();
 
-        SpriteAtlas& atlas = *bucket.spriteAtlas;
         const bool iconScaled = layout.get<IconSize>().constantOr(1.0) != 1.0 ||
-            frame.pixelRatio != atlas.getPixelRatio() ||
+            frame.pixelRatio != spriteAtlas->getPixelRatio() ||
             bucket.iconsNeedLinear;
         const bool iconTransformed = values.rotationAlignment == AlignmentType::Map || state.getPitch() != 0;
-        atlas.bind(bucket.sdfIcons || state.isChanging() || iconScaled || iconTransformed, context, 0);
+        spriteAtlas->bind(bucket.sdfIcons || state.isChanging() || iconScaled || iconTransformed, context, 0);
 
-        const Size texsize = atlas.getSize();
+        const Size texsize = spriteAtlas->getSize();
 
         if (bucket.sdfIcons) {
             if (values.hasHalo) {

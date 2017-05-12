@@ -30,7 +30,7 @@ public:
 
     float getQueryRadius(const RenderLayer&) const override;
 
-    style::LineLayoutProperties::PossiblyEvaluated layout;
+    const style::LineLayoutProperties::PossiblyEvaluated layout;
 
     gl::VertexVector<LineLayoutVertex> vertices;
     gl::IndexVector<gl::Triangles> triangles;
