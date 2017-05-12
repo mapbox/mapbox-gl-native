@@ -37,7 +37,7 @@ function run_clang_tidy_diff() {
                 ${CLANG_TIDY_PREFIX}/share/clang-tidy-diff.py \
                     -clang-tidy-binary ${CLANG_TIDY} \
                     2>/dev/null)
-    if [[ -n $OUTPUT ]]; then
+    if [[ -n $OUTPUT ]] && [[ $OUTPUT != "No relevant changes found." ]]; then
         echo -e "${OUTPUT}"
         exit 1
     fi

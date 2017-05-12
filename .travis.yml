@@ -81,6 +81,9 @@ matrix:
       script:
         - git fetch origin master:refs/remotes/origin/master
         - make check
+      branches:
+        except:
+          - master
 
     # EGL - Node v4 - Clang 3.9 - Release
     - os: linux
