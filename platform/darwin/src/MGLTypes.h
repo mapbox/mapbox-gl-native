@@ -107,6 +107,33 @@ NS_INLINE MGLTransition MGLTransitionMake(NSTimeInterval duration, NSTimeInterva
     return transition;
 }
 
+/**
+ A structure containing information about light position.
+ */
+typedef struct MGLPosition {
+    CGFloat radial;
+    CGFloat azimuthal;
+    CGFloat polar;
+} MGLPosition;
+
+/**
+ Creates a new `MGLPosition` from the given radial, azumuthal, polar.
+ 
+ @param radial value
+ @param azimuthal value
+ @param polar value
+ 
+ @return Returns a `MGLPosition` struct containing the position attributes.
+ */
+NS_INLINE MGLPosition MGLPositionMake(CGFloat radial, CGFloat azimuthal, CGFloat polar) {
+    MGLPosition position;
+    position.radial = radial;
+    position.azimuthal = azimuthal;
+    position.polar = polar;
+    
+    return position;
+}
+
 NS_ASSUME_NONNULL_END
 
 #ifndef NS_ARRAY_OF

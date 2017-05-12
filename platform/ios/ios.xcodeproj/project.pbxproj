@@ -9,6 +9,10 @@
 /* Begin PBXBuildFile section */
 		1753ED421E53CE6F00A9FD90 /* MGLConversion.h in Headers */ = {isa = PBXBuildFile; fileRef = 1753ED411E53CE6F00A9FD90 /* MGLConversion.h */; };
 		1753ED431E53CE6F00A9FD90 /* MGLConversion.h in Headers */ = {isa = PBXBuildFile; fileRef = 1753ED411E53CE6F00A9FD90 /* MGLConversion.h */; };
+		1F06668A1EC64F8E001C16D7 /* MGLLight.h in Headers */ = {isa = PBXBuildFile; fileRef = 1F0666881EC64F8E001C16D7 /* MGLLight.h */; };
+		1F06668B1EC64F8E001C16D7 /* MGLLight.m in Sources */ = {isa = PBXBuildFile; fileRef = 1F0666891EC64F8E001C16D7 /* MGLLight.m */; };
+		1F06668C1EC64F8E001C16D7 /* MGLLight.m in Sources */ = {isa = PBXBuildFile; fileRef = 1F0666891EC64F8E001C16D7 /* MGLLight.m */; };
+		1F06668D1EC64F8E001C16D7 /* MGLLight.m in Sources */ = {isa = PBXBuildFile; fileRef = 1F0666891EC64F8E001C16D7 /* MGLLight.m */; };
 		1F95931D1E6DE2E900D5B294 /* MGLNSDateAdditionsTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1F95931C1E6DE2E900D5B294 /* MGLNSDateAdditionsTests.mm */; };
 		30E578171DAA85520050F07E /* UIImage+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 30E578111DAA7D690050F07E /* UIImage+MGLAdditions.h */; };
 		30E578181DAA85520050F07E /* UIImage+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 30E578111DAA7D690050F07E /* UIImage+MGLAdditions.h */; };
@@ -545,6 +549,8 @@
 
 /* Begin PBXFileReference section */
 		1753ED411E53CE6F00A9FD90 /* MGLConversion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLConversion.h; sourceTree = "<group>"; };
+		1F0666881EC64F8E001C16D7 /* MGLLight.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLLight.h; sourceTree = "<group>"; };
+		1F0666891EC64F8E001C16D7 /* MGLLight.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLLight.m; sourceTree = "<group>"; };
 		1F95931C1E6DE2E900D5B294 /* MGLNSDateAdditionsTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLNSDateAdditionsTests.mm; path = ../../darwin/test/MGLNSDateAdditionsTests.mm; sourceTree = "<group>"; };
 		20DABE861DF78148007AC5FF /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Foundation.strings"; sourceTree = "<group>"; };
 		20DABE881DF78148007AC5FF /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
@@ -1039,6 +1045,8 @@
 				35599DB81D46AD7F0048254D /* Categories */,
 				353933F01D3FB6BA003F57D7 /* Layers */,
 				35136D491D4277EA00C20EFD /* Sources */,
+				1F0666881EC64F8E001C16D7 /* MGLLight.h */,
+				1F0666891EC64F8E001C16D7 /* MGLLight.m */,
 				DAAF72291DA903C700312FA4 /* MGLStyleValue.h */,
 				DAAF722A1DA903C700312FA4 /* MGLStyleValue_Private.h */,
 				35599DEA1D46F14E0048254D /* MGLStyleValue.mm */,
@@ -1657,6 +1665,7 @@
 				DA8847F01CBAFA5100AB86E3 /* MGLAnnotation.h in Headers */,
 				7E016D841D9E890300A29A21 /* MGLPolygon+MGLAdditions.h in Headers */,
 				400533011DB0862B0069F638 /* NSArray+MGLAdditions.h in Headers */,
+				1F06668A1EC64F8E001C16D7 /* MGLLight.h in Headers */,
 				4049C29D1DB6CD6C00B3F799 /* MGLPointCollection.h in Headers */,
 				40CF6DBB1DAC3C6600A4D18B /* MGLShape_Private.h in Headers */,
 				4018B1CA1CDC288E00F666AF /* MGLAnnotationView.h in Headers */,
@@ -2136,6 +2145,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1F06668B1EC64F8E001C16D7 /* MGLLight.m in Sources */,
 				DA1DC9971CB6E046006E619F /* main.m in Sources */,
 				354B839C1D2E9B48005D9406 /* MBXUserLocationAnnotationView.m in Sources */,
 				DA1DC9991CB6E054006E619F /* MBXAppDelegate.m in Sources */,
@@ -2221,6 +2231,7 @@
 				3566C76E1D4A8DFA008152BC /* MGLRasterSource.mm in Sources */,
 				DA88488C1CBB037E00AB86E3 /* SMCalloutView.m in Sources */,
 				35136D4E1D4277FC00C20EFD /* MGLSource.mm in Sources */,
+				1F06668D1EC64F8E001C16D7 /* MGLLight.m in Sources */,
 				DA35A2B81CCA9A5D00E826B2 /* MGLClockDirectionFormatter.m in Sources */,
 				DAD1657A1CF4CDFF001FF4B9 /* MGLShapeCollection.mm in Sources */,
 				35136D451D42275100C20EFD /* MGLSymbolStyleLayer.mm in Sources */,
@@ -2358,6 +2369,7 @@
 			files = (
 				DABCABB21CB80692000A7C39 /* MBXBenchViewController.mm in Sources */,
 				DABCABAF1CB80692000A7C39 /* MBXBenchAppDelegate.m in Sources */,
+				1F06668C1EC64F8E001C16D7 /* MGLLight.m in Sources */,
 				DABCABC21CB8071D000A7C39 /* locations.cpp in Sources */,
 				DABCABAC1CB80692000A7C39 /* main.m in Sources */,
 			);
