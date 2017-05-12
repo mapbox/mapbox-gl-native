@@ -67,7 +67,7 @@ public:
 
     /* common properties, but not shared by all */
 
-    jni::Object<mbgl::android::style::Filter> getFilter(jni::JNIEnv&);
+    jni::Object<mbgl::android::Filter> getFilter(jni::JNIEnv&);
 
     void setFilter(jni::JNIEnv&, jni::Array<jni::Object<>>);
 

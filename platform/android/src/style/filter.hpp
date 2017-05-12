@@ -7,14 +7,13 @@
 
 namespace mbgl {
 namespace android {
-namespace style {
 
 class Filter : private mbgl::util::noncopyable {
 public:
 
     static constexpr auto Name() { return "com/mapbox/mapboxsdk/style/layers/Filter"; };
 
-    static jni::Object<Filter> fromFilter(jni::JNIEnv&, mbgl::style::Filter);
+    static jni::Object<Filter> fromFilter(jni::JNIEnv&, const mbgl::style::Filter&);
 
     static jni::Class<Filter> javaClass;
 
@@ -22,6 +21,5 @@ public:
 
 };
 
-} // namespace style
 } // namespace android
 } // namespace mbgl
