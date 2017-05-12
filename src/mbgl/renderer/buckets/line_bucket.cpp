@@ -1,6 +1,6 @@
-#include <mbgl/renderer/line_bucket.hpp>
+#include <mbgl/renderer/buckets/line_bucket.hpp>
 #include <mbgl/renderer/painter.hpp>
-#include <mbgl/renderer/render_line_layer.hpp>
+#include <mbgl/renderer/layers/render_line_layer.hpp>
 #include <mbgl/renderer/bucket_parameters.hpp>
 #include <mbgl/style/layers/line_layer_impl.hpp>
 #include <mbgl/util/math.hpp>

@@ -10,7 +10,7 @@
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/layers/symbol_layer.hpp>
 #include <mbgl/renderer/tile_parameters.hpp>
-#include <mbgl/renderer/symbol_bucket.hpp>
+#include <mbgl/renderer/buckets/symbol_bucket.hpp>
 #include <mbgl/text/collision_tile.hpp>
 #include <mbgl/geometry/feature_index.hpp>
 #include <mbgl/annotation/annotation_manager.hpp>

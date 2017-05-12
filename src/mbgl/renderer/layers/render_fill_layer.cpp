@@ -1,5 +1,5 @@
-#include <mbgl/renderer/render_fill_layer.hpp>
-#include <mbgl/renderer/fill_bucket.hpp>
+#include <mbgl/renderer/layers/render_fill_layer.hpp>
+#include <mbgl/renderer/buckets/fill_bucket.hpp>
 #include <mbgl/style/layers/fill_layer_impl.hpp>
 #include <mbgl/geometry/feature_index.hpp>
 #include <mbgl/util/math.hpp>

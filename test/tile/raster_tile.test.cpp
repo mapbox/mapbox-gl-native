@@ -9,7 +9,7 @@
 #include <mbgl/style/style.hpp>
 #include <mbgl/annotation/annotation_manager.hpp>
 #include <mbgl/renderer/tile_parameters.hpp>
-#include <mbgl/renderer/raster_bucket.hpp>
+#include <mbgl/renderer/buckets/raster_bucket.hpp>
 
 using namespace mbgl;
 

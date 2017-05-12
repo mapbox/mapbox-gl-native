@@ -1,4 +1,4 @@
-#include <mbgl/renderer/debug_bucket.hpp>
+#include <mbgl/renderer/buckets/debug_bucket.hpp>
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/programs/fill_program.hpp>
 #include <mbgl/geometry/debug_font_data.hpp>

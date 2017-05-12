@@ -1,10 +1,10 @@
 #include <mbgl/layout/symbol_layout.hpp>
 #include <mbgl/layout/merge_lines.hpp>
 #include <mbgl/layout/clip_lines.hpp>
-#include <mbgl/renderer/symbol_bucket.hpp>
+#include <mbgl/renderer/buckets/symbol_bucket.hpp>
 #include <mbgl/style/filter_evaluator.hpp>
 #include <mbgl/renderer/bucket_parameters.hpp>
-#include <mbgl/renderer/render_symbol_layer.hpp>
+#include <mbgl/renderer/layers/render_symbol_layer.hpp>
 #include <mbgl/style/layers/symbol_layer_impl.hpp>
 #include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/text/get_anchors.hpp>

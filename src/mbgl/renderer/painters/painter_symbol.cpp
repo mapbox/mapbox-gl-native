@@ -1,8 +1,8 @@
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/renderer/paint_parameters.hpp>
-#include <mbgl/renderer/symbol_bucket.hpp>
+#include <mbgl/renderer/buckets/symbol_bucket.hpp>
 #include <mbgl/renderer/render_tile.hpp>
-#include <mbgl/renderer/render_symbol_layer.hpp>
+#include <mbgl/renderer/layers/render_symbol_layer.hpp>
 #include <mbgl/style/layers/symbol_layer_impl.hpp>
 #include <mbgl/text/glyph_atlas.hpp>
 #include <mbgl/sprite/sprite_atlas.hpp>

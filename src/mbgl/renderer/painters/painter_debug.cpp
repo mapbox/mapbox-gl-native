@@ -1,5 +1,5 @@
 #include <mbgl/renderer/painter.hpp>
-#include <mbgl/renderer/debug_bucket.hpp>
+#include <mbgl/renderer/buckets/debug_bucket.hpp>
 #include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/renderer/paint_parameters.hpp>
 #include <mbgl/map/view.hpp>

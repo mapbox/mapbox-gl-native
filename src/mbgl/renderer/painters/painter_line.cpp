@@ -1,8 +1,8 @@
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/renderer/paint_parameters.hpp>
-#include <mbgl/renderer/line_bucket.hpp>
+#include <mbgl/renderer/buckets/line_bucket.hpp>
 #include <mbgl/renderer/render_tile.hpp>
-#include <mbgl/renderer/render_line_layer.hpp>
+#include <mbgl/renderer/layers/render_line_layer.hpp>
 #include <mbgl/style/layers/line_layer_impl.hpp>
 #include <mbgl/programs/programs.hpp>
 #include <mbgl/programs/line_program.hpp>

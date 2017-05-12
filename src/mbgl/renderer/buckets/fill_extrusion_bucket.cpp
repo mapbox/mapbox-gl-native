@@ -1,9 +1,9 @@
-#include <mbgl/renderer/fill_extrusion_bucket.hpp>
+#include <mbgl/renderer/buckets/fill_extrusion_bucket.hpp>
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/programs/fill_extrusion_program.hpp>
 #include <mbgl/renderer/bucket_parameters.hpp>
 #include <mbgl/style/layers/fill_extrusion_layer_impl.hpp>
-#include <mbgl/renderer/render_fill_extrusion_layer.hpp>
+#include <mbgl/renderer/layers/render_fill_extrusion_layer.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/constants.hpp>
 

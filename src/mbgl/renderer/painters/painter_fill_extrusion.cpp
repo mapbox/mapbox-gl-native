@@ -1,8 +1,8 @@
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/renderer/paint_parameters.hpp>
-#include <mbgl/renderer/fill_extrusion_bucket.hpp>
+#include <mbgl/renderer/buckets/fill_extrusion_bucket.hpp>
 #include <mbgl/renderer/render_tile.hpp>
-#include <mbgl/renderer/render_fill_extrusion_layer.hpp>
+#include <mbgl/renderer/layers/render_fill_extrusion_layer.hpp>
 #include <mbgl/style/layers/fill_extrusion_layer_impl.hpp>
 #include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/programs/programs.hpp>

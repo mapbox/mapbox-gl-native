@@ -1,12 +1,12 @@
 #include <mbgl/renderer/render_layer.hpp>
-#include <mbgl/renderer/render_background_layer.hpp>
-#include <mbgl/renderer/render_circle_layer.hpp>
-#include <mbgl/renderer/render_custom_layer.hpp>
-#include <mbgl/renderer/render_fill_extrusion_layer.hpp>
-#include <mbgl/renderer/render_fill_layer.hpp>
-#include <mbgl/renderer/render_line_layer.hpp>
-#include <mbgl/renderer/render_raster_layer.hpp>
-#include <mbgl/renderer/render_symbol_layer.hpp>
+#include <mbgl/renderer/layers/render_background_layer.hpp>
+#include <mbgl/renderer/layers/render_circle_layer.hpp>
+#include <mbgl/renderer/layers/render_custom_layer.hpp>
+#include <mbgl/renderer/layers/render_fill_extrusion_layer.hpp>
+#include <mbgl/renderer/layers/render_fill_layer.hpp>
+#include <mbgl/renderer/layers/render_line_layer.hpp>
+#include <mbgl/renderer/layers/render_raster_layer.hpp>
+#include <mbgl/renderer/layers/render_symbol_layer.hpp>
 #include <mbgl/style/types.hpp>
 
 namespace mbgl {

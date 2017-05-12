@@ -15,10 +15,10 @@
 #include <mbgl/style/layer_impl.hpp>
 
 #include <mbgl/tile/tile.hpp>
-#include <mbgl/renderer/render_background_layer.hpp>
-#include <mbgl/renderer/render_custom_layer.hpp>
+#include <mbgl/renderer/layers/render_background_layer.hpp>
+#include <mbgl/renderer/layers/render_custom_layer.hpp>
 #include <mbgl/style/layers/custom_layer_impl.hpp>
-#include <mbgl/renderer/render_fill_extrusion_layer.hpp>
+#include <mbgl/renderer/layers/render_fill_extrusion_layer.hpp>
 
 #include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/geometry/line_atlas.hpp>
