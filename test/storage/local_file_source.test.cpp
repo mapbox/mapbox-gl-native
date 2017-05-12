@@ -3,7 +3,7 @@
 #include <mbgl/util/run_loop.hpp>
 
 #include <unistd.h>
-#include <limits.h>
+#include <climits>
 #include <gtest/gtest.h>
 
 namespace {

@@ -17,7 +17,7 @@
 #include <unordered_map>
 #include <utility>
 
-#include <stdlib.h>
+#include <cstdlib>
 #include <unistd.h>
 
 using namespace mbgl;
