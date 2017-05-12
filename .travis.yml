@@ -70,13 +70,14 @@ after_success:
 
 matrix:
   include:
-    # LLVM 3.8.0 - clang-{format,tidy}
+    # Clang 3.9.0 / clang-{format,tidy} 4.0.0
     - os: linux
-      sudo: false
+      sudo: required
       dist: trusty
       language: cpp
-      env: _CXX=c++ _CC=cc
       compiler: "check"
+      env: _CXX=clang++-3.9 _CC=clang-3.9
+      addons: *clang39
       script:
         - git fetch origin master:refs/remotes/origin/master
         - make check
