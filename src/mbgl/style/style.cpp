@@ -729,15 +729,10 @@ void Style::setObserver(style::Observer* observer_) {
     observer = observer_;
 }
 
-void Style::onGlyphsLoaded(const FontStack& fontStack, const GlyphRange& glyphRange) {
-    observer->onGlyphsLoaded(fontStack, glyphRange);
-}
-
 void Style::onGlyphsError(const FontStack& fontStack, const GlyphRange& glyphRange, std::exception_ptr error) {
     lastError = error;
     Log::Error(Event::Style, "Failed to load glyph range %d-%d for font stack %s: %s",
                glyphRange.first, glyphRange.second, fontStackToString(fontStack).c_str(), util::toString(error).c_str());
-    observer->onGlyphsError(fontStack, glyphRange, error);
     observer->onResourceError(error);
 }
 
@@ -789,14 +784,12 @@ void Style::onSpriteLoaded(SpriteLoader::Images&& images) {
     spriteAtlas->onSpriteLoaded(std::move(addedImages));
 
     // Update observer
-    observer->onSpriteLoaded(std::move(images));
     observer->onUpdate(Update::Repaint); // For *-pattern properties.
 }
 
 void Style::onSpriteError(std::exception_ptr error) {
     lastError = error;
     Log::Error(Event::Style, "Failed to load sprite: %s", util::toString(error).c_str());
-    observer->onSpriteError(error);
     observer->onResourceError(error);
 }
 
