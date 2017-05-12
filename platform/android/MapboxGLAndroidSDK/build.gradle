@@ -95,6 +95,9 @@ android {
                 }
             }
         }
+
+        // proguard config for .aar
+        consumerProguardFiles 'proguard-rules.pro'
     }
 
     // avoid naming conflicts, force usage of prefix
@@ -122,7 +125,6 @@ android {
 
         release {
             // aar proguard configuration
-            consumerProguardFiles 'proguard-rules.pro'
             jniDebuggable false
         }
     }
