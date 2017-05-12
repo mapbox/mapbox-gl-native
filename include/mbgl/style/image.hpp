@@ -1,8 +1,7 @@
 #pragma once
 
 #include <mbgl/util/image.hpp>
-
-#include <memory>
+#include <mbgl/util/immutable.hpp>
 
 namespace mbgl {
 namespace style {
@@ -11,7 +10,7 @@ class Image {
 public:
     Image(PremultipliedImage&&, float pixelRatio, bool sdf = false);
 
-    PremultipliedImage& getImage() const;
+    const PremultipliedImage& getImage() const;
 
     // Pixel ratio of the sprite image.
     float getPixelRatio() const;
@@ -23,9 +22,7 @@ public:
     float getHeight() const;
 
     class Impl;
-
-private:
-    const std::shared_ptr<Impl> impl;
+    Immutable<Impl> impl;
 };
 
 } // namespace style

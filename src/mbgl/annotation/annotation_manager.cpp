@@ -6,6 +6,7 @@
 #include <mbgl/annotation/fill_annotation_impl.hpp>
 #include <mbgl/sprite/sprite_image_collection.hpp>
 #include <mbgl/style/style.hpp>
+#include <mbgl/style/image_impl.hpp>
 #include <mbgl/style/layers/symbol_layer.hpp>
 #include <mbgl/style/layers/symbol_layer_impl.hpp>
 #include <mbgl/storage/file_source.hpp>
@@ -192,7 +193,7 @@ void AnnotationManager::removeTile(AnnotationTile& tile) {
 
 void AnnotationManager::addImage(const std::string& id, std::unique_ptr<style::Image> image) {
     addSpriteImage(spriteImages, id, std::move(image), [&](style::Image& added) {
-        spriteAtlas.addImage(id, std::make_unique<style::Image>(added));
+        spriteAtlas.addImage(id, added.impl);
     });
 }
 
@@ -203,8 +204,8 @@ void AnnotationManager::removeImage(const std::string& id) {
 }
 
 double AnnotationManager::getTopOffsetPixelsForImage(const std::string& id) {
-    const style::Image* image = spriteAtlas.getImage(id);
-    return image ? -(image->getImage().size.height / image->getPixelRatio()) / 2 : 0;
+    const style::Image::Impl* impl = spriteAtlas.getImage(id);
+    return impl ? -(impl->image.size.height / impl->pixelRatio) / 2 : 0;
 }
 
 } // namespace mbgl

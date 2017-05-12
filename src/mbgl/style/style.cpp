@@ -544,7 +544,7 @@ bool Style::isLoaded() const {
 
 void Style::addImage(const std::string& id, std::unique_ptr<style::Image> image) {
     addSpriteImage(spriteImages, id, std::move(image), [&](style::Image& added) {
-        spriteAtlas->addImage(id, std::make_unique<style::Image>(added));
+        spriteAtlas->addImage(id, added.impl);
         observer->onUpdate(Update::Repaint);
     });
 }
@@ -557,7 +557,8 @@ void Style::removeImage(const std::string& id) {
 }
 
 const style::Image* Style::getImage(const std::string& id) const {
-    return spriteAtlas->getImage(id);
+    auto it = spriteImages.find(id);
+    return it == spriteImages.end() ? nullptr : it->second.get();
 }
 
 RenderData Style::getRenderData(MapDebugOptions debugOptions, float angle) const {
