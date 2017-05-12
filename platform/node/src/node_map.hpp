@@ -26,7 +26,6 @@ public:
 class NodeMap : public Nan::ObjectWrap,
                 public mbgl::FileSource {
 public:
-    struct RenderOptions;
     class RenderWorker;
 
     NodeMap(v8::Local<v8::Object>);
@@ -51,20 +50,16 @@ public:
     static void SetLayoutProperty(const Nan::FunctionCallbackInfo<v8::Value>&);
     static void SetPaintProperty(const Nan::FunctionCallbackInfo<v8::Value>&);
     static void SetFilter(const Nan::FunctionCallbackInfo<v8::Value>&);
-    static void SetCenter(const Nan::FunctionCallbackInfo<v8::Value>&);
-    static void SetZoom(const Nan::FunctionCallbackInfo<v8::Value>&);
-    static void SetBearing(const Nan::FunctionCallbackInfo<v8::Value>&);
-    static void SetPitch(const Nan::FunctionCallbackInfo<v8::Value>&);
     static void DumpDebugLogs(const Nan::FunctionCallbackInfo<v8::Value>&);
     static void QueryRenderedFeatures(const Nan::FunctionCallbackInfo<v8::Value>&);
 
-    void startRender(RenderOptions options);
+    void startRender();
     void renderFinished();
 
     void release();
     void cancel();
 
-    static RenderOptions ParseOptions(v8::Local<v8::Object>);
+    static void ApplyOptions(mbgl::Map*, v8::Local<v8::Object>);
 
     std::unique_ptr<mbgl::AsyncRequest> request(const mbgl::Resource&, mbgl::FileSource::Callback);
 

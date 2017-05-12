@@ -117,10 +117,6 @@ test('Map', function(t) {
             'setLayoutProperty',
             'setPaintProperty',
             'setFilter',
-            'setCenter',
-            'setZoom',
-            'setBearing',
-            'setPitch',
             'dumpDebugLogs',
             'queryRenderedFeatures'
         ]);
@@ -272,7 +268,7 @@ test('Map', function(t) {
 
             t.throws(function() {
                 map.removeImage({});
-            }, /First argument must be a string/);
+            }, /Argument must be a string/);
 
             map.release();
             t.end();
@@ -432,12 +428,9 @@ test('Map', function(t) {
         t.test('requires a style to be set', function(t) {
             var map = new mbgl.Map(options);
 
-            t.throws(function() {
-                map.render({}, function() {});
-            }, /Style is not loaded/);
+            map.render({}, function(err) { if (err) t.end(); });
 
             map.release();
-            t.end();
         });
 
         t.test('returns an error delayed', function(t) {
@@ -520,17 +513,15 @@ test('Map', function(t) {
             render();
         });
 
-        t.test('throws if called in parallel', function(t) {
+        t.test('error if called in parallel', function(t) {
             var map = new mbgl.Map(options);
             map.load(style);
 
-            t.throws(function() {
-                map.render({}, function() {});
-                map.render({}, function() {});
-            }, /Map is currently rendering an image/);
+            t.plan(1);
 
-            map.release();
-            t.end();
+            // First will pass, second will fail
+            map.render({}, function(err) { if (err) t.fail(); });
+            map.render({}, function(err) { if (err) t.pass(); });
         });
 
         // This can't be tested with a test-suite render test because zoom and center
