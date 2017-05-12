@@ -1135,9 +1135,9 @@ IB_DESIGNABLE
 
  The objects in this array must adopt the `MGLOverlay` protocol. If no
  overlays are associated with the map view, the value of this property is
- `nil`.
+ empty array.
  */
-@property (nonatomic, readonly, nullable) NS_ARRAY_OF(id <MGLOverlay>) *overlays;
+@property (nonatomic, readonly, nonnull) NS_ARRAY_OF(id <MGLOverlay>) *overlays;
 
 /**
  Adds a single overlay object to the map.
