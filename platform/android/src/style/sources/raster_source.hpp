@@ -22,6 +22,8 @@ public:
 
     ~RasterSource();
 
+    jni::String getURL(jni::JNIEnv&);
+
     jni::jobject* createJavaPeer(jni::JNIEnv&);
 
 }; // class RasterSource

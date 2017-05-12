@@ -146,7 +146,7 @@ public final class UiSettings {
     if (compassMargins != null) {
       setCompassMargins(compassMargins[0], compassMargins[1], compassMargins[2], compassMargins[3]);
     } else {
-      int tenDp = (int) resources.getDimension(R.dimen.mapbox_ten_dp);
+      int tenDp = (int) resources.getDimension(R.dimen.mapbox_four_dp);
       setCompassMargins(tenDp, tenDp, tenDp, tenDp);
     }
     setCompassFadeFacingNorth(options.getCompassFadeFacingNorth());
@@ -171,9 +171,7 @@ public final class UiSettings {
   private byte[] convert(Bitmap resource) {
     ByteArrayOutputStream stream = new ByteArrayOutputStream();
     resource.compress(Bitmap.CompressFormat.PNG, 100, stream);
-    byte[] byteArray = stream.toByteArray();
-
-    return byteArray;
+    return stream.toByteArray();
   }
 
   private void restoreCompass(Bundle savedInstanceState) {
@@ -189,10 +187,7 @@ public final class UiSettings {
 
   private Drawable decode(byte[] bitmap) {
     Bitmap compass = BitmapFactory.decodeByteArray(bitmap, 0, bitmap.length);
-
-    Drawable compassImage = new BitmapDrawable(compassView.getResources(), compass);
-
-    return compassImage;
+    return new BitmapDrawable(compassView.getResources(), compass);
   }
 
   private void initialiseLogo(MapboxMapOptions options, Resources resources) {
@@ -202,8 +197,8 @@ public final class UiSettings {
     if (logoMargins != null) {
       setLogoMargins(logoMargins[0], logoMargins[1], logoMargins[2], logoMargins[3]);
     } else {
-      int sixteenDp = (int) resources.getDimension(R.dimen.mapbox_sixteen_dp);
-      setLogoMargins(sixteenDp, sixteenDp, sixteenDp, sixteenDp);
+      int twoDp = (int) resources.getDimension(R.dimen.mapbox_two_dp);
+      setLogoMargins(twoDp, twoDp, twoDp, twoDp);
     }
   }
 
@@ -226,16 +221,12 @@ public final class UiSettings {
   }
 
   private void initialiseAttribution(Context context, MapboxMapOptions options) {
-    Resources resources = context.getResources();
     setAttributionEnabled(options.getAttributionEnabled());
     setAttributionGravity(options.getAttributionGravity());
     int[] attributionMargins = options.getAttributionMargins();
     if (attributionMargins != null) {
-      setAttributionMargins(attributionMargins[0], attributionMargins[1], attributionMargins[2], attributionMargins[3]);
-    } else {
-      int sevenDp = (int) resources.getDimension(R.dimen.mapbox_seven_dp);
-      int seventySixDp = (int) resources.getDimension(R.dimen.mapbox_seventy_six_dp);
-      setAttributionMargins(seventySixDp, sevenDp, sevenDp, sevenDp);
+      setAttributionMargins(attributionMargins[0], attributionMargins[1],
+        attributionMargins[2], attributionMargins[3]);
     }
 
     int attributionTintColor = options.getAttributionTintColor();
