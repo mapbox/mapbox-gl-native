@@ -6,14 +6,14 @@
 
 - (nullable instancetype)initWithMGLStyleImage:(const mbgl::style::Image *)styleImage
 {
-    CGImageRef image = CGImageFromMGLPremultipliedImage(styleImage->image.clone());
+    CGImageRef image = CGImageFromMGLPremultipliedImage(styleImage->getImage().clone());
     if (!image) {
         return nil;
     }
 
-    if (self = [self initWithCGImage:image scale:styleImage->pixelRatio orientation:UIImageOrientationUp])
+    if (self = [self initWithCGImage:image scale:styleImage->getPixelRatio() orientation:UIImageOrientationUp])
     {
-        if (styleImage->sdf)
+        if (styleImage->isSdf())
         {
             self = [self imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
         }

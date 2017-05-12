@@ -9,6 +9,7 @@
 #include <string>
 #include <vector>
 #include <unordered_set>
+#include <unordered_map>
 
 namespace mbgl {
 
@@ -72,6 +73,8 @@ private:
     ShapeAnnotationMap shapeAnnotations;
     std::unordered_set<std::string> obsoleteShapeAnnotationLayers;
     std::unordered_set<AnnotationTile*> tiles;
+
+    std::unordered_map<std::string, std::unique_ptr<style::Image>> spriteImages;
     SpriteAtlas spriteAtlas;
 
     friend class AnnotationTile;

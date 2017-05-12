@@ -16,7 +16,7 @@
 }
 
 - (nullable instancetype)initWithMGLStyleImage:(const mbgl::style::Image *)styleImage {
-    CGImageRef image = CGImageFromMGLPremultipliedImage(styleImage->image.clone());
+    CGImageRef image = CGImageFromMGLPremultipliedImage(styleImage->getImage().clone());
     if (!image) {
         return nil;
     }
@@ -25,7 +25,7 @@
     CGImageRelease(image);
     if (self = [self initWithSize:NSMakeSize(styleImage->getWidth(), styleImage->getHeight())]) {
         [self addRepresentation:rep];
-        [self setTemplate:styleImage->sdf];
+        [self setTemplate:styleImage->isSdf()];
     }
     return self;
 }

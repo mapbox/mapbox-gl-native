@@ -2,6 +2,8 @@
 
 #include <mbgl/util/image.hpp>
 
+#include <memory>
+
 namespace mbgl {
 namespace style {
 
@@ -9,16 +11,21 @@ class Image {
 public:
     Image(PremultipliedImage&&, float pixelRatio, bool sdf = false);
 
-    PremultipliedImage image;
+    PremultipliedImage& getImage() const;
 
     // Pixel ratio of the sprite image.
-    const float pixelRatio;
+    float getPixelRatio() const;
 
     // Whether this image should be interpreted as a signed distance field icon.
-    const bool sdf;
+    bool isSdf() const;
 
-    float getWidth() const { return image.size.width / pixelRatio; }
-    float getHeight() const { return image.size.height / pixelRatio; }
+    float getWidth() const;
+    float getHeight() const;
+
+    class Impl;
+
+private:
+    const std::shared_ptr<Impl> impl;
 };
 
 } // namespace style

@@ -1,21 +1,35 @@
 #include <mbgl/style/image.hpp>
+#include <mbgl/style/image_impl.hpp>
 #include <mbgl/util/exception.hpp>
 
 namespace mbgl {
 namespace style {
 
-Image::Image(PremultipliedImage&& image_,
-             const float pixelRatio_,
-             bool sdf_)
-    : image(std::move(image_)),
-      pixelRatio(pixelRatio_),
-      sdf(sdf_) {
+Image::Image(PremultipliedImage &&image,
+             const float pixelRatio,
+             bool sdf)
+        : impl(std::make_shared<Impl>(std::move(image), pixelRatio, sdf)) {
+}
 
-    if (!image.valid()) {
-        throw util::SpriteImageException("Sprite image dimensions may not be zero");
-    } else if (pixelRatio <= 0) {
-        throw util::SpriteImageException("Sprite pixelRatio may not be <= 0");
-    }
+PremultipliedImage& Image::getImage() const {
+    assert(impl);
+    return impl->image;
+}
+
+bool Image::isSdf() const {
+    return impl->sdf;
+}
+
+float Image::getPixelRatio() const {
+    return impl->pixelRatio;
+}
+
+float Image::getWidth() const {
+    return impl->getWidth();
+}
+
+float Image::getHeight() const {
+    return impl->getHeight();
 }
 
 } // namespace style

@@ -145,11 +145,11 @@ TEST(Sprite, SpriteImageCreation1x) {
         ASSERT_TRUE(sprite.get());
         EXPECT_EQ(18, sprite->getWidth());
         EXPECT_EQ(18, sprite->getHeight());
-        EXPECT_EQ(18u, sprite->image.size.width);
-        EXPECT_EQ(18u, sprite->image.size.height);
-        EXPECT_EQ(1, sprite->pixelRatio);
+        EXPECT_EQ(18u, sprite->getImage().size.width);
+        EXPECT_EQ(18u, sprite->getImage().size.height);
+        EXPECT_EQ(1, sprite->getPixelRatio());
         EXPECT_EQ(readImage("test/fixtures/annotations/result-spriteimagecreation1x-museum.png"),
-                  sprite->image);
+                  sprite->getImage());
     }
 }
 
@@ -161,11 +161,11 @@ TEST(Sprite, SpriteImageCreation2x) {
     ASSERT_TRUE(sprite.get());
     EXPECT_EQ(18, sprite->getWidth());
     EXPECT_EQ(18, sprite->getHeight());
-    EXPECT_EQ(36u, sprite->image.size.width);
-    EXPECT_EQ(36u, sprite->image.size.height);
-    EXPECT_EQ(2, sprite->pixelRatio);
+    EXPECT_EQ(36u, sprite->getImage().size.width);
+    EXPECT_EQ(36u, sprite->getImage().size.height);
+    EXPECT_EQ(2, sprite->getPixelRatio());
     EXPECT_EQ(readImage("test/fixtures/annotations/result-spriteimagecreation2x.png"),
-              sprite->image);
+              sprite->getImage());
 }
 
 TEST(Sprite, SpriteImageCreation1_5x) {
@@ -176,22 +176,22 @@ TEST(Sprite, SpriteImageCreation1_5x) {
     ASSERT_TRUE(sprite.get());
     EXPECT_EQ(24, sprite->getWidth());
     EXPECT_EQ(24, sprite->getHeight());
-    EXPECT_EQ(36u, sprite->image.size.width);
-    EXPECT_EQ(36u, sprite->image.size.height);
-    EXPECT_EQ(1.5, sprite->pixelRatio);
+    EXPECT_EQ(36u, sprite->getImage().size.width);
+    EXPECT_EQ(36u, sprite->getImage().size.height);
+    EXPECT_EQ(1.5, sprite->getPixelRatio());
     EXPECT_EQ(readImage("test/fixtures/annotations/result-spriteimagecreation1_5x-museum.png"),
-              sprite->image);
+              sprite->getImage());
 
     // "hospital_icon":{"x":314,"y":518,"width":36,"height":36,"pixelRatio":2,"sdf":false}
     const auto sprite2 = createStyleImage(image_2x, 314, 518, 35, 35, 1.5, false);
     ASSERT_TRUE(sprite2.get());
     EXPECT_EQ(float(35 / 1.5), sprite2->getWidth());
     EXPECT_EQ(float(35 / 1.5), sprite2->getHeight());
-    EXPECT_EQ(35u, sprite2->image.size.width);
-    EXPECT_EQ(35u, sprite2->image.size.height);
-    EXPECT_EQ(1.5, sprite2->pixelRatio);
+    EXPECT_EQ(35u, sprite2->getImage().size.width);
+    EXPECT_EQ(35u, sprite2->getImage().size.height);
+    EXPECT_EQ(1.5, sprite2->getPixelRatio());
     EXPECT_EQ(readImage("test/fixtures/annotations/result-spriteimagecreation1_5x-hospital.png"),
-              sprite2->image);
+              sprite2->getImage());
 }
 
 TEST(Sprite, SpriteParsing) {
@@ -283,10 +283,10 @@ TEST(Sprite, SpriteParsing) {
         auto& sprite = images.find("generic-metro")->second;
         EXPECT_EQ(18, sprite->getWidth());
         EXPECT_EQ(18, sprite->getHeight());
-        EXPECT_EQ(18u, sprite->image.size.width);
-        EXPECT_EQ(18u, sprite->image.size.height);
-        EXPECT_EQ(1, sprite->pixelRatio);
-        EXPECT_EQ(readImage("test/fixtures/annotations/result-spriteparsing.png"), sprite->image);
+        EXPECT_EQ(18u, sprite->getImage().size.width);
+        EXPECT_EQ(18u, sprite->getImage().size.height);
+        EXPECT_EQ(1, sprite->getPixelRatio());
+        EXPECT_EQ(readImage("test/fixtures/annotations/result-spriteparsing.png"), sprite->getImage());
     }
 }
 

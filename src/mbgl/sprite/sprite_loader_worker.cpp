@@ -1,14 +1,14 @@
-#include <mbgl/sprite/sprite_atlas_worker.hpp>
-#include <mbgl/sprite/sprite_atlas.hpp>
+#include <mbgl/sprite/sprite_loader_worker.hpp>
+#include <mbgl/sprite/sprite_loader.hpp>
 #include <mbgl/sprite/sprite_parser.hpp>
 
 namespace mbgl {
 
-SpriteAtlasWorker::SpriteAtlasWorker(ActorRef<SpriteAtlasWorker>, ActorRef<SpriteAtlas> parent_)
+SpriteLoaderWorker::SpriteLoaderWorker(ActorRef<SpriteLoaderWorker>, ActorRef<SpriteLoader> parent_)
     : parent(std::move(parent_)) {
 }
 
-void SpriteAtlasWorker::parse(std::shared_ptr<const std::string> image,
+void SpriteLoaderWorker::parse(std::shared_ptr<const std::string> image,
                               std::shared_ptr<const std::string> json) {
     try {
         if (!image) {
@@ -20,9 +20,9 @@ void SpriteAtlasWorker::parse(std::shared_ptr<const std::string> image,
             throw std::runtime_error("missing sprite metadata");
         }
 
-        parent.invoke(&SpriteAtlas::onParsed, parseSprite(*image, *json));
+        parent.invoke(&SpriteLoader::onParsed, parseSprite(*image, *json));
     } catch (...) {
-        parent.invoke(&SpriteAtlas::onError, std::current_exception());
+        parent.invoke(&SpriteLoader::onError, std::current_exception());
     }
 }
 

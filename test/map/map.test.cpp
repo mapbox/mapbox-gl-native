@@ -512,7 +512,7 @@ TEST(Map, GetImage) {
 
     map.setStyleJSON(util::read_file("test/fixtures/api/icon_style.json"));
     map.addImage("test-icon", std::move(image));
-    test::checkImage("test/fixtures/map/get_icon", map.getImage("test-icon")->image);
+    test::checkImage("test/fixtures/map/get_icon", map.getImage("test-icon")->getImage());
 }
 
 TEST(Map, DontLoadUnneededTiles) {
