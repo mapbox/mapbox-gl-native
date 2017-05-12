@@ -81,7 +81,7 @@ void HeadlessBackend::createContext() {
     };
     GLXPbuffer glxPbuffer = glXCreatePbuffer(xDisplay, fbConfigs[0], pbufferAttributes);
 
-    impl.reset(new GLXImpl(glContext, glxPbuffer, xDisplay, fbConfigs));
+    impl = std::make_unique<mbgl::GLXImpl>(glContext, glxPbuffer, xDisplay, fbConfigs);
 }
 
 } // namespace mbgl
