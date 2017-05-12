@@ -111,20 +111,21 @@ namespace android {
         }
     };
 
-    jni::Object<jni::ObjectTag> Layer::getFilter(jni::JNIEnv& env) {
+    jni::Object<mbgl::android::style::Filter> Layer::getFilter(jni::JNIEnv& env) {
         using namespace mbgl::style;
+        using namespace mbgl::android::style;
         using namespace mbgl::android::conversion;
 
         if (layer.is<FillLayer>()) {
-            return jni::Object<jni::ObjectTag>(*convert<jni::jobject*>(env, layer.as<FillLayer>()->getFilter()));
+            return jni::Object<mbgl::android::style::Filter>(*convert<jni::jobject*>(env, layer.as<FillLayer>()->getFilter()));
         } else if (layer.is<LineLayer>()) {
-            return jni::Object<jni::ObjectTag>(*convert<jni::jobject*>(env, layer.as<LineLayer>()->getFilter()));
+            return jni::Object<mbgl::android::style::Filter>(*convert<jni::jobject*>(env, layer.as<LineLayer>()->getFilter()));
         } else if (layer.is<SymbolLayer>()) {
-            return jni::Object<jni::ObjectTag>(*convert<jni::jobject*>(env, layer.as<SymbolLayer>()->getFilter()));
+            return jni::Object<mbgl::android::style::Filter>(*convert<jni::jobject*>(env, layer.as<SymbolLayer>()->getFilter()));
         } else if (layer.is<CircleLayer>()) {
-            return jni::Object<jni::ObjectTag>(*convert<jni::jobject*>(env, layer.as<CircleLayer>()->getFilter()));
+            return jni::Object<mbgl::android::style::Filter>(*convert<jni::jobject*>(env, layer.as<CircleLayer>()->getFilter()));
         } else {
-            return jni::Object<jni::ObjectTag>(*convert<jni::jobject*>(env, NullFilter()));
+            return jni::Object<mbgl::android::style::Filter>(*convert<jni::jobject*>(env, NullFilter()));
         }
     }
 

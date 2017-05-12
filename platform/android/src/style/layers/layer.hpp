@@ -5,6 +5,7 @@
 #include <mbgl/style/layer.hpp>
 
 #include "../value.hpp"
+#include "../filter.hpp"
 
 #include <jni/jni.hpp>
 
@@ -66,7 +67,7 @@ public:
 
     /* common properties, but not shared by all */
 
-    jni::Object<jni::ObjectTag> getFilter(jni::JNIEnv&);
+    jni::Object<mbgl::android::style::Filter> getFilter(jni::JNIEnv&);
 
     void setFilter(jni::JNIEnv&, jni::Array<jni::Object<>>);
 

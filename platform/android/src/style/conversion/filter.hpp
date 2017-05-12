@@ -30,10 +30,10 @@ inline optional<mbgl::style::Filter> toFilter(jni::JNIEnv& env, jni::Array<jni::
 }
 
 template <>
-struct Converter<jni::Object<android::style::Filter>, mbgl::style::Filter> {
-    Result<jni::Object<android::style::Filter>> operator()(jni::JNIEnv& env, const mbgl::style::Filter& value) const {
+struct Converter<jni::Object<mbgl::android::style::Filter>, mbgl::style::Filter> {
+    Result<jni::Object<mbgl::android::style::Filter>> operator()(jni::JNIEnv& env, const mbgl::style::Filter& value) const {
         using namespace mbgl::android::style;
-        auto filter = jni::Object<android::style::Filter>(*convert<jni::jobject*>(env, value));
+        auto filter = mbgl::android::style::Filter::fromFilter(env, value);
 
         return filter;
     }
