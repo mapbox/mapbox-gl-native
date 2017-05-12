@@ -1,6 +1,5 @@
 #include <mbgl/test/util.hpp>
 #include <mbgl/test/stub_file_source.hpp>
-#include <mbgl/test/stub_style_observer.hpp>
 
 #include <mbgl/text/glyph_atlas.hpp>
 #include <mbgl/util/run_loop.hpp>
@@ -9,6 +8,20 @@
 #include <mbgl/util/logging.hpp>
 
 using namespace mbgl;
+
+class StubGlyphAtlasObserver : public GlyphAtlasObserver {
+public:
+    void onGlyphsLoaded(const FontStack& fontStack, const GlyphRange& glyphRange) override {
+        if (glyphsLoaded) glyphsLoaded(fontStack, glyphRange);
+    }
+
+    void onGlyphsError(const FontStack& fontStack, const GlyphRange& glyphRange, std::exception_ptr error) override {
+        if (glyphsError) glyphsError(fontStack, glyphRange, error);
+    }
+
+    std::function<void (const FontStack&, const GlyphRange&)> glyphsLoaded;
+    std::function<void (const FontStack&, const GlyphRange&, std::exception_ptr)> glyphsError;
+};
 
 class StubGlyphRequestor : public GlyphRequestor {
 public:
@@ -23,7 +36,7 @@ class GlyphAtlasTest {
 public:
     util::RunLoop loop;
     StubFileSource fileSource;
-    StubStyleObserver observer;
+    StubGlyphAtlasObserver observer;
     StubGlyphRequestor requestor;
     GlyphAtlas glyphAtlas{ { 32, 32 }, fileSource };
 

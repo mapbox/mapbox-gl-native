@@ -1,9 +1,9 @@
 #include <mbgl/test/util.hpp>
 #include <mbgl/test/fixture_log_observer.hpp>
 #include <mbgl/test/stub_file_source.hpp>
-#include <mbgl/test/stub_style_observer.hpp>
 
 #include <mbgl/sprite/sprite_loader.hpp>
+#include <mbgl/sprite/sprite_loader_observer.hpp>
 #include <mbgl/sprite/sprite_parser.hpp>
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/image.hpp>
@@ -14,6 +14,21 @@
 #include <utility>
 
 using namespace mbgl;
+using namespace mbgl::style;
+
+class StubSpriteLoaderObserver : public SpriteLoaderObserver {
+public:
+    void onSpriteLoaded(Images&& images) override {
+        if (spriteLoaded) spriteLoaded(std::move(images));
+    }
+
+    void onSpriteError(std::exception_ptr error) override {
+        if (spriteError) spriteError(error);
+    }
+
+    std::function<void (Images&&)> spriteLoaded;
+    std::function<void (std::exception_ptr)> spriteError;
+};
 
 class SpriteLoaderTest {
 public:
@@ -21,7 +36,7 @@ public:
 
     util::RunLoop loop;
     StubFileSource fileSource;
-    StubStyleObserver observer;
+    StubSpriteLoaderObserver observer;
     ThreadPool threadPool { 1 };
     SpriteLoader spriteLoader{ 1 };
 

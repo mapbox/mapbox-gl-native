@@ -154,8 +154,7 @@ private:
 
     std::vector<std::unique_ptr<Layer>>::const_iterator findLayer(const std::string& layerID) const;
 
-    // GlyphStoreObserver implementation.
-    void onGlyphsLoaded(const FontStack&, const GlyphRange&) override;
+    // GlyphAtlasObserver implementation.
     void onGlyphsError(const FontStack&, const GlyphRange&, std::exception_ptr) override;
 
     // SpriteLoaderObserver implementation.
