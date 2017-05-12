@@ -40,9 +40,15 @@ endfunction()
 
 # Run submodule update
 message(STATUS "Updating submodules...")
-execute_process(
-    COMMAND git submodule update --init mapbox-gl-js
-    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+if(MBGL_PLATFORM STREQUAL "ios")
+    execute_process(
+        COMMAND git submodule update --init --recursive
+        WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+else()
+    execute_process(
+        COMMAND git submodule update --init mapbox-gl-js
+        WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+endif()
 
 if(NOT EXISTS "${CMAKE_SOURCE_DIR}/mapbox-gl-js/node_modules")
     # Symlink mapbox-gl-js/node_modules so that the modules that are
