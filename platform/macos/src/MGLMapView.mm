@@ -2417,7 +2417,7 @@ public:
 {
     if (self.annotations == nil) { return @[]; }
 
-    NS_MUTABLE_ARRAY_OF(id <MGLOverlay>) *mutableOverlays = [NSMutableArray new];
+    NS_MUTABLE_ARRAY_OF(id <MGLOverlay>) *mutableOverlays = [NSMutableArray array];
 
     [self.annotations enumerateObjectsUsingBlock:^(id<MGLAnnotation>  _Nonnull annotation, NSUInteger idx, BOOL * _Nonnull stop) {
         if ([annotation conformsToProtocol:@protocol(MGLOverlay)])
