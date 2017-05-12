@@ -1,5 +1,5 @@
 #include <mbgl/geometry/anchor.hpp>
-#include <mbgl/sprite/sprite_atlas.hpp>
+#include <mbgl/style/image_impl.hpp>
 #include <mbgl/test/util.hpp>
 #include <mbgl/text/quads.hpp>
 #include <mbgl/text/shaping.hpp>
@@ -14,7 +14,7 @@ TEST(getIconQuads, normal) {
     Anchor anchor(2.0, 3.0, 0.0, 0.5f, 0);
     SpriteAtlasElement image = {
         Rect<uint16_t>( 0, 0, 15, 11 ),
-        style::Image(PremultipliedImage({1,1}), 1.0),
+        style::Image::Impl(PremultipliedImage({1,1}), 1.0),
         { 0, 0 },
         1.0f
     };
@@ -47,7 +47,7 @@ TEST(getIconQuads, style) {
     Anchor anchor(0.0, 0.0, 0.0, 0.5f, 0);
     SpriteAtlasElement image = {
         Rect<uint16_t>( 0, 0, 20, 20 ),
-        style::Image(PremultipliedImage({1,1}), 1.0),
+        style::Image::Impl(PremultipliedImage({1,1}), 1.0),
         { 0, 0 },
         1.0f
     };

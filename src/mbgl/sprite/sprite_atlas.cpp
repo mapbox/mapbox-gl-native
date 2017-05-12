@@ -1,4 +1,5 @@
 #include <mbgl/sprite/sprite_atlas.hpp>
+#include <mbgl/style/image_impl.hpp>
 #include <mbgl/gl/context.hpp>
 #include <mbgl/util/logging.hpp>
 #include <mbgl/util/platform.hpp>
@@ -14,11 +15,11 @@
 namespace mbgl {
 
 SpriteAtlasElement::SpriteAtlasElement(Rect<uint16_t> rect_,
-                                       const style::Image& image,
+                                       const style::Image::Impl& image,
                                        Size size_, float pixelRatio)
     : pos(std::move(rect_)),
-      sdf(image.isSdf()),
-      relativePixelRatio(image.getPixelRatio() / pixelRatio),
+      sdf(image.sdf),
+      relativePixelRatio(image.pixelRatio / pixelRatio),
       width(image.getWidth()),
       height(image.getHeight()) {
 
@@ -45,7 +46,7 @@ void SpriteAtlas::onSpriteLoaded(Images&& result) {
     markAsLoaded();
 
     for (auto& pair : result) {
-        addImage(pair.first, std::move(pair.second));
+        addImage(pair.first, pair.second->impl);
     }
 
     for (auto requestor : requestors) {
@@ -54,7 +55,7 @@ void SpriteAtlas::onSpriteLoaded(Images&& result) {
     requestors.clear();
 }
 
-void SpriteAtlas::addImage(const std::string& id, std::unique_ptr<style::Image> image_) {
+void SpriteAtlas::addImage(const std::string& id, Immutable<style::Image::Impl> image_) {
     icons.clear();
 
     auto it = entries.find(id);
@@ -66,7 +67,7 @@ void SpriteAtlas::addImage(const std::string& id, std::unique_ptr<style::Image> 
     Entry& entry = it->second;
 
     // There is already a sprite with that name in our store.
-    assert(entry.image->getImage().size == image_->getImage().size);
+    assert(entry.image->image.size == image_->image.size);
 
     entry.image = std::move(image_);
 
@@ -98,7 +99,7 @@ void SpriteAtlas::removeImage(const std::string& id) {
     entries.erase(it);
 }
 
-const style::Image* SpriteAtlas::getImage(const std::string& id) const {
+const style::Image::Impl* SpriteAtlas::getImage(const std::string& id) const {
     const auto it = entries.find(id);
     if (it != entries.end()) {
         return it->second.image.get();
@@ -152,8 +153,8 @@ optional<SpriteAtlasElement> SpriteAtlas::getImage(const std::string& id,
         };
     }
 
-    const uint16_t pixelWidth = std::ceil(entry.image->getImage().size.width / pixelRatio);
-    const uint16_t pixelHeight = std::ceil(entry.image->getImage().size.height / pixelRatio);
+    const uint16_t pixelWidth = std::ceil(entry.image->image.size.width / pixelRatio);
+    const uint16_t pixelHeight = std::ceil(entry.image->image.size.height / pixelRatio);
 
     // Increase to next number divisible by 4, but at least 1.
     // This is so we can scale down the texture coordinates and pack them
@@ -188,7 +189,7 @@ void SpriteAtlas::copy(const Entry& entry, optional<Rect<uint16_t>> Entry::*entr
         image.fill(0);
     }
 
-    const PremultipliedImage& src = entry.image->getImage();
+    const PremultipliedImage& src = entry.image->image;
     const Rect<uint16_t>& rect = *(entry.*entryRect);
 
     const uint32_t padding = 1;

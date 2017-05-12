@@ -8,11 +8,10 @@ namespace style {
 Image::Image(PremultipliedImage &&image,
              const float pixelRatio,
              bool sdf)
-        : impl(std::make_shared<Impl>(std::move(image), pixelRatio, sdf)) {
+    : impl(makeMutable<Impl>(std::move(image), pixelRatio, sdf)) {
 }
 
-PremultipliedImage& Image::getImage() const {
-    assert(impl);
+const PremultipliedImage& Image::getImage() const {
     return impl->image;
 }
 

@@ -20,7 +20,7 @@ class Context;
 
 class SpriteAtlasElement {
 public:
-    SpriteAtlasElement(Rect<uint16_t>, const style::Image&, Size size, float pixelRatio);
+    SpriteAtlasElement(Rect<uint16_t>, const style::Image::Impl&, Size size, float pixelRatio);
 
     Rect<uint16_t> pos;
     bool sdf;
@@ -60,8 +60,8 @@ public:
 
     void dumpDebugLogs() const;
 
-    const style::Image* getImage(const std::string&) const;
-    void addImage(const std::string&, std::unique_ptr<style::Image>);
+    const style::Image::Impl* getImage(const std::string&) const;
+    void addImage(const std::string&, Immutable<style::Image::Impl>);
     void removeImage(const std::string&);
 
     void getIcons(IconRequestor& requestor);
@@ -91,7 +91,7 @@ private:
     bool loaded = false;
 
     struct Entry {
-        std::unique_ptr<const style::Image> image;
+        Immutable<style::Image::Impl> image;
 
         // One sprite image might be used as both an icon image and a pattern image. If so,
         // it must have two distinct entries in the texture. The one for the icon image has
