@@ -278,7 +278,7 @@ NodeMap::RenderOptions NodeMap::ParseOptions(v8::Local<v8::Object> obj) {
         const int length = classes->Length();
         options.classes.reserve(length);
         for (int i = 0; i < length; i++) {
-            options.classes.push_back(std::string { *Nan::Utf8String(Nan::To<v8::String>(Nan::Get(classes, i).ToLocalChecked()).ToLocalChecked()) });
+            options.classes.emplace_back(std::string { *Nan::Utf8String(Nan::To<v8::String>(Nan::Get(classes, i).ToLocalChecked()).ToLocalChecked()) });
         }
     }
 
@@ -947,7 +947,7 @@ void NodeMap::QueryRenderedFeatures(const Nan::FunctionCallbackInfo<v8::Value>& 
             auto layers = layersOption.As<v8::Array>();
             std::vector<std::string> layersVec;
             for (uint32_t i=0; i < layers->Length(); i++) {
-                layersVec.push_back(*Nan::Utf8String(Nan::Get(layers,i).ToLocalChecked()));
+                layersVec.emplace_back(*Nan::Utf8String(Nan::Get(layers,i).ToLocalChecked()));
             }
             queryOptions.layerIDs = layersVec;
         }

@@ -45,7 +45,7 @@ TEST(AnnotationTile, Issue8289) {
 
     auto data = std::make_unique<AnnotationTileData>();
     data->layers.emplace("test", AnnotationTileLayer("test"));
-    data->layers.at("test").features.push_back(AnnotationTileFeature(0, FeatureType::Point, GeometryCollection()));
+    data->layers.at("test").features.emplace_back(0, FeatureType::Point, GeometryCollection());
 
     // Simulate layout and placement of a symbol layer.
     tile.onLayout(GeometryTile::LayoutResult {
