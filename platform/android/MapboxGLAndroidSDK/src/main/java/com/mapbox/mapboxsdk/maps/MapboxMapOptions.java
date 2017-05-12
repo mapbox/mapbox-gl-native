@@ -35,10 +35,8 @@ import java.util.Arrays;
  */
 public class MapboxMapOptions implements Parcelable {
 
-  private static final float DIMENSION_SEVEN_DP = 7f;
-  private static final float DIMENSION_TEN_DP = 10f;
-  private static final float DIMENSION_SIXTEEN_DP = 16f;
-  private static final float DIMENSION_SEVENTY_SIX_DP = 76f;
+  private static final float FOUR_DP = 4f;
+  private static final float EIGHTY_NINE_DP = 92f;
 
   private CameraPosition cameraPosition;
 
@@ -206,13 +204,13 @@ public class MapboxMapOptions implements Parcelable {
         Gravity.TOP | Gravity.END));
       mapboxMapOptions.compassMargins(new int[] {
         (int) (typedArray.getDimension(R.styleable.mapbox_MapView_mapbox_uiCompassMarginLeft,
-          DIMENSION_TEN_DP * pxlRatio)),
+          FOUR_DP * pxlRatio)),
         ((int) typedArray.getDimension(R.styleable.mapbox_MapView_mapbox_uiCompassMarginTop,
-          DIMENSION_TEN_DP * pxlRatio)),
+          FOUR_DP * pxlRatio)),
         ((int) typedArray.getDimension(R.styleable.mapbox_MapView_mapbox_uiCompassMarginRight,
-          DIMENSION_TEN_DP * pxlRatio)),
+          FOUR_DP * pxlRatio)),
         ((int) typedArray.getDimension(R.styleable.mapbox_MapView_mapbox_uiCompassMarginBottom,
-          DIMENSION_TEN_DP * pxlRatio))});
+          FOUR_DP * pxlRatio))});
       mapboxMapOptions.compassFadesWhenFacingNorth(typedArray.getBoolean(
         R.styleable.mapbox_MapView_mapbox_uiCompassFadeFacingNorth, true));
       Drawable compassDrawable = typedArray.getDrawable(
@@ -227,13 +225,13 @@ public class MapboxMapOptions implements Parcelable {
         Gravity.BOTTOM | Gravity.START));
       mapboxMapOptions.logoMargins(new int[] {
         (int) (typedArray.getDimension(R.styleable.mapbox_MapView_mapbox_uiLogoMarginLeft,
-          DIMENSION_SIXTEEN_DP * pxlRatio)),
+          FOUR_DP * pxlRatio)),
         (int) (typedArray.getDimension(R.styleable.mapbox_MapView_mapbox_uiLogoMarginTop,
-          DIMENSION_SIXTEEN_DP * pxlRatio)),
+          FOUR_DP * pxlRatio)),
         (int) (typedArray.getDimension(R.styleable.mapbox_MapView_mapbox_uiLogoMarginRight,
-          DIMENSION_SIXTEEN_DP * pxlRatio)),
+          FOUR_DP * pxlRatio)),
         (int) (typedArray.getDimension(R.styleable.mapbox_MapView_mapbox_uiLogoMarginBottom,
-          DIMENSION_SIXTEEN_DP * pxlRatio))});
+          FOUR_DP * pxlRatio))});
 
       mapboxMapOptions.attributionTintColor(typedArray.getColor(
         R.styleable.mapbox_MapView_mapbox_uiAttributionTintColor, -1));
@@ -243,13 +241,13 @@ public class MapboxMapOptions implements Parcelable {
         R.styleable.mapbox_MapView_mapbox_uiAttributionGravity, Gravity.BOTTOM));
       mapboxMapOptions.attributionMargins(new int[] {
         (int) (typedArray.getDimension(R.styleable.mapbox_MapView_mapbox_uiAttributionMarginLeft,
-          DIMENSION_SEVENTY_SIX_DP) * pxlRatio),
+          EIGHTY_NINE_DP * pxlRatio)),
         (int) (typedArray.getDimension(R.styleable.mapbox_MapView_mapbox_uiAttributionMarginTop,
-          DIMENSION_SEVEN_DP * pxlRatio)),
+          FOUR_DP * pxlRatio)),
         (int) (typedArray.getDimension(R.styleable.mapbox_MapView_mapbox_uiAttributionMarginRight,
-          DIMENSION_SEVEN_DP * pxlRatio)),
+          FOUR_DP * pxlRatio)),
         (int) (typedArray.getDimension(R.styleable.mapbox_MapView_mapbox_uiAttributionMarginBottom,
-          DIMENSION_SEVEN_DP * pxlRatio))});
+          FOUR_DP * pxlRatio))});
 
       mapboxMapOptions.locationEnabled(typedArray.getBoolean(R.styleable.mapbox_MapView_mapbox_myLocation, false));
       mapboxMapOptions.myLocationForegroundTintColor(
