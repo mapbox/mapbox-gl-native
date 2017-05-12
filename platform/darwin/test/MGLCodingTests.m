@@ -80,6 +80,32 @@
     XCTAssertEqual([multiLine coordinate].latitude, multiLineCenter.latitude);
     XCTAssertEqual([multiLine coordinate].longitude, multiLineCenter.longitude);
     
+    CLLocationCoordinate2D segmentCoordinates[] = {
+        CLLocationCoordinate2DMake(35.040390, -85.311477),
+        CLLocationCoordinate2DMake(35.040390, -85.209510),
+    };
+    
+    NSUInteger segmentCoordinatesCount = sizeof(segmentCoordinates) / sizeof(CLLocationCoordinate2D);
+    MGLPolyline *segmentLine = [MGLPolyline polylineWithCoordinates:segmentCoordinates count:segmentCoordinatesCount];
+    CLLocationCoordinate2D segmentCenter = CLLocationCoordinate2DMake(35.0404006631, -85.2604935);
+    
+    XCTAssertEqualWithAccuracy([segmentLine coordinate].latitude, segmentCenter.latitude, 1);
+    XCTAssertEqualWithAccuracy([segmentLine coordinate].longitude, segmentCenter.longitude, 1);
+    
+    CLLocationCoordinate2D sfToBerkeleyCoordinates[] = {
+        CLLocationCoordinate2DMake(37.782440, -122.397111),
+        CLLocationCoordinate2DMake(37.818384, -122.352994),
+        CLLocationCoordinate2DMake(37.831401, -122.274545),
+        CLLocationCoordinate2DMake(37.862172, -122.262700),
+    };
+    
+    NSUInteger sfToBerkeleyCoordinatesCount = sizeof(sfToBerkeleyCoordinates) / sizeof(CLLocationCoordinate2D);
+    MGLPolyline *sfToBerkeleyLine = [MGLPolyline polylineWithCoordinates:sfToBerkeleyCoordinates count:sfToBerkeleyCoordinatesCount];
+    CLLocationCoordinate2D sfToBerkeleyCenter = CLLocationCoordinate2DMake(37.8230575118,-122.324867587);
+    
+    XCTAssertEqualWithAccuracy([sfToBerkeleyLine coordinate].latitude, sfToBerkeleyCenter.latitude, 1);
+    XCTAssertEqualWithAccuracy([sfToBerkeleyLine coordinate].longitude, sfToBerkeleyCenter.longitude, 1);
+    
 }
 
 - (void)testPolygon {
