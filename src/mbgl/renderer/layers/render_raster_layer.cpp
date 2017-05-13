@@ -1,4 +1,4 @@
-#include <mbgl/renderer/render_raster_layer.hpp>
+#include <mbgl/renderer/layers/render_raster_layer.hpp>
 #include <mbgl/renderer/bucket.hpp>
 #include <mbgl/style/layers/raster_layer_impl.hpp>
 

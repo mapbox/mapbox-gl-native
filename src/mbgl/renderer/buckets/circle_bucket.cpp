@@ -1,9 +1,9 @@
-#include <mbgl/renderer/circle_bucket.hpp>
+#include <mbgl/renderer/buckets/circle_bucket.hpp>
 #include <mbgl/renderer/bucket_parameters.hpp>
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/programs/circle_program.hpp>
 #include <mbgl/style/layers/circle_layer_impl.hpp>
-#include <mbgl/renderer/render_circle_layer.hpp>
+#include <mbgl/renderer/layers/render_circle_layer.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/math.hpp>
 

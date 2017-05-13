@@ -1,7 +1,7 @@
 #include <mbgl/geometry/feature_index.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/renderer/render_layer.hpp>
-#include <mbgl/renderer/render_symbol_layer.hpp>
+#include <mbgl/renderer/layers/render_symbol_layer.hpp>
 #include <mbgl/text/collision_tile.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/math.hpp>

@@ -1,9 +1,9 @@
 #include <mbgl/test/util.hpp>
 
-#include <mbgl/renderer/circle_bucket.hpp>
-#include <mbgl/renderer/fill_bucket.hpp>
-#include <mbgl/renderer/line_bucket.hpp>
-#include <mbgl/renderer/symbol_bucket.hpp>
+#include <mbgl/renderer/buckets/circle_bucket.hpp>
+#include <mbgl/renderer/buckets/fill_bucket.hpp>
+#include <mbgl/renderer/buckets/line_bucket.hpp>
+#include <mbgl/renderer/buckets/symbol_bucket.hpp>
 #include <mbgl/renderer/bucket_parameters.hpp>
 #include <mbgl/style/layers/symbol_layer_properties.hpp>
 

@@ -1,8 +1,8 @@
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/renderer/paint_parameters.hpp>
-#include <mbgl/renderer/fill_bucket.hpp>
+#include <mbgl/renderer/buckets/fill_bucket.hpp>
 #include <mbgl/renderer/render_tile.hpp>
-#include <mbgl/renderer/render_fill_layer.hpp>
+#include <mbgl/renderer/layers/render_fill_layer.hpp>
 #include <mbgl/style/layers/fill_layer_impl.hpp>
 #include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/programs/programs.hpp>

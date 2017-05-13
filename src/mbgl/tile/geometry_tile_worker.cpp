@@ -9,8 +9,8 @@
 #include <mbgl/style/filter.hpp>
 #include <mbgl/style/filter_evaluator.hpp>
 #include <mbgl/style/layers/symbol_layer_impl.hpp>
-#include <mbgl/renderer/render_symbol_layer.hpp>
-#include <mbgl/renderer/symbol_bucket.hpp>
+#include <mbgl/renderer/layers/render_symbol_layer.hpp>
+#include <mbgl/renderer/buckets/symbol_bucket.hpp>
 #include <mbgl/util/logging.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/string.hpp>

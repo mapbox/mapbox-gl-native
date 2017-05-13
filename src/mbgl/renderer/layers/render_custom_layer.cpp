@@ -1,4 +1,4 @@
-#include <mbgl/renderer/render_custom_layer.hpp>
+#include <mbgl/renderer/layers/render_custom_layer.hpp>
 #include <mbgl/style/layers/custom_layer_impl.hpp>
 #include <mbgl/renderer/bucket.hpp>
 

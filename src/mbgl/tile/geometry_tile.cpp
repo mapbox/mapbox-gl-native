@@ -6,10 +6,10 @@
 #include <mbgl/style/layers/background_layer.hpp>
 #include <mbgl/style/layers/custom_layer.hpp>
 #include <mbgl/renderer/tile_parameters.hpp>
-#include <mbgl/renderer/render_background_layer.hpp>
-#include <mbgl/renderer/render_custom_layer.hpp>
-#include <mbgl/renderer/render_symbol_layer.hpp>
-#include <mbgl/renderer/symbol_bucket.hpp>
+#include <mbgl/renderer/layers/render_background_layer.hpp>
+#include <mbgl/renderer/layers/render_custom_layer.hpp>
+#include <mbgl/renderer/layers/render_symbol_layer.hpp>
+#include <mbgl/renderer/buckets/symbol_bucket.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/geometry/feature_index.hpp>

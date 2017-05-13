@@ -1,5 +1,5 @@
-#include <mbgl/renderer/render_circle_layer.hpp>
-#include <mbgl/renderer/circle_bucket.hpp>
+#include <mbgl/renderer/layers/render_circle_layer.hpp>
+#include <mbgl/renderer/buckets/circle_bucket.hpp>
 #include <mbgl/style/layers/circle_layer_impl.hpp>
 #include <mbgl/geometry/feature_index.hpp>
 #include <mbgl/util/math.hpp>

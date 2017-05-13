@@ -161,78 +161,84 @@ set(MBGL_CORE_FILES
     src/mbgl/renderer/bucket_parameters.cpp
     src/mbgl/renderer/bucket_parameters.hpp
     src/mbgl/renderer/cascade_parameters.hpp
-    src/mbgl/renderer/circle_bucket.cpp
-    src/mbgl/renderer/circle_bucket.hpp
     src/mbgl/renderer/cross_faded_property_evaluator.cpp
     src/mbgl/renderer/cross_faded_property_evaluator.hpp
     src/mbgl/renderer/data_driven_property_evaluator.hpp
-    src/mbgl/renderer/debug_bucket.cpp
-    src/mbgl/renderer/debug_bucket.hpp
-    src/mbgl/renderer/fill_bucket.cpp
-    src/mbgl/renderer/fill_bucket.hpp
-    src/mbgl/renderer/fill_extrusion_bucket.cpp
-    src/mbgl/renderer/fill_extrusion_bucket.hpp
     src/mbgl/renderer/frame_history.cpp
     src/mbgl/renderer/frame_history.hpp
     src/mbgl/renderer/group_by_layout.cpp
     src/mbgl/renderer/group_by_layout.hpp
-    src/mbgl/renderer/line_bucket.cpp
-    src/mbgl/renderer/line_bucket.hpp
     src/mbgl/renderer/paint_parameters.hpp
     src/mbgl/renderer/paint_property_binder.hpp
     src/mbgl/renderer/paint_property_statistics.hpp
     src/mbgl/renderer/painter.cpp
     src/mbgl/renderer/painter.hpp
-    src/mbgl/renderer/painter_background.cpp
-    src/mbgl/renderer/painter_circle.cpp
-    src/mbgl/renderer/painter_clipping.cpp
-    src/mbgl/renderer/painter_debug.cpp
-    src/mbgl/renderer/painter_fill.cpp
-    src/mbgl/renderer/painter_fill_extrusion.cpp
-    src/mbgl/renderer/painter_line.cpp
-    src/mbgl/renderer/painter_raster.cpp
-    src/mbgl/renderer/painter_symbol.cpp
     src/mbgl/renderer/possibly_evaluated_property_value.hpp
     src/mbgl/renderer/property_evaluation_parameters.hpp
     src/mbgl/renderer/property_evaluator.hpp
-    src/mbgl/renderer/raster_bucket.cpp
-    src/mbgl/renderer/raster_bucket.hpp
-    src/mbgl/renderer/render_background_layer.cpp
-    src/mbgl/renderer/render_background_layer.hpp
-    src/mbgl/renderer/render_circle_layer.cpp
-    src/mbgl/renderer/render_circle_layer.hpp
-    src/mbgl/renderer/render_custom_layer.cpp
-    src/mbgl/renderer/render_custom_layer.hpp
-    src/mbgl/renderer/render_fill_extrusion_layer.cpp
-    src/mbgl/renderer/render_fill_extrusion_layer.hpp
-    src/mbgl/renderer/render_fill_layer.cpp
-    src/mbgl/renderer/render_fill_layer.hpp
     src/mbgl/renderer/render_item.hpp
     src/mbgl/renderer/render_layer.cpp
     src/mbgl/renderer/render_layer.hpp
     src/mbgl/renderer/render_light.cpp
     src/mbgl/renderer/render_light.hpp
-    src/mbgl/renderer/render_line_layer.cpp
-    src/mbgl/renderer/render_line_layer.hpp
     src/mbgl/renderer/render_pass.hpp
-    src/mbgl/renderer/render_raster_layer.cpp
-    src/mbgl/renderer/render_raster_layer.hpp
     src/mbgl/renderer/render_source.cpp
     src/mbgl/renderer/render_source.hpp
     src/mbgl/renderer/render_source_observer.hpp
-    src/mbgl/renderer/render_symbol_layer.cpp
-    src/mbgl/renderer/render_symbol_layer.hpp
     src/mbgl/renderer/render_tile.cpp
     src/mbgl/renderer/render_tile.hpp
     src/mbgl/renderer/style_diff.cpp
     src/mbgl/renderer/style_diff.hpp
-    src/mbgl/renderer/symbol_bucket.cpp
-    src/mbgl/renderer/symbol_bucket.hpp
     src/mbgl/renderer/tile_parameters.hpp
     src/mbgl/renderer/tile_pyramid.cpp
     src/mbgl/renderer/tile_pyramid.hpp
     src/mbgl/renderer/transitioning_property.hpp
     src/mbgl/renderer/update_parameters.hpp
+
+    # renderer/buckets
+    src/mbgl/renderer/buckets/circle_bucket.cpp
+    src/mbgl/renderer/buckets/circle_bucket.hpp
+    src/mbgl/renderer/buckets/debug_bucket.cpp
+    src/mbgl/renderer/buckets/debug_bucket.hpp
+    src/mbgl/renderer/buckets/fill_bucket.cpp
+    src/mbgl/renderer/buckets/fill_bucket.hpp
+    src/mbgl/renderer/buckets/fill_extrusion_bucket.cpp
+    src/mbgl/renderer/buckets/fill_extrusion_bucket.hpp
+    src/mbgl/renderer/buckets/line_bucket.cpp
+    src/mbgl/renderer/buckets/line_bucket.hpp
+    src/mbgl/renderer/buckets/raster_bucket.cpp
+    src/mbgl/renderer/buckets/raster_bucket.hpp
+    src/mbgl/renderer/buckets/symbol_bucket.cpp
+    src/mbgl/renderer/buckets/symbol_bucket.hpp
+
+    # renderer/layers
+    src/mbgl/renderer/layers/render_background_layer.cpp
+    src/mbgl/renderer/layers/render_background_layer.hpp
+    src/mbgl/renderer/layers/render_circle_layer.cpp
+    src/mbgl/renderer/layers/render_circle_layer.hpp
+    src/mbgl/renderer/layers/render_custom_layer.cpp
+    src/mbgl/renderer/layers/render_custom_layer.hpp
+    src/mbgl/renderer/layers/render_fill_extrusion_layer.cpp
+    src/mbgl/renderer/layers/render_fill_extrusion_layer.hpp
+    src/mbgl/renderer/layers/render_fill_layer.cpp
+    src/mbgl/renderer/layers/render_fill_layer.hpp
+    src/mbgl/renderer/layers/render_line_layer.cpp
+    src/mbgl/renderer/layers/render_line_layer.hpp
+    src/mbgl/renderer/layers/render_raster_layer.cpp
+    src/mbgl/renderer/layers/render_raster_layer.hpp
+    src/mbgl/renderer/layers/render_symbol_layer.cpp
+    src/mbgl/renderer/layers/render_symbol_layer.hpp
+
+    # renderer/painters
+    src/mbgl/renderer/painters/painter_background.cpp
+    src/mbgl/renderer/painters/painter_circle.cpp
+    src/mbgl/renderer/painters/painter_clipping.cpp
+    src/mbgl/renderer/painters/painter_debug.cpp
+    src/mbgl/renderer/painters/painter_fill.cpp
+    src/mbgl/renderer/painters/painter_fill_extrusion.cpp
+    src/mbgl/renderer/painters/painter_line.cpp
+    src/mbgl/renderer/painters/painter_raster.cpp
+    src/mbgl/renderer/painters/painter_symbol.cpp
 
     # renderer/sources
     src/mbgl/renderer/sources/render_geojson_source.cpp

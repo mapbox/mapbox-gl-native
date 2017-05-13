@@ -1,6 +1,6 @@
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/renderer/paint_parameters.hpp>
-#include <mbgl/renderer/render_background_layer.hpp>
+#include <mbgl/renderer/layers/render_background_layer.hpp>
 #include <mbgl/style/layers/background_layer_impl.hpp>
 #include <mbgl/programs/programs.hpp>
 #include <mbgl/programs/fill_program.hpp>

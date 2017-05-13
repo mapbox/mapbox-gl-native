@@ -1,4 +1,4 @@
-#include <mbgl/renderer/render_background_layer.hpp>
+#include <mbgl/renderer/layers/render_background_layer.hpp>
 #include <mbgl/style/layers/background_layer_impl.hpp>
 #include <mbgl/renderer/bucket.hpp>
 
