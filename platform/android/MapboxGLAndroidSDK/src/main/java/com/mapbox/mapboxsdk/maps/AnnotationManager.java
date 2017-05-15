@@ -670,12 +670,15 @@ class AnnotationManager {
       for (Marker nearbyMarker : nearbyMarkers) {
         for (Marker selectedMarker : selectedMarkers) {
           if (nearbyMarker.equals(selectedMarker)) {
-            if (onMarkerClickListener != null) {
-              // end developer has provided a custom click listener
+            if (nearbyMarker instanceof MarkerView) {
+              handledDefaultClick = markerViewManager.onClickMarkerView((MarkerView) nearbyMarker);
+            } else if (onMarkerClickListener != null) {
               handledDefaultClick = onMarkerClickListener.onMarkerClick(nearbyMarker);
-              if (!handledDefaultClick) {
-                deselectMarker(nearbyMarker);
-              }
+            }
+
+            if (!handledDefaultClick) {
+              // only deselect marker if user didn't handle the click event themselves
+              deselectMarker(nearbyMarker);
             }
             return true;
           }
