@@ -33,7 +33,7 @@ public:
     Update updateAnnotation(const AnnotationID&, const Annotation&, const uint8_t maxZoom);
     void removeAnnotation(const AnnotationID&);
 
-    void addImage(const std::string&, std::unique_ptr<style::Image>);
+    void addImage(std::unique_ptr<style::Image>);
     void removeImage(const std::string&);
     double getTopOffsetPixelsForImage(const std::string&);
     SpriteAtlas& getSpriteAtlas() { return spriteAtlas; }

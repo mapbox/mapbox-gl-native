@@ -89,10 +89,7 @@ void SpriteLoader::emitSpriteLoadedIfComplete() {
     loader->worker.invoke(&SpriteLoaderWorker::parse, loader->image, loader->json);
 }
 
-void SpriteLoader::onParsed(Images&& result) {
-
-
-
+void SpriteLoader::onParsed(std::vector<std::unique_ptr<style::Image>>&& result) {
     observer->onSpriteLoaded(std::move(result));
 }
 

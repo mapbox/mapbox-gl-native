@@ -788,8 +788,8 @@ LatLng Map::latLngForPixel(const ScreenCoordinate& pixel) const {
 
 #pragma mark - Annotations
 
-void Map::addAnnotationImage(const std::string& id, std::unique_ptr<style::Image> image) {
-    impl->annotationManager->addImage(id, std::move(image));
+void Map::addAnnotationImage(std::unique_ptr<style::Image> image) {
+    impl->annotationManager->addImage(std::move(image));
 }
 
 void Map::removeAnnotationImage(const std::string& id) {
@@ -936,13 +936,13 @@ std::unique_ptr<Layer> Map::removeLayer(const std::string& id) {
     return removedLayer;
 }
 
-void Map::addImage(const std::string& id, std::unique_ptr<style::Image> image) {
+void Map::addImage(std::unique_ptr<style::Image> image) {
     if (!impl->style) {
         return;
     }
 
     impl->styleMutated = true;
-    impl->style->addImage(id, std::move(image));
+    impl->style->addImage(std::move(image));
 }
 
 void Map::removeImage(const std::string& id) {

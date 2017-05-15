@@ -2,8 +2,7 @@
 
 #include <exception>
 #include <memory>
-#include <unordered_map>
-#include <string>
+#include <vector>
 
 namespace mbgl {
 
@@ -13,11 +12,9 @@ class Image;
 
 class SpriteLoaderObserver {
 public:
-    using Images = std::unordered_map<std::string, std::unique_ptr<style::Image>>;
-
     virtual ~SpriteLoaderObserver() = default;
 
-    virtual void onSpriteLoaded(Images&&) {}
+    virtual void onSpriteLoaded(std::vector<std::unique_ptr<style::Image>>&&) {}
     virtual void onSpriteError(std::exception_ptr) {}
 };
 

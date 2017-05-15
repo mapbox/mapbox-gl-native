@@ -14,16 +14,16 @@ TEST(SpriteImageCollection, OtherPixelRatio) {
     Images images;
 
     // Adding mismatched sprite image
-    addSpriteImage(images, "one", std::make_unique<style::Image>(PremultipliedImage({ 8, 8 }), 2));
+    addSpriteImage(images, std::make_unique<style::Image>("one", PremultipliedImage({ 8, 8 }), 2));
 }
 
 TEST(SpriteImageCollection, Replace) {
     FixtureLog log;
     Images images;
 
-    addSpriteImage(images, "sprite", std::make_unique<style::Image>(PremultipliedImage({ 16, 16 }), 2));
+    addSpriteImage(images, std::make_unique<style::Image>("sprite", PremultipliedImage({ 16, 16 }), 2));
     auto image = images.find("sprite")->second.get();
-    addSpriteImage(images, "sprite", std::make_unique<style::Image>(PremultipliedImage({ 16, 16 }), 2));
+    addSpriteImage(images, std::make_unique<style::Image>("sprite", PremultipliedImage({ 16, 16 }), 2));
     EXPECT_NE(image, images.find("sprite")->second.get());
 }
 
@@ -31,8 +31,8 @@ TEST(SpriteImageCollection, ReplaceWithDifferentDimensions) {
     FixtureLog log;
     Images images;
 
-    addSpriteImage(images, "sprite", std::make_unique<style::Image>(PremultipliedImage({ 16, 16 }), 2));
-    addSpriteImage(images, "sprite", std::make_unique<style::Image>(PremultipliedImage({ 18, 18 }), 2));
+    addSpriteImage(images, std::make_unique<style::Image>("sprite", PremultipliedImage({ 16, 16 }), 2));
+    addSpriteImage(images, std::make_unique<style::Image>("sprite", PremultipliedImage({ 18, 18 }), 2));
 
     EXPECT_EQ(1u, log.count({
                                     EventSeverity::Warning,

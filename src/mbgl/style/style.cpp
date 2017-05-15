@@ -505,9 +505,9 @@ bool Style::isLoaded() const {
     return true;
 }
 
-void Style::addImage(const std::string& id, std::unique_ptr<style::Image> image) {
-    addSpriteImage(spriteImages, id, std::move(image), [&](style::Image& added) {
-        spriteAtlas->addImage(id, added.impl);
+void Style::addImage(std::unique_ptr<style::Image> image) {
+    addSpriteImage(spriteImages, std::move(image), [&](style::Image& added) {
+        spriteAtlas->addImage(added.impl);
         observer->onUpdate(Update::Repaint);
     });
 }
@@ -735,19 +735,11 @@ void Style::onTileError(RenderSource& source, const OverscaledTileID& tileID, st
     observer->onResourceError(error);
 }
 
-void Style::onSpriteLoaded(SpriteLoader::Images&& images) {
-    // Add images to collection
-    Images addedImages;
-    for (auto& entry : images) {
-        addSpriteImage(spriteImages, entry.first, std::move(entry.second), [&] (style::Image& added) {
-            addedImages.emplace(entry.first, std::make_unique<Image>(added));
-        });
+void Style::onSpriteLoaded(std::vector<std::unique_ptr<Image>>&& images) {
+    for (auto& image : images) {
+        addImage(std::move(image));
     }
-
-    // Update render sprite atlas
-    spriteAtlas->onSpriteLoaded(std::move(addedImages));
-
-    // Update observer
+    spriteAtlas->onSpriteLoaded();
     observer->onUpdate(Update::Repaint); // For *-pattern properties.
 }
 

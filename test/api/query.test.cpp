@@ -20,7 +20,7 @@ class QueryTest {
 public:
     QueryTest() {
         map.setStyleJSON(util::read_file("test/fixtures/api/query_style.json"));
-        map.addImage("test-icon", std::make_unique<style::Image>(
+        map.addImage(std::make_unique<style::Image>("test-icon",
             decodeImage(util::read_file("test/fixtures/sprites/default_marker.png")), 1.0));
 
         test::render(map, view);

@@ -22,9 +22,10 @@
     return self;
 }
 
-- (std::unique_ptr<mbgl::style::Image>)mgl_styleImage {
+- (std::unique_ptr<mbgl::style::Image>)mgl_styleImageWithIdentifier:(NSString *)identifier {
     BOOL isTemplate = self.renderingMode == UIImageRenderingModeAlwaysTemplate;
-    return std::make_unique<mbgl::style::Image>(MGLPremultipliedImageFromCGImage(self.CGImage),
+    return std::make_unique<mbgl::style::Image>([identifier UTF8String],
+                                                MGLPremultipliedImageFromCGImage(self.CGImage),
                                                 float(self.scale), isTemplate);
 }
 

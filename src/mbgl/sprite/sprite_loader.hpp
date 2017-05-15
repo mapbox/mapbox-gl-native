@@ -6,7 +6,7 @@
 #include <string>
 #include <map>
 #include <set>
-#include <unordered_map>
+#include <vector>
 #include <array>
 #include <memory>
 
@@ -18,8 +18,6 @@ class SpriteLoaderObserver;
 
 class SpriteLoader : public util::noncopyable {
 public:
-    using Images = std::unordered_map<std::string, std::unique_ptr<style::Image>>;
-
     SpriteLoader(float pixelRatio);
     ~SpriteLoader();
 
@@ -32,7 +30,7 @@ private:
 
     // Invoked by SpriteAtlasWorker
     friend class SpriteLoaderWorker;
-    void onParsed(Images&& result);
+    void onParsed(std::vector<std::unique_ptr<style::Image>>&&);
     void onError(std::exception_ptr);
 
     const float pixelRatio;

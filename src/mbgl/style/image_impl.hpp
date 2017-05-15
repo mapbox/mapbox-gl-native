@@ -7,7 +7,9 @@ namespace style {
 
 class Image::Impl {
 public:
-    Impl(PremultipliedImage&&, float pixelRatio, bool sdf = false);
+    Impl(std::string id, PremultipliedImage&&, float pixelRatio, bool sdf = false);
+
+    const std::string id;
 
     PremultipliedImage image;
 

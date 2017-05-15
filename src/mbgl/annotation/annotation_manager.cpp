@@ -191,9 +191,9 @@ void AnnotationManager::removeTile(AnnotationTile& tile) {
     tiles.erase(&tile);
 }
 
-void AnnotationManager::addImage(const std::string& id, std::unique_ptr<style::Image> image) {
-    addSpriteImage(spriteImages, id, std::move(image), [&](style::Image& added) {
-        spriteAtlas.addImage(id, added.impl);
+void AnnotationManager::addImage(std::unique_ptr<style::Image> image) {
+    addSpriteImage(spriteImages, std::move(image), [&](style::Image& added) {
+        spriteAtlas.addImage(added.impl);
     });
 }
 

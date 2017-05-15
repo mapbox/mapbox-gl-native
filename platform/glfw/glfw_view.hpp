@@ -61,7 +61,7 @@ private:
 
     mbgl::Color makeRandomColor() const;
     mbgl::Point<double> makeRandomPoint() const;
-    static std::unique_ptr<mbgl::style::Image> makeImage(int width, int height, float pixelRatio);
+    static std::unique_ptr<mbgl::style::Image> makeImage(const std::string& id, int width, int height, float pixelRatio);
 
     void nextOrientation();
 

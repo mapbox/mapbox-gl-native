@@ -3,10 +3,10 @@
 
 namespace mbgl {
 
-void addSpriteImage(Images& images, const std::string& id,
+void addSpriteImage(Images& images,
                            std::unique_ptr<style::Image> image_,
                            std::function<void (style::Image&)> onAdded) {
-
+    std::string id = image_->getID();
     auto it = images.find(id);
     if (it == images.end()) {
         // Add new

@@ -735,8 +735,8 @@ void NativeMapView::addAnnotationIcon(JNIEnv& env, jni::String symbol, jint w, j
     }
 
     jni::GetArrayRegion(env, *jpixels, 0, size, reinterpret_cast<jbyte*>(premultipliedImage.data.get()));
-    map->addAnnotationImage(symbolName,
-        std::make_unique<mbgl::style::Image>(std::move(premultipliedImage), float(scale)));
+    map->addAnnotationImage(std::make_unique<mbgl::style::Image>(
+        symbolName, std::move(premultipliedImage), float(scale)));
 }
 
 jdouble NativeMapView::getTopOffsetPixelsForAnnotationSymbol(JNIEnv& env, jni::String symbolName) {
@@ -1037,8 +1037,10 @@ void NativeMapView::addImage(JNIEnv& env, jni::String name, jni::jint w, jni::ji
 
     jni::GetArrayRegion(env, *pixels, 0, size, reinterpret_cast<jbyte*>(premultipliedImage.data.get()));
 
-    map->addImage(jni::Make<std::string>(env, name),
-        std::make_unique<mbgl::style::Image>(std::move(premultipliedImage), float(scale)));
+    map->addImage(std::make_unique<mbgl::style::Image>(
+        jni::Make<std::string>(env, name),
+        std::move(premultipliedImage),
+        float(scale)));
 }
 
 void NativeMapView::removeImage(JNIEnv& env, jni::String name) {
