@@ -385,4 +385,16 @@ void TransformState::setScalePoint(const double newScale, const ScreenCoordinate
     Cc = Projection::worldSize(scale) / util::M2PI;
 }
 
+float TransformState::getCameraToTileDistance(const UnwrappedTileID& tileID) const {
+    mat4 projectionMatrix;
+    getProjMatrix(projectionMatrix);
+    mat4 tileProjectionMatrix;
+    matrixFor(tileProjectionMatrix, tileID);
+    matrix::multiply(tileProjectionMatrix, projectionMatrix, tileProjectionMatrix);
+    vec4 tileCenter = {{util::tileSize / 2, util::tileSize / 2, 0, 1}};
+    vec4 projectedCenter;
+    matrix::transformMat4(projectedCenter, tileCenter, tileProjectionMatrix);
+    return projectedCenter[3];
+}
+
 } // namespace mbgl
