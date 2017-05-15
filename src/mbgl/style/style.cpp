@@ -361,6 +361,35 @@ void Style::update(const UpdateParameters& parameters) {
     }
 
 
+    std::vector<Immutable<Image::Impl>> newImageImpls;
+    newImageImpls.reserve(images.size());
+    for (const auto& entry : images) {
+        newImageImpls.push_back(entry.second->impl);
+    }
+
+    const ImageDifference imageDiff = diffImages(imageImpls, newImageImpls);
+    imageImpls = std::move(newImageImpls);
+
+    // Remove removed images from sprite atlas.
+    for (const auto& entry : imageDiff.removed) {
+        spriteAtlas->removeImage(entry.first);
+    }
+
+    // Add added images to sprite atlas.
+    for (const auto& entry : imageDiff.added) {
+        spriteAtlas->addImage(entry.second);
+    }
+
+    // Update changed images.
+    for (const auto& entry : imageDiff.changed) {
+        spriteAtlas->updateImage(entry.second);
+    }
+
+    if (spriteLoaded && !spriteAtlas->isLoaded()) {
+        spriteAtlas->onSpriteLoaded();
+    }
+
+
     std::vector<Immutable<Source::Impl>> newSourceImpls;
     newSourceImpls.reserve(sources.size());
     for (const auto& source : sources) {
@@ -509,6 +538,10 @@ bool Style::isLoaded() const {
         return false;
     }
 
+    if (!spriteLoaded) {
+        return false;
+    }
+
     for (const auto& source: sources) {
         if (!source->loaded) {
             return false;
@@ -521,10 +554,6 @@ bool Style::isLoaded() const {
         }
     }
 
-    if (!spriteAtlas->isLoaded()) {
-        return false;
-    }
-
     return true;
 }
 
@@ -535,13 +564,11 @@ void Style::addImage(std::unique_ptr<style::Image> image) {
         Log::Warning(Event::Sprite, "Can't change sprite dimensions for '%s'", id.c_str());
         return;
     }
-    spriteAtlas->addImage(image->impl);
     images[id] = std::move(image);
 }
 
 void Style::removeImage(const std::string& id) {
     images.erase(id);
-    spriteAtlas->removeImage(id);
 }
 
 const style::Image* Style::getImage(const std::string& id) const {
@@ -764,7 +791,7 @@ void Style::onSpriteLoaded(std::vector<std::unique_ptr<Image>>&& images_) {
     for (auto& image : images_) {
         addImage(std::move(image));
     }
-    spriteAtlas->onSpriteLoaded();
+    spriteLoaded = true;
     observer->onUpdate(Update::Repaint); // For *-pattern properties.
 }
 

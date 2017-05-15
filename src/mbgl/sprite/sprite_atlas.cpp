@@ -52,17 +52,16 @@ void SpriteAtlas::onSpriteLoaded() {
 }
 
 void SpriteAtlas::addImage(Immutable<style::Image::Impl> image_) {
+    assert(entries.find(image_->id) == entries.end());
+    entries.emplace(image_->id, Entry { image_ });
     icons.clear();
+}
 
-    auto it = entries.find(image_->id);
-    if (it == entries.end()) {
-        entries.emplace(image_->id, Entry { image_, {}, {} });
-        return;
-    }
+void SpriteAtlas::updateImage(Immutable<style::Image::Impl> image_) {
+    assert(entries.find(image_->id) != entries.end());
+    Entry& entry = entries.at(image_->id);
 
-    Entry& entry = it->second;
-
-    // There is already a sprite with that name in our store.
+    // Style::addImage should prevent changing size.
     assert(entry.image->image.size == image_->image.size);
 
     entry.image = std::move(image_);
@@ -74,15 +73,13 @@ void SpriteAtlas::addImage(Immutable<style::Image::Impl> image_) {
     if (entry.patternBin) {
         copy(entry, &Entry::patternBin);
     }
+
+    icons.clear();
 }
 
 void SpriteAtlas::removeImage(const std::string& id) {
-    icons.clear();
-
-    auto it = entries.find(id);
-    assert(it != entries.end());
-
-    Entry& entry = it->second;
+    assert(entries.find(id) != entries.end());
+    Entry& entry = entries.at(id);
 
     if (entry.iconBin) {
         shelfPack.unref(*entry.iconBin);
@@ -92,7 +89,8 @@ void SpriteAtlas::removeImage(const std::string& id) {
         shelfPack.unref(*entry.patternBin);
     }
 
-    entries.erase(it);
+    entries.erase(id);
+    icons.clear();
 }
 
 const style::Image::Impl* SpriteAtlas::getImage(const std::string& id) const {

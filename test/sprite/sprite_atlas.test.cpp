@@ -98,7 +98,7 @@ TEST(SpriteAtlas, Updates) {
     for (size_t i = 0; i < image2.bytes(); i++) {
         image2.data.get()[i] = 255;
     }
-    atlas.addImage(makeMutable<style::Image::Impl>("one", std::move(image2), 1));
+    atlas.updateImage(makeMutable<style::Image::Impl>("one", std::move(image2), 1));
 
     test::checkImage("test/fixtures/sprite_atlas/updates_after", atlas.getAtlasImage());
 }

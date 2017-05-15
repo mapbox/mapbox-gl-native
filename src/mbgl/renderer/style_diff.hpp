@@ -1,3 +1,4 @@
+#include <mbgl/style/image_impl.hpp>
 #include <mbgl/style/source_impl.hpp>
 #include <mbgl/style/layer_impl.hpp>
 #include <mbgl/util/immutable.hpp>
@@ -14,6 +15,12 @@ public:
     std::unordered_map<std::string, T> removed;
     std::unordered_map<std::string, T> changed;
 };
+
+using ImmutableImage = Immutable<style::Image::Impl>;
+using ImageDifference = StyleDifference<ImmutableImage>;
+
+ImageDifference diffImages(const std::vector<ImmutableImage>&,
+                           const std::vector<ImmutableImage>&);
 
 using ImmutableSource = Immutable<style::Source::Impl>;
 using SourceDifference = StyleDifference<ImmutableSource>;
