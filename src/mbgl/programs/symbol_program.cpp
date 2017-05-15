@@ -2,6 +2,7 @@
 #include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/map/transform_state.hpp>
 #include <mbgl/style/layers/symbol_layer_impl.hpp>
+#include <mbgl/tile/tile.hpp>
 #include <mbgl/util/enum.hpp>
 #include <mbgl/math/clamp.hpp>
 
@@ -57,6 +58,7 @@ Values makeValues(const bool isText,
         uniforms::u_texture::Value{ 0 },
         uniforms::u_fadetexture::Value{ 1 },
         uniforms::u_is_text::Value{ isText },
+        uniforms::u_collision_y_stretch::Value{ tile.tile.yStretch() },
         std::forward<Args>(args)...
     };
 }
