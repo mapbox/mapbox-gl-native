@@ -19,17 +19,13 @@ for CLANG_FILE in "${CLANG_TIDY} ${CLANG_APPLY} ${CLANG_FORMAT}"; do
     }
 done
 
-cd $1
-
-export CDUP=$(git rev-parse --show-cdup)
 export CLANG_TIDY CLANG_APPLY CLANG_FORMAT
 
 function run_clang_tidy() {
-    FILES=$(git ls-files "src/mbgl/*.cpp" "platform/*.cpp" "test/*.cpp")
     ${CLANG_TIDY_PREFIX}/share/run-clang-tidy.py -j ${JOBS} \
         -clang-tidy-binary ${CLANG_TIDY} \
         -clang-apply-replacements-binary ${CLANG_APPLY} \
-        -fix ${FILES} 2>/dev/null || exit 1
+        -p $1 -fix 2>/dev/null || exit 1
 }
 
 function run_clang_tidy_diff() {
@@ -55,6 +51,8 @@ export -f run_clang_tidy run_clang_tidy_diff run_clang_format
 echo "Running Clang checks... (this might take a while)"
 
 if [[ -n $2 ]] && [[ $2 == "--diff" ]]; then
+    cd $1
+    export CDUP=$(git rev-parse --show-cdup)
     run_clang_tidy_diff $@
     # XXX disabled until we run clang-format over the entire codebase.
     #run_clang_format $@
