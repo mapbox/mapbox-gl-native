@@ -577,7 +577,7 @@ RenderData Style::getRenderData(MapDebugOptions debugOptions, float angle) const
             continue;
         }
 
-        if (const RenderBackgroundLayer* background = layer->as<RenderBackgroundLayer>()) {
+        if (const auto* background = layer->as<RenderBackgroundLayer>()) {
             if (debugOptions & MapDebugOptions::Overdraw) {
                 // We want to skip glClear optimization in overdraw mode.
                 result.order.emplace_back(*layer);

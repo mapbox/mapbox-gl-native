@@ -16,7 +16,7 @@
 #include <procfs.h>
 
 #elif defined(__linux__) || defined(__linux) || defined(linux) || defined(__gnu_linux__)
-#include <stdio.h>
+#include <cstdio>
 
 #endif
 

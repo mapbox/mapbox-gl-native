@@ -80,7 +80,7 @@ struct AnimationOptions {
     std::function<void()> transitionFinishFn;
 
     /** Creates an animation with no options specified. */
-    AnimationOptions() {}
+    AnimationOptions() = default;
 
     /** Creates an animation with the specified duration. */
     AnimationOptions(Duration d)

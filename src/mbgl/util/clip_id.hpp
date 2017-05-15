@@ -12,7 +12,7 @@
 namespace mbgl {
 
 struct ClipID {
-    ClipID() {}
+    ClipID() = default;
     ClipID(const std::string &mask_, const std::string &reference_) : mask(mask_), reference(reference_) {}
 
     std::bitset<8> mask;

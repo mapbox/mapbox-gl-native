@@ -8,6 +8,7 @@
 #include <mbgl/renderer/layers/render_raster_layer.hpp>
 #include <mbgl/renderer/layers/render_symbol_layer.hpp>
 #include <mbgl/style/types.hpp>
+#include <utility>
 
 namespace mbgl {
 
@@ -40,7 +41,7 @@ std::unique_ptr<RenderLayer> RenderLayer::create(Immutable<Layer::Impl> impl) {
 
 RenderLayer::RenderLayer(style::LayerType type_, Immutable<style::Layer::Impl> baseImpl_)
         : type(type_),
-          baseImpl(baseImpl_) {
+          baseImpl(std::move(baseImpl_)) {
 }
 
 void RenderLayer::setImpl(Immutable<style::Layer::Impl> impl) {
