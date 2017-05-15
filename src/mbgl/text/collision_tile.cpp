@@ -20,12 +20,17 @@ CollisionTile::CollisionTile(PlacementConfig config_) : config(std::move(config_
     rotationMatrix = { { angle_cos, -angle_sin, angle_sin, angle_cos } };
     reverseRotationMatrix = { { angle_cos, angle_sin, -angle_sin, angle_cos } };
 
-    // Stretch boxes in y direction to account for the map tilt.
-    const float _yStretch = 1.0f / std::cos(config.pitch);
+    perspectiveRatio = 1.0f + 0.5f * ((config.cameraToTileDistance / config.cameraToCenterDistance) - 1.0f);
+    minScale /= perspectiveRatio;
+    maxScale /= perspectiveRatio;
 
-    // The amount the map is squished depends on the y position.
-    // Sort of account for this by making all boxes a bit bigger.
-    yStretch = std::pow(_yStretch, 1.3f);
+    // We can only approximate here based on the y position of the tile
+    // The shaders calculate a more accurate "incidence_stretch"
+    // at render time to calculate an effective scale for collision
+    // purposes, but we still want to use the yStretch approximation
+    // here because we can't adjust the aspect ratio of the collision
+    // boxes at render time.
+    yStretch = util::max(1.0f, config.cameraToTileDistance / (config.cameraToCenterDistance * std::cos(config.pitch)));
 }
 
 
@@ -157,13 +162,21 @@ void CollisionTile::insertFeature(CollisionFeature& feature, float minPlacementS
 Box CollisionTile::getTreeBox(const Point<float>& anchor, const CollisionBox& box, const float scale) {
     assert(box.x1 <= box.x2 && box.y1 <= box.y2);
     return Box{
+        // When the 'perspectiveRatio' is high, we're effectively underzooming
+        // the tile because it's in the distance.
+        // In order to detect collisions that only happen while underzoomed,
+        // we have to query a larger portion of the grid.
+        // This extra work is offset by having a lower 'maxScale' bound
+        // Note that this adjustment ONLY affects the bounding boxes
+        // in the grid. It doesn't affect the boxes used for the
+        // minPlacementScale calculations.
         CollisionPoint{
-            anchor.x + box.x1 / scale,
-            anchor.y + box.y1 / scale * yStretch
+            anchor.x + box.x1 / scale * perspectiveRatio,
+            anchor.y + box.y1 / scale * yStretch * perspectiveRatio,
         },
         CollisionPoint{
-            anchor.x + box.x2 / scale,
-            anchor.y + box.y2 / scale * yStretch
+            anchor.x + box.x2 / scale * perspectiveRatio,
+            anchor.y + box.y2 / scale * yStretch * perspectiveRatio
         }
     };
 }
@@ -190,8 +203,14 @@ std::vector<IndexedSubfeature> CollisionTile::queryRenderedSymbols(const Geometr
         return seenFeatures.find(feature.index) == seenFeatures.end();
     };
 
+    // "perspectiveRatio" is a tile-based approximation of how much larger symbols will
+    // be in the distance. It won't line up exactly with the actually rendered symbols
+    // Being exact would require running the collision detection logic in symbol_sdf.vertex
+    // in the CPU
+    const float perspectiveScale = scale / perspectiveRatio;
+
     // Account for the rounding done when updating symbol shader variables.
-    const float roundedScale = std::pow(2.0f, std::ceil(util::log2(scale) * 10.0f) / 10.0f);
+    const float roundedScale = std::pow(2.0f, std::ceil(util::log2(perspectiveScale) * 10.0f) / 10.0f);
 
     // Check if feature is rendered (collision free) at current scale.
     auto visibleAtScale = [&] (const CollisionTreeBox& treeBox) -> bool {
@@ -203,10 +222,11 @@ std::vector<IndexedSubfeature> CollisionTile::queryRenderedSymbols(const Geometr
     auto intersectsAtScale = [&] (const CollisionTreeBox& treeBox) -> bool {
         const CollisionBox& collisionBox = std::get<1>(treeBox);
         const auto anchor = util::matrixMultiply(rotationMatrix, collisionBox.anchor);
-        const int16_t x1 = anchor.x + collisionBox.x1 / scale;
-        const int16_t y1 = anchor.y + collisionBox.y1 / scale * yStretch;
-        const int16_t x2 = anchor.x + collisionBox.x2 / scale;
-        const int16_t y2 = anchor.y + collisionBox.y2 / scale * yStretch;
+
+        const int16_t x1 = anchor.x + (collisionBox.x1 / perspectiveScale);
+        const int16_t y1 = anchor.y + (collisionBox.y1 / perspectiveScale) * yStretch;
+        const int16_t x2 = anchor.x + (collisionBox.x2 / perspectiveScale);
+        const int16_t y2 = anchor.y + (collisionBox.y2 / perspectiveScale) * yStretch;
         auto bbox = GeometryCoordinates {
             { x1, y1 }, { x2, y1 }, { x2, y2 }, { x1, y2 }
         };
