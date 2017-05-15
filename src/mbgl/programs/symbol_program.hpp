@@ -42,6 +42,7 @@ MBGL_DEFINE_UNIFORM_SCALAR(bool, u_is_size_feature_constant);
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_size_t);
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_size);
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_layout_size);
+MBGL_DEFINE_UNIFORM_SCALAR(float, u_collision_y_stretch);
 } // namespace uniforms
 
 struct SymbolLayoutAttributes : gl::Attributes<
@@ -389,7 +390,8 @@ class SymbolIconProgram : public SymbolProgram<
         uniforms::u_rotate_with_map,
         uniforms::u_texture,
         uniforms::u_fadetexture,
-        uniforms::u_is_text>,
+        uniforms::u_is_text,
+        uniforms::u_collision_y_stretch>,
     style::IconPaintProperties>
 {
 public:
@@ -422,6 +424,7 @@ class SymbolSDFProgram : public SymbolProgram<
         uniforms::u_texture,
         uniforms::u_fadetexture,
         uniforms::u_is_text,
+        uniforms::u_collision_y_stretch,
         uniforms::u_gamma_scale,
         uniforms::u_pitch,
         uniforms::u_bearing,
@@ -443,6 +446,7 @@ public:
             uniforms::u_texture,
             uniforms::u_fadetexture,
             uniforms::u_is_text,
+            uniforms::u_collision_y_stretch,
             uniforms::u_gamma_scale,
             uniforms::u_pitch,
             uniforms::u_bearing,

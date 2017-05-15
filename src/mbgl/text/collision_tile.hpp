@@ -49,8 +49,8 @@ public:
 
     const PlacementConfig config;
 
-    const float minScale = 0.5f;
-    const float maxScale = 2.0f;
+    float minScale = 0.5f;
+    float maxScale = 2.0f;
     float yStretch;
 
     std::array<float, 4> rotationMatrix;
@@ -64,6 +64,8 @@ private:
 
     Tree tree;
     Tree ignoredTree;
+    
+    float perspectiveRatio;
 };
 
 } // namespace mbgl
