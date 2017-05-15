@@ -6,14 +6,9 @@
 
 namespace mbgl {
 
-template <class T>
-StyleDifference<T> diff(const std::vector<T>& a, const std::vector<T>& b) {
+template <class T, class Eq>
+StyleDifference<T> diff(const std::vector<T>& a, const std::vector<T>& b, const Eq& eq) {
     std::vector<T> lcs;
-
-    auto eq = [] (const T& lhs, const T& rhs) {
-        return std::tie(lhs->id, lhs->type)
-            == std::tie(rhs->id, rhs->type);
-    };
 
     longest_common_subsequence(a.begin(), a.end(), b.begin(), b.end(), std::back_inserter(lcs), eq);
 
@@ -43,14 +38,27 @@ StyleDifference<T> diff(const std::vector<T>& a, const std::vector<T>& b) {
     return result;
 }
 
+ImageDifference diffImages(const std::vector<ImmutableImage>& a,
+                           const std::vector<ImmutableImage>& b) {
+    return diff(a, b, [] (const ImmutableImage& lhs, const ImmutableImage& rhs) {
+        return lhs->id == rhs->id;
+    });
+}
+
 SourceDifference diffSources(const std::vector<ImmutableSource>& a,
                              const std::vector<ImmutableSource>& b) {
-    return diff(a, b);
+    return diff(a, b, [] (const ImmutableSource& lhs, const ImmutableSource& rhs) {
+        return std::tie(lhs->id, lhs->type)
+            == std::tie(rhs->id, rhs->type);
+    });
 }
 
 LayerDifference diffLayers(const std::vector<ImmutableLayer>& a,
                            const std::vector<ImmutableLayer>& b) {
-    return diff(a, b);
+    return diff(a, b, [] (const ImmutableLayer& lhs, const ImmutableLayer& rhs) {
+        return std::tie(lhs->id, lhs->type)
+            == std::tie(rhs->id, rhs->type);
+    });
 }
 
 } // namespace mbgl

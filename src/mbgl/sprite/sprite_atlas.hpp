@@ -73,7 +73,9 @@ public:
     void dumpDebugLogs() const;
 
     const style::Image::Impl* getImage(const std::string&) const;
+
     void addImage(Immutable<style::Image::Impl>);
+    void updateImage(Immutable<style::Image::Impl>);
     void removeImage(const std::string&);
 
     void getIcons(IconRequestor&, IconDependencies);

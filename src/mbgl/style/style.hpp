@@ -6,6 +6,7 @@
 #include <mbgl/style/layer_observer.hpp>
 #include <mbgl/style/light_observer.hpp>
 #include <mbgl/style/update_batch.hpp>
+#include <mbgl/style/image.hpp>
 #include <mbgl/renderer/render_source.hpp>
 #include <mbgl/renderer/render_source_observer.hpp>
 #include <mbgl/renderer/render_layer.hpp>
@@ -138,6 +139,7 @@ private:
     double defaultBearing = 0;
     double defaultPitch = 0;
 
+    std::vector<Immutable<Image::Impl>> imageImpls;
     std::vector<Immutable<Source::Impl>> sourceImpls;
     std::vector<Immutable<Layer::Impl>> layerImpls;
 
@@ -179,6 +181,7 @@ private:
 
     UpdateBatch updateBatch;
     ZoomHistory zoomHistory;
+    bool spriteLoaded = false;
 
 public:
     bool loaded = false;
