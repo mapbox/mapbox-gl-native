@@ -1,6 +1,6 @@
 # node-mapbox-gl-native
 
-[![NPM](https://nodei.co/npm/mapbox-gl-native.png)](https://npmjs.org/package/mapbox-gl-native)  
+[![NPM](https://nodei.co/npm/@mapbox/mapbox-gl-native.png)](https://npmjs.org/package/@mapbox/mapbox-gl-native)
 
 ## Installing
 
@@ -14,7 +14,7 @@ By default, installs binaries. On these platforms no additional dependencies are
 Run:
 
 ```
-npm install mapbox-gl-native
+npm install @mapbox/mapbox-gl-native
 ```
 
 Other platforms will fall back to a source compile with `make node`; see INSTALL.md in the repository root directory for prequisites.
@@ -31,7 +31,7 @@ npm run test-suite
 ```js
 var fs = require('fs');
 var path = require('path');
-var mbgl = require('mapbox-gl-native');
+var mbgl = require('@mapbox/mapbox-gl-native');
 var sharp = require('sharp');
 
 var options = {
