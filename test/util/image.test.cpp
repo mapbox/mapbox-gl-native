@@ -124,8 +124,9 @@ TEST(Image, Move) { // NOLINT
 
     auto moved = std::move(rgba);
 
-    EXPECT_EQ(0u, rgba.size.width);
-    EXPECT_EQ(nullptr, rgba.data.get());
+    // warning: 'rgba' used after it was moved [misc-use-after-move]
+    EXPECT_EQ(0u, rgba.size.width); // NOLINT
+    EXPECT_EQ(nullptr, rgba.data.get()); // NOLINT
     EXPECT_EQ(254, moved.data[1]);
     EXPECT_EQ(1u, moved.size.width);
 }
