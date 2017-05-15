@@ -13,13 +13,14 @@
 
 namespace mbgl {
 
-std::unique_ptr<style::Image> createStyleImage(const PremultipliedImage& image,
-                                 const uint32_t srcX,
-                                 const uint32_t srcY,
-                                 const uint32_t width,
-                                 const uint32_t height,
-                                 const double ratio,
-                                 const bool sdf) {
+std::unique_ptr<style::Image> createStyleImage(const std::string& id,
+                                               const PremultipliedImage& image,
+                                               const uint32_t srcX,
+                                               const uint32_t srcY,
+                                               const uint32_t width,
+                                               const uint32_t height,
+                                               const double ratio,
+                                               const bool sdf) {
     // Disallow invalid parameter configurations.
     if (width <= 0 || height <= 0 || width > 1024 || height > 1024 ||
         ratio <= 0 || ratio > 10 ||
@@ -37,7 +38,7 @@ std::unique_ptr<style::Image> createStyleImage(const PremultipliedImage& image,
     // Copy from the source image into our individual sprite image
     PremultipliedImage::copy(image, dstImage, { srcX, srcY }, { 0, 0 }, { width, height });
 
-    return std::make_unique<style::Image>(std::move(dstImage), ratio, sdf);
+    return std::make_unique<style::Image>(id, std::move(dstImage), ratio, sdf);
 }
 
 namespace {
@@ -84,7 +85,7 @@ bool getBoolean(const JSValue& value, const char* name, const bool def = false) 
 
 } // namespace
 
-Images parseSprite(const std::string& encodedImage, const std::string& json) {
+std::vector<std::unique_ptr<style::Image>> parseSprite(const std::string& encodedImage, const std::string& json) {
     const PremultipliedImage raster = decodeImage(encodedImage);
 
     JSDocument doc;
@@ -96,7 +97,7 @@ Images parseSprite(const std::string& encodedImage, const std::string& json) {
     } else if (!doc.IsObject()) {
         throw std::runtime_error("Sprite JSON root must be an object");
     } else {
-        Images images;
+        std::vector<std::unique_ptr<style::Image>> images;
         for (const auto& property : doc.GetObject()) {
             const std::string name = { property.name.GetString(), property.name.GetStringLength() };
             const JSValue& value = property.value;
@@ -109,9 +110,9 @@ Images parseSprite(const std::string& encodedImage, const std::string& json) {
                 const double pixelRatio = getDouble(value, "pixelRatio", 1);
                 const bool sdf = getBoolean(value, "sdf", false);
 
-                auto image = createStyleImage(raster, x, y, width, height, pixelRatio, sdf);
+                auto image = createStyleImage(name, raster, x, y, width, height, pixelRatio, sdf);
                 if (image) {
-                    images.emplace(name, std::move(image));
+                    images.push_back(std::move(image));
                 }
             }
         }

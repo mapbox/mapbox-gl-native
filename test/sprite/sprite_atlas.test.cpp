@@ -22,8 +22,8 @@ TEST(SpriteAtlas, Basic) {
 
     auto images = parseSprite(util::read_file("test/fixtures/annotations/emerald.png"),
                               util::read_file("test/fixtures/annotations/emerald.json"));
-    for (auto& pair : images) {
-        atlas.addImage(pair.first, pair.second->impl);
+    for (auto& image : images) {
+        atlas.addImage(image->impl);
     }
 
     EXPECT_EQ(1.0f, atlas.getPixelRatio());
@@ -79,8 +79,8 @@ TEST(SpriteAtlas, Size) {
 
     auto images = parseSprite(util::read_file("test/fixtures/annotations/emerald.png"),
                               util::read_file("test/fixtures/annotations/emerald.json"));
-    for (auto& pair : images) {
-        atlas.addImage(pair.first, pair.second->impl);
+    for (auto& image : images) {
+        atlas.addImage(image->impl);
     }
 
     EXPECT_DOUBLE_EQ(1.4f, atlas.getPixelRatio());
@@ -113,7 +113,7 @@ TEST(SpriteAtlas, Updates) {
     EXPECT_EQ(32u, atlas.getSize().width);
     EXPECT_EQ(32u, atlas.getSize().height);
 
-    atlas.addImage("one", makeMutable<style::Image::Impl>(PremultipliedImage({ 16, 12 }), 1));
+    atlas.addImage(makeMutable<style::Image::Impl>("one", PremultipliedImage({ 16, 12 }), 1));
     auto one = *atlas.getIcon("one");
     float imagePixelRatio = one.relativePixelRatio * atlas.getPixelRatio();
     EXPECT_EQ(0, one.pos.x);
@@ -137,7 +137,7 @@ TEST(SpriteAtlas, Updates) {
     for (size_t i = 0; i < image2.bytes(); i++) {
         image2.data.get()[i] = 255;
     }
-    atlas.addImage("one", makeMutable<style::Image::Impl>(std::move(image2), 1));
+    atlas.addImage(makeMutable<style::Image::Impl>("one", std::move(image2), 1));
 
     test::checkImage("test/fixtures/sprite_atlas/updates_after", atlas.getAtlasImage());
 }
@@ -146,9 +146,9 @@ TEST(SpriteAtlas, AddRemove) {
     FixtureLog log;
     SpriteAtlas atlas({ 32, 32 }, 1);
 
-    atlas.addImage("one", makeMutable<style::Image::Impl>(PremultipliedImage({ 16, 16 }), 2));
-    atlas.addImage("two", makeMutable<style::Image::Impl>(PremultipliedImage({ 16, 16 }), 2));
-    atlas.addImage("three", makeMutable<style::Image::Impl>(PremultipliedImage({ 16, 16 }), 2));
+    atlas.addImage(makeMutable<style::Image::Impl>("one", PremultipliedImage({ 16, 16 }), 2));
+    atlas.addImage(makeMutable<style::Image::Impl>("two", PremultipliedImage({ 16, 16 }), 2));
+    atlas.addImage(makeMutable<style::Image::Impl>("three", PremultipliedImage({ 16, 16 }), 2));
 
     atlas.removeImage("one");
     atlas.removeImage("two");
@@ -176,12 +176,12 @@ TEST(SpriteAtlas, RemoveReleasesBinPackRect) {
 
     SpriteAtlas atlas({ 36, 36 }, 1);
 
-    atlas.addImage("big", makeMutable<style::Image::Impl>(PremultipliedImage({ 32, 32 }), 1));
+    atlas.addImage(makeMutable<style::Image::Impl>("big", PremultipliedImage({ 32, 32 }), 1));
     EXPECT_TRUE(atlas.getIcon("big"));
 
     atlas.removeImage("big");
 
-    atlas.addImage("big", makeMutable<style::Image::Impl>(PremultipliedImage({ 32, 32 }), 1));
+    atlas.addImage(makeMutable<style::Image::Impl>("big", PremultipliedImage({ 32, 32 }), 1));
     EXPECT_TRUE(atlas.getIcon("big"));
     EXPECT_TRUE(log.empty());
 }

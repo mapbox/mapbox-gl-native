@@ -43,12 +43,10 @@ public:
 
 class SpriteAtlas : public util::noncopyable {
 public:
-    using Images = std::unordered_map<std::string, std::unique_ptr<style::Image>>;
-
     SpriteAtlas(Size, float pixelRatio);
     ~SpriteAtlas();
 
-    void onSpriteLoaded(Images&&);
+    void onSpriteLoaded();
 
     void markAsLoaded() {
         loaded = true;
@@ -61,7 +59,7 @@ public:
     void dumpDebugLogs() const;
 
     const style::Image::Impl* getImage(const std::string&) const;
-    void addImage(const std::string&, Immutable<style::Image::Impl>);
+    void addImage(Immutable<style::Image::Impl>);
     void removeImage(const std::string&);
 
     void getIcons(IconRequestor& requestor);

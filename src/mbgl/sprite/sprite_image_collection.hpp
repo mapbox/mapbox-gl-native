@@ -12,7 +12,6 @@ namespace mbgl {
 using Images = std::unordered_map<std::string, std::unique_ptr<style::Image>>;
 
 void addSpriteImage(Images&,
-                    const std::string&,
                     std::unique_ptr<style::Image>,
                     std::function<void (style::Image&)> onAdded = [] (style::Image&){});
 

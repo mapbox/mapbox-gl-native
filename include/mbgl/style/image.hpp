@@ -3,12 +3,16 @@
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/immutable.hpp>
 
+#include <string>
+
 namespace mbgl {
 namespace style {
 
 class Image {
 public:
-    Image(PremultipliedImage&&, float pixelRatio, bool sdf = false);
+    Image(std::string id, PremultipliedImage&&, float pixelRatio, bool sdf = false);
+
+    std::string getID() const;
 
     const PremultipliedImage& getImage() const;
 

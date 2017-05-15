@@ -510,7 +510,7 @@ static NSURL *MGLStyleURL_emerald;
                     format:@"Cannot assign image %@ to a nil name.", image];
     }
 
-    self.mapView.mbglMap->addImage([name UTF8String], image.mgl_styleImage);
+    self.mapView.mbglMap->addImage([image mgl_styleImageWithIdentifier:name]);
 }
 
 - (void)removeImageForName:(NSString *)name

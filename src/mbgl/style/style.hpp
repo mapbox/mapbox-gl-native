@@ -101,7 +101,7 @@ public:
     const RenderLight& getRenderLight() const;
 
     const style::Image* getImage(const std::string&) const;
-    void addImage(const std::string&, std::unique_ptr<style::Image>);
+    void addImage(std::unique_ptr<style::Image>);
     void removeImage(const std::string&);
 
     RenderData getRenderData(MapDebugOptions, float angle) const;
@@ -151,7 +151,7 @@ private:
 
     // SpriteLoaderObserver implementation.
     std::unordered_map<std::string, std::unique_ptr<style::Image>> spriteImages;
-    void onSpriteLoaded(SpriteLoaderObserver::Images&&) override;
+    void onSpriteLoaded(std::vector<std::unique_ptr<Image>>&&) override;
     void onSpriteError(std::exception_ptr) override;
 
     // SourceObserver implementation.

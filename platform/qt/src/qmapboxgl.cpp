@@ -78,7 +78,7 @@ mbgl::Size sanitizedSize(const QSize& size) {
     };
 };
 
-std::unique_ptr<mbgl::style::Image> toStyleImage(const QImage &sprite) {
+std::unique_ptr<mbgl::style::Image> toStyleImage(const QString &id, const QImage &sprite) {
     const QImage swapped = sprite
         .rgbSwapped()
         .convertToFormat(QImage::Format_ARGB32_Premultiplied);
@@ -87,6 +87,7 @@ std::unique_ptr<mbgl::style::Image> toStyleImage(const QImage &sprite) {
     memcpy(img.get(), swapped.constBits(), swapped.byteCount());
 
     return std::make_unique<mbgl::style::Image>(
+        id.toStdString(),
         mbgl::PremultipliedImage(
             { static_cast<uint32_t>(swapped.width()), static_cast<uint32_t>(swapped.height()) },
             std::move(img)),
@@ -1027,7 +1028,7 @@ void QMapboxGL::addAnnotationIcon(const QString &name, const QImage &icon)
 {
     if (icon.isNull()) return;
 
-    d_ptr->mapObj->addAnnotationImage(name.toStdString(), toStyleImage(icon));
+    d_ptr->mapObj->addAnnotationImage(toStyleImage(name, icon));
 }
 
 /*!
@@ -1329,7 +1330,7 @@ void QMapboxGL::addImage(const QString &id, const QImage &image)
 {
     if (image.isNull()) return;
 
-    d_ptr->mapObj->addImage(id.toStdString(), toStyleImage(image));
+    d_ptr->mapObj->addImage(toStyleImage(id, image));
 }
 
 /*!

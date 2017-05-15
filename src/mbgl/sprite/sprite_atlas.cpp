@@ -42,25 +42,20 @@ SpriteAtlas::SpriteAtlas(Size size_, float pixelRatio_)
 
 SpriteAtlas::~SpriteAtlas() = default;
 
-void SpriteAtlas::onSpriteLoaded(Images&& result) {
+void SpriteAtlas::onSpriteLoaded() {
     markAsLoaded();
-
-    for (auto& pair : result) {
-        addImage(pair.first, pair.second->impl);
-    }
-
     for (auto requestor : requestors) {
         requestor->onIconsAvailable(buildIconMap());
     }
     requestors.clear();
 }
 
-void SpriteAtlas::addImage(const std::string& id, Immutable<style::Image::Impl> image_) {
+void SpriteAtlas::addImage(Immutable<style::Image::Impl> image_) {
     icons.clear();
 
-    auto it = entries.find(id);
+    auto it = entries.find(image_->id);
     if (it == entries.end()) {
-        entries.emplace(id, Entry { std::move(image_), {}, {} });
+        entries.emplace(image_->id, Entry { image_, {}, {} });
         return;
     }
 

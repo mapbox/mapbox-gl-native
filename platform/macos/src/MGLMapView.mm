@@ -1949,7 +1949,7 @@ public:
         return;
     }
 
-    _mbglMap->addAnnotationImage(iconIdentifier.UTF8String, annotationImage.image.mgl_styleImage);
+    _mbglMap->addAnnotationImage([annotationImage.image mgl_styleImageWithIdentifier:iconIdentifier]);
 
     // Create a slop area with a “radius” equal to the annotation image’s entire
     // size, allowing the eventual click to be on any point within this image.

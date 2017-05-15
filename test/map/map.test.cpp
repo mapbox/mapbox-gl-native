@@ -445,14 +445,14 @@ TEST(Map, AddImage) {
     Map map(test.backend, test.view.getSize(), 1, test.fileSource, test.threadPool, MapMode::Still);
     auto decoded1 = decodeImage(util::read_file("test/fixtures/sprites/default_marker.png"));
     auto decoded2 = decodeImage(util::read_file("test/fixtures/sprites/default_marker.png"));
-    auto image1 = std::make_unique<style::Image>(std::move(decoded1), 1.0);
-    auto image2 = std::make_unique<style::Image>(std::move(decoded2), 1.0);
+    auto image1 = std::make_unique<style::Image>("test-icon", std::move(decoded1), 1.0);
+    auto image2 = std::make_unique<style::Image>("test-icon", std::move(decoded2), 1.0);
 
     // No-op.
-    map.addImage("test-icon", std::move(image1));
+    map.addImage(std::move(image1));
 
     map.setStyleJSON(util::read_file("test/fixtures/api/icon_style.json"));
-    map.addImage("test-icon", std::move(image2));
+    map.addImage(std::move(image2));
     test::checkImage("test/fixtures/map/add_icon", test::render(map, test.view));
 }
 
@@ -461,10 +461,10 @@ TEST(Map, RemoveImage) {
 
     Map map(test.backend, test.view.getSize(), 1, test.fileSource, test.threadPool, MapMode::Still);
     auto decoded = decodeImage(util::read_file("test/fixtures/sprites/default_marker.png"));
-    auto image = std::make_unique<style::Image>(std::move(decoded), 1.0);
+    auto image = std::make_unique<style::Image>("test-icon", std::move(decoded), 1.0);
 
     map.setStyleJSON(util::read_file("test/fixtures/api/icon_style.json"));
-    map.addImage("test-icon", std::move(image));
+    map.addImage(std::move(image));
     map.removeImage("test-icon");
     test::checkImage("test/fixtures/map/remove_icon", test::render(map, test.view));
 }
@@ -474,10 +474,10 @@ TEST(Map, GetImage) {
 
     Map map(test.backend, test.view.getSize(), 1, test.fileSource, test.threadPool, MapMode::Still);
     auto decoded = decodeImage(util::read_file("test/fixtures/sprites/default_marker.png"));
-    auto image = std::make_unique<style::Image>(std::move(decoded), 1.0);
+    auto image = std::make_unique<style::Image>("test-icon", std::move(decoded), 1.0);
 
     map.setStyleJSON(util::read_file("test/fixtures/api/icon_style.json"));
-    map.addImage("test-icon", std::move(image));
+    map.addImage(std::move(image));
     test::checkImage("test/fixtures/map/get_icon", map.getImage("test-icon")->getImage());
 }
 

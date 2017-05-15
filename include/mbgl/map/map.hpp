@@ -148,7 +148,7 @@ public:
     LatLng latLngForPixel(const ScreenCoordinate&) const;
 
     // Annotations
-    void addAnnotationImage(const std::string&, std::unique_ptr<style::Image>);
+    void addAnnotationImage(std::unique_ptr<style::Image>);
     void removeAnnotationImage(const std::string&);
     double getTopOffsetPixelsForAnnotationImage(const std::string&);
 
@@ -169,7 +169,7 @@ public:
     std::unique_ptr<style::Layer> removeLayer(const std::string& layerID);
 
     // Images
-    void addImage(const std::string&, std::unique_ptr<style::Image>);
+    void addImage(std::unique_ptr<style::Image>);
     void removeImage(const std::string&);
     const style::Image* getImage(const std::string&);
 
