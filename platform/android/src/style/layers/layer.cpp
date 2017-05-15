@@ -1,5 +1,6 @@
 #include "layer.hpp"
 #include "../android_conversion.hpp"
+#include "../conversion/filter.hpp"
 
 #include <jni/jni.hpp>
 
@@ -116,15 +117,15 @@ namespace android {
         using namespace mbgl::android::conversion;
 
         if (layer.is<FillLayer>()) {
-            return jni::Object<android::Filter>(*convert<jni::jobject*>(env, layer.as<FillLayer>()->getFilter()));
+            return *convert<jni::Object<mbgl::android::Filter>, mbgl::style::Filter>(env, layer.as<FillLayer>()->getFilter());
         } else if (layer.is<LineLayer>()) {
-            return jni::Object<android::Filter>(*convert<jni::jobject*>(env, layer.as<LineLayer>()->getFilter()));
+            return *convert<jni::Object<mbgl::android::Filter>, mbgl::style::Filter>(env, layer.as<LineLayer>()->getFilter());
         } else if (layer.is<SymbolLayer>()) {
-            return jni::Object<android::Filter>(*convert<jni::jobject*>(env, layer.as<SymbolLayer>()->getFilter()));
+            return *convert<jni::Object<mbgl::android::Filter>, mbgl::style::Filter>(env, layer.as<SymbolLayer>()->getFilter());
         } else if (layer.is<CircleLayer>()) {
-            return jni::Object<android::Filter>(*convert<jni::jobject*>(env, layer.as<CircleLayer>()->getFilter()));
+            return *convert<jni::Object<mbgl::android::Filter>, mbgl::style::Filter>(env, layer.as<CircleLayer>()->getFilter());
         } else {
-            return jni::Object<android::Filter>(*convert<jni::jobject*>(env, NullFilter()));
+            return *convert<jni::Object<mbgl::android::Filter>, mbgl::style::Filter>(env, NullFilter());
         }
     }
 
@@ -135,7 +136,7 @@ namespace android {
         Value wrapped(env, jfilter);
 
         Error error;
-        optional<Filter> converted = convert<Filter>(wrapped, error);
+        optional<mbgl::style::Filter> converted = convert<mbgl::style::Filter>(wrapped, error);
         if (!converted) {
             mbgl::Log::Error(mbgl::Event::JNI, "Error setting filter: " + error.message);
             return;
