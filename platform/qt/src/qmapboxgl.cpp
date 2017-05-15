@@ -742,11 +742,8 @@ void QMapboxGL::setGestureInProgress(bool progress)
 }
 
 /*!
-    Sets the \a duration and \a delay of style class transitions. Style property
-    values transition to new values with animation when a new class is set.
-
-    \deprecated
-    \sa addClass()
+    Sets the \a duration and \a delay of style transitions. Style paint property
+    values transition to new values with animation when they are updated.
 */
 void QMapboxGL::setTransitionOptions(qint64 duration, qint64 delay) {
     static auto convert = [](qint64 value) -> mbgl::optional<mbgl::Duration> {
