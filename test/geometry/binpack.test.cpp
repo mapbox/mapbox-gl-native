@@ -11,7 +11,7 @@ template <typename T> ::std::ostream& operator<<(::std::ostream& os, const Rect<
 }
 } // namespace mbgl
 
-TEST(BinPack, Allocating) {
+TEST(BinPack, Allocating) { // NOLINT
     mbgl::BinPack<uint16_t> bin(128, 128);
     std::array<mbgl::Rect<uint16_t>, 4> rects;
 
@@ -30,7 +30,7 @@ TEST(BinPack, Allocating) {
 }
 
 
-TEST(BinPack, Full) {
+TEST(BinPack, Full) { // NOLINT
     mbgl::BinPack<uint16_t> bin(128, 128);
     std::vector<mbgl::Rect<uint16_t>> rects;
 

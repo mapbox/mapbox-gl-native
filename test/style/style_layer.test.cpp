@@ -52,7 +52,7 @@ const auto duration = 1.0f;
 
 } // namespace
 
-TEST(Layer, BackgroundProperties) {
+TEST(Layer, BackgroundProperties) { // NOLINT
     auto layer = std::make_unique<BackgroundLayer>("background");
     EXPECT_TRUE(layer->is<BackgroundLayer>());
 
@@ -68,7 +68,7 @@ TEST(Layer, BackgroundProperties) {
     EXPECT_EQ(layer->getBackgroundPattern(), pattern);
 }
 
-TEST(Layer, CircleProperties) {
+TEST(Layer, CircleProperties) { // NOLINT
     auto layer = std::make_unique<CircleLayer>("circle", "source");
     EXPECT_TRUE(layer->is<CircleLayer>());
 
@@ -93,7 +93,7 @@ TEST(Layer, CircleProperties) {
     EXPECT_EQ(layer->getCircleTranslateAnchor(), translateAnchor);
 }
 
-TEST(Layer, FillProperties) {
+TEST(Layer, FillProperties) { // NOLINT
     auto layer = std::make_unique<FillLayer>("fill", "source");
     EXPECT_TRUE(layer->is<FillLayer>());
 
@@ -121,7 +121,7 @@ TEST(Layer, FillProperties) {
     EXPECT_EQ(layer->getFillTranslateAnchor(), translateAnchor);
 }
 
-TEST(Layer, LineProperties) {
+TEST(Layer, LineProperties) { // NOLINT
     auto layer = std::make_unique<LineLayer>("line", "source");
     EXPECT_TRUE(layer->is<LineLayer>());
 
@@ -172,7 +172,7 @@ TEST(Layer, LineProperties) {
     EXPECT_EQ(layer->getLinePattern(), pattern);
 }
 
-TEST(Layer, RasterProperties) {
+TEST(Layer, RasterProperties) { // NOLINT
     auto layer = std::make_unique<RasterLayer>("raster", "source");
     EXPECT_TRUE(layer->is<RasterLayer>());
 
@@ -200,7 +200,7 @@ TEST(Layer, RasterProperties) {
     EXPECT_EQ(layer->getRasterFadeDuration(), duration);
 }
 
-TEST(Layer, Observer) {
+TEST(Layer, Observer) { // NOLINT
     auto layer = std::make_unique<LineLayer>("line", "source");
     StubLayerObserver observer;
     layer->setObserver(&observer);
@@ -257,7 +257,7 @@ TEST(Layer, Observer) {
     EXPECT_FALSE(layoutPropertyChanged);
 }
 
-TEST(Layer, DuplicateLayer) {
+TEST(Layer, DuplicateLayer) { // NOLINT
     util::RunLoop loop;
 
     // Setup style

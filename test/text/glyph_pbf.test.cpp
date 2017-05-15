@@ -5,7 +5,7 @@
 
 using namespace mbgl;
 
-TEST(GlyphPBF, Parsing) {
+TEST(GlyphPBF, Parsing) { // NOLINT
     // The fake glyphs contain a number of invalid glyphs, which should be skipped by the parser.
     auto sdfs = parseGlyphPBF(GlyphRange { 0, 255 }, util::read_file("test/fixtures/resources/fake_glyphs-0-255.pbf"));
     EXPECT_TRUE(sdfs.size() == 1);

@@ -5,7 +5,7 @@
 
 using namespace mbgl;
 
-TEST(Token, replaceTokens) {
+TEST(Token, replaceTokens) { // NOLINT
     EXPECT_EQ("literal", mbgl::util::replaceTokens("literal", [](const std::string& token) -> std::string {
         if (token == "name") return "14th St NW";
         return "";

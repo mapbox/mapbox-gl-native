@@ -4,7 +4,7 @@
 
 using namespace mbgl;
 
-TEST(BinaryProgram, ObtainValues) {
+TEST(BinaryProgram, ObtainValues) { // NOLINT
     const BinaryProgram binaryProgram{ 42,
                                        "binary code",
                                        "identifier",

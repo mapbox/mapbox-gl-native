@@ -121,7 +121,7 @@ void checkImage(const std::string& base,
                 const PremultipliedImage& actual,
                 double imageThreshold,
                 double pixelThreshold) {
-#if !TEST_READ_ONLY
+#if !TEST_READ_ONLY // NOLINT
     if (getenv("UPDATE")) {
         util::write_file(base + "/expected.png", encodePNG(actual));
         return;
@@ -141,7 +141,7 @@ void checkImage(const std::string& base,
     PremultipliedImage diff { expected.size };
 
 
-#if !TEST_READ_ONLY
+#if !TEST_READ_ONLY // NOLINT
     util::write_file(base + "/actual.png", encodePNG(actual));
 #endif
 
@@ -156,7 +156,7 @@ void checkImage(const std::string& base,
 
     EXPECT_LE(pixels / (expected.size.width * expected.size.height), imageThreshold);
 
-#if !TEST_READ_ONLY
+#if !TEST_READ_ONLY // NOLINT
     util::write_file(base + "/diff.png", encodePNG(diff));
 #endif
 }

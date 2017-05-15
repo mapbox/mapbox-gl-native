@@ -2,21 +2,21 @@
 
 #include <gtest/gtest.h>
 
-TEST(Resource, Style) {
+TEST(Resource, Style) { // NOLINT
     using namespace mbgl;
     Resource resource = Resource::style("http://example.com");
     EXPECT_EQ(Resource::Kind::Style, resource.kind);
     EXPECT_EQ("http://example.com", resource.url);
 }
 
-TEST(Resource, Source) {
+TEST(Resource, Source) { // NOLINT
     using namespace mbgl;
     Resource resource = Resource::source("http://example.com");
     EXPECT_EQ(Resource::Kind::Source, resource.kind);
     EXPECT_EQ("http://example.com", resource.url);
 }
 
-TEST(Resource, Tile) {
+TEST(Resource, Tile) { // NOLINT
     using namespace mbgl;
 
     Resource rasterTile = Resource::tile("http://example.com/{z}/{x}/{y}{ratio}.png", 2.0, 1, 2, 3, Tileset::Scheme::XYZ);
@@ -103,21 +103,21 @@ TEST(Resource, Tile) {
     EXPECT_EQ(3, tmsTile.tileData->z);
 }
 
-TEST(Resource, Glyphs) {
+TEST(Resource, Glyphs) { // NOLINT
     using namespace mbgl;
     Resource resource = Resource::glyphs("http://example.com/{fontstack}/{range}", {{"stack"}}, {0, 255});
     EXPECT_EQ(Resource::Kind::Glyphs, resource.kind);
     EXPECT_EQ("http://example.com/stack/0-255", resource.url);
 }
 
-TEST(Resource, SpriteImage) {
+TEST(Resource, SpriteImage) { // NOLINT
     using namespace mbgl;
     Resource resource = Resource::spriteImage("http://example.com/sprite", 2.0);
     EXPECT_EQ(Resource::Kind::SpriteImage, resource.kind);
     EXPECT_EQ("http://example.com/sprite@2x.png", resource.url);
 }
 
-TEST(Resource, SpriteJSON) {
+TEST(Resource, SpriteJSON) { // NOLINT
     using namespace mbgl;
     Resource resource = Resource::spriteJSON("http://example.com/sprite", 2.0);
     EXPECT_EQ(Resource::Kind::SpriteJSON, resource.kind);

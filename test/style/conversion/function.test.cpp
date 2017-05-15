@@ -10,7 +10,7 @@ using namespace mbgl;
 using namespace mbgl::style;
 using namespace mbgl::style::conversion;
 
-TEST(StyleConversion, Function) {
+TEST(StyleConversion, Function) { // NOLINT
     Error error;
 
     auto parseFunction = [&](const std::string& src) {

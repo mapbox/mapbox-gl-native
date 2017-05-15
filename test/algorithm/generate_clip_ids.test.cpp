@@ -48,7 +48,7 @@ namespace {
 
 } // end namespace
 
-TEST(GenerateClipIDs, ParentAndFourChildren) {
+TEST(GenerateClipIDs, ParentAndFourChildren) { // NOLINT
     std::map<UnwrappedTileID, Renderable> renderables{
         { UnwrappedTileID{ 0, 0, 0 }, Renderable{ {} } },
         // All four covering children
@@ -81,7 +81,7 @@ TEST(GenerateClipIDs, ParentAndFourChildren) {
               stencils);
 }
 
-TEST(GenerateClipIDs, ParentAndFourChildrenNegative) {
+TEST(GenerateClipIDs, ParentAndFourChildrenNegative) { // NOLINT
     std::map<UnwrappedTileID, Renderable> renderables{
         { UnwrappedTileID{ 1, -2, 0 }, Renderable{ {} } },
         { UnwrappedTileID{ 1, -2, 1 }, Renderable{ {} } },
@@ -112,7 +112,7 @@ TEST(GenerateClipIDs, ParentAndFourChildrenNegative) {
               stencils);
 }
 
-TEST(GenerateClipIDs, NegativeParentAndMissingLevel) {
+TEST(GenerateClipIDs, NegativeParentAndMissingLevel) { // NOLINT
     std::map<UnwrappedTileID, Renderable> renderables{
         { UnwrappedTileID{ 1, -1, 0 }, Renderable{ {} } },
         { UnwrappedTileID{ 2, -1, 0 }, Renderable{ {} } },
@@ -143,7 +143,7 @@ TEST(GenerateClipIDs, NegativeParentAndMissingLevel) {
               stencils);
 }
 
-TEST(GenerateClipIDs, SevenOnSameLevel) {
+TEST(GenerateClipIDs, SevenOnSameLevel) { // NOLINT
     std::map<UnwrappedTileID, Renderable> renderables{
         // first column
         { UnwrappedTileID{ 2, 0, 0 }, Renderable{ {} } },
@@ -183,7 +183,7 @@ TEST(GenerateClipIDs, SevenOnSameLevel) {
               stencils);
 }
 
-TEST(GenerateClipIDs, MultipleLevels) {
+TEST(GenerateClipIDs, MultipleLevels) { // NOLINT
     std::map<UnwrappedTileID, Renderable> renderables{
         { UnwrappedTileID{ 2, 0, 0 }, Renderable{ {} } },
         // begin subtiles of (2/0/0)
@@ -239,7 +239,7 @@ TEST(GenerateClipIDs, MultipleLevels) {
               stencils);
 }
 
-TEST(GenerateClipIDs, Bug206) {
+TEST(GenerateClipIDs, Bug206) { // NOLINT
     std::map<UnwrappedTileID, Renderable> renderables{
         { UnwrappedTileID{ 10, 162, 395 }, Renderable{ {} } },
         { UnwrappedTileID{ 10, 162, 396 }, Renderable{ {} } },
@@ -291,7 +291,7 @@ TEST(GenerateClipIDs, Bug206) {
               stencils);
 }
 
-TEST(GenerateClipIDs, MultipleSources) {
+TEST(GenerateClipIDs, MultipleSources) { // NOLINT
     std::map<UnwrappedTileID, Renderable> renderables1{
         { UnwrappedTileID{ 0, 0, 0 }, Renderable{ {} } },
         { UnwrappedTileID{ 1, 1, 1 }, Renderable{ {} } },
@@ -355,7 +355,7 @@ TEST(GenerateClipIDs, MultipleSources) {
               stencils);
 }
 
-TEST(GenerateClipIDs, DuplicateIDs) {
+TEST(GenerateClipIDs, DuplicateIDs) { // NOLINT
     std::map<UnwrappedTileID, Renderable> renderables1{
         { UnwrappedTileID{ 2, 0, 0 }, Renderable{ {} } },
         { UnwrappedTileID{ 2, 0, 1 }, Renderable{ {} } },
@@ -388,7 +388,7 @@ TEST(GenerateClipIDs, DuplicateIDs) {
               stencils);
 }
 
-TEST(GenerateClipIDs, SecondSourceHasParentOfFirstSource) {
+TEST(GenerateClipIDs, SecondSourceHasParentOfFirstSource) { // NOLINT
     std::map<UnwrappedTileID, Renderable> renderables1{
         { UnwrappedTileID{ 1, 0, 0 }, Renderable{ {} } },
     };

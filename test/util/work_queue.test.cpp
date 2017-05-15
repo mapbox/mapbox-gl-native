@@ -20,7 +20,7 @@ private:
     WorkQueue* queue;
 };
 
-TEST(WorkQueue, push) {
+TEST(WorkQueue, push) { // NOLINT
     RunLoop loop;
 
     WorkQueue queue;
@@ -42,7 +42,7 @@ TEST(WorkQueue, push) {
     loop.run();
 }
 
-TEST(WorkQueue, cancel) {
+TEST(WorkQueue, cancel) { // NOLINT
     RunLoop loop;
 
     WorkQueue queue;

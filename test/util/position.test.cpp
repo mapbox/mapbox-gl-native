@@ -27,7 +27,7 @@ Position createPosition(std::array<float, 3> pos) {
     return Position(pos);
 }
 
-TEST(Position, Calculations) {
+TEST(Position, Calculations) { // NOLINT
     std::array<float, 3> spherical{{ 2, 10, 270 }};
 
     Position position(spherical);

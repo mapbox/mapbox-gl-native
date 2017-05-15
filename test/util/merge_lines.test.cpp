@@ -50,7 +50,7 @@ public:
     }
 };
 
-TEST(MergeLines, SameText) {
+TEST(MergeLines, SameText) { // NOLINT
     // merges lines with the same text
     std::vector<mbgl::SymbolFeature> input1;
     input1.push_back(SymbolFeatureStub({}, FeatureType::LineString, {{{0, 0}, {1, 0}, {2, 0}}}, {}, aaa, {}, 0));
@@ -76,7 +76,7 @@ TEST(MergeLines, SameText) {
     }
 }
 
-TEST(MergeLines, BothEnds) {
+TEST(MergeLines, BothEnds) { // NOLINT
     // mergeLines handles merge from both ends
     std::vector<mbgl::SymbolFeature> input2;
     input2.push_back(SymbolFeatureStub { {}, FeatureType::LineString, {{{0, 0}, {1, 0}, {2, 0}}}, {}, aaa, {}, 0 });
@@ -96,7 +96,7 @@ TEST(MergeLines, BothEnds) {
     }
 }
 
-TEST(MergeLines, CircularLines) {
+TEST(MergeLines, CircularLines) { // NOLINT
     // mergeLines handles circular lines
     std::vector<mbgl::SymbolFeature> input3;
     input3.push_back(SymbolFeatureStub { {}, FeatureType::LineString, {{{0, 0}, {1, 0}, {2, 0}}}, {}, aaa, {}, 0 });
@@ -116,7 +116,7 @@ TEST(MergeLines, CircularLines) {
     }
 }
 
-TEST(MergeLines, EmptyOuterGeometry) {
+TEST(MergeLines, EmptyOuterGeometry) { // NOLINT
     std::vector<mbgl::SymbolFeature> input;
     input.push_back(SymbolFeatureStub { {}, FeatureType::LineString, {}, {}, aaa, {}, 0 });
 
@@ -127,7 +127,7 @@ TEST(MergeLines, EmptyOuterGeometry) {
     EXPECT_EQ(input[0].geometry, expected[0].getGeometries());
 }
 
-TEST(MergeLines, EmptyInnerGeometry) {
+TEST(MergeLines, EmptyInnerGeometry) { // NOLINT
     std::vector<mbgl::SymbolFeature> input;
     input.push_back(SymbolFeatureStub { {}, FeatureType::LineString, {{}}, {}, aaa, {}, 0 });
 

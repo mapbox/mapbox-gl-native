@@ -6,7 +6,7 @@
 
 using namespace mbgl;
 
-TEST(LatLng, InvalidLatLng) {
+TEST(LatLng, InvalidLatLng) { // NOLINT
     try {
         LatLng { NAN };
         ASSERT_TRUE(false) << "should throw";
@@ -33,7 +33,7 @@ TEST(LatLng, InvalidLatLng) {
     }
 }
 
-TEST(EdgeInsets, InvalidEdgeInsets) {
+TEST(EdgeInsets, InvalidEdgeInsets) { // NOLINT
     try {
         EdgeInsets { NAN };
         ASSERT_TRUE(false) << "should throw";
@@ -60,7 +60,7 @@ TEST(EdgeInsets, InvalidEdgeInsets) {
     }
 }
 
-TEST(LatLngBounds, World) {
+TEST(LatLngBounds, World) { // NOLINT
     auto result = LatLngBounds::world();
     ASSERT_DOUBLE_EQ(-90,  result.south());
     ASSERT_DOUBLE_EQ( 90,  result.north());
@@ -68,7 +68,7 @@ TEST(LatLngBounds, World) {
     ASSERT_DOUBLE_EQ( 180, result.east());
 }
 
-TEST(LatLngBounds, Singleton) {
+TEST(LatLngBounds, Singleton) { // NOLINT
     auto result = LatLngBounds::singleton({1, 2});
     ASSERT_DOUBLE_EQ(1, result.south());
     ASSERT_DOUBLE_EQ(1, result.north());
@@ -76,7 +76,7 @@ TEST(LatLngBounds, Singleton) {
     ASSERT_DOUBLE_EQ(2, result.east());
 }
 
-TEST(LatLngBounds, Hull) {
+TEST(LatLngBounds, Hull) { // NOLINT
     double s = 1, w = 2, n = 3, e = 4;
 
     auto swne = LatLngBounds::hull({s, w}, {n, e});
@@ -104,42 +104,42 @@ TEST(LatLngBounds, Hull) {
     ASSERT_DOUBLE_EQ(e, nwse.east());
 }
 
-TEST(LatLngBounds, Empty) {
+TEST(LatLngBounds, Empty) { // NOLINT
     ASSERT_TRUE(LatLngBounds::empty().isEmpty());
     ASSERT_FALSE(LatLngBounds::world().isEmpty());
 }
 
-TEST(LatLngBounds, Center) {
+TEST(LatLngBounds, Center) { // NOLINT
     auto result = LatLngBounds::hull({1, 2}, {3, 4}).center();
     ASSERT_DOUBLE_EQ(2, result.latitude());
     ASSERT_DOUBLE_EQ(3, result.longitude());
 }
 
-TEST(LatLngBounds, Southwest) {
+TEST(LatLngBounds, Southwest) { // NOLINT
     auto result = LatLngBounds::hull({1, 2}, {3, 4}).southwest();
     ASSERT_DOUBLE_EQ(1, result.latitude());
     ASSERT_DOUBLE_EQ(2, result.longitude());
 }
 
-TEST(LatLngBounds, Northeast) {
+TEST(LatLngBounds, Northeast) { // NOLINT
     auto result = LatLngBounds::hull({1, 2}, {3, 4}).northeast();
     ASSERT_DOUBLE_EQ(3, result.latitude());
     ASSERT_DOUBLE_EQ(4, result.longitude());
 }
 
-TEST(LatLngBounds, Southeast) {
+TEST(LatLngBounds, Southeast) { // NOLINT
     auto result = LatLngBounds::hull({1, 2}, {3, 4}).southeast();
     ASSERT_DOUBLE_EQ(1, result.latitude());
     ASSERT_DOUBLE_EQ(4, result.longitude());
 }
 
-TEST(LatLngBounds, Northwest) {
+TEST(LatLngBounds, Northwest) { // NOLINT
     auto result = LatLngBounds::hull({1, 2}, {3, 4}).northwest();
     ASSERT_DOUBLE_EQ(3, result.latitude());
     ASSERT_DOUBLE_EQ(2, result.longitude());
 }
 
-TEST(LatLng, FromTileID) {
+TEST(LatLng, FromTileID) { // NOLINT
     for (int i = 0; i < 20; i++) {
         const LatLng ll{ CanonicalTileID(i, 0, 0) };
         ASSERT_DOUBLE_EQ(-util::LONGITUDE_MAX, ll.longitude());
@@ -159,7 +159,7 @@ TEST(LatLng, FromTileID) {
     }
 }
 
-TEST(LatLng, Boundaries) {
+TEST(LatLng, Boundaries) { // NOLINT
     LatLng coordinate;
     ASSERT_DOUBLE_EQ(0, coordinate.latitude());
     ASSERT_DOUBLE_EQ(0, coordinate.longitude());
@@ -187,7 +187,7 @@ TEST(LatLng, Boundaries) {
     ASSERT_DOUBLE_EQ(0.5, coordinate.longitude());
 }
 
-TEST(LatLngBounds, FromTileID) {
+TEST(LatLngBounds, FromTileID) { // NOLINT
     {
         const LatLngBounds bounds{ CanonicalTileID(0, 0, 0) };
         ASSERT_DOUBLE_EQ(-util::LONGITUDE_MAX, bounds.west());

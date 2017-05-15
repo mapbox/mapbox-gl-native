@@ -30,7 +30,7 @@ ThreadLocal<int> TestThread::number;
 
 } // namespace
 
-TEST(ThreadLocalStorage, Basic) {
+TEST(ThreadLocalStorage, Basic) { // NOLINT
     RunLoop loop;
 
     int number1 = 1;
@@ -48,7 +48,7 @@ TEST(ThreadLocalStorage, Basic) {
     EXPECT_EQ(number3, thread3.invokeSync(&TestThread::getNumber));
 }
 
-TEST(ThreadLocalStorage, NotSetReturnsNull) {
+TEST(ThreadLocalStorage, NotSetReturnsNull) { // NOLINT
     static ThreadLocal<int> number;
 
     EXPECT_EQ(nullptr, number.get());
@@ -75,7 +75,7 @@ ThreadLocal<DtorCounter> TestThreadReclaim::counter;
 
 } // namespace
 
-TEST(ThreadLocalStorage, AutoReclaim) {
+TEST(ThreadLocalStorage, AutoReclaim) { // NOLINT
     RunLoop loop;
 
     unsigned counter = 0;

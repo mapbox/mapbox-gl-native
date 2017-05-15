@@ -10,7 +10,7 @@
 
 using namespace mbgl;
 
-TEST(OnlineFileSource, Cancel) {
+TEST(OnlineFileSource, Cancel) { // NOLINT
     util::RunLoop loop;
     OnlineFileSource fs;
 
@@ -21,7 +21,7 @@ TEST(OnlineFileSource, Cancel) {
     loop.runOnce();
 }
 
-TEST(OnlineFileSource, TEST_REQUIRES_SERVER(CancelMultiple)) {
+TEST(OnlineFileSource, TEST_REQUIRES_SERVER(CancelMultiple)) { // NOLINT
     util::RunLoop loop;
     OnlineFileSource fs;
 
@@ -45,7 +45,7 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(CancelMultiple)) {
     loop.run();
 }
 
-TEST(OnlineFileSource, TEST_REQUIRES_SERVER(TemporaryError)) {
+TEST(OnlineFileSource, TEST_REQUIRES_SERVER(TemporaryError)) { // NOLINT
     util::RunLoop loop;
     OnlineFileSource fs;
 
@@ -83,7 +83,7 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(TemporaryError)) {
     loop.run();
 }
 
-TEST(OnlineFileSource, TEST_REQUIRES_SERVER(ConnectionError)) {
+TEST(OnlineFileSource, TEST_REQUIRES_SERVER(ConnectionError)) { // NOLINT
     util::RunLoop loop;
     OnlineFileSource fs;
 
@@ -113,7 +113,7 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(ConnectionError)) {
     loop.run();
 }
 
-TEST(OnlineFileSource, TEST_REQUIRES_SERVER(Timeout)) {
+TEST(OnlineFileSource, TEST_REQUIRES_SERVER(Timeout)) { // NOLINT
     util::RunLoop loop;
     OnlineFileSource fs;
 
@@ -139,7 +139,7 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(Timeout)) {
     EXPECT_EQ(4, counter);
 }
 
-TEST(OnlineFileSource, TEST_REQUIRES_SERVER(RetryDelayOnExpiredTile)) {
+TEST(OnlineFileSource, TEST_REQUIRES_SERVER(RetryDelayOnExpiredTile)) { // NOLINT
     util::RunLoop loop;
     OnlineFileSource fs;
 
@@ -162,7 +162,7 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(RetryDelayOnExpiredTile)) {
     EXPECT_EQ(1, counter);
 }
 
-TEST(OnlineFileSource, TEST_REQUIRES_SERVER(RetryOnClockSkew)) {
+TEST(OnlineFileSource, TEST_REQUIRES_SERVER(RetryOnClockSkew)) { // NOLINT
     util::RunLoop loop;
     OnlineFileSource fs;
 
@@ -190,7 +190,7 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(RetryOnClockSkew)) {
     loop.run();
 }
 
-TEST(OnlineFileSource, TEST_REQUIRES_SERVER(RespectPriorExpires)) {
+TEST(OnlineFileSource, TEST_REQUIRES_SERVER(RespectPriorExpires)) { // NOLINT
     util::RunLoop loop;
     OnlineFileSource fs;
 
@@ -220,7 +220,7 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(RespectPriorExpires)) {
     loop.run();
 }
 
-TEST(OnlineFileSource, TEST_REQUIRES_SERVER(Load)) {
+TEST(OnlineFileSource, TEST_REQUIRES_SERVER(Load)) { // NOLINT
     util::RunLoop loop;
     OnlineFileSource fs;
 
@@ -264,7 +264,7 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(Load)) {
 // trigger an immediate retry of all requests that are not in progress. This test makes sure that
 // we don't accidentally double-trigger the request.
 
-TEST(OnlineFileSource, TEST_REQUIRES_SERVER(NetworkStatusChange)) {
+TEST(OnlineFileSource, TEST_REQUIRES_SERVER(NetworkStatusChange)) { // NOLINT
     util::RunLoop loop;
     OnlineFileSource fs;
 
@@ -293,7 +293,7 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(NetworkStatusChange)) {
 
 // Tests that a change in network status preempts requests that failed due to connection or
 // reachability issues.
-TEST(OnlineFileSource, TEST_REQUIRES_SERVER(NetworkStatusChangePreempt)) {
+TEST(OnlineFileSource, TEST_REQUIRES_SERVER(NetworkStatusChangePreempt)) { // NOLINT
     util::RunLoop loop;
     OnlineFileSource fs;
 
@@ -333,7 +333,7 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(NetworkStatusChangePreempt)) {
     loop.run();
 }
 
-TEST(OnlineFileSource, TEST_REQUIRES_SERVER(NetworkStatusOnlineOffline)) {
+TEST(OnlineFileSource, TEST_REQUIRES_SERVER(NetworkStatusOnlineOffline)) { // NOLINT
     util::RunLoop loop;
     OnlineFileSource fs;
 
@@ -361,7 +361,7 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(NetworkStatusOnlineOffline)) {
     loop.run();
 }
 
-TEST(OnlineFileSource, TEST_REQUIRES_SERVER(RateLimitStandard)) {
+TEST(OnlineFileSource, TEST_REQUIRES_SERVER(RateLimitStandard)) { // NOLINT
     util::RunLoop loop;
     OnlineFileSource fs;
 
@@ -376,7 +376,7 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(RateLimitStandard)) {
     loop.run();
 }
 
-TEST(OnlineFileSource, TEST_REQUIRES_SERVER(RateLimitMBX)) {
+TEST(OnlineFileSource, TEST_REQUIRES_SERVER(RateLimitMBX)) { // NOLINT
     util::RunLoop loop;
     OnlineFileSource fs;
 
@@ -391,7 +391,7 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(RateLimitMBX)) {
     loop.run();
 }
 
-TEST(OnlineFileSource, TEST_REQUIRES_SERVER(RateLimitDefault)) {
+TEST(OnlineFileSource, TEST_REQUIRES_SERVER(RateLimitDefault)) { // NOLINT
     util::RunLoop loop;
     OnlineFileSource fs;
 
@@ -405,7 +405,7 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(RateLimitDefault)) {
     loop.run();
 }
 
-TEST(OnlineFileSource, ChangeAPIBaseURL){
+TEST(OnlineFileSource, ChangeAPIBaseURL){ // NOLINT
     util::RunLoop loop;
     OnlineFileSource fs;
 

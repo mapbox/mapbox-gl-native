@@ -18,7 +18,7 @@ std::unique_ptr<Layer> parseLayer(const std::string& src) {
     return std::move(*convert<std::unique_ptr<Layer>, JSValue>(doc, error));
 }
 
-TEST(StyleConversion, LayerTransition) {
+TEST(StyleConversion, LayerTransition) { // NOLINT
     auto layer = parseLayer(R"JSON({
         "type": "background",
         "id": "background",

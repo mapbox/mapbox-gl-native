@@ -8,7 +8,7 @@ using namespace mbgl;
 
 using List = std::map<UnwrappedTileID, bool>;
 
-TEST(CoveredByChildren, NotCovered) {
+TEST(CoveredByChildren, NotCovered) { // NOLINT
     const List list1;
     EXPECT_FALSE(algorithm::coveredByChildren(UnwrappedTileID{ 0, 0, 0 }, list1));
 
@@ -33,7 +33,7 @@ TEST(CoveredByChildren, NotCovered) {
     EXPECT_FALSE(algorithm::coveredByChildren(UnwrappedTileID{ 0, 0, 0 }, list3));
 }
 
-TEST(CoveredByChildren, Covered) {
+TEST(CoveredByChildren, Covered) { // NOLINT
     const List list1{
         { UnwrappedTileID{ 0, 0, 0 }, true },
         // all four child tiles

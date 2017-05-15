@@ -83,7 +83,7 @@ public:
     GLuint a_pos = 0;
 };
 
-TEST(CustomLayer, Basic) {
+TEST(CustomLayer, Basic) { // NOLINT
     util::RunLoop loop;
 
     HeadlessBackend backend { test::sharedDisplay() };

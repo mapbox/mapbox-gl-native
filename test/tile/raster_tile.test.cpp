@@ -35,7 +35,7 @@ public:
     };
 };
 
-TEST(RasterTile, setError) {
+TEST(RasterTile, setError) { // NOLINT
     RasterTileTest test;
     RasterTile tile(OverscaledTileID(0, 0, 0), test.tileParameters, test.tileset);
     tile.setError(std::make_exception_ptr(std::runtime_error("test")));
@@ -44,7 +44,7 @@ TEST(RasterTile, setError) {
     EXPECT_TRUE(tile.isComplete());
 }
 
-TEST(RasterTile, onError) {
+TEST(RasterTile, onError) { // NOLINT
     RasterTileTest test;
     RasterTile tile(OverscaledTileID(0, 0, 0), test.tileParameters, test.tileset);
     tile.onError(std::make_exception_ptr(std::runtime_error("test")));
@@ -53,7 +53,7 @@ TEST(RasterTile, onError) {
     EXPECT_TRUE(tile.isComplete());
 }
 
-TEST(RasterTile, onParsed) {
+TEST(RasterTile, onParsed) { // NOLINT
     RasterTileTest test;
     RasterTile tile(OverscaledTileID(0, 0, 0), test.tileParameters, test.tileset);
     tile.onParsed(std::make_unique<RasterBucket>(UnassociatedImage{}));
@@ -62,7 +62,7 @@ TEST(RasterTile, onParsed) {
     EXPECT_TRUE(tile.isComplete());
 }
 
-TEST(RasterTile, onParsedEmpty) {
+TEST(RasterTile, onParsedEmpty) { // NOLINT
     RasterTileTest test;
     RasterTile tile(OverscaledTileID(0, 0, 0), test.tileParameters, test.tileset);
     tile.onParsed(nullptr);

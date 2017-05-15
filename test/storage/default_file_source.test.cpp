@@ -4,7 +4,7 @@
 
 using namespace mbgl;
 
-TEST(DefaultFileSource, TEST_REQUIRES_SERVER(CacheResponse)) {
+TEST(DefaultFileSource, TEST_REQUIRES_SERVER(CacheResponse)) { // NOLINT
     util::RunLoop loop;
     DefaultFileSource fs(":memory:", ".");
 
@@ -42,7 +42,7 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(CacheResponse)) {
     loop.run();
 }
 
-TEST(DefaultFileSource, TEST_REQUIRES_SERVER(CacheRevalidateSame)) {
+TEST(DefaultFileSource, TEST_REQUIRES_SERVER(CacheRevalidateSame)) { // NOLINT
     util::RunLoop loop;
     DefaultFileSource fs(":memory:", ".");
 
@@ -86,7 +86,7 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(CacheRevalidateSame)) {
     loop.run();
 }
 
-TEST(DefaultFileSource, TEST_REQUIRES_SERVER(CacheRevalidateModified)) {
+TEST(DefaultFileSource, TEST_REQUIRES_SERVER(CacheRevalidateModified)) { // NOLINT
     util::RunLoop loop;
     DefaultFileSource fs(":memory:", ".");
 
@@ -130,7 +130,7 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(CacheRevalidateModified)) {
     loop.run();
 }
 
-TEST(DefaultFileSource, TEST_REQUIRES_SERVER(CacheRevalidateEtag)) {
+TEST(DefaultFileSource, TEST_REQUIRES_SERVER(CacheRevalidateEtag)) { // NOLINT
     util::RunLoop loop;
     DefaultFileSource fs(":memory:", ".");
 
@@ -185,7 +185,7 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(CacheRevalidateEtag)) {
 // gets invalidated by the first notify's pending.erase, and when it gets notified, the crash
 // occurs.
 
-TEST(DefaultFileSource, TEST_REQUIRES_SERVER(HTTPIssue1369)) {
+TEST(DefaultFileSource, TEST_REQUIRES_SERVER(HTTPIssue1369)) { // NOLINT
     util::RunLoop loop;
     DefaultFileSource fs(":memory:", ".");
 
@@ -209,7 +209,7 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(HTTPIssue1369)) {
     loop.run();
 }
 
-TEST(DefaultFileSource, OptionalNonExpired) {
+TEST(DefaultFileSource, OptionalNonExpired) { // NOLINT
     util::RunLoop loop;
     DefaultFileSource fs(":memory:", ".");
 
@@ -238,7 +238,7 @@ TEST(DefaultFileSource, OptionalNonExpired) {
     loop.run();
 }
 
-TEST(DefaultFileSource, OptionalExpired) {
+TEST(DefaultFileSource, OptionalExpired) { // NOLINT
     util::RunLoop loop;
     DefaultFileSource fs(":memory:", ".");
 
@@ -267,7 +267,7 @@ TEST(DefaultFileSource, OptionalExpired) {
     loop.run();
 }
 
-TEST(DefaultFileSource, GetBaseURLAndAccessTokenWhilePaused) {
+TEST(DefaultFileSource, GetBaseURLAndAccessTokenWhilePaused) { // NOLINT
     util::RunLoop loop;
     DefaultFileSource fs(":memory:", ".");
 
@@ -283,7 +283,7 @@ TEST(DefaultFileSource, GetBaseURLAndAccessTokenWhilePaused) {
     EXPECT_EQ(fs.getAccessToken(), accessToken);
 }
 
-TEST(DefaultFileSource, OptionalNotFound) {
+TEST(DefaultFileSource, OptionalNotFound) { // NOLINT
     util::RunLoop loop;
     DefaultFileSource fs(":memory:", ".");
 
@@ -309,7 +309,7 @@ TEST(DefaultFileSource, OptionalNotFound) {
 
 // Test that we can make a request with etag data that doesn't first try to load
 // from cache like a regular request
-TEST(DefaultFileSource, TEST_REQUIRES_SERVER(NoCacheRefreshEtagNotModified)) {
+TEST(DefaultFileSource, TEST_REQUIRES_SERVER(NoCacheRefreshEtagNotModified)) { // NOLINT
     util::RunLoop loop;
     DefaultFileSource fs(":memory:", ".");
 
@@ -343,7 +343,7 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(NoCacheRefreshEtagNotModified)) {
 
 // Test that we can make a request with etag data that doesn't first try to load
 // from cache like a regular request
-TEST(DefaultFileSource, TEST_REQUIRES_SERVER(NoCacheRefreshEtagModified)) {
+TEST(DefaultFileSource, TEST_REQUIRES_SERVER(NoCacheRefreshEtagModified)) { // NOLINT
     util::RunLoop loop;
     DefaultFileSource fs(":memory:", ".");
 
@@ -377,7 +377,7 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(NoCacheRefreshEtagModified)) {
 
 // Test that we can make a request that doesn't first try to load
 // from cache like a regular request.
-TEST(DefaultFileSource, TEST_REQUIRES_SERVER(NoCacheFull)) {
+TEST(DefaultFileSource, TEST_REQUIRES_SERVER(NoCacheFull)) { // NOLINT
     util::RunLoop loop;
     DefaultFileSource fs(":memory:", ".");
 
@@ -412,7 +412,7 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(NoCacheFull)) {
 
 // Test that we can make a request with a Modified field that doesn't first try to load
 // from cache like a regular request
-TEST(DefaultFileSource, TEST_REQUIRES_SERVER(NoCacheRefreshModifiedNotModified)) {
+TEST(DefaultFileSource, TEST_REQUIRES_SERVER(NoCacheRefreshModifiedNotModified)) { // NOLINT
     util::RunLoop loop;
     DefaultFileSource fs(":memory:", ".");
 
@@ -446,7 +446,7 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(NoCacheRefreshModifiedNotModified))
 
 // Test that we can make a request with a Modified field that doesn't first try to load
 // from cache like a regular request
-TEST(DefaultFileSource, TEST_REQUIRES_SERVER(NoCacheRefreshModifiedModified)) {
+TEST(DefaultFileSource, TEST_REQUIRES_SERVER(NoCacheRefreshModifiedModified)) { // NOLINT
     util::RunLoop loop;
     DefaultFileSource fs(":memory:", ".");
 
@@ -477,7 +477,7 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(NoCacheRefreshModifiedModified)) {
     loop.run();
 }
 
-TEST(DefaultFileSource, TEST_REQUIRES_SERVER(SetResourceTransform)) {
+TEST(DefaultFileSource, TEST_REQUIRES_SERVER(SetResourceTransform)) { // NOLINT
     util::RunLoop loop;
     DefaultFileSource fs(":memory:", ".");
 

@@ -6,7 +6,7 @@
 
 using namespace mbgl;
 
-TEST(HTTPFileSource, TEST_REQUIRES_SERVER(Cancel)) {
+TEST(HTTPFileSource, TEST_REQUIRES_SERVER(Cancel)) { // NOLINT
     util::RunLoop loop;
     HTTPFileSource fs;
 
@@ -17,7 +17,7 @@ TEST(HTTPFileSource, TEST_REQUIRES_SERVER(Cancel)) {
     loop.runOnce();
 }
 
-TEST(HTTPFileSource, TEST_REQUIRES_SERVER(HTTP200)) {
+TEST(HTTPFileSource, TEST_REQUIRES_SERVER(HTTP200)) { // NOLINT
     util::RunLoop loop;
     HTTPFileSource fs;
 
@@ -34,7 +34,7 @@ TEST(HTTPFileSource, TEST_REQUIRES_SERVER(HTTP200)) {
     loop.run();
 }
 
-TEST(HTTPFileSource, TEST_REQUIRES_SERVER(HTTP404)) {
+TEST(HTTPFileSource, TEST_REQUIRES_SERVER(HTTP404)) { // NOLINT
     util::RunLoop loop;
     HTTPFileSource fs;
 
@@ -52,7 +52,7 @@ TEST(HTTPFileSource, TEST_REQUIRES_SERVER(HTTP404)) {
     loop.run();
 }
 
-TEST(HTTPFileSource, TEST_REQUIRES_SERVER(HTTPTile404)) {
+TEST(HTTPFileSource, TEST_REQUIRES_SERVER(HTTPTile404)) { // NOLINT
     util::RunLoop loop;
     HTTPFileSource fs;
 
@@ -69,7 +69,7 @@ TEST(HTTPFileSource, TEST_REQUIRES_SERVER(HTTPTile404)) {
     loop.run();
 }
 
-TEST(HTTPFileSource, TEST_REQUIRES_SERVER(HTTP200EmptyData)) {
+TEST(HTTPFileSource, TEST_REQUIRES_SERVER(HTTP200EmptyData)) { // NOLINT
     util::RunLoop loop;
     HTTPFileSource fs;
 
@@ -86,7 +86,7 @@ TEST(HTTPFileSource, TEST_REQUIRES_SERVER(HTTP200EmptyData)) {
     loop.run();
 }
 
-TEST(HTTPFileSource, TEST_REQUIRES_SERVER(HTTP204)) {
+TEST(HTTPFileSource, TEST_REQUIRES_SERVER(HTTP204)) { // NOLINT
     util::RunLoop loop;
     HTTPFileSource fs;
 
@@ -103,7 +103,7 @@ TEST(HTTPFileSource, TEST_REQUIRES_SERVER(HTTP204)) {
     loop.run();
 }
 
-TEST(HTTPFileSource, TEST_REQUIRES_SERVER(HTTP500)) {
+TEST(HTTPFileSource, TEST_REQUIRES_SERVER(HTTP500)) { // NOLINT
     util::RunLoop loop;
     HTTPFileSource fs;
 
@@ -121,7 +121,7 @@ TEST(HTTPFileSource, TEST_REQUIRES_SERVER(HTTP500)) {
     loop.run();
 }
 
-TEST(HTTPFileSource, TEST_REQUIRES_SERVER(ExpiresParsing)) {
+TEST(HTTPFileSource, TEST_REQUIRES_SERVER(ExpiresParsing)) { // NOLINT
     util::RunLoop loop;
     HTTPFileSource fs;
 
@@ -139,7 +139,7 @@ TEST(HTTPFileSource, TEST_REQUIRES_SERVER(ExpiresParsing)) {
     loop.run();
 }
 
-TEST(HTTPFileSource, TEST_REQUIRES_SERVER(CacheControlParsing)) {
+TEST(HTTPFileSource, TEST_REQUIRES_SERVER(CacheControlParsing)) { // NOLINT
     util::RunLoop loop;
     HTTPFileSource fs;
 
@@ -156,7 +156,7 @@ TEST(HTTPFileSource, TEST_REQUIRES_SERVER(CacheControlParsing)) {
     loop.run();
 }
 
-TEST(HTTPFileSource, TEST_REQUIRES_SERVER(Load)) {
+TEST(HTTPFileSource, TEST_REQUIRES_SERVER(Load)) { // NOLINT
     util::RunLoop loop;
     HTTPFileSource fs;
 

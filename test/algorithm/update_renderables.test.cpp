@@ -112,7 +112,7 @@ auto renderTileFn(ActionLog& log) {
     };
 }
 
-TEST(UpdateRenderables, SingleTile) {
+TEST(UpdateRenderables, SingleTile) { // NOLINT
     ActionLog log;
     MockSource source;
     auto getTileData = getTileDataFn(log, source.dataTiles);
@@ -256,7 +256,7 @@ TEST(UpdateRenderables, SingleTile) {
               log);
 }
 
-TEST(UpdateRenderables, UseParentTile) {
+TEST(UpdateRenderables, UseParentTile) { // NOLINT
     ActionLog log;
     MockSource source;
     auto getTileData = getTileDataFn(log, source.dataTiles);
@@ -302,7 +302,7 @@ TEST(UpdateRenderables, UseParentTile) {
               log);
 }
 
-TEST(UpdateRenderables, DontUseWrongParentTile) {
+TEST(UpdateRenderables, DontUseWrongParentTile) { // NOLINT
     ActionLog log;
     MockSource source;
     auto getTileData = getTileDataFn(log, source.dataTiles);
@@ -379,7 +379,7 @@ TEST(UpdateRenderables, DontUseWrongParentTile) {
               log);
 }
 
-TEST(UpdateRenderables, UseParentTileWhenChildNotReady) {
+TEST(UpdateRenderables, UseParentTileWhenChildNotReady) { // NOLINT
     ActionLog log;
     MockSource source;
     auto getTileData = getTileDataFn(log, source.dataTiles);
@@ -424,7 +424,7 @@ TEST(UpdateRenderables, UseParentTileWhenChildNotReady) {
               log);
 }
 
-TEST(UpdateRenderables, UseOverlappingParentTile) {
+TEST(UpdateRenderables, UseOverlappingParentTile) { // NOLINT
     ActionLog log;
     MockSource source;
     auto getTileData = getTileDataFn(log, source.dataTiles);
@@ -462,7 +462,7 @@ TEST(UpdateRenderables, UseOverlappingParentTile) {
               log);
 }
 
-TEST(UpdateRenderables, UseChildTiles) {
+TEST(UpdateRenderables, UseChildTiles) { // NOLINT
     ActionLog log;
     MockSource source;
     auto getTileData = getTileDataFn(log, source.dataTiles);
@@ -496,7 +496,7 @@ TEST(UpdateRenderables, UseChildTiles) {
               log);
 }
 
-TEST(UpdateRenderables, PreferChildTiles) {
+TEST(UpdateRenderables, PreferChildTiles) { // NOLINT
     ActionLog log;
     MockSource source;
     auto getTileData = getTileDataFn(log, source.dataTiles);
@@ -605,7 +605,7 @@ TEST(UpdateRenderables, PreferChildTiles) {
               log);
 }
 
-TEST(UpdateRenderables, UseParentAndChildTiles) {
+TEST(UpdateRenderables, UseParentAndChildTiles) { // NOLINT
     ActionLog log;
     MockSource source;
     auto getTileData = getTileDataFn(log, source.dataTiles);
@@ -658,7 +658,7 @@ TEST(UpdateRenderables, UseParentAndChildTiles) {
               log);
 }
 
-TEST(UpdateRenderables, DontUseTilesLowerThanMinzoom) {
+TEST(UpdateRenderables, DontUseTilesLowerThanMinzoom) { // NOLINT
     ActionLog log;
     MockSource source;
     auto getTileData = getTileDataFn(log, source.dataTiles);
@@ -687,7 +687,7 @@ TEST(UpdateRenderables, DontUseTilesLowerThanMinzoom) {
               log);
 }
 
-TEST(UpdateRenderables, UseOverzoomedTileAfterMaxzoom) {
+TEST(UpdateRenderables, UseOverzoomedTileAfterMaxzoom) { // NOLINT
     ActionLog log;
     MockSource source;
     auto getTileData = getTileDataFn(log, source.dataTiles);
@@ -791,7 +791,7 @@ TEST(UpdateRenderables, UseOverzoomedTileAfterMaxzoom) {
               log);
 }
 
-TEST(UpdateRenderables, AscendToNonOverzoomedTiles) {
+TEST(UpdateRenderables, AscendToNonOverzoomedTiles) { // NOLINT
     ActionLog log;
     MockSource source;
     auto getTileData = getTileDataFn(log, source.dataTiles);
@@ -871,7 +871,7 @@ TEST(UpdateRenderables, AscendToNonOverzoomedTiles) {
               log);
 }
 
-TEST(UpdateRenderables, DoNotAscendMultipleTimesIfNotFound) {
+TEST(UpdateRenderables, DoNotAscendMultipleTimesIfNotFound) { // NOLINT
     ActionLog log;
     MockSource source;
     auto getTileData = getTileDataFn(log, source.dataTiles);
@@ -944,7 +944,7 @@ TEST(UpdateRenderables, DoNotAscendMultipleTimesIfNotFound) {
               log);
 }
 
-TEST(UpdateRenderables, DontRetainUnusedNonIdealTiles) {
+TEST(UpdateRenderables, DontRetainUnusedNonIdealTiles) { // NOLINT
     ActionLog log;
     MockSource source;
     auto getTileData = getTileDataFn(log, source.dataTiles);
@@ -973,7 +973,7 @@ TEST(UpdateRenderables, DontRetainUnusedNonIdealTiles) {
               log);
 }
 
-TEST(UpdateRenderables, WrappedTiles) {
+TEST(UpdateRenderables, WrappedTiles) { // NOLINT
     ActionLog log;
     MockSource source;
     auto getTileData = getTileDataFn(log, source.dataTiles);
@@ -1035,7 +1035,7 @@ TEST(UpdateRenderables, WrappedTiles) {
               log);
 }
 
-TEST(UpdateRenderables, RepeatedRenderWithMissingOptionals) {
+TEST(UpdateRenderables, RepeatedRenderWithMissingOptionals) { // NOLINT
     ActionLog log;
     MockSource source;
     auto getTileData = getTileDataFn(log, source.dataTiles);
@@ -1227,7 +1227,7 @@ TEST(UpdateRenderables, RepeatedRenderWithMissingOptionals) {
               log);
 }
 
-TEST(UpdateRenderables, LoadRequiredIfIdealTileCantBeFound) {
+TEST(UpdateRenderables, LoadRequiredIfIdealTileCantBeFound) { // NOLINT
     ActionLog log;
     MockSource source;
     auto getTileData = getTileDataFn(log, source.dataTiles);

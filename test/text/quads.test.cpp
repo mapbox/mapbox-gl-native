@@ -9,7 +9,7 @@
 using namespace mbgl;
 using namespace mbgl::style;
 
-TEST(getIconQuads, normal) {
+TEST(getIconQuads, normal) { // NOLINT
     SymbolLayoutProperties::Evaluated layout;
     Anchor anchor(2.0, 3.0, 0.0, 0.5f, 0);
     SpriteAtlasElement image = {
@@ -43,7 +43,7 @@ TEST(getIconQuads, normal) {
     ASSERT_EQ(quad.minScale, 0.5f);
 }
 
-TEST(getIconQuads, style) {
+TEST(getIconQuads, style) { // NOLINT
     Anchor anchor(0.0, 0.0, 0.0, 0.5f, 0);
     SpriteAtlasElement image = {
         Rect<uint16_t>( 0, 0, 20, 20 ),

@@ -4,7 +4,7 @@
 
 using namespace mbgl;
 
-TEST(TileID, Canonical) {
+TEST(TileID, Canonical) { // NOLINT
     CanonicalTileID id_0_0_0(0, 0, 0);
     EXPECT_EQ(0u, id_0_0_0.z);
     EXPECT_EQ(0u, id_0_0_0.x);
@@ -124,7 +124,7 @@ TEST(TileID, Canonical) {
               CanonicalTileID(0, 0, 0).children());
 }
 
-TEST(TileID, Overscaled) {
+TEST(TileID, Overscaled) { // NOLINT
     EXPECT_TRUE(OverscaledTileID(4, 2, 3) == OverscaledTileID(4, 2, 3));
     EXPECT_FALSE(OverscaledTileID(4, 2, 3) != OverscaledTileID(4, 2, 3));
     EXPECT_TRUE(OverscaledTileID(4, { 4, 2, 3 }) == OverscaledTileID(4, 2, 3));
@@ -212,7 +212,7 @@ TEST(TileID, Overscaled) {
     EXPECT_FALSE(OverscaledTileID(4, { 4, 2, 3 }).isChildOf(OverscaledTileID(5, { 3, 1, 1 })));
 }
 
-TEST(TileID, Unwrapped) {
+TEST(TileID, Unwrapped) { // NOLINT
     UnwrappedTileID id_0_0_0(0, 0, 0);
     EXPECT_EQ(0u, id_0_0_0.canonical.z);
     EXPECT_EQ(0u, id_0_0_0.canonical.x);

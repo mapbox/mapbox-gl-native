@@ -19,8 +19,9 @@ style::Filter parse(const char* expression) {
 }
 
 static void Parse_Filter(benchmark::State& state) {
-    while (state.KeepRunning()) {
-        parse(R"FILTER(["==", "foo", "bar"])FILTER");
+    // warning: Attempt to free released memory [clang-analyzer-cplusplus.NewDelete]
+    while (state.KeepRunning()) { // NOLINT
+        parse(R"FILTER(["==", "foo", "bar"])FILTER"); // NOLINT
     }
 }
 

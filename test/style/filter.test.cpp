@@ -28,13 +28,13 @@ Feature feature(const PropertyMap& properties, const Geometry<double>& geometry 
     return result;
 }
 
-TEST(Filter, EqualsString) {
+TEST(Filter, EqualsString) { // NOLINT
     Filter f = parse(R"(["==", "foo", "bar"])");
     ASSERT_TRUE(f(feature({{ "foo", std::string("bar") }})));
     ASSERT_FALSE(f(feature({{ "foo", std::string("baz") }})));
 }
 
-TEST(Filter, EqualsNumber) {
+TEST(Filter, EqualsNumber) { // NOLINT
     Filter f = parse(R"(["==", "foo", 0])");
     ASSERT_TRUE(f(feature({{ "foo", int64_t(0) }})));
     ASSERT_TRUE(f(feature({{ "foo", uint64_t(0) }})));
@@ -49,20 +49,20 @@ TEST(Filter, EqualsNumber) {
     ASSERT_FALSE(f(feature({{}})));
 }
 
-TEST(Filter, EqualsType) {
+TEST(Filter, EqualsType) { // NOLINT
     Filter f = parse(R"(["==", "$type", "LineString"])");
     ASSERT_FALSE(f(feature({{}}, Point<double>())));
     ASSERT_TRUE(f(feature({{}}, LineString<double>())));
 }
 
-TEST(Filter, InType) {
+TEST(Filter, InType) { // NOLINT
     Filter f = parse(R"(["in", "$type", "LineString", "Polygon"])");
     ASSERT_FALSE(f(feature({{}}, Point<double>())));
     ASSERT_TRUE(f(feature({{}}, LineString<double>())));
     ASSERT_TRUE(f(feature({{}}, Polygon<double>())));
 }
 
-TEST(Filter, Any) {
+TEST(Filter, Any) { // NOLINT
     ASSERT_FALSE(parse("[\"any\"]")(feature({{}})));
     ASSERT_TRUE(parse("[\"any\", [\"==\", \"foo\", 1]]")(
                          feature({{ std::string("foo"), int64_t(1) }})));
@@ -72,7 +72,7 @@ TEST(Filter, Any) {
                          feature({{ std::string("foo"), int64_t(1) }})));
 }
 
-TEST(Filter, All) {
+TEST(Filter, All) { // NOLINT
     ASSERT_TRUE(parse("[\"all\"]")(feature({{}})));
     ASSERT_TRUE(parse("[\"all\", [\"==\", \"foo\", 1]]")(
                          feature({{ std::string("foo"), int64_t(1) }})));
@@ -82,7 +82,7 @@ TEST(Filter, All) {
                          feature({{ std::string("foo"), int64_t(1) }})));
 }
 
-TEST(Filter, None) {
+TEST(Filter, None) { // NOLINT
     ASSERT_TRUE(parse("[\"none\"]")(feature({{}})));
     ASSERT_FALSE(parse("[\"none\", [\"==\", \"foo\", 1]]")(
                          feature({{ std::string("foo"), int64_t(1) }})));
@@ -92,7 +92,7 @@ TEST(Filter, None) {
                          feature({{ std::string("foo"), int64_t(1) }})));
 }
 
-TEST(Filter, Has) {
+TEST(Filter, Has) { // NOLINT
     ASSERT_TRUE(parse("[\"has\", \"foo\"]")(
                           feature({{ std::string("foo"), int64_t(1) }})));
     ASSERT_TRUE(parse("[\"has\", \"foo\"]")(
@@ -103,7 +103,7 @@ TEST(Filter, Has) {
                           feature({{}})));
 }
 
-TEST(Filter, NotHas) {
+TEST(Filter, NotHas) { // NOLINT
     ASSERT_FALSE(parse("[\"!has\", \"foo\"]")(
                           feature({{ std::string("foo"), int64_t(1) }})));
     ASSERT_FALSE(parse("[\"!has\", \"foo\"]")(
@@ -114,7 +114,7 @@ TEST(Filter, NotHas) {
                           feature({{}})));
 }
 
-TEST(Filter, ID) {
+TEST(Filter, ID) { // NOLINT
     Feature feature1 { Point<double>() };
     feature1.id = { uint64_t(1234) };
 

@@ -80,7 +80,7 @@ private:
 
 } // namespace
 
-TEST(OfflineDatabase, TEST_REQUIRES_WRITE(Create)) {
+TEST(OfflineDatabase, TEST_REQUIRES_WRITE(Create)) { // NOLINT
     using namespace mbgl;
 
     createDir("test/fixtures/offline_database");
@@ -94,7 +94,7 @@ TEST(OfflineDatabase, TEST_REQUIRES_WRITE(Create)) {
     Log::removeObserver();
 }
 
-TEST(OfflineDatabase, TEST_REQUIRES_WRITE(SchemaVersion)) {
+TEST(OfflineDatabase, TEST_REQUIRES_WRITE(SchemaVersion)) { // NOLINT
     using namespace mbgl;
 
     createDir("test/fixtures/offline_database");
@@ -116,7 +116,7 @@ TEST(OfflineDatabase, TEST_REQUIRES_WRITE(SchemaVersion)) {
     EXPECT_EQ(1u, flo->count({ EventSeverity::Warning, Event::Database, -1, "Removing existing incompatible offline database" }));
 }
 
-TEST(OfflineDatabase, TEST_REQUIRES_WRITE(Invalid)) {
+TEST(OfflineDatabase, TEST_REQUIRES_WRITE(Invalid)) { // NOLINT
     using namespace mbgl;
 
     createDir("test/fixtures/offline_database");
@@ -132,7 +132,7 @@ TEST(OfflineDatabase, TEST_REQUIRES_WRITE(Invalid)) {
     EXPECT_EQ(1u, flo->count({ EventSeverity::Warning, Event::Database, -1, "Removing existing incompatible offline database" }));
 }
 
-TEST(OfflineDatabase, PutDoesNotStoreConnectionErrors) {
+TEST(OfflineDatabase, PutDoesNotStoreConnectionErrors) { // NOLINT
     using namespace mbgl;
 
     OfflineDatabase db(":memory:");
@@ -145,7 +145,7 @@ TEST(OfflineDatabase, PutDoesNotStoreConnectionErrors) {
     EXPECT_FALSE(bool(db.get(resource)));
 }
 
-TEST(OfflineDatabase, PutDoesNotStoreServerErrors) {
+TEST(OfflineDatabase, PutDoesNotStoreServerErrors) { // NOLINT
     using namespace mbgl;
 
     OfflineDatabase db(":memory:");
@@ -158,7 +158,7 @@ TEST(OfflineDatabase, PutDoesNotStoreServerErrors) {
     EXPECT_FALSE(bool(db.get(resource)));
 }
 
-TEST(OfflineDatabase, PutResource) {
+TEST(OfflineDatabase, PutResource) { // NOLINT
     using namespace mbgl;
 
     OfflineDatabase db(":memory:");
@@ -185,7 +185,7 @@ TEST(OfflineDatabase, PutResource) {
     EXPECT_EQ("second", *updateGetResult->data);
 }
 
-TEST(OfflineDatabase, PutTile) {
+TEST(OfflineDatabase, PutTile) { // NOLINT
     using namespace mbgl;
 
     OfflineDatabase db(":memory:");
@@ -219,7 +219,7 @@ TEST(OfflineDatabase, PutTile) {
     EXPECT_EQ("second", *updateGetResult->data);
 }
 
-TEST(OfflineDatabase, PutResourceNoContent) {
+TEST(OfflineDatabase, PutResourceNoContent) { // NOLINT
     using namespace mbgl;
 
     OfflineDatabase db(":memory:");
@@ -235,7 +235,7 @@ TEST(OfflineDatabase, PutResourceNoContent) {
     EXPECT_FALSE(res->data.get());
 }
 
-TEST(OfflineDatabase, PutTileNotFound) {
+TEST(OfflineDatabase, PutTileNotFound) { // NOLINT
     using namespace mbgl;
 
     OfflineDatabase db(":memory:");
@@ -258,7 +258,7 @@ TEST(OfflineDatabase, PutTileNotFound) {
     EXPECT_FALSE(res->data.get());
 }
 
-TEST(OfflineDatabase, CreateRegion) {
+TEST(OfflineDatabase, CreateRegion) { // NOLINT
     using namespace mbgl;
 
     OfflineDatabase db(":memory:");
@@ -274,7 +274,7 @@ TEST(OfflineDatabase, CreateRegion) {
     EXPECT_EQ(metadata, region.getMetadata());
 }
 
-TEST(OfflineDatabase, UpdateMetadata) {
+TEST(OfflineDatabase, UpdateMetadata) { // NOLINT
     using namespace mbgl;
 
     OfflineDatabase db(":memory:");
@@ -287,7 +287,7 @@ TEST(OfflineDatabase, UpdateMetadata) {
     EXPECT_EQ(db.listRegions().at(0).getMetadata(), newmetadata);
 }
 
-TEST(OfflineDatabase, ListRegions) {
+TEST(OfflineDatabase, ListRegions) { // NOLINT
     using namespace mbgl;
 
     OfflineDatabase db(":memory:");
@@ -307,7 +307,7 @@ TEST(OfflineDatabase, ListRegions) {
     EXPECT_EQ(metadata, regions.at(0).getMetadata());
 }
 
-TEST(OfflineDatabase, GetRegionDefinition) {
+TEST(OfflineDatabase, GetRegionDefinition) { // NOLINT
     using namespace mbgl;
 
     OfflineDatabase db(":memory:");
@@ -324,7 +324,7 @@ TEST(OfflineDatabase, GetRegionDefinition) {
     EXPECT_EQ(definition.pixelRatio, result.pixelRatio);
 }
 
-TEST(OfflineDatabase, DeleteRegion) {
+TEST(OfflineDatabase, DeleteRegion) { // NOLINT
     using namespace mbgl;
 
     OfflineDatabase db(":memory:");
@@ -343,7 +343,7 @@ TEST(OfflineDatabase, DeleteRegion) {
     ASSERT_EQ(0u, db.listRegions().size());
 }
 
-TEST(OfflineDatabase, CreateRegionInfiniteMaxZoom) {
+TEST(OfflineDatabase, CreateRegionInfiniteMaxZoom) { // NOLINT
     using namespace mbgl;
 
     OfflineDatabase db(":memory:");
@@ -355,7 +355,7 @@ TEST(OfflineDatabase, CreateRegionInfiniteMaxZoom) {
     EXPECT_EQ(INFINITY, region.getDefinition().maxZoom);
 }
 
-TEST(OfflineDatabase, TEST_REQUIRES_WRITE(ConcurrentUse)) {
+TEST(OfflineDatabase, TEST_REQUIRES_WRITE(ConcurrentUse)) { // NOLINT
     using namespace mbgl;
 
     createDir("test/fixtures/offline_database");
@@ -397,7 +397,7 @@ static std::shared_ptr<std::string> randomString(size_t size) {
     return result;
 }
 
-TEST(OfflineDatabase, PutReturnsSize) {
+TEST(OfflineDatabase, PutReturnsSize) { // NOLINT
     using namespace mbgl;
 
     OfflineDatabase db(":memory:");
@@ -415,7 +415,7 @@ TEST(OfflineDatabase, PutReturnsSize) {
     EXPECT_EQ(0u, db.put(Resource::style("http://example.com/noContent"), noContent).second);
 }
 
-TEST(OfflineDatabase, PutEvictsLeastRecentlyUsedResources) {
+TEST(OfflineDatabase, PutEvictsLeastRecentlyUsedResources) { // NOLINT
     using namespace mbgl;
 
     OfflineDatabase db(":memory:", 1024 * 100);
@@ -432,7 +432,7 @@ TEST(OfflineDatabase, PutEvictsLeastRecentlyUsedResources) {
     EXPECT_FALSE(bool(db.get(Resource::style("http://example.com/1"))));
 }
 
-TEST(OfflineDatabase, PutRegionResourceDoesNotEvict) {
+TEST(OfflineDatabase, PutRegionResourceDoesNotEvict) { // NOLINT
     using namespace mbgl;
 
     OfflineDatabase db(":memory:", 1024 * 100);
@@ -450,7 +450,7 @@ TEST(OfflineDatabase, PutRegionResourceDoesNotEvict) {
     EXPECT_TRUE(bool(db.get(Resource::style("http://example.com/20"))));
 }
 
-TEST(OfflineDatabase, PutFailsWhenEvictionInsuffices) {
+TEST(OfflineDatabase, PutFailsWhenEvictionInsuffices) { // NOLINT
     using namespace mbgl;
 
     OfflineDatabase db(":memory:", 1024 * 100);
@@ -462,7 +462,7 @@ TEST(OfflineDatabase, PutFailsWhenEvictionInsuffices) {
     EXPECT_FALSE(bool(db.get(Resource::style("http://example.com/big"))));
 }
 
-TEST(OfflineDatabase, GetRegionCompletedStatus) {
+TEST(OfflineDatabase, GetRegionCompletedStatus) { // NOLINT
     using namespace mbgl;
 
     OfflineDatabase db(":memory:");
@@ -496,7 +496,7 @@ TEST(OfflineDatabase, GetRegionCompletedStatus) {
     EXPECT_EQ(tileSize, status3.completedTileSize);
 }
 
-TEST(OfflineDatabase, HasRegionResource) {
+TEST(OfflineDatabase, HasRegionResource) { // NOLINT
     using namespace mbgl;
 
     OfflineDatabase db(":memory:", 1024 * 100);
@@ -518,7 +518,7 @@ TEST(OfflineDatabase, HasRegionResource) {
     EXPECT_EQ(1024, *(db.hasRegionResource(region.getID(), Resource::style("http://example.com/20"))));
 }
 
-TEST(OfflineDatabase, HasRegionResourceTile) {
+TEST(OfflineDatabase, HasRegionResourceTile) { // NOLINT
     using namespace mbgl;
 
     OfflineDatabase db(":memory:", 1024 * 100);
@@ -549,7 +549,7 @@ TEST(OfflineDatabase, HasRegionResourceTile) {
 
 }
 
-TEST(OfflineDatabase, OfflineMapboxTileCount) {
+TEST(OfflineDatabase, OfflineMapboxTileCount) { // NOLINT
     using namespace mbgl;
 
     OfflineDatabase db(":memory:");
@@ -634,7 +634,7 @@ static int databaseSyncMode(const std::string& path) {
     return stmt.get<int>(0);
 }
 
-TEST(OfflineDatabase, MigrateFromV2Schema) {
+TEST(OfflineDatabase, MigrateFromV2Schema) { // NOLINT
     using namespace mbgl;
 
     // v2.db is a v2 database containing a single offline region with a small number of resources.
@@ -655,7 +655,7 @@ TEST(OfflineDatabase, MigrateFromV2Schema) {
               databasePageCount("test/fixtures/offline_database/v2.db"));
 }
 
-TEST(OfflineDatabase, MigrateFromV3Schema) {
+TEST(OfflineDatabase, MigrateFromV3Schema) { // NOLINT
     using namespace mbgl;
 
     // v3.db is a v3 database, migrated from v2.
@@ -674,7 +674,7 @@ TEST(OfflineDatabase, MigrateFromV3Schema) {
     EXPECT_EQ(5, databaseUserVersion("test/fixtures/offline_database/v5.db"));
 }
 
-TEST(OfflineDatabase, MigrateFromV4Schema) {
+TEST(OfflineDatabase, MigrateFromV4Schema) { // NOLINT
     using namespace mbgl;
 
     // v4.db is a v4 database, migrated from v2 & v3. This database used `journal_mode = WAL` and `synchronous = NORMAL`.

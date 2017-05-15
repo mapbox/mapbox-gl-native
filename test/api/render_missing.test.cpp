@@ -13,13 +13,13 @@
 
 #include <future>
 
-#if TEST_HAS_SERVER
-#define TEST_REQUIRES_SERVER(name) name
+#if TEST_HAS_SERVER // NOLINT
+#define TEST_REQUIRES_SERVER(name) name // NOLINT
 #else
-#define TEST_REQUIRES_SERVER(name) DISABLED_ ## name
+#define TEST_REQUIRES_SERVER(name) DISABLED_ ## name // NOLINT
 #endif
 
-TEST(API, TEST_REQUIRES_SERVER(RenderMissingTile)) {
+TEST(API, TEST_REQUIRES_SERVER(RenderMissingTile)) { // NOLINT
     using namespace mbgl;
 
     util::RunLoop loop;

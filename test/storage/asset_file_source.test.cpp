@@ -9,7 +9,7 @@
 using namespace mbgl;
 
 #if !ANDROID
-TEST(AssetFileSource, Load) {
+TEST(AssetFileSource, Load) { // NOLINT
     util::RunLoop loop;
 
     AssetFileSource fs("test/fixtures/storage/assets");
@@ -76,7 +76,7 @@ TEST(AssetFileSource, Load) {
     loop.run();
 }
 
-TEST(AssetFileSource, EmptyFile) {
+TEST(AssetFileSource, EmptyFile) { // NOLINT
     util::RunLoop loop;
 
     AssetFileSource fs("test/fixtures/storage/assets");
@@ -92,7 +92,7 @@ TEST(AssetFileSource, EmptyFile) {
     loop.run();
 }
 
-TEST(AssetFileSource, NonEmptyFile) {
+TEST(AssetFileSource, NonEmptyFile) { // NOLINT
     util::RunLoop loop;
 
     AssetFileSource fs("test/fixtures/storage/assets");
@@ -108,7 +108,7 @@ TEST(AssetFileSource, NonEmptyFile) {
     loop.run();
 }
 
-TEST(AssetFileSource, NonExistentFile) {
+TEST(AssetFileSource, NonExistentFile) { // NOLINT
     util::RunLoop loop;
 
     AssetFileSource fs("test/fixtures/storage/assets");
@@ -125,7 +125,7 @@ TEST(AssetFileSource, NonExistentFile) {
     loop.run();
 }
 
-TEST(AssetFileSource, ReadDirectory) {
+TEST(AssetFileSource, ReadDirectory) { // NOLINT
     util::RunLoop loop;
 
     AssetFileSource fs("test/fixtures/storage/assets");
@@ -142,7 +142,7 @@ TEST(AssetFileSource, ReadDirectory) {
     loop.run();
 }
 
-TEST(AssetFileSource, URLEncoding) {
+TEST(AssetFileSource, URLEncoding) { // NOLINT
     util::RunLoop loop;
 
     AssetFileSource fs("test/fixtures/storage/assets");

@@ -56,7 +56,7 @@ public:
     }
 };
 
-TEST(GlyphAtlas, LoadingSuccess) {
+TEST(GlyphAtlas, LoadingSuccess) { // NOLINT
     GlyphAtlasTest test;
 
     test.fileSource.glyphsResponse = [&] (const Resource& resource) {
@@ -95,7 +95,7 @@ TEST(GlyphAtlas, LoadingSuccess) {
         });
 }
 
-TEST(GlyphAtlas, LoadingFail) {
+TEST(GlyphAtlas, LoadingFail) { // NOLINT
     GlyphAtlasTest test;
 
     test.fileSource.glyphsResponse = [&] (const Resource&) {
@@ -128,7 +128,7 @@ TEST(GlyphAtlas, LoadingFail) {
         });
 }
 
-TEST(GlyphAtlas, LoadingCorrupted) {
+TEST(GlyphAtlas, LoadingCorrupted) { // NOLINT
     GlyphAtlasTest test;
 
     test.fileSource.glyphsResponse = [&] (const Resource&) {
@@ -159,7 +159,7 @@ TEST(GlyphAtlas, LoadingCorrupted) {
         });
 }
 
-TEST(GlyphAtlas, LoadingCancel) {
+TEST(GlyphAtlas, LoadingCancel) { // NOLINT
     GlyphAtlasTest test;
 
     test.fileSource.glyphsResponse = [&] (const Resource&) {
@@ -178,7 +178,7 @@ TEST(GlyphAtlas, LoadingCancel) {
         });
 }
 
-TEST(GlyphAtlas, LoadingInvalid) {
+TEST(GlyphAtlas, LoadingInvalid) { // NOLINT
     GlyphAtlasTest test;
 
     test.fileSource.glyphsResponse = [&] (const Resource& resource) {

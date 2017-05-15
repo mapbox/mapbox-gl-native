@@ -35,7 +35,7 @@ private:
 
 } // namespace
 
-TEST(AsyncTask, RequestCoalescing) {
+TEST(AsyncTask, RequestCoalescing) { // NOLINT
     RunLoop loop;
 
     unsigned count = 0;
@@ -52,7 +52,7 @@ TEST(AsyncTask, RequestCoalescing) {
     EXPECT_EQ(count, 1u);
 }
 
-TEST(AsyncTask, DestroyShouldNotRunQueue) {
+TEST(AsyncTask, DestroyShouldNotRunQueue) { // NOLINT
     RunLoop loop;
 
     unsigned count = 0;
@@ -64,7 +64,7 @@ TEST(AsyncTask, DestroyShouldNotRunQueue) {
     EXPECT_EQ(count, 0u);
 }
 
-TEST(AsyncTask, DestroyAfterSignaling) {
+TEST(AsyncTask, DestroyAfterSignaling) { // NOLINT
     RunLoop loop;
 
     // We're creating two tasks and signal both of them; the one that gets fired first destroys
@@ -91,7 +91,7 @@ TEST(AsyncTask, DestroyAfterSignaling) {
     loop.runOnce();
 }
 
-TEST(AsyncTask, RequestCoalescingMultithreaded) {
+TEST(AsyncTask, RequestCoalescingMultithreaded) { // NOLINT
     RunLoop loop;
 
     unsigned count = 0;
@@ -117,7 +117,7 @@ TEST(AsyncTask, RequestCoalescingMultithreaded) {
     EXPECT_EQ(count, 1u);
 }
 
-TEST(AsyncTask, ThreadSafety) {
+TEST(AsyncTask, ThreadSafety) { // NOLINT
     RunLoop loop;
 
     unsigned count = 0;

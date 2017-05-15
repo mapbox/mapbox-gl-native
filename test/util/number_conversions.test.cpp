@@ -5,7 +5,7 @@
 
 using namespace mbgl;
 
-TEST(NumberConversions, number_to_string) {
+TEST(NumberConversions, number_to_string) { // NOLINT
     EXPECT_EQ("0", util::toString(0));
     EXPECT_EQ("10", util::toString(10));
     EXPECT_EQ("-10", util::toString(-10));

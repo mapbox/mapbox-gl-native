@@ -44,7 +44,7 @@ static StubGeometryTileFeature falseFeature {
     PropertyMap {{ "property", false }}
 };
 
-TEST(SourceFunction, Identity) {
+TEST(SourceFunction, Identity) { // NOLINT
     EXPECT_EQ(1.0f, SourceFunction<float>("property", IdentityStops<float>(), 0.0f)
         .evaluate(oneInteger, 2.0f));
     EXPECT_EQ(1.0f, SourceFunction<float>("property", IdentityStops<float>(), 0.0f)
@@ -68,7 +68,7 @@ TEST(SourceFunction, Identity) {
         .evaluate(oneTwoString, zeroArray)));
 }
 
-TEST(SourceFunction, Categorical) {
+TEST(SourceFunction, Categorical) { // NOLINT
     EXPECT_EQ(1.0f, SourceFunction<float>("property", CategoricalStops<float>({{ int64_t(1), 1.0f }}))
         .evaluate(oneInteger, 0.0f));
     EXPECT_EQ(1.0f, SourceFunction<float>("property", CategoricalStops<float>({{ int64_t(1), 1.0f }}))

@@ -6,7 +6,7 @@
 
 using namespace mbgl::util;
 
-TEST(URL, Scheme) {
+TEST(URL, Scheme) { // NOLINT
     EXPECT_EQ(URL::Segment({ 0, 4 }), URL("http://example.com/test?query=foo").scheme);
     EXPECT_EQ(URL::Segment({ 0, 4 }), URL("http://127.0.0.1:8080/test?query=foo").scheme);
     EXPECT_EQ(URL::Segment({ 0, 4 }), URL("http://[2a01:4f8:c17:3680::386a:6f3d]:8080/test?query=foo").scheme);
@@ -24,7 +24,7 @@ TEST(URL, Scheme) {
     EXPECT_EQ(URL::Segment({ 0, 4 }), URL("data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D").scheme);
 }
 
-TEST(URL, Query) {
+TEST(URL, Query) { // NOLINT
     EXPECT_EQ(URL::Segment({ 23, 10 }), URL("http://example.com/test?query=foo").query);
     EXPECT_EQ(URL::Segment({ 26, 10 }), URL("http://127.0.0.1:8080/test?query=foo").query);
     EXPECT_EQ(URL::Segment({ 47, 10 }), URL("http://[2a01:4f8:c17:3680::386a:6f3d]:8080/test?query=foo").query);
@@ -45,7 +45,7 @@ TEST(URL, Query) {
     EXPECT_EQ(URL::Segment({ 47, 0 }), URL("data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D").query);
 }
 
-TEST(URL, Domain) {
+TEST(URL, Domain) { // NOLINT
     EXPECT_EQ(URL::Segment({ 7, 11 }), URL("http://example.com/test?query=foo").domain);
     EXPECT_EQ(URL::Segment({ 7, 14 }), URL("http://127.0.0.1:8080/test?query=foo").domain);
     EXPECT_EQ(URL::Segment({ 7, 35 }), URL("http://[2a01:4f8:c17:3680::386a:6f3d]:8080/test?query=foo").domain);
@@ -72,7 +72,7 @@ TEST(URL, Domain) {
     EXPECT_EQ(URL::Segment({ 5, 17 }), URL("data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D").domain);
 }
 
-TEST(URL, Path) {
+TEST(URL, Path) { // NOLINT
     EXPECT_EQ(URL::Segment({ 18, 5 }), URL("http://example.com/test?query=foo").path);
     EXPECT_EQ(URL::Segment({ 21, 5 }), URL("http://127.0.0.1:8080/test?query=foo").path);
     EXPECT_EQ(URL::Segment({ 42, 5 }), URL("http://[2a01:4f8:c17:3680::386a:6f3d]:8080/test?query=foo").path);
@@ -93,7 +93,7 @@ TEST(URL, Path) {
 
 auto URLPath = [](const char* str) { const URL url(str); return Path(str, url.path.first, url.path.second); };
 
-TEST(Path, Directory) {
+TEST(Path, Directory) { // NOLINT
     EXPECT_EQ(Path::Segment({ 0, 8 }), Path("foo/bar/baz.ext").directory);
     EXPECT_EQ(Path::Segment({ 0, 8 }), Path("foo.bar/baz.ext").directory);
     EXPECT_EQ(Path::Segment({ 0, 8 }), Path("foo.bar/baz").directory);
@@ -117,7 +117,7 @@ TEST(Path, Directory) {
     EXPECT_EQ(Path::Segment({ 0, 1 }), Path("/").directory);
 }
 
-TEST(Path, URLDirectory) {
+TEST(Path, URLDirectory) { // NOLINT
     EXPECT_EQ(Path::Segment({ 18, 9 }), URLPath("http://example.com/foo/bar/baz.ext").directory);
     EXPECT_EQ(Path::Segment({ 18, 9 }), URLPath("http://example.com/foo/bar/baz.ext?query=foo.bar").directory);
     EXPECT_EQ(Path::Segment({ 18, 9 }), URLPath("http://example.com/foo.bar/baz.ext").directory);
@@ -142,7 +142,7 @@ TEST(Path, URLDirectory) {
     EXPECT_EQ(Path::Segment({ 18, 0 }), URLPath("http://example.com?query=foo.bar").directory);
 }
 
-TEST(Path, Extension) {
+TEST(Path, Extension) { // NOLINT
     EXPECT_EQ(Path::Segment({ 11, 4 }), Path("foo/bar/baz.ext").extension);
     EXPECT_EQ(Path::Segment({ 11, 4 }), Path("foo.bar/baz.ext").extension);
     EXPECT_EQ(Path::Segment({ 18, 4 }), Path("foo.bar/baz.vector.pbf").extension);
@@ -168,7 +168,7 @@ TEST(Path, Extension) {
     EXPECT_EQ(Path::Segment({ 1, 0 }), Path("/").extension);
 }
 
-TEST(Path, URLExtension) {
+TEST(Path, URLExtension) { // NOLINT
     EXPECT_EQ(Path::Segment({ 30, 4 }), URLPath("http://example.com/foo/bar/baz.ext").extension);
     EXPECT_EQ(Path::Segment({ 30, 4 }), URLPath("http://example.com/foo/bar/baz.ext?query=foo.bar").extension);
     EXPECT_EQ(Path::Segment({ 30, 4 }), URLPath("http://example.com/foo.bar/baz.ext").extension);
@@ -193,7 +193,7 @@ TEST(Path, URLExtension) {
     EXPECT_EQ(Path::Segment({ 18, 0 }), URLPath("http://example.com?query=foo.bar").extension);
 }
 
-TEST(Path, Filename) {
+TEST(Path, Filename) { // NOLINT
     EXPECT_EQ(Path::Segment({ 8, 3 }), Path("foo/bar/baz.ext").filename);
     EXPECT_EQ(Path::Segment({ 8, 3 }), Path("foo.bar/baz.ext").filename);
     EXPECT_EQ(Path::Segment({ 8, 3 }), Path("foo.bar/baz").filename);
@@ -217,7 +217,7 @@ TEST(Path, Filename) {
     EXPECT_EQ(Path::Segment({ 1, 0 }), Path("/").filename);
 }
 
-TEST(Path, URLFilename) {
+TEST(Path, URLFilename) { // NOLINT
     EXPECT_EQ(Path::Segment({ 27, 3 }), URLPath("http://example.com/foo/bar/baz.ext").filename);
     EXPECT_EQ(Path::Segment({ 27, 3 }), URLPath("http://example.com/foo/bar/baz.ext?query=foo.bar").filename);
     EXPECT_EQ(Path::Segment({ 27, 3 }), URLPath("http://example.com/foo.bar/baz.ext").filename);

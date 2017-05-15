@@ -70,7 +70,7 @@ private:
     std::unordered_map<std::string, std::shared_ptr<std::string>> cache;
 };
 
-TEST(Memory, Vector) {
+TEST(Memory, Vector) { // NOLINT
     MemoryTest test;
 
     Map map(test.backend, { 256, 256 }, 2, test.fileSource, test.threadPool, MapMode::Still);
@@ -80,7 +80,7 @@ TEST(Memory, Vector) {
     test::render(map, test.view);
 }
 
-TEST(Memory, Raster) {
+TEST(Memory, Raster) { // NOLINT
     MemoryTest test;
 
     Map map(test.backend, { 256, 256 }, 2, test.fileSource, test.threadPool, MapMode::Still);
@@ -109,7 +109,7 @@ bool shouldRunFootprint() {
 // idea is to try to keep the memory footprint within
 // reasonable limits, so this test acts more like a
 // safeguard.
-TEST(Memory, Footprint) {
+TEST(Memory, Footprint) { // NOLINT
     if (!shouldRunFootprint()) {
         return;
     }

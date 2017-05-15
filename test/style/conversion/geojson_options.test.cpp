@@ -9,7 +9,7 @@
 using namespace mbgl::style;
 using namespace mbgl::style::conversion;
 
-TEST(GeoJSONOptions, Basic) {
+TEST(GeoJSONOptions, Basic) { // NOLINT
     ValueMap map;
     Value raw(map);
     Error error;
@@ -17,7 +17,7 @@ TEST(GeoJSONOptions, Basic) {
     ASSERT_TRUE((bool) converted);
 }
 
-TEST(GeoJSONOptions, ErrorHandling) {
+TEST(GeoJSONOptions, ErrorHandling) { // NOLINT
     ValueMap map {{"maxzoom", std::string{"should not be a string"}}};
     Value raw(map);
     Error error;
@@ -25,7 +25,7 @@ TEST(GeoJSONOptions, ErrorHandling) {
     ASSERT_FALSE((bool) converted);
 }
 
-TEST(GeoJSONOptions, RetainsDefaults) {
+TEST(GeoJSONOptions, RetainsDefaults) { // NOLINT
     ValueMap map;
     Value raw(map);
     Error error;
@@ -44,7 +44,7 @@ TEST(GeoJSONOptions, RetainsDefaults) {
 }
 
 
-TEST(GeoJSONOptions, FullConversion) {
+TEST(GeoJSONOptions, FullConversion) { // NOLINT
     ValueMap map {
         // GeoJSON-VT
         {"maxzoom", 1.0f},

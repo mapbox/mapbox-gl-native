@@ -63,7 +63,7 @@ public:
     const std::thread::id tid;
 };
 
-TEST(Thread, invoke) {
+TEST(Thread, invoke) { // NOLINT
     const std::thread::id tid = std::this_thread::get_id();
 
     RunLoop loop;
@@ -113,7 +113,7 @@ TEST(Thread, invoke) {
     loop.run();
 }
 
-TEST(Thread, context) {
+TEST(Thread, context) { // NOLINT
     const std::thread::id tid = std::this_thread::get_id();
 
     RunLoop loop;
@@ -141,7 +141,7 @@ public:
     }
 };
 
-TEST(Thread, ExecutesAfter) {
+TEST(Thread, ExecutesAfter) { // NOLINT
     RunLoop loop;
     Thread<TestWorker> thread({"Test"});
 
@@ -161,7 +161,7 @@ TEST(Thread, ExecutesAfter) {
     EXPECT_TRUE(didAfter);
 }
 
-TEST(Thread, WorkRequestDeletionWaitsForWorkToComplete) {
+TEST(Thread, WorkRequestDeletionWaitsForWorkToComplete) { // NOLINT
     RunLoop loop;
 
     Thread<TestWorker> thread({"Test"});
@@ -180,7 +180,7 @@ TEST(Thread, WorkRequestDeletionWaitsForWorkToComplete) {
     EXPECT_TRUE(didWork);
 }
 
-TEST(Thread, WorkRequestDeletionCancelsAfter) {
+TEST(Thread, WorkRequestDeletionCancelsAfter) { // NOLINT
     RunLoop loop;
     Thread<TestWorker> thread({"Test"});
 
@@ -199,7 +199,7 @@ TEST(Thread, WorkRequestDeletionCancelsAfter) {
     EXPECT_FALSE(didAfter);
 }
 
-TEST(Thread, WorkRequestDeletionCancelsImmediately) {
+TEST(Thread, WorkRequestDeletionCancelsImmediately) { // NOLINT
     RunLoop loop;
     Thread<TestWorker> thread({"Test"});
 
@@ -219,7 +219,7 @@ TEST(Thread, WorkRequestDeletionCancelsImmediately) {
     request1.reset();
 }
 
-TEST(Thread, DeletePausedThread) {
+TEST(Thread, DeletePausedThread) { // NOLINT
     RunLoop loop;
 
     std::atomic_bool flag(false);
@@ -235,7 +235,7 @@ TEST(Thread, DeletePausedThread) {
     ASSERT_TRUE(flag);
 }
 
-TEST(Thread, Pause) {
+TEST(Thread, Pause) { // NOLINT
     RunLoop loop;
 
     std::atomic_bool flag(false);
@@ -255,7 +255,7 @@ TEST(Thread, Pause) {
     loop.run();
 }
 
-TEST(Thread, Resume) {
+TEST(Thread, Resume) { // NOLINT
     RunLoop loop;
 
     std::atomic_bool flag(false);
@@ -280,7 +280,7 @@ TEST(Thread, Resume) {
     ASSERT_TRUE(flag);
 }
 
-TEST(Thread, PauseResume) {
+TEST(Thread, PauseResume) { // NOLINT
     RunLoop loop;
 
     Thread<TestWorker> thread({"Test"});

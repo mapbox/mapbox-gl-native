@@ -43,12 +43,12 @@ PossiblyEvaluatedPropertyValue<float> evaluate(TransitioningProperty<DataDrivenP
     return property.evaluate(evaluator, parameters.now);
 }
 
-TEST(TransitioningProperty, EvaluateDefaultValue) {
+TEST(TransitioningProperty, EvaluateDefaultValue) { // NOLINT
     TransitioningProperty<PropertyValue<float>> property;
     ASSERT_EQ(0.0f, evaluate(property));
 }
 
-TEST(TransitioningProperty, EvaluateUntransitionedConstant) {
+TEST(TransitioningProperty, EvaluateUntransitionedConstant) { // NOLINT
     TransitioningProperty<PropertyValue<float>> property {
         PropertyValue<float>(1.0f),
         TransitioningProperty<PropertyValue<float>>(),
@@ -59,7 +59,7 @@ TEST(TransitioningProperty, EvaluateUntransitionedConstant) {
     ASSERT_EQ(1.0f, evaluate(property));
 }
 
-TEST(TransitioningProperty, EvaluateTransitionedConstantWithoutDelay) {
+TEST(TransitioningProperty, EvaluateTransitionedConstantWithoutDelay) { // NOLINT
     TransitionOptions transition;
     transition.duration = { 1000ms };
 
@@ -82,7 +82,7 @@ TEST(TransitioningProperty, EvaluateTransitionedConstantWithoutDelay) {
     ASSERT_FLOAT_EQ(1.0f, evaluate(t1, 1500ms));
 }
 
-TEST(TransitioningProperty, EvaluateTransitionedConstantWithDelay) {
+TEST(TransitioningProperty, EvaluateTransitionedConstantWithDelay) { // NOLINT
     TransitionOptions transition;
     transition.delay = { 1000ms };
     transition.duration = { 1000ms };
@@ -108,7 +108,7 @@ TEST(TransitioningProperty, EvaluateTransitionedConstantWithDelay) {
     ASSERT_FLOAT_EQ(1.0f, evaluate(t1, 2500ms));
 }
 
-TEST(TransitioningProperty, EvaluateDataDrivenValue) {
+TEST(TransitioningProperty, EvaluateDataDrivenValue) { // NOLINT
     TransitionOptions transition;
     transition.delay = { 1000ms };
     transition.duration = { 1000ms };

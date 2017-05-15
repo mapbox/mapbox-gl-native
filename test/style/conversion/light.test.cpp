@@ -15,7 +15,7 @@ using namespace mbgl;
 using namespace mbgl::style;
 using namespace mbgl::style::conversion;
 
-TEST(StyleConversion, Light) {
+TEST(StyleConversion, Light) { // NOLINT
     Error error;
 
     auto parseLight = [&](const std::string& src) {

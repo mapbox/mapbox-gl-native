@@ -6,7 +6,7 @@
 
 using namespace mbgl;
 
-TEST(TextConversions, to_upper) {
+TEST(TextConversions, to_upper) { // NOLINT
     EXPECT_EQ(std::string("STREET"), platform::uppercase("strEEt"));  // EN
     EXPECT_EQ(std::string("ROAD"), platform::uppercase("rOAd"));      // EN
 
@@ -20,7 +20,7 @@ TEST(TextConversions, to_upper) {
 }
 
 
-TEST(TextConversions, to_lower) {
+TEST(TextConversions, to_lower) { // NOLINT
     EXPECT_EQ(std::string("street"), platform::lowercase("strEEt"));  // EN
     EXPECT_EQ(std::string("road"), platform::lowercase("rOAd"));      // EN
 

@@ -9,7 +9,7 @@
 
 using namespace mbgl::util;
 
-TEST(Timer, TEST_REQUIRES_ACCURATE_TIMING(Basic)) {
+TEST(Timer, TEST_REQUIRES_ACCURATE_TIMING(Basic)) { // NOLINT
     RunLoop loop;
 
     Timer timer;
@@ -33,7 +33,7 @@ TEST(Timer, TEST_REQUIRES_ACCURATE_TIMING(Basic)) {
     EXPECT_LE(totalTime, expectedTotalTime * 1.2);
 }
 
-TEST(Timer, TEST_REQUIRES_ACCURATE_TIMING(Repeat)) {
+TEST(Timer, TEST_REQUIRES_ACCURATE_TIMING(Repeat)) { // NOLINT
     RunLoop loop;
 
     Timer timer;
@@ -59,7 +59,7 @@ TEST(Timer, TEST_REQUIRES_ACCURATE_TIMING(Repeat)) {
     EXPECT_LE(totalTime, expectedTotalTime * 1.2);
 }
 
-TEST(Timer, TEST_REQUIRES_ACCURATE_TIMING(Stop)) {
+TEST(Timer, TEST_REQUIRES_ACCURATE_TIMING(Stop)) { // NOLINT
     RunLoop loop;
 
     Timer timer1;
@@ -95,7 +95,7 @@ TEST(Timer, TEST_REQUIRES_ACCURATE_TIMING(Stop)) {
     EXPECT_LE(totalTime, expectedTotalTime * 1.2);
 }
 
-TEST(Timer, TEST_REQUIRES_ACCURATE_TIMING(DestroyShouldStop)) {
+TEST(Timer, TEST_REQUIRES_ACCURATE_TIMING(DestroyShouldStop)) { // NOLINT
     RunLoop loop;
 
     auto timer1 = std::make_unique<Timer>();
@@ -131,7 +131,7 @@ TEST(Timer, TEST_REQUIRES_ACCURATE_TIMING(DestroyShouldStop)) {
     EXPECT_LE(totalTime, expectedTotalTime * 1.2);
 }
 
-TEST(Timer, TEST_REQUIRES_ACCURATE_TIMING(StartOverrides)) {
+TEST(Timer, TEST_REQUIRES_ACCURATE_TIMING(StartOverrides)) { // NOLINT
     RunLoop loop;
 
     Timer timer;
@@ -165,7 +165,7 @@ TEST(Timer, TEST_REQUIRES_ACCURATE_TIMING(StartOverrides)) {
     EXPECT_LE(totalTime, expectedTotalTime * 1.2);
 }
 
-TEST(Timer, TEST_REQUIRES_ACCURATE_TIMING(CanStopNonStartedTimer)) {
+TEST(Timer, TEST_REQUIRES_ACCURATE_TIMING(CanStopNonStartedTimer)) { // NOLINT
     RunLoop loop;
 
     Timer timer;

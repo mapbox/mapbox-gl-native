@@ -11,22 +11,22 @@
 
 using namespace mbgl;
 
-TEST(Buckets, CircleBucket) {
+TEST(Buckets, CircleBucket) { // NOLINT
     CircleBucket bucket { { {0, 0, 0}, MapMode::Still }, {} };
     ASSERT_FALSE(bucket.hasData());
 }
 
-TEST(Buckets, FillBucket) {
+TEST(Buckets, FillBucket) { // NOLINT
     FillBucket bucket { { {0, 0, 0}, MapMode::Still }, {} };
     ASSERT_FALSE(bucket.hasData());
 }
 
-TEST(Buckets, LineBucket) {
+TEST(Buckets, LineBucket) { // NOLINT
     LineBucket bucket { { {0, 0, 0}, MapMode::Still }, {}, {} };
     ASSERT_FALSE(bucket.hasData());
 }
 
-TEST(Buckets, SymbolBucket) {
+TEST(Buckets, SymbolBucket) { // NOLINT
     style::SymbolLayoutProperties::PossiblyEvaluated layout;
     bool sdfIcons = false;
     bool iconsNeedLinear = false;

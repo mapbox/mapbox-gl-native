@@ -82,8 +82,9 @@ std::string encodeOfflineRegionDefinition(const OfflineRegionDefinition& region)
     bounds.PushBack(region.bounds.east(), doc.GetAllocator());
     doc.AddMember("bounds", bounds, doc.GetAllocator());
 
-    doc.AddMember("min_zoom", region.minZoom, doc.GetAllocator());
-    if (std::isfinite(region.maxZoom)) {
+    // warning: Potential memory leak [clang-analyzer-unix.Malloc]
+    doc.AddMember("min_zoom", region.minZoom, doc.GetAllocator()); // NOLINT
+    if (std::isfinite(region.maxZoom)) { // NOLINT
         doc.AddMember("max_zoom", region.maxZoom, doc.GetAllocator());
     }
 

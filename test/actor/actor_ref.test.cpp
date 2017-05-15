@@ -10,7 +10,7 @@
 using namespace mbgl;
 using namespace std::chrono_literals;
 
-TEST(ActorRef, CanOutliveActor) {
+TEST(ActorRef, CanOutliveActor) { // NOLINT
     // An ActorRef can outlive its actor. Doing does not extend the actor's lifetime.
     // Sending a message to an ActorRef whose actor has died is a no-op.
 

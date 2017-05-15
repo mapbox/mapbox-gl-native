@@ -19,7 +19,7 @@ auto readImage(const std::string& name) {
 
 } // namespace
 
-TEST(Sprite, SpriteImageCreationInvalid) {
+TEST(Sprite, SpriteImageCreationInvalid) { // NOLINT
     FixtureLog log;
 
     const PremultipliedImage image_1x = decodeImage(util::read_file("test/fixtures/annotations/emerald.png"));
@@ -134,7 +134,7 @@ TEST(Sprite, SpriteImageCreationInvalid) {
 
 }
 
-TEST(Sprite, SpriteImageCreation1x) {
+TEST(Sprite, SpriteImageCreation1x) { // NOLINT
     const PremultipliedImage image_1x = decodeImage(util::read_file("test/fixtures/annotations/emerald.png"));
 
     ASSERT_EQ(200u, image_1x.size.width);
@@ -153,7 +153,7 @@ TEST(Sprite, SpriteImageCreation1x) {
     }
 }
 
-TEST(Sprite, SpriteImageCreation2x) {
+TEST(Sprite, SpriteImageCreation2x) { // NOLINT
     const PremultipliedImage image_2x = decodeImage(util::read_file("test/fixtures/annotations/emerald@2x.png"));
 
     // "museum_icon":{"x":354,"y":374,"width":36,"height":36,"pixelRatio":2,"sdf":false}
@@ -168,7 +168,7 @@ TEST(Sprite, SpriteImageCreation2x) {
               sprite->getImage());
 }
 
-TEST(Sprite, SpriteImageCreation1_5x) {
+TEST(Sprite, SpriteImageCreation1_5x) { // NOLINT
     const PremultipliedImage image_2x = decodeImage(util::read_file("test/fixtures/annotations/emerald@2x.png"));
 
     // "museum_icon":{"x":354,"y":374,"width":36,"height":36,"pixelRatio":2,"sdf":false}
@@ -194,7 +194,7 @@ TEST(Sprite, SpriteImageCreation1_5x) {
               sprite2->getImage());
 }
 
-TEST(Sprite, SpriteParsing) {
+TEST(Sprite, SpriteParsing) { // NOLINT
     const auto image_1x = util::read_file("test/fixtures/annotations/emerald.png");
     const auto json_1x = util::read_file("test/fixtures/annotations/emerald.json");
 
@@ -290,7 +290,7 @@ TEST(Sprite, SpriteParsing) {
     }
 }
 
-TEST(Sprite, SpriteParsingInvalidJSON) {
+TEST(Sprite, SpriteParsingInvalidJSON) { // NOLINT
     const auto image_1x = util::read_file("test/fixtures/annotations/emerald.png");
     const auto json_1x = R"JSON({ "image": " })JSON";
 
@@ -304,7 +304,7 @@ TEST(Sprite, SpriteParsingInvalidJSON) {
     }
 }
 
-TEST(Sprite, SpriteParsingEmptyImage) {
+TEST(Sprite, SpriteParsingEmptyImage) { // NOLINT
     FixtureLog log;
 
     const auto image_1x = util::read_file("test/fixtures/annotations/emerald.png");
@@ -321,7 +321,7 @@ TEST(Sprite, SpriteParsingEmptyImage) {
                   }));
 }
 
-TEST(Sprite, SpriteParsingSimpleWidthHeight) {
+TEST(Sprite, SpriteParsingSimpleWidthHeight) { // NOLINT
     FixtureLog log;
 
     const auto image_1x = util::read_file("test/fixtures/annotations/emerald.png");
@@ -331,7 +331,7 @@ TEST(Sprite, SpriteParsingSimpleWidthHeight) {
     EXPECT_EQ(1u, images.size());
 }
 
-TEST(Sprite, SpriteParsingWidthTooBig) {
+TEST(Sprite, SpriteParsingWidthTooBig) { // NOLINT
     FixtureLog log;
 
     const auto image_1x = util::read_file("test/fixtures/annotations/emerald.png");
@@ -354,7 +354,7 @@ TEST(Sprite, SpriteParsingWidthTooBig) {
                   }));
 }
 
-TEST(Sprite, SpriteParsingNegativeWidth) {
+TEST(Sprite, SpriteParsingNegativeWidth) { // NOLINT
     FixtureLog log;
 
     const auto image_1x = util::read_file("test/fixtures/annotations/emerald.png");
@@ -377,7 +377,7 @@ TEST(Sprite, SpriteParsingNegativeWidth) {
                   }));
 }
 
-TEST(Sprite, SpriteParsingNullRatio) {
+TEST(Sprite, SpriteParsingNullRatio) { // NOLINT
     FixtureLog log;
 
     const auto image_1x = util::read_file("test/fixtures/annotations/emerald.png");

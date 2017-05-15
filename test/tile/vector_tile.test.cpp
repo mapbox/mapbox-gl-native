@@ -41,7 +41,7 @@ public:
     };
 };
 
-TEST(VectorTile, setError) {
+TEST(VectorTile, setError) { // NOLINT
     VectorTileTest test;
     VectorTile tile(OverscaledTileID(0, 0, 0), "source", test.tileParameters, test.tileset);
     tile.setError(std::make_exception_ptr(std::runtime_error("test")));
@@ -50,7 +50,7 @@ TEST(VectorTile, setError) {
     EXPECT_TRUE(tile.isComplete());
 }
 
-TEST(VectorTile, onError) {
+TEST(VectorTile, onError) { // NOLINT
     VectorTileTest test;
     VectorTile tile(OverscaledTileID(0, 0, 0), "source", test.tileParameters, test.tileset);
     tile.onError(std::make_exception_ptr(std::runtime_error("test")));
@@ -59,7 +59,7 @@ TEST(VectorTile, onError) {
     EXPECT_TRUE(tile.isComplete());
 }
 
-TEST(VectorTile, Issue7615) {
+TEST(VectorTile, Issue7615) { // NOLINT
     VectorTileTest test;
     VectorTile tile(OverscaledTileID(0, 0, 0), "source", test.tileParameters, test.tileset);
 
@@ -92,7 +92,7 @@ TEST(VectorTile, Issue7615) {
     EXPECT_EQ(symbolBucket.get(), tile.getBucket(*symbolLayer.baseImpl));
 }
 
-TEST(VectorTile, Issue8542) {
+TEST(VectorTile, Issue8542) { // NOLINT
     VectorTileTest test;
     VectorTile tile(OverscaledTileID(0, 0, 0), "source", test.tileParameters, test.tileset);
 

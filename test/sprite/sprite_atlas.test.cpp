@@ -15,7 +15,7 @@
 
 using namespace mbgl;
 
-TEST(SpriteAtlas, Basic) {
+TEST(SpriteAtlas, Basic) { // NOLINT
     FixtureLog log;
     SpriteAtlas atlas({ 63, 112 }, 1);
 
@@ -73,7 +73,7 @@ TEST(SpriteAtlas, Basic) {
     test::checkImage("test/fixtures/sprite_atlas/basic", atlas.getAtlasImage());
 }
 
-TEST(SpriteAtlas, Size) {
+TEST(SpriteAtlas, Size) { // NOLINT
     SpriteAtlas atlas({ 63, 112 }, 1.4);
 
     auto images = parseSprite(util::read_file("test/fixtures/annotations/emerald.png"),
@@ -105,7 +105,7 @@ TEST(SpriteAtlas, Size) {
     test::checkImage("test/fixtures/sprite_atlas/size", atlas.getAtlasImage());
 }
 
-TEST(SpriteAtlas, Updates) {
+TEST(SpriteAtlas, Updates) { // NOLINT
     SpriteAtlas atlas({ 32, 32 }, 1);
 
     EXPECT_EQ(1.0f, atlas.getPixelRatio());
@@ -141,7 +141,7 @@ TEST(SpriteAtlas, Updates) {
     test::checkImage("test/fixtures/sprite_atlas/updates_after", atlas.getAtlasImage());
 }
 
-TEST(SpriteAtlas, AddRemove) {
+TEST(SpriteAtlas, AddRemove) { // NOLINT
     FixtureLog log;
     SpriteAtlas atlas({ 32, 32 }, 1);
 
@@ -170,7 +170,7 @@ TEST(SpriteAtlas, AddRemove) {
                   }));
 }
 
-TEST(SpriteAtlas, RemoveReleasesBinPackRect) {
+TEST(SpriteAtlas, RemoveReleasesBinPackRect) { // NOLINT
     FixtureLog log;
 
     SpriteAtlas atlas({ 36, 36 }, 1);

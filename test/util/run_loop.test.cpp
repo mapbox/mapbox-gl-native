@@ -5,7 +5,7 @@
 
 using namespace mbgl::util;
 
-TEST(RunLoop, Stop) {
+TEST(RunLoop, Stop) { // NOLINT
     RunLoop loop(RunLoop::Type::New);
 
     Timer timer;
@@ -16,7 +16,7 @@ TEST(RunLoop, Stop) {
     loop.run();
 }
 
-TEST(RunLoop, MultipleStop) {
+TEST(RunLoop, MultipleStop) { // NOLINT
     RunLoop loop(RunLoop::Type::New);
 
     Timer timer;
@@ -30,7 +30,7 @@ TEST(RunLoop, MultipleStop) {
     loop.run();
 }
 
-TEST(RunLoop, MultipleRun) {
+TEST(RunLoop, MultipleRun) { // NOLINT
     RunLoop loop(RunLoop::Type::New);
 
     Timer timer;

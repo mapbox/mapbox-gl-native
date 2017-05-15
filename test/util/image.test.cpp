@@ -6,7 +6,7 @@
 
 using namespace mbgl;
 
-TEST(Image, PNGRoundTrip) {
+TEST(Image, PNGRoundTrip) { // NOLINT
     PremultipliedImage rgba({ 1, 1 });
     rgba.data[0] = 128;
     rgba.data[1] = 0;
@@ -20,7 +20,7 @@ TEST(Image, PNGRoundTrip) {
     EXPECT_EQ(255, image.data[3]);
 }
 
-TEST(Image, PNGRoundTripAlpha) {
+TEST(Image, PNGRoundTripAlpha) { // NOLINT
     PremultipliedImage rgba({ 1, 1 });
     rgba.data[0] = 128;
     rgba.data[1] = 0;
@@ -34,7 +34,7 @@ TEST(Image, PNGRoundTripAlpha) {
     EXPECT_EQ(128, image.data[3]);
 }
 
-TEST(Image, PNGReadNoProfile) {
+TEST(Image, PNGReadNoProfile) { // NOLINT
     PremultipliedImage image = decodeImage(util::read_file("test/fixtures/image/no_profile.png"));
     EXPECT_EQ(128, image.data[0]);
     EXPECT_EQ(0, image.data[1]);
@@ -42,7 +42,7 @@ TEST(Image, PNGReadNoProfile) {
     EXPECT_EQ(255, image.data[3]);
 }
 
-TEST(Image, PNGReadNoProfileAlpha) {
+TEST(Image, PNGReadNoProfileAlpha) { // NOLINT
     PremultipliedImage image = decodeImage(util::read_file("test/fixtures/image/no_profile_alpha.png"));
     EXPECT_EQ(64, image.data[0]);
     EXPECT_EQ(0, image.data[1]);
@@ -50,7 +50,7 @@ TEST(Image, PNGReadNoProfileAlpha) {
     EXPECT_EQ(128, image.data[3]);
 }
 
-TEST(Image, PNGReadProfile) {
+TEST(Image, PNGReadProfile) { // NOLINT
     PremultipliedImage image = decodeImage(util::read_file("test/fixtures/image/profile.png"));
     EXPECT_EQ(128, image.data[0]);
     EXPECT_EQ(0, image.data[1]);
@@ -58,7 +58,7 @@ TEST(Image, PNGReadProfile) {
     EXPECT_EQ(255, image.data[3]);
 }
 
-TEST(Image, PNGReadProfileAlpha) {
+TEST(Image, PNGReadProfileAlpha) { // NOLINT
     PremultipliedImage image = decodeImage(util::read_file("test/fixtures/image/profile_alpha.png"));
     EXPECT_EQ(64, image.data[0]);
     EXPECT_EQ(0, image.data[1]);
@@ -66,27 +66,27 @@ TEST(Image, PNGReadProfileAlpha) {
     EXPECT_EQ(128, image.data[3]);
 }
 
-TEST(Image, PNGTile) {
+TEST(Image, PNGTile) { // NOLINT
     PremultipliedImage image = decodeImage(util::read_file("test/fixtures/image/tile.png"));
     EXPECT_EQ(256u, image.size.width);
     EXPECT_EQ(256u, image.size.height);
 }
 
-TEST(Image, JPEGTile) {
+TEST(Image, JPEGTile) { // NOLINT
     PremultipliedImage image = decodeImage(util::read_file("test/fixtures/image/tile.jpeg"));
     EXPECT_EQ(256u, image.size.width);
     EXPECT_EQ(256u, image.size.height);
 }
 
 #if !defined(__ANDROID__) && !defined(__APPLE__) && !defined(QT_IMAGE_DECODERS)
-TEST(Image, WebPTile) {
+TEST(Image, WebPTile) { // NOLINT
     PremultipliedImage image = decodeImage(util::read_file("test/fixtures/image/tile.webp"));
     EXPECT_EQ(256u, image.size.width);
     EXPECT_EQ(256u, image.size.height);
 }
 #endif // !defined(__ANDROID__) && !defined(__APPLE__) && !defined(QT_IMAGE_DECODERS)
 
-TEST(Image, Copy) {
+TEST(Image, Copy) { // NOLINT
     PremultipliedImage src5({5, 5});
     PremultipliedImage dst5({5, 5});
     PremultipliedImage src10({10, 10});
@@ -115,7 +115,7 @@ TEST(Image, Copy) {
     EXPECT_THROW(PremultipliedImage::copy(src10, dst10, {0, 0}, {0, 1}, {0, max}), std::out_of_range);
 }
 
-TEST(Image, Move) {
+TEST(Image, Move) { // NOLINT
     UnassociatedImage rgba({ 1, 1 });
     rgba.data[0] = 255;
     rgba.data[1] = 254;
@@ -130,7 +130,7 @@ TEST(Image, Move) {
     EXPECT_EQ(1u, moved.size.width);
 }
 
-TEST(Image, Premultiply) {
+TEST(Image, Premultiply) { // NOLINT
     UnassociatedImage rgba({ 1, 1 });
     rgba.data[0] = 255;
     rgba.data[1] = 254;

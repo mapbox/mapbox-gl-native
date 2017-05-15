@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 #include <sqlite3.hpp>
 
-TEST(SQLite, Statement) {
+TEST(SQLite, Statement) { // NOLINT
     using namespace mbgl;
 
     mapbox::sqlite::Database db(":memory:", mapbox::sqlite::Create | mapbox::sqlite::ReadWrite);

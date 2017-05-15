@@ -15,7 +15,7 @@ static double _signedArea(const GeometryCoordinates& ring) {
     return sum;
 }
 
-TEST(GeometryTileData, classifyRings1) {
+TEST(GeometryTileData, classifyRings1) { // NOLINT
     std::vector<GeometryCollection> polygons = classifyRings({
       { {0, 0}, {0, 40}, {40, 40}, {40, 0}, {0, 0} }
     });
@@ -26,7 +26,7 @@ TEST(GeometryTileData, classifyRings1) {
     ASSERT_EQ(polygons[0].size(), 1u);
 }
 
-TEST(GeometryTileData, classifyRings2) {
+TEST(GeometryTileData, classifyRings2) { // NOLINT
     std::vector<GeometryCollection> polygons = classifyRings({
       { {0, 0}, {0, 40}, {40, 40}, {40, 0}, {0, 0} },
       { {10, 10}, {20, 10}, {20, 20}, {10, 10} }
@@ -38,7 +38,7 @@ TEST(GeometryTileData, classifyRings2) {
     ASSERT_EQ(polygons[0].size(), 2u);
 }
 
-TEST(GeometryTileData, limitHoles1) {
+TEST(GeometryTileData, limitHoles1) { // NOLINT
     GeometryCollection polygon = {
       { {0, 0}, {0, 40}, {40, 40}, {40, 0}, {0, 0} },
       { {30, 30}, {32, 30}, {32, 32}, {30, 30} },
@@ -55,7 +55,7 @@ TEST(GeometryTileData, limitHoles1) {
     ASSERT_EQ(polygon[1][0].x, 10);
 }
 
-TEST(GeometryTileData, limitHoles2) {
+TEST(GeometryTileData, limitHoles2) { // NOLINT
     GeometryCollection polygon = {
       { {0, 0}, {0, 40}, {40, 40}, {40, 0}, {0, 0} },
       { {10, 10}, {20, 10}, {20, 20}, {10, 10} },
@@ -72,7 +72,7 @@ TEST(GeometryTileData, limitHoles2) {
     ASSERT_EQ(polygon[1][0].x, 10);
 }
 
-TEST(GeometryTileData, limitHoles3) {
+TEST(GeometryTileData, limitHoles3) { // NOLINT
     // real world polygon with interior rings with negative areas
     // that need to be sorted in `limitHoles` by comparing absolute
     // area not signed

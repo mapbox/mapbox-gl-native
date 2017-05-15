@@ -16,7 +16,7 @@
 using namespace mbgl;
 
 
-TEST(API, RenderWithoutCallback) {
+TEST(API, RenderWithoutCallback) { // NOLINT
     auto log = new FixtureLogObserver();
     Log::setObserver(std::unique_ptr<Log::Observer>(log));
 
@@ -45,7 +45,7 @@ TEST(API, RenderWithoutCallback) {
     EXPECT_EQ(log->count(logMessage), 1u);
 }
 
-TEST(API, RenderWithoutStyle) {
+TEST(API, RenderWithoutStyle) { // NOLINT
     util::RunLoop loop;
 
     HeadlessBackend backend { test::sharedDisplay() };

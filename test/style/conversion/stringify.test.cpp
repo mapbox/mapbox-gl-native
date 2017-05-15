@@ -20,73 +20,73 @@ std::string stringify(const T& t) {
     return s.GetString();
 }
 
-TEST(Stringify, NullValue) {
+TEST(Stringify, NullValue) { // NOLINT
     ASSERT_EQ(stringify(NullValue()), "null");
 }
 
-TEST(Stringify, Boolean) {
+TEST(Stringify, Boolean) { // NOLINT
     ASSERT_EQ(stringify(true), "true");
     ASSERT_EQ(stringify(false), "false");
 }
 
-TEST(Stringify, Uint64) {
+TEST(Stringify, Uint64) { // NOLINT
     ASSERT_EQ(stringify(uint64_t(0)), "0");
     ASSERT_EQ(stringify(uint64_t(1)), "1");
 }
 
-TEST(Stringify, Int64) {
+TEST(Stringify, Int64) { // NOLINT
     ASSERT_EQ(stringify(int64_t(0)), "0");
     ASSERT_EQ(stringify(int64_t(-1)), "-1");
 }
 
-TEST(Stringify, Double) {
+TEST(Stringify, Double) { // NOLINT
     ASSERT_EQ(stringify(0.0), "0.0");
     ASSERT_EQ(stringify(10.1234), "10.1234");
 }
 
-TEST(Stringify, String) {
+TEST(Stringify, String) { // NOLINT
     ASSERT_EQ(stringify(std::string("test")), "\"test\"");
 }
 
-TEST(Stringify, Enum) {
+TEST(Stringify, Enum) { // NOLINT
     ASSERT_EQ(stringify(VisibilityType::Visible), "\"visible\"");
 }
 
-TEST(Stringify, Color) {
+TEST(Stringify, Color) { // NOLINT
     ASSERT_EQ(stringify(Color::blue()), "\"rgba(0,0,255,1)\"");
 }
 
-TEST(Stringify, Array) {
+TEST(Stringify, Array) { // NOLINT
     ASSERT_EQ(stringify(std::array<float, 2> {{ 1, 2 }}), "[1.0,2.0]");
 }
 
-TEST(Stringify, Vector) {
+TEST(Stringify, Vector) { // NOLINT
     ASSERT_EQ(stringify(std::vector<float> {{ 1, 2 }}), "[1.0,2.0]");
 }
 
-TEST(Stringify, Map) {
+TEST(Stringify, Map) { // NOLINT
     ASSERT_EQ(stringify(std::unordered_map<std::string, float> {{ "a", 1 }}), "{\"a\":1.0}");
 }
 
-TEST(Stringify, Value) {
+TEST(Stringify, Value) { // NOLINT
     ASSERT_EQ(stringify(Value(true)), "true");
     ASSERT_EQ(stringify(Value(uint64_t(0))), "0");
     ASSERT_EQ(stringify(Value(1.2)), "1.2");
 }
 
-TEST(Stringify, Filter) {
+TEST(Stringify, Filter) { // NOLINT
     ASSERT_EQ(stringify(NullFilter()), "null");
     ASSERT_EQ(stringify(EqualsFilter { "a", 1.0 }), "[\"==\",\"a\",1.0]");
 }
 
-TEST(Stringify, CameraFunction) {
+TEST(Stringify, CameraFunction) { // NOLINT
     ASSERT_EQ(stringify(CameraFunction<float>(ExponentialStops<float> { {{0, 1}}, 2 })),
         "{\"type\":\"exponential\",\"base\":2.0,\"stops\":[[0.0,1.0]]}");
     ASSERT_EQ(stringify(CameraFunction<float>(IntervalStops<float> { {{0, 1}} })),
         "{\"type\":\"interval\",\"stops\":[[0.0,1.0]]}");
 }
 
-TEST(Stringify, SourceFunction) {
+TEST(Stringify, SourceFunction) { // NOLINT
     ASSERT_EQ(stringify(SourceFunction<float>("property", ExponentialStops<float> { {{0, 1}}, 2 })),
         "{\"property\":\"property\",\"type\":\"exponential\",\"base\":2.0,\"stops\":[[0.0,1.0]]}");
     ASSERT_EQ(stringify(SourceFunction<float>("property", IntervalStops<float> { {{0, 1}} })),
@@ -99,7 +99,7 @@ TEST(Stringify, SourceFunction) {
         "{\"property\":\"property\",\"type\":\"identity\",\"default\":0.0}");
 }
 
-TEST(Stringify, CompositeFunction) {
+TEST(Stringify, CompositeFunction) { // NOLINT
     ASSERT_EQ(stringify(CompositeFunction<float>("property",
         CompositeExponentialStops<float> {
             {
@@ -114,13 +114,13 @@ TEST(Stringify, CompositeFunction) {
             "[{\"zoom\":1.0,\"value\":0.0},1.0]],\"default\":0.0}");
 }
 
-TEST(Stringify, PropertyValue) {
+TEST(Stringify, PropertyValue) { // NOLINT
     ASSERT_EQ(stringify(PropertyValue<float>(1)), "1.0");
     ASSERT_EQ(stringify(PropertyValue<float>(CameraFunction<float>(ExponentialStops<float> { {{0, 1}}, 2 }))),
         "{\"type\":\"exponential\",\"base\":2.0,\"stops\":[[0.0,1.0]]}");
 }
 
-TEST(Stringify, Layout) {
+TEST(Stringify, Layout) { // NOLINT
     ASSERT_EQ(stringify(SymbolLayoutProperties()), "{}");
 
     SymbolLayoutProperties layout;

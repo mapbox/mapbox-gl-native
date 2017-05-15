@@ -20,7 +20,7 @@ std::string toAbsoluteURL(const std::string& fileName) {
 
 using namespace mbgl;
 
-TEST(LocalFileSource, EmptyFile) {
+TEST(LocalFileSource, EmptyFile) { // NOLINT
     util::RunLoop loop;
 
     LocalFileSource fs;
@@ -36,7 +36,7 @@ TEST(LocalFileSource, EmptyFile) {
     loop.run();
 }
 
-TEST(LocalFileSource, NonEmptyFile) {
+TEST(LocalFileSource, NonEmptyFile) { // NOLINT
     util::RunLoop loop;
 
     LocalFileSource fs;
@@ -52,7 +52,7 @@ TEST(LocalFileSource, NonEmptyFile) {
     loop.run();
 }
 
-TEST(LocalFileSource, NonExistentFile) {
+TEST(LocalFileSource, NonExistentFile) { // NOLINT
     util::RunLoop loop;
 
     LocalFileSource fs;
@@ -69,7 +69,7 @@ TEST(LocalFileSource, NonExistentFile) {
     loop.run();
 }
 
-TEST(LocalFileSource, ReadDirectory) {
+TEST(LocalFileSource, ReadDirectory) { // NOLINT
     util::RunLoop loop;
 
     LocalFileSource fs;
@@ -86,7 +86,7 @@ TEST(LocalFileSource, ReadDirectory) {
     loop.run();
 }
 
-TEST(LocalFileSource, URLEncoding) {
+TEST(LocalFileSource, URLEncoding) { // NOLINT
     util::RunLoop loop;
 
     LocalFileSource fs;
@@ -102,7 +102,7 @@ TEST(LocalFileSource, URLEncoding) {
     loop.run();
 }
 
-TEST(LocalFileSource, URLLimit) {
+TEST(LocalFileSource, URLLimit) { // NOLINT
     util::RunLoop loop;
 
     size_t length = PATH_MAX - toAbsoluteURL("").size();

@@ -8,7 +8,7 @@
 
 using namespace mbgl;
 
-TEST(Mapbox, SourceURL) {
+TEST(Mapbox, SourceURL) { // NOLINT
     EXPECT_EQ(
         "https://api.mapbox.com/v4/user.map.json?access_token=key&secure",
         mbgl::util::mapbox::normalizeSourceURL(util::API_BASE_URL, "mapbox://user.map", "key"));
@@ -29,7 +29,7 @@ TEST(Mapbox, SourceURL) {
         std::runtime_error);
 }
 
-TEST(Mapbox, GlyphsURL) {
+TEST(Mapbox, GlyphsURL) { // NOLINT
     EXPECT_EQ(
         "https://api.mapbox.com/fonts/v1/boxmap/Comic%20Sans/0-255.pbf?access_token=key",
         mbgl::util::mapbox::normalizeGlyphsURL(util::API_BASE_URL, "mapbox://fonts/boxmap/Comic%20Sans/0-255.pbf", "key"));
@@ -47,7 +47,7 @@ TEST(Mapbox, GlyphsURL) {
         mbgl::util::mapbox::normalizeGlyphsURL(util::API_BASE_URL, "mapbox://path", "key"));
 }
 
-TEST(Mapbox, StyleURL) {
+TEST(Mapbox, StyleURL) { // NOLINT
     EXPECT_EQ(
         "mapbox://foo",
         mbgl::util::mapbox::normalizeStyleURL(util::API_BASE_URL, "mapbox://foo", "key"));
@@ -71,7 +71,7 @@ TEST(Mapbox, StyleURL) {
         mbgl::util::mapbox::normalizeStyleURL(util::API_BASE_URL, "http://path", "key"));
 }
 
-TEST(Mapbox, SpriteURL) {
+TEST(Mapbox, SpriteURL) { // NOLINT
     EXPECT_EQ(
         "map/box/sprites@2x.json",
         mbgl::util::mapbox::normalizeSpriteURL(util::API_BASE_URL, "map/box/sprites@2x.json", "key"));
@@ -98,7 +98,7 @@ TEST(Mapbox, SpriteURL) {
     EXPECT_EQ("mapbox://////", mbgl::util::mapbox::normalizeSpriteURL(util::API_BASE_URL, "mapbox://////", "key"));
 }
 
-TEST(Mapbox, TileURL) {
+TEST(Mapbox, TileURL) { // NOLINT
     EXPECT_EQ(
         "https://api.mapbox.com/v4/a.b/0/0/0.pbf?access_token=key",
         mbgl::util::mapbox::normalizeTileURL(util::API_BASE_URL, "mapbox://tiles/a.b/0/0/0.pbf", "key"));
@@ -125,7 +125,7 @@ TEST(Mapbox, TileURL) {
         mbgl::util::mapbox::normalizeSpriteURL(util::API_BASE_URL, "http://path", "key"));
 }
 
-TEST(Mapbox, CanonicalURL) {
+TEST(Mapbox, CanonicalURL) { // NOLINT
     EXPECT_EQ(
         "mapbox://tiles/a.b/{z}/{x}/{y}.vector.pbf",
         mbgl::util::mapbox::canonicalizeTileURL("http://a.tiles.mapbox.com/v4/a.b/{z}/{x}/{y}.vector.pbf", SourceType::Vector, 512));
@@ -212,7 +212,7 @@ TEST(Mapbox, CanonicalURL) {
         mbgl::util::mapbox::canonicalizeTileURL("http://api.mapbox.com/v4/a.b/{z}/{x}/{y}/.", SourceType::Raster, 256));
 }
 
-TEST(Mapbox, CanonicalizeRasterTileset) {
+TEST(Mapbox, CanonicalizeRasterTileset) { // NOLINT
     mbgl::Tileset tileset;
     tileset.tiles = {
         "http://a.tiles.mapbox.com/v4/mapbox.satellite/{z}/{x}/{y}.png?access_token=key"
@@ -227,7 +227,7 @@ TEST(Mapbox, CanonicalizeRasterTileset) {
 #endif
 }
 
-TEST(Mapbox, CanonicalizeVectorTileset) {
+TEST(Mapbox, CanonicalizeVectorTileset) { // NOLINT
     mbgl::Tileset tileset;
     tileset.tiles = {
         "http://a.tiles.mapbox.com/v4/mapbox.streets/{z}/{x}/{y}.vector.pbf?access_token=key"

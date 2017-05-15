@@ -5,7 +5,7 @@
 
 using namespace mbgl;
 
-TEST(Math, MinMaxFloatingPoint) {
+TEST(Math, MinMaxFloatingPoint) { // NOLINT
     double minimumValue = std::numeric_limits<double>::min();
     double lowestValue = std::numeric_limits<double>::lowest();
     double maximumValue = std::numeric_limits<double>::max();
@@ -21,7 +21,7 @@ TEST(Math, MinMaxFloatingPoint) {
     ASSERT_DOUBLE_EQ(10., util::max(8., 9., 10.));
 }
 
-TEST(Math, MinMaxIntegral) {
+TEST(Math, MinMaxIntegral) { // NOLINT
     int32_t minimumValue = std::numeric_limits<int32_t>::min();
     int32_t lowestValue = std::numeric_limits<int32_t>::lowest();
     int32_t maximumValue = std::numeric_limits<int32_t>::max();

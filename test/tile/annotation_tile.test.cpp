@@ -39,7 +39,7 @@ public:
 };
 
 // Don't query stale collision tile
-TEST(AnnotationTile, Issue8289) {
+TEST(AnnotationTile, Issue8289) { // NOLINT
     AnnotationTileTest test;
     AnnotationTile tile(OverscaledTileID(0, 0, 0), test.tileParameters);
 

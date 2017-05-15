@@ -12,7 +12,7 @@ static StubGeometryTileFeature oneInteger {
     PropertyMap {{ "property", uint64_t(1) }}
 };
 
-TEST(CompositeFunction, ZoomInterpolation) {
+TEST(CompositeFunction, ZoomInterpolation) { // NOLINT
     EXPECT_EQ(40.0f, CompositeFunction<float>("property", CompositeExponentialStops<float>({
         {0.0f, {{uint64_t(1), 24.0f}}},
         {1.5f, {{uint64_t(1), 36.0f}}},

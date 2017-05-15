@@ -21,7 +21,7 @@ using Messages = std::vector<Message>;
 
 class StyleParserTest : public ::testing::TestWithParam<std::string> {};
 
-TEST_P(StyleParserTest, ParseStyle) {
+TEST_P(StyleParserTest, ParseStyle) { // NOLINT
     const std::string base = std::string("test/fixtures/style_parser/") + GetParam();
 
     rapidjson::GenericDocument<rapidjson::UTF8<>, rapidjson::CrtAllocator> infoDoc;
@@ -73,7 +73,7 @@ TEST_P(StyleParserTest, ParseStyle) {
     }
 }
 
-INSTANTIATE_TEST_CASE_P(StyleParser, StyleParserTest, ::testing::ValuesIn([] {
+INSTANTIATE_TEST_CASE_P(StyleParser, StyleParserTest, ::testing::ValuesIn([] { // NOLINT
     std::vector<std::string> names;
     const std::string ending = ".info.json";
 
@@ -93,7 +93,7 @@ INSTANTIATE_TEST_CASE_P(StyleParser, StyleParserTest, ::testing::ValuesIn([] {
     return names;
 }()));
 
-TEST(StyleParser, FontStacks) {
+TEST(StyleParser, FontStacks) { // NOLINT
     style::Parser parser;
     parser.parse(util::read_file("test/fixtures/style_parser/font_stacks.json"));
     auto result = parser.fontStacks();

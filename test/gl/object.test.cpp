@@ -26,7 +26,7 @@ struct MockGLObject {
 
 const bool MockGLObject::Default = false;
 
-TEST(GLObject, Value) {
+TEST(GLObject, Value) { // NOLINT
     setFlag = false;
 
     auto object = std::make_unique<gl::State<MockGLObject>>();
@@ -46,7 +46,7 @@ TEST(GLObject, Value) {
     EXPECT_TRUE(setFlag);
 }
 
-TEST(GLObject, Store) {
+TEST(GLObject, Store) { // NOLINT
     HeadlessBackend backend { test::sharedDisplay() };
     BackendScope scope { backend };
     OffscreenView view(backend.getContext());

@@ -11,7 +11,7 @@
 
 using namespace mbgl;
 
-TEST(TileCoordinate, FromLatLng) {
+TEST(TileCoordinate, FromLatLng) { // NOLINT
 
     size_t changeCount = 0;
     struct TransformObserver : public mbgl::MapObserver {
@@ -86,7 +86,7 @@ TEST(TileCoordinate, FromLatLng) {
     }
 }
 
-TEST(TileCoordinate, ToGeometryCoordinate) {
+TEST(TileCoordinate, ToGeometryCoordinate) { // NOLINT
     std::vector<Point<double>> edges {
         { 0.5, 0.5 }, { 0, 0 }, { 1, 0 }, { 1, 1 }, { 0, 1 }
     };

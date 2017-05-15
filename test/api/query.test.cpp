@@ -37,7 +37,7 @@ public:
 
 } // end namespace
 
-TEST(Query, QueryRenderedFeatures) {
+TEST(Query, QueryRenderedFeatures) { // NOLINT
     QueryTest test;
 
     auto features1 = test.map.queryRenderedFeatures(test.map.pixelForLatLng({ 0, 0 }));
@@ -47,7 +47,7 @@ TEST(Query, QueryRenderedFeatures) {
     EXPECT_EQ(features2.size(), 0u);
 }
 
-TEST(Query, QueryRenderedFeaturesFilterLayer) {
+TEST(Query, QueryRenderedFeaturesFilterLayer) { // NOLINT
     QueryTest test;
 
     auto zz = test.map.pixelForLatLng({ 0, 0 });
@@ -65,7 +65,7 @@ TEST(Query, QueryRenderedFeaturesFilterLayer) {
     EXPECT_EQ(features4.size(), 1u);
 }
 
-TEST(Query, QueryRenderedFeaturesFilter) {
+TEST(Query, QueryRenderedFeaturesFilter) { // NOLINT
     QueryTest test;
 
     auto zz = test.map.pixelForLatLng({ 0, 0 });
@@ -83,14 +83,14 @@ TEST(Query, QueryRenderedFeaturesFilter) {
     EXPECT_EQ(features3.size(), 1u);
 }
 
-TEST(Query, QuerySourceFeatures) {
+TEST(Query, QuerySourceFeatures) { // NOLINT
     QueryTest test;
 
     auto features1 = test.map.querySourceFeatures("source3");
     EXPECT_EQ(features1.size(), 1u);
 }
 
-TEST(Query, QuerySourceFeaturesOptionValidation) {
+TEST(Query, QuerySourceFeaturesOptionValidation) { // NOLINT
     QueryTest test;
 
     // GeoJSONSource, doesn't require a layer id
@@ -106,7 +106,7 @@ TEST(Query, QuerySourceFeaturesOptionValidation) {
     ASSERT_EQ(features.size(), 0u);
 }
 
-TEST(Query, QuerySourceFeaturesFilter) {
+TEST(Query, QuerySourceFeaturesFilter) { // NOLINT
     QueryTest test;
 
     const EqualsFilter eqFilter = { "key1", std::string("value1") };

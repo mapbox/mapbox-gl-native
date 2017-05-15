@@ -76,7 +76,7 @@ public:
     }
 };
 
-TEST(Source, LoadingFail) {
+TEST(Source, LoadingFail) { // NOLINT
     SourceTest test;
 
     test.fileSource.sourceResponse = [&] (const Resource& resource) {
@@ -101,7 +101,7 @@ TEST(Source, LoadingFail) {
     test.run();
 }
 
-TEST(Source, LoadingCorrupt) {
+TEST(Source, LoadingCorrupt) { // NOLINT
     SourceTest test;
 
     test.fileSource.sourceResponse = [&] (const Resource& resource) {
@@ -124,7 +124,7 @@ TEST(Source, LoadingCorrupt) {
     test.run();
 }
 
-TEST(Source, RasterTileEmpty) {
+TEST(Source, RasterTileEmpty) { // NOLINT
     SourceTest test;
 
     test.fileSource.tileResponse = [&] (const Resource&) {
@@ -155,7 +155,7 @@ TEST(Source, RasterTileEmpty) {
     test.run();
 }
 
-TEST(Source, VectorTileEmpty) {
+TEST(Source, VectorTileEmpty) { // NOLINT
     SourceTest test;
 
     test.fileSource.tileResponse = [&] (const Resource&) {
@@ -186,7 +186,7 @@ TEST(Source, VectorTileEmpty) {
     test.run();
 }
 
-TEST(Source, RasterTileFail) {
+TEST(Source, RasterTileFail) { // NOLINT
     SourceTest test;
 
     test.fileSource.tileResponse = [&] (const Resource&) {
@@ -217,7 +217,7 @@ TEST(Source, RasterTileFail) {
     test.run();
 }
 
-TEST(Source, VectorTileFail) {
+TEST(Source, VectorTileFail) { // NOLINT
     SourceTest test;
 
     test.fileSource.tileResponse = [&] (const Resource&) {
@@ -248,7 +248,7 @@ TEST(Source, VectorTileFail) {
     test.run();
 }
 
-TEST(Source, RasterTileCorrupt) {
+TEST(Source, RasterTileCorrupt) { // NOLINT
     SourceTest test;
 
     test.fileSource.tileResponse = [&] (const Resource&) {
@@ -278,7 +278,7 @@ TEST(Source, RasterTileCorrupt) {
     test.run();
 }
 
-TEST(Source, VectorTileCorrupt) {
+TEST(Source, VectorTileCorrupt) { // NOLINT
     SourceTest test;
 
     test.fileSource.tileResponse = [&] (const Resource&) {
@@ -312,7 +312,7 @@ TEST(Source, VectorTileCorrupt) {
     test.run();
 }
 
-TEST(Source, RasterTileCancel) {
+TEST(Source, RasterTileCancel) { // NOLINT
     SourceTest test;
 
     test.fileSource.tileResponse = [&] (const Resource&) {
@@ -341,7 +341,7 @@ TEST(Source, RasterTileCancel) {
     test.run();
 }
 
-TEST(Source, VectorTileCancel) {
+TEST(Source, VectorTileCancel) { // NOLINT
     SourceTest test;
 
     test.fileSource.tileResponse = [&] (const Resource&) {
@@ -370,7 +370,7 @@ TEST(Source, VectorTileCancel) {
     test.run();
 }
 
-TEST(Source, RasterTileAttribution) {
+TEST(Source, RasterTileAttribution) { // NOLINT
     SourceTest test;
 
     std::string mapboxOSM = ("<a href='https://www.mapbox.com/about/maps/' target='_blank'>&copy; Mapbox</a> "
@@ -407,7 +407,7 @@ TEST(Source, RasterTileAttribution) {
     test.run();
 }
 
-TEST(Source, GeoJSonSourceUrlUpdate) {
+TEST(Source, GeoJSonSourceUrlUpdate) { // NOLINT
     SourceTest test;
 
     test.fileSource.sourceResponse = [&] (const Resource& resource) {

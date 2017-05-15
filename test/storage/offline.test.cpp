@@ -11,13 +11,13 @@ static const LatLngBounds sanFrancisco =
 static const LatLngBounds sanFranciscoWrapped =
     LatLngBounds::hull({ 37.6609, 238.5744 }, { 37.8271, 238.3204 });
 
-TEST(OfflineTilePyramidRegionDefinition, TileCoverEmpty) {
+TEST(OfflineTilePyramidRegionDefinition, TileCoverEmpty) { // NOLINT
     OfflineTilePyramidRegionDefinition region("", LatLngBounds::empty(), 0, 20, 1.0);
 
     EXPECT_EQ((std::vector<CanonicalTileID>{}), region.tileCover(SourceType::Vector, 512, { 0, 22 }));
 }
 
-TEST(OfflineTilePyramidRegionDefinition, TileCoverZoomIntersection) {
+TEST(OfflineTilePyramidRegionDefinition, TileCoverZoomIntersection) { // NOLINT
     OfflineTilePyramidRegionDefinition region("", sanFrancisco, 2, 2, 1.0);
 
     EXPECT_EQ((std::vector<CanonicalTileID>{ { 2, 0, 1 } }),
@@ -26,7 +26,7 @@ TEST(OfflineTilePyramidRegionDefinition, TileCoverZoomIntersection) {
     EXPECT_EQ((std::vector<CanonicalTileID>{}), region.tileCover(SourceType::Vector, 512, { 3, 22 }));
 }
 
-TEST(OfflineTilePyramidRegionDefinition, TileCoverTileSize) {
+TEST(OfflineTilePyramidRegionDefinition, TileCoverTileSize) { // NOLINT
     OfflineTilePyramidRegionDefinition region("", LatLngBounds::world(), 0, 0, 1.0);
 
     EXPECT_EQ((std::vector<CanonicalTileID>{ { 0, 0, 0 } }),
@@ -36,7 +36,7 @@ TEST(OfflineTilePyramidRegionDefinition, TileCoverTileSize) {
               region.tileCover(SourceType::Vector, 256, { 0, 22 }));
 }
 
-TEST(OfflineTilePyramidRegionDefinition, TileCoverZoomRounding) {
+TEST(OfflineTilePyramidRegionDefinition, TileCoverZoomRounding) { // NOLINT
     OfflineTilePyramidRegionDefinition region("", sanFrancisco, 0.6, 0.7, 1.0);
 
     EXPECT_EQ((std::vector<CanonicalTileID>{ { 0, 0, 0 } }),
@@ -46,7 +46,7 @@ TEST(OfflineTilePyramidRegionDefinition, TileCoverZoomRounding) {
               region.tileCover(SourceType::Raster, 512, { 0, 22 }));
 }
 
-TEST(OfflineTilePyramidRegionDefinition, TileCoverWrapped) {
+TEST(OfflineTilePyramidRegionDefinition, TileCoverWrapped) { // NOLINT
     OfflineTilePyramidRegionDefinition region("", sanFranciscoWrapped, 0, 0, 1.0);
 
     EXPECT_EQ((std::vector<CanonicalTileID>{ { 0, 0, 0 } }),

@@ -10,7 +10,7 @@
 using namespace mbgl;
 using namespace std::chrono_literals;
 
-TEST(Actor, Construction) {
+TEST(Actor, Construction) { // NOLINT
     // Construction is currently synchronous. It may become asynchronous in the future.
 
     struct Test {
@@ -26,7 +26,7 @@ TEST(Actor, Construction) {
     EXPECT_TRUE(constructed);
 }
 
-TEST(Actor, DestructionClosesMailbox) {
+TEST(Actor, DestructionClosesMailbox) { // NOLINT
     // Destruction blocks until the actor is not receiving.
 
     struct Test {
@@ -67,7 +67,7 @@ TEST(Actor, DestructionClosesMailbox) {
     exitingPromise.set_value();
 }
 
-TEST(Actor, OrderedMailbox) {
+TEST(Actor, OrderedMailbox) { // NOLINT
     // Messages are processed in order.
 
     struct Test {
@@ -102,7 +102,7 @@ TEST(Actor, OrderedMailbox) {
     endedFuture.wait();
 }
 
-TEST(Actor, NonConcurrentMailbox) {
+TEST(Actor, NonConcurrentMailbox) { // NOLINT
     // An individual actor is never itself concurrent.
 
     struct Test {

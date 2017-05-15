@@ -18,7 +18,7 @@ static std::vector<std::unique_ptr<RenderLayer>> toRenderLayers(const std::vecto
     return result;
 }
 
-TEST(GroupByLayout, Related) {
+TEST(GroupByLayout, Related) { // NOLINT
     std::vector<std::unique_ptr<Layer>> layers;
     layers.push_back(std::make_unique<LineLayer>("a", "source"));
     layers.push_back(std::make_unique<LineLayer>("b", "source"));
@@ -27,7 +27,7 @@ TEST(GroupByLayout, Related) {
     ASSERT_EQ(2u, result[0].size());
 }
 
-TEST(GroupByLayout, UnrelatedType) {
+TEST(GroupByLayout, UnrelatedType) { // NOLINT
     std::vector<std::unique_ptr<Layer>> layers;
     layers.push_back(std::make_unique<BackgroundLayer>("background"));
     layers.push_back(std::make_unique<CircleLayer>("circle", "source"));
@@ -35,7 +35,7 @@ TEST(GroupByLayout, UnrelatedType) {
     ASSERT_EQ(2u, result.size());
 }
 
-TEST(GroupByLayout, UnrelatedFilter) {
+TEST(GroupByLayout, UnrelatedFilter) { // NOLINT
     std::vector<std::unique_ptr<Layer>> layers;
     layers.push_back(std::make_unique<LineLayer>("a", "source"));
     layers.push_back(std::make_unique<LineLayer>("b", "source"));
@@ -44,7 +44,7 @@ TEST(GroupByLayout, UnrelatedFilter) {
     ASSERT_EQ(2u, result.size());
 }
 
-TEST(GroupByLayout, UnrelatedLayout) {
+TEST(GroupByLayout, UnrelatedLayout) { // NOLINT
     std::vector<std::unique_ptr<Layer>> layers;
     layers.push_back(std::make_unique<LineLayer>("a", "source"));
     layers.push_back(std::make_unique<LineLayer>("b", "source"));

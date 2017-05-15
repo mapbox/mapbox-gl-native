@@ -58,7 +58,7 @@ public:
     }
 };
 
-TEST(OfflineDownload, NoSubresources) {
+TEST(OfflineDownload, NoSubresources) { // NOLINT
     OfflineTest test;
     OfflineRegion region = test.createRegion();
     OfflineDownload download(
@@ -98,7 +98,7 @@ TEST(OfflineDownload, NoSubresources) {
     test.loop.run();
 }
 
-TEST(OfflineDownload, InlineSource) {
+TEST(OfflineDownload, InlineSource) { // NOLINT
     OfflineTest test;
     OfflineRegion region = test.createRegion();
     OfflineDownload download(
@@ -138,7 +138,7 @@ TEST(OfflineDownload, InlineSource) {
     test.loop.run();
 }
 
-TEST(OfflineDownload, GeoJSONSource) {
+TEST(OfflineDownload, GeoJSONSource) { // NOLINT
     OfflineTest test;
     OfflineRegion region = test.createRegion();
     OfflineDownload download(
@@ -173,7 +173,7 @@ TEST(OfflineDownload, GeoJSONSource) {
     test.loop.run();
 }
 
-TEST(OfflineDownload, Activate) {
+TEST(OfflineDownload, Activate) { // NOLINT
     OfflineTest test;
     OfflineRegion region = test.createRegion();
     OfflineDownload download(
@@ -242,7 +242,7 @@ TEST(OfflineDownload, Activate) {
     test.loop.run();
 }
 
-TEST(OfflineDownload, DoesNotFloodTheFileSourceWithRequests) {
+TEST(OfflineDownload, DoesNotFloodTheFileSourceWithRequests) { // NOLINT
     FakeFileSource fileSource;
     OfflineTest test;
     OfflineRegion region = test.createRegion();
@@ -265,7 +265,7 @@ TEST(OfflineDownload, DoesNotFloodTheFileSourceWithRequests) {
     EXPECT_EQ(HTTPFileSource::maximumConcurrentRequests(), fileSource.requests.size());
 }
 
-TEST(OfflineDownload, GetStatusNoResources) {
+TEST(OfflineDownload, GetStatusNoResources) { // NOLINT
     OfflineTest test;
     OfflineRegion region = test.createRegion();
     OfflineDownload download(
@@ -282,7 +282,7 @@ TEST(OfflineDownload, GetStatusNoResources) {
     EXPECT_FALSE(status.complete());
 }
 
-TEST(OfflineDownload, GetStatusStyleComplete) {
+TEST(OfflineDownload, GetStatusStyleComplete) { // NOLINT
     OfflineTest test;
     OfflineRegion region = test.createRegion();
     OfflineDownload download(
@@ -304,7 +304,7 @@ TEST(OfflineDownload, GetStatusStyleComplete) {
     EXPECT_FALSE(status.complete());
 }
 
-TEST(OfflineDownload, GetStatusStyleAndSourceComplete) {
+TEST(OfflineDownload, GetStatusStyleAndSourceComplete) { // NOLINT
     OfflineTest test;
     OfflineRegion region = test.createRegion();
     OfflineDownload download(
@@ -330,7 +330,7 @@ TEST(OfflineDownload, GetStatusStyleAndSourceComplete) {
     EXPECT_FALSE(status.complete());
 }
 
-TEST(OfflineDownload, RequestError) {
+TEST(OfflineDownload, RequestError) { // NOLINT
     OfflineTest test;
     OfflineRegion region = test.createRegion();
     OfflineDownload download(
@@ -358,7 +358,7 @@ TEST(OfflineDownload, RequestError) {
     test.loop.run();
 }
 
-TEST(OfflineDownload, RequestErrorsAreRetried) {
+TEST(OfflineDownload, RequestErrorsAreRetried) { // NOLINT
     OfflineTest test;
     OfflineRegion region = test.createRegion();
     OfflineDownload download(
@@ -391,7 +391,7 @@ TEST(OfflineDownload, RequestErrorsAreRetried) {
     test.loop.run();
 }
 
-TEST(OfflineDownload, TileCountLimitExceededNoTileResponse) {
+TEST(OfflineDownload, TileCountLimitExceededNoTileResponse) { // NOLINT
     OfflineTest test;
     OfflineRegion region = test.createRegion();
     OfflineDownload download(
@@ -433,7 +433,7 @@ TEST(OfflineDownload, TileCountLimitExceededNoTileResponse) {
     test.loop.run();
 }
 
-TEST(OfflineDownload, TileCountLimitExceededWithTileResponse) {
+TEST(OfflineDownload, TileCountLimitExceededWithTileResponse) { // NOLINT
     OfflineTest test;
     OfflineRegion region = test.createRegion();
     OfflineDownload download(
@@ -487,7 +487,7 @@ TEST(OfflineDownload, TileCountLimitExceededWithTileResponse) {
     test.loop.run();
 }
 
-TEST(OfflineDownload, WithPreviouslyExistingTile) {
+TEST(OfflineDownload, WithPreviouslyExistingTile) { // NOLINT
     OfflineTest test;
     OfflineRegion region = test.createRegion();
     OfflineDownload download(
@@ -521,7 +521,7 @@ TEST(OfflineDownload, WithPreviouslyExistingTile) {
     test.loop.run();
 }
 
-TEST(OfflineDownload, ReactivatePreviouslyCompletedDownload) {
+TEST(OfflineDownload, ReactivatePreviouslyCompletedDownload) { // NOLINT
     OfflineTest test;
     OfflineRegion region = test.createRegion();
     OfflineDownload download(
@@ -588,7 +588,7 @@ TEST(OfflineDownload, ReactivatePreviouslyCompletedDownload) {
     EXPECT_EQ(2u, statusesAfterReactivate[2].completedResourceCount);
 }
 
-TEST(OfflineDownload, Deactivate) {
+TEST(OfflineDownload, Deactivate) { // NOLINT
     OfflineTest test;
     OfflineRegion region = test.createRegion();
     OfflineDownload download(

@@ -9,7 +9,7 @@
 
 using namespace mbgl;
 
-TEST(SpriteImageCollection, OtherPixelRatio) {
+TEST(SpriteImageCollection, OtherPixelRatio) { // NOLINT
     FixtureLog log;
     Images images;
 
@@ -17,7 +17,7 @@ TEST(SpriteImageCollection, OtherPixelRatio) {
     addSpriteImage(images, "one", std::make_unique<style::Image>(PremultipliedImage({ 8, 8 }), 2));
 }
 
-TEST(SpriteImageCollection, Replace) {
+TEST(SpriteImageCollection, Replace) { // NOLINT
     FixtureLog log;
     Images images;
 
@@ -27,7 +27,7 @@ TEST(SpriteImageCollection, Replace) {
     EXPECT_NE(image, images.find("sprite")->second.get());
 }
 
-TEST(SpriteImageCollection, ReplaceWithDifferentDimensions) {
+TEST(SpriteImageCollection, ReplaceWithDifferentDimensions) { // NOLINT
     FixtureLog log;
     Images images;
 

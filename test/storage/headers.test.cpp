@@ -1,7 +1,7 @@
 #include <mbgl/test/util.hpp>
 #include <mbgl/util/http_header.hpp>
 
-TEST(HTTPHeader, Parsing) {
+TEST(HTTPHeader, Parsing) { // NOLINT
     using namespace mbgl;
 
     http::CacheControl cc;

@@ -6,7 +6,7 @@
 
 using namespace mbgl;
 
-TEST(StyleImage, ZeroWidth) {
+TEST(StyleImage, ZeroWidth) { // NOLINT
     try {
         style::Image(PremultipliedImage({ 0, 16 }), 2.0);
         FAIL() << "Expected exception";
@@ -15,7 +15,7 @@ TEST(StyleImage, ZeroWidth) {
     }
 }
 
-TEST(StyleImage, ZeroHeight) {
+TEST(StyleImage, ZeroHeight) { // NOLINT
     try {
         style::Image(PremultipliedImage({ 16, 0 }), 2.0);
         FAIL() << "Expected exception";
@@ -24,7 +24,7 @@ TEST(StyleImage, ZeroHeight) {
     }
 }
 
-TEST(StyleImage, ZeroRatio) {
+TEST(StyleImage, ZeroRatio) { // NOLINT
     try {
         style::Image(PremultipliedImage({ 16, 16 }), 0.0);
         FAIL() << "Expected exception";
@@ -33,7 +33,7 @@ TEST(StyleImage, ZeroRatio) {
     }
 }
 
-TEST(StyleImage, Retina) {
+TEST(StyleImage, Retina) { // NOLINT
     style::Image image(PremultipliedImage({ 32, 24 }), 2.0);
     EXPECT_EQ(16, image.getWidth());
     EXPECT_EQ(32u, image.getImage().size.width);
@@ -42,7 +42,7 @@ TEST(StyleImage, Retina) {
     EXPECT_EQ(2, image.getPixelRatio());
 }
 
-TEST(StyleImage, FractionalRatio) {
+TEST(StyleImage, FractionalRatio) { // NOLINT
     style::Image image(PremultipliedImage({ 20, 12 }), 1.5);
     EXPECT_EQ(float(20.0 / 1.5), image.getWidth());
     EXPECT_EQ(20u, image.getImage().size.width);

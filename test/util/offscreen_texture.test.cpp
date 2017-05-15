@@ -10,7 +10,7 @@
 
 using namespace mbgl;
 
-TEST(OffscreenTexture, EmptyRed) {
+TEST(OffscreenTexture, EmptyRed) { // NOLINT
     HeadlessBackend backend { test::sharedDisplay() };
     BackendScope scope { backend };
     OffscreenView view(backend.getContext(), { 512, 256 });
@@ -68,7 +68,7 @@ struct Buffer {
 };
 
 
-TEST(OffscreenTexture, RenderToTexture) {
+TEST(OffscreenTexture, RenderToTexture) { // NOLINT
     HeadlessBackend backend { test::sharedDisplay() };
     BackendScope scope { backend };
     auto& context = backend.getContext();

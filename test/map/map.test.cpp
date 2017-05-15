@@ -53,7 +53,7 @@ struct MapTest {
     ThreadPool threadPool { 4 };
 };
 
-TEST(Map, LatLngBehavior) {
+TEST(Map, LatLngBehavior) { // NOLINT
     MapTest test;
     Map map(test.backend, test.view.getSize(), 1, test.fileSource, test.threadPool, MapMode::Still);
 
@@ -69,7 +69,7 @@ TEST(Map, LatLngBehavior) {
     ASSERT_DOUBLE_EQ(latLng1.longitude(), latLng2.longitude());
 }
 
-TEST(Map, LatLngBoundsToCamera) {
+TEST(Map, LatLngBoundsToCamera) { // NOLINT
     MapTest test;
     Map map(test.backend, test.view.getSize(), 1, test.fileSource, test.threadPool, MapMode::Still);
 
@@ -81,7 +81,7 @@ TEST(Map, LatLngBoundsToCamera) {
     ASSERT_TRUE(bounds.contains(*virtualCamera.center));
 }
 
-TEST(Map, CameraToLatLngBounds) {
+TEST(Map, CameraToLatLngBounds) { // NOLINT
     MapTest test;
     Map map(test.backend, test.view.getSize(), 1, test.fileSource, test.threadPool, MapMode::Still);
 
@@ -102,7 +102,7 @@ TEST(Map, CameraToLatLngBounds) {
     ASSERT_NEAR(camera.center->longitude(), virtualCamera.center->longitude(), 1e-7);
 }
 
-TEST(Map, Offline) {
+TEST(Map, Offline) { // NOLINT
     MapTest test;
     DefaultFileSource fileSource(":memory:", ".");
 
@@ -133,7 +133,7 @@ TEST(Map, Offline) {
     NetworkStatus::Set(NetworkStatus::Status::Online);
 }
 
-TEST(Map, SetStyleInvalidJSON) {
+TEST(Map, SetStyleInvalidJSON) { // NOLINT
     MapTest test;
 
     Log::setObserver(std::make_unique<FixtureLogObserver>());
@@ -159,7 +159,7 @@ TEST(Map, SetStyleInvalidJSON) {
     EXPECT_TRUE(unchecked.empty()) << unchecked;
 }
 
-TEST(Map, SetStyleInvalidURL) {
+TEST(Map, SetStyleInvalidURL) { // NOLINT
     MapTest test;
 
     test.fileSource.styleResponse = [] (const Resource&) {
@@ -180,7 +180,7 @@ TEST(Map, SetStyleInvalidURL) {
     test.runLoop.run();
 }
 
-TEST(Map, DoubleStyleLoad) {
+TEST(Map, DoubleStyleLoad) { // NOLINT
     MapTest test;
 
     Map map(test.backend, test.view.getSize(), 1, test.fileSource, test.threadPool, MapMode::Still);
@@ -188,7 +188,7 @@ TEST(Map, DoubleStyleLoad) {
     map.setStyleJSON("");
 }
 
-TEST(Map, StyleFresh) {
+TEST(Map, StyleFresh) { // NOLINT
     // The map should not revalidate fresh styles.
 
     MapTest test;
@@ -206,7 +206,7 @@ TEST(Map, StyleFresh) {
     EXPECT_EQ(0u, fileSource.requests.size());
 }
 
-TEST(Map, StyleExpired) {
+TEST(Map, StyleExpired) { // NOLINT
     // The map should allow expired styles to be revalidated, so long as no mutations are made.
 
     using namespace std::chrono_literals;
@@ -233,7 +233,7 @@ TEST(Map, StyleExpired) {
     EXPECT_NE(nullptr, map.getLayer("bg"));
 }
 
-TEST(Map, StyleExpiredWithAnnotations) {
+TEST(Map, StyleExpiredWithAnnotations) { // NOLINT
     // Adding an annotation should not prevent revalidation of an expired style.
 
     using namespace std::chrono_literals;
@@ -259,7 +259,7 @@ TEST(Map, StyleExpiredWithAnnotations) {
     EXPECT_EQ(1u, fileSource.requests.size());
 }
 
-TEST(Map, StyleEarlyMutation) {
+TEST(Map, StyleEarlyMutation) { // NOLINT
     // An early mutation should not prevent the initial style load.
 
     MapTest test;
@@ -277,7 +277,7 @@ TEST(Map, StyleEarlyMutation) {
     EXPECT_NE(nullptr, map.getLayer("water"));
 }
 
-TEST(Map, StyleLoadedSignal) {
+TEST(Map, StyleLoadedSignal) { // NOLINT
     MapTest test;
     Map map(test.backend, test.view.getSize(), 1, test.fileSource, test.threadPool, MapMode::Still);
 
@@ -296,7 +296,7 @@ TEST(Map, StyleLoadedSignal) {
 }
 
 // Test for https://github.com/mapbox/mapbox-gl-native/issues/7902
-TEST(Map, TEST_REQUIRES_SERVER(StyleNetworkErrorRetry)) {
+TEST(Map, TEST_REQUIRES_SERVER(StyleNetworkErrorRetry)) { // NOLINT
     MapTest test;
     OnlineFileSource fileSource;
 
@@ -310,7 +310,7 @@ TEST(Map, TEST_REQUIRES_SERVER(StyleNetworkErrorRetry)) {
     test.runLoop.run();
 }
 
-TEST(Map, TEST_REQUIRES_SERVER(StyleNotFound)) {
+TEST(Map, TEST_REQUIRES_SERVER(StyleNotFound)) { // NOLINT
     MapTest test;
     OnlineFileSource fileSource;
 
@@ -338,7 +338,7 @@ TEST(Map, TEST_REQUIRES_SERVER(StyleNotFound)) {
     test.runLoop.run();
 }
 
-TEST(Map, AddLayer) {
+TEST(Map, AddLayer) { // NOLINT
     MapTest test;
 
     Map map(test.backend, test.view.getSize(), 1, test.fileSource, test.threadPool, MapMode::Still);
@@ -351,7 +351,7 @@ TEST(Map, AddLayer) {
     test::checkImage("test/fixtures/map/add_layer", test::render(map, test.view));
 }
 
-TEST(Map, WithoutVAOExtension) {
+TEST(Map, WithoutVAOExtension) { // NOLINT
     MapTest test;
 
     test.backend.getContext().disableVAOExtension = true;
@@ -364,7 +364,7 @@ TEST(Map, WithoutVAOExtension) {
     test::checkImage("test/fixtures/map/no_vao", test::render(map, test.view), 0.002);
 }
 
-TEST(Map, RemoveLayer) {
+TEST(Map, RemoveLayer) { // NOLINT
     MapTest test;
 
     Map map(test.backend, test.view.getSize(), 1, test.fileSource, test.threadPool, MapMode::Still);
@@ -378,7 +378,7 @@ TEST(Map, RemoveLayer) {
     test::checkImage("test/fixtures/map/remove_layer", test::render(map, test.view));
 }
 
-TEST(Map, DisabledSources) {
+TEST(Map, DisabledSources) { // NOLINT
     MapTest test;
 
     // Always load the same image tile for raster layers.
@@ -439,7 +439,7 @@ TEST(Map, DisabledSources) {
     test::checkImage("test/fixtures/map/disabled_layers/second", test::render(map, test.view));
 }
 
-TEST(Map, Classes) {
+TEST(Map, Classes) { // NOLINT
     MapTest test;
 
     Map map(test.backend, test.view.getSize(), 1, test.fileSource, test.threadPool, MapMode::Still);
@@ -473,7 +473,7 @@ TEST(Map, Classes) {
     EXPECT_FALSE(map.getTransitionOptions().duration);
 }
 
-TEST(Map, AddImage) {
+TEST(Map, AddImage) { // NOLINT
     MapTest test;
 
     Map map(test.backend, test.view.getSize(), 1, test.fileSource, test.threadPool, MapMode::Still);
@@ -490,7 +490,7 @@ TEST(Map, AddImage) {
     test::checkImage("test/fixtures/map/add_icon", test::render(map, test.view));
 }
 
-TEST(Map, RemoveImage) {
+TEST(Map, RemoveImage) { // NOLINT
     MapTest test;
 
     Map map(test.backend, test.view.getSize(), 1, test.fileSource, test.threadPool, MapMode::Still);
@@ -503,7 +503,7 @@ TEST(Map, RemoveImage) {
     test::checkImage("test/fixtures/map/remove_icon", test::render(map, test.view));
 }
 
-TEST(Map, GetImage) {
+TEST(Map, GetImage) { // NOLINT
     MapTest test;
 
     Map map(test.backend, test.view.getSize(), 1, test.fileSource, test.threadPool, MapMode::Still);
@@ -515,7 +515,7 @@ TEST(Map, GetImage) {
     test::checkImage("test/fixtures/map/get_icon", map.getImage("test-icon")->getImage());
 }
 
-TEST(Map, DontLoadUnneededTiles) {
+TEST(Map, DontLoadUnneededTiles) { // NOLINT
     MapTest test;
 
     Map map(test.backend, test.view.getSize(), 1, test.fileSource, test.threadPool, MapMode::Still);
@@ -578,7 +578,7 @@ public:
     }
 };
 
-TEST(Map, TEST_DISABLED_ON_CI(ContinuousRendering)) {
+TEST(Map, TEST_DISABLED_ON_CI(ContinuousRendering)) { // NOLINT
     util::RunLoop runLoop;
     MockBackend backend { test::sharedDisplay() };
     BackendScope scope { backend };

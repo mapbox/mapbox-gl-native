@@ -39,7 +39,7 @@ public:
 
 } // end namespace
 
-TEST(Annotations, SymbolAnnotation) {
+TEST(Annotations, SymbolAnnotation) { // NOLINT
     AnnotationTest test;
 
     test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
@@ -56,7 +56,7 @@ TEST(Annotations, SymbolAnnotation) {
 //    }
 }
 
-TEST(Annotations, LineAnnotation) {
+TEST(Annotations, LineAnnotation) { // NOLINT
     AnnotationTest test;
 
     LineString<double> line = {{ { 0, 0 }, { 45, 45 }, { 30, 0 } }};
@@ -72,7 +72,7 @@ TEST(Annotations, LineAnnotation) {
     test.checkRendering("line_annotation_max_zoom");
 }
 
-TEST(Annotations, FillAnnotation) {
+TEST(Annotations, FillAnnotation) { // NOLINT
     AnnotationTest test;
 
     Polygon<double> polygon = { {{ { 0, 0 }, { 0, 45 }, { 45, 45 }, { 45, 0 } }} };
@@ -87,7 +87,7 @@ TEST(Annotations, FillAnnotation) {
     test.checkRendering("fill_annotation_max_zoom");
 }
 
-TEST(Annotations, AntimeridianAnnotationSmall) {
+TEST(Annotations, AntimeridianAnnotationSmall) { // NOLINT
     AnnotationTest test;
 
     double antimeridian = 180;
@@ -108,7 +108,7 @@ TEST(Annotations, AntimeridianAnnotationSmall) {
     test.checkRendering("antimeridian_annotation_small");
 }
 
-TEST(Annotations, AntimeridianAnnotationLarge) {
+TEST(Annotations, AntimeridianAnnotationLarge) { // NOLINT
     AnnotationTest test;
 
     double antimeridian = 180;
@@ -129,7 +129,7 @@ TEST(Annotations, AntimeridianAnnotationLarge) {
     test.checkRendering("antimeridian_annotation_large");
 }
 
-TEST(Annotations, OverlappingFillAnnotation) {
+TEST(Annotations, OverlappingFillAnnotation) { // NOLINT
     AnnotationTest test;
 
     Polygon<double> polygon = { {{ { 0, 0 }, { 0, 45 }, { 45, 45 }, { 45, 0 } }} };
@@ -144,7 +144,7 @@ TEST(Annotations, OverlappingFillAnnotation) {
     test.checkRendering("overlapping_fill_annotation");
 }
 
-TEST(Annotations, AddMultiple) {
+TEST(Annotations, AddMultiple) { // NOLINT
     AnnotationTest test;
 
     test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
@@ -157,7 +157,7 @@ TEST(Annotations, AddMultiple) {
     test.checkRendering("add_multiple");
 }
 
-TEST(Annotations, NonImmediateAdd) {
+TEST(Annotations, NonImmediateAdd) { // NOLINT
     AnnotationTest test;
 
     test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
@@ -171,7 +171,7 @@ TEST(Annotations, NonImmediateAdd) {
     test.checkRendering("non_immediate_add");
 }
 
-TEST(Annotations, UpdateSymbolAnnotationGeometry) {
+TEST(Annotations, UpdateSymbolAnnotationGeometry) { // NOLINT
     AnnotationTest test;
 
     test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
@@ -185,7 +185,7 @@ TEST(Annotations, UpdateSymbolAnnotationGeometry) {
     test.checkRendering("update_point");
 }
 
-TEST(Annotations, UpdateSymbolAnnotationIcon) {
+TEST(Annotations, UpdateSymbolAnnotationIcon) { // NOLINT
     AnnotationTest test;
 
     test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
@@ -199,7 +199,7 @@ TEST(Annotations, UpdateSymbolAnnotationIcon) {
     test.checkRendering("update_icon");
 }
 
-TEST(Annotations, UpdateLineAnnotationGeometry) {
+TEST(Annotations, UpdateLineAnnotationGeometry) { // NOLINT
     AnnotationTest test;
 
     LineAnnotation annotation { LineString<double> {{ { 0, 0 }, { 45, 45 }, { 30, 0 } }} };
@@ -216,7 +216,7 @@ TEST(Annotations, UpdateLineAnnotationGeometry) {
     test.checkRendering("update_line_geometry");
 }
 
-TEST(Annotations, UpdateLineAnnotationStyle) {
+TEST(Annotations, UpdateLineAnnotationStyle) { // NOLINT
     AnnotationTest test;
 
     LineAnnotation annotation { LineString<double> {{ { 0, 0 }, { 45, 45 }, { 30, 0 } }} };
@@ -234,7 +234,7 @@ TEST(Annotations, UpdateLineAnnotationStyle) {
     test.checkRendering("update_line_style");
 }
 
-TEST(Annotations, UpdateFillAnnotationGeometry) {
+TEST(Annotations, UpdateFillAnnotationGeometry) { // NOLINT
     AnnotationTest test;
 
     FillAnnotation annotation { Polygon<double> { {{ { 0, 0 }, { 0, 45 }, { 45, 45 }, { 45, 0 } }} } };
@@ -250,7 +250,7 @@ TEST(Annotations, UpdateFillAnnotationGeometry) {
     test.checkRendering("update_fill_geometry");
 }
 
-TEST(Annotations, UpdateFillAnnotationStyle) {
+TEST(Annotations, UpdateFillAnnotationStyle) { // NOLINT
     AnnotationTest test;
 
     Polygon<double> polygon = { {{ { 0, 0 }, { 0, 45 }, { 45, 45 }, { 45, 0 } }} };
@@ -267,7 +267,7 @@ TEST(Annotations, UpdateFillAnnotationStyle) {
     test.checkRendering("update_fill_style");
 }
 
-TEST(Annotations, RemovePoint) {
+TEST(Annotations, RemovePoint) { // NOLINT
     AnnotationTest test;
 
     test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
@@ -280,7 +280,7 @@ TEST(Annotations, RemovePoint) {
     test.checkRendering("remove_point");
 }
 
-TEST(Annotations, RemoveShape) {
+TEST(Annotations, RemoveShape) { // NOLINT
     AnnotationTest test;
 
     LineString<double> line = {{ { 0, 0 }, { 45, 45 } }};
@@ -297,7 +297,7 @@ TEST(Annotations, RemoveShape) {
     test.checkRendering("remove_shape");
 }
 
-TEST(Annotations, ImmediateRemoveShape) {
+TEST(Annotations, ImmediateRemoveShape) { // NOLINT
     AnnotationTest test;
 
     test.map.removeAnnotation(test.map.addAnnotation(LineAnnotation { LineString<double>() }));
@@ -306,7 +306,7 @@ TEST(Annotations, ImmediateRemoveShape) {
     test::render(test.map, test.view);
 }
 
-TEST(Annotations, SwitchStyle) {
+TEST(Annotations, SwitchStyle) { // NOLINT
     AnnotationTest test;
 
     test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
@@ -319,7 +319,7 @@ TEST(Annotations, SwitchStyle) {
     test.checkRendering("switch_style");
 }
 
-TEST(Annotations, QueryRenderedFeatures) {
+TEST(Annotations, QueryRenderedFeatures) { // NOLINT
     AnnotationTest test;
 
     test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
@@ -340,7 +340,7 @@ TEST(Annotations, QueryRenderedFeatures) {
     EXPECT_EQ(*features2[0].id, uint64_t(1));
 }
 
-TEST(Annotations, QueryFractionalZoomLevels) {
+TEST(Annotations, QueryFractionalZoomLevels) { // NOLINT
     AnnotationTest test;
 
     auto viewSize = test.view.getSize();
@@ -372,7 +372,7 @@ TEST(Annotations, QueryFractionalZoomLevels) {
     }
 }
 
-TEST(Annotations, VisibleFeatures) {
+TEST(Annotations, VisibleFeatures) { // NOLINT
     AnnotationTest test;
 
     auto viewSize = test.view.getSize();
@@ -410,7 +410,7 @@ TEST(Annotations, VisibleFeatures) {
 }
 
 
-TEST(Annotations, DebugEmpty) {
+TEST(Annotations, DebugEmpty) { // NOLINT
     // This test should render nothing, not even the tile borders. Tile borders are only rendered
     // when there is an actual tile we're trying to render, but since there is no annotation, we
     // should not render them.
@@ -424,7 +424,7 @@ TEST(Annotations, DebugEmpty) {
 }
 
 
-TEST(Annotations, DebugSparse) {
+TEST(Annotations, DebugSparse) { // NOLINT
     // This test should only render the top right tile with the associated tile border, but no other
     // tiles because they're all empty.
     AnnotationTest test;

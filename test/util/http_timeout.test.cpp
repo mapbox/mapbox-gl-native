@@ -6,17 +6,17 @@
 using namespace mbgl;
 using namespace mbgl::http;
 
-TEST(HttpRetry, OtherError) {
+TEST(HttpRetry, OtherError) { // NOLINT
     // Non-retryable
     ASSERT_EQ(Duration::max(), errorRetryTimeout(Response::Error::Reason::Other, 1));
 }
 
-TEST(HttpRetry, NotFound) {
+TEST(HttpRetry, NotFound) { // NOLINT
     // Non-retryable
     ASSERT_EQ(Duration::max(), errorRetryTimeout(Response::Error::Reason::NotFound, 1));
 }
 
-TEST(HttpRetry, ServerError) {
+TEST(HttpRetry, ServerError) { // NOLINT
     // 1-3 failures -> 1 sec
     ASSERT_EQ(Seconds(1), errorRetryTimeout(Response::Error::Reason::Server, 1));
     ASSERT_EQ(Seconds(1), errorRetryTimeout(Response::Error::Reason::Server, 3));
@@ -26,13 +26,13 @@ TEST(HttpRetry, ServerError) {
     ASSERT_EQ(Seconds(1u << 31), errorRetryTimeout(Response::Error::Reason::Server, 50));
 }
 
-TEST(HttpRetry, ConnectionError) {
+TEST(HttpRetry, ConnectionError) { // NOLINT
     // Exponential backoff
     ASSERT_EQ(Seconds(1), errorRetryTimeout(Response::Error::Reason::Server, 1));
     ASSERT_EQ(Seconds(1u << 31), errorRetryTimeout(Response::Error::Reason::Connection, 50));
 }
 
-TEST(HttpRetry, RateLimit) {
+TEST(HttpRetry, RateLimit) { // NOLINT
     // Pre-set value from header
     ASSERT_EQ(Seconds(1), errorRetryTimeout(Response::Error::Reason::Server, 1, { util::now() + Seconds(1) }));
 
@@ -40,18 +40,18 @@ TEST(HttpRetry, RateLimit) {
     ASSERT_EQ(Seconds(5), errorRetryTimeout(Response::Error::Reason::RateLimit, 1, {}));
 }
 
-TEST(HttpRetry, ExpiredInitial) {
+TEST(HttpRetry, ExpiredInitial) { // NOLINT
     // 1 sec timeout
     ASSERT_EQ(Seconds(1), expirationTimeout({ util::now() + Seconds(1) }, 0));
 }
 
-TEST(HttpRetry, ExpiredSubsequent) {
+TEST(HttpRetry, ExpiredSubsequent) { // NOLINT
     // exponential backoff
     ASSERT_EQ(Seconds(1), expirationTimeout({}, 1));
     ASSERT_EQ(Seconds(1u << 31), expirationTimeout({}, 50));
 }
 
-TEST(HttpRetry, ExpiredNotSet) {
+TEST(HttpRetry, ExpiredNotSet) { // NOLINT
     // No expires header set
     ASSERT_EQ(Duration::max(), expirationTimeout({}, 0));
 }

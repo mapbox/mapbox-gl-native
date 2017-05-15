@@ -39,7 +39,7 @@ public:
     };
 };
 
-TEST(GeoJSONTile, Issue7648) {
+TEST(GeoJSONTile, Issue7648) { // NOLINT
     GeoJSONTileTest test;
 
     test.style.addLayer(std::make_unique<CircleLayer>("circle", "source"));

@@ -5,7 +5,7 @@
 
 using namespace mbgl;
 
-TEST(Transform, InvalidZoom) {
+TEST(Transform, InvalidZoom) { // NOLINT
     Transform transform;
 
     ASSERT_DOUBLE_EQ(0, transform.getLatLng().latitude());
@@ -31,7 +31,7 @@ TEST(Transform, InvalidZoom) {
 }
 
 
-TEST(Transform, InvalidBearing) {
+TEST(Transform, InvalidBearing) { // NOLINT
     Transform transform;
 
     ASSERT_DOUBLE_EQ(0, transform.getLatLng().latitude());
@@ -55,7 +55,7 @@ TEST(Transform, InvalidBearing) {
     ASSERT_DOUBLE_EQ(2, transform.getAngle());
 }
 
-TEST(Transform, IntegerZoom) {
+TEST(Transform, IntegerZoom) { // NOLINT
     Transform transform;
 
     auto checkIntegerZoom = [&transform](uint8_t zoomInt, double zoom) {
@@ -76,7 +76,7 @@ TEST(Transform, IntegerZoom) {
     checkIntegerZoom(20, 20.0);
 }
 
-TEST(Transform, PerspectiveProjection) {
+TEST(Transform, PerspectiveProjection) { // NOLINT
     LatLng loc;
 
     Transform transform;
@@ -108,7 +108,7 @@ TEST(Transform, PerspectiveProjection) {
     ASSERT_NEAR(point.y, 0, 0.02);
 }
 
-TEST(Transform, UnwrappedLatLng) {
+TEST(Transform, UnwrappedLatLng) { // NOLINT
     Transform transform;
     transform.resize({ 1000, 1000 });
     transform.setZoom(10);
@@ -138,7 +138,7 @@ TEST(Transform, UnwrappedLatLng) {
     ASSERT_NEAR(wrappedLeftwards.longitude(), -76.99999999988728, 0.001); // 1.1272E-11
 }
 
-TEST(Transform, ConstrainHeightOnly) {
+TEST(Transform, ConstrainHeightOnly) { // NOLINT
     LatLng loc;
 
     Transform transform;
@@ -156,7 +156,7 @@ TEST(Transform, ConstrainHeightOnly) {
     ASSERT_NEAR(util::LONGITUDE_MAX, std::abs(loc.longitude()), 0.001);
 }
 
-TEST(Transform, ConstrainWidthAndHeight) {
+TEST(Transform, ConstrainWidthAndHeight) { // NOLINT
     LatLng loc;
 
     Transform transform(MapObserver::nullObserver(), ConstrainMode::WidthAndHeight);
@@ -174,7 +174,7 @@ TEST(Transform, ConstrainWidthAndHeight) {
     ASSERT_NEAR(util::LONGITUDE_MAX, std::abs(loc.longitude()), 0.001);
 }
 
-TEST(Transform, Anchor) {
+TEST(Transform, Anchor) { // NOLINT
     Transform transform;
     transform.resize({ 1000, 1000 });
 
@@ -274,7 +274,7 @@ TEST(Transform, Anchor) {
     ASSERT_NEAR(anchorLatLng.longitude(), transform.getLatLng().longitude(), 1);
 }
 
-TEST(Transform, Padding) {
+TEST(Transform, Padding) { // NOLINT
     Transform transform;
     transform.resize({ 1000, 1000 });
 
@@ -301,7 +301,7 @@ TEST(Transform, Padding) {
     ASSERT_DOUBLE_EQ(manualShiftedCenter.longitude(), shiftedCenter.longitude());
 }
 
-TEST(Transform, MoveBy) {
+TEST(Transform, MoveBy) { // NOLINT
     Transform transform;
     transform.resize({ 1000, 1000 });
     transform.setLatLngZoom({ 0, 0 }, 10);
@@ -328,7 +328,7 @@ TEST(Transform, MoveBy) {
     ASSERT_NEAR(0, trueCenter.longitude(), 1.1);
 }
 
-TEST(Transform, Antimeridian) {
+TEST(Transform, Antimeridian) { // NOLINT
     Transform transform;
     transform.resize({ 1000, 1000 });
     transform.setLatLngZoom({ 0, 0 }, 1);
@@ -388,7 +388,7 @@ TEST(Transform, Antimeridian) {
     ASSERT_NEAR(coordinateWaikiri.longitude(), coordinateFromPixel.longitude(), 0.000001);
 }
 
-TEST(Transform, Camera) {
+TEST(Transform, Camera) { // NOLINT
     Transform transform;
     transform.resize({ 1000, 1000 });
 
@@ -455,7 +455,7 @@ TEST(Transform, Camera) {
     ASSERT_FALSE(transform.inTransition());
 }
 
-TEST(Transform, DefaultTransform) {
+TEST(Transform, DefaultTransform) { // NOLINT
     struct TransformObserver : public mbgl::MapObserver {
         void onCameraWillChange(MapObserver::CameraChangeMode) final {
             cameraWillChangeCallback();
@@ -528,7 +528,7 @@ TEST(Transform, DefaultTransform) {
     ASSERT_DOUBLE_EQ(point.y, center.y);
 }
 
-TEST(Transform, LatLngBounds) {
+TEST(Transform, LatLngBounds) { // NOLINT
     const LatLng nullIsland {};
     const LatLng sanFrancisco { 37.7749, -122.4194 };
 
@@ -567,7 +567,7 @@ TEST(Transform, LatLngBounds) {
     ASSERT_EQ(transform.getLatLng().longitude(), 0.0);
 }
 
-TEST(Transform, PitchBounds) {
+TEST(Transform, PitchBounds) { // NOLINT
     Transform transform;
     transform.resize({ 1000, 1000 });
     transform.setLatLngZoom({ 0, 0 }, transform.getState().getMaxZoom());

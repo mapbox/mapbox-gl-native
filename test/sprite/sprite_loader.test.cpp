@@ -83,7 +83,7 @@ Response corruptSpriteResponse(const Resource&) {
     return response;
 }
 
-TEST(SpriteLoader, LoadingSuccess) {
+TEST(SpriteLoader, LoadingSuccess) { // NOLINT
     SpriteLoaderTest test;
 
     test.fileSource.spriteImageResponse = successfulSpriteImageResponse;
@@ -102,7 +102,7 @@ TEST(SpriteLoader, LoadingSuccess) {
     test.run();
 }
 
-TEST(SpriteLoader, JSONLoadingFail) {
+TEST(SpriteLoader, JSONLoadingFail) { // NOLINT
     SpriteLoaderTest test;
 
     test.fileSource.spriteImageResponse = successfulSpriteImageResponse;
@@ -117,7 +117,7 @@ TEST(SpriteLoader, JSONLoadingFail) {
     test.run();
 }
 
-TEST(SpriteLoader, ImageLoadingFail) {
+TEST(SpriteLoader, ImageLoadingFail) { // NOLINT
     SpriteLoaderTest test;
 
     test.fileSource.spriteImageResponse = failedSpriteResponse;
@@ -132,7 +132,7 @@ TEST(SpriteLoader, ImageLoadingFail) {
     test.run();
 }
 
-TEST(SpriteLoader, JSONLoadingCorrupted) {
+TEST(SpriteLoader, JSONLoadingCorrupted) { // NOLINT
     SpriteLoaderTest test;
 
     test.fileSource.spriteImageResponse = successfulSpriteImageResponse;
@@ -147,7 +147,7 @@ TEST(SpriteLoader, JSONLoadingCorrupted) {
     test.run();
 }
 
-TEST(SpriteLoader, ImageLoadingCorrupted) {
+TEST(SpriteLoader, ImageLoadingCorrupted) { // NOLINT
     SpriteLoaderTest test;
 
     test.fileSource.spriteImageResponse = corruptSpriteResponse;
@@ -162,7 +162,7 @@ TEST(SpriteLoader, ImageLoadingCorrupted) {
     test.run();
 }
 
-TEST(SpriteLoader, LoadingCancel) {
+TEST(SpriteLoader, LoadingCancel) { // NOLINT
     SpriteLoaderTest test;
 
     test.fileSource.spriteImageResponse =

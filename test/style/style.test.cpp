@@ -14,7 +14,7 @@
 using namespace mbgl;
 using namespace mbgl::style;
 
-TEST(Style, Properties) {
+TEST(Style, Properties) { // NOLINT
     util::RunLoop loop;
 
     ThreadPool threadPool{ 1 };
@@ -49,7 +49,7 @@ TEST(Style, Properties) {
     ASSERT_EQ(0, style.getDefaultPitch());
 }
 
-TEST(Style, DuplicateSource) {
+TEST(Style, DuplicateSource) { // NOLINT
     util::RunLoop loop;
 
     ThreadPool threadPool{ 1 };

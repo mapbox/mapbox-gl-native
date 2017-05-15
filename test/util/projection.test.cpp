@@ -7,7 +7,7 @@
 
 using namespace mbgl;
 
-TEST(Projection, MetersPerPixelAtLatitude) {
+TEST(Projection, MetersPerPixelAtLatitude) { // NOLINT
     double zoom = 0;
     EXPECT_DOUBLE_EQ(Projection::getMetersPerPixelAtLatitude(0, zoom), 78271.516964020484);
     EXPECT_DOUBLE_EQ(Projection::getMetersPerPixelAtLatitude(-util::LATITUDE_MAX, zoom), 6752.2284729446501);
@@ -34,7 +34,7 @@ TEST(Projection, MetersPerPixelAtLatitude) {
                      Projection::getMetersPerPixelAtLatitude(0, util::MAX_ZOOM));
 }
 
-TEST(Projection, ProjectedMeters) {
+TEST(Projection, ProjectedMeters) { // NOLINT
     auto latLng = LatLng {};
     auto projectedMeters = Projection::projectedMetersForLatLng(latLng);
     EXPECT_EQ(projectedMeters.northing(), projectedMeters.easting());
@@ -61,7 +61,7 @@ TEST(Projection, ProjectedMeters) {
     EXPECT_EQ(latLng.longitude(), util::LONGITUDE_MAX);
 }
 
-TEST(Projection, InvalidProjectedMeters) {
+TEST(Projection, InvalidProjectedMeters) { // NOLINT
     try {
         ProjectedMeters { NAN };
         ASSERT_TRUE(false) << "should throw";

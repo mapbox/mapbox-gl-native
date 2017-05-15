@@ -17,7 +17,7 @@ bool evaluate(PropertyValue<bool> value, float zoom) {
     return value.evaluate(PropertyEvaluator<bool>(PropertyEvaluationParameters(zoom), false));
 }
 
-TEST(CameraFunction, Constant) {
+TEST(CameraFunction, Constant) { // NOLINT
     EXPECT_EQ(2.0f, evaluate(PropertyValue<float>(2.0), 0));
     EXPECT_EQ(3.8f, evaluate(PropertyValue<float>(3.8), 0));
     EXPECT_EQ(22.0f, evaluate(PropertyValue<float>(22.0), 0));
@@ -29,7 +29,7 @@ TEST(CameraFunction, Constant) {
     EXPECT_EQ(22.0f, evaluate(PropertyValue<float>(22.0), 22));
 }
 
-TEST(CameraFunction, Stops) {
+TEST(CameraFunction, Stops) { // NOLINT
     // Explicit constant slope in fringe regions.
     CameraFunction<float> slope_1(ExponentialStops<float> { { { 0, 1.5 }, { 6, 1.5 }, { 8, 3 }, { 22, 3 } }, 1.75});
     EXPECT_EQ(1.5, evaluate(slope_1, 0));
