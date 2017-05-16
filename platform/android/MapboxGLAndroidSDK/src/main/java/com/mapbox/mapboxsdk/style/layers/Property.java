@@ -467,6 +467,27 @@ public final class Property {
   @Retention(RetentionPolicy.SOURCE)
   public @interface FILL_EXTRUSION_TRANSLATE_ANCHOR {}
 
+  // ANCHOR: Whether extruded geometries are lit relative to the map or viewport.
+
+  /**
+   * The position of the light source is aligned to the rotation of the map.
+   */
+  public static final String ANCHOR_MAP = "map";
+  /**
+   * The position of the light source is aligned to the rotation of the viewport.
+   */
+  public static final String ANCHOR_VIEWPORT = "viewport";
+
+  /**
+   * Whether extruded geometries are lit relative to the map or viewport.
+   */
+  @StringDef({
+      ANCHOR_MAP,
+      ANCHOR_VIEWPORT,
+    })
+  @Retention(RetentionPolicy.SOURCE)
+  public @interface ANCHOR {}
+
 
   private Property() {
   }

@@ -26,6 +26,7 @@ import com.mapbox.mapboxsdk.storage.FileSource;
 import com.mapbox.mapboxsdk.style.layers.CannotAddLayerException;
 import com.mapbox.mapboxsdk.style.layers.Filter;
 import com.mapbox.mapboxsdk.style.layers.Layer;
+import com.mapbox.mapboxsdk.style.light.Light;
 import com.mapbox.mapboxsdk.style.sources.CannotAddSourceException;
 import com.mapbox.mapboxsdk.style.sources.Source;
 import com.mapbox.services.commons.geojson.Feature;
@@ -885,6 +886,13 @@ final class NativeMapView {
     fileSource.setApiBaseUrl(baseUrl);
   }
 
+  public Light getLight() {
+    if (isDestroyedOn("getLight")) {
+      return null;
+    }
+    return nativeGetLight();
+  }
+
   public float getPixelRatio() {
     return pixelRatio;
   }
@@ -1119,6 +1127,8 @@ final class NativeMapView {
                                                              float right, float bottom,
                                                              String[] layerIds,
                                                              Object[] filter);
+
+  private native Light nativeGetLight();
 
   int getWidth() {
     if (isDestroyedOn("")) {

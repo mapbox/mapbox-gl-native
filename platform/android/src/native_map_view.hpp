@@ -24,6 +24,7 @@
 #include "style/sources/sources.hpp"
 #include "geometry/lat_lng_bounds.hpp"
 #include "map/camera_position.hpp"
+#include "style/light.hpp"
 
 #include <exception>
 #include <string>
@@ -229,6 +230,8 @@ public:
     jni::Array<jni::Object<geojson::Feature>> queryRenderedFeaturesForBox(JNIEnv&, jni::jfloat, jni::jfloat, jni::jfloat,
                                                                  jni::jfloat, jni::Array<jni::String>,
                                                                  jni::Array<jni::Object<>> jfilter);
+
+    jni::Object<Light> getLight(JNIEnv&);
 
     jni::Array<jni::Object<Layer>> getLayers(JNIEnv&);
 
