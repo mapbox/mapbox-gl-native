@@ -1,56 +1,56 @@
-os: Visual Studio 2015
-platform: x64
+# os: Visual Studio 2015
+# platform: x64
 
-environment:
-  matrix:
-  - configuration: Release
+# environment:
+#   matrix:
+#   - configuration: Release
 
-shallow_clone: true
+# shallow_clone: true
 
-branches:
-  only:
-    - master
+# branches:
+#   only:
+#     - master
 
-cache:
-  - '%APPVEYOR_BUILD_FOLDER%\mason_packages'
-  - '%APPVEYOR_BUILD_FOLDER%\LLVM-5.0.1-win64.exe'
-  - '%APPVEYOR_BUILD_FOLDER%\cmake-3.10.1-win64-x64.zip'
+# cache:
+#   - '%APPVEYOR_BUILD_FOLDER%\mason_packages'
+#   - '%APPVEYOR_BUILD_FOLDER%\LLVM-5.0.1-win64.exe'
+#   - '%APPVEYOR_BUILD_FOLDER%\cmake-3.10.1-win64-x64.zip'
 
-install:
-  - ps: |
-      if (!(Test-Path LLVM-5.0.1-win64.exe)) {
-          appveyor DownloadFile https://releases.llvm.org/5.0.1/LLVM-5.0.1-win64.exe
-      }
-      scripts\check-sha256.ps1 LLVM-5.0.1-win64.exe 981543611D719624ACB29A2CFFD6A479CFF36E8AB5EE8A57D8ECA4F9C4C6956F
-      Start-Process -FilePath 'LLVM-5.0.1-win64.exe' -ArgumentList '/S','/D=C:\LLVM-5.0.1' -Wait
-  - ps: |
-      if (!(Test-Path cmake-3.10.1-win64-x64.zip)) {
-          appveyor DownloadFile https://cmake.org/files/v3.10/cmake-3.10.1-win64-x64.zip
-      }
-      scripts\check-sha256.ps1 cmake-3.10.1-win64-x64.zip 8251F70C85B58F3CA1F24E4A3B0637E2D609B5E4A341D00B70E02E89244D5029
-      Start-Process -FilePath '7z' -ArgumentList 'x','cmake-3.10.1-win64-x64.zip','-oC:\' -Wait
+# install:
+#   - ps: |
+#       if (!(Test-Path LLVM-5.0.1-win64.exe)) {
+#           appveyor DownloadFile https://releases.llvm.org/5.0.1/LLVM-5.0.1-win64.exe
+#       }
+#       scripts\check-sha256.ps1 LLVM-5.0.1-win64.exe 981543611D719624ACB29A2CFFD6A479CFF36E8AB5EE8A57D8ECA4F9C4C6956F
+#       Start-Process -FilePath 'LLVM-5.0.1-win64.exe' -ArgumentList '/S','/D=C:\LLVM-5.0.1' -Wait
+#   - ps: |
+#       if (!(Test-Path cmake-3.10.1-win64-x64.zip)) {
+#           appveyor DownloadFile https://cmake.org/files/v3.10/cmake-3.10.1-win64-x64.zip
+#       }
+#       scripts\check-sha256.ps1 cmake-3.10.1-win64-x64.zip 8251F70C85B58F3CA1F24E4A3B0637E2D609B5E4A341D00B70E02E89244D5029
+#       Start-Process -FilePath '7z' -ArgumentList 'x','cmake-3.10.1-win64-x64.zip','-oC:\' -Wait
 
-before_build:
-  - set PATH=C:\LLVM-5.0.1\msbuild-bin;%PATH%
-  - set PATH=C:\cmake-3.10.1-win64-x64\bin;%PATH%
-  - set QT_CMAKE=C:\Qt\5.7\msvc2015_64\lib\cmake
-  - mkdir %APPVEYOR_BUILD_FOLDER%\build
-  - cd %APPVEYOR_BUILD_FOLDER%\build
+# before_build:
+#   - set PATH=C:\LLVM-5.0.1\msbuild-bin;%PATH%
+#   - set PATH=C:\cmake-3.10.1-win64-x64\bin;%PATH%
+#   - set QT_CMAKE=C:\Qt\5.7\msvc2015_64\lib\cmake
+#   - mkdir %APPVEYOR_BUILD_FOLDER%\build
+#   - cd %APPVEYOR_BUILD_FOLDER%\build
 
-build_script:
-  - cmake -G "Visual Studio 14 2015 Win64" -T LLVM-vs2014 -DMBGL_PLATFORM=qt -DWITH_QT_DECODERS=ON -DWITH_QT_I18N=ON -DWITH_NODEJS=OFF -DCMAKE_PREFIX_PATH=%QT_CMAKE% %APPVEYOR_BUILD_FOLDER% & exit 0
-  - cmake --build . --config Release --target qmapboxgl -- /m
+# build_script:
+#   - cmake -G "Visual Studio 14 2015 Win64" -T LLVM-vs2014 -DMBGL_PLATFORM=qt -DWITH_QT_DECODERS=ON -DWITH_QT_I18N=ON -DWITH_NODEJS=OFF -DCMAKE_PREFIX_PATH=%QT_CMAKE% %APPVEYOR_BUILD_FOLDER% & exit 0
+#   - cmake --build . --config Release --target qmapboxgl -- /m
 
-after_build:
-  - mkdir qmapboxgl
-  - mkdir qmapboxgl\lib
-  - mkdir qmapboxgl\include
-  - copy Release\qmapboxgl.* qmapboxgl\lib
-  - copy %APPVEYOR_BUILD_FOLDER%\platform\qt\include\* qmapboxgl\include
-  - 7z a qmapboxgl-%APPVEYOR_REPO_COMMIT%.zip qmapboxgl
+# after_build:
+#   - mkdir qmapboxgl
+#   - mkdir qmapboxgl\lib
+#   - mkdir qmapboxgl\include
+#   - copy Release\qmapboxgl.* qmapboxgl\lib
+#   - copy %APPVEYOR_BUILD_FOLDER%\platform\qt\include\* qmapboxgl\include
+#   - 7z a qmapboxgl-%APPVEYOR_REPO_COMMIT%.zip qmapboxgl
 
-artifacts:
-  - path: build\qmapboxgl-%APPVEYOR_REPO_COMMIT%.zip
-    name: QMapboxGL
+# artifacts:
+#   - path: build\qmapboxgl-%APPVEYOR_REPO_COMMIT%.zip
+#     name: QMapboxGL
 
-test: off
+# test: off

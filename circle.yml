@@ -8,41 +8,41 @@ workflows:
           filters:
             branches:
               ignore: master
-      - android-debug-arm-v7
-      - android-release-all
-      - node4-clang39-release:
-          filters:
-            tags:
-              only: /node-.*/
-      - node6-clang39-release:
-          filters:
-            tags:
-              only: /node-.*/
-      - node6-gcc6-debug:
-          filters:
-            tags:
-              only: /node-.*/
-      - linux-clang-3.8-libcxx-debug
-      - linux-clang4-sanitize-address
-      - linux-clang4-sanitize-undefined
-      - linux-clang4-sanitize-thread
-      - linux-gcc4.9-debug
-      - linux-gcc5-debug-coverage
-      - linux-gcc5-release-qt4
-      - linux-gcc5-release-qt5
-      - ios-debug
-      #- ios-sanitize-address
-      - ios-sanitize-thread
-      - macos-debug
-      - macos-debug-qt5
-      - macos-release-node4:
-          filters:
-            tags:
-              only: /node-.*/
-      - macos-release-node6:
-          filters:
-            tags:
-              only: /node-.*/
+      # - android-debug-arm-v7
+      # - android-release-all
+      # - node4-clang39-release:
+      #     filters:
+      #       tags:
+      #         only: /node-.*/
+      # - node6-clang39-release:
+      #     filters:
+      #       tags:
+      #         only: /node-.*/
+      # - node6-gcc6-debug:
+      #     filters:
+      #       tags:
+      #         only: /node-.*/
+      # - linux-clang-3.8-libcxx-debug
+      # - linux-clang4-sanitize-address
+      # - linux-clang4-sanitize-undefined
+      # - linux-clang4-sanitize-thread
+      # - linux-gcc4.9-debug
+      # - linux-gcc5-debug-coverage
+      # - linux-gcc5-release-qt4
+      # - linux-gcc5-release-qt5
+      # - ios-debug
+      # #- ios-sanitize-address
+      # - ios-sanitize-thread
+      # - macos-debug
+      # - macos-debug-qt5
+      # - macos-release-node4:
+      #     filters:
+      #       tags:
+      #         only: /node-.*/
+      # - macos-release-node6:
+      #     filters:
+      #       tags:
+      #         only: /node-.*/
 
 step-library:
   - &generate-cache-key
