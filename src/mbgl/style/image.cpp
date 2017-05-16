@@ -28,13 +28,5 @@ float Image::getPixelRatio() const {
     return impl->pixelRatio;
 }
 
-float Image::getWidth() const {
-    return impl->getWidth();
-}
-
-float Image::getHeight() const {
-    return impl->getHeight();
-}
-
 } // namespace style
 } // namespace mbgl

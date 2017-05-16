@@ -18,9 +18,6 @@ public:
 
     // Whether this image should be interpreted as a signed distance field icon.
     const bool sdf;
-
-    float getWidth() const { return image.size.width / pixelRatio; }
-    float getHeight() const { return image.size.height / pixelRatio; }
 };
 
 } // namespace style
