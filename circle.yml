@@ -4,45 +4,46 @@ workflows:
   version: 2
   default:
     jobs:
-      - clang-tidy:
-          filters:
-            branches:
-              ignore: master
-      - android-debug-arm-v7
-      - android-release-all
-      - node4-clang39-release:
-          filters:
-            tags:
-              only: /node-.*/
-      - node6-clang39-release:
-          filters:
-            tags:
-              only: /node-.*/
-      - node6-gcc6-debug:
-          filters:
-            tags:
-              only: /node-.*/
-      - linux-clang-3.8-libcxx-debug
-      - linux-clang4-sanitize-address
-      - linux-clang4-sanitize-undefined
-      - linux-clang4-sanitize-thread
-      - linux-gcc4.9-debug
-      - linux-gcc5-debug-coverage
-      - linux-gcc5-release-qt4
-      - linux-gcc5-release-qt5
-      - ios-debug
-      #- ios-sanitize-address
-      - ios-sanitize-thread
-      - macos-debug
-      - macos-debug-qt5
-      - macos-release-node4:
-          filters:
-            tags:
-              only: /node-.*/
-      - macos-release-node6:
-          filters:
-            tags:
-              only: /node-.*/
+      - danger
+      # - clang-tidy:
+      #     filters:
+      #       branches:
+      #         ignore: master
+      # - android-debug-arm-v7
+      # - android-release-all
+      # - node4-clang39-release:
+      #     filters:
+      #       tags:
+      #         only: /node-.*/
+      # - node6-clang39-release:
+      #     filters:
+      #       tags:
+      #         only: /node-.*/
+      # - node6-gcc6-debug:
+      #     filters:
+      #       tags:
+      #         only: /node-.*/
+      # - linux-clang-3.8-libcxx-debug
+      # - linux-clang4-sanitize-address
+      # - linux-clang4-sanitize-undefined
+      # - linux-clang4-sanitize-thread
+      # - linux-gcc4.9-debug
+      # - linux-gcc5-debug-coverage
+      # - linux-gcc5-release-qt4
+      # - linux-gcc5-release-qt5
+      # - ios-debug
+      # #- ios-sanitize-address
+      # - ios-sanitize-thread
+      # - macos-debug
+      # - macos-debug-qt5
+      # - macos-release-node4:
+      #     filters:
+      #       tags:
+      #         only: /node-.*/
+      # - macos-release-node6:
+      #     filters:
+      #       tags:
+      #         only: /node-.*/
 
 step-library:
   - &generate-cache-key
@@ -213,6 +214,27 @@ step-library:
         destination: render-tests
 
 jobs:
+
+# ------------------------------------------------------------------------------
+  danger:
+    docker:
+      - image: mbgl/7d2403f42e:base
+    working_directory: /src
+    steps:
+      - checkout
+      - *generate-cache-key
+      - *restore-cache
+      - run:
+          name: Update submodule
+          command: git submodule update --init mapbox-gl-js
+      - run:
+          name: Install Node modules
+          command: npm install
+      - *save-cache
+      - run:
+          name: Run Danger
+          command: npm run danger-ci
+
 # ------------------------------------------------------------------------------
   clang-tidy:
     docker:
