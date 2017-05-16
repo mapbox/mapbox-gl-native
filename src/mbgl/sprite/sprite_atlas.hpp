@@ -29,8 +29,6 @@ public:
     std::array<float, 2> size;
     std::array<float, 2> tl;
     std::array<float, 2> br;
-    float width;
-    float height;
 };
 
 using IconMap = std::unordered_map<std::string, SpriteAtlasElement>;

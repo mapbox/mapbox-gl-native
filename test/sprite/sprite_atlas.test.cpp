@@ -36,10 +36,10 @@ TEST(SpriteAtlas, Basic) {
     EXPECT_EQ(0, metro.pos.y);
     EXPECT_EQ(20, metro.pos.w);
     EXPECT_EQ(20, metro.pos.h);
-    EXPECT_EQ(18, metro.width);
-    EXPECT_EQ(18, metro.height);
-    EXPECT_EQ(18u, metro.width * imagePixelRatio);
-    EXPECT_EQ(18u, metro.height * imagePixelRatio);
+    EXPECT_EQ(18, metro.size[0]);
+    EXPECT_EQ(18, metro.size[1]);
+    EXPECT_EQ(18u, metro.size[0] * imagePixelRatio);
+    EXPECT_EQ(18u, metro.size[1] * imagePixelRatio);
     EXPECT_EQ(1.0f, imagePixelRatio);
 
 
@@ -93,10 +93,10 @@ TEST(SpriteAtlas, Size) {
     EXPECT_EQ(0, metro.pos.y);
     EXPECT_EQ(15, metro.pos.w);
     EXPECT_EQ(15, metro.pos.h);
-    EXPECT_EQ(18, metro.width);
-    EXPECT_EQ(18, metro.height);
-    EXPECT_EQ(18u, metro.width * imagePixelRatio);
-    EXPECT_EQ(18u, metro.height * imagePixelRatio);
+    EXPECT_EQ(18, metro.size[0]);
+    EXPECT_EQ(18, metro.size[1]);
+    EXPECT_EQ(18u, metro.size[0] * imagePixelRatio);
+    EXPECT_EQ(18u, metro.size[1] * imagePixelRatio);
     EXPECT_EQ(1.0f, imagePixelRatio);
 
     // Now the image was created lazily.
@@ -120,10 +120,10 @@ TEST(SpriteAtlas, Updates) {
     EXPECT_EQ(0, one.pos.y);
     EXPECT_EQ(18, one.pos.w);
     EXPECT_EQ(14, one.pos.h);
-    EXPECT_EQ(16, one.width);
-    EXPECT_EQ(12, one.height);
-    EXPECT_EQ(16u, one.width * imagePixelRatio);
-    EXPECT_EQ(12u, one.height * imagePixelRatio);
+    EXPECT_EQ(16, one.size[0]);
+    EXPECT_EQ(12, one.size[1]);
+    EXPECT_EQ(16u, one.size[0] * imagePixelRatio);
+    EXPECT_EQ(12u, one.size[1] * imagePixelRatio);
     EXPECT_EQ(1.0f, imagePixelRatio);
 
     // Now the image was created lazily.
