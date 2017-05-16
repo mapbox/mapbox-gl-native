@@ -23,7 +23,9 @@
 
     NSBitmapImageRep *rep = [[NSBitmapImageRep alloc] initWithCGImage:image];
     CGImageRelease(image);
-    if (self = [self initWithSize:NSMakeSize(styleImage->getWidth(), styleImage->getHeight())]) {
+    CGFloat w = styleImage->getImage().size.width / styleImage->getPixelRatio();
+    CGFloat h = styleImage->getImage().size.height / styleImage->getPixelRatio();
+    if (self = [self initWithSize:NSMakeSize(w, h)]) {
         [self addRepresentation:rep];
         [self setTemplate:styleImage->isSdf()];
     }

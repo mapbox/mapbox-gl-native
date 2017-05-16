@@ -143,8 +143,6 @@ TEST(Sprite, SpriteImageCreation1x) {
     { // "museum_icon":{"x":177,"y":187,"width":18,"height":18,"pixelRatio":1,"sdf":false}
         const auto sprite = createStyleImage("test", image_1x, 177, 187, 18, 18, 1, false);
         ASSERT_TRUE(sprite.get());
-        EXPECT_EQ(18, sprite->getWidth());
-        EXPECT_EQ(18, sprite->getHeight());
         EXPECT_EQ(18u, sprite->getImage().size.width);
         EXPECT_EQ(18u, sprite->getImage().size.height);
         EXPECT_EQ(1, sprite->getPixelRatio());
@@ -159,8 +157,6 @@ TEST(Sprite, SpriteImageCreation2x) {
     // "museum_icon":{"x":354,"y":374,"width":36,"height":36,"pixelRatio":2,"sdf":false}
     const auto sprite = createStyleImage("test", image_2x, 354, 374, 36, 36, 2, false);
     ASSERT_TRUE(sprite.get());
-    EXPECT_EQ(18, sprite->getWidth());
-    EXPECT_EQ(18, sprite->getHeight());
     EXPECT_EQ(36u, sprite->getImage().size.width);
     EXPECT_EQ(36u, sprite->getImage().size.height);
     EXPECT_EQ(2, sprite->getPixelRatio());
@@ -174,8 +170,6 @@ TEST(Sprite, SpriteImageCreation1_5x) {
     // "museum_icon":{"x":354,"y":374,"width":36,"height":36,"pixelRatio":2,"sdf":false}
     const auto sprite = createStyleImage("test", image_2x, 354, 374, 36, 36, 1.5, false);
     ASSERT_TRUE(sprite.get());
-    EXPECT_EQ(24, sprite->getWidth());
-    EXPECT_EQ(24, sprite->getHeight());
     EXPECT_EQ(36u, sprite->getImage().size.width);
     EXPECT_EQ(36u, sprite->getImage().size.height);
     EXPECT_EQ(1.5, sprite->getPixelRatio());
@@ -185,8 +179,6 @@ TEST(Sprite, SpriteImageCreation1_5x) {
     // "hospital_icon":{"x":314,"y":518,"width":36,"height":36,"pixelRatio":2,"sdf":false}
     const auto sprite2 = createStyleImage("test", image_2x, 314, 518, 35, 35, 1.5, false);
     ASSERT_TRUE(sprite2.get());
-    EXPECT_EQ(float(35 / 1.5), sprite2->getWidth());
-    EXPECT_EQ(float(35 / 1.5), sprite2->getHeight());
     EXPECT_EQ(35u, sprite2->getImage().size.width);
     EXPECT_EQ(35u, sprite2->getImage().size.height);
     EXPECT_EQ(1.5, sprite2->getPixelRatio());
@@ -281,8 +273,6 @@ TEST(Sprite, SpriteParsing) {
 
     {
         auto& sprite = *std::find_if(images.begin(), images.end(), [] (const auto& image) { return image->getID() == "generic-metro"; });
-        EXPECT_EQ(18, sprite->getWidth());
-        EXPECT_EQ(18, sprite->getHeight());
         EXPECT_EQ(18u, sprite->getImage().size.width);
         EXPECT_EQ(18u, sprite->getImage().size.height);
         EXPECT_EQ(1, sprite->getPixelRatio());

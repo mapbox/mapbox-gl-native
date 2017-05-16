@@ -22,9 +22,6 @@ public:
     // Whether this image should be interpreted as a signed distance field icon.
     bool isSdf() const;
 
-    float getWidth() const;
-    float getHeight() const;
-
     class Impl;
     Immutable<Impl> impl;
 };
