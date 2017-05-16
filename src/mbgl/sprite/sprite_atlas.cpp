@@ -22,14 +22,12 @@ SpriteAtlasElement::SpriteAtlasElement(Rect<uint16_t> rect_,
     : pos(std::move(rect_)),
       sdf(image.sdf),
       relativePixelRatio(image.pixelRatio / pixelRatio),
-      width(image.image.size.width / image.pixelRatio),
-      height(image.image.size.height / image.pixelRatio) {
-
+      size{{image.image.size.width / image.pixelRatio,
+            image.image.size.height / image.pixelRatio}} {
 
     const float w = image.image.size.width / pixelRatio;
     const float h = image.image.size.height / pixelRatio;
 
-    size = {{ width, height }};
     tl   = {{ float(pos.x + padding)     / size_.width, float(pos.y + padding)     / size_.height }};
     br   = {{ float(pos.x + padding + w) / size_.width, float(pos.y + padding + h) / size_.height }};
 }
