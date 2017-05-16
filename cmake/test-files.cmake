@@ -138,5 +138,4 @@ set(MBGL_TEST_FILES
     test/util/timer.test.cpp
     test/util/token.test.cpp
     test/util/url.test.cpp
-    test/util/work_queue.test.cpp
 )
