@@ -2,7 +2,6 @@
 
 namespace mbgl {
 namespace android {
-namespace style {
 
 jni::Object<Filter> Filter::fromFilter(jni::JNIEnv& env, const mbgl::style::Filter&) {
     static auto constructor = Filter::javaClass.template GetConstructor<>(env);
@@ -17,6 +16,5 @@ void Filter::registerNative(jni::JNIEnv& env) {
 jni::Class<Filter> Filter::javaClass;
 
 
-} // namespace style
 } // namespace android
 } // namespace mbgl
