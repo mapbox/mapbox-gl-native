@@ -33,6 +33,8 @@ import org.junit.runner.RunWith;
 import static com.mapbox.mapboxsdk.style.functions.Function.*;
 import static com.mapbox.mapboxsdk.style.functions.stops.Stop.stop;
 import static com.mapbox.mapboxsdk.style.functions.stops.Stops.*;
+import static com.mapbox.mapboxsdk.style.layers.Filter.all;
+import static com.mapbox.mapboxsdk.style.layers.Filter.eq;
 import static org.junit.Assert.*;
 import static com.mapbox.mapboxsdk.style.layers.Property.*;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.*;
@@ -62,6 +64,17 @@ public class FillLayerTest extends BaseActivityTest {
       // Layer reference is now stale, get new reference
       layer = mapboxMap.getLayerAs("my-layer");
     }
+  }
+
+  @Test
+  public void testGetFilter() {
+    validateTestSetup();
+    setupLayer();
+    Timber.i("Filter");
+    assertNotNull(layer);
+
+    layer.setFilter(all(eq("type", "park")));
+    assertEquals(all(eq("type", "park")), layer.getFilter());
   }
 
   @Test
@@ -423,7 +436,8 @@ public class FillLayerTest extends BaseActivityTest {
     assertEquals(CategoricalStops.class, layer.getFillColor().getFunction().getStops().getClass());
     assertNotNull(((SourceFunction) layer.getFillColor().getFunction()).getDefaultValue());
     assertNotNull(((SourceFunction) layer.getFillColor().getFunction()).getDefaultValue().getValue());
-    assertEquals(Color.GREEN, (int) ((SourceFunction) layer.getFillColor().getFunction()).getDefaultValue().getColorInt());
+    assertEquals(Color.GREEN, (int) ((SourceFunction) layer.getFillColor().getFunction()).getDefaultValue()
+      .getColorInt());
   }
 
   @Test
@@ -564,7 +578,8 @@ public class FillLayerTest extends BaseActivityTest {
     assertEquals(CategoricalStops.class, layer.getFillOutlineColor().getFunction().getStops().getClass());
     assertNotNull(((SourceFunction) layer.getFillOutlineColor().getFunction()).getDefaultValue());
     assertNotNull(((SourceFunction) layer.getFillOutlineColor().getFunction()).getDefaultValue().getValue());
-    assertEquals(Color.GREEN, (int) ((SourceFunction) layer.getFillOutlineColor().getFunction()).getDefaultValue().getColorInt());
+    assertEquals(Color.GREEN, (int) ((SourceFunction) layer.getFillOutlineColor().getFunction()).getDefaultValue()
+      .getColorInt());
   }
 
   @Test
@@ -600,8 +615,8 @@ public class FillLayerTest extends BaseActivityTest {
     assertNotNull(layer);
 
     // Set and Get
-    layer.setProperties(fillTranslate(new Float[]{0f,0f}));
-    assertEquals((Float[]) layer.getFillTranslate().getValue(), (Float[]) new Float[]{0f,0f});
+    layer.setProperties(fillTranslate(new Float[] {0f, 0f}));
+    assertEquals((Float[]) layer.getFillTranslate().getValue(), (Float[]) new Float[] {0f, 0f});
   }
 
   @Test
@@ -616,7 +631,7 @@ public class FillLayerTest extends BaseActivityTest {
       fillTranslate(
         zoom(
           exponential(
-            stop(2, fillTranslate(new Float[]{0f,0f}))
+            stop(2, fillTranslate(new Float[] {0f, 0f}))
           ).withBase(0.5f)
         )
       )
