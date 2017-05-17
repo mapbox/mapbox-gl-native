@@ -67,8 +67,8 @@ struct SymbolLayoutAttributes : gl::Attributes<
                 static_cast<int16_t>(::round(o.y * 64))
             }},
             {{
-                static_cast<uint16_t>(tx / 4),
-                static_cast<uint16_t>(ty / 4),
+                tx,
+                ty,
                 mbgl::attributes::packUint8Pair(
                    static_cast<uint8_t>(labelminzoom * 10), // 1/10 zoom levels: z16 == 160
                    static_cast<uint8_t>(labelangle)
