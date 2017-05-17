@@ -136,12 +136,17 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
             }
 
             ft.text = applyArabicShaping(util::utf8_to_utf16::convert(u8string));
+            const bool canVerticalizeText = layout.get<TextRotationAlignment>() == AlignmentType::Map
+                                         && layout.get<SymbolPlacement>() == SymbolPlacementType::Line
+                                         && util::i18n::allowsVerticalWritingMode(*ft.text);
 
             // Loop through all characters of this text and collect unique codepoints.
             for (char16_t chr : *ft.text) {
                 glyphDependencies[layout.get<TextFont>()].insert(chr);
-                if (char16_t verticalChr = util::i18n::verticalizePunctuation(chr)) {
-                    glyphDependencies[layout.get<TextFont>()].insert(verticalChr);
+                if (canVerticalizeText) {
+                    if (char16_t verticalChr = util::i18n::verticalizePunctuation(chr)) {
+                        glyphDependencies[layout.get<TextFont>()].insert(verticalChr);
+                    }
                 }
             }
         }
