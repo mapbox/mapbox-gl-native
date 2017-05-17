@@ -14,6 +14,8 @@
 
 namespace mbgl {
 
+static constexpr uint32_t padding = 1;
+
 SpriteAtlasElement::SpriteAtlasElement(Rect<uint16_t> rect_,
                                        const style::Image::Impl& image,
                                        Size size_, float pixelRatio)
@@ -23,7 +25,6 @@ SpriteAtlasElement::SpriteAtlasElement(Rect<uint16_t> rect_,
       width(image.getWidth()),
       height(image.getHeight()) {
 
-    const float padding = 1;
 
     const float w = image.getWidth() * relativePixelRatio;
     const float h = image.getHeight() * relativePixelRatio;
@@ -148,17 +149,10 @@ optional<SpriteAtlasElement> SpriteAtlas::getImage(const std::string& id,
         };
     }
 
-    const uint16_t pixelWidth = std::ceil(entry.image->image.size.width / pixelRatio);
-    const uint16_t pixelHeight = std::ceil(entry.image->image.size.height / pixelRatio);
+    const uint16_t width = std::ceil(entry.image->image.size.width / pixelRatio) + 2 * padding;
+    const uint16_t height = std::ceil(entry.image->image.size.height / pixelRatio) + 2 * padding;
 
-    // Increase to next number divisible by 4, but at least 1.
-    // This is so we can scale down the texture coordinates and pack them
-    // into 2 bytes rather than 4 bytes.
-    const uint16_t packWidth = (pixelWidth + 1) + (4 - (pixelWidth + 1) % 4);
-    const uint16_t packHeight = (pixelHeight + 1) + (4 - (pixelHeight + 1) % 4);
-
-    // We have to allocate a new area in the bin, and store an empty image in it.
-    Rect<uint16_t> rect = bin.allocate(packWidth, packHeight);
+    Rect<uint16_t> rect = bin.allocate(width, height);
     if (rect.w == 0) {
         if (debug::spriteWarnings) {
             Log::Warning(Event::Sprite, "sprite atlas bitmap overflow");
@@ -187,7 +181,6 @@ void SpriteAtlas::copy(const Entry& entry, optional<Rect<uint16_t>> Entry::*entr
     const PremultipliedImage& src = entry.image->image;
     const Rect<uint16_t>& rect = *(entry.*entryRect);
 
-    const uint32_t padding = 1;
     const uint32_t x = (rect.x + padding) * pixelRatio;
     const uint32_t y = (rect.y + padding) * pixelRatio;
     const uint32_t w = src.size.width;

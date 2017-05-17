@@ -91,8 +91,8 @@ TEST(SpriteAtlas, Size) {
     float imagePixelRatio = metro.relativePixelRatio * atlas.getPixelRatio();
     EXPECT_EQ(0, metro.pos.x);
     EXPECT_EQ(0, metro.pos.y);
-    EXPECT_EQ(16, metro.pos.w);
-    EXPECT_EQ(16, metro.pos.h);
+    EXPECT_EQ(15, metro.pos.w);
+    EXPECT_EQ(15, metro.pos.h);
     EXPECT_EQ(18, metro.width);
     EXPECT_EQ(18, metro.height);
     EXPECT_EQ(18u, metro.width * imagePixelRatio);
@@ -118,8 +118,8 @@ TEST(SpriteAtlas, Updates) {
     float imagePixelRatio = one.relativePixelRatio * atlas.getPixelRatio();
     EXPECT_EQ(0, one.pos.x);
     EXPECT_EQ(0, one.pos.y);
-    EXPECT_EQ(20, one.pos.w);
-    EXPECT_EQ(16, one.pos.h);
+    EXPECT_EQ(18, one.pos.w);
+    EXPECT_EQ(14, one.pos.h);
     EXPECT_EQ(16, one.width);
     EXPECT_EQ(12, one.height);
     EXPECT_EQ(16u, one.width * imagePixelRatio);

@@ -184,14 +184,8 @@ Rect<uint16_t> GlyphAtlas::addGlyph(GlyphValue& value) {
 
     // Add a 1px border around every image.
     const uint32_t padding = 1;
-    uint16_t width = value.bitmap.size.width + 2 * padding;
-    uint16_t height = value.bitmap.size.height + 2 * padding;
-
-    // Increase to next number divisible by 4, but at least 1.
-    // This is so we can scale down the texture coordinates and pack them
-    // into 2 bytes rather than 4 bytes.
-    width += (4 - width % 4);
-    height += (4 - height % 4);
+    const uint16_t width = value.bitmap.size.width + 2 * padding;
+    const uint16_t height = value.bitmap.size.height + 2 * padding;
 
     Rect<uint16_t> rect = bin.allocate(width, height);
     if (rect.w == 0) {
