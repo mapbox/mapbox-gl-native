@@ -18,6 +18,7 @@
 #include <mbgl/map/query.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/style/filter_evaluator.hpp>
+#include <mbgl/util/chrono.hpp>
 #include <mbgl/util/logging.hpp>
 
 #include <iostream>
@@ -41,7 +42,8 @@ GeometryTile::GeometryTile(const OverscaledTileID& id_,
              obsolete,
              parameters.mode),
       glyphAtlas(glyphAtlas_),
-      spriteAtlas(spriteAtlas_) {
+      spriteAtlas(spriteAtlas_),
+      placementThrottler(Milliseconds(300), [this] { invokePlacement(); }) {
 }
 
 GeometryTile::~GeometryTile() {
@@ -85,7 +87,13 @@ void GeometryTile::setPlacementConfig(const PlacementConfig& desiredConfig) {
 
     ++correlationID;
     requestedConfig = desiredConfig;
-    worker.invoke(&GeometryTileWorker::setPlacementConfig, desiredConfig, correlationID);
+    placementThrottler.invoke();
+}
+
+void GeometryTile::invokePlacement() {
+    if (requestedConfig) {
+        worker.invoke(&GeometryTileWorker::setPlacementConfig, *requestedConfig, correlationID);
+    }
 }
 
 void GeometryTile::redoLayout() {

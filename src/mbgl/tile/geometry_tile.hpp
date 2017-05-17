@@ -6,6 +6,7 @@
 #include <mbgl/text/glyph_atlas.hpp>
 #include <mbgl/text/placement_config.hpp>
 #include <mbgl/util/feature.hpp>
+#include <mbgl/util/throttler.hpp>
 #include <mbgl/actor/actor.hpp>
 
 #include <atomic>
@@ -88,6 +89,7 @@ protected:
 
 private:
     void markObsolete();
+    void invokePlacement();
 
     const std::string sourceID;
     style::Style& style;
@@ -110,6 +112,8 @@ private:
 
     std::unordered_map<std::string, std::shared_ptr<Bucket>> symbolBuckets;
     std::unique_ptr<CollisionTile> collisionTile;
+    
+    util::Throttler placementThrottler;
 };
 
 } // namespace mbgl
