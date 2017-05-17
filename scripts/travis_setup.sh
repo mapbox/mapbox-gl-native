@@ -33,9 +33,9 @@ fi
 mapbox_time "touch_package_json" \
 touch package.json
 
-function mapbox_install_logbt {
-    scripts/mason.sh INSTALL gdb VERSION 7.12
-    export PATH=$(scripts/mason.sh PREFIX gdb VERSION 7.12)/bin:${PATH}
+function mapbox_install_gdb_logbt {
+    scripts/mason.sh INSTALL gdb VERSION 2017-04-08-aebcde5
+    export PATH=$(scripts/mason.sh PREFIX gdb VERSION 2017-04-08-aebcde5)/bin:${PATH}
     curl -sSfL https://github.com/mapbox/logbt/archive/v2.0.1.tar.gz | tar --gunzip --extract --strip-components=2 --exclude="*md" --exclude="test*" --directory=.
     sudo ./logbt --setup
     ./logbt --test

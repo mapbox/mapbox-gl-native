@@ -315,7 +315,8 @@ benchmark: $(LINUX_BUILD)
 	$(NINJA) $(NINJA_ARGS) -j$(JOBS) -C $(LINUX_OUTPUT_PATH) mbgl-benchmark
 
 ifneq (,$(shell command -v gdb 2> /dev/null))
-  GDB = gdb -batch -return-child-result -ex 'set print thread-events off' -ex 'run' -ex 'thread apply all bt' --args
+  GDB = $(shell scripts/mason.sh PREFIX gdb VERSION 2017-04-08-aebcde5)/bin/gdb \
+        -batch -return-child-result -ex 'set print thread-events off' -ex 'run' -ex 'thread apply all bt' --args
 endif
 
 .PHONY: run-test
