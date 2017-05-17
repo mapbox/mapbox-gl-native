@@ -7,6 +7,10 @@ macro(mbgl_platform_core)
     set_xcode_property(mbgl-core ENABLE_BITCODE "YES")
     set_xcode_property(mbgl-core BITCODE_GENERATION_MODE bitcode)
     set_xcode_property(mbgl-core ONLY_ACTIVE_ARCH $<$<CONFIG:Debug>:YES>)
+    set_xcode_property(mbgl-core GCC_SYMBOLS_PRIVATE_EXTERN $<$<CONFIG:Debug>:NO>)
+    set_xcode_property(mbgl-core GCC_GENERATE_DEBUGGING_SYMBOLS $<$<CONFIG:Debug>:YES>)
+    set_xcode_property(mbgl-core GCC_SYMBOLS_PRIVATE_EXTERN $<$<CONFIG:Release>:YES>)
+    set_xcode_property(mbgl-core GCC_GENERATE_DEBUGGING_SYMBOLS $<$<CONFIG:Release>:NO>)
 
     target_sources(mbgl-core
         # Loop

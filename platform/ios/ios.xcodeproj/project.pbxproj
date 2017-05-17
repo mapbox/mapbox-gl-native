@@ -2837,6 +2837,8 @@
 			baseConfigurationReference = 55D8C9941D0F133500F42F10 /* config.xcconfig */;
 			buildSettings = {
 				BITCODE_GENERATION_MODE = bitcode;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
 				HEADER_SEARCH_PATHS = (
 					"$(mbgl_core_INCLUDE_DIRECTORIES)",
 					"$(polylabel_INCLUDE_DIRECTORIES)",
