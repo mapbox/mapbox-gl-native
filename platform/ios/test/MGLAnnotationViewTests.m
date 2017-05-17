@@ -85,7 +85,7 @@ static NSString * const MGLTestAnnotationReuseIdentifer = @"MGLTestAnnotationReu
 
     if (!annotationView)
     {
-        annotationView = [[MGLAnnotationView alloc] initWithReuseIdentifier:MGLTestAnnotationReuseIdentifer];
+        annotationView = [[MGLAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:MGLTestAnnotationReuseIdentifer];
     }
 
     _annotationView = annotationView;

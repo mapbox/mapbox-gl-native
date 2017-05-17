@@ -74,6 +74,36 @@ typedef NS_ENUM(NSUInteger, MGLAnnotationViewDragState) {
 - (instancetype)initWithReuseIdentifier:(nullable NSString *)reuseIdentifier;
 
 /**
+ Initializes and returns a new annotation view object.
+ 
+ Providing an annotation allows you to explicitly associate the annotation instance
+ with the new view and, in custom subclasses of `MGLAnnotationView`, customize the view
+ based on properties of the annotation instance in an overridden initializer. However,
+ annotation views that are reused will not necessarily be associated with the
+ same annotation they were initialized with. Also, annotation views that are in
+ the reuse queue will have a nil value for the annotation property. Passing an annotation
+ instance to the view is optional and the map view will automatically associate annotations
+ with views when views are provided to the map via the `-[MGLMapViewDelegate mapView:viewForAnnotation:]`
+ method.
+ 
+ The reuse identifier provides a way for you to improve performance by recycling
+ annotation views as they enter and leave the map’s viewport. As an annotation
+ leaves the viewport, the map view moves its associated view to a reuse queue.
+ When a new annotation becomes visible, you can request a view for that
+ annotation by passing the appropriate reuse identifier string to the
+ `-[MGLMapView dequeueReusableAnnotationViewWithIdentifier:]` method.
+ 
+ @param annotation The annotation object to associate with the new view.
+ @param reuseIdentifier A unique string identifier for this view that allows you
+ to reuse this view with multiple similar annotations. You can set this
+ parameter to `nil` if you don’t intend to reuse the view, but it is a good
+ idea in general to specify a reuse identifier to avoid creating redundant
+ views.
+ @return The initialized annotation view object.
+ */
+- (instancetype)initWithAnnotation:(nullable id<MGLAnnotation>)annotation reuseIdentifier:(nullable NSString *)reuseIdentifier;
+
+/**
  Called when the view is removed from the reuse queue.
 
  The default implementation of this method does nothing. You can override it in

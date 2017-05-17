@@ -19,21 +19,25 @@
 
 @implementation MGLAnnotationView
 
-- (instancetype)initWithReuseIdentifier:(NSString *)reuseIdentifier
-{
-    self = [self initWithFrame:CGRectZero];
++ (BOOL)supportsSecureCoding {
+    return YES;
+}
+
+- (instancetype)initWithReuseIdentifier:(NSString *)reuseIdentifier {
+    return [self initWithAnnotation:nil reuseIdentifier:reuseIdentifier];
+}
+
+- (instancetype)initWithAnnotation:(nullable id<MGLAnnotation>)annotation reuseIdentifier:(nullable NSString *)reuseIdentifier {
+    self = [super initWithFrame:CGRectZero];
     if (self)
     {
         _lastAppliedScaleTransform = CATransform3DIdentity;
+        _annotation = annotation;
         _reuseIdentifier = [reuseIdentifier copy];
         _scalesWithViewingDistance = YES;
         _enabled = YES;
     }
     return self;
-}
-
-+ (BOOL)supportsSecureCoding {
-    return YES;
 }
 
 - (instancetype)initWithCoder:(NSCoder *)decoder {
