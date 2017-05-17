@@ -1999,7 +1999,8 @@ public:
     }];
     [alertController addAction:participateAction];
     
-    [self.window.rootViewController presentViewController:alertController
+    UIViewController *viewController = [self.window.rootViewController mgl_topMostViewController];
+    [viewController presentViewController:alertController
                                                  animated:YES
                                                completion:NULL];
 }
