@@ -98,7 +98,7 @@ matrix:
         - sudo apt-get purge -qq fglrx
         - export PACKAGE_JSON_VERSION=$(node -e "console.log(require('./package.json').version)")
         - export PUBLISH=$([[ "${TRAVIS_TAG:-}" == "node-v${PACKAGE_JSON_VERSION}" ]] && echo true)
-        - mapbox_install_logbt
+        - mapbox_install_gdb_logbt
         - mapbox_start_xvfb
         - mapbox_export_mesa_library_path
       script:
@@ -125,7 +125,7 @@ matrix:
       before_script:
         - export PACKAGE_JSON_VERSION=$(node -e "console.log(require('./package.json').version)")
         - export PUBLISH=$([[ "${TRAVIS_TAG:-}" == "node-v${PACKAGE_JSON_VERSION}" ]] && echo true)
-        - mapbox_install_logbt
+        - mapbox_install_gdb_logbt
         - mapbox_start_xvfb
         - mapbox_export_mesa_library_path
       script:
@@ -154,7 +154,7 @@ matrix:
         - sudo apt-get purge -qq fglrx
         - export PACKAGE_JSON_VERSION=$(node -e "console.log(require('./package.json').version)")
         - export PUBLISH=$([[ "${TRAVIS_TAG:-}" == "node-v${PACKAGE_JSON_VERSION}" ]] && echo true)
-        - mapbox_install_logbt
+        - mapbox_install_gdb_logbt
         - mapbox_start_xvfb
         - mapbox_export_mesa_library_path
       script:
