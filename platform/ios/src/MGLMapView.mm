@@ -2001,8 +2001,8 @@ public:
     
     UIViewController *viewController = [self.window.rootViewController mgl_topMostViewController];
     [viewController presentViewController:alertController
-                                                 animated:YES
-                                               completion:NULL];
+                                 animated:YES
+                               completion:NULL];
 }
 
 #pragma mark - Properties -
