@@ -20,7 +20,7 @@ class Context;
 
 class SpriteAtlasElement {
 public:
-    SpriteAtlasElement(Rect<uint16_t>, const style::Image::Impl&, Size size, float pixelRatio);
+    SpriteAtlasElement(Rect<uint16_t>, const style::Image::Impl&, float pixelRatio);
 
     Rect<uint16_t> pos;
     bool sdf;

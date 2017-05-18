@@ -18,7 +18,7 @@ static constexpr uint32_t padding = 1;
 
 SpriteAtlasElement::SpriteAtlasElement(Rect<uint16_t> rect_,
                                        const style::Image::Impl& image,
-                                       Size size_, float pixelRatio)
+                                       float pixelRatio)
     : pos(std::move(rect_)),
       sdf(image.sdf),
       relativePixelRatio(image.pixelRatio / pixelRatio),
@@ -28,8 +28,8 @@ SpriteAtlasElement::SpriteAtlasElement(Rect<uint16_t> rect_,
     const float w = image.image.size.width / pixelRatio;
     const float h = image.image.size.height / pixelRatio;
 
-    tl   = {{ float(pos.x + padding)     / size_.width, float(pos.y + padding)     / size_.height }};
-    br   = {{ float(pos.x + padding + w) / size_.width, float(pos.y + padding + h) / size_.height }};
+    tl = {{ float(pos.x + padding),     float(pos.y + padding)     }};
+    br = {{ float(pos.x + padding + w), float(pos.y + padding + h) }};
 }
 
 SpriteAtlas::SpriteAtlas(Size size_, float pixelRatio_)
@@ -142,7 +142,6 @@ optional<SpriteAtlasElement> SpriteAtlas::getImage(const std::string& id,
         return SpriteAtlasElement {
             *(entry.*entryRect),
             *entry.image,
-            size,
             pixelRatio
         };
     }
@@ -164,7 +163,6 @@ optional<SpriteAtlasElement> SpriteAtlas::getImage(const std::string& id,
     return SpriteAtlasElement {
         rect,
         *entry.image,
-        size,
         pixelRatio
     };
 }

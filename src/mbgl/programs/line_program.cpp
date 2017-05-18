@@ -88,6 +88,7 @@ LinePatternProgram::uniformValues(const LinePaintProperties::PossiblyEvaluated& 
                                   const RenderTile& tile,
                                   const TransformState& state,
                                   const std::array<float, 2>& pixelsToGLUnits,
+                                  const Size atlasSize,
                                   const SpriteAtlasElement& posA,
                                   const SpriteAtlasElement& posB) {
      std::array<float, 2> sizeA {{
@@ -111,6 +112,7 @@ LinePatternProgram::uniformValues(const LinePaintProperties::PossiblyEvaluated& 
         uniforms::u_pattern_br_b::Value{ posB.br },
         uniforms::u_pattern_size_a::Value{ sizeA },
         uniforms::u_pattern_size_b::Value{ sizeB },
+        uniforms::u_texsize::Value{ atlasSize },
         uniforms::u_fade::Value{ properties.get<LinePattern>().t },
         uniforms::u_image::Value{ 0 }
     );

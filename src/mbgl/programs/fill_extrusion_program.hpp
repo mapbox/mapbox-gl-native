@@ -55,6 +55,7 @@ struct FillExtrusionPatternUniforms : gl::Uniforms<
     uniforms::u_pattern_size_b,
     uniforms::u_scale_a,
     uniforms::u_scale_b,
+    uniforms::u_texsize,
     uniforms::u_mix,
     uniforms::u_image,
     uniforms::u_pixel_coord_upper,
@@ -66,6 +67,7 @@ struct FillExtrusionPatternUniforms : gl::Uniforms<
     uniforms::u_lightintensity>
 {
     static Values values(mat4,
+                         Size atlasSize,
                          const SpriteAtlasElement&,
                          const SpriteAtlasElement&,
                          const Faded<std::string>&,

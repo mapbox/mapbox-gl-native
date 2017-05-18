@@ -29,7 +29,6 @@ class RenderTile;
 class TransformState;
 
 namespace uniforms {
-MBGL_DEFINE_UNIFORM_VECTOR(float, 2, u_texsize);
 MBGL_DEFINE_UNIFORM_SCALAR(bool, u_rotate_with_map);
 MBGL_DEFINE_UNIFORM_SCALAR(bool, u_pitch_with_map);
 MBGL_DEFINE_UNIFORM_SCALAR(gl::TextureUnit, u_texture);
