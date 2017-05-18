@@ -26,12 +26,14 @@ GeometryTileWorker::GeometryTileWorker(ActorRef<GeometryTileWorker> self_,
                                        ActorRef<GeometryTile> parent_,
                                        OverscaledTileID id_,
                                        const std::atomic<bool>& obsolete_,
-                                       const MapMode mode_)
+                                       const MapMode mode_,
+                                       const float pixelRatio_)
     : self(std::move(self_)),
       parent(std::move(parent_)),
       id(std::move(id_)),
       obsolete(obsolete_),
-      mode(mode_) {
+      mode(mode_),
+      pixelRatio(pixelRatio_) {
 }
 
 GeometryTileWorker::~GeometryTileWorker() = default;
@@ -275,7 +277,7 @@ void GeometryTileWorker::redoLayout() {
     std::unordered_map<std::string, std::unique_ptr<SymbolLayout>> symbolLayoutMap;
     std::unordered_map<std::string, std::shared_ptr<Bucket>> buckets;
     auto featureIndex = std::make_unique<FeatureIndex>();
-    BucketParameters parameters { id, mode };
+    BucketParameters parameters { id, mode, pixelRatio };
 
     GlyphDependencies glyphDependencies;
     IconDependencies iconDependencies;

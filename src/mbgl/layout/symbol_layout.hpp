@@ -78,6 +78,7 @@ private:
     const float overscaling;
     const float zoom;
     const MapMode mode;
+    const float pixelRatio;
 
     style::SymbolLayoutProperties::PossiblyEvaluated layout;
 

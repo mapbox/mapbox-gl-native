@@ -24,11 +24,15 @@ SymbolQuad getIconQuad(const Anchor& anchor,
                        const Shaping& shapedText) {
     const SpriteAtlasElement& image = shapedIcon.image();
 
+    // If you have a 10px icon that isn't perfectly aligned to the pixel grid it will cover 11 actual
+    // pixels. The quad needs to be padded to account for this, otherwise they'll look slightly clipped
+    // on one edge in some cases.
     const float border = 1.0;
-    auto left = shapedIcon.left() - border;
-    auto right = left + image.pos.w / image.relativePixelRatio;
-    auto top = shapedIcon.top() - border;
-    auto bottom = top + image.pos.h / image.relativePixelRatio;
+
+    float top = shapedIcon.top() - border / image.pixelRatio;
+    float left = shapedIcon.left() - border / image.pixelRatio;
+    float bottom = shapedIcon.bottom() + border / image.pixelRatio;
+    float right = shapedIcon.right() + border / image.pixelRatio;
     Point<float> tl;
     Point<float> tr;
     Point<float> br;
@@ -92,7 +96,15 @@ SymbolQuad getIconQuad(const Anchor& anchor,
         br = util::matrixMultiply(matrix, br);
     }
 
-    return SymbolQuad { tl, tr, bl, br, image.pos, 0, 0, anchor.point, globalMinScale, std::numeric_limits<float>::infinity(), shapedText.writingMode };
+    // Icon quad is padded, so texture coordinates also need to be padded.
+    Rect<uint16_t> textureRect {
+        static_cast<uint16_t>(image.textureRect.x - border),
+        static_cast<uint16_t>(image.textureRect.y - border),
+        static_cast<uint16_t>(image.textureRect.w + border * 2),
+        static_cast<uint16_t>(image.textureRect.h + border * 2)
+    };
+
+    return SymbolQuad { tl, tr, bl, br, textureRect, 0, 0, anchor.point, globalMinScale, std::numeric_limits<float>::infinity(), shapedText.writingMode };
 }
 
 struct GlyphInstance {

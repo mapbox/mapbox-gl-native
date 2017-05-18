@@ -12,17 +12,17 @@
 using namespace mbgl;
 
 TEST(Buckets, CircleBucket) {
-    CircleBucket bucket { { {0, 0, 0}, MapMode::Still }, {} };
+    CircleBucket bucket { { {0, 0, 0}, MapMode::Still, 1.0 }, {} };
     ASSERT_FALSE(bucket.hasData());
 }
 
 TEST(Buckets, FillBucket) {
-    FillBucket bucket { { {0, 0, 0}, MapMode::Still }, {} };
+    FillBucket bucket { { {0, 0, 0}, MapMode::Still, 1.0 }, {} };
     ASSERT_FALSE(bucket.hasData());
 }
 
 TEST(Buckets, LineBucket) {
-    LineBucket bucket { { {0, 0, 0}, MapMode::Still }, {}, {} };
+    LineBucket bucket { { {0, 0, 0}, MapMode::Still, 1.0 }, {}, {} };
     ASSERT_FALSE(bucket.hasData());
 }
 

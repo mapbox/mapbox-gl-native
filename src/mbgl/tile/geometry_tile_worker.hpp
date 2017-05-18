@@ -31,7 +31,8 @@ public:
                        ActorRef<GeometryTile> parent,
                        OverscaledTileID,
                        const std::atomic<bool>&,
-                       const MapMode);
+                       const MapMode,
+                       const float pixelRatio);
     ~GeometryTileWorker();
 
     void setLayers(std::vector<Immutable<style::Layer::Impl>>, uint64_t correlationID);
@@ -61,6 +62,7 @@ private:
     const OverscaledTileID id;
     const std::atomic<bool>& obsolete;
     const MapMode mode;
+    const float pixelRatio;
 
     enum State {
         Idle,

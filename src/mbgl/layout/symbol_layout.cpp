@@ -48,6 +48,7 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
       overscaling(parameters.tileID.overscaleFactor()),
       zoom(parameters.tileID.overscaledZ),
       mode(parameters.mode),
+      pixelRatio(parameters.pixelRatio),
       tileSize(util::tileSize * overscaling),
       tilePixelRatio(float(util::EXTENT) / tileSize),
       textSize(layers.at(0)->as<RenderSymbolLayer>()->impl().layout.get<TextSize>()),
@@ -270,7 +271,7 @@ void SymbolLayout::prepare(const GlyphPositionMap& glyphs, const IconMap& icons)
                 if (image->second.sdf) {
                     sdfIcons = true;
                 }
-                if (image->second.relativePixelRatio != 1.0f) {
+                if (image->second.pixelRatio != pixelRatio) {
                     iconsNeedLinear = true;
                 } else if (layout.get<IconRotate>().constantOr(1) != 0) {
                     iconsNeedLinear = true;

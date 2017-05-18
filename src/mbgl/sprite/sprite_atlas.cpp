@@ -14,28 +14,27 @@
 
 namespace mbgl {
 
-static constexpr uint32_t padding = 1;
+// When copied into the atlas texture, image data is padded by one pixel on each side. Icon
+// images are padded with fully transparent pixels, while pattern images are padded with a
+// copy of the image data wrapped from the opposite side. In both cases, this ensures the
+// correct behavior of GL_LINEAR texture sampling mode.
+static constexpr uint16_t padding = 1;
 
-SpriteAtlasElement::SpriteAtlasElement(Rect<uint16_t> rect_,
-                                       const style::Image::Impl& image,
-                                       float pixelRatio)
-    : pos(std::move(rect_)),
-      sdf(image.sdf),
-      relativePixelRatio(image.pixelRatio / pixelRatio),
-      size{{image.image.size.width / image.pixelRatio,
-            image.image.size.height / image.pixelRatio}} {
-
-    const float w = image.image.size.width / pixelRatio;
-    const float h = image.image.size.height / pixelRatio;
-
-    tl = {{ float(pos.x + padding),     float(pos.y + padding)     }};
-    br = {{ float(pos.x + padding + w), float(pos.y + padding + h) }};
+SpriteAtlasElement::SpriteAtlasElement(Rect<uint16_t> rect, const style::Image::Impl& image)
+    : sdf(image.sdf),
+      pixelRatio(image.pixelRatio),
+      textureRect(
+        rect.x + padding,
+        rect.y + padding,
+        rect.w - padding * 2,
+        rect.h - padding * 2
+      ) {
 }
 
-SpriteAtlas::SpriteAtlas(Size size_, float pixelRatio_)
-    : size(std::move(size_)),
-      pixelRatio(pixelRatio_),
-      bin(size.width, size.height),
+SpriteAtlas::SpriteAtlas(Size size, float pixelRatio)
+    : pixelSize(std::ceil(size.width * pixelRatio),
+                std::ceil(size.height * pixelRatio)),
+      bin(pixelSize.width, pixelSize.height),
       dirty(true) {
 }
 
@@ -141,13 +140,12 @@ optional<SpriteAtlasElement> SpriteAtlas::getImage(const std::string& id,
         assert(entry.image.get());
         return SpriteAtlasElement {
             *(entry.*entryRect),
-            *entry.image,
-            pixelRatio
+            *entry.image
         };
     }
 
-    const uint16_t width = std::ceil(entry.image->image.size.width / pixelRatio) + 2 * padding;
-    const uint16_t height = std::ceil(entry.image->image.size.height / pixelRatio) + 2 * padding;
+    const uint16_t width = entry.image->image.size.width + padding * 2;
+    const uint16_t height = entry.image->image.size.height + padding * 2;
 
     Rect<uint16_t> rect = bin.allocate(width, height);
     if (rect.w == 0) {
@@ -162,23 +160,25 @@ optional<SpriteAtlasElement> SpriteAtlas::getImage(const std::string& id,
 
     return SpriteAtlasElement {
         rect,
-        *entry.image,
-        pixelRatio
+        *entry.image
     };
+}
+
+Size SpriteAtlas::getPixelSize() const {
+    return pixelSize;
 }
 
 void SpriteAtlas::copy(const Entry& entry, optional<Rect<uint16_t>> Entry::*entryRect) {
     if (!image.valid()) {
-        image = PremultipliedImage({ static_cast<uint32_t>(std::ceil(size.width * pixelRatio)),
-                                     static_cast<uint32_t>(std::ceil(size.height * pixelRatio)) });
+        image = PremultipliedImage(getPixelSize());
         image.fill(0);
     }
 
     const PremultipliedImage& src = entry.image->image;
     const Rect<uint16_t>& rect = *(entry.*entryRect);
 
-    const uint32_t x = (rect.x + padding) * pixelRatio;
-    const uint32_t y = (rect.y + padding) * pixelRatio;
+    const uint32_t x = rect.x + padding;
+    const uint32_t y = rect.y + padding;
     const uint32_t w = src.size.width;
     const uint32_t h = src.size.height;
 

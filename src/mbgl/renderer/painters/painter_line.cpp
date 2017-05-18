@@ -75,7 +75,7 @@ void Painter::renderLine(PaintParameters& parameters,
                  tile,
                  state,
                  pixelsToGLUnits,
-                 spriteAtlas->getSize(),
+                 spriteAtlas->getPixelSize(),
                  *posA,
                  *posB));
 
