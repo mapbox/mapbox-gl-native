@@ -153,7 +153,7 @@ Map::Impl::Impl(Map& map_,
       contextMode(contextMode_),
       pixelRatio(pixelRatio_),
       programCacheDir(std::move(programCacheDir_)),
-      annotationManager(std::make_unique<AnnotationManager>(pixelRatio)),
+      annotationManager(std::make_unique<AnnotationManager>()),
       asyncInvalidate([this] {
           if (mode == MapMode::Continuous) {
               backend.invalidate();

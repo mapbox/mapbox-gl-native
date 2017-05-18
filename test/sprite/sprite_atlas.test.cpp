@@ -18,16 +18,13 @@ using namespace mbgl;
 
 TEST(SpriteAtlas, Basic) {
     FixtureLog log;
-    SpriteAtlas atlas({ 63, 112 }, 1);
+    SpriteAtlas atlas;
 
     auto images = parseSprite(util::read_file("test/fixtures/annotations/emerald.png"),
                               util::read_file("test/fixtures/annotations/emerald.json"));
     for (auto& image : images) {
         atlas.addImage(image->impl);
     }
-
-    EXPECT_EQ(63u, atlas.getPixelSize().width);
-    EXPECT_EQ(112u, atlas.getPixelSize().height);
 
     auto metro = *atlas.getIcon("metro");
     EXPECT_EQ(1, metro.tl()[0]);
@@ -38,8 +35,7 @@ TEST(SpriteAtlas, Basic) {
     EXPECT_EQ(18, metro.displaySize()[1]);
     EXPECT_EQ(1.0f, metro.pixelRatio);
 
-    EXPECT_EQ(63u, atlas.getAtlasImage().size.width);
-    EXPECT_EQ(112u, atlas.getAtlasImage().size.height);
+    EXPECT_EQ(atlas.getPixelSize(), atlas.getAtlasImage().size);
 
     auto missing = atlas.getIcon("doesnotexist");
     EXPECT_FALSE(missing);
@@ -62,16 +58,13 @@ TEST(SpriteAtlas, Basic) {
 }
 
 TEST(SpriteAtlas, Size) {
-    SpriteAtlas atlas({ 63, 112 }, 1.4);
+    SpriteAtlas atlas;
 
     auto images = parseSprite(util::read_file("test/fixtures/annotations/emerald.png"),
                               util::read_file("test/fixtures/annotations/emerald.json"));
     for (auto& image : images) {
         atlas.addImage(image->impl);
     }
-
-    EXPECT_EQ(89u, atlas.getPixelSize().width);
-    EXPECT_EQ(157u, atlas.getPixelSize().height);
 
     auto metro = *atlas.getIcon("metro");
     EXPECT_EQ(1, metro.tl()[0]);
@@ -86,10 +79,7 @@ TEST(SpriteAtlas, Size) {
 }
 
 TEST(SpriteAtlas, Updates) {
-    SpriteAtlas atlas({ 32, 32 }, 1);
-
-    EXPECT_EQ(32u, atlas.getPixelSize().width);
-    EXPECT_EQ(32u, atlas.getPixelSize().height);
+    SpriteAtlas atlas;
 
     atlas.addImage(makeMutable<style::Image::Impl>("one", PremultipliedImage({ 16, 12 }), 1));
     auto one = *atlas.getIcon("one");
@@ -100,10 +90,6 @@ TEST(SpriteAtlas, Updates) {
     EXPECT_EQ(16, one.displaySize()[0]);
     EXPECT_EQ(12, one.displaySize()[1]);
     EXPECT_EQ(1.0f, one.pixelRatio);
-
-    // Now the image was created lazily.
-    EXPECT_EQ(32u, atlas.getAtlasImage().size.width);
-    EXPECT_EQ(32u, atlas.getAtlasImage().size.height);
 
     test::checkImage("test/fixtures/sprite_atlas/updates_before", atlas.getAtlasImage());
 
@@ -119,7 +105,7 @@ TEST(SpriteAtlas, Updates) {
 
 TEST(SpriteAtlas, AddRemove) {
     FixtureLog log;
-    SpriteAtlas atlas({ 32, 32 }, 1);
+    SpriteAtlas atlas;
 
     atlas.addImage(makeMutable<style::Image::Impl>("one", PremultipliedImage({ 16, 16 }), 2));
     atlas.addImage(makeMutable<style::Image::Impl>("two", PremultipliedImage({ 16, 16 }), 2));
@@ -148,8 +134,7 @@ TEST(SpriteAtlas, AddRemove) {
 
 TEST(SpriteAtlas, RemoveReleasesBinPackRect) {
     FixtureLog log;
-
-    SpriteAtlas atlas({ 36, 36 }, 1);
+    SpriteAtlas atlas;
 
     atlas.addImage(makeMutable<style::Image::Impl>("big", PremultipliedImage({ 32, 32 }), 1));
     EXPECT_TRUE(atlas.getIcon("big"));

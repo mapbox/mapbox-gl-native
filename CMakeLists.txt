@@ -56,6 +56,7 @@ mason_use(pixelmatch VERSION 0.10.0 HEADER_ONLY)
 mason_use(geojson VERSION 0.4.0 HEADER_ONLY)
 mason_use(polylabel VERSION 1.0.2 HEADER_ONLY)
 mason_use(wagyu VERSION 0.4.1 HEADER_ONLY)
+mason_use(shelf-pack VERSION 2.0.1 HEADER_ONLY)
 
 add_definitions(-DRAPIDJSON_HAS_STDSTRING=1)
 
