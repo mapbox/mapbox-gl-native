@@ -43,7 +43,7 @@ public:
     Transform transform;
     TransformState transformState;
     ThreadPool threadPool { 1 };
-    AnnotationManager annotationManager { 1.0 };
+    AnnotationManager annotationManager;
     style::Style style { threadPool, fileSource, 1.0 };
 
     TileParameters tileParameters {

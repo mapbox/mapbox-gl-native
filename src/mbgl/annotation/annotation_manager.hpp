@@ -26,7 +26,7 @@ class Image;
 
 class AnnotationManager : private util::noncopyable {
 public:
-    AnnotationManager(float pixelRatio);
+    AnnotationManager();
     ~AnnotationManager();
 
     AnnotationID addAnnotation(const Annotation&, const uint8_t maxZoom);

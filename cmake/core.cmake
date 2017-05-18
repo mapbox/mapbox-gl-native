@@ -26,6 +26,7 @@ target_add_mason_package(mbgl-core PRIVATE earcut)
 target_add_mason_package(mbgl-core PRIVATE protozero)
 target_add_mason_package(mbgl-core PRIVATE polylabel)
 target_add_mason_package(mbgl-core PRIVATE wagyu)
+target_add_mason_package(mbgl-core PRIVATE shelf-pack)
 
 mbgl_platform_core()
 

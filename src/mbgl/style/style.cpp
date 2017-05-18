@@ -74,7 +74,7 @@ Style::Style(Scheduler& scheduler_, FileSource& fileSource_, float pixelRatio)
       fileSource(fileSource_),
       glyphAtlas(std::make_unique<GlyphAtlas>(Size{ 2048, 2048 }, fileSource)),
       spriteLoader(std::make_unique<SpriteLoader>(pixelRatio)),
-      spriteAtlas(std::make_unique<SpriteAtlas>(Size{ 1024, 1024 }, pixelRatio)),
+      spriteAtlas(std::make_unique<SpriteAtlas>()),
       lineAtlas(std::make_unique<LineAtlas>(Size{ 256, 512 })),
       light(std::make_unique<Light>()),
       renderLight(light->impl),

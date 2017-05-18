@@ -20,8 +20,7 @@ using namespace style;
 const std::string AnnotationManager::SourceID = "com.mapbox.annotations";
 const std::string AnnotationManager::PointLayerID = "com.mapbox.annotations.points";
 
-AnnotationManager::AnnotationManager(float pixelRatio)
-        : spriteAtlas({ 1024, 1024 }, pixelRatio){
+AnnotationManager::AnnotationManager() {
     // This is a special atlas, holding only images added via addIcon, so we always treat it as
     // loaded.
     spriteAtlas.markAsLoaded();
