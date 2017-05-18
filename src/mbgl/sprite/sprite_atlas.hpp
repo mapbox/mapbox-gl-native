@@ -36,6 +36,7 @@ using IconDependencies = std::set<std::string>;
 
 class IconRequestor {
 public:
+    virtual ~IconRequestor() = default;
     virtual void onIconsAvailable(IconMap) = 0;
 };
 

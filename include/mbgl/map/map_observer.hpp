@@ -10,6 +10,8 @@ namespace mbgl {
 
 class MapObserver {
 public:
+    virtual ~MapObserver() = default;
+
     static MapObserver& nullObserver() {
         static MapObserver mapObserver;
         return mapObserver;

@@ -93,6 +93,8 @@ public:
 // particular attribute & uniform logic needed by each possible type of the {Text,Icon}Size properties.
 class SymbolSizeBinder {
 public:
+    virtual ~SymbolSizeBinder() = default;
+
     using Uniforms = gl::Uniforms<
         uniforms::u_is_size_zoom_constant,
         uniforms::u_is_size_feature_constant,
@@ -129,7 +131,7 @@ Range<float> getCoveringStops(Stops s, float lowerZoom, float upperZoom) {
     };
 }
 
-class ConstantSymbolSizeBinder : public SymbolSizeBinder {
+class ConstantSymbolSizeBinder final : public SymbolSizeBinder {
 public:
     using PropertyValue = variant<float, style::CameraFunction<float>>;
     
@@ -198,7 +200,7 @@ public:
     optional<style::CameraFunction<float>> function;
 };
 
-class SourceFunctionSymbolSizeBinder : public SymbolSizeBinder {
+class SourceFunctionSymbolSizeBinder final : public SymbolSizeBinder {
 public:
     using Vertex = gl::detail::Vertex<gl::Attribute<uint16_t, 1>>;
     using VertexVector = gl::VertexVector<Vertex>;
@@ -251,7 +253,7 @@ public:
     optional<VertexBuffer> buffer;
 };
 
-class CompositeFunctionSymbolSizeBinder: public SymbolSizeBinder {
+class CompositeFunctionSymbolSizeBinder final : public SymbolSizeBinder {
 public:
     using Vertex = SymbolSizeAttributes::Vertex;
     using VertexVector = gl::VertexVector<Vertex>;

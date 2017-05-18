@@ -29,6 +29,7 @@ class Context;
 
 class GlyphRequestor {
 public:
+    virtual ~GlyphRequestor() = default;
     virtual void onGlyphsAvailable(GlyphPositionMap) = 0;
 };
     
