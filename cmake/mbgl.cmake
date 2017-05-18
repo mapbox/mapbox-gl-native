@@ -44,6 +44,12 @@ execute_process(
     COMMAND git submodule update --init mapbox-gl-js
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 
+if(MBGL_PLATFORM STREQUAL "ios")
+    execute_process(
+        COMMAND git submodule update --init platform/ios/vendor/SMCalloutView platform/ios/uitest/KIF platform/ios/uitest/OHHTTPStubs
+        WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+endif()
+
 if(NOT EXISTS "${CMAKE_SOURCE_DIR}/mapbox-gl-js/node_modules")
     # Symlink mapbox-gl-js/node_modules so that the modules that are
     # about to be installed get cached between CI runs.
