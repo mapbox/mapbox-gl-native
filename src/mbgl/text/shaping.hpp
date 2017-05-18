@@ -3,7 +3,6 @@
 #include <mbgl/text/glyph.hpp>
 #include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/style/image.hpp>
-#include <mbgl/util/optional.hpp>
 
 namespace mbgl {
 
@@ -26,7 +25,7 @@ private:
           _right(right_),
           _angle(angle_) {}
 
-    optional<SpriteAtlasElement> _image;
+    SpriteAtlasElement _image;
     float _top;
     float _bottom;
     float _left;
@@ -34,9 +33,9 @@ private:
     float _angle;
 
 public:
-    static optional<PositionedIcon> shapeIcon(const class SpriteAtlasElement&, const std::array<float, 2>& iconOffset, const float iconRotation);
+    static PositionedIcon shapeIcon(const SpriteAtlasElement&, const std::array<float, 2>& iconOffset, const float iconRotation);
 
-    optional<class SpriteAtlasElement> image() const { return _image; }
+    const SpriteAtlasElement& image() const { return _image; }
     float top() const { return _top; }
     float bottom() const { return _bottom; }
     float left() const { return _left; }

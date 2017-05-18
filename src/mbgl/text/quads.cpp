@@ -22,7 +22,7 @@ SymbolQuad getIconQuad(const Anchor& anchor,
                        const float layoutTextSize,
                        const style::SymbolPlacementType placement, 
                        const Shaping& shapedText) {
-    auto image = *shapedIcon.image();
+    const SpriteAtlasElement& image = shapedIcon.image();
 
     const float border = 1.0;
     auto left = shapedIcon.left() - border;
