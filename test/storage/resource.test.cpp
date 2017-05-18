@@ -117,6 +117,13 @@ TEST(Resource, SpriteImage) {
     EXPECT_EQ("http://example.com/sprite@2x.png", resource.url);
 }
 
+TEST(Resource, Image) {
+    using namespace mbgl;
+    Resource resource = Resource::image("http://example.com/sprite.jpg");
+    EXPECT_EQ(Resource::Kind::Image, resource.kind);
+    EXPECT_EQ("http://example.com/sprite.jpg", resource.url);
+}
+
 TEST(Resource, SpriteJSON) {
     using namespace mbgl;
     Resource resource = Resource::spriteJSON("http://example.com/sprite", 2.0);

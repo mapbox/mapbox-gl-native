@@ -77,6 +77,9 @@ optional<Response> StubFileSource::defaultResponse(const Resource& resource) {
     case Resource::Kind::SpriteImage:
         if (!spriteImageResponse) throw std::runtime_error("unexpected sprite image request");
         return spriteImageResponse(resource);
+    case Resource::Kind::Image:
+        if (!imageResponse) throw std::runtime_error("unexpected image request");
+        return imageResponse(resource);
     case Resource::Kind::Unknown:
         throw std::runtime_error("unknown resource type");
     }

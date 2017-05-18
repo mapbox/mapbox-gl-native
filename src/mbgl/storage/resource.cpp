@@ -53,6 +53,13 @@ Resource Resource::source(const std::string& url) {
     };
 }
 
+Resource Resource::image(const std::string& url) {
+    return Resource {
+        Resource::Kind::Image,
+        url
+    };
+}
+
 Resource Resource::spriteImage(const std::string& base, float pixelRatio) {
     return Resource {
         Resource::Kind::SpriteImage,
