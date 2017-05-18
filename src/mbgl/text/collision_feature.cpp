@@ -49,7 +49,11 @@ CollisionFeature::CollisionFeature(const GeometryCoordinates& line,
 void CollisionFeature::bboxifyLabel(const GeometryCoordinates& line, GeometryCoordinate& anchorPoint,
                                     const int segment, const float labelLength, const float boxSize) {
     const float step = boxSize / 2;
-    const unsigned int nBoxes = std::floor(labelLength / step);
+    const int nBoxes = std::floor(labelLength / step);
+    // We calculate line collision boxes out to 150% of what would normally be our
+    // max size, to allow collision detection to work on labels that expand as
+    // they move into the distance
+    const int nPitchPaddingBoxes = std::floor(nBoxes / 4);
 
     // offset the center of the first box by half a box so that the edge of the
     // box is at the edge of the label.
@@ -58,24 +62,40 @@ void CollisionFeature::bboxifyLabel(const GeometryCoordinates& line, GeometryCoo
     GeometryCoordinate &p = anchorPoint;
     int index = segment + 1;
     float anchorDistance = firstBoxOffset;
+    const float labelStartDistance = -labelLength / 2;
+    const float paddingStartDistance = labelStartDistance - labelLength / 8;
 
     // move backwards along the line to the first segment the label appears on
     do {
         index--;
 
-        // there isn't enough room for the label after the beginning of the line
-        // checkMaxAngle should have already caught this
-        if (index < 0) return;
+        if (index < 0) {
+            if (anchorDistance > labelStartDistance) {
+                // there isn't enough room for the label after the beginning of the line
+                // checkMaxAngle should have already caught this
+                return;
+            } else {
+                // The line doesn't extend far enough back for all of our padding,
+                // but we got far enough to show the label under most conditions.
+                index = 0;
+                break;
+            }
+        }
 
         anchorDistance -= util::dist<float>(line[index], p);
         p = line[index];
-    } while (anchorDistance > -labelLength / 2);
+    } while (anchorDistance > paddingStartDistance);
 
     auto segmentLength = util::dist<float>(line[index], line[index + 1]);
 
-    for (unsigned int i = 0; i < nBoxes; i++) {
+    for (int i = -nPitchPaddingBoxes; i < nBoxes + nPitchPaddingBoxes; i++) {
         // the distance the box will be from the anchor
-        const float boxDistanceToAnchor = -labelLength / 2 + i * step;
+        const float boxDistanceToAnchor = labelStartDistance + i * step;
+        if (boxDistanceToAnchor < anchorDistance) {
+            // The line doesn't extend far enough back for this box, skip it
+            // (This could allow for line collisions on distant tiles)
+            continue;
+        }
 
         // the box is not on the current segment. Move to the next segment.
         while (anchorDistance + segmentLength < boxDistanceToAnchor) {
@@ -99,8 +119,29 @@ void CollisionFeature::bboxifyLabel(const GeometryCoordinates& line, GeometryCoo
             p0.y + segmentBoxDistance / segmentLength * (p1.y - p0.y)
         };
 
+        // Distance from label anchor point to inner (towards center) edge of this box
+        // The tricky thing here is that box positioning doesn't change with scale,
+        // but box size does change with scale.
+        // Technically, distanceToInnerEdge should be:
+        // Math.max(Math.abs(boxDistanceToAnchor - firstBoxOffset) - (step / scale), 0);
+        // But using that formula would make solving for maxScale more difficult, so we
+        // approximate with scale=2.
+        // This makes our calculation spot-on at scale=2, and on the conservative side for
+        // lower scales
         const float distanceToInnerEdge = std::max(std::fabs(boxDistanceToAnchor - firstBoxOffset) - step / 2, 0.0f);
-        const float maxScale = labelLength / 2 / distanceToInnerEdge;
+        float maxScale = labelLength / 2 / distanceToInnerEdge;
+
+        // The box maxScale calculations are designed to be conservative on collisions in the scale range
+        // [1,2]. At scale=1, each box has 50% overlap, and at scale=2, the boxes are lined up edge
+        // to edge (beyond scale 2, gaps start to appear, which could potentially allow missed collisions).
+        // We add "pitch padding" boxes to the left and right to handle effective underzooming
+        // (scale < 1) when labels are in the distance. The overlap approximation could cause us to use
+        // these boxes when the scale is greater than 1, but we prevent that because we know
+        // they're only necessary for scales less than one.
+        // This preserves the pre-pitch-padding behavior for unpitched maps.
+        if (i < 0 || i >= nBoxes) {
+            maxScale = std::min(maxScale, 0.99f);
+        }
 
         boxes.emplace_back(boxAnchor, -boxSize / 2, -boxSize / 2, boxSize / 2, boxSize / 2, maxScale);
     }
