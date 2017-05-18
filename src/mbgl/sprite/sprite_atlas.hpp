@@ -43,6 +43,7 @@ typedef std::set<std::string> IconDependencies;
 
 class IconRequestor {
 public:
+    virtual ~IconRequestor() = default;
     virtual void onIconsAvailable(IconMap) = 0;
 };
 
