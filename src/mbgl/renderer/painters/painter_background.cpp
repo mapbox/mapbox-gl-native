@@ -42,6 +42,7 @@ void Painter::renderBackground(PaintParameters& parameters, const RenderBackgrou
                 FillPatternUniforms::values(
                     matrixForTile(tileID),
                     context.viewport.getCurrentValue().size,
+                    spriteAtlas->getSize(),
                     *imagePosA,
                     *imagePosB,
                     background.get<BackgroundPattern>(),

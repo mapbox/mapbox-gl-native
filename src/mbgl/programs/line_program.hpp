@@ -112,6 +112,7 @@ class LinePatternProgram : public Program<
         uniforms::u_pattern_br_b,
         uniforms::u_pattern_size_a,
         uniforms::u_pattern_size_b,
+        uniforms::u_texsize,
         uniforms::u_fade,
         uniforms::u_image>,
     style::LinePaintProperties>
@@ -123,6 +124,7 @@ public:
                                        const RenderTile&,
                                        const TransformState&,
                                        const std::array<float, 2>& pixelsToGLUnits,
+                                       Size atlasSize,
                                        const SpriteAtlasElement& posA,
                                        const SpriteAtlasElement& posB);
 };

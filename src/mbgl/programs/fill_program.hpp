@@ -33,6 +33,7 @@ struct FillUniforms : gl::Uniforms<
 struct FillPatternUniforms : gl::Uniforms<
     uniforms::u_matrix,
     uniforms::u_world,
+    uniforms::u_texsize,
     uniforms::u_pattern_tl_a,
     uniforms::u_pattern_br_a,
     uniforms::u_pattern_tl_b,
@@ -49,6 +50,7 @@ struct FillPatternUniforms : gl::Uniforms<
 {
     static Values values(mat4 matrix,
                          Size framebufferSize,
+                         Size atlasSize,
                          const SpriteAtlasElement&,
                          const SpriteAtlasElement&,
                          const Faded<std::string>&,
