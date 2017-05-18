@@ -29,6 +29,7 @@ public:
     ResponseFunction glyphsResponse;
     ResponseFunction spriteJSONResponse;
     ResponseFunction spriteImageResponse;
+    ResponseFunction imageResponse;
 
 private:
     // The default behavior is to throw if no per-kind callback has been set.

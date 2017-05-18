@@ -191,6 +191,11 @@ TEST(OfflineDownload, Activate) {
         return test.response("sprite.png");
     };
 
+    test.fileSource.imageResponse = [&] (const Resource& resource) {
+        EXPECT_EQ("http://127.0.0.1:3000/radar.gif", resource.url);
+        return test.response("radar.gif");
+    };
+
     test.fileSource.spriteJSONResponse = [&] (const Resource& resource) {
         EXPECT_EQ("http://127.0.0.1:3000/sprite.json", resource.url);
         return test.response("sprite.json");
@@ -219,7 +224,7 @@ TEST(OfflineDownload, Activate) {
 
     observer->statusChangedFn = [&] (OfflineRegionStatus status) {
         if (status.complete()) {
-            EXPECT_EQ(261u, status.completedResourceCount); // 256 glyphs, 1 tile, 1 style, source, sprite image, and sprite json
+            EXPECT_EQ(262u, status.completedResourceCount); // 256 glyphs, 1 tile, 1 style, source, image, sprite image, and sprite json
             EXPECT_EQ(test.size, status.completedResourceSize);
 
             download.setState(OfflineRegionDownloadState::Inactive);
@@ -299,7 +304,7 @@ TEST(OfflineDownload, GetStatusStyleComplete) {
     EXPECT_EQ(OfflineRegionDownloadState::Inactive, status.downloadState);
     EXPECT_EQ(1u, status.completedResourceCount);
     EXPECT_EQ(test.size, status.completedResourceSize);
-    EXPECT_EQ(260u, status.requiredResourceCount);
+    EXPECT_EQ(261u, status.requiredResourceCount);
     EXPECT_FALSE(status.requiredResourceCountIsPrecise);
     EXPECT_FALSE(status.complete());
 }
@@ -325,7 +330,7 @@ TEST(OfflineDownload, GetStatusStyleAndSourceComplete) {
     EXPECT_EQ(OfflineRegionDownloadState::Inactive, status.downloadState);
     EXPECT_EQ(2u, status.completedResourceCount);
     EXPECT_EQ(test.size, status.completedResourceSize);
-    EXPECT_EQ(261u, status.requiredResourceCount);
+    EXPECT_EQ(262u, status.requiredResourceCount);
     EXPECT_TRUE(status.requiredResourceCountIsPrecise);
     EXPECT_FALSE(status.complete());
 }

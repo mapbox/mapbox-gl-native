@@ -189,6 +189,7 @@ std::unique_ptr<AsyncRequest> OnlineFileSource::request(const Resource& resource
 
     switch (resource.kind) {
     case Resource::Kind::Unknown:
+    case Resource::Kind::Image:
         break;
 
     case Resource::Kind::Style:
