@@ -142,4 +142,8 @@ TEST(Image, Premultiply) {
     EXPECT_EQ(127, image.data[1]);
     EXPECT_EQ(127, image.data[2]);
     EXPECT_EQ(128, image.data[3]);
+    EXPECT_EQ(1u, image.size.width);
+    EXPECT_EQ(1u, image.size.height);
+    EXPECT_EQ(0u, rgba.size.width);
+    EXPECT_EQ(0u, rgba.size.height);
 }
