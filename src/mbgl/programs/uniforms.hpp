@@ -14,6 +14,8 @@ MBGL_DEFINE_UNIFORM_SCALAR(Color, u_color);
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_blur);
 
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_zoom);
+MBGL_DEFINE_UNIFORM_SCALAR(float, u_collision_y_stretch);
+MBGL_DEFINE_UNIFORM_SCALAR(float, u_camera_to_center_distance);
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_pitch);
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_bearing);
 

@@ -43,15 +43,17 @@ MBGL_DEFINE_UNIFORM_SCALAR(bool, u_is_size_feature_constant);
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_size_t);
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_size);
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_layout_size);
-MBGL_DEFINE_UNIFORM_SCALAR(float, u_collision_y_stretch);
+MBGL_DEFINE_UNIFORM_SCALAR(float, u_max_camera_distance);
 } // namespace uniforms
 
 struct SymbolLayoutAttributes : gl::Attributes<
     attributes::a_pos_offset,
+    attributes::a_label_pos,
     attributes::a_data<uint16_t, 4>>
 {
     static Vertex vertex(Point<float> a,
                          Point<float> o,
+                         Point<float> labelAnchor,
                          uint16_t tx,
                          uint16_t ty,
                          float minzoom,
@@ -65,6 +67,10 @@ struct SymbolLayoutAttributes : gl::Attributes<
                 static_cast<int16_t>(a.y),
                 static_cast<int16_t>(::round(o.x * 64)),  // use 1/64 pixels for placement
                 static_cast<int16_t>(::round(o.y * 64))
+            }},
+            {{
+                static_cast<int16_t>(labelAnchor.x),
+                static_cast<int16_t>(labelAnchor.y)
             }},
             {{
                 tx,
@@ -400,7 +406,10 @@ class SymbolIconProgram : public SymbolProgram<
         uniforms::u_texture,
         uniforms::u_fadetexture,
         uniforms::u_is_text,
-        uniforms::u_collision_y_stretch>,
+        uniforms::u_collision_y_stretch,
+        uniforms::u_camera_to_center_distance,
+        uniforms::u_pitch,
+        uniforms::u_max_camera_distance>,
     style::IconPaintProperties>
 {
 public:
@@ -434,8 +443,10 @@ class SymbolSDFProgram : public SymbolProgram<
         uniforms::u_fadetexture,
         uniforms::u_is_text,
         uniforms::u_collision_y_stretch,
-        uniforms::u_gamma_scale,
+        uniforms::u_camera_to_center_distance,
         uniforms::u_pitch,
+        uniforms::u_max_camera_distance,
+        uniforms::u_gamma_scale,
         uniforms::u_bearing,
         uniforms::u_aspect_ratio,
         uniforms::u_pitch_with_map,
@@ -456,8 +467,10 @@ public:
             uniforms::u_fadetexture,
             uniforms::u_is_text,
             uniforms::u_collision_y_stretch,
-            uniforms::u_gamma_scale,
+            uniforms::u_camera_to_center_distance,
             uniforms::u_pitch,
+            uniforms::u_max_camera_distance,
+            uniforms::u_gamma_scale,
             uniforms::u_bearing,
             uniforms::u_aspect_ratio,
             uniforms::u_pitch_with_map,

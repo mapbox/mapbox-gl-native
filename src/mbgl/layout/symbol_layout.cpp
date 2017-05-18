@@ -499,7 +499,7 @@ std::unique_ptr<SymbolBucket> SymbolLayout::place(CollisionTile& collisionTile) 
                 for (const auto& symbol : symbolInstance.glyphQuads) {
                     addSymbol(
                         bucket->text, *bucket->textSizeBinder, symbol, feature, placementZoom,
-                        keepUpright, textPlacement, collisionTile.config.angle, symbolInstance.writingModes);
+                        keepUpright, textPlacement, collisionTile.config.angle, symbolInstance.writingModes, symbolInstance.point);
                 }
             }
         }
@@ -510,7 +510,7 @@ std::unique_ptr<SymbolBucket> SymbolLayout::place(CollisionTile& collisionTile) 
             if (iconScale < collisionTile.maxScale && symbolInstance.iconQuad) {
                 addSymbol(
                     bucket->icon, *bucket->iconSizeBinder, *symbolInstance.iconQuad, feature, placementZoom,
-                    keepUpright, iconPlacement, collisionTile.config.angle, symbolInstance.writingModes);
+                    keepUpright, iconPlacement, collisionTile.config.angle, symbolInstance.writingModes, symbolInstance.point);
             }
         }
         
@@ -536,7 +536,8 @@ void SymbolLayout::addSymbol(Buffer& buffer,
                              const bool keepUpright,
                              const style::SymbolPlacementType placement,
                              const float placementAngle,
-                             const WritingModeType writingModes) {
+                             const WritingModeType writingModes,
+                             const Point<float> labelAnchor) {
     constexpr const uint16_t vertexLength = 4;
 
     const auto &tl = symbol.tl;
@@ -585,13 +586,13 @@ void SymbolLayout::addSymbol(Buffer& buffer,
     uint8_t glyphAngle = std::round((symbol.glyphAngle / (M_PI * 2)) * 256);
 
     // coordinates (2 triangles)
-    buffer.vertices.emplace_back(SymbolLayoutAttributes::vertex(anchorPoint, tl, tex.x, tex.y,
+    buffer.vertices.emplace_back(SymbolLayoutAttributes::vertex(anchorPoint, tl, labelAnchor, tex.x, tex.y,
                         minZoom, maxZoom, placementZoom, glyphAngle));
-    buffer.vertices.emplace_back(SymbolLayoutAttributes::vertex(anchorPoint, tr, tex.x + tex.w, tex.y,
+    buffer.vertices.emplace_back(SymbolLayoutAttributes::vertex(anchorPoint, tr, labelAnchor, tex.x + tex.w, tex.y,
                         minZoom, maxZoom, placementZoom, glyphAngle));
-    buffer.vertices.emplace_back(SymbolLayoutAttributes::vertex(anchorPoint, bl, tex.x, tex.y + tex.h,
+    buffer.vertices.emplace_back(SymbolLayoutAttributes::vertex(anchorPoint, bl, labelAnchor, tex.x, tex.y + tex.h,
                         minZoom, maxZoom, placementZoom, glyphAngle));
-    buffer.vertices.emplace_back(SymbolLayoutAttributes::vertex(anchorPoint, br, tex.x + tex.w, tex.y + tex.h,
+    buffer.vertices.emplace_back(SymbolLayoutAttributes::vertex(anchorPoint, br, labelAnchor, tex.x + tex.w, tex.y + tex.h,
                         minZoom, maxZoom, placementZoom, glyphAngle));
     
     sizeBinder.populateVertexVector(feature);
@@ -641,10 +642,10 @@ void SymbolLayout::addToDebugBuffers(CollisionTile& collisionTile, SymbolBucket&
                 auto& segment = collisionBox.segments.back();
                 uint16_t index = segment.vertexLength;
 
-                collisionBox.vertices.emplace_back(CollisionBoxProgram::vertex(anchor, tl, maxZoom, placementZoom));
-                collisionBox.vertices.emplace_back(CollisionBoxProgram::vertex(anchor, tr, maxZoom, placementZoom));
-                collisionBox.vertices.emplace_back(CollisionBoxProgram::vertex(anchor, br, maxZoom, placementZoom));
-                collisionBox.vertices.emplace_back(CollisionBoxProgram::vertex(anchor, bl, maxZoom, placementZoom));
+                collisionBox.vertices.emplace_back(CollisionBoxProgram::vertex(anchor, symbolInstance.point, tl, maxZoom, placementZoom));
+                collisionBox.vertices.emplace_back(CollisionBoxProgram::vertex(anchor, symbolInstance.point, tr, maxZoom, placementZoom));
+                collisionBox.vertices.emplace_back(CollisionBoxProgram::vertex(anchor, symbolInstance.point, br, maxZoom, placementZoom));
+                collisionBox.vertices.emplace_back(CollisionBoxProgram::vertex(anchor, symbolInstance.point, bl, maxZoom, placementZoom));
 
                 collisionBox.lines.emplace_back(index + 0, index + 1);
                 collisionBox.lines.emplace_back(index + 1, index + 2);

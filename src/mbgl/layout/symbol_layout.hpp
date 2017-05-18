@@ -71,7 +71,8 @@ private:
                    const bool keepUpright,
                    const style::SymbolPlacementType,
                    const float placementAngle,
-                   WritingModeType writingModes);
+                   WritingModeType writingModes,
+                   const Point<float> labelAnchor);
 
     const std::string sourceLayerName;
     const std::string bucketName;
