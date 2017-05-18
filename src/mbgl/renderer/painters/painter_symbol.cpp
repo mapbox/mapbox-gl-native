@@ -141,7 +141,7 @@ void Painter::renderSymbol(PaintParameters& parameters,
             context,
             gl::Lines { 1.0f },
             gl::DepthMode::disabled(),
-            gl::StencilMode::disabled(),
+            stencilModeForClipping(tile.clip),
             colorModeForRenderPass(),
             CollisionBoxProgram::UniformValues {
                 uniforms::u_matrix::Value{ tile.matrix },
