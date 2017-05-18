@@ -1,3 +1,8 @@
+# 3.5.2 - May 18, 2017
+
+- Fixed a memory leak ([#8884](https://github.com/mapbox/mapbox-gl-native/pull/9035))
+
+
 # 3.5.1 - May 8, 2017
 
 - Adds Node v6 binaries. **Note, Node v4 binaries will be removed on August 1st.** ([#8884](https://github.com/mapbox/mapbox-gl-native/pull/8884))
