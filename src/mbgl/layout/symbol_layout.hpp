@@ -65,7 +65,8 @@ private:
                    const bool keepUpright,
                    const style::SymbolPlacementType,
                    const float placementAngle,
-                   WritingModeType writingModes);
+                   WritingModeType writingModes,
+                   const Point<float> labelAnchor);
 
     // Stores the layer so that we can hold on to GeometryTileFeature instances in SymbolFeature,
     // which may reference data from this object.
