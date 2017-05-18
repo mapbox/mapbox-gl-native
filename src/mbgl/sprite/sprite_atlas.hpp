@@ -20,15 +20,32 @@ class Context;
 
 class SpriteAtlasElement {
 public:
-    SpriteAtlasElement(Rect<uint16_t>, const style::Image::Impl&, float pixelRatio);
+    SpriteAtlasElement(Rect<uint16_t>, const style::Image::Impl&);
 
-    Rect<uint16_t> pos;
     bool sdf;
+    float pixelRatio;
+    Rect<uint16_t> textureRect;
 
-    float relativePixelRatio;
-    std::array<float, 2> size;
-    std::array<float, 2> tl;
-    std::array<float, 2> br;
+    std::array<uint16_t, 2> tl() const {
+        return {{
+            textureRect.x,
+            textureRect.y
+        }};
+    }
+
+    std::array<uint16_t, 2> br() const {
+        return {{
+            static_cast<uint16_t>(textureRect.x + textureRect.w),
+            static_cast<uint16_t>(textureRect.y + textureRect.h)
+        }};
+    }
+
+    std::array<float, 2> displaySize() const {
+        return {{
+            textureRect.w / pixelRatio,
+            textureRect.h / pixelRatio,
+        }};
+    }
 };
 
 using IconMap = std::unordered_map<std::string, SpriteAtlasElement>;
@@ -64,7 +81,14 @@ public:
     void getIcons(IconRequestor& requestor);
     void removeRequestor(IconRequestor& requestor);
 
+    // Ensure that the atlas contains the named image suitable for rendering as an icon, and
+    // return its metrics. The image will be padded on each side with a one pixel wide transparent
+    // strip, but the returned metrics are exclusive of this padding.
     optional<SpriteAtlasElement> getIcon(const std::string& name);
+
+    // Ensure that the atlas contains the named image suitable for rendering as an pattern, and
+    // return its metrics. The image will be padded on each side with a one pixel wide copy of
+    // pixels from the opposite side, but the returned metrics are exclusive of this padding.
     optional<SpriteAtlasElement> getPattern(const std::string& name);
 
     // Binds the atlas texture to the GPU, and uploads data if it is out of date.
@@ -74,8 +98,7 @@ public:
     // the texture is only bound when the data is out of date (=dirty).
     void upload(gl::Context&, gl::TextureUnit unit);
 
-    Size getSize() const { return size; }
-    float getPixelRatio() const { return pixelRatio; }
+    Size getPixelSize() const;
 
     // Only for use in tests.
     const PremultipliedImage& getAtlasImage() const {
@@ -83,8 +106,7 @@ public:
     }
 
 private:
-    const Size size;
-    const float pixelRatio;
+    const Size pixelSize;
     bool loaded = false;
 
     struct Entry {

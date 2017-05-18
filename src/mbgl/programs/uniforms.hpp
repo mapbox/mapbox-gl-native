@@ -22,10 +22,10 @@ MBGL_DEFINE_UNIFORM_SCALAR(Size, u_texsize);
 
 MBGL_DEFINE_UNIFORM_VECTOR(float, 2, u_extrude_scale);
 
-MBGL_DEFINE_UNIFORM_VECTOR(float, 2, u_pattern_tl_a);
-MBGL_DEFINE_UNIFORM_VECTOR(float, 2, u_pattern_br_a);
-MBGL_DEFINE_UNIFORM_VECTOR(float, 2, u_pattern_tl_b);
-MBGL_DEFINE_UNIFORM_VECTOR(float, 2, u_pattern_br_b);
+MBGL_DEFINE_UNIFORM_VECTOR(uint16_t, 2, u_pattern_tl_a);
+MBGL_DEFINE_UNIFORM_VECTOR(uint16_t, 2, u_pattern_br_a);
+MBGL_DEFINE_UNIFORM_VECTOR(uint16_t, 2, u_pattern_tl_b);
+MBGL_DEFINE_UNIFORM_VECTOR(uint16_t, 2, u_pattern_br_b);
 MBGL_DEFINE_UNIFORM_VECTOR(float, 2, u_pattern_size_a);
 MBGL_DEFINE_UNIFORM_VECTOR(float, 2, u_pattern_size_b);
 MBGL_DEFINE_UNIFORM_VECTOR(float, 2, u_pixel_coord_upper);
