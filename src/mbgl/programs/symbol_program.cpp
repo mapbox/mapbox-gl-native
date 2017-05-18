@@ -10,7 +10,7 @@ namespace mbgl {
 
 using namespace style;
 
-static_assert(sizeof(SymbolLayoutVertex) == 16, "expected SymbolLayoutVertex size");
+static_assert(sizeof(SymbolLayoutVertex) == 20, "expected SymbolLayoutVertex size");
 
 std::unique_ptr<SymbolSizeBinder> SymbolSizeBinder::create(const float tileZoom,
                                                     const style::DataDrivenPropertyValue<float>& sizeProperty,
@@ -59,6 +59,9 @@ Values makeValues(const bool isText,
         uniforms::u_fadetexture::Value{ 1 },
         uniforms::u_is_text::Value{ isText },
         uniforms::u_collision_y_stretch::Value{ tile.tile.yStretch() },
+        uniforms::u_camera_to_center_distance::Value{ state.getCameraToCenterDistance() },
+        uniforms::u_pitch::Value{ state.getPitch() },
+        uniforms::u_max_camera_distance::Value{ 10.0f },
         std::forward<Args>(args)...
     };
 }
@@ -103,7 +106,6 @@ typename SymbolSDFProgram<PaintProperties>::UniformValues SymbolSDFProgram<Paint
         tile,
         state,
         uniforms::u_gamma_scale::Value{ gammaScale },
-        uniforms::u_pitch::Value{ state.getPitch() },
         uniforms::u_bearing::Value{ -1.0f * state.getAngle() },
         uniforms::u_aspect_ratio::Value{ (state.getSize().width * 1.0f) / (state.getSize().height * 1.0f) },
         uniforms::u_pitch_with_map::Value{ values.pitchAlignment == AlignmentType::Map },
