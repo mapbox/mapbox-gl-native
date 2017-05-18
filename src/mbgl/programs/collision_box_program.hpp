@@ -18,6 +18,7 @@ MBGL_DEFINE_UNIFORM_SCALAR(float, u_maxzoom);
 
 using CollisionBoxAttributes = gl::Attributes<
     attributes::a_pos,
+    attributes::a_anchor_pos,
     attributes::a_extrude,
     attributes::a_data<uint8_t, 2>>;
 
@@ -29,17 +30,24 @@ class CollisionBoxProgram : public Program<
         uniforms::u_matrix,
         uniforms::u_scale,
         uniforms::u_zoom,
-        uniforms::u_maxzoom>,
+        uniforms::u_maxzoom,
+        uniforms::u_collision_y_stretch,
+        uniforms::u_camera_to_center_distance,
+        uniforms::u_pitch>,
     style::Properties<>>
 {
 public:
     using Program::Program;
 
-    static LayoutVertex vertex(Point<float> a, Point<float> o, float maxzoom, float placementZoom) {
+    static LayoutVertex vertex(Point<float> a, Point<float> anchor, Point<float> o, float maxzoom, float placementZoom) {
         return LayoutVertex {
             {{
                 static_cast<int16_t>(a.x),
                 static_cast<int16_t>(a.y)
+            }},
+            {{
+                static_cast<int16_t>(anchor.x),
+                static_cast<int16_t>(anchor.y)
             }},
             {{
                 static_cast<int16_t>(::round(o.x)),
