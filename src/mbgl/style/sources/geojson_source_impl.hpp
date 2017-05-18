@@ -13,6 +13,7 @@ namespace style {
 
 class GeoJSONData {
 public:
+    virtual ~GeoJSONData() = default;
     virtual mapbox::geometry::feature_collection<int16_t> getTile(const CanonicalTileID&) = 0;
 };
 
