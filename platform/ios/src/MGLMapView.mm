@@ -467,7 +467,7 @@ public:
 
     // setup logo bug
     //
-    UIImage *logo = [MGLMapView resourceImageNamed:@"mapbox.png"];
+    UIImage *logo = [MGLMapView resourceImageNamed:@"mapbox"];
     _logoView = [[UIImageView alloc] initWithImage:logo];
     _logoView.accessibilityTraits = UIAccessibilityTraitStaticText;
     _logoView.accessibilityLabel = NSLocalizedStringWithDefaultValue(@"LOGO_A11Y_LABEL", nil, nil, @"Mapbox", @"Accessibility label");
@@ -616,11 +616,11 @@ public:
 
 - (UIImage *)compassImage
 {
-    UIImage *scaleImage = [MGLMapView resourceImageNamed:@"Compass.png"];
+    UIImage *scaleImage = [MGLMapView resourceImageNamed:@"Compass"];
     UIGraphicsBeginImageContextWithOptions(scaleImage.size, NO, [UIScreen mainScreen].scale);
     [scaleImage drawInRect:{ CGPointZero, scaleImage.size }];
 
-    CGFloat northSize = 9;
+    CGFloat northSize = 11;
     UIFont *northFont;
     if ([UIFont respondsToSelector:@selector(systemFontOfSize:weight:)])
     {
@@ -635,7 +635,7 @@ public:
         NSForegroundColorAttributeName: [UIColor whiteColor],
     }];
     CGRect stringRect = CGRectMake((scaleImage.size.width - north.size.width) / 2,
-                                   scaleImage.size.height * 0.45,
+                                   scaleImage.size.height * 0.435,
                                    north.size.width, north.size.height);
     [north drawInRect:stringRect];
 
@@ -874,8 +874,8 @@ public:
     
     // logo bug
     self.logoView.frame = {
-        self.contentInset.left+5,
-        CGRectGetHeight(self.bounds)-5-self.contentInset.bottom-CGRectGetHeight(self.logoView.bounds),
+        self.contentInset.left+8,
+        CGRectGetHeight(self.bounds)-8-self.contentInset.bottom-CGRectGetHeight(self.logoView.bounds),
         CGRectGetWidth(self.logoView.bounds),
         CGRectGetHeight(self.logoView.bounds)
     };
@@ -5290,17 +5290,17 @@ public:
 
 + (UIImage *)resourceImageNamed:(NSString *)imageName
 {
-    NSString *extension = imageName.pathExtension.length ? imageName.pathExtension : @"png";
-    NSBundle *bundle = [NSBundle mgl_frameworkBundle];
-    NSString *path = [bundle pathForResource:imageName.stringByDeletingPathExtension
-                                      ofType:extension];
-    if ( ! path)
+    UIImage *image = [UIImage imageNamed:imageName
+                                inBundle:[NSBundle mgl_frameworkBundle]
+           compatibleWithTraitCollection:nil];
+
+    if ( ! image)
     {
-        [NSException raise:@"Resource not found" format:
+        [NSException raise:@"MGLResourceNotFoundException" format:
          @"The resource named “%@” could not be found in the Mapbox framework bundle.", imageName];
     }
 
-    return [UIImage imageWithContentsOfFile:path];
+    return image;
 }
 
 - (BOOL)isFullyLoaded
