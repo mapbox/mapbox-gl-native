@@ -20,7 +20,6 @@ public:
 
     optional<T> evaluate(float z) const {
         if (stops.empty()) {
-            assert(false);
             return {};
         }
 
