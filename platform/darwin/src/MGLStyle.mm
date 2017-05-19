@@ -14,6 +14,8 @@
 #import "MGLStyle_Private.h"
 #import "MGLStyleLayer_Private.h"
 #import "MGLSource_Private.h"
+#import "MGLLight.h"
+#import "MGLLight_Private.h"
 
 #import "NSDate+MGLAdditions.h"
 
@@ -28,6 +30,7 @@
 #include <mbgl/map/map.hpp>
 #include <mbgl/util/default_styles.hpp>
 #include <mbgl/style/image.hpp>
+#include <mbgl/style/light.hpp>
 #include <mbgl/style/layers/fill_layer.hpp>
 #include <mbgl/style/layers/fill_extrusion_layer.hpp>
 #include <mbgl/style/layers/line_layer.hpp>
@@ -582,6 +585,17 @@ static NSURL *MGLStyleURL_emerald;
     transition.duration = MGLTimeIntervalFromDuration(transitionOptions.duration.value_or(mbgl::Duration::zero()));
     
     return transition;
+}
+
+- (void)setLight:(MGLLight *)light
+{
+    self.mapView.mbglMap->setLight([light mbglLight]);
+}
+
+- (MGLLight *)light
+{
+    MGLLight *light = [[MGLLight alloc] initWithRawLayer:self.mapView.mbglMap->getLight()];
+    return light;
 }
 
 - (NSString *)description

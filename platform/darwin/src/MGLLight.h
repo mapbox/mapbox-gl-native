@@ -1,20 +1,22 @@
-#import <Foundation/Foundation.h>
 #import <CoreGraphics/CoreGraphics.h>
 
+#import "MGLFoundation.h"
 #import "MGLStyleValue.h"
-#import "MGLTypes.h"
 
-typedef NS_ENUM(NSInteger, MGLLightAnchorType) {
-    MGLLightAnchorTypeMap = 0,
+NS_ASSUME_NONNULL_BEGIN
+
+typedef NS_ENUM(NSUInteger, MGLLightAnchorType) {
+    MGLLightAnchorTypeMap,
     MGLLightAnchorTypeViewport
 };
 
+MGL_EXPORT
 @interface MGLLight : NSObject
 
 /**
- Values describing animated transitions to `intensity` property.
+ `lightAnchorType` property.
  */
-@property (nonatomic) MGLLightAnchorType lightAnchorType;
+@property (nonatomic) MGLStyleValue<NSValue *> *lightAnchorType;
 
 /**
  Values describing animated transitions to `lightAnchorType` property.
@@ -35,7 +37,7 @@ typedef NS_ENUM(NSInteger, MGLLightAnchorType) {
 
 /**
  */
-@property (nonatomic, null_resettable) MGLStyleValue<MGLColor *> *color;
+@property (nonatomic) MGLStyleValue<UIColor *> *color;
 
 /**
  Values describing animated transitions to `color` property.
@@ -46,7 +48,7 @@ typedef NS_ENUM(NSInteger, MGLLightAnchorType) {
 /**
  Specifies the receiver's intensity.
  */
-@property(nonatomic) CGFloat intensity;
+@property(nonatomic) MGLStyleValue<NSNumber *> *intensity;
 
 /**
  Values describing animated transitions to `intensity` property.
@@ -54,3 +56,11 @@ typedef NS_ENUM(NSInteger, MGLLightAnchorType) {
 @property (nonatomic) MGLTransition intensityTransition;
 
 @end
+
+@interface NSValue (MGLLightAdditions)
+
++ (instancetype)valueWithMGLLightAnchorType:(MGLLightAnchorType)lightAnchorType;
+
+@end
+
+NS_ASSUME_NONNULL_END

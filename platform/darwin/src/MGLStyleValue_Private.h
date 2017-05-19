@@ -8,6 +8,7 @@
 #import "MGLConversion.h"
 #include <mbgl/style/conversion/data_driven_property_value.hpp>
 #include <mbgl/style/conversion.hpp>
+#import <mbgl/style/types.hpp>
 
 #import <mbgl/util/enum.hpp>
 
