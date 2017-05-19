@@ -22,26 +22,29 @@ public:
           base(base_) {
     }
 
-    optional<T> evaluate(const Value& value) const {
+    optional<T> evaluate(float z) const {
         if (stops.empty()) {
             assert(false);
             return T();
         }
 
-        optional<float> z = numericValue<float>(value);
-        if (!z) {
-            return T();
-        }
-
-        auto it = stops.upper_bound(*z);
+        auto it = stops.upper_bound(z);
         if (it == stops.end()) {
             return stops.rbegin()->second;
         } else if (it == stops.begin()) {
             return stops.begin()->second;
         } else {
             return util::interpolate(std::prev(it)->second, it->second,
-                util::interpolationFactor(base, { std::prev(it)->first, it->first }, *z));
+                util::interpolationFactor(base, { std::prev(it)->first, it->first }, z));
         }
+    }
+
+    optional<T> evaluate(const Value& value) const {
+        optional<float> z = numericValue<float>(value);
+        if (!z) {
+            return T();
+        }
+        return evaluate(*z);
     }
 
     friend bool operator==(const ExponentialStops& lhs,
