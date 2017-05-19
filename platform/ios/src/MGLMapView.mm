@@ -3492,6 +3492,7 @@ public:
 
         annotationView.annotation = nil;
         [annotationView removeFromSuperview];
+        [self.annotationContainerView.annotationViews removeObject:annotationView];
 
         if (annotationTag == _selectedAnnotationTag)
         {
