@@ -8,7 +8,7 @@ ext {
     versionName = "5.0.0"
 
     mapboxServicesVersion = "2.2.0-SNAPSHOT"
-    supportLibVersion = "25.1.0"
+    supportLibVersion = "25.3.1"
     wearableVersion = '2.0.0'
     espressoVersion = '2.2.2'
     testRunnerVersion = '0.5'
