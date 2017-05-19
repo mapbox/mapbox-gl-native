@@ -20,6 +20,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * Added a new initializer to `MGLAnnotationView` so that it is possible to create a new instance with an associated annotation object. ([#9029](https://github.com/mapbox/mapbox-gl-native/pull/9029))
 * Fixed an issue causing a view-backed annotation to disappear immediately instead of animating when the annotation’s `coordinate` property is set to a value outside the current viewport. ([#8565](https://github.com/mapbox/mapbox-gl-native/pull/8565))
 * Fixed an issue in which `MGLMapView` overrode the tint colors of its annotation views. ([#8789](https://github.com/mapbox/mapbox-gl-native/pull/8789))
+* Fixed an issue causing annotation views to persist in the map's annotation container view even after their associated annotations were removed. ([#9025](https://github.com/mapbox/mapbox-gl-native/pull/9025))
 
 ### User interaction
 
