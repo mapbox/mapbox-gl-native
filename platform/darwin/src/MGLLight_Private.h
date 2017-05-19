@@ -7,13 +7,9 @@
 
 @interface MGLLight (Private)
 
-/**
- A raw pointer to the mbgl object.
- */
-@property (nonatomic, readonly) mbgl::style::Light *rawLight;
 
-- (instancetype)initWithRawLayer:(mbgl::style::Light *)rawLight;
+- (instancetype)initWithMBGLLight:(const mbgl::style::Light &)mbglLight;
 
-- (std::unique_ptr<mbgl::style::Light>)mbglLight;
+- (mbgl::style::Light)toMBGLLight;
 
 @end

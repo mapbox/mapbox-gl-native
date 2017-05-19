@@ -14,7 +14,6 @@
 #import "MGLStyle_Private.h"
 #import "MGLStyleLayer_Private.h"
 #import "MGLSource_Private.h"
-#import "MGLLight.h"
 #import "MGLLight_Private.h"
 
 #import "NSDate+MGLAdditions.h"
@@ -589,12 +588,14 @@ static NSURL *MGLStyleURL_emerald;
 
 - (void)setLight:(MGLLight *)light
 {
-    self.mapView.mbglMap->setLight([light mbglLight]);
+    std::unique_ptr<mbgl::style::Light> mbglLight = std::make_unique<mbgl::style::Light>([light toMBGLLight]);
+    self.mapView.mbglMap->setLight(std::move(mbglLight));
 }
 
 - (MGLLight *)light
 {
-    MGLLight *light = [[MGLLight alloc] initWithRawLayer:self.mapView.mbglMap->getLight()];
+    mbgl::style::Light mbglLight = *self.mapView.mbglMap->getLight();
+    MGLLight *light = [[MGLLight alloc] initWithMBGLLight:mbglLight];
     return light;
 }
 

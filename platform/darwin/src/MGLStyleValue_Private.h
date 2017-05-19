@@ -3,6 +3,7 @@
 #import "MGLStyleValue.h"
 
 #import "NSValue+MGLStyleAttributeAdditions.h"
+#import "NSValue+MGLAdditions.h"
 #import "MGLTypes.h"
 
 #import "MGLConversion.h"
@@ -416,6 +417,11 @@ private: // Private utilities for converting from mgl to mbgl values
             mbglValue.push_back(mbglElement);
         }
     }
+    
+    void getMBGLValue(ObjCType rawValue, mbgl::style::Position &mbglValue) {
+        mbgl::style::Position position;
+        mbglValue = position;
+    }
 
     // Enumerations
     template <typename MBGLEnum = MBGLType,
@@ -473,6 +479,12 @@ private: // Private utilities for converting from mbgl to mgl values
             [array addObject:toMGLRawStyleValue(mbglElement)];
         }
         return array;
+    }
+    
+    static NSValue *toMGLRawStyleValue(const mbgl::style::Position &mbglStopValue) {
+        std::array<float, 3> spherical = mbglStopValue.getSpherical();
+        MGLPosition position = MGLPositionMake(spherical[0], spherical[1], spherical[2]);
+        return [NSValue valueWithMGLPosition:position];
     }
 
     // Enumerations

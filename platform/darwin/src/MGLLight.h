@@ -5,7 +5,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef NS_ENUM(NSUInteger, MGLLightAnchorType) {
+typedef NS_ENUM(NSUInteger, MGLLightAnchor) {
     MGLLightAnchorTypeMap,
     MGLLightAnchorTypeViewport
 };
@@ -13,21 +13,23 @@ typedef NS_ENUM(NSUInteger, MGLLightAnchorType) {
 MGL_EXPORT
 @interface MGLLight : NSObject
 
++ (instancetype)defaultLight;
+
 /**
  `lightAnchorType` property.
  */
-@property (nonatomic) MGLStyleValue<NSValue *> *lightAnchorType;
+@property (nonatomic) MGLLightAnchor lightAnchor;
 
 /**
  Values describing animated transitions to `lightAnchorType` property.
  */
-@property (nonatomic) MGLTransition lightAnchorTypeTransition;
+@property (nonatomic) MGLTransition lightAnchorTransition;
 
 
 /**
  Position.
  */
-@property (nonatomic) MGLPosition position;
+@property (nonatomic) MGLStyleValue<NSValue *> * position;
 
 /**
  Values describing animated transitions to `position` property.
@@ -35,9 +37,12 @@ MGL_EXPORT
 @property (nonatomic) MGLTransition positionTransiton;
 
 
-/**
- */
-@property (nonatomic) MGLStyleValue<UIColor *> *color;
+#if TARGET_OS_IPHONE
+@property (nonatomic, null_resettable) MGLStyleValue<UIColor *> *color;
+#else
+
+@property (nonatomic, null_resettable) MGLStyleValue<NSColor *> *color;
+#endif
 
 /**
  Values describing animated transitions to `color` property.
@@ -54,12 +59,6 @@ MGL_EXPORT
  Values describing animated transitions to `intensity` property.
  */
 @property (nonatomic) MGLTransition intensityTransition;
-
-@end
-
-@interface NSValue (MGLLightAdditions)
-
-+ (instancetype)valueWithMGLLightAnchorType:(MGLLightAnchorType)lightAnchorType;
 
 @end
 

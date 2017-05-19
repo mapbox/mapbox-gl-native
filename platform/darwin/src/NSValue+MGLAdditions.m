@@ -58,4 +58,27 @@
     return transition;
 }
 
++ (NSValue *)valueWithMGLPosition:(MGLPosition)position
+{
+    return [NSValue value:&position withObjCType:@encode(MGLPosition)];
+}
+
+- (MGLPosition)MGLPositionValue
+{
+    MGLPosition position;
+    [self getValue:&position];
+    return position;
+}
+
++ (NSValue *)valueWithMGLLightAnchor:(MGLLightAnchor)lightAnchor {
+    return [NSValue value:&lightAnchor withObjCType:@encode(MGLLightAnchor)];
+}
+
+- (MGLLightAnchor)MGLLightAnchorValue
+{
+    MGLLightAnchor achorType;
+    [self getValue:&achorType];
+    return achorType;
+}
+
 @end

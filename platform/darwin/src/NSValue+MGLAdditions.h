@@ -1,6 +1,7 @@
 #import <Foundation/Foundation.h>
 
 #import "MGLGeometry.h"
+#import "MGLLight.h"
 #import "MGLOfflinePack.h"
 #import "MGLTypes.h"
 
@@ -86,6 +87,15 @@ NS_ASSUME_NONNULL_BEGIN
  The `MGLTransition` structure representation of the value.
  */
 @property (readonly) MGLTransition MGLTransitionValue;
+
++ (instancetype)valueWithMGLPosition:(MGLPosition)position;
+
+
+@property (readonly) MGLPosition MGLPositionValue;
+
++ (NSValue *)valueWithMGLLightAnchor:(MGLLightAnchor)lightAnchor;
+
+@property (readonly) MGLLightAnchor MGLLightAnchorValue;
 
 @end
 
