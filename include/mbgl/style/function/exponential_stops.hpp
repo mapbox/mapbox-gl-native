@@ -24,8 +24,7 @@ public:
 
     optional<T> evaluate(float z) const {
         if (stops.empty()) {
-            assert(false);
-            return T();
+            return {};
         }
 
         auto it = stops.upper_bound(z);
@@ -42,7 +41,7 @@ public:
     optional<T> evaluate(const Value& value) const {
         optional<float> z = numericValue<float>(value);
         if (!z) {
-            return T();
+            return {};
         }
         return evaluate(*z);
     }
