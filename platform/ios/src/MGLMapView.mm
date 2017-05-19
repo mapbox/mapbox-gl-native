@@ -131,6 +131,9 @@ const CGFloat MGLAnnotationImagePaddingForCallout = 1;
 
 const CGSize MGLAnnotationAccessibilityElementMinimumSize = CGSizeMake(10, 10);
 
+// Context for KVO observing UILayoutGuides.
+static void * MGLLayoutGuidesUpdatedContext = &MGLLayoutGuidesUpdatedContext;
+
 /// Unique identifier representing a single annotation in mbgl.
 typedef uint32_t MGLAnnotationTag;
 
@@ -233,13 +236,9 @@ public:
 @property (nonatomic) GLKView *glView;
 @property (nonatomic) UIImageView *glSnapshotView;
 @property (nonatomic, readwrite) MGLScaleBar *scaleBar;
-@property (nonatomic) NS_MUTABLE_ARRAY_OF(NSLayoutConstraint *) *scaleBarConstraints;
 @property (nonatomic, readwrite) UIImageView *compassView;
-@property (nonatomic) NS_MUTABLE_ARRAY_OF(NSLayoutConstraint *) *compassViewConstraints;
 @property (nonatomic, readwrite) UIImageView *logoView;
-@property (nonatomic) NS_MUTABLE_ARRAY_OF(NSLayoutConstraint *) *logoViewConstraints;
 @property (nonatomic, readwrite) UIButton *attributionButton;
-@property (nonatomic) NS_MUTABLE_ARRAY_OF(NSLayoutConstraint *) *attributionButtonConstraints;
 @property (nonatomic, readwrite) MGLStyle *style;
 @property (nonatomic) UITapGestureRecognizer *singleTapGestureRecognizer;
 @property (nonatomic) UITapGestureRecognizer *doubleTap;
@@ -294,7 +293,8 @@ public:
     NSDate *_userLocationAnimationCompletionDate;
     /// True if a willChange notification has been issued for shape annotation layers and a didChange notification is pending.
     BOOL _isChangingAnnotationLayers;
-
+    BOOL _isObservingTopLayoutGuide;
+    BOOL _isObservingBottomLayoutGuide;
     BOOL _isWaitingForRedundantReachableNotification;
     BOOL _isTargetingInterfaceBuilder;
 
@@ -471,9 +471,7 @@ public:
     _logoView = [[UIImageView alloc] initWithImage:logo];
     _logoView.accessibilityTraits = UIAccessibilityTraitStaticText;
     _logoView.accessibilityLabel = NSLocalizedStringWithDefaultValue(@"LOGO_A11Y_LABEL", nil, nil, @"Mapbox", @"Accessibility label");
-    _logoView.translatesAutoresizingMaskIntoConstraints = NO;
     [self addSubview:_logoView];
-    _logoViewConstraints = [NSMutableArray array];
 
     // setup attribution
     //
@@ -481,9 +479,7 @@ public:
     _attributionButton.accessibilityLabel = NSLocalizedStringWithDefaultValue(@"INFO_A11Y_LABEL", nil, nil, @"About this map", @"Accessibility label");
     _attributionButton.accessibilityHint = NSLocalizedStringWithDefaultValue(@"INFO_A11Y_HINT", nil, nil, @"Shows credits, a feedback form, and more", @"Accessibility hint");
     [_attributionButton addTarget:self action:@selector(showAttribution) forControlEvents:UIControlEventTouchUpInside];
-    _attributionButton.translatesAutoresizingMaskIntoConstraints = NO;
     [self addSubview:_attributionButton];
-    _attributionButtonConstraints = [NSMutableArray array];
     [_attributionButton addObserver:self forKeyPath:@"hidden" options:NSKeyValueObservingOptionNew context:NULL];
 
     // setup compass
@@ -495,16 +491,12 @@ public:
     _compassView.accessibilityTraits = UIAccessibilityTraitButton;
     _compassView.accessibilityLabel = NSLocalizedStringWithDefaultValue(@"COMPASS_A11Y_LABEL", nil, nil, @"Compass", @"Accessibility label");
     _compassView.accessibilityHint = NSLocalizedStringWithDefaultValue(@"COMPASS_A11Y_HINT", nil, nil, @"Rotates the map to face due north", @"Accessibility hint");
-    _compassView.translatesAutoresizingMaskIntoConstraints = NO;
     [self addSubview:_compassView];
-    _compassViewConstraints = [NSMutableArray array];
     
     // setup scale control
     //
     _scaleBar = [[MGLScaleBar alloc] init];
-    _scaleBar.translatesAutoresizingMaskIntoConstraints = NO;
     [self addSubview:_scaleBar];
-    _scaleBarConstraints = [NSMutableArray array];
     
     // setup interaction
     //
@@ -672,6 +664,14 @@ public:
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [_attributionButton removeObserver:self forKeyPath:@"hidden"];
 
+    if (_isObservingTopLayoutGuide) {
+        [(NSObject *)self.viewControllerForLayoutGuides.topLayoutGuide removeObserver:self forKeyPath:@"bounds" context:(void *)&MGLLayoutGuidesUpdatedContext];
+    }
+    
+    if (_isObservingBottomLayoutGuide) {
+        [(NSObject *)self.viewControllerForLayoutGuides.bottomLayoutGuide removeObserver:self forKeyPath:@"bounds" context:(void *)&MGLLayoutGuidesUpdatedContext];
+    }
+
     // Removing the annotations unregisters any outstanding KVO observers.
     NSArray *annotations = self.annotations;
     if (annotations)
@@ -697,11 +697,6 @@ public:
     {
         [EAGLContext setCurrentContext:nil];
     }
-
-    [self.logoViewConstraints removeAllObjects];
-    self.logoViewConstraints = nil;
-    [self.attributionButtonConstraints removeAllObjects];
-    self.attributionButtonConstraints = nil;
 }
 
 - (void)setDelegate:(nullable id<MGLMapViewDelegate>)delegate
@@ -786,105 +781,31 @@ public:
 
 - (void)updateConstraints
 {
-    // scale control
-    //
-    [self removeConstraints:self.scaleBarConstraints];
-    [self.scaleBarConstraints removeAllObjects];
-    
-    [self.scaleBarConstraints addObject:
-     [NSLayoutConstraint constraintWithItem:self.scaleBar
-                                  attribute:NSLayoutAttributeTop
-                                  relatedBy:NSLayoutRelationEqual
-                                     toItem:self
-                                  attribute:NSLayoutAttributeTop
-                                 multiplier:1
-                                   constant:5+self.contentInset.top]];
-    
-    [self.scaleBarConstraints addObject:
-     [NSLayoutConstraint constraintWithItem:self.scaleBar
-                                  attribute:NSLayoutAttributeLeading
-                                  relatedBy:NSLayoutRelationEqual
-                                     toItem:self
-                                  attribute:NSLayoutAttributeLeading
-                                 multiplier:1
-                                   constant:8 + self.contentInset.left]];
-    
-    [self addConstraints:self.scaleBarConstraints];
-    
-    // compass
-    //
-    [self removeConstraints:self.compassViewConstraints];
-    [self.compassViewConstraints removeAllObjects];
-
-    [self.compassViewConstraints addObject:
-     [NSLayoutConstraint constraintWithItem:self.compassView
-                                  attribute:NSLayoutAttributeTop
-                                  relatedBy:NSLayoutRelationEqual
-                                     toItem:self
-                                  attribute:NSLayoutAttributeTop
-                                 multiplier:1
-                                   constant:5 + self.contentInset.top]];
-
-    [self.compassViewConstraints addObject:
-     [NSLayoutConstraint constraintWithItem:self
-                                  attribute:NSLayoutAttributeTrailing
-                                  relatedBy:NSLayoutRelationEqual
-                                     toItem:self.compassView
-                                  attribute:NSLayoutAttributeTrailing
-                                 multiplier:1
-                                   constant:5 + self.contentInset.right]];
-
-    [self addConstraints:self.compassViewConstraints];
-
-    // logo bug
-    //
-    [self removeConstraints:self.logoViewConstraints];
-    [self.logoViewConstraints removeAllObjects];
-
-    [self.logoViewConstraints addObject:
-     [NSLayoutConstraint constraintWithItem:self
-                                  attribute:NSLayoutAttributeBottom
-                                  relatedBy:NSLayoutRelationEqual
-                                     toItem:self.logoView
-                                  attribute:NSLayoutAttributeBaseline
-                                 multiplier:1
-                                   constant:8 + self.contentInset.bottom]];
-
-    [self.logoViewConstraints addObject:
-     [NSLayoutConstraint constraintWithItem:self.logoView
-                                  attribute:NSLayoutAttributeLeading
-                                  relatedBy:NSLayoutRelationEqual
-                                     toItem:self
-                                  attribute:NSLayoutAttributeLeading
-                                 multiplier:1
-                                   constant:8 + self.contentInset.left]];
-    [self addConstraints:self.logoViewConstraints];
-
-    // attribution button
-    //
-    [self removeConstraints:self.attributionButtonConstraints];
-    [self.attributionButtonConstraints removeAllObjects];
-
-    [self.attributionButtonConstraints addObject:
-     [NSLayoutConstraint constraintWithItem:self
-                                  attribute:NSLayoutAttributeBottom
-                                  relatedBy:NSLayoutRelationEqual
-                                     toItem:self.attributionButton
-                                  attribute:NSLayoutAttributeBaseline
-                                 multiplier:1
-                                   constant:8 + self.contentInset.bottom]];
-
-    [self.attributionButtonConstraints addObject:
-     [NSLayoutConstraint constraintWithItem:self
-                                  attribute:NSLayoutAttributeTrailing
-                                  relatedBy:NSLayoutRelationEqual
-                                     toItem:self.attributionButton
-                                  attribute:NSLayoutAttributeTrailing
-                                 multiplier:1
-                                   constant:8 + self.contentInset.right]];
-    [self addConstraints:self.attributionButtonConstraints];
-
     [super updateConstraints];
+    
+    // If we have a view controller reference and its automaticallyAdjustsScrollViewInsets
+    // is set to YES, -[MGLMapView adjustContentInset] takes top and bottom layout
+    // guides into account. To get notified about changes to the layout guides,
+    // we need to observe their bounds and re-layout accordingly.
+    
+    UIViewController *viewController = self.viewControllerForLayoutGuides;
+    BOOL useLayoutGuides = viewController.view && viewController.automaticallyAdjustsScrollViewInsets;
+    
+    if (useLayoutGuides && viewController.topLayoutGuide && !_isObservingTopLayoutGuide) {
+        [(NSObject *)viewController.topLayoutGuide addObserver:self forKeyPath:@"bounds" options:0 context:(void *)&MGLLayoutGuidesUpdatedContext];
+        _isObservingTopLayoutGuide = YES;
+    } else if (!useLayoutGuides && _isObservingTopLayoutGuide) {
+        [(NSObject *)viewController.topLayoutGuide removeObserver:self forKeyPath:@"bounds" context:(void *)&MGLLayoutGuidesUpdatedContext];
+        _isObservingTopLayoutGuide = NO;
+    }
+    
+    if (useLayoutGuides && viewController.bottomLayoutGuide && !_isObservingBottomLayoutGuide) {
+        [(NSObject *)viewController.bottomLayoutGuide addObserver:self forKeyPath:@"bounds" options:0 context:(void *)&MGLLayoutGuidesUpdatedContext];
+        _isObservingBottomLayoutGuide = YES;
+    } else if (!useLayoutGuides && _isObservingBottomLayoutGuide) {
+        [(NSObject *)viewController.bottomLayoutGuide removeObserver:self forKeyPath:@"bounds" context:(void *)&MGLLayoutGuidesUpdatedContext];
+        _isObservingBottomLayoutGuide = NO;
+    }
 }
 
 - (BOOL)isOpaque
@@ -917,6 +838,10 @@ public:
     [super layoutSubviews];
 
     [self adjustContentInset];
+    
+    [self observeLayoutGuidesIfNeeded];
+    
+    [self layoutOrnaments];
 
     if (!_isTargetingInterfaceBuilder) {
         _mbglMap->setSize([self size]);
@@ -929,6 +854,39 @@ public:
     }
 
     [self updateUserLocationAnnotationView];
+}
+
+- (void)layoutOrnaments
+{
+    // scale bar
+    self.scaleBar.frame = {
+        self.contentInset.left+8,
+        self.contentInset.top+5,
+        CGRectGetWidth(self.scaleBar.frame),
+        CGRectGetHeight(self.scaleBar.frame)
+    };
+    
+    // compass
+    self.compassView.center = {
+        .x = CGRectGetWidth(self.bounds)-CGRectGetMidX(self.compassView.bounds)-self.contentInset.right-5,
+        .y = CGRectGetMidY(self.compassView.bounds)+self.contentInset.top+5
+    };
+    
+    // logo bug
+    self.logoView.frame = {
+        self.contentInset.left+5,
+        CGRectGetHeight(self.bounds)-5-self.contentInset.bottom-CGRectGetHeight(self.logoView.bounds),
+        CGRectGetWidth(self.logoView.bounds),
+        CGRectGetHeight(self.logoView.bounds)
+    };
+    
+    // attribution
+    self.attributionButton.frame = {
+        CGRectGetWidth(self.bounds)-CGRectGetWidth(self.attributionButton.bounds)-self.contentInset.right-8,
+        CGRectGetHeight(self.bounds)-CGRectGetHeight(self.attributionButton.bounds)-self.contentInset.bottom-8,
+        CGRectGetWidth(self.attributionButton.bounds),
+        CGRectGetHeight(self.attributionButton.bounds)
+    };
 }
 
 /// Updates `contentInset` to reflect the current window geometry.
@@ -970,6 +928,34 @@ public:
     self.contentInset = contentInset;
 }
 
+- (void)observeLayoutGuidesIfNeeded
+{
+    UIViewController *viewController = self.viewControllerForLayoutGuides;
+    BOOL useLayoutGuides = viewController.view && viewController.automaticallyAdjustsScrollViewInsets;
+    
+    if (!_isObservingTopLayoutGuide && useLayoutGuides && viewController.topLayoutGuide)
+    {
+        [(NSObject *)viewController.topLayoutGuide addObserver:self forKeyPath:@"bounds" options:0 context:MGLLayoutGuidesUpdatedContext];
+        _isObservingTopLayoutGuide = YES;
+    }
+    else if (!useLayoutGuides && _isObservingTopLayoutGuide)
+    {
+        [(NSObject *)viewController.topLayoutGuide removeObserver:self forKeyPath:@"bounds" context:MGLLayoutGuidesUpdatedContext];
+        _isObservingTopLayoutGuide = NO;
+    }
+    
+    if (!_isObservingBottomLayoutGuide && useLayoutGuides && viewController.bottomLayoutGuide)
+    {
+        [(NSObject *)viewController.bottomLayoutGuide addObserver:self forKeyPath:@"bounds" options:0 context:MGLLayoutGuidesUpdatedContext];
+        _isObservingBottomLayoutGuide = YES;
+    }
+    else if (!useLayoutGuides && _isObservingBottomLayoutGuide)
+    {
+        [(NSObject *)viewController.bottomLayoutGuide removeObserver:self forKeyPath:@"bounds" context:MGLLayoutGuidesUpdatedContext];
+        _isObservingBottomLayoutGuide = NO;
+    }
+}
+
 - (void)setContentInset:(UIEdgeInsets)contentInset
 {
     [self setContentInset:contentInset animated:NO];
@@ -1000,7 +986,7 @@ public:
     }
 
     // Compass, logo and attribution button constraints needs to be updated.
-    [self setNeedsUpdateConstraints];
+    [self setNeedsLayout];
 }
 
 /// Returns the frame of inset content within the map view.
@@ -2065,6 +2051,10 @@ public:
             _mbglMap->updateAnnotation(annotationTag, [annotation annotationObjectWithDelegate:self]);
             [self updateCalloutView];
         }
+    }
+    else if (context == MGLLayoutGuidesUpdatedContext && [keyPath isEqualToString:@"bounds"])
+    {
+        [self setNeedsLayout];
     }
 }
 
