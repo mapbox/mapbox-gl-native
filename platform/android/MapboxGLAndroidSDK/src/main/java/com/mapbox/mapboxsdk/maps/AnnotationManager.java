@@ -92,6 +92,10 @@ class AnnotationManager {
     if (annotation instanceof Marker) {
       Marker marker = (Marker) annotation;
       marker.hideInfoWindow();
+      if (selectedMarkers.contains(marker)) {
+        selectedMarkers.remove(marker);
+      }
+
       if (marker instanceof MarkerView) {
         markerViewManager.removeMarkerView((MarkerView) marker);
       }
@@ -118,6 +122,10 @@ class AnnotationManager {
       if (annotation instanceof Marker) {
         Marker marker = (Marker) annotation;
         marker.hideInfoWindow();
+        if (selectedMarkers.contains(marker)) {
+          selectedMarkers.remove(marker);
+        }
+
         if (marker instanceof MarkerView) {
           markerViewManager.removeMarkerView((MarkerView) marker);
         }
@@ -138,6 +146,7 @@ class AnnotationManager {
     Annotation annotation;
     int count = annotations.size();
     long[] ids = new long[count];
+    selectedMarkers.clear();
     for (int i = 0; i < count; i++) {
       ids[i] = annotations.keyAt(i);
       annotation = annotations.get(ids[i]);
