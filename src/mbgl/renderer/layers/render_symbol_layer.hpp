@@ -51,6 +51,8 @@ public:
 
     bool hasHalo;
     bool hasFill;
+    
+    float maxCameraDistance; // 1.5 for road labels, or 10 (essentially infinite) for everything else
 };
 
 } // namespace style
