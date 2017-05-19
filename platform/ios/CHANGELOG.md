@@ -37,6 +37,14 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * The error passed into `-[MGLMapViewDelegate mapViewDidFailLoadingMap:withError:]` now includes a more specific description and failure reason. ([#8418](https://github.com/mapbox/mapbox-gl-native/pull/8418))
 * Fixed an issue rendering polylines that contain duplicate vertices. ([#8808](https://github.com/mapbox/mapbox-gl-native/pull/8808))
 
+## 3.5.4 - May 9, 2017
+
+* Fixed an issue that caused view backed annotations to become detached from the map view during pan gestures combined with animations of annotation view size or when the annotation view had no size but contained subviews with a non-zero size. ([#8926](https://github.com/mapbox/mapbox-gl-native/pull/8926))
+
+## 3.5.3 - May 2, 2017
+
+* Fixed an issue that prevented the attribution `UIAlertController` from showing in modal hierarchies. ([#8837](https://github.com/mapbox/mapbox-gl-native/pull/8837))
+
 ## 3.5.2 - April 7, 2017
 
 * Fixed an issue that caused a crash when the user location annotation was presenting a callout view and the map was moved. ([#8686](https://github.com/mapbox/mapbox-gl-native/pull/8686))
