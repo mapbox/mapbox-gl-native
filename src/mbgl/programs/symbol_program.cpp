@@ -61,7 +61,7 @@ Values makeValues(const bool isText,
         uniforms::u_collision_y_stretch::Value{ tile.tile.yStretch() },
         uniforms::u_camera_to_center_distance::Value{ state.getCameraToCenterDistance() },
         uniforms::u_pitch::Value{ state.getPitch() },
-        uniforms::u_max_camera_distance::Value{ 10.0f },
+        uniforms::u_max_camera_distance::Value{ values.maxCameraDistance },
         std::forward<Args>(args)...
     };
 }
