@@ -168,7 +168,7 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
         layer.sourceLayerIdentifier = "building"
         layer.fillExtrusionHeight = MGLStyleValue(interpolationMode: .identity, sourceStops: nil, attributeName: "height", options: nil)
         layer.fillExtrusionBase = MGLStyleValue(interpolationMode: .identity, sourceStops: nil, attributeName: "min_height", options: nil)
-        layer.predicate = NSPredicate(format: "extrude == TRUE")
+        layer.predicate = NSPredicate(format: "extrude == 'true'")
         mapView.style?.addLayer(layer)
         //#-end-example-code
         
