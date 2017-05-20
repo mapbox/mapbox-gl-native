@@ -88,13 +88,32 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (readonly) MGLTransition MGLTransitionValue;
 
-+ (instancetype)valueWithMGLPosition:(MGLPosition)position;
+/**
+ Creates a new value object containing the given `MGLLightPosition`
+ structure.
+ 
+ @param lightPosition The value for the new object.
+ @return A new value object that contains the light position information.
+ */
++ (instancetype)valueWithMGLLightPosition:(MGLLightPosition)lightPosition;
 
+/**
+ The `MGLLightPosition` structure representation of the value.
+ */
+@property (readonly) MGLLightPosition MGLLightPositionValue;
 
-@property (readonly) MGLPosition MGLPositionValue;
-
+/**
+ Creates a new value object containing the given `MGLLightAnchor`
+ enum.
+ 
+ @param lightAnchor The value for the new object.
+ @return A new value object that contains the light anchor information.
+ */
 + (NSValue *)valueWithMGLLightAnchor:(MGLLightAnchor)lightAnchor;
 
+/**
+ The `MGLLightAnchor` enum representation of the value.
+ */
 @property (readonly) MGLLightAnchor MGLLightAnchorValue;
 
 @end

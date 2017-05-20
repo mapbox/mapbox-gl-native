@@ -565,6 +565,12 @@ MGL_EXPORT
  */
 - (void)removeImageForName:(NSString *)name;
 
+
+#pragma mark Managing the Style's Light
+
+/**
+ Provides global light source for the style.
+ */
 @property (nonatomic, strong) MGLLight *light;
 
 @end

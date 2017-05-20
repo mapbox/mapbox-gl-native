@@ -586,15 +586,17 @@ static NSURL *MGLStyleURL_emerald;
     return transition;
 }
 
+#pragma mark Style light
+
 - (void)setLight:(MGLLight *)light
 {
-    std::unique_ptr<mbgl::style::Light> mbglLight = std::make_unique<mbgl::style::Light>([light toMBGLLight]);
+    std::unique_ptr<mbgl::style::Light> mbglLight = std::make_unique<mbgl::style::Light>([light mbglLight]);
     self.mapView.mbglMap->setLight(std::move(mbglLight));
 }
 
 - (MGLLight *)light
 {
-    mbgl::style::Light mbglLight = *self.mapView.mbglMap->getLight();
+    auto mbglLight = self.mapView.mbglMap->getLight();
     MGLLight *light = [[MGLLight alloc] initWithMBGLLight:mbglLight];
     return light;
 }

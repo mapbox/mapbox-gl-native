@@ -418,8 +418,9 @@ private: // Private utilities for converting from mgl to mbgl values
         }
     }
     
-    void getMBGLValue(ObjCType rawValue, mbgl::style::Position &mbglValue) {
-        mbgl::style::Position position;
+    void getMBGLValue(NSValue *rawValue, mbgl::style::Position &mbglValue) {
+        auto spherical = rawValue.mgl_lightPositionArrayValue;
+        mbgl::style::Position position(spherical);
         mbglValue = position;
     }
 
@@ -483,8 +484,8 @@ private: // Private utilities for converting from mbgl to mgl values
     
     static NSValue *toMGLRawStyleValue(const mbgl::style::Position &mbglStopValue) {
         std::array<float, 3> spherical = mbglStopValue.getSpherical();
-        MGLPosition position = MGLPositionMake(spherical[0], spherical[1], spherical[2]);
-        return [NSValue valueWithMGLPosition:position];
+        MGLLightPosition position = MGLLightPositionMake(spherical[0], spherical[1], spherical[2]);
+        return [NSValue valueWithMGLLightPosition:position];
     }
 
     // Enumerations

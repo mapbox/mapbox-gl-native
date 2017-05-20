@@ -3,13 +3,17 @@
 #import "MGLLight.h"
 
 #import <mbgl/style/light.hpp>
-#import <mbgl/style/types.hpp>
 
 @interface MGLLight (Private)
 
+/**
+ Initializes and returns a `MGLLight` associated with a style's light.
+ */
+- (instancetype)initWithMBGLLight:(const mbgl::style::Light *)mbglLight;
 
-- (instancetype)initWithMBGLLight:(const mbgl::style::Light &)mbglLight;
-
-- (mbgl::style::Light)toMBGLLight;
+/**
+ Returns an `mbgl::style::Light` representation of the `MGLLight`.
+ */
+- (mbgl::style::Light)mbglLight;
 
 @end
