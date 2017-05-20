@@ -1,5 +1,6 @@
 #include "i18n.hpp"
 
+#include <algorithm>
 #include <map>
 
 namespace {
@@ -29,14 +30,14 @@ DEFINE_IS_IN_UNICODE_BLOCK(Latin1Supplement, 0x0080, 0x00FF)
 // DEFINE_IS_IN_UNICODE_BLOCK(CyrillicSupplement, 0x0500, 0x052F)
 // DEFINE_IS_IN_UNICODE_BLOCK(Armenian, 0x0530, 0x058F)
 // DEFINE_IS_IN_UNICODE_BLOCK(Hebrew, 0x0590, 0x05FF)
-// DEFINE_IS_IN_UNICODE_BLOCK(Arabic, 0x0600, 0x06FF)
+DEFINE_IS_IN_UNICODE_BLOCK(Arabic, 0x0600, 0x06FF)
 // DEFINE_IS_IN_UNICODE_BLOCK(Syriac, 0x0700, 0x074F)
-// DEFINE_IS_IN_UNICODE_BLOCK(ArabicSupplement, 0x0750, 0x077F)
+DEFINE_IS_IN_UNICODE_BLOCK(ArabicSupplement, 0x0750, 0x077F)
 // DEFINE_IS_IN_UNICODE_BLOCK(Thaana, 0x0780, 0x07BF)
 // DEFINE_IS_IN_UNICODE_BLOCK(NKo, 0x07C0, 0x07FF)
 // DEFINE_IS_IN_UNICODE_BLOCK(Samaritan, 0x0800, 0x083F)
 // DEFINE_IS_IN_UNICODE_BLOCK(Mandaic, 0x0840, 0x085F)
-// DEFINE_IS_IN_UNICODE_BLOCK(ArabicExtendedA, 0x08A0, 0x08FF)
+DEFINE_IS_IN_UNICODE_BLOCK(ArabicExtendedA, 0x08A0, 0x08FF)
 // DEFINE_IS_IN_UNICODE_BLOCK(Devanagari, 0x0900, 0x097F)
 // DEFINE_IS_IN_UNICODE_BLOCK(Bengali, 0x0980, 0x09FF)
 // DEFINE_IS_IN_UNICODE_BLOCK(Gurmukhi, 0x0A00, 0x0A7F)
@@ -169,13 +170,13 @@ DEFINE_IS_IN_UNICODE_BLOCK(HangulJamoExtendedB, 0xD7B0, 0xD7FF)
 DEFINE_IS_IN_UNICODE_BLOCK(PrivateUseArea, 0xE000, 0xF8FF)
 DEFINE_IS_IN_UNICODE_BLOCK(CJKCompatibilityIdeographs, 0xF900, 0xFAFF)
 // DEFINE_IS_IN_UNICODE_BLOCK(AlphabeticPresentationForms, 0xFB00, 0xFB4F)
-// DEFINE_IS_IN_UNICODE_BLOCK(ArabicPresentationFormsA, 0xFB50, 0xFDFF)
+DEFINE_IS_IN_UNICODE_BLOCK(ArabicPresentationFormsA, 0xFB50, 0xFDFF)
 // DEFINE_IS_IN_UNICODE_BLOCK(VariationSelectors, 0xFE00, 0xFE0F)
 DEFINE_IS_IN_UNICODE_BLOCK(VerticalForms, 0xFE10, 0xFE1F)
 // DEFINE_IS_IN_UNICODE_BLOCK(CombiningHalfMarks, 0xFE20, 0xFE2F)
 DEFINE_IS_IN_UNICODE_BLOCK(CJKCompatibilityForms, 0xFE30, 0xFE4F)
 DEFINE_IS_IN_UNICODE_BLOCK(SmallFormVariants, 0xFE50, 0xFE6F)
-// DEFINE_IS_IN_UNICODE_BLOCK(ArabicPresentationFormsB, 0xFE70, 0xFEFF)
+DEFINE_IS_IN_UNICODE_BLOCK(ArabicPresentationFormsB, 0xFE70, 0xFEFF)
 DEFINE_IS_IN_UNICODE_BLOCK(HalfwidthandFullwidthForms, 0xFF00, 0xFFEF)
 // DEFINE_IS_IN_UNICODE_BLOCK(Specials, 0xFFF0, 0xFFFF)
 // DEFINE_IS_IN_UNICODE_BLOCK(LinearBSyllabary, 0x10000, 0x1007F)
@@ -330,6 +331,14 @@ bool allowsWordBreaking(char16_t chr) {
             || chr == 0x200b /* zero-width space */
             || chr == 0x2010 /* hyphen */
             || chr == 0x2013 /* en dash */);
+}
+
+bool charAllowsLetterSpacing(char16_t chr) {
+    return !(isInArabic(chr) || isInArabicSupplement(chr) || isInArabicExtendedA(chr) || isInArabicPresentationFormsA(chr) || isInArabicPresentationFormsB(chr));
+}
+
+bool allowsLetterSpacing(const std::u16string& string) {
+    return std::all_of(string.begin(), string.end(), charAllowsLetterSpacing);
 }
 
 bool allowsIdeographicBreaking(const std::u16string& string) {

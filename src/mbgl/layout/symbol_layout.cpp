@@ -242,7 +242,7 @@ void SymbolLayout::prepare(const GlyphPositionMap& glyphs, const IconMap& icons)
                         /* horizontalAlign */ horizontalAlign,
                         /* verticalAlign */ verticalAlign,
                         /* justify */ justify,
-                        /* spacing: ems */ layout.get<TextLetterSpacing>() * oneEm,
+                        /* spacing: ems */ util::i18n::allowsLetterSpacing(*feature.text) ? layout.get<TextLetterSpacing>() * oneEm : 0.0f,
                         /* translate */ Point<float>(layout.evaluate<TextOffset>(zoom, feature)[0] * oneEm, layout.evaluate<TextOffset>(zoom, feature)[1] * oneEm),
                         /* verticalHeight */ oneEm,
                         /* writingMode */ writingMode,
