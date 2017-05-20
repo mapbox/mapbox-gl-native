@@ -1,0 +1,19 @@
+unity {
+    global:
+        CountGameFeatures;
+        CycleStyle;
+        GetGameFeature;
+        GetRenderEventFunc;
+        MoveBy;
+        ScaleBy;
+        SetBearing;
+        SetCoordinate;
+        SetStyle;
+        SetTextureFromUnity;
+        SetTimeFromUnity;
+        SetToken;
+        SetZoom;
+        UnityPluginLoad;
+        UnityPluginUnload;
+    local: *;
+};
