@@ -10,6 +10,10 @@ namespace i18n {
     by the given Unicode codepoint due to word breaking. */
 bool allowsWordBreaking(char16_t chr);
 
+/** Returns whether the given string can be displayed with letter-spacing.
+    False for Arabic scripts, where letter-spacing will break ligatures. */
+bool allowsLetterSpacing(const std::u16string& string);
+
 /** Returns whether a line break can be inserted after any character in the
     given string. If false, line breaking should occur on word boundaries
     instead. */
