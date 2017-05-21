@@ -1397,19 +1397,20 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
 
 - (NSString *)bestLanguageForUser
 {
-    NSArray *supportedLanguages = @[ @"en", @"es", @"fr", @"de", @"ru", @"zh" ];
-    NSArray<NSString *> *preferredLanguages = [NSLocale preferredLanguages];
-    NSString *bestLanguage;
+    // https://www.mapbox.com/vector-tiles/mapbox-streets-v7/#overview
+    NSArray *supportedLanguages = @[ @"ar", @"en", @"es", @"fr", @"de", @"pt", @"ru", @"zh", @"zh-Hans" ];
+    NSArray<NSString *> *preferredLanguages = [NSBundle preferredLocalizationsFromArray:supportedLanguages forPreferences:[NSLocale preferredLanguages]];
+    NSString *mostSpecificLanguage;
 
-    for (NSString *language in preferredLanguages) {
-        NSString *thisLanguage = [[NSLocale localeWithLocaleIdentifier:language] objectForKey:NSLocaleLanguageCode];
-        if ([supportedLanguages containsObject:thisLanguage]) {
-            bestLanguage = thisLanguage;
-            break;
+    for (NSString *language in preferredLanguages)
+    {
+        if (language.length > mostSpecificLanguage.length)
+        {
+            mostSpecificLanguage = language;
         }
     }
 
-    return bestLanguage ?: @"en";
+    return mostSpecificLanguage ?: @"en";
 }
 
 - (IBAction)startWorldTour

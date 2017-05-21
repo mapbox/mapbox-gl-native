@@ -7,19 +7,23 @@
     static dispatch_once_t onceToken;
     static NS_SET_OF(NSString *) *mapboxStreetsLanguages;
     dispatch_once(&onceToken, ^{
-        mapboxStreetsLanguages = [NSSet setWithObjects:@"en", @"es", @"fr", @"de", @"ru", @"zh", nil];
+        // https://www.mapbox.com/vector-tiles/mapbox-streets-v7/#overview
+        mapboxStreetsLanguages = [NSSet setWithObjects:@"ar", @"de", @"en", @"es", @"fr", @"pt", @"ru", @"zh", @"zh-Hans", nil];
     });
     return mapboxStreetsLanguages;
 }
 
-+ (nullable NSString *)preferredMapboxStreetsLanguage {
-    for (NSString *language in [NSLocale preferredLanguages]) {
-        NSString *languageCode = [[NSLocale localeWithLocaleIdentifier:language] objectForKey:NSLocaleLanguageCode];
-        if ([[MGLVectorSource mapboxStreetsLanguages] containsObject:languageCode]) {
-            return languageCode;
++ (NSString *)preferredMapboxStreetsLanguage {
+    NSArray<NSString *> *supportedLanguages = [MGLVectorSource mapboxStreetsLanguages].allObjects;
+    NSArray<NSString *> *preferredLanguages = [NSBundle preferredLocalizationsFromArray:supportedLanguages
+                                                                         forPreferences:[NSLocale preferredLanguages]];
+    NSString *mostSpecificLanguage;
+    for (NSString *language in preferredLanguages) {
+        if (language.length > mostSpecificLanguage.length) {
+            mostSpecificLanguage = language;
         }
     }
-    return nil;
+    return mostSpecificLanguage ?: @"en";
 }
 
 - (BOOL)isMapboxStreets {
