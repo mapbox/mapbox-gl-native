@@ -98,12 +98,24 @@ namespace android {
         }
     }
 
+    struct SetFilterEvaluator {
+        style::Filter filter;
+
+        void operator()(style::BackgroundLayer&) { Log::Warning(mbgl::Event::JNI, "BackgroundLayer doesn't support filters"); }
+        void operator()(style::CustomLayer&) { Log::Warning(mbgl::Event::JNI, "CustomLayer doesn't support filters"); }
+        void operator()(style::RasterLayer&) { Log::Warning(mbgl::Event::JNI, "RasterLayer doesn't support filters"); }
+
+        template <class LayerType>
+        void operator()(LayerType& layer) {
+            layer.setFilter(filter);
+        }
+    };
+
     void Layer::setFilter(jni::JNIEnv& env, jni::Array<jni::Object<>> jfilter) {
         using namespace mbgl::style;
         using namespace mbgl::style::conversion;
 
         Value wrapped(env, jfilter);
-        Filter filter;
 
         Error error;
         optional<Filter> converted = convert<Filter>(wrapped, error);
@@ -111,62 +123,45 @@ namespace android {
             mbgl::Log::Error(mbgl::Event::JNI, "Error setting filter: " + error.message);
             return;
         }
-        filter = std::move(*converted);
 
-        if (layer.is<FillLayer>()) {
-            layer.as<FillLayer>()->setFilter(filter);
-        } else if (layer.is<LineLayer>()) {
-            layer.as<LineLayer>()->setFilter(filter);
-        } else if (layer.is<SymbolLayer>()) {
-            layer.as<SymbolLayer>()->setFilter(filter);
-        } else if (layer.is<CircleLayer>()) {
-            layer.as<CircleLayer>()->setFilter(filter);
-        } else if (layer.is<FillExtrusionLayer>()){
-            layer.as<FillExtrusionLayer>()->setFilter(filter);
-        } else {
-            mbgl::Log::Warning(mbgl::Event::JNI, "Layer doesn't support filters");
-        }
+        layer.accept(SetFilterEvaluator {std::move(*converted)});
     }
+
+    struct SetSourceLayerEvaluator {
+        std::string sourceLayer;
+
+        void operator()(style::BackgroundLayer&) { Log::Warning(mbgl::Event::JNI, "BackgroundLayer doesn't support source layer"); }
+        void operator()(style::CustomLayer&) { Log::Warning(mbgl::Event::JNI, "CustomLayer doesn't support source layer"); }
+        void operator()(style::RasterLayer&) { Log::Warning(mbgl::Event::JNI, "RasterLayer doesn't support source layer"); }
+
+        template <class LayerType>
+        void operator()(LayerType& layer) {
+            layer.setSourceLayer(sourceLayer);
+        }
+    };
 
     void Layer::setSourceLayer(jni::JNIEnv& env, jni::String sourceLayer) {
-        using namespace mbgl::style;
-
-        std::string layerId = jni::Make<std::string>(env, sourceLayer);
-
-        if (layer.is<FillLayer>()) {
-            layer.as<FillLayer>()->setSourceLayer(layerId);
-        } else if (layer.is<LineLayer>()) {
-            layer.as<LineLayer>()->setSourceLayer(layerId);
-        } else if (layer.is<SymbolLayer>()) {
-            layer.as<SymbolLayer>()->setSourceLayer(layerId);
-        } else if (layer.is<CircleLayer>()) {
-            layer.as<CircleLayer>()->setSourceLayer(layerId);
-        } else if(layer.is<FillExtrusionLayer>()) {
-            layer.as<FillExtrusionLayer>()->setSourceLayer(layerId);
-        } else {
-            mbgl::Log::Warning(mbgl::Event::JNI, "Layer doesn't support source layer");
-        }
+        layer.accept(SetSourceLayerEvaluator {jni::Make<std::string>(env, sourceLayer)});
     }
 
-    jni::String Layer::getSourceLayer(jni::JNIEnv& env) {
-        using namespace mbgl::style;
-
-        std::string sourceLayerId;
-        if (layer.is<FillLayer>()) {
-            sourceLayerId = layer.as<FillLayer>()->getSourceLayer();
-        } else if (layer.is<LineLayer>()) {
-            sourceLayerId = layer.as<LineLayer>()->getSourceLayer();
-        } else if (layer.is<SymbolLayer>()) {
-            sourceLayerId = layer.as<SymbolLayer>()->getSourceLayer();
-        } else if (layer.is<CircleLayer>()) {
-            sourceLayerId = layer.as<CircleLayer>()->getSourceLayer();
-        } else if (layer.is<FillExtrusionLayer>()) {
-            sourceLayerId = layer.as<FillExtrusionLayer>()->getSourceLayer();
-        } else {
-            mbgl::Log::Warning(mbgl::Event::JNI, "Layer doesn't support source layer");
+    struct GetSourceLayerEvaluator {
+        std::string noop(std::string layerType) {
+            Log::Warning(mbgl::Event::JNI, "%s doesn't support source layer", layerType.c_str());
+            return {};
         }
 
-        return jni::Make<jni::String>(env, sourceLayerId);
+        std::string operator()(style::BackgroundLayer&) { return noop("BackgroundLayer"); }
+        std::string operator()(style::CustomLayer&) { return noop("CustomLayer"); }
+        std::string operator()(style::RasterLayer&) { return noop("RasterLayer"); }
+
+        template <class LayerType>
+        std::string operator()(LayerType& layer) {
+            return layer.getSourceLayer();
+        }
+    };
+
+    jni::String Layer::getSourceLayer(jni::JNIEnv& env) {
+        return jni::Make<jni::String>(env, layer.accept(GetSourceLayerEvaluator()));
     }
 
     jni::jfloat Layer::getMinZoom(jni::JNIEnv&){

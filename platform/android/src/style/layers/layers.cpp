@@ -25,52 +25,45 @@ namespace mbgl {
 namespace android {
 
 static Layer* initializeLayerPeer(mbgl::Map& map, mbgl::style::Layer& coreLayer) {
-    if (coreLayer.is<mbgl::style::BackgroundLayer>()) {
-        return new BackgroundLayer(map, *coreLayer.as<mbgl::style::BackgroundLayer>());
-    } else if (coreLayer.is<mbgl::style::CircleLayer>()) {
-        return new CircleLayer(map, *coreLayer.as<mbgl::style::CircleLayer>());
-    } else if (coreLayer.is<mbgl::style::FillExtrusionLayer>()) {
-        return new FillExtrusionLayer(map, *coreLayer.as<mbgl::style::FillExtrusionLayer>());
-    } else if (coreLayer.is<mbgl::style::FillLayer>()) {
-        return new FillLayer(map, *coreLayer.as<mbgl::style::FillLayer>());
-    } else if (coreLayer.is<mbgl::style::LineLayer>()) {
-        return new LineLayer(map, *coreLayer.as<mbgl::style::LineLayer>());
-    } else if (coreLayer.is<mbgl::style::RasterLayer>()) {
-        return new RasterLayer(map, *coreLayer.as<mbgl::style::RasterLayer>());
-    } else if (coreLayer.is<mbgl::style::SymbolLayer>()) {
-        return new SymbolLayer(map, *coreLayer.as<mbgl::style::SymbolLayer>());
-    } else if (coreLayer.is<mbgl::style::CustomLayer>()) {
-        return new CustomLayer(map, *coreLayer.as<mbgl::style::CustomLayer>());
-    } else {
-        return new UnknownLayer(map, coreLayer);
-    }
+    struct LayerPeerIntitializer {
+        mbgl::Map& map;
+
+        Layer* operator()(style::BackgroundLayer& layer) { return new BackgroundLayer(map, layer); }
+        Layer* operator()(style::CircleLayer& layer) { return new CircleLayer(map, layer); }
+        Layer* operator()(style::FillExtrusionLayer& layer) { return new FillExtrusionLayer(map, layer); }
+        Layer* operator()(style::FillLayer& layer) { return new FillLayer(map, layer); }
+        Layer* operator()(style::LineLayer& layer) { return new LineLayer(map, layer); }
+        Layer* operator()(style::RasterLayer& layer) { return new RasterLayer(map, layer); }
+        Layer* operator()(style::SymbolLayer& layer) { return new SymbolLayer(map, layer); }
+        Layer* operator()(style::CustomLayer& layer) { return new CustomLayer(map, layer); }
+    };
+
+    Layer* layer = coreLayer.accept(LayerPeerIntitializer {map});
+    return layer ? layer : new UnknownLayer(map, coreLayer);
 }
 
-template <class LayerType, class PeerType>
-static PeerType* createPeer(Map& map, std::unique_ptr<mbgl::style::Layer> layer) {
-    return new PeerType(map, std::move(std::unique_ptr<LayerType>(layer.release()->as<LayerType>())));
-}
+struct UniqueLayerPeerIntitializer {
+    mbgl::Map& map;
+    std::unique_ptr<style::Layer> layer;
+
+    template <class LayerType>
+    std::unique_ptr<LayerType> cast() {
+        return std::unique_ptr<LayerType>(layer.release()->as<LayerType>());
+    }
+
+    Layer* operator()(style::BackgroundLayer&) && { return new BackgroundLayer(map, cast<style::BackgroundLayer>()); }
+    Layer* operator()(style::CircleLayer&) && { return new CircleLayer(map, cast<style::CircleLayer>()); }
+    Layer* operator()(style::FillExtrusionLayer&) && { return new FillExtrusionLayer(map, cast<style::FillExtrusionLayer>()); }
+    Layer* operator()(style::FillLayer&) && { return new FillLayer(map, cast<style::FillLayer>()); }
+    Layer* operator()(style::LineLayer&) && { return new LineLayer(map, cast<style::LineLayer>()); }
+    Layer* operator()(style::RasterLayer&) && { return new RasterLayer(map, cast<style::RasterLayer>()); }
+    Layer* operator()(style::SymbolLayer&) && { return new SymbolLayer(map, cast<style::SymbolLayer>()); }
+    Layer* operator()(style::CustomLayer&) && { return new CustomLayer(map, cast<style::CustomLayer>()); }
+};
 
 static Layer* initializeLayerPeer(Map& map, std::unique_ptr<mbgl::style::Layer> coreLayer) {
-    if (coreLayer->is<style::BackgroundLayer>()) {
-        return createPeer<style::BackgroundLayer, BackgroundLayer>(map, std::move(coreLayer));
-    } else if (coreLayer->is<style::CircleLayer>()) {
-        return createPeer<style::CircleLayer, CircleLayer>(map, std::move(coreLayer));
-    } else if (coreLayer->is<style::FillExtrusionLayer>()) {
-        return createPeer<style::FillExtrusionLayer, FillExtrusionLayer>(map, std::move(coreLayer));
-    } else if (coreLayer->is<style::FillLayer>()) {
-        return createPeer<style::FillLayer, FillLayer>(map, std::move(coreLayer));
-    } else if (coreLayer->is<style::LineLayer>()) {
-        return createPeer<style::LineLayer, LineLayer>(map, std::move(coreLayer));
-    } else if (coreLayer->is<style::RasterLayer>()) {
-        return createPeer<style::RasterLayer, RasterLayer>(map, std::move(coreLayer));
-    } else if (coreLayer->is<style::SymbolLayer>()) {
-        return createPeer<style::SymbolLayer, SymbolLayer>(map, std::move(coreLayer));
-    } else if (coreLayer->is<mbgl::style::CustomLayer>()) {
-        return createPeer<style::SymbolLayer, SymbolLayer>(map, std::move(coreLayer));
-    } else {
-        return new UnknownLayer(map, std::move(coreLayer));
-    }
+    Layer* layer = coreLayer->accept(UniqueLayerPeerIntitializer {map, std::move(coreLayer)});
+    return layer ? layer : new UnknownLayer(map, std::move(coreLayer));
 }
 
 jni::jobject* createJavaLayerPeer(jni::JNIEnv& env, Map& map, style::Layer& coreLayer) {
