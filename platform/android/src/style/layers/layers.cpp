@@ -24,53 +24,51 @@
 namespace mbgl {
 namespace android {
 
-static Layer* initializeLayerPeer(mbgl::Map& map, mbgl::style::Layer& coreLayer) {
-    if (coreLayer.is<mbgl::style::BackgroundLayer>()) {
-        return new BackgroundLayer(map, *coreLayer.as<mbgl::style::BackgroundLayer>());
-    } else if (coreLayer.is<mbgl::style::CircleLayer>()) {
-        return new CircleLayer(map, *coreLayer.as<mbgl::style::CircleLayer>());
-    } else if (coreLayer.is<mbgl::style::FillExtrusionLayer>()) {
-        return new FillExtrusionLayer(map, *coreLayer.as<mbgl::style::FillExtrusionLayer>());
-    } else if (coreLayer.is<mbgl::style::FillLayer>()) {
-        return new FillLayer(map, *coreLayer.as<mbgl::style::FillLayer>());
-    } else if (coreLayer.is<mbgl::style::LineLayer>()) {
-        return new LineLayer(map, *coreLayer.as<mbgl::style::LineLayer>());
-    } else if (coreLayer.is<mbgl::style::RasterLayer>()) {
-        return new RasterLayer(map, *coreLayer.as<mbgl::style::RasterLayer>());
-    } else if (coreLayer.is<mbgl::style::SymbolLayer>()) {
-        return new SymbolLayer(map, *coreLayer.as<mbgl::style::SymbolLayer>());
-    } else if (coreLayer.is<mbgl::style::CustomLayer>()) {
-        return new CustomLayer(map, *coreLayer.as<mbgl::style::CustomLayer>());
-    } else {
-        return new UnknownLayer(map, coreLayer);
+// Mapping from style layers to peer classes
+template <class> struct PeerType {};
+template <> struct PeerType<style::BackgroundLayer> { using Type = android::BackgroundLayer; };
+template <> struct PeerType<style::CircleLayer> { using Type = android::CircleLayer; };
+template <> struct PeerType<style::FillExtrusionLayer> { using Type = android::FillExtrusionLayer; };
+template <> struct PeerType<style::FillLayer> { using Type = android::FillLayer; };
+template <> struct PeerType<style::LineLayer> { using Type = android::LineLayer; };
+template <> struct PeerType<style::RasterLayer> { using Type = android::RasterLayer; };
+template <> struct PeerType<style::SymbolLayer> { using Type = android::SymbolLayer; };
+template <> struct PeerType<style::CustomLayer> { using Type = android::CustomLayer; };
+
+// Inititalizes a non-owning peer
+struct LayerPeerIntitializer {
+    mbgl::Map& map;
+
+    template <class LayerType>
+    Layer* operator()(LayerType& layer) {
+        return new typename PeerType<LayerType>::Type(map, layer);
     }
+};
+
+static Layer* initializeLayerPeer(mbgl::Map& map, mbgl::style::Layer& coreLayer) {
+    Layer* layer = coreLayer.accept(LayerPeerIntitializer {map});
+    return layer ? layer : new UnknownLayer(map, coreLayer);
 }
 
-template <class LayerType, class PeerType>
-static PeerType* createPeer(Map& map, std::unique_ptr<mbgl::style::Layer> layer) {
-    return new PeerType(map, std::move(std::unique_ptr<LayerType>(layer.release()->as<LayerType>())));
-}
+// Initializes an owning peer
+// Only usable once since it needs to pass on ownership
+// of the given layer and thus enforced to be an rvalue
+struct UniqueLayerPeerIntitializer {
+    mbgl::Map& map;
+    std::unique_ptr<style::Layer> layer;
+
+    template <class LayerType>
+    Layer* operator()(LayerType&) && {
+        return new typename PeerType<LayerType>::Type(
+                map,
+                std::unique_ptr<LayerType>(layer.release()->as<LayerType>())
+        );
+    }
+};
 
 static Layer* initializeLayerPeer(Map& map, std::unique_ptr<mbgl::style::Layer> coreLayer) {
-    if (coreLayer->is<style::BackgroundLayer>()) {
-        return createPeer<style::BackgroundLayer, BackgroundLayer>(map, std::move(coreLayer));
-    } else if (coreLayer->is<style::CircleLayer>()) {
-        return createPeer<style::CircleLayer, CircleLayer>(map, std::move(coreLayer));
-    } else if (coreLayer->is<style::FillExtrusionLayer>()) {
-        return createPeer<style::FillExtrusionLayer, FillExtrusionLayer>(map, std::move(coreLayer));
-    } else if (coreLayer->is<style::FillLayer>()) {
-        return createPeer<style::FillLayer, FillLayer>(map, std::move(coreLayer));
-    } else if (coreLayer->is<style::LineLayer>()) {
-        return createPeer<style::LineLayer, LineLayer>(map, std::move(coreLayer));
-    } else if (coreLayer->is<style::RasterLayer>()) {
-        return createPeer<style::RasterLayer, RasterLayer>(map, std::move(coreLayer));
-    } else if (coreLayer->is<style::SymbolLayer>()) {
-        return createPeer<style::SymbolLayer, SymbolLayer>(map, std::move(coreLayer));
-    } else if (coreLayer->is<mbgl::style::CustomLayer>()) {
-        return createPeer<style::SymbolLayer, SymbolLayer>(map, std::move(coreLayer));
-    } else {
-        return new UnknownLayer(map, std::move(coreLayer));
-    }
+    Layer* layer = coreLayer->accept(UniqueLayerPeerIntitializer {map, std::move(coreLayer)});
+    return layer ? layer : new UnknownLayer(map, std::move(coreLayer));
 }
 
 jni::jobject* createJavaLayerPeer(jni::JNIEnv& env, Map& map, style::Layer& coreLayer) {
