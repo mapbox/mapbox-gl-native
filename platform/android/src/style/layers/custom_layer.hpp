@@ -20,6 +20,8 @@ public:
 
     CustomLayer(mbgl::Map&, mbgl::style::CustomLayer&);
 
+    CustomLayer(mbgl::Map&, std::unique_ptr<mbgl::style::CustomLayer>);
+
     ~CustomLayer();
 
     void update(jni::JNIEnv&);
