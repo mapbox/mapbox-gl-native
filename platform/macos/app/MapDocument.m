@@ -345,7 +345,7 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
 
 - (void)updateLabels {
     MGLStyle *style = self.mapView.style;
-    NSString *preferredLanguage = _isLocalizingLabels ? ([MGLVectorSource preferredMapboxStreetsLanguage] ?: @"en") : nil;
+    NSString *preferredLanguage = _isLocalizingLabels ? [MGLVectorSource preferredMapboxStreetsLanguage] : nil;
     NSMutableDictionary *localizedKeysByKeyBySourceIdentifier = [NSMutableDictionary dictionary];
     for (MGLSymbolStyleLayer *layer in style.layers) {
         if (![layer isKindOfClass:[MGLSymbolStyleLayer class]]) {
@@ -855,8 +855,7 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
         if (menuItem.tag) {
             NSLocale *locale = [NSLocale localeWithLocaleIdentifier:[NSBundle mainBundle].developmentLocalization];
             NSString *preferredLanguage = [MGLVectorSource preferredMapboxStreetsLanguage];
-            menuItem.enabled = !!preferredLanguage;
-            menuItem.title = [locale displayNameForKey:NSLocaleIdentifier value:preferredLanguage ?: @"Preferred Language"];
+            menuItem.title = [locale displayNameForKey:NSLocaleIdentifier value:preferredLanguage];
         }
         return YES;
     }
