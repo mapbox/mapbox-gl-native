@@ -3,6 +3,7 @@
 ## master
 
 * The previously-deprecated support for style classes has been removed. For interface compatibility, the API methods remain, but they are now non-functional.
+* Added an `overlays` property to `MGLMapView`. ([#8617](https://github.com/mapbox/mapbox-gl-native/pull/8617))
 
 ## 0.5.0
 

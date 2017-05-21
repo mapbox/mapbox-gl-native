@@ -730,6 +730,15 @@ MGL_EXPORT IB_DESIGNABLE
 #pragma mark Overlaying the Map
 
 /**
+ The complete list of overlays associated with the receiver. (read-only)
+
+ The objects in this array must adopt the `MGLOverlay` protocol. If no
+ overlays are associated with the map view, the value of this property is
+ empty array.
+ */
+@property (nonatomic, readonly, nonnull) NS_ARRAY_OF(id <MGLOverlay>) *overlays;
+
+/**
  Adds a single overlay to the map.
 
  To remove an overlay from a map, use the `-removeOverlay:` method.

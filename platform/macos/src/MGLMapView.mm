@@ -2413,6 +2413,22 @@ public:
 
 #pragma mark Overlays
 
+- (nonnull NS_ARRAY_OF(id <MGLOverlay>) *)overlays
+{
+    if (self.annotations == nil) { return @[]; }
+
+    NS_MUTABLE_ARRAY_OF(id <MGLOverlay>) *mutableOverlays = [NSMutableArray array];
+
+    [self.annotations enumerateObjectsUsingBlock:^(id<MGLAnnotation>  _Nonnull annotation, NSUInteger idx, BOOL * _Nonnull stop) {
+        if ([annotation conformsToProtocol:@protocol(MGLOverlay)])
+        {
+            [mutableOverlays addObject:(id<MGLOverlay>)annotation];
+        }
+    }];
+
+    return [NSArray arrayWithArray:mutableOverlays];
+}
+
 - (void)addOverlay:(id <MGLOverlay>)overlay {
     [self addOverlays:@[overlay]];
 }
