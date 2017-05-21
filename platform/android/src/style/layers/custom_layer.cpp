@@ -21,6 +21,10 @@ namespace android {
         : Layer(map, coreLayer) {
     }
 
+    CustomLayer::CustomLayer(mbgl::Map& map, std::unique_ptr<mbgl::style::CustomLayer> coreLayer)
+            : Layer(map, std::move(coreLayer)) {
+    }
+
     CustomLayer::~CustomLayer() = default;
 
     void CustomLayer::update(jni::JNIEnv&) {
