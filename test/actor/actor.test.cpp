@@ -26,7 +26,7 @@ TEST(Actor, Construction) {
     EXPECT_TRUE(constructed);
 }
 
-TEST(Actor, DestructionClosesMailbox) {
+TEST(Actor, DestructionBlocksOnReceive) {
     // Destruction blocks until the actor is not receiving.
 
     struct Test {
@@ -65,6 +65,62 @@ TEST(Actor, DestructionClosesMailbox) {
     test.invoke(&Test::wait);
     enteredFuture.wait();
     exitingPromise.set_value();
+}
+
+TEST(Actor, DestructionBlocksOnSend) {
+    // Destruction blocks until the actor is not being sent a message.
+
+    struct TestScheduler : public Scheduler {
+        std::promise<void> promise;
+        std::future<void> future;
+        std::atomic<bool> waited;
+
+        TestScheduler(std::promise<void> promise_, std::future<void> future_)
+            : promise(std::move(promise_)),
+              future(std::move(future_)),
+              waited(false) {
+        }
+
+        ~TestScheduler() {
+            EXPECT_TRUE(waited.load());
+        }
+
+        void schedule(std::weak_ptr<Mailbox>) final {
+            promise.set_value();
+            future.wait();
+            std::this_thread::sleep_for(1ms);
+            waited = true;
+        }
+    };
+
+    struct Test {
+        Test(ActorRef<Test>) {}
+        void message() {}
+    };
+
+    std::promise<void> enteredPromise;
+    std::future<void> enteredFuture = enteredPromise.get_future();
+
+    std::promise<void> exitingPromise;
+    std::future<void> exitingFuture = exitingPromise.get_future();
+
+    auto scheduler = std::make_unique<TestScheduler>(std::move(enteredPromise), std::move(exitingFuture));
+    auto actor = std::make_unique<Actor<Test>>(*scheduler);
+
+    std::thread thread {
+        [] (ActorRef<Test> ref) {
+            ref.invoke(&Test::message);
+        },
+        actor->self()
+    };
+
+    enteredFuture.wait();
+    exitingPromise.set_value();
+
+    actor.reset();
+    scheduler.reset();
+
+    thread.join();
 }
 
 TEST(Actor, OrderedMailbox) {
