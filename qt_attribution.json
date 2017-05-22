@@ -1,13 +1,234 @@
-{
-    "Id": "mapboxgl",
-    "Name": "Mapbox GL Native",
-    "QDocModule": "qtlocation",
-    "QtUsage": "Used in the Mapbox GL plugin of Qt Location.",
+[
+    {
+        "Id": "mapboxgl",
+        "Name": "Mapbox GL Native",
+        "QDocModule": "qtlocation",
+        "QtUsage": "Used in the Mapbox GL plugin of Qt Location.",
 
-    "Description": "A library for embedding interactive and customizable vector maps.",
-    "Homepage": "https://github.com/mapbox/mapbox-gl-native",
-    "LicenseId": "BSD-2-Clause",
-    "License": "BSD 2-clause \"Simplified\" License",
-    "LicenseFile": "LICENSE.md",
-    "Copyright": "Copyright Mapbox 2014-2017"
-}
+        "Description": "A library for embedding interactive and customizable vector maps.",
+        "Homepage": "https://github.com/mapbox/mapbox-gl-native",
+        "LicenseId": "BSD-2-Clause",
+        "License": "BSD 2-clause \"Simplified\" License",
+        "Copyright": "Copyright (c) 2014-2017 Mapbox"
+    },
+    {
+        "Id": "mapboxgl-css_color_parser",
+        "Name": "CSS Color Parser",
+        "QDocModule": "qtlocation",
+        "QtUsage": "Used in the Mapbox GL plugin of Qt Location.",
+
+        "Path": "src/csscolorparser",
+        "Description": "C++ parser for CSS color strings.",
+        "Homepage": "https://github.com/kkaefer/css-color-parser-cpp",
+        "LicenseId": "MIT",
+        "License": "MIT License",
+        "Copyright": "Copyright (c) 2012 Dean McNamee, 2014 Konstantin Käfer"
+    },
+    {
+        "Id": "mapboxgl-libcxx",
+        "Name": "libc++",
+        "QDocModule": "qtlocation",
+        "QtUsage": "Used in the Mapbox GL plugin of Qt Location.",
+
+        "Description": "libc++ is a new implementation of the C++ standard library, targeting C++11.",
+        "Homepage": "https://libcxx.llvm.org",
+        "LicenseId": "MIT and UIUC",
+        "License": "MIT and UIUC (BSD-like)",
+        "Copyright": "Copyright (c) 2009-2014 libc++ developers"
+    },
+    {
+        "Id": "mapboxgl-earcut",
+        "Name": "Earcut",
+        "QDocModule": "qtlocation",
+        "QtUsage": "Used in the Mapbox GL plugin of Qt Location.",
+
+        "Path": "src/3rd_party/earcut",
+        "Description": "A fast polygon triangulation library.",
+        "Homepage": "https://github.com/mapbox/earcut.hpp",
+        "LicenseId": "ISC",
+        "License": "ISC License",
+        "LicenseFile": "src/3rd_party/earcut/LICENSE",
+        "Copyright": "Copyright (c) 2015 Mapbox"
+    },
+    {
+        "Id": "mapboxgl-geojson_cpp",
+        "Name": "geojson-cpp",
+        "QDocModule": "qtlocation",
+        "QtUsage": "Used in the Mapbox GL plugin of Qt Location.",
+
+        "Path": "src/3rd_party/geojson-cpp",
+        "Description": "A C++14 library for converting GeoJSON into geometry.hpp representation.",
+        "Homepage": "https://github.com/mapbox/geojson-cpp",
+        "LicenseId": "ISC",
+        "License": "ISC License",
+        "LicenseFile": "src/3rd_party/geojson-cpp/LICENSE",
+        "Copyright": "Copyright (c) 2016 Mapbox"
+    },
+    {
+        "Id": "mapboxgl-geojson_vt_cpp",
+        "Name": "geojson-vt-cpp",
+        "QDocModule": "qtlocation",
+        "QtUsage": "Used in the Mapbox GL plugin of Qt Location.",
+
+        "Path": "src/3rd_party/geojson-vt-cpp",
+        "Description": "A library for slicing GeoJSON into vector tiles on the fly.",
+        "Homepage": "https://github.com/mapbox/geojson-vt-cpp",
+        "LicenseId": "ISC",
+        "License": "ISC License",
+        "LicenseFile": "src/3rd_party/geojson-vt-cpp/LICENSE",
+        "Copyright": "Copyright (c) 2015 Mapbox"
+    },
+    {
+        "Id": "mapboxgl-geometry_hpp",
+        "Name": "geometry.hpp",
+        "QDocModule": "qtlocation",
+        "QtUsage": "Used in the Mapbox GL plugin of Qt Location.",
+
+        "Path": "src/3rd_party/geometry.hpp",
+        "Description": "C++ interfaces for geometry types, geometry collections, and features.",
+        "Homepage": "https://github.com/mapbox/geometry.hpp",
+        "LicenseId": "ISC",
+        "License": "ISC License",
+        "LicenseFile": "src/3rd_party/geometry.hpp/LICENSE",
+        "Copyright": "Copyright (c) 2016 Mapbox"
+    },
+    {
+        "Id": "mapboxgl-kdbush_hpp",
+        "Name": "kdbush.hpp",
+        "QDocModule": "qtlocation",
+        "QtUsage": "Used in the Mapbox GL plugin of Qt Location.",
+
+        "Path": "src/3rd_party/kdbush.hpp",
+        "Description": "A fast static spatial index for 2D points.",
+        "Homepage": "https://github.com/mourner/kdbush.hpp",
+        "LicenseId": "ISC",
+        "License": "ISC License",
+        "LicenseFile": "src/3rd_party/kdbush.hpp/LICENSE",
+        "Copyright": "Copyright (c) 2016 Vladimir Agafonkin"
+    },
+    {
+        "Id": "mapboxgl-boost",
+        "Name": "Boost",
+        "QDocModule": "qtlocation",
+        "QtUsage": "Used in the Mapbox GL plugin of Qt Location.",
+
+        "Path": "src/3rd_party/libboost",
+        "Description": "Boost provides free peer-reviewed portable C++ source libraries.",
+        "Homepage": "http://www.boost.org",
+        "LicenseId": "BSL-1.0",
+        "License": "Boost Software License 1.0",
+        "LicenseFile": "src/3rd_party/libboost/LICENSE_1_0.txt",
+        "Copyright": "Copyright (c) Boost developers"
+    },
+    {
+        "Id": "mapboxgl-shaders",
+        "Name": "Mapbox GL Shaders",
+        "QDocModule": "qtlocation",
+        "QtUsage": "Used in the Mapbox GL plugin of Qt Location.",
+
+        "Path": "src/3rd_party/mapbox-gl-shaders",
+        "Description": "Shaders used by Mapbox GL",
+        "LicenseId": "BSD-3-Clause",
+        "License": "BSD 3-clause \"New\" or \"Revised\" License",
+        "LicenseFile": "src/3rd_party/mapbox-gl-shaders/LICENSE.txt",
+        "Copyright": "Copyright (c) 2016 Mapbox"
+    },
+    {
+        "Id": "mapboxgl-optional",
+        "Name": "C+11 <optional> polyfill",
+        "QDocModule": "qtlocation",
+        "QtUsage": "Used in the Mapbox GL plugin of Qt Location.",
+
+        "Path": "src/3rd_party/optional",
+        "Description": "C++11 <optional> polyfill",
+        "Homepage": "https://github.com/akrzemi1/Optional",
+        "LicenseId": "BSL-1.0",
+        "License": "Boost Software License 1.0",
+        "LicenseFile": "src/3rd_party/optional/LICENSE_1_0.txt",
+        "Copyright": "Copyright (c) 2011-2012 Andrzej Krzemienski"
+    },
+    {
+        "Id": "mapboxgl-polylabel",
+        "Name": "polylabel",
+        "QDocModule": "qtlocation",
+        "QtUsage": "Used in the Mapbox GL plugin of Qt Location.",
+
+        "Path": "src/3rd_party/polylabel",
+        "Description": "A fast algorithm for finding polygon pole of inaccessibility.",
+        "Homepage": "https://github.com/mapbox/polylabel",
+        "LicenseId": "ISC",
+        "License": "ISC License",
+        "LicenseFile": "src/3rd_party/polylabel/LICENSE",
+        "Copyright": "Copyright (c) 2016 Mapbox"
+    },
+    {
+        "Id": "mapboxgl-protozero",
+        "Name": "protozero",
+        "QDocModule": "qtlocation",
+        "QtUsage": "Used in the Mapbox GL plugin of Qt Location.",
+
+        "Path": "src/3rd_party/protozero",
+        "Description": "Minimalist protocol buffer decoder and encoder in C++.",
+        "Homepage": "https://github.com/mapbox/protozero",
+        "LicenseFile": "src/3rd_party/protozero/LICENSE.md",
+        "LicenseId": "BSD-2-Clause",
+        "License": "BSD 2-clause \"Simplified\" License",
+        "Copyright": "Copyright (c) Mapbox"
+    },
+    {
+        "Id": "mapboxgl-rapidjson",
+        "Name": "RapidJSON",
+        "QDocModule": "qtlocation",
+        "QtUsage": "Used in the Mapbox GL plugin of Qt Location.",
+
+        "Path": "src/3rd_party/rapidjson",
+        "Description": "A fast JSON parser/generator for C++ with both SAX/DOM style API.",
+        "Homepage": "http://rapidjson.org",
+        "LicenseFile": "src/3rd_party/rapidjson/license.txt",
+        "LicenseId": "MIT",
+        "License": "MIT License",
+        "Copyright": "Copyright (c) 2015 THL A29 Limited, a Tencent company, and Milo Yip"
+    },
+    {
+        "Id": "mapboxgl-supercluster.hpp",
+        "Name": "supercluster.hpp",
+        "QDocModule": "qtlocation",
+        "QtUsage": "Used in the Mapbox GL plugin of Qt Location.",
+
+        "Path": "src/3rd_party/supercluster.hpp",
+        "Description": "A fast 2D point clustering library for use in interactive maps.",
+        "Homepage": "https://github.com/mapbox/supercluster.hpp",
+        "LicenseFile": "src/3rd_party/supercluster.hpp/LICENSE",
+        "LicenseId": "ISC",
+        "License": "ISC License",
+        "Copyright": "Copyright (c) 2016 Mapbox"
+    },
+    {
+        "Id": "mapboxgl-unique_resource",
+        "Name": "unique_resource",
+        "QDocModule": "qtlocation",
+        "QtUsage": "Used in the Mapbox GL plugin of Qt Location.",
+
+        "Path": "src/3rd_party/unique_resource",
+        "Description": "General RAII wrapper for exclusive ownership resource management",
+        "Homepage": "https://github.com/okdshin/unique_resource",
+        "LicenseId": "BSL-1.0",
+        "License": "Boost Software License 1.0",
+        "LicenseFile": "src/3rd_party/unique_resource/LICENSE.txt",
+        "Copyright": "Copyright (c) 2015 okdshin"
+    },
+    {
+        "Id": "mapboxgl-variant",
+        "Name": "variant",
+        "QDocModule": "qtlocation",
+        "QtUsage": "Used in the Mapbox GL plugin of Qt Location.",
+
+        "Path": "src/3rd_party/variant",
+        "Description": "A header-only alternative to boost::variant for C++11 and C++14.",
+        "Homepage": "https://github.com/mapbox/variant",
+        "LicenseId": "BSD-3-Clause",
+        "License": "BSD 3-clause \"New\" or \"Revised\" License",
+        "LicenseFile": "src/3rd_party/variant/LICENSE",
+        "Copyright": "Copyright (c) Mapbox"
+    }
+]
