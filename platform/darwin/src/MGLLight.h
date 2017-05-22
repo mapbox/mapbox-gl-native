@@ -30,7 +30,7 @@ typedef struct MGLLightPosition {
 } MGLLightPosition;
 
 /**
- Creates a new `MGLLightPosition` from the given radial, azumuthal, polar.
+ Creates a new `MGLLightPosition` from the given radial, azimuthal, polar.
  
  @param radial The radial coordinate.
  @param azimuthal The azimuthal angle.
@@ -48,8 +48,7 @@ NS_INLINE MGLLightPosition MGLLightPositionMake(CGFloat radial, CGFloat azimutha
 }
 
 /**
- An `MGLLight` object represents a viewpoint from which the user observes
- some point on a `MGLMapView`.
+ An `MGLLight` object represents the light source for extruded geometries in `MGLStyle`.
  */
 MGL_EXPORT
 @interface MGLLight : NSObject
