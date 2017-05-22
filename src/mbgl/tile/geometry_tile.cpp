@@ -139,9 +139,6 @@ void GeometryTile::onPlacement(PlacementResult result) {
         pending = false;
     }
     symbolBuckets = std::move(result.symbolBuckets);
-    for (auto& entry : symbolBuckets) {
-        dynamic_cast<SymbolBucket*>(entry.second.get())->spriteAtlas = &spriteAtlas;
-    }
     collisionTile = std::move(result.collisionTile);
     observer->onTileChanged(*this);
 }
@@ -165,8 +162,8 @@ void GeometryTile::onIconsAvailable(IconMap icons) {
     worker.invoke(&GeometryTileWorker::onIconsAvailable, std::move(icons));
 }
 
-void GeometryTile::getIcons(IconDependencies) {
-    spriteAtlas.getIcons(*this);
+void GeometryTile::getIcons(IconDependencies iconDependencies) {
+    spriteAtlas.getIcons(*this, std::move(iconDependencies));
 }
 
 Bucket* GeometryTile::getBucket(const Layer::Impl& layer) const {

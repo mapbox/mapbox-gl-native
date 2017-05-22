@@ -278,8 +278,7 @@ void Map::Impl::render(View& view) {
 
         painter->render(*style,
                         frameData,
-                        view,
-                        annotationManager->getSpriteAtlas());
+                        view);
 
         painter->cleanup();
 
@@ -312,8 +311,7 @@ void Map::Impl::render(View& view) {
 
         painter->render(*style,
                         frameData,
-                        view,
-                        annotationManager->getSpriteAtlas());
+                        view);
 
         auto request = std::move(stillImageRequest);
         request->callback(nullptr);
@@ -790,10 +788,12 @@ LatLng Map::latLngForPixel(const ScreenCoordinate& pixel) const {
 
 void Map::addAnnotationImage(std::unique_ptr<style::Image> image) {
     impl->annotationManager->addImage(std::move(image));
+    impl->onUpdate(Update::AnnotationStyle);
 }
 
 void Map::removeAnnotationImage(const std::string& id) {
     impl->annotationManager->removeImage(id);
+    impl->onUpdate(Update::AnnotationStyle);
 }
 
 double Map::getTopOffsetPixelsForAnnotationImage(const std::string& id) {

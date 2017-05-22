@@ -145,3 +145,43 @@ TEST(SpriteAtlas, RemoveReleasesBinPackRect) {
     EXPECT_TRUE(atlas.getIcon("big"));
     EXPECT_TRUE(log.empty());
 }
+
+class StubIconRequestor : public IconRequestor {
+public:
+    void onIconsAvailable(IconMap icons) final {
+        if (iconsAvailable) iconsAvailable(icons);
+    }
+
+    std::function<void (IconMap)> iconsAvailable;
+};
+
+TEST(SpriteAtlas, NotifiesRequestorWhenSpriteIsLoaded) {
+    SpriteAtlas atlas;
+    StubIconRequestor requestor;
+    bool notified = false;
+
+    requestor.iconsAvailable = [&] (IconMap) {
+        notified = true;
+    };
+
+    atlas.getIcons(requestor, {"one"});
+    ASSERT_FALSE(notified);
+
+    atlas.onSpriteLoaded();
+    ASSERT_TRUE(notified);
+}
+
+TEST(SpriteAtlas, NotifiesRequestorImmediatelyIfDependenciesAreSatisfied) {
+    SpriteAtlas atlas;
+    StubIconRequestor requestor;
+    bool notified = false;
+
+    requestor.iconsAvailable = [&] (IconMap) {
+        notified = true;
+    };
+
+    atlas.addImage(makeMutable<style::Image::Impl>("one", PremultipliedImage({ 16, 16 }), 2));
+    atlas.getIcons(requestor, {"one"});
+
+    ASSERT_TRUE(notified);
+}

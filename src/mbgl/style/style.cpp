@@ -16,7 +16,6 @@
 #include <mbgl/style/parser.hpp>
 #include <mbgl/style/transition_options.hpp>
 #include <mbgl/sprite/sprite_atlas.hpp>
-#include <mbgl/sprite/sprite_image_collection.hpp>
 #include <mbgl/sprite/sprite_loader.hpp>
 #include <mbgl/text/glyph_atlas.hpp>
 #include <mbgl/geometry/line_atlas.hpp>
@@ -36,6 +35,7 @@
 #include <mbgl/renderer/layers/render_raster_layer.hpp>
 #include <mbgl/renderer/layers/render_symbol_layer.hpp>
 #include <mbgl/renderer/style_diff.hpp>
+#include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/tile/tile.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/exception.hpp>
@@ -506,22 +506,24 @@ bool Style::isLoaded() const {
 }
 
 void Style::addImage(std::unique_ptr<style::Image> image) {
-    addSpriteImage(spriteImages, std::move(image), [&](style::Image& added) {
-        spriteAtlas->addImage(added.impl);
-        observer->onUpdate(Update::Repaint);
-    });
+    std::string id = image->getID();
+    auto it = images.find(id);
+    if (it != images.end() && it->second->getImage().size != image->getImage().size) {
+        Log::Warning(Event::Sprite, "Can't change sprite dimensions for '%s'", id.c_str());
+        return;
+    }
+    spriteAtlas->addImage(image->impl);
+    images[id] = std::move(image);
 }
 
 void Style::removeImage(const std::string& id) {
-    removeSpriteImage(spriteImages, id, [&] () {
-        spriteAtlas->removeImage(id);
-        observer->onUpdate(Update::Repaint);
-    });
+    images.erase(id);
+    spriteAtlas->removeImage(id);
 }
 
 const style::Image* Style::getImage(const std::string& id) const {
-    auto it = spriteImages.find(id);
-    return it == spriteImages.end() ? nullptr : it->second.get();
+    auto it = images.find(id);
+    return it == images.end() ? nullptr : it->second.get();
 }
 
 RenderData Style::getRenderData(MapDebugOptions debugOptions, float angle) const {
@@ -735,8 +737,8 @@ void Style::onTileError(RenderSource& source, const OverscaledTileID& tileID, st
     observer->onResourceError(error);
 }
 
-void Style::onSpriteLoaded(std::vector<std::unique_ptr<Image>>&& images) {
-    for (auto& image : images) {
+void Style::onSpriteLoaded(std::vector<std::unique_ptr<Image>>&& images_) {
+    for (auto& image : images_) {
         addImage(std::move(image));
     }
     spriteAtlas->onSpriteLoaded();

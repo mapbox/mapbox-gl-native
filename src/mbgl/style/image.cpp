@@ -16,6 +16,8 @@ std::string Image::getID() const {
     return impl->id;
 }
 
+Image::Image(const Image&) = default;
+
 const PremultipliedImage& Image::getImage() const {
     return impl->image;
 }

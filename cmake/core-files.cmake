@@ -288,8 +288,6 @@ set(MBGL_CORE_FILES
     # sprite
     src/mbgl/sprite/sprite_atlas.cpp
     src/mbgl/sprite/sprite_atlas.hpp
-    src/mbgl/sprite/sprite_image_collection.cpp
-    src/mbgl/sprite/sprite_image_collection.hpp
     src/mbgl/sprite/sprite_loader.cpp
     src/mbgl/sprite/sprite_loader.hpp
     src/mbgl/sprite/sprite_loader_observer.hpp

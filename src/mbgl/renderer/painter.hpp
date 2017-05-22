@@ -79,8 +79,7 @@ public:
 
     void render(const style::Style&,
                 const FrameData&,
-                View&,
-                SpriteAtlas& annotationSpriteAtlas);
+                View&);
 
     void cleanup();
 

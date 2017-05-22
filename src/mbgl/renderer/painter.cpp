@@ -125,7 +125,7 @@ void Painter::cleanup() {
     context.performCleanup();
 }
 
-void Painter::render(const Style& style, const FrameData& frame_, View& view, SpriteAtlas& annotationSpriteAtlas) {
+void Painter::render(const Style& style, const FrameData& frame_, View& view) {
     frame = frame_;
     if (frame.contextMode == GLContextMode::Shared) {
         context.setDirtyState();
@@ -176,7 +176,6 @@ void Painter::render(const Style& style, const FrameData& frame_, View& view, Sp
         lineAtlas->upload(context, 0);
         glyphAtlas->upload(context, 0);
         frameHistory.upload(context, 0);
-        annotationSpriteAtlas.upload(context, 0);
 
         for (const auto& item : order) {
             for (const auto& tileRef : item.tiles) {

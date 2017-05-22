@@ -66,10 +66,6 @@ public:
 
     void onSpriteLoaded();
 
-    void markAsLoaded() {
-        loaded = true;
-    }
-
     bool isLoaded() const {
         return loaded;
     }
@@ -80,8 +76,8 @@ public:
     void addImage(Immutable<style::Image::Impl>);
     void removeImage(const std::string&);
 
-    void getIcons(IconRequestor& requestor);
-    void removeRequestor(IconRequestor& requestor);
+    void getIcons(IconRequestor&, IconDependencies);
+    void removeRequestor(IconRequestor&);
 
     // Ensure that the atlas contains the named image suitable for rendering as an icon, and
     // return its metrics. The image will be padded on each side with a one pixel wide transparent

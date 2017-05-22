@@ -11,6 +11,7 @@ namespace style {
 class Image {
 public:
     Image(std::string id, PremultipliedImage&&, float pixelRatio, bool sdf = false);
+    Image(const Image&);
 
     std::string getID() const;
 

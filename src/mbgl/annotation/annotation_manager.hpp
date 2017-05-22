@@ -2,7 +2,7 @@
 
 #include <mbgl/annotation/annotation.hpp>
 #include <mbgl/annotation/symbol_annotation_impl.hpp>
-#include <mbgl/sprite/sprite_atlas.hpp>
+#include <mbgl/style/image.hpp>
 #include <mbgl/map/update.hpp>
 #include <mbgl/util/noncopyable.hpp>
 
@@ -21,7 +21,6 @@ class ShapeAnnotationImpl;
 
 namespace style {
 class Style;
-class Image;
 } // namespace style
 
 class AnnotationManager : private util::noncopyable {
@@ -36,7 +35,6 @@ public:
     void addImage(std::unique_ptr<style::Image>);
     void removeImage(const std::string&);
     double getTopOffsetPixelsForImage(const std::string&);
-    SpriteAtlas& getSpriteAtlas() { return spriteAtlas; }
 
     void updateStyle(style::Style&);
     void updateData();
@@ -67,15 +65,15 @@ private:
     // <https://github.com/mapbox/mapbox-gl-native/issues/5691>
     using SymbolAnnotationMap = std::map<AnnotationID, std::shared_ptr<SymbolAnnotationImpl>>;
     using ShapeAnnotationMap = std::map<AnnotationID, std::unique_ptr<ShapeAnnotationImpl>>;
+    using ImageMap = std::unordered_map<std::string, style::Image>;
 
     SymbolAnnotationTree symbolTree;
     SymbolAnnotationMap symbolAnnotations;
     ShapeAnnotationMap shapeAnnotations;
+    ImageMap images;
     std::unordered_set<std::string> obsoleteShapeAnnotationLayers;
+    std::unordered_set<std::string> obsoleteImages;
     std::unordered_set<AnnotationTile*> tiles;
-
-    std::unordered_map<std::string, std::unique_ptr<style::Image>> spriteImages;
-    SpriteAtlas spriteAtlas;
 
     friend class AnnotationTile;
 };
