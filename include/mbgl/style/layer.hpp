@@ -73,21 +73,21 @@ public:
     auto accept(V&& visitor) {
         switch (getType()) {
         case LayerType::Fill:
-            return visitor(*as<FillLayer>());
+            return std::forward<V>(visitor)(*as<FillLayer>());
         case LayerType::Line:
-            return visitor(*as<LineLayer>());
+            return std::forward<V>(visitor)(*as<LineLayer>());
         case LayerType::Circle:
-            return visitor(*as<CircleLayer>());
+            return std::forward<V>(visitor)(*as<CircleLayer>());
         case LayerType::Symbol:
-            return visitor(*as<SymbolLayer>());
+            return std::forward<V>(visitor)(*as<SymbolLayer>());
         case LayerType::Raster:
-            return visitor(*as<RasterLayer>());
+            return std::forward<V>(visitor)(*as<RasterLayer>());
         case LayerType::Background:
-            return visitor(*as<BackgroundLayer>());
+            return std::forward<V>(visitor)(*as<BackgroundLayer>());
         case LayerType::Custom:
-            return visitor(*as<CustomLayer>());
+            return std::forward<V>(visitor)(*as<CustomLayer>());
         case LayerType::FillExtrusion:
-            return visitor(*as<FillExtrusionLayer>());
+            return std::forward<V>(visitor)(*as<FillExtrusionLayer>());
         }
     }
 
