@@ -36,10 +36,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (nullable NS_DICTIONARY_OF(NSString *, id) *)mgl_frameworkInfoDictionary;
 
-/// The relative path to the directory containing the SDK’s resource files, or
-/// `nil` if the files are located directly within the bundle’s root directory.
-@property (readonly, copy, nullable) NSString *mgl_resourcesDirectory;
-
 @end
 
 NS_ASSUME_NONNULL_END
