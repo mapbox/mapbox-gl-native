@@ -15,6 +15,7 @@
 		1F7454931ECBB43F00021D39 /* MGLLight.h in Headers */ = {isa = PBXBuildFile; fileRef = 1F0666881EC64F8E001C16D7 /* MGLLight.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1F7454961ECD450D00021D39 /* MGLLight_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 1F7454941ECD450D00021D39 /* MGLLight_Private.h */; };
 		1F7454971ECD450D00021D39 /* MGLLight_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 1F7454941ECD450D00021D39 /* MGLLight_Private.h */; };
+		1F7454A91ED08AB400021D39 /* MGLLightTest.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1F7454A61ED08AB400021D39 /* MGLLightTest.mm */; };
 		1F95931D1E6DE2E900D5B294 /* MGLNSDateAdditionsTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1F95931C1E6DE2E900D5B294 /* MGLNSDateAdditionsTests.mm */; };
 		30E578171DAA85520050F07E /* UIImage+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 30E578111DAA7D690050F07E /* UIImage+MGLAdditions.h */; };
 		30E578181DAA85520050F07E /* UIImage+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 30E578111DAA7D690050F07E /* UIImage+MGLAdditions.h */; };
@@ -554,6 +555,7 @@
 		1F0666881EC64F8E001C16D7 /* MGLLight.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLLight.h; sourceTree = "<group>"; };
 		1F0666891EC64F8E001C16D7 /* MGLLight.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLLight.mm; sourceTree = "<group>"; };
 		1F7454941ECD450D00021D39 /* MGLLight_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLLight_Private.h; sourceTree = "<group>"; };
+		1F7454A61ED08AB400021D39 /* MGLLightTest.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLLightTest.mm; path = ../../darwin/test/MGLLightTest.mm; sourceTree = "<group>"; };
 		1F95931C1E6DE2E900D5B294 /* MGLNSDateAdditionsTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLNSDateAdditionsTests.mm; path = ../../darwin/test/MGLNSDateAdditionsTests.mm; sourceTree = "<group>"; };
 		20DABE861DF78148007AC5FF /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Foundation.strings"; sourceTree = "<group>"; };
 		20DABE881DF78148007AC5FF /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
@@ -1081,6 +1083,7 @@
 			children = (
 				3575798F1D513EF1000B822E /* Layers */,
 				40CFA64E1D78754A008103BD /* Sources */,
+				1F7454A61ED08AB400021D39 /* MGLLightTest.mm */,
 				357F09091DF84F3800941873 /* MGLStyleValueTests.h */,
 				3599A3E51DF708BC00E77FB2 /* MGLStyleValueTests.m */,
 				DA2207BE1DC0805F0002F84D /* MGLStyleValueTests.swift */,
@@ -2182,6 +2185,7 @@
 				DAE7DEC21E245455007505A6 /* MGLNSStringAdditionsTests.m in Sources */,
 				4085AF091D933DEA00F11B22 /* MGLTileSetTests.mm in Sources */,
 				DAEDC4341D603417000224FF /* MGLAttributionInfoTests.m in Sources */,
+				1F7454A91ED08AB400021D39 /* MGLLightTest.mm in Sources */,
 				357579851D502AF5000B822E /* MGLSymbolStyleLayerTests.mm in Sources */,
 				357579871D502AFE000B822E /* MGLLineStyleLayerTests.mm in Sources */,
 				357579891D502B06000B822E /* MGLCircleStyleLayerTests.mm in Sources */,
