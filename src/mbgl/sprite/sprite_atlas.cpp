@@ -44,7 +44,7 @@ SpriteAtlas::SpriteAtlas()
 SpriteAtlas::~SpriteAtlas() = default;
 
 void SpriteAtlas::onSpriteLoaded() {
-    markAsLoaded();
+    loaded = true;
     for (auto requestor : requestors) {
         requestor->onIconsAvailable(buildIconMap());
     }
@@ -106,8 +106,20 @@ const style::Image::Impl* SpriteAtlas::getImage(const std::string& id) const {
     return nullptr;
 }
 
-void SpriteAtlas::getIcons(IconRequestor& requestor) {
-    if (isLoaded()) {
+void SpriteAtlas::getIcons(IconRequestor& requestor, IconDependencies dependencies) {
+    // If the sprite has been loaded, or if all the icon dependencies are already present
+    // (i.e. if they've been addeded via runtime styling), then notify the requestor immediately.
+    // Otherwise, delay notification until the sprite is loaded. At that point, if any of the
+    // dependencies are still unavailable, we'll just assume they are permanently missing.
+    bool hasAllDependencies = true;
+    if (!isLoaded()) {
+        for (const auto& dependency : dependencies) {
+            if (entries.find(dependency) == entries.end()) {
+                hasAllDependencies = false;
+            }
+        }
+    }
+    if (isLoaded() || hasAllDependencies) {
         requestor.onIconsAvailable(buildIconMap());
     } else {
         requestors.insert(&requestor);

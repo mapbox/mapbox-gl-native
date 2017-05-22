@@ -46,7 +46,6 @@ set(MBGL_TEST_FILES
 
     # sprite
     test/sprite/sprite_atlas.test.cpp
-    test/sprite/sprite_image_collection.test.cpp
     test/sprite/sprite_loader.test.cpp
     test/sprite/sprite_parser.test.cpp
 

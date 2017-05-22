@@ -13,7 +13,7 @@ AnnotationTile::AnnotationTile(const OverscaledTileID& overscaledTileID,
                                const TileParameters& parameters)
     : GeometryTile(overscaledTileID, AnnotationManager::SourceID, parameters,
                    *parameters.style.glyphAtlas,
-                   parameters.annotationManager.spriteAtlas),
+                   *parameters.style.spriteAtlas),
       annotationManager(parameters.annotationManager) {
     annotationManager.addTile(*this);
 }
