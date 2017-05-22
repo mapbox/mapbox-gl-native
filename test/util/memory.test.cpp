@@ -159,7 +159,7 @@ TEST(Memory, Footprint) {
     RecordProperty("vectorFootprint", vectorFootprint);
     RecordProperty("rasterFootprint", rasterFootprint);
 
-    ASSERT_LT(vectorFootprint, 65.2 * 1024 * 1024) << "\
+    ASSERT_LT(vectorFootprint, 40 * 1024 * 1024) << "\
         mbgl::Map footprint over 65.2MB for vector styles.";
 
     ASSERT_LT(rasterFootprint, 25 * 1024 * 1024) << "\
