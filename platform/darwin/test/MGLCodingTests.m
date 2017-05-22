@@ -89,8 +89,8 @@
     MGLPolyline *segmentLine = [MGLPolyline polylineWithCoordinates:segmentCoordinates count:segmentCoordinatesCount];
     CLLocationCoordinate2D segmentCenter = CLLocationCoordinate2DMake(35.0404006631, -85.2604935);
     
-    XCTAssertEqualWithAccuracy([segmentLine coordinate].latitude, segmentCenter.latitude, 1);
-    XCTAssertEqualWithAccuracy([segmentLine coordinate].longitude, segmentCenter.longitude, 1);
+    XCTAssertEqualWithAccuracy([segmentLine coordinate].latitude, segmentCenter.latitude, 0.0001);
+    XCTAssertEqualWithAccuracy([segmentLine coordinate].longitude, segmentCenter.longitude, 0.0001);
     
     CLLocationCoordinate2D sfToBerkeleyCoordinates[] = {
         CLLocationCoordinate2DMake(37.782440, -122.397111),
@@ -103,8 +103,8 @@
     MGLPolyline *sfToBerkeleyLine = [MGLPolyline polylineWithCoordinates:sfToBerkeleyCoordinates count:sfToBerkeleyCoordinatesCount];
     CLLocationCoordinate2D sfToBerkeleyCenter = CLLocationCoordinate2DMake(37.8230575118,-122.324867587);
     
-    XCTAssertEqualWithAccuracy([sfToBerkeleyLine coordinate].latitude, sfToBerkeleyCenter.latitude, 1);
-    XCTAssertEqualWithAccuracy([sfToBerkeleyLine coordinate].longitude, sfToBerkeleyCenter.longitude, 1);
+    XCTAssertEqualWithAccuracy([sfToBerkeleyLine coordinate].latitude, sfToBerkeleyCenter.latitude, 0.0001);
+    XCTAssertEqualWithAccuracy([sfToBerkeleyLine coordinate].longitude, sfToBerkeleyCenter.longitude, 0.0001);
     
 }
 
