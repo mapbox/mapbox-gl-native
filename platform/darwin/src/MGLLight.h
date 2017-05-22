@@ -9,9 +9,9 @@ NS_ASSUME_NONNULL_BEGIN
 /** Options to specify extruded geometries are lit relative to the map or viewport. */
 typedef NS_ENUM(NSUInteger, MGLLightAnchor) {
     /** The position of the light source is aligned to the rotation of the map. */
-    MGLLightAnchorTypeMap,
+    MGLLightAnchorMap,
     /** The position of the light source is aligned to the rotation of the viewport. */
-    MGLLightAnchorTypeViewport
+    MGLLightAnchorViewport
 };
 
 /**

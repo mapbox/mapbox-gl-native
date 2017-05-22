@@ -25,7 +25,7 @@
     {
         auto light = new mbgl::style::Light();
         MGLLight *mglLight = [[MGLLight alloc] initWithMBGLLight:light];
-        XCTAssertEqual(mglLight.lightAnchor, MGLLightAnchorTypeViewport);
+        XCTAssertEqual(mglLight.lightAnchor, MGLLightAnchorViewport);
         XCTAssertEqual(mglLight.lightAnchorTransition.delay, defaultTransition.delay);
         XCTAssertEqual(mglLight.lightAnchorTransition.duration, defaultTransition.duration);
         
@@ -36,10 +36,10 @@
         XCTAssert(anchorTransition.delay && MGLTimeIntervalFromDuration(*anchorTransition.delay) == defaultTransition.delay);
         XCTAssert(anchorTransition.duration && MGLTimeIntervalFromDuration(*anchorTransition.duration) == defaultTransition.duration);
         
-        mglLight.lightAnchor = MGLLightAnchorTypeMap;
+        mglLight.lightAnchor = MGLLightAnchorMap;
         mglLight.lightAnchorTransition = transition;
         
-        XCTAssertEqual(mglLight.lightAnchor, MGLLightAnchorTypeMap);
+        XCTAssertEqual(mglLight.lightAnchor, MGLLightAnchorMap);
         XCTAssertEqual(mglLight.lightAnchorTransition.delay, transition.delay);
         XCTAssertEqual(mglLight.lightAnchorTransition.duration, transition.duration);
         
@@ -204,8 +204,8 @@
     XCTAssertEqual([NSValue valueWithMGLLightPosition:position].MGLLightPositionValue.radial, position.radial);
     XCTAssertEqual([NSValue valueWithMGLLightPosition:position].MGLLightPositionValue.azimuthal, position.azimuthal);
     XCTAssertEqual([NSValue valueWithMGLLightPosition:position].MGLLightPositionValue.polar, position.polar);
-    XCTAssertEqual([NSValue valueWithMGLLightAnchor:MGLLightAnchorTypeMap].MGLLightAnchorValue, MGLLightAnchorTypeMap);
-    XCTAssertEqual([NSValue valueWithMGLLightAnchor:MGLLightAnchorTypeViewport].MGLLightAnchorValue, MGLLightAnchorTypeViewport);
+    XCTAssertEqual([NSValue valueWithMGLLightAnchor:MGLLightAnchorMap].MGLLightAnchorValue, MGLLightAnchorMap);
+    XCTAssertEqual([NSValue valueWithMGLLightAnchor:MGLLightAnchorViewport].MGLLightAnchorValue, MGLLightAnchorViewport);
 }
 
 @end

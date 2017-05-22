@@ -11,8 +11,8 @@
 namespace mbgl {
     
     MBGL_DEFINE_ENUM(MGLLightAnchor, {
-        { MGLLightAnchorTypeMap, "map" },
-        { MGLLightAnchorTypeViewport, "viewport" },
+        { MGLLightAnchorMap, "map" },
+        { MGLLightAnchorViewport, "viewport" },
     });
     
 }
