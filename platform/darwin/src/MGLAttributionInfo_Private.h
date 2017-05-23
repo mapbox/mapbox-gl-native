@@ -20,6 +20,20 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (NSAttributedString *)attributedStringForAttributionInfos:(NS_ARRAY_OF(MGLAttributionInfo *) *)attributionInfos;
 
+/**
+ Returns a copy of the `URL` property modified to account for the given style
+ URL, center coordinate, and zoom level.
+
+ @param styleURL The map’s style URL.
+ @param centerCoordinate The map’s center coordinate.
+ @param zoomLevel The map’s zoom level. See the `MGLMapView.zoomLevel` property
+    for more information.
+ @return A modified URL containing a fragment that points to the specified
+    viewport. If the `feedbackLink` property is set to `NO`, this method returns
+    `nil`.
+ */
+- (nullable NSURL *)feedbackURLForStyleURL:(nullable NSURL *)styleURL atCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate zoomLevel:(double)zoomLevel;
+
 @end
 
 @interface NSMutableArray (MGLAttributionInfoAdditions)

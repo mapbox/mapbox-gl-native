@@ -47,7 +47,7 @@
     XCTAssertEqualObjects(infos[3].URL, [NSURL URLWithString:@"https://www.mapbox.com/map-feedback/"]);
     XCTAssertTrue(infos[3].feedbackLink);
     XCTAssertEqualObjects([infos[3] feedbackURLAtCenterCoordinate:mapbox zoomLevel:14],
-                          [NSURL URLWithString:@"https://www.mapbox.com/map-feedback/#/77.63680/12.98108/15"]);
+                          [NSURL URLWithString:@"https://www.mapbox.com/feedback/#/77.63680/12.98108/14"]);
 }
 
 - (void)testStyle {

@@ -1,17 +1,18 @@
 #import "MGLMapView_Private.h"
-#import "MGLAnnotationImage_Private.h"
+
 #import "MGLAttributionButton.h"
-#import "MGLAttributionInfo.h"
 #import "MGLCompassCell.h"
 #import "MGLOpenGLLayer.h"
 #import "MGLStyle.h"
 
+#import "MGLAnnotationImage_Private.h"
+#import "MGLAttributionInfo_Private.h"
 #import "MGLFeature_Private.h"
+#import "MGLFoundation_Private.h"
 #import "MGLGeometry_Private.h"
 #import "MGLMultiPoint_Private.h"
 #import "MGLOfflineStorage_Private.h"
 #import "MGLStyle_Private.h"
-#import "MGLFoundation_Private.h"
 
 #import "MGLAccountManager.h"
 #import "MGLMapCamera.h"
@@ -1739,7 +1740,7 @@ public:
     double zoomLevel = self.zoomLevel;
     NSMutableArray *urls = [NSMutableArray array];
     for (MGLAttributionInfo *info in [self.style attributionInfosWithFontSize:0 linkColor:nil]) {
-        NSURL *url = [info feedbackURLAtCenterCoordinate:centerCoordinate zoomLevel:zoomLevel];
+        NSURL *url = [info feedbackURLForStyleURL:self.styleURL atCenterCoordinate:centerCoordinate zoomLevel:zoomLevel];
         if (url) {
             [urls addObject:url];
         }

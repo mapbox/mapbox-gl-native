@@ -64,7 +64,7 @@
 #import "MGLCompactCalloutView.h"
 #import "MGLAnnotationContainerView.h"
 #import "MGLAnnotationContainerView_Private.h"
-#import "MGLAttributionInfo.h"
+#import "MGLAttributionInfo_Private.h"
 
 #include <algorithm>
 #include <cstdlib>
@@ -1907,8 +1907,9 @@ public:
             {
                 if (info.feedbackLink)
                 {
-                    url = [info feedbackURLAtCenterCoordinate:self.centerCoordinate
-                                                    zoomLevel:self.zoomLevel];
+                    url = [info feedbackURLForStyleURL:self.styleURL
+                                    atCenterCoordinate:self.centerCoordinate
+                                             zoomLevel:self.zoomLevel];
                 }
                 [[UIApplication sharedApplication] openURL:url];
             }

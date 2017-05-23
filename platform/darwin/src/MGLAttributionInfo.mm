@@ -6,6 +6,7 @@
     #import <Cocoa/Cocoa.h>
 #endif
 
+#import "MGLAccountManager.h"
 #import "MGLMapCamera.h"
 #import "NSArray+MGLAdditions.h"
 #import "NSString+MGLAdditions.h"
@@ -126,13 +127,29 @@
 }
 
 - (nullable NSURL *)feedbackURLAtCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate zoomLevel:(double)zoomLevel {
+    return [self feedbackURLForStyleURL:nil atCenterCoordinate:centerCoordinate zoomLevel:zoomLevel];
+}
+
+- (nullable NSURL *)feedbackURLForStyleURL:(nullable NSURL *)styleURL atCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate zoomLevel:(double)zoomLevel {
     if (!self.feedbackLink) {
         return nil;
     }
-
-    NSURLComponents *components = [NSURLComponents componentsWithURL:self.URL resolvingAgainstBaseURL:NO];
+    
+    NSURLComponents *components = [NSURLComponents componentsWithString:@"https://www.mapbox.com/feedback/"];
     components.fragment = [NSString stringWithFormat:@"/%.5f/%.5f/%i",
-                           centerCoordinate.longitude, centerCoordinate.latitude, (int)round(zoomLevel + 1)];
+                           centerCoordinate.longitude, centerCoordinate.latitude, (int)round(zoomLevel)];
+    
+    if ([styleURL.scheme isEqualToString:@"mapbox"] && [styleURL.host isEqualToString:@"styles"]) {
+        NSArray<NSString *> *stylePathComponents = styleURL.pathComponents;
+        if (stylePathComponents.count >= 3) {
+            components.queryItems = @[
+                [NSURLQueryItem queryItemWithName:@"owner" value:stylePathComponents[1]],
+                [NSURLQueryItem queryItemWithName:@"id" value:stylePathComponents[2]],
+                [NSURLQueryItem queryItemWithName:@"access_token" value:[MGLAccountManager accessToken]],
+            ];
+        }
+    }
+    
     return components.URL;
 }
 
