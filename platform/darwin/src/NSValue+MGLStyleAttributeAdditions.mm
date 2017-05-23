@@ -1,5 +1,5 @@
 #import "NSValue+MGLStyleAttributeAdditions.h"
-
+#import "MGLLight.h"
 #if TARGET_OS_IPHONE
     #import <UIKit/UIKit.h>
     #define MGLEdgeInsets UIEdgeInsets
@@ -58,6 +58,19 @@
         static_cast<float>(insets.right),
         static_cast<float>(insets.bottom),
         static_cast<float>(insets.left),
+    };
+}
+
+- (std::array<float, 3>)mgl_lightPositionArrayValue
+{
+    NSAssert(strcmp(self.objCType, @encode(MGLSphericalPosition)) == 0, @"Value does not represent an MGLSphericalPosition");
+    MGLSphericalPosition lightPosition;
+    [self getValue:&lightPosition];
+    // Style specification defines padding in clockwise order: top, right, bottom, left.
+    return {
+        static_cast<float>(lightPosition.radial),
+        static_cast<float>(lightPosition.azimuthal),
+        static_cast<float>(lightPosition.polar),
     };
 }
 

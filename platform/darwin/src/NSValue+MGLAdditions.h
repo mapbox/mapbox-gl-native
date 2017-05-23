@@ -1,6 +1,7 @@
 #import <Foundation/Foundation.h>
 
 #import "MGLGeometry.h"
+#import "MGLLight.h"
 #import "MGLOfflinePack.h"
 #import "MGLTypes.h"
 
@@ -86,6 +87,34 @@ NS_ASSUME_NONNULL_BEGIN
  The `MGLTransition` structure representation of the value.
  */
 @property (readonly) MGLTransition MGLTransitionValue;
+
+/**
+ Creates a new value object containing the given `MGLSphericalPosition`
+ structure.
+ 
+ @param lightPosition The value for the new object.
+ @return A new value object that contains the light position information.
+ */
++ (instancetype)valueWithMGLSphericalPosition:(MGLSphericalPosition)lightPosition;
+
+/**
+ The `MGLSphericalPosition` structure representation of the value.
+ */
+@property (readonly) MGLSphericalPosition MGLSphericalPositionValue;
+
+/**
+ Creates a new value object containing the given `MGLLightAnchor`
+ enum.
+ 
+ @param lightAnchor The value for the new object.
+ @return A new value object that contains the light anchor information.
+ */
++ (NSValue *)valueWithMGLLightAnchor:(MGLLightAnchor)lightAnchor;
+
+/**
+ The `MGLLightAnchor` enum representation of the value.
+ */
+@property (readonly) MGLLightAnchor MGLLightAnchorValue;
 
 @end
 

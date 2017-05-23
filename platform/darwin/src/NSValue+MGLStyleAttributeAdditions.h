@@ -9,5 +9,6 @@
 
 - (std::array<float, 2>)mgl_offsetArrayValue;
 - (std::array<float, 4>)mgl_paddingArrayValue;
+- (std::array<float, 3>)mgl_lightPositionArrayValue;
 
 @end
