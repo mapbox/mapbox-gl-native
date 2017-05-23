@@ -385,12 +385,12 @@ void NativeMapView::moveBy(jni::JNIEnv&, jni::jdouble dx, jni::jdouble dy, jni::
 void NativeMapView::jumpTo(jni::JNIEnv&, jni::jdouble angle, jni::jdouble latitude, jni::jdouble longitude, jni::jdouble pitch, jni::jdouble zoom) {
     mbgl::CameraOptions options;
     if (angle != -1) {
-        options.angle = (angle - 180 * M_PI) / 180;
+        options.angle = -angle * util::DEG2RAD;
     }
     options.center = mbgl::LatLng(latitude, longitude);
     options.padding = insets;
     if (pitch != -1) {
-        options.pitch = pitch * M_PI / 180;
+        options.pitch = pitch * util::DEG2RAD;
     }
     if (zoom != -1) {
         options.zoom = zoom;
@@ -402,12 +402,12 @@ void NativeMapView::jumpTo(jni::JNIEnv&, jni::jdouble angle, jni::jdouble latitu
 void NativeMapView::easeTo(jni::JNIEnv&, jni::jdouble angle, jni::jdouble latitude, jni::jdouble longitude, jni::jlong duration, jni::jdouble pitch, jni::jdouble zoom, jni::jboolean easing) {
     mbgl::CameraOptions cameraOptions;
     if (angle != -1) {
-        cameraOptions.angle = (angle - 180 * M_PI) / 180;
+        cameraOptions.angle = -angle * util::DEG2RAD;
     }
     cameraOptions.center = mbgl::LatLng(latitude, longitude);
     cameraOptions.padding = insets;
     if (pitch != -1) {
-        cameraOptions.pitch = pitch * M_PI / 180;
+        cameraOptions.pitch = pitch * util::DEG2RAD;
     }
     if (zoom != -1) {
         cameraOptions.zoom = zoom;
@@ -426,12 +426,12 @@ void NativeMapView::easeTo(jni::JNIEnv&, jni::jdouble angle, jni::jdouble latitu
 void NativeMapView::flyTo(jni::JNIEnv&, jni::jdouble angle, jni::jdouble latitude, jni::jdouble longitude, jni::jlong duration, jni::jdouble pitch, jni::jdouble zoom) {
     mbgl::CameraOptions cameraOptions;
     if (angle != -1) {
-        cameraOptions.angle = (angle - 180 * M_PI / 180);
+        cameraOptions.angle = -angle * util::DEG2RAD;
     }
     cameraOptions.center = mbgl::LatLng(latitude, longitude);
     cameraOptions.padding = insets;
     if (pitch != -1) {
-        cameraOptions.pitch = pitch * M_PI / 180;
+        cameraOptions.pitch = pitch * util::DEG2RAD;
     }
     if (zoom != -1) {
         cameraOptions.zoom = zoom;
