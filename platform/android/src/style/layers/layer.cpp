@@ -100,18 +100,18 @@ namespace android {
     }
 
     struct GetFilterEvaluator {
-        Filter noop(std::string layerType) {
+        optional<Filter> noop(std::string layerType) {
             Log::Warning(mbgl::Event::JNI, "%s doesn't support filters", layerType.c_str());
-            return NULL;
+            return {};
         }
 
-        Filter operator()(style::BackgroundLayer&) { return noop("BackgroundLayer doesn't support filters"); }
-        Filter operator()(style::CustomLayer&) { return noop("CustomLayer doesn't support filters"); }
-        Filter operator()(style::RasterLayer&) { return noop("RasterLayer doesn't support filters"); }
+        optional<Filter> operator()(style::BackgroundLayer&) { return noop("BackgroundLayer"); }
+        optional<Filter> operator()(style::CustomLayer&) { return noop("CustomLayer"); }
+        optional<Filter> operator()(style::RasterLayer&) { return noop("RasterLayer"); }
 
         template <class LayerType>
-        Filter operator()(LayerType& layer) {
-            return layer.getFilter();
+        optional<Filter> operator()(LayerType& layer) {
+            return { layer.getFilter() };
         }
     };
 
@@ -119,7 +119,9 @@ namespace android {
         using namespace mbgl::style;
         using namespace mbgl::android::conversion;
 
-        return *convert<jni::Object<mbgl::android::Filter::Statement>, mbgl::style::Filter>(env, layer.accept(GetFilterEvaluator());
+        auto tmp = layer.accept(GetFilterEvaluator());
+
+        return *convert<jni::Object<mbgl::android::Filter::Statement>, mbgl::style::Filter>(env, *tmp);
     }
 
     struct SetFilterEvaluator {
@@ -142,7 +144,7 @@ namespace android {
         Value wrapped(env, jfilter);
 
         Error error;
-        optional<mbgl::style::Filter> converted = convert<mbgl::style::Filter>(wrapped, error);
+        optional<Filter> converted = convert<Filter>(wrapped, error);
         if (!converted) {
             mbgl::Log::Error(mbgl::Event::JNI, "Error setting filter: " + error.message);
             return;
