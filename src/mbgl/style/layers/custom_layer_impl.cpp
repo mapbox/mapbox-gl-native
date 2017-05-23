@@ -1,6 +1,5 @@
 #include <mbgl/style/layers/custom_layer_impl.hpp>
 #include <mbgl/map/transform_state.hpp>
-#include <mbgl/util/logging.hpp>
 
 namespace mbgl {
 namespace style {
@@ -11,7 +10,6 @@ CustomLayer::Impl::Impl(const std::string& id_,
                          CustomLayerDeinitializeFunction deinitializeFn_,
                          void* context_)
     : Layer::Impl(LayerType::Custom, id_, std::string()) {
-    Log::Info(Event::General, "New custom layer Impl: %s", id_.c_str());
     initializeFn = initializeFn_;
     renderFn = renderFn_;
     deinitializeFn = deinitializeFn_;
