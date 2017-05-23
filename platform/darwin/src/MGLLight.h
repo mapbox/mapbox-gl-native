@@ -1,4 +1,4 @@
-#import <CoreGraphics/CoreGraphics.h>
+#import <CoreLocation/CoreLocation.h>
 
 #import "MGLFoundation.h"
 #import "MGLStyleValue.h"
@@ -20,13 +20,13 @@ typedef NS_ENUM(NSUInteger, MGLLightAnchor) {
  */
 typedef struct MGLSphericalPosition {
     /** Distance from the center of the base of an object to its light. */
-    CGFloat radial;
+    CLLocationDistance radial;
     /** Position of the light relative to 0° (0° when `MGLLight.anchor` is set to viewport corresponds
      to the top of the viewport, or 0° when `MGLLight.anchor` is set to map corresponds to due north,
      and degrees proceed clockwise). */
-    CGFloat azimuthal;
+    CLLocationDirection azimuthal;
     /** Indicates the height of the light (from 0°, directly above, to 180°, directly below). */
-    CGFloat polar;
+    CLLocationDirection polar;
 } MGLSphericalPosition;
 
 /**
@@ -38,7 +38,7 @@ typedef struct MGLSphericalPosition {
  
  @return Returns a `MGLSphericalPosition` struct containing the position attributes.
  */
-NS_INLINE MGLSphericalPosition MGLSphericalPositionMake(CGFloat radial, CGFloat azimuthal, CGFloat polar) {
+NS_INLINE MGLSphericalPosition MGLSphericalPositionMake(CLLocationDistance radial, CLLocationDirection azimuthal, CLLocationDirection polar) {
     MGLSphericalPosition position;
     position.radial = radial;
     position.azimuthal = azimuthal;
@@ -56,9 +56,9 @@ MGL_EXPORT
 /**
  `anchor` Whether extruded geometries are lit relative to the map or viewport.
  
- This attribute corresponds to the <a
+ This property corresponds to the <a
  href="https://www.mapbox.com/mapbox-gl-js/style-spec/#light-anchor"><code>anchor</code></a>
- layout property in the Mapbox Style Specification.
+ light property in the Mapbox Style Specification.
  */
 @property (nonatomic) MGLLightAnchor anchor;
 
@@ -71,9 +71,9 @@ MGL_EXPORT
 /**
  Position of the light source relative to lit (extruded) geometries.
  
- This attribute corresponds to the <a
+ This property corresponds to the <a
  href="https://www.mapbox.com/mapbox-gl-js/style-spec/#light-position"><code>position</code></a>
- layout property in the Mapbox Style Specification.
+ light property in the Mapbox Style Specification.
  */
 @property (nonatomic) MGLStyleValue<NSValue *> * position;
 
@@ -87,9 +87,9 @@ MGL_EXPORT
 /**
  Color tint for lighting extruded geometries.
  
- This attribute corresponds to the <a
+ This property corresponds to the <a
  href="https://www.mapbox.com/mapbox-gl-js/style-spec/#light-color"><code>color</code></a>
- layout property in the Mapbox Style Specification.
+ light property in the Mapbox Style Specification.
  */
 @property (nonatomic) MGLStyleValue<UIColor *> *color;
 #else
@@ -109,9 +109,9 @@ MGL_EXPORT
 /**
  Intensity of lighting (on a scale from 0 to 1). Higher numbers will present as more extreme contrast.
  
- This attribute corresponds to the <a
+ This property corresponds to the <a
  href="https://www.mapbox.com/mapbox-gl-js/style-spec/#light-intensity"><code>intensity</code></a>
- layout property in the Mapbox Style Specification.
+ light property in the Mapbox Style Specification.
  */
 @property(nonatomic) MGLStyleValue<NSNumber *> *intensity;
 
