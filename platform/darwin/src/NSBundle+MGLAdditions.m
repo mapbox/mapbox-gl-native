@@ -13,6 +13,9 @@
         NSString *bundlePath = [bundle pathForResource:@"Mapbox" ofType:@"bundle"];
         if (bundlePath) {
             bundle = [self bundleWithPath:bundlePath];
+        } else {
+            [NSException raise:@"MGLBundleNotFoundException" format:
+             @"The Mapbox framework bundle could not be found. If using the Mapbox iOS SDK as a static framework, make sure that Mapbox.bundle is copied into the root of the app bundle."];
         }
     }
 
