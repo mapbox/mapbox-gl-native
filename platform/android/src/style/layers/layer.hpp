@@ -6,7 +6,6 @@
 
 #include "../value.hpp"
 #include "../filter.hpp"
-#include "../statement.hpp"
 
 #include <jni/jni.hpp>
 
@@ -68,7 +67,7 @@ public:
 
     /* common properties, but not shared by all */
 
-    jni::Object<mbgl::android::Statement> getFilter(jni::JNIEnv&);
+    jni::Object<mbgl::android::Filter::Statement> getFilter(jni::JNIEnv&);
 
     void setFilter(jni::JNIEnv&, jni::Array<jni::Object<>>);
 

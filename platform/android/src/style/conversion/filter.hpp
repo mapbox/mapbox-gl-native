@@ -2,7 +2,6 @@
 
 #include "../android_conversion.hpp"
 #include "../filter.hpp"
-#include "../statement.hpp"
 #include "../../conversion/conversion.hpp"
 #include <mbgl/style/conversion.hpp>
 #include <mbgl/style/conversion/filter.hpp>
@@ -31,12 +30,10 @@ inline optional<mbgl::style::Filter> toFilter(jni::JNIEnv& env, jni::Array<jni::
 }
 
 template <>
-struct Converter<jni::Object<mbgl::android::Statement>, mbgl::style::Filter> {
-    Result<jni::Object<mbgl::android::Statement>> operator()(jni::JNIEnv& env, const mbgl::style::Filter& value) const {
+struct Converter<jni::Object<mbgl::android::Filter::Statement>, mbgl::style::Filter> {
+    Result<jni::Object<mbgl::android::Filter::Statement>> operator()(jni::JNIEnv& env, const mbgl::style::Filter& value) const {
         using namespace mbgl::android;
-        auto statement = Filter::fromFilter(env, value);
-
-        return statement;
+        return Filter::fromFilter(env, value);
     }
 };
 
