@@ -807,6 +807,9 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
             case 7:
                 state = [styleURL isEqual:[MGLStyle trafficDayStyleURL]];
                 break;
+            case 8:
+                state = [styleURL isEqual:[MGLStyle trafficNightStyleURL]];
+                break;
             default:
                 return NO;
         }
