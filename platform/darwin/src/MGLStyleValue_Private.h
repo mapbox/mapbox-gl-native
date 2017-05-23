@@ -484,8 +484,8 @@ private: // Private utilities for converting from mbgl to mgl values
     
     static NSValue *toMGLRawStyleValue(const mbgl::style::Position &mbglStopValue) {
         std::array<float, 3> spherical = mbglStopValue.getSpherical();
-        MGLLightPosition position = MGLLightPositionMake(spherical[0], spherical[1], spherical[2]);
-        return [NSValue valueWithMGLLightPosition:position];
+        MGLSphericalPosition position = MGLSphericalPositionMake(spherical[0], spherical[1], spherical[2]);
+        return [NSValue valueWithMGLSphericalPosition:position];
     }
 
     // Enumerations

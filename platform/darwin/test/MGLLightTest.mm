@@ -63,11 +63,11 @@
         NSAssert([mglLight.position isKindOfClass:[MGLConstantStyleValue class]], @"mglLight.position isn’t a MGLConstantStyleValue.");
         NSValue *positionValue = ((MGLConstantStyleValue *)mglLight.position).rawValue;
         auto positionArray = light.getDefaultPosition().getSpherical();
-        MGLLightPosition defaultPosition = MGLLightPositionMake(positionArray[0], positionArray[1], positionArray[2]);
+        MGLSphericalPosition defaultPosition = MGLSphericalPositionMake(positionArray[0], positionArray[1], positionArray[2]);
         
-        XCTAssert(defaultPosition.radial == positionValue.MGLLightPositionValue.radial);
-        XCTAssert(defaultPosition.azimuthal == positionValue.MGLLightPositionValue.azimuthal);
-        XCTAssert(defaultPosition.polar == positionValue.MGLLightPositionValue.polar);
+        XCTAssert(defaultPosition.radial == positionValue.MGLSphericalPositionValue.radial);
+        XCTAssert(defaultPosition.azimuthal == positionValue.MGLSphericalPositionValue.azimuthal);
+        XCTAssert(defaultPosition.polar == positionValue.MGLSphericalPositionValue.polar);
         XCTAssertEqual(mglLight.positionTransiton.delay, defaultTransition.delay);
         XCTAssertEqual(mglLight.positionTransiton.duration, defaultTransition.duration);
         
@@ -78,17 +78,17 @@
         XCTAssert(positionTransition.delay && MGLTimeIntervalFromDuration(*positionTransition.delay) == defaultTransition.delay);
         XCTAssert(positionTransition.duration && MGLTimeIntervalFromDuration(*positionTransition.duration) == defaultTransition.duration);
         
-        defaultPosition = MGLLightPositionMake(6, 180, 90);
-        MGLStyleValue<NSValue *> *positionStyleValue = [MGLStyleValue<NSValue *> valueWithRawValue:[NSValue valueWithMGLLightPosition:defaultPosition]];
+        defaultPosition = MGLSphericalPositionMake(6, 180, 90);
+        MGLStyleValue<NSValue *> *positionStyleValue = [MGLStyleValue<NSValue *> valueWithRawValue:[NSValue valueWithMGLSphericalPosition:defaultPosition]];
         mglLight.position = positionStyleValue;
         mglLight.positionTransiton = transition;
         
         NSAssert([mglLight.position isKindOfClass:[MGLConstantStyleValue class]], @"mglLight.position isn’t a MGLConstantStyleValue.");
         positionValue = ((MGLConstantStyleValue *)mglLight.position).rawValue;
         
-        XCTAssert(defaultPosition.radial == positionValue.MGLLightPositionValue.radial);
-        XCTAssert(defaultPosition.azimuthal == positionValue.MGLLightPositionValue.azimuthal);
-        XCTAssert(defaultPosition.polar == positionValue.MGLLightPositionValue.polar);
+        XCTAssert(defaultPosition.radial == positionValue.MGLSphericalPositionValue.radial);
+        XCTAssert(defaultPosition.azimuthal == positionValue.MGLSphericalPositionValue.azimuthal);
+        XCTAssert(defaultPosition.polar == positionValue.MGLSphericalPositionValue.polar);
         XCTAssertEqual(mglLight.positionTransiton.delay, transition.delay);
         XCTAssertEqual(mglLight.positionTransiton.duration, transition.duration);
         
@@ -199,11 +199,11 @@
 }
 
 - (void)testValueAdditions {
-    MGLLightPosition position = MGLLightPositionMake(1.15, 210, 30);
+    MGLSphericalPosition position = MGLSphericalPositionMake(1.15, 210, 30);
     
-    XCTAssertEqual([NSValue valueWithMGLLightPosition:position].MGLLightPositionValue.radial, position.radial);
-    XCTAssertEqual([NSValue valueWithMGLLightPosition:position].MGLLightPositionValue.azimuthal, position.azimuthal);
-    XCTAssertEqual([NSValue valueWithMGLLightPosition:position].MGLLightPositionValue.polar, position.polar);
+    XCTAssertEqual([NSValue valueWithMGLSphericalPosition:position].MGLSphericalPositionValue.radial, position.radial);
+    XCTAssertEqual([NSValue valueWithMGLSphericalPosition:position].MGLSphericalPositionValue.azimuthal, position.azimuthal);
+    XCTAssertEqual([NSValue valueWithMGLSphericalPosition:position].MGLSphericalPositionValue.polar, position.polar);
     XCTAssertEqual([NSValue valueWithMGLLightAnchor:MGLLightAnchorMap].MGLLightAnchorValue, MGLLightAnchorMap);
     XCTAssertEqual([NSValue valueWithMGLLightAnchor:MGLLightAnchorViewport].MGLLightAnchorValue, MGLLightAnchorViewport);
 }

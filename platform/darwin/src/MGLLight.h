@@ -18,7 +18,7 @@ typedef NS_ENUM(NSUInteger, MGLLightAnchor) {
  A structure containing information about the position of the light source
  relative to lit geometries.
  */
-typedef struct MGLLightPosition {
+typedef struct MGLSphericalPosition {
     /** Distance from the center of the base of an object to its light. */
     CGFloat radial;
     /** Position of the light relative to 0° (0° when `MGLLight.anchor` is set to viewport corresponds
@@ -27,19 +27,19 @@ typedef struct MGLLightPosition {
     CGFloat azimuthal;
     /** Indicates the height of the light (from 0°, directly above, to 180°, directly below). */
     CGFloat polar;
-} MGLLightPosition;
+} MGLSphericalPosition;
 
 /**
- Creates a new `MGLLightPosition` from the given radial, azimuthal, polar.
+ Creates a new `MGLSphericalPosition` from the given radial, azimuthal, polar.
  
  @param radial The radial coordinate.
  @param azimuthal The azimuthal angle.
  @param polar The polar angle.
  
- @return Returns a `MGLLightPosition` struct containing the position attributes.
+ @return Returns a `MGLSphericalPosition` struct containing the position attributes.
  */
-NS_INLINE MGLLightPosition MGLLightPositionMake(CGFloat radial, CGFloat azimuthal, CGFloat polar) {
-    MGLLightPosition position;
+NS_INLINE MGLSphericalPosition MGLSphericalPositionMake(CGFloat radial, CGFloat azimuthal, CGFloat polar) {
+    MGLSphericalPosition position;
     position.radial = radial;
     position.azimuthal = azimuthal;
     position.polar = polar;

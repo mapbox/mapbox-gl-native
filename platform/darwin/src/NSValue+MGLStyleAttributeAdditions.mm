@@ -63,8 +63,8 @@
 
 - (std::array<float, 3>)mgl_lightPositionArrayValue
 {
-    NSAssert(strcmp(self.objCType, @encode(MGLLightPosition)) == 0, @"Value does not represent an MGLLightPosition");
-    MGLLightPosition lightPosition;
+    NSAssert(strcmp(self.objCType, @encode(MGLSphericalPosition)) == 0, @"Value does not represent an MGLSphericalPosition");
+    MGLSphericalPosition lightPosition;
     [self getValue:&lightPosition];
     // Style specification defines padding in clockwise order: top, right, bottom, left.
     return {

@@ -58,14 +58,14 @@
     return transition;
 }
 
-+ (NSValue *)valueWithMGLLightPosition:(MGLLightPosition)lightPosition
++ (NSValue *)valueWithMGLSphericalPosition:(MGLSphericalPosition)lightPosition
 {
-    return [NSValue value:&lightPosition withObjCType:@encode(MGLLightPosition)];
+    return [NSValue value:&lightPosition withObjCType:@encode(MGLSphericalPosition)];
 }
 
-- (MGLLightPosition)MGLLightPositionValue
+- (MGLSphericalPosition)MGLSphericalPositionValue
 {
-    MGLLightPosition lightPosition;
+    MGLSphericalPosition lightPosition;
     [self getValue:&lightPosition];
     return lightPosition;
 }

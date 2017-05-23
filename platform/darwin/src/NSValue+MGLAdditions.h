@@ -89,18 +89,18 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) MGLTransition MGLTransitionValue;
 
 /**
- Creates a new value object containing the given `MGLLightPosition`
+ Creates a new value object containing the given `MGLSphericalPosition`
  structure.
  
  @param lightPosition The value for the new object.
  @return A new value object that contains the light position information.
  */
-+ (instancetype)valueWithMGLLightPosition:(MGLLightPosition)lightPosition;
++ (instancetype)valueWithMGLSphericalPosition:(MGLSphericalPosition)lightPosition;
 
 /**
- The `MGLLightPosition` structure representation of the value.
+ The `MGLSphericalPosition` structure representation of the value.
  */
-@property (readonly) MGLLightPosition MGLLightPositionValue;
+@property (readonly) MGLSphericalPosition MGLSphericalPositionValue;
 
 /**
  Creates a new value object containing the given `MGLLightAnchor`
