@@ -112,20 +112,20 @@ namespace android {
         }
     };
 
-    jni::Object<mbgl::android::Filter> Layer::getFilter(jni::JNIEnv& env) {
+    jni::Object<mbgl::android::Statement> Layer::getFilter(jni::JNIEnv& env) {
         using namespace mbgl::style;
         using namespace mbgl::android::conversion;
 
         if (layer.is<FillLayer>()) {
-            return *convert<jni::Object<mbgl::android::Filter>, mbgl::style::Filter>(env, layer.as<FillLayer>()->getFilter());
+            return *convert<jni::Object<mbgl::android::Statement>, mbgl::style::Filter>(env, layer.as<FillLayer>()->getFilter());
         } else if (layer.is<LineLayer>()) {
-            return *convert<jni::Object<mbgl::android::Filter>, mbgl::style::Filter>(env, layer.as<LineLayer>()->getFilter());
+            return *convert<jni::Object<mbgl::android::Statement>, mbgl::style::Filter>(env, layer.as<LineLayer>()->getFilter());
         } else if (layer.is<SymbolLayer>()) {
-            return *convert<jni::Object<mbgl::android::Filter>, mbgl::style::Filter>(env, layer.as<SymbolLayer>()->getFilter());
+            return *convert<jni::Object<mbgl::android::Statement>, mbgl::style::Filter>(env, layer.as<SymbolLayer>()->getFilter());
         } else if (layer.is<CircleLayer>()) {
-            return *convert<jni::Object<mbgl::android::Filter>, mbgl::style::Filter>(env, layer.as<CircleLayer>()->getFilter());
+            return *convert<jni::Object<mbgl::android::Statement>, mbgl::style::Filter>(env, layer.as<CircleLayer>()->getFilter());
         } else {
-            return *convert<jni::Object<mbgl::android::Filter>, mbgl::style::Filter>(env, NullFilter());
+            return *convert<jni::Object<mbgl::android::Statement>, mbgl::style::Filter>(env, NullFilter());
         }
     }
 

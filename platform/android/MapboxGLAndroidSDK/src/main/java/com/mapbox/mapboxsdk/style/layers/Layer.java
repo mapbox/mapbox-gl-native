@@ -71,7 +71,7 @@ public abstract class Layer {
 
   protected native void nativeSetFilter(Object[] filter);
 
-  protected native Filter nativeGetFilter();
+  protected native Filter.Statement nativeGetFilter();
 
   protected native void nativeSetSourceLayer(String sourceLayer);
 

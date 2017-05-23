@@ -77,7 +77,7 @@ public class FillExtrusionLayer extends Layer {
     nativeSetFilter(filter.toArray());
   }
 
-  public Filter getFilter() {
+  public Filter.Statement getFilter() {
     return nativeGetFilter();
   }
 

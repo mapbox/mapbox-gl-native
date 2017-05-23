@@ -3,9 +3,10 @@
 namespace mbgl {
 namespace android {
 
-jni::Object<Filter> Filter::fromFilter(jni::JNIEnv& env, const mbgl::style::Filter&) {
-    static auto constructor = Filter::javaClass.template GetConstructor<>(env);
-    return Filter::javaClass.New(env, constructor);
+jni::Object<Statement> Filter::fromFilter(jni::JNIEnv& env, const mbgl::style::Filter&) {
+    static auto constructor = Statement::javaClass.template GetConstructor<>(env);
+
+    return Statement::javaClass.New(env, constructor);
 }
 
 void Filter::registerNative(jni::JNIEnv& env) {
