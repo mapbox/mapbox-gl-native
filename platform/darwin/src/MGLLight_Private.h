@@ -2,7 +2,11 @@
 
 #import "MGLLight.h"
 
-#import <mbgl/style/light.hpp>
+namespace mbgl {
+    namespace style {
+        class Light;
+    }
+}
 
 @interface MGLLight (Private)
 

@@ -40,19 +40,19 @@ NS_INLINE mbgl::style::TransitionOptions MGLOptionsFromTransition(MGLTransition 
 {
     if (self = [super init]) {
         auto anchor = mbglLight->getAnchor();
-        MGLStyleValue<NSValue *> *lightAnchorType;
+        MGLStyleValue<NSValue *> *anchorStyleValue;
         if (anchor.isUndefined()) {
             mbgl::style::PropertyValue<mbgl::style::LightAnchorType> defaultAnchor = mbglLight->getDefaultAnchor();
-            lightAnchorType = MGLStyleValueTransformer<mbgl::style::LightAnchorType, NSValue *, mbgl::style::LightAnchorType, MGLLightAnchor>().toEnumStyleValue(defaultAnchor);
+            anchorStyleValue = MGLStyleValueTransformer<mbgl::style::LightAnchorType, NSValue *, mbgl::style::LightAnchorType, MGLLightAnchor>().toEnumStyleValue(defaultAnchor);
         } else {
-            lightAnchorType = MGLStyleValueTransformer<mbgl::style::LightAnchorType, NSValue *, mbgl::style::LightAnchorType, MGLLightAnchor>().toEnumStyleValue(anchor);
+            anchorStyleValue = MGLStyleValueTransformer<mbgl::style::LightAnchorType, NSValue *, mbgl::style::LightAnchorType, MGLLightAnchor>().toEnumStyleValue(anchor);
         }
         
-        NSAssert([lightAnchorType isKindOfClass:[MGLConstantStyleValue class]], @"Anchor isn’t an enum.");
-        NSValue *anchorValue = ((MGLConstantStyleValue *)lightAnchorType).rawValue;
-        _lightAnchor = [anchorValue MGLLightAnchorValue];
+        NSAssert([anchorStyleValue isKindOfClass:[MGLConstantStyleValue class]], @"Anchor isn’t a constant.");
+        NSValue *anchorValue = ((MGLConstantStyleValue *)anchorStyleValue).rawValue;
+        _anchor = [anchorValue MGLLightAnchorValue];
         
-        _lightAnchorTransition = MGLTransitionFromOptions(mbglLight->getAnchorTransition());
+        _anchorTransition = MGLTransitionFromOptions(mbglLight->getAnchorTransition());
         
         auto positionValue = mbglLight->getPosition();
         if (positionValue.isUndefined()) {
@@ -89,12 +89,12 @@ NS_INLINE mbgl::style::TransitionOptions MGLOptionsFromTransition(MGLTransition 
 {
     mbgl::style::Light mbglLight;
     
-    MGLStyleValue<NSValue *> *lightAnchorType = [MGLStyleValue<NSValue *> valueWithRawValue:[NSValue valueWithMGLLightAnchor:self.lightAnchor]];
-    auto anchor = MGLStyleValueTransformer<mbgl::style::LightAnchorType, NSValue *, mbgl::style::LightAnchorType, MGLLightAnchor>().toEnumPropertyValue(lightAnchorType);
+    MGLStyleValue<NSValue *> *anchorType = [MGLStyleValue<NSValue *> valueWithRawValue:[NSValue valueWithMGLLightAnchor:self.anchor]];
+    auto anchor = MGLStyleValueTransformer<mbgl::style::LightAnchorType, NSValue *, mbgl::style::LightAnchorType, MGLLightAnchor>().toEnumPropertyValue(anchorType);
     mbglLight.setAnchor(anchor);
     
     
-    mbglLight.setAnchorTransition(MGLOptionsFromTransition(self.lightAnchorTransition));
+    mbglLight.setAnchorTransition(MGLOptionsFromTransition(self.anchorTransition));
     
     auto position = MGLStyleValueTransformer<mbgl::style::Position, NSValue *>().toInterpolatablePropertyValue(self.position);
     mbglLight.setPosition(position);
