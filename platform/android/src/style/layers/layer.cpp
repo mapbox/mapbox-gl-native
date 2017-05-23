@@ -100,18 +100,18 @@ namespace android {
     }
 
     struct GetFilterEvaluator {
-        std::string noop(std::string layerType) {
+        Filter noop(std::string layerType) {
             Log::Warning(mbgl::Event::JNI, "%s doesn't support filters", layerType.c_str());
-            return {};
+            return NULL;
         }
 
-        std::string operator()(style::BackgroundLayer&) { return noop("BackgroundLayer doesn't support filters"); }
-        std::string operator()(style::CustomLayer&) { return noop("CustomLayer doesn't support filters"); }
-        std::string operator()(style::RasterLayer&) { return noop("RasterLayer doesn't support filters"); }
+        Filter operator()(style::BackgroundLayer&) { return noop("BackgroundLayer doesn't support filters"); }
+        Filter operator()(style::CustomLayer&) { return noop("CustomLayer doesn't support filters"); }
+        Filter operator()(style::RasterLayer&) { return noop("RasterLayer doesn't support filters"); }
 
         template <class LayerType>
-        std::string operator()(LayerType& layer) {
-            return layer.getSourceLayer();
+        Filter operator()(LayerType& layer) {
+            return layer.getFilter();
         }
     };
 
@@ -119,17 +119,7 @@ namespace android {
         using namespace mbgl::style;
         using namespace mbgl::android::conversion;
 
-        if (layer.is<FillLayer>()) {
-            return *convert<jni::Object<mbgl::android::Filter::Statement>, mbgl::style::Filter>(env, layer.as<FillLayer>()->getFilter());
-        } else if (layer.is<LineLayer>()) {
-            return *convert<jni::Object<mbgl::android::Filter::Statement>, mbgl::style::Filter>(env, layer.as<LineLayer>()->getFilter());
-        } else if (layer.is<SymbolLayer>()) {
-            return *convert<jni::Object<mbgl::android::Filter::Statement>, mbgl::style::Filter>(env, layer.as<SymbolLayer>()->getFilter());
-        } else if (layer.is<CircleLayer>()) {
-            return *convert<jni::Object<mbgl::android::Filter::Statement>, mbgl::style::Filter>(env, layer.as<CircleLayer>()->getFilter());
-        } else {
-            return *convert<jni::Object<mbgl::android::Filter::Statement>, mbgl::style::Filter>(env, NullFilter());
-        }
+        return *convert<jni::Object<mbgl::android::Filter::Statement>, mbgl::style::Filter>(env, layer.accept(GetFilterEvaluator());
     }
 
     struct SetFilterEvaluator {
