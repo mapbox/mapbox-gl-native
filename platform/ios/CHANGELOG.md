@@ -4,6 +4,12 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 
 ## 3.6.0
 
+### Packaging
+
+* Xcode 8.0 or higher is now recommended for using this SDK. ([#8775](https://github.com/mapbox/mapbox-gl-native/pull/8775))
+* Fixed an issue in the static framework where localizations would never load. ([#9074](https://github.com/mapbox/mapbox-gl-native/pull/9074))
+* Updated MGLMapView’s logo view to display [the new Mapbox logo](https://www.mapbox.com/blog/new-mapbox-logo/). ([#8771](https://github.com/mapbox/mapbox-gl-native/pull/8771), [#8773](https://github.com/mapbox/mapbox-gl-native/pull/8773))
+
 ### Styles
 
 * Added support for 3D extrusion of buildings and other polygonal features via the `MGLFillExtrusionStyleLayer` class and the `fill-extrusion` layer type in style JSON. ([#8431](https://github.com/mapbox/mapbox-gl-native/pull/8431))
@@ -15,30 +21,31 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * Fixed an issue causing a composite function’s highest zoom level stop to be misinterpreted. ([#8613](https://github.com/mapbox/mapbox-gl-native/pull/8613), [#8790](https://github.com/mapbox/mapbox-gl-native/pull/8790))
 * Fixed an issue where re-adding a layer that had been previously removed from a style would reset its paint properties. Moved initializers for `MGLTileSource`, `MGLStyleLayer`, and `MGLForegroundStyleLayer` to their concrete subclasses; because these classes were already intended for initialization only via concrete subclasses, this should have no developer impact. ([#8626](https://github.com/mapbox/mapbox-gl-native/pull/8626))
 * Feature querying results now account for any changes to a feature’s size caused by a source or composite style function. ([#8665](https://github.com/mapbox/mapbox-gl-native/pull/8665))
+* Letter spacing is now disabled in Arabic text so that ligatures are drawn correctly. ([#9062](https://github.com/mapbox/mapbox-gl-native/pull/9062))
 
 ### Annotations
 
 * Added a new initializer to `MGLAnnotationView` so that it is possible to create a new instance with an associated annotation object. ([#9029](https://github.com/mapbox/mapbox-gl-native/pull/9029))
 * Fixed an issue causing a view-backed annotation to disappear immediately instead of animating when the annotation’s `coordinate` property is set to a value outside the current viewport. ([#8565](https://github.com/mapbox/mapbox-gl-native/pull/8565))
 * Fixed an issue in which `MGLMapView` overrode the tint colors of its annotation views. ([#8789](https://github.com/mapbox/mapbox-gl-native/pull/8789))
-* Fixed an issue causing annotation views to persist in the map's annotation container view even after their associated annotations were removed. ([#9025](https://github.com/mapbox/mapbox-gl-native/pull/9025))
+* Fixed an issue causing annotation views to persist in the map’s annotation container view even after their associated annotations were removed. ([#9025](https://github.com/mapbox/mapbox-gl-native/pull/9025))
+* The `MGLPolyline.coordinate` and `MGLPolygon.coordinate` properties now return the midpoint and centroid, respectively, instead of the first coordinate. ([#8713](https://github.com/mapbox/mapbox-gl-native/pull/8713))
 
 ### User interaction
 
 * Added a scale bar to `MGLMapView` that indicates the scale of the map. ([#7631](https://github.com/mapbox/mapbox-gl-native/pull/7631))
 * Fixed an issue where gesture recognizers associated with map view interactivity were not disabled when their related interactions were disabled. ([#8304](https://github.com/mapbox/mapbox-gl-native/pull/8304))
 * Fixed an issue preventing the Mapbox Telemetry confirmation dialog from appearing when opened from within a map view in a modal view controller. ([#9027](https://github.com/mapbox/mapbox-gl-native/pull/9027))
+* Corrected the size of MGLMapView’s compass. ([#9060](https://github.com/mapbox/mapbox-gl-native/pull/9060))
 
 ### Other changes
 
-* Xcode 8.0 or higher is now recommended for using this SDK. ([#8775](https://github.com/mapbox/mapbox-gl-native/pull/8775))
-* Fixed a crash when calling `MGLMultiPolygon.coordinate` [#8713](https://github.com/mapbox/mapbox-gl-native/pull/8713)
-* Updated MGLMapView’s logo view to display [the new Mapbox logo](https://www.mapbox.com/blog/new-mapbox-logo/). ([#8771](https://github.com/mapbox/mapbox-gl-native/pull/8771), [#8773](https://github.com/mapbox/mapbox-gl-native/pull/8773))
+* Fixed a crash that occurred when accessing the `MGLMultiPolygon.coordinate` property. ([#8713](https://github.com/mapbox/mapbox-gl-native/pull/8713))
 * Fixed a crash or console spew when MGLMapView is initialized with a frame smaller than 64 points wide by 64 points tall. ([#8562](https://github.com/mapbox/mapbox-gl-native/pull/8562))
+* Fixed an issue that caused the compass and scale bar to underlap navigation and tab bars. ([#7716](https://github.com/mapbox/mapbox-gl-native/pull/7716))
 * The error passed into `-[MGLMapViewDelegate mapViewDidFailLoadingMap:withError:]` now includes a more specific description and failure reason. ([#8418](https://github.com/mapbox/mapbox-gl-native/pull/8418))
+* Improved CPU and battery performance while animating a tilted map’s camera in an area with many labels. ([#9031](https://github.com/mapbox/mapbox-gl-native/pull/9031))
 * Fixed an issue rendering polylines that contain duplicate vertices. ([#8808](https://github.com/mapbox/mapbox-gl-native/pull/8808))
-* Fixed a bug which caused the compass and other ornaments to underlap navigation and tab bars. ([#7716](https://github.com/mapbox/mapbox-gl-native/pull/7716))
-* Fixed an issue in the static framework where localizations would never load. ([#9074](https://github.com/mapbox/mapbox-gl-native/pull/9074))
 
 ## 3.5.4 - May 9, 2017
 
