@@ -7,10 +7,13 @@
 + (instancetype)mgl_frameworkBundle {
     NSBundle *bundle = [self bundleForClass:[MGLAccountManager class]];
 
-    if (![bundle.infoDictionary[@"CFBundlePackageType"] isEqualToString:@"FMWK"] && [bundle pathForResource:@"Mapbox" ofType:@"bundle"]) {
+    if (![bundle.infoDictionary[@"CFBundlePackageType"] isEqualToString:@"FMWK"]) {
         // For static frameworks, the bundle is the containing application
         // bundle but the resources are in Mapbox.bundle.
-        bundle = [self bundleWithPath:[bundle pathForResource:@"Mapbox" ofType:@"bundle"]];
+        NSString *bundlePath = [bundle pathForResource:@"Mapbox" ofType:@"bundle"];
+        if (bundlePath) {
+            bundle = [self bundleWithPath:bundlePath];
+        }
     }
 
     return bundle;
