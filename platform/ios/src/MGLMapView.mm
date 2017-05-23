@@ -5293,8 +5293,7 @@ public:
     NSString *extension = imageName.pathExtension.length ? imageName.pathExtension : @"png";
     NSBundle *bundle = [NSBundle mgl_frameworkBundle];
     NSString *path = [bundle pathForResource:imageName.stringByDeletingPathExtension
-                                      ofType:extension
-                                 inDirectory:bundle.mgl_resourcesDirectory];
+                                      ofType:extension];
     if ( ! path)
     {
         [NSException raise:@"Resource not found" format:
