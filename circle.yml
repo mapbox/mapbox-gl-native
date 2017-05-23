@@ -12,7 +12,7 @@ jobs:
 # ------------------------------------------------------------------------------
   android-debug-arm-v7:
     docker:
-      - image: mbgl/ci:r2-android-ndk-r13b-gradle
+      - image: mbgl/ci:r2-android-ndk-r15beta2-gradle
     working_directory: /src
     environment:
       LIBSYSCONFCPUS: 6
@@ -77,7 +77,7 @@ jobs:
 # ------------------------------------------------------------------------------
   android-release-all:
     docker:
-      - image: mbgl/ci:r2-android-ndk-r13b-gradle
+      - image: mbgl/ci:r2-android-ndk-r15beta2-gradle
     working_directory: /src
     environment:
       LIBSYSCONFCPUS: 6
