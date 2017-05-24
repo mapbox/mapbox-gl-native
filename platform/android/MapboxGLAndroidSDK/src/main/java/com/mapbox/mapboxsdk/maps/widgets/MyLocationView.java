@@ -440,6 +440,7 @@ public class MyLocationView extends View {
     } else {
       // Disable location and user dot
       location = null;
+      locationSource.removeLocationUpdates();
       locationSource.removeLocationEngineListener(userLocationListener);
       locationSource.deactivate();
     }
