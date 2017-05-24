@@ -21,6 +21,7 @@ import android.view.Gravity;
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
+import com.mapbox.mapboxsdk.constants.MyLocationTracking;
 import com.mapbox.mapboxsdk.utils.ColorUtils;
 
 import java.util.Arrays;
@@ -60,6 +61,8 @@ public class MapboxMapOptions implements Parcelable {
 
   private double minZoom = MapboxConstants.MINIMUM_ZOOM;
   private double maxZoom = MapboxConstants.MAXIMUM_ZOOM;
+
+  private boolean movementAnimationEnabled = true;
 
   private boolean rotateGesturesEnabled = true;
   private boolean scrollGesturesEnabled = true;
@@ -113,6 +116,8 @@ public class MapboxMapOptions implements Parcelable {
     attributionGravity = in.readInt();
     attributionMargins = in.createIntArray();
     attributionTintColor = in.readInt();
+
+    movementAnimationEnabled = in.readByte() != 0;
 
     minZoom = in.readDouble();
     maxZoom = in.readDouble();
@@ -732,6 +737,15 @@ public class MapboxMapOptions implements Parcelable {
   }
 
   /**
+   * Get camera animation state when using {@link MyLocationTracking#TRACKING_FOLLOW }.
+   *
+   * @return true if smooth transition animation enabled, false otherwise.
+   */
+  public boolean isMovementAnimationEnabled() {
+    return movementAnimationEnabled;
+  }
+
+  /**
    * Get the current configured visibility state for mapbox_compass_icon for a map view.
    *
    * @return Visibility state of the mapbox_compass_icon
@@ -1042,6 +1056,8 @@ public class MapboxMapOptions implements Parcelable {
     dest.writeDouble(minZoom);
     dest.writeDouble(maxZoom);
 
+    dest.writeByte((byte) (movementAnimationEnabled ? 1 : 0));
+
     dest.writeByte((byte) (rotateGesturesEnabled ? 1 : 0));
     dest.writeByte((byte) (scrollGesturesEnabled ? 1 : 0));
     dest.writeByte((byte) (tiltGesturesEnabled ? 1 : 0));
@@ -1115,6 +1131,9 @@ public class MapboxMapOptions implements Parcelable {
       return false;
     }
     if (Double.compare(options.maxZoom, maxZoom) != 0) {
+      return false;
+    }
+    if (movementAnimationEnabled != options.movementAnimationEnabled) {
       return false;
     }
     if (rotateGesturesEnabled != options.rotateGesturesEnabled) {
@@ -1211,6 +1230,7 @@ public class MapboxMapOptions implements Parcelable {
     result = 31 * result + (int) (temp ^ (temp >>> 32));
     temp = Double.doubleToLongBits(maxZoom);
     result = 31 * result + (int) (temp ^ (temp >>> 32));
+    result = 31 * result + (movementAnimationEnabled ? 1 : 0);
     result = 31 * result + (rotateGesturesEnabled ? 1 : 0);
     result = 31 * result + (scrollGesturesEnabled ? 1 : 0);
     result = 31 * result + (tiltGesturesEnabled ? 1 : 0);

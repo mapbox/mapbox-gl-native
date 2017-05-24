@@ -715,7 +715,7 @@ public class MyLocationView extends View {
       if (mode == MyLocationTracking.TRACKING_NONE) {
         return new MyLocationShowBehavior();
       } else {
-        return new MyLocationTrackingBehavior();
+        return new MyLocationTrackingBehavior(mapboxMap.getMyLocationViewSettings().isMovementAnimationEnabled());
       }
     }
   }
@@ -750,6 +750,12 @@ public class MyLocationView extends View {
   }
 
   private class MyLocationTrackingBehavior extends MyLocationBehavior implements MapboxMap.CancelableCallback {
+
+    private final boolean movementAnimationEnabled;
+
+    public MyLocationTrackingBehavior(boolean movementAnimationEnabled) {
+      this.movementAnimationEnabled = movementAnimationEnabled;
+    }
 
     @Override
     void updateLatLng(@NonNull Location location) {
@@ -791,7 +797,10 @@ public class MyLocationView extends View {
       // disable dismiss of tracking settings, enabled in #onFinish
       mapboxMap.getTrackingSettings().setDismissTrackingModeForCameraPositionChange(false);
       // ease to new camera position with a linear interpolator
-      mapboxMap.easeCamera(CameraUpdateFactory.newCameraPosition(builder.build()), animationDuration, false, this);
+      if (movementAnimationEnabled)
+        mapboxMap.easeCamera(CameraUpdateFactory.newCameraPosition(builder.build()), animationDuration, false, this);
+      else
+        mapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(builder.build()), this);
     }
 
     @Override
