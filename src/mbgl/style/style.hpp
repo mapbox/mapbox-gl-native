@@ -15,6 +15,7 @@
 #include <mbgl/map/mode.hpp>
 #include <mbgl/map/zoom_history.hpp>
 
+#include <mbgl/actor/actor.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/optional.hpp>
@@ -116,9 +117,14 @@ public:
     void dumpDebugLogs() const;
 
     Scheduler& scheduler;
+
+private:
+    std::shared_ptr<Mailbox> mailbox;
+
+public:
     FileSource& fileSource;
     std::unique_ptr<GlyphAtlas> glyphAtlas;
-    std::unique_ptr<SpriteLoader> spriteLoader;
+    std::unique_ptr<Actor<SpriteLoader>> spriteLoader;
     std::unique_ptr<SpriteAtlas> spriteAtlas;
     std::unique_ptr<LineAtlas> lineAtlas;
 

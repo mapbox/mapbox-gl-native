@@ -14,7 +14,8 @@ class SpriteLoaderObserver {
 public:
     virtual ~SpriteLoaderObserver() = default;
 
-    virtual void onSpriteLoaded(std::vector<std::unique_ptr<style::Image>>&&) {}
+    using Images = std::vector<std::unique_ptr<style::Image>>;
+    virtual void onSpriteLoaded(Images&&) {}
     virtual void onSpriteError(std::exception_ptr) {}
 };
 
