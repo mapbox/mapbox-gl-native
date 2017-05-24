@@ -3,9 +3,13 @@
 set -e
 set -o pipefail
 
+command -v lcov 2> /dev/null || {
+    echo "Aborting: lcov not found."
+    exit 1
+}
+
 # Collect coverage data and save it into coverage.info
-mapbox_time "lcov_capture" \
-`scripts/mason.sh PREFIX lcov VERSION 1.12`/usr/bin/lcov \
+lcov \
     --quiet \
     --capture \
     --no-external \
@@ -17,5 +21,8 @@ mapbox_time "lcov_capture" \
     --base-directory "build/linux-x86_64/${BUILDTYPE}" \
     --output-file "build/linux-x86_64/${BUILDTYPE}/coverage.info"
 
-mapbox_time "coveralls_upload" \
-coveralls-lcov "build/linux-x86_64/${BUILDTYPE}/coverage.info"
+coveralls-lcov \
+    --service-name="${COVERALLS_SERVICE_NAME}" \
+    --repo-token="${COVERALLS_REPO_TOKEN}" \
+    --service-job-id="${CIRCLE_BUILD_NUM}" \
+    "build/linux-x86_64/${BUILDTYPE}/coverage.info"

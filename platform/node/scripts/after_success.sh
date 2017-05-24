@@ -3,7 +3,7 @@
 set -e
 set -o pipefail
 
-if [[ -n ${PUBLISH:-} ]]; then
+if [[ "${PUBLISH:-}" == "true" ]]; then
     if [[ "${BUILDTYPE}" == "Release" ]]; then
         ./node_modules/.bin/node-pre-gyp package publish info
     else

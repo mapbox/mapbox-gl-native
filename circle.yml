@@ -4,15 +4,57 @@ workflows:
   version: 2
   default:
     jobs:
+      - clang-tidy
       - android-debug-arm-v7
       - android-release-all
+      - node4-clang39-release
+      - node6-clang39-release
+      - node6-clang39-debug
+      - linux-clang39-debug
+      - linux-gcc5-debug-coverage
+      - linux-gcc5-release-qt4
+      - linux-gcc5-release-qt5
 
 jobs:
 
 # ------------------------------------------------------------------------------
+  clang-tidy:
+    docker:
+      - image: mbgl/ci:r3-linux-clang-3.9
+    working_directory: /src
+    environment:
+      LIBSYSCONFCPUS: 6
+      JOBS: 6
+      BUILDTYPE: Debug
+    branches:
+      ignore:
+        - master
+    steps:
+      - checkout
+      - restore_cache:
+          key: v1-clang-tidy
+          paths:
+            - node_modules
+            - /root/.ccache
+      - run:
+          name: Fetch 'origin/master' branch
+          command: git fetch origin master:refs/remotes/origin/master
+      - run:
+          name: Generate compilation database
+          command: make compdb
+      - run:
+          name: Run Clang checks
+          command: make check
+      - save_cache:
+          key: v1-clang-tidy
+          paths:
+            - node_modules
+            - /root/.ccache
+
+# ------------------------------------------------------------------------------
   android-debug-arm-v7:
     docker:
-      - image: mbgl/ci:r2-android-ndk-r15beta2-gradle
+      - image: mbgl/ci:r3-android-ndk-r15-gradle
     working_directory: /src
     environment:
       LIBSYSCONFCPUS: 6
@@ -20,6 +62,11 @@ jobs:
       BUILDTYPE: Debug
     steps:
       - checkout
+      - restore_cache:
+          key: v1-android-debug-arm-v7
+          paths:
+            - node_modules
+            - /root/.ccache
       - run:
           name: Build libmapbox-gl.so for arm-v7
           command: make android-lib-arm-v7
@@ -70,6 +117,11 @@ jobs:
               xargs -0 -I '{}' ${ANDROID_NDK_HOME}/ndk-stack -sym build/android-arm-v7/Debug -dump {}
 
             exit ${EXIT_CODE:-0}
+      - save_cache:
+          key: v1-android-debug-arm-v7
+          paths:
+            - node_modules
+            - /root/.ccache
       - store_artifacts:
           path: platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk
           destination: .
@@ -77,7 +129,7 @@ jobs:
 # ------------------------------------------------------------------------------
   android-release-all:
     docker:
-      - image: mbgl/ci:r2-android-ndk-r15beta2-gradle
+      - image: mbgl/ci:r3-android-ndk-r15-gradle
     working_directory: /src
     environment:
       LIBSYSCONFCPUS: 6
@@ -85,6 +137,11 @@ jobs:
       BUILDTYPE: Release
     steps:
       - checkout
+      - restore_cache:
+          key: v1-android-release-all
+          paths:
+            - node_modules
+            - /root/.ccache
       - run:
           name: Generate Maven credentials
           shell: /bin/bash -euo pipefail
@@ -128,3 +185,310 @@ jobs:
           name: Publish to Maven
           command: |
             if [ "${CIRCLE_BRANCH}" == "release-ios-v3.6.0-android-v5.1.0" ]; then make run-android-upload-archives ; fi
+      - save_cache:
+          key: v1-android-release-all
+          paths:
+            - node_modules
+            - /root/.ccache
+
+# ------------------------------------------------------------------------------
+  node4-clang39-release:
+    docker:
+      - image: mbgl/ci:r3-linux-clang-3.9-node-4
+    working_directory: /src
+    environment:
+      LIBSYSCONFCPUS: 6
+      JOBS: 6
+      BUILDTYPE: Release
+      WITH_EGL: 1
+      PACKAGE_JSON_VERSION: $(node -e "console.log(require('./package.json').version)")
+      PUBLISH: $([[ "${CIRCLE_BRANCH}" == "node-v${PACKAGE_JSON_VERSION}" ]] && echo true)
+      DISPLAY: :0
+    steps:
+      - checkout
+      - restore_cache:
+          key: v1-node4-clang39-release
+          paths:
+            - node_modules
+            - /root/.ccache
+      - run:
+          name: Build node
+          command: make node
+      - run:
+          name: Run node tests
+          command: |
+            source scripts/circle_setup.sh
+            mapbox_install_logbt
+            mapbox_install_apitrace
+            mapbox_export_mesa_library_path
+            xvfb-run --server-args="-screen 0 1024x768x24" \
+              ./logbt -- apitrace trace --api=egl -v make test-node
+      - run:
+          name: Publish node package
+          when: on_success
+          command: platform/node/scripts/after_success.sh
+      - save_cache:
+          key: v1-node4-clang39-release
+          paths:
+            - node_modules
+            - /root/.ccache
+      - store_artifacts:
+          path: mapbox-gl-js/test/integration/render-tests/index.html
+          destination: render-tests
+
+# ------------------------------------------------------------------------------
+  node6-clang39-release:
+    docker:
+      - image: mbgl/ci:r3-linux-clang-3.9
+    working_directory: /src
+    environment:
+      LIBSYSCONFCPUS: 6
+      JOBS: 6
+      BUILDTYPE: Release
+      WITH_EGL: 1
+      PACKAGE_JSON_VERSION: $(node -e "console.log(require('./package.json').version)")
+      PUBLISH: $([[ "${CIRCLE_BRANCH}" == "node-v${PACKAGE_JSON_VERSION}" ]] && echo true)
+      DISPLAY: :0
+    steps:
+      - checkout
+      - restore_cache:
+          key: v1-node6-clang39-release
+          paths:
+            - node_modules
+            - /root/.ccache
+      - run:
+          name: Build node
+          command: make node
+      - run:
+          name: Run node tests
+          command: |
+            source scripts/circle_setup.sh
+            mapbox_install_logbt
+            mapbox_install_apitrace
+            mapbox_export_mesa_library_path
+            xvfb-run --server-args="-screen 0 1024x768x24" \
+              ./logbt -- apitrace trace --api=egl -v make test-node
+      - run:
+          name: Publish node package
+          when: on_success
+          command: platform/node/scripts/after_success.sh
+      - save_cache:
+          key: v1-node6-clang39-release
+          paths:
+            - node_modules
+            - /root/.ccache
+      - store_artifacts:
+          path: mapbox-gl-js/test/integration/render-tests/index.html
+          destination: render-tests
+
+# ------------------------------------------------------------------------------
+  node6-clang39-debug:
+    docker:
+      - image: mbgl/ci:r3-linux-clang-3.9
+    working_directory: /src
+    environment:
+      LIBSYSCONFCPUS: 6
+      JOBS: 6
+      BUILDTYPE: Debug
+      WITH_EGL: 1
+      PACKAGE_JSON_VERSION: $(node -e "console.log(require('./package.json').version)")
+      PUBLISH: $([[ "${CIRCLE_BRANCH}" == "node-v${PACKAGE_JSON_VERSION}" ]] && echo true)
+      DISPLAY: :0
+    steps:
+      - checkout
+      - restore_cache:
+          key: v1-node6-clang39-debug
+          paths:
+            - node_modules
+            - /root/.ccache
+      - run:
+          name: Build node
+          command: make node
+      - run:
+          name: Run node tests
+          command: |
+            source scripts/circle_setup.sh
+            mapbox_install_logbt
+            mapbox_install_apitrace
+            mapbox_export_mesa_library_path
+            xvfb-run --server-args="-screen 0 1024x768x24" \
+              ./logbt -- apitrace trace --api=egl -v make test-node
+      - run:
+          name: Publish node package
+          when: on_success
+          command: platform/node/scripts/after_success.sh
+      - save_cache:
+          key: v1-node6-clang39-debug
+          paths:
+            - node_modules
+            - /root/.ccache
+      - store_artifacts:
+          path: mapbox-gl-js/test/integration/render-tests/index.html
+          destination: render-tests
+
+# ------------------------------------------------------------------------------
+  linux-clang39-debug:
+    docker:
+      - image: mbgl/ci:r3-linux-clang-3.9
+    working_directory: /src
+    environment:
+      LIBSYSCONFCPUS: 6
+      JOBS: 6
+      BUILDTYPE: Debug
+      WITH_EGL: 1
+      DISPLAY: :0
+    steps:
+      - checkout
+      - restore_cache:
+          key: v1-linux-clang39-debug
+          paths:
+            - node_modules
+            - /root/.ccache
+      - run:
+          name: Build linux
+          command: make linux
+      - run:
+          name: Build benchmark
+          command: make benchmark
+      - run:
+          name: Build test
+          command: make test
+      - run:
+          name: Run tests
+          command: |
+            source scripts/circle_setup.sh
+            mapbox_export_mesa_library_path
+            xvfb-run --server-args="-screen 0 1024x768x24" \
+              make run-test
+      - save_cache:
+          key: v1-linux-clang39-debug
+          paths:
+            - node_modules
+            - /root/.ccache
+
+# ------------------------------------------------------------------------------
+  linux-gcc5-debug-coverage:
+    docker:
+      - image: mbgl/ci:r3-linux-gcc-5
+    working_directory: /src
+    environment:
+      LIBSYSCONFCPUS: 6
+      JOBS: 2
+      BUILDTYPE: Debug
+      WITH_EGL: 1
+      WITH_COVERAGE: 1
+      DISPLAY: :0
+    steps:
+      - checkout
+      - restore_cache:
+          key: v1-linux-gcc5-debug-coverage
+          paths:
+            - node_modules
+            - /root/.ccache
+      - run:
+          name: Build linux
+          command: make linux
+      - run:
+          name: Build benchmark
+          command: make benchmark
+      - run:
+          name: Build test
+          command: make test
+      - run:
+          name: Run tests
+          command: |
+            source scripts/circle_setup.sh
+            mapbox_export_mesa_library_path
+            xvfb-run --server-args="-screen 0 1024x768x24" \
+              make run-test
+      - run:
+          name: Upload coverage results to coveralls
+          command: |
+            source scripts/circle_setup.sh
+            platform/linux/scripts/coveralls.sh
+      - save_cache:
+          key: v1-linux-gcc5-debug-coverage
+          paths:
+            - node_modules
+            - /root/.ccache
+
+# ------------------------------------------------------------------------------
+  linux-gcc5-release-qt4:
+    docker:
+      - image: mbgl/ci:r3-linux-gcc-5-qt-4
+    working_directory: /src
+    environment:
+      LIBSYSCONFCPUS: 6
+      JOBS: 2 # OOM, causing the compiler to crash.
+      BUILDTYPE: Release
+      GTEST_OUTPUT: xml
+      LD_PRELOAD: /usr/lib/x86_64-linux-gnu/libjemalloc.so
+      DISPLAY: 0
+    steps:
+      - checkout
+      - restore_cache:
+          key: v1-linux-gcc5-release-qt4
+          paths:
+            - node_modules
+            - /root/.ccache
+      - run:
+          name: Build qt-app
+          command: make qt-app
+      - run:
+          name: Build qt-test
+          command: make qt-test
+      - run:
+          name: Run memory-load tests
+          command: |
+            source scripts/circle_setup.sh
+            mapbox_export_mesa_library_path
+            xvfb-run --server-args="-screen 0 1024x768x24" \
+              make run-qt-test-Memory.*:*.Load
+            scripts/log_memory_benchmarks.sh test_detail.xml "Platform=Linux,Compiler=${_CC},Arch=$(uname -m)"
+      - save_cache:
+          key: v1-linux-gcc5-release-qt4
+          paths:
+            - node_modules
+            - /root/.ccache
+
+# ------------------------------------------------------------------------------
+  linux-gcc5-release-qt5:
+    docker:
+      - image: mbgl/ci:r3-linux-gcc-5-qt-5
+    working_directory: /src
+    environment:
+      LIBSYSCONFCPUS: 6
+      JOBS: 2 # OOM, causing the compiler to crash.
+      BUILDTYPE: Release
+      WITH_QT_I18N: 1
+      DISPLAY: 0
+    steps:
+      - checkout
+      - restore_cache:
+          key: v1-linux-gcc5-release-qt5
+          paths:
+            - node_modules
+            - /root/.ccache
+      - run:
+          name: Build qt-app
+          command: make qt-app
+      - run:
+          name: Build qt-test
+          command: make qt-test
+      - run:
+          name: Build qt-docs
+          command: make qt-docs
+      - run:
+          name: Run valgrind-backed tests
+          environment:
+            JOBS: 1 # https://github.com/mapbox/mapbox-gl-native/issues/9108
+          command: |
+            source scripts/circle_setup.sh
+            mapbox_export_mesa_library_path
+            xvfb-run --server-args="-screen 0 1024x768x24" \
+              scripts/valgrind.sh build/qt-linux-x86_64/Release/mbgl-test --gtest_filter=-*.Load --gtest_filter=-Memory.Vector
+      - save_cache:
+          key: v1-linux-gcc5-release-qt5
+          paths:
+            - node_modules
+            - /root/.ccache
