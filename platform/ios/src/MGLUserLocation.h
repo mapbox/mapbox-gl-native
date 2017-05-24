@@ -8,7 +8,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  The MGLUserLocation class defines a specific type of annotation that identifies
  the user’s current location. You do not create instances of this class
- directly. Instead, you retrieve an existing MGLUserLocation object from the
+ directly. Instead, you retrieve an existing `MGLUserLocation` object from the
  `userLocation` property of the map view displayed in your application.
  */
 @interface MGLUserLocation : NSObject <MGLAnnotation, NSSecureCoding>

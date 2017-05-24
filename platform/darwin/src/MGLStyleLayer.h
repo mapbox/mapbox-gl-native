@@ -14,10 +14,8 @@ NS_ASSUME_NONNULL_BEGIN
  `MGLStyleLayer` object, which you can use to refine the map’s appearance. You
  can also add and remove style layers dynamically.
 
- Do not create instances of this class directly, and do not create your own
- subclasses of this class. Instead, create instances of
- `MGLBackgroundStyleLayer` and the concrete subclasses of
- `MGLForegroundStyleLayer`.
+ Create instances of `MGLBackgroundStyleLayer` and the concrete subclasses of
+ `MGLForegroundStyleLayer` in order to use `MGLStyleLayer`'s properties and methods.
  
  Do not add `MGLStyleLayer` objects to the `style` property of a `MGLMapView` before
  `-mapView:didFinishLoadingStyle:` is called.
