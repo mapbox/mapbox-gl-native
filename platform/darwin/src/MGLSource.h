@@ -16,9 +16,9 @@ NS_ASSUME_NONNULL_BEGIN
  add and remove sources dynamically using methods such as
  `-[MGLStyle addSource:]` and `-[MGLStyle sourceWithIdentifier:]`.
 
- Do not create instances of this class directly, and do not create your own
- subclasses of this class. Instead, create instances of `MGLShapeSource` and the
- concrete subclasses of `MGLTileSource`, `MGLVectorSource` and `MGLRasterSource`.
+ Create instances of `MGLShapeSource` and the concrete subclasses of
+ `MGLTileSource`, `MGLVectorSource` and `MGLRasterSource` in order to use
+ `MGLMultiPoint`'s properties and methods.
  */
 MGL_EXPORT
 @interface MGLSource : NSObject

@@ -239,11 +239,8 @@ MGL_EXPORT
  defined by an `MGLCameraStyleFunction`, `MGLSourceStyleFunction`, or
  `MGLCompositeStyleFunction` object.
  
- Do not create instances of this class directly, and do not create your own
- subclasses of this class. Instead, use one of the class factory methods in
- `MGLStyleValue` to create instances of the following concrete subclasses:
- `MGLCameraStyleFunction`, `MGLSourceStyleFunction`, and
- `MGLCompositeStyleFunction`.
+ Create instances of `MGLCameraStyleFunction`, `MGLSourceStyleFunction`, and
+ `MGLCompositeStyleFunction` in order to use `MGLStyleFunction`'s methods.
 
  The `MGLStyleFunction` class takes a generic parameter `T` that indicates the
  Foundation class being wrapped by this class.

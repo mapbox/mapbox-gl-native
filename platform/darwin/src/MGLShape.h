@@ -10,10 +10,9 @@ NS_ASSUME_NONNULL_BEGIN
  constitute the content of a map – not only the overlays atop the map, but also
  the content that forms the base map.
 
- You do not create instances of this class directly or create subclasses of this
- class. Instead, you create instances of `MGLPointAnnotation`,
- `MGLPointCollection`, `MGLPolyline`, `MGLMultiPolyline`, `MGLPolygon`,
- `MGLMultiPolygon`, or `MGLShapeCollection`. The shape classes correspond to the
+ Create instances of `MGLPointAnnotation`, `MGLPointCollection`, `MGLPolyline`,
+ `MGLMultiPolyline`, `MGLPolygon`, `MGLMultiPolygon`, or `MGLShapeCollection` in
+ order to use `MGLShape`'s methods. The shape classes correspond to the
  <a href="https://tools.ietf.org/html/rfc7946#section-3.1">Geometry</a> object
  types in the GeoJSON standard, but some have nonstandard names for backwards
  compatibility.
