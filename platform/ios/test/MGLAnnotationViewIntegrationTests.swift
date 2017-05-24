@@ -13,7 +13,7 @@ class CustomAnnotationView: MGLAnnotationView {
     
 }
 
-class MGLAnnotationViewTests: XCTestCase {
+class MGLAnnotationViewIntegrationTests: XCTestCase {
     
     func testCreatingCustomAnnotationView() {
         let customAnnotationView = CustomAnnotationView(reuseIdentifier: "resuse-id")
