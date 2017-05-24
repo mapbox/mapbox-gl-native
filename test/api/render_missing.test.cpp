@@ -29,8 +29,8 @@ TEST(API, TEST_REQUIRES_SERVER(RenderMissingTile)) {
     HeadlessBackend backend { test::sharedDisplay() };
     BackendScope scope { backend };
     OffscreenView view { backend.getContext(), { 256, 512 } };
-    DefaultFileSource fileSource(":memory:", "test/fixtures/api/assets");
     ThreadPool threadPool(4);
+    DefaultFileSource fileSource(threadPool, ":memory:", "test/fixtures/api/assets");
 
     Log::setObserver(std::make_unique<FixtureLogObserver>());
 

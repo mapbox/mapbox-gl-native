@@ -179,13 +179,15 @@ private:
     std::unordered_map<int64_t, std::unique_ptr<OfflineDownload>> downloads;
 };
 
-DefaultFileSource::DefaultFileSource(const std::string& cachePath,
+DefaultFileSource::DefaultFileSource(Scheduler& scheduler,
+                                     const std::string& cachePath,
                                      const std::string& assetRoot,
                                      uint64_t maximumCacheSize)
-    : DefaultFileSource(cachePath, std::make_unique<AssetFileSource>(assetRoot), maximumCacheSize) {
+    : DefaultFileSource(scheduler, cachePath, std::make_unique<AssetFileSource>(assetRoot), maximumCacheSize) {
 }
 
-DefaultFileSource::DefaultFileSource(const std::string& cachePath,
+DefaultFileSource::DefaultFileSource(Scheduler&,
+                                     const std::string& cachePath,
                                      std::unique_ptr<FileSource>&& assetFileSource_,
                                      uint64_t maximumCacheSize)
         : assetFileSource(std::move(assetFileSource_))

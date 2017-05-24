@@ -1,12 +1,14 @@
 #include <mbgl/test/util.hpp>
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/util/run_loop.hpp>
+#include <mbgl/util/default_thread_pool.hpp>
 
 using namespace mbgl;
 
 TEST(DefaultFileSource, TEST_REQUIRES_SERVER(CacheResponse)) {
     util::RunLoop loop;
-    DefaultFileSource fs(":memory:", ".");
+    ThreadPool threadPool {4};
+    DefaultFileSource fs(threadPool, ":memory:", ".");
 
     const Resource resource { Resource::Unknown, "http://127.0.0.1:3000/cache" };
     Response response;
@@ -44,7 +46,8 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(CacheResponse)) {
 
 TEST(DefaultFileSource, TEST_REQUIRES_SERVER(CacheRevalidateSame)) {
     util::RunLoop loop;
-    DefaultFileSource fs(":memory:", ".");
+    ThreadPool threadPool {4};
+    DefaultFileSource fs(threadPool, ":memory:", ".");
 
     const Resource revalidateSame { Resource::Unknown, "http://127.0.0.1:3000/revalidate-same" };
     std::unique_ptr<AsyncRequest> req1;
@@ -88,7 +91,8 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(CacheRevalidateSame)) {
 
 TEST(DefaultFileSource, TEST_REQUIRES_SERVER(CacheRevalidateModified)) {
     util::RunLoop loop;
-    DefaultFileSource fs(":memory:", ".");
+    ThreadPool threadPool {4};
+    DefaultFileSource fs(threadPool, ":memory:", ".");
 
     const Resource revalidateModified{ Resource::Unknown,
                                        "http://127.0.0.1:3000/revalidate-modified" };
@@ -132,7 +136,8 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(CacheRevalidateModified)) {
 
 TEST(DefaultFileSource, TEST_REQUIRES_SERVER(CacheRevalidateEtag)) {
     util::RunLoop loop;
-    DefaultFileSource fs(":memory:", ".");
+    ThreadPool threadPool {4};
+    DefaultFileSource fs(threadPool, ":memory:", ".");
 
     const Resource revalidateEtag { Resource::Unknown, "http://127.0.0.1:3000/revalidate-etag" };
     std::unique_ptr<AsyncRequest> req1;
@@ -187,7 +192,8 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(CacheRevalidateEtag)) {
 
 TEST(DefaultFileSource, TEST_REQUIRES_SERVER(HTTPIssue1369)) {
     util::RunLoop loop;
-    DefaultFileSource fs(":memory:", ".");
+    ThreadPool threadPool {4};
+    DefaultFileSource fs(threadPool, ":memory:", ".");
 
     const Resource resource { Resource::Unknown, "http://127.0.0.1:3000/test" };
 
@@ -211,7 +217,8 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(HTTPIssue1369)) {
 
 TEST(DefaultFileSource, OptionalNonExpired) {
     util::RunLoop loop;
-    DefaultFileSource fs(":memory:", ".");
+    ThreadPool threadPool {4};
+    DefaultFileSource fs(threadPool, ":memory:", ".");
 
     const Resource optionalResource { Resource::Unknown, "http://127.0.0.1:3000/test", {}, Resource::Optional };
 
@@ -240,7 +247,8 @@ TEST(DefaultFileSource, OptionalNonExpired) {
 
 TEST(DefaultFileSource, OptionalExpired) {
     util::RunLoop loop;
-    DefaultFileSource fs(":memory:", ".");
+    ThreadPool threadPool {4};
+    DefaultFileSource fs(threadPool, ":memory:", ".");
 
     const Resource optionalResource { Resource::Unknown, "http://127.0.0.1:3000/test", {}, Resource::Optional };
 
@@ -269,7 +277,8 @@ TEST(DefaultFileSource, OptionalExpired) {
 
 TEST(DefaultFileSource, GetBaseURLAndAccessTokenWhilePaused) {
     util::RunLoop loop;
-    DefaultFileSource fs(":memory:", ".");
+    ThreadPool threadPool {4};
+    DefaultFileSource fs(threadPool, ":memory:", ".");
 
     fs.pause();
 
@@ -285,7 +294,8 @@ TEST(DefaultFileSource, GetBaseURLAndAccessTokenWhilePaused) {
 
 TEST(DefaultFileSource, OptionalNotFound) {
     util::RunLoop loop;
-    DefaultFileSource fs(":memory:", ".");
+    ThreadPool threadPool {4};
+    DefaultFileSource fs(threadPool, ":memory:", ".");
 
     const Resource optionalResource { Resource::Unknown, "http://127.0.0.1:3000/test", {}, Resource::Optional };
 
@@ -311,7 +321,8 @@ TEST(DefaultFileSource, OptionalNotFound) {
 // from cache like a regular request
 TEST(DefaultFileSource, TEST_REQUIRES_SERVER(NoCacheRefreshEtagNotModified)) {
     util::RunLoop loop;
-    DefaultFileSource fs(":memory:", ".");
+    ThreadPool threadPool {4};
+    DefaultFileSource fs(threadPool, ":memory:", ".");
 
     Resource resource { Resource::Unknown, "http://127.0.0.1:3000/revalidate-same" };
     resource.priorEtag.emplace("snowfall");
@@ -345,7 +356,8 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(NoCacheRefreshEtagNotModified)) {
 // from cache like a regular request
 TEST(DefaultFileSource, TEST_REQUIRES_SERVER(NoCacheRefreshEtagModified)) {
     util::RunLoop loop;
-    DefaultFileSource fs(":memory:", ".");
+    ThreadPool threadPool {4};
+    DefaultFileSource fs(threadPool, ":memory:", ".");
 
     Resource resource { Resource::Unknown, "http://127.0.0.1:3000/revalidate-same" };
     resource.priorEtag.emplace("sunshine");
@@ -379,7 +391,8 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(NoCacheRefreshEtagModified)) {
 // from cache like a regular request.
 TEST(DefaultFileSource, TEST_REQUIRES_SERVER(NoCacheFull)) {
     util::RunLoop loop;
-    DefaultFileSource fs(":memory:", ".");
+    ThreadPool threadPool {4};
+    DefaultFileSource fs(threadPool, ":memory:", ".");
 
     Resource resource { Resource::Unknown, "http://127.0.0.1:3000/revalidate-same" };
     // Setting any prior field results in skipping the cache.
@@ -414,7 +427,8 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(NoCacheFull)) {
 // from cache like a regular request
 TEST(DefaultFileSource, TEST_REQUIRES_SERVER(NoCacheRefreshModifiedNotModified)) {
     util::RunLoop loop;
-    DefaultFileSource fs(":memory:", ".");
+    ThreadPool threadPool {4};
+    DefaultFileSource fs(threadPool, ":memory:", ".");
 
     Resource resource { Resource::Unknown, "http://127.0.0.1:3000/revalidate-modified" };
     resource.priorModified.emplace(Seconds(1420070400)); // January 1, 2015
@@ -448,7 +462,8 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(NoCacheRefreshModifiedNotModified))
 // from cache like a regular request
 TEST(DefaultFileSource, TEST_REQUIRES_SERVER(NoCacheRefreshModifiedModified)) {
     util::RunLoop loop;
-    DefaultFileSource fs(":memory:", ".");
+    ThreadPool threadPool {4};
+    DefaultFileSource fs(threadPool, ":memory:", ".");
 
     Resource resource { Resource::Unknown, "http://127.0.0.1:3000/revalidate-modified" };
     resource.priorModified.emplace(Seconds(1417392000)); // December 1, 2014
@@ -479,7 +494,8 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(NoCacheRefreshModifiedModified)) {
 
 TEST(DefaultFileSource, TEST_REQUIRES_SERVER(SetResourceTransform)) {
     util::RunLoop loop;
-    DefaultFileSource fs(":memory:", ".");
+    ThreadPool threadPool {4};
+    DefaultFileSource fs(threadPool, ":memory:", ".");
 
     // Translates the URL "localhost://test to http://127.0.0.1:3000/test
     fs.setResourceTransform([](Resource::Kind, std::string&& url) -> std::string {
