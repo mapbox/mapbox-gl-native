@@ -47,7 +47,11 @@
     XCTAssertEqualObjects(infos[3].URL, [NSURL URLWithString:@"https://www.mapbox.com/map-feedback/"]);
     XCTAssertTrue(infos[3].feedbackLink);
     XCTAssertEqualObjects([infos[3] feedbackURLAtCenterCoordinate:mapbox zoomLevel:14],
-                          [NSURL URLWithString:@"https://www.mapbox.com/feedback/#/77.63680/12.98108/14"]);
+                          [NSURL URLWithString:@"https://www.mapbox.com/feedback/?referrer=com.mapbox.MapboxGL#/77.63680/12.98108/14.00/0.0/0"]);
+    
+    NSURL *styleURL = [MGLStyle satelliteStreetsStyleURLWithVersion:99];
+    XCTAssertEqualObjects([infos[3] feedbackURLForStyleURL:styleURL atCenterCoordinate:mapbox zoomLevel:3.14159 direction:90.9 pitch:12.5],
+                          [NSURL URLWithString:@"https://www.mapbox.com/feedback/?referrer=com.mapbox.MapboxGL&owner=mapbox&id=satellite-streets-v99&access_token#/77.63680/12.98108/3.14/90.9/13"]);
 }
 
 - (void)testStyle {

@@ -28,11 +28,15 @@ NS_ASSUME_NONNULL_BEGIN
  @param centerCoordinate The map’s center coordinate.
  @param zoomLevel The map’s zoom level. See the `MGLMapView.zoomLevel` property
     for more information.
+ @param direction The heading of the map, measured in degrees clockwise from
+    true north.
+ @param pitch Pitch toward the horizon measured in degrees, with 0 degrees
+    resulting in a two-dimensional map.
  @return A modified URL containing a fragment that points to the specified
     viewport. If the `feedbackLink` property is set to `NO`, this method returns
     `nil`.
  */
-- (nullable NSURL *)feedbackURLForStyleURL:(nullable NSURL *)styleURL atCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate zoomLevel:(double)zoomLevel;
+- (nullable NSURL *)feedbackURLForStyleURL:(nullable NSURL *)styleURL atCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate zoomLevel:(double)zoomLevel direction:(CLLocationDirection)direction pitch:(CGFloat)pitch;
 
 @end
 

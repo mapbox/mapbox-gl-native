@@ -1736,11 +1736,15 @@ public:
 }
 
 - (IBAction)giveFeedback:(id)sender {
-    CLLocationCoordinate2D centerCoordinate = self.centerCoordinate;
+    MGLMapCamera *camera = self.camera;
     double zoomLevel = self.zoomLevel;
     NSMutableArray *urls = [NSMutableArray array];
     for (MGLAttributionInfo *info in [self.style attributionInfosWithFontSize:0 linkColor:nil]) {
-        NSURL *url = [info feedbackURLForStyleURL:self.styleURL atCenterCoordinate:centerCoordinate zoomLevel:zoomLevel];
+        NSURL *url = [info feedbackURLForStyleURL:self.styleURL
+                               atCenterCoordinate:camera.centerCoordinate
+                                        zoomLevel:zoomLevel
+                                        direction:camera.heading
+                                            pitch:camera.pitch];
         if (url) {
             [urls addObject:url];
         }

@@ -1907,9 +1907,12 @@ public:
             {
                 if (info.feedbackLink)
                 {
+                    MGLMapCamera *camera = self.camera;
                     url = [info feedbackURLForStyleURL:self.styleURL
-                                    atCenterCoordinate:self.centerCoordinate
-                                             zoomLevel:self.zoomLevel];
+                                    atCenterCoordinate:camera.centerCoordinate
+                                             zoomLevel:self.zoomLevel
+                                             direction:camera.heading
+                                                 pitch:camera.pitch];
                 }
                 [[UIApplication sharedApplication] openURL:url];
             }
