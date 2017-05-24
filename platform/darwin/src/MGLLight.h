@@ -60,7 +60,7 @@ MGL_EXPORT
  href="https://www.mapbox.com/mapbox-gl-js/style-spec/#light-anchor"><code>anchor</code></a>
  light property in the Mapbox Style Specification.
  */
-@property (nonatomic) MGLLightAnchor anchor;
+@property (nonatomic) MGLStyleValue<NSValue *> *anchor;
 
 /**
  Values describing animated transitions to `anchor` property.
@@ -75,7 +75,7 @@ MGL_EXPORT
  href="https://www.mapbox.com/mapbox-gl-js/style-spec/#light-position"><code>position</code></a>
  light property in the Mapbox Style Specification.
  */
-@property (nonatomic) MGLStyleValue<NSValue *> * position;
+@property (nonatomic) MGLStyleValue<NSValue *> *position;
 
 /**
  Values describing animated transitions to `position` property.
