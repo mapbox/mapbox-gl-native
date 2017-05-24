@@ -3,11 +3,24 @@
 
 static NSString * const MGLTestAnnotationReuseIdentifer = @"MGLTestAnnotationReuseIdentifer";
 
+@interface MGLCustomAnnotationView : MGLAnnotationView
+
+@end
+
+@implementation MGLCustomAnnotationView
+
+- (instancetype)initWithReuseIdentifier:(NSString *)reuseIdentifier {
+    return [super initWithReuseIdentifier:@"reuse-id"];
+}
+
+@end
+
 @interface MGLAnnotationView (Test)
+
 @property (nonatomic) MGLMapView *mapView;
 @property (nonatomic, readwrite) MGLAnnotationViewDragState dragState;
-
 - (void)setDragState:(MGLAnnotationViewDragState)dragState;
+
 @end
 
 @interface MGLMapView (Test)
@@ -77,6 +90,12 @@ static NSString * const MGLTestAnnotationReuseIdentifer = @"MGLTestAnnotationReu
 
     XCTAssert(_mapView.annotations.count == 0, @"number of annotations should be 0");
     XCTAssertNil(_annotationView.annotation, @"annotation property should be nil");
+}
+
+- (void)testCustomAnnotationView
+{
+    MGLCustomAnnotationView *customAnnotationView = [[MGLCustomAnnotationView alloc] initWithReuseIdentifier:@"reuse-id"];
+    XCTAssertNotNil(customAnnotationView);
 }
 
 - (MGLAnnotationView *)mapView:(MGLMapView *)mapView viewForAnnotation:(id<MGLAnnotation>)annotation
