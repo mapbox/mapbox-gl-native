@@ -267,6 +267,15 @@
    ...
 }
 {
+   Ubuntu 16.04 - CircleCI + mesa 13.0.4
+   Memcheck:Param
+   write(buf)
+   ...
+   obj:*/libc-*
+   fun:_ZN4mbgl4util10write_fileERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEES8_
+   ...
+}
+{
    Ubuntu 14.04 - Travis + mesa 13.0.3
    Memcheck:Cond
    fun:_ZN12_GLOBAL__N_117PeepholeOptimizer20runOnMachineFunctionERN4llvm15MachineFunctionE
