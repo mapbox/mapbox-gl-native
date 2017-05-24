@@ -25,7 +25,10 @@
     {
         mbgl::style::Light light;
         MGLLight *mglLight = [[MGLLight alloc] initWithMBGLLight:&light];
-        XCTAssertEqual(mglLight.anchor, MGLLightAnchorViewport);
+        
+        NSAssert([mglLight.anchor isKindOfClass:[MGLConstantStyleValue class]], @"mglLight.anchor isn’t a MGLConstantStyleValue.");
+        NSValue *anchorValue = ((MGLConstantStyleValue *)mglLight.anchor).rawValue;
+        XCTAssertEqual(anchorValue.MGLLightAnchorValue, MGLLightAnchorViewport);
         XCTAssertEqual(mglLight.anchorTransition.delay, defaultTransition.delay);
         XCTAssertEqual(mglLight.anchorTransition.duration, defaultTransition.duration);
         
@@ -36,10 +39,13 @@
         XCTAssert(anchorTransition.delay && MGLTimeIntervalFromDuration(*anchorTransition.delay) == defaultTransition.delay);
         XCTAssert(anchorTransition.duration && MGLTimeIntervalFromDuration(*anchorTransition.duration) == defaultTransition.duration);
         
-        mglLight.anchor = MGLLightAnchorMap;
+        MGLStyleValue<NSValue *> *anchorStyleValue = [MGLStyleValue<NSValue *> valueWithRawValue:[NSValue valueWithMGLLightAnchor:MGLLightAnchorMap]];
+        mglLight.anchor = anchorStyleValue;
         mglLight.anchorTransition = transition;
+        NSAssert([mglLight.anchor isKindOfClass:[MGLConstantStyleValue class]], @"mglLight.anchor isn’t a MGLConstantStyleValue.");
+        anchorValue = ((MGLConstantStyleValue *)mglLight.anchor).rawValue;
         
-        XCTAssertEqual(mglLight.anchor, MGLLightAnchorMap);
+        XCTAssertEqual(anchorValue.MGLLightAnchorValue, MGLLightAnchorMap);
         XCTAssertEqual(mglLight.anchorTransition.delay, transition.delay);
         XCTAssertEqual(mglLight.anchorTransition.duration, transition.duration);
         
