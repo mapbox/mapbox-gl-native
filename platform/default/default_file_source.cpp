@@ -183,7 +183,7 @@ DefaultFileSource::DefaultFileSource(Scheduler& scheduler,
                                      const std::string& cachePath,
                                      const std::string& assetRoot,
                                      uint64_t maximumCacheSize)
-    : DefaultFileSource(scheduler, cachePath, std::make_unique<AssetFileSource>(assetRoot), maximumCacheSize) {
+    : DefaultFileSource(scheduler, cachePath, std::make_unique<AssetFileSource>(scheduler, assetRoot), maximumCacheSize) {
 }
 
 DefaultFileSource::DefaultFileSource(Scheduler&,

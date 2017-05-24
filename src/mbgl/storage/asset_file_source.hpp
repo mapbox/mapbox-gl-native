@@ -4,20 +4,18 @@
 
 namespace mbgl {
 
-namespace util {
-template <typename T> class Thread;
-} // namespace util
+class Scheduler;
 
 class AssetFileSource : public FileSource {
 public:
-    AssetFileSource(const std::string& assetRoot);
+    AssetFileSource(Scheduler& scheduler, const std::string& assetRoot);
     ~AssetFileSource() override;
 
     std::unique_ptr<AsyncRequest> request(const Resource&, Callback) override;
 
 private:
     class Impl;
-    std::unique_ptr<util::Thread<Impl>> thread;
+    std::unique_ptr<Impl> impl;
 };
 
 } // namespace mbgl
