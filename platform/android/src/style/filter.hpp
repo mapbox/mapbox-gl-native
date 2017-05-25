@@ -15,7 +15,7 @@ public:
 
     class Statement : private mbgl::util::noncopyable {
     public:
-        static constexpr auto Name() { return "com/mapbox/mapboxsdk/style/layers/Filter$Statement"; };
+        static constexpr auto Name() { return "com/mapbox/mapboxsdk/style/layers/Filter$SimpleStatement"; };
 
         static jni::Class<Filter::Statement> javaClass;
     };
