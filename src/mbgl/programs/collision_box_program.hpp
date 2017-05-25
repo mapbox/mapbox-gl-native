@@ -33,7 +33,8 @@ class CollisionBoxProgram : public Program<
         uniforms::u_maxzoom,
         uniforms::u_collision_y_stretch,
         uniforms::u_camera_to_center_distance,
-        uniforms::u_pitch>,
+        uniforms::u_pitch,
+        uniforms::u_fadetexture>,
     style::Properties<>>
 {
 public:
