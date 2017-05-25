@@ -23,7 +23,7 @@ public:
 private:
     Scheduler& scheduler;
 
-    std::mutex receivingMutex;
+    std::recursive_mutex receivingMutex;
     std::mutex pushingMutex;
 
     bool closed { false };

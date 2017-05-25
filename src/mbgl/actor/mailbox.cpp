@@ -15,7 +15,8 @@ void Mailbox::close() {
     // must not block send(). Of the two, the receiving mutex must be acquired first, because that is
     // the order that an actor will obtain them when it self-sends a message, and consistent lock
     // acquisition order prevents deadlocks.
-    std::lock_guard<std::mutex> receivingLock(receivingMutex);
+    // The receiving mutex is recursive to allow a mailbox (and thus the actor) to close itself.
+    std::lock_guard<std::recursive_mutex> receivingLock(receivingMutex);
     std::lock_guard<std::mutex> pushingLock(pushingMutex);
 
     closed = true;
@@ -37,7 +38,7 @@ void Mailbox::push(std::unique_ptr<Message> message) {
 }
 
 void Mailbox::receive() {
-    std::lock_guard<std::mutex> receivingLock(receivingMutex);
+    std::lock_guard<std::recursive_mutex> receivingLock(receivingMutex);
 
     if (closed) {
         return;

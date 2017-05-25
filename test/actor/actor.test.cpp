@@ -6,6 +6,7 @@
 #include <chrono>
 #include <functional>
 #include <future>
+#include <memory>
 
 using namespace mbgl;
 using namespace std::chrono_literals;
@@ -121,6 +122,37 @@ TEST(Actor, DestructionBlocksOnSend) {
     scheduler.reset();
 
     thread.join();
+}
+
+TEST(Actor, DestructionAllowedInReceiveOnSameThread) {
+    // Destruction doesn't block if occurring on the same
+    // thread as receive(). This prevents deadlocks and
+    // allows for self-closing actors
+
+    struct Test {
+
+        Test(ActorRef<Test>){};
+
+        void callMeBack(std::function<void ()> callback) {
+            callback();
+        }
+    };
+
+    ThreadPool pool { 1 };
+
+    std::promise<void> callbackFiredPromise;
+
+    auto test = std::make_unique<Actor<Test>>(pool);
+
+    // Callback (triggered while mutex is locked in Mailbox::receive())
+    test->invoke(&Test::callMeBack, [&]() {
+        // Destroy the Actor/Mailbox in the same thread
+        test.reset();
+        callbackFiredPromise.set_value();
+    });
+
+    auto status = callbackFiredPromise.get_future().wait_for(std::chrono::seconds(1));
+    ASSERT_EQ(std::future_status::ready, status);
 }
 
 TEST(Actor, OrderedMailbox) {
