@@ -150,7 +150,8 @@ void Painter::renderSymbol(PaintParameters& parameters,
                 uniforms::u_maxzoom::Value{ float((tile.id.canonical.z + 1) * 10) },
                 uniforms::u_collision_y_stretch::Value{ tile.tile.yStretch() },
                 uniforms::u_camera_to_center_distance::Value{ state.getCameraToCenterDistance() },
-                uniforms::u_pitch::Value{ state.getPitch() }
+                uniforms::u_pitch::Value{ state.getPitch() },
+                uniforms::u_fadetexture::Value{ 1 }
             },
             *bucket.collisionBox.vertexBuffer,
             *bucket.collisionBox.indexBuffer,
