@@ -135,12 +135,13 @@ void RenderImageSource::update(Immutable<style::Source::Impl> baseImpl_,
         geomCoords.push_back(gc);
     }
     
-    if (!bucket) {
-        UnassociatedImage img = impl().getImage().clone();
-        if (!img.valid()) {
-            return;
-        }
-        bucket = std::make_unique<RasterBucket>(std::move(img));
+    const UnassociatedImage& image = impl().getImage();
+    if (!image.valid()) {
+        return;
+    }
+    
+    if (!bucket || image != bucket->image) {
+        bucket = std::make_unique<RasterBucket>(image.clone());
     } else {
         bucket->clear();
     }

@@ -56,6 +56,20 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (readonly) MGLCoordinateBounds MGLCoordinateBoundsValue;
 
+/**
+ Creates a new value object containing the specified Mapbox coordinate 
+ quad structure.
+
+ @param quad The value for the new object.
+ @return A new value object that contains the coordinate quad information.
+ */
++ (instancetype)valueWithMGLCoordinateQuad:(MGLCoordinateQuad)quad;
+
+/**
+ The Mapbox coordinate quad structure representation of the value.
+ */
+- (MGLCoordinateQuad)MGLCoordinateQuadValue;
+
 #pragma mark Working with Offline Map Values
 
 /**

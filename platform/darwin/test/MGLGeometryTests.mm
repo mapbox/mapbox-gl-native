@@ -144,4 +144,23 @@
     XCTAssertEqualObjects(serializedGeoJSON, geoJSON, @"MGLPointFeature should serialize as a GeoJSON point feature.");
 }
 
+- (void)testMGLCoordinateBoundsToMGLCoordinateQuad {
+    MGLCoordinateBounds bounds = MGLCoordinateBoundsMake(CLLocationCoordinate2DMake(37.936, -80.425),
+                                                         CLLocationCoordinate2DMake(46.437, -71.516));
+
+    MGLCoordinateQuad quad = MGLCoordinateQuadFromCoordinateBounds(bounds);
+    XCTAssertEqualObjects([NSValue valueWithMGLCoordinate:bounds.sw],
+                          [NSValue valueWithMGLCoordinate:quad.bottomLeft],
+                          @"Bounds southwest should be bottom left of quad.");
+    XCTAssertEqualObjects([NSValue valueWithMGLCoordinate:bounds.ne],
+                          [NSValue valueWithMGLCoordinate:quad.topRight],
+                          @"Bounds northeast should be top right of quad.");
+
+    XCTAssertEqualObjects([NSValue valueWithMGLCoordinate:CLLocationCoordinate2DMake(46.437, -80.425)],
+                          [NSValue valueWithMGLCoordinate:quad.topLeft],
+                          @"Quad top left should be computed correctly.");
+    XCTAssertEqualObjects([NSValue valueWithMGLCoordinate:CLLocationCoordinate2DMake(37.936, -71.516)],
+                          [NSValue valueWithMGLCoordinate:quad.bottomRight],
+                          @"Quad bottom right should be computed correctly.");
+}
 @end

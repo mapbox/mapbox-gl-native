@@ -617,6 +617,34 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
         cos(angle) * 20);
 }
 
+- (IBAction) addAnimatedImageSource:(id)sender {
+
+    MGLImage *image = [[NSBundle bundleForClass:[self class]] imageForResource:@"southeast_0"];
+
+    MGLCoordinateBounds bounds = { {22.551103322318994, -90.24006072802854}, {36.928147474567794, -75.1441643681673} };
+    MGLImageSource *imageSource = [[MGLImageSource alloc] initWithIdentifier:@"radar-source" bounds:bounds image:image];
+    [self.mapView.style addSource:imageSource];
+
+    MGLRasterStyleLayer * imageLayer = [[MGLRasterStyleLayer alloc] initWithIdentifier:@"radar-layer" source:imageSource];
+    [self.mapView.style addLayer:imageLayer];
+    
+    [NSTimer scheduledTimerWithTimeInterval:1.0
+                                     target:self
+                                   selector:@selector(updateAnimatedImageSource:)
+                                   userInfo:imageSource
+                                    repeats:YES];
+}
+
+
+- (void)updateAnimatedImageSource:(NSTimer *)timer {
+    MGLImageSource *imageSource = (MGLImageSource *)timer.userInfo;
+    double timeInterval = timer.fireDate.timeIntervalSinceReferenceDate;
+    int radarSuffix = (int)timeInterval % 4;
+    MGLImage *image = [[NSBundle bundleForClass:[self class]] imageForResource:[NSString stringWithFormat:@"southeast_%d", radarSuffix]];
+    
+    [imageSource setValue:image forKey:@"image"];
+}
+
 - (IBAction)insertCustomStyleLayer:(id)sender {
     [self.undoManager registerUndoWithTarget:self handler:^(id  _Nonnull target) {
         [self removeCustomStyleLayer:sender];
@@ -695,14 +723,18 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     MGLTransition transition = { .duration = 5, .delay = 1 };
     self.mapView.style.transition = transition;
 
-    MGLFillStyleLayer *fillStyleLayer = (MGLFillStyleLayer *)[self.mapView.style layerWithIdentifier:@"water"];
-
+    MGLStyleLayer *waterLayer = [self.mapView.style layerWithIdentifier:@"water"];
     MGLStyleValue *colorFunction = [MGLStyleValue<NSColor *> valueWithInterpolationMode:MGLInterpolationModeExponential cameraStops:@{
         @0.0: [MGLStyleValue<NSColor *> valueWithRawValue:[NSColor redColor]],
         @10.0: [MGLStyleValue<NSColor *> valueWithRawValue:[NSColor yellowColor]],
         @20.0: [MGLStyleValue<NSColor *> valueWithRawValue:[NSColor blackColor]],
     } options:nil];
-    fillStyleLayer.fillColor = colorFunction;
+    
+    if ([waterLayer respondsToSelector:@selector(fillColor)]) {
+        [waterLayer setValue:colorFunction forKey:@"fillColor"];
+    } else if ([waterLayer respondsToSelector:@selector(lineColor)]) {
+        [waterLayer setValue:colorFunction forKey:@"lineColor"];
+    }
 
     NSString *filePath = [[NSBundle bundleForClass:self.class] pathForResource:@"amsterdam" ofType:@"geojson"];
     NSURL *geoJSONURL = [NSURL fileURLWithPath:filePath];
@@ -714,21 +746,34 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     fillLayer.predicate = [NSPredicate predicateWithFormat:@"%K == %@", @"type", @"park"];
     [self.mapView.style addLayer:fillLayer];
 
+    MGLSource *streetsSource = [self.mapView.style sourceWithIdentifier:@"composite"];
+    if (streetsSource) {
     NSImage *image = [NSImage imageNamed:NSImageNameIChatTheaterTemplate];
     [self.mapView.style setImage:image forName:NSImageNameIChatTheaterTemplate];
 
-    MGLSource *streetsSource = [self.mapView.style sourceWithIdentifier:@"composite"];
-    MGLSymbolStyleLayer *theaterLayer = [[MGLSymbolStyleLayer alloc] initWithIdentifier:@"theaters" source:streetsSource];
-    theaterLayer.sourceLayerIdentifier = @"poi_label";
-    theaterLayer.predicate = [NSPredicate predicateWithFormat:@"maki == 'theatre'"];
-    theaterLayer.iconImageName = [MGLStyleValue valueWithRawValue:NSImageNameIChatTheaterTemplate];
-    theaterLayer.iconScale = [MGLStyleValue valueWithRawValue:@2];
-    theaterLayer.iconColor = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeExponential cameraStops:@{
-        @16.0: [MGLStyleValue valueWithRawValue:[NSColor redColor]],
-        @18.0: [MGLStyleValue valueWithRawValue:[NSColor yellowColor]],
-        @20.0: [MGLStyleValue valueWithRawValue:[NSColor blackColor]],
-    } options:nil];
-    [self.mapView.style addLayer:theaterLayer];
+        MGLSymbolStyleLayer *theaterLayer = [[MGLSymbolStyleLayer alloc] initWithIdentifier:@"theaters" source:streetsSource];
+        theaterLayer.sourceLayerIdentifier = @"poi_label";
+        theaterLayer.predicate = [NSPredicate predicateWithFormat:@"maki == 'theatre'"];
+        theaterLayer.iconImageName = [MGLStyleValue valueWithRawValue:NSImageNameIChatTheaterTemplate];
+        theaterLayer.iconScale = [MGLStyleValue valueWithRawValue:@2];
+        theaterLayer.iconColor = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeExponential cameraStops:@{
+            @16.0: [MGLStyleValue valueWithRawValue:[NSColor redColor]],
+            @18.0: [MGLStyleValue valueWithRawValue:[NSColor yellowColor]],
+            @20.0: [MGLStyleValue valueWithRawValue:[NSColor blackColor]],
+        } options:nil];
+        [self.mapView.style addLayer:theaterLayer];
+    }
+
+    MGLImage *image = [[NSBundle bundleForClass:[self class]] imageForResource:@"RadarImage"];
+    MGLCoordinateQuad quad = { {46.437, -80.425},
+      {46.437, -71.516},
+      {37.936, -71.516},
+      {37.936, -80.425} };
+    MGLImageSource *imageSource = [[MGLImageSource alloc] initWithIdentifier:@"radar-source" coordinates:quad image:image];
+    [self.mapView.style addSource:imageSource];
+
+    MGLRasterStyleLayer * imageLayer = [[MGLRasterStyleLayer alloc] initWithIdentifier:@"radar-layer" source:imageSource];
+    [self.mapView.style addLayer:imageLayer];
 }
 
 - (IBAction)dropPin:(NSMenuItem *)sender {
@@ -936,6 +981,9 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     }
     if (menuItem.action == @selector(drawAnimatedAnnotation:)) {
         return !_isShowingAnimatedAnnotation;
+    }
+    if (menuItem.action == @selector(addAnimatedImageSource:)) {
+        return YES;
     }
     if (menuItem.action == @selector(insertCustomStyleLayer:)) {
         return ![self.mapView.style layerWithIdentifier:@"mbx-custom"];

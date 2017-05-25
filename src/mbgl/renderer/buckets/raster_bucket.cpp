@@ -13,7 +13,9 @@ RasterBucket::RasterBucket(UnassociatedImage&& image_) : image(std::move(image_)
 }
 
 void RasterBucket::upload(gl::Context& context) {
-    texture = context.createTexture(image);
+    if (!texture) {
+        texture = context.createTexture(image);
+    }
     if (!vertices.empty()) {
         vertexBuffer = context.createVertexBuffer(std::move(vertices));
         indexBuffer = context.createIndexBuffer(std::move(indices));
@@ -27,7 +29,7 @@ void RasterBucket::clear() {
     segments.clear();
     vertices.clear();
     indices.clear();
-    
+
     uploaded = false;
 }
 void RasterBucket::render(Painter& painter,
