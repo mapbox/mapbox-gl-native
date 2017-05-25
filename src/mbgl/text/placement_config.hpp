@@ -1,5 +1,7 @@
 #pragma once
 
+#include <mbgl/util/constants.hpp>
+
 namespace mbgl {
 
 class PlacementConfig {
@@ -9,7 +11,11 @@ public:
     }
 
     bool operator==(const PlacementConfig& rhs) const {
-        return angle == rhs.angle && pitch == rhs.pitch && cameraToCenterDistance == rhs.cameraToCenterDistance && cameraToTileDistance == rhs.cameraToTileDistance && debug == rhs.debug;
+        return angle == rhs.angle &&
+            pitch == rhs.pitch &&
+            cameraToCenterDistance == rhs.cameraToCenterDistance &&
+            (pitch * util::RAD2DEG < 25 || cameraToTileDistance == rhs.cameraToTileDistance) &&
+            debug == rhs.debug;
     }
 
     bool operator!=(const PlacementConfig& rhs) const {
