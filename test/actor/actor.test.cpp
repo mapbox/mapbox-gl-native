@@ -155,6 +155,62 @@ TEST(Actor, DestructionAllowedInReceiveOnSameThread) {
     ASSERT_EQ(std::future_status::ready, status);
 }
 
+TEST(Actor, SelfDestructionDoesntCrashWaitingReceivingThreads) {
+    // Ensures destruction doesn't cause waiting threads to
+    // crash when a actor closes it's own mailbox from a
+    // callback
+
+    struct Test {
+
+        Test(ActorRef<Test>){};
+
+        void callMeBack(std::function<void ()> callback) {
+            callback();
+        }
+    };
+
+
+    ThreadPool pool { 2 };
+
+    std::promise<void> actorClosedPromise;
+
+    auto closingActor = std::make_unique<Actor<Test>>(pool);
+    auto waitingActor = std::make_unique<Actor<Test>>(pool);
+
+    std::atomic<bool> waitingMessageProcessed {false};
+
+    // Callback (triggered while mutex is locked in Mailbox::receive())
+    closingActor->invoke(&Test::callMeBack, [&]() {
+
+        // Queue up another message from another thread
+        std::promise<void> messageQueuedPromise;
+        waitingActor->invoke(&Test::callMeBack, [&]() {
+            // This will be waiting on the mutex in
+            // Mailbox::receive(), holding a lock
+            // on the weak_ptr so the mailbox is not
+            // destroyed
+            closingActor->invoke(&Test::callMeBack, [&]() {
+                waitingMessageProcessed.store(true);
+            });
+            messageQueuedPromise.set_value();
+        });
+
+        // Wait for the message to be queued
+        ASSERT_EQ(
+                messageQueuedPromise.get_future().wait_for(std::chrono::seconds(1)),
+                std::future_status::ready
+        );
+
+        // Destroy the Actor/Mailbox in the same thread
+        closingActor.reset();
+        actorClosedPromise.set_value();
+    });
+
+    auto status = actorClosedPromise.get_future().wait_for(std::chrono::seconds(1));
+    ASSERT_EQ(std::future_status::ready, status);
+    ASSERT_FALSE(waitingMessageProcessed.load());
+}
+
 TEST(Actor, OrderedMailbox) {
     // Messages are processed in order.
 
