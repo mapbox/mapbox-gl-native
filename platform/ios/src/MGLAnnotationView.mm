@@ -24,20 +24,27 @@
 }
 
 - (instancetype)initWithReuseIdentifier:(NSString *)reuseIdentifier {
-    return [self initWithAnnotation:nil reuseIdentifier:reuseIdentifier];
+    self = [super initWithFrame:CGRectZero];
+    if (self) {
+        [self commonInitWithAnnotation:nil reuseIdentifier:reuseIdentifier];
+    }
+    return self;
 }
 
 - (instancetype)initWithAnnotation:(nullable id<MGLAnnotation>)annotation reuseIdentifier:(nullable NSString *)reuseIdentifier {
     self = [super initWithFrame:CGRectZero];
-    if (self)
-    {
-        _lastAppliedScaleTransform = CATransform3DIdentity;
-        _annotation = annotation;
-        _reuseIdentifier = [reuseIdentifier copy];
-        _scalesWithViewingDistance = YES;
-        _enabled = YES;
+    if (self) {
+        [self commonInitWithAnnotation:annotation reuseIdentifier:reuseIdentifier];
     }
     return self;
+}
+
+- (void)commonInitWithAnnotation:(nullable id<MGLAnnotation>)annotation reuseIdentifier:(nullable NSString *)reuseIdentifier {
+    _lastAppliedScaleTransform = CATransform3DIdentity;
+    _annotation = annotation;
+    _reuseIdentifier = [reuseIdentifier copy];
+    _scalesWithViewingDistance = YES;
+    _enabled = YES;
 }
 
 - (instancetype)initWithCoder:(NSCoder *)decoder {
