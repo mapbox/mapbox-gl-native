@@ -6,15 +6,19 @@
 // C++ -> Java conversion
 #include "../../conversion/conversion.hpp"
 #include <mbgl/style/conversion.hpp>
+#include <mbgl/util/premultiply.hpp>
 
+#include "../../bitmap.hpp"
 #include <string>
+#include <array>
 
 namespace mbgl {
 namespace android {
 
-    ImageSource::ImageSource(jni::JNIEnv& env, jni::String sourceId)
+    ImageSource::ImageSource(jni::JNIEnv& env, jni::String sourceId, jni::Object<LatLngQuad> coordinatesObject)
         : Source(env, std::make_unique<mbgl::style::ImageSource>(
-                jni::Make<std::string>(env, sourceId)
+                jni::Make<std::string>(env, sourceId),
+                LatLngQuad::getLatLngArray(env, coordinatesObject)
                 )
             ) {
     }
@@ -25,31 +29,20 @@ namespace android {
 
     ImageSource::~ImageSource() = default;
 
-    void GeoJSONSource::setGeoJSONString(jni::JNIEnv& env, jni::String json) {
-        using namespace mbgl::style::conversion;
-
-        // Convert the jni object
-        Error error;
-        optional<GeoJSON> converted = convert<GeoJSON>(Value(env, json), error);
-        if(!converted) {
-            mbgl::Log::Error(mbgl::Event::JNI, "Error setting geo json: " + error.message);
-            return;
-        }
-
-        // Update the core source
-        source.as<mbgl::style::GeoJSONSource>()->GeoJSONSource::setGeoJSON(*converted);
-    }
-
     void ImageSource::setURL(jni::JNIEnv& env, jni::String url) {
         // Update the core source
-        source.as<mbgl::style::GeoJSONSource>()->GeoJSONSource::setURL(jni::Make<std::string>(env, url));
+        source.as<mbgl::style::ImageSource>()->ImageSource::setURL(jni::Make<std::string>(env, url));
     }
 
     jni::String ImageSource::getURL(jni::JNIEnv& env) {
-        std::string url = source.as<mbgl::style::ImageSource>()->ImageSource::getURL();
-        return !url.empty() ? jni::Make<jni::String>(env, url) : jni::String();
+        optional<std::string> url = source.as<mbgl::style::ImageSource>()->ImageSource::getURL();
+        return url ? jni::Make<jni::String>(env, *url) : jni::String();
     }
 
+    void ImageSource::setImage(jni::JNIEnv& env, jni::Object<Bitmap> bitmap) {
+        UnassociatedImage image = util::unpremultiply(Bitmap::GetImage(env, bitmap));
+        source.as<mbgl::style::ImageSource>()->setImage(std:: move(image));
+    }
 
     jni::Class<ImageSource> ImageSource::javaClass;
 
@@ -66,14 +59,13 @@ namespace android {
 
         // Register the peer
         jni::RegisterNativePeer<ImageSource>(
-            env, ImageSource::javaClass, "nativePtr",
-            std::make_unique<ImageSource, JNIEnv&, jni::String, jni::Object<>>,
-            "initialize",
-            "finalize",
-            METHOD(&ImageSource::setGeoJSONString, "nativeSetGeoJsonString"),
-            METHOD(&ImageSource::setURL, "nativeSetUrl"),
-            METHOD(&ImageSource::getURL, "nativeGetUrl"),
-            METHOD(&ImageSource::getURL, "nativeGetUrl"),
+                env, ImageSource::javaClass, "nativePtr",
+                std::make_unique<ImageSource, JNIEnv&, jni::String, jni::Object<LatLngQuad>>,
+                "initialize",
+                "finalize",
+                METHOD(&ImageSource::setURL, "nativeSetUrl"),
+                METHOD(&ImageSource::getURL, "nativeGetUrl"),
+                METHOD(&ImageSource::setImage, "nativeSetImage")
         );
     }
 

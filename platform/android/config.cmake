@@ -158,6 +158,8 @@ add_library(mbgl-android STATIC
     platform/android/src/style/sources/unknown_source.hpp
     platform/android/src/style/sources/vector_source.cpp
     platform/android/src/style/sources/vector_source.hpp
+    platform/android/src/style/sources/image_source.hpp
+    platform/android/src/style/sources/image_source.cpp
     platform/android/src/style/functions/stop.cpp
     platform/android/src/style/functions/stop.hpp
     platform/android/src/style/functions/categorical_stops.cpp
@@ -222,6 +224,8 @@ add_library(mbgl-android STATIC
     platform/android/src/geometry/lat_lng.hpp
     platform/android/src/geometry/lat_lng_bounds.cpp
     platform/android/src/geometry/lat_lng_bounds.hpp
+    platform/android/src/geometry/lat_lng_quad.cpp
+    platform/android/src/geometry/lat_lng_quad.hpp
     platform/android/src/geometry/projected_meters.cpp
     platform/android/src/geometry/projected_meters.hpp
 

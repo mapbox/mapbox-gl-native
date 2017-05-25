@@ -23,6 +23,7 @@
 #include "geojson/position.hpp"
 #include "geometry/lat_lng.hpp"
 #include "geometry/lat_lng_bounds.hpp"
+#include "geometry/lat_lng_quad.hpp"
 #include "geometry/projected_meters.hpp"
 #include "graphics/pointf.hpp"
 #include "graphics/rectf.hpp"
@@ -127,6 +128,7 @@ void registerNatives(JavaVM *vm) {
     // Geometry
     LatLng::registerNative(env);
     LatLngBounds::registerNative(env);
+    LatLngQuad::registerNative(env);
     ProjectedMeters::registerNative(env);
 
     // GSon

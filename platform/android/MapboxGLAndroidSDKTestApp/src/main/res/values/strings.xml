@@ -59,6 +59,7 @@
     <string name="activity_restricted_bounds">Restrict camera to a bounds</string>
     <string name="activity_fill_extrusion_layer">Fill extrusions</string>
     <string name="activity_building_fill_extrusion_layer">Building layer</string>
+    <string name="activity_animated_image_source">Animated Image Source</string>
 
     <!--Description-->
     <string name="description_user_location_tracking">Tracks the location of the user</string>
@@ -117,6 +118,7 @@
     <string name="description_restricted_bounds">Limit viewport to Iceland</string>
     <string name="description_fill_extrusion_layer">Shows how to add 3D extruded shapes</string>
     <string name="description_building_fill_extrusion_layer">Shows how to show 3D extruded buildings</string>
+    <string name="description_animated_image_source">Shows how to animate georeferenced images</string>
 
     <!--Categories-->
     <string name="category">category</string>

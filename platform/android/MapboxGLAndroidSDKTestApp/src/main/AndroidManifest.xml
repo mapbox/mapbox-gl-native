@@ -535,6 +535,17 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activity.FeatureOverviewActivity"/>
         </activity>
+        <activity
+            android:name=".activity.style.AnimatedImageSourceActivity"
+            android:label="@string/activity_animated_image_source"
+            android:description="@string/description_animated_image_source">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_style"/>
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.FeatureOverviewActivity"/>
+        </activity>
 
         <!-- Features -->
         <activity
