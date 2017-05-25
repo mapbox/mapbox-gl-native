@@ -445,6 +445,7 @@
 		DD4823761D94AE6C00EB71B7 /* line_filter_style.json in Resources */ = {isa = PBXBuildFile; fileRef = DD4823731D94AE6C00EB71B7 /* line_filter_style.json */; };
 		DD4823771D94AE6C00EB71B7 /* numeric_filter_style.json in Resources */ = {isa = PBXBuildFile; fileRef = DD4823741D94AE6C00EB71B7 /* numeric_filter_style.json */; };
 		DD58A4C61D822BD000E1F038 /* MGLExpressionTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = DD58A4C51D822BD000E1F038 /* MGLExpressionTests.mm */; };
+		DD945C0E1ED747FB00AB8DB0 /* MBXTestViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DD945C0D1ED747FB00AB8DB0 /* MBXTestViewController.m */; };
 		DD9BE4F71EB263C50079A3AF /* UIViewController+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = DD9BE4F51EB263C50079A3AF /* UIViewController+MGLAdditions.h */; };
 		DD9BE4F81EB263C50079A3AF /* UIViewController+MGLAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = DD9BE4F61EB263C50079A3AF /* UIViewController+MGLAdditions.m */; };
 		DD9BE4F91EB263D20079A3AF /* UIViewController+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = DD9BE4F51EB263C50079A3AF /* UIViewController+MGLAdditions.h */; };
@@ -917,6 +918,8 @@
 		DD4823731D94AE6C00EB71B7 /* line_filter_style.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = line_filter_style.json; sourceTree = "<group>"; };
 		DD4823741D94AE6C00EB71B7 /* numeric_filter_style.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = numeric_filter_style.json; sourceTree = "<group>"; };
 		DD58A4C51D822BD000E1F038 /* MGLExpressionTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLExpressionTests.mm; path = ../../darwin/test/MGLExpressionTests.mm; sourceTree = "<group>"; };
+		DD945C0C1ED747FB00AB8DB0 /* MBXTestViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MBXTestViewController.h; sourceTree = "<group>"; };
+		DD945C0D1ED747FB00AB8DB0 /* MBXTestViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MBXTestViewController.m; sourceTree = "<group>"; };
 		DD9BE4F51EB263C50079A3AF /* UIViewController+MGLAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIViewController+MGLAdditions.h"; sourceTree = "<group>"; };
 		DD9BE4F61EB263C50079A3AF /* UIViewController+MGLAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIViewController+MGLAdditions.m"; sourceTree = "<group>"; };
 		FA68F1481E9D656600F9F6C2 /* MGLFillExtrusionStyleLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLFillExtrusionStyleLayer.h; sourceTree = "<group>"; };
@@ -1179,6 +1182,8 @@
 				DA1DC9691CB6C6B7006E619F /* MBXOfflinePacksTableViewController.m */,
 				DA1DC9531CB6C1C2006E619F /* MBXViewController.h */,
 				DA1DC99A1CB6E064006E619F /* MBXViewController.m */,
+				DD945C0C1ED747FB00AB8DB0 /* MBXTestViewController.h */,
+				DD945C0D1ED747FB00AB8DB0 /* MBXTestViewController.m */,
 				632281DD1E6F855900D75A5D /* MBXEmbeddedMapViewController.h */,
 				632281DE1E6F855900D75A5D /* MBXEmbeddedMapViewController.m */,
 				DA821D051CCC6D59007508D4 /* Main.storyboard */,
@@ -2115,6 +2120,7 @@
 				DA1DC9991CB6E054006E619F /* MBXAppDelegate.m in Sources */,
 				DA1DC96B1CB6C6B7006E619F /* MBXOfflinePacksTableViewController.m in Sources */,
 				DA1DC96A1CB6C6B7006E619F /* MBXCustomCalloutView.m in Sources */,
+				DD945C0E1ED747FB00AB8DB0 /* MBXTestViewController.m in Sources */,
 				DA1DC99B1CB6E064006E619F /* MBXViewController.m in Sources */,
 				40FDA76B1CCAAA6800442548 /* MBXAnnotationView.m in Sources */,
 				632281DF1E6F855900D75A5D /* MBXEmbeddedMapViewController.m in Sources */,

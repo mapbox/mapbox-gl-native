@@ -7,6 +7,8 @@
 #import "MBXUserLocationAnnotationView.h"
 #import "MBXEmbeddedMapViewController.h"
 
+#import "MBXTestViewController.h"
+
 #import <Mapbox/Mapbox.h>
 
 #import <objc/runtime.h>
@@ -148,9 +150,36 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     }
 }
 
+- (void)present
+{
+    MBXTestViewController *vc = [[MBXTestViewController alloc] initWithNibName:nil bundle:nil];
+//    UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:vc];
+//    vc.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Dismiss" style:UIBarButtonItemStyleDone target:self action:@selector(dismiss)];
+    [self presentViewController:/*nav*/vc animated:YES completion:nil];
+
+    [self performSelector:@selector(dismiss) withObject:nil afterDelay:2];
+}
+
+- (void)dismiss
+{
+    [self dismissViewControllerAnimated:YES completion:nil];
+}
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+
+
+    [self performSelector:@selector(present) withObject:nil afterDelay:2];
+
+
+
+    return;
+
+
+
+
+
 
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(saveState:) name:UIApplicationDidEnterBackgroundNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(restoreState:) name:UIApplicationWillEnterForegroundNotification object:nil];

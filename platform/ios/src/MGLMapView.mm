@@ -656,21 +656,39 @@ public:
     _isWaitingForRedundantReachableNotification = NO;
 }
 
+- (void)removeFromSuperview
+{
+    NSLog(@"removeFromSuperview");
+
+    [super removeFromSuperview];
+}
+
+
 - (void)dealloc
 {
+    NSLog(@"dealloc");
+
     [_reachability stopNotifier];
 
     [[UIDevice currentDevice] endGeneratingDeviceOrientationNotifications];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [_attributionButton removeObserver:self forKeyPath:@"hidden"];
 
-    if (_isObservingTopLayoutGuide) {
-        [(NSObject *)self.viewControllerForLayoutGuides.topLayoutGuide removeObserver:self forKeyPath:@"bounds" context:(void *)&MGLLayoutGuidesUpdatedContext];
-    }
-    
-    if (_isObservingBottomLayoutGuide) {
-        [(NSObject *)self.viewControllerForLayoutGuides.bottomLayoutGuide removeObserver:self forKeyPath:@"bounds" context:(void *)&MGLLayoutGuidesUpdatedContext];
-    }
+//    if (_isObservingTopLayoutGuide) {
+//        [(NSObject *)self.viewControllerForLayoutGuides.topLayoutGuide removeObserver:self forKeyPath:@"bounds" context:(void *)&MGLLayoutGuidesUpdatedContext];
+//    } else {
+//        NSLog(@"not observing top!");
+//    }
+//    
+//    if (_isObservingBottomLayoutGuide) {
+//        [(NSObject *)self.viewControllerForLayoutGuides.bottomLayoutGuide removeObserver:self forKeyPath:@"bounds" context:(void *)&MGLLayoutGuidesUpdatedContext];
+//    } else {
+//        NSLog(@"not observing bottom!");
+//    }
+
+//    NSLog(@"observing: %@", self.ob
+
+
 
     // Removing the annotations unregisters any outstanding KVO observers.
     NSArray *annotations = self.annotations;
@@ -791,21 +809,21 @@ public:
     UIViewController *viewController = self.viewControllerForLayoutGuides;
     BOOL useLayoutGuides = viewController.view && viewController.automaticallyAdjustsScrollViewInsets;
     
-    if (useLayoutGuides && viewController.topLayoutGuide && !_isObservingTopLayoutGuide) {
-        [(NSObject *)viewController.topLayoutGuide addObserver:self forKeyPath:@"bounds" options:0 context:(void *)&MGLLayoutGuidesUpdatedContext];
-        _isObservingTopLayoutGuide = YES;
-    } else if (!useLayoutGuides && _isObservingTopLayoutGuide) {
-        [(NSObject *)viewController.topLayoutGuide removeObserver:self forKeyPath:@"bounds" context:(void *)&MGLLayoutGuidesUpdatedContext];
-        _isObservingTopLayoutGuide = NO;
-    }
-    
-    if (useLayoutGuides && viewController.bottomLayoutGuide && !_isObservingBottomLayoutGuide) {
-        [(NSObject *)viewController.bottomLayoutGuide addObserver:self forKeyPath:@"bounds" options:0 context:(void *)&MGLLayoutGuidesUpdatedContext];
-        _isObservingBottomLayoutGuide = YES;
-    } else if (!useLayoutGuides && _isObservingBottomLayoutGuide) {
-        [(NSObject *)viewController.bottomLayoutGuide removeObserver:self forKeyPath:@"bounds" context:(void *)&MGLLayoutGuidesUpdatedContext];
-        _isObservingBottomLayoutGuide = NO;
-    }
+//    if (useLayoutGuides && viewController.topLayoutGuide && !_isObservingTopLayoutGuide) {
+//        [(NSObject *)viewController.topLayoutGuide addObserver:self forKeyPath:@"bounds" options:0 context:(void *)&MGLLayoutGuidesUpdatedContext];
+//        _isObservingTopLayoutGuide = YES;
+//    } else if (!useLayoutGuides && _isObservingTopLayoutGuide) {
+//        [(NSObject *)viewController.topLayoutGuide removeObserver:self forKeyPath:@"bounds" context:(void *)&MGLLayoutGuidesUpdatedContext];
+//        _isObservingTopLayoutGuide = NO;
+//    }
+//    
+//    if (useLayoutGuides && viewController.bottomLayoutGuide && !_isObservingBottomLayoutGuide) {
+//        [(NSObject *)viewController.bottomLayoutGuide addObserver:self forKeyPath:@"bounds" options:0 context:(void *)&MGLLayoutGuidesUpdatedContext];
+//        _isObservingBottomLayoutGuide = YES;
+//    } else if (!useLayoutGuides && _isObservingBottomLayoutGuide) {
+//        [(NSObject *)viewController.bottomLayoutGuide removeObserver:self forKeyPath:@"bounds" context:(void *)&MGLLayoutGuidesUpdatedContext];
+//        _isObservingBottomLayoutGuide = NO;
+//    }
 }
 
 - (BOOL)isOpaque
@@ -835,6 +853,8 @@ public:
 // This gets called when the view dimension changes, e.g. because the device is being rotated.
 - (void)layoutSubviews
 {
+    NSLog(@"layoutSubviews");
+
     [super layoutSubviews];
 
     [self adjustContentInset];
@@ -933,27 +953,27 @@ public:
     UIViewController *viewController = self.viewControllerForLayoutGuides;
     BOOL useLayoutGuides = viewController.view && viewController.automaticallyAdjustsScrollViewInsets;
     
-    if (!_isObservingTopLayoutGuide && useLayoutGuides && viewController.topLayoutGuide)
-    {
-        [(NSObject *)viewController.topLayoutGuide addObserver:self forKeyPath:@"bounds" options:0 context:MGLLayoutGuidesUpdatedContext];
-        _isObservingTopLayoutGuide = YES;
-    }
-    else if (!useLayoutGuides && _isObservingTopLayoutGuide)
-    {
-        [(NSObject *)viewController.topLayoutGuide removeObserver:self forKeyPath:@"bounds" context:MGLLayoutGuidesUpdatedContext];
-        _isObservingTopLayoutGuide = NO;
-    }
-    
-    if (!_isObservingBottomLayoutGuide && useLayoutGuides && viewController.bottomLayoutGuide)
-    {
-        [(NSObject *)viewController.bottomLayoutGuide addObserver:self forKeyPath:@"bounds" options:0 context:MGLLayoutGuidesUpdatedContext];
-        _isObservingBottomLayoutGuide = YES;
-    }
-    else if (!useLayoutGuides && _isObservingBottomLayoutGuide)
-    {
-        [(NSObject *)viewController.bottomLayoutGuide removeObserver:self forKeyPath:@"bounds" context:MGLLayoutGuidesUpdatedContext];
-        _isObservingBottomLayoutGuide = NO;
-    }
+//    if (!_isObservingTopLayoutGuide && useLayoutGuides && viewController.topLayoutGuide)
+//    {
+//        [(NSObject *)viewController.topLayoutGuide addObserver:self forKeyPath:@"bounds" options:0 context:MGLLayoutGuidesUpdatedContext];
+//        _isObservingTopLayoutGuide = YES;
+//    }
+//    else if (!useLayoutGuides && _isObservingTopLayoutGuide)
+//    {
+//        [(NSObject *)viewController.topLayoutGuide removeObserver:self forKeyPath:@"bounds" context:MGLLayoutGuidesUpdatedContext];
+//        _isObservingTopLayoutGuide = NO;
+//    }
+//    
+//    if (!_isObservingBottomLayoutGuide && useLayoutGuides && viewController.bottomLayoutGuide)
+//    {
+//        [(NSObject *)viewController.bottomLayoutGuide addObserver:self forKeyPath:@"bounds" options:0 context:MGLLayoutGuidesUpdatedContext];
+//        _isObservingBottomLayoutGuide = YES;
+//    }
+//    else if (!useLayoutGuides && _isObservingBottomLayoutGuide)
+//    {
+//        [(NSObject *)viewController.bottomLayoutGuide removeObserver:self forKeyPath:@"bounds" context:MGLLayoutGuidesUpdatedContext];
+//        _isObservingBottomLayoutGuide = NO;
+//    }
 }
 
 - (void)setContentInset:(UIEdgeInsets)contentInset
