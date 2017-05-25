@@ -656,6 +656,48 @@ public:
     _isWaitingForRedundantReachableNotification = NO;
 }
 
+- (void)willMoveToWindow:(UIWindow *)newWindow
+{
+    [super willMoveToWindow:newWindow];
+    
+    if (newWindow) {
+        [self addLayoutGuideObserversIfNeeded];
+    } else {
+        [self removeLayoutGuideObserversIfNeeded];
+    }
+}
+
+- (void)addLayoutGuideObserversIfNeeded
+{
+    UIViewController *viewController = self.viewControllerForLayoutGuides;
+    BOOL useLayoutGuides = viewController.view && viewController.automaticallyAdjustsScrollViewInsets;
+    
+    if (useLayoutGuides && viewController.topLayoutGuide && !_isObservingTopLayoutGuide) {
+        [(NSObject *)viewController.topLayoutGuide addObserver:self forKeyPath:@"bounds" options:0 context:(void *)&MGLLayoutGuidesUpdatedContext];
+        _isObservingTopLayoutGuide = YES;
+    }
+    
+    if (useLayoutGuides && viewController.bottomLayoutGuide && !_isObservingBottomLayoutGuide) {
+        [(NSObject *)viewController.bottomLayoutGuide addObserver:self forKeyPath:@"bounds" options:0 context:(void *)&MGLLayoutGuidesUpdatedContext];
+        _isObservingBottomLayoutGuide = YES;
+    }
+}
+
+- (void)removeLayoutGuideObserversIfNeeded
+{
+    UIViewController *viewController = self.viewControllerForLayoutGuides;
+    
+    if (_isObservingTopLayoutGuide) {
+        [(NSObject *)viewController.topLayoutGuide removeObserver:self forKeyPath:@"bounds" context:(void *)&MGLLayoutGuidesUpdatedContext];
+        _isObservingTopLayoutGuide = NO;
+    }
+    
+    if (_isObservingBottomLayoutGuide) {
+        [(NSObject *)viewController.bottomLayoutGuide removeObserver:self forKeyPath:@"bounds" context:(void *)&MGLLayoutGuidesUpdatedContext];
+        _isObservingBottomLayoutGuide = NO;
+    }
+}
+
 - (void)dealloc
 {
     [_reachability stopNotifier];
@@ -664,13 +706,7 @@ public:
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [_attributionButton removeObserver:self forKeyPath:@"hidden"];
 
-    if (_isObservingTopLayoutGuide) {
-        [(NSObject *)self.viewControllerForLayoutGuides.topLayoutGuide removeObserver:self forKeyPath:@"bounds" context:(void *)&MGLLayoutGuidesUpdatedContext];
-    }
-    
-    if (_isObservingBottomLayoutGuide) {
-        [(NSObject *)self.viewControllerForLayoutGuides.bottomLayoutGuide removeObserver:self forKeyPath:@"bounds" context:(void *)&MGLLayoutGuidesUpdatedContext];
-    }
+    [self removeLayoutGuideObserversIfNeeded];
 
     // Removing the annotations unregisters any outstanding KVO observers.
     NSArray *annotations = self.annotations;
@@ -787,25 +823,7 @@ public:
     // is set to YES, -[MGLMapView adjustContentInset] takes top and bottom layout
     // guides into account. To get notified about changes to the layout guides,
     // we need to observe their bounds and re-layout accordingly.
-    
-    UIViewController *viewController = self.viewControllerForLayoutGuides;
-    BOOL useLayoutGuides = viewController.view && viewController.automaticallyAdjustsScrollViewInsets;
-    
-    if (useLayoutGuides && viewController.topLayoutGuide && !_isObservingTopLayoutGuide) {
-        [(NSObject *)viewController.topLayoutGuide addObserver:self forKeyPath:@"bounds" options:0 context:(void *)&MGLLayoutGuidesUpdatedContext];
-        _isObservingTopLayoutGuide = YES;
-    } else if (!useLayoutGuides && _isObservingTopLayoutGuide) {
-        [(NSObject *)viewController.topLayoutGuide removeObserver:self forKeyPath:@"bounds" context:(void *)&MGLLayoutGuidesUpdatedContext];
-        _isObservingTopLayoutGuide = NO;
-    }
-    
-    if (useLayoutGuides && viewController.bottomLayoutGuide && !_isObservingBottomLayoutGuide) {
-        [(NSObject *)viewController.bottomLayoutGuide addObserver:self forKeyPath:@"bounds" options:0 context:(void *)&MGLLayoutGuidesUpdatedContext];
-        _isObservingBottomLayoutGuide = YES;
-    } else if (!useLayoutGuides && _isObservingBottomLayoutGuide) {
-        [(NSObject *)viewController.bottomLayoutGuide removeObserver:self forKeyPath:@"bounds" context:(void *)&MGLLayoutGuidesUpdatedContext];
-        _isObservingBottomLayoutGuide = NO;
-    }
+    [self addLayoutGuideObserversIfNeeded];
 }
 
 - (BOOL)isOpaque
@@ -838,8 +856,6 @@ public:
     [super layoutSubviews];
 
     [self adjustContentInset];
-    
-    [self observeLayoutGuidesIfNeeded];
     
     [self layoutOrnaments];
 
@@ -926,34 +942,6 @@ public:
     contentInset.bottom = fmaxf(contentInset.bottom, 0);
 
     self.contentInset = contentInset;
-}
-
-- (void)observeLayoutGuidesIfNeeded
-{
-    UIViewController *viewController = self.viewControllerForLayoutGuides;
-    BOOL useLayoutGuides = viewController.view && viewController.automaticallyAdjustsScrollViewInsets;
-    
-    if (!_isObservingTopLayoutGuide && useLayoutGuides && viewController.topLayoutGuide)
-    {
-        [(NSObject *)viewController.topLayoutGuide addObserver:self forKeyPath:@"bounds" options:0 context:MGLLayoutGuidesUpdatedContext];
-        _isObservingTopLayoutGuide = YES;
-    }
-    else if (!useLayoutGuides && _isObservingTopLayoutGuide)
-    {
-        [(NSObject *)viewController.topLayoutGuide removeObserver:self forKeyPath:@"bounds" context:MGLLayoutGuidesUpdatedContext];
-        _isObservingTopLayoutGuide = NO;
-    }
-    
-    if (!_isObservingBottomLayoutGuide && useLayoutGuides && viewController.bottomLayoutGuide)
-    {
-        [(NSObject *)viewController.bottomLayoutGuide addObserver:self forKeyPath:@"bounds" options:0 context:MGLLayoutGuidesUpdatedContext];
-        _isObservingBottomLayoutGuide = YES;
-    }
-    else if (!useLayoutGuides && _isObservingBottomLayoutGuide)
-    {
-        [(NSObject *)viewController.bottomLayoutGuide removeObserver:self forKeyPath:@"bounds" context:MGLLayoutGuidesUpdatedContext];
-        _isObservingBottomLayoutGuide = NO;
-    }
 }
 
 - (void)setContentInset:(UIEdgeInsets)contentInset
