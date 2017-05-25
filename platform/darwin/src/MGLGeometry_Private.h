@@ -8,6 +8,7 @@
 #import <mbgl/util/geo.hpp>
 #import <mbgl/util/geometry.hpp>
 
+#import <array>
 typedef double MGLLocationRadians;
 typedef double MGLRadianDistance;
 typedef double MGLRadianDirection;
@@ -54,6 +55,27 @@ NS_INLINE MGLCoordinateBounds MGLCoordinateBoundsFromLatLngBounds(mbgl::LatLngBo
 NS_INLINE mbgl::LatLngBounds MGLLatLngBoundsFromCoordinateBounds(MGLCoordinateBounds coordinateBounds) {
     return mbgl::LatLngBounds::hull(MGLLatLngFromLocationCoordinate2D(coordinateBounds.sw),
                                     MGLLatLngFromLocationCoordinate2D(coordinateBounds.ne));
+}
+
+NS_INLINE std::array<mbgl::LatLng, 4> MGLLatLngArrayFromCoordinateQuad(MGLCoordinateQuad quad) {
+    return { MGLLatLngFromLocationCoordinate2D(quad.topLeft),
+    MGLLatLngFromLocationCoordinate2D(quad.topRight),
+    MGLLatLngFromLocationCoordinate2D(quad.bottomRight),
+    MGLLatLngFromLocationCoordinate2D(quad.bottomLeft) };
+}
+
+NS_INLINE MGLCoordinateQuad MGLCoordinateQuadFromLatLngArray(std::array<mbgl::LatLng, 4> quad) {
+    return { MGLLocationCoordinate2DFromLatLng(quad[0]),
+    MGLLocationCoordinate2DFromLatLng(quad[1]),
+    MGLLocationCoordinate2DFromLatLng(quad[2]),
+    MGLLocationCoordinate2DFromLatLng(quad[3]) };
+}
+
+NS_INLINE MGLCoordinateQuad MGLCoordinateQuadFromCoordinateBounds(MGLCoordinateBounds bounds) {
+    return { { bounds.ne.latitude, bounds.sw.longitude },
+    bounds.ne,
+    { bounds.sw.latitude, bounds.ne.longitude },
+    bounds.sw };
 }
 
 #if TARGET_OS_IPHONE

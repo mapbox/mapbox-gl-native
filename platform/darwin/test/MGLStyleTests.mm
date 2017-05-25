@@ -210,9 +210,9 @@
     MGLRasterSource *rasterSource = [[MGLRasterSource alloc] initWithIdentifier:@"some-identifier" tileURLTemplates:@[] options:nil];
     [self.style addSource:rasterSource];
 
-    // Attempt to remove a shape source with the same identifier as the raster source
-    MGLShapeSource *shapeSource = [[MGLShapeSource alloc] initWithIdentifier:@"some-identifier" shape:nil options:nil];
-    [self.style removeSource:shapeSource];
+    // Attempt to remove an image source with the same identifier as the raster source
+    MGLImageSource *imageSource = [[MGLImageSource alloc] initWithIdentifier:@"some-identifier" coordinates: { }];
+    [self.style removeSource:imageSource];
     // The raster source should still be added
     XCTAssertTrue([[self.style sourceWithIdentifier:rasterSource.identifier] isMemberOfClass:[MGLRasterSource class]]);
 
@@ -220,16 +220,16 @@
     [self.style removeSource:rasterSource];
 
     // Add the shape source
-    [self.style addSource:shapeSource];
+    [self.style addSource:imageSource];
 
     // Attempt to remove a vector source with the same identifer as the shape source
     MGLVectorSource *vectorSource = [[MGLVectorSource alloc] initWithIdentifier:@"some-identifier" tileURLTemplates:@[] options:nil];
     [self.style removeSource:vectorSource];
-    // The shape source should still be added
-    XCTAssertTrue([[self.style sourceWithIdentifier:shapeSource.identifier] isMemberOfClass:[MGLShapeSource class]]);
+    // The image source should still be added
+    XCTAssertTrue([[self.style sourceWithIdentifier:imageSource.identifier] isMemberOfClass:[MGLImageSource class]]);
 
-    // Remove the shape source
-    [self.style removeSource:shapeSource];
+    // Remove the image source
+    [self.style removeSource:imageSource];
 
     // Add the vector source
     [self.style addSource:vectorSource];
@@ -237,7 +237,7 @@
     // Attempt to remove the previously created raster source that has the same identifer as the shape source
     [self.style removeSource:rasterSource];
     // The vector source should still be added
-    XCTAssertTrue([[self.style sourceWithIdentifier:shapeSource.identifier] isMemberOfClass:[MGLVectorSource class]]);
+    XCTAssertTrue([[self.style sourceWithIdentifier:imageSource.identifier] isMemberOfClass:[MGLVectorSource class]]);
 }
 
 - (void)testRemovingSourceInUse {

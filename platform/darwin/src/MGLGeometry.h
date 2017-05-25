@@ -45,6 +45,23 @@ typedef struct MGLCoordinateBounds {
     CLLocationCoordinate2D ne;
 } MGLCoordinateBounds;
 
+/** 
+ A quadrilateral area as measured on a two-dimensional map projection.
+ `MGLCoordinateQuad` differs from `MGLCoordinateBounds` in that it allows
+ representation of non-axis aligned bounds and non-rectangular quadrilaterals
+ */
+typedef struct MGLCoordinateQuad {
+    /** Coordinate at the top left corner. */
+    CLLocationCoordinate2D topLeft;
+    /** Coordinate at the top right corner. */
+    CLLocationCoordinate2D topRight;
+    /** Coordinate at the bottom right corner. */
+    CLLocationCoordinate2D bottomRight;
+    /** Coordinate at the bottom left corner. */
+    CLLocationCoordinate2D bottomLeft;
+} MGLCoordinateQuad;
+
+
 /**
  Creates a new `MGLCoordinateBounds` structure from the given southwest and
  northeast coordinates.

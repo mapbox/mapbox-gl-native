@@ -99,6 +99,9 @@ NSString * const MGLOfflinePackMaximumCountUserInfoKey = MGLOfflinePackUserInfoK
                 case mbgl::Resource::Kind::SpriteJSON:
                     kind = MGLResourceKindSpriteJSON;
                     break;
+                case mbgl::Resource::Kind::Image:
+                    kind = MGLResourceKindImage;
+                    break;
                 case mbgl::Resource::Kind::Unknown:
                     kind = MGLResourceKindUnknown;
                     break;

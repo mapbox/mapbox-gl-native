@@ -34,6 +34,16 @@
     return bounds;
 }
 
++ (instancetype)valueWithMGLCoordinateQuad:(MGLCoordinateQuad)quad {
+    return [self valueWithBytes:&quad objCType:@encode(MGLCoordinateQuad)];
+}
+
+- (MGLCoordinateQuad)MGLCoordinateQuadValue {
+    MGLCoordinateQuad quad;
+    [self getValue:&quad];
+    return quad;
+}
+
 #pragma mark Offline maps
 
 + (NSValue *)valueWithMGLOfflinePackProgress:(MGLOfflinePackProgress)progress {
