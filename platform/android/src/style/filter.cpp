@@ -4,8 +4,10 @@ namespace mbgl {
 namespace android {
 
 jni::Object<Filter::Statement> Filter::fromFilter(jni::JNIEnv& env, const mbgl::style::Filter&) {
-    static auto constructor = Filter::Statement::javaClass.template GetConstructor<>(env);
-    return Filter::Statement::javaClass.New(env, constructor);
+    static auto constructor = Filter::Statement::javaClass.template GetConstructor<jni::String>(env);
+    const char *const equals = "==";
+    auto joper = jni::Make<jni::String>(env, equals);
+    return Filter::Statement::javaClass.New(env, constructor, joper);
 }
 
 jni::Class<Filter> Filter::javaClass;

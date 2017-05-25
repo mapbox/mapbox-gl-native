@@ -73,8 +73,8 @@ public class FillLayerTest extends BaseActivityTest {
     Timber.i("Filter");
     assertNotNull(layer);
 
-    layer.setFilter(all(eq("type", "park")));
-    assertEquals(all(eq("type", "park")), layer.getFilter());
+    layer.setFilter(eq("type", "park"));
+    assertEquals("==", layer.getFilter().getOperator());
   }
 
   @Test

@@ -100,17 +100,17 @@ namespace android {
     }
 
     struct GetFilterEvaluator {
-        optional<Filter> noop(std::string layerType) {
+        optional<style::Filter> noop(std::string layerType) {
             Log::Warning(mbgl::Event::JNI, "%s doesn't support filters", layerType.c_str());
             return {};
         }
 
-        optional<Filter> operator()(style::BackgroundLayer&) { return noop("BackgroundLayer"); }
-        optional<Filter> operator()(style::CustomLayer&) { return noop("CustomLayer"); }
-        optional<Filter> operator()(style::RasterLayer&) { return noop("RasterLayer"); }
+        optional<style::Filter> operator()(style::BackgroundLayer&) { return noop("BackgroundLayer"); }
+        optional<style::Filter> operator()(style::CustomLayer&) { return noop("CustomLayer"); }
+        optional<style::Filter> operator()(style::RasterLayer&) { return noop("RasterLayer"); }
 
         template <class LayerType>
-        optional<Filter> operator()(LayerType& layer) {
+        optional<style::Filter> operator()(LayerType& layer) {
             return { layer.getFilter() };
         }
     };
@@ -144,7 +144,7 @@ namespace android {
         Value wrapped(env, jfilter);
 
         Error error;
-        optional<Filter> converted = convert<Filter>(wrapped, error);
+        optional<mbgl::style::Filter> converted = convert<mbgl::style::Filter>(wrapped, error);
         if (!converted) {
             mbgl::Log::Error(mbgl::Event::JNI, "Error setting filter: " + error.message);
             return;
