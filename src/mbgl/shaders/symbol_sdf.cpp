@@ -30,12 +30,10 @@ uniform highp float u_size_t; // used to interpolate between zoom stops when siz
 uniform highp float u_size; // used when size is both zoom and feature constant
 uniform highp float u_layout_size; // used when size is feature constant
 
-uniform lowp float a_fill_color_t;
-attribute highp vec4 a_fill_color;
-varying highp vec4 fill_color;
-uniform lowp float a_halo_color_t;
-attribute highp vec4 a_halo_color;
-varying highp vec4 halo_color;
+uniform lowp float a_fill_or_halo_color_t;
+attribute highp vec4 a_fill_or_halo_color;
+varying highp vec4 fill_or_halo_color;
+
 uniform lowp float a_opacity_t;
 attribute lowp vec2 a_opacity;
 varying lowp float opacity;
@@ -81,8 +79,8 @@ highp float clipUnusedGlyphAngles(const highp float render_size,
 }
 
 void main() {
-    fill_color = unpack_mix_vec4(a_fill_color, a_fill_color_t);
-    halo_color = unpack_mix_vec4(a_halo_color, a_halo_color_t);
+    fill_or_halo_color = unpack_mix_vec4(a_fill_or_halo_color, a_fill_or_halo_color_t);
+    
     opacity = unpack_mix_vec2(a_opacity, a_opacity_t);
     halo_width = unpack_mix_vec2(a_halo_width, a_halo_width_t);
     halo_blur = unpack_mix_vec2(a_halo_blur, a_halo_blur_t);
@@ -195,7 +193,8 @@ void main() {
     // the y-axis.
     highp float collision_adjustment = max(1.0, incidence_stretch / u_collision_y_stretch);
 
-    highp float perspective_zoom_adjust = log2(perspective_ratio * collision_adjustment) * 10.0;
+    // Floor to 1/10th zoom to dodge precision issues that can cause partially hidden labels
+    highp float perspective_zoom_adjust = floor(log2(perspective_ratio * collision_adjustment) * 10.0);
     v_fade_tex = vec2((a_labelminzoom + perspective_zoom_adjust) / 255.0, 0.0);
 }
 
@@ -205,8 +204,8 @@ const char* symbol_sdf::fragmentSource = R"MBGL_SHADER(
 #define EDGE_GAMMA 0.105/DEVICE_PIXEL_RATIO
 
 uniform bool u_is_halo;
-varying highp vec4 fill_color;
-varying highp vec4 halo_color;
+varying highp vec4 fill_or_halo_color;
+
 varying lowp float opacity;
 varying lowp float halo_width;
 varying lowp float halo_blur;
@@ -230,11 +229,11 @@ void main() {
 
     float fontScale = u_is_text ? v_size / 24.0 : v_size;
 
-    lowp vec4 color = fill_color;
+    lowp vec4 color = fill_or_halo_color;
     highp float gamma = EDGE_GAMMA / (fontScale * u_gamma_scale);
     lowp float buff = (256.0 - 64.0) / 256.0;
     if (u_is_halo) {
-        color = halo_color;
+        color = fill_or_halo_color;
         gamma = (halo_blur * 1.19 / SDF_PX + EDGE_GAMMA) / (fontScale * u_gamma_scale);
         buff = (6.0 - halo_width / fontScale) / SDF_PX;
     }

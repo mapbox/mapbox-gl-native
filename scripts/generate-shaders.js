@@ -62,7 +62,12 @@ ${fragmentPrelude}
     'symbol_sdf'
 ].forEach(function (shaderName) {
     function applyPragmas(source, pragmas) {
-        return source.replace(/#pragma mapbox: ([\w]+) ([\w]+) ([\w]+) ([\w]+)/g, (match, operation, precision, type, name) => {
+        const transformedSource = source.replace(/#pragma mapbox: ([\w]+) ([\w]+) ([\w]+) ([\w]+)/g, (match, operation, precision, type, name) => {
+            if (shaderName === 'symbol_sdf' && name === "halo_color") {
+                return "";
+            } else if (shaderName === 'symbol_sdf' && name === "fill_color") {
+                name = "fill_or_halo_color";
+            }
             const a_type = type === "float" ? "vec2" : "vec4";
             return pragmas[operation]
                 .join("\n")
@@ -71,6 +76,13 @@ ${fragmentPrelude}
                 .replace(/\{precision\}/g, precision)
                 .replace(/\{name\}/g, name);
         });
+        if (shaderName === 'symbol_sdf') {
+            return transformedSource.replace(/\bfill_color\b|\bhalo_color\b/g, () => {
+                return "fill_or_halo_color";
+            })
+        } else {
+            return transformedSource;
+        }
     }
 
     function vertexSource() {
