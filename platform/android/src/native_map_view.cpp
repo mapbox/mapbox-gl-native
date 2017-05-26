@@ -46,6 +46,7 @@
 #include "java/util.hpp"
 #include "geometry/lat_lng_bounds.hpp"
 #include "map/camera_position.hpp"
+#include "style/light.hpp"
 
 namespace mbgl {
 namespace android {
@@ -819,6 +820,15 @@ jni::Array<jni::Object<geojson::Feature>> NativeMapView::queryRenderedFeaturesFo
     return *convert<jni::Array<jni::Object<Feature>>, std::vector<mbgl::Feature>>(env, map->queryRenderedFeatures(box, { layers, toFilter(env, jfilter) }));
 }
 
+jni::Object<Light> NativeMapView::getLight(JNIEnv& env) {
+    mbgl::style::Light* light = map->getLight();
+    if (light) {
+        return jni::Object<Light>(Light::createJavaLightPeer(env, *map, *light));
+    } else {
+        return jni::Object<Light>();
+    }
+}
+
 jni::Array<jni::Object<Layer>> NativeMapView::getLayers(JNIEnv& env) {
 
     // Get the core layers
@@ -1533,6 +1543,7 @@ void NativeMapView::registerNative(jni::JNIEnv& env) {
             METHOD(&NativeMapView::queryPointAnnotations, "nativeQueryPointAnnotations"),
             METHOD(&NativeMapView::queryRenderedFeaturesForPoint, "nativeQueryRenderedFeaturesForPoint"),
             METHOD(&NativeMapView::queryRenderedFeaturesForBox, "nativeQueryRenderedFeaturesForBox"),
+            METHOD(&NativeMapView::getLight, "nativeGetLight"),
             METHOD(&NativeMapView::getLayers, "nativeGetLayers"),
             METHOD(&NativeMapView::getLayer, "nativeGetLayer"),
             METHOD(&NativeMapView::addLayer, "nativeAddLayer"),

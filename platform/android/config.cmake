@@ -168,6 +168,10 @@ add_library(mbgl-android STATIC
     platform/android/src/style/functions/identity_stops.hpp
     platform/android/src/style/functions/interval_stops.cpp
     platform/android/src/style/functions/interval_stops.hpp
+    platform/android/src/style/position.cpp
+    platform/android/src/style/position.hpp
+    platform/android/src/style/light.cpp
+    platform/android/src/style/light.hpp
 
     # FileSource holder
     platform/android/src/file_source.cpp

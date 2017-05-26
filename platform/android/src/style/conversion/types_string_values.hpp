@@ -206,6 +206,20 @@ namespace conversion {
         }
     }
 
+    // anchor
+    inline std::string toString(mbgl::style::LightAnchorType value) {
+        switch (value) {
+          case mbgl::style::LightAnchorType::Map:
+            return "map";
+            break;
+          case mbgl::style::LightAnchorType::Viewport:
+            return "viewport";
+            break;
+          default:
+            throw std::runtime_error("Not implemented");
+        }
+    }
+
 
 } // namespace conversion
 } // namespace android
