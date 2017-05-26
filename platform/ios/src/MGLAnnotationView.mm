@@ -174,13 +174,10 @@
 {
     if (self.rotatesToMatchCamera == NO) return;
 
-    CATransform3D undoOfLastRotateTransform = CATransform3DInvert(_lastAppliedRotateTransform);
-
     CGFloat directionRad = self.mapView.direction * M_PI / 180.0;
     CATransform3D newRotateTransform = CATransform3DMakeRotation(-directionRad, 0, 0, 1);
-    CATransform3D effectiveTransform = CATransform3DConcat(undoOfLastRotateTransform, newRotateTransform);
-
-    self.layer.transform = CATransform3DConcat(self.layer.transform, effectiveTransform);
+    self.layer.transform = CATransform3DConcat(CATransform3DIdentity, newRotateTransform);
+    
     _lastAppliedRotateTransform = newRotateTransform;
 }
 
