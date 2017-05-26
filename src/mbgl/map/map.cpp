@@ -90,7 +90,7 @@ public:
 
     Update updateFlags = Update::Nothing;
 
-    std::unique_ptr<AnnotationManager> annotationManager;
+    AnnotationManager annotationManager;
     std::unique_ptr<Painter> painter;
     std::unique_ptr<Style> style;
 
@@ -153,7 +153,6 @@ Map::Impl::Impl(Map& map_,
       contextMode(contextMode_),
       pixelRatio(pixelRatio_),
       programCacheDir(std::move(programCacheDir_)),
-      annotationManager(std::make_unique<AnnotationManager>()),
       asyncInvalidate([this] {
           if (mode == MapMode::Continuous) {
               backend.invalidate();
@@ -171,7 +170,6 @@ Map::~Map() {
     // Explicit resets currently necessary because these abandon resources that need to be
     // cleaned up by context.reset();
     impl->style.reset();
-    impl->annotationManager.reset();
     impl->painter.reset();
 }
 
@@ -235,11 +233,11 @@ void Map::Impl::render(View& view) {
     transform.updateTransitions(timePoint);
 
     if (style->loaded && updateFlags & Update::AnnotationStyle) {
-        annotationManager->updateStyle(*style);
+        annotationManager.updateStyle(*style);
     }
 
     if (updateFlags & Update::AnnotationData) {
-        annotationManager->updateData();
+        annotationManager.updateData();
     }
 
     style->update({
@@ -251,7 +249,7 @@ void Map::Impl::render(View& view) {
         transform.getState(),
         scheduler,
         fileSource,
-        *annotationManager
+        annotationManager
     });
 
     updateFlags = Update::Nothing;
@@ -787,31 +785,31 @@ LatLng Map::latLngForPixel(const ScreenCoordinate& pixel) const {
 #pragma mark - Annotations
 
 void Map::addAnnotationImage(std::unique_ptr<style::Image> image) {
-    impl->annotationManager->addImage(std::move(image));
+    impl->annotationManager.addImage(std::move(image));
     impl->onUpdate(Update::AnnotationStyle);
 }
 
 void Map::removeAnnotationImage(const std::string& id) {
-    impl->annotationManager->removeImage(id);
+    impl->annotationManager.removeImage(id);
     impl->onUpdate(Update::AnnotationStyle);
 }
 
 double Map::getTopOffsetPixelsForAnnotationImage(const std::string& id) {
-    return impl->annotationManager->getTopOffsetPixelsForImage(id);
+    return impl->annotationManager.getTopOffsetPixelsForImage(id);
 }
 
 AnnotationID Map::addAnnotation(const Annotation& annotation) {
-    auto result = impl->annotationManager->addAnnotation(annotation, getMaxZoom());
+    auto result = impl->annotationManager.addAnnotation(annotation, getMaxZoom());
     impl->onUpdate(Update::AnnotationStyle | Update::AnnotationData);
     return result;
 }
 
 void Map::updateAnnotation(AnnotationID id, const Annotation& annotation) {
-    impl->onUpdate(impl->annotationManager->updateAnnotation(id, annotation, getMaxZoom()));
+    impl->onUpdate(impl->annotationManager.updateAnnotation(id, annotation, getMaxZoom()));
 }
 
 void Map::removeAnnotation(AnnotationID annotation) {
-    impl->annotationManager->removeAnnotation(annotation);
+    impl->annotationManager.removeAnnotation(annotation);
     impl->onUpdate(Update::AnnotationStyle | Update::AnnotationData);
 }
 
