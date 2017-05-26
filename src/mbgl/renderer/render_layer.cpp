@@ -8,6 +8,8 @@
 #include <mbgl/renderer/layers/render_raster_layer.hpp>
 #include <mbgl/renderer/layers/render_symbol_layer.hpp>
 #include <mbgl/style/types.hpp>
+#include <mbgl/renderer/render_tile.hpp>
+#include <mbgl/tile/tile.hpp>
 
 namespace mbgl {
 
@@ -62,4 +64,27 @@ bool RenderLayer::needsRendering(float zoom) const {
            && baseImpl->maxZoom >= zoom;
 }
 
-} // namespace mbgl
+void RenderLayer::setRenderTiles(std::vector<std::reference_wrapper<RenderTile>> tiles) {
+    renderTiles = std::move(tiles);
+}
+
+void RenderLayer::uploadBuckets(gl::Context& context, RenderSource*) {
+    for (const auto& tileRef : renderTiles) {
+        const auto& bucket = tileRef.get().tile.getBucket(*baseImpl);
+        if (bucket && bucket->needsUpload()) {
+            bucket->upload(context);
+        }
+    }
+}
+
+void RenderLayer::render(Painter& painter, PaintParameters& parameters, RenderSource*) {
+    for (auto& tileRef : renderTiles) {
+        auto& tile = tileRef.get();
+        auto bucket = tile.tile.getBucket(*baseImpl);
+        bucket->render(painter, parameters, *this, tile);
+    }
+}
+
+
+} //namespace mbgl
+

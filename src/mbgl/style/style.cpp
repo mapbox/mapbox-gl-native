@@ -535,8 +535,8 @@ RenderData Style::getRenderData(MapDebugOptions debugOptions, float angle) const
         }
     }
 
-    for (const auto& layerImpl : layerImpls) {
-        const RenderLayer* layer = getRenderLayer(layerImpl->id);
+    for (auto& layerImpl : layerImpls) {
+        RenderLayer* layer = getRenderLayer(layerImpl->id);
         assert(layer);
 
         if (!layer->needsRendering(zoomHistory.lastZoom)) {
@@ -546,7 +546,7 @@ RenderData Style::getRenderData(MapDebugOptions debugOptions, float angle) const
         if (const RenderBackgroundLayer* background = layer->as<RenderBackgroundLayer>()) {
             if (debugOptions & MapDebugOptions::Overdraw) {
                 // We want to skip glClear optimization in overdraw mode.
-                result.order.emplace_back(*layer);
+                result.order.emplace_back(*layer, nullptr);
                 continue;
             }
             const BackgroundPaintProperties::PossiblyEvaluated& paint = background->evaluated;
@@ -555,19 +555,19 @@ RenderData Style::getRenderData(MapDebugOptions debugOptions, float angle) const
                 result.backgroundColor = paint.get<BackgroundColor>() * paint.get<BackgroundOpacity>();
             } else {
                 // This is a textured background, or not the bottommost layer. We need to render it with a quad.
-                result.order.emplace_back(*layer);
+                result.order.emplace_back(*layer, nullptr);
             }
             continue;
         }
 
         if (layer->is<RenderCustomLayer>()) {
-            result.order.emplace_back(*layer);
+            result.order.emplace_back(*layer, nullptr);
             continue;
         }
 
         RenderSource* source = getRenderSource(layer->baseImpl->source);
         if (!source) {
-            Log::Warning(Event::Render, "can't find source for layer '%s'", layer->baseImpl->id.c_str());
+            Log::Warning(Event::Render, "can't find source for layer '%s'", layer->getID().c_str());
             continue;
         }
 
@@ -626,8 +626,8 @@ RenderData Style::getRenderData(MapDebugOptions debugOptions, float angle) const
                 tile.used = true;
             }
         }
-
-        result.order.emplace_back(*layer, std::move(sortedTilesForInsertion));
+        layer->setRenderTiles(std::move(sortedTilesForInsertion));
+        result.order.emplace_back(*layer, source);
     }
 
     return result;
