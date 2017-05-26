@@ -60,6 +60,7 @@ custom_categories:
     children:
       - MGLStyle
       - MGLStyleValue
+      - MGLLight
   - name: Style Primitives
     children:
       - MGLFeature
