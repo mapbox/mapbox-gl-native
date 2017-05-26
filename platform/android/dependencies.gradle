@@ -21,7 +21,7 @@ ext {
             mapboxAndroidTelemetry : "com.mapbox.mapboxsdk:mapbox-android-telemetry:${mapboxServicesVersion}@aar",
 
             // mapzen lost
-            lost                   : 'com.mapzen.android:lost:2.3.0-SNAPSHOT',
+            lost                   : 'com.mapzen.android:lost:3.0.0',
 
             // unit test
             junit                  : 'junit:junit:4.12',
