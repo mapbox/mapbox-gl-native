@@ -16,9 +16,12 @@ using namespace mbgl;
 
 namespace {
 
+PremultipliedImage namedImage(const std::string& name) {
+    return decodeImage(util::read_file("test/fixtures/sprites/" + name + ".png"));
+}
+
 std::unique_ptr<style::Image> namedMarker(const std::string& name) {
-    PremultipliedImage image = decodeImage(util::read_file("test/fixtures/sprites/" + name + ".png"));
-    return std::make_unique<style::Image>(name, std::move(image), 1.0);
+    return std::make_unique<style::Image>(name, namedImage(name), 1.0);
 }
 
 class AnnotationTest {
@@ -317,6 +320,19 @@ TEST(Annotations, SwitchStyle) {
 
     test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
     test.checkRendering("switch_style");
+}
+
+TEST(Annotations, ReaddImage) {
+    AnnotationTest test;
+
+    test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
+    test.map.addAnnotationImage(namedMarker("default_marker"));
+    test.map.addAnnotation(SymbolAnnotation { Point<double> { 0, 0 }, "default_marker" });
+
+    test::render(test.map, test.view);
+
+    test.map.addAnnotationImage(std::make_unique<style::Image>("default_marker", namedImage("flipped_marker"), 1.0));
+    test.checkRendering("readd_image");
 }
 
 TEST(Annotations, QueryRenderedFeatures) {
