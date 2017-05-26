@@ -197,19 +197,29 @@ DefaultFileSource::~DefaultFileSource() = default;
 
 void DefaultFileSource::setAPIBaseURL(const std::string& baseURL) {
     thread->invoke(&Impl::setAPIBaseURL, baseURL);
-    cachedBaseURL = baseURL;
+
+    {
+        std::lock_guard<std::mutex> lock(cachedBaseURLMutex);
+        cachedBaseURL = baseURL;
+    }
 }
 
-std::string DefaultFileSource::getAPIBaseURL() const {
+std::string DefaultFileSource::getAPIBaseURL() {
+    std::lock_guard<std::mutex> lock(cachedBaseURLMutex);
     return cachedBaseURL;
 }
 
 void DefaultFileSource::setAccessToken(const std::string& accessToken) {
     thread->invoke(&Impl::setAccessToken, accessToken);
-    cachedAccessToken = accessToken;
+
+    {
+        std::lock_guard<std::mutex> lock(cachedAccessTokenMutex);
+        cachedAccessToken = accessToken;
+    }
 }
 
-std::string DefaultFileSource::getAccessToken() const {
+std::string DefaultFileSource::getAccessToken() {
+    std::lock_guard<std::mutex> lock(cachedAccessTokenMutex);
     return cachedAccessToken;
 }
 
