@@ -140,9 +140,9 @@ public:
     class Impl;
 
 private:
+    // Shared so destruction is done on this thread
+    const std::shared_ptr<FileSource> assetFileSource;
     const std::unique_ptr<util::Thread<Impl>> thread;
-    const std::unique_ptr<FileSource> assetFileSource;
-    const std::unique_ptr<FileSource> localFileSource;
     std::string cachedBaseURL = mbgl::util::API_BASE_URL;
     std::string cachedAccessToken;
 };
