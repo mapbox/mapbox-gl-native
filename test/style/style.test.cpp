@@ -1,10 +1,12 @@
 #include <mbgl/test/util.hpp>
 #include <mbgl/test/stub_file_source.hpp>
+#include <mbgl/test/fixture_log_observer.hpp>
 
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/source_impl.hpp>
 #include <mbgl/style/sources/vector_source.hpp>
 #include <mbgl/style/layer.hpp>
+#include <mbgl/style/layers/line_layer.hpp>
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/default_thread_pool.hpp>
@@ -66,4 +68,34 @@ TEST(Style, DuplicateSource) {
     } catch (std::runtime_error) {
         // Expected
     }
+}
+
+TEST(Style, RemoveSourceInUse) {
+    util::RunLoop loop;
+
+    auto log = new FixtureLogObserver();
+    Log::setObserver(std::unique_ptr<Log::Observer>(log));
+
+    ThreadPool threadPool{ 1 };
+    StubFileSource fileSource;
+    Style style { threadPool, fileSource, 1.0 };
+
+    style.setJSON(util::read_file("test/fixtures/resources/style-unused-sources.json"));
+
+    style.addSource(std::make_unique<VectorSource>("sourceId", "mapbox://mapbox.mapbox-terrain-v2"));
+    style.addLayer(std::make_unique<LineLayer>("layerId", "sourceId"));
+
+    // Should not remove the source
+    auto removed = style.removeSource("sourceId");
+    ASSERT_EQ(nullptr, removed);
+    ASSERT_NE(nullptr, style.getSource("sourceId"));
+
+    const FixtureLogObserver::LogMessage logMessage {
+            EventSeverity::Warning,
+            Event::General,
+            int64_t(-1),
+            "Source 'sourceId' is in use, cannot remove",
+    };
+
+    EXPECT_EQ(log->count(logMessage), 1u);
 }
