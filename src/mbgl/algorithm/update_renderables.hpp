@@ -31,7 +31,7 @@ void updateRenderables(GetTileFn getTile,
         assert(idealRenderTileID.canonical.z <= zoomRange.max);
         assert(dataTileZoom >= idealRenderTileID.canonical.z);
 
-        const OverscaledTileID idealDataTileID(dataTileZoom, idealRenderTileID.canonical);
+        const OverscaledTileID idealDataTileID(dataTileZoom, idealRenderTileID.wrap, idealRenderTileID.canonical);
         auto tile = getTile(idealDataTileID);
         if (!tile) {
             tile = createTile(idealDataTileID);
@@ -64,11 +64,11 @@ void updateRenderables(GetTileFn getTile,
             } else {
                 // Check all four actual child tiles.
                 for (const auto& childTileID : idealDataTileID.canonical.children()) {
-                    const OverscaledTileID childDataTileID(overscaledZ, childTileID);
+                    const OverscaledTileID childDataTileID(overscaledZ, idealRenderTileID.wrap, childTileID);
                     tile = getTile(childDataTileID);
                     if (tile && tile->isRenderable()) {
                         retainTile(*tile, Resource::Necessity::Optional);
-                        renderTile(childDataTileID.unwrapTo(idealRenderTileID.wrap), *tile);
+                        renderTile(childDataTileID.toUnwrapped(), *tile);
                     } else {
                         // At least one child tile doesn't exist, so we are going to look for
                         // parents as well.
@@ -81,8 +81,7 @@ void updateRenderables(GetTileFn getTile,
                 // We couldn't find child tiles that entirely cover the ideal tile.
                 for (overscaledZ = dataTileZoom - 1; overscaledZ >= zoomRange.min; --overscaledZ) {
                     const auto parentDataTileID = idealDataTileID.scaledTo(overscaledZ);
-                    const auto parentRenderTileID =
-                        parentDataTileID.unwrapTo(idealRenderTileID.wrap);
+                    const auto parentRenderTileID = parentDataTileID.toUnwrapped();
 
                     if (checked.find(parentRenderTileID) != checked.end()) {
                         // Break parent tile ascent, this route has been checked by another child
