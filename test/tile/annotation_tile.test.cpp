@@ -81,7 +81,7 @@ TEST(AnnotationTile, Issue8289) {
     TransformState transformState;
     RenderedQueryOptions options;
 
-    tile.queryRenderedFeatures(result, queryGeometry, transformState, options);
+    tile.queryRenderedFeatures(result, queryGeometry, transformState, test.style, options);
 
     EXPECT_TRUE(result.empty());
 }

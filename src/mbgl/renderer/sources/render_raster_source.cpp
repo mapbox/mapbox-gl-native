@@ -67,6 +67,7 @@ void RenderRasterSource::reloadTiles() {
 std::unordered_map<std::string, std::vector<Feature>>
 RenderRasterSource::queryRenderedFeatures(const ScreenLineString&,
                                           const TransformState&,
+                                          const style::Style&,
                                           const RenderedQueryOptions&) const {
     return {};
 }
