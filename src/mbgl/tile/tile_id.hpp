@@ -46,8 +46,8 @@ std::string toString(const CanonicalTileID&);
 // z/x/y describe the
 class OverscaledTileID {
 public:
-    OverscaledTileID(uint8_t overscaledZ, CanonicalTileID);
-    OverscaledTileID(uint8_t overscaledZ, uint8_t z, uint32_t x, uint32_t y);
+    OverscaledTileID(uint8_t overscaledZ, int16_t wrap, CanonicalTileID);
+    OverscaledTileID(uint8_t overscaledZ, int16_t wrap, uint8_t z, uint32_t x, uint32_t y);
     OverscaledTileID(uint8_t z, uint32_t x, uint32_t y);
     explicit OverscaledTileID(const CanonicalTileID&);
     explicit OverscaledTileID(CanonicalTileID&&);
@@ -57,9 +57,10 @@ public:
     bool isChildOf(const OverscaledTileID&) const;
     uint32_t overscaleFactor() const;
     OverscaledTileID scaledTo(uint8_t z) const;
-    UnwrappedTileID unwrapTo(int16_t wrap) const;
+    UnwrappedTileID toUnwrapped() const;
 
     const uint8_t overscaledZ;
+    const int16_t wrap;
     const CanonicalTileID canonical;
 };
 
@@ -137,40 +138,40 @@ inline std::array<CanonicalTileID, 4> CanonicalTileID::children() const {
     } };
 }
 
-inline OverscaledTileID::OverscaledTileID(uint8_t overscaledZ_, CanonicalTileID canonical_)
-    : overscaledZ(overscaledZ_), canonical(std::move(canonical_)) {
+inline OverscaledTileID::OverscaledTileID(uint8_t overscaledZ_, int16_t wrap_, CanonicalTileID canonical_)
+    : overscaledZ(overscaledZ_), wrap(wrap_), canonical(std::move(canonical_)) {
     assert(overscaledZ >= canonical.z);
 }
 
-inline OverscaledTileID::OverscaledTileID(uint8_t overscaledZ_, uint8_t z, uint32_t x, uint32_t y)
-    : overscaledZ(overscaledZ_), canonical(z, x, y) {
+inline OverscaledTileID::OverscaledTileID(uint8_t overscaledZ_, int16_t wrap_, uint8_t z, uint32_t x, uint32_t y)
+    : overscaledZ(overscaledZ_), wrap(wrap_), canonical(z, x, y) {
     assert(overscaledZ >= canonical.z);
 }
 
 inline OverscaledTileID::OverscaledTileID(uint8_t z, uint32_t x, uint32_t y)
-    : overscaledZ(z), canonical(z, x, y) {
+    : overscaledZ(z), wrap(0), canonical(z, x, y) {
 }
 
 inline OverscaledTileID::OverscaledTileID(const CanonicalTileID& canonical_)
-    : overscaledZ(canonical_.z), canonical(canonical_) {
+    : overscaledZ(canonical_.z), wrap(0), canonical(canonical_) {
     assert(overscaledZ >= canonical.z);
 }
 
 inline OverscaledTileID::OverscaledTileID(CanonicalTileID&& canonical_)
-    : overscaledZ(canonical_.z), canonical(std::forward<CanonicalTileID>(canonical_)) {
+    : overscaledZ(canonical_.z), wrap(0), canonical(std::forward<CanonicalTileID>(canonical_)) {
     assert(overscaledZ >= canonical.z);
 }
 
 inline bool OverscaledTileID::operator==(const OverscaledTileID& rhs) const {
-    return overscaledZ == rhs.overscaledZ && canonical == rhs.canonical;
+    return overscaledZ == rhs.overscaledZ && wrap == rhs.wrap &&canonical == rhs.canonical;
 }
 
 inline bool OverscaledTileID::operator!=(const OverscaledTileID& rhs) const {
-    return overscaledZ != rhs.overscaledZ || canonical != rhs.canonical;
+    return overscaledZ != rhs.overscaledZ || wrap != rhs.wrap || canonical != rhs.canonical;
 }
 
 inline bool OverscaledTileID::operator<(const OverscaledTileID& rhs) const {
-    return std::tie(overscaledZ, canonical) < std::tie(rhs.overscaledZ, rhs.canonical);
+    return std::tie(overscaledZ, wrap, canonical) < std::tie(rhs.overscaledZ, rhs.wrap, rhs.canonical);
 }
 
 inline uint32_t OverscaledTileID::overscaleFactor() const {
@@ -183,10 +184,10 @@ inline bool OverscaledTileID::isChildOf(const OverscaledTileID& rhs) const {
 }
 
 inline OverscaledTileID OverscaledTileID::scaledTo(uint8_t z) const {
-    return { z, z >= canonical.z ? canonical : canonical.scaledTo(z) };
+    return { z, wrap, z >= canonical.z ? canonical : canonical.scaledTo(z) };
 }
 
-inline UnwrappedTileID OverscaledTileID::unwrapTo(int16_t wrap) const {
+inline UnwrappedTileID OverscaledTileID::toUnwrapped() const {
     return { wrap, canonical };
 }
 
@@ -232,7 +233,7 @@ inline std::array<UnwrappedTileID, 4> UnwrappedTileID::children() const {
 
 inline OverscaledTileID UnwrappedTileID::overscaleTo(const uint8_t overscaledZ) const {
     assert(overscaledZ >= canonical.z);
-    return { overscaledZ, canonical };
+    return { overscaledZ, wrap, canonical };
 }
 
 inline float UnwrappedTileID::pixelsToTileUnits(const float pixelValue, const float zoom) const {
