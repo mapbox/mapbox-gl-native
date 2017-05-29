@@ -306,13 +306,13 @@ void Style::update(const UpdateParameters& parameters) {
     const bool zoomChanged = zoomHistory.update(parameters.transformState.getZoom(), parameters.timePoint);
 
     const TransitionParameters transitionParameters {
-        parameters.timePoint,
+        parameters.mode == MapMode::Continuous ? parameters.timePoint : Clock::time_point::max(),
         parameters.mode == MapMode::Continuous ? transitionOptions : TransitionOptions()
     };
 
     const PropertyEvaluationParameters evaluationParameters {
         zoomHistory,
-        parameters.timePoint,
+        parameters.mode == MapMode::Continuous ? parameters.timePoint : Clock::time_point::max(),
         parameters.mode == MapMode::Continuous ? util::DEFAULT_FADE_DURATION : Duration::zero()
     };
 
