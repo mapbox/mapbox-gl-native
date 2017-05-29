@@ -181,6 +181,7 @@ void GeometryTile::queryRenderedFeatures(
     std::unordered_map<std::string, std::vector<Feature>>& result,
     const GeometryCoordinates& queryGeometry,
     const TransformState& transformState,
+    const style::Style& style_,
     const RenderedQueryOptions& options) {
 
     if (!featureIndex || !data) return;
@@ -193,7 +194,7 @@ void GeometryTile::queryRenderedFeatures(
                         options,
                         *data,
                         id.canonical,
-                        style,
+                        style_,
                         collisionTile.get(),
                         *this);
 }

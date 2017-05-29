@@ -697,13 +697,13 @@ std::vector<Feature> Style::queryRenderedFeatures(const ScreenLineString& geomet
         }
         for (const auto& sourceID : sourceIDs) {
             if (RenderSource* renderSource = getRenderSource(sourceID)) {
-                auto sourceResults = renderSource->queryRenderedFeatures(geometry, transformState, options);
+                auto sourceResults = renderSource->queryRenderedFeatures(geometry, transformState, *this, options);
                 std::move(sourceResults.begin(), sourceResults.end(), std::inserter(resultsByLayer, resultsByLayer.begin()));
             }
         }
     } else {
         for (const auto& entry : renderSources) {
-            auto sourceResults = entry.second->queryRenderedFeatures(geometry, transformState, options);
+            auto sourceResults = entry.second->queryRenderedFeatures(geometry, transformState, *this, options);
             std::move(sourceResults.begin(), sourceResults.end(), std::inserter(resultsByLayer, resultsByLayer.begin()));
         }
     }
