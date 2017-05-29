@@ -6,8 +6,10 @@
 #include <mbgl/style/layer_type.hpp>
 #include <mbgl/style/types.hpp>
 
+#include <cassert>
 #include <memory>
 #include <string>
+#include <stdexcept>
 
 namespace mbgl {
 namespace style {
@@ -89,6 +91,11 @@ public:
         case LayerType::FillExtrusion:
             return std::forward<V>(visitor)(*as<FillExtrusionLayer>());
         }
+
+
+        // Not reachable, but placate GCC.
+        assert(false);
+        throw new std::runtime_error("unknown layer type");
     }
 
     LayerType getType() const;
