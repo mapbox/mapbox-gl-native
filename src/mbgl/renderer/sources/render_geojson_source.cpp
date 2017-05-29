@@ -74,9 +74,10 @@ void RenderGeoJSONSource::reloadTiles() {
 
 std::unordered_map<std::string, std::vector<Feature>>
 RenderGeoJSONSource::queryRenderedFeatures(const ScreenLineString& geometry,
-                                          const TransformState& transformState,
-                                          const RenderedQueryOptions& options) const {
-    return tilePyramid.queryRenderedFeatures(geometry, transformState, options);
+                                           const TransformState& transformState,
+                                           const style::Style& style,
+                                           const RenderedQueryOptions& options) const {
+    return tilePyramid.queryRenderedFeatures(geometry, transformState, style, options);
 }
 
 std::vector<Feature> RenderGeoJSONSource::querySourceFeatures(const SourceQueryOptions& options) const {

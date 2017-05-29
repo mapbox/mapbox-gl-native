@@ -55,6 +55,7 @@ public:
             std::unordered_map<std::string, std::vector<Feature>>& result,
             const GeometryCoordinates& queryGeometry,
             const TransformState&,
+            const style::Style&,
             const RenderedQueryOptions& options) override;
 
     void querySourceFeatures(
@@ -92,6 +93,8 @@ private:
     void invokePlacement();
 
     const std::string sourceID;
+
+    // TODO: remove
     style::Style& style;
 
     // Used to signal the worker that it should abandon parsing this tile as soon as possible.

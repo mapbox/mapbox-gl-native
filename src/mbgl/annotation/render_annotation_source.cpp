@@ -59,9 +59,10 @@ void RenderAnnotationSource::reloadTiles() {
 
 std::unordered_map<std::string, std::vector<Feature>>
 RenderAnnotationSource::queryRenderedFeatures(const ScreenLineString& geometry,
-                                          const TransformState& transformState,
-                                          const RenderedQueryOptions& options) const {
-    return tilePyramid.queryRenderedFeatures(geometry, transformState, options);
+                                              const TransformState& transformState,
+                                              const style::Style& style,
+                                              const RenderedQueryOptions& options) const {
+    return tilePyramid.queryRenderedFeatures(geometry, transformState, style, options);
 }
 
 std::vector<Feature> RenderAnnotationSource::querySourceFeatures(const SourceQueryOptions&) const {

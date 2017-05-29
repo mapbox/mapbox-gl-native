@@ -25,6 +25,10 @@ class PlacementConfig;
 class RenderedQueryOptions;
 class SourceQueryOptions;
 
+namespace style {
+class Style;
+} // namespace style
+
 class Tile : private util::noncopyable {
 public:
     Tile(OverscaledTileID);
@@ -53,6 +57,7 @@ public:
             std::unordered_map<std::string, std::vector<Feature>>& result,
             const GeometryCoordinates& queryGeometry,
             const TransformState&,
+            const style::Style&,
             const RenderedQueryOptions& options);
 
     virtual void querySourceFeatures(

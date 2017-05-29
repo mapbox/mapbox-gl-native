@@ -71,8 +71,9 @@ void RenderVectorSource::reloadTiles() {
 std::unordered_map<std::string, std::vector<Feature>>
 RenderVectorSource::queryRenderedFeatures(const ScreenLineString& geometry,
                                           const TransformState& transformState,
+                                          const style::Style& style,
                                           const RenderedQueryOptions& options) const {
-    return tilePyramid.queryRenderedFeatures(geometry, transformState, options);
+    return tilePyramid.queryRenderedFeatures(geometry, transformState, style, options);
 }
 
 std::vector<Feature> RenderVectorSource::querySourceFeatures(const SourceQueryOptions& options) const {
