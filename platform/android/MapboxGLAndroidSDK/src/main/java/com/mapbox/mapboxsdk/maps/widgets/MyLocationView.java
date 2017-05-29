@@ -749,7 +749,7 @@ public class MyLocationView extends View {
     abstract void invalidate();
   }
 
-  private class MyLocationTrackingBehavior extends MyLocationBehavior implements MapboxMap.CancelableCallback {
+  private class MyLocationTrackingBehavior extends MyLocationBehavior {
 
     @Override
     void updateLatLng(@NonNull Location location) {
@@ -791,7 +791,8 @@ public class MyLocationView extends View {
       // disable dismiss of tracking settings, enabled in #onFinish
       mapboxMap.getTrackingSettings().setDismissTrackingModeForCameraPositionChange(false);
       // ease to new camera position with a linear interpolator
-      mapboxMap.easeCamera(CameraUpdateFactory.newCameraPosition(builder.build()), animationDuration, false, this);
+      mapboxMap.easeCamera(CameraUpdateFactory.newCameraPosition(builder.build()), animationDuration, false, null,
+        true);
     }
 
     @Override
@@ -801,22 +802,6 @@ public class MyLocationView extends View {
       float y = (getHeight() - mapPadding[3] + mapPadding[1]) / 2 + contentPaddingY;
       screenLocation = new PointF(x, y);
       MyLocationView.this.invalidate();
-    }
-
-    @Override
-    public void onCancel() {
-      //no op
-    }
-
-    @Override
-    public void onFinish() {
-      // Posting to end message queue to avoid race condition #8560
-      post(new Runnable() {
-        @Override
-        public void run() {
-          mapboxMap.getTrackingSettings().setDismissTrackingModeForCameraPositionChange(true);
-        }
-      });
     }
   }
 

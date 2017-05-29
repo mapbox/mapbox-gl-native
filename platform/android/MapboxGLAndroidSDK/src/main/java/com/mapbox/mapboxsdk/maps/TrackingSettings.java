@@ -306,7 +306,7 @@ public final class TrackingSettings {
    * <p>
    * </p>
    *
-   * @param willAllowToDismiss True will allow animated camera changes dismiss a trackig mode
+   * @param willAllowToDismiss True will allow animated camera changes dismiss a tracking mode
    */
   public void setDismissTrackingModeForCameraPositionChange(boolean willAllowToDismiss) {
     isResetTrackingWithCameraPositionChange = willAllowToDismiss;
