@@ -176,15 +176,12 @@ void TilePyramid::update(const std::vector<Immutable<style::Layer::Impl>>& layer
     removeStaleTiles(retain);
 
     for (auto& pair : tiles) {
-        // TODO: Calculating yStretch based on tile distance means we can no longer use the same collision tile for two wrapped
-        // copies of the same data tile. For now the assumption that we're always at "wrap = 0" means collision detection is broken
-        // for wrapped tiles.
         const PlacementConfig config { parameters.transformState.getAngle(),
                                        parameters.transformState.getPitch(),
                                        parameters.transformState.getCameraToCenterDistance(),
-                                       parameters.transformState.getCameraToTileDistance(pair.first.unwrapTo(0)),
+                                       parameters.transformState.getCameraToTileDistance(pair.first.toUnwrapped()),
                                        parameters.debugOptions & MapDebugOptions::Collision };
-        
+
         pair.second->setPlacementConfig(config);
     }
 }

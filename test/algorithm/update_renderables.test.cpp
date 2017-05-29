@@ -23,10 +23,10 @@ struct GetTileDataAction {
 };
 
 std::ostream& operator<<(std::ostream& os, const GetTileDataAction& action) {
-    return os << "GetTileDataAction{ { " << int(action.tileID.overscaledZ) << ", { "
+    return os << "GetTileDataAction{ { " << int(action.tileID.overscaledZ) << ", " << int(action.tileID.wrap) << ", { "
               << int(action.tileID.canonical.z) << ", " << action.tileID.canonical.x << ", "
               << action.tileID.canonical.y << " } }, "
-              << (action.found == Found ? "Found" : "NotFound") << " }";
+              << (action.found == Found ? "Found" : "NotFound") << " }\n";
 }
 
 struct CreateTileDataAction {
@@ -38,9 +38,9 @@ struct CreateTileDataAction {
 };
 
 std::ostream& operator<<(std::ostream& os, const CreateTileDataAction& action) {
-    return os << "CreateTileDataAction{ { " << int(action.tileID.overscaledZ) << ", { "
+    return os << "CreateTileDataAction{ { " << int(action.tileID.overscaledZ) << ", " << int(action.tileID.wrap) << ", { "
               << int(action.tileID.canonical.z) << ", " << action.tileID.canonical.x << ", "
-              << action.tileID.canonical.y << " } } }";
+              << action.tileID.canonical.y << " } } }\n";
 }
 
 struct RetainTileDataAction {
@@ -53,10 +53,10 @@ struct RetainTileDataAction {
 };
 
 std::ostream& operator<<(std::ostream& os, const RetainTileDataAction& action) {
-    return os << "RetainTileDataAction{ { " << int(action.tileID.overscaledZ) << ", { "
+    return os << "RetainTileDataAction{ { " << int(action.tileID.overscaledZ) << ", " << int(action.tileID.wrap) << ", { "
               << int(action.tileID.canonical.z) << ", " << action.tileID.canonical.x << ", "
               << action.tileID.canonical.y << " } }, "
-              << (action.necessity == Resource::Necessity::Required ? "Required" : "Optional") << " }";
+              << (action.necessity == Resource::Necessity::Required ? "Required" : "Optional") << " }\n";
 }
 
 struct RenderTileAction {
@@ -76,7 +76,7 @@ std::ostream& operator<<(std::ostream& os, const RenderTileAction& action) {
               << int(action.tileData.tileID.overscaledZ) << "_"
               << int(action.tileData.tileID.canonical.z) << "_"
               << action.tileData.tileID.canonical.x << "_" << action.tileData.tileID.canonical.y
-              << " }";
+              << " }\n";
 }
 
 using ActionLogEntry =
@@ -129,8 +129,8 @@ TEST(UpdateRenderables, SingleTile) {
     algorithm::updateRenderables(getTileData, createTileData, retainTileData, renderTile,
                                  source.idealTiles, source.zoomRange, 1);
     EXPECT_EQ(ActionLog({
-                  GetTileDataAction{ { 1, { 1, 1, 1 } }, Found },       // found ideal tile
-                  RetainTileDataAction{ { 1, { 1, 1, 1 } }, Resource::Necessity::Required }, //
+                  GetTileDataAction{ { 1, 0, { 1, 1, 1 } }, Found },       // found ideal tile
+                  RetainTileDataAction{ { 1, 0, { 1, 1, 1 } }, Resource::Necessity::Required }, //
                   RenderTileAction{ { 1, 1, 1 }, *tile_1_1_1_1 },       // render ideal tile
               }),
               log);
@@ -140,8 +140,8 @@ TEST(UpdateRenderables, SingleTile) {
     algorithm::updateRenderables(getTileData, createTileData, retainTileData, renderTile,
                                  source.idealTiles, source.zoomRange, 1);
     EXPECT_EQ(ActionLog({
-                  GetTileDataAction{ { 1, { 1, 1, 1 } }, Found },       // found ideal tile
-                  RetainTileDataAction{ { 1, { 1, 1, 1 } }, Resource::Necessity::Required }, //
+                  GetTileDataAction{ { 1, 0, { 1, 1, 1 } }, Found },       // found ideal tile
+                  RetainTileDataAction{ { 1, 0, { 1, 1, 1 } }, Resource::Necessity::Required }, //
                   RenderTileAction{ { 1, 1, 1 }, *tile_1_1_1_1 },       // render ideal tile
               }),
               log);
@@ -152,39 +152,39 @@ TEST(UpdateRenderables, SingleTile) {
     algorithm::updateRenderables(getTileData, createTileData, retainTileData, renderTile,
                                  source.idealTiles, source.zoomRange, 1);
     EXPECT_EQ(ActionLog({
-                  GetTileDataAction{ { 1, { 1, 0, 1 } }, NotFound },    // missing ideal tile
-                  CreateTileDataAction{ { 1, { 1, 0, 1 } } },           // create ideal tile
-                  RetainTileDataAction{ { 1, { 1, 0, 1 } }, Resource::Necessity::Required }, //
-                  GetTileDataAction{ { 2, { 2, 0, 2 } }, NotFound },    // four child tiles
-                  GetTileDataAction{ { 2, { 2, 0, 3 } }, NotFound },    // ...
-                  GetTileDataAction{ { 2, { 2, 1, 2 } }, NotFound },    // ...
-                  GetTileDataAction{ { 2, { 2, 1, 3 } }, NotFound },    // ...
-                  GetTileDataAction{ { 0, { 0, 0, 0 } }, NotFound },    // parent tile
+                  GetTileDataAction{ { 1, 0, { 1, 0, 1 } }, NotFound },    // missing ideal tile
+                  CreateTileDataAction{ { 1, 0, { 1, 0, 1 } } },           // create ideal tile
+                  RetainTileDataAction{ { 1, 0, { 1, 0, 1 } }, Resource::Necessity::Required }, //
+                  GetTileDataAction{ { 2, 0, { 2, 0, 2 } }, NotFound },    // four child tiles
+                  GetTileDataAction{ { 2, 0, { 2, 0, 3 } }, NotFound },    // ...
+                  GetTileDataAction{ { 2, 0, { 2, 1, 2 } }, NotFound },    // ...
+                  GetTileDataAction{ { 2, 0, { 2, 1, 3 } }, NotFound },    // ...
+                  GetTileDataAction{ { 0, 0, { 0, 0, 0 } }, NotFound },    // parent tile
 
-                  GetTileDataAction{ { 1, { 1, 1, 1 } }, Found },       // found ideal tile
-                  RetainTileDataAction{ { 1, { 1, 1, 1 } }, Resource::Necessity::Required }, //
+                  GetTileDataAction{ { 1, 0, { 1, 1, 1 } }, Found },       // found ideal tile
+                  RetainTileDataAction{ { 1, 0, { 1, 1, 1 } }, Resource::Necessity::Required }, //
                   RenderTileAction{ { 1, 1, 1 }, *tile_1_1_1_1 },       // render found tile
               }),
               log);
 
     // Mark the created tile as having the optional request tried.
     log.clear();
-    source.dataTiles[{ 1, { 1, 0, 1 } }]->triedOptional = true;
+    source.dataTiles[{ 1, 0, { 1, 0, 1 } }]->triedOptional = true;
     algorithm::updateRenderables(getTileData, createTileData, retainTileData, renderTile,
                                  source.idealTiles, source.zoomRange, 1);
     EXPECT_EQ(ActionLog({
-                  GetTileDataAction{ { 1, { 1, 0, 1 } }, Found },       // missing ideal tile
-                  RetainTileDataAction{ { 1, { 1, 0, 1 } }, Resource::Necessity::Required }, //
-                  GetTileDataAction{ { 2, { 2, 0, 2 } }, NotFound },    // four child tiles
-                  GetTileDataAction{ { 2, { 2, 0, 3 } }, NotFound },    // ...
-                  GetTileDataAction{ { 2, { 2, 1, 2 } }, NotFound },    // ...
-                  GetTileDataAction{ { 2, { 2, 1, 3 } }, NotFound },    // ...
-                  GetTileDataAction{ { 0, { 0, 0, 0 } }, NotFound },    // parent tile
-                  CreateTileDataAction{ { 0, { 0, 0, 0 } } },           // load parent tile
-                  RetainTileDataAction{ { 0, { 0, 0, 0 } }, Resource::Necessity::Optional }, //
+                  GetTileDataAction{ { 1, 0, { 1, 0, 1 } }, Found },       // missing ideal tile
+                  RetainTileDataAction{ { 1, 0, { 1, 0, 1 } }, Resource::Necessity::Required }, //
+                  GetTileDataAction{ { 2, 0, { 2, 0, 2 } }, NotFound },    // four child tiles
+                  GetTileDataAction{ { 2, 0, { 2, 0, 3 } }, NotFound },    // ...
+                  GetTileDataAction{ { 2, 0, { 2, 1, 2 } }, NotFound },    // ...
+                  GetTileDataAction{ { 2, 0, { 2, 1, 3 } }, NotFound },    // ...
+                  GetTileDataAction{ { 0, 0, { 0, 0, 0 } }, NotFound },    // parent tile
+                  CreateTileDataAction{ { 0, 0, { 0, 0, 0 } } },           // load parent tile
+                  RetainTileDataAction{ { 0, 0, { 0, 0, 0 } }, Resource::Necessity::Optional }, //
 
-                  GetTileDataAction{ { 1, { 1, 1, 1 } }, Found },       // found ideal tile
-                  RetainTileDataAction{ { 1, { 1, 1, 1 } }, Resource::Necessity::Required }, //
+                  GetTileDataAction{ { 1, 0, { 1, 1, 1 } }, Found },       // found ideal tile
+                  RetainTileDataAction{ { 1, 0, { 1, 1, 1 } }, Resource::Necessity::Required }, //
                   RenderTileAction{ { 1, 1, 1 }, *tile_1_1_1_1 },       // render found tile
               }),
               log);
@@ -196,12 +196,12 @@ TEST(UpdateRenderables, SingleTile) {
     algorithm::updateRenderables(getTileData, createTileData, retainTileData, renderTile,
                                  source.idealTiles, source.zoomRange, 1);
     EXPECT_EQ(ActionLog({
-                  GetTileDataAction{ { 1, { 1, 0, 1 } }, Found },       // newly added tile
-                  RetainTileDataAction{ { 1, { 1, 0, 1 } }, Resource::Necessity::Required }, //
+                  GetTileDataAction{ { 1, 0, { 1, 0, 1 } }, Found },       // newly added tile
+                  RetainTileDataAction{ { 1, 0, { 1, 0, 1 } }, Resource::Necessity::Required }, //
                   RenderTileAction{ { 1, 0, 1 }, *tile_1_1_0_1 },       // render ideal tile
 
-                  GetTileDataAction{ { 1, { 1, 1, 1 } }, Found },       // ideal tile
-                  RetainTileDataAction{ { 1, { 1, 1, 1 } }, Resource::Necessity::Required }, //
+                  GetTileDataAction{ { 1, 0, { 1, 1, 1 } }, Found },       // ideal tile
+                  RetainTileDataAction{ { 1, 0, { 1, 1, 1 } }, Resource::Necessity::Required }, //
                   RenderTileAction{ { 1, 1, 1 }, *tile_1_1_1_1 },       // render found tile
               }),
               log);
@@ -215,22 +215,22 @@ TEST(UpdateRenderables, SingleTile) {
     algorithm::updateRenderables(getTileData, createTileData, retainTileData, renderTile,
                                  source.idealTiles, source.zoomRange, 1);
     EXPECT_EQ(ActionLog({
-                  GetTileDataAction{ { 1, { 1, 0, 0 } }, Found },       // found tile, not ready
-                  RetainTileDataAction{ { 1, { 1, 0, 0 } }, Resource::Necessity::Required }, //
-                  GetTileDataAction{ { 2, { 2, 0, 0 } }, NotFound },    // four child tiles
-                  GetTileDataAction{ { 2, { 2, 0, 1 } }, NotFound },    // ...
-                  GetTileDataAction{ { 2, { 2, 1, 0 } }, NotFound },    // ...
-                  GetTileDataAction{ { 2, { 2, 1, 1 } }, NotFound },    // ...
-                  GetTileDataAction{ { 0, { 0, 0, 0 } }, Found },       // parent tile
-                  RetainTileDataAction{ { 0, { 0, 0, 0 } }, Resource::Necessity::Optional }, //
+                  GetTileDataAction{ { 1, 0, { 1, 0, 0 } }, Found },       // found tile, not ready
+                  RetainTileDataAction{ { 1, 0, { 1, 0, 0 } }, Resource::Necessity::Required }, //
+                  GetTileDataAction{ { 2, 0, { 2, 0, 0 } }, NotFound },    // four child tiles
+                  GetTileDataAction{ { 2, 0, { 2, 0, 1 } }, NotFound },    // ...
+                  GetTileDataAction{ { 2, 0, { 2, 1, 0 } }, NotFound },    // ...
+                  GetTileDataAction{ { 2, 0, { 2, 1, 1 } }, NotFound },    // ...
+                  GetTileDataAction{ { 0, 0, { 0, 0, 0 } }, Found },       // parent tile
+                  RetainTileDataAction{ { 0, 0, { 0, 0, 0 } }, Resource::Necessity::Optional }, //
                   // optional parent tile was already created before, but is not renderable
 
-                  GetTileDataAction{ { 1, { 1, 0, 1 } }, Found },       // ideal tile
-                  RetainTileDataAction{ { 1, { 1, 0, 1 } }, Resource::Necessity::Required }, //
+                  GetTileDataAction{ { 1, 0, { 1, 0, 1 } }, Found },       // ideal tile
+                  RetainTileDataAction{ { 1, 0, { 1, 0, 1 } }, Resource::Necessity::Required }, //
                   RenderTileAction{ { 1, 0, 1 }, *tile_1_1_0_1 },       // render ideal tile
 
-                  GetTileDataAction{ { 1, { 1, 1, 1 } }, Found },       // ideal tile
-                  RetainTileDataAction{ { 1, { 1, 1, 1 } }, Resource::Necessity::Required }, //
+                  GetTileDataAction{ { 1, 0, { 1, 1, 1 } }, Found },       // ideal tile
+                  RetainTileDataAction{ { 1, 0, { 1, 1, 1 } }, Resource::Necessity::Required }, //
                   RenderTileAction{ { 1, 1, 1 }, *tile_1_1_1_1 },       // render ideal tile
               }),
               log);
@@ -241,16 +241,16 @@ TEST(UpdateRenderables, SingleTile) {
     algorithm::updateRenderables(getTileData, createTileData, retainTileData, renderTile,
                                  source.idealTiles, source.zoomRange, 1);
     EXPECT_EQ(ActionLog({
-                  GetTileDataAction{ { 1, { 1, 0, 0 } }, Found },       // found tile, now ready
-                  RetainTileDataAction{ { 1, { 1, 0, 0 } }, Resource::Necessity::Required }, //
+                  GetTileDataAction{ { 1, 0, { 1, 0, 0 } }, Found },       // found tile, now ready
+                  RetainTileDataAction{ { 1, 0, { 1, 0, 0 } }, Resource::Necessity::Required }, //
                   RenderTileAction{ { 1, 0, 0 }, *tile_1_1_0_0 },       //
 
-                  GetTileDataAction{ { 1, { 1, 0, 1 } }, Found },       // ideal tile
-                  RetainTileDataAction{ { 1, { 1, 0, 1 } }, Resource::Necessity::Required }, //
+                  GetTileDataAction{ { 1, 0, { 1, 0, 1 } }, Found },       // ideal tile
+                  RetainTileDataAction{ { 1, 0, { 1, 0, 1 } }, Resource::Necessity::Required }, //
                   RenderTileAction{ { 1, 0, 1 }, *tile_1_1_0_1 },       //
 
-                  GetTileDataAction{ { 1, { 1, 1, 1 } }, Found },       // ideal tile
-                  RetainTileDataAction{ { 1, { 1, 1, 1 } }, Resource::Necessity::Required }, //
+                  GetTileDataAction{ { 1, 0, { 1, 1, 1 } }, Found },       // ideal tile
+                  RetainTileDataAction{ { 1, 0, { 1, 1, 1 } }, Resource::Necessity::Required }, //
                   RenderTileAction{ { 1, 1, 1 }, *tile_1_1_1_1 },       //
               }),
               log);
@@ -274,30 +274,30 @@ TEST(UpdateRenderables, UseParentTile) {
     algorithm::updateRenderables(getTileData, createTileData, retainTileData, renderTile,
                                  source.idealTiles, source.zoomRange, 1);
     EXPECT_EQ(ActionLog({
-                  GetTileDataAction{ { 1, { 1, 0, 1 } }, NotFound },    // missing ideal tile
-                  CreateTileDataAction{ { 1, { 1, 0, 1 } } },           //
-                  RetainTileDataAction{ { 1, { 1, 0, 1 } }, Resource::Necessity::Required }, //
-                  GetTileDataAction{ { 2, { 2, 0, 2 } }, NotFound },    // child tile
-                  GetTileDataAction{ { 2, { 2, 0, 3 } }, NotFound },    // ...
-                  GetTileDataAction{ { 2, { 2, 1, 2 } }, NotFound },    // ...
-                  GetTileDataAction{ { 2, { 2, 1, 3 } }, NotFound },    // ...
-                  GetTileDataAction{ { 0, { 0, 0, 0 } }, Found },       // parent found!
-                  RetainTileDataAction{ { 0, { 0, 0, 0 } }, Resource::Necessity::Optional }, //
+                  GetTileDataAction{ { 1, 0, { 1, 0, 1 } }, NotFound },    // missing ideal tile
+                  CreateTileDataAction{ { 1, 0, { 1, 0, 1 } } },           //
+                  RetainTileDataAction{ { 1, 0, { 1, 0, 1 } }, Resource::Necessity::Required }, //
+                  GetTileDataAction{ { 2, 0, { 2, 0, 2 } }, NotFound },    // child tile
+                  GetTileDataAction{ { 2, 0, { 2, 0, 3 } }, NotFound },    // ...
+                  GetTileDataAction{ { 2, 0, { 2, 1, 2 } }, NotFound },    // ...
+                  GetTileDataAction{ { 2, 0, { 2, 1, 3 } }, NotFound },    // ...
+                  GetTileDataAction{ { 0, 0, { 0, 0, 0 } }, Found },       // parent found!
+                  RetainTileDataAction{ { 0, 0, { 0, 0, 0 } }, Resource::Necessity::Optional }, //
                   RenderTileAction{ { 0, 0, 0 }, *tile_0_0_0_0 },       // render parent
-                  GetTileDataAction{ { 1, { 1, 1, 0 } }, NotFound },    // missing ideal tile
-                  CreateTileDataAction{ { 1, { 1, 1, 0 } } },           //
-                  RetainTileDataAction{ { 1, { 1, 1, 0 } }, Resource::Necessity::Required }, //
-                  GetTileDataAction{ { 2, { 2, 2, 0 } }, NotFound },    // child tile
-                  GetTileDataAction{ { 2, { 2, 2, 1 } }, NotFound },    // ...
-                  GetTileDataAction{ { 2, { 2, 3, 0 } }, NotFound },    // ...
-                  GetTileDataAction{ { 2, { 2, 3, 1 } }, NotFound },    // ...
-                  GetTileDataAction{ { 1, { 1, 1, 1 } }, NotFound },    // missing tile
-                  CreateTileDataAction{ { 1, { 1, 1, 1 } } },           //
-                  RetainTileDataAction{ { 1, { 1, 1, 1 } }, Resource::Necessity::Required }, //
-                  GetTileDataAction{ { 2, { 2, 2, 2 } }, NotFound },    // child tile
-                  GetTileDataAction{ { 2, { 2, 2, 3 } }, NotFound },    // ...
-                  GetTileDataAction{ { 2, { 2, 3, 2 } }, NotFound },    // ...
-                  GetTileDataAction{ { 2, { 2, 3, 3 } }, NotFound },    // ...
+                  GetTileDataAction{ { 1, 0, { 1, 1, 0 } }, NotFound },    // missing ideal tile
+                  CreateTileDataAction{ { 1, 0, { 1, 1, 0 } } },           //
+                  RetainTileDataAction{ { 1, 0, { 1, 1, 0 } }, Resource::Necessity::Required }, //
+                  GetTileDataAction{ { 2, 0, { 2, 2, 0 } }, NotFound },    // child tile
+                  GetTileDataAction{ { 2, 0, { 2, 2, 1 } }, NotFound },    // ...
+                  GetTileDataAction{ { 2, 0, { 2, 3, 0 } }, NotFound },    // ...
+                  GetTileDataAction{ { 2, 0, { 2, 3, 1 } }, NotFound },    // ...
+                  GetTileDataAction{ { 1, 0, { 1, 1, 1 } }, NotFound },    // missing tile
+                  CreateTileDataAction{ { 1, 0, { 1, 1, 1 } } },           //
+                  RetainTileDataAction{ { 1, 0, { 1, 1, 1 } }, Resource::Necessity::Required }, //
+                  GetTileDataAction{ { 2, 0, { 2, 2, 2 } }, NotFound },    // child tile
+                  GetTileDataAction{ { 2, 0, { 2, 2, 3 } }, NotFound },    // ...
+                  GetTileDataAction{ { 2, 0, { 2, 3, 2 } }, NotFound },    // ...
+                  GetTileDataAction{ { 2, 0, { 2, 3, 3 } }, NotFound },    // ...
               }),
               log);
 }
@@ -317,34 +317,34 @@ TEST(UpdateRenderables, DontUseWrongParentTile) {
     algorithm::updateRenderables(getTileData, createTileData, retainTileData, renderTile,
                                  source.idealTiles, source.zoomRange, 2);
     EXPECT_EQ(ActionLog({
-                  GetTileDataAction{ { 2, { 2, 0, 0 } }, NotFound },    // missing ideal tile
-                  CreateTileDataAction{ { 2, { 2, 0, 0 } } },           //
-                  RetainTileDataAction{ { 2, { 2, 0, 0 } }, Resource::Necessity::Required }, //
-                  GetTileDataAction{ { 3, { 3, 0, 0 } }, NotFound },    // child tile
-                  GetTileDataAction{ { 3, { 3, 0, 1 } }, NotFound },    // ...
-                  GetTileDataAction{ { 3, { 3, 1, 0 } }, NotFound },    // ...
-                  GetTileDataAction{ { 3, { 3, 1, 1 } }, NotFound },    // ...
-                  GetTileDataAction{ { 1, { 1, 0, 0 } }, NotFound },    // parent tile, missing
-                  GetTileDataAction{ { 0, { 0, 0, 0 } }, NotFound },    // parent tile, missing
+                  GetTileDataAction{ { 2, 0, { 2, 0, 0 } }, NotFound },    // missing ideal tile
+                  CreateTileDataAction{ { 2, 0, { 2, 0, 0 } } },           //
+                  RetainTileDataAction{ { 2, 0, { 2, 0, 0 } }, Resource::Necessity::Required }, //
+                  GetTileDataAction{ { 3, 0, { 3, 0, 0 } }, NotFound },    // child tile
+                  GetTileDataAction{ { 3, 0, { 3, 0, 1 } }, NotFound },    // ...
+                  GetTileDataAction{ { 3, 0, { 3, 1, 0 } }, NotFound },    // ...
+                  GetTileDataAction{ { 3, 0, { 3, 1, 1 } }, NotFound },    // ...
+                  GetTileDataAction{ { 1, 0, { 1, 0, 0 } }, NotFound },    // parent tile, missing
+                  GetTileDataAction{ { 0, 0, { 0, 0, 0 } }, NotFound },    // parent tile, missing
               }),
               log);
 
     // Now mark the created tile as having the optional request tried.
     log.clear();
-    source.dataTiles[{ 2, { 2, 0, 0 } }]->triedOptional = true;
+    source.dataTiles[{ 2, 0, { 2, 0, 0 } }]->triedOptional = true;
     algorithm::updateRenderables(getTileData, createTileData, retainTileData, renderTile,
                                  source.idealTiles, source.zoomRange, 2);
     EXPECT_EQ(ActionLog({
-                  GetTileDataAction{ { 2, { 2, 0, 0 } }, Found },       // non-ready ideal tile
-                  RetainTileDataAction{ { 2, { 2, 0, 0 } }, Resource::Necessity::Required }, //
-                  GetTileDataAction{ { 3, { 3, 0, 0 } }, NotFound },    // child tile
-                  GetTileDataAction{ { 3, { 3, 0, 1 } }, NotFound },    // ...
-                  GetTileDataAction{ { 3, { 3, 1, 0 } }, NotFound },    // ...
-                  GetTileDataAction{ { 3, { 3, 1, 1 } }, NotFound },    // ...
-                  GetTileDataAction{ { 1, { 1, 0, 0 } }, NotFound },    // parent tile, missing
-                  CreateTileDataAction{ { 1, { 1, 0, 0 } } },           // find optional parent
-                  RetainTileDataAction{ { 1, { 1, 0, 0 } }, Resource::Necessity::Optional }, //
-                  GetTileDataAction{ { 0, { 0, 0, 0 } }, NotFound },    // parent tile, missing
+                  GetTileDataAction{ { 2, 0, { 2, 0, 0 } }, Found },       // non-ready ideal tile
+                  RetainTileDataAction{ { 2, 0, { 2, 0, 0 } }, Resource::Necessity::Required }, //
+                  GetTileDataAction{ { 3, 0, { 3, 0, 0 } }, NotFound },    // child tile
+                  GetTileDataAction{ { 3, 0, { 3, 0, 1 } }, NotFound },    // ...
+                  GetTileDataAction{ { 3, 0, { 3, 1, 0 } }, NotFound },    // ...
+                  GetTileDataAction{ { 3, 0, { 3, 1, 1 } }, NotFound },    // ...
+                  GetTileDataAction{ { 1, 0, { 1, 0, 0 } }, NotFound },    // parent tile, missing
+                  CreateTileDataAction{ { 1, 0, { 1, 0, 0 } } },           // find optional parent
+                  RetainTileDataAction{ { 1, 0, { 1, 0, 0 } }, Resource::Necessity::Optional }, //
+                  GetTileDataAction{ { 0, 0, { 0, 0, 0 } }, NotFound },    // parent tile, missing
               }),
               log);
 
@@ -354,26 +354,26 @@ TEST(UpdateRenderables, DontUseWrongParentTile) {
     algorithm::updateRenderables(getTileData, createTileData, retainTileData, renderTile,
                                  source.idealTiles, source.zoomRange, 2);
     EXPECT_EQ(ActionLog({
-                  GetTileDataAction{ { 2, { 2, 0, 0 } }, Found },       // non-ready ideal tile
-                  RetainTileDataAction{ { 2, { 2, 0, 0 } }, Resource::Necessity::Required }, //
+                  GetTileDataAction{ { 2, 0, { 2, 0, 0 } }, Found },       // non-ready ideal tile
+                  RetainTileDataAction{ { 2, 0, { 2, 0, 0 } }, Resource::Necessity::Required }, //
                   // this tile was added by the previous invocation of updateRenderables
-                  GetTileDataAction{ { 3, { 3, 0, 0 } }, NotFound },    // child tile
-                  GetTileDataAction{ { 3, { 3, 0, 1 } }, NotFound },    // ...
-                  GetTileDataAction{ { 3, { 3, 1, 0 } }, NotFound },    // ...
-                  GetTileDataAction{ { 3, { 3, 1, 1 } }, NotFound },    // ...
-                  GetTileDataAction{ { 1, { 1, 0, 0 } }, Found },       // parent tile not ready
-                  RetainTileDataAction{ { 1, { 1, 0, 0 } }, Resource::Necessity::Optional }, //
-                  GetTileDataAction{ { 0, { 0, 0, 0 } }, NotFound },    // missing parent tile
+                  GetTileDataAction{ { 3, 0, { 3, 0, 0 } }, NotFound },    // child tile
+                  GetTileDataAction{ { 3, 0, { 3, 0, 1 } }, NotFound },    // ...
+                  GetTileDataAction{ { 3, 0, { 3, 1, 0 } }, NotFound },    // ...
+                  GetTileDataAction{ { 3, 0, { 3, 1, 1 } }, NotFound },    // ...
+                  GetTileDataAction{ { 1, 0, { 1, 0, 0 } }, Found },       // parent tile not ready
+                  RetainTileDataAction{ { 1, 0, { 1, 0, 0 } }, Resource::Necessity::Optional }, //
+                  GetTileDataAction{ { 0, 0, { 0, 0, 0 } }, NotFound },    // missing parent tile
 
-                  GetTileDataAction{ { 2, { 2, 2, 0 } }, NotFound },    // missing ideal tile
-                  CreateTileDataAction{ { 2, { 2, 2, 0 } } },           //
-                  RetainTileDataAction{ { 2, { 2, 2, 0 } }, Resource::Necessity::Required }, //
-                  GetTileDataAction{ { 3, { 3, 4, 0 } }, NotFound },    // child tile
-                  GetTileDataAction{ { 3, { 3, 4, 1 } }, NotFound },    // ...
-                  GetTileDataAction{ { 3, { 3, 5, 0 } }, NotFound },    // ...
-                  GetTileDataAction{ { 3, { 3, 5, 1 } }, NotFound },    // ...
-                  GetTileDataAction{ { 1, { 1, 1, 0 } }, Found },       // found parent tile
-                  RetainTileDataAction{ { 1, { 1, 1, 0 } }, Resource::Necessity::Optional }, //
+                  GetTileDataAction{ { 2, 0, { 2, 2, 0 } }, NotFound },    // missing ideal tile
+                  CreateTileDataAction{ { 2, 0, { 2, 2, 0 } } },           //
+                  RetainTileDataAction{ { 2, 0, { 2, 2, 0 } }, Resource::Necessity::Required }, //
+                  GetTileDataAction{ { 3, 0, { 3, 4, 0 } }, NotFound },    // child tile
+                  GetTileDataAction{ { 3, 0, { 3, 4, 1 } }, NotFound },    // ...
+                  GetTileDataAction{ { 3, 0, { 3, 5, 0 } }, NotFound },    // ...
+                  GetTileDataAction{ { 3, 0, { 3, 5, 1 } }, NotFound },    // ...
+                  GetTileDataAction{ { 1, 0, { 1, 1, 0 } }, Found },       // found parent tile
+                  RetainTileDataAction{ { 1, 0, { 1, 1, 0 } }, Resource::Necessity::Optional }, //
                   RenderTileAction{ { 1, 1, 0 }, *tile_1_1_1_0 },       // render parent tile
               }),
               log);
@@ -399,14 +399,14 @@ TEST(UpdateRenderables, UseParentTileWhenChildNotReady) {
     algorithm::updateRenderables(getTileData, createTileData, retainTileData, renderTile,
                                  source.idealTiles, source.zoomRange, 1);
     EXPECT_EQ(ActionLog({
-                  GetTileDataAction{ { 1, { 1, 0, 1 } }, Found },       // found, but not ready
-                  RetainTileDataAction{ { 1, { 1, 0, 1 } }, Resource::Necessity::Required }, //
-                  GetTileDataAction{ { 2, { 2, 0, 2 } }, NotFound },    // child tile
-                  GetTileDataAction{ { 2, { 2, 0, 3 } }, NotFound },    // ...
-                  GetTileDataAction{ { 2, { 2, 1, 2 } }, NotFound },    // ...
-                  GetTileDataAction{ { 2, { 2, 1, 3 } }, NotFound },    // ...
-                  GetTileDataAction{ { 0, { 0, 0, 0 } }, Found },       // parent tile, ready
-                  RetainTileDataAction{ { 0, { 0, 0, 0 } }, Resource::Necessity::Optional }, //
+                  GetTileDataAction{ { 1, 0, { 1, 0, 1 } }, Found },       // found, but not ready
+                  RetainTileDataAction{ { 1, 0, { 1, 0, 1 } }, Resource::Necessity::Required }, //
+                  GetTileDataAction{ { 2, 0, { 2, 0, 2 } }, NotFound },    // child tile
+                  GetTileDataAction{ { 2, 0, { 2, 0, 3 } }, NotFound },    // ...
+                  GetTileDataAction{ { 2, 0, { 2, 1, 2 } }, NotFound },    // ...
+                  GetTileDataAction{ { 2, 0, { 2, 1, 3 } }, NotFound },    // ...
+                  GetTileDataAction{ { 0, 0, { 0, 0, 0 } }, Found },       // parent tile, ready
+                  RetainTileDataAction{ { 0, 0, { 0, 0, 0 } }, Resource::Necessity::Optional }, //
                   RenderTileAction{ { 0, 0, 0 }, *tile_0_0_0_0 },       // render parent tile
               }),
               log);
@@ -417,8 +417,8 @@ TEST(UpdateRenderables, UseParentTileWhenChildNotReady) {
     algorithm::updateRenderables(getTileData, createTileData, retainTileData, renderTile,
                                  source.idealTiles, source.zoomRange, 1);
     EXPECT_EQ(ActionLog({
-                  GetTileDataAction{ { 1, { 1, 0, 1 } }, Found },       // found and ready
-                  RetainTileDataAction{ { 1, { 1, 0, 1 } }, Resource::Necessity::Required }, //
+                  GetTileDataAction{ { 1, 0, { 1, 0, 1 } }, Found },       // found and ready
+                  RetainTileDataAction{ { 1, 0, { 1, 0, 1 } }, Resource::Necessity::Required }, //
                   RenderTileAction{ { 1, 0, 1 }, *tile_1_1_0_1 },       // render ideal tile
               }),
               log);
@@ -444,19 +444,19 @@ TEST(UpdateRenderables, UseOverlappingParentTile) {
     algorithm::updateRenderables(getTileData, createTileData, retainTileData, renderTile,
                                  source.idealTiles, source.zoomRange, 1);
     EXPECT_EQ(ActionLog({
-                  GetTileDataAction{ { 1, { 1, 0, 0 } }, NotFound },    // ideal tile not found
-                  CreateTileDataAction{ { 1, { 1, 0, 0 } } },           //
-                  RetainTileDataAction{ { 1, { 1, 0, 0 } }, Resource::Necessity::Required }, //
-                  GetTileDataAction{ { 2, { 2, 0, 0 } }, NotFound },    // child tile
-                  GetTileDataAction{ { 2, { 2, 0, 1 } }, NotFound },    // ...
-                  GetTileDataAction{ { 2, { 2, 1, 0 } }, NotFound },    // ...
-                  GetTileDataAction{ { 2, { 2, 1, 1 } }, NotFound },    // ...
-                  GetTileDataAction{ { 0, { 0, 0, 0 } }, Found },       // parent tile found
-                  RetainTileDataAction{ { 0, { 0, 0, 0 } }, Resource::Necessity::Optional }, //
+                  GetTileDataAction{ { 1, 0, { 1, 0, 0 } }, NotFound },    // ideal tile not found
+                  CreateTileDataAction{ { 1, 0, { 1, 0, 0 } } },           //
+                  RetainTileDataAction{ { 1, 0, { 1, 0, 0 } }, Resource::Necessity::Required }, //
+                  GetTileDataAction{ { 2, 0, { 2, 0, 0 } }, NotFound },    // child tile
+                  GetTileDataAction{ { 2, 0, { 2, 0, 1 } }, NotFound },    // ...
+                  GetTileDataAction{ { 2, 0, { 2, 1, 0 } }, NotFound },    // ...
+                  GetTileDataAction{ { 2, 0, { 2, 1, 1 } }, NotFound },    // ...
+                  GetTileDataAction{ { 0, 0, { 0, 0, 0 } }, Found },       // parent tile found
+                  RetainTileDataAction{ { 0, 0, { 0, 0, 0 } }, Resource::Necessity::Optional }, //
                   RenderTileAction{ { 0, 0, 0 }, *tile_0_0_0_0 },       //
 
-                  GetTileDataAction{ { 1, { 1, 0, 1 } }, Found },       // ideal tile found
-                  RetainTileDataAction{ { 1, { 1, 0, 1 } }, Resource::Necessity::Required }, //
+                  GetTileDataAction{ { 1, 0, { 1, 0, 1 } }, Found },       // ideal tile found
+                  RetainTileDataAction{ { 1, 0, { 1, 0, 1 } }, Resource::Necessity::Required }, //
                   RenderTileAction{ { 1, 0, 1 }, *tile_1_1_0_1 },       //
               }),
               log);
@@ -480,17 +480,17 @@ TEST(UpdateRenderables, UseChildTiles) {
     algorithm::updateRenderables(getTileData, createTileData, retainTileData, renderTile,
                                  source.idealTiles, source.zoomRange, 0);
     EXPECT_EQ(ActionLog({
-                  GetTileDataAction{ { 0, { 0, 0, 0 } }, NotFound },    // ideal tile, missing
-                  CreateTileDataAction{ { 0, { 0, 0, 0 } } },           //
-                  RetainTileDataAction{ { 0, { 0, 0, 0 } }, Resource::Necessity::Required }, //
-                  GetTileDataAction{ { 1, { 1, 0, 0 } }, Found },       // child tile found
-                  RetainTileDataAction{ { 1, { 1, 0, 0 } }, Resource::Necessity::Optional }, //
+                  GetTileDataAction{ { 0, 0, { 0, 0, 0 } }, NotFound },    // ideal tile, missing
+                  CreateTileDataAction{ { 0, 0, { 0, 0, 0 } } },           //
+                  RetainTileDataAction{ { 0, 0, { 0, 0, 0 } }, Resource::Necessity::Required }, //
+                  GetTileDataAction{ { 1, 0, { 1, 0, 0 } }, Found },       // child tile found
+                  RetainTileDataAction{ { 1, 0, { 1, 0, 0 } }, Resource::Necessity::Optional }, //
                   RenderTileAction{ { 1, 0, 0 }, *tile_1_1_0_0 },       // render child tile
-                  GetTileDataAction{ { 1, { 1, 0, 1 } }, NotFound },    // child tile not found
-                  GetTileDataAction{ { 1, { 1, 1, 0 } }, Found },       // child tile found
-                  RetainTileDataAction{ { 1, { 1, 1, 0 } }, Resource::Necessity::Optional }, //
+                  GetTileDataAction{ { 1, 0, { 1, 0, 1 } }, NotFound },    // child tile not found
+                  GetTileDataAction{ { 1, 0, { 1, 1, 0 } }, Found },       // child tile found
+                  RetainTileDataAction{ { 1, 0, { 1, 1, 0 } }, Resource::Necessity::Optional }, //
                   RenderTileAction{ { 1, 1, 0 }, *tile_1_1_1_0 },       // render child tile
-                  GetTileDataAction{ { 1, { 1, 1, 1 } }, NotFound },    // child tile not found
+                  GetTileDataAction{ { 1, 0, { 1, 1, 1 } }, NotFound },    // child tile not found
                   // no parent tile of 0 to consider
               }),
               log);
@@ -514,17 +514,17 @@ TEST(UpdateRenderables, PreferChildTiles) {
     algorithm::updateRenderables(getTileData, createTileData, retainTileData, renderTile,
                                  source.idealTiles, source.zoomRange, 1);
     EXPECT_EQ(ActionLog({
-                  GetTileDataAction{ { 1, { 1, 0, 0 } }, NotFound },    // ideal tile, not found
-                  CreateTileDataAction{ { 1, { 1, 0, 0 } } },           //
-                  RetainTileDataAction{ { 1, { 1, 0, 0 } }, Resource::Necessity::Required }, //
-                  GetTileDataAction{ { 2, { 2, 0, 0 } }, Found },       // child tile, found
-                  RetainTileDataAction{ { 2, { 2, 0, 0 } }, Resource::Necessity::Optional }, //
+                  GetTileDataAction{ { 1, 0, { 1, 0, 0 } }, NotFound },    // ideal tile, not found
+                  CreateTileDataAction{ { 1, 0, { 1, 0, 0 } } },           //
+                  RetainTileDataAction{ { 1, 0, { 1, 0, 0 } }, Resource::Necessity::Required }, //
+                  GetTileDataAction{ { 2, 0, { 2, 0, 0 } }, Found },       // child tile, found
+                  RetainTileDataAction{ { 2, 0, { 2, 0, 0 } }, Resource::Necessity::Optional }, //
                   RenderTileAction{ { 2, 0, 0 }, *tile_2_2_0_0 },       //
-                  GetTileDataAction{ { 2, { 2, 0, 1 } }, NotFound },    // child tile, not found
-                  GetTileDataAction{ { 2, { 2, 1, 0 } }, NotFound },    // ...
-                  GetTileDataAction{ { 2, { 2, 1, 1 } }, NotFound },    // ...
-                  GetTileDataAction{ { 0, { 0, 0, 0 } }, Found },       // parent tile, found
-                  RetainTileDataAction{ { 0, { 0, 0, 0 } }, Resource::Necessity::Optional }, //
+                  GetTileDataAction{ { 2, 0, { 2, 0, 1 } }, NotFound },    // child tile, not found
+                  GetTileDataAction{ { 2, 0, { 2, 1, 0 } }, NotFound },    // ...
+                  GetTileDataAction{ { 2, 0, { 2, 1, 1 } }, NotFound },    // ...
+                  GetTileDataAction{ { 0, 0, { 0, 0, 0 } }, Found },       // parent tile, found
+                  RetainTileDataAction{ { 0, 0, { 0, 0, 0 } }, Resource::Necessity::Optional }, //
                   RenderTileAction{ { 0, 0, 0 }, *tile_0_0_0_0 },       //
               }),
               log);
@@ -537,19 +537,19 @@ TEST(UpdateRenderables, PreferChildTiles) {
     algorithm::updateRenderables(getTileData, createTileData, retainTileData, renderTile,
                                  source.idealTiles, source.zoomRange, 1);
     EXPECT_EQ(ActionLog({
-                  GetTileDataAction{ { 1, { 1, 0, 0 } }, Found }, // ideal tile, not ready
+                  GetTileDataAction{ { 1, 0, { 1, 0, 0 } }, Found }, // ideal tile, not ready
                   // ideal tile was added in previous invocation, but is not yet ready
-                  RetainTileDataAction{ { 1, { 1, 0, 0 } }, Resource::Necessity::Required }, //
-                  GetTileDataAction{ { 2, { 2, 0, 0 } }, Found },       // child tile, found
-                  RetainTileDataAction{ { 2, { 2, 0, 0 } }, Resource::Necessity::Optional }, //
+                  RetainTileDataAction{ { 1, 0, { 1, 0, 0 } }, Resource::Necessity::Required }, //
+                  GetTileDataAction{ { 2, 0, { 2, 0, 0 } }, Found },       // child tile, found
+                  RetainTileDataAction{ { 2, 0, { 2, 0, 0 } }, Resource::Necessity::Optional }, //
                   RenderTileAction{ { 2, 0, 0 }, *tile_2_2_0_0 },       //
-                  GetTileDataAction{ { 2, { 2, 0, 1 } }, Found },       // ...
-                  RetainTileDataAction{ { 2, { 2, 0, 1 } }, Resource::Necessity::Optional }, // ...
+                  GetTileDataAction{ { 2, 0, { 2, 0, 1 } }, Found },       // ...
+                  RetainTileDataAction{ { 2, 0, { 2, 0, 1 } }, Resource::Necessity::Optional }, // ...
                   RenderTileAction{ { 2, 0, 1 }, *tile_2_2_0_1 },       //
-                  GetTileDataAction{ { 2, { 2, 1, 0 } }, NotFound },    // child tile, not found
-                  GetTileDataAction{ { 2, { 2, 1, 1 } }, NotFound },    // ...
-                  GetTileDataAction{ { 0, { 0, 0, 0 } }, Found },       // parent tile, found
-                  RetainTileDataAction{ { 0, { 0, 0, 0 } }, Resource::Necessity::Optional }, //
+                  GetTileDataAction{ { 2, 0, { 2, 1, 0 } }, NotFound },    // child tile, not found
+                  GetTileDataAction{ { 2, 0, { 2, 1, 1 } }, NotFound },    // ...
+                  GetTileDataAction{ { 0, 0, { 0, 0, 0 } }, Found },       // parent tile, found
+                  RetainTileDataAction{ { 0, 0, { 0, 0, 0 } }, Resource::Necessity::Optional }, //
                   RenderTileAction{ { 0, 0, 0 }, *tile_0_0_0_0 },       //
               }),
               log);
@@ -560,21 +560,21 @@ TEST(UpdateRenderables, PreferChildTiles) {
     algorithm::updateRenderables(getTileData, createTileData, retainTileData, renderTile,
                                  source.idealTiles, source.zoomRange, 1);
     EXPECT_EQ(ActionLog({
-                  GetTileDataAction{ { 1, { 1, 0, 0 } }, Found }, // ideal tile, not ready
+                  GetTileDataAction{ { 1, 0, { 1, 0, 0 } }, Found }, // ideal tile, not ready
                   // ideal tile was added in first invocation, but is not yet ready
-                  RetainTileDataAction{ { 1, { 1, 0, 0 } }, Resource::Necessity::Required }, //
-                  GetTileDataAction{ { 2, { 2, 0, 0 } }, Found },       // child tile, found
-                  RetainTileDataAction{ { 2, { 2, 0, 0 } }, Resource::Necessity::Optional }, //
+                  RetainTileDataAction{ { 1, 0, { 1, 0, 0 } }, Resource::Necessity::Required }, //
+                  GetTileDataAction{ { 2, 0, { 2, 0, 0 } }, Found },       // child tile, found
+                  RetainTileDataAction{ { 2, 0, { 2, 0, 0 } }, Resource::Necessity::Optional }, //
                   RenderTileAction{ { 2, 0, 0 }, *tile_2_2_0_0 },       //
-                  GetTileDataAction{ { 2, { 2, 0, 1 } }, Found },       // ...
-                  RetainTileDataAction{ { 2, { 2, 0, 1 } }, Resource::Necessity::Optional }, //
+                  GetTileDataAction{ { 2, 0, { 2, 0, 1 } }, Found },       // ...
+                  RetainTileDataAction{ { 2, 0, { 2, 0, 1 } }, Resource::Necessity::Optional }, //
                   RenderTileAction{ { 2, 0, 1 }, *tile_2_2_0_1 },       //
-                  GetTileDataAction{ { 2, { 2, 1, 0 } }, Found },       // ...
-                  RetainTileDataAction{ { 2, { 2, 1, 0 } }, Resource::Necessity::Optional }, //
+                  GetTileDataAction{ { 2, 0, { 2, 1, 0 } }, Found },       // ...
+                  RetainTileDataAction{ { 2, 0, { 2, 1, 0 } }, Resource::Necessity::Optional }, //
                   RenderTileAction{ { 2, 1, 0 }, *tile_2_2_1_0 },       //
-                  GetTileDataAction{ { 2, { 2, 1, 1 } }, NotFound },    // child tile, not found
-                  GetTileDataAction{ { 0, { 0, 0, 0 } }, Found },       // parent tile, found
-                  RetainTileDataAction{ { 0, { 0, 0, 0 } }, Resource::Necessity::Optional }, //
+                  GetTileDataAction{ { 2, 0, { 2, 1, 1 } }, NotFound },    // child tile, not found
+                  GetTileDataAction{ { 0, 0, { 0, 0, 0 } }, Found },       // parent tile, found
+                  RetainTileDataAction{ { 0, 0, { 0, 0, 0 } }, Resource::Necessity::Optional }, //
                   RenderTileAction{ { 0, 0, 0 }, *tile_0_0_0_0 },       //
               }),
               log);
@@ -586,20 +586,20 @@ TEST(UpdateRenderables, PreferChildTiles) {
     algorithm::updateRenderables(getTileData, createTileData, retainTileData, renderTile,
                                  source.idealTiles, source.zoomRange, 1);
     EXPECT_EQ(ActionLog({
-                  GetTileDataAction{ { 1, { 1, 0, 0 } }, Found }, // ideal tile, not ready
+                  GetTileDataAction{ { 1, 0, { 1, 0, 0 } }, Found }, // ideal tile, not ready
                   // ideal tile was added in first invocation, but is not yet ready
-                  RetainTileDataAction{ { 1, { 1, 0, 0 } }, Resource::Necessity::Required }, //
-                  GetTileDataAction{ { 2, { 2, 0, 0 } }, Found },       // child tile, found
-                  RetainTileDataAction{ { 2, { 2, 0, 0 } }, Resource::Necessity::Optional }, //
+                  RetainTileDataAction{ { 1, 0, { 1, 0, 0 } }, Resource::Necessity::Required }, //
+                  GetTileDataAction{ { 2, 0, { 2, 0, 0 } }, Found },       // child tile, found
+                  RetainTileDataAction{ { 2, 0, { 2, 0, 0 } }, Resource::Necessity::Optional }, //
                   RenderTileAction{ { 2, 0, 0 }, *tile_2_2_0_0 },       //
-                  GetTileDataAction{ { 2, { 2, 0, 1 } }, Found },       // ...
-                  RetainTileDataAction{ { 2, { 2, 0, 1 } }, Resource::Necessity::Optional }, //
+                  GetTileDataAction{ { 2, 0, { 2, 0, 1 } }, Found },       // ...
+                  RetainTileDataAction{ { 2, 0, { 2, 0, 1 } }, Resource::Necessity::Optional }, //
                   RenderTileAction{ { 2, 0, 1 }, *tile_2_2_0_1 },       //
-                  GetTileDataAction{ { 2, { 2, 1, 0 } }, Found },       // ...
-                  RetainTileDataAction{ { 2, { 2, 1, 0 } }, Resource::Necessity::Optional }, //
+                  GetTileDataAction{ { 2, 0, { 2, 1, 0 } }, Found },       // ...
+                  RetainTileDataAction{ { 2, 0, { 2, 1, 0 } }, Resource::Necessity::Optional }, //
                   RenderTileAction{ { 2, 1, 0 }, *tile_2_2_1_0 },       //
-                  GetTileDataAction{ { 2, { 2, 1, 1 } }, Found },       // ...
-                  RetainTileDataAction{ { 2, { 2, 1, 1 } }, Resource::Necessity::Optional }, //
+                  GetTileDataAction{ { 2, 0, { 2, 1, 1 } }, Found },       // ...
+                  RetainTileDataAction{ { 2, 0, { 2, 1, 1 } }, Resource::Necessity::Optional }, //
                   RenderTileAction{ { 2, 1, 1 }, *tile_2_2_1_1 },       //
               }),
               log);
@@ -624,17 +624,17 @@ TEST(UpdateRenderables, UseParentAndChildTiles) {
     algorithm::updateRenderables(getTileData, createTileData, retainTileData, renderTile,
                                  source.idealTiles, source.zoomRange, 1);
     EXPECT_EQ(ActionLog({
-                  GetTileDataAction{ { 1, { 1, 0, 0 } }, NotFound },    // ideal tile, missing
-                  CreateTileDataAction{ { 1, { 1, 0, 0 } } },           //
-                  RetainTileDataAction{ { 1, { 1, 0, 0 } }, Resource::Necessity::Required }, //
-                  GetTileDataAction{ { 2, { 2, 0, 0 } }, Found },       // child tile
-                  RetainTileDataAction{ { 2, { 2, 0, 0 } }, Resource::Necessity::Optional }, //
+                  GetTileDataAction{ { 1, 0, { 1, 0, 0 } }, NotFound },    // ideal tile, missing
+                  CreateTileDataAction{ { 1, 0, { 1, 0, 0 } } },           //
+                  RetainTileDataAction{ { 1, 0, { 1, 0, 0 } }, Resource::Necessity::Required }, //
+                  GetTileDataAction{ { 2, 0, { 2, 0, 0 } }, Found },       // child tile
+                  RetainTileDataAction{ { 2, 0, { 2, 0, 0 } }, Resource::Necessity::Optional }, //
                   RenderTileAction{ { 2, 0, 0 }, *tile_2_2_0_0 },       //
-                  GetTileDataAction{ { 2, { 2, 0, 1 } }, NotFound },    //
-                  GetTileDataAction{ { 2, { 2, 1, 0 } }, NotFound },    //
-                  GetTileDataAction{ { 2, { 2, 1, 1 } }, NotFound },    //
-                  GetTileDataAction{ { 0, { 0, 0, 0 } }, Found },       // parent tile
-                  RetainTileDataAction{ { 0, { 0, 0, 0 } }, Resource::Necessity::Optional }, //
+                  GetTileDataAction{ { 2, 0, { 2, 0, 1 } }, NotFound },    //
+                  GetTileDataAction{ { 2, 0, { 2, 1, 0 } }, NotFound },    //
+                  GetTileDataAction{ { 2, 0, { 2, 1, 1 } }, NotFound },    //
+                  GetTileDataAction{ { 0, 0, { 0, 0, 0 } }, Found },       // parent tile
+                  RetainTileDataAction{ { 0, 0, { 0, 0, 0 } }, Resource::Necessity::Optional }, //
                   RenderTileAction{ { 0, 0, 0 }, *tile_0_0_0_0 },       //
               }),
               log);
@@ -645,14 +645,14 @@ TEST(UpdateRenderables, UseParentAndChildTiles) {
     algorithm::updateRenderables(getTileData, createTileData, retainTileData, renderTile,
                                  source.idealTiles, source.zoomRange, 1);
     EXPECT_EQ(ActionLog({
-                  GetTileDataAction{ { 1, { 1, 0, 0 } }, Found },       // ideal tile, not ready
-                  RetainTileDataAction{ { 1, { 1, 0, 0 } }, Resource::Necessity::Required }, //
-                  GetTileDataAction{ { 2, { 2, 0, 0 } }, NotFound },    //
-                  GetTileDataAction{ { 2, { 2, 0, 1 } }, NotFound },    //
-                  GetTileDataAction{ { 2, { 2, 1, 0 } }, NotFound },    //
-                  GetTileDataAction{ { 2, { 2, 1, 1 } }, NotFound },    //
-                  GetTileDataAction{ { 0, { 0, 0, 0 } }, Found },       // parent tile
-                  RetainTileDataAction{ { 0, { 0, 0, 0 } }, Resource::Necessity::Optional }, //
+                  GetTileDataAction{ { 1, 0, { 1, 0, 0 } }, Found },       // ideal tile, not ready
+                  RetainTileDataAction{ { 1, 0, { 1, 0, 0 } }, Resource::Necessity::Required }, //
+                  GetTileDataAction{ { 2, 0, { 2, 0, 0 } }, NotFound },    //
+                  GetTileDataAction{ { 2, 0, { 2, 0, 1 } }, NotFound },    //
+                  GetTileDataAction{ { 2, 0, { 2, 1, 0 } }, NotFound },    //
+                  GetTileDataAction{ { 2, 0, { 2, 1, 1 } }, NotFound },    //
+                  GetTileDataAction{ { 0, 0, { 0, 0, 0 } }, Found },       // parent tile
+                  RetainTileDataAction{ { 0, 0, { 0, 0, 0 } }, Resource::Necessity::Optional }, //
                   RenderTileAction{ { 0, 0, 0 }, *tile_0_0_0_0 },       //
               }),
               log);
@@ -675,13 +675,13 @@ TEST(UpdateRenderables, DontUseTilesLowerThanMinzoom) {
     algorithm::updateRenderables(getTileData, createTileData, retainTileData, renderTile,
                                  source.idealTiles, source.zoomRange, 2);
     EXPECT_EQ(ActionLog({
-                  GetTileDataAction{ { 2, { 2, 0, 0 } }, NotFound },    // ideal tile, missing
-                  CreateTileDataAction{ { 2, { 2, 0, 0 } } },           //
-                  RetainTileDataAction{ { 2, { 2, 0, 0 } }, Resource::Necessity::Required }, //
-                  GetTileDataAction{ { 3, { 3, 0, 0 } }, NotFound },    //
-                  GetTileDataAction{ { 3, { 3, 0, 1 } }, NotFound },    //
-                  GetTileDataAction{ { 3, { 3, 1, 0 } }, NotFound },    //
-                  GetTileDataAction{ { 3, { 3, 1, 1 } }, NotFound },    //
+                  GetTileDataAction{ { 2, 0, { 2, 0, 0 } }, NotFound },    // ideal tile, missing
+                  CreateTileDataAction{ { 2, 0, { 2, 0, 0 } } },           //
+                  RetainTileDataAction{ { 2, 0, { 2, 0, 0 } }, Resource::Necessity::Required }, //
+                  GetTileDataAction{ { 3, 0, { 3, 0, 0 } }, NotFound },    //
+                  GetTileDataAction{ { 3, 0, { 3, 0, 1 } }, NotFound },    //
+                  GetTileDataAction{ { 3, 0, { 3, 1, 0 } }, NotFound },    //
+                  GetTileDataAction{ { 3, 0, { 3, 1, 1 } }, NotFound },    //
                   // no requests for zoom 1 tiles
               }),
               log);
@@ -705,58 +705,58 @@ TEST(UpdateRenderables, UseOverzoomedTileAfterMaxzoom) {
                                  source.idealTiles, source.zoomRange, 2);
     EXPECT_EQ(
         ActionLog({
-            GetTileDataAction{ { 2, { 2, 0, 0 } }, NotFound },    // ideal tile, missing
-            CreateTileDataAction{ { 2, { 2, 0, 0 } } },           //
-            RetainTileDataAction{ { 2, { 2, 0, 0 } }, Resource::Necessity::Required }, //
-            GetTileDataAction{ { 3, { 2, 0, 0 } }, NotFound },    // overzoomed tile, not children!
-            GetTileDataAction{ { 1, { 1, 0, 0 } }, NotFound },    //
-            GetTileDataAction{ { 0, { 0, 0, 0 } }, NotFound },    //
+            GetTileDataAction{ { 2, 0, { 2, 0, 0 } }, NotFound },    // ideal tile, missing
+            CreateTileDataAction{ { 2, 0, { 2, 0, 0 } } },           //
+            RetainTileDataAction{ { 2, 0, { 2, 0, 0 } }, Resource::Necessity::Required }, //
+            GetTileDataAction{ { 3, 0, { 2, 0, 0 } }, NotFound },    // overzoomed tile, not children!
+            GetTileDataAction{ { 1, 0, { 1, 0, 0 } }, NotFound },    //
+            GetTileDataAction{ { 0, 0, { 0, 0, 0 } }, NotFound },    //
         }),
         log);
 
     // Mark the created tile as having tried the optional request.
     log.clear();
-    source.dataTiles[{ 2, { 2, 0, 0 } }]->triedOptional = true;
+    source.dataTiles[{ 2, 0, { 2, 0, 0 } }]->triedOptional = true;
     algorithm::updateRenderables(getTileData, createTileData, retainTileData, renderTile,
                                  source.idealTiles, source.zoomRange, 2);
     EXPECT_EQ(
         ActionLog({
-            GetTileDataAction{ { 2, { 2, 0, 0 } }, Found },       // ideal tile, missing
-            RetainTileDataAction{ { 2, { 2, 0, 0 } }, Resource::Necessity::Required }, //
-            GetTileDataAction{ { 3, { 2, 0, 0 } }, NotFound },    // overzoomed tile, not children!
-            GetTileDataAction{ { 1, { 1, 0, 0 } }, NotFound },    //
-            CreateTileDataAction{ { 1, { 1, 0, 0 } } },           //
-            RetainTileDataAction{ { 1, { 1, 0, 0 } }, Resource::Necessity::Optional }, //
-            GetTileDataAction{ { 0, { 0, 0, 0 } }, NotFound },    //
+            GetTileDataAction{ { 2, 0, { 2, 0, 0 } }, Found },       // ideal tile, missing
+            RetainTileDataAction{ { 2, 0, { 2, 0, 0 } }, Resource::Necessity::Required }, //
+            GetTileDataAction{ { 3, 0, { 2, 0, 0 } }, NotFound },    // overzoomed tile, not children!
+            GetTileDataAction{ { 1, 0, { 1, 0, 0 } }, NotFound },    //
+            CreateTileDataAction{ { 1, 0, { 1, 0, 0 } } },           //
+            RetainTileDataAction{ { 1, 0, { 1, 0, 0 } }, Resource::Necessity::Optional }, //
+            GetTileDataAction{ { 0, 0, { 0, 0, 0 } }, NotFound },    //
         }),
         log);
 
     // Only add a non-overzoomed ("parent") tile at first.
     log.clear();
-    auto tile_2_2_0_0 = source.createTileData(OverscaledTileID{ 2, { 2, 0, 0 } });
+    auto tile_2_2_0_0 = source.createTileData(OverscaledTileID{ 2, 0, { 2, 0, 0 } });
     tile_2_2_0_0->renderable = true;
     algorithm::updateRenderables(getTileData, createTileData, retainTileData, renderTile,
                                  source.idealTiles, source.zoomRange, 3);
     EXPECT_EQ(ActionLog({
-                  GetTileDataAction{ { 3, { 2, 0, 0 } }, NotFound },    // ideal tile, missing
-                  CreateTileDataAction{ { 3, { 2, 0, 0 } } },           //
-                  RetainTileDataAction{ { 3, { 2, 0, 0 } }, Resource::Necessity::Required }, //
-                  GetTileDataAction{ { 4, { 2, 0, 0 } }, NotFound },    //
-                  GetTileDataAction{ { 2, { 2, 0, 0 } }, Found },       //
-                  RetainTileDataAction{ { 2, { 2, 0, 0 } }, Resource::Necessity::Optional }, //
+                  GetTileDataAction{ { 3, 0, { 2, 0, 0 } }, NotFound },    // ideal tile, missing
+                  CreateTileDataAction{ { 3, 0, { 2, 0, 0 } } },           //
+                  RetainTileDataAction{ { 3, 0, { 2, 0, 0 } }, Resource::Necessity::Required }, //
+                  GetTileDataAction{ { 4, 0, { 2, 0, 0 } }, NotFound },    //
+                  GetTileDataAction{ { 2, 0, { 2, 0, 0 } }, Found },       //
+                  RetainTileDataAction{ { 2, 0, { 2, 0, 0 } }, Resource::Necessity::Optional }, //
                   RenderTileAction{ { 2, 0, 0 }, *tile_2_2_0_0 },       //
               }),
               log);
 
     // Then add the overzoomed tile matching the zoom level we're rendering.
     log.clear();
-    auto tile_3_2_0_0 = source.createTileData(OverscaledTileID{ 3, { 2, 0, 0 } });
+    auto tile_3_2_0_0 = source.createTileData(OverscaledTileID{ 3, 0, { 2, 0, 0 } });
     tile_3_2_0_0->renderable = true;
     algorithm::updateRenderables(getTileData, createTileData, retainTileData, renderTile,
                                  source.idealTiles, source.zoomRange, 3);
     EXPECT_EQ(ActionLog({
-                  GetTileDataAction{ { 3, { 2, 0, 0 } }, Found },       //
-                  RetainTileDataAction{ { 3, { 2, 0, 0 } }, Resource::Necessity::Required }, //
+                  GetTileDataAction{ { 3, 0, { 2, 0, 0 } }, Found },       //
+                  RetainTileDataAction{ { 3, 0, { 2, 0, 0 } }, Resource::Necessity::Required }, //
                   RenderTileAction{ { 2, 0, 0 }, *tile_3_2_0_0 },       //
               }),
               log);
@@ -766,26 +766,26 @@ TEST(UpdateRenderables, UseOverzoomedTileAfterMaxzoom) {
     algorithm::updateRenderables(getTileData, createTileData, retainTileData, renderTile,
                                  source.idealTiles, source.zoomRange, 2);
     EXPECT_EQ(ActionLog({
-                  GetTileDataAction{ { 2, { 2, 0, 0 } }, Found },       //
-                  RetainTileDataAction{ { 2, { 2, 0, 0 } }, Resource::Necessity::Required }, //
+                  GetTileDataAction{ { 2, 0, { 2, 0, 0 } }, Found },       //
+                  RetainTileDataAction{ { 2, 0, { 2, 0, 0 } }, Resource::Necessity::Required }, //
                   RenderTileAction{ { 2, 0, 0 }, *tile_2_2_0_0 },       //
               }),
               log);
 
     // Now remove the best match.
     log.clear();
-    source.dataTiles.erase(OverscaledTileID{ 2, { 2, 0, 0 } });
+    source.dataTiles.erase(OverscaledTileID{ 2, 0, { 2, 0, 0 } });
     tile_2_2_0_0 = nullptr;
 
     // Use the overzoomed tile even though it doesn't match the zoom level.
     algorithm::updateRenderables(getTileData, createTileData, retainTileData, renderTile,
                                  source.idealTiles, source.zoomRange, 2);
     EXPECT_EQ(ActionLog({
-                  GetTileDataAction{ { 2, { 2, 0, 0 } }, NotFound },    //
-                  CreateTileDataAction{ { 2, { 2, 0, 0 } } },           //
-                  RetainTileDataAction{ { 2, { 2, 0, 0 } }, Resource::Necessity::Required }, //
-                  GetTileDataAction{ { 3, { 2, 0, 0 } }, Found },       // use overzoomed tile!
-                  RetainTileDataAction{ { 3, { 2, 0, 0 } }, Resource::Necessity::Optional }, //
+                  GetTileDataAction{ { 2, 0, { 2, 0, 0 } }, NotFound },    //
+                  CreateTileDataAction{ { 2, 0, { 2, 0, 0 } } },           //
+                  RetainTileDataAction{ { 2, 0, { 2, 0, 0 } }, Resource::Necessity::Required }, //
+                  GetTileDataAction{ { 3, 0, { 2, 0, 0 } }, Found },       // use overzoomed tile!
+                  RetainTileDataAction{ { 3, 0, { 2, 0, 0 } }, Resource::Necessity::Optional }, //
                   RenderTileAction{ { 2, 0, 0 }, *tile_3_2_0_0 },       //
               }),
               log);
@@ -803,69 +803,69 @@ TEST(UpdateRenderables, AscendToNonOverzoomedTiles) {
     source.idealTiles.emplace(UnwrappedTileID{ 2, 0, 0 });
 
     // Add a matching overzoomed tile and make sure it gets selected.
-    auto tile_3_2_0_0 = source.createTileData(OverscaledTileID{ 3, { 2, 0, 0 } });
+    auto tile_3_2_0_0 = source.createTileData(OverscaledTileID{ 3, 0, { 2, 0, 0 } });
     tile_3_2_0_0->renderable = true;
     algorithm::updateRenderables(getTileData, createTileData, retainTileData, renderTile,
                                  source.idealTiles, source.zoomRange, 3);
     EXPECT_EQ(ActionLog({
-                  GetTileDataAction{ { 3, { 2, 0, 0 } }, Found },       //
-                  RetainTileDataAction{ { 3, { 2, 0, 0 } }, Resource::Necessity::Required }, //
+                  GetTileDataAction{ { 3, 0, { 2, 0, 0 } }, Found },       //
+                  RetainTileDataAction{ { 3, 0, { 2, 0, 0 } }, Resource::Necessity::Required }, //
                   RenderTileAction{ { 2, 0, 0 }, *tile_3_2_0_0 },       //
               }),
               log);
 
     // Then, swap it with a non-overzoomed tile.
     log.clear();
-    source.dataTiles.erase(OverscaledTileID{ 3, { 2, 0, 0 } });
+    source.dataTiles.erase(OverscaledTileID{ 3, 0, { 2, 0, 0 } });
     tile_3_2_0_0 = nullptr;
-    auto tile_2_2_0_0 = source.createTileData(OverscaledTileID{ 2, { 2, 0, 0 } });
+    auto tile_2_2_0_0 = source.createTileData(OverscaledTileID{ 2, 0, { 2, 0, 0 } });
     tile_2_2_0_0->renderable = true;
     algorithm::updateRenderables(getTileData, createTileData, retainTileData, renderTile,
                                  source.idealTiles, source.zoomRange, 3);
     EXPECT_EQ(ActionLog({
-                  GetTileDataAction{ { 3, { 2, 0, 0 } }, NotFound },    //
-                  CreateTileDataAction{ { 3, { 2, 0, 0 } } },           //
-                  RetainTileDataAction{ { 3, { 2, 0, 0 } }, Resource::Necessity::Required }, //
-                  GetTileDataAction{ { 4, { 2, 0, 0 } }, NotFound }, // prefer using a child first
-                  GetTileDataAction{ { 2, { 2, 0, 0 } }, Found },    //
-                  RetainTileDataAction{ { 2, { 2, 0, 0 } }, Resource::Necessity::Optional }, //
+                  GetTileDataAction{ { 3, 0, { 2, 0, 0 } }, NotFound },    //
+                  CreateTileDataAction{ { 3, 0, { 2, 0, 0 } } },           //
+                  RetainTileDataAction{ { 3, 0, { 2, 0, 0 } }, Resource::Necessity::Required }, //
+                  GetTileDataAction{ { 4, 0, { 2, 0, 0 } }, NotFound }, // prefer using a child first
+                  GetTileDataAction{ { 2, 0, { 2, 0, 0 } }, Found },    //
+                  RetainTileDataAction{ { 2, 0, { 2, 0, 0 } }, Resource::Necessity::Optional }, //
                   RenderTileAction{ { 2, 0, 0 }, *tile_2_2_0_0 },       //
               }),
               log);
 
     // Then, swap it with a parent tile.
     log.clear();
-    source.dataTiles.erase(OverscaledTileID{ 2, { 2, 0, 0 } });
+    source.dataTiles.erase(OverscaledTileID{ 2, 0, { 2, 0, 0 } });
     tile_2_2_0_0 = nullptr;
-    auto tile_1_1_0_0 = source.createTileData(OverscaledTileID{ 1, { 1, 0, 0 } });
+    auto tile_1_1_0_0 = source.createTileData(OverscaledTileID{ 1, 0, { 1, 0, 0 } });
     tile_1_1_0_0->renderable = true;
     algorithm::updateRenderables(getTileData, createTileData, retainTileData, renderTile,
                                  source.idealTiles, source.zoomRange, 3);
     EXPECT_EQ(ActionLog({
-                  GetTileDataAction{ { 3, { 2, 0, 0 } }, Found },       // ideal tile, not ready
-                  RetainTileDataAction{ { 3, { 2, 0, 0 } }, Resource::Necessity::Required }, //
-                  GetTileDataAction{ { 4, { 2, 0, 0 } }, NotFound },    //
-                  GetTileDataAction{ { 2, { 2, 0, 0 } }, NotFound },    //
-                  GetTileDataAction{ { 1, { 1, 0, 0 } }, Found },       //
-                  RetainTileDataAction{ { 1, { 1, 0, 0 } }, Resource::Necessity::Optional }, //
+                  GetTileDataAction{ { 3, 0, { 2, 0, 0 } }, Found },       // ideal tile, not ready
+                  RetainTileDataAction{ { 3, 0, { 2, 0, 0 } }, Resource::Necessity::Required }, //
+                  GetTileDataAction{ { 4, 0, { 2, 0, 0 } }, NotFound },    //
+                  GetTileDataAction{ { 2, 0, { 2, 0, 0 } }, NotFound },    //
+                  GetTileDataAction{ { 1, 0, { 1, 0, 0 } }, Found },       //
+                  RetainTileDataAction{ { 1, 0, { 1, 0, 0 } }, Resource::Necessity::Optional }, //
                   RenderTileAction{ { 1, 0, 0 }, *tile_1_1_0_0 },       //
               }),
               log);
 
     // Now, mark the created tile as found.
     log.clear();
-    source.dataTiles[{ 3, { 2, 0, 0 } }]->triedOptional = true;
+    source.dataTiles[{ 3, 0, { 2, 0, 0 } }]->triedOptional = true;
     algorithm::updateRenderables(getTileData, createTileData, retainTileData, renderTile,
                                  source.idealTiles, source.zoomRange, 3);
     EXPECT_EQ(ActionLog({
-                  GetTileDataAction{ { 3, { 2, 0, 0 } }, Found },       // ideal tile, not ready
-                  RetainTileDataAction{ { 3, { 2, 0, 0 } }, Resource::Necessity::Required }, //
-                  GetTileDataAction{ { 4, { 2, 0, 0 } }, NotFound },    //
-                  GetTileDataAction{ { 2, { 2, 0, 0 } }, NotFound },    //
-                  CreateTileDataAction{ { 2, { 2, 0, 0 } } },           //
-                  RetainTileDataAction{ { 2, { 2, 0, 0 } }, Resource::Necessity::Optional }, //
-                  GetTileDataAction{ { 1, { 1, 0, 0 } }, Found },       //
-                  RetainTileDataAction{ { 1, { 1, 0, 0 } }, Resource::Necessity::Optional }, //
+                  GetTileDataAction{ { 3, 0, { 2, 0, 0 } }, Found },       // ideal tile, not ready
+                  RetainTileDataAction{ { 3, 0, { 2, 0, 0 } }, Resource::Necessity::Required }, //
+                  GetTileDataAction{ { 4, 0, { 2, 0, 0 } }, NotFound },    //
+                  GetTileDataAction{ { 2, 0, { 2, 0, 0 } }, NotFound },    //
+                  CreateTileDataAction{ { 2, 0, { 2, 0, 0 } } },           //
+                  RetainTileDataAction{ { 2, 0, { 2, 0, 0 } }, Resource::Necessity::Optional }, //
+                  GetTileDataAction{ { 1, 0, { 1, 0, 0 } }, Found },       //
+                  RetainTileDataAction{ { 1, 0, { 1, 0, 0 } }, Resource::Necessity::Optional }, //
                   RenderTileAction{ { 1, 0, 0 }, *tile_1_1_0_0 },       //
               }),
               log);
@@ -885,60 +885,60 @@ TEST(UpdateRenderables, DoNotAscendMultipleTimesIfNotFound) {
     algorithm::updateRenderables(getTileData, createTileData, retainTileData, renderTile,
                                  source.idealTiles, source.zoomRange, 8);
     EXPECT_EQ(ActionLog({
-                  GetTileDataAction{ { 8, { 8, 0, 0 } }, NotFound },    // ideal tile
-                  CreateTileDataAction{ { 8, { 8, 0, 0 } } },           //
-                  RetainTileDataAction{ { 8, { 8, 0, 0 } }, Resource::Necessity::Required }, //
-                  GetTileDataAction{ { 9, { 9, 0, 0 } }, NotFound },    // child tile
-                  GetTileDataAction{ { 9, { 9, 0, 1 } }, NotFound },    // ...
-                  GetTileDataAction{ { 9, { 9, 1, 0 } }, NotFound },    // ...
-                  GetTileDataAction{ { 9, { 9, 1, 1 } }, NotFound },    // ...
-                  GetTileDataAction{ { 7, { 7, 0, 0 } }, NotFound },    // ascent
-                  GetTileDataAction{ { 6, { 6, 0, 0 } }, NotFound },    // ...
-                  GetTileDataAction{ { 5, { 5, 0, 0 } }, NotFound },    // ...
-                  GetTileDataAction{ { 4, { 4, 0, 0 } }, NotFound },    // ...
-                  GetTileDataAction{ { 3, { 3, 0, 0 } }, NotFound },    // ...
-                  GetTileDataAction{ { 2, { 2, 0, 0 } }, NotFound },    // ...
-                  GetTileDataAction{ { 1, { 1, 0, 0 } }, NotFound },    // ...
-                  GetTileDataAction{ { 0, { 0, 0, 0 } }, NotFound },    // ...
+                  GetTileDataAction{ { 8, 0, { 8, 0, 0 } }, NotFound },    // ideal tile
+                  CreateTileDataAction{ { 8, 0, { 8, 0, 0 } } },           //
+                  RetainTileDataAction{ { 8, 0, { 8, 0, 0 } }, Resource::Necessity::Required }, //
+                  GetTileDataAction{ { 9, 0, { 9, 0, 0 } }, NotFound },    // child tile
+                  GetTileDataAction{ { 9, 0, { 9, 0, 1 } }, NotFound },    // ...
+                  GetTileDataAction{ { 9, 0, { 9, 1, 0 } }, NotFound },    // ...
+                  GetTileDataAction{ { 9, 0, { 9, 1, 1 } }, NotFound },    // ...
+                  GetTileDataAction{ { 7, 0, { 7, 0, 0 } }, NotFound },    // ascent
+                  GetTileDataAction{ { 6, 0, { 6, 0, 0 } }, NotFound },    // ...
+                  GetTileDataAction{ { 5, 0, { 5, 0, 0 } }, NotFound },    // ...
+                  GetTileDataAction{ { 4, 0, { 4, 0, 0 } }, NotFound },    // ...
+                  GetTileDataAction{ { 3, 0, { 3, 0, 0 } }, NotFound },    // ...
+                  GetTileDataAction{ { 2, 0, { 2, 0, 0 } }, NotFound },    // ...
+                  GetTileDataAction{ { 1, 0, { 1, 0, 0 } }, NotFound },    // ...
+                  GetTileDataAction{ { 0, 0, { 0, 0, 0 } }, NotFound },    // ...
 
-                  GetTileDataAction{ { 8, { 8, 1, 0 } }, NotFound },    // ideal tile
-                  CreateTileDataAction{ { 8, { 8, 1, 0 } } },           //
-                  RetainTileDataAction{ { 8, { 8, 1, 0 } }, Resource::Necessity::Required }, //
-                  GetTileDataAction{ { 9, { 9, 2, 0 } }, NotFound },    // child tile
-                  GetTileDataAction{ { 9, { 9, 2, 1 } }, NotFound },    // ...
-                  GetTileDataAction{ { 9, { 9, 3, 0 } }, NotFound },    // ...
-                  GetTileDataAction{ { 9, { 9, 3, 1 } }, NotFound },    // ...
+                  GetTileDataAction{ { 8, 0, { 8, 1, 0 } }, NotFound },    // ideal tile
+                  CreateTileDataAction{ { 8, 0, { 8, 1, 0 } } },           //
+                  RetainTileDataAction{ { 8, 0, { 8, 1, 0 } }, Resource::Necessity::Required }, //
+                  GetTileDataAction{ { 9, 0, { 9, 2, 0 } }, NotFound },    // child tile
+                  GetTileDataAction{ { 9, 0, { 9, 2, 1 } }, NotFound },    // ...
+                  GetTileDataAction{ { 9, 0, { 9, 3, 0 } }, NotFound },    // ...
+                  GetTileDataAction{ { 9, 0, { 9, 3, 1 } }, NotFound },    // ...
                   // no second ascent to 0
               }),
               log);
 
     // Now add a mid-level tile that stops the ascent
     log.clear();
-    auto tile_4_0_0_0 = source.createTileData(OverscaledTileID{ 4, { 4, 0, 0 } });
+    auto tile_4_0_0_0 = source.createTileData(OverscaledTileID{ 4, 0, { 4, 0, 0 } });
     tile_4_0_0_0->renderable = true;
 
     algorithm::updateRenderables(getTileData, createTileData, retainTileData, renderTile,
                                  source.idealTiles, source.zoomRange, 8);
     EXPECT_EQ(ActionLog({
-                  GetTileDataAction{ { 8, { 8, 0, 0 } }, Found },       // ideal tile, not ready
-                  RetainTileDataAction{ { 8, { 8, 0, 0 } }, Resource::Necessity::Required }, //
-                  GetTileDataAction{ { 9, { 9, 0, 0 } }, NotFound },    // child tile
-                  GetTileDataAction{ { 9, { 9, 0, 1 } }, NotFound },    // ...
-                  GetTileDataAction{ { 9, { 9, 1, 0 } }, NotFound },    // ...
-                  GetTileDataAction{ { 9, { 9, 1, 1 } }, NotFound },    // ...
-                  GetTileDataAction{ { 7, { 7, 0, 0 } }, NotFound },    // ascent
-                  GetTileDataAction{ { 6, { 6, 0, 0 } }, NotFound },    // ...
-                  GetTileDataAction{ { 5, { 5, 0, 0 } }, NotFound },    // ...
-                  GetTileDataAction{ { 4, { 4, 0, 0 } }, Found },       // stops ascent
-                  RetainTileDataAction{ { 4, { 4, 0, 0 } }, Resource::Necessity::Optional }, //
+                  GetTileDataAction{ { 8, 0, { 8, 0, 0 } }, Found },       // ideal tile, not ready
+                  RetainTileDataAction{ { 8, 0, { 8, 0, 0 } }, Resource::Necessity::Required }, //
+                  GetTileDataAction{ { 9, 0, { 9, 0, 0 } }, NotFound },    // child tile
+                  GetTileDataAction{ { 9, 0, { 9, 0, 1 } }, NotFound },    // ...
+                  GetTileDataAction{ { 9, 0, { 9, 1, 0 } }, NotFound },    // ...
+                  GetTileDataAction{ { 9, 0, { 9, 1, 1 } }, NotFound },    // ...
+                  GetTileDataAction{ { 7, 0, { 7, 0, 0 } }, NotFound },    // ascent
+                  GetTileDataAction{ { 6, 0, { 6, 0, 0 } }, NotFound },    // ...
+                  GetTileDataAction{ { 5, 0, { 5, 0, 0 } }, NotFound },    // ...
+                  GetTileDataAction{ { 4, 0, { 4, 0, 0 } }, Found },       // stops ascent
+                  RetainTileDataAction{ { 4, 0, { 4, 0, 0 } }, Resource::Necessity::Optional }, //
                   RenderTileAction{ { 4, 0, 0 }, *tile_4_0_0_0 },       //
 
-                  GetTileDataAction{ { 8, { 8, 1, 0 } }, Found },       // ideal tile, not ready
-                  RetainTileDataAction{ { 8, { 8, 1, 0 } }, Resource::Necessity::Required }, //
-                  GetTileDataAction{ { 9, { 9, 2, 0 } }, NotFound },    // child tile
-                  GetTileDataAction{ { 9, { 9, 2, 1 } }, NotFound },    // ...
-                  GetTileDataAction{ { 9, { 9, 3, 0 } }, NotFound },    // ...
-                  GetTileDataAction{ { 9, { 9, 3, 1 } }, NotFound },    // ...
+                  GetTileDataAction{ { 8, 0, { 8, 1, 0 } }, Found },       // ideal tile, not ready
+                  RetainTileDataAction{ { 8, 0, { 8, 1, 0 } }, Resource::Necessity::Required }, //
+                  GetTileDataAction{ { 9, 0, { 9, 2, 0 } }, NotFound },    // child tile
+                  GetTileDataAction{ { 9, 0, { 9, 2, 1 } }, NotFound },    // ...
+                  GetTileDataAction{ { 9, 0, { 9, 3, 0 } }, NotFound },    // ...
+                  GetTileDataAction{ { 9, 0, { 9, 3, 1 } }, NotFound },    // ...
                   // no second ascent to 0
               }),
               log);
@@ -960,15 +960,15 @@ TEST(UpdateRenderables, DontRetainUnusedNonIdealTiles) {
     algorithm::updateRenderables(getTileData, createTileData, retainTileData, renderTile,
                                  source.idealTiles, source.zoomRange, 2);
     EXPECT_EQ(ActionLog({
-                  GetTileDataAction{ { 2, { 2, 0, 0 } }, Found },       // ideal tile, not ready
-                  RetainTileDataAction{ { 2, { 2, 0, 0 } }, Resource::Necessity::Required }, //
-                  GetTileDataAction{ { 3, { 3, 0, 0 } }, NotFound },    //
-                  GetTileDataAction{ { 3, { 3, 0, 1 } }, NotFound },    //
-                  GetTileDataAction{ { 3, { 3, 1, 0 } }, NotFound },    //
-                  GetTileDataAction{ { 3, { 3, 1, 1 } }, NotFound },    //
-                  GetTileDataAction{ { 1, { 1, 0, 0 } }, Found },       // parent tile, not ready
-                  RetainTileDataAction{ { 1, { 1, 0, 0 } }, Resource::Necessity::Optional }, //
-                  GetTileDataAction{ { 0, { 0, 0, 0 } }, NotFound },    //
+                  GetTileDataAction{ { 2, 0, { 2, 0, 0 } }, Found },       // ideal tile, not ready
+                  RetainTileDataAction{ { 2, 0, { 2, 0, 0 } }, Resource::Necessity::Required }, //
+                  GetTileDataAction{ { 3, 0, { 3, 0, 0 } }, NotFound },    //
+                  GetTileDataAction{ { 3, 0, { 3, 0, 1 } }, NotFound },    //
+                  GetTileDataAction{ { 3, 0, { 3, 1, 0 } }, NotFound },    //
+                  GetTileDataAction{ { 3, 0, { 3, 1, 1 } }, NotFound },    //
+                  GetTileDataAction{ { 1, 0, { 1, 0, 0 } }, Found },       // parent tile, not ready
+                  RetainTileDataAction{ { 1, 0, { 1, 0, 0 } }, Resource::Necessity::Optional }, //
+                  GetTileDataAction{ { 0, 0, { 0, 0, 0 } }, NotFound },    //
               }),
               log);
 }
@@ -981,56 +981,54 @@ TEST(UpdateRenderables, WrappedTiles) {
     auto retainTileData = retainTileDataFn(log);
     auto renderTile = renderTileFn(log);
 
-    source.idealTiles.emplace(UnwrappedTileID{ 1, -1, 0 });
-    source.idealTiles.emplace(UnwrappedTileID{ 1, 0, 0 });
-    source.idealTiles.emplace(UnwrappedTileID{ 1, 1, 0 });
-    source.idealTiles.emplace(UnwrappedTileID{ 1, 2, 0 });
+    source.idealTiles.emplace(UnwrappedTileID{ 1, -1, 0 }); // 'wrap' -> -1
+    source.idealTiles.emplace(UnwrappedTileID{ 1, 0, 0 });  // 'wrap' -> 0
+    source.idealTiles.emplace(UnwrappedTileID{ 1, 1, 0 });  // 'wrap' -> 0
+    source.idealTiles.emplace(UnwrappedTileID{ 1, 2, 0 });  // 'wrap' -> 1
 
-    auto tile_0_0_0_0 = source.createTileData(OverscaledTileID{ 0, { 0, 0, 0 } });
+    auto tile_0_0_0_0 = source.createTileData(OverscaledTileID{ 0, 0, { 0, 0, 0 } });
     tile_0_0_0_0->renderable = true;
 
     algorithm::updateRenderables(getTileData, createTileData, retainTileData, renderTile,
                                  source.idealTiles, source.zoomRange, 1);
     EXPECT_EQ(ActionLog({
-                  GetTileDataAction{ { 1, { 1, 1, 0 } }, NotFound },    // ideal tile 1/-1/0
-                  CreateTileDataAction{ { 1, { 1, 1, 0 } } },           //
-                  RetainTileDataAction{ { 1, { 1, 1, 0 } }, Resource::Necessity::Required }, //
-                  GetTileDataAction{ { 2, { 2, 2, 0 } }, NotFound },    //
-                  GetTileDataAction{ { 2, { 2, 2, 1 } }, NotFound },    //
-                  GetTileDataAction{ { 2, { 2, 3, 0 } }, NotFound },    //
-                  GetTileDataAction{ { 2, { 2, 3, 1 } }, NotFound },    //
-                  GetTileDataAction{ { 0, { 0, 0, 0 } }, Found },       //
-                  RetainTileDataAction{ { 0, { 0, 0, 0 } }, Resource::Necessity::Optional }, //
-                  RenderTileAction{ { 0, -1, 0 }, *tile_0_0_0_0 },      //
+                  GetTileDataAction{ { 1, -1, { 1, 1, 0 } }, NotFound },    // ideal tile 1/-1/0 (wrapped to -1)
+                  CreateTileDataAction{ { 1, -1, { 1, 1, 0 } } },           //
+                  RetainTileDataAction{ { 1, -1, { 1, 1, 0 } }, Resource::Necessity::Required }, //
+                  GetTileDataAction{ { 2, -1, { 2, 2, 0 } }, NotFound },    //
+                  GetTileDataAction{ { 2, -1, { 2, 2, 1 } }, NotFound },    //
+                  GetTileDataAction{ { 2, -1, { 2, 3, 0 } }, NotFound },    //
+                  GetTileDataAction{ { 2, -1, { 2, 3, 1 } }, NotFound },    //
+                  GetTileDataAction{ { 0, -1, { 0, 0, 0 } }, NotFound },    // { 0, 0, 0 } exists, but not the version wrapped to -1
 
-                  GetTileDataAction{ { 1, { 1, 0, 0 } }, NotFound },    // ideal tile 1/0/0
-                  CreateTileDataAction{ { 1, { 1, 0, 0 } } },           //
-                  RetainTileDataAction{ { 1, { 1, 0, 0 } }, Resource::Necessity::Required }, //
-                  GetTileDataAction{ { 2, { 2, 0, 0 } }, NotFound },    //
-                  GetTileDataAction{ { 2, { 2, 0, 1 } }, NotFound },    //
-                  GetTileDataAction{ { 2, { 2, 1, 0 } }, NotFound },    //
-                  GetTileDataAction{ { 2, { 2, 1, 1 } }, NotFound },    //
-                  GetTileDataAction{ { 0, { 0, 0, 0 } }, Found },       //
-                  RetainTileDataAction{ { 0, { 0, 0, 0 } }, Resource::Necessity::Optional }, //
+                  GetTileDataAction{ { 1, 0, { 1, 0, 0 } }, NotFound },    // ideal tile 1/0/0
+                  CreateTileDataAction{ { 1, 0, { 1, 0, 0 } } },           //
+                  RetainTileDataAction{ { 1, 0, { 1, 0, 0 } }, Resource::Necessity::Required }, //
+                  GetTileDataAction{ { 2, 0, { 2, 0, 0 } }, NotFound },    //
+                  GetTileDataAction{ { 2, 0, { 2, 0, 1 } }, NotFound },    //
+                  GetTileDataAction{ { 2, 0, { 2, 1, 0 } }, NotFound },    //
+                  GetTileDataAction{ { 2, 0, { 2, 1, 1 } }, NotFound },    //
+                  GetTileDataAction{ { 0, 0, { 0, 0, 0 } }, Found },       //
+                  RetainTileDataAction{ { 0, 0, { 0, 0, 0 } }, Resource::Necessity::Optional }, //
                   RenderTileAction{ { 0, 0, 0 }, *tile_0_0_0_0 },       //
 
-                  GetTileDataAction{ { 1, { 1, 1, 0 } }, Found },       // ideal tile 1/1/0
-                  RetainTileDataAction{ { 1, { 1, 1, 0 } }, Resource::Necessity::Required }, //
-                  GetTileDataAction{ { 2, { 2, 2, 0 } }, NotFound },    //
-                  GetTileDataAction{ { 2, { 2, 2, 1 } }, NotFound },    //
-                  GetTileDataAction{ { 2, { 2, 3, 0 } }, NotFound },    //
-                  GetTileDataAction{ { 2, { 2, 3, 1 } }, NotFound },    //
+                  GetTileDataAction{ { 1, 0, { 1, 1, 0 } }, NotFound },       // ideal tile 1/1/0, doesn't match 1/-/1/0
+                  CreateTileDataAction{ { 1, 0, { 1, 1, 0 } } },
+                  RetainTileDataAction{ { 1, 0, { 1, 1, 0 } }, Resource::Necessity::Required }, //
+                  GetTileDataAction{ { 2, 0, { 2, 2, 0 } }, NotFound },    //
+                  GetTileDataAction{ { 2, 0, { 2, 2, 1 } }, NotFound },    //
+                  GetTileDataAction{ { 2, 0, { 2, 3, 0 } }, NotFound },    //
+                  GetTileDataAction{ { 2, 0, { 2, 3, 1 } }, NotFound },    //
                   // do not ascent; 0/0/0 has been rendered already for 1/0/0
 
-                  GetTileDataAction{ { 1, { 1, 0, 0 } }, Found },       // ideal tile 1/2/0
-                  RetainTileDataAction{ { 1, { 1, 0, 0 } }, Resource::Necessity::Required }, //
-                  GetTileDataAction{ { 2, { 2, 0, 0 } }, NotFound },    //
-                  GetTileDataAction{ { 2, { 2, 0, 1 } }, NotFound },    //
-                  GetTileDataAction{ { 2, { 2, 1, 0 } }, NotFound },    //
-                  GetTileDataAction{ { 2, { 2, 1, 1 } }, NotFound },    //
-                  GetTileDataAction{ { 0, { 0, 0, 0 } }, Found },       //
-                  RetainTileDataAction{ { 0, { 0, 0, 0 } }, Resource::Necessity::Optional }, //
-                  RenderTileAction{ { 0, 1, 0 }, *tile_0_0_0_0 },       //
+                  GetTileDataAction{ { 1, 1, { 1, 0, 0 } }, NotFound },       // ideal tile 1/2/0 (wrapped to 1)
+                  CreateTileDataAction{ { 1, 1, { 1, 0, 0 } } },
+                  RetainTileDataAction{ { 1, 1, { 1, 0, 0 } }, Resource::Necessity::Required }, //
+                  GetTileDataAction{ { 2, 1, { 2, 0, 0 } }, NotFound },    //
+                  GetTileDataAction{ { 2, 1, { 2, 0, 1 } }, NotFound },    //
+                  GetTileDataAction{ { 2, 1, { 2, 1, 0 } }, NotFound },    //
+                  GetTileDataAction{ { 2, 1, { 2, 1, 1 } }, NotFound },    //
+                  GetTileDataAction{ { 0, 1, { 0, 0, 0 } }, NotFound },    // { 0, 0, 0 } exists, but not the version wrapped to -1
               }),
               log);
 }
@@ -1048,19 +1046,19 @@ TEST(UpdateRenderables, RepeatedRenderWithMissingOptionals) {
     algorithm::updateRenderables(getTileData, createTileData, retainTileData, renderTile,
                                  source.idealTiles, source.zoomRange, 6);
     EXPECT_EQ(ActionLog({
-                  GetTileDataAction{ { 6, { 6, 0, 0 } }, NotFound },    // ideal tile, not found
-                  CreateTileDataAction{ { 6, { 6, 0, 0 } } },           //
-                  RetainTileDataAction{ { 6, { 6, 0, 0 } }, Resource::Necessity::Required }, //
-                  GetTileDataAction{ { 7, { 7, 0, 0 } }, NotFound },    // children
-                  GetTileDataAction{ { 7, { 7, 0, 1 } }, NotFound },    // ...
-                  GetTileDataAction{ { 7, { 7, 1, 0 } }, NotFound },    // ...
-                  GetTileDataAction{ { 7, { 7, 1, 1 } }, NotFound },    // ...
-                  GetTileDataAction{ { 5, { 5, 0, 0 } }, NotFound },    // ascent
-                  GetTileDataAction{ { 4, { 4, 0, 0 } }, NotFound },    // ...
-                  GetTileDataAction{ { 3, { 3, 0, 0 } }, NotFound },    // ...
-                  GetTileDataAction{ { 2, { 2, 0, 0 } }, NotFound },    // ...
-                  GetTileDataAction{ { 1, { 1, 0, 0 } }, NotFound },    // ...
-                  GetTileDataAction{ { 0, { 0, 0, 0 } }, NotFound },    // ...
+                  GetTileDataAction{ { 6, 0, { 6, 0, 0 } }, NotFound },    // ideal tile, not found
+                  CreateTileDataAction{ { 6, 0, { 6, 0, 0 } } },           //
+                  RetainTileDataAction{ { 6, 0, { 6, 0, 0 } }, Resource::Necessity::Required }, //
+                  GetTileDataAction{ { 7, 0, { 7, 0, 0 } }, NotFound },    // children
+                  GetTileDataAction{ { 7, 0, { 7, 0, 1 } }, NotFound },    // ...
+                  GetTileDataAction{ { 7, 0, { 7, 1, 0 } }, NotFound },    // ...
+                  GetTileDataAction{ { 7, 0, { 7, 1, 1 } }, NotFound },    // ...
+                  GetTileDataAction{ { 5, 0, { 5, 0, 0 } }, NotFound },    // ascent
+                  GetTileDataAction{ { 4, 0, { 4, 0, 0 } }, NotFound },    // ...
+                  GetTileDataAction{ { 3, 0, { 3, 0, 0 } }, NotFound },    // ...
+                  GetTileDataAction{ { 2, 0, { 2, 0, 0 } }, NotFound },    // ...
+                  GetTileDataAction{ { 1, 0, { 1, 0, 0 } }, NotFound },    // ...
+                  GetTileDataAction{ { 0, 0, { 0, 0, 0 } }, NotFound },    // ...
               }),
               log);
 
@@ -1069,41 +1067,41 @@ TEST(UpdateRenderables, RepeatedRenderWithMissingOptionals) {
     algorithm::updateRenderables(getTileData, createTileData, retainTileData, renderTile,
                                  source.idealTiles, source.zoomRange, 6);
     EXPECT_EQ(ActionLog({
-                  GetTileDataAction{ { 6, { 6, 0, 0 } }, Found },       // ideal tile, not ready
-                  RetainTileDataAction{ { 6, { 6, 0, 0 } }, Resource::Necessity::Required }, //
-                  GetTileDataAction{ { 7, { 7, 0, 0 } }, NotFound },    // children
-                  GetTileDataAction{ { 7, { 7, 0, 1 } }, NotFound },    // ...
-                  GetTileDataAction{ { 7, { 7, 1, 0 } }, NotFound },    // ...
-                  GetTileDataAction{ { 7, { 7, 1, 1 } }, NotFound },    // ...
-                  GetTileDataAction{ { 5, { 5, 0, 0 } }, NotFound },    // ascent
-                  GetTileDataAction{ { 4, { 4, 0, 0 } }, NotFound },    // ...
-                  GetTileDataAction{ { 3, { 3, 0, 0 } }, NotFound },    // ...
-                  GetTileDataAction{ { 2, { 2, 0, 0 } }, NotFound },    // ...
-                  GetTileDataAction{ { 1, { 1, 0, 0 } }, NotFound },    // ...
-                  GetTileDataAction{ { 0, { 0, 0, 0 } }, NotFound },    // ...
+                  GetTileDataAction{ { 6, 0, { 6, 0, 0 } }, Found },       // ideal tile, not ready
+                  RetainTileDataAction{ { 6, 0, { 6, 0, 0 } }, Resource::Necessity::Required }, //
+                  GetTileDataAction{ { 7, 0, { 7, 0, 0 } }, NotFound },    // children
+                  GetTileDataAction{ { 7, 0, { 7, 0, 1 } }, NotFound },    // ...
+                  GetTileDataAction{ { 7, 0, { 7, 1, 0 } }, NotFound },    // ...
+                  GetTileDataAction{ { 7, 0, { 7, 1, 1 } }, NotFound },    // ...
+                  GetTileDataAction{ { 5, 0, { 5, 0, 0 } }, NotFound },    // ascent
+                  GetTileDataAction{ { 4, 0, { 4, 0, 0 } }, NotFound },    // ...
+                  GetTileDataAction{ { 3, 0, { 3, 0, 0 } }, NotFound },    // ...
+                  GetTileDataAction{ { 2, 0, { 2, 0, 0 } }, NotFound },    // ...
+                  GetTileDataAction{ { 1, 0, { 1, 0, 0 } }, NotFound },    // ...
+                  GetTileDataAction{ { 0, 0, { 0, 0, 0 } }, NotFound },    // ...
               }),
               log);
 
     // Mark next level has having tried optional.
     log.clear();
-    source.dataTiles[{ 6, { 6, 0, 0 } }]->triedOptional = true;
+    source.dataTiles[{ 6, 0, { 6, 0, 0 } }]->triedOptional = true;
     algorithm::updateRenderables(getTileData, createTileData, retainTileData, renderTile,
                                  source.idealTiles, source.zoomRange, 6);
     EXPECT_EQ(ActionLog({
-                  GetTileDataAction{ { 6, { 6, 0, 0 } }, Found },       // ideal tile, not ready
-                  RetainTileDataAction{ { 6, { 6, 0, 0 } }, Resource::Necessity::Required }, //
-                  GetTileDataAction{ { 7, { 7, 0, 0 } }, NotFound },    // children
-                  GetTileDataAction{ { 7, { 7, 0, 1 } }, NotFound },    // ...
-                  GetTileDataAction{ { 7, { 7, 1, 0 } }, NotFound },    // ...
-                  GetTileDataAction{ { 7, { 7, 1, 1 } }, NotFound },    // ...
-                  GetTileDataAction{ { 5, { 5, 0, 0 } }, NotFound },    // ascent
-                  CreateTileDataAction{ { 5, { 5, 0, 0 } } },           //
-                  RetainTileDataAction{ { 5, { 5, 0, 0 } }, Resource::Necessity::Optional }, //
-                  GetTileDataAction{ { 4, { 4, 0, 0 } }, NotFound },    // ...
-                  GetTileDataAction{ { 3, { 3, 0, 0 } }, NotFound },    // ...
-                  GetTileDataAction{ { 2, { 2, 0, 0 } }, NotFound },    // ...
-                  GetTileDataAction{ { 1, { 1, 0, 0 } }, NotFound },    // ...
-                  GetTileDataAction{ { 0, { 0, 0, 0 } }, NotFound },    // ...
+                  GetTileDataAction{ { 6, 0, { 6, 0, 0 } }, Found },       // ideal tile, not ready
+                  RetainTileDataAction{ { 6, 0, { 6, 0, 0 } }, Resource::Necessity::Required }, //
+                  GetTileDataAction{ { 7, 0, { 7, 0, 0 } }, NotFound },    // children
+                  GetTileDataAction{ { 7, 0, { 7, 0, 1 } }, NotFound },    // ...
+                  GetTileDataAction{ { 7, 0, { 7, 1, 0 } }, NotFound },    // ...
+                  GetTileDataAction{ { 7, 0, { 7, 1, 1 } }, NotFound },    // ...
+                  GetTileDataAction{ { 5, 0, { 5, 0, 0 } }, NotFound },    // ascent
+                  CreateTileDataAction{ { 5, 0, { 5, 0, 0 } } },           //
+                  RetainTileDataAction{ { 5, 0, { 5, 0, 0 } }, Resource::Necessity::Optional }, //
+                  GetTileDataAction{ { 4, 0, { 4, 0, 0 } }, NotFound },    // ...
+                  GetTileDataAction{ { 3, 0, { 3, 0, 0 } }, NotFound },    // ...
+                  GetTileDataAction{ { 2, 0, { 2, 0, 0 } }, NotFound },    // ...
+                  GetTileDataAction{ { 1, 0, { 1, 0, 0 } }, NotFound },    // ...
+                  GetTileDataAction{ { 0, 0, { 0, 0, 0 } }, NotFound },    // ...
               }),
               log);
 
@@ -1112,116 +1110,116 @@ TEST(UpdateRenderables, RepeatedRenderWithMissingOptionals) {
     algorithm::updateRenderables(getTileData, createTileData, retainTileData, renderTile,
                                  source.idealTiles, source.zoomRange, 6);
     EXPECT_EQ(ActionLog({
-                  GetTileDataAction{ { 6, { 6, 0, 0 } }, Found },       // ideal tile, not ready
-                  RetainTileDataAction{ { 6, { 6, 0, 0 } }, Resource::Necessity::Required }, //
-                  GetTileDataAction{ { 7, { 7, 0, 0 } }, NotFound },    // children
-                  GetTileDataAction{ { 7, { 7, 0, 1 } }, NotFound },    // ...
-                  GetTileDataAction{ { 7, { 7, 1, 0 } }, NotFound },    // ...
-                  GetTileDataAction{ { 7, { 7, 1, 1 } }, NotFound },    // ...
-                  GetTileDataAction{ { 5, { 5, 0, 0 } }, Found },       // ascent
-                  RetainTileDataAction{ { 5, { 5, 0, 0 } }, Resource::Necessity::Optional }, //
-                  GetTileDataAction{ { 4, { 4, 0, 0 } }, NotFound },    // ...
-                  GetTileDataAction{ { 3, { 3, 0, 0 } }, NotFound },    // ...
-                  GetTileDataAction{ { 2, { 2, 0, 0 } }, NotFound },    // ...
-                  GetTileDataAction{ { 1, { 1, 0, 0 } }, NotFound },    // ...
-                  GetTileDataAction{ { 0, { 0, 0, 0 } }, NotFound },    // ...
+                  GetTileDataAction{ { 6, 0, { 6, 0, 0 } }, Found },       // ideal tile, not ready
+                  RetainTileDataAction{ { 6, 0, { 6, 0, 0 } }, Resource::Necessity::Required }, //
+                  GetTileDataAction{ { 7, 0, { 7, 0, 0 } }, NotFound },    // children
+                  GetTileDataAction{ { 7, 0, { 7, 0, 1 } }, NotFound },    // ...
+                  GetTileDataAction{ { 7, 0, { 7, 1, 0 } }, NotFound },    // ...
+                  GetTileDataAction{ { 7, 0, { 7, 1, 1 } }, NotFound },    // ...
+                  GetTileDataAction{ { 5, 0, { 5, 0, 0 } }, Found },       // ascent
+                  RetainTileDataAction{ { 5, 0, { 5, 0, 0 } }, Resource::Necessity::Optional }, //
+                  GetTileDataAction{ { 4, 0, { 4, 0, 0 } }, NotFound },    // ...
+                  GetTileDataAction{ { 3, 0, { 3, 0, 0 } }, NotFound },    // ...
+                  GetTileDataAction{ { 2, 0, { 2, 0, 0 } }, NotFound },    // ...
+                  GetTileDataAction{ { 1, 0, { 1, 0, 0 } }, NotFound },    // ...
+                  GetTileDataAction{ { 0, 0, { 0, 0, 0 } }, NotFound },    // ...
               }),
               log);
 
     // Mark next level has having tried optional.
     log.clear();
-    source.dataTiles[{ 5, { 5, 0, 0 } }]->triedOptional = true;
+    source.dataTiles[{ 5, 0, { 5, 0, 0 } }]->triedOptional = true;
     algorithm::updateRenderables(getTileData, createTileData, retainTileData, renderTile,
                                  source.idealTiles, source.zoomRange, 6);
     EXPECT_EQ(ActionLog({
-                  GetTileDataAction{ { 6, { 6, 0, 0 } }, Found },       // ideal tile, not ready
-                  RetainTileDataAction{ { 6, { 6, 0, 0 } }, Resource::Necessity::Required }, //
-                  GetTileDataAction{ { 7, { 7, 0, 0 } }, NotFound },    // children
-                  GetTileDataAction{ { 7, { 7, 0, 1 } }, NotFound },    // ...
-                  GetTileDataAction{ { 7, { 7, 1, 0 } }, NotFound },    // ...
-                  GetTileDataAction{ { 7, { 7, 1, 1 } }, NotFound },    // ...
-                  GetTileDataAction{ { 5, { 5, 0, 0 } }, Found },       // ascent
-                  RetainTileDataAction{ { 5, { 5, 0, 0 } }, Resource::Necessity::Optional }, //
-                  GetTileDataAction{ { 4, { 4, 0, 0 } }, NotFound },    // ...
-                  CreateTileDataAction{ { 4, { 4, 0, 0 } } },           //
-                  RetainTileDataAction{ { 4, { 4, 0, 0 } }, Resource::Necessity::Optional }, //
-                  GetTileDataAction{ { 3, { 3, 0, 0 } }, NotFound },    // ...
-                  GetTileDataAction{ { 2, { 2, 0, 0 } }, NotFound },    // ...
-                  GetTileDataAction{ { 1, { 1, 0, 0 } }, NotFound },    // ...
-                  GetTileDataAction{ { 0, { 0, 0, 0 } }, NotFound },    // ...
+                  GetTileDataAction{ { 6, 0, { 6, 0, 0 } }, Found },       // ideal tile, not ready
+                  RetainTileDataAction{ { 6, 0, { 6, 0, 0 } }, Resource::Necessity::Required }, //
+                  GetTileDataAction{ { 7, 0, { 7, 0, 0 } }, NotFound },    // children
+                  GetTileDataAction{ { 7, 0, { 7, 0, 1 } }, NotFound },    // ...
+                  GetTileDataAction{ { 7, 0, { 7, 1, 0 } }, NotFound },    // ...
+                  GetTileDataAction{ { 7, 0, { 7, 1, 1 } }, NotFound },    // ...
+                  GetTileDataAction{ { 5, 0, { 5, 0, 0 } }, Found },       // ascent
+                  RetainTileDataAction{ { 5, 0, { 5, 0, 0 } }, Resource::Necessity::Optional }, //
+                  GetTileDataAction{ { 4, 0, { 4, 0, 0 } }, NotFound },    // ...
+                  CreateTileDataAction{ { 4, 0, { 4, 0, 0 } } },           //
+                  RetainTileDataAction{ { 4, 0, { 4, 0, 0 } }, Resource::Necessity::Optional }, //
+                  GetTileDataAction{ { 3, 0, { 3, 0, 0 } }, NotFound },    // ...
+                  GetTileDataAction{ { 2, 0, { 2, 0, 0 } }, NotFound },    // ...
+                  GetTileDataAction{ { 1, 0, { 1, 0, 0 } }, NotFound },    // ...
+                  GetTileDataAction{ { 0, 0, { 0, 0, 0 } }, NotFound },    // ...
               }),
               log);
 
     // Mark next level has having tried optional.
     log.clear();
-    source.dataTiles[{ 4, { 4, 0, 0 } }]->triedOptional = true;
+    source.dataTiles[{ 4, 0, { 4, 0, 0 } }]->triedOptional = true;
     algorithm::updateRenderables(getTileData, createTileData, retainTileData, renderTile,
                                  source.idealTiles, source.zoomRange, 6);
     EXPECT_EQ(ActionLog({
-                  GetTileDataAction{ { 6, { 6, 0, 0 } }, Found },       // ideal tile, not ready
-                  RetainTileDataAction{ { 6, { 6, 0, 0 } }, Resource::Necessity::Required }, //
-                  GetTileDataAction{ { 7, { 7, 0, 0 } }, NotFound },    // children
-                  GetTileDataAction{ { 7, { 7, 0, 1 } }, NotFound },    // ...
-                  GetTileDataAction{ { 7, { 7, 1, 0 } }, NotFound },    // ...
-                  GetTileDataAction{ { 7, { 7, 1, 1 } }, NotFound },    // ...
-                  GetTileDataAction{ { 5, { 5, 0, 0 } }, Found },       // ascent
-                  RetainTileDataAction{ { 5, { 5, 0, 0 } }, Resource::Necessity::Optional }, //
-                  GetTileDataAction{ { 4, { 4, 0, 0 } }, Found },       // ...
-                  RetainTileDataAction{ { 4, { 4, 0, 0 } }, Resource::Necessity::Optional }, //
-                  GetTileDataAction{ { 3, { 3, 0, 0 } }, NotFound },    // ...
-                  CreateTileDataAction{ { 3, { 3, 0, 0 } } },           //
-                  RetainTileDataAction{ { 3, { 3, 0, 0 } }, Resource::Necessity::Optional }, //
-                  GetTileDataAction{ { 2, { 2, 0, 0 } }, NotFound },    // ...
-                  GetTileDataAction{ { 1, { 1, 0, 0 } }, NotFound },    // ...
-                  GetTileDataAction{ { 0, { 0, 0, 0 } }, NotFound },    // ...
+                  GetTileDataAction{ { 6, 0, { 6, 0, 0 } }, Found },       // ideal tile, not ready
+                  RetainTileDataAction{ { 6, 0, { 6, 0, 0 } }, Resource::Necessity::Required }, //
+                  GetTileDataAction{ { 7, 0, { 7, 0, 0 } }, NotFound },    // children
+                  GetTileDataAction{ { 7, 0, { 7, 0, 1 } }, NotFound },    // ...
+                  GetTileDataAction{ { 7, 0, { 7, 1, 0 } }, NotFound },    // ...
+                  GetTileDataAction{ { 7, 0, { 7, 1, 1 } }, NotFound },    // ...
+                  GetTileDataAction{ { 5, 0, { 5, 0, 0 } }, Found },       // ascent
+                  RetainTileDataAction{ { 5, 0, { 5, 0, 0 } }, Resource::Necessity::Optional }, //
+                  GetTileDataAction{ { 4, 0, { 4, 0, 0 } }, Found },       // ...
+                  RetainTileDataAction{ { 4, 0, { 4, 0, 0 } }, Resource::Necessity::Optional }, //
+                  GetTileDataAction{ { 3, 0, { 3, 0, 0 } }, NotFound },    // ...
+                  CreateTileDataAction{ { 3, 0, { 3, 0, 0 } } },           //
+                  RetainTileDataAction{ { 3, 0, { 3, 0, 0 } }, Resource::Necessity::Optional }, //
+                  GetTileDataAction{ { 2, 0, { 2, 0, 0 } }, NotFound },    // ...
+                  GetTileDataAction{ { 1, 0, { 1, 0, 0 } }, NotFound },    // ...
+                  GetTileDataAction{ { 0, 0, { 0, 0, 0 } }, NotFound },    // ...
               }),
               log);
 
     // Mark next level has having tried optional.
     log.clear();
-    source.dataTiles[{ 3, { 3, 0, 0 } }]->triedOptional = true;
+    source.dataTiles[{ 3, 0, { 3, 0, 0 } }]->triedOptional = true;
     algorithm::updateRenderables(getTileData, createTileData, retainTileData, renderTile,
                                  source.idealTiles, source.zoomRange, 6);
     EXPECT_EQ(ActionLog({
-                  GetTileDataAction{ { 6, { 6, 0, 0 } }, Found },       // ideal tile, not ready
-                  RetainTileDataAction{ { 6, { 6, 0, 0 } }, Resource::Necessity::Required }, //
-                  GetTileDataAction{ { 7, { 7, 0, 0 } }, NotFound },    // children
-                  GetTileDataAction{ { 7, { 7, 0, 1 } }, NotFound },    // ...
-                  GetTileDataAction{ { 7, { 7, 1, 0 } }, NotFound },    // ...
-                  GetTileDataAction{ { 7, { 7, 1, 1 } }, NotFound },    // ...
-                  GetTileDataAction{ { 5, { 5, 0, 0 } }, Found },       // ascent
-                  RetainTileDataAction{ { 5, { 5, 0, 0 } }, Resource::Necessity::Optional }, //
-                  GetTileDataAction{ { 4, { 4, 0, 0 } }, Found },       // ...
-                  RetainTileDataAction{ { 4, { 4, 0, 0 } }, Resource::Necessity::Optional }, //
-                  GetTileDataAction{ { 3, { 3, 0, 0 } }, Found },       // ...
-                  RetainTileDataAction{ { 3, { 3, 0, 0 } }, Resource::Necessity::Optional }, //
-                  GetTileDataAction{ { 2, { 2, 0, 0 } }, NotFound },    // ...
-                  CreateTileDataAction{ { 2, { 2, 0, 0 } } },           //
-                  RetainTileDataAction{ { 2, { 2, 0, 0 } }, Resource::Necessity::Optional }, //
-                  GetTileDataAction{ { 1, { 1, 0, 0 } }, NotFound },    // ...
-                  GetTileDataAction{ { 0, { 0, 0, 0 } }, NotFound },    // ...
+                  GetTileDataAction{ { 6, 0, { 6, 0, 0 } }, Found },       // ideal tile, not ready
+                  RetainTileDataAction{ { 6, 0, { 6, 0, 0 } }, Resource::Necessity::Required }, //
+                  GetTileDataAction{ { 7, 0, { 7, 0, 0 } }, NotFound },    // children
+                  GetTileDataAction{ { 7, 0, { 7, 0, 1 } }, NotFound },    // ...
+                  GetTileDataAction{ { 7, 0, { 7, 1, 0 } }, NotFound },    // ...
+                  GetTileDataAction{ { 7, 0, { 7, 1, 1 } }, NotFound },    // ...
+                  GetTileDataAction{ { 5, 0, { 5, 0, 0 } }, Found },       // ascent
+                  RetainTileDataAction{ { 5, 0, { 5, 0, 0 } }, Resource::Necessity::Optional }, //
+                  GetTileDataAction{ { 4, 0, { 4, 0, 0 } }, Found },       // ...
+                  RetainTileDataAction{ { 4, 0, { 4, 0, 0 } }, Resource::Necessity::Optional }, //
+                  GetTileDataAction{ { 3, 0, { 3, 0, 0 } }, Found },       // ...
+                  RetainTileDataAction{ { 3, 0, { 3, 0, 0 } }, Resource::Necessity::Optional }, //
+                  GetTileDataAction{ { 2, 0, { 2, 0, 0 } }, NotFound },    // ...
+                  CreateTileDataAction{ { 2, 0, { 2, 0, 0 } } },           //
+                  RetainTileDataAction{ { 2, 0, { 2, 0, 0 } }, Resource::Necessity::Optional }, //
+                  GetTileDataAction{ { 1, 0, { 1, 0, 0 } }, NotFound },    // ...
+                  GetTileDataAction{ { 0, 0, { 0, 0, 0 } }, NotFound },    // ...
               }),
               log);
 
     // Mark as found
     log.clear();
-    auto tile_3_3_0_0 = source.dataTiles[{ 3, { 3, 0, 0 } }].get();
+    auto tile_3_3_0_0 = source.dataTiles[{ 3, 0, { 3, 0, 0 } }].get();
     tile_3_3_0_0->renderable = true;
     algorithm::updateRenderables(getTileData, createTileData, retainTileData, renderTile,
                                  source.idealTiles, source.zoomRange, 6);
     EXPECT_EQ(ActionLog({
-                  GetTileDataAction{ { 6, { 6, 0, 0 } }, Found },       // ideal tile, not ready
-                  RetainTileDataAction{ { 6, { 6, 0, 0 } }, Resource::Necessity::Required }, //
-                  GetTileDataAction{ { 7, { 7, 0, 0 } }, NotFound },    // children
-                  GetTileDataAction{ { 7, { 7, 0, 1 } }, NotFound },    // ...
-                  GetTileDataAction{ { 7, { 7, 1, 0 } }, NotFound },    // ...
-                  GetTileDataAction{ { 7, { 7, 1, 1 } }, NotFound },    // ...
-                  GetTileDataAction{ { 5, { 5, 0, 0 } }, Found },       // ascent
-                  RetainTileDataAction{ { 5, { 5, 0, 0 } }, Resource::Necessity::Optional }, //
-                  GetTileDataAction{ { 4, { 4, 0, 0 } }, Found },       // ...
-                  RetainTileDataAction{ { 4, { 4, 0, 0 } }, Resource::Necessity::Optional }, //
-                  GetTileDataAction{ { 3, { 3, 0, 0 } }, Found },       // ...
-                  RetainTileDataAction{ { 3, { 3, 0, 0 } }, Resource::Necessity::Optional }, //
+                  GetTileDataAction{ { 6, 0, { 6, 0, 0 } }, Found },       // ideal tile, not ready
+                  RetainTileDataAction{ { 6, 0, { 6, 0, 0 } }, Resource::Necessity::Required }, //
+                  GetTileDataAction{ { 7, 0, { 7, 0, 0 } }, NotFound },    // children
+                  GetTileDataAction{ { 7, 0, { 7, 0, 1 } }, NotFound },    // ...
+                  GetTileDataAction{ { 7, 0, { 7, 1, 0 } }, NotFound },    // ...
+                  GetTileDataAction{ { 7, 0, { 7, 1, 1 } }, NotFound },    // ...
+                  GetTileDataAction{ { 5, 0, { 5, 0, 0 } }, Found },       // ascent
+                  RetainTileDataAction{ { 5, 0, { 5, 0, 0 } }, Resource::Necessity::Optional }, //
+                  GetTileDataAction{ { 4, 0, { 4, 0, 0 } }, Found },       // ...
+                  RetainTileDataAction{ { 4, 0, { 4, 0, 0 } }, Resource::Necessity::Optional }, //
+                  GetTileDataAction{ { 3, 0, { 3, 0, 0 } }, Found },       // ...
+                  RetainTileDataAction{ { 3, 0, { 3, 0, 0 } }, Resource::Necessity::Optional }, //
                   RenderTileAction{ { 3, 0, 0 }, *tile_3_3_0_0 },       //
               }),
               log);
@@ -1238,24 +1236,24 @@ TEST(UpdateRenderables, LoadRequiredIfIdealTileCantBeFound) {
     source.zoomRange.max = 6;
     source.idealTiles.emplace(UnwrappedTileID{ 6, 0, 0 });
 
-    auto tile_6_6_0_0 = source.createTileData(OverscaledTileID{ 6, { 6, 0, 0 } });
+    auto tile_6_6_0_0 = source.createTileData(OverscaledTileID{ 6, 0, { 6, 0, 0 } });
     tile_6_6_0_0->triedOptional = true;
     tile_6_6_0_0->loaded = true;
 
     algorithm::updateRenderables(getTileData, createTileData, retainTileData, renderTile,
                                  source.idealTiles, source.zoomRange, 6);
     EXPECT_EQ(ActionLog({
-                  GetTileDataAction{ { 6, { 6, 0, 0 } }, Found }, // ideal tile, not found
-                  RetainTileDataAction{ { 6, { 6, 0, 0 } }, Resource::Necessity::Required }, //
-                  GetTileDataAction{ { 7, { 6, 0, 0 } }, NotFound }, // overzoomed child
-                  GetTileDataAction{ { 5, { 5, 0, 0 } }, NotFound }, // ascent
-                  CreateTileDataAction{ { 5, { 5, 0, 0 } } },
-                  RetainTileDataAction{ { 5, { 5, 0, 0 } }, Resource::Necessity::Required },
-                  GetTileDataAction{ { 4, { 4, 0, 0 } }, NotFound }, // ...
-                  GetTileDataAction{ { 3, { 3, 0, 0 } }, NotFound }, // ...
-                  GetTileDataAction{ { 2, { 2, 0, 0 } }, NotFound }, // ...
-                  GetTileDataAction{ { 1, { 1, 0, 0 } }, NotFound }, // ...
-                  GetTileDataAction{ { 0, { 0, 0, 0 } }, NotFound }, // ...
+                  GetTileDataAction{ { 6, 0, { 6, 0, 0 } }, Found }, // ideal tile, not found
+                  RetainTileDataAction{ { 6, 0, { 6, 0, 0 } }, Resource::Necessity::Required }, //
+                  GetTileDataAction{ { 7, 0, { 6, 0, 0 } }, NotFound }, // overzoomed child
+                  GetTileDataAction{ { 5, 0, { 5, 0, 0 } }, NotFound }, // ascent
+                  CreateTileDataAction{ { 5, 0, { 5, 0, 0 } } },
+                  RetainTileDataAction{ { 5, 0, { 5, 0, 0 } }, Resource::Necessity::Required },
+                  GetTileDataAction{ { 4, 0, { 4, 0, 0 } }, NotFound }, // ...
+                  GetTileDataAction{ { 3, 0, { 3, 0, 0 } }, NotFound }, // ...
+                  GetTileDataAction{ { 2, 0, { 2, 0, 0 } }, NotFound }, // ...
+                  GetTileDataAction{ { 1, 0, { 1, 0, 0 } }, NotFound }, // ...
+                  GetTileDataAction{ { 0, 0, { 0, 0, 0 } }, NotFound }, // ...
               }),
               log);
 }
