@@ -897,10 +897,6 @@ final class NativeMapView {
     return pixelRatio;
   }
 
-  public Context getContext() {
-    return mapView.getContext();
-  }
-
   //
   // Callbacks
   //
