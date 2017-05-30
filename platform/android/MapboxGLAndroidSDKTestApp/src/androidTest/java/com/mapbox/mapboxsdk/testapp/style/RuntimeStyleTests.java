@@ -12,6 +12,7 @@ import com.mapbox.mapboxsdk.style.layers.CannotAddLayerException;
 import com.mapbox.mapboxsdk.style.layers.CircleLayer;
 import com.mapbox.mapboxsdk.style.layers.FillLayer;
 import com.mapbox.mapboxsdk.style.layers.Layer;
+import com.mapbox.mapboxsdk.style.layers.LineLayer;
 import com.mapbox.mapboxsdk.style.layers.Property;
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory;
 import com.mapbox.mapboxsdk.style.sources.CannotAddSourceException;
@@ -221,6 +222,23 @@ public class RuntimeStyleTests extends BaseActivityTest {
     assertNull(source.getUrl());
     source.setUrl(new URL("http://mapbox.com/my-file.json"));
     assertEquals("http://mapbox.com/my-file.json", source.getUrl());
+  }
+
+  @Test
+  public void testRemoveSourceInUse() {
+    validateTestSetup();
+
+    onView(withId(R.id.mapView)).perform(new BaseViewAction() {
+
+      @Override
+      public void perform(UiController uiController, View view) {
+        mapboxMap.addSource(new VectorSource("my-source", "mapbox://mapbox.mapbox-terrain-v2"));
+        mapboxMap.addLayer(new LineLayer("my-layer", "my-source"));
+        mapboxMap.removeSource("my-source");
+        assertNotNull(mapboxMap.getSource("my-source"));
+      }
+
+    });
   }
 
   /**
