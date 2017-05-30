@@ -184,6 +184,9 @@ set(MBGL_CORE_FILES
     src/mbgl/renderer/render_source.cpp
     src/mbgl/renderer/render_source.hpp
     src/mbgl/renderer/render_source_observer.hpp
+    src/mbgl/renderer/render_style.cpp
+    src/mbgl/renderer/render_style.hpp
+    src/mbgl/renderer/render_style_observer.hpp
     src/mbgl/renderer/render_tile.cpp
     src/mbgl/renderer/render_tile.hpp
     src/mbgl/renderer/style_diff.cpp

@@ -57,7 +57,7 @@ void RenderImageSource::finishRender(Painter& painter) {
 std::unordered_map<std::string, std::vector<Feature>>
 RenderImageSource::queryRenderedFeatures(const ScreenLineString&,
                                          const TransformState&,
-                                         const style::Style&,
+                                         const RenderStyle&,
                                          const RenderedQueryOptions&) const {
     return {};
 }

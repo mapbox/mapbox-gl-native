@@ -15,6 +15,8 @@
 #include <mbgl/renderer/update_parameters.hpp>
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/renderer/render_source.hpp>
+#include <mbgl/renderer/render_style.hpp>
+#include <mbgl/renderer/render_style_observer.hpp>
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
@@ -48,7 +50,8 @@ struct StillImageRequest {
     Map::StillImageCallback callback;
 };
 
-class Map::Impl : public style::Observer {
+class Map::Impl : public style::Observer,
+                  public RenderStyleObserver {
 public:
     Impl(Map&,
          Backend&,
@@ -63,6 +66,7 @@ public:
 
     void onSourceChanged(style::Source&) override;
     void onUpdate(Update) override;
+    void onInvalidate() override;
     void onStyleLoaded() override;
     void onStyleError(std::exception_ptr) override;
     void onResourceError(std::exception_ptr) override;
@@ -93,6 +97,7 @@ public:
     AnnotationManager annotationManager;
     std::unique_ptr<Painter> painter;
     std::unique_ptr<Style> style;
+    std::unique_ptr<RenderStyle> renderStyle;
 
     std::string styleURL;
     std::string styleJSON;
@@ -169,6 +174,7 @@ Map::~Map() {
 
     // Explicit resets currently necessary because these abandon resources that need to be
     // cleaned up by context.reset();
+    impl->renderStyle.reset();
     impl->style.reset();
     impl->painter.reset();
 }
@@ -238,16 +244,22 @@ void Map::Impl::render(View& view) {
         annotationManager.updateData();
     }
 
-    style->update({
+    renderStyle->update({
         mode,
-        updateFlags,
         pixelRatio,
         debugOptions,
         timePoint,
-        transform.getState(),
+        style->getGlyphURL(),
+        style->spriteLoaded,
+        style->getTransitionOptions(),
+        style->getLight()->impl,
+        style->getImageImpls(),
+        style->getSourceImpls(),
+        style->getLayerImpls(),
         scheduler,
         fileSource,
-        annotationManager
+        annotationManager,
+        transform.getState()
     });
 
     updateFlags = Update::Nothing;
@@ -256,6 +268,8 @@ void Map::Impl::render(View& view) {
     if (!painter) {
         painter = std::make_unique<Painter>(context, transform.getState(), pixelRatio, programCacheDir);
     }
+
+    bool loaded = style->isLoaded() && renderStyle->isLoaded();
 
     if (mode == MapMode::Continuous) {
         if (renderState == RenderState::Never) {
@@ -272,15 +286,17 @@ void Map::Impl::render(View& view) {
 
         backend.updateAssumedState();
 
-        painter->render(*style,
+        painter->render(*renderStyle,
                         frameData,
                         view);
 
         painter->cleanup();
 
-        observer.onDidFinishRenderingFrame(style->isLoaded() ? MapObserver::RenderMode::Full : MapObserver::RenderMode::Partial);
+        observer.onDidFinishRenderingFrame(loaded
+            ? MapObserver::RenderMode::Full
+            : MapObserver::RenderMode::Partial);
 
-        if (!style->isLoaded()) {
+        if (!loaded) {
             renderState = RenderState::Partial;
         } else if (renderState != RenderState::Fully) {
             renderState = RenderState::Fully;
@@ -293,10 +309,10 @@ void Map::Impl::render(View& view) {
 
         // Schedule an update if we need to paint another frame due to transitions or
         // animations that are still in progress
-        if (style->hasTransitions() || painter->needsAnimation() || transform.inTransition()) {
+        if (renderStyle->hasTransitions() || painter->needsAnimation() || transform.inTransition()) {
             onUpdate(Update::Repaint);
         }
-    } else if (stillImageRequest && style->isLoaded()) {
+    } else if (stillImageRequest && loaded) {
         FrameData frameData { timePoint,
                               pixelRatio,
                               mode,
@@ -305,7 +321,7 @@ void Map::Impl::render(View& view) {
 
         backend.updateAssumedState();
 
-        painter->render(*style,
+        painter->render(*renderStyle,
                         frameData,
                         view);
 
@@ -333,6 +349,7 @@ void Map::setStyleURL(const std::string& url) {
     impl->styleMutated = false;
 
     impl->style = std::make_unique<Style>(impl->scheduler, impl->fileSource, impl->pixelRatio);
+    impl->renderStyle = std::make_unique<RenderStyle>(impl->scheduler, impl->fileSource);
 
     impl->styleRequest = impl->fileSource.request(Resource::style(impl->styleURL), [this](Response res) {
         // Once we get a fresh style, or the style is mutated, stop revalidating.
@@ -379,12 +396,15 @@ void Map::setStyleJSON(const std::string& json) {
     impl->styleMutated = false;
 
     impl->style = std::make_unique<Style>(impl->scheduler, impl->fileSource, impl->pixelRatio);
+    impl->renderStyle = std::make_unique<RenderStyle>(impl->scheduler, impl->fileSource);
 
     impl->loadStyleJSON(json);
 }
 
 void Map::Impl::loadStyleJSON(const std::string& json) {
     style->setObserver(this);
+    renderStyle->setObserver(this);
+
     style->setJSON(json);
     styleJSON = json;
 
@@ -816,7 +836,7 @@ void Map::removeAnnotation(AnnotationID annotation) {
 std::vector<Feature> Map::queryRenderedFeatures(const ScreenCoordinate& point, const RenderedQueryOptions& options) {
     if (!impl->style) return {};
 
-    return impl->style->queryRenderedFeatures(
+    return impl->renderStyle->queryRenderedFeatures(
         { point },
         impl->transform.getState(),
         options
@@ -826,7 +846,7 @@ std::vector<Feature> Map::queryRenderedFeatures(const ScreenCoordinate& point, c
 std::vector<Feature> Map::queryRenderedFeatures(const ScreenBox& box, const RenderedQueryOptions& options) {
     if (!impl->style) return {};
 
-    return impl->style->queryRenderedFeatures(
+    return impl->renderStyle->queryRenderedFeatures(
         {
             box.min,
             { box.max.x, box.min.y },
@@ -842,7 +862,7 @@ std::vector<Feature> Map::queryRenderedFeatures(const ScreenBox& box, const Rend
 std::vector<Feature> Map::querySourceFeatures(const std::string& sourceID, const SourceQueryOptions& options) {
     if (!impl->style) return {};
 
-    const RenderSource* source = impl->style->getRenderSource(sourceID);
+    const RenderSource* source = impl->renderStyle->getRenderSource(sourceID);
     if (!source) return {};
 
     return source->querySourceFeatures(options);
@@ -1046,7 +1066,7 @@ MapDebugOptions Map::getDebug() const {
 }
 
 bool Map::isFullyLoaded() const {
-    return impl->style ? impl->style->isLoaded() : false;
+    return impl->style && impl->style->isLoaded() && impl->renderStyle->isLoaded();
 }
 
 style::TransitionOptions Map::getTransitionOptions() const {
@@ -1066,7 +1086,7 @@ void Map::setSourceTileCacheSize(size_t size) {
     if (size != impl->sourceCacheSize) {
         impl->sourceCacheSize = size;
         if (!impl->style) return;
-        impl->style->setSourceTileCacheSize(size);
+        impl->renderStyle->setSourceTileCacheSize(size);
         impl->backend.invalidate();
     }
 }
@@ -1076,8 +1096,8 @@ void Map::onLowMemory() {
         BackendScope guard(impl->backend);
         impl->painter->cleanup();
     }
-    if (impl->style) {
-        impl->style->onLowMemory();
+    if (impl->renderStyle) {
+        impl->renderStyle->onLowMemory();
         impl->backend.invalidate();
     }
 }
@@ -1089,6 +1109,10 @@ void Map::Impl::onSourceChanged(style::Source& source) {
 void Map::Impl::onUpdate(Update flags) {
     updateFlags |= flags;
     asyncInvalidate.send();
+}
+
+void Map::Impl::onInvalidate() {
+    onUpdate(Update::Repaint);
 }
 
 void Map::Impl::onStyleLoaded() {
@@ -1111,6 +1135,7 @@ void Map::dumpDebugLogs() const {
     Log::Info(Event::General, "MapContext::styleURL: %s", impl->styleURL.c_str());
     if (impl->style) {
         impl->style->dumpDebugLogs();
+        impl->renderStyle->dumpDebugLogs();
     } else {
         Log::Info(Event::General, "no style loaded");
     }

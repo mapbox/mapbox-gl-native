@@ -59,7 +59,7 @@ std::map<UnwrappedTileID, RenderTile>& RenderAnnotationSource::getRenderTiles() 
 std::unordered_map<std::string, std::vector<Feature>>
 RenderAnnotationSource::queryRenderedFeatures(const ScreenLineString& geometry,
                                               const TransformState& transformState,
-                                              const style::Style& style,
+                                              const RenderStyle& style,
                                               const RenderedQueryOptions& options) const {
     return tilePyramid.queryRenderedFeatures(geometry, transformState, style, options);
 }
