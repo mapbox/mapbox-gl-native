@@ -64,7 +64,7 @@
 #import "MGLCompactCalloutView.h"
 #import "MGLAnnotationContainerView.h"
 #import "MGLAnnotationContainerView_Private.h"
-#import "MGLAttributionInfo.h"
+#import "MGLAttributionInfo_Private.h"
 
 #include <algorithm>
 #include <cstdlib>
@@ -1895,8 +1895,12 @@ public:
             {
                 if (info.feedbackLink)
                 {
-                    url = [info feedbackURLAtCenterCoordinate:self.centerCoordinate
-                                                    zoomLevel:self.zoomLevel];
+                    MGLMapCamera *camera = self.camera;
+                    url = [info feedbackURLForStyleURL:self.styleURL
+                                    atCenterCoordinate:camera.centerCoordinate
+                                             zoomLevel:self.zoomLevel
+                                             direction:camera.heading
+                                                 pitch:camera.pitch];
                 }
                 [[UIApplication sharedApplication] openURL:url];
             }

@@ -37,6 +37,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * Fixed an issue where gesture recognizers associated with map view interactivity were not disabled when their related interactions were disabled. ([#8304](https://github.com/mapbox/mapbox-gl-native/pull/8304))
 * Fixed an issue preventing the Mapbox Telemetry confirmation dialog from appearing when opened from within a map view in a modal view controller. ([#9027](https://github.com/mapbox/mapbox-gl-native/pull/9027))
 * Corrected the size of MGLMapView’s compass. ([#9060](https://github.com/mapbox/mapbox-gl-native/pull/9060))
+* The Improve This Map button in the attribution action sheet now leads to a feedback tool that matches MGLMapView’s rotation and pitch. `-[MGLAttributionInfo feedbackURLAtCenterCoordinate:zoomLevel:]` no longer respects the feedback URL specified in TileJSON. ([#9078](https://github.com/mapbox/mapbox-gl-native/pull/9078))
 
 ### Other changes
 

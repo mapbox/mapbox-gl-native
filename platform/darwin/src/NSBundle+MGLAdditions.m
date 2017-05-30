@@ -31,4 +31,13 @@
     return bundle.infoDictionary;
 }
 
++ (nullable NSString *)mgl_applicationBundleIdentifier {
+    NSString *bundleIdentifier = [NSBundle mainBundle].bundleIdentifier;
+    if (!bundleIdentifier) {
+        // There’s no main bundle identifier when running in a unit test bundle.
+        bundleIdentifier = [NSBundle bundleForClass:[MGLAccountManager class]].bundleIdentifier;
+    }
+    return bundleIdentifier;
+}
+
 @end

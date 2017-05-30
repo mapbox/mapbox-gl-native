@@ -7,6 +7,7 @@
 #import "MGLOfflinePack_Private.h"
 #import "MGLOfflineRegion_Private.h"
 #import "MGLTilePyramidOfflineRegion.h"
+#import "NSBundle+MGLAdditions.h"
 #import "NSValue+MGLAdditions.h"
 
 #include <mbgl/util/string.hpp>
@@ -132,7 +133,7 @@ NSString * const MGLOfflinePackMaximumCountUserInfoKey = MGLOfflinePackUserInfoK
                                                              appropriateForURL:nil
                                                                         create:YES
                                                                          error:nil];
-    NSString *bundleIdentifier = [self bundleIdentifier];
+    NSString *bundleIdentifier = [NSBundle mgl_applicationBundleIdentifier];
     if (!bundleIdentifier) {
         // There’s no main bundle identifier when running in a unit test bundle.
         bundleIdentifier = [NSBundle bundleForClass:self].bundleIdentifier;
@@ -166,7 +167,7 @@ NSString * const MGLOfflinePackMaximumCountUserInfoKey = MGLOfflinePackUserInfoK
     NSString *legacyCachePath = [legacyPaths.firstObject stringByAppendingPathComponent:MGLOfflineStorageFileName3_2_0_beta_1];
 #elif TARGET_OS_MAC
     // ~/Library/Caches/tld.app.bundle.id/offline.db
-    NSString *bundleIdentifier = [self bundleIdentifier];
+    NSString *bundleIdentifier = [NSBundle mgl_applicationBundleIdentifier];
     NSURL *legacyCacheDirectoryURL = [[NSFileManager defaultManager] URLForDirectory:NSCachesDirectory
                                                                             inDomain:NSUserDomainMask
                                                                    appropriateForURL:nil
@@ -217,15 +218,6 @@ NSString * const MGLOfflinePackMaximumCountUserInfoKey = MGLOfflinePackUserInfoK
                                                context:NULL];
     }
     return self;
-}
-
-+ (NSString *)bundleIdentifier {
-    NSString *bundleIdentifier = [NSBundle mainBundle].bundleIdentifier;
-    if (!bundleIdentifier) {
-        // There’s no main bundle identifier when running in a unit test bundle.
-        bundleIdentifier = [NSBundle bundleForClass:self].bundleIdentifier;
-    }
-    return bundleIdentifier;
 }
 
 - (void)dealloc {
