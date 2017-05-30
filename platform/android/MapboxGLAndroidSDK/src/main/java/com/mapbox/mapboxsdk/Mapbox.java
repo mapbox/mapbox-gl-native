@@ -20,7 +20,7 @@ import com.mapbox.services.android.telemetry.location.LocationEnginePriority;
  * The entry point of the Mapbox Android SDK.
  * <p>
  * Obtain a reference by calling {@link #getInstance(Context, String)}. Usually this class is configured in
- * {@link Application#onCreate()} and is responsible for the active access token, application context and
+ * {@link Application#onCreate()} and is responsible for the active access token, application context, and
  * connectivity state.
  * </p>
  */
