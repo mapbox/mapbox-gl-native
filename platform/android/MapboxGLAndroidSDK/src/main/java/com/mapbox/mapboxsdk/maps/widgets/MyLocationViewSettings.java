@@ -26,6 +26,8 @@ public class MyLocationViewSettings {
 
   private boolean enabled;
 
+  private boolean movementAnimationEnabled;
+
   //
   // Foreground
   //
@@ -88,6 +90,7 @@ public class MyLocationViewSettings {
     setBackgroundTintColor(options.getMyLocationBackgroundTintColor());
     setAccuracyAlpha(options.getMyLocationAccuracyAlpha());
     setAccuracyTintColor(options.getMyLocationAccuracyTintColor());
+    setMovementAnimationEnabled(options.isMovementAnimationEnabled());
   }
 
   /**
@@ -107,6 +110,24 @@ public class MyLocationViewSettings {
   public void setEnabled(boolean enabled) {
     this.enabled = enabled;
     myLocationView.setEnabled(enabled);
+  }
+
+  /**
+   * Check whether smooth camera movement on location change is enabled.
+   *
+   * @return true if is enabled, else otherwise.
+   */
+  public boolean isMovementAnimationEnabled() {
+    return movementAnimationEnabled;
+  }
+
+  /**
+   * Set whether smooth camera movement on location change (while using {@link MyLocationTracking#TRACKING_FOLLOW }) should be enabled or not.
+   *
+   * @param movementAnimationEnabled true (default value) if animation should be enabled, else otherwise.
+   */
+  public void setMovementAnimationEnabled(boolean movementAnimationEnabled) {
+    this.movementAnimationEnabled = movementAnimationEnabled;
   }
 
   /**
