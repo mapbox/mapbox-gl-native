@@ -22,6 +22,8 @@ target_sources(mbgl-node
     PRIVATE platform/node/src/node_thread_pool.hpp
     PRIVATE platform/node/src/node_thread_pool.cpp
     PRIVATE platform/node/src/util/async_queue.hpp
+    PRIVATE platform/default/mbgl/util/threaded_run_loop.hpp
+    PRIVATE platform/default/mbgl/util/threaded_run_loop.cpp
 )
 
 target_compile_options(mbgl-node

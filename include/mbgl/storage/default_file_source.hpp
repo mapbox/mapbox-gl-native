@@ -9,11 +9,9 @@
 
 namespace mbgl {
 
+template <class>
+class Actor;
 class Scheduler;
-
-namespace util {
-template <typename T> class Thread;
-} // namespace util
 
 class DefaultFileSource : public FileSource {
 public:
@@ -145,9 +143,9 @@ public:
     class Impl;
 
 private:
-    // Shared so destruction is done on this thread
-    const std::shared_ptr<FileSource> assetFileSource;
-    const std::unique_ptr<util::Thread<Impl>> thread;
+    Scheduler& scheduler;
+    const std::unique_ptr<Scheduler> workerScheduler;
+    const std::unique_ptr<Actor<Impl>> worker;
 
     std::mutex cachedBaseURLMutex;
     std::string cachedBaseURL = mbgl::util::API_BASE_URL;
