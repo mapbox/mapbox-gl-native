@@ -21,13 +21,10 @@ namespace mbgl {
 class Painter;
 class TransformState;
 class RenderTile;
+class RenderStyle;
 class RenderedQueryOptions;
 class SourceQueryOptions;
 class TileParameters;
-
-namespace style {
-class Style;
-} // namespace style
 
 class TilePyramid {
 public:
@@ -55,7 +52,7 @@ public:
     std::unordered_map<std::string, std::vector<Feature>>
     queryRenderedFeatures(const ScreenLineString& geometry,
                           const TransformState& transformState,
-                          const style::Style& style,
+                          const RenderStyle& style,
                           const RenderedQueryOptions& options) const;
 
     std::vector<Feature> querySourceFeatures(const SourceQueryOptions&) const;

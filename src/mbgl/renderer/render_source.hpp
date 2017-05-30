@@ -18,16 +18,13 @@ namespace mbgl {
 class Painter;
 class TransformState;
 class RenderTile;
+class RenderStyle;
 class RenderLayer;
 class RenderedQueryOptions;
 class SourceQueryOptions;
 class Tile;
 class RenderSourceObserver;
 class TileParameters;
-
-namespace style {
-class Style;
-} // namespace style
 
 namespace algorithm {
 class ClipIDGenerator;
@@ -72,7 +69,7 @@ public:
     virtual std::unordered_map<std::string, std::vector<Feature>>
     queryRenderedFeatures(const ScreenLineString& geometry,
                           const TransformState& transformState,
-                          const style::Style& style,
+                          const RenderStyle& style,
                           const RenderedQueryOptions& options) const = 0;
 
     virtual std::vector<Feature>

@@ -7,6 +7,7 @@
 #include <mbgl/renderer/frame_history.hpp>
 #include <mbgl/renderer/render_item.hpp>
 #include <mbgl/renderer/bucket.hpp>
+#include <mbgl/renderer/render_light.hpp>
 
 #include <mbgl/gl/context.hpp>
 #include <mbgl/programs/debug_program.hpp>
@@ -14,8 +15,6 @@
 #include <mbgl/programs/fill_program.hpp>
 #include <mbgl/programs/extrusion_texture_program.hpp>
 #include <mbgl/programs/raster_program.hpp>
-
-#include <mbgl/style/style.hpp>
 
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/chrono.hpp>
@@ -29,6 +28,7 @@
 
 namespace mbgl {
 
+class RenderStyle;
 class RenderTile;
 class SpriteAtlas;
 class View;
@@ -59,11 +59,6 @@ class TilePyramid;
 
 struct ClipID;
 
-namespace style {
-class Style;
-class Source;
-} // namespace style
-
 struct FrameData {
     TimePoint timePoint;
     float pixelRatio;
@@ -77,7 +72,7 @@ public:
     Painter(gl::Context&, const TransformState&, float pixelRatio, const std::string& programCacheDir);
     ~Painter();
 
-    void render(const style::Style&,
+    void render(RenderStyle&,
                 const FrameData&,
                 View&);
 

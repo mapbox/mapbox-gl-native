@@ -176,7 +176,7 @@ void GeometryTile::queryRenderedFeatures(
     std::unordered_map<std::string, std::vector<Feature>>& result,
     const GeometryCoordinates& queryGeometry,
     const TransformState& transformState,
-    const style::Style& style,
+    const RenderStyle& style,
     const RenderedQueryOptions& options) {
 
     if (!featureIndex || !data) return;

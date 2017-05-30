@@ -1,5 +1,5 @@
 #include <mbgl/geometry/feature_index.hpp>
-#include <mbgl/style/style.hpp>
+#include <mbgl/renderer/render_style.hpp>
 #include <mbgl/renderer/render_layer.hpp>
 #include <mbgl/renderer/layers/render_symbol_layer.hpp>
 #include <mbgl/text/collision_tile.hpp>
@@ -54,7 +54,7 @@ static bool topDownSymbols(const IndexedSubfeature& a, const IndexedSubfeature& 
 }
 
 static int16_t getAdditionalQueryRadius(const RenderedQueryOptions& queryOptions,
-                                        const style::Style& style,
+                                        const RenderStyle& style,
                                         const GeometryTile& tile,
                                         const float pixelsToTileUnits) {
 
@@ -69,7 +69,7 @@ static int16_t getAdditionalQueryRadius(const RenderedQueryOptions& queryOptions
 
     if (queryOptions.layerIDs) {
         for (const auto& layerID : *queryOptions.layerIDs) {
-            RenderLayer* layer = style.getRenderLayer(layerID);
+            const RenderLayer* layer = style.getRenderLayer(layerID);
             if (layer) {
                 getQueryRadius(*layer);
             }
@@ -92,7 +92,7 @@ void FeatureIndex::query(
         const RenderedQueryOptions& queryOptions,
         const GeometryTileData& geometryTileData,
         const CanonicalTileID& tileID,
-        const style::Style& style,
+        const RenderStyle& style,
         const CollisionTile* collisionTile,
         const GeometryTile& tile) const {
 
@@ -135,7 +135,7 @@ void FeatureIndex::addFeature(
     const RenderedQueryOptions& options,
     const GeometryTileData& geometryTileData,
     const CanonicalTileID& tileID,
-    const style::Style& style,
+    const RenderStyle& style,
     const float bearing,
     const float pixelsToTileUnits) const {
 

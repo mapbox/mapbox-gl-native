@@ -19,6 +19,7 @@ namespace mbgl {
 class GeometryTileData;
 class FeatureIndex;
 class CollisionTile;
+class RenderStyle;
 class RenderLayer;
 class SourceQueryOptions;
 class TileParameters;
@@ -49,7 +50,7 @@ public:
             std::unordered_map<std::string, std::vector<Feature>>& result,
             const GeometryCoordinates& queryGeometry,
             const TransformState&,
-            const style::Style&,
+            const RenderStyle&,
             const RenderedQueryOptions& options) override;
 
     void querySourceFeatures(

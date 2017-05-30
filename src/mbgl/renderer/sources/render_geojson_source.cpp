@@ -74,7 +74,7 @@ std::map<UnwrappedTileID, RenderTile>& RenderGeoJSONSource::getRenderTiles() {
 std::unordered_map<std::string, std::vector<Feature>>
 RenderGeoJSONSource::queryRenderedFeatures(const ScreenLineString& geometry,
                                            const TransformState& transformState,
-                                           const style::Style& style,
+                                           const RenderStyle& style,
                                            const RenderedQueryOptions& options) const {
     return tilePyramid.queryRenderedFeatures(geometry, transformState, style, options);
 }

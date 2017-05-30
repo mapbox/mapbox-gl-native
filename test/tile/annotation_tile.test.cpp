@@ -5,7 +5,7 @@
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/map/transform.hpp>
 #include <mbgl/map/query.hpp>
-#include <mbgl/style/style.hpp>
+#include <mbgl/renderer/render_style.hpp>
 #include <mbgl/renderer/tile_parameters.hpp>
 #include <mbgl/map/query.hpp>
 #include <mbgl/text/collision_tile.hpp>
@@ -26,7 +26,7 @@ public:
     util::RunLoop loop;
     ThreadPool threadPool { 1 };
     AnnotationManager annotationManager;
-    style::Style style { threadPool, fileSource, 1.0 };
+    RenderStyle style { threadPool, fileSource };
     SpriteAtlas spriteAtlas;
     GlyphAtlas glyphAtlas { { 512, 512, }, fileSource };
 

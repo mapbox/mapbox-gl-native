@@ -33,7 +33,7 @@ void Tile::queryRenderedFeatures(
         std::unordered_map<std::string, std::vector<Feature>>&,
         const GeometryCoordinates&,
         const TransformState&,
-        const style::Style&,
+        const RenderStyle&,
         const RenderedQueryOptions&) {}
 
 void Tile::querySourceFeatures(
