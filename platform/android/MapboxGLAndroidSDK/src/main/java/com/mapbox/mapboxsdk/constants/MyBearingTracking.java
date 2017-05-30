@@ -16,7 +16,7 @@ import java.lang.annotation.RetentionPolicy;
 public class MyBearingTracking {
 
   /**
-   * Indicates the parameter accepts one of the values from MyBearingTracking.
+   * Indicates that the parameter accepts one of the values from MyBearingTracking.
    */
   @IntDef( {NONE, COMPASS, GPS, /**COMBINED**/})
   @Retention(RetentionPolicy.SOURCE)
