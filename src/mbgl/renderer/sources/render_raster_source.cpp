@@ -19,8 +19,41 @@ bool RenderRasterSource::isLoaded() const {
     return tilePyramid.isLoaded();
 }
 
-void RenderRasterSource::invalidateTiles() {
-    tilePyramid.invalidateTiles();
+void RenderRasterSource::update(Immutable<style::Source::Impl> baseImpl_,
+                                const std::vector<Immutable<Layer::Impl>>& layers,
+                                const bool needsRendering,
+                                const bool needsRelayout,
+                                const TileParameters& parameters) {
+    std::swap(baseImpl, baseImpl_);
+
+    enabled = needsRendering;
+
+    optional<Tileset> tileset = impl().getTileset();
+
+    if (!tileset) {
+        return;
+    }
+
+    if (tileURLTemplates != tileset->tiles) {
+        tileURLTemplates = tileset->tiles;
+
+        // TODO: this removes existing buckets, and will cause flickering.
+        // Should instead refresh tile data in place.
+        tilePyramid.tiles.clear();
+        tilePyramid.renderTiles.clear();
+        tilePyramid.cache.clear();
+    }
+
+    tilePyramid.update(layers,
+                       needsRendering,
+                       needsRelayout,
+                       parameters,
+                       SourceType::Raster,
+                       impl().getTileSize(),
+                       tileset->zoomRange,
+                       [&] (const OverscaledTileID& tileID) {
+                           return std::make_unique<RasterTile>(tileID, parameters, *tileset);
+                       });
 }
 
 void RenderRasterSource::startRender(algorithm::ClipIDGenerator&, const mat4& projMatrix, const mat4& clipMatrix, const TransformState& transform) {
@@ -33,35 +66,6 @@ void RenderRasterSource::finishRender(Painter& painter) {
 
 std::map<UnwrappedTileID, RenderTile>& RenderRasterSource::getRenderTiles() {
     return tilePyramid.getRenderTiles();
-}
-
-void RenderRasterSource::updateTiles(const TileParameters& parameters) {
-    optional<Tileset> tileset = impl().getTileset();
-
-    if (!tileset) {
-        return;
-    }
-
-    if (tileURLTemplates != tileset->tiles) {
-        tileURLTemplates = tileset->tiles;
-        tilePyramid.invalidateTiles();
-    }
-
-    tilePyramid.updateTiles(parameters,
-                            SourceType::Raster,
-                            impl().getTileSize(),
-                            tileset->zoomRange,
-                            [&] (const OverscaledTileID& tileID) {
-                                return std::make_unique<RasterTile>(tileID, parameters, *tileset);
-                            });
-}
-
-void RenderRasterSource::removeTiles() {
-    tilePyramid.removeTiles();
-}
-
-void RenderRasterSource::reloadTiles() {
-    tilePyramid.reloadTiles();
 }
 
 std::unordered_map<std::string, std::vector<Feature>>

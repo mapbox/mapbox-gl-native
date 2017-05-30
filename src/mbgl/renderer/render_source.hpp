@@ -6,6 +6,7 @@
 #include <mbgl/util/geo.hpp>
 #include <mbgl/util/feature.hpp>
 #include <mbgl/style/source_impl.hpp>
+#include <mbgl/style/layer_impl.hpp>
 
 #include <unordered_map>
 #include <vector>
@@ -17,6 +18,7 @@ namespace mbgl {
 class Painter;
 class TransformState;
 class RenderTile;
+class RenderLayer;
 class RenderedQueryOptions;
 class SourceQueryOptions;
 class Tile;
@@ -35,8 +37,6 @@ class RenderSource : protected TileObserver {
 public:
     static std::unique_ptr<RenderSource> create(Immutable<style::Source::Impl>);
 
-    ~RenderSource() override = default;
-
     // Check whether this source is of the given subtype.
     template <class T>
     bool is() const;
@@ -52,21 +52,14 @@ public:
         return is<T>() ? reinterpret_cast<const T*>(this) : nullptr;
     }
 
+    bool isEnabled() const;
     virtual bool isLoaded() const = 0;
 
-    // Called when the camera has changed. May load new tiles, unload obsolete tiles, or
-    // trigger re-placement of existing complete tiles.
-    virtual void updateTiles(const TileParameters&) = 0;
-
-    // Removes all tiles (by putting them into the cache).
-    virtual void removeTiles() = 0;
-
-    // Remove all tiles and clear the cache.
-    virtual void invalidateTiles() = 0;
-
-    // Request that all loaded tiles re-run the layout operation on the existing source
-    // data with fresh style information.
-    virtual void reloadTiles() = 0;
+    virtual void update(Immutable<style::Source::Impl>,
+                        const std::vector<Immutable<style::Layer::Impl>>&,
+                        bool needsRendering,
+                        bool needsRelayout,
+                        const TileParameters&) = 0;
 
     virtual void startRender(algorithm::ClipIDGenerator&,
                              const mat4& projMatrix,
@@ -93,13 +86,12 @@ public:
     void setObserver(RenderSourceObserver*);
 
     Immutable<style::Source::Impl> baseImpl;
-    void setImpl(Immutable<style::Source::Impl>);
-
-    bool enabled = false;
 
 protected:
     RenderSource(Immutable<style::Source::Impl>);
     RenderSourceObserver* observer;
+
+    bool enabled = false;
 
     void onTileChanged(Tile&) final;
     void onTileError(Tile&, std::exception_ptr) final;

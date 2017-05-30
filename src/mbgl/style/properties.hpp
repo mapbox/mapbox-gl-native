@@ -205,6 +205,12 @@ public:
                     .transition(parameters, std::move(prior.template get<Ps>()))...
             };
         }
+
+        bool hasDataDrivenPropertyDifference(const Transitionable& other) const {
+            bool result = false;
+            util::ignore({ (result |= this->template get<Ps>().value.hasDataDrivenPropertyDifference(other.template get<Ps>().value))... });
+            return result;
+        }
     };
 };
 

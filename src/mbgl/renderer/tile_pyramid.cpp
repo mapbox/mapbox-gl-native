@@ -39,12 +39,6 @@ bool TilePyramid::isLoaded() const {
     return true;
 }
 
-void TilePyramid::invalidateTiles() {
-    tiles.clear();
-    renderTiles.clear();
-    cache.clear();
-}
-
 void TilePyramid::startRender(const mat4& projMatrix,
                               const mat4& clipMatrix,
                               const TransformState& transform) {
@@ -67,11 +61,34 @@ std::map<UnwrappedTileID, RenderTile>& TilePyramid::getRenderTiles() {
     return renderTiles;
 }
 
-void TilePyramid::updateTiles(const TileParameters& parameters,
-                              const SourceType type,
-                              const uint16_t tileSize,
-                              const Range<uint8_t> zoomRange,
-                              std::function<std::unique_ptr<Tile> (const OverscaledTileID&)> createTile) {
+void TilePyramid::update(const std::vector<Immutable<style::Layer::Impl>>& layers,
+                         const bool needsRendering,
+                         const bool needsRelayout,
+                         const TileParameters& parameters,
+                         const SourceType type,
+                         const uint16_t tileSize,
+                         const Range<uint8_t> zoomRange,
+                         std::function<std::unique_ptr<Tile> (const OverscaledTileID&)> createTile) {
+    // If we need a relayout, abandon any cached tiles; they're now stale.
+    if (needsRelayout) {
+        cache.clear();
+    }
+
+    // If we're not going to render anything, move our existing tiles into
+    // the cache (if they're not stale) or abandon them, and return.
+    if (!needsRendering) {
+        if (!needsRelayout) {
+            for (auto& entry : tiles) {
+                cache.add(entry.first, std::move(entry.second));
+            }
+        }
+
+        tiles.clear();
+        renderTiles.clear();
+
+        return;
+    }
+
     // Determine the overzooming/underzooming amounts and required tiles.
     int32_t overscaledZoom = util::coveringZoomLevel(parameters.transformState.getZoom(), type, tileSize);
     int32_t tileZoom = overscaledZoom;
@@ -97,6 +114,9 @@ void TilePyramid::updateTiles(const TileParameters& parameters,
     auto retainTileFn = [&](Tile& tile, Resource::Necessity necessity) -> void {
         retain.emplace(tile.id);
         tile.setNecessity(necessity);
+        if (needsRelayout) {
+            tile.setLayers(layers);
+        }
     };
     auto getTileFn = [&](const OverscaledTileID& tileID) -> Tile* {
         auto it = tiles.find(tileID);
@@ -108,6 +128,7 @@ void TilePyramid::updateTiles(const TileParameters& parameters,
             tile = createTile(tileID);
             if (tile) {
                 tile->setObserver(observer);
+                tile->setLayers(layers);
             }
         }
         if (!tile) {
@@ -160,21 +181,6 @@ void TilePyramid::removeStaleTiles(const std::set<OverscaledTileID>& retain) {
             }
             ++retainIt;
         }
-    }
-}
-
-void TilePyramid::removeTiles() {
-    renderTiles.clear();
-    if (!tiles.empty()) {
-        removeStaleTiles({});
-    }
-}
-
-void TilePyramid::reloadTiles() {
-    cache.clear();
-
-    for (auto& pair : tiles) {
-        pair.second->redoLayout();
     }
 }
 

@@ -59,6 +59,10 @@ public:
     auto evaluate(const Evaluator& evaluator, TimePoint = {}) const {
         return Value::visit(value, evaluator);
     }
+
+    bool hasDataDrivenPropertyDifference(const DataDrivenPropertyValue<T>& other) const {
+        return *this != other && (isDataDriven() || other.isDataDriven());
+    }
 };
 
 } // namespace style

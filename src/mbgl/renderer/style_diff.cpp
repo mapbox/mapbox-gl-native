@@ -27,7 +27,7 @@ StyleDifference<T> diff(const std::vector<T>& a, const std::vector<T>& b, const 
             bIt++;
         } else {
             if (aIt->get() != bIt->get()) {
-                result.changed.emplace((*bIt)->id, *bIt);
+                result.changed.emplace((*bIt)->id, std::array<T, 2> {{ *aIt, *bIt }});
             }
             aIt++;
             bIt++;
@@ -59,6 +59,15 @@ LayerDifference diffLayers(const std::vector<ImmutableLayer>& a,
         return std::tie(lhs->id, lhs->type)
             == std::tie(rhs->id, rhs->type);
     });
+}
+
+bool hasLayoutDifference(const LayerDifference& layerDiff, const std::string& layerID) {
+    if (layerDiff.added.count(layerID))
+        return true;
+    const auto it = layerDiff.changed.find(layerID);
+    if (it == layerDiff.changed.end())
+        return false;
+    return it->second[0]->hasLayoutDifference(*it->second[1]);
 }
 
 } // namespace mbgl

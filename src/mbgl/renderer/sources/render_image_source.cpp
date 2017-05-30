@@ -72,7 +72,14 @@ void RenderImageSource::upload(gl::Context& context) {
     }
 }
 
-void RenderImageSource::updateTiles(const TileParameters& parameters) {
+void RenderImageSource::update(Immutable<style::Source::Impl> baseImpl_,
+                               const std::vector<Immutable<Layer::Impl>>&,
+                               const bool needsRendering,
+                               const bool,
+                               const TileParameters& parameters) {
+    std::swap(baseImpl, baseImpl_);
+
+    enabled = needsRendering;
 
     auto transformState = parameters.transformState;
     auto size = transformState.getSize();

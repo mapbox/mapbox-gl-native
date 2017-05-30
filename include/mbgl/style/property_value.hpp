@@ -38,6 +38,10 @@ public:
     auto evaluate(const Evaluator& evaluator, TimePoint = {}) const {
         return Value::visit(value, evaluator);
     }
+
+    bool hasDataDrivenPropertyDifference(const PropertyValue<T>&) const {
+        return false;
+    }
 };
 
 } // namespace style

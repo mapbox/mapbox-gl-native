@@ -5,7 +5,6 @@
 #include <mbgl/style/source_observer.hpp>
 #include <mbgl/style/layer_observer.hpp>
 #include <mbgl/style/light_observer.hpp>
-#include <mbgl/style/update_batch.hpp>
 #include <mbgl/style/image.hpp>
 #include <mbgl/renderer/render_source.hpp>
 #include <mbgl/renderer/render_source_observer.hpp>
@@ -179,7 +178,6 @@ private:
 
     std::exception_ptr lastError;
 
-    UpdateBatch updateBatch;
     ZoomHistory zoomHistory;
     bool spriteLoaded = false;
 

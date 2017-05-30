@@ -22,6 +22,7 @@ public:
     void render(const TransformState&) const;
 
 private:
+    bool hasLayoutDifference(const Layer::Impl&) const override;
     void stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>&) const override;
 
     CustomLayerInitializeFunction initializeFn = nullptr;

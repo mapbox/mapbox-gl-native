@@ -7,10 +7,11 @@
 #include <mbgl/util/default_thread_pool.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/map/transform.hpp>
-#include <mbgl/style/style.hpp>
 #include <mbgl/renderer/tile_parameters.hpp>
 #include <mbgl/style/layers/circle_layer.hpp>
 #include <mbgl/annotation/annotation_manager.hpp>
+#include <mbgl/sprite/sprite_atlas.hpp>
+#include <mbgl/text/glyph_atlas.hpp>
 
 #include <memory>
 
@@ -24,7 +25,8 @@ public:
     util::RunLoop loop;
     ThreadPool threadPool { 1 };
     AnnotationManager annotationManager;
-    style::Style style { threadPool, fileSource, 1.0 };
+    SpriteAtlas spriteAtlas;
+    GlyphAtlas glyphAtlas { { 512, 512, }, fileSource };
     Tileset tileset { { "https://example.com" }, { 0, 22 }, "none" };
 
     TileParameters tileParameters {
@@ -35,14 +37,15 @@ public:
         fileSource,
         MapMode::Continuous,
         annotationManager,
-        style
+        spriteAtlas,
+        glyphAtlas
     };
 };
 
 TEST(GeoJSONTile, Issue7648) {
     GeoJSONTileTest test;
 
-    test.style.addLayer(std::make_unique<CircleLayer>("circle", "source"));
+    CircleLayer layer("circle", "source");
 
     mapbox::geometry::feature_collection<int16_t> features;
     features.push_back(mapbox::geometry::feature<int16_t> {
@@ -55,9 +58,10 @@ TEST(GeoJSONTile, Issue7648) {
     observer.tileChanged = [&] (const Tile&) {
         // Once present, the bucket should never "disappear", which would cause
         // flickering.
-        ASSERT_NE(nullptr, tile.getBucket(*test.style.getLayer("circle")->baseImpl));
+        ASSERT_NE(nullptr, tile.getBucket(*layer.baseImpl));
     };
 
+    tile.setLayers({{ layer.baseImpl }});
     tile.setObserver(&observer);
     tile.setPlacementConfig({});
 

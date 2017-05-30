@@ -23,17 +23,11 @@ class RenderLayer;
 class SourceQueryOptions;
 class TileParameters;
 
-namespace style {
-class Style;
-} // namespace style
-
 class GeometryTile : public Tile, public GlyphRequestor, IconRequestor {
 public:
     GeometryTile(const OverscaledTileID&,
                  std::string sourceID,
-                 const TileParameters&,
-                 GlyphAtlas&,
-                 SpriteAtlas&);
+                 const TileParameters&);
 
     ~GeometryTile() override;
 
@@ -41,7 +35,7 @@ public:
     void setData(std::unique_ptr<const GeometryTileData>);
 
     void setPlacementConfig(const PlacementConfig&) override;
-    void redoLayout() override;
+    void setLayers(const std::vector<Immutable<style::Layer::Impl>>&) override;
     
     void onGlyphsAvailable(GlyphPositionMap) override;
     void onIconsAvailable(IconMap) override;
@@ -93,9 +87,6 @@ private:
     void invokePlacement();
 
     const std::string sourceID;
-
-    // TODO: remove
-    style::Style& style;
 
     // Used to signal the worker that it should abandon parsing this tile as soon as possible.
     std::atomic<bool> obsolete { false };
