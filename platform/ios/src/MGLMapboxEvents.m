@@ -317,13 +317,6 @@ const NSTimeInterval MGLFlushInterval = 180;
         return;
     }
 
-    if ([self.eventQueue count] <= 1) {
-        [self.eventQueue removeAllObjects];
-        [[UIApplication sharedApplication] endBackgroundTask:_backgroundTaskIdentifier];
-        _backgroundTaskIdentifier = UIBackgroundTaskInvalid;
-        return;
-    }
-
     NSArray *events = [NSArray arrayWithArray:self.eventQueue];
     [self.eventQueue removeAllObjects];
 
