@@ -1,38 +1,55 @@
 package com.mapbox.mapboxsdk.testapp.activity.userlocation;
 
-
+import android.animation.AnimatorListenerAdapter;
+import android.animation.TypeEvaluator;
+import android.animation.ValueAnimator;
 import android.location.Location;
-import android.os.Handler;
 
 import com.mapbox.services.android.telemetry.location.LocationEngine;
 import com.mapbox.services.android.telemetry.location.LocationEngineListener;
 
+import timber.log.Timber;
+
 /**
- * Sample LocationEngine that provides mocked locations simulating GPS updates
+ * Sample LocationEngine that provides mocked LOCATIONS simulating GPS updates
  */
 public class MockLocationEngine extends LocationEngine {
+  private static MockLocationEngine INSTANCE;
 
-  // Mocked data
-  private static final int UPDATE_INTERVAL_MS = 1000;
-  private static final double[][] locations = new double[][] {
-    new double[] {39.489309, -0.360415},
-    new double[] {39.492469, -0.358777},
-    new double[] {40.393285, -3.707260},
-    new double[] {40.394374, -3.707767},
-    new double[] {40.398012, -3.715943},
-    new double[] {40.416913, -3.703861}};
+  private final LocationAnimator locationAnimator;
+  private boolean running;
+  private static int counter;
 
-  private Handler handler;
-  int currentIndex;
+  MockLocationEngine(Location start, Location end) {
+    locationAnimator = new LocationAnimator(start, end, new ValueAnimator.AnimatorUpdateListener() {
+      @Override
+      public void onAnimationUpdate(ValueAnimator animation) {
+        for (LocationEngineListener listener : locationListeners) {
+          listener.onLocationChanged((Location) animation.getAnimatedValue());
+        }
+      }
+    });
+  }
 
-  public MockLocationEngine() {
-    super();
+  public static synchronized MockLocationEngine getInstance() {
+    if (INSTANCE == null) {
+      INSTANCE = new MockLocationEngine(
+        MockLocationEngine.createLocation(40.416913, -3.703861),
+        MockLocationEngine.createLocation(39.461643, -0.368041)
+      );
+    }
+    return INSTANCE;
+  }
+
+  public static Location createLocation(double latitude, double longitude) {
+    Location location = new Location(MockLocationEngine.class.getSimpleName());
+    location.setLatitude(latitude);
+    location.setLongitude(longitude);
+    return location;
   }
 
   @Override
   public void activate() {
-    currentIndex = 0;
-
     // "Connection" is immediate here
     for (LocationEngineListener listener : locationListeners) {
       listener.onConnected();
@@ -41,7 +58,6 @@ public class MockLocationEngine extends LocationEngine {
 
   @Override
   public void deactivate() {
-    handler = null;
   }
 
   @Override
@@ -51,44 +67,61 @@ public class MockLocationEngine extends LocationEngine {
 
   @Override
   public Location getLastLocation() {
-    return getNextLocation();
+    return null;
   }
 
   @Override
   public void requestLocationUpdates() {
-    // Fake regular updates with a handler
-    handler = new Handler();
-    handler.postDelayed(new LocationUpdateRunnable(), UPDATE_INTERVAL_MS);
+    if (!running) {
+      locationAnimator.start();
+      running = true;
+    }
   }
 
   @Override
   public void removeLocationUpdates() {
-    if (handler != null) {
-      handler.removeCallbacksAndMessages(null);
+    if (running) {
+      locationAnimator.stop();
+      running = false;
+      Timber.e("LOC %s", counter);
     }
   }
 
-  private Location getNextLocation() {
-    // Build the next location and rotate the index
-    Location location = new Location(MockLocationEngine.class.getSimpleName());
-    location.setLatitude(locations[currentIndex][0]);
-    location.setLongitude(locations[currentIndex][1]);
-    currentIndex = (currentIndex == locations.length - 1 ? 0 : currentIndex + 1);
-    return location;
-  }
+  private static class LocationAnimator extends AnimatorListenerAdapter {
 
-  private class LocationUpdateRunnable implements Runnable {
-    @Override
-    public void run() {
-      // Notify of an update
-      Location location = getNextLocation();
-      for (LocationEngineListener listener : locationListeners) {
-        listener.onLocationChanged(location);
-      }
+    private static final long DURATION_ANIMATION = 10000;
+    private final ValueAnimator locationAnimator;
+    private long animationTime;
 
-      if (handler != null) {
-        // Schedule the next update
-        handler.postDelayed(new LocationUpdateRunnable(), UPDATE_INTERVAL_MS);
+    LocationAnimator(Location start, Location end, ValueAnimator.AnimatorUpdateListener listener) {
+      locationAnimator = ValueAnimator.ofObject(new LocationEvaluator(), start, end);
+      locationAnimator.setDuration(DURATION_ANIMATION);
+      locationAnimator.addUpdateListener(listener);
+      locationAnimator.addListener(this);
+    }
+
+    void start() {
+      locationAnimator.start();
+      locationAnimator.setCurrentPlayTime(animationTime);
+    }
+
+    void stop() {
+      animationTime = locationAnimator.getCurrentPlayTime();
+      locationAnimator.cancel();
+    }
+
+    private static class LocationEvaluator implements TypeEvaluator<Location> {
+
+      private Location location = new Location(MockLocationEngine.class.getSimpleName());
+
+      @Override
+      public Location evaluate(float fraction, Location startValue, Location endValue) {
+        counter++;
+        location.setLatitude(startValue.getLatitude()
+          + ((endValue.getLatitude() - startValue.getLatitude()) * fraction));
+        location.setLongitude(startValue.getLongitude()
+          + ((endValue.getLongitude() - startValue.getLongitude()) * fraction));
+        return location;
       }
     }
   }

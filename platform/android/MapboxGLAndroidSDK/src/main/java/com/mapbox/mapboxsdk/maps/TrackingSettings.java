@@ -6,11 +6,11 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
 
+import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.constants.MyBearingTracking;
 import com.mapbox.mapboxsdk.constants.MyLocationTracking;
-import com.mapbox.mapboxsdk.location.LocationSource;
 import com.mapbox.mapboxsdk.maps.widgets.MyLocationView;
 import com.mapbox.services.android.telemetry.location.LocationEngine;
 import com.mapbox.services.android.telemetry.location.LocationEngineListener;
@@ -48,7 +48,7 @@ public final class TrackingSettings {
   }
 
   void initialise(MapboxMapOptions options) {
-    locationSource = LocationSource.getLocationEngine(myLocationView.getContext());
+    locationSource = Mapbox.getLocationSource();
     setMyLocationEnabled(options.getLocationEnabled());
   }
 
@@ -65,20 +65,20 @@ public final class TrackingSettings {
   void onRestoreInstanceState(Bundle savedInstanceState) {
     try {
       setMyLocationEnabled(
-              savedInstanceState.getBoolean(MapboxConstants.STATE_MY_LOCATION_ENABLED),
-              savedInstanceState.getBoolean(MapboxConstants.STATE_USING_CUSTOM_LOCATION_SOURCE)
+        savedInstanceState.getBoolean(MapboxConstants.STATE_MY_LOCATION_ENABLED),
+        savedInstanceState.getBoolean(MapboxConstants.STATE_USING_CUSTOM_LOCATION_SOURCE)
       );
     } catch (SecurityException ignore) {
       // User did not accept location permissions
     }
     // noinspection ResourceType
     setMyLocationTrackingMode(savedInstanceState.getInt(
-            MapboxConstants.STATE_MY_LOCATION_TRACKING_MODE, MyLocationTracking.TRACKING_NONE));
+      MapboxConstants.STATE_MY_LOCATION_TRACKING_MODE, MyLocationTracking.TRACKING_NONE));
     // noinspection ResourceType
     setMyBearingTrackingMode(savedInstanceState.getInt(
-            MapboxConstants.STATE_MY_BEARING_TRACKING_MODE, MyBearingTracking.NONE));
+      MapboxConstants.STATE_MY_BEARING_TRACKING_MODE, MyBearingTracking.NONE));
     setDismissLocationTrackingOnGesture(savedInstanceState.getBoolean(
-            MapboxConstants.STATE_MY_LOCATION_TRACKING_DISMISS, true));
+      MapboxConstants.STATE_MY_LOCATION_TRACKING_DISMISS, true));
     setDismissBearingTrackingOnGesture(savedInstanceState.getBoolean(
       MapboxConstants.STATE_MY_BEARING_TRACKING_DISMISS, true));
     setLocationChangeAnimationEnabled(savedInstanceState.getBoolean(
@@ -247,9 +247,9 @@ public final class TrackingSettings {
     //    The user settings are enabled AND;
     //    EITHER bearing tracking is dismissed on gesture OR there is no bearing tracking
     return uiSettings.isRotateGesturesEnabled()
-            && (dismissBearingTrackingOnGesture
-            || myLocationView.getMyBearingTrackingMode() == MyBearingTracking.NONE
-            || myLocationView.getMyLocationTrackingMode() == MyLocationTracking.TRACKING_NONE);
+      && (dismissBearingTrackingOnGesture
+      || myLocationView.getMyBearingTrackingMode() == MyBearingTracking.NONE
+      || myLocationView.getMyLocationTrackingMode() == MyLocationTracking.TRACKING_NONE);
   }
 
   /**
@@ -259,8 +259,8 @@ public final class TrackingSettings {
    */
   public boolean isScrollGestureCurrentlyEnabled() {
     return uiSettings.isScrollGesturesEnabled()
-            && (dismissLocationTrackingOnGesture
-            || myLocationView.getMyLocationTrackingMode() == MyLocationTracking.TRACKING_NONE);
+      && (dismissLocationTrackingOnGesture
+      || myLocationView.getMyLocationTrackingMode() == MyLocationTracking.TRACKING_NONE);
   }
 
   /**
@@ -372,7 +372,7 @@ public final class TrackingSettings {
   private void setMyLocationEnabled(boolean locationEnabled, boolean isCustomLocationSource) {
     if (!PermissionsManager.areLocationPermissionsGranted(myLocationView.getContext())) {
       Timber.e("Could not activate user location tracking: "
-              + "user did not accept the permission or permissions were not requested.");
+        + "user did not accept the permission or permissions were not requested.");
       return;
     }
     myLocationEnabled = locationEnabled;
@@ -381,15 +381,17 @@ public final class TrackingSettings {
   }
 
   void setLocationSource(LocationEngine locationSource) {
-    this.locationSource = locationSource;
-    this.isCustomLocationSource = true;
-    myLocationView.setLocationSource(locationSource);
-  }
+    if (this.locationSource != null && this.locationSource.equals(locationSource)) {
+      // this source is already active
+      return;
+    }
 
-  void removeLocationSource() {
-    locationSource = LocationSource.getLocationEngine(myLocationView.getContext());
-    this.isCustomLocationSource = false;
-    myLocationView.removeLocationSource();
+    this.isCustomLocationSource = locationSource != null;
+    if (locationSource == null) {
+      locationSource = Mapbox.getLocationSource();
+    }
+    this.locationSource = locationSource;
+    myLocationView.setLocationSource(locationSource);
   }
 
   void update() {

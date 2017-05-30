@@ -26,6 +26,7 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.constants.MyBearingTracking;
@@ -39,6 +40,8 @@ import com.mapbox.services.android.telemetry.location.LocationEngineListener;
 import com.mapbox.services.android.telemetry.location.LocationEnginePriority;
 
 import java.lang.ref.WeakReference;
+
+import timber.log.Timber;
 
 /**
  * UI element overlaid on a map to show the user's location.
@@ -71,12 +74,12 @@ public class MyLocationView extends View {
   private boolean locationChangeAnimationEnabled;
 
   private ValueAnimator.AnimatorUpdateListener invalidateSelfOnUpdateListener =
-          new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-              invalidate();
-            }
-          };
+    new ValueAnimator.AnimatorUpdateListener() {
+      @Override
+      public void onAnimationUpdate(ValueAnimator animation) {
+        invalidate();
+      }
+    };
 
   private Drawable foregroundDrawable;
   private Drawable foregroundBearingDrawable;
@@ -135,8 +138,8 @@ public class MyLocationView extends View {
 
     // setup LayoutParams
     ViewGroup.LayoutParams lp = new ViewGroup.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.MATCH_PARENT);
+      ViewGroup.LayoutParams.MATCH_PARENT,
+      ViewGroup.LayoutParams.MATCH_PARENT);
     setLayoutParams(lp);
 
     matrix = new Matrix();
@@ -146,6 +149,10 @@ public class MyLocationView extends View {
 
     myLocationBehavior = new MyLocationBehaviorFactory().getBehavioralModel(MyLocationTracking.TRACKING_NONE);
     compassListener = new CompassListener(context);
+  }
+
+  public void init(LocationSource locationSource) {
+    this.locationSource = locationSource;
   }
 
   public final void setForegroundDrawables(Drawable defaultDrawable, Drawable bearingDrawable) {
@@ -166,7 +173,7 @@ public class MyLocationView extends View {
     }
 
     if (defaultDrawable.getIntrinsicWidth() != bearingDrawable.getIntrinsicWidth()
-            || defaultDrawable.getIntrinsicHeight() != bearingDrawable.getIntrinsicHeight()) {
+      || defaultDrawable.getIntrinsicHeight() != bearingDrawable.getIntrinsicHeight()) {
       throw new RuntimeException("The dimensions from location and bearing drawables should be match");
     }
 
@@ -233,8 +240,8 @@ public class MyLocationView extends View {
     int horizontalOffset = backgroundOffsetLeft - backgroundOffsetRight;
     int verticalOffset = backgroundOffsetTop - backgroundOffsetBottom;
     backgroundBounds = new Rect(-backgroundWidth / 2 + horizontalOffset,
-            -backgroundHeight / 2 + verticalOffset, backgroundWidth / 2 + horizontalOffset, backgroundHeight / 2
-            + verticalOffset);
+      -backgroundHeight / 2 + verticalOffset, backgroundWidth / 2 + horizontalOffset, backgroundHeight / 2
+      + verticalOffset);
     backgroundDrawable.setBounds(backgroundBounds);
 
     int foregroundWidth = foregroundDrawable.getIntrinsicWidth();
@@ -252,7 +259,7 @@ public class MyLocationView extends View {
     super.onDraw(canvas);
 
     if (location == null || foregroundBounds == null || backgroundBounds == null || accuracyAnimator == null
-            || screenLocation == null) {
+      || screenLocation == null) {
       // Not ready yet
       return;
     }
@@ -430,16 +437,11 @@ public class MyLocationView extends View {
   private void toggleGps(boolean enableGps, boolean isCustomLocationSource) {
     if (enableGps) {
       if (locationSource == null) {
-        if (!isCustomLocationSource)
-          locationSource = LocationSource.getLocationEngine(this.getContext());
-        else
+        if (!isCustomLocationSource) {
+          locationSource = Mapbox.getLocationSource();
+        } else {
           return;
-      }
-      // Set an initial location if one available
-      Location lastLocation = locationSource.getLastLocation();
-
-      if (lastLocation != null) {
-        setLocation(lastLocation);
+        }
       }
 
       if (userLocationListener == null) {
@@ -447,16 +449,16 @@ public class MyLocationView extends View {
       }
 
       locationSource.addLocationEngineListener(userLocationListener);
-      locationSource.activate();
-
       locationSource.setPriority(LocationEnginePriority.HIGH_ACCURACY);
+      locationSource.activate();
     } else {
-      if (locationSource == null)
+      if (locationSource == null) {
         return;
+      }
       // Disable location and user dot
       location = null;
-      locationSource.removeLocationUpdates();
       locationSource.removeLocationEngineListener(userLocationListener);
+      locationSource.removeLocationUpdates();
       locationSource.deactivate();
     }
   }
@@ -509,7 +511,6 @@ public class MyLocationView extends View {
         // center map directly
         mapboxMap.easeCamera(CameraUpdateFactory.newLatLng(new LatLng(location)), 0, false /*linear interpolator*/,
           null, true);
-
       } else {
         // do not use interpolated location from tracking mode
         latLng = null;
@@ -580,14 +581,7 @@ public class MyLocationView extends View {
     toggleGps(false);
     this.locationSource = locationSource;
     this.userLocationListener = null;
-    setEnabled(isEnabled(), true);
-  }
-
-  public void removeLocationSource() {
-    toggleGps(false);
-    this.locationSource = LocationSource.getLocationEngine(getContext());
-    this.userLocationListener = null;
-    setEnabled(isEnabled(), false);
+    setEnabled(isEnabled(), locationSource != null);
   }
 
   private static class GpsLocationListener implements LocationEngineListener {
@@ -603,10 +597,12 @@ public class MyLocationView extends View {
     @Override
     public void onConnected() {
       MyLocationView locationView = userLocationView.get();
-      if (locationView != null) {
-        LocationEngine locationEngine = locationSource.get();
-        Location location = locationEngine.getLastLocation();
-        locationView.setLocation(location);
+      LocationEngine locationEngine = locationSource.get();
+      if (locationView != null && locationEngine != null) {
+        Location lastKnownLocation = locationEngine.getLastLocation();
+        if (lastKnownLocation != null) {
+          locationView.setLocation(lastKnownLocation);
+        }
         locationEngine.requestLocationUpdates();
       }
     }
@@ -650,6 +646,9 @@ public class MyLocationView extends View {
     }
 
     public boolean isSensorAvailable() {
+      if (rotationVectorSensor == null) {
+        Timber.e("Sensor.TYPE_ROTATION_VECTOR is missing from this device. Unable to use MyBearingTracking.COMPASS.");
+      }
       return rotationVectorSensor != null;
     }
 
@@ -861,7 +860,7 @@ public class MyLocationView extends View {
         locationChangeAnimator.setDuration(0);
       }
       locationChangeAnimator.addUpdateListener(new MarkerCoordinateAnimatorListener(this,
-              latLng, newLocation
+        latLng, newLocation
       ));
       locationChangeAnimator.start();
       latLng = newLocation;
