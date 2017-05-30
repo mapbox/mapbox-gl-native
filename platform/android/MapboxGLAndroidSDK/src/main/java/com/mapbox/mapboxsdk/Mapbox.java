@@ -1,5 +1,6 @@
 package com.mapbox.mapboxsdk;
 
+import android.app.Application;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -15,6 +16,14 @@ import com.mapbox.services.android.telemetry.MapboxTelemetry;
 import com.mapbox.services.android.telemetry.location.LocationEngine;
 import com.mapbox.services.android.telemetry.location.LocationEnginePriority;
 
+/**
+ * The entry point of the Mapbox Android SDK.
+ * <p>
+ * Obtain a reference by calling {@link #getInstance(Context, String)}. Usually this class is configured in
+ * {@link Application#onCreate()} and is responsible for the active access token, application context and
+ * connectivity state.
+ * </p>
+ */
 public final class Mapbox {
 
   private static Mapbox INSTANCE;
