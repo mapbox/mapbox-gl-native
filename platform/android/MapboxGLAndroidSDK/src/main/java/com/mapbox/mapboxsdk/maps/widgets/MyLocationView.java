@@ -70,12 +70,12 @@ public class MyLocationView extends View {
   private ValueAnimator directionAnimator;
 
   private ValueAnimator.AnimatorUpdateListener invalidateSelfOnUpdateListener =
-    new ValueAnimator.AnimatorUpdateListener() {
-      @Override
-      public void onAnimationUpdate(ValueAnimator animation) {
-        invalidate();
-      }
-    };
+          new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+              invalidate();
+            }
+          };
 
   private Drawable foregroundDrawable;
   private Drawable foregroundBearingDrawable;
@@ -134,8 +134,8 @@ public class MyLocationView extends View {
 
     // setup LayoutParams
     ViewGroup.LayoutParams lp = new ViewGroup.LayoutParams(
-      ViewGroup.LayoutParams.MATCH_PARENT,
-      ViewGroup.LayoutParams.MATCH_PARENT);
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.MATCH_PARENT);
     setLayoutParams(lp);
 
     matrix = new Matrix();
@@ -165,7 +165,7 @@ public class MyLocationView extends View {
     }
 
     if (defaultDrawable.getIntrinsicWidth() != bearingDrawable.getIntrinsicWidth()
-      || defaultDrawable.getIntrinsicHeight() != bearingDrawable.getIntrinsicHeight()) {
+            || defaultDrawable.getIntrinsicHeight() != bearingDrawable.getIntrinsicHeight()) {
       throw new RuntimeException("The dimensions from location and bearing drawables should be match");
     }
 
@@ -232,8 +232,8 @@ public class MyLocationView extends View {
     int horizontalOffset = backgroundOffsetLeft - backgroundOffsetRight;
     int verticalOffset = backgroundOffsetTop - backgroundOffsetBottom;
     backgroundBounds = new Rect(-backgroundWidth / 2 + horizontalOffset,
-      -backgroundHeight / 2 + verticalOffset, backgroundWidth / 2 + horizontalOffset, backgroundHeight / 2
-      + verticalOffset);
+            -backgroundHeight / 2 + verticalOffset, backgroundWidth / 2 + horizontalOffset, backgroundHeight / 2
+            + verticalOffset);
     backgroundDrawable.setBounds(backgroundBounds);
 
     int foregroundWidth = foregroundDrawable.getIntrinsicWidth();
@@ -251,7 +251,7 @@ public class MyLocationView extends View {
     super.onDraw(canvas);
 
     if (location == null || foregroundBounds == null || backgroundBounds == null || accuracyAnimator == null
-      || screenLocation == null) {
+            || screenLocation == null) {
       // Not ready yet
       return;
     }
@@ -390,9 +390,13 @@ public class MyLocationView extends View {
 
   @Override
   public void setEnabled(boolean enabled) {
+    setEnabled(enabled, false);
+  }
+
+  public void setEnabled(boolean enabled, boolean isCustomLocationSource) {
     super.setEnabled(enabled);
     setVisibility(enabled ? View.VISIBLE : View.INVISIBLE);
-    toggleGps(enabled);
+    toggleGps(enabled, isCustomLocationSource);
   }
 
   @Override
@@ -413,17 +417,23 @@ public class MyLocationView extends View {
     super.onRestoreInstanceState(state);
   }
 
+  private void toggleGps(boolean enableGps) {
+    toggleGps(enableGps, mapboxMap != null && mapboxMap.getTrackingSettings().isCustomLocationSource());
+  }
+
   /**
    * Enabled / Disable GPS location updates along with updating the UI
    *
    * @param enableGps true if GPS is to be enabled, false if GPS is to be disabled
    */
-  private void toggleGps(boolean enableGps) {
-    if (locationSource == null) {
-      locationSource = LocationSource.getLocationEngine(this.getContext());
-    }
-
+  private void toggleGps(boolean enableGps, boolean isCustomLocationSource) {
     if (enableGps) {
+      if (locationSource == null) {
+        if (!isCustomLocationSource)
+          locationSource = LocationSource.getLocationEngine(this.getContext());
+        else
+          return;
+      }
       // Set an initial location if one available
       Location lastLocation = locationSource.getLastLocation();
 
@@ -437,15 +447,17 @@ public class MyLocationView extends View {
 
       locationSource.addLocationEngineListener(userLocationListener);
       locationSource.activate();
+
+      locationSource.setPriority(LocationEnginePriority.HIGH_ACCURACY);
     } else {
+      if (locationSource == null)
+        return;
       // Disable location and user dot
       location = null;
       locationSource.removeLocationUpdates();
       locationSource.removeLocationEngineListener(userLocationListener);
       locationSource.deactivate();
     }
-
-    locationSource.setPriority(LocationEnginePriority.HIGH_ACCURACY);
   }
 
   public Location getLocation() {
@@ -487,17 +499,17 @@ public class MyLocationView extends View {
         // center map directly
         mapboxMap.getTrackingSettings().setDismissTrackingModeForCameraPositionChange(false);
         mapboxMap.easeCamera(CameraUpdateFactory.newLatLng(new LatLng(location)), 0, false /*linear interpolator*/,
-          new MapboxMap.CancelableCallback() {
-            @Override
-            public void onCancel() {
+                new MapboxMap.CancelableCallback() {
+                  @Override
+                  public void onCancel() {
 
-            }
+                  }
 
-            @Override
-            public void onFinish() {
-              mapboxMap.getTrackingSettings().setDismissTrackingModeForCameraPositionChange(true);
-            }
-          });
+                  @Override
+                  public void onFinish() {
+                    mapboxMap.getTrackingSettings().setDismissTrackingModeForCameraPositionChange(true);
+                  }
+                });
       } else {
         // do not use interpolated location from tracking mode
         latLng = null;
@@ -565,7 +577,17 @@ public class MyLocationView extends View {
   }
 
   public void setLocationSource(LocationEngine locationSource) {
+    toggleGps(false);
     this.locationSource = locationSource;
+    this.userLocationListener = null;
+    setEnabled(isEnabled(), true);
+  }
+
+  public void removeLocationSource() {
+    toggleGps(false);
+    this.locationSource = LocationSource.getLocationEngine(getContext());
+    this.userLocationListener = null;
+    setEnabled(isEnabled(), false);
   }
 
   private static class GpsLocationListener implements LocationEngineListener {
@@ -665,17 +687,17 @@ public class MyLocationView extends View {
       builder.bearing(rotation);
       mapboxMap.getTrackingSettings().setDismissTrackingModeForCameraPositionChange(false);
       mapboxMap.easeCamera(CameraUpdateFactory.newCameraPosition(builder.build()), COMPASS_UPDATE_RATE_MS,
-        false /*linear interpolator*/, new MapboxMap.CancelableCallback() {
-          @Override
-          public void onCancel() {
+              false /*linear interpolator*/, new MapboxMap.CancelableCallback() {
+                @Override
+                public void onCancel() {
 
-          }
+                }
 
-          @Override
-          public void onFinish() {
-            mapboxMap.getTrackingSettings().setDismissTrackingModeForCameraPositionChange(true);
-          }
-        });
+                @Override
+                public void onFinish() {
+                  mapboxMap.getTrackingSettings().setDismissTrackingModeForCameraPositionChange(true);
+                }
+              });
     }
 
     @Override
@@ -852,7 +874,7 @@ public class MyLocationView extends View {
       locationChangeAnimator = ValueAnimator.ofFloat(0.0f, 1.0f);
       locationChangeAnimator.setDuration(locationUpdateDuration);
       locationChangeAnimator.addUpdateListener(new MarkerCoordinateAnimatorListener(this,
-        latLng, newLocation
+              latLng, newLocation
       ));
       locationChangeAnimator.start();
       latLng = newLocation;
