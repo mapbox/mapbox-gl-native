@@ -16,19 +16,11 @@ public:
 
     bool isLoaded() const final;
 
-    // Called when the camera has changed. May load new tiles, unload obsolete tiles, or
-    // trigger re-placement of existing complete tiles.
-    void updateTiles(const TileParameters&) final;
-
-    // Removes all tiles (by putting them into the cache).
-    void removeTiles() final;
-
-    // Remove all tiles and clear the cache.
-    void invalidateTiles() final;
-
-    // Request that all loaded tiles re-run the layout operation on the existing source
-    // data with fresh style information.
-    void reloadTiles() final;
+    void update(Immutable<style::Source::Impl>,
+                const std::vector<Immutable<style::Layer::Impl>>&,
+                bool needsRendering,
+                bool needsRelayout,
+                const TileParameters&) final;
 
     void startRender(algorithm::ClipIDGenerator&,
                      const mat4& projMatrix,

@@ -30,13 +30,11 @@ public:
 
     void finishRender(Painter&) final;
 
-    void updateTiles(const TileParameters&) final;
-    void removeTiles() final {
-    }
-    void invalidateTiles() final {
-    }
-    void reloadTiles() final {
-    }
+    void update(Immutable<style::Source::Impl>,
+                const std::vector<Immutable<style::Layer::Impl>>&,
+                bool needsRendering,
+                bool needsRelayout,
+                const TileParameters&) final;
 
     std::map<UnwrappedTileID, RenderTile>& getRenderTiles() final {
         return tiles;

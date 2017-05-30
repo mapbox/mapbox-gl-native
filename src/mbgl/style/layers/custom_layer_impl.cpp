@@ -16,6 +16,10 @@ CustomLayer::Impl::Impl(const std::string& id_,
     context = context_;
 }
 
+bool CustomLayer::Impl::hasLayoutDifference(const Layer::Impl&) const {
+    return false;
+}
+
 void CustomLayer::Impl::stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>&) const {
 }
 

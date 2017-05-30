@@ -51,7 +51,7 @@ public:
     virtual Bucket* getBucket(const style::Layer::Impl&) const = 0;
 
     virtual void setPlacementConfig(const PlacementConfig&) {}
-    virtual void redoLayout() {}
+    virtual void setLayers(const std::vector<Immutable<style::Layer::Impl>>&) {}
 
     virtual void queryRenderedFeatures(
             std::unordered_map<std::string, std::vector<Feature>>& result,

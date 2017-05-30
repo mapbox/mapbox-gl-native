@@ -10,7 +10,6 @@
 #include <mbgl/renderer/layers/render_custom_layer.hpp>
 #include <mbgl/renderer/layers/render_symbol_layer.hpp>
 #include <mbgl/renderer/buckets/symbol_bucket.hpp>
-#include <mbgl/style/style.hpp>
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/geometry/feature_index.hpp>
 #include <mbgl/text/collision_tile.hpp>
@@ -29,12 +28,9 @@ using namespace style;
 
 GeometryTile::GeometryTile(const OverscaledTileID& id_,
                            std::string sourceID_,
-                           const TileParameters& parameters,
-                           GlyphAtlas& glyphAtlas_,
-                           SpriteAtlas& spriteAtlas_)
+                           const TileParameters& parameters)
     : Tile(id_),
       sourceID(std::move(sourceID_)),
-      style(parameters.style),
       mailbox(std::make_shared<Mailbox>(*util::RunLoop::Get())),
       worker(parameters.workerScheduler,
              ActorRef<GeometryTile>(*this, mailbox),
@@ -42,8 +38,8 @@ GeometryTile::GeometryTile(const OverscaledTileID& id_,
              obsolete,
              parameters.mode,
              parameters.pixelRatio),
-      glyphAtlas(glyphAtlas_),
-      spriteAtlas(spriteAtlas_),
+      glyphAtlas(parameters.glyphAtlas),
+      spriteAtlas(parameters.spriteAtlas),
       placementThrottler(Milliseconds(300), [this] { invokePlacement(); }) {
 }
 
@@ -74,7 +70,6 @@ void GeometryTile::setData(std::unique_ptr<const GeometryTileData> data_) {
 
     ++correlationID;
     worker.invoke(&GeometryTileWorker::setData, std::move(data_), correlationID);
-    redoLayout();
 }
 
 void GeometryTile::setPlacementConfig(const PlacementConfig& desiredConfig) {
@@ -97,25 +92,25 @@ void GeometryTile::invokePlacement() {
     }
 }
 
-void GeometryTile::redoLayout() {
+void GeometryTile::setLayers(const std::vector<Immutable<Layer::Impl>>& layers) {
     // Mark the tile as pending again if it was complete before to prevent signaling a complete
     // state despite pending parse operations.
     pending = true;
 
     std::vector<Immutable<Layer::Impl>> impls;
 
-    for (const Layer* layer : style.getLayers()) {
+    for (const auto& layer : layers) {
         // Skip irrelevant layers.
-        if (layer->is<BackgroundLayer>() ||
-            layer->is<CustomLayer>() ||
-            layer->baseImpl->source != sourceID ||
-            id.overscaledZ < std::floor(layer->baseImpl->minZoom) ||
-            id.overscaledZ >= std::ceil(layer->baseImpl->maxZoom) ||
-            layer->baseImpl->visibility == VisibilityType::None) {
+        if (layer->type == LayerType::Background ||
+            layer->type == LayerType::Custom ||
+            layer->source != sourceID ||
+            id.overscaledZ < std::floor(layer->minZoom) ||
+            id.overscaledZ >= std::ceil(layer->maxZoom) ||
+            layer->visibility == VisibilityType::None) {
             continue;
         }
 
-        impls.push_back(layer->baseImpl);
+        impls.push_back(layer);
     }
 
     ++correlationID;
@@ -181,7 +176,7 @@ void GeometryTile::queryRenderedFeatures(
     std::unordered_map<std::string, std::vector<Feature>>& result,
     const GeometryCoordinates& queryGeometry,
     const TransformState& transformState,
-    const style::Style& style_,
+    const style::Style& style,
     const RenderedQueryOptions& options) {
 
     if (!featureIndex || !data) return;
@@ -194,7 +189,7 @@ void GeometryTile::queryRenderedFeatures(
                         options,
                         *data,
                         id.canonical,
-                        style_,
+                        style,
                         collisionTile.get(),
                         *this);
 }

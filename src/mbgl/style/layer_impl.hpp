@@ -34,6 +34,10 @@ public:
 
     Impl& operator=(const Impl&) = delete;
 
+    // Returns true buckets if properties affecting layout have changed: i.e. filter,
+    // visibility, layout properties, or data-driven paint properties.
+    virtual bool hasLayoutDifference(const Layer::Impl&) const = 0;
+
     // Utility function for automatic layer grouping.
     virtual void stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>&) const = 0;
 

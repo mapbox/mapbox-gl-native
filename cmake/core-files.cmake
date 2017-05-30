@@ -353,7 +353,6 @@ set(MBGL_CORE_FILES
     src/mbgl/style/style.cpp
     src/mbgl/style/style.hpp
     src/mbgl/style/types.cpp
-    src/mbgl/style/update_batch.hpp
 
     # style/conversion
     include/mbgl/style/conversion/constant.hpp

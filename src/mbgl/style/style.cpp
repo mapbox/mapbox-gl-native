@@ -54,21 +54,6 @@ namespace style {
 
 static Observer nullObserver;
 
-struct QueueSourceReloadVisitor {
-    UpdateBatch& updateBatch;
-
-    // No need to reload sources for these types; their visibility can change but
-    // they don't participate in layout.
-    void operator()(CustomLayer&) {}
-    void operator()(RasterLayer&) {}
-    void operator()(BackgroundLayer&) {}
-
-    template <class VectorLayer>
-    void operator()(VectorLayer& layer) {
-        updateBatch.sourceIDs.insert(layer.getSourceID());
-    }
-};
-
 Style::Style(Scheduler& scheduler_, FileSource& fileSource_, float pixelRatio)
     : scheduler(scheduler_),
       fileSource(fileSource_),
@@ -105,7 +90,6 @@ void Style::setJSON(const std::string& json) {
     renderSources.clear();
     layers.clear();
     transitionOptions = {};
-    updateBatch = {};
 
     Parser parser;
     auto error = parser.parse(json);
@@ -193,7 +177,6 @@ std::unique_ptr<Source> Style::removeSource(const std::string& id) {
     auto source = std::move(*it);
     source->setObserver(nullptr);
     sources.erase(it);
-    updateBatch.sourceIDs.erase(id);
 
     return source;
 }
@@ -244,7 +227,6 @@ Layer* Style::addLayer(std::unique_ptr<Layer> layer, optional<std::string> befor
     }
 
     layer->setObserver(this);
-    layer->accept(QueueSourceReloadVisitor { updateBatch });
 
     return layers.emplace(before ? findLayer(*before) : layers.end(), std::move(layer))->get();
 }
@@ -339,14 +321,17 @@ void Style::update(const UpdateParameters& parameters) {
         parameters.mode == MapMode::Continuous ? util::DEFAULT_FADE_DURATION : Duration::zero()
     };
 
-    const TileParameters tileParameters(parameters.pixelRatio,
-                                        parameters.debugOptions,
-                                        parameters.transformState,
-                                        parameters.scheduler,
-                                        parameters.fileSource,
-                                        parameters.mode,
-                                        parameters.annotationManager,
-                                        *this);
+    const TileParameters tileParameters {
+        parameters.pixelRatio,
+        parameters.debugOptions,
+        parameters.transformState,
+        parameters.scheduler,
+        parameters.fileSource,
+        parameters.mode,
+        parameters.annotationManager,
+        *spriteAtlas,
+        *glyphAtlas
+    };
 
     // Update light.
     const bool lightChanged = renderLight.impl != light->impl;
@@ -382,7 +367,7 @@ void Style::update(const UpdateParameters& parameters) {
 
     // Update changed images.
     for (const auto& entry : imageDiff.changed) {
-        spriteAtlas->updateImage(entry.second);
+        spriteAtlas->updateImage(entry.second[1]);
     }
 
     if (spriteLoaded && !spriteAtlas->isLoaded()) {
@@ -394,26 +379,6 @@ void Style::update(const UpdateParameters& parameters) {
     newSourceImpls.reserve(sources.size());
     for (const auto& source : sources) {
         newSourceImpls.push_back(source->baseImpl);
-    }
-
-    const SourceDifference sourceDiff = diffSources(sourceImpls, newSourceImpls);
-    sourceImpls = std::move(newSourceImpls);
-
-    // Remove render layers for removed sources.
-    for (const auto& entry : sourceDiff.removed) {
-        renderLayers.erase(entry.first);
-    }
-
-    // Create render sources for newly added sources.
-    for (const auto& entry : sourceDiff.added) {
-        std::unique_ptr<RenderSource> renderSource = RenderSource::create(entry.second);
-        renderSource->setObserver(this);
-        renderSources.emplace(entry.first, std::move(renderSource));
-    }
-
-    // Update render sources for changed sources.
-    for (const auto& entry : sourceDiff.changed) {
-        renderSources.at(entry.first)->setImpl(entry.second);
     }
 
 
@@ -438,7 +403,7 @@ void Style::update(const UpdateParameters& parameters) {
 
     // Update render layers for changed layers.
     for (const auto& entry : layerDiff.changed) {
-        renderLayers.at(entry.first)->setImpl(entry.second);
+        renderLayers.at(entry.first)->setImpl(entry.second[1]);
     }
 
     // Update layers for class and zoom changes.
@@ -457,35 +422,51 @@ void Style::update(const UpdateParameters& parameters) {
     }
 
 
-    // Update tiles for each source.
-    for (const auto& entry : renderSources) {
-        entry.second->enabled = false;
+    const SourceDifference sourceDiff = diffSources(sourceImpls, newSourceImpls);
+    sourceImpls = std::move(newSourceImpls);
+
+    // Remove render layers for removed sources.
+    for (const auto& entry : sourceDiff.removed) {
+        renderSources.erase(entry.first);
     }
 
-    for (const auto& entry : renderLayers) {
-        RenderLayer& layer = *entry.second;
-        if (layer.needsRendering(zoomHistory.lastZoom)) {
-            if (RenderSource* source = getRenderSource(layer.baseImpl->source)) {
-                source->enabled = true;
+    // Create render sources for newly added sources.
+    for (const auto& entry : sourceDiff.added) {
+        std::unique_ptr<RenderSource> renderSource = RenderSource::create(entry.second);
+        renderSource->setObserver(this);
+        renderSources.emplace(entry.first, std::move(renderSource));
+    }
+
+    // Update all sources.
+    for (const auto& source : sourceImpls) {
+        std::vector<Immutable<Layer::Impl>> filteredLayers;
+        bool needsRendering = false;
+        bool needsRelayout = false;
+
+        for (const auto& layer : layerImpls) {
+            if (layer->type == LayerType::Background ||
+                layer->type == LayerType::Custom ||
+                layer->source != source->id) {
+                continue;
             }
-        }
-    }
 
-    for (const auto& entry : renderSources) {
-        bool updated = updateBatch.sourceIDs.count(entry.first);
-        if (entry.second->enabled) {
-            if (updated) {
-                entry.second->reloadTiles();
+            if (getRenderLayer(layer->id)->needsRendering(zoomHistory.lastZoom)) {
+                needsRendering = true;
             }
-            entry.second->updateTiles(tileParameters);
-        } else if (updated) {
-            entry.second->invalidateTiles();
-        } else {
-            entry.second->removeTiles();
-        }
-    }
 
-    updateBatch.sourceIDs.clear();
+            if (hasLayoutDifference(layerDiff, layer->id)) {
+                needsRelayout = true;
+            }
+
+            filteredLayers.push_back(layer);
+        }
+
+        renderSources.at(source->id)->update(source,
+                                             filteredLayers,
+                                             needsRendering,
+                                             needsRelayout,
+                                             tileParameters);
+    }
 }
 
 std::vector<const Source*> Style::getSources() const {
@@ -580,7 +561,7 @@ RenderData Style::getRenderData(MapDebugOptions debugOptions, float angle) const
     RenderData result;
 
     for (const auto& entry : renderSources) {
-        if (entry.second->enabled) {
+        if (entry.second->isEnabled()) {
             result.sources.insert(entry.second.get());
         }
     }
@@ -801,13 +782,11 @@ void Style::onSpriteError(std::exception_ptr error) {
     observer->onResourceError(error);
 }
 
-void Style::onLayerFilterChanged(Layer& layer) {
-    layer.accept(QueueSourceReloadVisitor { updateBatch });
+void Style::onLayerFilterChanged(Layer&) {
     observer->onUpdate(Update::Repaint);
 }
 
-void Style::onLayerVisibilityChanged(Layer& layer) {
-    layer.accept(QueueSourceReloadVisitor { updateBatch });
+void Style::onLayerVisibilityChanged(Layer&) {
     observer->onUpdate(Update::Repaint);
 }
 
@@ -815,13 +794,11 @@ void Style::onLayerPaintPropertyChanged(Layer&) {
     observer->onUpdate(Update::Repaint);
 }
 
-void Style::onLayerDataDrivenPaintPropertyChanged(Layer& layer) {
-    layer.accept(QueueSourceReloadVisitor { updateBatch });
+void Style::onLayerDataDrivenPaintPropertyChanged(Layer&) {
     observer->onUpdate(Update::Repaint);
 }
 
-void Style::onLayerLayoutPropertyChanged(Layer& layer, const char *) {
-    layer.accept(QueueSourceReloadVisitor { updateBatch });
+void Style::onLayerLayoutPropertyChanged(Layer&, const char *) {
     observer->onUpdate(Update::Repaint);
 }
 

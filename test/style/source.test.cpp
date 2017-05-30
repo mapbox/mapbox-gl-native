@@ -8,6 +8,8 @@
 #include <mbgl/style/sources/vector_source.hpp>
 #include <mbgl/style/sources/geojson_source.hpp>
 #include <mbgl/style/sources/image_source.hpp>
+#include <mbgl/style/layers/raster_layer.cpp>
+#include <mbgl/style/layers/line_layer.hpp>
 
 #include <mbgl/renderer/sources/render_raster_source.hpp>
 #include <mbgl/renderer/sources/render_vector_source.hpp>
@@ -27,12 +29,10 @@
 #include <mbgl/util/range.hpp>
 
 #include <mbgl/map/transform.hpp>
-#include <mbgl/style/style.hpp>
-#include <mbgl/style/layers/line_layer.hpp>
 #include <mbgl/annotation/annotation_manager.hpp>
 #include <mbgl/annotation/annotation_source.hpp>
-
-#include <mapbox/geojsonvt.hpp>
+#include <mbgl/sprite/sprite_atlas.hpp>
+#include <mbgl/text/glyph_atlas.hpp>
 
 #include <cstdint>
 
@@ -48,7 +48,8 @@ public:
     TransformState transformState;
     ThreadPool threadPool { 1 };
     AnnotationManager annotationManager;
-    style::Style style { threadPool, fileSource, 1.0 };
+    SpriteAtlas spriteAtlas;
+    GlyphAtlas glyphAtlas { { 512, 512, }, fileSource };
 
     TileParameters tileParameters {
         1.0,
@@ -58,7 +59,8 @@ public:
         fileSource,
         MapMode::Continuous,
         annotationManager,
-        style
+        spriteAtlas,
+        glyphAtlas
     };
 
     SourceTest() {
@@ -137,6 +139,9 @@ TEST(Source, RasterTileEmpty) {
         return response;
     };
 
+    RasterLayer layer("id", "source");
+    std::vector<Immutable<Layer::Impl>> layers {{ layer.baseImpl }};
+
     Tileset tileset;
     tileset.tiles = { "tiles" };
 
@@ -154,7 +159,11 @@ TEST(Source, RasterTileEmpty) {
 
     auto renderSource = RenderSource::create(source.baseImpl);
     renderSource->setObserver(&test.renderSourceObserver);
-    renderSource->updateTiles(test.tileParameters);
+    renderSource->update(source.baseImpl,
+                         layers,
+                         true,
+                         true,
+                         test.tileParameters);
 
     test.run();
 }
@@ -167,6 +176,11 @@ TEST(Source, VectorTileEmpty) {
         response.noContent = true;
         return response;
     };
+
+    LineLayer layer("id", "source");
+    layer.setSourceLayer("water");
+
+    std::vector<Immutable<Layer::Impl>> layers {{ layer.baseImpl }};
 
     Tileset tileset;
     tileset.tiles = { "tiles" };
@@ -185,7 +199,11 @@ TEST(Source, VectorTileEmpty) {
 
     auto renderSource = RenderSource::create(source.baseImpl);
     renderSource->setObserver(&test.renderSourceObserver);
-    renderSource->updateTiles(test.tileParameters);
+    renderSource->update(source.baseImpl,
+                         layers,
+                         true,
+                         true,
+                         test.tileParameters);
 
     test.run();
 }
@@ -200,6 +218,9 @@ TEST(Source, RasterTileFail) {
             "Failed by the test case");
         return response;
     };
+
+    RasterLayer layer("id", "source");
+    std::vector<Immutable<Layer::Impl>> layers {{ layer.baseImpl }};
 
     Tileset tileset;
     tileset.tiles = { "tiles" };
@@ -216,7 +237,11 @@ TEST(Source, RasterTileFail) {
 
     auto renderSource = RenderSource::create(source.baseImpl);
     renderSource->setObserver(&test.renderSourceObserver);
-    renderSource->updateTiles(test.tileParameters);
+    renderSource->update(source.baseImpl,
+                         layers,
+                         true,
+                         true,
+                         test.tileParameters);
 
     test.run();
 }
@@ -231,6 +256,11 @@ TEST(Source, VectorTileFail) {
             "Failed by the test case");
         return response;
     };
+
+    LineLayer layer("id", "source");
+    layer.setSourceLayer("water");
+
+    std::vector<Immutable<Layer::Impl>> layers {{ layer.baseImpl }};
 
     Tileset tileset;
     tileset.tiles = { "tiles" };
@@ -247,7 +277,11 @@ TEST(Source, VectorTileFail) {
 
     auto renderSource = RenderSource::create(source.baseImpl);
     renderSource->setObserver(&test.renderSourceObserver);
-    renderSource->updateTiles(test.tileParameters);
+    renderSource->update(source.baseImpl,
+                         layers,
+                         true,
+                         true,
+                         test.tileParameters);
 
     test.run();
 }
@@ -260,6 +294,9 @@ TEST(Source, RasterTileCorrupt) {
         response.data = std::make_unique<std::string>("CORRUPTED");
         return response;
     };
+
+    RasterLayer layer("id", "source");
+    std::vector<Immutable<Layer::Impl>> layers {{ layer.baseImpl }};
 
     Tileset tileset;
     tileset.tiles = { "tiles" };
@@ -277,7 +314,11 @@ TEST(Source, RasterTileCorrupt) {
 
     auto renderSource = RenderSource::create(source.baseImpl);
     renderSource->setObserver(&test.renderSourceObserver);
-    renderSource->updateTiles(test.tileParameters);
+    renderSource->update(source.baseImpl,
+                         layers,
+                         true,
+                         true,
+                         test.tileParameters);
 
     test.run();
 }
@@ -291,10 +332,10 @@ TEST(Source, VectorTileCorrupt) {
         return response;
     };
 
-    // Need to have at least one layer that uses the source.
-    auto layer = std::make_unique<LineLayer>("id", "source");
-    layer->setSourceLayer("water");
-    test.style.addLayer(std::move(layer));
+    LineLayer layer("id", "source");
+    layer.setSourceLayer("water");
+
+    std::vector<Immutable<Layer::Impl>> layers {{ layer.baseImpl }};
 
     Tileset tileset;
     tileset.tiles = { "tiles" };
@@ -311,7 +352,11 @@ TEST(Source, VectorTileCorrupt) {
 
     auto renderSource = RenderSource::create(source.baseImpl);
     renderSource->setObserver(&test.renderSourceObserver);
-    renderSource->updateTiles(test.tileParameters);
+    renderSource->update(source.baseImpl,
+                         layers,
+                         true,
+                         true,
+                         test.tileParameters);
 
     test.run();
 }
@@ -323,6 +368,9 @@ TEST(Source, RasterTileCancel) {
         test.end();
         return optional<Response>();
     };
+
+    RasterLayer layer("id", "source");
+    std::vector<Immutable<Layer::Impl>> layers {{ layer.baseImpl }};
 
     Tileset tileset;
     tileset.tiles = { "tiles" };
@@ -340,7 +388,11 @@ TEST(Source, RasterTileCancel) {
 
     auto renderSource = RenderSource::create(source.baseImpl);
     renderSource->setObserver(&test.renderSourceObserver);
-    renderSource->updateTiles(test.tileParameters);
+    renderSource->update(source.baseImpl,
+                         layers,
+                         true,
+                         true,
+                         test.tileParameters);
 
     test.run();
 }
@@ -352,6 +404,11 @@ TEST(Source, VectorTileCancel) {
         test.end();
         return optional<Response>();
     };
+
+    LineLayer layer("id", "source");
+    layer.setSourceLayer("water");
+
+    std::vector<Immutable<Layer::Impl>> layers {{ layer.baseImpl }};
 
     Tileset tileset;
     tileset.tiles = { "tiles" };
@@ -369,13 +426,20 @@ TEST(Source, VectorTileCancel) {
 
     auto renderSource = RenderSource::create(source.baseImpl);
     renderSource->setObserver(&test.renderSourceObserver);
-    renderSource->updateTiles(test.tileParameters);
+    renderSource->update(source.baseImpl,
+                         layers,
+                         true,
+                         true,
+                         test.tileParameters);
 
     test.run();
 }
 
 TEST(Source, RasterTileAttribution) {
     SourceTest test;
+
+    RasterLayer layer("id", "source");
+    std::vector<Immutable<Layer::Impl>> layers {{ layer.baseImpl }};
 
     std::string mapboxOSM = ("<a href='https://www.mapbox.com/about/maps/' target='_blank'>&copy; Mapbox</a> "
                              "<a href='http://www.openstreetmap.org/about/' target='_blank'>©️ OpenStreetMap</a>");
@@ -406,7 +470,11 @@ TEST(Source, RasterTileAttribution) {
     source.loadDescription(test.fileSource);
 
     auto renderSource = RenderSource::create(source.baseImpl);
-    renderSource->updateTiles(test.tileParameters);
+    renderSource->update(source.baseImpl,
+                         layers,
+                         true,
+                         true,
+                         test.tileParameters);
 
     test.run();
 }

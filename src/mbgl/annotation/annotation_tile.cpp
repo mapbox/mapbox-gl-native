@@ -3,7 +3,6 @@
 #include <mbgl/util/constants.hpp>
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/renderer/tile_parameters.hpp>
-#include <mbgl/style/style.hpp>
 
 #include <utility>
 
@@ -11,9 +10,7 @@ namespace mbgl {
 
 AnnotationTile::AnnotationTile(const OverscaledTileID& overscaledTileID,
                                const TileParameters& parameters)
-    : GeometryTile(overscaledTileID, AnnotationManager::SourceID, parameters,
-                   *parameters.style.glyphAtlas,
-                   *parameters.style.spriteAtlas),
+    : GeometryTile(overscaledTileID, AnnotationManager::SourceID, parameters),
       annotationManager(parameters.annotationManager) {
     annotationManager.addTile(*this);
 }

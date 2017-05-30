@@ -12,6 +12,8 @@
 #include <mbgl/geometry/feature_index.hpp>
 #include <mbgl/annotation/annotation_manager.hpp>
 #include <mbgl/annotation/annotation_tile.hpp>
+#include <mbgl/sprite/sprite_atlas.hpp>
+#include <mbgl/text/glyph_atlas.hpp>
 
 #include <memory>
 
@@ -25,6 +27,8 @@ public:
     ThreadPool threadPool { 1 };
     AnnotationManager annotationManager;
     style::Style style { threadPool, fileSource, 1.0 };
+    SpriteAtlas spriteAtlas;
+    GlyphAtlas glyphAtlas { { 512, 512, }, fileSource };
 
     TileParameters tileParameters {
         1.0,
@@ -34,7 +38,8 @@ public:
         fileSource,
         MapMode::Continuous,
         annotationManager,
-        style
+        spriteAtlas,
+        glyphAtlas
     };
 };
 

@@ -1,3 +1,5 @@
+#pragma once
+
 #include <mbgl/style/image_impl.hpp>
 #include <mbgl/style/source_impl.hpp>
 #include <mbgl/style/layer_impl.hpp>
@@ -13,7 +15,7 @@ class StyleDifference {
 public:
     std::unordered_map<std::string, T> added;
     std::unordered_map<std::string, T> removed;
-    std::unordered_map<std::string, T> changed;
+    std::unordered_map<std::string, std::array<T, 2>> changed;
 };
 
 using ImmutableImage = Immutable<style::Image::Impl>;
@@ -33,5 +35,7 @@ using LayerDifference = StyleDifference<ImmutableLayer>;
 
 LayerDifference diffLayers(const std::vector<ImmutableLayer>&,
                            const std::vector<ImmutableLayer>&);
+
+bool hasLayoutDifference(const LayerDifference&, const std::string& layerID);
 
 } // namespace mbgl

@@ -6,10 +6,11 @@
 #include <mbgl/util/default_thread_pool.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/map/transform.hpp>
-#include <mbgl/style/style.hpp>
 #include <mbgl/annotation/annotation_manager.hpp>
 #include <mbgl/renderer/tile_parameters.hpp>
 #include <mbgl/renderer/buckets/raster_bucket.hpp>
+#include <mbgl/sprite/sprite_atlas.hpp>
+#include <mbgl/text/glyph_atlas.hpp>
 
 using namespace mbgl;
 
@@ -20,7 +21,8 @@ public:
     util::RunLoop loop;
     ThreadPool threadPool { 1 };
     AnnotationManager annotationManager;
-    style::Style style { threadPool, fileSource, 1.0 };
+    SpriteAtlas spriteAtlas;
+    GlyphAtlas glyphAtlas { { 512, 512, }, fileSource };
     Tileset tileset { { "https://example.com" }, { 0, 22 }, "none" };
 
     TileParameters tileParameters {
@@ -31,7 +33,8 @@ public:
         fileSource,
         MapMode::Continuous,
         annotationManager,
-        style
+        spriteAtlas,
+        glyphAtlas
     };
 };
 

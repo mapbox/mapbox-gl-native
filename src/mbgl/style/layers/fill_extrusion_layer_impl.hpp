@@ -11,6 +11,7 @@ class FillExtrusionLayer::Impl : public Layer::Impl {
 public:
     using Layer::Impl::Impl;
 
+    bool hasLayoutDifference(const Layer::Impl&) const override;
     void stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>&) const override;
 
     FillExtrusionPaintProperties::Transitionable paint;
