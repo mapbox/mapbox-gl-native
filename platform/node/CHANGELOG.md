@@ -1,3 +1,7 @@
+# 3.5.3 - May 30, 2017
+
+- Fixed a regression around `line-dasharrary` and `fill-pattern` that caused these properties to sometimes not render correctly ([#9130](https://github.com/mapbox/mapbox-gl-native/pull/9130))
+
 # 3.5.2 - May 18, 2017
 
 - Fixed a memory leak ([#8884](https://github.com/mapbox/mapbox-gl-native/pull/9035))
