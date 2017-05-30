@@ -34,7 +34,6 @@ final class Transform implements MapView.OnMapChangedListener {
   private CameraPosition cameraPosition;
   private MapboxMap.CancelableCallback cameraCancelableCallback;
   private MapboxMap.OnCameraChangeListener onCameraChangeListener;
-  private boolean isFromLocation = false;
 
   Transform(NativeMapView mapView, MarkerViewManager markerViewManager, TrackingSettings trackingSettings) {
     this.mapView = mapView;
@@ -88,7 +87,7 @@ final class Transform implements MapView.OnMapChangedListener {
   final void moveCamera(MapboxMap mapboxMap, CameraUpdate update, MapboxMap.CancelableCallback callback) {
     CameraPosition cameraPosition = update.getCameraPosition(mapboxMap);
     if (!cameraPosition.equals(this.cameraPosition)) {
-      trackingSettings.resetTrackingModesIfRequired(cameraPosition);
+      trackingSettings.resetTrackingModesIfRequired(this.cameraPosition, cameraPosition, false);
       cancelTransitions();
       mapView.jumpTo(cameraPosition.bearing, cameraPosition.target, cameraPosition.tilt, cameraPosition.zoom);
       if (callback != null) {
@@ -100,18 +99,13 @@ final class Transform implements MapView.OnMapChangedListener {
   @UiThread
   final void easeCamera(MapboxMap mapboxMap, CameraUpdate update, int durationMs, boolean easingInterpolator,
                         final MapboxMap.CancelableCallback callback, boolean isDismissable) {
-    isFromLocation = isDismissable;
     CameraPosition cameraPosition = update.getCameraPosition(mapboxMap);
     if (!cameraPosition.equals(this.cameraPosition)) {
-      trackingSettings.resetTrackingModesIfRequired(cameraPosition);
+      trackingSettings.resetTrackingModesIfRequired(this.cameraPosition, cameraPosition, isDismissable);
       cancelTransitions();
       if (callback != null) {
         cameraCancelableCallback = callback;
         mapView.addOnMapChangedListener(this);
-      }
-      if (isFromLocation) {
-        trackingSettings.setDismissTrackingModeForCameraPositionChange(true);
-        isFromLocation = false;
       }
       mapView.easeTo(cameraPosition.bearing, cameraPosition.target, durationMs, cameraPosition.tilt,
         cameraPosition.zoom, easingInterpolator);
@@ -123,7 +117,7 @@ final class Transform implements MapView.OnMapChangedListener {
                            final MapboxMap.CancelableCallback callback) {
     CameraPosition cameraPosition = update.getCameraPosition(mapboxMap);
     if (!cameraPosition.equals(this.cameraPosition)) {
-      trackingSettings.resetTrackingModesIfRequired(cameraPosition);
+      trackingSettings.resetTrackingModesIfRequired(this.cameraPosition, cameraPosition, false);
 
       cancelTransitions();
       if (callback != null) {
