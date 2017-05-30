@@ -52,7 +52,7 @@ public class LocationSource extends LocationEngine implements
    * Get the LocationEngine instance.
    *
    * @param context a Context from which the application context is derived
-   * @return the LocationEgine instance
+   * @return the LocationEngine instance
    */
   public static synchronized LocationEngine getLocationEngine(@NonNull Context context) {
     if (instance == null) {
@@ -74,8 +74,8 @@ public class LocationSource extends LocationEngine implements
   }
 
   /**
-   * Disconnect the location engine, useful when you no longer need location updates or requesting the users
-   * {@link LocationEngine#getLastLocation()}. Before deactivating you'll need to stop request user location updates
+   * Disconnect the location engine which is useful when you no longer need location updates or requesting the users
+   * {@link LocationEngine#getLastLocation()}. Before deactivating, you'll need to stop request user location updates
    * using {@link LocationEngine#removeLocationUpdates()}.
    */
   @Override
@@ -87,7 +87,7 @@ public class LocationSource extends LocationEngine implements
 
   /**
    * Check if your location provider has been activated/connected. This is mainly used internally but is also useful in
-   * the rare cases when you'd like to know if your location engine is connected or not.
+   * the rare case when you'd like to know if your location engine is connected or not.
    *
    * @return boolean true if the location engine has been activated/connected, else false.
    */
@@ -107,7 +107,7 @@ public class LocationSource extends LocationEngine implements
   }
 
   /**
-   * Invoked when the location provider connection has been suspended
+   * Invoked when the location provider connection has been suspended.
    */
   @Override
   public void onConnectionSuspended() {
