@@ -2,9 +2,10 @@ export BUILDTYPE ?= Debug
 export WITH_CXX11ABI ?= $(shell scripts/check-cxx11abi.sh)
 
 ifeq ($(BUILDTYPE), Release)
+else ifeq ($(BUILDTYPE), RelWithDebInfo)
 else ifeq ($(BUILDTYPE), Debug)
 else
-  $(error BUILDTYPE must be Debug or Release)
+  $(error BUILDTYPE must be Debug, Release or RelWithDebInfo)
 endif
 
 buildtype := $(shell echo "$(BUILDTYPE)" | tr "[A-Z]" "[a-z]")
