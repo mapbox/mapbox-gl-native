@@ -4,6 +4,7 @@
 #include <mbgl/util/geo.hpp>
 #include <mbgl/util/geometry.hpp>
 #include <mbgl/util/constants.hpp>
+#include <mbgl/util/optional.hpp>
 #include <mbgl/util/projection.hpp>
 #include <mbgl/util/mat4.hpp>
 #include <mbgl/util/size.hpp>
@@ -50,8 +51,8 @@ public:
     double getZoomFraction() const;
 
     // Bounds
-    void setLatLngBounds(const LatLngBounds&);
-    LatLngBounds getLatLngBounds() const;
+    void setLatLngBounds(optional<LatLngBounds>);
+    optional<LatLngBounds> getLatLngBounds() const;
     void setMinZoom(double);
     double getMinZoom() const;
     void setMaxZoom(double);
@@ -89,7 +90,7 @@ private:
     bool rotatedNorth() const;
     void constrain(double& scale, double& x, double& y) const;
 
-    LatLngBounds bounds = LatLngBounds::world();
+    optional<LatLngBounds> bounds;
 
     // Limit the amount of zooming possible on the map.
     double min_scale = std::pow(2, 0);
