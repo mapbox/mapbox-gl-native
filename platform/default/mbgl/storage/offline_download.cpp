@@ -121,7 +121,7 @@ OfflineRegionStatus OfflineDownload::getStatus() const {
 
         case SourceType::Image: {
             const auto& imageSource = *source->as<ImageSource>();
-            if (!imageSource.getURL().empty()) {
+            if (imageSource.getURL()) {
                 result.requiredResourceCount += 1;
             }
             break;
@@ -205,9 +205,9 @@ void OfflineDownload::activateDownload() {
 
             case SourceType::Image: {
                 const auto& imageSource = *source->as<ImageSource>();
-                std::string imageUrl = imageSource.getURL();
-                if (!imageUrl.empty()) {
-                    queueResource(Resource::image(imageUrl));
+                auto imageUrl = imageSource.getURL();
+                if (imageUrl && !imageUrl->empty()) {
+                    queueResource(Resource::image(*imageUrl));
                 }
                 break;
             }

@@ -37,14 +37,8 @@ bool RenderRasterLayer::hasTransition() const {
 }
 
 void RenderRasterLayer::uploadBuckets(gl::Context& context, RenderSource* source) {
-    if (renderTiles.size() > 0) {
-        for (const auto& tileRef : renderTiles) {
-            const auto& bucket = tileRef.get().tile.getBucket(impl());
-            if (bucket && bucket->needsUpload()) {
-                bucket->upload(context);
-            }
-        }
-    } else {
+    RenderLayer::uploadBuckets(context, source);
+    if (renderTiles.size() == 0) {
         RenderImageSource* imageSource = dynamic_cast<RenderImageSource*>(source);
         if (imageSource) {
             imageSource->upload(context);
@@ -53,13 +47,8 @@ void RenderRasterLayer::uploadBuckets(gl::Context& context, RenderSource* source
 }
 
 void RenderRasterLayer::render(Painter& painter, PaintParameters& parameters, RenderSource* source) {
-    if (renderTiles.size() > 0) {
-        for (auto& tileRef : renderTiles) {
-            auto& tile = tileRef.get();
-            auto bucket = tile.tile.getBucket(impl());
-            bucket->render(painter, parameters, *this, tile);
-        }
-    } else {
+    RenderLayer::render(painter, parameters, source);
+    if (renderTiles.size() == 0) {
         RenderImageSource* imageSource = dynamic_cast<RenderImageSource*>(source);
         if (imageSource) {
             imageSource->render(painter, parameters, *this);

@@ -16,6 +16,8 @@ RenderImageSource::RenderImageSource(Immutable<style::ImageSource::Impl> impl_)
     : RenderSource(impl_), shouldRender(false) {
 }
 
+RenderImageSource::~RenderImageSource() = default;
+
 const style::ImageSource::Impl& RenderImageSource::impl() const {
     return static_cast<const style::ImageSource::Impl&>(*baseImpl);
 }
@@ -127,10 +129,7 @@ void RenderImageSource::updateTiles(const TileParameters& parameters) {
         auto gc = TileCoordinate::toGeometryCoordinate(tileIds[0], tc.p);
         geomCoords.push_back(gc);
     }
-    setupBucket(geomCoords);
-}
-
-void RenderImageSource::setupBucket(GeometryCoordinates& geomCoords) {
+    
     if (!bucket) {
         UnassociatedImage img = impl().getImage().clone();
         if (!img.valid()) {
