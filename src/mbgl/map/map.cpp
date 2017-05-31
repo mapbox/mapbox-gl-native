@@ -249,6 +249,7 @@ void Map::Impl::render(View& view) {
         pixelRatio,
         debugOptions,
         timePoint,
+        transform.getState(),
         style->getGlyphURL(),
         style->spriteLoaded,
         style->getTransitionOptions(),
@@ -258,8 +259,7 @@ void Map::Impl::render(View& view) {
         style->getLayerImpls(),
         scheduler,
         fileSource,
-        annotationManager,
-        transform.getState()
+        annotationManager
     });
 
     updateFlags = Update::Nothing;
