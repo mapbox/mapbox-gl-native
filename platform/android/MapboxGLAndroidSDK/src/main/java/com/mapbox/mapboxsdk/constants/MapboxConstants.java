@@ -113,7 +113,6 @@ public class MapboxConstants {
   public static final String STATE_MY_BEARING_TRACKING_MODE = "mapbox_myBearingTracking";
   public static final String STATE_MY_LOCATION_TRACKING_DISMISS = "mapbox_myLocationTrackingDismiss";
   public static final String STATE_MY_BEARING_TRACKING_DISMISS = "mapbox_myBearingTrackingDismiss";
-  public static final String STATE_MY_TRACKING_MODE_DISMISS_FOR_CAMERA = "mapbox_myBearingTrackingDismiss";
   public static final String STATE_COMPASS_ENABLED = "mapbox_compassEnabled";
   public static final String STATE_COMPASS_GRAVITY = "mapbox_compassGravity";
   public static final String STATE_COMPASS_MARGIN_LEFT = "mapbox_compassMarginLeft";
