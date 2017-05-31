@@ -200,24 +200,30 @@ void AnnotationManager::removeTile(AnnotationTile& tile) {
     tiles.erase(&tile);
 }
 
+// To ensure that annotation images do not collide with images from the style,
+// we prefix input image IDs with "com.mapbox.annotations".
+static std::string prefixedImageID(const std::string& id) {
+    return AnnotationManager::SourceID + "." + id;
+}
+
 void AnnotationManager::addImage(std::unique_ptr<style::Image> image) {
-    // To ensure that annotation images do not collide with images from the style,
-    // create a new image with the input ID prefixed by "com.mapbox.annotations".
-    std::string id = SourceID + "." + image->getID();
+    const std::string id = prefixedImageID(image->getID());
     images.erase(id);
     images.emplace(id,
         style::Image(id, image->getImage().clone(), image->getPixelRatio(), image->isSdf()));
     obsoleteImages.erase(id);
 }
 
-void AnnotationManager::removeImage(const std::string& id) {
+void AnnotationManager::removeImage(const std::string& id_) {
+    const std::string id = prefixedImageID(id_);
     images.erase(id);
     obsoleteImages.insert(id);
 }
 
-double AnnotationManager::getTopOffsetPixelsForImage(const std::string& id) {
+double AnnotationManager::getTopOffsetPixelsForImage(const std::string& id_) {
+    const std::string id = prefixedImageID(id_);
     auto it = images.find(id);
-    return it == images.end() ? -(it->second.getImage().size.height / it->second.getPixelRatio()) / 2 : 0;
+    return it != images.end() ? -(it->second.getImage().size.height / it->second.getPixelRatio()) / 2 : 0;
 }
 
 } // namespace mbgl

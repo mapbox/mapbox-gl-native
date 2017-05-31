@@ -425,6 +425,12 @@ TEST(Annotations, VisibleFeatures) {
     EXPECT_EQ(features.size(), ids.size());
 }
 
+TEST(Annotations, TopOffsetPixels) {
+    AnnotationTest test;
+
+    test.map.addAnnotationImage(namedMarker("default_marker"));
+    EXPECT_EQ(test.map.getTopOffsetPixelsForAnnotationImage("default_marker"), -28);
+}
 
 TEST(Annotations, DebugEmpty) {
     // This test should render nothing, not even the tile borders. Tile borders are only rendered
