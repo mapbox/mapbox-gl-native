@@ -164,15 +164,15 @@ TEST(Buckets, RasterBucketMaskNoChildren) {
          (std::vector<RasterLayoutVertex>{
              // 1/0/1
              RasterProgram::layoutVertex({ 0, 0 }, { 0, 0 }),
-             RasterProgram::layoutVertex({ 4096, 0 }, { 16384, 0 }),
-             RasterProgram::layoutVertex({ 0, 4096 }, { 0, 16384 }),
-             RasterProgram::layoutVertex({ 4096, 4096 }, { 16384, 16384 }),
+             RasterProgram::layoutVertex({ 4096, 0 }, { 4096, 0 }),
+             RasterProgram::layoutVertex({ 0, 4096 }, { 0, 4096 }),
+             RasterProgram::layoutVertex({ 4096, 4096 }, { 4096, 4096 }),
 
              // 1/1/1
-             RasterProgram::layoutVertex({ 4096, 4096 }, { 16384, 16384 }),
-             RasterProgram::layoutVertex({ 8192, 4096 }, { 32768, 16384 }),
-             RasterProgram::layoutVertex({ 4096, 8192 }, { 16384, 32768 }),
-             RasterProgram::layoutVertex({ 8192, 8192 }, { 32768, 32768 }),
+             RasterProgram::layoutVertex({ 4096, 4096 }, { 4096, 4096 }),
+             RasterProgram::layoutVertex({ 8192, 4096 }, { 8192, 4096 }),
+             RasterProgram::layoutVertex({ 4096, 8192 }, { 4096, 8192 }),
+             RasterProgram::layoutVertex({ 8192, 8192 }, { 8192, 8192 }),
          }),
          bucket.vertices.vector());
 
@@ -203,40 +203,40 @@ TEST(Buckets, RasterBucketMaskNoChildren) {
      EXPECT_EQ(
          (std::vector<RasterLayoutVertex>{
              // 1/0/1
-             RasterProgram::layoutVertex({ 0, 4096 }, { 0, 16384 }),
-             RasterProgram::layoutVertex({ 4096, 4096 }, { 16384, 16384 }),
-             RasterProgram::layoutVertex({ 0, 8192 }, { 0, 32768 }),
-             RasterProgram::layoutVertex({ 4096, 8192 }, { 16384, 32768 }),
+             RasterProgram::layoutVertex({ 0, 4096 }, { 0, 4096 }),
+             RasterProgram::layoutVertex({ 4096, 4096 }, { 4096, 4096 }),
+             RasterProgram::layoutVertex({ 0, 8192 }, { 0, 8192 }),
+             RasterProgram::layoutVertex({ 4096, 8192 }, { 4096, 8192 }),
 
              // 1/1/0
-             RasterProgram::layoutVertex({ 4096, 0 }, { 16384, 0 }),
-             RasterProgram::layoutVertex({ 8192, 0 }, { 32768, 0 }),
-             RasterProgram::layoutVertex({ 4096, 4096 }, { 16384, 16384 }),
-             RasterProgram::layoutVertex({ 8192, 4096 }, { 32768, 16384 }),
+             RasterProgram::layoutVertex({ 4096, 0 }, { 4096, 0 }),
+             RasterProgram::layoutVertex({ 8192, 0 }, { 8192, 0 }),
+             RasterProgram::layoutVertex({ 4096, 4096 }, { 4096, 4096 }),
+             RasterProgram::layoutVertex({ 8192, 4096 }, { 8192, 4096 }),
 
              // 2/2/3
-             RasterProgram::layoutVertex({ 4096, 6144 }, { 16384, 24576 }),
-             RasterProgram::layoutVertex({ 6144, 6144 }, { 24576, 24576 }),
-             RasterProgram::layoutVertex({ 4096, 8192 }, { 16384, 32768 }),
-             RasterProgram::layoutVertex({ 6144, 8192 }, { 24576, 32768 }),
+             RasterProgram::layoutVertex({ 4096, 6144 }, { 4096, 6144 }),
+             RasterProgram::layoutVertex({ 6144, 6144 }, { 6144, 6144 }),
+             RasterProgram::layoutVertex({ 4096, 8192 }, { 4096, 8192 }),
+             RasterProgram::layoutVertex({ 6144, 8192 }, { 6144, 8192 }),
 
              // 2/3/2
-             RasterProgram::layoutVertex({ 6144, 4096 }, { 24576, 16384 }),
-             RasterProgram::layoutVertex({ 8192, 4096 }, { 32768, 16384 }),
-             RasterProgram::layoutVertex({ 6144, 6144 }, { 24576, 24576 }),
-             RasterProgram::layoutVertex({ 8192, 6144 }, { 32768, 24576 }),
+             RasterProgram::layoutVertex({ 6144, 4096 }, { 6144, 4096 }),
+             RasterProgram::layoutVertex({ 8192, 4096 }, { 8192, 4096 }),
+             RasterProgram::layoutVertex({ 6144, 6144 }, { 6144, 6144 }),
+             RasterProgram::layoutVertex({ 8192, 6144 }, { 8192, 6144 }),
 
              // 3/6/7
-             RasterProgram::layoutVertex({ 6144, 7168 }, { 24576, 28672 }),
-             RasterProgram::layoutVertex({ 7168, 7168 }, { 28672, 28672 }),
-             RasterProgram::layoutVertex({ 6144, 8192 }, { 24576, 32768 }),
-             RasterProgram::layoutVertex({ 7168, 8192 }, { 28672, 32768 }),
+             RasterProgram::layoutVertex({ 6144, 7168 }, { 6144, 7168 }),
+             RasterProgram::layoutVertex({ 7168, 7168 }, { 7168, 7168 }),
+             RasterProgram::layoutVertex({ 6144, 8192 }, { 6144, 8192 }),
+             RasterProgram::layoutVertex({ 7168, 8192 }, { 7168, 8192 }),
 
              // 3/7/6
-             RasterProgram::layoutVertex({ 7168, 6144 }, { 28672, 24576 }),
-             RasterProgram::layoutVertex({ 8192, 6144 }, { 32768, 24576 }),
-             RasterProgram::layoutVertex({ 7168, 7168 }, { 28672, 28672 }),
-             RasterProgram::layoutVertex({ 8192, 7168 }, { 32768, 28672 }),
+             RasterProgram::layoutVertex({ 7168, 6144 }, { 7168, 6144 }),
+             RasterProgram::layoutVertex({ 8192, 6144 }, { 8192, 6144 }),
+             RasterProgram::layoutVertex({ 7168, 7168 }, { 7168, 7168 }),
+             RasterProgram::layoutVertex({ 8192, 7168 }, { 8192, 7168 }),
          }),
          bucket.vertices.vector());
 
