@@ -142,12 +142,14 @@ double TransformState::getZoomFraction() const {
 
 #pragma mark - Bounds
 
-void TransformState::setLatLngBounds(const LatLngBounds& bounds_) {
-    bounds = bounds_;
-    setLatLngZoom(getLatLng(LatLng::Unwrapped), getZoom());
+void TransformState::setLatLngBounds(optional<LatLngBounds> bounds_) {
+    if (bounds_ != bounds) {
+        bounds = bounds_;
+        setLatLngZoom(getLatLng(LatLng::Unwrapped), getZoom());
+    }
 }
 
-LatLngBounds TransformState::getLatLngBounds() const {
+optional<LatLngBounds> TransformState::getLatLngBounds() const {
     return bounds;
 }
 
@@ -350,8 +352,11 @@ void TransformState::moveLatLng(const LatLng& latLng, const ScreenCoordinate& an
     setLatLngZoom(Projection::unproject(centerCoord + latLngCoord - anchorCoord, scale), getZoom());
 }
 
-void TransformState::setLatLngZoom(const LatLng &latLng, double zoom) {
-    const LatLng constrained = bounds.constrain(latLng);
+void TransformState::setLatLngZoom(const LatLng& latLng, double zoom) {
+    LatLng constrained = latLng;
+    if (bounds) {
+        constrained = bounds->constrain(latLng);
+    }
 
     double newScale = zoomScale(zoom);
     const double newWorldSize = newScale * util::tileSize;

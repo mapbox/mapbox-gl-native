@@ -406,10 +406,11 @@ double Transform::getZoom() const {
 
 #pragma mark - Bounds
 
-void Transform::setLatLngBounds(const LatLngBounds& bounds) {
-    if (bounds.valid()) {
-        state.setLatLngBounds(bounds);
+void Transform::setLatLngBounds(optional<LatLngBounds> bounds) {
+    if (bounds && !bounds->valid()) {
+        throw std::runtime_error("failed to set bounds: bounds are invalid");
     }
+    state.setLatLngBounds(bounds);
 }
 
 void Transform::setMinZoom(const double minZoom) {
