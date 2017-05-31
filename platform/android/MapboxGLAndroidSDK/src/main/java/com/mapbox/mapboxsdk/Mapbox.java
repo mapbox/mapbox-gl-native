@@ -86,9 +86,7 @@ public final class Mapbox {
    * @throws MapboxConfigurationException exception thrown when not using a valid accessToken
    */
   private static void validateAccessToken() throws MapboxConfigurationException {
-    String 
-      
-      = INSTANCE.accessToken;
+    String accessToken = INSTANCE.accessToken;
     if (TextUtils.isEmpty(accessToken) || (!accessToken.toLowerCase(MapboxConstants.MAPBOX_LOCALE).startsWith("pk.")
       && !accessToken.toLowerCase(MapboxConstants.MAPBOX_LOCALE).startsWith("sk."))) {
       throw new MapboxConfigurationException();
