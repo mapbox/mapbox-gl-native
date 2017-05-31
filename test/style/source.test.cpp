@@ -454,7 +454,7 @@ TEST(Source, ImageSourceImageUpdate) {
         // Should be called (test will hang if it doesn't)
         test.end();
     };
-    std::vector<LatLng> coords;
+    std::array<LatLng, 4> coords;
 
     ImageSource source("source", coords);
     source.setURL("http://url");

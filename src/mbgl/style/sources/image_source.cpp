@@ -8,7 +8,7 @@
 namespace mbgl {
 namespace style {
 
-ImageSource::ImageSource(std::string id, const std::vector<LatLng> coords_)
+ImageSource::ImageSource(std::string id, const std::array<LatLng, 4> coords_)
     : Source(makeMutable<Impl>(std::move(id), coords_)) {
 }
 
@@ -18,12 +18,12 @@ const ImageSource::Impl& ImageSource::impl() const {
     return static_cast<const Impl&>(*baseImpl);
 }
 
-void ImageSource::setCoordinates(const std::vector<LatLng>& coords_) {
+void ImageSource::setCoordinates(const std::array<LatLng, 4>& coords_) {
     baseImpl = makeMutable<Impl>(impl(), coords_);
     observer->onSourceChanged(*this);
 }
 
-std::vector<LatLng> ImageSource::getCoordinates() const {
+std::array<LatLng, 4> ImageSource::getCoordinates() const {
     return impl().getCoordinates();
 }
 
@@ -37,7 +37,7 @@ void ImageSource::setURL(const std::string& url_) {
     }
 }
 
-void ImageSource::setImage(mbgl::UnassociatedImage&& image_) {
+void ImageSource::setImage(UnassociatedImage&& image_) {
     url = {};
     if (req) {
         req.reset();
@@ -47,8 +47,8 @@ void ImageSource::setImage(mbgl::UnassociatedImage&& image_) {
     observer->onSourceChanged(*this);
 }
 
-const std::string& ImageSource::getURL() const {
-    return *url;
+optional<std::string> ImageSource::getURL() const {
+    return url;
 }
 
 void ImageSource::loadDescription(FileSource& fileSource) {

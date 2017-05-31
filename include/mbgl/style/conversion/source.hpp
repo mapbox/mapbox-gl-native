@@ -170,14 +170,13 @@ private:
             return {};
         }
         
-        std::vector<LatLng> coordinates;
-        coordinates.reserve(4);
-        for( std::size_t i=0; i < arrayLength(*coordinatesValue); i++) {
+        std::array<LatLng, 4> coordinates;
+        for (std::size_t i=0; i < 4; i++) {
             auto latLng = conversion::convert<LatLng>(arrayMember(*coordinatesValue,i), error);
             if (!latLng) {
                 return {};
             }
-            coordinates.push_back(*latLng);
+            coordinates[i] = *latLng;
         }
         auto result = std::make_unique<ImageSource>(id, coordinates);
         result->setURL(*urlString);

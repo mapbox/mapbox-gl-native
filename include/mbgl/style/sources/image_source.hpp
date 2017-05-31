@@ -12,16 +12,16 @@ namespace style {
 
 class ImageSource : public Source {
 public:
-    ImageSource(std::string id, const std::vector<LatLng>);
+    ImageSource(std::string id, const std::array<LatLng, 4>);
     ~ImageSource() override;
 
-    const std::string& getURL() const;
-    void setURL(const std::string& url) ;
+    optional<std::string> getURL() const;
+    void setURL(const std::string& url);
 
-    void setImage(mbgl::UnassociatedImage&&);
+    void setImage(UnassociatedImage&&);
 
-    void setCoordinates(const std::vector<LatLng>&);
-    std::vector<LatLng> getCoordinates() const;
+    void setCoordinates(const std::array<LatLng, 4>&);
+    std::array<LatLng, 4> getCoordinates() const;
 
     class Impl;
     const Impl& impl() const;
