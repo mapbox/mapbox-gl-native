@@ -71,9 +71,9 @@ public:
     std::unique_ptr<LineAtlas> lineAtlas;
 
 private:
-    std::vector<Immutable<style::Image::Impl>> imageImpls;
-    std::vector<Immutable<style::Source::Impl>> sourceImpls;
-    std::vector<Immutable<style::Layer::Impl>> layerImpls;
+    Immutable<std::vector<Immutable<style::Image::Impl>>> imageImpls;
+    Immutable<std::vector<Immutable<style::Source::Impl>>> sourceImpls;
+    Immutable<std::vector<Immutable<style::Layer::Impl>>> layerImpls;
 
     std::unordered_map<std::string, std::unique_ptr<RenderSource>> renderSources;
     std::unordered_map<std::string, std::unique_ptr<RenderLayer>> renderLayers;

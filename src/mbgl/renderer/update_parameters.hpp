@@ -22,9 +22,9 @@ public:
     const bool spriteLoaded;
     const style::TransitionOptions transitionOptions;
     const Immutable<style::Light::Impl> light;
-    const std::vector<Immutable<style::Image::Impl>> images;
-    const std::vector<Immutable<style::Source::Impl>> sources;
-    const std::vector<Immutable<style::Layer::Impl>> layers;
+    const Immutable<std::vector<Immutable<style::Image::Impl>>> images;
+    const Immutable<std::vector<Immutable<style::Source::Impl>>> sources;
+    const Immutable<std::vector<Immutable<style::Layer::Impl>>> layers;
 
     Scheduler& scheduler;
     FileSource& fileSource;

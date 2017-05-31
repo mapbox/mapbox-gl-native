@@ -23,7 +23,7 @@ TEST(SpriteAtlas, Basic) {
     auto images = parseSprite(util::read_file("test/fixtures/annotations/emerald.png"),
                               util::read_file("test/fixtures/annotations/emerald.json"));
     for (auto& image : images) {
-        atlas.addImage(image->impl);
+        atlas.addImage(image->baseImpl);
     }
 
     auto metro = *atlas.getIcon("metro");
@@ -63,7 +63,7 @@ TEST(SpriteAtlas, Size) {
     auto images = parseSprite(util::read_file("test/fixtures/annotations/emerald.png"),
                               util::read_file("test/fixtures/annotations/emerald.json"));
     for (auto& image : images) {
-        atlas.addImage(image->impl);
+        atlas.addImage(image->baseImpl);
     }
 
     auto metro = *atlas.getIcon("metro");

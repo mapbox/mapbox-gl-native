@@ -9,6 +9,7 @@
 #include <mbgl/style/image.hpp>
 #include <mbgl/style/source.hpp>
 #include <mbgl/style/layer.hpp>
+#include <mbgl/style/collection.hpp>
 
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/optional.hpp>
@@ -75,9 +76,9 @@ public:
 
     const std::string& getGlyphURL() const;
 
-    std::vector<Immutable<Image::Impl>> getImageImpls() const;
-    std::vector<Immutable<Source::Impl>> getSourceImpls() const;
-    std::vector<Immutable<Layer::Impl>> getLayerImpls() const;
+    Immutable<std::vector<Immutable<Image::Impl>>> getImageImpls() const;
+    Immutable<std::vector<Immutable<Source::Impl>>> getSourceImpls() const;
+    Immutable<std::vector<Immutable<Layer::Impl>>> getLayerImpls() const;
 
     void dumpDebugLogs() const;
 
@@ -90,9 +91,9 @@ private:
     std::unique_ptr<SpriteLoader> spriteLoader;
     std::string glyphURL;
 
-    std::unordered_map<std::string, std::unique_ptr<style::Image>> images;
-    std::vector<std::unique_ptr<Source>> sources;
-    std::vector<std::unique_ptr<Layer>> layers;
+    Collection<style::Image> images;
+    Collection<Source> sources;
+    Collection<Layer> layers;
     TransitionOptions transitionOptions;
     std::unique_ptr<Light> light;
 
@@ -102,8 +103,6 @@ private:
     double defaultZoom = 0;
     double defaultBearing = 0;
     double defaultPitch = 0;
-
-    std::vector<std::unique_ptr<Layer>>::const_iterator findLayer(const std::string& layerID) const;
 
     // SpriteLoaderObserver implementation.
     void onSpriteLoaded(std::vector<std::unique_ptr<Image>>&&) override;
