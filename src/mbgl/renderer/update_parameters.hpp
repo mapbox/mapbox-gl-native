@@ -1,11 +1,11 @@
 #pragma once
 
 #include <mbgl/map/mode.hpp>
-#include <mbgl/map/update.hpp>
+#include <mbgl/map/transform_state.hpp>
+#include <mbgl/util/chrono.hpp>
 
 namespace mbgl {
 
-class TransformState;
 class Scheduler;
 class FileSource;
 class AnnotationManager;
@@ -16,6 +16,7 @@ public:
     const float pixelRatio;
     const MapDebugOptions debugOptions;
     const TimePoint timePoint;
+    const TransformState transformState;
 
     const std::string glyphURL;
     const bool spriteLoaded;
@@ -28,7 +29,6 @@ public:
     Scheduler& scheduler;
     FileSource& fileSource;
     AnnotationManager& annotationManager;
-    const TransformState& transformState;
 };
 
 } // namespace mbgl
