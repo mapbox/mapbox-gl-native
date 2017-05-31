@@ -282,8 +282,10 @@ public final class TrackingSettings {
    */
   void resetTrackingModesIfRequired(CameraPosition currentCameraPosition, CameraPosition targetCameraPosition,
                                     boolean isFromLocation) {
-    resetTrackingModesIfRequired(!currentCameraPosition.target.equals(targetCameraPosition.target), false,
-      isFromLocation);
+    if (currentCameraPosition.target != null) {
+      resetTrackingModesIfRequired(!currentCameraPosition.target.equals(targetCameraPosition.target), false,
+        isFromLocation);
+    }
   }
 
   Location getMyLocation() {
