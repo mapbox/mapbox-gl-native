@@ -91,7 +91,7 @@ matrix:
       dist: trusty
       language: node
       compiler: "egl-node4-clang39-release"
-      env: BUILDTYPE=Release _CXX=clang++-3.9 _CC=clang-3.9 WITH_EGL=1
+      env: BUILDTYPE=RelWithDebInfo _CXX=clang++-3.9 _CC=clang-3.9 WITH_EGL=1
       addons: *clang39
       before_script:
         # fglrx causes the GLX extension to be unavailable
@@ -147,7 +147,7 @@ matrix:
       dist: trusty
       language: node
       compiler: "egl-node6-clang39-release"
-      env: BUILDTYPE=Release _CXX=clang++-3.9 _CC=clang-3.9 WITH_EGL=1
+      env: BUILDTYPE=RelWithDebInfo _CXX=clang++-3.9 _CC=clang-3.9 WITH_EGL=1
       addons: *clang39
       before_script:
         # fglrx causes the GLX extension to be unavailable
