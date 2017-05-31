@@ -17,6 +17,9 @@ import com.mapbox.mapboxsdk.exceptions.ConversionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Color utility class.
+ */
 public class ColorUtils {
 
   /**

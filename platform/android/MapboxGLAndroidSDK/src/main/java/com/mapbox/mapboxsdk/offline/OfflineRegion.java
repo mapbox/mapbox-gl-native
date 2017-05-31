@@ -98,7 +98,7 @@ public class OfflineRegion {
   }
 
   /**
-   * This callback receives an asynchronous response containing the {@link OfflineRegionStatus}
+   * This callback receives an asynchronous response containing the OfflineRegionStatus
    * of the offline region, or a {@link String} error message otherwise.
    */
   public interface OfflineRegionStatusCallback {

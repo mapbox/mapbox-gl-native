@@ -13,7 +13,7 @@ import com.mapbox.mapboxsdk.style.layers.PropertyValue;
 import java.util.Map;
 
 /**
- * Composite functions combine {@link android.graphics.Camera} and {@link SourceFunction}s.
+ * Composite functions combine Camera and SourceFunctions.
  * <p>
  * Composite functions allow the appearance of a map feature to change with both its
  * properties and zoom. Each stop is an array with two elements, the first is an object

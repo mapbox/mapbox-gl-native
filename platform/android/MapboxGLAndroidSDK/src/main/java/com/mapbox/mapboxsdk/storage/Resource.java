@@ -5,9 +5,15 @@ import android.support.annotation.IntDef;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
+/**
+ * Resource provides access to resource types.
+ */
 public final class Resource {
   // Note: Keep this in sync with include/mbgl/storage/resource.hpp
 
+  /**
+   * Resource type variants.
+   */
   @IntDef( {UNKNOWN, STYLE, SOURCE, TILE, GLYPHS, SPRITE_IMAGE, SPRITE_JSON})
   @Retention(RetentionPolicy.SOURCE)
   public @interface Kind {

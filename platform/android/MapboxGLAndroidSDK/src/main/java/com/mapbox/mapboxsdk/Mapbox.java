@@ -1,5 +1,6 @@
 package com.mapbox.mapboxsdk;
 
+import android.app.Application;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -15,6 +16,14 @@ import com.mapbox.services.android.telemetry.MapboxTelemetry;
 import com.mapbox.services.android.telemetry.location.LocationEngine;
 import com.mapbox.services.android.telemetry.location.LocationEnginePriority;
 
+/**
+ * The entry point of the Mapbox Android SDK.
+ * <p>
+ * Obtain a reference by calling {@link #getInstance(Context, String)}. Usually this class is configured in
+ * {@link Application#onCreate()} and is responsible for the active access token, application context, and
+ * connectivity state.
+ * </p>
+ */
 public final class Mapbox {
 
   private static Mapbox INSTANCE;
@@ -25,7 +34,7 @@ public final class Mapbox {
   /**
    * Get an instance of Mapbox.
    * <p>
-   * This class manages the active access token, application context and connectivity state.
+   * This class manages the active access token, application context, and connectivity state.
    * </p>
    *
    * @param context     Android context which holds or is an application context
@@ -52,9 +61,9 @@ public final class Mapbox {
   }
 
   /**
-   * Access Token for this application.
+   * Access token for this application.
    *
-   * @return Mapbox Access Token
+   * @return Mapbox access token
    */
   public static String getAccessToken() {
     validateMapbox();
@@ -72,12 +81,14 @@ public final class Mapbox {
   }
 
   /**
-   * Runtime validation of Access Token.
+   * Runtime validation of access token.
    *
    * @throws MapboxConfigurationException exception thrown when not using a valid accessToken
    */
   private static void validateAccessToken() throws MapboxConfigurationException {
-    String accessToken = INSTANCE.accessToken;
+    String 
+      
+      = INSTANCE.accessToken;
     if (TextUtils.isEmpty(accessToken) || (!accessToken.toLowerCase(MapboxConstants.MAPBOX_LOCALE).startsWith("pk.")
       && !accessToken.toLowerCase(MapboxConstants.MAPBOX_LOCALE).startsWith("sk."))) {
       throw new MapboxConfigurationException();
@@ -92,11 +103,11 @@ public final class Mapbox {
   }
 
   /**
-   * Manually sets the connectivity state of the app. This is useful for apps that control their
+   * Manually sets the connectivity state of the app. This is useful for apps which control their
    * own connectivity state and want to bypass any checks to the ConnectivityManager.
    *
    * @param connected flag to determine the connectivity state, true for connected, false for
-   *                  disconnected, null for ConnectivityManager to determine.
+   *                  disconnected, and null for ConnectivityManager to determine.
    */
   public static synchronized void setConnected(Boolean connected) {
     // Connectivity state overridden by app
@@ -104,10 +115,10 @@ public final class Mapbox {
   }
 
   /**
-   * Determines whether we have an Internet connection available. Please do not rely on this
-   * method in your apps, this method is used internally by the SDK.
+   * Determines whether we have an internet connection available. Please do not rely on this
+   * method in your apps. This method is used internally by the SDK.
    *
-   * @return true if there is an Internet connection, false otherwise
+   * @return true if there is an internet connection, false otherwise
    */
   public static synchronized Boolean isConnected() {
     if (INSTANCE.connected != null) {

@@ -1972,9 +1972,9 @@ public final class MapboxMap {
   /**
    * Interface definition for a callback to be invoked when the camera changes position.
    *
-   * @deprecated Replaced by MapboxMap.OnCameraMoveStartedListener, MapboxMap.OnCameraMoveListener and
-   * MapboxMap.OnCameraIdleListener. The order in which the deprecated onCameraChange method will be called in relation
-   * to the methods in the new camera change listeners is undefined.
+   * @deprecated Replaced by {@link MapboxMap.OnCameraMoveStartedListener}, {@link MapboxMap.OnCameraMoveListener} and
+   * {@link MapboxMap.OnCameraIdleListener}. The order in which the deprecated onCameraChange method will be called in
+   * relation to the methods in the new camera change listeners is undefined.
    */
   @Deprecated
   public interface OnCameraChangeListener {

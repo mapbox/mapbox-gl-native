@@ -16,7 +16,7 @@ import java.lang.annotation.RetentionPolicy;
 public class MyBearingTracking {
 
   /**
-   * Indicates the parameter accepts one of the values from {@link MyBearingTracking}.
+   * Indicates that the parameter accepts one of the values from MyBearingTracking.
    */
   @IntDef( {NONE, COMPASS, GPS, /**COMBINED**/})
   @Retention(RetentionPolicy.SOURCE)
@@ -37,7 +37,5 @@ public class MyBearingTracking {
    * Tracking the bearing of the user based on GPS data
    */
   public static final int GPS = 0x00000008;
-
-  // public static final int COMBINED = 0x00000012;
 
 }

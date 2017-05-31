@@ -2,7 +2,7 @@ package com.mapbox.mapboxsdk.location;
 
 import android.content.Context;
 import android.location.Location;
-import android.util.Log;
+import android.support.annotation.NonNull;
 
 import com.mapbox.services.android.telemetry.location.LocationEngine;
 import com.mapbox.services.android.telemetry.location.LocationEngineListener;
@@ -14,6 +14,8 @@ import com.mapzen.android.lost.api.LocationServices;
 import com.mapzen.android.lost.api.LostApiClient;
 
 import java.lang.ref.WeakReference;
+
+import timber.log.Timber;
 
 /**
  * Manages locational updates. Contains methods to register and unregister location listeners.
@@ -33,8 +35,6 @@ import java.lang.ref.WeakReference;
 public class LocationSource extends LocationEngine implements
   LostApiClient.ConnectionCallbacks, LocationListener {
 
-  private static final String LOG_TAG = LocationSource.class.getSimpleName();
-
   private static LocationEngine instance;
 
   private WeakReference<Context> context;
@@ -48,7 +48,13 @@ public class LocationSource extends LocationEngine implements
       .build();
   }
 
-  public static synchronized LocationEngine getLocationEngine(Context context) {
+  /**
+   * Get the LocationEngine instance.
+   *
+   * @param context a Context from which the application context is derived
+   * @return the LocationEngine instance
+   */
+  public static synchronized LocationEngine getLocationEngine(@NonNull Context context) {
     if (instance == null) {
       instance = new LocationSource(context.getApplicationContext());
     }
@@ -56,6 +62,10 @@ public class LocationSource extends LocationEngine implements
     return instance;
   }
 
+  /**
+   * Activate the location engine which will connect whichever location provider you are using. You'll need to call
+   * this before requesting user location updates using {@link LocationEngine#requestLocationUpdates()}.
+   */
   @Override
   public void activate() {
     if (lostApiClient != null && !lostApiClient.isConnected()) {
@@ -63,6 +73,11 @@ public class LocationSource extends LocationEngine implements
     }
   }
 
+  /**
+   * Disconnect the location engine which is useful when you no longer need location updates or requesting the users
+   * {@link LocationEngine#getLastLocation()}. Before deactivating, you'll need to stop request user location updates
+   * using {@link LocationEngine#removeLocationUpdates()}.
+   */
   @Override
   public void deactivate() {
     if (lostApiClient != null && lostApiClient.isConnected()) {
@@ -70,11 +85,20 @@ public class LocationSource extends LocationEngine implements
     }
   }
 
+  /**
+   * Check if your location provider has been activated/connected. This is mainly used internally but is also useful in
+   * the rare case when you'd like to know if your location engine is connected or not.
+   *
+   * @return boolean true if the location engine has been activated/connected, else false.
+   */
   @Override
   public boolean isConnected() {
     return lostApiClient.isConnected();
   }
 
+  /**
+   * Invoked when the location provider has connected.
+   */
   @Override
   public void onConnected() {
     for (LocationEngineListener listener : locationListeners) {
@@ -82,11 +106,19 @@ public class LocationSource extends LocationEngine implements
     }
   }
 
+  /**
+   * Invoked when the location provider connection has been suspended.
+   */
   @Override
   public void onConnectionSuspended() {
-    Log.d(LOG_TAG, "Connection suspended.");
+    Timber.d("Connection suspended.");
   }
 
+  /**
+   * Returns the Last known location is the location provider is connected and location permissions are granted.
+   *
+   * @return the last known location
+   */
   @Override
   public Location getLastLocation() {
     if (lostApiClient.isConnected() && PermissionsManager.areLocationPermissionsGranted(context.get())) {
@@ -97,6 +129,9 @@ public class LocationSource extends LocationEngine implements
     return null;
   }
 
+  /**
+   * Request location updates to the location provider.
+   */
   @Override
   public void requestLocationUpdates() {
     // Common params
@@ -122,6 +157,9 @@ public class LocationSource extends LocationEngine implements
     }
   }
 
+  /**
+   * Dismiss ongoing location update to the location provider.
+   */
   @Override
   public void removeLocationUpdates() {
     if (lostApiClient.isConnected()) {
@@ -129,6 +167,11 @@ public class LocationSource extends LocationEngine implements
     }
   }
 
+  /**
+   * Invoked when the Location has changed.
+   *
+   * @param location the new location
+   */
   @Override
   public void onLocationChanged(Location location) {
     for (LocationEngineListener listener : locationListeners) {

@@ -156,7 +156,7 @@ public final class CameraPosition implements Parcelable {
   }
 
   /**
-   * Builder for composing {@link CameraPosition} objects.
+   * Builder for composing CameraPosition objects.
    */
   public static final class Builder {
 
@@ -190,7 +190,7 @@ public final class CameraPosition implements Parcelable {
     /**
      * Create Builder with an existing CameraPosition data.
      *
-     * @param typedArray TypedArray containgin attribute values
+     * @param typedArray TypedArray containing attribute values
      */
     public Builder(TypedArray typedArray) {
       super();
