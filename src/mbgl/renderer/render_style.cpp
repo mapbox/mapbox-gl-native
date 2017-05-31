@@ -41,6 +41,9 @@ RenderStyle::RenderStyle(Scheduler& scheduler_, FileSource& fileSource_)
       glyphAtlas(std::make_unique<GlyphAtlas>(Size{ 2048, 2048 }, fileSource)),
       spriteAtlas(std::make_unique<SpriteAtlas>()),
       lineAtlas(std::make_unique<LineAtlas>(Size{ 256, 512 })),
+      imageImpls(makeMutable<std::vector<Immutable<style::Image::Impl>>>()),
+      sourceImpls(makeMutable<std::vector<Immutable<style::Source::Impl>>>()),
+      layerImpls(makeMutable<std::vector<Immutable<style::Layer::Impl>>>()),
       renderLight(makeMutable<Light::Impl>()),
       observer(&nullObserver) {
     glyphAtlas->setObserver(this);
@@ -55,7 +58,7 @@ void RenderStyle::setObserver(RenderStyleObserver* observer_) {
 std::vector<const RenderLayer*> RenderStyle::getRenderLayers() const {
     std::vector<const RenderLayer*> result;
     result.reserve(renderLayers.size());
-    for (const auto& layer : layerImpls) {
+    for (const auto& layer : *layerImpls) {
         result.push_back(getRenderLayer(layer->id));
     }
     return result;
@@ -189,12 +192,12 @@ void RenderStyle::update(const UpdateParameters& parameters) {
     }
 
     // Update all sources.
-    for (const auto& source : sourceImpls) {
+    for (const auto& source : *sourceImpls) {
         std::vector<Immutable<Layer::Impl>> filteredLayers;
         bool needsRendering = false;
         bool needsRelayout = false;
 
-        for (const auto& layer : layerImpls) {
+        for (const auto& layer : *layerImpls) {
             if (layer->type == LayerType::Background ||
                 layer->type == LayerType::Custom ||
                 layer->source != source->id) {
@@ -262,7 +265,7 @@ RenderData RenderStyle::getRenderData(MapDebugOptions debugOptions, float angle)
         }
     }
 
-    for (auto& layerImpl : layerImpls) {
+    for (auto& layerImpl : *layerImpls) {
         RenderLayer* layer = getRenderLayer(layerImpl->id);
         assert(layer);
 
@@ -277,7 +280,7 @@ RenderData RenderStyle::getRenderData(MapDebugOptions debugOptions, float angle)
                 continue;
             }
             const BackgroundPaintProperties::PossiblyEvaluated& paint = background->evaluated;
-            if (layerImpl.get() == layerImpls[0].get() && paint.get<BackgroundPattern>().from.empty()) {
+            if (layerImpl.get() == layerImpls->at(0).get() && paint.get<BackgroundPattern>().from.empty()) {
                 // This is a solid background. We can use glClear().
                 result.backgroundColor = paint.get<BackgroundColor>() * paint.get<BackgroundOpacity>();
             } else {
@@ -392,7 +395,7 @@ std::vector<Feature> RenderStyle::queryRenderedFeatures(const ScreenLineString& 
     }
 
     // Combine all results based on the style layer order.
-    for (const auto& layerImpl : layerImpls) {
+    for (const auto& layerImpl : *layerImpls) {
         const RenderLayer* layer = getRenderLayer(layerImpl->id);
         if (!layer->needsRendering(zoomHistory.lastZoom)) {
             continue;

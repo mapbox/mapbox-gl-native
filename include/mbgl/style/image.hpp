@@ -24,7 +24,7 @@ public:
     bool isSdf() const;
 
     class Impl;
-    Immutable<Impl> impl;
+    Immutable<Impl> baseImpl;
 };
 
 } // namespace style

@@ -54,6 +54,8 @@ TransitionOptions Style::getTransitionOptions() const {
 void Style::setJSON(const std::string& json) {
     sources.clear();
     layers.clear();
+    images.clear();
+
     transitionOptions = {};
 
     Parser parser;
@@ -91,12 +93,7 @@ void Style::setJSON(const std::string& json) {
 }
 
 void Style::addSource(std::unique_ptr<Source> source) {
-    // Guard against duplicate source ids
-    auto it = std::find_if(sources.begin(), sources.end(), [&](const auto& existing) {
-        return existing->getID() == source->getID();
-    });
-
-    if (it != sources.end()) {
+    if (sources.get(source->getID())) {
         std::string msg = "Source " + source->getID() + " already exists";
         throw std::runtime_error(msg.c_str());
     }
@@ -104,7 +101,7 @@ void Style::addSource(std::unique_ptr<Source> source) {
     source->setObserver(this);
     source->loadDescription(fileSource);
 
-    sources.emplace_back(std::move(source));
+    sources.add(std::move(source));
 }
 
 struct SourceIdUsageEvaluator {
@@ -131,50 +128,27 @@ std::unique_ptr<Source> Style::removeSource(const std::string& id) {
         return nullptr;
     }
 
-    auto it = std::find_if(sources.begin(), sources.end(), [&](const auto& source) {
-        return source->getID() == id;
-    });
+    std::unique_ptr<Source> source = sources.remove(id);
 
-    if (it == sources.end()) {
-        return nullptr;
+    if (source) {
+        source->setObserver(nullptr);
     }
-
-    auto source = std::move(*it);
-    source->setObserver(nullptr);
-    sources.erase(it);
 
     return source;
 }
 
 std::vector<Layer*> Style::getLayers() {
-    std::vector<Layer*> result;
-    result.reserve(layers.size());
-    for (auto& layer : layers) {
-        result.push_back(layer.get());
-    }
-    return result;
-}
-
-std::vector<std::unique_ptr<Layer>>::const_iterator Style::findLayer(const std::string& id) const {
-    return std::find_if(layers.begin(), layers.end(), [&](const auto& layer) {
-        return layer->baseImpl->id == id;
-    });
+    return layers.getWrappers();
 }
 
 Layer* Style::getLayer(const std::string& id) const {
-    auto it = findLayer(id);
-    return it != layers.end() ? it->get() : nullptr;
+    return layers.get(id);
 }
 
 Layer* Style::addLayer(std::unique_ptr<Layer> layer, optional<std::string> before) {
     // TODO: verify source
 
-    // Guard against duplicate layer ids
-    auto it = std::find_if(layers.begin(), layers.end(), [&](const auto& existing) {
-        return existing->getID() == layer->getID();
-    });
-
-    if (it != layers.end()) {
+    if (layers.get(layer->getID())) {
         throw std::runtime_error(std::string{"Layer "} + layer->getID() + " already exists");
     }
 
@@ -184,25 +158,20 @@ Layer* Style::addLayer(std::unique_ptr<Layer> layer, optional<std::string> befor
 
     layer->setObserver(this);
 
-    return layers.emplace(before ? findLayer(*before) : layers.end(), std::move(layer))->get();
+    return layers.add(std::move(layer), before);
 }
 
 std::unique_ptr<Layer> Style::removeLayer(const std::string& id) {
-    auto it = std::find_if(layers.begin(), layers.end(), [&](const auto& layer) {
-        return layer->baseImpl->id == id;
-    });
+    std::unique_ptr<Layer> layer = layers.remove(id);
 
-    if (it == layers.end())
-        return nullptr;
+    if (layer) {
+        layer->setObserver(nullptr);
 
-    auto layer = std::move(*it);
-
-    if (auto* customLayer = layer->as<CustomLayer>()) {
-        customLayer->impl().deinitialize();
+        if (auto* customLayer = layer->as<CustomLayer>()) {
+            customLayer->impl().deinitialize();
+        }
     }
 
-    layer->setObserver(nullptr);
-    layers.erase(it);
     return layer;
 }
 
@@ -237,20 +206,11 @@ double Style::getDefaultPitch() const {
 }
 
 std::vector<Source*> Style::getSources() {
-    std::vector<Source*> result;
-    result.reserve(sources.size());
-    for (auto& source : sources) {
-        result.push_back(source.get());
-    }
-    return result;
+    return sources.getWrappers();
 }
 
 Source* Style::getSource(const std::string& id) const {
-    const auto it = std::find_if(sources.begin(), sources.end(), [&](const auto& source) {
-        return source->getID() == id;
-    });
-
-    return it != sources.end() ? it->get() : nullptr;
+    return sources.get(id);
 }
 
 bool Style::isLoaded() const {
@@ -272,22 +232,23 @@ bool Style::isLoaded() const {
 }
 
 void Style::addImage(std::unique_ptr<style::Image> image) {
-    std::string id = image->getID();
-    auto it = images.find(id);
-    if (it != images.end() && it->second->getImage().size != image->getImage().size) {
-        Log::Warning(Event::Sprite, "Can't change sprite dimensions for '%s'", id.c_str());
-        return;
+    if (style::Image* existing = images.get(image->getID())) {
+        if (existing->getImage().size != image->getImage().size) {
+            Log::Warning(Event::Sprite, "Can't change sprite dimensions for '%s'", image->getID().c_str());
+            return;
+        }
+        images.remove(image->getID());
     }
-    images[id] = std::move(image);
+
+    images.add(std::move(image));
 }
 
 void Style::removeImage(const std::string& id) {
-    images.erase(id);
+    images.remove(id);
 }
 
 const style::Image* Style::getImage(const std::string& id) const {
-    auto it = images.find(id);
-    return it == images.end() ? nullptr : it->second.get();
+    return images.get(id);
 }
 
 void Style::setObserver(style::Observer* observer_) {
@@ -295,11 +256,13 @@ void Style::setObserver(style::Observer* observer_) {
 }
 
 void Style::onSourceLoaded(Source& source) {
+    sources.update(source);
     observer->onSourceLoaded(source);
     observer->onUpdate(Update::Repaint);
 }
 
 void Style::onSourceChanged(Source& source) {
+    sources.update(source);
     observer->onSourceChanged(source);
 }
 
@@ -312,6 +275,7 @@ void Style::onSourceError(Source& source, std::exception_ptr error) {
 }
 
 void Style::onSourceDescriptionChanged(Source& source) {
+    sources.update(source);
     observer->onSourceDescriptionChanged(source);
     if (!source.loaded) {
         source.loadDescription(fileSource);
@@ -332,7 +296,8 @@ void Style::onSpriteError(std::exception_ptr error) {
     observer->onResourceError(error);
 }
 
-void Style::onLayerChanged(Layer&) {
+void Style::onLayerChanged(Layer& layer) {
+    layers.update(layer);
     observer->onUpdate(Update::Repaint);
 }
 
@@ -350,31 +315,16 @@ const std::string& Style::getGlyphURL() const {
     return glyphURL;
 }
 
-std::vector<Immutable<Image::Impl>> Style::getImageImpls() const {
-    std::vector<Immutable<style::Image::Impl>> result;
-    result.reserve(images.size());
-    for (const auto& image : images) {
-        result.push_back(image.second->impl);
-    }
-    return result;
+Immutable<std::vector<Immutable<Image::Impl>>> Style::getImageImpls() const {
+    return images.getImpls();
 }
 
-std::vector<Immutable<Source::Impl>> Style::getSourceImpls() const {
-    std::vector<Immutable<style::Source::Impl>> result;
-    result.reserve(sources.size());
-    for (const auto& source : sources) {
-        result.push_back(source->baseImpl);
-    }
-    return result;
+Immutable<std::vector<Immutable<Source::Impl>>> Style::getSourceImpls() const {
+    return sources.getImpls();
 }
 
-std::vector<Immutable<Layer::Impl>> Style::getLayerImpls() const {
-    std::vector<Immutable<style::Layer::Impl>> result;
-    result.reserve(layers.size());
-    for (const auto& layer : layers) {
-        result.push_back(layer->baseImpl);
-    }
-    return result;
+Immutable<std::vector<Immutable<Layer::Impl>>> Style::getLayerImpls() const {
+    return layers.getImpls();
 }
 
 } // namespace style

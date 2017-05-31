@@ -115,4 +115,19 @@ Immutable<S> staticImmutableCast(const Immutable<U>& u) {
     return Immutable<S>(std::static_pointer_cast<const S>(u.ptr));
 }
 
+/**
+ * Constrained mutation of an immutable reference. Makes a temporarily-mutable copy of the
+ * input Immutable using the inner type's copy constructor, runs the given callable on the
+ * mutable copy, and then freezes the copy and reassigns it to the input reference.
+ *
+ * Note that other Immutables referring to the same inner instance are not affected; they
+ * continue to referencing the original immutable instance.
+ */
+template <class T, class Fn>
+void mutate(Immutable<T>& immutable, Fn&& fn) {
+    Mutable<T> mut = makeMutable<T>(*immutable);
+    std::forward<Fn>(fn)(*mut);
+    immutable = std::move(mut);
+}
+
 } // namespace mbgl

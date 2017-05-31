@@ -21,20 +21,20 @@ public:
 using ImmutableImage = Immutable<style::Image::Impl>;
 using ImageDifference = StyleDifference<ImmutableImage>;
 
-ImageDifference diffImages(const std::vector<ImmutableImage>&,
-                           const std::vector<ImmutableImage>&);
+ImageDifference diffImages(const Immutable<std::vector<ImmutableImage>>&,
+                           const Immutable<std::vector<ImmutableImage>>&);
 
 using ImmutableSource = Immutable<style::Source::Impl>;
 using SourceDifference = StyleDifference<ImmutableSource>;
 
-SourceDifference diffSources(const std::vector<ImmutableSource>&,
-                             const std::vector<ImmutableSource>&);
+SourceDifference diffSources(const Immutable<std::vector<ImmutableSource>>&,
+                             const Immutable<std::vector<ImmutableSource>>&);
 
 using ImmutableLayer = Immutable<style::Layer::Impl>;
 using LayerDifference = StyleDifference<ImmutableLayer>;
 
-LayerDifference diffLayers(const std::vector<ImmutableLayer>&,
-                           const std::vector<ImmutableLayer>&);
+LayerDifference diffLayers(const Immutable<std::vector<ImmutableLayer>>&,
+                           const Immutable<std::vector<ImmutableLayer>>&);
 
 bool hasLayoutDifference(const LayerDifference&, const std::string& layerID);
 
