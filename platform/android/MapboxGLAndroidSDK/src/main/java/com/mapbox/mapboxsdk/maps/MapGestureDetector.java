@@ -357,7 +357,7 @@ final class MapGestureDetector {
         return false;
       }
 
-      trackingSettings.resetTrackingModesIfRequired(true, false);
+      trackingSettings.resetTrackingModesIfRequired(true, false, false);
 
       // cancel any animation
       transform.cancelTransitions();
@@ -402,7 +402,7 @@ final class MapGestureDetector {
       }
 
       // reset tracking if needed
-      trackingSettings.resetTrackingModesIfRequired(true, false);
+      trackingSettings.resetTrackingModesIfRequired(true, false, false);
 
       // Scroll the map
       transform.moveBy(-distanceX, -distanceY, 0 /*no duration*/);
@@ -484,7 +484,7 @@ final class MapGestureDetector {
       // to be in the center of the map. Therefore the zoom will translate the map center, so tracking
       // should be disabled.
 
-      trackingSettings.resetTrackingModesIfRequired(!quickZoom, false);
+      trackingSettings.resetTrackingModesIfRequired(!quickZoom, false, false);
       // Scale the map
       if (focalPoint != null) {
         // arround user provided focal point
@@ -568,7 +568,7 @@ final class MapGestureDetector {
       }
       // rotation constitutes translation of anything except the center of
       // rotation, so cancel both location and bearing tracking if required
-      trackingSettings.resetTrackingModesIfRequired(true, true);
+      trackingSettings.resetTrackingModesIfRequired(true, true, false);
 
       // Get rotate value
       double bearing = transform.getRawBearing();
