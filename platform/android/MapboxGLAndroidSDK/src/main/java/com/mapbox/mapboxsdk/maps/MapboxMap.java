@@ -470,7 +470,7 @@ public final class MapboxMap {
    */
   @UiThread
   public void setMinZoomPreference(
-    @FloatRange(from = MapboxConstants.MINIMUM_ZOOM, to = MapboxConstants.MAXIMUM_ZOOM) double minZoom) {
+          @FloatRange(from = MapboxConstants.MINIMUM_ZOOM, to = MapboxConstants.MAXIMUM_ZOOM) double minZoom) {
     transform.setMinZoom(minZoom);
   }
 
@@ -499,7 +499,7 @@ public final class MapboxMap {
    */
   @UiThread
   public void setMaxZoomPreference(@FloatRange(from = MapboxConstants.MINIMUM_ZOOM,
-    to = MapboxConstants.MAXIMUM_ZOOM) double maxZoom) {
+          to = MapboxConstants.MAXIMUM_ZOOM) double maxZoom) {
     transform.setMaxZoom(maxZoom);
   }
 
@@ -1154,7 +1154,7 @@ public final class MapboxMap {
   @UiThread
   @NonNull
   public List<MarkerView> addMarkerViews(@NonNull List<? extends
-    BaseMarkerViewOptions> markerViewOptions) {
+          BaseMarkerViewOptions> markerViewOptions) {
     return annotationManager.addMarkerViews(markerViewOptions, this);
   }
 
@@ -1183,7 +1183,7 @@ public final class MapboxMap {
   @UiThread
   @NonNull
   public List<Marker> addMarkers(@NonNull List<? extends
-    BaseMarkerOptions> markerOptionsList) {
+          BaseMarkerOptions> markerOptionsList) {
     return annotationManager.addMarkers(markerOptionsList, this);
   }
 
@@ -1746,7 +1746,7 @@ public final class MapboxMap {
    */
   @UiThread
   public void setOnInfoWindowLongClickListener(@Nullable OnInfoWindowLongClickListener
-                                                 listener) {
+                                                       listener) {
     annotationManager.getInfoWindowManager().setOnInfoWindowLongClickListener(listener);
   }
 
@@ -1828,16 +1828,25 @@ public final class MapboxMap {
    */
   @UiThread
   public void setOnMyLocationChangeListener(@Nullable MapboxMap.OnMyLocationChangeListener
-                                              listener) {
+                                                    listener) {
     trackingSettings.setOnMyLocationChangeListener(listener);
+  }
+
+  /**
+   * Removes custom location source of the my-location layer and brings back default {@link LocationSource}
+   * location source.
+   *
+   */
+  @UiThread
+  public void removeLocationSource() {
+    trackingSettings.removeLocationSource();
   }
 
   /**
    * Replaces the location source of the my-location layer.
    *
    * @param locationSource A {@link LocationEngine} location source to use in the my-location layer.
-   *                       Set to null to use the default {@link LocationSource}
-   *                       location source.
+   *
    */
   @UiThread
   public void setLocationSource(@Nullable LocationEngine locationSource) {
@@ -1852,7 +1861,7 @@ public final class MapboxMap {
    */
   @UiThread
   public void setOnMyLocationTrackingModeChangeListener(
-    @Nullable MapboxMap.OnMyLocationTrackingModeChangeListener listener) {
+          @Nullable MapboxMap.OnMyLocationTrackingModeChangeListener listener) {
     trackingSettings.setOnMyLocationTrackingModeChangeListener(listener);
   }
 
@@ -1891,7 +1900,7 @@ public final class MapboxMap {
   @UiThread
   @NonNull
   public List<Feature> queryRenderedFeatures(@NonNull PointF coordinates, @Nullable String...
-    layerIds) {
+          layerIds) {
     return nativeMapView.queryRenderedFeatures(coordinates, layerIds, null);
   }
 
