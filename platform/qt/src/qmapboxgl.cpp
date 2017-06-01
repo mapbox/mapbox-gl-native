@@ -1506,12 +1506,12 @@ mbgl::Size QMapboxGLPrivate::framebufferSize() const {
 
 void QMapboxGLPrivate::updateAssumedState() {
     assumeFramebufferBinding(fbObject);
-    assumeViewportSize(framebufferSize());
+    assumeViewport(0, 0, framebufferSize());
 }
 
 void QMapboxGLPrivate::bind() {
     setFramebufferBinding(fbObject);
-    setViewportSize(framebufferSize());
+    setViewport(0, 0, framebufferSize());
 }
 
 void QMapboxGLPrivate::invalidate()

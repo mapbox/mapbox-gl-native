@@ -61,7 +61,7 @@ protected:
     // Tells the renderer that OpenGL state has already been set by the windowing toolkit.
     // It sets the internal assumed state to the supplied values.
     void assumeFramebufferBinding(gl::FramebufferID fbo);
-    void assumeViewportSize(const Size&);
+    void assumeViewport(int32_t x, int32_t y, const Size&);
 
     // Returns true when assumed framebuffer binding hasn't changed from the implicit binding.
     bool implicitFramebufferBound();
@@ -69,7 +69,7 @@ protected:
     // Triggers an OpenGL state update if the internal assumed state doesn't match the
     // supplied values.
     void setFramebufferBinding(gl::FramebufferID fbo);
-    void setViewportSize(const Size&);
+    void setViewport(int32_t x, int32_t y, const Size&);
 
 protected:
     std::unique_ptr<gl::Context> context;
