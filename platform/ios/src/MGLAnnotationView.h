@@ -171,6 +171,19 @@ typedef NS_ENUM(NSUInteger, MGLAnnotationViewDragState) {
  */
 @property (nonatomic, assign) BOOL scalesWithViewingDistance;
 
+/**
+ A Boolean value that determines whether the annotation view rotates together
+ with the map.
+
+ When the value of this property is `YES` and the map is rotated, the annotation
+ view rotates. This is also the behavior of `MGLAnnotationImage` objects. When the
+ value of this property is `NO` the annotation has its rotation angle fixed.
+
+ The default value of this property is `NO`. Set this property to `YES` if the
+ view’s rotation is important.
+ */
+@property (nonatomic, assign) BOOL rotatesToMatchCamera;
+
 #pragma mark Managing the Selection State
 
 /**
