@@ -53,4 +53,9 @@ private:
     optional<std::vector<std::string>> tileURLTemplates;
 };
 
+template <>
+inline bool RenderSource::is<RenderRasterSource>() const {
+    return baseImpl->type == SourceType::Raster;
+}
+
 } // namespace mbgl

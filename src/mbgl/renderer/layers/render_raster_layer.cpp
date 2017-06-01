@@ -38,8 +38,8 @@ bool RenderRasterLayer::hasTransition() const {
 
 void RenderRasterLayer::uploadBuckets(gl::Context& context, RenderSource* source) {
     RenderLayer::uploadBuckets(context, source);
-    if (renderTiles.size() == 0) {
-        RenderImageSource* imageSource = dynamic_cast<RenderImageSource*>(source);
+    if (renderTiles.empty()) {
+        RenderImageSource* imageSource = source->as<RenderImageSource>();
         if (imageSource) {
             imageSource->upload(context);
         }
@@ -48,8 +48,8 @@ void RenderRasterLayer::uploadBuckets(gl::Context& context, RenderSource* source
 
 void RenderRasterLayer::render(Painter& painter, PaintParameters& parameters, RenderSource* source) {
     RenderLayer::render(painter, parameters, source);
-    if (renderTiles.size() == 0) {
-        RenderImageSource* imageSource = dynamic_cast<RenderImageSource*>(source);
+    if (renderTiles.empty()) {
+        RenderImageSource* imageSource = source->as<RenderImageSource>();
         if (imageSource) {
             imageSource->render(painter, parameters, *this);
         }

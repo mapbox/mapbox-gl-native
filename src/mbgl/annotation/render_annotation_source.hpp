@@ -52,4 +52,9 @@ private:
     TilePyramid tilePyramid;
 };
 
+template <>
+inline bool RenderSource::is<RenderAnnotationSource>() const {
+    return baseImpl->type == SourceType::Annotations;
+}
+
 } // namespace mbgl
