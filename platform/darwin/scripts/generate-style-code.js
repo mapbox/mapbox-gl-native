@@ -519,12 +519,27 @@ global.setSourceLayer = function() {
     return `_layer->setSourceLayer(sourceLayer.UTF8String);`
 };
 
+const lightProperties = Object.keys(spec[`light`]).reduce((memo, name) => {
+  var property = spec[`light`][name];
+  property.name = name;
+  property['light-property'] = true;
+  memo.push(property);
+  return memo;
+}, []);
+
 const layerH = ejs.compile(fs.readFileSync('platform/darwin/src/MGLStyleLayer.h.ejs', 'utf8'), { strict: true });
 const layerM = ejs.compile(fs.readFileSync('platform/darwin/src/MGLStyleLayer.mm.ejs', 'utf8'), { strict: true});
 const testLayers = ejs.compile(fs.readFileSync('platform/darwin/test/MGLStyleLayerTests.mm.ejs', 'utf8'), { strict: true});
 const forStyleAuthorsMD = ejs.compile(fs.readFileSync('platform/darwin/docs/guides/For Style Authors.md.ejs', 'utf8'), { strict: true });
 const ddsGuideMD = ejs.compile(fs.readFileSync('platform/darwin/docs/guides/Using Style Functions at Runtime.md.ejs', 'utf8'), { strict: true });
 const templatesMD = ejs.compile(fs.readFileSync('platform/darwin/docs/guides/Tile URL Templates.md.ejs', 'utf8'), { strict: true });
+
+const lightH = ejs.compile(fs.readFileSync('platform/darwin/src/MGLLight.h.ejs', 'utf8'), {strict: true});;
+const lightM = ejs.compile(fs.readFileSync('platform/darwin/src/MGLLight.mm.ejs', 'utf8'), {strict: true});;
+fs.writeFileSync(`platform/darwin/src/MGLLight.h`, lightH(lightProperties));
+fs.writeFileSync(`platform/darwin/src/MGLLight.mm`, lightM(lightProperties));
+
+
 
 const layers = _(spec.layer.type.values).map((value, layerType) => {
     const layoutProperties = Object.keys(spec[`layout_${layerType}`]).reduce((memo, name) => {
