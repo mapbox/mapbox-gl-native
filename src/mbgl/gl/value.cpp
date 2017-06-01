@@ -267,6 +267,18 @@ Viewport::Type Viewport::Get() {
              { static_cast<uint32_t>(viewport[2]), static_cast<uint32_t>(viewport[3]) } };
 }
 
+const constexpr ScissorTest::Type ScissorTest::Default;
+
+void ScissorTest::Set(const Type& value) {
+    MBGL_CHECK_ERROR(value ? glEnable(GL_SCISSOR_TEST) : glDisable(GL_SCISSOR_TEST));
+}
+
+ScissorTest::Type ScissorTest::Get() {
+    Type scissorTest;
+    MBGL_CHECK_ERROR(scissorTest = glIsEnabled(GL_SCISSOR_TEST));
+    return scissorTest;
+}
+
 const constexpr BindFramebuffer::Type BindFramebuffer::Default;
 
 void BindFramebuffer::Set(const Type& value) {

@@ -38,6 +38,11 @@ void Backend::assumeViewport(int32_t x, int32_t y, const Size& size) {
     assert(gl::value::Viewport::Get() == getContext().viewport.getCurrentValue());
 }
 
+void Backend::assumeScissorTest(bool enabled) {
+    getContext().scissorTest.setCurrentValue(enabled);
+    assert(gl::value::ScissorTest::Get() == getContext().scissorTest.getCurrentValue());
+}
+
 bool Backend::implicitFramebufferBound() {
     return getContext().bindFramebuffer.getCurrentValue() == ImplicitFramebufferBinding;
 }
@@ -52,6 +57,11 @@ void Backend::setFramebufferBinding(const gl::FramebufferID fbo) {
 void Backend::setViewport(int32_t x, int32_t y, const Size& size) {
     getContext().viewport = { x, y, size };
     assert(gl::value::Viewport::Get() == getContext().viewport.getCurrentValue());
+}
+
+void Backend::setScissorTest(bool enabled) {
+    getContext().scissorTest = enabled;
+    assert(gl::value::ScissorTest::Get() == getContext().scissorTest.getCurrentValue());
 }
 
 Backend::~Backend() = default;

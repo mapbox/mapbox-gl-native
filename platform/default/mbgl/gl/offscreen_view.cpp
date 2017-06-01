@@ -24,6 +24,7 @@ public:
             context.bindFramebuffer = framebuffer->framebuffer;
         }
 
+        context.scissorTest = false;
         context.viewport = { 0, 0, size };
     }
 
