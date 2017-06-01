@@ -3,9 +3,11 @@
 #include <mbgl/renderer/buckets/circle_bucket.hpp>
 #include <mbgl/renderer/buckets/fill_bucket.hpp>
 #include <mbgl/renderer/buckets/line_bucket.hpp>
+#include <mbgl/renderer/buckets/raster_bucket.hpp>
 #include <mbgl/renderer/buckets/symbol_bucket.hpp>
 #include <mbgl/renderer/bucket_parameters.hpp>
 #include <mbgl/style/layers/symbol_layer_properties.hpp>
+#include <mbgl/gl/context.hpp>
 
 #include <mbgl/map/mode.hpp>
 
@@ -35,4 +37,18 @@ TEST(Buckets, SymbolBucket) {
     ASSERT_FALSE(bucket.hasIconData());
     ASSERT_FALSE(bucket.hasTextData());
     ASSERT_FALSE(bucket.hasCollisionBoxData());
+}
+
+TEST(Buckets, RasterBucket) {
+    gl::Context context;
+    UnassociatedImage rgba({ 1, 1 });
+
+    RasterBucket bucket = { std::move(rgba) };
+    ASSERT_TRUE(bucket.needsUpload());
+
+    bucket.upload(context);
+    ASSERT_FALSE(bucket.needsUpload());
+
+    bucket.clear();
+    ASSERT_TRUE(bucket.needsUpload());
 }

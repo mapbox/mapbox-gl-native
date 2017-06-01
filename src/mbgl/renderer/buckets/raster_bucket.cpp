@@ -12,10 +12,6 @@ using namespace style;
 RasterBucket::RasterBucket(UnassociatedImage&& image_) : image(std::move(image_)) {
 }
 
-RasterBucket::RasterBucket(RasterBucket&& other) : image(std::move(other.image)) {
-    uploaded = false;
-}
-
 void RasterBucket::upload(gl::Context& context) {
     texture = context.createTexture(image);
     if (!vertices.empty()) {
@@ -25,6 +21,15 @@ void RasterBucket::upload(gl::Context& context) {
     uploaded = true;
 }
 
+void RasterBucket::clear() {
+    vertexBuffer = {};
+    indexBuffer = {};
+    segments.clear();
+    vertices.clear();
+    indices.clear();
+    
+    uploaded = false;
+}
 void RasterBucket::render(Painter& painter,
                           PaintParameters& parameters,
                           const RenderLayer& layer,

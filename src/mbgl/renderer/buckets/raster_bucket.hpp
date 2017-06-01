@@ -14,7 +14,6 @@ namespace mbgl {
 class RasterBucket : public Bucket {
 public:
     RasterBucket(UnassociatedImage&&);
-    RasterBucket(RasterBucket&&);
 
     void upload(gl::Context&) override;
     void render(Painter&, PaintParameters&, const RenderLayer&, const RenderTile&) override;
@@ -24,6 +23,7 @@ public:
                 const mat4& matrix);
     bool hasData() const override;
 
+    void clear();
     UnassociatedImage image;
     optional<gl::Texture> texture;
 
