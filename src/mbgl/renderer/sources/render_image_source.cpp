@@ -137,8 +137,7 @@ void RenderImageSource::updateTiles(const TileParameters& parameters) {
         }
         bucket = std::make_unique<RasterBucket>(std::move(img));
     } else {
-        // Reuse the bucket
-        bucket = std::make_unique<RasterBucket>(std::move(*bucket));
+        bucket->clear();
     }
 
     // Set Bucket Vertices, Indices, and segments

@@ -24,6 +24,7 @@ public:
     std::size_t byteSize() const { return v.size() * sizeof(uint16_t); }
 
     bool empty() const { return v.empty(); }
+    void clear() { v.clear(); }
     const uint16_t* data() const { return v.data(); }
 
 private:
