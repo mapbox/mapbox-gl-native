@@ -11,11 +11,18 @@
 namespace mbgl {
 
 template <class T>
+class StyleChange {
+public:
+    T before;
+    T after;
+};
+
+template <class T>
 class StyleDifference {
 public:
     std::unordered_map<std::string, T> added;
     std::unordered_map<std::string, T> removed;
-    std::unordered_map<std::string, std::array<T, 2>> changed;
+    std::unordered_map<std::string, StyleChange<T>> changed;
 };
 
 using ImmutableImage = Immutable<style::Image::Impl>;

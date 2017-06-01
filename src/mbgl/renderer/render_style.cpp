@@ -134,7 +134,7 @@ void RenderStyle::update(const UpdateParameters& parameters) {
 
     // Update changed images.
     for (const auto& entry : imageDiff.changed) {
-        spriteAtlas->updateImage(entry.second[1]);
+        spriteAtlas->updateImage(entry.second.after);
     }
 
     if (parameters.spriteLoaded && !spriteAtlas->isLoaded()) {
@@ -157,7 +157,7 @@ void RenderStyle::update(const UpdateParameters& parameters) {
 
     // Update render layers for changed layers.
     for (const auto& entry : layerDiff.changed) {
-        renderLayers.at(entry.first)->setImpl(entry.second[1]);
+        renderLayers.at(entry.first)->setImpl(entry.second.after);
     }
 
     // Update layers for class and zoom changes.
