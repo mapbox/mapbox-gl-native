@@ -109,7 +109,7 @@ NativeMapView::~NativeMapView() {
  */
 void NativeMapView::bind() {
     setFramebufferBinding(0);
-    setViewportSize(getFramebufferSize());
+    setViewport(0, 0, getFramebufferSize());
 }
 
 /**
@@ -292,7 +292,7 @@ void NativeMapView::render(jni::JNIEnv& env) {
     BackendScope guard(*this);
 
     if (framebufferSizeChanged) {
-        setViewportSize(getFramebufferSize());
+        setViewport(0, 0, getFramebufferSize());
         framebufferSizeChanged = false;
     }
 
@@ -1430,7 +1430,7 @@ mbgl::Size NativeMapView::getFramebufferSize() const {
 
 void NativeMapView::updateAssumedState() {
     assumeFramebufferBinding(0);
-    assumeViewportSize(getFramebufferSize());
+    assumeViewport(0, 0, getFramebufferSize());
 }
 
 void NativeMapView::updateFps() {

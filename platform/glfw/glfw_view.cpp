@@ -136,12 +136,12 @@ void GLFWView::setMap(mbgl::Map *map_) {
 
 void GLFWView::updateAssumedState() {
     assumeFramebufferBinding(0);
-    assumeViewportSize(getFramebufferSize());
+    assumeViewport(0, 0, getFramebufferSize());
 }
 
 void GLFWView::bind() {
     setFramebufferBinding(0);
-    setViewportSize(getFramebufferSize());
+    setViewport(0, 0, getFramebufferSize());
 }
 
 void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, int mods) {

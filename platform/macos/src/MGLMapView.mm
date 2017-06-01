@@ -2888,12 +2888,12 @@ public:
     void updateAssumedState() override {
         glGetIntegerv(GL_FRAMEBUFFER_BINDING, &fbo);
         assumeFramebufferBinding(fbo);
-        assumeViewportSize(nativeView.framebufferSize);
+        assumeViewport(0, 0, nativeView.framebufferSize);
     }
 
     void bind() override {
         setFramebufferBinding(fbo);
-        setViewportSize(nativeView.framebufferSize);
+        setViewport(0, 0, nativeView.framebufferSize);
     }
 
     mbgl::PremultipliedImage readStillImage() {
