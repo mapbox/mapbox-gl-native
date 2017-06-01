@@ -468,8 +468,8 @@ void Context::reset() {
 }
 
 void Context::setDirtyState() {
-    // Note: does not set viewport/bindFramebuffer to dirty since they are handled separately in
-    // the view object.
+    // Note: does not set viewport/scissorTest/bindFramebuffer to dirty
+    // since they are handled separately in the view object.
     stencilFunc.setDirty();
     stencilMask.setDirty();
     stencilTest.setDirty();

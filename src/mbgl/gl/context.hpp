@@ -199,6 +199,7 @@ public:
     State<value::ActiveTexture> activeTexture;
     State<value::BindFramebuffer> bindFramebuffer;
     State<value::Viewport> viewport;
+    State<value::ScissorTest> scissorTest;
     std::array<State<value::BindTexture>, 2> texture;
     State<value::BindVertexArray, const Context&> vertexArrayObject { *this };
     State<value::Program> program;

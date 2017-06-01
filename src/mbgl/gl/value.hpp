@@ -182,6 +182,13 @@ struct Viewport {
     static Type Get();
 };
 
+struct ScissorTest {
+    using Type = bool;
+    static const constexpr Type Default = false;
+    static void Set(const Type&);
+    static Type Get();
+};
+
 constexpr bool operator!=(const Viewport::Type& a, const Viewport::Type& b) {
     return a.x != b.x || a.y != b.y || a.size != b.size;
 }
