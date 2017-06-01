@@ -23,7 +23,6 @@
 
 #include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/geometry/line_atlas.hpp>
-#include <mbgl/text/glyph_atlas.hpp>
 
 #include <mbgl/programs/program_parameters.hpp>
 #include <mbgl/programs/programs.hpp>
@@ -138,7 +137,6 @@ void Painter::render(RenderStyle& style, const FrameData& frame_, View& view) {
         view
     };
 
-    glyphAtlas = style.glyphAtlas.get();
     spriteAtlas = style.spriteAtlas.get();
     lineAtlas = style.lineAtlas.get();
 
@@ -172,7 +170,6 @@ void Painter::render(RenderStyle& style, const FrameData& frame_, View& view) {
         spriteAtlas->upload(context, 0);
 
         lineAtlas->upload(context, 0);
-        glyphAtlas->upload(context, 0);
         frameHistory.upload(context, 0);
     }
 

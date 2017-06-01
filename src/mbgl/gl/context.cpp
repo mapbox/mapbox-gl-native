@@ -397,6 +397,7 @@ Context::createFramebuffer(const Texture& color,
 UniqueTexture
 Context::createTexture(const Size size, const void* data, TextureFormat format, TextureUnit unit) {
     auto obj = createTexture();
+    pixelStoreUnpack = { 1 };
     updateTexture(obj, size, data, format, unit);
     // We are using clamp to edge here since OpenGL ES doesn't allow GL_REPEAT on NPOT textures.
     // We use those when the pixelRatio isn't a power of two, e.g. on iPhone 6 Plus.

@@ -5,6 +5,8 @@
 #include <mbgl/util/rect.hpp>
 #include <mbgl/util/traits.hpp>
 #include <mbgl/util/optional.hpp>
+#include <mbgl/util/immutable.hpp>
+#include <mbgl/util/image.hpp>
 
 #include <cstdint>
 #include <vector>
@@ -35,13 +37,23 @@ inline bool operator==(const GlyphMetrics& lhs, const GlyphMetrics& rhs) {
         lhs.advance == rhs.advance;
 }
 
-struct Glyph {
-    Rect<uint16_t> rect;
+class Glyph {
+public:
+    // We're using this value throughout the Mapbox GL ecosystem. If this is different, the glyphs
+    // also need to be reencoded.
+    static constexpr const uint8_t borderSize = 3;
+
+    GlyphID id = 0;
+
+    // A signed distance field of the glyph with a border (see above).
+    AlphaImage bitmap;
+
+    // Glyph metrics
     GlyphMetrics metrics;
 };
 
-using GlyphPositions = std::map<GlyphID, optional<Glyph>>;
-using GlyphPositionMap = std::map<FontStack, GlyphPositions>;
+using Glyphs = std::map<GlyphID, optional<Immutable<Glyph>>>;
+using GlyphMap = std::map<FontStack, Glyphs>;
 
 class PositionedGlyph {
 public:

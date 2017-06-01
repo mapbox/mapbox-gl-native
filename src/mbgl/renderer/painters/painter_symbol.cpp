@@ -105,12 +105,12 @@ void Painter::renderSymbol(PaintParameters& parameters,
     }
 
     if (bucket.hasTextData()) {
-        glyphAtlas->bind(context, 0);
+        context.bindTexture(*bucket.text.atlasTexture, 0, gl::TextureFilter::Linear);
 
         auto values = layer.textPropertyValues(layout);
         auto paintPropertyValues = layer.textPaintProperties();
 
-        const Size texsize = glyphAtlas->getSize();
+        const Size texsize = bucket.text.atlasTexture->size;
 
         if (values.hasHalo) {
             draw(parameters.programs.symbolGlyph,

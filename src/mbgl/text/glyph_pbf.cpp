@@ -4,8 +4,8 @@
 
 namespace mbgl {
 
-std::vector<SDFGlyph> parseGlyphPBF(const GlyphRange& glyphRange, const std::string& data) {
-    std::vector<SDFGlyph> result;
+std::vector<Glyph> parseGlyphPBF(const GlyphRange& glyphRange, const std::string& data) {
+    std::vector<Glyph> result;
     result.reserve(256);
 
     protozero::pbf_reader glyphs_pbf(data);
@@ -15,7 +15,7 @@ std::vector<SDFGlyph> parseGlyphPBF(const GlyphRange& glyphRange, const std::str
         while (fontstack_pbf.next(3)) {
             auto glyph_pbf = fontstack_pbf.get_message();
 
-            SDFGlyph glyph;
+            Glyph glyph;
             protozero::data_view glyphData;
 
             bool hasID = false, hasWidth = false, hasHeight = false, hasLeft = false,
@@ -73,8 +73,8 @@ std::vector<SDFGlyph> parseGlyphPBF(const GlyphRange& glyphRange, const std::str
             // with the implicit border size, otherwise we expect there to be no bitmap at all.
             if (glyph.metrics.width && glyph.metrics.height) {
                 const Size size {
-                    glyph.metrics.width + 2 * SDFGlyph::borderSize,
-                    glyph.metrics.height + 2 * SDFGlyph::borderSize
+                    glyph.metrics.width + 2 * Glyph::borderSize,
+                    glyph.metrics.height + 2 * Glyph::borderSize
                 };
 
                 if (size.area() != glyphData.size()) {

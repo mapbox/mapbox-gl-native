@@ -1,7 +1,7 @@
 #include <mbgl/test/util.hpp>
 #include <mbgl/test/stub_file_source.hpp>
 
-#include <mbgl/text/glyph_atlas.hpp>
+#include <mbgl/text/glyph_manager.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/io.hpp>
@@ -9,7 +9,7 @@
 
 using namespace mbgl;
 
-class StubGlyphAtlasObserver : public GlyphAtlasObserver {
+class StubGlyphManagerObserver : public GlyphManagerObserver {
 public:
     void onGlyphsLoaded(const FontStack& fontStack, const GlyphRange& glyphRange) override {
         if (glyphsLoaded) glyphsLoaded(fontStack, glyphRange);
@@ -25,28 +25,28 @@ public:
 
 class StubGlyphRequestor : public GlyphRequestor {
 public:
-    void onGlyphsAvailable(GlyphPositionMap positions) override {
-        if (glyphsAvailable) glyphsAvailable(std::move(positions));
+    void onGlyphsAvailable(GlyphMap glyphs) override {
+        if (glyphsAvailable) glyphsAvailable(std::move(glyphs));
     }
 
-    std::function<void (GlyphPositionMap)> glyphsAvailable;
+    std::function<void (GlyphMap)> glyphsAvailable;
 };
 
-class GlyphAtlasTest {
+class GlyphManagerTest {
 public:
     util::RunLoop loop;
     StubFileSource fileSource;
-    StubGlyphAtlasObserver observer;
+    StubGlyphManagerObserver observer;
     StubGlyphRequestor requestor;
-    GlyphAtlas glyphAtlas{ { 32, 32 }, fileSource };
+    GlyphManager glyphManager { fileSource };
 
     void run(const std::string& url, GlyphDependencies dependencies) {
         // Squelch logging.
         Log::setObserver(std::make_unique<Log::NullObserver>());
 
-        glyphAtlas.setURL(url);
-        glyphAtlas.setObserver(&observer);
-        glyphAtlas.getGlyphs(requestor, std::move(dependencies));
+        glyphManager.setURL(url);
+        glyphManager.setObserver(&observer);
+        glyphManager.getGlyphs(requestor, std::move(dependencies));
 
         loop.run();
     }
@@ -56,8 +56,8 @@ public:
     }
 };
 
-TEST(GlyphAtlas, LoadingSuccess) {
-    GlyphAtlasTest test;
+TEST(GlyphManager, LoadingSuccess) {
+    GlyphManagerTest test;
 
     test.fileSource.glyphsResponse = [&] (const Resource& resource) {
         EXPECT_EQ(Resource::Kind::Glyphs, resource.kind);
@@ -76,8 +76,8 @@ TEST(GlyphAtlas, LoadingSuccess) {
         ASSERT_EQ(range, GlyphRange(0, 255));
     };
 
-    test.requestor.glyphsAvailable = [&] (GlyphPositionMap positions) {
-        const auto& testPositions = positions.at({{"Test Stack"}});
+    test.requestor.glyphsAvailable = [&] (GlyphMap glyphs) {
+        const auto& testPositions = glyphs.at({{"Test Stack"}});
 
         ASSERT_EQ(testPositions.size(), 3u);
         ASSERT_EQ(testPositions.count(u'a'), 1u);
@@ -95,8 +95,8 @@ TEST(GlyphAtlas, LoadingSuccess) {
         });
 }
 
-TEST(GlyphAtlas, LoadingFail) {
-    GlyphAtlasTest test;
+TEST(GlyphManager, LoadingFail) {
+    GlyphManagerTest test;
 
     test.fileSource.glyphsResponse = [&] (const Resource&) {
         Response response;
@@ -116,7 +116,7 @@ TEST(GlyphAtlas, LoadingFail) {
         test.end();
     };
 
-    test.requestor.glyphsAvailable = [&] (GlyphPositionMap) {
+    test.requestor.glyphsAvailable = [&] (GlyphMap) {
         FAIL();
         test.end();
     };
@@ -128,8 +128,8 @@ TEST(GlyphAtlas, LoadingFail) {
         });
 }
 
-TEST(GlyphAtlas, LoadingCorrupted) {
-    GlyphAtlasTest test;
+TEST(GlyphManager, LoadingCorrupted) {
+    GlyphManagerTest test;
 
     test.fileSource.glyphsResponse = [&] (const Resource&) {
         Response response;
@@ -147,7 +147,7 @@ TEST(GlyphAtlas, LoadingCorrupted) {
         test.end();
     };
 
-    test.requestor.glyphsAvailable = [&] (GlyphPositionMap) {
+    test.requestor.glyphsAvailable = [&] (GlyphMap) {
         FAIL();
         test.end();
     };
@@ -159,8 +159,8 @@ TEST(GlyphAtlas, LoadingCorrupted) {
         });
 }
 
-TEST(GlyphAtlas, LoadingCancel) {
-    GlyphAtlasTest test;
+TEST(GlyphManager, LoadingCancel) {
+    GlyphManagerTest test;
 
     test.fileSource.glyphsResponse = [&] (const Resource&) {
         test.end();
@@ -178,8 +178,8 @@ TEST(GlyphAtlas, LoadingCancel) {
         });
 }
 
-TEST(GlyphAtlas, LoadingInvalid) {
-    GlyphAtlasTest test;
+TEST(GlyphManager, LoadingInvalid) {
+    GlyphManagerTest test;
 
     test.fileSource.glyphsResponse = [&] (const Resource& resource) {
         EXPECT_EQ(Resource::Kind::Glyphs, resource.kind);
@@ -198,8 +198,8 @@ TEST(GlyphAtlas, LoadingInvalid) {
         ASSERT_EQ(range, GlyphRange(0, 255));
     };
 
-    test.requestor.glyphsAvailable = [&] (GlyphPositionMap positions) {
-        const auto& testPositions = positions.at({{"Test Stack"}});
+    test.requestor.glyphsAvailable = [&] (GlyphMap glyphs) {
+        const auto& testPositions = glyphs.at({{"Test Stack"}});
 
         ASSERT_EQ(testPositions.size(), 2u);
         ASSERT_FALSE(bool(testPositions.at(u'A')));

@@ -21,7 +21,7 @@
 #include <mbgl/style/transition_options.hpp>
 #include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/sprite/sprite_loader.hpp>
-#include <mbgl/text/glyph_atlas.hpp>
+#include <mbgl/text/glyph_manager.hpp>
 #include <mbgl/geometry/line_atlas.hpp>
 #include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/map/query.hpp>
@@ -38,7 +38,7 @@ RenderStyleObserver nullObserver;
 RenderStyle::RenderStyle(Scheduler& scheduler_, FileSource& fileSource_)
     : scheduler(scheduler_),
       fileSource(fileSource_),
-      glyphAtlas(std::make_unique<GlyphAtlas>(Size{ 2048, 2048 }, fileSource)),
+      glyphManager(std::make_unique<GlyphManager>(fileSource)),
       spriteAtlas(std::make_unique<SpriteAtlas>()),
       lineAtlas(std::make_unique<LineAtlas>(Size{ 256, 512 })),
       imageImpls(makeMutable<std::vector<Immutable<style::Image::Impl>>>()),
@@ -46,7 +46,7 @@ RenderStyle::RenderStyle(Scheduler& scheduler_, FileSource& fileSource_)
       layerImpls(makeMutable<std::vector<Immutable<style::Layer::Impl>>>()),
       renderLight(makeMutable<Light::Impl>()),
       observer(&nullObserver) {
-    glyphAtlas->setObserver(this);
+    glyphManager->setObserver(this);
 }
 
 RenderStyle::~RenderStyle() = default;
@@ -101,10 +101,10 @@ void RenderStyle::update(const UpdateParameters& parameters) {
         parameters.mode,
         parameters.annotationManager,
         *spriteAtlas,
-        *glyphAtlas
+        *glyphManager
     };
 
-    glyphAtlas->setURL(parameters.glyphURL);
+    glyphManager->setURL(parameters.glyphURL);
 
     // Update light.
     const bool lightChanged = renderLight.impl != parameters.light;

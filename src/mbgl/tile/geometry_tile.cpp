@@ -38,13 +38,13 @@ GeometryTile::GeometryTile(const OverscaledTileID& id_,
              obsolete,
              parameters.mode,
              parameters.pixelRatio),
-      glyphAtlas(parameters.glyphAtlas),
+      glyphManager(parameters.glyphManager),
       spriteAtlas(parameters.spriteAtlas),
       placementThrottler(Milliseconds(300), [this] { invokePlacement(); }) {
 }
 
 GeometryTile::~GeometryTile() {
-    glyphAtlas.removeGlyphs(*this);
+    glyphManager.removeRequestor(*this);
     spriteAtlas.removeRequestor(*this);
     markObsolete();
 }
@@ -145,12 +145,12 @@ void GeometryTile::onError(std::exception_ptr err) {
     observer->onTileError(*this, err);
 }
     
-void GeometryTile::onGlyphsAvailable(GlyphPositionMap glyphPositions) {
-    worker.invoke(&GeometryTileWorker::onGlyphsAvailable, std::move(glyphPositions));
+void GeometryTile::onGlyphsAvailable(GlyphMap glyphs) {
+    worker.invoke(&GeometryTileWorker::onGlyphsAvailable, std::move(glyphs));
 }
 
 void GeometryTile::getGlyphs(GlyphDependencies glyphDependencies) {
-    glyphAtlas.getGlyphs(*this, std::move(glyphDependencies));
+    glyphManager.getGlyphs(*this, std::move(glyphDependencies));
 }
 
 void GeometryTile::onIconsAvailable(IconMap icons) {

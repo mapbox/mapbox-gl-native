@@ -5,7 +5,7 @@
 #include <mbgl/renderer/render_source_observer.hpp>
 #include <mbgl/renderer/render_layer.hpp>
 #include <mbgl/renderer/render_light.hpp>
-#include <mbgl/text/glyph_atlas_observer.hpp>
+#include <mbgl/text/glyph_manager_observer.hpp>
 #include <mbgl/map/zoom_history.hpp>
 #include <mbgl/map/mode.hpp>
 
@@ -16,7 +16,7 @@
 namespace mbgl {
 
 class FileSource;
-class GlyphAtlas;
+class GlyphManager;
 class SpriteAtlas;
 class LineAtlas;
 class RenderData;
@@ -32,7 +32,7 @@ class Source;
 class Layer;
 } // namespace style
 
-class RenderStyle : public GlyphAtlasObserver,
+class RenderStyle : public GlyphManagerObserver,
                     public RenderSourceObserver {
 public:
     RenderStyle(Scheduler&, FileSource&);
@@ -66,7 +66,7 @@ public:
 
     Scheduler& scheduler;
     FileSource& fileSource;
-    std::unique_ptr<GlyphAtlas> glyphAtlas;
+    std::unique_ptr<GlyphManager> glyphManager;
     std::unique_ptr<SpriteAtlas> spriteAtlas;
     std::unique_ptr<LineAtlas> lineAtlas;
 
@@ -79,7 +79,7 @@ private:
     std::unordered_map<std::string, std::unique_ptr<RenderLayer>> renderLayers;
     RenderLight renderLight;
 
-    // GlyphAtlasObserver implementation.
+    // GlyphManagerObserver implementation.
     void onGlyphsError(const FontStack&, const GlyphRange&, std::exception_ptr) override;
 
     // RenderSourceObserver implementation.

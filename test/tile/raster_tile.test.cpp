@@ -10,7 +10,7 @@
 #include <mbgl/renderer/tile_parameters.hpp>
 #include <mbgl/renderer/buckets/raster_bucket.hpp>
 #include <mbgl/sprite/sprite_atlas.hpp>
-#include <mbgl/text/glyph_atlas.hpp>
+#include <mbgl/text/glyph_manager.hpp>
 
 using namespace mbgl;
 
@@ -22,7 +22,7 @@ public:
     ThreadPool threadPool { 1 };
     AnnotationManager annotationManager;
     SpriteAtlas spriteAtlas;
-    GlyphAtlas glyphAtlas { { 512, 512, }, fileSource };
+    GlyphManager glyphManager { fileSource };
     Tileset tileset { { "https://example.com" }, { 0, 22 }, "none" };
 
     TileParameters tileParameters {
@@ -34,7 +34,7 @@ public:
         MapMode::Continuous,
         annotationManager,
         spriteAtlas,
-        glyphAtlas
+        glyphManager
     };
 };
 

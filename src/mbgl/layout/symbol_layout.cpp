@@ -175,7 +175,7 @@ bool SymbolLayout::hasSymbolInstances() const {
     return !symbolInstances.empty();
 }
 
-void SymbolLayout::prepare(const GlyphPositionMap& glyphs, const IconMap& icons) {
+void SymbolLayout::prepare(const GlyphMap& glyphs, const IconMap& icons) {
     float horizontalAlign = 0.5;
     float verticalAlign = 0.5;
 
@@ -217,9 +217,13 @@ void SymbolLayout::prepare(const GlyphPositionMap& glyphs, const IconMap& icons)
         layout.get<TextJustify>() == TextJustifyType::Left ? 0 :
         0.5;
 
-
     const bool textAlongLine = layout.get<TextRotationAlignment>() == AlignmentType::Map &&
         layout.get<SymbolPlacement>() == SymbolPlacementType::Line;
+
+    auto glyphPositionsIt = glyphs.find(layout.get<TextFont>());
+    if (glyphPositionsIt != glyphs.end()) {
+        glyphAtlas = makeGlyphAtlas(glyphPositionsIt->second);
+    }
 
     for (auto it = features.begin(); it != features.end(); ++it) {
         auto& feature = *it;
@@ -227,7 +231,6 @@ void SymbolLayout::prepare(const GlyphPositionMap& glyphs, const IconMap& icons)
 
         std::pair<Shaping, Shaping> shapedTextOrientations;
         optional<PositionedIcon> shapedIcon;
-        GlyphPositions face;
 
         // if feature has text, shape the text
         if (feature.text) {
@@ -281,8 +284,7 @@ void SymbolLayout::prepare(const GlyphPositionMap& glyphs, const IconMap& icons)
 
         // if either shapedText or icon position is present, add the feature
         if (shapedTextOrientations.first || shapedIcon) {
-            auto glyphPositionsIt = glyphs.find(layout.get<TextFont>());
-            addFeature(std::distance(features.begin(), it), feature, shapedTextOrientations, shapedIcon, glyphPositionsIt == glyphs.end() ? GlyphPositions() : glyphPositionsIt->second);
+            addFeature(std::distance(features.begin(), it), feature, shapedTextOrientations, shapedIcon);
         }
         
         feature.geometry.clear();
@@ -294,8 +296,7 @@ void SymbolLayout::prepare(const GlyphPositionMap& glyphs, const IconMap& icons)
 void SymbolLayout::addFeature(const std::size_t index,
                               const SymbolFeature& feature,
                               const std::pair<Shaping, Shaping>& shapedTextOrientations,
-                              optional<PositionedIcon> shapedIcon,
-                              const GlyphPositions& glyphs) {
+                              optional<PositionedIcon> shapedIcon) {
     const float minScale = 0.5f;
     const float glyphSize = 24.0f;
     
@@ -352,7 +353,7 @@ void SymbolLayout::addFeature(const std::size_t index,
                 addToBuffers, symbolInstances.size(),
                 textBoxScale, textPadding, textPlacement,
                 iconBoxScale, iconPadding, iconPlacement,
-                glyphs, indexedFeature, index);
+                glyphAtlas.positions, indexedFeature, index);
     };
     
     const auto& type = feature.getType();
@@ -425,6 +426,8 @@ bool SymbolLayout::anchorIsTooClose(const std::u16string& text, const float repe
 
 std::unique_ptr<SymbolBucket> SymbolLayout::place(CollisionTile& collisionTile) {
     auto bucket = std::make_unique<SymbolBucket>(layout, layerPaintProperties, textSize, iconSize, zoom, sdfIcons, iconsNeedLinear);
+
+    bucket->text.atlasImage = glyphAtlas.image.clone();
 
     // Calculate which labels can be shown and when they can be shown and
     // create the bufers used for rendering.

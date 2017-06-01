@@ -42,7 +42,7 @@ void align(Shaping& shaping,
 
 // justify left = 0, right = 1, center = .5
 void justifyLine(std::vector<PositionedGlyph>& positionedGlyphs,
-                 const GlyphPositions& glyphs,
+                 const Glyphs& glyphs,
                  std::size_t start,
                  std::size_t end,
                  float justify) {
@@ -53,7 +53,7 @@ void justifyLine(std::vector<PositionedGlyph>& positionedGlyphs,
     PositionedGlyph& glyph = positionedGlyphs[end];
     auto it = glyphs.find(glyph.glyph);
     if (it != glyphs.end() && it->second) {
-        const uint32_t lastAdvance = it->second->metrics.advance;
+        const uint32_t lastAdvance = (*it->second)->metrics.advance;
         const float lineIndent = float(glyph.x + lastAdvance) * justify;
         
         for (std::size_t j = start; j <= end; j++) {
@@ -65,13 +65,13 @@ void justifyLine(std::vector<PositionedGlyph>& positionedGlyphs,
 float determineAverageLineWidth(const std::u16string& logicalInput,
                                 const float spacing,
                                 float maxWidth,
-                                const GlyphPositions& glyphs) {
+                                const Glyphs& glyphs) {
     float totalWidth = 0;
     
     for (char16_t chr : logicalInput) {
         auto it = glyphs.find(chr);
         if (it != glyphs.end() && it->second) {
-            totalWidth += it->second->metrics.advance + spacing;
+            totalWidth += (*it->second)->metrics.advance + spacing;
         }
     }
     
@@ -164,7 +164,7 @@ std::set<std::size_t> determineLineBreaks(const std::u16string& logicalInput,
                                           const float spacing,
                                           float maxWidth,
                                           const WritingModeType writingMode,
-                                          const GlyphPositions& glyphs) {
+                                          const Glyphs& glyphs) {
     if (!maxWidth || writingMode != WritingModeType::Horizontal) {
         return {};
     }
@@ -182,7 +182,7 @@ std::set<std::size_t> determineLineBreaks(const std::u16string& logicalInput,
         const char16_t codePoint = logicalInput[i];
         auto it = glyphs.find(codePoint);
         if (it != glyphs.end() && it->second && !boost::algorithm::is_any_of(u" \t\n\v\f\r")(codePoint)) {
-            currentX += it->second->metrics.advance + spacing;
+            currentX += (*it->second)->metrics.advance + spacing;
         }
         
         // Ideographic characters, spaces, and word-breaking punctuation that often appear without
@@ -208,7 +208,7 @@ void shapeLines(Shaping& shaping,
                           const Point<float>& translate,
                           const float verticalHeight,
                           const WritingModeType writingMode,
-                          const GlyphPositions& glyphs) {
+                          const Glyphs& glyphs) {
     
     // the y offset *should* be part of the font metadata
     const int32_t yOffset = -17;
@@ -234,7 +234,7 @@ void shapeLines(Shaping& shaping,
                 continue;
             }
             
-            const Glyph& glyph = *it->second;
+            const Glyph& glyph = **it->second;
             
             if (writingMode == WritingModeType::Horizontal || !util::i18n::hasUprightVerticalOrientation(chr)) {
                 shaping.positionedGlyphs.emplace_back(chr, x, y, 0);
@@ -280,7 +280,7 @@ const Shaping getShaping(const std::u16string& logicalInput,
                          const float verticalHeight,
                          const WritingModeType writingMode,
                          BiDi& bidi,
-                         const GlyphPositions& glyphs) {
+                         const Glyphs& glyphs) {
     Shaping shaping(translate.x, translate.y, writingMode);
     
     std::vector<std::u16string> reorderedLines =
