@@ -73,6 +73,7 @@ if(APPLE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-error=unused-command-line-argument")
 endif()
 set(CMAKE_CXX_FLAGS_RELEASE "-Os -DNDEBUG")
+SET(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O3 -DNDEBUG")
 
 if(CMAKE_COMPILER_IS_GNUCXX)
     # https://svn.boost.org/trac/boost/ticket/9240
