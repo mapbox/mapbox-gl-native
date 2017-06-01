@@ -53,4 +53,9 @@ private:
     optional<std::vector<std::string>> tileURLTemplates;
 };
 
+template <>
+inline bool RenderSource::is<RenderVectorSource>() const {
+    return baseImpl->type == SourceType::Vector;
+}
+
 } // namespace mbgl

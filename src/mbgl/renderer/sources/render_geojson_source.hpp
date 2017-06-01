@@ -57,4 +57,9 @@ private:
     style::GeoJSONData* data;
 };
 
+template <>
+inline bool RenderSource::is<RenderGeoJSONSource>() const {
+    return baseImpl->type == SourceType::GeoJSON;
+}
+
 } // namespace mbgl

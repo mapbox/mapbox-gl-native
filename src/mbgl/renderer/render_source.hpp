@@ -33,6 +33,21 @@ public:
 
     ~RenderSource() override = default;
 
+    // Check whether this source is of the given subtype.
+    template <class T>
+    bool is() const;
+
+    // Dynamically cast this source to the given subtype.
+    template <class T>
+    T* as() {
+        return is<T>() ? reinterpret_cast<T*>(this) : nullptr;
+    }
+
+    template <class T>
+    const T* as() const {
+        return is<T>() ? reinterpret_cast<const T*>(this) : nullptr;
+    }
+
     virtual bool isLoaded() const = 0;
 
     // Called when the camera has changed. May load new tiles, unload obsolete tiles, or

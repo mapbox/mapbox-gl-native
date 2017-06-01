@@ -65,4 +65,9 @@ private:
     bool shouldRender;
 };
 
+template <>
+inline bool RenderSource::is<RenderImageSource>() const {
+    return baseImpl->type == SourceType::Image;
+}
+
 } // namespace mbgl
