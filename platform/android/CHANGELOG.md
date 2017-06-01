@@ -2,6 +2,11 @@
 
 Mapbox welcomes participation and contributions from everyone.  If you'd like to do so please see the [`Contributing Guide`](https://github.com/mapbox/mapbox-gl-native/blob/master/CONTRIBUTING.md) first to get started.
 
+## 5.1.0-rc.1 - TBA
+
+* Fix tracking mode + camera race condition [#9133](https://github.com/mapbox/mapbox-gl-native/pull/9133)
+* Harden orientation changes [#9128](https://github.com/mapbox/mapbox-gl-native/pull/9128)
+
 ## 5.1.0-beta.3 - May 26, 2017
 
 * Add binding support for Light [#9013](https://github.com/mapbox/mapbox-gl-native/pull/9013)

@@ -94,7 +94,7 @@ final class Transform implements MapView.OnMapChangedListener {
   final void moveCamera(MapboxMap mapboxMap, CameraUpdate update, MapboxMap.CancelableCallback callback) {
     CameraPosition cameraPosition = update.getCameraPosition(mapboxMap);
     if (!cameraPosition.equals(this.cameraPosition)) {
-      trackingSettings.resetTrackingModesIfRequired(cameraPosition);
+      trackingSettings.resetTrackingModesIfRequired(this.cameraPosition, cameraPosition, false);
       cancelTransitions();
       cameraChangeDispatcher.onCameraMoveStarted(OnCameraMoveStartedListener.REASON_API_ANIMATION);
       mapView.jumpTo(cameraPosition.bearing, cameraPosition.target, cameraPosition.tilt, cameraPosition.zoom);
@@ -107,10 +107,10 @@ final class Transform implements MapView.OnMapChangedListener {
 
   @UiThread
   final void easeCamera(MapboxMap mapboxMap, CameraUpdate update, int durationMs, boolean easingInterpolator,
-                        final MapboxMap.CancelableCallback callback) {
+                        final MapboxMap.CancelableCallback callback, boolean isDismissable) {
     CameraPosition cameraPosition = update.getCameraPosition(mapboxMap);
     if (!cameraPosition.equals(this.cameraPosition)) {
-      trackingSettings.resetTrackingModesIfRequired(cameraPosition);
+      trackingSettings.resetTrackingModesIfRequired(this.cameraPosition, cameraPosition, isDismissable);
       cancelTransitions();
       cameraChangeDispatcher.onCameraMoveStarted(OnCameraMoveStartedListener.REASON_API_ANIMATION);
 
@@ -118,7 +118,6 @@ final class Transform implements MapView.OnMapChangedListener {
         cameraCancelableCallback = callback;
         mapView.addOnMapChangedListener(this);
       }
-
       mapView.easeTo(cameraPosition.bearing, cameraPosition.target, durationMs, cameraPosition.tilt,
         cameraPosition.zoom, easingInterpolator);
     }
@@ -129,7 +128,7 @@ final class Transform implements MapView.OnMapChangedListener {
                            final MapboxMap.CancelableCallback callback) {
     CameraPosition cameraPosition = update.getCameraPosition(mapboxMap);
     if (!cameraPosition.equals(this.cameraPosition)) {
-      trackingSettings.resetTrackingModesIfRequired(cameraPosition);
+      trackingSettings.resetTrackingModesIfRequired(this.cameraPosition, cameraPosition, false);
       cancelTransitions();
       cameraChangeDispatcher.onCameraMoveStarted(OnCameraMoveStartedListener.REASON_API_ANIMATION);
 
