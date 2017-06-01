@@ -473,7 +473,9 @@ set(MBGL_CORE_FILES
     src/mbgl/text/glyph.hpp
     src/mbgl/text/glyph_atlas.cpp
     src/mbgl/text/glyph_atlas.hpp
-    src/mbgl/text/glyph_atlas_observer.hpp
+    src/mbgl/text/glyph_manager.cpp
+    src/mbgl/text/glyph_manager.hpp
+    src/mbgl/text/glyph_manager_observer.hpp
     src/mbgl/text/glyph_pbf.cpp
     src/mbgl/text/glyph_pbf.hpp
     src/mbgl/text/glyph_range.hpp

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <mbgl/text/quads.hpp>
-#include <mbgl/text/glyph.hpp>
+#include <mbgl/text/glyph_atlas.hpp>
 #include <mbgl/text/collision_feature.hpp>
 #include <mbgl/style/layers/symbol_layer_properties.hpp>
 

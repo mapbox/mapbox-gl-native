@@ -315,10 +315,10 @@ SymbolQuads getGlyphQuads(Anchor& anchor,
 
     for (const PositionedGlyph &positionedGlyph: shapedText.positionedGlyphs) {
         auto face_it = face.find(positionedGlyph.glyph);
-        if (face_it == face.end() || !face_it->second || !(*face_it->second).rect.hasArea())
+        if (face_it == face.end())
             continue;
 
-        const Glyph& glyph = *face_it->second;
+        const GlyphPosition& glyph = face_it->second;
         const Rect<uint16_t>& rect = glyph.rect;
         const float centerX = (positionedGlyph.x + glyph.metrics.advance / 2.0f) * boxScale;
 

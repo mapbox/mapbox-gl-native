@@ -17,9 +17,7 @@ namespace mbgl {
 
 class GeometryTile;
 class GeometryTileData;
-class GlyphAtlas;
 class SymbolLayout;
-class RenderLayer;
 
 namespace style {
 class Layer;
@@ -39,7 +37,7 @@ public:
     void setData(std::unique_ptr<const GeometryTileData>, uint64_t correlationID);
     void setPlacementConfig(PlacementConfig, uint64_t correlationID);
     
-    void onGlyphsAvailable(GlyphPositionMap glyphs);
+    void onGlyphsAvailable(GlyphMap glyphs);
     void onIconsAvailable(IconMap icons);
 
 private:
@@ -82,8 +80,8 @@ private:
     std::vector<std::unique_ptr<SymbolLayout>> symbolLayouts;
     GlyphDependencies pendingGlyphDependencies;
     IconDependencies pendingIconDependencies;
-    GlyphPositionMap glyphPositions;
-    IconMap icons;
+    GlyphMap glyphMap;
+    IconMap iconMap;
 };
 
 } // namespace mbgl

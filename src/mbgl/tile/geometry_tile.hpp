@@ -3,7 +3,7 @@
 #include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/tile/tile.hpp>
 #include <mbgl/tile/geometry_tile_worker.hpp>
-#include <mbgl/text/glyph_atlas.hpp>
+#include <mbgl/text/glyph_manager.hpp>
 #include <mbgl/text/placement_config.hpp>
 #include <mbgl/util/feature.hpp>
 #include <mbgl/util/throttler.hpp>
@@ -38,7 +38,7 @@ public:
     void setPlacementConfig(const PlacementConfig&) override;
     void setLayers(const std::vector<Immutable<style::Layer::Impl>>&) override;
     
-    void onGlyphsAvailable(GlyphPositionMap) override;
+    void onGlyphsAvailable(GlyphMap) override;
     void onIconsAvailable(IconMap) override;
     
     void getGlyphs(GlyphDependencies);
@@ -96,7 +96,7 @@ private:
     std::shared_ptr<Mailbox> mailbox;
     Actor<GeometryTileWorker> worker;
 
-    GlyphAtlas& glyphAtlas;
+    GlyphManager& glyphManager;
     SpriteAtlas& spriteAtlas;
 
     uint64_t correlationID = 0;

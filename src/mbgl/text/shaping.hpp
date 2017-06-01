@@ -2,7 +2,6 @@
 
 #include <mbgl/text/glyph.hpp>
 #include <mbgl/sprite/sprite_atlas.hpp>
-#include <mbgl/style/image.hpp>
 
 namespace mbgl {
 
@@ -54,6 +53,6 @@ const Shaping getShaping(const std::u16string& string,
                          float verticalHeight,
                          const WritingModeType,
                          BiDi& bidi,
-                         const GlyphPositions& glyphs);
+                         const Glyphs& glyphs);
 
 } // namespace mbgl

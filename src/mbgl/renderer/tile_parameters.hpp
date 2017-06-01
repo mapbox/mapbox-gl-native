@@ -9,7 +9,7 @@ class Scheduler;
 class FileSource;
 class AnnotationManager;
 class SpriteAtlas;
-class GlyphAtlas;
+class GlyphManager;
 
 class TileParameters {
 public:
@@ -21,7 +21,7 @@ public:
     const MapMode mode;
     AnnotationManager& annotationManager;
     SpriteAtlas& spriteAtlas;
-    GlyphAtlas& glyphAtlas;
+    GlyphManager& glyphManager;
 };
 
 } // namespace mbgl

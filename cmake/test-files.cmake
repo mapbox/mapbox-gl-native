@@ -106,7 +106,7 @@ set(MBGL_TEST_FILES
     test/style/style_parser.test.cpp
 
     # text
-    test/text/glyph_atlas.test.cpp
+    test/text/glyph_loader.test.cpp
     test/text/glyph_pbf.test.cpp
     test/text/quads.test.cpp
 

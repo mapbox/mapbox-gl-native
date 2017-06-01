@@ -32,7 +32,7 @@
 #include <mbgl/annotation/annotation_manager.hpp>
 #include <mbgl/annotation/annotation_source.hpp>
 #include <mbgl/sprite/sprite_atlas.hpp>
-#include <mbgl/text/glyph_atlas.hpp>
+#include <mbgl/text/glyph_manager.hpp>
 
 #include <cstdint>
 
@@ -49,7 +49,7 @@ public:
     ThreadPool threadPool { 1 };
     AnnotationManager annotationManager;
     SpriteAtlas spriteAtlas;
-    GlyphAtlas glyphAtlas { { 512, 512, }, fileSource };
+    GlyphManager glyphManager { fileSource };
 
     TileParameters tileParameters {
         1.0,
@@ -60,7 +60,7 @@ public:
         MapMode::Continuous,
         annotationManager,
         spriteAtlas,
-        glyphAtlas
+        glyphManager
     };
 
     SourceTest() {

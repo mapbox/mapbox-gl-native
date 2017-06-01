@@ -197,37 +197,37 @@ void GeometryTileWorker::coalesce() {
     self.invoke(&GeometryTileWorker::coalesced);
 }
 
-void GeometryTileWorker::onGlyphsAvailable(GlyphPositionMap newGlyphPositions) {
-    for (auto& newFontGlyphs : newGlyphPositions) {
+void GeometryTileWorker::onGlyphsAvailable(GlyphMap newGlyphMap) {
+    for (auto& newFontGlyphs : newGlyphMap) {
         const FontStack& fontStack = newFontGlyphs.first;
-        GlyphPositions& newPositions = newFontGlyphs.second;
+        Glyphs& newGlyphs = newFontGlyphs.second;
 
-        GlyphPositions& positions = glyphPositions[fontStack];
+        Glyphs& glyphs = glyphMap[fontStack];
         GlyphIDs& pendingGlyphIDs = pendingGlyphDependencies[fontStack];
 
-        for (auto& newPosition : newPositions) {
-            const GlyphID& glyphID = newPosition.first;
-            optional<Glyph>& glyph = newPosition.second;
+        for (auto& newGlyph : newGlyphs) {
+            const GlyphID& glyphID = newGlyph.first;
+            optional<Immutable<Glyph>>& glyph = newGlyph.second;
 
             if (pendingGlyphIDs.erase(glyphID)) {
-                positions.emplace(glyphID, std::move(glyph));
+                glyphs.emplace(glyphID, std::move(glyph));
             }
         }
     }
     symbolDependenciesChanged();
 }
 
-void GeometryTileWorker::onIconsAvailable(IconMap newIcons) {
-    icons = std::move(newIcons);
+void GeometryTileWorker::onIconsAvailable(IconMap newIconMap) {
+    iconMap = std::move(newIconMap);
     pendingIconDependencies.clear();
     symbolDependenciesChanged();
 }
 
 void GeometryTileWorker::requestNewGlyphs(const GlyphDependencies& glyphDependencies) {
     for (auto& fontDependencies : glyphDependencies) {
-        auto fontGlyphs = glyphPositions.find(fontDependencies.first);
+        auto fontGlyphs = glyphMap.find(fontDependencies.first);
         for (auto glyphID : fontDependencies.second) {
-            if (fontGlyphs == glyphPositions.end() || fontGlyphs->second.find(glyphID) == fontGlyphs->second.end()) {
+            if (fontGlyphs == glyphMap.end() || fontGlyphs->second.find(glyphID) == fontGlyphs->second.end()) {
                 pendingGlyphDependencies[fontDependencies.first].insert(glyphID);
             }
         }
@@ -393,7 +393,7 @@ void GeometryTileWorker::attemptPlacement() {
         }
 
         if (symbolLayout->state == SymbolLayout::Pending) {
-            symbolLayout->prepare(glyphPositions, icons);
+            symbolLayout->prepare(glyphMap, iconMap);
             symbolLayout->state = SymbolLayout::Placed;
         }
 
