@@ -15,7 +15,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /**
- * Factory for creating {@link CameraUpdate} objects.
+ * Factory for creating CameraUpdate objects.
  */
 public final class CameraUpdateFactory {
 

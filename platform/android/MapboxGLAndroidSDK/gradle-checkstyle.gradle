@@ -15,6 +15,7 @@ task checkstyle(type: Checkstyle) {
     exclude '**/style/layers/Property.java'
     exclude '**/style/layers/PropertyFactory.java'
     exclude '**/style/layers/*Layer.java'
+    exclude '**/style/light/Light.java'
     classpath = files()
     ignoreFailures = false
 }

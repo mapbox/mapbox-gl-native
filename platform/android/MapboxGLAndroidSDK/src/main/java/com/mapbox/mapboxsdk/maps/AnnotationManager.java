@@ -100,6 +100,10 @@ class AnnotationManager {
     if (annotation instanceof Marker) {
       Marker marker = (Marker) annotation;
       marker.hideInfoWindow();
+      if (selectedMarkers.contains(marker)) {
+        selectedMarkers.remove(marker);
+      }
+
       if (marker instanceof MarkerView) {
         markerViewManager.removeMarkerView((MarkerView) marker);
       }
@@ -112,6 +116,10 @@ class AnnotationManager {
       if (annotation instanceof Marker) {
         Marker marker = (Marker) annotation;
         marker.hideInfoWindow();
+        if (selectedMarkers.contains(marker)) {
+          selectedMarkers.remove(marker);
+        }
+
         if (marker instanceof MarkerView) {
           markerViewManager.removeMarkerView((MarkerView) marker);
         }
@@ -124,6 +132,7 @@ class AnnotationManager {
     Annotation annotation;
     int count = annotationsArray.size();
     long[] ids = new long[count];
+    selectedMarkers.clear();
     for (int i = 0; i < count; i++) {
       ids[i] = annotationsArray.keyAt(i);
       annotation = annotationsArray.get(ids[i]);
@@ -383,12 +392,15 @@ class AnnotationManager {
       for (Marker nearbyMarker : nearbyMarkers) {
         for (Marker selectedMarker : selectedMarkers) {
           if (nearbyMarker.equals(selectedMarker)) {
-            if (onMarkerClickListener != null) {
-              // end developer has provided a custom click listener
+            if (nearbyMarker instanceof MarkerView) {
+              handledDefaultClick = markerViewManager.onClickMarkerView((MarkerView) nearbyMarker);
+            } else if (onMarkerClickListener != null) {
               handledDefaultClick = onMarkerClickListener.onMarkerClick(nearbyMarker);
-              if (!handledDefaultClick) {
-                deselectMarker(nearbyMarker);
-              }
+            }
+
+            if (!handledDefaultClick) {
+              // only deselect marker if user didn't handle the click event themselves
+              deselectMarker(nearbyMarker);
             }
             return true;
           }

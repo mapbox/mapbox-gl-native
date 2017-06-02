@@ -274,22 +274,20 @@ public class OfflineActivity extends AppCompatActivity
         }
 
         // Debug
-        Timber.d(String.format("%s/%s resources; %s bytes downloaded.",
+        Timber.d("%s/%s resources; %s bytes downloaded.",
           String.valueOf(status.getCompletedResourceCount()),
           String.valueOf(status.getRequiredResourceCount()),
-          String.valueOf(status.getCompletedResourceSize())));
+          String.valueOf(status.getCompletedResourceSize()));
       }
 
       @Override
       public void onError(OfflineRegionError error) {
-        Timber.e("onError reason: " + error.getReason());
-        Timber.e("onError message: " + error.getMessage());
-        offlineRegion.setObserver(null);
+        Timber.e("onError: %s, %s", error.getReason(), error.getMessage());
       }
 
       @Override
       public void mapboxTileCountLimitExceeded(long limit) {
-        Timber.e("Mapbox tile count limit exceeded: " + limit);
+        Timber.e("Mapbox tile count limit exceeded: %s", limit);
       }
     });
 

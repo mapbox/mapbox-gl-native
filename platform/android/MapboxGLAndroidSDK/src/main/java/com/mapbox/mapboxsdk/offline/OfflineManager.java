@@ -47,7 +47,7 @@ public class OfflineManager {
 
   /**
    * This callback receives an asynchronous response containing a list of all
-   * {@link OfflineRegion} in the database, or an error message otherwise.
+   * OfflineRegion in the database or an error message otherwise.
    */
   public interface ListOfflineRegionsCallback {
     /**
@@ -67,7 +67,7 @@ public class OfflineManager {
 
   /**
    * This callback receives an asynchronous response containing the newly created
-   * {@link OfflineRegion} in the database, or an error message otherwise.
+   * OfflineRegion in the database or an error message otherwise.
    */
   public interface CreateOfflineRegionCallback {
     /**

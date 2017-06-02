@@ -4,7 +4,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface MGLVectorSource (MBXAdditions)
 
-+ (nullable NSString *)preferredMapboxStreetsLanguage;
++ (NSString *)preferredMapboxStreetsLanguage;
 
 - (NS_DICTIONARY_OF(NSString *, NSString *) *)localizedKeysByKeyForPreferredLanguage:(nullable NSString *)preferredLanguage;
 

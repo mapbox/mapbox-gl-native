@@ -193,12 +193,16 @@ public final class UiSettings {
   private void initialiseLogo(MapboxMapOptions options, Resources resources) {
     setLogoEnabled(options.getLogoEnabled());
     setLogoGravity(options.getLogoGravity());
-    int[] logoMargins = options.getLogoMargins();
+    setLogoMargins(resources, options.getLogoMargins());
+  }
+
+  private void setLogoMargins(Resources resources, int[] logoMargins) {
     if (logoMargins != null) {
       setLogoMargins(logoMargins[0], logoMargins[1], logoMargins[2], logoMargins[3]);
     } else {
-      int twoDp = (int) resources.getDimension(R.dimen.mapbox_two_dp);
-      setLogoMargins(twoDp, twoDp, twoDp, twoDp);
+      // user did not specify margins when programmatically creating a map
+      int fourDp = (int) resources.getDimension(R.dimen.mapbox_four_dp);
+      setLogoMargins(fourDp, fourDp, fourDp, fourDp);
     }
   }
 
@@ -223,15 +227,23 @@ public final class UiSettings {
   private void initialiseAttribution(Context context, MapboxMapOptions options) {
     setAttributionEnabled(options.getAttributionEnabled());
     setAttributionGravity(options.getAttributionGravity());
-    int[] attributionMargins = options.getAttributionMargins();
-    if (attributionMargins != null) {
-      setAttributionMargins(attributionMargins[0], attributionMargins[1],
-        attributionMargins[2], attributionMargins[3]);
-    }
-
+    setAttributionMargins(context, options.getAttributionMargins());
     int attributionTintColor = options.getAttributionTintColor();
     setAttributionTintColor(attributionTintColor != -1
       ? attributionTintColor : ColorUtils.getPrimaryColor(context));
+  }
+
+  private void setAttributionMargins(Context context, int[] attributionMargins) {
+    if (attributionMargins != null) {
+      setAttributionMargins(attributionMargins[0], attributionMargins[1],
+        attributionMargins[2], attributionMargins[3]);
+    } else {
+      // user did not specify margins when programmatically creating a map
+      Resources resources = context.getResources();
+      int margin = (int) resources.getDimension(R.dimen.mapbox_four_dp);
+      int leftMargin = (int) resources.getDimension(R.dimen.mapbox_ninety_two_dp);
+      setAttributionMargins(leftMargin, margin, margin, margin);
+    }
   }
 
   private void saveAttribution(Bundle outState) {

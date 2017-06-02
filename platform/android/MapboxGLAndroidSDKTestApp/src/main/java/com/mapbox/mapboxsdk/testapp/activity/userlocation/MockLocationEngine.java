@@ -63,7 +63,9 @@ public class MockLocationEngine extends LocationEngine {
 
   @Override
   public void removeLocationUpdates() {
-    handler.removeCallbacksAndMessages(null);
+    if (handler != null) {
+      handler.removeCallbacksAndMessages(null);
+    }
   }
 
   private Location getNextLocation() {

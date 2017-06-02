@@ -43,10 +43,35 @@ public class CameraPositionActivity extends AppCompatActivity implements OnMapRe
   public void onMapReady(@NonNull final MapboxMap mapboxMap) {
     this.mapboxMap = mapboxMap;
 
-    mapboxMap.setOnCameraChangeListener(new MapboxMap.OnCameraChangeListener() {
+    mapboxMap.setOnCameraIdleListener(new MapboxMap.OnCameraIdleListener() {
       @Override
-      public void onCameraChange(CameraPosition position) {
-        Timber.w("OnCameraChange: " + position);
+      public void onCameraIdle() {
+        Timber.e("OnCameraIdle");
+      }
+    });
+
+    mapboxMap.setOnCameraMoveCancelListener(new MapboxMap.OnCameraMoveCanceledListener() {
+      @Override
+      public void onCameraMoveCanceled() {
+        Timber.e("OnCameraMoveCanceled");
+      }
+    });
+
+    mapboxMap.setOnCameraMoveListener(new MapboxMap.OnCameraMoveListener() {
+      @Override
+      public void onCameraMove() {
+        Timber.e("OnCameraMove");
+      }
+    });
+
+    mapboxMap.setOnCameraMoveStartedistener(new MapboxMap.OnCameraMoveStartedListener() {
+
+      private final String[] REASONS = {"REASON_API_GESTURE", "REASON_DEVELOPER_ANIMATION", "REASON_API_ANIMATION"};
+
+      @Override
+      public void onCameraMoveStarted(int reason) {
+        // reason ranges from 1 <-> 3
+        Timber.e("OnCameraMoveStarted: %s", REASONS[reason - 1]);
       }
     });
 

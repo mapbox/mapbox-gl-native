@@ -220,6 +220,12 @@ static const CGFloat MGLFeetPerMeter = 3.28084;
     
     self.row = [self preferredRow];
     
+    CGSize size = self.intrinsicContentSize;
+    self.frame = CGRectMake(CGRectGetMinX(self.frame),
+                            CGRectGetMinY(self.frame),
+                            size.width,
+                            size.height);
+    
     [self invalidateIntrinsicContentSize];
     [self setNeedsLayout];
 }

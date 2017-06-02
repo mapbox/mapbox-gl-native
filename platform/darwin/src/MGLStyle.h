@@ -6,6 +6,7 @@
 #import "MGLTypes.h"
 
 @class MGLSource;
+@class MGLLight;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -547,6 +548,14 @@ MGL_EXPORT
  @param name The name of the image to remove.
  */
 - (void)removeImageForName:(NSString *)name;
+
+
+#pragma mark Managing the Style's Light
+
+/**
+ Provides global light source for the style.
+ */
+@property (nonatomic, strong) MGLLight *light;
 
 @end
 

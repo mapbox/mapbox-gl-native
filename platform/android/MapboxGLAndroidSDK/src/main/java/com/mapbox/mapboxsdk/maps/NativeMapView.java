@@ -27,6 +27,7 @@ import com.mapbox.mapboxsdk.storage.FileSource;
 import com.mapbox.mapboxsdk.style.layers.CannotAddLayerException;
 import com.mapbox.mapboxsdk.style.layers.Filter;
 import com.mapbox.mapboxsdk.style.layers.Layer;
+import com.mapbox.mapboxsdk.style.light.Light;
 import com.mapbox.mapboxsdk.style.sources.CannotAddSourceException;
 import com.mapbox.mapboxsdk.style.sources.Source;
 import com.mapbox.services.commons.geojson.Feature;
@@ -617,7 +618,7 @@ final class NativeMapView {
     if (isDestroyedOn("getMetersPerPixelAtLatitude")) {
       return 0;
     }
-    return nativeGetMetersPerPixelAtLatitude(lat, getZoom());
+    return nativeGetMetersPerPixelAtLatitude(lat, getZoom()) / pixelRatio;
   }
 
   public ProjectedMeters projectedMetersForLatLng(LatLng latLng) {
@@ -882,12 +883,15 @@ final class NativeMapView {
     fileSource.setApiBaseUrl(baseUrl);
   }
 
-  public float getPixelRatio() {
-    return pixelRatio;
+  public Light getLight() {
+    if (isDestroyedOn("getLight")) {
+      return null;
+    }
+    return nativeGetLight();
   }
 
-  public Context getContext() {
-    return mapView.getContext();
+  public float getPixelRatio() {
+    return pixelRatio;
   }
 
   //
@@ -1116,6 +1120,8 @@ final class NativeMapView {
                                                              float right, float bottom,
                                                              String[] layerIds,
                                                              Object[] filter);
+
+  private native Light nativeGetLight();
 
   int getWidth() {
     if (isDestroyedOn("")) {

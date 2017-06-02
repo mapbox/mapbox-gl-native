@@ -9,6 +9,7 @@ import org.mockito.MockitoAnnotations;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotSame;
+import static org.mockito.Mockito.when;
 
 public class IconTest {
 
@@ -18,6 +19,7 @@ public class IconTest {
   @Before
   public void beforeTest() {
     MockitoAnnotations.initMocks(this);
+    when(bitmap.getConfig()).thenReturn(Bitmap.Config.ARGB_8888);
   }
 
   @Test
