@@ -150,12 +150,21 @@ final class Transform implements MapView.OnMapChangedListener {
         cameraChangeDispatcher.onCameraMove();
       }
 
+      if (isComponentUpdateRequired(cameraPosition)) {
+        updateCameraPosition(cameraPosition);
+      }
+
       this.cameraPosition = cameraPosition;
       if (onCameraChangeListener != null) {
         onCameraChangeListener.onCameraChange(this.cameraPosition);
       }
     }
     return cameraPosition;
+  }
+
+  private boolean isComponentUpdateRequired(@NonNull CameraPosition cameraPosition) {
+    return this.cameraPosition != null && (this.cameraPosition.tilt != cameraPosition.tilt
+      || this.cameraPosition.bearing != cameraPosition.bearing);
   }
 
   void cancelTransitions() {
