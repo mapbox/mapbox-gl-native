@@ -5,6 +5,7 @@ var mbgl = require('../../index');
 var fs = require('fs');
 var path = require('path');
 var style = require('../fixtures/style.json');
+var PNG = require('pngjs').PNG;
 
 test('Map', function(t) {
     // This test is skipped because of the req.respond shim in index.js
@@ -564,7 +565,6 @@ test('Map', function(t) {
             map.render({width: 400, height: 400, zoom: 5, center: [18.05489, 59.32744]}, function(err, actual) {
                 t.error(err);
 
-                var PNG = require('pngjs').PNG;
                 var pixelmatch = require('pixelmatch');
                 var expected = PNG.sync.read(
                     fs.readFileSync(path.join(__dirname, '../fixtures/zoom-center/expected.png'))).data;
@@ -572,7 +572,52 @@ test('Map', function(t) {
                 t.equal(numPixels, 0);
                 t.end();
             });
-        })
+        });
+
+        t.test('addImage test', function(t) {
+            var map = new mbgl.Map(options);
+            var newStyle = JSON.parse(JSON.stringify(style));
+            style.layers.push({
+                source: 'catImage',
+                id: 'catImage',
+                type: 'symbol',
+                layout: {
+                    'icon-image': 'catImage',
+                    'icon-size': 1,
+                    'icon-allow-overlap': true
+                }
+            });
+            style.sources.catImage = {};
+            style.sources.catImage = {
+                type: 'geojson',
+                data: {
+                    type: 'Feature',
+                    properties: {},
+                    geometry: {
+                        type: "Point",
+                        coordinates: [
+                            0,
+                            0
+                        ]
+                    }
+                }
+            };
+            map.load(style);
+            map.addImage('catImage', PNG.sync.read(fs.readFileSync(path.join(__dirname, '../fixtures/cat.png'))).data, {
+                height: 128,
+                width: 128,
+                pixelRatio: 1
+            });
+            map.render({zoom: 0}, function(err, actual) {
+                t.error(err);
+                var pixelmatch = require('pixelmatch');
+                var expected = PNG.sync.read(
+                    fs.readFileSync(path.join(__dirname, '../fixtures/image-test.png'))).data;
+                var numPixels = pixelmatch(actual, expected, undefined, 512, 512, { threshold: 0.13 });
+                t.equal(numPixels, 0);
+                t.end();
+            });
+        });
     });
 
     t.test('request callback', function (t) {
