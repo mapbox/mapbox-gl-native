@@ -409,7 +409,10 @@ class SymbolIconProgram : public SymbolProgram<
         uniforms::u_camera_to_center_distance,
         uniforms::u_pitch,
         uniforms::u_max_camera_distance>,
-    style::IconPaintProperties>
+    style::Properties<
+        style::IconOpacity,
+        style::IconTranslate,
+        style::IconTranslateAnchor>>
 {
 public:
     using SymbolProgram::SymbolProgram;
@@ -427,75 +430,85 @@ enum class SymbolSDFPart {
     Halo = 0
 };
 
-template <class PaintProperties>
-class SymbolSDFProgram : public SymbolProgram<
+using SymbolSDFUniforms = gl::Uniforms<
+    uniforms::u_matrix,
+    uniforms::u_extrude_scale,
+    uniforms::u_texsize,
+    uniforms::u_zoom,
+    uniforms::u_rotate_with_map,
+    uniforms::u_texture,
+    uniforms::u_fadetexture,
+    uniforms::u_is_text,
+    uniforms::u_collision_y_stretch,
+    uniforms::u_camera_to_center_distance,
+    uniforms::u_pitch,
+    uniforms::u_max_camera_distance,
+    uniforms::u_gamma_scale,
+    uniforms::u_pitch,
+    uniforms::u_bearing,
+    uniforms::u_aspect_ratio,
+    uniforms::u_pitch_with_map,
+    uniforms::u_is_halo>;
+
+SymbolSDFUniforms::Values
+symbolSDFUniformValues(const bool isText,
+                       const style::SymbolPropertyValues&,
+                       const Size& texsize,
+                       const std::array<float, 2>& pixelsToGLUnits,
+                       const RenderTile&,
+                       const TransformState&,
+                       const SymbolSDFPart);
+
+using SymbolSDFIconFillProgram = SymbolProgram<
     shaders::symbol_sdf,
     gl::Triangle,
     SymbolLayoutAttributes,
-    gl::Uniforms<
-        uniforms::u_matrix,
-        uniforms::u_extrude_scale,
-        uniforms::u_texsize,
-        uniforms::u_zoom,
-        uniforms::u_rotate_with_map,
-        uniforms::u_texture,
-        uniforms::u_fadetexture,
-        uniforms::u_is_text,
-        uniforms::u_collision_y_stretch,
-        uniforms::u_camera_to_center_distance,
-        uniforms::u_pitch,
-        uniforms::u_max_camera_distance,
-        uniforms::u_gamma_scale,
-        uniforms::u_bearing,
-        uniforms::u_aspect_ratio,
-        uniforms::u_pitch_with_map,
-        uniforms::u_is_halo>,
-    PaintProperties>
-{
-public:
-    using BaseProgram = SymbolProgram<shaders::symbol_sdf,
-        gl::Triangle,
-        SymbolLayoutAttributes,
-        gl::Uniforms<
-            uniforms::u_matrix,
-            uniforms::u_extrude_scale,
-            uniforms::u_texsize,
-            uniforms::u_zoom,
-            uniforms::u_rotate_with_map,
-            uniforms::u_texture,
-            uniforms::u_fadetexture,
-            uniforms::u_is_text,
-            uniforms::u_collision_y_stretch,
-            uniforms::u_camera_to_center_distance,
-            uniforms::u_pitch,
-            uniforms::u_max_camera_distance,
-            uniforms::u_gamma_scale,
-            uniforms::u_bearing,
-            uniforms::u_aspect_ratio,
-            uniforms::u_pitch_with_map,
-            uniforms::u_is_halo>,
-        PaintProperties>;
-    
-    using UniformValues = typename BaseProgram::UniformValues;
-    
+    SymbolSDFUniforms,
+    style::Properties<
+        style::IconOpacity,
+        style::IconTranslate,
+        style::IconTranslateAnchor,
+        style::IconColor>>;
 
-    
-    using BaseProgram::BaseProgram;
+using SymbolSDFIconHaloProgram = SymbolProgram<
+    shaders::symbol_sdf,
+    gl::Triangle,
+    SymbolLayoutAttributes,
+    SymbolSDFUniforms,
+    style::Properties<
+        style::IconOpacity,
+        style::IconTranslate,
+        style::IconTranslateAnchor,
+        style::IconHaloColor,
+        style::IconHaloWidth,
+        style::IconHaloBlur>>;
 
-    static UniformValues uniformValues(const bool isText,
-                                       const style::SymbolPropertyValues&,
-                                       const Size& texsize,
-                                       const std::array<float, 2>& pixelsToGLUnits,
-                                       const RenderTile&,
-                                       const TransformState&,
-                                       const SymbolSDFPart);
-};
+using SymbolSDFTextFillProgram = SymbolProgram<
+    shaders::symbol_sdf,
+    gl::Triangle,
+    SymbolLayoutAttributes,
+    SymbolSDFUniforms,
+    style::Properties<
+        style::TextOpacity,
+        style::TextTranslate,
+        style::TextTranslateAnchor,
+        style::TextColor>>;
 
-using SymbolSDFIconProgram = SymbolSDFProgram<style::IconPaintProperties>;
-using SymbolSDFTextProgram = SymbolSDFProgram<style::TextPaintProperties>;
+using SymbolSDFTextHaloProgram = SymbolProgram<
+    shaders::symbol_sdf,
+    gl::Triangle,
+    SymbolLayoutAttributes,
+    SymbolSDFUniforms,
+    style::Properties<
+        style::TextOpacity,
+        style::TextTranslate,
+        style::TextTranslateAnchor,
+        style::TextHaloColor,
+        style::TextHaloWidth,
+        style::TextHaloBlur>>;
 
 using SymbolLayoutVertex = SymbolLayoutAttributes::Vertex;
 using SymbolIconAttributes = SymbolIconProgram::Attributes;
-using SymbolTextAttributes = SymbolSDFTextProgram::Attributes;
+//using SymbolTextAttributes = SymbolSDFTextProgram::Attributes;
 
 } // namespace mbgl

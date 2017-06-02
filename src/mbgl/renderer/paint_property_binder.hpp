@@ -296,26 +296,36 @@ public:
 
     template <class P>
     using Attribute = ZoomInterpolatedAttribute<typename P::Attribute>;
-
     using Attributes = gl::Attributes<Attribute<Ps>...>;
     using AttributeBindings = typename Attributes::Bindings;
+
+    template <class P, class EvaluatedProperties>
+    auto attributeBinding(const EvaluatedProperties& currentProperties) const {
+        return binders.template get<P>()->attributeBinding(currentProperties.template get<P>());
+    }
 
     template <class EvaluatedProperties>
     AttributeBindings attributeBindings(const EvaluatedProperties& currentProperties) const {
         return AttributeBindings {
-            binders.template get<Ps>()->attributeBinding(currentProperties.template get<Ps>())...
+            attributeBinding<Ps>(currentProperties)...
         };
     }
 
-    using Uniforms = gl::Uniforms<InterpolationUniform<typename Ps::Attribute>...>;
+    template <class P>
+    using Uniform = InterpolationUniform<typename P::Attribute>;
+    using Uniforms = gl::Uniforms<Uniform<Ps>...>;
     using UniformValues = typename Uniforms::Values;
 
+    template <class P>
+    auto uniformValue(float currentZoom) const {
+        return typename Uniform<P>::Value {
+            binders.template get<P>()->interpolationFactor(currentZoom)
+        };
+    }
+
     UniformValues uniformValues(float currentZoom) const {
-        (void)currentZoom; // Workaround for https://gcc.gnu.org/bugzilla/show_bug.cgi?id=56958
         return UniformValues {
-            typename InterpolationUniform<typename Ps::Attribute>::Value {
-                binders.template get<Ps>()->interpolationFactor(currentZoom)
-            }...
+            uniformValue<Ps>(currentZoom)...
         };
     }
 

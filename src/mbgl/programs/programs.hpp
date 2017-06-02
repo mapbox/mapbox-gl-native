@@ -29,8 +29,10 @@ public:
           linePattern(context, programParameters),
           raster(context, programParameters),
           symbolIcon(context, programParameters),
-          symbolIconSDF(context, programParameters),
-          symbolGlyph(context, programParameters),
+          symbolSDFIconFill(context, programParameters),
+          symbolSDFIconHalo(context, programParameters),
+          symbolSDFTextFill(context, programParameters),
+          symbolSDFTextHalo(context, programParameters),
           debug(context, ProgramParameters(programParameters.pixelRatio, false, programParameters.cacheDir)),
           collisionBox(context, ProgramParameters(programParameters.pixelRatio, false, programParameters.cacheDir)) {
     }
@@ -48,8 +50,10 @@ public:
     LinePatternProgram linePattern;
     RasterProgram raster;
     SymbolIconProgram symbolIcon;
-    SymbolSDFIconProgram symbolIconSDF;
-    SymbolSDFTextProgram symbolGlyph;
+    SymbolSDFIconFillProgram symbolSDFIconFill;
+    SymbolSDFIconHaloProgram symbolSDFIconHalo;
+    SymbolSDFTextFillProgram symbolSDFTextFill;
+    SymbolSDFTextHaloProgram symbolSDFTextHalo;
 
     DebugProgram debug;
     CollisionBoxProgram collisionBox;

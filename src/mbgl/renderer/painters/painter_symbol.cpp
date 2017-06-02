@@ -75,8 +75,8 @@ void Painter::renderSymbol(PaintParameters& parameters,
 
         if (bucket.sdfIcons) {
             if (values.hasHalo) {
-                draw(parameters.programs.symbolIconSDF,
-                     SymbolSDFIconProgram::uniformValues(false, values, texsize, pixelsToGLUnits, tile, state, SymbolSDFPart::Halo),
+                draw(parameters.programs.symbolSDFIconHalo,
+                     symbolSDFUniformValues(false, values, texsize, pixelsToGLUnits, tile, state, SymbolSDFPart::Halo),
                      bucket.icon,
                      bucket.iconSizeBinder,
                      values,
@@ -85,8 +85,8 @@ void Painter::renderSymbol(PaintParameters& parameters,
             }
 
             if (values.hasFill) {
-                draw(parameters.programs.symbolIconSDF,
-                     SymbolSDFIconProgram::uniformValues(false, values, texsize, pixelsToGLUnits, tile, state, SymbolSDFPart::Fill),
+                draw(parameters.programs.symbolSDFIconFill,
+                     symbolSDFUniformValues(false, values, texsize, pixelsToGLUnits, tile, state, SymbolSDFPart::Fill),
                      bucket.icon,
                      bucket.iconSizeBinder,
                      values,
@@ -113,8 +113,8 @@ void Painter::renderSymbol(PaintParameters& parameters,
         const Size texsize = glyphAtlas->getSize();
 
         if (values.hasHalo) {
-            draw(parameters.programs.symbolGlyph,
-                 SymbolSDFTextProgram::uniformValues(true, values, texsize, pixelsToGLUnits, tile, state, SymbolSDFPart::Halo),
+            draw(parameters.programs.symbolSDFTextHalo,
+                 symbolSDFUniformValues(true, values, texsize, pixelsToGLUnits, tile, state, SymbolSDFPart::Halo),
                  bucket.text,
                  bucket.textSizeBinder,
                  values,
@@ -123,8 +123,8 @@ void Painter::renderSymbol(PaintParameters& parameters,
         }
 
         if (values.hasFill) {
-            draw(parameters.programs.symbolGlyph,
-                 SymbolSDFTextProgram::uniformValues(true, values, texsize, pixelsToGLUnits, tile, state, SymbolSDFPart::Fill),
+            draw(parameters.programs.symbolSDFTextFill,
+                 symbolSDFUniformValues(true, values, texsize, pixelsToGLUnits, tile, state, SymbolSDFPart::Fill),
                  bucket.text,
                  bucket.textSizeBinder,
                  values,

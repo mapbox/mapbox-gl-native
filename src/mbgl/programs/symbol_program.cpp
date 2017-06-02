@@ -84,8 +84,8 @@ SymbolIconProgram::uniformValues(const bool isText,
     );
 }
 
-template <class PaintProperties>
-typename SymbolSDFProgram<PaintProperties>::UniformValues SymbolSDFProgram<PaintProperties>::uniformValues(
+SymbolSDFUniforms::Values
+symbolSDFUniformValues(
       const bool isText,
       const style::SymbolPropertyValues& values,
       const Size& texsize,
@@ -98,7 +98,7 @@ typename SymbolSDFProgram<PaintProperties>::UniformValues SymbolSDFProgram<Paint
                               ? std::cos(state.getPitch())
                               : 1.0) * state.getCameraToCenterDistance();
     
-    return makeValues<SymbolSDFProgram<PaintProperties>::UniformValues>(
+    return makeValues<SymbolSDFUniforms::Values>(
         isText,
         values,
         texsize,
@@ -112,8 +112,5 @@ typename SymbolSDFProgram<PaintProperties>::UniformValues SymbolSDFProgram<Paint
         uniforms::u_is_halo::Value{ part == SymbolSDFPart::Halo }
     );
 }
-
-template class SymbolSDFProgram<style::IconPaintProperties>;
-template class SymbolSDFProgram<style::TextPaintProperties>;
 
 } // namespace mbgl

@@ -18,7 +18,9 @@ namespace mbgl {
 class SymbolBucket : public Bucket {
 public:
     SymbolBucket(style::SymbolLayoutProperties::PossiblyEvaluated,
-                 const std::map<std::string, std::pair<style::IconPaintProperties::PossiblyEvaluated, style::TextPaintProperties::PossiblyEvaluated>>&,
+                 const std::map<std::string, std::pair<
+                    style::IconPaintProperties::PossiblyEvaluated,
+                    style::TextPaintProperties::PossiblyEvaluated>>&,
                  const style::DataDrivenPropertyValue<float>& textSize,
                  const style::DataDrivenPropertyValue<float>& iconSize,
                  float zoom,
@@ -37,8 +39,8 @@ public:
     const bool iconsNeedLinear;
 
     std::map<std::string, std::pair<
-        SymbolIconProgram::PaintPropertyBinders,
-        SymbolSDFTextProgram::PaintPropertyBinders>> paintPropertyBinders;
+        style::IconPaintProperties::Binders,
+        style::TextPaintProperties::Binders>> paintPropertyBinders;
     
     std::unique_ptr<SymbolSizeBinder> textSizeBinder;
 

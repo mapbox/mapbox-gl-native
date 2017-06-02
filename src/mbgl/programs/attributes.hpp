@@ -53,16 +53,6 @@ struct a_color {
     using Type = gl::Attribute<float, 2>;
 };
 
-struct a_fill_color {
-    static auto name() { return "a_fill_color"; }
-    using Type = gl::Attribute<float, 2>;
-};
-
-struct a_halo_color {
-    static auto name() { return "a_halo_color"; }
-    using Type = gl::Attribute<float, 2>;
-};
-
 struct a_stroke_color {
     static auto name() { return "a_stroke_color"; }
     using Type = gl::Attribute<float, 2>;
