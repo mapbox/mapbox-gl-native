@@ -105,29 +105,36 @@ void VectorTile::setData(std::shared_ptr<const std::string> data_,
 }
 
 Value parseValue(protozero::pbf_reader data) {
-    while (data.next())
-    {
+    Value value;
+    while (data.next()) {
         switch (data.tag()) {
         case 1: // string_value
-            return data.get_string();
+            value = data.get_string();
+            break;
         case 2: // float_value
-            return static_cast<double>(data.get_float());
+            value = static_cast<double>(data.get_float());
+            break;
         case 3: // double_value
-            return data.get_double();
+            value = data.get_double();
+            break;
         case 4: // int_value
-            return data.get_int64();
+            value = data.get_int64();
+            break;
         case 5: // uint_value
-            return data.get_uint64();
+            value = data.get_uint64();
+            break;
         case 6: // sint_value
-            return data.get_sint64();
+            value = data.get_sint64();
+            break;
         case 7: // bool_value
-            return data.get_bool();
+            value = data.get_bool();
+            break;
         default:
             data.skip();
             break;
         }
     }
-    return NullValue{};
+    return value;
 }
 
 VectorTileFeature::VectorTileFeature(protozero::pbf_reader feature_pbf, std::shared_ptr<VectorTileLayerData> layerData_)
