@@ -11,8 +11,9 @@ jni::Object<CameraPosition> CameraPosition::New(jni::JNIEnv &env, mbgl::CameraOp
     auto center = options.center.value();
     center.wrap();
 
-    // convert bearing, core ranges from [−π rad, π rad], android from 0 to 360 degrees
-    double bearing_degrees = options.angle.value_or(0) * 180.0 / M_PI;
+    // convert bearing, measured in radians counterclockwise from true north.
+    // Wrapped to [−π rad, π rad). Android binding from 0 to 360 degrees
+    double bearing_degrees = -options.angle.value_or(0) * util::RAD2DEG;
     while (bearing_degrees > 360) {
         bearing_degrees -= 360;
     }
@@ -21,7 +22,7 @@ jni::Object<CameraPosition> CameraPosition::New(jni::JNIEnv &env, mbgl::CameraOp
     }
 
     // convert tilt, core ranges from  [0 rad, 1,0472 rad], android ranges from 0 to 60
-    double tilt_degrees = options.pitch.value_or(0) * 180 / M_PI;
+    double tilt_degrees = options.pitch.value_or(0) * util::RAD2DEG;
 
     return CameraPosition::javaClass.New(env, constructor, LatLng::New(env, center), options.zoom.value_or(0), tilt_degrees, bearing_degrees);
 }

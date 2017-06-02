@@ -131,6 +131,9 @@ public class MapView extends FrameLayout {
     // callback for zooming in the camera
     CameraZoomInvalidator zoomInvalidator = new CameraZoomInvalidator();
 
+    // callback for camera change events
+    CameraChangeDispatcher cameraChangeDispatcher = new CameraChangeDispatcher();
+
     // setup components for MapboxMap creation
     Projection proj = new Projection(nativeMapView);
     UiSettings uiSettings = new UiSettings(proj, focalPoint, compassView, attrView, view.findViewById(R.id.logoView));
@@ -145,13 +148,14 @@ public class MapView extends FrameLayout {
     Polylines polylines = new PolylineContainer(nativeMapView, annotationsArray);
     AnnotationManager annotationManager = new AnnotationManager(nativeMapView, this, annotationsArray,
       markerViewManager, iconManager, annotations, markers, polygons, polylines);
-    Transform transform = new Transform(nativeMapView, annotationManager.getMarkerViewManager(), trackingSettings);
+    Transform transform = new Transform(nativeMapView, annotationManager.getMarkerViewManager(), trackingSettings,
+      cameraChangeDispatcher);
     mapboxMap = new MapboxMap(nativeMapView, transform, uiSettings, trackingSettings, myLocationViewSettings, proj,
-      registerTouchListener, annotationManager);
+      registerTouchListener, annotationManager, cameraChangeDispatcher);
 
     // user input
     mapGestureDetector = new MapGestureDetector(context, transform, proj, uiSettings, trackingSettings,
-      annotationManager);
+      annotationManager, cameraChangeDispatcher);
     mapKeyListener = new MapKeyListener(transform, trackingSettings, uiSettings);
 
     MapZoomControllerListener zoomListener = new MapZoomControllerListener(mapGestureDetector, uiSettings, transform);

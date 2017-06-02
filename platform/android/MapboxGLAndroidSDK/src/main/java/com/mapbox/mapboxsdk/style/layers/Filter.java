@@ -11,7 +11,7 @@ import java.util.Collections;
 public class Filter {
 
   /**
-   * Base {@link Filter} statement. Subclassed to provide concrete statements.
+   * Base Filter statement. Subclassed to provide concrete statements.
    */
   public abstract static class Statement {
     protected final String operator;

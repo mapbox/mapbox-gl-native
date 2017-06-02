@@ -58,4 +58,27 @@
     return transition;
 }
 
++ (NSValue *)valueWithMGLSphericalPosition:(MGLSphericalPosition)lightPosition
+{
+    return [NSValue value:&lightPosition withObjCType:@encode(MGLSphericalPosition)];
+}
+
+- (MGLSphericalPosition)MGLSphericalPositionValue
+{
+    MGLSphericalPosition lightPosition;
+    [self getValue:&lightPosition];
+    return lightPosition;
+}
+
++ (NSValue *)valueWithMGLLightAnchor:(MGLLightAnchor)lightAnchor {
+    return [NSValue value:&lightAnchor withObjCType:@encode(MGLLightAnchor)];
+}
+
+- (MGLLightAnchor)MGLLightAnchorValue
+{
+    MGLLightAnchor achorType;
+    [self getValue:&achorType];
+    return achorType;
+}
+
 @end

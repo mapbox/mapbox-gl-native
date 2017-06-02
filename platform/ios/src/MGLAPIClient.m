@@ -117,7 +117,7 @@ static NSString * const MGLAPIClientHTTPMethodPost = @"POST";
 
 - (void)loadCertificate:(NSData **)certificate withResource:(NSString *)resource {
     NSBundle *frameworkBundle = [NSBundle mgl_frameworkBundle];
-    NSString *cerPath = [frameworkBundle pathForResource:resource ofType:@"der" inDirectory:frameworkBundle.mgl_resourcesDirectory];
+    NSString *cerPath = [frameworkBundle pathForResource:resource ofType:@"der"];
     if (cerPath != nil) {
         *certificate = [NSData dataWithContentsOfFile:cerPath];
     }

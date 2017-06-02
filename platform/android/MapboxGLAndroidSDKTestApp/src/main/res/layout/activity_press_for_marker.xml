@@ -16,6 +16,6 @@
         app:mapbox_styleUrl="@string/mapbox_style_mapbox_streets"
         app:mapbox_uiAttributionGravity="top|end"
         app:mapbox_uiLogoGravity="top|end"
-        app:mapbox_uiLogoMarginRight="10dp"/>
+        app:mapbox_uiLogoMarginRight="28dp"/>
 
 </RelativeLayout>

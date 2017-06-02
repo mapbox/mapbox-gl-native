@@ -46,6 +46,7 @@
 #include "java/util.hpp"
 #include "geometry/lat_lng_bounds.hpp"
 #include "map/camera_position.hpp"
+#include "style/light.hpp"
 
 namespace mbgl {
 namespace android {
@@ -385,12 +386,12 @@ void NativeMapView::moveBy(jni::JNIEnv&, jni::jdouble dx, jni::jdouble dy, jni::
 void NativeMapView::jumpTo(jni::JNIEnv&, jni::jdouble angle, jni::jdouble latitude, jni::jdouble longitude, jni::jdouble pitch, jni::jdouble zoom) {
     mbgl::CameraOptions options;
     if (angle != -1) {
-        options.angle = (-angle * M_PI) / 180;
+        options.angle = -angle * util::DEG2RAD;
     }
     options.center = mbgl::LatLng(latitude, longitude);
     options.padding = insets;
     if (pitch != -1) {
-        options.pitch = pitch * M_PI / 180;
+        options.pitch = pitch * util::DEG2RAD;
     }
     if (zoom != -1) {
         options.zoom = zoom;
@@ -402,12 +403,12 @@ void NativeMapView::jumpTo(jni::JNIEnv&, jni::jdouble angle, jni::jdouble latitu
 void NativeMapView::easeTo(jni::JNIEnv&, jni::jdouble angle, jni::jdouble latitude, jni::jdouble longitude, jni::jlong duration, jni::jdouble pitch, jni::jdouble zoom, jni::jboolean easing) {
     mbgl::CameraOptions cameraOptions;
     if (angle != -1) {
-        cameraOptions.angle = (-angle * M_PI) / 180;
+        cameraOptions.angle = -angle * util::DEG2RAD;
     }
     cameraOptions.center = mbgl::LatLng(latitude, longitude);
     cameraOptions.padding = insets;
     if (pitch != -1) {
-        cameraOptions.pitch = pitch * M_PI / 180;
+        cameraOptions.pitch = pitch * util::DEG2RAD;
     }
     if (zoom != -1) {
         cameraOptions.zoom = zoom;
@@ -426,12 +427,12 @@ void NativeMapView::easeTo(jni::JNIEnv&, jni::jdouble angle, jni::jdouble latitu
 void NativeMapView::flyTo(jni::JNIEnv&, jni::jdouble angle, jni::jdouble latitude, jni::jdouble longitude, jni::jlong duration, jni::jdouble pitch, jni::jdouble zoom) {
     mbgl::CameraOptions cameraOptions;
     if (angle != -1) {
-        cameraOptions.angle = (-angle * M_PI) / 180 ;
+        cameraOptions.angle = -angle * util::DEG2RAD;
     }
     cameraOptions.center = mbgl::LatLng(latitude, longitude);
     cameraOptions.padding = insets;
     if (pitch != -1) {
-        cameraOptions.pitch = pitch * M_PI / 180;
+        cameraOptions.pitch = pitch * util::DEG2RAD;
     }
     if (zoom != -1) {
         cameraOptions.zoom = zoom;
@@ -817,6 +818,15 @@ jni::Array<jni::Object<geojson::Feature>> NativeMapView::queryRenderedFeaturesFo
     };
 
     return *convert<jni::Array<jni::Object<Feature>>, std::vector<mbgl::Feature>>(env, map->queryRenderedFeatures(box, { layers, toFilter(env, jfilter) }));
+}
+
+jni::Object<Light> NativeMapView::getLight(JNIEnv& env) {
+    mbgl::style::Light* light = map->getLight();
+    if (light) {
+        return jni::Object<Light>(Light::createJavaLightPeer(env, *map, *light));
+    } else {
+        return jni::Object<Light>();
+    }
 }
 
 jni::Array<jni::Object<Layer>> NativeMapView::getLayers(JNIEnv& env) {
@@ -1535,6 +1545,7 @@ void NativeMapView::registerNative(jni::JNIEnv& env) {
             METHOD(&NativeMapView::queryPointAnnotations, "nativeQueryPointAnnotations"),
             METHOD(&NativeMapView::queryRenderedFeaturesForPoint, "nativeQueryRenderedFeaturesForPoint"),
             METHOD(&NativeMapView::queryRenderedFeaturesForBox, "nativeQueryRenderedFeaturesForBox"),
+            METHOD(&NativeMapView::getLight, "nativeGetLight"),
             METHOD(&NativeMapView::getLayers, "nativeGetLayers"),
             METHOD(&NativeMapView::getLayer, "nativeGetLayer"),
             METHOD(&NativeMapView::addLayer, "nativeAddLayer"),

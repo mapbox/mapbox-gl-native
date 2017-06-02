@@ -13,6 +13,6 @@
     <dimen name="mapbox_eight_dp">8dp</dimen>
     <dimen name="mapbox_ten_dp">10dp</dimen>
     <dimen name="mapbox_sixteen_dp">16dp</dimen>
-    <dimen name="mapbox_ninety_five_dp">95dp</dimen>
+    <dimen name="mapbox_ninety_two_dp">92dp</dimen>
     <dimen name="mapbox_my_locationview_outer_circle">18dp</dimen>
 </resources>

@@ -75,9 +75,9 @@ typedef NS_ENUM(NSUInteger, MGLInterpolationMode) {
      */
     MGLInterpolationModeCategorical,
     /**
-     Values between two stops are not interpolated. Instead, values are set to their
-     input value. Use identity interpolation mode to show attribute values that can be
-     used as style values.
+     Values between two stops are not interpolated. Instead, for any given feature, the
+     style value matches a value in that feature’s attributes dictionary. Use identity
+     interpolation mode to show attribute values that can be used as style values.
      */
     MGLInterpolationModeIdentity
 };

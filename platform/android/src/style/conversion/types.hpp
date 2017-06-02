@@ -92,6 +92,13 @@ struct Converter<jni::jobject*, mbgl::style::CirclePitchScaleType> {
     }
 };
 
+template <>
+struct Converter<jni::jobject*, mbgl::style::LightAnchorType> {
+    Result<jni::jobject*> operator()(jni::JNIEnv& env, const mbgl::style::LightAnchorType& value) const {
+        return convert<jni::jobject*, std::string>(env, toString(value));
+    }
+};
+
 
 } // namespace conversion
 } // namespace android

@@ -4,6 +4,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.mapbox.mapboxsdk.LibraryLoader;
 import com.mapbox.mapboxsdk.storage.FileSource;
@@ -36,6 +37,9 @@ public class OfflineRegion {
 
   //Region id
   private long id;
+
+  // delete status
+  private boolean isDeleted;
 
   private OfflineRegionDefinition definition;
 
@@ -95,7 +99,7 @@ public class OfflineRegion {
   }
 
   /**
-   * This callback receives an asynchronous response containing the {@link OfflineRegionStatus}
+   * This callback receives an asynchronous response containing the OfflineRegionStatus
    * of the offline region, or a {@link String} error message otherwise.
    */
   public interface OfflineRegionStatusCallback {
@@ -248,7 +252,7 @@ public class OfflineRegion {
    *
    * @param observer the observer to be notified
    */
-  public void setObserver(@NonNull final OfflineRegionObserver observer) {
+  public void setObserver(@Nullable final OfflineRegionObserver observer) {
     setOfflineRegionObserver(new OfflineRegionObserver() {
       @Override
       public void onStatusChanged(final OfflineRegionStatus status) {
@@ -256,7 +260,9 @@ public class OfflineRegion {
           getHandler().post(new Runnable() {
             @Override
             public void run() {
-              observer.onStatusChanged(status);
+              if (observer != null) {
+                observer.onStatusChanged(status);
+              }
             }
           });
         }
@@ -268,7 +274,9 @@ public class OfflineRegion {
           getHandler().post(new Runnable() {
             @Override
             public void run() {
-              observer.onError(error);
+              if (observer != null) {
+                observer.onError(error);
+              }
             }
           });
         }
@@ -280,7 +288,9 @@ public class OfflineRegion {
           getHandler().post(new Runnable() {
             @Override
             public void run() {
-              observer.mapboxTileCountLimitExceeded(limit);
+              if (observer != null) {
+                observer.mapboxTileCountLimitExceeded(limit);
+              }
             }
           });
         }
@@ -347,28 +357,31 @@ public class OfflineRegion {
    * @param callback the callback to be invoked
    */
   public void delete(@NonNull final OfflineRegionDeleteCallback callback) {
-    deleteOfflineRegion(new OfflineRegionDeleteCallback() {
-      @Override
-      public void onDelete() {
-        getHandler().post(new Runnable() {
-          @Override
-          public void run() {
-            callback.onDelete();
-            OfflineRegion.this.finalize();
-          }
-        });
-      }
+    if (!isDeleted) {
+      deleteOfflineRegion(new OfflineRegionDeleteCallback() {
+        @Override
+        public void onDelete() {
+          isDeleted = true;
+          getHandler().post(new Runnable() {
+            @Override
+            public void run() {
+              callback.onDelete();
+              OfflineRegion.this.finalize();
+            }
+          });
+        }
 
-      @Override
-      public void onError(final String error) {
-        getHandler().post(new Runnable() {
-          @Override
-          public void run() {
-            callback.onError(error);
-          }
-        });
-      }
-    });
+        @Override
+        public void onError(final String error) {
+          getHandler().post(new Runnable() {
+            @Override
+            public void run() {
+              callback.onError(error);
+            }
+          });
+        }
+      });
+    }
   }
 
   /**

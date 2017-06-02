@@ -7,21 +7,21 @@ ext {
     versionCode = 11
     versionName = "5.0.0"
 
+    mapboxServicesVersion = "2.1.1"
     supportLibVersion = "25.3.1"
-    leakCanaryVersion = '1.5'
     wearableVersion = '2.0.0'
-
     espressoVersion = '2.2.2'
     testRunnerVersion = '0.5'
+    leakCanaryVersion = '1.5'
 
     dep = [
             // mapbox
-            mapboxJavaServices     : 'com.mapbox.mapboxsdk:mapbox-java-services:2.1.0@jar',
-            mapboxJavaGeoJSON      : 'com.mapbox.mapboxsdk:mapbox-java-geojson:2.1.0@jar',
-            mapboxAndroidTelemetry : 'com.mapbox.mapboxsdk:mapbox-android-telemetry:2.1.0@aar',
+            mapboxJavaServices     : "com.mapbox.mapboxsdk:mapbox-java-services:${mapboxServicesVersion}@jar",
+            mapboxJavaGeoJSON      : "com.mapbox.mapboxsdk:mapbox-java-geojson:${mapboxServicesVersion}@jar",
+            mapboxAndroidTelemetry : "com.mapbox.mapboxsdk:mapbox-android-telemetry:${mapboxServicesVersion}@aar",
 
             // mapzen lost
-            lost                   : 'com.mapzen.android:lost:2.2.0',
+            lost                   : 'com.mapzen.android:lost:3.0.0',
 
             // unit test
             junit                  : 'junit:junit:4.12',
@@ -47,7 +47,7 @@ ext {
 
             // square crew
             timber                 : 'com.jakewharton.timber:timber:4.5.1',
-            okhttp3                : 'com.squareup.okhttp3:okhttp:3.6.0',
+            okhttp3                : 'com.squareup.okhttp3:okhttp:3.7.0',
             leakCanaryDebug        : "com.squareup.leakcanary:leakcanary-android:${leakCanaryVersion}",
             leakCanaryRelease      : "com.squareup.leakcanary:leakcanary-android-no-op:${leakCanaryVersion}",
             leakCanaryTest         : "com.squareup.leakcanary:leakcanary-android-no-op:${leakCanaryVersion}"

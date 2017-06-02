@@ -1,15 +1,14 @@
 package com.mapbox.mapboxsdk.maps;
 
 import android.graphics.Bitmap;
-import android.util.DisplayMetrics;
 
+import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.annotations.Icon;
 import com.mapbox.mapboxsdk.annotations.IconFactory;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerView;
 import com.mapbox.mapboxsdk.exceptions.IconBitmapChangedException;
 
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,111 +40,26 @@ class IconManager {
 
   Icon loadIconForMarker(Marker marker) {
     Icon icon = marker.getIcon();
-
-    // calculating average before adding
-    int iconSize = icons.size() + 1;
-
-    // TODO replace former if case with anchor implementation,
-    // current workaround for having extra pixels is diving height by 2
     if (icon == null) {
-      icon = IconFactory.getInstance(nativeMapView.getContext()).defaultMarker();
-      Bitmap bitmap = icon.getBitmap();
-      averageIconHeight = averageIconHeight + (bitmap.getHeight() / 2 - averageIconHeight) / iconSize;
-      averageIconWidth = averageIconWidth + (bitmap.getWidth() - averageIconWidth) / iconSize;
-      marker.setIcon(icon);
+      // TODO replace with anchor implementation, we are faking an anchor by adding extra pixels and diving height by 2
+      // TODO we can move this code afterwards to getIcon as with MarkerView.getIcon
+      icon = loadDefaultIconForMarker(marker);
     } else {
-      Bitmap bitmap = icon.getBitmap();
-      averageIconHeight = averageIconHeight + (bitmap.getHeight() - averageIconHeight) / iconSize;
-      averageIconWidth = averageIconWidth + (bitmap.getWidth() - averageIconWidth) / iconSize;
+      updateAverageIconSize(icon);
     }
-
-    if (!icons.contains(icon)) {
-      icons.add(icon);
-      loadIcon(icon);
-    } else {
-      Icon oldIcon = icons.get(icons.indexOf(icon));
-      if (!oldIcon.getBitmap().sameAs(icon.getBitmap())) {
-        throw new IconBitmapChangedException();
-      }
-    }
+    addIcon(icon);
     return icon;
   }
 
-  Icon loadIconForMarkerView(MarkerView marker) {
+  void loadIconForMarkerView(MarkerView marker) {
     Icon icon = marker.getIcon();
-    int iconSize = icons.size() + 1;
-    if (icon == null) {
-      icon = IconFactory.getInstance(nativeMapView.getContext()).defaultMarkerView();
-      marker.setIcon(icon);
-    }
     Bitmap bitmap = icon.getBitmap();
-    averageIconHeight = averageIconHeight + (bitmap.getHeight() - averageIconHeight) / iconSize;
-    averageIconWidth = averageIconWidth + (bitmap.getWidth() - averageIconWidth) / iconSize;
-    if (!icons.contains(icon)) {
-      icons.add(icon);
-    } else {
-      Icon oldIcon = icons.get(icons.indexOf(icon));
-      if (!oldIcon.getBitmap().sameAs(icon.getBitmap())) {
-        throw new IconBitmapChangedException();
-      }
-    }
-    return icon;
+    updateAverageIconSize(bitmap);
+    addIcon(icon, false);
   }
 
   int getTopOffsetPixelsForIcon(Icon icon) {
     return (int) (nativeMapView.getTopOffsetPixelsForAnnotationSymbol(icon.getId()) * nativeMapView.getPixelRatio());
-  }
-
-  void loadIcon(Icon icon) {
-    Bitmap bitmap = icon.getBitmap();
-    String id = icon.getId();
-    if (bitmap.getConfig() != Bitmap.Config.ARGB_8888) {
-      bitmap = bitmap.copy(Bitmap.Config.ARGB_8888, false);
-    }
-    ByteBuffer buffer = ByteBuffer.allocate(bitmap.getRowBytes() * bitmap.getHeight());
-    bitmap.copyPixelsToBuffer(buffer);
-
-    float density = bitmap.getDensity();
-    if (density == Bitmap.DENSITY_NONE) {
-      density = DisplayMetrics.DENSITY_DEFAULT;
-    }
-    float scale = density / DisplayMetrics.DENSITY_DEFAULT;
-    nativeMapView.addAnnotationIcon(
-      id,
-      bitmap.getWidth(),
-      bitmap.getHeight(),
-      scale, buffer.array());
-  }
-
-  void reloadIcons() {
-    int count = icons.size();
-    for (int i = 0; i < count; i++) {
-      Icon icon = icons.get(i);
-      loadIcon(icon);
-    }
-  }
-
-  void ensureIconLoaded(Marker marker, MapboxMap mapboxMap) {
-    Icon icon = marker.getIcon();
-    if (icon == null) {
-      icon = IconFactory.getInstance(nativeMapView.getContext()).defaultMarker();
-      marker.setIcon(icon);
-    }
-    if (!icons.contains(icon)) {
-      icons.add(icon);
-      loadIcon(icon);
-    } else {
-      Icon oldIcon = icons.get(icons.indexOf(icon));
-      if (!oldIcon.getBitmap().sameAs(icon.getBitmap())) {
-        throw new IconBitmapChangedException();
-      }
-    }
-
-    // this seems to be a costly operation according to the profiler so I'm trying to save some calls
-    Marker previousMarker = marker.getId() != -1 ? (Marker) mapboxMap.getAnnotation(marker.getId()) : null;
-    if (previousMarker == null || previousMarker.getIcon() == null || previousMarker.getIcon() != marker.getIcon()) {
-      marker.setTopOffsetPixels(getTopOffsetPixelsForIcon(icon));
-    }
   }
 
   int getAverageIconHeight() {
@@ -154,5 +68,81 @@ class IconManager {
 
   int getAverageIconWidth() {
     return averageIconWidth;
+  }
+
+  private Icon loadDefaultIconForMarker(Marker marker) {
+    Icon icon = IconFactory.getInstance(Mapbox.getApplicationContext()).defaultMarker();
+    Bitmap bitmap = icon.getBitmap();
+    updateAverageIconSize(bitmap.getWidth(), bitmap.getHeight() / 2);
+    marker.setIcon(icon);
+    return icon;
+  }
+
+  private void addIcon(Icon icon) {
+    addIcon(icon, true);
+  }
+
+  private void addIcon(Icon icon, boolean addIconToMap) {
+    if (!icons.contains(icon)) {
+      icons.add(icon);
+      if (addIconToMap) {
+        loadIcon(icon);
+      }
+    } else {
+      validateIconChanged(icon);
+    }
+  }
+
+  private void updateAverageIconSize(Icon icon) {
+    updateAverageIconSize(icon.getBitmap());
+  }
+
+  private void updateAverageIconSize(Bitmap bitmap) {
+    updateAverageIconSize(bitmap.getWidth(), bitmap.getHeight());
+  }
+
+  private void updateAverageIconSize(int width, int height) {
+    int iconSize = icons.size() + 1;
+    averageIconHeight = averageIconHeight + (height - averageIconHeight) / iconSize;
+    averageIconWidth = averageIconWidth + (width - averageIconWidth) / iconSize;
+  }
+
+  private void loadIcon(Icon icon) {
+    Bitmap bitmap = icon.getBitmap();
+    nativeMapView.addAnnotationIcon(icon.getId(),
+      bitmap.getWidth(),
+      bitmap.getHeight(),
+      icon.getScale(),
+      icon.toBytes());
+  }
+
+  void reloadIcons() {
+    for (Icon icon : icons) {
+      loadIcon(icon);
+    }
+  }
+
+  private void validateIconChanged(Icon icon) {
+    Icon oldIcon = icons.get(icons.indexOf(icon));
+    if (!oldIcon.getBitmap().sameAs(icon.getBitmap())) {
+      throw new IconBitmapChangedException();
+    }
+  }
+
+  void ensureIconLoaded(Marker marker, MapboxMap mapboxMap) {
+    Icon icon = marker.getIcon();
+    if (icon == null) {
+      icon = loadDefaultIconForMarker(marker);
+    }
+    addIcon(icon);
+    setTopOffsetPixels(marker, mapboxMap, icon);
+  }
+
+  private void setTopOffsetPixels(Marker marker, MapboxMap mapboxMap, Icon icon) {
+    // this seems to be a costly operation according to the profiler so I'm trying to save some calls
+    Marker previousMarker = marker.getId() != -1 ? (Marker) mapboxMap.getAnnotation(marker.getId()) : null;
+    if (previousMarker == null || previousMarker.getIcon() == null || previousMarker.getIcon() != marker.getIcon()) {
+      marker.setTopOffsetPixels(getTopOffsetPixelsForIcon(icon));
+    }
   }
 }
