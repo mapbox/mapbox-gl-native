@@ -383,6 +383,14 @@ final class MapGestureDetector {
     // Called for drags
     @Override
     public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+      if (!trackingSettings.isScrollGestureCurrentlyEnabled()) {
+        return false;
+      }
+
+      if (dragStarted) {
+        return false;
+      }
+
       if (!scrollInProgress) {
         scrollInProgress = true;
 
@@ -392,13 +400,6 @@ final class MapGestureDetector {
         MapboxTelemetry.getInstance().pushEvent(MapboxEventWrapper.buildMapClickEvent(
           getLocationFromGesture(e1.getX(), e1.getY()),
           MapboxEvent.GESTURE_PAN_START, transform));
-      }
-      if (!trackingSettings.isScrollGestureCurrentlyEnabled()) {
-        return false;
-      }
-
-      if (dragStarted) {
-        return false;
       }
 
       // reset tracking if needed
