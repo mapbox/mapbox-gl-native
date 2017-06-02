@@ -127,7 +127,7 @@ Value parseValue(protozero::pbf_reader data) {
             break;
         }
     }
-    return false;
+    return NullValue{};
 }
 
 VectorTileFeature::VectorTileFeature(protozero::pbf_reader feature_pbf, std::shared_ptr<VectorTileLayerData> layerData_)
