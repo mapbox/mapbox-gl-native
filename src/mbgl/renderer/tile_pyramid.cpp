@@ -180,6 +180,7 @@ void TilePyramid::reloadTiles() {
 
 std::unordered_map<std::string, std::vector<Feature>> TilePyramid::queryRenderedFeatures(const ScreenLineString& geometry,
                                            const TransformState& transformState,
+                                           const style::Style& style,
                                            const RenderedQueryOptions& options) const {
     std::unordered_map<std::string, std::vector<Feature>> result;
     if (renderTiles.empty() || geometry.empty()) {
@@ -226,6 +227,7 @@ std::unordered_map<std::string, std::vector<Feature>> TilePyramid::queryRendered
         renderTile.tile.queryRenderedFeatures(result,
                                               tileSpaceQueryGeometry,
                                               transformState,
+                                              style,
                                               options);
     }
 
