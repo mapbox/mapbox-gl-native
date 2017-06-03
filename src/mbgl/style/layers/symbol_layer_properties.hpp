@@ -185,11 +185,11 @@ struct IconOpacity : DataDrivenPaintProperty<float, attributes::a_opacity> {
     static float defaultValue() { return 1; }
 };
 
-struct IconColor : DataDrivenPaintProperty<Color, attributes::a_color> {
+struct IconColor : DataDrivenPaintProperty<Color, attributes::a_fill_or_halo_color> {
     static Color defaultValue() { return Color::black(); }
 };
 
-struct IconHaloColor : DataDrivenPaintProperty<Color, attributes::a_color> {
+struct IconHaloColor : DataDrivenPaintProperty<Color, attributes::a_fill_or_halo_color> {
     static Color defaultValue() { return {}; }
 };
 

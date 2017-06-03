@@ -114,6 +114,12 @@ struct a_offset<1> {
     using Type = gl::Attribute<float, 1>;
 };
 
+struct a_fill_or_halo_color {
+    static auto name() { return "a_fill_or_halo_color"; }
+    using Type = gl::Attribute<float, 2>;
+};
+
+
 struct a_halo_width {
     static auto name() { return "a_halo_width"; }
     using Type = gl::Attribute<float, 1>;
