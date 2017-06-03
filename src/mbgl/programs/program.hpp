@@ -51,7 +51,7 @@ public:
               UniformValues&& uniformValues,
               const gl::VertexBuffer<LayoutVertex>& layoutVertexBuffer,
               const gl::IndexBuffer<DrawMode>& indexBuffer,
-              const gl::SegmentVector<Attributes>& segments,
+              const gl::SegmentVector& segments,
               const PaintPropertyBinders& paintPropertyBinders,
               const typename PaintProperties::PossiblyEvaluated& currentProperties,
               float currentZoom) {

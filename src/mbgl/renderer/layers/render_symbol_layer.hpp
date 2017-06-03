@@ -23,9 +23,47 @@ class IconPaintProperties : public Properties<
         IconTranslateAnchor
 > {};
 
+class PlainIconPaintProperties : public Properties<
+        IconOpacity,
+        IconTranslate,
+        IconTranslateAnchor
+> {};
+
+class IconFillPaintProperties : public Properties<
+        IconOpacity,
+        IconColor,
+        IconTranslate,
+        IconTranslateAnchor
+> {};
+
+class IconHaloPaintProperties : public Properties<
+        IconOpacity,
+        IconHaloColor,
+        IconHaloWidth,
+        IconHaloBlur,
+        IconTranslate,
+        IconTranslateAnchor
+> {};
+
 class TextPaintProperties : public Properties<
         TextOpacity,
         TextColor,
+        TextHaloColor,
+        TextHaloWidth,
+        TextHaloBlur,
+        TextTranslate,
+        TextTranslateAnchor
+> {};
+
+class TextFillPaintProperties : public Properties<
+        TextOpacity,
+        TextColor,
+        TextTranslate,
+        TextTranslateAnchor
+> {};
+
+class TextHaloPaintProperties : public Properties<
+        TextOpacity,
         TextHaloColor,
         TextHaloWidth,
         TextHaloBlur,
@@ -71,7 +109,12 @@ public:
     bool hasTransition() const override;
 
     style::IconPaintProperties::PossiblyEvaluated iconPaintProperties() const;
+    style::PlainIconPaintProperties::PossiblyEvaluated plainIconPaintProperties() const;
+    style::IconFillPaintProperties::PossiblyEvaluated iconFillPaintProperties() const;
+    style::IconHaloPaintProperties::PossiblyEvaluated iconHaloPaintProperties() const;
     style::TextPaintProperties::PossiblyEvaluated textPaintProperties() const;
+    style::TextFillPaintProperties::PossiblyEvaluated textFillPaintProperties() const;
+    style::TextHaloPaintProperties::PossiblyEvaluated textHaloPaintProperties() const;
 
     style::SymbolPropertyValues iconPropertyValues(const style::SymbolLayoutProperties::PossiblyEvaluated&) const;
     style::SymbolPropertyValues textPropertyValues(const style::SymbolLayoutProperties::PossiblyEvaluated&) const;

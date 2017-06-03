@@ -29,7 +29,7 @@ public:
 
     gl::VertexVector<CircleLayoutVertex> vertices;
     gl::IndexVector<gl::Triangles> triangles;
-    gl::SegmentVector<CircleAttributes> segments;
+    gl::SegmentVector segments;
 
     optional<gl::VertexBuffer<CircleLayoutVertex>> vertexBuffer;
     optional<gl::IndexBuffer<gl::Triangles>> indexBuffer;

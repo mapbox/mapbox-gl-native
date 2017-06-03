@@ -47,7 +47,7 @@ public:
     struct TextBuffer {
         gl::VertexVector<SymbolLayoutVertex> vertices;
         gl::IndexVector<gl::Triangles> triangles;
-        gl::SegmentVector<SymbolTextAttributes> segments;
+        gl::SegmentVector segments;
 
         optional<gl::VertexBuffer<SymbolLayoutVertex>> vertexBuffer;
         optional<gl::IndexBuffer<gl::Triangles>> indexBuffer;
@@ -58,7 +58,7 @@ public:
     struct IconBuffer {
         gl::VertexVector<SymbolLayoutVertex> vertices;
         gl::IndexVector<gl::Triangles> triangles;
-        gl::SegmentVector<SymbolIconAttributes> segments;
+        gl::SegmentVector segments;
 
         optional<gl::VertexBuffer<SymbolLayoutVertex>> vertexBuffer;
         optional<gl::IndexBuffer<gl::Triangles>> indexBuffer;
@@ -67,7 +67,7 @@ public:
     struct CollisionBoxBuffer {
         gl::VertexVector<CollisionBoxVertex> vertices;
         gl::IndexVector<gl::Lines> lines;
-        gl::SegmentVector<CollisionBoxAttributes> segments;
+        gl::SegmentVector segments;
 
         optional<gl::VertexBuffer<CollisionBoxVertex>> vertexBuffer;
         optional<gl::IndexBuffer<gl::Lines>> indexBuffer;

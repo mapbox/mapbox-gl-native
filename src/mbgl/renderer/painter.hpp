@@ -172,10 +172,10 @@ private:
     gl::IndexBuffer<gl::Triangles> quadTriangleIndexBuffer;
     gl::IndexBuffer<gl::LineStrip> tileBorderIndexBuffer;
 
-    gl::SegmentVector<FillAttributes> tileTriangleSegments;
-    gl::SegmentVector<DebugAttributes> tileBorderSegments;
-    gl::SegmentVector<RasterAttributes> rasterSegments;
-    gl::SegmentVector<ExtrusionTextureAttributes> extrusionTextureSegments;
+    gl::SegmentVector tileTriangleSegments;
+    gl::SegmentVector tileBorderSegments;
+    gl::SegmentVector rasterSegments;
+    gl::SegmentVector extrusionTextureSegments;
 };
 
 } // namespace mbgl

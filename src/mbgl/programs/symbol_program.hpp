@@ -339,11 +339,13 @@ public:
 
     using PaintPropertyBinders = typename PaintProperties::Binders;
     using PaintAttributes = typename PaintPropertyBinders::Attributes;
+    using PaintAttributeBindings = typename PaintAttributes::Bindings;
     using Attributes = gl::ConcatenateAttributes<LayoutAndSizeAttributes, PaintAttributes>;
 
     using UniformValues = typename Uniforms::Values;
     using SizeUniforms = typename SymbolSizeBinder::Uniforms;
     using PaintUniforms = typename PaintPropertyBinders::Uniforms;
+    using PaintUniformValues = typename PaintUniforms::Values;
     using AllUniforms = gl::ConcatenateUniforms<Uniforms, gl::ConcatenateUniforms<SizeUniforms, PaintUniforms>>;
 
     using ProgramType = gl::Program<Primitive, Attributes, AllUniforms>;
@@ -370,9 +372,9 @@ public:
               const SymbolSizeBinder& symbolSizeBinder,
               const PossiblyEvaluatedPropertyValue<float>& currentSizeValue,
               const gl::IndexBuffer<DrawMode>& indexBuffer,
-              const gl::SegmentVector<Attributes>& segments,
-              const PaintPropertyBinders& paintPropertyBinders,
-              const typename PaintProperties::PossiblyEvaluated& currentProperties,
+              const gl::SegmentVector& segments,
+              const PaintUniformValues& paintPropertyUniformValues,
+              const PaintAttributeBindings& paintPropertyAttributeBindings,
               float currentZoom) {
         program.draw(
             context,
@@ -382,10 +384,10 @@ public:
             std::move(colorMode),
             uniformValues
                 .concat(symbolSizeBinder.uniformValues(currentZoom))
-                .concat(paintPropertyBinders.uniformValues(currentZoom)),
+                .concat(paintPropertyUniformValues),
             LayoutAttributes::allVariableBindings(layoutVertexBuffer)
                 .concat(symbolSizeBinder.attributeBindings(currentSizeValue))
-                .concat(paintPropertyBinders.attributeBindings(currentProperties)),
+                .concat(paintPropertyAttributeBindings),
             indexBuffer,
             segments
         );
@@ -444,7 +446,6 @@ using SymbolSDFUniforms = gl::Uniforms<
     uniforms::u_pitch,
     uniforms::u_max_camera_distance,
     uniforms::u_gamma_scale,
-    uniforms::u_pitch,
     uniforms::u_bearing,
     uniforms::u_aspect_ratio,
     uniforms::u_pitch_with_map,
@@ -464,51 +465,30 @@ using SymbolSDFIconFillProgram = SymbolProgram<
     gl::Triangle,
     SymbolLayoutAttributes,
     SymbolSDFUniforms,
-    style::Properties<
-        style::IconOpacity,
-        style::IconTranslate,
-        style::IconTranslateAnchor,
-        style::IconColor>>;
+    style::IconFillPaintProperties>;
 
 using SymbolSDFIconHaloProgram = SymbolProgram<
     shaders::symbol_sdf,
     gl::Triangle,
     SymbolLayoutAttributes,
     SymbolSDFUniforms,
-    style::Properties<
-        style::IconOpacity,
-        style::IconTranslate,
-        style::IconTranslateAnchor,
-        style::IconHaloColor,
-        style::IconHaloWidth,
-        style::IconHaloBlur>>;
+    style::IconHaloPaintProperties>;
 
 using SymbolSDFTextFillProgram = SymbolProgram<
     shaders::symbol_sdf,
     gl::Triangle,
     SymbolLayoutAttributes,
     SymbolSDFUniforms,
-    style::Properties<
-        style::TextOpacity,
-        style::TextTranslate,
-        style::TextTranslateAnchor,
-        style::TextColor>>;
+    style::TextFillPaintProperties>;
 
 using SymbolSDFTextHaloProgram = SymbolProgram<
     shaders::symbol_sdf,
     gl::Triangle,
     SymbolLayoutAttributes,
     SymbolSDFUniforms,
-    style::Properties<
-        style::TextOpacity,
-        style::TextTranslate,
-        style::TextTranslateAnchor,
-        style::TextHaloColor,
-        style::TextHaloWidth,
-        style::TextHaloBlur>>;
+    style::TextHaloPaintProperties>;
 
 using SymbolLayoutVertex = SymbolLayoutAttributes::Vertex;
 using SymbolIconAttributes = SymbolIconProgram::Attributes;
-//using SymbolTextAttributes = SymbolSDFTextProgram::Attributes;
 
 } // namespace mbgl

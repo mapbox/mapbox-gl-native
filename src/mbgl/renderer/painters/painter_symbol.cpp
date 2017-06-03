@@ -35,6 +35,7 @@ void Painter::renderSymbol(PaintParameters& parameters,
                      const auto& buffers,
                      const auto& symbolSizeBinder,
                      const SymbolPropertyValues& values_,
+                     const auto& bindersFacade,
                      const auto& binders,
                      const auto& paintProperties)
     {
@@ -57,15 +58,14 @@ void Painter::renderSymbol(PaintParameters& parameters,
             values_.layoutSize,
             *buffers.indexBuffer,
             buffers.segments,
-            binders,
-            paintProperties,
+            bindersFacade.uniformValues(state.getZoom(), binders),
+            bindersFacade.attributeBindings(paintProperties, binders),
             state.getZoom()
         );
     };
 
     if (bucket.hasIconData()) {
         auto values = layer.iconPropertyValues(layout);
-        auto paintPropertyValues = layer.iconPaintProperties();
 
         const bool iconScaled = layout.get<IconSize>().constantOr(1.0) != 1.0 || bucket.iconsNeedLinear;
         const bool iconTransformed = values.rotationAlignment == AlignmentType::Map || state.getPitch() != 0;
@@ -80,8 +80,9 @@ void Painter::renderSymbol(PaintParameters& parameters,
                      bucket.icon,
                      bucket.iconSizeBinder,
                      values,
+                     IconHaloPaintProperties::BindersFacade(),
                      bucket.paintPropertyBinders.at(layer.getID()).first,
-                     paintPropertyValues);
+                     layer.iconHaloPaintProperties());
             }
 
             if (values.hasFill) {
@@ -90,8 +91,9 @@ void Painter::renderSymbol(PaintParameters& parameters,
                      bucket.icon,
                      bucket.iconSizeBinder,
                      values,
+                     IconFillPaintProperties::BindersFacade(),
                      bucket.paintPropertyBinders.at(layer.getID()).first,
-                     paintPropertyValues);
+                     layer.iconFillPaintProperties());
             }
         } else {
             draw(parameters.programs.symbolIcon,
@@ -99,8 +101,9 @@ void Painter::renderSymbol(PaintParameters& parameters,
                  bucket.icon,
                  bucket.iconSizeBinder,
                  values,
+                 PlainIconPaintProperties::BindersFacade(),
                  bucket.paintPropertyBinders.at(layer.getID()).first,
-                 paintPropertyValues);
+                 layer.plainIconPaintProperties());
         }
     }
 
@@ -108,7 +111,6 @@ void Painter::renderSymbol(PaintParameters& parameters,
         glyphAtlas->bind(context, 0);
 
         auto values = layer.textPropertyValues(layout);
-        auto paintPropertyValues = layer.textPaintProperties();
 
         const Size texsize = glyphAtlas->getSize();
 
@@ -118,8 +120,9 @@ void Painter::renderSymbol(PaintParameters& parameters,
                  bucket.text,
                  bucket.textSizeBinder,
                  values,
+                 TextHaloPaintProperties::BindersFacade(),
                  bucket.paintPropertyBinders.at(layer.getID()).second,
-                 paintPropertyValues);
+                 layer.textHaloPaintProperties());
         }
 
         if (values.hasFill) {
@@ -128,8 +131,9 @@ void Painter::renderSymbol(PaintParameters& parameters,
                  bucket.text,
                  bucket.textSizeBinder,
                  values,
+                 TextFillPaintProperties::BindersFacade(),
                  bucket.paintPropertyBinders.at(layer.getID()).second,
-                 paintPropertyValues);
+                 layer.textFillPaintProperties());
         }
     }
 

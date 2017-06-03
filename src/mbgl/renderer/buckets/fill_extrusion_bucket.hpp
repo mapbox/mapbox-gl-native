@@ -27,7 +27,7 @@ public:
 
     gl::VertexVector<FillExtrusionLayoutVertex> vertices;
     gl::IndexVector<gl::Triangles> triangles;
-    gl::SegmentVector<FillExtrusionAttributes> triangleSegments;
+    gl::SegmentVector triangleSegments;
 
     optional<gl::VertexBuffer<FillExtrusionLayoutVertex>> vertexBuffer;
     optional<gl::IndexBuffer<gl::Triangles>> indexBuffer;

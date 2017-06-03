@@ -324,6 +324,7 @@ public:
     }
 
     UniformValues uniformValues(float currentZoom) const {
+        (void)currentZoom; // Workaround for https://gcc.gnu.org/bugzilla/show_bug.cgi?id=56958
         return UniformValues {
             uniformValue<Ps>(currentZoom)...
         };
@@ -336,6 +337,38 @@ public:
 
 private:
     Binders binders;
+};
+
+
+template <class Ps>
+struct PaintPropertyBindersFacade;
+
+template <class... Ps>
+struct PaintPropertyBindersFacade<TypeList<Ps...>> {
+    template <class P>
+    using Attribute = ZoomInterpolatedAttribute<typename P::Attribute>;
+    using Attributes = gl::Attributes<Attribute<Ps>...>;
+    using AttributeBindings = typename Attributes::Bindings;
+
+    template <class EvaluatedProperties, class... Rs>
+    AttributeBindings attributeBindings(const EvaluatedProperties& currentProperties, const PaintPropertyBinders<Rs...>& binders) const {
+        return AttributeBindings {
+            binders.template attributeBinding<Ps>(currentProperties)...
+        };
+    }
+
+    template <class P>
+    using Uniform = InterpolationUniform<typename P::Attribute>;
+    using Uniforms = gl::Uniforms<Uniform<Ps>...>;
+    using UniformValues = typename Uniforms::Values;
+
+    template <class... Rs>
+    UniformValues uniformValues(float currentZoom, const PaintPropertyBinders<Rs...>& binders) const {
+        return UniformValues {
+            binders.template uniformValue<Ps>(currentZoom)...
+        };
+    }
+
 };
 
 } // namespace mbgl

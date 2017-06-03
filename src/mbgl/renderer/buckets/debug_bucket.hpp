@@ -33,7 +33,7 @@ public:
     const optional<Timestamp> expires;
     const MapDebugOptions debugMode;
 
-    gl::SegmentVector<DebugAttributes> segments;
+    gl::SegmentVector segments;
     optional<gl::VertexBuffer<DebugLayoutVertex>> vertexBuffer;
     optional<gl::IndexBuffer<gl::Lines>> indexBuffer;
 };

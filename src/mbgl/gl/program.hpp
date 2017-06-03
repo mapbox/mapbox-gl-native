@@ -118,7 +118,7 @@ public:
               UniformValues&& uniformValues,
               AttributeBindings&& attributeBindings,
               const IndexBuffer<DrawMode>& indexBuffer,
-              const SegmentVector<Attributes>& segments) {
+              const SegmentVector& segments) {
         static_assert(std::is_same<Primitive, typename DrawMode::Primitive>::value, "incompatible draw mode");
 
         context.setDrawMode(drawMode);
@@ -131,10 +131,16 @@ public:
         Uniforms::bind(uniformsState, std::move(uniformValues));
 
         for (const auto& segment : segments) {
-            segment.bind(context,
-                         indexBuffer.buffer,
+            // TODO: (Re-add VAO support) No VAO support. Force attributes to be rebound.
+            context.elementBuffer = indexBuffer.buffer;
+            variableBindings = {};
+
+            Attributes::bind(context,
                          attributeLocations,
-                         attributeBindings);
+                         variableBindings,
+                         attributeBindings,
+                         segment.vertexOffset);
+
 
             context.draw(drawMode.primitiveType,
                          segment.indexOffset,
@@ -146,6 +152,8 @@ private:
     UniqueProgram program;
 
     typename Attributes::Locations attributeLocations;
+    typename Attributes::VariableBindings variableBindings;
+
     typename Uniforms::State uniformsState;
 };
 

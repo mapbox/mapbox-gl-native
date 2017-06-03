@@ -30,8 +30,8 @@ public:
     gl::VertexVector<FillLayoutVertex> vertices;
     gl::IndexVector<gl::Lines> lines;
     gl::IndexVector<gl::Triangles> triangles;
-    gl::SegmentVector<FillAttributes> lineSegments;
-    gl::SegmentVector<FillAttributes> triangleSegments;
+    gl::SegmentVector lineSegments;
+    gl::SegmentVector triangleSegments;
 
     optional<gl::VertexBuffer<FillLayoutVertex>> vertexBuffer;
     optional<gl::IndexBuffer<gl::Lines>> lineIndexBuffer;

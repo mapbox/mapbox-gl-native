@@ -66,6 +66,34 @@ style::IconPaintProperties::PossiblyEvaluated RenderSymbolLayer::iconPaintProper
     };
 }
 
+style::PlainIconPaintProperties::PossiblyEvaluated RenderSymbolLayer::plainIconPaintProperties() const {
+    return style::PlainIconPaintProperties::PossiblyEvaluated {
+        evaluated.get<style::IconOpacity>(),
+        evaluated.get<style::IconTranslate>(),
+        evaluated.get<style::IconTranslateAnchor>()
+    };
+}
+
+style::IconFillPaintProperties::PossiblyEvaluated RenderSymbolLayer::iconFillPaintProperties() const {
+    return style::IconFillPaintProperties::PossiblyEvaluated {
+            evaluated.get<style::IconOpacity>(),
+            evaluated.get<style::IconColor>(),
+            evaluated.get<style::IconTranslate>(),
+            evaluated.get<style::IconTranslateAnchor>()
+    };
+}
+
+style::IconHaloPaintProperties::PossiblyEvaluated RenderSymbolLayer::iconHaloPaintProperties() const {
+    return style::IconHaloPaintProperties::PossiblyEvaluated {
+            evaluated.get<style::IconOpacity>(),
+            evaluated.get<style::IconHaloColor>(),
+            evaluated.get<style::IconHaloWidth>(),
+            evaluated.get<style::IconHaloBlur>(),
+            evaluated.get<style::IconTranslate>(),
+            evaluated.get<style::IconTranslateAnchor>()
+    };
+}
+
 style::TextPaintProperties::PossiblyEvaluated RenderSymbolLayer::textPaintProperties() const {
     return style::TextPaintProperties::PossiblyEvaluated {
             evaluated.get<style::TextOpacity>(),
@@ -78,6 +106,24 @@ style::TextPaintProperties::PossiblyEvaluated RenderSymbolLayer::textPaintProper
     };
 }
 
+style::TextFillPaintProperties::PossiblyEvaluated RenderSymbolLayer::textFillPaintProperties() const {
+    return style::TextFillPaintProperties::PossiblyEvaluated {
+            evaluated.get<style::TextOpacity>(),
+            evaluated.get<style::TextColor>(),
+            evaluated.get<style::TextTranslate>(),
+            evaluated.get<style::TextTranslateAnchor>()
+    };
+}
+style::TextHaloPaintProperties::PossiblyEvaluated RenderSymbolLayer::textHaloPaintProperties() const {
+    return style::TextHaloPaintProperties::PossiblyEvaluated {
+            evaluated.get<style::TextOpacity>(),
+            evaluated.get<style::TextHaloColor>(),
+            evaluated.get<style::TextHaloWidth>(),
+            evaluated.get<style::TextHaloBlur>(),
+            evaluated.get<style::TextTranslate>(),
+            evaluated.get<style::TextTranslateAnchor>()
+    };
+}
 
 style::SymbolPropertyValues RenderSymbolLayer::iconPropertyValues(const style::SymbolLayoutProperties::PossiblyEvaluated& layout_) const {
     return style::SymbolPropertyValues {

@@ -34,7 +34,7 @@ public:
 
     gl::VertexVector<LineLayoutVertex> vertices;
     gl::IndexVector<gl::Triangles> triangles;
-    gl::SegmentVector<LineAttributes> segments;
+    gl::SegmentVector segments;
 
     optional<gl::VertexBuffer<LineLayoutVertex>> vertexBuffer;
     optional<gl::IndexBuffer<gl::Triangles>> indexBuffer;

@@ -119,6 +119,7 @@ public:
 
     using DataDrivenProperties = FilteredTypeList<PropertyTypes, IsDataDriven>;
     using Binders = PaintPropertyBinders<DataDrivenProperties>;
+    using BindersFacade = PaintPropertyBindersFacade<DataDrivenProperties>;
 
     template <class TypeList>
     using Tuple = IndexedTuple<PropertyTypes, TypeList>;
