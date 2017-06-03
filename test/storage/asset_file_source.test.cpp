@@ -3,6 +3,7 @@
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/thread.hpp>
+#include <mbgl/util/default_thread_pool.hpp>
 
 #include <gtest/gtest.h>
 
@@ -12,14 +13,16 @@ using namespace mbgl;
 TEST(AssetFileSource, Load) {
     util::RunLoop loop;
 
-    AssetFileSource fs("test/fixtures/storage/assets");
+    ThreadPool threadPool {4};
+    AssetFileSource fs(threadPool, "test/fixtures/storage/assets");
 
     // iOS seems to run out of file descriptors...
 #if TARGET_OS_IPHONE
     unsigned numThreads = 30;
 #else
-    unsigned numThreads = 50;
+    unsigned numThreads = 1;
 #endif
+
 
     auto callback = [&] {
         if (!--numThreads) {
@@ -79,7 +82,8 @@ TEST(AssetFileSource, Load) {
 TEST(AssetFileSource, EmptyFile) {
     util::RunLoop loop;
 
-    AssetFileSource fs("test/fixtures/storage/assets");
+    ThreadPool threadPool {1};
+    AssetFileSource fs(threadPool, "test/fixtures/storage/assets");
 
     std::unique_ptr<AsyncRequest> req = fs.request({ Resource::Unknown, "asset://empty" }, [&](Response res) {
         req.reset();
@@ -95,7 +99,8 @@ TEST(AssetFileSource, EmptyFile) {
 TEST(AssetFileSource, NonEmptyFile) {
     util::RunLoop loop;
 
-    AssetFileSource fs("test/fixtures/storage/assets");
+    ThreadPool threadPool {1};
+    AssetFileSource fs(threadPool, "test/fixtures/storage/assets");
 
     std::unique_ptr<AsyncRequest> req = fs.request({ Resource::Unknown, "asset://nonempty" }, [&](Response res) {
         req.reset();
@@ -111,7 +116,8 @@ TEST(AssetFileSource, NonEmptyFile) {
 TEST(AssetFileSource, NonExistentFile) {
     util::RunLoop loop;
 
-    AssetFileSource fs("test/fixtures/storage/assets");
+    ThreadPool threadPool {1};
+    AssetFileSource fs(threadPool, "test/fixtures/storage/assets");
 
     std::unique_ptr<AsyncRequest> req = fs.request({ Resource::Unknown, "asset://does_not_exist" }, [&](Response res) {
         req.reset();
@@ -128,7 +134,8 @@ TEST(AssetFileSource, NonExistentFile) {
 TEST(AssetFileSource, ReadDirectory) {
     util::RunLoop loop;
 
-    AssetFileSource fs("test/fixtures/storage/assets");
+    ThreadPool threadPool {1};
+    AssetFileSource fs(threadPool, "test/fixtures/storage/assets");
 
     std::unique_ptr<AsyncRequest> req = fs.request({ Resource::Unknown, "asset://directory" }, [&](Response res) {
         req.reset();
@@ -145,7 +152,8 @@ TEST(AssetFileSource, ReadDirectory) {
 TEST(AssetFileSource, URLEncoding) {
     util::RunLoop loop;
 
-    AssetFileSource fs("test/fixtures/storage/assets");
+    ThreadPool threadPool {1};
+    AssetFileSource fs(threadPool, "test/fixtures/storage/assets");
 
     std::unique_ptr<AsyncRequest> req = fs.request({ Resource::Unknown, "asset://%6eonempty" }, [&](Response res) {
         req.reset();

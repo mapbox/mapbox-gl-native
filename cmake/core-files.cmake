@@ -293,8 +293,6 @@ set(MBGL_CORE_FILES
     src/mbgl/sprite/sprite_loader.cpp
     src/mbgl/sprite/sprite_loader.hpp
     src/mbgl/sprite/sprite_loader_observer.hpp
-    src/mbgl/sprite/sprite_loader_worker.cpp
-    src/mbgl/sprite/sprite_loader_worker.hpp
     src/mbgl/sprite/sprite_parser.cpp
     src/mbgl/sprite/sprite_parser.hpp
 

@@ -43,6 +43,7 @@
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/logging.hpp>
 #include <mbgl/util/math.hpp>
+#include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/std.hpp>
 #include <mbgl/math/minmax.hpp>
 #include <mbgl/map/query.hpp>
@@ -71,16 +72,16 @@ struct QueueSourceReloadVisitor {
 
 Style::Style(Scheduler& scheduler_, FileSource& fileSource_, float pixelRatio)
     : scheduler(scheduler_),
+      mailbox(std::make_shared<Mailbox>(*util::RunLoop::Get())),
       fileSource(fileSource_),
       glyphAtlas(std::make_unique<GlyphAtlas>(Size{ 2048, 2048 }, fileSource)),
-      spriteLoader(std::make_unique<SpriteLoader>(pixelRatio)),
+      spriteLoader(std::make_unique<Actor<SpriteLoader>>(scheduler, ActorRef<SpriteLoaderObserver>(*this, mailbox), fileSource, pixelRatio)),
       spriteAtlas(std::make_unique<SpriteAtlas>()),
       lineAtlas(std::make_unique<LineAtlas>(Size{ 256, 512 })),
       light(std::make_unique<Light>()),
       renderLight(light->impl),
       observer(&nullObserver) {
     glyphAtlas->setObserver(this);
-    spriteLoader->setObserver(this);
     light->setObserver(this);
 }
 
@@ -134,7 +135,7 @@ void Style::setJSON(const std::string& json) {
     setLight(std::make_unique<Light>(parser.light));
 
     glyphAtlas->setURL(parser.glyphURL);
-    spriteLoader->load(parser.spriteURL, scheduler, fileSource);
+    spriteLoader->invoke(&SpriteLoader::load, parser.spriteURL);
 
     loaded = true;
 

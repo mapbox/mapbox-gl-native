@@ -1,8 +1,6 @@
 #include <mbgl/sprite/sprite_loader.hpp>
-#include <mbgl/sprite/sprite_loader_worker.hpp>
 #include <mbgl/sprite/sprite_loader_observer.hpp>
 #include <mbgl/sprite/sprite_parser.hpp>
-#include <mbgl/util/logging.hpp>
 #include <mbgl/util/platform.hpp>
 #include <mbgl/util/std.hpp>
 #include <mbgl/util/constants.hpp>
@@ -10,95 +8,89 @@
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
-#include <mbgl/util/run_loop.hpp>
 #include <mbgl/actor/actor.hpp>
 
 #include <cassert>
 
 namespace mbgl {
 
-static SpriteLoaderObserver nullObserver;
-
-struct SpriteLoader::Loader {
-    Loader(Scheduler& scheduler, SpriteLoader& spriteAtlas)
-        : mailbox(std::make_shared<Mailbox>(*util::RunLoop::Get())),
-          worker(scheduler, ActorRef<SpriteLoader>(spriteAtlas, mailbox)) {
-    }
-
-    std::shared_ptr<const std::string> image;
-    std::shared_ptr<const std::string> json;
-    std::unique_ptr<AsyncRequest> jsonRequest;
-    std::unique_ptr<AsyncRequest> spriteRequest;
-    std::shared_ptr<Mailbox> mailbox;
-    Actor<SpriteLoaderWorker> worker;
-};
-
-SpriteLoader::SpriteLoader(float pixelRatio_)
-        : pixelRatio(pixelRatio_)
-        , observer(&nullObserver) {
+SpriteLoader::SpriteLoader(ActorRef<SpriteLoader> self_, ActorRef<SpriteLoaderObserver> observer_, FileSource& fileSource_, float pixelRatio_)
+        : self(self_)
+        , observer(observer_)
+        , fileSource(fileSource_)
+        , pixelRatio(pixelRatio_) {
 }
 
 SpriteLoader::~SpriteLoader() = default;
 
-void SpriteLoader::load(const std::string& url, Scheduler& scheduler, FileSource& fileSource) {
+void SpriteLoader::load(const std::string& url) {
     if (url.empty()) {
         // Treat a non-existent sprite as a successfully loaded empty sprite.
-        observer->onSpriteLoaded({});
+        observer.invoke(&SpriteLoaderObserver::onSpriteLoaded, SpriteLoaderObserver::Images());
         return;
     }
 
-    loader = std::make_unique<Loader>(scheduler, *this);
-
-    loader->jsonRequest = fileSource.request(Resource::spriteJSON(url, pixelRatio), [this](Response res) {
+    jsonRequest = fileSource.request(Resource::spriteJSON(url, pixelRatio), [this](Response res) {
         if (res.error) {
-            observer->onSpriteError(std::make_exception_ptr(std::runtime_error(res.error->message)));
+            observer.invoke(&SpriteLoaderObserver::onSpriteError, std::make_exception_ptr(std::runtime_error(res.error->message)));
         } else if (res.notModified) {
             return;
         } else if (res.noContent) {
-            loader->json = std::make_shared<const std::string>();
-            emitSpriteLoadedIfComplete();
+            json = std::make_shared<const std::string>();
+            parseIfComplete();
         } else {
             // Only trigger a sprite loaded event we got new data.
-            loader->json = res.data;
-            emitSpriteLoadedIfComplete();
+            json = res.data;
+            parseIfComplete();
         }
     });
 
-    loader->spriteRequest = fileSource.request(Resource::spriteImage(url, pixelRatio), [this](Response res) {
+    spriteRequest = fileSource.request(Resource::spriteImage(url, pixelRatio), [this](Response res) {
         if (res.error) {
-            observer->onSpriteError(std::make_exception_ptr(std::runtime_error(res.error->message)));
+            observer.invoke(&SpriteLoaderObserver::onSpriteError, std::make_exception_ptr(std::runtime_error(res.error->message)));
         } else if (res.notModified) {
             return;
         } else if (res.noContent) {
-            loader->image = std::make_shared<const std::string>();
-            emitSpriteLoadedIfComplete();
+            image = std::make_shared<const std::string>();
+            parseIfComplete();
         } else {
-            loader->image = res.data;
-            emitSpriteLoadedIfComplete();
+            image = res.data;
+            parseIfComplete();
         }
     });
 }
 
-void SpriteLoader::emitSpriteLoadedIfComplete() {
-    assert(loader);
+void SpriteLoader::parse() {
+    try {
+        if (!image) {
+            // This shouldn't happen, since we always invoke it with a non-empty pointer.
+            throw std::runtime_error("missing sprite image");
+        }
+        if (!json) {
+            // This shouldn't happen, since we always invoke it with a non-empty pointer.
+            throw std::runtime_error("missing sprite metadata");
+        }
 
-    if (!loader->image || !loader->json) {
+        self.invoke(&SpriteLoader::onParsed, parseSprite(*image, *json));
+    } catch (...) {
+        self.invoke(&SpriteLoader::onError, std::current_exception());
+    }
+}
+
+void SpriteLoader::parseIfComplete() {
+    if (!image || !json) {
         return;
     }
 
-    loader->worker.invoke(&SpriteLoaderWorker::parse, loader->image, loader->json);
+    self.invoke(&SpriteLoader::parse);
 }
 
 void SpriteLoader::onParsed(std::vector<std::unique_ptr<style::Image>>&& result) {
-    observer->onSpriteLoaded(std::move(result));
+    observer.invoke(&SpriteLoaderObserver::onSpriteLoaded, std::move(result));
 }
 
 void SpriteLoader::onError(std::exception_ptr err) {
-    observer->onSpriteError(err);
-}
-
-void SpriteLoader::setObserver(SpriteLoaderObserver* observer_) {
-    observer = observer_;
+    observer.invoke(&SpriteLoaderObserver::onSpriteError, err);
 }
 
 } // namespace mbgl

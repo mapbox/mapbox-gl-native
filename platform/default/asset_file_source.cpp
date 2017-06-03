@@ -1,5 +1,7 @@
 #include <mbgl/storage/asset_file_source.hpp>
 #include <mbgl/storage/response.hpp>
+
+#include <mbgl/actor/actor.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/thread.hpp>
 #include <mbgl/util/url.hpp>
@@ -12,14 +14,33 @@
 
 namespace mbgl {
 
-class AssetFileSource::Impl {
+class RequestCallback {
 public:
-    Impl(std::string root_)
-        : root(std::move(root_)) {
+    RequestCallback(ActorRef<RequestCallback>, FileSource::Callback callback_)
+        :callback(callback_) {
+    };
+
+    ~RequestCallback() = default;
+
+    void operator() (Response response) {
+        callback(response);
     }
 
-    void request(const std::string& url, FileSource::Callback callback) {
+private:
+    FileSource::Callback callback;
+};
+
+class AssetRequest {
+public:
+    AssetRequest(ActorRef<AssetRequest>) {
+
+    }
+    ~AssetRequest() = default;
+
+    void send(const std::string root, const Resource& resource, ActorRef<RequestCallback> callback) {
         std::string path;
+
+        auto url = resource.url;
 
         if (url.size() <= 8 || url[8] == '/') {
             // This is an empty or absolute path.
@@ -43,28 +64,55 @@ public:
                 response.data = std::make_shared<std::string>(util::read_file(path));
             } catch (...) {
                 response.error = std::make_unique<Response::Error>(
-                    Response::Error::Reason::Other,
-                    util::toString(std::current_exception()));
+                        Response::Error::Reason::Other,
+                        util::toString(std::current_exception()));
             }
         }
 
-        callback(response);
+        callback.invoke(&RequestCallback::operator(), response);
+    }
+};
+
+class AssetRequestHandle : public AsyncRequest {
+public:
+    AssetRequestHandle(Scheduler& scheduler, const std::string root, const Resource& resource, FileSource::Callback callback_)
+        : request(scheduler)
+        , callback(scheduler, callback_) {
+        request.invoke(&AssetRequest::send, root, resource, callback.self());
+    }
+
+    ~AssetRequestHandle() = default;
+
+private:
+    Actor<AssetRequest> request;
+    Actor<RequestCallback> callback;
+};
+
+
+class AssetFileSource::Impl {
+public:
+    Impl(Scheduler& scheduler_, const std::string& root_)
+            : scheduler(scheduler_)
+            , root(root_) {
+    }
+
+    std::unique_ptr<AsyncRequest> request(const Resource& resource, Callback callback) {
+        return std::make_unique<AssetRequestHandle>(scheduler, root, resource, callback);
     }
 
 private:
-    std::string root;
+    Scheduler& scheduler;
+    const std::string root;
 };
 
-AssetFileSource::AssetFileSource(const std::string& root)
-    : thread(std::make_unique<util::Thread<Impl>>(
-        util::ThreadContext{"AssetFileSource", util::ThreadPriority::Low},
-        root)) {
+AssetFileSource::AssetFileSource(Scheduler& scheduler, const std::string& root)
+    : impl(std::make_unique<Impl>(scheduler, root)) {
 }
 
 AssetFileSource::~AssetFileSource() = default;
 
 std::unique_ptr<AsyncRequest> AssetFileSource::request(const Resource& resource, Callback callback) {
-    return thread->invokeWithCallback(&Impl::request, resource.url, callback);
+    return impl->request(resource, callback);
 }
 
 } // namespace mbgl

@@ -16,6 +16,8 @@ macro(mbgl_platform_core)
         PRIVATE platform/default/default_file_source.cpp
         PRIVATE platform/default/local_file_source.cpp
         PRIVATE platform/default/online_file_source.cpp
+        PRIVATE platform/default/mbgl/util/threaded_run_loop.cpp
+        PRIVATE platform/default/mbgl/util/threaded_run_loop.hpp
 
         # Default styles
         PRIVATE platform/default/mbgl/util/default_styles.hpp

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <mbgl/actor/actor.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/style/image.hpp>
 
@@ -12,33 +13,35 @@
 
 namespace mbgl {
 
+class AsyncRequest;
 class Scheduler;
 class FileSource;
 class SpriteLoaderObserver;
 
 class SpriteLoader : public util::noncopyable {
 public:
-    SpriteLoader(float pixelRatio);
+    SpriteLoader(ActorRef<SpriteLoader>, ActorRef<SpriteLoaderObserver>, FileSource&, float pixelRatio);
     ~SpriteLoader();
 
-    void load(const std::string& url, Scheduler&, FileSource&);
-
-    void setObserver(SpriteLoaderObserver*);
+    void load(const std::string& url);
 
 private:
-    void emitSpriteLoadedIfComplete();
-
-    // Invoked by SpriteAtlasWorker
-    friend class SpriteLoaderWorker;
-    void onParsed(std::vector<std::unique_ptr<style::Image>>&&);
-    void onError(std::exception_ptr);
-
+    ActorRef<SpriteLoader> self;
+    ActorRef<SpriteLoaderObserver> observer;
+    FileSource& fileSource;
     const float pixelRatio;
 
-    struct Loader;
-    std::unique_ptr<Loader> loader;
+    std::unique_ptr<AsyncRequest> jsonRequest;
+    std::unique_ptr<AsyncRequest> spriteRequest;
 
-    SpriteLoaderObserver* observer = nullptr;
+    std::shared_ptr<const std::string> image;
+    std::shared_ptr<const std::string> json;
+
+    void parseIfComplete();
+    void parse();
+
+    void onParsed(std::vector<std::unique_ptr<style::Image>>&&);
+    void onError(std::exception_ptr);
 };
 
 } // namespace mbgl

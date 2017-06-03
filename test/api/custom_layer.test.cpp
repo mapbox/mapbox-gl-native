@@ -89,8 +89,8 @@ TEST(CustomLayer, Basic) {
     HeadlessBackend backend { test::sharedDisplay() };
     BackendScope scope { backend };
     OffscreenView view { backend.getContext() };
-    DefaultFileSource fileSource(":memory:", "test/fixtures/api/assets");
     ThreadPool threadPool(4);
+    DefaultFileSource fileSource(threadPool, ":memory:", "test/fixtures/api/assets");
 
     Map map(backend, view.getSize(), 1, fileSource, threadPool, MapMode::Still);
     map.setStyleJSON(util::read_file("test/fixtures/api/water.json"));

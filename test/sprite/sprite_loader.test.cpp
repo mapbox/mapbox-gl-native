@@ -36,16 +36,16 @@ public:
 
     util::RunLoop loop;
     StubFileSource fileSource;
+    std::shared_ptr<Mailbox> mailbox = std::make_shared<Mailbox>(loop);
     StubSpriteLoaderObserver observer;
     ThreadPool threadPool { 1 };
-    SpriteLoader spriteLoader{ 1 };
+    Actor<SpriteLoader> spriteLoader {threadPool, ActorRef<SpriteLoaderObserver>(observer, mailbox), fileSource, 1};
 
     void run() {
         // Squelch logging.
         Log::setObserver(std::make_unique<Log::NullObserver>());
 
-        spriteLoader.setObserver(&observer);
-        spriteLoader.load("test/fixtures/resources/sprite", threadPool, fileSource);
+        spriteLoader.invoke(&SpriteLoader::load, "test/fixtures/resources/sprite");
 
         loop.run();
     }

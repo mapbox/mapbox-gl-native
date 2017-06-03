@@ -104,7 +104,7 @@ TEST(Map, CameraToLatLngBounds) {
 
 TEST(Map, Offline) {
     MapTest test;
-    DefaultFileSource fileSource(":memory:", ".");
+    DefaultFileSource fileSource(test.threadPool, ":memory:", ".");
 
     auto expiredItem = [] (const std::string& path) {
         Response response;
@@ -356,7 +356,7 @@ TEST(Map, WithoutVAOExtension) {
 
     test.backend.getContext().disableVAOExtension = true;
 
-    DefaultFileSource fileSource(":memory:", "test/fixtures/api/assets");
+    DefaultFileSource fileSource(test.threadPool, ":memory:", "test/fixtures/api/assets");
 
     Map map(test.backend, test.view.getSize(), 1, fileSource, test.threadPool, MapMode::Still);
     map.setStyleJSON(util::read_file("test/fixtures/api/water.json"));
@@ -550,7 +550,7 @@ TEST(Map, TEST_DISABLED_ON_CI(ContinuousRendering)) {
     BackendScope scope { backend };
     OffscreenView view { backend.getContext() };
     ThreadPool threadPool { 4 };
-    DefaultFileSource fileSource(":memory:", "test/fixtures/api/assets");
+    DefaultFileSource fileSource(threadPool, ":memory:", "test/fixtures/api/assets");
     Map map(backend, view.getSize(), 1, fileSource, threadPool, MapMode::Continuous);
 
     using namespace std::chrono_literals;

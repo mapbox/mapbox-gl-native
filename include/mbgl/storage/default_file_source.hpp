@@ -9,9 +9,9 @@
 
 namespace mbgl {
 
-namespace util {
-template <typename T> class Thread;
-} // namespace util
+template <class>
+class Actor;
+class Scheduler;
 
 class DefaultFileSource : public FileSource {
 public:
@@ -22,10 +22,12 @@ public:
      * regions, we want the database to remain fairly small (order tens or low hundreds
      * of megabytes).
      */
-    DefaultFileSource(const std::string& cachePath,
+    DefaultFileSource(Scheduler&,
+                      const std::string& cachePath,
                       const std::string& assetRoot,
                       uint64_t maximumCacheSize = util::DEFAULT_MAX_CACHE_SIZE);
-    DefaultFileSource(const std::string& cachePath,
+    DefaultFileSource(Scheduler&,
+                      const std::string& cachePath,
                       std::unique_ptr<FileSource>&& assetFileSource,
                       uint64_t maximumCacheSize = util::DEFAULT_MAX_CACHE_SIZE);
     ~DefaultFileSource() override;
@@ -141,9 +143,9 @@ public:
     class Impl;
 
 private:
-    // Shared so destruction is done on this thread
-    const std::shared_ptr<FileSource> assetFileSource;
-    const std::unique_ptr<util::Thread<Impl>> thread;
+    Scheduler& scheduler;
+    const std::unique_ptr<Scheduler> workerScheduler;
+    const std::unique_ptr<Actor<Impl>> worker;
 
     std::mutex cachedBaseURLMutex;
     std::string cachedBaseURL = mbgl::util::API_BASE_URL;
