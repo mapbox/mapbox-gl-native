@@ -36,22 +36,62 @@ varying vec2 v_width2;
 varying float v_linesofar;
 varying float v_gamma_scale;
 
+
+#ifndef HAS_UNIFORM_u_blur
 uniform lowp float a_blur_t;
 attribute lowp vec2 a_blur;
 varying lowp float blur;
+#else
+uniform lowp float u_blur;
+#endif
+
+#ifndef HAS_UNIFORM_u_opacity
 uniform lowp float a_opacity_t;
 attribute lowp vec2 a_opacity;
 varying lowp float opacity;
+#else
+uniform lowp float u_opacity;
+#endif
+
+#ifndef HAS_UNIFORM_u_offset
 uniform lowp float a_offset_t;
 attribute lowp vec2 a_offset;
+#else
+uniform lowp float u_offset;
+#endif
+
+#ifndef HAS_UNIFORM_u_gapwidth
 uniform lowp float a_gapwidth_t;
 attribute mediump vec2 a_gapwidth;
+#else
+uniform mediump float u_gapwidth;
+#endif
 
 void main() {
+
+#ifndef HAS_UNIFORM_u_blur
     blur = unpack_mix_vec2(a_blur, a_blur_t);
+#else
+    lowp float blur = u_blur;
+#endif
+
+#ifndef HAS_UNIFORM_u_opacity
     opacity = unpack_mix_vec2(a_opacity, a_opacity_t);
+#else
+    lowp float opacity = u_opacity;
+#endif
+
+#ifndef HAS_UNIFORM_u_offset
     lowp float offset = unpack_mix_vec2(a_offset, a_offset_t);
+#else
+    lowp float offset = u_offset;
+#endif
+
+#ifndef HAS_UNIFORM_u_gapwidth
     mediump float gapwidth = unpack_mix_vec2(a_gapwidth, a_gapwidth_t);
+#else
+    mediump float gapwidth = u_gapwidth;
+#endif
 
     vec2 a_extrude = a_data.xy - 128.0;
     float a_direction = mod(a_data.z, 4.0) - 1.0;
@@ -118,12 +158,28 @@ varying vec2 v_width2;
 varying float v_linesofar;
 varying float v_gamma_scale;
 
+
+#ifndef HAS_UNIFORM_u_blur
 varying lowp float blur;
+#else
+uniform lowp float u_blur;
+#endif
+
+#ifndef HAS_UNIFORM_u_opacity
 varying lowp float opacity;
+#else
+uniform lowp float u_opacity;
+#endif
 
 void main() {
-    
-    
+
+#ifdef HAS_UNIFORM_u_blur
+    lowp float blur = u_blur;
+#endif
+
+#ifdef HAS_UNIFORM_u_opacity
+    lowp float opacity = u_opacity;
+#endif
 
     // Calculate the distance of the pixel from the line in pixels.
     float dist = length(v_normal) * v_width2.s;
