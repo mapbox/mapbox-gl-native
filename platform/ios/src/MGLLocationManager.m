@@ -41,6 +41,9 @@ static NSString * const MGLLocationManagerRegionIdentifier = @"MGLLocationManage
     if ([self isUpdatingLocation]) {
         [self.standardLocationManager stopUpdatingLocation];
         [self.standardLocationManager stopMonitoringSignificantLocationChanges];
+        for (CLRegion *region in self.standardLocationManager.monitoredRegions) {
+            [self.standardLocationManager stopMonitoringForRegion:region];
+        }
         self.updatingLocation = NO;
         if ([self.delegate respondsToSelector:@selector(locationManagerDidStopLocationUpdates:)]) {
             [self.delegate locationManagerDidStopLocationUpdates:self];
