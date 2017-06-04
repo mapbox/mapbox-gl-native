@@ -377,7 +377,7 @@ public:
             std::move(colorMode),
             uniformValues
                 .concat(symbolSizeBinder.uniformValues(currentZoom))
-                .concat(paintPropertyBinders.uniformValues(currentZoom)),
+                .concat(paintPropertyBinders.uniformValues(currentZoom, currentProperties)),
             LayoutAttributes::allVariableBindings(layoutVertexBuffer)
                 .concat(symbolSizeBinder.attributeBindings(currentSizeValue))
                 .concat(paintPropertyBinders.attributeBindings(currentProperties)),
