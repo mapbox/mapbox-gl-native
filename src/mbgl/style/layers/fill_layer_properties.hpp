@@ -6,6 +6,7 @@
 #include <mbgl/style/layout_property.hpp>
 #include <mbgl/style/paint_property.hpp>
 #include <mbgl/programs/attributes.hpp>
+#include <mbgl/programs/uniforms.hpp>
 
 namespace mbgl {
 namespace style {
@@ -14,15 +15,15 @@ struct FillAntialias : PaintProperty<bool> {
     static bool defaultValue() { return true; }
 };
 
-struct FillOpacity : DataDrivenPaintProperty<float, attributes::a_opacity> {
+struct FillOpacity : DataDrivenPaintProperty<float, attributes::a_opacity, uniforms::u_opacity> {
     static float defaultValue() { return 1; }
 };
 
-struct FillColor : DataDrivenPaintProperty<Color, attributes::a_color> {
+struct FillColor : DataDrivenPaintProperty<Color, attributes::a_color, uniforms::u_color> {
     static Color defaultValue() { return Color::black(); }
 };
 
-struct FillOutlineColor : DataDrivenPaintProperty<Color, attributes::a_outline_color> {
+struct FillOutlineColor : DataDrivenPaintProperty<Color, attributes::a_outline_color, uniforms::u_outline_color> {
     static Color defaultValue() { return {}; }
 };
 

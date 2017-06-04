@@ -16,7 +16,19 @@ MBGL_DEFINE_UNIFORM_SCALAR(float, u_blur);
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_zoom);
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_pitch);
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_bearing);
-
+MBGL_DEFINE_UNIFORM_SCALAR(float, u_radius);
+MBGL_DEFINE_UNIFORM_SCALAR(float, u_stroke_width);
+MBGL_DEFINE_UNIFORM_SCALAR(Color, u_stroke_color);
+MBGL_DEFINE_UNIFORM_SCALAR(float, u_stroke_opacity);
+MBGL_DEFINE_UNIFORM_SCALAR(Color, u_fill_color);
+MBGL_DEFINE_UNIFORM_SCALAR(Color, u_halo_color);
+MBGL_DEFINE_UNIFORM_SCALAR(float, u_halo_width);
+MBGL_DEFINE_UNIFORM_SCALAR(float, u_halo_blur);
+MBGL_DEFINE_UNIFORM_SCALAR(Color, u_outline_color);
+MBGL_DEFINE_UNIFORM_SCALAR(float, u_height);
+MBGL_DEFINE_UNIFORM_SCALAR(float, u_base);
+MBGL_DEFINE_UNIFORM_SCALAR(float, u_gap_width);
+MBGL_DEFINE_UNIFORM_SCALAR(float, u_offset);
 MBGL_DEFINE_UNIFORM_SCALAR(Size, u_world);
 
 MBGL_DEFINE_UNIFORM_VECTOR(float, 2, u_extrude_scale);

@@ -6,23 +6,24 @@
 #include <mbgl/style/layout_property.hpp>
 #include <mbgl/style/paint_property.hpp>
 #include <mbgl/programs/attributes.hpp>
+#include <mbgl/programs/uniforms.hpp>
 
 namespace mbgl {
 namespace style {
 
-struct CircleRadius : DataDrivenPaintProperty<float, attributes::a_radius> {
+struct CircleRadius : DataDrivenPaintProperty<float, attributes::a_radius, uniforms::u_radius> {
     static float defaultValue() { return 5; }
 };
 
-struct CircleColor : DataDrivenPaintProperty<Color, attributes::a_color> {
+struct CircleColor : DataDrivenPaintProperty<Color, attributes::a_color, uniforms::u_color> {
     static Color defaultValue() { return Color::black(); }
 };
 
-struct CircleBlur : DataDrivenPaintProperty<float, attributes::a_blur> {
+struct CircleBlur : DataDrivenPaintProperty<float, attributes::a_blur, uniforms::u_blur> {
     static float defaultValue() { return 0; }
 };
 
-struct CircleOpacity : DataDrivenPaintProperty<float, attributes::a_opacity> {
+struct CircleOpacity : DataDrivenPaintProperty<float, attributes::a_opacity, uniforms::u_opacity> {
     static float defaultValue() { return 1; }
 };
 
@@ -38,15 +39,15 @@ struct CirclePitchScale : PaintProperty<CirclePitchScaleType> {
     static CirclePitchScaleType defaultValue() { return CirclePitchScaleType::Map; }
 };
 
-struct CircleStrokeWidth : DataDrivenPaintProperty<float, attributes::a_stroke_width> {
+struct CircleStrokeWidth : DataDrivenPaintProperty<float, attributes::a_stroke_width, uniforms::u_stroke_width> {
     static float defaultValue() { return 0; }
 };
 
-struct CircleStrokeColor : DataDrivenPaintProperty<Color, attributes::a_stroke_color> {
+struct CircleStrokeColor : DataDrivenPaintProperty<Color, attributes::a_stroke_color, uniforms::u_stroke_color> {
     static Color defaultValue() { return Color::black(); }
 };
 
-struct CircleStrokeOpacity : DataDrivenPaintProperty<float, attributes::a_stroke_opacity> {
+struct CircleStrokeOpacity : DataDrivenPaintProperty<float, attributes::a_stroke_opacity, uniforms::u_stroke_opacity> {
     static float defaultValue() { return 1; }
 };
 

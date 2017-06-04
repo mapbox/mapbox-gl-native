@@ -92,7 +92,7 @@ public:
     static constexpr bool IsDataDriven = false;
 };
 
-template <class T, class A>
+template <class T, class A, class U>
 class DataDrivenPaintProperty {
 public:
     using ValueType = DataDrivenPropertyValue<T>;
@@ -104,6 +104,7 @@ public:
 
     using Type = T;
     using Attribute = A;
+    using Uniform = U;
 };
 
 template <class T>
