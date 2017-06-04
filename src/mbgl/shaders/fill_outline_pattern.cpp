@@ -23,12 +23,22 @@ varying vec2 v_pos_a;
 varying vec2 v_pos_b;
 varying vec2 v_pos;
 
+
+#ifndef HAS_UNIFORM_u_opacity
 uniform lowp float a_opacity_t;
 attribute lowp vec2 a_opacity;
 varying lowp float opacity;
+#else
+uniform lowp float u_opacity;
+#endif
 
 void main() {
+
+#ifndef HAS_UNIFORM_u_opacity
     opacity = unpack_mix_vec2(a_opacity, a_opacity_t);
+#else
+    lowp float opacity = u_opacity;
+#endif
 
     gl_Position = u_matrix * vec4(a_pos, 0, 1);
 
@@ -52,10 +62,18 @@ varying vec2 v_pos_a;
 varying vec2 v_pos_b;
 varying vec2 v_pos;
 
+
+#ifndef HAS_UNIFORM_u_opacity
 varying lowp float opacity;
+#else
+uniform lowp float u_opacity;
+#endif
 
 void main() {
-    
+
+#ifdef HAS_UNIFORM_u_opacity
+    lowp float opacity = u_opacity;
+#endif
 
     vec2 imagecoord = mod(v_pos_a, 1.0);
     vec2 pos = mix(u_pattern_tl_a, u_pattern_br_a, imagecoord);

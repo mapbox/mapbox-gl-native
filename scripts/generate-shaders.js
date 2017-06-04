@@ -69,21 +69,52 @@ ${fragmentPrelude}
 
     fragmentSource = fragmentSource.replace(re, (match, operation, precision, type, name) => {
         fragmentPragmas.add(name);
-        return operation === "define" ?
-            `varying ${precision} ${type} ${name};` :
-            ``;
+        return operation === "define" ? `
+#ifndef HAS_UNIFORM_u_${name}
+varying ${precision} ${type} ${name};
+#else
+uniform ${precision} ${type} u_${name};
+#endif
+` : `
+#ifdef HAS_UNIFORM_u_${name}
+    ${precision} ${type} ${name} = u_${name};
+#endif
+`;
     });
 
     vertexSource = vertexSource.replace(re, (match, operation, precision, type, name) => {
         const a_type = type === "float" ? "vec2" : "vec4";
         if (fragmentPragmas.has(name)) {
-            return operation === "define" ?
-                `uniform lowp float a_${name}_t;\nattribute ${precision} ${a_type} a_${name};\nvarying ${precision} ${type} ${name};` :
-                `${name} = unpack_mix_${a_type}(a_${name}, a_${name}_t);`;
+            return operation === "define" ? `
+#ifdef HAS_UNIFORM_u_${name}
+uniform lowp float a_${name}_t;
+attribute ${precision} ${a_type} a_${name};
+varying ${precision} ${type} ${name};
+#else
+uniform ${precision} ${type} u_${name};
+#endif
+` : `
+#ifndef HAS_UNIFORM_u_${name}
+    ${name} = unpack_mix_${a_type}(a_${name}, a_${name}_t);
+#else
+    ${precision} ${type} ${name} = u_${name};
+#endif
+`;
         } else {
-            return operation === "define" ?
-                `uniform lowp float a_${name}_t;\nattribute ${precision} ${a_type} a_${name};` :
-                `${precision} ${type} ${name} = unpack_mix_${a_type}(a_${name}, a_${name}_t);`;
+            return operation === "define" ? `
+#ifdef HAS_UNIFORM_u_${name}
+uniform lowp float a_${name}_t;
+attribute ${precision} ${a_type} a_${name};
+#else
+uniform ${precision} ${type} u_${name};
+#endif
+` : `
+#ifndef HAS_UNIFORM_u_${name}
+    ${precision} ${type} ${name} = unpack_mix_${a_type}(a_${name}, a_${name}_t);
+#else
+    ${precision} ${type} ${name} = u_${name};
+#endif
+`;
         }
     });
 
