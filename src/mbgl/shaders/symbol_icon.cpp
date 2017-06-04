@@ -19,9 +19,14 @@ uniform mediump float u_size_t; // used to interpolate between zoom stops when s
 uniform mediump float u_size; // used when size is both zoom and feature constant
 uniform mediump float u_layout_size; // used when size is feature constant
 
+
+#ifndef HAS_UNIFORM_u_opacity
 uniform lowp float a_opacity_t;
 attribute lowp vec2 a_opacity;
 varying lowp float opacity;
+#else
+uniform lowp float u_opacity;
+#endif
 
 // matrix is for the vertex position.
 uniform mat4 u_matrix;
@@ -37,7 +42,12 @@ varying vec2 v_tex;
 varying vec2 v_fade_tex;
 
 void main() {
+
+#ifndef HAS_UNIFORM_u_opacity
     opacity = unpack_mix_vec2(a_opacity, a_opacity_t);
+#else
+    lowp float opacity = u_opacity;
+#endif
 
     vec2 a_pos = a_pos_offset.xy;
     vec2 a_offset = a_pos_offset.zw;
@@ -97,13 +107,21 @@ const char* symbol_icon::fragmentSource = R"MBGL_SHADER(
 uniform sampler2D u_texture;
 uniform sampler2D u_fadetexture;
 
+
+#ifndef HAS_UNIFORM_u_opacity
 varying lowp float opacity;
+#else
+uniform lowp float u_opacity;
+#endif
 
 varying vec2 v_tex;
 varying vec2 v_fade_tex;
 
 void main() {
-    
+
+#ifdef HAS_UNIFORM_u_opacity
+    lowp float opacity = u_opacity;
+#endif
 
     lowp float alpha = texture2D(u_fadetexture, v_fade_tex).a * opacity;
     gl_FragColor = texture2D(u_texture, v_tex) * alpha;

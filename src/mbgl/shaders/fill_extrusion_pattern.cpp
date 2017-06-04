@@ -30,16 +30,36 @@ varying vec2 v_pos_b;
 varying vec4 v_lighting;
 varying float v_directional;
 
+
+#ifndef HAS_UNIFORM_u_base
 uniform lowp float a_base_t;
 attribute lowp vec2 a_base;
 varying lowp float base;
+#else
+uniform lowp float u_base;
+#endif
+
+#ifndef HAS_UNIFORM_u_height
 uniform lowp float a_height_t;
 attribute lowp vec2 a_height;
 varying lowp float height;
+#else
+uniform lowp float u_height;
+#endif
 
 void main() {
+
+#ifndef HAS_UNIFORM_u_base
     base = unpack_mix_vec2(a_base, a_base_t);
+#else
+    lowp float base = u_base;
+#endif
+
+#ifndef HAS_UNIFORM_u_height
     height = unpack_mix_vec2(a_height, a_height_t);
+#else
+    lowp float height = u_height;
+#endif
 
     base = max(0.0, base);
     height = max(0.0, height);
@@ -82,12 +102,28 @@ varying vec2 v_pos_a;
 varying vec2 v_pos_b;
 varying vec4 v_lighting;
 
+
+#ifndef HAS_UNIFORM_u_base
 varying lowp float base;
+#else
+uniform lowp float u_base;
+#endif
+
+#ifndef HAS_UNIFORM_u_height
 varying lowp float height;
+#else
+uniform lowp float u_height;
+#endif
 
 void main() {
-    
-    
+
+#ifdef HAS_UNIFORM_u_base
+    lowp float base = u_base;
+#endif
+
+#ifdef HAS_UNIFORM_u_height
+    lowp float height = u_height;
+#endif
 
     vec2 imagecoord = mod(v_pos_a, 1.0);
     vec2 pos = mix(u_pattern_tl_a / u_texsize, u_pattern_br_a / u_texsize, imagecoord);
