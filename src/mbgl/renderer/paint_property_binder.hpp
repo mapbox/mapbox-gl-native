@@ -88,6 +88,7 @@ public:
     virtual void upload(gl::Context& context) = 0;
     virtual AttributeBinding attributeBinding(const PossiblyEvaluatedPropertyValue<T>& currentValue) const = 0;
     virtual float interpolationFactor(float currentZoom) const = 0;
+    virtual T uniformValue(const PossiblyEvaluatedPropertyValue<T>& currentValue) const = 0;
 
     static std::unique_ptr<PaintPropertyBinder> create(const PossiblyEvaluatedPropertyValue<T>& value, float zoom, T defaultValue);
 
@@ -116,6 +117,10 @@ public:
 
     float interpolationFactor(float) const override {
         return 0.0f;
+    }
+
+    T uniformValue(const PossiblyEvaluatedPropertyValue<T>& currentValue) const override {
+        return currentValue.constantOr(constant);
     }
 
 private:
@@ -163,6 +168,11 @@ public:
 
     float interpolationFactor(float) const override {
         return 0.0f;
+    }
+
+    T uniformValue(const PossiblyEvaluatedPropertyValue<T>&) const override {
+        // Uniform values for vertex attribute arrays are unused.
+        return {};
     }
 
 private:
@@ -218,6 +228,11 @@ public:
 
     float interpolationFactor(float currentZoom) const override {
         return util::interpolationFactor(1.0f, std::get<0>(coveringRanges), currentZoom);
+    }
+
+    T uniformValue(const PossiblyEvaluatedPropertyValue<T>&) const override {
+        // Uniform values for vertex attribute arrays are unused.
+        return {};
     }
 
 private:
@@ -306,14 +321,18 @@ public:
         };
     }
 
-    using Uniforms = gl::Uniforms<InterpolationUniform<typename Ps::Attribute>...>;
+    using Uniforms = gl::Uniforms<InterpolationUniform<typename Ps::Attribute>..., typename Ps::Uniform...>;
     using UniformValues = typename Uniforms::Values;
 
-    UniformValues uniformValues(float currentZoom) const {
+    template <class EvaluatedProperties>
+    UniformValues uniformValues(float currentZoom, const EvaluatedProperties& currentProperties) const {
         (void)currentZoom; // Workaround for https://gcc.gnu.org/bugzilla/show_bug.cgi?id=56958
         return UniformValues {
             typename InterpolationUniform<typename Ps::Attribute>::Value {
                 binders.template get<Ps>()->interpolationFactor(currentZoom)
+            }...,
+            typename Ps::Uniform::Value {
+                binders.template get<Ps>()->uniformValue(currentProperties.template get<Ps>())
             }...
         };
     }
