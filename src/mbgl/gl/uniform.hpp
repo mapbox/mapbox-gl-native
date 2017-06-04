@@ -49,7 +49,7 @@ public:
     class State {
     public:
         void operator=(const Value& value) {
-            if (!current || *current != value.t) {
+            if (location >= 0 && (!current || *current != value.t)) {
                 current = value.t;
                 bindUniform(location, value.t);
             }
