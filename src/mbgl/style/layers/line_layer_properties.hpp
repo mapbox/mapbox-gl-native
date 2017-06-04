@@ -6,6 +6,7 @@
 #include <mbgl/style/layout_property.hpp>
 #include <mbgl/style/paint_property.hpp>
 #include <mbgl/programs/attributes.hpp>
+#include <mbgl/programs/uniforms.hpp>
 
 namespace mbgl {
 namespace style {
@@ -30,11 +31,11 @@ struct LineRoundLimit : LayoutProperty<float> {
     static float defaultValue() { return 1; }
 };
 
-struct LineOpacity : DataDrivenPaintProperty<float, attributes::a_opacity> {
+struct LineOpacity : DataDrivenPaintProperty<float, attributes::a_opacity, uniforms::u_opacity> {
     static float defaultValue() { return 1; }
 };
 
-struct LineColor : DataDrivenPaintProperty<Color, attributes::a_color> {
+struct LineColor : DataDrivenPaintProperty<Color, attributes::a_color, uniforms::u_color> {
     static Color defaultValue() { return Color::black(); }
 };
 
@@ -50,15 +51,15 @@ struct LineWidth : PaintProperty<float> {
     static float defaultValue() { return 1; }
 };
 
-struct LineGapWidth : DataDrivenPaintProperty<float, attributes::a_gap_width> {
+struct LineGapWidth : DataDrivenPaintProperty<float, attributes::a_gap_width, uniforms::u_gap_width> {
     static float defaultValue() { return 0; }
 };
 
-struct LineOffset : DataDrivenPaintProperty<float, attributes::a_offset<1>> {
+struct LineOffset : DataDrivenPaintProperty<float, attributes::a_offset<1>, uniforms::u_offset> {
     static float defaultValue() { return 0; }
 };
 
-struct LineBlur : DataDrivenPaintProperty<float, attributes::a_blur> {
+struct LineBlur : DataDrivenPaintProperty<float, attributes::a_blur, uniforms::u_blur> {
     static float defaultValue() { return 0; }
 };
 
