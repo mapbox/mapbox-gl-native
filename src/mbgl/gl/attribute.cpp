@@ -29,6 +29,7 @@ void VariableAttributeBinding<T, N>::bind(Context& context,
     }
     context.vertexBuffer = vertexBuffer;
     MBGL_CHECK_ERROR(glEnableVertexAttribArray(location));
+    oldBinding = *this;
     MBGL_CHECK_ERROR(glVertexAttribPointer(
         location,
         static_cast<GLint>(attributeSize),
