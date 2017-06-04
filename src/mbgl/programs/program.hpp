@@ -62,7 +62,7 @@ public:
             std::move(stencilMode),
             std::move(colorMode),
             uniformValues
-                .concat(paintPropertyBinders.uniformValues(currentZoom)),
+                .concat(paintPropertyBinders.uniformValues(currentZoom, currentProperties)),
             LayoutAttributes::allVariableBindings(layoutVertexBuffer)
                 .concat(paintPropertyBinders.attributeBindings(currentProperties)),
             indexBuffer,
