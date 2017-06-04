@@ -23,7 +23,7 @@ public:
     static constexpr bool IsDataDriven = false;
 };
 
-template <class T, class A>
+template <class T, class A, class U>
 class DataDrivenPaintProperty {
 public:
     using TransitionableType = Transitionable<DataDrivenPropertyValue<T>>;
@@ -34,6 +34,7 @@ public:
     static constexpr bool IsDataDriven = true;
 
     using Attribute = A;
+    using Uniform = U;
 };
 
 template <class T>
