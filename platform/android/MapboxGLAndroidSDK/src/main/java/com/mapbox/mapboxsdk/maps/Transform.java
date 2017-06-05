@@ -51,7 +51,7 @@ final class Transform implements MapView.OnMapChangedListener {
   void initialise(@NonNull MapboxMap mapboxMap, @NonNull MapboxMapOptions options) {
     CameraPosition position = options.getCamera();
     if (position != null && !position.equals(CameraPosition.DEFAULT)) {
-      moveCamera(mapboxMap, CameraUpdateFactory.newCameraPosition(position), null);
+      moveCamera(mapboxMap, CameraUpdateFactory.newCameraPosition(position), null, true);
     }
     setMinZoom(options.getMinZoomPreference());
     setMaxZoom(options.getMaxZoomPreference());
@@ -91,10 +91,10 @@ final class Transform implements MapView.OnMapChangedListener {
   }
 
   @UiThread
-  final void moveCamera(MapboxMap mapboxMap, CameraUpdate update, MapboxMap.CancelableCallback callback) {
+  final void moveCamera(MapboxMap mapboxMap, CameraUpdate update, MapboxMap.CancelableCallback callback, boolean canDismissTracking) {
     CameraPosition cameraPosition = update.getCameraPosition(mapboxMap);
     if (!cameraPosition.equals(this.cameraPosition)) {
-      trackingSettings.resetTrackingModesIfRequired(this.cameraPosition, cameraPosition, false);
+      trackingSettings.resetTrackingModesIfRequired(this.cameraPosition, cameraPosition, !canDismissTracking);
       cancelTransitions();
       cameraChangeDispatcher.onCameraMoveStarted(OnCameraMoveStartedListener.REASON_API_ANIMATION);
       mapView.jumpTo(cameraPosition.bearing, cameraPosition.target, cameraPosition.tilt, cameraPosition.zoom);
