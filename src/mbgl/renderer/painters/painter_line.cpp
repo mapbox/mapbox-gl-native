@@ -21,7 +21,7 @@ void Painter::renderLine(PaintParameters& parameters,
         return;
     }
 
-    const LinePaintProperties::PossiblyEvaluated& properties = layer.evaluated;
+    const RenderLinePaintProperties::PossiblyEvaluated& properties = layer.evaluated;
 
     auto draw = [&] (auto& program, auto&& uniformValues) {
         program.get(properties).draw(
@@ -57,7 +57,6 @@ void Painter::renderLine(PaintParameters& parameters,
                  pixelsToGLUnits,
                  posA,
                  posB,
-                 layer.dashLineWidth,
                  lineAtlas->getSize().width));
 
     } else if (!properties.get<LinePattern>().from.empty()) {

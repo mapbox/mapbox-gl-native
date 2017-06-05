@@ -24,16 +24,18 @@ void RenderLineLayer::transition(const TransitionParameters& parameters) {
 }
 
 void RenderLineLayer::evaluate(const PropertyEvaluationParameters& parameters) {
-    // for scaling dasharrays
-    auto dashArrayParams = parameters;
-    dashArrayParams.z = std::floor(dashArrayParams.z);
-    dashLineWidth = unevaluated.evaluate<style::LineWidth>(dashArrayParams);
+    style::Properties<LineFloorwidth>::Unevaluated extra;
+    extra.get<LineFloorwidth>() = unevaluated.get<style::LineWidth>();
 
-    evaluated = unevaluated.evaluate(parameters);
+    auto dashArrayParams = parameters;
+    dashArrayParams.useIntegerZoom = true;
+
+    evaluated = RenderLinePaintProperties::PossiblyEvaluated(
+        unevaluated.evaluate(parameters).concat(extra.evaluate(dashArrayParams)));
 
     passes = (evaluated.get<style::LineOpacity>().constantOr(1.0) > 0
               && evaluated.get<style::LineColor>().constantOr(Color::black()).a > 0
-              && evaluated.get<style::LineWidth>() > 0)
+              && evaluated.get<style::LineWidth>().constantOr(1.0) > 0)
              ? RenderPass::Translucent : RenderPass::None;
 }
 
@@ -102,7 +104,8 @@ bool RenderLineLayer::queryIntersectsFeature(
 }
 
 float RenderLineLayer::getLineWidth(const GeometryTileFeature& feature, const float zoom) const {
-    float lineWidth = evaluated.get<style::LineWidth>();
+    float lineWidth = evaluated.get<style::LineWidth>()
+            .evaluate(feature, zoom, style::LineWidth::defaultValue());
     float gapWidth = evaluated.get<style::LineGapWidth>()
             .evaluate(feature, zoom, style::LineGapWidth::defaultValue());
     if (gapWidth) {

@@ -31,7 +31,7 @@ class LineAnnotation {
 public:
     ShapeAnnotationGeometry geometry;
     style::DataDrivenPropertyValue<float> opacity { 1.0f };
-    style::PropertyValue<float> width { 1.0f };
+    style::DataDrivenPropertyValue<float> width { 1.0f };
     style::DataDrivenPropertyValue<Color> color { Color::black() };
 };
 

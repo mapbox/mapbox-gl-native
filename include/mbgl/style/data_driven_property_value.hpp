@@ -49,7 +49,7 @@ public:
     bool isZoomConstant() const {
         return !value.template is<CameraFunction<T>>() && !value.template is<CompositeFunction<T>>();
     }
-    
+
     template <class... Ts>
     auto match(Ts&&... ts) const {
         return value.match(std::forward<Ts>(ts)...);

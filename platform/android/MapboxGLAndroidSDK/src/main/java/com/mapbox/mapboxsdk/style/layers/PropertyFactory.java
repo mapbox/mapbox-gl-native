@@ -322,11 +322,11 @@ public class PropertyFactory {
   /**
    * Stroke thickness.
    *
-   * @param <Z> the zoom parameter type
-   * @param function a wrapper {@link CameraFunction} for Float
+   * @param <T> the function input type
+   * @param function a wrapper function for Float
    * @return property wrapper around a Float function
    */
-  public static <Z extends Number> PropertyValue<CameraFunction<Z, Float>> lineWidth(CameraFunction<Z, Float> function) {
+  public static <T> PropertyValue<Function<T, Float>> lineWidth(Function<T, Float> function) {
     return new PaintPropertyValue<>("line-width", function);
   }
 
@@ -1676,7 +1676,7 @@ public class PropertyFactory {
   }
 
   /**
-   * Scale factor for icon. 1 is original size, 3 triples the size.
+   * Scales the original size of the icon by the provided factor. The new pixel size of the image will be the original pixel size multiplied by {@link PropertyFactory#iconSize}. 1 is the original size; 3 triples the size of the image.
    *
    * @param value a Float value
    * @return property wrapper around Float
@@ -1688,7 +1688,7 @@ public class PropertyFactory {
 
 
   /**
-   * Scale factor for icon. 1 is original size, 3 triples the size.
+   * Scales the original size of the icon by the provided factor. The new pixel size of the image will be the original pixel size multiplied by {@link PropertyFactory#iconSize}. 1 is the original size; 3 triples the size of the image.
    *
    * @param <T> the function input type
    * @param function a wrapper function for Float

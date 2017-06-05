@@ -267,15 +267,15 @@ TransitionOptions LineLayer::getLineTranslateAnchorTransition() const {
     return impl().paint.template get<LineTranslateAnchor>().options;
 }
 
-PropertyValue<float> LineLayer::getDefaultLineWidth() {
+DataDrivenPropertyValue<float> LineLayer::getDefaultLineWidth() {
     return { 1 };
 }
 
-PropertyValue<float> LineLayer::getLineWidth() const {
+DataDrivenPropertyValue<float> LineLayer::getLineWidth() const {
     return impl().paint.template get<LineWidth>().value;
 }
 
-void LineLayer::setLineWidth(PropertyValue<float> value) {
+void LineLayer::setLineWidth(DataDrivenPropertyValue<float> value) {
     if (value == getLineWidth())
         return;
     auto impl_ = mutableImpl();
