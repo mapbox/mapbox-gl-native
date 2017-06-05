@@ -38,7 +38,7 @@ void Painter::renderFill(PaintParameters& parameters,
                          const auto& drawMode,
                          const auto& indexBuffer,
                          const auto& segments) {
-            program.draw(
+            program.get(properties).draw(
                 context,
                 drawMode,
                 depthModeForSublayer(sublayer, gl::DepthMode::ReadWrite),
@@ -85,7 +85,7 @@ void Painter::renderFill(PaintParameters& parameters,
                          const auto& drawMode,
                          const auto& indexBuffer,
                          const auto& segments) {
-            program.draw(
+            program.get(properties).draw(
                 context,
                 drawMode,
                 depthModeForSublayer(sublayer, gl::DepthMode::ReadWrite),

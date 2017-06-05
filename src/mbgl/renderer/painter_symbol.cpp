@@ -41,7 +41,7 @@ void Painter::renderSymbol(PaintParameters& parameters,
         // We clip symbols to their tile extent in still mode.
         const bool needsClipping = frame.mapMode == MapMode::Still;
 
-        program.draw(
+        program.get(paintProperties).draw(
             context,
             gl::Triangles(),
             values_.pitchAlignment == AlignmentType::Map
