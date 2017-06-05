@@ -34,7 +34,7 @@ void Painter::renderFillExtrusion(PaintParameters& parameters,
 
         imageManager->bind(context, 0);
 
-        parameters.programs.fillExtrusionPattern.draw(
+        parameters.programs.fillExtrusionPattern.get(properties).draw(
             context,
             gl::Triangles(),
             depthModeForSublayer(0, gl::DepthMode::ReadWrite),
@@ -61,7 +61,7 @@ void Painter::renderFillExtrusion(PaintParameters& parameters,
             state.getZoom());
 
     } else {
-        parameters.programs.fillExtrusion.draw(
+        parameters.programs.fillExtrusion.get(properties).draw(
             context,
             gl::Triangles(),
             depthModeForSublayer(0, gl::DepthMode::ReadWrite),

@@ -35,21 +35,21 @@ public:
           collisionBox(context, programParameters) {
     }
 
-    CircleProgram circle;
+    ProgramMap<CircleProgram> circle;
     ExtrusionTextureProgram extrusionTexture;
-    FillProgram fill;
-    FillExtrusionProgram fillExtrusion;
-    FillExtrusionPatternProgram fillExtrusionPattern;
-    FillPatternProgram fillPattern;
-    FillOutlineProgram fillOutline;
-    FillOutlinePatternProgram fillOutlinePattern;
-    LineProgram line;
-    LineSDFProgram lineSDF;
-    LinePatternProgram linePattern;
+    ProgramMap<FillProgram> fill;
+    ProgramMap<FillExtrusionProgram> fillExtrusion;
+    ProgramMap<FillExtrusionPatternProgram> fillExtrusionPattern;
+    ProgramMap<FillPatternProgram> fillPattern;
+    ProgramMap<FillOutlineProgram> fillOutline;
+    ProgramMap<FillOutlinePatternProgram> fillOutlinePattern;
+    ProgramMap<LineProgram> line;
+    ProgramMap<LineSDFProgram> lineSDF;
+    ProgramMap<LinePatternProgram> linePattern;
     RasterProgram raster;
-    SymbolIconProgram symbolIcon;
-    SymbolSDFIconProgram symbolIconSDF;
-    SymbolSDFTextProgram symbolGlyph;
+    ProgramMap<SymbolIconProgram> symbolIcon;
+    ProgramMap<SymbolSDFIconProgram> symbolIconSDF;
+    ProgramMap<SymbolSDFTextProgram> symbolGlyph;
 
     DebugProgram debug;
     CollisionBoxProgram collisionBox;

@@ -7,6 +7,8 @@
 #include <mbgl/renderer/possibly_evaluated_property_value.hpp>
 #include <mbgl/renderer/paint_property_statistics.hpp>
 
+#include <bitset>
+
 namespace mbgl {
 
 /*
@@ -55,8 +57,7 @@ std::array<float, N*2> zoomInterpolatedAttributeValue(const std::array<float, N>
 
    * For _constant_ properties -- those whose value is a constant, or the constant
      result of evaluating a camera function at a particular camera position -- we
-     don't need a vertex buffer, and can instead use a constant attribute binding
-     via the `glVertexAttrib*` family of functions.
+     don't need a vertex buffer, and instead use a uniform.
    * For source functions, we use a vertex buffer with a single attribute value,
      the evaluated result of the source function for the given feature.
    * For composite functions, we use a vertex buffer with two attributes: min and
@@ -67,15 +68,8 @@ std::array<float, N*2> zoomInterpolatedAttributeValue(const std::array<float, N>
      between the min and max value at the final displayed zoom level. The use of a
      uniform allows us to cheaply update the value on every frame.
 
-   Note that the shader source is the same regardless of the strategy used to bind
-   the attribute -- in all cases the attribute is declared as a vec2, in order to
-   support composite min and max values (color attributes use a vec4 with special
-   packing). When the constant or source function strategies are used, the
-   interpolation uniform value is set to zero, and the second attribute element is
-   unused. This differs from the GL JS implementation, which dynamically generates
-   shader source based on the strategy used. We found that in WebGL, using
-   `glVertexAttrib*` was unnacceptably slow. Additionally, in GL Native we have
-   implemented binary shader caching, which works better if the shaders are constant.
+   Note that the shader source varies depending on whether we're using a uniform or
+   attribute. Like GL JS, we dynamically compile shaders at runtime to accomodate this.
 */
 template <class T, class A>
 class PaintPropertyBinder {
@@ -171,9 +165,13 @@ public:
         return 0.0f;
     }
 
-    T uniformValue(const PossiblyEvaluatedPropertyValue<T>&) const override {
-        // Uniform values for vertex attribute arrays are unused.
-        return {};
+    T uniformValue(const PossiblyEvaluatedPropertyValue<T>& currentValue) const override {
+        if (currentValue.isConstant()) {
+            return *currentValue.constant();
+        } else {
+            // Uniform values for vertex attribute arrays are unused.
+            return {};
+        }
     }
 
 private:
@@ -231,9 +229,13 @@ public:
         return util::interpolationFactor(1.0f, std::get<0>(coveringRanges), currentZoom);
     }
 
-    T uniformValue(const PossiblyEvaluatedPropertyValue<T>&) const override {
-        // Uniform values for vertex attribute arrays are unused.
-        return {};
+    T uniformValue(const PossiblyEvaluatedPropertyValue<T>& currentValue) const override {
+        if (currentValue.isConstant()) {
+            return *currentValue.constant();
+        } else {
+            // Uniform values for vertex attribute arrays are unused.
+            return {};
+        }
     }
 
 private:
@@ -341,6 +343,30 @@ public:
     template <class P>
     const auto& statistics() const {
         return binders.template get<P>()->statistics;
+    }
+
+
+    using Bitset = std::bitset<sizeof...(Ps)>;
+
+    template <class EvaluatedProperties>
+    static Bitset constants(const EvaluatedProperties& currentProperties) {
+        Bitset result;
+        util::ignore({
+            result.set(TypeIndex<Ps, Ps...>::value,
+                       currentProperties.template get<Ps>().isConstant())...
+        });
+        return result;
+    }
+
+    template <class EvaluatedProperties>
+    static std::vector<std::string> defines(const EvaluatedProperties& currentProperties) {
+        std::vector<std::string> result;
+        util::ignore({
+            (result.push_back(currentProperties.template get<Ps>().isConstant()
+                ? std::string("#define HAS_UNIFORM_") + Ps::Uniform::name()
+                : std::string()), 0)...
+        });
+        return result;
     }
 
 private:

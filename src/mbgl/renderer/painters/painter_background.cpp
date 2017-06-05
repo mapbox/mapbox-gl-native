@@ -33,7 +33,7 @@ void Painter::renderBackground(PaintParameters& parameters, const RenderBackgrou
         imageManager->bind(context, 0);
 
         for (const auto& tileID : util::tileCover(state, state.getIntegerZoom())) {
-            parameters.programs.fillPattern.draw(
+            parameters.programs.fillPattern.get(properties).draw(
                 context,
                 gl::Triangles(),
                 depthModeForSublayer(0, gl::DepthMode::ReadOnly),
@@ -59,7 +59,7 @@ void Painter::renderBackground(PaintParameters& parameters, const RenderBackgrou
         }
     } else {
         for (const auto& tileID : util::tileCover(state, state.getIntegerZoom())) {
-            parameters.programs.fill.draw(
+            parameters.programs.fill.get(properties).draw(
                 context,
                 gl::Triangles(),
                 depthModeForSublayer(0, gl::DepthMode::ReadOnly),

@@ -10,11 +10,11 @@ namespace mbgl {
 namespace shaders {
 
 std::string fragmentSource(const ProgramParameters& parameters, const char* fragmentSource) {
-    return parameters.defines + fragmentPrelude + fragmentSource;
+    return parameters.getDefines() + fragmentPrelude + fragmentSource;
 }
 
 std::string vertexSource(const ProgramParameters& parameters, const char* vertexSource) {
-    return parameters.defines + vertexPrelude + vertexSource;
+    return parameters.getDefines() + vertexPrelude + vertexSource;
 }
 
 std::string programIdentifier(const std::string& vertexSource, const std::string& fragmentSource) {
