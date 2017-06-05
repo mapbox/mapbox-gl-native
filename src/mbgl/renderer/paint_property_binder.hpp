@@ -218,7 +218,11 @@ public:
     }
 
     float interpolationFactor(float currentZoom) const override {
-        return util::interpolationFactor(1.0f, std::get<0>(coveringRanges), currentZoom);
+        if (function.useIntegerZoom) {
+            return util::interpolationFactor(1.0f, std::get<0>(coveringRanges), floor(currentZoom));
+        } else {
+            return util::interpolationFactor(1.0f, std::get<0>(coveringRanges), currentZoom);
+        }
     }
 
 private:

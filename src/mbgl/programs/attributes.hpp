@@ -96,6 +96,11 @@ struct a_width {
     using Type = gl::Attribute<float, 1>;
 };
 
+struct a_floorwidth {
+    static auto name() { return "a_floorwidth"; }
+    using Type = gl::Attribute<float, 1>;
+};
+
 struct a_height {
     static auto name() { return "a_height"; }
     using Type = gl::Attribute<float, 1>;

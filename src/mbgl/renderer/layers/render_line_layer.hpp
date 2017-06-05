@@ -30,9 +30,6 @@ public:
 
     const style::LineLayer::Impl& impl() const;
 
-    // Special case
-    float dashLineWidth = 1;
-
 private:
     float getLineWidth(const GeometryTileFeature&, const float) const;
 };

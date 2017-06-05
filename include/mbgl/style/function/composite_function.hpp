@@ -115,6 +115,7 @@ public:
     std::string property;
     Stops stops;
     optional<T> defaultValue;
+    bool useIntegerZoom = false;
 };
 
 } // namespace style

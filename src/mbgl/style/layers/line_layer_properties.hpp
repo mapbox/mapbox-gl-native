@@ -47,7 +47,11 @@ struct LineTranslateAnchor : PaintProperty<TranslateAnchorType> {
     static TranslateAnchorType defaultValue() { return TranslateAnchorType::Map; }
 };
 
-struct LineWidth : PaintProperty<float> {
+struct LineWidth : DataDrivenPaintProperty<float, attributes::a_width> {
+    static float defaultValue() { return 1; }
+};
+
+struct LineFloorwidth : DataDrivenPaintProperty<float, attributes::a_floorwidth> {
     static float defaultValue() { return 1; }
 };
 
@@ -84,6 +88,7 @@ class LinePaintProperties : public Properties<
     LineTranslate,
     LineTranslateAnchor,
     LineWidth,
+    LineFloorwidth,
     LineGapWidth,
     LineOffset,
     LineBlur,

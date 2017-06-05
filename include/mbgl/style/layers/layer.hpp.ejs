@@ -63,14 +63,14 @@ public:
 <% } -%>
     // Paint properties
 
-<% for (const property of paintProperties) { -%>
+<% for (const property of paintProperties) { if (!property.skip) { -%>
     static <%- propertyValueType(property) %> getDefault<%- camelize(property.name) %>();
     <%- propertyValueType(property) %> get<%- camelize(property.name) %>() const;
     void set<%- camelize(property.name) %>(<%- propertyValueType(property) %>);
     void set<%- camelize(property.name) %>Transition(const TransitionOptions&);
     TransitionOptions get<%- camelize(property.name) %>Transition() const;
 
-<% } -%>
+<% }} -%>
     // Private implementation
 
     class Impl;

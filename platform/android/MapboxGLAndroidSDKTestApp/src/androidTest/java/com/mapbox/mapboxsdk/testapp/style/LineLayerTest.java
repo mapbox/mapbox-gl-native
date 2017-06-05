@@ -697,6 +697,118 @@ public class LineLayerTest extends BaseActivityTest {
   }
 
   @Test
+  public void testLineWidthAsIdentitySourceFunction() {
+    validateTestSetup();
+    setupLayer();
+    Timber.i("line-width");
+    assertNotNull(layer);
+
+    // Set
+    layer.setProperties(
+      lineWidth(property("FeaturePropertyA", Stops.<Float>identity()))
+    );
+
+    // Verify
+    assertNotNull(layer.getLineWidth());
+    assertNotNull(layer.getLineWidth().getFunction());
+    assertEquals(SourceFunction.class, layer.getLineWidth().getFunction().getClass());
+    assertEquals("FeaturePropertyA", ((SourceFunction) layer.getLineWidth().getFunction()).getProperty());
+    assertEquals(IdentityStops.class, layer.getLineWidth().getFunction().getStops().getClass());
+  }
+
+  @Test
+  public void testLineWidthAsExponentialSourceFunction() {
+    validateTestSetup();
+    setupLayer();
+    Timber.i("line-width");
+    assertNotNull(layer);
+
+    // Set
+    layer.setProperties(
+      lineWidth(
+        property(
+          "FeaturePropertyA",
+          exponential(
+            stop(0.3f, lineWidth(0.3f))
+          ).withBase(0.5f)
+        )
+      )
+    );
+
+    // Verify
+    assertNotNull(layer.getLineWidth());
+    assertNotNull(layer.getLineWidth().getFunction());
+    assertEquals(SourceFunction.class, layer.getLineWidth().getFunction().getClass());
+    assertEquals("FeaturePropertyA", ((SourceFunction) layer.getLineWidth().getFunction()).getProperty());
+    assertEquals(ExponentialStops.class, layer.getLineWidth().getFunction().getStops().getClass());
+  }
+
+  @Test
+  public void testLineWidthAsCategoricalSourceFunction() {
+    validateTestSetup();
+    setupLayer();
+    Timber.i("line-width");
+    assertNotNull(layer);
+
+    // Set
+    layer.setProperties(
+      lineWidth(
+        property(
+          "FeaturePropertyA",
+          categorical(
+            stop(1.0f, lineWidth(0.3f))
+          )
+        ).withDefaultValue(lineWidth(0.3f))
+      )
+    );
+
+    // Verify
+    assertNotNull(layer.getLineWidth());
+    assertNotNull(layer.getLineWidth().getFunction());
+    assertEquals(SourceFunction.class, layer.getLineWidth().getFunction().getClass());
+    assertEquals("FeaturePropertyA", ((SourceFunction) layer.getLineWidth().getFunction()).getProperty());
+    assertEquals(CategoricalStops.class, layer.getLineWidth().getFunction().getStops().getClass());
+    assertNotNull(((SourceFunction) layer.getLineWidth().getFunction()).getDefaultValue());
+    assertNotNull(((SourceFunction) layer.getLineWidth().getFunction()).getDefaultValue().getValue());
+    assertEquals(0.3f, ((SourceFunction) layer.getLineWidth().getFunction()).getDefaultValue().getValue());
+  }
+
+  @Test
+  public void testLineWidthAsCompositeFunction() {
+    validateTestSetup();
+    setupLayer();
+    Timber.i("line-width");
+    assertNotNull(layer);
+
+    // Set
+    layer.setProperties(
+      lineWidth(
+        composite(
+          "FeaturePropertyA",
+          exponential(
+            stop(0, 0.3f, lineWidth(0.9f))
+          ).withBase(0.5f)
+        ).withDefaultValue(lineWidth(0.3f))
+      )
+    );
+
+    // Verify
+    assertNotNull(layer.getLineWidth());
+    assertNotNull(layer.getLineWidth().getFunction());
+    assertEquals(CompositeFunction.class, layer.getLineWidth().getFunction().getClass());
+    assertEquals("FeaturePropertyA", ((CompositeFunction) layer.getLineWidth().getFunction()).getProperty());
+    assertEquals(ExponentialStops.class, layer.getLineWidth().getFunction().getStops().getClass());
+    assertEquals(1, ((ExponentialStops) layer.getLineWidth().getFunction().getStops()).size());
+
+    ExponentialStops<Stop.CompositeValue<Float, Float>, Float> stops =
+      (ExponentialStops<Stop.CompositeValue<Float, Float>, Float>) layer.getLineWidth().getFunction().getStops();
+    Stop<Stop.CompositeValue<Float, Float>, Float> stop = stops.iterator().next();
+    assertEquals(0f, stop.in.zoom, 0.001);
+    assertEquals(0.3f, stop.in.value, 0.001f);
+    assertEquals(0.9f, stop.out, 0.001f);
+  }
+
+  @Test
   public void testLineGapWidthTransition() {
     validateTestSetup();
     setupLayer();

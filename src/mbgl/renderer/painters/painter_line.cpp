@@ -57,7 +57,6 @@ void Painter::renderLine(PaintParameters& parameters,
                  pixelsToGLUnits,
                  posA,
                  posB,
-                 layer.dashLineWidth,
                  lineAtlas->getSize().width));
 
     } else if (!properties.get<LinePattern>().from.empty()) {

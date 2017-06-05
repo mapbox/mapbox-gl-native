@@ -322,11 +322,11 @@ public class PropertyFactory {
   /**
    * Stroke thickness.
    *
-   * @param <Z> the zoom parameter type
-   * @param function a wrapper {@link CameraFunction} for Float
+   * @param <T> the function input type
+   * @param function a wrapper function for Float
    * @return property wrapper around a Float function
    */
-  public static <Z extends Number> PropertyValue<CameraFunction<Z, Float>> lineWidth(CameraFunction<Z, Float> function) {
+  public static <T> PropertyValue<Function<T, Float>> lineWidth(Function<T, Float> function) {
     return new PaintPropertyValue<>("line-width", function);
   }
 

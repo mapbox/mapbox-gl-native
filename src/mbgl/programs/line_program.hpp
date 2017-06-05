@@ -20,7 +20,6 @@ class SpriteAtlasElement;
 
 namespace uniforms {
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_ratio);
-MBGL_DEFINE_UNIFORM_SCALAR(float, u_width);
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_tex_y_a);
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_tex_y_b);
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_sdfgamma);
@@ -41,7 +40,6 @@ class LineProgram : public Program<
     LineLayoutAttributes,
     gl::Uniforms<
         uniforms::u_matrix,
-        uniforms::u_width,
         uniforms::u_ratio,
         uniforms::u_gl_units_to_pixels>,
     style::LinePaintProperties>
@@ -103,7 +101,6 @@ class LinePatternProgram : public Program<
     LineLayoutAttributes,
     gl::Uniforms<
         uniforms::u_matrix,
-        uniforms::u_width,
         uniforms::u_ratio,
         uniforms::u_gl_units_to_pixels,
         uniforms::u_pattern_tl_a,
@@ -135,7 +132,6 @@ class LineSDFProgram : public Program<
     LineLayoutAttributes,
     gl::Uniforms<
         uniforms::u_matrix,
-        uniforms::u_width,
         uniforms::u_ratio,
         uniforms::u_gl_units_to_pixels,
         uniforms::u_patternscale_a,
@@ -157,7 +153,6 @@ public:
                                        const std::array<float, 2>& pixelsToGLUnits,
                                        const LinePatternPos& posA,
                                        const LinePatternPos& posB,
-                                       float dashLineWidth,
                                        float atlasWidth);
 };
 
