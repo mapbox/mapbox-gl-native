@@ -324,7 +324,7 @@ template <class Shaders,
           class Primitive,
           class LayoutAttrs,
           class Uniforms,
-          class PaintProperties>
+          class PaintProps>
 class SymbolProgram {
 public:
     using LayoutAttributes = LayoutAttrs;
@@ -332,6 +332,7 @@ public:
     
     using LayoutAndSizeAttributes = gl::ConcatenateAttributes<LayoutAttributes, SymbolSizeAttributes>;
 
+    using PaintProperties = PaintProps;
     using PaintPropertyBinders = typename PaintProperties::Binders;
     using PaintAttributes = typename PaintPropertyBinders::Attributes;
     using Attributes = gl::ConcatenateAttributes<LayoutAndSizeAttributes, PaintAttributes>;

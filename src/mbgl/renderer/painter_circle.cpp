@@ -23,7 +23,7 @@ void Painter::renderCircle(PaintParameters& parameters,
     const CirclePaintProperties::Evaluated& properties = layer.evaluated;
     const bool scaleWithMap = properties.get<CirclePitchScale>() == CirclePitchScaleType::Map;
 
-    parameters.programs.circle.draw(
+    parameters.programs.circle.get(properties).draw(
         context,
         gl::Triangles(),
         depthModeForSublayer(0, gl::DepthMode::ReadOnly),

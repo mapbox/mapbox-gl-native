@@ -24,7 +24,7 @@ void Painter::renderLine(PaintParameters& parameters,
     const LinePaintProperties::Evaluated& properties = layer.evaluated;
 
     auto draw = [&] (auto& program, auto&& uniformValues) {
-        program.draw(
+        program.get(properties).draw(
             context,
             gl::Triangles(),
             depthModeForSublayer(0, gl::DepthMode::ReadOnly),

@@ -8,7 +8,7 @@ namespace mbgl {
 void Painter::renderClippingMask(const UnwrappedTileID& tileID, const ClipID& clip) {
     static const style::FillPaintProperties::Evaluated properties {};
     static const FillProgram::PaintPropertyBinders paintAttibuteData(properties, 0);
-    programs->fill.draw(
+    programs->fill.get(properties).draw(
         context,
         gl::Triangles(),
         gl::DepthMode::disabled(),

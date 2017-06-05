@@ -74,7 +74,7 @@ struct FrameData {
 
 class Painter : private util::noncopyable {
 public:
-    Painter(gl::Context&, const TransformState&, float pixelRatio, const std::string& programCacheDir);
+    Painter(gl::Context&, const TransformState&, float pixelRatio, const optional<std::string>& programCacheDir);
     ~Painter();
 
     void render(const style::Style&,

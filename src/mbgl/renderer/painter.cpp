@@ -93,7 +93,7 @@ static gl::VertexVector<ExtrusionTextureLayoutVertex> extrusionTextureVertices()
 Painter::Painter(gl::Context& context_,
                  const TransformState& state_,
                  float pixelRatio,
-                 const std::string& programCacheDir)
+                 const optional<std::string>& programCacheDir)
     : context(context_),
       state(state_),
       tileVertexBuffer(context.createVertexBuffer(tileVertices())),
