@@ -55,10 +55,10 @@ public:
                 shaders::vertexSource(programParameters, vertexSource_);
             const std::string fragmentSource =
                 shaders::fragmentSource(programParameters, fragmentSource_);
-            const std::string cachePath =
-                shaders::programCachePath(programParameters, name);
             const std::string identifier =
                 shaders::programIdentifier(vertexSource, fragmentSource_);
+
+            const std::string cachePath = programParameters.cachePath(name);
 
             try {
                 if (auto cachedBinaryProgram = util::readFile(cachePath)) {
