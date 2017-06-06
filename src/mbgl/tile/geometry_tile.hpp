@@ -111,6 +111,7 @@ private:
     std::unique_ptr<CollisionTile> collisionTile;
     
     util::Throttler placementThrottler;
+    float lastYStretch;
 };
 
 } // namespace mbgl
