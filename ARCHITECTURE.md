@@ -57,15 +57,49 @@ The "Style" component of mapbox-gl-native contains an implementation of the [Map
 
 In addition to supporting styles loaded from a URL, mapbox-gl-native includes a runtime styling API, which allows users to dynamically modify the current style: add and remove layers, modify layer properties, and so on. As appropriate for a C++ API, the runtime styling API API is _strongly typed_: there are subclasses for each layer type, with correctly-typed accessors for each style property. This results in a large API surface area. Fortunately, this is automated, by generating the API – and the regular portion of the implementation – from the style specification.
 
-The layers API makes a distinction between public API and internal implementation using [the `Impl` idiom](https://github.com/mapbox/mapbox-gl-native/issues/3254) seen elsewhere in the codebase. Here, it takes the form of two parallel class hierarchies:
+The layers API makes a distinction between public API and internal implementation using [the `Impl` idiom](https://github.com/mapbox/mapbox-gl-native/issues/3254) seen elsewhere in the codebase. Here, it takes the form of parallel class hierarchies:
 
-* `Layer` and its subclasses form the public API.
-* `Layer::Impl` and its subclasses form the internal API.
+* `Layer`, `Source`, and their subclasses form the public API. This is the API consumed by SDK bindings.
+* `Layer::Impl`, `Source::Impl`, and their subclasses form the internal API. This API is used only by other parts of the core C++ implementation.
 
-As well as forming the boundary between public and internal, these two class hierarchies form the boundary between generated code and handwritten code. Except for `CustomLayer` and `CustomLayer::Impl`:
+For each subclass of `Layer` or source, there's a corresponding `Impl` subclass. For example, `CircleLayer` and `CircleLayer::Impl`. The base `Layer` class holds a reference to the base `Layer::Impl`, and `CircleLayer` and other subclasses have an `impl()` accessor method that casts this reference to the appropriate subtype.
 
-* `Layer` subclasses are entirely generated. (`Layer` itself is handwritten.)
-* `Layer::Impl` and its subclasses are entirely handwritten.
+## Immutability
+
+The `Layer::Impl` and `Source::Impl` reference held by `Layer` and `Source` base classes is _immutable_: it's a shared reference to a `const` (read only) pointer. Immutability permits the `Impl` objects to be shared safely between threads when needed -- for example, between the main thread and worker thread that performs computation in the background, or between the main thread and a dedicated renderer thread. See the "Threading" section below for further details on the threading model.
+
+Immutability is an alternative to several other strategies for safe intra-thread communication. One alternative strategy is to insert locks whenever data is shared between threads and at least one thread may be modifying the data. This strategy is prone to problems such as race conditions (if you forget to use a lock), deadlocks (if locks are acquired in conflicting orders), and poor performance due to lock contention. Another strategy is to copy data whenever it's needed by another thread. For complex structures such as a Mapbox Style, copying can be an expensive operation. With immutability, the approach is to share data without copying, but ensure that any data so shared cannot be modified by any thread, and that the data is not destroyed until the last thread using it relinquishes its reference.
+
+Immutability is implemented by the `Immutable<T>` template, which acts as a non-nullable shared reference to a `const T`. It has behavior similar to `std::shared_ptr<const T>`, but indicates its intent as an immutable reference that is safe to share between threads.
+
+Immutability is core to the implementation, and yet one of the defining features of Mapbox GL is the ability to manipulate and mutate the style freely at runtime. How can this be possible if everything is immutable? The answer turns on the distinction mentioned in the previous section between public classes such as `Layer` and private implementations such as `Layer::Impl`. In Mapbox GL, the latter is immutable, but the former is not:
+
+* **Mutable objects**: `Layer`, `Source`, `Image`, `Light`
+* **Immutable objects**: `Layer::Impl`, `Source::Impl`, `Image::Impl`, `Light::Impl`
+
+An instance of a `Layer` subclass such as `CircleLayer` has a reference to an `Immutable<Layer::Impl>`, but is itself mutable -- it has mutating methods such as `setCircleRadius`. Such methods follow a common pattern:
+
+* Create a new instance of the Impl, copied from the existing Impl. This new instance is temporarily mutable.
+* Modify this new instance as needed; e.g. set the radius to a new value.
+* "Freeze" the new instance by making it immutable, and then assign that immutable reference to be the new Impl for the `Layer`.
+
+Two things to note about this process:
+
+* No existing Impls are modified -- only the newly created copy.
+* Only one existing reference to an Impl is modified -- the one held by the `Layer` instance being mutated. Any references to the previous Impl held by other threads remain unchanged. They go on using the previous value for radius until notified by some other means that there has been a change.
+
+So how do things that are holding references to the previous Impl get notified? The answer is **style diffing**. This is the process by which we determine, from one frame to the next, what parts of the style have changed and therefore what needs to be recalculated in response to those changes in order to draw an updated frame. In parallel to style objects such as `Style`, `Layer`, `Source` and so on, Mapbox GL maintains render objects such as `RenderStyle`, `RenderLayer`, `RenderSource` and so on. These render objects:
+
+* are mutable
+* may live on either the main thread or an independent rendering thread, depending on the SDK
+* contain any and all values calculated from the style objects plus state such as the current zoom level and location -- for example, the set of loaded tiles and the buckets calculated from them
+
+From one frame to the next, these render objects are updated based on the current state of the style objects. In order to permit the render objects to live on a different thread, this state is communicated as immutable Impl references -- in effect, a snapshot of the style state at the time the frame was requested. And it really is a just snapshot -- we don't communicate things like "the radius of this circle layer was changed", "this layer was removed", etc. Instead, that information is reconstructed by `RenderStyle` by comparing the new snapshot to the old snapshot. Immutability allows us to perform this comparison very efficiently:
+
+* If the "before" and "after" of two immutable references refer to the same object, we know that it hasn't changed. If they're different, we know it has changed in some way.
+* We can calculate changes in collections of immutable references (a list of layers or sources) using an efficient [diff algorithm](http://www.xmailserver.org/diff2.pdf). We can further improve this efficiency by making the collections themselves immutable, so that we can avoid running the diff algorithm altogether in the common case where the "before" and "after" collections refer to the same immutable object.
+
+One final benefit of this approach of diffing immutable objects: we get "smart" updates between two completely independent styles essentially for free. For example, `RenderStyle` doesn't care if the "before" snapshot is from the Mapbox Light style and the "after" snapshot is from the Mapbox Dark style. It will just calculate the difference between the two snapshots, update render data where necessary, and render the next frame. Since those two styles use the same source data and layer IDs, the result will be a fully automatic, seamless transition between light and dark.
 
 ## FileSource
 ## Layout
