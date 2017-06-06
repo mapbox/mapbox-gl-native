@@ -8,6 +8,7 @@ import android.support.test.espresso.ViewAction;
 import android.support.test.runner.AndroidJUnit4;
 import android.view.View;
 
+import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.style.layers.CannotAddLayerException;
 import com.mapbox.mapboxsdk.style.layers.CircleLayer;
 import com.mapbox.mapboxsdk.style.layers.FillLayer;
@@ -20,6 +21,7 @@ import com.mapbox.mapboxsdk.style.sources.RasterSource;
 import com.mapbox.mapboxsdk.style.sources.Source;
 import com.mapbox.mapboxsdk.style.sources.VectorSource;
 import com.mapbox.mapboxsdk.testapp.R;
+import com.mapbox.mapboxsdk.testapp.action.MapboxMapAction;
 import com.mapbox.mapboxsdk.testapp.activity.BaseActivityTest;
 import com.mapbox.mapboxsdk.testapp.activity.style.RuntimeStyleTestActivity;
 
@@ -39,6 +41,7 @@ import timber.log.Timber;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
+import static com.mapbox.mapboxsdk.testapp.action.MapboxMapAction.invoke;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -188,39 +191,89 @@ public class RuntimeStyleTests extends BaseActivityTest {
   @Test
   public void testAddRemoveSource() {
     validateTestSetup();
-    mapboxMap.addSource(new VectorSource("my-source", "mapbox://mapbox.mapbox-terrain-v2"));
-    mapboxMap.removeSource("my-source");
+    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
+      @Override
+      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
+        mapboxMap.addSource(new VectorSource("my-source", "mapbox://mapbox.mapbox-terrain-v2"));
+        mapboxMap.removeSource("my-source");
 
-    onView(withId(R.id.mapView)).perform(new AddRemoveSourceAction());
+        // Add initial source
+        mapboxMap.addSource(new VectorSource("my-source", "mapbox://mapbox.mapbox-terrain-v2"));
+
+        // Remove
+        Source mySource = mapboxMap.removeSource("my-source");
+        assertNotNull(mySource);
+        assertNull(mapboxMap.getLayer("my-source"));
+
+        // Add
+        Source source = new VectorSource("my-source", "mapbox://mapbox.mapbox-terrain-v2");
+        mapboxMap.addSource(source);
+
+        // Remove, preserving the reference
+        mapboxMap.removeSource(source);
+
+        // Re-add the reference...
+        mapboxMap.addSource(source);
+
+        // Ensure it's there
+        Assert.assertNotNull(mapboxMap.getSource(source.getId()));
+
+        // Test adding a duplicate source
+        try {
+          Source source2 = new VectorSource("my-source", "mapbox://mapbox.mapbox-terrain-v2");
+          mapboxMap.addSource(source2);
+          fail("Should not have been allowed to add a source with a duplicate id");
+        } catch (CannotAddSourceException cannotAddSourceException) {
+          // OK
+        }
+      }
+    });
+
   }
 
   @Test
   public void testVectorSourceUrlGetter() {
     validateTestSetup();
-
-    VectorSource source = new VectorSource("my-source", "mapbox://mapbox.mapbox-terrain-v2");
-    mapboxMap.addSource(source);
-    assertEquals("mapbox://mapbox.mapbox-terrain-v2", source.getUrl());
+    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
+      @Override
+      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
+        VectorSource source = new VectorSource("my-source", "mapbox://mapbox.mapbox-terrain-v2");
+        mapboxMap.addSource(source);
+        assertEquals("mapbox://mapbox.mapbox-terrain-v2", source.getUrl());
+      }
+    });
   }
 
   @Test
   public void testRasterSourceUrlGetter() {
     validateTestSetup();
-
-    RasterSource source = new RasterSource("my-source", "mapbox://mapbox.mapbox-terrain-v2");
-    mapboxMap.addSource(source);
-    assertEquals("mapbox://mapbox.mapbox-terrain-v2", source.getUrl());
+    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
+      @Override
+      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
+        RasterSource source = new RasterSource("my-source", "mapbox://mapbox.mapbox-terrain-v2");
+        mapboxMap.addSource(source);
+        assertEquals("mapbox://mapbox.mapbox-terrain-v2", source.getUrl());
+      }
+    });
   }
 
   @Test
   public void testGeoJsonSourceUrlGetter() throws MalformedURLException {
     validateTestSetup();
-
-    GeoJsonSource source = new GeoJsonSource("my-source");
-    mapboxMap.addSource(source);
-    assertNull(source.getUrl());
-    source.setUrl(new URL("http://mapbox.com/my-file.json"));
-    assertEquals("http://mapbox.com/my-file.json", source.getUrl());
+    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
+      @Override
+      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
+        GeoJsonSource source = new GeoJsonSource("my-source");
+        mapboxMap.addSource(source);
+        assertNull(source.getUrl());
+        try {
+          source.setUrl(new URL("http://mapbox.com/my-file.json"));
+        } catch (MalformedURLException exception) {
+          fail();
+        }
+        assertEquals("http://mapbox.com/my-file.json", source.getUrl());
+      }
+    });
   }
 
   /**
@@ -281,42 +334,6 @@ public class RuntimeStyleTests extends BaseActivityTest {
         mapboxMap.addLayer(new FillLayer("building", "composite"));
         fail("Should not have been allowed to add a layer with a duplicate id");
       } catch (CannotAddLayerException cannotAddLayerException) {
-        // OK
-      }
-    }
-  }
-
-  private class AddRemoveSourceAction extends BaseViewAction {
-
-    @Override
-    public void perform(UiController uiController, View view) {
-      // Add initial source
-      mapboxMap.addSource(new VectorSource("my-source", "mapbox://mapbox.mapbox-terrain-v2"));
-
-      // Remove
-      Source mySource = mapboxMap.removeSource("my-source");
-      assertNotNull(mySource);
-      assertNull(mapboxMap.getLayer("my-source"));
-
-      // Add
-      Source source = new VectorSource("my-source", "mapbox://mapbox.mapbox-terrain-v2");
-      mapboxMap.addSource(source);
-
-      // Remove, preserving the reference
-      mapboxMap.removeSource(source);
-
-      // Re-add the reference...
-      mapboxMap.addSource(source);
-
-      // Ensure it's there
-      Assert.assertNotNull(mapboxMap.getSource(source.getId()));
-
-      // Test adding a duplicate source
-      try {
-        Source source2 = new VectorSource("my-source", "mapbox://mapbox.mapbox-terrain-v2");
-        mapboxMap.addSource(source2);
-        fail("Should not have been allowed to add a source with a duplicate id");
-      } catch (CannotAddSourceException cannotAddSourceException) {
         // OK
       }
     }

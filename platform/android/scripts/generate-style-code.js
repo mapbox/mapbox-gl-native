@@ -167,11 +167,11 @@ global.defaultValueJava = function(property) {
               case 'string':
                 return '[' + property['default'] + "]";
               case 'number':
-                var result ='new Float[]{';
+                var result ='new Float[] {';
                 for (var i = 0; i < property.length; i++) {
                     result += "0f";
                     if (i +1 != property.length) {
-                        result += ",";
+                        result += ", ";
                     }
                 }
                 return result + "}";
