@@ -701,6 +701,12 @@ public class MyLocationView extends View {
 
   private abstract class MyLocationBehavior {
 
+    MyLocationBehavior() {
+      if (latLng != null) {
+        locationUpdateTimestamp = SystemClock.elapsedRealtime();
+      }
+    }
+
     void updateLatLng(@NonNull Location newLocation) {
       location = newLocation;
     }
