@@ -122,6 +122,7 @@ private:
     std::unique_ptr<CollisionTile> collisionTile;
     
     util::Throttler placementThrottler;
+    float lastYStretch;
 
 public:
     optional<gl::Texture> glyphAtlasTexture;
