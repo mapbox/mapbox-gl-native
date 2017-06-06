@@ -235,16 +235,13 @@ void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &anima
         return std::log(std::sqrt(b * b + 1) - b);
     };
 
-    // When u₀ = u₁, the optimal path doesn’t require both ascent and descent.
-    bool isClose = std::abs(u1) < 0.000001;
-    // Perform a more or less instantaneous transition if the path is too short.
-    if (isClose && std::abs(w0 - w1) < 0.000001) {
-        easeTo(camera, animation);
-        return;
-    }
-
     /// r₀: Zoom-out factor during ascent.
     double r0 = r(0);
+    double r1 = r(1);
+
+    // When u₀ = u₁, the optimal path doesn’t require both ascent and descent.
+    bool isClose = std::abs(u1) < 1.0 || !std::isfinite(r0) || !std::isfinite(r1);
+
     /** w(s): Returns the visible span on the ground, measured in pixels with
         respect to the initial scale.
 
@@ -262,7 +259,7 @@ void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &anima
     };
     /// S: Total length of the flight path, measured in ρ-screenfuls.
     double S = (isClose ? (std::abs(std::log(w1 / w0)) / rho)
-                : ((r(1) - r0) / rho));
+                : ((r1 - r0) / rho));
 
     Duration duration;
     if (animation.duration) {
@@ -290,7 +287,7 @@ void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &anima
         /// s: The distance traveled along the flight path, measured in
         /// ρ-screenfuls.
         double s = k * S;
-        double us = u(s);
+        double us = k == 1.0 ? 1.0 : u(s);
 
         // Calculate the current point and zoom level along the flight path.
         Point<double> framePoint = util::interpolate(startPoint, endPoint, us);
