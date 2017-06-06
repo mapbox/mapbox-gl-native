@@ -67,8 +67,6 @@ public class MapView extends FrameLayout {
 
   private MapboxMap mapboxMap;
   private MapCallback mapCallback;
-  private boolean onStartCalled;
-  private boolean onStopCalled;
 
   private MapGestureDetector mapGestureDetector;
   private MapKeyListener mapKeyListener;
@@ -233,7 +231,6 @@ public class MapView extends FrameLayout {
    */
   @UiThread
   public void onStart() {
-    onStartCalled = true;
     mapboxMap.onStart();
     ConnectivityReceiver.instance(getContext()).activate();
   }
@@ -243,11 +240,7 @@ public class MapView extends FrameLayout {
    */
   @UiThread
   public void onResume() {
-    if (!onStartCalled) {
-      // TODO: 26/10/16, can be removed after 5.0.0 release
-      throw new IllegalStateException("MapView#onStart() was not called. "
-        + "You must call this method from the parent's {@link Activity#onStart()} or {@link Fragment#onStart()}.");
-    }
+    // replaced by onStart in v5.0.0
   }
 
   /**
@@ -255,7 +248,7 @@ public class MapView extends FrameLayout {
    */
   @UiThread
   public void onPause() {
-    // replaced by onStop in v5.0.0, keep around for future development
+    // replaced by onStop in v5.0.0
   }
 
   /**
@@ -263,7 +256,6 @@ public class MapView extends FrameLayout {
    */
   @UiThread
   public void onStop() {
-    onStopCalled = true;
     mapboxMap.onStop();
     ConnectivityReceiver.instance(getContext()).deactivate();
   }
@@ -273,12 +265,6 @@ public class MapView extends FrameLayout {
    */
   @UiThread
   public void onDestroy() {
-    if (!onStopCalled) {
-      // TODO: 26/10/16, can be removed after 5.0.0 release
-      throw new IllegalStateException("MapView#onStop() was not called. "
-        + "You must call this method from the parent's {@link Activity#onStop()} or {@link Fragment#onStop()}.");
-    }
-
     destroyed = true;
     nativeMapView.terminateContext();
     nativeMapView.terminateDisplay();
