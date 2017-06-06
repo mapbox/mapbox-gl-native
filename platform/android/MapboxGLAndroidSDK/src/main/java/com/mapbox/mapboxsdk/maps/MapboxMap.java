@@ -141,12 +141,20 @@ public final class MapboxMap {
    */
   void onRestoreInstanceState(Bundle savedInstanceState) {
     final CameraPosition cameraPosition = savedInstanceState.getParcelable(MapboxConstants.STATE_CAMERA_POSITION);
-    if (cameraPosition != null) {
-      moveCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition.Builder(cameraPosition).build()));
-    }
 
     uiSettings.onRestoreInstanceState(savedInstanceState);
     trackingSettings.onRestoreInstanceState(savedInstanceState);
+
+    if (cameraPosition != null) {
+      easeCamera(CameraUpdateFactory.newCameraPosition(
+        new CameraPosition.Builder(cameraPosition).build()),
+        0,
+        false,
+        null,
+        !trackingSettings.isLocationTrackingDisabled()
+      );
+    }
+
     nativeMapView.setDebug(savedInstanceState.getBoolean(MapboxConstants.STATE_DEBUG_ACTIVE));
 
     final String styleUrl = savedInstanceState.getString(MapboxConstants.STATE_STYLE_URL);
