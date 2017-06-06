@@ -146,7 +146,7 @@ public final class MapboxMap {
     trackingSettings.onRestoreInstanceState(savedInstanceState);
 
     if (cameraPosition != null) {
-      moveCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition.Builder(cameraPosition).build()), null, trackingSettings.isLocationTrackingDisabled());
+      easeCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition.Builder(cameraPosition).build()), 0, false, null, !trackingSettings.isLocationTrackingDisabled());
     }
 
     nativeMapView.setDebug(savedInstanceState.getBoolean(MapboxConstants.STATE_DEBUG_ACTIVE));
@@ -645,29 +645,7 @@ public final class MapboxMap {
     new Handler().post(new Runnable() {
       @Override
       public void run() {
-        transform.moveCamera(MapboxMap.this, update, callback, true);
-        // MapChange.REGION_DID_CHANGE_ANIMATED is not called for `jumpTo`
-        // invalidate camera position to provide OnCameraChange event.
-        invalidateCameraPosition();
-      }
-    });
-  }
-
-  /**
-   * Repositions the camera according to the instructions defined in the update.
-   * The move is instantaneous, and a subsequent getCameraPosition() will reflect the new position.
-   * See CameraUpdateFactory for a set of updates.
-   *
-   * @param update             The change that should be applied to the camera
-   * @param callback           the callback to be invoked when an animation finishes or is canceled
-   * @param canDismissTracking you can specify whether this move can reset location tracking or not
-   */
-  @UiThread
-  public final void moveCamera(final CameraUpdate update, final MapboxMap.CancelableCallback callback, final boolean canDismissTracking) {
-    new Handler().post(new Runnable() {
-      @Override
-      public void run() {
-        transform.moveCamera(MapboxMap.this, update, callback, canDismissTracking);
+        transform.moveCamera(MapboxMap.this, update, callback);
         // MapChange.REGION_DID_CHANGE_ANIMATED is not called for `jumpTo`
         // invalidate camera position to provide OnCameraChange event.
         invalidateCameraPosition();
