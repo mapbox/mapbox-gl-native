@@ -79,7 +79,7 @@ final class Transform implements MapView.OnMapChangedListener {
 
   @Override
   public void onMapChanged(@MapView.MapChange int change) {
-    if (change == REGION_DID_CHANGE_ANIMATED && cameraCancelableCallback != null) {
+    if (change == REGION_DID_CHANGE_ANIMATED) {
       updateCameraPosition(invalidateCameraPosition());
       if (cameraCancelableCallback != null) {
         cameraCancelableCallback.onFinish();
@@ -116,8 +116,8 @@ final class Transform implements MapView.OnMapChangedListener {
 
       if (callback != null) {
         cameraCancelableCallback = callback;
-        mapView.addOnMapChangedListener(this);
       }
+      mapView.addOnMapChangedListener(this);
       mapView.easeTo(cameraPosition.bearing, cameraPosition.target, durationMs, cameraPosition.tilt,
         cameraPosition.zoom, easingInterpolator);
     }
@@ -134,9 +134,8 @@ final class Transform implements MapView.OnMapChangedListener {
 
       if (callback != null) {
         cameraCancelableCallback = callback;
-        mapView.addOnMapChangedListener(this);
       }
-
+      mapView.addOnMapChangedListener(this);
       mapView.flyTo(cameraPosition.bearing, cameraPosition.target, durationMs, cameraPosition.tilt,
         cameraPosition.zoom);
     }
