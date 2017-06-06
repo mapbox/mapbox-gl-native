@@ -346,7 +346,6 @@ final class MapGestureDetector {
         // and ignore when a scale gesture has occurred
         return false;
       }
-      cameraChangeDispatcher.onCameraMoveStarted(REASON_API_GESTURE);
 
       float screenDensity = uiSettings.getPixelRatio();
 
@@ -361,6 +360,8 @@ final class MapGestureDetector {
 
       // cancel any animation
       transform.cancelTransitions();
+
+      cameraChangeDispatcher.onCameraMoveStarted(REASON_API_GESTURE);
 
       // tilt results in a bigger translation, limiting input for #5281
       double tilt = transform.getTilt();
