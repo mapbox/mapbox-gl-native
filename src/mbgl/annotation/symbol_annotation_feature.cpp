@@ -1,4 +1,4 @@
-#include <mbgl/annotation/symbol_annotation_impl.hpp>
+#include <mbgl/annotation/symbol_annotation_feature.hpp>
 #include <mbgl/annotation/annotation_tile.hpp>
 #include <mbgl/tile/tile_id.hpp>
 #include <mbgl/math/clamp.hpp>
@@ -6,12 +6,12 @@
 
 namespace mbgl {
 
-SymbolAnnotationImpl::SymbolAnnotationImpl(AnnotationID id_, SymbolAnnotation annotation_)
-: id(id_),
-  annotation(std::move(annotation_)) {
+SymbolAnnotationFeature::SymbolAnnotationFeature(const AnnotationID& id_, const SymbolAnnotation& annotation_)
+        : id(id_)
+        , annotation(std::move(annotation_)) {
 }
 
-void SymbolAnnotationImpl::updateLayer(const CanonicalTileID& tileID, AnnotationTileLayer& layer) const {
+void SymbolAnnotationFeature::updateTileLayer(const CanonicalTileID& tileID, AnnotationTileLayer& layer) const {
     std::unordered_map<std::string, std::string> featureProperties;
     featureProperties.emplace("sprite", annotation.icon.empty() ? std::string("default_marker") : annotation.icon);
 

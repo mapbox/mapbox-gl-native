@@ -236,14 +236,6 @@ void Map::Impl::render(View& view) {
 
     transform.updateTransitions(timePoint);
 
-    if (style->loaded && updateFlags & Update::AnnotationStyle) {
-        annotationManager.updateStyle(*style);
-    }
-
-    if (updateFlags & Update::AnnotationData) {
-        annotationManager.updateData();
-    }
-
     renderStyle->update({
         mode,
         pixelRatio,
@@ -258,8 +250,7 @@ void Map::Impl::render(View& view) {
         style->getSourceImpls(),
         style->getLayerImpls(),
         scheduler,
-        fileSource,
-        annotationManager
+        fileSource
     });
 
     updateFlags = Update::Nothing;
@@ -415,8 +406,6 @@ void Map::Impl::loadStyleJSON(const std::string& json) {
         map.setBearing(map.getDefaultBearing());
         map.setPitch(map.getDefaultPitch());
     }
-
-    onUpdate(Update::AnnotationStyle);
 }
 
 std::string Map::getStyleURL() const {
@@ -804,12 +793,10 @@ LatLng Map::latLngForPixel(const ScreenCoordinate& pixel) const {
 
 void Map::addAnnotationImage(std::unique_ptr<style::Image> image) {
     impl->annotationManager.addImage(std::move(image));
-    impl->onUpdate(Update::AnnotationStyle);
 }
 
 void Map::removeAnnotationImage(const std::string& id) {
     impl->annotationManager.removeImage(id);
-    impl->onUpdate(Update::AnnotationStyle);
 }
 
 double Map::getTopOffsetPixelsForAnnotationImage(const std::string& id) {
@@ -818,17 +805,15 @@ double Map::getTopOffsetPixelsForAnnotationImage(const std::string& id) {
 
 AnnotationID Map::addAnnotation(const Annotation& annotation) {
     auto result = impl->annotationManager.addAnnotation(annotation, getMaxZoom());
-    impl->onUpdate(Update::AnnotationStyle | Update::AnnotationData);
     return result;
 }
 
 void Map::updateAnnotation(AnnotationID id, const Annotation& annotation) {
-    impl->onUpdate(impl->annotationManager.updateAnnotation(id, annotation, getMaxZoom()));
+    impl->annotationManager.updateAnnotation(id, annotation, getMaxZoom());
 }
 
 void Map::removeAnnotation(AnnotationID annotation) {
     impl->annotationManager.removeAnnotation(annotation);
-    impl->onUpdate(Update::AnnotationStyle | Update::AnnotationData);
 }
 
 #pragma mark - Feature query api
@@ -1116,6 +1101,7 @@ void Map::Impl::onInvalidate() {
 }
 
 void Map::Impl::onStyleLoaded() {
+    annotationManager.onStyleLoaded(*style);
     observer.onDidFinishLoadingStyle();
 }
 

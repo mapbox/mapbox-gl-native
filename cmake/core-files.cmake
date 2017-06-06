@@ -22,6 +22,8 @@ set(MBGL_CORE_FILES
     src/mbgl/annotation/annotation_manager.hpp
     src/mbgl/annotation/annotation_source.cpp
     src/mbgl/annotation/annotation_source.hpp
+    src/mbgl/annotation/annotation_source_impl.cpp
+    src/mbgl/annotation/annotation_source_impl.hpp
     src/mbgl/annotation/annotation_tile.cpp
     src/mbgl/annotation/annotation_tile.hpp
     src/mbgl/annotation/fill_annotation_impl.cpp
@@ -30,10 +32,12 @@ set(MBGL_CORE_FILES
     src/mbgl/annotation/line_annotation_impl.hpp
     src/mbgl/annotation/render_annotation_source.cpp
     src/mbgl/annotation/render_annotation_source.hpp
+    src/mbgl/annotation/shape_annotation_feature.cpp
+    src/mbgl/annotation/shape_annotation_feature.hpp
     src/mbgl/annotation/shape_annotation_impl.cpp
     src/mbgl/annotation/shape_annotation_impl.hpp
-    src/mbgl/annotation/symbol_annotation_impl.cpp
-    src/mbgl/annotation/symbol_annotation_impl.hpp
+    src/mbgl/annotation/symbol_annotation_feature.cpp
+    src/mbgl/annotation/symbol_annotation_feature.hpp
 
     # csscolorparser
     src/csscolorparser/csscolorparser.cpp

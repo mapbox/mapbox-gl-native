@@ -3,7 +3,6 @@
 #include <mbgl/renderer/sources/render_geojson_source.hpp>
 #include <mbgl/renderer/sources/render_raster_source.hpp>
 #include <mbgl/renderer/sources/render_vector_source.hpp>
-#include <mbgl/renderer/tile_parameters.hpp>
 #include <mbgl/annotation/render_annotation_source.hpp>
 #include <mbgl/renderer/sources/render_image_source.hpp>
 #include <mbgl/tile/tile.hpp>

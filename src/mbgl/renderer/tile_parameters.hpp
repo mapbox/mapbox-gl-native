@@ -19,7 +19,6 @@ public:
     Scheduler& workerScheduler;
     FileSource& fileSource;
     const MapMode mode;
-    AnnotationManager& annotationManager;
     SpriteAtlas& spriteAtlas;
     GlyphAtlas& glyphAtlas;
 };

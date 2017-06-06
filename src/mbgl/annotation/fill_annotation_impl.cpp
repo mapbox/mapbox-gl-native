@@ -7,9 +7,13 @@ namespace mbgl {
 
 using namespace style;
 
-FillAnnotationImpl::FillAnnotationImpl(AnnotationID id_, FillAnnotation annotation_, uint8_t maxZoom_)
-    : ShapeAnnotationImpl(id_, maxZoom_),
-      annotation({ ShapeAnnotationGeometry::visit(annotation_.geometry, CloseShapeAnnotation{}), annotation_.opacity, annotation_.color, annotation_.outlineColor }) {
+FillAnnotationImpl::FillAnnotationImpl(const AnnotationID& id_,
+                                       const FillAnnotation &annotation_,
+                                       const uint8_t maxZoom_)
+        : ShapeAnnotationImpl(id_, maxZoom_)
+        , opacity(annotation_.opacity)
+        , color(annotation_.color)
+        , outlineColor(annotation_.outlineColor) {
 }
 
 void FillAnnotationImpl::updateStyle(Style& style) const {
@@ -21,14 +25,10 @@ void FillAnnotationImpl::updateStyle(Style& style) const {
         layer = style.addLayer(std::move(newLayer), AnnotationManager::PointLayerID);
     }
 
-    auto* fillLayer = layer->as<FillLayer>();
-    fillLayer->setFillOpacity(annotation.opacity);
-    fillLayer->setFillColor(annotation.color);
-    fillLayer->setFillOutlineColor(annotation.outlineColor);
-}
-
-const ShapeAnnotationGeometry& FillAnnotationImpl::geometry() const {
-    return annotation.geometry;
+    auto *fillLayer = layer->as<FillLayer>();
+    fillLayer->setFillOpacity(opacity);
+    fillLayer->setFillColor(color);
+    fillLayer->setFillOutlineColor(outlineColor);
 }
 
 } // namespace mbgl

@@ -28,7 +28,6 @@ public:
 
     Scheduler& scheduler;
     FileSource& fileSource;
-    AnnotationManager& annotationManager;
 };
 
 } // namespace mbgl

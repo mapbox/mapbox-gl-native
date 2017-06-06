@@ -1,28 +1,44 @@
 #pragma once
 
+#include <mbgl/annotation/annotation.hpp>
 #include <mbgl/style/source.hpp>
-#include <mbgl/style/source_impl.hpp>
+
+#include <memory>
 
 namespace mbgl {
 
+class ShapeAnnotationFeature;
+class SymbolAnnotationFeature;
+
 class AnnotationSource : public style::Source {
 public:
-    AnnotationSource();
-
     class Impl;
+
+    AnnotationSource();
+    AnnotationSource(Immutable<Impl>);
+
+    Immutable<Impl> addAnnotation(const AnnotationID&, ShapeAnnotationGeometry, const uint8_t maxZoom);
+    Immutable<Impl> addAnnotation(const AnnotationID&, const SymbolAnnotation&);
+
+    Immutable<Impl> updateAnnotation(const AnnotationID&,
+                                     ShapeAnnotationGeometry,
+                                     const uint8_t);
+    Immutable<Impl> updateAnnotation(const AnnotationID&, const SymbolAnnotation&);
+
+    Immutable<Impl> removeAnnotation(const AnnotationID&);
+
     const Impl& impl() const;
 
-private:
     void loadDescription(FileSource&) final;
 
-    Mutable<Impl> mutableImpl() const;
 };
 
-class AnnotationSource::Impl : public style::Source::Impl {
-public:
-    Impl();
+namespace style {
 
-    optional<std::string> getAttribution() const final;
-};
+template<>
+inline bool Source::is<AnnotationSource>() const {
+    return getType() == SourceType::Annotations;
+}
 
+} // namespace style
 } // namespace mbgl

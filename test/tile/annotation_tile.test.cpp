@@ -10,7 +10,6 @@
 #include <mbgl/map/query.hpp>
 #include <mbgl/text/collision_tile.hpp>
 #include <mbgl/geometry/feature_index.hpp>
-#include <mbgl/annotation/annotation_manager.hpp>
 #include <mbgl/annotation/annotation_tile.hpp>
 #include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/text/glyph_atlas.hpp>
@@ -25,7 +24,6 @@ public:
     TransformState transformState;
     util::RunLoop loop;
     ThreadPool threadPool { 1 };
-    AnnotationManager annotationManager;
     RenderStyle style { threadPool, fileSource };
     SpriteAtlas spriteAtlas;
     GlyphAtlas glyphAtlas { { 512, 512, }, fileSource };
@@ -37,7 +35,6 @@ public:
         threadPool,
         fileSource,
         MapMode::Continuous,
-        annotationManager,
         spriteAtlas,
         glyphAtlas
     };
@@ -46,7 +43,7 @@ public:
 // Don't query stale collision tile
 TEST(AnnotationTile, Issue8289) {
     AnnotationTileTest test;
-    AnnotationTile tile(OverscaledTileID(0, 0, 0), test.tileParameters);
+    AnnotationTile tile(OverscaledTileID(0, 0, 0), test.tileParameters, std::make_unique<AnnotationTileData>());
 
     auto data = std::make_unique<AnnotationTileData>();
     data->layers.emplace("test", AnnotationTileLayer("test"));

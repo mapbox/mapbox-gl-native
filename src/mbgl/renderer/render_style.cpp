@@ -99,7 +99,6 @@ void RenderStyle::update(const UpdateParameters& parameters) {
         parameters.scheduler,
         parameters.fileSource,
         parameters.mode,
-        parameters.annotationManager,
         *spriteAtlas,
         *glyphAtlas
     };

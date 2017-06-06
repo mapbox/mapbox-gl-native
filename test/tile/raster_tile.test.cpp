@@ -6,7 +6,6 @@
 #include <mbgl/util/default_thread_pool.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/map/transform.hpp>
-#include <mbgl/annotation/annotation_manager.hpp>
 #include <mbgl/renderer/tile_parameters.hpp>
 #include <mbgl/renderer/buckets/raster_bucket.hpp>
 #include <mbgl/sprite/sprite_atlas.hpp>
@@ -20,7 +19,6 @@ public:
     TransformState transformState;
     util::RunLoop loop;
     ThreadPool threadPool { 1 };
-    AnnotationManager annotationManager;
     SpriteAtlas spriteAtlas;
     GlyphAtlas glyphAtlas { { 512, 512, }, fileSource };
     Tileset tileset { { "https://example.com" }, { 0, 22 }, "none" };
@@ -32,7 +30,6 @@ public:
         threadPool,
         fileSource,
         MapMode::Continuous,
-        annotationManager,
         spriteAtlas,
         glyphAtlas
     };
