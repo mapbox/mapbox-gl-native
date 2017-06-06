@@ -146,7 +146,13 @@ public final class MapboxMap {
     trackingSettings.onRestoreInstanceState(savedInstanceState);
 
     if (cameraPosition != null) {
-      easeCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition.Builder(cameraPosition).build()), 0, false, null, !trackingSettings.isLocationTrackingDisabled());
+      easeCamera(CameraUpdateFactory.newCameraPosition(
+        new CameraPosition.Builder(cameraPosition).build()),
+        0,
+        false,
+        null,
+        !trackingSettings.isLocationTrackingDisabled()
+      );
     }
 
     nativeMapView.setDebug(savedInstanceState.getBoolean(MapboxConstants.STATE_DEBUG_ACTIVE));
