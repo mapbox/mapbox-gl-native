@@ -461,7 +461,8 @@ public class MyLocationView extends View {
     this.location = location;
     myLocationBehavior.updateLatLng(location);
 
-    if (myBearingTrackingMode == MyBearingTracking.GPS && myLocationTrackingMode == MyLocationTracking.TRACKING_NONE) {
+    if (mapboxMap != null &&
+      myBearingTrackingMode == MyBearingTracking.GPS && myLocationTrackingMode == MyLocationTracking.TRACKING_NONE) {
       setBearing(mapboxMap.getCameraPosition().bearing);
     }
   }
