@@ -52,7 +52,8 @@ typedef NS_ENUM(NSInteger, MBXSettingsAnnotationsRows) {
 };
 
 typedef NS_ENUM(NSInteger, MBXSettingsRuntimeStylingRows) {
-    MBXSettingsRuntimeStylingWater = 0,
+    MBXSettingsRuntimeStylingBuildingExtrusions = 0,
+    MBXSettingsRuntimeStylingWater,
     MBXSettingsRuntimeStylingRoads,
     MBXSettingsRuntimeStylingRaster,
     MBXSettingsRuntimeStylingShape,
@@ -324,6 +325,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
             break;
         case MBXSettingsRuntimeStyling:
             [settingsTitles addObjectsFromArray:@[
+                @"Add Building Extrusions",
                 @"Style Water With Function",
                 @"Style Roads With Function",
                 @"Add Raster & Apply Function",
@@ -523,6 +525,9 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
         case MBXSettingsRuntimeStyling:
             switch (indexPath.row)
             {
+                case MBXSettingsRuntimeStylingBuildingExtrusions:
+                    [self styleBuildingExtrusions];
+                    break;
                 case MBXSettingsRuntimeStylingWater:
                     [self styleWaterLayer];
                     break;
@@ -858,6 +863,38 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     [self.mapView addAnnotations:annotations];
 
     [self.mapView showAnnotations:annotations animated:YES];
+}
+
+- (void)styleBuildingExtrusions
+{
+    MGLSource* source = [self.mapView.style sourceWithIdentifier:@"composite"];
+    if (source) {
+
+        MGLFillExtrusionStyleLayer* layer = [[MGLFillExtrusionStyleLayer alloc] initWithIdentifier:@"extrudedBuildings" source:source];
+        layer.sourceLayerIdentifier = @"building";
+        layer.predicate = [NSPredicate predicateWithFormat:@"extrude == 'true' AND height > 0"];
+        layer.fillExtrusionBase = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeIdentity sourceStops:nil attributeName:@"min_height" options:nil];
+        layer.fillExtrusionHeight = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeIdentity sourceStops:nil attributeName:@"height" options:nil];
+
+        // Set the fill color to that of the existing building footprint layer, if it exists.
+        MGLFillStyleLayer* buildingLayer = (MGLFillStyleLayer*)[self.mapView.style layerWithIdentifier:@"building"];
+        if (buildingLayer) {
+            if (buildingLayer.fillColor) {
+                layer.fillExtrusionColor = buildingLayer.fillColor;
+            } else {
+                layer.fillExtrusionColor = [MGLStyleValue valueWithRawValue:[UIColor whiteColor]];
+            }
+
+            layer.fillExtrusionOpacity = [MGLStyleValue<NSNumber *> valueWithRawValue:@0.75];
+        }
+
+        MGLStyleLayer* labelLayer = [self.mapView.style layerWithIdentifier:@"waterway-label"];
+        if (labelLayer) {
+            [self.mapView.style insertLayer:layer belowLayer:labelLayer];
+        } else {
+            [self.mapView.style addLayer:layer];
+        }
+    }
 }
 
 - (void)styleWaterLayer
