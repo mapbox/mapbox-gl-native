@@ -207,7 +207,10 @@ void RenderStyle::update(const UpdateParameters& parameters) {
                 needsRendering = true;
             }
 
-            if (hasLayoutDifference(layerDiff, layer->id) || !imageDiff.changed.empty()) {
+            if (hasLayoutDifference(layerDiff, layer->id) ||
+                !imageDiff.added.empty() ||
+                !imageDiff.removed.empty() ||
+                !imageDiff.changed.empty()) {
                 needsRelayout = true;
             }
 
