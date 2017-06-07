@@ -68,6 +68,7 @@ public class MyLocationView extends View {
   private ValueAnimator locationChangeAnimator;
   private ValueAnimator accuracyAnimator;
   private ValueAnimator directionAnimator;
+  private boolean locationChangeAnimationEnabled;
 
   private ValueAnimator.AnimatorUpdateListener invalidateSelfOnUpdateListener =
     new ValueAnimator.AnimatorUpdateListener() {
@@ -462,6 +463,10 @@ public class MyLocationView extends View {
     myLocationBehavior.updateLatLng(location);
   }
 
+  public void setLocationChangeAnimationEnabled(boolean locationChangeAnimationEnabled) {
+    this.locationChangeAnimationEnabled = locationChangeAnimationEnabled;
+  }
+
   public void setMyBearingTrackingMode(@MyBearingTracking.Mode int myBearingTrackingMode) {
     this.myBearingTrackingMode = myBearingTrackingMode;
     if (myBearingTrackingMode == MyBearingTracking.COMPASS && compassListener.isSensorAvailable()) {
@@ -773,9 +778,14 @@ public class MyLocationView extends View {
       // accuracy
       updateAccuracy(location);
 
-      // ease to new camera position with a linear interpolator
-      mapboxMap.easeCamera(CameraUpdateFactory.newCameraPosition(builder.build()), animationDuration, false, null,
-        true);
+      if (locationChangeAnimationEnabled) {
+        // ease to new camera position with a linear interpolator
+        mapboxMap.easeCamera(CameraUpdateFactory.newCameraPosition(builder.build()), animationDuration, false, null,
+          true);
+      } else {
+        mapboxMap.easeCamera(CameraUpdateFactory.newCameraPosition(builder.build()), 0, false, null,
+          true);
+      }
     }
 
     @Override
@@ -817,7 +827,11 @@ public class MyLocationView extends View {
       }
 
       locationChangeAnimator = ValueAnimator.ofFloat(0.0f, 1.0f);
-      locationChangeAnimator.setDuration(locationUpdateDuration);
+      if (locationChangeAnimationEnabled) {
+        locationChangeAnimator.setDuration(locationUpdateDuration);
+      } else {
+        locationChangeAnimator.setDuration(0);
+      }
       locationChangeAnimator.addUpdateListener(new MarkerCoordinateAnimatorListener(this,
         latLng, newLocation
       ));
