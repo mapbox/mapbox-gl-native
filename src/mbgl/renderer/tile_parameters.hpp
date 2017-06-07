@@ -8,7 +8,7 @@ class TransformState;
 class Scheduler;
 class FileSource;
 class AnnotationManager;
-class SpriteAtlas;
+class ImageManager;
 class GlyphManager;
 
 class TileParameters {
@@ -20,7 +20,7 @@ public:
     FileSource& fileSource;
     const MapMode mode;
     AnnotationManager& annotationManager;
-    SpriteAtlas& spriteAtlas;
+    ImageManager& imageManager;
     GlyphManager& glyphManager;
 };
 

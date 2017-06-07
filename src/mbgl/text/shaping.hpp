@@ -1,30 +1,29 @@
 #pragma once
 
 #include <mbgl/text/glyph.hpp>
-#include <mbgl/sprite/sprite_atlas.hpp>
+#include <mbgl/renderer/image_atlas.hpp>
 
 namespace mbgl {
 
-class SpriteAtlasElement;
 class SymbolFeature;
 class BiDi;
 
 class PositionedIcon {
 private:
-    PositionedIcon(const SpriteAtlasElement& image_,
+    PositionedIcon(ImagePosition image_,
                    float top_,
                    float bottom_,
                    float left_,
                    float right_,
                    float angle_)
-        : _image(image_),
+        : _image(std::move(image_)),
           _top(top_),
           _bottom(bottom_),
           _left(left_),
           _right(right_),
           _angle(angle_) {}
 
-    SpriteAtlasElement _image;
+    ImagePosition _image;
     float _top;
     float _bottom;
     float _left;
@@ -32,9 +31,9 @@ private:
     float _angle;
 
 public:
-    static PositionedIcon shapeIcon(const SpriteAtlasElement&, const std::array<float, 2>& iconOffset, const float iconRotation);
+    static PositionedIcon shapeIcon(const ImagePosition&, const std::array<float, 2>& iconOffset, const float iconRotation);
 
-    const SpriteAtlasElement& image() const { return _image; }
+    const ImagePosition& image() const { return _image; }
     float top() const { return _top; }
     float bottom() const { return _bottom; }
     float left() const { return _left; }

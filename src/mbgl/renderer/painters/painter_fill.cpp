@@ -3,8 +3,8 @@
 #include <mbgl/renderer/buckets/fill_bucket.hpp>
 #include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/renderer/layers/render_fill_layer.hpp>
+#include <mbgl/renderer/image_manager.hpp>
 #include <mbgl/style/layers/fill_layer_impl.hpp>
-#include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/programs/programs.hpp>
 #include <mbgl/programs/fill_program.hpp>
 #include <mbgl/util/convert.hpp>
@@ -24,14 +24,14 @@ void Painter::renderFill(PaintParameters& parameters,
             return;
         }
 
-        optional<SpriteAtlasElement> imagePosA = spriteAtlas->getPattern(properties.get<FillPattern>().from);
-        optional<SpriteAtlasElement> imagePosB = spriteAtlas->getPattern(properties.get<FillPattern>().to);
+        optional<ImagePosition> imagePosA = imageManager->getPattern(properties.get<FillPattern>().from);
+        optional<ImagePosition> imagePosB = imageManager->getPattern(properties.get<FillPattern>().to);
 
         if (!imagePosA || !imagePosB) {
             return;
         }
 
-        spriteAtlas->bind(true, context, 0);
+        imageManager->bind(context, 0);
 
         auto draw = [&] (uint8_t sublayer,
                          auto& program,
@@ -49,7 +49,7 @@ void Painter::renderFill(PaintParameters& parameters,
                                           properties.get<FillTranslateAnchor>(),
                                           state),
                     context.viewport.getCurrentValue().size,
-                    spriteAtlas->getPixelSize(),
+                    imageManager->getPixelSize(),
                     *imagePosA,
                     *imagePosB,
                     properties.get<FillPattern>(),

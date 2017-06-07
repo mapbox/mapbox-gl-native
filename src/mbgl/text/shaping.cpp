@@ -10,7 +10,7 @@
 
 namespace mbgl {
 
-PositionedIcon PositionedIcon::shapeIcon(const SpriteAtlasElement& image, const std::array<float, 2>& iconOffset, const float iconRotation) {
+PositionedIcon PositionedIcon::shapeIcon(const ImagePosition& image, const std::array<float, 2>& iconOffset, const float iconRotation) {
     float dx = iconOffset[0];
     float dy = iconOffset[1];
     float x1 = dx - image.displaySize()[0] / 2.0f;

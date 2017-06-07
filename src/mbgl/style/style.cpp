@@ -232,14 +232,7 @@ bool Style::isLoaded() const {
 }
 
 void Style::addImage(std::unique_ptr<style::Image> image) {
-    if (style::Image* existing = images.get(image->getID())) {
-        if (existing->getImage().size != image->getImage().size) {
-            Log::Warning(Event::Sprite, "Can't change sprite dimensions for '%s'", image->getID().c_str());
-            return;
-        }
-        images.remove(image->getID());
-    }
-
+    images.remove(image->getID()); // We permit using addImage to update.
     images.add(std::move(image));
 }
 

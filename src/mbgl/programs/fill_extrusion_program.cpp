@@ -1,5 +1,5 @@
 #include <mbgl/programs/fill_extrusion_program.hpp>
-#include <mbgl/sprite/sprite_atlas.hpp>
+#include <mbgl/renderer/image_atlas.hpp>
 #include <mbgl/renderer/cross_faded_property_evaluator.hpp>
 #include <mbgl/tile/tile_id.hpp>
 #include <mbgl/map/transform_state.hpp>
@@ -46,8 +46,8 @@ FillExtrusionUniforms::values(mat4 matrix,
 FillExtrusionPatternUniforms::Values
 FillExtrusionPatternUniforms::values(mat4 matrix,
                                      Size atlasSize,
-                                     const SpriteAtlasElement& a,
-                                     const SpriteAtlasElement& b,
+                                     const ImagePosition& a,
+                                     const ImagePosition& b,
                                      const Faded<std::string>& fading,
                                      const UnwrappedTileID& tileID,
                                      const TransformState& state,

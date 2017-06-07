@@ -167,6 +167,10 @@ set(MBGL_CORE_FILES
     src/mbgl/renderer/frame_history.hpp
     src/mbgl/renderer/group_by_layout.cpp
     src/mbgl/renderer/group_by_layout.hpp
+    src/mbgl/renderer/image_atlas.cpp
+    src/mbgl/renderer/image_atlas.hpp
+    src/mbgl/renderer/image_manager.cpp
+    src/mbgl/renderer/image_manager.hpp
     src/mbgl/renderer/paint_parameters.hpp
     src/mbgl/renderer/paint_property_binder.hpp
     src/mbgl/renderer/paint_property_statistics.hpp
@@ -291,8 +295,6 @@ set(MBGL_CORE_FILES
     src/mbgl/shaders/symbol_sdf.hpp
 
     # sprite
-    src/mbgl/sprite/sprite_atlas.cpp
-    src/mbgl/sprite/sprite_atlas.hpp
     src/mbgl/sprite/sprite_loader.cpp
     src/mbgl/sprite/sprite_loader.hpp
     src/mbgl/sprite/sprite_loader_observer.hpp

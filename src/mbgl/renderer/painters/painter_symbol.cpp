@@ -5,7 +5,6 @@
 #include <mbgl/renderer/layers/render_symbol_layer.hpp>
 #include <mbgl/style/layers/symbol_layer_impl.hpp>
 #include <mbgl/text/glyph_atlas.hpp>
-#include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/programs/programs.hpp>
 #include <mbgl/programs/symbol_program.hpp>
 #include <mbgl/programs/collision_box_program.hpp>
@@ -69,9 +68,12 @@ void Painter::renderSymbol(PaintParameters& parameters,
 
         const bool iconScaled = layout.get<IconSize>().constantOr(1.0) != 1.0 || bucket.iconsNeedLinear;
         const bool iconTransformed = values.rotationAlignment == AlignmentType::Map || state.getPitch() != 0;
-        spriteAtlas->bind(bucket.sdfIcons || state.isChanging() || iconScaled || iconTransformed, context, 0);
 
-        const Size texsize = spriteAtlas->getPixelSize();
+        context.bindTexture(*bucket.icon.atlasTexture, 0,
+            bucket.sdfIcons || state.isChanging() || iconScaled || iconTransformed
+                ? gl::TextureFilter::Linear : gl::TextureFilter::Nearest);
+
+        const Size texsize = bucket.icon.atlasTexture->size;
 
         if (bucket.sdfIcons) {
             if (values.hasHalo) {

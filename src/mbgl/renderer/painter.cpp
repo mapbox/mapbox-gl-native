@@ -21,7 +21,7 @@
 #include <mbgl/style/layers/custom_layer_impl.hpp>
 #include <mbgl/renderer/layers/render_fill_extrusion_layer.hpp>
 
-#include <mbgl/sprite/sprite_atlas.hpp>
+#include <mbgl/renderer/image_manager.hpp>
 #include <mbgl/geometry/line_atlas.hpp>
 
 #include <mbgl/programs/program_parameters.hpp>
@@ -137,7 +137,7 @@ void Painter::render(RenderStyle& style, const FrameData& frame_, View& view) {
         view
     };
 
-    spriteAtlas = style.spriteAtlas.get();
+    imageManager = style.imageManager.get();
     lineAtlas = style.lineAtlas.get();
 
     evaluatedLight = style.getRenderLight().getEvaluated();
@@ -167,8 +167,7 @@ void Painter::render(RenderStyle& style, const FrameData& frame_, View& view) {
     {
         MBGL_DEBUG_GROUP(context, "upload");
 
-        spriteAtlas->upload(context, 0);
-
+        imageManager->upload(context, 0);
         lineAtlas->upload(context, 0);
         frameHistory.upload(context, 0);
     }

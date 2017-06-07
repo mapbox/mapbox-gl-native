@@ -46,6 +46,7 @@ void SymbolBucket::upload(gl::Context& context) {
     if (hasIconData()) {
         icon.vertexBuffer = context.createVertexBuffer(std::move(icon.vertices));
         icon.indexBuffer = context.createIndexBuffer(std::move(icon.triangles));
+        icon.atlasTexture = context.createTexture(std::move(icon.atlasImage), 0);
         iconSizeBinder->upload(context);
     }
 

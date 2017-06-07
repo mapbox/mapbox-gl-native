@@ -5,8 +5,8 @@
 #include <mbgl/style/filter_evaluator.hpp>
 #include <mbgl/renderer/bucket_parameters.hpp>
 #include <mbgl/renderer/layers/render_symbol_layer.hpp>
+#include <mbgl/renderer/image_atlas.hpp>
 #include <mbgl/style/layers/symbol_layer_impl.hpp>
-#include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/text/get_anchors.hpp>
 #include <mbgl/text/collision_tile.hpp>
 #include <mbgl/text/shaping.hpp>
@@ -41,7 +41,7 @@ static bool has(const style::SymbolLayoutProperties::PossiblyEvaluated& layout) 
 SymbolLayout::SymbolLayout(const BucketParameters& parameters,
                            const std::vector<const RenderLayer*>& layers,
                            const GeometryTileLayer& sourceLayer,
-                           IconDependencies& iconDependencies,
+                           ImageDependencies& imageDependencies,
                            GlyphDependencies& glyphDependencies)
     : sourceLayerName(sourceLayer.getName()),
       bucketName(layers.at(0)->getID()),
@@ -158,7 +158,7 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
                 icon = util::replaceTokens(icon, getValue);
             }
             ft.icon = icon;
-            iconDependencies.insert(*ft.icon);
+            imageDependencies.insert(*ft.icon);
         }
 
         if (ft.text || ft.icon) {
@@ -175,7 +175,7 @@ bool SymbolLayout::hasSymbolInstances() const {
     return !symbolInstances.empty();
 }
 
-void SymbolLayout::prepare(const GlyphMap& glyphs, const IconMap& icons) {
+void SymbolLayout::prepare(const GlyphMap& glyphs, const ImageMap& images) {
     float horizontalAlign = 0.5;
     float verticalAlign = 0.5;
 
@@ -225,6 +225,8 @@ void SymbolLayout::prepare(const GlyphMap& glyphs, const IconMap& icons) {
         glyphAtlas = makeGlyphAtlas(glyphPositionsIt->second);
     }
 
+    imageAtlas = makeImageAtlas(images);
+
     for (auto it = features.begin(); it != features.end(); ++it) {
         auto& feature = *it;
         if (feature.geometry.empty()) continue;
@@ -266,15 +268,16 @@ void SymbolLayout::prepare(const GlyphMap& glyphs, const IconMap& icons) {
 
         // if feature has icon, get sprite atlas position
         if (feature.icon) {
-            auto image = icons.find(*feature.icon);
-            if (image != icons.end()) {
-                shapedIcon = PositionedIcon::shapeIcon(image->second,
+            auto image = images.find(*feature.icon);
+            if (image != images.end()) {
+                shapedIcon = PositionedIcon::shapeIcon(
+                    imageAtlas.positions.at(*feature.icon),
                     layout.evaluate<IconOffset>(zoom, feature),
                     layout.evaluate<IconRotate>(zoom, feature) * util::DEG2RAD);
-                if (image->second.sdf) {
+                if (image->second->sdf) {
                     sdfIcons = true;
                 }
-                if (image->second.pixelRatio != pixelRatio) {
+                if (image->second->pixelRatio != pixelRatio) {
                     iconsNeedLinear = true;
                 } else if (layout.get<IconRotate>().constantOr(1) != 0) {
                     iconsNeedLinear = true;
@@ -428,6 +431,7 @@ std::unique_ptr<SymbolBucket> SymbolLayout::place(CollisionTile& collisionTile) 
     auto bucket = std::make_unique<SymbolBucket>(layout, layerPaintProperties, textSize, iconSize, zoom, sdfIcons, iconsNeedLinear);
 
     bucket->text.atlasImage = glyphAtlas.image.clone();
+    bucket->icon.atlasImage = imageAtlas.image.clone();
 
     // Calculate which labels can be shown and when they can be shown and
     // create the bufers used for rendering.

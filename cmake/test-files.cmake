@@ -43,9 +43,9 @@ set(MBGL_TEST_FILES
 
     # renderer
     test/renderer/group_by_layout.test.cpp
+    test/renderer/image_manager.test.cpp
 
     # sprite
-    test/sprite/sprite_atlas.test.cpp
     test/sprite/sprite_loader.test.cpp
     test/sprite/sprite_parser.test.cpp
 

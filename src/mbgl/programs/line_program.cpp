@@ -1,9 +1,9 @@
 #include <mbgl/programs/line_program.hpp>
 #include <mbgl/style/layers/line_layer_properties.hpp>
 #include <mbgl/renderer/render_tile.hpp>
+#include <mbgl/renderer/image_atlas.hpp>
 #include <mbgl/map/transform_state.hpp>
 #include <mbgl/util/mat2.hpp>
-#include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/geometry/line_atlas.hpp>
 
 namespace mbgl {
@@ -89,8 +89,8 @@ LinePatternProgram::uniformValues(const LinePaintProperties::PossiblyEvaluated& 
                                   const TransformState& state,
                                   const std::array<float, 2>& pixelsToGLUnits,
                                   const Size atlasSize,
-                                  const SpriteAtlasElement& posA,
-                                  const SpriteAtlasElement& posB) {
+                                  const ImagePosition& posA,
+                                  const ImagePosition& posB) {
      std::array<float, 2> sizeA {{
          tile.id.pixelsToTileUnits(posA.displaySize()[0] * properties.get<LinePattern>().fromScale, state.getIntegerZoom()),
          posA.displaySize()[1]

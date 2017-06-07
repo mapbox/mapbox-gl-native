@@ -17,7 +17,7 @@ namespace mbgl {
 
 class FileSource;
 class GlyphManager;
-class SpriteAtlas;
+class ImageManager;
 class LineAtlas;
 class RenderData;
 class TransformState;
@@ -67,7 +67,7 @@ public:
     Scheduler& scheduler;
     FileSource& fileSource;
     std::unique_ptr<GlyphManager> glyphManager;
-    std::unique_ptr<SpriteAtlas> spriteAtlas;
+    std::unique_ptr<ImageManager> imageManager;
     std::unique_ptr<LineAtlas> lineAtlas;
 
 private:

@@ -3,10 +3,10 @@
 #include <mbgl/renderer/buckets/line_bucket.hpp>
 #include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/renderer/layers/render_line_layer.hpp>
+#include <mbgl/renderer/image_manager.hpp>
 #include <mbgl/style/layers/line_layer_impl.hpp>
 #include <mbgl/programs/programs.hpp>
 #include <mbgl/programs/line_program.hpp>
-#include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/geometry/line_atlas.hpp>
 
 namespace mbgl {
@@ -61,13 +61,13 @@ void Painter::renderLine(PaintParameters& parameters,
                  lineAtlas->getSize().width));
 
     } else if (!properties.get<LinePattern>().from.empty()) {
-        optional<SpriteAtlasElement> posA = spriteAtlas->getPattern(properties.get<LinePattern>().from);
-        optional<SpriteAtlasElement> posB = spriteAtlas->getPattern(properties.get<LinePattern>().to);
+        optional<ImagePosition> posA = imageManager->getPattern(properties.get<LinePattern>().from);
+        optional<ImagePosition> posB = imageManager->getPattern(properties.get<LinePattern>().to);
 
         if (!posA || !posB)
             return;
 
-        spriteAtlas->bind(true, context, 0);
+        imageManager->bind(context, 0);
 
         draw(parameters.programs.linePattern,
              LinePatternProgram::uniformValues(
@@ -75,7 +75,7 @@ void Painter::renderLine(PaintParameters& parameters,
                  tile,
                  state,
                  pixelsToGLUnits,
-                 spriteAtlas->getPixelSize(),
+                 imageManager->getPixelSize(),
                  *posA,
                  *posB));
 
