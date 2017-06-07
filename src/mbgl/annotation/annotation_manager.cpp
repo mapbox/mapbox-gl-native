@@ -21,22 +21,22 @@ AnnotationManager::AnnotationManager()
 
 AnnotationManager::~AnnotationManager() = default;
 
-AnnotationID AnnotationManager::addAnnotation(const Annotation &annotation, const uint8_t maxZoom) {
+AnnotationID AnnotationManager::addAnnotation(const Annotation& annotation, const uint8_t maxZoom) {
     AnnotationID id = nextID++;
-    Annotation::visit(annotation, [&](const auto &annotation_) {
+    Annotation::visit(annotation, [&](const auto& annotation_) {
         this->add(id, annotation_, maxZoom);
     });
     return id;
 }
 
-void AnnotationManager::updateAnnotation(const AnnotationID &id, const Annotation &annotation,
+void AnnotationManager::updateAnnotation(const AnnotationID& id, const Annotation& annotation,
                                          const uint8_t maxZoom) {
-    return Annotation::visit(annotation, [&](const auto &annotation_) {
+    return Annotation::visit(annotation, [&](const auto& annotation_) {
         return this->update(id, annotation_, maxZoom);
     });
 }
 
-void AnnotationManager::removeAnnotation(const AnnotationID &id) {
+void AnnotationManager::removeAnnotation(const AnnotationID& id) {
     // Remove from source
     sourceImpl = source->removeAnnotation(id);
 
@@ -51,19 +51,20 @@ void AnnotationManager::removeAnnotation(const AnnotationID &id) {
     }
 }
 
-void AnnotationManager::add(const AnnotationID &id,
-                            const SymbolAnnotation &annotation,
+void AnnotationManager::add(const AnnotationID& id,
+                            const SymbolAnnotation& annotation,
                             const uint8_t) {
     sourceImpl = source->addAnnotation(id, annotation);
 }
 
-void AnnotationManager::add(const AnnotationID &id, const LineAnnotation &annotation,
+void AnnotationManager::add(const AnnotationID& id,
+                            const LineAnnotation& annotation,
                             const uint8_t maxZoom) {
     // Add to source
     sourceImpl = source->addAnnotation(id, annotation.geometry, maxZoom);
 
     // Add to collection
-    ShapeAnnotationImpl &impl = *shapeAnnotations
+    ShapeAnnotationImpl& impl = *shapeAnnotations
             .emplace(id,
                      std::make_unique<LineAnnotationImpl>(id, annotation, maxZoom)).first->second;
 
@@ -72,13 +73,13 @@ void AnnotationManager::add(const AnnotationID &id, const LineAnnotation &annota
     }
 }
 
-void AnnotationManager::add(const AnnotationID &id, const FillAnnotation &annotation,
+void AnnotationManager::add(const AnnotationID& id, const FillAnnotation& annotation,
                             const uint8_t maxZoom) {
     // Add to source
     sourceImpl = source->addAnnotation(id, annotation.geometry, maxZoom);
 
     // Add to collection
-    ShapeAnnotationImpl &impl = *shapeAnnotations
+    ShapeAnnotationImpl& impl = *shapeAnnotations
             .emplace(id,
                      std::make_unique<FillAnnotationImpl>(id, annotation, maxZoom)).first->second;
 
@@ -87,14 +88,14 @@ void AnnotationManager::add(const AnnotationID &id, const FillAnnotation &annota
     }
 }
 
-void AnnotationManager::update(const AnnotationID &id,
-                               const SymbolAnnotation &annotation,
+void AnnotationManager::update(const AnnotationID& id,
+                               const SymbolAnnotation& annotation,
                                const uint8_t) {
     sourceImpl = source->updateAnnotation(id, annotation);
 }
 
-void AnnotationManager::update(const AnnotationID &id,
-                               const LineAnnotation &annotation,
+void AnnotationManager::update(const AnnotationID& id,
+                               const LineAnnotation& annotation,
                                const uint8_t maxZoom) {
     auto it = shapeAnnotations.find(id);
     if (it == shapeAnnotations.end()) {
@@ -103,7 +104,7 @@ void AnnotationManager::update(const AnnotationID &id,
 
     // Update in collection
     shapeAnnotations.erase(it);
-    ShapeAnnotationImpl &impl = *shapeAnnotations
+    ShapeAnnotationImpl& impl = *shapeAnnotations
             .emplace(id,
                      std::make_unique<LineAnnotationImpl>(id, annotation, maxZoom)).first->second;
 
@@ -116,8 +117,8 @@ void AnnotationManager::update(const AnnotationID &id,
     }
 }
 
-void AnnotationManager::update(const AnnotationID &id,
-                               const FillAnnotation &annotation,
+void AnnotationManager::update(const AnnotationID& id,
+                               const FillAnnotation& annotation,
                                const uint8_t maxZoom) {
     auto it = shapeAnnotations.find(id);
     if (it == shapeAnnotations.end()) {
@@ -126,7 +127,7 @@ void AnnotationManager::update(const AnnotationID &id,
 
     // Update in collection
     shapeAnnotations.erase(it);
-    ShapeAnnotationImpl &impl = *shapeAnnotations
+    ShapeAnnotationImpl& impl = *shapeAnnotations
             .emplace(id,
                      std::make_unique<FillAnnotationImpl>(id, annotation, maxZoom)).first->second;
 
@@ -141,7 +142,7 @@ void AnnotationManager::update(const AnnotationID &id,
 
 // To ensure that annotation images do not collide with images from the style,
 // we prefix input image IDs with "com.mapbox.annotations".
-static std::string prefixedImageID(const std::string &id) {
+static std::string prefixedImageID(const std::string& id) {
     return AnnotationManager::SourceID + "." + id;
 }
 
@@ -158,7 +159,7 @@ void AnnotationManager::addImage(std::unique_ptr<style::Image> image) {
     }
 }
 
-void AnnotationManager::removeImage(const std::string &id_) {
+void AnnotationManager::removeImage(const std::string& id_) {
     const std::string id = prefixedImageID(id_);
     images.erase(id);
 
@@ -167,7 +168,7 @@ void AnnotationManager::removeImage(const std::string &id_) {
     }
 }
 
-double AnnotationManager::getTopOffsetPixelsForImage(const std::string &id_) {
+double AnnotationManager::getTopOffsetPixelsForImage(const std::string& id_) {
     const std::string id = prefixedImageID(id_);
     auto it = images.find(id);
     return it != images.end() ?
@@ -175,7 +176,7 @@ double AnnotationManager::getTopOffsetPixelsForImage(const std::string &id_) {
            0;
 }
 
-void AnnotationManager::onStyleLoaded(style::Style &style_) {
+void AnnotationManager::onStyleLoaded(style::Style& style_) {
     style = &style_;
 
     // Add the annotation source
@@ -198,7 +199,7 @@ void AnnotationManager::onStyleLoaded(style::Style &style_) {
     style->addLayer(std::move(layer));
 
     // Add all images
-    for (const auto &image : images) {
+    for (const auto& image : images) {
         // Call addImage even for images we may have previously added, because we must support
         // addAnnotationImage being used to update an existing image. Creating a new image is
         // relatively cheap, as it copies only the Immutable reference. (We can't keep track
@@ -209,7 +210,7 @@ void AnnotationManager::onStyleLoaded(style::Style &style_) {
     }
 
     // Add all layers for shape annotations
-    for (auto &entry : shapeAnnotations) {
+    for (auto& entry : shapeAnnotations) {
         entry.second->updateStyle(*style);
     }
 }

@@ -4,8 +4,8 @@
 
 namespace mbgl {
 
-AnnotationTile::AnnotationTile(const OverscaledTileID &overscaledTileID,
-                               const TileParameters &parameters,
+AnnotationTile::AnnotationTile(const OverscaledTileID& overscaledTileID,
+                               const TileParameters& parameters,
                                std::unique_ptr<const AnnotationTileData> _data)
         : GeometryTile(overscaledTileID, AnnotationManager::SourceID, parameters) {
 
