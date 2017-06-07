@@ -353,6 +353,34 @@ BindVertexArray::Type BindVertexArray::Get(const Context& context) {
     return binding;
 }
 
+const constexpr PixelStorePack::Type PixelStorePack::Default;
+
+void PixelStorePack::Set(const Type& value) {
+    assert(value.alignment == 1 || value.alignment == 2 || value.alignment == 4 ||
+           value.alignment == 8);
+    MBGL_CHECK_ERROR(glPixelStorei(GL_PACK_ALIGNMENT, value.alignment));
+}
+
+PixelStorePack::Type PixelStorePack::Get() {
+    Type value;
+    MBGL_CHECK_ERROR(glGetIntegerv(GL_PACK_ALIGNMENT, &value.alignment));
+    return value;
+}
+
+const constexpr PixelStoreUnpack::Type PixelStoreUnpack::Default;
+
+void PixelStoreUnpack::Set(const Type& value) {
+    assert(value.alignment == 1 || value.alignment == 2 || value.alignment == 4 ||
+           value.alignment == 8);
+    MBGL_CHECK_ERROR(glPixelStorei(GL_UNPACK_ALIGNMENT, value.alignment));
+}
+
+PixelStoreUnpack::Type PixelStoreUnpack::Get() {
+    Type value;
+    MBGL_CHECK_ERROR(glGetIntegerv(GL_UNPACK_ALIGNMENT, &value.alignment));
+    return value;
+}
+
 #if not MBGL_USE_GLES2
 
 const constexpr PointSize::Type PointSize::Default;
@@ -390,34 +418,6 @@ RasterPos::Type RasterPos::Get() {
     GLdouble pos[4];
     MBGL_CHECK_ERROR(glGetDoublev(GL_CURRENT_RASTER_POSITION, pos));
     return { pos[0], pos[1], pos[2], pos[3] };
-}
-
-const constexpr PixelStorePack::Type PixelStorePack::Default;
-
-void PixelStorePack::Set(const Type& value) {
-    assert(value.alignment == 1 || value.alignment == 2 || value.alignment == 4 ||
-           value.alignment == 8);
-    MBGL_CHECK_ERROR(glPixelStorei(GL_PACK_ALIGNMENT, value.alignment));
-}
-
-PixelStorePack::Type PixelStorePack::Get() {
-    Type value;
-    MBGL_CHECK_ERROR(glGetIntegerv(GL_PACK_ALIGNMENT, &value.alignment));
-    return value;
-}
-
-const constexpr PixelStoreUnpack::Type PixelStoreUnpack::Default;
-
-void PixelStoreUnpack::Set(const Type& value) {
-    assert(value.alignment == 1 || value.alignment == 2 || value.alignment == 4 ||
-           value.alignment == 8);
-    MBGL_CHECK_ERROR(glPixelStorei(GL_UNPACK_ALIGNMENT, value.alignment));
-}
-
-PixelStoreUnpack::Type PixelStoreUnpack::Get() {
-    Type value;
-    MBGL_CHECK_ERROR(glGetIntegerv(GL_UNPACK_ALIGNMENT, &value.alignment));
-    return value;
 }
 
 const constexpr PixelTransferDepth::Type PixelTransferDepth::Default;

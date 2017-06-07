@@ -66,8 +66,6 @@ enum class PrimitiveType {
     TriangleFan = 0x0006
 };
 
-#if not MBGL_USE_GLES2
-
 struct PixelStorageType {
     int32_t alignment;
 };
@@ -75,8 +73,6 @@ struct PixelStorageType {
 constexpr bool operator!=(const PixelStorageType& a, const PixelStorageType& b) {
     return a.alignment != b.alignment;
 }
-
-#endif // MBGL_USE_GLES2
 
 using BinaryProgramFormat = uint32_t;
 
