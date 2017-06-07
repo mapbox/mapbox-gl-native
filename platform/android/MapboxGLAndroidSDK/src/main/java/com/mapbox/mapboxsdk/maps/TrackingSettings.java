@@ -29,6 +29,7 @@ public final class TrackingSettings {
   private final CameraZoomInvalidator zoomInvalidator;
   private LocationEngine locationSource;
   private LocationEngineListener myLocationListener;
+  private boolean locationChangeAnimationEnabled = true;
 
   private boolean myLocationEnabled;
   private boolean dismissLocationTrackingOnGesture = true;
@@ -56,6 +57,7 @@ public final class TrackingSettings {
     outState.putBoolean(MapboxConstants.STATE_MY_LOCATION_TRACKING_DISMISS, isDismissLocationTrackingOnGesture());
     outState.putBoolean(MapboxConstants.STATE_MY_BEARING_TRACKING_DISMISS, isDismissBearingTrackingOnGesture());
     outState.putBoolean(MapboxConstants.STATE_MY_LOCATION_ENABLED, isMyLocationEnabled());
+    outState.putBoolean(MapboxConstants.STATE_LOCATION_CHANGE_ANIMATION_ENABLED, isLocationChangeAnimationEnabled());
   }
 
   void onRestoreInstanceState(Bundle savedInstanceState) {
@@ -74,6 +76,8 @@ public final class TrackingSettings {
       MapboxConstants.STATE_MY_LOCATION_TRACKING_DISMISS, true));
     setDismissBearingTrackingOnGesture(savedInstanceState.getBoolean(
       MapboxConstants.STATE_MY_BEARING_TRACKING_DISMISS, true));
+    setLocationChangeAnimationEnabled(savedInstanceState.getBoolean(
+      MapboxConstants.STATE_LOCATION_CHANGE_ANIMATION_ENABLED, true));
   }
 
   /**
@@ -91,6 +95,7 @@ public final class TrackingSettings {
    */
   @UiThread
   public void setMyLocationTrackingMode(@MyLocationTracking.Mode int myLocationTrackingMode) {
+    myLocationView.setLocationChangeAnimationEnabled(isLocationChangeAnimationEnabled());
     myLocationView.setMyLocationTrackingMode(myLocationTrackingMode);
 
     if (myLocationTrackingMode == MyLocationTracking.TRACKING_FOLLOW) {
@@ -251,6 +256,26 @@ public final class TrackingSettings {
     return uiSettings.isScrollGesturesEnabled()
       && (dismissLocationTrackingOnGesture
       || myLocationView.getMyLocationTrackingMode() == MyLocationTracking.TRACKING_NONE);
+  }
+
+  /**
+   * Returns whether location change animation is applied for {@link MyLocationTracking#TRACKING_FOLLOW}.
+   *
+   * @return True if animation is applied, false otherwise.
+   */
+  public boolean isLocationChangeAnimationEnabled() {
+    return locationChangeAnimationEnabled;
+  }
+
+  /**
+   * Set whether location change animation should be applied for {@link MyLocationTracking#TRACKING_FOLLOW}.
+   *
+   * @param locationChangeAnimationEnabled True if animation should be applied, false otherwise.
+   */
+  public void setLocationChangeAnimationEnabled(boolean locationChangeAnimationEnabled) {
+    this.locationChangeAnimationEnabled = locationChangeAnimationEnabled;
+
+    myLocationView.setLocationChangeAnimationEnabled(locationChangeAnimationEnabled);
   }
 
   /**
