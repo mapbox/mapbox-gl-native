@@ -2,6 +2,10 @@
 
 #include <mbgl/style/image.hpp>
 
+#include <string>
+#include <unordered_map>
+#include <set>
+
 namespace mbgl {
 namespace style {
 
@@ -21,4 +25,8 @@ public:
 };
 
 } // namespace style
+
+using ImageMap = std::unordered_map<std::string, Immutable<style::Image::Impl>>;
+using ImageDependencies = std::set<std::string>;
+
 } // namespace mbgl

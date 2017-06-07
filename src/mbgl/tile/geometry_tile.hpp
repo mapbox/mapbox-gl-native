@@ -1,8 +1,8 @@
 #pragma once
 
-#include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/tile/tile.hpp>
 #include <mbgl/tile/geometry_tile_worker.hpp>
+#include <mbgl/renderer/image_manager.hpp>
 #include <mbgl/text/glyph_manager.hpp>
 #include <mbgl/text/placement_config.hpp>
 #include <mbgl/util/feature.hpp>
@@ -24,7 +24,7 @@ class RenderLayer;
 class SourceQueryOptions;
 class TileParameters;
 
-class GeometryTile : public Tile, public GlyphRequestor, IconRequestor {
+class GeometryTile : public Tile, public GlyphRequestor, ImageRequestor {
 public:
     GeometryTile(const OverscaledTileID&,
                  std::string sourceID,
@@ -39,10 +39,10 @@ public:
     void setLayers(const std::vector<Immutable<style::Layer::Impl>>&) override;
     
     void onGlyphsAvailable(GlyphMap) override;
-    void onIconsAvailable(IconMap) override;
+    void onImagesAvailable(ImageMap) override;
     
     void getGlyphs(GlyphDependencies);
-    void getIcons(IconDependencies);
+    void getImages(ImageDependencies);
 
     void upload(gl::Context&) override;
     Bucket* getBucket(const style::Layer::Impl&) const override;
@@ -97,7 +97,7 @@ private:
     Actor<GeometryTileWorker> worker;
 
     GlyphManager& glyphManager;
-    SpriteAtlas& spriteAtlas;
+    ImageManager& imageManager;
 
     uint64_t correlationID = 0;
     optional<PlacementConfig> requestedConfig;

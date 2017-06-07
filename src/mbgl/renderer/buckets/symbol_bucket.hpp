@@ -59,9 +59,11 @@ public:
         gl::VertexVector<SymbolLayoutVertex> vertices;
         gl::IndexVector<gl::Triangles> triangles;
         gl::SegmentVector<SymbolIconAttributes> segments;
+        PremultipliedImage atlasImage;
 
         optional<gl::VertexBuffer<SymbolLayoutVertex>> vertexBuffer;
         optional<gl::IndexBuffer<gl::Triangles>> indexBuffer;
+        optional<gl::Texture> atlasTexture;
     } icon;
 
     struct CollisionBoxBuffer {

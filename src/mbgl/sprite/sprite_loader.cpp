@@ -20,9 +20,9 @@ namespace mbgl {
 static SpriteLoaderObserver nullObserver;
 
 struct SpriteLoader::Loader {
-    Loader(Scheduler& scheduler, SpriteLoader& spriteAtlas)
+    Loader(Scheduler& scheduler, SpriteLoader& imageManager)
         : mailbox(std::make_shared<Mailbox>(*util::RunLoop::Get())),
-          worker(scheduler, ActorRef<SpriteLoader>(spriteAtlas, mailbox)) {
+          worker(scheduler, ActorRef<SpriteLoader>(imageManager, mailbox)) {
     }
 
     std::shared_ptr<const std::string> image;

@@ -2,7 +2,7 @@
 
 #include <mbgl/map/mode.hpp>
 #include <mbgl/tile/tile_id.hpp>
-#include <mbgl/sprite/sprite_atlas.hpp>
+#include <mbgl/style/image_impl.hpp>
 #include <mbgl/text/glyph.hpp>
 #include <mbgl/text/placement_config.hpp>
 #include <mbgl/actor/actor_ref.hpp>
@@ -38,7 +38,7 @@ public:
     void setPlacementConfig(PlacementConfig, uint64_t correlationID);
     
     void onGlyphsAvailable(GlyphMap glyphs);
-    void onIconsAvailable(IconMap icons);
+    void onImagesAvailable(ImageMap images);
 
 private:
     void coalesced();
@@ -48,7 +48,7 @@ private:
     void coalesce();
 
     void requestNewGlyphs(const GlyphDependencies&);
-    void requestNewIcons(const IconDependencies&);
+    void requestNewImages(const ImageDependencies&);
    
     void symbolDependenciesChanged();
     bool hasPendingSymbolDependencies() const;
@@ -79,9 +79,9 @@ private:
 
     std::vector<std::unique_ptr<SymbolLayout>> symbolLayouts;
     GlyphDependencies pendingGlyphDependencies;
-    IconDependencies pendingIconDependencies;
+    ImageDependencies pendingImageDependencies;
     GlyphMap glyphMap;
-    IconMap iconMap;
+    ImageMap imageMap;
 };
 
 } // namespace mbgl

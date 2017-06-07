@@ -31,7 +31,7 @@
 #include <mbgl/map/transform.hpp>
 #include <mbgl/annotation/annotation_manager.hpp>
 #include <mbgl/annotation/annotation_source.hpp>
-#include <mbgl/sprite/sprite_atlas.hpp>
+#include <mbgl/renderer/image_manager.hpp>
 #include <mbgl/text/glyph_manager.hpp>
 
 #include <cstdint>
@@ -48,7 +48,7 @@ public:
     TransformState transformState;
     ThreadPool threadPool { 1 };
     AnnotationManager annotationManager;
-    SpriteAtlas spriteAtlas;
+    ImageManager imageManager;
     GlyphManager glyphManager { fileSource };
 
     TileParameters tileParameters {
@@ -59,7 +59,7 @@ public:
         fileSource,
         MapMode::Continuous,
         annotationManager,
-        spriteAtlas,
+        imageManager,
         glyphManager
     };
 

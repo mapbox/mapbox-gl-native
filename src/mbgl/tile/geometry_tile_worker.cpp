@@ -3,7 +3,6 @@
 #include <mbgl/tile/geometry_tile.hpp>
 #include <mbgl/text/collision_tile.hpp>
 #include <mbgl/layout/symbol_layout.hpp>
-#include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/renderer/bucket_parameters.hpp>
 #include <mbgl/renderer/group_by_layout.hpp>
 #include <mbgl/style/filter.hpp>
@@ -217,9 +216,9 @@ void GeometryTileWorker::onGlyphsAvailable(GlyphMap newGlyphMap) {
     symbolDependenciesChanged();
 }
 
-void GeometryTileWorker::onIconsAvailable(IconMap newIconMap) {
-    iconMap = std::move(newIconMap);
-    pendingIconDependencies.clear();
+void GeometryTileWorker::onImagesAvailable(ImageMap newImageMap) {
+    imageMap = std::move(newImageMap);
+    pendingImageDependencies.clear();
     symbolDependenciesChanged();
 }
 
@@ -237,10 +236,10 @@ void GeometryTileWorker::requestNewGlyphs(const GlyphDependencies& glyphDependen
     }
 }
 
-void GeometryTileWorker::requestNewIcons(const IconDependencies& iconDependencies) {
-    pendingIconDependencies = iconDependencies;
-    if (!pendingIconDependencies.empty()) {
-        parent.invoke(&GeometryTile::getIcons, pendingIconDependencies);
+void GeometryTileWorker::requestNewImages(const ImageDependencies& imageDependencies) {
+    pendingImageDependencies = imageDependencies;
+    if (!pendingImageDependencies.empty()) {
+        parent.invoke(&GeometryTile::getImages, pendingImageDependencies);
     }
 }
 
@@ -280,7 +279,7 @@ void GeometryTileWorker::redoLayout() {
     BucketParameters parameters { id, mode, pixelRatio };
 
     GlyphDependencies glyphDependencies;
-    IconDependencies iconDependencies;
+    ImageDependencies imageDependencies;
 
     // Create render layers and group by layout
     std::vector<std::unique_ptr<RenderLayer>> renderLayers = toRenderLayers(*layers, id.overscaledZ);
@@ -311,7 +310,7 @@ void GeometryTileWorker::redoLayout() {
 
         if (leader.is<RenderSymbolLayer>()) {
             symbolLayoutMap.emplace(leader.getID(),
-                leader.as<RenderSymbolLayer>()->createLayout(parameters, group, *geometryLayer, glyphDependencies, iconDependencies));
+                leader.as<RenderSymbolLayer>()->createLayout(parameters, group, *geometryLayer, glyphDependencies, imageDependencies));
         } else {
             const Filter& filter = leader.baseImpl->filter;
             const std::string& sourceLayerID = leader.baseImpl->sourceLayer;
@@ -347,7 +346,7 @@ void GeometryTileWorker::redoLayout() {
     }
 
     requestNewGlyphs(glyphDependencies);
-    requestNewIcons(iconDependencies);
+    requestNewImages(imageDependencies);
 
     parent.invoke(&GeometryTile::onLayout, GeometryTile::LayoutResult {
         std::move(buckets),
@@ -375,7 +374,7 @@ bool GeometryTileWorker::hasPendingSymbolDependencies() const {
             return true;
         }
     }
-    return !pendingIconDependencies.empty();
+    return !pendingImageDependencies.empty();
 }
 
 
@@ -393,7 +392,7 @@ void GeometryTileWorker::attemptPlacement() {
         }
 
         if (symbolLayout->state == SymbolLayout::Pending) {
-            symbolLayout->prepare(glyphMap, iconMap);
+            symbolLayout->prepare(glyphMap, imageMap);
             symbolLayout->state = SymbolLayout::Placed;
         }
 

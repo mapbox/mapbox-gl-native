@@ -16,7 +16,7 @@
 
 namespace mbgl {
 
-class SpriteAtlasElement;
+class ImagePosition;
 class UnwrappedTileID;
 class TransformState;
 template <class> class Faded;
@@ -68,8 +68,8 @@ struct FillExtrusionPatternUniforms : gl::Uniforms<
 {
     static Values values(mat4,
                          Size atlasSize,
-                         const SpriteAtlasElement&,
-                         const SpriteAtlasElement&,
+                         const ImagePosition&,
+                         const ImagePosition&,
                          const Faded<std::string>&,
                          const UnwrappedTileID&,
                          const TransformState&,

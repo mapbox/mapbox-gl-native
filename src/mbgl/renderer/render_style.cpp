@@ -16,14 +16,13 @@
 #include <mbgl/renderer/layers/render_raster_layer.hpp>
 #include <mbgl/renderer/layers/render_symbol_layer.hpp>
 #include <mbgl/renderer/style_diff.hpp>
+#include <mbgl/renderer/image_manager.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/source_impl.hpp>
 #include <mbgl/style/transition_options.hpp>
-#include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/sprite/sprite_loader.hpp>
 #include <mbgl/text/glyph_manager.hpp>
 #include <mbgl/geometry/line_atlas.hpp>
-#include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/map/query.hpp>
 #include <mbgl/tile/tile.hpp>
 #include <mbgl/util/math.hpp>
@@ -39,7 +38,7 @@ RenderStyle::RenderStyle(Scheduler& scheduler_, FileSource& fileSource_)
     : scheduler(scheduler_),
       fileSource(fileSource_),
       glyphManager(std::make_unique<GlyphManager>(fileSource)),
-      spriteAtlas(std::make_unique<SpriteAtlas>()),
+      imageManager(std::make_unique<ImageManager>()),
       lineAtlas(std::make_unique<LineAtlas>(Size{ 256, 512 })),
       imageImpls(makeMutable<std::vector<Immutable<style::Image::Impl>>>()),
       sourceImpls(makeMutable<std::vector<Immutable<style::Source::Impl>>>()),
@@ -100,7 +99,7 @@ void RenderStyle::update(const UpdateParameters& parameters) {
         parameters.fileSource,
         parameters.mode,
         parameters.annotationManager,
-        *spriteAtlas,
+        *imageManager,
         *glyphManager
     };
 
@@ -124,21 +123,21 @@ void RenderStyle::update(const UpdateParameters& parameters) {
 
     // Remove removed images from sprite atlas.
     for (const auto& entry : imageDiff.removed) {
-        spriteAtlas->removeImage(entry.first);
+        imageManager->removeImage(entry.first);
     }
 
     // Add added images to sprite atlas.
     for (const auto& entry : imageDiff.added) {
-        spriteAtlas->addImage(entry.second);
+        imageManager->addImage(entry.second);
     }
 
     // Update changed images.
     for (const auto& entry : imageDiff.changed) {
-        spriteAtlas->updateImage(entry.second.after);
+        imageManager->updateImage(entry.second.after);
     }
 
-    if (parameters.spriteLoaded && !spriteAtlas->isLoaded()) {
-        spriteAtlas->onSpriteLoaded();
+    if (parameters.spriteLoaded && !imageManager->isLoaded()) {
+        imageManager->onSpriteLoaded();
     }
 
 
@@ -208,7 +207,7 @@ void RenderStyle::update(const UpdateParameters& parameters) {
                 needsRendering = true;
             }
 
-            if (hasLayoutDifference(layerDiff, layer->id)) {
+            if (hasLayoutDifference(layerDiff, layer->id) || !imageDiff.changed.empty()) {
                 needsRelayout = true;
             }
 
@@ -249,7 +248,7 @@ bool RenderStyle::isLoaded() const {
         }
     }
 
-    if (!spriteAtlas->isLoaded()) {
+    if (!imageManager->isLoaded()) {
         return false;
     }
 
@@ -442,7 +441,7 @@ void RenderStyle::dumpDebugLogs() const {
         entry.second->dumpDebugLogs();
     }
 
-    spriteAtlas->dumpDebugLogs();
+    imageManager->dumpDebugLogs();
 }
 
 } // namespace mbgl

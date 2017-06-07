@@ -32,7 +32,7 @@ namespace mbgl {
 
 class RenderStyle;
 class RenderTile;
-class SpriteAtlas;
+class ImageManager;
 class View;
 class LineAtlas;
 struct FrameData;
@@ -151,7 +151,7 @@ public:
     float depthRangeSize;
     const float depthEpsilon = 1.0f / (1 << 16);
 
-    SpriteAtlas* spriteAtlas = nullptr;
+    ImageManager* imageManager = nullptr;
     LineAtlas* lineAtlas = nullptr;
 
     optional<OffscreenTexture> extrusionTexture;

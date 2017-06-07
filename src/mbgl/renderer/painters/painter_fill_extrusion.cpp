@@ -3,8 +3,8 @@
 #include <mbgl/renderer/buckets/fill_extrusion_bucket.hpp>
 #include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/renderer/layers/render_fill_extrusion_layer.hpp>
+#include <mbgl/renderer/image_manager.hpp>
 #include <mbgl/style/layers/fill_extrusion_layer_impl.hpp>
-#include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/programs/programs.hpp>
 #include <mbgl/programs/fill_extrusion_program.hpp>
 #include <mbgl/util/constants.hpp>
@@ -25,16 +25,14 @@ void Painter::renderFillExtrusion(PaintParameters& parameters,
     }
 
     if (!properties.get<FillExtrusionPattern>().from.empty()) {
-        optional<SpriteAtlasElement> imagePosA =
-            spriteAtlas->getPattern(properties.get<FillExtrusionPattern>().from);
-        optional<SpriteAtlasElement> imagePosB =
-            spriteAtlas->getPattern(properties.get<FillExtrusionPattern>().to);
+        optional<ImagePosition> imagePosA = imageManager->getPattern(properties.get<FillExtrusionPattern>().from);
+        optional<ImagePosition> imagePosB = imageManager->getPattern(properties.get<FillExtrusionPattern>().to);
 
         if (!imagePosA || !imagePosB) {
             return;
         }
 
-        spriteAtlas->bind(true, context, 0);
+        imageManager->bind(context, 0);
 
         parameters.programs.fillExtrusionPattern.draw(
             context,
@@ -46,7 +44,7 @@ void Painter::renderFillExtrusion(PaintParameters& parameters,
                 tile.translatedClipMatrix(properties.get<FillExtrusionTranslate>(),
                                           properties.get<FillExtrusionTranslateAnchor>(),
                                           state),
-                spriteAtlas->getPixelSize(),
+                imageManager->getPixelSize(),
                 *imagePosA,
                 *imagePosB,
                 properties.get<FillExtrusionPattern>(),

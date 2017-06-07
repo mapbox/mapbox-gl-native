@@ -30,10 +30,10 @@ public:
     SymbolLayout(const BucketParameters&,
                  const std::vector<const RenderLayer*>&,
                  const GeometryTileLayer&,
-                 IconDependencies&,
+                 ImageDependencies&,
                  GlyphDependencies&);
 
-    void prepare(const GlyphMap& glyphs, const IconMap& icons);
+    void prepare(const GlyphMap& glyphs, const ImageMap& icons);
 
     std::unique_ptr<SymbolBucket> place(CollisionTile&);
 
@@ -94,6 +94,7 @@ private:
     std::vector<SymbolFeature> features;
 
     GlyphAtlas glyphAtlas;
+    ImageAtlas imageAtlas;
 
     BiDi bidi; // Consider moving this up to geometry tile worker to reduce reinstantiation costs; use of BiDi/ubiditransform object must be constrained to one thread
 };

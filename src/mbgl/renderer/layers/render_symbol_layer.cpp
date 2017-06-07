@@ -25,11 +25,11 @@ std::unique_ptr<SymbolLayout> RenderSymbolLayer::createLayout(const BucketParame
                                                               const std::vector<const RenderLayer*>& group,
                                                               const GeometryTileLayer& layer,
                                                               GlyphDependencies& glyphDependencies,
-                                                              IconDependencies& iconDependencies) const {
+                                                              ImageDependencies& imageDependencies) const {
     return std::make_unique<SymbolLayout>(parameters,
                                           group,
                                           layer,
-                                          iconDependencies,
+                                          imageDependencies,
                                           glyphDependencies);
 }
 
