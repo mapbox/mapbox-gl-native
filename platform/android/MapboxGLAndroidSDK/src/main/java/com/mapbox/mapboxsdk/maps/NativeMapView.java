@@ -621,7 +621,7 @@ final class NativeMapView {
     if (isDestroyedOn("getMetersPerPixelAtLatitude")) {
       return 0;
     }
-    return nativeGetMetersPerPixelAtLatitude(lat, getZoom()) / pixelRatio;
+    return nativeGetMetersPerPixelAtLatitude(lat, getZoom());
   }
 
   public ProjectedMeters projectedMetersForLatLng(LatLng latLng) {
