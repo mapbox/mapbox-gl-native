@@ -406,6 +406,8 @@ void Map::Impl::loadStyleJSON(const std::string& json) {
         map.setBearing(map.getDefaultBearing());
         map.setPitch(map.getDefaultPitch());
     }
+    
+    onUpdate(Update::Repaint);
 }
 
 std::string Map::getStyleURL() const {
@@ -793,10 +795,12 @@ LatLng Map::latLngForPixel(const ScreenCoordinate& pixel) const {
 
 void Map::addAnnotationImage(std::unique_ptr<style::Image> image) {
     impl->annotationManager.addImage(std::move(image));
+    impl->onUpdate(Update::Repaint);
 }
 
 void Map::removeAnnotationImage(const std::string& id) {
     impl->annotationManager.removeImage(id);
+    impl->onUpdate(Update::Repaint);
 }
 
 double Map::getTopOffsetPixelsForAnnotationImage(const std::string& id) {
@@ -805,15 +809,18 @@ double Map::getTopOffsetPixelsForAnnotationImage(const std::string& id) {
 
 AnnotationID Map::addAnnotation(const Annotation& annotation) {
     auto result = impl->annotationManager.addAnnotation(annotation, getMaxZoom());
+    impl->onUpdate(Update::Repaint);
     return result;
 }
 
 void Map::updateAnnotation(AnnotationID id, const Annotation& annotation) {
     impl->annotationManager.updateAnnotation(id, annotation, getMaxZoom());
+    impl->onUpdate(Update::Repaint);
 }
 
 void Map::removeAnnotation(AnnotationID annotation) {
     impl->annotationManager.removeAnnotation(annotation);
+    impl->onUpdate(Update::Repaint);
 }
 
 #pragma mark - Feature query api
