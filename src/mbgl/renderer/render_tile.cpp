@@ -1,6 +1,7 @@
 #include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/map/transform_state.hpp>
+#include <mbgl/tile/tile.hpp>
 
 namespace mbgl {
 
@@ -46,6 +47,8 @@ mat4 RenderTile::translatedClipMatrix(const std::array<float, 2>& translation,
 }
 
 void RenderTile::startRender(Painter& painter) {
+    tile.upload(painter.context);
+
     // Calculate two matrices for this tile: matrix is the standard tile matrix; nearClippedMatrix
     // clips the near plane to 100 to save depth buffer precision
     painter.state.matrixFor(matrix, id);

@@ -19,7 +19,6 @@ public:
     ~RenderImageSource() override;
 
     bool isLoaded() const final;
-    void upload(gl::Context&);
 
     void startRender(Painter&) final;
     void render(Painter&, PaintParameters&, const RenderLayer&);

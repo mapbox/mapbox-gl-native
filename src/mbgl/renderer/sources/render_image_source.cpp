@@ -27,10 +27,10 @@ bool RenderImageSource::isLoaded() const {
 }
 
 void RenderImageSource::startRender(Painter& painter) {
-
     if (!isLoaded()) {
         return;
     }
+
     matrices.clear();
 
     for (size_t i = 0; i < tileIds.size(); i++) {
@@ -39,6 +39,10 @@ void RenderImageSource::startRender(Painter& painter) {
         painter.state.matrixFor(matrix, tileIds[i]);
         matrix::multiply(matrix, painter.projMatrix, matrix);
         matrices.push_back(matrix);
+    }
+
+    if (bucket->needsUpload() && shouldRender) {
+        bucket->upload(painter.context);
     }
 }
 
@@ -61,12 +65,6 @@ RenderImageSource::queryRenderedFeatures(const ScreenLineString&,
 
 std::vector<Feature> RenderImageSource::querySourceFeatures(const SourceQueryOptions&) const {
     return {};
-}
-
-void RenderImageSource::upload(gl::Context& context) {
-    if (isLoaded() && bucket->needsUpload() && shouldRender) {
-        bucket->upload(context);
-    }
 }
 
 void RenderImageSource::update(Immutable<style::Source::Impl> baseImpl_,

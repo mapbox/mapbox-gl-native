@@ -26,6 +26,10 @@ class RenderStyle;
 class RenderedQueryOptions;
 class SourceQueryOptions;
 
+namespace gl {
+class Context;
+} // namespace gl
+
 class Tile : private util::noncopyable {
 public:
     Tile(OverscaledTileID);
@@ -45,6 +49,7 @@ public:
     // Mark this tile as no longer needed and cancel any pending work.
     virtual void cancel() = 0;
 
+    virtual void upload(gl::Context&) = 0;
     virtual Bucket* getBucket(const style::Layer::Impl&) const = 0;
 
     virtual void setPlacementConfig(const PlacementConfig&) {}

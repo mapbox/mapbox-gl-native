@@ -44,6 +44,7 @@ public:
     void getGlyphs(GlyphDependencies);
     void getIcons(IconDependencies);
 
+    void upload(gl::Context&) override;
     Bucket* getBucket(const style::Layer::Impl&) const override;
 
     void queryRenderedFeatures(

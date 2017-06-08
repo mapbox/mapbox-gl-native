@@ -29,6 +29,8 @@ public:
                  optional<Timestamp> expires_);
 
     void cancel() override;
+
+    void upload(gl::Context&) override;
     Bucket* getBucket(const style::Layer::Impl&) const override;
 
     void onParsed(std::unique_ptr<Bucket> result);
