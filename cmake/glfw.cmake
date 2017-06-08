@@ -34,7 +34,11 @@ target_link_libraries(mbgl-glfw
     PRIVATE mbgl-core
 )
 
+target_add_mason_package(mbgl-glfw PRIVATE cheap-ruler)
+target_add_mason_package(mbgl-glfw PRIVATE geojson)
+target_add_mason_package(mbgl-glfw PRIVATE geometry)
 target_add_mason_package(mbgl-glfw PRIVATE glfw)
+target_add_mason_package(mbgl-glfw PRIVATE variant)
 
 mbgl_platform_glfw()
 

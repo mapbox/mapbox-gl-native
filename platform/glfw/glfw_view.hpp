@@ -41,6 +41,9 @@ public:
     void invalidate() override;
     void updateAssumedState() override;
 
+    // mbgl::MapObserver implementation
+    void onDidFinishLoadingStyle() override;
+
 protected:
     // mbgl::Backend implementation
     mbgl::gl::ProcAddress initializeExtension(const char*) override;
@@ -77,6 +80,8 @@ private:
     std::vector<std::string> spriteIDs;
 
 private:
+    void toggle3DExtrusions(bool visible);
+
     mbgl::Map* map = nullptr;
 
     bool fullscreen = false;
@@ -84,6 +89,7 @@ private:
     bool tracking = false;
     bool rotating = false;
     bool pitching = false;
+    bool show3DExtrusions = false;
 
     // Frame timer
     int frames = 0;
@@ -102,6 +108,7 @@ private:
 
     std::function<void()> changeStyleCallback;
     std::function<void()> pauseResumeCallback;
+    std::function<void(mbgl::Map*)> animateRouteCallback;
 
     mbgl::util::RunLoop runLoop;
     mbgl::util::Timer frameTick;
