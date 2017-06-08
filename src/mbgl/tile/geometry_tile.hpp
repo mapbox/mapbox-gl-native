@@ -23,6 +23,8 @@ class RenderStyle;
 class RenderLayer;
 class SourceQueryOptions;
 class TileParameters;
+class GlyphAtlas;
+class ImageAtlas;
 
 class GeometryTile : public Tile, public GlyphRequestor, ImageRequestor {
 public:
@@ -46,6 +48,9 @@ public:
 
     void upload(gl::Context&) override;
     Bucket* getBucket(const style::Layer::Impl&) const override;
+
+    Size bindGlyphAtlas(gl::Context&);
+    Size bindIconAtlas(gl::Context&);
 
     void queryRenderedFeatures(
             std::unordered_map<std::string, std::vector<Feature>>& result,
@@ -73,6 +78,8 @@ public:
     public:
         std::unordered_map<std::string, std::shared_ptr<Bucket>> symbolBuckets;
         std::unique_ptr<CollisionTile> collisionTile;
+        optional<AlphaImage> glyphAtlasImage;
+        optional<PremultipliedImage> iconAtlasImage;
         uint64_t correlationID;
     };
     void onPlacement(PlacementResult);
@@ -106,10 +113,17 @@ private:
     std::unique_ptr<FeatureIndex> featureIndex;
     std::unique_ptr<const GeometryTileData> data;
 
+    optional<AlphaImage> glyphAtlasImage;
+    optional<PremultipliedImage> iconAtlasImage;
+
     std::unordered_map<std::string, std::shared_ptr<Bucket>> symbolBuckets;
     std::unique_ptr<CollisionTile> collisionTile;
     
     util::Throttler placementThrottler;
+
+public:
+    optional<gl::Texture> glyphAtlasTexture;
+    optional<gl::Texture> iconAtlasTexture;
 };
 
 } // namespace mbgl

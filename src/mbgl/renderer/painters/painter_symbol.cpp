@@ -9,7 +9,7 @@
 #include <mbgl/programs/symbol_program.hpp>
 #include <mbgl/programs/collision_box_program.hpp>
 #include <mbgl/util/math.hpp>
-#include <mbgl/tile/tile.hpp>
+#include <mbgl/tile/geometry_tile.hpp>
 
 #include <cmath>
 
@@ -62,6 +62,9 @@ void Painter::renderSymbol(PaintParameters& parameters,
         );
     };
 
+    assert(dynamic_cast<GeometryTile*>(&tile.tile));
+    GeometryTile& geometryTile = static_cast<GeometryTile&>(tile.tile);
+
     if (bucket.hasIconData()) {
         auto values = layer.iconPropertyValues(layout);
         auto paintPropertyValues = layer.iconPaintProperties();
@@ -69,11 +72,11 @@ void Painter::renderSymbol(PaintParameters& parameters,
         const bool iconScaled = layout.get<IconSize>().constantOr(1.0) != 1.0 || bucket.iconsNeedLinear;
         const bool iconTransformed = values.rotationAlignment == AlignmentType::Map || state.getPitch() != 0;
 
-        context.bindTexture(*bucket.icon.atlasTexture, 0,
+        context.bindTexture(*geometryTile.iconAtlasTexture, 0,
             bucket.sdfIcons || state.isChanging() || iconScaled || iconTransformed
                 ? gl::TextureFilter::Linear : gl::TextureFilter::Nearest);
 
-        const Size texsize = bucket.icon.atlasTexture->size;
+        const Size texsize = geometryTile.iconAtlasTexture->size;
 
         if (bucket.sdfIcons) {
             if (values.hasHalo) {
@@ -107,12 +110,12 @@ void Painter::renderSymbol(PaintParameters& parameters,
     }
 
     if (bucket.hasTextData()) {
-        context.bindTexture(*bucket.text.atlasTexture, 0, gl::TextureFilter::Linear);
+        context.bindTexture(*geometryTile.glyphAtlasTexture, 0, gl::TextureFilter::Linear);
 
         auto values = layer.textPropertyValues(layout);
         auto paintPropertyValues = layer.textPaintProperties();
 
-        const Size texsize = bucket.text.atlasTexture->size;
+        const Size texsize = geometryTile.glyphAtlasTexture->size;
 
         if (values.hasHalo) {
             draw(parameters.programs.symbolGlyph,

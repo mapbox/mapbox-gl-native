@@ -65,6 +65,6 @@ SymbolQuads getGlyphQuads(Anchor& anchor,
                           const GeometryCoordinates& line,
                           const style::SymbolLayoutProperties::Evaluated&,
                           style::SymbolPlacementType placement,
-                          const GlyphPositions& face);
+                          const GlyphPositionMap& positions);
 
 } // namespace mbgl

@@ -46,11 +46,9 @@ public:
         gl::VertexVector<SymbolLayoutVertex> vertices;
         gl::IndexVector<gl::Triangles> triangles;
         gl::SegmentVector<SymbolTextAttributes> segments;
-        AlphaImage atlasImage;
 
         optional<gl::VertexBuffer<SymbolLayoutVertex>> vertexBuffer;
         optional<gl::IndexBuffer<gl::Triangles>> indexBuffer;
-        optional<gl::Texture> atlasTexture;
     } text;
     
     std::unique_ptr<SymbolSizeBinder> iconSizeBinder;
@@ -63,7 +61,6 @@ public:
 
         optional<gl::VertexBuffer<SymbolLayoutVertex>> vertexBuffer;
         optional<gl::IndexBuffer<gl::Triangles>> indexBuffer;
-        optional<gl::Texture> atlasTexture;
     } icon;
 
     struct CollisionBoxBuffer {

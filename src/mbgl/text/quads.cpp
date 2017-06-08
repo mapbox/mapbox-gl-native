@@ -307,18 +307,18 @@ SymbolQuads getGlyphQuads(Anchor& anchor,
                           const GeometryCoordinates& line,
                           const SymbolLayoutProperties::Evaluated& layout,
                           const style::SymbolPlacementType placement,
-                          const GlyphPositions& face) {
+                          const GlyphPositionMap& positions) {
     const float textRotate = layout.get<TextRotate>() * util::DEG2RAD;
     const bool keepUpright = layout.get<TextKeepUpright>();
 
     SymbolQuads quads;
 
     for (const PositionedGlyph &positionedGlyph: shapedText.positionedGlyphs) {
-        auto face_it = face.find(positionedGlyph.glyph);
-        if (face_it == face.end())
+        auto positionsIt = positions.find(positionedGlyph.glyph);
+        if (positionsIt == positions.end())
             continue;
 
-        const GlyphPosition& glyph = face_it->second;
+        const GlyphPosition& glyph = positionsIt->second;
         const Rect<uint16_t>& rect = glyph.rect;
         const float centerX = (positionedGlyph.x + glyph.metrics.advance / 2.0f) * boxScale;
 

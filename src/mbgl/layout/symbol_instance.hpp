@@ -26,7 +26,7 @@ public:
                    const float iconBoxScale,
                    const float iconPadding,
                    style::SymbolPlacementType iconPlacement,
-                   const GlyphPositions& face,
+                   const GlyphPositionMap&,
                    const IndexedSubfeature&,
                    const std::size_t featureIndex);
 

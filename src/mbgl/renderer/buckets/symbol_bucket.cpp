@@ -39,14 +39,12 @@ void SymbolBucket::upload(gl::Context& context) {
     if (hasTextData()) {
         text.vertexBuffer = context.createVertexBuffer(std::move(text.vertices));
         text.indexBuffer = context.createIndexBuffer(std::move(text.triangles));
-        text.atlasTexture = context.createTexture(std::move(text.atlasImage), 0);
         textSizeBinder->upload(context);
     }
 
     if (hasIconData()) {
         icon.vertexBuffer = context.createVertexBuffer(std::move(icon.vertices));
         icon.indexBuffer = context.createIndexBuffer(std::move(icon.triangles));
-        icon.atlasTexture = context.createTexture(std::move(icon.atlasImage), 0);
         iconSizeBinder->upload(context);
     }
 

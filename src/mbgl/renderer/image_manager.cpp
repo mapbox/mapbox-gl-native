@@ -119,14 +119,7 @@ optional<ImagePosition> ImageManager::getPattern(const std::string& id) {
         return {};
     }
 
-    if (!atlasImage.valid()) {
-        atlasImage = PremultipliedImage(getPixelSize());
-        atlasImage.fill(0);
-    } else if (atlasImage.size != getPixelSize()) {
-        PremultipliedImage newImage(getPixelSize());
-        PremultipliedImage::copy(atlasImage, newImage, { 0, 0 }, { 0, 0 }, atlasImage.size);
-        atlasImage = std::move(newImage);
-    }
+    atlasImage.resize(getPixelSize());
 
     const PremultipliedImage& src = image->image;
 
