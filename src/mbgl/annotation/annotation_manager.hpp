@@ -6,6 +6,7 @@
 #include <mbgl/map/update.hpp>
 #include <mbgl/util/noncopyable.hpp>
 
+#include <mutex>
 #include <string>
 #include <vector>
 #include <unordered_set>
@@ -56,7 +57,11 @@ private:
 
     void removeAndAdd(const AnnotationID&, const Annotation&, const uint8_t);
 
+    void remove(const AnnotationID&);
+
     std::unique_ptr<AnnotationTileData> getTileData(const CanonicalTileID&);
+
+    std::mutex mutex;
 
     AnnotationID nextID = 0;
 
