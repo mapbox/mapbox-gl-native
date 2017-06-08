@@ -66,8 +66,8 @@ public:
     // Checks whether this layer can be rendered.
     bool needsRendering(float zoom) const;
 
-    virtual void uploadBuckets(gl::Context&, RenderSource* source);
-    virtual void render(Painter& , PaintParameters& , RenderSource* source);
+    virtual void render(Painter&, PaintParameters&, RenderSource*);
+
     // Check wether the given geometry intersects
     // with the feature
     virtual bool queryIntersectsFeature(

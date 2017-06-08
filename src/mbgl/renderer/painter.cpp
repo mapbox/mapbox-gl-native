@@ -174,10 +174,6 @@ void Painter::render(RenderStyle& style, const FrameData& frame_, View& view) {
         lineAtlas->upload(context, 0);
         glyphAtlas->upload(context, 0);
         frameHistory.upload(context, 0);
-
-        for (const auto& item : order) {
-            item.layer.uploadBuckets(context, item.source);
-        }
     }
 
     // - CLEAR -------------------------------------------------------------------------------------

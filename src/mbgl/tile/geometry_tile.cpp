@@ -161,6 +161,22 @@ void GeometryTile::getIcons(IconDependencies iconDependencies) {
     spriteAtlas.getIcons(*this, std::move(iconDependencies));
 }
 
+void GeometryTile::upload(gl::Context& context) {
+    auto upload = [&] (Bucket& bucket) {
+        if (bucket.needsUpload()) {
+            bucket.upload(context);
+        }
+    };
+
+    for (auto& entry : nonSymbolBuckets) {
+        upload(*entry.second);
+    }
+
+    for (auto& entry : symbolBuckets) {
+        upload(*entry.second);
+    }
+}
+
 Bucket* GeometryTile::getBucket(const Layer::Impl& layer) const {
     const auto& buckets = layer.type == LayerType::Symbol ? symbolBuckets : nonSymbolBuckets;
     const auto it = buckets.find(layer.id);

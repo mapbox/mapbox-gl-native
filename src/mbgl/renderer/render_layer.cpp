@@ -68,15 +68,6 @@ void RenderLayer::setRenderTiles(std::vector<std::reference_wrapper<RenderTile>>
     renderTiles = std::move(tiles);
 }
 
-void RenderLayer::uploadBuckets(gl::Context& context, RenderSource*) {
-    for (const auto& tileRef : renderTiles) {
-        const auto& bucket = tileRef.get().tile.getBucket(*baseImpl);
-        if (bucket && bucket->needsUpload()) {
-            bucket->upload(context);
-        }
-    }
-}
-
 void RenderLayer::render(Painter& painter, PaintParameters& parameters, RenderSource*) {
     for (auto& tileRef : renderTiles) {
         auto& tile = tileRef.get();

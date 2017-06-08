@@ -55,6 +55,12 @@ void RasterTile::onError(std::exception_ptr err) {
     observer->onTileError(*this, err);
 }
 
+void RasterTile::upload(gl::Context& context) {
+    if (bucket) {
+        bucket->upload(context);
+    }
+}
+
 Bucket* RasterTile::getBucket(const style::Layer::Impl&) const {
     return bucket.get();
 }

@@ -36,16 +36,6 @@ bool RenderRasterLayer::hasTransition() const {
     return unevaluated.hasTransition();
 }
 
-void RenderRasterLayer::uploadBuckets(gl::Context& context, RenderSource* source) {
-    RenderLayer::uploadBuckets(context, source);
-    if (renderTiles.empty()) {
-        RenderImageSource* imageSource = source->as<RenderImageSource>();
-        if (imageSource) {
-            imageSource->upload(context);
-        }
-    }
-}
-
 void RenderRasterLayer::render(Painter& painter, PaintParameters& parameters, RenderSource* source) {
     RenderLayer::render(painter, parameters, source);
     if (renderTiles.empty()) {
