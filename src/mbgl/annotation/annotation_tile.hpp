@@ -6,19 +6,17 @@
 
 namespace mbgl {
 
-class AnnotationManager;
+class AnnotationTileData;
 class TileParameters;
 
 class AnnotationTile : public GeometryTile {
 public:
     AnnotationTile(const OverscaledTileID&,
-                   const TileParameters&);
+                   const TileParameters&,
+                   std::unique_ptr<const AnnotationTileData> data);
     ~AnnotationTile() override;
 
     void setNecessity(Necessity) final;
-
-private:
-    AnnotationManager& annotationManager;
 };
 
 class AnnotationTileFeature : public GeometryTileFeature {
@@ -55,6 +53,10 @@ private:
     std::string name;
 };
 
+/**
+ * Holds the layers for a AnnotationTile. One layer per shape geometry
+ * and a single layer for all symbol geometries
+ */
 class AnnotationTileData : public GeometryTileData {
 public:
     std::unique_ptr<GeometryTileData> clone() const override;

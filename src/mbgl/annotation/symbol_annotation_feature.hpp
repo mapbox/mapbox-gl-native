@@ -31,11 +31,14 @@ namespace mbgl {
 class AnnotationTileLayer;
 class CanonicalTileID;
 
-class SymbolAnnotationImpl {
+/**
+ * Contains the geometry and icon name for this symbol feature
+ */
+class SymbolAnnotationFeature {
 public:
-    SymbolAnnotationImpl(AnnotationID, SymbolAnnotation);
+    SymbolAnnotationFeature(const AnnotationID&, const SymbolAnnotation&);
 
-    void updateLayer(const CanonicalTileID&, AnnotationTileLayer&) const;
+    void updateTileLayer(const CanonicalTileID&, AnnotationTileLayer&) const;
 
     const AnnotationID id;
     const SymbolAnnotation annotation;
@@ -82,9 +85,9 @@ struct indexed_access<mbgl::LatLngBounds, max_corner, D>
 namespace index {
 
 template <>
-struct indexable<std::shared_ptr<const mbgl::SymbolAnnotationImpl>> {
+struct indexable<std::shared_ptr<const mbgl::SymbolAnnotationFeature>> {
     using result_type = mbgl::LatLng;
-    mbgl::LatLng operator()(const std::shared_ptr<const mbgl::SymbolAnnotationImpl>& v) const {
+    mbgl::LatLng operator()(const std::shared_ptr<const mbgl::SymbolAnnotationFeature>& v) const {
         const mbgl::Point<double>& p = v->annotation.geometry;
         return mbgl::LatLng(p.y, p.x);
     }

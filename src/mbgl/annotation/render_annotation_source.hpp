@@ -3,8 +3,11 @@
 #include <mbgl/renderer/render_source.hpp>
 #include <mbgl/renderer/tile_pyramid.hpp>
 #include <mbgl/annotation/annotation_source.hpp>
+#include <mbgl/annotation/annotation_source_impl.hpp>
 
 namespace mbgl {
+
+class AnnotationData;
 
 class RenderAnnotationSource : public RenderSource {
 public:
@@ -43,6 +46,7 @@ private:
     const AnnotationSource::Impl& impl() const;
 
     TilePyramid tilePyramid;
+    const AnnotationData* data;
 };
 
 template <>

@@ -6,9 +6,7 @@ namespace mbgl {
 
 enum class Update {
     Nothing                   = 0,
-    Repaint                   = 1 << 0,
-    AnnotationStyle           = 1 << 6,
-    AnnotationData            = 1 << 7
+    Repaint                   = 1 << 0
 };
 
 constexpr Update operator|(Update lhs, Update rhs) {

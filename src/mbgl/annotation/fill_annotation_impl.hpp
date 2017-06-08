@@ -5,15 +5,19 @@
 
 namespace mbgl {
 
+/**
+ * Holds the data needed to update the style for this fill annotation.
+ */
 class FillAnnotationImpl : public ShapeAnnotationImpl {
 public:
-    FillAnnotationImpl(AnnotationID, FillAnnotation, uint8_t maxZoom);
+    FillAnnotationImpl(const AnnotationID&, const FillAnnotation&, const uint8_t maxZoom);
 
     void updateStyle(style::Style&) const final;
-    const ShapeAnnotationGeometry& geometry() const final;
 
 private:
-    const FillAnnotation annotation;
+    style::DataDrivenPropertyValue<float> opacity { 1.0f };
+    style::DataDrivenPropertyValue<Color> color { Color::black() };
+    style::DataDrivenPropertyValue<Color> outlineColor {};
 };
 
 } // namespace mbgl

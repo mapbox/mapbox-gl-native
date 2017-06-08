@@ -7,9 +7,13 @@ namespace mbgl {
 
 using namespace style;
 
-LineAnnotationImpl::LineAnnotationImpl(AnnotationID id_, LineAnnotation annotation_, uint8_t maxZoom_)
-    : ShapeAnnotationImpl(id_, maxZoom_),
-      annotation({ ShapeAnnotationGeometry::visit(annotation_.geometry, CloseShapeAnnotation{}), annotation_.opacity, annotation_.width, annotation_.color }) {
+LineAnnotationImpl::LineAnnotationImpl(const AnnotationID& id_,
+                                       const LineAnnotation& annotation_,
+                                       const uint8_t maxZoom_)
+        : ShapeAnnotationImpl(id_, maxZoom_)
+        , opacity(annotation_.opacity)
+        , width(annotation_.width)
+        , color(annotation_.color) {
 }
 
 void LineAnnotationImpl::updateStyle(Style& style) const {
@@ -22,14 +26,10 @@ void LineAnnotationImpl::updateStyle(Style& style) const {
         layer = style.addLayer(std::move(newLayer), AnnotationManager::PointLayerID);
     }
 
-    auto* lineLayer = layer->as<LineLayer>();
-    lineLayer->setLineOpacity(annotation.opacity);
-    lineLayer->setLineWidth(annotation.width);
-    lineLayer->setLineColor(annotation.color);
-}
-
-const ShapeAnnotationGeometry& LineAnnotationImpl::geometry() const {
-    return annotation.geometry;
+    auto *lineLayer = layer->as<LineLayer>();
+    lineLayer->setLineOpacity(opacity);
+    lineLayer->setLineWidth(width);
+    lineLayer->setLineColor(color);
 }
 
 } // namespace mbgl

@@ -1,4 +1,5 @@
 #include <mbgl/annotation/render_annotation_source.hpp>
+#include <mbgl/annotation/annotation_source_impl.hpp>
 #include <mbgl/annotation/annotation_tile.hpp>
 #include <mbgl/renderer/render_tile.hpp>
 
@@ -31,6 +32,17 @@ void RenderAnnotationSource::update(Immutable<style::Source::Impl> baseImpl_,
 
     enabled = needsRendering;
 
+    const AnnotationData* data_ = impl().getData();
+
+    if (data_ != data) {
+        data = data_;
+        tilePyramid.cache.clear();
+
+        for (auto const& item : tilePyramid.tiles) {
+            static_cast<AnnotationTile*>(item.second.get())->setData(data->getTile(item.first.canonical));
+        }
+    }
+
     tilePyramid.update(layers,
                        needsRendering,
                        needsRelayout,
@@ -39,7 +51,7 @@ void RenderAnnotationSource::update(Immutable<style::Source::Impl> baseImpl_,
                        util::tileSize,
                        { 0, 22 },
                        [&] (const OverscaledTileID& tileID) {
-                           return std::make_unique<AnnotationTile>(tileID, parameters);
+                           return std::make_unique<AnnotationTile>(tileID, parameters, data->getTile(tileID.canonical));
                        });
 }
 
