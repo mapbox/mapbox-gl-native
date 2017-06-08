@@ -386,14 +386,24 @@ void GeometryTileWorker::attemptPlacement() {
     auto collisionTile = std::make_unique<CollisionTile>(*placementConfig);
     std::unordered_map<std::string, std::shared_ptr<Bucket>> buckets;
 
+    optional<AlphaImage> glyphAtlasImage;
+    optional<PremultipliedImage> iconAtlasImage;
+
     for (auto& symbolLayout : symbolLayouts) {
         if (obsolete) {
             return;
         }
 
         if (symbolLayout->state == SymbolLayout::Pending) {
-            symbolLayout->prepare(glyphMap, imageMap);
+            GlyphAtlas glyphAtlas = makeGlyphAtlas(glyphMap);
+            ImageAtlas imageAtlas = makeImageAtlas(imageMap);
+
+            symbolLayout->prepare(glyphMap, glyphAtlas.positions,
+                                  imageMap, imageAtlas.positions);
             symbolLayout->state = SymbolLayout::Placed;
+
+            glyphAtlasImage = std::move(glyphAtlas.image);
+            iconAtlasImage = std::move(imageAtlas.image);
         }
 
         if (!symbolLayout->hasSymbolInstances()) {
@@ -409,6 +419,8 @@ void GeometryTileWorker::attemptPlacement() {
     parent.invoke(&GeometryTile::onPlacement, GeometryTile::PlacementResult {
         std::move(buckets),
         std::move(collisionTile),
+        std::move(glyphAtlasImage),
+        std::move(iconAtlasImage),
         correlationID
     });
 }

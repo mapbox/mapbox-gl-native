@@ -33,7 +33,8 @@ public:
                  ImageDependencies&,
                  GlyphDependencies&);
 
-    void prepare(const GlyphMap& glyphs, const ImageMap& icons);
+    void prepare(const GlyphMap&, const GlyphPositions&,
+                 const ImageMap&, const ImagePositions&);
 
     std::unique_ptr<SymbolBucket> place(CollisionTile&);
 
@@ -53,7 +54,8 @@ private:
     void addFeature(const size_t,
                     const SymbolFeature&,
                     const std::pair<Shaping, Shaping>& shapedTextOrientations,
-                    optional<PositionedIcon> shapedIcon);
+                    optional<PositionedIcon> shapedIcon,
+                    const GlyphPositionMap&);
 
     bool anchorIsTooClose(const std::u16string& text, const float repeatDistance, const Anchor&);
     std::map<std::u16string, std::vector<Anchor>> compareText;
@@ -92,9 +94,6 @@ private:
 
     std::vector<SymbolInstance> symbolInstances;
     std::vector<SymbolFeature> features;
-
-    GlyphAtlas glyphAtlas;
-    ImageAtlas imageAtlas;
 
     BiDi bidi; // Consider moving this up to geometry tile worker to reduce reinstantiation costs; use of BiDi/ubiditransform object must be constrained to one thread
 };

@@ -55,9 +55,9 @@ TEST(AnnotationTile, Issue8289) {
     // Simulate layout and placement of a symbol layer.
     tile.onLayout(GeometryTile::LayoutResult {
         {},
-            std::make_unique<FeatureIndex>(),
-            std::move(data),
-            0
+        std::make_unique<FeatureIndex>(),
+        std::move(data),
+        0
     });
 
     auto collisionTile = std::make_unique<CollisionTile>(PlacementConfig());
@@ -69,16 +69,18 @@ TEST(AnnotationTile, Issue8289) {
 
     tile.onPlacement(GeometryTile::PlacementResult {
         {},
-            std::move(collisionTile),
-            0
+        std::move(collisionTile),
+        {},
+        {},
+        0
     });
 
     // Simulate a second layout with empty data.
     tile.onLayout(GeometryTile::LayoutResult {
         {},
-            std::make_unique<FeatureIndex>(),
-            std::make_unique<AnnotationTileData>(),
-            0
+        std::make_unique<FeatureIndex>(),
+        std::make_unique<AnnotationTileData>(),
+        0
     });
 
     std::unordered_map<std::string, std::vector<Feature>> result;

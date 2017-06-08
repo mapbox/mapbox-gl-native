@@ -81,6 +81,8 @@ TEST(VectorTile, Issue7615) {
             symbolBucket
         }},
         nullptr,
+        {},
+        {},
         0
     });
 

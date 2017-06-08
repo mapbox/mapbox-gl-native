@@ -10,6 +10,8 @@
 #include <mbgl/renderer/layers/render_custom_layer.hpp>
 #include <mbgl/renderer/layers/render_symbol_layer.hpp>
 #include <mbgl/renderer/buckets/symbol_bucket.hpp>
+#include <mbgl/text/glyph_atlas.hpp>
+#include <mbgl/renderer/image_atlas.hpp>
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/geometry/feature_index.hpp>
 #include <mbgl/text/collision_tile.hpp>
@@ -135,6 +137,12 @@ void GeometryTile::onPlacement(PlacementResult result) {
     }
     symbolBuckets = std::move(result.symbolBuckets);
     collisionTile = std::move(result.collisionTile);
+    if (result.glyphAtlasImage) {
+        glyphAtlasImage = std::move(*result.glyphAtlasImage);
+    }
+    if (result.iconAtlasImage) {
+        iconAtlasImage = std::move(*result.iconAtlasImage);
+    }
     observer->onTileChanged(*this);
 }
 
@@ -174,6 +182,16 @@ void GeometryTile::upload(gl::Context& context) {
 
     for (auto& entry : symbolBuckets) {
         upload(*entry.second);
+    }
+
+    if (glyphAtlasImage) {
+        glyphAtlasTexture = context.createTexture(*glyphAtlasImage, 0);
+        glyphAtlasImage = {};
+    }
+
+    if (iconAtlasImage) {
+        iconAtlasTexture = context.createTexture(*iconAtlasImage, 0);
+        iconAtlasImage = {};
     }
 }
 

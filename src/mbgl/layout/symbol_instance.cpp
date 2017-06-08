@@ -19,7 +19,7 @@ SymbolInstance::SymbolInstance(Anchor& anchor,
                                const float iconBoxScale,
                                const float iconPadding,
                                const SymbolPlacementType iconPlacement,
-                               const GlyphPositions& face,
+                               const GlyphPositionMap& positions,
                                const IndexedSubfeature& indexedFeature,
                                const std::size_t featureIndex_) :
     point(anchor.point),
@@ -38,11 +38,11 @@ SymbolInstance::SymbolInstance(Anchor& anchor,
             iconQuad = getIconQuad(anchor, *shapedIcon, line, layout, layoutTextSize, iconPlacement, shapedTextOrientations.first);
         }
         if (shapedTextOrientations.first) {
-            auto quads = getGlyphQuads(anchor, shapedTextOrientations.first, textBoxScale, line, layout, textPlacement, face);
+            auto quads = getGlyphQuads(anchor, shapedTextOrientations.first, textBoxScale, line, layout, textPlacement, positions);
             glyphQuads.insert(glyphQuads.end(), quads.begin(), quads.end());
         }
         if (shapedTextOrientations.second) {
-            auto quads = getGlyphQuads(anchor, shapedTextOrientations.second, textBoxScale, line, layout, textPlacement, face);
+            auto quads = getGlyphQuads(anchor, shapedTextOrientations.second, textBoxScale, line, layout, textPlacement, positions);
             glyphQuads.insert(glyphQuads.end(), quads.begin(), quads.end());
         }
     }

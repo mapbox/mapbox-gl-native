@@ -11,7 +11,8 @@ struct GlyphPosition {
     GlyphMetrics metrics;
 };
 
-using GlyphPositions = std::map<GlyphID, GlyphPosition>;
+using GlyphPositionMap = std::map<GlyphID, GlyphPosition>;
+using GlyphPositions = std::map<FontStack, GlyphPositionMap>;
 
 class GlyphAtlas {
 public:
@@ -19,6 +20,6 @@ public:
     GlyphPositions positions;
 };
 
-GlyphAtlas makeGlyphAtlas(const Glyphs&);
+GlyphAtlas makeGlyphAtlas(const GlyphMap&);
 
 } // namespace mbgl
