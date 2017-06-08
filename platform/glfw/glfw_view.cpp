@@ -1,14 +1,20 @@
 #include "glfw_view.hpp"
+#include "ny_route.hpp"
 
 #include <mbgl/annotation/annotation.hpp>
 #include <mbgl/style/image.hpp>
 #include <mbgl/style/transition_options.hpp>
+#include <mbgl/style/layers/fill_extrusion_layer.hpp>
 #include <mbgl/util/logging.hpp>
 #include <mbgl/util/platform.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/map/backend_scope.hpp>
 #include <mbgl/map/camera.hpp>
+
+#include <mapbox/cheap_ruler.hpp>
+#include <mapbox/geometry.hpp>
+#include <mapbox/geojson.hpp>
 
 #if MBGL_USE_GLES2
 #define GLFW_INCLUDE_ES2
@@ -99,7 +105,8 @@ GLFWView::GLFWView(bool fullscreen_, bool benchmark_)
     printf("- Press `S` to cycle through bundled styles\n");
     printf("- Press `X` to reset the transform\n");
     printf("- Press `N` to reset north\n");
-    printf("- Press `R` to toggle any available `night` style class\n");
+    printf("- Press `R` to enable the route demo\n");
+    printf("- Press `E` to insert an example building extrusion layer\n");
     printf("- Press `Z` to cycle through north orientations\n");
     printf("- Prezz `X` to cycle through the viewport modes\n");
     printf("- Press `A` to cycle through Mapbox offices in the world + dateline monument\n");
@@ -148,6 +155,9 @@ void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, 
     auto *view = reinterpret_cast<GLFWView *>(glfwGetWindowUserPointer(window));
 
     if (action == GLFW_RELEASE) {
+        if (key != GLFW_KEY_R || key != GLFW_KEY_S)
+            view->animateRouteCallback = nullptr;
+
         switch (key) {
         case GLFW_KEY_ESCAPE:
             glfwSetWindowShouldClose(window, true);
@@ -220,6 +230,37 @@ void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, 
             view->map->flyTo(cameraOptions, animationOptions);
             nextPlace = nextPlace % places.size();
         } break;
+        case GLFW_KEY_R: {
+            view->show3DExtrusions = true;
+            view->toggle3DExtrusions(view->show3DExtrusions);
+            if (view->animateRouteCallback) break;
+            view->animateRouteCallback = [](mbgl::Map* routeMap) {
+                static mapbox::cheap_ruler::CheapRuler ruler { 40.7 }; // New York
+                static mapbox::geojson::geojson route { mapbox::geojson::parse(mbgl::platform::glfw::route) };
+                const auto& geometry = route.get<mapbox::geometry::geometry<double>>();
+                const auto& lineString = geometry.get<mapbox::geometry::line_string<double>>();
+
+                static double routeDistance = ruler.lineDistance(lineString);
+                static double routeProgress = 0;
+                routeProgress += 0.0005;
+                if (routeProgress > 1.0) routeProgress = 0;
+
+                double distance = routeProgress * routeDistance;
+                auto point = ruler.along(lineString, distance);
+                auto latLng = routeMap->getLatLng();
+                routeMap->setLatLng({ point.y, point.x });
+                double bearing = ruler.bearing({ latLng.longitude(), latLng.latitude() }, point);
+                double easing = bearing - routeMap->getBearing();
+                easing += easing > 180.0 ? -360.0 : easing < -180 ? 360.0 : 0;
+                routeMap->setBearing(routeMap->getBearing() + (easing / 20));
+                routeMap->setPitch(60.0);
+                routeMap->setZoom(18.0);
+            };
+            view->animateRouteCallback(view->map);
+        } break;
+        case GLFW_KEY_E:
+            view->toggle3DExtrusions(!view->show3DExtrusions);
+            break;
         }
     }
 
@@ -450,6 +491,9 @@ void GLFWView::run() {
         if (dirty) {
             const double started = glfwGetTime();
 
+            if (animateRouteCallback)
+                animateRouteCallback(map);
+
             activate();
             mbgl::BackendScope scope { *this, mbgl::BackendScope::ScopeType::Implicit };
 
@@ -529,6 +573,51 @@ void GLFWView::setShouldClose() {
 
 void GLFWView::setWindowTitle(const std::string& title) {
     glfwSetWindowTitle(window, (std::string { "Mapbox GL: " } + title).c_str());
+}
+
+void GLFWView::onDidFinishLoadingStyle() {
+    if (show3DExtrusions) {
+        toggle3DExtrusions(show3DExtrusions);
+    }
+}
+
+void GLFWView::toggle3DExtrusions(bool visible) {
+    show3DExtrusions = visible;
+
+    // Satellite-only style does not contain building extrusions data.
+    if (!map->getSource("composite")) {
+        return;
+    }
+
+    if (auto layer = map->getLayer("3d-buildings")) {
+        layer->setVisibility(mbgl::style::VisibilityType(!show3DExtrusions));
+        return;
+    }
+
+    auto extrusionLayer = std::make_unique<mbgl::style::FillExtrusionLayer>("3d-buildings", "composite");
+    extrusionLayer->setSourceLayer("building");
+    extrusionLayer->setMinZoom(15.0f);
+    extrusionLayer->setFilter(mbgl::style::EqualsFilter { "extrude", { std::string("true") } });
+
+    auto colorFn = mbgl::style::SourceFunction<mbgl::Color> { "height",
+        mbgl::style::ExponentialStops<mbgl::Color> {
+            std::map<float, mbgl::Color> {
+                {   0.f, *mbgl::Color::parse("#160e23") },
+                {  50.f, *mbgl::Color::parse("#00615f") },
+                { 100.f, *mbgl::Color::parse("#55e9ff") }
+            }
+        }
+    };
+    extrusionLayer->setFillExtrusionColor({ colorFn });
+    extrusionLayer->setFillExtrusionOpacity({ 0.6f });
+
+    auto heightSourceFn = mbgl::style::SourceFunction<float> { "height", mbgl::style::IdentityStops<float>() };
+    extrusionLayer->setFillExtrusionHeight({ heightSourceFn });
+
+    auto baseSourceFn = mbgl::style::SourceFunction<float> { "min_height", mbgl::style::IdentityStops<float>() };
+    extrusionLayer->setFillExtrusionBase({ baseSourceFn });
+
+    map->addLayer(std::move(extrusionLayer));
 }
 
 namespace mbgl {
