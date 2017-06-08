@@ -26,10 +26,7 @@ bool RenderImageSource::isLoaded() const {
     return !!bucket;
 }
 
-void RenderImageSource::startRender(algorithm::ClipIDGenerator&,
-                                    const mat4& projMatrix,
-                                    const mat4&,
-                                    const TransformState& transformState) {
+void RenderImageSource::startRender(Painter& painter) {
 
     if (!isLoaded()) {
         return;
@@ -39,8 +36,8 @@ void RenderImageSource::startRender(algorithm::ClipIDGenerator&,
     for (size_t i = 0; i < tileIds.size(); i++) {
         mat4 matrix;
         matrix::identity(matrix);
-        transformState.matrixFor(matrix, tileIds[i]);
-        matrix::multiply(matrix, projMatrix, matrix);
+        painter.state.matrixFor(matrix, tileIds[i]);
+        matrix::multiply(matrix, painter.projMatrix, matrix);
         matrices.push_back(matrix);
     }
 }

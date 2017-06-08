@@ -18,10 +18,7 @@ public:
                 bool needsRelayout,
                 const TileParameters&) final;
 
-    void startRender(algorithm::ClipIDGenerator&,
-                     const mat4& projMatrix,
-                     const mat4& clipMatrix,
-                     const TransformState&) final;
+    void startRender(Painter&) final;
     void finishRender(Painter&) final;
 
     std::map<UnwrappedTileID, RenderTile>& getRenderTiles() final;

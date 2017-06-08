@@ -11,6 +11,7 @@ namespace mbgl {
 
 class Tile;
 class TransformState;
+class Painter;
 
 class RenderTile {
 public:
@@ -35,9 +36,8 @@ public:
                               style::TranslateAnchorType anchor,
                               const TransformState&) const;
 
-    void calculateMatrices(const mat4& projMatrix,
-                           const mat4& projClipMatrix,
-                           const TransformState&);
+    void startRender(Painter&);
+
 private:
     mat4 translateVtxMatrix(const mat4& tileMatrix,
                             const std::array<float, 2>& translation,

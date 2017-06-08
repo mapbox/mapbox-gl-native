@@ -21,13 +21,8 @@ public:
     bool isLoaded() const final;
     void upload(gl::Context&);
 
-    void startRender(algorithm::ClipIDGenerator&,
-                     const mat4& projMatrix,
-                     const mat4& clipMatrix,
-                     const TransformState&) final;
-
+    void startRender(Painter&) final;
     void render(Painter&, PaintParameters&, const RenderLayer&);
-
     void finishRender(Painter&) final;
 
     void update(Immutable<style::Source::Impl>,
