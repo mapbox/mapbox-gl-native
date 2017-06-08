@@ -40,6 +40,7 @@ set(MBGL_TEST_FILES
 
     # programs
     test/programs/binary_program.test.cpp
+    test/programs/symbol_program.test.cpp
 
     # renderer
     test/renderer/group_by_layout.test.cpp
