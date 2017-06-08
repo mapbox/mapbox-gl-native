@@ -59,7 +59,7 @@ public:
                 
                 // lower_bound yields first element >= zoom, but we want the *last*
                 // element <= zoom, so if we found a stop > zoom, back up by one.
-                if (minIt != s.stops.begin() && minIt->first > zoom) {
+                if (minIt != s.stops.begin() && minIt != s.stops.end() && minIt->first > zoom) {
                     minIt--;
                 }
                 

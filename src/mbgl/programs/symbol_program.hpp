@@ -121,7 +121,7 @@ Range<float> getCoveringStops(Stops s, float lowerZoom, float upperZoom) {
     
     // lower_bound yields first element >= lowerZoom, but we want the *last*
     // element <= lowerZoom, so if we found a stop > lowerZoom, back up by one.
-    if (minIt != s.stops.begin() && minIt->first > lowerZoom) {
+    if (minIt != s.stops.begin() && minIt != s.stops.end() && minIt->first > lowerZoom) {
         minIt--;
     }
     return Range<float> {
