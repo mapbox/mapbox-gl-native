@@ -42,9 +42,7 @@ public:
                 Range<uint8_t> zoomRange,
                 std::function<std::unique_ptr<Tile> (const OverscaledTileID&)> createTile);
 
-    void startRender(const mat4& projMatrix,
-                     const mat4& clipMatrix,
-                     const TransformState&);
+    void startRender(Painter&);
     void finishRender(Painter&);
 
     std::map<UnwrappedTileID, RenderTile>& getRenderTiles();

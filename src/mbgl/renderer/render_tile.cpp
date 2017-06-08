@@ -1,4 +1,5 @@
 #include <mbgl/renderer/render_tile.hpp>
+#include <mbgl/renderer/painter.hpp>
 #include <mbgl/map/transform_state.hpp>
 
 namespace mbgl {
@@ -44,15 +45,13 @@ mat4 RenderTile::translatedClipMatrix(const std::array<float, 2>& translation,
     return translateVtxMatrix(nearClippedMatrix, translation, anchor, state);
 }
 
-void RenderTile::calculateMatrices(const mat4& projMatrix,
-                                   const mat4& projClipMatrix,
-                                   const TransformState& transform) {
+void RenderTile::startRender(Painter& painter) {
     // Calculate two matrices for this tile: matrix is the standard tile matrix; nearClippedMatrix
     // clips the near plane to 100 to save depth buffer precision
-    transform.matrixFor(matrix, id);
-    transform.matrixFor(nearClippedMatrix, id);
-    matrix::multiply(matrix, projMatrix, matrix);
-    matrix::multiply(nearClippedMatrix, projClipMatrix, nearClippedMatrix);
+    painter.state.matrixFor(matrix, id);
+    painter.state.matrixFor(nearClippedMatrix, id);
+    matrix::multiply(matrix, painter.projMatrix, matrix);
+    matrix::multiply(nearClippedMatrix, painter.nearClippedProjMatrix, nearClippedMatrix);
 }
 
 } // namespace mbgl

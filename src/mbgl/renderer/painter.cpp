@@ -28,9 +28,6 @@
 #include <mbgl/programs/program_parameters.hpp>
 #include <mbgl/programs/programs.hpp>
 
-#include <mbgl/algorithm/generate_clip_ids.hpp>
-#include <mbgl/algorithm/generate_clip_ids_impl.hpp>
-
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/mat3.hpp>
 #include <mbgl/util/string.hpp>
@@ -202,14 +199,14 @@ void Painter::render(RenderStyle& style, const FrameData& frame_, View& view) {
         MBGL_DEBUG_GROUP(context, "clip");
 
         // Update all clipping IDs.
-        algorithm::ClipIDGenerator generator;
+        clipIDGenerator = algorithm::ClipIDGenerator();
         for (const auto& source : sources) {
-            source->startRender(generator, projMatrix, nearClippedProjMatrix, state);
+            source->startRender(*this);
         }
 
         MBGL_DEBUG_GROUP(context, "clipping masks");
 
-        for (const auto& stencil : generator.getStencils()) {
+        for (const auto& stencil : clipIDGenerator.getStencils()) {
             MBGL_DEBUG_GROUP(context, std::string{ "mask: " } + util::toString(stencil.first));
             renderClippingMask(stencil.first, stencil.second);
         }

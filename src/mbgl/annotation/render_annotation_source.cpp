@@ -1,6 +1,7 @@
 #include <mbgl/annotation/render_annotation_source.hpp>
 #include <mbgl/annotation/annotation_tile.hpp>
 #include <mbgl/renderer/render_tile.hpp>
+#include <mbgl/renderer/painter.hpp>
 
 #include <mbgl/algorithm/generate_clip_ids.hpp>
 #include <mbgl/algorithm/generate_clip_ids_impl.hpp>
@@ -43,9 +44,9 @@ void RenderAnnotationSource::update(Immutable<style::Source::Impl> baseImpl_,
                        });
 }
 
-void RenderAnnotationSource::startRender(algorithm::ClipIDGenerator& generator, const mat4& projMatrix, const mat4& clipMatrix, const TransformState& transform) {
-    generator.update(tilePyramid.getRenderTiles());
-    tilePyramid.startRender(projMatrix, clipMatrix, transform);
+void RenderAnnotationSource::startRender(Painter& painter) {
+    painter.clipIDGenerator.update(tilePyramid.getRenderTiles());
+    tilePyramid.startRender(painter);
 }
 
 void RenderAnnotationSource::finishRender(Painter& painter) {

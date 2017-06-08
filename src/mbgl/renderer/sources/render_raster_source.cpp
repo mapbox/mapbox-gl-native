@@ -56,8 +56,8 @@ void RenderRasterSource::update(Immutable<style::Source::Impl> baseImpl_,
                        });
 }
 
-void RenderRasterSource::startRender(algorithm::ClipIDGenerator&, const mat4& projMatrix, const mat4& clipMatrix, const TransformState& transform) {
-    tilePyramid.startRender(projMatrix, clipMatrix, transform);
+void RenderRasterSource::startRender(Painter& painter) {
+    tilePyramid.startRender(painter);
 }
 
 void RenderRasterSource::finishRender(Painter& painter) {

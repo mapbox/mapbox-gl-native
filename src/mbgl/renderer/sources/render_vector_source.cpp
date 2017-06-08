@@ -1,5 +1,6 @@
 #include <mbgl/renderer/sources/render_vector_source.hpp>
 #include <mbgl/renderer/render_tile.hpp>
+#include <mbgl/renderer/painter.hpp>
 #include <mbgl/tile/vector_tile.hpp>
 
 #include <mbgl/algorithm/generate_clip_ids.hpp>
@@ -59,9 +60,9 @@ void RenderVectorSource::update(Immutable<style::Source::Impl> baseImpl_,
                        });
 }
 
-void RenderVectorSource::startRender(algorithm::ClipIDGenerator& generator, const mat4& projMatrix, const mat4& clipMatrix, const TransformState& transform) {
-    generator.update(tilePyramid.getRenderTiles());
-    tilePyramid.startRender(projMatrix, clipMatrix, transform);
+void RenderVectorSource::startRender(Painter& painter) {
+    painter.clipIDGenerator.update(tilePyramid.getRenderTiles());
+    tilePyramid.startRender(painter);
 }
 
 void RenderVectorSource::finishRender(Painter& painter) {

@@ -39,12 +39,9 @@ bool TilePyramid::isLoaded() const {
     return true;
 }
 
-void TilePyramid::startRender(const mat4& projMatrix,
-                              const mat4& clipMatrix,
-                              const TransformState& transform) {
+void TilePyramid::startRender(Painter& painter) {
     for (auto& pair : renderTiles) {
-        auto& tile = pair.second;
-        tile.calculateMatrices(projMatrix, clipMatrix, transform);
+        pair.second.startRender(painter);
     }
 }
 

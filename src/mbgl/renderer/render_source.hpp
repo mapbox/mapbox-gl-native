@@ -26,10 +26,6 @@ class Tile;
 class RenderSourceObserver;
 class TileParameters;
 
-namespace algorithm {
-class ClipIDGenerator;
-} // namespace algorithm
-
 class RenderSource : protected TileObserver {
 public:
     static std::unique_ptr<RenderSource> create(Immutable<style::Source::Impl>);
@@ -58,10 +54,7 @@ public:
                         bool needsRelayout,
                         const TileParameters&) = 0;
 
-    virtual void startRender(algorithm::ClipIDGenerator&,
-                             const mat4& projMatrix,
-                             const mat4& clipMatrix,
-                             const TransformState&) = 0;
+    virtual void startRender(Painter&) = 0;
     virtual void finishRender(Painter&) = 0;
 
     virtual std::map<UnwrappedTileID, RenderTile>& getRenderTiles() = 0;

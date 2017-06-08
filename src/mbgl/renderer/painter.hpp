@@ -21,6 +21,8 @@
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/offscreen_texture.hpp>
 
+#include <mbgl/algorithm/generate_clip_ids.hpp>
+
 #include <array>
 #include <vector>
 #include <set>
@@ -100,7 +102,6 @@ public:
 
     bool needsAnimation() const;
 
-private:
     template <class Iterator>
     void renderPass(PaintParameters&,
                     RenderPass,
@@ -123,8 +124,9 @@ private:
     }
 #endif
 
-private:
     gl::Context& context;
+
+    algorithm::ClipIDGenerator clipIDGenerator;
 
     mat4 projMatrix;
     mat4 nearClippedProjMatrix;
