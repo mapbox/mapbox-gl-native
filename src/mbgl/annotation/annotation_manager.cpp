@@ -22,6 +22,7 @@ AnnotationManager::AnnotationManager() = default;
 AnnotationManager::~AnnotationManager() = default;
 
 AnnotationID AnnotationManager::addAnnotation(const Annotation& annotation, const uint8_t maxZoom) {
+    std::lock_guard<std::mutex> lock(mutex);
     AnnotationID id = nextID++;
     Annotation::visit(annotation, [&] (const auto& annotation_) {
         this->add(id, annotation_, maxZoom);
@@ -30,21 +31,15 @@ AnnotationID AnnotationManager::addAnnotation(const Annotation& annotation, cons
 }
 
 Update AnnotationManager::updateAnnotation(const AnnotationID& id, const Annotation& annotation, const uint8_t maxZoom) {
+    std::lock_guard<std::mutex> lock(mutex);
     return Annotation::visit(annotation, [&] (const auto& annotation_) {
         return this->update(id, annotation_, maxZoom);
     });
 }
 
 void AnnotationManager::removeAnnotation(const AnnotationID& id) {
-    if (symbolAnnotations.find(id) != symbolAnnotations.end()) {
-        symbolTree.remove(symbolAnnotations.at(id));
-        symbolAnnotations.erase(id);
-    } else if (shapeAnnotations.find(id) != shapeAnnotations.end()) {
-        obsoleteShapeAnnotationLayers.insert(shapeAnnotations.at(id)->layerID);
-        shapeAnnotations.erase(id);
-    } else {
-        assert(false); // Should never happen
-    }
+    std::lock_guard<std::mutex> lock(mutex);
+    remove(id);
 }
 
 void AnnotationManager::add(const AnnotationID& id, const SymbolAnnotation& annotation, const uint8_t) {
@@ -97,6 +92,7 @@ Update AnnotationManager::update(const AnnotationID& id, const LineAnnotation& a
         assert(false); // Attempt to update a non-existent shape annotation
         return Update::Nothing;
     }
+
     removeAndAdd(id, annotation, maxZoom);
     return Update::AnnotationData | Update::AnnotationStyle;
 }
@@ -107,15 +103,28 @@ Update AnnotationManager::update(const AnnotationID& id, const FillAnnotation& a
         assert(false); // Attempt to update a non-existent shape annotation
         return Update::Nothing;
     }
+
     removeAndAdd(id, annotation, maxZoom);
     return Update::AnnotationData | Update::AnnotationStyle;
 }
 
 void AnnotationManager::removeAndAdd(const AnnotationID& id, const Annotation& annotation, const uint8_t maxZoom) {
-    removeAnnotation(id);
+    remove(id);
     Annotation::visit(annotation, [&] (const auto& annotation_) {
         this->add(id, annotation_, maxZoom);
     });
+}
+
+void AnnotationManager::remove(const AnnotationID& id) {
+    if (symbolAnnotations.find(id) != symbolAnnotations.end()) {
+        symbolTree.remove(symbolAnnotations.at(id));
+        symbolAnnotations.erase(id);
+    } else if (shapeAnnotations.find(id) != shapeAnnotations.end()) {
+        obsoleteShapeAnnotationLayers.insert(shapeAnnotations.at(id)->layerID);
+        shapeAnnotations.erase(id);
+    } else {
+        assert(false); // Should never happen
+    }
 }
 
 std::unique_ptr<AnnotationTileData> AnnotationManager::getTileData(const CanonicalTileID& tileID) {
@@ -155,6 +164,8 @@ void AnnotationManager::updateStyle(Style& style) {
         style.addLayer(std::move(layer));
     }
 
+    std::lock_guard<std::mutex> lock(mutex);
+
     for (const auto& shape : shapeAnnotations) {
         shape.second->updateStyle(style);
     }
@@ -186,17 +197,20 @@ void AnnotationManager::updateStyle(Style& style) {
 }
 
 void AnnotationManager::updateData() {
+    std::lock_guard<std::mutex> lock(mutex);
     for (auto& tile : tiles) {
         tile->setData(getTileData(tile->id.canonical));
     }
 }
 
 void AnnotationManager::addTile(AnnotationTile& tile) {
+    std::lock_guard<std::mutex> lock(mutex);
     tiles.insert(&tile);
     tile.setData(getTileData(tile.id.canonical));
 }
 
 void AnnotationManager::removeTile(AnnotationTile& tile) {
+    std::lock_guard<std::mutex> lock(mutex);
     tiles.erase(&tile);
 }
 
@@ -207,6 +221,7 @@ static std::string prefixedImageID(const std::string& id) {
 }
 
 void AnnotationManager::addImage(std::unique_ptr<style::Image> image) {
+    std::lock_guard<std::mutex> lock(mutex);
     const std::string id = prefixedImageID(image->getID());
     images.erase(id);
     images.emplace(id,
@@ -215,12 +230,14 @@ void AnnotationManager::addImage(std::unique_ptr<style::Image> image) {
 }
 
 void AnnotationManager::removeImage(const std::string& id_) {
+    std::lock_guard<std::mutex> lock(mutex);
     const std::string id = prefixedImageID(id_);
     images.erase(id);
     obsoleteImages.insert(id);
 }
 
 double AnnotationManager::getTopOffsetPixelsForImage(const std::string& id_) {
+    std::lock_guard<std::mutex> lock(mutex);
     const std::string id = prefixedImageID(id_);
     auto it = images.find(id);
     return it != images.end() ? -(it->second.getImage().size.height / it->second.getPixelRatio()) / 2 : 0;
