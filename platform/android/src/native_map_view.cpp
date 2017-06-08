@@ -557,7 +557,7 @@ void NativeMapView::setVisibleCoordinateBounds(JNIEnv& env, jni::Array<jni::Obje
 }
 
 void NativeMapView::setContentPadding(JNIEnv&, double top, double left, double bottom, double right) {
-    insets = {top, left, bottom, right};
+    insets = EdgeInsets(top, left, bottom, right);
 }
 
 void NativeMapView::scheduleSnapshot(jni::JNIEnv&) {

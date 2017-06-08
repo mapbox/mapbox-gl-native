@@ -333,7 +333,7 @@ private:
     // Ensure these are initialised last
     std::shared_ptr<mbgl::ThreadPool> threadPool;
     std::unique_ptr<mbgl::Map> map;
-    mbgl::EdgeInsets insets;
+    optional<mbgl::EdgeInsets> insets;
 
     unsigned active = 0;
 };
