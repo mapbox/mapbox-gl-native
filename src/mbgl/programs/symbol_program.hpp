@@ -144,9 +144,10 @@ public:
       : layoutSize(function_.evaluate(tileZoom + 1)) {
         function_.stops.match(
             [&] (const style::ExponentialStops<float>& stops) {
+                const auto& zoomLevels = getCoveringStops(stops, tileZoom, tileZoom + 1);
                 coveringRanges = std::make_tuple(
-                    getCoveringStops(stops, tileZoom, tileZoom + 1),
-                    Range<float> { function_.evaluate(tileZoom), function_.evaluate(tileZoom + 1) }
+                    zoomLevels,
+                    Range<float> { function_.evaluate(zoomLevels.min), function_.evaluate(zoomLevels.max) }
                 );
                 functionInterpolationBase = stops.base;
             },
