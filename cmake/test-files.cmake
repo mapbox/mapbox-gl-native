@@ -19,9 +19,6 @@ set(MBGL_TEST_FILES
     test/api/render_missing.test.cpp
     test/api/repeated_render.test.cpp
 
-    # geometry
-    test/geometry/binpack.test.cpp
-
     # gl
     test/gl/bucket.test.cpp
     test/gl/object.test.cpp
