@@ -121,7 +121,7 @@ Range<float> getCoveringStops(Stops s, float lowerZoom, float upperZoom) {
     
     // lower_bound yields first element >= lowerZoom, but we want the *last*
     // element <= lowerZoom, so if we found a stop > lowerZoom, back up by one.
-    if (minIt != s.stops.begin() && minIt->first > lowerZoom) {
+    if (minIt != s.stops.begin() && minIt != s.stops.end() && minIt->first > lowerZoom) {
         minIt--;
     }
     return Range<float> {
@@ -144,9 +144,10 @@ public:
       : layoutSize(function_.evaluate(tileZoom + 1)) {
         function_.stops.match(
             [&] (const style::ExponentialStops<float>& stops) {
+                const auto& zoomLevels = getCoveringStops(stops, tileZoom, tileZoom + 1);
                 coveringRanges = std::make_tuple(
-                    getCoveringStops(stops, tileZoom, tileZoom + 1),
-                    Range<float> { function_.evaluate(tileZoom), function_.evaluate(tileZoom + 1) }
+                    zoomLevels,
+                    Range<float> { function_.evaluate(zoomLevels.min), function_.evaluate(zoomLevels.max) }
                 );
                 functionInterpolationBase = stops.base;
             },
