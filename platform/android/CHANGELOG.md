@@ -2,10 +2,22 @@
 
 Mapbox welcomes participation and contributions from everyone.  If you'd like to do so please see the [`Contributing Guide`](https://github.com/mapbox/mapbox-gl-native/blob/master/CONTRIBUTING.md) first to get started.
 
-## 5.1.0-rc.1 - TBA
+## 5.1.0 - TBA
 
+## 5.1.0-beta.4 - June 9, 2017
+
+* Option to disable location change animation [#9210](https://github.com/mapbox/mapbox-gl-native/pull/9210)
+* Invalidating MyLocationView bearing when not following [#9212](https://github.com/mapbox/mapbox-gl-native/pull/9212)
+* Remove upgrade runtime exceptions [#9191](https://github.com/mapbox/mapbox-gl-native/pull/9191)
+* Check source usage before removal [#9129](https://github.com/mapbox/mapbox-gl-native/pull/9129)
 * Fix tracking mode + camera race condition [#9133](https://github.com/mapbox/mapbox-gl-native/pull/9133)
 * Harden orientation changes [#9128](https://github.com/mapbox/mapbox-gl-native/pull/9128)
+* Infinite location animation updates [#9194](https://github.com/mapbox/mapbox-gl-native/pull/9194)
+* Invoke callback with valid fling gestures [#9192](https://github.com/mapbox/mapbox-gl-native/pull/9192)
+* Keep location tracking after screen rotation [#9187](https://github.com/mapbox/mapbox-gl-native/pull/9187)
+* Update components with camera values when animating [#9174](https://github.com/mapbox/mapbox-gl-native/pull/9174) 
+* Validate if gestures should execute [#9173](https://github.com/mapbox/mapbox-gl-native/pull/9173)
+* Custom location source and LOST integration [#9142](https://github.com/mapbox/mapbox-gl-native/pull/9142)
 
 ## 5.1.0-beta.3 - May 26, 2017
 
