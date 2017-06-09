@@ -240,6 +240,22 @@
     XCTAssertTrue([[self.style sourceWithIdentifier:shapeSource.identifier] isMemberOfClass:[MGLVectorSource class]]);
 }
 
+- (void)testRemovingSourceInUse {
+    // Add a raster source
+    MGLRasterSource *rasterSource = [[MGLRasterSource alloc] initWithIdentifier:@"some-identifier" tileURLTemplates:@[] options:nil];
+    [self.style addSource:rasterSource];
+    
+    // Add a layer using it
+    MGLFillStyleLayer *fillLayer = [[MGLFillStyleLayer alloc] initWithIdentifier:@"fillLayer" source:rasterSource];
+    [self.style addLayer:fillLayer];
+
+    // Attempt to remove the raster source
+    [self.style removeSource:rasterSource];
+    
+    // Ensure it is still there
+    XCTAssertTrue([[self.style sourceWithIdentifier:rasterSource.identifier] isMemberOfClass:[MGLRasterSource class]]);
+}
+
 - (void)testLayers {
     NSArray<MGLStyleLayer *> *initialLayers = self.style.layers;
     if ([initialLayers.firstObject.identifier isEqualToString:@"com.mapbox.annotations.points"]) {

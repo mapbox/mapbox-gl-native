@@ -196,7 +196,30 @@ void Style::addSource(std::unique_ptr<Source> source) {
     sources.emplace_back(std::move(source));
 }
 
+struct SourceIdUsageEvaluator {
+    const std::string& sourceId;
+
+    bool operator()(BackgroundLayer&) { return false; }
+    bool operator()(CustomLayer&) { return false; }
+
+    template <class LayerType>
+    bool operator()(LayerType& layer) {
+        return layer.getSourceID() == sourceId;
+    }
+};
+
 std::unique_ptr<Source> Style::removeSource(const std::string& id) {
+    // Check if source is in use
+    SourceIdUsageEvaluator sourceIdEvaluator {id};
+    auto layerIt = std::find_if(layers.begin(), layers.end(), [&](const auto& layer) {
+        return layer->accept(sourceIdEvaluator);
+    });
+
+    if (layerIt != layers.end()) {
+        Log::Warning(Event::General, "Source '%s' is in use, cannot remove", id.c_str());
+        return nullptr;
+    }
+
     auto it = std::find_if(sources.begin(), sources.end(), [&](const auto& source) {
         return source->getID() == id;
     });
