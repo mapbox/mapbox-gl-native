@@ -57,10 +57,8 @@ uniform vec2 u_extrude_scale;
 
 uniform vec2 u_texsize;
 
-varying vec2 v_tex;
-varying vec2 v_fade_tex;
-varying float v_gamma_scale;
-varying float v_size;
+varying vec4 v_data0;
+varying vec2 v_data1;
 
 void main() {
     fill_color = unpack_mix_vec4(a_fill_color, a_fill_color_t);
@@ -81,6 +79,7 @@ void main() {
     mediump vec2 a_zoom = unpack_float(a_data[3]);
     mediump float a_minzoom = a_zoom[0];
     mediump float a_maxzoom = a_zoom[1];
+    float size;
 
     // In order to accommodate placing labels around corners in
     // symbol-placement: line, each glyph in a label could have multiple
@@ -92,22 +91,22 @@ void main() {
     // based on the scale of rendered text size relative to layout text size.
     mediump float layoutSize;
     if (!u_is_size_zoom_constant && !u_is_size_feature_constant) {
-        v_size = mix(a_size[0], a_size[1], u_size_t) / 10.0;
+        size = mix(a_size[0], a_size[1], u_size_t) / 10.0;
         layoutSize = a_size[2] / 10.0;
     } else if (u_is_size_zoom_constant && !u_is_size_feature_constant) {
-        v_size = a_size[0] / 10.0;
-        layoutSize = v_size;
+        size = a_size[0] / 10.0;
+        layoutSize = size;
     } else if (!u_is_size_zoom_constant && u_is_size_feature_constant) {
-        v_size = u_size;
+        size = u_size;
         layoutSize = u_layout_size;
     } else {
-        v_size = u_size;
+        size = u_size;
         layoutSize = u_size;
     }
 
-    float fontScale = u_is_text ? v_size / 24.0 : v_size;
+    float fontScale = u_is_text ? size / 24.0 : size;
 
-    mediump float zoomAdjust = log2(v_size / layoutSize);
+    mediump float zoomAdjust = log2(size / layoutSize);
     mediump float adjustedZoom = (u_zoom - zoomAdjust) * 10.0;
     // result: z = 0 if a_minzoom <= adjustedZoom < a_maxzoom, and 1 otherwise
     // Used below to move the vertex out of the clip space for when the current
@@ -156,10 +155,13 @@ void main() {
         gl_Position = u_matrix * vec4(a_pos, 0, 1) + vec4(extrude, 0, 0);
     }
 
-    v_gamma_scale = gl_Position.w;
+    float gamma_scale = gl_Position.w;
 
-    v_tex = a_tex / u_texsize;
-    v_fade_tex = vec2(a_labelminzoom / 255.0, 0.0);
+    vec2 tex = a_tex / u_texsize;
+    vec2 fade_tex = vec2(a_labelminzoom / 255.0, 0.0);
+
+    v_data0 = vec4(tex.x, tex.y, fade_tex.x, fade_tex.y);
+    v_data1 = vec2(gamma_scale, size);
 }
 
 )MBGL_SHADER";
@@ -179,10 +181,8 @@ uniform sampler2D u_fadetexture;
 uniform highp float u_gamma_scale;
 uniform bool u_is_text;
 
-varying vec2 v_tex;
-varying vec2 v_fade_tex;
-varying float v_gamma_scale;
-varying float v_size;
+varying vec4 v_data0;
+varying vec2 v_data1;
 
 void main() {
     
@@ -191,7 +191,12 @@ void main() {
     
     
 
-    float fontScale = u_is_text ? v_size / 24.0 : v_size;
+    vec2 tex = v_data0.xy;
+    vec2 fade_tex = v_data0.zw;
+    float gamma_scale = v_data1.x;
+    float size = v_data1.y;
+
+    float fontScale = u_is_text ? size / 24.0 : size;
 
     lowp vec4 color = fill_color;
     highp float gamma = EDGE_GAMMA / (fontScale * u_gamma_scale);
@@ -202,9 +207,9 @@ void main() {
         buff = (6.0 - halo_width / fontScale) / SDF_PX;
     }
 
-    lowp float dist = texture2D(u_texture, v_tex).a;
-    lowp float fade_alpha = texture2D(u_fadetexture, v_fade_tex).a;
-    highp float gamma_scaled = gamma * v_gamma_scale;
+    lowp float dist = texture2D(u_texture, tex).a;
+    lowp float fade_alpha = texture2D(u_fadetexture, fade_tex).a;
+    highp float gamma_scaled = gamma * gamma_scale;
     highp float alpha = smoothstep(buff - gamma_scaled, buff + gamma_scaled, dist) * fade_alpha;
 
     gl_FragColor = color * (alpha * opacity);

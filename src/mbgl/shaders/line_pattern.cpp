@@ -44,16 +44,14 @@ attribute lowp vec2 a_opacity;
 varying lowp float opacity;
 uniform lowp float a_offset_t;
 attribute lowp vec2 a_offset;
-varying lowp float offset;
 uniform lowp float a_gapwidth_t;
 attribute mediump vec2 a_gapwidth;
-varying mediump float gapwidth;
 
 void main() {
     blur = unpack_mix_vec2(a_blur, a_blur_t);
     opacity = unpack_mix_vec2(a_opacity, a_opacity_t);
-    offset = unpack_mix_vec2(a_offset, a_offset_t);
-    gapwidth = unpack_mix_vec2(a_gapwidth, a_gapwidth_t);
+    lowp float offset = unpack_mix_vec2(a_offset, a_offset_t);
+    mediump float gapwidth = unpack_mix_vec2(a_gapwidth, a_gapwidth_t);
 
     vec2 a_extrude = a_data.xy - 128.0;
     float a_direction = mod(a_data.z, 4.0) - 1.0;
