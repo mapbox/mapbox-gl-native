@@ -32,6 +32,7 @@ public:
     std::vector<std::unique_ptr<Source>> sources;
     std::vector<std::unique_ptr<Layer>> layers;
 
+    TransitionOptions transition;
     Light light;
 
     std::string name;
@@ -44,6 +45,7 @@ public:
     std::vector<FontStack> fontStacks() const;
 
 private:
+    void parseTransition(const JSValue&);
     void parseLight(const JSValue&);
     void parseSources(const JSValue&);
     void parseLayers(const JSValue&);

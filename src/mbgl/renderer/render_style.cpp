@@ -88,7 +88,7 @@ void RenderStyle::update(const UpdateParameters& parameters) {
     const PropertyEvaluationParameters evaluationParameters {
         zoomHistory,
         parameters.mode == MapMode::Continuous ? parameters.timePoint : Clock::time_point::max(),
-        parameters.mode == MapMode::Continuous ? util::DEFAULT_FADE_DURATION : Duration::zero()
+        parameters.mode == MapMode::Continuous ? util::DEFAULT_TRANSITION_DURATION : Duration::zero()
     };
 
     const TileParameters tileParameters {

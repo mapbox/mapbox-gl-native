@@ -57,6 +57,7 @@ void Style::setJSON(const std::string& json) {
     images.clear();
 
     transitionOptions = {};
+    transitionOptions.duration = util::DEFAULT_TRANSITION_DURATION;
 
     Parser parser;
     auto error = parser.parse(json);

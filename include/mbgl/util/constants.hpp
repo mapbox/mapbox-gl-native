@@ -40,7 +40,7 @@ constexpr float  MAX_ZOOM_F = MAX_ZOOM;
 
 constexpr uint64_t DEFAULT_MAX_CACHE_SIZE = 50 * 1024 * 1024;
 
-constexpr Duration DEFAULT_FADE_DURATION = Milliseconds(300);
+constexpr Duration DEFAULT_TRANSITION_DURATION = Milliseconds(300);
 constexpr Seconds CLOCK_SKEW_RETRY_TIMEOUT { 30 };
 
 constexpr UnitBezier DEFAULT_TRANSITION_EASE = { 0, 0, 0.25, 1 };
