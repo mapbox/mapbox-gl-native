@@ -203,14 +203,15 @@ void RenderStyle::update(const UpdateParameters& parameters) {
                 continue;
             }
 
-            if (getRenderLayer(layer->id)->needsRendering(zoomHistory.lastZoom)) {
+            if (!needsRendering && getRenderLayer(layer->id)->needsRendering(zoomHistory.lastZoom)) {
                 needsRendering = true;
             }
 
-            if (hasLayoutDifference(layerDiff, layer->id) ||
+            if (!needsRelayout && (
+                hasLayoutDifference(layerDiff, layer->id) ||
                 !imageDiff.added.empty() ||
                 !imageDiff.removed.empty() ||
-                !imageDiff.changed.empty()) {
+                !imageDiff.changed.empty())) {
                 needsRelayout = true;
             }
 
