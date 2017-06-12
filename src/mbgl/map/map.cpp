@@ -165,6 +165,8 @@ Map::Impl::Impl(Map& map_,
               renderStill();
           }
       }) {
+    style = std::make_unique<Style>(scheduler, fileSource, pixelRatio);
+    style->setObserver(this);
 }
 
 Map::~Map() {
@@ -175,7 +177,6 @@ Map::~Map() {
     // Explicit resets currently necessary because these abandon resources that need to be
     // cleaned up by context.reset();
     impl->renderStyle.reset();
-    impl->style.reset();
     impl->painter.reset();
 }
 
@@ -192,11 +193,6 @@ void Map::renderStill(View& view, StillImageCallback callback) {
 
     if (impl->stillImageRequest) {
         callback(std::make_exception_ptr(util::MisuseException("Map is currently rendering an image")));
-        return;
-    }
-
-    if (!impl->style) {
-        callback(std::make_exception_ptr(util::MisuseException("Map doesn't have a style")));
         return;
     }
 
@@ -228,10 +224,6 @@ void Map::render(View& view) {
 }
 
 void Map::Impl::render(View& view) {
-    if (!style) {
-        return;
-    }
-
     TimePoint timePoint = Clock::now();
 
     transform.updateTransitions(timePoint);
@@ -242,6 +234,15 @@ void Map::Impl::render(View& view) {
 
     if (updateFlags & Update::AnnotationData) {
         annotationManager.updateData();
+    }
+
+    updateFlags = Update::Nothing;
+
+    gl::Context& context = backend.getContext();
+    if (!painter) {
+        renderStyle = std::make_unique<RenderStyle>(scheduler, fileSource);
+        renderStyle->setObserver(this);
+        painter = std::make_unique<Painter>(context, transform.getState(), pixelRatio, programCacheDir);
     }
 
     renderStyle->update({
@@ -261,13 +262,6 @@ void Map::Impl::render(View& view) {
         fileSource,
         annotationManager
     });
-
-    updateFlags = Update::Nothing;
-
-    gl::Context& context = backend.getContext();
-    if (!painter) {
-        painter = std::make_unique<Painter>(context, transform.getState(), pixelRatio, programCacheDir);
-    }
 
     bool loaded = style->isLoaded() && renderStyle->isLoaded();
 
@@ -346,10 +340,9 @@ void Map::setStyleURL(const std::string& url) {
     impl->styleRequest = nullptr;
     impl->styleURL = url;
     impl->styleJSON.clear();
-    impl->styleMutated = false;
 
-    impl->style = std::make_unique<Style>(impl->scheduler, impl->fileSource, impl->pixelRatio);
-    impl->renderStyle = std::make_unique<RenderStyle>(impl->scheduler, impl->fileSource);
+    impl->style->loaded = false;
+    impl->styleMutated = false;
 
     impl->styleRequest = impl->fileSource.request(Resource::style(impl->styleURL), [this](Response res) {
         // Once we get a fresh style, or the style is mutated, stop revalidating.
@@ -395,16 +388,10 @@ void Map::setStyleJSON(const std::string& json) {
     impl->styleJSON.clear();
     impl->styleMutated = false;
 
-    impl->style = std::make_unique<Style>(impl->scheduler, impl->fileSource, impl->pixelRatio);
-    impl->renderStyle = std::make_unique<RenderStyle>(impl->scheduler, impl->fileSource);
-
     impl->loadStyleJSON(json);
 }
 
 void Map::Impl::loadStyleJSON(const std::string& json) {
-    style->setObserver(this);
-    renderStyle->setObserver(this);
-
     style->setJSON(json);
     styleJSON = json;
 
@@ -834,7 +821,7 @@ void Map::removeAnnotation(AnnotationID annotation) {
 #pragma mark - Feature query api
 
 std::vector<Feature> Map::queryRenderedFeatures(const ScreenCoordinate& point, const RenderedQueryOptions& options) {
-    if (!impl->style) return {};
+    if (!impl->renderStyle) return {};
 
     return impl->renderStyle->queryRenderedFeatures(
         { point },
@@ -844,7 +831,7 @@ std::vector<Feature> Map::queryRenderedFeatures(const ScreenCoordinate& point, c
 }
 
 std::vector<Feature> Map::queryRenderedFeatures(const ScreenBox& box, const RenderedQueryOptions& options) {
-    if (!impl->style) return {};
+    if (!impl->renderStyle) return {};
 
     return impl->renderStyle->queryRenderedFeatures(
         {
@@ -860,7 +847,7 @@ std::vector<Feature> Map::queryRenderedFeatures(const ScreenBox& box, const Rend
 }
 
 std::vector<Feature> Map::querySourceFeatures(const std::string& sourceID, const SourceQueryOptions& options) {
-    if (!impl->style) return {};
+    if (!impl->renderStyle) return {};
 
     const RenderSource* source = impl->renderStyle->getRenderSource(sourceID);
     if (!source) return {};
@@ -888,49 +875,34 @@ AnnotationIDs Map::queryPointAnnotations(const ScreenBox& box) {
 #pragma mark - Style API
 
 std::vector<style::Source*> Map::getSources() {
-    return impl->style ? impl->style->getSources() : std::vector<style::Source*>();
+    return impl->style->getSources();
 }
 
 style::Source* Map::getSource(const std::string& sourceID) {
-    if (impl->style) {
-        impl->styleMutated = true;
-        return impl->style->getSource(sourceID);
-    }
-    return nullptr;
+    impl->styleMutated = true;
+    return impl->style->getSource(sourceID);
 }
 
 void Map::addSource(std::unique_ptr<style::Source> source) {
-    if (impl->style) {
-        impl->styleMutated = true;
-        impl->style->addSource(std::move(source));
-    }
+    impl->styleMutated = true;
+    impl->style->addSource(std::move(source));
 }
 
 std::unique_ptr<Source> Map::removeSource(const std::string& sourceID) {
-    if (impl->style) {
-        impl->styleMutated = true;
-        return impl->style->removeSource(sourceID);
-    }
-    return nullptr;
+    impl->styleMutated = true;
+    return impl->style->removeSource(sourceID);
 }
 
 std::vector<style::Layer*> Map::getLayers() {
-    return impl->style ? impl->style->getLayers() : std::vector<style::Layer*>();
+    return impl->style->getLayers();
 }
 
 Layer* Map::getLayer(const std::string& layerID) {
-    if (impl->style) {
-        impl->styleMutated = true;
-        return impl->style->getLayer(layerID);
-    }
-    return nullptr;
+    impl->styleMutated = true;
+    return impl->style->getLayer(layerID);
 }
 
 void Map::addLayer(std::unique_ptr<Layer> layer, const optional<std::string>& before) {
-    if (!impl->style) {
-        return;
-    }
-
     impl->styleMutated = true;
     BackendScope guard(impl->backend);
 
@@ -939,10 +911,6 @@ void Map::addLayer(std::unique_ptr<Layer> layer, const optional<std::string>& be
 }
 
 std::unique_ptr<Layer> Map::removeLayer(const std::string& id) {
-    if (!impl->style) {
-        return nullptr;
-    }
-
     impl->styleMutated = true;
     BackendScope guard(impl->backend);
 
@@ -953,81 +921,47 @@ std::unique_ptr<Layer> Map::removeLayer(const std::string& id) {
 }
 
 void Map::addImage(std::unique_ptr<style::Image> image) {
-    if (!impl->style) {
-        return;
-    }
-
     impl->styleMutated = true;
     impl->style->addImage(std::move(image));
 }
 
 void Map::removeImage(const std::string& id) {
-    if (!impl->style) {
-        return;
-    }
-
     impl->styleMutated = true;
     impl->style->removeImage(id);
 }
 
 const style::Image* Map::getImage(const std::string& id) {
-    if (impl->style) {
-        return impl->style->getImage(id);
-    }
-    return nullptr;
+    return impl->style->getImage(id);
 }
 
 void Map::setLight(std::unique_ptr<style::Light> light) {
-    if (!impl->style) {
-        return;
-    }
-
     impl->style->setLight(std::move(light));
 }
 
 style::Light* Map::getLight() {
-    if (!impl->style) {
-        return nullptr;
-    }
-
     return impl->style->getLight();
 }
 
 #pragma mark - Defaults
 
 std::string Map::getStyleName() const {
-    if (impl->style) {
-        return impl->style->getName();
-    }
-    return {};
+    return impl->style->getName();
 }
 
 LatLng Map::getDefaultLatLng() const {
-    if (impl->style) {
-        return impl->style->getDefaultLatLng();
-    }
-    return {};
+    return impl->style->getDefaultLatLng();
 }
 
 double Map::getDefaultZoom() const {
-    if (impl->style) {
-        return impl->style->getDefaultZoom();
-    }
-    return {};
+    return impl->style->getDefaultZoom();
 }
 
 double Map::getDefaultBearing() const {
-    if (impl->style) {
-        return impl->style->getDefaultBearing();
-    }
-    return {};
+    return impl->style->getDefaultBearing();
 }
 
 double Map::getDefaultPitch() const {
-    if (impl->style) {
-        return impl->style->getDefaultPitch();
-    }
-    return {};
+    return impl->style->getDefaultPitch();
 }
 
 #pragma mark - Toggles
@@ -1066,26 +1000,21 @@ MapDebugOptions Map::getDebug() const {
 }
 
 bool Map::isFullyLoaded() const {
-    return impl->style && impl->style->isLoaded() && impl->renderStyle->isLoaded();
+    return impl->style && impl->style->isLoaded() && impl->renderStyle && impl->renderStyle->isLoaded();
 }
 
 style::TransitionOptions Map::getTransitionOptions() const {
-    if (impl->style) {
-        return impl->style->getTransitionOptions();
-    }
-    return {};
+    return impl->style->getTransitionOptions();
 }
 
 void Map::setTransitionOptions(const style::TransitionOptions& options) {
-    if (impl->style) {
-        impl->style->setTransitionOptions(options);
-    }
+    impl->style->setTransitionOptions(options);
 }
 
 void Map::setSourceTileCacheSize(size_t size) {
     if (size != impl->sourceCacheSize) {
         impl->sourceCacheSize = size;
-        if (!impl->style) return;
+        if (!impl->renderStyle) return;
         impl->renderStyle->setSourceTileCacheSize(size);
         impl->backend.invalidate();
     }
@@ -1133,11 +1062,9 @@ void Map::Impl::onResourceError(std::exception_ptr error) {
 void Map::dumpDebugLogs() const {
     Log::Info(Event::General, "--------------------------------------------------------------------------------");
     Log::Info(Event::General, "MapContext::styleURL: %s", impl->styleURL.c_str());
-    if (impl->style) {
-        impl->style->dumpDebugLogs();
+    impl->style->dumpDebugLogs();
+    if (impl->renderStyle) {
         impl->renderStyle->dumpDebugLogs();
-    } else {
-        Log::Info(Event::General, "no style loaded");
     }
     Log::Info(Event::General, "--------------------------------------------------------------------------------");
 }
