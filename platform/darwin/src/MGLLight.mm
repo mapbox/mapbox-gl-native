@@ -1,3 +1,7 @@
+// This file is generated.
+// Edit platform/darwin/scripts/generate-style-code.js, then run `make darwin-style-code`.
+// test
+
 #import "MGLLight.h"
 
 #import "MGLTypes.h"
@@ -9,7 +13,7 @@
 #import <mbgl/style/types.hpp>
 
 namespace mbgl {
-    
+
     MBGL_DEFINE_ENUM(MGLLightAnchor, {
         { MGLLightAnchorMap, "map" },
         { MGLLightAnchorViewport, "viewport" },

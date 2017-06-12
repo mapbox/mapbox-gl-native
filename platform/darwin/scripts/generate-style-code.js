@@ -220,6 +220,7 @@ global.testHelperMessage = function (property, layerType, isFunction) {
 };
 
 global.propertyDoc = function (propertyName, property, layerType, kind) {
+    console.log(propertyName + " : " + property + " : " + layerType + " : " + kind)
     // Match references to other property names & values.
     // Requires the format 'When `foo` is set to `bar`,'.
     let doc = property.doc.replace(/`([^`]+?)` is set to `([^`]+?)`/g, function (m, peerPropertyName, propertyValue, offset, str) {
@@ -527,6 +528,8 @@ const lightProperties = Object.keys(spec[`light`]).reduce((memo, name) => {
   return memo;
 }, []);
 
+console.log(lightProperties);
+
 const layerH = ejs.compile(fs.readFileSync('platform/darwin/src/MGLStyleLayer.h.ejs', 'utf8'), { strict: true });
 const layerM = ejs.compile(fs.readFileSync('platform/darwin/src/MGLStyleLayer.mm.ejs', 'utf8'), { strict: true});
 const testLayers = ejs.compile(fs.readFileSync('platform/darwin/test/MGLStyleLayerTests.mm.ejs', 'utf8'), { strict: true});
@@ -536,8 +539,8 @@ const templatesMD = ejs.compile(fs.readFileSync('platform/darwin/docs/guides/Til
 
 const lightH = ejs.compile(fs.readFileSync('platform/darwin/src/MGLLight.h.ejs', 'utf8'), {strict: true});;
 const lightM = ejs.compile(fs.readFileSync('platform/darwin/src/MGLLight.mm.ejs', 'utf8'), {strict: true});;
-fs.writeFileSync(`platform/darwin/src/MGLLight.h`, lightH(lightProperties));
-fs.writeFileSync(`platform/darwin/src/MGLLight.mm`, lightM(lightProperties));
+fs.writeFileSync(`platform/darwin/src/MGLLight.h`, lightH({ properties: lightProperties, }));
+fs.writeFileSync(`platform/darwin/src/MGLLight.mm`, lightM({ properties: lightProperties, }));
 
 
 
@@ -555,7 +558,7 @@ const layers = _(spec.layer.type.values).map((value, layerType) => {
         memo.push(spec[`paint_${layerType}`][name]);
         return memo;
     }, []);
-
+console.log(spec.layer.type.values[layerType].doc)
     return {
         doc: spec.layer.type.values[layerType].doc,
         type: layerType,

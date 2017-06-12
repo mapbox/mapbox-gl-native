@@ -1,3 +1,6 @@
+// This file is generated.
+// Edit platform/darwin/scripts/generate-style-code.js, then run `make darwin-style-code`.
+
 #import <CoreLocation/CoreLocation.h>
 
 #import "MGLFoundation.h"
@@ -20,7 +23,7 @@ typedef NS_ENUM(NSUInteger, MGLLightAnchor) {
  */
 typedef struct MGLSphericalPosition {
     /** Distance from the center of the base of an object to its light. */
-    CLLocationDistance radial;
+    CGFloat radial;
     /** Position of the light relative to 0° (0° when `MGLLight.anchor` is set to viewport corresponds
      to the top of the viewport, or 0° when `MGLLight.anchor` is set to map corresponds to due north,
      and degrees proceed clockwise). */
