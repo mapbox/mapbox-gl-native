@@ -53,11 +53,11 @@ GlyphAtlas makeGlyphAtlas(const GlyphMap& glyphs) {
         }
     }
 
-//    pack.shrink();
-//    result.image.resize({
-//        static_cast<uint32_t>(pack.width()),
-//        static_cast<uint32_t>(pack.height())
-//    });
+    pack.shrink();
+    result.image.resize({
+        static_cast<uint32_t>(pack.width()),
+        static_cast<uint32_t>(pack.height())
+    });
 
     return result;
 }
