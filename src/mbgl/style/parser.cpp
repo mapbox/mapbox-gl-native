@@ -86,6 +86,10 @@ StyleParseResult Parser::parse(const std::string& json) {
         }
     }
 
+    if (document.HasMember("transition")) {
+        parseTransition(document["transition"]);
+    }
+
     if (document.HasMember("light")) {
         parseLight(document["light"]);
     }
@@ -113,6 +117,17 @@ StyleParseResult Parser::parse(const std::string& json) {
     }
 
     return nullptr;
+}
+
+void Parser::parseTransition(const JSValue& value) {
+    conversion::Error error;
+    optional<TransitionOptions> converted = conversion::convert<TransitionOptions>(value, error);
+    if (!converted) {
+        Log::Warning(Event::ParseStyle, error.message);
+        return;
+    }
+
+    transition = std::move(*converted);
 }
 
 void Parser::parseLight(const JSValue& value) {

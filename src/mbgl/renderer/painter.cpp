@@ -115,7 +115,7 @@ Painter::Painter(gl::Context& context_,
 Painter::~Painter() = default;
 
 bool Painter::needsAnimation() const {
-    return frameHistory.needsAnimation(util::DEFAULT_FADE_DURATION);
+    return frameHistory.needsAnimation(util::DEFAULT_TRANSITION_DURATION);
 }
 
 void Painter::cleanup() {
@@ -159,7 +159,7 @@ void Painter::render(RenderStyle& style, const FrameData& frame_, View& view) {
     }
 
     frameHistory.record(frame.timePoint, state.getZoom(),
-        frame.mapMode == MapMode::Continuous ? util::DEFAULT_FADE_DURATION : Milliseconds(0));
+        frame.mapMode == MapMode::Continuous ? util::DEFAULT_TRANSITION_DURATION : Milliseconds(0));
 
 
     // - UPLOAD PASS -------------------------------------------------------------------------------
