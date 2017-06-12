@@ -44,31 +44,3 @@ TEST(API, RenderWithoutCallback) {
 
     EXPECT_EQ(log->count(logMessage), 1u);
 }
-
-TEST(API, RenderWithoutStyle) {
-    util::RunLoop loop;
-
-    HeadlessBackend backend { test::sharedDisplay() };
-    BackendScope scope { backend };
-    OffscreenView view { backend.getContext(), { 128, 512 } };
-    StubFileSource fileSource;
-    ThreadPool threadPool(4);
-
-    Map map(backend, view.getSize(), 1, fileSource, threadPool, MapMode::Still);
-
-    std::exception_ptr error;
-    map.renderStill(view, [&](std::exception_ptr error_) {
-        error = error_;
-        loop.stop();
-    });
-
-    loop.run();
-
-    try {
-        std::rethrow_exception(error);
-    } catch (const util::MisuseException& ex) {
-        EXPECT_EQ(std::string(ex.what()), "Map doesn't have a style");
-    } catch (const std::exception&) {
-        EXPECT_TRUE(false) << "Unhandled exception.";
-    }
-}
