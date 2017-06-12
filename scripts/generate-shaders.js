@@ -61,42 +61,31 @@ ${fragmentPrelude}
     'symbol_icon',
     'symbol_sdf'
 ].forEach(function (shaderName) {
-    function applyPragmas(source, pragmas) {
-        return source.replace(/#pragma mapbox: ([\w]+) ([\w]+) ([\w]+) ([\w]+)/g, (match, operation, precision, type, name) => {
-            const a_type = type === "float" ? "vec2" : "vec4";
-            return pragmas[operation]
-                .join("\n")
-                .replace(/\{type\}/g, type)
-                .replace(/\{a_type}/g, a_type)
-                .replace(/\{precision\}/g, precision)
-                .replace(/\{name\}/g, name);
-        });
-    }
+    const re = /#pragma mapbox: ([\w]+) ([\w]+) ([\w]+) ([\w]+)/g;
+    const fragmentPragmas = new Set();
 
-    function vertexSource() {
-        const source = fs.readFileSync(path.join(inputPath, shaderName + '.vertex.glsl'), 'utf8');
-        return applyPragmas(source, {
-                define: [
-                    "uniform lowp float a_{name}_t;",
-                    "attribute {precision} {a_type} a_{name};",
-                    "varying {precision} {type} {name};"
-                ],
-                initialize: [
-                    "{name} = unpack_mix_{a_type}(a_{name}, a_{name}_t);"
-                ]
-            });
-    }
+    let fragmentSource = fs.readFileSync(path.join(inputPath, shaderName + '.fragment.glsl'), 'utf8');
+    let vertexSource = fs.readFileSync(path.join(inputPath, shaderName + '.vertex.glsl'), 'utf8');
 
-    function fragmentSource() {
-        const source = fs.readFileSync(path.join(inputPath, shaderName + '.fragment.glsl'), 'utf8');
-        return applyPragmas(source, {
-                define: [
-                    "varying {precision} {type} {name};"
-                ],
-                initialize: [
-                ]
-            });
-    }
+    fragmentSource = fragmentSource.replace(re, (match, operation, precision, type, name) => {
+        fragmentPragmas.add(name);
+        return operation === "define" ?
+            `varying ${precision} ${type} ${name};` :
+            ``;
+    });
+
+    vertexSource = vertexSource.replace(re, (match, operation, precision, type, name) => {
+        const a_type = type === "float" ? "vec2" : "vec4";
+        if (fragmentPragmas.has(name)) {
+            return operation === "define" ?
+                `uniform lowp float a_${name}_t;\nattribute ${precision} ${a_type} a_${name};\nvarying ${precision} ${type} ${name};` :
+                `${name} = unpack_mix_${a_type}(a_${name}, a_${name}_t);`;
+        } else {
+            return operation === "define" ?
+                `uniform lowp float a_${name}_t;\nattribute ${precision} ${a_type} a_${name};` :
+                `${precision} ${type} ${name} = unpack_mix_${a_type}(a_${name}, a_${name}_t);`;
+        }
+    });
 
     writeIfModified(path.join(outputPath, `${shaderName}.hpp`), `// NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.
 
@@ -125,10 +114,10 @@ namespace shaders {
 
 const char* ${shaderName}::name = "${shaderName}";
 const char* ${shaderName}::vertexSource = R"MBGL_SHADER(
-${vertexSource()}
+${vertexSource}
 )MBGL_SHADER";
 const char* ${shaderName}::fragmentSource = R"MBGL_SHADER(
-${fragmentSource()}
+${fragmentSource}
 )MBGL_SHADER";
 
 } // namespace shaders
