@@ -1,25 +1,34 @@
 package com.mapbox.mapboxsdk.testapp.activity.userlocation;
 
-import android.Manifest;
-import android.content.pm.PackageManager;
 import android.os.Build;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
-import android.support.v4.app.ActivityCompat;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 
+import com.mapbox.services.android.telemetry.permissions.PermissionsListener;
 import com.mapbox.services.android.telemetry.permissions.PermissionsManager;
 
-public abstract class BaseLocationActivity extends AppCompatActivity {
+import java.util.List;
 
-  private static final int PERMISSIONS_LOCATION = 0;
+public abstract class BaseLocationActivity extends AppCompatActivity implements PermissionsListener {
+
+  private PermissionsManager permissionsManager;
+
+  @Override
+  protected void onCreate(@Nullable Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    permissionsManager = new PermissionsManager(this);
+  }
 
   @UiThread
   protected final void toggleGps(boolean enableGps) {
     if (enableGps) {
-      if (!PermissionsManager.areLocationPermissionsGranted(this)) {
-        ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.ACCESS_COARSE_LOCATION,
-          Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_LOCATION);
+      if (!isRuntimePermissionsRequired()) {
+        permissionsManager.requestLocationPermissions(this);
       } else {
         enableLocation(true);
       }
@@ -29,16 +38,21 @@ public abstract class BaseLocationActivity extends AppCompatActivity {
   }
 
   @Override
-  public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-    if (requestCode == PERMISSIONS_LOCATION) {
-      if (!isRuntimePermissionsRequired() || isPermissionAccepted(grantResults)) {
-        enableLocation(true);
-      }
-    }
+  public void onExplanationNeeded(List<String> list) {
+    Snackbar.make(
+      findViewById(android.R.id.content),
+      TextUtils.join("", list.toArray()),
+      Snackbar.LENGTH_SHORT).show();
   }
 
-  private boolean isPermissionAccepted(int[] grantResults) {
-    return grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED;
+  @Override
+  public void onPermissionResult(boolean isPermissionAccepted) {
+    enableLocation(isPermissionAccepted);
+  }
+
+  @Override
+  public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    permissionsManager.onRequestPermissionsResult(requestCode, permissions, grantResults);
   }
 
   private boolean isRuntimePermissionsRequired() {
