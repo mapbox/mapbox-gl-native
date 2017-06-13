@@ -165,6 +165,7 @@
 		40599F0C1DEE1B7600182B5D /* api_mapbox_staging.der in Resources */ = {isa = PBXBuildFile; fileRef = 40599F001DEE1B2400182B5D /* api_mapbox_staging.der */; };
 		40599F0D1DEE1B7A00182B5D /* api_mapbox_com-digicert.der in Resources */ = {isa = PBXBuildFile; fileRef = 40599F011DEE1B2400182B5D /* api_mapbox_com-digicert.der */; };
 		40599F0E1DEE1B7E00182B5D /* api_mapbox_com-geotrust.der in Resources */ = {isa = PBXBuildFile; fileRef = 40599F021DEE1B2400182B5D /* api_mapbox_com-geotrust.der */; };
+		407D23FC1EF0874400057EA0 /* MGLMapboxEvents.h in Headers */ = {isa = PBXBuildFile; fileRef = DA8848481CBAFB9800AB86E3 /* MGLMapboxEvents.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4085AF091D933DEA00F11B22 /* MGLTileSetTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4085AF081D933DEA00F11B22 /* MGLTileSetTests.mm */; };
 		408982E91DEE208200754016 /* api_mapbox_staging.der in Resources */ = {isa = PBXBuildFile; fileRef = 40599F001DEE1B2400182B5D /* api_mapbox_staging.der */; };
 		408982EA1DEE208B00754016 /* api_mapbox_com-digicert.der in Resources */ = {isa = PBXBuildFile; fileRef = 40599F011DEE1B2400182B5D /* api_mapbox_com-digicert.der */; };
@@ -328,7 +329,7 @@
 		DA8848541CBAFB9800AB86E3 /* MGLCompactCalloutView.m in Sources */ = {isa = PBXBuildFile; fileRef = DA8848451CBAFB9800AB86E3 /* MGLCompactCalloutView.m */; };
 		DA8848551CBAFB9800AB86E3 /* MGLLocationManager.h in Headers */ = {isa = PBXBuildFile; fileRef = DA8848461CBAFB9800AB86E3 /* MGLLocationManager.h */; };
 		DA8848561CBAFB9800AB86E3 /* MGLLocationManager.m in Sources */ = {isa = PBXBuildFile; fileRef = DA8848471CBAFB9800AB86E3 /* MGLLocationManager.m */; };
-		DA8848571CBAFB9800AB86E3 /* MGLMapboxEvents.h in Headers */ = {isa = PBXBuildFile; fileRef = DA8848481CBAFB9800AB86E3 /* MGLMapboxEvents.h */; };
+		DA8848571CBAFB9800AB86E3 /* MGLMapboxEvents.h in Headers */ = {isa = PBXBuildFile; fileRef = DA8848481CBAFB9800AB86E3 /* MGLMapboxEvents.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DA8848581CBAFB9800AB86E3 /* MGLMapboxEvents.m in Sources */ = {isa = PBXBuildFile; fileRef = DA8848491CBAFB9800AB86E3 /* MGLMapboxEvents.m */; };
 		DA8848591CBAFB9800AB86E3 /* MGLMapView.mm in Sources */ = {isa = PBXBuildFile; fileRef = DA88484A1CBAFB9800AB86E3 /* MGLMapView.mm */; };
 		DA88485A1CBAFB9800AB86E3 /* MGLUserLocation_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = DA88484B1CBAFB9800AB86E3 /* MGLUserLocation_Private.h */; };
@@ -1810,6 +1811,7 @@
 				DA737EE21D056A4E005BDA16 /* MGLMapViewDelegate.h in Headers */,
 				DAF0D8191DFE6B2800B28378 /* MGLAttributionInfo_Private.h in Headers */,
 				DABFB86A1CBE99E500D62B32 /* MGLStyle.h in Headers */,
+				407D23FC1EF0874400057EA0 /* MGLMapboxEvents.h in Headers */,
 				DA00FC8F1D5EEB0D009AABC8 /* MGLAttributionInfo.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
