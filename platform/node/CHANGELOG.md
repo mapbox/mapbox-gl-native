@@ -1,5 +1,5 @@
 # 3.5.4 - June 6, 2017
-
+- Add support for ImageSource [#8968](https://github.com/mapbox/mapbox-gl-native/pull/8968)
 - Fixed an issue with `map.addImage()` which would cause added images to randomly be replaced with images found the style's sprite sheet ([#9119](https://github.com/mapbox/mapbox-gl-native/pull/9119))
 
 # 3.5.3 - May 30, 2017

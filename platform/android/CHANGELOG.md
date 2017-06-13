@@ -2,6 +2,9 @@
 
 Mapbox welcomes participation and contributions from everyone.  If you'd like to do so please see the [`Contributing Guide`](https://github.com/mapbox/mapbox-gl-native/blob/master/CONTRIBUTING.md) first to get started.
 
+## master
+* Add support for ImageSource [#9110](https://github.com/mapbox/mapbox-gl-native/pull/9110)
+
 ## 5.1.0 - TBA
 * Fix tracking mode + camera race condition [#9133](https://github.com/mapbox/mapbox-gl-native/pull/9133)
 * Harden orientation changes [#9128](https://github.com/mapbox/mapbox-gl-native/pull/9128)
