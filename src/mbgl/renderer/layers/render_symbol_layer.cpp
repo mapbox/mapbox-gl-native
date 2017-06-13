@@ -83,11 +83,8 @@ style::SymbolPropertyValues RenderSymbolLayer::iconPropertyValues(const style::S
     return style::SymbolPropertyValues {
             layout_.get<style::IconRotationAlignment>(), // icon-pitch-alignment is not yet implemented; inherit the rotation alignment
             layout_.get<style::IconRotationAlignment>(),
-            layout_.get<style::IconSize>(),
             evaluated.get<style::IconTranslate>(),
             evaluated.get<style::IconTranslateAnchor>(),
-            iconSize,
-            1.0f,
             evaluated.get<style::IconHaloColor>().constantOr(Color::black()).a > 0 &&
             evaluated.get<style::IconHaloWidth>().constantOr(1),
             evaluated.get<style::IconColor>().constantOr(Color::black()).a > 0
@@ -98,11 +95,8 @@ style::SymbolPropertyValues RenderSymbolLayer::textPropertyValues(const style::S
     return style::SymbolPropertyValues {
             layout_.get<style::TextPitchAlignment>(),
             layout_.get<style::TextRotationAlignment>(),
-            layout_.get<style::TextSize>(),
             evaluated.get<style::TextTranslate>(),
             evaluated.get<style::TextTranslateAnchor>(),
-            textSize,
-            24.0f,
             evaluated.get<style::TextHaloColor>().constantOr(Color::black()).a > 0 &&
             evaluated.get<style::TextHaloWidth>().constantOr(1),
             evaluated.get<style::TextColor>().constantOr(Color::black()).a > 0
