@@ -40,14 +40,10 @@ public:
     // Layout
     AlignmentType pitchAlignment;
     AlignmentType rotationAlignment;
-    PossiblyEvaluatedPropertyValue<float> layoutSize;
 
     // Paint
     std::array<float, 2> translate;
     TranslateAnchorType translateAnchor;
-    float paintSize;
-
-    float sdfScale;   // Constant (1.0 or 24.0)
 
     bool hasHalo;
     bool hasFill;
