@@ -156,8 +156,9 @@ public:
     }
     
     SymbolSizeAttributes::Bindings attributeBindings() const override {
-        return SymbolSizeAttributes::Bindings { SymbolSizeAttributes::Attribute::ConstantBinding {{{0, 0, 0}}} };
+        return SymbolSizeAttributes::Bindings { gl::DisabledAttribute() };
     }
+
     void upload(gl::Context&) override {}
     void populateVertexVector(const GeometryTileFeature&) override {};
     
@@ -210,9 +211,9 @@ public:
     }
 
     SymbolSizeAttributes::Bindings attributeBindings() const override {
-        return SymbolSizeAttributes::Bindings { SymbolSizeAttributes::Attribute::variableBinding(*buffer, 0, 1) };
+        return SymbolSizeAttributes::Bindings { SymbolSizeAttributes::Attribute::binding(*buffer, 0, 1) };
     }
-    
+
     void populateVertexVector(const GeometryTileFeature& feature) override {
         const auto sizeVertex = Vertex {
             {{
@@ -263,7 +264,7 @@ public:
     {}
 
     SymbolSizeAttributes::Bindings attributeBindings() const override {
-        return SymbolSizeAttributes::Bindings { SymbolSizeAttributes::Attribute::variableBinding(*buffer, 0) };
+        return SymbolSizeAttributes::Bindings { SymbolSizeAttributes::Attribute::binding(*buffer, 0) };
     }
     
     void populateVertexVector(const GeometryTileFeature& feature) override {
@@ -368,7 +369,7 @@ public:
             uniformValues
                 .concat(symbolSizeBinder.uniformValues(currentZoom))
                 .concat(paintPropertyBinders.uniformValues(currentZoom, currentProperties)),
-            LayoutAttributes::allVariableBindings(layoutVertexBuffer)
+            LayoutAttributes::bindings(layoutVertexBuffer)
                 .concat(symbolSizeBinder.attributeBindings())
                 .concat(paintPropertyBinders.attributeBindings(currentProperties)),
             indexBuffer,

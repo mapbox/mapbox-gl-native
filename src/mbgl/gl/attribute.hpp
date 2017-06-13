@@ -13,23 +13,33 @@
 namespace mbgl {
 namespace gl {
 
-template <class T, std::size_t N>
-class VariableAttributeBinding {
+class DisabledAttribute {
 public:
-    VariableAttributeBinding(BufferID vertexBuffer_,
-                             std::size_t vertexSize_,
-                             std::size_t attributeOffset_,
-                             std::size_t attributeSize_ = N)
+    void bind(Context&, AttributeLocation, std::size_t vertexOffset) const;
+
+    friend bool operator==(const DisabledAttribute&,
+                           const DisabledAttribute&) {
+        return true;
+    }
+};
+
+template <class T, std::size_t N>
+class AttributeBinding {
+public:
+    AttributeBinding(BufferID vertexBuffer_,
+                     std::size_t vertexSize_,
+                     std::size_t attributeOffset_,
+                     std::size_t attributeSize_ = N)
         : vertexBuffer(vertexBuffer_),
           vertexSize(vertexSize_),
           attributeOffset(attributeOffset_),
           attributeSize(attributeSize_)
         {}
 
-    void bind(Context&, AttributeLocation, optional<VariableAttributeBinding<T, N>>&, std::size_t vertexOffset) const;
+    void bind(Context&, AttributeLocation, std::size_t vertexOffset) const;
 
-    friend bool operator==(const VariableAttributeBinding& lhs,
-                           const VariableAttributeBinding& rhs) {
+    friend bool operator==(const AttributeBinding& lhs,
+                           const AttributeBinding& rhs) {
         return lhs.vertexBuffer == rhs.vertexBuffer
             && lhs.vertexSize == rhs.vertexSize
             && lhs.attributeOffset == rhs.attributeOffset
@@ -43,28 +53,8 @@ private:
     std::size_t attributeSize;
 };
 
-template <class T, std::size_t N>
-class ConstantAttributeBinding {
-public:
-    ConstantAttributeBinding() { value.fill(T()); }
-
-    explicit ConstantAttributeBinding(std::array<T, N> value_)
-        : value(std::move(value_))
-        {}
-
-    void bind(Context&, AttributeLocation, optional<VariableAttributeBinding<T, N>>&, std::size_t) const;
-
-    friend bool operator==(const ConstantAttributeBinding& lhs,
-                           const ConstantAttributeBinding& rhs) {
-        return lhs.value == rhs.value;
-    }
-
-private:
-    std::array<T, N> value;
-};
-
 /*
-    gl::Attribute<T,N> manages the binding of a constant value or vertex buffer to a GL program attribute.
+    gl::Attribute<T,N> manages the binding of a vertex buffer to a GL program attribute.
       - T is the underlying primitive type (exposed as Attribute<T,N>::ValueType)
       - N is the number of components in the attribute declared in the shader (exposed as Attribute<T,N>::Dimensions)
 */
@@ -75,27 +65,23 @@ public:
     static constexpr size_t Dimensions = N;
     using Value = std::array<T, N>;
 
-    using VariableBinding = VariableAttributeBinding<T, N>;
-    using ConstantBinding = ConstantAttributeBinding<T, N>;
-
     using Location = AttributeLocation;
 
     using Binding = variant<
-        ConstantBinding,
-        VariableBinding>;
+        DisabledAttribute,
+        AttributeBinding<T, N>>;
 
     /*
-        Create a variable (i.e. data-driven) binding for this attribute.  The `attributeSize`
-        parameter may be used to override the number of components available in the buffer for
-        each vertex.  Thus, a buffer with only one float for each vertex can be bound to a
-        `vec2` attribute
+        Create a binding for this attribute.  The `attributeSize` parameter may be used to
+        override the number of components available in the buffer for each vertex.  Thus,
+        a buffer with only one float for each vertex can be bound to a `vec2` attribute
     */
     template <class Vertex, class DrawMode>
-    static VariableBinding variableBinding(const VertexBuffer<Vertex, DrawMode>& buffer,
-                                           std::size_t attributeIndex,
-                                           std::size_t attributeSize = N) {
+    static Binding binding(const VertexBuffer<Vertex, DrawMode>& buffer,
+                           std::size_t attributeIndex,
+                           std::size_t attributeSize = N) {
         static_assert(std::is_standard_layout<Vertex>::value, "vertex type must use standard layout");
-        return VariableBinding {
+        return AttributeBinding<T, N> {
             buffer.buffer,
             sizeof(Vertex),
             Vertex::attributeOffsets[attributeIndex],
@@ -105,12 +91,18 @@ public:
 
     static void bind(Context& context,
                      const Location& location,
-                     optional<VariableBinding>& oldBinding,
+                     Binding& oldBinding,
                      const Binding& newBinding,
                      std::size_t vertexOffset) {
+        if (oldBinding == newBinding) {
+            return;
+        }
+
         Binding::visit(newBinding, [&] (const auto& binding) {
-            binding.bind(context, location, oldBinding, vertexOffset);
+            binding.bind(context, location, vertexOffset);
         });
+
+        oldBinding = newBinding;
     }
 };
 
@@ -242,9 +234,6 @@ public:
     using Bindings = IndexedTuple<
         TypeList<As...>,
         TypeList<typename As::Type::Binding...>>;
-    using VariableBindings = IndexedTuple<
-        TypeList<As...>,
-        TypeList<optional<typename As::Type::VariableBinding>...>>;
     using NamedLocations = std::vector<std::pair<const std::string, AttributeLocation>>;
 
     using Vertex = detail::Vertex<typename As::Type...>;
@@ -266,13 +255,13 @@ public:
     }
 
     template <class DrawMode>
-    static Bindings allVariableBindings(const VertexBuffer<Vertex, DrawMode>& buffer) {
-        return Bindings { As::Type::variableBinding(buffer, Index<As>)... };
+    static Bindings bindings(const VertexBuffer<Vertex, DrawMode>& buffer) {
+        return Bindings { As::Type::binding(buffer, Index<As>)... };
     }
 
     static void bind(Context& context,
                      const Locations& locations,
-                     VariableBindings& oldBindings,
+                     Bindings& oldBindings,
                      const Bindings& newBindings,
                      std::size_t vertexOffset) {
         util::ignore({ (As::Type::bind(context,
