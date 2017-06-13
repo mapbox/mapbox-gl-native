@@ -1,0 +1,1220 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		079E77C51E1C4E2100F92FA8 /* camera.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 079E77C41E1C4E2100F92FA8 /* camera.xcassets */; };
+		07C138C01E6F646F00D6F678 /* ShapeCollectionFeatureExample.m in Sources */ = {isa = PBXBuildFile; fileRef = 07C138BF1E6F646F00D6F678 /* ShapeCollectionFeatureExample.m */; };
+		07C138C21E6F65D000D6F678 /* ShapeCollectionFeatureExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07C138C11E6F65D000D6F678 /* ShapeCollectionFeatureExample.swift */; };
+		07C138C41E721C8F00D6F678 /* DDSCircleLayerExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07C138C31E721C8F00D6F678 /* DDSCircleLayerExample.swift */; };
+		07C138C71E72216E00D6F678 /* DDSCircleLayerExample.m in Sources */ = {isa = PBXBuildFile; fileRef = 07C138C61E72216E00D6F678 /* DDSCircleLayerExample.m */; };
+		07F53B851E00D02100B58DB3 /* AnnotationViewMultipleExample.m in Sources */ = {isa = PBXBuildFile; fileRef = 07F53B841E00D02100B58DB3 /* AnnotationViewMultipleExample.m */; };
+		1F1F84751E538ABB00332CC3 /* BlockingGesturesDelegateExample.m in Sources */ = {isa = PBXBuildFile; fileRef = 1F1F84741E538ABB00332CC3 /* BlockingGesturesDelegateExample.m */; };
+		1F1F84771E53A3B700332CC3 /* BlockingGesturesDelegateExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F1F84761E53A3B700332CC3 /* BlockingGesturesDelegateExample.swift */; };
+		3E085B801EC526C500163C99 /* ExtrusionsExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E085B7F1EC526C500163C99 /* ExtrusionsExample.swift */; };
+		3E085B831EC526E500163C99 /* ExtrusionsExample.m in Sources */ = {isa = PBXBuildFile; fileRef = 3E085B821EC526E500163C99 /* ExtrusionsExample.m */; };
+		3E3BFAD91E81D7A300D0BEA1 /* DDSLayerSelectionExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E3BFAD81E81D7A300D0BEA1 /* DDSLayerSelectionExample.swift */; };
+		3E3BFADC1E81D7BB00D0BEA1 /* DDSLayerSelectionExample.m in Sources */ = {isa = PBXBuildFile; fileRef = 3E3BFADB1E81D7BB00D0BEA1 /* DDSLayerSelectionExample.m */; };
+		3EBCD7161DC28240001E342F /* AnnotationViewExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EBCD7021DC28240001E342F /* AnnotationViewExample.swift */; };
+		3EBCD7171DC28240001E342F /* CalloutDelegateUsageExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EBCD7031DC28240001E342F /* CalloutDelegateUsageExample.swift */; };
+		3EBCD7181DC28240001E342F /* CameraAnimationExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EBCD7041DC28240001E342F /* CameraAnimationExample.swift */; };
+		3EBCD7191DC28240001E342F /* CustomAnnotationModelExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EBCD7051DC28240001E342F /* CustomAnnotationModelExample.swift */; };
+		3EBCD71A1DC28240001E342F /* CustomAnnotationModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EBCD7061DC28240001E342F /* CustomAnnotationModels.swift */; };
+		3EBCD71B1DC28240001E342F /* CustomCalloutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EBCD7071DC28240001E342F /* CustomCalloutView.swift */; };
+		3EBCD71C1DC28240001E342F /* CustomCalloutViewExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EBCD7081DC28240001E342F /* CustomCalloutViewExample.swift */; };
+		3EBCD71D1DC28240001E342F /* CustomRasterStyleExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EBCD7091DC28240001E342F /* CustomRasterStyleExample.swift */; };
+		3EBCD71E1DC28240001E342F /* CustomStyleExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EBCD70A1DC28240001E342F /* CustomStyleExample.swift */; };
+		3EBCD71F1DC28240001E342F /* DefaultStylesExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EBCD70B1DC28240001E342F /* DefaultStylesExample.swift */; };
+		3EBCD7201DC28240001E342F /* DraggableAnnotationViewExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EBCD70C1DC28240001E342F /* DraggableAnnotationViewExample.swift */; };
+		3EBCD7211DC28240001E342F /* DrawingACustomMarkerExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EBCD70D1DC28240001E342F /* DrawingACustomMarkerExample.swift */; };
+		3EBCD7221DC28240001E342F /* DrawingAGeoJSONLineExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EBCD70E1DC28240001E342F /* DrawingAGeoJSONLineExample.swift */; };
+		3EBCD7231DC28240001E342F /* DrawingAMarkerExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EBCD70F1DC28240001E342F /* DrawingAMarkerExample.swift */; };
+		3EBCD7241DC28240001E342F /* DrawingAPolygonExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EBCD7101DC28240001E342F /* DrawingAPolygonExample.swift */; };
+		3EBCD7251DC28240001E342F /* OfflinePackExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EBCD7111DC28240001E342F /* OfflinePackExample.swift */; };
+		3EBCD7261DC28240001E342F /* PointConversionExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EBCD7121DC28240001E342F /* PointConversionExample.swift */; };
+		3EBCD7271DC28240001E342F /* SatelliteStyleExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EBCD7131DC28240001E342F /* SatelliteStyleExample.swift */; };
+		3EBCD7281DC28240001E342F /* SimpleMapViewExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EBCD7141DC28240001E342F /* SimpleMapViewExample.swift */; };
+		3EBCD7291DC28240001E342F /* UserTrackingModesExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EBCD7151DC28240001E342F /* UserTrackingModesExample.swift */; };
+		3EC92DB71E78C431001D0503 /* metro-line.geojson in Resources */ = {isa = PBXBuildFile; fileRef = 3EC92DB61E78C431001D0503 /* metro-line.geojson */; };
+		3ED403411E006B5200230C95 /* CameraFlyToExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3ED403401E006B5200230C95 /* CameraFlyToExample.swift */; };
+		3ED403481E006BE800230C95 /* CameraFlyToExample.m in Sources */ = {isa = PBXBuildFile; fileRef = 3ED403471E006BE800230C95 /* CameraFlyToExample.m */; };
+		4F1B1A74F32EB5E8C46C9A12 /* Pods_Examples.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9EC12D8F1A97963D68BFA871 /* Pods_Examples.framework */; };
+		646B62971DEF6DAF000AA523 /* RuntimeToggleLayerExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 646B62961DEF6DAF000AA523 /* RuntimeToggleLayerExample.swift */; };
+		646B629C1DEF6DF1000AA523 /* RuntimeToggleLayerExample.m in Sources */ = {isa = PBXBuildFile; fileRef = 646B629B1DEF6DF1000AA523 /* RuntimeToggleLayerExample.m */; };
+		646B62A41DEF7115000AA523 /* RuntimeAddLineExample.m in Sources */ = {isa = PBXBuildFile; fileRef = 646B62A31DEF7115000AA523 /* RuntimeAddLineExample.m */; };
+		646B62A61DEF7121000AA523 /* RuntimeAnimateLineExample.m in Sources */ = {isa = PBXBuildFile; fileRef = 646B62A51DEF7121000AA523 /* RuntimeAnimateLineExample.m */; };
+		646B62AE1DEF7155000AA523 /* RuntimeAddLineExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 646B62AD1DEF7155000AA523 /* RuntimeAddLineExample.swift */; };
+		646B62B01DEF7161000AA523 /* RuntimeAnimateLineExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 646B62AF1DEF7161000AA523 /* RuntimeAnimateLineExample.swift */; };
+		646B62B41DEF9613000AA523 /* RuntimeCircleStylesExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 646B62B31DEF9613000AA523 /* RuntimeCircleStylesExample.swift */; };
+		646B62BD1DEF965A000AA523 /* RuntimeCircleStylesExample.m in Sources */ = {isa = PBXBuildFile; fileRef = 646B62BC1DEF965A000AA523 /* RuntimeCircleStylesExample.m */; };
+		64BBDAF01DF22D9600BB705D /* third_party_vector_style.json in Resources */ = {isa = PBXBuildFile; fileRef = 64BBDAEF1DF22D9600BB705D /* third_party_vector_style.json */; };
+		64BBDAF61DF232FD00BB705D /* SelectFeatureExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64BBDAF51DF232FD00BB705D /* SelectFeatureExample.swift */; };
+		64BBDAF81DF2330B00BB705D /* SelectFeatureExample.m in Sources */ = {isa = PBXBuildFile; fileRef = 64BBDAF71DF2330B00BB705D /* SelectFeatureExample.m */; };
+		64BBDAFD1DF24DEB00BB705D /* RuntimeMultipleAnnotationsExample.m in Sources */ = {isa = PBXBuildFile; fileRef = 64BBDAFC1DF24DEB00BB705D /* RuntimeMultipleAnnotationsExample.m */; };
+		64BBDB031DF24E0900BB705D /* RuntimeMultipleAnnotationsExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64BBDB021DF24E0900BB705D /* RuntimeMultipleAnnotationsExample.swift */; };
+		64CF970C1DF224C500C3C27B /* SourceCustomVectorExample.m in Sources */ = {isa = PBXBuildFile; fileRef = 64CF970B1DF224C500C3C27B /* SourceCustomVectorExample.m */; };
+		64CF97101DF224E400C3C27B /* SourceCustomVectorExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64CF970F1DF224E400C3C27B /* SourceCustomVectorExample.swift */; };
+		64CF97121DF224F600C3C27B /* SourceCustomRasterExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64CF97111DF224F600C3C27B /* SourceCustomRasterExample.swift */; };
+		64CF97171DF2251500C3C27B /* SourceCustomRasterExample.m in Sources */ = {isa = PBXBuildFile; fileRef = 64CF97161DF2251500C3C27B /* SourceCustomRasterExample.m */; };
+		960A21611D344F9F00BB348B /* DraggableAnnotationViewExample.m in Sources */ = {isa = PBXBuildFile; fileRef = 960A21601D344F9F00BB348B /* DraggableAnnotationViewExample.m */; };
+		96115A681CAD4E1C000963B8 /* OfflinePackExample.m in Sources */ = {isa = PBXBuildFile; fileRef = 96115A671CAD4E1C000963B8 /* OfflinePackExample.m */; };
+		961962911C581700002D3DAB /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 961962901C581700002D3DAB /* main.m */; };
+		961962941C581700002D3DAB /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 961962931C581700002D3DAB /* AppDelegate.m */; };
+		9619629C1C581700002D3DAB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9619629B1C581700002D3DAB /* Assets.xcassets */; };
+		9619629F1C581700002D3DAB /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9619629D1C581700002D3DAB /* LaunchScreen.storyboard */; };
+		961962AA1C581700002D3DAB /* ExamplesTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 961962A91C581700002D3DAB /* ExamplesTests.m */; };
+		961962B51C581700002D3DAB /* ExamplesUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = 961962B41C581700002D3DAB /* ExamplesUITests.m */; };
+		961962CF1C581FBC002D3DAB /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 961962CE1C581FBC002D3DAB /* Main.storyboard */; };
+		961962D21C5821A9002D3DAB /* ExamplesTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 961962D11C5821A9002D3DAB /* ExamplesTableViewController.m */; };
+		961962D51C583FDC002D3DAB /* ExamplesContainerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 961962D41C583FDC002D3DAB /* ExamplesContainerViewController.m */; };
+		962B450F1D1C8520007B7454 /* AnnotationViewExample.m in Sources */ = {isa = PBXBuildFile; fileRef = 962B450E1D1C8520007B7454 /* AnnotationViewExample.m */; };
+		964CB5111E42A0A3004549EA /* AnnotationViewMultipleExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 964CB5101E42A0A3004549EA /* AnnotationViewMultipleExample.swift */; };
+		9678E3EE1CEF58DA00F21AE2 /* CustomAnnotationModelExample.m in Sources */ = {isa = PBXBuildFile; fileRef = 9678E3ED1CEF58DA00F21AE2 /* CustomAnnotationModelExample.m */; };
+		968247031C5BDCBB00494AB8 /* CustomRasterStyleExample.m in Sources */ = {isa = PBXBuildFile; fileRef = 968247021C5BDCBB00494AB8 /* CustomRasterStyleExample.m */; };
+		968247081C5BEBDC00494AB8 /* SatelliteStyleExample.m in Sources */ = {isa = PBXBuildFile; fileRef = 968247071C5BEBDC00494AB8 /* SatelliteStyleExample.m */; };
+		9682470F1C5BF12700494AB8 /* DrawingAMarkerExample.m in Sources */ = {isa = PBXBuildFile; fileRef = 9682470E1C5BF12700494AB8 /* DrawingAMarkerExample.m */; };
+		968247131C5C0F0F00494AB8 /* CalloutDelegateUsageExample.m in Sources */ = {isa = PBXBuildFile; fileRef = 968247121C5C0F0F00494AB8 /* CalloutDelegateUsageExample.m */; };
+		9682471A1C5C115000494AB8 /* DrawingAGeoJSONLineExample.m in Sources */ = {isa = PBXBuildFile; fileRef = 968247191C5C115000494AB8 /* DrawingAGeoJSONLineExample.m */; };
+		9682471D1C5C123B00494AB8 /* example.geojson in Resources */ = {isa = PBXBuildFile; fileRef = 9682471C1C5C123B00494AB8 /* example.geojson */; };
+		968247201C5C1C0400494AB8 /* DrawingAPolygonExample.m in Sources */ = {isa = PBXBuildFile; fileRef = 9682471F1C5C1C0400494AB8 /* DrawingAPolygonExample.m */; };
+		968247271C5C1DC700494AB8 /* CameraAnimationExample.m in Sources */ = {isa = PBXBuildFile; fileRef = 968247261C5C1DC700494AB8 /* CameraAnimationExample.m */; };
+		9682472A1C5C1FF800494AB8 /* PointConversionExample.m in Sources */ = {isa = PBXBuildFile; fileRef = 968247291C5C1FF800494AB8 /* PointConversionExample.m */; };
+		9691AA941C5AA702006A58C6 /* Examples.m in Sources */ = {isa = PBXBuildFile; fileRef = 9691AA931C5AA702006A58C6 /* Examples.m */; };
+		9691AAA71C5AAD8F006A58C6 /* CustomStyleExample.m in Sources */ = {isa = PBXBuildFile; fileRef = 9691AAA21C5AAD8F006A58C6 /* CustomStyleExample.m */; };
+		9691AAA81C5AAD8F006A58C6 /* DefaultStylesExample.m in Sources */ = {isa = PBXBuildFile; fileRef = 9691AAA41C5AAD8F006A58C6 /* DefaultStylesExample.m */; };
+		9691AAA91C5AAD8F006A58C6 /* SimpleMapViewExample.m in Sources */ = {isa = PBXBuildFile; fileRef = 9691AAA61C5AAD8F006A58C6 /* SimpleMapViewExample.m */; };
+		969E7FDD1D25C31700663F84 /* UserTrackingModesExample.m in Sources */ = {isa = PBXBuildFile; fileRef = 969E7FDC1D25C31700663F84 /* UserTrackingModesExample.m */; };
+		96A2A1CF1C8CA16C0059441E /* CustomCalloutViewExample.m in Sources */ = {isa = PBXBuildFile; fileRef = 96A2A1CE1C8CA16C0059441E /* CustomCalloutViewExample.m */; };
+		96A2A1D21C8CA74B0059441E /* CustomCalloutView.m in Sources */ = {isa = PBXBuildFile; fileRef = 96A2A1D11C8CA74B0059441E /* CustomCalloutView.m */; };
+		96D431FC1C84B4F7007D09D1 /* DrawingACustomMarkerExample.m in Sources */ = {isa = PBXBuildFile; fileRef = 96D431FB1C84B4F7007D09D1 /* DrawingACustomMarkerExample.m */; };
+		96D432061C84B9CF007D09D1 /* pisavector.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 96D432051C84B9CF007D09D1 /* pisavector.xcassets */; };
+		BBD05676206B24335DEA52C4 /* Pods_ExamplesUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7692D1D792EB3849E8754E6B /* Pods_ExamplesUITests.framework */; };
+		DD5939E41E6639BA0009BEB2 /* ClusteringExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD5939E31E6639BA0009BEB2 /* ClusteringExample.swift */; };
+		DD5939E61E6778480009BEB2 /* clustering.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DD5939E51E6778480009BEB2 /* clustering.xcassets */; };
+		DDF943291E5DE63300545D0F /* ClusteringExample.m in Sources */ = {isa = PBXBuildFile; fileRef = DDF943281E5DE63300545D0F /* ClusteringExample.m */; };
+		DDF9432B1E5DEACC00545D0F /* ports.geojson in Resources */ = {isa = PBXBuildFile; fileRef = DDF9432A1E5DEACC00545D0F /* ports.geojson */; };
+		F9C1D0F8EE832A1D242930D2 /* Pods_ExamplesTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F8EE2FB6BE39BB48832DA94C /* Pods_ExamplesTests.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		961962A61C581700002D3DAB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 961962841C581700002D3DAB /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 9619628B1C581700002D3DAB;
+			remoteInfo = Examples;
+		};
+		961962B11C581700002D3DAB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 961962841C581700002D3DAB /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 9619628B1C581700002D3DAB;
+			remoteInfo = Examples;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		961962C71C5818EB002D3DAB /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		03CC5D45DBD04AB716469E7B /* Pods-Examples.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Examples.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Examples/Pods-Examples.debug.xcconfig"; sourceTree = "<group>"; };
+		079E77C41E1C4E2100F92FA8 /* camera.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = camera.xcassets; sourceTree = "<group>"; };
+		07C138BE1E6F646F00D6F678 /* ShapeCollectionFeatureExample.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ShapeCollectionFeatureExample.h; sourceTree = "<group>"; };
+		07C138BF1E6F646F00D6F678 /* ShapeCollectionFeatureExample.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ShapeCollectionFeatureExample.m; sourceTree = "<group>"; };
+		07C138C11E6F65D000D6F678 /* ShapeCollectionFeatureExample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShapeCollectionFeatureExample.swift; sourceTree = "<group>"; };
+		07C138C31E721C8F00D6F678 /* DDSCircleLayerExample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DDSCircleLayerExample.swift; sourceTree = "<group>"; };
+		07C138C51E72216D00D6F678 /* DDSCircleLayerExample.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DDSCircleLayerExample.h; sourceTree = "<group>"; };
+		07C138C61E72216E00D6F678 /* DDSCircleLayerExample.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DDSCircleLayerExample.m; sourceTree = "<group>"; };
+		07F53B841E00D02100B58DB3 /* AnnotationViewMultipleExample.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AnnotationViewMultipleExample.m; sourceTree = "<group>"; };
+		07F53B861E00D08600B58DB3 /* AnnotationViewMultipleExample.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AnnotationViewMultipleExample.h; sourceTree = "<group>"; };
+		0A4917D6B62E749D739044A4 /* Pods-ExamplesUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ExamplesUITests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ExamplesUITests/Pods-ExamplesUITests.debug.xcconfig"; sourceTree = "<group>"; };
+		1F1F84731E538ABB00332CC3 /* BlockingGesturesDelegateExample.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BlockingGesturesDelegateExample.h; sourceTree = "<group>"; };
+		1F1F84741E538ABB00332CC3 /* BlockingGesturesDelegateExample.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BlockingGesturesDelegateExample.m; sourceTree = "<group>"; };
+		1F1F84761E53A3B700332CC3 /* BlockingGesturesDelegateExample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BlockingGesturesDelegateExample.swift; sourceTree = "<group>"; };
+		29A0D7C8DCD539DCA5DA1BAC /* Pods-Examples.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Examples.release.xcconfig"; path = "Pods/Target Support Files/Pods-Examples/Pods-Examples.release.xcconfig"; sourceTree = "<group>"; };
+		3E085B7F1EC526C500163C99 /* ExtrusionsExample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExtrusionsExample.swift; sourceTree = "<group>"; };
+		3E085B811EC526E500163C99 /* ExtrusionsExample.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExtrusionsExample.h; sourceTree = "<group>"; };
+		3E085B821EC526E500163C99 /* ExtrusionsExample.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ExtrusionsExample.m; sourceTree = "<group>"; };
+		3E3BFAD81E81D7A300D0BEA1 /* DDSLayerSelectionExample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DDSLayerSelectionExample.swift; sourceTree = "<group>"; };
+		3E3BFADA1E81D7BB00D0BEA1 /* DDSLayerSelectionExample.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DDSLayerSelectionExample.h; sourceTree = "<group>"; };
+		3E3BFADB1E81D7BB00D0BEA1 /* DDSLayerSelectionExample.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DDSLayerSelectionExample.m; sourceTree = "<group>"; };
+		3EBCD7021DC28240001E342F /* AnnotationViewExample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnnotationViewExample.swift; sourceTree = "<group>"; };
+		3EBCD7031DC28240001E342F /* CalloutDelegateUsageExample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CalloutDelegateUsageExample.swift; sourceTree = "<group>"; };
+		3EBCD7041DC28240001E342F /* CameraAnimationExample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CameraAnimationExample.swift; sourceTree = "<group>"; };
+		3EBCD7051DC28240001E342F /* CustomAnnotationModelExample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomAnnotationModelExample.swift; sourceTree = "<group>"; };
+		3EBCD7061DC28240001E342F /* CustomAnnotationModels.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomAnnotationModels.swift; sourceTree = "<group>"; };
+		3EBCD7071DC28240001E342F /* CustomCalloutView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomCalloutView.swift; sourceTree = "<group>"; };
+		3EBCD7081DC28240001E342F /* CustomCalloutViewExample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomCalloutViewExample.swift; sourceTree = "<group>"; };
+		3EBCD7091DC28240001E342F /* CustomRasterStyleExample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomRasterStyleExample.swift; sourceTree = "<group>"; };
+		3EBCD70A1DC28240001E342F /* CustomStyleExample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomStyleExample.swift; sourceTree = "<group>"; };
+		3EBCD70B1DC28240001E342F /* DefaultStylesExample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DefaultStylesExample.swift; sourceTree = "<group>"; };
+		3EBCD70C1DC28240001E342F /* DraggableAnnotationViewExample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DraggableAnnotationViewExample.swift; sourceTree = "<group>"; };
+		3EBCD70D1DC28240001E342F /* DrawingACustomMarkerExample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DrawingACustomMarkerExample.swift; sourceTree = "<group>"; };
+		3EBCD70E1DC28240001E342F /* DrawingAGeoJSONLineExample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DrawingAGeoJSONLineExample.swift; sourceTree = "<group>"; };
+		3EBCD70F1DC28240001E342F /* DrawingAMarkerExample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DrawingAMarkerExample.swift; sourceTree = "<group>"; };
+		3EBCD7101DC28240001E342F /* DrawingAPolygonExample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DrawingAPolygonExample.swift; sourceTree = "<group>"; };
+		3EBCD7111DC28240001E342F /* OfflinePackExample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OfflinePackExample.swift; sourceTree = "<group>"; };
+		3EBCD7121DC28240001E342F /* PointConversionExample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PointConversionExample.swift; sourceTree = "<group>"; };
+		3EBCD7131DC28240001E342F /* SatelliteStyleExample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SatelliteStyleExample.swift; sourceTree = "<group>"; };
+		3EBCD7141DC28240001E342F /* SimpleMapViewExample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SimpleMapViewExample.swift; sourceTree = "<group>"; };
+		3EBCD7151DC28240001E342F /* UserTrackingModesExample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserTrackingModesExample.swift; sourceTree = "<group>"; };
+		3EC92DB61E78C431001D0503 /* metro-line.geojson */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "metro-line.geojson"; sourceTree = "<group>"; };
+		3ED403401E006B5200230C95 /* CameraFlyToExample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CameraFlyToExample.swift; sourceTree = "<group>"; };
+		3ED403461E006BE800230C95 /* CameraFlyToExample.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CameraFlyToExample.h; sourceTree = "<group>"; };
+		3ED403471E006BE800230C95 /* CameraFlyToExample.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CameraFlyToExample.m; sourceTree = "<group>"; };
+		589ABF8859560819F8B431C7 /* Pods-ExamplesTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ExamplesTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ExamplesTests/Pods-ExamplesTests.debug.xcconfig"; sourceTree = "<group>"; };
+		646B62961DEF6DAF000AA523 /* RuntimeToggleLayerExample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RuntimeToggleLayerExample.swift; sourceTree = "<group>"; };
+		646B629B1DEF6DF1000AA523 /* RuntimeToggleLayerExample.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RuntimeToggleLayerExample.m; sourceTree = "<group>"; };
+		646B629E1DEF6DFD000AA523 /* RuntimeToggleLayerExample.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RuntimeToggleLayerExample.h; sourceTree = "<group>"; };
+		646B62A11DEF70DD000AA523 /* RuntimeAnimateLineExample.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RuntimeAnimateLineExample.h; sourceTree = "<group>"; };
+		646B62A21DEF7106000AA523 /* RuntimeAddLineExample.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RuntimeAddLineExample.h; sourceTree = "<group>"; };
+		646B62A31DEF7115000AA523 /* RuntimeAddLineExample.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RuntimeAddLineExample.m; sourceTree = "<group>"; };
+		646B62A51DEF7121000AA523 /* RuntimeAnimateLineExample.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RuntimeAnimateLineExample.m; sourceTree = "<group>"; };
+		646B62AD1DEF7155000AA523 /* RuntimeAddLineExample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RuntimeAddLineExample.swift; sourceTree = "<group>"; };
+		646B62AF1DEF7161000AA523 /* RuntimeAnimateLineExample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RuntimeAnimateLineExample.swift; sourceTree = "<group>"; };
+		646B62B31DEF9613000AA523 /* RuntimeCircleStylesExample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RuntimeCircleStylesExample.swift; sourceTree = "<group>"; };
+		646B62BB1DEF964A000AA523 /* RuntimeCircleStylesExample.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RuntimeCircleStylesExample.h; sourceTree = "<group>"; };
+		646B62BC1DEF965A000AA523 /* RuntimeCircleStylesExample.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RuntimeCircleStylesExample.m; sourceTree = "<group>"; };
+		64BBDAEF1DF22D9600BB705D /* third_party_vector_style.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = third_party_vector_style.json; sourceTree = "<group>"; };
+		64BBDAF51DF232FD00BB705D /* SelectFeatureExample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SelectFeatureExample.swift; sourceTree = "<group>"; };
+		64BBDAF71DF2330B00BB705D /* SelectFeatureExample.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SelectFeatureExample.m; sourceTree = "<group>"; };
+		64BBDAFA1DF2331600BB705D /* SelectFeatureExample.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SelectFeatureExample.h; sourceTree = "<group>"; };
+		64BBDAFB1DF24DD700BB705D /* RuntimeMultipleAnnotationsExample.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RuntimeMultipleAnnotationsExample.h; sourceTree = "<group>"; };
+		64BBDAFC1DF24DEB00BB705D /* RuntimeMultipleAnnotationsExample.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RuntimeMultipleAnnotationsExample.m; sourceTree = "<group>"; };
+		64BBDB021DF24E0900BB705D /* RuntimeMultipleAnnotationsExample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RuntimeMultipleAnnotationsExample.swift; sourceTree = "<group>"; };
+		64CF970B1DF224C500C3C27B /* SourceCustomVectorExample.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SourceCustomVectorExample.m; sourceTree = "<group>"; };
+		64CF970E1DF224D400C3C27B /* SourceCustomVectorExample.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SourceCustomVectorExample.h; sourceTree = "<group>"; };
+		64CF970F1DF224E400C3C27B /* SourceCustomVectorExample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SourceCustomVectorExample.swift; sourceTree = "<group>"; };
+		64CF97111DF224F600C3C27B /* SourceCustomRasterExample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SourceCustomRasterExample.swift; sourceTree = "<group>"; };
+		64CF97161DF2251500C3C27B /* SourceCustomRasterExample.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SourceCustomRasterExample.m; sourceTree = "<group>"; };
+		64CF97191DF2252C00C3C27B /* SourceCustomRasterExample.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SourceCustomRasterExample.h; sourceTree = "<group>"; };
+		7556D44879C1E2866B0355B8 /* Pods-ExamplesTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ExamplesTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-ExamplesTests/Pods-ExamplesTests.release.xcconfig"; sourceTree = "<group>"; };
+		7692D1D792EB3849E8754E6B /* Pods_ExamplesUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ExamplesUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		960A215F1D344F9F00BB348B /* DraggableAnnotationViewExample.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DraggableAnnotationViewExample.h; sourceTree = "<group>"; };
+		960A21601D344F9F00BB348B /* DraggableAnnotationViewExample.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DraggableAnnotationViewExample.m; sourceTree = "<group>"; };
+		96115A661CAD4E1C000963B8 /* OfflinePackExample.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OfflinePackExample.h; path = Examples/ObjectiveC/OfflinePackExample.h; sourceTree = SOURCE_ROOT; };
+		96115A671CAD4E1C000963B8 /* OfflinePackExample.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OfflinePackExample.m; path = Examples/ObjectiveC/OfflinePackExample.m; sourceTree = SOURCE_ROOT; };
+		9619628C1C581700002D3DAB /* Examples.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Examples.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		961962901C581700002D3DAB /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		961962921C581700002D3DAB /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		961962931C581700002D3DAB /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		9619629B1C581700002D3DAB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		9619629E1C581700002D3DAB /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		961962A01C581700002D3DAB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		961962A51C581700002D3DAB /* ExamplesTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ExamplesTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		961962A91C581700002D3DAB /* ExamplesTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ExamplesTests.m; sourceTree = "<group>"; };
+		961962AB1C581700002D3DAB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		961962B01C581700002D3DAB /* ExamplesUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ExamplesUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		961962B41C581700002D3DAB /* ExamplesUITests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ExamplesUITests.m; sourceTree = "<group>"; };
+		961962B61C581700002D3DAB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		961962CE1C581FBC002D3DAB /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
+		961962D01C5821A9002D3DAB /* ExamplesTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExamplesTableViewController.h; sourceTree = "<group>"; };
+		961962D11C5821A9002D3DAB /* ExamplesTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ExamplesTableViewController.m; sourceTree = "<group>"; };
+		961962D31C583FDC002D3DAB /* ExamplesContainerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExamplesContainerViewController.h; sourceTree = "<group>"; };
+		961962D41C583FDC002D3DAB /* ExamplesContainerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ExamplesContainerViewController.m; sourceTree = "<group>"; };
+		962B450D1D1C8520007B7454 /* AnnotationViewExample.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AnnotationViewExample.h; sourceTree = "<group>"; };
+		962B450E1D1C8520007B7454 /* AnnotationViewExample.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AnnotationViewExample.m; sourceTree = "<group>"; };
+		964CB5101E42A0A3004549EA /* AnnotationViewMultipleExample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnnotationViewMultipleExample.swift; sourceTree = "<group>"; };
+		964CB5171E445AE1004549EA /* mapbox_access_token */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = mapbox_access_token; sourceTree = SOURCE_ROOT; };
+		9678E3EC1CEF58DA00F21AE2 /* CustomAnnotationModelExample.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CustomAnnotationModelExample.h; sourceTree = "<group>"; };
+		9678E3ED1CEF58DA00F21AE2 /* CustomAnnotationModelExample.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CustomAnnotationModelExample.m; sourceTree = "<group>"; };
+		9678E3F21CEF616700F21AE2 /* CustomAnnotationModels.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CustomAnnotationModels.h; sourceTree = "<group>"; };
+		968247011C5BDCBB00494AB8 /* CustomRasterStyleExample.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CustomRasterStyleExample.h; path = Examples/ObjectiveC/CustomRasterStyleExample.h; sourceTree = SOURCE_ROOT; };
+		968247021C5BDCBB00494AB8 /* CustomRasterStyleExample.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CustomRasterStyleExample.m; path = Examples/ObjectiveC/CustomRasterStyleExample.m; sourceTree = SOURCE_ROOT; };
+		968247061C5BEBDC00494AB8 /* SatelliteStyleExample.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SatelliteStyleExample.h; path = Examples/ObjectiveC/SatelliteStyleExample.h; sourceTree = SOURCE_ROOT; };
+		968247071C5BEBDC00494AB8 /* SatelliteStyleExample.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SatelliteStyleExample.m; path = Examples/ObjectiveC/SatelliteStyleExample.m; sourceTree = SOURCE_ROOT; };
+		9682470D1C5BF12700494AB8 /* DrawingAMarkerExample.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DrawingAMarkerExample.h; path = Examples/ObjectiveC/DrawingAMarkerExample.h; sourceTree = SOURCE_ROOT; };
+		9682470E1C5BF12700494AB8 /* DrawingAMarkerExample.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DrawingAMarkerExample.m; path = Examples/ObjectiveC/DrawingAMarkerExample.m; sourceTree = SOURCE_ROOT; };
+		968247111C5C0F0F00494AB8 /* CalloutDelegateUsageExample.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CalloutDelegateUsageExample.h; path = Examples/ObjectiveC/CalloutDelegateUsageExample.h; sourceTree = SOURCE_ROOT; };
+		968247121C5C0F0F00494AB8 /* CalloutDelegateUsageExample.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CalloutDelegateUsageExample.m; path = Examples/ObjectiveC/CalloutDelegateUsageExample.m; sourceTree = SOURCE_ROOT; };
+		968247181C5C115000494AB8 /* DrawingAGeoJSONLineExample.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DrawingAGeoJSONLineExample.h; path = Examples/ObjectiveC/DrawingAGeoJSONLineExample.h; sourceTree = SOURCE_ROOT; };
+		968247191C5C115000494AB8 /* DrawingAGeoJSONLineExample.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DrawingAGeoJSONLineExample.m; path = Examples/ObjectiveC/DrawingAGeoJSONLineExample.m; sourceTree = SOURCE_ROOT; };
+		9682471C1C5C123B00494AB8 /* example.geojson */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = example.geojson; path = ../Files/example.geojson; sourceTree = "<group>"; };
+		9682471E1C5C1C0400494AB8 /* DrawingAPolygonExample.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DrawingAPolygonExample.h; path = Examples/ObjectiveC/DrawingAPolygonExample.h; sourceTree = SOURCE_ROOT; };
+		9682471F1C5C1C0400494AB8 /* DrawingAPolygonExample.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DrawingAPolygonExample.m; path = Examples/ObjectiveC/DrawingAPolygonExample.m; sourceTree = SOURCE_ROOT; };
+		968247251C5C1DC700494AB8 /* CameraAnimationExample.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CameraAnimationExample.h; path = Examples/ObjectiveC/CameraAnimationExample.h; sourceTree = SOURCE_ROOT; };
+		968247261C5C1DC700494AB8 /* CameraAnimationExample.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CameraAnimationExample.m; path = Examples/ObjectiveC/CameraAnimationExample.m; sourceTree = SOURCE_ROOT; };
+		968247281C5C1FF800494AB8 /* PointConversionExample.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PointConversionExample.h; path = Examples/ObjectiveC/PointConversionExample.h; sourceTree = SOURCE_ROOT; };
+		968247291C5C1FF800494AB8 /* PointConversionExample.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PointConversionExample.m; path = Examples/ObjectiveC/PointConversionExample.m; sourceTree = SOURCE_ROOT; };
+		9691AA921C5AA702006A58C6 /* Examples.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Examples.h; sourceTree = "<group>"; };
+		9691AA931C5AA702006A58C6 /* Examples.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Examples.m; sourceTree = "<group>"; };
+		9691AAA11C5AAD8F006A58C6 /* CustomStyleExample.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CustomStyleExample.h; path = Examples/ObjectiveC/CustomStyleExample.h; sourceTree = SOURCE_ROOT; };
+		9691AAA21C5AAD8F006A58C6 /* CustomStyleExample.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CustomStyleExample.m; path = Examples/ObjectiveC/CustomStyleExample.m; sourceTree = SOURCE_ROOT; };
+		9691AAA31C5AAD8F006A58C6 /* DefaultStylesExample.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DefaultStylesExample.h; path = Examples/ObjectiveC/DefaultStylesExample.h; sourceTree = SOURCE_ROOT; };
+		9691AAA41C5AAD8F006A58C6 /* DefaultStylesExample.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DefaultStylesExample.m; path = Examples/ObjectiveC/DefaultStylesExample.m; sourceTree = SOURCE_ROOT; };
+		9691AAA51C5AAD8F006A58C6 /* SimpleMapViewExample.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SimpleMapViewExample.h; path = Examples/ObjectiveC/SimpleMapViewExample.h; sourceTree = SOURCE_ROOT; };
+		9691AAA61C5AAD8F006A58C6 /* SimpleMapViewExample.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SimpleMapViewExample.m; path = Examples/ObjectiveC/SimpleMapViewExample.m; sourceTree = SOURCE_ROOT; };
+		9691AAAA1C5AB546006A58C6 /* Examples-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Examples-Bridging-Header.h"; sourceTree = "<group>"; };
+		969E7FDB1D25C31700663F84 /* UserTrackingModesExample.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserTrackingModesExample.h; sourceTree = "<group>"; };
+		969E7FDC1D25C31700663F84 /* UserTrackingModesExample.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UserTrackingModesExample.m; sourceTree = "<group>"; };
+		96A2A1CD1C8CA16C0059441E /* CustomCalloutViewExample.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CustomCalloutViewExample.h; path = Examples/ObjectiveC/CustomCalloutViewExample.h; sourceTree = SOURCE_ROOT; };
+		96A2A1CE1C8CA16C0059441E /* CustomCalloutViewExample.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CustomCalloutViewExample.m; path = Examples/ObjectiveC/CustomCalloutViewExample.m; sourceTree = SOURCE_ROOT; };
+		96A2A1D01C8CA74B0059441E /* CustomCalloutView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CustomCalloutView.h; path = Examples/ObjectiveC/CustomCalloutView.h; sourceTree = SOURCE_ROOT; };
+		96A2A1D11C8CA74B0059441E /* CustomCalloutView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CustomCalloutView.m; path = Examples/ObjectiveC/CustomCalloutView.m; sourceTree = SOURCE_ROOT; };
+		96D431FA1C84B4F7007D09D1 /* DrawingACustomMarkerExample.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DrawingACustomMarkerExample.h; path = Examples/ObjectiveC/DrawingACustomMarkerExample.h; sourceTree = SOURCE_ROOT; };
+		96D431FB1C84B4F7007D09D1 /* DrawingACustomMarkerExample.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DrawingACustomMarkerExample.m; path = Examples/ObjectiveC/DrawingACustomMarkerExample.m; sourceTree = SOURCE_ROOT; };
+		96D432051C84B9CF007D09D1 /* pisavector.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = pisavector.xcassets; sourceTree = "<group>"; };
+		9EC12D8F1A97963D68BFA871 /* Pods_Examples.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Examples.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		DD5939E31E6639BA0009BEB2 /* ClusteringExample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClusteringExample.swift; sourceTree = "<group>"; };
+		DD5939E51E6778480009BEB2 /* clustering.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = clustering.xcassets; sourceTree = "<group>"; };
+		DDF943271E5DE63300545D0F /* ClusteringExample.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ClusteringExample.h; sourceTree = "<group>"; };
+		DDF943281E5DE63300545D0F /* ClusteringExample.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ClusteringExample.m; sourceTree = "<group>"; };
+		DDF9432A1E5DEACC00545D0F /* ports.geojson */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ports.geojson; sourceTree = "<group>"; };
+		E0520BEE090DE0364897BAF3 /* Pods-ExamplesUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ExamplesUITests.release.xcconfig"; path = "Pods/Target Support Files/Pods-ExamplesUITests/Pods-ExamplesUITests.release.xcconfig"; sourceTree = "<group>"; };
+		F8EE2FB6BE39BB48832DA94C /* Pods_ExamplesTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ExamplesTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		961962891C581700002D3DAB /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4F1B1A74F32EB5E8C46C9A12 /* Pods_Examples.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		961962A21C581700002D3DAB /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F9C1D0F8EE832A1D242930D2 /* Pods_ExamplesTests.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		961962AD1C581700002D3DAB /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BBD05676206B24335DEA52C4 /* Pods_ExamplesUITests.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		3EBCD6FA1DC26355001E342F /* Objective-C */ = {
+			isa = PBXGroup;
+			children = (
+				962B450E1D1C8520007B7454 /* AnnotationViewExample.m */,
+				07F53B841E00D02100B58DB3 /* AnnotationViewMultipleExample.m */,
+				1F1F84741E538ABB00332CC3 /* BlockingGesturesDelegateExample.m */,
+				968247121C5C0F0F00494AB8 /* CalloutDelegateUsageExample.m */,
+				968247261C5C1DC700494AB8 /* CameraAnimationExample.m */,
+				3ED403471E006BE800230C95 /* CameraFlyToExample.m */,
+				DDF943281E5DE63300545D0F /* ClusteringExample.m */,
+				9678E3ED1CEF58DA00F21AE2 /* CustomAnnotationModelExample.m */,
+				9678E3F21CEF616700F21AE2 /* CustomAnnotationModels.h */,
+				96A2A1D11C8CA74B0059441E /* CustomCalloutView.m */,
+				96A2A1CE1C8CA16C0059441E /* CustomCalloutViewExample.m */,
+				968247021C5BDCBB00494AB8 /* CustomRasterStyleExample.m */,
+				9691AAA21C5AAD8F006A58C6 /* CustomStyleExample.m */,
+				07C138C61E72216E00D6F678 /* DDSCircleLayerExample.m */,
+				3E3BFADB1E81D7BB00D0BEA1 /* DDSLayerSelectionExample.m */,
+				9691AAA41C5AAD8F006A58C6 /* DefaultStylesExample.m */,
+				960A21601D344F9F00BB348B /* DraggableAnnotationViewExample.m */,
+				96D431FB1C84B4F7007D09D1 /* DrawingACustomMarkerExample.m */,
+				968247191C5C115000494AB8 /* DrawingAGeoJSONLineExample.m */,
+				9682470E1C5BF12700494AB8 /* DrawingAMarkerExample.m */,
+				9682471F1C5C1C0400494AB8 /* DrawingAPolygonExample.m */,
+				3E085B821EC526E500163C99 /* ExtrusionsExample.m */,
+				646B62A31DEF7115000AA523 /* RuntimeAddLineExample.m */,
+				646B62A51DEF7121000AA523 /* RuntimeAnimateLineExample.m */,
+				646B62BC1DEF965A000AA523 /* RuntimeCircleStylesExample.m */,
+				646B629B1DEF6DF1000AA523 /* RuntimeToggleLayerExample.m */,
+				64BBDAFC1DF24DEB00BB705D /* RuntimeMultipleAnnotationsExample.m */,
+				96115A671CAD4E1C000963B8 /* OfflinePackExample.m */,
+				968247291C5C1FF800494AB8 /* PointConversionExample.m */,
+				968247071C5BEBDC00494AB8 /* SatelliteStyleExample.m */,
+				64BBDAF71DF2330B00BB705D /* SelectFeatureExample.m */,
+				07C138BF1E6F646F00D6F678 /* ShapeCollectionFeatureExample.m */,
+				9691AAA61C5AAD8F006A58C6 /* SimpleMapViewExample.m */,
+				64CF970B1DF224C500C3C27B /* SourceCustomVectorExample.m */,
+				64CF97161DF2251500C3C27B /* SourceCustomRasterExample.m */,
+				969E7FDC1D25C31700663F84 /* UserTrackingModesExample.m */,
+			);
+			name = "Objective-C";
+			sourceTree = "<group>";
+		};
+		3EBCD6FC1DC26364001E342F /* Swift */ = {
+			isa = PBXGroup;
+			children = (
+				3EBCD7021DC28240001E342F /* AnnotationViewExample.swift */,
+				964CB5101E42A0A3004549EA /* AnnotationViewMultipleExample.swift */,
+				1F1F84761E53A3B700332CC3 /* BlockingGesturesDelegateExample.swift */,
+				3EBCD7031DC28240001E342F /* CalloutDelegateUsageExample.swift */,
+				3EBCD7041DC28240001E342F /* CameraAnimationExample.swift */,
+				3ED403401E006B5200230C95 /* CameraFlyToExample.swift */,
+				DD5939E31E6639BA0009BEB2 /* ClusteringExample.swift */,
+				3EBCD7051DC28240001E342F /* CustomAnnotationModelExample.swift */,
+				3EBCD7061DC28240001E342F /* CustomAnnotationModels.swift */,
+				3EBCD7071DC28240001E342F /* CustomCalloutView.swift */,
+				3EBCD7081DC28240001E342F /* CustomCalloutViewExample.swift */,
+				3EBCD7091DC28240001E342F /* CustomRasterStyleExample.swift */,
+				3EBCD70A1DC28240001E342F /* CustomStyleExample.swift */,
+				07C138C31E721C8F00D6F678 /* DDSCircleLayerExample.swift */,
+				3E3BFAD81E81D7A300D0BEA1 /* DDSLayerSelectionExample.swift */,
+				3EBCD70B1DC28240001E342F /* DefaultStylesExample.swift */,
+				3EBCD70C1DC28240001E342F /* DraggableAnnotationViewExample.swift */,
+				3EBCD70D1DC28240001E342F /* DrawingACustomMarkerExample.swift */,
+				3EBCD70E1DC28240001E342F /* DrawingAGeoJSONLineExample.swift */,
+				3EBCD70F1DC28240001E342F /* DrawingAMarkerExample.swift */,
+				3EBCD7101DC28240001E342F /* DrawingAPolygonExample.swift */,
+				3E085B7F1EC526C500163C99 /* ExtrusionsExample.swift */,
+				3EBCD7111DC28240001E342F /* OfflinePackExample.swift */,
+				3EBCD7121DC28240001E342F /* PointConversionExample.swift */,
+				646B62AD1DEF7155000AA523 /* RuntimeAddLineExample.swift */,
+				646B62AF1DEF7161000AA523 /* RuntimeAnimateLineExample.swift */,
+				646B62B31DEF9613000AA523 /* RuntimeCircleStylesExample.swift */,
+				646B62961DEF6DAF000AA523 /* RuntimeToggleLayerExample.swift */,
+				64BBDB021DF24E0900BB705D /* RuntimeMultipleAnnotationsExample.swift */,
+				3EBCD7131DC28240001E342F /* SatelliteStyleExample.swift */,
+				64BBDAF51DF232FD00BB705D /* SelectFeatureExample.swift */,
+				07C138C11E6F65D000D6F678 /* ShapeCollectionFeatureExample.swift */,
+				3EBCD7141DC28240001E342F /* SimpleMapViewExample.swift */,
+				64CF970F1DF224E400C3C27B /* SourceCustomVectorExample.swift */,
+				64CF97111DF224F600C3C27B /* SourceCustomRasterExample.swift */,
+				3EBCD7151DC28240001E342F /* UserTrackingModesExample.swift */,
+			);
+			name = Swift;
+			path = ../Swift;
+			sourceTree = "<group>";
+		};
+		961962831C581700002D3DAB = {
+			isa = PBXGroup;
+			children = (
+				9619628E1C581700002D3DAB /* Examples */,
+				961962A81C581700002D3DAB /* ExamplesTests */,
+				961962B31C581700002D3DAB /* ExamplesUITests */,
+				9619628D1C581700002D3DAB /* Products */,
+				C977D0AF4A14922071F96B9B /* Pods */,
+				CBAD5BE154F4126883B2A6DC /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		9619628D1C581700002D3DAB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				9619628C1C581700002D3DAB /* Examples.app */,
+				961962A51C581700002D3DAB /* ExamplesTests.xctest */,
+				961962B01C581700002D3DAB /* ExamplesUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		9619628E1C581700002D3DAB /* Examples */ = {
+			isa = PBXGroup;
+			children = (
+				9691AAA01C5AAD8F006A58C6 /* Code */,
+				9682471B1C5C123B00494AB8 /* Files */,
+				961962921C581700002D3DAB /* AppDelegate.h */,
+				961962931C581700002D3DAB /* AppDelegate.m */,
+				9691AA921C5AA702006A58C6 /* Examples.h */,
+				9691AA931C5AA702006A58C6 /* Examples.m */,
+				961962D31C583FDC002D3DAB /* ExamplesContainerViewController.h */,
+				961962D41C583FDC002D3DAB /* ExamplesContainerViewController.m */,
+				961962D01C5821A9002D3DAB /* ExamplesTableViewController.h */,
+				961962D11C5821A9002D3DAB /* ExamplesTableViewController.m */,
+				9619629B1C581700002D3DAB /* Assets.xcassets */,
+				961962CE1C581FBC002D3DAB /* Main.storyboard */,
+				9619629D1C581700002D3DAB /* LaunchScreen.storyboard */,
+				961962A01C581700002D3DAB /* Info.plist */,
+				9619628F1C581700002D3DAB /* Supporting Files */,
+			);
+			path = Examples;
+			sourceTree = "<group>";
+		};
+		9619628F1C581700002D3DAB /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				9691AAAA1C5AB546006A58C6 /* Examples-Bridging-Header.h */,
+				961962901C581700002D3DAB /* main.m */,
+				964CB5171E445AE1004549EA /* mapbox_access_token */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		961962A81C581700002D3DAB /* ExamplesTests */ = {
+			isa = PBXGroup;
+			children = (
+				961962A91C581700002D3DAB /* ExamplesTests.m */,
+				961962AB1C581700002D3DAB /* Info.plist */,
+			);
+			path = ExamplesTests;
+			sourceTree = "<group>";
+		};
+		961962B31C581700002D3DAB /* ExamplesUITests */ = {
+			isa = PBXGroup;
+			children = (
+				961962B41C581700002D3DAB /* ExamplesUITests.m */,
+				961962B61C581700002D3DAB /* Info.plist */,
+			);
+			path = ExamplesUITests;
+			sourceTree = "<group>";
+		};
+		9682471B1C5C123B00494AB8 /* Files */ = {
+			isa = PBXGroup;
+			children = (
+				3EC92DB61E78C431001D0503 /* metro-line.geojson */,
+				9682471C1C5C123B00494AB8 /* example.geojson */,
+				64BBDAEF1DF22D9600BB705D /* third_party_vector_style.json */,
+				96D432051C84B9CF007D09D1 /* pisavector.xcassets */,
+				079E77C41E1C4E2100F92FA8 /* camera.xcassets */,
+				DD5939E51E6778480009BEB2 /* clustering.xcassets */,
+				DDF9432A1E5DEACC00545D0F /* ports.geojson */,
+			);
+			path = Files;
+			sourceTree = "<group>";
+		};
+		9682472D1C5C226D00494AB8 /* Headers */ = {
+			isa = PBXGroup;
+			children = (
+				07F53B861E00D08600B58DB3 /* AnnotationViewMultipleExample.h */,
+				962B450D1D1C8520007B7454 /* AnnotationViewExample.h */,
+				1F1F84731E538ABB00332CC3 /* BlockingGesturesDelegateExample.h */,
+				968247111C5C0F0F00494AB8 /* CalloutDelegateUsageExample.h */,
+				968247251C5C1DC700494AB8 /* CameraAnimationExample.h */,
+				3ED403461E006BE800230C95 /* CameraFlyToExample.h */,
+				DDF943271E5DE63300545D0F /* ClusteringExample.h */,
+				9678E3EC1CEF58DA00F21AE2 /* CustomAnnotationModelExample.h */,
+				96A2A1D01C8CA74B0059441E /* CustomCalloutView.h */,
+				96A2A1CD1C8CA16C0059441E /* CustomCalloutViewExample.h */,
+				968247011C5BDCBB00494AB8 /* CustomRasterStyleExample.h */,
+				9691AAA11C5AAD8F006A58C6 /* CustomStyleExample.h */,
+				07C138C51E72216D00D6F678 /* DDSCircleLayerExample.h */,
+				3E3BFADA1E81D7BB00D0BEA1 /* DDSLayerSelectionExample.h */,
+				9691AAA31C5AAD8F006A58C6 /* DefaultStylesExample.h */,
+				960A215F1D344F9F00BB348B /* DraggableAnnotationViewExample.h */,
+				96D431FA1C84B4F7007D09D1 /* DrawingACustomMarkerExample.h */,
+				968247181C5C115000494AB8 /* DrawingAGeoJSONLineExample.h */,
+				9682470D1C5BF12700494AB8 /* DrawingAMarkerExample.h */,
+				9682471E1C5C1C0400494AB8 /* DrawingAPolygonExample.h */,
+				3E085B811EC526E500163C99 /* ExtrusionsExample.h */,
+				96115A661CAD4E1C000963B8 /* OfflinePackExample.h */,
+				968247281C5C1FF800494AB8 /* PointConversionExample.h */,
+				646B62A21DEF7106000AA523 /* RuntimeAddLineExample.h */,
+				646B62A11DEF70DD000AA523 /* RuntimeAnimateLineExample.h */,
+				646B62BB1DEF964A000AA523 /* RuntimeCircleStylesExample.h */,
+				646B629E1DEF6DFD000AA523 /* RuntimeToggleLayerExample.h */,
+				64BBDAFB1DF24DD700BB705D /* RuntimeMultipleAnnotationsExample.h */,
+				968247061C5BEBDC00494AB8 /* SatelliteStyleExample.h */,
+				64BBDAFA1DF2331600BB705D /* SelectFeatureExample.h */,
+				07C138BE1E6F646F00D6F678 /* ShapeCollectionFeatureExample.h */,
+				9691AAA51C5AAD8F006A58C6 /* SimpleMapViewExample.h */,
+				64CF970E1DF224D400C3C27B /* SourceCustomVectorExample.h */,
+				64CF97191DF2252C00C3C27B /* SourceCustomRasterExample.h */,
+				969E7FDB1D25C31700663F84 /* UserTrackingModesExample.h */,
+			);
+			name = Headers;
+			path = Examples/ObjectiveC;
+			sourceTree = SOURCE_ROOT;
+		};
+		9691AAA01C5AAD8F006A58C6 /* Code */ = {
+			isa = PBXGroup;
+			children = (
+				3EBCD6FC1DC26364001E342F /* Swift */,
+				3EBCD6FA1DC26355001E342F /* Objective-C */,
+				9682472D1C5C226D00494AB8 /* Headers */,
+			);
+			name = Code;
+			path = ObjectiveC;
+			sourceTree = "<group>";
+		};
+		C977D0AF4A14922071F96B9B /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				03CC5D45DBD04AB716469E7B /* Pods-Examples.debug.xcconfig */,
+				29A0D7C8DCD539DCA5DA1BAC /* Pods-Examples.release.xcconfig */,
+				589ABF8859560819F8B431C7 /* Pods-ExamplesTests.debug.xcconfig */,
+				7556D44879C1E2866B0355B8 /* Pods-ExamplesTests.release.xcconfig */,
+				0A4917D6B62E749D739044A4 /* Pods-ExamplesUITests.debug.xcconfig */,
+				E0520BEE090DE0364897BAF3 /* Pods-ExamplesUITests.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
+		CBAD5BE154F4126883B2A6DC /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				9EC12D8F1A97963D68BFA871 /* Pods_Examples.framework */,
+				F8EE2FB6BE39BB48832DA94C /* Pods_ExamplesTests.framework */,
+				7692D1D792EB3849E8754E6B /* Pods_ExamplesUITests.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		9619628B1C581700002D3DAB /* Examples */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 961962B91C581700002D3DAB /* Build configuration list for PBXNativeTarget "Examples" */;
+			buildPhases = (
+				E8773E0E765E2B04318A4906 /* [CP] Check Pods Manifest.lock */,
+				961962881C581700002D3DAB /* Sources */,
+				961962891C581700002D3DAB /* Frameworks */,
+				9619628A1C581700002D3DAB /* Resources */,
+				961962C71C5818EB002D3DAB /* Embed Frameworks */,
+				964CB5161E445964004549EA /* Insert Mapbox Access Token */,
+				68B044275FAAD94BEB604ADD /* [CP] Embed Pods Frameworks */,
+				AFCD70701CA828429FE683F5 /* [CP] Copy Pods Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Examples;
+			productName = Examples;
+			productReference = 9619628C1C581700002D3DAB /* Examples.app */;
+			productType = "com.apple.product-type.application";
+		};
+		961962A41C581700002D3DAB /* ExamplesTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 961962BC1C581700002D3DAB /* Build configuration list for PBXNativeTarget "ExamplesTests" */;
+			buildPhases = (
+				227ED455385772D85979EFDA /* [CP] Check Pods Manifest.lock */,
+				961962A11C581700002D3DAB /* Sources */,
+				961962A21C581700002D3DAB /* Frameworks */,
+				961962A31C581700002D3DAB /* Resources */,
+				62886E6EC1BFD0C753782703 /* [CP] Embed Pods Frameworks */,
+				22AEEA788A5D2A11DF9F9032 /* [CP] Copy Pods Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				961962A71C581700002D3DAB /* PBXTargetDependency */,
+			);
+			name = ExamplesTests;
+			productName = ExamplesTests;
+			productReference = 961962A51C581700002D3DAB /* ExamplesTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		961962AF1C581700002D3DAB /* ExamplesUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 961962BF1C581700002D3DAB /* Build configuration list for PBXNativeTarget "ExamplesUITests" */;
+			buildPhases = (
+				86411F4AADC7F6D3F4B54A6C /* [CP] Check Pods Manifest.lock */,
+				961962AC1C581700002D3DAB /* Sources */,
+				961962AD1C581700002D3DAB /* Frameworks */,
+				961962AE1C581700002D3DAB /* Resources */,
+				BC5D06A971EDB0EA19738436 /* [CP] Embed Pods Frameworks */,
+				5EB77C15F6FACA271F7F81D5 /* [CP] Copy Pods Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				961962B21C581700002D3DAB /* PBXTargetDependency */,
+			);
+			name = ExamplesUITests;
+			productName = ExamplesUITests;
+			productReference = 961962B01C581700002D3DAB /* ExamplesUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		961962841C581700002D3DAB /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0810;
+				ORGANIZATIONNAME = Mapbox;
+				TargetAttributes = {
+					9619628B1C581700002D3DAB = {
+						CreatedOnToolsVersion = 7.3;
+						DevelopmentTeam = GJZR2MEM28;
+						LastSwiftMigration = 0800;
+						ProvisioningStyle = Automatic;
+					};
+					961962A41C581700002D3DAB = {
+						CreatedOnToolsVersion = 7.3;
+						DevelopmentTeam = GJZR2MEM28;
+						TestTargetID = 9619628B1C581700002D3DAB;
+					};
+					961962AF1C581700002D3DAB = {
+						CreatedOnToolsVersion = 7.3;
+						DevelopmentTeam = GJZR2MEM28;
+						TestTargetID = 9619628B1C581700002D3DAB;
+					};
+				};
+			};
+			buildConfigurationList = 961962871C581700002D3DAB /* Build configuration list for PBXProject "Examples" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 961962831C581700002D3DAB;
+			productRefGroup = 9619628D1C581700002D3DAB /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				9619628B1C581700002D3DAB /* Examples */,
+				961962A41C581700002D3DAB /* ExamplesTests */,
+				961962AF1C581700002D3DAB /* ExamplesUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		9619628A1C581700002D3DAB /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DDF9432B1E5DEACC00545D0F /* ports.geojson in Resources */,
+				3EC92DB71E78C431001D0503 /* metro-line.geojson in Resources */,
+				9619629F1C581700002D3DAB /* LaunchScreen.storyboard in Resources */,
+				DD5939E61E6778480009BEB2 /* clustering.xcassets in Resources */,
+				079E77C51E1C4E2100F92FA8 /* camera.xcassets in Resources */,
+				9619629C1C581700002D3DAB /* Assets.xcassets in Resources */,
+				9682471D1C5C123B00494AB8 /* example.geojson in Resources */,
+				64BBDAF01DF22D9600BB705D /* third_party_vector_style.json in Resources */,
+				961962CF1C581FBC002D3DAB /* Main.storyboard in Resources */,
+				96D432061C84B9CF007D09D1 /* pisavector.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		961962A31C581700002D3DAB /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		961962AE1C581700002D3DAB /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		227ED455385772D85979EFDA /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+		22AEEA788A5D2A11DF9F9032 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-ExamplesTests/Pods-ExamplesTests-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		5EB77C15F6FACA271F7F81D5 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-ExamplesUITests/Pods-ExamplesUITests-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		62886E6EC1BFD0C753782703 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-ExamplesTests/Pods-ExamplesTests-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		68B044275FAAD94BEB604ADD /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Examples/Pods-Examples-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		86411F4AADC7F6D3F4B54A6C /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+		964CB5161E445964004549EA /* Insert Mapbox Access Token */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Insert Mapbox Access Token";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "$SRCROOT/Examples/insert-mapbox-token.sh";
+		};
+		AFCD70701CA828429FE683F5 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Examples/Pods-Examples-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		BC5D06A971EDB0EA19738436 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-ExamplesUITests/Pods-ExamplesUITests-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		E8773E0E765E2B04318A4906 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		961962881C581700002D3DAB /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				07C138C71E72216E00D6F678 /* DDSCircleLayerExample.m in Sources */,
+				3EBCD7191DC28240001E342F /* CustomAnnotationModelExample.swift in Sources */,
+				962B450F1D1C8520007B7454 /* AnnotationViewExample.m in Sources */,
+				1F1F84771E53A3B700332CC3 /* BlockingGesturesDelegateExample.swift in Sources */,
+				3ED403411E006B5200230C95 /* CameraFlyToExample.swift in Sources */,
+				9691AAA91C5AAD8F006A58C6 /* SimpleMapViewExample.m in Sources */,
+				960A21611D344F9F00BB348B /* DraggableAnnotationViewExample.m in Sources */,
+				1F1F84751E538ABB00332CC3 /* BlockingGesturesDelegateExample.m in Sources */,
+				646B62B41DEF9613000AA523 /* RuntimeCircleStylesExample.swift in Sources */,
+				07C138C41E721C8F00D6F678 /* DDSCircleLayerExample.swift in Sources */,
+				646B62BD1DEF965A000AA523 /* RuntimeCircleStylesExample.m in Sources */,
+				646B629C1DEF6DF1000AA523 /* RuntimeToggleLayerExample.m in Sources */,
+				96A2A1CF1C8CA16C0059441E /* CustomCalloutViewExample.m in Sources */,
+				07C138C21E6F65D000D6F678 /* ShapeCollectionFeatureExample.swift in Sources */,
+				3EBCD7161DC28240001E342F /* AnnotationViewExample.swift in Sources */,
+				9682470F1C5BF12700494AB8 /* DrawingAMarkerExample.m in Sources */,
+				961962941C581700002D3DAB /* AppDelegate.m in Sources */,
+				3EBCD71B1DC28240001E342F /* CustomCalloutView.swift in Sources */,
+				07C138C01E6F646F00D6F678 /* ShapeCollectionFeatureExample.m in Sources */,
+				3EBCD7291DC28240001E342F /* UserTrackingModesExample.swift in Sources */,
+				646B62A61DEF7121000AA523 /* RuntimeAnimateLineExample.m in Sources */,
+				9691AAA71C5AAD8F006A58C6 /* CustomStyleExample.m in Sources */,
+				9678E3EE1CEF58DA00F21AE2 /* CustomAnnotationModelExample.m in Sources */,
+				3EBCD7261DC28240001E342F /* PointConversionExample.swift in Sources */,
+				961962D21C5821A9002D3DAB /* ExamplesTableViewController.m in Sources */,
+				64BBDB031DF24E0900BB705D /* RuntimeMultipleAnnotationsExample.swift in Sources */,
+				646B62971DEF6DAF000AA523 /* RuntimeToggleLayerExample.swift in Sources */,
+				968247201C5C1C0400494AB8 /* DrawingAPolygonExample.m in Sources */,
+				3EBCD7221DC28240001E342F /* DrawingAGeoJSONLineExample.swift in Sources */,
+				96A2A1D21C8CA74B0059441E /* CustomCalloutView.m in Sources */,
+				3E085B831EC526E500163C99 /* ExtrusionsExample.m in Sources */,
+				64BBDAF61DF232FD00BB705D /* SelectFeatureExample.swift in Sources */,
+				64BBDAF81DF2330B00BB705D /* SelectFeatureExample.m in Sources */,
+				96D431FC1C84B4F7007D09D1 /* DrawingACustomMarkerExample.m in Sources */,
+				968247031C5BDCBB00494AB8 /* CustomRasterStyleExample.m in Sources */,
+				64CF97121DF224F600C3C27B /* SourceCustomRasterExample.swift in Sources */,
+				3E3BFADC1E81D7BB00D0BEA1 /* DDSLayerSelectionExample.m in Sources */,
+				9682472A1C5C1FF800494AB8 /* PointConversionExample.m in Sources */,
+				3ED403481E006BE800230C95 /* CameraFlyToExample.m in Sources */,
+				3EBCD71D1DC28240001E342F /* CustomRasterStyleExample.swift in Sources */,
+				646B62B01DEF7161000AA523 /* RuntimeAnimateLineExample.swift in Sources */,
+				07F53B851E00D02100B58DB3 /* AnnotationViewMultipleExample.m in Sources */,
+				3E085B801EC526C500163C99 /* ExtrusionsExample.swift in Sources */,
+				3EBCD7231DC28240001E342F /* DrawingAMarkerExample.swift in Sources */,
+				961962911C581700002D3DAB /* main.m in Sources */,
+				968247131C5C0F0F00494AB8 /* CalloutDelegateUsageExample.m in Sources */,
+				3EBCD7251DC28240001E342F /* OfflinePackExample.swift in Sources */,
+				3EBCD71A1DC28240001E342F /* CustomAnnotationModels.swift in Sources */,
+				3E3BFAD91E81D7A300D0BEA1 /* DDSLayerSelectionExample.swift in Sources */,
+				3EBCD7181DC28240001E342F /* CameraAnimationExample.swift in Sources */,
+				9691AA941C5AA702006A58C6 /* Examples.m in Sources */,
+				3EBCD7201DC28240001E342F /* DraggableAnnotationViewExample.swift in Sources */,
+				3EBCD7281DC28240001E342F /* SimpleMapViewExample.swift in Sources */,
+				3EBCD7241DC28240001E342F /* DrawingAPolygonExample.swift in Sources */,
+				964CB5111E42A0A3004549EA /* AnnotationViewMultipleExample.swift in Sources */,
+				9691AAA81C5AAD8F006A58C6 /* DefaultStylesExample.m in Sources */,
+				64CF97101DF224E400C3C27B /* SourceCustomVectorExample.swift in Sources */,
+				3EBCD7211DC28240001E342F /* DrawingACustomMarkerExample.swift in Sources */,
+				3EBCD71E1DC28240001E342F /* CustomStyleExample.swift in Sources */,
+				968247081C5BEBDC00494AB8 /* SatelliteStyleExample.m in Sources */,
+				64CF97171DF2251500C3C27B /* SourceCustomRasterExample.m in Sources */,
+				3EBCD7271DC28240001E342F /* SatelliteStyleExample.swift in Sources */,
+				96115A681CAD4E1C000963B8 /* OfflinePackExample.m in Sources */,
+				3EBCD71C1DC28240001E342F /* CustomCalloutViewExample.swift in Sources */,
+				DDF943291E5DE63300545D0F /* ClusteringExample.m in Sources */,
+				3EBCD7171DC28240001E342F /* CalloutDelegateUsageExample.swift in Sources */,
+				64BBDAFD1DF24DEB00BB705D /* RuntimeMultipleAnnotationsExample.m in Sources */,
+				646B62AE1DEF7155000AA523 /* RuntimeAddLineExample.swift in Sources */,
+				3EBCD71F1DC28240001E342F /* DefaultStylesExample.swift in Sources */,
+				DD5939E41E6639BA0009BEB2 /* ClusteringExample.swift in Sources */,
+				9682471A1C5C115000494AB8 /* DrawingAGeoJSONLineExample.m in Sources */,
+				64CF970C1DF224C500C3C27B /* SourceCustomVectorExample.m in Sources */,
+				969E7FDD1D25C31700663F84 /* UserTrackingModesExample.m in Sources */,
+				646B62A41DEF7115000AA523 /* RuntimeAddLineExample.m in Sources */,
+				968247271C5C1DC700494AB8 /* CameraAnimationExample.m in Sources */,
+				961962D51C583FDC002D3DAB /* ExamplesContainerViewController.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		961962A11C581700002D3DAB /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				961962AA1C581700002D3DAB /* ExamplesTests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		961962AC1C581700002D3DAB /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				961962B51C581700002D3DAB /* ExamplesUITests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		961962A71C581700002D3DAB /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 9619628B1C581700002D3DAB /* Examples */;
+			targetProxy = 961962A61C581700002D3DAB /* PBXContainerItemProxy */;
+		};
+		961962B21C581700002D3DAB /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 9619628B1C581700002D3DAB /* Examples */;
+			targetProxy = 961962B11C581700002D3DAB /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		9619629D1C581700002D3DAB /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				9619629E1C581700002D3DAB /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		961962B71C581700002D3DAB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		961962B81C581700002D3DAB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		961962BA1C581700002D3DAB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 03CC5D45DBD04AB716469E7B /* Pods-Examples.debug.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				DEVELOPMENT_TEAM = GJZR2MEM28;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
+				INFOPLIST_FILE = Examples/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.mapbox.Examples;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_OBJC_BRIDGING_HEADER = "Examples/Examples-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 3.0;
+			};
+			name = Debug;
+		};
+		961962BB1C581700002D3DAB /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 29A0D7C8DCD539DCA5DA1BAC /* Pods-Examples.release.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				DEVELOPMENT_TEAM = GJZR2MEM28;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
+				INFOPLIST_FILE = Examples/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.mapbox.Examples;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_OBJC_BRIDGING_HEADER = "Examples/Examples-Bridging-Header.h";
+				SWIFT_VERSION = 3.0;
+			};
+			name = Release;
+		};
+		961962BD1C581700002D3DAB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 589ABF8859560819F8B431C7 /* Pods-ExamplesTests.debug.xcconfig */;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				DEVELOPMENT_TEAM = GJZR2MEM28;
+				HEADER_SEARCH_PATHS = "$(inherited)";
+				INFOPLIST_FILE = ExamplesTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.mapbox.ExamplesTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Examples.app/Examples";
+			};
+			name = Debug;
+		};
+		961962BE1C581700002D3DAB /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7556D44879C1E2866B0355B8 /* Pods-ExamplesTests.release.xcconfig */;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				DEVELOPMENT_TEAM = GJZR2MEM28;
+				HEADER_SEARCH_PATHS = "$(inherited)";
+				INFOPLIST_FILE = ExamplesTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.mapbox.ExamplesTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Examples.app/Examples";
+			};
+			name = Release;
+		};
+		961962C01C581700002D3DAB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 0A4917D6B62E749D739044A4 /* Pods-ExamplesUITests.debug.xcconfig */;
+			buildSettings = {
+				DEVELOPMENT_TEAM = GJZR2MEM28;
+				INFOPLIST_FILE = ExamplesUITests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.mapbox.ExamplesUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_TARGET_NAME = Examples;
+			};
+			name = Debug;
+		};
+		961962C11C581700002D3DAB /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = E0520BEE090DE0364897BAF3 /* Pods-ExamplesUITests.release.xcconfig */;
+			buildSettings = {
+				DEVELOPMENT_TEAM = GJZR2MEM28;
+				INFOPLIST_FILE = ExamplesUITests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.mapbox.ExamplesUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_TARGET_NAME = Examples;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		961962871C581700002D3DAB /* Build configuration list for PBXProject "Examples" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				961962B71C581700002D3DAB /* Debug */,
+				961962B81C581700002D3DAB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		961962B91C581700002D3DAB /* Build configuration list for PBXNativeTarget "Examples" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				961962BA1C581700002D3DAB /* Debug */,
+				961962BB1C581700002D3DAB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		961962BC1C581700002D3DAB /* Build configuration list for PBXNativeTarget "ExamplesTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				961962BD1C581700002D3DAB /* Debug */,
+				961962BE1C581700002D3DAB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		961962BF1C581700002D3DAB /* Build configuration list for PBXNativeTarget "ExamplesUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				961962C01C581700002D3DAB /* Debug */,
+				961962C11C581700002D3DAB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 961962841C581700002D3DAB /* Project object */;
+}

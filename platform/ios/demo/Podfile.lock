@@ -1,0 +1,16 @@
+PODS:
+  - Mapbox-iOS-SDK-symbols (3.6.0-beta.2-symbols)
+
+DEPENDENCIES:
+  - Mapbox-iOS-SDK-symbols (from `https://raw.githubusercontent.com/mapbox/mapbox-gl-native/ios-v3.6.0-beta.2/platform/ios/Mapbox-iOS-SDK-symbols.podspec`)
+
+EXTERNAL SOURCES:
+  Mapbox-iOS-SDK-symbols:
+    :podspec: https://raw.githubusercontent.com/mapbox/mapbox-gl-native/ios-v3.6.0-beta.2/platform/ios/Mapbox-iOS-SDK-symbols.podspec
+
+SPEC CHECKSUMS:
+  Mapbox-iOS-SDK-symbols: 64f82739d062491d56627880a2851fd355b367f3
+
+PODFILE CHECKSUM: e0fd4e004213e9d20beced091a11f3df7d14bb50
+
+COCOAPODS: 1.2.0
