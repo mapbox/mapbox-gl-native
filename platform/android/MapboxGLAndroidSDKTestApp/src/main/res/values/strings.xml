@@ -151,6 +151,9 @@
     <string name="menuitem_title_reset">Reset</string>
     <string name="menuitem_title_rotate_gesture_enabled">Enable rotate gestures</string>
     <string name="menuitem_title_scroll_gesture_enabled">Enable scroll gestures</string>
+    <string name="menuitem_title_change_location_source_lost">Change to LOST location source</string>
+    <string name="menuitem_title_change_location_source_mock">Change to mock location source</string>
+    <string name="menuitem_title_change_location_source_null">Reset location source to null</string>
 
     <!--Button-->
     <string name="button_camera_move">Move</string>

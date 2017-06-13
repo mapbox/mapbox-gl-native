@@ -37,7 +37,6 @@ import com.mapbox.mapboxsdk.constants.MyLocationTracking;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
-import com.mapbox.mapboxsdk.location.LocationSource;
 import com.mapbox.mapboxsdk.maps.widgets.MyLocationViewSettings;
 import com.mapbox.mapboxsdk.style.layers.Filter;
 import com.mapbox.mapboxsdk.style.layers.Layer;
@@ -141,12 +140,20 @@ public final class MapboxMap {
    */
   void onRestoreInstanceState(Bundle savedInstanceState) {
     final CameraPosition cameraPosition = savedInstanceState.getParcelable(MapboxConstants.STATE_CAMERA_POSITION);
-    if (cameraPosition != null) {
-      moveCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition.Builder(cameraPosition).build()));
-    }
 
     uiSettings.onRestoreInstanceState(savedInstanceState);
     trackingSettings.onRestoreInstanceState(savedInstanceState);
+
+    if (cameraPosition != null) {
+      easeCamera(CameraUpdateFactory.newCameraPosition(
+        new CameraPosition.Builder(cameraPosition).build()),
+        0,
+        false,
+        null,
+        !trackingSettings.isLocationTrackingDisabled()
+      );
+    }
+
     nativeMapView.setDebug(savedInstanceState.getBoolean(MapboxConstants.STATE_DEBUG_ACTIVE));
 
     final String styleUrl = savedInstanceState.getString(MapboxConstants.STATE_STYLE_URL);
@@ -1864,8 +1871,6 @@ public final class MapboxMap {
    * Replaces the location source of the my-location layer.
    *
    * @param locationSource A {@link LocationEngine} location source to use in the my-location layer.
-   *                       Set to null to use the default {@link LocationSource}
-   *                       location source.
    */
   @UiThread
   public void setLocationSource(@Nullable LocationEngine locationSource) {

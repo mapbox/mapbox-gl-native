@@ -362,6 +362,8 @@ final class MapGestureDetector {
       // cancel any animation
       transform.cancelTransitions();
 
+      cameraChangeDispatcher.onCameraMoveStarted(REASON_API_GESTURE);
+
       // tilt results in a bigger translation, limiting input for #5281
       double tilt = transform.getTilt();
       double tiltFactor = 1 + ((tilt != 0) ? (tilt / 10) : 0); /* 1 -> 7 */
