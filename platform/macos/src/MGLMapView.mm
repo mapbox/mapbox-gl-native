@@ -270,7 +270,7 @@ public:
     mbgl::DefaultFileSource* mbglFileSource = [MGLOfflineStorage sharedOfflineStorage].mbglFileSource;
 
     _mbglThreadPool = mbgl::sharedThreadPool();
-    _mbglMap = new mbgl::Map(*_mbglView, self.size, [NSScreen mainScreen].backingScaleFactor, *mbglFileSource, *_mbglThreadPool, mbgl::MapMode::Continuous, mbgl::GLContextMode::Unique, mbgl::ConstrainMode::None, mbgl::ViewportMode::Default);
+    _mbglMap = new mbgl::Map(*_mbglView, *_mbglView, self.size, [NSScreen mainScreen].backingScaleFactor, *mbglFileSource, *_mbglThreadPool, mbgl::MapMode::Continuous, mbgl::GLContextMode::Unique, mbgl::ConstrainMode::None, mbgl::ViewportMode::Default);
 
     // Install the OpenGL layer. Interface Builder’s synchronous drawing means
     // we can’t display a map, so don’t even bother to have a map layer.
@@ -2756,7 +2756,7 @@ public:
 }
 
 /// Adapter responsible for bridging calls from mbgl to MGLMapView and Cocoa.
-class MGLMapViewImpl : public mbgl::View, public mbgl::Backend {
+class MGLMapViewImpl : public mbgl::View, public mbgl::Backend, public mbgl::MapObserver {
 public:
     MGLMapViewImpl(MGLMapView *nativeView_)
         : nativeView(nativeView_) {}

@@ -121,7 +121,7 @@ int main(int argc, char *argv[]) {
 
     mbgl::ThreadPool threadPool(4);
 
-    mbgl::Map map(backend, view->getSize(), view->getPixelRatio(), fileSource, threadPool);
+    mbgl::Map map(backend, backend, view->getSize(), view->getPixelRatio(), fileSource, threadPool);
 
     backend.setMap(&map);
 

@@ -36,7 +36,7 @@
 namespace mbgl {
 namespace android {
 
-class NativeMapView : public View, public Backend {
+class NativeMapView : public View, public Backend, public MapObserver {
 public:
 
     static constexpr auto Name() { return "com/mapbox/mapboxsdk/maps/NativeMapView"; };

@@ -1498,7 +1498,7 @@ QMapboxGLPrivate::QMapboxGLPrivate(QMapboxGL *q, const QMapboxGLSettings &settin
     , threadPool(mbgl::sharedThreadPool())
 {
     mapObj = std::make_unique<mbgl::Map>(
-            *this, sanitizedSize(size),
+            *this, *this, sanitizedSize(size),
             pixelRatio, *fileSourceObj, *threadPool,
             mbgl::MapMode::Continuous,
             static_cast<mbgl::GLContextMode>(settings.contextMode()),
