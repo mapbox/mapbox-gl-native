@@ -33,6 +33,7 @@ class Style;
 class Map : private util::noncopyable {
 public:
     explicit Map(Backend&,
+                 MapObserver&,
                  Size size,
                  float pixelRatio,
                  FileSource&,

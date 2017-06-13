@@ -93,7 +93,7 @@ TEST(CustomLayer, Basic) {
     DefaultFileSource fileSource(":memory:", "test/fixtures/api/assets");
     ThreadPool threadPool(4);
 
-    Map map(backend, view.getSize(), 1, fileSource, threadPool, MapMode::Still);
+    Map map(backend, MapObserver::nullObserver(), view.getSize(), 1, fileSource, threadPool, MapMode::Still);
     map.getStyle().loadJSON(util::read_file("test/fixtures/api/water.json"));
     map.setLatLngZoom({ 37.8, -122.5 }, 10);
     map.getStyle().addLayer(std::make_unique<CustomLayer>(

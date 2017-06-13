@@ -33,7 +33,7 @@ TEST(API, RepeatedRender) {
 
     Log::setObserver(std::make_unique<FixtureLogObserver>());
 
-    Map map(backend, view.getSize(), 1, fileSource, threadPool, MapMode::Still);
+    Map map(backend, MapObserver::nullObserver(), view.getSize(), 1, fileSource, threadPool, MapMode::Still);
 
     {
         map.getStyle().loadJSON(style);
@@ -86,7 +86,7 @@ TEST(API, ZoomHistory) {
 
     Log::setObserver(std::make_unique<FixtureLogObserver>());
 
-    Map map(backend, view.getSize(), 1, fileSource, threadPool, MapMode::Still);
+    Map map(backend, MapObserver::nullObserver(), view.getSize(), 1, fileSource, threadPool, MapMode::Still);
     map.getStyle().loadJSON(style);
 
     auto geojson = mapbox::geojson::parse(R"t({ "type": "FeatureCollection", "features": [{ "type": "Feature", "properties": {}, "geometry": { "type": "LineString", "coordinates": [ [ -150, -75 ], [  150,  75 ] ] } } ] })t");

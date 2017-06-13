@@ -27,7 +27,7 @@ TEST(Map, PrefetchTiles) {
     OffscreenView view(backend.getContext(), { 512, 512 });
     ThreadPool threadPool(4);
     StubFileSource fileSource;
-    Map map(backend, view.getSize(), 1, fileSource, threadPool, MapMode::Still);
+    Map map(backend, MapObserver::nullObserver(), view.getSize(), 1, fileSource, threadPool, MapMode::Still);
 
     std::vector<int> tiles;
 

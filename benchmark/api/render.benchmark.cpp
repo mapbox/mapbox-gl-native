@@ -2,6 +2,7 @@
 
 #include <mbgl/benchmark/util.hpp>
 #include <mbgl/map/map.hpp>
+#include <mbgl/map/map_observer.hpp>
 #include <mbgl/map/backend_scope.hpp>
 #include <mbgl/gl/headless_backend.hpp>
 #include <mbgl/gl/offscreen_view.hpp>
@@ -44,7 +45,7 @@ static void prepare(Map& map, optional<std::string> json = {}) {
 
 static void API_renderStill_reuse_map(::benchmark::State& state) {
     RenderBenchmark bench;
-    Map map { bench.backend, bench.view.getSize(), 1, bench.fileSource, bench.threadPool, MapMode::Still };
+    Map map { bench.backend, MapObserver::nullObserver(), bench.view.getSize(), 1, bench.fileSource, bench.threadPool, MapMode::Still };
     prepare(map);
 
     while (state.KeepRunning()) {
@@ -54,7 +55,7 @@ static void API_renderStill_reuse_map(::benchmark::State& state) {
 
 static void API_renderStill_reuse_map_switch_styles(::benchmark::State& state) {
     RenderBenchmark bench;
-    Map map { bench.backend, bench.view.getSize(), 1, bench.fileSource, bench.threadPool, MapMode::Still };
+    Map map { bench.backend, MapObserver::nullObserver(), bench.view.getSize(), 1, bench.fileSource, bench.threadPool, MapMode::Still };
     
     while (state.KeepRunning()) {
         prepare(map, { "{}" });
@@ -68,7 +69,7 @@ static void API_renderStill_recreate_map(::benchmark::State& state) {
     RenderBenchmark bench;
     
     while (state.KeepRunning()) {
-        Map map { bench.backend, bench.view.getSize(), 1, bench.fileSource, bench.threadPool, MapMode::Still };
+        Map map { bench.backend, MapObserver::nullObserver(), bench.view.getSize(), 1, bench.fileSource, bench.threadPool, MapMode::Still };
         prepare(map);
         mbgl::benchmark::render(map, bench.view);
     }

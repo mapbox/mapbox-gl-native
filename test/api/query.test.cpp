@@ -33,7 +33,7 @@ public:
     OffscreenView view { backend.getContext() };
     StubFileSource fileSource;
     ThreadPool threadPool { 4 };
-    Map map { backend, view.getSize(), 1, fileSource, threadPool, MapMode::Still };
+    Map map { backend, MapObserver::nullObserver(), view.getSize(), 1, fileSource, threadPool, MapMode::Still };
 };
 
 } // end namespace
