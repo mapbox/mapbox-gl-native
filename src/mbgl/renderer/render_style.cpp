@@ -17,6 +17,7 @@
 #include <mbgl/renderer/layers/render_symbol_layer.hpp>
 #include <mbgl/renderer/style_diff.hpp>
 #include <mbgl/renderer/image_manager.hpp>
+#include <mbgl/renderer/query.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/source_impl.hpp>
 #include <mbgl/style/transition_options.hpp>
@@ -24,7 +25,6 @@
 #include <mbgl/text/glyph_manager.hpp>
 #include <mbgl/geometry/line_atlas.hpp>
 #include <mbgl/map/backend_scope.hpp>
-#include <mbgl/map/query.hpp>
 #include <mbgl/tile/tile.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/string.hpp>

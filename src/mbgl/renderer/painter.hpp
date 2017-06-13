@@ -70,7 +70,7 @@ struct FrameData {
 
 class Painter : private util::noncopyable {
 public:
-    Painter(gl::Context&, const TransformState&, float pixelRatio, const optional<std::string>& programCacheDir);
+    Painter(gl::Context&, float pixelRatio, const optional<std::string>& programCacheDir);
     ~Painter();
 
     void render(RenderStyle&,
@@ -125,6 +125,8 @@ public:
 
     gl::Context& context;
 
+    TransformState state;
+
     algorithm::ClipIDGenerator clipIDGenerator;
 
     mat4 projMatrix;
@@ -137,8 +139,6 @@ public:
         matrix::identity(identity);
         return identity;
     }();
-
-    const TransformState& state;
 
     FrameData frame;
 

@@ -4,13 +4,10 @@
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/map/map_observer.hpp>
 #include <mbgl/map/mode.hpp>
-#include <mbgl/util/geo.hpp>
-#include <mbgl/util/feature.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/size.hpp>
 #include <mbgl/annotation/annotation.hpp>
 #include <mbgl/map/camera.hpp>
-#include <mbgl/map/query.hpp>
 
 #include <cstdint>
 #include <string>
@@ -24,6 +21,7 @@ class Backend;
 class View;
 class FileSource;
 class Scheduler;
+class RendererFrontend;
 
 namespace style {
 class Image;
@@ -32,29 +30,24 @@ class Style;
 
 class Map : private util::noncopyable {
 public:
-    explicit Map(Backend&,
+    explicit Map(RendererFrontend&,
                  MapObserver&,
                  Size size,
                  float pixelRatio,
                  FileSource&,
                  Scheduler&,
                  MapMode mapMode = MapMode::Continuous,
-                 GLContextMode contextMode = GLContextMode::Unique,
                  ConstrainMode constrainMode = ConstrainMode::HeightOnly,
-                 ViewportMode viewportMode = ViewportMode::Default,
-                 optional<std::string> programCacheDir = optional<std::string>());
+                 ViewportMode viewportMode = ViewportMode::Default);
     ~Map();
 
     // Register a callback that will get called (on the render thread) when all resources have
     // been loaded and a complete render occurs.
     using StillImageCallback = std::function<void (std::exception_ptr)>;
-    void renderStill(View&, StillImageCallback callback);
+    void renderStill(StillImageCallback callback);
 
     // Triggers a repaint.
     void triggerRepaint();
-
-    // Main render function.
-    void render(View&);
 
           style::Style& getStyle();
     const style::Style& getStyle() const;
@@ -150,13 +143,6 @@ public:
     void updateAnnotation(AnnotationID, const Annotation&);
     void removeAnnotation(AnnotationID);
 
-    // Feature queries
-    std::vector<Feature> queryRenderedFeatures(const ScreenCoordinate&, const RenderedQueryOptions& options = {});
-    std::vector<Feature> queryRenderedFeatures(const ScreenBox&,        const RenderedQueryOptions& options = {});
-    std::vector<Feature> querySourceFeatures(const std::string& sourceID, const SourceQueryOptions& options = {});
-
-    AnnotationIDs queryPointAnnotations(const ScreenBox&);
-
     // Tile prefetching
     //
     // When loading a map, if `PrefetchZoomDelta` is set to any number greater than 0, the map will
@@ -165,9 +151,6 @@ public:
     // The default `delta` is 4.
     void setPrefetchZoomDelta(uint8_t delta);
     uint8_t getPrefetchZoomDelta() const;
-
-    // Memory
-    void onLowMemory();
 
     // Debug
     void setDebug(MapDebugOptions);

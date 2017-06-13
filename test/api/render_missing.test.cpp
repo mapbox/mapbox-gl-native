@@ -7,12 +7,15 @@
 #include <mbgl/gl/offscreen_view.hpp>
 #include <mbgl/util/default_thread_pool.hpp>
 #include <mbgl/storage/default_file_source.hpp>
+#include <mbgl/renderer/renderer.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/style/style.hpp>
+#include <mbgl/test/stub_renderer_frontend.hpp>
 
 #include <future>
+#include <memory>
 
 #if TEST_HAS_SERVER
 #define TEST_REQUIRES_SERVER(name) name
@@ -30,19 +33,22 @@ TEST(API, TEST_REQUIRES_SERVER(RenderMissingTile)) {
     HeadlessBackend backend { test::sharedDisplay() };
     BackendScope scope { backend };
     OffscreenView view { backend.getContext(), { 256, 512 } };
+    float pixelRatio { 1 };
     DefaultFileSource fileSource(":memory:", "test/fixtures/api/assets");
     ThreadPool threadPool(4);
+    StubRendererFrontend rendererFrontend { std::make_unique<Renderer>(backend, pixelRatio, fileSource, threadPool), view };
 
     Log::setObserver(std::make_unique<FixtureLogObserver>());
 
-    Map map(backend, MapObserver::nullObserver(), view.getSize(), 1, fileSource, threadPool, MapMode::Still);
+    Map map { rendererFrontend, MapObserver::nullObserver(), view.getSize(), pixelRatio, fileSource,
+        threadPool, MapMode::Still };
 
     std::string message;
 
     // This host does not respond (== connection error).
     // Are you seeing this test fail? Make sure you don't have a server running on port 3001!
     map.getStyle().loadJSON(style);
-    map.renderStill(view, [&](std::exception_ptr err) {
+    map.renderStill([&](std::exception_ptr err) {
         ASSERT_TRUE(err.operator bool());
         try {
             std::rethrow_exception(err);

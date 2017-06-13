@@ -12,7 +12,6 @@
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/image.hpp>
 #include <mbgl/map/backend_scope.hpp>
-#include <mbgl/map/query.hpp>
 #include <mbgl/util/premultiply.hpp>
 
 #include <unistd.h>

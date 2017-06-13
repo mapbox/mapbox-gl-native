@@ -106,7 +106,7 @@ std::shared_ptr<HeadlessDisplay> sharedDisplay() {
 
 PremultipliedImage render(Map& map, OffscreenView& view) {
     PremultipliedImage result;
-    map.renderStill(view, [&](std::exception_ptr) {
+    map.renderStill([&](std::exception_ptr) {
         result = view.readStillImage();
     });
 

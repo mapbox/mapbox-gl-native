@@ -60,6 +60,8 @@ set(MBGL_TEST_FILES
     test/src/mbgl/test/stub_geometry_tile_feature.hpp
     test/src/mbgl/test/stub_layer_observer.hpp
     test/src/mbgl/test/stub_render_source_observer.hpp
+    test/src/mbgl/test/stub_renderer_frontend.cpp
+    test/src/mbgl/test/stub_renderer_frontend.hpp
     test/src/mbgl/test/stub_style_observer.hpp
     test/src/mbgl/test/stub_tile_observer.hpp
     test/src/mbgl/test/test.cpp

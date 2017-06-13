@@ -4,10 +4,9 @@
 #include <mbgl/util/default_thread_pool.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/map/transform.hpp>
-#include <mbgl/map/query.hpp>
 #include <mbgl/renderer/render_style.hpp>
 #include <mbgl/renderer/tile_parameters.hpp>
-#include <mbgl/map/query.hpp>
+#include <mbgl/renderer/query.hpp>
 #include <mbgl/text/collision_tile.hpp>
 #include <mbgl/geometry/feature_index.hpp>
 #include <mbgl/annotation/annotation_manager.hpp>

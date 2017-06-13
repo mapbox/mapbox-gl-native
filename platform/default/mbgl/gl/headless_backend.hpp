@@ -17,8 +17,6 @@ public:
 
     void updateAssumedState() override;
 
-    void invalidate() override;
-
     struct Impl {
         virtual ~Impl() = default;
         virtual void activateContext() = 0;

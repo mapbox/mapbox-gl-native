@@ -6,11 +6,11 @@
 #include <mbgl/util/default_thread_pool.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/map/transform.hpp>
-#include <mbgl/map/query.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/layers/symbol_layer.hpp>
 #include <mbgl/renderer/tile_parameters.hpp>
 #include <mbgl/renderer/buckets/symbol_bucket.hpp>
+#include <mbgl/renderer/query.hpp>
 #include <mbgl/text/collision_tile.hpp>
 #include <mbgl/geometry/feature_index.hpp>
 #include <mbgl/annotation/annotation_manager.hpp>
