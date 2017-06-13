@@ -33,7 +33,6 @@ uniform float u_tex_y_a;
 uniform vec2 u_patternscale_b;
 uniform float u_tex_y_b;
 uniform vec2 u_gl_units_to_pixels;
-uniform mediump float u_width;
 
 varying vec2 v_normal;
 varying vec2 v_width2;
@@ -56,6 +55,12 @@ varying mediump float gapwidth;
 uniform lowp float a_offset_t;
 attribute lowp vec2 a_offset;
 varying lowp float offset;
+uniform lowp float a_width_t;
+attribute mediump vec2 a_width;
+varying mediump float width;
+uniform lowp float a_floorwidth_t;
+attribute lowp vec2 a_floorwidth;
+varying lowp float floorwidth;
 
 void main() {
     color = unpack_mix_vec4(a_color, a_color_t);
@@ -63,6 +68,8 @@ void main() {
     opacity = unpack_mix_vec2(a_opacity, a_opacity_t);
     gapwidth = unpack_mix_vec2(a_gapwidth, a_gapwidth_t);
     offset = unpack_mix_vec2(a_offset, a_offset_t);
+    width = unpack_mix_vec2(a_width, a_width_t);
+    floorwidth = unpack_mix_vec2(a_floorwidth, a_floorwidth_t);
 
     vec2 a_extrude = a_data.xy - 128.0;
     float a_direction = mod(a_data.z, 4.0) - 1.0;
@@ -79,11 +86,11 @@ void main() {
     // these transformations used to be applied in the JS and native code bases. 
     // moved them into the shader for clarity and simplicity. 
     gapwidth = gapwidth / 2.0;
-    float width = u_width / 2.0;
+    float halfwidth = width / 2.0;
     offset = -1.0 * offset;
  
     float inset = gapwidth + (gapwidth > 0.0 ? ANTIALIASING : 0.0);
-    float outset = gapwidth + width * (gapwidth > 0.0 ? 2.0 : 1.0) + ANTIALIASING;
+    float outset = gapwidth + halfwidth * (gapwidth > 0.0 ? 2.0 : 1.0) + ANTIALIASING;
 
     // Scale the extrusion vector down to a normal and then up by the line width
     // of this vertex.
@@ -108,8 +115,8 @@ void main() {
     float extrude_length_with_perspective = length(projected_extrude.xy / gl_Position.w * u_gl_units_to_pixels);
     v_gamma_scale = extrude_length_without_perspective / extrude_length_with_perspective;
 
-    v_tex_a = vec2(a_linesofar * u_patternscale_a.x, normal.y * u_patternscale_a.y + u_tex_y_a);
-    v_tex_b = vec2(a_linesofar * u_patternscale_b.x, normal.y * u_patternscale_b.y + u_tex_y_b);
+    v_tex_a = vec2(a_linesofar * u_patternscale_a.x / floorwidth, normal.y * u_patternscale_a.y + u_tex_y_a);
+    v_tex_b = vec2(a_linesofar * u_patternscale_b.x / floorwidth, normal.y * u_patternscale_b.y + u_tex_y_b);
 
     v_width2 = vec2(outset, inset);
 }
@@ -130,8 +137,12 @@ varying float v_gamma_scale;
 varying highp vec4 color;
 varying lowp float blur;
 varying lowp float opacity;
+varying mediump float width;
+varying lowp float floorwidth;
 
 void main() {
+    
+    
     
     
     
@@ -148,7 +159,7 @@ void main() {
     float sdfdist_a = texture2D(u_image, v_tex_a).a;
     float sdfdist_b = texture2D(u_image, v_tex_b).a;
     float sdfdist = mix(sdfdist_a, sdfdist_b, u_mix);
-    alpha *= smoothstep(0.5 - u_sdfgamma, 0.5 + u_sdfgamma, sdfdist);
+    alpha *= smoothstep(0.5 - u_sdfgamma / floorwidth, 0.5 + u_sdfgamma / floorwidth, sdfdist);
 
     gl_FragColor = color * (alpha * opacity);
 

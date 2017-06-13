@@ -24,7 +24,11 @@ public:
     }
 
     ResultType operator()(const style::CameraFunction<T>& function) const {
-        return ResultType(function.evaluate(parameters.z));
+        if (!function.useIntegerZoom) {
+            return ResultType(function.evaluate(parameters.z));
+        } else {
+            return ResultType(function.evaluate(floor(parameters.z)));
+        }
     }
 
     template <class Function>

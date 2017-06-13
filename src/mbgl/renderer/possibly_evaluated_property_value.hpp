@@ -48,7 +48,13 @@ public:
                     return function.evaluate(feature, defaultValue);
                 },
                 [&] (const style::CompositeFunction<T>& function) {
-                    return function.evaluate(zoom, feature, defaultValue);
+                    return function.evaluate(floor(zoom), feature, defaultValue);
+                    // TODO when is this evaluate used? 
+//                    if (!function.useIntegerZoom) {
+//                        return function.evaluate(zoom, feature, defaultValue);
+//                    } else {
+//                        return function.evaluate(floor(zoom), feature, defaultValue);
+//                    }
                 }
         );
     }

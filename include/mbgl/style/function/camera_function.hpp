@@ -35,6 +35,7 @@ public:
     }
 
     Stops stops;
+    bool useIntegerZoom = false;
 };
 
 } // namespace style

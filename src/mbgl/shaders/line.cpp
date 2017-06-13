@@ -26,7 +26,6 @@ attribute vec4 a_data;
 
 uniform mat4 u_matrix;
 uniform mediump float u_ratio;
-uniform mediump float u_width;
 uniform vec2 u_gl_units_to_pixels;
 
 varying vec2 v_normal;
@@ -48,6 +47,9 @@ varying mediump float gapwidth;
 uniform lowp float a_offset_t;
 attribute lowp vec2 a_offset;
 varying lowp float offset;
+uniform lowp float a_width_t;
+attribute mediump vec2 a_width;
+varying mediump float width;
 
 void main() {
     color = unpack_mix_vec4(a_color, a_color_t);
@@ -55,6 +57,7 @@ void main() {
     opacity = unpack_mix_vec2(a_opacity, a_opacity_t);
     gapwidth = unpack_mix_vec2(a_gapwidth, a_gapwidth_t);
     offset = unpack_mix_vec2(a_offset, a_offset_t);
+    width = unpack_mix_vec2(a_width, a_width_t);
 
     vec2 a_extrude = a_data.xy - 128.0;
     float a_direction = mod(a_data.z, 4.0) - 1.0;
@@ -71,11 +74,11 @@ void main() {
     // these transformations used to be applied in the JS and native code bases. 
     // moved them into the shader for clarity and simplicity. 
     gapwidth = gapwidth / 2.0;
-    float width = u_width / 2.0;
+    float halfwidth = width / 2.0;
     offset = -1.0 * offset; 
 
     float inset = gapwidth + (gapwidth > 0.0 ? ANTIALIASING : 0.0);
-    float outset = gapwidth + width * (gapwidth > 0.0 ? 2.0 : 1.0) + ANTIALIASING;
+    float outset = gapwidth + halfwidth * (gapwidth > 0.0 ? 2.0 : 1.0) + ANTIALIASING;
 
     // Scale the extrusion vector down to a normal and then up by the line width
     // of this vertex.

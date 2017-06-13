@@ -132,7 +132,7 @@ void <%- camelize(type) %>Layer::set<%- camelize(property.name) %>(<%- propertyV
 <% } -%>
 
 // Paint properties
-<% for (const property of paintProperties) { %>
+<% for (const property of paintProperties) { if (!property.skip) { %>
 <%- propertyValueType(property) %> <%- camelize(type) %>Layer::getDefault<%- camelize(property.name) %>() {
     return { <%- defaultValue(property) %> };
 }
@@ -146,6 +146,10 @@ void <%- camelize(type) %>Layer::set<%- camelize(property.name) %>(<%- propertyV
         return;
     auto impl_ = mutableImpl();
     impl_->paint.template get<<%- camelize(property.name) %>>().value = value;
+<% if (property.name === "line-width") { -%>
+    impl_->paint.template get<LineFloorwidth>().value = value;
+    impl_->paint.template get<LineFloorwidth>().value.useIntegerZoom();
+<% } -%>
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
@@ -159,7 +163,7 @@ void <%- camelize(type) %>Layer::set<%- camelize(property.name) %>Transition(con
 TransitionOptions <%- camelize(type) %>Layer::get<%- camelize(property.name) %>Transition() const {
     return impl().paint.template get<<%- camelize(property.name) %>>().options;
 }
-<% } -%>
+<% }} -%>
 
 } // namespace style
 } // namespace mbgl

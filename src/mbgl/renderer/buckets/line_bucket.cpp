@@ -480,7 +480,7 @@ static float get(const RenderLineLayer& layer, const std::map<std::string, LineP
 }
 
 float LineBucket::getLineWidth(const RenderLineLayer& layer) const {
-    float lineWidth = layer.evaluated.get<LineWidth>();
+    float lineWidth = get<LineWidth>(layer, paintPropertyBinders);
     float gapWidth = get<LineGapWidth>(layer, paintPropertyBinders);
 
     if (gapWidth) {

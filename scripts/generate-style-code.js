@@ -159,6 +159,12 @@ const layers = Object.keys(spec.layer.type.values).map((type) => {
   const paintProperties = Object.keys(spec[`paint_${type}`]).reduce((memo, name) => {
     spec[`paint_${type}`][name].name = name;
     memo.push(spec[`paint_${type}`][name]);
+    if (name === 'line-width') {
+      spec[`paint_${type}`]['line-floorwidth'] = Object.assign({}, spec[`paint_${type}`][name]);
+      spec[`paint_${type}`]['line-floorwidth'].name = 'line-floorwidth';
+      spec[`paint_${type}`]['line-floorwidth'].skip = true;
+      memo.push(spec[`paint_${type}`]['line-floorwidth']);
+    }
     return memo;
   }, []);
 

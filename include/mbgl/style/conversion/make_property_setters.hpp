@@ -99,7 +99,7 @@ auto makePaintPropertySetters() {
     result["line-translate-transition"] = &setTransition<V, LineLayer, &LineLayer::setLineTranslateTransition>;
     result["line-translate-anchor"] = &setProperty<V, LineLayer, PropertyValue<TranslateAnchorType>, &LineLayer::setLineTranslateAnchor>;
     result["line-translate-anchor-transition"] = &setTransition<V, LineLayer, &LineLayer::setLineTranslateAnchorTransition>;
-    result["line-width"] = &setProperty<V, LineLayer, PropertyValue<float>, &LineLayer::setLineWidth>;
+    result["line-width"] = &setProperty<V, LineLayer, DataDrivenPropertyValue<float>, &LineLayer::setLineWidth>;
     result["line-width-transition"] = &setTransition<V, LineLayer, &LineLayer::setLineWidthTransition>;
     result["line-gap-width"] = &setProperty<V, LineLayer, DataDrivenPropertyValue<float>, &LineLayer::setLineGapWidth>;
     result["line-gap-width-transition"] = &setTransition<V, LineLayer, &LineLayer::setLineGapWidthTransition>;
