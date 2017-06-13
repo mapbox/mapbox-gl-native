@@ -69,7 +69,7 @@ NativeMapView::NativeMapView(jni::JNIEnv& _env,
 
     // Create the core map
     map = std::make_unique<mbgl::Map>(
-        *this, mbgl::Size{ static_cast<uint32_t>(width), static_cast<uint32_t>(height) },
+        *this, *this, mbgl::Size{ static_cast<uint32_t>(width), static_cast<uint32_t>(height) },
         pixelRatio, mbgl::android::FileSource::getDefaultFileSource(_env, jFileSource), *threadPool,
         MapMode::Continuous, GLContextMode::Unique, ConstrainMode::HeightOnly,
         ViewportMode::Default, jni::Make<std::string>(_env, _programCacheDir));

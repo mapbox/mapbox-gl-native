@@ -12,7 +12,7 @@
 #include <QObject>
 #include <QSize>
 
-class QMapboxGLPrivate : public QObject, public mbgl::View, public mbgl::Backend
+class QMapboxGLPrivate : public QObject, public mbgl::View, public mbgl::Backend, public mbgl::MapObserver
 {
     Q_OBJECT
 

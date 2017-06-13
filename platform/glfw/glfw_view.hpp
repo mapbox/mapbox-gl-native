@@ -9,7 +9,7 @@
 
 struct GLFWwindow;
 
-class GLFWView : public mbgl::View, public mbgl::Backend {
+class GLFWView : public mbgl::View, public mbgl::Backend, public mbgl::MapObserver {
 public:
     GLFWView(bool fullscreen = false, bool benchmark = false);
     ~GLFWView() override;
