@@ -154,7 +154,7 @@ typedef NS_ENUM(NSUInteger, MGLResourceKind) {
     /** JSON part of a sprite sheet. It is constructed of the prefix in
         https://www.mapbox.com/mapbox-gl-js/style-spec/#root-sprite and a JSON file extension. */
     MGLResourceKindSpriteJSON,
-    /** Image **/
+    /** Image data for a georeferenced image source. **/
     MGLResourceKindImage,
 };
 
