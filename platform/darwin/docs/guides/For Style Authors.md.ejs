@@ -178,8 +178,9 @@ In style JSON | In the SDK
 `geojson`     | `MGLShapeSource`
 `raster`      | `MGLRasterSource`
 `vector`      | `MGLVectorSource`
+`image`       | `MGLImageSource`
 
-`canvas`, `image`, and `video` sources are not supported.
+`canvas` and `video` sources are not supported.
 
 ### Tile sources
 
@@ -219,6 +220,12 @@ In style JSON    | In the SDK
 To create a shape source from local GeoJSON data, first
 [convert the GeoJSON data into a shape](working-with-geojson-data.html#converting-geojson-data-into-shape-objects),
 then use the `-[MGLShapeSource initWithIdentifier:shape:options:]` method.
+
+### Image sources
+
+Image sources accept a non-axis aligned quadrilateral as their geographic coordinates.
+These coordinates, in `MGLCoordinateQuad`, are described in counterclockwise order, 
+in contrast to the clockwise order defined in the style specification. 
 
 ## Configuring the map content’s appearance
 

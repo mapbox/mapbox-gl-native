@@ -1,6 +1,9 @@
 # Changelog for Mapbox macOS SDK
 
-## 3.6.0
+## master
+
+### Styles
+* Added suuport for diplaying georeferenced images via the `MGLImageSource`.  [#9110](https://github.com/mapbox/mapbox-gl-native/pull/9110)
 
 ### Packaging
 
