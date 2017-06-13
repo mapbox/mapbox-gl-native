@@ -47,12 +47,12 @@ public:
         } else {
             // No VAO support. Force attributes to be rebound.
             context.elementBuffer = indexBuffer_;
-            variableBindings = {};
+            attributeBindings = {};
         }
 
         Attributes::bind(context,
                          attributeLocations,
-                         variableBindings,
+                         attributeBindings,
                          attributeBindings_,
                          vertexOffset);
     }
@@ -60,7 +60,7 @@ public:
 private:
     mutable optional<UniqueVertexArray> vao;
     mutable optional<BufferID> indexBuffer;
-    mutable typename Attributes::VariableBindings variableBindings;
+    mutable typename Attributes::Bindings attributeBindings;
 };
 
 template <class Attributes>

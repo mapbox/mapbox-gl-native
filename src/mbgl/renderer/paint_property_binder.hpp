@@ -103,11 +103,8 @@ public:
     void populateVertexVector(const GeometryTileFeature&, std::size_t) override {}
     void upload(gl::Context&) override {}
 
-    AttributeBinding attributeBinding(const PossiblyEvaluatedPropertyValue<T>& currentValue) const override {
-        auto value = attributeValue(currentValue.constantOr(constant));
-        return typename Attribute::ConstantBinding {
-            zoomInterpolatedAttributeValue(value, value)
-        };
+    AttributeBinding attributeBinding(const PossiblyEvaluatedPropertyValue<T>&) const override {
+        return gl::DisabledAttribute();
     }
 
     float interpolationFactor(float) const override {
@@ -152,12 +149,9 @@ public:
 
     AttributeBinding attributeBinding(const PossiblyEvaluatedPropertyValue<T>& currentValue) const override {
         if (currentValue.isConstant()) {
-            BaseAttributeValue value = attributeValue(*currentValue.constant());
-            return typename Attribute::ConstantBinding {
-                zoomInterpolatedAttributeValue(value, value)
-            };
+            return gl::DisabledAttribute();
         } else {
-            return Attribute::variableBinding(*vertexBuffer, 0, BaseAttribute::Dimensions);
+            return Attribute::binding(*vertexBuffer, 0, BaseAttribute::Dimensions);
         }
     }
 
@@ -216,12 +210,9 @@ public:
 
     AttributeBinding attributeBinding(const PossiblyEvaluatedPropertyValue<T>& currentValue) const override {
         if (currentValue.isConstant()) {
-            BaseAttributeValue value = attributeValue(*currentValue.constant());
-            return typename Attribute::ConstantBinding {
-                zoomInterpolatedAttributeValue(value, value)
-            };
+            return gl::DisabledAttribute();
         } else {
-            return Attribute::variableBinding(*vertexBuffer, 0);
+            return Attribute::binding(*vertexBuffer, 0);
         }
     }
 

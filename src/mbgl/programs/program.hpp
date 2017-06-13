@@ -66,7 +66,7 @@ public:
             std::move(colorMode),
             uniformValues
                 .concat(paintPropertyBinders.uniformValues(currentZoom, currentProperties)),
-            LayoutAttributes::allVariableBindings(layoutVertexBuffer)
+            LayoutAttributes::bindings(layoutVertexBuffer)
                 .concat(paintPropertyBinders.attributeBindings(currentProperties)),
             indexBuffer,
             segments
