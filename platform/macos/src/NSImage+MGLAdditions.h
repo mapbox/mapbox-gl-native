@@ -12,7 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (std::unique_ptr<mbgl::style::Image>)mgl_styleImageWithIdentifier:(NSString *)identifier;
 
-- (mbgl::PremultipliedImage) mgl_PremultipliedImage;
+- (mbgl::PremultipliedImage) mgl_premultipliedImage;
 
 @end
 

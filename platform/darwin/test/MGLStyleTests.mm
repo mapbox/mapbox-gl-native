@@ -211,7 +211,7 @@
     [self.style addSource:rasterSource];
 
     // Attempt to remove an image source with the same identifier as the raster source
-    MGLImageSource *imageSource = [[MGLImageSource alloc] initWithIdentifier:@"some-identifier" coordinates: { }];
+    MGLImageSource *imageSource = [[MGLImageSource alloc] initWithIdentifier:@"some-identifier" coordinateQuad: { } URL:[NSURL URLWithString:@"http://host/image.png"]];
     [self.style removeSource:imageSource];
     // The raster source should still be added
     XCTAssertTrue([[self.style sourceWithIdentifier:rasterSource.identifier] isMemberOfClass:[MGLRasterSource class]]);

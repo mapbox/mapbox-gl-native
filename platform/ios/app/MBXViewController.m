@@ -1317,15 +1317,33 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
 {
     MGLCoordinateQuad coordinateQuad = {
         { 46.437, -80.425 },
-        { 46.437, -71.516 },
+        { 37.936, -80.425 },
         { 37.936, -71.516 },
-        { 37.936, -80.425 } };
+        { 46.437, -71.516 } };
 
-    MGLImageSource *imageSource = [[MGLImageSource alloc] initWithIdentifier:@"style-image-source-id" coordinates:coordinateQuad imageURL:[NSURL URLWithString:@"https://www.mapbox.com/mapbox-gl-js/assets/radar.gif"]];
+    MGLImageSource *imageSource = [[MGLImageSource alloc] initWithIdentifier:@"style-image-source-id" coordinateQuad:coordinateQuad URL:[NSURL URLWithString:@"https://www.mapbox.com/mapbox-gl-js/assets/radar0.gif"]];
+
     [self.mapView.style addSource:imageSource];
     
     MGLRasterStyleLayer *rasterLayer = [[MGLRasterStyleLayer alloc] initWithIdentifier:@"style-raster-image-layer-id" source:imageSource];
     [self.mapView.style addLayer:rasterLayer];
+    
+    [NSTimer scheduledTimerWithTimeInterval:1.0
+                                     target:self
+                                   selector:@selector(updateAnimatedImageSource:)
+                                   userInfo:imageSource
+                                    repeats:YES];
+}
+
+
+- (void)updateAnimatedImageSource:(NSTimer *)timer {
+    static int radarSuffix = 0;
+    MGLImageSource *imageSource = (MGLImageSource *)timer.userInfo;
+    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"https://www.mapbox.com/mapbox-gl-js/assets/radar%d.gif", radarSuffix++]];
+    [imageSource setValue:url forKey:@"URL"];
+    if (radarSuffix > 3) {
+        radarSuffix = 0;
+    }
 }
 
 -(void)styleCountryLabelsLanguage

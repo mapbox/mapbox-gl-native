@@ -1,4 +1,4 @@
-#import "MGLImageSource_Private.h"
+#import "MGLImageSource.h"
 
 #import "MGLGeometry_Private.h"
 #import "MGLSource_Private.h"
@@ -14,6 +14,7 @@
 #include <mbgl/util/premultiply.hpp>
 
 @interface MGLImageSource ()
+- (instancetype)initWithIdentifier:(NSString *)identifier coordinateQuad:(MGLCoordinateQuad)coordinateQuad NS_DESIGNATED_INITIALIZER;
 
 @property (nonatomic, readonly) mbgl::style::ImageSource *rawSource;
 
@@ -21,7 +22,7 @@
 
 @implementation MGLImageSource
 
-- (instancetype)initWithIdentifier:(NSString *)identifier coordinates:(MGLCoordinateQuad)coordinateQuad {
+- (instancetype)initWithIdentifier:(NSString *)identifier coordinateQuad:(MGLCoordinateQuad)coordinateQuad {
 
     const auto coordsArray = MGLLatLngArrayFromCoordinateQuad(coordinateQuad);
     auto source = std::make_unique<mbgl::style::ImageSource>(identifier.UTF8String, coordsArray);
@@ -29,32 +30,17 @@
 }
 
 
-- (instancetype)initWithIdentifier:(NSString *)identifier coordinates:(MGLCoordinateQuad)coordinateQuad imageURL:(NSURL *)url {
-    self =  [self initWithIdentifier:identifier coordinates: coordinateQuad];
+- (instancetype)initWithIdentifier:(NSString *)identifier coordinateQuad:(MGLCoordinateQuad)coordinateQuad URL:(NSURL *)url {
+    self =  [self initWithIdentifier:identifier coordinateQuad: coordinateQuad];
     self.URL = url;
     return self;
 }
 
 
-- (instancetype)initWithIdentifier:(NSString *)identifier coordinates:(MGLCoordinateQuad)coordinateQuad image:(MGLImage *)image {
-    self =  [self initWithIdentifier:identifier coordinates: coordinateQuad];
+- (instancetype)initWithIdentifier:(NSString *)identifier coordinateQuad:(MGLCoordinateQuad)coordinateQuad image:(MGLImage *)image {
+    self =  [self initWithIdentifier:identifier coordinateQuad: coordinateQuad];
     self.image = image;
 
-    return self;
-}
-
-- (instancetype)initWithIdentifier:(NSString *)identifier bounds:(MGLCoordinateBounds)bounds {
-    self = [self initWithIdentifier:identifier coordinates:MGLCoordinateQuadFromCoordinateBounds(bounds)];
-    return self;
-}
-
-- (instancetype)initWithIdentifier:(NSString *)identifier bounds:(MGLCoordinateBounds)bounds imageURL:(NSURL *)url {
-    self = [self initWithIdentifier:identifier coordinates:MGLCoordinateQuadFromCoordinateBounds(bounds) imageURL:url];
-    return self;
-}
-
-- (instancetype)initWithIdentifier:(NSString *)identifier bounds:(MGLCoordinateBounds)bounds image:(MGLImage *)image {
-    self = [self initWithIdentifier:identifier coordinates:MGLCoordinateQuadFromCoordinateBounds(bounds) image:image];
     return self;
 }
 
@@ -74,8 +60,10 @@
 
 - (void)setImage:(MGLImage *)image {
     if (image != nullptr) {
-        mbgl::UnassociatedImage unassociatedImage = mbgl::util::unpremultiply(image.mgl_PremultipliedImage);
+        mbgl::UnassociatedImage unassociatedImage = mbgl::util::unpremultiply(image.mgl_premultipliedImage);
         self.rawSource->setImage(std::move(unassociatedImage));
+    } else {
+        self.rawSource->setImage(mbgl::UnassociatedImage({0,0}));
     }
     _image = image;
 }
@@ -89,8 +77,8 @@
 }
 
 - (NSString *)description {
-    return [NSString stringWithFormat:@"<%@: %p; identifier = %@; URL = %@; image = %@>",
-            NSStringFromClass([self class]), (void *)self, self.identifier, self.URL, self.image];
+    return [NSString stringWithFormat:@"<%@: %p; identifier = %@; coordinates = %@; URL = %@; image = %@>",
+            NSStringFromClass([self class]), (void *)self, self.identifier, MGLStringFromCoordinateQuad(self.coordinates), self.URL, self.image];
 }
 
 - (mbgl::style::ImageSource *)rawSource {

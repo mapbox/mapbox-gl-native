@@ -66,16 +66,9 @@ NS_INLINE std::array<mbgl::LatLng, 4> MGLLatLngArrayFromCoordinateQuad(MGLCoordi
 
 NS_INLINE MGLCoordinateQuad MGLCoordinateQuadFromLatLngArray(std::array<mbgl::LatLng, 4> quad) {
     return { MGLLocationCoordinate2DFromLatLng(quad[0]),
-    MGLLocationCoordinate2DFromLatLng(quad[1]),
+    MGLLocationCoordinate2DFromLatLng(quad[3]),
     MGLLocationCoordinate2DFromLatLng(quad[2]),
-    MGLLocationCoordinate2DFromLatLng(quad[3]) };
-}
-
-NS_INLINE MGLCoordinateQuad MGLCoordinateQuadFromCoordinateBounds(MGLCoordinateBounds bounds) {
-    return { { bounds.ne.latitude, bounds.sw.longitude },
-    bounds.ne,
-    { bounds.sw.latitude, bounds.ne.longitude },
-    bounds.sw };
+    MGLLocationCoordinate2DFromLatLng(quad[1]) };
 }
 
 #if TARGET_OS_IPHONE

@@ -75,6 +75,7 @@ custom_categories:
     children:
       - MGLSource
       - MGLTileSource
+      - MGLImageSource
       - MGLShapeSource
       - MGLRasterSource
       - MGLVectorSource
@@ -108,6 +109,9 @@ custom_categories:
       - MGLCoordinateBoundsMake
       - MGLCoordinateBoundsOffset
       - MGLCoordinateInCoordinateBounds
+      - MGLCoordinateQuad
+      - MGLCoordinateQuadMake
+      - MGLCoordinateQuadFromCoordinateBounds
       - MGLCoordinateSpan
       - MGLCoordinateSpanEqualToCoordinateSpan
       - MGLCoordinateSpanMake
@@ -115,6 +119,7 @@ custom_categories:
       - MGLDegreesFromRadians
       - MGLRadiansFromDegrees
       - MGLStringFromCoordinateBounds
+      - MGLStringFromCoordinateQuad
   - name: Formatters
     children:
       - MGLClockDirectionFormatter

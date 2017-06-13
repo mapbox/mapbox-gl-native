@@ -20,6 +20,7 @@
 #import "MGLPolyline.h"
 #import "MGLAnnotationImage.h"
 #import "MGLMapViewDelegate.h"
+#import "MGLImageSource.h"
 
 #import <mbgl/map/map.hpp>
 #import <mbgl/map/view.hpp>
@@ -943,13 +944,16 @@ public:
     }
 }
 
-- (void)sourceDidChange {
+- (void)sourceDidChange:(MGLSource *)source {
     if (!_mbglMap) {
         return;
     }
-
-    [self installAttributionView];
+    // Attribution only applies to tiled sources
+    if ([source isKindOfClass:[MGLTileSource class]]) {
+        [self installAttributionView];
+    }
     self.needsUpdateConstraints = YES;
+    self.needsDisplay = YES;
 }
 
 #pragma mark Printing
@@ -2847,8 +2851,10 @@ public:
         [nativeView mapViewDidFinishLoadingStyle];
     }
 
-    void onSourceChanged(mbgl::style::Source&) override {
-        [nativeView sourceDidChange];
+    void onSourceChanged(mbgl::style::Source& source) override {
+        NSString *identifier = @(source.getID().c_str());
+        MGLSource * nativeSource = [nativeView.style sourceWithIdentifier:identifier];
+        [nativeView sourceDidChange:nativeSource];
     }
 
     mbgl::gl::ProcAddress initializeExtension(const char* name) override {

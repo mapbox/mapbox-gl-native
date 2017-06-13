@@ -25,11 +25,11 @@
 - (std::unique_ptr<mbgl::style::Image>)mgl_styleImageWithIdentifier:(NSString *)identifier {
     BOOL isTemplate = self.renderingMode == UIImageRenderingModeAlwaysTemplate;
     return std::make_unique<mbgl::style::Image>([identifier UTF8String],
-                                                self.mgl_PremultipliedImage,
+                                                self.mgl_premultipliedImage,
                                                 float(self.scale), isTemplate);
 }
 
--(mbgl::PremultipliedImage)mgl_PremultipliedImage {
+-(mbgl::PremultipliedImage)mgl_premultipliedImage {
     return MGLPremultipliedImageFromCGImage(self.CGImage);
 }
 @end
