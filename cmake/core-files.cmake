@@ -312,6 +312,8 @@ set(MBGL_CORE_FILES
     include/mbgl/storage/resource.hpp
     include/mbgl/storage/response.hpp
     src/mbgl/storage/asset_file_source.hpp
+    src/mbgl/storage/file_source_request.cpp
+    src/mbgl/storage/file_source_request.hpp
     src/mbgl/storage/http_file_source.hpp
     src/mbgl/storage/local_file_source.hpp
     src/mbgl/storage/network_status.cpp
@@ -605,6 +607,7 @@ set(MBGL_CORE_FILES
     src/mbgl/util/thread_context.cpp
     src/mbgl/util/thread_context.hpp
     src/mbgl/util/thread_local.hpp
+    src/mbgl/util/threaded_object.hpp
     src/mbgl/util/throttler.cpp
     src/mbgl/util/throttler.hpp
     src/mbgl/util/tile_coordinate.hpp
