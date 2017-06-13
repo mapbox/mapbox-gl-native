@@ -36,7 +36,6 @@ By default, annotations added to the map are displayed with a red pin ([example]
 
 * Annotation images are purely static and cannot be animated
 * No control over z-ordering
-* Limits to the number and size of images you can add
 
 ### Annotation Views (`MGLAnnotationView`)
 
