@@ -1,4 +1,5 @@
 {
+  "light-cocoa-doc": "An `MGLLight` object represents the light source for extruded geometries in `MGLStyle`.",
   "layer": {
     "type": {
       "values": {

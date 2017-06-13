@@ -220,7 +220,6 @@ global.testHelperMessage = function (property, layerType, isFunction) {
 };
 
 global.propertyDoc = function (propertyName, property, layerType, kind) {
-    console.log(propertyName + " : " + property + " : " + layerType + " : " + kind)
     // Match references to other property names & values.
     // Requires the format 'When `foo` is set to `bar`,'.
     let doc = property.doc.replace(/`([^`]+?)` is set to `([^`]+?)`/g, function (m, peerPropertyName, propertyValue, offset, str) {
@@ -257,7 +256,7 @@ global.propertyDoc = function (propertyName, property, layerType, kind) {
     if (kind !== 'enum') {
         if ('default' in property) {
             doc += `\n\nThe default value of this property is ${propertyDefault(property, layerType)}.`;
-            if (!property.required) {
+            if (!property.required && kind != 'light') {
                 doc += ' Set this property to `nil` to reset it to the default value.';
             }
         }
@@ -419,6 +418,7 @@ global.propertyType = function (property) {
                     return 'NSArray<NSString *> *';
                 case 'padding':
                     return 'NSValue *';
+                case 'position':
                 case 'offset':
                 case 'translate':
                     return 'NSValue *';
@@ -458,6 +458,8 @@ global.valueTransformerArguments = function (property) {
                     return ['std::vector<std::string>', objCType, 'std::string'];
                 case 'padding':
                     return ['std::array<float, 4>', objCType];
+                case 'position':
+                    return ['mbgl::style::Position', objCType];
                 case 'offset':
                 case 'translate':
                     return ['std::array<float, 2>', objCType];
@@ -520,15 +522,15 @@ global.setSourceLayer = function() {
     return `_layer->setSourceLayer(sourceLayer.UTF8String);`
 };
 
-const lightProperties = Object.keys(spec[`light`]).reduce((memo, name) => {
-  var property = spec[`light`][name];
+const lightProperties = Object.keys(spec['light']).reduce((memo, name) => {
+  var property = spec['light'][name];
   property.name = name;
   property['light-property'] = true;
   memo.push(property);
   return memo;
 }, []);
 
-console.log(lightProperties);
+const lightDoc = spec[`light-cocoa-doc`];
 
 const layerH = ejs.compile(fs.readFileSync('platform/darwin/src/MGLStyleLayer.h.ejs', 'utf8'), { strict: true });
 const layerM = ejs.compile(fs.readFileSync('platform/darwin/src/MGLStyleLayer.mm.ejs', 'utf8'), { strict: true});
@@ -539,9 +541,8 @@ const templatesMD = ejs.compile(fs.readFileSync('platform/darwin/docs/guides/Til
 
 const lightH = ejs.compile(fs.readFileSync('platform/darwin/src/MGLLight.h.ejs', 'utf8'), {strict: true});;
 const lightM = ejs.compile(fs.readFileSync('platform/darwin/src/MGLLight.mm.ejs', 'utf8'), {strict: true});;
-fs.writeFileSync(`platform/darwin/src/MGLLight.h`, lightH({ properties: lightProperties, }));
-fs.writeFileSync(`platform/darwin/src/MGLLight.mm`, lightM({ properties: lightProperties, }));
-
+fs.writeFileSync(`platform/darwin/src/MGLLight.h`, duplicatePlatformDecls(lightH({ properties: lightProperties, doc: lightDoc})));
+fs.writeFileSync(`platform/darwin/src/MGLLight.mm`, lightM({ properties: lightProperties, doc: lightDoc}));
 
 
 const layers = _(spec.layer.type.values).map((value, layerType) => {
@@ -558,7 +559,7 @@ const layers = _(spec.layer.type.values).map((value, layerType) => {
         memo.push(spec[`paint_${layerType}`][name]);
         return memo;
     }, []);
-console.log(spec.layer.type.values[layerType].doc)
+
     return {
         doc: spec.layer.type.values[layerType].doc,
         type: layerType,

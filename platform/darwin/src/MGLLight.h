@@ -8,13 +8,19 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-
-/** Options to specify extruded geometries are lit relative to the map or viewport. */
+/**
+ Whether extruded geometries are lit relative to the map or viewport.
+ */
 typedef NS_ENUM(NSUInteger, MGLLightAnchor) {
-    /** The position of the light source is aligned to the rotation of the map. */
+    /**
+     The position of the light source is aligned to the rotation of the map.
+     */
     MGLLightAnchorMap,
-    /** The position of the light source is aligned to the rotation of the viewport. */
-    MGLLightAnchorViewport
+    /**
+     The position of the light source is aligned to the rotation of the
+     viewport.
+     */
+    MGLLightAnchorViewport,
 };
 
 /**
@@ -57,8 +63,17 @@ MGL_EXPORT
 @interface MGLLight : NSObject
 
 /**
- `anchor` Whether extruded geometries are lit relative to the map or viewport.
+ Whether extruded geometries are lit relative to the map or viewport.
  
+ The default value of this property is an `MGLStyleValue` object containing an
+ `NSValue` object containing `MGLAnchorViewport`.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLConstantStyleValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of
+ `MGLInterpolationModeInterval`
+
  This property corresponds to the <a
  href="https://www.mapbox.com/mapbox-gl-js/style-spec/#light-anchor"><code>anchor</code></a>
  light property in the Mapbox Style Specification.
@@ -66,14 +81,25 @@ MGL_EXPORT
 @property (nonatomic) MGLStyleValue<NSValue *> *anchor;
 
 /**
- Values describing animated transitions to `anchor` property.
- */
-@property (nonatomic) MGLTransition anchorTransition;
-
-
-/**
- Position of the light source relative to lit (extruded) geometries.
+ Position of the light source relative to lit (extruded) geometries, in [r
+ radial coordinate, a azimuthal angle, p polar angle] where r indicates the
+ distance from the center of the base of an object to its light, a indicates the
+ position of the light relative to 0° (0° when `light.anchor` is set to
+ `MGLLight.anchorViewport` corresponds to the top of the viewport, or 0° when
+ `light.anchor` is set to `MGLLight.anchorMap` corresponds to due north, and
+ degrees proceed clockwise), and p indicates the height of the light (from 0°,
+ directly above, to 180°, directly below).
  
+ The default value of this property is an `MGLStyleValue` object containing the
+ array `1.15`, `210`, `30`.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLConstantStyleValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+
  This property corresponds to the <a
  href="https://www.mapbox.com/mapbox-gl-js/style-spec/#light-position"><code>position</code></a>
  light property in the Mapbox Style Specification.
@@ -81,47 +107,86 @@ MGL_EXPORT
 @property (nonatomic) MGLStyleValue<NSValue *> *position;
 
 /**
- Values describing animated transitions to `position` property.
- */
-@property (nonatomic) MGLTransition positionTransiton;
+ The transition affecting any changes to this layer’s `position` property.
 
+ This property corresponds to the `position-transition` property in the style JSON file format.
+*/
+@property (nonatomic) MGLTransition positionTransition;
 
 #if TARGET_OS_IPHONE
 /**
  Color tint for lighting extruded geometries.
  
+ The default value of this property is an `MGLStyleValue` object containing
+ `UIColor.whiteColor`.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLConstantStyleValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+
  This property corresponds to the <a
  href="https://www.mapbox.com/mapbox-gl-js/style-spec/#light-color"><code>color</code></a>
  light property in the Mapbox Style Specification.
  */
 @property (nonatomic) MGLStyleValue<UIColor *> *color;
 #else
-
 /**
  Color tint for lighting extruded geometries.
+ 
+ The default value of this property is an `MGLStyleValue` object containing
+ `NSColor.whiteColor`.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLConstantStyleValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+
+ This property corresponds to the <a
+ href="https://www.mapbox.com/mapbox-gl-js/style-spec/#light-color"><code>color</code></a>
+ light property in the Mapbox Style Specification.
  */
 @property (nonatomic) MGLStyleValue<NSColor *> *color;
 #endif
 
 /**
- Values describing animated transitions to `color` property.
- */
-@property (nonatomic) MGLTransition colorTransiton;
+ The transition affecting any changes to this layer’s `color` property.
 
+ This property corresponds to the `color-transition` property in the style JSON file format.
+*/
+@property (nonatomic) MGLTransition colorTransition;
 
 /**
- Intensity of lighting (on a scale from 0 to 1). Higher numbers will present as more extreme contrast.
+ Intensity of lighting (on a scale from 0 to 1). Higher numbers will present as
+ more extreme contrast.
  
+ The default value of this property is an `MGLStyleValue` object containing an
+ `NSNumber` object containing the float `0.5`.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLConstantStyleValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+
  This property corresponds to the <a
  href="https://www.mapbox.com/mapbox-gl-js/style-spec/#light-intensity"><code>intensity</code></a>
  light property in the Mapbox Style Specification.
  */
-@property(nonatomic) MGLStyleValue<NSNumber *> *intensity;
+@property (nonatomic) MGLStyleValue<NSNumber *> *intensity;
 
 /**
- Values describing animated transitions to `intensity` property.
- */
+ The transition affecting any changes to this layer’s `intensity` property.
+
+ This property corresponds to the `intensity-transition` property in the style JSON file format.
+*/
 @property (nonatomic) MGLTransition intensityTransition;
+
 
 @end
 

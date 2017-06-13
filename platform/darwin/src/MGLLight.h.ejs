@@ -13,14 +13,21 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-
-/** Options to specify extruded geometries are lit relative to the map or viewport. */
-typedef NS_ENUM(NSUInteger, MGLLightAnchor) {
-    /** The position of the light source is aligned to the rotation of the map. */
-    MGLLightAnchorMap,
-    /** The position of the light source is aligned to the rotation of the viewport. */
-    MGLLightAnchorViewport
+<% for (const property of properties) { -%>
+<% if (property.type == "enum") { -%>
+/**
+<%- propertyDoc(property.name, property, type, 'enum').wrap(80, 1) %>
+ */
+typedef NS_ENUM(NSUInteger, MGLLight<%- camelize(property.name) %>) {
+<% for (const value in property.values) { -%>
+    /**
+<%- propertyDoc(property.name, property.values[value], type, 'enum').wrap(80, 4+1) %>
+     */
+    MGLLightAnchor<%- camelize(value) %>,
+<% } -%>
 };
+<% } -%>
+<% } -%>
 
 /**
  A structure containing information about the position of the light source
@@ -46,7 +53,7 @@ typedef struct MGLSphericalPosition {
  
  @return Returns a `MGLSphericalPosition` struct containing the position attributes.
  */
-NS_INLINE MGLSphericalPosition MGLSphericalPositionMake(CLLocationDistance radial, CLLocationDirection azimuthal, CLLocationDirection polar) {
+NS_INLINE MGLSphericalPosition MGLSphericalPositionMake(CGFloat radial, CLLocationDirection azimuthal, CLLocationDirection polar) {
     MGLSphericalPosition position;
     position.radial = radial;
     position.azimuthal = azimuthal;
@@ -56,77 +63,37 @@ NS_INLINE MGLSphericalPosition MGLSphericalPositionMake(CLLocationDistance radia
 }
 
 /**
- An `MGLLight` object represents the light source for extruded geometries in `MGLStyle`.
+ <%- doc %>
  */
 MGL_EXPORT
 @interface MGLLight : NSObject
+<% if (properties.length) { -%>
 
+<% for (const property of properties) { -%>
 /**
- `anchor` Whether extruded geometries are lit relative to the map or viewport.
- 
+<%- propertyDoc(property.name, property, type, 'light').wrap(80, 1) %>
+
  This property corresponds to the <a
- href="https://www.mapbox.com/mapbox-gl-js/style-spec/#light-anchor"><code>anchor</code></a>
+ href="https://www.mapbox.com/mapbox-gl-js/style-spec/#light-<%- originalPropertyName(property) %>"><code><%- originalPropertyName(property) %></code></a>
  light property in the Mapbox Style Specification.
  */
-@property (nonatomic) MGLStyleValue<NSValue *> *anchor;
+@property (nonatomic<% if (property.getter) { %>, getter=<%- objCGetter(property) -%><% } %>) MGLStyleValue<<%- propertyType(property, true) %>> *<%- camelizeWithLeadingLowercase(property.name) %>;
 
+<% if (property.transition) { -%>
 /**
- Values describing animated transitions to `anchor` property.
- */
-@property (nonatomic) MGLTransition anchorTransition;
+ The transition affecting any changes to this layer’s `<%- camelizeWithLeadingLowercase(property.name) %>` property.
 
+ This property corresponds to the `<%- originalPropertyName(property) %>-transition` property in the style JSON file format.
+*/
+@property (nonatomic) MGLTransition <%- camelizeWithLeadingLowercase(property.name) %>Transition;
 
-/**
- Position of the light source relative to lit (extruded) geometries.
- 
- This property corresponds to the <a
- href="https://www.mapbox.com/mapbox-gl-js/style-spec/#light-position"><code>position</code></a>
- light property in the Mapbox Style Specification.
- */
-@property (nonatomic) MGLStyleValue<NSValue *> *position;
+<% } -%>
+<% if (property.original) { -%>
+@property (nonatomic<% if (!property.required) { %>, null_resettable<% } %>) MGLStyleValue<<%- propertyType(property, true) %>> *<%- camelizeWithLeadingLowercase(originalPropertyName(property)) %> __attribute__((unavailable("Use <%- camelizeWithLeadingLowercase(property.name) %> instead.")));
 
-/**
- Values describing animated transitions to `position` property.
- */
-@property (nonatomic) MGLTransition positionTransiton;
-
-
-#if TARGET_OS_IPHONE
-/**
- Color tint for lighting extruded geometries.
- 
- This property corresponds to the <a
- href="https://www.mapbox.com/mapbox-gl-js/style-spec/#light-color"><code>color</code></a>
- light property in the Mapbox Style Specification.
- */
-@property (nonatomic) MGLStyleValue<UIColor *> *color;
-#else
-
-/**
- Color tint for lighting extruded geometries.
- */
-@property (nonatomic) MGLStyleValue<NSColor *> *color;
-#endif
-
-/**
- Values describing animated transitions to `color` property.
- */
-@property (nonatomic) MGLTransition colorTransiton;
-
-
-/**
- Intensity of lighting (on a scale from 0 to 1). Higher numbers will present as more extreme contrast.
- 
- This property corresponds to the <a
- href="https://www.mapbox.com/mapbox-gl-js/style-spec/#light-intensity"><code>intensity</code></a>
- light property in the Mapbox Style Specification.
- */
-@property(nonatomic) MGLStyleValue<NSNumber *> *intensity;
-
-/**
- Values describing animated transitions to `intensity` property.
- */
-@property (nonatomic) MGLTransition intensityTransition;
+<% } -%>
+<% } -%>
+<% } -%>
 
 @end
 
