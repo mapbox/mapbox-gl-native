@@ -37,9 +37,9 @@ void FrameHistory::record(const TimePoint& now, float zoom, const Duration& dura
     }
 
     for (int16_t z = 0; z <= 255; z++) {
-        std::chrono::duration<float> timeDiff = now - changeTimes[z];
-        int32_t opacityChange = (duration == Milliseconds(0) ? 1 : (timeDiff / duration)) * 255;
-        uint8_t opacity = z <= zoomIndex
+        const std::chrono::duration<float> timeDiff = now - changeTimes[z];
+        const int32_t opacityChange = (duration == Milliseconds(0) ? 1 : (timeDiff / duration)) * 255;
+        const uint8_t opacity = z <= zoomIndex
             ? util::min(255, changeOpacities[z] + opacityChange)
             : util::max(0, changeOpacities[z] - opacityChange);
         if (opacities.data[z] != opacity) {
