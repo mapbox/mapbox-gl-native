@@ -10,7 +10,8 @@ NS_ASSUME_NONNULL_BEGIN
  is defined by an `MGLShapeSource` or `MGLVectorSource` object.
 
  Create instances of `MGLCircleStyleLayer`, `MGLFillStyleLayer`, `MGLLineStyleLayer`,
- and `MGLSymbolStyleLayer` in order to use `MGLVectorStyleLayer`'s properties and methods.
+ and `MGLSymbolStyleLayer` in order to use `MGLVectorStyleLayer`'s properties and
+ methods. Do not create instances of `MGLVectorStyleLayer` directly.
  */
 MGL_EXPORT
 @interface MGLVectorStyleLayer : MGLForegroundStyleLayer

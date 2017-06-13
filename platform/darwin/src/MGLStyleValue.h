@@ -240,7 +240,8 @@ MGL_EXPORT
  `MGLCompositeStyleFunction` object.
  
  Create instances of `MGLCameraStyleFunction`, `MGLSourceStyleFunction`, and
- `MGLCompositeStyleFunction` in order to use `MGLStyleFunction`'s methods.
+ `MGLCompositeStyleFunction` in order to use `MGLStyleFunction`'s methods. Do
+ not create instances of `MGLStyleFunction` directly.
 
  The `MGLStyleFunction` class takes a generic parameter `T` that indicates the
  Foundation class being wrapped by this class.

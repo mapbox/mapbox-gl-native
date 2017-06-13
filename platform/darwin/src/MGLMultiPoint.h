@@ -11,8 +11,9 @@ NS_ASSUME_NONNULL_BEGIN
  composed of multiple vertices.
 
  Create instances of `MGLPolyline` or `MGLPolygon` in order to use 
- properties of `MGLMultiPoint`. You can use the method and properties of this
- class to access information about the vertices of the line or polygon.
+ properties of `MGLMultiPoint`. Do not create instances of `MGLMultiPoint`
+ directly. You can use the method and properties of this class to access
+ information about the vertices of the line or polygon.
 
  Do not confuse `MGLMultiPoint` with `MGLPointCollection`, which represents a
  collection of related but disconnected points.
