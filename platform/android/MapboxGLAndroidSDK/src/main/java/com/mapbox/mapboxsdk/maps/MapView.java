@@ -774,7 +774,7 @@ public class MapView extends FrameLayout {
   public static final int DID_FINISH_LOADING_STYLE = 14;
 
   /**
-   * This {@link MapChange} is triggered when a source attribution changes.
+   * This {@link MapChange} is triggered when a source changes.
    * <p>
    * Register to {@link MapChange} events with {@link MapView#addOnMapChangedListener(OnMapChangedListener)}.
    * </p>
