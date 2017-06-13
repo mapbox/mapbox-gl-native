@@ -215,7 +215,6 @@ void AnnotationManager::addImage(std::unique_ptr<style::Image> image) {
     images.erase(id);
     auto inserted = images.emplace(id, style::Image(id, image->getImage().clone(),
                                                     image->getPixelRatio(), image->isSdf()));
-
     style.get().impl->addImage(std::make_unique<style::Image>(inserted.first->second));
 }
 

@@ -1,23 +1,19 @@
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/camera.hpp>
-#include <mbgl/map/view.hpp>
-#include <mbgl/map/backend.hpp>
-#include <mbgl/map/backend_scope.hpp>
 #include <mbgl/map/transform.hpp>
 #include <mbgl/map/transform_state.hpp>
 #include <mbgl/annotation/annotation_manager.hpp>
 #include <mbgl/style/style_impl.hpp>
 #include <mbgl/style/observer.hpp>
 #include <mbgl/renderer/update_parameters.hpp>
-#include <mbgl/renderer/painter.hpp>
-#include <mbgl/renderer/render_source.hpp>
-#include <mbgl/renderer/render_style.hpp>
-#include <mbgl/renderer/render_style_observer.hpp>
+#include <mbgl/renderer/renderer_frontend.hpp>
+#include <mbgl/renderer/renderer_observer.hpp>
+#include <mbgl/storage/file_source.hpp>
+#include <mbgl/storage/resource.hpp>
+#include <mbgl/storage/response.hpp>
 #include <mbgl/util/constants.hpp>
-#include <mbgl/util/exception.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/exception.hpp>
-#include <mbgl/util/async_task.hpp>
 #include <mbgl/util/mapbox.hpp>
 #include <mbgl/util/tile_coordinate.hpp>
 #include <mbgl/actor/scheduler.hpp>
@@ -29,69 +25,58 @@ namespace mbgl {
 
 using namespace style;
 
-enum class RenderState : uint8_t {
-    Never,
-    Partial,
-    Fully,
-};
-
 struct StillImageRequest {
-    StillImageRequest(View& view_, Map::StillImageCallback&& callback_)
-        : view(view_), callback(std::move(callback_)) {
+    StillImageRequest(Map::StillImageCallback&& callback_)
+        : callback(std::move(callback_)) {
     }
 
-    View& view;
     Map::StillImageCallback callback;
 };
 
 class Map::Impl : public style::Observer,
-                  public RenderStyleObserver {
+                  public RendererObserver {
 public:
     Impl(Map&,
-         Backend&,
+         RendererFrontend&,
          MapObserver&,
          float pixelRatio,
          FileSource&,
          Scheduler&,
          MapMode,
-         GLContextMode,
          ConstrainMode,
-         ViewportMode,
-         optional<std::string> programCacheDir);
+         ViewportMode);
 
+    ~Impl();
+
+    // StyleObserver
     void onSourceChanged(style::Source&) override;
     void onUpdate(Update) override;
-    void onInvalidate() override;
     void onStyleLoading() override;
     void onStyleLoaded() override;
     void onStyleError(std::exception_ptr) override;
-    void onResourceError(std::exception_ptr) override;
 
-    void render(View&);
-    void renderStill();
+    // RendererObserver
+    void onInvalidate() override;
+    void onResourceError(std::exception_ptr) override;
+    void onWillStartRenderingFrame() override;
+    void onDidFinishRenderingFrame(RenderMode, bool) override;
+    void onWillStartRenderingMap() override;
+    void onDidFinishRenderingMap() override;
 
     Map& map;
     MapObserver& observer;
-    Backend& backend;
+    RendererFrontend& rendererFrontend;
     FileSource& fileSource;
     Scheduler& scheduler;
 
-    RenderState renderState = RenderState::Never;
     Transform transform;
 
     const MapMode mode;
-    const GLContextMode contextMode;
     const float pixelRatio;
-    const optional<std::string> programCacheDir;
 
     MapDebugOptions debugOptions { MapDebugOptions::NoDebug };
 
-    Update updateFlags = Update::Nothing;
-
-    std::unique_ptr<Painter> painter;
     std::unique_ptr<Style> style;
-    std::unique_ptr<RenderStyle> renderStyle;
-
     AnnotationManager annotationManager;
 
     bool cameraMutated = false;
@@ -99,81 +84,66 @@ public:
     uint8_t prefetchZoomDelta = util::DEFAULT_PREFETCH_ZOOM_DELTA;
 
     bool loading = false;
-
-    util::AsyncTask asyncInvalidate;
+    bool rendererFullyLoaded;
     std::unique_ptr<StillImageRequest> stillImageRequest;
 };
 
-Map::Map(Backend& backend,
+Map::Map(RendererFrontend& rendererFrontend,
          MapObserver& mapObserver,
          const Size size,
          const float pixelRatio,
          FileSource& fileSource,
          Scheduler& scheduler,
          MapMode mapMode,
-         GLContextMode contextMode,
          ConstrainMode constrainMode,
-         ViewportMode viewportMode,
-         optional<std::string> programCacheDir)
+         ViewportMode viewportMode)
     : impl(std::make_unique<Impl>(*this,
-                                  backend,
+                                  rendererFrontend,
                                   mapObserver,
                                   pixelRatio,
                                   fileSource,
                                   scheduler,
                                   mapMode,
-                                  contextMode,
                                   constrainMode,
-                                  viewportMode,
-                                  programCacheDir)) {
+                                  viewportMode)) {
     impl->transform.resize(size);
 }
 
 Map::Impl::Impl(Map& map_,
-                Backend& backend_,
+                RendererFrontend& frontend,
                 MapObserver& mapObserver,
                 float pixelRatio_,
                 FileSource& fileSource_,
                 Scheduler& scheduler_,
                 MapMode mode_,
-                GLContextMode contextMode_,
                 ConstrainMode constrainMode_,
-                ViewportMode viewportMode_,
-                optional<std::string> programCacheDir_)
+                ViewportMode viewportMode_)
     : map(map_),
       observer(mapObserver),
-      backend(backend_),
+      rendererFrontend(frontend),
       fileSource(fileSource_),
       scheduler(scheduler_),
       transform(observer,
                 constrainMode_,
                 viewportMode_),
       mode(mode_),
-      contextMode(contextMode_),
       pixelRatio(pixelRatio_),
-      programCacheDir(std::move(programCacheDir_)),
       style(std::make_unique<Style>(scheduler, fileSource, pixelRatio)),
-      annotationManager(*style),
-      asyncInvalidate([this] {
-          if (mode == MapMode::Continuous) {
-              backend.invalidate();
-          } else {
-              renderStill();
-          }
-      }) {
+      annotationManager(*style) {
+
     style->impl->setObserver(this);
+    rendererFrontend.setObserver(*this);
 }
 
-Map::~Map() {
-    BackendScope guard(impl->backend);
+Map::Impl::~Impl() {
+    // Explicitly reset the RendererFrontend first to ensure it releases
+    // All shared resources (AnnotationManager)
+    rendererFrontend.reset();
+};
 
-    // Explicit resets currently necessary because these abandon resources that need to be
-    // cleaned up by context.reset();
-    impl->renderStyle.reset();
-    impl->painter.reset();
-}
+Map::~Map() = default;
 
-void Map::renderStill(View& view, StillImageCallback callback) {
+void Map::renderStill(StillImageCallback callback) {
     if (!callback) {
         Log::Error(Event::General, "StillImageCallback not set");
         return;
@@ -194,129 +164,53 @@ void Map::renderStill(View& view, StillImageCallback callback) {
         return;
     }
 
-    impl->stillImageRequest = std::make_unique<StillImageRequest>(view, std::move(callback));
+    impl->stillImageRequest = std::make_unique<StillImageRequest>(std::move(callback));
+
     impl->onUpdate(Update::Repaint);
 }
 
-void Map::Impl::renderStill() {
-    if (!stillImageRequest) {
-        return;
-    }
-
-    // TODO: determine whether we need activate/deactivate
-    BackendScope guard(backend);
-    render(stillImageRequest->view);
-}
-
 void Map::triggerRepaint() {
-    impl->backend.invalidate();
+    impl->onUpdate(Update::Repaint);
 }
 
-void Map::render(View& view) {
-    impl->render(view);
+#pragma mark - Map::Impl RendererObserver
+
+void Map::Impl::onWillStartRenderingMap() {
+    if (mode == MapMode::Continuous) {
+        observer.onWillStartRenderingMap();
+    }
 }
 
-void Map::Impl::render(View& view) {
-    TimePoint timePoint = mode == MapMode::Continuous
-        ? Clock::now()
-        : Clock::time_point::max();
-
-    transform.updateTransitions(timePoint);
-
-    if (updateFlags & Update::AnnotationData) {
-        annotationManager.updateData();
+void Map::Impl::onWillStartRenderingFrame() {
+    if (mode == MapMode::Continuous) {
+        observer.onWillStartRenderingFrame();
     }
+}
 
-    updateFlags = Update::Nothing;
-
-    gl::Context& context = backend.getContext();
-    if (!painter) {
-        renderStyle = std::make_unique<RenderStyle>(scheduler, fileSource);
-        renderStyle->setObserver(this);
-        painter = std::make_unique<Painter>(context, transform.getState(), pixelRatio, programCacheDir);
-    }
-
-    renderStyle->update({
-        mode,
-        pixelRatio,
-        debugOptions,
-        timePoint,
-        transform.getState(),
-        style->impl->getGlyphURL(),
-        style->impl->spriteLoaded,
-        style->impl->getTransitionOptions(),
-        style->impl->getLight()->impl,
-        style->impl->getImageImpls(),
-        style->impl->getSourceImpls(),
-        style->impl->getLayerImpls(),
-        scheduler,
-        fileSource,
-        annotationManager,
-        prefetchZoomDelta
-    });
-
-    bool loaded = style->impl->isLoaded() && renderStyle->isLoaded();
+void Map::Impl::onDidFinishRenderingFrame(RenderMode renderMode, bool needsRepaint) {
+    rendererFullyLoaded = renderMode == RenderMode::Full;
 
     if (mode == MapMode::Continuous) {
-        if (renderState == RenderState::Never) {
-            observer.onWillStartRenderingMap();
-        }
+        observer.onDidFinishRenderingFrame(MapObserver::RenderMode(renderMode));
 
-        observer.onWillStartRenderingFrame();
-
-        FrameData frameData { timePoint,
-                              pixelRatio,
-                              mode,
-                              contextMode,
-                              debugOptions };
-
-        backend.updateAssumedState();
-
-        painter->render(*renderStyle,
-                        frameData,
-                        view);
-
-        painter->cleanup();
-
-        observer.onDidFinishRenderingFrame(loaded
-            ? MapObserver::RenderMode::Full
-            : MapObserver::RenderMode::Partial);
-
-        if (!loaded) {
-            renderState = RenderState::Partial;
-        } else if (renderState != RenderState::Fully) {
-            renderState = RenderState::Fully;
-            observer.onDidFinishRenderingMap(MapObserver::RenderMode::Full);
-            if (loading) {
-                loading = false;
-                observer.onDidFinishLoadingMap();
-            }
-        }
-
-        // Schedule an update if we need to paint another frame due to transitions or
-        // animations that are still in progress
-        if (renderStyle->hasTransitions() || painter->needsAnimation() || transform.inTransition()) {
+        if (needsRepaint || transform.inTransition()) {
             onUpdate(Update::Repaint);
         }
-    } else if (stillImageRequest && loaded) {
-        FrameData frameData { timePoint,
-                              pixelRatio,
-                              mode,
-                              contextMode,
-                              debugOptions };
-
-        backend.updateAssumedState();
-
-        painter->render(*renderStyle,
-                        frameData,
-                        view);
-
-        auto request = std::move(stillImageRequest);
-        request->callback(nullptr);
-
-        painter->cleanup();
     }
 }
+
+void Map::Impl::onDidFinishRenderingMap() {
+    if (mode == MapMode::Continuous && loading) {
+        observer.onDidFinishRenderingMap(MapObserver::RenderMode::Full);
+        if (loading) {
+            loading = false;
+            observer.onDidFinishLoadingMap();
+        }
+    } else if (stillImageRequest) {
+        auto request = std::move(stillImageRequest);
+        request->callback(nullptr);
+    }
+};
 
 #pragma mark - Style
 
@@ -737,60 +631,6 @@ void Map::removeAnnotation(AnnotationID annotation) {
     impl->onUpdate(Update::AnnotationData);
 }
 
-#pragma mark - Feature query api
-
-std::vector<Feature> Map::queryRenderedFeatures(const ScreenCoordinate& point, const RenderedQueryOptions& options) {
-    if (!impl->renderStyle) return {};
-
-    return impl->renderStyle->queryRenderedFeatures(
-        { point },
-        impl->transform.getState(),
-        options
-    );
-}
-
-std::vector<Feature> Map::queryRenderedFeatures(const ScreenBox& box, const RenderedQueryOptions& options) {
-    if (!impl->renderStyle) return {};
-
-    return impl->renderStyle->queryRenderedFeatures(
-        {
-            box.min,
-            { box.max.x, box.min.y },
-            box.max,
-            { box.min.x, box.max.y },
-            box.min
-        },
-        impl->transform.getState(),
-        options
-    );
-}
-
-std::vector<Feature> Map::querySourceFeatures(const std::string& sourceID, const SourceQueryOptions& options) {
-    if (!impl->renderStyle) return {};
-
-    const RenderSource* source = impl->renderStyle->getRenderSource(sourceID);
-    if (!source) return {};
-
-    return source->querySourceFeatures(options);
-}
-
-AnnotationIDs Map::queryPointAnnotations(const ScreenBox& box) {
-    RenderedQueryOptions options;
-    options.layerIDs = {{ AnnotationManager::PointLayerID }};
-    auto features = queryRenderedFeatures(box, options);
-    std::set<AnnotationID> set;
-    for (auto &feature : features) {
-        assert(feature.id);
-        assert(feature.id->is<uint64_t>());
-        assert(feature.id->get<uint64_t>() <= std::numeric_limits<AnnotationID>::max());
-        set.insert(static_cast<AnnotationID>(feature.id->get<uint64_t>()));
-    }
-    AnnotationIDs ids;
-    ids.reserve(set.size());
-    std::move(set.begin(), set.end(), std::back_inserter(ids));
-    return ids;
-}
-
 #pragma mark - Toggles
 
 void Map::setDebug(MapDebugOptions debugOptions) {
@@ -826,10 +666,6 @@ MapDebugOptions Map::getDebug() const {
     return impl->debugOptions;
 }
 
-bool Map::isFullyLoaded() const {
-    return impl->style->impl->isLoaded() && impl->renderStyle && impl->renderStyle->isLoaded();
-}
-
 void Map::setPrefetchZoomDelta(uint8_t delta) {
     impl->prefetchZoomDelta = delta;
 }
@@ -838,32 +674,54 @@ uint8_t Map::getPrefetchZoomDelta() const {
     return impl->prefetchZoomDelta;
 }
 
-void Map::onLowMemory() {
-    if (impl->painter) {
-        BackendScope guard(impl->backend);
-        impl->painter->cleanup();
-    }
-    if (impl->renderStyle) {
-        impl->renderStyle->onLowMemory();
-        impl->backend.invalidate();
-    }
+bool Map::isFullyLoaded() const {
+    return impl->style->impl->isLoaded() && impl->rendererFullyLoaded;
 }
 
 void Map::Impl::onSourceChanged(style::Source& source) {
     observer.onSourceChanged(source);
 }
 
-void Map::Impl::onUpdate(Update flags) {
-    updateFlags |= flags;
-    asyncInvalidate.send();
-}
-
 void Map::Impl::onInvalidate() {
     onUpdate(Update::Repaint);
 }
 
+void Map::Impl::onUpdate(Update flags) {
+    TimePoint timePoint = mode == MapMode::Continuous ? Clock::now() : Clock::time_point::max();
+
+    transform.updateTransitions(timePoint);
+
+    if (flags & Update::AnnotationData) {
+        annotationManager.updateData();
+    }
+
+    UpdateParameters params = {
+        style->impl->isLoaded(),
+        mode,
+        pixelRatio,
+        debugOptions,
+        timePoint,
+        transform.getState(),
+        style->impl->getGlyphURL(),
+        style->impl->spriteLoaded,
+        style->impl->getTransitionOptions(),
+        style->impl->getLight()->impl,
+        style->impl->getImageImpls(),
+        style->impl->getSourceImpls(),
+        style->impl->getLayerImpls(),
+        scheduler,
+        fileSource,
+        annotationManager,
+        prefetchZoomDelta,
+        bool(stillImageRequest)
+    };
+
+    rendererFrontend.update(std::make_shared<UpdateParameters>(std::move(params)));
+}
+
 void Map::Impl::onStyleLoading() {
     loading = true;
+    rendererFullyLoaded = false;
     observer.onWillStartLoadingMap();
 }
 
@@ -894,9 +752,6 @@ void Map::Impl::onResourceError(std::exception_ptr error) {
 void Map::dumpDebugLogs() const {
     Log::Info(Event::General, "--------------------------------------------------------------------------------");
     impl->style->impl->dumpDebugLogs();
-    if (impl->renderStyle) {
-        impl->renderStyle->dumpDebugLogs();
-    }
     Log::Info(Event::General, "--------------------------------------------------------------------------------");
 }
 

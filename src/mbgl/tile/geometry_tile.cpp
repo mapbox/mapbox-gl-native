@@ -10,13 +10,13 @@
 #include <mbgl/renderer/layers/render_custom_layer.hpp>
 #include <mbgl/renderer/layers/render_symbol_layer.hpp>
 #include <mbgl/renderer/buckets/symbol_bucket.hpp>
+#include <mbgl/renderer/query.hpp>
 #include <mbgl/text/glyph_atlas.hpp>
 #include <mbgl/renderer/image_atlas.hpp>
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/geometry/feature_index.hpp>
 #include <mbgl/text/collision_tile.hpp>
 #include <mbgl/map/transform_state.hpp>
-#include <mbgl/map/query.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/style/filter_evaluator.hpp>
 #include <mbgl/util/chrono.hpp>

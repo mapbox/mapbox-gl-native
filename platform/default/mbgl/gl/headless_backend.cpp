@@ -16,7 +16,7 @@ HeadlessBackend::HeadlessBackend(std::shared_ptr<HeadlessDisplay> display_)
 }
 
 HeadlessBackend::~HeadlessBackend() {
-    BackendScope scope(*this);
+    BackendScope guard { *this, getScopeType() };
     context.reset();
 }
 
@@ -42,10 +42,6 @@ void HeadlessBackend::deactivate() {
 
 void HeadlessBackend::updateAssumedState() {
     // no-op
-}
-
-void HeadlessBackend::invalidate() {
-    assert(false);
 }
 
 } // namespace mbgl

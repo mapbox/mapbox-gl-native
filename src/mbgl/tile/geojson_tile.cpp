@@ -1,6 +1,6 @@
 #include <mbgl/tile/geojson_tile.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
-#include <mbgl/map/query.hpp>
+#include <mbgl/renderer/query.hpp>
 #include <mbgl/renderer/tile_parameters.hpp>
 
 #include <mapbox/geojsonvt.hpp>

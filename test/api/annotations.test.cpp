@@ -12,6 +12,8 @@
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/color.hpp>
+#include <mbgl/renderer/renderer.hpp>
+#include <mbgl/test/stub_renderer_frontend.hpp>
 
 using namespace mbgl;
 
@@ -33,7 +35,10 @@ public:
     OffscreenView view { backend.getContext() };
     StubFileSource fileSource;
     ThreadPool threadPool { 4 };
-    Map map { backend, MapObserver::nullObserver(), view.getSize(), 1, fileSource, threadPool, MapMode::Still };
+    float pixelRatio { 1 };
+    StubRendererFrontend rendererFrontend { std::make_unique<Renderer>(backend, pixelRatio, fileSource, threadPool), view };
+    Map map { rendererFrontend, MapObserver::nullObserver(), view.getSize(), pixelRatio, fileSource,
+              threadPool, MapMode::Still };
 
     void checkRendering(const char * name) {
         test::checkImage(std::string("test/fixtures/annotations/") + name,
@@ -346,12 +351,12 @@ TEST(Annotations, QueryRenderedFeatures) {
 
     test::render(test.map, test.view);
 
-    auto features = test.map.queryRenderedFeatures(test.map.pixelForLatLng({ 0, 0 }));
+    auto features = test.rendererFrontend.getRenderer()->queryRenderedFeatures(test.map.pixelForLatLng({ 0, 0 }));
     EXPECT_EQ(features.size(), 1u);
     EXPECT_TRUE(!!features[0].id);
     EXPECT_EQ(*features[0].id, uint64_t(0));
 
-    auto features2 = test.map.queryRenderedFeatures(test.map.pixelForLatLng({ 50, 0 }));
+    auto features2 = test.rendererFrontend.getRenderer()->queryRenderedFeatures(test.map.pixelForLatLng({ 50, 0 }));
     EXPECT_EQ(features2.size(), 1u);
     EXPECT_TRUE(!!features2[0].id);
     EXPECT_EQ(*features2[0].id, uint64_t(1));
@@ -377,7 +382,7 @@ TEST(Annotations, QueryFractionalZoomLevels) {
     for (uint16_t zoomSteps = 10; zoomSteps <= 20; ++zoomSteps) {
         test.map.setZoom(zoomSteps / 10.0);
         test::render(test.map, test.view);
-        auto features = test.map.queryRenderedFeatures(box);
+        auto features = test.rendererFrontend.getRenderer()->queryRenderedFeatures(box);
 
         // Filter out repeated features.
         // See 'edge-cases/null-island' query-test for reference.
@@ -410,7 +415,7 @@ TEST(Annotations, VisibleFeatures) {
     test.map.setBearing(45);
     test::render(test.map, test.view);
 
-    auto features = test.map.queryRenderedFeatures(box, {});
+    auto features = test.rendererFrontend.getRenderer()->queryRenderedFeatures(box, {});
     auto sortID = [](const Feature& lhs, const Feature& rhs) { return lhs.id < rhs.id; };
     auto sameID = [](const Feature& lhs, const Feature& rhs) { return lhs.id == rhs.id; };
     std::sort(features.begin(), features.end(), sortID);
@@ -420,7 +425,7 @@ TEST(Annotations, VisibleFeatures) {
     test.map.setBearing(0);
     test.map.setZoom(4);
     test::render(test.map, test.view);
-    features = test.map.queryRenderedFeatures(box);
+    features = test.rendererFrontend.getRenderer()->queryRenderedFeatures(box);
     std::sort(features.begin(), features.end(), sortID);
     features.erase(std::unique(features.begin(), features.end(), sameID), features.end());
     EXPECT_EQ(features.size(), ids.size());

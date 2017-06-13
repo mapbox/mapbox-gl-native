@@ -7,9 +7,11 @@
 #include <mbgl/gl/offscreen_view.hpp>
 #include <mbgl/util/default_thread_pool.hpp>
 #include <mbgl/storage/default_file_source.hpp>
+#include <mbgl/renderer/renderer.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/layers/custom_layer.hpp>
 #include <mbgl/style/layers/fill_layer.hpp>
+#include <mbgl/test/stub_renderer_frontend.hpp>
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/mat4.hpp>
 #include <mbgl/util/run_loop.hpp>
@@ -92,8 +94,10 @@ TEST(CustomLayer, Basic) {
     OffscreenView view { backend.getContext() };
     DefaultFileSource fileSource(":memory:", "test/fixtures/api/assets");
     ThreadPool threadPool(4);
-
-    Map map(backend, MapObserver::nullObserver(), view.getSize(), 1, fileSource, threadPool, MapMode::Still);
+    float pixelRatio { 1 };
+    StubRendererFrontend rendererFrontend { std::make_unique<Renderer>(backend, pixelRatio, fileSource, threadPool), view };
+    Map map(rendererFrontend, MapObserver::nullObserver(), view.getSize(), pixelRatio, fileSource,
+            threadPool, MapMode::Still);
     map.getStyle().loadJSON(util::read_file("test/fixtures/api/water.json"));
     map.setLatLngZoom({ 37.8, -122.5 }, 10);
     map.getStyle().addLayer(std::make_unique<CustomLayer>(
@@ -114,4 +118,5 @@ TEST(CustomLayer, Basic) {
     map.getStyle().addLayer(std::move(layer));
 
     test::checkImage("test/fixtures/custom_layer/basic", test::render(map, view), 0.0006, 0.1);
+
 }
