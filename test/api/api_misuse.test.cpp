@@ -29,7 +29,7 @@ TEST(API, RenderWithoutCallback) {
     ThreadPool threadPool(4);
 
     std::unique_ptr<Map> map =
-        std::make_unique<Map>(backend, view.getSize(), 1, fileSource, threadPool, MapMode::Still);
+        std::make_unique<Map>(backend, MapObserver::nullObserver(), view.getSize(), 1, fileSource, threadPool, MapMode::Still);
     map->renderStill(view, nullptr);
 
     // Force Map thread to join.

@@ -88,7 +88,7 @@ int main(int argc, char *argv[]) {
     OffscreenView view(backend.getContext(), { static_cast<uint32_t>(width * pixelRatio),
                                                static_cast<uint32_t>(height * pixelRatio) });
     ThreadPool threadPool(4);
-    Map map(backend, mbgl::Size { width, height }, pixelRatio, fileSource, threadPool, MapMode::Still);
+    Map map(backend, MapObserver::nullObserver(), mbgl::Size { width, height }, pixelRatio, fileSource, threadPool, MapMode::Still);
 
     if (style_path.find("://") == std::string::npos) {
         style_path = std::string("file://") + style_path;

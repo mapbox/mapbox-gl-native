@@ -1,6 +1,6 @@
 #pragma once
 
-#include <mbgl/map/map_observer.hpp>
+#include <mbgl/map/view.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/size.hpp>
 
@@ -17,7 +17,7 @@ using FramebufferID = uint32_t;
 
 class BackendScope;
 
-class Backend : public MapObserver {
+class Backend {
 public:
     Backend();
     virtual ~Backend();
