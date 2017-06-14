@@ -1,5 +1,4 @@
 #include <mbgl/style/layers/custom_layer_impl.hpp>
-#include <mbgl/map/transform_state.hpp>
 
 namespace mbgl {
 namespace style {
@@ -21,34 +20,6 @@ bool CustomLayer::Impl::hasLayoutDifference(const Layer::Impl&) const {
 }
 
 void CustomLayer::Impl::stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>&) const {
-}
-
-void CustomLayer::Impl::initialize() const {
-    assert(initializeFn);
-    initializeFn(context);
-}
-
-void CustomLayer::Impl::deinitialize() const {
-    if (deinitializeFn) {
-        deinitializeFn(context);
-    }
-}
-
-void CustomLayer::Impl::render(const TransformState& state) const {
-    assert(renderFn);
-
-    CustomLayerRenderParameters parameters;
-
-    parameters.width = state.getSize().width;
-    parameters.height = state.getSize().height;
-    parameters.latitude = state.getLatLng().latitude();
-    parameters.longitude = state.getLatLng().longitude();
-    parameters.zoom = state.getZoom();
-    parameters.bearing = -state.getAngle() * util::RAD2DEG;
-    parameters.pitch = state.getPitch();
-    parameters.fieldOfView = state.getFieldOfView();
-
-    renderFn(context, parameters);
 }
 
 } // namespace style

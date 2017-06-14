@@ -904,20 +904,14 @@ Layer* Map::getLayer(const std::string& layerID) {
 
 void Map::addLayer(std::unique_ptr<Layer> layer, const optional<std::string>& before) {
     impl->styleMutated = true;
-    BackendScope guard(impl->backend);
-
     impl->style->addLayer(std::move(layer), before);
     impl->onUpdate(Update::Repaint);
 }
 
 std::unique_ptr<Layer> Map::removeLayer(const std::string& id) {
     impl->styleMutated = true;
-    BackendScope guard(impl->backend);
-
-    auto removedLayer = impl->style->removeLayer(id);
     impl->onUpdate(Update::Repaint);
-
-    return removedLayer;
+    return impl->style->removeLayer(id);
 }
 
 void Map::addImage(std::unique_ptr<style::Image> image) {

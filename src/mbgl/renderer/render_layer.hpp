@@ -19,10 +19,6 @@ class PaintParameters;
 class RenderSource;
 class RenderTile;
 
-namespace gl {
-class Context;
-}   // namespace gl
-
 class RenderLayer {
 protected:
     RenderLayer(style::LayerType, Immutable<style::Layer::Impl>);

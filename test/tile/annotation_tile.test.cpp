@@ -14,6 +14,8 @@
 #include <mbgl/annotation/annotation_tile.hpp>
 #include <mbgl/renderer/image_manager.hpp>
 #include <mbgl/text/glyph_manager.hpp>
+#include <mbgl/map/backend_scope.hpp>
+#include <mbgl/gl/headless_backend.hpp>
 
 #include <memory>
 
@@ -26,6 +28,8 @@ public:
     util::RunLoop loop;
     ThreadPool threadPool { 1 };
     AnnotationManager annotationManager;
+    HeadlessBackend backend { test::sharedDisplay() };
+    BackendScope scope { backend };
     RenderStyle style { threadPool, fileSource };
     ImageManager imageManager;
     GlyphManager glyphManager { fileSource };

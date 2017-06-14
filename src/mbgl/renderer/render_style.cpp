@@ -23,6 +23,7 @@
 #include <mbgl/sprite/sprite_loader.hpp>
 #include <mbgl/text/glyph_manager.hpp>
 #include <mbgl/geometry/line_atlas.hpp>
+#include <mbgl/map/backend_scope.hpp>
 #include <mbgl/map/query.hpp>
 #include <mbgl/tile/tile.hpp>
 #include <mbgl/util/math.hpp>
@@ -48,7 +49,9 @@ RenderStyle::RenderStyle(Scheduler& scheduler_, FileSource& fileSource_)
     glyphManager->setObserver(this);
 }
 
-RenderStyle::~RenderStyle() = default;
+RenderStyle::~RenderStyle() {
+    assert(BackendScope::exists()); // Required for custom layers.
+}
 
 void RenderStyle::setObserver(RenderStyleObserver* observer_) {
     observer = observer_;
@@ -78,6 +81,8 @@ const RenderLight& RenderStyle::getRenderLight() const {
 }
 
 void RenderStyle::update(const UpdateParameters& parameters) {
+    assert(BackendScope::exists()); // Required for custom layers.
+
     const bool zoomChanged = zoomHistory.update(parameters.transformState.getZoom(), parameters.timePoint);
 
     const TransitionParameters transitionParameters {

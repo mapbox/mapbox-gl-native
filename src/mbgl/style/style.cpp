@@ -2,11 +2,8 @@
 #include <mbgl/style/observer.hpp>
 #include <mbgl/style/source_impl.hpp>
 #include <mbgl/style/layers/symbol_layer.hpp>
-#include <mbgl/style/layers/symbol_layer_impl.hpp>
 #include <mbgl/style/layers/custom_layer.hpp>
-#include <mbgl/style/layers/custom_layer_impl.hpp>
 #include <mbgl/style/layers/background_layer.hpp>
-#include <mbgl/style/layers/background_layer_impl.hpp>
 #include <mbgl/style/layers/fill_layer.hpp>
 #include <mbgl/style/layers/fill_extrusion_layer.hpp>
 #include <mbgl/style/layers/line_layer.hpp>
@@ -35,13 +32,7 @@ Style::Style(Scheduler& scheduler_, FileSource& fileSource_, float pixelRatio)
     light->setObserver(this);
 }
 
-Style::~Style() {
-    for (const auto& layer : layers) {
-        if (auto* customLayer = layer->as<CustomLayer>()) {
-            customLayer->impl().deinitialize();
-        }
-    }
-}
+Style::~Style() = default;
 
 void Style::setTransitionOptions(const TransitionOptions& options) {
     transitionOptions = options;
@@ -153,10 +144,6 @@ Layer* Style::addLayer(std::unique_ptr<Layer> layer, optional<std::string> befor
         throw std::runtime_error(std::string{"Layer "} + layer->getID() + " already exists");
     }
 
-    if (auto* customLayer = layer->as<CustomLayer>()) {
-        customLayer->impl().initialize();
-    }
-
     layer->setObserver(this);
 
     return layers.add(std::move(layer), before);
@@ -167,10 +154,6 @@ std::unique_ptr<Layer> Style::removeLayer(const std::string& id) {
 
     if (layer) {
         layer->setObserver(nullptr);
-
-        if (auto* customLayer = layer->as<CustomLayer>()) {
-            customLayer->impl().deinitialize();
-        }
     }
 
     return layer;

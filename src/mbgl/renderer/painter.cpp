@@ -292,21 +292,6 @@ void Painter::renderPass(PaintParameters& parameters,
         if (layer.is<RenderBackgroundLayer>()) {
             MBGL_DEBUG_GROUP(context, "background");
             renderBackground(parameters, *layer.as<RenderBackgroundLayer>());
-        } else if (layer.is<RenderCustomLayer>()) {
-            MBGL_DEBUG_GROUP(context, layer.baseImpl->id + " - custom");
-
-            // Reset GL state to a known state so the CustomLayer always has a clean slate.
-            context.vertexArrayObject = 0;
-            context.setDepthMode(depthModeForSublayer(0, gl::DepthMode::ReadOnly));
-            context.setStencilMode(gl::StencilMode::disabled());
-            context.setColorMode(colorModeForRenderPass());
-
-            layer.as<RenderCustomLayer>()->impl().render(state);
-
-            // Reset the view back to our original one, just in case the CustomLayer changed
-            // the viewport or Framebuffer.
-            parameters.view.bind();
-            context.setDirtyState();
         } else if (layer.is<RenderFillExtrusionLayer>()) {
             const auto size = context.viewport.getCurrentValue().size;
 
