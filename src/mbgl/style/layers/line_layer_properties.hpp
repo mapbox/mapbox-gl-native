@@ -51,7 +51,7 @@ struct LineWidth : PaintProperty<float> {
     static float defaultValue() { return 1; }
 };
 
-struct LineGapWidth : DataDrivenPaintProperty<float, attributes::a_gap_width, uniforms::u_gap_width> {
+struct LineGapWidth : DataDrivenPaintProperty<float, attributes::a_gapwidth, uniforms::u_gapwidth> {
     static float defaultValue() { return 0; }
 };
 

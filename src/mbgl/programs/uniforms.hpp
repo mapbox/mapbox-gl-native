@@ -27,7 +27,7 @@ MBGL_DEFINE_UNIFORM_SCALAR(float, u_halo_blur);
 MBGL_DEFINE_UNIFORM_SCALAR(Color, u_outline_color);
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_height);
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_base);
-MBGL_DEFINE_UNIFORM_SCALAR(float, u_gap_width);
+MBGL_DEFINE_UNIFORM_SCALAR(float, u_gapwidth);
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_offset);
 MBGL_DEFINE_UNIFORM_SCALAR(Size, u_world);
 
