@@ -9,8 +9,6 @@ const char* symbol_sdf::name = "symbol_sdf";
 const char* symbol_sdf::vertexSource = R"MBGL_SHADER(
 const float PI = 3.141592653589793;
 
-// NOTE: the a_data attribute in this shader is manually bound (see https://github.com/mapbox/mapbox-gl-js/issues/4607).
-// If removing or renaming a_data, revisit the manual binding in painter.js accordingly.
 attribute vec4 a_pos_offset;
 attribute vec2 a_label_pos;
 attribute vec4 a_data;
@@ -31,7 +29,7 @@ uniform highp float u_size; // used when size is both zoom and feature constant
 uniform highp float u_layout_size; // used when size is feature constant
 
 
-#ifdef HAS_UNIFORM_u_fill_color
+#ifndef HAS_UNIFORM_u_fill_color
 uniform lowp float a_fill_color_t;
 attribute highp vec4 a_fill_color;
 varying highp vec4 fill_color;
@@ -40,7 +38,7 @@ uniform highp vec4 u_fill_color;
 #endif
 
 
-#ifdef HAS_UNIFORM_u_halo_color
+#ifndef HAS_UNIFORM_u_halo_color
 uniform lowp float a_halo_color_t;
 attribute highp vec4 a_halo_color;
 varying highp vec4 halo_color;
@@ -49,7 +47,7 @@ uniform highp vec4 u_halo_color;
 #endif
 
 
-#ifdef HAS_UNIFORM_u_opacity
+#ifndef HAS_UNIFORM_u_opacity
 uniform lowp float a_opacity_t;
 attribute lowp vec2 a_opacity;
 varying lowp float opacity;
@@ -58,7 +56,7 @@ uniform lowp float u_opacity;
 #endif
 
 
-#ifdef HAS_UNIFORM_u_halo_width
+#ifndef HAS_UNIFORM_u_halo_width
 uniform lowp float a_halo_width_t;
 attribute lowp vec2 a_halo_width;
 varying lowp float halo_width;
@@ -67,7 +65,7 @@ uniform lowp float u_halo_width;
 #endif
 
 
-#ifdef HAS_UNIFORM_u_halo_blur
+#ifndef HAS_UNIFORM_u_halo_blur
 uniform lowp float a_halo_blur_t;
 attribute lowp vec2 a_halo_blur;
 varying lowp float halo_blur;

@@ -31,6 +31,7 @@ varying lowp float opacity;
 uniform lowp float u_opacity;
 #endif
 
+
 // matrix is for the vertex position.
 uniform mat4 u_matrix;
 
@@ -45,12 +46,13 @@ varying vec2 v_tex;
 varying vec2 v_fade_tex;
 
 void main() {
-
+    
 #ifndef HAS_UNIFORM_u_opacity
     opacity = unpack_mix_vec2(a_opacity, a_opacity_t);
 #else
     lowp float opacity = u_opacity;
 #endif
+
 
     vec2 a_pos = a_pos_offset.xy;
     vec2 a_offset = a_pos_offset.zw;
@@ -110,7 +112,7 @@ void main() {
     highp float incidence_stretch  = camera_to_anchor_distance / (u_camera_to_center_distance * cos(u_pitch));
     highp float collision_adjustment = max(1.0, incidence_stretch / u_collision_y_stretch);
 
-    highp float perspective_zoom_adjust = log2(perspective_ratio * collision_adjustment) * 10.0;
+    highp float perspective_zoom_adjust = floor(log2(perspective_ratio * collision_adjustment) * 10.0);
     v_fade_tex = vec2((a_labelminzoom + perspective_zoom_adjust) / 255.0, 0.0);
 }
 
@@ -126,14 +128,16 @@ varying lowp float opacity;
 uniform lowp float u_opacity;
 #endif
 
+
 varying vec2 v_tex;
 varying vec2 v_fade_tex;
 
 void main() {
-
+    
 #ifdef HAS_UNIFORM_u_opacity
     lowp float opacity = u_opacity;
 #endif
+
 
     lowp float alpha = texture2D(u_fadetexture, v_fade_tex).a * opacity;
     gl_FragColor = texture2D(u_texture, v_tex) * alpha;

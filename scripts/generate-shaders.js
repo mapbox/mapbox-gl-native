@@ -86,7 +86,7 @@ uniform ${precision} ${type} u_${name};
         const a_type = type === "float" ? "vec2" : "vec4";
         if (fragmentPragmas.has(name)) {
             return operation === "define" ? `
-#ifdef HAS_UNIFORM_u_${name}
+#ifndef HAS_UNIFORM_u_${name}
 uniform lowp float a_${name}_t;
 attribute ${precision} ${a_type} a_${name};
 varying ${precision} ${type} ${name};
@@ -102,7 +102,7 @@ uniform ${precision} ${type} u_${name};
 `;
         } else {
             return operation === "define" ? `
-#ifdef HAS_UNIFORM_u_${name}
+#ifndef HAS_UNIFORM_u_${name}
 uniform lowp float a_${name}_t;
 attribute ${precision} ${a_type} a_${name};
 #else
