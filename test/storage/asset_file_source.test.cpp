@@ -2,9 +2,11 @@
 #include <mbgl/util/platform.hpp>
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/run_loop.hpp>
-#include <mbgl/util/thread.hpp>
+#include <mbgl/util/threaded_object.hpp>
+#include <mbgl/actor/actor_ref.hpp>
 
 #include <gtest/gtest.h>
+#include <atomic>
 
 using namespace mbgl;
 
@@ -20,16 +22,11 @@ TEST(AssetFileSource, Load) {
 #else
     unsigned numThreads = 50;
 #endif
-
-    auto callback = [&] {
-        if (!--numThreads) {
-            loop.stop();
-        }
-    };
+    std::atomic_uint completed(numThreads);
 
     class TestWorker {
     public:
-        TestWorker(mbgl::AssetFileSource* fs_) : fs(fs_) {}
+        TestWorker(ActorRef<TestWorker>, mbgl::AssetFileSource* fs_) : fs(fs_) {}
 
         void run(std::function<void()> endCallback) {
             const std::string asset("asset://nonempty");
@@ -59,17 +56,13 @@ TEST(AssetFileSource, Load) {
         std::function<void(mbgl::Response)> requestCallback;
     };
 
-    std::vector<std::unique_ptr<util::Thread<TestWorker>>> threads;
-    std::vector<std::unique_ptr<mbgl::AsyncRequest>> requests;
-    util::ThreadContext context = { "Test" };
+    std::vector<std::unique_ptr<util::ThreadedObject<TestWorker>>> threads;
 
     for (unsigned i = 0; i < numThreads; ++i) {
-        std::unique_ptr<util::Thread<TestWorker>> thread =
-            std::make_unique<util::Thread<TestWorker>>(context, &fs);
+        std::unique_ptr<util::ThreadedObject<TestWorker>> thread =
+            std::make_unique<util::ThreadedObject<TestWorker>>("Test", &fs);
 
-        requests.push_back(
-            thread->invokeWithCallback(&TestWorker::run, callback));
-
+        thread->actor().invoke(&TestWorker::run, [&] { if (!--completed) loop.stop(); });
         threads.push_back(std::move(thread));
     }
 
