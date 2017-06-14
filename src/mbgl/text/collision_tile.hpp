@@ -5,6 +5,7 @@
 #include <mbgl/tile/geometry_tile_data.hpp>
 
 #pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmisleading-indentation"
 #pragma GCC diagnostic ignored "-Wunused-function"
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 #pragma GCC diagnostic ignored "-Wunused-variable"
