@@ -518,7 +518,7 @@ TEST(Source, ImageSourceImageUpdate) {
         response.data = std::make_unique<std::string>(util::read_file("test/fixtures/image/no_profile.png"));
         return response;
     };
-    test.styleObserver.sourceLoaded = [&] (Source&) {
+    test.styleObserver.sourceChanged = [&] (Source&) {
         // Should be called (test will hang if it doesn't)
         test.end();
     };

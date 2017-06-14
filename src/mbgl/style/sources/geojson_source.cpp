@@ -33,6 +33,7 @@ void GeoJSONSource::setURL(const std::string& url_) {
 void GeoJSONSource::setGeoJSON(const mapbox::geojson::geojson& geoJSON) {
     req.reset();
     baseImpl = makeMutable<Impl>(impl(), geoJSON);
+    observer->onSourceChanged(*this);
 }
 
 optional<std::string> GeoJSONSource::getURL() const {
