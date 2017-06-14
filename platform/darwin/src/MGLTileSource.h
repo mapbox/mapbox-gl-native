@@ -140,9 +140,9 @@ typedef NS_ENUM(NSUInteger, MGLTileCoordinateSystem) {
  Mapbox-hosted tile set, view it in
  <a href="https://www.mapbox.com/studio/tilesets/">Mapbox Studio’s Tilesets editor</a>.
 
- Do not create instances of this class directly, and do not create your own
- subclasses of this class. Instead, create instances of `MGLRasterSource` and
- `MGLVectorSource`.
+ Create instances of `MGLRasterSource` and `MGLVectorSource` in order to use
+ `MGLTileSource`'s properties and methods. Do not create instances of `MGLTileSource`
+ directly, and do not create your own subclasses of this class.
  */
 MGL_EXPORT
 @interface MGLTileSource : MGLSource
