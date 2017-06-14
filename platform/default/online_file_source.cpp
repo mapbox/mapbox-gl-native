@@ -6,7 +6,6 @@
 #include <mbgl/util/logging.hpp>
 
 #include <mbgl/util/constants.hpp>
-#include <mbgl/util/thread.hpp>
 #include <mbgl/util/mapbox.hpp>
 #include <mbgl/util/exception.hpp>
 #include <mbgl/util/chrono.hpp>
