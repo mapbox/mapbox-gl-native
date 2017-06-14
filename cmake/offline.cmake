@@ -4,7 +4,6 @@ add_executable(mbgl-offline
 
 target_sources(mbgl-offline
     PRIVATE platform/default/mbgl/util/default_styles.hpp
-    PRIVATE platform/default/mbgl/util/default_styles.cpp
 )
 
 target_compile_options(mbgl-offline
