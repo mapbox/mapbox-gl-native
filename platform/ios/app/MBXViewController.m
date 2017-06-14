@@ -112,7 +112,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
 
 
 @property (nonatomic) IBOutlet MGLMapView *mapView;
-@property (weak, nonatomic) IBOutlet UILabel *hudLabel;
+@property (weak, nonatomic) IBOutlet UIButton *hudLabel;
 @property (nonatomic) NSInteger styleIndex;
 @property (nonatomic) BOOL debugLoggingEnabled;
 @property (nonatomic) BOOL customUserLocationAnnnotationEnabled;
@@ -161,6 +161,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     self.debugLoggingEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:@"MGLMapboxMetricsDebugLoggingEnabled"];
     self.mapView.scaleBar.hidden = NO;
     self.hudLabel.hidden = YES;
+    self.hudLabel.titleLabel.font = [UIFont monospacedDigitSystemFontOfSize:10 weight:UIFontWeightRegular];
 
     if ([MGLAccountManager accessToken].length)
     {
@@ -350,7 +351,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
             [settingsTitles addObjectsFromArray:@[
                 [NSString stringWithFormat:@"%@ Reuse Queue Stats", (_reuseQueueStatsEnabled ? @"Hide" :@"Show")],
                 @"Start World Tour",
-                [NSString stringWithFormat:@"%@ Zoom Level", (_showZoomLevelEnabled ? @"Hide" :@"Show")],
+                [NSString stringWithFormat:@"%@ Zoom/Pitch/Direction Label", (_showZoomLevelEnabled ? @"Hide" :@"Show")],
                 @"Embedded Map View",
                 [NSString stringWithFormat:@"%@ Second Map", ([self.view viewWithTag:2] == nil ? @"Show" : @"Hide")],
                 [NSString stringWithFormat:@"Show Labels in %@", (_usingLocaleBasedCountryLabels ? @"Default Language" : [[NSLocale currentLocale] displayNameForKey:NSLocaleIdentifier value:[self bestLanguageForUser]])],
@@ -538,6 +539,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                     self.reuseQueueStatsEnabled = !self.reuseQueueStatsEnabled;
                     self.hudLabel.hidden = !self.reuseQueueStatsEnabled;
                     self.showZoomLevelEnabled = NO;
+                    [self updateHUD];
                     break;
                 }
                 case MBXSettingsMiscellaneousShowZoomLevel:
@@ -545,6 +547,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                     self.showZoomLevelEnabled = !self.showZoomLevelEnabled;
                     self.hudLabel.hidden = !self.showZoomLevelEnabled;
                     self.reuseQueueStatsEnabled = NO;
+                    [self updateHUD];
                     break;
                 }
                 case MBXSettingsMiscellaneousScrollView:
@@ -1791,22 +1794,33 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
 
 - (void)mapViewRegionIsChanging:(MGLMapView *)mapView
 {
-    if (self.reuseQueueStatsEnabled) {
-        NSUInteger queuedAnnotations = 0;
-        for (NSArray *queue in self.mapView.annotationViewReuseQueueByIdentifier.allValues)
-        {
-            queuedAnnotations += queue.count;
-        }
-        self.hudLabel.text = [NSString stringWithFormat:@" Visible: %ld  Queued: %ld", (unsigned long)mapView.visibleAnnotations.count, (unsigned long)queuedAnnotations];
-    } else if (self.showZoomLevelEnabled) {
-        self.hudLabel.text = [NSString stringWithFormat:@" Zoom: %.2f", self.mapView.zoomLevel];
-    }
+    [self updateHUD];
 }
 
 - (void)mapView:(MGLMapView *)mapView regionDidChangeAnimated:(BOOL)animated {
-    if (self.showZoomLevelEnabled) {
-        self.hudLabel.text = [NSString stringWithFormat:@" Zoom: %.2f", self.mapView.zoomLevel];
+    [self updateHUD];
+}
+
+- (void)mapView:(MGLMapView *)mapView didUpdateUserLocation:(MGLUserLocation *)userLocation {
+    [self updateHUD];
+}
+
+- (void)updateHUD {
+    if (!self.reuseQueueStatsEnabled && !self.showZoomLevelEnabled) return;
+
+    NSString *hudString;
+
+    if (self.reuseQueueStatsEnabled) {
+        NSUInteger queuedAnnotations = 0;
+        for (NSArray *queue in self.mapView.annotationViewReuseQueueByIdentifier.allValues) {
+            queuedAnnotations += queue.count;
+        }
+        hudString = [NSString stringWithFormat:@"Visible: %ld  Queued: %ld", (unsigned long)self.mapView.visibleAnnotations.count, (unsigned long)queuedAnnotations];
+    } else if (self.showZoomLevelEnabled) {
+        hudString = [NSString stringWithFormat:@"%.2f ∕ ↕\U0000FE0E%.f° ∕ %.f°", self.mapView.zoomLevel, self.mapView.camera.pitch, self.mapView.direction];
     }
+
+    [self.hudLabel setTitle:hudString forState:UIControlStateNormal];
 }
 
 @end

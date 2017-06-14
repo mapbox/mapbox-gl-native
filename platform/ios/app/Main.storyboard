@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="11762" systemVersion="16D32" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="PSe-Ot-7Ff">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="12121" systemVersion="16G8c" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="PSe-Ot-7Ff">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11757"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12089"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
         <capability name="Constraints with non-1.0 multipliers" minToolsVersion="5.1"/>
         <capability name="Navigation items with more than one left or right bar item" minToolsVersion="7.0"/>
@@ -33,17 +33,24 @@
                                     <outletCollection property="gestureRecognizers" destination="lfd-mn-7en" appends="YES" id="0PH-gH-GRm"/>
                                 </connections>
                             </view>
-                            <label opaque="NO" userInteractionEnabled="NO" alpha="0.69999999999999996" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="58y-pX-YyB">
-                                <rect key="frame" x="179" y="626" width="180" height="21"/>
+                            <button opaque="NO" userInteractionEnabled="NO" alpha="0.69999999999999996" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="tailTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="58y-pX-YyB">
+                                <rect key="frame" x="319" y="606" width="40" height="21"/>
                                 <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                <accessibility key="accessibilityConfiguration">
+                                    <accessibilityTraits key="traits" button="YES" notEnabled="YES"/>
+                                </accessibility>
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="180" id="OL2-l5-I2f"/>
-                                    <constraint firstAttribute="height" constant="21" id="xHg-ye-wzT"/>
+                                    <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="40" id="OL2-l5-I2f"/>
+                                    <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="20" id="xHg-ye-wzT"/>
                                 </constraints>
-                                <fontDescription key="fontDescription" type="system" pointSize="8"/>
-                                <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                <nil key="highlightedColor"/>
-                            </label>
+                                <fontDescription key="fontDescription" type="system" pointSize="10"/>
+                                <inset key="contentEdgeInsets" minX="4" minY="2" maxX="4" maxY="2"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                                        <integer key="value" value="2"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
@@ -51,7 +58,8 @@
                             <constraint firstItem="kNe-zV-9ha" firstAttribute="bottom" secondItem="m8o-i7-QIy" secondAttribute="top" id="Etp-BC-E1N"/>
                             <constraint firstAttribute="trailing" secondItem="kNe-zV-9ha" secondAttribute="trailing" id="MGr-8G-VEb"/>
                             <constraint firstItem="58y-pX-YyB" firstAttribute="trailing" secondItem="Z9X-fc-PUC" secondAttribute="trailingMargin" id="O3a-bR-boI"/>
-                            <constraint firstItem="m8o-i7-QIy" firstAttribute="top" secondItem="58y-pX-YyB" secondAttribute="bottom" constant="20" id="cjh-ZS-Mv4"/>
+                            <constraint firstItem="58y-pX-YyB" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="Z9X-fc-PUC" secondAttribute="leadingMargin" id="ceH-yz-ewY"/>
+                            <constraint firstItem="m8o-i7-QIy" firstAttribute="top" secondItem="58y-pX-YyB" secondAttribute="bottom" constant="40" id="cjh-ZS-Mv4"/>
                             <constraint firstItem="kNe-zV-9ha" firstAttribute="top" secondItem="Z9X-fc-PUC" secondAttribute="top" id="qMm-e9-jxH"/>
                         </constraints>
                     </view>
@@ -66,7 +74,7 @@
                             </connections>
                         </barButtonItem>
                         <button key="titleView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="KsN-ny-Hou">
-                            <rect key="frame" x="61" y="7" width="207" height="30"/>
+                            <rect key="frame" x="65" y="5.5" width="203" height="33"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <fontDescription key="fontDescription" type="system" weight="medium" pointSize="17"/>
                             <state key="normal" title="Streets"/>
@@ -94,7 +102,7 @@
                         </rightBarButtonItems>
                     </navigationItem>
                     <connections>
-                        <outlet property="hudLabel" destination="58y-pX-YyB" id="MEh-ir-3IH"/>
+                        <outlet property="hudLabel" destination="58y-pX-YyB" id="aGG-7a-bZR"/>
                         <outlet property="mapView" destination="kNe-zV-9ha" id="VNR-WO-1q4"/>
                     </connections>
                 </viewController>
