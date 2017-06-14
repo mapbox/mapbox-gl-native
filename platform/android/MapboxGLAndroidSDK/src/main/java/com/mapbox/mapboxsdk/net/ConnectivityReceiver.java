@@ -24,7 +24,10 @@ public class ConnectivityReceiver extends BroadcastReceiver {
   private static ConnectivityReceiver INSTANCE;
 
   /**
-   * Get or create the singleton instance
+   * Get a single instance of ConnectivityReceiver.
+   *
+   * @param context the context to extract the application context from
+   * @return single instance of ConnectivityReceiver
    */
   public static synchronized ConnectivityReceiver instance(Context context) {
     if (INSTANCE == null) {
@@ -74,7 +77,7 @@ public class ConnectivityReceiver extends BroadcastReceiver {
   }
 
   /**
-   * @see BroadcastReceiver#onReceive(Context, Intent)
+   * {@inheritDoc}
    */
   @Override
   public void onReceive(Context context, Intent intent) {
