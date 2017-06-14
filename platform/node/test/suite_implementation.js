@@ -80,6 +80,11 @@ module.exports = function (style, options, callback) {
             });
 
             applyOperations(operations.slice(1), callback);
+
+        } else if (operation[0] === 'setStyle') {
+            map.load(operation[1]);
+            applyOperations(operations.slice(1), callback);
+
         } else {
             // Ensure that the next `map.render(options)` does not overwrite this change.
             if (operation[0] === 'setCenter') {
