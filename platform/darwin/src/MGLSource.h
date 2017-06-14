@@ -19,7 +19,7 @@ NS_ASSUME_NONNULL_BEGIN
  Create instances of `MGLShapeSource` and the concrete subclasses of
  `MGLTileSource`, `MGLVectorSource` and `MGLRasterSource` in order to use
  `MGLMultiPoint`'s properties and methods. Do not create instances of `MGLSource`
- directly.
+ directly, and do not create your own subclasses of this class.
  */
 MGL_EXPORT
 @interface MGLSource : NSObject

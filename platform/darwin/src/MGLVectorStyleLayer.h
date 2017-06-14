@@ -11,7 +11,8 @@ NS_ASSUME_NONNULL_BEGIN
 
  Create instances of `MGLCircleStyleLayer`, `MGLFillStyleLayer`, `MGLLineStyleLayer`,
  and `MGLSymbolStyleLayer` in order to use `MGLVectorStyleLayer`'s properties and
- methods. Do not create instances of `MGLVectorStyleLayer` directly.
+ methods. Do not create instances of `MGLVectorStyleLayer` directly, and do not
+ create your own subclasses of this class.
  */
 MGL_EXPORT
 @interface MGLVectorStyleLayer : MGLForegroundStyleLayer
