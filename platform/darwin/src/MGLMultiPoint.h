@@ -12,8 +12,9 @@ NS_ASSUME_NONNULL_BEGIN
 
  Create instances of `MGLPolyline` or `MGLPolygon` in order to use 
  properties of `MGLMultiPoint`. Do not create instances of `MGLMultiPoint`
- directly. You can use the method and properties of this class to access
- information about the vertices of the line or polygon.
+ directly and do not create your own subclasses of this class. You can use
+ the method and properties of this class to access information about the
+ vertices of the line or polygon.
 
  Do not confuse `MGLMultiPoint` with `MGLPointCollection`, which represents a
  collection of related but disconnected points.
