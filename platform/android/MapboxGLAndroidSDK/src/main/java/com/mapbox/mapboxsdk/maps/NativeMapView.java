@@ -29,6 +29,7 @@ import com.mapbox.mapboxsdk.style.layers.Layer;
 import com.mapbox.mapboxsdk.style.light.Light;
 import com.mapbox.mapboxsdk.style.sources.CannotAddSourceException;
 import com.mapbox.mapboxsdk.style.sources.Source;
+import com.mapbox.mapboxsdk.utils.BitmapUtils;
 import com.mapbox.services.commons.geojson.Feature;
 
 import java.nio.ByteBuffer;
@@ -38,7 +39,6 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import timber.log.Timber;
-
 
 // Class that wraps the native methods for convenience
 final class NativeMapView {
@@ -920,12 +920,20 @@ final class NativeMapView {
   }
 
   protected void onFpsChanged(double fps) {
+    if (isDestroyedOn("OnFpsChanged")) {
+      return;
+    }
     mapView.onFpsChanged(fps);
   }
 
-  protected void onSnapshotReady(Bitmap bitmap) {
-    if (snapshotReadyCallback != null && bitmap != null) {
-      snapshotReadyCallback.onSnapshotReady(bitmap);
+  protected void onSnapshotReady(Bitmap mapContent) {
+    if (isDestroyedOn("OnSnapshotReady")) {
+      return;
+    }
+
+    Bitmap viewContent = BitmapUtils.createBitmapFromView(mapView);
+    if (snapshotReadyCallback != null && mapContent != null && viewContent != null) {
+      snapshotReadyCallback.onSnapshotReady(BitmapUtils.mergeBitmap(mapContent, viewContent));
     }
   }
 
