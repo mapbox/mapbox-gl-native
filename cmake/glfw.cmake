@@ -8,7 +8,6 @@ target_sources(mbgl-glfw
     PRIVATE platform/glfw/settings_json.hpp
     PRIVATE platform/glfw/settings_json.cpp
     PRIVATE platform/default/mbgl/util/default_styles.hpp
-    PRIVATE platform/default/mbgl/util/default_styles.cpp
 )
 
 # Our GL implementation is internal to mbgl-core, which causes the GL header to

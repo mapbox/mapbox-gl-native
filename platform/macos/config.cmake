@@ -19,7 +19,6 @@ macro(mbgl_platform_core)
 
         # Default styles
         PRIVATE platform/default/mbgl/util/default_styles.hpp
-        PRIVATE platform/default/mbgl/util/default_styles.cpp
 
         # Offline
         PRIVATE platform/default/mbgl/storage/offline.cpp
