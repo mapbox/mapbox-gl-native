@@ -106,7 +106,7 @@ struct a_base {
     using Type = gl::Attribute<float, 1>;
 };
 
-struct a_gap_width {
+struct a_gapwidth {
     static auto name() { return "a_gapwidth"; }
     using Type = gl::Attribute<float, 1>;
 };
