@@ -539,10 +539,12 @@ const forStyleAuthorsMD = ejs.compile(fs.readFileSync('platform/darwin/docs/guid
 const ddsGuideMD = ejs.compile(fs.readFileSync('platform/darwin/docs/guides/Using Style Functions at Runtime.md.ejs', 'utf8'), { strict: true });
 const templatesMD = ejs.compile(fs.readFileSync('platform/darwin/docs/guides/Tile URL Templates.md.ejs', 'utf8'), { strict: true });
 
-const lightH = ejs.compile(fs.readFileSync('platform/darwin/src/MGLLight.h.ejs', 'utf8'), {strict: true});;
-const lightM = ejs.compile(fs.readFileSync('platform/darwin/src/MGLLight.mm.ejs', 'utf8'), {strict: true});;
+const lightH = ejs.compile(fs.readFileSync('platform/darwin/src/MGLLight.h.ejs', 'utf8'), {strict: true});
+const lightM = ejs.compile(fs.readFileSync('platform/darwin/src/MGLLight.mm.ejs', 'utf8'), {strict: true});
+const testLight = ejs.compile(fs.readFileSync('platform/darwin/test/MGLLightTest.mm.ejs', 'utf8'), { strict: true});
 fs.writeFileSync(`platform/darwin/src/MGLLight.h`, duplicatePlatformDecls(lightH({ properties: lightProperties, doc: lightDoc})));
 fs.writeFileSync(`platform/darwin/src/MGLLight.mm`, lightM({ properties: lightProperties, doc: lightDoc}));
+fs.writeFileSync(`platform/darwin/test/MGLLightTest.mm`, testLight({ properties: lightProperties, doc: lightDoc}));
 
 
 const layers = _(spec.layer.type.values).map((value, layerType) => {

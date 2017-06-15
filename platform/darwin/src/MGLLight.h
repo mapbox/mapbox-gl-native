@@ -47,7 +47,7 @@ typedef struct MGLSphericalPosition {
  
  @return Returns a `MGLSphericalPosition` struct containing the position attributes.
  */
-NS_INLINE MGLSphericalPosition MGLSphericalPositionMake(CLLocationDistance radial, CLLocationDirection azimuthal, CLLocationDirection polar) {
+NS_INLINE MGLSphericalPosition MGLSphericalPositionMake(CGFloat radial, CLLocationDirection azimuthal, CLLocationDirection polar) {
     MGLSphericalPosition position;
     position.radial = radial;
     position.azimuthal = azimuthal;

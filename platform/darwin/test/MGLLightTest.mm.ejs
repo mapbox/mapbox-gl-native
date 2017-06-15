@@ -1,3 +1,6 @@
+<%
+  const properties = locals.properties;
+-%>
 // This file is generated.
 // Edit platform/darwin/scripts/generate-style-code.js, then run `make darwin-style-code`.
 #import <XCTest/XCTest.h>
@@ -23,108 +26,92 @@
     MGLTransition transition = MGLTransitionMake(6, 3);
     mbgl::style::TransitionOptions transitionOptions { { MGLDurationFromTimeInterval(6) }, { MGLDurationFromTimeInterval(3) } };
 
-    // anchor
+<% for (const property of properties) { -%>
+    // <%- property.name %>
     {
         mbgl::style::Light light;
         MGLLight *mglLight = [[MGLLight alloc] initWithMBGLLight:&light];
 
-        XCTAssert([mglLight.anchor isKindOfClass:[MGLConstantStyleValue class]], @"mglLight.anchor isn’t a MGLConstantStyleValue.");
-        NSValue *anchorValue = ((MGLConstantStyleValue *)mglLight.anchor).rawValue;
-        XCTAssertEqual(anchorValue.MGLLightAnchorValue, MGLLightAnchorViewport);
- 
- 
-        auto lightFromMGLlight = [mglLight mbglLight];
-
-        XCTAssertEqual(light.getDefaultAnchor(), lightFromMGLlight.getAnchor().asConstant());
- 
- 
-    }
-
-    // position
-    {
-        mbgl::style::Light light;
-        MGLLight *mglLight = [[MGLLight alloc] initWithMBGLLight:&light];
-
-        XCTAssert([mglLight.position isKindOfClass:[MGLConstantStyleValue class]], @"mglLight.position isn’t a MGLConstantStyleValue.");
-        NSValue *positionValue = ((MGLConstantStyleValue *)mglLight.position).rawValue;
+        XCTAssert([mglLight.<%- camelizeWithLeadingLowercase(property.name) -%> isKindOfClass:[MGLConstantStyleValue class]], @"mglLight.<%- camelizeWithLeadingLowercase(property.name) -%> isn’t a MGLConstantStyleValue.");
+        NSValue *<%- camelizeWithLeadingLowercase(property.name) -%>Value = ((MGLConstantStyleValue *)mglLight.<%- camelizeWithLeadingLowercase(property.name) -%>).rawValue;
+<% if (property.type == "enum") { -%>
+        XCTAssertEqual(<%- camelizeWithLeadingLowercase(property.name) -%>Value.MGLLight<%- camelize(property.name) -%>Value, MGLLight<%- camelize(property.name) -%><%- camelize(property.default) -%>);
+<% } else if (property.type == "array") { -%>
         auto positionArray = light.getDefaultPosition().getSpherical();
         MGLSphericalPosition defaultPosition = MGLSphericalPositionMake(positionArray[0], positionArray[1], positionArray[2]);
         
         XCTAssert(defaultPosition.radial == positionValue.MGLSphericalPositionValue.radial);
         XCTAssert(defaultPosition.azimuthal == positionValue.MGLSphericalPositionValue.azimuthal);
         XCTAssert(defaultPosition.polar == positionValue.MGLSphericalPositionValue.polar);
- 
+<% } else if (property.type == "color") {-%>
+        MGLColor *<%- camelizeWithLeadingLowercase(property.name) -%>Value = ((MGLConstantStyleValue *)mglLight.<%- camelizeWithLeadingLowercase(property.name) -%>).rawValue;
+        auto <%- camelizeWithLeadingLowercase(property.name) -%> = light.getDefault<%- camelize(property.name) -%>();
+        const CGFloat *<%- camelizeWithLeadingLowercase(property.name) -%>Components = CGColorGetComponents(<%- camelizeWithLeadingLowercase(property.name) -%>Value.CGColor);
+        
+        XCTAssert(<%- camelizeWithLeadingLowercase(property.name) -%>.r == <%- camelizeWithLeadingLowercase(property.name) -%>Components[0] && <%- camelizeWithLeadingLowercase(property.name) -%>.g == <%- camelizeWithLeadingLowercase(property.name) -%>Components[1] && <%- camelizeWithLeadingLowercase(property.name) -%>.b == <%- camelizeWithLeadingLowercase(property.name) -%>Components[2] &&
+                  <%- camelizeWithLeadingLowercase(property.name) -%>.a == <%- camelizeWithLeadingLowercase(property.name) -%>Components[3]);
+<% } else if (property.type == "number") { -%>
+        NSNumber *<%- camelizeWithLeadingLowercase(property.name) -%>Number = ((MGLConstantStyleValue *)mglLight.<%- camelizeWithLeadingLowercase(property.name) -%>).rawValue;
+        auto <%- camelizeWithLeadingLowercase(property.name) -%> = light.getDefault<%- camelize(property.name) -%>();
+        
+        XCTAssert(<%- camelizeWithLeadingLowercase(property.name) -%>Number.floatValue == <%- camelizeWithLeadingLowercase(property.name) -%>);
+<% } else { -%>
+        XCTAssertTrue(NO, @"<%- camelizeWithLeadingLowercase(property.name) -%> has not implementation in the test generation script.");
+<% } -%> 
+<% if (property.transition) { -%>
         // Default transition test
-        XCTAssertEqual(mglLight.positionTransition.delay, defaultTransition.delay);
-        XCTAssertEqual(mglLight.positionTransition.duration, defaultTransition.duration);
- 
+        XCTAssertEqual(mglLight.<%- camelizeWithLeadingLowercase(property.name) -%>Transition.delay, defaultTransition.delay);
+        XCTAssertEqual(mglLight.<%- camelizeWithLeadingLowercase(property.name) -%>Transition.duration, defaultTransition.duration);
+<% } -%> 
         auto lightFromMGLlight = [mglLight mbglLight];
 
+<% if (property.type == "enum") { -%>
+        XCTAssertEqual(light.getDefault<%- camelize(property.name) -%>(), lightFromMGLlight.get<%- camelize(property.name) -%>().asConstant());
+<% } else if (property.type == "array") { -%>
         XCTAssertEqual(positionArray, lightFromMGLlight.getPosition().asConstant().getSpherical());      
- 
+<% } else { -%>
+        XCTAssertEqual(<%- camelizeWithLeadingLowercase(property.name) -%>, lightFromMGLlight.get<%- camelize(property.name) -%>().asConstant());
+<% } -%> 
+<% if (property.transition) { -%>
         // transition test
-        auto positionTransition = lightFromMGLlight.getPositionTransition();
-        XCTAssert(positionTransition.delay && MGLTimeIntervalFromDuration(*anchorTransition.delay) == defaultTransition.delay);
-        XCTAssert(positionTransition.duration && MGLTimeIntervalFromDuration(*anchorTransition.duration) == defaultTransition.duration);
- 
-    }
-
-    // color
-    {
-        mbgl::style::Light light;
-        MGLLight *mglLight = [[MGLLight alloc] initWithMBGLLight:&light];
-
+        auto <%- camelizeWithLeadingLowercase(property.name) -%>Transition = lightFromMGLlight.get<%- camelize(property.name) -%>Transition();
+        XCTAssert(<%- camelizeWithLeadingLowercase(property.name) -%>Transition.delay && MGLTimeIntervalFromDuration(*anchorTransition.delay) == defaultTransition.delay);
+        XCTAssert(<%- camelizeWithLeadingLowercase(property.name) -%>Transition.duration && MGLTimeIntervalFromDuration(*anchorTransition.duration) == defaultTransition.duration);
+<% } -%> 
+<% if (property.type == "enum") { -%>
+        MGLStyleValue<<%- propertyType(property) %>> *anchorStyleValue = [MGLStyleValue<<%- propertyType(property) %>> valueWithRawValue:[NSValue valueWithMGLLightAnchor:MGLLightAnchorMap]];
+        mglLight.anchor = anchorStyleValue;
+        XCTAssert([mglLight.anchor isKindOfClass:[MGLConstantStyleValue class]], @"mglLight.anchor isn’t a MGLConstantStyleValue.");
+        anchorValue = ((MGLConstantStyleValue *)mglLight.anchor).rawValue;
+        XCTAssertEqual(anchorValue.MGLLightAnchorValue, MGLLightAnchorMap);
+<% } else if (property.type == "array") { -%>
+        defaultPosition = MGLSphericalPositionMake(6, 180, 90);
+        MGLStyleValue<<%- propertyType(property) %>> *positionStyleValue = [MGLStyleValue<<%- propertyType(property) %>> valueWithRawValue:[NSValue valueWithMGLSphericalPosition:defaultPosition]];
+        mglLight.position = positionStyleValue;
+        XCTAssert([mglLight.position isKindOfClass:[MGLConstantStyleValue class]], @"mglLight.position isn’t a MGLConstantStyleValue.");
+        positionValue = ((MGLConstantStyleValue *)mglLight.position).rawValue;
+        XCTAssert(defaultPosition.radial == positionValue.MGLSphericalPositionValue.radial);
+        XCTAssert(defaultPosition.azimuthal == positionValue.MGLSphericalPositionValue.azimuthal);
+        XCTAssert(defaultPosition.polar == positionValue.MGLSphericalPositionValue.polar);
+<% } else if (property.type == "color") {-%>
+        MGLStyleValue<<%- propertyType(property) %>> *colorStyleValue = [MGLStyleValue<<%- propertyType(property) %>> valueWithRawValue:[MGLColor blackColor]];
+        mglLight.color = colorStyleValue;
         XCTAssert([mglLight.color isKindOfClass:[MGLConstantStyleValue class]], @"mglLight.color isn’t a MGLConstantStyleValue.");
-        NSValue *colorValue = ((MGLConstantStyleValue *)mglLight.color).rawValue;
-        MGLColor *colorValue = ((MGLConstantStyleValue *)mglLight.color).rawValue;
-        auto color = light.getDefaultColor();
-        const CGFloat *colorComponents = CGColorGetComponents(colorValue.CGColor);
-        
-        XCTAssert(color.r == colorComponents[0] && color.g == colorComponents[1] && color.b == colorComponents[2] &&
-                  color.a == colorComponents[3]);
- 
-        // Default transition test
-        XCTAssertEqual(mglLight.colorTransition.delay, defaultTransition.delay);
-        XCTAssertEqual(mglLight.colorTransition.duration, defaultTransition.duration);
- 
-        auto lightFromMGLlight = [mglLight mbglLight];
-
-        XCTAssertEqual(color, lightFromMGLlight.getColor().asConstant());
- 
-        // transition test
-        auto colorTransition = lightFromMGLlight.getColorTransition();
-        XCTAssert(colorTransition.delay && MGLTimeIntervalFromDuration(*anchorTransition.delay) == defaultTransition.delay);
-        XCTAssert(colorTransition.duration && MGLTimeIntervalFromDuration(*anchorTransition.duration) == defaultTransition.duration);
- 
-    }
-
-    // intensity
-    {
-        mbgl::style::Light light;
-        MGLLight *mglLight = [[MGLLight alloc] initWithMBGLLight:&light];
-
+        colorValue = ((MGLConstantStyleValue *)mglLight.color).rawValue;
+        XCTAssertEqual([MGLColor blackColor], colorValue);
+<% } else if (property.type == "number") { -%>
+        NSNumber *intensityValue = @0.4;
+        MGLStyleValue<<%- propertyType(property) %>> *intensityStyleValue = [MGLStyleValue<<%- propertyType(property) %>> valueWithRawValue:intensityValue];
+        mglLight.intensity = intensityStyleValue;
         XCTAssert([mglLight.intensity isKindOfClass:[MGLConstantStyleValue class]], @"mglLight.intensity isn’t a MGLConstantStyleValue.");
-        NSValue *intensityValue = ((MGLConstantStyleValue *)mglLight.intensity).rawValue;
-        NSNumber *intensityNumber = ((MGLConstantStyleValue *)mglLight.intensity).rawValue;
-        auto intensity = light.getDefaultIntensity();
-        
-        XCTAssert(intensityNumber.floatValue == intensity);
- 
-        // Default transition test
-        XCTAssertEqual(mglLight.intensityTransition.delay, defaultTransition.delay);
-        XCTAssertEqual(mglLight.intensityTransition.duration, defaultTransition.duration);
- 
-        auto lightFromMGLlight = [mglLight mbglLight];
-
-        XCTAssertEqual(intensity, lightFromMGLlight.getIntensity().asConstant());
- 
-        // transition test
-        auto intensityTransition = lightFromMGLlight.getIntensityTransition();
-        XCTAssert(intensityTransition.delay && MGLTimeIntervalFromDuration(*anchorTransition.delay) == defaultTransition.delay);
-        XCTAssert(intensityTransition.duration && MGLTimeIntervalFromDuration(*anchorTransition.duration) == defaultTransition.duration);
- 
+        intensityNumber = ((MGLConstantStyleValue *)mglLight.intensity).rawValue;
+        XCTAssert(intensityNumber.floatValue == intensityValue.floatValue);
+<% } else { -%>
+        XCTAssertTrue(NO, @"<%- camelizeWithLeadingLowercase(property.name) -%> has not implementation in the test generation script.");
+<% } -%> 
     }
 
+<% } -%>
     // anchor
     {
         mbgl::style::Light light;
@@ -145,11 +132,11 @@
         
         MGLStyleValue<NSValue *> *anchorStyleValue = [MGLStyleValue<NSValue *> valueWithRawValue:[NSValue valueWithMGLLightAnchor:MGLLightAnchorMap]];
         mglLight.anchor = anchorStyleValue;
+        mglLight.anchorTransition = transition;
         XCTAssert([mglLight.anchor isKindOfClass:[MGLConstantStyleValue class]], @"mglLight.anchor isn’t a MGLConstantStyleValue.");
         anchorValue = ((MGLConstantStyleValue *)mglLight.anchor).rawValue;
-        XCTAssertEqual(anchorValue.MGLLightAnchorValue, MGLLightAnchorMap);
         
-        mglLight.anchorTransition = transition;
+        XCTAssertEqual(anchorValue.MGLLightAnchorValue, MGLLightAnchorMap);
         XCTAssertEqual(mglLight.anchorTransition.delay, transition.delay);
         XCTAssertEqual(mglLight.anchorTransition.duration, transition.duration);
         
@@ -191,13 +178,14 @@
         defaultPosition = MGLSphericalPositionMake(6, 180, 90);
         MGLStyleValue<NSValue *> *positionStyleValue = [MGLStyleValue<NSValue *> valueWithRawValue:[NSValue valueWithMGLSphericalPosition:defaultPosition]];
         mglLight.position = positionStyleValue;
+        mglLight.positionTransiton = transition;
+        
         XCTAssert([mglLight.position isKindOfClass:[MGLConstantStyleValue class]], @"mglLight.position isn’t a MGLConstantStyleValue.");
         positionValue = ((MGLConstantStyleValue *)mglLight.position).rawValue;
+        
         XCTAssert(defaultPosition.radial == positionValue.MGLSphericalPositionValue.radial);
         XCTAssert(defaultPosition.azimuthal == positionValue.MGLSphericalPositionValue.azimuthal);
         XCTAssert(defaultPosition.polar == positionValue.MGLSphericalPositionValue.polar);
-        
-        mglLight.positionTransiton = transition;
         XCTAssertEqual(mglLight.positionTransiton.delay, transition.delay);
         XCTAssertEqual(mglLight.positionTransiton.duration, transition.duration);
         
@@ -239,11 +227,12 @@
         
         MGLStyleValue<MGLColor *> *colorStyleValue = [MGLStyleValue<MGLColor *> valueWithRawValue:[MGLColor blackColor]];
         mglLight.color = colorStyleValue;
+        mglLight.colorTransiton = transition;
+        
         XCTAssert([mglLight.color isKindOfClass:[MGLConstantStyleValue class]], @"mglLight.color isn’t a MGLConstantStyleValue.");
         colorValue = ((MGLConstantStyleValue *)mglLight.color).rawValue;
-        XCTAssertEqual([MGLColor blackColor], colorValue);
         
-        mglLight.colorTransiton = transition;
+        XCTAssertEqual([MGLColor blackColor], colorValue);
         XCTAssertEqual(mglLight.colorTransiton.delay, transition.delay);
         XCTAssertEqual(mglLight.colorTransiton.duration, transition.duration);
         
@@ -283,11 +272,11 @@
         NSNumber *intensityValue = @0.4;
         MGLStyleValue<NSNumber *> *intensityStyleValue = [MGLStyleValue<NSNumber *> valueWithRawValue:intensityValue];
         mglLight.intensity = intensityStyleValue;
+        mglLight.intensityTransition = transition;
+        
         XCTAssert([mglLight.intensity isKindOfClass:[MGLConstantStyleValue class]], @"mglLight.intensity isn’t a MGLConstantStyleValue.");
         intensityNumber = ((MGLConstantStyleValue *)mglLight.intensity).rawValue;
         XCTAssert(intensityNumber.floatValue == intensityValue.floatValue);
-        
-        mglLight.intensityTransition = transition;
         XCTAssertEqual(mglLight.intensityTransition.delay, transition.delay);
         XCTAssertEqual(mglLight.intensityTransition.duration, transition.duration);
 
