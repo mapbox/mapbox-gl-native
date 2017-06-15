@@ -66,7 +66,7 @@ MGL_EXPORT
  Whether extruded geometries are lit relative to the map or viewport.
  
  The default value of this property is an `MGLStyleValue` object containing an
- `NSValue` object containing `MGLAnchorViewport`.
+ `NSValue` object containing `MGLLightAnchorViewport`.
  
  You can set this property to an instance of:
  
@@ -81,17 +81,17 @@ MGL_EXPORT
 @property (nonatomic) MGLStyleValue<NSValue *> *anchor;
 
 /**
- Position of the light source relative to lit (extruded) geometries, in [r
- radial coordinate, a azimuthal angle, p polar angle] where r indicates the
- distance from the center of the base of an object to its light, a indicates the
- position of the light relative to 0° (0° when `light.anchor` is set to
- `MGLLight.anchorViewport` corresponds to the top of the viewport, or 0° when
- `light.anchor` is set to `MGLLight.anchorMap` corresponds to due north, and
- degrees proceed clockwise), and p indicates the height of the light (from 0°,
- directly above, to 180°, directly below).
+ Position of the `MGLLight` source relative to lit (extruded) geometries, in a
+ `MGLSphericalPosition` struct [radial coordinate, azimuthal angle, polar angle]
+ where radial indicates the distance from the center of the base of an object to
+ its light, azimuthal indicates the position of the light relative to 0° (0°
+ when `MGLLight.anchor` is set to `MGLLightAnchorViewport` corresponds to the
+ top of the viewport, or 0° when `MGLLight.anchor` is set to `MGLLightAnchorMap`
+ corresponds to due north, and degrees proceed clockwise), and polar indicates
+ the height of the light (from 0°, directly above, to 180°, directly below).
  
- The default value of this property is an `MGLStyleValue` object containing the
- array `1.15`, `210`, `30`.
+ The default value of this property is an `MGLStyleValue` object containing an
+ `MGLSphericalPosition` struct set to 1.15 radial, 210 azimuthal and 30 polar.
  
  You can set this property to an instance of:
  
