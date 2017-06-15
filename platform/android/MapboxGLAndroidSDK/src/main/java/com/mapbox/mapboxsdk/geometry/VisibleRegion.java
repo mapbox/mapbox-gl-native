@@ -38,7 +38,7 @@ public class VisibleRegion implements Parcelable {
   public final LatLngBounds latLngBounds;
 
   /**
-   * Creates a VisibleRegion form a Parcel.
+   * Creates a VisibleRegion from a Parcel.
    *
    * @param in The Parcel to create this from
    */
@@ -96,7 +96,7 @@ public class VisibleRegion implements Parcelable {
   /**
    * The string representation of the object.
    *
-   * @return the string representatio of this
+   * @return the string representation of this
    */
   @Override
   public String toString() {

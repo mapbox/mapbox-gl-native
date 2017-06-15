@@ -1,7 +1,7 @@
 package com.mapbox.mapboxsdk.geometry;
 
 /**
- * Describes a latitude, longitude and altitude pair.
+ * Describes a latitude, longitude and altitude tuple.
  */
 public interface ILatLng {
 

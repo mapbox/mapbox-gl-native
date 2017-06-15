@@ -104,7 +104,7 @@ public class OfflineRegionStatus {
    * Get the number of resources (inclusive of tiles) that have been fully downloaded
    * and are ready for offline access.
    *
-   * @return the amount of resurces that have finished downloading.
+   * @return the amount of resources that have finished downloading.
    */
   public long getCompletedResourceCount() {
     return completedResourceCount;

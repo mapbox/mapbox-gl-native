@@ -91,7 +91,7 @@ public final class IconFactory {
   }
 
   /**
-   * Create an icon using the resource ID of a Bitmap image.
+   * Creates an icon using the resource ID of a Bitmap image.
    *
    * @param resourceId The resource ID of a Bitmap image.
    * @return The icon that was loaded from the asset or {@code null} if failed to load.
@@ -155,8 +155,7 @@ public final class IconFactory {
    * Creates an Icon using the absolute file path of a Bitmap image.
    *
    * @param absolutePath The absolute path of the Bitmap image.
-   * @return The Icon that was loaded from the absolute path or null if failed to
-   * load.
+   * @return The Icon that was loaded from the absolute path or null if failed to load.
    */
   public Icon fromPath(@NonNull String absolutePath) {
     Bitmap bitmap = BitmapFactory.decodeFile(absolutePath, options);

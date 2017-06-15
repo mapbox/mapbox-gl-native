@@ -6,8 +6,8 @@ import com.mapbox.mapboxsdk.maps.MapView;
 
 /**
  * <p>
- * A IconBitmapChangedException is thrown by MapView when a Marker is added
- * that has a Icon with a Bitmap that has been modified since the creation of the Icon.
+ * An IconBitmapChangedException is thrown by MapView when a Marker is added
+ * that has an Icon with a Bitmap that has been modified since the creation of the Icon.
  * </p>
  * You cannot modify a {@code Icon} after it has been added to the map in a {@code Marker}
  *

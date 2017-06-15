@@ -736,8 +736,8 @@ public final class MapboxMap {
    * will return the current location of the camera in flight.
    * <p>
    * Note that this will cancel location tracking mode if enabled. You can change this behaviour by calling
-   * {@link com.mapbox.mapboxsdk.maps.TrackingSettings#setDismissLocationTrackingOnGesture(boolean)} and  with false
-   * before invoking this method and calling it with true in the {@link CancelableCallback#onFinish()}.
+   * {@link com.mapbox.mapboxsdk.maps.TrackingSettings#setDismissLocationTrackingOnGesture(boolean)} with false before
+   * invoking this method and calling it with true in the {@link CancelableCallback#onFinish()}.
    * </p>
    *
    * @param update             The change that should be applied to the camera.
@@ -1081,7 +1081,7 @@ public final class MapboxMap {
    * sent.
    *
    * @param style    The bundled style.
-   * @param callback The calback to be invoked when the ha finished loading
+   * @param callback The callback to be invoked when the style has finished loading
    * @see Style
    */
   @UiThread

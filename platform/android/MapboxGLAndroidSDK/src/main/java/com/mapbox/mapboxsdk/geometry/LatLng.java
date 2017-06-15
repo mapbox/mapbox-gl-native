@@ -92,7 +92,7 @@ public class LatLng implements ILatLng, Parcelable {
   }
 
   /**
-   * Constructs a new latitude, longitude, altitude pair given a parcel.
+   * Constructs a new latitude, longitude, altitude tuple given a parcel.
    *
    * @param in the parcel containing the latitude, longitude, altitude values
    */

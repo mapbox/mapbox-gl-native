@@ -53,8 +53,7 @@ public class ProjectedMeters implements IProjectedMeters, Parcelable {
   /**
    * Creates a ProjectedMeters from a Parcel.
    *
-   * @param in The parcel to create from /**
-   *           Describe the kinds of special objects contained in this Parcelable instance's marshaled representation.
+   * @param in The parcel to create from
    * @return a bitmask indicating the set of special object types marshaled by this Parcelable object instance.
    */
   private ProjectedMeters(Parcel in) {
@@ -122,7 +121,7 @@ public class ProjectedMeters implements IProjectedMeters, Parcelable {
   /**
    * Returns a string representation of the object.
    *
-   * @return the string represnetation of this
+   * @return the string representation of this
    */
   @Override
   public String toString() {
