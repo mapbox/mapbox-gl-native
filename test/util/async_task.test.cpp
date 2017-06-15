@@ -1,9 +1,12 @@
 #include <mbgl/util/async_task.hpp>
 #include <mbgl/util/run_loop.hpp>
-#include <mbgl/util/thread.hpp>
+#include <mbgl/util/default_thread_pool.hpp>
+#include <mbgl/actor/actor_ref.hpp>
 
 #include <mbgl/test/util.hpp>
 
+#include <atomic>
+#include <future>
 #include <vector>
 
 using namespace mbgl::util;
@@ -27,6 +30,10 @@ public:
         }
 
         cb();
+    }
+
+    void sync(std::promise<void> barrier) {
+        barrier.set_value();
     }
 
 private:
@@ -94,23 +101,24 @@ TEST(AsyncTask, DestroyAfterSignaling) {
 TEST(AsyncTask, RequestCoalescingMultithreaded) {
     RunLoop loop;
 
-    unsigned count = 0;
+    unsigned count = 0, numThreads = 25;
     AsyncTask async([&count] { ++count; });
 
-    std::vector<std::unique_ptr<Thread<TestWorker>>> threads;
-    ThreadContext context = {"Test"};
+    mbgl::ThreadPool threads(numThreads);
+    auto mailbox = std::make_shared<mbgl::Mailbox>(threads);
 
-    unsigned numThreads = 25;
+    TestWorker worker(&async);
+    mbgl::ActorRef<TestWorker> workerRef(worker, mailbox);
+
     for (unsigned i = 0; i < numThreads; ++i) {
-        std::unique_ptr<Thread<TestWorker>> thread =
-            std::make_unique<Thread<TestWorker>>(context, &async);
-
-        thread->invoke(&TestWorker::run);
-        threads.push_back(std::move(thread));
+        workerRef.invoke(&TestWorker::run);
     }
 
-    // Join all the threads
-    threads.clear();
+    std::promise<void> barrier;
+    std::future<void> barrierFuture = barrier.get_future();
+
+    workerRef.invoke(&TestWorker::sync, std::move(barrier));
+    barrierFuture.wait();
 
     loop.runOnce();
 
@@ -120,29 +128,20 @@ TEST(AsyncTask, RequestCoalescingMultithreaded) {
 TEST(AsyncTask, ThreadSafety) {
     RunLoop loop;
 
-    unsigned count = 0;
+    unsigned count = 0, numThreads = 25;
+    std::atomic_uint completed(numThreads);
+
     AsyncTask async([&count] { ++count; });
 
-    unsigned numThreads = 25;
+    mbgl::ThreadPool threads(numThreads);
+    auto mailbox = std::make_shared<mbgl::Mailbox>(threads);
 
-    auto callback = [&] {
-        if (!--numThreads) {
-            loop.stop();
-        }
-    };
-
-    std::vector<std::unique_ptr<Thread<TestWorker>>> threads;
-    std::vector<std::unique_ptr<mbgl::AsyncRequest>> requests;
-    ThreadContext context = {"Test"};
+    TestWorker worker(&async);
+    mbgl::ActorRef<TestWorker> workerRef(worker, mailbox);
 
     for (unsigned i = 0; i < numThreads; ++i) {
-        std::unique_ptr<Thread<TestWorker>> thread =
-            std::make_unique<Thread<TestWorker>>(context, &async);
-
-        requests.push_back(
-            thread->invokeWithCallback(&TestWorker::runWithCallback, callback));
-
-        threads.push_back(std::move(thread));
+        // The callback runs on the worker, thus the atomic type.
+        workerRef.invoke(&TestWorker::runWithCallback, [&] { if (!--completed) loop.stop(); });
     }
 
     loop.run();
