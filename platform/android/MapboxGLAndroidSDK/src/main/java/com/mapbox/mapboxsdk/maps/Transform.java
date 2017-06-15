@@ -93,7 +93,7 @@ final class Transform implements MapView.OnMapChangedListener {
   @UiThread
   final void moveCamera(MapboxMap mapboxMap, CameraUpdate update, MapboxMap.CancelableCallback callback) {
     CameraPosition cameraPosition = update.getCameraPosition(mapboxMap);
-    if (!cameraPosition.equals(this.cameraPosition)) {
+    if (isValidCameraPosition(cameraPosition)) {
       trackingSettings.resetTrackingModesIfRequired(this.cameraPosition, cameraPosition, false);
       cancelTransitions();
       cameraChangeDispatcher.onCameraMoveStarted(OnCameraMoveStartedListener.REASON_API_ANIMATION);
@@ -109,7 +109,7 @@ final class Transform implements MapView.OnMapChangedListener {
   final void easeCamera(MapboxMap mapboxMap, CameraUpdate update, int durationMs, boolean easingInterpolator,
                         final MapboxMap.CancelableCallback callback, boolean isDismissable) {
     CameraPosition cameraPosition = update.getCameraPosition(mapboxMap);
-    if (!cameraPosition.equals(this.cameraPosition)) {
+    if (isValidCameraPosition(cameraPosition)) {
       trackingSettings.resetTrackingModesIfRequired(this.cameraPosition, cameraPosition, isDismissable);
       cancelTransitions();
       cameraChangeDispatcher.onCameraMoveStarted(OnCameraMoveStartedListener.REASON_API_ANIMATION);
@@ -127,7 +127,7 @@ final class Transform implements MapView.OnMapChangedListener {
   final void animateCamera(MapboxMap mapboxMap, CameraUpdate update, int durationMs,
                            final MapboxMap.CancelableCallback callback) {
     CameraPosition cameraPosition = update.getCameraPosition(mapboxMap);
-    if (!cameraPosition.equals(this.cameraPosition)) {
+    if (isValidCameraPosition(cameraPosition)) {
       trackingSettings.resetTrackingModesIfRequired(this.cameraPosition, cameraPosition, false);
       cancelTransitions();
       cameraChangeDispatcher.onCameraMoveStarted(OnCameraMoveStartedListener.REASON_API_ANIMATION);
@@ -139,6 +139,10 @@ final class Transform implements MapView.OnMapChangedListener {
       mapView.flyTo(cameraPosition.bearing, cameraPosition.target, durationMs, cameraPosition.tilt,
         cameraPosition.zoom);
     }
+  }
+
+  private boolean isValidCameraPosition(@Nullable CameraPosition cameraPosition) {
+    return cameraPosition != null && !cameraPosition.equals(this.cameraPosition);
   }
 
   @UiThread
