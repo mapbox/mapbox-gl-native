@@ -132,6 +132,7 @@ set(MBGL_TEST_FILES
     test/util/run_loop.test.cpp
     test/util/text_conversions.test.cpp
     test/util/thread.test.cpp
+    test/util/threaded_object.test.cpp
     test/util/thread_local.test.cpp
     test/util/tile_cover.test.cpp
     test/util/timer.test.cpp
