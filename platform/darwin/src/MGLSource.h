@@ -17,8 +17,8 @@ NS_ASSUME_NONNULL_BEGIN
  `-[MGLStyle addSource:]` and `-[MGLStyle sourceWithIdentifier:]`.
 
  Create instances of `MGLShapeSource` and the concrete subclasses of
- `MGLTileSource`, `MGLVectorSource` and `MGLRasterSource` in order to use
- `MGLMultiPoint`'s properties and methods. Do not create instances of `MGLSource`
+ `MGLTileSource` (`MGLVectorSource` and `MGLRasterSource`) in order to use
+ `MGLSource`'s properties and methods. Do not create instances of `MGLSource`
  directly, and do not create your own subclasses of this class.
  */
 MGL_EXPORT
