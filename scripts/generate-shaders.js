@@ -61,7 +61,7 @@ ${fragmentPrelude}
     'symbol_icon',
     'symbol_sdf'
 ].forEach(function (shaderName) {
-    const re = /#pragma mapbox: ([\w]+) ([\w]+) ([\w]+) ([\w]+)/g;
+    const re = / *#pragma mapbox: ([\w]+) ([\w]+) ([\w]+) ([\w]+)/g;
     const fragmentPragmas = new Set();
 
     let fragmentSource = fs.readFileSync(path.join(inputPath, shaderName + '.fragment.glsl'), 'utf8');
@@ -74,47 +74,41 @@ ${fragmentPrelude}
 varying ${precision} ${type} ${name};
 #else
 uniform ${precision} ${type} u_${name};
-#endif
-` : `
+#endif` : `
 #ifdef HAS_UNIFORM_u_${name}
     ${precision} ${type} ${name} = u_${name};
-#endif
-`;
+#endif`;
     });
 
     vertexSource = vertexSource.replace(re, (match, operation, precision, type, name) => {
         const a_type = type === "float" ? "vec2" : "vec4";
         if (fragmentPragmas.has(name)) {
             return operation === "define" ? `
-#ifdef HAS_UNIFORM_u_${name}
+#ifndef HAS_UNIFORM_u_${name}
 uniform lowp float a_${name}_t;
 attribute ${precision} ${a_type} a_${name};
 varying ${precision} ${type} ${name};
 #else
 uniform ${precision} ${type} u_${name};
-#endif
-` : `
+#endif` : `
 #ifndef HAS_UNIFORM_u_${name}
     ${name} = unpack_mix_${a_type}(a_${name}, a_${name}_t);
 #else
     ${precision} ${type} ${name} = u_${name};
-#endif
-`;
+#endif`;
         } else {
             return operation === "define" ? `
-#ifdef HAS_UNIFORM_u_${name}
+#ifndef HAS_UNIFORM_u_${name}
 uniform lowp float a_${name}_t;
 attribute ${precision} ${a_type} a_${name};
 #else
 uniform ${precision} ${type} u_${name};
-#endif
-` : `
+#endif` : `
 #ifndef HAS_UNIFORM_u_${name}
     ${precision} ${type} ${name} = unpack_mix_${a_type}(a_${name}, a_${name}_t);
 #else
     ${precision} ${type} ${name} = u_${name};
-#endif
-`;
+#endif`;
         }
     });
 
