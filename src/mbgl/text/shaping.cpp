@@ -27,12 +27,9 @@ void align(Shaping& shaping,
            const float verticalAlign,
            const float maxLineLength,
            const float lineHeight,
-           const std::size_t lineCount,
-           const Point<float>& translate) {
-    const float shiftX =
-    (justify - horizontalAlign) * maxLineLength + ::round(translate.x);
-    const float shiftY =
-    (-verticalAlign * lineCount + 0.5) * lineHeight + ::round(translate.y);
+           const std::size_t lineCount) {
+    const float shiftX = (justify - horizontalAlign) * maxLineLength;
+    const float shiftY = (-verticalAlign * lineCount + 0.5) * lineHeight;
     
     for (auto& glyph : shaping.positionedGlyphs) {
         glyph.x += shiftX;
@@ -205,7 +202,6 @@ void shapeLines(Shaping& shaping,
                           const float horizontalAlign,
                           const float verticalAlign,
                           const float justify,
-                          const Point<float>& translate,
                           const float verticalHeight,
                           const WritingModeType writingMode,
                           const Glyphs& glyphs) {
@@ -259,7 +255,7 @@ void shapeLines(Shaping& shaping,
     }
     
     align(shaping, justify, horizontalAlign, verticalAlign, maxLineLength, lineHeight,
-          lines.size(), translate);
+          lines.size());
     const uint32_t height = lines.size() * lineHeight;
     
     // Calculate the bounding box
@@ -288,7 +284,7 @@ const Shaping getShaping(const std::u16string& logicalInput,
                      determineLineBreaks(logicalInput, spacing, maxWidth, writingMode, glyphs));
     
     shapeLines(shaping, reorderedLines, spacing, lineHeight, horizontalAlign, verticalAlign,
-               justify, translate, verticalHeight, writingMode, glyphs);
+               justify, verticalHeight, writingMode, glyphs);
     
     return shaping;
 }

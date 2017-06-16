@@ -20,6 +20,7 @@ class CollisionTile;
 class SymbolBucket;
 class Anchor;
 class RenderLayer;
+class PlacedSymbol;
 
 namespace style {
 class Filter;
@@ -58,15 +59,13 @@ private:
     // Adds placed items to the buffer.
     template <typename Buffer>
     void addSymbol(Buffer&,
-                   SymbolSizeBinder& sizeBinder,
+                   const Range<float> sizeData,
                    const SymbolQuad&,
-                   const SymbolFeature& feature,
                    float scale,
                    const bool keepUpright,
                    const style::SymbolPlacementType,
-                   const float placementAngle,
-                   WritingModeType writingModes,
-                   const Point<float> labelAnchor);
+                   const Anchor& labelAnchor,
+                   PlacedSymbol& placedSymbol);
 
     // Stores the layer so that we can hold on to GeometryTileFeature instances in SymbolFeature,
     // which may reference data from this object.

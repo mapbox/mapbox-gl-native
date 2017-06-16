@@ -97,6 +97,8 @@ set(MBGL_CORE_FILES
     src/mbgl/layout/symbol_instance.hpp
     src/mbgl/layout/symbol_layout.cpp
     src/mbgl/layout/symbol_layout.hpp
+    src/mbgl/layout/symbol_projection.cpp
+    src/mbgl/layout/symbol_projection.hpp
 
     # map
     include/mbgl/map/backend.hpp

@@ -10,6 +10,7 @@
 #include <mbgl/programs/collision_box_program.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/tile/geometry_tile.hpp>
+#include <mbgl/layout/symbol_projection.hpp>
 
 #include <cmath>
 
@@ -52,6 +53,7 @@ void Painter::renderSymbol(PaintParameters& parameters,
             colorModeForRenderPass(),
             std::move(uniformValues),
             *buffers.vertexBuffer,
+            *buffers.dynamicVertexBuffer,
             *symbolSizeBinder,
             *buffers.indexBuffer,
             buffers.segments,
@@ -64,9 +66,18 @@ void Painter::renderSymbol(PaintParameters& parameters,
     assert(dynamic_cast<GeometryTile*>(&tile.tile));
     GeometryTile& geometryTile = static_cast<GeometryTile&>(tile.tile);
 
+
     if (bucket.hasIconData()) {
         auto values = layer.iconPropertyValues(layout);
         auto paintPropertyValues = layer.iconPaintProperties();
+
+        const bool alongLine = bucket.layout.get<SymbolPlacement>() == SymbolPlacementType::Line &&
+            bucket.layout.get<IconRotationAlignment>() == AlignmentType::Map;
+
+        if (alongLine) {
+            reprojectLineLabels(bucket.icon.dynamicVertices, bucket.icon.placedSymbols, tile.matrix, values, tile, *(bucket.iconSizeBinder), state, frameHistory);
+            context.updateVertexBuffer(*bucket.icon.dynamicVertexBuffer, std::move(bucket.icon.dynamicVertices));
+        }
 
         const bool iconScaled = layout.get<IconSize>().constantOr(1.0) != 1.0 || bucket.iconsNeedLinear;
         const bool iconTransformed = values.rotationAlignment == AlignmentType::Map || state.getPitch() != 0;
@@ -80,7 +91,7 @@ void Painter::renderSymbol(PaintParameters& parameters,
         if (bucket.sdfIcons) {
             if (values.hasHalo) {
                 draw(parameters.programs.symbolIconSDF,
-                     SymbolSDFIconProgram::uniformValues(false, values, texsize, pixelsToGLUnits, tile, state, SymbolSDFPart::Halo),
+                     SymbolSDFIconProgram::uniformValues(false, values, texsize, pixelsToGLUnits, alongLine, tile, state, SymbolSDFPart::Halo),
                      bucket.icon,
                      bucket.iconSizeBinder,
                      values,
@@ -90,7 +101,7 @@ void Painter::renderSymbol(PaintParameters& parameters,
 
             if (values.hasFill) {
                 draw(parameters.programs.symbolIconSDF,
-                     SymbolSDFIconProgram::uniformValues(false, values, texsize, pixelsToGLUnits, tile, state, SymbolSDFPart::Fill),
+                     SymbolSDFIconProgram::uniformValues(false, values, texsize, pixelsToGLUnits, alongLine, tile, state, SymbolSDFPart::Fill),
                      bucket.icon,
                      bucket.iconSizeBinder,
                      values,
@@ -99,7 +110,7 @@ void Painter::renderSymbol(PaintParameters& parameters,
             }
         } else {
             draw(parameters.programs.symbolIcon,
-                 SymbolIconProgram::uniformValues(false, values, texsize, pixelsToGLUnits, tile, state),
+                 SymbolIconProgram::uniformValues(false, values, texsize, pixelsToGLUnits, alongLine, tile, state),
                  bucket.icon,
                  bucket.iconSizeBinder,
                  values,
@@ -114,11 +125,19 @@ void Painter::renderSymbol(PaintParameters& parameters,
         auto values = layer.textPropertyValues(layout);
         auto paintPropertyValues = layer.textPaintProperties();
 
+        const bool alongLine = bucket.layout.get<SymbolPlacement>() == SymbolPlacementType::Line &&
+            bucket.layout.get<TextRotationAlignment>() == AlignmentType::Map;
+
+        if (alongLine) {
+            reprojectLineLabels(bucket.text.dynamicVertices, bucket.text.placedSymbols, tile.matrix, values, tile, *(bucket.textSizeBinder), state, frameHistory);
+            context.updateVertexBuffer(*bucket.text.dynamicVertexBuffer, std::move(bucket.text.dynamicVertices));
+        }
+
         const Size texsize = geometryTile.glyphAtlasTexture->size;
 
         if (values.hasHalo) {
             draw(parameters.programs.symbolGlyph,
-                 SymbolSDFTextProgram::uniformValues(true, values, texsize, pixelsToGLUnits, tile, state, SymbolSDFPart::Halo),
+                 SymbolSDFTextProgram::uniformValues(true, values, texsize, pixelsToGLUnits, alongLine, tile, state, SymbolSDFPart::Halo),
                  bucket.text,
                  bucket.textSizeBinder,
                  values,
@@ -128,7 +147,7 @@ void Painter::renderSymbol(PaintParameters& parameters,
 
         if (values.hasFill) {
             draw(parameters.programs.symbolGlyph,
-                 SymbolSDFTextProgram::uniformValues(true, values, texsize, pixelsToGLUnits, tile, state, SymbolSDFPart::Fill),
+                 SymbolSDFTextProgram::uniformValues(true, values, texsize, pixelsToGLUnits, alongLine, tile, state, SymbolSDFPart::Fill),
                  bucket.text,
                  bucket.textSizeBinder,
                  values,

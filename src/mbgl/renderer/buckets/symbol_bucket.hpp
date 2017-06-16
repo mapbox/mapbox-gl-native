@@ -15,6 +15,23 @@
 
 namespace mbgl {
 
+class PlacedSymbol {
+public:
+    PlacedSymbol(Point<float> anchorPoint_, uint16_t segment_, float lowerSize_, float upperSize_,
+            std::array<float, 2> lineOffset_, float placementZoom_, bool useVerticalMode_, GeometryCoordinates line_) :
+        anchorPoint(anchorPoint_), segment(segment_), lowerSize(lowerSize_), upperSize(upperSize_),
+        lineOffset(lineOffset_), placementZoom(placementZoom_), useVerticalMode(useVerticalMode_), line(std::move(line_)) {}
+    Point<float> anchorPoint;
+    uint16_t segment;
+    float lowerSize;
+    float upperSize;
+    std::array<float, 2> lineOffset;
+    float placementZoom;
+    bool useVerticalMode;
+    GeometryCoordinates line;
+    std::vector<float> glyphOffsets;
+};
+
 class SymbolBucket : public Bucket {
 public:
     SymbolBucket(style::SymbolLayoutProperties::PossiblyEvaluated,
@@ -44,10 +61,13 @@ public:
 
     struct TextBuffer {
         gl::VertexVector<SymbolLayoutVertex> vertices;
+        gl::VertexVector<SymbolDynamicLayoutAttributes::Vertex> dynamicVertices;
         gl::IndexVector<gl::Triangles> triangles;
         gl::SegmentVector<SymbolTextAttributes> segments;
+        std::vector<PlacedSymbol> placedSymbols;
 
         optional<gl::VertexBuffer<SymbolLayoutVertex>> vertexBuffer;
+        optional<gl::VertexBuffer<SymbolDynamicLayoutAttributes::Vertex>> dynamicVertexBuffer;
         optional<gl::IndexBuffer<gl::Triangles>> indexBuffer;
     } text;
     
@@ -55,11 +75,14 @@ public:
     
     struct IconBuffer {
         gl::VertexVector<SymbolLayoutVertex> vertices;
+        gl::VertexVector<SymbolDynamicLayoutAttributes::Vertex> dynamicVertices;
         gl::IndexVector<gl::Triangles> triangles;
         gl::SegmentVector<SymbolIconAttributes> segments;
+        std::vector<PlacedSymbol> placedSymbols;
         PremultipliedImage atlasImage;
 
         optional<gl::VertexBuffer<SymbolLayoutVertex>> vertexBuffer;
+        optional<gl::VertexBuffer<SymbolDynamicLayoutAttributes::Vertex>> dynamicVertexBuffer;
         optional<gl::IndexBuffer<gl::Triangles>> indexBuffer;
     } icon;
 
@@ -69,6 +92,7 @@ public:
         gl::SegmentVector<CollisionBoxAttributes> segments;
 
         optional<gl::VertexBuffer<CollisionBoxVertex>> vertexBuffer;
+        optional<gl::VertexBuffer<SymbolDynamicLayoutAttributes::Vertex>> dynamicVertexBuffer;
         optional<gl::IndexBuffer<gl::Lines>> indexBuffer;
     } collisionBox;
 };
