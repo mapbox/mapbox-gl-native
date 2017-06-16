@@ -49,8 +49,16 @@ public:
           defaultValue(std::move(defaultValue_)) {
     }
 
-    std::tuple<Range<float>, Range<InnerStops>>
-    coveringRanges(float zoom) const {
+    struct CoveringRanges {
+        float zoom;
+        Range<float> coveringZoomRange;
+        Range<InnerStops> coveringStopsRange;
+    };
+
+    // Return the relevant stop zoom values and inner stops that bracket a given zoom level. This
+    // is the first step toward evaluating the function, and is used for in the course of both partial
+    // evaluation of data-driven paint properties, and full evaluation of data-driven layout properties.
+    CoveringRanges coveringRanges(float zoom) const {
         return stops.match(
             [&] (const auto& s) {
                 assert(!s.stops.empty());
@@ -63,7 +71,8 @@ public:
                     minIt--;
                 }
                 
-                return std::make_tuple(
+                return CoveringRanges {
+                    zoom,
                     Range<float> {
                         minIt == s.stops.end() ? s.stops.rbegin()->first : minIt->first,
                         maxIt == s.stops.end() ? s.stops.rbegin()->first : maxIt->first
@@ -72,38 +81,49 @@ public:
                         s.innerStops(minIt == s.stops.end() ? s.stops.rbegin()->second : minIt->second),
                         s.innerStops(maxIt == s.stops.end() ? s.stops.rbegin()->second : maxIt->second)
                     }
-                );
+                };
             }
         );
     }
 
+    // Given a range of zoom values (typically two adjacent integer zoom levels, e.g. 5.0 and 6.0),
+    // return the covering ranges for both. This is used in the course of partial evaluation for
+    // data-driven paint properties.
+    Range<CoveringRanges> rangeOfCoveringRanges(Range<float> zoomRange) {
+        return Range<CoveringRanges> {
+            coveringRanges(zoomRange.min),
+            coveringRanges(zoomRange.max)
+        };
+    }
+
+    // Given the covering ranges for range of zoom values (typically two adjacent integer zoom levels,
+    // e.g. 5.0 and 6.0), and a feature, return the results of fully evaluating the function for that
+    // feature at each of the two zoom levels. These two results are what go into the paint vertex buffers
+    // for vertices associated with this feature. The shader will interpolate between them at render time.
     template <class Feature>
-    Range<T> evaluate(Range<InnerStops> coveringStops,
-                      const Feature& feature,
-                      T finalDefaultValue) const {
-        optional<Value> v = feature.getValue(property);
-        if (!v) {
-            return {
+    Range<T> evaluate(const Range<CoveringRanges>& ranges, const Feature& feature, T finalDefaultValue) {
+        optional<Value> value = feature.getValue(property);
+        if (!value) {
+            return Range<T> {
                 defaultValue.value_or(finalDefaultValue),
                 defaultValue.value_or(finalDefaultValue)
             };
         }
-        auto eval = [&] (const auto& s) {
-            return s.evaluate(*v).value_or(defaultValue.value_or(finalDefaultValue));
-        };
         return Range<T> {
-            coveringStops.min.match(eval),
-            coveringStops.max.match(eval)
+            evaluateFinal(ranges.min, *value, finalDefaultValue),
+            evaluateFinal(ranges.max, *value, finalDefaultValue)
         };
     }
 
-    T evaluate(float zoom, const GeometryTileFeature& feature, T finalDefaultValue) const {
-        std::tuple<Range<float>, Range<InnerStops>> ranges = coveringRanges(zoom);
-        Range<T> resultRange = evaluate(std::get<1>(ranges), feature, finalDefaultValue);
-        return util::interpolate(
-            resultRange.min,
-            resultRange.max,
-            util::interpolationFactor(1.0f, std::get<0>(ranges), zoom));
+    // Fully evaluate the function for a zoom value and feature. This is used when evaluating data-driven
+    // layout properties.
+    template <class Feature>
+    T evaluate(float zoom, const Feature& feature, T finalDefaultValue) const {
+        optional<Value> value = feature.getValue(property);
+        if (!value) {
+            return defaultValue.value_or(finalDefaultValue);
+        }
+        return evaluateFinal(coveringRanges(zoom), *value, finalDefaultValue);
     }
 
     friend bool operator==(const CompositeFunction& lhs,
@@ -115,6 +135,17 @@ public:
     std::string property;
     Stops stops;
     optional<T> defaultValue;
+
+private:
+    T evaluateFinal(const CoveringRanges& ranges, const Value& value, T finalDefaultValue) const {
+        auto eval = [&] (const auto& s) {
+            return s.evaluate(value).value_or(defaultValue.value_or(finalDefaultValue));
+        };
+        return util::interpolate(
+            ranges.coveringStopsRange.min.match(eval),
+            ranges.coveringStopsRange.max.match(eval),
+            util::interpolationFactor(1.0f, ranges.coveringZoomRange, ranges.zoom));
+    }
 };
 
 } // namespace style

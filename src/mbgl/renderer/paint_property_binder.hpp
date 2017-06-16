@@ -194,11 +194,11 @@ public:
     CompositeFunctionPaintPropertyBinder(style::CompositeFunction<T> function_, float zoom, T defaultValue_)
         : function(std::move(function_)),
           defaultValue(std::move(defaultValue_)),
-          coveringRanges(function.coveringRanges(zoom)) {
+          rangeOfCoveringRanges(function.rangeOfCoveringRanges({zoom, zoom + 1})) {
     }
 
     void populateVertexVector(const GeometryTileFeature& feature, std::size_t length) override {
-        Range<T> range = function.evaluate(std::get<1>(coveringRanges), feature, defaultValue);
+        Range<T> range = function.evaluate(rangeOfCoveringRanges, feature, defaultValue);
         this->statistics.add(range.min);
         this->statistics.add(range.max);
         AttributeValue value = zoomInterpolatedAttributeValue(
@@ -225,7 +225,7 @@ public:
     }
 
     float interpolationFactor(float currentZoom) const override {
-        return util::interpolationFactor(1.0f, std::get<0>(coveringRanges), currentZoom);
+        return util::interpolationFactor(1.0f, { rangeOfCoveringRanges.min.zoom, rangeOfCoveringRanges.max.zoom }, currentZoom);
     }
 
     T uniformValue(const PossiblyEvaluatedPropertyValue<T>& currentValue) const override {
@@ -238,10 +238,10 @@ public:
     }
 
 private:
-    using InnerStops = typename style::CompositeFunction<T>::InnerStops;
     style::CompositeFunction<T> function;
     T defaultValue;
-    std::tuple<Range<float>, Range<InnerStops>> coveringRanges;
+    using CoveringRanges = typename style::CompositeFunction<T>::CoveringRanges;
+    Range<CoveringRanges> rangeOfCoveringRanges;
     gl::VertexVector<Vertex> vertexVector;
     optional<gl::VertexBuffer<Vertex>> vertexBuffer;
 };
