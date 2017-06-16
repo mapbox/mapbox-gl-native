@@ -65,11 +65,17 @@ public:
     optional<std::pair<BinaryProgramFormat, std::string>> getBinaryProgram(ProgramID) const;
 
     template <class Vertex, class DrawMode>
-    VertexBuffer<Vertex, DrawMode> createVertexBuffer(VertexVector<Vertex, DrawMode>&& v) {
+    VertexBuffer<Vertex, DrawMode> createVertexBuffer(VertexVector<Vertex, DrawMode>&& v, bool dynamicDraw=false) {
         return VertexBuffer<Vertex, DrawMode> {
             v.vertexSize(),
-            createVertexBuffer(v.data(), v.byteSize())
+            createVertexBuffer(v.data(), v.byteSize(), dynamicDraw)
         };
+    }
+
+    template <class Vertex, class DrawMode>
+    void updateVertexBuffer(VertexVector<Vertex, DrawMode>&& v, VertexBuffer<Vertex, DrawMode>& buffer) {
+        assert(v.vertexSize() == buffer.vertexCount);
+        updateVertexBuffer(v.data(), v.byteSize(), buffer.buffer);
     }
 
     template <class DrawMode>
@@ -239,7 +245,8 @@ private:
     State<value::PointSize> pointSize;
 #endif // MBGL_USE_GLES2
 
-    UniqueBuffer createVertexBuffer(const void* data, std::size_t size);
+    UniqueBuffer createVertexBuffer(const void* data, std::size_t size, bool dynamicDraw);
+    void updateVertexBuffer(const void* data, std::size_t size, UniqueBuffer& buffer);
     UniqueBuffer createIndexBuffer(const void* data, std::size_t size);
     UniqueTexture createTexture(Size size, const void* data, TextureFormat, TextureUnit);
     void updateTexture(TextureID, Size size, const void* data, TextureFormat, TextureUnit);
