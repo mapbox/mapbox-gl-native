@@ -167,12 +167,20 @@ std::vector<UnwrappedTileID> tileCover(const TransformState& state, uint8_t zoom
 
     const double w = state.getSize().width;
     const double h = state.getSize().height;
+
+    // Limit tile coverage when pitch >= 60 degrees (M_PI / 3).
+    const double clampedH = [&]() {
+        const double clampedPitch = state.getPitch() - M_PI / 3;
+        return clampedPitch <= 0 ? h : h - (h * std::sin(clampedPitch));
+    }();
+
+    // top-left, top-right, bottom-right, bottom-left, center
     return tileCover(
-        TileCoordinate::fromScreenCoordinate(state, zoom, { 0,   0   }).p,
-        TileCoordinate::fromScreenCoordinate(state, zoom, { w,   0   }).p,
-        TileCoordinate::fromScreenCoordinate(state, zoom, { w,   h   }).p,
-        TileCoordinate::fromScreenCoordinate(state, zoom, { 0,   h   }).p,
-        TileCoordinate::fromScreenCoordinate(state, zoom, { w/2, h/2 }).p,
+        TileCoordinate::fromScreenCoordinate(state, zoom, { 0,   0        }).p,
+        TileCoordinate::fromScreenCoordinate(state, zoom, { w,   0        }).p,
+        TileCoordinate::fromScreenCoordinate(state, zoom, { w,   clampedH }).p,
+        TileCoordinate::fromScreenCoordinate(state, zoom, { 0,   clampedH }).p,
+        TileCoordinate::fromScreenCoordinate(state, zoom, { w/2, h/2      }).p,
         zoom);
 }
 
