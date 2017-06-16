@@ -65,9 +65,16 @@ void Painter::renderSymbol(PaintParameters& parameters,
     assert(dynamic_cast<GeometryTile*>(&tile.tile));
     GeometryTile& geometryTile = static_cast<GeometryTile&>(tile.tile);
 
+    const alongLine = bucket.layout.get<SymbolPlacement>() == SymbolPlacementType::Line &&
+        bucket.layout.get<RotationAlignment>() == AlignmentType::Map;
+
     if (bucket.hasIconData()) {
         auto values = layer.iconPropertyValues(layout);
         auto paintPropertyValues = layer.iconPaintProperties();
+
+        if (alongLine) {
+            reprojectLineLabels(bucket, tile.matrix, false, values, tile);
+        }
 
         const bool iconScaled = layout.get<IconSize>().constantOr(1.0) != 1.0 || bucket.iconsNeedLinear;
         const bool iconTransformed = values.rotationAlignment == AlignmentType::Map || state.getPitch() != 0;
@@ -81,7 +88,7 @@ void Painter::renderSymbol(PaintParameters& parameters,
         if (bucket.sdfIcons) {
             if (values.hasHalo) {
                 draw(parameters.programs.symbolIconSDF,
-                     SymbolSDFIconProgram::uniformValues(false, values, texsize, pixelsToGLUnits, tile, state, SymbolSDFPart::Halo),
+                     SymbolSDFIconProgram::uniformValues(false, values, texsize, pixelsToGLUnits, alongLine, tile, state, SymbolSDFPart::Halo),
                      bucket.icon,
                      bucket.iconSizeBinder,
                      values,
@@ -91,7 +98,7 @@ void Painter::renderSymbol(PaintParameters& parameters,
 
             if (values.hasFill) {
                 draw(parameters.programs.symbolIconSDF,
-                     SymbolSDFIconProgram::uniformValues(false, values, texsize, pixelsToGLUnits, tile, state, SymbolSDFPart::Fill),
+                     SymbolSDFIconProgram::uniformValues(false, values, texsize, pixelsToGLUnits, alongLine, tile, state, SymbolSDFPart::Fill),
                      bucket.icon,
                      bucket.iconSizeBinder,
                      values,
@@ -100,7 +107,7 @@ void Painter::renderSymbol(PaintParameters& parameters,
             }
         } else {
             draw(parameters.programs.symbolIcon,
-                 SymbolIconProgram::uniformValues(false, values, texsize, pixelsToGLUnits, tile, state),
+                 SymbolIconProgram::uniformValues(false, values, texsize, pixelsToGLUnits, alongLine, tile, state),
                  bucket.icon,
                  bucket.iconSizeBinder,
                  values,
@@ -119,7 +126,7 @@ void Painter::renderSymbol(PaintParameters& parameters,
 
         if (values.hasHalo) {
             draw(parameters.programs.symbolGlyph,
-                 SymbolSDFTextProgram::uniformValues(true, values, texsize, pixelsToGLUnits, tile, state, SymbolSDFPart::Halo),
+                 SymbolSDFTextProgram::uniformValues(true, values, texsize, pixelsToGLUnits, alongLine, tile, state, SymbolSDFPart::Halo),
                  bucket.text,
                  bucket.textSizeBinder,
                  values,
@@ -129,7 +136,7 @@ void Painter::renderSymbol(PaintParameters& parameters,
 
         if (values.hasFill) {
             draw(parameters.programs.symbolGlyph,
-                 SymbolSDFTextProgram::uniformValues(true, values, texsize, pixelsToGLUnits, tile, state, SymbolSDFPart::Fill),
+                 SymbolSDFTextProgram::uniformValues(true, values, texsize, pixelsToGLUnits, alongLine, tile, state, SymbolSDFPart::Fill),
                  bucket.text,
                  bucket.textSizeBinder,
                  values,

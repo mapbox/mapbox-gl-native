@@ -2,6 +2,7 @@
 #include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/map/transform_state.hpp>
 #include <mbgl/style/layers/symbol_layer_impl.hpp>
+#include <mbgl/layout/symbol_projection.hpp>
 #include <mbgl/tile/tile.hpp>
 #include <mbgl/util/enum.hpp>
 #include <mbgl/math/clamp.hpp>
@@ -33,6 +34,7 @@ Values makeValues(const bool isText,
                   const style::SymbolPropertyValues& values,
                   const Size& texsize,
                   const std::array<float, 2>& pixelsToGLUnits,
+                  const bool alongLine,
                   const RenderTile& tile,
                   const TransformState& state,
                   Args&&... args) {
@@ -46,11 +48,26 @@ Values makeValues(const bool isText,
             pixelsToGLUnits[1] * state.getCameraToCenterDistance()
         }};
     }
+
+    const float pixelsToTileUnits = tile.id.pixelsToTileUnits(1.0, state.getZoom());
+
+    mat4 labelPlaneMatrix;
+    if (alongLine) {
+        // For labels that follow lines the first part of the projection is handled on the cpu.
+        // Pass an identity matrix because no transformation needs to be done in the vertex shader.
+        matrix::identity(labelPlaneMatrix);
+    } else {
+        labelPlaneMatrix = getLabelPlaneMatrix(tile.matrix, true, true, state, pixelsToTileUnits);
+    }
+
+    mat4 glCoordMatrix = getGlCoordMatrix(tile.matrix, true, true, state, pixelsToTileUnits);
         
     return Values {
         uniforms::u_matrix::Value{ tile.translatedMatrix(values.translate,
                                    values.translateAnchor,
                                    state) },
+        uniforms::u_label_plane_matrix::Value{labelPlaneMatrix},
+        uniforms::u_gl_coord_matrix::Value{glCoordMatrix},
         uniforms::u_extrude_scale::Value{ extrudeScale },
         uniforms::u_texsize::Value{ texsize },
         uniforms::u_zoom::Value{ float(state.getZoom()) },
@@ -71,6 +88,7 @@ SymbolIconProgram::uniformValues(const bool isText,
                                  const style::SymbolPropertyValues& values,
                                  const Size& texsize,
                                  const std::array<float, 2>& pixelsToGLUnits,
+                                 const bool alongLine,
                                  const RenderTile& tile,
                                  const TransformState& state)
 {
@@ -79,6 +97,7 @@ SymbolIconProgram::uniformValues(const bool isText,
         values,
         texsize,
         pixelsToGLUnits,
+        alongLine,
         tile,
         state
     );
@@ -90,6 +109,7 @@ typename SymbolSDFProgram<PaintProperties>::UniformValues SymbolSDFProgram<Paint
       const style::SymbolPropertyValues& values,
       const Size& texsize,
       const std::array<float, 2>& pixelsToGLUnits,
+      const bool alongLine,
       const RenderTile& tile,
       const TransformState& state,
       const SymbolSDFPart part)
@@ -103,6 +123,7 @@ typename SymbolSDFProgram<PaintProperties>::UniformValues SymbolSDFProgram<Paint
         values,
         texsize,
         pixelsToGLUnits,
+        alongLine,
         tile,
         state,
         uniforms::u_gamma_scale::Value{ gammaScale },

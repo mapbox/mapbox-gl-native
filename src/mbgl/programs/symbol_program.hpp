@@ -29,6 +29,8 @@ class RenderTile;
 class TransformState;
 
 namespace uniforms {
+MBGL_DEFINE_UNIFORM_MATRIX(double, 4, u_gl_coord_matrix);
+MBGL_DEFINE_UNIFORM_MATRIX(double, 4, u_label_plane_matrix);
 MBGL_DEFINE_UNIFORM_SCALAR(bool, u_rotate_with_map);
 MBGL_DEFINE_UNIFORM_SCALAR(bool, u_pitch_with_map);
 MBGL_DEFINE_UNIFORM_SCALAR(gl::TextureUnit, u_texture);
@@ -406,6 +408,8 @@ class SymbolIconProgram : public SymbolProgram<
     SymbolLayoutAttributes,
     gl::Uniforms<
         uniforms::u_matrix,
+        uniforms::u_label_plane_matrix,
+        uniforms::u_gl_coord_matrix,
         uniforms::u_extrude_scale,
         uniforms::u_texsize,
         uniforms::u_zoom,
@@ -426,6 +430,7 @@ public:
                                        const style::SymbolPropertyValues&,
                                        const Size& texsize,
                                        const std::array<float, 2>& pixelsToGLUnits,
+                                       const bool alongLine,
                                        const RenderTile&,
                                        const TransformState&);
 };
@@ -442,6 +447,8 @@ class SymbolSDFProgram : public SymbolProgram<
     SymbolLayoutAttributes,
     gl::Uniforms<
         uniforms::u_matrix,
+        uniforms::u_label_plane_matrix,
+        uniforms::u_gl_coord_matrix,
         uniforms::u_extrude_scale,
         uniforms::u_texsize,
         uniforms::u_zoom,
@@ -466,6 +473,8 @@ public:
         SymbolLayoutAttributes,
         gl::Uniforms<
             uniforms::u_matrix,
+            uniforms::u_label_plane_matrix,
+            uniforms::u_gl_coord_matrix,
             uniforms::u_extrude_scale,
             uniforms::u_texsize,
             uniforms::u_zoom,
@@ -494,6 +503,7 @@ public:
                                        const style::SymbolPropertyValues&,
                                        const Size& texsize,
                                        const std::array<float, 2>& pixelsToGLUnits,
+                                       const bool alongLine,
                                        const RenderTile&,
                                        const TransformState&,
                                        const SymbolSDFPart);
