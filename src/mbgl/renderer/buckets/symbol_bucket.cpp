@@ -38,14 +38,14 @@ SymbolBucket::SymbolBucket(style::SymbolLayoutProperties::PossiblyEvaluated layo
 void SymbolBucket::upload(gl::Context& context) {
     if (hasTextData()) {
         text.vertexBuffer = context.createVertexBuffer(std::move(text.vertices));
+        text.dynamicVertexBuffer = context.createVertexBuffer(std::move(text.dynamicVertices), gl::BufferUsageType::StreamDraw);
         text.indexBuffer = context.createIndexBuffer(std::move(text.triangles));
-        textSizeBinder->upload(context);
     }
 
     if (hasIconData()) {
         icon.vertexBuffer = context.createVertexBuffer(std::move(icon.vertices));
+        icon.dynamicVertexBuffer = context.createVertexBuffer(std::move(icon.dynamicVertices), gl::BufferUsageType::StreamDraw);
         icon.indexBuffer = context.createIndexBuffer(std::move(icon.triangles));
-        iconSizeBinder->upload(context);
     }
 
     if (!collisionBox.vertices.empty()) {

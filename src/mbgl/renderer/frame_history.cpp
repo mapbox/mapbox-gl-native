@@ -74,4 +74,8 @@ void FrameHistory::bind(gl::Context& context, uint32_t unit) {
     context.bindTexture(*texture, unit);
 }
 
+bool FrameHistory::isVisible(const float zoom) const {
+    return opacities.data[std::floor(zoom * 10)] != 0;
+}
+
 } // namespace mbgl

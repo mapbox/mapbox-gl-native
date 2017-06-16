@@ -22,6 +22,7 @@ public:
     bool needsAnimation(const Duration&) const;
     void bind(gl::Context&, uint32_t);
     void upload(gl::Context&, uint32_t);
+    bool isVisible(const float zoom) const;
 
 private:
     std::array<TimePoint, 256> changeTimes;
