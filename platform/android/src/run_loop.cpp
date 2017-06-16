@@ -1,9 +1,8 @@
 #include "run_loop_impl.hpp"
 
 #include <mbgl/util/platform.hpp>
-#include <mbgl/util/thread.hpp>
-#include <mbgl/util/thread_context.hpp>
 #include <mbgl/util/thread_local.hpp>
+#include <mbgl/util/threaded_object.hpp>
 #include <mbgl/util/timer.hpp>
 
 #include <android/looper.h>
@@ -62,9 +61,13 @@ namespace util {
 // timeout, but on the main thread `ALooper_pollAll` is called by the activity
 // automatically, thus we cannot set the timeout. Instead we wake the loop
 // with an external file descriptor event coming from this thread.
+//
+// Usually an actor should not carry pointers to other threads, but in
+// this case the RunLoop itself owns the Alarm and calling wake() is the most
+// efficient way of waking up the RunLoop and it is also thread-safe.
 class Alarm {
 public:
-    Alarm(RunLoop::Impl* loop_) : loop(loop_) {}
+    Alarm(ActorRef<Alarm>, RunLoop::Impl* loop_) : loop(loop_) {}
 
     void set(const Milliseconds& timeout) {
         alarm.start(timeout, mbgl::Duration::zero(), [this]() { loop->wake(); });
@@ -102,7 +105,7 @@ RunLoop::Impl::Impl(RunLoop* runLoop_, RunLoop::Type type) : runLoop(runLoop_) {
     case Type::Default:
         ret = ALooper_addFd(loop, fds[PIPE_OUT], ALOOPER_POLL_CALLBACK,
             ALOOPER_EVENT_INPUT, looperCallbackDefault, this);
-        alarm = std::make_unique<Thread<Alarm>>(ThreadContext{"Alarm"}, this);
+        alarm = std::make_unique<ThreadedObject<Alarm>>("Alarm", this);
         running = true;
         break;
     }
@@ -190,7 +193,7 @@ Milliseconds RunLoop::Impl::processRunnables() {
 
     auto timeout = std::chrono::duration_cast<Milliseconds>(nextDue - now);
     if (alarm) {
-        alarm->invoke(&Alarm::set, timeout);
+        alarm->actor().invoke(&Alarm::set, timeout);
     }
 
     return timeout;
