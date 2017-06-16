@@ -9,7 +9,7 @@ namespace style {
 class Position {
 public:
     Position() = default;
-    Position(std::array<float, 3>& position_)
+    Position(const std::array<float, 3>& position_)
         : radial(position_[0]), azimuthal(position_[1]), polar(position_[2]) {
         calculateCartesian();
     };
