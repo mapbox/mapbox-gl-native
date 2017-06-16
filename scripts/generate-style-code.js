@@ -53,7 +53,7 @@ global.evaluatedType = function (property) {
   }
 };
 
-function attributeType(property, type) {
+function attributeUniformType(property, type) {
     const attributeNameExceptions = {
       'text-opacity': 'opacity',
       'icon-opacity': 'opacity',
@@ -64,11 +64,12 @@ function attributeType(property, type) {
       'text-halo-blur': 'halo_blur',
       'icon-halo-blur': 'halo_blur',
       'text-halo-width': 'halo_width',
-      'icon-halo-width': 'halo_width'
+      'icon-halo-width': 'halo_width',
+      'line-gap-width': 'gapwidth'
     }
     const name = attributeNameExceptions[property.name] ||
         property.name.replace(type + '-', '').replace(/-/g, '_');
-    return `attributes::a_${name}${name === 'offset' ? '<1>' : ''}`;
+    return `attributes::a_${name}${name === 'offset' ? '<1>' : ''}, uniforms::u_${name}`;
 }
 
 global.layoutPropertyType = function (property) {
@@ -81,7 +82,7 @@ global.layoutPropertyType = function (property) {
 
 global.paintPropertyType = function (property, type) {
   if (isDataDriven(property)) {
-    return `DataDrivenPaintProperty<${evaluatedType(property)}, ${attributeType(property, type)}>`;
+    return `DataDrivenPaintProperty<${evaluatedType(property)}, ${attributeUniformType(property, type)}>`;
   } else if (/-pattern$/.test(property.name) || property.name === 'line-dasharray') {
     return `CrossFadedPaintProperty<${evaluatedType(property)}>`;
   } else {
