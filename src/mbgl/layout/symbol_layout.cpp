@@ -599,6 +599,12 @@ void SymbolLayout::addSymbol(Buffer& buffer,
     buffer.vertices.emplace_back(SymbolLayoutAttributes::vertex(anchorPoint, br, labelAnchor, tex.x + tex.w, tex.y + tex.h,
                         minZoom, maxZoom, placementZoom, glyphAngle));
     
+    auto dynamicVertex = SymbolDynamicLayoutAttributes::vertex(anchorPoint, 0, placementZoom);
+    buffer.dynamicVertices.emplace_back(dynamicVertex);
+    buffer.dynamicVertices.emplace_back(dynamicVertex);
+    buffer.dynamicVertices.emplace_back(dynamicVertex);
+    buffer.dynamicVertices.emplace_back(dynamicVertex);
+
     sizeBinder.populateVertexVector(feature);
 
     // add the two triangles, referencing the four coordinates we just inserted.

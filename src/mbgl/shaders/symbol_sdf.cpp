@@ -12,6 +12,7 @@ const float PI = 3.141592653589793;
 attribute vec4 a_pos_offset;
 attribute vec2 a_label_pos;
 attribute vec4 a_data;
+attribute vec3 a_projected_pos;
 
 // contents of a_size vary based on the type of property value
 // used for {text,icon}-size.
@@ -152,7 +153,10 @@ void main() {
 
     highp vec2 label_data = unpack_float(a_data[2]);
     highp float a_labelminzoom = label_data[0];
-    highp float a_lineangle = (label_data[1] / 256.0 * 2.0 * PI);
+    //highp float a_lineangle = (label_data[1] / 256.0 * 2.0 * PI);
+    highp vec2 a_angle_zoom = unpack_float(a_projected_pos[2]);
+    highp float a_lineangle = a_angle_zoom[0] / 256.0 * 2.0 * PI;
+    a_lineangle += 1.0;
     highp vec2 a_zoom = unpack_float(a_data[3]);
     highp float a_minzoom = a_zoom[0];
     highp float a_maxzoom = a_zoom[1];

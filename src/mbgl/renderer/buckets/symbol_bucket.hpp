@@ -44,10 +44,12 @@ public:
 
     struct TextBuffer {
         gl::VertexVector<SymbolLayoutVertex> vertices;
+        gl::VertexVector<SymbolDynamicLayoutAttributes::Vertex> dynamicVertices;
         gl::IndexVector<gl::Triangles> triangles;
         gl::SegmentVector<SymbolTextAttributes> segments;
 
         optional<gl::VertexBuffer<SymbolLayoutVertex>> vertexBuffer;
+        optional<gl::VertexBuffer<SymbolDynamicLayoutAttributes::Vertex>> dynamicVertexBuffer;
         optional<gl::IndexBuffer<gl::Triangles>> indexBuffer;
     } text;
     
@@ -55,11 +57,13 @@ public:
     
     struct IconBuffer {
         gl::VertexVector<SymbolLayoutVertex> vertices;
+        gl::VertexVector<SymbolDynamicLayoutAttributes::Vertex> dynamicVertices;
         gl::IndexVector<gl::Triangles> triangles;
         gl::SegmentVector<SymbolIconAttributes> segments;
         PremultipliedImage atlasImage;
 
         optional<gl::VertexBuffer<SymbolLayoutVertex>> vertexBuffer;
+        optional<gl::VertexBuffer<SymbolDynamicLayoutAttributes::Vertex>> dynamicVertexBuffer;
         optional<gl::IndexBuffer<gl::Triangles>> indexBuffer;
     } icon;
 
@@ -69,6 +73,7 @@ public:
         gl::SegmentVector<CollisionBoxAttributes> segments;
 
         optional<gl::VertexBuffer<CollisionBoxVertex>> vertexBuffer;
+        optional<gl::VertexBuffer<SymbolDynamicLayoutAttributes::Vertex>> dynamicVertexBuffer;
         optional<gl::IndexBuffer<gl::Lines>> indexBuffer;
     } collisionBox;
 };

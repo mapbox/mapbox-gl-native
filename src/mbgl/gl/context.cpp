@@ -164,12 +164,12 @@ void Context::verifyProgramLinkage(ProgramID program_) {
     throw std::runtime_error("program failed to link");
 }
 
-UniqueBuffer Context::createVertexBuffer(const void* data, std::size_t size) {
+UniqueBuffer Context::createVertexBuffer(const void* data, std::size_t size, bool dynamicDraw) {
     BufferID id = 0;
     MBGL_CHECK_ERROR(glGenBuffers(1, &id));
     UniqueBuffer result { std::move(id), { this } };
     vertexBuffer = result;
-    MBGL_CHECK_ERROR(glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW));
+    MBGL_CHECK_ERROR(glBufferData(GL_ARRAY_BUFFER, size, data, dynamicDraw ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW));
     return result;
 }
 

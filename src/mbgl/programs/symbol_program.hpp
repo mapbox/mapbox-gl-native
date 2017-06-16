@@ -86,6 +86,20 @@ struct SymbolLayoutAttributes : gl::Attributes<
         };
     }
 };
+
+struct SymbolDynamicLayoutAttributes : gl::Attributes<attributes::a_projected_pos> {
+    static Vertex vertex(Point<float> anchorPoint, float labelAngle, float labelminzoom) {
+        return Vertex {
+            {{
+                 static_cast<uint16_t>(anchorPoint.x),
+                 static_cast<uint16_t>(anchorPoint.y),
+                 mbgl::attributes::packUint8Pair(
+                         static_cast<uint8_t>(std::fmod(labelAngle + 2 * M_PI, 2 * M_PI) / (2 * M_PI) * 255),
+                         static_cast<uint8_t>(labelminzoom * 10))
+             }}
+        };
+    }
+};
     
 class SymbolSizeAttributes : public gl::Attributes<attributes::a_size> {
 public:
@@ -327,7 +341,7 @@ public:
     using LayoutAttributes = LayoutAttrs;
     using LayoutVertex = typename LayoutAttributes::Vertex;
     
-    using LayoutAndSizeAttributes = gl::ConcatenateAttributes<LayoutAttributes, SymbolSizeAttributes>;
+    using LayoutAndSizeAttributes = gl::ConcatenateAttributes<LayoutAttributes, gl::ConcatenateAttributes<SymbolDynamicLayoutAttributes, SymbolSizeAttributes>>;
 
     using PaintProperties = PaintProps;
     using PaintPropertyBinders = typename PaintProperties::Binders;
@@ -360,6 +374,7 @@ public:
               gl::ColorMode colorMode,
               UniformValues&& uniformValues,
               const gl::VertexBuffer<LayoutVertex>& layoutVertexBuffer,
+              const gl::VertexBuffer<SymbolDynamicLayoutAttributes::Vertex>& dynamicLayoutVertexBuffer,
               const SymbolSizeBinder& symbolSizeBinder,
               const gl::IndexBuffer<DrawMode>& indexBuffer,
               const gl::SegmentVector<Attributes>& segments,
@@ -376,6 +391,7 @@ public:
                 .concat(symbolSizeBinder.uniformValues(currentZoom))
                 .concat(paintPropertyBinders.uniformValues(currentZoom, currentProperties)),
             LayoutAttributes::bindings(layoutVertexBuffer)
+                .concat(SymbolDynamicLayoutAttributes::bindings(dynamicLayoutVertexBuffer))
                 .concat(symbolSizeBinder.attributeBindings())
                 .concat(paintPropertyBinders.attributeBindings(currentProperties)),
             indexBuffer,
