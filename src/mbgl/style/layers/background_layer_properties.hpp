@@ -7,6 +7,7 @@
 #include <mbgl/style/paint_property.hpp>
 #include <mbgl/style/properties.hpp>
 #include <mbgl/programs/attributes.hpp>
+#include <mbgl/programs/uniforms.hpp>
 
 namespace mbgl {
 namespace style {
