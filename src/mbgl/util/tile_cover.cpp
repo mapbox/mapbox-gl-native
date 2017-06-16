@@ -80,8 +80,8 @@ std::vector<UnwrappedTileID> tileCover(const Point<double>& tl,
                                        const Point<double>& br,
                                        const Point<double>& bl,
                                        const Point<double>& c,
-                                       int32_t z) {
-    const int32_t tiles = 1 << z;
+                                       uint8_t zoom) {
+    const int32_t tiles = 1 << zoom;
 
     struct ID {
         int32_t x, y;
@@ -119,7 +119,7 @@ std::vector<UnwrappedTileID> tileCover(const Point<double>& tl,
 
     std::vector<UnwrappedTileID> result;
     for (const auto& id : t) {
-        result.emplace_back(z, id.x, id.y);
+        result.emplace_back(zoom, id.x, id.y);
     }
     return result;
 }
@@ -135,7 +135,7 @@ int32_t coveringZoomLevel(double zoom, SourceType type, uint16_t size) {
     }
 }
 
-std::vector<UnwrappedTileID> tileCover(const LatLngBounds& bounds_, int32_t z) {
+std::vector<UnwrappedTileID> tileCover(const LatLngBounds& bounds_, uint8_t zoom) {
     if (bounds_.isEmpty() ||
         bounds_.south() >  util::LATITUDE_MAX ||
         bounds_.north() < -util::LATITUDE_MAX) {
@@ -147,26 +147,26 @@ std::vector<UnwrappedTileID> tileCover(const LatLngBounds& bounds_, int32_t z) {
         { std::min(bounds_.north(),  util::LATITUDE_MAX), bounds_.east() });
 
     return tileCover(
-        TileCoordinate::fromLatLng(z, bounds.northwest()).p,
-        TileCoordinate::fromLatLng(z, bounds.northeast()).p,
-        TileCoordinate::fromLatLng(z, bounds.southeast()).p,
-        TileCoordinate::fromLatLng(z, bounds.southwest()).p,
-        TileCoordinate::fromLatLng(z, bounds.center()).p,
-        z);
+        TileCoordinate::fromLatLng(zoom, bounds.northwest()).p,
+        TileCoordinate::fromLatLng(zoom, bounds.northeast()).p,
+        TileCoordinate::fromLatLng(zoom, bounds.southeast()).p,
+        TileCoordinate::fromLatLng(zoom, bounds.southwest()).p,
+        TileCoordinate::fromLatLng(zoom, bounds.center()).p,
+        zoom);
 }
 
-std::vector<UnwrappedTileID> tileCover(const TransformState& state, int32_t z) {
+std::vector<UnwrappedTileID> tileCover(const TransformState& state, uint8_t zoom) {
     assert(state.valid());
 
     const double w = state.getSize().width;
     const double h = state.getSize().height;
     return tileCover(
-        TileCoordinate::fromScreenCoordinate(state, z, { 0,   0   }).p,
-        TileCoordinate::fromScreenCoordinate(state, z, { w,   0   }).p,
-        TileCoordinate::fromScreenCoordinate(state, z, { w,   h   }).p,
-        TileCoordinate::fromScreenCoordinate(state, z, { 0,   h   }).p,
-        TileCoordinate::fromScreenCoordinate(state, z, { w/2, h/2 }).p,
-        z);
+        TileCoordinate::fromScreenCoordinate(state, zoom, { 0,   0   }).p,
+        TileCoordinate::fromScreenCoordinate(state, zoom, { w,   0   }).p,
+        TileCoordinate::fromScreenCoordinate(state, zoom, { w,   h   }).p,
+        TileCoordinate::fromScreenCoordinate(state, zoom, { 0,   h   }).p,
+        TileCoordinate::fromScreenCoordinate(state, zoom, { w/2, h/2 }).p,
+        zoom);
 }
 
 } // namespace util
