@@ -83,7 +83,7 @@ std::vector<UnwrappedTileID> tileCover(const Point<double>& tl,
                                        const Point<double>& br,
                                        const Point<double>& bl,
                                        const Point<double>& c,
-                                       int32_t z) {
+                                       uint8_t z) {
     const int32_t tiles = 1 << z;
 
     struct ID {
@@ -129,7 +129,7 @@ std::vector<UnwrappedTileID> tileCover(const Point<double>& tl,
 
 } // namespace
 
-int32_t coveringZoomLevel(double zoom, style::SourceType type, uint16_t size) {
+uint8_t coveringZoomLevel(double zoom, style::SourceType type, uint16_t size) {
     zoom += ::log2(util::tileSize / size);
     if (type == style::SourceType::Raster || type == style::SourceType::Video) {
         return ::round(zoom);
@@ -138,7 +138,7 @@ int32_t coveringZoomLevel(double zoom, style::SourceType type, uint16_t size) {
     }
 }
 
-std::vector<UnwrappedTileID> tileCover(const LatLngBounds& bounds_, int32_t z) {
+std::vector<UnwrappedTileID> tileCover(const LatLngBounds& bounds_, uint8_t z) {
     if (bounds_.isEmpty() ||
         bounds_.south() >  util::LATITUDE_MAX ||
         bounds_.north() < -util::LATITUDE_MAX) {
@@ -158,7 +158,7 @@ std::vector<UnwrappedTileID> tileCover(const LatLngBounds& bounds_, int32_t z) {
         z);
 }
 
-std::vector<UnwrappedTileID> tileCover(const TransformState& state, int32_t z) {
+std::vector<UnwrappedTileID> tileCover(const TransformState& state, uint8_t z) {
     assert(state.valid());
 
     const double w = state.getSize().width;
@@ -172,7 +172,7 @@ std::vector<UnwrappedTileID> tileCover(const TransformState& state, int32_t z) {
         z);
 }
 
-std::vector<UnwrappedTileID> tileCover(const Geometry<double>& geometry, int32_t z) {
+std::vector<UnwrappedTileID> tileCover(const Geometry<double>& geometry, uint8_t z) {
     std::vector<UnwrappedTileID> result;
     TileCover tc(geometry, z, true);
     while (tc.hasNext()) {
@@ -182,7 +182,7 @@ std::vector<UnwrappedTileID> tileCover(const Geometry<double>& geometry, int32_t
     return result;
 }
 
-// Taken from https://github.com/mapbox/sphericalmercator#xyzbbox-zoom-tms_style-srs
+// Taken from https://github.com/mapbox/sphericalmercator#xyzbbox-z-tms_style-srs
 // Computes the projected tiles for the lower left and upper right points of the bounds
 // and uses that to compute the tile cover count
 uint64_t tileCount(const LatLngBounds& bounds, uint8_t zoom){
@@ -212,7 +212,7 @@ uint64_t tileCount(const Geometry<double>& geometry, uint8_t z) {
     return tileCount;
 }
 
-TileCover::TileCover(const LatLngBounds&bounds_, int32_t z) {
+TileCover::TileCover(const LatLngBounds&bounds_, uint8_t z) {
     LatLngBounds bounds = LatLngBounds::hull(
         { std::max(bounds_.south(), -util::LATITUDE_MAX), bounds_.west() },
         { std::min(bounds_.north(),  util::LATITUDE_MAX), bounds_.east() });
@@ -232,7 +232,7 @@ TileCover::TileCover(const LatLngBounds&bounds_, int32_t z) {
     impl = std::make_unique<TileCover::Impl>(z, p, false);
 }
 
-TileCover::TileCover(const Geometry<double>& geom, int32_t z, bool project/* = true*/)
+TileCover::TileCover(const Geometry<double>& geom, uint8_t z, bool project/* = true*/)
  : impl( std::make_unique<TileCover::Impl>(z, geom, project)) {
 }
 
