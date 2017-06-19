@@ -1,5 +1,6 @@
 #include <mbgl/style/sources/geojson_source.hpp>
 #include <mbgl/style/sources/geojson_source_impl.hpp>
+#include <mbgl/style/source_observer.hpp>
 
 namespace mbgl {
 namespace style {
@@ -16,6 +17,7 @@ void GeoJSONSource::setURL(const std::string& url) {
 
 void GeoJSONSource::setGeoJSON(const mapbox::geojson::geojson& geoJSON) {
     impl->setGeoJSON(geoJSON);
+    impl->observer->onSourceChanged(*this);
 }
 
 optional<std::string> GeoJSONSource::getURL() const {
