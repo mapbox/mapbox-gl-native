@@ -165,7 +165,7 @@ static NSString * const MGLAPIClientHTTPMethodPost = @"POST";
         SecTrustRef serverTrust = [[challenge protectionSpace] serverTrust];
         SecTrustResultType trustResult;
         
-        // Validate the certificate chain with the device's trust store anyway this *might* give use revocation checking
+        // Validate the certificate chain with the device's trust store anyway this *might* use revocation checking
         SecTrustEvaluate(serverTrust, &trustResult);
         
         BOOL found = NO; // For clarity; we start in a state where the challange has not been completed and no certificate has been found
