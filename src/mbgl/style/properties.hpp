@@ -130,7 +130,10 @@ public:
 
     class PossiblyEvaluated : public Tuple<PossiblyEvaluatedTypes> {
     public:
-        using Tuple<PossiblyEvaluatedTypes>::Tuple;
+        template <class... Us>
+        PossiblyEvaluated(Us&&... us)
+            : Tuple<PossiblyEvaluatedTypes>(std::forward<Us>(us)...) {
+        }
 
         template <class T>
         static T evaluate(float, const GeometryTileFeature&, const T& t, const T&) {
@@ -212,6 +215,14 @@ public:
             return result;
         }
     };
+};
+
+template <class...>
+struct ConcatenateProperties;
+
+template <class... As, class... Bs>
+struct ConcatenateProperties<TypeList<As...>, TypeList<Bs...>> {
+    using Type = Properties<As..., Bs...>;
 };
 
 } // namespace style

@@ -19,7 +19,9 @@ private:
 
 public:
     PossiblyEvaluatedPropertyValue() = default;
-    PossiblyEvaluatedPropertyValue(Value v) : value(std::move(v)) {}
+    PossiblyEvaluatedPropertyValue(Value v, bool useIntegerZoom_ = false)
+        : value(std::move(v)),
+          useIntegerZoom(useIntegerZoom_) {}
 
     bool isConstant() const {
         return value.template is<T>();
@@ -48,10 +50,16 @@ public:
                     return function.evaluate(feature, defaultValue);
                 },
                 [&] (const style::CompositeFunction<T>& function) {
-                    return function.evaluate(zoom, feature, defaultValue);
+                    if (useIntegerZoom) {
+                        return function.evaluate(floor(zoom), feature, defaultValue);
+                    } else {
+                        return function.evaluate(zoom, feature, defaultValue);
+                    }
                 }
         );
     }
+
+    bool useIntegerZoom;
 };
 
 namespace util {

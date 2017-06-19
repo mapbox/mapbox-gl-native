@@ -217,7 +217,11 @@ public:
     }
 
     float interpolationFactor(float currentZoom) const override {
-        return util::interpolationFactor(1.0f, { rangeOfCoveringRanges.min.zoom, rangeOfCoveringRanges.max.zoom }, currentZoom);
+        if (function.useIntegerZoom) {
+            return util::interpolationFactor(1.0f, { rangeOfCoveringRanges.min.zoom, rangeOfCoveringRanges.max.zoom }, std::floor(currentZoom));
+        } else {
+            return util::interpolationFactor(1.0f, { rangeOfCoveringRanges.min.zoom, rangeOfCoveringRanges.max.zoom }, currentZoom);
+        }
     }
 
     T uniformValue(const PossiblyEvaluatedPropertyValue<T>& currentValue) const override {

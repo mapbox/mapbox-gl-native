@@ -3,8 +3,17 @@
 #include <mbgl/renderer/render_layer.hpp>
 #include <mbgl/style/layers/line_layer_impl.hpp>
 #include <mbgl/style/layers/line_layer_properties.hpp>
+#include <mbgl/programs/uniforms.hpp>
 
 namespace mbgl {
+
+struct LineFloorwidth : style::DataDrivenPaintProperty<float, attributes::a_floorwidth, uniforms::u_floorwidth> {
+    static float defaultValue() { return 1; }
+};
+
+class RenderLinePaintProperties : public style::ConcatenateProperties<
+    style::LinePaintProperties::PropertyTypes,
+    TypeList<LineFloorwidth>>::Type {};
 
 class RenderLineLayer: public RenderLayer {
 public:
@@ -26,12 +35,9 @@ public:
 
     // Paint properties
     style::LinePaintProperties::Unevaluated unevaluated;
-    style::LinePaintProperties::PossiblyEvaluated evaluated;
+    RenderLinePaintProperties::PossiblyEvaluated evaluated;
 
     const style::LineLayer::Impl& impl() const;
-
-    // Special case
-    float dashLineWidth = 1;
 
 private:
     float getLineWidth(const GeometryTileFeature&, const float) const;

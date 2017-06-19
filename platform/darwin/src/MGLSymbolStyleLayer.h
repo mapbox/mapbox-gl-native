@@ -533,7 +533,11 @@ MGL_EXPORT
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *iconRotationAlignment;
 
 /**
- Scale factor for icon. 1 is original size, 3 triples the size.
+ Scales the original size of the icon by the provided factor. The new point size
+ of the image will be the original point size multiplied by `iconSize`. 1 is the
+ original size; 3 triples the size of the image.
+ 
+ This property is measured in factor of the original icon sizes.
  
  The default value of this property is an `MGLStyleValue` object containing an
  `NSNumber` object containing the float `1`. Set this property to `nil` to reset

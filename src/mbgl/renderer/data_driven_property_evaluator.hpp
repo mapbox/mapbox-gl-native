@@ -24,12 +24,18 @@ public:
     }
 
     ResultType operator()(const style::CameraFunction<T>& function) const {
-        return ResultType(function.evaluate(parameters.z));
+        if (!parameters.useIntegerZoom) {
+            return ResultType(function.evaluate(parameters.z));
+        } else {
+            return ResultType(function.evaluate(floor(parameters.z)));
+        }
     }
 
     template <class Function>
     ResultType operator()(const Function& function) const {
-        return ResultType(function);
+        auto returnFunction = function;
+        returnFunction.useIntegerZoom = parameters.useIntegerZoom;
+        return ResultType(returnFunction);
     }
 
 private:

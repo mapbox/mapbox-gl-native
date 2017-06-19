@@ -135,6 +135,7 @@ public:
     std::string property;
     Stops stops;
     optional<T> defaultValue;
+    bool useIntegerZoom = false;
 
 private:
     T evaluateFinal(const CoveringRanges& ranges, const Value& value, T finalDefaultValue) const {

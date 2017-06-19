@@ -328,7 +328,7 @@ void Painter::renderPass(PaintParameters& parameters,
             mat4 viewportMat;
             matrix::ortho(viewportMat, 0, size.width, size.height, 0, 0, 1);
 
-            const Properties<>::PossiblyEvaluated properties{};
+            const Properties<>::PossiblyEvaluated properties;
 
             parameters.programs.extrusionTexture.draw(
                 context, gl::Triangles(), gl::DepthMode::disabled(), gl::StencilMode::disabled(),
