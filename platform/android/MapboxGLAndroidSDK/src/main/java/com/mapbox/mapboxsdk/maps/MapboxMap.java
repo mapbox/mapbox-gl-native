@@ -887,7 +887,7 @@ public final class MapboxMap {
   }
 
   /**
-   * Transform the map bearing given a bearing, focal point coordinates and a duration.
+   * Transform the map bearing given a bearing, focal point coordinates, and a duration.
    *
    * @param bearing  The bearing of the Map to be transformed to
    * @param focalX   The x coordinate of the focal point

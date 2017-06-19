@@ -13,7 +13,7 @@ import java.lang.annotation.RetentionPolicy;
 /**
  * MyLocationTracking exposes types of location tracking modes.
  * * <p>
- * This allows to track to the user location on screen by updating the camera position when a location update occurs.
+ * This allows tracking the user location on screen by updating the camera position when a location update occurs.
  * </p>
  * <p>
  * Required to enable showing the user location first through {@link MapboxMap#setMyLocationEnabled(boolean)}.
