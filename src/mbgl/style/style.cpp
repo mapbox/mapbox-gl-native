@@ -725,6 +725,7 @@ void Style::onSourceLoaded(Source& source) {
 
 void Style::onSourceChanged(Source& source) {
     observer->onSourceChanged(source);
+    observer->onUpdate(Update::Repaint);
 }
 
 void Style::onSourceError(Source& source, std::exception_ptr error) {
