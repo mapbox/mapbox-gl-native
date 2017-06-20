@@ -309,8 +309,9 @@ void GeometryTileWorker::redoLayout() {
         featureIndex->setBucketLayerIDs(leader.getID(), layerIDs);
 
         if (leader.is<RenderSymbolLayer>()) {
-            symbolLayoutMap.emplace(leader.getID(),
-                leader.as<RenderSymbolLayer>()->createLayout(parameters, group, *geometryLayer, glyphDependencies, imageDependencies));
+            auto layout = leader.as<RenderSymbolLayer>()->createLayout(
+                parameters, group, std::move(geometryLayer), glyphDependencies, imageDependencies);
+            symbolLayoutMap.emplace(leader.getID(), std::move(layout));
         } else {
             const Filter& filter = leader.baseImpl->filter;
             const std::string& sourceLayerID = leader.baseImpl->sourceLayer;

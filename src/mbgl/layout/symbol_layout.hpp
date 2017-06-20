@@ -29,7 +29,7 @@ class SymbolLayout {
 public:
     SymbolLayout(const BucketParameters&,
                  const std::vector<const RenderLayer*>&,
-                 const GeometryTileLayer&,
+                 std::unique_ptr<GeometryTileLayer>,
                  ImageDependencies&,
                  GlyphDependencies&);
 
@@ -74,7 +74,9 @@ private:
                    const float placementAngle,
                    WritingModeType writingModes);
 
-    const std::string sourceLayerName;
+    // Stores the layer so that we can hold on to GeometryTileFeature instances in SymbolFeature,
+    // which may reference data from this object.
+    const std::unique_ptr<GeometryTileLayer> sourceLayer;
     const std::string bucketName;
     const float overscaling;
     const float zoom;
