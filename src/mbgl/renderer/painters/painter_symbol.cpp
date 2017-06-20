@@ -10,6 +10,7 @@
 #include <mbgl/programs/collision_box_program.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/tile/geometry_tile.hpp>
+#include <mbgl/layout/symbol_projection.hpp>
 
 #include <cmath>
 
@@ -65,15 +66,16 @@ void Painter::renderSymbol(PaintParameters& parameters,
     assert(dynamic_cast<GeometryTile*>(&tile.tile));
     GeometryTile& geometryTile = static_cast<GeometryTile&>(tile.tile);
 
-    const alongLine = bucket.layout.get<SymbolPlacement>() == SymbolPlacementType::Line &&
-        bucket.layout.get<RotationAlignment>() == AlignmentType::Map;
 
     if (bucket.hasIconData()) {
         auto values = layer.iconPropertyValues(layout);
         auto paintPropertyValues = layer.iconPaintProperties();
 
+        const bool alongLine = bucket.layout.get<SymbolPlacement>() == SymbolPlacementType::Line &&
+            bucket.layout.get<IconRotationAlignment>() == AlignmentType::Map;
+
         if (alongLine) {
-            reprojectLineLabels(bucket, tile.matrix, false, values, tile);
+            reprojectLineLabels(bucket, tile.matrix, false, values, tile, state);
         }
 
         const bool iconScaled = layout.get<IconSize>().constantOr(1.0) != 1.0 || bucket.iconsNeedLinear;
@@ -121,6 +123,9 @@ void Painter::renderSymbol(PaintParameters& parameters,
 
         auto values = layer.textPropertyValues(layout);
         auto paintPropertyValues = layer.textPaintProperties();
+
+        const bool alongLine = bucket.layout.get<SymbolPlacement>() == SymbolPlacementType::Line &&
+            bucket.layout.get<TextRotationAlignment>() == AlignmentType::Map;
 
         const Size texsize = geometryTile.glyphAtlasTexture->size;
 

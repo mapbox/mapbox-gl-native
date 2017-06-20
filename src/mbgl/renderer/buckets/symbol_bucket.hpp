@@ -15,6 +15,24 @@
 
 namespace mbgl {
 
+class PlacedSymbol {
+public:
+    PlacedSymbol(Point<float> anchorPoint_, uint16_t segment_, float lowerSize_, float upperSize_,
+            float lineOffsetX_, float lineOffsetY_, float placementZoom_, bool vertical_) :
+        anchorPoint(anchorPoint_), segment(segment_), lowerSize(lowerSize_), upperSize(upperSize_),
+        lineOffsetX(lineOffsetX_), lineOffsetY(lineOffsetY_), placementZoom(placementZoom_), vertical(vertical_) {}
+    Point<float> anchorPoint;
+    uint16_t segment;
+    float lowerSize;
+    float upperSize;
+    float lineOffsetX;
+    float lineOffsetY;
+    float placementZoom;
+    bool vertical;
+    std::vector<float> glyphOffsets;
+    std::vector<Point<float>> line;
+};
+
 class SymbolBucket : public Bucket {
 public:
     SymbolBucket(style::SymbolLayoutProperties::PossiblyEvaluated,
@@ -47,6 +65,7 @@ public:
         gl::VertexVector<SymbolDynamicLayoutAttributes::Vertex> dynamicVertices;
         gl::IndexVector<gl::Triangles> triangles;
         gl::SegmentVector<SymbolTextAttributes> segments;
+        std::vector<PlacedSymbol> placedSymbols;
 
         optional<gl::VertexBuffer<SymbolLayoutVertex>> vertexBuffer;
         optional<gl::VertexBuffer<SymbolDynamicLayoutAttributes::Vertex>> dynamicVertexBuffer;
@@ -60,6 +79,7 @@ public:
         gl::VertexVector<SymbolDynamicLayoutAttributes::Vertex> dynamicVertices;
         gl::IndexVector<gl::Triangles> triangles;
         gl::SegmentVector<SymbolIconAttributes> segments;
+        std::vector<PlacedSymbol> placedSymbols;
         PremultipliedImage atlasImage;
 
         optional<gl::VertexBuffer<SymbolLayoutVertex>> vertexBuffer;

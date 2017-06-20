@@ -40,6 +40,7 @@ public:
     // Layout
     AlignmentType pitchAlignment;
     AlignmentType rotationAlignment;
+    bool keepUpright;
 
     // Paint
     std::array<float, 2> translate;
