@@ -14,7 +14,7 @@ namespace mbgl {
 using namespace style;
 
 RenderImageSource::RenderImageSource(Immutable<style::ImageSource::Impl> impl_)
-    : RenderSource(impl_), shouldRender(false) {
+    : RenderSource(impl_) {
 }
 
 RenderImageSource::~RenderImageSource() = default;
@@ -42,13 +42,13 @@ void RenderImageSource::startRender(Painter& painter) {
         matrices.push_back(matrix);
     }
 
-    if (bucket->needsUpload() && shouldRender) {
+    if (bucket->needsUpload()) {
         bucket->upload(painter.context);
     }
 }
 
 void RenderImageSource::finishRender(Painter& painter) {
-    if (!isLoaded() || !shouldRender) {
+    if (!isLoaded()) {
         return;
     }
     for (auto matrix : matrices) {
@@ -73,15 +73,24 @@ void RenderImageSource::update(Immutable<style::Source::Impl> baseImpl_,
                                const bool needsRendering,
                                const bool,
                                const TileParameters& parameters) {
-    std::swap(baseImpl, baseImpl_);
-
     enabled = needsRendering;
+    if (!needsRendering) {
+        return;
+    }
 
     auto transformState = parameters.transformState;
-    auto size = transformState.getSize();
-    double viewportHeight = size.height;
+    std::swap(baseImpl, baseImpl_);
 
     auto coords = impl().getCoordinates();
+    std::shared_ptr<UnassociatedImage> image = impl().getImage();
+
+    if (!image || !image->valid()) {
+        enabled = false;
+        return;
+    }
+
+    auto size = transformState.getSize();
+    const double viewportHeight = size.height;
 
     // Compute the screen coordinates at wrap=0 for the given LatLng
     ScreenCoordinate nePixel = { -INFINITY, -INFINITY };
@@ -94,38 +103,51 @@ void RenderImageSource::update(Immutable<style::Source::Impl> baseImpl_,
         swPixel.y = std::min(swPixel.y, viewportHeight - pixel.y);
         nePixel.y = std::max(nePixel.y, viewportHeight - pixel.y);
     }
-    double width = nePixel.x - swPixel.x;
-    double height = nePixel.y - swPixel.y;
+    const double width = nePixel.x - swPixel.x;
+    const double height = nePixel.y - swPixel.y;
 
     // Don't bother drawing the ImageSource unless it occupies >4 screen pixels
-    shouldRender = (width * height > 4);
-    if (!shouldRender) {
+    enabled = (width * height > 4);
+    if (!enabled) {
         return;
     }
 
     // Calculate the optimum zoom level to determine the tile ids to use for transforms
     double minScale = INFINITY;
-    if (width > 0 || height > 0) {
-        double scaleX = double(size.width) / width;
-        double scaleY = double(size.height) / height;
-        minScale = util::min(scaleX, scaleY);
-    }
+    double scaleX = double(size.width) / width;
+    double scaleY = double(size.height) / height;
+    minScale = util::min(scaleX, scaleY);
     double zoom = transformState.getZoom() + util::log2(minScale);
-    zoom = util::clamp(zoom, transformState.getMinZoom(), transformState.getMaxZoom());
-
+    zoom = std::floor(util::clamp(zoom, transformState.getMinZoom(), transformState.getMaxZoom()));
     auto imageBounds = LatLngBounds::hull(coords[0], coords[1]);
     imageBounds.extend(coords[2]);
     imageBounds.extend(coords[3]);
-    auto tileCover = util::tileCover(imageBounds, ::floor(zoom));
+    auto tileCover = util::tileCover(imageBounds, zoom);
     tileIds.clear();
     tileIds.push_back(tileCover[0]);
+    bool hasVisibleTile = false;
 
     // Add additional wrapped tile ids if neccessary
     auto idealTiles = util::tileCover(transformState, transformState.getZoom());
     for (auto tile : idealTiles) {
         if (tile.wrap != 0 && tileCover[0].canonical.isChildOf(tile.canonical)) {
             tileIds.push_back({ tile.wrap, tileCover[0].canonical });
+            hasVisibleTile = true;
         }
+        else if (!hasVisibleTile) {
+            for (auto coveringTile: tileCover) {
+                if(coveringTile.canonical == tile.canonical ||
+                    coveringTile.canonical.isChildOf(tile.canonical) ||
+                    tile.canonical.isChildOf(coveringTile.canonical)) {
+                    hasVisibleTile = true;
+                }
+            }
+        }
+    }
+
+    enabled = hasVisibleTile;
+    if (!enabled) {
+        return;
     }
 
     // Calculate Geometry Coordinates based on tile cover at ideal zoom
@@ -135,16 +157,13 @@ void RenderImageSource::update(Immutable<style::Source::Impl> baseImpl_,
         auto gc = TileCoordinate::toGeometryCoordinate(tileIds[0], tc.p);
         geomCoords.push_back(gc);
     }
-    
-    const UnassociatedImage& image = impl().getImage();
-    if (!image.valid()) {
-        return;
-    }
-    
-    if (!bucket || image != bucket->image) {
-        bucket = std::make_unique<RasterBucket>(image.clone());
+    if (!bucket) {
+        bucket = std::make_unique<RasterBucket>(image);
     } else {
         bucket->clear();
+        if (image != bucket->image) {
+            bucket->setImage(image);
+        }
     }
 
     // Set Bucket Vertices, Indices, and segments
@@ -166,7 +185,7 @@ void RenderImageSource::update(Immutable<style::Source::Impl> baseImpl_,
 void RenderImageSource::render(Painter& painter,
                                PaintParameters& parameters,
                                const RenderLayer& layer) {
-    if (isLoaded() && !bucket->needsUpload() && shouldRender) {
+    if (isEnabled() && isLoaded() && !bucket->needsUpload()) {
         for (auto matrix : matrices) {
             bucket->render(painter, parameters, layer, matrix);
         }

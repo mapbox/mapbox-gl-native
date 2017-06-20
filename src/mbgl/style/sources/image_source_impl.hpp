@@ -13,17 +13,17 @@ class ImageSource::Impl : public Source::Impl {
 public:
     Impl(std::string id, std::array<LatLng, 4> coords);
     Impl(const Impl& rhs, std::array<LatLng, 4> coords);
-    Impl(const Impl& rhs, UnassociatedImage image);
+    Impl(const Impl& rhs, UnassociatedImage&& image);
 
     ~Impl() final;
 
-    const UnassociatedImage& getImage() const;
+    std::shared_ptr<UnassociatedImage> getImage() const;
     std::array<LatLng, 4> getCoordinates() const;
 
     optional<std::string> getAttribution() const final;
 private:
     std::array<LatLng, 4> coords;
-    UnassociatedImage image;
+    std::shared_ptr<UnassociatedImage> image;
 };
 
 } // namespace style
