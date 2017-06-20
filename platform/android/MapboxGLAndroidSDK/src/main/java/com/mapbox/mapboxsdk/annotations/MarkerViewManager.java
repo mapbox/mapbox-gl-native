@@ -135,6 +135,12 @@ public class MarkerViewManager implements MapView.OnMapChangedListener {
     }
   }
 
+  /**
+   * Set the rotation of a MarkerView to a given rotation value.
+   *
+   * @param marker   The MarkerView to change its rotation value
+   * @param rotation The rotation value
+   */
   public void setRotation(@NonNull MarkerView marker, float rotation) {
     View convertView = markerViewMap.get(marker);
     if (convertView != null) {
@@ -544,10 +550,11 @@ public class MarkerViewManager implements MapView.OnMapChangedListener {
   }
 
   /**
-   * When the provided {@link MarkerView} is clicked on by a user, we check if a custom click
-   * event has been created and if not, display a {@link InfoWindow}.
+   * When the provided MarkerView is clicked on by a user, we check if a custom click
+   * event has been created and if not, display a InfoWindow.
    *
-   * @param markerView that the click event occurred.
+   * @param markerView that the click event occurred
+   * @return true if the marker view click has been handled, false if not
    */
   public boolean onClickMarkerView(MarkerView markerView) {
     boolean clickHandled = false;
@@ -572,9 +579,9 @@ public class MarkerViewManager implements MapView.OnMapChangedListener {
   }
 
   /**
-   * Handles the {@link MarkerView}'s info window offset.
+   * Handles the MarkerView info window offset.
    *
-   * @param marker that we are ensuring info window offset.
+   * @param marker that we are ensuring info window offset
    */
   public void ensureInfoWindowOffset(MarkerView marker) {
     View view = null;
@@ -624,7 +631,7 @@ public class MarkerViewManager implements MapView.OnMapChangedListener {
   }
 
   /**
-   * Default MarkerViewAdapter used for base class of {@link MarkerView} to adapt a MarkerView to
+   * Default MarkerViewAdapter used for base class of MarkerView to adapt a MarkerView to
    * an ImageView.
    */
   private static class ImageMarkerViewAdapter extends MapboxMap.MarkerViewAdapter<MarkerView> {

@@ -736,8 +736,8 @@ public final class MapboxMap {
    * will return the current location of the camera in flight.
    * <p>
    * Note that this will cancel location tracking mode if enabled. You can change this behaviour by calling
-   * {@link TrackingSettings#setDismissTrackingModeForCameraPositionChange(boolean)} with false before invoking this
-   * method and calling it with true in the {@link CancelableCallback#onFinish()}.
+   * {@link com.mapbox.mapboxsdk.maps.TrackingSettings#setDismissLocationTrackingOnGesture(boolean)} with false before
+   * invoking this method and calling it with true in the {@link CancelableCallback#onFinish()}.
    * </p>
    *
    * @param update             The change that should be applied to the camera.
@@ -763,8 +763,8 @@ public final class MapboxMap {
    * will return the current location of the camera in flight.
    * <p>
    * Note that this will cancel location tracking mode if enabled. You can change this behaviour by calling
-   * {@link TrackingSettings#setDismissTrackingModeForCameraPositionChange(boolean)} with false before invoking this
-   * method and calling it with true in the {@link CancelableCallback#onFinish()}.
+   * {@link com.mapbox.mapboxsdk.maps.TrackingSettings#setDismissLocationTrackingOnGesture(boolean)} with false before
+   * invoking this method and calling it with true in the {@link CancelableCallback#onFinish()}.
    * </p>
    *
    * @param update             The change that should be applied to the camera.
@@ -887,7 +887,12 @@ public final class MapboxMap {
   }
 
   /**
-   * Set focal bearing.
+   * Transform the map bearing given a bearing, focal point coordinates, and a duration.
+   *
+   * @param bearing  The bearing of the Map to be transformed to
+   * @param focalX   The x coordinate of the focal point
+   * @param focalY   The y coordinate of the focal point
+   * @param duration The duration of the transformation
    */
   public void setFocalBearing(double bearing, float focalX, float focalY, long duration) {
     transform.setBearing(bearing, focalX, focalY, duration);
@@ -1059,7 +1064,7 @@ public final class MapboxMap {
    * An error message will be logged in the Android logcat and {@link MapView#DID_FAIL_LOADING_MAP} event will be
    * sent.
    *
-   * @param style The bundled style. Accepts one of the values from {@link Style}.
+   * @param style The bundled style.
    * @see Style
    */
   @UiThread
@@ -1075,7 +1080,8 @@ public final class MapboxMap {
    * An error message will be logged in the Android logcat and {@link MapView#DID_FAIL_LOADING_MAP} event will be
    * sent.
    *
-   * @param style The bundled style. Accepts one of the values from {@link Style}.
+   * @param style    The bundled style.
+   * @param callback The callback to be invoked when the style has finished loading
    * @see Style
    */
   @UiThread
@@ -1576,9 +1582,11 @@ public final class MapboxMap {
   }
 
   /**
-   * Gets a camera position that would fit a bounds.
+   * Get a camera position that fits a provided bounds and padding.
    *
    * @param latLngBounds the bounds to constrain the map with
+   * @param padding      the padding to apply to the bounds
+   * @return the camera position that fits the bounds and padding
    */
   public CameraPosition getCameraForLatLngBounds(@Nullable LatLngBounds latLngBounds, int[] padding) {
     // calculate and set additional bounds padding
@@ -2410,11 +2418,13 @@ public final class MapboxMap {
   }
 
   /**
-   * Interface definintion for a callback to be invoked when the style has finished loading.
+   * Interface definition for a callback to be invoked when the style has finished loading.
    */
   public interface OnStyleLoadedListener {
     /**
-     * Invoked when the style has finished loading.
+     * Invoked when the style has finished loading
+     *
+     * @param style the style that has been loaded
      */
     void onStyleLoaded(String style);
   }

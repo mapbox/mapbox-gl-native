@@ -23,7 +23,7 @@ import java.util.regex.Pattern;
 public class ColorUtils {
 
   /**
-   * Returns a color integer associated as primary color from a theme based on a {@link Context}.
+   * Returns a color integer associated as primary color from a theme based on a Context.
    *
    * @param context The context used to style the color attributes.
    * @return The primary color value of current theme in the form 0xAARRGGBB.
@@ -37,7 +37,7 @@ public class ColorUtils {
   }
 
   /**
-   * Returns a color integer associated as primary dark color from a theme based on a {@link Context}.
+   * Returns a color integer associated as primary dark color from a theme based on a Context.
    *
    * @param context The context used to style the color attributes.
    * @return The primary dark color value of current theme in the form 0xAARRGGBB.
@@ -51,7 +51,7 @@ public class ColorUtils {
   }
 
   /**
-   * Returns a color integer associated as accent color from a theme based on a {@link Context}.
+   * Returns a color integer associated as accent color from a theme based on a Context.
    *
    * @param context The context used to style the color attributes.
    * @return The accent color value of current theme in the form 0xAARRGGBB.
@@ -65,7 +65,7 @@ public class ColorUtils {
   }
 
   /**
-   * Returns a color state list associated with a theme based on a {@link Context}
+   * Returns a color state list associated with a theme based on a Context.
    *
    * @param color The color used for tinting.
    * @return A ColorStateList object containing the primary color of a theme
@@ -85,7 +85,7 @@ public class ColorUtils {
   }
 
   /**
-   * Set a color tint list to the {@link Drawable} of an {@link ImageView}.
+   * Set a color tint list to the Drawable of an ImageView.
    *
    * @param imageView The view to set the default tint list.
    * @param tintColor The color to tint.

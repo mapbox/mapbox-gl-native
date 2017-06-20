@@ -27,14 +27,32 @@ public class BubbleLayout extends LinearLayout {
   private float strokeWidth;
   private int strokeColor;
 
+  /**
+   * Creates an instance of bubble layout.
+   *
+   * @param context The context used to inflate this bubble layout
+   */
   public BubbleLayout(Context context) {
     this(context, null, 0);
   }
 
+  /**
+   * Creates an instance of bubble layout.
+   *
+   * @param context The context used to inflate this bubble layout
+   * @param attrs   The attribute set to initialise this bubble layout from
+   */
   public BubbleLayout(Context context, AttributeSet attrs) {
     this(context, attrs, 0);
   }
 
+  /**
+   * Creates an instance of bubble layout.
+   *
+   * @param context      The context used to inflate this bubble layout
+   * @param attrs        The attribute set to initialise this bubble layout from
+   * @param defStyleAttr The default style to apply this bubble layout with
+   */
   public BubbleLayout(Context context, AttributeSet attrs, int defStyleAttr) {
     super(context, attrs, defStyleAttr);
 
@@ -78,10 +96,21 @@ public class BubbleLayout extends LinearLayout {
     return dp * (metrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT);
   }
 
+  /**
+   * Get the arrow direction.
+   *
+   * @return the arrow direction
+   */
   public ArrowDirection getArrowDirection() {
     return arrowDirection;
   }
 
+  /**
+   * Set the arrow direction.
+   *
+   * @param arrowDirection The direction of the arrow
+   * @return this
+   */
   public BubbleLayout setArrowDirection(ArrowDirection arrowDirection) {
     resetPadding();
     this.arrowDirection = arrowDirection;
@@ -89,10 +118,21 @@ public class BubbleLayout extends LinearLayout {
     return this;
   }
 
+  /**
+   * Get the arrow width.
+   *
+   * @return the width of the arrow
+   */
   public float getArrowWidth() {
     return arrowWidth;
   }
 
+  /**
+   * Set the arrow width.
+   *
+   * @param arrowWidth The width of the arrow
+   * @return this
+   */
   public BubbleLayout setArrowWidth(float arrowWidth) {
     resetPadding();
     this.arrowWidth = arrowWidth;
@@ -100,10 +140,21 @@ public class BubbleLayout extends LinearLayout {
     return this;
   }
 
+  /**
+   * Get the arrow height
+   *
+   * @return the height of the arrow
+   */
   public float getArrowHeight() {
     return arrowHeight;
   }
 
+  /**
+   * Set the arrow height.
+   *
+   * @param arrowHeight The height of the arrow
+   * @return this
+   */
   public BubbleLayout setArrowHeight(float arrowHeight) {
     resetPadding();
     this.arrowHeight = arrowHeight;
@@ -111,10 +162,21 @@ public class BubbleLayout extends LinearLayout {
     return this;
   }
 
+  /**
+   * Get the arrow position.
+   *
+   * @return the arrow position
+   */
   public float getArrowPosition() {
     return arrowPosition;
   }
 
+  /**
+   * Get the arrow position.
+   *
+   * @param arrowPosition The arrow position
+   * @return this
+   */
   public BubbleLayout setArrowPosition(float arrowPosition) {
     resetPadding();
     this.arrowPosition = arrowPosition;
@@ -122,30 +184,63 @@ public class BubbleLayout extends LinearLayout {
     return this;
   }
 
+  /**
+   * Get the corner radius
+   *
+   * @return the corner radius
+   */
   public float getCornersRadius() {
     return cornersRadius;
   }
 
+  /**
+   * Set the corner radius
+   *
+   * @param cornersRadius The corner radius
+   * @return this
+   */
   public BubbleLayout setCornersRadius(float cornersRadius) {
     this.cornersRadius = cornersRadius;
     requestLayout();
     return this;
   }
 
+  /**
+   * Get the bubble color.
+   *
+   * @return the bubble color
+   */
   public int getBubbleColor() {
     return bubbleColor;
   }
 
+  /**
+   * Set the bubble color.
+   *
+   * @param bubbleColor The buble color
+   * @return this
+   */
   public BubbleLayout setBubbleColor(int bubbleColor) {
     this.bubbleColor = bubbleColor;
     requestLayout();
     return this;
   }
 
+  /**
+   * Get stroke width.
+   *
+   * @return the stroke width
+   */
   public float getStrokeWidth() {
     return strokeWidth;
   }
 
+  /**
+   * Set the stroke width.
+   *
+   * @param strokeWidth The stroke width
+   * @return this
+   */
   public BubbleLayout setStrokeWidth(float strokeWidth) {
     resetPadding();
     this.strokeWidth = strokeWidth;
@@ -153,10 +248,21 @@ public class BubbleLayout extends LinearLayout {
     return this;
   }
 
+  /**
+   * Get the stroke color.
+   *
+   * @return the stroke color
+   */
   public int getStrokeColor() {
     return strokeColor;
   }
 
+  /**
+   * Set the stroke color.
+   *
+   * @param strokeColor The stroke color
+   * @return this
+   */
   public BubbleLayout setStrokeColor(int strokeColor) {
     this.strokeColor = strokeColor;
     requestLayout();

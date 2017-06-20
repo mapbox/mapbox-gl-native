@@ -28,12 +28,16 @@ import com.mapzen.android.lost.api.LostApiClient;
  * in the history stack.
  * </p>
  */
-public class LocationSource extends LocationEngine implements
-  LostApiClient.ConnectionCallbacks, LocationListener {
+public class LocationSource extends LocationEngine implements LostApiClient.ConnectionCallbacks, LocationListener {
 
   private Context context;
   private LostApiClient lostApiClient;
 
+  /**
+   * Constructs a location source instance.
+   *
+   * @param context the context from which the Application context will be derived.
+   */
   public LocationSource(Context context) {
     super();
     this.context = context.getApplicationContext();

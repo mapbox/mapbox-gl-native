@@ -13,6 +13,9 @@ import android.os.Parcelable;
  */
 public class ProjectedMeters implements IProjectedMeters, Parcelable {
 
+  /**
+   * Inner class responsible for recreating Parcels into objects.
+   */
   public static final Creator<ProjectedMeters> CREATOR = new Creator<ProjectedMeters>() {
     public ProjectedMeters createFromParcel(Parcel in) {
       return new ProjectedMeters(in);
@@ -47,6 +50,12 @@ public class ProjectedMeters implements IProjectedMeters, Parcelable {
     this.easting = projectedMeters.easting;
   }
 
+  /**
+   * Creates a ProjectedMeters from a Parcel.
+   *
+   * @param in The parcel to create from
+   * @return a bitmask indicating the set of special object types marshaled by this Parcelable object instance.
+   */
   private ProjectedMeters(Parcel in) {
     northing = in.readDouble();
     easting = in.readDouble();
@@ -72,22 +81,32 @@ public class ProjectedMeters implements IProjectedMeters, Parcelable {
     return easting;
   }
 
+  /**
+   * Indicates whether some other object is "equal to" this one.
+   *
+   * @param other The object to compare this to
+   * @return true if equal, false if not
+   */
   @Override
-  public boolean equals(Object o) {
-    if (this == o) {
+  public boolean equals(Object other) {
+    if (this == other) {
       return true;
     }
-    if (o == null || getClass() != o.getClass()) {
+    if (other == null || getClass() != other.getClass()) {
       return false;
     }
 
-    ProjectedMeters projectedMeters = (ProjectedMeters) o;
+    ProjectedMeters projectedMeters = (ProjectedMeters) other;
 
     return Double.compare(projectedMeters.easting, easting) == 0
       && Double.compare(projectedMeters.northing, northing) == 0;
-
   }
 
+  /**
+   * Returns a hash code value for the object.
+   *
+   * @return the hash code of this
+   */
   @Override
   public int hashCode() {
     int result;
@@ -99,16 +118,32 @@ public class ProjectedMeters implements IProjectedMeters, Parcelable {
     return result;
   }
 
+  /**
+   * Returns a string representation of the object.
+   *
+   * @return the string representation of this
+   */
   @Override
   public String toString() {
     return "ProjectedMeters [northing=" + northing + ", easting=" + easting + "]";
   }
 
+  /**
+   * Describe the kinds of special objects contained in this Parcelable instance's marshaled representation.
+   *
+   * @return a bitmask indicating the set of special object types marshaled by this Parcelable object instance.
+   */
   @Override
   public int describeContents() {
     return 0;
   }
 
+  /**
+   * Flatten this object in to a Parcel.
+   *
+   * @param out   The Parcel in which the object should be written.
+   * @param flags Additional flags about how the object should be written
+   */
   @Override
   public void writeToParcel(Parcel out, int flags) {
     out.writeDouble(northing);
