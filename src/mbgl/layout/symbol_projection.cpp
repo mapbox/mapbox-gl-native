@@ -83,7 +83,7 @@ namespace mbgl {
     };
 
 	optional<PlacedGlyph> placeGlyphAlongLine(const float offsetX, const float lineOffsetX, const float lineOffsetY, const bool flip,
-            Point<float> anchorPoint, const uint16_t anchorSegment, const std::vector<Point<float>>& line, const mat4& labelPlaneMatrix) {
+            Point<float> anchorPoint, const uint16_t anchorSegment, const GeometryCoordinates& line, const mat4& labelPlaneMatrix) {
 
         const float combinedOffsetX = flip ?
             offsetX - lineOffsetX :
@@ -116,7 +116,7 @@ namespace mbgl {
             if (currentIndex < 0 || currentIndex >= static_cast<int32_t>(line.size())) return {};
 
             prev = current;
-            current = project(line.at(currentIndex), labelPlaneMatrix);
+            current = project(convertPoint<float>(line.at(currentIndex)), labelPlaneMatrix);
 
             distanceToPrev += currentSegmentDistance;
             currentSegmentDistance = util::dist<float>(prev, current);
@@ -191,8 +191,8 @@ namespace mbgl {
             bool flip = false;
             if (values.keepUpright) {
                 if (false) {
-                    const Point<float> a = project(placedSymbol.line.at(placedSymbol.segment), posMatrix);
-                    const Point<float> b = project(placedSymbol.line.at(placedSymbol.segment + 1), posMatrix);
+                    const Point<float> a = project(convertPoint<float>(placedSymbol.line.at(placedSymbol.segment)), posMatrix);
+                    const Point<float> b = project(convertPoint<float>(placedSymbol.line.at(placedSymbol.segment + 1)), posMatrix);
                     flip = placedSymbol.vertical ? b.y > a.y : b.x < a.x;
                 } 
             }

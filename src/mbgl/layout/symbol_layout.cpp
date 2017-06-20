@@ -505,7 +505,7 @@ std::unique_ptr<SymbolBucket> SymbolLayout::place(CollisionTile& collisionTile) 
                         bucket->text, *bucket->textSizeBinder, symbol, feature, placementZoom,
                         keepUpright, textPlacement, collisionTile.config.angle, symbolInstance.writingModes, symbolInstance.point);
                 }
-                PlacedSymbol placedSymbol(symbolInstance.point, 0, 0, 0, 0, 0, placementZoom, false);
+                PlacedSymbol placedSymbol(symbolInstance.point, symbolInstance.index, 16, 16, 0, 0, placementZoom, false, symbolInstance.line);
                 bucket->text.placedSymbols.emplace_back(std::move(placedSymbol));
             }
         }
@@ -517,7 +517,7 @@ std::unique_ptr<SymbolBucket> SymbolLayout::place(CollisionTile& collisionTile) 
                 addSymbol(
                     bucket->icon, *bucket->iconSizeBinder, *symbolInstance.iconQuad, feature, placementZoom,
                     keepUpright, iconPlacement, collisionTile.config.angle, symbolInstance.writingModes, symbolInstance.point);
-                PlacedSymbol placedSymbol(symbolInstance.point, 0, 0, 0, 0, 0, placementZoom, false);
+                PlacedSymbol placedSymbol(symbolInstance.point, 0, 0, 0, 0, 0, placementZoom, false, symbolInstance.line);
                 bucket->icon.placedSymbols.emplace_back(std::move(placedSymbol));
             }
         }

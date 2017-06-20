@@ -13,7 +13,7 @@ class IndexedSubfeature;
 class SymbolInstance {
 public:
     SymbolInstance(Anchor& anchor,
-                   const GeometryCoordinates& line,
+                   GeometryCoordinates line,
                    const std::pair<Shaping, Shaping>& shapedTextOrientations,
                    optional<PositionedIcon> shapedIcon,
                    const style::SymbolLayoutProperties::Evaluated&,
@@ -31,6 +31,7 @@ public:
                    const std::size_t featureIndex);
 
     Point<float> point;
+    GeometryCoordinates line;
     uint32_t index;
     bool hasText;
     bool hasIcon;

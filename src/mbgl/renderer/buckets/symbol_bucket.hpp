@@ -18,9 +18,9 @@ namespace mbgl {
 class PlacedSymbol {
 public:
     PlacedSymbol(Point<float> anchorPoint_, uint16_t segment_, float lowerSize_, float upperSize_,
-            float lineOffsetX_, float lineOffsetY_, float placementZoom_, bool vertical_) :
+            float lineOffsetX_, float lineOffsetY_, float placementZoom_, bool vertical_, GeometryCoordinates line_) :
         anchorPoint(anchorPoint_), segment(segment_), lowerSize(lowerSize_), upperSize(upperSize_),
-        lineOffsetX(lineOffsetX_), lineOffsetY(lineOffsetY_), placementZoom(placementZoom_), vertical(vertical_) {}
+        lineOffsetX(lineOffsetX_), lineOffsetY(lineOffsetY_), placementZoom(placementZoom_), vertical(vertical_), line(line_) {}
     Point<float> anchorPoint;
     uint16_t segment;
     float lowerSize;
@@ -30,7 +30,7 @@ public:
     float placementZoom;
     bool vertical;
     std::vector<float> glyphOffsets;
-    std::vector<Point<float>> line;
+    GeometryCoordinates line;
 };
 
 class SymbolBucket : public Bucket {

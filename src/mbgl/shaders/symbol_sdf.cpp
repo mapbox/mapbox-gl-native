@@ -151,15 +151,15 @@ void main() {
 
     vec2 a_tex = a_data.xy;
 
-    highp vec2 label_data = unpack_float(a_data[2]);
-    highp float a_labelminzoom = label_data[0];
+    //highp vec2 label_data = unpack_float(a_data[2]);
+    //highp float a_labelminzoom = label_data[0];
     //highp float a_lineangle = (label_data[1] / 256.0 * 2.0 * PI);
     highp vec2 a_angle_zoom = unpack_float(a_projected_pos[2]);
     highp float a_lineangle = a_angle_zoom[0] / 256.0 * 2.0 * PI;
-    a_lineangle += 1.0;
-    highp vec2 a_zoom = unpack_float(a_data[3]);
-    highp float a_minzoom = a_zoom[0];
-    highp float a_maxzoom = a_zoom[1];
+    highp float a_labelminzoom = a_angle_zoom[1];
+    //highp vec2 a_zoom = unpack_float(a_data[3]);
+    highp float a_minzoom = 0.0;//a_zoom[0];
+    highp float a_maxzoom = 250.0;//a_zoom[1];
 
     // In order to accommodate placing labels around corners in
     // symbol-placement: line, each glyph in a label could have multiple

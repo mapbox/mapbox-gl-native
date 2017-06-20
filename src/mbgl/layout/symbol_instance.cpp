@@ -6,7 +6,7 @@ namespace mbgl {
 using namespace style;
 
 SymbolInstance::SymbolInstance(Anchor& anchor,
-                               const GeometryCoordinates& line,
+                               GeometryCoordinates line_,
                                const std::pair<Shaping, Shaping>& shapedTextOrientations,
                                optional<PositionedIcon> shapedIcon,
                                const SymbolLayoutProperties::Evaluated& layout,
@@ -23,26 +23,27 @@ SymbolInstance::SymbolInstance(Anchor& anchor,
                                const IndexedSubfeature& indexedFeature,
                                const std::size_t featureIndex_) :
     point(anchor.point),
+    line(line_),
     index(index_),
     hasText(shapedTextOrientations.first || shapedTextOrientations.second),
     hasIcon(shapedIcon),
 
     // Create the collision features that will be used to check whether this symbol instance can be placed
-    textCollisionFeature(line, anchor, shapedTextOrientations.second ?: shapedTextOrientations.first, textBoxScale, textPadding, textPlacement, indexedFeature),
-    iconCollisionFeature(line, anchor, shapedIcon, iconBoxScale, iconPadding, iconPlacement, indexedFeature),
+    textCollisionFeature(line_, anchor, shapedTextOrientations.second ?: shapedTextOrientations.first, textBoxScale, textPadding, textPlacement, indexedFeature),
+    iconCollisionFeature(line_, anchor, shapedIcon, iconBoxScale, iconPadding, iconPlacement, indexedFeature),
     featureIndex(featureIndex_) {
 
     // Create the quads used for rendering the icon and glyphs.
     if (addToBuffers) {
         if (shapedIcon) {
-            iconQuad = getIconQuad(anchor, *shapedIcon, line, layout, layoutTextSize, iconPlacement, shapedTextOrientations.first);
+            iconQuad = getIconQuad(anchor, *shapedIcon, line_, layout, layoutTextSize, iconPlacement, shapedTextOrientations.first);
         }
         if (shapedTextOrientations.first) {
-            auto quads = getGlyphQuads(anchor, shapedTextOrientations.first, textBoxScale, line, layout, textPlacement, positions);
+            auto quads = getGlyphQuads(anchor, shapedTextOrientations.first, textBoxScale, line_, layout, textPlacement, positions);
             glyphQuads.insert(glyphQuads.end(), quads.begin(), quads.end());
         }
         if (shapedTextOrientations.second) {
-            auto quads = getGlyphQuads(anchor, shapedTextOrientations.second, textBoxScale, line, layout, textPlacement, positions);
+            auto quads = getGlyphQuads(anchor, shapedTextOrientations.second, textBoxScale, line_, layout, textPlacement, positions);
             glyphQuads.insert(glyphQuads.end(), quads.begin(), quads.end());
         }
     }

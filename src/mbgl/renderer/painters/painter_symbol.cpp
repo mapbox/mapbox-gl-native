@@ -128,6 +128,11 @@ void Painter::renderSymbol(PaintParameters& parameters,
         const bool alongLine = bucket.layout.get<SymbolPlacement>() == SymbolPlacementType::Line &&
             bucket.layout.get<TextRotationAlignment>() == AlignmentType::Map;
 
+        if (alongLine) {
+            reprojectLineLabels(bucket, tile.matrix, true, values, tile, state, frameHistory);
+            context.updateVertexBuffer(std::move(bucket.text.dynamicVertices), *bucket.text.dynamicVertexBuffer);
+        }
+
         const Size texsize = geometryTile.glyphAtlasTexture->size;
 
         if (values.hasHalo) {
