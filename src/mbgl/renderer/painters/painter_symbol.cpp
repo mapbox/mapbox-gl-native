@@ -75,7 +75,8 @@ void Painter::renderSymbol(PaintParameters& parameters,
             bucket.layout.get<IconRotationAlignment>() == AlignmentType::Map;
 
         if (alongLine) {
-            reprojectLineLabels(bucket, tile.matrix, false, values, tile, state);
+            reprojectLineLabels(bucket, tile.matrix, false, values, tile, state, frameHistory);
+            context.updateVertexBuffer(std::move(bucket.icon.dynamicVertices), *bucket.icon.dynamicVertexBuffer);
         }
 
         const bool iconScaled = layout.get<IconSize>().constantOr(1.0) != 1.0 || bucket.iconsNeedLinear;

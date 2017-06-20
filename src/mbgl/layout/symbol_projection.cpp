@@ -3,6 +3,7 @@
 #include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/renderer/buckets/symbol_bucket.hpp>
 #include <mbgl/renderer/layers/render_symbol_layer.hpp>
+#include <mbgl/renderer/frame_history.hpp>
 #include <mbgl/util/optional.hpp>
 #include <mbgl/util/math.hpp>
 
@@ -48,7 +49,7 @@ namespace mbgl {
         return { static_cast<float>(pos[0] / pos[3]), static_cast<float>(pos[1] / pos[3]) };
     }
 
-    bool isVisible(const vec4& anchorPos, const float, const std::array<double, 2>& clippingBuffer) {
+    bool isVisible(const vec4& anchorPos, const float placementZoom, const std::array<double, 2>& clippingBuffer, const FrameHistory& frameHistory) {
         const float x = anchorPos[0] / anchorPos[3];
         const float y = anchorPos[1] / anchorPos[3];
         const bool inPaddedViewport = (
@@ -56,8 +57,7 @@ namespace mbgl {
                 x <= clippingBuffer[0] &&
                 y >= -clippingBuffer[1] &&
                 y <= clippingBuffer[1]);
-        // TODO do framehistory check here as well
-        return inPaddedViewport;
+        return inPaddedViewport && frameHistory.isVisible(placementZoom);
     }
 
     void addDynamicAttributes(const Point<float>& anchorPoint, const float angle, const float placementZoom,
@@ -161,7 +161,7 @@ namespace mbgl {
 
     void reprojectLineLabels(SymbolBucket& bucket, const mat4& posMatrix, const bool isText, const style::SymbolPropertyValues& values,
             //const RenderTile& tile, const TransformState& state) {
-            const RenderTile&, const TransformState& state) {
+            const RenderTile&, const TransformState& state, const FrameHistory& frameHistory) {
         // const sizeData = isText ? bucket.textSizeData : bucket.iconSizeData;
         // const partiallyEvaluatedSize = symbolSize.evaluateSizeForZoom(sizeData, painter.transform, layer, isText);
 
@@ -183,7 +183,7 @@ namespace mbgl {
             matrix::transformMat4(anchorPos, anchorPos, posMatrix);
 
             // Don't bother calculating the correct point for invisible labels.
-            if (!isVisible(anchorPos, placedSymbol.placementZoom, clippingBuffer)) {
+            if (!isVisible(anchorPos, placedSymbol.placementZoom, clippingBuffer, frameHistory)) {
                 hideGlyphs(placedSymbol.glyphOffsets.size(), dynamicVertexArray);
                 continue;
             }

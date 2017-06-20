@@ -72,6 +72,11 @@ public:
         };
     }
 
+    template <class Vertex, class DrawMode>
+    void updateVertexBuffer(VertexVector<Vertex, DrawMode>&& v, VertexBuffer<Vertex, DrawMode>& buffer) {
+        updateVertexBuffer(v.data(), v.byteSize(), buffer.buffer);
+    }
+
     template <class DrawMode>
     IndexBuffer<DrawMode> createIndexBuffer(IndexVector<DrawMode>&& v) {
         return IndexBuffer<DrawMode> {
@@ -240,6 +245,7 @@ private:
 #endif // MBGL_USE_GLES2
 
     UniqueBuffer createVertexBuffer(const void* data, std::size_t size, bool dynamicDraw);
+    void updateVertexBuffer(const void* data, std::size_t size, UniqueBuffer& buffer);
     UniqueBuffer createIndexBuffer(const void* data, std::size_t size);
     UniqueTexture createTexture(Size size, const void* data, TextureFormat, TextureUnit);
     void updateTexture(TextureID, Size size, const void* data, TextureFormat, TextureUnit);

@@ -173,6 +173,11 @@ UniqueBuffer Context::createVertexBuffer(const void* data, std::size_t size, boo
     return result;
 }
 
+void Context::updateVertexBuffer(const void* data, std::size_t size, UniqueBuffer& buffer) {
+    vertexBuffer = buffer;
+    MBGL_CHECK_ERROR(glBufferSubData(GL_ARRAY_BUFFER, 0, size, data));
+}
+
 UniqueBuffer Context::createIndexBuffer(const void* data, std::size_t size) {
     BufferID id = 0;
     MBGL_CHECK_ERROR(glGenBuffers(1, &id));
