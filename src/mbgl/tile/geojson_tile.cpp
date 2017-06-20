@@ -54,14 +54,17 @@ public:
 class GeoJSONTileData : public GeometryTileData,
                         public GeometryTileLayer {
 public:
-    mapbox::geometry::feature_collection<int16_t> features;
-
     GeoJSONTileData(mapbox::geometry::feature_collection<int16_t> features_)
+        : features(std::make_shared<mapbox::geometry::feature_collection<int16_t>>(
+              std::move(features_))) {
+    }
+
+    GeoJSONTileData(std::shared_ptr<const mapbox::geometry::feature_collection<int16_t>> features_)
         : features(std::move(features_)) {
     }
 
     std::unique_ptr<GeometryTileData> clone() const override {
-        return std::make_unique<GeoJSONTileData>(*this);
+        return std::make_unique<GeoJSONTileData>(features);
     }
 
     const GeometryTileLayer* getLayer(const std::string&) const override {
@@ -73,12 +76,15 @@ public:
     }
 
     std::size_t featureCount() const override {
-        return features.size();
+        return features->size();
     }
 
     std::unique_ptr<GeometryTileFeature> getFeature(std::size_t i) const override {
-        return std::make_unique<GeoJSONTileFeature>(features[i]);
+        return std::make_unique<GeoJSONTileFeature>((*features)[i]);
     }
+
+private:
+    std::shared_ptr<const mapbox::geometry::feature_collection<int16_t>> features;
 };
 
 GeoJSONTile::GeoJSONTile(const OverscaledTileID& overscaledTileID,
