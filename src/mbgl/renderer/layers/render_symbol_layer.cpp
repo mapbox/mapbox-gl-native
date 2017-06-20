@@ -23,12 +23,12 @@ std::unique_ptr<Bucket> RenderSymbolLayer::createBucket(const BucketParameters&,
 
 std::unique_ptr<SymbolLayout> RenderSymbolLayer::createLayout(const BucketParameters& parameters,
                                                               const std::vector<const RenderLayer*>& group,
-                                                              const GeometryTileLayer& layer,
+                                                              std::unique_ptr<GeometryTileLayer> layer,
                                                               GlyphDependencies& glyphDependencies,
                                                               ImageDependencies& imageDependencies) const {
     return std::make_unique<SymbolLayout>(parameters,
                                           group,
-                                          layer,
+                                          std::move(layer),
                                           imageDependencies,
                                           glyphDependencies);
 }

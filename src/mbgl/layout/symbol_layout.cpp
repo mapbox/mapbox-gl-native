@@ -40,10 +40,10 @@ static bool has(const style::SymbolLayoutProperties::PossiblyEvaluated& layout) 
 
 SymbolLayout::SymbolLayout(const BucketParameters& parameters,
                            const std::vector<const RenderLayer*>& layers,
-                           const GeometryTileLayer& sourceLayer,
+                           std::unique_ptr<GeometryTileLayer> sourceLayer_,
                            ImageDependencies& imageDependencies,
                            GlyphDependencies& glyphDependencies)
-    : sourceLayerName(sourceLayer.getName()),
+    : sourceLayer(std::move(sourceLayer_)),
       bucketName(layers.at(0)->getID()),
       overscaling(parameters.tileID.overscaleFactor()),
       zoom(parameters.tileID.overscaledZ),
@@ -95,9 +95,9 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
     }
 
     // Determine glyph dependencies
-    const size_t featureCount = sourceLayer.featureCount();
+    const size_t featureCount = sourceLayer->featureCount();
     for (size_t i = 0; i < featureCount; ++i) {
-        auto feature = sourceLayer.getFeature(i);
+        auto feature = sourceLayer->getFeature(i);
         if (!leader.filter(feature->getType(), feature->getID(), [&] (const auto& key) { return feature->getValue(key); }))
             continue;
         
@@ -328,8 +328,9 @@ void SymbolLayout::addFeature(const std::size_t index,
                                                   ? SymbolPlacementType::Point
                                                   : layout.get<SymbolPlacement>();
     const float textRepeatDistance = symbolSpacing / 2;
-    IndexedSubfeature indexedFeature = {feature.index, sourceLayerName, bucketName, symbolInstances.size()};
-    
+    IndexedSubfeature indexedFeature = { feature.index, sourceLayer->getName(), bucketName,
+                                         symbolInstances.size() };
+
     auto addSymbolInstance = [&] (const GeometryCoordinates& line, Anchor& anchor) {
         // https://github.com/mapbox/vector-tile-spec/tree/master/2.1#41-layers
         // +-------------------+ Symbols with anchors located on tile edges

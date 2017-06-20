@@ -71,8 +71,11 @@ public:
     style::SymbolPropertyValues textPropertyValues(const style::SymbolLayoutProperties::PossiblyEvaluated&) const;
 
     std::unique_ptr<Bucket> createBucket(const BucketParameters&, const std::vector<const RenderLayer*>&) const override;
-    std::unique_ptr<SymbolLayout> createLayout(const BucketParameters&, const std::vector<const RenderLayer*>&,
-                                               const GeometryTileLayer&, GlyphDependencies&, ImageDependencies&) const;
+    std::unique_ptr<SymbolLayout> createLayout(const BucketParameters&,
+                                               const std::vector<const RenderLayer*>&,
+                                               std::unique_ptr<GeometryTileLayer>,
+                                               GlyphDependencies&,
+                                               ImageDependencies&) const;
 
     // Paint properties
     style::SymbolPaintProperties::Unevaluated unevaluated;
