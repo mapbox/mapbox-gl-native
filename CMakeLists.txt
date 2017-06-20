@@ -58,6 +58,7 @@ mason_use(polylabel VERSION 1.0.2 HEADER_ONLY)
 mason_use(wagyu VERSION 0.4.1 HEADER_ONLY)
 mason_use(shelf-pack VERSION 2.1.0 HEADER_ONLY)
 mason_use(cheap-ruler VERSION 2.5.1 HEADER_ONLY)
+mason_use(vector-tile VERSION 1.0.0-rc6 HEADER_ONLY)
 
 add_definitions(-DRAPIDJSON_HAS_STDSTRING=1)
 
