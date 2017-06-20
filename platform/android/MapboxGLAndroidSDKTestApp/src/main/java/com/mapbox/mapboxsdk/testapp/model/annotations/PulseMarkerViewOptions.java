@@ -66,14 +66,14 @@ public class PulseMarkerViewOptions extends BaseMarkerViewOptions<PulseMarkerVie
     return new PulseMarkerView(this);
   }
 
-  public static final Parcelable.Creator<CountryMarkerViewOptions> CREATOR
-    = new Parcelable.Creator<CountryMarkerViewOptions>() {
-      public CountryMarkerViewOptions createFromParcel(Parcel in) {
-        return new CountryMarkerViewOptions(in);
+  public static final Parcelable.Creator<PulseMarkerViewOptions> CREATOR
+    = new Parcelable.Creator<PulseMarkerViewOptions>() {
+      public PulseMarkerViewOptions createFromParcel(Parcel in) {
+        return new PulseMarkerViewOptions(in);
       }
 
-      public CountryMarkerViewOptions[] newArray(int size) {
-        return new CountryMarkerViewOptions[size];
+      public PulseMarkerViewOptions[] newArray(int size) {
+        return new PulseMarkerViewOptions[size];
       }
     };
 }
