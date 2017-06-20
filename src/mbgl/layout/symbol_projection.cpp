@@ -60,10 +60,20 @@ namespace mbgl {
         return inPaddedViewport;
     }
 
-    void addDynamicAttributes(const Point<float>&, const float, const float) {
+    void addDynamicAttributes(const Point<float>& anchorPoint, const float angle, const float placementZoom,
+            gl::VertexVector<SymbolDynamicLayoutAttributes::Vertex>& dynamicVertexArray) {
+        auto dynamicVertex = SymbolDynamicLayoutAttributes::vertex(anchorPoint, angle, placementZoom);
+        dynamicVertexArray.emplace_back(dynamicVertex);
+        dynamicVertexArray.emplace_back(dynamicVertex);
+        dynamicVertexArray.emplace_back(dynamicVertex);
+        dynamicVertexArray.emplace_back(dynamicVertex);
     }
 
-    void hideGlyphs(size_t) {
+    void hideGlyphs(size_t numGlyphs, gl::VertexVector<SymbolDynamicLayoutAttributes::Vertex>& dynamicVertexArray) {
+        const Point<float> offscreenPoint = { -INFINITY, -INFINITY };
+        for (size_t i = 0; i < numGlyphs; i++) {
+            addDynamicAttributes(offscreenPoint, 0, 25, dynamicVertexArray);
+        }
     }
 
     struct PlacedGlyph {
@@ -125,7 +135,8 @@ namespace mbgl {
         return {{ p, segmentAngle }};
     }
 
-    void placeGlyphsAlongLine(const PlacedSymbol& symbol, const float fontSize, const bool flip, const mat4& labelPlaneMatrix) {
+    void placeGlyphsAlongLine(const PlacedSymbol& symbol, const float fontSize, const bool flip, const mat4& labelPlaneMatrix,
+            gl::VertexVector<SymbolDynamicLayoutAttributes::Vertex>& dynamicVertexArray) {
         const float fontScale = fontSize / 24.0;
         const float lineOffsetX = symbol.lineOffsetX * fontSize;
         const float lineOffsetY = symbol.lineOffsetY * fontSize;
@@ -138,13 +149,13 @@ namespace mbgl {
             if (placedGlyph) {
                 placedGlyphs.push_back(*placedGlyph);
             } else {
-                hideGlyphs(symbol.glyphOffsets.size());
+                hideGlyphs(symbol.glyphOffsets.size(), dynamicVertexArray);
                 return;
             }
         }
 
         for (auto& placedGlyph : placedGlyphs) {
-            addDynamicAttributes(placedGlyph.point, placedGlyph.angle, symbol.placementZoom);
+            addDynamicAttributes(placedGlyph.point, placedGlyph.angle, symbol.placementZoom, dynamicVertexArray);
         }
     }
 
@@ -161,11 +172,10 @@ namespace mbgl {
         const mat4 labelPlaneMatrix = getLabelPlaneMatrix(posMatrix, values.pitchAlignment == style::AlignmentType::Map,
                 values.rotationAlignment == style::AlignmentType::Map, state, pixelsToTileUnits);
         
-        // 
-        //     const dynamicLayoutVertexArray = isText ?
-        //             bucket.buffers.glyph.dynamicLayoutVertexArray :
-        //                     bucket.buffers.icon.dynamicLayoutVertexArray;
-        //                         dynamicLayoutVertexArray.clear();
+        gl::VertexVector<SymbolDynamicLayoutAttributes::Vertex>& dynamicVertexArray = isText ?
+            bucket.text.dynamicVertices :
+            bucket.icon.dynamicVertices;
+        dynamicVertexArray.clear();
 
         const std::vector<PlacedSymbol>& placedSymbols = isText ? bucket.text.placedSymbols : bucket.icon.placedSymbols;
         for (auto& placedSymbol : placedSymbols) {
@@ -174,7 +184,7 @@ namespace mbgl {
 
             // Don't bother calculating the correct point for invisible labels.
             if (!isVisible(anchorPos, placedSymbol.placementZoom, clippingBuffer)) {
-                hideGlyphs(placedSymbol.glyphOffsets.size());
+                hideGlyphs(placedSymbol.glyphOffsets.size(), dynamicVertexArray);
                 continue;
             }
 
@@ -197,8 +207,7 @@ namespace mbgl {
                 fontSize * perspectiveRatio :
                 fontSize / perspectiveRatio;
 
-            //placeGlyphsAlongLine(symbol, pitchScaledFontSize, flip, labelPlaneMatrix, bucket.glyphOffsetArray, lineVertexArray, dynamicLayoutVertexArray);
-            placeGlyphsAlongLine(placedSymbol, pitchScaledFontSize, flip, labelPlaneMatrix);
+            placeGlyphsAlongLine(placedSymbol, pitchScaledFontSize, flip, labelPlaneMatrix, dynamicVertexArray);
         }
     }
 } // end namespace mbgl
