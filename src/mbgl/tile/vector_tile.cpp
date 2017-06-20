@@ -3,16 +3,13 @@
 #include <mbgl/tile/tile_loader_impl.hpp>
 #include <mbgl/renderer/tile_parameters.hpp>
 
-#include <memory>
-
 namespace mbgl {
 
 VectorTile::VectorTile(const OverscaledTileID& id_,
                        std::string sourceID_,
                        const TileParameters& parameters,
                        const Tileset& tileset)
-    : GeometryTile(id_, sourceID_, parameters),
-      loader(*this, id_, parameters, tileset) {
+    : GeometryTile(id_, sourceID_, parameters), loader(*this, id_, parameters, tileset) {
 }
 
 void VectorTile::setNecessity(Necessity necessity) {
