@@ -135,6 +135,12 @@ public class MarkerViewManager implements MapView.OnMapChangedListener {
     }
   }
 
+  /**
+   * Set the rotation of a MarkerView to a given rotation value.
+   *
+   * @param marker   The MarkerView to change its rotation value
+   * @param rotation The rotation value
+   */
   public void setRotation(@NonNull MarkerView marker, float rotation) {
     View convertView = markerViewMap.get(marker);
     if (convertView != null) {

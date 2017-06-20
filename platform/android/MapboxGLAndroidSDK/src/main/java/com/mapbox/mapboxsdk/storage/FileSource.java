@@ -39,6 +39,12 @@ public class FileSource {
   // File source instance is kept alive after initialization
   private static FileSource INSTANCE;
 
+  /**
+   * Get the single instance of FileSource.
+   *
+   * @param context the context to derive the cache path from
+   * @return the single instance of FileSource
+   */
   public static synchronized FileSource getInstance(Context context) {
     if (INSTANCE == null) {
       String cachePath = getCachePath(context);
@@ -48,6 +54,12 @@ public class FileSource {
     return INSTANCE;
   }
 
+  /**
+   * Get the cache path for a context.
+   *
+   * @param context the context to derive the cache path from
+   * @return the cache path
+   */
   public static String getCachePath(Context context) {
     // Default value
     boolean setStorageExternal = MapboxConstants.DEFAULT_SET_STORAGE_EXTERNAL;

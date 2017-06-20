@@ -115,6 +115,12 @@ public class OfflineManager {
     }).start();
   }
 
+  /**
+   * Get the single instance of offline manager.
+   *
+   * @param context the context used to host the offline manager
+   * @return the single instance of offline manager
+   */
   public static synchronized OfflineManager getInstance(Context context) {
     if (instance == null) {
       instance = new OfflineManager(context);
