@@ -67,19 +67,17 @@ std::unique_ptr<GeometryTileData> VectorTileData::clone() const {
     return std::make_unique<VectorTileData>(data);
 }
 
-const GeometryTileLayer* VectorTileData::getLayer(const std::string& name) const {
+std::unique_ptr<GeometryTileLayer> VectorTileData::getLayer(const std::string& name) const {
     if (!parsed) {
         // We're parsing this lazily so that we can construct VectorTileData objects on the main
         // thread without incurring the overhead of parsing immediately.
-        for (const auto& pair : mapbox::vector_tile::buffer(*data).getLayers()) {
-            layers.emplace(pair.first, VectorTileLayer{ data, pair.second });
-        }
+        layers = mapbox::vector_tile::buffer(*data).getLayers();
         parsed = true;
     }
 
     auto it = layers.find(name);
     if (it != layers.end()) {
-        return &it->second;
+        return std::make_unique<VectorTileLayer>(data, it->second);
     }
     return nullptr;
 }

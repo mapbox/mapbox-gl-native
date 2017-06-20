@@ -38,7 +38,7 @@ void ShapeAnnotationImpl::updateTileData(const CanonicalTileID& tileID, Annotati
     if (shapeTile.features.empty())
         return;
 
-    AnnotationTileLayer& layer = data.addLayer(layerID);
+    auto layer = data.addLayer(layerID);
 
     ToGeometryCollection toGeometryCollection;
     ToFeatureType toFeatureType;
@@ -53,7 +53,7 @@ void ShapeAnnotationImpl::updateTileData(const CanonicalTileID& tileID, Annotati
             renderGeometry = fixupPolygons(renderGeometry);
         }
 
-        layer.addFeature(id, featureType, renderGeometry);
+        layer->addFeature(id, featureType, renderGeometry);
     }
 }
 

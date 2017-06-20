@@ -59,7 +59,7 @@ class GeometryTileData {
 public:
     virtual ~GeometryTileData() = default;
     virtual std::unique_ptr<GeometryTileData> clone() const = 0;
-    virtual const GeometryTileLayer* getLayer(const std::string&) const = 0;
+    virtual std::unique_ptr<GeometryTileLayer> getLayer(const std::string&) const = 0;
 };
 
 // classifies an array of rings into polygons with outer rings and holes
