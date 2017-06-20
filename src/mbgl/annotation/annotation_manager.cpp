@@ -133,13 +133,13 @@ std::unique_ptr<AnnotationTileData> AnnotationManager::getTileData(const Canonic
 
     auto tileData = std::make_unique<AnnotationTileData>();
 
-    AnnotationTileLayer& pointLayer = tileData->addLayer(PointLayerID);
+    auto pointLayer = tileData->addLayer(PointLayerID);
 
     LatLngBounds tileBounds(tileID);
 
     symbolTree.query(boost::geometry::index::intersects(tileBounds),
         boost::make_function_output_iterator([&](const auto& val){
-            val->updateLayer(tileID, pointLayer);
+            val->updateLayer(tileID, *pointLayer);
         }));
 
     for (const auto& shape : shapeAnnotations) {

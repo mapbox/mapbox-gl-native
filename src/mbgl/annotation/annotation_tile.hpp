@@ -36,21 +36,15 @@ private:
     std::shared_ptr<const AnnotationTileFeatureData> data;
 };
 
+class AnnotationTileLayerData;
+
 class AnnotationTileLayer : public GeometryTileLayer {
 public:
-    AnnotationTileLayer(std::string);
+    AnnotationTileLayer(std::shared_ptr<AnnotationTileLayerData>);
 
-    std::size_t featureCount() const override {
-        return features.size();
-    }
-
-    std::unique_ptr<GeometryTileFeature> getFeature(std::size_t i) const override {
-        return std::make_unique<AnnotationTileFeature>(features.at(i));
-    }
-
-    std::string getName() const override {
-        return name;
-    }
+    std::size_t featureCount() const override;
+    std::unique_ptr<GeometryTileFeature> getFeature(std::size_t i) const override;
+    std::string getName() const override;
 
     void addFeature(const AnnotationID,
                     FeatureType,
@@ -58,18 +52,18 @@ public:
                     std::unordered_map<std::string, std::string> properties = { {} });
 
 private:
-    std::vector<std::shared_ptr<const AnnotationTileFeatureData>> features;
-    std::string name;
+    std::shared_ptr<AnnotationTileLayerData> layer;
 };
 
 class AnnotationTileData : public GeometryTileData {
 public:
     std::unique_ptr<GeometryTileData> clone() const override;
-    const GeometryTileLayer* getLayer(const std::string&) const override;
-    AnnotationTileLayer& addLayer(const std::string&);
+    std::unique_ptr<GeometryTileLayer> getLayer(const std::string&) const override;
+
+    std::unique_ptr<AnnotationTileLayer> addLayer(const std::string&);
 
 private:
-    std::unordered_map<std::string, AnnotationTileLayer> layers;
+    std::unordered_map<std::string, std::shared_ptr<AnnotationTileLayerData>> layers;
 };
 
 } // namespace mbgl
