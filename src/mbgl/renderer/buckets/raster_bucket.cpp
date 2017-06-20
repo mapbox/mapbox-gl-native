@@ -9,12 +9,19 @@ namespace mbgl {
 
 using namespace style;
 
-RasterBucket::RasterBucket(UnassociatedImage&& image_) : image(std::move(image_)) {
+RasterBucket::RasterBucket(UnassociatedImage&& image_) {
+    image = std::make_shared<UnassociatedImage>(std::move(image_));
 }
 
+RasterBucket::RasterBucket(std::shared_ptr<UnassociatedImage> image_): image(image_) {
+
+}
 void RasterBucket::upload(gl::Context& context) {
+    if (!hasData()) {
+        return;
+    }
     if (!texture) {
-        texture = context.createTexture(image);
+        texture = context.createTexture(*image);
     }
     if (!vertices.empty()) {
         vertexBuffer = context.createVertexBuffer(std::move(vertices));
@@ -32,6 +39,12 @@ void RasterBucket::clear() {
 
     uploaded = false;
 }
+
+void RasterBucket::setImage(std::shared_ptr<UnassociatedImage> image_) {
+    image = std::move(image_);
+    texture = {};
+    uploaded = false;
+}
 void RasterBucket::render(Painter& painter,
                           PaintParameters& parameters,
                           const RenderLayer& layer,
@@ -47,7 +60,7 @@ void RasterBucket::render(Painter& painter,
 }
 
 bool RasterBucket::hasData() const {
-    return true;
+    return !!image;
 }
 
 } // namespace mbgl
