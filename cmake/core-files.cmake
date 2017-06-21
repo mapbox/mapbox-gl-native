@@ -310,6 +310,7 @@ set(MBGL_CORE_FILES
     include/mbgl/storage/offline.hpp
     include/mbgl/storage/online_file_source.hpp
     include/mbgl/storage/resource.hpp
+    include/mbgl/storage/resource_transform.hpp
     include/mbgl/storage/response.hpp
     src/mbgl/storage/asset_file_source.hpp
     src/mbgl/storage/file_source_request.cpp
@@ -318,6 +319,7 @@ set(MBGL_CORE_FILES
     src/mbgl/storage/local_file_source.hpp
     src/mbgl/storage/network_status.cpp
     src/mbgl/storage/resource.cpp
+    src/mbgl/storage/resource_transform.cpp
     src/mbgl/storage/response.cpp
 
     # style
