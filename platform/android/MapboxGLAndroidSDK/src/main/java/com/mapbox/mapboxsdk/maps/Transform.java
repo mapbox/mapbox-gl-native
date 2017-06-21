@@ -327,7 +327,7 @@ final class Transform implements MapView.OnMapChangedListener {
       mapView.addOnMapChangedListener(new MapView.OnMapChangedListener() {
         @Override
         public void onMapChanged(int change) {
-          if (change == MapView.DID_FINISH_RENDERING_MAP_FULLY_RENDERED) {
+          if (change == MapView.REGION_DID_CHANGE_ANIMATED) {
             mapView.removeOnMapChangedListener(this);
             cameraChangeDispatcher.onCameraIdle();
           }
