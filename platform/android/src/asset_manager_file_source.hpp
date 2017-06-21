@@ -9,7 +9,7 @@
 namespace mbgl {
 
 namespace util {
-template <typename T> class ThreadedObject;
+template <typename T> class Thread;
 } // namespace util
 
 class AssetManagerFileSource : public FileSource {
@@ -23,7 +23,7 @@ private:
     class Impl;
 
     jni::UniqueObject<android::AssetManager> assetManager;
-    std::unique_ptr<util::ThreadedObject<Impl>> impl;
+    std::unique_ptr<util::Thread<Impl>> impl;
 };
 
 } // namespace mbgl

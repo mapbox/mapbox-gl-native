@@ -3,7 +3,7 @@
 #include <mbgl/storage/file_source_request.hpp>
 #include <mbgl/storage/response.hpp>
 #include <mbgl/util/util.hpp>
-#include <mbgl/util/threaded_object.hpp>
+#include <mbgl/util/thread.hpp>
 #include <mbgl/util/url.hpp>
 
 #include <android/asset_manager.h>
@@ -40,7 +40,7 @@ private:
 
 AssetManagerFileSource::AssetManagerFileSource(jni::JNIEnv& env, jni::Object<android::AssetManager> assetManager_)
     : assetManager(assetManager_.NewGlobalRef(env)),
-      impl(std::make_unique<util::ThreadedObject<Impl>>("AssetManagerFileSource",
+      impl(std::make_unique<util::Thread<Impl>>("AssetManagerFileSource",
           AAssetManager_fromJava(&env, jni::Unwrap(**assetManager)))) {
 }
 

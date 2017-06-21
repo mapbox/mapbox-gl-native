@@ -2,7 +2,7 @@
 #include <mbgl/util/platform.hpp>
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/run_loop.hpp>
-#include <mbgl/util/threaded_object.hpp>
+#include <mbgl/util/thread.hpp>
 #include <mbgl/actor/actor_ref.hpp>
 
 #include <gtest/gtest.h>
@@ -56,11 +56,11 @@ TEST(AssetFileSource, Load) {
         std::function<void(mbgl::Response)> requestCallback;
     };
 
-    std::vector<std::unique_ptr<util::ThreadedObject<TestWorker>>> threads;
+    std::vector<std::unique_ptr<util::Thread<TestWorker>>> threads;
 
     for (unsigned i = 0; i < numThreads; ++i) {
-        std::unique_ptr<util::ThreadedObject<TestWorker>> thread =
-            std::make_unique<util::ThreadedObject<TestWorker>>("Test", &fs);
+        std::unique_ptr<util::Thread<TestWorker>> thread =
+            std::make_unique<util::Thread<TestWorker>>("Test", &fs);
 
         thread->actor().invoke(&TestWorker::run, [&] { if (!--completed) loop.stop(); });
         threads.push_back(std::move(thread));

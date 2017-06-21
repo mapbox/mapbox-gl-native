@@ -5,7 +5,7 @@
 namespace mbgl {
 
 namespace util {
-template <typename T> class ThreadedObject;
+template <typename T> class Thread;
 } // namespace util
 
 class AssetFileSource : public FileSource {
@@ -18,7 +18,7 @@ public:
 private:
     class Impl;
 
-    std::unique_ptr<util::ThreadedObject<Impl>> impl;
+    std::unique_ptr<util::Thread<Impl>> impl;
 };
 
 } // namespace mbgl
