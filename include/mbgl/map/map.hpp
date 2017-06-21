@@ -55,14 +55,10 @@ public:
     // Main render function.
     void render(View&);
 
-    // Style
-    void setStyleURL(const std::string&);
-    void setStyleJSON(const std::string&);
-    std::string getStyleURL() const;
-    std::string getStyleJSON() const;
-
           style::Style& getStyle();
     const style::Style& getStyle() const;
+
+    void setStyle(std::unique_ptr<style::Style>);
 
     // Transition
     void cancelTransitions();

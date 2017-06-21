@@ -80,8 +80,6 @@ TEST(Map, LatLngBehavior) {
     MapTest test;
     Map map(test.backend, test.view.getSize(), 1, test.fileSource, test.threadPool, MapMode::Still);
 
-    map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
-
     map.setLatLngZoom({ 1, 1 }, 0);
     auto latLng1 = map.getLatLng();
 
@@ -146,7 +144,7 @@ TEST(Map, Offline) {
     NetworkStatus::Set(NetworkStatus::Status::Offline);
 
     Map map(test.backend, test.view.getSize(), 1, fileSource, test.threadPool, MapMode::Still);
-    map.setStyleURL(prefix + "style.json");
+    map.getStyle().loadURL(prefix + "style.json");
 
     test::checkImage("test/fixtures/map/offline",
                      test::render(map, test.view),
@@ -169,7 +167,7 @@ TEST(Map, SetStyleInvalidJSON) {
     {
         Map map(test.backend, test.view.getSize(), 1, test.fileSource, test.threadPool,
                 MapMode::Still);
-        map.setStyleJSON("invalid");
+        map.getStyle().loadJSON("invalid");
     }
 
     EXPECT_TRUE(fail);
@@ -198,7 +196,7 @@ TEST(Map, SetStyleInvalidURL) {
     };
 
     Map map(test.backend, test.view.getSize(), 1, test.fileSource, test.threadPool, MapMode::Still);
-    map.setStyleURL("mapbox://bar");
+    map.getStyle().loadURL("mapbox://bar");
 
     test.runLoop.run();
 }
@@ -207,8 +205,8 @@ TEST(Map, DoubleStyleLoad) {
     MapTest test;
 
     Map map(test.backend, test.view.getSize(), 1, test.fileSource, test.threadPool, MapMode::Still);
-    map.setStyleJSON("");
-    map.setStyleJSON("");
+    map.getStyle().loadJSON("");
+    map.getStyle().loadJSON("");
 }
 
 TEST(Map, StyleFresh) {
@@ -218,7 +216,7 @@ TEST(Map, StyleFresh) {
     FakeFileSource fileSource;
 
     Map map(test.backend, test.view.getSize(), 1, fileSource, test.threadPool, MapMode::Still);
-    map.setStyleURL("mapbox://styles/test");
+    map.getStyle().loadURL("mapbox://styles/test");
     EXPECT_EQ(1u, fileSource.requests.size());
 
     Response response;
@@ -238,7 +236,7 @@ TEST(Map, StyleExpired) {
     FakeFileSource fileSource;
 
     Map map(test.backend, test.view.getSize(), 1, fileSource, test.threadPool, MapMode::Still);
-    map.setStyleURL("mapbox://styles/test");
+    map.getStyle().loadURL("mapbox://styles/test");
     EXPECT_EQ(1u, fileSource.requests.size());
 
     Response response;
@@ -265,7 +263,7 @@ TEST(Map, StyleExpiredWithAnnotations) {
     FakeFileSource fileSource;
 
     Map map(test.backend, test.view.getSize(), 1, fileSource, test.threadPool, MapMode::Still);
-    map.setStyleURL("mapbox://styles/test");
+    map.getStyle().loadURL("mapbox://styles/test");
     EXPECT_EQ(1u, fileSource.requests.size());
 
     Response response;
@@ -289,7 +287,7 @@ TEST(Map, StyleEarlyMutation) {
     FakeFileSource fileSource;
 
     Map map(test.backend, test.view.getSize(), 1, fileSource, test.threadPool, MapMode::Still);
-    map.setStyleURL("mapbox://styles/test");
+    map.getStyle().loadURL("mapbox://styles/test");
     map.getStyle().addLayer(std::make_unique<style::BackgroundLayer>("bg"));
 
     Response response;
@@ -308,7 +306,7 @@ TEST(Map, MapLoadingSignal) {
     test.backend.onWillStartLoadingMapCallback = [&]() {
         emitted = true;
     };
-    map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
+    map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
     EXPECT_TRUE(emitted);
 }
 
@@ -324,7 +322,7 @@ TEST(Map, MapLoadedSignal) {
         map.render(test.view);
     };
 
-    map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
+    map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
     test.runLoop.run();
 }
 
@@ -337,12 +335,12 @@ TEST(Map, StyleLoadedSignal) {
     test.backend.didFinishLoadingStyleCallback = [&]() {
         emitted = true;
     };
-    map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
+    map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
     EXPECT_TRUE(emitted);
 
     // But not when the style couldn't be parsed
     emitted = false;
-    map.setStyleJSON("invalid");
+    map.getStyle().loadJSON("invalid");
     EXPECT_FALSE(emitted);
 }
 
@@ -352,7 +350,7 @@ TEST(Map, TEST_REQUIRES_SERVER(StyleNetworkErrorRetry)) {
     OnlineFileSource fileSource;
 
     Map map(test.backend, test.view.getSize(), 1, fileSource, test.threadPool, MapMode::Still);
-    map.setStyleURL("http://127.0.0.1:3000/style-fail-once-500");
+    map.getStyle().loadURL("http://127.0.0.1:3000/style-fail-once-500");
 
     test.backend.didFinishLoadingStyleCallback = [&]() {
         test.runLoop.stop();
@@ -366,7 +364,7 @@ TEST(Map, TEST_REQUIRES_SERVER(StyleNotFound)) {
     OnlineFileSource fileSource;
 
     Map map(test.backend, test.view.getSize(), 1, fileSource, test.threadPool, MapMode::Still);
-    map.setStyleURL("http://127.0.0.1:3000/style-fail-once-404");
+    map.getStyle().loadURL("http://127.0.0.1:3000/style-fail-once-404");
 
     using namespace std::chrono_literals;
     util::Timer timer;
@@ -385,7 +383,7 @@ TEST(Map, TEST_REQUIRES_SERVER(StyleNotFound)) {
     test.runLoop.run();
 
     // Should also not retry if the response has cache headers.
-    map.setStyleURL("http://127.0.0.1:3000/style-fail-once-404-cache");
+    map.getStyle().loadURL("http://127.0.0.1:3000/style-fail-once-404-cache");
     test.runLoop.run();
 }
 
@@ -393,7 +391,7 @@ TEST(Map, AddLayer) {
     MapTest test;
 
     Map map(test.backend, test.view.getSize(), 1, test.fileSource, test.threadPool, MapMode::Still);
-    map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
+    map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
 
     auto layer = std::make_unique<BackgroundLayer>("background");
     layer->setBackgroundColor({ { 1, 0, 0, 1 } });
@@ -410,7 +408,7 @@ TEST(Map, WithoutVAOExtension) {
     DefaultFileSource fileSource(":memory:", "test/fixtures/api/assets");
 
     Map map(test.backend, test.view.getSize(), 1, fileSource, test.threadPool, MapMode::Still);
-    map.setStyleJSON(util::read_file("test/fixtures/api/water.json"));
+    map.getStyle().loadJSON(util::read_file("test/fixtures/api/water.json"));
 
     test::checkImage("test/fixtures/map/no_vao", test::render(map, test.view), 0.002);
 }
@@ -419,7 +417,7 @@ TEST(Map, RemoveLayer) {
     MapTest test;
 
     Map map(test.backend, test.view.getSize(), 1, test.fileSource, test.threadPool, MapMode::Still);
-    map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
+    map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
 
     auto layer = std::make_unique<BackgroundLayer>("background");
     layer->setBackgroundColor({{ 1, 0, 0, 1 }});
@@ -451,7 +449,7 @@ TEST(Map, DisabledSources) {
     // to an opacity of 0.5). Then, we are zooming back out to a zoom level of 0.5 and rerender.
     // The "raster1" layer should not be visible anymore since it has minzoom 1, while "raster2"
     // should still be there. Both layers have a distinct color through "raster-hue-rotate".
-    map.setStyleJSON(R"STYLE(
+    map.getStyle().loadJSON(R"STYLE(
 {
   "version": 8,
   "name": "Test",
@@ -494,7 +492,7 @@ TEST(Map, DontLoadUnneededTiles) {
     MapTest test;
 
     Map map(test.backend, test.view.getSize(), 1, test.fileSource, test.threadPool, MapMode::Still);
-    map.setStyleJSON(R"STYLE({
+    map.getStyle().loadJSON(R"STYLE({
   "sources": {
     "a": { "type": "vector", "tiles": [ "a/{z}/{x}/{y}" ] }
   },
@@ -591,6 +589,6 @@ TEST(Map, TEST_DISABLED_ON_CI(ContinuousRendering)) {
         render.send();
     };
 
-    map.setStyleJSON(util::read_file("test/fixtures/api/water.json"));
+    map.getStyle().loadJSON(util::read_file("test/fixtures/api/water.json"));
     util::RunLoop::Get()->run();
 }

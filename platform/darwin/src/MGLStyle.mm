@@ -124,7 +124,7 @@ static NSURL *MGLStyleURL_emerald;
 }
 
 - (NSURL *)URL {
-    return [NSURL URLWithString:@(self.mapView.mbglMap->getStyleURL().c_str())];
+    return [NSURL URLWithString:@(self.rawStyle->getURL().c_str())];
 }
 
 - (NSString *)name {

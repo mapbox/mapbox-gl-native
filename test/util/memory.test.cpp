@@ -9,6 +9,7 @@
 #include <mbgl/util/default_thread_pool.hpp>
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/run_loop.hpp>
+#include <mbgl/style/style.hpp>
 
 #include <algorithm>
 #include <iostream>
@@ -75,7 +76,7 @@ TEST(Memory, Vector) {
 
     Map map(test.backend, { 256, 256 }, 2, test.fileSource, test.threadPool, MapMode::Still);
     map.setZoom(16); // more map features
-    map.setStyleURL("mapbox://streets");
+    map.getStyle().loadURL("mapbox://streets");
 
     test::render(map, test.view);
 }
@@ -84,7 +85,7 @@ TEST(Memory, Raster) {
     MemoryTest test;
 
     Map map(test.backend, { 256, 256 }, 2, test.fileSource, test.threadPool, MapMode::Still);
-    map.setStyleURL("mapbox://satellite");
+    map.getStyle().loadURL("mapbox://satellite");
 
     test::render(map, test.view);
 }
@@ -118,7 +119,7 @@ TEST(Memory, Footprint) {
 
     auto renderMap = [&](Map& map, const char* style){
         map.setZoom(16);
-        map.setStyleURL(style);
+        map.getStyle().loadURL(style);
         test::render(map, test.view);
     };
 

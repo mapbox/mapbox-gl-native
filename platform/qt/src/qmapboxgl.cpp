@@ -475,12 +475,12 @@ void QMapboxGL::cycleDebugOptions()
 */
 QString QMapboxGL::styleJson() const
 {
-    return QString::fromStdString(d_ptr->mapObj->getStyleJSON());
+    return QString::fromStdString(d_ptr->mapObj->getStyle().getJSON());
 }
 
 void QMapboxGL::setStyleJson(const QString &style)
 {
-    d_ptr->mapObj->setStyleJSON(style.toStdString());
+    d_ptr->mapObj->getStyle().loadJSON(style.toStdString());
 }
 
 /*!
@@ -500,12 +500,12 @@ void QMapboxGL::setStyleJson(const QString &style)
 */
 QString QMapboxGL::styleUrl() const
 {
-    return QString::fromStdString(d_ptr->mapObj->getStyleURL());
+    return QString::fromStdString(d_ptr->mapObj->getStyle().getURL());
 }
 
 void QMapboxGL::setStyleUrl(const QString &url)
 {
-    d_ptr->mapObj->setStyleURL(url.toStdString());
+    d_ptr->mapObj->getStyle().loadURL(url.toStdString());
 }
 
 /*!

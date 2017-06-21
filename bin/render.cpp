@@ -7,6 +7,7 @@
 #include <mbgl/gl/offscreen_view.hpp>
 #include <mbgl/util/default_thread_pool.hpp>
 #include <mbgl/storage/default_file_source.hpp>
+#include <mbgl/style/style.hpp>
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunknown-pragmas"
@@ -93,7 +94,7 @@ int main(int argc, char *argv[]) {
         style_path = std::string("file://") + style_path;
     }
 
-    map.setStyleURL(style_path);
+    map.getStyle().loadURL(style_path);
     map.setLatLngZoom({ lat, lon }, zoom);
     map.setBearing(bearing);
     map.setPitch(pitch);

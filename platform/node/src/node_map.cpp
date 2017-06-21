@@ -214,7 +214,7 @@ void NodeMap::Load(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     }
 
     try {
-        nodeMap->map->setStyleJSON(style);
+        nodeMap->map->getStyle().loadJSON(style);
     } catch (const std::exception &ex) {
         return Nan::ThrowError(ex.what());
     }
@@ -528,7 +528,7 @@ void NodeMap::Cancel(const Nan::FunctionCallbackInfo<v8::Value>& info) {
 }
 
 void NodeMap::cancel() {
-    auto style = map->getStyleJSON();
+    auto style = map->getStyle().getJSON();
 
     map = std::make_unique<mbgl::Map>(backend, mbgl::Size{ 256, 256 },
             pixelRatio, *this, threadpool, mbgl::MapMode::Still);
@@ -536,7 +536,7 @@ void NodeMap::cancel() {
     // FIXME: Reload the style after recreating the map. We need to find
     // a better way of canceling an ongoing rendering on the core level
     // without resetting the map, which is way too expensive.
-    map->setStyleJSON(style);
+    map->getStyle().loadJSON(style);
 
     error = std::make_exception_ptr(std::runtime_error("Canceled"));
     renderFinished();

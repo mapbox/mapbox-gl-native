@@ -24,6 +24,12 @@ public:
     Style(Scheduler&, FileSource&, float pixelRatio);
     ~Style();
 
+    void loadJSON(const std::string&);
+    void loadURL(const std::string&);
+
+    std::string getJSON() const;
+    std::string getURL() const;
+
     // Defaults
     std::string getName() const;
     LatLng getDefaultLatLng() const;

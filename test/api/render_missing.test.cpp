@@ -10,6 +10,7 @@
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/run_loop.hpp>
+#include <mbgl/style/style.hpp>
 
 #include <future>
 
@@ -40,7 +41,7 @@ TEST(API, TEST_REQUIRES_SERVER(RenderMissingTile)) {
 
     // This host does not respond (== connection error).
     // Are you seeing this test fail? Make sure you don't have a server running on port 3001!
-    map.setStyleJSON(style);
+    map.getStyle().loadJSON(style);
     map.renderStill(view, [&](std::exception_ptr err) {
         ASSERT_TRUE(err.operator bool());
         try {
