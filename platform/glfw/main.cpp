@@ -6,6 +6,7 @@
 #include <mbgl/util/platform.hpp>
 #include <mbgl/util/default_thread_pool.hpp>
 #include <mbgl/storage/default_file_source.hpp>
+#include <mbgl/style/style.hpp>
 
 #include <csignal>
 #include <getopt.h>
@@ -147,7 +148,7 @@ int main(int argc, char *argv[]) {
         }
 
         mbgl::util::default_styles::DefaultStyle newStyle = mbgl::util::default_styles::orderedStyles[currentStyleIndex];
-        map.setStyleURL(newStyle.url);
+        map.getStyle().loadURL(newStyle.url);
         view->setWindowTitle(newStyle.name);
 
         mbgl::Log::Info(mbgl::Event::Setup, "Changed style to: %s", newStyle.name);
@@ -178,7 +179,7 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    map.setStyleURL(style);
+    map.getStyle().loadURL(style);
 
     view->run();
 

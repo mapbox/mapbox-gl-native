@@ -373,7 +373,7 @@ public:
 
 - (nonnull NSURL *)styleURL
 {
-    NSString *styleURLString = @(_mbglMap->getStyleURL().c_str()).mgl_stringOrNilIfEmpty;
+    NSString *styleURLString = @(_mbglMap->getStyle().getURL().c_str()).mgl_stringOrNilIfEmpty;
     NSAssert(styleURLString || _isTargetingInterfaceBuilder, @"Invalid style URL string %@", styleURLString);
     return styleURLString ? [NSURL URLWithString:styleURLString] : nil;
 }
@@ -389,12 +389,12 @@ public:
 
     styleURL = styleURL.mgl_URLByStandardizingScheme;
     self.style = nil;
-    _mbglMap->setStyleURL([[styleURL absoluteString] UTF8String]);
+    _mbglMap->getStyle().loadURL([[styleURL absoluteString] UTF8String]);
 }
 
 - (IBAction)reloadStyle:(__unused id)sender {
     NSURL *styleURL = self.styleURL;
-    _mbglMap->setStyleURL("");
+    _mbglMap->getStyle().loadURL("");
     self.styleURL = styleURL;
 }
 

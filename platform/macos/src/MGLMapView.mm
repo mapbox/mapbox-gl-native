@@ -24,6 +24,7 @@
 
 #import <mbgl/map/map.hpp>
 #import <mbgl/map/view.hpp>
+#import <mbgl/style/style.hpp>
 #import <mbgl/annotation/annotation.hpp>
 #import <mbgl/map/camera.hpp>
 #import <mbgl/storage/reachability.h>
@@ -239,7 +240,7 @@ public:
 
     // If the Style URL inspectable was not set, make sure to go through
     // -setStyleURL: to load the default style.
-    if (_mbglMap->getStyleURL().empty()) {
+    if (_mbglMap->getStyle().getURL().empty()) {
         self.styleURL = nil;
     }
 }
@@ -607,7 +608,7 @@ public:
 }
 
 - (nonnull NSURL *)styleURL {
-    NSString *styleURLString = @(_mbglMap->getStyleURL().c_str()).mgl_stringOrNilIfEmpty;
+    NSString *styleURLString = @(_mbglMap->getStyle().getURL().c_str()).mgl_stringOrNilIfEmpty;
     return styleURLString ? [NSURL URLWithString:styleURLString] : [MGLStyle streetsStyleURLWithVersion:MGLStyleDefaultVersion];
 }
 
@@ -629,12 +630,12 @@ public:
 
     styleURL = styleURL.mgl_URLByStandardizingScheme;
     self.style = nil;
-    _mbglMap->setStyleURL(styleURL.absoluteString.UTF8String);
+    _mbglMap->getStyle().loadURL(styleURL.absoluteString.UTF8String);
 }
 
 - (IBAction)reloadStyle:(__unused id)sender {
     NSURL *styleURL = self.styleURL;
-    _mbglMap->setStyleURL("");
+    _mbglMap->getStyle().loadURL("");
     self.styleURL = styleURL;
 }
 

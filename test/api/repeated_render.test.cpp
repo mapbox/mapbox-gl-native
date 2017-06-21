@@ -10,6 +10,7 @@
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/run_loop.hpp>
+#include <mbgl/style/style.hpp>
 
 #include <future>
 
@@ -33,7 +34,7 @@ TEST(API, RepeatedRender) {
     Map map(backend, view.getSize(), 1, fileSource, threadPool, MapMode::Still);
 
     {
-        map.setStyleJSON(style);
+        map.getStyle().loadJSON(style);
         PremultipliedImage result;
         map.renderStill(view, [&](std::exception_ptr) {
             result = view.readStillImage();
@@ -51,7 +52,7 @@ TEST(API, RepeatedRender) {
     }
 
     {
-        map.setStyleJSON(style);
+        map.getStyle().loadJSON(style);
         PremultipliedImage result;
         map.renderStill(view, [&](std::exception_ptr) {
             result = view.readStillImage();

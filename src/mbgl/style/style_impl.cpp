@@ -16,6 +16,9 @@
 #include <mbgl/util/exception.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/logging.hpp>
+#include <mbgl/storage/file_source.hpp>
+#include <mbgl/storage/resource.hpp>
+#include <mbgl/storage/response.hpp>
 
 namespace mbgl {
 namespace style {
@@ -34,32 +37,64 @@ Style::Impl::Impl(Scheduler& scheduler_, FileSource& fileSource_, float pixelRat
 
 Style::Impl::~Impl() = default;
 
-void Style::Impl::setTransitionOptions(const TransitionOptions& options) {
-    transitionOptions = options;
+void Style::Impl::loadJSON(const std::string& json_) {
+    observer->onStyleLoading();
+
+    url.clear();
+    parse(json_);
 }
 
-TransitionOptions Style::Impl::getTransitionOptions() const {
-    return transitionOptions;
+void Style::Impl::loadURL(const std::string& url_) {
+    observer->onStyleLoading();
+
+    loaded = false;
+    url = url_;
+
+    styleRequest = fileSource.request(Resource::style(url), [this](Response res) {
+        // Once we get a fresh style, or the style is mutated, stop revalidating.
+        if (res.isFresh() || mutated) {
+            styleRequest.reset();
+        }
+
+        // Don't allow a loaded, mutated style to be overwritten with a new version.
+        if (mutated && loaded) {
+            return;
+        }
+
+        if (res.error) {
+            const std::string message = "loading style failed: " + res.error->message;
+            Log::Error(Event::Setup, message.c_str());
+            observer->onStyleError(std::make_exception_ptr(util::StyleLoadException(message)));
+            observer->onResourceError(std::make_exception_ptr(std::runtime_error(res.error->message)));
+        } else if (res.notModified || res.noContent) {
+            return;
+        } else {
+            parse(*res.data);
+        }
+    });
 }
 
-void Style::Impl::setJSON(const std::string& json) {
-    sources.clear();
-    layers.clear();
-    images.clear();
-
-    transitionOptions = {};
-    transitionOptions.duration = util::DEFAULT_TRANSITION_DURATION;
-
+void Style::Impl::parse(const std::string& json_) {
     Parser parser;
-    auto error = parser.parse(json);
 
-    if (error) {
+    if (auto error = parser.parse(json_)) {
         std::string message = "Failed to parse style: " + util::toString(error);
         Log::Error(Event::ParseStyle, message.c_str());
         observer->onStyleError(std::make_exception_ptr(util::StyleParseException(message)));
         observer->onResourceError(error);
         return;
     }
+
+    mutated = false;
+    loaded = true;
+    json = json_;
+
+    sources.clear();
+    layers.clear();
+    images.clear();
+
+    transitionOptions = {};
+    transitionOptions.duration = util::DEFAULT_TRANSITION_DURATION;
 
     for (auto& source : parser.sources) {
         addSource(std::move(source));
@@ -79,9 +114,23 @@ void Style::Impl::setJSON(const std::string& json) {
     spriteLoader->load(parser.spriteURL, scheduler, fileSource);
     glyphURL = parser.glyphURL;
 
-    loaded = true;
-
     observer->onStyleLoaded();
+}
+
+std::string Style::Impl::getJSON() const {
+    return json;
+}
+
+std::string Style::Impl::getURL() const {
+    return url;
+}
+
+void Style::Impl::setTransitionOptions(const TransitionOptions& options) {
+    transitionOptions = options;
+}
+
+TransitionOptions Style::Impl::getTransitionOptions() const {
+    return transitionOptions;
 }
 
 void Style::Impl::addSource(std::unique_ptr<Source> source) {
@@ -296,6 +345,7 @@ void Style::Impl::onLightChanged(const Light&) {
 }
 
 void Style::Impl::dumpDebugLogs() const {
+    Log::Info(Event::General, "styleURL: %s", url.c_str());
     for (const auto& source : sources) {
         source->dumpDebugLogs();
     }

@@ -13,9 +13,6 @@
 #include <mbgl/renderer/render_source.hpp>
 #include <mbgl/renderer/render_style.hpp>
 #include <mbgl/renderer/render_style_observer.hpp>
-#include <mbgl/storage/file_source.hpp>
-#include <mbgl/storage/resource.hpp>
-#include <mbgl/storage/response.hpp>
 #include <mbgl/util/exception.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/exception.hpp>
@@ -63,14 +60,13 @@ public:
     void onSourceChanged(style::Source&) override;
     void onUpdate(Update) override;
     void onInvalidate() override;
+    void onStyleLoading() override;
     void onStyleLoaded() override;
     void onStyleError(std::exception_ptr) override;
     void onResourceError(std::exception_ptr) override;
 
     void render(View&);
     void renderStill();
-
-    void loadStyleJSON(const std::string&);
 
     Map& map;
     MapObserver& observer;
@@ -95,11 +91,7 @@ public:
     std::unique_ptr<Style> style;
     std::unique_ptr<RenderStyle> renderStyle;
 
-    std::string styleURL;
-    std::string styleJSON;
     bool cameraMutated = false;
-
-    std::unique_ptr<AsyncRequest> styleRequest;
 
     size_t sourceCacheSize;
     bool loading = false;
@@ -166,8 +158,6 @@ Map::Impl::Impl(Map& map_,
 
 Map::~Map() {
     BackendScope guard(impl->backend);
-
-    impl->styleRequest = nullptr;
 
     // Explicit resets currently necessary because these abandon resources that need to be
     // cleaned up by context.reset();
@@ -323,94 +313,17 @@ void Map::Impl::render(View& view) {
 
 #pragma mark - Style
 
-void Map::setStyleURL(const std::string& url) {
-    if (impl->styleURL == url) {
-        return;
-    }
-
-    impl->loading = true;
-    impl->observer.onWillStartLoadingMap();
-
-    impl->styleRequest = nullptr;
-    impl->styleURL = url;
-    impl->styleJSON.clear();
-    impl->style->impl->loaded = false;
-
-    impl->styleRequest = impl->fileSource.request(Resource::style(impl->styleURL), [this](Response res) {
-        // Once we get a fresh style, or the style is mutated, stop revalidating.
-        if (res.isFresh() || impl->style->impl->mutated) {
-            impl->styleRequest.reset();
-        }
-
-        // Don't allow a loaded, mutated style to be overwritten with a new version.
-        if (impl->style->impl->mutated && impl->style->impl->loaded) {
-            return;
-        }
-
-        if (res.error) {
-            if (res.error->reason == Response::Error::Reason::NotFound &&
-                util::mapbox::isMapboxURL(impl->styleURL)) {
-                const std::string message = "style " + impl->styleURL + " could not be found or is an incompatible legacy map or style";
-                Log::Error(Event::Setup, message.c_str());
-                impl->onStyleError(std::make_exception_ptr(util::NotFoundException(message)));
-            } else {
-                const std::string message = "loading style failed: " + res.error->message;
-                Log::Error(Event::Setup, message.c_str());
-                impl->onStyleError(std::make_exception_ptr(util::StyleLoadException(message)));
-            }
-            impl->onResourceError(std::make_exception_ptr(std::runtime_error(res.error->message)));
-        } else if (res.notModified || res.noContent) {
-            return;
-        } else {
-            impl->loadStyleJSON(*res.data);
-        }
-    });
-}
-
-void Map::setStyleJSON(const std::string& json) {
-    if (impl->styleJSON == json) {
-        return;
-    }
-
-    impl->loading = true;
-    impl->observer.onWillStartLoadingMap();
-
-    impl->styleURL.clear();
-    impl->styleJSON.clear();
-    impl->style->impl->mutated = false;
-
-    impl->loadStyleJSON(json);
-}
-
-void Map::Impl::loadStyleJSON(const std::string& json) {
-    style->impl->setJSON(json);
-    styleJSON = json;
-
-    if (!cameraMutated) {
-        // Zoom first because it may constrain subsequent operations.
-        map.setZoom(style->getDefaultZoom());
-        map.setLatLng(style->getDefaultLatLng());
-        map.setBearing(style->getDefaultBearing());
-        map.setPitch(style->getDefaultPitch());
-    }
-
-    onUpdate(Update::AnnotationStyle);
-}
-
-std::string Map::getStyleURL() const {
-    return impl->styleURL;
-}
-
-std::string Map::getStyleJSON() const {
-    return impl->styleJSON;
-}
-
 style::Style& Map::getStyle() {
     return *impl->style;
 }
 
 const style::Style& Map::getStyle() const {
     return *impl->style;
+}
+
+void Map::setStyle(std::unique_ptr<Style> style) {
+    impl->onStyleLoading();
+    impl->style = std::move(style);
 }
 
 #pragma mark - Transitions
@@ -943,7 +856,21 @@ void Map::Impl::onInvalidate() {
     onUpdate(Update::Repaint);
 }
 
+void Map::Impl::onStyleLoading() {
+    loading = true;
+    observer.onWillStartLoadingMap();
+}
+
 void Map::Impl::onStyleLoaded() {
+    if (!cameraMutated) {
+        // Zoom first because it may constrain subsequent operations.
+        map.setZoom(style->getDefaultZoom());
+        map.setLatLng(style->getDefaultLatLng());
+        map.setBearing(style->getDefaultBearing());
+        map.setPitch(style->getDefaultPitch());
+    }
+
+    onUpdate(Update::AnnotationStyle);
     observer.onDidFinishLoadingStyle();
 }
 
@@ -960,7 +887,6 @@ void Map::Impl::onResourceError(std::exception_ptr error) {
 
 void Map::dumpDebugLogs() const {
     Log::Info(Event::General, "--------------------------------------------------------------------------------");
-    Log::Info(Event::General, "MapContext::styleURL: %s", impl->styleURL.c_str());
     impl->style->impl->dumpDebugLogs();
     if (impl->renderStyle) {
         impl->renderStyle->dumpDebugLogs();

@@ -344,19 +344,19 @@ void NativeMapView::resizeFramebuffer(jni::JNIEnv&, int w, int h) {
 }
 
 jni::String NativeMapView::getStyleUrl(jni::JNIEnv& env) {
-    return jni::Make<jni::String>(env, map->getStyleURL());
+    return jni::Make<jni::String>(env, map->getStyle().getURL());
 }
 
 void NativeMapView::setStyleUrl(jni::JNIEnv& env, jni::String url) {
-    map->setStyleURL(jni::Make<std::string>(env, url));
+    map->getStyle().loadURL(jni::Make<std::string>(env, url));
 }
 
 jni::String NativeMapView::getStyleJson(jni::JNIEnv& env) {
-    return jni::Make<jni::String>(env, map->getStyleJSON());
+    return jni::Make<jni::String>(env, map->getStyle().getJSON());
 }
 
 void NativeMapView::setStyleJson(jni::JNIEnv& env, jni::String json) {
-    map->setStyleJSON(jni::Make<std::string>(env, json));
+    map->getStyle().loadJSON(jni::Make<std::string>(env, json));
 }
 
 void NativeMapView::setLatLngBounds(jni::JNIEnv& env, jni::Object<mbgl::android::LatLngBounds> jBounds) {

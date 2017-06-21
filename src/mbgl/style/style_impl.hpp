@@ -25,6 +25,7 @@ namespace mbgl {
 
 class Scheduler;
 class FileSource;
+class AsyncRequest;
 class SpriteLoader;
 
 namespace style {
@@ -38,7 +39,11 @@ public:
     Impl(Scheduler&, FileSource&, float pixelRatio);
     ~Impl() override;
 
-    void setJSON(const std::string&);
+    void loadJSON(const std::string&);
+    void loadURL(const std::string&);
+
+    std::string getJSON() const;
+    std::string getURL() const;
 
     void setObserver(Observer*);
 
@@ -92,11 +97,18 @@ public:
     bool spriteLoaded = false;
 
 private:
+    void parse(const std::string&);
+
     Scheduler& scheduler;
     FileSource& fileSource;
-    std::unique_ptr<SpriteLoader> spriteLoader;
-    std::string glyphURL;
 
+    std::string url;
+    std::string json;
+
+    std::unique_ptr<AsyncRequest> styleRequest;
+    std::unique_ptr<SpriteLoader> spriteLoader;
+
+    std::string glyphURL;
     Collection<style::Image> images;
     Collection<Source> sources;
     Collection<Layer> layers;
