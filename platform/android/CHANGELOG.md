@@ -4,6 +4,21 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 
 ## 5.1.0 - TBA
 
+## 5.1.0-beta.5 - June 21, 2017
+
+* Update MAS dependency to 2.1.2 [#9311](https://github.com/mapbox/mapbox-gl-native/pull/9311)
+* Update LOST dependency to 3.0.1 [#9302](https://github.com/mapbox/mapbox-gl-native/pull/9302)
+* Fix Pulse example Parcelable creator [#9283](https://github.com/mapbox/mapbox-gl-native/pull/9283)
+* Custom marker view anchoring [#9282](https://github.com/mapbox/mapbox-gl-native/pull/9282)
+* Update Activity test generation [#9276](https://github.com/mapbox/mapbox-gl-native/pull/9276)
+* Validate camera position before transforming [#9275](https://github.com/mapbox/mapbox-gl-native/pull/9275)
+* Revisit javadoc [#9266](https://github.com/mapbox/mapbox-gl-native/pull/9266)
+* Build with NDK 15 [#9263](https://github.com/mapbox/mapbox-gl-native/pull/9263)
+* Snapshot with view content [#9263](https://github.com/mapbox/mapbox-gl-native/pull/9263)
+* Update source changed javadoc [#9243](https://github.com/mapbox/mapbox-gl-native/pull/9243)
+* Run tests on UI-thread [#9198](https://github.com/mapbox/mapbox-gl-native/pull/9198)
+* Fix trackball on worker thread [#9305](https://github.com/mapbox/mapbox-gl-native/pull/9305)
+
 ## 5.1.0-beta.4 - June 9, 2017
 
 * Option to disable location change animation [#9210](https://github.com/mapbox/mapbox-gl-native/pull/9210)
