@@ -8,7 +8,8 @@
 namespace mbgl {
 
 RenderCircleLayer::RenderCircleLayer(Immutable<style::CircleLayer::Impl> _impl)
-    : RenderLayer(style::LayerType::Circle, _impl) {
+    : RenderLayer(style::LayerType::Circle, _impl),
+      unevaluated(impl().paint.untransitioned()) {
 }
 
 const style::CircleLayer::Impl& RenderCircleLayer::impl() const {
@@ -20,7 +21,7 @@ std::unique_ptr<Bucket> RenderCircleLayer::createBucket(const BucketParameters& 
 }
 
 void RenderCircleLayer::transition(const TransitionParameters& parameters) {
-    unevaluated = impl().paint.transition(parameters, std::move(unevaluated));
+    unevaluated = impl().paint.transitioned(parameters, std::move(unevaluated));
 }
 
 void RenderCircleLayer::evaluate(const PropertyEvaluationParameters& parameters) {

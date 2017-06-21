@@ -8,7 +8,8 @@
 namespace mbgl {
 
 RenderLineLayer::RenderLineLayer(Immutable<style::LineLayer::Impl> _impl)
-    : RenderLayer(style::LayerType::Line, _impl) {
+    : RenderLayer(style::LayerType::Line, _impl),
+      unevaluated(impl().paint.untransitioned()) {
 }
 
 const style::LineLayer::Impl& RenderLineLayer::impl() const {
@@ -20,12 +21,11 @@ std::unique_ptr<Bucket> RenderLineLayer::createBucket(const BucketParameters& pa
 }
 
 void RenderLineLayer::transition(const TransitionParameters& parameters) {
-    unevaluated = impl().paint.transition(parameters, std::move(unevaluated));
+    unevaluated = impl().paint.transitioned(parameters, std::move(unevaluated));
 }
 
 void RenderLineLayer::evaluate(const PropertyEvaluationParameters& parameters) {
-    style::Properties<LineFloorwidth>::Unevaluated extra;
-    extra.get<LineFloorwidth>() = unevaluated.get<style::LineWidth>();
+    style::Properties<LineFloorwidth>::Unevaluated extra(unevaluated.get<style::LineWidth>());
 
     auto dashArrayParams = parameters;
     dashArrayParams.useIntegerZoom = true;

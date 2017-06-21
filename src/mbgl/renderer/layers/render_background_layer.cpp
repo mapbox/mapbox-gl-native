@@ -5,7 +5,8 @@
 namespace mbgl {
 
 RenderBackgroundLayer::RenderBackgroundLayer(Immutable<style::BackgroundLayer::Impl> _impl)
-    : RenderLayer(style::LayerType::Background, _impl) {
+    : RenderLayer(style::LayerType::Background, _impl),
+      unevaluated(impl().paint.untransitioned()) {
 }
 
 const style::BackgroundLayer::Impl& RenderBackgroundLayer::impl() const {
@@ -19,7 +20,7 @@ std::unique_ptr<Bucket> RenderBackgroundLayer::createBucket(const BucketParamete
 }
 
 void RenderBackgroundLayer::transition(const TransitionParameters &parameters) {
-    unevaluated = impl().paint.transition(parameters, std::move(unevaluated));
+    unevaluated = impl().paint.transitioned(parameters, std::move(unevaluated));
 }
 
 void RenderBackgroundLayer::evaluate(const PropertyEvaluationParameters &parameters) {

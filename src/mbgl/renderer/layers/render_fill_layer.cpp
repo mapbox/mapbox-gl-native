@@ -8,7 +8,8 @@
 namespace mbgl {
 
 RenderFillLayer::RenderFillLayer(Immutable<style::FillLayer::Impl> _impl)
-    : RenderLayer(style::LayerType::Fill, _impl) {
+    : RenderLayer(style::LayerType::Fill, _impl),
+      unevaluated(impl().paint.untransitioned()) {
 }
 
 const style::FillLayer::Impl& RenderFillLayer::impl() const {
@@ -20,7 +21,7 @@ std::unique_ptr<Bucket> RenderFillLayer::createBucket(const BucketParameters& pa
 }
 
 void RenderFillLayer::transition(const TransitionParameters& parameters) {
-    unevaluated = impl().paint.transition(parameters, std::move(unevaluated));
+    unevaluated = impl().paint.transitioned(parameters, std::move(unevaluated));
 }
 
 void RenderFillLayer::evaluate(const PropertyEvaluationParameters& parameters) {
