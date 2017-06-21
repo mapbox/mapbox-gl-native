@@ -7,7 +7,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /** Defines the area spanned by an `MGLCoordinateBounds`. */
-typedef struct MGLCoordinateSpan {
+typedef struct __attribute__((objc_boxable)) MGLCoordinateSpan {
     /** Latitudes spanned by an `MGLCoordinateBounds`. */
     CLLocationDegrees latitudeDelta;
     /** Longitudes spanned by an `MGLCoordinateBounds`. */
@@ -38,7 +38,7 @@ NS_INLINE BOOL MGLCoordinateSpanEqualToCoordinateSpan(MGLCoordinateSpan span1, M
 extern MGL_EXPORT const MGLCoordinateSpan MGLCoordinateSpanZero;
 
 /** A rectangular area as measured on a two-dimensional map projection. */
-typedef struct MGLCoordinateBounds {
+typedef struct __attribute__((objc_boxable)) MGLCoordinateBounds {
     /** Coordinate at the southwest corner. */
     CLLocationCoordinate2D sw;
     /** Coordinate at the northeast corner. */
