@@ -2,12 +2,12 @@
 
 set(MBGL_CORE_FILES
     # actor
+    include/mbgl/actor/actor.hpp
+    include/mbgl/actor/actor_ref.hpp
     include/mbgl/actor/mailbox.hpp
+    include/mbgl/actor/message.hpp
     include/mbgl/actor/scheduler.hpp
-    src/mbgl/actor/actor.hpp
-    src/mbgl/actor/actor_ref.hpp
     src/mbgl/actor/mailbox.cpp
-    src/mbgl/actor/message.hpp
 
     # algorithm
     src/mbgl/algorithm/covered_by_children.hpp
