@@ -9,10 +9,10 @@ jni::Object<LatLngBounds> LatLngBounds::New(jni::JNIEnv& env, mbgl::LatLngBounds
 }
 
 mbgl::LatLngBounds LatLngBounds::getLatLngBounds(jni::JNIEnv& env, jni::Object<LatLngBounds> bounds) {
-    static auto swLat = LatLngBounds::javaClass.GetField<jni::jdouble>(env, "mLatSouth");
-    static auto swLon = LatLngBounds::javaClass.GetField<jni::jdouble>(env, "mLonWest");
-    static auto neLat = LatLngBounds::javaClass.GetField<jni::jdouble>(env, "mLatNorth");
-    static auto neLon = LatLngBounds::javaClass.GetField<jni::jdouble>(env, "mLonEast");
+    static auto swLat = LatLngBounds::javaClass.GetField<jni::jdouble>(env, "latitudeSouth");
+    static auto swLon = LatLngBounds::javaClass.GetField<jni::jdouble>(env, "longitudeWest");
+    static auto neLat = LatLngBounds::javaClass.GetField<jni::jdouble>(env, "latitudeNorth");
+    static auto neLon = LatLngBounds::javaClass.GetField<jni::jdouble>(env, "longitudeEast");
     return mbgl::LatLngBounds::hull(
         { bounds.Get(env, swLat), bounds.Get(env, swLon) },
         { bounds.Get(env, neLat), bounds.Get(env, neLon) }
