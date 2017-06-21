@@ -57,12 +57,12 @@
                                                     OS_LOG_TYPE_ERROR,
                                                     OS_LOG_TYPE_FAULT };
             dispatch_once(&once, ^ {
-                info_log = os_log_create("com.mapbox.maps", "INFO");
+                info_log = os_log_create("com.mapbox.Mapbox", "INFO");
 #if MGL_LOGGING_ENABLE_DEBUG
-                debug_log = os_log_create("com.mapbox.maps", "DEBUG");
+                debug_log = os_log_create("com.mapbox.Mapbox", "DEBUG");
 #endif
-                error_log = os_log_create("com.mapbox.maps", "ERROR");
-                fault_log = os_log_create("com.mapbox.maps", "FAULT");
+                error_log = os_log_create("com.mapbox.Mapbox", "ERROR");
+                fault_log = os_log_create("com.mapbox.Mapbox", "FAULT");
             });
             
             os_log_t mapbox_log;

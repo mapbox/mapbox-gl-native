@@ -2014,7 +2014,7 @@
 					"$(mbgl_core_LINK_LIBRARIES)",
 					"$(mbgl_filesource_LINK_LIBRARIES)",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.mapbox.MapboxGL;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mapbox.Mapbox;
 				PRODUCT_NAME = Mapbox;
 				SKIP_INSTALL = YES;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -2048,7 +2048,7 @@
 					"$(mbgl_core_LINK_LIBRARIES)",
 					"$(mbgl_filesource_LINK_LIBRARIES)",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.mapbox.MapboxGL;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mapbox.Mapbox;
 				PRODUCT_NAME = Mapbox;
 				SKIP_INSTALL = YES;
 				STRIP_STYLE = "non-global";

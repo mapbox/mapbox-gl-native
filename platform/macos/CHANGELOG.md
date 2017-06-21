@@ -3,6 +3,7 @@
 ## 0.12.0 - November 8, 2018
 
 * Renamed `-[MGLOfflineStorage putResourceWithUrl:data:modified:expires:etag:mustRevalidate:]` to `-[MGLOfflineStorage preloadData:forURL:modificationDate:expirationDate:eTag:mustRevalidate:]`. ([#13318](https://github.com/mapbox/mapbox-gl-native/pull/13318))
+* This SDK’s dynamic framework now has a bundle identifier of `com.mapbox.Mapbox`. ([#12857](https://github.com/mapbox/mapbox-gl-native/pull/12857))
 
 ## master
 
