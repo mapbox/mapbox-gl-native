@@ -84,7 +84,7 @@ typedef NS_ENUM(NSUInteger, MGLUserTrackingState) {
     MGLUserTrackingStatePossible = 0,
     /// The map view has begun to move to the first reported user location.
     MGLUserTrackingStateBegan,
-    /// The map view has begun to move to
+    /// The map view begins a significant transition.
     MGLUserTrackingStateBeginSignificantTransition,
     /// The map view has finished moving to the first reported user location.
     MGLUserTrackingStateChanged,
@@ -114,7 +114,7 @@ const NSUInteger MGLTargetFrameInterval = 1;  // Target FPS will be 60 divided b
 /// Tolerance for snapping to true north, measured in degrees in either direction.
 const CLLocationDirection MGLToleranceForSnappingToNorth = 7;
 
-/// Distance threshold
+/// Distance threshold to stop the camera while animating.
 const CLLocationDistance MGLDistanceThresholdForCameraPause = 500;
 
 /// Reuse identifier and file name of the default point annotation image.
