@@ -616,6 +616,18 @@ test-code-android:
 android-checkstyle: platform/android/configuration.gradle
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=none checkstyle
 
+.PHONY: android-lint-sdk
+android-lint-sdk: platform/android/configuration.gradle
+	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=none :MapboxGLAndroidSDK:lint
+
+.PHONY: android-lint-test-app
+android-lint-test-app: platform/android/configuration.gradle
+	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=none :MapboxGLAndroidSDKTestApp:lint
+
+.PHONY: android-lint-wear-app
+android-lint-wear-app: platform/android/configuration.gradle
+	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=none :MapboxGLAndroidSDKWearTestApp:lint
+
 .PHONY: android-javadoc
 android-javadoc: platform/android/configuration.gradle
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=none :MapboxGLAndroidSDK:javadocrelease
