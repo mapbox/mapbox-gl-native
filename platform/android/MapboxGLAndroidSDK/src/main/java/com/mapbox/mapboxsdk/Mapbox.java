@@ -24,6 +24,7 @@ import com.mapbox.services.android.telemetry.location.LocationEnginePriority;
  * connectivity state.
  * </p>
  */
+@UiThread
 public final class Mapbox {
 
   private static Mapbox INSTANCE;
