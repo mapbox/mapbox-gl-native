@@ -10,7 +10,8 @@
 namespace mbgl {
 
 RenderRasterLayer::RenderRasterLayer(Immutable<style::RasterLayer::Impl> _impl)
-    : RenderLayer(style::LayerType::Raster, _impl) {
+    : RenderLayer(style::LayerType::Raster, _impl),
+      unevaluated(impl().paint.untransitioned()) {
 }
 
 const style::RasterLayer::Impl& RenderRasterLayer::impl() const {
@@ -23,7 +24,7 @@ std::unique_ptr<Bucket> RenderRasterLayer::createBucket(const BucketParameters&,
 }
 
 void RenderRasterLayer::transition(const TransitionParameters& parameters) {
-    unevaluated = impl().paint.transition(parameters, std::move(unevaluated));
+    unevaluated = impl().paint.transitioned(parameters, std::move(unevaluated));
 }
 
 void RenderRasterLayer::evaluate(const PropertyEvaluationParameters& parameters) {

@@ -9,7 +9,8 @@
 namespace mbgl {
 
 RenderSymbolLayer::RenderSymbolLayer(Immutable<style::SymbolLayer::Impl> _impl)
-    : RenderLayer(style::LayerType::Symbol, _impl) {
+    : RenderLayer(style::LayerType::Symbol, _impl),
+      unevaluated(impl().paint.untransitioned()) {
 }
 
 const style::SymbolLayer::Impl& RenderSymbolLayer::impl() const {
@@ -34,7 +35,7 @@ std::unique_ptr<SymbolLayout> RenderSymbolLayer::createLayout(const BucketParame
 }
 
 void RenderSymbolLayer::transition(const TransitionParameters& parameters) {
-    unevaluated = impl().paint.transition(parameters, std::move(unevaluated));
+    unevaluated = impl().paint.transitioned(parameters, std::move(unevaluated));
 }
 
 void RenderSymbolLayer::evaluate(const PropertyEvaluationParameters& parameters) {

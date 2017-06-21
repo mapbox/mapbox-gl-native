@@ -8,7 +8,8 @@
 namespace mbgl {
 
 RenderFillExtrusionLayer::RenderFillExtrusionLayer(Immutable<style::FillExtrusionLayer::Impl> _impl)
-    : RenderLayer(style::LayerType::FillExtrusion, _impl) {
+    : RenderLayer(style::LayerType::FillExtrusion, _impl),
+      unevaluated(impl().paint.untransitioned()) {
 }
 
 const style::FillExtrusionLayer::Impl& RenderFillExtrusionLayer::impl() const {
@@ -20,7 +21,7 @@ std::unique_ptr<Bucket> RenderFillExtrusionLayer::createBucket(const BucketParam
 }
 
 void RenderFillExtrusionLayer::transition(const TransitionParameters& parameters) {
-    unevaluated = impl().paint.transition(parameters, std::move(unevaluated));
+    unevaluated = impl().paint.transitioned(parameters, std::move(unevaluated));
 }
 
 void RenderFillExtrusionLayer::evaluate(const PropertyEvaluationParameters& parameters) {
