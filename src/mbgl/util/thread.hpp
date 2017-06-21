@@ -22,8 +22,8 @@ namespace util {
 // Manages a thread with `Object`.
 
 // Upon creation of this object, it launches a thread and creates an object of type `Object`
-// in that thread. When the `ThreadedObject<>` object is destructed, the destructor waits
-// for thread termination. The `ThreadedObject<>` constructor blocks until the thread and
+// in that thread. When the `Thread<>` object is destructed, the destructor waits
+// for thread termination. The `Thread<>` constructor blocks until the thread and
 // the `Object` are fully created, so after the object creation, it's safe to obtain the
 // `Object` stored in this thread. The thread created will always have low priority on
 // the platforms that support setting thread priority.
@@ -32,15 +32,15 @@ namespace util {
 //
 // - Only one thread is created.
 // - `Object` will live in a single thread, providing thread affinity.
-// - It is safe to use `ThreadLocal` in an `Object` managed by `ThreadedObject<>`
+// - It is safe to use `ThreadLocal` in an `Object` managed by `Thread<>`
 // - A `RunLoop` is created for the `Object` thread.
 // - `Object` can use `Timer` and do asynchronous I/O, like wait for sockets events.
 //
 template<class Object>
-class ThreadedObject : public Scheduler {
+class Thread : public Scheduler {
 public:
     template <class... Args>
-    ThreadedObject(const std::string& name, Args&&... args) {
+    Thread(const std::string& name, Args&&... args) {
         std::promise<void> running;
 
         thread = std::thread([&] {
@@ -60,7 +60,7 @@ public:
         running.get_future().get();
     }
 
-    ~ThreadedObject() override {
+    ~Thread() override {
         MBGL_VERIFY_THREAD(tid);
 
         if (paused) {
@@ -86,7 +86,7 @@ public:
     // Returns a non-owning reference to `Object` that
     // can be used to send messages to `Object`. It is safe
     // to the non-owning reference to outlive this object
-    // and be used after the `ThreadedObject<>` gets destroyed.
+    // and be used after the `Thread<>` gets destroyed.
     ActorRef<std::decay_t<Object>> actor() const {
         return object->self();
     }

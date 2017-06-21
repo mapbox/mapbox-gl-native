@@ -1,5 +1,5 @@
 #include <mbgl/util/run_loop.hpp>
-#include <mbgl/util/threaded_object.hpp>
+#include <mbgl/util/thread.hpp>
 #include <mbgl/util/thread_local.hpp>
 
 #include <mbgl/test/util.hpp>
@@ -39,9 +39,9 @@ TEST(ThreadLocalStorage, Basic) {
     int number2 = 2;
     int number3 = 3;
 
-    ThreadedObject<TestThread> thread1("Test", &number1);
-    ThreadedObject<TestThread> thread2("Test", &number2);
-    ThreadedObject<TestThread> thread3("Test", &number3);
+    Thread<TestThread> thread1("Test", &number1);
+    Thread<TestThread> thread2("Test", &number2);
+    Thread<TestThread> thread3("Test", &number3);
 
     auto thread1Ref = thread1.actor();
     auto thread2Ref = thread2.actor();
@@ -98,8 +98,8 @@ TEST(ThreadLocalStorage, AutoReclaim) {
     auto dtorCounter1 = new DtorCounter{ &counter };
     auto dtorCounter2 = new DtorCounter{ &counter };
 
-    auto thread1 = std::make_unique<ThreadedObject<TestThreadReclaim>>("Test", dtorCounter1);
-    auto thread2 = std::make_unique<ThreadedObject<TestThreadReclaim>>("Test", dtorCounter2);
+    auto thread1 = std::make_unique<Thread<TestThreadReclaim>>("Test", dtorCounter1);
+    auto thread2 = std::make_unique<Thread<TestThreadReclaim>>("Test", dtorCounter2);
 
     thread1.reset();
     thread2.reset();

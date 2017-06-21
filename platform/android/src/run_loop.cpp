@@ -2,7 +2,7 @@
 
 #include <mbgl/util/platform.hpp>
 #include <mbgl/util/thread_local.hpp>
-#include <mbgl/util/threaded_object.hpp>
+#include <mbgl/util/thread.hpp>
 #include <mbgl/util/timer.hpp>
 
 #include <android/looper.h>
@@ -105,7 +105,7 @@ RunLoop::Impl::Impl(RunLoop* runLoop_, RunLoop::Type type) : runLoop(runLoop_) {
     case Type::Default:
         ret = ALooper_addFd(loop, fds[PIPE_OUT], ALOOPER_POLL_CALLBACK,
             ALOOPER_EVENT_INPUT, looperCallbackDefault, this);
-        alarm = std::make_unique<ThreadedObject<Alarm>>("Alarm", this);
+        alarm = std::make_unique<Thread<Alarm>>("Alarm", this);
         running = true;
         break;
     }

@@ -604,7 +604,7 @@ set(MBGL_CORE_FILES
     src/mbgl/util/stopwatch.hpp
     src/mbgl/util/string.cpp
     src/mbgl/util/thread_local.hpp
-    src/mbgl/util/threaded_object.hpp
+    src/mbgl/util/thread.hpp
     src/mbgl/util/throttler.cpp
     src/mbgl/util/throttler.hpp
     src/mbgl/util/tile_coordinate.hpp

@@ -2,7 +2,7 @@
 #include <mbgl/test/util.hpp>
 #include <mbgl/util/default_thread_pool.hpp>
 #include <mbgl/util/run_loop.hpp>
-#include <mbgl/util/threaded_object.hpp>
+#include <mbgl/util/thread.hpp>
 #include <mbgl/util/timer.hpp>
 
 #include <atomic>
@@ -58,9 +58,9 @@ public:
     const std::thread::id tid;
 };
 
-TEST(ThreadedObject, invoke) {
+TEST(Thread, invoke) {
     const std::thread::id tid = std::this_thread::get_id();
-    ThreadedObject<TestObject> thread("Test", tid);
+    Thread<TestObject> thread("Test", tid);
 
     thread.actor().invoke(&TestObject::fn1, 1);
     thread.actor().invoke(&TestObject::fn2, [] (int result) { EXPECT_EQ(result, 1); } );
@@ -77,9 +77,9 @@ TEST(ThreadedObject, invoke) {
     resultFuture.get();
 }
 
-TEST(ThreadedObject, Context) {
+TEST(Thread, Context) {
     const std::thread::id tid = std::this_thread::get_id();
-    ThreadedObject<TestObject> thread("Test", tid);
+    Thread<TestObject> thread("Test", tid);
 
     std::promise<bool> result;
     auto resultFuture = result.get_future();
@@ -106,9 +106,9 @@ private:
     Timer timer;
 };
 
-TEST(ThreadedObject, ExecutesAfter) {
+TEST(Thread, ExecutesAfter) {
     RunLoop loop;
-    ThreadedObject<TestWorker> thread("Test");
+    Thread<TestWorker> thread("Test");
 
     bool didWork = false;
     bool didAfter = false;
@@ -122,9 +122,9 @@ TEST(ThreadedObject, ExecutesAfter) {
     EXPECT_TRUE(didAfter);
 }
 
-TEST(ThreadedObject, CanSelfWakeUp) {
+TEST(Thread, CanSelfWakeUp) {
     RunLoop loop;
-    ThreadedObject<TestWorker> thread("Test");
+    Thread<TestWorker> thread("Test");
 
     thread.actor().invoke(&TestWorker::sendDelayed, [&] {
         loop.stop();
@@ -133,7 +133,7 @@ TEST(ThreadedObject, CanSelfWakeUp) {
     loop.run();
 }
 
-TEST(ThreadedObject, Concurrency) {
+TEST(Thread, Concurrency) {
     auto loop = std::make_shared<RunLoop>();
 
     unsigned numMessages = 100000;
@@ -143,10 +143,10 @@ TEST(ThreadedObject, Concurrency) {
     Actor<TestWorker> poolWorker(threadPool);
     auto poolWorkerRef = poolWorker.self();
 
-    ThreadedObject<TestWorker> threadedObject("Test");
+    Thread<TestWorker> threadedObject("Test");
     auto threadedObjectRef = threadedObject.actor();
 
-    // 10 threads sending 100k messages to the ThreadedObject. The
+    // 10 threads sending 100k messages to the Thread. The
     // idea here is to test if the scheduler is handling concurrency
     // correctly, otherwise this test should crash.
     for (unsigned i = 0; i < numMessages; ++i) {
@@ -162,18 +162,18 @@ TEST(ThreadedObject, Concurrency) {
     loop->run();
 }
 
-TEST(ThreadedObject, ThreadPoolMessaging) {
+TEST(Thread, ThreadPoolMessaging) {
     auto loop = std::make_shared<RunLoop>();
 
     ThreadPool threadPool(1);
     Actor<TestWorker> poolWorker(threadPool);
     auto poolWorkerRef = poolWorker.self();
 
-    ThreadedObject<TestWorker> threadedObject("Test");
+    Thread<TestWorker> threadedObject("Test");
     auto threadedObjectRef = threadedObject.actor();
 
-    // This is sending a message to the ThreadedObject from the main
-    // thread. Then the ThreadedObject will send another message to
+    // This is sending a message to the Thread from the main
+    // thread. Then the Thread will send another message to
     // a worker on the ThreadPool.
     threadedObjectRef.invoke(&TestWorker::send, [poolWorkerRef, loop] () mutable {
         poolWorkerRef.invoke(&TestWorker::send, [loop] () { loop->stop(); });
@@ -189,8 +189,8 @@ TEST(ThreadedObject, ThreadPoolMessaging) {
     loop->run();
 }
 
-TEST(ThreadedObject, ReferenceCanOutliveThreadedObject) {
-    auto thread = std::make_unique<ThreadedObject<TestWorker>>("Test");
+TEST(Thread, ReferenceCanOutliveThread) {
+    auto thread = std::make_unique<Thread<TestWorker>>("Test");
     auto worker = thread->actor();
 
     thread.reset();
@@ -202,10 +202,10 @@ TEST(ThreadedObject, ReferenceCanOutliveThreadedObject) {
     usleep(10000);
 }
 
-TEST(ThreadedObject, DeletePausedThreadedObject) {
+TEST(Thread, DeletePausedThread) {
     std::atomic_bool flag(false);
 
-    auto thread = std::make_unique<ThreadedObject<TestWorker>>("Test");
+    auto thread = std::make_unique<Thread<TestWorker>>("Test");
     thread->pause();
     thread->actor().invoke(&TestWorker::send, [&] { flag = true; });
 
@@ -216,15 +216,15 @@ TEST(ThreadedObject, DeletePausedThreadedObject) {
     ASSERT_TRUE(flag);
 }
 
-TEST(ThreadedObject, Pause) {
+TEST(Thread, Pause) {
     RunLoop loop;
 
     std::atomic_bool flag(false);
 
-    ThreadedObject<TestWorker> thread1("Test1");
+    Thread<TestWorker> thread1("Test1");
     thread1.pause();
 
-    ThreadedObject<TestWorker> thread2("Test2");
+    Thread<TestWorker> thread2("Test2");
 
     for (unsigned i = 0; i < 100; ++i) {
         thread1.actor().invoke(&TestWorker::send, [&] { flag = true; });
@@ -236,19 +236,19 @@ TEST(ThreadedObject, Pause) {
     loop.run();
 }
 
-TEST(ThreadedObject, Resume) {
+TEST(Thread, Resume) {
     RunLoop loop;
 
     std::atomic_bool flag(false);
 
-    ThreadedObject<TestWorker> thread("Test");
+    Thread<TestWorker> thread("Test");
     thread.pause();
 
     for (unsigned i = 0; i < 100; ++i) {
         thread.actor().invoke(&TestWorker::send, [&] { flag = true; });
     }
 
-    // ThreadedObject messages are ondered, when we resume, this is going
+    // Thread messages are ondered, when we resume, this is going
     // to me the last thing to run on the message queue.
     thread.actor().invoke(&TestWorker::send, [&] { loop.stop(); });
 
@@ -261,10 +261,10 @@ TEST(ThreadedObject, Resume) {
     ASSERT_TRUE(flag);
 }
 
-TEST(ThreadedObject, PauseResume) {
+TEST(Thread, PauseResume) {
     RunLoop loop;
 
-    ThreadedObject<TestWorker> thread("Test");
+    Thread<TestWorker> thread("Test");
 
     // Test if multiple pause/resume work.
     for (unsigned i = 0; i < 100; ++i) {

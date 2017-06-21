@@ -2,7 +2,7 @@
 #include <mbgl/storage/file_source_request.hpp>
 #include <mbgl/storage/response.hpp>
 #include <mbgl/util/string.hpp>
-#include <mbgl/util/threaded_object.hpp>
+#include <mbgl/util/thread.hpp>
 #include <mbgl/util/url.hpp>
 #include <mbgl/util/util.hpp>
 #include <mbgl/util/io.hpp>
@@ -53,7 +53,7 @@ public:
 };
 
 LocalFileSource::LocalFileSource()
-    : impl(std::make_unique<util::ThreadedObject<Impl>>("LocalFileSource")) {
+    : impl(std::make_unique<util::Thread<Impl>>("LocalFileSource")) {
 }
 
 LocalFileSource::~LocalFileSource() = default;
