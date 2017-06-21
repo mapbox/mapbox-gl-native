@@ -28,6 +28,26 @@ class BackendTest : public HeadlessBackend {
 public:
     BackendTest() : HeadlessBackend(test::sharedDisplay()) {}
 
+    void invalidate() {
+        if (invalidateCallback) {
+            invalidateCallback();
+        }
+    }
+
+    std::function<void()> invalidateCallback;
+
+    void onWillStartLoadingMap() final {
+        if (onWillStartLoadingMapCallback) {
+            onWillStartLoadingMapCallback();
+        }
+    }
+
+    void onDidFinishLoadingMap() final {
+        if (onDidFinishLoadingMapCallback) {
+            onDidFinishLoadingMapCallback();
+        }
+    }
+
     void onDidFailLoadingMap(std::exception_ptr) final {
         if (didFailLoadingMapCallback) {
             didFailLoadingMapCallback();
@@ -40,6 +60,8 @@ public:
         }
     }
 
+    std::function<void()> onWillStartLoadingMapCallback;
+    std::function<void()> onDidFinishLoadingMapCallback;
     std::function<void()> didFailLoadingMapCallback;
     std::function<void()> didFinishLoadingStyleCallback;
 };
@@ -275,6 +297,34 @@ TEST(Map, StyleEarlyMutation) {
 
     EXPECT_EQ(0u, fileSource.requests.size());
     EXPECT_NE(nullptr, map.getLayer("water"));
+}
+
+TEST(Map, MapLoadingSignal) {
+    MapTest test;
+    Map map(test.backend, test.view.getSize(), 1, test.fileSource, test.threadPool, MapMode::Still);
+
+    bool emitted = false;
+    test.backend.onWillStartLoadingMapCallback = [&]() {
+        emitted = true;
+    };
+    map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
+    EXPECT_TRUE(emitted);
+}
+
+TEST(Map, MapLoadedSignal) {
+    MapTest test;
+    Map map(test.backend, test.view.getSize(), 1, test.fileSource, test.threadPool, MapMode::Continuous);
+
+    test.backend.onDidFinishLoadingMapCallback = [&]() {
+        test.runLoop.stop();
+    };
+
+    test.backend.invalidateCallback = [&]() {
+        map.render(test.view);
+    };
+
+    map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
+    test.runLoop.run();
 }
 
 TEST(Map, StyleLoadedSignal) {
