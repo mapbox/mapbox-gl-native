@@ -513,6 +513,8 @@ set(MBGL_CORE_FILES
     src/mbgl/tile/tile_observer.hpp
     src/mbgl/tile/vector_tile.cpp
     src/mbgl/tile/vector_tile.hpp
+    src/mbgl/tile/vector_tile_data.cpp
+    src/mbgl/tile/vector_tile_data.hpp
 
     # util
     include/mbgl/util/any.hpp
