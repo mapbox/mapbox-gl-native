@@ -5,6 +5,7 @@
 #include <mbgl/storage/online_file_source.hpp>
 #include <mbgl/storage/offline_database.hpp>
 #include <mbgl/storage/offline_download.hpp>
+#include <mbgl/storage/resource_transform.hpp>
 
 #include <mbgl/util/platform.hpp>
 #include <mbgl/util/url.hpp>
@@ -49,7 +50,7 @@ public:
         return onlineFileSource.getAccessToken();
     }
 
-    void setResourceTransform(OnlineFileSource::ResourceTransform&& transform) {
+    void setResourceTransform(optional<ActorRef<ResourceTransform>>&& transform) {
         onlineFileSource.setResourceTransform(std::move(transform));
     }
 
@@ -227,17 +228,8 @@ std::string DefaultFileSource::getAccessToken() {
     return cachedAccessToken;
 }
 
-void DefaultFileSource::setResourceTransform(std::function<std::string(Resource::Kind, std::string&&)> transform) {
-    if (transform) {
-        auto loop = util::RunLoop::Get();
-        impl->actor().invoke(&Impl::setResourceTransform, [loop, transform](Resource::Kind kind_, std::string&& url_, auto callback_) {
-            return loop->invokeWithCallback([transform](Resource::Kind kind, std::string&& url, auto callback) {
-                callback(transform(kind, std::move(url)));
-            }, kind_, std::move(url_), callback_);
-        });
-    } else {
-        impl->actor().invoke(&Impl::setResourceTransform, nullptr);
-    }
+void DefaultFileSource::setResourceTransform(optional<ActorRef<ResourceTransform>>&& transform) {
+    impl->actor().invoke(&Impl::setResourceTransform, std::move(transform));
 }
 
 std::unique_ptr<AsyncRequest> DefaultFileSource::request(const Resource& resource, Callback callback) {

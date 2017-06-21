@@ -2,15 +2,18 @@
 #include <mbgl/storage/http_file_source.hpp>
 #include <mbgl/storage/network_status.hpp>
 
+#include <mbgl/storage/resource_transform.hpp>
 #include <mbgl/storage/response.hpp>
 #include <mbgl/util/logging.hpp>
 
+#include <mbgl/actor/mailbox.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/mapbox.hpp>
 #include <mbgl/util/exception.hpp>
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/async_task.hpp>
 #include <mbgl/util/noncopyable.hpp>
+#include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/timer.hpp>
 #include <mbgl/util/http_timeout.hpp>
 
@@ -34,11 +37,16 @@ public:
     void schedule(optional<Timestamp> expires);
     void completed(Response);
 
+    void setTransformedURL(const std::string&& url);
+    ActorRef<OnlineFileRequest> actor();
+
     OnlineFileSource::Impl& impl;
     Resource resource;
     std::unique_ptr<AsyncRequest> request;
     util::Timer timer;
     Callback callback;
+
+    std::shared_ptr<Mailbox> mailbox;
 
     // Counts the number of times a response was already expired when received. We're using
     // this to add a delay when making a new request so we don't keep retrying immediately
@@ -65,15 +73,12 @@ public:
     void add(OnlineFileRequest* request) {
         allRequests.insert(request);
         if (resourceTransform) {
-            // When there's a Resource transform callback set, replace the resource with the
+            // Request the ResourceTransform actor a new url and replace the resource url with the
             // transformed one before proceeding to schedule the request.
-            request->request =
-                resourceTransform(request->resource.kind, std::move(request->resource.url),
-                                  [request](std::string&& url) {
-                                      request->request.release();
-                                      request->resource.url = std::move(url);
-                                      request->schedule();
-                                  });
+            resourceTransform->invoke(&ResourceTransform::transform, request->resource.kind,
+                std::move(request->resource.url), [ref = request->actor()](const std::string&& url) mutable {
+                    ref.invoke(&OnlineFileRequest::setTransformedURL, std::move(url));
+                });
         } else {
             request->schedule();
         }
@@ -144,7 +149,7 @@ public:
         return activeRequests.find(request) != activeRequests.end();
     }
 
-    void setResourceTransform(ResourceTransform&& transform) {
+    void setResourceTransform(optional<ActorRef<ResourceTransform>>&& transform) {
         resourceTransform = std::move(transform);
     }
 
@@ -155,7 +160,7 @@ private:
         }
     }
 
-    ResourceTransform resourceTransform;
+    optional<ActorRef<ResourceTransform>> resourceTransform;
 
     /**
      * The lifetime of a request is:
@@ -216,7 +221,7 @@ std::unique_ptr<AsyncRequest> OnlineFileSource::request(const Resource& resource
     return std::make_unique<OnlineFileRequest>(std::move(res), std::move(callback), *impl);
 }
 
-void OnlineFileSource::setResourceTransform(ResourceTransform&& transform) {
+void OnlineFileSource::setResourceTransform(optional<ActorRef<ResourceTransform>>&& transform) {
     impl->setResourceTransform(std::move(transform));
 }
 
@@ -359,6 +364,21 @@ void OnlineFileRequest::networkIsReachableAgain() {
     if (failedRequestReason == Response::Error::Reason::Connection) {
         schedule(util::now());
     }
+}
+
+void OnlineFileRequest::setTransformedURL(const std::string&& url) {
+     resource.url = std::move(url);
+     schedule();
+}
+
+ActorRef<OnlineFileRequest> OnlineFileRequest::actor() {
+    if (!mailbox) {
+        // Lazy constructed because this can be costly and
+        // the ResourceTransform is not used by many apps.
+        mailbox = std::make_shared<Mailbox>(*util::RunLoop::Get());
+    }
+
+    return ActorRef<OnlineFileRequest>(*this, mailbox);
 }
 
 } // namespace mbgl
