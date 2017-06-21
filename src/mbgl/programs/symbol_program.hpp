@@ -56,11 +56,7 @@ struct SymbolLayoutAttributes : gl::Attributes<
                          Point<float> o,
                          Point<float> labelAnchor,
                          uint16_t tx,
-                         uint16_t ty,
-                         float minzoom,
-                         float maxzoom,
-                         float labelminzoom,
-                         uint8_t labelangle) {
+                         uint16_t ty) {
         return Vertex {
             // combining pos and offset to reduce number of vertex attributes passed to shader (8 max for some devices)
             {{
@@ -76,14 +72,8 @@ struct SymbolLayoutAttributes : gl::Attributes<
             {{
                 tx,
                 ty,
-                mbgl::attributes::packUint8Pair(
-                   static_cast<uint8_t>(labelminzoom * 10), // 1/10 zoom levels: z16 == 160
-                   static_cast<uint8_t>(labelangle)
-                ),
-                mbgl::attributes::packUint8Pair(
-                   static_cast<uint8_t>(minzoom * 10),
-                   static_cast<uint8_t>(::fmin(maxzoom, 25) * 10)
-                )
+                0,
+                0
             }}
         };
     }

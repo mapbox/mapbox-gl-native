@@ -594,14 +594,10 @@ void SymbolLayout::addSymbol(Buffer& buffer,
     uint8_t glyphAngle = std::round((symbol.glyphAngle / (M_PI * 2)) * 256);
 
     // coordinates (2 triangles)
-    buffer.vertices.emplace_back(SymbolLayoutAttributes::vertex(anchorPoint, tl, labelAnchor, tex.x, tex.y,
-                        minZoom, maxZoom, placementZoom, glyphAngle));
-    buffer.vertices.emplace_back(SymbolLayoutAttributes::vertex(anchorPoint, tr, labelAnchor, tex.x + tex.w, tex.y,
-                        minZoom, maxZoom, placementZoom, glyphAngle));
-    buffer.vertices.emplace_back(SymbolLayoutAttributes::vertex(anchorPoint, bl, labelAnchor, tex.x, tex.y + tex.h,
-                        minZoom, maxZoom, placementZoom, glyphAngle));
-    buffer.vertices.emplace_back(SymbolLayoutAttributes::vertex(anchorPoint, br, labelAnchor, tex.x + tex.w, tex.y + tex.h,
-                        minZoom, maxZoom, placementZoom, glyphAngle));
+    buffer.vertices.emplace_back(SymbolLayoutAttributes::vertex(anchorPoint, tl, labelAnchor, tex.x, tex.y));
+    buffer.vertices.emplace_back(SymbolLayoutAttributes::vertex(anchorPoint, tr, labelAnchor, tex.x + tex.w, tex.y));
+    buffer.vertices.emplace_back(SymbolLayoutAttributes::vertex(anchorPoint, bl, labelAnchor, tex.x, tex.y + tex.h));
+    buffer.vertices.emplace_back(SymbolLayoutAttributes::vertex(anchorPoint, br, labelAnchor, tex.x + tex.w, tex.y + tex.h));
     
     auto dynamicVertex = SymbolDynamicLayoutAttributes::vertex(anchorPoint, 0, placementZoom);
     buffer.dynamicVertices.emplace_back(dynamicVertex);
