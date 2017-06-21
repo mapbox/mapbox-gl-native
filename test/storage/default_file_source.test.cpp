@@ -1,5 +1,7 @@
+#include <mbgl/actor/actor.hpp>
 #include <mbgl/test/util.hpp>
 #include <mbgl/storage/default_file_source.hpp>
+#include <mbgl/storage/resource_transform.hpp>
 #include <mbgl/util/run_loop.hpp>
 
 using namespace mbgl;
@@ -482,7 +484,7 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(SetResourceTransform)) {
     DefaultFileSource fs(":memory:", ".");
 
     // Translates the URL "localhost://test to http://127.0.0.1:3000/test
-    fs.setResourceTransform([](Resource::Kind, std::string&& url) -> std::string {
+    Actor<ResourceTransform> transform(loop, [](Resource::Kind, const std::string&& url) -> std::string {
         if (url == "localhost://test") {
             return "http://127.0.0.1:3000/test";
         } else {
@@ -490,10 +492,27 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(SetResourceTransform)) {
         }
     });
 
-    const Resource resource { Resource::Unknown, "localhost://test" };
+    fs.setResourceTransform(transform.self());
+    const Resource resource1 { Resource::Unknown, "localhost://test" };
 
     std::unique_ptr<AsyncRequest> req;
-    req = fs.request(resource, [&](Response res) {
+    req = fs.request(resource1, [&](Response res) {
+        req.reset();
+        EXPECT_EQ(nullptr, res.error);
+        ASSERT_TRUE(res.data.get());
+        EXPECT_EQ("Hello World!", *res.data);
+        EXPECT_FALSE(bool(res.expires));
+        EXPECT_FALSE(bool(res.modified));
+        EXPECT_FALSE(bool(res.etag));
+        loop.stop();
+    });
+
+    loop.run();
+
+    fs.setResourceTransform({});
+    const Resource resource2 { Resource::Unknown, "http://127.0.0.1:3000/test" };
+
+    req = fs.request(resource2, [&](Response res) {
         req.reset();
         EXPECT_EQ(nullptr, res.error);
         ASSERT_TRUE(res.data.get());

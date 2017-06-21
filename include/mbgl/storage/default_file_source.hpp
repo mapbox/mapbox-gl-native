@@ -1,8 +1,10 @@
 #pragma once
 
+#include <mbgl/actor/actor_ref.hpp>
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/storage/offline.hpp>
 #include <mbgl/util/constants.hpp>
+#include <mbgl/util/optional.hpp>
 
 #include <vector>
 #include <mutex>
@@ -12,6 +14,8 @@ namespace mbgl {
 namespace util {
 template <typename T> class Thread;
 } // namespace util
+
+class ResourceTransform;
 
 class DefaultFileSource : public FileSource {
 public:
@@ -40,7 +44,7 @@ public:
     void setAccessToken(const std::string&);
     std::string getAccessToken();
 
-    void setResourceTransform(std::function<std::string(Resource::Kind, std::string&&)>);
+    void setResourceTransform(optional<ActorRef<ResourceTransform>>&&);
 
     std::unique_ptr<AsyncRequest> request(const Resource&, Callback) override;
 
