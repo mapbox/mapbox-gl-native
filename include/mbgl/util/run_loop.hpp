@@ -63,15 +63,6 @@ public:
         return std::make_unique<WorkRequest>(task);
     }
 
-    // Invoke fn(args...) on this RunLoop, then invoke callback(results...) on the current RunLoop.
-    template <class Fn, class... Args>
-    std::unique_ptr<AsyncRequest>
-    invokeWithCallback(Fn&& fn, Args&&... args) {
-        std::shared_ptr<WorkTask> task = WorkTask::makeWithCallback(std::forward<Fn>(fn), std::forward<Args>(args)...);
-        push(task);
-        return std::make_unique<WorkRequest>(task);
-    }
-
     class Impl;
 
 private:
