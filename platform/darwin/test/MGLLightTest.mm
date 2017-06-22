@@ -132,9 +132,9 @@
 - (void)testValueAdditions {
     MGLSphericalPosition position = MGLSphericalPositionMake(1.15, 210, 30);
     
-    XCTAssertEqual([NSValue valueWithMGLSphericalPosition:position].MGLSphericalPositionValue.radial, position.radial);
-    XCTAssertEqual([NSValue valueWithMGLSphericalPosition:position].MGLSphericalPositionValue.azimuthal, position.azimuthal);
-    XCTAssertEqual([NSValue valueWithMGLSphericalPosition:position].MGLSphericalPositionValue.polar, position.polar);
+    XCTAssertEqual(@(position).MGLSphericalPositionValue.radial, position.radial);
+    XCTAssertEqual(@(position).MGLSphericalPositionValue.azimuthal, position.azimuthal);
+    XCTAssertEqual(@(position).MGLSphericalPositionValue.polar, position.polar);
     XCTAssertEqual([NSValue valueWithMGLLightAnchor:MGLLightAnchorMap].MGLLightAnchorValue, MGLLightAnchorMap);
     XCTAssertEqual([NSValue valueWithMGLLightAnchor:MGLLightAnchorViewport].MGLLightAnchorValue, MGLLightAnchorViewport);
 }

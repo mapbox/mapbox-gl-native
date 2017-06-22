@@ -54,7 +54,7 @@ typedef NS_ENUM (NSInteger, MGLOfflinePackState) {
  A structure containing information about an offline pack’s current download
  progress.
  */
-typedef struct MGLOfflinePackProgress {
+typedef struct __attribute__((objc_boxable)) MGLOfflinePackProgress {
     /**
      The number of resources, including tiles, that have been completely
      downloaded and are ready to use offline.
