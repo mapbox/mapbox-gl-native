@@ -8,6 +8,7 @@
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/map/transform.hpp>
 #include <mbgl/renderer/tile_parameters.hpp>
+#include <mbgl/style/style.hpp>
 #include <mbgl/style/layers/circle_layer.hpp>
 #include <mbgl/annotation/annotation_manager.hpp>
 #include <mbgl/renderer/image_manager.hpp>
@@ -24,7 +25,8 @@ public:
     TransformState transformState;
     util::RunLoop loop;
     ThreadPool threadPool { 1 };
-    AnnotationManager annotationManager;
+    style::Style style { loop, fileSource, 1 };
+    AnnotationManager annotationManager { style };
     ImageManager imageManager;
     GlyphManager glyphManager { fileSource };
     Tileset tileset { { "https://example.com" }, { 0, 22 }, "none" };
