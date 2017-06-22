@@ -500,12 +500,13 @@ std::unique_ptr<SymbolBucket> SymbolLayout::place(CollisionTile& collisionTile) 
             const float placementZoom = util::max(util::log2(glyphScale) + zoom, 0.0f);
             collisionTile.insertFeature(symbolInstance.textCollisionFeature, glyphScale, layout.get<TextIgnorePlacement>());
             if (glyphScale < collisionTile.maxScale) {
+                const Range<float> sizeData = bucket->textSizeBinder->getVertexSizeData(feature);
                 for (const auto& symbol : symbolInstance.glyphQuads) {
                     addSymbol(
-                        bucket->text, *bucket->textSizeBinder, symbol, feature, placementZoom,
+                        bucket->text, sizeData, symbol, placementZoom,
                         keepUpright, textPlacement, collisionTile.config.angle, symbolInstance.writingModes, symbolInstance.point);
                 }
-                PlacedSymbol placedSymbol(symbolInstance.point, symbolInstance.index, 16, 16, 0, 0, placementZoom, false, symbolInstance.line);
+                PlacedSymbol placedSymbol(symbolInstance.point, symbolInstance.index, sizeData.min, sizeData.max, 0, 0, placementZoom, false, symbolInstance.line);
                 bucket->text.placedSymbols.emplace_back(std::move(placedSymbol));
             }
         }
@@ -514,10 +515,11 @@ std::unique_ptr<SymbolBucket> SymbolLayout::place(CollisionTile& collisionTile) 
             const float placementZoom = util::max(util::log2(iconScale) + zoom, 0.0f);
             collisionTile.insertFeature(symbolInstance.iconCollisionFeature, iconScale, layout.get<IconIgnorePlacement>());
             if (iconScale < collisionTile.maxScale && symbolInstance.iconQuad) {
+                const Range<float> sizeData = bucket->iconSizeBinder->getVertexSizeData(feature);
                 addSymbol(
-                    bucket->icon, *bucket->iconSizeBinder, *symbolInstance.iconQuad, feature, placementZoom,
+                    bucket->icon, sizeData, *symbolInstance.iconQuad, placementZoom,
                     keepUpright, iconPlacement, collisionTile.config.angle, symbolInstance.writingModes, symbolInstance.point);
-                PlacedSymbol placedSymbol(symbolInstance.point, 0, 0, 0, 0, 0, placementZoom, false, symbolInstance.line);
+                PlacedSymbol placedSymbol(symbolInstance.point, symbolInstance.index, sizeData.min, sizeData.max, 0, 0, placementZoom, false, symbolInstance.line);
                 bucket->icon.placedSymbols.emplace_back(std::move(placedSymbol));
             }
         }
@@ -537,9 +539,8 @@ std::unique_ptr<SymbolBucket> SymbolLayout::place(CollisionTile& collisionTile) 
 
 template <typename Buffer>
 void SymbolLayout::addSymbol(Buffer& buffer,
-                             SymbolSizeBinder& sizeBinder,
+                             const Range<float> sizeData,
                              const SymbolQuad& symbol,
-                             const SymbolFeature& feature,
                              const float placementZoom,
                              const bool keepUpright,
                              const style::SymbolPlacementType placement,
@@ -590,22 +591,17 @@ void SymbolLayout::addSymbol(Buffer& buffer,
     assert(segment.vertexLength <= std::numeric_limits<uint16_t>::max());
     uint16_t index = segment.vertexLength;
 
-    // Encode angle of glyph
-    uint8_t glyphAngle = std::round((symbol.glyphAngle / (M_PI * 2)) * 256);
-
     // coordinates (2 triangles)
-    buffer.vertices.emplace_back(SymbolLayoutAttributes::vertex(anchorPoint, tl, labelAnchor, tex.x, tex.y));
-    buffer.vertices.emplace_back(SymbolLayoutAttributes::vertex(anchorPoint, tr, labelAnchor, tex.x + tex.w, tex.y));
-    buffer.vertices.emplace_back(SymbolLayoutAttributes::vertex(anchorPoint, bl, labelAnchor, tex.x, tex.y + tex.h));
-    buffer.vertices.emplace_back(SymbolLayoutAttributes::vertex(anchorPoint, br, labelAnchor, tex.x + tex.w, tex.y + tex.h));
+    buffer.vertices.emplace_back(SymbolLayoutAttributes::vertex(anchorPoint, tl, labelAnchor, tex.x, tex.y, sizeData));
+    buffer.vertices.emplace_back(SymbolLayoutAttributes::vertex(anchorPoint, tr, labelAnchor, tex.x + tex.w, tex.y, sizeData));
+    buffer.vertices.emplace_back(SymbolLayoutAttributes::vertex(anchorPoint, bl, labelAnchor, tex.x, tex.y + tex.h, sizeData));
+    buffer.vertices.emplace_back(SymbolLayoutAttributes::vertex(anchorPoint, br, labelAnchor, tex.x + tex.w, tex.y + tex.h, sizeData));
     
     auto dynamicVertex = SymbolDynamicLayoutAttributes::vertex(anchorPoint, 0, placementZoom);
     buffer.dynamicVertices.emplace_back(dynamicVertex);
     buffer.dynamicVertices.emplace_back(dynamicVertex);
     buffer.dynamicVertices.emplace_back(dynamicVertex);
     buffer.dynamicVertices.emplace_back(dynamicVertex);
-
-    sizeBinder.populateVertexVector(feature);
 
     // add the two triangles, referencing the four coordinates we just inserted.
     buffer.triangles.emplace_back(index + 0, index + 1, index + 2);

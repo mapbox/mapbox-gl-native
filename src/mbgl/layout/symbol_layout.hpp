@@ -65,9 +65,8 @@ private:
     // Adds placed items to the buffer.
     template <typename Buffer>
     void addSymbol(Buffer&,
-                   SymbolSizeBinder& sizeBinder,
+                   const Range<float> sizeData,
                    const SymbolQuad&,
-                   const SymbolFeature& feature,
                    float scale,
                    const bool keepUpright,
                    const style::SymbolPlacementType,

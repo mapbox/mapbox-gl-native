@@ -40,14 +40,12 @@ void SymbolBucket::upload(gl::Context& context) {
         text.vertexBuffer = context.createVertexBuffer(std::move(text.vertices));
         text.dynamicVertexBuffer = context.createVertexBuffer(std::move(text.dynamicVertices), true);
         text.indexBuffer = context.createIndexBuffer(std::move(text.triangles));
-        textSizeBinder->upload(context);
     }
 
     if (hasIconData()) {
         icon.vertexBuffer = context.createVertexBuffer(std::move(icon.vertices));
         icon.dynamicVertexBuffer = context.createVertexBuffer(std::move(icon.dynamicVertices), true);
         icon.indexBuffer = context.createIndexBuffer(std::move(icon.triangles));
-        iconSizeBinder->upload(context);
     }
 
     if (!collisionBox.vertices.empty()) {

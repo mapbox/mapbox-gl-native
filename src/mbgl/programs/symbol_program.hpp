@@ -56,7 +56,8 @@ struct SymbolLayoutAttributes : gl::Attributes<
                          Point<float> o,
                          Point<float> labelAnchor,
                          uint16_t tx,
-                         uint16_t ty) {
+                         uint16_t ty,
+                         const Range<float>& sizeData) {
         return Vertex {
             // combining pos and offset to reduce number of vertex attributes passed to shader (8 max for some devices)
             {{
@@ -72,8 +73,8 @@ struct SymbolLayoutAttributes : gl::Attributes<
             {{
                 tx,
                 ty,
-                0,
-                0
+                static_cast<uint16_t>(sizeData.min * 10),
+                static_cast<uint16_t>(sizeData.max * 10)
             }}
         };
     }
@@ -93,11 +94,13 @@ struct SymbolDynamicLayoutAttributes : gl::Attributes<attributes::a_projected_po
     }
 };
     
-class SymbolSizeAttributes : public gl::Attributes<attributes::a_size> {
-public:
-    using Attribute = attributes::a_size::Type;
+struct ZoomEvaluatedSize {
+    bool isZoomConstant;
+    bool isFeatureConstant;
+    float sizeT;
+    float size;
+    float layoutSize;
 };
-
 // Mimic the PaintPropertyBinder technique specifically for the {text,icon}-size layout properties
 // in order to provide a 'custom' scheme for encoding the necessary attribute data.  As with
 // PaintPropertyBinder, SymbolSizeBinder is an abstract class whose implementations handle the
@@ -118,10 +121,19 @@ public:
                                                     const style::DataDrivenPropertyValue<float>& sizeProperty,
                                                     const float defaultValue);
 
-    virtual SymbolSizeAttributes::Bindings attributeBindings() const = 0;
-    virtual void populateVertexVector(const GeometryTileFeature& feature) = 0;
-    virtual UniformValues uniformValues(float currentZoom) const = 0;
-    virtual void upload(gl::Context&) = 0;
+    virtual Range<float> getVertexSizeData(const GeometryTileFeature& feature) = 0;
+    virtual ZoomEvaluatedSize evaluateForZoom(float currentZoom) const = 0;
+
+    UniformValues uniformValues(float currentZoom) const {
+        const ZoomEvaluatedSize u = evaluateForZoom(currentZoom);
+        return UniformValues {
+            uniforms::u_is_size_zoom_constant::Value{ u.isZoomConstant },
+            uniforms::u_is_size_feature_constant::Value{ u.isFeatureConstant},
+            uniforms::u_size_t::Value{ u.sizeT },
+            uniforms::u_size::Value{ u.size },
+            uniforms::u_layout_size::Value{ u.layoutSize }
+        };
+    }
 };
 
 // Return the smallest range of stops that covers the interval [lowerZoom, upperZoom]
@@ -167,14 +179,9 @@ public:
         );
     }
     
-    SymbolSizeAttributes::Bindings attributeBindings() const override {
-        return SymbolSizeAttributes::Bindings { gl::DisabledAttribute() };
-    }
-
-    void upload(gl::Context&) override {}
-    void populateVertexVector(const GeometryTileFeature&) override {};
+    Range<float> getVertexSizeData(const GeometryTileFeature&) override { return { 0.0f, 0.0f }; };
     
-    UniformValues uniformValues(float currentZoom) const override {
+    ZoomEvaluatedSize evaluateForZoom(float currentZoom) const override {
         float size = layoutSize;
         bool isZoomConstant = !(coveringRanges || function);
         if (coveringRanges) {
@@ -193,14 +200,9 @@ public:
         } else if (function) {
             size = function->evaluate(currentZoom);
         }
-        
-        return UniformValues {
-            uniforms::u_is_size_zoom_constant::Value{ isZoomConstant },
-            uniforms::u_is_size_feature_constant::Value{ true },
-            uniforms::u_size_t::Value{ 0.0f },  // unused
-            uniforms::u_size::Value{ size },
-            uniforms::u_layout_size::Value{ layoutSize }
-        };
+
+        const float unused = 0.0f;
+        return { isZoomConstant, true, unused, size, layoutSize };
     }
     
     float layoutSize;
@@ -222,49 +224,22 @@ public:
           defaultValue(defaultValue_) {
     }
 
-    SymbolSizeAttributes::Bindings attributeBindings() const override {
-        return SymbolSizeAttributes::Bindings { SymbolSizeAttributes::Attribute::binding(*buffer, 0, 1) };
-    }
-
-    void populateVertexVector(const GeometryTileFeature& feature) override {
-        const auto sizeVertex = Vertex {
-            {{
-                static_cast<uint16_t>(function.evaluate(feature, defaultValue) * 10)
-            }}
-        };
-        
-        vertices.emplace_back(sizeVertex);
-        vertices.emplace_back(sizeVertex);
-        vertices.emplace_back(sizeVertex);
-        vertices.emplace_back(sizeVertex);
+    Range<float> getVertexSizeData(const GeometryTileFeature& feature) override {
+        const float size = function.evaluate(feature, defaultValue);
+        return { size, size };
     };
     
-    UniformValues uniformValues(float) const override {
-        return UniformValues {
-            uniforms::u_is_size_zoom_constant::Value{ true },
-            uniforms::u_is_size_feature_constant::Value{ false },
-            uniforms::u_size_t::Value{ 0.0f },      // unused
-            uniforms::u_size::Value{ 0.0f },        // unused
-            uniforms::u_layout_size::Value{ 0.0f }  // unused
-        };
-    }
-    
-    void upload(gl::Context& context) override {
-        buffer = VertexBuffer { context.createVertexBuffer(std::move(vertices)) };
+    ZoomEvaluatedSize evaluateForZoom(float) const override {
+        const float unused = 0.0f;
+        return { true, true, unused, unused, unused };
     }
     
     const style::SourceFunction<float>& function;
     const float defaultValue;
-    
-    VertexVector vertices;
-    optional<VertexBuffer> buffer;
 };
 
 class CompositeFunctionSymbolSizeBinder final : public SymbolSizeBinder {
 public:
-    using Vertex = SymbolSizeAttributes::Vertex;
-    using VertexVector = gl::VertexVector<Vertex>;
-    using VertexBuffer = gl::VertexBuffer<Vertex>;
     
     CompositeFunctionSymbolSizeBinder(const float tileZoom, const style::CompositeFunction<float>& function_, const float defaultValue_)
         : function(function_),
@@ -275,51 +250,27 @@ public:
             return getCoveringStops(stops, tileZoom, tileZoom + 1); }))
     {}
 
-    SymbolSizeAttributes::Bindings attributeBindings() const override {
-        return SymbolSizeAttributes::Bindings { SymbolSizeAttributes::Attribute::binding(*buffer, 0) };
-    }
-    
-    void populateVertexVector(const GeometryTileFeature& feature) override {
-        const auto sizeVertex = Vertex {
-            {{
-                static_cast<uint16_t>(function.evaluate(coveringZoomStops.min, feature, defaultValue) * 10),
-                static_cast<uint16_t>(function.evaluate(coveringZoomStops.max, feature, defaultValue) * 10),
-                static_cast<uint16_t>(function.evaluate(layoutZoom, feature, defaultValue) * 10)
-            }}
+    Range<float> getVertexSizeData(const GeometryTileFeature& feature) override {
+        return {
+            function.evaluate(coveringZoomStops.min, feature, defaultValue),
+            function.evaluate(coveringZoomStops.max, feature, defaultValue)
         };
-        
-        vertices.emplace_back(sizeVertex);
-        vertices.emplace_back(sizeVertex);
-        vertices.emplace_back(sizeVertex);
-        vertices.emplace_back(sizeVertex);
     };
     
-    UniformValues uniformValues(float currentZoom) const override {
+    ZoomEvaluatedSize evaluateForZoom(float currentZoom) const override {
         float sizeInterpolationT = util::clamp(
             util::interpolationFactor(1.0f, coveringZoomStops, currentZoom),
             0.0f, 1.0f
         );
 
-        return UniformValues {
-            uniforms::u_is_size_zoom_constant::Value{ false },
-            uniforms::u_is_size_feature_constant::Value{ false },
-            uniforms::u_size_t::Value{ sizeInterpolationT },
-            uniforms::u_size::Value{ 0.0f },        // unused
-            uniforms::u_layout_size::Value{ 0.0f }  // unused
-        };
-    }
-    
-    void upload(gl::Context& context) override {
-        buffer = VertexBuffer { context.createVertexBuffer(std::move(vertices)) };
+        const float unused = 0.0f;
+        return { false, false, sizeInterpolationT, unused, unused };
     }
     
     const style::CompositeFunction<float>& function;
     const float defaultValue;
     float layoutZoom;
     Range<float> coveringZoomStops;
-
-    VertexVector vertices;
-    optional<VertexBuffer> buffer;
 };
 
 
@@ -333,7 +284,7 @@ public:
     using LayoutAttributes = LayoutAttrs;
     using LayoutVertex = typename LayoutAttributes::Vertex;
     
-    using LayoutAndSizeAttributes = gl::ConcatenateAttributes<LayoutAttributes, gl::ConcatenateAttributes<SymbolDynamicLayoutAttributes, SymbolSizeAttributes>>;
+    using LayoutAndSizeAttributes = gl::ConcatenateAttributes<LayoutAttributes, SymbolDynamicLayoutAttributes>;
 
     using PaintProperties = PaintProps;
     using PaintPropertyBinders = typename PaintProperties::Binders;
@@ -384,7 +335,6 @@ public:
                 .concat(paintPropertyBinders.uniformValues(currentZoom, currentProperties)),
             LayoutAttributes::bindings(layoutVertexBuffer)
                 .concat(SymbolDynamicLayoutAttributes::bindings(dynamicLayoutVertexBuffer))
-                .concat(symbolSizeBinder.attributeBindings())
                 .concat(paintPropertyBinders.attributeBindings(currentProperties)),
             indexBuffer,
             segments
