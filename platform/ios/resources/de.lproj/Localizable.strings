@@ -10,6 +10,9 @@
 /* No comment provided by engineer. */
 "CANCEL" = "Abbrechen";
 
+/* Accessibility hint for closing the selected annotation’s callout view and returning to the map */
+"CLOSE_CALLOUT_A11Y_HINT" = "Zurück zur Karte ";
+
 /* Accessibility hint */
 "COMPASS_A11Y_HINT" = "Dreht die Karte nach Norden";
 
@@ -31,6 +34,12 @@
 /* Accessibility label */
 "INFO_A11Y_LABEL" = "Über diese Karte";
 
+/* User-friendly error description */
+"LOAD_MAP_FAILED_DESC" = "Die Karte konnte nicht geladen werden, da ein unbekannter Fehler aufgetreten ist.";
+
+/* User-friendly error description */
+"LOAD_STYLE_FAILED_DESC" = "Die Karte konnte nicht geladen werden, da diese Form nicht geladen werden kann";
+
 /* Accessibility label */
 "LOGO_A11Y_LABEL" = "Mapbox";
 
@@ -40,8 +49,17 @@
 /* Map accessibility value */
 "MAP_A11Y_VALUE" = "Zoomstufe %1$d\n%2$ld Anmerkung(en) sichtbar";
 
+/* User-friendly error description */
+"PARSE_STYLE_FAILED_DESC" = "Die Karte konnte nicht geladen werden, da diese Form beschädigt ist.";
+
 /* Action sheet title */
 "SDK_NAME" = "Mapbox iOS SDK";
+
+/* Developer-only SDK update notification; {latest version, in format x.x.x} */
+"SDK_UPDATE_AVAILABLE" = "Mapbox iOS SDK Version %@ ist ab sofort verfügbar.";
+
+/* User-friendly error description */
+"STYLE_NOT_FOUND_DESC" = "Die Karte konnte nicht geladen werden, da diese Form nicht gefunden werden kann oder nicht kompatibel ist.";
 
 /* Telemetry prompt message */
 "TELEMETRY_DISABLED_MSG" = "Durch anonymisierte Nutzungsdaten können Sie helfen, OpenStreetMap- und Mapbox-Karten zu verbessern.";
