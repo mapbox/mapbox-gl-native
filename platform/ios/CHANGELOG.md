@@ -9,6 +9,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * Xcode 8.0 or higher is now recommended for using this SDK. ([#8775](https://github.com/mapbox/mapbox-gl-native/pull/8775))
 * Fixed an issue in the static framework where localizations would never load. ([#9074](https://github.com/mapbox/mapbox-gl-native/pull/9074))
 * Updated MGLMapView’s logo view to display [the new Mapbox logo](https://www.mapbox.com/blog/new-mapbox-logo/). ([#8771](https://github.com/mapbox/mapbox-gl-native/pull/8771), [#8773](https://github.com/mapbox/mapbox-gl-native/pull/8773))
+* Reduced dynamic and static framework sizes by more aggressively stripping symbols. ([#9021](https://github.com/mapbox/mapbox-gl-native/issues/9021))
 
 ### Styles
 
