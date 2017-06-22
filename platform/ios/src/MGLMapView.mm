@@ -84,6 +84,8 @@ typedef NS_ENUM(NSUInteger, MGLUserTrackingState) {
     MGLUserTrackingStatePossible = 0,
     /// The map view has begun to move to the first reported user location.
     MGLUserTrackingStateBegan,
+    /// The map view begins a significant transition.
+    MGLUserTrackingStateBeginSignificantTransition,
     /// The map view has finished moving to the first reported user location.
     MGLUserTrackingStateChanged,
 };
@@ -111,6 +113,9 @@ const NSUInteger MGLTargetFrameInterval = 1;  // Target FPS will be 60 divided b
 
 /// Tolerance for snapping to true north, measured in degrees in either direction.
 const CLLocationDirection MGLToleranceForSnappingToNorth = 7;
+
+/// Distance threshold to stop the camera while animating.
+const CLLocationDistance MGLDistanceThresholdForCameraPause = 500;
 
 /// Reuse identifier and file name of the default point annotation image.
 static NSString * const MGLDefaultStyleMarkerSymbolName = @"default_marker";
@@ -309,6 +314,8 @@ public:
     /// Center coordinate of the pinch gesture on the previous iteration of the gesture.
     CLLocationCoordinate2D _previousPinchCenterCoordinate;
     NSUInteger _previousPinchNumberOfTouches;
+    
+    CLLocationDistance _distanceFromOldUserLocation;
 
     BOOL _delegateHasAlphasForShapeAnnotations;
     BOOL _delegateHasStrokeColorsForShapeAnnotations;
@@ -1166,6 +1173,10 @@ public:
 {
     _changeDelimiterSuppressionDepth = 0;
     _mbglMap->setGestureInProgress(false);
+    if (self.userTrackingState == MGLUserTrackingStateBegan)
+    {
+        [self setUserTrackingMode:MGLUserTrackingModeNone animated:NO];
+    }
     _mbglMap->cancelTransitions();
 }
 
@@ -4385,6 +4396,7 @@ public:
 {
     CLLocation *oldLocation = self.userLocation.location;
     CLLocation *newLocation = locations.lastObject;
+    _distanceFromOldUserLocation = [newLocation distanceFromLocation:oldLocation];
 
     if ( ! _showsUserLocation || ! newLocation || ! CLLocationCoordinate2DIsValid(newLocation.coordinate)) return;
 
@@ -4478,7 +4490,12 @@ public:
 /// first location update.
 - (void)didUpdateLocationSignificantlyAnimated:(BOOL)animated
 {
-    self.userTrackingState = MGLUserTrackingStateBegan;
+    
+    if (_distanceFromOldUserLocation >= MGLDistanceThresholdForCameraPause) {
+        self.userTrackingState = MGLUserTrackingStateBeginSignificantTransition;
+    } else {
+        self.userTrackingState = MGLUserTrackingStateBegan;
+    }
 
     MGLMapCamera *camera = self.camera;
     camera.centerCoordinate = self.userLocation.location.coordinate;
@@ -4498,7 +4515,8 @@ public:
           peakAltitude:-1
      completionHandler:^{
         MGLMapView *strongSelf = weakSelf;
-        if (strongSelf.userTrackingState == MGLUserTrackingStateBegan)
+        if (strongSelf.userTrackingState == MGLUserTrackingStateBegan ||
+            strongSelf.userTrackingState == MGLDistanceThresholdForCameraPause)
         {
             strongSelf.userTrackingState = MGLUserTrackingStateChanged;
         }
