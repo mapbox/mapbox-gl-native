@@ -7,6 +7,10 @@
 #include <jni/jni.hpp>
 
 namespace mbgl {
+
+template <typename T> class Actor;
+class ResourceTransform;
+
 namespace android {
 
 /**
@@ -46,7 +50,7 @@ public:
     static void registerNative(jni::JNIEnv&);
 
 private:
-
+    std::unique_ptr<Actor<ResourceTransform>> resourceTransform;
     std::unique_ptr<mbgl::DefaultFileSource> fileSource;
 };
 
