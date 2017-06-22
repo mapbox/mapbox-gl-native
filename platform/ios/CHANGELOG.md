@@ -43,6 +43,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * Corrected the size of MGLMapView’s compass. ([#9060](https://github.com/mapbox/mapbox-gl-native/pull/9060))
 * The Improve This Map button in the attribution action sheet now leads to a feedback tool that matches MGLMapView’s rotation and pitch. `-[MGLAttributionInfo feedbackURLAtCenterCoordinate:zoomLevel:]` no longer respects the feedback URL specified in TileJSON. ([#9078](https://github.com/mapbox/mapbox-gl-native/pull/9078))
 * Fixed an issue when user starts tracking position and stops manually the animation. ([#7916](https://github.com/mapbox/mapbox-gl-native/pull/7916))
+* `-[MGLMapViewDelegate mapView:shouldChangeFromCamera:toCamera:]` can now block any panning caused by a pinch gesture. ([#9344](https://github.com/mapbox/mapbox-gl-native/pull/9344))
 
 ### Other changes
 
