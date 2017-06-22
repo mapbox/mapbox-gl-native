@@ -33,6 +33,7 @@
 * The `MGLPolyline.coordinate` and `MGLPolygon.coordinate` properties now return the midpoint and centroid, respectively, instead of the first coordinate. ([#8713](https://github.com/mapbox/mapbox-gl-native/pull/8713))
 * Improved CPU and battery performance while animating a tilted map’s camera in an area with many labels. ([#9031](https://github.com/mapbox/mapbox-gl-native/pull/9031))
 * Fixed an issue rendering polylines that contain duplicate vertices. ([#8808](https://github.com/mapbox/mapbox-gl-native/pull/8808))
+* Added struct boxing to `MGLCoordinateSpan`, `MGLCoordinateBounds`, `MGLOfflinePackProgress`, and `MGLTransition`. ([#9343](https://github.com/mapbox/mapbox-gl-native/pull/9343)
 
 ## 0.4.1 - April 8, 2017
 
