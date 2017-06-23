@@ -10,6 +10,7 @@
 
 #include <mbgl/map/map.hpp>
 #include <mbgl/style/sources/vector_source.hpp>
+#include <mbgl/renderer/renderer.hpp>
 
 @interface MGLVectorSource ()
 
@@ -64,7 +65,7 @@
     
     std::vector<mbgl::Feature> features;
     if (self.style) {
-        features = self.style.mapView.mbglMap->querySourceFeatures(self.rawSource->getID(), { optionalSourceLayerIDs, optionalFilter });
+        features = self.style.mapView.renderer->querySourceFeatures(self.rawSource->getID(), { optionalSourceLayerIDs, optionalFilter });
     }
     return MGLFeaturesFromMBGLFeatures(features);
 }

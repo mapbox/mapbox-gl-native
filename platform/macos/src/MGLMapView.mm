@@ -4,6 +4,7 @@
 #import "MGLCompassCell.h"
 #import "MGLOpenGLLayer.h"
 #import "MGLStyle.h"
+#import "MGLRendererFrontend.h"
 
 #import "MGLAnnotationImage_Private.h"
 #import "MGLAttributionInfo_Private.h"
@@ -32,6 +33,7 @@
 #import <mbgl/map/backend.hpp>
 #import <mbgl/map/backend_scope.hpp>
 #import <mbgl/style/image.hpp>
+#import <mbgl/renderer/renderer.hpp>
 #import <mbgl/storage/default_file_source.hpp>
 #import <mbgl/storage/network_status.hpp>
 #import <mbgl/math/wrap.hpp>
@@ -155,6 +157,7 @@ public:
     /// Cross-platform map view controller.
     mbgl::Map *_mbglMap;
     MGLMapViewImpl *_mbglView;
+    std::unique_ptr<MGLRenderFrontend> _rendererFrontend;
     std::shared_ptr<mbgl::ThreadPool> _mbglThreadPool;
 
     NSPanGestureRecognizer *_panGestureRecognizer;
@@ -270,7 +273,10 @@ public:
     mbgl::DefaultFileSource* mbglFileSource = [MGLOfflineStorage sharedOfflineStorage].mbglFileSource;
 
     _mbglThreadPool = mbgl::sharedThreadPool();
-    _mbglMap = new mbgl::Map(*_mbglView, *_mbglView, self.size, [NSScreen mainScreen].backingScaleFactor, *mbglFileSource, *_mbglThreadPool, mbgl::MapMode::Continuous, mbgl::GLContextMode::Unique, mbgl::ConstrainMode::None, mbgl::ViewportMode::Default);
+
+    auto renderer = std::make_unique<mbgl::Renderer>(*_mbglView, [NSScreen mainScreen].backingScaleFactor, *mbglFileSource, *_mbglThreadPool, mbgl::GLContextMode::Unique);
+    _rendererFrontend = std::make_unique<MGLRenderFrontend>(std::move(renderer), self, _mbglView, true);
+    _mbglMap = new mbgl::Map(*_rendererFrontend, *_mbglView, self.size, [NSScreen mainScreen].backingScaleFactor, *mbglFileSource, *_mbglThreadPool, mbgl::MapMode::Continuous, mbgl::ConstrainMode::None, mbgl::ViewportMode::Default);
 
     // Install the OpenGL layer. Interface Builder’s synchronous drawing means
     // we can’t display a map, so don’t even bother to have a map layer.
@@ -642,6 +648,10 @@ public:
     return _mbglMap;
 }
 
+- (mbgl::Renderer *)renderer {
+    return _rendererFrontend->getRenderer();
+}
+
 #pragma mark View hierarchy and drawing
 
 - (void)viewWillMoveToWindow:(NSWindow *)newWindow {
@@ -769,11 +779,8 @@ public:
 }
 
 - (void)renderSync {
-    if (!self.dormant) {
-        // The OpenGL implementation automatically enables the OpenGL context for us.
-        mbgl::BackendScope scope { *_mbglView, mbgl::BackendScope::ScopeType::Implicit };
-
-        _mbglMap->render(*_mbglView);
+    if (!self.dormant && _rendererFrontend) {
+        _rendererFrontend->render();
 
         if (_isPrinting) {
             _isPrinting = NO;
@@ -2123,7 +2130,7 @@ public:
 /// Returns the tags of the annotations coincident with the given rectangle.
 - (std::vector<MGLAnnotationTag>)annotationTagsInRect:(NSRect)rect {
     // Cocoa origin is at the lower-left corner.
-    return _mbglMap->queryPointAnnotations({
+    return self.renderer->queryPointAnnotations({
         { NSMinX(rect), NSHeight(self.bounds) - NSMaxY(rect) },
         { NSMaxX(rect), NSHeight(self.bounds) - NSMinY(rect) },
     });
@@ -2544,7 +2551,7 @@ public:
         optionalFilter = predicate.mgl_filter;
     }
     
-    std::vector<mbgl::Feature> features = _mbglMap->queryRenderedFeatures(screenCoordinate, { optionalLayerIDs, optionalFilter });
+    std::vector<mbgl::Feature> features = _rendererFrontend->getRenderer()->queryRenderedFeatures(screenCoordinate, { optionalLayerIDs, optionalFilter });
     return MGLFeaturesFromMBGLFeatures(features);
 }
 
@@ -2578,7 +2585,7 @@ public:
         optionalFilter = predicate.mgl_filter;
     }
     
-    std::vector<mbgl::Feature> features = _mbglMap->queryRenderedFeatures(screenBox, { optionalLayerIDs, optionalFilter });
+    std::vector<mbgl::Feature> features = _rendererFrontend->getRenderer()->queryRenderedFeatures(screenBox, { optionalLayerIDs, optionalFilter });
     return MGLFeaturesFromMBGLFeatures(features);
 }
 
@@ -2758,8 +2765,7 @@ public:
 /// Adapter responsible for bridging calls from mbgl to MGLMapView and Cocoa.
 class MGLMapViewImpl : public mbgl::View, public mbgl::Backend, public mbgl::MapObserver {
 public:
-    MGLMapViewImpl(MGLMapView *nativeView_)
-        : nativeView(nativeView_) {}
+    MGLMapViewImpl(MGLMapView *nativeView_) : nativeView(nativeView_) {}
 
     void onCameraWillChange(mbgl::MapObserver::CameraChangeMode mode) override {
         bool animated = mode == mbgl::MapObserver::CameraChangeMode::Animated;
@@ -2850,10 +2856,6 @@ public:
         return reinterpret_cast<mbgl::gl::ProcAddress>(symbol);
     }
 
-    void invalidate() override {
-        [nativeView setNeedsGLDisplay];
-    }
-
     void activate() override {
         if (activationCount++) {
             return;
@@ -2875,6 +2877,10 @@ public:
         glGetIntegerv(GL_FRAMEBUFFER_BINDING, &fbo);
         assumeFramebufferBinding(fbo);
         assumeViewport(0, 0, nativeView.framebufferSize);
+    }
+    
+    mbgl::BackendScope::ScopeType getScopeType() const override {
+        return mbgl::BackendScope::ScopeType::Implicit;
     }
 
     void bind() override {
