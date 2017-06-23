@@ -40,13 +40,6 @@ public:
 
     bool hasSymbolInstances() const;
 
-    enum State {
-        Pending,  // Waiting for the necessary glyphs or icons to be available.
-        Placed    // The final positions have been determined, taking into account prior layers.
-    };
-
-    State state = Pending;
-
     std::map<std::string,
         std::pair<style::IconPaintProperties::PossiblyEvaluated, style::TextPaintProperties::PossiblyEvaluated>> layerPaintProperties;
 

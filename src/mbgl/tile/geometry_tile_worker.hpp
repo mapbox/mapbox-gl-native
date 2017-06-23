@@ -52,7 +52,6 @@ private:
    
     void symbolDependenciesChanged();
     bool hasPendingSymbolDependencies() const;
-    bool hasPendingSymbolLayouts() const;
 
     ActorRef<GeometryTileWorker> self;
     ActorRef<GeometryTile> parent;
@@ -77,6 +76,7 @@ private:
     optional<std::unique_ptr<const GeometryTileData>> data;
     optional<PlacementConfig> placementConfig;
 
+    bool symbolLayoutsNeedPreparation = false;
     std::vector<std::unique_ptr<SymbolLayout>> symbolLayouts;
     GlyphDependencies pendingGlyphDependencies;
     ImageDependencies pendingImageDependencies;
