@@ -153,24 +153,6 @@ jobs:
             signing.password=$SIGNING_PASSWORD
             signing.secretKeyRingFile=secring.gpg" >> platform/android/MapboxGLAndroidSDK/gradle.properties
       - run:
-          name: Build libmapbox-gl.so for arm-v7
-          command: make android-lib-arm-v7
-      - run:
-          name: Build libmapbox-gl.so for arm-v8
-          command: make android-lib-arm-v8
-      - run:
-          name: Build libmapbox-gl.so for arm-v5
-          command: make android-lib-arm-v5
-      - run:
-          name: Build libmapbox-gl.so for mips
-          command: make android-lib-mips
-      - run:
-          name: Build libmapbox-gl.so for x86
-          command: make android-lib-x86
-      - run:
-          name: Build libmapbox-gl.so for x86-64
-          command: make android-lib-x86-64
-      - run:
           name: Build package
           command: make apackage
       - store_artifacts:
