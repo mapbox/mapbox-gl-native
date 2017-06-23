@@ -699,6 +699,10 @@ LatLng Map::latLngForPixel(const ScreenCoordinate& pixel) const {
     return impl->transform.screenCoordinateToLatLng(pixel);
 }
 
+void Map::getProjMatrix(mat4& matrix, uint16_t nearZ) const {
+    impl->transform.getState().getProjMatrix(matrix, nearZ);
+}
+
 #pragma mark - Annotations
 
 void Map::addAnnotationImage(std::unique_ptr<style::Image> image) {

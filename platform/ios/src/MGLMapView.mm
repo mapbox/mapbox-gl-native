@@ -165,6 +165,32 @@ mbgl::util::UnitBezier MGLUnitBezierForMediaTimingFunction(CAMediaTimingFunction
     return { p1[0], p1[1], p2[0], p2[1] };
 }
 
+static CATransform3D MGLTransform3DFromMat4(mbgl::mat4 &matrix) {
+    CATransform3D transform;
+    
+    transform.m11 = matrix[0];
+    transform.m12 = matrix[1];
+    transform.m13 = matrix[2];
+    transform.m14 = matrix[3];
+    
+    transform.m21 = matrix[4];
+    transform.m22 = matrix[5];
+    transform.m23 = matrix[6];
+    transform.m24 = matrix[7];
+    
+    transform.m31 = matrix[8];
+    transform.m32 = matrix[9];
+    transform.m33 = matrix[10];
+    transform.m34 = matrix[11];
+    
+    transform.m41 = matrix[12];
+    transform.m42 = matrix[13];
+    transform.m43 = matrix[14];
+    transform.m44 = matrix[15];
+    
+    return transform;
+}
+
 @interface MGLAnnotationAccessibilityElement : UIAccessibilityElement
 
 @property (nonatomic) MGLAnnotationTag tag;
@@ -3285,9 +3311,12 @@ public:
     }
     else
     {
+//        CGFloat side = mbgl::util::tileSize * powf(2.0, self.zoomLevel);
+//        CGRect frame = CGRectMake(0, 0, side, side);
+//        newAnnotationContainerView = [[MGLAnnotationContainerView alloc] initWithFrame:frame];
         newAnnotationContainerView = [[MGLAnnotationContainerView alloc] initWithFrame:self.bounds];
     }
-    newAnnotationContainerView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+//    newAnnotationContainerView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     newAnnotationContainerView.contentMode = UIViewContentModeCenter;
     [newAnnotationContainerView addSubviews:annotationViews];
     [_glView insertSubview:newAnnotationContainerView atIndex:0];
@@ -5001,6 +5030,31 @@ public:
     NSArray *visibleAnnotations = [self visibleAnnotationsInRect:viewPort];
     NSMutableArray *offscreenAnnotations = [self.annotations mutableCopy];
     [offscreenAnnotations removeObjectsInArray:visibleAnnotations];
+    
+    MGLMapCamera *camera = self.camera;
+    
+    // Build a projection matrix, paralleling the code found in mbgl.
+    // mbgl::TransformState::fov
+    double fov = 0.6435011087932844;
+    double halfFov = fov / 2.0;
+    double cameraToCenterDistance = 0.5 * CGRectGetHeight(self.bounds) / tanf(halfFov);
+    
+    double groundAngle = M_PI_2 + MGLRadiansFromDegrees(camera.pitch);
+    double topHalfSurfaceDistance = sinf(halfFov) * cameraToCenterDistance / sinf(M_PI - groundAngle - halfFov);
+    
+    // Calculate z distance of the farthest fragment that should be rendered.
+    double furthestDistance = cosf(M_PI_2 - MGLRadiansFromDegrees(camera.pitch)) * topHalfSurfaceDistance + cameraToCenterDistance;
+    
+    // Add a bit extra to avoid precision problems when a fragment's distance is exactly `furthestDistance`.
+    double farZ = furthestDistance * 1.01;
+    
+    GLKMatrix4 projectionMatrix = GLKMatrix4MakePerspective(fov, CGRectGetWidth(self.bounds) / CGRectGetHeight(self.bounds), 1, farZ);
+//    CATransform3D projectionTransform = MGLTransform3DFromMatrix4(projectionMatrix);
+    
+    CATransform3D projectionTransform = CATransform3DIdentity;
+    projectionTransform.m34 = -1.0 / (1.0 - furthestDistance * 0.5);
+    projectionTransform = CATransform3DRotate(projectionTransform, MGLRadiansFromDegrees(camera.pitch), -1, 0, 0);
+//    self.annotationContainerView.layer.sublayerTransform = projectionTransform;
 
     // Update the center of visible annotation views
     for (id<MGLAnnotation> annotation in visibleAnnotations)
@@ -5084,6 +5138,12 @@ public:
     }
 
     [CATransaction commit];
+}
+
+- (CATransform3D)projectionTransform {
+    mbgl::mat4 matrix;
+    _mbglMap->getProjMatrix(matrix);
+    return MGLTransform3DFromMat4(matrix);
 }
 
 - (void)updateCalloutView

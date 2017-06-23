@@ -30,6 +30,8 @@ class Image;
 class Style;
 } // namespace style
 
+using mat4 = std::array<double, 16>;
+
 class Map : private util::noncopyable {
 public:
     explicit Map(Backend&,
@@ -139,6 +141,7 @@ public:
     // Projection
     ScreenCoordinate pixelForLatLng(const LatLng&) const;
     LatLng latLngForPixel(const ScreenCoordinate&) const;
+    void getProjMatrix(mat4& matrix, uint16_t nearZ = 1) const;
 
     // Annotations
     void addAnnotationImage(std::unique_ptr<style::Image>);

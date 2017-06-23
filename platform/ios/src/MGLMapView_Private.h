@@ -17,6 +17,8 @@ extern const CGSize MGLAnnotationAccessibilityElementMinimumSize;
 
 - (mbgl::Map *)mbglMap;
 
+- (CATransform3D)projectionTransform;
+
 /** Returns whether the map view is currently loading or processing any assets required to render the map */
 - (BOOL)isFullyLoaded;
 

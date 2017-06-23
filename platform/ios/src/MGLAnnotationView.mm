@@ -5,7 +5,35 @@
 
 #import "NSBundle+MGLAdditions.h"
 
+#import <GLKit/GLKit.h>
+
 #include <mbgl/util/constants.hpp>
+
+CATransform3D MGLTransform3DFromMatrix4(GLKMatrix4 matrix) {
+    CATransform3D transform;
+    
+    transform.m11 = matrix.m[0];
+    transform.m12 = matrix.m[1];
+    transform.m13 = matrix.m[2];
+    transform.m14 = matrix.m[3];
+    
+    transform.m21 = matrix.m[4];
+    transform.m22 = matrix.m[5];
+    transform.m23 = matrix.m[6];
+    transform.m24 = matrix.m[7];
+    
+    transform.m31 = matrix.m[8];
+    transform.m32 = matrix.m[9];
+    transform.m33 = matrix.m[10];
+    transform.m34 = matrix.m[11];
+    
+    transform.m41 = matrix.m[12];
+    transform.m42 = matrix.m[13];
+    transform.m43 = matrix.m[14];
+    transform.m44 = matrix.m[15];
+    
+    return transform;
+}
 
 @interface MGLAnnotationView () <UIGestureRecognizerDelegate>
 
@@ -142,23 +170,85 @@
     // We keep track of each viewing distance scale transform that we apply. Each iteration,
     // we can account for it so that we don't get cumulative scaling every time we move.
     // We also avoid clobbering any existing transform passed in by the client, too.
-    CATransform3D undoOfLastScaleTransform = CATransform3DInvert(_lastAppliedTransform);
+    CATransform3D undoOfLastAppliedTransform = CATransform3DInvert(_lastAppliedTransform);
     
     CATransform3D freeTransform = CATransform3DIdentity;
     MGLMapCamera *camera = self.mapView.camera;
-    if (camera.pitch >= 0 && (self.freeAxes & MGLAnnotationViewBillboardAxisX))
+//    if (camera.pitch >= 0 && (self.freeAxes & MGLAnnotationViewBillboardAxisX))
     {
+//        freeTransform = self.mapView.projectionTransform;
+        
+        CGRect superBounds = self.superview.bounds;
+        
+        // Build a projection matrix, paralleling the code found in mbgl.
+        // mbgl::TransformState::fov
+        double fov = 0.6435011087932844;
+        double halfFov = fov / 2.0;
+        double cameraToCenterDistance = 0.5 * CGRectGetHeight(superBounds) / tanf(halfFov);
+        
+        double groundAngle = M_PI_2 + MGLRadiansFromDegrees(camera.pitch);
+        double topHalfSurfaceDistance = sinf(halfFov) * cameraToCenterDistance / sinf(M_PI - groundAngle - halfFov);
+        
+        // Calculate z distance of the farthest fragment that should be rendered.
+        double furthestDistance = cosf(M_PI_2 - MGLRadiansFromDegrees(camera.pitch)) * topHalfSurfaceDistance + cameraToCenterDistance;
+        
+        // Add a bit extra to avoid precision problems when a fragment's distance is exactly `furthestDistance`.
+        double farZ = furthestDistance * 1.01;
+        
+        GLKMatrix4 projectionMatrix = GLKMatrix4MakePerspective(fov, CGRectGetWidth(superBounds) / CGRectGetHeight(superBounds), 1, farZ);
+        CATransform3D projectionTransform = MGLTransform3DFromMatrix4(projectionMatrix);
+//        freeTransform = projectionTransform;
+//        self.layer.sublayerTransform = projectionTransform;
+        
+        // Unlike the Mapbox GL JS camera, separate camera translation and rotation out into its world matrix.
+        // If this is applied directly to the projection matrix, it will work OK but break raycasting.
+        GLKMatrix4 cameraTranslateZ = GLKMatrix4MakeTranslation(0, 0, -cameraToCenterDistance);
+        GLKMatrix4 cameraRotateX = GLKMatrix4MakeXRotation(MGLRadiansFromDegrees(camera.pitch));
+        GLKMatrix4 cameraWorldMatrix = GLKMatrix4Multiply(cameraRotateX, cameraTranslateZ);
+        GLKMatrix4 cameraRotateZ = GLKMatrix4MakeZRotation(-MGLRadiansFromDegrees(camera.heading));
+        cameraWorldMatrix = GLKMatrix4Multiply(cameraRotateZ, cameraWorldMatrix);
+        
+//        self.layer.sublayerTransform = MGLTransform3DFromMatrix4(cameraWorldMatrix);
+        
+        double zoomPow = powf(2.0, self.mapView.zoomLevel);
+        double worldSize = mbgl::util::tileSize * zoomPow;
+        double x = (180 + camera.centerCoordinate.longitude) * worldSize / 360.0;
+        double y = MGLDegreesFromRadians(logf(tanf(M_PI_4 + camera.centerCoordinate.latitude * M_PI / 360.0)));
+        y = (180 - y) * worldSize / 360.0;
+        
+        // Handle scaling and translation of objects in the map in the world's matrix transform, not the camera.
+        GLKMatrix4 rotateMap = GLKMatrix4MakeZRotation(M_PI);
+        GLKMatrix4 translateCenter = GLKMatrix4MakeTranslation(mbgl::util::tileSize / 2.0, -mbgl::util::tileSize / 2.0, 0);
+        GLKMatrix4 worldMatrix = GLKMatrix4Multiply(translateCenter, rotateMap);
+        GLKMatrix4 scale = GLKMatrix4MakeScale(zoomPow, zoomPow, zoomPow);
+        worldMatrix = GLKMatrix4Multiply(scale, worldMatrix);
+        GLKMatrix4 translateMap = GLKMatrix4MakeTranslation(-x, y, 0);
+        worldMatrix = GLKMatrix4Multiply(translateMap, worldMatrix);
+//        freeTransform = MGLTransform3DFromMatrix4(worldMatrix);
+        
+//        bool isInvertible;
+//        GLKMatrix4 inverseCameraWorldMatrix = GLKMatrix4Invert(cameraWorldMatrix, &isInvertible);
+//        NSAssert(isInvertible, @"Camera world matrix should be invertible.");
+//        GLKMatrix4 modelViewMatrix = GLKMatrix4Multiply(inverseCameraWorldMatrix, worldMatrix);
+//        freeTransform = MGLTransform3DFromMatrix4(modelViewMatrix);
+        
+        
+        
         // https://developer.apple.com/library/mac/documentation/Cocoa/Conceptual/CoreAnimation_guide/AdvancedAnimationTricks/AdvancedAnimationTricks.html#//apple_ref/doc/uid/TP40004514-CH8-SW13
         // FIXME: This is a rough, eyeballed value. Replace this transform with one derived from mbgl::TransformState::coordinatePointMatrix().
-        CGRect superBounds = self.superview.bounds;
-        freeTransform.m34 = -1.0 / (1000 - CGRectGetWidth(superBounds));
+        double xPoint = (180 + self.annotation.coordinate.longitude) * worldSize / 360.0;
+        double yPoint = MGLDegreesFromRadians(logf(tanf(M_PI_4 + self.annotation.coordinate.latitude * M_PI / 360.0)));
+        y = (180 - y) * worldSize / 360.0;
+        double xDelta = x - xPoint;
+        freeTransform.m34 = -1.0 / (1.0 - furthestDistance * 0.5);
         
-        freeTransform = CATransform3DRotate(freeTransform, MGLRadiansFromDegrees(camera.pitch), 1.0, 0, 0);
+        freeTransform = CATransform3DRotate(freeTransform, MGLRadiansFromDegrees(camera.pitch), -1.0, 0, 0);
+//        self.layer.anchorPoint = [self convertPoint:self.superview.center toView:self];
     }
-    if (camera.heading >= 0 && (self.freeAxes & MGLAnnotationViewBillboardAxisY))
-    {
-        freeTransform = CATransform3DRotate(freeTransform, MGLRadiansFromDegrees(-camera.heading), 0.0, 0.0, 1.0);
-    }
+//    if (camera.heading >= 0 && (self.freeAxes & MGLAnnotationViewBillboardAxisY))
+//    {
+//        freeTransform = CATransform3DRotate(freeTransform, MGLRadiansFromDegrees(-camera.heading), 0.0, 0.0, 1.0);
+//    }
     
     CATransform3D scaleTransform = CATransform3DIdentity;
     CGFloat superviewHeight = CGRectGetHeight(self.superview.frame);
@@ -182,11 +272,11 @@
         // map view is 50% pitched then the annotation view should be reduced by 37.5% (.75 * .5). The
         // reduction is then normalized for a scale of 1.0.
         CGFloat pitchAdjustedScale = 1.0 - maxScaleReduction * pitchIntensity;
-        scaleTransform = CATransform3DMakeScale(pitchAdjustedScale, pitchAdjustedScale, 1);
+//        scaleTransform = CATransform3DMakeScale(pitchAdjustedScale, pitchAdjustedScale, 1);
     }
     
-    CATransform3D effectiveTransform = CATransform3DConcat(freeTransform, scaleTransform);
-    self.layer.transform = CATransform3DConcat(self.layer.transform, CATransform3DConcat(undoOfLastScaleTransform, effectiveTransform));
+    CATransform3D effectiveTransform = freeTransform;//CATransform3DConcat(freeTransform, scaleTransform);
+    self.layer.transform = CATransform3DConcat(self.layer.transform, CATransform3DConcat(undoOfLastAppliedTransform, effectiveTransform));
     _lastAppliedTransform = effectiveTransform;
 }
 

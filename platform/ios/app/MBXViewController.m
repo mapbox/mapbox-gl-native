@@ -1713,6 +1713,9 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
         annotationView = [[MBXAnnotationView alloc] initWithReuseIdentifier:MBXViewControllerAnnotationViewReuseIdentifer];
         annotationView.frame = CGRectMake(0, 0, 30, 30);
         annotationView.backgroundColor = [UIColor whiteColor];
+        annotationView.layer.borderColor = [UIColor blueColor].CGColor;
+        annotationView.layer.borderWidth = 2;
+        annotationView.layer.cornerRadius = 4;
 
         // Note that having two long press gesture recognizers on overlapping
         // views (`self.view` & `annotationView`) will cause weird behaviour.
@@ -1731,7 +1734,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
         // annotationView.scalesWithViewingDistance = NO;
     } else {
         // orange indicates that the annotation view was reused
-        annotationView.backgroundColor = [UIColor orangeColor];
+        annotationView.layer.borderColor = [UIColor orangeColor].CGColor;
     }
     return annotationView;
 }
