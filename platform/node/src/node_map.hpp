@@ -16,6 +16,8 @@
 #pragma GCC diagnostic pop
 
 namespace node_mbgl {
+    
+class NodeRendererFrontend;
 
 class NodeBackend : public mbgl::HeadlessBackend {
 public:
@@ -75,6 +77,7 @@ public:
     std::unique_ptr<mbgl::OffscreenView> view;
     NodeThreadPool threadpool;
     NodeMapObserver mapObserver;
+    std::unique_ptr<NodeRendererFrontend> rendererFrontend;
     std::unique_ptr<mbgl::Map> map;
 
     std::exception_ptr error;
