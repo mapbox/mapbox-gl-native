@@ -10,6 +10,11 @@ extern NSString *const MGLEventTypeMapLoad;
 extern NSString *const MGLEventTypeMapTap;
 extern NSString *const MGLEventTypeMapDragEnd;
 extern NSString *const MGLEventTypeLocation;
+extern NSString *const MGLEventTypeNavigationTurnstile;
+extern NSString *const MGLEventTypeNavigationDepart;
+extern NSString *const MGLEventTypeNavigationArrive;
+extern NSString *const MGLEventTypeNavigationCancel;
+extern NSString *const MGLEventTypeNavigationFeedback;
 
 // Event keys
 extern NSString *const MGLEventKeyLatitude;

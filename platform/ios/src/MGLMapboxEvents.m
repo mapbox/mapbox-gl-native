@@ -17,6 +17,11 @@ NSString *const MGLEventTypeMapTap = @"map.click";
 NSString *const MGLEventTypeMapDragEnd = @"map.dragend";
 NSString *const MGLEventTypeLocation = @"location";
 NSString *const MGLEventTypeLocalDebug = @"debug";
+NSString *const MGLEventTypeNavigationTurnstile = @"navigation.turnstile";
+NSString *const MGLEventTypeNavigationDepart = @"navigation.depart";
+NSString *const MGLEventTypeNavigationArrive = @"navigation.arrive";
+NSString *const MGLEventTypeNavigationCancel = @"navigation.cancel";
+NSString *const MGLEventTypeNavigationFeedback = @"navigation.feedback";
 
 // Gestures
 NSString *const MGLEventGestureSingleTap = @"SingleTap";
@@ -423,6 +428,16 @@ const NSTimeInterval MGLFlushInterval = 180;
         return [self mapDragEndEventWithAttributes:attributeDictionary];
     } else if ([event isEqualToString:MGLEventTypeLocation]) {
         return [self locationEventWithAttributes:attributeDictionary];
+    } else if ([event isEqualToString:MGLEventTypeNavigationTurnstile]) {
+        return attributeDictionary;
+    } else if ([event isEqualToString:MGLEventTypeNavigationDepart]) {
+        return attributeDictionary;
+    }else if ([event isEqualToString:MGLEventTypeNavigationArrive]) {
+        return attributeDictionary;
+    }else if ([event isEqualToString:MGLEventTypeNavigationCancel]) {
+        return attributeDictionary;
+    }else if ([event isEqualToString:MGLEventTypeNavigationFeedback]) {
+        return attributeDictionary;
     }
     return nil;
 }
