@@ -144,14 +144,14 @@ void GeometryTileWorker::symbolDependenciesChanged() {
     try {
         switch (state) {
         case Idle:
-            if (hasPendingSymbolLayouts()) {
+            if (symbolLayoutsNeedPreparation) {
                 attemptPlacement();
                 coalesce();
             }
             break;
 
         case Coalescing:
-            if (hasPendingSymbolLayouts()) {
+            if (symbolLayoutsNeedPreparation) {
                 state = NeedPlacement;
             }
             break;
@@ -312,6 +312,7 @@ void GeometryTileWorker::redoLayout() {
             auto layout = leader.as<RenderSymbolLayer>()->createLayout(
                 parameters, group, std::move(geometryLayer), glyphDependencies, imageDependencies);
             symbolLayoutMap.emplace(leader.getID(), std::move(layout));
+            symbolLayoutsNeedPreparation = true;
         } else {
             const Filter& filter = leader.baseImpl->filter;
             const std::string& sourceLayerID = leader.baseImpl->sourceLayer;
@@ -359,16 +360,6 @@ void GeometryTileWorker::redoLayout() {
     attemptPlacement();
 }
 
-bool GeometryTileWorker::hasPendingSymbolLayouts() const {
-    for (const auto& symbolLayout : symbolLayouts) {
-        if (symbolLayout->state == SymbolLayout::Pending) {
-            return true;
-        }
-    }
-
-    return false;
-}
-
 bool GeometryTileWorker::hasPendingSymbolDependencies() const {
     for (auto& glyphDependency : pendingGlyphDependencies) {
         if (!glyphDependency.second.empty()) {
@@ -378,33 +369,39 @@ bool GeometryTileWorker::hasPendingSymbolDependencies() const {
     return !pendingImageDependencies.empty();
 }
 
-
 void GeometryTileWorker::attemptPlacement() {
     if (!data || !layers || !placementConfig || hasPendingSymbolDependencies()) {
         return;
     }
     
-    auto collisionTile = std::make_unique<CollisionTile>(*placementConfig);
-    std::unordered_map<std::string, std::shared_ptr<Bucket>> buckets;
-
     optional<AlphaImage> glyphAtlasImage;
     optional<PremultipliedImage> iconAtlasImage;
+
+    if (symbolLayoutsNeedPreparation) {
+        GlyphAtlas glyphAtlas = makeGlyphAtlas(glyphMap);
+        ImageAtlas imageAtlas = makeImageAtlas(imageMap);
+
+        glyphAtlasImage = std::move(glyphAtlas.image);
+        iconAtlasImage = std::move(imageAtlas.image);
+
+        for (auto& symbolLayout : symbolLayouts) {
+            if (obsolete) {
+                return;
+            }
+
+            symbolLayout->prepare(glyphMap, glyphAtlas.positions,
+                                  imageMap, imageAtlas.positions);
+        }
+
+        symbolLayoutsNeedPreparation = false;
+    }
+
+    auto collisionTile = std::make_unique<CollisionTile>(*placementConfig);
+    std::unordered_map<std::string, std::shared_ptr<Bucket>> buckets;
 
     for (auto& symbolLayout : symbolLayouts) {
         if (obsolete) {
             return;
-        }
-
-        if (symbolLayout->state == SymbolLayout::Pending) {
-            GlyphAtlas glyphAtlas = makeGlyphAtlas(glyphMap);
-            ImageAtlas imageAtlas = makeImageAtlas(imageMap);
-
-            symbolLayout->prepare(glyphMap, glyphAtlas.positions,
-                                  imageMap, imageAtlas.positions);
-            symbolLayout->state = SymbolLayout::Placed;
-
-            glyphAtlasImage = std::move(glyphAtlas.image);
-            iconAtlasImage = std::move(imageAtlas.image);
         }
 
         if (!symbolLayout->hasSymbolInstances()) {
