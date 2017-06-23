@@ -15,6 +15,7 @@
 #include <mbgl/util/default_thread_pool.hpp>
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/storage/network_status.hpp>
+#include <mbgl/renderer/renderer.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/image.hpp>
 #include <mbgl/style/transition_options.hpp>
@@ -40,6 +41,7 @@
 #import "MGLMultiPoint_Private.h"
 #import "MGLOfflineStorage_Private.h"
 #import "MGLFoundation_Private.h"
+#import "MGLRendererFrontend.h"
 
 #import "NSBundle+MGLAdditions.h"
 #import "NSDate+MGLAdditions.h"
@@ -278,6 +280,8 @@ public:
 {
     mbgl::Map *_mbglMap;
     MBGLView *_mbglView;
+    std::unique_ptr<MGLRenderFrontend> _rendererFrontend;
+    
     std::shared_ptr<mbgl::ThreadPool> _mbglThreadPool;
 
     BOOL _opaque;
@@ -410,6 +414,11 @@ public:
     return _mbglMap;
 }
 
+- (mbgl::Renderer *)renderer
+{
+    return _rendererFrontend->getRenderer();
+}
+
 - (void)commonInit
 {
     _isTargetingInterfaceBuilder = NSProcessInfo.processInfo.mgl_isInterfaceBuilderDesignablesAgent;
@@ -444,7 +453,10 @@ public:
     mbgl::DefaultFileSource *mbglFileSource = [MGLOfflineStorage sharedOfflineStorage].mbglFileSource;
     const float scaleFactor = [UIScreen instancesRespondToSelector:@selector(nativeScale)] ? [[UIScreen mainScreen] nativeScale] : [[UIScreen mainScreen] scale];
     _mbglThreadPool = mbgl::sharedThreadPool();
-    _mbglMap = new mbgl::Map(*_mbglView, *_mbglView, self.size, scaleFactor, *mbglFileSource, *_mbglThreadPool, mbgl::MapMode::Continuous, mbgl::GLContextMode::Unique, mbgl::ConstrainMode::None, mbgl::ViewportMode::Default);
+    
+    auto renderer = std::make_unique<mbgl::Renderer>(*_mbglView, scaleFactor, *mbglFileSource, *_mbglThreadPool, mbgl::GLContextMode::Unique);
+    _rendererFrontend = std::make_unique<MGLRenderFrontend>(std::move(renderer), self, _mbglView);
+    _mbglMap = new mbgl::Map(*_rendererFrontend, *_mbglView, self.size, scaleFactor, *mbglFileSource, *_mbglThreadPool, mbgl::MapMode::Continuous, mbgl::ConstrainMode::None, mbgl::ViewportMode::Default);
 
     // start paused if in IB
     if (_isTargetingInterfaceBuilder || background) {
@@ -758,7 +770,7 @@ public:
 {
     MGLAssertIsMainThread();
 
-    _mbglMap->onLowMemory();
+    _rendererFrontend->onLowMemory();
 }
 
 #pragma mark - Layout -
@@ -810,12 +822,9 @@ public:
 // This is the delegate of the GLKView object's display call.
 - (void)glkView:(__unused GLKView *)view drawInRect:(__unused CGRect)rect
 {
-    if ( ! self.dormant)
+    if ( ! self.dormant || ! _rendererFrontend)
     {
-        // The OpenGL implementation automatically enables the OpenGL context for us.
-        mbgl::BackendScope scope { *_mbglView, mbgl::BackendScope::ScopeType::Implicit };
-
-        _mbglMap->render(*_mbglView);
+        _rendererFrontend->render();
 
         [self updateUserLocationAnnotationView];
     }
@@ -2139,7 +2148,7 @@ public:
 
 - (void)emptyMemoryCache
 {
-    _mbglMap->onLowMemory();
+    _rendererFrontend->onLowMemory();
 }
 
 - (void)setZoomEnabled:(BOOL)zoomEnabled
@@ -3707,7 +3716,7 @@ public:
 /// Returns the tags of the annotations coincident with the given rectangle.
 - (std::vector<MGLAnnotationTag>)annotationTagsInRect:(CGRect)rect
 {
-    return _mbglMap->queryPointAnnotations({
+    return _rendererFrontend->getRenderer()->queryPointAnnotations({
         { CGRectGetMinX(rect), CGRectGetMinY(rect) },
         { CGRectGetMaxX(rect), CGRectGetMaxY(rect) },
     });
@@ -4707,7 +4716,7 @@ public:
         optionalFilter = predicate.mgl_filter;
     }
 
-    std::vector<mbgl::Feature> features = _mbglMap->queryRenderedFeatures(screenCoordinate, { optionalLayerIDs, optionalFilter });
+    std::vector<mbgl::Feature> features = _rendererFrontend->getRenderer()->queryRenderedFeatures(screenCoordinate, { optionalLayerIDs, optionalFilter });
     return MGLFeaturesFromMBGLFeatures(features);
 }
 
@@ -4740,7 +4749,7 @@ public:
         optionalFilter = predicate.mgl_filter;
     }
 
-    std::vector<mbgl::Feature> features = _mbglMap->queryRenderedFeatures(screenBox, { optionalLayerIDs, optionalFilter });
+    std::vector<mbgl::Feature> features = _rendererFrontend->getRenderer()->queryRenderedFeatures(screenBox, { optionalLayerIDs, optionalFilter });
     return MGLFeaturesFromMBGLFeatures(features);
 }
 
@@ -5519,10 +5528,9 @@ public:
 
         return reinterpret_cast<mbgl::gl::ProcAddress>(symbol);
     }
-
-    void invalidate() override
-    {
-        [nativeView setNeedsGLDisplay];
+    
+    mbgl::BackendScope::ScopeType getScopeType() const override {
+        return mbgl::BackendScope::ScopeType::Implicit;
     }
 
     void activate() override
