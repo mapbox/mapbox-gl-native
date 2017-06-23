@@ -75,7 +75,7 @@ void Painter::renderSymbol(PaintParameters& parameters,
             bucket.layout.get<IconRotationAlignment>() == AlignmentType::Map;
 
         if (alongLine) {
-            reprojectLineLabels(bucket, tile.matrix, false, values, tile, state, frameHistory);
+            reprojectLineLabels(bucket, tile.matrix, false, values, tile, *(bucket.iconSizeBinder), state, frameHistory);
             context.updateVertexBuffer(std::move(bucket.icon.dynamicVertices), *bucket.icon.dynamicVertexBuffer);
         }
 
@@ -129,8 +129,10 @@ void Painter::renderSymbol(PaintParameters& parameters,
             bucket.layout.get<TextRotationAlignment>() == AlignmentType::Map;
 
         if (alongLine) {
-            reprojectLineLabels(bucket, tile.matrix, true, values, tile, state, frameHistory);
+            reprojectLineLabels(bucket, tile.matrix, true, values, tile, *(bucket.textSizeBinder), state, frameHistory);
             context.updateVertexBuffer(std::move(bucket.text.dynamicVertices), *bucket.text.dynamicVertexBuffer);
+        } else {
+            return;
         }
 
         const Size texsize = geometryTile.glyphAtlasTexture->size;

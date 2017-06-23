@@ -592,10 +592,10 @@ void SymbolLayout::addSymbol(Buffer& buffer,
     uint16_t index = segment.vertexLength;
 
     // coordinates (2 triangles)
-    buffer.vertices.emplace_back(SymbolLayoutAttributes::vertex(anchorPoint, tl, labelAnchor, tex.x, tex.y, sizeData));
-    buffer.vertices.emplace_back(SymbolLayoutAttributes::vertex(anchorPoint, tr, labelAnchor, tex.x + tex.w, tex.y, sizeData));
-    buffer.vertices.emplace_back(SymbolLayoutAttributes::vertex(anchorPoint, bl, labelAnchor, tex.x, tex.y + tex.h, sizeData));
-    buffer.vertices.emplace_back(SymbolLayoutAttributes::vertex(anchorPoint, br, labelAnchor, tex.x + tex.w, tex.y + tex.h, sizeData));
+    buffer.vertices.emplace_back(SymbolLayoutAttributes::vertex(labelAnchor, tl, tex.x, tex.y, sizeData));
+    buffer.vertices.emplace_back(SymbolLayoutAttributes::vertex(labelAnchor, tr, tex.x + tex.w, tex.y, sizeData));
+    buffer.vertices.emplace_back(SymbolLayoutAttributes::vertex(labelAnchor, bl, tex.x, tex.y + tex.h, sizeData));
+    buffer.vertices.emplace_back(SymbolLayoutAttributes::vertex(labelAnchor, br, tex.x + tex.w, tex.y + tex.h, sizeData));
     
     auto dynamicVertex = SymbolDynamicLayoutAttributes::vertex(anchorPoint, 0, placementZoom);
     buffer.dynamicVertices.emplace_back(dynamicVertex);

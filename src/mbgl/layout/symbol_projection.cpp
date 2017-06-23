@@ -49,6 +49,18 @@ namespace mbgl {
         return { static_cast<float>(pos[0] / pos[3]), static_cast<float>(pos[1] / pos[3]) };
     }
 
+    float evaluateSizeForFeature(const ZoomEvaluatedSize& zoomEvaluatedSize, const PlacedSymbol& placedSymbol) {
+        if (zoomEvaluatedSize.isFeatureConstant) {
+            return zoomEvaluatedSize.size;
+        } else {
+            if (zoomEvaluatedSize.isZoomConstant) {
+                return placedSymbol.lowerSize;
+            } else {
+                return placedSymbol.lowerSize + zoomEvaluatedSize.sizeT * (placedSymbol.upperSize - placedSymbol.lowerSize);
+            }
+        }
+    }
+
     bool isVisible(const vec4& anchorPos, const float placementZoom, const std::array<double, 2>& clippingBuffer, const FrameHistory& frameHistory) {
         const float x = anchorPos[0] / anchorPos[3];
         const float y = anchorPos[1] / anchorPos[3];
@@ -160,17 +172,14 @@ namespace mbgl {
     }
 
     void reprojectLineLabels(SymbolBucket& bucket, const mat4& posMatrix, const bool isText, const style::SymbolPropertyValues& values,
-            //const RenderTile& tile, const TransformState& state) {
-            const RenderTile&, const TransformState& state, const FrameHistory& frameHistory) {
-        // const sizeData = isText ? bucket.textSizeData : bucket.iconSizeData;
-        // const partiallyEvaluatedSize = symbolSize.evaluateSizeForZoom(sizeData, painter.transform, layer, isText);
+            const RenderTile& tile, const SymbolSizeBinder& sizeBinder, const TransformState& state, const FrameHistory& frameHistory) {
+
+        const ZoomEvaluatedSize partiallyEvaluatedSize = sizeBinder.evaluateForZoom(state.getZoom());
 
         const std::array<double, 2> clippingBuffer = {{ 256.0 / state.getSize().width * 2.0 + 1.0, 256.0 / state.getSize().height }};
 
-        //TODO
-        const float pixelsToTileUnits = 1.0;
         const mat4 labelPlaneMatrix = getLabelPlaneMatrix(posMatrix, values.pitchAlignment == style::AlignmentType::Map,
-                values.rotationAlignment == style::AlignmentType::Map, state, pixelsToTileUnits);
+                values.rotationAlignment == style::AlignmentType::Map, state, tile.id.pixelsToTileUnits(1, state.getZoom()));
         
         gl::VertexVector<SymbolDynamicLayoutAttributes::Vertex>& dynamicVertexArray = isText ?
             bucket.text.dynamicVertices :
@@ -200,9 +209,7 @@ namespace mbgl {
             const float cameraToAnchorDistance = anchorPos[3];
             const float perspectiveRatio = 1 + 0.5 * ((cameraToAnchorDistance / state.getCameraToCenterDistance()) - 1.0);
 
-
-            //const fontSize = symbolSize.evaluateSizeForFeature(sizeData, partiallyEvaluatedSize, symbol);
-            const float fontSize = 16;
+            const float fontSize = evaluateSizeForFeature(partiallyEvaluatedSize, placedSymbol);
             const float pitchScaledFontSize = values.pitchAlignment == style::AlignmentType::Map ?
                 fontSize * perspectiveRatio :
                 fontSize / perspectiveRatio;

@@ -8,6 +8,7 @@ namespace mbgl {
     class SymbolBucket;
     class RenderTile;
     class FrameHistory;
+    class SymbolSizeBinder;
     namespace style {
         class SymbolPropertyValues;
     }
@@ -16,6 +17,6 @@ namespace mbgl {
     mat4 getGlCoordMatrix(const mat4& posMatrix, const bool pitchWithMap, const bool rotateWithMap, const TransformState& state, const float pixelsToTileUnits);
 
     void reprojectLineLabels(SymbolBucket&, const mat4& posMatrix, const bool isText, const style::SymbolPropertyValues&,
-            const RenderTile&, const TransformState&, const FrameHistory& frameHistory);
+            const RenderTile&, const SymbolSizeBinder& sizeBinder, const TransformState&, const FrameHistory& frameHistory);
 
 } // end namespace mbgl

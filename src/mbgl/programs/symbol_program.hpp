@@ -31,10 +31,8 @@ class TransformState;
 namespace uniforms {
 MBGL_DEFINE_UNIFORM_MATRIX(double, 4, u_gl_coord_matrix);
 MBGL_DEFINE_UNIFORM_MATRIX(double, 4, u_label_plane_matrix);
-MBGL_DEFINE_UNIFORM_SCALAR(bool, u_rotate_with_map);
 MBGL_DEFINE_UNIFORM_SCALAR(bool, u_pitch_with_map);
 MBGL_DEFINE_UNIFORM_SCALAR(gl::TextureUnit, u_texture);
-MBGL_DEFINE_UNIFORM_SCALAR(float, u_aspect_ratio);
 MBGL_DEFINE_UNIFORM_SCALAR(bool, u_is_halo);
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_gamma_scale);
 
@@ -43,32 +41,25 @@ MBGL_DEFINE_UNIFORM_SCALAR(bool, u_is_size_zoom_constant);
 MBGL_DEFINE_UNIFORM_SCALAR(bool, u_is_size_feature_constant);
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_size_t);
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_size);
-MBGL_DEFINE_UNIFORM_SCALAR(float, u_layout_size);
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_max_camera_distance);
 } // namespace uniforms
 
 struct SymbolLayoutAttributes : gl::Attributes<
     attributes::a_pos_offset,
-    attributes::a_label_pos,
     attributes::a_data<uint16_t, 4>>
 {
-    static Vertex vertex(Point<float> a,
+    static Vertex vertex(Point<float> labelAnchor,
                          Point<float> o,
-                         Point<float> labelAnchor,
                          uint16_t tx,
                          uint16_t ty,
                          const Range<float>& sizeData) {
         return Vertex {
             // combining pos and offset to reduce number of vertex attributes passed to shader (8 max for some devices)
             {{
-                static_cast<int16_t>(a.x),
-                static_cast<int16_t>(a.y),
+                static_cast<int16_t>(labelAnchor.x),
+                static_cast<int16_t>(labelAnchor.y),
                 static_cast<int16_t>(::round(o.x * 64)),  // use 1/64 pixels for placement
                 static_cast<int16_t>(::round(o.y * 64))
-            }},
-            {{
-                static_cast<int16_t>(labelAnchor.x),
-                static_cast<int16_t>(labelAnchor.y)
             }},
             {{
                 tx,
@@ -84,11 +75,11 @@ struct SymbolDynamicLayoutAttributes : gl::Attributes<attributes::a_projected_po
     static Vertex vertex(Point<float> anchorPoint, float labelAngle, float labelminzoom) {
         return Vertex {
             {{
-                 static_cast<uint16_t>(anchorPoint.x),
-                 static_cast<uint16_t>(anchorPoint.y),
-                 mbgl::attributes::packUint8Pair(
+                 anchorPoint.x,
+                 anchorPoint.y,
+                 static_cast<float>(mbgl::attributes::packUint8Pair(
                          static_cast<uint8_t>(std::fmod(labelAngle + 2 * M_PI, 2 * M_PI) / (2 * M_PI) * 255),
-                         static_cast<uint8_t>(labelminzoom * 10))
+                         static_cast<uint8_t>(labelminzoom * 10)))
              }}
         };
     }
@@ -113,8 +104,7 @@ public:
         uniforms::u_is_size_zoom_constant,
         uniforms::u_is_size_feature_constant,
         uniforms::u_size_t,
-        uniforms::u_size,
-        uniforms::u_layout_size>;
+        uniforms::u_size>;
     using UniformValues = Uniforms::Values;
     
     static std::unique_ptr<SymbolSizeBinder> create(const float tileZoom,
@@ -130,8 +120,7 @@ public:
             uniforms::u_is_size_zoom_constant::Value{ u.isZoomConstant },
             uniforms::u_is_size_feature_constant::Value{ u.isFeatureConstant},
             uniforms::u_size_t::Value{ u.sizeT },
-            uniforms::u_size::Value{ u.size },
-            uniforms::u_layout_size::Value{ u.layoutSize }
+            uniforms::u_size::Value{ u.size }
         };
     }
 };
@@ -352,8 +341,6 @@ class SymbolIconProgram : public SymbolProgram<
         uniforms::u_gl_coord_matrix,
         uniforms::u_extrude_scale,
         uniforms::u_texsize,
-        uniforms::u_zoom,
-        uniforms::u_rotate_with_map,
         uniforms::u_texture,
         uniforms::u_fadetexture,
         uniforms::u_is_text,
@@ -391,8 +378,6 @@ class SymbolSDFProgram : public SymbolProgram<
         uniforms::u_gl_coord_matrix,
         uniforms::u_extrude_scale,
         uniforms::u_texsize,
-        uniforms::u_zoom,
-        uniforms::u_rotate_with_map,
         uniforms::u_texture,
         uniforms::u_fadetexture,
         uniforms::u_is_text,
@@ -401,8 +386,6 @@ class SymbolSDFProgram : public SymbolProgram<
         uniforms::u_pitch,
         uniforms::u_max_camera_distance,
         uniforms::u_gamma_scale,
-        uniforms::u_bearing,
-        uniforms::u_aspect_ratio,
         uniforms::u_pitch_with_map,
         uniforms::u_is_halo>,
     PaintProperties>
@@ -417,8 +400,6 @@ public:
             uniforms::u_gl_coord_matrix,
             uniforms::u_extrude_scale,
             uniforms::u_texsize,
-            uniforms::u_zoom,
-            uniforms::u_rotate_with_map,
             uniforms::u_texture,
             uniforms::u_fadetexture,
             uniforms::u_is_text,
@@ -427,8 +408,6 @@ public:
             uniforms::u_pitch,
             uniforms::u_max_camera_distance,
             uniforms::u_gamma_scale,
-            uniforms::u_bearing,
-            uniforms::u_aspect_ratio,
             uniforms::u_pitch_with_map,
             uniforms::u_is_halo>,
         PaintProperties>;

@@ -11,7 +11,7 @@ namespace mbgl {
 
 using namespace style;
 
-static_assert(sizeof(SymbolLayoutVertex) == 20, "expected SymbolLayoutVertex size");
+static_assert(sizeof(SymbolLayoutVertex) == 16, "expected SymbolLayoutVertex size");
 
 std::unique_ptr<SymbolSizeBinder> SymbolSizeBinder::create(const float tileZoom,
                                                     const style::DataDrivenPropertyValue<float>& sizeProperty,
@@ -70,8 +70,6 @@ Values makeValues(const bool isText,
         uniforms::u_gl_coord_matrix::Value{glCoordMatrix},
         uniforms::u_extrude_scale::Value{ extrudeScale },
         uniforms::u_texsize::Value{ texsize },
-        uniforms::u_zoom::Value{ float(state.getZoom()) },
-        uniforms::u_rotate_with_map::Value{ values.rotationAlignment == AlignmentType::Map },
         uniforms::u_texture::Value{ 0 },
         uniforms::u_fadetexture::Value{ 1 },
         uniforms::u_is_text::Value{ isText },
@@ -114,9 +112,9 @@ typename SymbolSDFProgram<PaintProperties>::UniformValues SymbolSDFProgram<Paint
       const TransformState& state,
       const SymbolSDFPart part)
 {
-    const float gammaScale = (values.pitchAlignment == AlignmentType::Map
-                              ? std::cos(state.getPitch())
-                              : 1.0) * state.getCameraToCenterDistance();
+    const float gammaScale = values.pitchAlignment == AlignmentType::Map
+                              ? std::cos(state.getPitch()) * state.getCameraToCenterDistance()
+                              : 1.0;
     
     return makeValues<SymbolSDFProgram<PaintProperties>::UniformValues>(
         isText,
@@ -127,8 +125,6 @@ typename SymbolSDFProgram<PaintProperties>::UniformValues SymbolSDFProgram<Paint
         tile,
         state,
         uniforms::u_gamma_scale::Value{ gammaScale },
-        uniforms::u_bearing::Value{ -1.0f * state.getAngle() },
-        uniforms::u_aspect_ratio::Value{ (state.getSize().width * 1.0f) / (state.getSize().height * 1.0f) },
         uniforms::u_pitch_with_map::Value{ values.pitchAlignment == AlignmentType::Map },
         uniforms::u_is_halo::Value{ part == SymbolSDFPart::Halo }
     );
