@@ -21,7 +21,7 @@ jobs:
 # ------------------------------------------------------------------------------
   clang-tidy:
     docker:
-      - image: mbgl/ci:r3-linux-clang-3.9
+      - image: mbgl/ci:r4-linux-clang-3.9
     working_directory: /src
     environment:
       LIBSYSCONFCPUS: 6
@@ -55,7 +55,7 @@ jobs:
 # ------------------------------------------------------------------------------
   android-debug-arm-v7:
     docker:
-      - image: mbgl/ci:r3-android-ndk-r15-gradle
+      - image: mbgl/ci:r4-android-ndk-r15-gradle
     working_directory: /src
     environment:
       LIBSYSCONFCPUS: 6
@@ -131,7 +131,7 @@ jobs:
 # ------------------------------------------------------------------------------
   android-release-all:
     docker:
-      - image: mbgl/ci:r3-android-ndk-r15-gradle
+      - image: mbgl/ci:r4-android-ndk-r15-gradle
     working_directory: /src
     environment:
       LIBSYSCONFCPUS: 6
@@ -178,7 +178,7 @@ jobs:
 # ------------------------------------------------------------------------------
   node4-clang39-release:
     docker:
-      - image: mbgl/ci:r3-linux-clang-3.9-node-4
+      - image: mbgl/ci:r4-linux-clang-3.9-node-4
     working_directory: /src
     environment:
       LIBSYSCONFCPUS: 6
@@ -187,7 +187,6 @@ jobs:
       WITH_EGL: 1
       PACKAGE_JSON_VERSION: $(node -e "console.log(require('./package.json').version)")
       PUBLISH: $([[ "${CIRCLE_BRANCH}" == "node-v${PACKAGE_JSON_VERSION}" ]] && echo true)
-      DISPLAY: :0
     steps:
       - checkout
       - restore_cache:
@@ -201,12 +200,8 @@ jobs:
       - run:
           name: Run node tests
           command: |
-            source scripts/circle_setup.sh
-            mapbox_install_logbt
-            mapbox_install_apitrace
-            mapbox_export_mesa_library_path
             xvfb-run --server-args="-screen 0 1024x768x24" \
-              ./logbt -- apitrace trace --api=egl -v make test-node
+              logbt -- apitrace trace --api=egl -v make test-node
       - run:
           name: Publish node package
           when: on_success
@@ -223,7 +218,7 @@ jobs:
 # ------------------------------------------------------------------------------
   node6-clang39-release:
     docker:
-      - image: mbgl/ci:r3-linux-clang-3.9
+      - image: mbgl/ci:r4-linux-clang-3.9
     working_directory: /src
     environment:
       LIBSYSCONFCPUS: 6
@@ -232,7 +227,6 @@ jobs:
       WITH_EGL: 1
       PACKAGE_JSON_VERSION: $(node -e "console.log(require('./package.json').version)")
       PUBLISH: $([[ "${CIRCLE_BRANCH}" == "node-v${PACKAGE_JSON_VERSION}" ]] && echo true)
-      DISPLAY: :0
     steps:
       - checkout
       - restore_cache:
@@ -246,12 +240,8 @@ jobs:
       - run:
           name: Run node tests
           command: |
-            source scripts/circle_setup.sh
-            mapbox_install_logbt
-            mapbox_install_apitrace
-            mapbox_export_mesa_library_path
             xvfb-run --server-args="-screen 0 1024x768x24" \
-              ./logbt -- apitrace trace --api=egl -v make test-node
+              logbt -- apitrace trace --api=egl -v make test-node
       - run:
           name: Publish node package
           when: on_success
@@ -268,7 +258,7 @@ jobs:
 # ------------------------------------------------------------------------------
   node6-clang39-debug:
     docker:
-      - image: mbgl/ci:r3-linux-clang-3.9
+      - image: mbgl/ci:r4-linux-clang-3.9
     working_directory: /src
     environment:
       LIBSYSCONFCPUS: 6
@@ -277,7 +267,6 @@ jobs:
       WITH_EGL: 1
       PACKAGE_JSON_VERSION: $(node -e "console.log(require('./package.json').version)")
       PUBLISH: $([[ "${CIRCLE_BRANCH}" == "node-v${PACKAGE_JSON_VERSION}" ]] && echo true)
-      DISPLAY: :0
     steps:
       - checkout
       - restore_cache:
@@ -291,12 +280,8 @@ jobs:
       - run:
           name: Run node tests
           command: |
-            source scripts/circle_setup.sh
-            mapbox_install_logbt
-            mapbox_install_apitrace
-            mapbox_export_mesa_library_path
             xvfb-run --server-args="-screen 0 1024x768x24" \
-              ./logbt -- apitrace trace --api=egl -v make test-node
+              logbt -- apitrace trace --api=egl -v make test-node
       - run:
           name: Publish node package
           when: on_success
@@ -313,14 +298,13 @@ jobs:
 # ------------------------------------------------------------------------------
   linux-clang39-debug:
     docker:
-      - image: mbgl/ci:r3-linux-clang-3.9
+      - image: mbgl/ci:r4-linux-clang-3.9
     working_directory: /src
     environment:
       LIBSYSCONFCPUS: 6
       JOBS: 6
       BUILDTYPE: Debug
       WITH_EGL: 1
-      DISPLAY: :0
     steps:
       - checkout
       - restore_cache:
@@ -340,8 +324,6 @@ jobs:
       - run:
           name: Run tests
           command: |
-            source scripts/circle_setup.sh
-            mapbox_export_mesa_library_path
             xvfb-run --server-args="-screen 0 1024x768x24" \
               make run-test
       - save_cache:
@@ -394,7 +376,7 @@ jobs:
 # ------------------------------------------------------------------------------
   linux-gcc5-debug-coverage:
     docker:
-      - image: mbgl/ci:r3-linux-gcc-5
+      - image: mbgl/ci:r4-linux-gcc-5
     working_directory: /src
     environment:
       LIBSYSCONFCPUS: 6
@@ -402,7 +384,6 @@ jobs:
       BUILDTYPE: Debug
       WITH_EGL: 1
       WITH_COVERAGE: 1
-      DISPLAY: :0
     steps:
       - checkout
       - restore_cache:
@@ -422,14 +403,11 @@ jobs:
       - run:
           name: Run tests
           command: |
-            source scripts/circle_setup.sh
-            mapbox_export_mesa_library_path
             xvfb-run --server-args="-screen 0 1024x768x24" \
               make run-test
       - run:
           name: Upload coverage results to coveralls
           command: |
-            source scripts/circle_setup.sh
             platform/linux/scripts/coveralls.sh
       - save_cache:
           key: v1-linux-gcc5-debug-coverage
@@ -440,7 +418,7 @@ jobs:
 # ------------------------------------------------------------------------------
   linux-gcc5-release-qt4:
     docker:
-      - image: mbgl/ci:r3-linux-gcc-5-qt-4
+      - image: mbgl/ci:r4-linux-gcc-5-qt-4
     working_directory: /src
     environment:
       LIBSYSCONFCPUS: 6
@@ -465,8 +443,6 @@ jobs:
       - run:
           name: Run memory-load tests
           command: |
-            source scripts/circle_setup.sh
-            mapbox_export_mesa_library_path
             xvfb-run --server-args="-screen 0 1024x768x24" \
               make run-qt-test-Memory.*:*.Load
             scripts/log_memory_benchmarks.sh test_detail.xml "Platform=Linux,Compiler=${_CC},Arch=$(uname -m)"
@@ -479,7 +455,7 @@ jobs:
 # ------------------------------------------------------------------------------
   linux-gcc5-release-qt5:
     docker:
-      - image: mbgl/ci:r3-linux-gcc-5-qt-5
+      - image: mbgl/ci:r4-linux-gcc-5-qt-5
     working_directory: /src
     environment:
       LIBSYSCONFCPUS: 6
@@ -508,8 +484,6 @@ jobs:
           environment:
             JOBS: 1 # https://github.com/mapbox/mapbox-gl-native/issues/9108
           command: |
-            source scripts/circle_setup.sh
-            mapbox_export_mesa_library_path
             xvfb-run --server-args="-screen 0 1024x768x24" \
               scripts/valgrind.sh build/qt-linux-x86_64/Release/mbgl-test --gtest_filter=-*.Load --gtest_filter=-Memory.Vector
       - save_cache:
