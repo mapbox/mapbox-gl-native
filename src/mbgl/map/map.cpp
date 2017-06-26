@@ -92,8 +92,6 @@ public:
     std::unique_ptr<RenderStyle> renderStyle;
 
     bool cameraMutated = false;
-
-    size_t sourceCacheSize;
     bool loading = false;
 
     util::AsyncTask asyncInvalidate;
@@ -821,15 +819,6 @@ MapDebugOptions Map::getDebug() const {
 
 bool Map::isFullyLoaded() const {
     return impl->style->impl->isLoaded() && impl->renderStyle && impl->renderStyle->isLoaded();
-}
-
-void Map::setSourceTileCacheSize(size_t size) {
-    if (size != impl->sourceCacheSize) {
-        impl->sourceCacheSize = size;
-        if (!impl->renderStyle) return;
-        impl->renderStyle->setSourceTileCacheSize(size);
-        impl->backend.invalidate();
-    }
 }
 
 void Map::onLowMemory() {

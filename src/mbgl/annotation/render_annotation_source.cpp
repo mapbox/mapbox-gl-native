@@ -69,10 +69,6 @@ std::vector<Feature> RenderAnnotationSource::querySourceFeatures(const SourceQue
     return {};
 }
 
-void RenderAnnotationSource::setCacheSize(size_t size) {
-    tilePyramid.setCacheSize(size);
-}
-
 void RenderAnnotationSource::onLowMemory() {
     tilePyramid.onLowMemory();
 }

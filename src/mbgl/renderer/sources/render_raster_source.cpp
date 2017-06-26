@@ -80,10 +80,6 @@ std::vector<Feature> RenderRasterSource::querySourceFeatures(const SourceQueryOp
     return {};
 }
 
-void RenderRasterSource::setCacheSize(size_t size) {
-    tilePyramid.setCacheSize(size);
-}
-
 void RenderRasterSource::onLowMemory() {
     tilePyramid.onLowMemory();
 }

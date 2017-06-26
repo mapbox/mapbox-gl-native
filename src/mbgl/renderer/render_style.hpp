@@ -59,7 +59,6 @@ public:
                                                const TransformState& transformState,
                                                const RenderedQueryOptions& options) const;
 
-    void setSourceTileCacheSize(size_t);
     void onLowMemory();
 
     void dumpDebugLogs() const;
