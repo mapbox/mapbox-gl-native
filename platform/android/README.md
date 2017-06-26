@@ -8,11 +8,9 @@ A library based on [Mapbox GL Native](../../README.md) for embedding interactive
 
 Alright. So, actually, you may be in the wrong place. From here on in, this README is going to be for people who are interested in working on and improving on Mapbox GL Native for Android.
 
-**To view our current API documentation, see our [JavaDoc](https://www.mapbox.com/android-sdk/api).**
+**To view our current API documentation, see our [JavaDoc](https://www.mapbox.com/android-docs/api/map-sdk/5.0.2/index.html).**
 
-**To install and use the Mapbox Android SDK in an application, see the [Mapbox Android SDK website](https://www.mapbox.com/android-sdk/).**
-
-[![](https://www.mapbox.com/android-sdk/images/splash.png)](https://www.mapbox.com/android-sdk/)
+**To install and use the Mapbox Android SDK in an application, see the [Mapbox Android Maps SDK "First Steps Guide"](https://www.mapbox.com/android-docs/map-sdk/tutorials/).**
 
 ### Setup environment
 
