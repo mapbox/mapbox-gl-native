@@ -125,7 +125,7 @@ SymbolQuads getGlyphQuads(const Shaping& shapedText,
 
 
         const float x1 = glyph.metrics.left - rectBuffer - halfAdvance + builtInOffset.x;
-        const float y1 = glyph.metrics.top - rectBuffer + builtInOffset.y;
+        const float y1 = -glyph.metrics.top - rectBuffer + builtInOffset.y;
         const float x2 = x1 + rect.w;
         const float y2 = y1 + rect.h;
 

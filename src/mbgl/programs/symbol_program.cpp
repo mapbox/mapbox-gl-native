@@ -112,9 +112,9 @@ typename SymbolSDFProgram<PaintProperties>::UniformValues SymbolSDFProgram<Paint
       const TransformState& state,
       const SymbolSDFPart part)
 {
-    const float gammaScale = values.pitchAlignment == AlignmentType::Map
-                              ? std::cos(state.getPitch()) * state.getCameraToCenterDistance()
-                              : 1.0;
+    const float gammaScale = (values.pitchAlignment == AlignmentType::Map
+                              ? std::cos(state.getPitch())
+                              : 1.0) * state.getCameraToCenterDistance();
     
     return makeValues<SymbolSDFProgram<PaintProperties>::UniformValues>(
         isText,
