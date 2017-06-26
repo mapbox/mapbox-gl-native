@@ -68,7 +68,6 @@ public:
     virtual std::vector<Feature>
     querySourceFeatures(const SourceQueryOptions&) const = 0;
 
-    virtual void setCacheSize(size_t) = 0;
     virtual void onLowMemory() = 0;
 
     virtual void dumpDebugLogs() const = 0;

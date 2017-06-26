@@ -84,10 +84,6 @@ std::vector<Feature> RenderGeoJSONSource::querySourceFeatures(const SourceQueryO
     return tilePyramid.querySourceFeatures(options);
 }
 
-void RenderGeoJSONSource::setCacheSize(size_t size) {
-    tilePyramid.setCacheSize(size);
-}
-
 void RenderGeoJSONSource::onLowMemory() {
     tilePyramid.onLowMemory();
 }

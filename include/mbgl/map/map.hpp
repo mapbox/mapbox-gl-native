@@ -157,7 +157,6 @@ public:
     AnnotationIDs queryPointAnnotations(const ScreenBox&);
 
     // Memory
-    void setSourceTileCacheSize(size_t);
     void onLowMemory();
 
     // Debug

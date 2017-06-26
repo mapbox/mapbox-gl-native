@@ -417,12 +417,6 @@ std::vector<Feature> RenderStyle::queryRenderedFeatures(const ScreenLineString& 
     return result;
 }
 
-void RenderStyle::setSourceTileCacheSize(size_t size) {
-    for (const auto& entry : renderSources) {
-        entry.second->setCacheSize(size);
-    }
-}
-
 void RenderStyle::onLowMemory() {
     for (const auto& entry : renderSources) {
         entry.second->onLowMemory();

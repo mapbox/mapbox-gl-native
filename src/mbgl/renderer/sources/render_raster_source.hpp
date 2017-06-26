@@ -32,7 +32,6 @@ public:
     std::vector<Feature>
     querySourceFeatures(const SourceQueryOptions&) const final;
 
-    void setCacheSize(size_t) final;
     void onLowMemory() final;
     void dumpDebugLogs() const final;
 
