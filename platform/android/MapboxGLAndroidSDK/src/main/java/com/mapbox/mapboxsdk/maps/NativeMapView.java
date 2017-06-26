@@ -1,11 +1,9 @@
 package com.mapbox.mapboxsdk.maps;
 
-import android.app.ActivityManager;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.PointF;
 import android.graphics.RectF;
-import android.os.Build;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -78,27 +76,11 @@ final class NativeMapView {
     fileSource = FileSource.getInstance(context);
 
     pixelRatio = context.getResources().getDisplayMetrics().density;
-    int availableProcessors = Runtime.getRuntime().availableProcessors();
-    ActivityManager.MemoryInfo memoryInfo = new ActivityManager.MemoryInfo();
-    ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-    activityManager.getMemoryInfo(memoryInfo);
-    long totalMemory = memoryInfo.availMem;
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-      totalMemory = memoryInfo.totalMem;
-    }
-
-    if (availableProcessors < 0) {
-      throw new IllegalArgumentException("availableProcessors cannot be negative.");
-    }
-
-    if (totalMemory < 0) {
-      throw new IllegalArgumentException("totalMemory cannot be negative.");
-    }
     onMapChangedListeners = new CopyOnWriteArrayList<>();
     this.mapView = mapView;
 
     String programCacheDir = context.getCacheDir().getAbsolutePath();
-    nativeInitialize(this, fileSource, pixelRatio, programCacheDir, availableProcessors, totalMemory);
+    nativeInitialize(this, fileSource, pixelRatio, programCacheDir);
   }
 
   //
@@ -941,9 +923,7 @@ final class NativeMapView {
   private native void nativeInitialize(NativeMapView nativeMapView,
                                        FileSource fileSource,
                                        float pixelRatio,
-                                       String programCacheDir,
-                                       int availableProcessors,
-                                       long totalMemory);
+                                       String programCacheDir);
 
   private native void nativeDestroy();
 
