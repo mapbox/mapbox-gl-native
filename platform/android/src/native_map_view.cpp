@@ -56,13 +56,9 @@ NativeMapView::NativeMapView(jni::JNIEnv& _env,
                              jni::Object<NativeMapView> _obj,
                              jni::Object<FileSource> jFileSource,
                              jni::jfloat _pixelRatio,
-                             jni::String _programCacheDir,
-                             jni::jint _availableProcessors,
-                             jni::jlong _totalMemory)
+                             jni::String _programCacheDir)
     : javaPeer(_obj.NewWeakGlobalRef(_env)),
       pixelRatio(_pixelRatio),
-      availableProcessors(_availableProcessors),
-      totalMemory(_totalMemory),
       threadPool(sharedThreadPool()) {
 
     // Get a reference to the JavaVM for callbacks
@@ -77,19 +73,6 @@ NativeMapView::NativeMapView(jni::JNIEnv& _env,
         pixelRatio, mbgl::android::FileSource::getDefaultFileSource(_env, jFileSource), *threadPool,
         MapMode::Continuous, GLContextMode::Unique, ConstrainMode::HeightOnly,
         ViewportMode::Default, jni::Make<std::string>(_env, _programCacheDir));
-
-    recalculateSourceTileCacheSize();
-}
-
-void NativeMapView::recalculateSourceTileCacheSize() {
-    //Calculate a fitting cache size based on device parameters
-    float zoomFactor   = map->getMaxZoom() - map->getMinZoom() + 1;
-    float cpuFactor    = availableProcessors;
-    float memoryFactor = static_cast<float>(totalMemory) / 1000.0f / 1000.0f / 1000.0f;
-    float sizeFactor   = (static_cast<float>(map->getSize().width)  / mbgl::util::tileSize) *
-        (static_cast<float>(map->getSize().height) / mbgl::util::tileSize);
-
-    map->setSourceTileCacheSize(zoomFactor * cpuFactor * memoryFactor * sizeFactor * 0.5f);
 }
 
 /**
@@ -333,7 +316,6 @@ void NativeMapView::resizeView(jni::JNIEnv&, int w, int h) {
     width = util::max(64, w);
     height = util::max(64, h);
     map->setSize({ static_cast<uint32_t>(width), static_cast<uint32_t>(height) });
-    recalculateSourceTileCacheSize();
 }
 
 void NativeMapView::resizeFramebuffer(jni::JNIEnv&, int w, int h) {
@@ -488,7 +470,6 @@ void NativeMapView::resetZoom(jni::JNIEnv&) {
 
 void NativeMapView::setMinZoom(jni::JNIEnv&, jni::jdouble zoom) {
     map->setMinZoom(zoom);
-    recalculateSourceTileCacheSize();
 }
 
 jni::jdouble NativeMapView::getMinZoom(jni::JNIEnv&) {
@@ -497,7 +478,6 @@ jni::jdouble NativeMapView::getMinZoom(jni::JNIEnv&) {
 
 void NativeMapView::setMaxZoom(jni::JNIEnv&, jni::jdouble zoom) {
     map->setMaxZoom(zoom);
-    recalculateSourceTileCacheSize();
 }
 
 jni::jdouble NativeMapView::getMaxZoom(jni::JNIEnv&) {
@@ -1473,7 +1453,7 @@ void NativeMapView::registerNative(jni::JNIEnv& env) {
 
     // Register the peer
     jni::RegisterNativePeer<NativeMapView>(env, NativeMapView::javaClass, "nativePtr",
-            std::make_unique<NativeMapView, JNIEnv&, jni::Object<NativeMapView>, jni::Object<FileSource>, jni::jfloat, jni::String, jni::jint, jni::jlong>,
+            std::make_unique<NativeMapView, JNIEnv&, jni::Object<NativeMapView>, jni::Object<FileSource>, jni::jfloat, jni::String>,
             "nativeInitialize",
             "nativeDestroy",
             METHOD(&NativeMapView::render, "nativeRender"),

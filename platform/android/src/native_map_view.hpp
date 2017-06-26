@@ -49,9 +49,7 @@ public:
                   jni::Object<NativeMapView>,
                   jni::Object<FileSource>,
                   jni::jfloat pixelRatio,
-                  jni::String programCacheDir,
-                  jni::jint availableProcessors,
-                  jni::jlong totalMemory);
+                  jni::String programCacheDir);
 
     virtual ~NativeMapView();
 
@@ -290,8 +288,6 @@ private:
     void updateFps();
 
 private:
-    void recalculateSourceTileCacheSize();
-
     JavaVM *vm = nullptr;
     jni::UniqueWeakObject<NativeMapView> javaPeer;
 
@@ -326,9 +322,6 @@ private:
     int fbHeight = 64;
 
     bool framebufferSizeChanged = true;
-
-    int availableProcessors = 0;
-    size_t totalMemory = 0;
 
     // Ensure these are initialised last
     std::shared_ptr<mbgl::ThreadPool> threadPool;
