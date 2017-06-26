@@ -6,8 +6,39 @@ namespace mbgl {
 namespace gl {
 
 AttributeLocation bindAttributeLocation(ProgramID id, AttributeLocation location, const char* name) {
-    MBGL_CHECK_ERROR(glBindAttribLocation(id, location, name));
+    if (location != -1) MBGL_CHECK_ERROR(glBindAttribLocation(id, location, name));
     return location;
+}
+
+AttributeLocation locationToBindAttribute(std::set<std::string>& set, std::string attributeName) {
+    auto it = set.find(attributeName);
+    if (it != set.end()) {
+        return std::distance(set.begin(), it);
+    } else {
+        return AttributeLocation(-1);
+    }
+}
+
+int32_t getActiveAttributeCount(ProgramID id) {
+    GLint numAttributes;
+    MBGL_CHECK_ERROR(glGetProgramiv(id, GL_ACTIVE_ATTRIBUTES, &numAttributes));
+    return numAttributes;
+}
+
+int32_t getMaxAttributeNameLength(ProgramID id) {
+    GLint nameLength;
+    MBGL_CHECK_ERROR(glGetProgramiv(id, GL_ACTIVE_ATTRIBUTE_MAX_LENGTH, &nameLength));
+    return nameLength;
+}
+
+std::string getAttributeName(ProgramID id, int32_t maxLength, AttributeLocation location) {
+    std::string attributeName;
+    attributeName.resize(maxLength);
+    MBGL_CHECK_ERROR(glGetActiveAttrib(id, static_cast<GLuint>(location),
+                                       static_cast<GLsizei>(maxLength), nullptr, nullptr, nullptr,
+                                       const_cast<char*>(attributeName.data())));
+    attributeName.resize(strlen(attributeName.c_str()));
+    return attributeName;
 }
 
 void DisabledAttribute::bind(Context&, AttributeLocation location, std::size_t) const {
