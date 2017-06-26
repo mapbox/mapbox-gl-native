@@ -2,6 +2,8 @@
 #include <mbgl/gl/context.hpp>
 #include <mbgl/gl/gl.hpp>
 
+#include <cstring>
+
 namespace mbgl {
 namespace gl {
 
