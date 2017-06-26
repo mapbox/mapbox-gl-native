@@ -5,7 +5,7 @@ namespace mbgl {
 
 using namespace style;
 
-SymbolInstance::SymbolInstance(Anchor& anchor,
+SymbolInstance::SymbolInstance(Anchor& anchor_,
                                GeometryCoordinates line_,
                                const std::pair<Shaping, Shaping>& shapedTextOrientations,
                                optional<PositionedIcon> shapedIcon,
@@ -22,7 +22,7 @@ SymbolInstance::SymbolInstance(Anchor& anchor,
                                const GlyphPositionMap& positions,
                                const IndexedSubfeature& indexedFeature,
                                const std::size_t featureIndex_) :
-    point(anchor.point),
+    anchor(anchor_),
     line(line_),
     index(index_),
     hasText(shapedTextOrientations.first || shapedTextOrientations.second),
@@ -36,14 +36,14 @@ SymbolInstance::SymbolInstance(Anchor& anchor,
     // Create the quads used for rendering the icon and glyphs.
     if (addToBuffers) {
         if (shapedIcon) {
-            iconQuad = getIconQuad(anchor, *shapedIcon, line_, layout, layoutTextSize, iconPlacement, shapedTextOrientations.first);
+            iconQuad = getIconQuad(*shapedIcon, layout, layoutTextSize, shapedTextOrientations.first);
         }
         if (shapedTextOrientations.first) {
-            auto quads = getGlyphQuads(anchor, shapedTextOrientations.first, textBoxScale, line_, layout, textPlacement, positions);
+            auto quads = getGlyphQuads(shapedTextOrientations.first, layout, textPlacement, positions);
             glyphQuads.insert(glyphQuads.end(), quads.begin(), quads.end());
         }
         if (shapedTextOrientations.second) {
-            auto quads = getGlyphQuads(anchor, shapedTextOrientations.second, textBoxScale, line_, layout, textPlacement, positions);
+            auto quads = getGlyphQuads(shapedTextOrientations.second, layout, textPlacement, positions);
             glyphQuads.insert(glyphQuads.end(), quads.begin(), quads.end());
         }
     }

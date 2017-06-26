@@ -72,7 +72,7 @@ private:
                    const style::SymbolPlacementType,
                    const float placementAngle,
                    WritingModeType writingModes,
-                   const Point<float> labelAnchor);
+                   const Anchor& labelAnchor);
 
     const std::string sourceLayerName;
     const std::string bucketName;

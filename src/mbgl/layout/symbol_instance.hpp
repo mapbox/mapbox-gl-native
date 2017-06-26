@@ -30,7 +30,7 @@ public:
                    const IndexedSubfeature&,
                    const std::size_t featureIndex);
 
-    Point<float> point;
+    Anchor anchor;
     GeometryCoordinates line;
     uint32_t index;
     bool hasText;
