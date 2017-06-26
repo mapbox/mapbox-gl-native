@@ -438,7 +438,6 @@ public:
     const float scaleFactor = [UIScreen instancesRespondToSelector:@selector(nativeScale)] ? [[UIScreen mainScreen] nativeScale] : [[UIScreen mainScreen] scale];
     _mbglThreadPool = mbgl::sharedThreadPool();
     _mbglMap = new mbgl::Map(*_mbglView, self.size, scaleFactor, *mbglFileSource, *_mbglThreadPool, mbgl::MapMode::Continuous, mbgl::GLContextMode::Unique, mbgl::ConstrainMode::None, mbgl::ViewportMode::Default);
-    [self validateTileCacheSize];
 
     // start paused if in IB
     if (_isTargetingInterfaceBuilder || background) {
@@ -756,42 +755,6 @@ public:
 }
 
 #pragma mark - Layout -
-
-- (void)setFrame:(CGRect)frame
-{
-    [super setFrame:frame];
-    if ( ! CGRectEqualToRect(frame, self.frame))
-    {
-        [self validateTileCacheSize];
-    }
-}
-
-- (void)setBounds:(CGRect)bounds
-{
-    [super setBounds:bounds];
-    if ( ! CGRectEqualToRect(bounds, self.bounds))
-    {
-        [self validateTileCacheSize];
-    }
-}
-
-- (void)validateTileCacheSize
-{
-    if ( ! _mbglMap)
-    {
-        return;
-    }
-
-    CGFloat zoomFactor   = self.maximumZoomLevel - self.minimumZoomLevel + 1;
-    CGFloat cpuFactor    = [NSProcessInfo processInfo].processorCount;
-    CGFloat memoryFactor = (CGFloat)[NSProcessInfo processInfo].physicalMemory / 1000 / 1000 / 1000;
-    CGFloat sizeFactor   = (CGRectGetWidth(self.bounds)  / mbgl::util::tileSize) *
-                           (CGRectGetHeight(self.bounds) / mbgl::util::tileSize);
-
-    NSUInteger cacheSize = zoomFactor * cpuFactor * memoryFactor * sizeFactor * 0.5;
-
-    _mbglMap->setSourceTileCacheSize(cacheSize);
-}
 
 + (BOOL)requiresConstraintBasedLayout
 {
@@ -2547,8 +2510,6 @@ public:
 
 - (void)setMinimumZoomLevel:(double)minimumZoomLevel
 {
-    _mbglMap->setMinZoom(minimumZoomLevel);
-    [self validateTileCacheSize];
 }
 
 - (double)minimumZoomLevel
@@ -2559,7 +2520,6 @@ public:
 - (void)setMaximumZoomLevel:(double)maximumZoomLevel
 {
     _mbglMap->setMaxZoom(maximumZoomLevel);
-    [self validateTileCacheSize];
 }
 
 - (double)maximumZoomLevel
