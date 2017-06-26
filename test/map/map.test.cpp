@@ -280,6 +280,32 @@ TEST(Map, StyleExpiredWithAnnotations) {
     EXPECT_EQ(1u, fileSource.requests.size());
 }
 
+TEST(Map, StyleExpiredWithRender) {
+    // Rendering should not prevent revalidation of an expired style.
+
+    using namespace std::chrono_literals;
+
+    MapTest test;
+    FakeFileSource fileSource;
+
+    Map map(test.backend, test.view.getSize(), 1, fileSource, test.threadPool, MapMode::Still);
+    map.getStyle().loadURL("mapbox://styles/test");
+    EXPECT_EQ(1u, fileSource.requests.size());
+
+    Response response;
+    response.data = std::make_shared<std::string>(util::read_file("test/fixtures/api/empty.json"));
+    response.expires = util::now() - 1h;
+
+    fileSource.respond(Resource::Style, response);
+    EXPECT_EQ(1u, fileSource.requests.size());
+
+    map.render(test.view);
+    EXPECT_EQ(1u, fileSource.requests.size());
+
+    fileSource.respond(Resource::Style, response);
+    EXPECT_EQ(1u, fileSource.requests.size());
+}
+
 TEST(Map, StyleEarlyMutation) {
     // An early mutation should not prevent the initial style load.
 
