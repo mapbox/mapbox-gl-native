@@ -249,9 +249,9 @@ public:
         std::set<std::string> activeAttributes = getActiveAttributes(id);
 
         AttributeLocation location = -1;
-        auto bindAndIncrement = [&](ProgramID id, AttributeLocation location, const char* name) {
+        auto bindAndIncrement = [&](ProgramID id, AttributeLocation locationToBind, const char* name) {
             location++;
-            return bindAttributeLocation(id, location, name);
+            return bindAttributeLocation(id, locationToBind, name);
         };
         return Locations{ (activeAttributes.count(As::name())
                                ? bindAndIncrement(id, location++, As::name())
