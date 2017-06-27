@@ -369,7 +369,7 @@ public:
             uniformValues
                 .concat(symbolSizeBinder.uniformValues(currentZoom))
                 .concat(paintPropertyBinders.uniformValues(currentZoom, currentProperties)),
-            LayoutAttributes::bindings(layoutVertexBuffer)
+            LayoutAttributes::bindings(program.program, layoutVertexBuffer)
                 .concat(symbolSizeBinder.attributeBindings())
                 .concat(paintPropertyBinders.attributeBindings(currentProperties)),
             indexBuffer,

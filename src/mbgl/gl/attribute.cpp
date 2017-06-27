@@ -8,7 +8,7 @@ namespace mbgl {
 namespace gl {
 
 AttributeLocation bindAttributeLocation(ProgramID id, AttributeLocation location, const char* name) {
-    if (location != -1) MBGL_CHECK_ERROR(glBindAttribLocation(id, location, name));
+    MBGL_CHECK_ERROR(glBindAttribLocation(id, location, name));
     return location;
 }
 
@@ -43,6 +43,19 @@ std::string getAttributeName(ProgramID id, int32_t maxLength, AttributeLocation 
     return attributeName;
 }
 
+std::set<std::string> getActiveAttributes(ProgramID id) {
+    std::set<std::string> activeAttributes;
+
+    GLint attributeCount = getActiveAttributeCount(id);
+    GLint maxAttributeLength = getMaxAttributeNameLength(id);
+
+    for (int32_t i = 0; i < attributeCount; i++) {
+        activeAttributes.emplace(getAttributeName(id, maxAttributeLength, i));
+    }
+
+    return activeAttributes;
+}
+
 void DisabledAttribute::bind(Context&, AttributeLocation location, std::size_t) const {
     MBGL_CHECK_ERROR(glDisableVertexAttribArray(location));
 }
@@ -58,6 +71,7 @@ template <> DataType DataTypeOf<float>    = DataType::Float;
 
 template <class T, std::size_t N>
 void AttributeBinding<T, N>::bind(Context& context, AttributeLocation location, std::size_t vertexOffset) const {
+    if (location == -1) return;
     context.vertexBuffer = vertexBuffer;
     MBGL_CHECK_ERROR(glEnableVertexAttribArray(location));
     MBGL_CHECK_ERROR(glVertexAttribPointer(
