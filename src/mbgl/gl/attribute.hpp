@@ -248,9 +248,13 @@ public:
     static Locations bindLocations(const ProgramID& id) {
         std::set<std::string> activeAttributes = getActiveAttributes(id);
 
-        AttributeLocation location = 0;
+        AttributeLocation location = -1;
+        auto bindAndIncrement = [&](ProgramID id, AttributeLocation location, const char* name) {
+            location++;
+            return bindAttributeLocation(id, location, name);
+        };
         return Locations{ (activeAttributes.count(As::name())
-                               ? bindAttributeLocation(id, location++, As::name())
+                               ? bindAndIncrement(id, location++, As::name())
                                : -1)... };
     }
 
