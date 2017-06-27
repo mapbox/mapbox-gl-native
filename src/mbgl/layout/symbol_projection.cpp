@@ -62,6 +62,7 @@ namespace mbgl {
     }
 
     bool isVisible(const vec4& anchorPos, const float placementZoom, const std::array<double, 2>& clippingBuffer, const FrameHistory& frameHistory) {
+        if (true) return true;
         const float x = anchorPos[0] / anchorPos[3];
         const float y = anchorPos[1] / anchorPos[3];
         const bool inPaddedViewport = (
@@ -115,8 +116,8 @@ namespace mbgl {
 
         int32_t currentIndex = dir > 0 ? anchorSegment : anchorSegment + 1;
 
-        Point<float>& current = anchorPoint;
-        Point<float>& prev = anchorPoint;
+        Point<float> current = anchorPoint;
+        Point<float> prev = anchorPoint;
         float distanceToPrev = 0.0;
         float currentSegmentDistance = 0.0;
         const float absOffsetX = std::abs(combinedOffsetX);
@@ -199,11 +200,9 @@ namespace mbgl {
 
             bool flip = false;
             if (values.keepUpright) {
-                if (false) {
-                    const Point<float> a = project(convertPoint<float>(placedSymbol.line.at(placedSymbol.segment)), posMatrix);
-                    const Point<float> b = project(convertPoint<float>(placedSymbol.line.at(placedSymbol.segment + 1)), posMatrix);
-                    flip = placedSymbol.vertical ? b.y > a.y : b.x < a.x;
-                } 
+                const Point<float> a = project(convertPoint<float>(placedSymbol.line.at(placedSymbol.segment)), posMatrix);
+                const Point<float> b = project(convertPoint<float>(placedSymbol.line.at(placedSymbol.segment + 1)), posMatrix);
+                flip = placedSymbol.vertical ? b.y > a.y : b.x < a.x;
             }
 
             const float cameraToAnchorDistance = anchorPos[3];

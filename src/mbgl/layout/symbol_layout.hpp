@@ -20,6 +20,7 @@ class CollisionTile;
 class SymbolBucket;
 class Anchor;
 class RenderLayer;
+class PlacedSymbol;
 
 namespace style {
 class Filter;
@@ -72,7 +73,8 @@ private:
                    const style::SymbolPlacementType,
                    const float placementAngle,
                    WritingModeType writingModes,
-                   const Anchor& labelAnchor);
+                   const Anchor& labelAnchor,
+                   PlacedSymbol& placedSymbol);
 
     const std::string sourceLayerName;
     const std::string bucketName;

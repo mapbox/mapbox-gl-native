@@ -74,6 +74,7 @@ public:
 
     template <class Vertex, class DrawMode>
     void updateVertexBuffer(VertexVector<Vertex, DrawMode>&& v, VertexBuffer<Vertex, DrawMode>& buffer) {
+        assert(v.vertexSize() == buffer.vertexCount);
         updateVertexBuffer(v.data(), v.byteSize(), buffer.buffer);
     }
 

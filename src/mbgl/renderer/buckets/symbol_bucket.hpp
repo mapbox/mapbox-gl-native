@@ -29,8 +29,8 @@ public:
     float lineOffsetY;
     float placementZoom;
     bool vertical;
-    std::vector<float> glyphOffsets;
     GeometryCoordinates line;
+    std::vector<float> glyphOffsets;
 };
 
 class SymbolBucket : public Bucket {
