@@ -8,6 +8,7 @@ namespace mbgl {
 namespace gl {
 
 AttributeLocation bindAttributeLocation(ProgramID id, AttributeLocation location, const char* name) {
+    assert(location < 8);
     MBGL_CHECK_ERROR(glBindAttribLocation(id, location, name));
     return location;
 }
