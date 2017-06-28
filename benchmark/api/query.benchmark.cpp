@@ -6,6 +6,8 @@
 #include <mbgl/gl/headless_backend.hpp>
 #include <mbgl/gl/offscreen_view.hpp>
 #include <mbgl/util/default_thread_pool.hpp>
+#include <mbgl/renderer/renderer.hpp>
+#include <mbgl/renderer/async_renderer_frontend.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/image.hpp>
 #include <mbgl/storage/default_file_source.hpp>
@@ -38,7 +40,8 @@ public:
     OffscreenView view{ backend.getContext(), { 1000, 1000 } };
     DefaultFileSource fileSource{ "benchmark/fixtures/api/cache.db", "." };
     ThreadPool threadPool{ 4 };
-    Map map{ backend, MapObserver::nullObserver(), view.getSize(), 1, fileSource, threadPool, MapMode::Still };
+    AsyncRendererFrontend rendererFrontend { std::make_unique<Renderer>(backend, 1, fileSource, threadPool), view };
+    Map map { rendererFrontend, MapObserver::nullObserver(), view.getSize(), 1, fileSource, threadPool, MapMode::Still };
     ScreenBox box{{ 0, 0 }, { 1000, 1000 }};
 };
 
@@ -48,7 +51,7 @@ static void API_queryRenderedFeaturesAll(::benchmark::State& state) {
     QueryBenchmark bench;
 
     while (state.KeepRunning()) {
-        bench.map.queryRenderedFeatures(bench.box, {});
+        bench.rendererFrontend.getRenderer()->queryRenderedFeatures(bench.box, {});
     }
 }
 
@@ -56,7 +59,7 @@ static void API_queryRenderedFeaturesLayerFromLowDensity(::benchmark::State& sta
     QueryBenchmark bench;
 
     while (state.KeepRunning()) {
-        bench.map.queryRenderedFeatures(bench.box, {{{ "testlayer" }}, {}});
+        bench.rendererFrontend.getRenderer()->queryRenderedFeatures(bench.box, {{{ "testlayer" }}, {}});
     }
 }
 
@@ -64,7 +67,7 @@ static void API_queryRenderedFeaturesLayerFromHighDensity(::benchmark::State& st
     QueryBenchmark bench;
 
     while (state.KeepRunning()) {
-        bench.map.queryRenderedFeatures(bench.box, {{{"road-street" }}, {}});
+        bench.rendererFrontend.getRenderer()->queryRenderedFeatures(bench.box, {{{"road-street" }}, {}});
     }
 }
 
