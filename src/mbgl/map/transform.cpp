@@ -293,6 +293,11 @@ void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &anima
         Point<double> framePoint = util::interpolate(startPoint, endPoint, us);
         double frameZoom = startZoom + state.scaleZoom(1 / w(s));
 
+        // Zoom can be NaN if size is empty.
+        if (std::isnan(frameZoom)) {
+            frameZoom = zoom;
+        }
+
         // Convert to geographic coordinates and set the new viewpoint.
         LatLng frameLatLng = Projection::unproject(framePoint, startScale);
         state.setLatLngZoom(frameLatLng, frameZoom);
