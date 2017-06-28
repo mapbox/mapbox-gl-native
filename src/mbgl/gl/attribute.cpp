@@ -37,8 +37,11 @@ int32_t getMaxAttributeNameLength(ProgramID id) {
 std::string getAttributeName(ProgramID id, int32_t maxLength, AttributeLocation location) {
     std::string attributeName;
     attributeName.resize(maxLength);
+    GLsizei length;
+    GLint size;
+    GLenum type;
     MBGL_CHECK_ERROR(glGetActiveAttrib(id, static_cast<GLuint>(location),
-                                       static_cast<GLsizei>(maxLength), nullptr, nullptr, nullptr,
+                                       static_cast<GLsizei>(maxLength), &length, &size, &type,
                                        const_cast<char*>(attributeName.data())));
     attributeName.resize(strlen(attributeName.c_str()));
     return attributeName;
