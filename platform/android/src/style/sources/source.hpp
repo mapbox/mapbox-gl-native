@@ -5,6 +5,7 @@
 #include <mbgl/style/source.hpp>
 
 #include "../value.hpp"
+#include "../../android_renderer_frontend.hpp"
 
 #include <jni/jni.hpp>
 
@@ -23,7 +24,7 @@ public:
     /*
      * Called when a Java object is created on the c++ side
      */
-    Source(mbgl::Map&, mbgl::style::Source&);
+    Source(mbgl::style::Source&);
 
     /*
      * Called when a Java object was created from the jvm side
@@ -41,6 +42,8 @@ public:
 
     void addToMap(mbgl::Map&);
 
+    void setRendererFrontend(AndroidRendererFrontend&);
+
     virtual jni::jobject* createJavaPeer(jni::JNIEnv&) = 0;
 
     jni::String getId(jni::JNIEnv&);
@@ -57,8 +60,9 @@ protected:
     // Raw pointer that is valid until the source is removed from the map
     mbgl::style::Source& source;
 
-    // Map pointer is valid for newly created sources only after adding to the map
-    mbgl::Map* map;
+    // RendererFrontend pointer is valid only when
+    // added to the map
+    AndroidRendererFrontend* rendererFrontend;
 };
 
 } // namespace android

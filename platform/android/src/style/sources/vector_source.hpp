@@ -19,7 +19,7 @@ public:
 
     VectorSource(jni::JNIEnv&, jni::String, jni::Object<>);
 
-    VectorSource(mbgl::Map&, mbgl::style::VectorSource&);
+    VectorSource(mbgl::style::VectorSource&);
 
     ~VectorSource();
 

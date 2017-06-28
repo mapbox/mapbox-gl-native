@@ -36,6 +36,8 @@
 namespace mbgl {
 namespace android {
 
+class AndroidRendererFrontend;
+
 class NativeMapView : public View, public Backend, public MapObserver {
 public:
 
@@ -60,7 +62,6 @@ public:
     // mbgl::Backend //
 
     void updateAssumedState() override;
-    void invalidate() override;
 
     // Deprecated //
     void notifyMapChange(mbgl::MapChange);
@@ -78,6 +79,9 @@ public:
     void onDidFinishRenderingMap(MapObserver::RenderMode) override;
     void onDidFinishLoadingStyle() override;
     void onSourceChanged(mbgl::style::Source&) override;
+
+    // Signal the view system, we want to redraw
+    void invalidate();
 
     // JNI //
 
@@ -288,6 +292,8 @@ private:
     void updateFps();
 
 private:
+    std::unique_ptr<AndroidRendererFrontend> rendererFrontend;
+
     JavaVM *vm = nullptr;
     jni::UniqueWeakObject<NativeMapView> javaPeer;
 

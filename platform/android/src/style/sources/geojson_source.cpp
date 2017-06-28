@@ -1,5 +1,7 @@
 #include "geojson_source.hpp"
 
+#include <mbgl/renderer/query.hpp>
+
 // Java -> C++ conversion
 #include "../android_conversion.hpp"
 #include "../conversion/filter.hpp"
@@ -41,8 +43,8 @@ namespace android {
             ) {
     }
 
-    GeoJSONSource::GeoJSONSource(mbgl::Map& map, mbgl::style::GeoJSONSource& coreSource)
-        : Source(map, coreSource) {
+    GeoJSONSource::GeoJSONSource(mbgl::style::GeoJSONSource& coreSource)
+        : Source(coreSource) {
     }
 
     GeoJSONSource::~GeoJSONSource() = default;
@@ -108,8 +110,8 @@ namespace android {
         using namespace mbgl::android::geojson;
 
         std::vector<mbgl::Feature> features;
-        if (map) {
-            features = map->querySourceFeatures(source.getID(), { {},  toFilter(env, jfilter) });
+        if (rendererFrontend) {
+            features = rendererFrontend->querySourceFeatures(source.getID(), { {},  toFilter(env, jfilter) });
         }
         return *convert<jni::Array<jni::Object<Feature>>, std::vector<mbgl::Feature>>(env, features);
     }

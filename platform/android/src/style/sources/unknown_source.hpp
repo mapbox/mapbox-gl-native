@@ -16,7 +16,7 @@ public:
 
     static void registerNative(jni::JNIEnv&);
 
-    UnknownSource(mbgl::Map&, mbgl::style::Source&);
+    UnknownSource(mbgl::style::Source&);
 
     ~UnknownSource() = default;
 

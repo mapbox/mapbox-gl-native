@@ -21,7 +21,7 @@ public:
 
     GeoJSONSource(jni::JNIEnv&, jni::String, jni::Object<>);
 
-    GeoJSONSource(mbgl::Map&, mbgl::style::GeoJSONSource&);
+    GeoJSONSource(mbgl::style::GeoJSONSource&);
 
     ~GeoJSONSource();
 
