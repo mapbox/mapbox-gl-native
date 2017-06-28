@@ -224,7 +224,6 @@ const std::size_t Vertex<A1, A2, A3, A4, A5>::attributeOffsets[5] = {
 } // namespace detail
 
 AttributeLocation bindAttributeLocation(ProgramID, AttributeLocation, const char * name);
-AttributeLocation locationToBindAttribute(std::set<std::string>&, std::string);
 std::set<std::string> getActiveAttributes(ProgramID);
 int32_t getActiveAttributeCount(ProgramID);
 

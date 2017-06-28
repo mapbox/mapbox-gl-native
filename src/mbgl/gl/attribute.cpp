@@ -13,15 +13,6 @@ AttributeLocation bindAttributeLocation(ProgramID id, AttributeLocation location
     return location;
 }
 
-AttributeLocation locationToBindAttribute(std::set<std::string>& set, std::string attributeName) {
-    auto it = set.find(attributeName);
-    if (it != set.end()) {
-        return std::distance(set.begin(), it);
-    } else {
-        return AttributeLocation(-1);
-    }
-}
-
 int32_t getActiveAttributeCount(ProgramID id) {
     GLint numAttributes;
     MBGL_CHECK_ERROR(glGetProgramiv(id, GL_ACTIVE_ATTRIBUTES, &numAttributes));
@@ -37,13 +28,13 @@ int32_t getMaxAttributeNameLength(ProgramID id) {
 std::string getAttributeName(ProgramID id, int32_t maxLength, AttributeLocation location) {
     std::string attributeName;
     attributeName.resize(maxLength);
-    GLsizei length;
+    GLsizei actualLength;
     GLint size;
     GLenum type;
     MBGL_CHECK_ERROR(glGetActiveAttrib(id, static_cast<GLuint>(location),
-                                       static_cast<GLsizei>(maxLength), &length, &size, &type,
+                                       static_cast<GLsizei>(maxLength), &actualLength, &size, &type,
                                        const_cast<char*>(attributeName.data())));
-    attributeName.resize(strlen(attributeName.c_str()));
+    attributeName.resize(actualLength);
     return attributeName;
 }
 
