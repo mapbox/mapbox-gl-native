@@ -41,8 +41,8 @@ public class CameraPositionActivity extends AppCompatActivity implements OnMapRe
   }
 
   @Override
-  public void onMapReady(@NonNull final MapboxMap mapboxMap) {
-    this.mapboxMap = mapboxMap;
+  public void onMapReady(@NonNull final MapboxMap map) {
+    mapboxMap = map;
 
     mapboxMap.setOnCameraIdleListener(new MapboxMap.OnCameraIdleListener() {
       @Override
