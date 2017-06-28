@@ -1,5 +1,6 @@
 #include "qmapboxgl.hpp"
 #include "qmapboxgl_p.hpp"
+#include "qmapboxgl_renderer_frontend_p.hpp"
 
 #include "qt_conversion.hpp"
 #include "qt_geojson.hpp"
@@ -17,6 +18,7 @@
 #include <mbgl/style/sources/geojson_source.hpp>
 #include <mbgl/style/transition_options.hpp>
 #include <mbgl/style/image.hpp>
+#include <mbgl/renderer/renderer.hpp>
 #include <mbgl/storage/network_status.hpp>
 #include <mbgl/util/color.hpp>
 #include <mbgl/util/constants.hpp>
@@ -1448,7 +1450,7 @@ void QMapboxGL::render()
     mbgl::BackendScope scope { *d_ptr, mbgl::BackendScope::ScopeType::Implicit };
 
     d_ptr->dirty = false;
-    d_ptr->mapObj->render(*d_ptr);
+    d_ptr->render();
 }
 
 /*!
@@ -1487,6 +1489,8 @@ void QMapboxGL::connectionEstablished()
     \a copyrightsHtml is a string with a HTML snippet.
 */
 
+class QMapboxGLRendererFrontend;
+
 QMapboxGLPrivate::QMapboxGLPrivate(QMapboxGL *q, const QMapboxGLSettings &settings, const QSize &size_, qreal pixelRatio)
     : QObject(q)
     , size(size_)
@@ -1497,11 +1501,18 @@ QMapboxGLPrivate::QMapboxGLPrivate(QMapboxGL *q, const QMapboxGLSettings &settin
         settings.cacheDatabaseMaximumSize()))
     , threadPool(mbgl::sharedThreadPool())
 {
+    // Setup and connect the renderer frontend
+    frontend = std::make_unique<QMapboxGLRendererFrontend>(
+            std::make_unique<mbgl::Renderer>(*this, pixelRatio, *fileSourceObj, *threadPool,
+                                             static_cast<mbgl::GLContextMode>(settings.contextMode())),
+            *this);
+    connect(frontend.get(), SIGNAL(updated()), this, SLOT(invalidate()));
+    
     mapObj = std::make_unique<mbgl::Map>(
-            *this, *this, sanitizedSize(size),
+            *frontend,
+            *this, sanitizedSize(size),
             pixelRatio, *fileSourceObj, *threadPool,
             mbgl::MapMode::Continuous,
-            static_cast<mbgl::GLContextMode>(settings.contextMode()),
             static_cast<mbgl::ConstrainMode>(settings.constrainMode()),
             static_cast<mbgl::ViewportMode>(settings.viewportMode()));
 
@@ -1539,6 +1550,11 @@ void QMapboxGLPrivate::invalidate()
         emit needsRendering();
         dirty = true;
     }
+}
+
+void QMapboxGLPrivate::render()
+{
+    frontend->render();
 }
 
 void QMapboxGLPrivate::onCameraWillChange(mbgl::MapObserver::CameraChangeMode mode)

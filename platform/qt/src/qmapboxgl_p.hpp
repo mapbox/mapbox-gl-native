@@ -1,6 +1,7 @@
 #pragma once
 
 #include "qmapboxgl.hpp"
+#include "qmapboxgl_renderer_frontend_p.hpp"
 
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/backend.hpp>
@@ -22,14 +23,17 @@ public:
 
     mbgl::Size framebufferSize() const;
 
+
     // mbgl::View implementation.
     void bind() final;
 
     // mbgl::Backend implementation.
     void updateAssumedState() final;
-    void invalidate() final;
     void activate() final {}
     void deactivate() final {}
+    mbgl::BackendScope::ScopeType getScopeType() const final {
+        return mbgl::BackendScope::ScopeType::Implicit;
+    }
 
     // mbgl::MapObserver implementation.
     void onCameraWillChange(mbgl::MapObserver::CameraChangeMode) final;
@@ -55,6 +59,7 @@ public:
     std::shared_ptr<mbgl::DefaultFileSource> fileSourceObj;
     std::shared_ptr<mbgl::ThreadPool> threadPool;
     std::unique_ptr<mbgl::Map> mapObj;
+    std::unique_ptr<QMapboxGLRendererFrontend> frontend;
 
     bool dirty { false };
 
@@ -63,6 +68,8 @@ private:
 
 public slots:
     void connectionEstablished();
+    void invalidate();
+    void render();
 
 signals:
     void needsRendering();
