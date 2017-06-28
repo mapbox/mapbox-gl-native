@@ -1,4 +1,5 @@
 #include "glfw_view.hpp"
+#include "glfw_renderer_frontend.hpp"
 #include "settings_json.hpp"
 
 #include <mbgl/util/default_styles.hpp>
@@ -7,6 +8,7 @@
 #include <mbgl/util/default_thread_pool.hpp>
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/style/style.hpp>
+#include <mbgl/renderer/renderer.hpp>
 
 #include <csignal>
 #include <getopt.h>
@@ -120,8 +122,8 @@ int main(int argc, char *argv[]) {
     }
 
     mbgl::ThreadPool threadPool(4);
-
-    mbgl::Map map(backend, backend, view->getSize(), view->getPixelRatio(), fileSource, threadPool);
+    GLFWRendererFrontend rendererFrontend { std::make_unique<mbgl::Renderer>(backend, view->getPixelRatio(), fileSource, threadPool), backend };
+    mbgl::Map map(rendererFrontend, backend, view->getSize(), view->getPixelRatio(), fileSource, threadPool);
 
     backend.setMap(&map);
 

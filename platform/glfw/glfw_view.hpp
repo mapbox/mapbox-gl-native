@@ -8,6 +8,7 @@
 #include <mbgl/util/geometry.hpp>
 
 struct GLFWwindow;
+class GLFWRendererFrontend;
 
 class GLFWView : public mbgl::View, public mbgl::Backend, public mbgl::MapObserver {
 public:
@@ -17,6 +18,8 @@ public:
     float getPixelRatio() const;
 
     void setMap(mbgl::Map*);
+    
+    void setRenderFrontend(GLFWRendererFrontend*);
 
     // Callback called when the user presses the key mapped to style change.
     // The expected action is to set a new style, different to the current one.
@@ -31,6 +34,8 @@ public:
     void setWindowTitle(const std::string&);
 
     void run();
+    
+    void invalidate();
 
     // mbgl::View implementation
     void bind() override;
@@ -38,7 +43,6 @@ public:
     mbgl::Size getFramebufferSize() const;
 
     // mbgl::Backend implementation
-    void invalidate() override;
     void updateAssumedState() override;
 
     // mbgl::MapObserver implementation
@@ -83,6 +87,7 @@ private:
     void toggle3DExtrusions(bool visible);
 
     mbgl::Map* map = nullptr;
+    GLFWRendererFrontend* rendererFrontend = nullptr;
 
     bool fullscreen = false;
     const bool benchmark = false;
