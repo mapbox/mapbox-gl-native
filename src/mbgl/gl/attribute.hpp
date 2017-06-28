@@ -249,13 +249,12 @@ public:
         std::set<std::string> activeAttributes = getActiveAttributes(id);
 
         AttributeLocation location = -1;
-        auto bindAndIncrement = [&](ProgramID id, AttributeLocation locationToBind, const char* name) {
+        auto bindAndIncrement = [&](const char* name) {
             location++;
-            return bindAttributeLocation(id, locationToBind, name);
+            return bindAttributeLocation(id, location, name);
         };
-        return Locations{ (activeAttributes.count(As::name())
-                               ? bindAndIncrement(id, location++, As::name())
-                               : -1)... };
+        return Locations{ (activeAttributes.count(As::name()) ? bindAndIncrement(As::name())
+                                                              : -1)... };
     }
 
     template <class Program>
@@ -269,7 +268,7 @@ public:
 
     template <class DrawMode>
     static Bindings bindings(const ProgramID& id, const VertexBuffer<Vertex, DrawMode>& buffer) {
-        std::size_t activeAttribs = static_cast<std::size_t>(getActiveAttributeCount(id));
+        auto activeAttribs = static_cast<std::size_t>(getActiveAttributeCount(id));
         return Bindings { As::Type::binding(buffer, Index<As> < activeAttribs ? Index<As> : -1)... };
     }
 
