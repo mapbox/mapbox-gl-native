@@ -532,20 +532,20 @@ public:
     _singleTapGestureRecognizer.delegate = self;
     [self addGestureRecognizer:_singleTapGestureRecognizer];
 
-    _twoFingerTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTwoFingerTapGesture:)];
-    _twoFingerTap.numberOfTouchesRequired = 2;
-    [_twoFingerTap requireGestureRecognizerToFail:_pinch];
-    [_twoFingerTap requireGestureRecognizerToFail:_rotate];
-    [self addGestureRecognizer:_twoFingerTap];
-
     _twoFingerDrag = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handleTwoFingerDragGesture:)];
     _twoFingerDrag.minimumNumberOfTouches = 2;
     _twoFingerDrag.maximumNumberOfTouches = 2;
     _twoFingerDrag.delegate = self;
-    [_twoFingerDrag requireGestureRecognizerToFail:_twoFingerTap];
     [_twoFingerDrag requireGestureRecognizerToFail:_pan];
     [self addGestureRecognizer:_twoFingerDrag];
     _pitchEnabled = YES;
+
+    _twoFingerTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTwoFingerTapGesture:)];
+    _twoFingerTap.numberOfTouchesRequired = 2;
+    [_twoFingerTap requireGestureRecognizerToFail:_pinch];
+    [_twoFingerTap requireGestureRecognizerToFail:_rotate];
+    [_twoFingerTap requireGestureRecognizerToFail:_twoFingerDrag];
+    [self addGestureRecognizer:_twoFingerTap];
 
     _decelerationRate = MGLMapViewDecelerationRateNormal;
 
@@ -1682,14 +1682,14 @@ public:
     if ( ! self.isPitchEnabled) return;
 
     _mbglMap->cancelTransitions();
-    MGLMapCamera *oldCamera = self.camera;
 
     if (twoFingerDrag.state == UIGestureRecognizerStateBegan)
     {
         [self trackGestureEvent:MGLEventGesturePitchStart forRecognizer:twoFingerDrag];
         [self notifyGestureDidBegin];
     }
-    else if (twoFingerDrag.state == UIGestureRecognizerStateBegan || twoFingerDrag.state == UIGestureRecognizerStateChanged)
+
+    if (twoFingerDrag.state == UIGestureRecognizerStateBegan || twoFingerDrag.state == UIGestureRecognizerStateChanged)
     {
         CGFloat gestureDistance = CGPoint([twoFingerDrag translationInView:twoFingerDrag.view]).y;
         CGFloat currentPitch = _mbglMap->getPitch();
@@ -1699,6 +1699,7 @@ public:
 
         CGPoint centerPoint = [self anchorPointForGesture:twoFingerDrag];
 
+        MGLMapCamera *oldCamera = self.camera;
         MGLMapCamera *toCamera = [self cameraByTiltingToPitch:pitchNew];
 
         if (![self.delegate respondsToSelector:@selector(mapView:shouldChangeFromCamera:toCamera:)] ||

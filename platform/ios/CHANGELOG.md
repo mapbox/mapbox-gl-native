@@ -46,6 +46,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * The Improve This Map button in the attribution action sheet now leads to a feedback tool that matches MGLMapView’s rotation and pitch. `-[MGLAttributionInfo feedbackURLAtCenterCoordinate:zoomLevel:]` no longer respects the feedback URL specified in TileJSON. ([#9078](https://github.com/mapbox/mapbox-gl-native/pull/9078))
 * `-[MGLMapViewDelegate mapView:shouldChangeFromCamera:toCamera:]` can now block any panning caused by a pinch gesture. ([#9344](https://github.com/mapbox/mapbox-gl-native/pull/9344))
 * If the user taps on the map while it is flying to the user’s location, the user dot no longer appears in the incorrect location. ([#7916](https://github.com/mapbox/mapbox-gl-native/pull/7916))
+* Improved the responsiveness of the tilt gesture by reducing the initial recognition delay. ([#9386](https://github.com/mapbox/mapbox-gl-native/pull/9386))
 
 ### Other changes
 
