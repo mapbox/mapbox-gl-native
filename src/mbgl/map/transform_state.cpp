@@ -358,7 +358,7 @@ void TransformState::setLatLngZoom(const LatLng& latLng, double zoom) {
         constrained = bounds->constrain(latLng);
     }
 
-    double newScale = zoomScale(zoom);
+    double newScale = util::clamp(zoomScale(zoom), min_scale, max_scale);
     const double newWorldSize = newScale * util::tileSize;
     Bc = newWorldSize / util::DEGREES_MAX;
     Cc = newWorldSize / util::M2PI;
