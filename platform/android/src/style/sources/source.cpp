@@ -26,11 +26,11 @@ namespace android {
         , source(*ownedSource) {
     }
 
-    Source::Source(mbgl::Map& coreMap, mbgl::style::Source& coreSource) : source(coreSource) , map(&coreMap) {
+    Source::Source(mbgl::style::Source& coreSource)
+            : source(coreSource) {
     }
 
-    Source::~Source() {
-    }
+    Source::~Source() = default;
 
     style::Source& Source::get() {
         return source;
@@ -57,9 +57,10 @@ namespace android {
 
         // Add source to map
         _map.getStyle().addSource(releaseCoreSource());
+    }
 
-        // Save pointer to the map
-        this->map = &_map;
+    void Source::setRendererFrontend(AndroidRendererFrontend& frontend_) {
+        rendererFrontend = &frontend_;
     }
 
     std::unique_ptr<mbgl::style::Source> Source::releaseCoreSource() {

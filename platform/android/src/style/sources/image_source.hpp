@@ -21,7 +21,7 @@ public:
 
     ImageSource(jni::JNIEnv&, jni::String, jni::Object<LatLngQuad>);
 
-    ImageSource(mbgl::Map&, mbgl::style::ImageSource&);
+    ImageSource(mbgl::style::ImageSource&);
 
     ~ImageSource();
 
