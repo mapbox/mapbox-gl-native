@@ -34,6 +34,8 @@ DebugBucket::DebugBucket(const OverscaledTileID& id,
             optional<Point<int16_t>> prev;
 
             const glyph& glyph = simplex[c - 32];
+            vertices.reserve(vertices.vertexSize() + (glyph.length / 2) + 1);
+            indices.reserve(indices.indexSize() + (glyph.length / 2) + 1);
             for (int32_t j = 0; j < glyph.length; j += 2) {
                 if (glyph.data[j] == -1 && glyph.data[j + 1] == -1) {
                     prev = {};

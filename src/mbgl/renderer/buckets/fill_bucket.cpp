@@ -61,6 +61,9 @@ void FillBucket::addFeature(const GeometryTileFeature& feature,
             if (nVertices == 0)
                 continue;
 
+            vertices.reserve(vertices.vertexSize() + nVertices);
+            lines.reserve(lines.indexSize() + nVertices);
+
             if (lineSegments.empty() || lineSegments.back().vertexLength + nVertices > std::numeric_limits<uint16_t>::max()) {
                 lineSegments.emplace_back(vertices.vertexSize(), lines.indexSize());
             }
@@ -94,6 +97,7 @@ void FillBucket::addFeature(const GeometryTileFeature& feature,
         assert(triangleSegment.vertexLength <= std::numeric_limits<uint16_t>::max());
         uint16_t triangleIndex = triangleSegment.vertexLength;
 
+        triangles.reserve(triangles.indexSize() + (nIndicies / 3) + 1);
         for (uint32_t i = 0; i < nIndicies; i += 3) {
             triangles.emplace_back(triangleIndex + indices[i],
                                    triangleIndex + indices[i + 1],

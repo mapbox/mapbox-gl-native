@@ -14,6 +14,10 @@ class IndexVector {
 public:
     static constexpr std::size_t groupSize = DrawMode::bufferGroupSize;
 
+    void reserve(std::size_t size) {
+        v.reserve(size);
+    }
+
     template <class... Args>
     void emplace_back(Args&&... args) {
         static_assert(sizeof...(args) == groupSize, "wrong buffer element count");

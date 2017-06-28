@@ -501,6 +501,8 @@ std::unique_ptr<SymbolBucket> SymbolLayout::place(CollisionTile& collisionTile) 
             const float placementZoom = util::max(util::log2(glyphScale) + zoom, 0.0f);
             collisionTile.insertFeature(symbolInstance.textCollisionFeature, glyphScale, layout.get<TextIgnorePlacement>());
             if (glyphScale < collisionTile.maxScale) {
+                bucket->text.vertices.reserve(bucket->text.vertices.vertexSize() + (symbolInstance.glyphQuads.size() * 4));
+                bucket->text.triangles.reserve(bucket->text.triangles.indexSize() + (symbolInstance.glyphQuads.size() * 2));
                 for (const auto& symbol : symbolInstance.glyphQuads) {
                     addSymbol(
                         bucket->text, *bucket->textSizeBinder, symbol, feature, placementZoom,
@@ -621,6 +623,8 @@ void SymbolLayout::addToDebugBuffers(CollisionTile& collisionTile, SymbolBucket&
 
     for (const SymbolInstance &symbolInstance : symbolInstances) {
         auto populateCollisionBox = [&](const auto& feature) {
+            collisionBox.vertices.reserve(collisionBox.vertices.vertexSize() + (feature.boxes.size() * 4));
+            collisionBox.lines.reserve(collisionBox.lines.indexSize() + (feature.boxes.size() * 4));
             for (const CollisionBox &box : feature.boxes) {
                 auto& anchor = box.anchor;
 
