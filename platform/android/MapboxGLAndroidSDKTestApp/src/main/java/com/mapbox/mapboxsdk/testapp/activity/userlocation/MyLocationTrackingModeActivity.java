@@ -236,8 +236,8 @@ public class MyLocationTrackingModeActivity extends AppCompatActivity implements
   @Override
   protected void onStop() {
     super.onStop();
-    LocationServices.FusedLocationApi.removeLocationUpdates(lostApiClient, this);
     if (lostApiClient.isConnected()) {
+      LocationServices.FusedLocationApi.removeLocationUpdates(lostApiClient, this);
       lostApiClient.unregisterConnectionCallbacks(this);
       lostApiClient.disconnect();
     }
