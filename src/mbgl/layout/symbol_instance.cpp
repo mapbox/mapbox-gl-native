@@ -16,9 +16,11 @@ SymbolInstance::SymbolInstance(Anchor& anchor_,
                                const float textBoxScale,
                                const float textPadding,
                                const SymbolPlacementType textPlacement,
+                               const std::array<float, 2> textOffset_,
                                const float iconBoxScale,
                                const float iconPadding,
                                const SymbolPlacementType iconPlacement,
+                               const std::array<float, 2> iconOffset_,
                                const GlyphPositionMap& positions,
                                const IndexedSubfeature& indexedFeature,
                                const std::size_t featureIndex_) :
@@ -31,7 +33,9 @@ SymbolInstance::SymbolInstance(Anchor& anchor_,
     // Create the collision features that will be used to check whether this symbol instance can be placed
     textCollisionFeature(line_, anchor, shapedTextOrientations.second ?: shapedTextOrientations.first, textBoxScale, textPadding, textPlacement, indexedFeature),
     iconCollisionFeature(line_, anchor, shapedIcon, iconBoxScale, iconPadding, iconPlacement, indexedFeature),
-    featureIndex(featureIndex_) {
+    featureIndex(featureIndex_),
+    textOffset(textOffset_),
+    iconOffset(iconOffset_) {
 
     // Create the quads used for rendering the icon and glyphs.
     if (addToBuffers) {

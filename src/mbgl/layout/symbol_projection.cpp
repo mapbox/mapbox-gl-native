@@ -62,7 +62,6 @@ namespace mbgl {
     }
 
     bool isVisible(const vec4& anchorPos, const float placementZoom, const std::array<double, 2>& clippingBuffer, const FrameHistory& frameHistory) {
-        if (true) return true;
         const float x = anchorPos[0] / anchorPos[3];
         const float y = anchorPos[1] / anchorPos[3];
         const bool inPaddedViewport = (
@@ -151,8 +150,8 @@ namespace mbgl {
     void placeGlyphsAlongLine(const PlacedSymbol& symbol, const float fontSize, const bool flip, const mat4& labelPlaneMatrix,
             gl::VertexVector<SymbolDynamicLayoutAttributes::Vertex>& dynamicVertexArray) {
         const float fontScale = fontSize / 24.0;
-        const float lineOffsetX = symbol.lineOffsetX * fontSize;
-        const float lineOffsetY = symbol.lineOffsetY * fontSize;
+        const float lineOffsetX = symbol.lineOffset[0] * fontSize;
+        const float lineOffsetY = symbol.lineOffset[1] * fontSize;
 
         const Point<float> anchorPoint = project(symbol.anchorPoint, labelPlaneMatrix);
 
@@ -177,7 +176,7 @@ namespace mbgl {
 
         const ZoomEvaluatedSize partiallyEvaluatedSize = sizeBinder.evaluateForZoom(state.getZoom());
 
-        const std::array<double, 2> clippingBuffer = {{ 256.0 / state.getSize().width * 2.0 + 1.0, 256.0 / state.getSize().height }};
+        const std::array<double, 2> clippingBuffer = {{ 256.0 / state.getSize().width * 2.0 + 1.0, 256.0 / state.getSize().height * 2.0 + 1.0 }};
 
         const mat4 labelPlaneMatrix = getLabelPlaneMatrix(posMatrix, values.pitchAlignment == style::AlignmentType::Map,
                 values.rotationAlignment == style::AlignmentType::Map, state, tile.id.pixelsToTileUnits(1, state.getZoom()));

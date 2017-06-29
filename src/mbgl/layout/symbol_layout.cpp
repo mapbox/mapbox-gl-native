@@ -305,6 +305,8 @@ void SymbolLayout::addFeature(const std::size_t index,
     
     const float layoutTextSize = layout.evaluate<TextSize>(zoom + 1, feature);
     const float layoutIconSize = layout.evaluate<IconSize>(zoom + 1, feature);
+    const std::array<float, 2> textOffset = layout.evaluate<TextOffset>(zoom, feature);
+    const std::array<float, 2> iconOffset = layout.evaluate<IconOffset>(zoom, feature);
     
     // To reduce the number of labels that jump around when zooming we need
     // to use a text-size value that is the same for all zoom levels.
@@ -354,8 +356,8 @@ void SymbolLayout::addFeature(const std::size_t index,
         symbolInstances.emplace_back(anchor, line, shapedTextOrientations, shapedIcon,
                 layout.evaluate(zoom, feature), layoutTextSize,
                 addToBuffers, symbolInstances.size(),
-                textBoxScale, textPadding, textPlacement,
-                iconBoxScale, iconPadding, iconPlacement,
+                textBoxScale, textPadding, textPlacement, textOffset,
+                iconBoxScale, iconPadding, iconPlacement, iconOffset,
                 glyphPositionMap, indexedFeature, index);
     };
     
@@ -502,7 +504,7 @@ std::unique_ptr<SymbolBucket> SymbolLayout::place(CollisionTile& collisionTile) 
             if (glyphScale < collisionTile.maxScale) {
                 const Range<float> sizeData = bucket->textSizeBinder->getVertexSizeData(feature);
                 PlacedSymbol placedSymbol(symbolInstance.anchor.point, symbolInstance.anchor.segment, sizeData.min, sizeData.max,
-                        0, 0, placementZoom, false, symbolInstance.line);
+                        symbolInstance.textOffset, placementZoom, false, symbolInstance.line);
                 for (const auto& symbol : symbolInstance.glyphQuads) {
                     addSymbol(
                         bucket->text, sizeData, symbol, placementZoom,
@@ -518,7 +520,7 @@ std::unique_ptr<SymbolBucket> SymbolLayout::place(CollisionTile& collisionTile) 
             if (iconScale < collisionTile.maxScale && symbolInstance.iconQuad) {
                 const Range<float> sizeData = bucket->iconSizeBinder->getVertexSizeData(feature);
                 PlacedSymbol placedSymbol(symbolInstance.anchor.point, symbolInstance.anchor.segment, sizeData.min, sizeData.max,
-                        0, 0, placementZoom, false, symbolInstance.line);
+                        symbolInstance.iconOffset, placementZoom, false, symbolInstance.line);
                 addSymbol(
                     bucket->icon, sizeData, *symbolInstance.iconQuad, placementZoom,
                     keepUpright, iconPlacement, collisionTile.config.angle, symbolInstance.writingModes, symbolInstance.anchor, placedSymbol);
@@ -580,10 +582,10 @@ void SymbolLayout::addSymbol(Buffer& buffer,
     uint16_t index = segment.vertexLength;
 
     // coordinates (2 triangles)
-    buffer.vertices.emplace_back(SymbolLayoutAttributes::vertex(labelAnchor.point, tl, tex.x, tex.y, sizeData));
-    buffer.vertices.emplace_back(SymbolLayoutAttributes::vertex(labelAnchor.point, tr, tex.x + tex.w, tex.y, sizeData));
-    buffer.vertices.emplace_back(SymbolLayoutAttributes::vertex(labelAnchor.point, bl, tex.x, tex.y + tex.h, sizeData));
-    buffer.vertices.emplace_back(SymbolLayoutAttributes::vertex(labelAnchor.point, br, tex.x + tex.w, tex.y + tex.h, sizeData));
+    buffer.vertices.emplace_back(SymbolLayoutAttributes::vertex(labelAnchor.point, tl, symbol.glyphOffset.y, tex.x, tex.y, sizeData));
+    buffer.vertices.emplace_back(SymbolLayoutAttributes::vertex(labelAnchor.point, tr, symbol.glyphOffset.y, tex.x + tex.w, tex.y, sizeData));
+    buffer.vertices.emplace_back(SymbolLayoutAttributes::vertex(labelAnchor.point, bl, symbol.glyphOffset.y, tex.x, tex.y + tex.h, sizeData));
+    buffer.vertices.emplace_back(SymbolLayoutAttributes::vertex(labelAnchor.point, br, symbol.glyphOffset.y, tex.x + tex.w, tex.y + tex.h, sizeData));
     
     auto dynamicVertex = SymbolDynamicLayoutAttributes::vertex(labelAnchor.point, 0, placementZoom);
     buffer.dynamicVertices.emplace_back(dynamicVertex);

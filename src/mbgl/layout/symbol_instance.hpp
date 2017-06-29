@@ -23,9 +23,11 @@ public:
                    const float textBoxScale,
                    const float textPadding,
                    style::SymbolPlacementType textPlacement,
+                   const std::array<float, 2> textOffset,
                    const float iconBoxScale,
                    const float iconPadding,
                    style::SymbolPlacementType iconPlacement,
+                   const std::array<float, 2> iconOffset,
                    const GlyphPositionMap&,
                    const IndexedSubfeature&,
                    const std::size_t featureIndex);
@@ -41,6 +43,8 @@ public:
     CollisionFeature iconCollisionFeature;
     WritingModeType writingModes;
     std::size_t featureIndex;
+    std::array<float, 2> textOffset;
+    std::array<float, 2> iconOffset;
 };
 
 } // namespace mbgl

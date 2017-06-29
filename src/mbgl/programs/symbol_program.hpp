@@ -50,6 +50,7 @@ struct SymbolLayoutAttributes : gl::Attributes<
 {
     static Vertex vertex(Point<float> labelAnchor,
                          Point<float> o,
+                         float glyphOffsetY,
                          uint16_t tx,
                          uint16_t ty,
                          const Range<float>& sizeData) {
@@ -59,7 +60,7 @@ struct SymbolLayoutAttributes : gl::Attributes<
                 static_cast<int16_t>(labelAnchor.x),
                 static_cast<int16_t>(labelAnchor.y),
                 static_cast<int16_t>(::round(o.x * 64)),  // use 1/64 pixels for placement
-                static_cast<int16_t>(::round(o.y * 64))
+                static_cast<int16_t>(::round((o.y + glyphOffsetY) * 64))
             }},
             {{
                 tx,
