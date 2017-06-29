@@ -14,6 +14,7 @@ extern NSString *const MGLEventTypeNavigationTurnstile;
 extern NSString *const MGLEventTypeNavigationDepart;
 extern NSString *const MGLEventTypeNavigationArrive;
 extern NSString *const MGLEventTypeNavigationCancel;
+extern NSString *const MGLEventTypeNavigationReroute;
 extern NSString *const MGLEventTypeNavigationFeedback;
 
 // Event keys

@@ -21,6 +21,7 @@ NSString *const MGLEventTypeNavigationTurnstile = @"navigation.turnstile";
 NSString *const MGLEventTypeNavigationDepart = @"navigation.depart";
 NSString *const MGLEventTypeNavigationArrive = @"navigation.arrive";
 NSString *const MGLEventTypeNavigationCancel = @"navigation.cancel";
+NSString *const MGLEventTypeNavigationReroute = @"navigation.reroute";
 NSString *const MGLEventTypeNavigationFeedback = @"navigation.feedback";
 
 // Gestures
@@ -150,9 +151,9 @@ const NSTimeInterval MGLFlushInterval = 180;
 }
 
 + (BOOL)isEnabled {
-#if TARGET_OS_SIMULATOR
-    return NO;
-#else
+//#if TARGET_OS_SIMULATOR
+//    return NO;
+//#else
     BOOL isLowPowerModeEnabled = NO;
     if ([NSProcessInfo instancesRespondToSelector:@selector(isLowPowerModeEnabled)]) {
         isLowPowerModeEnabled = [[NSProcessInfo processInfo] isLowPowerModeEnabled];
@@ -160,7 +161,7 @@ const NSTimeInterval MGLFlushInterval = 180;
     return ([[NSUserDefaults standardUserDefaults] boolForKey:@"MGLMapboxMetricsEnabled"] &&
             [[NSUserDefaults standardUserDefaults] integerForKey:@"MGLMapboxAccountType"] == 0 &&
             !isLowPowerModeEnabled);
-#endif
+//#endif
 }
 
 
@@ -432,11 +433,13 @@ const NSTimeInterval MGLFlushInterval = 180;
         return attributeDictionary;
     } else if ([event isEqualToString:MGLEventTypeNavigationDepart]) {
         return attributeDictionary;
-    }else if ([event isEqualToString:MGLEventTypeNavigationArrive]) {
+    } else if ([event isEqualToString:MGLEventTypeNavigationArrive]) {
         return attributeDictionary;
-    }else if ([event isEqualToString:MGLEventTypeNavigationCancel]) {
+    } else if ([event isEqualToString:MGLEventTypeNavigationCancel]) {
         return attributeDictionary;
-    }else if ([event isEqualToString:MGLEventTypeNavigationFeedback]) {
+    } else if ([event isEqualToString:MGLEventTypeNavigationReroute]) {
+        return attributeDictionary;
+    } else if ([event isEqualToString:MGLEventTypeNavigationFeedback]) {
         return attributeDictionary;
     }
     return nil;
