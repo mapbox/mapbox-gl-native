@@ -36,8 +36,14 @@ public final class UiSettings {
   private final FocalPointChangeListener focalPointChangeListener;
   private final Projection projection;
   private final CompassView compassView;
+  private final int[] compassMargins = new int[4];
+
   private final ImageView attributionsView;
+  private final int[] attributionsMargins = new int[4];
+
   private final View logoView;
+  private final int[] logoMargins = new int[4];
+
   private float pixelRatio;
 
   private boolean rotateGesturesEnabled = true;
@@ -368,7 +374,7 @@ public final class UiSettings {
    */
   @UiThread
   public void setCompassMargins(int left, int top, int right, int bottom) {
-    setWidgetMargins(compassView, left, top, right, bottom);
+    setWidgetMargins(compassView, compassMargins, left, top, right, bottom);
   }
 
   /**
@@ -377,7 +383,7 @@ public final class UiSettings {
    * @return The left margin in pixels
    */
   public int getCompassMarginLeft() {
-    return ((FrameLayout.LayoutParams) compassView.getLayoutParams()).leftMargin;
+    return compassMargins[0];
   }
 
   /**
@@ -386,7 +392,7 @@ public final class UiSettings {
    * @return The top margin in pixels
    */
   public int getCompassMarginTop() {
-    return ((FrameLayout.LayoutParams) compassView.getLayoutParams()).topMargin;
+    return compassMargins[1];
   }
 
   /**
@@ -395,7 +401,7 @@ public final class UiSettings {
    * @return The right margin in pixels
    */
   public int getCompassMarginRight() {
-    return ((FrameLayout.LayoutParams) compassView.getLayoutParams()).rightMargin;
+    return compassMargins[2];
   }
 
   /**
@@ -404,7 +410,7 @@ public final class UiSettings {
    * @return The bottom margin in pixels
    */
   public int getCompassMarginBottom() {
-    return ((FrameLayout.LayoutParams) compassView.getLayoutParams()).bottomMargin;
+    return compassMargins[3];
   }
 
   /**
@@ -478,7 +484,7 @@ public final class UiSettings {
    * @param bottom The bottom margin in pixels.
    */
   public void setLogoMargins(int left, int top, int right, int bottom) {
-    setWidgetMargins(logoView, left, top, right, bottom);
+    setWidgetMargins(logoView, logoMargins, left, top, right, bottom);
   }
 
   /**
@@ -487,7 +493,7 @@ public final class UiSettings {
    * @return The left margin in pixels
    */
   public int getLogoMarginLeft() {
-    return ((FrameLayout.LayoutParams) logoView.getLayoutParams()).leftMargin;
+    return logoMargins[0];
   }
 
   /**
@@ -496,7 +502,7 @@ public final class UiSettings {
    * @return The top margin in pixels
    */
   public int getLogoMarginTop() {
-    return ((FrameLayout.LayoutParams) logoView.getLayoutParams()).topMargin;
+    return logoMargins[1];
   }
 
   /**
@@ -505,7 +511,7 @@ public final class UiSettings {
    * @return The right margin in pixels
    */
   public int getLogoMarginRight() {
-    return ((FrameLayout.LayoutParams) logoView.getLayoutParams()).rightMargin;
+    return logoMargins[2];
   }
 
   /**
@@ -514,7 +520,7 @@ public final class UiSettings {
    * @return The bottom margin in pixels
    */
   public int getLogoMarginBottom() {
-    return ((FrameLayout.LayoutParams) logoView.getLayoutParams()).bottomMargin;
+    return logoMargins[3];
   }
 
   /**
@@ -568,7 +574,7 @@ public final class UiSettings {
    * @param bottom The bottom margin in pixels.
    */
   public void setAttributionMargins(int left, int top, int right, int bottom) {
-    setWidgetMargins(attributionsView, left, top, right, bottom);
+    setWidgetMargins(attributionsView, attributionsMargins, left, top, right, bottom);
   }
 
   /**
@@ -595,7 +601,7 @@ public final class UiSettings {
    * @return The left margin in pixels
    */
   public int getAttributionMarginLeft() {
-    return ((FrameLayout.LayoutParams) attributionsView.getLayoutParams()).leftMargin;
+    return attributionsMargins[0];
   }
 
   /**
@@ -604,7 +610,7 @@ public final class UiSettings {
    * @return The top margin in pixels
    */
   public int getAttributionMarginTop() {
-    return ((FrameLayout.LayoutParams) attributionsView.getLayoutParams()).topMargin;
+    return attributionsMargins[1];
   }
 
   /**
@@ -613,7 +619,7 @@ public final class UiSettings {
    * @return The right margin in pixels
    */
   public int getAttributionMarginRight() {
-    return ((FrameLayout.LayoutParams) attributionsView.getLayoutParams()).rightMargin;
+    return attributionsMargins[2];
   }
 
   /**
@@ -622,7 +628,7 @@ public final class UiSettings {
    * @return The bottom margin in pixels
    */
   public int getAttributionMarginBottom() {
-    return ((FrameLayout.LayoutParams) attributionsView.getLayoutParams()).bottomMargin;
+    return attributionsMargins[3];
   }
 
   /**
@@ -926,7 +932,14 @@ public final class UiSettings {
     view.setLayoutParams(layoutParams);
   }
 
-  private void setWidgetMargins(@NonNull final View view, int left, int top, int right, int bottom) {
+  private void setWidgetMargins(@NonNull final View view, int[] initMargins, int left, int top, int right, int bottom) {
+    // keep state of initially set margins
+    initMargins[0] = left;
+    initMargins[1] = top;
+    initMargins[2] = right;
+    initMargins[3] = bottom;
+
+    // convert inital margins with padding
     int[] contentPadding = projection.getContentPadding();
     FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) view.getLayoutParams();
     left += contentPadding[0];
