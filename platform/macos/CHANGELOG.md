@@ -33,6 +33,7 @@ This version of the Mapbox macOS SDK corresponds to version 3.6.0 of the Mapbox 
 ### User interaction
 
 * Fixed an issue causing the map to go blank during a flight animation that travels a very short distance. ([#9199](https://github.com/mapbox/mapbox-gl-native/pull/9199))
+* Fixed an issue causing the mouse cursor to jump after Shift- or Option-dragging the map. ([#9390](https://github.com/mapbox/mapbox-gl-native/pull/9390))
 * The Improve This Map button in the attribution action sheet now leads to a feedback tool that matches MGLMapView’s rotation and pitch. `-[MGLAttributionInfo feedbackURLAtCenterCoordinate:zoomLevel:]` no longer respects the feedback URL specified in TileJSON. ([#9078](https://github.com/mapbox/mapbox-gl-native/pull/9078))
 
 ### Other changes
