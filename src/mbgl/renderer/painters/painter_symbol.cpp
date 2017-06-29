@@ -131,8 +131,6 @@ void Painter::renderSymbol(PaintParameters& parameters,
         if (alongLine) {
             reprojectLineLabels(bucket, tile.matrix, true, values, tile, *(bucket.textSizeBinder), state, frameHistory);
             context.updateVertexBuffer(std::move(bucket.text.dynamicVertices), *bucket.text.dynamicVertexBuffer);
-        } else {
-            return;
         }
 
         const Size texsize = geometryTile.glyphAtlasTexture->size;
