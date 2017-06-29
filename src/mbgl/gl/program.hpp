@@ -143,9 +143,9 @@ public:
         }
     }
 
+private:
     UniqueProgram program;
 
-private:
     typename Uniforms::State uniformsState;
     typename Attributes::Locations attributeLocations;
 };

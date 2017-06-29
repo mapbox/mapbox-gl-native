@@ -266,9 +266,8 @@ public:
     }
 
     template <class DrawMode>
-    static Bindings bindings(const ProgramID& id, const VertexBuffer<Vertex, DrawMode>& buffer) {
-        auto activeAttribs = static_cast<std::size_t>(getActiveAttributeCount(id));
-        return Bindings { As::Type::binding(buffer, Index<As> < activeAttribs ? Index<As> : -1)... };
+    static Bindings bindings(const VertexBuffer<Vertex, DrawMode>& buffer) {
+        return Bindings { As::Type::binding(buffer, Index<As>)... };
     }
 
     static void bind(Context& context,

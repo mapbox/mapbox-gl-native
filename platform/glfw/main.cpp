@@ -127,18 +127,20 @@ int main(int argc, char *argv[]) {
 
     // Load settings
     mbgl::Settings_JSON settings;
+    
+    map.setLatLngZoom(mbgl::LatLng(37.7793, -122.4346), 13);
 
-    if (skipConfig) {
-        map.setLatLngZoom(mbgl::LatLng(latitude, longitude), zoom);
-        map.setBearing(bearing);
-        map.setPitch(pitch);
-        mbgl::Log::Info(mbgl::Event::General, "Location: %f/%f (z%.2f, %.2f deg)", latitude, longitude, zoom, bearing);
-    } else {
-        map.setLatLngZoom(mbgl::LatLng(settings.latitude, settings.longitude), settings.zoom);
-        map.setBearing(settings.bearing);
-        map.setPitch(settings.pitch);
-        map.setDebug(mbgl::MapDebugOptions(settings.debug));
-    }
+//    if (skipConfig) {
+//        map.setLatLngZoom(mbgl::LatLng(latitude, longitude), zoom);
+//        map.setBearing(bearing);
+//        map.setPitch(pitch);
+//        mbgl::Log::Info(mbgl::Event::General, "Location: %f/%f (z%.2f, %.2f deg)", latitude, longitude, zoom, bearing);
+//    } else {
+//        map.setLatLngZoom(mbgl::LatLng(settings.latitude, settings.longitude), settings.zoom);
+//        map.setBearing(settings.bearing);
+//        map.setPitch(settings.pitch);
+//        map.setDebug(mbgl::MapDebugOptions(settings.debug));
+//    }
 
     view->setChangeStyleCallback([&map] () {
         static uint8_t currentStyleIndex;
@@ -179,7 +181,9 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    map.getStyle().loadURL(style);
+//    map.getStyle().loadURL(style);
+    map.getStyle().loadURL("mapbox://styles/lbud/cj4eslslz0i5f2rnujz78o7kl");   // property fn
+//    map.getStyle().loadURL("mapbox://styles/lbud/cj4hpit4x2cbd2ro3kadm3l1b");   // constant
 
     view->run();
 
