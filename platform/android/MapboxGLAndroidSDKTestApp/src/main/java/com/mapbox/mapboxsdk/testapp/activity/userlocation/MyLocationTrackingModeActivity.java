@@ -38,8 +38,8 @@ import timber.log.Timber;
  * using gesture configurations.
  * </p>
  */
-public class MyLocationTrackingModeActivity extends AppCompatActivity implements
-  AdapterView.OnItemSelectedListener, OnMapReadyCallback, LostApiClient.ConnectionCallbacks, LocationListener {
+public class MyLocationTrackingModeActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener,
+  OnMapReadyCallback, LocationListener {
 
   // Testing for user defined LostApiClient
   private LostApiClient lostApiClient;
@@ -75,27 +75,18 @@ public class MyLocationTrackingModeActivity extends AppCompatActivity implements
   @Override
   public void onMapReady(MapboxMap mapboxMap) {
     MyLocationTrackingModeActivity.this.mapboxMap = mapboxMap;
-    lostApiClient = new LostApiClient.Builder(this).addConnectionCallbacks(this).build();
+    lostApiClient = new LostApiClient.Builder(this).build();
     lostApiClient.connect();
-  }
-
-  @Override
-  public void onConnected() {
     LocationRequest request = LocationRequest.create()
       .setPriority(LocationRequest.PRIORITY_LOW_POWER)
       .setInterval(5000)
       .setSmallestDisplacement(10);
 
-    Location location = LocationServices.FusedLocationApi.getLastLocation(lostApiClient);
+    Location location = LocationServices.FusedLocationApi.getLastLocation();
     if (location != null) {
       setInitialLocation(location, 15);
     }
-    LocationServices.FusedLocationApi.requestLocationUpdates(lostApiClient, request, this);
-  }
-
-  @Override
-  public void onConnectionSuspended() {
-
+    LocationServices.FusedLocationApi.requestLocationUpdates(request, this);
   }
 
   @Override
@@ -237,8 +228,7 @@ public class MyLocationTrackingModeActivity extends AppCompatActivity implements
   protected void onStop() {
     super.onStop();
     if (lostApiClient.isConnected()) {
-      LocationServices.FusedLocationApi.removeLocationUpdates(lostApiClient, this);
-      lostApiClient.unregisterConnectionCallbacks(this);
+      LocationServices.FusedLocationApi.removeLocationUpdates(this);
       lostApiClient.disconnect();
     }
     mapView.onStop();
