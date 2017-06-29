@@ -33,15 +33,17 @@ public:
         : program(
               context.createProgram(context.createShader(ShaderType::Vertex, vertexSource),
                                     context.createShader(ShaderType::Fragment, fragmentSource))),
-          attributeLocations(Attributes::bindLocations(program)),
-          uniformsState((context.linkProgram(program), Uniforms::bindLocations(program))) {
+          uniformsState((context.linkProgram(program), Uniforms::bindLocations(program))),
+          attributeLocations(Attributes::bindLocations(program)) {
+        // Re-link program after manually binding only active attributes in Attributes::bindLocations
+        context.linkProgram(program);
     }
 
     template <class BinaryProgram>
     Program(Context& context, const BinaryProgram& binaryProgram)
         : program(context.createProgram(binaryProgram.format(), binaryProgram.code())),
-          attributeLocations(Attributes::loadNamedLocations(binaryProgram)),
-          uniformsState(Uniforms::loadNamedLocations(binaryProgram)) {
+          uniformsState(Uniforms::loadNamedLocations(binaryProgram)),
+          attributeLocations(Attributes::loadNamedLocations(binaryProgram)) {
     }
     
     static Program createProgram(gl::Context& context,
@@ -144,8 +146,8 @@ public:
 private:
     UniqueProgram program;
 
-    typename Attributes::Locations attributeLocations;
     typename Uniforms::State uniformsState;
+    typename Attributes::Locations attributeLocations;
 };
 
 } // namespace gl

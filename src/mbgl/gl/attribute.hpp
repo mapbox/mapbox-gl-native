@@ -8,6 +8,7 @@
 
 #include <cstddef>
 #include <vector>
+#include <set>
 #include <functional>
 
 namespace mbgl {
@@ -223,6 +224,7 @@ const std::size_t Vertex<A1, A2, A3, A4, A5>::attributeOffsets[5] = {
 } // namespace detail
 
 AttributeLocation bindAttributeLocation(ProgramID, AttributeLocation, const char * name);
+std::set<std::string> getActiveAttributes(ProgramID);
 
 template <class... As>
 class Attributes {
@@ -242,7 +244,15 @@ public:
     static constexpr std::size_t Index = TypeIndex<A, As...>::value;
 
     static Locations bindLocations(const ProgramID& id) {
-        return Locations { bindAttributeLocation(id, Index<As>, As::name())... };
+        std::set<std::string> activeAttributes = getActiveAttributes(id);
+
+        AttributeLocation location = -1;
+        auto bindAndIncrement = [&](const char* name) {
+            location++;
+            return bindAttributeLocation(id, location, name);
+        };
+        return Locations{ (activeAttributes.count(As::name()) ? bindAndIncrement(As::name())
+                                                              : -1)... };
     }
 
     template <class Program>
