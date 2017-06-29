@@ -243,7 +243,12 @@ CATransform3D MGLTransform3DFromMatrix4(GLKMatrix4 matrix) {
         freeTransform.m34 = -1.0 / (1.0 - furthestDistance * 0.5);
         
         freeTransform = CATransform3DRotate(freeTransform, MGLRadiansFromDegrees(camera.pitch), -1.0, 0, 0);
-//        self.layer.anchorPoint = [self convertPoint:self.superview.center toView:self];
+        CGPoint anchorPoint = [self convertPoint:self.superview.center toView:self];
+        anchorPoint.x -= self.center.x;
+        anchorPoint.x /= CGRectGetWidth(self.bounds);
+        anchorPoint.y -= self.center.y;
+        anchorPoint.y /= CGRectGetHeight(self.bounds);
+        self.layer.anchorPoint = anchorPoint;
     }
 //    if (camera.heading >= 0 && (self.freeAxes & MGLAnnotationViewBillboardAxisY))
 //    {

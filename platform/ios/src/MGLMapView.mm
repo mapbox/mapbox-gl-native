@@ -5048,12 +5048,16 @@ public:
     // Add a bit extra to avoid precision problems when a fragment's distance is exactly `furthestDistance`.
     double farZ = furthestDistance * 1.01;
     
-    GLKMatrix4 projectionMatrix = GLKMatrix4MakePerspective(fov, CGRectGetWidth(self.bounds) / CGRectGetHeight(self.bounds), 1, farZ);
+//    GLKMatrix4 projectionMatrix = GLKMatrix4MakePerspective(fov, CGRectGetWidth(self.bounds) / CGRectGetHeight(self.bounds), 1, farZ);
+//    projectionMatrix = GLKMatrix4Translate(projectionMatrix, 0, 0, -cameraToCenterDistance);
+//    projectionMatrix = GLKMatrix4RotateX(projectionMatrix, camera.pitch);
 //    CATransform3D projectionTransform = MGLTransform3DFromMatrix4(projectionMatrix);
     
     CATransform3D projectionTransform = CATransform3DIdentity;
     projectionTransform.m34 = -1.0 / (1.0 - furthestDistance * 0.5);
+//    projectionTransform = CATransform3DTranslate(projectionTransform, 0, 0, -cameraToCenterDistance);
     projectionTransform = CATransform3DRotate(projectionTransform, MGLRadiansFromDegrees(camera.pitch), -1, 0, 0);
+//    projectionTransform = CATransform3DScale(projectionTransform, 1, 1, 1.0 / [self metersPerPointAtLatitude:camera.centerCoordinate.latitude]);
 //    self.annotationContainerView.layer.sublayerTransform = projectionTransform;
 
     // Update the center of visible annotation views
