@@ -86,13 +86,13 @@ void RenderStyle::update(const UpdateParameters& parameters) {
     const bool zoomChanged = zoomHistory.update(parameters.transformState.getZoom(), parameters.timePoint);
 
     const TransitionParameters transitionParameters {
-        parameters.mode == MapMode::Continuous ? parameters.timePoint : Clock::time_point::max(),
+        parameters.timePoint,
         parameters.mode == MapMode::Continuous ? parameters.transitionOptions : TransitionOptions()
     };
 
     const PropertyEvaluationParameters evaluationParameters {
         zoomHistory,
-        parameters.mode == MapMode::Continuous ? parameters.timePoint : Clock::time_point::max(),
+        parameters.timePoint,
         parameters.mode == MapMode::Continuous ? util::DEFAULT_TRANSITION_DURATION : Duration::zero()
     };
 
