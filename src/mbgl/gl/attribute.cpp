@@ -66,6 +66,7 @@ template <> DataType DataTypeOf<float>    = DataType::Float;
 
 template <class T, std::size_t N>
 void AttributeBinding<T, N>::bind(Context& context, AttributeLocation location, std::size_t vertexOffset) const {
+    if (location == -1) return;
     context.vertexBuffer = vertexBuffer;
     MBGL_CHECK_ERROR(glEnableVertexAttribArray(location));
     MBGL_CHECK_ERROR(glVertexAttribPointer(

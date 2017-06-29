@@ -225,7 +225,6 @@ const std::size_t Vertex<A1, A2, A3, A4, A5>::attributeOffsets[5] = {
 
 AttributeLocation bindAttributeLocation(ProgramID, AttributeLocation, const char * name);
 std::set<std::string> getActiveAttributes(ProgramID);
-int32_t getActiveAttributeCount(ProgramID);
 
 template <class... As>
 class Attributes {
