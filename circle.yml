@@ -19,27 +19,118 @@ workflows:
       - linux-gcc5-release-qt4
       - linux-gcc5-release-qt5
 
-jobs:
+step-library:
+  - &generate-cache-key
+      run:
+        name: Generate cache key
+        command: |
+          echo "$(date +"%Y-%V")" > .circle-week
+          ccache --clear
+          ccache --max-size=5G
+  - &restore-cache
+      restore_cache:
+        keys:
+          - 'v3/{{ .Environment.CIRCLE_JOB }}/{{ .Branch }}/{{ checksum ".circle-week" }}'
+          - 'v3/{{ .Environment.CIRCLE_JOB }}/master/{{ checksum ".circle-week" }}'
+  - &save-cache
+      save_cache:
+        key: 'v3/{{ .Environment.CIRCLE_JOB }}/{{ .Branch }}/{{ checksum ".circle-week" }}'
+        paths: [ "node_modules", "/root/.ccache", "mason_packages/.binaries" ]
 
+
+  - &reset-ccache-stats
+      run:
+        name: Clear ccache statistics
+        command: |
+          ccache --zero-stats
+          ccache --show-stats
+  - &show-ccache-stats
+      run:
+        name: Show ccache statistics
+        command: ccache --show-stats
+
+
+  - &setup-llvm-symbolizer
+      run:
+        name: Environment Setup
+        command: |
+          # LLVM has a hard check for "llvm-symbolizer" and doesn't support suffixed executables
+          ln -s /usr/bin/llvm-symbolizer-* /usr/bin/llvm-symbolizer
+          # We'll use tee to redirect stderr to a file so we can check for sanitiziation
+          # https://bugs.launchpad.net/ubuntu/+source/xorg-server/+bug/1059947
+          sed -i 's/"$@" 2>&1/"$@"/' /usr/bin/xvfb-run
+
+
+  - &build-node
+      run:
+        name: Build node
+        command: make node
+  - &build-linux
+      run:
+        name: Build linux
+        command: make linux
+  - &build-benchmark
+      run:
+        name: Build benchmark
+        command: make benchmark
+  - &build-test
+      run:
+        name: Build test
+        command: make test
+  - &build-qt-app
+      run:
+        name: Build qt-app
+        command: make qt-app
+  - &build-qt-test
+      run:
+        name: Build qt-test
+        command: make qt-test
+
+
+  - &run-node-tests
+      run:
+        name: Run node tests
+        command: |
+          xvfb-run --server-args="-screen 0 1024x768x24" \
+            logbt -- apitrace trace --api=egl -v make test-node
+  - &run-unit-tests
+      run:
+        name: Run tests
+        command: |
+          xvfb-run --server-args="-screen 0 1024x768x24" \
+            make run-test
+
+
+  - &publish-node-package
+      run:
+        name: Publish node package
+        when: on_success
+        command: platform/node/scripts/after_success.sh
+
+
+  - &upload-render-tests
+      store_artifacts:
+        path: mapbox-gl-js/test/integration/render-tests/index.html
+        destination: render-tests
+
+jobs:
 # ------------------------------------------------------------------------------
   clang-tidy:
     docker:
       - image: mbgl/ci:r4-linux-clang-3.9
     working_directory: /src
     environment:
-      LIBSYSCONFCPUS: 6
-      JOBS: 6
+      LIBSYSCONFCPUS: 4
+      JOBS: 4
       BUILDTYPE: Debug
     branches:
       ignore:
         - master
     steps:
       - checkout
-      - restore_cache:
-          key: v1-clang-tidy
-          paths:
-            - node_modules
-            - /root/.ccache
+      - *generate-cache-key
+      - *restore-cache
+      - *reset-ccache-stats
       - run:
           name: Fetch 'origin/master' branch
           command: git fetch origin master:refs/remotes/origin/master
@@ -49,28 +140,23 @@ jobs:
       - run:
           name: Run Clang checks
           command: make check
-      - save_cache:
-          key: v1-clang-tidy
-          paths:
-            - node_modules
-            - /root/.ccache
+      - *show-ccache-stats
+      - *save-cache
 
 # ------------------------------------------------------------------------------
   android-debug-arm-v7:
     docker:
-      - image: mbgl/ci:r4-android-ndk-r15-gradle
+      - image: mbgl/ci@sha256:c34e221294d81da80918d3e9a9df5de795b067e88f86d7c9a5e262763332536e
     working_directory: /src
     environment:
-      LIBSYSCONFCPUS: 6
-      JOBS: 6
+      LIBSYSCONFCPUS: 4
+      JOBS: 4
       BUILDTYPE: Debug
     steps:
       - checkout
-      - restore_cache:
-          key: v1-android-debug-arm-v7
-          paths:
-            - node_modules
-            - /root/.ccache
+      - *generate-cache-key
+      - *restore-cache
+      - *reset-ccache-stats
       - run:
           name: Build libmapbox-gl.so for arm-v7
           command: make android-lib-arm-v7
@@ -94,6 +180,8 @@ jobs:
           command: |
             echo "${MAPBOX_DEVELOPER_CONFIG_XML}" > platform/android/MapboxGLAndroidSDKTestApp/src/main/res/values/developer-config.xml
             make android-ui-test-arm-v7
+      - *show-ccache-stats
+      - *save-cache
       - run:
           name: Log in to Google Cloud Platform
           shell: /bin/bash -euo pipefail
@@ -122,11 +210,6 @@ jobs:
               xargs -0 -I '{}' ${ANDROID_NDK_HOME}/ndk-stack -sym build/android-arm-v7/Debug -dump {}
 
             exit ${EXIT_CODE:-0}
-      - save_cache:
-          key: v1-android-debug-arm-v7
-          paths:
-            - node_modules
-            - /root/.ccache
       - store_artifacts:
           path: platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk
           destination: .
@@ -134,19 +217,17 @@ jobs:
 # ------------------------------------------------------------------------------
   android-release-all:
     docker:
-      - image: mbgl/ci:r4-android-ndk-r15-gradle
+      - image: mbgl/ci@sha256:c34e221294d81da80918d3e9a9df5de795b067e88f86d7c9a5e262763332536e
     working_directory: /src
     environment:
-      LIBSYSCONFCPUS: 6
-      JOBS: 6
+      LIBSYSCONFCPUS: 4
+      JOBS: 4
       BUILDTYPE: Release
     steps:
       - checkout
-      - restore_cache:
-          key: v1-android-release-all
-          paths:
-            - node_modules
-            - /root/.ccache
+      - *generate-cache-key
+      - *restore-cache
+      - *reset-ccache-stats
       - run:
           name: Generate Maven credentials
           shell: /bin/bash -euo pipefail
@@ -160,6 +241,8 @@ jobs:
       - run:
           name: Build package
           command: make apackage
+      - *show-ccache-stats
+      - *save-cache
       - store_artifacts:
           path: platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk
           destination: .
@@ -172,11 +255,7 @@ jobs:
           name: Publish to Maven
           command: |
             if [ "${CIRCLE_BRANCH}" == "master" ]; then make run-android-upload-archives ; fi
-      - save_cache:
-          key: v1-android-release-all
-          paths:
-            - node_modules
-            - /root/.ccache
+
 
 # ------------------------------------------------------------------------------
   node4-clang39-release:
@@ -184,39 +263,23 @@ jobs:
       - image: mbgl/ci:r4-linux-clang-3.9-node-4
     working_directory: /src
     environment:
-      LIBSYSCONFCPUS: 6
-      JOBS: 6
+      LIBSYSCONFCPUS: 4
+      JOBS: 4
       BUILDTYPE: Release
       WITH_EGL: 1
       PACKAGE_JSON_VERSION: $(node -e "console.log(require('./package.json').version)")
       PUBLISH: $([[ "${CIRCLE_BRANCH}" == "node-v${PACKAGE_JSON_VERSION}" ]] && echo true)
     steps:
       - checkout
-      - restore_cache:
-          key: v1-node4-clang39-release
-          paths:
-            - node_modules
-            - /root/.ccache
-      - run:
-          name: Build node
-          command: make node
-      - run:
-          name: Run node tests
-          command: |
-            xvfb-run --server-args="-screen 0 1024x768x24" \
-              logbt -- apitrace trace --api=egl -v make test-node
-      - run:
-          name: Publish node package
-          when: on_success
-          command: platform/node/scripts/after_success.sh
-      - save_cache:
-          key: v1-node4-clang39-release
-          paths:
-            - node_modules
-            - /root/.ccache
-      - store_artifacts:
-          path: mapbox-gl-js/test/integration/render-tests/index.html
-          destination: render-tests
+      - *generate-cache-key
+      - *restore-cache
+      - *reset-ccache-stats
+      - *build-node
+      - *show-ccache-stats
+      - *run-node-tests
+      - *publish-node-package
+      - *save-cache
+      - *upload-render-tests
 
 # ------------------------------------------------------------------------------
   node6-clang39-release:
@@ -224,39 +287,23 @@ jobs:
       - image: mbgl/ci:r4-linux-clang-3.9
     working_directory: /src
     environment:
-      LIBSYSCONFCPUS: 6
-      JOBS: 6
+      LIBSYSCONFCPUS: 4
+      JOBS: 4
       BUILDTYPE: Release
       WITH_EGL: 1
       PACKAGE_JSON_VERSION: $(node -e "console.log(require('./package.json').version)")
       PUBLISH: $([[ "${CIRCLE_BRANCH}" == "node-v${PACKAGE_JSON_VERSION}" ]] && echo true)
     steps:
       - checkout
-      - restore_cache:
-          key: v1-node6-clang39-release
-          paths:
-            - node_modules
-            - /root/.ccache
-      - run:
-          name: Build node
-          command: make node
-      - run:
-          name: Run node tests
-          command: |
-            xvfb-run --server-args="-screen 0 1024x768x24" \
-              logbt -- apitrace trace --api=egl -v make test-node
-      - run:
-          name: Publish node package
-          when: on_success
-          command: platform/node/scripts/after_success.sh
-      - save_cache:
-          key: v1-node6-clang39-release
-          paths:
-            - node_modules
-            - /root/.ccache
-      - store_artifacts:
-          path: mapbox-gl-js/test/integration/render-tests/index.html
-          destination: render-tests
+      - *generate-cache-key
+      - *restore-cache
+      - *reset-ccache-stats
+      - *build-node
+      - *show-ccache-stats
+      - *run-node-tests
+      - *publish-node-package
+      - *save-cache
+      - *upload-render-tests
 
 # ------------------------------------------------------------------------------
   node6-clang39-debug:
@@ -264,39 +311,23 @@ jobs:
       - image: mbgl/ci:r4-linux-clang-3.9
     working_directory: /src
     environment:
-      LIBSYSCONFCPUS: 6
-      JOBS: 6
+      LIBSYSCONFCPUS: 4
+      JOBS: 4
       BUILDTYPE: Debug
       WITH_EGL: 1
       PACKAGE_JSON_VERSION: $(node -e "console.log(require('./package.json').version)")
       PUBLISH: $([[ "${CIRCLE_BRANCH}" == "node-v${PACKAGE_JSON_VERSION}" ]] && echo true)
     steps:
       - checkout
-      - restore_cache:
-          key: v1-node6-clang39-debug
-          paths:
-            - node_modules
-            - /root/.ccache
-      - run:
-          name: Build node
-          command: make node
-      - run:
-          name: Run node tests
-          command: |
-            xvfb-run --server-args="-screen 0 1024x768x24" \
-              logbt -- apitrace trace --api=egl -v make test-node
-      - run:
-          name: Publish node package
-          when: on_success
-          command: platform/node/scripts/after_success.sh
-      - save_cache:
-          key: v1-node6-clang39-debug
-          paths:
-            - node_modules
-            - /root/.ccache
-      - store_artifacts:
-          path: mapbox-gl-js/test/integration/render-tests/index.html
-          destination: render-tests
+      - *generate-cache-key
+      - *restore-cache
+      - *reset-ccache-stats
+      - *build-node
+      - *show-ccache-stats
+      - *run-node-tests
+      - *publish-node-package
+      - *save-cache
+      - *upload-render-tests
 
 # ------------------------------------------------------------------------------
   linux-clang39-debug:
@@ -304,37 +335,21 @@ jobs:
       - image: mbgl/ci:r4-linux-clang-3.9
     working_directory: /src
     environment:
-      LIBSYSCONFCPUS: 6
-      JOBS: 6
+      LIBSYSCONFCPUS: 4
+      JOBS: 4
       BUILDTYPE: Debug
       WITH_EGL: 1
     steps:
       - checkout
-      - restore_cache:
-          key: v1-linux-clang39-debug
-          paths:
-            - node_modules
-            - /root/.ccache
-      - run:
-          name: Build linux
-          command: make linux
-      - run:
-          name: Build benchmark
-          command: make benchmark
-      - run:
-          name: Build test
-          command: make test
-      - run:
-          name: Run tests
-          command: |
-            xvfb-run --server-args="-screen 0 1024x768x24" \
-              make run-test
-      - save_cache:
-          key: v1-linux-clang39-debug
-          paths:
-            - node_modules
-            - /root/.ccache
-
+      - *generate-cache-key
+      - *restore-cache
+      - *reset-ccache-stats
+      - *build-linux
+      - *build-benchmark
+      - *build-test
+      - *show-ccache-stats
+      - *run-unit-tests
+      - *save-cache
 
 # ------------------------------------------------------------------------------
   linux-clang4-sanitize-address:
@@ -342,44 +357,29 @@ jobs:
       - image: mbgl/ci:r4-linux-clang-4
     working_directory: /src
     environment:
-      LIBSYSCONFCPUS: 6
-      JOBS: 6
+      LIBSYSCONFCPUS: 4
+      JOBS: 4
       BUILDTYPE: Sanitize
       WITH_EGL: 1
       GDB: '' # Do not run with GDB
       CXXFLAGS: -fsanitize=address
       LDFLAGS: -fsanitize=address
-      ASAN_OPTIONS: detect_leaks=0:color=always
+      ASAN_OPTIONS: detect_leaks=0:color=always:print_summary=1
     steps:
       - checkout
-      - restore_cache:
-          key: v1-linux-clang4-sanitize-address
-          paths:
-            - node_modules
-            - /root/.ccache
-      - run:
-          name: Environment Setup
-          command: |
-            # LLVM has a hard check for "llvm-symbolizer" and doesn't support suffixed executables
-            ln -s /usr/bin/llvm-symbolizer-* /usr/bin/llvm-symbolizer
-            # We'll use tee to redirect stderr to a file so we can check for sanitiziation
-            # https://bugs.launchpad.net/ubuntu/+source/xorg-server/+bug/1059947
-            sed -i 's/"$@" 2>&1/"$@"/' /usr/bin/xvfb-run
-      - run:
-          name: Build test
-          command: make test
+      - *generate-cache-key
+      - *restore-cache
+      - *reset-ccache-stats
+      - *setup-llvm-symbolizer
+      - *build-test
+      - *show-ccache-stats
       - run:
           name: Run tests
           command: |
             xvfb-run --server-args="-screen 0 1024x768x24" make run-test 2> >(tee sanitizer 1>&2)
             # Unfortunately, Google Test eats the status code, so we'll have to check the output.
             [ -z "$(sed -n '/^SUMMARY: AddressSanitizer:/p' sanitizer)" ]
-      - save_cache:
-          key: v1-linux-clang4-sanitize-address
-          paths:
-            - node_modules
-            - /root/.ccache
-
+      - *save-cache
 
 # ------------------------------------------------------------------------------
   linux-clang4-sanitize-undefined:
@@ -387,46 +387,29 @@ jobs:
       - image: mbgl/ci:r4-linux-clang-4
     working_directory: /src
     environment:
-      LIBSYSCONFCPUS: 6
-      JOBS: 6
+      LIBSYSCONFCPUS: 4
+      JOBS: 4
       BUILDTYPE: Sanitize
       WITH_EGL: 1
       GDB: '' # Do not run with GDB
       CXXFLAGS: -fsanitize=undefined
       LDFLAGS: -fsanitize=undefined
-      UBSAN_OPTIONS: print_stacktrace=1:color=always
+      UBSAN_OPTIONS: print_stacktrace=1:color=always:print_summary=1
     steps:
       - checkout
-      - restore_cache:
-          key: v1-linux-clang4-sanitize-undefined
-          paths:
-            - node_modules
-            - /root/.ccache
-      - run:
-          name: Environment Setup
-          command: |
-            # LLVM has a hard check for "llvm-symbolizer" and doesn't support suffixed executables
-            ln -s /usr/bin/llvm-symbolizer-* /usr/bin/llvm-symbolizer
-            # We'll use tee to redirect stderr to a file so we can check for sanitiziation
-            # https://bugs.launchpad.net/ubuntu/+source/xorg-server/+bug/1059947
-            sed -i 's/"$@" 2>&1/"$@"/' /usr/bin/xvfb-run
-      - run:
-          name: Build test
-          command: make test
+      - *generate-cache-key
+      - *restore-cache
+      - *reset-ccache-stats
+      - *setup-llvm-symbolizer
+      - *build-test
+      - *show-ccache-stats
       - run:
           name: Run tests
           command: |
             xvfb-run --server-args="-screen 0 1024x768x24" make run-test 2> >(tee sanitizer 1>&2)
             # Unfortunately, Google Test eats the status code, so we'll have to check the output.
-            # Uncomment this once we've fixed all thread behavior to make new thread behavior
-            # fail on CircleCI.
-            # [ -z "$(sed -n '/^SUMMARY: UndefinedBehaviorSanitizer:/p' sanitizer)" ]
-      - save_cache:
-          key: v1-linux-clang4-sanitize-address-undefined
-          paths:
-            - node_modules
-            - /root/.ccache
-
+            [ -z "$(sed -n '/^SUMMARY: UndefinedBehaviorSanitizer:/p' sanitizer)" ]
+      - *save-cache
 
 # ------------------------------------------------------------------------------
   linux-clang4-sanitize-thread:
@@ -434,52 +417,37 @@ jobs:
       - image: mbgl/ci:r4-linux-clang-4
     working_directory: /src
     environment:
-      LIBSYSCONFCPUS: 6
-      JOBS: 6
+      LIBSYSCONFCPUS: 4
+      JOBS: 4
       BUILDTYPE: Sanitize
       WITH_EGL: 1
       GDB: '' # Do not run with GDB
       CXXFLAGS: -fsanitize=thread
       LDFLAGS: -fsanitize=thread
-      TSAN_OPTIONS: color=always
+      TSAN_OPTIONS: color=always:print_summary=1
     steps:
       - checkout
-      - restore_cache:
-          key: v1-linux-clang4-sanitize-thread
-          paths:
-            - node_modules
-            - /root/.ccache
-      - run:
-          name: Environment Setup
-          command: |
-            # LLVM has a hard check for "llvm-symbolizer" and doesn't support suffixed executables
-            ln -s /usr/bin/llvm-symbolizer-* /usr/bin/llvm-symbolizer
-            # We'll use tee to redirect stderr to a file so we can check for sanitiziation
-            # https://bugs.launchpad.net/ubuntu/+source/xorg-server/+bug/1059947
-            sed -i 's/"$@" 2>&1/"$@"/' /usr/bin/xvfb-run
-      - run:
-          name: Build test
-          command: make test
+      - *generate-cache-key
+      - *restore-cache
+      - *reset-ccache-stats
+      - *setup-llvm-symbolizer
+      - *build-test
+      - *show-ccache-stats
+      - *save-cache
       - run:
           name: Run tests
           command: |
             xvfb-run --server-args="-screen 0 1024x768x24" make run-test 2> >(tee sanitizer 1>&2)
             # Unfortunately, Google Test eats the status code, so we'll have to check the output.
             [ -z "$(sed -n '/^SUMMARY: ThreadSanitizer:/p' sanitizer)" ]
-      - save_cache:
-          key: v1-linux-clang4-sanitize-thread
-          paths:
-            - node_modules
-            - /root/.ccache
-
 
 # ------------------------------------------------------------------------------
   linux-gcc4.9-debug:
     docker:
-      - image: mbgl/ci:r3-linux-gcc-4.9
+      - image: mbgl/ci:r4-linux-gcc-4.9
     working_directory: /src
     environment:
-      LIBSYSCONFCPUS: 6
+      LIBSYSCONFCPUS: 4
       JOBS: 2
       BUILDTYPE: Debug
       WITH_EGL: 1
@@ -487,32 +455,15 @@ jobs:
       DISPLAY: :0
     steps:
       - checkout
-      - restore_cache:
-          key: v1-linux-gcc4.9-debug
-          paths:
-            - node_modules
-            - /root/.ccache
-      - run:
-          name: Build linux
-          command: make linux
-      - run:
-          name: Build benchmark
-          command: make benchmark
-      - run:
-          name: Build test
-          command: make test
-      - run:
-          name: Run tests
-          command: |
-            source scripts/circle_setup.sh
-            mapbox_export_mesa_library_path
-            xvfb-run --server-args="-screen 0 1024x768x24" \
-              make run-test
-      - save_cache:
-          key: v1-linux-gcc4.9-debug
-          paths:
-            - node_modules
-            - /root/.ccache
+      - *generate-cache-key
+      - *restore-cache
+      - *reset-ccache-stats
+      - *build-linux
+      - *build-benchmark
+      - *build-test
+      - *show-ccache-stats
+      - *save-cache
+      - *run-unit-tests
 
 # ------------------------------------------------------------------------------
   linux-gcc5-debug-coverage:
@@ -520,41 +471,25 @@ jobs:
       - image: mbgl/ci:r4-linux-gcc-5
     working_directory: /src
     environment:
-      LIBSYSCONFCPUS: 6
+      LIBSYSCONFCPUS: 4
       JOBS: 2
       BUILDTYPE: Debug
       WITH_EGL: 1
       WITH_COVERAGE: 1
     steps:
       - checkout
-      - restore_cache:
-          key: v1-linux-gcc5-debug-coverage
-          paths:
-            - node_modules
-            - /root/.ccache
-      - run:
-          name: Build linux
-          command: make linux
-      - run:
-          name: Build benchmark
-          command: make benchmark
-      - run:
-          name: Build test
-          command: make test
-      - run:
-          name: Run tests
-          command: |
-            xvfb-run --server-args="-screen 0 1024x768x24" \
-              make run-test
+      - *generate-cache-key
+      - *restore-cache
+      - *reset-ccache-stats
+      - *build-linux
+      - *build-benchmark
+      - *build-test
+      - *run-unit-tests
       - run:
           name: Upload coverage results to coveralls
           command: |
             platform/linux/scripts/coveralls.sh
-      - save_cache:
-          key: v1-linux-gcc5-debug-coverage
-          paths:
-            - node_modules
-            - /root/.ccache
+      - *save-cache
 
 # ------------------------------------------------------------------------------
   linux-gcc5-release-qt4:
@@ -562,36 +497,26 @@ jobs:
       - image: mbgl/ci:r4-linux-gcc-5-qt-4
     working_directory: /src
     environment:
-      LIBSYSCONFCPUS: 6
+      LIBSYSCONFCPUS: 4
       JOBS: 2 # OOM, causing the compiler to crash.
       BUILDTYPE: Release
       GTEST_OUTPUT: xml
       LD_PRELOAD: /usr/lib/x86_64-linux-gnu/libjemalloc.so
-      DISPLAY: 0
     steps:
       - checkout
-      - restore_cache:
-          key: v1-linux-gcc5-release-qt4
-          paths:
-            - node_modules
-            - /root/.ccache
-      - run:
-          name: Build qt-app
-          command: make qt-app
-      - run:
-          name: Build qt-test
-          command: make qt-test
+      - *generate-cache-key
+      - *restore-cache
+      - *reset-ccache-stats
+      - *build-qt-app
+      - *build-qt-test
+      - *show-ccache-stats
       - run:
           name: Run memory-load tests
           command: |
             xvfb-run --server-args="-screen 0 1024x768x24" \
               make run-qt-test-Memory.*:*.Load
             scripts/log_memory_benchmarks.sh test_detail.xml "Platform=Linux,Compiler=${_CC},Arch=$(uname -m)"
-      - save_cache:
-          key: v1-linux-gcc5-release-qt4
-          paths:
-            - node_modules
-            - /root/.ccache
+      - *save-cache
 
 # ------------------------------------------------------------------------------
   linux-gcc5-release-qt5:
@@ -599,27 +524,21 @@ jobs:
       - image: mbgl/ci:r4-linux-gcc-5-qt-5
     working_directory: /src
     environment:
-      LIBSYSCONFCPUS: 6
+      LIBSYSCONFCPUS: 4
       JOBS: 2 # OOM, causing the compiler to crash.
       BUILDTYPE: Release
       WITH_QT_I18N: 1
-      DISPLAY: 0
     steps:
       - checkout
-      - restore_cache:
-          key: v1-linux-gcc5-release-qt5
-          paths:
-            - node_modules
-            - /root/.ccache
-      - run:
-          name: Build qt-app
-          command: make qt-app
-      - run:
-          name: Build qt-test
-          command: make qt-test
+      - *generate-cache-key
+      - *restore-cache
+      - *reset-ccache-stats
+      - *build-qt-app
+      - *build-qt-test
       - run:
           name: Build qt-docs
           command: make qt-docs
+      - *show-ccache-stats
       - run:
           name: Run valgrind-backed tests
           environment:
@@ -627,8 +546,4 @@ jobs:
           command: |
             xvfb-run --server-args="-screen 0 1024x768x24" \
               scripts/valgrind.sh build/qt-linux-x86_64/Release/mbgl-test --gtest_filter=-*.Load --gtest_filter=-Memory.Vector
-      - save_cache:
-          key: v1-linux-gcc5-release-qt5
-          paths:
-            - node_modules
-            - /root/.ccache
+      - *save-cache
