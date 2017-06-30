@@ -38,11 +38,11 @@ public:
 
     void startRender(Painter&);
 
-private:
     mat4 translateVtxMatrix(const mat4& tileMatrix,
                             const std::array<float, 2>& translation,
                             style::TranslateAnchorType anchor,
-                            const TransformState& state) const;
+                            const TransformState& state,
+                            const bool inViewportPixelUnits) const;
 };
 
 } // namespace mbgl

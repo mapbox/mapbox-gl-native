@@ -2,6 +2,7 @@
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/map/transform_state.hpp>
 #include <mbgl/tile/tile.hpp>
+#include <mbgl/util/math.hpp>
 
 namespace mbgl {
 
@@ -10,24 +11,26 @@ using namespace style;
 mat4 RenderTile::translateVtxMatrix(const mat4& tileMatrix,
                                     const std::array<float, 2>& translation,
                                     TranslateAnchorType anchor,
-                                    const TransformState& state) const {
+                                    const TransformState& state,
+                                    const bool inViewportPixelUnits) const {
     if (translation[0] == 0 && translation[1] == 0) {
         return tileMatrix;
     }
 
     mat4 vtxMatrix;
 
-    if (anchor == TranslateAnchorType::Viewport) {
-        const double sin_a = std::sin(-state.getAngle());
-        const double cos_a = std::cos(-state.getAngle());
-        matrix::translate(vtxMatrix, tileMatrix,
-                          id.pixelsToTileUnits(translation[0] * cos_a - translation[1] * sin_a, state.getZoom()),
-                          id.pixelsToTileUnits(translation[0] * sin_a + translation[1] * cos_a, state.getZoom()),
-                          0);
+    const float angle = inViewportPixelUnits ?
+        (anchor == TranslateAnchorType::Map ? state.getAngle() : 0) :
+        (anchor == TranslateAnchorType::Viewport ? -state.getAngle() : 0);
+
+    Point<float> translate = util::rotate(Point<float>{ translation[0], translation[1] }, angle);
+
+    if (inViewportPixelUnits) {
+        matrix::translate(vtxMatrix, tileMatrix, translate.x, translate.y, 0);
     } else {
         matrix::translate(vtxMatrix, tileMatrix,
-                          id.pixelsToTileUnits(translation[0], state.getZoom()),
-                          id.pixelsToTileUnits(translation[1], state.getZoom()),
+                          id.pixelsToTileUnits(translate.x, state.getZoom()),
+                          id.pixelsToTileUnits(translate.y, state.getZoom()),
                           0);
     }
 
@@ -37,13 +40,13 @@ mat4 RenderTile::translateVtxMatrix(const mat4& tileMatrix,
 mat4 RenderTile::translatedMatrix(const std::array<float, 2>& translation,
                                   TranslateAnchorType anchor,
                                   const TransformState& state) const {
-    return translateVtxMatrix(matrix, translation, anchor, state);
+    return translateVtxMatrix(matrix, translation, anchor, state, false);
 }
 
 mat4 RenderTile::translatedClipMatrix(const std::array<float, 2>& translation,
                                       TranslateAnchorType anchor,
                                       const TransformState& state) const {
-    return translateVtxMatrix(nearClippedMatrix, translation, anchor, state);
+    return translateVtxMatrix(nearClippedMatrix, translation, anchor, state, false);
 }
 
 void RenderTile::startRender(Painter& painter) {
