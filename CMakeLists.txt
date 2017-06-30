@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.4)
 project(mbgl LANGUAGES CXX C)
 set(CMAKE_CXX_STANDARD 14)
 
@@ -84,6 +84,34 @@ if(CMAKE_CXX_COMPILER_ID MATCHES ".*Clang")
 elseif(CMAKE_COMPILER_IS_GNUCXX)
     # https://svn.boost.org/trac/boost/ticket/9240
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fext-numeric-literals")
+endif()
+
+# Technique from https://crascit.com/2016/04/09/using-ccache-with-cmake/
+find_program(CCACHE_PROGRAM ccache)
+if(CCACHE_PROGRAM)
+    set(C_LAUNCHER   "${CCACHE_PROGRAM}")
+    set(CXX_LAUNCHER "${CCACHE_PROGRAM}")
+    configure_file(scripts/launch-c.in   launch-c)
+    configure_file(scripts/launch-cxx.in launch-cxx)
+    execute_process(COMMAND chmod a+rx "${CMAKE_BINARY_DIR}/launch-c" "${CMAKE_BINARY_DIR}/launch-cxx")
+
+    if(CMAKE_GENERATOR STREQUAL "Xcode")
+        # Set Xcode project attributes to route compilation and linking through our scripts
+        set(CMAKE_XCODE_ATTRIBUTE_CC         "${CMAKE_BINARY_DIR}/launch-c")
+        set(CMAKE_XCODE_ATTRIBUTE_CXX        "${CMAKE_BINARY_DIR}/launch-cxx")
+        set(CMAKE_XCODE_ATTRIBUTE_LD         "${CMAKE_BINARY_DIR}/launch-c")
+        set(CMAKE_XCODE_ATTRIBUTE_LDPLUSPLUS "${CMAKE_BINARY_DIR}/launch-cxx")
+    else()
+        # Support Unix Makefiles and Ninja
+        set(CMAKE_C_COMPILER_LAUNCHER        "${CMAKE_BINARY_DIR}/launch-c")
+        set(CMAKE_CXX_COMPILER_LAUNCHER      "${CMAKE_BINARY_DIR}/launch-cxx")
+    endif()
+
+    if(CMAKE_CXX_COMPILER_ID MATCHES ".*Clang")
+        # ccache splits up the compile steps, so we end up with unused arguments in some steps.
+        # Clang also thinks that ccache isn't interactive, so we explicitly need to enable color.
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Qunused-arguments -fcolor-diagnostics")
+    endif()
 endif()
 
 if(NOT EXISTS ${CMAKE_SOURCE_DIR}/platform/${MBGL_PLATFORM}/config.cmake)
