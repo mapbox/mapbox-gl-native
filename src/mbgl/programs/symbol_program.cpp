@@ -50,6 +50,8 @@ Values makeValues(const bool isText,
     }
 
     const float pixelsToTileUnits = tile.id.pixelsToTileUnits(1.0, state.getZoom());
+    const bool pitchWithMap = values.pitchAlignment == style::AlignmentType::Map;
+    const bool rotateWithMap = values.rotationAlignment == style::AlignmentType::Map;
 
     mat4 labelPlaneMatrix;
     if (alongLine) {
@@ -57,10 +59,10 @@ Values makeValues(const bool isText,
         // Pass an identity matrix because no transformation needs to be done in the vertex shader.
         matrix::identity(labelPlaneMatrix);
     } else {
-        labelPlaneMatrix = getLabelPlaneMatrix(tile.matrix, true, true, state, pixelsToTileUnits);
+        labelPlaneMatrix = getLabelPlaneMatrix(tile.matrix, pitchWithMap, rotateWithMap, state, pixelsToTileUnits);
     }
 
-    mat4 glCoordMatrix = getGlCoordMatrix(tile.matrix, true, true, state, pixelsToTileUnits);
+    mat4 glCoordMatrix = getGlCoordMatrix(tile.matrix, pitchWithMap, rotateWithMap, state, pixelsToTileUnits);
         
     return Values {
         uniforms::u_matrix::Value{ tile.translatedMatrix(values.translate,
@@ -113,8 +115,8 @@ typename SymbolSDFProgram<PaintProperties>::UniformValues SymbolSDFProgram<Paint
       const SymbolSDFPart part)
 {
     const float gammaScale = (values.pitchAlignment == AlignmentType::Map
-                              ? std::cos(state.getPitch())
-                              : 1.0) * state.getCameraToCenterDistance();
+                              ? std::cos(state.getPitch()) * state.getCameraToCenterDistance()
+                              : 1.0);
     
     return makeValues<SymbolSDFProgram<PaintProperties>::UniformValues>(
         isText,

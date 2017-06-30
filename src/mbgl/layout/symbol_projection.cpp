@@ -18,7 +18,7 @@ namespace mbgl {
                 matrix::rotate_z(m, m, state.getAngle());
             }
         } else {
-            matrix::scale(m, m, state.getSize().width / 2.0, -state.getSize().height / 2.0, 1.0);
+            matrix::scale(m, m, state.getSize().width / 2.0, -static_cast<float>(state.getSize().height) / 2.0, 1.0);
             matrix::translate(m, m, 1, -1, 0);
             matrix::multiply(m, m, posMatrix);
         }
