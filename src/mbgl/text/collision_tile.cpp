@@ -34,7 +34,7 @@ CollisionTile::CollisionTile(PlacementConfig config_) : config(std::move(config_
 }
 
 
-float CollisionTile::findPlacementScale(const Point<float>& anchor, const CollisionBox& box, const Point<float>& blockingAnchor, const CollisionBox& blocking) {
+float CollisionTile::findPlacementScale(const Point<float>& anchor, const CollisionBox& box, const float boxMaxScale, const Point<float>& blockingAnchor, const CollisionBox& blocking) {
     float minPlacementScale = minScale;
 
     // Find the lowest scale at which the two boxes can fit side by side without overlapping.
@@ -55,10 +55,10 @@ float CollisionTile::findPlacementScale(const Point<float>& anchor, const Collis
         collisionFreeScale = blocking.maxScale;
     }
 
-    if (collisionFreeScale > box.maxScale) {
+    if (collisionFreeScale > boxMaxScale) {
         // If the box can only be shown after it is visible, then the box can never be shown.
         // But the label can be shown after this box is not visible.
-        collisionFreeScale = box.maxScale;
+        collisionFreeScale = boxMaxScale;
     }
 
     if (collisionFreeScale > minPlacementScale &&
@@ -77,13 +77,13 @@ float CollisionTile::placeFeature(const CollisionFeature& feature, bool allowOve
     static const float infinity = std::numeric_limits<float>::infinity();
     static const std::array<CollisionBox, 4> edges {{
         // left
-        CollisionBox(Point<float>(0, 0), 0, -infinity, 0, infinity, infinity),
+        CollisionBox(Point<float>(0, 0), { 0, 0 }, 0, -infinity, 0, infinity, infinity),
         // right
-        CollisionBox(Point<float>(util::EXTENT, 0), 0, -infinity, 0, infinity, infinity),
+        CollisionBox(Point<float>(util::EXTENT, 0), { 0, 0 }, 0, -infinity, 0, infinity, infinity),
         // top
-        CollisionBox(Point<float>(0, 0), -infinity, 0, infinity, 0, infinity),
+        CollisionBox(Point<float>(0, 0), { 0, 0 }, -infinity, 0, infinity, 0, infinity),
         // bottom
-        CollisionBox(Point<float>(0, util::EXTENT), -infinity, 0, infinity, 0, infinity)
+        CollisionBox(Point<float>(0, util::EXTENT), { 0, 0 }, -infinity, 0, infinity, 0, infinity)
     }};
 
     float minPlacementScale = minScale;
@@ -91,12 +91,14 @@ float CollisionTile::placeFeature(const CollisionFeature& feature, bool allowOve
     for (auto& box : feature.boxes) {
         const auto anchor = util::matrixMultiply(rotationMatrix, box.anchor);
 
+        const float boxMaxScale = box.adjustedMaxScale(rotationMatrix, yStretch);
+
         if (!allowOverlap) {
             for (auto it = tree.qbegin(bgi::intersects(getTreeBox(anchor, box))); it != tree.qend(); ++it) {
                 const CollisionBox& blocking = std::get<1>(*it);
                 Point<float> blockingAnchor = util::matrixMultiply(rotationMatrix, blocking.anchor);
 
-                minPlacementScale = util::max(minPlacementScale, findPlacementScale(anchor, box, blockingAnchor, blocking));
+                minPlacementScale = util::max(minPlacementScale, findPlacementScale(anchor, box, boxMaxScale, blockingAnchor, blocking));
                 if (minPlacementScale >= maxScale) return minPlacementScale;
             }
         }
@@ -107,14 +109,15 @@ float CollisionTile::placeFeature(const CollisionFeature& feature, bool allowOve
             const Point<float> rbl = util::matrixMultiply(reverseRotationMatrix, { box.x1, box.y2 });
             const Point<float> rbr = util::matrixMultiply(reverseRotationMatrix, { box.x2, box.y2 });
             CollisionBox rotatedBox(box.anchor,
+                    box.offset,
                     util::min(rtl.x, rtr.x, rbl.x, rbr.x),
                     util::min(rtl.y, rtr.y, rbl.y, rbr.y),
                     util::max(rtl.x, rtr.x, rbl.x, rbr.x),
                     util::max(rtl.y, rtr.y, rbl.y, rbr.y),
-                    box.maxScale);
+                    boxMaxScale);
 
             for (auto& blocking : edges) {
-                minPlacementScale = util::max(minPlacementScale, findPlacementScale(box.anchor, rotatedBox, blocking.anchor, blocking));
+                minPlacementScale = util::max(minPlacementScale, findPlacementScale(box.anchor, rotatedBox, boxMaxScale, blocking.anchor, blocking));
                 if (minPlacementScale >= maxScale) return minPlacementScale;
             }
         }
@@ -131,7 +134,9 @@ void CollisionTile::insertFeature(CollisionFeature& feature, float minPlacementS
     if (minPlacementScale < maxScale) {
         std::vector<CollisionTreeBox> treeBoxes;
         for (auto& box : feature.boxes) {
-            treeBoxes.emplace_back(getTreeBox(util::matrixMultiply(rotationMatrix, box.anchor), box), box, feature.indexedFeature);
+            CollisionBox adjustedBox = box;
+            box.maxScale = box.adjustedMaxScale(rotationMatrix, yStretch);
+            treeBoxes.emplace_back(getTreeBox(util::matrixMultiply(rotationMatrix, box.anchor), box), std::move(adjustedBox), feature.indexedFeature);
         }
         if (ignorePlacement) {
             ignoredTree.insert(treeBoxes.begin(), treeBoxes.end());
@@ -215,7 +220,7 @@ std::vector<IndexedSubfeature> CollisionTile::queryRenderedSymbols(const Geometr
     // Check if feature is rendered (collision free) at current scale.
     auto visibleAtScale = [&] (const CollisionTreeBox& treeBox) -> bool {
         const CollisionBox& box = std::get<1>(treeBox);
-        return roundedScale >= box.placementScale && roundedScale <= box.maxScale;
+        return roundedScale >= box.placementScale && roundedScale <= box.adjustedMaxScale(rotationMatrix, yStretch);
     };
 
     // Check if query polygon intersects with the feature box at current scale.

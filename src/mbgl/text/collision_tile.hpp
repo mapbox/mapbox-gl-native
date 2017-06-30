@@ -56,7 +56,7 @@ public:
 
 private:
     float findPlacementScale(
-            const Point<float>& anchor, const CollisionBox& box,
+            const Point<float>& anchor, const CollisionBox& box, const float boxMaxScale,
             const Point<float>& blockingAnchor, const CollisionBox& blocking);
     Box getTreeBox(const Point<float>& anchor, const CollisionBox& box, const float scale = 1.0);
 
