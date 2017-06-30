@@ -6,7 +6,9 @@ dependencies {
     compile rootProject.ext.dep.supportDesign
     compile rootProject.ext.dep.timber
     compile rootProject.ext.dep.okhttp3
-    compile rootProject.ext.dep.lost
+    compile(rootProject.ext.dep.lost) {
+        exclude group: 'com.google.guava'
+    }
 
     // Mapbox Android Services (GeoJSON support)
     compile(rootProject.ext.dep.mapboxJavaGeoJSON) {
