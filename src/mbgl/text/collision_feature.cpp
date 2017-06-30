@@ -42,7 +42,7 @@ CollisionFeature::CollisionFeature(const GeometryCoordinates& line,
             bboxifyLabel(line, anchorPoint, anchor.segment, length, height);
         }
     } else {
-        boxes.emplace_back(anchor.point, x1, y1, x2, y2, std::numeric_limits<float>::infinity());
+        boxes.emplace_back(anchor.point, Point<float>{ 0, 0 }, x1, y1, x2, y2, std::numeric_limits<float>::infinity());
     }
 }
 
@@ -50,10 +50,10 @@ void CollisionFeature::bboxifyLabel(const GeometryCoordinates& line, GeometryCoo
                                     const int segment, const float labelLength, const float boxSize) {
     const float step = boxSize / 2;
     const int nBoxes = std::floor(labelLength / step);
-    // We calculate line collision boxes out to 150% of what would normally be our
+    // We calculate line collision boxes out to 300% of what would normally be our
     // max size, to allow collision detection to work on labels that expand as
     // they move into the distance
-    const int nPitchPaddingBoxes = std::floor(nBoxes / 4);
+    const int nPitchPaddingBoxes = std::floor(nBoxes / 2);
 
     // offset the center of the first box by half a box so that the edge of the
     // box is at the edge of the label.
@@ -90,7 +90,13 @@ void CollisionFeature::bboxifyLabel(const GeometryCoordinates& line, GeometryCoo
 
     for (int i = -nPitchPaddingBoxes; i < nBoxes + nPitchPaddingBoxes; i++) {
         // the distance the box will be from the anchor
-        const float boxDistanceToAnchor = labelStartDistance + i * step;
+        const float boxOffset = i * step;
+        float boxDistanceToAnchor = labelStartDistance + boxOffset;
+
+         // make the distance between pitch padding boxes bigger
+         if (boxOffset < 0) boxDistanceToAnchor += boxOffset;
+         if (boxOffset > labelLength) boxDistanceToAnchor += boxOffset - labelLength;
+
         if (boxDistanceToAnchor < anchorDistance) {
             // The line doesn't extend far enough back for this box, skip it
             // (This could allow for line collisions on distant tiles)
@@ -143,8 +149,22 @@ void CollisionFeature::bboxifyLabel(const GeometryCoordinates& line, GeometryCoo
             maxScale = std::min(maxScale, 0.99f);
         }
 
-        boxes.emplace_back(boxAnchor, -boxSize / 2, -boxSize / 2, boxSize / 2, boxSize / 2, maxScale);
+        boxes.emplace_back(boxAnchor, boxAnchor - convertPoint<float>(anchorPoint), -boxSize / 2, -boxSize / 2, boxSize / 2, boxSize / 2, maxScale);
     }
+}
+
+float CollisionBox::adjustedMaxScale(const std::array<float, 4>& rotationMatrix, const float yStretch) const {
+    // When the map is pitched the distance covered by a line changes.
+    // Adjust the max scale by (approximatePitchedLength / approximateRegularLength)
+    // to compensate for this.
+    const Point<float> rotatedOffset = util::matrixMultiply(rotationMatrix, offset);
+    const float xSqr = rotatedOffset.x * rotatedOffset.x;
+    const float ySqr = rotatedOffset.y * rotatedOffset.y;
+    const float yStretchSqr = ySqr * yStretch * yStretch;
+    const float adjustmentFactor = xSqr + ySqr != 0 ?
+        std::sqrt((xSqr + yStretchSqr) / (xSqr + ySqr)) :
+        1.0f;
+    return maxScale * adjustmentFactor;
 }
 
 } // namespace mbgl
