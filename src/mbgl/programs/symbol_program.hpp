@@ -221,7 +221,7 @@ public:
     
     ZoomEvaluatedSize evaluateForZoom(float) const override {
         const float unused = 0.0f;
-        return { true, true, unused, unused, unused };
+        return { true, false, unused, unused, unused };
     }
     
     const style::SourceFunction<float>& function;
