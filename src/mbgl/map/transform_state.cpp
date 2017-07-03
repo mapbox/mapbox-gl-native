@@ -66,6 +66,15 @@ void TransformState::getProjMatrix(mat4& projMatrix, uint16_t nearZ) const {
     matrix::translate(projMatrix, projMatrix, pixel_x() - size.width / 2.0f,
                       pixel_y() - size.height / 2.0f, 0);
 
+    if (axonometric) {
+        // mat[11] controls perspective
+        projMatrix[11] = 0;
+
+        // mat[8], mat[9] control x-skew, y-skew
+        projMatrix[8] = xSkew;
+        projMatrix[9] = ySkew;
+    }
+
     matrix::scale(projMatrix, projMatrix, 1, 1,
                   1.0 / Projection::getMetersPerPixelAtLatitude(getLatLng(LatLng::Unwrapped).latitude(), getZoom()));
 }

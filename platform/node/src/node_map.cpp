@@ -26,6 +26,9 @@ struct NodeMap::RenderOptions {
     double latitude = 0;
     double longitude = 0;
     mbgl::Size size = { 512, 512 };
+    bool axonometric = false;
+    double xSkew = 0;
+    double ySkew = 1;
     std::vector<std::string> classes;
     mbgl::MapDebugOptions debugOptions = mbgl::MapDebugOptions::NoDebug;
 };
@@ -65,6 +68,9 @@ void NodeMap::Init(v8::Local<v8::Object> target) {
     Nan::SetPrototypeMethod(tpl, "setZoom", SetZoom);
     Nan::SetPrototypeMethod(tpl, "setBearing", SetBearing);
     Nan::SetPrototypeMethod(tpl, "setPitch", SetPitch);
+    Nan::SetPrototypeMethod(tpl, "setAxonometric", SetAxonometric);
+    Nan::SetPrototypeMethod(tpl, "setXSkew", SetXSkew);
+    Nan::SetPrototypeMethod(tpl, "setYSkew", SetYSkew);
 
     Nan::SetPrototypeMethod(tpl, "dumpDebugLogs", DumpDebugLogs);
     Nan::SetPrototypeMethod(tpl, "queryRenderedFeatures", QueryRenderedFeatures);
@@ -251,6 +257,19 @@ NodeMap::RenderOptions NodeMap::ParseOptions(v8::Local<v8::Object> obj) {
         options.pitch = Nan::Get(obj, Nan::New("pitch").ToLocalChecked()).ToLocalChecked()->NumberValue();
     }
 
+    if (Nan::Has(obj, Nan::New("axonometric").ToLocalChecked()).FromJust()) {
+        options.axonometric = Nan::Get(obj, Nan::New("axonometric").ToLocalChecked()).ToLocalChecked()->BooleanValue();
+    }
+
+    if (Nan::Has(obj, Nan::New("skew").ToLocalChecked()).FromJust()) {
+        auto skewObj = Nan::Get(obj, Nan::New("skew").ToLocalChecked()).ToLocalChecked();
+        if (skewObj->IsArray()) {
+            auto skew = skewObj.As<v8::Array>();
+            if (skew->Length() > 0) { options.xSkew = Nan::Get(skew, 0).ToLocalChecked()->NumberValue(); }
+            if (skew->Length() > 1) { options.ySkew = Nan::Get(skew, 1).ToLocalChecked()->NumberValue(); }
+        }
+    }
+
     if (Nan::Has(obj, Nan::New("center").ToLocalChecked()).FromJust()) {
         auto centerObj = Nan::Get(obj, Nan::New("center").ToLocalChecked()).ToLocalChecked();
         if (centerObj->IsArray()) {
@@ -369,6 +388,18 @@ void NodeMap::startRender(NodeMap::RenderOptions options) {
     camera.zoom = options.zoom;
     camera.angle = -options.bearing * mbgl::util::DEG2RAD;
     camera.pitch = options.pitch * mbgl::util::DEG2RAD;
+
+    if (map->getAxonometric() != options.axonometric) {
+        map->setAxonometric(options.axonometric);
+    }
+
+    if (map->getXSkew() != options.xSkew) {
+        map->setXSkew(options.xSkew);
+    }
+
+    if (map->getYSkew() != options.ySkew) {
+        map->setYSkew(options.ySkew);
+    }
 
     map->renderStill(camera, options.debugOptions, [this](const std::exception_ptr eptr) {
         if (eptr) {
@@ -872,6 +903,57 @@ void NodeMap::SetPitch(const Nan::FunctionCallbackInfo<v8::Value>& info) {
 
     try {
         nodeMap->map->setPitch(info[0]->NumberValue());
+    } catch (const std::exception &ex) {
+        return Nan::ThrowError(ex.what());
+    }
+
+    info.GetReturnValue().SetUndefined();
+}
+
+void NodeMap::SetAxonometric(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+    auto nodeMap = Nan::ObjectWrap::Unwrap<NodeMap>(info.Holder());
+    if (!nodeMap->map) return Nan::ThrowError(releasedMessage());
+
+    if (info.Length() <= 0 || !info[0]->IsBoolean()) {
+        return Nan::ThrowTypeError("First argument must be a boolean");
+    }
+
+    try {
+        nodeMap->map->setAxonometric(info[0]->BooleanValue());
+    } catch (const std::exception &ex) {
+        return Nan::ThrowError(ex.what());
+    }
+
+    info.GetReturnValue().SetUndefined();
+}
+
+void NodeMap::SetXSkew(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+    auto nodeMap = Nan::ObjectWrap::Unwrap<NodeMap>(info.Holder());
+    if (!nodeMap->map) return Nan::ThrowError(releasedMessage());
+
+    if (info.Length() <= 0 || !info[0]->IsNumber()) {
+        return Nan::ThrowTypeError("First argument must be a number");
+    }
+
+    try {
+        nodeMap->map->setXSkew(info[0]->NumberValue());
+    } catch (const std::exception &ex) {
+        return Nan::ThrowError(ex.what());
+    }
+
+    info.GetReturnValue().SetUndefined();
+}
+
+void NodeMap::SetYSkew(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+    auto nodeMap = Nan::ObjectWrap::Unwrap<NodeMap>(info.Holder());
+    if (!nodeMap->map) return Nan::ThrowError(releasedMessage());
+
+    if (info.Length() <= 0 || !info[0]->IsNumber()) {
+        return Nan::ThrowTypeError("First argument must be a number");
+    }
+
+    try {
+        nodeMap->map->setYSkew(info[0]->NumberValue());
     } catch (const std::exception &ex) {
         return Nan::ThrowError(ex.what());
     }

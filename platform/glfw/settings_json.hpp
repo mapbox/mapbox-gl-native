@@ -17,6 +17,9 @@ public:
     double zoom = 0;
     double bearing = 0;
     double pitch = 0;
+    bool axonometric = false;
+    double xSkew = 0.0;
+    double ySkew = 1.0;
 
     EnumType debug = 0;
     bool online = true;
