@@ -9,6 +9,7 @@
 #include <mbgl/gl/framebuffer.hpp>
 #include <mbgl/gl/vertex_buffer.hpp>
 #include <mbgl/gl/index_buffer.hpp>
+#include <mbgl/gl/vertex_array.hpp>
 #include <mbgl/gl/types.hpp>
 #include <mbgl/gl/draw_mode.hpp>
 #include <mbgl/gl/depth_mode.hpp>
@@ -53,9 +54,7 @@ public:
     void verifyProgramLinkage(ProgramID);
     void linkProgram(ProgramID);
     UniqueTexture createTexture();
-
-    bool supportsVertexArrays() const;
-    UniqueVertexArray createVertexArray();
+    VertexArray createVertexArray();
 
 #if MBGL_HAS_BINARY_PROGRAMS
     bool supportsProgramBinaries() const;
@@ -200,10 +199,11 @@ public:
     State<value::BindFramebuffer> bindFramebuffer;
     State<value::Viewport> viewport;
     std::array<State<value::BindTexture>, 2> texture;
-    State<value::BindVertexArray, const Context&> vertexArrayObject { *this };
     State<value::Program> program;
     State<value::BindVertexBuffer> vertexBuffer;
-    State<value::BindElementBuffer> elementBuffer;
+
+    State<value::BindVertexArray, const Context&> bindVertexArray { *this };
+    VertexArrayState globalVertexArrayState { UniqueVertexArray(0, { this }), *this };
 
 #if not MBGL_USE_GLES2
     State<value::PixelZoom> pixelZoom;
@@ -247,6 +247,8 @@ private:
 #if not MBGL_USE_GLES2
     void drawPixels(Size size, const void* data, TextureFormat);
 #endif // MBGL_USE_GLES2
+
+    bool supportsVertexArrays() const;
 
     friend detail::ProgramDeleter;
     friend detail::ShaderDeleter;

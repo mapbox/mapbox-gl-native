@@ -177,8 +177,8 @@ UniqueBuffer Context::createIndexBuffer(const void* data, std::size_t size) {
     BufferID id = 0;
     MBGL_CHECK_ERROR(glGenBuffers(1, &id));
     UniqueBuffer result { std::move(id), { this } };
-    vertexArrayObject = 0;
-    elementBuffer = result;
+    bindVertexArray = 0;
+    globalVertexArrayState.indexBuffer = result;
     MBGL_CHECK_ERROR(glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, data, GL_STATIC_DRAW));
     return result;
 }
@@ -229,11 +229,16 @@ optional<std::pair<BinaryProgramFormat, std::string>> Context::getBinaryProgram(
 }
 #endif
 
-UniqueVertexArray Context::createVertexArray() {
-    assert(supportsVertexArrays());
-    VertexArrayID id = 0;
-    MBGL_CHECK_ERROR(vertexArray->genVertexArrays(1, &id));
-    return UniqueVertexArray(std::move(id), { this });
+VertexArray Context::createVertexArray() {
+    if (supportsVertexArrays()) {
+        VertexArrayID id = 0;
+        MBGL_CHECK_ERROR(vertexArray->genVertexArrays(1, &id));
+        return { std::make_unique<VertexArrayState>(UniqueVertexArray(std::move(id), { this }), *this) };
+    } else {
+        // On GL implementations which do not support vertex arrays, attribute bindings are global state.
+        // So return a VertexArray which shares our global state tracking and whose deleter is a no-op.
+        return { UniqueVertexArrayState(&globalVertexArrayState, [] (VertexArrayState*) {}) };
+    }
 }
 
 UniqueFramebuffer Context::createFramebuffer() {
@@ -502,8 +507,8 @@ void Context::setDirtyState() {
        tex.setDirty();
     }
     vertexBuffer.setDirty();
-    elementBuffer.setDirty();
-    vertexArrayObject.setDirty();
+    bindVertexArray.setDirty();
+    globalVertexArrayState.setDirty();
 }
 
 void Context::clear(optional<mbgl::Color> color,
@@ -622,8 +627,8 @@ void Context::performCleanup() {
         for (const auto id : abandonedBuffers) {
             if (vertexBuffer == id) {
                 vertexBuffer.setDirty();
-            } else if (elementBuffer == id) {
-                elementBuffer.setDirty();
+            } else if (globalVertexArrayState.indexBuffer == id) {
+                globalVertexArrayState.indexBuffer.setDirty();
             }
         }
         MBGL_CHECK_ERROR(glDeleteBuffers(int(abandonedBuffers.size()), abandonedBuffers.data()));
@@ -643,8 +648,8 @@ void Context::performCleanup() {
     if (!abandonedVertexArrays.empty()) {
         assert(supportsVertexArrays());
         for (const auto id : abandonedVertexArrays) {
-            if (vertexArrayObject == id) {
-                vertexArrayObject.setDirty();
+            if (bindVertexArray == id) {
+                bindVertexArray.setDirty();
             }
         }
         MBGL_CHECK_ERROR(vertexArray->deleteVertexArrays(int(abandonedVertexArrays.size()),

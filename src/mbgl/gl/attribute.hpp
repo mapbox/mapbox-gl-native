@@ -1,58 +1,50 @@
 #pragma once
 
 #include <mbgl/gl/types.hpp>
-#include <mbgl/gl/segment.hpp>
+#include <mbgl/gl/vertex_buffer.hpp>
 #include <mbgl/util/ignore.hpp>
 #include <mbgl/util/indexed_tuple.hpp>
-#include <mbgl/util/variant.hpp>
+#include <mbgl/util/optional.hpp>
 
 #include <cstddef>
 #include <vector>
 #include <set>
 #include <functional>
+#include <string>
+#include <array>
 
 namespace mbgl {
 namespace gl {
 
-class DisabledAttribute {
-public:
-    void bind(Context&, AttributeLocation, std::size_t vertexOffset) const;
+static constexpr std::size_t MAX_ATTRIBUTES = 8;
 
-    friend bool operator==(const DisabledAttribute&,
-                           const DisabledAttribute&) {
-        return true;
-    }
-};
+template <class> struct DataTypeOf;
+template <> struct DataTypeOf< int8_t>  : std::integral_constant<DataType, DataType::Byte> {};
+template <> struct DataTypeOf<uint8_t>  : std::integral_constant<DataType, DataType::UnsignedByte> {};
+template <> struct DataTypeOf< int16_t> : std::integral_constant<DataType, DataType::Short> {};
+template <> struct DataTypeOf<uint16_t> : std::integral_constant<DataType, DataType::UnsignedShort> {};
+template <> struct DataTypeOf< int32_t> : std::integral_constant<DataType, DataType::Integer> {};
+template <> struct DataTypeOf<uint32_t> : std::integral_constant<DataType, DataType::UnsignedInteger> {};
+template <> struct DataTypeOf<float>    : std::integral_constant<DataType, DataType::Float> {};
 
-template <class T, std::size_t N>
 class AttributeBinding {
 public:
-    AttributeBinding(BufferID vertexBuffer_,
-                     std::size_t vertexSize_,
-                     std::size_t attributeOffset_,
-                     std::size_t attributeSize_ = N)
-        : vertexBuffer(vertexBuffer_),
-          vertexSize(vertexSize_),
-          attributeOffset(attributeOffset_),
-          attributeSize(attributeSize_)
-        {}
+    DataType attributeType;
+    std::size_t attributeSize;
+    std::size_t attributeOffset;
 
-    void bind(Context&, AttributeLocation, std::size_t vertexOffset) const;
+    BufferID vertexBuffer;
+    std::size_t vertexSize;
+    std::size_t vertexOffset;
 
     friend bool operator==(const AttributeBinding& lhs,
                            const AttributeBinding& rhs) {
-        return lhs.vertexBuffer == rhs.vertexBuffer
-            && lhs.vertexSize == rhs.vertexSize
-            && lhs.attributeOffset == rhs.attributeOffset
-            && lhs.attributeSize == rhs.attributeSize;
+        return std::tie(lhs.attributeType, lhs.attributeSize, lhs.attributeOffset, lhs.vertexBuffer, lhs.vertexSize, lhs.vertexOffset)
+            == std::tie(rhs.attributeType, rhs.attributeSize, rhs.attributeOffset, rhs.vertexBuffer, rhs.vertexSize, rhs.vertexOffset);
     }
-
-private:
-    BufferID vertexBuffer;
-    std::size_t vertexSize;
-    std::size_t attributeOffset;
-    std::size_t attributeSize;
 };
+
+using AttributeBindingArray = std::array<optional<AttributeBinding>, MAX_ATTRIBUTES>;
 
 /*
     gl::Attribute<T,N> manages the binding of a vertex buffer to a GL program attribute.
@@ -67,10 +59,7 @@ public:
     using Value = std::array<T, N>;
 
     using Location = AttributeLocation;
-
-    using Binding = variant<
-        DisabledAttribute,
-        AttributeBinding<T, N>>;
+    using Binding = AttributeBinding;
 
     /*
         Create a binding for this attribute.  The `attributeSize` parameter may be used to
@@ -82,28 +71,24 @@ public:
                            std::size_t attributeIndex,
                            std::size_t attributeSize = N) {
         static_assert(std::is_standard_layout<Vertex>::value, "vertex type must use standard layout");
-        return AttributeBinding<T, N> {
+        return AttributeBinding {
+            DataTypeOf<T>::value,
+            attributeSize,
+            Vertex::attributeOffsets[attributeIndex],
             buffer.buffer,
             sizeof(Vertex),
-            Vertex::attributeOffsets[attributeIndex],
-            attributeSize
+            0,
         };
     }
 
-    static void bind(Context& context,
-                     const Location& location,
-                     Binding& oldBinding,
-                     const Binding& newBinding,
-                     std::size_t vertexOffset) {
-        if (oldBinding == newBinding) {
-            return;
+    static optional<Binding> offsetBinding(const optional<Binding>& binding, std::size_t vertexOffset) {
+        if (binding) {
+            AttributeBinding result = *binding;
+            result.vertexOffset = vertexOffset;
+            return result;
+        } else {
+            return binding;
         }
-
-        Binding::visit(newBinding, [&] (const auto& binding) {
-            binding.bind(context, location, vertexOffset);
-        });
-
-        oldBinding = newBinding;
     }
 };
 
@@ -223,7 +208,7 @@ const std::size_t Vertex<A1, A2, A3, A4, A5>::attributeOffsets[5] = {
 
 } // namespace detail
 
-AttributeLocation bindAttributeLocation(ProgramID, AttributeLocation, const char * name);
+void bindAttributeLocation(ProgramID, AttributeLocation, const char * name);
 std::set<std::string> getActiveAttributes(ProgramID);
 
 template <class... As>
@@ -232,10 +217,10 @@ public:
     using Types = TypeList<As...>;
     using Locations = IndexedTuple<
         TypeList<As...>,
-        TypeList<typename As::Type::Location...>>;
+        TypeList<optional<typename As::Type::Location>...>>;
     using Bindings = IndexedTuple<
         TypeList<As...>,
-        TypeList<typename As::Type::Binding...>>;
+        TypeList<optional<typename As::Type::Binding>...>>;
     using NamedLocations = std::vector<std::pair<const std::string, AttributeLocation>>;
 
     using Vertex = detail::Vertex<typename As::Type...>;
@@ -246,13 +231,17 @@ public:
     static Locations bindLocations(const ProgramID& id) {
         std::set<std::string> activeAttributes = getActiveAttributes(id);
 
-        AttributeLocation location = -1;
-        auto bindAndIncrement = [&](const char* name) {
-            location++;
-            return bindAttributeLocation(id, location, name);
+        AttributeLocation location = 0;
+        auto maybeBindLocation = [&](const char* name) -> optional<AttributeLocation> {
+            if (activeAttributes.count(name)) {
+                bindAttributeLocation(id, location, name);
+                return location++;
+            } else {
+                return {};
+            }
         };
-        return Locations{ (activeAttributes.count(As::name()) ? bindAndIncrement(As::name())
-                                                              : -1)... };
+
+        return Locations { maybeBindLocation(As::name())... };
     }
 
     template <class Program>
@@ -261,7 +250,17 @@ public:
     }
 
     static NamedLocations getNamedLocations(const Locations& locations) {
-        return NamedLocations{ { As::name(), locations.template get<As>() }... };
+        NamedLocations result;
+
+        auto maybeAddLocation = [&] (const std::string& name, const optional<AttributeLocation>& location) {
+            if (location) {
+                result.emplace_back(name, *location);
+            }
+        };
+
+        util::ignore({ (maybeAddLocation(As::name(), locations.template get<As>()), 0)... });
+
+        return result;
     }
 
     template <class DrawMode>
@@ -269,16 +268,23 @@ public:
         return Bindings { As::Type::binding(buffer, Index<As>)... };
     }
 
-    static void bind(Context& context,
-                     const Locations& locations,
-                     Bindings& oldBindings,
-                     const Bindings& newBindings,
-                     std::size_t vertexOffset) {
-        util::ignore({ (As::Type::bind(context,
-                                       locations.template get<As>(),
-                                       oldBindings.template get<As>(),
-                                       newBindings.template get<As>(),
-                                       vertexOffset), 0)... });
+    static Bindings offsetBindings(const Bindings& bindings, std::size_t vertexOffset) {
+        return Bindings { As::Type::offsetBinding(bindings.template get<As>(), vertexOffset)... };
+    }
+
+    static AttributeBindingArray toBindingArray(const Locations& locations, const Bindings& bindings) {
+        AttributeBindingArray result;
+
+        auto maybeAddBinding = [&] (const optional<AttributeLocation>& location,
+                                    const optional<AttributeBinding>& binding) {
+            if (location) {
+                result.at(*location) = binding;
+            }
+        };
+
+        util::ignore({ (maybeAddBinding(locations.template get<As>(), bindings.template get<As>()), 0)... });
+
+        return result;
     }
 };
 
