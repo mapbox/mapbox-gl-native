@@ -5,6 +5,7 @@
 #include <mbgl/gl/context.hpp>
 #include <mbgl/gl/vertex_buffer.hpp>
 #include <mbgl/gl/index_buffer.hpp>
+#include <mbgl/gl/vertex_array.hpp>
 #include <mbgl/gl/attribute.hpp>
 #include <mbgl/gl/uniform.hpp>
 
@@ -116,10 +117,12 @@ public:
               DepthMode depthMode,
               StencilMode stencilMode,
               ColorMode colorMode,
-              UniformValues&& uniformValues,
-              AttributeBindings&& attributeBindings,
+              const UniformValues& uniformValues,
+              VertexArray& vertexArray,
+              const AttributeBindings& attributeBindings,
               const IndexBuffer<DrawMode>& indexBuffer,
-              const SegmentVector<Attributes>& segments) {
+              std::size_t indexOffset,
+              std::size_t indexLength) {
         static_assert(std::is_same<Primitive, typename DrawMode::Primitive>::value, "incompatible draw mode");
 
         context.setDrawMode(drawMode);
@@ -129,18 +132,15 @@ public:
 
         context.program = program;
 
-        Uniforms::bind(uniformsState, std::move(uniformValues));
+        Uniforms::bind(uniformsState, uniformValues);
 
-        for (const auto& segment : segments) {
-            segment.bind(context,
-                         indexBuffer.buffer,
-                         attributeLocations,
-                         attributeBindings);
+        vertexArray.bind(context,
+                        indexBuffer.buffer,
+                        Attributes::toBindingArray(attributeLocations, attributeBindings));
 
-            context.draw(drawMode.primitiveType,
-                         segment.indexOffset,
-                         segment.indexLength);
-        }
+        context.draw(drawMode.primitiveType,
+                     indexOffset,
+                     indexLength);
     }
 
 private:

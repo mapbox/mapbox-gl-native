@@ -7,6 +7,7 @@
 
 #include <mbgl/programs/attributes.hpp>
 #include <mbgl/programs/uniforms.hpp>
+#include <mbgl/programs/segment.hpp>
 #include <mbgl/shaders/symbol_icon.hpp>
 #include <mbgl/shaders/symbol_sdf.hpp>
 #include <mbgl/util/geometry.hpp>
@@ -156,7 +157,7 @@ public:
     }
     
     SymbolSizeAttributes::Bindings attributeBindings() const override {
-        return SymbolSizeAttributes::Bindings { gl::DisabledAttribute() };
+        return SymbolSizeAttributes::Bindings { {} };
     }
 
     void upload(gl::Context&) override {}
@@ -352,29 +353,40 @@ public:
               gl::DepthMode depthMode,
               gl::StencilMode stencilMode,
               gl::ColorMode colorMode,
-              UniformValues&& uniformValues,
+              const UniformValues& uniformValues,
               const gl::VertexBuffer<LayoutVertex>& layoutVertexBuffer,
               const SymbolSizeBinder& symbolSizeBinder,
               const gl::IndexBuffer<DrawMode>& indexBuffer,
-              const gl::SegmentVector<Attributes>& segments,
+              const SegmentVector<Attributes>& segments,
               const PaintPropertyBinders& paintPropertyBinders,
               const typename PaintProperties::Evaluated& currentProperties,
               float currentZoom) {
-        program.draw(
-            context,
-            std::move(drawMode),
-            std::move(depthMode),
-            std::move(stencilMode),
-            std::move(colorMode),
-            uniformValues
-                .concat(symbolSizeBinder.uniformValues(currentZoom))
-                .concat(paintPropertyBinders.uniformValues(currentZoom, currentProperties)),
-            LayoutAttributes::bindings(layoutVertexBuffer)
-                .concat(symbolSizeBinder.attributeBindings())
-                .concat(paintPropertyBinders.attributeBindings(currentProperties)),
-            indexBuffer,
-            segments
-        );
+        typename AllUniforms::Values allUniformValues = uniformValues
+            .concat(symbolSizeBinder.uniformValues(currentZoom))
+            .concat(paintPropertyBinders.uniformValues(currentZoom, currentProperties));
+
+        typename Attributes::Bindings allAttributeBindings = LayoutAttributes::bindings(layoutVertexBuffer)
+            .concat(symbolSizeBinder.attributeBindings())
+            .concat(paintPropertyBinders.attributeBindings(currentProperties));
+
+        for (auto& segment : segments) {
+            if (!segment.vertexArray) {
+                segment.vertexArray = context.createVertexArray();
+            }
+
+            program.draw(
+                context,
+                std::move(drawMode),
+                std::move(depthMode),
+                std::move(stencilMode),
+                std::move(colorMode),
+                allUniformValues,
+                *segment.vertexArray,
+                Attributes::offsetBindings(allAttributeBindings, segment.vertexOffset),
+                indexBuffer,
+                segment.indexOffset,
+                segment.indexLength);
+        }
     }
 };
 

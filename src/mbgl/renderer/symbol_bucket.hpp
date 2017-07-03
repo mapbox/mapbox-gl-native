@@ -4,7 +4,7 @@
 #include <mbgl/map/mode.hpp>
 #include <mbgl/gl/vertex_buffer.hpp>
 #include <mbgl/gl/index_buffer.hpp>
-#include <mbgl/gl/segment.hpp>
+#include <mbgl/programs/segment.hpp>
 #include <mbgl/programs/symbol_program.hpp>
 #include <mbgl/programs/collision_box_program.hpp>
 #include <mbgl/text/glyph_range.hpp>
@@ -45,7 +45,7 @@ public:
     struct TextBuffer {
         gl::VertexVector<SymbolLayoutVertex> vertices;
         gl::IndexVector<gl::Triangles> triangles;
-        gl::SegmentVector<SymbolTextAttributes> segments;
+        SegmentVector<SymbolTextAttributes> segments;
 
         optional<gl::VertexBuffer<SymbolLayoutVertex>> vertexBuffer;
         optional<gl::IndexBuffer<gl::Triangles>> indexBuffer;
@@ -56,7 +56,7 @@ public:
     struct IconBuffer {
         gl::VertexVector<SymbolLayoutVertex> vertices;
         gl::IndexVector<gl::Triangles> triangles;
-        gl::SegmentVector<SymbolIconAttributes> segments;
+        SegmentVector<SymbolIconAttributes> segments;
 
         optional<gl::VertexBuffer<SymbolLayoutVertex>> vertexBuffer;
         optional<gl::IndexBuffer<gl::Triangles>> indexBuffer;
@@ -65,7 +65,7 @@ public:
     struct CollisionBoxBuffer {
         gl::VertexVector<CollisionBoxVertex> vertices;
         gl::IndexVector<gl::Lines> lines;
-        gl::SegmentVector<CollisionBoxAttributes> segments;
+        SegmentVector<CollisionBoxAttributes> segments;
 
         optional<gl::VertexBuffer<CollisionBoxVertex>> vertexBuffer;
         optional<gl::IndexBuffer<gl::Lines>> indexBuffer;
