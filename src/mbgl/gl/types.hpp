@@ -15,7 +15,7 @@ using VertexArrayID = uint32_t;
 using FramebufferID = uint32_t;
 using RenderbufferID = uint32_t;
 
-using AttributeLocation = int32_t;
+using AttributeLocation = uint32_t;
 using UniformLocation = int32_t;
 using TextureUnit = uint8_t;
 

@@ -4,7 +4,7 @@
 #include <mbgl/tile/geometry_tile_data.hpp>
 #include <mbgl/gl/vertex_buffer.hpp>
 #include <mbgl/gl/index_buffer.hpp>
-#include <mbgl/gl/segment.hpp>
+#include <mbgl/programs/segment.hpp>
 #include <mbgl/programs/fill_program.hpp>
 #include <mbgl/style/layers/fill_layer_properties.hpp>
 
@@ -30,8 +30,8 @@ public:
     gl::VertexVector<FillLayoutVertex> vertices;
     gl::IndexVector<gl::Lines> lines;
     gl::IndexVector<gl::Triangles> triangles;
-    gl::SegmentVector<FillAttributes> lineSegments;
-    gl::SegmentVector<FillAttributes> triangleSegments;
+    SegmentVector<FillAttributes> lineSegments;
+    SegmentVector<FillAttributes> triangleSegments;
 
     optional<gl::VertexBuffer<FillLayoutVertex>> vertexBuffer;
     optional<gl::IndexBuffer<gl::Lines>> lineIndexBuffer;

@@ -1,4 +1,4 @@
-#include <mbgl/gl/segment.hpp>
+#include <mbgl/programs/segment.hpp>
 
 namespace mbgl {
 namespace gl {

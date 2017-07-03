@@ -3,6 +3,7 @@
 #include <mbgl/programs/attributes.hpp>
 #include <mbgl/gl/attribute.hpp>
 #include <mbgl/gl/uniform.hpp>
+#include <mbgl/gl/context.hpp>
 #include <mbgl/util/type_list.hpp>
 #include <mbgl/renderer/possibly_evaluated_property_value.hpp>
 #include <mbgl/renderer/paint_property_statistics.hpp>
@@ -81,7 +82,7 @@ public:
 
     virtual void populateVertexVector(const GeometryTileFeature& feature, std::size_t length) = 0;
     virtual void upload(gl::Context& context) = 0;
-    virtual AttributeBinding attributeBinding(const PossiblyEvaluatedPropertyValue<T>& currentValue) const = 0;
+    virtual optional<AttributeBinding> attributeBinding(const PossiblyEvaluatedPropertyValue<T>& currentValue) const = 0;
     virtual float interpolationFactor(float currentZoom) const = 0;
     virtual T uniformValue(const PossiblyEvaluatedPropertyValue<T>& currentValue) const = 0;
 
@@ -103,8 +104,8 @@ public:
     void populateVertexVector(const GeometryTileFeature&, std::size_t) override {}
     void upload(gl::Context&) override {}
 
-    AttributeBinding attributeBinding(const PossiblyEvaluatedPropertyValue<T>&) const override {
-        return gl::DisabledAttribute();
+    optional<AttributeBinding> attributeBinding(const PossiblyEvaluatedPropertyValue<T>&) const override {
+        return {};
     }
 
     float interpolationFactor(float) const override {
@@ -147,9 +148,9 @@ public:
         vertexBuffer = context.createVertexBuffer(std::move(vertexVector));
     }
 
-    AttributeBinding attributeBinding(const PossiblyEvaluatedPropertyValue<T>& currentValue) const override {
+    optional<AttributeBinding> attributeBinding(const PossiblyEvaluatedPropertyValue<T>& currentValue) const override {
         if (currentValue.isConstant()) {
-            return gl::DisabledAttribute();
+            return {};
         } else {
             return Attribute::binding(*vertexBuffer, 0, BaseAttribute::Dimensions);
         }
@@ -208,9 +209,9 @@ public:
         vertexBuffer = context.createVertexBuffer(std::move(vertexVector));
     }
 
-    AttributeBinding attributeBinding(const PossiblyEvaluatedPropertyValue<T>& currentValue) const override {
+    optional<AttributeBinding> attributeBinding(const PossiblyEvaluatedPropertyValue<T>& currentValue) const override {
         if (currentValue.isConstant()) {
-            return gl::DisabledAttribute();
+            return {};
         } else {
             return Attribute::binding(*vertexBuffer, 0);
         }

@@ -73,8 +73,6 @@ set(MBGL_CORE_FILES
     src/mbgl/gl/program.hpp
     src/mbgl/gl/program_binary_extension.hpp
     src/mbgl/gl/renderbuffer.hpp
-    src/mbgl/gl/segment.cpp
-    src/mbgl/gl/segment.hpp
     src/mbgl/gl/state.hpp
     src/mbgl/gl/stencil_mode.cpp
     src/mbgl/gl/stencil_mode.hpp
@@ -84,6 +82,8 @@ set(MBGL_CORE_FILES
     src/mbgl/gl/uniform.hpp
     src/mbgl/gl/value.cpp
     src/mbgl/gl/value.hpp
+    src/mbgl/gl/vertex_array.cpp
+    src/mbgl/gl/vertex_array.hpp
     src/mbgl/gl/vertex_array_extension.hpp
     src/mbgl/gl/vertex_buffer.hpp
 
@@ -154,6 +154,8 @@ set(MBGL_CORE_FILES
     src/mbgl/programs/programs.hpp
     src/mbgl/programs/raster_program.cpp
     src/mbgl/programs/raster_program.hpp
+    src/mbgl/programs/segment.cpp
+    src/mbgl/programs/segment.hpp
     src/mbgl/programs/symbol_program.cpp
     src/mbgl/programs/symbol_program.hpp
     src/mbgl/programs/uniforms.hpp
@@ -611,8 +613,8 @@ set(MBGL_CORE_FILES
     src/mbgl/util/stopwatch.cpp
     src/mbgl/util/stopwatch.hpp
     src/mbgl/util/string.cpp
-    src/mbgl/util/thread_local.hpp
     src/mbgl/util/thread.hpp
+    src/mbgl/util/thread_local.hpp
     src/mbgl/util/throttler.cpp
     src/mbgl/util/throttler.hpp
     src/mbgl/util/tile_coordinate.hpp

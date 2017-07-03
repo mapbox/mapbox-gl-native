@@ -262,7 +262,7 @@ void Painter::render(RenderStyle& style, const FrameData& frame_, View& view) {
         context.activeTexture = 0;
         context.texture[0] = 0;
 
-        context.vertexArrayObject = 0;
+        context.bindVertexArray = 0;
     }
 }
 
