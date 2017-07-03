@@ -57,9 +57,6 @@ final class NativeMapView {
   // Device density
   private final float pixelRatio;
 
-  // Listeners for Map change events
-  private CopyOnWriteArrayList<MapView.OnMapChangedListener> onMapChangedListeners;
-
   // Listener invoked to return a bitmap of the map
   private MapboxMap.SnapshotReadyCallback snapshotReadyCallback;
 
@@ -76,7 +73,6 @@ final class NativeMapView {
     fileSource = FileSource.getInstance(context);
 
     pixelRatio = context.getResources().getDisplayMetrics().density;
-    onMapChangedListeners = new CopyOnWriteArrayList<>();
     this.mapView = mapView;
 
     String programCacheDir = context.getCacheDir().getAbsolutePath();
@@ -887,14 +883,8 @@ final class NativeMapView {
   }
 
   protected void onMapChanged(int rawChange) {
-    if (onMapChangedListeners != null) {
-      for (MapView.OnMapChangedListener onMapChangedListener : onMapChangedListeners) {
-        try {
-          onMapChangedListener.onMapChanged(rawChange);
-        } catch (RuntimeException err) {
-          Timber.e("Exception (%s) in MapView.OnMapChangedListener: %s", err.getClass(), err.getMessage());
-        }
-      }
+    if (mapView != null) {
+      mapView.onMapChange(rawChange);
     }
   }
 
@@ -1130,11 +1120,15 @@ final class NativeMapView {
   //
 
   void addOnMapChangedListener(@NonNull MapView.OnMapChangedListener listener) {
-    onMapChangedListeners.add(listener);
+    if (mapView != null) {
+      mapView.addOnMapChangedListener(listener);
+    }
   }
 
   void removeOnMapChangedListener(@NonNull MapView.OnMapChangedListener listener) {
-    onMapChangedListeners.remove(listener);
+    if (mapView != null) {
+      mapView.removeOnMapChangedListener(listener);
+    }
   }
 
   //
