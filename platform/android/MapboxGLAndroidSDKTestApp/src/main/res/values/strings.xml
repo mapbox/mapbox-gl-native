@@ -53,6 +53,8 @@
     <string name="activity_add_sprite">Add Custom Sprite</string>
     <string name="activity_navigation_drawer">Android SDK View integration</string>
     <string name="activity_simple_map">Simple Map</string>
+    <string name="activity_map_change">Map Change Events</string>
+    <string name="activity_map_visibility">Visibility Map</string>
     <string name="activity_map_in_dialog">Dialog with map</string>
     <string name="activity_marker_view_rectangle">Marker views in rectangle</string>
     <string name="activity_url_transform">Url transform</string>
@@ -109,6 +111,8 @@
     <string name="description_query_rendered_features_box_highlight">Hightligh buildings in box</string>
     <string name="description_query_source_features">Query source for features</string>
     <string name="description_simple_map">Shows a simple map</string>
+    <string name="description_map_change">Logs map change events to Logcat</string>
+    <string name="description_visibility_map">Changes visibility of map and view parent</string>
     <string name="description_add_remove_markers">Based on zoom level</string>
     <string name="description_style_file">Use a local file as the style</string>
     <string name="description_map_in_dialog">Display a map inside a dialog fragment</string>
