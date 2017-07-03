@@ -13,39 +13,25 @@ AttributeLocation bindAttributeLocation(ProgramID id, AttributeLocation location
     return location;
 }
 
-int32_t getActiveAttributeCount(ProgramID id) {
-    GLint numAttributes;
-    MBGL_CHECK_ERROR(glGetProgramiv(id, GL_ACTIVE_ATTRIBUTES, &numAttributes));
-    return numAttributes;
-}
-
-int32_t getMaxAttributeNameLength(ProgramID id) {
-    GLint nameLength;
-    MBGL_CHECK_ERROR(glGetProgramiv(id, GL_ACTIVE_ATTRIBUTE_MAX_LENGTH, &nameLength));
-    return nameLength;
-}
-
-std::string getAttributeName(ProgramID id, int32_t maxLength, AttributeLocation location) {
-    std::string attributeName;
-    attributeName.resize(maxLength);
-    GLsizei actualLength;
-    GLint size;
-    GLenum type;
-    MBGL_CHECK_ERROR(glGetActiveAttrib(id, static_cast<GLuint>(location),
-                                       static_cast<GLsizei>(maxLength), &actualLength, &size, &type,
-                                       const_cast<char*>(attributeName.data())));
-    attributeName.resize(actualLength);
-    return attributeName;
-}
-
 std::set<std::string> getActiveAttributes(ProgramID id) {
     std::set<std::string> activeAttributes;
 
-    GLint attributeCount = getActiveAttributeCount(id);
-    GLint maxAttributeLength = getMaxAttributeNameLength(id);
+    GLint attributeCount;
+    MBGL_CHECK_ERROR(glGetProgramiv(id, GL_ACTIVE_ATTRIBUTES, &attributeCount));
+
+    GLint maxAttributeLength;
+    MBGL_CHECK_ERROR(glGetProgramiv(id, GL_ACTIVE_ATTRIBUTE_MAX_LENGTH, &maxAttributeLength));
+
+    std::string attributeName;
+    attributeName.resize(maxAttributeLength);
+
+    GLsizei actualLength;
+    GLint size;
+    GLenum type;
 
     for (int32_t i = 0; i < attributeCount; i++) {
-        activeAttributes.emplace(getAttributeName(id, maxAttributeLength, i));
+        MBGL_CHECK_ERROR(glGetActiveAttrib(id, i, maxAttributeLength, &actualLength, &size, &type, &attributeName[0]));
+        activeAttributes.emplace(std::string(attributeName, 0, actualLength));
     }
 
     return activeAttributes;
