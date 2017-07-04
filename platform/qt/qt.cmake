@@ -76,6 +76,8 @@ add_executable(mbgl-qt
     platform/qt/resources/common.qrc
 )
 
+xcode_create_scheme(TARGET mbgl-qt)
+
 if(WITH_QT_4)
     include(platform/qt/qt4.cmake)
 else()
@@ -107,3 +109,5 @@ add_custom_command(
             ${CMAKE_SOURCE_DIR}/platform/qt/include
             ${CMAKE_CURRENT_BINARY_DIR}/platform/qt/include
 )
+
+xcode_create_scheme(TARGET qmapboxgl)

@@ -14,10 +14,10 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "{{BLUEPRINT_ID}}"
-               BuildableName = "{{BUILDABLE_NAME}}"
-               BlueprintName = "{{BLUEPRINT_NAME}}"
-               ReferencedContainer = "container:{{CONTAINER}}">
+               BlueprintIdentifier = "${XCSCHEME_BLUEPRINT_ID}"
+               BuildableName = "${XCSCHEME_BUILDABLE_NAME}"
+               BlueprintName = "${XCSCHEME_BLUEPRINT_NAME}"
+               ReferencedContainer = "container:${XCSCHEME_CONTAINER}">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -37,20 +37,34 @@
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       launchStyle = "0"
-      useCustomWorkingDirectory = "NO"
+      useCustomWorkingDirectory = "YES"
+      customWorkingDirectory = "${XCSCHEME_WORKING_DIRECTORY}"
       ignoresPersistentStateOnLaunch = "NO"
       debugDocumentVersioning = "YES"
       debugServiceExtension = "internal"
       allowLocationSimulation = "YES">
+      <PathRunnable
+         runnableDebuggingMode = "0"
+         FilePath = "${XCSCHEME_NODE_EXECUTABLE}">
+      </PathRunnable>
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "{{BLUEPRINT_ID}}"
-            BuildableName = "{{BUILDABLE_NAME}}"
-            BlueprintName = "{{BLUEPRINT_NAME}}"
-            ReferencedContainer = "container:{{CONTAINER}}">
+            BlueprintIdentifier = "${XCSCHEME_BLUEPRINT_ID}"
+            BuildableName = "${XCSCHEME_BUILDABLE_NAME}"
+            BlueprintName = "${XCSCHEME_BLUEPRINT_NAME}"
+            ReferencedContainer = "container:${XCSCHEME_CONTAINER}">
          </BuildableReference>
       </MacroExpansion>
+      <CommandLineArguments>${XCSCHEME_COMMAND_LINE_ARGS}
+      </CommandLineArguments>
+      <EnvironmentVariables>
+         <EnvironmentVariable
+            key = "PATH"
+            value = "${XCSCHEME_NODE_PATH}:$PATH"
+            isEnabled = "YES">
+         </EnvironmentVariable>
+      </EnvironmentVariables>
       <AdditionalOptions>
       </AdditionalOptions>
    </LaunchAction>
@@ -58,15 +72,16 @@
       buildConfiguration = "Release"
       shouldUseLaunchSchemeArgsEnv = "YES"
       savedToolIdentifier = ""
-      useCustomWorkingDirectory = "NO"
+      useCustomWorkingDirectory = "YES"
+      customWorkingDirectory = "${XCSCHEME_WORKING_DIRECTORY}"
       debugDocumentVersioning = "YES">
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "{{BLUEPRINT_ID}}"
-            BuildableName = "{{BUILDABLE_NAME}}"
-            BlueprintName = "{{BLUEPRINT_NAME}}"
-            ReferencedContainer = "container:{{CONTAINER}}">
+            BlueprintIdentifier = "${XCSCHEME_BLUEPRINT_ID}"
+            BuildableName = "${XCSCHEME_BUILDABLE_NAME}"
+            BlueprintName = "${XCSCHEME_BLUEPRINT_NAME}"
+            ReferencedContainer = "container:${XCSCHEME_CONTAINER}">
          </BuildableReference>
       </MacroExpansion>
    </ProfileAction>
