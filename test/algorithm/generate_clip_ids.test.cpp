@@ -10,7 +10,7 @@ struct Renderable {
     bool used = true;
 
     bool operator==(const Renderable& rhs) const {
-        return clip == rhs.clip;
+        return id == rhs.id && clip == rhs.clip;
     }
 };
 
