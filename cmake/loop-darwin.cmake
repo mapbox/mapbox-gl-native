@@ -17,3 +17,5 @@ target_include_directories(mbgl-loop-darwin
 )
 
 create_source_groups(mbgl-loop-darwin)
+
+xcode_create_scheme(TARGET mbgl-loop-darwin)

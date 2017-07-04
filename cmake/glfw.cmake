@@ -43,3 +43,16 @@ target_add_mason_package(mbgl-glfw PRIVATE variant)
 mbgl_platform_glfw()
 
 create_source_groups(mbgl-glfw)
+
+xcode_create_scheme(
+    TARGET mbgl-glfw
+    OPTIONAL_ARGS
+        "--style=file.json"
+        "--lon=0"
+        "--lat=0"
+        "--zoom=1"
+        "--bearing=0"
+        "--pitch=0"
+        "--fullscreen"
+        "--benchmark"
+)

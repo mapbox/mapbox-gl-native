@@ -19,3 +19,5 @@ target_link_libraries(mbgl-loop-uv
 )
 
 create_source_groups(mbgl-loop-uv)
+
+xcode_create_scheme(TARGET mbgl-loop-uv)
