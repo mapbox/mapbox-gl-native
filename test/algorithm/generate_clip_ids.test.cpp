@@ -40,15 +40,15 @@ TEST(GenerateClipIDs, ParentAndFourChildren) {
               }),
               renderables);
 
-    const auto stencils = generator.getStencils();
-    EXPECT_EQ(decltype(stencils)({
+    const auto clipIDs = generator.getClipIDs();
+    EXPECT_EQ(decltype(clipIDs)({
                   // 0/0/0 is missing because it is covered by children.
                   { UnwrappedTileID{ 1, 0, 0 }, ClipID{ "00000111", "00000010" } },
                   { UnwrappedTileID{ 1, 0, 1 }, ClipID{ "00000111", "00000011" } },
                   { UnwrappedTileID{ 1, 1, 0 }, ClipID{ "00000111", "00000100" } },
                   { UnwrappedTileID{ 1, 1, 1 }, ClipID{ "00000111", "00000101" } },
               }),
-              stencils);
+              clipIDs);
 }
 
 TEST(GenerateClipIDs, ParentAndFourChildrenNegative) {
@@ -72,14 +72,14 @@ TEST(GenerateClipIDs, ParentAndFourChildrenNegative) {
               }),
               renderables);
 
-    const auto stencils = generator.getStencils();
-    EXPECT_EQ(decltype(stencils)({
+    const auto clipIDs = generator.getClipIDs();
+    EXPECT_EQ(decltype(clipIDs)({
                   { UnwrappedTileID{ 1, -2, 0 }, ClipID{ "00000111", "00000010" } },
                   { UnwrappedTileID{ 1, -2, 1 }, ClipID{ "00000111", "00000011" } },
                   { UnwrappedTileID{ 1, -1, 0 }, ClipID{ "00000111", "00000100" } },
                   { UnwrappedTileID{ 1, -1, 1 }, ClipID{ "00000111", "00000101" } },
               }),
-              stencils);
+              clipIDs);
 }
 
 TEST(GenerateClipIDs, NegativeParentAndMissingLevel) {
@@ -103,14 +103,14 @@ TEST(GenerateClipIDs, NegativeParentAndMissingLevel) {
               }),
               renderables);
 
-    const auto stencils = generator.getStencils();
-    EXPECT_EQ(decltype(stencils)({
+    const auto clipIDs = generator.getClipIDs();
+    EXPECT_EQ(decltype(clipIDs)({
                   { UnwrappedTileID{ 2, -2, 0 }, ClipID{ "00000111", "00000010" } },
                   { UnwrappedTileID{ 2, -2, 1 }, ClipID{ "00000111", "00000011" } },
                   { UnwrappedTileID{ 2, -1, 0 }, ClipID{ "00000111", "00000100" } },
                   { UnwrappedTileID{ 2, -1, 1 }, ClipID{ "00000111", "00000101" } },
               }),
-              stencils);
+              clipIDs);
 }
 
 TEST(GenerateClipIDs, SevenOnSameLevel) {
@@ -140,8 +140,8 @@ TEST(GenerateClipIDs, SevenOnSameLevel) {
               }),
               renderables);
 
-    const auto stencils = generator.getStencils();
-    EXPECT_EQ(decltype(stencils)({
+    const auto clipIDs = generator.getClipIDs();
+    EXPECT_EQ(decltype(clipIDs)({
                   { UnwrappedTileID{ 2, 0, 0 }, ClipID{ "00000111", "00000001" } },
                   { UnwrappedTileID{ 2, 0, 1 }, ClipID{ "00000111", "00000010" } },
                   { UnwrappedTileID{ 2, 0, 2 }, ClipID{ "00000111", "00000011" } },
@@ -150,7 +150,7 @@ TEST(GenerateClipIDs, SevenOnSameLevel) {
                   { UnwrappedTileID{ 2, 1, 2 }, ClipID{ "00000111", "00000110" } },
                   { UnwrappedTileID{ 2, 2, 0 }, ClipID{ "00000111", "00000111" } },
               }),
-              stencils);
+              clipIDs);
 }
 
 TEST(GenerateClipIDs, MultipleLevels) {
@@ -193,8 +193,8 @@ TEST(GenerateClipIDs, MultipleLevels) {
               }),
               renderables);
 
-    const auto stencils = generator.getStencils();
-    EXPECT_EQ(decltype(stencils)({
+    const auto clipIDs = generator.getClipIDs();
+    EXPECT_EQ(decltype(clipIDs)({
                   { UnwrappedTileID{ 2, 1, 0 }, ClipID{ "00001111", "00000010" } },
                   { UnwrappedTileID{ 3, 0, 0 }, ClipID{ "00001111", "00000011" } },
                   { UnwrappedTileID{ 3, 1, 0 }, ClipID{ "00001111", "00000101" } },
@@ -206,7 +206,7 @@ TEST(GenerateClipIDs, MultipleLevels) {
                   { UnwrappedTileID{ 4, 1, 2 }, ClipID{ "00001111", "00001011" } },
                   { UnwrappedTileID{ 4, 1, 3 }, ClipID{ "00001111", "00001100" } },
               }),
-              stencils);
+              clipIDs);
 }
 
 TEST(GenerateClipIDs, Bug206) {
@@ -244,8 +244,8 @@ TEST(GenerateClipIDs, Bug206) {
         }),
         renderables);
 
-    const auto stencils = generator.getStencils();
-    EXPECT_EQ(decltype(stencils)({
+    const auto clipIDs = generator.getClipIDs();
+    EXPECT_EQ(decltype(clipIDs)({
                   { UnwrappedTileID{ 10, 162, 395 }, ClipID{ "00001111", "00000001" } },
                   { UnwrappedTileID{ 10, 162, 396 }, ClipID{ "00001111", "00000010" } },
                   { UnwrappedTileID{ 10, 163, 395 }, ClipID{ "00001111", "00000011" } },
@@ -258,7 +258,7 @@ TEST(GenerateClipIDs, Bug206) {
                   { UnwrappedTileID{ 12, 655, 1582 }, ClipID{ "00001111", "00001010" } },
                   { UnwrappedTileID{ 12, 655, 1583 }, ClipID{ "00001111", "00001011" } },
               }),
-              stencils);
+              clipIDs);
 }
 
 TEST(GenerateClipIDs, MultipleSources) {
@@ -312,8 +312,8 @@ TEST(GenerateClipIDs, MultipleSources) {
               }),
               renderables3);
 
-    const auto stencils = generator.getStencils();
-    EXPECT_EQ(decltype(stencils)({
+    const auto clipIDs = generator.getClipIDs();
+    EXPECT_EQ(decltype(clipIDs)({
                   { UnwrappedTileID{ 1, 0, 0 }, ClipID{ "11111111", "00101001" } },
                   { UnwrappedTileID{ 1, 0, 1 }, ClipID{ "11111111", "01001001" } },
                   { UnwrappedTileID{ 1, 1, 0 }, ClipID{ "11111111", "01101001" } },
@@ -322,7 +322,7 @@ TEST(GenerateClipIDs, MultipleSources) {
                   { UnwrappedTileID{ 2, 2, 1 }, ClipID{ "11111111", "01101011" } },
                   { UnwrappedTileID{ 2, 2, 2 }, ClipID{ "11111111", "10000100" } },
               }),
-              stencils);
+              clipIDs);
 }
 
 TEST(GenerateClipIDs, DuplicateIDs) {
@@ -351,12 +351,12 @@ TEST(GenerateClipIDs, DuplicateIDs) {
               }),
               renderables2);
 
-    const auto stencils = generator.getStencils();
-    EXPECT_EQ(decltype(stencils)({
+    const auto clipIDs = generator.getClipIDs();
+    EXPECT_EQ(decltype(clipIDs)({
                   { UnwrappedTileID{ 2, 0, 0 }, ClipID{ "00000011", "00000001" } },
                   { UnwrappedTileID{ 2, 0, 1 }, ClipID{ "00000011", "00000010" } },
               }),
-              stencils);
+              clipIDs);
 }
 
 TEST(GenerateClipIDs, SecondSourceHasParentOfFirstSource) {
@@ -390,10 +390,10 @@ TEST(GenerateClipIDs, SecondSourceHasParentOfFirstSource) {
               }),
               renderables3);
 
-    const auto stencils = generator.getStencils();
-    EXPECT_EQ(decltype(stencils)({
+    const auto clipIDs = generator.getClipIDs();
+    EXPECT_EQ(decltype(clipIDs)({
                   { UnwrappedTileID{ 0, 0, 0 }, ClipID{ "00000110", "00000110" } },
                   { UnwrappedTileID{ 1, 0, 0 }, ClipID{ "00000111", "00000101" } },
               }),
-              stencils);
+              clipIDs);
 }

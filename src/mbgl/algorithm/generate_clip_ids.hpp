@@ -28,7 +28,7 @@ public:
     template <typename Renderable>
     void update(std::vector<std::reference_wrapper<Renderable>> renderables);
 
-    std::map<UnwrappedTileID, ClipID> getStencils() const;
+    std::map<UnwrappedTileID, ClipID> getClipIDs() const;
 };
 
 } // namespace algorithm

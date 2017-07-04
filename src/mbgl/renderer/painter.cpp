@@ -198,9 +198,9 @@ void Painter::render(RenderStyle& style, const FrameData& frame_, View& view) {
 
         MBGL_DEBUG_GROUP(context, "clipping masks");
 
-        for (const auto& stencil : clipIDGenerator.getStencils()) {
-            MBGL_DEBUG_GROUP(context, std::string{ "mask: " } + util::toString(stencil.first));
-            renderClippingMask(stencil.first, stencil.second);
+        for (const auto& clipID : clipIDGenerator.getClipIDs()) {
+            MBGL_DEBUG_GROUP(context, std::string{ "mask: " } + util::toString(clipID.first));
+            renderClippingMask(clipID.first, clipID.second);
         }
     }
 
