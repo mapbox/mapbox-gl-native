@@ -64,7 +64,7 @@ void RenderRasterSource::finishRender(Painter& painter) {
     tilePyramid.finishRender(painter);
 }
 
-std::map<UnwrappedTileID, RenderTile>& RenderRasterSource::getRenderTiles() {
+std::vector<std::reference_wrapper<RenderTile>> RenderRasterSource::getRenderTiles() {
     return tilePyramid.getRenderTiles();
 }
 

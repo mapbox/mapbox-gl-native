@@ -13,7 +13,7 @@ class Tile;
 class TransformState;
 class Painter;
 
-class RenderTile {
+class RenderTile final {
 public:
     RenderTile(UnwrappedTileID id_, Tile& tile_) : id(std::move(id_)), tile(tile_) {}
     RenderTile(const RenderTile&) = delete;
