@@ -40,22 +40,21 @@ bool TilePyramid::isLoaded() const {
 }
 
 void TilePyramid::startRender(Painter& painter) {
-    for (auto& pair : renderTiles) {
-        pair.second.startRender(painter);
+    for (auto& tile : renderTiles) {
+        tile.startRender(painter);
     }
 }
 
 void TilePyramid::finishRender(Painter& painter) {
-    for (auto& pair : renderTiles) {
-        auto& tile = pair.second;
+    for (auto& tile : renderTiles) {
         if (tile.used) {
             painter.renderTileDebug(tile);
         }
     }
 }
 
-std::map<UnwrappedTileID, RenderTile>& TilePyramid::getRenderTiles() {
-    return renderTiles;
+std::vector<std::reference_wrapper<RenderTile>> TilePyramid::getRenderTiles() {
+    return { renderTiles.begin(), renderTiles.end() };
 }
 
 void TilePyramid::update(const std::vector<Immutable<style::Layer::Impl>>& layers,
@@ -134,7 +133,7 @@ void TilePyramid::update(const std::vector<Immutable<style::Layer::Impl>>& layer
         return tiles.emplace(tileID, std::move(tile)).first->second.get();
     };
     auto renderTileFn = [&](const UnwrappedTileID& tileID, Tile& tile) {
-        renderTiles.emplace(tileID, RenderTile{ tileID, tile });
+        renderTiles.emplace_back(tileID, tile);
     };
 
     renderTiles.clear();
@@ -199,18 +198,14 @@ std::unordered_map<std::string, std::vector<Feature>> TilePyramid::queryRendered
 
     mapbox::geometry::box<double> box = mapbox::geometry::envelope(queryGeometry);
 
-
-    auto sortRenderTiles = [](const RenderTile& a, const RenderTile& b) {
+    std::vector<std::reference_wrapper<const RenderTile>> sortedTiles{ renderTiles.begin(),
+                                                                       renderTiles.end() };
+    std::sort(sortedTiles.begin(), sortedTiles.end(), [](const RenderTile& a, const RenderTile& b) {
         return std::tie(a.id.canonical.z, a.id.canonical.y, a.id.wrap, a.id.canonical.x) <
             std::tie(b.id.canonical.z, b.id.canonical.y, b.id.wrap, b.id.canonical.x);
-    };
-    std::vector<std::reference_wrapper<const RenderTile>> sortedTiles;
-    std::transform(renderTiles.cbegin(), renderTiles.cend(), std::back_inserter(sortedTiles),
-                   [](const auto& pair) { return std::ref(pair.second); });
-    std::sort(sortedTiles.begin(), sortedTiles.end(), sortRenderTiles);
+    });
 
-    for (const auto& renderTileRef : sortedTiles) {
-        const RenderTile& renderTile = renderTileRef.get();
+    for (const RenderTile& renderTile : sortedTiles) {
         GeometryCoordinate tileSpaceBoundsMin = TileCoordinate::toGeometryCoordinate(renderTile.id, box.min);
         if (tileSpaceBoundsMin.x >= util::EXTENT || tileSpaceBoundsMin.y >= util::EXTENT) {
             continue;

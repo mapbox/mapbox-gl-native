@@ -69,7 +69,7 @@ void RenderVectorSource::finishRender(Painter& painter) {
     tilePyramid.finishRender(painter);
 }
 
-std::map<UnwrappedTileID, RenderTile>& RenderVectorSource::getRenderTiles() {
+std::vector<std::reference_wrapper<RenderTile>> RenderVectorSource::getRenderTiles() {
     return tilePyramid.getRenderTiles();
 }
 

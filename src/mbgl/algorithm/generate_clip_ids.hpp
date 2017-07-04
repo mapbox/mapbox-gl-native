@@ -25,8 +25,8 @@ private:
     std::unordered_multimap<UnwrappedTileID, Leaf> pool;
 
 public:
-    template <typename Renderables>
-    void update(Renderables& renderables);
+    template <typename Renderable>
+    void update(std::vector<std::reference_wrapper<Renderable>> renderables);
 
     std::map<UnwrappedTileID, ClipID> getStencils() const;
 };
