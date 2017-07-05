@@ -22,6 +22,7 @@ void Painter::renderCircle(PaintParameters& parameters,
 
     const CirclePaintProperties::PossiblyEvaluated& properties = layer.evaluated;
     const bool scaleWithMap = properties.get<CirclePitchScale>() == CirclePitchScaleType::Map;
+    const bool pitchWithMap = properties.get<CirclePitchAlignment>() == AlignmentType::Map;
 
     parameters.programs.circle.get(properties).draw(
         context,
@@ -38,12 +39,13 @@ void Painter::renderCircle(PaintParameters& parameters,
                                       state)
             },
             uniforms::u_scale_with_map::Value{ scaleWithMap },
-            uniforms::u_extrude_scale::Value{ scaleWithMap
+            uniforms::u_extrude_scale::Value{ pitchWithMap
                 ? std::array<float, 2> {{
-                    pixelsToGLUnits[0] * state.getCameraToCenterDistance(),
-                    pixelsToGLUnits[1] * state.getCameraToCenterDistance()
-                  }}
-                : pixelsToGLUnits }
+                    tile.id.pixelsToTileUnits(1, state.getZoom()),
+                    tile.id.pixelsToTileUnits(1, state.getZoom()) }}
+                : pixelsToGLUnits },
+            uniforms::u_camera_to_center_distance::Value{ state.getCameraToCenterDistance() },
+            uniforms::u_pitch_with_map::Value{ pitchWithMap }
         },
         *bucket.vertexBuffer,
         *bucket.indexBuffer,

@@ -283,6 +283,33 @@ TransitionOptions CircleLayer::getCirclePitchScaleTransition() const {
     return impl().paint.template get<CirclePitchScale>().options;
 }
 
+PropertyValue<AlignmentType> CircleLayer::getDefaultCirclePitchAlignment() {
+    return { AlignmentType::Viewport };
+}
+
+PropertyValue<AlignmentType> CircleLayer::getCirclePitchAlignment() const {
+    return impl().paint.template get<CirclePitchAlignment>().value;
+}
+
+void CircleLayer::setCirclePitchAlignment(PropertyValue<AlignmentType> value) {
+    if (value == getCirclePitchAlignment())
+        return;
+    auto impl_ = mutableImpl();
+    impl_->paint.template get<CirclePitchAlignment>().value = value;
+    baseImpl = std::move(impl_);
+    observer->onLayerChanged(*this);
+}
+
+void CircleLayer::setCirclePitchAlignmentTransition(const TransitionOptions& options) {
+    auto impl_ = mutableImpl();
+    impl_->paint.template get<CirclePitchAlignment>().options = options;
+    baseImpl = std::move(impl_);
+}
+
+TransitionOptions CircleLayer::getCirclePitchAlignmentTransition() const {
+    return impl().paint.template get<CirclePitchAlignment>().options;
+}
+
 DataDrivenPropertyValue<float> CircleLayer::getDefaultCircleStrokeWidth() {
     return { 0 };
 }

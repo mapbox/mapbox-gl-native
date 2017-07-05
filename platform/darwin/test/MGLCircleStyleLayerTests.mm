@@ -246,6 +246,45 @@
         XCTAssertEqual(circleOpacityTransition.duration, transitionTest.duration);
     }
 
+    // circle-pitch-alignment
+    {
+        XCTAssertTrue(rawLayer->getCirclePitchAlignment().isUndefined(),
+                      @"circle-pitch-alignment should be unset initially.");
+        MGLStyleValue<NSValue *> *defaultStyleValue = layer.circlePitchAlignment;
+
+        MGLStyleValue<NSValue *> *constantStyleValue = [MGLStyleValue<NSValue *> valueWithRawValue:[NSValue valueWithMGLCirclePitchAlignment:MGLCirclePitchAlignmentViewport]];
+        layer.circlePitchAlignment = constantStyleValue;
+        mbgl::style::PropertyValue<mbgl::style::AlignmentType> propertyValue = { mbgl::style::AlignmentType::Viewport };
+        XCTAssertEqual(rawLayer->getCirclePitchAlignment(), propertyValue,
+                       @"Setting circlePitchAlignment to a constant value should update circle-pitch-alignment.");
+        XCTAssertEqualObjects(layer.circlePitchAlignment, constantStyleValue,
+                              @"circlePitchAlignment should round-trip constant values.");
+
+        MGLStyleValue<NSValue *> * functionStyleValue = [MGLStyleValue<NSValue *> valueWithInterpolationMode:MGLInterpolationModeInterval cameraStops:@{@18: constantStyleValue} options:nil];
+        layer.circlePitchAlignment = functionStyleValue;
+
+        mbgl::style::IntervalStops<mbgl::style::AlignmentType> intervalStops = { {{18, mbgl::style::AlignmentType::Viewport}} };
+        propertyValue = mbgl::style::CameraFunction<mbgl::style::AlignmentType> { intervalStops };
+        
+        XCTAssertEqual(rawLayer->getCirclePitchAlignment(), propertyValue,
+                       @"Setting circlePitchAlignment to a camera function should update circle-pitch-alignment.");
+        XCTAssertEqualObjects(layer.circlePitchAlignment, functionStyleValue,
+                              @"circlePitchAlignment should round-trip camera functions.");
+
+                              
+
+        layer.circlePitchAlignment = nil;
+        XCTAssertTrue(rawLayer->getCirclePitchAlignment().isUndefined(),
+                      @"Unsetting circlePitchAlignment should return circle-pitch-alignment to the default value.");
+        XCTAssertEqualObjects(layer.circlePitchAlignment, defaultStyleValue,
+                              @"circlePitchAlignment should return the default value after being unset.");
+
+        functionStyleValue = [MGLStyleValue<NSValue *> valueWithInterpolationMode:MGLInterpolationModeIdentity sourceStops:nil attributeName:@"" options:nil];
+        XCTAssertThrowsSpecificNamed(layer.circlePitchAlignment = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
+        functionStyleValue = [MGLStyleValue<NSValue *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
+        XCTAssertThrowsSpecificNamed(layer.circlePitchAlignment = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
+    }
+
     // circle-radius
     {
         XCTAssertTrue(rawLayer->getCircleRadius().isUndefined(),
@@ -638,6 +677,7 @@
     [self testPropertyName:@"circle-blur" isBoolean:NO];
     [self testPropertyName:@"circle-color" isBoolean:NO];
     [self testPropertyName:@"circle-opacity" isBoolean:NO];
+    [self testPropertyName:@"circle-pitch-alignment" isBoolean:NO];
     [self testPropertyName:@"circle-radius" isBoolean:NO];
     [self testPropertyName:@"circle-scale-alignment" isBoolean:NO];
     [self testPropertyName:@"circle-stroke-color" isBoolean:NO];
@@ -648,6 +688,8 @@
 }
 
 - (void)testValueAdditions {
+    XCTAssertEqual([NSValue valueWithMGLCirclePitchAlignment:MGLCirclePitchAlignmentMap].MGLCirclePitchAlignmentValue, MGLCirclePitchAlignmentMap);
+    XCTAssertEqual([NSValue valueWithMGLCirclePitchAlignment:MGLCirclePitchAlignmentViewport].MGLCirclePitchAlignmentValue, MGLCirclePitchAlignmentViewport);
     XCTAssertEqual([NSValue valueWithMGLCircleScaleAlignment:MGLCircleScaleAlignmentMap].MGLCircleScaleAlignmentValue, MGLCircleScaleAlignmentMap);
     XCTAssertEqual([NSValue valueWithMGLCircleScaleAlignment:MGLCircleScaleAlignmentViewport].MGLCircleScaleAlignmentValue, MGLCircleScaleAlignmentViewport);
     XCTAssertEqual([NSValue valueWithMGLCircleTranslationAnchor:MGLCircleTranslationAnchorMap].MGLCircleTranslationAnchorValue, MGLCircleTranslationAnchorMap);
