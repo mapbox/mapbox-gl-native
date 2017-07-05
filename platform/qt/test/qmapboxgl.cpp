@@ -15,7 +15,7 @@ class QMapboxGLTest : public QObject, public ::testing::Test {
     Q_OBJECT
 
 public:
-    QMapboxGLTest() : fbo((assert(widget.context()->isValid()), widget.makeCurrent(), QSize(512, 512))), map(nullptr, settings) {
+    QMapboxGLTest() : size(512, 512), fbo((assert(widget.context()->isValid()), widget.makeCurrent(), size)), map(nullptr, settings, size) {
         connect(&map, SIGNAL(mapChanged(QMapboxGL::MapChange)),
                 this, SLOT(onMapChanged(QMapboxGL::MapChange)));
         connect(&map, SIGNAL(needsRendering()),
@@ -38,6 +38,7 @@ public:
 
 private:
     QGLWidget widget;
+    const QSize size;
     QGLFramebufferObject fbo;
 
 protected:
