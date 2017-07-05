@@ -28,6 +28,9 @@ NS_ASSUME_NONNULL_BEGIN
  ### Example
 
  ```swift
+ let layer = MGLRasterStyleLayer(identifier: "clouds", source: source)
+ layer.rasterOpacity = MGLStyleValue(rawValue: 0.5)
+ mapView.style?.addLayer(layer)
  ```
  */
 MGL_EXPORT
