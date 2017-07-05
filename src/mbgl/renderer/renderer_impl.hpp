@@ -1,10 +1,9 @@
 #pragma once
 #include <mbgl/renderer/renderer.hpp>
+#include <mbgl/renderer/renderer_backend.hpp>
 #include <mbgl/renderer/renderer_observer.hpp>
 #include <mbgl/renderer/render_style_observer.hpp>
 #include <mbgl/style/style.hpp>
-
-#include <mbgl/map/backend.hpp>
 
 #include <memory>
 #include <string>
@@ -25,7 +24,7 @@ class View;
 
 class Renderer::Impl : public RenderStyleObserver {
 public:
-    Impl(Backend&, float pixelRatio_, FileSource&, Scheduler&, GLContextMode,
+    Impl(RendererBackend&, float pixelRatio_, FileSource&, Scheduler&, GLContextMode,
          const optional<std::string> programCacheDir);
     ~Impl() final;
 
@@ -47,7 +46,7 @@ public:
 private:
     friend class Renderer;
 
-    Backend& backend;
+    RendererBackend& backend;
 
     RendererObserver* observer;
 

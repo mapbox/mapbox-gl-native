@@ -13,7 +13,7 @@
 #include <mbgl/annotation/annotation_tile.hpp>
 #include <mbgl/renderer/image_manager.hpp>
 #include <mbgl/text/glyph_manager.hpp>
-#include <mbgl/map/backend_scope.hpp>
+#include <mbgl/renderer/backend_scope.hpp>
 #include <mbgl/gl/headless_backend.hpp>
 #include <mbgl/style/style.hpp>
 

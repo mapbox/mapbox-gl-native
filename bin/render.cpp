@@ -1,5 +1,4 @@
 #include <mbgl/map/map.hpp>
-#include <mbgl/map/backend_scope.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/run_loop.hpp>
 
@@ -9,6 +8,7 @@
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/renderer/renderer.hpp>
+#include <mbgl/renderer/backend_scope.hpp>
 #include <mbgl/renderer/async_renderer_frontend.hpp>
 
 #pragma GCC diagnostic push

@@ -5,7 +5,7 @@
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/renderer/update_parameters.hpp>
 #include <mbgl/map/transform_state.hpp>
-#include <mbgl/map/backend_scope.hpp>
+#include <mbgl/renderer/backend_scope.hpp>
 
 namespace mbgl {
 
@@ -14,7 +14,7 @@ static RendererObserver& nullObserver() {
     return observer;
 }
 
-Renderer::Impl::Impl(Backend& backend_,
+Renderer::Impl::Impl(RendererBackend& backend_,
                      float pixelRatio_,
                      FileSource& fileSource_,
                      Scheduler& scheduler_,
