@@ -2,7 +2,7 @@
 
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/view.hpp>
-#include <mbgl/map/backend.hpp>
+#include <mbgl/renderer/renderer_backend.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/timer.hpp>
 #include <mbgl/util/geometry.hpp>
@@ -10,7 +10,7 @@
 struct GLFWwindow;
 class GLFWRendererFrontend;
 
-class GLFWView : public mbgl::View, public mbgl::Backend, public mbgl::MapObserver {
+class GLFWView : public mbgl::View, public mbgl::RendererBackend, public mbgl::MapObserver {
 public:
     GLFWView(bool fullscreen = false, bool benchmark = false);
     ~GLFWView() override;
@@ -42,7 +42,7 @@ public:
     mbgl::Size getSize() const;
     mbgl::Size getFramebufferSize() const;
 
-    // mbgl::Backend implementation
+    // mbgl::RendererBackend implementation
     void updateAssumedState() override;
 
     // mbgl::MapObserver implementation

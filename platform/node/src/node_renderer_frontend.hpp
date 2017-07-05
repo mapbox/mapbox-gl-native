@@ -1,6 +1,6 @@
 #pragma once
 
-#include <mbgl/map/backend.hpp>
+#include <mbgl/renderer/renderer_backend.hpp>
 #include <mbgl/renderer/renderer_frontend.hpp>
 #include <mbgl/renderer/query.hpp>
 #include <mbgl/util/async_task.hpp>
