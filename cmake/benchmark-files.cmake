@@ -10,6 +10,7 @@ set(MBGL_BENCHMARK_FILES
 
     # parse
     benchmark/parse/filter.benchmark.cpp
+    benchmark/parse/tile_mask.benchmark.cpp
     benchmark/parse/vector_tile.benchmark.cpp
 
     # src
