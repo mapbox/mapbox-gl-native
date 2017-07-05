@@ -15,6 +15,7 @@ set(MBGL_CORE_FILES
     src/mbgl/algorithm/generate_clip_ids.hpp
     src/mbgl/algorithm/generate_clip_ids_impl.hpp
     src/mbgl/algorithm/update_renderables.hpp
+    src/mbgl/algorithm/update_tile_masks.hpp
 
     # annotation
     include/mbgl/annotation/annotation.hpp
@@ -197,6 +198,7 @@ set(MBGL_CORE_FILES
     src/mbgl/renderer/render_tile.hpp
     src/mbgl/renderer/style_diff.cpp
     src/mbgl/renderer/style_diff.hpp
+    src/mbgl/renderer/tile_mask.hpp
     src/mbgl/renderer/tile_parameters.hpp
     src/mbgl/renderer/tile_pyramid.cpp
     src/mbgl/renderer/tile_pyramid.hpp

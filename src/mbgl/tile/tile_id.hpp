@@ -28,6 +28,7 @@ public:
     bool operator<(const CanonicalTileID&) const;
     bool isChildOf(const CanonicalTileID&) const;
     CanonicalTileID scaledTo(uint8_t z) const;
+    CanonicalTileID operator-(const CanonicalTileID&) const;
     std::array<CanonicalTileID, 4> children() const;
 
     const uint8_t z;
@@ -122,6 +123,15 @@ inline CanonicalTileID CanonicalTileID::scaledTo(uint8_t targetZ) const {
         return { targetZ, x >> (z - targetZ), y >> (z - targetZ) }; // parent or same
     } else {
         return { targetZ, x << (targetZ - z), y << (targetZ - z) }; // child
+    }
+}
+
+inline CanonicalTileID CanonicalTileID::operator-(const CanonicalTileID& rhs) const {
+    if (!isChildOf(rhs)) {
+        return { 0, 0, 0 };
+    } else {
+        const uint8_t diffZ = z - rhs.z;
+        return { diffZ, x - (rhs.x << diffZ), y - (rhs.y << diffZ) };
     }
 }
 
