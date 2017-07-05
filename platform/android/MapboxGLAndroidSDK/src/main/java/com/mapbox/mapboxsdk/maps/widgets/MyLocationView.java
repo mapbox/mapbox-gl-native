@@ -51,7 +51,7 @@ import timber.log.Timber;
  */
 public class MyLocationView extends View {
 
-  private static final int UNDEFINED_FOREGROUND_TINT_COLOR = -1;
+  private static final int UNDEFINED_TINT_COLOR = -1;
   private MyLocationBehavior myLocationBehavior;
   private MapboxMap mapboxMap;
 
@@ -199,11 +199,8 @@ public class MyLocationView extends View {
    * @param color The color to tint the drawable with
    */
   public final void setForegroundDrawableTint(@ColorInt int color) {
-    if (color == UNDEFINED_FOREGROUND_TINT_COLOR) {
-      removeForegroundTintColorFilter();
-    } else {
-      applyForegroundTintColorFilter(color);
-    }
+    applyDrawableTint(foregroundDrawable, color);
+    applyDrawableTint(foregroundBearingDrawable, color);
     invalidate();
   }
 
@@ -247,7 +244,7 @@ public class MyLocationView extends View {
     if (backgroundDrawable == null) {
       return;
     }
-    backgroundDrawable.mutate().setColorFilter(color, PorterDuff.Mode.SRC_IN);
+    applyDrawableTint(backgroundDrawable, color);
     invalidate();
   }
 
@@ -737,21 +734,23 @@ public class MyLocationView extends View {
     setEnabled(isEnabled(), locationSource != null);
   }
 
-  private void removeForegroundTintColorFilter() {
-    if (foregroundDrawable != null) {
-      foregroundDrawable.mutate().setColorFilter(null);
-    }
-    if (foregroundBearingDrawable != null) {
-      foregroundBearingDrawable.mutate().setColorFilter(null);
+  private void applyDrawableTint(Drawable drawable, @ColorInt int color) {
+    if (color == UNDEFINED_TINT_COLOR) {
+      removeTintColorFilter(drawable);
+    } else {
+      applyTintColorFilter(drawable, color);
     }
   }
 
-  private void applyForegroundTintColorFilter(@ColorInt int color) {
-    if (foregroundDrawable != null) {
-      foregroundDrawable.mutate().setColorFilter(color, PorterDuff.Mode.SRC_IN);
+  private void removeTintColorFilter(Drawable drawable) {
+    if (drawable != null) {
+      drawable.mutate().setColorFilter(null);
     }
-    if (foregroundBearingDrawable != null) {
-      foregroundBearingDrawable.mutate().setColorFilter(color, PorterDuff.Mode.SRC_IN);
+  }
+
+  private void applyTintColorFilter(Drawable drawable, @ColorInt int color) {
+    if (drawable != null) {
+      drawable.mutate().setColorFilter(color, PorterDuff.Mode.SRC_IN);
     }
   }
 

@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Parcel;
@@ -75,7 +74,8 @@ public class MapboxMapOptions implements Parcelable {
   private Drawable myLocationBackgroundDrawable;
   @ColorInt
   private int myLocationForegroundTintColor = UNDEFINED_COLOR;
-  private int myLocationBackgroundTintColor;
+  @ColorInt
+  private int myLocationBackgroundTintColor = UNDEFINED_COLOR;
   private int[] myLocationBackgroundPadding;
   private int myLocationAccuracyTintColor;
   private int myLocationAccuracyAlpha;
@@ -255,7 +255,7 @@ public class MapboxMapOptions implements Parcelable {
       mapboxMapOptions.myLocationForegroundTintColor(
         typedArray.getColor(R.styleable.mapbox_MapView_mapbox_myLocationTintColor, UNDEFINED_COLOR));
       mapboxMapOptions.myLocationBackgroundTintColor(
-        typedArray.getColor(R.styleable.mapbox_MapView_mapbox_myLocationBackgroundTintColor, Color.WHITE));
+        typedArray.getColor(R.styleable.mapbox_MapView_mapbox_myLocationBackgroundTintColor, UNDEFINED_COLOR));
 
       Drawable foregroundDrawable = typedArray.getDrawable(R.styleable.mapbox_MapView_mapbox_myLocationDrawable);
       if (foregroundDrawable == null) {
@@ -639,7 +639,7 @@ public class MapboxMapOptions implements Parcelable {
   /**
    * Set the background tint color of MyLocationView.
    *
-   * @param myLocationBackgroundTintColor the color to tint the background
+   * @param myLocationBackgroundTintColor the color to tint the background drawable
    * @return This
    */
   public MapboxMapOptions myLocationBackgroundTintColor(@ColorInt int myLocationBackgroundTintColor) {
@@ -955,6 +955,7 @@ public class MapboxMapOptions implements Parcelable {
    *
    * @return the tint color
    */
+  @ColorInt
   public int getMyLocationBackgroundTintColor() {
     return myLocationBackgroundTintColor;
   }

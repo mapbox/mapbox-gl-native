@@ -16,7 +16,6 @@ import com.mapbox.mapboxsdk.maps.Projection;
  */
 public class MyLocationViewSettings {
 
-  private static final int UNDEFINED_FOREGROUND_TINT_COLOR = -1;
   private Projection projection;
   private MyLocationView myLocationView;
   private FocalPointChangeListener focalPointChangeListener;
@@ -178,6 +177,7 @@ public class MyLocationViewSettings {
    * <p>
    * Padding can be added to provide an offset to the background
    * </p>
+   * It's linked with the background tint color
    *
    * @param backgroundDrawable the drawable to show as background
    * @param padding            the padding added to the background
@@ -190,6 +190,7 @@ public class MyLocationViewSettings {
     } else {
       myLocationView.setShadowDrawable(backgroundDrawable);
     }
+    myLocationView.setShadowDrawableTint(backgroundTintColor);
   }
 
   /**
@@ -204,7 +205,8 @@ public class MyLocationViewSettings {
   /**
    * Set the background tint color.
    *
-   * @param backgroundTintColor the color to tint the background
+   * @param backgroundTintColor the color to tint the background drawable or -1 (undefined color) to remove the
+   *                            existing background tint color
    */
   public void setBackgroundTintColor(@ColorInt int backgroundTintColor) {
     this.backgroundTintColor = backgroundTintColor;
