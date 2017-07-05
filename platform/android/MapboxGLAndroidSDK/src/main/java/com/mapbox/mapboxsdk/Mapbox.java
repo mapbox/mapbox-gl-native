@@ -1,6 +1,5 @@
 package com.mapbox.mapboxsdk;
 
-import android.app.Application;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -17,10 +16,10 @@ import com.mapbox.services.android.telemetry.location.LocationEngine;
 import com.mapbox.services.android.telemetry.location.LocationEnginePriority;
 
 /**
- * The entry point of the Mapbox Android SDK.
+ * The entry point to initialize the Mapbox Android SDK.
  * <p>
  * Obtain a reference by calling {@link #getInstance(Context, String)}. Usually this class is configured in
- * {@link Application#onCreate()} and is responsible for the active access token, application context, and
+ * Application#onCreate() and is responsible for the active access token, application context, and
  * connectivity state.
  * </p>
  */
@@ -31,6 +30,7 @@ public final class Mapbox {
   private Context context;
   private String accessToken;
   private Boolean connected;
+  private LocationSource locationSource;
 
   /**
    * Get an instance of Mapbox.
@@ -46,8 +46,8 @@ public final class Mapbox {
   public static synchronized Mapbox getInstance(@NonNull Context context, @NonNull String accessToken) {
     if (INSTANCE == null) {
       Context appContext = context.getApplicationContext();
-      INSTANCE = new Mapbox(appContext, accessToken);
-      LocationEngine locationEngine = LocationSource.getLocationEngine(appContext);
+      INSTANCE = new Mapbox(appContext, accessToken, new LocationSource(appContext));
+      LocationEngine locationEngine = new LocationSource(appContext);
       locationEngine.setPriority(LocationEnginePriority.NO_POWER);
       MapboxTelemetry.getInstance().initialize(
         appContext, accessToken, BuildConfig.MAPBOX_EVENTS_USER_AGENT, locationEngine);
@@ -56,9 +56,10 @@ public final class Mapbox {
     return INSTANCE;
   }
 
-  Mapbox(@NonNull Context context, @NonNull String accessToken) {
+  Mapbox(@NonNull Context context, @NonNull String accessToken, LocationSource locationSource) {
     this.context = context;
     this.accessToken = accessToken;
+    this.locationSource = locationSource;
   }
 
   /**
@@ -96,6 +97,8 @@ public final class Mapbox {
 
   /**
    * Application context
+   *
+   * @return the application context
    */
   public static Context getApplicationContext() {
     return INSTANCE.context;
@@ -128,5 +131,9 @@ public final class Mapbox {
     ConnectivityManager cm = (ConnectivityManager) INSTANCE.context.getSystemService(Context.CONNECTIVITY_SERVICE);
     NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
     return (activeNetwork != null && activeNetwork.isConnected());
+  }
+
+  public static LocationSource getLocationSource() {
+    return INSTANCE.locationSource;
   }
 }

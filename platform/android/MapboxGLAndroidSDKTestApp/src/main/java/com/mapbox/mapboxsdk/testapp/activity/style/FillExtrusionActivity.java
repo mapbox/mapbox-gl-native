@@ -26,6 +26,7 @@ import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.fillExtrusionOpa
 public class FillExtrusionActivity extends AppCompatActivity {
 
   private MapView mapView;
+  private MapboxMap mapboxMap;
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -36,8 +37,8 @@ public class FillExtrusionActivity extends AppCompatActivity {
     mapView.onCreate(savedInstanceState);
     mapView.getMapAsync(new OnMapReadyCallback() {
       @Override
-      public void onMapReady(@NonNull
-                             final MapboxMap map) {
+      public void onMapReady(@NonNull final MapboxMap map) {
+        mapboxMap = map;
         Polygon domTower = Polygon.fromCoordinates(new double[][][] {
           new double[][] {
             new double[] {
@@ -66,7 +67,7 @@ public class FillExtrusionActivity extends AppCompatActivity {
         GeoJsonSource source = new GeoJsonSource("extrusion-source", domTower);
         map.addSource(source);
 
-        map.addLayer(
+        mapboxMap.addLayer(
           new FillExtrusionLayer("extrusion-layer", source.getId())
             .withProperties(
               fillExtrusionHeight(40f),
@@ -75,7 +76,7 @@ public class FillExtrusionActivity extends AppCompatActivity {
             )
         );
 
-        map.animateCamera(
+        mapboxMap.animateCamera(
           CameraUpdateFactory.newCameraPosition(
             new CameraPosition.Builder()
               .target(new LatLng(52.09071040847704, 5.12112557888031))

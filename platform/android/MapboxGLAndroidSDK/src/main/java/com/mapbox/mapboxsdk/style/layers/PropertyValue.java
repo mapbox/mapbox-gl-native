@@ -30,14 +30,29 @@ public class PropertyValue<T> {
     this.value = value;
   }
 
+  /**
+   * Returns if this is null
+   *
+   * @return true if this is null, false if not
+   */
   public boolean isNull() {
     return value == null;
   }
 
+  /**
+   * Returns if this is a function.
+   *
+   * @return true if is a function, false if not
+   */
   public boolean isFunction() {
     return !isNull() && value instanceof Function;
   }
 
+  /**
+   * Returns if this is a value.
+   *
+   * @return true if is a value, false if not
+   */
   public boolean isValue() {
     return !isNull() && !isFunction();
   }
@@ -53,6 +68,11 @@ public class PropertyValue<T> {
     }
   }
 
+  /**
+   * Get the value of the property.
+   *
+   * @return the property value
+   */
   @Nullable
   public T getValue() {
     if (isValue()) {
@@ -64,6 +84,11 @@ public class PropertyValue<T> {
     }
   }
 
+  /**
+   * Get the color int value of the property if the value is a color.
+   *
+   * @return the color int value of the property, null if not a color value
+   */
   @ColorInt
   @Nullable
   public Integer getColorInt() {
@@ -80,6 +105,11 @@ public class PropertyValue<T> {
     }
   }
 
+  /**
+   * Get the string representation of a property value.
+   *
+   * @return the string representation
+   */
   @Override
   public String toString() {
     return String.format("%s: %s", name, value);

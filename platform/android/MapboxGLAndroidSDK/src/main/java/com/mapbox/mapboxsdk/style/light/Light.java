@@ -13,7 +13,7 @@ import com.mapbox.mapboxsdk.style.layers.TransitionOptions;
 /**
  * The global light source.
  *
- * @see <a href="https://www.mapbox.com/mapbox-gl-style-spec/#light>">The online documentation</a>
+ * @see <a href="https://www.mapbox.com/mapbox-gl-style-spec/#light">The online documentation</a>
  */
 @UiThread
 public class Light {
@@ -43,7 +43,8 @@ public class Light {
    *
    * @return anchor as String
    */
-  @Property.ANCHOR public String getAnchor() {
+  @Property.ANCHOR
+  public String getAnchor() {
     return nativeGetAnchor();
   }
 
@@ -106,7 +107,7 @@ public class Light {
    *
    * @return color as String
    */
-   public String getColor() {
+  public String getColor() {
     return nativeGetColor();
   }
 
@@ -142,7 +143,7 @@ public class Light {
    *
    * @return intensity as Float
    */
-   public float getIntensity() {
+  public float getIntensity() {
     return nativeGetIntensity();
   }
 
@@ -165,17 +166,30 @@ public class Light {
   }
 
   private native void nativeSetAnchor(String anchor);
+
   private native String nativeGetAnchor();
+
   private native void nativeSetPosition(Position position);
+
   private native Position nativeGetPosition();
+
   private native TransitionOptions nativeGetPositionTransition();
+
   private native void nativeSetPositionTransition(long duration, long delay);
+
   private native void nativeSetColor(String color);
+
   private native String nativeGetColor();
+
   private native TransitionOptions nativeGetColorTransition();
+
   private native void nativeSetColorTransition(long duration, long delay);
+
   private native void nativeSetIntensity(float intensity);
+
   private native float nativeGetIntensity();
+
   private native TransitionOptions nativeGetIntensityTransition();
+
   private native void nativeSetIntensityTransition(long duration, long delay);
 }

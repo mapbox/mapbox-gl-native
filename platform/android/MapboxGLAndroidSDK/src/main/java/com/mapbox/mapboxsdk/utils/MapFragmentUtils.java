@@ -18,12 +18,25 @@ import com.mapbox.mapboxsdk.maps.MapboxMapOptions;
  */
 public class MapFragmentUtils {
 
+  /**
+   * Convert MapboxMapOptions to a bundle of fragment arguments.
+   *
+   * @param options The MapboxMapOptions to convert
+   * @return a bundle of converted fragment arguments
+   */
   public static Bundle createFragmentArgs(MapboxMapOptions options) {
     Bundle bundle = new Bundle();
     bundle.putParcelable(MapboxConstants.FRAG_ARG_MAPBOXMAPOPTIONS, options);
     return bundle;
   }
 
+  /**
+   * Convert a bundle of fragment arguments to MapboxMapOptions.
+   *
+   * @param context The context of the activity hosting the fragment
+   * @param args    The fragment arguments
+   * @return converted MapboxMapOptions
+   */
   public static MapboxMapOptions resolveArgs(Context context, Bundle args) {
     MapboxMapOptions options;
     if (args != null && args.containsKey(MapboxConstants.FRAG_ARG_MAPBOXMAPOPTIONS)) {

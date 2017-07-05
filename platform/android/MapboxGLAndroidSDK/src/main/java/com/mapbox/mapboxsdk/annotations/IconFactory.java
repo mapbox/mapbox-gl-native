@@ -23,7 +23,7 @@ import java.io.InputStream;
 /**
  * Factory for creating Icons from bitmap images.
  * <p>
- * {@link Icon} is used to display bitmaps on top of the map using {@link Marker} and {@link MarkerView}.
+ * icon is used to display bitmaps on top of the map using {@link Marker} and {@link MarkerView}.
  * </p>
  *
  * @see Icon
@@ -42,6 +42,12 @@ public final class IconFactory {
 
   private int nextId = 0;
 
+  /**
+   * Get a single instance of IconFactory.
+   *
+   * @param context the context to derive the application context from
+   * @return the single instance of IconFactory
+   */
   public static synchronized IconFactory getInstance(@NonNull Context context) {
     if (instance == null) {
       instance = new IconFactory(context.getApplicationContext());
@@ -71,10 +77,10 @@ public final class IconFactory {
   }
 
   /**
-   * Creates an {@link Icon} from a given Bitmap image.
+   * Creates an icon from a given Bitmap image.
    *
    * @param bitmap image used for creating the Icon.
-   * @return The {@link Icon} using the given Bitmap image.
+   * @return The icon using the given Bitmap image.
    */
   public Icon fromBitmap(@NonNull Bitmap bitmap) {
     if (nextId < 0) {
@@ -85,10 +91,10 @@ public final class IconFactory {
   }
 
   /**
-   * Create an {@link Icon} using the resource ID of a Bitmap image.
+   * Creates an icon using the resource ID of a Bitmap image.
    *
    * @param resourceId The resource ID of a Bitmap image.
-   * @return The {@link Icon} that was loaded from the asset or {@code null} if failed to load.
+   * @return The icon that was loaded from the asset or {@code null} if failed to load.
    */
   public Icon fromResource(@DrawableRes int resourceId) {
     Drawable drawable = ContextCompat.getDrawable(context, resourceId);
@@ -101,9 +107,9 @@ public final class IconFactory {
   }
 
   /**
-   * Provides an {@link Icon} using the default marker icon used for {@link Marker}.
+   * Provides an icon using the default marker icon used for {@link Marker}.
    *
-   * @return An {@link Icon} with the default {@link Marker} icon.
+   * @return An icon with the default {@link Marker} icon.
    */
   public Icon defaultMarker() {
     if (defaultMarker == null) {
@@ -113,9 +119,9 @@ public final class IconFactory {
   }
 
   /**
-   * Provides an {@link Icon} using the default marker icon used for {@link MarkerView}.
+   * Provides an icon using the default marker icon used for {@link MarkerView}.
    *
-   * @return An {@link Icon} with the default {@link MarkerView} icon.
+   * @return An icon with the default {@link MarkerView} icon.
    */
   public Icon defaultMarkerView() {
     if (defaultMarkerView == null) {
@@ -130,10 +136,10 @@ public final class IconFactory {
   }
 
   /**
-   * Creates an {@link Icon} using the name of a Bitmap image in the assets directory.
+   * Creates an Icon using the name of a Bitmap image in the assets directory.
    *
    * @param assetName The name of a Bitmap image in the assets directory.
-   * @return The {@link Icon} that was loaded from the asset or {@code null} if failed to load.
+   * @return The Icon that was loaded from the asset or null if failed to load.
    */
   public Icon fromAsset(@NonNull String assetName) {
     InputStream is;
@@ -146,11 +152,10 @@ public final class IconFactory {
   }
 
   /**
-   * Creates an {@link Icon} using the absolute file path of a Bitmap image.
+   * Creates an Icon using the absolute file path of a Bitmap image.
    *
    * @param absolutePath The absolute path of the Bitmap image.
-   * @return The {@link Icon} that was loaded from the absolute path or {@code null} if failed to
-   * load.
+   * @return The Icon that was loaded from the absolute path or null if failed to load.
    */
   public Icon fromPath(@NonNull String absolutePath) {
     Bitmap bitmap = BitmapFactory.decodeFile(absolutePath, options);
@@ -158,11 +163,11 @@ public final class IconFactory {
   }
 
   /**
-   * Create an {@link Icon} using the name of a Bitmap image file located in the internal storage.
-   * In particular, this calls {@link Context#openFileInput(String)}.
+   * Create an Icon using the name of a Bitmap image file located in the internal storage.
+   * In particular, this calls Context#openFileInput(String).
    *
    * @param fileName The name of the Bitmap image file.
-   * @return The {@link Icon} that was loaded from the asset or {@code null} if failed to load.
+   * @return The Icon that was loaded from the asset or null if failed to load.
    * @see <a href="https://developer.android.com/guide/topics/data/data-storage.html#filesInternal">
    * Using the Internal Storage</a>
    */
@@ -177,12 +182,11 @@ public final class IconFactory {
   }
 
   /**
-   * Create an {@link Icon} using a previously created icon identifier along with a provided
-   * Bitmap.
+   * Create an Icon using a previously created icon identifier along with a provided Bitmap.
    *
-   * @param iconId The {@link Icon} identifier you'd like to recreate.
+   * @param iconId The Icon identifier you'd like to recreate.
    * @param bitmap a Bitmap used to replace the current one.
-   * @return The {@link Icon} using the new Bitmap.
+   * @return The Icon using the new Bitmap.
    */
   public static Icon recreate(@NonNull String iconId, @NonNull Bitmap bitmap) {
     return new Icon(iconId, bitmap);
