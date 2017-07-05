@@ -2,7 +2,7 @@
 
 namespace mbgl {
 
-class Backend;
+class RendererBackend;
 
 class BackendScope {
 public:
@@ -15,7 +15,7 @@ public:
         Explicit,
     };
 
-    BackendScope(Backend&, ScopeType = ScopeType::Explicit);
+    BackendScope(RendererBackend&, ScopeType = ScopeType::Explicit);
     ~BackendScope();
 
     // Returns true when there is currently a BackendScope active in this thread.
@@ -24,7 +24,7 @@ public:
 private:
     BackendScope* priorScope;
     BackendScope* nextScope;
-    Backend& backend;
+    RendererBackend& backend;
     const ScopeType scopeType;
 };
 

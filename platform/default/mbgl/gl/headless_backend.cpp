@@ -1,7 +1,7 @@
 #include <mbgl/gl/headless_backend.hpp>
 #include <mbgl/gl/headless_display.hpp>
 #include <mbgl/gl/context.hpp>
-#include <mbgl/map/backend_scope.hpp>
+#include <mbgl/renderer/backend_scope.hpp>
 
 #include <cassert>
 #include <stdexcept>

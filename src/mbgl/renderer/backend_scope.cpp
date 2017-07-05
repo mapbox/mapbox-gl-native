@@ -1,5 +1,5 @@
-#include <mbgl/map/backend_scope.hpp>
-#include <mbgl/map/backend.hpp>
+#include <mbgl/renderer/backend_scope.hpp>
+#include <mbgl/renderer/renderer_backend.hpp>
 #include <mbgl/util/thread_local.hpp>
 
 #include <cassert>
@@ -8,7 +8,7 @@ namespace mbgl {
 
 static util::ThreadLocal<BackendScope> currentScope;
 
-BackendScope::BackendScope(Backend& backend_, ScopeType scopeType_)
+BackendScope::BackendScope(RendererBackend& backend_, ScopeType scopeType_)
     : priorScope(currentScope.get()),
       nextScope(nullptr),
       backend(backend_),
