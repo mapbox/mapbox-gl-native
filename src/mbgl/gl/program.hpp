@@ -9,10 +9,10 @@
 #include <mbgl/gl/uniform.hpp>
 
 #include <mbgl/util/io.hpp>
+#include <mbgl/util/logging.hpp>
 #include <mbgl/programs/binary_program.hpp>
 #include <mbgl/programs/program_parameters.hpp>
 #include <mbgl/shaders/shaders.hpp>
-
 
 #include <string>
 

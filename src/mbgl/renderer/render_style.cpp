@@ -28,6 +28,7 @@
 #include <mbgl/tile/tile.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/string.hpp>
+#include <mbgl/util/logging.hpp>
 
 namespace mbgl {
 
