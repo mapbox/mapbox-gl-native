@@ -5,7 +5,6 @@
 #include "node_geojson.hpp"
 #include "node_renderer_frontend.hpp"
 
-#include <mbgl/gl/headless_display.hpp>
 #include <mbgl/util/exception.hpp>
 #include <mbgl/renderer/renderer.hpp>
 #include <mbgl/renderer/backend_scope.hpp>
@@ -35,17 +34,11 @@ struct NodeMap::RenderOptions {
 
 Nan::Persistent<v8::Function> NodeMap::constructor;
 
-static std::shared_ptr<mbgl::HeadlessDisplay> sharedDisplay() {
-    static auto display = std::make_shared<mbgl::HeadlessDisplay>();
-    return display;
-}
-
 static const char* releasedMessage() {
     return "Map resources have already been released";
 }
 
-NodeBackend::NodeBackend()
-    : HeadlessBackend(sharedDisplay()) {}
+NodeBackend::NodeBackend(): HeadlessBackend() {}
 
 void NodeMapObserver::onDidFailLoadingMap(std::exception_ptr error) {
     std::rethrow_exception(error);
@@ -81,9 +74,6 @@ void NodeMap::Init(v8::Local<v8::Object> target) {
 
     constructor.Reset(tpl->GetFunction());
     Nan::Set(target, Nan::New("Map").ToLocalChecked(), tpl->GetFunction());
-
-    // Initialize display connection on module load.
-    sharedDisplay();
 }
 
 /**

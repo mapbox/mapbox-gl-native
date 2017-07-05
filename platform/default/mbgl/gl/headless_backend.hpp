@@ -12,7 +12,6 @@ class HeadlessDisplay;
 class HeadlessBackend : public RendererBackend {
 public:
     HeadlessBackend();
-    HeadlessBackend(std::shared_ptr<HeadlessDisplay>);
     ~HeadlessBackend() override;
 
     void updateAssumedState() override;

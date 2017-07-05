@@ -11,10 +11,6 @@ namespace mbgl {
 
 HeadlessBackend::HeadlessBackend() = default;
 
-HeadlessBackend::HeadlessBackend(std::shared_ptr<HeadlessDisplay> display_)
-        : display(std::move(display_)) {
-}
-
 HeadlessBackend::~HeadlessBackend() {
     BackendScope guard { *this, getScopeType() };
     context.reset();

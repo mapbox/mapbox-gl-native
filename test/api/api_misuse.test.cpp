@@ -24,7 +24,7 @@ TEST(API, RenderWithoutCallback) {
 
     util::RunLoop loop;
 
-    HeadlessBackend backend { test::sharedDisplay() };
+    HeadlessBackend backend;
     BackendScope scope { backend };
     OffscreenView view { backend.getContext(), { 128, 512 } };
     StubFileSource fileSource;

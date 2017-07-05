@@ -29,7 +29,7 @@ public:
     ThreadPool threadPool { 1 };
     style::Style style { loop, fileSource, 1 };
     AnnotationManager annotationManager { style };
-    HeadlessBackend backend { test::sharedDisplay() };
+    HeadlessBackend backend;
     BackendScope scope { backend };
     RenderStyle renderStyle { threadPool, fileSource };
     ImageManager imageManager;

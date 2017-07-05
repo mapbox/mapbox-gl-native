@@ -38,7 +38,7 @@ public:
     }
 
     util::RunLoop runLoop;
-    HeadlessBackend backend { test::sharedDisplay() };
+    HeadlessBackend backend;
     BackendScope scope { backend };
     OffscreenView view { backend.getContext(), { 512, 512 } };
     StubFileSource fileSource;
