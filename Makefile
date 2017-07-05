@@ -253,11 +253,6 @@ iframework: $(IOS_PROJ_PATH)
 	FORMAT=dynamic BUILD_DEVICE=$(BUILD_DEVICE) SYMBOLS=$(SYMBOLS) \
 	./platform/ios/scripts/package.sh
 
-.PHONY: ifabric
-ifabric: $(IOS_PROJ_PATH)
-	FORMAT=static BUILD_DEVICE=$(BUILD_DEVICE) SYMBOLS=NO SELF_CONTAINED=YES \
-	./platform/ios/scripts/package.sh
-
 .PHONY: ideploy
 ideploy:
 	caffeinate -i ./platform/ios/scripts/deploy-packages.sh

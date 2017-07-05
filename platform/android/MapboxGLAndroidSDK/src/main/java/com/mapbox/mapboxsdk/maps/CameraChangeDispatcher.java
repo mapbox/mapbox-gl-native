@@ -2,8 +2,8 @@ package com.mapbox.mapboxsdk.maps;
 
 import static com.mapbox.mapboxsdk.maps.MapboxMap.OnCameraIdleListener;
 import static com.mapbox.mapboxsdk.maps.MapboxMap.OnCameraMoveCanceledListener;
-import static com.mapbox.mapboxsdk.maps.MapboxMap.OnCameraMoveStartedListener;
 import static com.mapbox.mapboxsdk.maps.MapboxMap.OnCameraMoveListener;
+import static com.mapbox.mapboxsdk.maps.MapboxMap.OnCameraMoveStartedListener;
 
 class CameraChangeDispatcher implements MapboxMap.OnCameraMoveStartedListener, MapboxMap.OnCameraMoveListener,
   MapboxMap.OnCameraMoveCanceledListener, OnCameraIdleListener {
@@ -59,9 +59,11 @@ class CameraChangeDispatcher implements MapboxMap.OnCameraMoveStartedListener, M
 
   @Override
   public void onCameraIdle() {
-    if (onCameraIdleListener != null && !idle) {
+    if (!idle) {
       idle = true;
-      onCameraIdleListener.onCameraIdle();
+      if (onCameraIdleListener != null) {
+        onCameraIdleListener.onCameraIdle();
+      }
     }
   }
 }

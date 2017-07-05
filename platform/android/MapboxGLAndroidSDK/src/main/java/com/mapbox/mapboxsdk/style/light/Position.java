@@ -18,7 +18,7 @@ public class Position {
   private float polarAngle;
 
   /**
-   * Creates a Position from a radial coordinate, an azimuthal angle & a polar angle.
+   * Creates a Position from a radial coordinate, an azimuthal angle and a polar angle.
    *
    * @param radialCoordinate the distance from the center of the base of an object to its light
    * @param azimuthalAngle the position of the light relative to 0°
@@ -31,7 +31,7 @@ public class Position {
   }
 
   /**
-   * Returns a Position from a radial coordinate, an azimuthal angle & a polar angle
+   * Returns a Position from a radial coordinate, an azimuthal angle and a polar angle
    *
    * @param radialCoordinate the radial coordinate
    * @param azimuthalAngle the azimuthal angle

@@ -26,6 +26,7 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.constants.MyBearingTracking;
@@ -40,8 +41,13 @@ import com.mapbox.services.android.telemetry.location.LocationEnginePriority;
 
 import java.lang.ref.WeakReference;
 
+import timber.log.Timber;
+
 /**
  * UI element overlaid on a map to show the user's location.
+ * <p>
+ * Use {@link MyLocationViewSettings} to manipulate the state of this view.
+ * </p>
  */
 public class MyLocationView extends View {
 
@@ -68,6 +74,7 @@ public class MyLocationView extends View {
   private ValueAnimator locationChangeAnimator;
   private ValueAnimator accuracyAnimator;
   private ValueAnimator directionAnimator;
+  private boolean locationChangeAnimationEnabled;
 
   private ValueAnimator.AnimatorUpdateListener invalidateSelfOnUpdateListener =
     new ValueAnimator.AnimatorUpdateListener() {
@@ -147,6 +154,16 @@ public class MyLocationView extends View {
     compassListener = new CompassListener(context);
   }
 
+  public void init(LocationSource locationSource) {
+    this.locationSource = locationSource;
+  }
+
+  /**
+   * Set the foreground drawable, for internal use only.
+   *
+   * @param defaultDrawable The drawable shown when showing this view
+   * @param bearingDrawable The drawable shown when tracking of bearing is enabled
+   */
   public final void setForegroundDrawables(Drawable defaultDrawable, Drawable bearingDrawable) {
     if (defaultDrawable == null) {
       return;
@@ -175,6 +192,11 @@ public class MyLocationView extends View {
     invalidateBounds();
   }
 
+  /**
+   * Set the foreground drawable tint, for internal use only.
+   *
+   * @param color The color to tint the drawable with
+   */
   public final void setForegroundDrawableTint(@ColorInt int color) {
     if (foregroundDrawable != null) {
       foregroundDrawable.mutate().setColorFilter(color, PorterDuff.Mode.SRC_IN);
@@ -185,10 +207,24 @@ public class MyLocationView extends View {
     invalidate();
   }
 
+  /**
+   * Set the shadow drawable, for internal use only.
+   *
+   * @param drawable The drawable shown as shadow
+   */
   public final void setShadowDrawable(Drawable drawable) {
     setShadowDrawable(drawable, 0, 0, 0, 0);
   }
 
+  /**
+   * Set the shadow drawable with some additional offset.
+   *
+   * @param drawable The drawable shown as shadow
+   * @param left     The left offset margin
+   * @param top      The top offset margin
+   * @param right    The right offset margin
+   * @param bottom   The bottom offset margin
+   */
   public final void setShadowDrawable(Drawable drawable, int left, int top, int right, int bottom) {
     if (drawable != null) {
       backgroundDrawable = drawable;
@@ -202,6 +238,11 @@ public class MyLocationView extends View {
     invalidateBounds();
   }
 
+  /**
+   * Set the shadow drawable tint color, for internal use only.
+   *
+   * @param color The tint color to apply
+   */
   public final void setShadowDrawableTint(@ColorInt int color) {
     if (backgroundDrawable == null) {
       return;
@@ -210,6 +251,11 @@ public class MyLocationView extends View {
     invalidate();
   }
 
+  /**
+   * Set the accuracy tint color, for internal use only.
+   *
+   * @param color The tint color to apply
+   */
   public final void setAccuracyTint(@ColorInt int color) {
     int alpha = accuracyPaint.getAlpha();
     accuracyPaint.setColor(color);
@@ -217,6 +263,11 @@ public class MyLocationView extends View {
     invalidate();
   }
 
+  /**
+   * Set the accuracy alpha value, for internal use only.
+   *
+   * @param alpha The alpha accuracy value to apply
+   */
   public final void setAccuracyAlpha(@IntRange(from = 0, to = 255) int alpha) {
     accuracyPaint.setAlpha(alpha);
     invalidate();
@@ -297,15 +348,25 @@ public class MyLocationView extends View {
     }
 
     // draw foreground
-    if (myBearingTrackingMode == MyBearingTracking.NONE || !compassListener.isSensorAvailable()) {
+    if (myBearingTrackingMode == MyBearingTracking.NONE) {
       if (foregroundDrawable != null) {
         foregroundDrawable.draw(canvas);
       }
     } else if (foregroundBearingDrawable != null && foregroundBounds != null) {
-      foregroundBearingDrawable.draw(canvas);
+      if (myBearingTrackingMode == MyBearingTracking.GPS || compassListener.isSensorAvailable()) {
+        foregroundBearingDrawable.draw(canvas);
+      } else {
+        // We are tracking MyBearingTracking.COMPASS, but sensor is not available.
+        foregroundDrawable.draw(canvas);
+      }
     }
   }
 
+  /**
+   * Set the tilt value, for internal use only.
+   *
+   * @param tilt The tilt to apply
+   */
   public void setTilt(@FloatRange(from = 0, to = 60.0f) double tilt) {
     this.tilt = tilt;
     if (myLocationTrackingMode == MyLocationTracking.TRACKING_FOLLOW) {
@@ -314,6 +375,11 @@ public class MyLocationView extends View {
     invalidate();
   }
 
+  /**
+   * Set the bearing value, for internal use only.
+   *
+   * @param bearing The bearing to apply
+   */
   public void setBearing(double bearing) {
     this.bearing = bearing;
     if (myLocationTrackingMode == MyLocationTracking.TRACKING_NONE) {
@@ -327,6 +393,11 @@ public class MyLocationView extends View {
     }
   }
 
+  /**
+   * Set the bearing and tilt from a camera position, for internal use only.
+   *
+   * @param position The camera position to extract bearing and tilt from
+   */
   public void setCameraPosition(CameraPosition position) {
     if (position != null) {
       setBearing(position.bearing);
@@ -334,6 +405,9 @@ public class MyLocationView extends View {
     }
   }
 
+  /**
+   * Called when the hosting activity is starting, for internal use only.
+   */
   public void onStart() {
     if (myBearingTrackingMode == MyBearingTracking.COMPASS && compassListener.isSensorAvailable()) {
       compassListener.onResume();
@@ -343,6 +417,9 @@ public class MyLocationView extends View {
     }
   }
 
+  /**
+   * Called when the hosting activity is stopping, for internal use only.
+   */
   public void onStop() {
     compassListener.onPause();
     toggleGps(false);
@@ -374,6 +451,9 @@ public class MyLocationView extends View {
     }
   }
 
+  /**
+   * Update current locationstate.
+   */
   public void update() {
     if (isEnabled()) {
       myLocationBehavior.invalidate();
@@ -388,13 +468,33 @@ public class MyLocationView extends View {
     this.projection = mapboxMap.getProjection();
   }
 
+  /**
+   * Set the enabled state, for internal use only.
+   *
+   * @param enabled The value to set the state to
+   */
   @Override
   public void setEnabled(boolean enabled) {
-    super.setEnabled(enabled);
-    setVisibility(enabled ? View.VISIBLE : View.INVISIBLE);
-    toggleGps(enabled);
+    setEnabled(enabled, false);
   }
 
+  /**
+   * Set the enabled state, for internal use only.
+   *
+   * @param enabled                The value to set the state to
+   * @param isCustomLocationSource Flag handling for handling user provided custom location source
+   */
+  public void setEnabled(boolean enabled, boolean isCustomLocationSource) {
+    super.setEnabled(enabled);
+    setVisibility(enabled ? View.VISIBLE : View.INVISIBLE);
+    toggleGps(enabled, isCustomLocationSource);
+  }
+
+  /**
+   * Save the view instance state, for internal use only.
+   *
+   * @return the marshaled representation of the view state
+   */
   @Override
   protected Parcelable onSaveInstanceState() {
     Bundle bundle = new Bundle();
@@ -403,6 +503,11 @@ public class MyLocationView extends View {
     return bundle;
   }
 
+  /**
+   * Restore the view instance state, for internal use only.
+   *
+   * @param state the marshalled representation of the state to restore
+   */
   @Override
   public void onRestoreInstanceState(Parcelable state) {
     if (state instanceof Bundle) {
@@ -413,22 +518,23 @@ public class MyLocationView extends View {
     super.onRestoreInstanceState(state);
   }
 
+  private void toggleGps(boolean enableGps) {
+    toggleGps(enableGps, mapboxMap != null && mapboxMap.getTrackingSettings().isCustomLocationSource());
+  }
+
   /**
-   * Enabled / Disable GPS location updates along with updating the UI
+   * Enabled / Disable GPS location updates along with updating the UI, for internal use only.
    *
    * @param enableGps true if GPS is to be enabled, false if GPS is to be disabled
    */
-  private void toggleGps(boolean enableGps) {
-    if (locationSource == null) {
-      locationSource = LocationSource.getLocationEngine(this.getContext());
-    }
-
+  private void toggleGps(boolean enableGps, boolean isCustomLocationSource) {
     if (enableGps) {
-      // Set an initial location if one available
-      Location lastLocation = locationSource.getLastLocation();
-
-      if (lastLocation != null) {
-        setLocation(lastLocation);
+      if (locationSource == null) {
+        if (!isCustomLocationSource) {
+          locationSource = Mapbox.getLocationSource();
+        } else {
+          return;
+        }
       }
 
       if (userLocationListener == null) {
@@ -436,22 +542,34 @@ public class MyLocationView extends View {
       }
 
       locationSource.addLocationEngineListener(userLocationListener);
+      locationSource.setPriority(LocationEnginePriority.HIGH_ACCURACY);
       locationSource.activate();
     } else {
+      if (locationSource == null) {
+        return;
+      }
       // Disable location and user dot
       location = null;
-      locationSource.removeLocationUpdates();
       locationSource.removeLocationEngineListener(userLocationListener);
+      locationSource.removeLocationUpdates();
       locationSource.deactivate();
     }
-
-    locationSource.setPriority(LocationEnginePriority.HIGH_ACCURACY);
   }
 
+  /**
+   * Get the current location.
+   *
+   * @return the current location
+   */
   public Location getLocation() {
     return location;
   }
 
+  /**
+   * Set the current location, for internal use only.
+   *
+   * @param location The current location
+   */
   public void setLocation(Location location) {
     if (location == null) {
       this.location = null;
@@ -460,8 +578,27 @@ public class MyLocationView extends View {
 
     this.location = location;
     myLocationBehavior.updateLatLng(location);
+
+    if (mapboxMap != null && myBearingTrackingMode == MyBearingTracking.GPS
+      && myLocationTrackingMode == MyLocationTracking.TRACKING_NONE) {
+      setBearing(mapboxMap.getCameraPosition().bearing);
+    }
   }
 
+  /**
+   * Set location change animation enabled, for internal use only.
+   *
+   * @param locationChangeAnimationEnabled True if location changes are animated
+   */
+  public void setLocationChangeAnimationEnabled(boolean locationChangeAnimationEnabled) {
+    this.locationChangeAnimationEnabled = locationChangeAnimationEnabled;
+  }
+
+  /**
+   * Set the bearing tracking mode, for internal use only.
+   *
+   * @param myBearingTrackingMode The bearing tracking mode
+   */
   public void setMyBearingTrackingMode(@MyBearingTracking.Mode int myBearingTrackingMode) {
     this.myBearingTrackingMode = myBearingTrackingMode;
     if (myBearingTrackingMode == MyBearingTracking.COMPASS && compassListener.isSensorAvailable()) {
@@ -478,6 +615,11 @@ public class MyLocationView extends View {
     invalidate();
   }
 
+  /**
+   * Set the location tracking mode, for internla use only.
+   *
+   * @param myLocationTrackingMode The location tracking mode
+   */
   public void setMyLocationTrackingMode(@MyLocationTracking.Mode int myLocationTrackingMode) {
     MyLocationBehaviorFactory factory = new MyLocationBehaviorFactory();
     myLocationBehavior = factory.getBehavioralModel(myLocationTrackingMode);
@@ -498,17 +640,32 @@ public class MyLocationView extends View {
     invalidate();
   }
 
+  /**
+   * Get the location tracking mode, for internal use only.
+   *
+   * @return The location tracking mode
+   */
   @MyLocationTracking.Mode
   public int getMyLocationTrackingMode() {
     return myLocationTrackingMode;
   }
 
 
+  /**
+   * Get the bearing tracking mode, for internal use only.
+   *
+   * @return the bearing tracking mode
+   */
   @MyBearingTracking.Mode
   public int getMyBearingTrackingMode() {
     return myBearingTrackingMode;
   }
 
+  /**
+   * Set the compass bearing value, for internal use only.
+   *
+   * @param bearing The compas bearing value
+   */
   private void setCompass(double bearing) {
     setCompass(bearing, 0 /* no animation */);
   }
@@ -536,14 +693,29 @@ public class MyLocationView extends View {
     directionAnimator.start();
   }
 
+  /**
+   * Get the center of this view in screen coordinates.
+   *
+   * @return the center of the view
+   */
   public PointF getCenter() {
     return new PointF(getCenterX(), getCenterY());
   }
 
+  /**
+   * Get the x value of the center of this view.
+   *
+   * @return the x value of the center of the view
+   */
   private float getCenterX() {
     return (getX() + getMeasuredWidth()) / 2 + contentPaddingX - projectedX;
   }
 
+  /**
+   * Get the y value of the center of this view.
+   *
+   * @return the y value of the center of the view
+   */
   private float getCenterY() {
     return (getY() + getMeasuredHeight()) / 2 + contentPaddingY - projectedY;
   }
@@ -553,8 +725,16 @@ public class MyLocationView extends View {
     contentPaddingY = (padding[1] - padding[3]) / 2;
   }
 
+  /**
+   * Set the location source from which location updates are received, for internal use only.
+   *
+   * @param locationSource The location source to receive updates from
+   */
   public void setLocationSource(LocationEngine locationSource) {
+    toggleGps(false);
     this.locationSource = locationSource;
+    this.userLocationListener = null;
+    setEnabled(isEnabled(), locationSource != null);
   }
 
   private static class GpsLocationListener implements LocationEngineListener {
@@ -570,10 +750,12 @@ public class MyLocationView extends View {
     @Override
     public void onConnected() {
       MyLocationView locationView = userLocationView.get();
-      if (locationView != null) {
-        LocationEngine locationEngine = locationSource.get();
-        Location location = locationEngine.getLastLocation();
-        locationView.setLocation(location);
+      LocationEngine locationEngine = locationSource.get();
+      if (locationView != null && locationEngine != null) {
+        Location lastKnownLocation = locationEngine.getLastLocation();
+        if (lastKnownLocation != null) {
+          locationView.setLocation(lastKnownLocation);
+        }
         locationEngine.requestLocationUpdates();
       }
     }
@@ -597,9 +779,9 @@ public class MyLocationView extends View {
     private final SensorManager sensorManager;
 
     private Sensor rotationVectorSensor;
-    float[] matrix = new float[9];
-    float[] orientation = new float[3];
-
+    private float[] matrix = new float[9];
+    private float[] orientation = new float[3];
+    private boolean reportMissingSensor = true;
     // Compass data
     private long compassUpdateNextTimestamp = 0;
 
@@ -617,6 +799,10 @@ public class MyLocationView extends View {
     }
 
     public boolean isSensorAvailable() {
+      if (rotationVectorSensor == null && reportMissingSensor) {
+        reportMissingSensor = false;
+        Timber.e("Sensor.TYPE_ROTATION_VECTOR is missing from this device. Unable to use MyBearingTracking.COMPASS.");
+      }
       return rotationVectorSensor != null;
     }
 
@@ -701,6 +887,12 @@ public class MyLocationView extends View {
 
   private abstract class MyLocationBehavior {
 
+    MyLocationBehavior() {
+      if (latLng != null) {
+        locationUpdateTimestamp = SystemClock.elapsedRealtime();
+      }
+    }
+
     void updateLatLng(@NonNull Location newLocation) {
       location = newLocation;
     }
@@ -767,9 +959,14 @@ public class MyLocationView extends View {
       // accuracy
       updateAccuracy(location);
 
-      // ease to new camera position with a linear interpolator
-      mapboxMap.easeCamera(CameraUpdateFactory.newCameraPosition(builder.build()), animationDuration, false, null,
-        true);
+      if (locationChangeAnimationEnabled) {
+        // ease to new camera position with a linear interpolator
+        mapboxMap.easeCamera(CameraUpdateFactory.newCameraPosition(builder.build()), animationDuration, false, null,
+          true);
+      } else {
+        mapboxMap.easeCamera(CameraUpdateFactory.newCameraPosition(builder.build()), 0, false, null,
+          true);
+      }
     }
 
     @Override
@@ -811,7 +1008,11 @@ public class MyLocationView extends View {
       }
 
       locationChangeAnimator = ValueAnimator.ofFloat(0.0f, 1.0f);
-      locationChangeAnimator.setDuration(locationUpdateDuration);
+      if (locationChangeAnimationEnabled) {
+        locationChangeAnimator.setDuration(locationUpdateDuration);
+      } else {
+        locationChangeAnimator.setDuration(0);
+      }
       locationChangeAnimator.addUpdateListener(new MarkerCoordinateAnimatorListener(this,
         latLng, newLocation
       ));

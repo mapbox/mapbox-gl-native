@@ -5,9 +5,9 @@ import android.support.annotation.ColorInt;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 
+import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.constants.MyLocationTracking;
 import com.mapbox.mapboxsdk.maps.FocalPointChangeListener;
-import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.maps.MapboxMapOptions;
 import com.mapbox.mapboxsdk.maps.Projection;
 
@@ -77,6 +77,11 @@ public class MyLocationViewSettings {
     this.focalPointChangeListener = focalPointChangedListener;
   }
 
+  /**
+   * Initialise this with MapboxMapOptions.
+   *
+   * @param options the options to initialise this class from
+   */
   public void initialise(@NonNull MapboxMapOptions options) {
     CameraPosition position = options.getCamera();
     if (position != null && !position.equals(CameraPosition.DEFAULT)) {

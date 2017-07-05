@@ -9,12 +9,12 @@ import android.support.test.espresso.UiController;
 import android.support.test.espresso.ViewAction;
 import android.view.View;
 
+import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.constants.MyBearingTracking;
 import com.mapbox.mapboxsdk.constants.MyLocationTracking;
 import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.mapbox.mapboxsdk.location.LocationSource;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.widgets.MyLocationView;
 import com.mapbox.mapboxsdk.testapp.R;
@@ -104,7 +104,7 @@ public class MyLocationViewTest extends BaseActivityTest {
         mapboxMap.moveCamera(
           CameraUpdateFactory.newCameraPosition(
             new CameraPosition.Builder()
-              .target(new LatLng(LocationSource.getLocationEngine(view.getContext()).getLastLocation()))
+              .target(new LatLng(Mapbox.getLocationSource().getLastLocation()))
               .build()
           )
         );

@@ -1,3 +1,7 @@
+// This file is generated.
+// Edit platform/darwin/scripts/generate-style-code.js, then run `make darwin-style-code`.
+// test
+
 #import "MGLLight.h"
 
 #import "MGLTypes.h"
@@ -9,7 +13,7 @@
 #import <mbgl/style/types.hpp>
 
 namespace mbgl {
-    
+
     MBGL_DEFINE_ENUM(MGLLightAnchor, {
         { MGLLightAnchorMap, "map" },
         { MGLLightAnchorViewport, "viewport" },
@@ -47,11 +51,9 @@ NS_INLINE mbgl::style::TransitionOptions MGLOptionsFromTransition(MGLTransition 
         } else {
             anchorStyleValue = MGLStyleValueTransformer<mbgl::style::LightAnchorType, NSValue *, mbgl::style::LightAnchorType, MGLLightAnchor>().toEnumStyleValue(anchor);
         }
-        
+
         _anchor = anchorStyleValue;
-        
-        _anchorTransition = MGLTransitionFromOptions(mbglLight->getAnchorTransition());
-        
+
         auto positionValue = mbglLight->getPosition();
         if (positionValue.isUndefined()) {
             _position = MGLStyleValueTransformer<mbgl::style::Position, NSValue *>().toStyleValue(mbglLight->getDefaultPosition());
@@ -59,8 +61,8 @@ NS_INLINE mbgl::style::TransitionOptions MGLOptionsFromTransition(MGLTransition 
             _position = MGLStyleValueTransformer<mbgl::style::Position, NSValue *>().toStyleValue(positionValue);
         }
         
-        _positionTransiton = MGLTransitionFromOptions(mbglLight->getPositionTransition());
-        
+        _positionTransition = MGLTransitionFromOptions(mbglLight->getPositionTransition());
+ 
         auto colorValue = mbglLight->getColor();
         if (colorValue.isUndefined()) {
             _color = MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toStyleValue(mbglLight->getDefaultColor());
@@ -68,8 +70,8 @@ NS_INLINE mbgl::style::TransitionOptions MGLOptionsFromTransition(MGLTransition 
             _color = MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toStyleValue(colorValue);
         }
         
-        _colorTransiton = MGLTransitionFromOptions(mbglLight->getColorTransition());
-        
+        _colorTransition = MGLTransitionFromOptions(mbglLight->getColorTransition());
+ 
         auto intensityValue = mbglLight->getIntensity();
         if (intensityValue.isUndefined()) {
             _intensity = MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(mbglLight->getDefaultIntensity());
@@ -78,6 +80,7 @@ NS_INLINE mbgl::style::TransitionOptions MGLOptionsFromTransition(MGLTransition 
         }
         
         _intensityTransition = MGLTransitionFromOptions(mbglLight->getIntensityTransition());
+ 
     }
 
     return self;
@@ -86,26 +89,24 @@ NS_INLINE mbgl::style::TransitionOptions MGLOptionsFromTransition(MGLTransition 
 - (mbgl::style::Light)mbglLight
 {
     mbgl::style::Light mbglLight;
-    
     auto anchor = MGLStyleValueTransformer<mbgl::style::LightAnchorType, NSValue *, mbgl::style::LightAnchorType, MGLLightAnchor>().toEnumPropertyValue(self.anchor);
     mbglLight.setAnchor(anchor);
-    
-    mbglLight.setAnchorTransition(MGLOptionsFromTransition(self.anchorTransition));
-    
+
     auto position = MGLStyleValueTransformer<mbgl::style::Position, NSValue *>().toInterpolatablePropertyValue(self.position);
     mbglLight.setPosition(position);
-    
-    mbglLight.setPositionTransition(MGLOptionsFromTransition(self.positionTransiton));
-    
+ 
+    mbglLight.setPositionTransition(MGLOptionsFromTransition(self.positionTransition));
+
     auto color = MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toInterpolatablePropertyValue(self.color);
     mbglLight.setColor(color);
-    
-    mbglLight.setColorTransition(MGLOptionsFromTransition(self.colorTransiton));
-    
+ 
+    mbglLight.setColorTransition(MGLOptionsFromTransition(self.colorTransition));
+
     auto intensity = MGLStyleValueTransformer<float, NSNumber *>().toInterpolatablePropertyValue(self.intensity);
     mbglLight.setIntensity(intensity);
-    
+ 
     mbglLight.setIntensityTransition(MGLOptionsFromTransition(self.intensityTransition));
+
     
     return mbglLight;
 }

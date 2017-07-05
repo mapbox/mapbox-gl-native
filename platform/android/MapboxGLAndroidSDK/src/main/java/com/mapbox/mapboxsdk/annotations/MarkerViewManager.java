@@ -10,6 +10,7 @@ import android.support.v4.util.LongSparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.ImageView;
 
 import com.mapbox.mapboxsdk.R;
@@ -33,6 +34,15 @@ import java.util.Map;
 public class MarkerViewManager implements MapView.OnMapChangedListener {
 
   private final ViewGroup markerViewContainer;
+  private final ViewTreeObserver.OnPreDrawListener markerViewPreDrawObserver =
+    new ViewTreeObserver.OnPreDrawListener() {
+      @Override
+      public boolean onPreDraw() {
+        invalidateViewMarkersInVisibleRegion();
+        markerViewContainer.getViewTreeObserver().removeOnPreDrawListener(markerViewPreDrawObserver);
+        return false;
+      }
+    };
   private final Map<MarkerView, View> markerViewMap = new HashMap<>();
   private final LongSparseArray<OnMarkerViewAddedListener> markerViewAddedListenerMap = new LongSparseArray<>();
   private final List<MapboxMap.MarkerViewAdapter> markerViewAdapters = new ArrayList<>();
@@ -125,6 +135,12 @@ public class MarkerViewManager implements MapView.OnMapChangedListener {
     }
   }
 
+  /**
+   * Set the rotation of a MarkerView to a given rotation value.
+   *
+   * @param marker   The MarkerView to change its rotation value
+   * @param rotation The rotation value
+   */
   public void setRotation(@NonNull MarkerView marker, float rotation) {
     View convertView = markerViewMap.get(marker);
     if (convertView != null) {
@@ -180,14 +196,16 @@ public class MarkerViewManager implements MapView.OnMapChangedListener {
         PointF point = mapboxMap.getProjection().toScreenLocation(marker.getPosition());
         if (marker.getOffsetX() == MapboxConstants.UNMEASURED) {
           // ensure view is measured first
+          // #6805 invalidate marker views to ensure convertView width and height
+          // values are properly measured and up to date
           if (marker.getWidth() == 0) {
-            convertView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
-            if (convertView.getMeasuredWidth() != 0) {
-              marker.setWidth(convertView.getMeasuredWidth());
-              marker.setHeight(convertView.getMeasuredHeight());
-            }
+            convertView.getViewTreeObserver().addOnPreDrawListener(markerViewPreDrawObserver);
           }
         }
+
+        marker.setWidth(convertView.getWidth());
+        marker.setHeight(convertView.getHeight());
+
         if (marker.getWidth() != 0) {
           int x = (int) (marker.getAnchorU() * marker.getWidth());
           int y = (int) (marker.getAnchorV() * marker.getHeight());
@@ -532,10 +550,11 @@ public class MarkerViewManager implements MapView.OnMapChangedListener {
   }
 
   /**
-   * When the provided {@link MarkerView} is clicked on by a user, we check if a custom click
-   * event has been created and if not, display a {@link InfoWindow}.
+   * When the provided MarkerView is clicked on by a user, we check if a custom click
+   * event has been created and if not, display a InfoWindow.
    *
-   * @param markerView that the click event occurred.
+   * @param markerView that the click event occurred
+   * @return true if the marker view click has been handled, false if not
    */
   public boolean onClickMarkerView(MarkerView markerView) {
     boolean clickHandled = false;
@@ -560,9 +579,9 @@ public class MarkerViewManager implements MapView.OnMapChangedListener {
   }
 
   /**
-   * Handles the {@link MarkerView}'s info window offset.
+   * Handles the MarkerView info window offset.
    *
-   * @param marker that we are ensuring info window offset.
+   * @param marker that we are ensuring info window offset
    */
   public void ensureInfoWindowOffset(MarkerView marker) {
     View view = null;
@@ -612,7 +631,7 @@ public class MarkerViewManager implements MapView.OnMapChangedListener {
   }
 
   /**
-   * Default MarkerViewAdapter used for base class of {@link MarkerView} to adapt a MarkerView to
+   * Default MarkerViewAdapter used for base class of MarkerView to adapt a MarkerView to
    * an ImageView.
    */
   private static class ImageMarkerViewAdapter extends MapboxMap.MarkerViewAdapter<MarkerView> {

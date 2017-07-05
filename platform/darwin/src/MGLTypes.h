@@ -78,7 +78,7 @@ typedef NS_OPTIONS(NSUInteger, MGLMapDebugMaskOptions) {
 /**
  A structure containing information about a transition.
  */
-typedef struct MGLTransition {
+typedef struct __attribute__((objc_boxable)) MGLTransition {
     /**
      The amount of time the animation should take, not including the delay.
      */
