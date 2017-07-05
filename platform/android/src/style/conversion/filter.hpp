@@ -1,6 +1,8 @@
 #pragma once
 
 #include "../android_conversion.hpp"
+#include "../filter.hpp"
+#include "../../conversion/conversion.hpp"
 #include <mbgl/style/conversion.hpp>
 #include <mbgl/style/conversion/filter.hpp>
 
@@ -26,6 +28,14 @@ inline optional<mbgl::style::Filter> toFilter(jni::JNIEnv& env, jni::Array<jni::
     }
     return filter;
 }
+
+template <>
+struct Converter<jni::Object<mbgl::android::Filter::Statement>, mbgl::style::Filter> {
+    Result<jni::Object<mbgl::android::Filter::Statement>> operator()(jni::JNIEnv& env, const mbgl::style::Filter& value) const {
+        using namespace mbgl::android;
+        return Filter::fromFilter(env, value);
+    }
+};
 
 } // namespace conversion
 } // namespace android

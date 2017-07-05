@@ -77,6 +77,10 @@ public class CircleLayer extends Layer {
     nativeSetFilter(filter.toArray());
   }
 
+  public Filter.Statement getFilter() {
+    return nativeGetFilter();
+  }
+
   /**
    * Set a single filter.
    *

@@ -111,6 +111,8 @@ add_library(mbgl-android STATIC
     platform/android/src/style/conversion/property_value.hpp
     platform/android/src/style/conversion/types.hpp
     platform/android/src/style/conversion/types_string_values.hpp
+    platform/android/src/style/filter.cpp
+    platform/android/src/style/filter.hpp
     platform/android/src/map/camera_position.cpp
     platform/android/src/map/camera_position.hpp
 

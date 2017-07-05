@@ -26,6 +26,10 @@ public class Filter {
      * @return the filter represented as an array
      */
     public abstract Object[] toArray();
+
+    public String getOperator() {
+      return operator;
+    }
   }
 
   /**

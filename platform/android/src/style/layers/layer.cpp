@@ -1,5 +1,6 @@
 #include "layer.hpp"
 #include "../android_conversion.hpp"
+#include "../conversion/filter.hpp"
 
 #include <jni/jni.hpp>
 
@@ -99,6 +100,31 @@ namespace android {
         }
     }
 
+    struct GetFilterEvaluator {
+        optional<style::Filter> noop(std::string layerType) {
+            Log::Warning(mbgl::Event::JNI, "%s doesn't support filters", layerType.c_str());
+            return {};
+        }
+
+        optional<style::Filter> operator()(style::BackgroundLayer&) { return noop("BackgroundLayer"); }
+        optional<style::Filter> operator()(style::CustomLayer&) { return noop("CustomLayer"); }
+        optional<style::Filter> operator()(style::RasterLayer&) { return noop("RasterLayer"); }
+
+        template <class LayerType>
+        optional<style::Filter> operator()(LayerType& layer) {
+            return { layer.getFilter() };
+        }
+    };
+
+    jni::Object<mbgl::android::Filter::Statement> Layer::getFilter(jni::JNIEnv& env) {
+        using namespace mbgl::style;
+        using namespace mbgl::android::conversion;
+
+        auto tmp = layer.accept(GetFilterEvaluator());
+
+        return *convert<jni::Object<mbgl::android::Filter::Statement>, mbgl::style::Filter>(env, *tmp);
+    }
+
     struct SetFilterEvaluator {
         style::Filter filter;
 
@@ -119,7 +145,7 @@ namespace android {
         Value wrapped(env, jfilter);
 
         Error error;
-        optional<Filter> converted = convert<Filter>(wrapped, error);
+        optional<mbgl::style::Filter> converted = convert<mbgl::style::Filter>(wrapped, error);
         if (!converted) {
             mbgl::Log::Error(mbgl::Event::JNI, "Error setting filter: " + error.message);
             return;
@@ -199,6 +225,7 @@ namespace android {
             METHOD(&Layer::getId, "nativeGetId"),
             METHOD(&Layer::setLayoutProperty, "nativeSetLayoutProperty"),
             METHOD(&Layer::setPaintProperty, "nativeSetPaintProperty"),
+            METHOD(&Layer::getFilter, "nativeGetFilter"),
             METHOD(&Layer::setFilter, "nativeSetFilter"),
             METHOD(&Layer::setSourceLayer, "nativeSetSourceLayer"),
             METHOD(&Layer::getSourceLayer, "nativeGetSourceLayer"),

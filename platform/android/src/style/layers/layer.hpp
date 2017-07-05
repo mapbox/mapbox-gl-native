@@ -5,6 +5,7 @@
 #include <mbgl/style/layer.hpp>
 
 #include "../value.hpp"
+#include "../filter.hpp"
 
 #include <jni/jni.hpp>
 
@@ -65,6 +66,8 @@ public:
     void setMaxZoom(jni::JNIEnv&, jni::jfloat zoom);
 
     /* common properties, but not shared by all */
+
+    jni::Object<mbgl::android::Filter::Statement> getFilter(jni::JNIEnv&);
 
     void setFilter(jni::JNIEnv&, jni::Array<jni::Object<>>);
 
