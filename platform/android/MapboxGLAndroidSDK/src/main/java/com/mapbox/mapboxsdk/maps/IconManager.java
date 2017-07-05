@@ -12,6 +12,8 @@ import com.mapbox.mapboxsdk.exceptions.IconBitmapChangedException;
 import java.util.ArrayList;
 import java.util.List;
 
+import timber.log.Timber;
+
 /**
  * Responsible for managing icons added to the Map.
  * <p>
@@ -105,6 +107,8 @@ class IconManager {
     int iconSize = icons.size() + 1;
     averageIconHeight = averageIconHeight + (height - averageIconHeight) / iconSize;
     averageIconWidth = averageIconWidth + (width - averageIconWidth) / iconSize;
+    Timber.e("OnUpdateAverageSizeIcon with: %s %s", width, height);
+    Timber.e("OnUpdateAverageSizeIcon now: %s %s", averageIconWidth, averageIconHeight);
   }
 
   private void loadIcon(Icon icon) {

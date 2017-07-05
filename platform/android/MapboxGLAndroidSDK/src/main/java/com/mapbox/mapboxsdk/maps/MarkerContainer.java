@@ -261,6 +261,7 @@ class MarkerContainer implements Markers {
     if (icon == null) {
       icon = IconFactory.getInstance(mapView.getContext()).defaultMarkerView();
     }
+    iconManager.loadIconForMarkerView(marker);
     marker.setIcon(icon);
     return marker;
   }
