@@ -198,7 +198,7 @@ public class MarkerViewManager implements MapView.OnMapChangedListener {
           // ensure view is measured first
           // #6805 invalidate marker views to ensure convertView width and height
           // values are properly measured and up to date
-          if (marker.getWidth() == 0) {
+          if (marker.getWidth() == 0 && marker.isVisible()) {
             convertView.getViewTreeObserver().addOnPreDrawListener(markerViewPreDrawObserver);
           }
         }
