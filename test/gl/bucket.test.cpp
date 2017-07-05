@@ -16,16 +16,19 @@ using namespace mbgl;
 TEST(Buckets, CircleBucket) {
     CircleBucket bucket { { {0, 0, 0}, MapMode::Still, 1.0 }, {} };
     ASSERT_FALSE(bucket.hasData());
+    ASSERT_FALSE(bucket.needsUpload());
 }
 
 TEST(Buckets, FillBucket) {
     FillBucket bucket { { {0, 0, 0}, MapMode::Still, 1.0 }, {} };
     ASSERT_FALSE(bucket.hasData());
+    ASSERT_FALSE(bucket.needsUpload());
 }
 
 TEST(Buckets, LineBucket) {
     LineBucket bucket { { {0, 0, 0}, MapMode::Still, 1.0 }, {}, {} };
     ASSERT_FALSE(bucket.hasData());
+    ASSERT_FALSE(bucket.needsUpload());
 }
 
 TEST(Buckets, SymbolBucket) {
@@ -37,6 +40,8 @@ TEST(Buckets, SymbolBucket) {
     ASSERT_FALSE(bucket.hasIconData());
     ASSERT_FALSE(bucket.hasTextData());
     ASSERT_FALSE(bucket.hasCollisionBoxData());
+    ASSERT_FALSE(bucket.hasData());
+    ASSERT_FALSE(bucket.needsUpload());
 }
 
 TEST(Buckets, RasterBucket) {
@@ -44,6 +49,7 @@ TEST(Buckets, RasterBucket) {
     UnassociatedImage rgba({ 1, 1 });
 
     RasterBucket bucket = { std::move(rgba) };
+    ASSERT_TRUE(bucket.hasData());
     ASSERT_TRUE(bucket.needsUpload());
 
     bucket.upload(context);

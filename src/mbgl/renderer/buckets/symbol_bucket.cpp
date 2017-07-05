@@ -69,8 +69,7 @@ void SymbolBucket::render(Painter& painter,
 }
 
 bool SymbolBucket::hasData() const {
-    assert(false); // Should be calling SymbolLayout::has{Text,Icon,CollisonBox}Data() instead.
-    return false;
+    return hasTextData() || hasIconData() || hasCollisionBoxData();
 }
 
 bool SymbolBucket::hasTextData() const {

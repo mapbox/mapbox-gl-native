@@ -28,6 +28,9 @@ public:
     Bucket() = default;
     virtual ~Bucket() = default;
 
+    // Feature geometries are also used to populate the feature index.
+    // Obtaining these is a costly operation, so we do it only once, and
+    // pass-by-const-ref the geometries as a second parameter.
     virtual void addFeature(const GeometryTileFeature&,
                             const GeometryCollection&) {};
 
@@ -46,7 +49,7 @@ public:
     };
 
     bool needsUpload() const {
-        return !uploaded;
+        return hasData() && !uploaded;
     }
 
 protected:
