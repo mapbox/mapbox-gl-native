@@ -14,7 +14,7 @@
 
 #include <jni/jni.hpp>
 
-#include <mbgl/map/backend_scope.hpp>
+#include <mbgl/renderer/backend_scope.hpp>
 #include <mbgl/math/minmax.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/event.hpp>
@@ -110,7 +110,7 @@ void NativeMapView::bind() {
 }
 
 /**
- * From mbgl::Backend.
+ * From mbgl::RendererBackend.
  */
 gl::ProcAddress NativeMapView::initializeExtension(const char* name) {
     return eglGetProcAddress(name);
@@ -145,7 +145,7 @@ void NativeMapView::activate() {
 }
 
 /**
- * From mbgl::Backend.
+ * From mbgl::RendererBackend.
  */
 void NativeMapView::deactivate() {
     if (--active) {
@@ -172,7 +172,7 @@ void NativeMapView::deactivate() {
 }
 
 /**
- * From mbgl::Backend. Callback to java NativeMapView#onInvalidate().
+ * From mbgl::RendererBackend. Callback to java NativeMapView#onInvalidate().
  *
  * May be called from any thread
  */
@@ -183,7 +183,7 @@ void NativeMapView::invalidate() {
 }
 
 /**
- * From mbgl::Backend. Callback to java NativeMapView#onMapChanged(int).
+ * From mbgl::RendererBackend. Callback to java NativeMapView#onMapChanged(int).
  *
  * May be called from any thread
  */

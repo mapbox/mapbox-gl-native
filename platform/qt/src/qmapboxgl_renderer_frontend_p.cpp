@@ -1,6 +1,6 @@
 #include "qmapboxgl_renderer_frontend_p.hpp"
 
-#include <mbgl/map/backend_scope.hpp>
+#include <mbgl/renderer/backend_scope.hpp>
 #include <mbgl/renderer/renderer.hpp>
 
 QMapboxGLRendererFrontend::QMapboxGLRendererFrontend(std::unique_ptr<mbgl::Renderer> renderer_, mbgl::View& view_)

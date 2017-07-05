@@ -30,10 +30,10 @@
 #import <mbgl/map/camera.hpp>
 #import <mbgl/storage/reachability.h>
 #import <mbgl/util/default_thread_pool.hpp>
-#import <mbgl/map/backend.hpp>
-#import <mbgl/map/backend_scope.hpp>
 #import <mbgl/style/image.hpp>
 #import <mbgl/renderer/renderer.hpp>
+#import <mbgl/renderer/renderer_backend.hpp>
+#import <mbgl/renderer/backend_scope.hpp>
 #import <mbgl/storage/default_file_source.hpp>
 #import <mbgl/storage/network_status.hpp>
 #import <mbgl/math/wrap.hpp>
@@ -2763,7 +2763,7 @@ public:
 }
 
 /// Adapter responsible for bridging calls from mbgl to MGLMapView and Cocoa.
-class MGLMapViewImpl : public mbgl::View, public mbgl::Backend, public mbgl::MapObserver {
+class MGLMapViewImpl : public mbgl::View, public mbgl::RendererBackend, public mbgl::MapObserver {
 public:
     MGLMapViewImpl(MGLMapView *nativeView_) : nativeView(nativeView_) {}
 

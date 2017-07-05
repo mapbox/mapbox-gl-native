@@ -8,7 +8,6 @@
 #include <mbgl/annotation/annotation.hpp>
 #include <mbgl/map/camera.hpp>
 #include <mbgl/map/map.hpp>
-#include <mbgl/map/backend_scope.hpp>
 #include <mbgl/math/minmax.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/conversion.hpp>
@@ -19,6 +18,7 @@
 #include <mbgl/style/transition_options.hpp>
 #include <mbgl/style/image.hpp>
 #include <mbgl/renderer/renderer.hpp>
+#include <mbgl/renderer/backend_scope.hpp>
 #include <mbgl/storage/network_status.hpp>
 #include <mbgl/util/color.hpp>
 #include <mbgl/util/constants.hpp>

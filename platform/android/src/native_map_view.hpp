@@ -1,6 +1,6 @@
 #pragma once
 
-#include <mbgl/map/backend.hpp>
+#include <mbgl/renderer/renderer_backend.hpp>
 #include <mbgl/map/change.hpp>
 #include <mbgl/map/camera.hpp>
 #include <mbgl/map/map.hpp>
@@ -38,7 +38,7 @@ namespace android {
 
 class AndroidRendererFrontend;
 
-class NativeMapView : public View, public Backend, public MapObserver {
+class NativeMapView : public View, public RendererBackend, public MapObserver {
 public:
 
     static constexpr auto Name() { return "com/mapbox/mapboxsdk/maps/NativeMapView"; };
@@ -59,14 +59,14 @@ public:
 
     void bind() override;
 
-    // mbgl::Backend //
+    // mbgl::RendererBackend //
 
     void updateAssumedState() override;
 
     // Deprecated //
     void notifyMapChange(mbgl::MapChange);
 
-    // mbgl::Backend (mbgl::MapObserver) //
+    // mbgl::RendererBackend (mbgl::MapObserver) //
     void onCameraWillChange(MapObserver::CameraChangeMode) override;
     void onCameraIsChanging() override;
     void onCameraDidChange(MapObserver::CameraChangeMode) override;
@@ -266,7 +266,7 @@ public:
     void removeImage(JNIEnv&, jni::String);
 
 protected:
-    // mbgl::Backend //
+    // mbgl::RendererBackend //
 
     gl::ProcAddress initializeExtension(const char*) override;
     void activate() override;
