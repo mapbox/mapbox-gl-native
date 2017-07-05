@@ -30,7 +30,7 @@ TEST(API, TEST_REQUIRES_SERVER(RenderMissingTile)) {
 
     const auto style = util::read_file("test/fixtures/api/water_missing_tiles.json");
 
-    HeadlessBackend backend { test::sharedDisplay() };
+    HeadlessBackend backend;
     BackendScope scope { backend };
     OffscreenView view { backend.getContext(), { 256, 512 } };
     float pixelRatio { 1 };

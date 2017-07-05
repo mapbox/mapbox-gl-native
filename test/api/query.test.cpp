@@ -30,7 +30,7 @@ public:
     }
 
     util::RunLoop loop;
-    HeadlessBackend backend { test::sharedDisplay() };
+    HeadlessBackend backend;
     BackendScope scope { backend };
     OffscreenView view { backend.getContext() };
     StubFileSource fileSource;

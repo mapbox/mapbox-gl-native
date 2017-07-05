@@ -27,7 +27,7 @@ TEST(API, RepeatedRender) {
 
     const auto style = util::read_file("test/fixtures/api/water.json");
 
-    HeadlessBackend backend { test::sharedDisplay() };
+    HeadlessBackend backend;
     BackendScope scope { backend };
     OffscreenView view { backend.getContext(), { 512, 512 } };
     float pixelRatio { 1 };
@@ -84,7 +84,7 @@ TEST(API, ZoomHistory) {
 
     const auto style = util::read_file("test/fixtures/api/empty.json");
 
-    HeadlessBackend backend { test::sharedDisplay() };
+    HeadlessBackend backend;
     BackendScope scope { backend };
     OffscreenView view { backend.getContext(), { 512, 512 } };
     DefaultFileSource fileSource(":memory:", ".");

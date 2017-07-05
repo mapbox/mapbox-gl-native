@@ -24,7 +24,7 @@ using namespace std::literals::string_literals;
 
 TEST(Map, PrefetchTiles) {
     util::RunLoop runLoop;
-    HeadlessBackend backend(test::sharedDisplay());
+    HeadlessBackend backend;
     BackendScope scope(backend);
     OffscreenView view(backend.getContext(), { 512, 512 });
     ThreadPool threadPool(4);

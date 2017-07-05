@@ -11,7 +11,7 @@
 using namespace mbgl;
 
 TEST(OffscreenTexture, EmptyRed) {
-    HeadlessBackend backend { test::sharedDisplay() };
+    HeadlessBackend backend;
     BackendScope scope { backend };
     OffscreenView view(backend.getContext(), { 512, 256 });
 
@@ -74,7 +74,7 @@ struct Buffer {
 
 
 TEST(OffscreenTexture, RenderToTexture) {
-    HeadlessBackend backend { test::sharedDisplay() };
+    HeadlessBackend backend;
     BackendScope scope { backend };
     auto& context = backend.getContext();
 

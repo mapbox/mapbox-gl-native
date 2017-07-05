@@ -89,7 +89,7 @@ public:
 TEST(CustomLayer, Basic) {
     util::RunLoop loop;
 
-    HeadlessBackend backend { test::sharedDisplay() };
+    HeadlessBackend backend;
     BackendScope scope { backend };
     OffscreenView view { backend.getContext() };
     DefaultFileSource fileSource(":memory:", "test/fixtures/api/assets");

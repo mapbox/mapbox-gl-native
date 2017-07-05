@@ -6,6 +6,7 @@
 #include <mbgl/map/map.hpp>
 #include <mbgl/renderer/backend_scope.hpp>
 #include <mbgl/gl/headless_backend.hpp>
+#include <mbgl/gl/headless_display.hpp>
 #include <mbgl/gl/offscreen_view.hpp>
 #include <mbgl/gl/context.hpp>
 #include <mbgl/util/default_thread_pool.hpp>
@@ -539,8 +540,8 @@ TEST(Map, DontLoadUnneededTiles) {
 
 TEST(Map, TEST_DISABLED_ON_CI(ContinuousRendering)) {
     util::RunLoop runLoop;
-    HeadlessBackend backend { test::sharedDisplay() };
-    BackendScope scope(backend);
+    HeadlessBackend backend;
+    BackendScope scope { backend };
     OffscreenView view { backend.getContext() };
     ThreadPool threadPool { 4 };
     DefaultFileSource fileSource(":memory:", "test/fixtures/api/assets");
