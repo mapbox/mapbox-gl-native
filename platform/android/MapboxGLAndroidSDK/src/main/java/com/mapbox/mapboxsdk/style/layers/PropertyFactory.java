@@ -953,6 +953,28 @@ public class PropertyFactory {
   }
 
   /**
+   * Orientation of circle when map is pitched.
+   *
+   * @param value a String value
+   * @return property wrapper around String
+   */
+  public static PropertyValue<String> circlePitchAlignment(@Property.CIRCLE_PITCH_ALIGNMENT String value) {
+    return new PaintPropertyValue<>("circle-pitch-alignment", value);
+  }
+
+
+  /**
+   * Orientation of circle when map is pitched.
+   *
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for String
+   * @return property wrapper around a String function
+   */
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, String>> circlePitchAlignment(CameraFunction<Z, String> function) {
+    return new PaintPropertyValue<>("circle-pitch-alignment", function);
+  }
+
+  /**
    * The width of the circle's stroke. Strokes are placed outside of the {@link PropertyFactory#circleRadius}.
    *
    * @param value a Float value

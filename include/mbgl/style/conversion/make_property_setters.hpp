@@ -155,6 +155,8 @@ auto makePaintPropertySetters() {
     result["circle-translate-anchor-transition"] = &setTransition<V, CircleLayer, &CircleLayer::setCircleTranslateAnchorTransition>;
     result["circle-pitch-scale"] = &setProperty<V, CircleLayer, PropertyValue<CirclePitchScaleType>, &CircleLayer::setCirclePitchScale>;
     result["circle-pitch-scale-transition"] = &setTransition<V, CircleLayer, &CircleLayer::setCirclePitchScaleTransition>;
+    result["circle-pitch-alignment"] = &setProperty<V, CircleLayer, PropertyValue<AlignmentType>, &CircleLayer::setCirclePitchAlignment>;
+    result["circle-pitch-alignment-transition"] = &setTransition<V, CircleLayer, &CircleLayer::setCirclePitchAlignmentTransition>;
     result["circle-stroke-width"] = &setProperty<V, CircleLayer, DataDrivenPropertyValue<float>, &CircleLayer::setCircleStrokeWidth>;
     result["circle-stroke-width-transition"] = &setTransition<V, CircleLayer, &CircleLayer::setCircleStrokeWidthTransition>;
     result["circle-stroke-color"] = &setProperty<V, CircleLayer, DataDrivenPropertyValue<Color>, &CircleLayer::setCircleStrokeColor>;
