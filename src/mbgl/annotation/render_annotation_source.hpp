@@ -21,7 +21,7 @@ public:
     void startRender(Painter&) final;
     void finishRender(Painter&) final;
 
-    std::map<UnwrappedTileID, RenderTile>& getRenderTiles() final;
+    std::vector<std::reference_wrapper<RenderTile>> getRenderTiles() final;
 
     std::unordered_map<std::string, std::vector<Feature>>
     queryRenderedFeatures(const ScreenLineString& geometry,

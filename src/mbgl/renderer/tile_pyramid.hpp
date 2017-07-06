@@ -45,7 +45,7 @@ public:
     void startRender(Painter&);
     void finishRender(Painter&);
 
-    std::map<UnwrappedTileID, RenderTile>& getRenderTiles();
+    std::vector<std::reference_wrapper<RenderTile>> getRenderTiles();
 
     std::unordered_map<std::string, std::vector<Feature>>
     queryRenderedFeatures(const ScreenLineString& geometry,
@@ -68,7 +68,7 @@ public:
     std::map<OverscaledTileID, std::unique_ptr<Tile>> tiles;
     TileCache cache;
 
-    std::map<UnwrappedTileID, RenderTile> renderTiles;
+    std::vector<RenderTile> renderTiles;
 
     TileObserver* observer = nullptr;
 };

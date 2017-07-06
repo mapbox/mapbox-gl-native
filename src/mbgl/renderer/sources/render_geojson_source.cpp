@@ -68,7 +68,7 @@ void RenderGeoJSONSource::finishRender(Painter& painter) {
     tilePyramid.finishRender(painter);
 }
 
-std::map<UnwrappedTileID, RenderTile>& RenderGeoJSONSource::getRenderTiles() {
+std::vector<std::reference_wrapper<RenderTile>> RenderGeoJSONSource::getRenderTiles() {
     return tilePyramid.getRenderTiles();
 }
 

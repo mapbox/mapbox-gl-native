@@ -53,7 +53,7 @@ void RenderAnnotationSource::finishRender(Painter& painter) {
     tilePyramid.finishRender(painter);
 }
 
-std::map<UnwrappedTileID, RenderTile>& RenderAnnotationSource::getRenderTiles() {
+std::vector<std::reference_wrapper<RenderTile>> RenderAnnotationSource::getRenderTiles() {
     return tilePyramid.getRenderTiles();
 }
 

@@ -30,8 +30,8 @@ public:
                 bool needsRelayout,
                 const TileParameters&) final;
 
-    std::map<UnwrappedTileID, RenderTile>& getRenderTiles() final {
-        return tiles;
+    std::vector<std::reference_wrapper<RenderTile>> getRenderTiles() final {
+        return {};
     }
 
     std::unordered_map<std::string, std::vector<Feature>>
@@ -48,7 +48,6 @@ public:
 
 private:
     const style::ImageSource::Impl& impl() const;
-    std::map<UnwrappedTileID, RenderTile> tiles;
 
     std::vector<UnwrappedTileID> tileIds;
     std::unique_ptr<RasterBucket> bucket;

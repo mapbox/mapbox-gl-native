@@ -57,7 +57,8 @@ public:
     virtual void startRender(Painter&) = 0;
     virtual void finishRender(Painter&) = 0;
 
-    virtual std::map<UnwrappedTileID, RenderTile>& getRenderTiles() = 0;
+    // Returns an unsorted list of RenderTiles.
+    virtual std::vector<std::reference_wrapper<RenderTile>> getRenderTiles() = 0;
 
     virtual std::unordered_map<std::string, std::vector<Feature>>
     queryRenderedFeatures(const ScreenLineString& geometry,
