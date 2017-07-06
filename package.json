@@ -13,7 +13,7 @@
   },
   "license": "BSD-2-Clause",
   "dependencies": {
-    "nan": "^2.4.0",
+    "nan": "^2.6.2",
     "node-pre-gyp": "^0.6.37",
     "npm-run-all": "^4.0.2"
   },
@@ -23,6 +23,7 @@
     "ejs": "^2.4.1",
     "express": "^4.11.1",
     "flow-remove-types": "^1.2.1",
+    "json-stringify-pretty-compact": "^1.0.4",
     "lodash": "^4.16.4",
     "mapbox-gl-styles": "2.0.2",
     "pixelmatch": "^4.0.2",
@@ -38,7 +39,8 @@
     "install": "node-pre-gyp install --fallback-to-build=false || make node",
     "test": "tape platform/node/test/js/**/*.test.js",
     "test-memory": "node --expose-gc platform/node/test/memory.test.js",
-    "test-suite": "run-s test-render test-query",
+    "test-suite": "run-s test-render test-query test-expressions",
+    "test-expressions": "node platform/node/test/expression.test.js",
     "test-render": "node platform/node/test/render.test.js",
     "test-query": "node platform/node/test/query.test.js"
   },

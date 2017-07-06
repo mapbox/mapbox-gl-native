@@ -76,7 +76,7 @@ void stringify(Writer& writer, const std::array<float, 4>& v) {
 }
 
 template <class Writer>
-void stringify(Writer&, const Value&);
+void stringify(Writer&, const mbgl::Value&);
 
 template <class Writer, class T>
 void stringify(Writer& writer, const std::vector<T>& v) {

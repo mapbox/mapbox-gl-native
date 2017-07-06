@@ -69,9 +69,9 @@ TEST(Stringify, Map) {
 }
 
 TEST(Stringify, Value) {
-    ASSERT_EQ(stringify(Value(true)), "true");
-    ASSERT_EQ(stringify(Value(uint64_t(0))), "0");
-    ASSERT_EQ(stringify(Value(1.2)), "1.2");
+    ASSERT_EQ(stringify(mbgl::Value(true)), "true");
+    ASSERT_EQ(stringify(mbgl::Value(uint64_t(0))), "0");
+    ASSERT_EQ(stringify(mbgl::Value(1.2)), "1.2");
 }
 
 TEST(Stringify, Filter) {

@@ -3,6 +3,8 @@
 #include <mbgl/style/conversion/json.hpp>
 #include <mbgl/style/conversion/constant.hpp>
 #include <mbgl/style/conversion/function.hpp>
+#include <mbgl/style/conversion/data_driven_property_value.hpp>
+#include <mbgl/util/rapidjson.hpp>
 
 using namespace mbgl;
 using namespace mbgl::style;
@@ -49,4 +51,38 @@ TEST(StyleConversion, Function) {
     auto fn9 = parseFunction(R"({"stops":[[0,0]],"base":false})");
     ASSERT_FALSE(fn9);
     ASSERT_EQ("function base must be a number", error.message);
+}
+
+TEST(StyleConversion, CompositeFunctionExpression) {
+    Error error;
+
+    auto parseFunction = [&](const std::string& src) {
+        JSDocument doc;
+        doc.Parse<0>(src);
+        return convert<DataDrivenPropertyValue<float>>(doc, error);
+    };
+
+    auto fn1 = parseFunction(R"({"expression": ["curve", ["linear"], ["zoom"], 0, ["number", ["get", "x"]], 10, 10]})");
+    ASSERT_TRUE(fn1);
+    
+    auto fn2 = parseFunction(R"({
+        "expression": ["coalesce", ["curve", ["linear"], ["zoom"], 0, ["number", ["get", "x"]], 10, 10], 0]
+    })");
+    ASSERT_TRUE(fn2);
+
+//    auto fn3 = parseFunction(R"({
+//        "expression": ["let", "a", 0, ["curve", ["linear"], ["zoom"], 0, ["number", ["get", "x"]], 10, 10] ]
+//    })");
+//    ASSERT_TRUE(fn3);
+
+//    auto fn4 = parseFunction(R"({
+//        "expression": ["coalesce", ["let", "a", 0, ["curve", ["linear"], ["zoom"], 0, ["number", ["get", "x"]], 10, 10], 0 ]
+//    })");
+//    ASSERT_TRUE(fn4);
+
+    auto fn5 = parseFunction(R"({
+        "expression": ["coalesce", ["curve", ["linear"], ["number", ["get", "x"]], 0, ["zoom"], 10, 10], 0]
+    })");
+    ASSERT_FALSE(fn5);
+    ASSERT_EQ(R"("zoom" expression may only be used as input to a top-level "curve" expression.)", error.message);
 }

@@ -364,10 +364,12 @@ set(MBGL_CORE_FILES
     include/mbgl/style/conversion/constant.hpp
     include/mbgl/style/conversion/coordinate.hpp
     include/mbgl/style/conversion/data_driven_property_value.hpp
+    include/mbgl/style/conversion/expression.hpp
     include/mbgl/style/conversion/filter.hpp
     include/mbgl/style/conversion/function.hpp
     include/mbgl/style/conversion/geojson.hpp
     include/mbgl/style/conversion/geojson_options.hpp
+    include/mbgl/style/conversion/get_json_type.hpp
     include/mbgl/style/conversion/layer.hpp
     include/mbgl/style/conversion/light.hpp
     include/mbgl/style/conversion/position.hpp
@@ -391,6 +393,34 @@ set(MBGL_CORE_FILES
     src/mbgl/style/conversion/tileset.cpp
     src/mbgl/style/conversion/transition_options.cpp
 
+    # style/expression
+    include/mbgl/style/expression/array_assertion.hpp
+    include/mbgl/style/expression/at.hpp
+    include/mbgl/style/expression/case.hpp
+    include/mbgl/style/expression/check_subtype.hpp
+    include/mbgl/style/expression/coalesce.hpp
+    include/mbgl/style/expression/compound_expression.hpp
+    include/mbgl/style/expression/curve.hpp
+    include/mbgl/style/expression/expression.hpp
+    include/mbgl/style/expression/let.hpp
+    include/mbgl/style/expression/literal.hpp
+    include/mbgl/style/expression/match.hpp
+    include/mbgl/style/expression/parsing_context.hpp
+    include/mbgl/style/expression/type.hpp
+    include/mbgl/style/expression/value.hpp
+    src/mbgl/style/expression/array_assertion.cpp
+    src/mbgl/style/expression/at.cpp
+    src/mbgl/style/expression/case.cpp
+    src/mbgl/style/expression/check_subtype.cpp
+    src/mbgl/style/expression/coalesce.cpp
+    src/mbgl/style/expression/compound_expression.cpp
+    src/mbgl/style/expression/curve.cpp
+    src/mbgl/style/expression/let.cpp
+    src/mbgl/style/expression/literal.cpp
+    src/mbgl/style/expression/match.cpp
+    src/mbgl/style/expression/parsing_context.cpp
+    src/mbgl/style/expression/value.cpp
+
     # style/function
     include/mbgl/style/function/camera_function.hpp
     include/mbgl/style/function/categorical_stops.hpp
@@ -398,11 +428,13 @@ set(MBGL_CORE_FILES
     include/mbgl/style/function/composite_exponential_stops.hpp
     include/mbgl/style/function/composite_function.hpp
     include/mbgl/style/function/composite_interval_stops.hpp
+    include/mbgl/style/function/convert.hpp
     include/mbgl/style/function/exponential_stops.hpp
     include/mbgl/style/function/identity_stops.hpp
     include/mbgl/style/function/interval_stops.hpp
     include/mbgl/style/function/source_function.hpp
     src/mbgl/style/function/categorical_stops.cpp
+    src/mbgl/style/function/expression.cpp
     src/mbgl/style/function/identity_stops.cpp
 
     # style/layers

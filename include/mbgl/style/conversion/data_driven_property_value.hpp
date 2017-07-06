@@ -4,6 +4,8 @@
 #include <mbgl/style/conversion.hpp>
 #include <mbgl/style/conversion/constant.hpp>
 #include <mbgl/style/conversion/function.hpp>
+#include <mbgl/style/conversion/expression.hpp>
+#include <mbgl/style/expression/curve.hpp>
 
 namespace mbgl {
 namespace style {
@@ -20,6 +22,27 @@ struct Converter<DataDrivenPropertyValue<T>> {
                 return {};
             }
             return DataDrivenPropertyValue<T>(*constant);
+        } else if (objectMember(value, "expression")) {
+            optional<std::unique_ptr<Expression>> expression = convert<std::unique_ptr<Expression>>(
+                *objectMember(value, "expression"),
+                error,
+                valueTypeToExpressionType<T>());
+            
+            if (!expression) {
+                return {};
+            }
+            if ((*expression)->isFeatureConstant()) {
+                return DataDrivenPropertyValue<T>(CameraFunction<T>(std::move(*expression)));
+            } else if ((*expression)->isZoomConstant()) {
+                return DataDrivenPropertyValue<T>(SourceFunction<T>(std::move(*expression)));
+            } else {
+                if (!CompositeFunction<T>::Curve::findZoomCurve(expression->get())) {
+                    error = { R"("zoom" expression may only be used as input to a top-level "curve" expression.)" };
+                    return {};
+                }
+            
+                return DataDrivenPropertyValue<T>(CompositeFunction<T>(std::move(*expression)));
+            }
         } else if (!objectMember(value, "property")) {
             optional<CameraFunction<T>> function = convert<CameraFunction<T>>(value, error);
             if (!function) {

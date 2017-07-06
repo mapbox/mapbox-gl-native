@@ -22,6 +22,8 @@ target_sources(mbgl-node
     PRIVATE platform/node/src/node_feature.cpp
     PRIVATE platform/node/src/node_thread_pool.hpp
     PRIVATE platform/node/src/node_thread_pool.cpp
+    PRIVATE platform/node/src/node_expression.hpp
+    PRIVATE platform/node/src/node_expression.cpp
     PRIVATE platform/node/src/util/async_queue.hpp
 )
 
@@ -86,6 +88,17 @@ xcode_create_scheme(
     NAME "node query tests"
     ARGS
         "platform/node/test/query.test.js"
+    OPTIONAL_ARGS
+        "group"
+        "test"
+)
+
+xcode_create_scheme(
+    TARGET mbgl-node
+    TYPE node
+    NAME "node expression tests"
+    ARGS
+        "platform/node/test/expression.test.js"
     OPTIONAL_ARGS
         "group"
         "test"
