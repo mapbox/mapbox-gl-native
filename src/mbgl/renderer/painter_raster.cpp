@@ -81,7 +81,8 @@ void Painter::renderRaster(PaintParameters& parameters,
         rasterSegments,
         paintAttributeData,
         properties,
-        state.getZoom()
+        state.getZoom(),
+        layer.getID()
     );
 }
 
