@@ -3,7 +3,6 @@ package com.mapbox.mapboxsdk.maps;
 import android.content.Context;
 import android.graphics.PointF;
 import android.location.Location;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.ScaleGestureDetectorCompat;
@@ -134,7 +133,12 @@ final class MapGestureDetector {
    * @param event the MotionEvent
    * @return True if touch event is handled
    */
-  boolean onTouchEvent(@NonNull MotionEvent event) {
+  boolean onTouchEvent(MotionEvent event) {
+    // framework can return null motion events in edge cases #9432
+    if (event == null) {
+      return false;
+    }
+
     // Check and ignore non touch or left clicks
     if ((event.getButtonState() != 0) && (event.getButtonState() != MotionEvent.BUTTON_PRIMARY)) {
       return false;
