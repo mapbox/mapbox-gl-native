@@ -78,6 +78,12 @@ public:
     void setCirclePitchScaleTransition(const TransitionOptions&);
     TransitionOptions getCirclePitchScaleTransition() const;
 
+    static PropertyValue<AlignmentType> getDefaultCirclePitchAlignment();
+    PropertyValue<AlignmentType> getCirclePitchAlignment() const;
+    void setCirclePitchAlignment(PropertyValue<AlignmentType>);
+    void setCirclePitchAlignmentTransition(const TransitionOptions&);
+    TransitionOptions getCirclePitchAlignmentTransition() const;
+
     static DataDrivenPropertyValue<float> getDefaultCircleStrokeWidth();
     DataDrivenPropertyValue<float> getCircleStrokeWidth() const;
     void setCircleStrokeWidth(DataDrivenPropertyValue<float>);

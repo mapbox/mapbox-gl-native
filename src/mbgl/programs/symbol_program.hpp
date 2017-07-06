@@ -30,7 +30,6 @@ class TransformState;
 
 namespace uniforms {
 MBGL_DEFINE_UNIFORM_SCALAR(bool, u_rotate_with_map);
-MBGL_DEFINE_UNIFORM_SCALAR(bool, u_pitch_with_map);
 MBGL_DEFINE_UNIFORM_SCALAR(gl::TextureUnit, u_texture);
 MBGL_DEFINE_UNIFORM_SCALAR(gl::TextureUnit, u_fadetexture);
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_aspect_ratio);

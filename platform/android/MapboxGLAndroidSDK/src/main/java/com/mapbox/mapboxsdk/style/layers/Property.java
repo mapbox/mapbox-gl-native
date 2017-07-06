@@ -446,6 +446,27 @@ public final class Property {
   @Retention(RetentionPolicy.SOURCE)
   public @interface CIRCLE_PITCH_SCALE {}
 
+  // CIRCLE_PITCH_ALIGNMENT: Orientation of circle when map is pitched.
+
+  /**
+   * The circle is aligned to the plane of the map.
+   */
+  public static final String CIRCLE_PITCH_ALIGNMENT_MAP = "map";
+  /**
+   * The circle is aligned to the plane of the viewport.
+   */
+  public static final String CIRCLE_PITCH_ALIGNMENT_VIEWPORT = "viewport";
+
+  /**
+   * Orientation of circle when map is pitched.
+   */
+  @StringDef({
+      CIRCLE_PITCH_ALIGNMENT_MAP,
+      CIRCLE_PITCH_ALIGNMENT_VIEWPORT,
+    })
+  @Retention(RetentionPolicy.SOURCE)
+  public @interface CIRCLE_PITCH_ALIGNMENT {}
+
   // FILL_EXTRUSION_TRANSLATE_ANCHOR: Controls the translation reference point.
 
   /**
