@@ -53,3 +53,37 @@ add_custom_command(
 mbgl_platform_node()
 
 create_source_groups(mbgl-node)
+
+xcode_create_scheme(
+    TARGET mbgl-node
+)
+
+xcode_create_scheme(
+    TARGET mbgl-node
+    TYPE node
+    NAME "node tests"
+    ARGS
+        "`npm bin tape`/tape platform/node/test/js/**/*.test.js"
+)
+
+xcode_create_scheme(
+    TARGET mbgl-node
+    TYPE node
+    NAME "node render tests"
+    ARGS
+        "platform/node/test/render.test.js"
+    OPTIONAL_ARGS
+        "group"
+        "test"
+)
+
+xcode_create_scheme(
+    TARGET mbgl-node
+    TYPE node
+    NAME "node query tests"
+    ARGS
+        "platform/node/test/query.test.js"
+    OPTIONAL_ARGS
+        "group"
+        "test"
+)

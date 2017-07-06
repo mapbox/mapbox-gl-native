@@ -25,3 +25,10 @@ target_add_mason_package(mbgl-benchmark PRIVATE vector-tile)
 mbgl_platform_benchmark()
 
 create_source_groups(mbgl-benchmark)
+
+xcode_create_scheme(
+    TARGET mbgl-benchmark
+    OPTIONAL_ARGS
+        "--benchmark_filter=Category.*"
+        "--benchmark_repetitions=1"
+)

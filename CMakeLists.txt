@@ -4,6 +4,7 @@ set(CMAKE_CXX_STANDARD 14)
 
 include(cmake/mbgl.cmake)
 include(cmake/mason.cmake)
+include(cmake/xcode.cmake)
 
 option(WITH_CXX11ABI "Use cxx11abi mason packages" OFF)
 option(WITH_COVERAGE "Enable coverage reports" OFF)
