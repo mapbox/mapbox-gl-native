@@ -39,7 +39,8 @@ void Painter::renderTileDebug(const RenderTile& renderTile) {
             segments,
             paintAttibuteData,
             properties,
-            state.getZoom()
+            state.getZoom(),
+            "debug"
         );
     };
 

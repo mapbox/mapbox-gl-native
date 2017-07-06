@@ -59,7 +59,8 @@ void Painter::renderFillExtrusion(PaintParameters& parameters,
             bucket.triangleSegments,
             bucket.paintPropertyBinders.at(layer.getID()),
             properties,
-            state.getZoom());
+            state.getZoom(),
+            layer.getID());
 
     } else {
         parameters.programs.fillExtrusion.get(properties).draw(
@@ -80,7 +81,8 @@ void Painter::renderFillExtrusion(PaintParameters& parameters,
             bucket.triangleSegments,
             bucket.paintPropertyBinders.at(layer.getID()),
             properties,
-            state.getZoom());
+            state.getZoom(),
+            layer.getID());
     };
 }
 

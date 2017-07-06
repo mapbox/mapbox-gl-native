@@ -58,7 +58,8 @@ public:
               const SegmentVector<Attributes>& segments,
               const PaintPropertyBinders& paintPropertyBinders,
               const typename PaintProperties::Evaluated& currentProperties,
-              float currentZoom) {
+              float currentZoom,
+              const std::string& layerID) {
         typename AllUniforms::Values allUniformValues = uniformValues
             .concat(paintPropertyBinders.uniformValues(currentZoom, currentProperties));
 
@@ -66,8 +67,10 @@ public:
             .concat(paintPropertyBinders.attributeBindings(currentProperties));
 
         for (auto& segment : segments) {
-            if (!segment.vertexArray) {
-                segment.vertexArray = context.createVertexArray();
+            optional<gl::VertexArray>& vertexArray = segment.vertexArrays[layerID];
+
+            if (!vertexArray) {
+                vertexArray = context.createVertexArray();
             }
 
             program.draw(
@@ -77,7 +80,7 @@ public:
                 std::move(stencilMode),
                 std::move(colorMode),
                 allUniformValues,
-                *segment.vertexArray,
+                *vertexArray,
                 Attributes::offsetBindings(allAttributeBindings, segment.vertexOffset),
                 indexBuffer,
                 segment.indexOffset,

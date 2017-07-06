@@ -28,7 +28,14 @@ public:
     std::size_t vertexLength;
     std::size_t indexLength;
 
-    mutable optional<gl::VertexArray> vertexArray;
+    // One VertexArray per layer ID. This minimizes rebinding in cases where
+    // several layers share buckets but have different sets of active attributes.
+    // This can happen:
+    //   * when two layers have the same layout properties, but differing
+    //     data-driven paint properties
+    //   * when two fill layers have the same layout properties, but one
+    //     uses fill-color and the other uses fill-pattern
+    mutable std::map<std::string, optional<gl::VertexArray>> vertexArrays;
 };
 
 template <class Attributes>
