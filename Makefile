@@ -108,6 +108,14 @@ run-benchmark: run-benchmark-.
 run-benchmark-%: benchmark
 	$(MACOS_OUTPUT_PATH)/$(BUILDTYPE)/mbgl-benchmark --benchmark_filter=$*
 
+.PHONY: node-benchmark
+node-benchmark: $(MACOS_PROJ_PATH)
+	set -o pipefail && $(MACOS_XCODEBUILD) -scheme 'node-benchmark' build $(XCPRETTY)
+
+.PHONY: run-node-benchmark
+run-node-benchmark: node-benchmark
+	node platform/node/test/benchmark.js
+
 .PHONY: glfw-app
 glfw-app: $(MACOS_PROJ_PATH)
 	set -o pipefail && $(MACOS_XCODEBUILD) -scheme 'mbgl-glfw' build $(XCPRETTY)
