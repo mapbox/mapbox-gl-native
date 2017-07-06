@@ -87,3 +87,14 @@ xcode_create_scheme(
         "group"
         "test"
 )
+
+xcode_create_scheme(
+    TARGET mbgl-node
+    TYPE node
+    NAME "node-benchmark"
+    ARGS
+        "platform/node/test/benchmark.js"
+    OPTIONAL_ARGS
+        "group"
+        "test"
+)
