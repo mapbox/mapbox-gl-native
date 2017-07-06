@@ -326,6 +326,9 @@ RenderData RenderStyle::getRenderData(MapDebugOptions debugOptions, float angle)
 
                 return std::tie(par.y, par.x) < std::tie(pbr.y, pbr.x);
             });
+        } else {
+            std::sort(sortedTiles.begin(), sortedTiles.end(),
+                      [](const auto& a, const auto& b) { return a.get().id < b.get().id; });
         }
 
         std::vector<std::reference_wrapper<RenderTile>> sortedTilesForInsertion;
