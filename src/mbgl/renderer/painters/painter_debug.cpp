@@ -70,9 +70,9 @@ void Painter::renderTileDebug(const RenderTile& renderTile) {
 
     if (frame.debugOptions & MapDebugOptions::TileBorders) {
         draw(Color::red(),
-             tileVertexBuffer,
-             tileBorderIndexBuffer,
-             tileBorderSegments,
+             borderDrawable.vertices,
+             borderDrawable.indices,
+             borderDrawable.segments,
              gl::LineStrip { 4.0f * frame.pixelRatio });
     }
 }
@@ -95,9 +95,9 @@ void Painter::renderTileDebug(const mat4& matrix) {
              uniforms::u_matrix::Value{ matrix },
              uniforms::u_color::Value{ Color::red() }
             },
-            tileVertexBuffer,
-            tileBorderIndexBuffer,
-            tileBorderSegments,
+            borderDrawable.vertices,
+            borderDrawable.indices,
+            borderDrawable.segments,
             paintAttibuteData,
             properties,
             state.getZoom()

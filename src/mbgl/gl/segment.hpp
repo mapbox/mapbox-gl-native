@@ -39,13 +39,6 @@ using SegmentInfoVector = std::vector<SegmentInfo>;
 template <class Attributes>
 class Segment {
 public:
-    Segment(std::size_t vertexOffset,
-            std::size_t indexOffset,
-            std::size_t vertexLength = 0,
-            std::size_t indexLength = 0)
-        : info(vertexOffset, indexOffset, vertexLength, indexLength) {
-    }
-
     Segment(SegmentInfo info_)
         : info(std::move(info_)) {
     }

@@ -69,7 +69,7 @@ void FillExtrusionBucket::addFeature(const GeometryTileFeature& feature,
         if (triangleSegments.empty() ||
             triangleSegments.back().info.vertexLength + (5 * (totalVertices - 1) + 1) >
                 std::numeric_limits<uint16_t>::max()) {
-            triangleSegments.emplace_back(startVertices, triangles.indexSize());
+            triangleSegments.emplace_back(gl::SegmentInfo{ startVertices, triangles.indexSize() });
         }
 
         auto& triangleSegment = triangleSegments.back();

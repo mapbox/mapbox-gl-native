@@ -163,6 +163,7 @@ set(MBGL_CORE_FILES
     src/mbgl/renderer/cross_faded_property_evaluator.cpp
     src/mbgl/renderer/cross_faded_property_evaluator.hpp
     src/mbgl/renderer/data_driven_property_evaluator.hpp
+    src/mbgl/renderer/drawable.hpp
     src/mbgl/renderer/frame_history.cpp
     src/mbgl/renderer/frame_history.hpp
     src/mbgl/renderer/group_by_layout.cpp
@@ -171,6 +172,7 @@ set(MBGL_CORE_FILES
     src/mbgl/renderer/image_atlas.hpp
     src/mbgl/renderer/image_manager.cpp
     src/mbgl/renderer/image_manager.hpp
+    src/mbgl/renderer/indexed_primitives.hpp
     src/mbgl/renderer/paint_parameters.hpp
     src/mbgl/renderer/paint_property_binder.hpp
     src/mbgl/renderer/paint_property_statistics.hpp

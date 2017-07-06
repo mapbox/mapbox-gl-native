@@ -20,6 +20,15 @@ class DebugProgram : public Program<
 {
 public:
     using Program::Program;
+
+    static LayoutVertex layoutVertex(Point<int16_t> p) {
+        return LayoutVertex {
+            {{
+                p.x,
+                p.y
+            }}
+        };
+    }
 };
 
 using DebugLayoutVertex = DebugProgram::LayoutVertex;

@@ -577,7 +577,7 @@ void SymbolLayout::addSymbol(Buffer& buffer,
     }
 
     if (buffer.segments.empty() || buffer.segments.back().info.vertexLength + vertexLength > std::numeric_limits<uint16_t>::max()) {
-        buffer.segments.emplace_back(buffer.vertices.vertexSize(), buffer.triangles.indexSize());
+        buffer.segments.emplace_back(gl::SegmentInfo{ buffer.vertices.vertexSize(), buffer.triangles.indexSize() });
     }
 
     // We're generating triangle fans, so we always start with the first
@@ -640,7 +640,7 @@ void SymbolLayout::addToDebugBuffers(CollisionTile& collisionTile, SymbolBucket&
                 static constexpr std::size_t indexLength = 8;
 
                 if (collisionBox.segments.empty() || collisionBox.segments.back().info.vertexLength + vertexLength > std::numeric_limits<uint16_t>::max()) {
-                    collisionBox.segments.emplace_back(collisionBox.vertices.vertexSize(), collisionBox.lines.indexSize());
+                    collisionBox.segments.emplace_back(gl::SegmentInfo{ collisionBox.vertices.vertexSize(), collisionBox.lines.indexSize() });
                 }
 
                 auto& segment = collisionBox.segments.back();

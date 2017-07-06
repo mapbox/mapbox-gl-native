@@ -49,9 +49,9 @@ void Painter::renderBackground(PaintParameters& parameters, const RenderBackgrou
                     tileID,
                     state
                 ),
-                tileVertexBuffer,
-                quadTriangleIndexBuffer,
-                tileTriangleSegments,
+                fillDrawable.vertices,
+                fillDrawable.indices,
+                fillDrawable.segments,
                 paintAttibuteData,
                 properties,
                 state.getZoom()
@@ -69,9 +69,9 @@ void Painter::renderBackground(PaintParameters& parameters, const RenderBackgrou
                     uniforms::u_matrix::Value{ matrixForTile(tileID) },
                     uniforms::u_world::Value{ context.viewport.getCurrentValue().size },
                 },
-                tileVertexBuffer,
-                quadTriangleIndexBuffer,
-                tileTriangleSegments,
+                fillDrawable.vertices,
+                fillDrawable.indices,
+                fillDrawable.segments,
                 paintAttibuteData,
                 properties,
                 state.getZoom()

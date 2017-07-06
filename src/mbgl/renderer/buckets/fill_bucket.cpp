@@ -62,7 +62,7 @@ void FillBucket::addFeature(const GeometryTileFeature& feature,
                 continue;
 
             if (lineSegments.empty() || lineSegments.back().info.vertexLength + nVertices > std::numeric_limits<uint16_t>::max()) {
-                lineSegments.emplace_back(vertices.vertexSize(), lines.indexSize());
+                lineSegments.emplace_back(gl::SegmentInfo{ vertices.vertexSize(), lines.indexSize() });
             }
 
             auto& lineSegment = lineSegments.back();
@@ -87,7 +87,7 @@ void FillBucket::addFeature(const GeometryTileFeature& feature,
         assert(nIndicies % 3 == 0);
 
         if (triangleSegments.empty() || triangleSegments.back().info.vertexLength + totalVertices > std::numeric_limits<uint16_t>::max()) {
-            triangleSegments.emplace_back(startVertices, triangles.indexSize());
+            triangleSegments.emplace_back(gl::SegmentInfo{ startVertices, triangles.indexSize() });
         }
 
         auto& triangleSegment = triangleSegments.back();

@@ -8,6 +8,7 @@
 #include <mbgl/renderer/render_item.hpp>
 #include <mbgl/renderer/bucket.hpp>
 #include <mbgl/renderer/render_light.hpp>
+#include <mbgl/renderer/drawable.hpp>
 
 #include <mbgl/gl/context.hpp>
 #include <mbgl/programs/debug_program.hpp>
@@ -165,17 +166,10 @@ public:
     std::unique_ptr<Programs> overdrawPrograms;
 #endif
 
-    gl::VertexBuffer<FillLayoutVertex> tileVertexBuffer;
-    gl::VertexBuffer<RasterLayoutVertex> rasterVertexBuffer;
-    gl::VertexBuffer<ExtrusionTextureLayoutVertex> extrusionTextureVertexBuffer;
-
-    gl::IndexBuffer<gl::Triangles> quadTriangleIndexBuffer;
-    gl::IndexBuffer<gl::LineStrip> tileBorderIndexBuffer;
-
-    gl::SegmentVector<FillAttributes> tileTriangleSegments;
-    gl::SegmentVector<DebugAttributes> tileBorderSegments;
-    gl::SegmentVector<RasterAttributes> rasterSegments;
-    gl::SegmentVector<ExtrusionTextureAttributes> extrusionTextureSegments;
+    const Drawable<gl::Triangles, RasterLayoutVertex, RasterAttributes> rasterDrawable;
+    const Drawable<gl::Triangles, FillLayoutVertex, FillAttributes> fillDrawable;
+    const Drawable<gl::LineStrip, DebugLayoutVertex, DebugAttributes> borderDrawable;
+    const Drawable<gl::Triangles, ExtrusionTextureLayoutVertex, ExtrusionTextureAttributes> extrusionTextureDrawable;
 };
 
 } // namespace mbgl

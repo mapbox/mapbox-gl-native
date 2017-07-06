@@ -62,7 +62,7 @@ void CircleBucket::addFeature(const GeometryTileFeature& feature,
 
             if (segments.empty() || segments.back().info.vertexLength + vertexLength > std::numeric_limits<uint16_t>::max()) {
                 // Move to a new segments because the old one can't hold the geometry.
-                segments.emplace_back(vertices.vertexSize(), triangles.indexSize());
+                segments.emplace_back(gl::SegmentInfo{ vertices.vertexSize(), triangles.indexSize() });
             }
 
             // this geometry will be of the Point type, and we'll derive

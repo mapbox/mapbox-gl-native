@@ -159,7 +159,7 @@ void RenderImageSource::update(Immutable<style::Source::Impl> baseImpl_,
     bucket->indices.emplace_back(0, 1, 2);
     bucket->indices.emplace_back(1, 2, 3);
 
-    bucket->segments.emplace_back(0, 0, 4, 6);
+    bucket->segments.emplace_back(gl::SegmentInfo{ 0, 0, 4, 6 });
 }
 
 void RenderImageSource::render(Painter& painter,

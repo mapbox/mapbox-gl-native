@@ -221,6 +221,32 @@ const std::size_t Vertex<A1, A2, A3, A4, A5>::attributeOffsets[5] = {
     offsetof(VertexType, a5)
 };
 
+template <class A1>
+bool operator==(const Vertex<A1>& lhs, const Vertex<A1>& rhs) {
+    return std::tie(lhs.a1) == std::tie(rhs.a1);
+}
+
+template <class A1, class A2>
+bool operator==(const Vertex<A1, A2>& lhs, const Vertex<A1, A2>& rhs) {
+    return std::tie(lhs.a1, lhs.a2) == std::tie(rhs.a1, rhs.a2);
+}
+
+template <class A1, class A2, class A3>
+bool operator==(const Vertex<A1, A2, A3>& lhs, const Vertex<A1, A2, A3>& rhs) {
+    return std::tie(lhs.a1, lhs.a2, lhs.a3) == std::tie(rhs.a1, rhs.a2, rhs.a3);
+}
+
+template <class A1, class A2, class A3, class A4>
+bool operator==(const Vertex<A1, A2, A3, A4>& lhs, const Vertex<A1, A2, A3, A4>& rhs) {
+    return std::tie(lhs.a1, lhs.a2, lhs.a3, lhs.a4) == std::tie(rhs.a1, rhs.a2, rhs.a3, rhs.a4);
+}
+
+template <class A1, class A2, class A3, class A4, class A5>
+bool operator==(const Vertex<A1, A2, A3, A4, A5>& lhs, const Vertex<A1, A2, A3, A4, A5>& rhs) {
+    return std::tie(lhs.a1, lhs.a2, lhs.a3, lhs.a4, lhs.a5) ==
+           std::tie(rhs.a1, rhs.a2, rhs.a3, rhs.a4, rhs.a5);
+}
+
 } // namespace detail
 
 AttributeLocation bindAttributeLocation(ProgramID, AttributeLocation, const char * name);

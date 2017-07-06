@@ -22,6 +22,7 @@ set(MBGL_TEST_FILES
     # gl
     test/gl/bucket.test.cpp
     test/gl/object.test.cpp
+    test/gl/primitives.test.cpp
 
     # include/mbgl
     test/include/mbgl/test.hpp

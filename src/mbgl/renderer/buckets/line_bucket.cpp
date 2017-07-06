@@ -372,7 +372,7 @@ void LineBucket::addGeometry(const GeometryCoordinates& coordinates, FeatureType
     const std::size_t vertexCount = endVertex - startVertex;
 
     if (segments.empty() || segments.back().info.vertexLength + vertexCount > std::numeric_limits<uint16_t>::max()) {
-        segments.emplace_back(startVertex, triangles.indexSize());
+        segments.emplace_back(gl::SegmentInfo{ startVertex, triangles.indexSize() });
     }
 
     auto& segment = segments.back();

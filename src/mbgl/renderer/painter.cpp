@@ -3,6 +3,7 @@
 #include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/renderer/render_source.hpp>
 #include <mbgl/renderer/render_style.hpp>
+#include <mbgl/renderer/indexed_primitives.hpp>
 
 #include <mbgl/style/source.hpp>
 #include <mbgl/style/source_impl.hpp>
@@ -42,50 +43,72 @@ namespace mbgl {
 
 using namespace style;
 
-static gl::VertexVector<FillLayoutVertex> tileVertices() {
-    gl::VertexVector<FillLayoutVertex> result;
-    result.emplace_back(FillProgram::layoutVertex({ 0,            0 }));
-    result.emplace_back(FillProgram::layoutVertex({ util::EXTENT, 0 }));
-    result.emplace_back(FillProgram::layoutVertex({ 0, util::EXTENT }));
-    result.emplace_back(FillProgram::layoutVertex({ util::EXTENT, util::EXTENT }));
-    return result;
+static auto rasterPrimitives() {
+    IndexedPrimitives<gl::Triangles, RasterLayoutVertex, RasterAttributes> primitives;
+    primitives.add(
+        {
+            RasterProgram::layoutVertex({ 0,            0            }, { 0,     0 }),
+            RasterProgram::layoutVertex({ util::EXTENT, 0            }, { 32767, 0 }),
+            RasterProgram::layoutVertex({ 0,            util::EXTENT }, { 0,     32767 }),
+            RasterProgram::layoutVertex({ util::EXTENT, util::EXTENT }, { 32767, 32767 }),
+        }, {
+            {{ 0, 1, 2 }},
+            {{ 1, 2, 3 }},
+        }
+    );
+    return primitives;
 }
 
-static gl::IndexVector<gl::Triangles> quadTriangleIndices() {
-    gl::IndexVector<gl::Triangles> result;
-    result.emplace_back(0, 1, 2);
-    result.emplace_back(1, 2, 3);
-    return result;
+static auto borderPrimitives() {
+    IndexedPrimitives<gl::LineStrip, DebugLayoutVertex, DebugAttributes> primitives;
+    primitives.add(
+        {
+            DebugProgram::layoutVertex({ 0,            0 }),
+            DebugProgram::layoutVertex({ util::EXTENT, 0 }),
+            DebugProgram::layoutVertex({ util::EXTENT, util::EXTENT }),
+            DebugProgram::layoutVertex({ 0,            util::EXTENT }),
+        }, {
+            {{ 0 }},
+            {{ 1 }},
+            {{ 2 }},
+            {{ 3 }},
+            {{ 0 }},
+        }
+    );
+    return primitives;
 }
 
-static gl::IndexVector<gl::LineStrip> tileLineStripIndices() {
-    gl::IndexVector<gl::LineStrip> result;
-    result.emplace_back(0);
-    result.emplace_back(1);
-    result.emplace_back(3);
-    result.emplace_back(2);
-    result.emplace_back(0);
-    return result;
+static auto fillPrimitives() {
+    IndexedPrimitives<gl::Triangles, FillLayoutVertex, FillAttributes> primitives;
+    primitives.add(
+        {
+            FillProgram::layoutVertex({ 0,            0 }),
+            FillProgram::layoutVertex({ util::EXTENT, 0 }),
+            FillProgram::layoutVertex({ 0,            util::EXTENT }),
+            FillProgram::layoutVertex({ util::EXTENT, util::EXTENT }),
+        }, {
+            {{ 0, 1, 2 }},
+            {{ 1, 2, 3 }},
+        }
+    );
+    return primitives;
 }
 
-static gl::VertexVector<RasterLayoutVertex> rasterVertices() {
-    gl::VertexVector<RasterLayoutVertex> result;
-    result.emplace_back(RasterProgram::layoutVertex({ 0, 0 }, { 0, 0 }));
-    result.emplace_back(RasterProgram::layoutVertex({ util::EXTENT, 0 }, { 32767, 0 }));
-    result.emplace_back(RasterProgram::layoutVertex({ 0, util::EXTENT }, { 0, 32767 }));
-    result.emplace_back(RasterProgram::layoutVertex({ util::EXTENT, util::EXTENT }, { 32767, 32767 }));
-    return result;
+static auto extrusionTexturePrimitives() {
+    IndexedPrimitives<gl::Triangles, ExtrusionTextureLayoutVertex, ExtrusionTextureAttributes> primitives;
+    primitives.add(
+        {
+            ExtrusionTextureProgram::layoutVertex({ 0, 0 }),
+            ExtrusionTextureProgram::layoutVertex({ 1, 0 }),
+            ExtrusionTextureProgram::layoutVertex({ 0, 1 }),
+            ExtrusionTextureProgram::layoutVertex({ 1, 1 }),
+        }, {
+            {{ 0, 1, 2 }},
+            {{ 1, 2, 3 }},
+        }
+    );
+    return primitives;
 }
-
-static gl::VertexVector<ExtrusionTextureLayoutVertex> extrusionTextureVertices() {
-    gl::VertexVector<ExtrusionTextureLayoutVertex> result;
-    result.emplace_back(ExtrusionTextureProgram::layoutVertex({ 0, 0 }));
-    result.emplace_back(ExtrusionTextureProgram::layoutVertex({ 1, 0 }));
-    result.emplace_back(ExtrusionTextureProgram::layoutVertex({ 0, 1 }));
-    result.emplace_back(ExtrusionTextureProgram::layoutVertex({ 1, 1 }));
-    return result;
-}
-
 
 Painter::Painter(gl::Context& context_,
                  const TransformState& state_,
@@ -93,17 +116,10 @@ Painter::Painter(gl::Context& context_,
                  const optional<std::string>& programCacheDir)
     : context(context_),
       state(state_),
-      tileVertexBuffer(context.createVertexBuffer(tileVertices())),
-      rasterVertexBuffer(context.createVertexBuffer(rasterVertices())),
-      extrusionTextureVertexBuffer(context.createVertexBuffer(extrusionTextureVertices())),
-      quadTriangleIndexBuffer(context.createIndexBuffer(quadTriangleIndices())),
-      tileBorderIndexBuffer(context.createIndexBuffer(tileLineStripIndices())) {
-
-    tileTriangleSegments.emplace_back(0, 0, 4, 6);
-    tileBorderSegments.emplace_back(0, 0, 4, 5);
-    rasterSegments.emplace_back(0, 0, 4, 6);
-    extrusionTextureSegments.emplace_back(0, 0, 4, 6);
-
+      rasterDrawable(context, rasterPrimitives()),
+      fillDrawable(context, fillPrimitives()),
+      borderDrawable(context, borderPrimitives()),
+      extrusionTextureDrawable(context, extrusionTexturePrimitives()) {
     programs = std::make_unique<Programs>(context,
                                           ProgramParameters{ pixelRatio, false, programCacheDir });
 #ifndef NDEBUG
@@ -323,7 +339,9 @@ void Painter::renderPass(PaintParameters& parameters,
                     uniforms::u_image::Value{ 0 },
                     uniforms::u_opacity::Value{ layer.as<RenderFillExtrusionLayer>()
                                                     ->evaluated.get<FillExtrusionOpacity>() } },
-                extrusionTextureVertexBuffer, quadTriangleIndexBuffer, extrusionTextureSegments,
+                extrusionTextureDrawable.vertices,
+                extrusionTextureDrawable.indices,
+                extrusionTextureDrawable.segments,
                 ExtrusionTextureProgram::PaintPropertyBinders{ properties, 0 }, properties,
                 state.getZoom());
         } else {

@@ -74,7 +74,7 @@ DebugBucket::DebugBucket(const OverscaledTileID& id,
         addText(expiresText, 50, baseline + 200, 5);
     }
 
-    segments.emplace_back(0, 0, vertices.vertexSize(), indices.indexSize());
+    segments.emplace_back(gl::SegmentInfo{ 0, 0, vertices.vertexSize(), indices.indexSize() });
 
     vertexBuffer = context.createVertexBuffer(std::move(vertices));
     indexBuffer = context.createIndexBuffer(std::move(indices));
