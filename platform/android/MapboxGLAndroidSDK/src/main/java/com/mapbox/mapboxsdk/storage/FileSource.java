@@ -3,9 +3,9 @@ package com.mapbox.mapboxsdk.storage;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.content.res.AssetManager;
 import android.os.Environment;
 import android.support.annotation.NonNull;
-import android.content.res.AssetManager;
 
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
@@ -28,8 +28,9 @@ public class FileSource {
     /**
      * Called whenever a URL needs to be transformed.
      *
-     * @param kind The kind of URL to be transformed.
-     * @return A URL that will now be downloaded.
+     * @param kind the kind of URL to be transformed.
+     * @param url  the  URL to be transformed
+     * @return a URL that will now be downloaded.
      */
     String onURL(@Resource.Kind int kind, String url);
 
@@ -38,6 +39,12 @@ public class FileSource {
   // File source instance is kept alive after initialization
   private static FileSource INSTANCE;
 
+  /**
+   * Get the single instance of FileSource.
+   *
+   * @param context the context to derive the cache path from
+   * @return the single instance of FileSource
+   */
   public static synchronized FileSource getInstance(Context context) {
     if (INSTANCE == null) {
       String cachePath = getCachePath(context);
@@ -47,6 +54,12 @@ public class FileSource {
     return INSTANCE;
   }
 
+  /**
+   * Get the cache path for a context.
+   *
+   * @param context the context to derive the cache path from
+   * @return the cache path
+   */
   public static String getCachePath(Context context) {
     // Default value
     boolean setStorageExternal = MapboxConstants.DEFAULT_SET_STORAGE_EXTERNAL;

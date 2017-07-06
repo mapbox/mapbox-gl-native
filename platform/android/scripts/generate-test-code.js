@@ -14,7 +14,7 @@ global.camelize = function (str) {
 }
 
 
-const excludeActivities = ["DeleteRegionActivity","RealTimeGeoJsonActivity","UpdateMetadataActivity","CarDrivingActivity","MyLocationTrackingModeActivity","MyLocationToggleActivity","MyLocationTintActivity","MyLocationDrawableActivity","DoubleMapActivity", "LocationPickerActivity","GeoJsonClusteringActivity","RuntimeStyleTestActivity", "AnimatedMarkerActivity", "ViewPagerActivity","MapFragmentActivity","SupportMapFragmentActivity","SnapshotActivity","NavigationDrawerActivity", "QueryRenderedFeaturesBoxHighlightActivity", "MultiMapActivity", "MapInDialogActivity", "SimpleMapActivity"];
+const excludeActivities = ["BaseLocationActivity","MockLocationEngine","DeleteRegionActivity","RealTimeGeoJsonActivity","UpdateMetadataActivity","CarDrivingActivity","MyLocationTrackingModeActivity","MyLocationToggleActivity","MyLocationTintActivity","MyLocationDrawableActivity","DoubleMapActivity", "LocationPickerActivity","GeoJsonClusteringActivity","RuntimeStyleTestActivity", "AnimatedMarkerActivity", "ViewPagerActivity","MapFragmentActivity","SupportMapFragmentActivity","SnapshotActivity","NavigationDrawerActivity", "QueryRenderedFeaturesBoxHighlightActivity", "MultiMapActivity", "MapInDialogActivity", "SimpleMapActivity"];
 const appBasePath = 'platform/android/MapboxGLAndroidSDKTestApp/src/main/java/com/mapbox/mapboxsdk/testapp/activity';
 const testBasePath = 'platform/android/MapboxGLAndroidSDKTestApp/src/androidTest/java/com/mapbox/mapboxsdk/testapp/activity/gen';
 const subPackages = fs.readdirSync(appBasePath);

@@ -112,6 +112,5 @@ buildPackageStyle "ipackage" "symbols"
 buildPackageStyle "ipackage-strip"
 buildPackageStyle "iframework" "symbols-dynamic"
 buildPackageStyle "iframework SYMBOLS=NO" "dynamic"
-buildPackageStyle "ifabric" "fabric"
 
 step "Finished deploying ${PUBLISH_VERSION} in $(($SECONDS / 60)) minutes and $(($SECONDS % 60)) seconds"

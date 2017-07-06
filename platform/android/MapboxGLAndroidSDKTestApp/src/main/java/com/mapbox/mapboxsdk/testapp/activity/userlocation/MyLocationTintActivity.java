@@ -13,7 +13,6 @@ import android.view.View;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.constants.MyLocationTracking;
 import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.mapbox.mapboxsdk.location.LocationSource;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
@@ -133,7 +132,6 @@ public class MyLocationTintActivity extends BaseLocationActivity implements Loca
   protected void onStart() {
     super.onStart();
     mapView.onStart();
-    LocationSource.getLocationEngine(this).addLocationEngineListener(this);
   }
 
   @Override
@@ -151,7 +149,6 @@ public class MyLocationTintActivity extends BaseLocationActivity implements Loca
   @Override
   protected void onStop() {
     super.onStop();
-    LocationSource.getLocationEngine(this).removeLocationEngineListener(this);
     mapView.onStop();
   }
 

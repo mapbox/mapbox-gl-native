@@ -133,5 +133,6 @@ public class MapboxConstants {
   public static final String STATE_ATTRIBUTION_MARGIN_RIGHT = "mapbox_attrMarginRight";
   public static final String STATE_ATTRIBUTION_MARGIN_BOTTOM = "mapbox_atrrMarginBottom";
   public static final String STATE_ATTRIBUTION_ENABLED = "mapbox_atrrEnabled";
-
+  public static final String STATE_LOCATION_CHANGE_ANIMATION_ENABLED = "mapbox_locationChangeAnimationEnabled";
+  public static final String STATE_USING_CUSTOM_LOCATION_SOURCE = "mapbox_usingCustomLocationSource";
 }

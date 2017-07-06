@@ -16,7 +16,6 @@ import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.res.ResourcesCompat;
-import android.view.Gravity;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -315,8 +314,7 @@ public final class UiSettings {
    * </p>
    * By default, the compass is in the top right corner.
    *
-   * @param gravity One of the values from {@link Gravity}.
-   * @see Gravity
+   * @param gravity Android SDK Gravity.
    */
   @UiThread
   public void setCompassGravity(int gravity) {
@@ -460,8 +458,7 @@ public final class UiSettings {
    * </p>
    * By default, the logo is in the bottom left corner.
    *
-   * @param gravity One of the values from {@link Gravity}.
-   * @see Gravity
+   * @param gravity Android SDK Gravity.
    */
   public void setLogoGravity(int gravity) {
     setWidgetGravity(logoView, gravity);
@@ -552,8 +549,7 @@ public final class UiSettings {
    * </p>
    * By default, the attribution is in the bottom left corner next to the Mapbox logo.
    *
-   * @param gravity One of the values from {@link Gravity}.
-   * @see Gravity
+   * @param gravity Android SDK Gravity.
    */
   public void setAttributionGravity(int gravity) {
     setWidgetGravity(attributionsView, gravity);

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:mapbox="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_id_location_source_lost"
+        android:title="@string/menuitem_title_change_location_source_lost"
+        mapbox:showAsAction="never"/>
+
+    <item
+        android:id="@+id/action_id_location_source_mock"
+        android:title="@string/menuitem_title_change_location_source_mock"
+        mapbox:showAsAction="never"/>
+
+    <item
+        android:id="@+id/action_id_location_source_null"
+        android:title="@string/menuitem_title_change_location_source_null"
+        mapbox:showAsAction="never"/>
+
+</menu>

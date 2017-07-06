@@ -76,6 +76,8 @@ gestures.
 
 For more information about user interface design, consult Apple’s
 [_iOS Human Interface Guidelines_](https://developer.apple.com/ios/human-interface-guidelines/).
+To learn more about designing maps for mobile devices, see [Nathaniel Slaughter's blog post](https://www.mapbox.com/blog/designing-maps-for-mobile-devices/) on
+the subject.
 
 ## Applying your style
 
