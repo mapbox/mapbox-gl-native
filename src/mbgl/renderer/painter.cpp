@@ -316,16 +316,23 @@ void Painter::renderPass(PaintParameters& parameters,
             const Properties<>::PossiblyEvaluated properties;
 
             parameters.programs.extrusionTexture.draw(
-                context, gl::Triangles(), gl::DepthMode::disabled(), gl::StencilMode::disabled(),
+                context,
+                gl::Triangles(),
+                gl::DepthMode::disabled(),
+                gl::StencilMode::disabled(),
                 colorModeForRenderPass(),
                 ExtrusionTextureProgram::UniformValues{
                     uniforms::u_matrix::Value{ viewportMat }, uniforms::u_world::Value{ size },
                     uniforms::u_image::Value{ 0 },
                     uniforms::u_opacity::Value{ layer.as<RenderFillExtrusionLayer>()
                                                     ->evaluated.get<FillExtrusionOpacity>() } },
-                extrusionTextureVertexBuffer, quadTriangleIndexBuffer, extrusionTextureSegments,
-                ExtrusionTextureProgram::PaintPropertyBinders{ properties, 0 }, properties,
-                state.getZoom());
+                extrusionTextureVertexBuffer,
+                quadTriangleIndexBuffer,
+                extrusionTextureSegments,
+                ExtrusionTextureProgram::PaintPropertyBinders{ properties, 0 },
+                properties,
+                state.getZoom(),
+                layer.getID());
         } else {
             renderItem(parameters, item);
         }

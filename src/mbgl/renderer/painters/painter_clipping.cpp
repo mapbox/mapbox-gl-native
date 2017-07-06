@@ -30,7 +30,8 @@ void Painter::renderClippingMask(const UnwrappedTileID& tileID, const ClipID& cl
         tileTriangleSegments,
         paintAttibuteData,
         properties,
-        state.getZoom()
+        state.getZoom(),
+        "clipping"
     );
 }
 

@@ -54,7 +54,8 @@ void Painter::renderBackground(PaintParameters& parameters, const RenderBackgrou
                 tileTriangleSegments,
                 paintAttibuteData,
                 properties,
-                state.getZoom()
+                state.getZoom(),
+                layer.getID()
             );
         }
     } else {
@@ -74,7 +75,8 @@ void Painter::renderBackground(PaintParameters& parameters, const RenderBackgrou
                 tileTriangleSegments,
                 paintAttibuteData,
                 properties,
-                state.getZoom()
+                state.getZoom(),
+                layer.getID()
             );
         }
     }

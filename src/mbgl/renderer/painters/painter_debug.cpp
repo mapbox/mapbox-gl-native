@@ -39,7 +39,8 @@ void Painter::renderTileDebug(const RenderTile& renderTile) {
             segments,
             paintAttibuteData,
             properties,
-            state.getZoom()
+            state.getZoom(),
+            "debug"
         );
     };
 
@@ -100,7 +101,8 @@ void Painter::renderTileDebug(const mat4& matrix) {
             tileBorderSegments,
             paintAttibuteData,
             properties,
-            state.getZoom()
+            state.getZoom(),
+            "debug"
         );
     }
 }
