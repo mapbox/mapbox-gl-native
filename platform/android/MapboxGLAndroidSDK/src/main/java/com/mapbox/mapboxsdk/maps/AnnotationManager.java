@@ -398,7 +398,7 @@ class AnnotationManager {
       return closestMarkerId;
     }
 
-    private void resolveForMarkers(MarkerHit markerHit){
+    private void resolveForMarkers(MarkerHit markerHit) {
       for (Marker marker : markerHit.markers) {
         if (marker instanceof MarkerView) {
           resolveForMarkerView(markerHit, (MarkerView) marker);
