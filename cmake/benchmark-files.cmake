@@ -3,6 +3,7 @@
 set(MBGL_BENCHMARK_FILES
     # api
     benchmark/api/query.benchmark.cpp
+    benchmark/api/render.benchmark.cpp
 
     # include/mbgl
     benchmark/include/mbgl/benchmark.hpp
