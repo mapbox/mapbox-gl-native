@@ -16,6 +16,31 @@ namespace gl {
 static_assert(underlying_type(ShaderType::Vertex) == GL_VERTEX_SHADER, "OpenGL type mismatch");
 static_assert(underlying_type(ShaderType::Fragment) == GL_FRAGMENT_SHADER, "OpenGL type mismatch");
 
+static_assert(underlying_type(DataType::Byte) == GL_BYTE, "OpenGL type mismatch");
+static_assert(underlying_type(DataType::UnsignedByte) == GL_UNSIGNED_BYTE, "OpenGL type mismatch");
+static_assert(underlying_type(DataType::Short) == GL_SHORT, "OpenGL type mismatch");
+static_assert(underlying_type(DataType::UnsignedShort) == GL_UNSIGNED_SHORT, "OpenGL type mismatch");
+static_assert(underlying_type(DataType::Integer) == GL_INT, "OpenGL type mismatch");
+static_assert(underlying_type(DataType::UnsignedInteger) == GL_UNSIGNED_INT, "OpenGL type mismatch");
+static_assert(underlying_type(DataType::Float) == GL_FLOAT, "OpenGL type mismatch");
+
+#if not MBGL_USE_GLES2
+static_assert(underlying_type(RenderbufferType::RGBA) == GL_RGBA8, "OpenGL type mismatch");
+#else
+static_assert(underlying_type(RenderbufferType::RGBA) == GL_RGBA8_OES, "OpenGL type mismatch");
+#endif // MBGL_USE_GLES2
+#if not MBGL_USE_GLES2
+static_assert(underlying_type(RenderbufferType::DepthStencil) == GL_DEPTH24_STENCIL8, "OpenGL type mismatch");
+#else
+static_assert(underlying_type(RenderbufferType::DepthStencil) == GL_DEPTH24_STENCIL8_OES, "OpenGL type mismatch");
+#endif // MBGL_USE_GLES2
+#if not MBGL_USE_GLES2
+static_assert(underlying_type(RenderbufferType::DepthComponent) == GL_DEPTH_COMPONENT, "OpenGL type mismatch");
+#else
+static_assert(underlying_type(RenderbufferType::DepthComponent) == GL_DEPTH_COMPONENT16, "OpenGL type mismatch");
+#endif // MBGL_USE_GLES2
+
+
 static_assert(underlying_type(PrimitiveType::Points) == GL_POINTS, "OpenGL type mismatch");
 static_assert(underlying_type(PrimitiveType::Lines) == GL_LINES, "OpenGL type mismatch");
 static_assert(underlying_type(PrimitiveType::LineLoop) == GL_LINE_LOOP, "OpenGL type mismatch");
@@ -35,6 +60,28 @@ static_assert(std::is_same<RenderbufferID, GLuint>::value, "OpenGL type mismatch
 static_assert(std::is_same<std::underlying_type_t<TextureFormat>, GLenum>::value, "OpenGL type mismatch");
 static_assert(underlying_type(TextureFormat::RGBA) == GL_RGBA, "OpenGL type mismatch");
 static_assert(underlying_type(TextureFormat::Alpha) == GL_ALPHA, "OpenGL type mismatch");
+
+static_assert(underlying_type(UniformDataType::Float) == GL_FLOAT, "OpenGL type mismatch");
+static_assert(underlying_type(UniformDataType::FloatVec2) == GL_FLOAT_VEC2, "OpenGL type mismatch");
+static_assert(underlying_type(UniformDataType::FloatVec3) == GL_FLOAT_VEC3, "OpenGL type mismatch");
+static_assert(underlying_type(UniformDataType::FloatVec4) == GL_FLOAT_VEC4, "OpenGL type mismatch");
+static_assert(underlying_type(UniformDataType::Int) == GL_INT, "OpenGL type mismatch");
+static_assert(underlying_type(UniformDataType::IntVec2) == GL_INT_VEC2, "OpenGL type mismatch");
+static_assert(underlying_type(UniformDataType::IntVec3) == GL_INT_VEC3, "OpenGL type mismatch");
+static_assert(underlying_type(UniformDataType::IntVec4) == GL_INT_VEC4, "OpenGL type mismatch");
+static_assert(underlying_type(UniformDataType::Bool) == GL_BOOL, "OpenGL type mismatch");
+static_assert(underlying_type(UniformDataType::BoolVec2) == GL_BOOL_VEC2, "OpenGL type mismatch");
+static_assert(underlying_type(UniformDataType::BoolVec3) == GL_BOOL_VEC3, "OpenGL type mismatch");
+static_assert(underlying_type(UniformDataType::BoolVec4) == GL_BOOL_VEC4, "OpenGL type mismatch");
+static_assert(underlying_type(UniformDataType::FloatMat2) == GL_FLOAT_MAT2, "OpenGL type mismatch");
+static_assert(underlying_type(UniformDataType::FloatMat3) == GL_FLOAT_MAT3, "OpenGL type mismatch");
+static_assert(underlying_type(UniformDataType::FloatMat4) == GL_FLOAT_MAT4, "OpenGL type mismatch");
+static_assert(underlying_type(UniformDataType::Sampler2D) == GL_SAMPLER_2D, "OpenGL type mismatch");
+static_assert(underlying_type(UniformDataType::SamplerCube) == GL_SAMPLER_CUBE, "OpenGL type mismatch");
+
+static_assert(underlying_type(BufferUsage::StreamDraw) == GL_STREAM_DRAW, "OpenGL type mismatch");
+static_assert(underlying_type(BufferUsage::StaticDraw) == GL_STATIC_DRAW, "OpenGL type mismatch");
+static_assert(underlying_type(BufferUsage::DynamicDraw) == GL_DYNAMIC_DRAW, "OpenGL type mismatch");
 
 static_assert(std::is_same<BinaryProgramFormat, GLenum>::value, "OpenGL type mismatch");
 
@@ -164,7 +211,7 @@ void Context::verifyProgramLinkage(ProgramID program_) {
     throw std::runtime_error("program failed to link");
 }
 
-UniqueBuffer Context::createVertexBuffer(const void* data, std::size_t size, const BufferUsageType usage) {
+UniqueBuffer Context::createVertexBuffer(const void* data, std::size_t size, const BufferUsage usage) {
     BufferID id = 0;
     MBGL_CHECK_ERROR(glGenBuffers(1, &id));
     UniqueBuffer result { std::move(id), { this } };
