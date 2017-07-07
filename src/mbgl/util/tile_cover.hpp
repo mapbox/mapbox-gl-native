@@ -15,8 +15,8 @@ namespace util {
 
 int32_t coveringZoomLevel(double z, SourceType type, uint16_t tileSize);
 
-std::vector<UnwrappedTileID> tileCover(const TransformState&, int32_t z);
-std::vector<UnwrappedTileID> tileCover(const LatLngBounds&, int32_t z);
+std::vector<UnwrappedTileID> tileCover(const TransformState&, uint8_t zoom);
+std::vector<UnwrappedTileID> tileCover(const LatLngBounds&, uint8_t zoom);
 
 } // namespace util
 } // namespace mbgl

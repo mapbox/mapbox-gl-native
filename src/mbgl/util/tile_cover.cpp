@@ -80,22 +80,28 @@ std::vector<UnwrappedTileID> tileCover(const Point<double>& tl,
                                        const Point<double>& br,
                                        const Point<double>& bl,
                                        const Point<double>& c,
-                                       int32_t z) {
-    const int32_t tiles = 1 << z;
+                                       uint8_t zoom) {
+    const int32_t maxTilesPerAxis = 1 << zoom;
 
-    struct ID {
+    struct CoverID {
         int32_t x, y;
         double sqDist;
     };
 
-    std::vector<ID> t;
+    std::vector<CoverID> coverIDs;
+    // Simple bbox for pre-reserving coverIDs elements.
+    const auto maxX = util::max(tl.x, tr.x, br.x, bl.x);
+    const auto minX = util::min(tl.x, tr.x, br.x, bl.x);
+    const auto maxY = util::max(tl.y, tr.x, br.x, bl.x);
+    const auto minY = util::min(tl.y, tr.y, br.y, bl.y);
+    coverIDs.reserve(util::clamp(0lu, size_t((maxX - minX) * (maxY - minY)), std::numeric_limits<size_t>::max()));
 
     auto scanLine = [&](int32_t x0, int32_t x1, int32_t y) {
         int32_t x;
-        if (y >= 0 && y <= tiles) {
+        if (y >= 0 && y <= maxTilesPerAxis) {
             for (x = x0; x < x1; ++x) {
                 const auto dx = x + 0.5 - c.x, dy = y + 0.5 - c.y;
-                t.emplace_back(ID{ x, y, dx * dx + dy * dy });
+                coverIDs.emplace_back(CoverID { x, y, dx * dx + dy * dy });
             }
         }
     };
@@ -104,22 +110,23 @@ std::vector<UnwrappedTileID> tileCover(const Point<double>& tl,
     // \---+
     // | \ |
     // +---\.
-    scanTriangle(tl, tr, br, 0, tiles, scanLine);
-    scanTriangle(br, bl, tl, 0, tiles, scanLine);
+    scanTriangle(tl, tr, br, 0, maxTilesPerAxis, scanLine);
+    scanTriangle(br, bl, tl, 0, maxTilesPerAxis, scanLine);
 
     // Sort first by distance, then by x/y.
-    std::sort(t.begin(), t.end(), [](const ID& a, const ID& b) {
+    std::sort(coverIDs.begin(), coverIDs.end(), [](const CoverID& a, const CoverID& b) {
         return std::tie(a.sqDist, a.x, a.y) < std::tie(b.sqDist, b.x, b.y);
     });
 
     // Erase duplicate tile IDs (they typically occur at the common side of both triangles).
-    t.erase(std::unique(t.begin(), t.end(), [](const ID& a, const ID& b) {
+    coverIDs.erase(std::unique(coverIDs.begin(), coverIDs.end(), [](const CoverID& a, const CoverID& b) {
                 return a.x == b.x && a.y == b.y;
-            }), t.end());
+            }), coverIDs.end());
 
     std::vector<UnwrappedTileID> result;
-    for (const auto& id : t) {
-        result.emplace_back(z, id.x, id.y);
+    result.reserve(coverIDs.size());
+    for (const auto& coverID : coverIDs) {
+        result.emplace_back(zoom, coverID.x, coverID.y);
     }
     return result;
 }
@@ -135,7 +142,7 @@ int32_t coveringZoomLevel(double zoom, SourceType type, uint16_t size) {
     }
 }
 
-std::vector<UnwrappedTileID> tileCover(const LatLngBounds& bounds_, int32_t z) {
+std::vector<UnwrappedTileID> tileCover(const LatLngBounds& bounds_, uint8_t zoom) {
     if (bounds_.isEmpty() ||
         bounds_.south() >  util::LATITUDE_MAX ||
         bounds_.north() < -util::LATITUDE_MAX) {
@@ -147,26 +154,34 @@ std::vector<UnwrappedTileID> tileCover(const LatLngBounds& bounds_, int32_t z) {
         { std::min(bounds_.north(),  util::LATITUDE_MAX), bounds_.east() });
 
     return tileCover(
-        TileCoordinate::fromLatLng(z, bounds.northwest()).p,
-        TileCoordinate::fromLatLng(z, bounds.northeast()).p,
-        TileCoordinate::fromLatLng(z, bounds.southeast()).p,
-        TileCoordinate::fromLatLng(z, bounds.southwest()).p,
-        TileCoordinate::fromLatLng(z, bounds.center()).p,
-        z);
+        TileCoordinate::fromLatLng(zoom, bounds.northwest()).p,
+        TileCoordinate::fromLatLng(zoom, bounds.northeast()).p,
+        TileCoordinate::fromLatLng(zoom, bounds.southeast()).p,
+        TileCoordinate::fromLatLng(zoom, bounds.southwest()).p,
+        TileCoordinate::fromLatLng(zoom, bounds.center()).p,
+        zoom);
 }
 
-std::vector<UnwrappedTileID> tileCover(const TransformState& state, int32_t z) {
+std::vector<UnwrappedTileID> tileCover(const TransformState& state, uint8_t zoom) {
     assert(state.valid());
 
     const double w = state.getSize().width;
     const double h = state.getSize().height;
+
+    // Limit tile coverage when pitch >= 60 degrees (M_PI / 3).
+    const double clampedH = [&]() {
+        const double clampedPitch = state.getPitch() - M_PI / 3;
+        return clampedPitch <= 0 ? h : h - (h * std::sin(clampedPitch));
+    }();
+
+    // top-left, top-right, bottom-right, bottom-left, center
     return tileCover(
-        TileCoordinate::fromScreenCoordinate(state, z, { 0,   0   }).p,
-        TileCoordinate::fromScreenCoordinate(state, z, { w,   0   }).p,
-        TileCoordinate::fromScreenCoordinate(state, z, { w,   h   }).p,
-        TileCoordinate::fromScreenCoordinate(state, z, { 0,   h   }).p,
-        TileCoordinate::fromScreenCoordinate(state, z, { w/2, h/2 }).p,
-        z);
+        TileCoordinate::fromScreenCoordinate(state, zoom, { 0,   0        }).p,
+        TileCoordinate::fromScreenCoordinate(state, zoom, { w,   0        }).p,
+        TileCoordinate::fromScreenCoordinate(state, zoom, { w,   clampedH }).p,
+        TileCoordinate::fromScreenCoordinate(state, zoom, { 0,   clampedH }).p,
+        TileCoordinate::fromScreenCoordinate(state, zoom, { w/2, h/2      }).p,
+        zoom);
 }
 
 } // namespace util
