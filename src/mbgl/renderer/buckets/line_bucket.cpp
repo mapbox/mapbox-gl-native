@@ -371,20 +371,20 @@ void LineBucket::addGeometry(const GeometryCoordinates& coordinates, FeatureType
     const std::size_t endVertex = vertices.vertexSize();
     const std::size_t vertexCount = endVertex - startVertex;
 
-    if (segments.empty() || segments.back().vertexLength + vertexCount > std::numeric_limits<uint16_t>::max()) {
+    if (segments.empty() || segments.back().info.vertexLength + vertexCount > std::numeric_limits<uint16_t>::max()) {
         segments.emplace_back(startVertex, triangles.indexSize());
     }
 
     auto& segment = segments.back();
-    assert(segment.vertexLength <= std::numeric_limits<uint16_t>::max());
-    uint16_t index = segment.vertexLength;
+    assert(segment.info.vertexLength <= std::numeric_limits<uint16_t>::max());
+    uint16_t index = segment.info.vertexLength;
 
     for (const auto& triangle : triangleStore) {
         triangles.emplace_back(index + triangle.a, index + triangle.b, index + triangle.c);
     }
 
-    segment.vertexLength += vertexCount;
-    segment.indexLength += triangleStore.size() * 3;
+    segment.info.vertexLength += vertexCount;
+    segment.info.indexLength += triangleStore.size() * 3;
 }
 
 void LineBucket::addCurrentVertex(const GeometryCoordinate& currentCoordinate,

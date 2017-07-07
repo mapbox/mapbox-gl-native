@@ -576,15 +576,15 @@ void SymbolLayout::addSymbol(Buffer& buffer,
         minZoom = 0;
     }
 
-    if (buffer.segments.empty() || buffer.segments.back().vertexLength + vertexLength > std::numeric_limits<uint16_t>::max()) {
+    if (buffer.segments.empty() || buffer.segments.back().info.vertexLength + vertexLength > std::numeric_limits<uint16_t>::max()) {
         buffer.segments.emplace_back(buffer.vertices.vertexSize(), buffer.triangles.indexSize());
     }
 
     // We're generating triangle fans, so we always start with the first
     // coordinate in this polygon.
     auto& segment = buffer.segments.back();
-    assert(segment.vertexLength <= std::numeric_limits<uint16_t>::max());
-    uint16_t index = segment.vertexLength;
+    assert(segment.info.vertexLength <= std::numeric_limits<uint16_t>::max());
+    uint16_t index = segment.info.vertexLength;
 
     // Encode angle of glyph
     uint8_t glyphAngle = std::round((symbol.glyphAngle / (M_PI * 2)) * 256);
@@ -605,8 +605,8 @@ void SymbolLayout::addSymbol(Buffer& buffer,
     buffer.triangles.emplace_back(index + 0, index + 1, index + 2);
     buffer.triangles.emplace_back(index + 1, index + 2, index + 3);
 
-    segment.vertexLength += vertexLength;
-    segment.indexLength += 6;
+    segment.info.vertexLength += vertexLength;
+    segment.info.indexLength += 6;
 }
 
 void SymbolLayout::addToDebugBuffers(CollisionTile& collisionTile, SymbolBucket& bucket) {
@@ -639,12 +639,12 @@ void SymbolLayout::addToDebugBuffers(CollisionTile& collisionTile, SymbolBucket&
                 static constexpr std::size_t vertexLength = 4;
                 static constexpr std::size_t indexLength = 8;
 
-                if (collisionBox.segments.empty() || collisionBox.segments.back().vertexLength + vertexLength > std::numeric_limits<uint16_t>::max()) {
+                if (collisionBox.segments.empty() || collisionBox.segments.back().info.vertexLength + vertexLength > std::numeric_limits<uint16_t>::max()) {
                     collisionBox.segments.emplace_back(collisionBox.vertices.vertexSize(), collisionBox.lines.indexSize());
                 }
 
                 auto& segment = collisionBox.segments.back();
-                uint16_t index = segment.vertexLength;
+                uint16_t index = segment.info.vertexLength;
 
                 collisionBox.vertices.emplace_back(CollisionBoxProgram::vertex(anchor, tl, maxZoom, placementZoom));
                 collisionBox.vertices.emplace_back(CollisionBoxProgram::vertex(anchor, tr, maxZoom, placementZoom));
@@ -656,8 +656,8 @@ void SymbolLayout::addToDebugBuffers(CollisionTile& collisionTile, SymbolBucket&
                 collisionBox.lines.emplace_back(index + 2, index + 3);
                 collisionBox.lines.emplace_back(index + 3, index + 0);
 
-                segment.vertexLength += vertexLength;
-                segment.indexLength += indexLength;
+                segment.info.vertexLength += vertexLength;
+                segment.info.indexLength += indexLength;
             }
         };
         populateCollisionBox(symbolInstance.textCollisionFeature);

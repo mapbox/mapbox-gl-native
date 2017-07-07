@@ -61,13 +61,13 @@ void FillBucket::addFeature(const GeometryTileFeature& feature,
             if (nVertices == 0)
                 continue;
 
-            if (lineSegments.empty() || lineSegments.back().vertexLength + nVertices > std::numeric_limits<uint16_t>::max()) {
+            if (lineSegments.empty() || lineSegments.back().info.vertexLength + nVertices > std::numeric_limits<uint16_t>::max()) {
                 lineSegments.emplace_back(vertices.vertexSize(), lines.indexSize());
             }
 
             auto& lineSegment = lineSegments.back();
-            assert(lineSegment.vertexLength <= std::numeric_limits<uint16_t>::max());
-            uint16_t lineIndex = lineSegment.vertexLength;
+            assert(lineSegment.info.vertexLength <= std::numeric_limits<uint16_t>::max());
+            uint16_t lineIndex = lineSegment.info.vertexLength;
 
             vertices.emplace_back(FillProgram::layoutVertex(ring[0]));
             lines.emplace_back(lineIndex + nVertices - 1, lineIndex);
@@ -77,8 +77,8 @@ void FillBucket::addFeature(const GeometryTileFeature& feature,
                 lines.emplace_back(lineIndex + i - 1, lineIndex + i);
             }
 
-            lineSegment.vertexLength += nVertices;
-            lineSegment.indexLength += nVertices * 2;
+            lineSegment.info.vertexLength += nVertices;
+            lineSegment.info.indexLength += nVertices * 2;
         }
 
         std::vector<uint32_t> indices = mapbox::earcut(polygon);
@@ -86,13 +86,13 @@ void FillBucket::addFeature(const GeometryTileFeature& feature,
         std::size_t nIndicies = indices.size();
         assert(nIndicies % 3 == 0);
 
-        if (triangleSegments.empty() || triangleSegments.back().vertexLength + totalVertices > std::numeric_limits<uint16_t>::max()) {
+        if (triangleSegments.empty() || triangleSegments.back().info.vertexLength + totalVertices > std::numeric_limits<uint16_t>::max()) {
             triangleSegments.emplace_back(startVertices, triangles.indexSize());
         }
 
         auto& triangleSegment = triangleSegments.back();
-        assert(triangleSegment.vertexLength <= std::numeric_limits<uint16_t>::max());
-        uint16_t triangleIndex = triangleSegment.vertexLength;
+        assert(triangleSegment.info.vertexLength <= std::numeric_limits<uint16_t>::max());
+        uint16_t triangleIndex = triangleSegment.info.vertexLength;
 
         for (uint32_t i = 0; i < nIndicies; i += 3) {
             triangles.emplace_back(triangleIndex + indices[i],
@@ -100,8 +100,8 @@ void FillBucket::addFeature(const GeometryTileFeature& feature,
                                    triangleIndex + indices[i + 2]);
         }
 
-        triangleSegment.vertexLength += totalVertices;
-        triangleSegment.indexLength += nIndicies;
+        triangleSegment.info.vertexLength += totalVertices;
+        triangleSegment.info.indexLength += nIndicies;
     }
 
     for (auto& pair : paintPropertyBinders) {

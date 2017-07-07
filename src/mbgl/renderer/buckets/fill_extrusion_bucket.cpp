@@ -67,14 +67,14 @@ void FillExtrusionBucket::addFeature(const GeometryTileFeature& feature,
         std::size_t startVertices = vertices.vertexSize();
 
         if (triangleSegments.empty() ||
-            triangleSegments.back().vertexLength + (5 * (totalVertices - 1) + 1) >
+            triangleSegments.back().info.vertexLength + (5 * (totalVertices - 1) + 1) >
                 std::numeric_limits<uint16_t>::max()) {
             triangleSegments.emplace_back(startVertices, triangles.indexSize());
         }
 
         auto& triangleSegment = triangleSegments.back();
-        assert(triangleSegment.vertexLength <= std::numeric_limits<uint16_t>::max());
-        uint16_t triangleIndex = triangleSegment.vertexLength;
+        assert(triangleSegment.info.vertexLength <= std::numeric_limits<uint16_t>::max());
+        uint16_t triangleIndex = triangleSegment.info.vertexLength;
 
         assert(triangleIndex + (5 * (totalVertices - 1) + 1) <=
                std::numeric_limits<uint16_t>::max());
@@ -118,8 +118,8 @@ void FillExtrusionBucket::addFeature(const GeometryTileFeature& feature,
                     triangles.emplace_back(triangleIndex, triangleIndex + 1, triangleIndex + 2);
                     triangles.emplace_back(triangleIndex + 1, triangleIndex + 2, triangleIndex + 3);
                     triangleIndex += 4;
-                    triangleSegment.vertexLength += 4;
-                    triangleSegment.indexLength += 6;
+                    triangleSegment.info.vertexLength += 4;
+                    triangleSegment.info.indexLength += 6;
                 }
             }
         }
@@ -134,8 +134,8 @@ void FillExtrusionBucket::addFeature(const GeometryTileFeature& feature,
                                    flatIndices[indices[i + 2]]);
         }
 
-        triangleSegment.vertexLength += totalVertices;
-        triangleSegment.indexLength += nIndices;
+        triangleSegment.info.vertexLength += totalVertices;
+        triangleSegment.info.indexLength += nIndices;
     }
 
     for (auto& pair : paintPropertyBinders) {

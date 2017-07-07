@@ -60,7 +60,7 @@ void CircleBucket::addFeature(const GeometryTileFeature& feature,
             if ((mode != MapMode::Still) &&
                 (x < 0 || x >= util::EXTENT || y < 0 || y >= util::EXTENT)) continue;
 
-            if (segments.empty() || segments.back().vertexLength + vertexLength > std::numeric_limits<uint16_t>::max()) {
+            if (segments.empty() || segments.back().info.vertexLength + vertexLength > std::numeric_limits<uint16_t>::max()) {
                 // Move to a new segments because the old one can't hold the geometry.
                 segments.emplace_back(vertices.vertexSize(), triangles.indexSize());
             }
@@ -80,16 +80,16 @@ void CircleBucket::addFeature(const GeometryTileFeature& feature,
             vertices.emplace_back(CircleProgram::vertex(point, -1,  1)); // 4
 
             auto& segment = segments.back();
-            assert(segment.vertexLength <= std::numeric_limits<uint16_t>::max());
-            uint16_t index = segment.vertexLength;
+            assert(segment.info.vertexLength <= std::numeric_limits<uint16_t>::max());
+            uint16_t index = segment.info.vertexLength;
 
             // 1, 2, 3
             // 1, 4, 3
             triangles.emplace_back(index, index + 1, index + 2);
             triangles.emplace_back(index, index + 3, index + 2);
 
-            segment.vertexLength += vertexLength;
-            segment.indexLength += 6;
+            segment.info.vertexLength += vertexLength;
+            segment.info.indexLength += 6;
         }
     }
 

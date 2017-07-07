@@ -138,8 +138,8 @@ public:
                          attributeBindings);
 
             context.draw(drawMode.primitiveType,
-                         segment.indexOffset,
-                         segment.indexLength);
+                         segment.info.indexOffset,
+                         segment.info.indexLength);
         }
     }
 

@@ -84,7 +84,7 @@ TEST(Buckets, SymbolBucket) {
     ASSERT_FALSE(bucket.hasData());
     ASSERT_FALSE(bucket.needsUpload());
 
-    bucket.text.segments.emplace_back(0, 0);
+    bucket.text.segments.emplace_back(gl::SegmentInfo{ 0, 0 });
     ASSERT_TRUE(bucket.hasTextData());
     ASSERT_TRUE(bucket.hasData());
     ASSERT_TRUE(bucket.needsUpload());
