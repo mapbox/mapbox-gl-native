@@ -156,6 +156,15 @@ public:
 
     AnnotationIDs queryPointAnnotations(const ScreenBox&);
 
+    // Tile prefetching
+    //
+    // When loading a map, if `PrefetchZoomDelta` is set to any number greater than 0, the map will
+    // first request a tile for `zoom = getZoom() - delta` in a attempt to display a full map at
+    // lower resolution as quick as possible. It will get clamped at the tile source minimum zoom.
+    // The default `delta` is 4.
+    void setPrefetchZoomDelta(uint8_t delta);
+    uint8_t getPrefetchZoomDelta() const;
+
     // Memory
     void onLowMemory();
 
