@@ -12,6 +12,7 @@
 #include <functional>
 #include <string>
 #include <array>
+#include <limits>
 
 namespace mbgl {
 namespace gl {
@@ -30,12 +31,12 @@ template <> struct DataTypeOf<float>    : std::integral_constant<DataType, DataT
 class AttributeBinding {
 public:
     DataType attributeType;
-    std::size_t attributeSize;
-    std::size_t attributeOffset;
+    uint8_t attributeSize;
+    uint32_t attributeOffset;
 
     BufferID vertexBuffer;
-    std::size_t vertexSize;
-    std::size_t vertexOffset;
+    uint32_t vertexSize;
+    uint32_t vertexOffset;
 
     friend bool operator==(const AttributeBinding& lhs,
                            const AttributeBinding& rhs) {
@@ -71,20 +72,25 @@ public:
                            std::size_t attributeIndex,
                            std::size_t attributeSize = N) {
         static_assert(std::is_standard_layout<Vertex>::value, "vertex type must use standard layout");
+        assert(attributeSize >= 1);
+        assert(attributeSize <= 4);
+        assert(Vertex::attributeOffsets[attributeIndex] <= std::numeric_limits<uint32_t>::max());
+        static_assert(sizeof(Vertex) <= std::numeric_limits<uint32_t>::max(), "vertex too large");
         return AttributeBinding {
             DataTypeOf<T>::value,
-            attributeSize,
-            Vertex::attributeOffsets[attributeIndex],
+            static_cast<uint8_t>(attributeSize),
+            static_cast<uint32_t>(Vertex::attributeOffsets[attributeIndex]),
             buffer.buffer,
-            sizeof(Vertex),
+            static_cast<uint32_t>(sizeof(Vertex)),
             0,
         };
     }
 
     static optional<Binding> offsetBinding(const optional<Binding>& binding, std::size_t vertexOffset) {
+        assert(vertexOffset <= std::numeric_limits<uint32_t>::max());
         if (binding) {
             AttributeBinding result = *binding;
-            result.vertexOffset = vertexOffset;
+            result.vertexOffset = static_cast<uint32_t>(vertexOffset);
             return result;
         } else {
             return binding;

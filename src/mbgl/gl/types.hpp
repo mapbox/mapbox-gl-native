@@ -24,7 +24,7 @@ enum class ShaderType : uint32_t {
     Fragment = 0x8B30
 };
 
-enum class DataType : uint32_t {
+enum class DataType : uint16_t {
     Byte = 0x1400,
     UnsignedByte = 0x1401,
     Short = 0x1402,
