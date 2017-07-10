@@ -175,11 +175,13 @@ void TilePyramid::update(const std::vector<Immutable<style::Layer::Impl>>& layer
 
     removeStaleTiles(retain);
 
-    const PlacementConfig config { parameters.transformState.getAngle(),
-                                   parameters.transformState.getPitch(),
-                                   parameters.debugOptions & MapDebugOptions::Collision };
-
     for (auto& pair : tiles) {
+        const PlacementConfig config { parameters.transformState.getAngle(),
+                                       parameters.transformState.getPitch(),
+                                       parameters.transformState.getCameraToCenterDistance(),
+                                       parameters.transformState.getCameraToTileDistance(pair.first.toUnwrapped()),
+                                       parameters.debugOptions & MapDebugOptions::Collision };
+
         pair.second->setPlacementConfig(config);
     }
 }

@@ -86,6 +86,8 @@ public:
         return !size.isEmpty() && (scale >= min_scale && scale <= max_scale);
     }
 
+    float getCameraToTileDistance(const UnwrappedTileID&) const;
+
 private:
     bool rotatedNorth() const;
     void constrain(double& scale, double& x, double& y) const;

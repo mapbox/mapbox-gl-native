@@ -11,11 +11,16 @@ namespace mbgl {
 
 class CollisionBox {
 public:
-    CollisionBox(Point<float> _anchor, float _x1, float _y1, float _x2, float _y2, float _maxScale) :
-        anchor(std::move(_anchor)), x1(_x1), y1(_y1), x2(_x2), y2(_y2), maxScale(_maxScale) {}
+    CollisionBox(Point<float> _anchor, Point<float> _offset, float _x1, float _y1, float _x2, float _y2, float _maxScale) :
+        anchor(std::move(_anchor)), offset(_offset), x1(_x1), y1(_y1), x2(_x2), y2(_y2), maxScale(_maxScale) {}
+
+    float adjustedMaxScale(const std::array<float, 4>& rotationMatrix, const float yStretch) const;
 
     // the box is centered around the anchor point
     Point<float> anchor;
+    
+    // the offset of the box from the label's anchor point
+    Point<float> offset;
 
     // distances to the edges from the anchor
     float x1;

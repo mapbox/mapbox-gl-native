@@ -86,6 +86,8 @@ public:
 
     void onError(std::exception_ptr);
     
+    float yStretch() const override;
+    
 protected:
     const GeometryTileData* getData() {
         return data.get();
@@ -120,6 +122,7 @@ private:
     std::unique_ptr<CollisionTile> collisionTile;
     
     util::Throttler placementThrottler;
+    float lastYStretch;
 
 public:
     optional<gl::Texture> glyphAtlasTexture;
