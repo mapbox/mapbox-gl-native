@@ -40,7 +40,22 @@ private:
     }
 };
 
-using UniqueVertexArrayState = std::unique_ptr<VertexArrayState, std::function<void (VertexArrayState*)>>;
+class VertexArrayStateDeleter {
+public:
+    VertexArrayStateDeleter(bool destroy_)
+        : destroy(destroy_) {}
+
+    void operator()(VertexArrayState* ptr) const {
+        if (destroy) {
+            delete ptr;
+        }
+    }
+
+private:
+    bool destroy;
+};
+
+using UniqueVertexArrayState = std::unique_ptr<VertexArrayState, VertexArrayStateDeleter>;
 
 class VertexArray {
 public:

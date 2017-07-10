@@ -233,11 +233,12 @@ VertexArray Context::createVertexArray() {
     if (supportsVertexArrays()) {
         VertexArrayID id = 0;
         MBGL_CHECK_ERROR(vertexArray->genVertexArrays(1, &id));
-        return { std::make_unique<VertexArrayState>(UniqueVertexArray(std::move(id), { this }), *this) };
+        UniqueVertexArray vao(std::move(id), { this });
+        return { UniqueVertexArrayState(new VertexArrayState(std::move(vao), *this), VertexArrayStateDeleter { true })};
     } else {
         // On GL implementations which do not support vertex arrays, attribute bindings are global state.
         // So return a VertexArray which shares our global state tracking and whose deleter is a no-op.
-        return { UniqueVertexArrayState(&globalVertexArrayState, [] (VertexArrayState*) {}) };
+        return { UniqueVertexArrayState(&globalVertexArrayState, VertexArrayStateDeleter { false }) };
     }
 }
 
