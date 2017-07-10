@@ -2,7 +2,6 @@
 
 #include <mbgl/gl/context.hpp>
 #include <mbgl/gl/vertex_array.hpp>
-#include <mbgl/util/optional.hpp>
 
 #include <cstddef>
 #include <vector>
@@ -35,7 +34,7 @@ public:
     //     data-driven paint properties
     //   * when two fill layers have the same layout properties, but one
     //     uses fill-color and the other uses fill-pattern
-    mutable std::map<std::string, optional<gl::VertexArray>> vertexArrays;
+    mutable std::map<std::string, gl::VertexArray> vertexArrays;
 };
 
 template <class Attributes>
