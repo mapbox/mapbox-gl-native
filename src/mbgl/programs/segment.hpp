@@ -39,9 +39,6 @@ public:
 };
 
 template <class Attributes>
-class SegmentVector : public std::vector<Segment<Attributes>> {
-public:
-    SegmentVector() = default;
-};
+using SegmentVector = std::vector<Segment<Attributes>>;
 
 } // namespace mbgl
