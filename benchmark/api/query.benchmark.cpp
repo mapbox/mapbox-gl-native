@@ -48,7 +48,7 @@ static void API_queryRenderedFeaturesAll(::benchmark::State& state) {
     QueryBenchmark bench;
 
     while (state.KeepRunning()) {
-        bench.map.queryRenderedFeatures(bench.box);
+        bench.map.queryRenderedFeatures(bench.box, {});
     }
 }
 
