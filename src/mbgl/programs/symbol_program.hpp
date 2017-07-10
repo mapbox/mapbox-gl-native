@@ -326,10 +326,10 @@ public:
             .concat(paintPropertyBinders.attributeBindings(currentProperties));
 
         for (auto& segment : segments) {
-            optional<gl::VertexArray>& vertexArray = segment.vertexArrays[layerID];
+            auto vertexArrayIt = segment.vertexArrays.find(layerID);
 
-            if (!vertexArray) {
-                vertexArray = context.createVertexArray();
+            if (vertexArrayIt == segment.vertexArrays.end()) {
+                vertexArrayIt = segment.vertexArrays.emplace(layerID, context.createVertexArray()).first;
             }
 
             program.draw(
@@ -339,7 +339,7 @@ public:
                 std::move(stencilMode),
                 std::move(colorMode),
                 allUniformValues,
-                *vertexArray,
+                vertexArrayIt->second,
                 Attributes::offsetBindings(allAttributeBindings, segment.vertexOffset),
                 indexBuffer,
                 segment.indexOffset,
