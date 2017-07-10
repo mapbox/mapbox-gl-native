@@ -79,6 +79,7 @@ public class MapboxMapOptions implements Parcelable {
   private int[] myLocationBackgroundPadding;
   private int myLocationAccuracyTintColor;
   private int myLocationAccuracyAlpha;
+  private float myLocationAccuracyThreshold;
 
   private String apiBaseUrl;
 
@@ -148,6 +149,7 @@ public class MapboxMapOptions implements Parcelable {
     myLocationBackgroundPadding = in.createIntArray();
     myLocationAccuracyAlpha = in.readInt();
     myLocationAccuracyTintColor = in.readInt();
+    myLocationAccuracyThreshold = in.readFloat();
 
     style = in.readString();
     apiBaseUrl = in.readString();
@@ -291,6 +293,8 @@ public class MapboxMapOptions implements Parcelable {
       mapboxMapOptions.myLocationAccuracyTint(
         typedArray.getColor(R.styleable.mapbox_MapView_mapbox_myLocationAccuracyTintColor,
           ColorUtils.getPrimaryColor(context)));
+      mapboxMapOptions.myLocationAccuracyThreshold(
+        typedArray.getFloat(R.styleable.mapbox_MapView_mapbox_myLocationAccuracyThreshold, 0));
       mapboxMapOptions.textureMode(
         typedArray.getBoolean(R.styleable.mapbox_MapView_mapbox_renderTextureMode, false));
     } finally {
@@ -681,6 +685,17 @@ public class MapboxMapOptions implements Parcelable {
   }
 
   /**
+   * Set accuracy circle threshold. Circle won't be displayed if accuracy is below set value.
+   *
+   * @param myLocationAccuracyThreshold Value of accuracy (in meters), below which circle won't be displayed
+   * @return This
+   */
+  public MapboxMapOptions myLocationAccuracyThreshold(float myLocationAccuracyThreshold) {
+    this.myLocationAccuracyThreshold = myLocationAccuracyThreshold;
+    return this;
+  }
+
+  /**
    * Enable TextureView as rendered surface.
    * <p>
    * Since the 4.2.0 release we replaced our TextureView with an SurfaceView implemenation.
@@ -988,6 +1003,15 @@ public class MapboxMapOptions implements Parcelable {
   }
 
   /**
+   * Returns current accuracy threshold value (in meters).
+   *
+   * @return Value of accuracy threshold (in meters), below which circle won't be displayed
+   */
+  public float getMyLocationAccuracyThreshold() {
+    return myLocationAccuracyThreshold;
+  }
+
+  /**
    * Get the current configured debug state for a map view.
    *
    * @return True indicates debug is enabled.
@@ -1065,6 +1089,7 @@ public class MapboxMapOptions implements Parcelable {
     dest.writeIntArray(myLocationBackgroundPadding);
     dest.writeInt(myLocationAccuracyAlpha);
     dest.writeInt(myLocationAccuracyTintColor);
+    dest.writeFloat(myLocationAccuracyThreshold);
 
     dest.writeString(style);
     dest.writeString(apiBaseUrl);
@@ -1153,6 +1178,9 @@ public class MapboxMapOptions implements Parcelable {
     if (myLocationAccuracyAlpha != options.myLocationAccuracyAlpha) {
       return false;
     }
+    if (myLocationAccuracyThreshold != options.myLocationAccuracyThreshold) {
+      return false;
+    }
     if (cameraPosition != null ? !cameraPosition.equals(options.cameraPosition) : options.cameraPosition != null) {
       return false;
     }
@@ -1230,6 +1258,8 @@ public class MapboxMapOptions implements Parcelable {
     result = 31 * result + Arrays.hashCode(myLocationBackgroundPadding);
     result = 31 * result + myLocationAccuracyTintColor;
     result = 31 * result + myLocationAccuracyAlpha;
+    result = 31 * result + (myLocationAccuracyThreshold != +0.0f
+      ? Float.floatToIntBits(myLocationAccuracyThreshold) : 0);
     result = 31 * result + (apiBaseUrl != null ? apiBaseUrl.hashCode() : 0);
     result = 31 * result + (textureMode ? 1 : 0);
     result = 31 * result + (style != null ? style.hashCode() : 0);
