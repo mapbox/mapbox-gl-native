@@ -15,8 +15,16 @@ using VertexArrayID = uint32_t;
 using FramebufferID = uint32_t;
 using RenderbufferID = uint32_t;
 
+// OpenGL does not formally define a type for attribute locations, but most APIs use
+// GLuint. The exception is glGetAttribLocation, which returns GLint so that -1 can
+// be used as an error indicator.
 using AttributeLocation = uint32_t;
+
+// OpenGL does not formally define a type for uniform locations, but all APIs use GLint.
+// The value -1 is special, typically used as a placeholder for an unused uniform and
+// "silently ignored".
 using UniformLocation = int32_t;
+
 using TextureUnit = uint8_t;
 
 enum class ShaderType : uint32_t {
