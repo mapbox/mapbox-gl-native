@@ -147,19 +147,18 @@ void RenderImageSource::update(Immutable<style::Source::Impl> baseImpl_,
     }
 
     // Set Bucket Vertices, Indices, and segments
-    bucket->vertices.emplace_back(
-        RasterProgram::layoutVertex({ geomCoords[0].x, geomCoords[0].y }, { 0, 0 }));
-    bucket->vertices.emplace_back(
-        RasterProgram::layoutVertex({ geomCoords[1].x, geomCoords[1].y }, { 32767, 0 }));
-    bucket->vertices.emplace_back(
-        RasterProgram::layoutVertex({ geomCoords[3].x, geomCoords[3].y }, { 0, 32767 }));
-    bucket->vertices.emplace_back(
-        RasterProgram::layoutVertex({ geomCoords[2].x, geomCoords[2].y }, { 32767, 32767 }));
-
-    bucket->indices.emplace_back(0, 1, 2);
-    bucket->indices.emplace_back(1, 2, 3);
-
-    bucket->segments.emplace_back(gl::SegmentInfo{ 0, 0, 4, 6 });
+    bucket->primitives.add(
+        {
+            RasterProgram::layoutVertex({ geomCoords[0].x, geomCoords[0].y }, { 0, 0 }),
+            RasterProgram::layoutVertex({ geomCoords[1].x, geomCoords[1].y }, { 32767, 0 }),
+            RasterProgram::layoutVertex({ geomCoords[3].x, geomCoords[3].y }, { 0, 32767 }),
+            RasterProgram::layoutVertex({ geomCoords[2].x, geomCoords[2].y }, { 32767, 32767 }),
+        },
+        {
+            {{ 0, 1, 2 }},
+            {{ 1, 2, 3 }},
+        }
+    );
 }
 
 void RenderImageSource::render(Painter& painter,

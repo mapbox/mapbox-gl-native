@@ -47,6 +47,10 @@ public:
         segment.indexLength += i.size() * DrawMode::bufferGroupSize;
     }
 
+    bool empty() const {
+        return segmentInfo.empty();
+    }
+
     // Accessors for test suite.
     const gl::VertexVector<LayoutVertex>& getVertices() const {
         return vertices;

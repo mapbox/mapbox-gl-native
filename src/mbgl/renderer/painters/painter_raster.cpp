@@ -43,7 +43,7 @@ void Painter::renderRaster(PaintParameters& parameters,
                            RasterBucket& bucket,
                            const RenderRasterLayer& layer,
                            const mat4& matrix,
-                           bool useBucketBuffers = false) {
+                           const RasterDrawable& drawable) {
     if (pass != RenderPass::Translucent)
         return;
     if (!bucket.hasData())
@@ -77,9 +77,9 @@ void Painter::renderRaster(PaintParameters& parameters,
             uniforms::u_scale_parent::Value{ 1.0f },
             uniforms::u_tl_parent::Value{ std::array<float, 2> {{ 0.0f, 0.0f }} },
         },
-        useBucketBuffers ? *bucket.vertexBuffer : rasterDrawable.vertices,
-        useBucketBuffers ? *bucket.indexBuffer : rasterDrawable.indices,
-        useBucketBuffers ? bucket.segments : rasterDrawable.segments,
+        drawable.vertices,
+        drawable.indices,
+        drawable.segments,
         paintAttributeData,
         properties,
         state.getZoom()

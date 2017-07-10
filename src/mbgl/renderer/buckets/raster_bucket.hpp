@@ -5,6 +5,8 @@
 #include <mbgl/gl/vertex_buffer.hpp>
 #include <mbgl/programs/raster_program.hpp>
 #include <mbgl/renderer/bucket.hpp>
+#include <mbgl/renderer/indexed_primitives.hpp>
+#include <mbgl/renderer/drawable.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/mat4.hpp>
 #include <mbgl/util/optional.hpp>
@@ -27,14 +29,11 @@ public:
     UnassociatedImage image;
     optional<gl::Texture> texture;
 
+
     // Bucket specific vertices are used for Image Sources only
     // Raster Tile Sources use the default buffers from Painter
-    gl::VertexVector<RasterLayoutVertex> vertices;
-    gl::IndexVector<gl::Triangles> indices;
-    gl::SegmentVector<RasterAttributes> segments;
-
-    optional<gl::VertexBuffer<RasterLayoutVertex>> vertexBuffer;
-    optional<gl::IndexBuffer<gl::Triangles>> indexBuffer;
+    IndexedPrimitives<gl::Triangles, RasterLayoutVertex, RasterAttributes> primitives;
+    optional<Drawable<gl::Triangles, RasterLayoutVertex, RasterAttributes>> drawable;
 };
 
 } // namespace mbgl

@@ -16,34 +16,33 @@ void RasterBucket::upload(gl::Context& context) {
     if (!texture) {
         texture = context.createTexture(image);
     }
-    if (!vertices.empty()) {
-        vertexBuffer = context.createVertexBuffer(std::move(vertices));
-        indexBuffer = context.createIndexBuffer(std::move(indices));
+    if (!primitives.empty()) {
+        drawable.emplace(context, std::move(primitives));
     }
     uploaded = true;
 }
 
 void RasterBucket::clear() {
-    vertexBuffer = {};
-    indexBuffer = {};
-    segments.clear();
-    vertices.clear();
-    indices.clear();
-
+    primitives = {};
+    drawable = std::experimental::nullopt;
     uploaded = false;
 }
+
 void RasterBucket::render(Painter& painter,
                           PaintParameters& parameters,
                           const RenderLayer& layer,
                           const RenderTile& tile) {
-    painter.renderRaster(parameters, *this, *layer.as<RenderRasterLayer>(), tile.matrix, false);
+    painter.renderRaster(parameters, *this, *layer.as<RenderRasterLayer>(), tile.matrix,
+                         painter.rasterDrawable);
 }
 
 void RasterBucket::render(Painter& painter,
                           PaintParameters& parameters,
                           const RenderLayer& layer,
                           const mat4& matrix) {
-    painter.renderRaster(parameters, *this, *layer.as<RenderRasterLayer>(), matrix, true);
+    if (drawable) {
+        painter.renderRaster(parameters, *this, *layer.as<RenderRasterLayer>(), matrix, *drawable);
+    }
 }
 
 bool RasterBucket::hasData() const {

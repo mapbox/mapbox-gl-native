@@ -80,6 +80,8 @@ public:
 
     void cleanup();
 
+    using RasterDrawable = Drawable<gl::Triangles, RasterLayoutVertex, RasterAttributes>;
+
     void renderClippingMask(const UnwrappedTileID&, const ClipID&);
     void renderTileDebug(const RenderTile&);
     void renderTileDebug(const mat4& matrix);
@@ -88,7 +90,7 @@ public:
     void renderLine(PaintParameters&, LineBucket&, const RenderLineLayer&, const RenderTile&);
     void renderCircle(PaintParameters&, CircleBucket&, const RenderCircleLayer&, const RenderTile&);
     void renderSymbol(PaintParameters&, SymbolBucket&, const RenderSymbolLayer&, const RenderTile&);
-    void renderRaster(PaintParameters&, RasterBucket&, const RenderRasterLayer&, const mat4&, bool useBucketBuffers /* = false */);
+    void renderRaster(PaintParameters&, RasterBucket&, const RenderRasterLayer&, const mat4&, const RasterDrawable&);
     void renderBackground(PaintParameters&, const RenderBackgroundLayer&);
 
     void renderItem(PaintParameters&, const RenderItem&);
