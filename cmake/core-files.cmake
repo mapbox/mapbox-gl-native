@@ -154,7 +154,6 @@ set(MBGL_CORE_FILES
     src/mbgl/programs/programs.hpp
     src/mbgl/programs/raster_program.cpp
     src/mbgl/programs/raster_program.hpp
-    src/mbgl/programs/segment.cpp
     src/mbgl/programs/segment.hpp
     src/mbgl/programs/symbol_program.cpp
     src/mbgl/programs/symbol_program.hpp
