@@ -12,18 +12,31 @@ namespace mbgl {
 
 OfflineTilePyramidRegionDefinition::OfflineTilePyramidRegionDefinition(
     std::string styleURL_, LatLngBounds bounds_, double minZoom_, double maxZoom_, float pixelRatio_)
+    : OfflineTilePyramidRegionDefinition(styleURL_, bounds_, minZoom_, maxZoom_, pixelRatio_, {}) {
+    
+}
+    
+OfflineTilePyramidRegionDefinition::OfflineTilePyramidRegionDefinition(
+    std::string styleURL_, LatLngBounds bounds_, double minZoom_, double maxZoom_,
+    float pixelRatio_, std::vector<CanonicalTileID> tileList_)
     : styleURL(std::move(styleURL_)),
       bounds(std::move(bounds_)),
       minZoom(minZoom_),
       maxZoom(maxZoom_),
-      pixelRatio(pixelRatio_) {
+      pixelRatio(pixelRatio_),
+      tileList(std::move(tileList_)) {
     if (minZoom < 0 || maxZoom < 0 || maxZoom < minZoom || pixelRatio < 0 ||
         !std::isfinite(minZoom) || std::isnan(maxZoom) || !std::isfinite(pixelRatio)) {
         throw std::invalid_argument("Invalid offline region definition");
     }
 }
 
+
 std::vector<CanonicalTileID> OfflineTilePyramidRegionDefinition::tileCover(SourceType type, uint16_t tileSize, const Range<uint8_t>& zoomRange) const {
+    
+    if (!tileList.empty()) {
+        return tileList;
+    }
     double minZ = std::max<double>(util::coveringZoomLevel(minZoom, type, tileSize), zoomRange.min);
     double maxZ = std::min<double>(util::coveringZoomLevel(maxZoom, type, tileSize), zoomRange.max);
 
@@ -65,8 +78,20 @@ OfflineRegionDefinition decodeOfflineRegionDefinition(const std::string& region)
     double minZoom = doc["min_zoom"].GetDouble();
     double maxZoom = doc.HasMember("max_zoom") ? doc["max_zoom"].GetDouble() : INFINITY;
     float pixelRatio = doc["pixel_ratio"].GetDouble();
+    
+    std::vector<mbgl::CanonicalTileID> tileList;
 
-    return { styleURL, bounds, minZoom, maxZoom, pixelRatio };
+    if (doc.HasMember("tile_list")) {
+        for (auto& v : doc["tile_list"].GetArray()) {
+            uint64_t key = v.GetUint64();
+            CanonicalTileID tileID = mbgl::CanonicalTileID(key >> 56,
+                                                           key >> 28 & 0xFFFFFFFLL,
+                                                           key & 0xFFFFFFFLL);
+            tileList.push_back(tileID);
+        }
+    }
+
+    return { styleURL, bounds, minZoom, maxZoom, pixelRatio, tileList};
 }
 
 std::string encodeOfflineRegionDefinition(const OfflineRegionDefinition& region) {
@@ -88,7 +113,21 @@ std::string encodeOfflineRegionDefinition(const OfflineRegionDefinition& region)
     }
 
     doc.AddMember("pixel_ratio", region.pixelRatio, doc.GetAllocator());
+  
+    if (!region.tileList.empty()) {
+        rapidjson::GenericValue<rapidjson::UTF8<>, rapidjson::CrtAllocator> tileList(rapidjson::kArrayType);
 
+        for ( auto &i : region.tileList ) {
+            uint64_t zoom = (uint64_t) i.z & 0xFFLL; // 8bits, 256 levels
+            uint64_t x = (uint64_t) i.x & 0xFFFFFFFLL;  // 28 bits
+            uint64_t y = (uint64_t) i.y & 0xFFFFFFFLL;  // 28 bits
+            uint64_t key = (zoom << 56) | (x << 28) | (y << 0);
+            tileList.PushBack(key, doc.GetAllocator());
+        
+        }
+        doc.AddMember("tile_list", tileList, doc.GetAllocator());
+    }
+    
     rapidjson::StringBuffer buffer;
     rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
     doc.Accept(writer);
