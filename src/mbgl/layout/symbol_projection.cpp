@@ -144,6 +144,12 @@ namespace mbgl {
         Point<float> point;
         float angle;
     };
+    
+    enum PlacementResult {
+        OK,
+        NotEnoughRoom,
+        NeedsFlipping
+    };
 
 	optional<PlacedGlyph> placeGlyphAlongLine(const float offsetX, const float lineOffsetX, const float lineOffsetY, const bool flip,
             Point<float> anchorPoint, const uint16_t anchorSegment, const GeometryCoordinates& line, const mat4& labelPlaneMatrix) {
@@ -198,8 +204,14 @@ namespace mbgl {
         return {{ p, segmentAngle }};
     }
 
-    void placeGlyphsAlongLine(const PlacedSymbol& symbol, const float fontSize, const bool flip, const mat4& labelPlaneMatrix,
-            gl::VertexVector<SymbolDynamicLayoutAttributes::Vertex>& dynamicVertexArray) {
+    PlacementResult placeGlyphsAlongLine(const PlacedSymbol& symbol,
+                              const float fontSize,
+                              const bool flip,
+                              const bool keepUpright,
+                              const mat4& posMatrix,
+                              const mat4& labelPlaneMatrix,
+                              const mat4& glCoordMatrix,
+                              gl::VertexVector<SymbolDynamicLayoutAttributes::Vertex>& dynamicVertexArray) {
         const float fontScale = fontSize / 24.0;
         const float lineOffsetX = symbol.lineOffset[0] * fontSize;
         const float lineOffsetY = symbol.lineOffset[1] * fontSize;
@@ -207,19 +219,60 @@ namespace mbgl {
         const Point<float> anchorPoint = project(symbol.anchorPoint, labelPlaneMatrix);
 
         std::vector<PlacedGlyph> placedGlyphs;
-        for (auto glyphOffsetX : symbol.glyphOffsets) {
-            auto placedGlyph = placeGlyphAlongLine(glyphOffsetX * fontScale, lineOffsetX, lineOffsetY, flip, anchorPoint, symbol.segment, symbol.line, labelPlaneMatrix);
-            if (placedGlyph) {
-                placedGlyphs.push_back(*placedGlyph);
-            } else {
-                hideGlyphs(symbol.glyphOffsets.size(), dynamicVertexArray);
-                return;
+        if (symbol.glyphOffsets.size() > 1) {
+
+            const float firstGlyphOffset = symbol.glyphOffsets.front();
+            const float lastGlyphOffset = symbol.glyphOffsets.back();
+            
+            optional<PlacedGlyph> firstPlacedGlyph = placeGlyphAlongLine(fontScale * firstGlyphOffset, lineOffsetX, lineOffsetY, flip, anchorPoint, symbol.segment, symbol.line, labelPlaneMatrix);
+            if (!firstPlacedGlyph)
+                return PlacementResult::NotEnoughRoom;
+
+            optional<PlacedGlyph> lastPlacedGlyph = placeGlyphAlongLine(fontScale * lastGlyphOffset, lineOffsetX, lineOffsetY, flip, anchorPoint, symbol.segment, symbol.line, labelPlaneMatrix);
+            if (!lastPlacedGlyph)
+                return PlacementResult::NotEnoughRoom;
+
+            const Point<float> firstPoint = project(firstPlacedGlyph->point, glCoordMatrix);
+            const Point<float> lastPoint = project(lastPlacedGlyph->point, glCoordMatrix);
+
+            if (keepUpright && !flip &&
+                (symbol.useVerticalMode ? firstPoint.y < lastPoint.y : firstPoint.x > lastPoint.x)) {
+                return PlacementResult::NeedsFlipping;
             }
+
+            placedGlyphs.push_back(*firstPlacedGlyph);
+            for (size_t glyphIndex = 1; glyphIndex < symbol.glyphOffsets.size() - 1; glyphIndex++) {
+                const float glyphOffsetX = symbol.glyphOffsets[glyphIndex];
+                // Since first and last glyph fit on the line, we're sure that the rest of the glyphs can be placed
+                auto placedGlyph = placeGlyphAlongLine(glyphOffsetX * fontScale, lineOffsetX, lineOffsetY, flip, anchorPoint, symbol.segment, symbol.line, labelPlaneMatrix);
+                placedGlyphs.push_back(*placedGlyph);
+            }
+            placedGlyphs.push_back(*lastPlacedGlyph);
+        } else {
+            // Only a single glyph to place
+            // So, determine whether to flip based on projected angle of the line segment it's on
+            if (keepUpright && !flip) {
+                const Point<float> a = project(convertPoint<float>(symbol.line.at(symbol.segment)), posMatrix);
+                const Point<float> b = project(convertPoint<float>(symbol.line.at(symbol.segment + 1)), posMatrix);
+                if (symbol.useVerticalMode ? b.y > a.y : b.x < a.x) {
+                    return PlacementResult::NeedsFlipping;
+                }
+            }
+            assert(symbol.glyphOffsets.size() == 1); // We are relying on SymbolInstance.hasText filtering out symbols without any glyphs at all
+            const float glyphOffsetX = symbol.glyphOffsets.front();
+            optional<PlacedGlyph> singleGlyph = placeGlyphAlongLine(fontScale * glyphOffsetX, lineOffsetX, lineOffsetY, flip, anchorPoint, symbol.segment,
+                symbol.line, labelPlaneMatrix);
+            if (!singleGlyph)
+                return PlacementResult::NotEnoughRoom;
+
+            placedGlyphs.push_back(*singleGlyph);
         }
 
         for (auto& placedGlyph : placedGlyphs) {
             addDynamicAttributes(placedGlyph.point, placedGlyph.angle, symbol.placementZoom, dynamicVertexArray);
         }
+        
+        return PlacementResult::OK;
     }
 
     void reprojectLineLabels(gl::VertexVector<SymbolDynamicLayoutAttributes::Vertex>& dynamicVertexArray, const std::vector<PlacedSymbol>& placedSymbols,
@@ -229,9 +282,15 @@ namespace mbgl {
         const ZoomEvaluatedSize partiallyEvaluatedSize = sizeBinder.evaluateForZoom(state.getZoom());
 
         const std::array<double, 2> clippingBuffer = {{ 256.0 / state.getSize().width * 2.0 + 1.0, 256.0 / state.getSize().height * 2.0 + 1.0 }};
+        
+        const bool pitchWithMap = values.pitchAlignment == style::AlignmentType::Map;
+        const bool rotateWithMap = values.rotationAlignment == style::AlignmentType::Map;
+        const float pixelsToTileUnits = tile.id.pixelsToTileUnits(1, state.getZoom());
 
-        const mat4 labelPlaneMatrix = getLabelPlaneMatrix(posMatrix, values.pitchAlignment == style::AlignmentType::Map,
-                values.rotationAlignment == style::AlignmentType::Map, state, tile.id.pixelsToTileUnits(1, state.getZoom()));
+        const mat4 labelPlaneMatrix = getLabelPlaneMatrix(posMatrix, pitchWithMap,
+                rotateWithMap, state, pixelsToTileUnits);
+        
+        const mat4 glCoordMatrix = getGlCoordMatrix(posMatrix, pitchWithMap, rotateWithMap, state, pixelsToTileUnits);
         
         dynamicVertexArray.clear();
 
@@ -245,13 +304,6 @@ namespace mbgl {
                 continue;
             }
 
-            bool flip = false;
-            if (values.keepUpright) {
-                const Point<float> a = project(convertPoint<float>(placedSymbol.line.at(placedSymbol.segment)), posMatrix);
-                const Point<float> b = project(convertPoint<float>(placedSymbol.line.at(placedSymbol.segment + 1)), posMatrix);
-                flip = placedSymbol.useVerticalMode ? b.y > a.y : b.x < a.x;
-            }
-
             const float cameraToAnchorDistance = anchorPos[3];
             const float perspectiveRatio = 1 + 0.5 * ((cameraToAnchorDistance / state.getCameraToCenterDistance()) - 1.0);
 
@@ -260,7 +312,13 @@ namespace mbgl {
                 fontSize * perspectiveRatio :
                 fontSize / perspectiveRatio;
 
-            placeGlyphsAlongLine(placedSymbol, pitchScaledFontSize, flip, labelPlaneMatrix, dynamicVertexArray);
+            PlacementResult placeUnflipped = placeGlyphsAlongLine(placedSymbol, pitchScaledFontSize, false /*unflipped*/, values.keepUpright, posMatrix, labelPlaneMatrix, glCoordMatrix, dynamicVertexArray);
+
+            if (placeUnflipped == PlacementResult::NotEnoughRoom ||
+                (placeUnflipped == PlacementResult::NeedsFlipping &&
+                 placeGlyphsAlongLine(placedSymbol, pitchScaledFontSize, true /*flipped*/, values.keepUpright, posMatrix, labelPlaneMatrix, glCoordMatrix, dynamicVertexArray) == PlacementResult::NotEnoughRoom)) {
+                hideGlyphs(placedSymbol.glyphOffsets.size(), dynamicVertexArray);
+            }
         }
     }
 } // end namespace mbgl
