@@ -19,6 +19,7 @@ OfflineDatabase::OfflineDatabase(std::string path_, uint64_t maximumCacheSize_)
     : path(std::move(path_)),
       maximumCacheSize(maximumCacheSize_) {
     ensureSchema();
+    insertedSinceEvictCheck = maximumCacheSize / 10 - (512 * 1024); // checks for evictions after caching 1/2 MB
 }
 
 OfflineDatabase::~OfflineDatabase() {
@@ -178,7 +179,7 @@ std::pair<bool, uint64_t> OfflineDatabase::putInternal(const Resource& resource,
         size = compressed ? compressedData.size() : response.data->size();
     }
 
-    if (evict_ && !evict(size)) {
+    if (evict_ && !checkEvict(size)) {
         Log::Debug(Event::Database, "Unable to make space for entry");
         return { false, 0 };
     }
@@ -591,7 +592,7 @@ void OfflineDatabase::deleteRegion(OfflineRegion&& region) {
     stmt->bind(1, region.getID());
     stmt->run();
 
-    evict(0);
+    evict();
     db->exec("PRAGMA incremental_vacuum");
 
     // Ensure that the cached offlineTileCount value is recalculated.
@@ -770,93 +771,144 @@ T OfflineDatabase::getPragma(const char * sql) {
     return stmt->get<T>(0);
 }
 
-// Remove least-recently used resources and tiles until the used database size,
-// as calculated by multiplying the number of in-use pages by the page size, is
-// less than the maximum cache size. Returns false if this condition cannot be
-// satisfied.
-//
-// SQLite database never shrinks in size unless we call VACCUM. We here
-// are monitoring the soft limit (i.e. number of free pages in the file)
-// and as it approaches to the hard limit (i.e. the actual file size) we
-// delete an arbitrary number of old cache entries. The free pages approach saves
-// us from calling VACCUM or keeping a running total, which can be costly.
-bool OfflineDatabase::evict(uint64_t neededFreeSize) {
-    uint64_t pageSize = getPragma<int64_t>("PRAGMA page_size");
-    uint64_t pageCount = getPragma<int64_t>("PRAGMA page_count");
-
-    auto usedSize = [&] {
-        return pageSize * (pageCount - getPragma<int64_t>("PRAGMA freelist_count"));
-    };
-
-    // The addition of pageSize is a fudge factor to account for non `data` column
-    // size, and because pages can get fragmented on the database.
-    while (usedSize() + neededFreeSize + pageSize > maximumCacheSize) {
-        // clang-format off
-        Statement accessedStmt = getStatement(
-            "SELECT max(accessed) "
-            "FROM ( "
-            "    SELECT accessed "
-            "    FROM resources "
-            "    LEFT JOIN region_resources "
-            "    ON resource_id = resources.id "
-            "    WHERE resource_id IS NULL "
-            "  UNION ALL "
-            "    SELECT accessed "
-            "    FROM tiles "
-            "    LEFT JOIN region_tiles "
-            "    ON tile_id = tiles.id "
-            "    WHERE tile_id IS NULL "
-            "  ORDER BY accessed ASC LIMIT ?1 "
-            ") "
-        );
-        accessedStmt->bind(1, 50);
-        // clang-format on
-        if (!accessedStmt->run()) {
-            return false;
-        }
-        Timestamp accessed = accessedStmt->get<Timestamp>(0);
-
-        // clang-format off
-        Statement stmt1 = getStatement(
-            "DELETE FROM resources "
-            "WHERE id IN ( "
-            "  SELECT id FROM resources "
-            "  LEFT JOIN region_resources "
-            "  ON resource_id = resources.id "
-            "  WHERE resource_id IS NULL "
-            "  AND accessed <= ?1 "
-            ") ");
-        // clang-format on
-        stmt1->bind(1, accessed);
-        stmt1->run();
-        uint64_t changes1 = stmt1->changes();
-
-        // clang-format off
-        Statement stmt2 = getStatement(
-            "DELETE FROM tiles "
-            "WHERE id IN ( "
-            "  SELECT id FROM tiles "
-            "  LEFT JOIN region_tiles "
-            "  ON tile_id = tiles.id "
-            "  WHERE tile_id IS NULL "
-            "  AND accessed <= ?1 "
-            ") ");
-        // clang-format on
-        stmt2->bind(1, accessed);
-        stmt2->run();
-        uint64_t changes2 = stmt2->changes();
-
-        // The cached value of offlineTileCount does not need to be updated
-        // here because only non-offline tiles can be removed by eviction.
-
-        if (changes1 == 0 && changes2 == 0) {
-            return false;
-        }
-    }
-
-    return true;
+// Remove least-recently used resources and tiles until the size of ambiently cached items
+// is less than the maximum cache size. This function keeps a running tally of the size
+// of recently inserted items in the database. Whenever 10% of the maximum cache size has
+// been added, it checks if an eviction is necessary.
+bool OfflineDatabase::checkEvict(uint64_t neededFreeSize) {
+  if (insertedSinceEvictCheck > maximumCacheSize / 10) {
+    insertedSinceEvictCheck = 0;
+    OfflineDatabase::evict();
+  }
+  insertedSinceEvictCheck += neededFreeSize;
+  return neededFreeSize < maximumCacheSize;
 }
 
+// for merging convenience
+bool OfflineDatabase::evict(__attribute__((unused)) uint64_t neededFreeSize) {
+  return evict();
+}
+
+// Tallys the size of the ambiently cached tiles and resources in the database. If the size
+// is greater than the maximum cache size, it deletes 25% of the ambiently cached items.
+// This is run when offline map packs are deleted and regularly when using the map.
+// Returns true if the eviction process was run.
+bool OfflineDatabase::evict() {
+  
+  uint64_t pageSize = getPragma<int64_t>("PRAGMA page_size");
+  uint64_t pageCount = getPragma<int64_t>("PRAGMA page_count");
+  
+  auto usedSize = [&] {
+    return pageSize * (pageCount - getPragma<int64_t>("PRAGMA freelist_count"));
+  };
+  
+  // clang-format off
+  Statement tileCountStmt = getStatement(
+                                         " SELECT "
+                                         " count(*) "
+                                         "  FROM tiles "
+                                         );
+  // clang-format on
+  if (!tileCountStmt->run()) {
+    return false;
+  }
+  uint64_t totalTileCount = tileCountStmt->get<int64_t>(0);
+  if (totalTileCount == 0) return false;
+  
+  // estimate avg tile size, this will be high because it includes resource and metadata
+  // size averaged in, but that is okay because we remove resources to the same degree as tiles
+  double avgTileSize = usedSize() / totalTileCount;
+  
+  // clang-format off
+  Statement tileSizeStmt = getStatement(
+                                        " SELECT "
+                                        " count(*) "
+                                        "  FROM tiles "
+                                        "  LEFT JOIN region_tiles "
+                                        "  ON tile_id = tiles.id "
+                                        "  WHERE tile_id IS NULL "
+                                        );
+  // clang-format on
+  if (!tileSizeStmt->run()) {
+    return false;
+  }
+  
+  uint64_t tileCount = tileSizeStmt->get<int64_t>(0);
+  
+  if(tileCount == 0) {
+    return false;
+  }
+  
+  uint64_t tileCacheSize = tileCount * avgTileSize;
+  if (tileCacheSize < maximumCacheSize) {
+    return false;
+  }
+  
+  // Try to purge to approximately 75% of the maximum cache size
+  int64_t tilesToDelete = tileCount - (maximumCacheSize / avgTileSize) * 0.75 - 1;
+  if (tilesToDelete < 0) return false;
+  
+  // get accessed time to pivot deletes on
+  // clang-format off
+  Statement getPivotAccessedStmt = getStatement(
+                                                "SELECT accessed "
+                                                "  FROM tiles "
+                                                "  LEFT JOIN region_tiles "
+                                                "  ON tile_id = tiles.id "
+                                                "  WHERE tile_id IS NULL "
+                                                "ORDER BY accessed ASC "
+                                                "LIMIT 1 OFFSET ?1 "
+                                                );
+  // clang-format on
+  getPivotAccessedStmt->bind(1, tilesToDelete);
+  if (!getPivotAccessedStmt->run()) {
+    return false;
+  }
+  
+  Timestamp accessed = getPivotAccessedStmt->get<Timestamp>(0);
+  
+  // clang-format off
+  Statement stmt1 = getStatement(
+                                 "DELETE FROM resources "
+                                 "WHERE id IN ( "
+                                 "  SELECT id FROM resources "
+                                 "  LEFT JOIN region_resources "
+                                 "  ON resource_id = resources.id "
+                                 "  WHERE resource_id IS NULL "
+                                 "  AND accessed <= ?1 "
+                                 ") ");
+  // clang-format on
+  stmt1->bind(1, accessed);
+  stmt1->run();
+  
+  // clang-format off
+  while (true) {
+    Statement stmt2 = getStatement(
+                                   "DELETE FROM tiles "
+                                   "WHERE id IN ( "
+                                   "  SELECT id FROM tiles "
+                                   "  LEFT JOIN region_tiles "
+                                   "  ON tile_id = tiles.id "
+                                   "  WHERE tile_id IS NULL "
+                                   "  AND accessed <= ?1 "
+                                   ") LIMIT 10000");
+    
+    // clang-format on
+    stmt2->bind(1, accessed);
+    stmt2->run();
+    Log::Info(Event::Database, "deleted tiles %d", stmt2->changes());
+    
+    if (stmt2->changes() < 10000) {
+      break;
+    }
+    
+  }
+  insertedSinceEvictCheck = 0;
+  
+  Log::Info(Event::Database, "Evicted tiles %d", tilesToDelete);
+  return true;
+}
+  
 void OfflineDatabase::setOfflineMapboxTileCountLimit(uint64_t limit) {
     offlineMapboxTileCountLimit = limit;
 }

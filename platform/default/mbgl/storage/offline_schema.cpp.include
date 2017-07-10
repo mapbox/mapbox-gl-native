@@ -46,6 +46,8 @@ static const char * schema =
 "ON resources (accessed);\n"
 "CREATE INDEX tiles_accessed\n"
 "ON tiles (accessed);\n"
+"CREATE INDEX tile_id\n"
+"ON tiles (id);\n"
 "CREATE INDEX region_resources_resource_id\n"
 "ON region_resources (resource_id);\n"
 "CREATE INDEX region_tiles_tile_id\n"

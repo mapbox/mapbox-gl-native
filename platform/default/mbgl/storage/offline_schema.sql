@@ -55,8 +55,12 @@ ON resources (accessed);
 CREATE INDEX tiles_accessed
 ON tiles (accessed);
 
+CREATE INDEX tile_id
+ON tiles (id);
+
 CREATE INDEX region_resources_resource_id
 ON region_resources (resource_id);
 
 CREATE INDEX region_tiles_tile_id
 ON region_tiles (tile_id);
+
