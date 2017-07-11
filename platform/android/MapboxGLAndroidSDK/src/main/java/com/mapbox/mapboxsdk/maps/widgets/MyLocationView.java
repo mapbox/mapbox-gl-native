@@ -71,6 +71,7 @@ public class MyLocationView extends View {
 
   private float accuracy;
   private Paint accuracyPaint;
+  private float accuracyThreshold;
 
   private ValueAnimator locationChangeAnimator;
   private ValueAnimator accuracyAnimator;
@@ -592,6 +593,16 @@ public class MyLocationView extends View {
   }
 
   /**
+   * Set accuracy circle threshold. Circle won't be displayed if accuracy is below set value.
+   * For internal use only.
+   *
+   * @param accuracyThreshold Value below which circle won't be displayed
+   */
+  public void setAccuracyThreshold(float accuracyThreshold) {
+    this.accuracyThreshold = accuracyThreshold;
+  }
+
+  /**
    * Set the bearing tracking mode, for internal use only.
    *
    * @param myBearingTrackingMode The bearing tracking mode
@@ -928,10 +939,11 @@ public class MyLocationView extends View {
         accuracyAnimator.end();
       }
 
-      accuracyAnimator = ValueAnimator.ofFloat(accuracy, location.getAccuracy());
+      float newAccuracy = location.getAccuracy() >= accuracyThreshold ? location.getAccuracy() : 0f;
+      accuracyAnimator = ValueAnimator.ofFloat(accuracy, newAccuracy);
       accuracyAnimator.setDuration(750);
       accuracyAnimator.start();
-      accuracy = location.getAccuracy();
+      accuracy = newAccuracy;
     }
 
     abstract void invalidate();
