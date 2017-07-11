@@ -92,6 +92,9 @@ macro(mbgl_platform_glfw)
     target_link_libraries(mbgl-glfw
         PRIVATE mbgl-loop-darwin
     )
+    target_compile_options(mbgl-glfw
+        PRIVATE -fvisibility=hidden
+    )
 endmacro()
 
 
@@ -99,12 +102,18 @@ macro(mbgl_platform_render)
     target_link_libraries(mbgl-render
         PRIVATE mbgl-loop-darwin
     )
+    target_compile_options(mbgl-render
+        PRIVATE -fvisibility=hidden
+    )
 endmacro()
 
 
 macro(mbgl_platform_offline)
     target_link_libraries(mbgl-offline
         PRIVATE mbgl-loop-darwin
+    )
+    target_compile_options(mbgl-offline
+        PRIVATE -fvisibility=hidden
     )
 endmacro()
 
