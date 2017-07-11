@@ -48,6 +48,8 @@ public:
 
     class State {
     public:
+        State(UniformLocation location_) : location(std::move(location_)) {}
+
         void operator=(const Value& value) {
             if (location >= 0 && (!current || *current != value.t)) {
                 current = value.t;
@@ -106,7 +108,7 @@ public:
 
     template <class Program>
     static State loadNamedLocations(const Program& program) {
-        return State{ { program.uniformLocation(Us::name()) }... };
+        return State(typename Us::State(program.uniformLocation(Us::name()))...);
     }
 
     static NamedLocations getNamedLocations(const State& state) {

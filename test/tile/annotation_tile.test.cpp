@@ -58,7 +58,7 @@ TEST(AnnotationTile, Issue8289) {
 
     // Simulate layout and placement of a symbol layer.
     tile.onLayout(GeometryTile::LayoutResult {
-        {},
+        std::unordered_map<std::string, std::shared_ptr<Bucket>>(),
         std::make_unique<FeatureIndex>(),
         std::move(data),
         0
@@ -72,7 +72,7 @@ TEST(AnnotationTile, Issue8289) {
     collisionTile->placeFeature(feature, false, false);
 
     tile.onPlacement(GeometryTile::PlacementResult {
-        {},
+        std::unordered_map<std::string, std::shared_ptr<Bucket>>(),
         std::move(collisionTile),
         {},
         {},
@@ -81,7 +81,7 @@ TEST(AnnotationTile, Issue8289) {
 
     // Simulate a second layout with empty data.
     tile.onLayout(GeometryTile::LayoutResult {
-        {},
+        std::unordered_map<std::string, std::shared_ptr<Bucket>>(),
         std::make_unique<FeatureIndex>(),
         std::make_unique<AnnotationTileData>(),
         0

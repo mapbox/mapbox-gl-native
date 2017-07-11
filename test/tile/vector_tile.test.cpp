@@ -89,7 +89,7 @@ TEST(VectorTile, Issue7615) {
 
     // Subsequent onLayout should not cause the existing symbol bucket to be discarded.
     tile.onLayout(GeometryTile::LayoutResult {
-        {},
+        std::unordered_map<std::string, std::shared_ptr<Bucket>>(),
         nullptr,
         nullptr,
         0

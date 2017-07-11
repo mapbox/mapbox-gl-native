@@ -60,11 +60,11 @@ RenderImageSource::queryRenderedFeatures(const ScreenLineString&,
                                          const TransformState&,
                                          const RenderStyle&,
                                          const RenderedQueryOptions&) const {
-    return {};
+    return std::unordered_map<std::string, std::vector<Feature>>();
 }
 
 std::vector<Feature> RenderImageSource::querySourceFeatures(const SourceQueryOptions&) const {
-    return {};
+    return std::vector<Feature>();
 }
 
 void RenderImageSource::update(Immutable<style::Source::Impl> baseImpl_,

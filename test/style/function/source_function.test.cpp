@@ -76,11 +76,14 @@ TEST(SourceFunction, Categorical) {
     EXPECT_EQ(0.0f, SourceFunction<float>("property", CategoricalStops<float>({{ int64_t(1), 1.0f }}))
         .evaluate(oneString, 0.0f));
 
-    EXPECT_EQ(0.0f, SourceFunction<float>("property", CategoricalStops<float>({{ "1"s, 1.0f }}))
+    CategoricalStops<float>::Stops stops;
+    stops["1"s] = 1.0f;
+
+    EXPECT_EQ(0.0f, SourceFunction<float>("property", CategoricalStops<float>(stops))
         .evaluate(oneInteger, 0.0f));
-    EXPECT_EQ(0.0f, SourceFunction<float>("property", CategoricalStops<float>({{ "1"s, 1.0f }}))
+    EXPECT_EQ(0.0f, SourceFunction<float>("property", CategoricalStops<float>(stops))
         .evaluate(oneDouble, 0.0f));
-    EXPECT_EQ(1.0f, SourceFunction<float>("property", CategoricalStops<float>({{ "1"s, 1.0f }}))
+    EXPECT_EQ(1.0f, SourceFunction<float>("property", CategoricalStops<float>(stops))
         .evaluate(oneString, 0.0f));
 
     EXPECT_EQ(1.0f, SourceFunction<float>("property", CategoricalStops<float>({{ true, 1.0f }}))
