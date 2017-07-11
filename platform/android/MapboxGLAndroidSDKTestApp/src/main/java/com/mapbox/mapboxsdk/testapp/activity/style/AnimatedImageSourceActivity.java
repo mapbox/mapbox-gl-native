@@ -1,10 +1,16 @@
 package com.mapbox.mapboxsdk.testapp.activity.style;
 
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 
+import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngQuad;
 import com.mapbox.mapboxsdk.maps.MapView;
@@ -106,17 +112,27 @@ public class AnimatedImageSourceActivity extends AppCompatActivity implements On
 
     private MapboxMap mapboxMap;
     private Handler handler;
-    private int[] drawables;
+    private Bitmap[] drawables;
     private int drawableIndex;
+
+    Bitmap getBitmap(int resourceId) {
+      Context context = Mapbox.getApplicationContext();
+      Drawable drawable = ContextCompat.getDrawable(context, resourceId);
+      if (drawable instanceof BitmapDrawable) {
+        BitmapDrawable bitmapDrawable = (BitmapDrawable) drawable;
+        return bitmapDrawable.getBitmap();
+      }
+      return null;
+    }
 
     RefreshImageRunnable(MapboxMap mapboxMap, Handler handler) {
       this.mapboxMap = mapboxMap;
       this.handler = handler;
-      drawables = new int[4];
-      drawables[0] = R.drawable.southeast_radar_0;
-      drawables[1] = R.drawable.southeast_radar_1;
-      drawables[2] = R.drawable.southeast_radar_2;
-      drawables[3] = R.drawable.southeast_radar_3;
+      drawables = new Bitmap[4];
+      drawables[0] = getBitmap(R.drawable.southeast_radar_0);
+      drawables[1] = getBitmap(R.drawable.southeast_radar_1);
+      drawables[2] = getBitmap(R.drawable.southeast_radar_2);
+      drawables[3] = getBitmap(R.drawable.southeast_radar_3);
       drawableIndex = 1;
     }
 

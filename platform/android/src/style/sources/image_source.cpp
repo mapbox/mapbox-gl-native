@@ -40,8 +40,7 @@ namespace android {
     }
 
     void ImageSource::setImage(jni::JNIEnv& env, jni::Object<Bitmap> bitmap) {
-        UnassociatedImage image = util::unpremultiply(Bitmap::GetImage(env, bitmap));
-        source.as<mbgl::style::ImageSource>()->setImage(std:: move(image));
+        source.as<mbgl::style::ImageSource>()->setImage(Bitmap::GetImage(env, bitmap));
     }
 
     jni::Class<ImageSource> ImageSource::javaClass;

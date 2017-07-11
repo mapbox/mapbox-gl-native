@@ -13,8 +13,8 @@ namespace mbgl {
 
 class RasterBucket : public Bucket {
 public:
-    RasterBucket(UnassociatedImage&&);
-    RasterBucket(std::shared_ptr<UnassociatedImage>);
+    RasterBucket(PremultipliedImage&&);
+    RasterBucket(std::shared_ptr<PremultipliedImage>);
     void upload(gl::Context&) override;
     void render(Painter&, PaintParameters&, const RenderLayer&, const RenderTile&) override;
     void render(Painter& painter,
@@ -24,8 +24,8 @@ public:
     bool hasData() const override;
 
     void clear();
-    void setImage(std::shared_ptr<UnassociatedImage>);
-    std::shared_ptr<UnassociatedImage> image;
+    void setImage(std::shared_ptr<PremultipliedImage>);
+    std::shared_ptr<PremultipliedImage> image;
     optional<gl::Texture> texture;
 
     // Bucket specific vertices are used for Image Sources only
