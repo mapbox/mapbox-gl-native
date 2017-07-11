@@ -7,7 +7,14 @@ using namespace mbgl;
 struct Renderable {
     UnwrappedTileID id;
     ClipID clip;
-    bool used = true;
+    bool used;
+
+    Renderable(UnwrappedTileID id_,
+               ClipID clip_,
+               bool used_ = true)
+        : id(std::move(id_)),
+          clip(std::move(clip_)),
+          used(used_) {}
 
     bool operator==(const Renderable& rhs) const {
         return id == rhs.id && clip == rhs.clip;

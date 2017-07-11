@@ -11,6 +11,11 @@ public:
     optional<Duration> duration = {};
     optional<Duration> delay = {};
 
+    TransitionOptions(optional<Duration> duration_ = optional<Duration>(),
+                      optional<Duration> delay_ = optional<Duration>())
+        : duration(std::move(duration_)),
+          delay(std::move(delay_)) {}
+
     TransitionOptions reverseMerge(const TransitionOptions& defaults) const {
         return {
             duration ? duration : defaults.duration,

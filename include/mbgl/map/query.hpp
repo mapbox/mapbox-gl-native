@@ -13,6 +13,11 @@ namespace mbgl {
  */
 class RenderedQueryOptions {
 public:
+    RenderedQueryOptions(optional<std::vector<std::string>> layerIDs_ = optional<std::vector<std::string>>(),
+                         optional<style::Filter> filter_ = optional<style::Filter>())
+        : layerIDs(std::move(layerIDs_)),
+          filter(std::move(filter_)) {}
+
     /** layerIDs to include in the query */
     optional<std::vector<std::string>> layerIDs;
 
@@ -24,6 +29,11 @@ public:
  */
 class SourceQueryOptions {
 public:
+    SourceQueryOptions(optional<std::vector<std::string>> sourceLayers_ = optional<std::vector<std::string>> (),
+                       optional<style::Filter> filter_ = optional<style::Filter>())
+        : sourceLayers(std::move(sourceLayers_)),
+          filter(std::move(filter_)) {}
+
     // Required for VectorSource, ignored for GeoJSONSource
     optional<std::vector<std::string>> sourceLayers;
 
