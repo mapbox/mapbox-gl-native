@@ -8,8 +8,8 @@ namespace style {
 
 class TransitionOptions {
 public:
-    optional<Duration> duration = {};
-    optional<Duration> delay = {};
+    optional<Duration> duration;
+    optional<Duration> delay;
 
     TransitionOptions(optional<Duration> duration_ = optional<Duration>(),
                       optional<Duration> delay_ = optional<Duration>())

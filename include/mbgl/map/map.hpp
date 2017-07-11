@@ -41,7 +41,7 @@ public:
                  GLContextMode contextMode = GLContextMode::Unique,
                  ConstrainMode constrainMode = ConstrainMode::HeightOnly,
                  ViewportMode viewportMode = ViewportMode::Default,
-                 const optional<std::string>& programCacheDir = {});
+                 optional<std::string> programCacheDir = optional<std::string>());
     ~Map();
 
     // Register a callback that will get called (on the render thread) when all resources have
