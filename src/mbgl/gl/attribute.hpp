@@ -240,9 +240,6 @@ public:
 
     using Vertex = detail::Vertex<typename As::Type...>;
 
-    template <class A>
-    static constexpr std::size_t Index = TypeIndex<A, As...>::value;
-
     static Locations bindLocations(const ProgramID& id) {
         std::set<std::string> activeAttributes = getActiveAttributes(id);
 
@@ -266,7 +263,7 @@ public:
 
     template <class DrawMode>
     static Bindings bindings(const VertexBuffer<Vertex, DrawMode>& buffer) {
-        return Bindings { As::Type::binding(buffer, Index<As>)... };
+        return Bindings { As::Type::binding(buffer, TypeIndex<As, As...>::value)... };
     }
 
     static void bind(Context& context,

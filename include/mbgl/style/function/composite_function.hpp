@@ -24,7 +24,7 @@ template <class T>
 class CompositeFunction {
 public:
     using InnerStops = std::conditional_t<
-        util::Interpolatable<T>,
+        util::Interpolatable<T>::value,
         variant<
             ExponentialStops<T>,
             IntervalStops<T>,
@@ -34,7 +34,7 @@ public:
             CategoricalStops<T>>>;
 
     using Stops = std::conditional_t<
-        util::Interpolatable<T>,
+        util::Interpolatable<T>::value,
         variant<
             CompositeExponentialStops<T>,
             CompositeIntervalStops<T>,
