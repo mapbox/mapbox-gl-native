@@ -66,9 +66,9 @@ public:
 
     template <typename T = Image>
     T clone() const {
-        T copy(size);
-        std::copy(data.get(), data.get() + bytes(), copy.data.get());
-        return copy;
+        T copy_(size);
+        std::copy(data.get(), data.get() + bytes(), copy_.data.get());
+        return copy_;
     }
 
     size_t stride() const { return channels * size.width; }

@@ -426,13 +426,13 @@ void QMapboxGLSettings::setApiBaseUrl(const QString& url)
 */
 
 /*!
-    Constructs a QMapboxGL object with \a settings and sets \a parent as the parent
+    Constructs a QMapboxGL object with \a settings and sets \a parent_ as the parent
     object. The \a settings cannot be changed after the object is constructed. The
     \a size represents the size of the viewport and the \a pixelRatio the initial pixel
     density of the screen.
 */
-QMapboxGL::QMapboxGL(QObject *parent, const QMapboxGLSettings &settings, const QSize& size, qreal pixelRatio)
-    : QObject(parent)
+QMapboxGL::QMapboxGL(QObject *parent_, const QMapboxGLSettings &settings, const QSize& size, qreal pixelRatio)
+    : QObject(parent_)
 {
     assert(!size.isEmpty());
 
@@ -829,7 +829,7 @@ void QMapboxGL::removeAnnotation(QMapbox::AnnotationID id)
 }
 
 /*!
-    Sets a layout \a property \a value to an existing \a layer. The \a property string can be any
+    Sets a layout \a property \a value to an existing \a layer. The \a property_ string can be any
     as defined by the \l {https://www.mapbox.com/mapbox-gl-style-spec/} {Mapbox style specification}
     for layout properties.
 
@@ -863,7 +863,7 @@ void QMapboxGL::removeAnnotation(QMapbox::AnnotationID id)
         \li QVariantList
     \endtable
 */
-void QMapboxGL::setLayoutProperty(const QString& layer, const QString& property, const QVariant& value)
+void QMapboxGL::setLayoutProperty(const QString& layer, const QString& property_, const QVariant& value)
 {
     using namespace mbgl::style;
 
@@ -873,14 +873,14 @@ void QMapboxGL::setLayoutProperty(const QString& layer, const QString& property,
         return;
     }
 
-    if (conversion::setLayoutProperty(*layer_, property.toStdString(), value)) {
-        qWarning() << "Error setting layout property:" << layer << "-" << property;
+    if (conversion::setLayoutProperty(*layer_, property_.toStdString(), value)) {
+        qWarning() << "Error setting layout property:" << layer << "-" << property_;
         return;
     }
 }
 
 /*!
-    Sets a paint \a property \a value to an existing \a layer. The \a property string can be any
+    Sets a paint \a property_ \a value to an existing \a layer. The \a property string can be any
     as defined by the \l {https://www.mapbox.com/mapbox-gl-style-spec/} {Mapbox style specification}
     for paint properties.
 
@@ -929,7 +929,7 @@ void QMapboxGL::setLayoutProperty(const QString& layer, const QString& property,
         map->setPaintProperty("route","line-dasharray", lineDashArray);
     \endcode
 */
-void QMapboxGL::setPaintProperty(const QString& layer, const QString& property, const QVariant& value)
+void QMapboxGL::setPaintProperty(const QString& layer, const QString& property_, const QVariant& value)
 {
     using namespace mbgl::style;
 
@@ -939,8 +939,8 @@ void QMapboxGL::setPaintProperty(const QString& layer, const QString& property, 
         return;
     }
 
-    if (conversion::setPaintProperty(*layer_, property.toStdString(), value)) {
-        qWarning() << "Error setting paint property:" << layer << "-" << property;
+    if (conversion::setPaintProperty(*layer_, property_.toStdString(), value)) {
+        qWarning() << "Error setting paint property:" << layer << "-" << property_;
         return;
     }
 }
@@ -1033,11 +1033,11 @@ void QMapboxGL::addAnnotationIcon(const QString &name, const QImage &icon)
 }
 
 /*!
-    Returns the amount of meters per pixel from a given \a latitude and \a zoom.
+    Returns the amount of meters per pixel from a given \a latitude_ and \a zoom_.
 */
-double QMapboxGL::metersPerPixelAtLatitude(double latitude, double zoom) const
+double QMapboxGL::metersPerPixelAtLatitude(double latitude_, double zoom_) const
 {
-    return mbgl::Projection::getMetersPerPixelAtLatitude(latitude, zoom);
+    return mbgl::Projection::getMetersPerPixelAtLatitude(latitude_, zoom_);
 }
 
 /*!

@@ -42,8 +42,8 @@ public:
     }
 
     bool respond(Resource::Kind kind, const Response& response) {
-        auto it = std::find_if(requests.begin(), requests.end(), [&] (FakeFileRequest* request) {
-            return request->resource.kind == kind;
+        auto it = std::find_if(requests.begin(), requests.end(), [&] (FakeFileRequest* fakeRequest) {
+            return fakeRequest->resource.kind == kind;
         });
 
         if (it != requests.end()) {
