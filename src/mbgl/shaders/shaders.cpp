@@ -22,6 +22,7 @@ std::string programIdentifier(const std::string& vertexSource, const std::string
     ss << std::setfill('0') << std::setw(sizeof(size_t) * 2) << std::hex;
     ss << std::hash<std::string>()(vertexSource);
     ss << std::hash<std::string>()(fragmentSource);
+    ss << "v2";
     return ss.str();
 }
 
