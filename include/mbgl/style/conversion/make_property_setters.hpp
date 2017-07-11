@@ -45,6 +45,7 @@ auto makeLayoutPropertySetters() {
     result["icon-padding"] = &setProperty<V, SymbolLayer, PropertyValue<float>, &SymbolLayer::setIconPadding>;
     result["icon-keep-upright"] = &setProperty<V, SymbolLayer, PropertyValue<bool>, &SymbolLayer::setIconKeepUpright>;
     result["icon-offset"] = &setProperty<V, SymbolLayer, DataDrivenPropertyValue<std::array<float, 2>>, &SymbolLayer::setIconOffset>;
+    result["icon-pitch-alignment"] = &setProperty<V, SymbolLayer, PropertyValue<AlignmentType>, &SymbolLayer::setIconPitchAlignment>;
     result["text-pitch-alignment"] = &setProperty<V, SymbolLayer, PropertyValue<AlignmentType>, &SymbolLayer::setTextPitchAlignment>;
     result["text-rotation-alignment"] = &setProperty<V, SymbolLayer, PropertyValue<AlignmentType>, &SymbolLayer::setTextRotationAlignment>;
     result["text-field"] = &setProperty<V, SymbolLayer, DataDrivenPropertyValue<std::string>, &SymbolLayer::setTextField>;

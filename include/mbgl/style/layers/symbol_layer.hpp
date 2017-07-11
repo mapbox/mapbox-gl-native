@@ -98,6 +98,10 @@ public:
     DataDrivenPropertyValue<std::array<float, 2>> getIconOffset() const;
     void setIconOffset(DataDrivenPropertyValue<std::array<float, 2>>);
 
+    static PropertyValue<AlignmentType> getDefaultIconPitchAlignment();
+    PropertyValue<AlignmentType> getIconPitchAlignment() const;
+    void setIconPitchAlignment(PropertyValue<AlignmentType>);
+
     static PropertyValue<AlignmentType> getDefaultTextPitchAlignment();
     PropertyValue<AlignmentType> getTextPitchAlignment() const;
     void setTextPitchAlignment(PropertyValue<AlignmentType>);

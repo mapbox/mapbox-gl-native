@@ -75,9 +75,12 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
         }
     }
 
-    // If unspecified `text-pitch-alignment` inherits `text-rotation-alignment`
+    // If unspecified `*-pitch-alignment` inherits `*-rotation-alignment`
     if (layout.get<TextPitchAlignment>() == AlignmentType::Auto) {
         layout.get<TextPitchAlignment>() = layout.get<TextRotationAlignment>();
+    }
+    if (layout.get<IconPitchAlignment>() == AlignmentType::Auto) {
+        layout.get<IconPitchAlignment>() = layout.get<IconRotationAlignment>();
     }
 
     const bool hasText = has<TextField>(layout) && !layout.get<TextFont>().empty();

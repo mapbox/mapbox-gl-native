@@ -87,6 +87,11 @@ struct IconOffset : DataDrivenLayoutProperty<std::array<float, 2>> {
     static std::array<float, 2> defaultValue() { return {{ 0, 0 }}; }
 };
 
+struct IconPitchAlignment : LayoutProperty<AlignmentType> {
+    static constexpr const char * key = "icon-pitch-alignment";
+    static AlignmentType defaultValue() { return AlignmentType::Auto; }
+};
+
 struct TextPitchAlignment : LayoutProperty<AlignmentType> {
     static constexpr const char * key = "text-pitch-alignment";
     static AlignmentType defaultValue() { return AlignmentType::Auto; }
@@ -254,6 +259,7 @@ class SymbolLayoutProperties : public Properties<
     IconPadding,
     IconKeepUpright,
     IconOffset,
+    IconPitchAlignment,
     TextPitchAlignment,
     TextRotationAlignment,
     TextField,

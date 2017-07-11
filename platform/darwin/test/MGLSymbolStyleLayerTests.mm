@@ -301,6 +301,45 @@
         XCTAssertThrowsSpecificNamed(layer.iconPadding = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
     }
 
+    // icon-pitch-alignment
+    {
+        XCTAssertTrue(rawLayer->getIconPitchAlignment().isUndefined(),
+                      @"icon-pitch-alignment should be unset initially.");
+        MGLStyleValue<NSValue *> *defaultStyleValue = layer.iconPitchAlignment;
+
+        MGLStyleValue<NSValue *> *constantStyleValue = [MGLStyleValue<NSValue *> valueWithRawValue:[NSValue valueWithMGLIconPitchAlignment:MGLIconPitchAlignmentAuto]];
+        layer.iconPitchAlignment = constantStyleValue;
+        mbgl::style::PropertyValue<mbgl::style::AlignmentType> propertyValue = { mbgl::style::AlignmentType::Auto };
+        XCTAssertEqual(rawLayer->getIconPitchAlignment(), propertyValue,
+                       @"Setting iconPitchAlignment to a constant value should update icon-pitch-alignment.");
+        XCTAssertEqualObjects(layer.iconPitchAlignment, constantStyleValue,
+                              @"iconPitchAlignment should round-trip constant values.");
+
+        MGLStyleValue<NSValue *> * functionStyleValue = [MGLStyleValue<NSValue *> valueWithInterpolationMode:MGLInterpolationModeInterval cameraStops:@{@18: constantStyleValue} options:nil];
+        layer.iconPitchAlignment = functionStyleValue;
+
+        mbgl::style::IntervalStops<mbgl::style::AlignmentType> intervalStops = { {{18, mbgl::style::AlignmentType::Auto}} };
+        propertyValue = mbgl::style::CameraFunction<mbgl::style::AlignmentType> { intervalStops };
+        
+        XCTAssertEqual(rawLayer->getIconPitchAlignment(), propertyValue,
+                       @"Setting iconPitchAlignment to a camera function should update icon-pitch-alignment.");
+        XCTAssertEqualObjects(layer.iconPitchAlignment, functionStyleValue,
+                              @"iconPitchAlignment should round-trip camera functions.");
+
+                              
+
+        layer.iconPitchAlignment = nil;
+        XCTAssertTrue(rawLayer->getIconPitchAlignment().isUndefined(),
+                      @"Unsetting iconPitchAlignment should return icon-pitch-alignment to the default value.");
+        XCTAssertEqualObjects(layer.iconPitchAlignment, defaultStyleValue,
+                              @"iconPitchAlignment should return the default value after being unset.");
+
+        functionStyleValue = [MGLStyleValue<NSValue *> valueWithInterpolationMode:MGLInterpolationModeIdentity sourceStops:nil attributeName:@"" options:nil];
+        XCTAssertThrowsSpecificNamed(layer.iconPitchAlignment = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
+        functionStyleValue = [MGLStyleValue<NSValue *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
+        XCTAssertThrowsSpecificNamed(layer.iconPitchAlignment = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
+    }
+
     // icon-rotate
     {
         XCTAssertTrue(rawLayer->getIconRotate().isUndefined(),
@@ -2321,6 +2360,7 @@
     [self testPropertyName:@"icon-offset" isBoolean:NO];
     [self testPropertyName:@"is-icon-optional" isBoolean:YES];
     [self testPropertyName:@"icon-padding" isBoolean:NO];
+    [self testPropertyName:@"icon-pitch-alignment" isBoolean:NO];
     [self testPropertyName:@"icon-rotation" isBoolean:NO];
     [self testPropertyName:@"icon-rotation-alignment" isBoolean:NO];
     [self testPropertyName:@"icon-scale" isBoolean:NO];
@@ -2366,6 +2406,9 @@
 }
 
 - (void)testValueAdditions {
+    XCTAssertEqual([NSValue valueWithMGLIconPitchAlignment:MGLIconPitchAlignmentMap].MGLIconPitchAlignmentValue, MGLIconPitchAlignmentMap);
+    XCTAssertEqual([NSValue valueWithMGLIconPitchAlignment:MGLIconPitchAlignmentViewport].MGLIconPitchAlignmentValue, MGLIconPitchAlignmentViewport);
+    XCTAssertEqual([NSValue valueWithMGLIconPitchAlignment:MGLIconPitchAlignmentAuto].MGLIconPitchAlignmentValue, MGLIconPitchAlignmentAuto);
     XCTAssertEqual([NSValue valueWithMGLIconRotationAlignment:MGLIconRotationAlignmentMap].MGLIconRotationAlignmentValue, MGLIconRotationAlignmentMap);
     XCTAssertEqual([NSValue valueWithMGLIconRotationAlignment:MGLIconRotationAlignmentViewport].MGLIconRotationAlignmentValue, MGLIconRotationAlignmentViewport);
     XCTAssertEqual([NSValue valueWithMGLIconRotationAlignment:MGLIconRotationAlignmentAuto].MGLIconRotationAlignmentValue, MGLIconRotationAlignmentAuto);

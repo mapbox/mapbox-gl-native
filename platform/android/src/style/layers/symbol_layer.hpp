@@ -59,6 +59,8 @@ public:
 
     jni::Object<jni::ObjectTag> getIconOffset(jni::JNIEnv&);
 
+    jni::Object<jni::ObjectTag> getIconPitchAlignment(jni::JNIEnv&);
+
     jni::Object<jni::ObjectTag> getTextPitchAlignment(jni::JNIEnv&);
 
     jni::Object<jni::ObjectTag> getTextRotationAlignment(jni::JNIEnv&);
