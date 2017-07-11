@@ -73,7 +73,10 @@ if(APPLE)
 endif()
 set(CMAKE_CXX_FLAGS_RELEASE "-Os -DNDEBUG")
 
-if(CMAKE_COMPILER_IS_GNUCXX)
+
+if(CMAKE_CXX_COMPILER_ID MATCHES ".*Clang")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-error=unknown-warning-option")
+elseif(CMAKE_COMPILER_IS_GNUCXX)
     # https://svn.boost.org/trac/boost/ticket/9240
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fext-numeric-literals")
 endif()
