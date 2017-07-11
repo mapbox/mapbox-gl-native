@@ -52,15 +52,13 @@ public:
                                  const char* name,
                                  const char* vertexSource_,
                                  const char* fragmentSource_) {
+        const std::string vertexSource = shaders::vertexSource(programParameters, vertexSource_);
+        const std::string fragmentSource = shaders::fragmentSource(programParameters, fragmentSource_);
+
 #if MBGL_HAS_BINARY_PROGRAMS
         optional<std::string> cachePath = programParameters.cachePath(name);
         if (cachePath && context.supportsProgramBinaries()) {
-            const std::string vertexSource =
-                shaders::vertexSource(programParameters, vertexSource_);
-            const std::string fragmentSource =
-                shaders::fragmentSource(programParameters, fragmentSource_);
-            const std::string identifier =
-                shaders::programIdentifier(vertexSource, fragmentSource_);
+            const std::string identifier = shaders::programIdentifier(vertexSource, fragmentSource);
 
             try {
                 if (auto cachedBinaryProgram = util::readFile(*cachePath)) {
@@ -94,11 +92,9 @@ public:
             return std::move(result);
         }
 #endif
+
         (void)name;
-        return Program {
-            context, shaders::vertexSource(programParameters, vertexSource_),
-            shaders::fragmentSource(programParameters, fragmentSource_)
-        };
+        return Program { context, vertexSource, fragmentSource };
     }
 
     template <class BinaryProgram>
