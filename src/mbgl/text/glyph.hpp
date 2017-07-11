@@ -7,6 +7,7 @@
 #include <mbgl/util/optional.hpp>
 #include <mbgl/util/immutable.hpp>
 #include <mbgl/util/image.hpp>
+#include <mbgl/util/util.hpp>
 
 #include <cstdint>
 #include <vector>
@@ -89,23 +90,23 @@ enum class WritingModeType : uint8_t {
     Vertical = 1 << 1,
 };
 
-constexpr WritingModeType operator|(WritingModeType a, WritingModeType b) {
+MBGL_CONSTEXPR WritingModeType operator|(WritingModeType a, WritingModeType b) {
     return WritingModeType(mbgl::underlying_type(a) | mbgl::underlying_type(b));
 }
 
-constexpr WritingModeType& operator|=(WritingModeType& a, WritingModeType b) {
+MBGL_CONSTEXPR WritingModeType& operator|=(WritingModeType& a, WritingModeType b) {
     return (a = a | b);
 }
 
-constexpr bool operator&(WritingModeType lhs, WritingModeType rhs) {
+MBGL_CONSTEXPR bool operator&(WritingModeType lhs, WritingModeType rhs) {
     return mbgl::underlying_type(lhs) & mbgl::underlying_type(rhs);
 }
 
-constexpr WritingModeType& operator&=(WritingModeType& lhs, WritingModeType rhs) {
+MBGL_CONSTEXPR WritingModeType& operator&=(WritingModeType& lhs, WritingModeType rhs) {
     return (lhs = WritingModeType(mbgl::underlying_type(lhs) & mbgl::underlying_type(rhs)));
 }
 
-constexpr WritingModeType operator~(WritingModeType value) {
+MBGL_CONSTEXPR WritingModeType operator~(WritingModeType value) {
     return WritingModeType(~mbgl::underlying_type(value));
 }
 

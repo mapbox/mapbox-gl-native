@@ -1,5 +1,6 @@
 #pragma once
 
+#include <mbgl/util/util.hpp>
 #include <mbgl/util/traits.hpp>
 
 #include <cstdint>
@@ -51,23 +52,23 @@ enum class MapDebugOptions : EnumType {
 #endif // MBGL_USE_GLES2
 };
 
-constexpr MapDebugOptions operator|(MapDebugOptions lhs, MapDebugOptions rhs) {
+MBGL_CONSTEXPR MapDebugOptions operator|(MapDebugOptions lhs, MapDebugOptions rhs) {
     return MapDebugOptions(mbgl::underlying_type(lhs) | mbgl::underlying_type(rhs));
 }
 
-constexpr MapDebugOptions& operator|=(MapDebugOptions& lhs, MapDebugOptions rhs) {
+MBGL_CONSTEXPR MapDebugOptions& operator|=(MapDebugOptions& lhs, MapDebugOptions rhs) {
     return (lhs = MapDebugOptions(mbgl::underlying_type(lhs) | mbgl::underlying_type(rhs)));
 }
 
-constexpr bool operator&(MapDebugOptions lhs, MapDebugOptions rhs) {
+MBGL_CONSTEXPR bool operator&(MapDebugOptions lhs, MapDebugOptions rhs) {
     return mbgl::underlying_type(lhs) & mbgl::underlying_type(rhs);
 }
 
-constexpr MapDebugOptions& operator&=(MapDebugOptions& lhs, MapDebugOptions rhs) {
+MBGL_CONSTEXPR MapDebugOptions& operator&=(MapDebugOptions& lhs, MapDebugOptions rhs) {
     return (lhs = MapDebugOptions(mbgl::underlying_type(lhs) & mbgl::underlying_type(rhs)));
 }
 
-constexpr MapDebugOptions operator~(MapDebugOptions value) {
+MBGL_CONSTEXPR MapDebugOptions operator~(MapDebugOptions value) {
     return MapDebugOptions(~mbgl::underlying_type(value));
 }
 
