@@ -31,16 +31,13 @@ public:
     using std::tuple<Ts...>::tuple;
 
     template <class I>
-    static constexpr std::size_t Index = TypeIndex<I, Is...>::value;
-
-    template <class I>
     auto& get() {
-        return std::get<Index<I>>(*this);
+        return std::get<TypeIndex<I, Is...>::value>(*this);
     }
 
     template <class I>
     const auto& get() const {
-        return std::get<Index<I>>(*this);
+        return std::get<TypeIndex<I, Is...>::value>(*this);
     }
 
     template <class... Js, class... Us>

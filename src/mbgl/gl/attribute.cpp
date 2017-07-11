@@ -55,14 +55,16 @@ void DisabledAttribute::bind(Context&, AttributeLocation location, std::size_t) 
     MBGL_CHECK_ERROR(glDisableVertexAttribArray(location));
 }
 
-template <class T> DataType DataTypeOf    = static_cast<DataType>(0);
-template <> DataType DataTypeOf< int8_t>  = DataType::Byte;
-template <> DataType DataTypeOf<uint8_t>  = DataType::UnsignedByte;
-template <> DataType DataTypeOf< int16_t> = DataType::Short;
-template <> DataType DataTypeOf<uint16_t> = DataType::UnsignedShort;
-template <> DataType DataTypeOf< int32_t> = DataType::Integer;
-template <> DataType DataTypeOf<uint32_t> = DataType::UnsignedInteger;
-template <> DataType DataTypeOf<float>    = DataType::Float;
+template <class T>
+constexpr DataType DataTypeOf() {
+    return std::is_same<T,   int8_t>::value ? DataType::Byte :
+           std::is_same<T,  uint8_t>::value ? DataType::UnsignedByte :
+           std::is_same<T,  int16_t>::value ? DataType::Short :
+           std::is_same<T, uint16_t>::value ? DataType::UnsignedShort :
+           std::is_same<T,  int32_t>::value ? DataType::Integer :
+           std::is_same<T, uint32_t>::value ? DataType::UnsignedInteger :
+           std::is_same<T,    float>::value ? DataType::Float : static_cast<DataType>(0);
+}
 
 template <class T, std::size_t N>
 void AttributeBinding<T, N>::bind(Context& context, AttributeLocation location, std::size_t vertexOffset) const {
@@ -76,7 +78,7 @@ void AttributeBinding<T, N>::bind(Context& context, AttributeLocation location, 
     MBGL_CHECK_ERROR(glVertexAttribPointer(
         location,
         static_cast<GLint>(attributeSize),
-        static_cast<GLenum>(DataTypeOf<T>),
+        static_cast<GLenum>(DataTypeOf<T>()),
         static_cast<GLboolean>(false),
         static_cast<GLsizei>(vertexSize),
         reinterpret_cast<GLvoid*>(attributeOffset + (vertexSize * vertexOffset))));

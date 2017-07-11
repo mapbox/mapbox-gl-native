@@ -95,7 +95,11 @@ struct Interpolator<std::vector<T>>
     : Uninterpolated {};
 
 template <class T>
-constexpr bool Interpolatable = !std::is_base_of<Uninterpolated, Interpolator<T>>::value;
+struct Interpolatable
+    : std::conditional_t<
+      !std::is_base_of<Uninterpolated, Interpolator<T>>::value,
+      std::true_type,
+      std::false_type> {};
 
 } // namespace util
 } // namespace mbgl
