@@ -9,11 +9,11 @@ namespace mbgl {
 
 using namespace style;
 
-RasterBucket::RasterBucket(UnassociatedImage&& image_) {
-    image = std::make_shared<UnassociatedImage>(std::move(image_));
+RasterBucket::RasterBucket(PremultipliedImage&& image_) {
+    image = std::make_shared<PremultipliedImage>(std::move(image_));
 }
 
-RasterBucket::RasterBucket(std::shared_ptr<UnassociatedImage> image_): image(image_) {
+RasterBucket::RasterBucket(std::shared_ptr<PremultipliedImage> image_): image(image_) {
 
 }
 void RasterBucket::upload(gl::Context& context) {
@@ -40,7 +40,7 @@ void RasterBucket::clear() {
     uploaded = false;
 }
 
-void RasterBucket::setImage(std::shared_ptr<UnassociatedImage> image_) {
+void RasterBucket::setImage(std::shared_ptr<PremultipliedImage> image_) {
     image = std::move(image_);
     texture = {};
     uploaded = false;

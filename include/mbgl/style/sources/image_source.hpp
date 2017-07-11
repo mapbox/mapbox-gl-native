@@ -18,7 +18,7 @@ public:
     optional<std::string> getURL() const;
     void setURL(const std::string& url);
 
-    void setImage(UnassociatedImage&&);
+    void setImage(PremultipliedImage&&);
 
     void setCoordinates(const std::array<LatLng, 4>&);
     std::array<LatLng, 4> getCoordinates() const;

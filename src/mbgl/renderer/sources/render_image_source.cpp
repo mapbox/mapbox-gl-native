@@ -82,7 +82,7 @@ void RenderImageSource::update(Immutable<style::Source::Impl> baseImpl_,
     std::swap(baseImpl, baseImpl_);
 
     auto coords = impl().getCoordinates();
-    std::shared_ptr<UnassociatedImage> image = impl().getImage();
+    std::shared_ptr<PremultipliedImage> image = impl().getImage();
 
     if (!image || !image->valid()) {
         enabled = false;
