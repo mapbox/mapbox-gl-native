@@ -2697,10 +2697,7 @@
 			baseConfigurationReference = 55D8C9941D0F133500F42F10 /* config.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
-				HEADER_SEARCH_PATHS = (
-					"$(mbgl_core_INCLUDE_DIRECTORIES)",
-					"$(polylabel_INCLUDE_DIRECTORIES)",
-				);
+				HEADER_SEARCH_PATHS = "$(mbgl_core_INCLUDE_DIRECTORIES)";
 				INFOPLIST_FILE = test/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
@@ -2724,10 +2721,7 @@
 			baseConfigurationReference = 55D8C9941D0F133500F42F10 /* config.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
-				HEADER_SEARCH_PATHS = (
-					"$(mbgl_core_INCLUDE_DIRECTORIES)",
-					"$(polylabel_INCLUDE_DIRECTORIES)",
-				);
+				HEADER_SEARCH_PATHS = "$(mbgl_core_INCLUDE_DIRECTORIES)";
 				INFOPLIST_FILE = test/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
@@ -2755,10 +2749,7 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				HEADER_SEARCH_PATHS = (
-					"$(mbgl_core_INCLUDE_DIRECTORIES)",
-					"$(polylabel_INCLUDE_DIRECTORIES)",
-				);
+				HEADER_SEARCH_PATHS = "$(mbgl_core_INCLUDE_DIRECTORIES)";
 				INFOPLIST_FILE = framework/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
@@ -2792,10 +2783,7 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				HEADER_SEARCH_PATHS = (
-					"$(mbgl_core_INCLUDE_DIRECTORIES)",
-					"$(polylabel_INCLUDE_DIRECTORIES)",
-				);
+				HEADER_SEARCH_PATHS = "$(mbgl_core_INCLUDE_DIRECTORIES)";
 				INFOPLIST_FILE = framework/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
@@ -2846,10 +2834,7 @@
 			baseConfigurationReference = 55D8C9941D0F133500F42F10 /* config.xcconfig */;
 			buildSettings = {
 				BITCODE_GENERATION_MODE = bitcode;
-				HEADER_SEARCH_PATHS = (
-					"$(mbgl_core_INCLUDE_DIRECTORIES)",
-					"$(polylabel_INCLUDE_DIRECTORIES)",
-				);
+				HEADER_SEARCH_PATHS = "$(mbgl_core_INCLUDE_DIRECTORIES)";
 				OTHER_CPLUSPLUSFLAGS = (
 					"$(OTHER_CFLAGS)",
 					"$(sqlite_cflags)",
@@ -2875,10 +2860,7 @@
 			baseConfigurationReference = 55D8C9941D0F133500F42F10 /* config.xcconfig */;
 			buildSettings = {
 				BITCODE_GENERATION_MODE = bitcode;
-				HEADER_SEARCH_PATHS = (
-					"$(mbgl_core_INCLUDE_DIRECTORIES)",
-					"$(polylabel_INCLUDE_DIRECTORIES)",
-				);
+				HEADER_SEARCH_PATHS = "$(mbgl_core_INCLUDE_DIRECTORIES)";
 				OTHER_CPLUSPLUSFLAGS = (
 					"$(OTHER_CFLAGS)",
 					"$(sqlite_cflags)",
