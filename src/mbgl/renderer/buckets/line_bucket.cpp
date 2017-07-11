@@ -379,6 +379,7 @@ void LineBucket::addGeometry(const GeometryCoordinates& coordinates, FeatureType
     assert(segment.vertexLength <= std::numeric_limits<uint16_t>::max());
     uint16_t index = segment.vertexLength;
 
+    triangles.reserve(triangles.indexSize() + triangleStore.size());
     for (const auto& triangle : triangleStore) {
         triangles.emplace_back(index + triangle.a, index + triangle.b, index + triangle.c);
     }
