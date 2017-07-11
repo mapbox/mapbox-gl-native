@@ -40,6 +40,7 @@ public:
     // Layout
     AlignmentType pitchAlignment;
     AlignmentType rotationAlignment;
+    bool keepUpright;
 
     // Paint
     std::array<float, 2> translate;
@@ -47,6 +48,8 @@ public:
 
     bool hasHalo;
     bool hasFill;
+    
+    float maxCameraDistance; // 1.5 for road labels, or 10 (essentially infinite) for everything else
 };
 
 } // namespace style

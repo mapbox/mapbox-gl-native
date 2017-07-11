@@ -11,6 +11,7 @@ const float PI = 3.141592653589793;
 
 attribute vec4 a_pos_offset;
 attribute vec4 a_data;
+attribute vec3 a_projected_pos;
 
 // contents of a_size vary based on the type of property value
 // used for {text,icon}-size.
@@ -18,14 +19,11 @@ attribute vec4 a_data;
 // For source functions, we bind only one value per vertex: the value of {text,icon}-size evaluated for the current feature.
 // For composite functions:
 // [ text-size(lowerZoomStop, feature),
-//   text-size(upperZoomStop, feature),
-//   layoutSize == text-size(layoutZoomLevel, feature) ]
-attribute vec3 a_size;
+//   text-size(upperZoomStop, feature) ]
 uniform bool u_is_size_zoom_constant;
 uniform bool u_is_size_feature_constant;
-uniform mediump float u_size_t; // used to interpolate between zoom stops when size is a composite function
-uniform mediump float u_size; // used when size is both zoom and feature constant
-uniform mediump float u_layout_size; // used when size is feature constant
+uniform highp float u_size_t; // used to interpolate between zoom stops when size is a composite function
+uniform highp float u_size; // used when size is both zoom and feature constant
 
 
 #ifndef HAS_UNIFORM_u_fill_color
@@ -68,17 +66,15 @@ varying lowp float halo_blur;
 uniform lowp float u_halo_blur;
 #endif
 
-// matrix is for the vertex position.
 uniform mat4 u_matrix;
+uniform mat4 u_label_plane_matrix;
+uniform mat4 u_gl_coord_matrix;
 
 uniform bool u_is_text;
-uniform mediump float u_zoom;
-uniform bool u_rotate_with_map;
 uniform bool u_pitch_with_map;
-uniform mediump float u_pitch;
-uniform mediump float u_bearing;
-uniform mediump float u_aspect_ratio;
-uniform vec2 u_extrude_scale;
+uniform highp float u_pitch;
+uniform highp float u_camera_to_center_distance;
+uniform highp float u_collision_y_stretch;
 
 uniform vec2 u_texsize;
 
@@ -121,94 +117,71 @@ void main() {
     vec2 a_offset = a_pos_offset.zw;
 
     vec2 a_tex = a_data.xy;
+    vec2 a_size = a_data.zw;
 
-    mediump vec2 label_data = unpack_float(a_data[2]);
-    mediump float a_labelminzoom = label_data[0];
-    mediump float a_labelangle = label_data[1];
-
-    mediump vec2 a_zoom = unpack_float(a_data[3]);
-    mediump float a_minzoom = a_zoom[0];
-    mediump float a_maxzoom = a_zoom[1];
+    highp vec2 angle_labelminzoom = unpack_float(a_projected_pos[2]);
+    highp float segment_angle = -angle_labelminzoom[0] / 255.0 * 2.0 * PI;
+    mediump float a_labelminzoom = angle_labelminzoom[1];
     float size;
 
-    // In order to accommodate placing labels around corners in
-    // symbol-placement: line, each glyph in a label could have multiple
-    // "quad"s only one of which should be shown at a given zoom level.
-    // The min/max zoom assigned to each quad is based on the font size at
-    // the vector tile's zoom level, which might be different than at the
-    // currently rendered zoom level if text-size is zoom-dependent.
-    // Thus, we compensate for this difference by calculating an adjustment
-    // based on the scale of rendered text size relative to layout text size.
-    mediump float layoutSize;
     if (!u_is_size_zoom_constant && !u_is_size_feature_constant) {
         size = mix(a_size[0], a_size[1], u_size_t) / 10.0;
-        layoutSize = a_size[2] / 10.0;
     } else if (u_is_size_zoom_constant && !u_is_size_feature_constant) {
         size = a_size[0] / 10.0;
-        layoutSize = size;
     } else if (!u_is_size_zoom_constant && u_is_size_feature_constant) {
         size = u_size;
-        layoutSize = u_layout_size;
     } else {
         size = u_size;
-        layoutSize = u_size;
     }
+
+    vec4 projectedPoint = u_matrix * vec4(a_pos, 0, 1);
+    highp float camera_to_anchor_distance = projectedPoint.w;
+    // If the label is pitched with the map, layout is done in pitched space,
+    // which makes labels in the distance smaller relative to viewport space.
+    // We counteract part of that effect by multiplying by the perspective ratio.
+    // If the label isn't pitched with the map, we do layout in viewport space,
+    // which makes labels in the distance larger relative to the features around
+    // them. We counteract part of that effect by dividing by the perspective ratio.
+    highp float distance_ratio = u_pitch_with_map ?
+        camera_to_anchor_distance / u_camera_to_center_distance :
+        u_camera_to_center_distance / camera_to_anchor_distance;
+    highp float perspective_ratio = 0.5 + 0.5 * distance_ratio;
+
+    size *= perspective_ratio;
 
     float fontScale = u_is_text ? size / 24.0 : size;
 
-    mediump float zoomAdjust = log2(size / layoutSize);
-    mediump float adjustedZoom = (u_zoom - zoomAdjust) * 10.0;
-    // result: z = 0 if a_minzoom <= adjustedZoom < a_maxzoom, and 1 otherwise
-    // Used below to move the vertex out of the clip space for when the current
-    // zoom is out of the glyph's zoom range.
-    mediump float z = 2.0 - step(a_minzoom, adjustedZoom) - (1.0 - step(a_maxzoom, adjustedZoom));
+    highp float angle_sin = sin(segment_angle);
+    highp float angle_cos = cos(segment_angle);
+    mat2 rotation_matrix = mat2(angle_cos, -1.0 * angle_sin, angle_sin, angle_cos);
 
-    // pitch-alignment: map
-    // rotation-alignment: map | viewport
-    if (u_pitch_with_map) {
-        lowp float angle = u_rotate_with_map ? (a_labelangle / 256.0 * 2.0 * PI) : u_bearing;
-        lowp float asin = sin(angle);
-        lowp float acos = cos(angle);
-        mat2 RotationMatrix = mat2(acos, asin, -1.0 * asin, acos);
-        vec2 offset = RotationMatrix * a_offset;
-        vec2 extrude = fontScale * u_extrude_scale * (offset / 64.0);
-        gl_Position = u_matrix * vec4(a_pos + extrude, 0, 1);
-        gl_Position.z += z * gl_Position.w;
-    // pitch-alignment: viewport
-    // rotation-alignment: map
-    } else if (u_rotate_with_map) {
-        // foreshortening factor to apply on pitched maps
-        // as a label goes from horizontal <=> vertical in angle
-        // it goes from 0% foreshortening to up to around 70% foreshortening
-        lowp float pitchfactor = 1.0 - cos(u_pitch * sin(u_pitch * 0.75));
-
-        lowp float lineangle = a_labelangle / 256.0 * 2.0 * PI;
-
-        // use the lineangle to position points a,b along the line
-        // project the points and calculate the label angle in projected space
-        // this calculation allows labels to be rendered unskewed on pitched maps
-        vec4 a = u_matrix * vec4(a_pos, 0, 1);
-        vec4 b = u_matrix * vec4(a_pos + vec2(cos(lineangle),sin(lineangle)), 0, 1);
-        lowp float angle = atan((b[1]/b[3] - a[1]/a[3])/u_aspect_ratio, b[0]/b[3] - a[0]/a[3]);
-        lowp float asin = sin(angle);
-        lowp float acos = cos(angle);
-        mat2 RotationMatrix = mat2(acos, -1.0 * asin, asin, acos);
-
-        vec2 offset = RotationMatrix * (vec2((1.0-pitchfactor)+(pitchfactor*cos(angle*2.0)), 1.0) * a_offset);
-        vec2 extrude = fontScale * u_extrude_scale * (offset / 64.0);
-        gl_Position = u_matrix * vec4(a_pos, 0, 1) + vec4(extrude, 0, 0);
-        gl_Position.z += z * gl_Position.w;
-    // pitch-alignment: viewport
-    // rotation-alignment: viewport
-    } else {
-        vec2 extrude = fontScale * u_extrude_scale * (a_offset / 64.0);
-        gl_Position = u_matrix * vec4(a_pos, 0, 1) + vec4(extrude, 0, 0);
-    }
-
+    vec4 projected_pos = u_label_plane_matrix * vec4(a_projected_pos.xy, 0.0, 1.0);
+    gl_Position = u_gl_coord_matrix * vec4(projected_pos.xy / projected_pos.w + rotation_matrix * (a_offset / 64.0 * fontScale), 0.0, 1.0);
     float gamma_scale = gl_Position.w;
 
     vec2 tex = a_tex / u_texsize;
-    vec2 fade_tex = vec2(a_labelminzoom / 255.0, 0.0);
+    // incidence_stretch is the ratio of how much y space a label takes up on a tile while drawn perpendicular to the viewport vs
+    //  how much space it would take up if it were drawn flat on the tile
+    // Using law of sines, camera_to_anchor/sin(ground_angle) = camera_to_center/sin(incidence_angle)
+    // sin(incidence_angle) = 1/incidence_stretch
+    // Incidence angle 90 -> head on, sin(incidence_angle) = 1, no incidence stretch
+    // Incidence angle 1 -> very oblique, sin(incidence_angle) =~ 0, lots of incidence stretch
+    // ground_angle = u_pitch + PI/2 -> sin(ground_angle) = cos(u_pitch)
+    // This 2D calculation is only exactly correct when gl_Position.x is in the center of the viewport,
+    //  but it's a close enough approximation for our purposes
+    highp float incidence_stretch  = camera_to_anchor_distance / (u_camera_to_center_distance * cos(u_pitch));
+    // incidence_stretch only applies to the y-axis, but without re-calculating the collision tile, we can't
+    // adjust the size of only one axis. So, we do a crude approximation at placement time to get the aspect ratio
+    // about right, and then do the rest of the adjustment here: there will be some extra padding on the x-axis,
+    // but hopefully not too much.
+    // Never make the adjustment less than 1.0: instead of allowing collisions on the x-axis, be conservative on
+    // the y-axis.
+    highp float collision_adjustment = max(1.0, incidence_stretch / u_collision_y_stretch);
+
+    // Floor to 1/10th zoom to dodge precision issues that can cause partially hidden labels
+    highp float collision_perspective_ratio = 1.0 + 0.5*((camera_to_anchor_distance / u_camera_to_center_distance) - 1.0);
+    highp float perspective_zoom_adjust = floor(log2(collision_perspective_ratio * collision_adjustment) * 10.0);
+    vec2 fade_tex = vec2((a_labelminzoom + perspective_zoom_adjust) / 255.0, 0.0);
 
     v_data0 = vec4(tex.x, tex.y, fade_tex.x, fade_tex.y);
     v_data1 = vec2(gamma_scale, size);

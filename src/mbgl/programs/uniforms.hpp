@@ -14,6 +14,7 @@ MBGL_DEFINE_UNIFORM_SCALAR(Color, u_color);
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_blur);
 
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_zoom);
+MBGL_DEFINE_UNIFORM_SCALAR(float, u_collision_y_stretch);
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_pitch);
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_bearing);
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_radius);
@@ -49,6 +50,7 @@ MBGL_DEFINE_UNIFORM_VECTOR(float, 2, u_pixel_coord_lower);
 
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_mix);
 MBGL_DEFINE_UNIFORM_SCALAR(gl::TextureUnit, u_image);
+MBGL_DEFINE_UNIFORM_SCALAR(gl::TextureUnit, u_fadetexture);
 MBGL_DEFINE_UNIFORM_SCALAR(float,    u_scale_a);
 MBGL_DEFINE_UNIFORM_SCALAR(float,    u_scale_b);
 MBGL_DEFINE_UNIFORM_SCALAR(float,    u_tile_units_to_pixels);

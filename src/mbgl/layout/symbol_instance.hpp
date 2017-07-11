@@ -13,7 +13,7 @@ class IndexedSubfeature;
 class SymbolInstance {
 public:
     SymbolInstance(Anchor& anchor,
-                   const GeometryCoordinates& line,
+                   GeometryCoordinates line,
                    const std::pair<Shaping, Shaping>& shapedTextOrientations,
                    optional<PositionedIcon> shapedIcon,
                    const style::SymbolLayoutProperties::Evaluated&,
@@ -23,14 +23,17 @@ public:
                    const float textBoxScale,
                    const float textPadding,
                    style::SymbolPlacementType textPlacement,
+                   const std::array<float, 2> textOffset,
                    const float iconBoxScale,
                    const float iconPadding,
                    style::SymbolPlacementType iconPlacement,
+                   const std::array<float, 2> iconOffset,
                    const GlyphPositionMap&,
                    const IndexedSubfeature&,
                    const std::size_t featureIndex);
 
-    Point<float> point;
+    Anchor anchor;
+    GeometryCoordinates line;
     uint32_t index;
     bool hasText;
     bool hasIcon;
@@ -40,6 +43,8 @@ public:
     CollisionFeature iconCollisionFeature;
     WritingModeType writingModes;
     std::size_t featureIndex;
+    std::array<float, 2> textOffset;
+    std::array<float, 2> iconOffset;
 };
 
 } // namespace mbgl

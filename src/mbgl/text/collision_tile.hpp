@@ -49,8 +49,8 @@ public:
 
     const PlacementConfig config;
 
-    const float minScale = 0.5f;
-    const float maxScale = 2.0f;
+    float minScale = 0.5f;
+    float maxScale = 2.0f;
     float yStretch;
 
     std::array<float, 4> rotationMatrix;
@@ -58,12 +58,14 @@ public:
 
 private:
     float findPlacementScale(
-            const Point<float>& anchor, const CollisionBox& box,
+            const Point<float>& anchor, const CollisionBox& box, const float boxMaxScale,
             const Point<float>& blockingAnchor, const CollisionBox& blocking);
     Box getTreeBox(const Point<float>& anchor, const CollisionBox& box, const float scale = 1.0);
 
     Tree tree;
     Tree ignoredTree;
+    
+    float perspectiveRatio;
 };
 
 } // namespace mbgl
