@@ -332,6 +332,22 @@ void SymbolLayer::setIconOffset(DataDrivenPropertyValue<std::array<float, 2>> va
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
+PropertyValue<AlignmentType> SymbolLayer::getDefaultIconPitchAlignment() {
+    return IconPitchAlignment::defaultValue();
+}
+
+PropertyValue<AlignmentType> SymbolLayer::getIconPitchAlignment() const {
+    return impl().layout.get<IconPitchAlignment>();
+}
+
+void SymbolLayer::setIconPitchAlignment(PropertyValue<AlignmentType> value) {
+    if (value == getIconPitchAlignment())
+        return;
+    auto impl_ = mutableImpl();
+    impl_->layout.get<IconPitchAlignment>() = value;
+    baseImpl = std::move(impl_);
+    observer->onLayerChanged(*this);
+}
 PropertyValue<AlignmentType> SymbolLayer::getDefaultTextPitchAlignment() {
     return TextPitchAlignment::defaultValue();
 }

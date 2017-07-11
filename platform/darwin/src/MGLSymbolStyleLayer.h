@@ -8,6 +8,27 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /**
+ Orientation of icon when map is pitched.
+
+ Values of this type are used in the `MGLSymbolStyleLayer.iconPitchAlignment`
+ property.
+ */
+typedef NS_ENUM(NSUInteger, MGLIconPitchAlignment) {
+    /**
+     The icon is aligned to the plane of the map.
+     */
+    MGLIconPitchAlignmentMap,
+    /**
+     The icon is aligned to the plane of the viewport.
+     */
+    MGLIconPitchAlignmentViewport,
+    /**
+     Automatically matches the value of `iconRotationAlignment`.
+     */
+    MGLIconPitchAlignmentAuto,
+};
+
+/**
  In combination with `symbolPlacement`, determines the rotation behavior of
  icons.
 
@@ -475,6 +496,24 @@ MGL_EXPORT
    * `MGLInterpolationModeInterval`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconPadding;
+
+/**
+ Orientation of icon when map is pitched.
+ 
+ The default value of this property is an `MGLStyleValue` object containing an
+ `NSValue` object containing `MGLIconPitchAlignmentAuto`. Set this property to
+ `nil` to reset it to the default value.
+ 
+ This property is only applied to the style if `iconImageName` is non-`nil`.
+ Otherwise, it is ignored.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLConstantStyleValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of
+ `MGLInterpolationModeInterval`
+ */
+@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *iconPitchAlignment;
 
 /**
  Rotates the icon clockwise.
@@ -1923,6 +1962,19 @@ MGL_EXPORT
 @interface NSValue (MGLSymbolStyleLayerAdditions)
 
 #pragma mark Working with Symbol Style Layer Attribute Values
+
+/**
+ Creates a new value object containing the given `MGLIconPitchAlignment` enumeration.
+
+ @param iconPitchAlignment The value for the new object.
+ @return A new value object that contains the enumeration value.
+ */
++ (instancetype)valueWithMGLIconPitchAlignment:(MGLIconPitchAlignment)iconPitchAlignment;
+
+/**
+ The `MGLIconPitchAlignment` enumeration representation of the value.
+ */
+@property (readonly) MGLIconPitchAlignment MGLIconPitchAlignmentValue;
 
 /**
  Creates a new value object containing the given `MGLIconRotationAlignment` enumeration.

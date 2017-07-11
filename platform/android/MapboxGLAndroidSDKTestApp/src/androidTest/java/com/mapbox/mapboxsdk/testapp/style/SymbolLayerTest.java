@@ -1214,6 +1214,54 @@ public class SymbolLayerTest extends BaseActivityTest {
   }
 
   @Test
+  public void testIconPitchAlignmentAsConstant() {
+    validateTestSetup();
+    setupLayer();
+    Timber.i("icon-pitch-alignment");
+    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
+      @Override
+      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
+        assertNotNull(layer);
+
+        // Set and Get
+        layer.setProperties(iconPitchAlignment(ICON_PITCH_ALIGNMENT_MAP));
+        assertEquals((String) layer.getIconPitchAlignment().getValue(), (String) ICON_PITCH_ALIGNMENT_MAP);
+      }
+    });
+  }
+
+  @Test
+  public void testIconPitchAlignmentAsCameraFunction() {
+    validateTestSetup();
+    setupLayer();
+    Timber.i("icon-pitch-alignment");
+    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
+      @Override
+      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
+        assertNotNull(layer);
+
+        // Set
+        layer.setProperties(
+          iconPitchAlignment(
+            zoom(
+              interval(
+                stop(2, iconPitchAlignment(ICON_PITCH_ALIGNMENT_MAP))
+              )
+            )
+          )
+        );
+
+        // Verify
+        assertNotNull(layer.getIconPitchAlignment());
+        assertNotNull(layer.getIconPitchAlignment().getFunction());
+        assertEquals(CameraFunction.class, layer.getIconPitchAlignment().getFunction().getClass());
+        assertEquals(IntervalStops.class, layer.getIconPitchAlignment().getFunction().getStops().getClass());
+        assertEquals(1, ((IntervalStops) layer.getIconPitchAlignment().getFunction().getStops()).size());
+      }
+    });
+  }
+
+  @Test
   public void testTextPitchAlignmentAsConstant() {
     validateTestSetup();
     setupLayer();

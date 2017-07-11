@@ -1052,11 +1052,16 @@ public class CircleLayerTest extends BaseActivityTest {
     validateTestSetup();
     setupLayer();
     Timber.i("circle-pitch-alignment");
-    assertNotNull(layer);
+    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
+      @Override
+      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
+        assertNotNull(layer);
 
-    // Set and Get
-    layer.setProperties(circlePitchAlignment(CIRCLE_PITCH_ALIGNMENT_MAP));
-    assertEquals((String) layer.getCirclePitchAlignment().getValue(), (String) CIRCLE_PITCH_ALIGNMENT_MAP);
+        // Set and Get
+        layer.setProperties(circlePitchAlignment(CIRCLE_PITCH_ALIGNMENT_MAP));
+        assertEquals((String) layer.getCirclePitchAlignment().getValue(), (String) CIRCLE_PITCH_ALIGNMENT_MAP);
+      }
+    });
   }
 
   @Test
@@ -1064,25 +1069,30 @@ public class CircleLayerTest extends BaseActivityTest {
     validateTestSetup();
     setupLayer();
     Timber.i("circle-pitch-alignment");
-    assertNotNull(layer);
+    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
+      @Override
+      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
+        assertNotNull(layer);
 
-    // Set
-    layer.setProperties(
-      circlePitchAlignment(
-        zoom(
-          interval(
-            stop(2, circlePitchAlignment(CIRCLE_PITCH_ALIGNMENT_MAP))
+        // Set
+        layer.setProperties(
+          circlePitchAlignment(
+            zoom(
+              interval(
+                stop(2, circlePitchAlignment(CIRCLE_PITCH_ALIGNMENT_MAP))
+              )
+            )
           )
-        )
-      )
-    );
+        );
 
-    // Verify
-    assertNotNull(layer.getCirclePitchAlignment());
-    assertNotNull(layer.getCirclePitchAlignment().getFunction());
-    assertEquals(CameraFunction.class, layer.getCirclePitchAlignment().getFunction().getClass());
-    assertEquals(IntervalStops.class, layer.getCirclePitchAlignment().getFunction().getStops().getClass());
-    assertEquals(1, ((IntervalStops) layer.getCirclePitchAlignment().getFunction().getStops()).size());
+        // Verify
+        assertNotNull(layer.getCirclePitchAlignment());
+        assertNotNull(layer.getCirclePitchAlignment().getFunction());
+        assertEquals(CameraFunction.class, layer.getCirclePitchAlignment().getFunction().getClass());
+        assertEquals(IntervalStops.class, layer.getCirclePitchAlignment().getFunction().getStops().getClass());
+        assertEquals(1, ((IntervalStops) layer.getCirclePitchAlignment().getFunction().getStops()).size());
+      }
+    });
   }
 
   @Test

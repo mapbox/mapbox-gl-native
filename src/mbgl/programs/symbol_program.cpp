@@ -52,6 +52,11 @@ Values makeValues(const bool isText,
     const float pixelsToTileUnits = tile.id.pixelsToTileUnits(1.0, state.getZoom());
     const bool pitchWithMap = values.pitchAlignment == style::AlignmentType::Map;
     const bool rotateWithMap = values.rotationAlignment == style::AlignmentType::Map;
+    
+    // Line label rotation happens in `updateLineLabels`
+    // Pitched point labels are automatically rotated by the labelPlaneMatrix projection
+    // Unpitched point labels need to have their rotation applied after projection
+    const bool rotateInShader = rotateWithMap && !pitchWithMap && !alongLine;
 
     mat4 labelPlaneMatrix;
     if (alongLine) {
@@ -84,6 +89,8 @@ Values makeValues(const bool isText,
         uniforms::u_pitch::Value{ state.getPitch() },
         uniforms::u_pitch_with_map::Value{ pitchWithMap },
         uniforms::u_max_camera_distance::Value{ values.maxCameraDistance },
+        uniforms::u_rotate_symbol::Value{ rotateInShader },
+        uniforms::u_aspect_ratio::Value{ state.getSize().aspectRatio() },
         std::forward<Args>(args)...
     };
 }

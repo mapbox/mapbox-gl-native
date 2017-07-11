@@ -1882,6 +1882,29 @@ public class PropertyFactory {
   }
 
   /**
+   * Orientation of icon when map is pitched.
+   *
+   * @param value a String value
+   * @return property wrapper around String
+   */
+  public static PropertyValue<String> iconPitchAlignment(@Property.ICON_PITCH_ALIGNMENT String value) {
+    return new LayoutPropertyValue<>("icon-pitch-alignment", value);
+  }
+
+
+
+  /**
+   * Orientation of icon when map is pitched.
+   *
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for String
+   * @return property wrapper around a String function
+   */
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, String>> iconPitchAlignment(CameraFunction<Z, String> function) {
+    return new LayoutPropertyValue<>("icon-pitch-alignment", function);
+  }
+
+  /**
    * Orientation of text when map is pitched.
    *
    * @param value a String value

@@ -82,7 +82,7 @@ style::TextPaintProperties::PossiblyEvaluated RenderSymbolLayer::textPaintProper
 
 style::SymbolPropertyValues RenderSymbolLayer::iconPropertyValues(const style::SymbolLayoutProperties::PossiblyEvaluated& layout_) const {
     return style::SymbolPropertyValues {
-            layout_.get<style::IconRotationAlignment>(), // icon-pitch-alignment is not yet implemented; inherit the rotation alignment
+            layout_.get<style::IconPitchAlignment>(),
             layout_.get<style::IconRotationAlignment>(),
             layout_.get<style::IconKeepUpright>(),
             evaluated.get<style::IconTranslate>(),

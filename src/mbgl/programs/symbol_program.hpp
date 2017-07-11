@@ -41,6 +41,8 @@ MBGL_DEFINE_UNIFORM_SCALAR(bool, u_is_size_feature_constant);
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_size_t);
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_size);
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_max_camera_distance);
+MBGL_DEFINE_UNIFORM_SCALAR(bool, u_rotate_symbol);
+MBGL_DEFINE_UNIFORM_SCALAR(float, u_aspect_ratio);
 } // namespace uniforms
 
 struct SymbolLayoutAttributes : gl::Attributes<
@@ -348,7 +350,9 @@ class SymbolIconProgram : public SymbolProgram<
         uniforms::u_camera_to_center_distance,
         uniforms::u_pitch,
         uniforms::u_pitch_with_map,
-        uniforms::u_max_camera_distance>,
+        uniforms::u_max_camera_distance,
+        uniforms::u_rotate_symbol,
+        uniforms::u_aspect_ratio>,
     style::IconPaintProperties>
 {
 public:
@@ -387,6 +391,8 @@ class SymbolSDFProgram : public SymbolProgram<
         uniforms::u_pitch,
         uniforms::u_pitch_with_map,
         uniforms::u_max_camera_distance,
+        uniforms::u_rotate_symbol,
+        uniforms::u_aspect_ratio,
         uniforms::u_gamma_scale,
         uniforms::u_is_halo>,
     PaintProperties>
@@ -409,6 +415,8 @@ public:
             uniforms::u_pitch,
             uniforms::u_pitch_with_map,            
             uniforms::u_max_camera_distance,
+            uniforms::u_rotate_symbol,
+            uniforms::u_aspect_ratio,
             uniforms::u_gamma_scale,
             uniforms::u_is_halo>,
         PaintProperties>;
