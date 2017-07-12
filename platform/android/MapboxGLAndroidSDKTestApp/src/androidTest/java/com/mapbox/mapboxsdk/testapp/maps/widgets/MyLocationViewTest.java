@@ -106,7 +106,7 @@ public class MyLocationViewTest extends BaseActivityTest {
         mapboxMap.moveCamera(
           CameraUpdateFactory.newCameraPosition(
             new CameraPosition.Builder()
-              .target(new LatLng(Mapbox.getLocationSource().getLastLocation()))
+              .target(new LatLng(Mapbox.getLocationEngine().getLastLocation()))
               .build()
           )
         );
