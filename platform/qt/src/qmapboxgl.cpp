@@ -1027,7 +1027,7 @@ void QMapboxGL::resize(const QSize& size, const QSize& framebufferSize)
 }
 
 /*!
-    If Mapbox GL needs to rebind the default framebuffer, it will use the
+    If Mapbox GL needs to rebind the default \a fbo, it will use the
     ID supplied here.
 */
 void QMapboxGL::setFramebufferObject(quint32 fbo) {
@@ -1426,10 +1426,10 @@ void QMapboxGL::setFilter(const QString& layer, const QVariant& filter)
 }
 
 /*!
-    Renders the map using OpenGL draw calls. If \a fbo is passed, it will
-    make sure to bind the framebuffer object before drawing; otherwise a
-    valid OpenGL context is expected with an appropriate OpenGL viewport state set
-    for the size of the canvas.
+    Renders the map using OpenGL draw calls. It will make sure to bind the
+    framebuffer object before drawing; otherwise a valid OpenGL context is
+    expected with an appropriate OpenGL viewport state set for the size of
+    the canvas.
 
     This function should be called only after the signal needsRendering() is
     emitted at least once.
