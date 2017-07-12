@@ -19,4 +19,7 @@ set(MBGL_BENCHMARK_FILES
     benchmark/src/mbgl/benchmark/benchmark.cpp
     benchmark/src/mbgl/benchmark/util.cpp
     benchmark/src/mbgl/benchmark/util.hpp
+
+    # util
+    benchmark/util/dtoa.benchmark.cpp
 )
