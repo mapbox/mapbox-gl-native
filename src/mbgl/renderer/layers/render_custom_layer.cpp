@@ -48,7 +48,7 @@ void RenderCustomLayer::render(Painter& painter, PaintParameters& paintParameter
     const TransformState& state = painter.state;
 
     // Reset GL state to a known state so the CustomLayer always has a clean slate.
-    context.vertexArrayObject = 0;
+    context.bindVertexArray = 0;
     context.setDepthMode(painter.depthModeForSublayer(0, gl::DepthMode::ReadOnly));
     context.setStencilMode(gl::StencilMode::disabled());
     context.setColorMode(painter.colorModeForRenderPass());

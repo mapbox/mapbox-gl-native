@@ -5,14 +5,15 @@
 #include <mbgl/gl/context.hpp>
 #include <mbgl/gl/vertex_buffer.hpp>
 #include <mbgl/gl/index_buffer.hpp>
+#include <mbgl/gl/vertex_array.hpp>
 #include <mbgl/gl/attribute.hpp>
 #include <mbgl/gl/uniform.hpp>
 
 #include <mbgl/util/io.hpp>
+#include <mbgl/util/logging.hpp>
 #include <mbgl/programs/binary_program.hpp>
 #include <mbgl/programs/program_parameters.hpp>
 #include <mbgl/shaders/shaders.hpp>
-
 
 #include <string>
 
@@ -51,15 +52,13 @@ public:
                                  const char* name,
                                  const char* vertexSource_,
                                  const char* fragmentSource_) {
+        const std::string vertexSource = shaders::vertexSource(programParameters, vertexSource_);
+        const std::string fragmentSource = shaders::fragmentSource(programParameters, fragmentSource_);
+
 #if MBGL_HAS_BINARY_PROGRAMS
         optional<std::string> cachePath = programParameters.cachePath(name);
         if (cachePath && context.supportsProgramBinaries()) {
-            const std::string vertexSource =
-                shaders::vertexSource(programParameters, vertexSource_);
-            const std::string fragmentSource =
-                shaders::fragmentSource(programParameters, fragmentSource_);
-            const std::string identifier =
-                shaders::programIdentifier(vertexSource, fragmentSource_);
+            const std::string identifier = shaders::programIdentifier(vertexSource, fragmentSource);
 
             try {
                 if (auto cachedBinaryProgram = util::readFile(*cachePath)) {
@@ -93,11 +92,9 @@ public:
             return std::move(result);
         }
 #endif
+
         (void)name;
-        return Program {
-            context, shaders::vertexSource(programParameters, vertexSource_),
-            shaders::fragmentSource(programParameters, fragmentSource_)
-        };
+        return Program { context, vertexSource, fragmentSource };
     }
 
     template <class BinaryProgram>
@@ -116,10 +113,12 @@ public:
               DepthMode depthMode,
               StencilMode stencilMode,
               ColorMode colorMode,
-              UniformValues&& uniformValues,
-              AttributeBindings&& attributeBindings,
+              const UniformValues& uniformValues,
+              VertexArray& vertexArray,
+              const AttributeBindings& attributeBindings,
               const IndexBuffer<DrawMode>& indexBuffer,
-              const SegmentVector<Attributes>& segments) {
+              std::size_t indexOffset,
+              std::size_t indexLength) {
         static_assert(std::is_same<Primitive, typename DrawMode::Primitive>::value, "incompatible draw mode");
 
         context.setDrawMode(drawMode);
@@ -129,18 +128,15 @@ public:
 
         context.program = program;
 
-        Uniforms::bind(uniformsState, std::move(uniformValues));
+        Uniforms::bind(uniformsState, uniformValues);
 
-        for (const auto& segment : segments) {
-            segment.bind(context,
-                         indexBuffer.buffer,
-                         attributeLocations,
-                         attributeBindings);
+        vertexArray.bind(context,
+                        indexBuffer.buffer,
+                        Attributes::toBindingArray(attributeLocations, attributeBindings));
 
-            context.draw(drawMode.primitiveType,
-                         segment.indexOffset,
-                         segment.indexLength);
-        }
+        context.draw(drawMode.primitiveType,
+                     indexOffset,
+                     indexLength);
     }
 
 private:

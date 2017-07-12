@@ -31,7 +31,7 @@ public:
     // Raster Tile Sources use the default buffers from Painter
     gl::VertexVector<RasterLayoutVertex> vertices;
     gl::IndexVector<gl::Triangles> indices;
-    gl::SegmentVector<RasterAttributes> segments;
+    SegmentVector<RasterAttributes> segments;
 
     optional<gl::VertexBuffer<RasterLayoutVertex>> vertexBuffer;
     optional<gl::IndexBuffer<gl::Triangles>> indexBuffer;

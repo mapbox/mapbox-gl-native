@@ -82,7 +82,8 @@ void Painter::renderRaster(PaintParameters& parameters,
         useBucketBuffers ? bucket.segments : rasterSegments,
         paintAttributeData,
         properties,
-        state.getZoom()
+        state.getZoom(),
+        layer.getID()
     );
 }
 

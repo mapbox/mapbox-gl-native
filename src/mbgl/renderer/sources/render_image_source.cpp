@@ -7,6 +7,7 @@
 #include <mbgl/renderer/tile_parameters.hpp>
 #include <mbgl/util/tile_coordinate.hpp>
 #include <mbgl/util/tile_cover.hpp>
+#include <mbgl/util/logging.hpp>
 
 namespace mbgl {
 

@@ -365,6 +365,24 @@ BindVertexArray::Type BindVertexArray::Get(const Context& context) {
     return binding;
 }
 
+const optional<AttributeBinding> VertexAttribute::Default {};
+
+void VertexAttribute::Set(const optional<AttributeBinding>& binding, Context& context, AttributeLocation location) {
+    if (binding) {
+        context.vertexBuffer = binding->vertexBuffer;
+        MBGL_CHECK_ERROR(glEnableVertexAttribArray(location));
+        MBGL_CHECK_ERROR(glVertexAttribPointer(
+            location,
+            static_cast<GLint>(binding->attributeSize),
+            static_cast<GLenum>(binding->attributeType),
+            static_cast<GLboolean>(false),
+            static_cast<GLsizei>(binding->vertexSize),
+            reinterpret_cast<GLvoid*>(binding->attributeOffset + (binding->vertexSize * binding->vertexOffset))));
+    } else {
+        MBGL_CHECK_ERROR(glDisableVertexAttribArray(location));
+    }
+}
+
 const constexpr PixelStorePack::Type PixelStorePack::Default;
 
 void PixelStorePack::Set(const Type& value) {

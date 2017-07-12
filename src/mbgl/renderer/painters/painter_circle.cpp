@@ -52,7 +52,8 @@ void Painter::renderCircle(PaintParameters& parameters,
         bucket.segments,
         bucket.paintPropertyBinders.at(layer.getID()),
         properties,
-        state.getZoom()
+        state.getZoom(),
+        layer.getID()
     );
 }
 

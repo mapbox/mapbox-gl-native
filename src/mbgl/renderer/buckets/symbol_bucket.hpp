@@ -4,7 +4,7 @@
 #include <mbgl/map/mode.hpp>
 #include <mbgl/gl/vertex_buffer.hpp>
 #include <mbgl/gl/index_buffer.hpp>
-#include <mbgl/gl/segment.hpp>
+#include <mbgl/programs/segment.hpp>
 #include <mbgl/programs/symbol_program.hpp>
 #include <mbgl/programs/collision_box_program.hpp>
 #include <mbgl/text/glyph_range.hpp>
@@ -63,7 +63,7 @@ public:
         gl::VertexVector<SymbolLayoutVertex> vertices;
         gl::VertexVector<SymbolDynamicLayoutAttributes::Vertex> dynamicVertices;
         gl::IndexVector<gl::Triangles> triangles;
-        gl::SegmentVector<SymbolTextAttributes> segments;
+        SegmentVector<SymbolTextAttributes> segments;
         std::vector<PlacedSymbol> placedSymbols;
 
         optional<gl::VertexBuffer<SymbolLayoutVertex>> vertexBuffer;
@@ -77,7 +77,7 @@ public:
         gl::VertexVector<SymbolLayoutVertex> vertices;
         gl::VertexVector<SymbolDynamicLayoutAttributes::Vertex> dynamicVertices;
         gl::IndexVector<gl::Triangles> triangles;
-        gl::SegmentVector<SymbolIconAttributes> segments;
+        SegmentVector<SymbolIconAttributes> segments;
         std::vector<PlacedSymbol> placedSymbols;
         PremultipliedImage atlasImage;
 
@@ -89,7 +89,7 @@ public:
     struct CollisionBoxBuffer {
         gl::VertexVector<CollisionBoxVertex> vertices;
         gl::IndexVector<gl::Lines> lines;
-        gl::SegmentVector<CollisionBoxAttributes> segments;
+        SegmentVector<CollisionBoxAttributes> segments;
 
         optional<gl::VertexBuffer<CollisionBoxVertex>> vertexBuffer;
         optional<gl::VertexBuffer<SymbolDynamicLayoutAttributes::Vertex>> dynamicVertexBuffer;
