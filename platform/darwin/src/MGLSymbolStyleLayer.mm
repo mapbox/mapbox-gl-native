@@ -13,6 +13,12 @@
 
 namespace mbgl {
 
+    MBGL_DEFINE_ENUM(MGLIconPitchAlignment, {
+        { MGLIconPitchAlignmentMap, "map" },
+        { MGLIconPitchAlignmentViewport, "viewport" },
+        { MGLIconPitchAlignmentAuto, "auto" },
+    });
+
     MBGL_DEFINE_ENUM(MGLIconRotationAlignment, {
         { MGLIconRotationAlignmentMap, "map" },
         { MGLIconRotationAlignmentViewport, "viewport" },
@@ -257,6 +263,23 @@ namespace mbgl {
         return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(self.rawLayer->getDefaultIconPadding());
     }
     return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(propertyValue);
+}
+
+- (void)setIconPitchAlignment:(MGLStyleValue<NSValue *> *)iconPitchAlignment {
+    MGLAssertStyleLayerIsValid();
+
+    auto mbglValue = MGLStyleValueTransformer<mbgl::style::AlignmentType, NSValue *, mbgl::style::AlignmentType, MGLIconPitchAlignment>().toEnumPropertyValue(iconPitchAlignment);
+    self.rawLayer->setIconPitchAlignment(mbglValue);
+}
+
+- (MGLStyleValue<NSValue *> *)iconPitchAlignment {
+    MGLAssertStyleLayerIsValid();
+
+    auto propertyValue = self.rawLayer->getIconPitchAlignment();
+    if (propertyValue.isUndefined()) {
+        return MGLStyleValueTransformer<mbgl::style::AlignmentType, NSValue *, mbgl::style::AlignmentType, MGLIconPitchAlignment>().toEnumStyleValue(self.rawLayer->getDefaultIconPitchAlignment());
+    }
+    return MGLStyleValueTransformer<mbgl::style::AlignmentType, NSValue *, mbgl::style::AlignmentType, MGLIconPitchAlignment>().toEnumStyleValue(propertyValue);
 }
 
 - (void)setIconRotation:(MGLStyleValue<NSNumber *> *)iconRotation {
@@ -1320,6 +1343,16 @@ namespace mbgl {
 @end
 
 @implementation NSValue (MGLSymbolStyleLayerAdditions)
+
++ (NSValue *)valueWithMGLIconPitchAlignment:(MGLIconPitchAlignment)iconPitchAlignment {
+    return [NSValue value:&iconPitchAlignment withObjCType:@encode(MGLIconPitchAlignment)];
+}
+
+- (MGLIconPitchAlignment)MGLIconPitchAlignmentValue {
+    MGLIconPitchAlignment iconPitchAlignment;
+    [self getValue:&iconPitchAlignment];
+    return iconPitchAlignment;
+}
 
 + (NSValue *)valueWithMGLIconRotationAlignment:(MGLIconRotationAlignment)iconRotationAlignment {
     return [NSValue value:&iconRotationAlignment withObjCType:@encode(MGLIconRotationAlignment)];
