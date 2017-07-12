@@ -216,7 +216,7 @@ Q_DECL_EXPORT NetworkMode networkMode()
 
     Forwards the network status \a mode to Mapbox GL Native engine.
 
-    File source requests uses the available network when \a mode is set to \a
+    File source requests uses the available network when \a mode is set to \b
     Online, otherwise scoped to the local cache.
 */
 Q_DECL_EXPORT void setNetworkMode(NetworkMode mode)
