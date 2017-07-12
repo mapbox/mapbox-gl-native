@@ -70,6 +70,19 @@ namespace {
 
 QThreadStorage<std::shared_ptr<mbgl::util::RunLoop>> loop;
 
+std::shared_ptr<mbgl::DefaultFileSource> sharedDefaultFileSource(
+        const std::string& cachePath, const std::string& assetRoot, uint64_t maximumCacheSize) {
+    static std::weak_ptr<mbgl::DefaultFileSource> weak;
+    auto fs = weak.lock();
+
+    if (!fs) {
+        weak = fs = std::make_shared<mbgl::DefaultFileSource>(
+                cachePath, assetRoot, maximumCacheSize);
+    }
+
+    return fs;
+}
+
 // Conversion helper functions.
 
 mbgl::Size sanitizedSize(const QSize& size) {
@@ -105,6 +118,11 @@ std::unique_ptr<mbgl::style::Image> toStyleImage(const QString &id, const QImage
 
     QMapboxGLSettings is used to configure QMapboxGL at the moment of its creation.
     Once created, the QMapboxGLSettings of a QMapboxGL can no longer be changed.
+
+    Cache-related settings are shared between all QMapboxGL instances because different
+    maps will share the same cache database file. The first map to configure cache properties
+    such as size and path will force the configuration to all newly instantiated QMapboxGL
+    objects.
 
     \since 4.7
 */
@@ -1473,7 +1491,7 @@ QMapboxGLPrivate::QMapboxGLPrivate(QMapboxGL *q, const QMapboxGLSettings &settin
     : QObject(q)
     , size(size_)
     , q_ptr(q)
-    , fileSourceObj(std::make_unique<mbgl::DefaultFileSource>(
+    , fileSourceObj(sharedDefaultFileSource(
         settings.cacheDatabasePath().toStdString(),
         settings.assetPath().toStdString(),
         settings.cacheDatabaseMaximumSize()))

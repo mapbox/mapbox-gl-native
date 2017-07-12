@@ -52,7 +52,7 @@ public:
 
     QMapboxGL *q_ptr { nullptr };
 
-    std::unique_ptr<mbgl::DefaultFileSource> fileSourceObj;
+    std::shared_ptr<mbgl::DefaultFileSource> fileSourceObj;
     std::shared_ptr<mbgl::ThreadPool> threadPool;
     std::unique_ptr<mbgl::Map> mapObj;
 
