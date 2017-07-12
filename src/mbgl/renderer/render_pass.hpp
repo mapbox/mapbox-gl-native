@@ -1,6 +1,7 @@
 #pragma once
 
 #include <mbgl/util/traits.hpp>
+#include <mbgl/util/util.hpp>
 
 #include <cstdint>
 
@@ -12,15 +13,15 @@ enum class RenderPass : uint8_t {
     Translucent = 1 << 1,
 };
 
-constexpr RenderPass operator|(RenderPass a, RenderPass b) {
+MBGL_CONSTEXPR RenderPass operator|(RenderPass a, RenderPass b) {
     return RenderPass(mbgl::underlying_type(a) | mbgl::underlying_type(b));
 }
 
-constexpr RenderPass& operator|=(RenderPass& a, RenderPass b) {
+MBGL_CONSTEXPR RenderPass& operator|=(RenderPass& a, RenderPass b) {
     return (a = a | b);
 }
 
-constexpr RenderPass operator&(RenderPass a, RenderPass b) {
+MBGL_CONSTEXPR RenderPass operator&(RenderPass a, RenderPass b) {
     return RenderPass(mbgl::underlying_type(a) & mbgl::underlying_type(b));
 }
 

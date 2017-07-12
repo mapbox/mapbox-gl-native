@@ -3,6 +3,7 @@
 #include <protozero/pbf_reader.hpp>
 #include <protozero/pbf_writer.hpp>
 #include <utility>
+#include <stdexcept>
 
 template <class Binding>
 static std::pair<const std::string, Binding> parseBinding(protozero::pbf_reader&& pbf) {

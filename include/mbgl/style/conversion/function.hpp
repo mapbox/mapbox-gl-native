@@ -156,7 +156,7 @@ struct StopsConverter<T, variant<Ts...>> {
 public:
     template <class V>
     optional<variant<Ts...>> operator()(const V& value, Error& error) const {
-        std::string type = util::Interpolatable<T> ? "exponential" : "interval";
+        std::string type = util::Interpolatable<T>::value ? "exponential" : "interval";
 
         auto typeValue = objectMember(value, "type");
         if (typeValue && toString(*typeValue)) {

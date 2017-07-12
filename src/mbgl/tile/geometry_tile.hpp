@@ -5,9 +5,11 @@
 #include <mbgl/renderer/image_manager.hpp>
 #include <mbgl/text/glyph_manager.hpp>
 #include <mbgl/text/placement_config.hpp>
+#include <mbgl/text/collision_tile.hpp>
 #include <mbgl/util/feature.hpp>
 #include <mbgl/util/throttler.hpp>
 #include <mbgl/actor/actor.hpp>
+#include <mbgl/geometry/feature_index.hpp>
 
 #include <atomic>
 #include <memory>
@@ -17,8 +19,6 @@
 namespace mbgl {
 
 class GeometryTileData;
-class FeatureIndex;
-class CollisionTile;
 class RenderStyle;
 class RenderLayer;
 class SourceQueryOptions;
@@ -71,6 +71,15 @@ public:
         std::unique_ptr<FeatureIndex> featureIndex;
         std::unique_ptr<GeometryTileData> tileData;
         uint64_t correlationID;
+
+        LayoutResult(std::unordered_map<std::string, std::shared_ptr<Bucket>> nonSymbolBuckets_,
+                     std::unique_ptr<FeatureIndex> featureIndex_,
+                     std::unique_ptr<GeometryTileData> tileData_,
+                     uint64_t correlationID_)
+            : nonSymbolBuckets(std::move(nonSymbolBuckets_)),
+              featureIndex(std::move(featureIndex_)),
+              tileData(std::move(tileData_)),
+              correlationID(correlationID_) {}
     };
     void onLayout(LayoutResult);
 
@@ -81,6 +90,17 @@ public:
         optional<AlphaImage> glyphAtlasImage;
         optional<PremultipliedImage> iconAtlasImage;
         uint64_t correlationID;
+
+        PlacementResult(std::unordered_map<std::string, std::shared_ptr<Bucket>> symbolBuckets_,
+                        std::unique_ptr<CollisionTile> collisionTile_,
+                        optional<AlphaImage> glyphAtlasImage_,
+                        optional<PremultipliedImage> iconAtlasImage_,
+                        uint64_t correlationID_)
+            : symbolBuckets(std::move(symbolBuckets_)),
+              collisionTile(std::move(collisionTile_)),
+              glyphAtlasImage(std::move(glyphAtlasImage_)),
+              iconAtlasImage(std::move(iconAtlasImage_)),
+              correlationID(correlationID_) {}
     };
     void onPlacement(PlacementResult);
 

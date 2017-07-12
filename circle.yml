@@ -11,6 +11,7 @@ workflows:
       - node6-clang39-release
       - node6-clang39-debug
       - linux-clang39-debug
+      - linux-gcc4.9-debug
       - linux-gcc5-debug-coverage
       - linux-gcc5-release-qt4
       - linux-gcc5-release-qt5
@@ -345,6 +346,47 @@ jobs:
               make run-test
       - save_cache:
           key: v1-linux-clang39-debug
+          paths:
+            - node_modules
+            - /root/.ccache
+
+# ------------------------------------------------------------------------------
+  linux-gcc4.9-debug:
+    docker:
+      - image: mbgl/ci:r3-linux-gcc-4.9
+    working_directory: /src
+    environment:
+      LIBSYSCONFCPUS: 6
+      JOBS: 2
+      BUILDTYPE: Debug
+      WITH_EGL: 1
+      WITH_CXX11ABI: 0
+      DISPLAY: :0
+    steps:
+      - checkout
+      - restore_cache:
+          key: v1-linux-gcc4.9-debug
+          paths:
+            - node_modules
+            - /root/.ccache
+      - run:
+          name: Build linux
+          command: make linux
+      - run:
+          name: Build benchmark
+          command: make benchmark
+      - run:
+          name: Build test
+          command: make test
+      - run:
+          name: Run tests
+          command: |
+            source scripts/circle_setup.sh
+            mapbox_export_mesa_library_path
+            xvfb-run --server-args="-screen 0 1024x768x24" \
+              make run-test
+      - save_cache:
+          key: v1-linux-gcc4.9-debug
           paths:
             - node_modules
             - /root/.ccache

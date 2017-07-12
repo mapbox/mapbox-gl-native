@@ -38,7 +38,8 @@ public:
         MapMode::Continuous,
         annotationManager,
         imageManager,
-        glyphManager
+        glyphManager,
+        0
     };
 };
 

@@ -111,7 +111,7 @@ Map::Map(Backend& backend,
          GLContextMode contextMode,
          ConstrainMode constrainMode,
          ViewportMode viewportMode,
-         const optional<std::string>& programCacheDir)
+         optional<std::string> programCacheDir)
     : impl(std::make_unique<Impl>(*this,
                                   backend,
                                   pixelRatio,

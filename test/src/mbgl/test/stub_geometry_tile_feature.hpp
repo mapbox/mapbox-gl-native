@@ -17,9 +17,9 @@ public:
     }
 
     PropertyMap properties;
-    optional<FeatureIdentifier> id = {};
+    optional<FeatureIdentifier> id;
     FeatureType type = FeatureType::Point;
-    GeometryCollection geometry = {};
+    GeometryCollection geometry;
 
     FeatureType getType() const override {
         return type;

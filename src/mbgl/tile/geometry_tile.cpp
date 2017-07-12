@@ -174,18 +174,18 @@ void GeometryTile::getImages(ImageDependencies imageDependencies) {
 }
 
 void GeometryTile::upload(gl::Context& context) {
-    auto upload = [&] (Bucket& bucket) {
+    auto uploadFn = [&] (Bucket& bucket) {
         if (bucket.needsUpload()) {
             bucket.upload(context);
         }
     };
 
     for (auto& entry : nonSymbolBuckets) {
-        upload(*entry.second);
+        uploadFn(*entry.second);
     }
 
     for (auto& entry : symbolBuckets) {
-        upload(*entry.second);
+        uploadFn(*entry.second);
     }
 
     if (glyphAtlasImage) {

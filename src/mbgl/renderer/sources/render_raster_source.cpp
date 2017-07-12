@@ -73,11 +73,11 @@ RenderRasterSource::queryRenderedFeatures(const ScreenLineString&,
                                           const TransformState&,
                                           const RenderStyle&,
                                           const RenderedQueryOptions&) const {
-    return {};
+    return std::unordered_map<std::string, std::vector<Feature>>();
 }
 
 std::vector<Feature> RenderRasterSource::querySourceFeatures(const SourceQueryOptions&) const {
-    return {};
+    return std::vector<Feature>();
 }
 
 void RenderRasterSource::onLowMemory() {
