@@ -6,8 +6,6 @@
 #include <sstream>
 #include <fstream>
 
-#include <unistd.h>
-
 namespace mbgl {
 namespace util {
 
@@ -43,8 +41,8 @@ optional<std::string> readFile(const std::string &filename) {
 }
 
 void deleteFile(const std::string& filename) {
-    const int ret = unlink(filename.c_str());
-    if (ret == -1) {
+    const int ret = std::remove(filename.c_str());
+    if (ret != 0) {
         throw IOException(errno, "failed to unlink file");
     }
 }
