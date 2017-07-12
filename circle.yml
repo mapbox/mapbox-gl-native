@@ -99,6 +99,7 @@ jobs:
             rm secret.json
       - run:
           name: Run instrumentation tests on Firebase
+          no_output_timeout: 1200
           shell: /bin/bash -euo pipefail
           command: |
             gcloud firebase test android models list
@@ -106,7 +107,7 @@ jobs:
               --app platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/MapboxGLAndroidSDKTestApp-debug.apk \
               --test platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/MapboxGLAndroidSDKTestApp-debug-androidTest.apk \
               --device-ids shamu --os-version-ids 22 --locales en --orientations portrait --timeout 15m \
-              --test-targets "class com.mapbox.mapboxsdk.testapp.maps.widgets.LogoTest" 2>&1 | tee firebase.log) || EXIT_CODE=$?
+              --test-targets "package com.mapbox.mapboxsdk.testapp.style" 2>&1 | tee firebase.log) || EXIT_CODE=$?
 
             FIREBASE_TEST_BUCKET=$(sed -n 's|^.*\[https://console.developers.google.com/storage/browser/\([^]]*\).*|gs://\1|p' firebase.log)
             echo "Downloading from: ${FIREBASE_TEST_BUCKET}"
