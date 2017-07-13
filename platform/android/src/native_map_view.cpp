@@ -117,9 +117,6 @@ gl::ProcAddress NativeMapView::initializeExtension(const char* name) {
 }
 
 void NativeMapView::activate() {
-    if (active++) {
-        return;
-    }
 
     oldDisplay = eglGetCurrentDisplay();
     oldReadSurface = eglGetCurrentSurface(EGL_READ);
@@ -148,10 +145,6 @@ void NativeMapView::activate() {
  * From mbgl::RendererBackend.
  */
 void NativeMapView::deactivate() {
-    if (--active) {
-        return;
-    }
-
     assert(vm != nullptr);
 
     if (oldContext != context && oldContext != EGL_NO_CONTEXT) {
