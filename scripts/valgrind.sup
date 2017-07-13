@@ -76,11 +76,3 @@
    fun:_ZN4mbgl4util10write_fileERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEES8_
    ...
 }
-{
-   Qt5 ThreadStorage
-   Memcheck:Leak
-   match-leak-kinds: definite
-   fun:_Znwm
-   fun:_Z24qThreadStorage_localDataISt5arrayIPiLm1EEERT_R18QThreadStorageDataPS3_.isra.5
-   ...
-}

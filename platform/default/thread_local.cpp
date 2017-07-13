@@ -29,7 +29,11 @@ ThreadLocal<T>::ThreadLocal() : impl(std::make_unique<Impl>()) {
 
 template <class T>
 ThreadLocal<T>::~ThreadLocal() {
-    delete get();
+    // ThreadLocal will not take ownership
+    // of the pointer it is managing. The pointer
+    // needs to be explicitly cleared before we
+    // destroy this object.
+    assert(!get());
 
     if (pthread_key_delete(impl->key)) {
         Log::Error(Event::General, "Failed to delete local storage key.");
