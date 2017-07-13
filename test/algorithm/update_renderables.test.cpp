@@ -100,12 +100,18 @@ auto createTileDataFn(ActionLog& log, T& dataTiles) {
     };
 }
 
+// Unused template argument to fix Clang crash
+// See https://github.com/mapbox/mapbox-gl-native/pull/9501
+template <typename = int>
 auto retainTileDataFn(ActionLog& log) {
     return [&](auto& tileData, Resource::Necessity necessity) {
         log.emplace_back(RetainTileDataAction{ tileData.tileID, necessity });
     };
 }
 
+// Unused template argument to fix Clang crash
+// See https://github.com/mapbox/mapbox-gl-native/pull/9501
+template <typename = int>
 auto renderTileFn(ActionLog& log) {
     return [&](const auto& id, auto& tileData) {
         log.emplace_back(RenderTileAction{ id, tileData });
