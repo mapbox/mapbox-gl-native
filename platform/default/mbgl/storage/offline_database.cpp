@@ -188,11 +188,11 @@ std::pair<bool, uint64_t> OfflineDatabase::putInternal(const Resource& resource,
     if (resource.kind == Resource::Kind::Tile) {
         assert(resource.tileData);
         inserted = putTile(*resource.tileData, response,
-                compressed ? compressedData : *response.data,
+                compressed ? compressedData : response.data ? *response.data : "",
                 compressed);
     } else {
         inserted = putResource(resource, response,
-                compressed ? compressedData : *response.data,
+                compressed ? compressedData : response.data ? *response.data : "",
                 compressed);
     }
 
