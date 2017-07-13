@@ -4,6 +4,7 @@
 #include <mbgl/map/backend_scope.hpp>
 
 #include <array>
+#include <cassert>
 
 #include <QThreadStorage>
 
@@ -23,7 +24,11 @@ ThreadLocal<T>::ThreadLocal() : impl(std::make_unique<Impl>()) {
 
 template <class T>
 ThreadLocal<T>::~ThreadLocal() {
-    delete get();
+    // ThreadLocal will not take ownership
+    // of the pointer it is managing. The pointer
+    // needs to be explicitly cleared before we
+    // destroy this object.
+    assert(!get());
 }
 
 template <class T>
