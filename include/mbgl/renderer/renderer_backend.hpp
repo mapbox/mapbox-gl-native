@@ -4,6 +4,7 @@
 #include <mbgl/renderer/backend_scope.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/size.hpp>
+#include <mbgl/util/util.hpp>
 
 #include <memory>
 #include <mutex>
@@ -80,5 +81,9 @@ private:
 
     friend class BackendScope;
 };
+
+MBGL_CONSTEXPR bool operator==(const RendererBackend& a, const RendererBackend& b) {
+    return &a == &b;
+}
 
 } // namespace mbgl

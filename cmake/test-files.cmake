@@ -41,6 +41,7 @@ set(MBGL_TEST_FILES
     test/programs/symbol_program.test.cpp
 
     # renderer
+    test/renderer/backend_scope.test.cpp
     test/renderer/group_by_layout.test.cpp
     test/renderer/image_manager.test.cpp
 
