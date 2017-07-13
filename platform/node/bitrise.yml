@@ -64,7 +64,7 @@ workflows:
             brew install cmake awscli node@4 node@6
             brew link node@4 --force
             gem install xcpretty --no-rdoc --no-ri
-            export BUILDTYPE=Release
+            export BUILDTYPE=RelWithDebInfo
             export PUBLISH=true
             make test-node && ./platform/node/scripts/after_success.sh
             brew unlink node@4

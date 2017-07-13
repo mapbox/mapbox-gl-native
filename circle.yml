@@ -265,7 +265,7 @@ jobs:
     environment:
       LIBSYSCONFCPUS: 4
       JOBS: 4
-      BUILDTYPE: Release
+      BUILDTYPE: RelWithDebInfo
       WITH_EGL: 1
       PACKAGE_JSON_VERSION: $(node -e "console.log(require('./package.json').version)")
       PUBLISH: $([[ "${CIRCLE_BRANCH}" == "node-v${PACKAGE_JSON_VERSION}" ]] && echo true)
@@ -289,7 +289,7 @@ jobs:
     environment:
       LIBSYSCONFCPUS: 4
       JOBS: 4
-      BUILDTYPE: Release
+      BUILDTYPE: RelWithDebInfo
       WITH_EGL: 1
       PACKAGE_JSON_VERSION: $(node -e "console.log(require('./package.json').version)")
       PUBLISH: $([[ "${CIRCLE_BRANCH}" == "node-v${PACKAGE_JSON_VERSION}" ]] && echo true)
