@@ -16,27 +16,46 @@ BackendScope::BackendScope(Backend& backend_, ScopeType scopeType_)
     if (priorScope) {
         assert(priorScope->nextScope == nullptr);
         priorScope->nextScope = this;
+        priorScope->deactivate();
     }
-    if (scopeType == ScopeType::Explicit) {
-        backend.activate();
-    }
+
+    activate();
 
     currentScope.set(this);
 }
 
 BackendScope::~BackendScope() {
     assert(nextScope == nullptr);
+    deactivate();
+
     if (priorScope) {
-        priorScope->backend.activate();
+        priorScope->activate();
         currentScope.set(priorScope);
         assert(priorScope->nextScope == this);
         priorScope->nextScope = nullptr;
     } else {
-        if (scopeType == ScopeType::Explicit) {
-            backend.deactivate();
-        }
-
         currentScope.set(nullptr);
+    }
+}
+
+void BackendScope::activate() {
+    if (scopeType == ScopeType::Explicit &&
+            !(priorScope && this->backend == priorScope->backend) &&
+            !(nextScope && this->backend == nextScope->backend)) {
+        // Only activate when set to Explicit and
+        // only once per RenderBackend
+        backend.activate();
+        activated = true;
+    }
+}
+
+void BackendScope::deactivate() {
+    if (activated &&
+        !(nextScope && this->backend == nextScope->backend)) {
+        // Only deactivate when set to Explicit and
+        // only once per RenderBackend
+        backend.deactivate();
+        activated = false;
     }
 }
 

@@ -42,6 +42,7 @@ set(MBGL_TEST_FILES
     test/programs/binary_program.test.cpp
 
     # renderer
+    test/renderer/backend_scope.test.cpp
     test/renderer/group_by_layout.test.cpp
 
     # sprite
