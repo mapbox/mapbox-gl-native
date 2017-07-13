@@ -4,7 +4,10 @@ workflows:
   version: 2
   default:
     jobs:
-      - clang-tidy
+      - clang-tidy:
+          filters:
+            branches:
+              ignore: master
       - android-debug-arm-v7
       - android-release-all
       - node4-clang39-release
@@ -123,9 +126,6 @@ jobs:
       LIBSYSCONFCPUS: 4
       JOBS: 4
       BUILDTYPE: Debug
-    branches:
-      ignore:
-        - master
     steps:
       - checkout
       - *generate-cache-key
