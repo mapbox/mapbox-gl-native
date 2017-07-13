@@ -3,6 +3,7 @@
 #include <mbgl/map/map_observer.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/size.hpp>
+#include <mbgl/util/util.hpp>
 
 #include <memory>
 #include <mutex>
@@ -79,5 +80,9 @@ private:
 
     friend class BackendScope;
 };
+
+constexpr bool operator==(const Backend& a, const Backend& b) {
+    return &a == &b;
+}
 
 } // namespace mbgl

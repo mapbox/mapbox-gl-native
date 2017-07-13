@@ -22,10 +22,14 @@ public:
     static bool exists();
 
 private:
+    void activate();
+    void deactivate();
+
     BackendScope* priorScope;
     BackendScope* nextScope;
     Backend& backend;
     const ScopeType scopeType;
+    bool activated = false;
 };
 
 } // namespace mbgl
