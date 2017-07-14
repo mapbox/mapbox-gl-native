@@ -1,3 +1,6 @@
+# 3.5.5 - July 14, 2017
+- Provide debuggable release builds for node packages [#9497](https://github.com/mapbox/mapbox-gl-native/pull/9497)
+
 # 3.5.4 - June 6, 2017
 - Add support for ImageSource [#8968](https://github.com/mapbox/mapbox-gl-native/pull/8968)
 - Fixed an issue with `map.addImage()` which would cause added images to randomly be replaced with images found the style's sprite sheet ([#9119](https://github.com/mapbox/mapbox-gl-native/pull/9119))
