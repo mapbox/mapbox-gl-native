@@ -25,3 +25,14 @@ TEST(SQLite, Statement) {
     ASSERT_EQ(stmt2.lastInsertRowId(), 2);
     ASSERT_EQ(stmt2.changes(), 1u);
 }
+
+TEST(SQLite, TEST_REQUIRES_WRITE(CantOpenException)) {
+    try {
+        // Should throw a CANTOPEN when the database doesn't exist,
+        // make sure all the backends behave the same way.
+        mapbox::sqlite::Database("test/fixtures/offline_database/foobar123.db", mapbox::sqlite::ReadOnly);
+        FAIL();
+    } catch (mapbox::sqlite::Exception& ex) {
+        ASSERT_EQ(ex.code, mapbox::sqlite::Exception::Code::CANTOPEN);
+    }
+}
