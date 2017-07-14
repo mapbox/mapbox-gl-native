@@ -71,30 +71,38 @@ TEST(ThreadLocalStorage, NotSetReturnsNull) {
 
 namespace {
 
-class TestThreadReclaim {
+class TestThreadDataOwnership {
 public:
-    TestThreadReclaim(mbgl::ActorRef<TestThreadReclaim>, int* data_) {
+    TestThreadDataOwnership(mbgl::ActorRef<TestThreadDataOwnership>, int* data_) {
         data.set(data_);
     }
 
+    ~TestThreadDataOwnership() {
+        data.set(nullptr);
+    }
+
 private:
-    ThreadLocal<int> data;
+    static ThreadLocal<int> data;
 };
+
+ThreadLocal<int> TestThreadDataOwnership::data;
 
 } // namespace
 
-TEST(ThreadLocalStorage, AutoReclaim) {
+TEST(ThreadLocalStorage, ShouldNotTakeOwnership) {
     RunLoop loop;
 
-    auto data1 = new int;
-    auto data2 = new int;
+    auto data1 = std::make_unique<int>(10);
+    auto data2 = std::make_unique<int>(20);
 
-    auto thread1 = std::make_unique<Thread<TestThreadReclaim>>("Test", data1);
-    auto thread2 = std::make_unique<Thread<TestThreadReclaim>>("Test", data2);
+    auto thread1 = std::make_unique<Thread<TestThreadDataOwnership>>("Test", data1.get());
+    auto thread2 = std::make_unique<Thread<TestThreadDataOwnership>>("Test", data2.get());
 
     thread1.reset();
     thread2.reset();
 
-    // Should not leak, valgrind will
-    // let us know.
+    // Will crash if ThreadLocal destroys
+    // the pointer it is managing.
+    ASSERT_EQ(*data1, 10);
+    ASSERT_EQ(*data2, 20);
 }
