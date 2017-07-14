@@ -3,7 +3,7 @@
 set -e
 set -o pipefail
 
-if [[ -n ${PUBLISH:-} ]]; then
+if [[ "${PUBLISH:-}" == true ]]; then
     if [[ "${BUILDTYPE}" == "RelWithDebInfo" ]]; then
         ./node_modules/.bin/node-pre-gyp package publish info
     elif [[ "${BUILDTYPE}" == "Debug" ]]; then
