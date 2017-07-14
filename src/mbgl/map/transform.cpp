@@ -168,7 +168,7 @@ void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &anima
     double angle = camera.angle.value_or(getAngle());
     double pitch = camera.pitch.value_or(getPitch());
 
-    if (std::isnan(zoom)) {
+    if (std::isnan(zoom) || state.size.isEmpty()) {
         return;
     }
 
