@@ -135,7 +135,7 @@ void CollisionFeature::bboxifyLabel(const GeometryCoordinates& line, GeometryCoo
         // This makes our calculation spot-on at scale=2, and on the conservative side for
         // lower scales
         const float distanceToInnerEdge = std::max(std::fabs(boxDistanceToAnchor - firstBoxOffset) - step / 2, 0.0f);
-        float maxScale = labelLength / 2 / distanceToInnerEdge;
+        float maxScale = util::division(labelLength / 2, distanceToInnerEdge, std::numeric_limits<float>::infinity());
 
         // The box maxScale calculations are designed to be conservative on collisions in the scale range
         // [1,2]. At scale=1, each box has 50% overlap, and at scale=2, the boxes are lined up edge
