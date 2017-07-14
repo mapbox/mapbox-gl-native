@@ -13,7 +13,7 @@ TEST(getIconQuads, normal) {
     SymbolLayoutProperties::Evaluated layout;
     Anchor anchor(2.0, 3.0, 0.0, 0.5f, 0);
     ImagePosition image = {
-        mapbox::Bin(-1, 15, 11, 0, 0),
+        mapbox::Bin(-1, 15, 11, 0, 0, 0, 0),
         style::Image::Impl("test", PremultipliedImage({1,1}), 1.0)
     };
 
@@ -38,7 +38,7 @@ TEST(getIconQuads, normal) {
 TEST(getIconQuads, style) {
     Anchor anchor(0.0, 0.0, 0.0, 0.5f, 0);
     ImagePosition image = {
-        mapbox::Bin(-1, 20, 20, 0, 0),
+        mapbox::Bin(-1, 20, 20, 0, 0, 0, 0),
         style::Image::Impl("test", PremultipliedImage({1,1}), 1.0)
     };
 
