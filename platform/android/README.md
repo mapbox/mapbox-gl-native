@@ -10,7 +10,7 @@ Alright. So, actually, you may be in the wrong place. From here on in, this READ
 
 **To view our current API documentation, see our [JavaDoc](https://www.mapbox.com/android-docs/api/map-sdk/5.0.2/index.html).**
 
-**To install and use the Mapbox Android SDK in an application, see the [Mapbox Android Maps SDK "First Steps Guide"](https://www.mapbox.com/android-docs/map-sdk/tutorials/).**
+**To install and use the Mapbox Android SDK in an application, see the [Mapbox Android Maps SDK Overview](https://www.mapbox.com/android-docs/map-sdk/overview/).**
 
 ### Setup environment
 
