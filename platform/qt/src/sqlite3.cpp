@@ -50,6 +50,15 @@ void checkDatabaseError(const QSqlDatabase &db) {
     }
 }
 
+void checkDatabaseOpenError(const QSqlDatabase &db) {
+    // Assume every error when opening the data as CANTOPEN. Qt
+    // always returns -1 for `nativeErrorCode()` on database errors.
+    QSqlError lastError = db.lastError();
+    if (lastError.type() != QSqlError::NoError) {
+        throw Exception { Exception::Code::CANTOPEN, "Error opening the database." };
+    }
+}
+
 class DatabaseImpl {
 public:
     DatabaseImpl(const char* filename, int flags) {
@@ -77,7 +86,7 @@ public:
         db->setDatabaseName(QString(filename));
 
         if (!db->open()) {
-            checkDatabaseError(*db);
+            checkDatabaseOpenError(*db);
         }
     }
 
@@ -143,7 +152,7 @@ void Database::setBusyTimeout(std::chrono::milliseconds timeout) {
     }
     impl->db->setConnectOptions(connectOptions);
     if (!impl->db->open()) {
-        checkDatabaseError(*impl->db);
+        checkDatabaseOpenError(*impl->db);
     }
 }
 
