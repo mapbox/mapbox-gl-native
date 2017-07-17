@@ -101,7 +101,7 @@ TEST(Buckets, SymbolBucket) {
 
 TEST(Buckets, RasterBucket) {
     gl::Context context;
-    UnassociatedImage rgba({ 1, 1 });
+    PremultipliedImage rgba({ 1, 1 });
 
     // RasterBucket::hasData() is always true.
     RasterBucket bucket = { std::move(rgba) };

@@ -531,11 +531,11 @@ TEST(Source, ImageSourceImageUpdate) {
 
     // Load initial, so the source state will be loaded=true
     source.loadDescription(test.fileSource);
-    UnassociatedImage rgba({ 1, 1 });
+    PremultipliedImage rgba({ 1, 1 });
     rgba.data[0] = 255;
     rgba.data[1] = 254;
     rgba.data[2] = 253;
-    rgba.data[3] = 128;
+    rgba.data[3] = 0;
 
     // Schedule an update
     test.loop.invoke([&] () {

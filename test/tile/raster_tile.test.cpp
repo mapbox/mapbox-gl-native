@@ -60,7 +60,7 @@ TEST(RasterTile, onError) {
 TEST(RasterTile, onParsed) {
     RasterTileTest test;
     RasterTile tile(OverscaledTileID(0, 0, 0), test.tileParameters, test.tileset);
-    tile.onParsed(std::make_unique<RasterBucket>(UnassociatedImage{}));
+    tile.onParsed(std::make_unique<RasterBucket>(PremultipliedImage{}));
     EXPECT_TRUE(tile.isRenderable());
     EXPECT_TRUE(tile.isLoaded());
     EXPECT_TRUE(tile.isComplete());
