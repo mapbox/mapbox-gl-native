@@ -106,5 +106,18 @@ T smoothstep(T edge0, T edge1, T x) {
     return t * t * (T(3) - T(2) * t);
 }
 
+template <typename T>
+inline T division(const T dividend, const T divisor, const T nan) {
+    if (divisor == 0) {
+        if (dividend == 0) {
+            return nan;
+        } else {
+            return std::copysign(std::numeric_limits<T>::infinity(), dividend);
+        }
+    } else {
+        return dividend / divisor;
+    }
+}
+
 } // namespace util
 } // namespace mbgl

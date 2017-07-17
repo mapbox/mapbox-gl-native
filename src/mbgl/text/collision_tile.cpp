@@ -20,7 +20,11 @@ CollisionTile::CollisionTile(PlacementConfig config_) : config(std::move(config_
     rotationMatrix = { { angle_cos, -angle_sin, angle_sin, angle_cos } };
     reverseRotationMatrix = { { angle_cos, angle_sin, -angle_sin, angle_cos } };
 
-    perspectiveRatio = 1.0f + 0.5f * ((config.cameraToTileDistance / config.cameraToCenterDistance) - 1.0f);
+    perspectiveRatio =
+        1.0f +
+        0.5f * (util::division(config.cameraToTileDistance, config.cameraToCenterDistance, 1.0f) -
+                1.0f);
+
     minScale /= perspectiveRatio;
     maxScale /= perspectiveRatio;
 
@@ -30,22 +34,25 @@ CollisionTile::CollisionTile(PlacementConfig config_) : config(std::move(config_
     // purposes, but we still want to use the yStretch approximation
     // here because we can't adjust the aspect ratio of the collision
     // boxes at render time.
-    yStretch = util::max(1.0f, config.cameraToTileDistance / (config.cameraToCenterDistance * std::cos(config.pitch)));
+    yStretch = util::max(
+        1.0f, util::division(config.cameraToTileDistance,
+                             config.cameraToCenterDistance * std::cos(config.pitch), 1.0f));
 }
-
 
 float CollisionTile::findPlacementScale(const Point<float>& anchor, const CollisionBox& box, const float boxMaxScale, const Point<float>& blockingAnchor, const CollisionBox& blocking) {
     float minPlacementScale = minScale;
 
     // Find the lowest scale at which the two boxes can fit side by side without overlapping.
     // Original algorithm:
-    float s1 = (blocking.x1 - box.x2) / (anchor.x - blockingAnchor.x); // scale at which new box is to the left of old box
-    float s2 = (blocking.x2 - box.x1) / (anchor.x - blockingAnchor.x); // scale at which new box is to the right of old box
-    float s3 = (blocking.y1 - box.y2) * yStretch / (anchor.y - blockingAnchor.y); // scale at which new box is to the top of old box
-    float s4 = (blocking.y2 - box.y1) * yStretch / (anchor.y - blockingAnchor.y); // scale at which new box is to the bottom of old box
 
-    if (std::isnan(s1) || std::isnan(s2)) s1 = s2 = 1;
-    if (std::isnan(s3) || std::isnan(s4)) s3 = s4 = 1;
+    const float s1 = util::division(blocking.x1 - box.x2, anchor.x - blockingAnchor.x,
+                                    1.0f); // scale at which new box is to the left of old box
+    const float s2 = util::division(blocking.x2 - box.x1, anchor.x - blockingAnchor.x,
+                                    1.0f); // scale at which new box is to the right of old box
+    const float s3 = util::division((blocking.y1 - box.y2) * yStretch, anchor.y - blockingAnchor.y,
+                                    1.0f); // scale at which new box is to the top of old box
+    const float s4 = util::division((blocking.y2 - box.y1) * yStretch, anchor.y - blockingAnchor.y,
+                                    1.0f); // scale at which new box is to the bottom of old box
 
     float collisionFreeScale = util::min(util::max(s1, s2), util::max(s3, s4));
 
