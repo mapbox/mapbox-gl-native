@@ -50,13 +50,12 @@ final class MapGestureDetector {
 
   private PointF focalPoint;
 
-  private boolean twoTap = false;
-  private boolean zoomStarted = false;
-  private boolean dragStarted = false;
-  private boolean quickZoom = false;
-  private boolean scrollInProgress = false;
-  private boolean scaleGestureOccurred = false;
-  private boolean recentScaleGestureOccurred = false;
+  private boolean twoTap;
+  private boolean quickZoom;
+  private boolean tiltGestureOccurred;
+  private boolean scrollGestureOccurred;
+  private boolean scaleGestureOccurred;
+  private boolean recentScaleGestureOccurred;
 
   MapGestureDetector(Context context, Transform transform, Projection projection, UiSettings uiSettings,
                      TrackingSettings trackingSettings, AnnotationManager annotationManager,
@@ -193,10 +192,10 @@ final class MapGestureDetector {
         }
 
         // Scroll / Pan Has Stopped
-        if (scrollInProgress) {
+        if (scrollGestureOccurred) {
           MapboxTelemetry.getInstance().pushEvent(MapboxEventWrapper.buildMapDragEndEvent(
             getLocationFromGesture(event.getX(), event.getY()), transform));
-          scrollInProgress = false;
+          scrollGestureOccurred = false;
           cameraChangeDispatcher.onCameraIdle();
         }
 
@@ -393,20 +392,18 @@ final class MapGestureDetector {
         return false;
       }
 
-      if (dragStarted) {
+      if (tiltGestureOccurred) {
         return false;
       }
 
-      if (scaleGestureOccurred) {
-        return false;
-      }
-
-      if (!scrollInProgress) {
-        scrollInProgress = true;
+      if (!scrollGestureOccurred) {
+        scrollGestureOccurred = true;
 
         // Cancel any animation
-        transform.cancelTransitions();
-        cameraChangeDispatcher.onCameraMoveStarted(REASON_API_GESTURE);
+        if (!scaleGestureOccurred) {
+          transform.cancelTransitions();
+          cameraChangeDispatcher.onCameraMoveStarted(REASON_API_GESTURE);
+        }
 
         MapboxTelemetry.getInstance().pushEvent(MapboxEventWrapper.buildMapClickEvent(
           getLocationFromGesture(e1.getX(), e1.getY()),
@@ -456,7 +453,6 @@ final class MapGestureDetector {
       scaleGestureOccurred = false;
       beginTime = 0;
       scaleFactor = 1.0f;
-      zoomStarted = false;
       cameraChangeDispatcher.onCameraIdle();
     }
 
@@ -468,27 +464,27 @@ final class MapGestureDetector {
         return super.onScale(detector);
       }
 
-      // If scale is large enough ignore a tap
-      scaleFactor *= detector.getScaleFactor();
-      if ((scaleFactor > 1.05f) || (scaleFactor < 0.95f)) {
-        // notify camera change listener
-        cameraChangeDispatcher.onCameraMoveStarted(REASON_API_GESTURE);
-        zoomStarted = true;
+      if (tiltGestureOccurred) {
+        return false;
       }
 
       // Ignore short touches in case it is a tap
       // Also ignore small scales
       long time = detector.getEventTime();
       long interval = time - beginTime;
-      if (!zoomStarted && (interval <= ViewConfiguration.getTapTimeout())) {
+      if (!scaleGestureOccurred && (interval <= ViewConfiguration.getTapTimeout())) {
         return false;
       }
 
-      if (!zoomStarted) {
-        return false;
+      // If scale is large enough ignore a tap
+      scaleFactor *= detector.getScaleFactor();
+      if ((scaleFactor > 1.05f) || (scaleFactor < 0.95f)) {
+        // notify camera change listener
+        cameraChangeDispatcher.onCameraMoveStarted(REASON_API_GESTURE);
+        scaleGestureOccurred = true;
       }
 
-      if (dragStarted) {
+      if (!scaleGestureOccurred) {
         return false;
       }
 
@@ -506,7 +502,7 @@ final class MapGestureDetector {
       // Scale the map
       if (focalPoint != null) {
         // arround user provided focal point
-        transform.zoomBy(Math.log(detector.getScaleFactor()) / Math.log(2), focalPoint.x, focalPoint.y);
+        transform.zoomBy(Math.log(detector.getScaleFactor()) / Math.log(Math.PI / 2), focalPoint.x, focalPoint.y);
       } else if (quickZoom) {
         cameraChangeDispatcher.onCameraMove();
         // clamp scale factors we feed to core #7514
@@ -514,10 +510,12 @@ final class MapGestureDetector {
           MapboxConstants.MINIMUM_SCALE_FACTOR_CLAMP,
           MapboxConstants.MAXIMUM_SCALE_FACTOR_CLAMP);
         // around center map
-        transform.zoomBy(Math.log(scaleFactor) / Math.log(2), uiSettings.getWidth() / 2, uiSettings.getHeight() / 2);
+        transform.zoomBy(Math.log(scaleFactor) / Math.log(Math.PI / 2),
+          uiSettings.getWidth() / 2, uiSettings.getHeight() / 2);
       } else {
         // around gesture
-        transform.zoomBy(Math.log(detector.getScaleFactor()) / Math.log(2), detector.getFocusX(), detector.getFocusY());
+        transform.zoomBy(Math.log(detector.getScaleFactor()) / Math.log(Math.PI / 2),
+          detector.getFocusX(), detector.getFocusY());
       }
 
       return true;
@@ -544,9 +542,6 @@ final class MapGestureDetector {
       cameraChangeDispatcher.onCameraMoveStarted(REASON_API_GESTURE);
 
       beginTime = detector.getEventTime();
-      MapboxTelemetry.getInstance().pushEvent(MapboxEventWrapper.buildMapClickEvent(
-        getLocationFromGesture(detector.getFocusX(), detector.getFocusY()),
-        MapboxEvent.GESTURE_ROTATION_START, transform));
       return true;
     }
 
@@ -563,15 +558,8 @@ final class MapGestureDetector {
     // Called for rotation
     @Override
     public boolean onRotate(RotateGestureDetector detector) {
-      if (!trackingSettings.isRotateGestureCurrentlyEnabled() || dragStarted) {
+      if (!trackingSettings.isRotateGestureCurrentlyEnabled() || tiltGestureOccurred) {
         return false;
-      }
-
-      // If rotate is large enough ignore a tap
-      // Also is zoom already started, don't rotate
-      totalAngle += detector.getRotationDegreesDelta();
-      if (totalAngle > 20.0f || totalAngle < -20.0f) {
-        started = true;
       }
 
       // Ignore short touches in case it is a tap
@@ -580,6 +568,16 @@ final class MapGestureDetector {
       long interval = time - beginTime;
       if (!started && (interval <= ViewConfiguration.getTapTimeout())) {
         return false;
+      }
+
+      // If rotate is large enough ignore a tap
+      // Also is zoom already started, don't rotate
+      totalAngle += detector.getRotationDegreesDelta();
+      if (totalAngle > 35.0f || totalAngle < -35.0f) {
+        MapboxTelemetry.getInstance().pushEvent(MapboxEventWrapper.buildMapClickEvent(
+          getLocationFromGesture(detector.getFocusX(), detector.getFocusY()),
+          MapboxEvent.GESTURE_ROTATION_START, transform));
+        started = true;
       }
 
       if (!started) {
@@ -610,9 +608,8 @@ final class MapGestureDetector {
    */
   private class ShoveGestureListener implements ShoveGestureDetector.OnShoveGestureListener {
 
-    long beginTime = 0;
-    float totalDelta = 0.0f;
-    boolean started = false;
+    private long beginTime = 0;
+    private float totalDelta = 0.0f;
 
     @Override
     public boolean onShoveBegin(ShoveGestureDetector detector) {
@@ -622,10 +619,6 @@ final class MapGestureDetector {
 
       // notify camera change listener
       cameraChangeDispatcher.onCameraMoveStarted(REASON_API_GESTURE);
-      beginTime = detector.getEventTime();
-      MapboxTelemetry.getInstance().pushEvent(MapboxEventWrapper.buildMapClickEvent(
-        getLocationFromGesture(detector.getFocusX(), detector.getFocusY()),
-        MapboxEvent.GESTURE_PITCH_START, transform));
       return true;
     }
 
@@ -633,8 +626,7 @@ final class MapGestureDetector {
     public void onShoveEnd(ShoveGestureDetector detector) {
       beginTime = 0;
       totalDelta = 0.0f;
-      started = false;
-      dragStarted = false;
+      tiltGestureOccurred = false;
     }
 
     @Override
@@ -643,22 +635,26 @@ final class MapGestureDetector {
         return false;
       }
 
-      // If tilt is large enough ignore a tap
-      // Also if zoom already started, don't tilt
-      totalDelta += detector.getShovePixelsDelta();
-      if (!zoomStarted && ((totalDelta > 10.0f) || (totalDelta < -10.0f))) {
-        started = true;
-      }
-
       // Ignore short touches in case it is a tap
       // Also ignore small tilt
       long time = detector.getEventTime();
       long interval = time - beginTime;
-      if (!started && (interval <= ViewConfiguration.getTapTimeout())) {
+      if (!tiltGestureOccurred && (interval <= ViewConfiguration.getTapTimeout())) {
         return false;
       }
 
-      if (!started) {
+      // If tilt is large enough ignore a tap
+      // Also if zoom already started, don't tilt
+      totalDelta += detector.getShovePixelsDelta();
+      if (!tiltGestureOccurred && ((totalDelta > 10.0f) || (totalDelta < -10.0f))) {
+        tiltGestureOccurred = true;
+        beginTime = detector.getEventTime();
+        MapboxTelemetry.getInstance().pushEvent(MapboxEventWrapper.buildMapClickEvent(
+          getLocationFromGesture(detector.getFocusX(), detector.getFocusY()),
+          MapboxEvent.GESTURE_PITCH_START, transform));
+      }
+
+      if (!tiltGestureOccurred) {
         return false;
       }
 
@@ -669,9 +665,6 @@ final class MapGestureDetector {
 
       // Tilt the map
       transform.setTilt(pitch);
-
-      dragStarted = true;
-
       return true;
     }
   }

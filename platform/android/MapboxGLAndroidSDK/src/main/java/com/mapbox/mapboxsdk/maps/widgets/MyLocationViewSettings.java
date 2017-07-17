@@ -51,6 +51,7 @@ public class MyLocationViewSettings {
   //
 
   private int accuracyAlpha;
+  private float accuracyThreshold = 0f;
 
   @ColorInt
   private int accuracyTintColor;
@@ -93,6 +94,7 @@ public class MyLocationViewSettings {
     setBackgroundTintColor(options.getMyLocationBackgroundTintColor());
     setAccuracyAlpha(options.getMyLocationAccuracyAlpha());
     setAccuracyTintColor(options.getMyLocationAccuracyTintColor());
+    setAccuracyThreshold(options.getMyLocationAccuracyThreshold());
   }
 
   /**
@@ -291,6 +293,25 @@ public class MyLocationViewSettings {
   public void setAccuracyTintColor(@ColorInt int accuracyTintColor) {
     this.accuracyTintColor = accuracyTintColor;
     myLocationView.setAccuracyTint(accuracyTintColor);
+  }
+
+  /**
+   * Returns current accuracy threshold value (in meters).
+   *
+   * @return Value of accuracy threshold (in meters), below which circle won't be displayed
+   */
+  public float getAccuracyThreshold() {
+    return accuracyThreshold;
+  }
+
+  /**
+   * Set accuracy circle threshold. Circle won't be displayed if accuracy is below set value.
+   *
+   * @param accuracyThreshold Value of accuracy (in meters), below which circle won't be displayed
+   */
+  public void setAccuracyThreshold(float accuracyThreshold) {
+    this.accuracyThreshold = accuracyThreshold;
+    myLocationView.setAccuracyThreshold(accuracyThreshold);
   }
 
   public void setTilt(double tilt) {
