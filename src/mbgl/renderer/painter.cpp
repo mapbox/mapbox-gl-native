@@ -259,17 +259,51 @@ void Painter::render(RenderStyle& style, const FrameData& frame_, View& view) {
 
     // - OPAQUE PASS -------------------------------------------------------------------------------
     // Render everything top-to-bottom by using reverse iterators. Render opaque objects first.
-    renderPass(parameters,
-               RenderPass::Opaque,
-               order.rbegin(), order.rend(),
-               0, 1);
+    {
+        pass = RenderPass::Opaque;
+        MBGL_DEBUG_GROUP(context, "opaque");
+
+        if (debug::renderTree) {
+            Log::Info(Event::Render, "%*s%s {", indent++ * 4, "", "opaque");
+        }
+
+        uint32_t i = 0;
+        for (auto it = order.rbegin(); it != order.rend(); ++it, ++i) {
+            currentLayer = i;
+            if (it->layer.hasRenderPass(pass)) {
+                MBGL_DEBUG_GROUP(context, it->layer.getID());
+                it->layer.render(*this, parameters, it->source);
+            }
+        }
+
+        if (debug::renderTree) {
+            Log::Info(Event::Render, "%*s%s", --indent * 4, "", "}");
+        }
+    }
 
     // - TRANSLUCENT PASS --------------------------------------------------------------------------
     // Make a second pass, rendering translucent objects. This time, we render bottom-to-top.
-    renderPass(parameters,
-               RenderPass::Translucent,
-               order.begin(), order.end(),
-               static_cast<uint32_t>(order.size()) - 1, -1);
+    {
+        pass = RenderPass::Translucent;
+        MBGL_DEBUG_GROUP(context, "translucent");
+
+        if (debug::renderTree) {
+            Log::Info(Event::Render, "%*s%s {", indent++ * 4, "", "translucent");
+        }
+
+        uint32_t i = static_cast<uint32_t>(order.size()) - 1;
+        for (auto it = order.begin(); it != order.end(); ++it, --i) {
+            currentLayer = i;
+            if (it->layer.hasRenderPass(pass)) {
+                MBGL_DEBUG_GROUP(context, it->layer.getID());
+                it->layer.render(*this, parameters, it->source);
+            }
+        }
+
+        if (debug::renderTree) {
+            Log::Info(Event::Render, "%*s%s", --indent * 4, "", "}");
+        }
+    }
 
     if (debug::renderTree) { Log::Info(Event::Render, "}"); indent--; }
 
@@ -322,33 +356,6 @@ void Painter::render(RenderStyle& style, const FrameData& frame_, View& view) {
         context.texture[0] = 0;
 
         context.bindVertexArray = 0;
-    }
-}
-
-template <class Iterator>
-void Painter::renderPass(PaintParameters& parameters,
-                         RenderPass pass_,
-                         Iterator it, Iterator end,
-                         uint32_t i, int8_t increment) {
-    pass = pass_;
-
-    MBGL_DEBUG_GROUP(context, pass == RenderPass::Opaque ? "opaque" : "translucent");
-
-    if (debug::renderTree) {
-        Log::Info(Event::Render, "%*s%s {", indent++ * 4, "",
-                  pass == RenderPass::Opaque ? "opaque" : "translucent");
-    }
-
-    for (; it != end; ++it, i += increment) {
-        currentLayer = i;
-        if (it->layer.hasRenderPass(pass)) {
-            MBGL_DEBUG_GROUP(context, it->layer.getID());
-            it->layer.render(*this, parameters, it->source);
-        }
-    }
-
-    if (debug::renderTree) {
-        Log::Info(Event::Render, "%*s%s", --indent * 4, "", "}");
     }
 }
 
