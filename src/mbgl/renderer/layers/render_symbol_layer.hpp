@@ -66,7 +66,7 @@ public:
     void transition(const TransitionParameters&) override;
     void evaluate(const PropertyEvaluationParameters&) override;
     bool hasTransition() const override;
-    void render(Painter&, PaintParameters&, RenderSource*) override;
+    void render(PaintParameters&, RenderSource*) override;
 
     style::IconPaintProperties::PossiblyEvaluated iconPaintProperties() const;
     style::TextPaintProperties::PossiblyEvaluated textPaintProperties() const;

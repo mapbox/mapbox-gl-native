@@ -1,6 +1,6 @@
 #include <mbgl/renderer/sources/render_geojson_source.hpp>
 #include <mbgl/renderer/render_tile.hpp>
-#include <mbgl/renderer/painter.hpp>
+#include <mbgl/renderer/paint_parameters.hpp>
 #include <mbgl/tile/geojson_tile.hpp>
 
 #include <mbgl/algorithm/generate_clip_ids.hpp>
@@ -59,13 +59,13 @@ void RenderGeoJSONSource::update(Immutable<style::Source::Impl> baseImpl_,
                        });
 }
 
-void RenderGeoJSONSource::startRender(Painter& painter) {
-    painter.clipIDGenerator.update(tilePyramid.getRenderTiles());
-    tilePyramid.startRender(painter);
+void RenderGeoJSONSource::startRender(PaintParameters& parameters) {
+    parameters.clipIDGenerator.update(tilePyramid.getRenderTiles());
+    tilePyramid.startRender(parameters);
 }
 
-void RenderGeoJSONSource::finishRender(Painter& painter) {
-    tilePyramid.finishRender(painter);
+void RenderGeoJSONSource::finishRender(PaintParameters& parameters) {
+    tilePyramid.finishRender(parameters);
 }
 
 std::vector<std::reference_wrapper<RenderTile>> RenderGeoJSONSource::getRenderTiles() {

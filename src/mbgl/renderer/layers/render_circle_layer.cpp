@@ -1,6 +1,5 @@
 #include <mbgl/renderer/layers/render_circle_layer.hpp>
 #include <mbgl/renderer/buckets/circle_bucket.hpp>
-#include <mbgl/renderer/painter.hpp>
 #include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/renderer/paint_parameters.hpp>
 #include <mbgl/programs/programs.hpp>
@@ -48,8 +47,8 @@ bool RenderCircleLayer::hasTransition() const {
     return unevaluated.hasTransition();
 }
 
-void RenderCircleLayer::render(Painter& painter, PaintParameters& parameters, RenderSource*) {
-    if (painter.pass == RenderPass::Opaque) {
+void RenderCircleLayer::render(PaintParameters& parameters, RenderSource*) {
+    if (parameters.pass == RenderPass::Opaque) {
         return;
     }
 
@@ -61,26 +60,26 @@ void RenderCircleLayer::render(Painter& painter, PaintParameters& parameters, Re
         CircleBucket& bucket = *reinterpret_cast<CircleBucket*>(tile.tile.getBucket(*baseImpl));
 
         parameters.programs.circle.get(evaluated).draw(
-            painter.context,
+            parameters.context,
             gl::Triangles(),
-            painter.depthModeForSublayer(0, gl::DepthMode::ReadOnly),
-            painter.frame.mapMode == MapMode::Still
-                ? painter.stencilModeForClipping(tile.clip)
+            parameters.depthModeForSublayer(0, gl::DepthMode::ReadOnly),
+            parameters.mapMode == MapMode::Still
+                ? parameters.stencilModeForClipping(tile.clip)
                 : gl::StencilMode::disabled(),
-            painter.colorModeForRenderPass(),
+            parameters.colorModeForRenderPass(),
             CircleProgram::UniformValues {
                 uniforms::u_matrix::Value{
                     tile.translatedMatrix(evaluated.get<CircleTranslate>(),
                                           evaluated.get<CircleTranslateAnchor>(),
-                                          painter.state)
+                                          parameters.state)
                 },
                 uniforms::u_scale_with_map::Value{ scaleWithMap },
                 uniforms::u_extrude_scale::Value{ pitchWithMap
                     ? std::array<float, 2> {{
-                        tile.id.pixelsToTileUnits(1, painter.state.getZoom()),
-                        tile.id.pixelsToTileUnits(1, painter.state.getZoom()) }}
-                    : painter.pixelsToGLUnits },
-                uniforms::u_camera_to_center_distance::Value{ painter.state.getCameraToCenterDistance() },
+                        tile.id.pixelsToTileUnits(1, parameters.state.getZoom()),
+                        tile.id.pixelsToTileUnits(1, parameters.state.getZoom()) }}
+                    : parameters.pixelsToGLUnits },
+                uniforms::u_camera_to_center_distance::Value{ parameters.state.getCameraToCenterDistance() },
                 uniforms::u_pitch_with_map::Value{ pitchWithMap }
             },
             *bucket.vertexBuffer,
@@ -88,7 +87,7 @@ void RenderCircleLayer::render(Painter& painter, PaintParameters& parameters, Re
             bucket.segments,
             bucket.paintPropertyBinders.at(getID()),
             evaluated,
-            painter.state.getZoom(),
+            parameters.state.getZoom(),
             getID()
         );
     }

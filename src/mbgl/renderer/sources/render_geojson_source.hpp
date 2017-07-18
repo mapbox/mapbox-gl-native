@@ -22,8 +22,8 @@ public:
                 bool needsRelayout,
                 const TileParameters&) final;
 
-    void startRender(Painter&) final;
-    void finishRender(Painter&) final;
+    void startRender(PaintParameters&) final;
+    void finishRender(PaintParameters&) final;
 
     std::vector<std::reference_wrapper<RenderTile>> getRenderTiles() final;
 

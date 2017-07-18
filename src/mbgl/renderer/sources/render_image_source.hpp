@@ -15,8 +15,8 @@ public:
 
     bool isLoaded() const final;
 
-    void startRender(Painter&) final;
-    void finishRender(Painter&) final;
+    void startRender(PaintParameters&) final;
+    void finishRender(PaintParameters&) final;
 
     void update(Immutable<style::Source::Impl>,
                 const std::vector<Immutable<style::Layer::Impl>>&,

@@ -15,7 +15,7 @@
 
 namespace mbgl {
 
-class Painter;
+class PaintParameters;
 class TransformState;
 class RenderTile;
 class RenderStyle;
@@ -54,8 +54,8 @@ public:
                         bool needsRelayout,
                         const TileParameters&) = 0;
 
-    virtual void startRender(Painter&) = 0;
-    virtual void finishRender(Painter&) = 0;
+    virtual void startRender(PaintParameters&) = 0;
+    virtual void finishRender(PaintParameters&) = 0;
 
     // Returns an unsorted list of RenderTiles.
     virtual std::vector<std::reference_wrapper<RenderTile>> getRenderTiles() = 0;

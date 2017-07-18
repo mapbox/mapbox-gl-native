@@ -56,12 +56,12 @@ void RenderRasterSource::update(Immutable<style::Source::Impl> baseImpl_,
                        });
 }
 
-void RenderRasterSource::startRender(Painter& painter) {
-    tilePyramid.startRender(painter);
+void RenderRasterSource::startRender(PaintParameters& parameters) {
+    tilePyramid.startRender(parameters);
 }
 
-void RenderRasterSource::finishRender(Painter& painter) {
-    tilePyramid.finishRender(painter);
+void RenderRasterSource::finishRender(PaintParameters& parameters) {
+    tilePyramid.finishRender(parameters);
 }
 
 std::vector<std::reference_wrapper<RenderTile>> RenderRasterSource::getRenderTiles() {

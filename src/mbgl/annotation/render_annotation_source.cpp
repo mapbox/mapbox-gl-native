@@ -1,7 +1,7 @@
 #include <mbgl/annotation/render_annotation_source.hpp>
 #include <mbgl/annotation/annotation_tile.hpp>
 #include <mbgl/renderer/render_tile.hpp>
-#include <mbgl/renderer/painter.hpp>
+#include <mbgl/renderer/paint_parameters.hpp>
 
 #include <mbgl/algorithm/generate_clip_ids.hpp>
 #include <mbgl/algorithm/generate_clip_ids_impl.hpp>
@@ -44,13 +44,13 @@ void RenderAnnotationSource::update(Immutable<style::Source::Impl> baseImpl_,
                        });
 }
 
-void RenderAnnotationSource::startRender(Painter& painter) {
-    painter.clipIDGenerator.update(tilePyramid.getRenderTiles());
-    tilePyramid.startRender(painter);
+void RenderAnnotationSource::startRender(PaintParameters& parameters) {
+    parameters.clipIDGenerator.update(tilePyramid.getRenderTiles());
+    tilePyramid.startRender(parameters);
 }
 
-void RenderAnnotationSource::finishRender(Painter& painter) {
-    tilePyramid.finishRender(painter);
+void RenderAnnotationSource::finishRender(PaintParameters& parameters) {
+    tilePyramid.finishRender(parameters);
 }
 
 std::vector<std::reference_wrapper<RenderTile>> RenderAnnotationSource::getRenderTiles() {

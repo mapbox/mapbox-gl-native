@@ -1,26 +1,23 @@
 #pragma once
+
 #include <mbgl/renderer/renderer.hpp>
 #include <mbgl/renderer/renderer_backend.hpp>
 #include <mbgl/renderer/renderer_observer.hpp>
 #include <mbgl/renderer/render_style_observer.hpp>
-#include <mbgl/style/style.hpp>
+#include <mbgl/renderer/frame_history.hpp>
+#include <mbgl/map/transform_state.hpp>
 
 #include <memory>
 #include <string>
+#include <vector>
 
 namespace mbgl {
 
-enum class RenderState : uint8_t {
-    Never,
-    Partial,
-    Fully,
-};
-
-class Painter;
-class RenderStyle;
-class TransformState;
 class View;
-
+class UpdateParameters;
+class PaintParameters;
+class RenderStyle;
+class RenderStaticData;
 
 class Renderer::Impl : public RenderStyleObserver {
 public:
@@ -36,29 +33,36 @@ public:
     std::vector<Feature> querySourceFeatures(const std::string& sourceID, const SourceQueryOptions&) const;
 
     void onLowMemory();
-
-    void dumDebugLogs() ;
+    void dumDebugLogs();
 
     // RenderStyleObserver implementation
-    void onInvalidate()override;
+    void onInvalidate() override;
     void onResourceError(std::exception_ptr) override;
 
 private:
+    void doRender(PaintParameters&);
+
     friend class Renderer;
 
     RendererBackend& backend;
-
     RendererObserver* observer;
 
     const GLContextMode contextMode;
     const float pixelRatio;
     const optional<std::string> programCacheDir;
 
+    enum class RenderState {
+        Never,
+        Partial,
+        Fully,
+    };
+
     RenderState renderState = RenderState::Never;
+    FrameHistory frameHistory;
+    TransformState transformState;
 
     std::unique_ptr<RenderStyle> renderStyle;
-    std::unique_ptr<Painter> painter;
-
+    std::unique_ptr<RenderStaticData> staticData;
 };
 
 } // namespace mbgl

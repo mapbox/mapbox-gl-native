@@ -1,9 +1,9 @@
 #include <mbgl/renderer/layers/render_raster_layer.hpp>
 #include <mbgl/renderer/buckets/raster_bucket.hpp>
-#include <mbgl/renderer/painter.hpp>
 #include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/renderer/paint_parameters.hpp>
 #include <mbgl/renderer/sources/render_image_source.hpp>
+#include <mbgl/renderer/render_static_data.hpp>
 #include <mbgl/programs/programs.hpp>
 #include <mbgl/programs/raster_program.hpp>
 #include <mbgl/tile/tile.hpp>
@@ -69,8 +69,8 @@ static std::array<float, 3> spinWeights(float spin) {
     return spin_weights;
 }
 
-void RenderRasterLayer::render(Painter& painter, PaintParameters& parameters, RenderSource* source) {
-    if (painter.pass != RenderPass::Translucent)
+void RenderRasterLayer::render(PaintParameters& parameters, RenderSource* source) {
+    if (parameters.pass != RenderPass::Translucent)
         return;
 
     auto draw = [&] (const mat4& matrix,
@@ -78,11 +78,11 @@ void RenderRasterLayer::render(Painter& painter, PaintParameters& parameters, Re
                      const auto& indexBuffer,
                      const auto& segments) {
         parameters.programs.raster.draw(
-            painter.context,
+            parameters.context,
             gl::Triangles(),
-            painter.depthModeForSublayer(0, gl::DepthMode::ReadOnly),
+            parameters.depthModeForSublayer(0, gl::DepthMode::ReadOnly),
             gl::StencilMode::disabled(),
-            painter.colorModeForRenderPass(),
+            parameters.colorModeForRenderPass(),
             RasterProgram::UniformValues {
                 uniforms::u_matrix::Value{ matrix },
                 uniforms::u_image0::Value{ 0 },
@@ -103,7 +103,7 @@ void RenderRasterLayer::render(Painter& painter, PaintParameters& parameters, Re
             segments,
             RasterProgram::PaintPropertyBinders { evaluated, 0 },
             evaluated,
-            painter.state.getZoom(),
+            parameters.state.getZoom(),
             getID()
         );
     };
@@ -113,8 +113,8 @@ void RenderRasterLayer::render(Painter& painter, PaintParameters& parameters, Re
             RasterBucket& bucket = *imageSource->bucket;
 
             assert(bucket.texture);
-            painter.context.bindTexture(*bucket.texture, 0, gl::TextureFilter::Linear);
-            painter.context.bindTexture(*bucket.texture, 1, gl::TextureFilter::Linear);
+            parameters.context.bindTexture(*bucket.texture, 0, gl::TextureFilter::Linear);
+            parameters.context.bindTexture(*bucket.texture, 1, gl::TextureFilter::Linear);
 
             for (auto matrix_ : imageSource->matrices) {
                 draw(matrix_,
@@ -132,13 +132,13 @@ void RenderRasterLayer::render(Painter& painter, PaintParameters& parameters, Re
                 continue;
 
             assert(bucket.texture);
-            painter.context.bindTexture(*bucket.texture, 0, gl::TextureFilter::Linear);
-            painter.context.bindTexture(*bucket.texture, 1, gl::TextureFilter::Linear);
+            parameters.context.bindTexture(*bucket.texture, 0, gl::TextureFilter::Linear);
+            parameters.context.bindTexture(*bucket.texture, 1, gl::TextureFilter::Linear);
 
             draw(tile.matrix,
-                 painter.rasterVertexBuffer,
-                 painter.quadTriangleIndexBuffer,
-                 painter.rasterSegments);
+                 parameters.staticData.rasterVertexBuffer,
+                 parameters.staticData.quadTriangleIndexBuffer,
+                 parameters.staticData.rasterSegments);
         }
     }
 }
