@@ -1,5 +1,4 @@
 #include <mbgl/renderer/buckets/symbol_bucket.hpp>
-#include <mbgl/renderer/painter.hpp>
 #include <mbgl/renderer/layers/render_symbol_layer.hpp>
 #include <mbgl/renderer/bucket_parameters.hpp>
 #include <mbgl/style/layers/symbol_layer_impl.hpp>
@@ -59,13 +58,6 @@ void SymbolBucket::upload(gl::Context& context) {
     }
 
     uploaded = true;
-}
-
-void SymbolBucket::render(Painter& painter,
-                          PaintParameters& parameters,
-                          const RenderLayer& layer,
-                          const RenderTile& tile) {
-    painter.renderSymbol(parameters, *this, *layer.as<RenderSymbolLayer>(), tile);
 }
 
 bool SymbolBucket::hasData() const {

@@ -1,9 +1,12 @@
 #include <mbgl/renderer/layers/render_symbol_layer.hpp>
-#include <mbgl/layout/symbol_layout.hpp>
-#include <mbgl/renderer/bucket.hpp>
+#include <mbgl/renderer/buckets/symbol_bucket.hpp>
 #include <mbgl/renderer/bucket_parameters.hpp>
 #include <mbgl/renderer/property_evaluation_parameters.hpp>
+#include <mbgl/renderer/painter.hpp>
+#include <mbgl/renderer/render_tile.hpp>
+#include <mbgl/tile/tile.hpp>
 #include <mbgl/style/layers/symbol_layer_impl.hpp>
+#include <mbgl/layout/symbol_layout.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
 
 namespace mbgl {
@@ -53,6 +56,18 @@ void RenderSymbolLayer::evaluate(const PropertyEvaluationParameters& parameters)
 
 bool RenderSymbolLayer::hasTransition() const {
     return unevaluated.hasTransition();
+}
+
+void RenderSymbolLayer::render(Painter& painter, PaintParameters& parameters, RenderSource*) {
+    for (const RenderTile& tile : renderTiles) {
+        Bucket* bucket = tile.tile.getBucket(*baseImpl);
+        assert(dynamic_cast<SymbolBucket*>(bucket));
+        painter.renderSymbol(
+            parameters,
+            *reinterpret_cast<SymbolBucket*>(bucket),
+            *this,
+            tile);
+    }
 }
 
 style::IconPaintProperties::PossiblyEvaluated RenderSymbolLayer::iconPaintProperties() const {

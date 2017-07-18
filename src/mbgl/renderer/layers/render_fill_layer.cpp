@@ -1,5 +1,8 @@
 #include <mbgl/renderer/layers/render_fill_layer.hpp>
 #include <mbgl/renderer/buckets/fill_bucket.hpp>
+#include <mbgl/renderer/painter.hpp>
+#include <mbgl/renderer/render_tile.hpp>
+#include <mbgl/tile/tile.hpp>
 #include <mbgl/style/layers/fill_layer_impl.hpp>
 #include <mbgl/geometry/feature_index.hpp>
 #include <mbgl/util/math.hpp>
@@ -48,6 +51,18 @@ void RenderFillLayer::evaluate(const PropertyEvaluationParameters& parameters) {
 
 bool RenderFillLayer::hasTransition() const {
     return unevaluated.hasTransition();
+}
+
+void RenderFillLayer::render(Painter& painter, PaintParameters& parameters, RenderSource*) {
+    for (const RenderTile& tile : renderTiles) {
+        Bucket* bucket = tile.tile.getBucket(*baseImpl);
+        assert(dynamic_cast<FillBucket*>(bucket));
+        painter.renderFill(
+            parameters,
+            *reinterpret_cast<FillBucket*>(bucket),
+            *this,
+            tile);
+    }
 }
 
 bool RenderFillLayer::queryIntersectsFeature(

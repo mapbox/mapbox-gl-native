@@ -1,6 +1,7 @@
 #include <mbgl/renderer/layers/render_background_layer.hpp>
 #include <mbgl/style/layers/background_layer_impl.hpp>
 #include <mbgl/renderer/bucket.hpp>
+#include <mbgl/renderer/painter.hpp>
 
 namespace mbgl {
 
@@ -32,6 +33,10 @@ void RenderBackgroundLayer::evaluate(const PropertyEvaluationParameters &paramet
 
 bool RenderBackgroundLayer::hasTransition() const {
     return unevaluated.hasTransition();
+}
+
+void RenderBackgroundLayer::render(Painter& painter, PaintParameters& parameters, RenderSource*) {
+     painter.renderBackground(parameters, *this);
 }
 
 } // namespace mbgl
