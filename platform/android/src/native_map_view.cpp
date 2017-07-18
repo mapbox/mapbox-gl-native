@@ -371,7 +371,7 @@ void NativeMapView::moveBy(jni::JNIEnv&, jni::jdouble dx, jni::jdouble dy, jni::
     mbgl::AnimationOptions animationOptions;
     if (duration > 0) {
        animationOptions.duration.emplace(mbgl::Milliseconds(duration));
-       animationOptions.easing.emplace(mbgl::util::UnitBezier { 0, 0.3, 0.6, 1.0 });
+       animationOptions.easing.emplace(mbgl::util::UnitBezier {0.25, 0.46, 0.45, 0.94});
     }
     map->moveBy({dx, dy}, animationOptions);
 }
