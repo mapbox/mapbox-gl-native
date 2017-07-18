@@ -201,4 +201,14 @@
              @"coordinates": coordinates};
 }
 
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"<%@: %p; title = %@, subtitle: = %@, count = %lu; bounds = %@>",
+            NSStringFromClass([self class]), (void *)self,
+            self.title ? [NSString stringWithFormat:@"\"%@\"", self.title] : self.title,
+            self.subtitle ? [NSString stringWithFormat:@"\"%@\"", self.subtitle] : self.subtitle,
+            (unsigned long)self.polylines.count,
+            MGLStringFromCoordinateBounds(self.overlayBounds)];
+}
+
 @end
