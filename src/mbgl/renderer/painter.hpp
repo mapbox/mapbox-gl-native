@@ -39,11 +39,9 @@ struct FrameData;
 class Tile;
 
 class DebugBucket;
-class LineBucket;
 class SymbolBucket;
 class RasterBucket;
 
-class RenderLineLayer;
 class RenderSymbolLayer;
 class RenderRasterLayer;
 
@@ -75,7 +73,6 @@ public:
     void renderClippingMask(const UnwrappedTileID&, const ClipID&);
     void renderTileDebug(const RenderTile&);
     void renderTileDebug(const mat4& matrix);
-    void renderLine(PaintParameters&, LineBucket&, const RenderLineLayer&, const RenderTile&);
     void renderSymbol(PaintParameters&, SymbolBucket&, const RenderSymbolLayer&, const RenderTile&);
     void renderRaster(PaintParameters&, RasterBucket&, const RenderRasterLayer&, const mat4&, bool useBucketBuffers /* = false */);
 
