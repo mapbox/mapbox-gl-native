@@ -6,8 +6,6 @@
 
 namespace mbgl {
 
-class RenderRasterLayer;
-class PaintParameters;
 class RasterBucket;
 
 class RenderImageSource : public RenderSource {
@@ -18,7 +16,6 @@ public:
     bool isLoaded() const final;
 
     void startRender(Painter&) final;
-    void render(Painter&, PaintParameters&, const RenderRasterLayer&);
     void finishRender(Painter&) final;
 
     void update(Immutable<style::Source::Impl>,
@@ -44,6 +41,8 @@ public:
     void dumpDebugLogs() const final;
 
 private:
+    friend class RenderRasterLayer;
+
     const style::ImageSource::Impl& impl() const;
 
     std::vector<UnwrappedTileID> tileIds;

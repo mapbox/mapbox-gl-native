@@ -247,7 +247,6 @@ set(MBGL_CORE_FILES
     # renderer/painters
     src/mbgl/renderer/painters/painter_clipping.cpp
     src/mbgl/renderer/painters/painter_debug.cpp
-    src/mbgl/renderer/painters/painter_raster.cpp
     src/mbgl/renderer/painters/painter_symbol.cpp
 
     # renderer/sources

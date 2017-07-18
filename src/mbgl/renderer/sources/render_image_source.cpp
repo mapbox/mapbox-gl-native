@@ -182,16 +182,6 @@ void RenderImageSource::update(Immutable<style::Source::Impl> baseImpl_,
     bucket->segments.emplace_back(0, 0, 4, 6);
 }
 
-void RenderImageSource::render(Painter& painter,
-                               PaintParameters& parameters,
-                               const RenderRasterLayer& layer) {
-    if (isEnabled() && isLoaded() && !bucket->needsUpload()) {
-        for (auto matrix : matrices) {
-            painter.renderRaster(parameters, *bucket, layer, matrix, true);
-        }
-    }
-}
-
 void RenderImageSource::dumpDebugLogs() const {
     Log::Info(Event::General, "RenderImageSource::id: %s", impl().id.c_str());
     Log::Info(Event::General, "RenderImageSource::loaded: %s", isLoaded() ? "yes" : "no");
