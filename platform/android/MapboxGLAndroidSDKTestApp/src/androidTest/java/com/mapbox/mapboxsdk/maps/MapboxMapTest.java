@@ -779,6 +779,22 @@ public class MapboxMapTest extends BaseActivityTest {
     }));
   }
 
+  // Tile pre-fetching
+
+  @Test
+  public void testTilePrefetch() {
+    validateTestSetup();
+    onView(withId(R.id.mapView)).perform(new MapboxMapAction(new InvokeViewAction() {
+      @Override
+      public void onViewAction(UiController uiController, View view) {
+        mapboxMap.setPrefetchesTiles(true);
+        assertTrue(mapboxMap.getPrefetchesTiles());
+        mapboxMap.setPrefetchesTiles(false);
+        assertFalse(mapboxMap.getPrefetchesTiles());
+      }
+    }));
+  }
+
   private class MapboxMapAction implements ViewAction {
 
     private InvokeViewAction invokeViewAction;

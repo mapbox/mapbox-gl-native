@@ -265,6 +265,10 @@ public:
 
     void removeImage(JNIEnv&, jni::String);
 
+    void setPrefetchesTiles(JNIEnv&, jni::jboolean);
+
+    jni::jboolean getPrefetchesTiles(JNIEnv&);
+
 protected:
     // mbgl::RendererBackend //
 
