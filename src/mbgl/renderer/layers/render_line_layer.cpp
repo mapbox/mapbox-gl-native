@@ -2,6 +2,11 @@
 #include <mbgl/renderer/buckets/line_bucket.hpp>
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/renderer/render_tile.hpp>
+#include <mbgl/renderer/paint_parameters.hpp>
+#include <mbgl/renderer/image_manager.hpp>
+#include <mbgl/programs/programs.hpp>
+#include <mbgl/programs/line_program.hpp>
+#include <mbgl/geometry/line_atlas.hpp>
 #include <mbgl/tile/tile.hpp>
 #include <mbgl/style/layers/line_layer_impl.hpp>
 #include <mbgl/geometry/feature_index.hpp>
@@ -9,6 +14,8 @@
 #include <mbgl/util/intersection_tests.hpp>
 
 namespace mbgl {
+
+using namespace style;
 
 RenderLineLayer::RenderLineLayer(Immutable<style::LineLayer::Impl> _impl)
     : RenderLayer(style::LayerType::Line, _impl),
@@ -47,14 +54,78 @@ bool RenderLineLayer::hasTransition() const {
 }
 
 void RenderLineLayer::render(Painter& painter, PaintParameters& parameters, RenderSource*) {
+    if (painter.pass == RenderPass::Opaque) {
+        return;
+    }
+
     for (const RenderTile& tile : renderTiles) {
-        Bucket* bucket = tile.tile.getBucket(*baseImpl);
-        assert(dynamic_cast<LineBucket*>(bucket));
-        painter.renderLine(
-            parameters,
-            *reinterpret_cast<LineBucket*>(bucket),
-            *this,
-            tile);
+        assert(dynamic_cast<LineBucket*>(tile.tile.getBucket(*baseImpl)));
+        LineBucket& bucket = *reinterpret_cast<LineBucket*>(tile.tile.getBucket(*baseImpl));
+
+        auto draw = [&] (auto& program, auto&& uniformValues) {
+            program.get(evaluated).draw(
+                painter.context,
+                gl::Triangles(),
+                painter.depthModeForSublayer(0, gl::DepthMode::ReadOnly),
+                painter.stencilModeForClipping(tile.clip),
+                painter.colorModeForRenderPass(),
+                std::move(uniformValues),
+                *bucket.vertexBuffer,
+                *bucket.indexBuffer,
+                bucket.segments,
+                bucket.paintPropertyBinders.at(getID()),
+                evaluated,
+                painter.state.getZoom(),
+                getID()
+            );
+        };
+
+        if (!evaluated.get<LineDasharray>().from.empty()) {
+            const LinePatternCap cap = bucket.layout.get<LineCap>() == LineCapType::Round
+                ? LinePatternCap::Round : LinePatternCap::Square;
+            LinePatternPos posA = painter.lineAtlas->getDashPosition(evaluated.get<LineDasharray>().from, cap);
+            LinePatternPos posB = painter.lineAtlas->getDashPosition(evaluated.get<LineDasharray>().to, cap);
+
+            painter.lineAtlas->bind(painter.context, 0);
+
+            draw(parameters.programs.lineSDF,
+                 LineSDFProgram::uniformValues(
+                     evaluated,
+                     painter.frame.pixelRatio,
+                     tile,
+                     painter.state,
+                     painter.pixelsToGLUnits,
+                     posA,
+                     posB,
+                     painter.lineAtlas->getSize().width));
+
+        } else if (!evaluated.get<LinePattern>().from.empty()) {
+            optional<ImagePosition> posA = painter.imageManager->getPattern(evaluated.get<LinePattern>().from);
+            optional<ImagePosition> posB = painter.imageManager->getPattern(evaluated.get<LinePattern>().to);
+
+            if (!posA || !posB)
+                return;
+
+            painter.imageManager->bind(painter.context, 0);
+
+            draw(parameters.programs.linePattern,
+                 LinePatternProgram::uniformValues(
+                     evaluated,
+                     tile,
+                     painter.state,
+                     painter.pixelsToGLUnits,
+                     painter.imageManager->getPixelSize(),
+                     *posA,
+                     *posB));
+
+        } else {
+            draw(parameters.programs.line,
+                 LineProgram::uniformValues(
+                     evaluated,
+                     tile,
+                     painter.state,
+                     painter.pixelsToGLUnits));
+        }
     }
 }
 
