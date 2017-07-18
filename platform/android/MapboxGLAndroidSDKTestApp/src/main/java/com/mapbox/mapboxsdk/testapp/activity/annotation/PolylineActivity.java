@@ -67,8 +67,20 @@ public class PolylineActivity extends AppCompatActivity {
     mapView.onCreate(savedInstanceState);
     mapView.getMapAsync(new OnMapReadyCallback() {
       @Override
-      public void onMapReady(@NonNull MapboxMap mapboxMap) {
+      public void onMapReady(@NonNull final MapboxMap mapboxMap) {
         PolylineActivity.this.mapboxMap = mapboxMap;
+
+        mapboxMap.setOnPolylineClickListener(new MapboxMap.OnPolylineClickListener() {
+          @Override
+          public void onPolylineClick(@NonNull Polyline polyline) {
+            Toast.makeText(
+              PolylineActivity.this,
+              "You clicked on polygon with id = " + polyline.getId(),
+              Toast.LENGTH_SHORT
+            ).show();
+          }
+        });
+
         polylines = mapboxMap.addPolylines(polylineOptions);
       }
     });
