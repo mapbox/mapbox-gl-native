@@ -58,8 +58,8 @@ public:
 
     std::shared_ptr<mbgl::DefaultFileSource> fileSourceObj;
     std::shared_ptr<mbgl::ThreadPool> threadPool;
-    std::unique_ptr<mbgl::Map> mapObj;
     std::unique_ptr<QMapboxGLRendererFrontend> frontend;
+    std::unique_ptr<mbgl::Map> mapObj;
 
     bool dirty { false };
 
