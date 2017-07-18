@@ -80,6 +80,7 @@ public class MapboxMapOptions implements Parcelable {
   private int myLocationAccuracyTintColor;
   private int myLocationAccuracyAlpha;
   private float myLocationAccuracyThreshold;
+  private boolean prefetchesTiles = true;
 
   private String apiBaseUrl;
 
@@ -154,6 +155,7 @@ public class MapboxMapOptions implements Parcelable {
     style = in.readString();
     apiBaseUrl = in.readString();
     textureMode = in.readByte() != 0;
+    prefetchesTiles = in.readByte() != 0;
   }
 
   static Bitmap getBitmapFromDrawable(Drawable drawable) {
@@ -297,6 +299,8 @@ public class MapboxMapOptions implements Parcelable {
         typedArray.getFloat(R.styleable.mapbox_MapView_mapbox_myLocationAccuracyThreshold, 0));
       mapboxMapOptions.textureMode(
         typedArray.getBoolean(R.styleable.mapbox_MapView_mapbox_renderTextureMode, false));
+      mapboxMapOptions.setPrefetchesTiles(
+        typedArray.getBoolean(R.styleable.mapbox_MapView_mapbox_enableTilePrefetch, true));
     } finally {
       typedArray.recycle();
     }
@@ -712,6 +716,30 @@ public class MapboxMapOptions implements Parcelable {
   }
 
   /**
+   * Enable tile pre-fetching. Loads tiles at a lower zoom-level to pre-render
+   * a low resolution preview while more detailed tiles are loaded.
+   *
+   * Enabled by default
+   *
+   * @param enable true to enable
+   *
+   * @return This
+   */
+  public MapboxMapOptions setPrefetchesTiles(boolean enable) {
+    this.prefetchesTiles = enable;
+    return this;
+  }
+
+  /**
+   * Check whether tile pre-fetching is enabled.
+   *
+   * @return true if enabled
+   */
+  public boolean getPrefetchesTiles() {
+    return prefetchesTiles;
+  }
+
+  /**
    * Get the current configured API endpoint base URL.
    *
    * @return Base URL to be used API endpoint.
@@ -1094,6 +1122,7 @@ public class MapboxMapOptions implements Parcelable {
     dest.writeString(style);
     dest.writeString(apiBaseUrl);
     dest.writeByte((byte) (textureMode ? 1 : 0));
+    dest.writeByte((byte) (prefetchesTiles ? 1 : 0));
   }
 
   @Override
@@ -1217,6 +1246,9 @@ public class MapboxMapOptions implements Parcelable {
     if (apiBaseUrl != null ? !apiBaseUrl.equals(options.apiBaseUrl) : options.apiBaseUrl != null) {
       return false;
     }
+    if (prefetchesTiles != options.prefetchesTiles) {
+      return false;
+    }
     return false;
   }
 
@@ -1263,6 +1295,7 @@ public class MapboxMapOptions implements Parcelable {
     result = 31 * result + (apiBaseUrl != null ? apiBaseUrl.hashCode() : 0);
     result = 31 * result + (textureMode ? 1 : 0);
     result = 31 * result + (style != null ? style.hashCode() : 0);
+    result = 31 * result + (prefetchesTiles ? 1 : 0);
     return result;
   }
 }

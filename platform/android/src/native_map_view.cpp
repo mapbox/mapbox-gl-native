@@ -1037,6 +1037,15 @@ void NativeMapView::removeImage(JNIEnv& env, jni::String name) {
     map->getStyle().removeImage(jni::Make<std::string>(env, name));
 }
 
+
+void NativeMapView::setPrefetchesTiles(JNIEnv&, jni::jboolean enable) {
+    map->setPrefetchZoomDelta(enable ? util::DEFAULT_PREFETCH_ZOOM_DELTA : uint8_t(0));
+}
+
+jni::jboolean NativeMapView::getPrefetchesTiles(JNIEnv&) {
+    return jni::jboolean(map->getPrefetchZoomDelta() > 0);
+}
+
 // Private methods //
 
 void NativeMapView::_initializeDisplay() {
@@ -1537,7 +1546,9 @@ void NativeMapView::registerNative(jni::JNIEnv& env) {
             METHOD(&NativeMapView::removeSource, "nativeRemoveSource"),
             METHOD(&NativeMapView::addImage, "nativeAddImage"),
             METHOD(&NativeMapView::removeImage, "nativeRemoveImage"),
-            METHOD(&NativeMapView::setLatLngBounds, "nativeSetLatLngBounds")
+            METHOD(&NativeMapView::setLatLngBounds, "nativeSetLatLngBounds"),
+            METHOD(&NativeMapView::setPrefetchesTiles, "nativeSetPrefetchesTiles"),
+            METHOD(&NativeMapView::getPrefetchesTiles, "nativeGetPrefetchesTiles")
     );
 }
 

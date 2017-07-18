@@ -638,6 +638,20 @@ final class NativeMapView {
     return nativeGetCameraPosition();
   }
 
+  public void setPrefetchesTiles(boolean enable) {
+    if (isDestroyedOn("setPrefetchesTiles")) {
+      return;
+    }
+    nativeSetPrefetchesTiles(enable);
+  }
+
+  public boolean getPrefetchesTiles() {
+    if (isDestroyedOn("getPrefetchesTiles")) {
+      return false;
+    }
+    return nativeGetPrefetchesTiles();
+  }
+
   // Runtime style Api
 
   public long getTransitionDuration() {
@@ -1071,6 +1085,10 @@ final class NativeMapView {
                                                              Object[] filter);
 
   private native Light nativeGetLight();
+
+  private native void nativeSetPrefetchesTiles(boolean enable);
+
+  private native boolean nativeGetPrefetchesTiles();
 
   int getWidth() {
     if (isDestroyedOn("")) {
