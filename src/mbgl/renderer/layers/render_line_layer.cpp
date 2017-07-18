@@ -1,6 +1,5 @@
 #include <mbgl/renderer/layers/render_line_layer.hpp>
 #include <mbgl/renderer/buckets/line_bucket.hpp>
-#include <mbgl/renderer/painter.hpp>
 #include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/renderer/paint_parameters.hpp>
 #include <mbgl/renderer/image_manager.hpp>
@@ -53,8 +52,8 @@ bool RenderLineLayer::hasTransition() const {
     return unevaluated.hasTransition();
 }
 
-void RenderLineLayer::render(Painter& painter, PaintParameters& parameters, RenderSource*) {
-    if (painter.pass == RenderPass::Opaque) {
+void RenderLineLayer::render(PaintParameters& parameters, RenderSource*) {
+    if (parameters.pass == RenderPass::Opaque) {
         return;
     }
 
@@ -64,18 +63,18 @@ void RenderLineLayer::render(Painter& painter, PaintParameters& parameters, Rend
 
         auto draw = [&] (auto& program, auto&& uniformValues) {
             program.get(evaluated).draw(
-                painter.context,
+                parameters.context,
                 gl::Triangles(),
-                painter.depthModeForSublayer(0, gl::DepthMode::ReadOnly),
-                painter.stencilModeForClipping(tile.clip),
-                painter.colorModeForRenderPass(),
+                parameters.depthModeForSublayer(0, gl::DepthMode::ReadOnly),
+                parameters.stencilModeForClipping(tile.clip),
+                parameters.colorModeForRenderPass(),
                 std::move(uniformValues),
                 *bucket.vertexBuffer,
                 *bucket.indexBuffer,
                 bucket.segments,
                 bucket.paintPropertyBinders.at(getID()),
                 evaluated,
-                painter.state.getZoom(),
+                parameters.state.getZoom(),
                 getID()
             );
         };
@@ -83,38 +82,38 @@ void RenderLineLayer::render(Painter& painter, PaintParameters& parameters, Rend
         if (!evaluated.get<LineDasharray>().from.empty()) {
             const LinePatternCap cap = bucket.layout.get<LineCap>() == LineCapType::Round
                 ? LinePatternCap::Round : LinePatternCap::Square;
-            LinePatternPos posA = painter.lineAtlas->getDashPosition(evaluated.get<LineDasharray>().from, cap);
-            LinePatternPos posB = painter.lineAtlas->getDashPosition(evaluated.get<LineDasharray>().to, cap);
+            LinePatternPos posA = parameters.lineAtlas.getDashPosition(evaluated.get<LineDasharray>().from, cap);
+            LinePatternPos posB = parameters.lineAtlas.getDashPosition(evaluated.get<LineDasharray>().to, cap);
 
-            painter.lineAtlas->bind(painter.context, 0);
+            parameters.lineAtlas.bind(parameters.context, 0);
 
             draw(parameters.programs.lineSDF,
                  LineSDFProgram::uniformValues(
                      evaluated,
-                     painter.frame.pixelRatio,
+                     parameters.pixelRatio,
                      tile,
-                     painter.state,
-                     painter.pixelsToGLUnits,
+                     parameters.state,
+                     parameters.pixelsToGLUnits,
                      posA,
                      posB,
-                     painter.lineAtlas->getSize().width));
+                     parameters.lineAtlas.getSize().width));
 
         } else if (!evaluated.get<LinePattern>().from.empty()) {
-            optional<ImagePosition> posA = painter.imageManager->getPattern(evaluated.get<LinePattern>().from);
-            optional<ImagePosition> posB = painter.imageManager->getPattern(evaluated.get<LinePattern>().to);
+            optional<ImagePosition> posA = parameters.imageManager.getPattern(evaluated.get<LinePattern>().from);
+            optional<ImagePosition> posB = parameters.imageManager.getPattern(evaluated.get<LinePattern>().to);
 
             if (!posA || !posB)
                 return;
 
-            painter.imageManager->bind(painter.context, 0);
+            parameters.imageManager.bind(parameters.context, 0);
 
             draw(parameters.programs.linePattern,
                  LinePatternProgram::uniformValues(
                      evaluated,
                      tile,
-                     painter.state,
-                     painter.pixelsToGLUnits,
-                     painter.imageManager->getPixelSize(),
+                     parameters.state,
+                     parameters.pixelsToGLUnits,
+                     parameters.imageManager.getPixelSize(),
                      *posA,
                      *posB));
 
@@ -123,8 +122,8 @@ void RenderLineLayer::render(Painter& painter, PaintParameters& parameters, Rend
                  LineProgram::uniformValues(
                      evaluated,
                      tile,
-                     painter.state,
-                     painter.pixelsToGLUnits));
+                     parameters.state,
+                     parameters.pixelsToGLUnits));
         }
     }
 }

@@ -1,12 +1,13 @@
 #include <mbgl/renderer/layers/render_fill_extrusion_layer.hpp>
 #include <mbgl/renderer/buckets/fill_extrusion_bucket.hpp>
-#include <mbgl/renderer/painter.hpp>
 #include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/renderer/paint_parameters.hpp>
 #include <mbgl/renderer/image_manager.hpp>
+#include <mbgl/renderer/render_static_data.hpp>
 #include <mbgl/programs/programs.hpp>
 #include <mbgl/programs/fill_extrusion_program.hpp>
 #include <mbgl/tile/tile.hpp>
+#include <mbgl/map/view.hpp>
 #include <mbgl/style/layers/fill_extrusion_layer_impl.hpp>
 #include <mbgl/geometry/feature_index.hpp>
 #include <mbgl/util/math.hpp>
@@ -44,22 +45,22 @@ bool RenderFillExtrusionLayer::hasTransition() const {
     return unevaluated.hasTransition();
 }
 
-void RenderFillExtrusionLayer::render(Painter& painter, PaintParameters& parameters, RenderSource*) {
-    if (painter.pass == RenderPass::Opaque) {
+void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*) {
+    if (parameters.pass == RenderPass::Opaque) {
         return;
     }
 
-    const auto size = painter.context.viewport.getCurrentValue().size;
+    const auto size = parameters.context.viewport.getCurrentValue().size;
 
-    if (!painter.extrusionTexture || painter.extrusionTexture->getSize() != size) {
-        painter.extrusionTexture = OffscreenTexture(painter.context, size, OffscreenTextureAttachment::Depth);
+    if (!parameters.staticData.extrusionTexture || parameters.staticData.extrusionTexture->getSize() != size) {
+        parameters.staticData.extrusionTexture = OffscreenTexture(parameters.context, size, OffscreenTextureAttachment::Depth);
     }
 
-    painter.extrusionTexture->bind();
+    parameters.staticData.extrusionTexture->bind();
 
-    painter.context.setStencilMode(gl::StencilMode::disabled());
-    painter.context.setDepthMode(painter.depthModeForSublayer(0, gl::DepthMode::ReadWrite));
-    painter.context.clear(Color{ 0.0f, 0.0f, 0.0f, 0.0f }, 1.0f, {});
+    parameters.context.setStencilMode(gl::StencilMode::disabled());
+    parameters.context.setDepthMode(parameters.depthModeForSublayer(0, gl::DepthMode::ReadWrite));
+    parameters.context.clear(Color{ 0.0f, 0.0f, 0.0f, 0.0f }, 1.0f, {});
 
     if (evaluated.get<FillExtrusionPattern>().from.empty()) {
         for (const RenderTile& tile : renderTiles) {
@@ -67,71 +68,71 @@ void RenderFillExtrusionLayer::render(Painter& painter, PaintParameters& paramet
             FillExtrusionBucket& bucket = *reinterpret_cast<FillExtrusionBucket*>(tile.tile.getBucket(*baseImpl));
 
             parameters.programs.fillExtrusion.get(evaluated).draw(
-                painter.context,
+                parameters.context,
                 gl::Triangles(),
-                painter.depthModeForSublayer(0, gl::DepthMode::ReadWrite),
+                parameters.depthModeForSublayer(0, gl::DepthMode::ReadWrite),
                 gl::StencilMode::disabled(),
-                painter.colorModeForRenderPass(),
+                parameters.colorModeForRenderPass(),
                 FillExtrusionUniforms::values(
                     tile.translatedClipMatrix(evaluated.get<FillExtrusionTranslate>(),
                                               evaluated.get<FillExtrusionTranslateAnchor>(),
-                                              painter.state),
-                    painter.state,
-                    painter.evaluatedLight
+                                              parameters.state),
+                    parameters.state,
+                    parameters.evaluatedLight
                 ),
                 *bucket.vertexBuffer,
                 *bucket.indexBuffer,
                 bucket.triangleSegments,
                 bucket.paintPropertyBinders.at(getID()),
                 evaluated,
-                painter.state.getZoom(),
+                parameters.state.getZoom(),
                 getID());
         }
     } else {
-        optional<ImagePosition> imagePosA = painter.imageManager->getPattern(evaluated.get<FillExtrusionPattern>().from);
-        optional<ImagePosition> imagePosB = painter.imageManager->getPattern(evaluated.get<FillExtrusionPattern>().to);
+        optional<ImagePosition> imagePosA = parameters.imageManager.getPattern(evaluated.get<FillExtrusionPattern>().from);
+        optional<ImagePosition> imagePosB = parameters.imageManager.getPattern(evaluated.get<FillExtrusionPattern>().to);
 
         if (!imagePosA || !imagePosB) {
             return;
         }
 
-        painter.imageManager->bind(painter.context, 0);
+        parameters.imageManager.bind(parameters.context, 0);
 
         for (const RenderTile& tile : renderTiles) {
             assert(dynamic_cast<FillExtrusionBucket*>(tile.tile.getBucket(*baseImpl)));
             FillExtrusionBucket& bucket = *reinterpret_cast<FillExtrusionBucket*>(tile.tile.getBucket(*baseImpl));
 
             parameters.programs.fillExtrusionPattern.get(evaluated).draw(
-                painter.context,
+                parameters.context,
                 gl::Triangles(),
-                painter.depthModeForSublayer(0, gl::DepthMode::ReadWrite),
+                parameters.depthModeForSublayer(0, gl::DepthMode::ReadWrite),
                 gl::StencilMode::disabled(),
-                painter.colorModeForRenderPass(),
+                parameters.colorModeForRenderPass(),
                 FillExtrusionPatternUniforms::values(
                     tile.translatedClipMatrix(evaluated.get<FillExtrusionTranslate>(),
                                               evaluated.get<FillExtrusionTranslateAnchor>(),
-                                              painter.state),
-                    painter.imageManager->getPixelSize(),
+                                              parameters.state),
+                    parameters.imageManager.getPixelSize(),
                     *imagePosA,
                     *imagePosB,
                     evaluated.get<FillExtrusionPattern>(),
                     tile.id,
-                    painter.state,
+                    parameters.state,
                     -std::pow(2, tile.id.canonical.z) / util::tileSize / 8.0f,
-                    painter.evaluatedLight
+                    parameters.evaluatedLight
                 ),
                 *bucket.vertexBuffer,
                 *bucket.indexBuffer,
                 bucket.triangleSegments,
                 bucket.paintPropertyBinders.at(getID()),
                 evaluated,
-                painter.state.getZoom(),
+                parameters.state.getZoom(),
                 getID());
         }
     }
 
     parameters.view.bind();
-    painter.context.bindTexture(painter.extrusionTexture->getTexture());
+    parameters.context.bindTexture(parameters.staticData.extrusionTexture->getTexture());
 
     mat4 viewportMat;
     matrix::ortho(viewportMat, 0, size.width, size.height, 0, 0, 1);
@@ -139,22 +140,22 @@ void RenderFillExtrusionLayer::render(Painter& painter, PaintParameters& paramet
     const Properties<>::PossiblyEvaluated properties;
 
     parameters.programs.extrusionTexture.draw(
-        painter.context,
+        parameters.context,
         gl::Triangles(),
         gl::DepthMode::disabled(),
         gl::StencilMode::disabled(),
-        painter.colorModeForRenderPass(),
+        parameters.colorModeForRenderPass(),
         ExtrusionTextureProgram::UniformValues{
             uniforms::u_matrix::Value{ viewportMat }, uniforms::u_world::Value{ size },
             uniforms::u_image::Value{ 0 },
             uniforms::u_opacity::Value{ evaluated.get<FillExtrusionOpacity>() }
         },
-        painter.extrusionTextureVertexBuffer,
-        painter.quadTriangleIndexBuffer,
-        painter.extrusionTextureSegments,
+        parameters.staticData.extrusionTextureVertexBuffer,
+        parameters.staticData.quadTriangleIndexBuffer,
+        parameters.staticData.extrusionTextureSegments,
         ExtrusionTextureProgram::PaintPropertyBinders{ properties, 0 },
         properties,
-        painter.state.getZoom(),
+        parameters.state.getZoom(),
         getID());
 }
 

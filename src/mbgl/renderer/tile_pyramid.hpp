@@ -18,7 +18,7 @@
 
 namespace mbgl {
 
-class Painter;
+class PaintParameters;
 class TransformState;
 class RenderTile;
 class RenderStyle;
@@ -42,8 +42,8 @@ public:
                 Range<uint8_t> zoomRange,
                 std::function<std::unique_ptr<Tile> (const OverscaledTileID&)> createTile);
 
-    void startRender(Painter&);
-    void finishRender(Painter&);
+    void startRender(PaintParameters&);
+    void finishRender(PaintParameters&);
 
     std::vector<std::reference_wrapper<RenderTile>> getRenderTiles();
 

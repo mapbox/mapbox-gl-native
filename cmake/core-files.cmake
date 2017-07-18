@@ -175,11 +175,10 @@ set(MBGL_CORE_FILES
     src/mbgl/renderer/image_atlas.hpp
     src/mbgl/renderer/image_manager.cpp
     src/mbgl/renderer/image_manager.hpp
+    src/mbgl/renderer/paint_parameters.cpp
     src/mbgl/renderer/paint_parameters.hpp
     src/mbgl/renderer/paint_property_binder.hpp
     src/mbgl/renderer/paint_property_statistics.hpp
-    src/mbgl/renderer/painter.cpp
-    src/mbgl/renderer/painter.hpp
     src/mbgl/renderer/possibly_evaluated_property_value.hpp
     src/mbgl/renderer/property_evaluation_parameters.hpp
     src/mbgl/renderer/property_evaluator.hpp
@@ -192,6 +191,8 @@ set(MBGL_CORE_FILES
     src/mbgl/renderer/render_source.cpp
     src/mbgl/renderer/render_source.hpp
     src/mbgl/renderer/render_source_observer.hpp
+    src/mbgl/renderer/render_static_data.cpp
+    src/mbgl/renderer/render_static_data.hpp
     src/mbgl/renderer/render_style.cpp
     src/mbgl/renderer/render_style.hpp
     src/mbgl/renderer/render_style_observer.hpp

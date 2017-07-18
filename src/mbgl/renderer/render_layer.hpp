@@ -14,7 +14,6 @@ class Bucket;
 class BucketParameters;
 class TransitionParameters;
 class PropertyEvaluationParameters;
-class Painter;
 class PaintParameters;
 class RenderSource;
 class RenderTile;
@@ -62,7 +61,7 @@ public:
     // Checks whether this layer can be rendered.
     bool needsRendering(float zoom) const;
 
-    virtual void render(Painter&, PaintParameters&, RenderSource*) = 0;
+    virtual void render(PaintParameters&, RenderSource*) = 0;
 
     // Check wether the given geometry intersects
     // with the feature

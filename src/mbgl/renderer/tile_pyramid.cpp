@@ -1,6 +1,6 @@
 #include <mbgl/renderer/tile_pyramid.hpp>
 #include <mbgl/renderer/render_tile.hpp>
-#include <mbgl/renderer/painter.hpp>
+#include <mbgl/renderer/paint_parameters.hpp>
 #include <mbgl/renderer/render_source.hpp>
 #include <mbgl/renderer/tile_parameters.hpp>
 #include <mbgl/renderer/query.hpp>
@@ -39,15 +39,15 @@ bool TilePyramid::isLoaded() const {
     return true;
 }
 
-void TilePyramid::startRender(Painter& painter) {
+void TilePyramid::startRender(PaintParameters& parameters) {
     for (auto& tile : renderTiles) {
-        tile.startRender(painter);
+        tile.startRender(parameters);
     }
 }
 
-void TilePyramid::finishRender(Painter& painter) {
+void TilePyramid::finishRender(PaintParameters& parameters) {
     for (auto& tile : renderTiles) {
-        tile.finishRender(painter);
+        tile.finishRender(parameters);
     }
 }
 

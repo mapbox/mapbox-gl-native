@@ -1,9 +1,9 @@
 #include <mbgl/renderer/layers/render_background_layer.hpp>
 #include <mbgl/style/layers/background_layer_impl.hpp>
 #include <mbgl/renderer/bucket.hpp>
-#include <mbgl/renderer/painter.hpp>
 #include <mbgl/renderer/paint_parameters.hpp>
 #include <mbgl/renderer/image_manager.hpp>
+#include <mbgl/renderer/render_static_data.hpp>
 #include <mbgl/programs/programs.hpp>
 #include <mbgl/programs/fill_program.hpp>
 #include <mbgl/util/tile_cover.hpp>
@@ -42,7 +42,7 @@ bool RenderBackgroundLayer::hasTransition() const {
     return unevaluated.hasTransition();
 }
 
-void RenderBackgroundLayer::render(Painter& painter, PaintParameters& parameters, RenderSource*) {
+void RenderBackgroundLayer::render(PaintParameters& parameters, RenderSource*) {
     // Note that for bottommost layers without a pattern, the background color is drawn with
     // glClear rather than this method.
 
@@ -54,58 +54,58 @@ void RenderBackgroundLayer::render(Painter& painter, PaintParameters& parameters
     const FillProgram::PaintPropertyBinders paintAttibuteData(properties, 0);
 
     if (!evaluated.get<BackgroundPattern>().to.empty()) {
-        optional<ImagePosition> imagePosA = painter.imageManager->getPattern(evaluated.get<BackgroundPattern>().from);
-        optional<ImagePosition> imagePosB = painter.imageManager->getPattern(evaluated.get<BackgroundPattern>().to);
+        optional<ImagePosition> imagePosA = parameters.imageManager.getPattern(evaluated.get<BackgroundPattern>().from);
+        optional<ImagePosition> imagePosB = parameters.imageManager.getPattern(evaluated.get<BackgroundPattern>().to);
 
         if (!imagePosA || !imagePosB)
             return;
 
-        painter.imageManager->bind(painter.context, 0);
+        parameters.imageManager.bind(parameters.context, 0);
 
-        for (const auto& tileID : util::tileCover(painter.state, painter.state.getIntegerZoom())) {
+        for (const auto& tileID : util::tileCover(parameters.state, parameters.state.getIntegerZoom())) {
             parameters.programs.fillPattern.get(properties).draw(
-                painter.context,
+                parameters.context,
                 gl::Triangles(),
-                painter.depthModeForSublayer(0, gl::DepthMode::ReadOnly),
+                parameters.depthModeForSublayer(0, gl::DepthMode::ReadOnly),
                 gl::StencilMode::disabled(),
-                painter.colorModeForRenderPass(),
+                parameters.colorModeForRenderPass(),
                 FillPatternUniforms::values(
-                    painter.matrixForTile(tileID),
-                    painter.context.viewport.getCurrentValue().size,
-                    painter.imageManager->getPixelSize(),
+                    parameters.matrixForTile(tileID),
+                    parameters.context.viewport.getCurrentValue().size,
+                    parameters.imageManager.getPixelSize(),
                     *imagePosA,
                     *imagePosB,
                     evaluated.get<BackgroundPattern>(),
                     tileID,
-                    painter.state
+                    parameters.state
                 ),
-                painter.tileVertexBuffer,
-                painter.quadTriangleIndexBuffer,
-                painter.tileTriangleSegments,
+                parameters.staticData.tileVertexBuffer,
+                parameters.staticData.quadTriangleIndexBuffer,
+                parameters.staticData.tileTriangleSegments,
                 paintAttibuteData,
                 properties,
-                painter.state.getZoom(),
+                parameters.state.getZoom(),
                 getID()
             );
         }
     } else {
-        for (const auto& tileID : util::tileCover(painter.state, painter.state.getIntegerZoom())) {
+        for (const auto& tileID : util::tileCover(parameters.state, parameters.state.getIntegerZoom())) {
             parameters.programs.fill.get(properties).draw(
-                painter.context,
+                parameters.context,
                 gl::Triangles(),
-                painter.depthModeForSublayer(0, gl::DepthMode::ReadOnly),
+                parameters.depthModeForSublayer(0, gl::DepthMode::ReadOnly),
                 gl::StencilMode::disabled(),
-                painter.colorModeForRenderPass(),
+                parameters.colorModeForRenderPass(),
                 FillProgram::UniformValues {
-                    uniforms::u_matrix::Value{ painter.matrixForTile(tileID) },
-                    uniforms::u_world::Value{ painter.context.viewport.getCurrentValue().size },
+                    uniforms::u_matrix::Value{ parameters.matrixForTile(tileID) },
+                    uniforms::u_world::Value{ parameters.context.viewport.getCurrentValue().size },
                 },
-                painter.tileVertexBuffer,
-                painter.quadTriangleIndexBuffer,
-                painter.tileTriangleSegments,
+                parameters.staticData.tileVertexBuffer,
+                parameters.staticData.quadTriangleIndexBuffer,
+                parameters.staticData.tileTriangleSegments,
                 paintAttibuteData,
                 properties,
-                painter.state.getZoom(),
+                parameters.state.getZoom(),
                 getID()
             );
         }

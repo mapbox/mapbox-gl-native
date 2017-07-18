@@ -1,6 +1,7 @@
 #include <mbgl/renderer/render_tile.hpp>
-#include <mbgl/renderer/painter.hpp>
+#include <mbgl/renderer/paint_parameters.hpp>
 #include <mbgl/renderer/buckets/debug_bucket.hpp>
+#include <mbgl/renderer/render_static_data.hpp>
 #include <mbgl/programs/programs.hpp>
 #include <mbgl/map/transform_state.hpp>
 #include <mbgl/tile/tile.hpp>
@@ -51,30 +52,30 @@ mat4 RenderTile::translatedClipMatrix(const std::array<float, 2>& translation,
     return translateVtxMatrix(nearClippedMatrix, translation, anchor, state, false);
 }
 
-void RenderTile::startRender(Painter& painter) {
-    tile.upload(painter.context);
+void RenderTile::startRender(PaintParameters& parameters) {
+    tile.upload(parameters.context);
 
     // Calculate two matrices for this tile: matrix is the standard tile matrix; nearClippedMatrix
     // clips the near plane to 100 to save depth buffer precision
-    painter.state.matrixFor(matrix, id);
-    painter.state.matrixFor(nearClippedMatrix, id);
-    matrix::multiply(matrix, painter.projMatrix, matrix);
-    matrix::multiply(nearClippedMatrix, painter.nearClippedProjMatrix, nearClippedMatrix);
+    parameters.state.matrixFor(matrix, id);
+    parameters.state.matrixFor(nearClippedMatrix, id);
+    matrix::multiply(matrix, parameters.projMatrix, matrix);
+    matrix::multiply(nearClippedMatrix, parameters.nearClippedProjMatrix, nearClippedMatrix);
 }
 
-void RenderTile::finishRender(Painter& painter) {
-    if (!used || painter.frame.debugOptions == MapDebugOptions::NoDebug)
+void RenderTile::finishRender(PaintParameters& parameters) {
+    if (!used || parameters.debugOptions == MapDebugOptions::NoDebug)
         return;
 
     static const style::Properties<>::PossiblyEvaluated properties {};
     static const DebugProgram::PaintPropertyBinders paintAttibuteData(properties, 0);
 
     auto draw = [&] (Color color, const auto& vertexBuffer, const auto& indexBuffer, const auto& segments, auto drawMode) {
-        painter.programs->debug.draw(
-            painter.context,
+        parameters.programs.debug.draw(
+            parameters.context,
             drawMode,
             gl::DepthMode::disabled(),
-            painter.stencilModeForClipping(clip),
+            parameters.stencilModeForClipping(clip),
             gl::ColorMode::unblended(),
             DebugProgram::UniformValues {
                 uniforms::u_matrix::Value{ matrix },
@@ -85,41 +86,41 @@ void RenderTile::finishRender(Painter& painter) {
             segments,
             paintAttibuteData,
             properties,
-            painter.state.getZoom(),
+            parameters.state.getZoom(),
             "debug"
         );
     };
 
-    if (painter.frame.debugOptions & (MapDebugOptions::Timestamps | MapDebugOptions::ParseStatus)) {
+    if (parameters.debugOptions & (MapDebugOptions::Timestamps | MapDebugOptions::ParseStatus)) {
         if (!tile.debugBucket || tile.debugBucket->renderable != tile.isRenderable() ||
             tile.debugBucket->complete != tile.isComplete() ||
             !(tile.debugBucket->modified == tile.modified) ||
             !(tile.debugBucket->expires == tile.expires) ||
-            tile.debugBucket->debugMode != painter.frame.debugOptions) {
+            tile.debugBucket->debugMode != parameters.debugOptions) {
             tile.debugBucket = std::make_unique<DebugBucket>(
                 tile.id, tile.isRenderable(), tile.isComplete(), tile.modified,
-                tile.expires, painter.frame.debugOptions, painter.context);
+                tile.expires, parameters.debugOptions, parameters.context);
         }
 
         draw(Color::white(),
              *tile.debugBucket->vertexBuffer,
              *tile.debugBucket->indexBuffer,
              tile.debugBucket->segments,
-             gl::Lines { 4.0f * painter.frame.pixelRatio });
+             gl::Lines { 4.0f * parameters.pixelRatio });
 
         draw(Color::black(),
              *tile.debugBucket->vertexBuffer,
              *tile.debugBucket->indexBuffer,
              tile.debugBucket->segments,
-             gl::Lines { 2.0f * painter.frame.pixelRatio });
+             gl::Lines { 2.0f * parameters.pixelRatio });
     }
 
-    if (painter.frame.debugOptions & MapDebugOptions::TileBorders) {
+    if (parameters.debugOptions & MapDebugOptions::TileBorders) {
         draw(Color::red(),
-             painter.tileVertexBuffer,
-             painter.tileBorderIndexBuffer,
-             painter.tileBorderSegments,
-             gl::LineStrip { 4.0f * painter.frame.pixelRatio });
+             parameters.staticData.tileVertexBuffer,
+             parameters.staticData.tileBorderIndexBuffer,
+             parameters.staticData.tileBorderSegments,
+             gl::LineStrip { 4.0f * parameters.pixelRatio });
     }
 }
 

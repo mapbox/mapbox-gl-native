@@ -1,10 +1,11 @@
 #include <mbgl/map/transform_state.hpp>
 #include <mbgl/math/log2.hpp>
 #include <mbgl/renderer/buckets/raster_bucket.hpp>
-#include <mbgl/renderer/painter.hpp>
+#include <mbgl/renderer/paint_parameters.hpp>
 #include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/renderer/sources/render_image_source.hpp>
 #include <mbgl/renderer/tile_parameters.hpp>
+#include <mbgl/renderer/render_static_data.hpp>
 #include <mbgl/programs/programs.hpp>
 #include <mbgl/util/tile_coordinate.hpp>
 #include <mbgl/util/tile_cover.hpp>
@@ -28,7 +29,7 @@ bool RenderImageSource::isLoaded() const {
     return !!bucket;
 }
 
-void RenderImageSource::startRender(Painter& painter) {
+void RenderImageSource::startRender(PaintParameters& parameters) {
     if (!isLoaded()) {
         return;
     }
@@ -38,18 +39,18 @@ void RenderImageSource::startRender(Painter& painter) {
     for (size_t i = 0; i < tileIds.size(); i++) {
         mat4 matrix;
         matrix::identity(matrix);
-        painter.state.matrixFor(matrix, tileIds[i]);
-        matrix::multiply(matrix, painter.projMatrix, matrix);
+        parameters.state.matrixFor(matrix, tileIds[i]);
+        matrix::multiply(matrix, parameters.projMatrix, matrix);
         matrices.push_back(matrix);
     }
 
     if (bucket->needsUpload()) {
-        bucket->upload(painter.context);
+        bucket->upload(parameters.context);
     }
 }
 
-void RenderImageSource::finishRender(Painter& painter) {
-    if (!isLoaded() || !(painter.frame.debugOptions & MapDebugOptions::TileBorders)) {
+void RenderImageSource::finishRender(PaintParameters& parameters) {
+    if (!isLoaded() || !(parameters.debugOptions & MapDebugOptions::TileBorders)) {
         return;
     }
 
@@ -57,9 +58,9 @@ void RenderImageSource::finishRender(Painter& painter) {
     static const DebugProgram::PaintPropertyBinders paintAttibuteData(properties, 0);
 
     for (auto matrix : matrices) {
-        painter.programs->debug.draw(
-            painter.context,
-            gl::LineStrip { 4.0f * painter.frame.pixelRatio },
+        parameters.programs.debug.draw(
+            parameters.context,
+            gl::LineStrip { 4.0f * parameters.pixelRatio },
             gl::DepthMode::disabled(),
             gl::StencilMode::disabled(),
             gl::ColorMode::unblended(),
@@ -67,12 +68,12 @@ void RenderImageSource::finishRender(Painter& painter) {
              uniforms::u_matrix::Value{ matrix },
              uniforms::u_color::Value{ Color::red() }
             },
-            painter.tileVertexBuffer,
-            painter.tileBorderIndexBuffer,
-            painter.tileBorderSegments,
+            parameters.staticData.tileVertexBuffer,
+            parameters.staticData.tileBorderIndexBuffer,
+            parameters.staticData.tileBorderSegments,
             paintAttibuteData,
             properties,
-            painter.state.getZoom(),
+            parameters.state.getZoom(),
             "debug"
         );
     }

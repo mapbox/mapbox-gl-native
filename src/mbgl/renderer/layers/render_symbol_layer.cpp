@@ -2,9 +2,9 @@
 #include <mbgl/renderer/buckets/symbol_bucket.hpp>
 #include <mbgl/renderer/bucket_parameters.hpp>
 #include <mbgl/renderer/property_evaluation_parameters.hpp>
-#include <mbgl/renderer/painter.hpp>
 #include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/renderer/paint_parameters.hpp>
+#include <mbgl/renderer/frame_history.hpp>
 #include <mbgl/text/glyph_atlas.hpp>
 #include <mbgl/programs/programs.hpp>
 #include <mbgl/programs/symbol_program.hpp>
@@ -70,8 +70,8 @@ bool RenderSymbolLayer::hasTransition() const {
     return unevaluated.hasTransition();
 }
 
-void RenderSymbolLayer::render(Painter& painter, PaintParameters& parameters, RenderSource*) {
-    if (painter.pass == RenderPass::Opaque) {
+void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
+    if (parameters.pass == RenderPass::Opaque) {
         return;
     }
 
@@ -81,7 +81,7 @@ void RenderSymbolLayer::render(Painter& painter, PaintParameters& parameters, Re
 
         const auto& layout = bucket.layout;
 
-        painter.frameHistory.bind(painter.context, 1);
+        parameters.frameHistory.bind(parameters.context, 1);
 
         auto draw = [&] (auto& program,
                          auto&& uniformValues,
@@ -92,18 +92,18 @@ void RenderSymbolLayer::render(Painter& painter, PaintParameters& parameters, Re
                          const auto& paintProperties)
         {
             // We clip symbols to their tile extent in still mode.
-            const bool needsClipping = painter.frame.mapMode == MapMode::Still;
+            const bool needsClipping = parameters.mapMode == MapMode::Still;
 
             program.get(paintProperties).draw(
-                painter.context,
+                parameters.context,
                 gl::Triangles(),
                 values_.pitchAlignment == AlignmentType::Map
-                    ? painter.depthModeForSublayer(0, gl::DepthMode::ReadOnly)
+                    ? parameters.depthModeForSublayer(0, gl::DepthMode::ReadOnly)
                     : gl::DepthMode::disabled(),
                 needsClipping
-                    ? painter.stencilModeForClipping(tile.clip)
+                    ? parameters.stencilModeForClipping(tile.clip)
                     : gl::StencilMode::disabled(),
-                painter.colorModeForRenderPass(),
+                parameters.colorModeForRenderPass(),
                 std::move(uniformValues),
                 *buffers.vertexBuffer,
                 *buffers.dynamicVertexBuffer,
@@ -112,7 +112,7 @@ void RenderSymbolLayer::render(Painter& painter, PaintParameters& parameters, Re
                 buffers.segments,
                 binders,
                 paintProperties,
-                painter.state.getZoom(),
+                parameters.state.getZoom(),
                 getID()
             );
         };
@@ -134,17 +134,17 @@ void RenderSymbolLayer::render(Painter& painter, PaintParameters& parameters, Re
                                     values,
                                     tile,
                                     *bucket.iconSizeBinder,
-                                    painter.state,
-                                    painter.frameHistory);
+                                    parameters.state,
+                                    parameters.frameHistory);
 
-                painter.context.updateVertexBuffer(*bucket.icon.dynamicVertexBuffer, std::move(bucket.icon.dynamicVertices));
+                parameters.context.updateVertexBuffer(*bucket.icon.dynamicVertexBuffer, std::move(bucket.icon.dynamicVertices));
             }
 
             const bool iconScaled = layout.get<IconSize>().constantOr(1.0) != 1.0 || bucket.iconsNeedLinear;
-            const bool iconTransformed = values.rotationAlignment == AlignmentType::Map || painter.state.getPitch() != 0;
+            const bool iconTransformed = values.rotationAlignment == AlignmentType::Map || parameters.state.getPitch() != 0;
 
-            painter.context.bindTexture(*geometryTile.iconAtlasTexture, 0,
-                bucket.sdfIcons || painter.state.isChanging() || iconScaled || iconTransformed
+            parameters.context.bindTexture(*geometryTile.iconAtlasTexture, 0,
+                bucket.sdfIcons || parameters.state.isChanging() || iconScaled || iconTransformed
                     ? gl::TextureFilter::Linear : gl::TextureFilter::Nearest);
 
             const Size texsize = geometryTile.iconAtlasTexture->size;
@@ -152,7 +152,7 @@ void RenderSymbolLayer::render(Painter& painter, PaintParameters& parameters, Re
             if (bucket.sdfIcons) {
                 if (values.hasHalo) {
                     draw(parameters.programs.symbolIconSDF,
-                         SymbolSDFIconProgram::uniformValues(false, values, texsize, painter.pixelsToGLUnits, alongLine, tile, painter.state, SymbolSDFPart::Halo),
+                         SymbolSDFIconProgram::uniformValues(false, values, texsize, parameters.pixelsToGLUnits, alongLine, tile, parameters.state, SymbolSDFPart::Halo),
                          bucket.icon,
                          bucket.iconSizeBinder,
                          values,
@@ -162,7 +162,7 @@ void RenderSymbolLayer::render(Painter& painter, PaintParameters& parameters, Re
 
                 if (values.hasFill) {
                     draw(parameters.programs.symbolIconSDF,
-                         SymbolSDFIconProgram::uniformValues(false, values, texsize, painter.pixelsToGLUnits, alongLine, tile, painter.state, SymbolSDFPart::Fill),
+                         SymbolSDFIconProgram::uniformValues(false, values, texsize, parameters.pixelsToGLUnits, alongLine, tile, parameters.state, SymbolSDFPart::Fill),
                          bucket.icon,
                          bucket.iconSizeBinder,
                          values,
@@ -171,7 +171,7 @@ void RenderSymbolLayer::render(Painter& painter, PaintParameters& parameters, Re
                 }
             } else {
                 draw(parameters.programs.symbolIcon,
-                     SymbolIconProgram::uniformValues(false, values, texsize, painter.pixelsToGLUnits, alongLine, tile, painter.state),
+                     SymbolIconProgram::uniformValues(false, values, texsize, parameters.pixelsToGLUnits, alongLine, tile, parameters.state),
                      bucket.icon,
                      bucket.iconSizeBinder,
                      values,
@@ -181,7 +181,7 @@ void RenderSymbolLayer::render(Painter& painter, PaintParameters& parameters, Re
         }
 
         if (bucket.hasTextData()) {
-            painter.context.bindTexture(*geometryTile.glyphAtlasTexture, 0, gl::TextureFilter::Linear);
+            parameters.context.bindTexture(*geometryTile.glyphAtlasTexture, 0, gl::TextureFilter::Linear);
 
             auto values = textPropertyValues(layout);
             auto paintPropertyValues = textPaintProperties();
@@ -196,17 +196,17 @@ void RenderSymbolLayer::render(Painter& painter, PaintParameters& parameters, Re
                                     values,
                                     tile,
                                     *bucket.textSizeBinder,
-                                    painter.state,
-                                    painter.frameHistory);
+                                    parameters.state,
+                                    parameters.frameHistory);
 
-                painter.context.updateVertexBuffer(*bucket.text.dynamicVertexBuffer, std::move(bucket.text.dynamicVertices));
+                parameters.context.updateVertexBuffer(*bucket.text.dynamicVertexBuffer, std::move(bucket.text.dynamicVertices));
             }
 
             const Size texsize = geometryTile.glyphAtlasTexture->size;
 
             if (values.hasHalo) {
                 draw(parameters.programs.symbolGlyph,
-                     SymbolSDFTextProgram::uniformValues(true, values, texsize, painter.pixelsToGLUnits, alongLine, tile, painter.state, SymbolSDFPart::Halo),
+                     SymbolSDFTextProgram::uniformValues(true, values, texsize, parameters.pixelsToGLUnits, alongLine, tile, parameters.state, SymbolSDFPart::Halo),
                      bucket.text,
                      bucket.textSizeBinder,
                      values,
@@ -216,7 +216,7 @@ void RenderSymbolLayer::render(Painter& painter, PaintParameters& parameters, Re
 
             if (values.hasFill) {
                 draw(parameters.programs.symbolGlyph,
-                     SymbolSDFTextProgram::uniformValues(true, values, texsize, painter.pixelsToGLUnits, alongLine, tile, painter.state, SymbolSDFPart::Fill),
+                     SymbolSDFTextProgram::uniformValues(true, values, texsize, parameters.pixelsToGLUnits, alongLine, tile, parameters.state, SymbolSDFPart::Fill),
                      bucket.text,
                      bucket.textSizeBinder,
                      values,
@@ -229,20 +229,20 @@ void RenderSymbolLayer::render(Painter& painter, PaintParameters& parameters, Re
             static const style::Properties<>::PossiblyEvaluated properties {};
             static const CollisionBoxProgram::PaintPropertyBinders paintAttributeData(properties, 0);
 
-            painter.programs->collisionBox.draw(
-                painter.context,
+            parameters.programs.collisionBox.draw(
+                parameters.context,
                 gl::Lines { 1.0f },
                 gl::DepthMode::disabled(),
-                painter.stencilModeForClipping(tile.clip),
-                painter.colorModeForRenderPass(),
+                parameters.stencilModeForClipping(tile.clip),
+                parameters.colorModeForRenderPass(),
                 CollisionBoxProgram::UniformValues {
                     uniforms::u_matrix::Value{ tile.matrix },
-                    uniforms::u_scale::Value{ std::pow(2.0f, float(painter.state.getZoom() - tile.tile.id.overscaledZ)) },
-                    uniforms::u_zoom::Value{ float(painter.state.getZoom() * 10) },
+                    uniforms::u_scale::Value{ std::pow(2.0f, float(parameters.state.getZoom() - tile.tile.id.overscaledZ)) },
+                    uniforms::u_zoom::Value{ float(parameters.state.getZoom() * 10) },
                     uniforms::u_maxzoom::Value{ float((tile.id.canonical.z + 1) * 10) },
                     uniforms::u_collision_y_stretch::Value{ tile.tile.yStretch() },
-                    uniforms::u_camera_to_center_distance::Value{ painter.state.getCameraToCenterDistance() },
-                    uniforms::u_pitch::Value{ painter.state.getPitch() },
+                    uniforms::u_camera_to_center_distance::Value{ parameters.state.getCameraToCenterDistance() },
+                    uniforms::u_pitch::Value{ parameters.state.getPitch() },
                     uniforms::u_fadetexture::Value{ 1 }
                 },
                 *bucket.collisionBox.vertexBuffer,
@@ -250,7 +250,7 @@ void RenderSymbolLayer::render(Painter& painter, PaintParameters& parameters, Re
                 bucket.collisionBox.segments,
                 paintAttributeData,
                 properties,
-                painter.state.getZoom(),
+                parameters.state.getZoom(),
                 getID()
             );
         }
