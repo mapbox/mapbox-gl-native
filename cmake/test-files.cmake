@@ -41,6 +41,7 @@ set(MBGL_TEST_FILES
     test/programs/symbol_program.test.cpp
 
     # renderer
+    test/renderer/backend_scope.test.cpp
     test/renderer/group_by_layout.test.cpp
     test/renderer/image_manager.test.cpp
 
@@ -60,6 +61,8 @@ set(MBGL_TEST_FILES
     test/src/mbgl/test/stub_geometry_tile_feature.hpp
     test/src/mbgl/test/stub_layer_observer.hpp
     test/src/mbgl/test/stub_render_source_observer.hpp
+    test/src/mbgl/test/stub_renderer_frontend.cpp
+    test/src/mbgl/test/stub_renderer_frontend.hpp
     test/src/mbgl/test/stub_style_observer.hpp
     test/src/mbgl/test/stub_tile_observer.hpp
     test/src/mbgl/test/test.cpp

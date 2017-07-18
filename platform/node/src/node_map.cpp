@@ -3,16 +3,17 @@
 #include "node_feature.hpp"
 #include "node_conversion.hpp"
 #include "node_geojson.hpp"
+#include "node_renderer_frontend.hpp"
 
-#include <mbgl/gl/headless_display.hpp>
 #include <mbgl/util/exception.hpp>
+#include <mbgl/renderer/renderer.hpp>
+#include <mbgl/renderer/backend_scope.hpp>
 #include <mbgl/style/conversion/source.hpp>
 #include <mbgl/style/conversion/layer.hpp>
 #include <mbgl/style/conversion/filter.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/image.hpp>
-#include <mbgl/map/backend_scope.hpp>
-#include <mbgl/map/query.hpp>
+#include <mbgl/map/map_observer.hpp>
 #include <mbgl/util/premultiply.hpp>
 
 #include <unistd.h>
@@ -33,19 +34,13 @@ struct NodeMap::RenderOptions {
 
 Nan::Persistent<v8::Function> NodeMap::constructor;
 
-static std::shared_ptr<mbgl::HeadlessDisplay> sharedDisplay() {
-    static auto display = std::make_shared<mbgl::HeadlessDisplay>();
-    return display;
-}
-
 static const char* releasedMessage() {
     return "Map resources have already been released";
 }
 
-NodeBackend::NodeBackend()
-    : HeadlessBackend(sharedDisplay()) {}
+NodeBackend::NodeBackend(): HeadlessBackend() {}
 
-void NodeBackend::onDidFailLoadingMap(std::exception_ptr error) {
+void NodeMapObserver::onDidFailLoadingMap(std::exception_ptr error) {
     std::rethrow_exception(error);
 }
 
@@ -79,9 +74,6 @@ void NodeMap::Init(v8::Local<v8::Object> target) {
 
     constructor.Reset(tpl->GetFunction());
     Nan::Set(target, Nan::New("Map").ToLocalChecked(), tpl->GetFunction());
-
-    // Initialize display connection on module load.
-    sharedDisplay();
 }
 
 /**
@@ -397,7 +389,7 @@ void NodeMap::startRender(NodeMap::RenderOptions options) {
         map->setDebug(options.debugOptions);
     }
 
-    map->renderStill(*view, [this](const std::exception_ptr eptr) {
+    map->renderStill([this](const std::exception_ptr eptr) {
         if (eptr) {
             error = std::move(eptr);
             uv_async_send(async);
@@ -502,7 +494,7 @@ void NodeMap::release() {
     uv_close(reinterpret_cast<uv_handle_t *>(async), [] (uv_handle_t *h) {
         delete reinterpret_cast<uv_async_t *>(h);
     });
-
+    
     map.reset();
 }
 
@@ -529,9 +521,14 @@ void NodeMap::Cancel(const Nan::FunctionCallbackInfo<v8::Value>& info) {
 
 void NodeMap::cancel() {
     auto style = map->getStyle().getJSON();
+    
+    // Reset map explicitly as it resets the renderer frontend
+    map.reset();
 
-    map = std::make_unique<mbgl::Map>(backend, mbgl::Size{ 256, 256 },
-            pixelRatio, *this, threadpool, mbgl::MapMode::Still);
+    auto renderer = std::make_unique<mbgl::Renderer>(backend, pixelRatio, *this, threadpool);
+    rendererFrontend = std::make_unique<NodeRendererFrontend>(std::move(renderer), [this] { return view.get(); });
+    map = std::make_unique<mbgl::Map>(*rendererFrontend, mapObserver, mbgl::Size{ 256, 256 }, pixelRatio,
+                                      *this, threadpool, mbgl::MapMode::Still);
 
     // FIXME: Reload the style after recreating the map. We need to find
     // a better way of canceling an ongoing rendering on the core level
@@ -885,6 +882,11 @@ void NodeMap::DumpDebugLogs(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     if (!nodeMap->map) return Nan::ThrowError(releasedMessage());
 
     nodeMap->map->dumpDebugLogs();
+    
+    if (nodeMap->rendererFrontend) {
+        nodeMap->rendererFrontend->dumpDebugLogs();
+    }
+    
     info.GetReturnValue().SetUndefined();
 }
 
@@ -946,7 +948,7 @@ void NodeMap::QueryRenderedFeatures(const Nan::FunctionCallbackInfo<v8::Value>& 
             auto pos0 = Nan::Get(posOrBox, 0).ToLocalChecked().As<v8::Array>();
             auto pos1 = Nan::Get(posOrBox, 1).ToLocalChecked().As<v8::Array>();
 
-            optional = nodeMap->map->queryRenderedFeatures(mbgl::ScreenBox {
+            optional = nodeMap->rendererFrontend->queryRenderedFeatures(mbgl::ScreenBox {
                 {
                     Nan::Get(pos0, 0).ToLocalChecked()->NumberValue(),
                     Nan::Get(pos0, 1).ToLocalChecked()->NumberValue()
@@ -957,7 +959,7 @@ void NodeMap::QueryRenderedFeatures(const Nan::FunctionCallbackInfo<v8::Value>& 
             },  queryOptions);
 
         } else {
-            optional = nodeMap->map->queryRenderedFeatures(mbgl::ScreenCoordinate {
+            optional = nodeMap->rendererFrontend->queryRenderedFeatures(mbgl::ScreenCoordinate {
                 Nan::Get(posOrBox, 0).ToLocalChecked()->NumberValue(),
                 Nan::Get(posOrBox, 1).ToLocalChecked()->NumberValue()
             }, queryOptions);
@@ -981,9 +983,12 @@ NodeMap::NodeMap(v8::Local<v8::Object> options)
                            .ToLocalChecked()
                            ->NumberValue()
                      : 1.0;
-      }()),
-      map(std::make_unique<mbgl::Map>(backend,
-                                      mbgl::Size{ 256, 256 },
+      }())
+    , mapObserver(NodeMapObserver())
+    , rendererFrontend(std::make_unique<NodeRendererFrontend>(std::make_unique<mbgl::Renderer>(backend, pixelRatio, *this, threadpool), [this] { return view.get(); }))
+    , map(std::make_unique<mbgl::Map>(*rendererFrontend,
+                                      mapObserver,
+                                      mbgl::Size { 256, 256 },
                                       pixelRatio,
                                       *this,
                                       threadpool,

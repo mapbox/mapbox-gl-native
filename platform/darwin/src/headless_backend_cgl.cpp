@@ -51,7 +51,7 @@ gl::ProcAddress HeadlessBackend::initializeExtension(const char* name) {
 
 bool HeadlessBackend::hasDisplay() {
     if (!display) {
-        display.reset(new HeadlessDisplay);
+        display = HeadlessDisplay::create();
     }
     return bool(display);
 }

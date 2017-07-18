@@ -2,6 +2,7 @@
 
 namespace mbgl {
     class Map;
+    class Renderer;
 }
 
 @interface MGLMapView (Private)
@@ -28,5 +29,7 @@ namespace mbgl {
 - (void)renderSync;
 
 - (mbgl::Map *)mbglMap;
+
+- (mbgl::Renderer *)renderer;
 
 @end

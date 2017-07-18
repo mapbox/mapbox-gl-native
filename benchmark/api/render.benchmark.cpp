@@ -2,10 +2,13 @@
 
 #include <mbgl/benchmark/util.hpp>
 #include <mbgl/map/map.hpp>
-#include <mbgl/map/backend_scope.hpp>
+#include <mbgl/map/map_observer.hpp>
 #include <mbgl/gl/headless_backend.hpp>
 #include <mbgl/gl/offscreen_view.hpp>
 #include <mbgl/util/default_thread_pool.hpp>
+#include <mbgl/renderer/renderer.hpp>
+#include <mbgl/renderer/backend_scope.hpp>
+#include <mbgl/renderer/async_renderer_frontend.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/image.hpp>
 #include <mbgl/storage/default_file_source.hpp>
@@ -44,7 +47,8 @@ static void prepare(Map& map, optional<std::string> json = {}) {
 
 static void API_renderStill_reuse_map(::benchmark::State& state) {
     RenderBenchmark bench;
-    Map map { bench.backend, bench.view.getSize(), 1, bench.fileSource, bench.threadPool, MapMode::Still };
+    AsyncRendererFrontend frontend { std::make_unique<Renderer>(bench.backend, 1, bench.fileSource, bench.threadPool), bench.view };
+    Map map { frontend, MapObserver::nullObserver(), bench.view.getSize(), 1, bench.fileSource, bench.threadPool, MapMode::Still };
     prepare(map);
 
     while (state.KeepRunning()) {
@@ -54,7 +58,8 @@ static void API_renderStill_reuse_map(::benchmark::State& state) {
 
 static void API_renderStill_reuse_map_switch_styles(::benchmark::State& state) {
     RenderBenchmark bench;
-    Map map { bench.backend, bench.view.getSize(), 1, bench.fileSource, bench.threadPool, MapMode::Still };
+    AsyncRendererFrontend frontend { std::make_unique<Renderer>(bench.backend, 1, bench.fileSource, bench.threadPool), bench.view };
+    Map map { frontend, MapObserver::nullObserver(), bench.view.getSize(), 1, bench.fileSource, bench.threadPool, MapMode::Still };
     
     while (state.KeepRunning()) {
         prepare(map, { "{}" });
@@ -68,7 +73,8 @@ static void API_renderStill_recreate_map(::benchmark::State& state) {
     RenderBenchmark bench;
     
     while (state.KeepRunning()) {
-        Map map { bench.backend, bench.view.getSize(), 1, bench.fileSource, bench.threadPool, MapMode::Still };
+        AsyncRendererFrontend frontend { std::make_unique<Renderer>(bench.backend, 1, bench.fileSource, bench.threadPool), bench.view };
+        Map map { frontend, MapObserver::nullObserver(), bench.view.getSize(), 1, bench.fileSource, bench.threadPool, MapMode::Still };
         prepare(map);
         mbgl::benchmark::render(map, bench.view);
     }

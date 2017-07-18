@@ -4,14 +4,14 @@
 #include <mbgl/gl/context.hpp>
 #include <mbgl/gl/headless_backend.hpp>
 #include <mbgl/gl/offscreen_view.hpp>
-#include <mbgl/map/backend_scope.hpp>
+#include <mbgl/renderer/backend_scope.hpp>
 
 #include <mbgl/util/offscreen_texture.hpp>
 
 using namespace mbgl;
 
 TEST(OffscreenTexture, EmptyRed) {
-    HeadlessBackend backend { test::sharedDisplay() };
+    HeadlessBackend backend;
     BackendScope scope { backend };
     OffscreenView view(backend.getContext(), { 512, 256 });
 
@@ -74,7 +74,7 @@ struct Buffer {
 
 
 TEST(OffscreenTexture, RenderToTexture) {
-    HeadlessBackend backend { test::sharedDisplay() };
+    HeadlessBackend backend;
     BackendScope scope { backend };
     auto& context = backend.getContext();
 

@@ -11,6 +11,7 @@
 
 #include <mbgl/map/map.hpp>
 #include <mbgl/style/sources/geojson_source.hpp>
+#include <mbgl/renderer/renderer.hpp>
 
 const MGLShapeSourceOption MGLShapeSourceOptionClustered = @"MGLShapeSourceOptionClustered";
 const MGLShapeSourceOption MGLShapeSourceOptionClusterRadius = @"MGLShapeSourceOptionClusterRadius";
@@ -98,7 +99,7 @@ const MGLShapeSourceOption MGLShapeSourceOptionSimplificationTolerance = @"MGLSh
     
     std::vector<mbgl::Feature> features;
     if (self.style) {
-        features = self.style.mapView.mbglMap->querySourceFeatures(self.rawSource->getID(), { {}, optionalFilter });
+        features = self.style.mapView.renderer->querySourceFeatures(self.rawSource->getID(), { {}, optionalFilter });
     }
     return MGLFeaturesFromMBGLFeatures(features);
 }

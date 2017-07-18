@@ -23,8 +23,8 @@ namespace android {
             ) {
     }
 
-    ImageSource::ImageSource(mbgl::Map& map, mbgl::style::ImageSource& coreSource)
-        : Source(map, coreSource) {
+    ImageSource::ImageSource(mbgl::style::ImageSource& coreSource)
+        : Source(coreSource) {
     }
 
     ImageSource::~ImageSource() = default;

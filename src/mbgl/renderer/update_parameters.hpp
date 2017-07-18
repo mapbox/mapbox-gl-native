@@ -2,11 +2,14 @@
 
 #include <mbgl/map/mode.hpp>
 #include <mbgl/map/transform_state.hpp>
-#include <mbgl/util/chrono.hpp>
 #include <mbgl/style/light.hpp>
 #include <mbgl/style/image.hpp>
 #include <mbgl/style/source.hpp>
 #include <mbgl/style/layer.hpp>
+#include <mbgl/util/chrono.hpp>
+#include <mbgl/util/immutable.hpp>
+
+#include <vector>
 
 namespace mbgl {
 
@@ -16,7 +19,8 @@ class AnnotationManager;
 
 class UpdateParameters {
 public:
-    UpdateParameters(const MapMode mode_,
+    UpdateParameters(const bool styleLoaded_,
+                     const MapMode mode_,
                      const float pixelRatio_,
                      const MapDebugOptions debugOptions_,
                      const TimePoint timePoint_,
@@ -31,8 +35,10 @@ public:
                      Scheduler& scheduler_,
                      FileSource& fileSource_,
                      AnnotationManager& annotationManager_,
-                     const uint8_t prefetchZoomDelta_)
-        : mode(mode_),
+                     const uint8_t prefetchZoomDelta_,
+                     const bool stillImageRequest_)
+        : styleLoaded(styleLoaded_),
+          mode(mode_),
           pixelRatio(pixelRatio_),
           debugOptions(debugOptions_),
           timePoint(std::move(timePoint_)),
@@ -47,8 +53,10 @@ public:
           scheduler(scheduler_),
           fileSource(fileSource_),
           annotationManager(annotationManager_),
-          prefetchZoomDelta(prefetchZoomDelta_) {}
+          prefetchZoomDelta(prefetchZoomDelta_),
+          stillImageRequest(stillImageRequest_) {}
 
+    const bool styleLoaded;
     const MapMode mode;
     const float pixelRatio;
     const MapDebugOptions debugOptions;
@@ -68,6 +76,9 @@ public:
     AnnotationManager& annotationManager;
 
     const uint8_t prefetchZoomDelta;
+    
+    // For still image requests, render requested
+    const bool stillImageRequest;
 };
 
 } // namespace mbgl

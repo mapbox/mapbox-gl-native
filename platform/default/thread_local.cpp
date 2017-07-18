@@ -1,6 +1,6 @@
 #include <mbgl/util/thread_local.hpp>
 
-#include <mbgl/map/backend_scope.hpp>
+#include <mbgl/renderer/backend_scope.hpp>
 #include <mbgl/util/logging.hpp>
 #include <mbgl/util/run_loop.hpp>
 

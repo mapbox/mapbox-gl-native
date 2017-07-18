@@ -4,18 +4,18 @@
 #include <mbgl/util/default_thread_pool.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/map/transform.hpp>
-#include <mbgl/map/query.hpp>
 #include <mbgl/renderer/render_style.hpp>
 #include <mbgl/renderer/tile_parameters.hpp>
-#include <mbgl/map/query.hpp>
+#include <mbgl/renderer/query.hpp>
 #include <mbgl/text/collision_tile.hpp>
 #include <mbgl/geometry/feature_index.hpp>
 #include <mbgl/annotation/annotation_manager.hpp>
 #include <mbgl/annotation/annotation_tile.hpp>
 #include <mbgl/renderer/image_manager.hpp>
 #include <mbgl/text/glyph_manager.hpp>
-#include <mbgl/map/backend_scope.hpp>
+#include <mbgl/renderer/backend_scope.hpp>
 #include <mbgl/gl/headless_backend.hpp>
+#include <mbgl/style/style.hpp>
 
 #include <memory>
 
@@ -27,10 +27,11 @@ public:
     TransformState transformState;
     util::RunLoop loop;
     ThreadPool threadPool { 1 };
-    AnnotationManager annotationManager;
-    HeadlessBackend backend { test::sharedDisplay() };
+    style::Style style { loop, fileSource, 1 };
+    AnnotationManager annotationManager { style };
+    HeadlessBackend backend;
     BackendScope scope { backend };
-    RenderStyle style { threadPool, fileSource };
+    RenderStyle renderStyle { threadPool, fileSource };
     ImageManager imageManager;
     GlyphManager glyphManager { fileSource };
 
@@ -92,7 +93,7 @@ TEST(AnnotationTile, Issue8289) {
     TransformState transformState;
     RenderedQueryOptions options;
 
-    tile.queryRenderedFeatures(result, queryGeometry, transformState, test.style, options);
+    tile.queryRenderedFeatures(result, queryGeometry, transformState, test.renderStyle, options);
 
     EXPECT_TRUE(result.empty());
 }

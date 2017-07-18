@@ -16,11 +16,16 @@
 #pragma GCC diagnostic pop
 
 namespace node_mbgl {
+    
+class NodeRendererFrontend;
 
 class NodeBackend : public mbgl::HeadlessBackend {
 public:
     NodeBackend();
-    void onDidFailLoadingMap(std::exception_ptr) final;
+};
+    
+class NodeMapObserver : public mbgl::MapObserver {
+    void onDidFailLoadingMap(std::exception_ptr) override;
 };
 
 class NodeMap : public Nan::ObjectWrap,
@@ -71,6 +76,8 @@ public:
     NodeBackend backend;
     std::unique_ptr<mbgl::OffscreenView> view;
     NodeThreadPool threadpool;
+    NodeMapObserver mapObserver;
+    std::unique_ptr<NodeRendererFrontend> rendererFrontend;
     std::unique_ptr<mbgl::Map> map;
 
     std::exception_ptr error;

@@ -1,8 +1,10 @@
 #pragma once
 
-#include <mbgl/map/map_observer.hpp>
+#include <mbgl/map/view.hpp>
+#include <mbgl/renderer/backend_scope.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/size.hpp>
+#include <mbgl/util/util.hpp>
 
 #include <memory>
 #include <mutex>
@@ -15,12 +17,12 @@ using ProcAddress = void (*)();
 using FramebufferID = uint32_t;
 } // namespace gl
 
-class BackendScope;
-
-class Backend : public MapObserver {
+// The RendererBackend is used by the Renderer to facilitate
+// the actual rendering.
+class RendererBackend {
 public:
-    Backend();
-    virtual ~Backend();
+    RendererBackend();
+    virtual ~RendererBackend();
 
     // Returns the backend's context which manages OpenGL state.
     gl::Context& getContext();
@@ -28,26 +30,24 @@ public:
     // Called prior to rendering to update the internally assumed OpenGL state.
     virtual void updateAssumedState() = 0;
 
-    // Called when the map needs to be rendered; the backend should call Map::render() at some point
-    // in the near future. (Not called for Map::renderStill() mode.)
-    virtual void invalidate() = 0;
+    virtual BackendScope::ScopeType getScopeType() const {
+        return BackendScope::ScopeType::Explicit;
+    }
 
 protected:
-    // Called with the name of an OpenGL extension that should be loaded. Backend implementations
+    // Called with the name of an OpenGL extension that should be loaded. RendererBackend implementations
     // must call the API-specific version that obtains the function pointer for this function,
     // or a null pointer if unsupported/unavailable.
     virtual gl::ProcAddress initializeExtension(const char*) = 0;
 
     // Called when the backend's GL context needs to be made active or inactive. These are called,
-    // as a matched pair, in four situations:
+    // as a matched pair, exclusively through BackendScope, in two situations:
     //
-    //   1. When releasing GL resources during Map destruction
-    //   2. When calling a CustomLayerInitializeFunction, during Map::addLayer
-    //   3. When calling a CustomLayerDeinitializeFunction, during Map::removeLayer
-    //   4. When rendering for Map::renderStill
-    //
-    // They are *not* called for Map::render; it is assumed that the correct context is already
-    // activated prior to calling Map::render.
+    //   1. When releasing GL resources during Renderer destruction
+    //      (Including calling CustomLayerDeinitializeFunction during RenderCustomLayer destruction)
+    //   2. When renderering through Renderer::render()
+    //      (Including calling CustomLayerDeinitializeFunction for newly added custom layers and
+    //       CustomLayerDeinitializeFunction on layer removal)
     virtual void activate() = 0;
     virtual void deactivate() = 0;
 
@@ -81,5 +81,9 @@ private:
 
     friend class BackendScope;
 };
+
+MBGL_CONSTEXPR bool operator==(const RendererBackend& a, const RendererBackend& b) {
+    return &a == &b;
+}
 
 } // namespace mbgl

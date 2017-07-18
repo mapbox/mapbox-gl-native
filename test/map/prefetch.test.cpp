@@ -3,14 +3,16 @@
 
 #include <mbgl/gl/headless_backend.hpp>
 #include <mbgl/gl/offscreen_view.hpp>
-#include <mbgl/map/backend_scope.hpp>
 #include <mbgl/map/map.hpp>
+#include <mbgl/renderer/renderer.hpp>
+#include <mbgl/renderer/backend_scope.hpp>
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/util/default_thread_pool.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/run_loop.hpp>
+#include <mbgl/test/stub_renderer_frontend.hpp>
 
 #include <algorithm>
 #include <string>
@@ -22,12 +24,14 @@ using namespace std::literals::string_literals;
 
 TEST(Map, PrefetchTiles) {
     util::RunLoop runLoop;
-    HeadlessBackend backend(test::sharedDisplay());
+    HeadlessBackend backend;
     BackendScope scope(backend);
     OffscreenView view(backend.getContext(), { 512, 512 });
     ThreadPool threadPool(4);
     StubFileSource fileSource;
-    Map map(backend, view.getSize(), 1, fileSource, threadPool, MapMode::Still);
+    StubRendererFrontend rendererFrontend {
+            std::make_unique<Renderer>(backend, 1, fileSource, threadPool), view };
+    Map map(rendererFrontend, MapObserver::nullObserver(), view.getSize(), 1, fileSource, threadPool, MapMode::Still);
 
     std::vector<int> tiles;
 

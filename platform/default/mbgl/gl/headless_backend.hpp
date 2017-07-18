@@ -1,6 +1,6 @@
 #pragma once
 
-#include <mbgl/map/backend.hpp>
+#include <mbgl/renderer/renderer_backend.hpp>
 
 #include <memory>
 #include <functional>
@@ -9,15 +9,12 @@ namespace mbgl {
 
 class HeadlessDisplay;
 
-class HeadlessBackend : public Backend {
+class HeadlessBackend : public RendererBackend {
 public:
     HeadlessBackend();
-    HeadlessBackend(std::shared_ptr<HeadlessDisplay>);
     ~HeadlessBackend() override;
 
     void updateAssumedState() override;
-
-    void invalidate() override;
 
     struct Impl {
         virtual ~Impl() = default;

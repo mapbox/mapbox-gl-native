@@ -2,14 +2,15 @@
 
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/view.hpp>
-#include <mbgl/map/backend.hpp>
+#include <mbgl/renderer/renderer_backend.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/timer.hpp>
 #include <mbgl/util/geometry.hpp>
 
 struct GLFWwindow;
+class GLFWRendererFrontend;
 
-class GLFWView : public mbgl::View, public mbgl::Backend {
+class GLFWView : public mbgl::View, public mbgl::RendererBackend, public mbgl::MapObserver {
 public:
     GLFWView(bool fullscreen = false, bool benchmark = false);
     ~GLFWView() override;
@@ -17,6 +18,8 @@ public:
     float getPixelRatio() const;
 
     void setMap(mbgl::Map*);
+    
+    void setRenderFrontend(GLFWRendererFrontend*);
 
     // Callback called when the user presses the key mapped to style change.
     // The expected action is to set a new style, different to the current one.
@@ -31,14 +34,15 @@ public:
     void setWindowTitle(const std::string&);
 
     void run();
+    
+    void invalidate();
 
     // mbgl::View implementation
     void bind() override;
     mbgl::Size getSize() const;
     mbgl::Size getFramebufferSize() const;
 
-    // mbgl::Backend implementation
-    void invalidate() override;
+    // mbgl::RendererBackend implementation
     void updateAssumedState() override;
 
     // mbgl::MapObserver implementation
@@ -83,6 +87,7 @@ private:
     void toggle3DExtrusions(bool visible);
 
     mbgl::Map* map = nullptr;
+    GLFWRendererFrontend* rendererFrontend = nullptr;
 
     bool fullscreen = false;
     const bool benchmark = false;

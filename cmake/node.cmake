@@ -19,6 +19,8 @@ target_sources(mbgl-node
     PRIVATE platform/node/src/node_request.cpp
     PRIVATE platform/node/src/node_feature.hpp
     PRIVATE platform/node/src/node_feature.cpp
+    PRIVATE platform/node/src/node_renderer_frontend.hpp
+    PRIVATE platform/node/src/node_renderer_frontend.cpp
     PRIVATE platform/node/src/node_thread_pool.hpp
     PRIVATE platform/node/src/node_thread_pool.cpp
     PRIVATE platform/node/src/util/async_queue.hpp

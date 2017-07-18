@@ -1,5 +1,4 @@
 #include <mbgl/map/map.hpp>
-#include <mbgl/map/backend_scope.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/run_loop.hpp>
 
@@ -8,6 +7,9 @@
 #include <mbgl/util/default_thread_pool.hpp>
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/style/style.hpp>
+#include <mbgl/renderer/renderer.hpp>
+#include <mbgl/renderer/backend_scope.hpp>
+#include <mbgl/renderer/async_renderer_frontend.hpp>
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunknown-pragmas"
@@ -88,7 +90,8 @@ int main(int argc, char *argv[]) {
     OffscreenView view(backend.getContext(), { static_cast<uint32_t>(width * pixelRatio),
                                                static_cast<uint32_t>(height * pixelRatio) });
     ThreadPool threadPool(4);
-    Map map(backend, mbgl::Size { width, height }, pixelRatio, fileSource, threadPool, MapMode::Still);
+    AsyncRendererFrontend rendererFrontend(std::make_unique<Renderer>(backend, pixelRatio, fileSource, threadPool), view);
+    Map map(rendererFrontend, MapObserver::nullObserver(), mbgl::Size { width, height }, pixelRatio, fileSource, threadPool, MapMode::Still);
 
     if (style_path.find("://") == std::string::npos) {
         style_path = std::string("file://") + style_path;
@@ -103,7 +106,7 @@ int main(int argc, char *argv[]) {
         map.setDebug(debug ? mbgl::MapDebugOptions::TileBorders | mbgl::MapDebugOptions::ParseStatus : mbgl::MapDebugOptions::NoDebug);
     }
 
-    map.renderStill(view, [&](std::exception_ptr error) {
+    map.renderStill([&](std::exception_ptr error) {
         try {
             if (error) {
                 std::rethrow_exception(error);

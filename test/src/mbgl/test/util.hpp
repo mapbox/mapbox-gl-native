@@ -70,8 +70,6 @@ private:
     int fd = -1;
 };
 
-std::shared_ptr<HeadlessDisplay> sharedDisplay();
-
 PremultipliedImage render(Map&, OffscreenView&);
 
 void checkImage(const std::string& base,

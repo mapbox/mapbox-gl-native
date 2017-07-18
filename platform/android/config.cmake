@@ -71,6 +71,10 @@ macro(mbgl_platform_core)
         PRIVATE platform/default/mbgl/util/shared_thread_pool.hpp
         PRIVATE platform/default/mbgl/util/default_thread_pool.cpp
         PRIVATE platform/default/mbgl/util/default_thread_pool.hpp
+
+        # Rendering
+        PRIVATE platform/android/src/android_renderer_frontend.cpp
+        PRIVATE platform/android/src/android_renderer_frontend.hpp
     )
 
     target_include_directories(mbgl-core

@@ -2,7 +2,6 @@
 
 #include <mbgl/map/map.hpp>
 #include <mbgl/gl/offscreen_view.hpp>
-#include <mbgl/gl/headless_display.hpp>
 #include <mbgl/util/logging.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/io.hpp>
@@ -99,14 +98,9 @@ Server::~Server() {
     }
 }
 
-std::shared_ptr<HeadlessDisplay> sharedDisplay() {
-    static auto display = std::make_shared<HeadlessDisplay>();
-    return display;
-}
-
 PremultipliedImage render(Map& map, OffscreenView& view) {
     PremultipliedImage result;
-    map.renderStill(view, [&](std::exception_ptr) {
+    map.renderStill([&](std::exception_ptr) {
         result = view.readStillImage();
     });
 

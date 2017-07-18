@@ -3,7 +3,7 @@
 #include <mbgl/renderer/paint_parameters.hpp>
 #include <mbgl/style/layers/custom_layer_impl.hpp>
 #include <mbgl/map/transform_state.hpp>
-#include <mbgl/map/backend_scope.hpp>
+#include <mbgl/renderer/backend_scope.hpp>
 
 namespace mbgl {
 
