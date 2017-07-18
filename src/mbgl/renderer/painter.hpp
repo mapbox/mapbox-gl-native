@@ -37,16 +37,10 @@ class View;
 class LineAtlas;
 struct FrameData;
 class Tile;
-
 class DebugBucket;
-class SymbolBucket;
-
-class RenderSymbolLayer;
-
 class Programs;
 class PaintParameters;
 class TilePyramid;
-
 struct ClipID;
 
 struct FrameData {
@@ -71,8 +65,6 @@ public:
     void renderClippingMask(const UnwrappedTileID&, const ClipID&);
     void renderTileDebug(const RenderTile&);
     void renderTileDebug(const mat4& matrix);
-    void renderSymbol(PaintParameters&, SymbolBucket&, const RenderSymbolLayer&, const RenderTile&);
-
     void renderItem(PaintParameters&, const RenderItem&);
 
 #ifndef NDEBUG
