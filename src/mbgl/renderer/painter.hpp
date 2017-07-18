@@ -55,12 +55,6 @@ public:
     void cleanup();
     bool needsAnimation() const;
 
-    template <class Iterator>
-    void renderPass(PaintParameters&,
-                    RenderPass,
-                    Iterator it, Iterator end,
-                    uint32_t i, int8_t increment);
-
     mat4 matrixForTile(const UnwrappedTileID&);
     gl::DepthMode depthModeForSublayer(uint8_t n, gl::DepthMode::Mask) const;
     gl::StencilMode stencilModeForClipping(const ClipID&) const;
