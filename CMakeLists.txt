@@ -119,6 +119,8 @@ if(CCACHE_PROGRAM)
         # Clang also thinks that ccache isn't interactive, so we explicitly need to enable color.
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Qunused-arguments -fcolor-diagnostics")
     endif()
+else()
+    message(STATUS "Can't find ccache — consider installing ccache to improve recompilation performance")
 endif()
 
 if(NOT EXISTS ${CMAKE_SOURCE_DIR}/platform/${MBGL_PLATFORM}/config.cmake)
