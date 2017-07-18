@@ -4,12 +4,24 @@
 #include <mbgl/renderer/property_evaluation_parameters.hpp>
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/renderer/render_tile.hpp>
+#include <mbgl/renderer/paint_parameters.hpp>
+#include <mbgl/text/glyph_atlas.hpp>
+#include <mbgl/programs/programs.hpp>
+#include <mbgl/programs/symbol_program.hpp>
+#include <mbgl/programs/collision_box_program.hpp>
 #include <mbgl/tile/tile.hpp>
+#include <mbgl/tile/geometry_tile.hpp>
+#include <mbgl/tile/geometry_tile_data.hpp>
 #include <mbgl/style/layers/symbol_layer_impl.hpp>
 #include <mbgl/layout/symbol_layout.hpp>
-#include <mbgl/tile/geometry_tile_data.hpp>
+#include <mbgl/layout/symbol_projection.hpp>
+#include <mbgl/util/math.hpp>
+
+#include <cmath>
 
 namespace mbgl {
+
+using namespace style;
 
 RenderSymbolLayer::RenderSymbolLayer(Immutable<style::SymbolLayer::Impl> _impl)
     : RenderLayer(style::LayerType::Symbol, _impl),
@@ -59,14 +71,189 @@ bool RenderSymbolLayer::hasTransition() const {
 }
 
 void RenderSymbolLayer::render(Painter& painter, PaintParameters& parameters, RenderSource*) {
+    if (painter.pass == RenderPass::Opaque) {
+        return;
+    }
+
     for (const RenderTile& tile : renderTiles) {
-        Bucket* bucket = tile.tile.getBucket(*baseImpl);
-        assert(dynamic_cast<SymbolBucket*>(bucket));
-        painter.renderSymbol(
-            parameters,
-            *reinterpret_cast<SymbolBucket*>(bucket),
-            *this,
-            tile);
+        assert(dynamic_cast<SymbolBucket*>(tile.tile.getBucket(*baseImpl)));
+        SymbolBucket& bucket = *reinterpret_cast<SymbolBucket*>(tile.tile.getBucket(*baseImpl));
+
+        const auto& layout = bucket.layout;
+
+        painter.frameHistory.bind(painter.context, 1);
+
+        auto draw = [&] (auto& program,
+                         auto&& uniformValues,
+                         const auto& buffers,
+                         const auto& symbolSizeBinder,
+                         const SymbolPropertyValues& values_,
+                         const auto& binders,
+                         const auto& paintProperties)
+        {
+            // We clip symbols to their tile extent in still mode.
+            const bool needsClipping = painter.frame.mapMode == MapMode::Still;
+
+            program.get(paintProperties).draw(
+                painter.context,
+                gl::Triangles(),
+                values_.pitchAlignment == AlignmentType::Map
+                    ? painter.depthModeForSublayer(0, gl::DepthMode::ReadOnly)
+                    : gl::DepthMode::disabled(),
+                needsClipping
+                    ? painter.stencilModeForClipping(tile.clip)
+                    : gl::StencilMode::disabled(),
+                painter.colorModeForRenderPass(),
+                std::move(uniformValues),
+                *buffers.vertexBuffer,
+                *buffers.dynamicVertexBuffer,
+                *symbolSizeBinder,
+                *buffers.indexBuffer,
+                buffers.segments,
+                binders,
+                paintProperties,
+                painter.state.getZoom(),
+                getID()
+            );
+        };
+
+        assert(dynamic_cast<GeometryTile*>(&tile.tile));
+        GeometryTile& geometryTile = static_cast<GeometryTile&>(tile.tile);
+
+        if (bucket.hasIconData()) {
+            auto values = iconPropertyValues(layout);
+            auto paintPropertyValues = iconPaintProperties();
+
+            const bool alongLine = layout.get<SymbolPlacement>() == SymbolPlacementType::Line &&
+                layout.get<IconRotationAlignment>() == AlignmentType::Map;
+
+            if (alongLine) {
+                reprojectLineLabels(bucket.icon.dynamicVertices,
+                                    bucket.icon.placedSymbols,
+                                    tile.matrix,
+                                    values,
+                                    tile,
+                                    *bucket.iconSizeBinder,
+                                    painter.state,
+                                    painter.frameHistory);
+
+                painter.context.updateVertexBuffer(*bucket.icon.dynamicVertexBuffer, std::move(bucket.icon.dynamicVertices));
+            }
+
+            const bool iconScaled = layout.get<IconSize>().constantOr(1.0) != 1.0 || bucket.iconsNeedLinear;
+            const bool iconTransformed = values.rotationAlignment == AlignmentType::Map || painter.state.getPitch() != 0;
+
+            painter.context.bindTexture(*geometryTile.iconAtlasTexture, 0,
+                bucket.sdfIcons || painter.state.isChanging() || iconScaled || iconTransformed
+                    ? gl::TextureFilter::Linear : gl::TextureFilter::Nearest);
+
+            const Size texsize = geometryTile.iconAtlasTexture->size;
+
+            if (bucket.sdfIcons) {
+                if (values.hasHalo) {
+                    draw(parameters.programs.symbolIconSDF,
+                         SymbolSDFIconProgram::uniformValues(false, values, texsize, painter.pixelsToGLUnits, alongLine, tile, painter.state, SymbolSDFPart::Halo),
+                         bucket.icon,
+                         bucket.iconSizeBinder,
+                         values,
+                         bucket.paintPropertyBinders.at(getID()).first,
+                         paintPropertyValues);
+                }
+
+                if (values.hasFill) {
+                    draw(parameters.programs.symbolIconSDF,
+                         SymbolSDFIconProgram::uniformValues(false, values, texsize, painter.pixelsToGLUnits, alongLine, tile, painter.state, SymbolSDFPart::Fill),
+                         bucket.icon,
+                         bucket.iconSizeBinder,
+                         values,
+                         bucket.paintPropertyBinders.at(getID()).first,
+                         paintPropertyValues);
+                }
+            } else {
+                draw(parameters.programs.symbolIcon,
+                     SymbolIconProgram::uniformValues(false, values, texsize, painter.pixelsToGLUnits, alongLine, tile, painter.state),
+                     bucket.icon,
+                     bucket.iconSizeBinder,
+                     values,
+                     bucket.paintPropertyBinders.at(getID()).first,
+                     paintPropertyValues);
+            }
+        }
+
+        if (bucket.hasTextData()) {
+            painter.context.bindTexture(*geometryTile.glyphAtlasTexture, 0, gl::TextureFilter::Linear);
+
+            auto values = textPropertyValues(layout);
+            auto paintPropertyValues = textPaintProperties();
+
+            const bool alongLine = layout.get<SymbolPlacement>() == SymbolPlacementType::Line &&
+                layout.get<TextRotationAlignment>() == AlignmentType::Map;
+
+            if (alongLine) {
+                reprojectLineLabels(bucket.text.dynamicVertices,
+                                    bucket.text.placedSymbols,
+                                    tile.matrix,
+                                    values,
+                                    tile,
+                                    *bucket.textSizeBinder,
+                                    painter.state,
+                                    painter.frameHistory);
+
+                painter.context.updateVertexBuffer(*bucket.text.dynamicVertexBuffer, std::move(bucket.text.dynamicVertices));
+            }
+
+            const Size texsize = geometryTile.glyphAtlasTexture->size;
+
+            if (values.hasHalo) {
+                draw(parameters.programs.symbolGlyph,
+                     SymbolSDFTextProgram::uniformValues(true, values, texsize, painter.pixelsToGLUnits, alongLine, tile, painter.state, SymbolSDFPart::Halo),
+                     bucket.text,
+                     bucket.textSizeBinder,
+                     values,
+                     bucket.paintPropertyBinders.at(getID()).second,
+                     paintPropertyValues);
+            }
+
+            if (values.hasFill) {
+                draw(parameters.programs.symbolGlyph,
+                     SymbolSDFTextProgram::uniformValues(true, values, texsize, painter.pixelsToGLUnits, alongLine, tile, painter.state, SymbolSDFPart::Fill),
+                     bucket.text,
+                     bucket.textSizeBinder,
+                     values,
+                     bucket.paintPropertyBinders.at(getID()).second,
+                     paintPropertyValues);
+            }
+        }
+
+        if (bucket.hasCollisionBoxData()) {
+            static const style::Properties<>::PossiblyEvaluated properties {};
+            static const CollisionBoxProgram::PaintPropertyBinders paintAttributeData(properties, 0);
+
+            painter.programs->collisionBox.draw(
+                painter.context,
+                gl::Lines { 1.0f },
+                gl::DepthMode::disabled(),
+                painter.stencilModeForClipping(tile.clip),
+                painter.colorModeForRenderPass(),
+                CollisionBoxProgram::UniformValues {
+                    uniforms::u_matrix::Value{ tile.matrix },
+                    uniforms::u_scale::Value{ std::pow(2.0f, float(painter.state.getZoom() - tile.tile.id.overscaledZ)) },
+                    uniforms::u_zoom::Value{ float(painter.state.getZoom() * 10) },
+                    uniforms::u_maxzoom::Value{ float((tile.id.canonical.z + 1) * 10) },
+                    uniforms::u_collision_y_stretch::Value{ tile.tile.yStretch() },
+                    uniforms::u_camera_to_center_distance::Value{ painter.state.getCameraToCenterDistance() },
+                    uniforms::u_pitch::Value{ painter.state.getPitch() },
+                    uniforms::u_fadetexture::Value{ 1 }
+                },
+                *bucket.collisionBox.vertexBuffer,
+                *bucket.collisionBox.indexBuffer,
+                bucket.collisionBox.segments,
+                paintAttributeData,
+                properties,
+                painter.state.getZoom(),
+                getID()
+            );
+        }
     }
 }
 
