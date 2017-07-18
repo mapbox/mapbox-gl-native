@@ -40,10 +40,8 @@ class Tile;
 
 class DebugBucket;
 class SymbolBucket;
-class RasterBucket;
 
 class RenderSymbolLayer;
-class RenderRasterLayer;
 
 class Programs;
 class PaintParameters;
@@ -74,7 +72,6 @@ public:
     void renderTileDebug(const RenderTile&);
     void renderTileDebug(const mat4& matrix);
     void renderSymbol(PaintParameters&, SymbolBucket&, const RenderSymbolLayer&, const RenderTile&);
-    void renderRaster(PaintParameters&, RasterBucket&, const RenderRasterLayer&, const mat4&, bool useBucketBuffers /* = false */);
 
     void renderItem(PaintParameters&, const RenderItem&);
 
