@@ -42,14 +42,12 @@ class DebugBucket;
 class FillBucket;
 class FillExtrusionBucket;
 class LineBucket;
-class CircleBucket;
 class SymbolBucket;
 class RasterBucket;
 
 class RenderFillLayer;
 class RenderFillExtrusionLayer;
 class RenderLineLayer;
-class RenderCircleLayer;
 class RenderSymbolLayer;
 class RenderRasterLayer;
 
@@ -84,7 +82,6 @@ public:
     void renderFill(PaintParameters&, FillBucket&, const RenderFillLayer&, const RenderTile&);
     void renderFillExtrusion(PaintParameters&, FillExtrusionBucket&, const RenderFillExtrusionLayer&, const RenderTile&);
     void renderLine(PaintParameters&, LineBucket&, const RenderLineLayer&, const RenderTile&);
-    void renderCircle(PaintParameters&, CircleBucket&, const RenderCircleLayer&, const RenderTile&);
     void renderSymbol(PaintParameters&, SymbolBucket&, const RenderSymbolLayer&, const RenderTile&);
     void renderRaster(PaintParameters&, RasterBucket&, const RenderRasterLayer&, const mat4&, bool useBucketBuffers /* = false */);
 
