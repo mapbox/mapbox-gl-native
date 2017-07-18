@@ -341,59 +341,9 @@ void Painter::renderPass(PaintParameters& parameters,
 
     for (; it != end; ++it, i += increment) {
         currentLayer = i;
-
-        const auto& item = *it;
-        const RenderLayer& layer = item.layer;
-
-        if (!layer.hasRenderPass(pass))
-            continue;
-
-        if (layer.is<RenderFillExtrusionLayer>()) {
-            MBGL_DEBUG_GROUP(context, item.layer.getID());
-
-            const auto size = context.viewport.getCurrentValue().size;
-
-            if (!extrusionTexture || extrusionTexture->getSize() != size) {
-                extrusionTexture = OffscreenTexture(context, size, OffscreenTextureAttachment::Depth);
-            }
-
-            extrusionTexture->bind();
-
-            context.setStencilMode(gl::StencilMode::disabled());
-            context.setDepthMode(depthModeForSublayer(0, gl::DepthMode::ReadWrite));
-            context.clear(Color{ 0.0f, 0.0f, 0.0f, 0.0f }, 1.0f, {});
-
-            item.layer.render(*this, parameters, item.source);
-
-            parameters.view.bind();
-            context.bindTexture(extrusionTexture->getTexture());
-
-            mat4 viewportMat;
-            matrix::ortho(viewportMat, 0, size.width, size.height, 0, 0, 1);
-
-            const Properties<>::PossiblyEvaluated properties;
-
-            parameters.programs.extrusionTexture.draw(
-                context,
-                gl::Triangles(),
-                gl::DepthMode::disabled(),
-                gl::StencilMode::disabled(),
-                colorModeForRenderPass(),
-                ExtrusionTextureProgram::UniformValues{
-                    uniforms::u_matrix::Value{ viewportMat }, uniforms::u_world::Value{ size },
-                    uniforms::u_image::Value{ 0 },
-                    uniforms::u_opacity::Value{ layer.as<RenderFillExtrusionLayer>()
-                                                    ->evaluated.get<FillExtrusionOpacity>() } },
-                extrusionTextureVertexBuffer,
-                quadTriangleIndexBuffer,
-                extrusionTextureSegments,
-                ExtrusionTextureProgram::PaintPropertyBinders{ properties, 0 },
-                properties,
-                state.getZoom(),
-                layer.getID());
-        } else {
-            MBGL_DEBUG_GROUP(context, item.layer.getID());
-            item.layer.render(*this, parameters, item.source);
+        if (it->layer.hasRenderPass(pass)) {
+            MBGL_DEBUG_GROUP(context, it->layer.getID());
+            it->layer.render(*this, parameters, it->source);
         }
     }
 

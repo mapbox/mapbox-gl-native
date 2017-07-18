@@ -49,6 +49,18 @@ void RenderFillExtrusionLayer::render(Painter& painter, PaintParameters& paramet
         return;
     }
 
+    const auto size = painter.context.viewport.getCurrentValue().size;
+
+    if (!painter.extrusionTexture || painter.extrusionTexture->getSize() != size) {
+        painter.extrusionTexture = OffscreenTexture(painter.context, size, OffscreenTextureAttachment::Depth);
+    }
+
+    painter.extrusionTexture->bind();
+
+    painter.context.setStencilMode(gl::StencilMode::disabled());
+    painter.context.setDepthMode(painter.depthModeForSublayer(0, gl::DepthMode::ReadWrite));
+    painter.context.clear(Color{ 0.0f, 0.0f, 0.0f, 0.0f }, 1.0f, {});
+
     if (evaluated.get<FillExtrusionPattern>().from.empty()) {
         for (const RenderTile& tile : renderTiles) {
             assert(dynamic_cast<FillExtrusionBucket*>(tile.tile.getBucket(*baseImpl)));
@@ -117,6 +129,33 @@ void RenderFillExtrusionLayer::render(Painter& painter, PaintParameters& paramet
                 getID());
         }
     }
+
+    parameters.view.bind();
+    painter.context.bindTexture(painter.extrusionTexture->getTexture());
+
+    mat4 viewportMat;
+    matrix::ortho(viewportMat, 0, size.width, size.height, 0, 0, 1);
+
+    const Properties<>::PossiblyEvaluated properties;
+
+    parameters.programs.extrusionTexture.draw(
+        painter.context,
+        gl::Triangles(),
+        gl::DepthMode::disabled(),
+        gl::StencilMode::disabled(),
+        painter.colorModeForRenderPass(),
+        ExtrusionTextureProgram::UniformValues{
+            uniforms::u_matrix::Value{ viewportMat }, uniforms::u_world::Value{ size },
+            uniforms::u_image::Value{ 0 },
+            uniforms::u_opacity::Value{ evaluated.get<FillExtrusionOpacity>() }
+        },
+        painter.extrusionTextureVertexBuffer,
+        painter.quadTriangleIndexBuffer,
+        painter.extrusionTextureSegments,
+        ExtrusionTextureProgram::PaintPropertyBinders{ properties, 0 },
+        properties,
+        painter.state.getZoom(),
+        getID());
 }
 
 bool RenderFillExtrusionLayer::queryIntersectsFeature(
