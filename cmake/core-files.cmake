@@ -244,10 +244,6 @@ set(MBGL_CORE_FILES
     src/mbgl/renderer/layers/render_symbol_layer.cpp
     src/mbgl/renderer/layers/render_symbol_layer.hpp
 
-    # renderer/painters
-    src/mbgl/renderer/painters/painter_clipping.cpp
-    src/mbgl/renderer/painters/painter_debug.cpp
-
     # renderer/sources
     src/mbgl/renderer/sources/render_geojson_source.cpp
     src/mbgl/renderer/sources/render_geojson_source.hpp

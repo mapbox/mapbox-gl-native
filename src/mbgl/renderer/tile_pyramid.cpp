@@ -47,9 +47,7 @@ void TilePyramid::startRender(Painter& painter) {
 
 void TilePyramid::finishRender(Painter& painter) {
     for (auto& tile : renderTiles) {
-        if (tile.used) {
-            painter.renderTileDebug(tile);
-        }
+        tile.finishRender(painter);
     }
 }
 

@@ -1,27 +1,17 @@
 #pragma once
 
-#include <mbgl/renderer/render_pass.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
-#include <mbgl/renderer/render_layer.hpp>
 
 #include <atomic>
-#include <string>
-#include <unordered_map>
 
 namespace mbgl {
-
-class Painter;
-class PaintParameters;
-class RenderTile;
 
 namespace gl {
 class Context;
 } // namespace gl
 
-namespace style {
-class Layer;
-} // namespace style
+class RenderLayer;
 
 class Bucket : private util::noncopyable {
 public:
