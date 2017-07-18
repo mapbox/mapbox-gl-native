@@ -133,7 +133,7 @@ public class MapView extends FrameLayout {
         } else {
           getViewTreeObserver().removeGlobalOnLayoutListener(this);
         }
-        initialiseDrawingSurface(mapboxMapOptions);
+        initialiseDrawingSurface();
       }
     });
   }
@@ -229,17 +229,11 @@ public class MapView extends FrameLayout {
     }
   }
 
-  private void initialiseDrawingSurface(MapboxMapOptions mapboxMapOptions) {
-    if (mapboxMapOptions.getTextureMode()) {
-      TextureView textureView = new TextureView(getContext());
-      textureView.setSurfaceTextureListener(new SurfaceTextureListener());
-      addView(textureView, 0);
-    } else {
-      SurfaceView surfaceView = (SurfaceView) findViewById(R.id.surfaceView);
-      surfaceView.setZOrderMediaOverlay(mapboxMapOptions.getRenderSurfaceOnTop());
-      surfaceView.getHolder().addCallback(new SurfaceCallback());
-      surfaceView.setVisibility(View.VISIBLE);
-    }
+  private void initialiseDrawingSurface() {
+    SurfaceView surfaceView = (SurfaceView) findViewById(R.id.surfaceView);
+    surfaceView.setZOrderMediaOverlay(mapboxMapOptions.getRenderSurfaceOnTop());
+    surfaceView.getHolder().addCallback(new SurfaceCallback());
+    surfaceView.setVisibility(View.VISIBLE);
   }
 
   /**

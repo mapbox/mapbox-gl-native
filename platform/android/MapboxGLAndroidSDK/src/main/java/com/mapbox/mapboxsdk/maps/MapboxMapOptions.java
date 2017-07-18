@@ -85,9 +85,6 @@ public class MapboxMapOptions implements Parcelable {
 
   private String apiBaseUrl;
 
-  @Deprecated
-  private boolean textureMode;
-
   private String style;
 
   /**
@@ -155,7 +152,7 @@ public class MapboxMapOptions implements Parcelable {
 
     style = in.readString();
     apiBaseUrl = in.readString();
-    textureMode = in.readByte() != 0;
+
     prefetchesTiles = in.readByte() != 0;
     zMediaOverlay = in.readByte() != 0;
   }
@@ -299,8 +296,6 @@ public class MapboxMapOptions implements Parcelable {
           ColorUtils.getPrimaryColor(context)));
       mapboxMapOptions.myLocationAccuracyThreshold(
         typedArray.getFloat(R.styleable.mapbox_MapView_mapbox_myLocationAccuracyThreshold, 0));
-      mapboxMapOptions.textureMode(
-        typedArray.getBoolean(R.styleable.mapbox_MapView_mapbox_renderTextureMode, false));
       mapboxMapOptions.setPrefetchesTiles(
         typedArray.getBoolean(R.styleable.mapbox_MapView_mapbox_enableTilePrefetch, true));
       mapboxMapOptions.renderSurfaceOnTop(
@@ -704,22 +699,6 @@ public class MapboxMapOptions implements Parcelable {
   }
 
   /**
-   * Enable TextureView as rendered surface.
-   * <p>
-   * Since the 4.2.0 release we replaced our TextureView with an SurfaceView implemenation.
-   * Enabling this option will use the deprecated TextureView instead.
-   * </p>
-   *
-   * @param textureMode True to enable texture mode
-   * @return This
-   * @deprecated As of the 4.2.0 release, using TextureView is deprecated.
-   */
-  public MapboxMapOptions textureMode(boolean textureMode) {
-    this.textureMode = textureMode;
-    return this;
-  }
-
-  /**
    * Enable tile pre-fetching. Loads tiles at a lower zoom-level to pre-render
    * a low resolution preview while more detailed tiles are loaded.
    * Enabled by default
@@ -1070,16 +1049,6 @@ public class MapboxMapOptions implements Parcelable {
     return debugActive;
   }
 
-  /**
-   * Returns true if TextureView is being used a render view.
-   *
-   * @return True if TextureView is used.
-   * @deprecated As of the 4.2.0 release, using TextureView is deprecated.
-   */
-  public boolean getTextureMode() {
-    return textureMode;
-  }
-
   public static final Parcelable.Creator<MapboxMapOptions> CREATOR = new Parcelable.Creator<MapboxMapOptions>() {
     public MapboxMapOptions createFromParcel(Parcel in) {
       return new MapboxMapOptions(in);
@@ -1143,7 +1112,7 @@ public class MapboxMapOptions implements Parcelable {
 
     dest.writeString(style);
     dest.writeString(apiBaseUrl);
-    dest.writeByte((byte) (textureMode ? 1 : 0));
+
     dest.writeByte((byte) (prefetchesTiles ? 1 : 0));
     dest.writeByte((byte) (zMediaOverlay ? 1 : 0));
   }
@@ -1320,7 +1289,6 @@ public class MapboxMapOptions implements Parcelable {
     result = 31 * result + (myLocationAccuracyThreshold != +0.0f
       ? Float.floatToIntBits(myLocationAccuracyThreshold) : 0);
     result = 31 * result + (apiBaseUrl != null ? apiBaseUrl.hashCode() : 0);
-    result = 31 * result + (textureMode ? 1 : 0);
     result = 31 * result + (style != null ? style.hashCode() : 0);
     result = 31 * result + (prefetchesTiles ? 1 : 0);
     result = 31 * result + (zMediaOverlay ? 1 : 0);
