@@ -2,6 +2,10 @@
 #include <mbgl/renderer/buckets/fill_bucket.hpp>
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/renderer/render_tile.hpp>
+#include <mbgl/renderer/paint_parameters.hpp>
+#include <mbgl/renderer/image_manager.hpp>
+#include <mbgl/programs/programs.hpp>
+#include <mbgl/programs/fill_program.hpp>
 #include <mbgl/tile/tile.hpp>
 #include <mbgl/style/layers/fill_layer_impl.hpp>
 #include <mbgl/geometry/feature_index.hpp>
@@ -9,6 +13,8 @@
 #include <mbgl/util/intersection_tests.hpp>
 
 namespace mbgl {
+
+using namespace style;
 
 RenderFillLayer::RenderFillLayer(Immutable<style::FillLayer::Impl> _impl)
     : RenderLayer(style::LayerType::Fill, _impl),
@@ -54,14 +60,134 @@ bool RenderFillLayer::hasTransition() const {
 }
 
 void RenderFillLayer::render(Painter& painter, PaintParameters& parameters, RenderSource*) {
-    for (const RenderTile& tile : renderTiles) {
-        Bucket* bucket = tile.tile.getBucket(*baseImpl);
-        assert(dynamic_cast<FillBucket*>(bucket));
-        painter.renderFill(
-            parameters,
-            *reinterpret_cast<FillBucket*>(bucket),
-            *this,
-            tile);
+    if (evaluated.get<FillPattern>().from.empty()) {
+        for (const RenderTile& tile : renderTiles) {
+            assert(dynamic_cast<FillBucket*>(tile.tile.getBucket(*baseImpl)));
+            FillBucket& bucket = *reinterpret_cast<FillBucket*>(tile.tile.getBucket(*baseImpl));
+
+            auto draw = [&] (uint8_t sublayer,
+                             auto& program,
+                             const auto& drawMode,
+                             const auto& indexBuffer,
+                             const auto& segments) {
+                program.get(evaluated).draw(
+                    painter.context,
+                    drawMode,
+                    painter.depthModeForSublayer(sublayer, gl::DepthMode::ReadWrite),
+                    painter.stencilModeForClipping(tile.clip),
+                    painter.colorModeForRenderPass(),
+                    FillProgram::UniformValues {
+                        uniforms::u_matrix::Value{
+                            tile.translatedMatrix(evaluated.get<FillTranslate>(),
+                                                  evaluated.get<FillTranslateAnchor>(),
+                                                  painter.state)
+                        },
+                        uniforms::u_world::Value{ painter.context.viewport.getCurrentValue().size },
+                    },
+                    *bucket.vertexBuffer,
+                    indexBuffer,
+                    segments,
+                    bucket.paintPropertyBinders.at(getID()),
+                    evaluated,
+                    painter.state.getZoom(),
+                    getID()
+                );
+            };
+
+            if (evaluated.get<FillAntialias>() && !unevaluated.get<FillOutlineColor>().isUndefined() && painter.pass == RenderPass::Translucent) {
+                draw(2,
+                     parameters.programs.fillOutline,
+                     gl::Lines { 2.0f },
+                     *bucket.lineIndexBuffer,
+                     bucket.lineSegments);
+            }
+
+            // Only draw the fill when it's opaque and we're drawing opaque fragments,
+            // or when it's translucent and we're drawing translucent fragments.
+            if ((evaluated.get<FillColor>().constantOr(Color()).a >= 1.0f
+              && evaluated.get<FillOpacity>().constantOr(0) >= 1.0f) == (painter.pass == RenderPass::Opaque)) {
+                draw(1,
+                     parameters.programs.fill,
+                     gl::Triangles(),
+                     *bucket.triangleIndexBuffer,
+                     bucket.triangleSegments);
+            }
+
+            if (evaluated.get<FillAntialias>() && unevaluated.get<FillOutlineColor>().isUndefined() && painter.pass == RenderPass::Translucent) {
+                draw(2,
+                     parameters.programs.fillOutline,
+                     gl::Lines { 2.0f },
+                     *bucket.lineIndexBuffer,
+                     bucket.lineSegments);
+            }
+        }
+    } else {
+        if (painter.pass != RenderPass::Translucent) {
+            return;
+        }
+
+        optional<ImagePosition> imagePosA = painter.imageManager->getPattern(evaluated.get<FillPattern>().from);
+        optional<ImagePosition> imagePosB = painter.imageManager->getPattern(evaluated.get<FillPattern>().to);
+
+        if (!imagePosA || !imagePosB) {
+            return;
+        }
+
+        painter.imageManager->bind(painter.context, 0);
+
+        for (const RenderTile& tile : renderTiles) {
+            assert(dynamic_cast<FillBucket*>(tile.tile.getBucket(*baseImpl)));
+            FillBucket& bucket = *reinterpret_cast<FillBucket*>(tile.tile.getBucket(*baseImpl));
+
+            auto draw = [&] (uint8_t sublayer,
+                             auto& program,
+                             const auto& drawMode,
+                             const auto& indexBuffer,
+                             const auto& segments) {
+                program.get(evaluated).draw(
+                    painter.context,
+                    drawMode,
+                    painter.depthModeForSublayer(sublayer, gl::DepthMode::ReadWrite),
+                    painter.stencilModeForClipping(tile.clip),
+                    painter.colorModeForRenderPass(),
+                    FillPatternUniforms::values(
+                        tile.translatedMatrix(evaluated.get<FillTranslate>(),
+                                              evaluated.get<FillTranslateAnchor>(),
+                                              painter.state),
+                        painter.context.viewport.getCurrentValue().size,
+                        painter.imageManager->getPixelSize(),
+                        *imagePosA,
+                        *imagePosB,
+                        evaluated.get<FillPattern>(),
+                        tile.id,
+                        painter.state
+                    ),
+                    *bucket.vertexBuffer,
+                    indexBuffer,
+                    segments,
+                    bucket.paintPropertyBinders.at(getID()),
+                    evaluated,
+                    painter.state.getZoom(),
+                    getID()
+                );
+            };
+
+            draw(0,
+                 parameters.programs.fillPattern,
+                 gl::Triangles(),
+                 *bucket.triangleIndexBuffer,
+                 bucket.triangleSegments);
+
+            if (!evaluated.get<FillAntialias>() || !unevaluated.get<FillOutlineColor>().isUndefined()) {
+                continue;
+            }
+
+            draw(2,
+                 parameters.programs.fillOutlinePattern,
+                 gl::Lines { 2.0f },
+                 *bucket.lineIndexBuffer,
+                 bucket.lineSegments);
+        }
     }
 }
 
