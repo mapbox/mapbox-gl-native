@@ -1,5 +1,8 @@
 #include <mbgl/renderer/layers/render_fill_extrusion_layer.hpp>
 #include <mbgl/renderer/buckets/fill_extrusion_bucket.hpp>
+#include <mbgl/renderer/painter.hpp>
+#include <mbgl/renderer/render_tile.hpp>
+#include <mbgl/tile/tile.hpp>
 #include <mbgl/style/layers/fill_extrusion_layer_impl.hpp>
 #include <mbgl/geometry/feature_index.hpp>
 #include <mbgl/util/math.hpp>
@@ -33,6 +36,18 @@ void RenderFillExtrusionLayer::evaluate(const PropertyEvaluationParameters& para
 
 bool RenderFillExtrusionLayer::hasTransition() const {
     return unevaluated.hasTransition();
+}
+
+void RenderFillExtrusionLayer::render(Painter& painter, PaintParameters& parameters, RenderSource*) {
+    for (const RenderTile& tile : renderTiles) {
+        Bucket* bucket = tile.tile.getBucket(*baseImpl);
+        assert(dynamic_cast<FillExtrusionBucket*>(bucket));
+        painter.renderFillExtrusion(
+            parameters,
+            *reinterpret_cast<FillExtrusionBucket*>(bucket),
+            *this,
+            tile);
+    }
 }
 
 bool RenderFillExtrusionLayer::queryIntersectsFeature(

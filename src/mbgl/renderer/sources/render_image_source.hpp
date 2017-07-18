@@ -5,14 +5,10 @@
 #include <mbgl/style/sources/image_source_impl.hpp>
 
 namespace mbgl {
-class RenderLayer;
+
+class RenderRasterLayer;
 class PaintParameters;
 class RasterBucket;
-class LatLng;
-
-namespace gl {
-class Context;
-} // namespace gl
 
 class RenderImageSource : public RenderSource {
 public:
@@ -22,7 +18,7 @@ public:
     bool isLoaded() const final;
 
     void startRender(Painter&) final;
-    void render(Painter&, PaintParameters&, const RenderLayer&);
+    void render(Painter&, PaintParameters&, const RenderRasterLayer&);
     void finishRender(Painter&) final;
 
     void update(Immutable<style::Source::Impl>,

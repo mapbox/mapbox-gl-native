@@ -62,7 +62,7 @@ public:
     // Checks whether this layer can be rendered.
     bool needsRendering(float zoom) const;
 
-    virtual void render(Painter&, PaintParameters&, RenderSource*);
+    virtual void render(Painter&, PaintParameters&, RenderSource*) = 0;
 
     // Check wether the given geometry intersects
     // with the feature

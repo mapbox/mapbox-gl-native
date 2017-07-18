@@ -1,5 +1,8 @@
 #include <mbgl/renderer/layers/render_circle_layer.hpp>
 #include <mbgl/renderer/buckets/circle_bucket.hpp>
+#include <mbgl/renderer/painter.hpp>
+#include <mbgl/renderer/render_tile.hpp>
+#include <mbgl/tile/tile.hpp>
 #include <mbgl/style/layers/circle_layer_impl.hpp>
 #include <mbgl/geometry/feature_index.hpp>
 #include <mbgl/util/math.hpp>
@@ -38,6 +41,18 @@ void RenderCircleLayer::evaluate(const PropertyEvaluationParameters& parameters)
 
 bool RenderCircleLayer::hasTransition() const {
     return unevaluated.hasTransition();
+}
+
+void RenderCircleLayer::render(Painter& painter, PaintParameters& parameters, RenderSource*) {
+    for (const RenderTile& tile : renderTiles) {
+        Bucket* bucket = tile.tile.getBucket(*baseImpl);
+        assert(dynamic_cast<CircleBucket*>(bucket));
+        painter.renderCircle(
+            parameters,
+            *reinterpret_cast<CircleBucket*>(bucket),
+            *this,
+            tile);
+    }
 }
 
 bool RenderCircleLayer::queryIntersectsFeature(

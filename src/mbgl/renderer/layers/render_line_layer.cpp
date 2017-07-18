@@ -1,5 +1,8 @@
 #include <mbgl/renderer/layers/render_line_layer.hpp>
 #include <mbgl/renderer/buckets/line_bucket.hpp>
+#include <mbgl/renderer/painter.hpp>
+#include <mbgl/renderer/render_tile.hpp>
+#include <mbgl/tile/tile.hpp>
 #include <mbgl/style/layers/line_layer_impl.hpp>
 #include <mbgl/geometry/feature_index.hpp>
 #include <mbgl/util/math.hpp>
@@ -41,6 +44,18 @@ void RenderLineLayer::evaluate(const PropertyEvaluationParameters& parameters) {
 
 bool RenderLineLayer::hasTransition() const {
     return unevaluated.hasTransition();
+}
+
+void RenderLineLayer::render(Painter& painter, PaintParameters& parameters, RenderSource*) {
+    for (const RenderTile& tile : renderTiles) {
+        Bucket* bucket = tile.tile.getBucket(*baseImpl);
+        assert(dynamic_cast<LineBucket*>(bucket));
+        painter.renderLine(
+            parameters,
+            *reinterpret_cast<LineBucket*>(bucket),
+            *this,
+            tile);
+    }
 }
 
 optional<GeometryCollection> offsetLine(const GeometryCollection& rings, const double offset) {

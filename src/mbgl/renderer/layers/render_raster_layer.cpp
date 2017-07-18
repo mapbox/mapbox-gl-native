@@ -1,11 +1,10 @@
 #include <mbgl/renderer/layers/render_raster_layer.hpp>
-#include <mbgl/renderer/bucket.hpp>
-#include <mbgl/style/layers/raster_layer_impl.hpp>
-#include <mbgl/gl/context.hpp>
+#include <mbgl/renderer/buckets/raster_bucket.hpp>
+#include <mbgl/renderer/painter.hpp>
 #include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/tile/tile.hpp>
 #include <mbgl/renderer/sources/render_image_source.hpp>
-#include <mbgl/renderer/painter.hpp>
+#include <mbgl/style/layers/raster_layer_impl.hpp>
 
 namespace mbgl {
 
@@ -38,11 +37,18 @@ bool RenderRasterLayer::hasTransition() const {
 }
 
 void RenderRasterLayer::render(Painter& painter, PaintParameters& parameters, RenderSource* source) {
-    RenderLayer::render(painter, parameters, source);
-    if (renderTiles.empty()) {
-        RenderImageSource* imageSource = source->as<RenderImageSource>();
-        if (imageSource) {
-            imageSource->render(painter, parameters, *this);
+    if (RenderImageSource* imageSource = source->as<RenderImageSource>()) {
+        imageSource->render(painter, parameters, *this);
+    } else {
+        for (const RenderTile& tile : renderTiles) {
+            Bucket* bucket = tile.tile.getBucket(*baseImpl);
+            assert(dynamic_cast<RasterBucket*>(bucket));
+            painter.renderRaster(
+                parameters,
+                *reinterpret_cast<RasterBucket*>(bucket),
+                *this,
+                tile.matrix,
+                false);
         }
     }
 }

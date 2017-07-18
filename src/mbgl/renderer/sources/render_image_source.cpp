@@ -184,10 +184,10 @@ void RenderImageSource::update(Immutable<style::Source::Impl> baseImpl_,
 
 void RenderImageSource::render(Painter& painter,
                                PaintParameters& parameters,
-                               const RenderLayer& layer) {
+                               const RenderRasterLayer& layer) {
     if (isEnabled() && isLoaded() && !bucket->needsUpload()) {
         for (auto matrix : matrices) {
-            bucket->render(painter, parameters, layer, matrix);
+            painter.renderRaster(parameters, *bucket, layer, matrix, true);
         }
     }
 }

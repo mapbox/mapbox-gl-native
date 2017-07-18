@@ -287,10 +287,7 @@ void Painter::renderPass(PaintParameters& parameters,
         if (!layer.hasRenderPass(pass))
             continue;
 
-        if (layer.is<RenderBackgroundLayer>()) {
-            MBGL_DEBUG_GROUP(context, "background");
-            renderBackground(parameters, *layer.as<RenderBackgroundLayer>());
-        } else if (layer.is<RenderFillExtrusionLayer>()) {
+        if (layer.is<RenderFillExtrusionLayer>()) {
             const auto size = context.viewport.getCurrentValue().size;
 
             if (!extrusionTexture || extrusionTexture->getSize() != size) {

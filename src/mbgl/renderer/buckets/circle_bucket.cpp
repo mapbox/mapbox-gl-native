@@ -1,6 +1,5 @@
 #include <mbgl/renderer/buckets/circle_bucket.hpp>
 #include <mbgl/renderer/bucket_parameters.hpp>
-#include <mbgl/renderer/painter.hpp>
 #include <mbgl/programs/circle_program.hpp>
 #include <mbgl/style/layers/circle_layer_impl.hpp>
 #include <mbgl/renderer/layers/render_circle_layer.hpp>
@@ -32,13 +31,6 @@ void CircleBucket::upload(gl::Context& context) {
     }
 
     uploaded = true;
-}
-
-void CircleBucket::render(Painter& painter,
-                        PaintParameters& parameters,
-                        const RenderLayer& layer,
-                        const RenderTile& tile) {
-    painter.renderCircle(parameters, *this, *layer.as<RenderCircleLayer>(), tile);
 }
 
 bool CircleBucket::hasData() const {

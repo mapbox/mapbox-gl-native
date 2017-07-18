@@ -1,5 +1,4 @@
 #include <mbgl/renderer/buckets/fill_extrusion_bucket.hpp>
-#include <mbgl/renderer/painter.hpp>
 #include <mbgl/programs/fill_extrusion_program.hpp>
 #include <mbgl/renderer/bucket_parameters.hpp>
 #include <mbgl/style/layers/fill_extrusion_layer_impl.hpp>
@@ -152,13 +151,6 @@ void FillExtrusionBucket::upload(gl::Context& context) {
     }
 
     uploaded = true;
-}
-
-void FillExtrusionBucket::render(Painter& painter,
-                                 PaintParameters& parameters,
-                                 const RenderLayer& layer,
-                                 const RenderTile& tile) {
-    painter.renderFillExtrusion(parameters, *this, *layer.as<RenderFillExtrusionLayer>(), tile);
 }
 
 bool FillExtrusionBucket::hasData() const {
