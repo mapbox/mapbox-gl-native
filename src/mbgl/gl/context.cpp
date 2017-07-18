@@ -137,6 +137,28 @@ void Context::enableDebugging() {
     MBGL_CHECK_ERROR(debugging->debugMessageCallback(extension::Debugging::DebugCallback, nullptr));
 }
 
+void Context::logGLDiagnostics() {
+#ifdef GL_HIGH_FLOAT
+    int precision;
+    int range[2];
+    MBGL_CHECK_ERROR(glGetShaderPrecisionFormat(GL_VERTEX_SHADER, GL_LOW_FLOAT, range, &precision));
+    mbgl::Log::Info(mbgl::Event::General, "vertex shader / lowp float, precision: %i, range: [%i, %i]", precision, range[0], range[1]);
+    MBGL_CHECK_ERROR(glGetShaderPrecisionFormat(GL_VERTEX_SHADER, GL_MEDIUM_FLOAT, range, &precision));
+    mbgl::Log::Info(mbgl::Event::General, "vertex shader / mediump float, precision: %i, range: [%i, %i]", precision, range[0], range[1]);
+    MBGL_CHECK_ERROR(glGetShaderPrecisionFormat(GL_VERTEX_SHADER, GL_HIGH_FLOAT, range, &precision));
+    mbgl::Log::Info(mbgl::Event::General, "vertex shader / highp float, precision: %i, range: [%i, %i]", precision, range[0], range[1]);
+    
+    MBGL_CHECK_ERROR(glGetShaderPrecisionFormat(GL_FRAGMENT_SHADER, GL_LOW_FLOAT, range, &precision));
+    mbgl::Log::Info(mbgl::Event::General, "fragment shader / lowp float, precision: %i, range: [%i, %i]", precision, range[0], range[1]);
+    MBGL_CHECK_ERROR(glGetShaderPrecisionFormat(GL_FRAGMENT_SHADER, GL_MEDIUM_FLOAT, range, &precision));
+    mbgl::Log::Info(mbgl::Event::General, "fragment shader / mediump float, precision: %i, range: [%i, %i]", precision, range[0], range[1]);
+    MBGL_CHECK_ERROR(glGetShaderPrecisionFormat(GL_FRAGMENT_SHADER, GL_HIGH_FLOAT, range, &precision));
+    mbgl::Log::Info(mbgl::Event::General, "fragment shader / highp float, precision: %i, range: [%i, %i]", precision, range[0], range[1]);
+#else
+    mbgl::Log::Info(mbgl::Event::General, "Shader precision information is not available.");
+#endif
+}
+
 UniqueShader Context::createShader(ShaderType type, const std::string& source) {
     UniqueShader result { MBGL_CHECK_ERROR(glCreateShader(static_cast<GLenum>(type))), { this } };
 

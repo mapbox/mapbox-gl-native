@@ -104,6 +104,8 @@ Painter::Painter(gl::Context& context_,
 
     programs = std::make_unique<Programs>(context,
                                           ProgramParameters{ pixelRatio, false, programCacheDir });
+          
+    context.logGLDiagnostics();
 #ifndef NDEBUG
     overdrawPrograms =
         std::make_unique<Programs>(context, ProgramParameters{ pixelRatio, true, programCacheDir });
