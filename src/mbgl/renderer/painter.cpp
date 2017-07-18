@@ -3,35 +3,27 @@
 #include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/renderer/render_source.hpp>
 #include <mbgl/renderer/render_style.hpp>
+#include <mbgl/renderer/image_manager.hpp>
+#include <mbgl/renderer/layers/render_fill_extrusion_layer.hpp>
 
 #include <mbgl/style/source.hpp>
 #include <mbgl/style/source_impl.hpp>
+#include <mbgl/style/layer_impl.hpp>
 
 #include <mbgl/map/view.hpp>
-
-#include <mbgl/util/logging.hpp>
 #include <mbgl/gl/debugging.hpp>
-
-#include <mbgl/style/layer_impl.hpp>
-#include <mbgl/style/layers/custom_layer_impl.hpp>
-
 #include <mbgl/tile/tile.hpp>
-#include <mbgl/renderer/layers/render_background_layer.hpp>
-#include <mbgl/renderer/layers/render_custom_layer.hpp>
-#include <mbgl/style/layers/custom_layer_impl.hpp>
-#include <mbgl/renderer/layers/render_fill_extrusion_layer.hpp>
-
-#include <mbgl/renderer/image_manager.hpp>
 #include <mbgl/geometry/line_atlas.hpp>
-
 #include <mbgl/programs/program_parameters.hpp>
 #include <mbgl/programs/programs.hpp>
 
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/mat3.hpp>
 #include <mbgl/util/string.hpp>
-
 #include <mbgl/util/stopwatch.hpp>
+#include <mbgl/util/clip_id.hpp>
+#include <mbgl/util/logging.hpp>
+#include <mbgl/util/color.hpp>
 
 #include <cassert>
 #include <algorithm>
@@ -196,15 +188,66 @@ void Painter::render(RenderStyle& style, const FrameData& frame_, View& view) {
 
         MBGL_DEBUG_GROUP(context, "clipping masks");
 
+        static const style::FillPaintProperties::PossiblyEvaluated properties {};
+        static const FillProgram::PaintPropertyBinders paintAttibuteData(properties, 0);
+
         for (const auto& clipID : clipIDGenerator.getClipIDs()) {
-            MBGL_DEBUG_GROUP(context, std::string{ "mask: " } + util::toString(clipID.first));
-            renderClippingMask(clipID.first, clipID.second);
+            programs->fill.get(properties).draw(
+                context,
+                gl::Triangles(),
+                gl::DepthMode::disabled(),
+                gl::StencilMode {
+                    gl::StencilMode::Always(),
+                    static_cast<int32_t>(clipID.second.reference.to_ulong()),
+                    0b11111111,
+                    gl::StencilMode::Keep,
+                    gl::StencilMode::Keep,
+                    gl::StencilMode::Replace
+                },
+                gl::ColorMode::disabled(),
+                FillProgram::UniformValues {
+                    uniforms::u_matrix::Value{ matrixForTile(clipID.first) },
+                    uniforms::u_world::Value{ context.viewport.getCurrentValue().size },
+                },
+                tileVertexBuffer,
+                quadTriangleIndexBuffer,
+                tileTriangleSegments,
+                paintAttibuteData,
+                properties,
+                state.getZoom(),
+                "clipping"
+            );
         }
     }
 
 #if not MBGL_USE_GLES2 and not defined(NDEBUG)
+    // Render tile clip boundaries, using stencil buffer to calculate fill color.
     if (frame.debugOptions & MapDebugOptions::StencilClip) {
-        renderClipMasks(parameters);
+        context.setStencilMode(gl::StencilMode::disabled());
+        context.setDepthMode(gl::DepthMode::disabled());
+        context.setColorMode(gl::ColorMode::unblended());
+        context.program = 0;
+
+        // Reset the value in case someone else changed it, or it's dirty.
+        context.pixelTransferStencil = gl::value::PixelTransferStencil::Default;
+
+        // Read the stencil buffer
+        const auto viewport = context.viewport.getCurrentValue();
+        auto image =
+            context.readFramebuffer<AlphaImage, gl::TextureFormat::Stencil>(viewport.size, false);
+
+        // Scale the Stencil buffer to cover the entire color space.
+        auto it = image.data.get();
+        auto end = it + viewport.size.width * viewport.size.height;
+        const auto factor = 255.0f / *std::max_element(it, end);
+        for (; it != end; ++it) {
+            *it *= factor;
+        }
+
+        context.pixelZoom = { 1, 1 };
+        context.rasterPos = { -1, -1, 0, 1 };
+        context.drawPixels(image);
+
         return;
     }
 #endif
@@ -245,8 +288,26 @@ void Painter::render(RenderStyle& style, const FrameData& frame_, View& view) {
     }
 
 #if not MBGL_USE_GLES2 and not defined(NDEBUG)
+    // Render the depth buffer.
     if (frame.debugOptions & MapDebugOptions::DepthBuffer) {
-        renderDepthBuffer(parameters);
+        context.setStencilMode(gl::StencilMode::disabled());
+        context.setDepthMode(gl::DepthMode::disabled());
+        context.setColorMode(gl::ColorMode::unblended());
+        context.program = 0;
+
+        // Scales the values in the depth buffer so that they cover the entire grayscale range. This
+        // makes it easier to spot tiny differences.
+        const float base = 1.0f / (1.0f - depthRangeSize);
+        context.pixelTransferDepth = { base, 1.0f - base };
+
+        // Read the stencil buffer
+        auto viewport = context.viewport.getCurrentValue();
+        auto image =
+            context.readFramebuffer<AlphaImage, gl::TextureFormat::Depth>(viewport.size, false);
+
+        context.pixelZoom = { 1, 1 };
+        context.rasterPos = { -1, -1, 0, 1 };
+        context.drawPixels(image);
     }
 #endif
 
@@ -288,6 +349,8 @@ void Painter::renderPass(PaintParameters& parameters,
             continue;
 
         if (layer.is<RenderFillExtrusionLayer>()) {
+            MBGL_DEBUG_GROUP(context, item.layer.getID());
+
             const auto size = context.viewport.getCurrentValue().size;
 
             if (!extrusionTexture || extrusionTexture->getSize() != size) {
@@ -300,7 +363,7 @@ void Painter::renderPass(PaintParameters& parameters,
             context.setDepthMode(depthModeForSublayer(0, gl::DepthMode::ReadWrite));
             context.clear(Color{ 0.0f, 0.0f, 0.0f, 0.0f }, 1.0f, {});
 
-            renderItem(parameters, item);
+            item.layer.render(*this, parameters, item.source);
 
             parameters.view.bind();
             context.bindTexture(extrusionTexture->getTexture());
@@ -329,19 +392,14 @@ void Painter::renderPass(PaintParameters& parameters,
                 state.getZoom(),
                 layer.getID());
         } else {
-            renderItem(parameters, item);
+            MBGL_DEBUG_GROUP(context, item.layer.getID());
+            item.layer.render(*this, parameters, item.source);
         }
     }
 
     if (debug::renderTree) {
         Log::Info(Event::Render, "%*s%s", --indent * 4, "", "}");
     }
-}
-
-void Painter::renderItem(PaintParameters& parameters, const RenderItem& item) {
-    RenderLayer& layer = item.layer;
-    MBGL_DEBUG_GROUP(context, layer.getID());
-    layer.render(*this, parameters, item.source);
 }
 
 mat4 Painter::matrixForTile(const UnwrappedTileID& tileID) {

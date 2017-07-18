@@ -37,6 +37,7 @@ public:
                               const TransformState&) const;
 
     void startRender(Painter&);
+    void finishRender(Painter&);
 
     mat4 translateVtxMatrix(const mat4& tileMatrix,
                             const std::array<float, 2>& translation,

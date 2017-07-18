@@ -5,6 +5,7 @@
 #include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/renderer/sources/render_image_source.hpp>
 #include <mbgl/renderer/tile_parameters.hpp>
+#include <mbgl/programs/programs.hpp>
 #include <mbgl/util/tile_coordinate.hpp>
 #include <mbgl/util/tile_cover.hpp>
 #include <mbgl/util/logging.hpp>
@@ -48,11 +49,32 @@ void RenderImageSource::startRender(Painter& painter) {
 }
 
 void RenderImageSource::finishRender(Painter& painter) {
-    if (!isLoaded()) {
+    if (!isLoaded() || !(painter.frame.debugOptions & MapDebugOptions::TileBorders)) {
         return;
     }
+
+    static const style::Properties<>::PossiblyEvaluated properties {};
+    static const DebugProgram::PaintPropertyBinders paintAttibuteData(properties, 0);
+
     for (auto matrix : matrices) {
-        painter.renderTileDebug(matrix);
+        painter.programs->debug.draw(
+            painter.context,
+            gl::LineStrip { 4.0f * painter.frame.pixelRatio },
+            gl::DepthMode::disabled(),
+            gl::StencilMode::disabled(),
+            gl::ColorMode::unblended(),
+            DebugProgram::UniformValues {
+             uniforms::u_matrix::Value{ matrix },
+             uniforms::u_color::Value{ Color::red() }
+            },
+            painter.tileVertexBuffer,
+            painter.tileBorderIndexBuffer,
+            painter.tileBorderSegments,
+            paintAttibuteData,
+            properties,
+            painter.state.getZoom(),
+            "debug"
+        );
     }
 }
 

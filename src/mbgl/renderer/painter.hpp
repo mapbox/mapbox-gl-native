@@ -8,39 +8,31 @@
 #include <mbgl/renderer/render_item.hpp>
 #include <mbgl/renderer/bucket.hpp>
 #include <mbgl/renderer/render_light.hpp>
+#include <mbgl/renderer/render_pass.hpp>
 
 #include <mbgl/gl/context.hpp>
 #include <mbgl/programs/debug_program.hpp>
-#include <mbgl/programs/program_parameters.hpp>
 #include <mbgl/programs/fill_program.hpp>
 #include <mbgl/programs/extrusion_texture_program.hpp>
 #include <mbgl/programs/raster_program.hpp>
 
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/chrono.hpp>
-#include <mbgl/util/constants.hpp>
 #include <mbgl/util/offscreen_texture.hpp>
 
 #include <mbgl/algorithm/generate_clip_ids.hpp>
 
 #include <array>
 #include <vector>
-#include <set>
-#include <map>
 
 namespace mbgl {
 
 class RenderStyle;
-class RenderTile;
 class ImageManager;
 class View;
 class LineAtlas;
-struct FrameData;
-class Tile;
-class DebugBucket;
 class Programs;
 class PaintParameters;
-class TilePyramid;
 struct ClipID;
 
 struct FrameData {
@@ -61,19 +53,6 @@ public:
                 View&);
 
     void cleanup();
-
-    void renderClippingMask(const UnwrappedTileID&, const ClipID&);
-    void renderTileDebug(const RenderTile&);
-    void renderTileDebug(const mat4& matrix);
-    void renderItem(PaintParameters&, const RenderItem&);
-
-#ifndef NDEBUG
-    // Renders tile clip boundaries, using stencil buffer to calculate fill color.
-    void renderClipMasks(PaintParameters&);
-    // Renders the depth buffer.
-    void renderDepthBuffer(PaintParameters&);
-#endif
-
     bool needsAnimation() const;
 
     template <class Iterator>
