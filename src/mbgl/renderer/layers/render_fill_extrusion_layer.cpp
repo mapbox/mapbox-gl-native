@@ -2,6 +2,10 @@
 #include <mbgl/renderer/buckets/fill_extrusion_bucket.hpp>
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/renderer/render_tile.hpp>
+#include <mbgl/renderer/paint_parameters.hpp>
+#include <mbgl/renderer/image_manager.hpp>
+#include <mbgl/programs/programs.hpp>
+#include <mbgl/programs/fill_extrusion_program.hpp>
 #include <mbgl/tile/tile.hpp>
 #include <mbgl/style/layers/fill_extrusion_layer_impl.hpp>
 #include <mbgl/geometry/feature_index.hpp>
@@ -9,6 +13,8 @@
 #include <mbgl/util/intersection_tests.hpp>
 
 namespace mbgl {
+
+using namespace style;
 
 RenderFillExtrusionLayer::RenderFillExtrusionLayer(Immutable<style::FillExtrusionLayer::Impl> _impl)
     : RenderLayer(style::LayerType::FillExtrusion, _impl),
@@ -39,14 +45,77 @@ bool RenderFillExtrusionLayer::hasTransition() const {
 }
 
 void RenderFillExtrusionLayer::render(Painter& painter, PaintParameters& parameters, RenderSource*) {
-    for (const RenderTile& tile : renderTiles) {
-        Bucket* bucket = tile.tile.getBucket(*baseImpl);
-        assert(dynamic_cast<FillExtrusionBucket*>(bucket));
-        painter.renderFillExtrusion(
-            parameters,
-            *reinterpret_cast<FillExtrusionBucket*>(bucket),
-            *this,
-            tile);
+    if (painter.pass == RenderPass::Opaque) {
+        return;
+    }
+
+    if (evaluated.get<FillExtrusionPattern>().from.empty()) {
+        for (const RenderTile& tile : renderTiles) {
+            assert(dynamic_cast<FillExtrusionBucket*>(tile.tile.getBucket(*baseImpl)));
+            FillExtrusionBucket& bucket = *reinterpret_cast<FillExtrusionBucket*>(tile.tile.getBucket(*baseImpl));
+
+            parameters.programs.fillExtrusion.get(evaluated).draw(
+                painter.context,
+                gl::Triangles(),
+                painter.depthModeForSublayer(0, gl::DepthMode::ReadWrite),
+                gl::StencilMode::disabled(),
+                painter.colorModeForRenderPass(),
+                FillExtrusionUniforms::values(
+                    tile.translatedClipMatrix(evaluated.get<FillExtrusionTranslate>(),
+                                              evaluated.get<FillExtrusionTranslateAnchor>(),
+                                              painter.state),
+                    painter.state,
+                    painter.evaluatedLight
+                ),
+                *bucket.vertexBuffer,
+                *bucket.indexBuffer,
+                bucket.triangleSegments,
+                bucket.paintPropertyBinders.at(getID()),
+                evaluated,
+                painter.state.getZoom(),
+                getID());
+        }
+    } else {
+        optional<ImagePosition> imagePosA = painter.imageManager->getPattern(evaluated.get<FillExtrusionPattern>().from);
+        optional<ImagePosition> imagePosB = painter.imageManager->getPattern(evaluated.get<FillExtrusionPattern>().to);
+
+        if (!imagePosA || !imagePosB) {
+            return;
+        }
+
+        painter.imageManager->bind(painter.context, 0);
+
+        for (const RenderTile& tile : renderTiles) {
+            assert(dynamic_cast<FillExtrusionBucket*>(tile.tile.getBucket(*baseImpl)));
+            FillExtrusionBucket& bucket = *reinterpret_cast<FillExtrusionBucket*>(tile.tile.getBucket(*baseImpl));
+
+            parameters.programs.fillExtrusionPattern.get(evaluated).draw(
+                painter.context,
+                gl::Triangles(),
+                painter.depthModeForSublayer(0, gl::DepthMode::ReadWrite),
+                gl::StencilMode::disabled(),
+                painter.colorModeForRenderPass(),
+                FillExtrusionPatternUniforms::values(
+                    tile.translatedClipMatrix(evaluated.get<FillExtrusionTranslate>(),
+                                              evaluated.get<FillExtrusionTranslateAnchor>(),
+                                              painter.state),
+                    painter.imageManager->getPixelSize(),
+                    *imagePosA,
+                    *imagePosB,
+                    evaluated.get<FillExtrusionPattern>(),
+                    tile.id,
+                    painter.state,
+                    -std::pow(2, tile.id.canonical.z) / util::tileSize / 8.0f,
+                    painter.evaluatedLight
+                ),
+                *bucket.vertexBuffer,
+                *bucket.indexBuffer,
+                bucket.triangleSegments,
+                bucket.paintPropertyBinders.at(getID()),
+                evaluated,
+                painter.state.getZoom(),
+                getID());
+        }
     }
 }
 
