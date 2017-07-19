@@ -66,3 +66,51 @@ var test = require('tape');
         });
     });
 });
+
+test(`render reports an error if the request function throws an exception`, function(t) {
+    var map = new mbgl.Map({
+        request: function() {
+            throw new Error('message');
+        }
+    });
+    map.load(mockfs.style_vector);
+    map.render({ zoom: 16 }, function(err, pixels) {
+        t.assert(err);
+        t.assert(/message/.test(err.message));
+        t.assert(!pixels);
+        t.end();
+    });
+});
+
+test(`render ignores request functions throwing an exception after calling the callback`, function(t) {
+    var map = new mbgl.Map({
+        request: function(req, callback) {
+            var data = mockfs.dataForRequest(req);
+            callback(null, { data: data });
+            throw new Error('message');
+        }
+    });
+    map.load(mockfs.style_vector);
+    map.render({ zoom: 16 }, function(err, pixels) {
+        t.error(err);
+        t.assert(pixels);
+        t.end();
+    });
+});
+
+test(`render ignores request functions calling the callback a second time`, function(t) {
+    var map = new mbgl.Map({
+        request: function(req, callback) {
+            var data = mockfs.dataForRequest(req);
+            callback(null, { data: data });
+            callback(null, { data: data });
+        }
+    });
+    map.load(mockfs.style_vector);
+    map.render({ zoom: 16 }, function(err, pixels) {
+        t.error(err);
+        t.assert(pixels);
+        t.end();
+    });
+});
+
