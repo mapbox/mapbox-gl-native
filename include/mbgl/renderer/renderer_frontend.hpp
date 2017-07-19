@@ -5,7 +5,7 @@
 namespace mbgl {
 
 class RendererObserver;
-class UpdateParameters;
+struct UpdateParameters;
 
 // The RenderFrontend is the bridge between the Map and
 // platform used to update and observer the Renderer

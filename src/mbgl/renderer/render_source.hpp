@@ -24,7 +24,7 @@ class RenderedQueryOptions;
 class SourceQueryOptions;
 class Tile;
 class RenderSourceObserver;
-class TileParameters;
+struct TileParameters;
 
 class RenderSource : protected TileObserver {
 public:

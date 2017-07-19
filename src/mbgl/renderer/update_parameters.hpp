@@ -17,45 +17,7 @@ class Scheduler;
 class FileSource;
 class AnnotationManager;
 
-class UpdateParameters {
-public:
-    UpdateParameters(const bool styleLoaded_,
-                     const MapMode mode_,
-                     const float pixelRatio_,
-                     const MapDebugOptions debugOptions_,
-                     const TimePoint timePoint_,
-                     const TransformState TransformState_,
-                     const std::string glyphURL_,
-                     const bool spriteLoaded_,
-                     const style::TransitionOptions transitionOptions_,
-                     const Immutable<style::Light::Impl> light_,
-                     const Immutable<std::vector<Immutable<style::Image::Impl>>> images_,
-                     const Immutable<std::vector<Immutable<style::Source::Impl>>> sources_,
-                     const Immutable<std::vector<Immutable<style::Layer::Impl>>> layers_,
-                     Scheduler& scheduler_,
-                     FileSource& fileSource_,
-                     AnnotationManager& annotationManager_,
-                     const uint8_t prefetchZoomDelta_,
-                     const bool stillImageRequest_)
-        : styleLoaded(styleLoaded_),
-          mode(mode_),
-          pixelRatio(pixelRatio_),
-          debugOptions(debugOptions_),
-          timePoint(std::move(timePoint_)),
-          transformState(std::move(TransformState_)),
-          glyphURL(std::move(glyphURL_)),
-          spriteLoaded(spriteLoaded_),
-          transitionOptions(std::move(transitionOptions_)),
-          light(std::move(light_)),
-          images(std::move(images_)),
-          sources(std::move(sources_)),
-          layers(std::move(layers_)),
-          scheduler(scheduler_),
-          fileSource(fileSource_),
-          annotationManager(annotationManager_),
-          prefetchZoomDelta(prefetchZoomDelta_),
-          stillImageRequest(stillImageRequest_) {}
-
+struct UpdateParameters {
     const bool styleLoaded;
     const MapMode mode;
     const float pixelRatio;

@@ -6,7 +6,7 @@
 namespace mbgl {
 
 class Tileset;
-class TileParameters;
+struct TileParameters;
 
 class VectorTile : public GeometryTile {
 public:
