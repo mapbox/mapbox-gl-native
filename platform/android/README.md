@@ -40,12 +40,15 @@ These dependencies are required for all operating systems and all platform targe
   - NDK
   - LLDB
 
-- Modern C++ compiler that supports -std=c++14
+- Modern C++ compiler that supports `-std=c++14`\*
   - clang++ 3.5 or later or
-  - g++-5 or later
+  - g++-4.9 or later
 - [cURL](https://curl.haxx.se) (for build only)
 - [Node.js](https://nodejs.org/) or later (for build only)
 - [pkg-config](https://wiki.freedesktop.org/www/Software/pkg-config/) (for build only)
+
+**Note**: We partially support C++14 because GCC 4.9 does not fully implement the
+final draft of the C++14 standard. More information in [DEVELOPING.md](DEVELOPING.md).
 
 ##### Additional Dependencies for Linux
 
