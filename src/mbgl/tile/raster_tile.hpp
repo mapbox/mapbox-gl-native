@@ -8,7 +8,7 @@
 namespace mbgl {
 
 class Tileset;
-class TileParameters;
+struct TileParameters;
 
 namespace style {
 class Layer;

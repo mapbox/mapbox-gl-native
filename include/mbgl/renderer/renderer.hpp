@@ -19,7 +19,7 @@ class RendererObserver;
 class RenderedQueryOptions;
 class Scheduler;
 class SourceQueryOptions;
-class UpdateParameters;
+struct UpdateParameters;
 class View;
 
 class Renderer {

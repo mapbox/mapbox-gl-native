@@ -7,7 +7,7 @@
 namespace mbgl {
 
 class AnnotationManager;
-class TileParameters;
+struct TileParameters;
 
 class AnnotationTile : public GeometryTile {
 public:
