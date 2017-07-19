@@ -17,8 +17,6 @@ set(MBGL_TEST_FILES
     test/api/api_misuse.test.cpp
     test/api/custom_layer.test.cpp
     test/api/query.test.cpp
-    test/api/render_missing.test.cpp
-    test/api/repeated_render.test.cpp
 
     # gl
     test/gl/bucket.test.cpp
