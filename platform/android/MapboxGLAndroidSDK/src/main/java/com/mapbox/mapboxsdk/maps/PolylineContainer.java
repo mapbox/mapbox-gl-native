@@ -80,6 +80,7 @@ class PolylineContainer implements Polylines {
   public void update(Polyline polyline) {
     if (!isAddedToMap(polyline)) {
       Timber.w("Attempting to update non-added Polyline with value %s", polyline);
+      return;
     }
 
     nativeMapView.updatePolyline(polyline);
