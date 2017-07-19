@@ -55,6 +55,7 @@
   "render-tests/runtime-styling/set-style-paint-property-fill-flat-to-extrude": "skip - needs issue",
   "render-tests/runtime-styling/source-add-geojson-inline": "skip - needs issue",
   "render-tests/symbol-placement/line": "needs issue",
+  "render-tests/text-anchor/property-function": "https://github.com/mapbox/mapbox-gl-native/issues/9555",
   "render-tests/text-keep-upright/line-placement-true-offset": "https://github.com/mapbox/mapbox-gl-native/issues/9271",
   "render-tests/text-size/composite-function-high-base": "https://github.com/mapbox/mapbox-gl-native/issues/8654",
   "render-tests/video/default": "skip - needs issue"
