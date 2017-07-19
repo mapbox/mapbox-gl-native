@@ -5,7 +5,7 @@
 
 namespace mbgl {
 
-struct TileParameters;
+class TileParameters;
 
 class GeoJSONTile : public GeometryTile {
 public:

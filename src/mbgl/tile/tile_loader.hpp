@@ -10,7 +10,7 @@ class FileSource;
 class AsyncRequest;
 class Response;
 class Tileset;
-struct TileParameters;
+class TileParameters;
 
 template <typename T>
 class TileLoader : private util::noncopyable {

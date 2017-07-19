@@ -11,7 +11,8 @@ class AnnotationManager;
 class ImageManager;
 class GlyphManager;
 
-struct TileParameters {
+class TileParameters {
+public:
     const float pixelRatio;
     const MapDebugOptions debugOptions;
     const TransformState& transformState;
