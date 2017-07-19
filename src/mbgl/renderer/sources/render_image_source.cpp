@@ -1,10 +1,12 @@
 #include <mbgl/map/transform_state.hpp>
 #include <mbgl/math/log2.hpp>
 #include <mbgl/renderer/buckets/raster_bucket.hpp>
-#include <mbgl/renderer/painter.hpp>
+#include <mbgl/renderer/paint_parameters.hpp>
 #include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/renderer/sources/render_image_source.hpp>
 #include <mbgl/renderer/tile_parameters.hpp>
+#include <mbgl/renderer/render_static_data.hpp>
+#include <mbgl/programs/programs.hpp>
 #include <mbgl/util/tile_coordinate.hpp>
 #include <mbgl/util/tile_cover.hpp>
 #include <mbgl/util/logging.hpp>
@@ -27,7 +29,7 @@ bool RenderImageSource::isLoaded() const {
     return !!bucket;
 }
 
-void RenderImageSource::startRender(Painter& painter) {
+void RenderImageSource::startRender(PaintParameters& parameters) {
     if (!isLoaded()) {
         return;
     }
@@ -37,22 +39,43 @@ void RenderImageSource::startRender(Painter& painter) {
     for (size_t i = 0; i < tileIds.size(); i++) {
         mat4 matrix;
         matrix::identity(matrix);
-        painter.state.matrixFor(matrix, tileIds[i]);
-        matrix::multiply(matrix, painter.projMatrix, matrix);
+        parameters.state.matrixFor(matrix, tileIds[i]);
+        matrix::multiply(matrix, parameters.projMatrix, matrix);
         matrices.push_back(matrix);
     }
 
     if (bucket->needsUpload()) {
-        bucket->upload(painter.context);
+        bucket->upload(parameters.context);
     }
 }
 
-void RenderImageSource::finishRender(Painter& painter) {
-    if (!isLoaded()) {
+void RenderImageSource::finishRender(PaintParameters& parameters) {
+    if (!isLoaded() || !(parameters.debugOptions & MapDebugOptions::TileBorders)) {
         return;
     }
+
+    static const style::Properties<>::PossiblyEvaluated properties {};
+    static const DebugProgram::PaintPropertyBinders paintAttibuteData(properties, 0);
+
     for (auto matrix : matrices) {
-        painter.renderTileDebug(matrix);
+        parameters.programs.debug.draw(
+            parameters.context,
+            gl::LineStrip { 4.0f * parameters.pixelRatio },
+            gl::DepthMode::disabled(),
+            gl::StencilMode::disabled(),
+            gl::ColorMode::unblended(),
+            DebugProgram::UniformValues {
+             uniforms::u_matrix::Value{ matrix },
+             uniforms::u_color::Value{ Color::red() }
+            },
+            parameters.staticData.tileVertexBuffer,
+            parameters.staticData.tileBorderIndexBuffer,
+            parameters.staticData.tileBorderSegments,
+            paintAttibuteData,
+            properties,
+            parameters.state.getZoom(),
+            "debug"
+        );
     }
 }
 
@@ -61,11 +84,11 @@ RenderImageSource::queryRenderedFeatures(const ScreenLineString&,
                                          const TransformState&,
                                          const RenderStyle&,
                                          const RenderedQueryOptions&) const {
-    return std::unordered_map<std::string, std::vector<Feature>>();
+    return std::unordered_map<std::string, std::vector<Feature>> {};
 }
 
 std::vector<Feature> RenderImageSource::querySourceFeatures(const SourceQueryOptions&) const {
-    return std::vector<Feature>();
+    return {};
 }
 
 void RenderImageSource::update(Immutable<style::Source::Impl> baseImpl_,
@@ -180,16 +203,6 @@ void RenderImageSource::update(Immutable<style::Source::Impl> baseImpl_,
     bucket->indices.emplace_back(1, 2, 3);
 
     bucket->segments.emplace_back(0, 0, 4, 6);
-}
-
-void RenderImageSource::render(Painter& painter,
-                               PaintParameters& parameters,
-                               const RenderLayer& layer) {
-    if (isEnabled() && isLoaded() && !bucket->needsUpload()) {
-        for (auto matrix : matrices) {
-            bucket->render(painter, parameters, layer, matrix);
-        }
-    }
 }
 
 void RenderImageSource::dumpDebugLogs() const {

@@ -56,12 +56,12 @@ void RenderRasterSource::update(Immutable<style::Source::Impl> baseImpl_,
                        });
 }
 
-void RenderRasterSource::startRender(Painter& painter) {
-    tilePyramid.startRender(painter);
+void RenderRasterSource::startRender(PaintParameters& parameters) {
+    tilePyramid.startRender(parameters);
 }
 
-void RenderRasterSource::finishRender(Painter& painter) {
-    tilePyramid.finishRender(painter);
+void RenderRasterSource::finishRender(PaintParameters& parameters) {
+    tilePyramid.finishRender(parameters);
 }
 
 std::vector<std::reference_wrapper<RenderTile>> RenderRasterSource::getRenderTiles() {
@@ -73,11 +73,11 @@ RenderRasterSource::queryRenderedFeatures(const ScreenLineString&,
                                           const TransformState&,
                                           const RenderStyle&,
                                           const RenderedQueryOptions&) const {
-    return std::unordered_map<std::string, std::vector<Feature>>();
+    return std::unordered_map<std::string, std::vector<Feature>> {};
 }
 
 std::vector<Feature> RenderRasterSource::querySourceFeatures(const SourceQueryOptions&) const {
-    return std::vector<Feature>();
+    return {};
 }
 
 void RenderRasterSource::onLowMemory() {

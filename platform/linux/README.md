@@ -8,12 +8,15 @@ This process gives you a Linux desktop app built on a Linux host system.
 
 ### Build
 
-Install GCC 5+ if you are running Ubuntu 14.04 or older. Alternatively, you can also use [Clang 3.5+](http://llvm.org/apt/).
+Install GCC 4.9+ if you are running Ubuntu 14.04 or older. Alternatively, you can also use [Clang 3.5+](http://llvm.org/apt/).
 
     sudo add-apt-repository --yes ppa:ubuntu-toolchain-r/test
     sudo apt-get update
-    sudo apt-get install gcc-5 g++-5
-    export CXX=g++-5
+    sudo apt-get install gcc-4.9 g++-4.9
+    export CXX=g++-4.9
+
+**Note**: We partially support C++14 because GCC 4.9 does not fully implement the
+final draft of the C++14 standard. More information in [DEVELOPING.md](DEVELOPING.md).
 
 Ensure you have git and other build essentials:
 

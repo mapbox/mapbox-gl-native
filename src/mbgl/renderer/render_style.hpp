@@ -23,7 +23,7 @@ class RenderData;
 class TransformState;
 class RenderedQueryOptions;
 class Scheduler;
-class UpdateParameters;
+struct UpdateParameters;
 class RenderStyleObserver;
 
 namespace style {

@@ -14,6 +14,7 @@ public:
     void transition(const TransitionParameters&) override;
     void evaluate(const PropertyEvaluationParameters&) override;
     bool hasTransition() const override;
+    void render(PaintParameters&, RenderSource*) override;
 
     bool queryIntersectsFeature(
         const GeometryCoordinates&,

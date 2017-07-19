@@ -15,12 +15,8 @@ class RasterBucket : public Bucket {
 public:
     RasterBucket(PremultipliedImage&&);
     RasterBucket(std::shared_ptr<PremultipliedImage>);
+
     void upload(gl::Context&) override;
-    void render(Painter&, PaintParameters&, const RenderLayer&, const RenderTile&) override;
-    void render(Painter& painter,
-                PaintParameters& parameters,
-                const RenderLayer& layer,
-                const mat4& matrix);
     bool hasData() const override;
 
     void clear();

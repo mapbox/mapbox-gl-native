@@ -1,6 +1,6 @@
 #include <mbgl/renderer/sources/render_vector_source.hpp>
 #include <mbgl/renderer/render_tile.hpp>
-#include <mbgl/renderer/painter.hpp>
+#include <mbgl/renderer/paint_parameters.hpp>
 #include <mbgl/tile/vector_tile.hpp>
 
 #include <mbgl/algorithm/generate_clip_ids.hpp>
@@ -60,13 +60,13 @@ void RenderVectorSource::update(Immutable<style::Source::Impl> baseImpl_,
                        });
 }
 
-void RenderVectorSource::startRender(Painter& painter) {
-    painter.clipIDGenerator.update(tilePyramid.getRenderTiles());
-    tilePyramid.startRender(painter);
+void RenderVectorSource::startRender(PaintParameters& parameters) {
+    parameters.clipIDGenerator.update(tilePyramid.getRenderTiles());
+    tilePyramid.startRender(parameters);
 }
 
-void RenderVectorSource::finishRender(Painter& painter) {
-    tilePyramid.finishRender(painter);
+void RenderVectorSource::finishRender(PaintParameters& parameters) {
+    tilePyramid.finishRender(parameters);
 }
 
 std::vector<std::reference_wrapper<RenderTile>> RenderVectorSource::getRenderTiles() {
