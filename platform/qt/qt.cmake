@@ -46,7 +46,7 @@ set(MBGL_QT_FILES
     PRIVATE platform/qt/src/http_file_source.hpp
     PRIVATE platform/qt/src/http_request.cpp
     PRIVATE platform/qt/src/http_request.hpp
-    PRIVATE platform/qt/src/image.cpp
+    PRIVATE platform/qt/src/qt_image.cpp
     PRIVATE platform/qt/src/run_loop.cpp
     PRIVATE platform/qt/src/run_loop_impl.hpp
     PRIVATE platform/qt/src/sqlite3.cpp
