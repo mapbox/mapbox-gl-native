@@ -584,7 +584,7 @@ set(MBGL_CORE_FILES
     src/mbgl/util/event.cpp
     src/mbgl/util/font_stack.cpp
     src/mbgl/util/geo.cpp
-    src/mbgl/util/geojson.cpp
+    src/mbgl/util/geojson_impl.cpp
     src/mbgl/util/grid_index.cpp
     src/mbgl/util/grid_index.hpp
     src/mbgl/util/http_header.cpp
