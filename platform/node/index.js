@@ -4,6 +4,7 @@
 
 var mbgl = require('../../lib/mapbox_gl_native.node');
 var constructor = mbgl.Map.prototype.constructor;
+var process = require('process');
 
 var Map = function(options) {
     if (!(options instanceof Object)) {
@@ -19,7 +20,12 @@ var Map = function(options) {
     return new constructor(Object.assign(options, {
         request: function(req) {
             request(req, function() {
-                req.respond.apply(req, arguments);
+                var args = arguments;
+                // Protect against `request` implementations that call the callback synchronously.
+                // http://blog.izs.me/post/59142742143/designing-apis-for-asynchrony
+                process.nextTick(function() {
+                    req.respond.apply(req, args);
+                });
             });
         }
     }));
