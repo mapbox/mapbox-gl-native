@@ -85,8 +85,6 @@ public:
 
     // JNI //
 
-    void destroy(jni::JNIEnv&);
-
     void render(jni::JNIEnv&);
 
     void update(jni::JNIEnv&);
@@ -94,14 +92,6 @@ public:
     void resizeView(jni::JNIEnv&, int, int);
 
     void resizeFramebuffer(jni::JNIEnv&, int, int);
-
-    void initializeDisplay(jni::JNIEnv&);
-
-    void terminateDisplay(jni::JNIEnv&);
-
-    void initializeContext(jni::JNIEnv&);
-
-    void terminateContext(jni::JNIEnv&);
 
     void createSurface(jni::JNIEnv&, jni::Object<>);
 

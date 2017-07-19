@@ -35,7 +35,6 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import timber.log.Timber;
 
@@ -57,9 +56,6 @@ final class NativeMapView {
   // Device density
   private final float pixelRatio;
 
-  // Listeners for Map change events
-  private CopyOnWriteArrayList<MapView.OnMapChangedListener> onMapChangedListeners;
-
   // Listener invoked to return a bitmap of the map
   private MapboxMap.SnapshotReadyCallback snapshotReadyCallback;
 
@@ -76,7 +72,6 @@ final class NativeMapView {
     fileSource = FileSource.getInstance(context);
 
     pixelRatio = context.getResources().getDisplayMetrics().density;
-    onMapChangedListeners = new CopyOnWriteArrayList<>();
     this.mapView = mapView;
 
     String programCacheDir = context.getCacheDir().getAbsolutePath();
@@ -100,34 +95,6 @@ final class NativeMapView {
     nativeDestroy();
     mapView = null;
     destroyed = true;
-  }
-
-  public void initializeDisplay() {
-    if (isDestroyedOn("initializeDisplay")) {
-      return;
-    }
-    nativeInitializeDisplay();
-  }
-
-  public void terminateDisplay() {
-    if (isDestroyedOn("terminateDisplay")) {
-      return;
-    }
-    nativeTerminateDisplay();
-  }
-
-  public void initializeContext() {
-    if (isDestroyedOn("initializeContext")) {
-      return;
-    }
-    nativeInitializeContext();
-  }
-
-  public void terminateContext() {
-    if (isDestroyedOn("terminateContext")) {
-      return;
-    }
-    nativeTerminateContext();
   }
 
   public void createSurface(Surface surface) {
@@ -887,14 +854,8 @@ final class NativeMapView {
   }
 
   protected void onMapChanged(int rawChange) {
-    if (onMapChangedListeners != null) {
-      for (MapView.OnMapChangedListener onMapChangedListener : onMapChangedListeners) {
-        try {
-          onMapChangedListener.onMapChanged(rawChange);
-        } catch (RuntimeException err) {
-          Timber.e("Exception (%s) in MapView.OnMapChangedListener: %s", err.getClass(), err.getMessage());
-        }
-      }
+    if (mapView != null) {
+      mapView.onMapChange(rawChange);
     }
   }
 
@@ -1130,11 +1091,11 @@ final class NativeMapView {
   //
 
   void addOnMapChangedListener(@NonNull MapView.OnMapChangedListener listener) {
-    onMapChangedListeners.add(listener);
+    mapView.addOnMapChangedListener(listener);
   }
 
   void removeOnMapChangedListener(@NonNull MapView.OnMapChangedListener listener) {
-    onMapChangedListeners.remove(listener);
+    mapView.removeOnMapChangedListener(listener);
   }
 
   //

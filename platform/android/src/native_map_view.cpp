@@ -86,6 +86,10 @@ NativeMapView::NativeMapView(jni::JNIEnv& _env,
                                                   static_cast<uint32_t>(height) }, pixelRatio,
                                       fileSource, *threadPool, MapMode::Continuous,
                                       ConstrainMode::HeightOnly, ViewportMode::Default);
+
+    // initialize egl components
+    _initializeDisplay();
+    _initializeContext();
 }
 
 /**
@@ -253,22 +257,6 @@ void NativeMapView::onSourceChanged(mbgl::style::Source&) {
 }
 
 // JNI Methods //
-
-void NativeMapView::initializeDisplay(jni::JNIEnv&) {
-    _initializeDisplay();
-}
-
-void NativeMapView::terminateDisplay(jni::JNIEnv&) {
-    _terminateDisplay();
-}
-
-void NativeMapView::initializeContext(jni::JNIEnv&) {
-    _initializeContext();
-}
-
-void NativeMapView::terminateContext(jni::JNIEnv&) {
-    _terminateContext();
-}
 
 void NativeMapView::createSurface(jni::JNIEnv& env, jni::Object<> _surface) {
     _createSurface(ANativeWindow_fromSurface(&env, jni::Unwrap(*_surface)));
@@ -1471,10 +1459,6 @@ void NativeMapView::registerNative(jni::JNIEnv& env) {
             METHOD(&NativeMapView::update, "nativeUpdate"),
             METHOD(&NativeMapView::resizeView, "nativeResizeView"),
             METHOD(&NativeMapView::resizeFramebuffer, "nativeResizeFramebuffer"),
-            METHOD(&NativeMapView::initializeDisplay, "nativeInitializeDisplay"),
-            METHOD(&NativeMapView::terminateDisplay, "nativeTerminateDisplay"),
-            METHOD(&NativeMapView::initializeContext, "nativeInitializeContext"),
-            METHOD(&NativeMapView::terminateContext, "nativeTerminateContext"),
             METHOD(&NativeMapView::createSurface, "nativeCreateSurface"),
             METHOD(&NativeMapView::destroySurface, "nativeDestroySurface"),
             METHOD(&NativeMapView::getStyleUrl, "nativeGetStyleUrl"),
