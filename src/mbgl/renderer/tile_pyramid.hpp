@@ -24,7 +24,7 @@ class RenderTile;
 class RenderStyle;
 class RenderedQueryOptions;
 class SourceQueryOptions;
-struct TileParameters;
+class TileParameters;
 
 class TilePyramid {
 public:

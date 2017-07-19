@@ -17,7 +17,8 @@ class Scheduler;
 class FileSource;
 class AnnotationManager;
 
-struct UpdateParameters {
+class UpdateParameters {
+public:
     const bool styleLoaded;
     const MapMode mode;
     const float pixelRatio;

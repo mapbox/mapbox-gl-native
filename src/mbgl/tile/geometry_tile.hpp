@@ -22,7 +22,7 @@ class GeometryTileData;
 class RenderStyle;
 class RenderLayer;
 class SourceQueryOptions;
-struct TileParameters;
+class TileParameters;
 class GlyphAtlas;
 class ImageAtlas;
 
