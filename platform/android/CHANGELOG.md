@@ -2,6 +2,10 @@
 
 Mapbox welcomes participation and contributions from everyone.  If you'd like to do so please see the [`Contributing Guide`](https://github.com/mapbox/mapbox-gl-native/blob/master/CONTRIBUTING.md) first to get started.
 
+## 5.1.1 - TBA
+
+* Add French localization [#9545](https://github.com/mapbox/mapbox-gl-native/pull/9545)
+
 ## 5.1.0 - June 30, 2017
 
 * Update to MAS 2.1.3 [#9402](https://github.com/mapbox/mapbox-gl-native/pull/9402)
