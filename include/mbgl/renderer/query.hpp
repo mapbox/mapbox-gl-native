@@ -13,8 +13,8 @@ namespace mbgl {
  */
 class RenderedQueryOptions {
 public:
-    RenderedQueryOptions(optional<std::vector<std::string>> layerIDs_ = optional<std::vector<std::string>>(),
-                         optional<style::Filter> filter_ = optional<style::Filter>())
+    RenderedQueryOptions(optional<std::vector<std::string>> layerIDs_ = {},
+                         optional<style::Filter> filter_ = {})
         : layerIDs(std::move(layerIDs_)),
           filter(std::move(filter_)) {}
 
@@ -29,8 +29,8 @@ public:
  */
 class SourceQueryOptions {
 public:
-    SourceQueryOptions(optional<std::vector<std::string>> sourceLayers_ = optional<std::vector<std::string>> (),
-                       optional<style::Filter> filter_ = optional<style::Filter>())
+    SourceQueryOptions(optional<std::vector<std::string>> sourceLayers_ = {},
+                       optional<style::Filter> filter_ = {})
         : sourceLayers(std::move(sourceLayers_)),
           filter(std::move(filter_)) {}
 

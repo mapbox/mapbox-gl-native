@@ -26,7 +26,7 @@ class Renderer {
 public:
     Renderer(RendererBackend&, float pixelRatio_, FileSource&, Scheduler&,
              GLContextMode = GLContextMode::Unique,
-             const optional<std::string> programCacheDir = optional<std::string>());
+             const optional<std::string> programCacheDir = {});
     ~Renderer();
 
     void setObserver(RendererObserver*);

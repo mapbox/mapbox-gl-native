@@ -11,8 +11,8 @@ public:
     optional<Duration> duration;
     optional<Duration> delay;
 
-    TransitionOptions(optional<Duration> duration_ = optional<Duration>(),
-                      optional<Duration> delay_ = optional<Duration>())
+    TransitionOptions(optional<Duration> duration_ = {},
+                      optional<Duration> delay_ = {})
         : duration(std::move(duration_)),
           delay(std::move(delay_)) {}
 
