@@ -127,7 +127,7 @@ TEST(ImageManager, NotifiesRequestorWhenSpriteIsLoaded) {
     imageManager.getImages(requestor, {"one"});
     ASSERT_FALSE(notified);
 
-    imageManager.onSpriteLoaded();
+    imageManager.setLoaded(true);
     ASSERT_TRUE(notified);
 }
 

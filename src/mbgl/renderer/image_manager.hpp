@@ -39,11 +39,8 @@ public:
     ImageManager();
     ~ImageManager();
 
-    void onSpriteLoaded();
-
-    bool isLoaded() const {
-        return loaded;
-    }
+    void setLoaded(bool);
+    bool isLoaded() const;
 
     void dumpDebugLogs() const;
 
