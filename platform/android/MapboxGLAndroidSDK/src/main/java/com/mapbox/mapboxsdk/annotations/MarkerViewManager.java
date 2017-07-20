@@ -570,11 +570,6 @@ public class MarkerViewManager implements MapView.OnMapChangedListener {
       clickHandled = onMarkerViewClickListener.onMarkerClick(markerView, view, adapter);
     }
 
-    if (!clickHandled) {
-      ensureInfoWindowOffset(markerView);
-      select(markerView, view, adapter);
-    }
-
     return clickHandled;
   }
 
