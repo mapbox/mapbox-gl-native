@@ -73,6 +73,8 @@ macro(mbgl_platform_core)
         PRIVATE platform/default/mbgl/util/default_thread_pool.hpp
 
         # Rendering
+        PRIVATE platform/android/src/android_renderer_backend.cpp
+        PRIVATE platform/android/src/android_renderer_backend.hpp
         PRIVATE platform/android/src/android_renderer_frontend.cpp
         PRIVATE platform/android/src/android_renderer_frontend.hpp
 
