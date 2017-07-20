@@ -143,9 +143,7 @@ void RenderStyle::update(const UpdateParameters& parameters) {
         imageManager->updateImage(entry.second.after);
     }
 
-    if (parameters.spriteLoaded && !imageManager->isLoaded()) {
-        imageManager->onSpriteLoaded();
-    }
+    imageManager->setLoaded(parameters.spriteLoaded);
 
 
     const LayerDifference layerDiff = diffLayers(layerImpls, parameters.layers);
