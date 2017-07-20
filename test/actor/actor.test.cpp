@@ -281,3 +281,27 @@ TEST(Actor, NonConcurrentMailbox) {
     test.invoke(&Test::end);
     endedFuture.wait();
 }
+
+TEST(Actor, Ask) {
+    // Asking for a result
+
+    struct Test {
+
+        Test(ActorRef<Test>) {}
+
+        int doubleIt(int i) {
+            return i * 2;
+        }
+    };
+
+    ThreadPool pool { 2 };
+    Actor<Test> test(pool);
+
+    auto result = test.ask(&Test::doubleIt, 1);
+
+    ASSERT_TRUE(result.valid());
+    
+    auto status = result.wait_for(std::chrono::seconds(1));
+    ASSERT_EQ(std::future_status::ready, status);
+    ASSERT_EQ(2, result.get());
+}
