@@ -4,6 +4,16 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 
 ## 5.1.1 - TBA
 
+* Rework attribution binding [#9433](https://github.com/mapbox/mapbox-gl-native/pull/9433)
+* BackendScope changes [#9538](https://github.com/mapbox/mapbox-gl-native/pull/9538)
+* Invisible MarkerView performance fix [#9420](https://github.com/mapbox/mapbox-gl-native/pull/9420)
+* Polyline/Polygon click listeners [#9443](https://github.com/mapbox/mapbox-gl-native/pull/9443)
+* Hit test Marker/MarkerViews [#9424](https://github.com/mapbox/mapbox-gl-native/pull/9424)
+* Fine tune fling gesture [#9532](https://github.com/mapbox/mapbox-gl-native/pull/9532)
+* Bump OkHttp 3.8.0, Android 7.x crashes [#9522](https://github.com/mapbox/mapbox-gl-native/pull/9522)
+* MyLocationView tint fix [#9410](https://github.com/mapbox/mapbox-gl-native/pull/9410)
+* VisibleRegion logic [#9428](https://github.com/mapbox/mapbox-gl-native/pull/9428)
+* Validate motion event [#9434](https://github.com/mapbox/mapbox-gl-native/pull/9434)
 * Add French localization [#9545](https://github.com/mapbox/mapbox-gl-native/pull/9545)
 
 ## 5.1.0 - June 30, 2017
