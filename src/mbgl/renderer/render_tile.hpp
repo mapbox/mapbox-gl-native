@@ -4,6 +4,7 @@
 #include <mbgl/util/mat4.hpp>
 #include <mbgl/util/clip_id.hpp>
 #include <mbgl/style/types.hpp>
+#include <mbgl/renderer/tile_mask.hpp>
 
 #include <array>
 
@@ -36,6 +37,7 @@ public:
                               style::TranslateAnchorType anchor,
                               const TransformState&) const;
 
+    void setMask(TileMask&&);
     void startRender(PaintParameters&);
     void finishRender(PaintParameters&);
 

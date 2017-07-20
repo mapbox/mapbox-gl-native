@@ -52,6 +52,10 @@ mat4 RenderTile::translatedClipMatrix(const std::array<float, 2>& translation,
     return translateVtxMatrix(nearClippedMatrix, translation, anchor, state, false);
 }
 
+void RenderTile::setMask(TileMask&& mask) {
+    tile.setMask(std::move(mask));
+}
+
 void RenderTile::startRender(PaintParameters& parameters) {
     tile.upload(parameters.context);
 
