@@ -43,6 +43,7 @@
 
 #include "jni.hpp"
 #include "attach_env.hpp"
+#include "android_renderer_backend.hpp"
 #include "android_renderer_frontend.hpp"
 #include "bitmap.hpp"
 #include "run_loop_impl.hpp"
@@ -60,7 +61,8 @@ NativeMapView::NativeMapView(jni::JNIEnv& _env,
                              jni::Object<FileSource> jFileSource,
                              jni::jfloat _pixelRatio,
                              jni::String _programCacheDir)
-    : javaPeer(_obj.NewWeakGlobalRef(_env)),
+    : rendererBackend(std::make_unique<AndroidRendererBackend>()),
+      javaPeer(_obj.NewWeakGlobalRef(_env)),
       pixelRatio(_pixelRatio),
       threadPool(sharedThreadPool()) {
 
@@ -73,13 +75,13 @@ NativeMapView::NativeMapView(jni::JNIEnv& _env,
     auto& fileSource = mbgl::android::FileSource::getDefaultFileSource(_env, jFileSource);
 
     // Create a renderer
-    auto renderer = std::make_unique<Renderer>(*this, pixelRatio, fileSource, *threadPool,
-                                               GLContextMode::Unique,
+    auto renderer = std::make_unique<Renderer>(*rendererBackend, pixelRatio, fileSource,
+                                               *threadPool, GLContextMode::Unique,
                                                jni::Make<std::string>(_env, _programCacheDir));
 
     // Create a renderer frontend
     rendererFrontend = std::make_unique<AndroidRendererFrontend>(std::move(renderer),
-                                                                 *this,
+                                                                 *rendererBackend,
                                                                  [this] { this->invalidate(); });
 
     // Create the core map
@@ -108,70 +110,7 @@ NativeMapView::~NativeMapView() {
 }
 
 /**
- * From mbgl::RendererBackend
- */
-void NativeMapView::bind() {
-    setFramebufferBinding(0);
-    setViewport(0, 0, getFramebufferSize());
-}
-
-/**
- * From mbgl::RendererBackend.
- */
-gl::ProcAddress NativeMapView::initializeExtension(const char* name) {
-    return eglGetProcAddress(name);
-}
-
-void NativeMapView::activate() {
-
-    oldDisplay = eglGetCurrentDisplay();
-    oldReadSurface = eglGetCurrentSurface(EGL_READ);
-    oldDrawSurface = eglGetCurrentSurface(EGL_DRAW);
-    oldContext = eglGetCurrentContext();
-
-    assert(vm != nullptr);
-
-    if ((display != EGL_NO_DISPLAY) && (surface != EGL_NO_SURFACE) && (context != EGL_NO_CONTEXT)) {
-        if (!eglMakeCurrent(display, surface, surface, context)) {
-            mbgl::Log::Error(mbgl::Event::OpenGL, "eglMakeCurrent() returned error %d",
-                             eglGetError());
-            throw std::runtime_error("eglMakeCurrent() failed");
-        }
-
-        if (!eglSwapInterval(display, 0)) {
-            mbgl::Log::Error(mbgl::Event::OpenGL, "eglSwapInterval() returned error %d", eglGetError());
-            throw std::runtime_error("eglSwapInterval() failed");
-        }
-    } else {
-        mbgl::Log::Info(mbgl::Event::Android, "Not activating as we are not ready");
-    }
-}
-
-/**
- * From mbgl::RendererBackend.
- */
-void NativeMapView::deactivate() {
-    assert(vm != nullptr);
-
-    if (oldContext != context && oldContext != EGL_NO_CONTEXT) {
-        if (!eglMakeCurrent(oldDisplay, oldDrawSurface, oldReadSurface, oldContext)) {
-            mbgl::Log::Error(mbgl::Event::OpenGL, "eglMakeCurrent() returned error %d",
-                             eglGetError());
-            throw std::runtime_error("eglMakeCurrent() failed");
-        }
-    } else if (display != EGL_NO_DISPLAY) {
-        if (!eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT)) {
-            mbgl::Log::Error(mbgl::Event::OpenGL, "eglMakeCurrent(EGL_NO_CONTEXT) returned error %d",
-                             eglGetError());
-            throw std::runtime_error("eglMakeCurrent() failed");
-        }
-    } else {
-        mbgl::Log::Info(mbgl::Event::Android, "Not deactivating as we are not ready");
-    }
-}
-
-/**
- * From mbgl::RendererBackend. Callback to java NativeMapView#onInvalidate().
+ * Callback to java NativeMapView#onInvalidate().
  *
  * May be called from any thread
  */
@@ -269,10 +208,10 @@ void NativeMapView::destroySurface(jni::JNIEnv&) {
 }
 
 void NativeMapView::render(jni::JNIEnv& env) {
-    BackendScope guard { *this };
+    BackendScope guard { *rendererBackend };
 
     if (framebufferSizeChanged) {
-        setViewport(0, 0, getFramebufferSize());
+        rendererBackend->updateViewPort();
         framebufferSizeChanged = false;
     }
 
@@ -282,7 +221,7 @@ void NativeMapView::render(jni::JNIEnv& env) {
          snapshot = false;
 
          // take snapshot
-         auto image = readFramebuffer(getFramebufferSize());
+         auto image = rendererBackend->readFramebuffer();
          auto bitmap = Bitmap::CreateBitmap(env, std::move(image));
 
          // invoke Mapview#OnSnapshotReady
@@ -315,8 +254,7 @@ void NativeMapView::resizeView(jni::JNIEnv&, int w, int h) {
 }
 
 void NativeMapView::resizeFramebuffer(jni::JNIEnv&, int w, int h) {
-    fbWidth = w;
-    fbHeight = h;
+    rendererBackend->resizeFramebuffer(w, h);
     framebufferSizeChanged = true;
     invalidate();
 }
@@ -1400,7 +1338,7 @@ void NativeMapView::_createSurface(ANativeWindow *window_) {
     if (firstRender) {
         firstRender = false;
 
-        BackendScope guard(*this);
+        BackendScope guard(*rendererBackend);
 
         if (!eglMakeCurrent(display, surface, surface, context)) {
             mbgl::Log::Error(mbgl::Event::OpenGL, "eglMakeCurrent() returned error %d",
@@ -1426,15 +1364,6 @@ void NativeMapView::_destroySurface() {
         ANativeWindow_release(window);
         window = nullptr;
     }
-}
-
-mbgl::Size NativeMapView::getFramebufferSize() const {
-    return { static_cast<uint32_t>(fbWidth), static_cast<uint32_t>(fbHeight) };
-}
-
-void NativeMapView::updateAssumedState() {
-    assumeFramebufferBinding(0);
-    assumeViewport(0, 0, getFramebufferSize());
 }
 
 void NativeMapView::updateFps() {
