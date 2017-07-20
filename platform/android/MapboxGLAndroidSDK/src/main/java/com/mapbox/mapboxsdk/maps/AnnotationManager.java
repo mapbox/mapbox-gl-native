@@ -679,12 +679,12 @@ class AnnotationManager {
   }
 
   private MarkerHit getMarkerHitFromTouchArea(PointF tapPoint) {
-    int averageIconWidthOffset = iconManager.getAverageIconWidth() / 2;
-    int averageIconHeightOffset = iconManager.getAverageIconHeight() / 2;
-    final RectF tapRect = new RectF(tapPoint.x - averageIconWidthOffset,
-      tapPoint.y - averageIconHeightOffset,
-      tapPoint.x + averageIconWidthOffset,
-      tapPoint.y + averageIconHeightOffset
+    int touchSurfaceWidth = (int) (iconManager.getHighestIconHeight() * 1.5);
+    int touchSurfaceHeight = (int) (iconManager.getHighestIconWidth() * 1.5);
+    final RectF tapRect = new RectF(tapPoint.x - touchSurfaceWidth,
+      tapPoint.y - touchSurfaceHeight,
+      tapPoint.x + touchSurfaceWidth,
+      tapPoint.y + touchSurfaceHeight
     );
     return new MarkerHit(tapRect, getMarkersInRect(tapRect));
   }
