@@ -15,6 +15,10 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 * VisibleRegion logic [#9428](https://github.com/mapbox/mapbox-gl-native/pull/9428)
 * Validate motion event [#9434](https://github.com/mapbox/mapbox-gl-native/pull/9434)
 * Add French localization [#9545](https://github.com/mapbox/mapbox-gl-native/pull/9545)
+* Fix public.xml [#9525](https://github.com/mapbox/mapbox-gl-native/pull/9525/files)
+* Manage InfoWindow selection in AnnotationManager [#9567](https://github.com/mapbox/mapbox-gl-native/pull/9567)
+* Increase touch target size [#9565](https://github.com/mapbox/mapbox-gl-native/pull/9565)
+* Work around Adreno 2xx GPU bugs [#9573](https://github.com/mapbox/mapbox-gl-native/pull/9573)
 
 ## 5.1.0 - June 30, 2017
 
