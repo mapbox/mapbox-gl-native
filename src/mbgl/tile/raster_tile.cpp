@@ -41,7 +41,7 @@ void RasterTile::setData(std::shared_ptr<const std::string> data,
     worker.invoke(&RasterTileWorker::parse, data);
 }
 
-void RasterTile::onParsed(std::unique_ptr<Bucket> result) {
+void RasterTile::onParsed(std::unique_ptr<RasterBucket> result) {
     bucket = std::move(result);
     loaded = true;
     renderable = bucket ? true : false;
@@ -63,6 +63,12 @@ void RasterTile::upload(gl::Context& context) {
 
 Bucket* RasterTile::getBucket(const style::Layer::Impl&) const {
     return bucket.get();
+}
+
+void RasterTile::setMask(TileMask&& mask) {
+    if (bucket) {
+        bucket->setMask(std::move(mask));
+    }
 }
 
 void RasterTile::setNecessity(Necessity necessity) {

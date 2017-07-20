@@ -135,10 +135,19 @@ void RenderRasterLayer::render(PaintParameters& parameters, RenderSource* source
             parameters.context.bindTexture(*bucket.texture, 0, gl::TextureFilter::Linear);
             parameters.context.bindTexture(*bucket.texture, 1, gl::TextureFilter::Linear);
 
-            draw(tile.matrix,
-                 parameters.staticData.rasterVertexBuffer,
-                 parameters.staticData.quadTriangleIndexBuffer,
-                 parameters.staticData.rasterSegments);
+            if (bucket.vertexBuffer && bucket.indexBuffer && !bucket.segments.empty()) {
+                // Draw only the parts of the tile that aren't drawn by another tile in the layer.
+                draw(tile.matrix,
+                     *bucket.vertexBuffer,
+                     *bucket.indexBuffer,
+                     bucket.segments);
+            } else {
+                // Draw the full tile.
+                draw(tile.matrix,
+                     parameters.staticData.rasterVertexBuffer,
+                     parameters.staticData.quadTriangleIndexBuffer,
+                     parameters.staticData.rasterSegments);
+            }
         }
     }
 }
