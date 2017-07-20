@@ -12,8 +12,6 @@ import com.mapbox.mapboxsdk.exceptions.IconBitmapChangedException;
 import java.util.ArrayList;
 import java.util.List;
 
-import timber.log.Timber;
-
 /**
  * Responsible for managing icons added to the Map.
  * <p>
@@ -30,8 +28,8 @@ class IconManager {
   private NativeMapView nativeMapView;
   private List<Icon> icons;
 
-  private int averageIconHeight;
-  private int averageIconWidth;
+  private int highestIconWidth;
+  private int highestIconHeight;
 
   IconManager(NativeMapView nativeMapView) {
     this.nativeMapView = nativeMapView;
@@ -47,7 +45,7 @@ class IconManager {
       // TODO we can move this code afterwards to getIcon as with MarkerView.getIcon
       icon = loadDefaultIconForMarker(marker);
     } else {
-      updateAverageIconSize(icon);
+      updateHighestIconSize(icon);
     }
     addIcon(icon);
     return icon;
@@ -56,7 +54,7 @@ class IconManager {
   void loadIconForMarkerView(MarkerView marker) {
     Icon icon = marker.getIcon();
     Bitmap bitmap = icon.getBitmap();
-    updateAverageIconSize(bitmap);
+    updateHighestIconSize(bitmap);
     addIcon(icon, false);
   }
 
@@ -64,18 +62,18 @@ class IconManager {
     return (int) (nativeMapView.getTopOffsetPixelsForAnnotationSymbol(icon.getId()) * nativeMapView.getPixelRatio());
   }
 
-  int getAverageIconHeight() {
-    return averageIconHeight;
+  int getHighestIconWidth() {
+    return highestIconWidth;
   }
 
-  int getAverageIconWidth() {
-    return averageIconWidth;
+  int getHighestIconHeight() {
+    return highestIconHeight;
   }
 
   private Icon loadDefaultIconForMarker(Marker marker) {
     Icon icon = IconFactory.getInstance(Mapbox.getApplicationContext()).defaultMarker();
     Bitmap bitmap = icon.getBitmap();
-    updateAverageIconSize(bitmap.getWidth(), bitmap.getHeight() / 2);
+    updateHighestIconSize(bitmap.getWidth(), bitmap.getHeight() / 2);
     marker.setIcon(icon);
     return icon;
   }
@@ -95,20 +93,22 @@ class IconManager {
     }
   }
 
-  private void updateAverageIconSize(Icon icon) {
-    updateAverageIconSize(icon.getBitmap());
+  private void updateHighestIconSize(Icon icon) {
+    updateHighestIconSize(icon.getBitmap());
   }
 
-  private void updateAverageIconSize(Bitmap bitmap) {
-    updateAverageIconSize(bitmap.getWidth(), bitmap.getHeight());
+  private void updateHighestIconSize(Bitmap bitmap) {
+    updateHighestIconSize(bitmap.getWidth(), bitmap.getHeight());
   }
 
-  private void updateAverageIconSize(int width, int height) {
-    int iconSize = icons.size() + 1;
-    averageIconHeight = averageIconHeight + (height - averageIconHeight) / iconSize;
-    averageIconWidth = averageIconWidth + (width - averageIconWidth) / iconSize;
-    Timber.e("OnUpdateAverageSizeIcon with: %s %s", width, height);
-    Timber.e("OnUpdateAverageSizeIcon now: %s %s", averageIconWidth, averageIconHeight);
+  private void updateHighestIconSize(int width, int height) {
+    if (width > highestIconWidth) {
+      highestIconWidth = width;
+    }
+
+    if (height > highestIconHeight) {
+      highestIconHeight = height;
+    }
   }
 
   private void loadIcon(Icon icon) {
