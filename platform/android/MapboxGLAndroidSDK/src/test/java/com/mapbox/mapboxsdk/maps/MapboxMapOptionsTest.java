@@ -186,5 +186,15 @@ public class MapboxMapOptionsTest {
     assertEquals(Color.BLUE, new MapboxMapOptions()
       .myLocationBackgroundTintColor(Color.BLUE).getMyLocationBackgroundTintColor());
   }
+
+  @Test
+  public void testPrefetchesTiles() {
+    // Default value
+    assertTrue(new MapboxMapOptions().getPrefetchesTiles());
+
+    // Check mutations
+    assertTrue(new MapboxMapOptions().setPrefetchesTiles(true).getPrefetchesTiles());
+    assertFalse(new MapboxMapOptions().setPrefetchesTiles(false).getPrefetchesTiles());
+  }
 }
 

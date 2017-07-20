@@ -99,6 +99,7 @@ public final class MapboxMap {
     setDebugActive(options.getDebugActive());
     setApiBaseUrl(options);
     setStyleUrl(options);
+    setPrefetchesTiles(options);
   }
 
   /**
@@ -245,6 +246,38 @@ public final class MapboxMap {
   @UiThread
   public void setTransitionDelay(long delayMs) {
     nativeMapView.setTransitionDelay(delayMs);
+  }
+
+  /**
+   * Sets tile pre-fetching from MapboxOptions.
+   *
+   * @param options the options object
+   */
+  private void setPrefetchesTiles(@NonNull MapboxMapOptions options) {
+    setPrefetchesTiles(options.getPrefetchesTiles());
+  }
+
+  /**
+   * Enable or disable tile pre-fetching. Pre-fetching makes sure that a low-resolution
+   * tile is rendered as soon as possible at the expense of a little bandwidth.
+   *
+   * @param enable true to enable
+   */
+  @UiThread
+  public void setPrefetchesTiles(boolean enable) {
+    nativeMapView.setPrefetchesTiles(enable);
+  }
+
+  /**
+   * Check whether tile pre-fetching is enabled or not.
+   *
+   * @return true if enabled
+   *
+   * @see MapboxMap#setPrefetchesTiles(boolean)
+   */
+  @UiThread
+  public boolean getPrefetchesTiles() {
+    return nativeMapView.getPrefetchesTiles();
   }
 
   /**
