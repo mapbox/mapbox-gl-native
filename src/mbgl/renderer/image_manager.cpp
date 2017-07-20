@@ -4,12 +4,23 @@
 
 namespace mbgl {
 
-void ImageManager::onSpriteLoaded() {
-    loaded = true;
-    for (const auto& entry : requestors) {
-        notify(*entry.first, entry.second);
+void ImageManager::setLoaded(bool loaded_) {
+    if (loaded == loaded_) {
+        return;
     }
-    requestors.clear();
+
+    loaded = loaded_;
+
+    if (loaded) {
+        for (const auto& entry : requestors) {
+            notify(*entry.first, entry.second);
+        }
+        requestors.clear();
+    }
+}
+
+bool ImageManager::isLoaded() const {
+    return loaded;
 }
 
 void ImageManager::addImage(Immutable<style::Image::Impl> image_) {

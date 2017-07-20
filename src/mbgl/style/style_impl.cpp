@@ -111,6 +111,7 @@ void Style::Impl::parse(const std::string& json_) {
     defaultPitch = parser.pitch;
     setLight(std::make_unique<Light>(parser.light));
 
+    spriteLoaded = false;
     spriteLoader->load(parser.spriteURL, scheduler, fileSource);
     glyphURL = parser.glyphURL;
 
