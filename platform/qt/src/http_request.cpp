@@ -6,6 +6,7 @@
 #include <mbgl/util/optional.hpp>
 #include <mbgl/util/http_header.hpp>
 #include <mbgl/util/string.hpp>
+#include <mbgl/util/version.hpp>
 
 #include <QByteArray>
 #include <QNetworkReply>
@@ -37,7 +38,9 @@ QNetworkRequest HTTPRequest::networkRequest() const
 {
     QNetworkRequest req = QNetworkRequest(requestUrl());
     req.setAttribute(QNetworkRequest::CacheLoadControlAttribute, QNetworkRequest::PreferCache);
-    req.setRawHeader("User-Agent", "MapboxGL/1.0 [Qt]");
+
+    static const QByteArray agent = QString("MapboxGL/%1 (Qt %2)").arg(version::revision).arg(QT_VERSION_STR).toLatin1();
+    req.setRawHeader("User-Agent", agent);
 
     if (m_resource.priorEtag) {
         const auto etag = m_resource.priorEtag;
