@@ -196,56 +196,6 @@ std::set<std::size_t> determineLineBreaks(const std::u16string& logicalInput,
     return leastBadBreaks(evaluateBreak(logicalInput.size(), currentX, targetWidth, potentialBreaks, 0, true));
 }
 
-struct AnchorAlignment {
-    AnchorAlignment(float horizontal_, float vertical_)
-        : horizontalAlign(horizontal_), verticalAlign(vertical_) {
-    }
-
-    const float horizontalAlign;
-    const float verticalAlign;
-};
-
-AnchorAlignment getAnchorAlignment(const style::TextAnchorType textAnchor) {
-    float horizontalAlign = 0.5;
-    float verticalAlign = 0.5;
-
-    switch (textAnchor) {
-    case style::TextAnchorType::Top:
-    case style::TextAnchorType::Bottom:
-    case style::TextAnchorType::Center:
-        break;
-    case style::TextAnchorType::Right:
-    case style::TextAnchorType::TopRight:
-    case style::TextAnchorType::BottomRight:
-        horizontalAlign = 1;
-        break;
-    case style::TextAnchorType::Left:
-    case style::TextAnchorType::TopLeft:
-    case style::TextAnchorType::BottomLeft:
-        horizontalAlign = 0;
-        break;
-    }
-
-    switch (textAnchor) {
-    case style::TextAnchorType::Left:
-    case style::TextAnchorType::Right:
-    case style::TextAnchorType::Center:
-        break;
-    case style::TextAnchorType::Bottom:
-    case style::TextAnchorType::BottomLeft:
-    case style::TextAnchorType::BottomRight:
-        verticalAlign = 1;
-        break;
-    case style::TextAnchorType::Top:
-    case style::TextAnchorType::TopLeft:
-    case style::TextAnchorType::TopRight:
-        verticalAlign = 0;
-        break;
-    }
-
-    return { horizontalAlign, verticalAlign };
-}
-
 void shapeLines(Shaping& shaping,
                           const std::vector<std::u16string>& lines,
                           const float spacing,
@@ -308,16 +258,51 @@ void shapeLines(Shaping& shaping,
         y += lineHeight;
     }
 
-    const AnchorAlignment anchorPosition = getAnchorAlignment(textAnchor);
+    float horizontalAlign = 0.5;
+    float verticalAlign = 0.5;
 
-    align(shaping, justify, anchorPosition.horizontalAlign, anchorPosition.verticalAlign,
+    switch (textAnchor) {
+        case style::TextAnchorType::Top:
+        case style::TextAnchorType::Bottom:
+        case style::TextAnchorType::Center:
+            break;
+        case style::TextAnchorType::Right:
+        case style::TextAnchorType::TopRight:
+        case style::TextAnchorType::BottomRight:
+            horizontalAlign = 1;
+            break;
+        case style::TextAnchorType::Left:
+        case style::TextAnchorType::TopLeft:
+        case style::TextAnchorType::BottomLeft:
+            horizontalAlign = 0;
+            break;
+    }
+
+    switch (textAnchor) {
+        case style::TextAnchorType::Left:
+        case style::TextAnchorType::Right:
+        case style::TextAnchorType::Center:
+            break;
+        case style::TextAnchorType::Bottom:
+        case style::TextAnchorType::BottomLeft:
+        case style::TextAnchorType::BottomRight:
+            verticalAlign = 1;
+            break;
+        case style::TextAnchorType::Top:
+        case style::TextAnchorType::TopLeft:
+        case style::TextAnchorType::TopRight:
+            verticalAlign = 0;
+            break;
+    }
+
+    align(shaping, justify, horizontalAlign, verticalAlign,
           maxLineLength, lineHeight, lines.size());
     const uint32_t height = lines.size() * lineHeight;
 
     // Calculate the bounding box
-    shaping.top += -anchorPosition.verticalAlign * height;
+    shaping.top += -verticalAlign * height;
     shaping.bottom = shaping.top + height;
-    shaping.left += -anchorPosition.horizontalAlign * maxLineLength;
+    shaping.left += -horizontalAlign * maxLineLength;
     shaping.right = shaping.left + maxLineLength;
 }
 
