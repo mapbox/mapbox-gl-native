@@ -36,7 +36,6 @@
 namespace mbgl {
 namespace android {
 
-class AndroidRendererBackend;
 class AndroidRendererFrontend;
 
 class NativeMapView : public MapObserver {
@@ -77,17 +76,18 @@ public:
 
     // JNI //
 
+    // Called on OpenGL Thread
+    void onSurfaceCreated(jni::JNIEnv&);
+
+    // Called on OpenGL Thread
     void render(jni::JNIEnv&);
 
     void update(jni::JNIEnv&);
 
     void resizeView(jni::JNIEnv&, int, int);
 
+    // Called on OpenGL Thread
     void resizeFramebuffer(jni::JNIEnv&, int, int);
-
-    void createSurface(jni::JNIEnv&, jni::Object<>);
-
-    void destroySurface(jni::JNIEnv&);
 
     jni::String getStyleUrl(jni::JNIEnv&);
 
@@ -256,25 +256,11 @@ public:
     jni::jboolean getPrefetchesTiles(JNIEnv&);
 
 private:
-    void _initializeDisplay();
-
-    void _terminateDisplay();
-
-    void _initializeContext();
-
-    void _terminateContext();
-
-    void _createSurface(ANativeWindow*);
-
-    void _destroySurface();
-
-    EGLConfig chooseConfig(const EGLConfig configs[], EGLint numConfigs);
 
     void updateFps();
 
 private:
     std::unique_ptr<AndroidRendererFrontend> rendererFrontend;
-    std::unique_ptr<AndroidRendererBackend> rendererBackend;
 
     JavaVM *vm = nullptr;
     jni::UniqueWeakObject<NativeMapView> javaPeer;
@@ -282,27 +268,13 @@ private:
     std::string styleUrl;
     std::string apiKey;
 
-    ANativeWindow *window = nullptr;
-
-    EGLConfig config = nullptr;
-    EGLint format = -1;
-
-    EGLDisplay display = EGL_NO_DISPLAY;
-    EGLSurface surface = EGL_NO_SURFACE;
-    EGLContext context = EGL_NO_CONTEXT;
-
-
     float pixelRatio;
     bool fpsEnabled = false;
-    bool snapshot = false;
-    bool firstRender = true;
     double fps = 0.0;
 
     // Minimum texture size according to OpenGL ES 2.0 specification.
     int width = 64;
     int height = 64;
-
-    bool framebufferSizeChanged = true;
 
     // Ensure these are initialised last
     std::shared_ptr<mbgl::ThreadPool> threadPool;

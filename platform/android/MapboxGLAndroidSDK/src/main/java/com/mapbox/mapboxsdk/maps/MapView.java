@@ -1,10 +1,9 @@
 package com.mapbox.mapboxsdk.maps;
 
 import android.content.Context;
-import android.graphics.Canvas;
 import android.graphics.PointF;
-import android.graphics.SurfaceTexture;
 import android.os.Build;
+import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
 import android.support.annotation.IntDef;
@@ -16,10 +15,6 @@ import android.util.AttributeSet;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
-import android.view.Surface;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
-import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
@@ -45,7 +40,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import javax.microedition.khronos.egl.EGLConfig;
+import javax.microedition.khronos.opengles.GL10;
+
 import timber.log.Timber;
+
+import static android.opengl.GLSurfaceView.RENDERMODE_WHEN_DIRTY;
 
 /**
  * <p>
@@ -69,7 +69,6 @@ public class MapView extends FrameLayout {
   private NativeMapView nativeMapView;
   private MapboxMapOptions mapboxMapOptions;
   private boolean destroyed;
-  private boolean hasSurface;
 
   private MyLocationView myLocationView;
   private CompassView compassView;
@@ -81,6 +80,8 @@ public class MapView extends FrameLayout {
   private MapZoomButtonController mapZoomButtonController;
   private Bundle savedInstanceState;
   private final CopyOnWriteArrayList<OnMapChangedListener> onMapChangedListeners = new CopyOnWriteArrayList<>();
+
+  private GLSurfaceView glSurfaceView;
 
   @UiThread
   public MapView(@NonNull Context context) {
@@ -230,10 +231,38 @@ public class MapView extends FrameLayout {
   }
 
   private void initialiseDrawingSurface() {
-    SurfaceView surfaceView = (SurfaceView) findViewById(R.id.surfaceView);
-    surfaceView.setZOrderMediaOverlay(mapboxMapOptions.getRenderSurfaceOnTop());
-    surfaceView.getHolder().addCallback(new SurfaceCallback());
-    surfaceView.setVisibility(View.VISIBLE);
+    glSurfaceView = (GLSurfaceView) findViewById(R.id.surfaceView);
+    glSurfaceView.setZOrderMediaOverlay(mapboxMapOptions.getRenderSurfaceOnTop());
+    // TODO port config chooser from native code
+    glSurfaceView.setEGLConfigChooser(8, 8, 8, 0 /** TODO: What alpha value do we need here?? */, 16, 8);
+    glSurfaceView.setEGLContextClientVersion(2);
+    glSurfaceView.setRenderer(new GLSurfaceView.Renderer() {
+
+      @Override
+      public void onSurfaceCreated(GL10 gl, EGLConfig config) {
+        MapView.this.post(new Runnable() {
+          @Override
+          public void run() {
+            initialiseMap();
+            mapboxMap.onStart();
+          }
+        });
+
+        nativeMapView.onSurfaceCreated(gl, config);
+      }
+
+      @Override
+      public void onSurfaceChanged(GL10 gl, int width, int height) {
+        nativeMapView.onSurfaceChanged(gl, width, height);
+      }
+
+      @Override
+      public void onDrawFrame(GL10 gl) {
+        nativeMapView.onDrawFrame(gl);
+      }
+    });
+    glSurfaceView.setRenderMode(RENDERMODE_WHEN_DIRTY);
+    glSurfaceView.setVisibility(View.VISIBLE);
   }
 
   /**
@@ -264,7 +293,9 @@ public class MapView extends FrameLayout {
    */
   @UiThread
   public void onResume() {
-    // replaced by onStart in v5.0.0
+    if (glSurfaceView != null) {
+      glSurfaceView.onResume();
+    }
   }
 
   /**
@@ -272,7 +303,9 @@ public class MapView extends FrameLayout {
    */
   @UiThread
   public void onPause() {
-    // replaced by onStop in v5.0.0
+    if (glSurfaceView != null) {
+      glSurfaceView.onPause();
+    }
   }
 
   /**
@@ -415,24 +448,10 @@ public class MapView extends FrameLayout {
   // Called when the map needs to be rerendered
   // Called via JNI from NativeMapView
   protected void onInvalidate() {
-    postInvalidate();
-  }
-
-  @Override
-  public void onDraw(Canvas canvas) {
-    super.onDraw(canvas);
-    if (isInEditMode()) {
-      return;
+    if (glSurfaceView != null) {
+      glSurfaceView.requestRender();
     }
-
-    if (destroyed) {
-      return;
-    }
-
-    if (!hasSurface) {
-      return;
-    }
-    nativeMapView.render();
+    // TODO: removable? postInvalidate();
   }
 
   @Override
@@ -443,103 +462,6 @@ public class MapView extends FrameLayout {
 
     if (!isInEditMode() && nativeMapView != null) {
       nativeMapView.resizeView(width, height);
-    }
-  }
-
-  private class SurfaceCallback implements SurfaceHolder.Callback {
-
-    private Surface surface;
-
-    @Override
-    public void surfaceCreated(SurfaceHolder holder) {
-      if (nativeMapView == null) {
-        nativeMapView = new NativeMapView(MapView.this);
-        nativeMapView.createSurface(surface = holder.getSurface());
-        nativeMapView.resizeView(getWidth(), getHeight());
-        initialiseMap();
-        mapboxMap.onStart();
-      } else {
-        nativeMapView.createSurface(surface = holder.getSurface());
-      }
-
-      hasSurface = true;
-    }
-
-    @Override
-    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-      if (destroyed) {
-        return;
-      }
-      nativeMapView.resizeFramebuffer(width, height);
-    }
-
-    @Override
-    public void surfaceDestroyed(SurfaceHolder holder) {
-      hasSurface = false;
-
-      if (nativeMapView != null) {
-        // occurs when activity goes to background
-        nativeMapView.destroySurface();
-      }
-      surface.release();
-    }
-  }
-
-  // This class handles TextureView callbacks
-  private class SurfaceTextureListener implements TextureView.SurfaceTextureListener {
-
-    private Surface surface;
-
-    // Called when the native surface texture has been created
-    // Must do all EGL/GL ES initialization here
-    @Override
-    public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
-      if (nativeMapView == null) {
-        nativeMapView = new NativeMapView(MapView.this);
-        nativeMapView.createSurface(this.surface = new Surface(surface));
-        nativeMapView.resizeFramebuffer(width, height);
-        nativeMapView.resizeView(width, height);
-        initialiseMap();
-        mapboxMap.onStart();
-      } else {
-        nativeMapView.createSurface(this.surface = new Surface(surface));
-      }
-
-      hasSurface = true;
-    }
-
-    // Called when the native surface texture has been destroyed
-    // Must do all EGL/GL ES destruction here
-    @Override
-    public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
-      hasSurface = false;
-
-      if (nativeMapView != null) {
-        nativeMapView.destroySurface();
-      }
-      this.surface.release();
-      return true;
-    }
-
-    // Called when the format or size of the native surface texture has been changed
-    // Must handle window resizing here.
-    @Override
-    public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
-      if (destroyed) {
-        return;
-      }
-
-      nativeMapView.resizeFramebuffer(width, height);
-    }
-
-    // Called when the SurfaceTexure frame is drawn to screen
-    // Must sync with UI here
-    @Override
-    public void onSurfaceTextureUpdated(SurfaceTexture surface) {
-      if (destroyed) {
-        return;
-      }
-      mapboxMap.onUpdateRegionChange();
     }
   }
 
@@ -562,7 +484,9 @@ public class MapView extends FrameLayout {
       return;
     }
 
-    if (nativeMapView != null) {
+    if (nativeMapView == null) {
+      nativeMapView = new NativeMapView(this);
+    } else if (mapZoomButtonController != null) {
       mapZoomButtonController.setVisible(visibility == View.VISIBLE);
     }
   }

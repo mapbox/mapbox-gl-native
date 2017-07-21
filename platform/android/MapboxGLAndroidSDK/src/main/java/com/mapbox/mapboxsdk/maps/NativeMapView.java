@@ -4,12 +4,12 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.PointF;
 import android.graphics.RectF;
+import android.opengl.GLSurfaceView;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
-import android.view.Surface;
 
 import com.mapbox.mapboxsdk.LibraryLoader;
 import com.mapbox.mapboxsdk.annotations.Icon;
@@ -35,10 +35,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.microedition.khronos.egl.EGLConfig;
+import javax.microedition.khronos.opengles.GL10;
+
 import timber.log.Timber;
 
 // Class that wraps the native methods for convenience
-final class NativeMapView {
+final class NativeMapView implements GLSurfaceView.Renderer {
 
   // Flag to indicating destroy was called
   private boolean destroyed = false;
@@ -97,20 +100,6 @@ final class NativeMapView {
     destroyed = true;
   }
 
-  public void createSurface(Surface surface) {
-    if (isDestroyedOn("createSurface")) {
-      return;
-    }
-    nativeCreateSurface(surface);
-  }
-
-  public void destroySurface() {
-    if (isDestroyedOn("destroySurface")) {
-      return;
-    }
-    nativeDestroySurface();
-  }
-
   public void update() {
     if (isDestroyedOn("update")) {
       return;
@@ -156,7 +145,7 @@ final class NativeMapView {
     nativeResizeView(width, height);
   }
 
-  public void resizeFramebuffer(int fbWidth, int fbHeight) {
+  private void resizeFramebuffer(int fbWidth, int fbHeight) {
     if (isDestroyedOn("resizeFramebuffer")) {
       return;
     }
@@ -1141,6 +1130,33 @@ final class NativeMapView {
   void addSnapshotCallback(@NonNull MapboxMap.SnapshotReadyCallback callback) {
     snapshotReadyCallback = callback;
     scheduleTakeSnapshot();
-    render();
+    mapView.onInvalidate();
+    // TODO. this should do a request render
+    //render();
+  }
+
+  //
+  // GLSurfaceView.Renderer
+  //
+
+  @Override
+  public void onSurfaceCreated(GL10 gl, EGLConfig config) {
+    Timber.i("[%s] onSurfaceCreated", Thread.currentThread().getName());
+    //TODO: callback to map to re-create renderer?
+  }
+
+  @Override
+  public void onSurfaceChanged(GL10 gl, int width, int height) {
+    Timber.i("[%s] onSurfaceChanged %sx%s", Thread.currentThread().getName(), width, height);
+    // Sets the current view port to the new size.
+    gl.glViewport(0, 0, width, height);
+    resizeFramebuffer(width, height);
+    // resizeView(width, height); Done from MapView#onSizeChanged
+  }
+
+  @Override
+  public void onDrawFrame(GL10 gl) {
+    Timber.i("[%s] onDrawFrame", Thread.currentThread().getName());
+    nativeRender();
   }
 }
