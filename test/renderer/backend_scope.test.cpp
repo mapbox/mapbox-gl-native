@@ -9,6 +9,8 @@ using namespace mbgl;
 
 class StubRendererBackend: public RendererBackend {
 public:
+    void bind() override {
+    }
 
     void activate() override {
         if (activateFunction) activateFunction();

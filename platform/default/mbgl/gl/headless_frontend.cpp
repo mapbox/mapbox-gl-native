@@ -17,7 +17,7 @@ HeadlessFrontend::HeadlessFrontend(Size size_, float pixelRatio_, FileSource& fi
     asyncInvalidate([this] {
         if (renderer && updateParameters) {
             mbgl::BackendScope guard { backend };
-            renderer->render(backend, *updateParameters);
+            renderer->render(*updateParameters);
         }
     }),
     renderer(std::make_unique<Renderer>(backend, pixelRatio, fileSource, scheduler)) {

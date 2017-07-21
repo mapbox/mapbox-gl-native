@@ -107,7 +107,6 @@ set(MBGL_CORE_FILES
     include/mbgl/map/map.hpp
     include/mbgl/map/map_observer.hpp
     include/mbgl/map/mode.hpp
-    include/mbgl/map/view.hpp
     src/mbgl/map/map.cpp
     src/mbgl/map/transform.cpp
     src/mbgl/map/transform.hpp

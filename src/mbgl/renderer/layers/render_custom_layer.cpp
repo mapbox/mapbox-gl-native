@@ -1,10 +1,10 @@
 #include <mbgl/renderer/layers/render_custom_layer.hpp>
 #include <mbgl/renderer/paint_parameters.hpp>
 #include <mbgl/renderer/backend_scope.hpp>
+#include <mbgl/renderer/renderer_backend.hpp>
 #include <mbgl/renderer/bucket.hpp>
 #include <mbgl/style/layers/custom_layer_impl.hpp>
 #include <mbgl/map/transform_state.hpp>
-#include <mbgl/map/view.hpp>
 
 namespace mbgl {
 
@@ -70,7 +70,7 @@ void RenderCustomLayer::render(PaintParameters& paintParameters, RenderSource*) 
 
     // Reset the view back to our original one, just in case the CustomLayer changed
     // the viewport or Framebuffer.
-    paintParameters.view.bind();
+    paintParameters.backend.bind();
     context.setDirtyState();
 }
 

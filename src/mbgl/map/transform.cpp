@@ -1,6 +1,5 @@
 #include <mbgl/map/camera.hpp>
 #include <mbgl/map/transform.hpp>
-#include <mbgl/map/view.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/mat4.hpp>
 #include <mbgl/util/math.hpp>

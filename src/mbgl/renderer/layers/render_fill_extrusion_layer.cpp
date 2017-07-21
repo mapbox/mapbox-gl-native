@@ -4,10 +4,10 @@
 #include <mbgl/renderer/paint_parameters.hpp>
 #include <mbgl/renderer/image_manager.hpp>
 #include <mbgl/renderer/render_static_data.hpp>
+#include <mbgl/renderer/renderer_backend.hpp>
 #include <mbgl/programs/programs.hpp>
 #include <mbgl/programs/fill_extrusion_program.hpp>
 #include <mbgl/tile/tile.hpp>
-#include <mbgl/map/view.hpp>
 #include <mbgl/style/layers/fill_extrusion_layer_impl.hpp>
 #include <mbgl/geometry/feature_index.hpp>
 #include <mbgl/util/math.hpp>
@@ -131,7 +131,7 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
         }
     }
 
-    parameters.view.bind();
+    parameters.backend.bind();
     parameters.context.bindTexture(parameters.staticData.extrusionTexture->getTexture());
 
     mat4 viewportMat;

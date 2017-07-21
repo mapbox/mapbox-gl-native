@@ -1,6 +1,5 @@
 #pragma once
 
-#include <mbgl/map/view.hpp>
 #include <mbgl/renderer/renderer_backend.hpp>
 
 #include <memory>
@@ -10,7 +9,7 @@ namespace mbgl {
 
 class HeadlessDisplay;
 
-class HeadlessBackend : public View, public RendererBackend {
+class HeadlessBackend : public RendererBackend {
 public:
     HeadlessBackend(Size = { 256, 256 });
     ~HeadlessBackend() override;
