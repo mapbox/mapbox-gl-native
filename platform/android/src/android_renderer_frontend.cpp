@@ -1,6 +1,5 @@
 #include "android_renderer_frontend.hpp"
 
-#include <mbgl/map/view.hpp>
 #include <mbgl/renderer/backend_scope.hpp>
 #include <mbgl/renderer/renderer.hpp>
 
@@ -37,13 +36,13 @@ void AndroidRendererFrontend::update(std::shared_ptr<UpdateParameters> params) {
     asyncInvalidate.send();
 }
 
-void AndroidRendererFrontend::render(View& view) {
+void AndroidRendererFrontend::render() {
     assert (renderer);
     if (!updateParameters) return;
 
     BackendScope guard { backend };
 
-    renderer->render(view, *updateParameters);
+    renderer->render(*updateParameters);
 }
 
 void AndroidRendererFrontend::onLowMemory() {

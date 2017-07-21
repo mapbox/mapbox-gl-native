@@ -13,7 +13,7 @@
 
 namespace mbgl {
 
-class View;
+class RendererBackend;
 class UpdateParameters;
 class RenderStyle;
 class RenderStaticData;
@@ -29,14 +29,14 @@ public:
     PaintParameters(gl::Context&,
                     float pixelRatio,
                     GLContextMode,
-                    View&,
+                    RendererBackend&,
                     const UpdateParameters&,
                     RenderStyle&,
                     RenderStaticData&,
                     FrameHistory&);
 
     gl::Context& context;
-    View& view;
+    RendererBackend& backend;
 
     const TransformState& state;
     const EvaluatedLight& evaluatedLight;

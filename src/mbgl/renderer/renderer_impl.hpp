@@ -13,7 +13,6 @@
 
 namespace mbgl {
 
-class View;
 class UpdateParameters;
 class PaintParameters;
 class RenderStyle;
@@ -27,7 +26,7 @@ public:
 
     void setObserver(RendererObserver*);
 
-    void render(View&, const UpdateParameters&);
+    void render(const UpdateParameters&);
 
     std::vector<Feature> queryRenderedFeatures(const ScreenLineString&, const RenderedQueryOptions&) const;
     std::vector<Feature> querySourceFeatures(const std::string& sourceID, const SourceQueryOptions&) const;

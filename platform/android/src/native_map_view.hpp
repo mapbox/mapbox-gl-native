@@ -4,7 +4,6 @@
 #include <mbgl/map/change.hpp>
 #include <mbgl/map/camera.hpp>
 #include <mbgl/map/map.hpp>
-#include <mbgl/map/view.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/default_thread_pool.hpp>
 #include <mbgl/util/run_loop.hpp>
@@ -38,7 +37,7 @@ namespace android {
 
 class AndroidRendererFrontend;
 
-class NativeMapView : public View, public RendererBackend, public MapObserver {
+class NativeMapView : public RendererBackend, public MapObserver {
 public:
 
     static constexpr auto Name() { return "com/mapbox/mapboxsdk/maps/NativeMapView"; };
@@ -55,12 +54,9 @@ public:
 
     virtual ~NativeMapView();
 
-    // mbgl::View //
-
-    void bind() override;
-
     // mbgl::RendererBackend //
 
+    void bind() override;
     void updateAssumedState() override;
 
     // Deprecated //

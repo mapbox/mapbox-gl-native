@@ -1,7 +1,6 @@
 #pragma once
 
 #include <mbgl/map/map.hpp>
-#include <mbgl/map/view.hpp>
 #include <mbgl/renderer/renderer_backend.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/timer.hpp>
@@ -10,7 +9,7 @@
 struct GLFWwindow;
 class GLFWRendererFrontend;
 
-class GLFWView : public mbgl::View, public mbgl::RendererBackend, public mbgl::MapObserver {
+class GLFWView : public mbgl::RendererBackend, public mbgl::MapObserver {
 public:
     GLFWView(bool fullscreen = false, bool benchmark = false);
     ~GLFWView() override;
@@ -37,12 +36,11 @@ public:
     
     void invalidate();
 
-    // mbgl::View implementation
-    void bind() override;
     mbgl::Size getSize() const;
     mbgl::Size getFramebufferSize() const;
 
     // mbgl::RendererBackend implementation
+    void bind() override;
     void updateAssumedState() override;
 
     // mbgl::MapObserver implementation

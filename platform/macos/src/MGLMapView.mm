@@ -24,7 +24,6 @@
 #import "MGLImageSource.h"
 
 #import <mbgl/map/map.hpp>
-#import <mbgl/map/view.hpp>
 #import <mbgl/style/style.hpp>
 #import <mbgl/annotation/annotation.hpp>
 #import <mbgl/map/camera.hpp>
@@ -275,7 +274,7 @@ public:
     _mbglThreadPool = mbgl::sharedThreadPool();
 
     auto renderer = std::make_unique<mbgl::Renderer>(*_mbglView, [NSScreen mainScreen].backingScaleFactor, *mbglFileSource, *_mbglThreadPool, mbgl::GLContextMode::Unique);
-    _rendererFrontend = std::make_unique<MGLRenderFrontend>(std::move(renderer), self, *_mbglView, *_mbglView, true);
+    _rendererFrontend = std::make_unique<MGLRenderFrontend>(std::move(renderer), self, *_mbglView, true);
     _mbglMap = new mbgl::Map(*_rendererFrontend, *_mbglView, self.size, [NSScreen mainScreen].backingScaleFactor, *mbglFileSource, *_mbglThreadPool, mbgl::MapMode::Continuous, mbgl::ConstrainMode::None, mbgl::ViewportMode::Default);
 
     // Install the OpenGL layer. Interface Builder’s synchronous drawing means
@@ -2763,7 +2762,7 @@ public:
 }
 
 /// Adapter responsible for bridging calls from mbgl to MGLMapView and Cocoa.
-class MGLMapViewImpl : public mbgl::View, public mbgl::RendererBackend, public mbgl::MapObserver {
+class MGLMapViewImpl : public mbgl::RendererBackend, public mbgl::MapObserver {
 public:
     MGLMapViewImpl(MGLMapView *nativeView_) : nativeView(nativeView_) {}
 

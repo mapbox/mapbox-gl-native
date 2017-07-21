@@ -50,7 +50,7 @@ TEST(Annotations, SymbolAnnotation) {
     test.map.addAnnotation(SymbolAnnotation { Point<double>(0, 0), "default_marker" });
     test.checkRendering("point_annotation");
 
-//    auto size = test.view.getSize();
+//    auto size = test.frontend.getSize();
 //    auto screenBox = ScreenBox { {}, { double(size.width), double(size.height) } };
 //    for (uint8_t zoom = test.map.getMinZoom(); zoom <= test.map.getMaxZoom(); ++zoom) {
 //        test.map.setZoom(zoom);
