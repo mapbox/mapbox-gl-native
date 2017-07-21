@@ -20,7 +20,7 @@
     <public name="mapbox_cameraTilt" type="attr" />
 
     <!--Zoom-->
-    <public name="mapbox_cameraZoomMax" ftype="attr" />
+    <public name="mapbox_cameraZoomMax" type="attr" />
     <public name="mapbox_cameraZoomMin" type="attr" />
 
     <!--Gestures-->
