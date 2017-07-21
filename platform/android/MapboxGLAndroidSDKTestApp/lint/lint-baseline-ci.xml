@@ -1,0 +1,2569 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- REMEMBER! First you run Lint locally you'll need to move the lint-baseline.xml file
+    generated into the lint folder and called it lint-baseline-local.xml
+    If you remove any error when running Lint locally, you'll get a warning from the command
+    line advising you to remove it from the baseline. If you remove it (remember to remove it
+    from lint-baseline-local.xml file) you should remove it too from
+    lint-baseline-ci.xml (THIS FILE) which is the only one included in the repo.
+    Eventually, it'll be removed (when we remove all current lint errors included). -->
+<issues format="4" by="lint 2.3.1">
+
+    <issue
+        id="MissingPermission"
+        message="Call requires permission which may be rejected by user: code should explicitly check to see if permission is available (with `checkPermission`) or explicitly handle a potential `SecurityException`"
+        errorLine1="        Location lastKnownLocation = locationEngine.getLastLocation();"
+        errorLine2="                                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/maps/widgets/MyLocationView.java"
+            line="783"
+            column="38"/>
+    </issue>
+
+    <issue
+        id="MissingPermission"
+        message="Call requires permission which may be rejected by user: code should explicitly check to see if permission is available (with `checkPermission`) or explicitly handle a potential `SecurityException`"
+        errorLine1="        locationEngine.requestLocationUpdates();"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/maps/widgets/MyLocationView.java"
+            line="787"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="MissingPermission"
+        message="Call requires permission which may be rejected by user: code should explicitly check to see if permission is available (with `checkPermission`) or explicitly handle a potential `SecurityException`"
+        errorLine1="              .target(new LatLng(Mapbox.getLocationSource().getLastLocation()))"
+        errorLine2="                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidTest/java/com/mapbox/mapboxsdk/testapp/maps/widgets/MyLocationViewTest.java"
+            line="107"
+            column="34"/>
+    </issue>
+
+    <issue
+        id="DefaultLocale"
+        message="Implicitly using the default locale is a common source of bugs: Use `String.format(Locale, ...)` instead"
+        errorLine1="          ((TextView) infoWindow.getView()).setText(String.format(&quot;%.2fkm&quot;, distanceKm));"
+        errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/testapp/activity/infowindow/DynamicInfoWindowAdapterActivity.java"
+            line="72"
+            column="53"/>
+    </issue>
+
+    <issue
+        id="DefaultLocale"
+        message="Implicitly using the default locale is a common source of bugs: Use `String.format(Locale, ...)` instead"
+        errorLine1="      Timber.v(String.format(&quot;[HTTP] Request was successful (code = %d).&quot;, response.code()));"
+        errorLine2="               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/http/HTTPRequest.java"
+            line="112"
+            column="16"/>
+    </issue>
+
+    <issue
+        id="DefaultLocale"
+        message="Implicitly using the default locale is a common source of bugs: Use `String.format(Locale, ...)` instead"
+        errorLine1="      Timber.d(String.format("
+        errorLine2="               ^">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/http/HTTPRequest.java"
+            line="116"
+            column="16"/>
+    </issue>
+
+    <issue
+        id="DefaultLocale"
+        message="Implicitly using the default locale is a common source of bugs: Use `String.format(Locale, ...)` instead"
+        errorLine1="          String.format(&quot;Snapshot taken in %d ms&quot;, duration),"
+        errorLine2="          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/testapp/activity/imagegenerator/SnapshotActivity.java"
+            line="59"
+            column="11"/>
+    </issue>
+
+    <issue
+        id="InflateParams"
+        message="Avoid passing `null` as the view root (needed to resolve layout parameters on the inflated layout&apos;s root element)"
+        errorLine1="        final View dialogContent = LayoutInflater.from(context).inflate(R.layout.dialog_camera_position, null);"
+        errorLine2="                                                                                                         ~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/testapp/activity/camera/CameraPositionActivity.java"
+            line="89"
+            column="106"/>
+    </issue>
+
+    <issue
+        id="StringFormatMatches"
+        message="Suspicious argument type for formatting argument #1 in `debug_zoom`: conversion is `s`, received `double` (argument #2 in method call) (Did you mean formatting character `e`, &apos;f&apos;, &apos;g&apos; or `a`?)"
+        errorLine1="            textView.setText(String.format(getString(R.string.debug_zoom), position.zoom));"
+        errorLine2="                                                                           ~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/testapp/activity/maplayout/DebugModeActivity.java"
+            line="60"
+            column="76"/>
+        <location
+            file="src/main/res/values/strings.xml"
+            line="186"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="TimberArgCount"
+        message="Wrong argument count, format string `Could not add markers,` requires `0` but format call supplies `1`"
+        errorLine1="        Timber.e(&quot;Could not add markers,&quot;, exception);"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/testapp/activity/annotation/BulkMarkerActivity.java"
+            line="277"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="TimberArgCount"
+        message="Wrong argument count, format string `That&apos;s not an url... ` requires `0` but format call supplies `1`"
+        errorLine1="      Timber.e(&quot;That&apos;s not an url... &quot;, exception);"
+        errorLine2="      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/testapp/activity/style/CircleLayerActivity.java"
+            line="77"
+            column="7"/>
+    </issue>
+
+    <issue
+        id="TimberArgCount"
+        message="Wrong argument count, format string `That&apos;s not an url... ` requires `0` but format call supplies `1`"
+        errorLine1="      Timber.e(&quot;That&apos;s not an url... &quot;, malformedUrlException);"
+        errorLine2="      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/testapp/activity/style/CircleLayerActivity.java"
+            line="135"
+            column="7"/>
+    </issue>
+
+    <issue
+        id="TimberArgCount"
+        message="Wrong argument count, format string `Could not resolve package info` requires `0` but format call supplies `1`"
+        errorLine1="      Timber.e(&quot;Could not resolve package info&quot;, exception);"
+        errorLine2="      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/testapp/activity/FeatureOverviewActivity.java"
+            line="95"
+            column="7"/>
+    </issue>
+
+    <issue
+        id="TimberArgCount"
+        message="Wrong argument count, format string `Failed to read the package metadata: ` requires `0` but format call supplies `1`"
+        errorLine1="      Timber.e(&quot;Failed to read the package metadata: &quot;, exception);"
+        errorLine2="      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/storage/FileSource.java"
+            line="75"
+            column="7"/>
+    </issue>
+
+    <issue
+        id="TimberArgCount"
+        message="Wrong argument count, format string `Failed to read the storage key: ` requires `0` but format call supplies `1`"
+        errorLine1="      Timber.e(&quot;Failed to read the storage key: &quot;, exception);"
+        errorLine2="      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/storage/FileSource.java"
+            line="77"
+            column="7"/>
+    </issue>
+
+    <issue
+        id="TimberArgCount"
+        message="Wrong argument count, format string `Failed to obtain the external storage path: ` requires `0` but format call supplies `1`"
+        errorLine1="        Timber.e(&quot;Failed to obtain the external storage path: &quot;, exception);"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/storage/FileSource.java"
+            line="86"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="TimberArgCount"
+        message="Wrong argument count, format string `Failed to delete old ambient cache database: ` requires `0` but format call supplies `1`"
+        errorLine1="          Timber.e(&quot;Failed to delete old ambient cache database: &quot;, exception);"
+        errorLine2="          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/offline/OfflineManager.java"
+            line="113"
+            column="11"/>
+    </issue>
+
+    <issue
+        id="TimberArgCount"
+        message="Wrong argument count, format string `could not reflect` requires `0` but format call supplies `1`"
+        errorLine1="      Timber.e(&quot;could not reflect&quot;, exception);"
+        errorLine2="      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidTest/java/com/mapbox/mapboxsdk/testapp/utils/OnMapReadyIdlingResource.java"
+            line="49"
+            column="7"/>
+    </issue>
+
+    <issue
+        id="TimberArgCount"
+        message="Wrong argument count, format string `Got NULL feature %s` requires `1` but format call supplies `0`"
+        errorLine1="        Timber.i(&quot;Got NULL feature %s&quot;);"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/testapp/activity/feature/QueryRenderedFeaturesBoxCountActivity.java"
+            line="84"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="TimberArgCount"
+        message="Wrong argument count, format string `Got NULL feature %s` requires `1` but format call supplies `0`"
+        errorLine1="        Timber.i(&quot;Got NULL feature %s&quot;);"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/testapp/activity/feature/QueryRenderedFeaturesPropertiesActivity.java"
+            line="102"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="TimberArgCount"
+        message="Wrong argument count, format string `Invalid URL` requires `0` but format call supplies `1`"
+        errorLine1="      Timber.e(&quot;Invalid URL&quot;, malformedUrlException);"
+        errorLine2="      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/testapp/activity/style/RealTimeGeoJsonActivity.java"
+            line="58"
+            column="7"/>
+    </issue>
+
+    <issue
+        id="BinaryOperationInTimber"
+        message="Replace String concatenation with Timber&apos;s string formatting"
+        errorLine1="      Timber.d(&quot;Remove marker with &quot; + activeMarker.getId());"
+        errorLine2="               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/testapp/activity/annotation/AddRemoveMarkerActivity.java"
+            line="118"
+            column="16"/>
+    </issue>
+
+    <issue
+        id="BinaryOperationInTimber"
+        message="Replace String concatenation with Timber&apos;s string formatting"
+        errorLine1="    Timber.d(&quot;showLowThresholdMarker() &quot; + activeMarker.getId());"
+        errorLine2="             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/testapp/activity/annotation/AddRemoveMarkerActivity.java"
+            line="125"
+            column="14"/>
+    </issue>
+
+    <issue
+        id="BinaryOperationInTimber"
+        message="Replace String concatenation with Timber&apos;s string formatting"
+        errorLine1="      Timber.d(&quot;Remove marker with &quot; + activeMarker.getId());"
+        errorLine2="               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/testapp/activity/annotation/AddRemoveMarkerActivity.java"
+            line="137"
+            column="16"/>
+    </issue>
+
+    <issue
+        id="BinaryOperationInTimber"
+        message="Replace String concatenation with Timber&apos;s string formatting"
+        errorLine1="    Timber.d(&quot;showHighThresholdMarker() &quot; + activeMarker.getId());"
+        errorLine2="             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/testapp/activity/annotation/AddRemoveMarkerActivity.java"
+            line="144"
+            column="14"/>
+    </issue>
+
+    <issue
+        id="BinaryOperationInTimber"
+        message="Replace String concatenation with Timber&apos;s string formatting"
+        errorLine1="    Timber.v(&quot;Connected: &quot; + connected);"
+        errorLine2="             ~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/net/ConnectivityReceiver.java"
+            line="85"
+            column="14"/>
+    </issue>
+
+    <issue
+        id="BinaryOperationInTimber"
+        message="Replace String concatenation with Timber&apos;s string formatting"
+        errorLine1="          Timber.d(&quot;Debug FAB: isDebug Active? &quot; + mapboxMap.isDebugActive());"
+        errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/testapp/activity/maplayout/DebugModeActivity.java"
+            line="72"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="BinaryOperationInTimber"
+        message="Replace String concatenation with Timber&apos;s string formatting"
+        errorLine1="      Timber.e(&quot;That&apos;s not an url... &quot; + malformedUrlException.getMessage());"
+        errorLine2="               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/testapp/activity/style/GeoJsonClusteringActivity.java"
+            line="131"
+            column="16"/>
+    </issue>
+
+    <issue
+        id="BinaryOperationInTimber"
+        message="Replace String concatenation with Timber&apos;s string formatting"
+        errorLine1="      Timber.e(&quot;Device returned an out of range width size, &quot;"
+        errorLine2="               ^">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/maps/NativeMapView.java"
+            line="178"
+            column="16"/>
+    </issue>
+
+    <issue
+        id="BinaryOperationInTimber"
+        message="Replace String concatenation with Timber&apos;s string formatting"
+        errorLine1="      Timber.e(&quot;Device returned an out of range height size, &quot;"
+        errorLine2="               ^">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/maps/NativeMapView.java"
+            line="185"
+            column="16"/>
+    </issue>
+
+    <issue
+        id="BinaryOperationInTimber"
+        message="Replace String concatenation with Timber&apos;s string formatting"
+        errorLine1="        Timber.e(&quot;Error: &quot; + error);"
+        errorLine2="                 ~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/testapp/activity/offline/OfflineActivity.java"
+            line="210"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="BinaryOperationInTimber"
+        message="Replace String concatenation with Timber&apos;s string formatting"
+        errorLine1="    Timber.d(&quot;Download started: &quot; + regionName);"
+        errorLine2="             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/testapp/activity/offline/OfflineActivity.java"
+            line="226"
+            column="14"/>
+    </issue>
+
+    <issue
+        id="BinaryOperationInTimber"
+        message="Replace String concatenation with Timber&apos;s string formatting"
+        errorLine1="        Timber.d(&quot;Offline region created: &quot; + regionName);"
+        errorLine2="                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/testapp/activity/offline/OfflineActivity.java"
+            line="244"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="BinaryOperationInTimber"
+        message="Replace String concatenation with Timber&apos;s string formatting"
+        errorLine1="        Timber.e(&quot;Error: &quot; + error);"
+        errorLine2="                 ~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/testapp/activity/offline/OfflineActivity.java"
+            line="251"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="BinaryOperationInTimber"
+        message="Replace String concatenation with Timber&apos;s string formatting"
+        errorLine1="          Timber.d(&quot;Selected item: &quot; + which);"
+        errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/testapp/model/other/OfflineListRegionsDialog.java"
+            line="35"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="BinaryOperationInTimber"
+        message="Replace String concatenation with Timber&apos;s string formatting"
+        errorLine1="            Timber.d(&quot;Old ambient cache database deleted to save space: &quot; + path);"
+        errorLine2="                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/offline/OfflineManager.java"
+            line="110"
+            column="22"/>
+    </issue>
+
+    <issue
+        id="BinaryOperationInTimber"
+        message="Replace String concatenation with Timber&apos;s string formatting"
+        errorLine1="      Timber.e(&quot;Failed to encode metadata: &quot; + exception.getMessage());"
+        errorLine2="               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/testapp/utils/OfflineUtils.java"
+            line="32"
+            column="16"/>
+    </issue>
+
+    <issue
+        id="BinaryOperationInTimber"
+        message="Replace String concatenation with Timber&apos;s string formatting"
+        errorLine1="      Timber.e(&quot;isMapboxReady called with value &quot; + (mapboxMap != null));"
+        errorLine2="               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidTest/java/com/mapbox/mapboxsdk/testapp/utils/OnMapReadyIdlingResource.java"
+            line="46"
+            column="16"/>
+    </issue>
+
+    <issue
+        id="BinaryOperationInTimber"
+        message="Replace String concatenation with Timber&apos;s string formatting"
+        errorLine1="          Timber.e(&quot;Could not load geojson: &quot; + ioException.getMessage());"
+        errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/testapp/activity/feature/QueryRenderedFeaturesBoxSymbolCountActivity.java"
+            line="62"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="BinaryOperationInTimber"
+        message="Replace String concatenation with Timber&apos;s string formatting"
+        errorLine1="    Timber.d(&quot;Fill anti alias: &quot; + fillAntialias.getValue());"
+        errorLine2="             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/testapp/activity/style/RuntimeStyleActivity.java"
+            line="320"
+            column="14"/>
+    </issue>
+
+    <issue
+        id="BinaryOperationInTimber"
+        message="Replace String concatenation with Timber&apos;s string formatting"
+        errorLine1="    Timber.d(&quot;Fill translate anchor: &quot; + fillTranslateAnchor.getValue());"
+        errorLine2="             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/testapp/activity/style/RuntimeStyleActivity.java"
+            line="323"
+            column="14"/>
+    </issue>
+
+    <issue
+        id="BinaryOperationInTimber"
+        message="Replace String concatenation with Timber&apos;s string formatting"
+        errorLine1="    Timber.d(&quot;Visibility: &quot; + visibility.getValue());"
+        errorLine2="             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/testapp/activity/style/RuntimeStyleActivity.java"
+            line="325"
+            column="14"/>
+    </issue>
+
+    <issue
+        id="BinaryOperationInTimber"
+        message="Replace String concatenation with Timber&apos;s string formatting"
+        errorLine1="      Timber.d(&quot;Fill color base: &quot; + stops.getBase());"
+        errorLine2="               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/testapp/activity/style/RuntimeStyleActivity.java"
+            line="480"
+            column="16"/>
+    </issue>
+
+    <issue
+        id="BinaryOperationInTimber"
+        message="Replace String concatenation with Timber&apos;s string formatting"
+        errorLine1="      Timber.d(&quot;Fill color #stops: &quot; + stops.size());"
+        errorLine2="               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/testapp/activity/style/RuntimeStyleActivity.java"
+            line="481"
+            column="16"/>
+    </issue>
+
+    <issue
+        id="BinaryOperationInTimber"
+        message="Replace String concatenation with Timber&apos;s string formatting"
+        errorLine1="          Timber.d(&quot;Fill color #stops: &quot; + stop);"
+        errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/testapp/activity/style/RuntimeStyleActivity.java"
+            line="484"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="BinaryOperationInTimber"
+        message="Replace String concatenation with Timber&apos;s string formatting"
+        errorLine1="        Timber.i(&quot;Writing style file to: &quot; + cacheStyleFile.getAbsolutePath());"
+        errorLine2="                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/testapp/activity/style/StyleFileActivity.java"
+            line="75"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="BinaryOperationInTimber"
+        message="Replace String concatenation with Timber&apos;s string formatting"
+        errorLine1="    Timber.d(label + &quot;: begin&quot;);"
+        errorLine2="             ~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/testapp/utils/TimingLogger.java"
+            line="149"
+            column="14"/>
+    </issue>
+
+    <issue
+        id="BinaryOperationInTimber"
+        message="Replace String concatenation with Timber&apos;s string formatting"
+        errorLine1="      Timber.d(label + &quot;:      &quot; + (now - prev) + &quot; ms, &quot; + splitLabel);"
+        errorLine2="               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/testapp/utils/TimingLogger.java"
+            line="156"
+            column="16"/>
+    </issue>
+
+    <issue
+        id="BinaryOperationInTimber"
+        message="Replace String concatenation with Timber&apos;s string formatting"
+        errorLine1="    Timber.d(label + &quot;: end, &quot; + (now - first) + &quot; ms&quot;);"
+        errorLine2="             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/testapp/utils/TimingLogger.java"
+            line="158"
+            column="14"/>
+    </issue>
+
+    <issue
+        id="BinaryOperationInTimber"
+        message="Replace String concatenation with Timber&apos;s string formatting"
+        errorLine1="      Timber.e(&quot;Not setting minZoomPreference, value is in unsupported range: &quot; + minZoom);"
+        errorLine2="               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/maps/Transform.java"
+            line="349"
+            column="16"/>
+    </issue>
+
+    <issue
+        id="BinaryOperationInTimber"
+        message="Replace String concatenation with Timber&apos;s string formatting"
+        errorLine1="      Timber.e(&quot;Not setting maxZoomPreference, value is in unsupported range: &quot; + maxZoom);"
+        errorLine2="               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/maps/Transform.java"
+            line="361"
+            column="16"/>
+    </issue>
+
+    <issue
+        id="LogNotTimber"
+        message="Using &apos;Log&apos; instead of &apos;Timber&apos;"
+        errorLine1="      Log.w(LOG_TAG, ACCESS_TOKEN_NOT_SET_MESSAGE);"
+        errorLine2="      ~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/testapp/MapboxApplication.java"
+            line="58"
+            column="7"/>
+    </issue>
+
+    <issue
+        id="StringFormatInTimber"
+        message="Using &apos;String#format&apos; inside of &apos;Timber&apos;"
+        errorLine1="      Timber.e(String.format(&quot;Stops: %s is a different type: %s&quot;, stops.getClass(), exception));"
+        errorLine2="               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/style/functions/Function.java"
+            line="282"
+            column="16"/>
+    </issue>
+
+    <issue
+        id="StringFormatInTimber"
+        message="Using &apos;String#format&apos; inside of &apos;Timber&apos;"
+        errorLine1="      Timber.v(String.format(&quot;[HTTP] Request was successful (code = %d).&quot;, response.code()));"
+        errorLine2="               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/http/HTTPRequest.java"
+            line="112"
+            column="16"/>
+    </issue>
+
+    <issue
+        id="StringFormatInTimber"
+        message="Using &apos;String#format&apos; inside of &apos;Timber&apos;"
+        errorLine1="      Timber.d(String.format("
+        errorLine2="               ^">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/http/HTTPRequest.java"
+            line="116"
+            column="16"/>
+    </issue>
+
+    <issue
+        id="StringFormatInTimber"
+        message="Using &apos;String#format&apos; inside of &apos;Timber&apos;"
+        errorLine1="      Timber.d(String.format(MapboxConstants.MAPBOX_LOCALE,"
+        errorLine2="               ^">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/http/HTTPRequest.java"
+            line="163"
+            column="16"/>
+    </issue>
+
+    <issue
+        id="StringFormatInTimber"
+        message="Using &apos;String#format&apos; inside of &apos;Timber&apos;"
+        errorLine1="      Timber.i(String.format(MapboxConstants.MAPBOX_LOCALE,"
+        errorLine2="               ^">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/http/HTTPRequest.java"
+            line="166"
+            column="16"/>
+    </issue>
+
+    <issue
+        id="StringFormatInTimber"
+        message="Using &apos;String#format&apos; inside of &apos;Timber&apos;"
+        errorLine1="      Timber.w(String.format(MapboxConstants.MAPBOX_LOCALE,"
+        errorLine2="               ^">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/http/HTTPRequest.java"
+            line="170"
+            column="16"/>
+    </issue>
+
+    <issue
+        id="StringFormatInTimber"
+        message="Using &apos;String#format&apos; inside of &apos;Timber&apos;"
+        errorLine1="      Timber.e(String.format(&quot;Layer: %s is a different type: %s&quot;, layerId, exception));"
+        errorLine2="               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/maps/MapboxMap.java"
+            line="286"
+            column="16"/>
+    </issue>
+
+    <issue
+        id="StringFormatInTimber"
+        message="Using &apos;String#format&apos; inside of &apos;Timber&apos;"
+        errorLine1="      Timber.e(String.format(&quot;Source: %s is a different type: %s&quot;, sourceId, exception));"
+        errorLine2="               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/maps/MapboxMap.java"
+            line="407"
+            column="16"/>
+    </issue>
+
+    <issue
+        id="StringFormatInTimber"
+        message="Using &apos;String#format&apos; inside of &apos;Timber&apos;"
+        errorLine1="    Timber.i(String.format(&quot;Querying box %s&quot;, box));"
+        errorLine2="             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/testapp/activity/annotation/MarkerViewsInRectangleActivity.java"
+            line="56"
+            column="14"/>
+    </issue>
+
+    <issue
+        id="StringFormatInTimber"
+        message="Using &apos;String#format&apos; inside of &apos;Timber&apos;"
+        errorLine1="      Timber.e(String.format(MapboxConstants.MAPBOX_LOCALE,"
+        errorLine2="               ^">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/maps/NativeMapView.java"
+            line="92"
+            column="16"/>
+    </issue>
+
+    <issue
+        id="StringFormatInTimber"
+        message="Using &apos;String#format&apos; inside of &apos;Timber&apos;"
+        errorLine1="    Timber.d(String.format(MapboxConstants.MAPBOX_LOCALE,"
+        errorLine2="             ^">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/testapp/activity/offline/OfflineActivity.java"
+            line="78"
+            column="14"/>
+    </issue>
+
+    <issue
+        id="StringFormatInTimber"
+        message="Using &apos;String#format&apos; inside of &apos;Timber&apos;"
+        errorLine1="            Timber.i(String.format(&quot;Querying box %s&quot;, box));"
+        errorLine2="                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/testapp/activity/feature/QueryRenderedFeaturesBoxCountActivity.java"
+            line="51"
+            column="22"/>
+    </issue>
+
+    <issue
+        id="StringFormatInTimber"
+        message="Using &apos;String#format&apos; inside of &apos;Timber&apos;"
+        errorLine1="    Timber.i(String.format(&quot;Got %s features&quot;, features.size()));"
+        errorLine2="             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/testapp/activity/feature/QueryRenderedFeaturesBoxCountActivity.java"
+            line="69"
+            column="14"/>
+    </issue>
+
+    <issue
+        id="StringFormatInTimber"
+        message="Using &apos;String#format&apos; inside of &apos;Timber&apos;"
+        errorLine1="        Timber.i(String.format(&quot;Got feature %s with %s properties and Geometry %s&quot;,"
+        errorLine2="                 ^">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/testapp/activity/feature/QueryRenderedFeaturesBoxCountActivity.java"
+            line="72"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="StringFormatInTimber"
+        message="Using &apos;String#format&apos; inside of &apos;Timber&apos;"
+        errorLine1="            Timber.i(String.format(&quot;Prop %s - %s&quot;, entry.getKey(), entry.getValue()));"
+        errorLine2="                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/testapp/activity/feature/QueryRenderedFeaturesBoxCountActivity.java"
+            line="79"
+            column="22"/>
+    </issue>
+
+    <issue
+        id="StringFormatInTimber"
+        message="Using &apos;String#format&apos; inside of &apos;Timber&apos;"
+        errorLine1="            Timber.i(String.format(&quot;Querying box %s for buildings&quot;, box));"
+        errorLine2="                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/testapp/activity/feature/QueryRenderedFeaturesBoxHighlightActivity.java"
+            line="56"
+            column="22"/>
+    </issue>
+
+    <issue
+        id="StringFormatInTimber"
+        message="Using &apos;String#format&apos; inside of &apos;Timber&apos;"
+        errorLine1="            Timber.i(String.format(&quot;Querying box %s&quot;, box));"
+        errorLine2="                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/testapp/activity/feature/QueryRenderedFeaturesBoxSymbolCountActivity.java"
+            line="79"
+            column="22"/>
+    </issue>
+
+    <issue
+        id="StringFormatInTimber"
+        message="Using &apos;String#format&apos; inside of &apos;Timber&apos;"
+        errorLine1="            Timber.i(String.format("
+        errorLine2="                     ^">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/testapp/activity/feature/QueryRenderedFeaturesPropertiesActivity.java"
+            line="62"
+            column="22"/>
+    </issue>
+
+    <issue
+        id="StringFormatInTimber"
+        message="Using &apos;String#format&apos; inside of &apos;Timber&apos;"
+        errorLine1="    Timber.i(String.format(&quot;Got %s features&quot;, features.size()));"
+        errorLine2="             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/testapp/activity/feature/QueryRenderedFeaturesPropertiesActivity.java"
+            line="87"
+            column="14"/>
+    </issue>
+
+    <issue
+        id="StringFormatInTimber"
+        message="Using &apos;String#format&apos; inside of &apos;Timber&apos;"
+        errorLine1="        Timber.i(String.format(&quot;Got feature %s with %s properties and Geometry %s&quot;,"
+        errorLine2="                 ^">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/testapp/activity/feature/QueryRenderedFeaturesPropertiesActivity.java"
+            line="90"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="StringFormatInTimber"
+        message="Using &apos;String#format&apos; inside of &apos;Timber&apos;"
+        errorLine1="            Timber.i(String.format(&quot;Prop %s - %s&quot;, entry.getKey(), entry.getValue()));"
+        errorLine2="                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/testapp/activity/feature/QueryRenderedFeaturesPropertiesActivity.java"
+            line="97"
+            column="22"/>
+    </issue>
+
+    <issue
+        id="ThrowableNotAtBeginning"
+        message="Throwable should be first argument"
+        errorLine1="        Timber.e(&quot;Could not add markers,&quot;, exception);"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/testapp/activity/annotation/BulkMarkerActivity.java"
+            line="277"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="ThrowableNotAtBeginning"
+        message="Throwable should be first argument"
+        errorLine1="      Timber.e(&quot;That&apos;s not an url... &quot;, exception);"
+        errorLine2="      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/testapp/activity/style/CircleLayerActivity.java"
+            line="77"
+            column="7"/>
+    </issue>
+
+    <issue
+        id="ThrowableNotAtBeginning"
+        message="Throwable should be first argument"
+        errorLine1="      Timber.e(&quot;That&apos;s not an url... &quot;, malformedUrlException);"
+        errorLine2="      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/testapp/activity/style/CircleLayerActivity.java"
+            line="135"
+            column="7"/>
+    </issue>
+
+    <issue
+        id="ThrowableNotAtBeginning"
+        message="Throwable should be first argument"
+        errorLine1="      Timber.e(&quot;Could not resolve package info&quot;, exception);"
+        errorLine2="      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/testapp/activity/FeatureOverviewActivity.java"
+            line="95"
+            column="7"/>
+    </issue>
+
+    <issue
+        id="ThrowableNotAtBeginning"
+        message="Throwable should be first argument"
+        errorLine1="      Timber.e(&quot;Failed to read the package metadata: &quot;, exception);"
+        errorLine2="      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/storage/FileSource.java"
+            line="75"
+            column="7"/>
+    </issue>
+
+    <issue
+        id="ThrowableNotAtBeginning"
+        message="Throwable should be first argument"
+        errorLine1="      Timber.e(&quot;Failed to read the storage key: &quot;, exception);"
+        errorLine2="      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/storage/FileSource.java"
+            line="77"
+            column="7"/>
+    </issue>
+
+    <issue
+        id="ThrowableNotAtBeginning"
+        message="Throwable should be first argument"
+        errorLine1="        Timber.e(&quot;Failed to obtain the external storage path: &quot;, exception);"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/storage/FileSource.java"
+            line="86"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="ThrowableNotAtBeginning"
+        message="Throwable should be first argument"
+        errorLine1="          Timber.e(&quot;Failed to delete old ambient cache database: &quot;, exception);"
+        errorLine2="          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/offline/OfflineManager.java"
+            line="113"
+            column="11"/>
+    </issue>
+
+    <issue
+        id="ThrowableNotAtBeginning"
+        message="Throwable should be first argument"
+        errorLine1="      Timber.e(&quot;could not reflect&quot;, exception);"
+        errorLine2="      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidTest/java/com/mapbox/mapboxsdk/testapp/utils/OnMapReadyIdlingResource.java"
+            line="49"
+            column="7"/>
+    </issue>
+
+    <issue
+        id="ThrowableNotAtBeginning"
+        message="Throwable should be first argument"
+        errorLine1="      Timber.e(&quot;Invalid URL&quot;, malformedUrlException);"
+        errorLine2="      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/testapp/activity/style/RealTimeGeoJsonActivity.java"
+            line="58"
+            column="7"/>
+    </issue>
+
+    <issue
+        id="StaticFieldLeak"
+        message="Do not place Android context classes in static fields (static reference to `ConnectivityReceiver` which has field `context` pointing to `Context`); this is a memory leak (and also breaks Instant Run)"
+        errorLine1="  private static ConnectivityReceiver INSTANCE;"
+        errorLine2="  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/net/ConnectivityReceiver.java"
+            line="24"
+            column="3"/>
+    </issue>
+
+    <issue
+        id="StaticFieldLeak"
+        message="Do not place Android context classes in static fields (static reference to `IconFactory` which has field `context` pointing to `Context`); this is a memory leak (and also breaks Instant Run)"
+        errorLine1="  private static IconFactory instance;"
+        errorLine2="  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/annotations/IconFactory.java"
+            line="38"
+            column="3"/>
+    </issue>
+
+    <issue
+        id="StaticFieldLeak"
+        message="Do not place Android context classes in static fields (static reference to `Mapbox` which has field `context` pointing to `Context`); this is a memory leak (and also breaks Instant Run)"
+        errorLine1="  private static Mapbox INSTANCE;"
+        errorLine2="  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/Mapbox.java"
+            line="29"
+            column="3"/>
+    </issue>
+
+    <issue
+        id="StaticFieldLeak"
+        message="Do not place Android context classes in static fields (static reference to `OfflineManager` which has field `context` pointing to `Context`); this is a memory leak (and also breaks Instant Run)"
+        errorLine1="  // This object is implemented as a singleton"
+        errorLine2="  ^">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/offline/OfflineManager.java"
+            line="42"
+            column="3"/>
+    </issue>
+
+    <issue
+        id="UnpackedNativeCode"
+        message="Missing attribute android:extractNativeLibs=&quot;false&quot; on the `&lt;application>` tag."
+        errorLine1="    &lt;application"
+        errorLine2="    ^">
+        <location
+            file="src/main/AndroidManifest.xml"
+            line="8"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="MergeRootFrame"
+        message="This `&lt;FrameLayout>` can be replaced with a `&lt;merge>` tag"
+        errorLine1="&lt;FrameLayout xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="src/main/res/layout/activity_building_layer.xml"
+            line="2"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="MergeRootFrame"
+        message="This `&lt;FrameLayout>` can be replaced with a `&lt;merge>` tag"
+        errorLine1="&lt;FrameLayout"
+        errorLine2="^">
+        <location
+            file="src/main/res/layout/activity_map_in_dialog.xml"
+            line="2"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="MergeRootFrame"
+        message="This `&lt;FrameLayout>` can be replaced with a `&lt;merge>` tag"
+        errorLine1="&lt;FrameLayout xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="src/main/res/layout/activity_map_padding.xml"
+            line="2"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="DisableBaselineAlignment"
+        message="Set `android:baselineAligned=&quot;false&quot;` on this element for better performance"
+        errorLine1="    &lt;LinearLayout"
+        errorLine2="    ^">
+        <location
+            file="src/main/res/layout/activity_multi_map.xml"
+            line="10"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="DisableBaselineAlignment"
+        message="Set `android:baselineAligned=&quot;false&quot;` on this element for better performance"
+        errorLine1="    &lt;LinearLayout"
+        errorLine2="    ^">
+        <location
+            file="src/main/res/layout/activity_multi_map.xml"
+            line="42"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="NestedWeights"
+        message="Nested weights are bad for performance"
+        errorLine1="            android:layout_weight=&quot;0.5&quot;"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_multi_map.xml"
+            line="23"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="NestedWeights"
+        message="Nested weights are bad for performance"
+        errorLine1="            android:layout_weight=&quot;0.5&quot;"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_multi_map.xml"
+            line="55"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="Overdraw"
+        message="Possible overdraw: Root element paints background `#cccc` with a theme that also paints a background (inferred theme is `@style/AppTheme`)"
+        errorLine1="    android:background=&quot;#cccc&quot;"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/drawer_navigation_drawer.xml"
+            line="4"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="Overdraw"
+        message="Possible overdraw: Root element paints background `?android:attr/selectableItemBackground` with a theme that also paints a background (inferred theme is `@style/AppTheme`)"
+        errorLine1="    android:background=&quot;?android:attr/selectableItemBackground&quot;"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/item_main_feature.xml"
+            line="6"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="Overdraw"
+        message="Possible overdraw: Root element paints background `@color/mapboxGreen` with a theme that also paints a background (inferred theme is `@style/AppTheme`)"
+        errorLine1="    android:background=&quot;@color/mapboxGreen&quot;>"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/view_text_marker.xml"
+            line="5"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.color.mapbox_my_location_ring` appears to be unused"
+        errorLine1="    &lt;color name=&quot;mapbox_my_location_ring&quot;>@color/mapbox_blue&lt;/color>"
+        errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/src/platform/android/MapboxGLAndroidSDK/src/main/res/values/colors.xml"
+            line="6"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.mapbox_access_token` appears to be unused"
+        errorLine1="    &lt;string name=&quot;mapbox_access_token&quot;>YOUR_MAPBOX_ACCESS_TOKEN_GOES_HERE&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/developer-config.xml"
+            line="3"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.dimen.mapbox_infowindow_offset` appears to be unused"
+        errorLine1="    &lt;dimen name=&quot;mapbox_infowindow_offset&quot;>-2dp&lt;/dimen>"
+        errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/src/platform/android/MapboxGLAndroidSDK/src/main/res/values/dimens.xml"
+            line="5"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.dimen.coordinatebounds_margin` appears to be unused"
+        errorLine1="    &lt;dimen name=&quot;coordinatebounds_margin&quot;>32dp&lt;/dimen>"
+        errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/dimens.xml"
+            line="6"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.dimen.mapbox_infowindow_line_width` appears to be unused"
+        errorLine1="    &lt;dimen name=&quot;mapbox_infowindow_line_width&quot;>1.5dp&lt;/dimen>"
+        errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/src/platform/android/MapboxGLAndroidSDK/src/main/res/values/dimens.xml"
+            line="6"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.dimen.mapbox_attribution_icon_left_padding` appears to be unused"
+        errorLine1="    &lt;dimen name=&quot;mapbox_attribution_icon_left_padding&quot;>@dimen/mapbox_two_dp&lt;/dimen>"
+        errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/src/platform/android/MapboxGLAndroidSDK/src/main/res/values/dimens.xml"
+            line="7"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.dimen.mapbox_attribution_icon_top_padding` appears to be unused"
+        errorLine1="    &lt;dimen name=&quot;mapbox_attribution_icon_top_padding&quot;>@dimen/mapbox_two_dp&lt;/dimen>"
+        errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/src/platform/android/MapboxGLAndroidSDK/src/main/res/values/dimens.xml"
+            line="8"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.dimen.mapbox_attribution_icon_right_padding` appears to be unused"
+        errorLine1="    &lt;dimen name=&quot;mapbox_attribution_icon_right_padding&quot;>@dimen/mapbox_two_dp&lt;/dimen>"
+        errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/src/platform/android/MapboxGLAndroidSDK/src/main/res/values/dimens.xml"
+            line="9"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.dimen.mapbox_attribution_icon_bottom_padding` appears to be unused"
+        errorLine1="    &lt;dimen name=&quot;mapbox_attribution_icon_bottom_padding&quot;>@dimen/mapbox_two_dp&lt;/dimen>"
+        errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/src/platform/android/MapboxGLAndroidSDK/src/main/res/values/dimens.xml"
+            line="10"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.dimen.mapbox_two_dp` appears to be unused"
+        errorLine1="    &lt;dimen name=&quot;mapbox_two_dp&quot;>2dp&lt;/dimen>"
+        errorLine2="           ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/src/platform/android/MapboxGLAndroidSDK/src/main/res/values/dimens.xml"
+            line="11"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.dimen.mapbox_ten_dp` appears to be unused"
+        errorLine1="    &lt;dimen name=&quot;mapbox_ten_dp&quot;>10dp&lt;/dimen>"
+        errorLine2="           ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/src/platform/android/MapboxGLAndroidSDK/src/main/res/values/dimens.xml"
+            line="14"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.dimen.mapbox_sixteen_dp` appears to be unused"
+        errorLine1="    &lt;dimen name=&quot;mapbox_sixteen_dp&quot;>16dp&lt;/dimen>"
+        errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/src/platform/android/MapboxGLAndroidSDK/src/main/res/values/dimens.xml"
+            line="15"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.ic_check_box` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="src/main/res/drawable/ic_check_box.xml"
+            line="1"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.mapbox_infowindow_icon_bg` appears to be unused">
+        <location
+            file="/src/platform/android/MapboxGLAndroidSDK/src/main/res/drawable-xxxhdpi/mapbox_infowindow_icon_bg.9.png"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.color.mapbox_material_bg_selector` appears to be unused"
+        errorLine1="&lt;selector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;>"
+        errorLine2="^">
+        <location
+            file="/src/platform/android/MapboxGLAndroidSDK/src/main/res/color/mapbox_material_bg_selector.xml"
+            line="2"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.marker` appears to be unused"
+        errorLine1="&lt;shape xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot; android:shape=&quot;rectangle&quot;>"
+        errorLine2="^">
+        <location
+            file="src/main/res/drawable/marker.xml"
+            line="1"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.mapbox_style_outdoors` appears to be unused"
+        errorLine1="    &lt;string name=&quot;mapbox_style_outdoors&quot; translatable=&quot;false&quot;>mapbox://styles/mapbox/outdoors-v10&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/src/platform/android/MapboxGLAndroidSDK/src/main/res/values/strings.xml"
+            line="22"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.mapbox_style_traffic_day` appears to be unused"
+        errorLine1="    &lt;string name=&quot;mapbox_style_traffic_day&quot; translatable=&quot;false&quot;>mapbox://styles/mapbox/traffic-day-v2&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/src/platform/android/MapboxGLAndroidSDK/src/main/res/values/strings.xml"
+            line="27"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.mapbox_style_traffic_night` appears to be unused"
+        errorLine1="    &lt;string name=&quot;mapbox_style_traffic_night&quot; translatable=&quot;false&quot;>mapbox://styles/mapbox/traffic-night-v2&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/src/platform/android/MapboxGLAndroidSDK/src/main/res/values/strings.xml"
+            line="28"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UselessParent"
+        message="This `FrameLayout` layout or its `LinearLayout` parent is possibly useless"
+        errorLine1="    &lt;FrameLayout"
+        errorLine2="    ^">
+        <location
+            file="src/main/res/layout/activity_my_location_customization.xml"
+            line="9"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="UnusedIds"
+        message="The resource `R.id.fabStartStop` appears to be unused"
+        errorLine1="    android:id=&quot;@+id/fabStartStop&quot;"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_animated_image_source.xml"
+            line="18"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="UnusedIds"
+        message="The resource `R.id.map_container` appears to be unused"
+        errorLine1="    android:id=&quot;@+id/map_container&quot;"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_multi_map.xml"
+            line="5"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="UnusedIds"
+        message="The resource `R.id.map_container1` appears to be unused"
+        errorLine1="        android:id=&quot;@+id/map_container1&quot;"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_multi_map.xml"
+            line="11"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedIds"
+        message="The resource `R.id.map_container2` appears to be unused"
+        errorLine1="        android:id=&quot;@+id/map_container2&quot;"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_multi_map.xml"
+            line="43"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedIds"
+        message="The resource `R.id.content_frame` appears to be unused"
+        errorLine1="        android:id=&quot;@+id/content_frame&quot;"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_scroll_by.xml"
+            line="69"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedIds"
+        message="The resource `R.id.viewpager_header` appears to be unused"
+        errorLine1="            android:id=&quot;@+id/viewpager_header&quot;"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_viewpager.xml"
+            line="13"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedIds"
+        message="The resource `R.id.map_card` appears to be unused"
+        errorLine1="        android:id=&quot;@+id/map_card&quot;"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/fragment_double_map.xml"
+            line="12"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedIds"
+        message="The resource `R.id.infowindow_subdescription` appears to be unused"
+        errorLine1="        android:id=&quot;@+id/infowindow_subdescription&quot;"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/src/platform/android/MapboxGLAndroidSDK/src/main/res/layout/mapbox_infowindow_content.xml"
+            line="43"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="TypographyQuotes"
+        message="Replace straight quotes (&apos;&apos;) with directional quotes (‘’, &amp;#8216; and &amp;#8217;) ?"
+        errorLine1="    &lt;string name=&quot;mapbox_attributionTelemetryMessage&quot;>Estàs ajudant a millorar els mapes d\&apos;OpenStreetMap i de Mapbox aportant dades d\&apos;ús anònimes.&lt;/string>"
+        errorLine2="                                                      ^">
+        <location
+            file="src/main/res/values-ca/strings.xml"
+            line="9"
+            column="55"/>
+    </issue>
+
+    <issue
+        id="IconDipSize"
+        message="The image `icon_burned.png` varies significantly in its density-independent (dip) size across the various density versions: drawable-hdpi/icon_burned.png: 64x64 dp (96x96 px), drawable-xxxhdpi/icon_burned.png: 48x48 dp (192x192 px), drawable-xxhdpi/icon_burned.png: 48x48 dp (144x144 px), drawable-mdpi/icon_burned.png: 48x48 dp (48x48 px), drawable-xhdpi/icon_burned.png: 48x48 dp (96x96 px)">
+        <location
+            file="src/main/res/drawable-xhdpi/icon_burned.png"/>
+        <location
+            file="src/main/res/drawable-mdpi/icon_burned.png"/>
+        <location
+            file="src/main/res/drawable-xxhdpi/icon_burned.png"/>
+        <location
+            file="src/main/res/drawable-xxxhdpi/icon_burned.png"/>
+        <location
+            file="src/main/res/drawable-hdpi/icon_burned.png"/>
+    </issue>
+
+    <issue
+        id="IconDuplicatesConfig"
+        message="The `icon_burned.png` icon has identical contents in the following configuration folders: drawable-hdpi, drawable-xhdpi">
+        <location
+            file="src/main/res/drawable-xhdpi/icon_burned.png"/>
+        <location
+            file="src/main/res/drawable-hdpi/icon_burned.png"/>
+    </issue>
+
+    <issue
+        id="IconExpectedSize"
+        message="Incorrect icon size for `drawable-hdpi/ic_launcher_round.png`: expected 72x72, but was 216x216">
+        <location
+            file="src/main/res/drawable-hdpi/ic_launcher_round.png"/>
+    </issue>
+
+    <issue
+        id="IconExpectedSize"
+        message="Incorrect icon size for `drawable-mdpi/ic_launcher_round.png`: expected 48x48, but was 144x144">
+        <location
+            file="src/main/res/drawable-mdpi/ic_launcher_round.png"/>
+    </issue>
+
+    <issue
+        id="IconExpectedSize"
+        message="Incorrect icon size for `drawable-xhdpi/ic_launcher_round.png`: expected 96x96, but was 288x288">
+        <location
+            file="src/main/res/drawable-xhdpi/ic_launcher_round.png"/>
+    </issue>
+
+    <issue
+        id="IconExpectedSize"
+        message="Incorrect icon size for `drawable-xxhdpi/ic_launcher_round.png`: expected 144x144, but was 432x432">
+        <location
+            file="src/main/res/drawable-xxhdpi/ic_launcher_round.png"/>
+    </issue>
+
+    <issue
+        id="IconExpectedSize"
+        message="Incorrect icon size for `drawable-xxxhdpi/ic_launcher_round.png`: expected 192x192, but was 576x576">
+        <location
+            file="src/main/res/drawable-xxxhdpi/ic_launcher_round.png"/>
+    </issue>
+
+    <issue
+        id="IconExpectedSize"
+        message="Incorrect icon size for `drawable-hdpi/icon.png`: expected 72x72, but was 215x212">
+        <location
+            file="src/main/res/drawable-hdpi/icon.png"/>
+    </issue>
+
+    <issue
+        id="IconExpectedSize"
+        message="Incorrect icon size for `drawable-mdpi/icon.png`: expected 48x48, but was 143x141">
+        <location
+            file="src/main/res/drawable-mdpi/icon.png"/>
+    </issue>
+
+    <issue
+        id="IconExpectedSize"
+        message="Incorrect icon size for `drawable-xhdpi/icon.png`: expected 96x96, but was 286x282">
+        <location
+            file="src/main/res/drawable-xhdpi/icon.png"/>
+    </issue>
+
+    <issue
+        id="IconExpectedSize"
+        message="Incorrect icon size for `drawable-xxhdpi/icon.png`: expected 144x144, but was 429x423">
+        <location
+            file="src/main/res/drawable-xxhdpi/icon.png"/>
+    </issue>
+
+    <issue
+        id="IconExpectedSize"
+        message="Incorrect icon size for `drawable-xxxhdpi/icon.png`: expected 192x192, but was 572x564">
+        <location
+            file="src/main/res/drawable-xxxhdpi/icon.png"/>
+    </issue>
+
+    <issue
+        id="SelectableText"
+        message="Consider making the text value selectable by specifying `android:textIsSelectable=&quot;true&quot;`"
+        errorLine1="    &lt;TextView"
+        errorLine2="    ^">
+        <location
+            file="src/main/res/layout/activity_debug_mode.xml"
+            line="18"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="SelectableText"
+        message="Consider making the text value selectable by specifying `android:textIsSelectable=&quot;true&quot;`"
+        errorLine1="    &lt;TextView"
+        errorLine2="    ^">
+        <location
+            file="src/main/res/layout/activity_marker_bulk.xml"
+            line="18"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="SelectableText"
+        message="Consider making the text value selectable by specifying `android:textIsSelectable=&quot;true&quot;`"
+        errorLine1="    &lt;TextView"
+        errorLine2="    ^">
+        <location
+            file="src/main/res/layout/activity_marker_view.xml"
+            line="18"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="SelectableText"
+        message="Consider making the text value selectable by specifying `android:textIsSelectable=&quot;true&quot;`"
+        errorLine1="    &lt;TextView"
+        errorLine2="    ^">
+        <location
+            file="src/main/res/layout/item_main_feature.xml"
+            line="14"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="SelectableText"
+        message="Consider making the text value selectable by specifying `android:textIsSelectable=&quot;true&quot;`"
+        errorLine1="    &lt;TextView"
+        errorLine2="    ^">
+        <location
+            file="src/main/res/layout/item_main_feature.xml"
+            line="25"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="SelectableText"
+        message="Consider making the text value selectable by specifying `android:textIsSelectable=&quot;true&quot;`"
+        errorLine1="&lt;TextView"
+        errorLine2="^">
+        <location
+            file="src/main/res/layout/mapbox_attribution_list_item.xml"
+            line="2"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="SelectableText"
+        message="Consider making the text value selectable by specifying `android:textIsSelectable=&quot;true&quot;`"
+        errorLine1="    &lt;TextView"
+        errorLine2="    ^">
+        <location
+            file="src/main/res/layout/mapbox_infowindow_content.xml"
+            line="21"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="SelectableText"
+        message="Consider making the text value selectable by specifying `android:textIsSelectable=&quot;true&quot;`"
+        errorLine1="    &lt;TextView"
+        errorLine2="    ^">
+        <location
+            file="src/main/res/layout/mapbox_infowindow_content.xml"
+            line="31"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="SelectableText"
+        message="Consider making the text value selectable by specifying `android:textIsSelectable=&quot;true&quot;`"
+        errorLine1="    &lt;TextView"
+        errorLine2="    ^">
+        <location
+            file="src/main/res/layout/section_main_layout.xml"
+            line="13"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="SelectableText"
+        message="Consider making the text value selectable by specifying `android:textIsSelectable=&quot;true&quot;`"
+        errorLine1="    &lt;TextView"
+        errorLine2="    ^">
+        <location
+            file="src/main/res/layout/view_custom_marker.xml"
+            line="11"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="SelectableText"
+        message="Consider making the text value selectable by specifying `android:textIsSelectable=&quot;true&quot;`"
+        errorLine1="    &lt;TextView"
+        errorLine2="    ^">
+        <location
+            file="src/main/res/layout/view_text_marker.xml"
+            line="7"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="ButtonStyle"
+        message="Buttons in button bars should be borderless; use `style=&quot;?android:attr/buttonBarButtonStyle&quot;` (and `?android:attr/buttonBarStyle` on the parent)"
+        errorLine1="        &lt;Button"
+        errorLine2="        ^">
+        <location
+            file="src/main/res/layout/activity_camera_animation_types.xml"
+            line="24"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="ButtonStyle"
+        message="Buttons in button bars should be borderless; use `style=&quot;?android:attr/buttonBarButtonStyle&quot;` (and `?android:attr/buttonBarStyle` on the parent)"
+        errorLine1="        &lt;Button"
+        errorLine2="        ^">
+        <location
+            file="src/main/res/layout/activity_camera_animation_types.xml"
+            line="31"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="ButtonStyle"
+        message="Buttons in button bars should be borderless; use `style=&quot;?android:attr/buttonBarButtonStyle&quot;` (and `?android:attr/buttonBarStyle` on the parent)"
+        errorLine1="        &lt;Button"
+        errorLine2="        ^">
+        <location
+            file="src/main/res/layout/activity_camera_animation_types.xml"
+            line="38"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="GoogleAppIndexingWarning"
+        message="App is not indexable by Google Search; consider adding at least one Activity with an ACTION-VIEW intent filter. See issue explanation for more details."
+        errorLine1="    &lt;application"
+        errorLine2="    ^">
+        <location
+            file="src/main/AndroidManifest.xml"
+            line="8"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="ContentDescription"
+        message="[Accessibility] Missing `contentDescription` attribute on image"
+        errorLine1="        &lt;ImageView"
+        errorLine2="        ^">
+        <location
+            file="src/main/res/layout/activity_snapshot.xml"
+            line="14"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="ContentDescription"
+        message="[Accessibility] Missing `contentDescription` attribute on image"
+        errorLine1="&lt;ImageView xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="src/main/res/layout/mapbox_view_image_marker.xml"
+            line="2"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="ContentDescription"
+        message="[Accessibility] Missing `contentDescription` attribute on image"
+        errorLine1="    &lt;ImageView"
+        errorLine2="    ^">
+        <location
+            file="src/main/res/layout/view_custom_marker.xml"
+            line="6"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="String literal in `setText` can not be translated. Use Android resources instead."
+        errorLine1="        textView.setText(&quot;Click the map to calculate the distance&quot;);"
+        errorLine2="                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/testapp/activity/infowindow/DynamicInfoWindowAdapterActivity.java"
+            line="103"
+            column="26"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="Do not concatenate text displayed with `setText`. Use resource string with placeholders."
+        errorLine1="                viewCountView.setText(&quot;ViewCache size &quot; + markerViewContainer.getChildCount());"
+        errorLine2="                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/testapp/activity/annotation/MarkerViewActivity.java"
+            line="153"
+            column="39"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="String literal in `setText` can not be translated. Use Android resources instead."
+        errorLine1="                viewCountView.setText(&quot;ViewCache size &quot; + markerViewContainer.getChildCount());"
+        errorLine2="                                      ~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/testapp/activity/annotation/MarkerViewActivity.java"
+            line="153"
+            column="39"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="[I18N] Hardcoded string &quot;No Results&quot;, should use `@string` resource"
+        errorLine1="        android:text=&quot;No Results&quot;"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_metadata_update.xml"
+            line="18"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="[I18N] Hardcoded string &quot;No Results&quot;, should use `@string` resource"
+        errorLine1="        android:text=&quot;No Results&quot;"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_offline_region_delete.xml"
+            line="18"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="[I18N] Hardcoded string &quot;Move the map by x/y pixels&quot;, should use `@string` resource"
+        errorLine1="                android:text=&quot;Move the map by x/y pixels&quot;"
+        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_scroll_by.xml"
+            line="25"
+            column="17"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="[I18N] Hardcoded string &quot;X: 0000&quot;, should use `@string` resource"
+        errorLine1="                android:text=&quot;X: 0000&quot; />"
+        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_scroll_by.xml"
+            line="35"
+            column="17"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="[I18N] Hardcoded string &quot;Y: 0000&quot;, should use `@string` resource"
+        errorLine1="                android:text=&quot;Y: 0000&quot; />"
+        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_scroll_by.xml"
+            line="51"
+            column="17"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="[I18N] Hardcoded string &quot;Latitude&quot;, should use `@string` resource"
+        errorLine1="            android:text=&quot;Latitude&quot;"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/dialog_camera_position.xml"
+            line="19"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="[I18N] Hardcoded string &quot;-180&quot;, should use `@string` resource"
+        errorLine1="            android:text=&quot;-180&quot;"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/dialog_camera_position.xml"
+            line="41"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="[I18N] Hardcoded string &quot;Longitude&quot;, should use `@string` resource"
+        errorLine1="            android:text=&quot;Longitude&quot; />"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/dialog_camera_position.xml"
+            line="59"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="[I18N] Hardcoded string &quot;-180&quot;, should use `@string` resource"
+        errorLine1="            android:text=&quot;-180&quot; />"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/dialog_camera_position.xml"
+            line="81"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="[I18N] Hardcoded string &quot;Zoom&quot;, should use `@string` resource"
+        errorLine1="            android:text=&quot;Zoom&quot; />"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/dialog_camera_position.xml"
+            line="98"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="[I18N] Hardcoded string &quot;18&quot;, should use `@string` resource"
+        errorLine1="            android:text=&quot;18&quot; />"
+        errorLine2="            ~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/dialog_camera_position.xml"
+            line="120"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="[I18N] Hardcoded string &quot;Bearing&quot;, should use `@string` resource"
+        errorLine1="            android:text=&quot;Bearing&quot; />"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/dialog_camera_position.xml"
+            line="137"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="[I18N] Hardcoded string &quot;0&quot;, should use `@string` resource"
+        errorLine1="            android:text=&quot;0&quot; />"
+        errorLine2="            ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/dialog_camera_position.xml"
+            line="159"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="[I18N] Hardcoded string &quot;Tilt&quot;, should use `@string` resource"
+        errorLine1="            android:text=&quot;Tilt&quot; />"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/dialog_camera_position.xml"
+            line="176"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="[I18N] Hardcoded string &quot;0&quot;, should use `@string` resource"
+        errorLine1="            android:text=&quot;0&quot; />"
+        errorLine2="            ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/dialog_camera_position.xml"
+            line="198"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="[I18N] Hardcoded string &quot;Change intensity&quot;, should use `@string` resource"
+        errorLine1="        android:title=&quot;Change intensity&quot;"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/menu/menu_building.xml"
+            line="6"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="[I18N] Hardcoded string &quot;Change Anchor&quot;, should use `@string` resource"
+        errorLine1="        android:title=&quot;Change Anchor&quot;"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/menu/menu_building.xml"
+            line="10"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="[I18N] Hardcoded string &quot;Amount of markers&quot;, should use `@string` resource"
+        errorLine1="        android:title=&quot;Amount of markers&quot;"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/menu/menu_bulk_marker.xml"
+            line="6"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="[I18N] Hardcoded string &quot;Update layer (invalidate)&quot;, should use `@string` resource"
+        errorLine1="        android:title=&quot;Update layer (invalidate)&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/menu/menu_custom_layer.xml"
+            line="7"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="[I18N] Hardcoded string &quot;Red&quot;, should use `@string` resource"
+        errorLine1="        android:title=&quot;Red&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/menu/menu_custom_layer.xml"
+            line="10"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="[I18N] Hardcoded string &quot;Green&quot;, should use `@string` resource"
+        errorLine1="        android:title=&quot;Green&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/menu/menu_custom_layer.xml"
+            line="13"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="[I18N] Hardcoded string &quot;Blue&quot;, should use `@string` resource"
+        errorLine1="        android:title=&quot;Blue&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/menu/menu_custom_layer.xml"
+            line="16"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="[I18N] Hardcoded string &quot;Add an exponential zoom function&quot;, should use `@string` resource"
+        errorLine1="        android:title=&quot;Add an exponential zoom function&quot;"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/menu/menu_data_driven_style.xml"
+            line="7"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="[I18N] Hardcoded string &quot;Add an interval zoom function&quot;, should use `@string` resource"
+        errorLine1="        android:title=&quot;Add an interval zoom function&quot;"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/menu/menu_data_driven_style.xml"
+            line="12"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="[I18N] Hardcoded string &quot;Add a categorical source function&quot;, should use `@string` resource"
+        errorLine1="        android:title=&quot;Add a categorical source function&quot;"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/menu/menu_data_driven_style.xml"
+            line="17"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="[I18N] Hardcoded string &quot;Add an exponential source function&quot;, should use `@string` resource"
+        errorLine1="        android:title=&quot;Add an exponential source function&quot;"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/menu/menu_data_driven_style.xml"
+            line="22"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="[I18N] Hardcoded string &quot;Add an identity source function&quot;, should use `@string` resource"
+        errorLine1="        android:title=&quot;Add an identity source function&quot;"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/menu/menu_data_driven_style.xml"
+            line="27"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="[I18N] Hardcoded string &quot;Add an interval source function&quot;, should use `@string` resource"
+        errorLine1="        android:title=&quot;Add an interval source function&quot;"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/menu/menu_data_driven_style.xml"
+            line="32"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="[I18N] Hardcoded string &quot;Add a composite, exponential function&quot;, should use `@string` resource"
+        errorLine1="        android:title=&quot;Add a composite, exponential function&quot;"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/menu/menu_data_driven_style.xml"
+            line="37"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="[I18N] Hardcoded string &quot;Add a composite, categorical function&quot;, should use `@string` resource"
+        errorLine1="        android:title=&quot;Add a composite, categorical function&quot;"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/menu/menu_data_driven_style.xml"
+            line="42"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="[I18N] Hardcoded string &quot;Add a composite, interval function&quot;, should use `@string` resource"
+        errorLine1="        android:title=&quot;Add a composite, interval function&quot;"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/menu/menu_data_driven_style.xml"
+            line="47"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="[I18N] Hardcoded string &quot;My Location Tracking&quot;, should use `@string` resource"
+        errorLine1="        android:title=&quot;My Location Tracking&quot;"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/menu/menu_padding.xml"
+            line="6"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="[I18N] Hardcoded string &quot;Bangalore&quot;, should use `@string` resource"
+        errorLine1="        android:title=&quot;Bangalore&quot;"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/menu/menu_padding.xml"
+            line="10"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="[I18N] Hardcoded string &quot;List all layers in the style&quot;, should use `@string` resource"
+        errorLine1="        android:title=&quot;List all layers in the style&quot;"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/menu/menu_runtime_style.xml"
+            line="7"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="[I18N] Hardcoded string &quot;List all sources in the style&quot;, should use `@string` resource"
+        errorLine1="        android:title=&quot;List all sources in the style&quot;"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/menu/menu_runtime_style.xml"
+            line="11"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="[I18N] Hardcoded string &quot;Color the water&quot;, should use `@string` resource"
+        errorLine1="        android:title=&quot;Color the water&quot;"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/menu/menu_runtime_style.xml"
+            line="15"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="[I18N] Hardcoded string &quot;Set background opacity&quot;, should use `@string` resource"
+        errorLine1="        android:title=&quot;Set background opacity&quot;"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/menu/menu_runtime_style.xml"
+            line="19"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="[I18N] Hardcoded string &quot;Set road symbol placement to Point&quot;, should use `@string` resource"
+        errorLine1="        android:title=&quot;Set road symbol placement to Point&quot;"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/menu/menu_runtime_style.xml"
+            line="23"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="[I18N] Hardcoded string &quot;Set layer visibility to false&quot;, should use `@string` resource"
+        errorLine1="        android:title=&quot;Set layer visibility to false&quot;"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/menu/menu_runtime_style.xml"
+            line="27"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="[I18N] Hardcoded string &quot;Add a parks layer&quot;, should use `@string` resource"
+        errorLine1="        android:title=&quot;Add a parks layer&quot;"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/menu/menu_runtime_style.xml"
+            line="31"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="[I18N] Hardcoded string &quot;Add a dynamic GeoJSON source&quot;, should use `@string` resource"
+        errorLine1="        android:title=&quot;Add a dynamic GeoJSON source&quot;"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/menu/menu_runtime_style.xml"
+            line="35"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="[I18N] Hardcoded string &quot;Remove buildings layer&quot;, should use `@string` resource"
+        errorLine1="        android:title=&quot;Remove buildings layer&quot;"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/menu/menu_runtime_style.xml"
+            line="39"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="[I18N] Hardcoded string &quot;Add a terrain layer&quot;, should use `@string` resource"
+        errorLine1="        android:title=&quot;Add a terrain layer&quot;"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/menu/menu_runtime_style.xml"
+            line="43"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="[I18N] Hardcoded string &quot;Add a satellite layer&quot;, should use `@string` resource"
+        errorLine1="        android:title=&quot;Add a satellite layer&quot;"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/menu/menu_runtime_style.xml"
+            line="47"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="[I18N] Hardcoded string &quot;Change the water color on zoom&quot;, should use `@string` resource"
+        errorLine1="        android:title=&quot;Change the water color on zoom&quot;"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/menu/menu_runtime_style.xml"
+            line="51"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="[I18N] Hardcoded string &quot;Custom tiles&quot;, should use `@string` resource"
+        errorLine1="        android:title=&quot;Custom tiles&quot;"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/menu/menu_runtime_style.xml"
+            line="55"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="[I18N] Hardcoded string &quot;Apply filtered fill&quot;, should use `@string` resource"
+        errorLine1="        android:title=&quot;Apply filtered fill&quot;"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/menu/menu_runtime_style.xml"
+            line="59"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="[I18N] Hardcoded string &quot;Apply filtered line&quot;, should use `@string` resource"
+        errorLine1="        android:title=&quot;Apply filtered line&quot;"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/menu/menu_runtime_style.xml"
+            line="63"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="[I18N] Hardcoded string &quot;Apply numeric fill filter&quot;, should use `@string` resource"
+        errorLine1="        android:title=&quot;Apply numeric fill filter&quot;"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/menu/menu_runtime_style.xml"
+            line="67"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="[I18N] Hardcoded string &quot;Toggle text size&quot;, should use `@string` resource"
+        errorLine1="        android:title=&quot;Toggle text size&quot;/>"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/menu/menu_symbol_layer.xml"
+            line="6"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="[I18N] Hardcoded string &quot;Toggle text field contents&quot;, should use `@string` resource"
+        errorLine1="        android:title=&quot;Toggle text field contents&quot;/>"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/menu/menu_symbol_layer.xml"
+            line="10"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="[I18N] Hardcoded string &quot;Toggle text font&quot;, should use `@string` resource"
+        errorLine1="        android:title=&quot;Toggle text font&quot;/>"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/menu/menu_symbol_layer.xml"
+            line="14"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="[I18N] Hardcoded string &quot;Zoom in&quot;, should use `@string` resource"
+        errorLine1="        android:title=&quot;Zoom in&quot;"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/menu/menu_zoom.xml"
+            line="6"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="[I18N] Hardcoded string &quot;Zoom out&quot;, should use `@string` resource"
+        errorLine1="        android:title=&quot;Zoom out&quot;"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/menu/menu_zoom.xml"
+            line="10"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="[I18N] Hardcoded string &quot;Zoom by 2&quot;, should use `@string` resource"
+        errorLine1="        android:title=&quot;Zoom by 2&quot;"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/menu/menu_zoom.xml"
+            line="14"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="[I18N] Hardcoded string &quot;Zoom to point&quot;, should use `@string` resource"
+        errorLine1="        android:title=&quot;Zoom to point&quot;"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/menu/menu_zoom.xml"
+            line="18"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="[I18N] Hardcoded string &quot;Zoom to 4&quot;, should use `@string` resource"
+        errorLine1="        android:title=&quot;Zoom to 4&quot;"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/menu/menu_zoom.xml"
+            line="22"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="RelativeOverlap"
+        message="`@id/button_list_regions` can overlap `@id/button_download_region` if @string/button_download_region, @string/button_list_regions grow due to localized text expansion"
+        errorLine1="    &lt;Button"
+        errorLine2="    ^">
+        <location
+            file="src/main/res/layout/activity_offline.xml"
+            line="33"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Consider adding `android:layout_marginEnd=&quot;@dimen/fab_margin&quot;` to better support right-to-left layouts"
+        errorLine1="    android:layout_marginRight=&quot;@dimen/fab_margin&quot;"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_animated_image_source.xml"
+            line="25"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Consider adding `android:layout_marginEnd=&quot;@dimen/fab_margin&quot;` to better support right-to-left layouts"
+        errorLine1="        android:layout_marginRight=&quot;@dimen/fab_margin&quot;"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_circle_layer.xml"
+            line="25"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Consider adding `android:layout_marginEnd=&quot;@dimen/fab_margin&quot;` to better support right-to-left layouts"
+        errorLine1="        android:layout_marginRight=&quot;@dimen/fab_margin&quot;"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_circle_layer.xml"
+            line="37"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Consider adding `android:layout_marginEnd=&quot;@dimen/fab_margin&quot;` to better support right-to-left layouts"
+        errorLine1="        android:layout_marginRight=&quot;@dimen/fab_margin&quot;"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_debug_mode.xml"
+            line="32"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Consider adding `android:layout_alignParentEnd=&quot;true&quot;` to better support right-to-left layouts"
+        errorLine1="        android:layout_alignParentRight=&quot;true&quot;"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_offline.xml"
+            line="38"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Consider adding `android:layout_marginEnd=&quot;@dimen/fab_margin&quot;` to better support right-to-left layouts"
+        errorLine1="        android:layout_marginRight=&quot;@dimen/fab_margin&quot;"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_offline.xml"
+            line="39"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Consider adding `android:layout_marginStart=&quot;56dp&quot;` to better support right-to-left layouts"
+        errorLine1="                android:layout_marginLeft=&quot;56dp&quot;"
+        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_scroll_by.xml"
+            line="42"
+            column="17"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Consider adding `android:layout_marginStart=&quot;56dp&quot;` to better support right-to-left layouts"
+        errorLine1="                android:layout_marginLeft=&quot;56dp&quot;"
+        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_scroll_by.xml"
+            line="59"
+            column="17"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Consider adding `android:layout_toStartOf=&quot;@+id/value_lat&quot;` to better support right-to-left layouts"
+        errorLine1="            android:layout_toLeftOf=&quot;@+id/value_lat&quot;"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/dialog_camera_position.xml"
+            line="28"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Consider adding `android:layout_toEndOf=&quot;@id/text_lat&quot;` to better support right-to-left layouts"
+        errorLine1="            android:layout_toRightOf=&quot;@id/text_lat&quot;"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/dialog_camera_position.xml"
+            line="29"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Consider adding `android:layout_toStartOf=&quot;@+id/value_lon&quot;` to better support right-to-left layouts"
+        errorLine1="            android:layout_toLeftOf=&quot;@+id/value_lon&quot;"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/dialog_camera_position.xml"
+            line="67"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Consider adding `android:layout_toEndOf=&quot;@id/text_lon&quot;` to better support right-to-left layouts"
+        errorLine1="            android:layout_toRightOf=&quot;@id/text_lon&quot;"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/dialog_camera_position.xml"
+            line="68"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Consider adding `android:layout_toStartOf=&quot;@+id/value_zoom&quot;` to better support right-to-left layouts"
+        errorLine1="            android:layout_toLeftOf=&quot;@+id/value_zoom&quot;"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/dialog_camera_position.xml"
+            line="106"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Consider adding `android:layout_toEndOf=&quot;@id/text_zoom&quot;` to better support right-to-left layouts"
+        errorLine1="            android:layout_toRightOf=&quot;@id/text_zoom&quot;"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/dialog_camera_position.xml"
+            line="107"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Consider adding `android:layout_toStartOf=&quot;@+id/value_bearing&quot;` to better support right-to-left layouts"
+        errorLine1="            android:layout_toLeftOf=&quot;@+id/value_bearing&quot;"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/dialog_camera_position.xml"
+            line="145"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Consider adding `android:layout_toEndOf=&quot;@id/text_bearing&quot;` to better support right-to-left layouts"
+        errorLine1="            android:layout_toRightOf=&quot;@id/text_bearing&quot;"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/dialog_camera_position.xml"
+            line="146"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Consider adding `android:layout_toStartOf=&quot;@+id/value_tilt&quot;` to better support right-to-left layouts"
+        errorLine1="            android:layout_toLeftOf=&quot;@+id/value_tilt&quot;"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/dialog_camera_position.xml"
+            line="184"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Consider adding `android:layout_toEndOf=&quot;@id/text_tilt&quot;` to better support right-to-left layouts"
+        errorLine1="            android:layout_toRightOf=&quot;@id/text_tilt&quot;"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/dialog_camera_position.xml"
+            line="185"
+            column="13"/>
+    </issue>
+
+</issues>

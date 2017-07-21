@@ -116,6 +116,7 @@ android {
     }
 
     lintOptions {
+        baseline file("lint-baseline.xml")
         checkAllWarnings true
         warningsAsErrors true
     }
@@ -152,3 +153,4 @@ apply from: 'gradle-javadoc.gradle'
 apply from: 'gradle-publish.gradle'
 apply from: 'gradle-checkstyle.gradle'
 apply from: 'gradle-tests-staticblockremover.gradle'
+apply from: '../gradle-lint.gradle'

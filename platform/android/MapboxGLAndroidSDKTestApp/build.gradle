@@ -25,6 +25,7 @@ android {
     }
 
     lintOptions {
+        baseline file("lint-baseline.xml")
         checkAllWarnings true
         warningsAsErrors true
         disable 'MissingTranslation'
@@ -84,5 +85,6 @@ apply from: 'gradle-config.gradle'
 apply from: 'gradle-device-farm.gradle'
 apply from: 'gradle-spoon.gradle'
 apply from: 'gradle-checkstyle.gradle'
+apply from: '../gradle-lint.gradle'
 
 
