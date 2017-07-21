@@ -7,6 +7,7 @@
 
 #include <atomic>
 #include <memory>
+#include <thread>
 
 using namespace mbgl;
 using namespace mbgl::util;
@@ -274,4 +275,36 @@ TEST(Thread, PauseResume) {
 
     thread.actor().invoke(&TestWorker::send, [&] { loop.stop(); });
     loop.run();
+}
+
+TEST(Thread, PauseResumeMultiThreaded) {
+    RunLoop loop;
+    
+    // Thread to be paused
+    Thread<TestWorker> test("Test");
+    
+    std::promise<void> thread1Complete;
+    auto future = thread1Complete.get_future();
+    std::thread thread1 {[&, promise = std::move(thread1Complete)]() mutable {
+        // Pause the thread
+        test.pause();
+        promise.set_value();
+    }};
+    
+    // Wait for the test thread to be paused
+    future.wait();
+    
+    std::thread thread2 {[&]() {
+        // Pause from this thread as well and resume
+        test.pause();
+        test.resume();
+    }};
+    
+    // Queue a message at the end of test thread's queue.
+    test.actor().invoke(&TestWorker::send, [&] { loop.stop(); });
+    loop.run();
+    
+    // Wait for threads
+    thread1.join();
+    thread2.join();
 }
