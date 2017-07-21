@@ -45,6 +45,11 @@ namespace mbgl {
     purpose of the actor model: prohibiting direct concurrent access to shared state.
 */
 
+
+namespace util {
+template <class> class Thread;
+} // namespace util
+
 template <class Object>
 class Actor : public util::noncopyable {
 public:
@@ -91,6 +96,9 @@ public:
     }
 
 private:
+    template<typename U>
+    friend class util::Thread;
+
     std::shared_ptr<Mailbox> mailbox;
     Object object;
 };

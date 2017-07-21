@@ -125,6 +125,13 @@ public:
     }
 
 private:
+    template <class U>
+    friend class BlockingThreadGuard;
+
+    Object& getObject() {
+        return object->object;
+    }
+
     MBGL_STORE_THREAD(tid);
 
     void schedule(std::weak_ptr<Mailbox> mailbox) override {
@@ -151,10 +158,32 @@ private:
     std::thread thread;
     std::unique_ptr<Actor<Object>> object;
 
+    std::mutex pauseMutex;
     std::unique_ptr<std::promise<void>> paused;
     std::unique_ptr<std::promise<void>> resumed;
 
     util::RunLoop* loop = nullptr;
+};
+
+
+template <class Object>
+class BlockingThreadGuard {
+public:
+    BlockingThreadGuard(Thread<Object>& thread_)
+        : thread(thread_) {
+        thread.pause();
+    }
+
+    ~BlockingThreadGuard() {
+        thread.resume();
+    }
+
+    Object& object() {
+        return thread.getObject();
+    }
+
+private:
+    Thread<Object>& thread;
 };
 
 } // namespace util
