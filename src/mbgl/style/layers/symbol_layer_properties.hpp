@@ -132,12 +132,12 @@ struct TextLetterSpacing : LayoutProperty<float> {
     static float defaultValue() { return 0; }
 };
 
-struct TextJustify : LayoutProperty<TextJustifyType> {
+struct TextJustify : DataDrivenLayoutProperty<TextJustifyType> {
     static constexpr const char * key = "text-justify";
     static TextJustifyType defaultValue() { return TextJustifyType::Center; }
 };
 
-struct TextAnchor : LayoutProperty<TextAnchorType> {
+struct TextAnchor : DataDrivenLayoutProperty<TextAnchorType> {
     static constexpr const char * key = "text-anchor";
     static TextAnchorType defaultValue() { return TextAnchorType::Center; }
 };

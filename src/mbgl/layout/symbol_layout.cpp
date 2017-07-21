@@ -180,47 +180,6 @@ bool SymbolLayout::hasSymbolInstances() const {
 
 void SymbolLayout::prepare(const GlyphMap& glyphMap, const GlyphPositions& glyphPositions,
                            const ImageMap& imageMap, const ImagePositions& imagePositions) {
-    float horizontalAlign = 0.5;
-    float verticalAlign = 0.5;
-
-    switch (layout.get<TextAnchor>()) {
-        case TextAnchorType::Top:
-        case TextAnchorType::Bottom:
-        case TextAnchorType::Center:
-            break;
-        case TextAnchorType::Right:
-        case TextAnchorType::TopRight:
-        case TextAnchorType::BottomRight:
-            horizontalAlign = 1;
-            break;
-        case TextAnchorType::Left:
-        case TextAnchorType::TopLeft:
-        case TextAnchorType::BottomLeft:
-            horizontalAlign = 0;
-            break;
-    }
-
-    switch (layout.get<TextAnchor>()) {
-        case TextAnchorType::Left:
-        case TextAnchorType::Right:
-        case TextAnchorType::Center:
-            break;
-        case TextAnchorType::Bottom:
-        case TextAnchorType::BottomLeft:
-        case TextAnchorType::BottomRight:
-            verticalAlign = 1;
-            break;
-        case TextAnchorType::Top:
-        case TextAnchorType::TopLeft:
-        case TextAnchorType::TopRight:
-            verticalAlign = 0;
-            break;
-    }
-
-    const float justify = layout.get<TextJustify>() == TextJustifyType::Right ? 1 :
-        layout.get<TextJustify>() == TextJustifyType::Left ? 0 :
-        0.5;
-
     const bool textAlongLine = layout.get<TextRotationAlignment>() == AlignmentType::Map &&
         layout.get<SymbolPlacement>() == SymbolPlacementType::Line;
 
@@ -248,9 +207,8 @@ void SymbolLayout::prepare(const GlyphMap& glyphMap, const GlyphPositions& glyph
                     /* maxWidth: ems */ layout.get<SymbolPlacement>() != SymbolPlacementType::Line ?
                         layout.get<TextMaxWidth>() * oneEm : 0,
                     /* lineHeight: ems */ layout.get<TextLineHeight>() * oneEm,
-                    /* horizontalAlign */ horizontalAlign,
-                    /* verticalAlign */ verticalAlign,
-                    /* justify */ justify,
+                    /* anchor */ layout.evaluate<TextAnchor>(zoom, feature),
+                    /* justify */ layout.evaluate<TextJustify>(zoom, feature),
                     /* spacing: ems */ util::i18n::allowsLetterSpacing(*feature.text) ? layout.get<TextLetterSpacing>() * oneEm : 0.0f,
                     /* translate */ Point<float>(layout.evaluate<TextOffset>(zoom, feature)[0] * oneEm, layout.evaluate<TextOffset>(zoom, feature)[1] * oneEm),
                     /* verticalHeight */ oneEm,

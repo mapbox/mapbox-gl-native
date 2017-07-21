@@ -2,6 +2,7 @@
 
 #include <mbgl/text/glyph.hpp>
 #include <mbgl/renderer/image_atlas.hpp>
+#include <mbgl/style/types.hpp>
 
 namespace mbgl {
 
@@ -44,9 +45,8 @@ public:
 const Shaping getShaping(const std::u16string& string,
                          float maxWidth,
                          float lineHeight,
-                         float horizontalAlign,
-                         float verticalAlign,
-                         float justify,
+                         style::TextAnchorType textAnchor,
+                         style::TextJustifyType textJustify,
                          float spacing,
                          const Point<float>& translate,
                          float verticalHeight,

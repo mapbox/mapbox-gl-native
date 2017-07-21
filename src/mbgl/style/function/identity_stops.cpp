@@ -36,8 +36,26 @@ optional<TextTransformType> IdentityStops<TextTransformType>::evaluate(const Val
     if (!value.is<std::string>()) {
         return {};
     }
-    
+
     return Enum<TextTransformType>::toEnum(value.get<std::string>());
+}
+
+template <>
+optional<TextJustifyType> IdentityStops<TextJustifyType>::evaluate(const Value& value) const {
+    if (!value.is<std::string>()) {
+        return {};
+    }
+
+    return Enum<TextJustifyType>::toEnum(value.get<std::string>());
+}
+
+template <>
+optional<TextAnchorType> IdentityStops<TextAnchorType>::evaluate(const Value& value) const {
+    if (!value.is<std::string>()) {
+        return {};
+    }
+
+    return Enum<TextAnchorType>::toEnum(value.get<std::string>());
 }
 
 template <>
