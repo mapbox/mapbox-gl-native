@@ -41,6 +41,15 @@ optional<TextTransformType> IdentityStops<TextTransformType>::evaluate(const Val
 }
 
 template <>
+optional<LineJoinType> IdentityStops<LineJoinType>::evaluate(const Value& value) const {
+    if (!value.is<std::string>()) {
+        return {};
+    }
+
+    return Enum<LineJoinType>::toEnum(value.get<std::string>());
+}
+
+template <>
 optional<std::array<float, 2>> IdentityStops<std::array<float, 2>>::evaluate(const Value& value) const {
     if (!value.is<std::vector<Value>>()) {
         return {};

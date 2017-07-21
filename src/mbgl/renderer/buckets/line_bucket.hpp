@@ -41,7 +41,7 @@ public:
     std::map<std::string, LineProgram::PaintPropertyBinders> paintPropertyBinders;
 
 private:
-    void addGeometry(const GeometryCoordinates&, FeatureType);
+    void addGeometry(const GeometryCoordinates&, const GeometryTileFeature&);
 
     struct TriangleElement {
         TriangleElement(uint16_t a_, uint16_t b_, uint16_t c_) : a(a_), b(b_), c(c_) {}
@@ -59,6 +59,7 @@ private:
     std::ptrdiff_t e3;
 
     const uint32_t overscaling;
+    const float zoom;
 
     float getLineWidth(const RenderLineLayer& layer) const;
 };

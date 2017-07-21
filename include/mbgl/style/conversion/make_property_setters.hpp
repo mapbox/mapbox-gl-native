@@ -26,7 +26,7 @@ auto makeLayoutPropertySetters() {
 
 
     result["line-cap"] = &setProperty<V, LineLayer, PropertyValue<LineCapType>, &LineLayer::setLineCap>;
-    result["line-join"] = &setProperty<V, LineLayer, PropertyValue<LineJoinType>, &LineLayer::setLineJoin>;
+    result["line-join"] = &setProperty<V, LineLayer, DataDrivenPropertyValue<LineJoinType>, &LineLayer::setLineJoin>;
     result["line-miter-limit"] = &setProperty<V, LineLayer, PropertyValue<float>, &LineLayer::setLineMiterLimit>;
     result["line-round-limit"] = &setProperty<V, LineLayer, PropertyValue<float>, &LineLayer::setLineRoundLimit>;
 
