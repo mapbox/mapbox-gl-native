@@ -564,6 +564,13 @@ void Context::setDrawMode(const TriangleStrip&) {
 void Context::setDepthMode(const DepthMode& depth) {
     if (depth.func == DepthMode::Always && !depth.mask) {
         depthTest = false;
+
+        // Workaround for rendering errors on Adreno 2xx GPUs. Depth-related state should
+        // not matter when the depth test is disabled, but on these GPUs it apparently does.
+        // https://github.com/mapbox/mapbox-gl-native/issues/9164
+        depthFunc = depth.func;
+        depthMask = depth.mask;
+        depthRange = depth.range;
     } else {
         depthTest = true;
         depthFunc = depth.func;
