@@ -35,6 +35,27 @@ public:
         }
     }
 
+    template <typename Fn, class... Args>
+    auto ask(Fn fn, Args&&... args) {
+        // Result type is deduced from the function's return type
+        using ResultType = typename std::result_of<decltype(fn)(Object, Args...)>::type;
+
+        std::promise<ResultType> promise;
+        auto future = promise.get_future();
+
+        if (auto mailbox = weakMailbox.lock()) {
+            mailbox->push(
+                    actor::makeMessage(
+                            std::move(promise), *object, fn, std::forward<Args>(args)...
+                    )
+            );
+        } else {
+            promise.set_exception(std::make_exception_ptr(std::runtime_error("Actor has gone away")));
+        }
+
+        return future;
+    }
+
 private:
     Object* object;
     std::weak_ptr<Mailbox> weakMailbox;
