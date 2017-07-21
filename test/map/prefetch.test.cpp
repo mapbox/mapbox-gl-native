@@ -1,18 +1,14 @@
 #include <mbgl/test/util.hpp>
 #include <mbgl/test/stub_file_source.hpp>
 
-#include <mbgl/gl/headless_backend.hpp>
-#include <mbgl/gl/offscreen_view.hpp>
 #include <mbgl/map/map.hpp>
-#include <mbgl/renderer/renderer.hpp>
-#include <mbgl/renderer/backend_scope.hpp>
+#include <mbgl/gl/headless_frontend.hpp>
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/util/default_thread_pool.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/run_loop.hpp>
-#include <mbgl/test/stub_renderer_frontend.hpp>
 
 #include <algorithm>
 #include <string>
@@ -24,14 +20,10 @@ using namespace std::literals::string_literals;
 
 TEST(Map, PrefetchTiles) {
     util::RunLoop runLoop;
-    HeadlessBackend backend;
-    BackendScope scope(backend);
-    OffscreenView view(backend.getContext(), { 512, 512 });
     ThreadPool threadPool(4);
     StubFileSource fileSource;
-    StubRendererFrontend rendererFrontend {
-            std::make_unique<Renderer>(backend, 1, fileSource, threadPool), view };
-    Map map(rendererFrontend, MapObserver::nullObserver(), view.getSize(), 1, fileSource, threadPool, MapMode::Still);
+    HeadlessFrontend frontend { { 512, 512 }, 1, fileSource, threadPool };
+    Map map(frontend, MapObserver::nullObserver(), frontend.getSize(), 1, fileSource, threadPool, MapMode::Still);
 
     std::vector<int> tiles;
 
@@ -65,7 +57,7 @@ TEST(Map, PrefetchTiles) {
         map.setLatLngZoom({ 40.726989, -73.992857 }, zoom); // Manhattan
 
         // Should always render the ideal tiles (i.e. a green map)
-        test::checkImage("test/fixtures/map/prefetch", test::render(map, view));
+        test::checkImage("test/fixtures/map/prefetch", frontend.render(map));
 
         ASSERT_TRUE(std::is_permutation(tiles.begin(), tiles.end(), expected.begin()));
         ASSERT_FALSE(tiles.empty());

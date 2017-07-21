@@ -3,7 +3,6 @@
 #include <mbgl/gl/gl.hpp>
 #include <mbgl/gl/context.hpp>
 #include <mbgl/gl/headless_backend.hpp>
-#include <mbgl/gl/offscreen_view.hpp>
 #include <mbgl/renderer/backend_scope.hpp>
 
 #include <mbgl/util/offscreen_texture.hpp>
@@ -11,20 +10,19 @@
 using namespace mbgl;
 
 TEST(OffscreenTexture, EmptyRed) {
-    HeadlessBackend backend;
+    HeadlessBackend backend({ 512, 256 });
     BackendScope scope { backend };
-    OffscreenView view(backend.getContext(), { 512, 256 });
 
-    // Scissor test shouldn't leak after OffscreenView::bind().
+    // Scissor test shouldn't leak after HeadlessBackend::bind().
     MBGL_CHECK_ERROR(glScissor(64, 64, 128, 128));
     backend.getContext().scissorTest.setCurrentValue(true);
 
-    view.bind();
+    backend.bind();
 
     MBGL_CHECK_ERROR(glClearColor(1.0f, 0.0f, 0.0f, 1.0f));
     MBGL_CHECK_ERROR(glClear(GL_COLOR_BUFFER_BIT));
 
-    auto image = view.readStillImage();
+    auto image = backend.readStillImage();
     test::checkImage("test/fixtures/offscreen_texture/empty-red", image, 0, 0);
 }
 
@@ -74,7 +72,7 @@ struct Buffer {
 
 
 TEST(OffscreenTexture, RenderToTexture) {
-    HeadlessBackend backend;
+    HeadlessBackend backend({ 512, 256 });
     BackendScope scope { backend };
     auto& context = backend.getContext();
 
@@ -124,8 +122,7 @@ void main() {
     Buffer triangleBuffer({ 0, 0.5, 0.5, -0.5, -0.5, -0.5 });
     Buffer viewportBuffer({ -1, -1, 1, -1, -1, 1, 1, 1 });
 
-    OffscreenView view(context, { 512, 256 });
-    view.bind();
+    backend.bind();
 
     // First, draw red to the bound FBO.
     context.clear(Color::red(), {}, {});
@@ -153,9 +150,9 @@ void main() {
     test::checkImage("test/fixtures/offscreen_texture/render-to-texture", image, 0, 0);
 
     // Now reset the FBO back to normal and retrieve the original (restored) framebuffer.
-    view.bind();
+    backend.bind();
 
-    image = view.readStillImage();
+    image = backend.readStillImage();
     test::checkImage("test/fixtures/offscreen_texture/render-to-fbo", image, 0, 0);
 
     // Now, composite the Framebuffer texture we've rendered to onto the main FBO.
@@ -168,6 +165,6 @@ void main() {
         glVertexAttribPointer(compositeShader.a_pos, 2, GL_FLOAT, GL_FALSE, 0, nullptr));
     MBGL_CHECK_ERROR(glDrawArrays(GL_TRIANGLE_STRIP, 0, 4));
 
-    image = view.readStillImage();
+    image = backend.readStillImage();
     test::checkImage("test/fixtures/offscreen_texture/render-to-fbo-composited", image, 0, 0.1);
 }

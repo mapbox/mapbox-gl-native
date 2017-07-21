@@ -308,10 +308,10 @@ macro(mbgl_platform_test)
         platform/android/src/test/main.jni.cpp
 
         # Headless view
+        platform/default/mbgl/gl/headless_frontend.cpp
+        platform/default/mbgl/gl/headless_frontend.hpp
         platform/default/mbgl/gl/headless_backend.cpp
         platform/default/mbgl/gl/headless_backend.hpp
-        platform/default/mbgl/gl/offscreen_view.cpp
-        platform/default/mbgl/gl/offscreen_view.hpp
 
         platform/linux/src/headless_backend_egl.cpp
         platform/linux/src/headless_display_egl.cpp

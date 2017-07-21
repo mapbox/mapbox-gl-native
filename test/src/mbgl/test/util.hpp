@@ -54,11 +54,6 @@
 #include <gtest/gtest.h>
 
 namespace mbgl {
-
-class Map;
-class OffscreenView;
-class HeadlessDisplay;
-
 namespace test {
 
 class Server {
@@ -69,8 +64,6 @@ public:
 private:
     int fd = -1;
 };
-
-PremultipliedImage render(Map&, OffscreenView&);
 
 void checkImage(const std::string& base,
                 const PremultipliedImage& actual,

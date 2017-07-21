@@ -6,14 +6,11 @@
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/image.hpp>
 #include <mbgl/map/map.hpp>
-#include <mbgl/renderer/backend_scope.hpp>
-#include <mbgl/gl/headless_backend.hpp>
-#include <mbgl/gl/offscreen_view.hpp>
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/color.hpp>
 #include <mbgl/renderer/renderer.hpp>
-#include <mbgl/test/stub_renderer_frontend.hpp>
+#include <mbgl/gl/headless_frontend.hpp>
 
 using namespace mbgl;
 
@@ -30,19 +27,16 @@ std::unique_ptr<style::Image> namedMarker(const std::string& name) {
 class AnnotationTest {
 public:
     util::RunLoop loop;
-    HeadlessBackend backend;
-    BackendScope scope { backend };
-    OffscreenView view { backend.getContext() };
     StubFileSource fileSource;
     ThreadPool threadPool { 4 };
     float pixelRatio { 1 };
-    StubRendererFrontend rendererFrontend { std::make_unique<Renderer>(backend, pixelRatio, fileSource, threadPool), view };
-    Map map { rendererFrontend, MapObserver::nullObserver(), view.getSize(), pixelRatio, fileSource,
+    HeadlessFrontend frontend { pixelRatio, fileSource, threadPool };
+    Map map { frontend, MapObserver::nullObserver(), frontend.getSize(), pixelRatio, fileSource,
               threadPool, MapMode::Still };
 
     void checkRendering(const char * name) {
         test::checkImage(std::string("test/fixtures/annotations/") + name,
-                         test::render(map, view), 0.0002, 0.1);
+                         frontend.render(map), 0.0002, 0.1);
     }
 };
 
@@ -160,7 +154,7 @@ TEST(Annotations, AddMultiple) {
     test.map.addAnnotationImage(namedMarker("default_marker"));
     test.map.addAnnotation(SymbolAnnotation { Point<double> { -10, 0 }, "default_marker" });
 
-    test::render(test.map, test.view);
+    test.frontend.render(test.map);
 
     test.map.addAnnotation(SymbolAnnotation { Point<double> { 10, 0 }, "default_marker" });
     test.checkRendering("add_multiple");
@@ -170,7 +164,7 @@ TEST(Annotations, NonImmediateAdd) {
     AnnotationTest test;
 
     test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
-    test::render(test.map, test.view);
+    test.frontend.render(test.map);
 
     Polygon<double> polygon = { {{ { 0, 0 }, { 0, 45 }, { 45, 45 }, { 45, 0 } }} };
     FillAnnotation annotation { polygon };
@@ -188,7 +182,7 @@ TEST(Annotations, UpdateSymbolAnnotationGeometry) {
     test.map.addAnnotationImage(namedMarker("flipped_marker"));
     AnnotationID point = test.map.addAnnotation(SymbolAnnotation { Point<double> { 0, 0 }, "default_marker" });
 
-    test::render(test.map, test.view);
+    test.frontend.render(test.map);
 
     test.map.updateAnnotation(point, SymbolAnnotation { Point<double> { -10, 0 }, "default_marker" });
     test.checkRendering("update_point");
@@ -202,7 +196,7 @@ TEST(Annotations, UpdateSymbolAnnotationIcon) {
     test.map.addAnnotationImage(namedMarker("flipped_marker"));
     AnnotationID point = test.map.addAnnotation(SymbolAnnotation { Point<double> { 0, 0 }, "default_marker" });
 
-    test::render(test.map, test.view);
+    test.frontend.render(test.map);
 
     test.map.updateAnnotation(point, SymbolAnnotation { Point<double> { 0, 0 }, "flipped_marker" });
     test.checkRendering("update_icon");
@@ -218,7 +212,7 @@ TEST(Annotations, UpdateLineAnnotationGeometry) {
     test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
     AnnotationID line = test.map.addAnnotation(annotation);
 
-    test::render(test.map, test.view);
+    test.frontend.render(test.map);
 
     annotation.geometry = LineString<double> {{ { 0, 0 }, { -45, -45 } }};
     test.map.updateAnnotation(line, annotation);
@@ -235,7 +229,7 @@ TEST(Annotations, UpdateLineAnnotationStyle) {
     test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
     AnnotationID line = test.map.addAnnotation(annotation);
 
-    test::render(test.map, test.view);
+    test.frontend.render(test.map);
 
     annotation.color = Color::green();
     annotation.width = { 2 };
@@ -252,7 +246,7 @@ TEST(Annotations, UpdateFillAnnotationGeometry) {
     test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
     AnnotationID fill = test.map.addAnnotation(annotation);
 
-    test::render(test.map, test.view);
+    test.frontend.render(test.map);
 
     annotation.geometry = Polygon<double> { {{ { 0, 0 }, { 0, 45 }, { 45, 0 } }} };
     test.map.updateAnnotation(fill, annotation);
@@ -269,7 +263,7 @@ TEST(Annotations, UpdateFillAnnotationStyle) {
     test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
     AnnotationID fill = test.map.addAnnotation(annotation);
 
-    test::render(test.map, test.view);
+    test.frontend.render(test.map);
 
     annotation.color = Color::green();
     test.map.updateAnnotation(fill, annotation);
@@ -283,7 +277,7 @@ TEST(Annotations, RemovePoint) {
     test.map.addAnnotationImage(namedMarker("default_marker"));
     AnnotationID point = test.map.addAnnotation(SymbolAnnotation { Point<double> { 0, 0 }, "default_marker" });
 
-    test::render(test.map, test.view);
+    test.frontend.render(test.map);
 
     test.map.removeAnnotation(point);
     test.checkRendering("remove_point");
@@ -300,7 +294,7 @@ TEST(Annotations, RemoveShape) {
     test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
     AnnotationID shape = test.map.addAnnotation(annotation);
 
-    test::render(test.map, test.view);
+    test.frontend.render(test.map);
 
     test.map.removeAnnotation(shape);
     test.checkRendering("remove_shape");
@@ -312,7 +306,7 @@ TEST(Annotations, ImmediateRemoveShape) {
     test.map.removeAnnotation(test.map.addAnnotation(LineAnnotation { LineString<double>() }));
     test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
 
-    test::render(test.map, test.view);
+    test.frontend.render(test.map);
 }
 
 TEST(Annotations, SwitchStyle) {
@@ -322,7 +316,7 @@ TEST(Annotations, SwitchStyle) {
     test.map.addAnnotationImage(namedMarker("default_marker"));
     test.map.addAnnotation(SymbolAnnotation { Point<double> { 0, 0 }, "default_marker" });
 
-    test::render(test.map, test.view);
+    test.frontend.render(test.map);
 
     test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
     test.checkRendering("switch_style");
@@ -335,7 +329,7 @@ TEST(Annotations, ReaddImage) {
     test.map.addAnnotationImage(namedMarker("default_marker"));
     test.map.addAnnotation(SymbolAnnotation { Point<double> { 0, 0 }, "default_marker" });
 
-    test::render(test.map, test.view);
+    test.frontend.render(test.map);
 
     test.map.addAnnotationImage(std::make_unique<style::Image>("default_marker", namedImage("flipped_marker"), 1.0));
     test.checkRendering("readd_image");
@@ -349,14 +343,14 @@ TEST(Annotations, QueryRenderedFeatures) {
     test.map.addAnnotation(SymbolAnnotation { Point<double> { 0, 0 }, "default_marker" });
     test.map.addAnnotation(SymbolAnnotation { Point<double> { 0, 50 }, "default_marker" });
 
-    test::render(test.map, test.view);
+    test.frontend.render(test.map);
 
-    auto features = test.rendererFrontend.getRenderer()->queryRenderedFeatures(test.map.pixelForLatLng({ 0, 0 }));
+    auto features = test.frontend.getRenderer()->queryRenderedFeatures(test.map.pixelForLatLng({ 0, 0 }));
     EXPECT_EQ(features.size(), 1u);
     EXPECT_TRUE(!!features[0].id);
     EXPECT_EQ(*features[0].id, uint64_t(0));
 
-    auto features2 = test.rendererFrontend.getRenderer()->queryRenderedFeatures(test.map.pixelForLatLng({ 50, 0 }));
+    auto features2 = test.frontend.getRenderer()->queryRenderedFeatures(test.map.pixelForLatLng({ 50, 0 }));
     EXPECT_EQ(features2.size(), 1u);
     EXPECT_TRUE(!!features2[0].id);
     EXPECT_EQ(*features2[0].id, uint64_t(1));
@@ -365,7 +359,7 @@ TEST(Annotations, QueryRenderedFeatures) {
 TEST(Annotations, QueryFractionalZoomLevels) {
     AnnotationTest test;
 
-    auto viewSize = test.view.getSize();
+    auto viewSize = test.frontend.getSize();
     auto box = ScreenBox { {}, { double(viewSize.width), double(viewSize.height) } };
 
     test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
@@ -381,8 +375,8 @@ TEST(Annotations, QueryFractionalZoomLevels) {
     test.map.setLatLngZoom({ 5, 5 }, 0);
     for (uint16_t zoomSteps = 10; zoomSteps <= 20; ++zoomSteps) {
         test.map.setZoom(zoomSteps / 10.0);
-        test::render(test.map, test.view);
-        auto features = test.rendererFrontend.getRenderer()->queryRenderedFeatures(box);
+        test.frontend.render(test.map);
+        auto features = test.frontend.getRenderer()->queryRenderedFeatures(box);
 
         // Filter out repeated features.
         // See 'edge-cases/null-island' query-test for reference.
@@ -397,7 +391,7 @@ TEST(Annotations, QueryFractionalZoomLevels) {
 TEST(Annotations, VisibleFeatures) {
     AnnotationTest test;
 
-    auto viewSize = test.view.getSize();
+    auto viewSize = test.frontend.getSize();
     auto box = ScreenBox { {}, { double(viewSize.width), double(viewSize.height) } };
 
     test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
@@ -413,9 +407,9 @@ TEST(Annotations, VisibleFeatures) {
 
     // Change bearing *after* adding annotations causes them to be reordered.
     test.map.setBearing(45);
-    test::render(test.map, test.view);
+    test.frontend.render(test.map);
 
-    auto features = test.rendererFrontend.getRenderer()->queryRenderedFeatures(box, {});
+    auto features = test.frontend.getRenderer()->queryRenderedFeatures(box, {});
     auto sortID = [](const Feature& lhs, const Feature& rhs) { return lhs.id < rhs.id; };
     auto sameID = [](const Feature& lhs, const Feature& rhs) { return lhs.id == rhs.id; };
     std::sort(features.begin(), features.end(), sortID);
@@ -424,8 +418,8 @@ TEST(Annotations, VisibleFeatures) {
 
     test.map.setBearing(0);
     test.map.setZoom(4);
-    test::render(test.map, test.view);
-    features = test.rendererFrontend.getRenderer()->queryRenderedFeatures(box);
+    test.frontend.render(test.map);
+    features = test.frontend.getRenderer()->queryRenderedFeatures(box);
     std::sort(features.begin(), features.end(), sortID);
     features.erase(std::unique(features.begin(), features.end(), sameID), features.end());
     EXPECT_EQ(features.size(), ids.size());

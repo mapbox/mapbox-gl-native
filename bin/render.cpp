@@ -2,14 +2,10 @@
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/run_loop.hpp>
 
-#include <mbgl/gl/headless_backend.hpp>
-#include <mbgl/gl/offscreen_view.hpp>
+#include <mbgl/gl/headless_frontend.hpp>
 #include <mbgl/util/default_thread_pool.hpp>
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/style/style.hpp>
-#include <mbgl/renderer/renderer.hpp>
-#include <mbgl/renderer/backend_scope.hpp>
-#include <mbgl/renderer/async_renderer_frontend.hpp>
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunknown-pragmas"
@@ -85,13 +81,9 @@ int main(int argc, char *argv[]) {
         fileSource.setAccessToken(std::string(token));
     }
 
-    HeadlessBackend backend;
-    BackendScope scope { backend };
-    OffscreenView view(backend.getContext(), { static_cast<uint32_t>(width * pixelRatio),
-                                               static_cast<uint32_t>(height * pixelRatio) });
     ThreadPool threadPool(4);
-    AsyncRendererFrontend rendererFrontend(std::make_unique<Renderer>(backend, pixelRatio, fileSource, threadPool), backend, view);
-    Map map(rendererFrontend, MapObserver::nullObserver(), mbgl::Size { width, height }, pixelRatio, fileSource, threadPool, MapMode::Still);
+    HeadlessFrontend frontend({ width, height }, pixelRatio, fileSource, threadPool);
+    Map map(frontend, MapObserver::nullObserver(), frontend.getSize(), pixelRatio, fileSource, threadPool, MapMode::Still);
 
     if (style_path.find("://") == std::string::npos) {
         style_path = std::string("file://") + style_path;
@@ -106,23 +98,14 @@ int main(int argc, char *argv[]) {
         map.setDebug(debug ? mbgl::MapDebugOptions::TileBorders | mbgl::MapDebugOptions::ParseStatus : mbgl::MapDebugOptions::NoDebug);
     }
 
-    map.renderStill([&](std::exception_ptr error) {
-        try {
-            if (error) {
-                std::rethrow_exception(error);
-            }
-        } catch(std::exception& e) {
-            std::cout << "Error: " << e.what() << std::endl;
-            exit(1);
-        }
-
+    try {
         std::ofstream out(output, std::ios::binary);
-        out << encodePNG(view.readStillImage());
+        out << encodePNG(frontend.render(map));
         out.close();
-        loop.stop();
-    });
-
-    loop.run();
+    } catch(std::exception& e) {
+        std::cout << "Error: " << e.what() << std::endl;
+        exit(1);
+    }
 
     return 0;
 }
