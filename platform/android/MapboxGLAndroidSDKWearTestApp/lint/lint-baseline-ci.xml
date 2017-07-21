@@ -1,0 +1,823 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- REMEMBER! First you run Lint locally you'll need to move the lint-baseline.xml file
+    generated into the lint folder and called it lint-baseline-local.xml
+    If you remove any error when running Lint locally, you'll get a warning from the command
+    line advising you to remove it from the baseline. If you remove it (remember to remove it
+    from lint-baseline-local.xml file) you should remove it too from
+    lint-baseline-ci.xml (THIS FILE) which is the only one included in the repo.
+    Eventually, it'll be removed (when we remove all current lint errors included). -->
+<issues format="4" by="lint 2.3.1">
+
+    <issue
+        id="MissingPermission"
+        message="Call requires permission which may be rejected by user: code should explicitly check to see if permission is available (with `checkPermission`) or explicitly handle a potential `SecurityException`"
+        errorLine1="        Location lastKnownLocation = locationEngine.getLastLocation();"
+        errorLine2="                                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/maps/widgets/MyLocationView.java"
+            line="783"
+            column="38"/>
+    </issue>
+
+    <issue
+        id="MissingPermission"
+        message="Call requires permission which may be rejected by user: code should explicitly check to see if permission is available (with `checkPermission`) or explicitly handle a potential `SecurityException`"
+        errorLine1="        locationEngine.requestLocationUpdates();"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/maps/widgets/MyLocationView.java"
+            line="787"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="GradleCompatible"
+        message="All com.android.support libraries must use the exact same version specification (mixing versions can lead to runtime crashes). Found versions 25.3.1, 23.0.1. Examples include `com.android.support:animated-vector-drawable:25.3.1` and `com.android.support:percent:23.0.1`">
+        <location
+            file="build.gradle"/>
+    </issue>
+
+    <issue
+        id="DefaultLocale"
+        message="Implicitly using the default locale is a common source of bugs: Use `String.format(Locale, ...)` instead"
+        errorLine1="      Timber.v(String.format(&quot;[HTTP] Request was successful (code = %d).&quot;, response.code()));"
+        errorLine2="               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/http/HTTPRequest.java"
+            line="112"
+            column="16"/>
+    </issue>
+
+    <issue
+        id="DefaultLocale"
+        message="Implicitly using the default locale is a common source of bugs: Use `String.format(Locale, ...)` instead"
+        errorLine1="      Timber.d(String.format("
+        errorLine2="               ^">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/http/HTTPRequest.java"
+            line="116"
+            column="16"/>
+    </issue>
+
+    <issue
+        id="TimberArgCount"
+        message="Wrong argument count, format string `Failed to read the package metadata: ` requires `0` but format call supplies `1`"
+        errorLine1="      Timber.e(&quot;Failed to read the package metadata: &quot;, exception);"
+        errorLine2="      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/storage/FileSource.java"
+            line="75"
+            column="7"/>
+    </issue>
+
+    <issue
+        id="TimberArgCount"
+        message="Wrong argument count, format string `Failed to read the storage key: ` requires `0` but format call supplies `1`"
+        errorLine1="      Timber.e(&quot;Failed to read the storage key: &quot;, exception);"
+        errorLine2="      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/storage/FileSource.java"
+            line="77"
+            column="7"/>
+    </issue>
+
+    <issue
+        id="TimberArgCount"
+        message="Wrong argument count, format string `Failed to obtain the external storage path: ` requires `0` but format call supplies `1`"
+        errorLine1="        Timber.e(&quot;Failed to obtain the external storage path: &quot;, exception);"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/storage/FileSource.java"
+            line="86"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="TimberArgCount"
+        message="Wrong argument count, format string `Failed to delete old ambient cache database: ` requires `0` but format call supplies `1`"
+        errorLine1="          Timber.e(&quot;Failed to delete old ambient cache database: &quot;, exception);"
+        errorLine2="          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/offline/OfflineManager.java"
+            line="113"
+            column="11"/>
+    </issue>
+
+    <issue
+        id="BinaryOperationInTimber"
+        message="Replace String concatenation with Timber&apos;s string formatting"
+        errorLine1="    Timber.v(&quot;Connected: &quot; + connected);"
+        errorLine2="             ~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/net/ConnectivityReceiver.java"
+            line="85"
+            column="14"/>
+    </issue>
+
+    <issue
+        id="BinaryOperationInTimber"
+        message="Replace String concatenation with Timber&apos;s string formatting"
+        errorLine1="      Timber.e(&quot;Device returned an out of range width size, &quot;"
+        errorLine2="               ^">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/maps/NativeMapView.java"
+            line="178"
+            column="16"/>
+    </issue>
+
+    <issue
+        id="BinaryOperationInTimber"
+        message="Replace String concatenation with Timber&apos;s string formatting"
+        errorLine1="      Timber.e(&quot;Device returned an out of range height size, &quot;"
+        errorLine2="               ^">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/maps/NativeMapView.java"
+            line="185"
+            column="16"/>
+    </issue>
+
+    <issue
+        id="BinaryOperationInTimber"
+        message="Replace String concatenation with Timber&apos;s string formatting"
+        errorLine1="            Timber.d(&quot;Old ambient cache database deleted to save space: &quot; + path);"
+        errorLine2="                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/offline/OfflineManager.java"
+            line="110"
+            column="22"/>
+    </issue>
+
+    <issue
+        id="BinaryOperationInTimber"
+        message="Replace String concatenation with Timber&apos;s string formatting"
+        errorLine1="      Timber.e(&quot;Not setting minZoomPreference, value is in unsupported range: &quot; + minZoom);"
+        errorLine2="               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/maps/Transform.java"
+            line="349"
+            column="16"/>
+    </issue>
+
+    <issue
+        id="BinaryOperationInTimber"
+        message="Replace String concatenation with Timber&apos;s string formatting"
+        errorLine1="      Timber.e(&quot;Not setting maxZoomPreference, value is in unsupported range: &quot; + maxZoom);"
+        errorLine2="               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/maps/Transform.java"
+            line="361"
+            column="16"/>
+    </issue>
+
+    <issue
+        id="StringFormatInTimber"
+        message="Using &apos;String#format&apos; inside of &apos;Timber&apos;"
+        errorLine1="      Timber.e(String.format(&quot;Stops: %s is a different type: %s&quot;, stops.getClass(), exception));"
+        errorLine2="               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/style/functions/Function.java"
+            line="282"
+            column="16"/>
+    </issue>
+
+    <issue
+        id="StringFormatInTimber"
+        message="Using &apos;String#format&apos; inside of &apos;Timber&apos;"
+        errorLine1="      Timber.v(String.format(&quot;[HTTP] Request was successful (code = %d).&quot;, response.code()));"
+        errorLine2="               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/http/HTTPRequest.java"
+            line="112"
+            column="16"/>
+    </issue>
+
+    <issue
+        id="StringFormatInTimber"
+        message="Using &apos;String#format&apos; inside of &apos;Timber&apos;"
+        errorLine1="      Timber.d(String.format("
+        errorLine2="               ^">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/http/HTTPRequest.java"
+            line="116"
+            column="16"/>
+    </issue>
+
+    <issue
+        id="StringFormatInTimber"
+        message="Using &apos;String#format&apos; inside of &apos;Timber&apos;"
+        errorLine1="      Timber.d(String.format(MapboxConstants.MAPBOX_LOCALE,"
+        errorLine2="               ^">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/http/HTTPRequest.java"
+            line="163"
+            column="16"/>
+    </issue>
+
+    <issue
+        id="StringFormatInTimber"
+        message="Using &apos;String#format&apos; inside of &apos;Timber&apos;"
+        errorLine1="      Timber.i(String.format(MapboxConstants.MAPBOX_LOCALE,"
+        errorLine2="               ^">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/http/HTTPRequest.java"
+            line="166"
+            column="16"/>
+    </issue>
+
+    <issue
+        id="StringFormatInTimber"
+        message="Using &apos;String#format&apos; inside of &apos;Timber&apos;"
+        errorLine1="      Timber.w(String.format(MapboxConstants.MAPBOX_LOCALE,"
+        errorLine2="               ^">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/http/HTTPRequest.java"
+            line="170"
+            column="16"/>
+    </issue>
+
+    <issue
+        id="StringFormatInTimber"
+        message="Using &apos;String#format&apos; inside of &apos;Timber&apos;"
+        errorLine1="      Timber.e(String.format(&quot;Layer: %s is a different type: %s&quot;, layerId, exception));"
+        errorLine2="               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/maps/MapboxMap.java"
+            line="286"
+            column="16"/>
+    </issue>
+
+    <issue
+        id="StringFormatInTimber"
+        message="Using &apos;String#format&apos; inside of &apos;Timber&apos;"
+        errorLine1="      Timber.e(String.format(&quot;Source: %s is a different type: %s&quot;, sourceId, exception));"
+        errorLine2="               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/maps/MapboxMap.java"
+            line="407"
+            column="16"/>
+    </issue>
+
+    <issue
+        id="StringFormatInTimber"
+        message="Using &apos;String#format&apos; inside of &apos;Timber&apos;"
+        errorLine1="      Timber.e(String.format(MapboxConstants.MAPBOX_LOCALE,"
+        errorLine2="               ^">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/maps/NativeMapView.java"
+            line="92"
+            column="16"/>
+    </issue>
+
+    <issue
+        id="ThrowableNotAtBeginning"
+        message="Throwable should be first argument"
+        errorLine1="      Timber.e(&quot;Failed to read the package metadata: &quot;, exception);"
+        errorLine2="      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/storage/FileSource.java"
+            line="75"
+            column="7"/>
+    </issue>
+
+    <issue
+        id="ThrowableNotAtBeginning"
+        message="Throwable should be first argument"
+        errorLine1="      Timber.e(&quot;Failed to read the storage key: &quot;, exception);"
+        errorLine2="      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/storage/FileSource.java"
+            line="77"
+            column="7"/>
+    </issue>
+
+    <issue
+        id="ThrowableNotAtBeginning"
+        message="Throwable should be first argument"
+        errorLine1="        Timber.e(&quot;Failed to obtain the external storage path: &quot;, exception);"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/storage/FileSource.java"
+            line="86"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="ThrowableNotAtBeginning"
+        message="Throwable should be first argument"
+        errorLine1="          Timber.e(&quot;Failed to delete old ambient cache database: &quot;, exception);"
+        errorLine2="          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/offline/OfflineManager.java"
+            line="113"
+            column="11"/>
+    </issue>
+
+    <issue
+        id="AllowBackup"
+        message="On SDK version 23 and up, your app data will be automatically backed up and restored on app install. Consider adding the attribute `android:fullBackupContent` to specify an `@xml` resource which configures which files to backup. More info: https://developer.android.com/training/backup/autosyncapi.html"
+        errorLine1="    &lt;application"
+        errorLine2="    ^">
+        <location
+            file="src/main/AndroidManifest.xml"
+            line="14"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="StaticFieldLeak"
+        message="Do not place Android context classes in static fields (static reference to `ConnectivityReceiver` which has field `context` pointing to `Context`); this is a memory leak (and also breaks Instant Run)"
+        errorLine1="  private static ConnectivityReceiver INSTANCE;"
+        errorLine2="  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/net/ConnectivityReceiver.java"
+            line="24"
+            column="3"/>
+    </issue>
+
+    <issue
+        id="StaticFieldLeak"
+        message="Do not place Android context classes in static fields (static reference to `IconFactory` which has field `context` pointing to `Context`); this is a memory leak (and also breaks Instant Run)"
+        errorLine1="  private static IconFactory instance;"
+        errorLine2="  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/annotations/IconFactory.java"
+            line="38"
+            column="3"/>
+    </issue>
+
+    <issue
+        id="StaticFieldLeak"
+        message="Do not place Android context classes in static fields (static reference to `Mapbox` which has field `context` pointing to `Context`); this is a memory leak (and also breaks Instant Run)"
+        errorLine1="  private static Mapbox INSTANCE;"
+        errorLine2="  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/Mapbox.java"
+            line="29"
+            column="3"/>
+    </issue>
+
+    <issue
+        id="StaticFieldLeak"
+        message="Do not place Android context classes in static fields (static reference to `OfflineManager` which has field `context` pointing to `Context`); this is a memory leak (and also breaks Instant Run)"
+        errorLine1="  // This object is implemented as a singleton"
+        errorLine2="  ^">
+        <location
+            file="src/main/java/com/mapbox/mapboxsdk/offline/OfflineManager.java"
+            line="42"
+            column="3"/>
+    </issue>
+
+    <issue
+        id="MergeRootFrame"
+        message="This `&lt;FrameLayout>` can be replaced with a `&lt;merge>` tag"
+        errorLine1="&lt;FrameLayout"
+        errorLine2="^">
+        <location
+            file="src/main/res/layout/activity_simple_mapview.xml"
+            line="2"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.color.colorPrimary` appears to be unused"
+        errorLine1="    &lt;color name=&quot;colorPrimary&quot;>@color/mapboxBlue&lt;/color>"
+        errorLine2="           ~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/colors.xml"
+            line="5"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.color.colorPrimaryDark` appears to be unused"
+        errorLine1="    &lt;color name=&quot;colorPrimaryDark&quot;>@color/mapboxBlueDark&lt;/color>"
+        errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/colors.xml"
+            line="6"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.color.mapbox_my_location_ring` appears to be unused"
+        errorLine1="    &lt;color name=&quot;mapbox_my_location_ring&quot;>@color/mapbox_blue&lt;/color>"
+        errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/src/platform/android/MapboxGLAndroidSDK/src/main/res/values/colors.xml"
+            line="6"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.color.colorAccent` appears to be unused"
+        errorLine1="    &lt;color name=&quot;colorAccent&quot;>@color/mapboxRed&lt;/color>"
+        errorLine2="           ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/colors.xml"
+            line="7"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.color.materialGrey` appears to be unused"
+        errorLine1="    &lt;color name=&quot;materialGrey&quot;>#F5F5F5&lt;/color>"
+        errorLine2="           ~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/colors.xml"
+            line="9"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.color.materialDarkGrey` appears to be unused"
+        errorLine1="    &lt;color name=&quot;materialDarkGrey&quot;>#DFDFDF&lt;/color>"
+        errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/colors.xml"
+            line="10"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.color.mapboxCyan` appears to be unused"
+        errorLine1="    &lt;color name=&quot;mapboxCyan&quot;>#3BB2D0&lt;/color>"
+        errorLine2="           ~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/colors.xml"
+            line="13"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.color.mapboxGreen` appears to be unused"
+        errorLine1="    &lt;color name=&quot;mapboxGreen&quot;>#56B881&lt;/color>"
+        errorLine2="           ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/colors.xml"
+            line="14"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.color.mapboxBlue` appears to be unused"
+        errorLine1="    &lt;color name=&quot;mapboxBlue&quot;>#3887BE&lt;/color>"
+        errorLine2="           ~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/colors.xml"
+            line="15"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.color.mapboxBlueDark` appears to be unused"
+        errorLine1="    &lt;color name=&quot;mapboxBlueDark&quot;>#1F6EA5&lt;/color>"
+        errorLine2="           ~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/colors.xml"
+            line="16"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.color.mapboxPurple` appears to be unused"
+        errorLine1="    &lt;color name=&quot;mapboxPurple&quot;>#8A8ACB&lt;/color>"
+        errorLine2="           ~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/colors.xml"
+            line="17"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.color.mapboxPurpleDark` appears to be unused"
+        errorLine1="    &lt;color name=&quot;mapboxPurpleDark&quot;>#7171b2&lt;/color>"
+        errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/colors.xml"
+            line="18"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.color.mapboxPurpleLight` appears to be unused"
+        errorLine1="    &lt;color name=&quot;mapboxPurpleLight&quot;>#A4A4E5&lt;/color>"
+        errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/colors.xml"
+            line="19"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.color.mapboxDenim` appears to be unused"
+        errorLine1="    &lt;color name=&quot;mapboxDenim&quot;>#50667F&lt;/color>"
+        errorLine2="           ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/colors.xml"
+            line="21"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.color.mapboxTeal` appears to be unused"
+        errorLine1="    &lt;color name=&quot;mapboxTeal&quot;>#41AFA5&lt;/color>"
+        errorLine2="           ~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/colors.xml"
+            line="22"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.color.mapboxOrange` appears to be unused"
+        errorLine1="    &lt;color name=&quot;mapboxOrange&quot;>#F9886C&lt;/color>"
+        errorLine2="           ~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/colors.xml"
+            line="23"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.color.mapboxRed` appears to be unused"
+        errorLine1="    &lt;color name=&quot;mapboxRed&quot;>#E55E5E&lt;/color>"
+        errorLine2="           ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/colors.xml"
+            line="24"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.color.mapboxPink` appears to be unused"
+        errorLine1="    &lt;color name=&quot;mapboxPink&quot;>#ED6498&lt;/color>"
+        errorLine2="           ~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/colors.xml"
+            line="25"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.color.mapboxYellow` appears to be unused"
+        errorLine1="    &lt;color name=&quot;mapboxYellow&quot;>#f1f075&lt;/color>"
+        errorLine2="           ~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/colors.xml"
+            line="26"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.color.mapboxMustard` appears to be unused"
+        errorLine1="    &lt;color name=&quot;mapboxMustard&quot;>#FBB03B&lt;/color>"
+        errorLine2="           ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/colors.xml"
+            line="27"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.color.mapboxNavy` appears to be unused"
+        errorLine1="    &lt;color name=&quot;mapboxNavy&quot;>#28353D&lt;/color>"
+        errorLine2="           ~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/colors.xml"
+            line="28"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.color.mapboxNavyDark` appears to be unused"
+        errorLine1="    &lt;color name=&quot;mapboxNavyDark&quot;>#222B30&lt;/color>"
+        errorLine2="           ~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/colors.xml"
+            line="29"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.dimen.mapbox_infowindow_offset` appears to be unused"
+        errorLine1="    &lt;dimen name=&quot;mapbox_infowindow_offset&quot;>-2dp&lt;/dimen>"
+        errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/src/platform/android/MapboxGLAndroidSDK/src/main/res/values/dimens.xml"
+            line="5"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.dimen.mapbox_infowindow_line_width` appears to be unused"
+        errorLine1="    &lt;dimen name=&quot;mapbox_infowindow_line_width&quot;>1.5dp&lt;/dimen>"
+        errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/src/platform/android/MapboxGLAndroidSDK/src/main/res/values/dimens.xml"
+            line="6"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.dimen.mapbox_attribution_icon_left_padding` appears to be unused"
+        errorLine1="    &lt;dimen name=&quot;mapbox_attribution_icon_left_padding&quot;>@dimen/mapbox_two_dp&lt;/dimen>"
+        errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/src/platform/android/MapboxGLAndroidSDK/src/main/res/values/dimens.xml"
+            line="7"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.dimen.mapbox_attribution_icon_top_padding` appears to be unused"
+        errorLine1="    &lt;dimen name=&quot;mapbox_attribution_icon_top_padding&quot;>@dimen/mapbox_two_dp&lt;/dimen>"
+        errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/src/platform/android/MapboxGLAndroidSDK/src/main/res/values/dimens.xml"
+            line="8"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.dimen.mapbox_attribution_icon_right_padding` appears to be unused"
+        errorLine1="    &lt;dimen name=&quot;mapbox_attribution_icon_right_padding&quot;>@dimen/mapbox_two_dp&lt;/dimen>"
+        errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/src/platform/android/MapboxGLAndroidSDK/src/main/res/values/dimens.xml"
+            line="9"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.dimen.mapbox_attribution_icon_bottom_padding` appears to be unused"
+        errorLine1="    &lt;dimen name=&quot;mapbox_attribution_icon_bottom_padding&quot;>@dimen/mapbox_two_dp&lt;/dimen>"
+        errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/src/platform/android/MapboxGLAndroidSDK/src/main/res/values/dimens.xml"
+            line="10"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.dimen.mapbox_two_dp` appears to be unused"
+        errorLine1="    &lt;dimen name=&quot;mapbox_two_dp&quot;>2dp&lt;/dimen>"
+        errorLine2="           ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/src/platform/android/MapboxGLAndroidSDK/src/main/res/values/dimens.xml"
+            line="11"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.dimen.mapbox_ten_dp` appears to be unused"
+        errorLine1="    &lt;dimen name=&quot;mapbox_ten_dp&quot;>10dp&lt;/dimen>"
+        errorLine2="           ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/src/platform/android/MapboxGLAndroidSDK/src/main/res/values/dimens.xml"
+            line="14"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.dimen.mapbox_sixteen_dp` appears to be unused"
+        errorLine1="    &lt;dimen name=&quot;mapbox_sixteen_dp&quot;>16dp&lt;/dimen>"
+        errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/src/platform/android/MapboxGLAndroidSDK/src/main/res/values/dimens.xml"
+            line="15"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.mapbox_infowindow_icon_bg` appears to be unused">
+        <location
+            file="/src/platform/android/MapboxGLAndroidSDK/src/main/res/drawable-xxxhdpi/mapbox_infowindow_icon_bg.9.png"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.color.mapbox_material_bg_selector` appears to be unused"
+        errorLine1="&lt;selector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;>"
+        errorLine2="^">
+        <location
+            file="/src/platform/android/MapboxGLAndroidSDK/src/main/res/color/mapbox_material_bg_selector.xml"
+            line="2"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.mapbox_style_outdoors` appears to be unused"
+        errorLine1="    &lt;string name=&quot;mapbox_style_outdoors&quot; translatable=&quot;false&quot;>mapbox://styles/mapbox/outdoors-v10&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/src/platform/android/MapboxGLAndroidSDK/src/main/res/values/strings.xml"
+            line="22"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.mapbox_style_traffic_day` appears to be unused"
+        errorLine1="    &lt;string name=&quot;mapbox_style_traffic_day&quot; translatable=&quot;false&quot;>mapbox://styles/mapbox/traffic-day-v2&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/src/platform/android/MapboxGLAndroidSDK/src/main/res/values/strings.xml"
+            line="27"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.mapbox_style_traffic_night` appears to be unused"
+        errorLine1="    &lt;string name=&quot;mapbox_style_traffic_night&quot; translatable=&quot;false&quot;>mapbox://styles/mapbox/traffic-night-v2&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/src/platform/android/MapboxGLAndroidSDK/src/main/res/values/strings.xml"
+            line="28"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="IconDensities"
+        message="Missing the following drawables in `drawable-hdpi`: mapbox_infowindow_icon_bg.9.png, mapbox_mapview_preview.jpg">
+        <location
+            file="src/main/res/drawable-hdpi"/>
+    </issue>
+
+    <issue
+        id="IconDensities"
+        message="Missing the following drawables in `drawable-mdpi`: mapbox_infowindow_icon_bg.9.png, mapbox_mapview_preview.jpg">
+        <location
+            file="src/main/res/drawable-mdpi"/>
+    </issue>
+
+    <issue
+        id="IconDensities"
+        message="Missing the following drawables in `drawable-xhdpi`: mapbox_infowindow_icon_bg.9.png, mapbox_mapview_preview.jpg">
+        <location
+            file="src/main/res/drawable-xhdpi"/>
+    </issue>
+
+    <issue
+        id="IconDensities"
+        message="Missing the following drawables in `drawable-xxhdpi`: mapbox_infowindow_icon_bg.9.png (found in drawable-xxxhdpi)">
+        <location
+            file="src/main/res/drawable-xxhdpi"/>
+    </issue>
+
+    <issue
+        id="GoogleAppIndexingWarning"
+        message="App is not indexable by Google Search; consider adding at least one Activity with an ACTION-VIEW intent filter. See issue explanation for more details."
+        errorLine1="    &lt;application"
+        errorLine2="    ^">
+        <location
+            file="src/main/AndroidManifest.xml"
+            line="14"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="ContentDescription"
+        message="[Accessibility] Missing `contentDescription` attribute on image"
+        errorLine1="&lt;ImageView xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="src/main/res/layout/mapbox_view_image_marker.xml"
+            line="2"
+            column="1"/>
+    </issue>
+
+</issues>

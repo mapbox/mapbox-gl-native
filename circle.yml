@@ -152,6 +152,7 @@ jobs:
       LIBSYSCONFCPUS: 4
       JOBS: 4
       BUILDTYPE: Debug
+      IS_LOCAL_DEVELOPMENT: false
     steps:
       - checkout
       - *generate-cache-key
@@ -175,6 +176,18 @@ jobs:
       - run:
           name: Check Java code style
           command: make android-checkstyle
+      - run:
+          name: Check Android modules for potential bugs (Lint SDK)
+          command: |
+            make android-lint-sdk
+      - run:
+          name: Check Android modules for potential bugs (Lint Test App)
+          command: |
+            make android-lint-test-app
+      - run:
+          name: Check Android modules for potential bugs (Lint Wear Test App)
+          command: |
+            make android-lint-wear-app
       - run:
           name: Build Test APK
           command: |
@@ -213,6 +226,24 @@ jobs:
       - store_artifacts:
           path: platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk
           destination: .
+      - store_artifacts:
+          path: platform/android/MapboxGLAndroidSDK/build/reports/lint-results.html
+      - store_artifacts:
+          path: platform/android/MapboxGLAndroidSDK/build/reports/lint-results.xml
+      - store_artifacts:
+          path: platform/android/MapboxGLAndroidSDK/lint-baseline.xml
+      - store_artifacts:
+          path: platform/android/MapboxGLAndroidSDKTestApp/build/reports/lint-results.html
+      - store_artifacts:
+          path: platform/android/MapboxGLAndroidSDKTestApp/build/reports/lint-results.xml
+      - store_artifacts:
+          path: platform/android/MapboxGLAndroidSDKTestApp/lint-baseline.xml
+      - store_artifacts:
+          path: platform/android/MapboxGLAndroidSDKWearTestApp/build/reports/lint-results.html
+      - store_artifacts:
+          path: platform/android/MapboxGLAndroidSDKWearTestApp/build/reports/lint-results.xml
+      - store_artifacts:
+          path: platform/android/MapboxGLAndroidSDKWearTestApp/lint-baseline.xml
 
 # ------------------------------------------------------------------------------
   android-release-all:
@@ -223,6 +254,7 @@ jobs:
       LIBSYSCONFCPUS: 4
       JOBS: 4
       BUILDTYPE: Release
+      IS_LOCAL_DEVELOPMENT: false
     steps:
       - checkout
       - *generate-cache-key
