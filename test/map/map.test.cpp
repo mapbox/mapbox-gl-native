@@ -4,16 +4,12 @@
 #include <mbgl/test/fixture_log_observer.hpp>
 
 #include <mbgl/map/map.hpp>
-#include <mbgl/renderer/backend_scope.hpp>
-#include <mbgl/gl/headless_backend.hpp>
-#include <mbgl/gl/headless_display.hpp>
-#include <mbgl/gl/offscreen_view.hpp>
 #include <mbgl/gl/context.hpp>
+#include <mbgl/gl/headless_frontend.hpp>
 #include <mbgl/util/default_thread_pool.hpp>
 #include <mbgl/storage/network_status.hpp>
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/storage/online_file_source.hpp>
-#include <mbgl/renderer/renderer.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/run_loop.hpp>
@@ -21,7 +17,6 @@
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/image.hpp>
 #include <mbgl/style/layers/background_layer.hpp>
-#include <mbgl/test/stub_renderer_frontend.hpp>
 #include <mbgl/util/color.hpp>
 
 using namespace mbgl;
@@ -53,30 +48,33 @@ public:
             didFinishLoadingStyleCallback();
         }
     }
-    
+
+    void onDidFinishRenderingFrame(RenderMode mode) final {
+        if (didFinishRenderingFrame) {
+            didFinishRenderingFrame(mode);
+        }
+    }
+
     std::function<void()> onWillStartLoadingMapCallback;
     std::function<void()> onDidFinishLoadingMapCallback;
     std::function<void()> didFailLoadingMapCallback;
     std::function<void()> didFinishLoadingStyleCallback;
+    std::function<void(RenderMode)> didFinishRenderingFrame;
 };
 
 template <class FileSource = StubFileSource>
 class MapTest {
 public:
     util::RunLoop runLoop;
-    HeadlessBackend backend;
-    BackendScope scope { backend };
-    OffscreenView view { backend.getContext() };
     FileSource fileSource;
     ThreadPool threadPool { 4 };
     StubMapObserver observer;
-    StubRendererFrontend rendererFrontend;
+    HeadlessFrontend frontend;
     Map map;
 
     MapTest(float pixelRatio = 1, MapMode mode = MapMode::Still)
-        : rendererFrontend(
-            std::make_unique<Renderer>(backend, pixelRatio, fileSource, threadPool), view)
-        , map(rendererFrontend, observer, view.getSize(), pixelRatio, fileSource, threadPool, mode) {
+        : frontend(pixelRatio, fileSource, threadPool)
+        , map(frontend, observer, frontend.getSize(), pixelRatio, fileSource, threadPool, mode) {
     }
 
     template <typename T = FileSource>
@@ -84,10 +82,8 @@ public:
             float pixelRatio = 1, MapMode mode = MapMode::Still,
             typename std::enable_if<std::is_same<T, DefaultFileSource>::value>::type* = 0)
             : fileSource { cachePath, assetRoot }
-            , rendererFrontend(
-                    std::make_unique<Renderer>(backend, pixelRatio, fileSource, threadPool),
-                    view)
-            , map(rendererFrontend, observer, view.getSize(), pixelRatio, fileSource, threadPool, mode) {
+            , frontend(pixelRatio, fileSource, threadPool)
+            , map(frontend, observer, frontend.getSize(), pixelRatio, fileSource, threadPool, mode) {
     }
 };
 
@@ -157,7 +153,7 @@ TEST(Map, Offline) {
     test.map.getStyle().loadURL(prefix + "style.json");
 
     test::checkImage("test/fixtures/map/offline",
-                     test::render(test.map, test.view),
+                     test.frontend.render(test.map),
                      0.0015,
                      0.1);
 
@@ -296,7 +292,7 @@ TEST(Map, StyleExpiredWithRender) {
     test.fileSource.respond(Resource::Style, response);
     EXPECT_EQ(1u, test.fileSource.requests.size());
 
-    test::render(test.map, test.view);
+    test.frontend.render(test.map);
     EXPECT_EQ(1u, test.fileSource.requests.size());
 
     test.fileSource.respond(Resource::Style, response);
@@ -406,16 +402,18 @@ TEST(Map, AddLayer) {
     layer->setBackgroundColor({ { 1, 0, 0, 1 } });
     test.map.getStyle().addLayer(std::move(layer));
 
-    test::checkImage("test/fixtures/map/add_layer", test::render(test.map, test.view));
+    test::checkImage("test/fixtures/map/add_layer", test.frontend.render(test.map));
 }
 
 TEST(Map, WithoutVAOExtension) {
     MapTest<DefaultFileSource> test { ":memory:", "test/fixtures/api/assets" };
-    test.backend.getContext().disableVAOExtension = true;
+
+    BackendScope scope { *test.frontend.getBackend() };
+    test.frontend.getBackend()->getContext().disableVAOExtension = true;
 
     test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/water.json"));
 
-    test::checkImage("test/fixtures/map/no_vao", test::render(test.map, test.view), 0.002);
+    test::checkImage("test/fixtures/map/no_vao", test.frontend.render(test.map), 0.002);
 }
 
 TEST(Map, RemoveLayer) {
@@ -428,7 +426,7 @@ TEST(Map, RemoveLayer) {
     test.map.getStyle().addLayer(std::move(layer));
     test.map.getStyle().removeLayer("background");
 
-    test::checkImage("test/fixtures/map/remove_layer", test::render(test.map, test.view));
+    test::checkImage("test/fixtures/map/remove_layer", test.frontend.render(test.map));
 }
 
 TEST(Map, DisabledSources) {
@@ -486,9 +484,9 @@ TEST(Map, DisabledSources) {
 }
 )STYLE");
 
-    test::checkImage("test/fixtures/map/disabled_layers/first", test::render(test.map, test.view));
+    test::checkImage("test/fixtures/map/disabled_layers/first", test.frontend.render(test.map));
     test.map.setZoom(0.5);
-    test::checkImage("test/fixtures/map/disabled_layers/second", test::render(test.map, test.view));
+    test::checkImage("test/fixtures/map/disabled_layers/second", test.frontend.render(test.map));
 }
 
 TEST(Map, DontLoadUnneededTiles) {
@@ -533,16 +531,13 @@ TEST(Map, DontLoadUnneededTiles) {
         const double z = double(zoom) / 10;
         tiles.clear();
         test.map.setZoom(z);
-        test::render(test.map, test.view);
+        test.frontend.render(test.map);
         EXPECT_EQ(referenceTiles[z], tiles) << "zoom level " << z;
     }
 }
 
 TEST(Map, TEST_DISABLED_ON_CI(ContinuousRendering)) {
     util::RunLoop runLoop;
-    HeadlessBackend backend;
-    BackendScope scope { backend };
-    OffscreenView view { backend.getContext() };
     ThreadPool threadPool { 4 };
     DefaultFileSource fileSource(":memory:", "test/fixtures/api/assets");
     float pixelRatio { 1 };
@@ -551,39 +546,26 @@ TEST(Map, TEST_DISABLED_ON_CI(ContinuousRendering)) {
 
     util::Timer emergencyShutoff;
     emergencyShutoff.start(10s, 0s, [&] {
-        util::RunLoop::Get()->stop();
+        runLoop.stop();
         FAIL() << "Did not stop rendering";
     });
 
     util::Timer timer;
 
-    std::function<bool()> isLoaded;
+    HeadlessFrontend frontend(pixelRatio, fileSource, threadPool);
 
-    StubRendererFrontend rendererFrontend {
-            std::make_unique<Renderer>(backend, pixelRatio, fileSource, threadPool),
-            [&](StubRendererFrontend& bridge) {
-                if (isLoaded()) {
-                    // Abort the test after 1 second after the map loading fully. Note that a "fully loaded
-                    // map" doesn't mean that we won't render anymore: we could still render fade in/fade
-                    // out or other animations.
-                    // If we are continuing to render indefinitely, the emergency shutoff above will trigger
-                    // and the test will fail since the regular time will be constantly reset.
-                    timer.start(1s, 0s, [&] {
-                        util::RunLoop::Get()->stop();
-                    });
-                }
-
-                bridge.render(view);
-            }
+    StubMapObserver observer;
+    observer.didFinishRenderingFrame = [&] (MapObserver::RenderMode) {
+        // Start a timer that ends the test one second from now. If we are continuing to render
+        // indefinitely, the timer will be constantly restarted and never trigger. Instead, the
+        // emergency shutoff above will trigger, failing the test.
+        timer.start(1s, 0s, [&] {
+            runLoop.stop();
+        });
     };
 
-    Map map(rendererFrontend, MapObserver::nullObserver(), view.getSize(), pixelRatio, fileSource,
-            threadPool, MapMode::Continuous);
-
-    isLoaded = [&] {
-        return map.isFullyLoaded();
-    };
-
+    Map map(frontend, observer, frontend.getSize(), pixelRatio, fileSource, threadPool, MapMode::Continuous);
     map.getStyle().loadJSON(util::read_file("test/fixtures/api/water.json"));
-    util::RunLoop::Get()->run();
+
+    runLoop.run();
 }

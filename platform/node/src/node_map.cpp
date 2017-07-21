@@ -3,11 +3,10 @@
 #include "node_feature.hpp"
 #include "node_conversion.hpp"
 #include "node_geojson.hpp"
-#include "node_renderer_frontend.hpp"
 
 #include <mbgl/util/exception.hpp>
 #include <mbgl/renderer/renderer.hpp>
-#include <mbgl/renderer/backend_scope.hpp>
+#include <mbgl/gl/headless_frontend.hpp>
 #include <mbgl/style/conversion/source.hpp>
 #include <mbgl/style/conversion/layer.hpp>
 #include <mbgl/style/conversion/filter.hpp>
@@ -26,8 +25,7 @@ struct NodeMap::RenderOptions {
     double pitch = 0;
     double latitude = 0;
     double longitude = 0;
-    unsigned int width = 512;
-    unsigned int height = 512;
+    mbgl::Size size = { 512, 512 };
     std::vector<std::string> classes;
     mbgl::MapDebugOptions debugOptions = mbgl::MapDebugOptions::NoDebug;
 };
@@ -37,8 +35,6 @@ Nan::Persistent<v8::Function> NodeMap::constructor;
 static const char* releasedMessage() {
     return "Map resources have already been released";
 }
-
-NodeBackend::NodeBackend(): HeadlessBackend() {}
 
 void NodeMapObserver::onDidFailLoadingMap(std::exception_ptr error) {
     std::rethrow_exception(error);
@@ -258,11 +254,11 @@ NodeMap::RenderOptions NodeMap::ParseOptions(v8::Local<v8::Object> obj) {
     }
 
     if (Nan::Has(obj, Nan::New("width").ToLocalChecked()).FromJust()) {
-        options.width = Nan::Get(obj, Nan::New("width").ToLocalChecked()).ToLocalChecked()->IntegerValue();
+        options.size.width = Nan::Get(obj, Nan::New("width").ToLocalChecked()).ToLocalChecked()->IntegerValue();
     }
 
     if (Nan::Has(obj, Nan::New("height").ToLocalChecked()).FromJust()) {
-        options.height = Nan::Get(obj, Nan::New("height").ToLocalChecked()).ToLocalChecked()->IntegerValue();
+        options.size.height = Nan::Get(obj, Nan::New("height").ToLocalChecked()).ToLocalChecked()->IntegerValue();
     }
 
     if (Nan::Has(obj, Nan::New("classes").ToLocalChecked()).FromJust()) {
@@ -358,15 +354,8 @@ void NodeMap::Render(const Nan::FunctionCallbackInfo<v8::Value>& info) {
 }
 
 void NodeMap::startRender(NodeMap::RenderOptions options) {
-    map->setSize({ options.width, options.height });
-
-    const mbgl::Size fbSize{ static_cast<uint32_t>(options.width * pixelRatio),
-                             static_cast<uint32_t>(options.height * pixelRatio) };
-    if (!view || view->getSize() != fbSize) {
-        view.reset();
-        mbgl::BackendScope scope { backend };
-        view = std::make_unique<mbgl::OffscreenView>(backend.getContext(), fbSize);
-    }
+    frontend->setSize(options.size);
+    map->setSize(options.size);
 
     if (map->getZoom() != options.zoom) {
         map->setZoom(options.zoom);
@@ -395,7 +384,7 @@ void NodeMap::startRender(NodeMap::RenderOptions options) {
             uv_async_send(async);
         } else {
             assert(!image.data);
-            image = view->readStillImage();
+            image = frontend->readStillImage();
             uv_async_send(async);
         }
     });
@@ -525,9 +514,8 @@ void NodeMap::cancel() {
     // Reset map explicitly as it resets the renderer frontend
     map.reset();
 
-    auto renderer = std::make_unique<mbgl::Renderer>(backend, pixelRatio, *this, threadpool);
-    rendererFrontend = std::make_unique<NodeRendererFrontend>(std::move(renderer), backend, [this] { return view.get(); });
-    map = std::make_unique<mbgl::Map>(*rendererFrontend, mapObserver, mbgl::Size{ 256, 256 }, pixelRatio,
+    frontend = std::make_unique<mbgl::HeadlessFrontend>(mbgl::Size{ 256, 256 }, pixelRatio, *this, threadpool);
+    map = std::make_unique<mbgl::Map>(*frontend, mapObserver, frontend->getSize(), pixelRatio,
                                       *this, threadpool, mbgl::MapMode::Still);
 
     // FIXME: Reload the style after recreating the map. We need to find
@@ -882,11 +870,8 @@ void NodeMap::DumpDebugLogs(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     if (!nodeMap->map) return Nan::ThrowError(releasedMessage());
 
     nodeMap->map->dumpDebugLogs();
-    
-    if (nodeMap->rendererFrontend) {
-        nodeMap->rendererFrontend->dumpDebugLogs();
-    }
-    
+    nodeMap->frontend->getRenderer()->dumpDebugLogs();
+
     info.GetReturnValue().SetUndefined();
 }
 
@@ -948,7 +933,7 @@ void NodeMap::QueryRenderedFeatures(const Nan::FunctionCallbackInfo<v8::Value>& 
             auto pos0 = Nan::Get(posOrBox, 0).ToLocalChecked().As<v8::Array>();
             auto pos1 = Nan::Get(posOrBox, 1).ToLocalChecked().As<v8::Array>();
 
-            optional = nodeMap->rendererFrontend->queryRenderedFeatures(mbgl::ScreenBox {
+            optional = nodeMap->frontend->getRenderer()->queryRenderedFeatures(mbgl::ScreenBox {
                 {
                     Nan::Get(pos0, 0).ToLocalChecked()->NumberValue(),
                     Nan::Get(pos0, 1).ToLocalChecked()->NumberValue()
@@ -959,7 +944,7 @@ void NodeMap::QueryRenderedFeatures(const Nan::FunctionCallbackInfo<v8::Value>& 
             },  queryOptions);
 
         } else {
-            optional = nodeMap->rendererFrontend->queryRenderedFeatures(mbgl::ScreenCoordinate {
+            optional = nodeMap->frontend->getRenderer()->queryRenderedFeatures(mbgl::ScreenCoordinate {
                 Nan::Get(posOrBox, 0).ToLocalChecked()->NumberValue(),
                 Nan::Get(posOrBox, 1).ToLocalChecked()->NumberValue()
             }, queryOptions);
@@ -985,10 +970,10 @@ NodeMap::NodeMap(v8::Local<v8::Object> options)
                      : 1.0;
       }())
     , mapObserver(NodeMapObserver())
-    , rendererFrontend(std::make_unique<NodeRendererFrontend>(std::make_unique<mbgl::Renderer>(backend, pixelRatio, *this, threadpool), backend, [this] { return view.get(); }))
-    , map(std::make_unique<mbgl::Map>(*rendererFrontend,
+    , frontend(std::make_unique<mbgl::HeadlessFrontend>(mbgl::Size { 256, 256 }, pixelRatio, *this, threadpool))
+    , map(std::make_unique<mbgl::Map>(*frontend,
                                       mapObserver,
-                                      mbgl::Size { 256, 256 },
+                                      frontend->getSize(),
                                       pixelRatio,
                                       *this,
                                       threadpool,

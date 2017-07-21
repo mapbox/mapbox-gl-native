@@ -2,8 +2,6 @@
 
 #include <mbgl/renderer/backend_scope.hpp>
 #include <mbgl/gl/headless_backend.hpp>
-#include <mbgl/gl/offscreen_view.hpp>
-
 #include <mbgl/gl/context.hpp>
 
 #include <memory>
@@ -47,9 +45,8 @@ TEST(GLObject, Value) {
 }
 
 TEST(GLObject, Store) {
-    HeadlessBackend backend;
+    HeadlessBackend backend { { 256, 256 } };
     BackendScope scope { backend };
-    OffscreenView view(backend.getContext());
 
     gl::Context context;
     EXPECT_TRUE(context.empty());
