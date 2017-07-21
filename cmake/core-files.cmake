@@ -554,6 +554,7 @@ set(MBGL_CORE_FILES
     include/mbgl/util/run_loop.hpp
     include/mbgl/util/size.hpp
     include/mbgl/util/string.hpp
+    include/mbgl/util/thread.hpp
     include/mbgl/util/tileset.hpp
     include/mbgl/util/timer.hpp
     include/mbgl/util/traits.hpp
@@ -610,7 +611,6 @@ set(MBGL_CORE_FILES
     src/mbgl/util/stopwatch.cpp
     src/mbgl/util/stopwatch.hpp
     src/mbgl/util/string.cpp
-    src/mbgl/util/thread.hpp
     src/mbgl/util/thread_local.hpp
     src/mbgl/util/throttler.cpp
     src/mbgl/util/throttler.hpp
