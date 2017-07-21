@@ -6,6 +6,7 @@
 #include <mbgl/util/timer.hpp>
 
 #include <atomic>
+#include <chrono>
 #include <memory>
 #include <thread>
 
@@ -307,4 +308,31 @@ TEST(Thread, PauseResumeMultiThreaded) {
     // Wait for threads
     thread1.join();
     thread2.join();
+}
+
+TEST(Thread, DirectAccess) {
+    
+    Thread<TestWorker> test("Test");
+    
+    // Use the thread's object directly
+    std::atomic<bool> flag { false };
+    auto guard = std::make_unique<BlockingThreadGuard<TestWorker>>( test );
+    guard->object().send([&] { flag = true; });
+    ASSERT_TRUE(flag);
+    
+    // Ensure messages queued up are processed
+    std::atomic<bool> message1Consumed { false };
+    test.actor().invoke(&TestWorker::send, [&]() { message1Consumed = true; });
+    
+    // Release the guard
+    guard.reset();
+    
+    // Ensure messages send after releasing the guard are processed
+    std::atomic<bool> message2Consumed { false };
+    test.actor().invoke(&TestWorker::send, [&]() { message2Consumed = true; });
+    
+    while (!message1Consumed && !message2Consumed) {
+        using namespace std::chrono_literals;
+        std::this_thread::sleep_for(10ms);
+    };
 }
