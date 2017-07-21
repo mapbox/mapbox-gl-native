@@ -133,4 +133,4 @@ jobs:
       - deploy:
           name: Publish to Maven
           command: |
-            if [ "${CIRCLE_BRANCH}" == "release-ios-v3.6.0-android-v5.1.0" ]; then make run-android-upload-archives ; fi
+            if [ "${CIRCLE_BRANCH}" == "master" ]; then make run-android-upload-archives ; fi
