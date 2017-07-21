@@ -1482,11 +1482,11 @@ public class PropertyFactory {
   /**
    * The display of lines when joining.
    *
-   * @param <Z> the zoom parameter type
-   * @param function a wrapper {@link CameraFunction} for String
+   * @param <T> the function input type
+   * @param function a wrapper function for String
    * @return property wrapper around a String function
    */
-  public static <Z extends Number> PropertyValue<CameraFunction<Z, String>> lineJoin(CameraFunction<Z, String> function) {
+  public static <T> PropertyValue<Function<T, String>> lineJoin(Function<T, String> function) {
     return new LayoutPropertyValue<>("line-join", function);
   }
 
@@ -2103,11 +2103,11 @@ public class PropertyFactory {
   /**
    * Text justification options.
    *
-   * @param <Z> the zoom parameter type
-   * @param function a wrapper {@link CameraFunction} for String
+   * @param <T> the function input type
+   * @param function a wrapper function for String
    * @return property wrapper around a String function
    */
-  public static <Z extends Number> PropertyValue<CameraFunction<Z, String>> textJustify(CameraFunction<Z, String> function) {
+  public static <T> PropertyValue<Function<T, String>> textJustify(Function<T, String> function) {
     return new LayoutPropertyValue<>("text-justify", function);
   }
 
@@ -2126,11 +2126,11 @@ public class PropertyFactory {
   /**
    * Part of the text placed closest to the anchor.
    *
-   * @param <Z> the zoom parameter type
-   * @param function a wrapper {@link CameraFunction} for String
+   * @param <T> the function input type
+   * @param function a wrapper function for String
    * @return property wrapper around a String function
    */
-  public static <Z extends Number> PropertyValue<CameraFunction<Z, String>> textAnchor(CameraFunction<Z, String> function) {
+  public static <T> PropertyValue<Function<T, String>> textAnchor(Function<T, String> function) {
     return new LayoutPropertyValue<>("text-anchor", function);
   }
 

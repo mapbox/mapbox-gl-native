@@ -204,6 +204,63 @@ public class LineLayerTest extends BaseActivityTest {
   }
 
   @Test
+  public void testLineJoinAsIdentitySourceFunction() {
+    validateTestSetup();
+    setupLayer();
+    Timber.i("line-join");
+    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
+      @Override
+      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
+        assertNotNull(layer);
+
+        // Set
+        layer.setProperties(
+          lineJoin(property("FeaturePropertyA", Stops.<String>identity()))
+        );
+
+        // Verify
+        assertNotNull(layer.getLineJoin());
+        assertNotNull(layer.getLineJoin().getFunction());
+        assertEquals(SourceFunction.class, layer.getLineJoin().getFunction().getClass());
+        assertEquals("FeaturePropertyA", ((SourceFunction) layer.getLineJoin().getFunction()).getProperty());
+        assertEquals(IdentityStops.class, layer.getLineJoin().getFunction().getStops().getClass());
+      }
+    });
+  }
+
+  @Test
+  public void testLineJoinAsIntervalSourceFunction() {
+    validateTestSetup();
+    setupLayer();
+    Timber.i("line-join");
+    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
+      @Override
+      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
+        assertNotNull(layer);
+
+        // Set
+        layer.setProperties(
+          lineJoin(
+            property(
+              "FeaturePropertyA",
+              interval(
+                stop(1, lineJoin(LINE_JOIN_BEVEL))
+              )
+            )
+          )
+        );
+
+        // Verify
+        assertNotNull(layer.getLineJoin());
+        assertNotNull(layer.getLineJoin().getFunction());
+        assertEquals(SourceFunction.class, layer.getLineJoin().getFunction().getClass());
+        assertEquals("FeaturePropertyA", ((SourceFunction) layer.getLineJoin().getFunction()).getProperty());
+        assertEquals(IntervalStops.class, layer.getLineJoin().getFunction().getStops().getClass());
+      }
+    });
+  }
+
+  @Test
   public void testLineMiterLimitAsConstant() {
     validateTestSetup();
     setupLayer();

@@ -1888,6 +1888,63 @@ public class SymbolLayerTest extends BaseActivityTest {
   }
 
   @Test
+  public void testTextJustifyAsIdentitySourceFunction() {
+    validateTestSetup();
+    setupLayer();
+    Timber.i("text-justify");
+    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
+      @Override
+      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
+        assertNotNull(layer);
+
+        // Set
+        layer.setProperties(
+          textJustify(property("FeaturePropertyA", Stops.<String>identity()))
+        );
+
+        // Verify
+        assertNotNull(layer.getTextJustify());
+        assertNotNull(layer.getTextJustify().getFunction());
+        assertEquals(SourceFunction.class, layer.getTextJustify().getFunction().getClass());
+        assertEquals("FeaturePropertyA", ((SourceFunction) layer.getTextJustify().getFunction()).getProperty());
+        assertEquals(IdentityStops.class, layer.getTextJustify().getFunction().getStops().getClass());
+      }
+    });
+  }
+
+  @Test
+  public void testTextJustifyAsIntervalSourceFunction() {
+    validateTestSetup();
+    setupLayer();
+    Timber.i("text-justify");
+    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
+      @Override
+      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
+        assertNotNull(layer);
+
+        // Set
+        layer.setProperties(
+          textJustify(
+            property(
+              "FeaturePropertyA",
+              interval(
+                stop(1, textJustify(TEXT_JUSTIFY_LEFT))
+              )
+            )
+          )
+        );
+
+        // Verify
+        assertNotNull(layer.getTextJustify());
+        assertNotNull(layer.getTextJustify().getFunction());
+        assertEquals(SourceFunction.class, layer.getTextJustify().getFunction().getClass());
+        assertEquals("FeaturePropertyA", ((SourceFunction) layer.getTextJustify().getFunction()).getProperty());
+        assertEquals(IntervalStops.class, layer.getTextJustify().getFunction().getStops().getClass());
+      }
+    });
+  }
+
+  @Test
   public void testTextAnchorAsConstant() {
     validateTestSetup();
     setupLayer();
@@ -1931,6 +1988,63 @@ public class SymbolLayerTest extends BaseActivityTest {
         assertEquals(CameraFunction.class, layer.getTextAnchor().getFunction().getClass());
         assertEquals(IntervalStops.class, layer.getTextAnchor().getFunction().getStops().getClass());
         assertEquals(1, ((IntervalStops) layer.getTextAnchor().getFunction().getStops()).size());
+      }
+    });
+  }
+
+  @Test
+  public void testTextAnchorAsIdentitySourceFunction() {
+    validateTestSetup();
+    setupLayer();
+    Timber.i("text-anchor");
+    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
+      @Override
+      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
+        assertNotNull(layer);
+
+        // Set
+        layer.setProperties(
+          textAnchor(property("FeaturePropertyA", Stops.<String>identity()))
+        );
+
+        // Verify
+        assertNotNull(layer.getTextAnchor());
+        assertNotNull(layer.getTextAnchor().getFunction());
+        assertEquals(SourceFunction.class, layer.getTextAnchor().getFunction().getClass());
+        assertEquals("FeaturePropertyA", ((SourceFunction) layer.getTextAnchor().getFunction()).getProperty());
+        assertEquals(IdentityStops.class, layer.getTextAnchor().getFunction().getStops().getClass());
+      }
+    });
+  }
+
+  @Test
+  public void testTextAnchorAsIntervalSourceFunction() {
+    validateTestSetup();
+    setupLayer();
+    Timber.i("text-anchor");
+    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
+      @Override
+      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
+        assertNotNull(layer);
+
+        // Set
+        layer.setProperties(
+          textAnchor(
+            property(
+              "FeaturePropertyA",
+              interval(
+                stop(1, textAnchor(TEXT_ANCHOR_CENTER))
+              )
+            )
+          )
+        );
+
+        // Verify
+        assertNotNull(layer.getTextAnchor());
+        assertNotNull(layer.getTextAnchor().getFunction());
+        assertEquals(SourceFunction.class, layer.getTextAnchor().getFunction().getClass());
+        assertEquals("FeaturePropertyA", ((SourceFunction) layer.getTextAnchor().getFunction()).getProperty());
+        assertEquals(IntervalStops.class, layer.getTextAnchor().getFunction().getStops().getClass());
       }
     });
   }

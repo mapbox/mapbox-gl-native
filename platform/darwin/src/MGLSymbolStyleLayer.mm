@@ -586,7 +586,7 @@ namespace mbgl {
 - (void)setTextAnchor:(MGLStyleValue<NSValue *> *)textAnchor {
     MGLAssertStyleLayerIsValid();
 
-    auto mbglValue = MGLStyleValueTransformer<mbgl::style::TextAnchorType, NSValue *, mbgl::style::TextAnchorType, MGLTextAnchor>().toEnumPropertyValue(textAnchor);
+    auto mbglValue = MGLStyleValueTransformer<mbgl::style::TextAnchorType, NSValue *, mbgl::style::TextAnchorType, MGLTextAnchor>().toDataDrivenPropertyValue(textAnchor);
     self.rawLayer->setTextAnchor(mbglValue);
 }
 
@@ -595,9 +595,9 @@ namespace mbgl {
 
     auto propertyValue = self.rawLayer->getTextAnchor();
     if (propertyValue.isUndefined()) {
-        return MGLStyleValueTransformer<mbgl::style::TextAnchorType, NSValue *, mbgl::style::TextAnchorType, MGLTextAnchor>().toEnumStyleValue(self.rawLayer->getDefaultTextAnchor());
+        return MGLStyleValueTransformer<mbgl::style::TextAnchorType, NSValue *, mbgl::style::TextAnchorType, MGLTextAnchor>().toDataDrivenStyleValue(self.rawLayer->getDefaultTextAnchor());
     }
-    return MGLStyleValueTransformer<mbgl::style::TextAnchorType, NSValue *, mbgl::style::TextAnchorType, MGLTextAnchor>().toEnumStyleValue(propertyValue);
+    return MGLStyleValueTransformer<mbgl::style::TextAnchorType, NSValue *, mbgl::style::TextAnchorType, MGLTextAnchor>().toDataDrivenStyleValue(propertyValue);
 }
 
 - (void)setTextFontNames:(MGLStyleValue<NSArray<NSString *> *> *)textFontNames {
@@ -675,7 +675,7 @@ namespace mbgl {
 - (void)setTextJustification:(MGLStyleValue<NSValue *> *)textJustification {
     MGLAssertStyleLayerIsValid();
 
-    auto mbglValue = MGLStyleValueTransformer<mbgl::style::TextJustifyType, NSValue *, mbgl::style::TextJustifyType, MGLTextJustification>().toEnumPropertyValue(textJustification);
+    auto mbglValue = MGLStyleValueTransformer<mbgl::style::TextJustifyType, NSValue *, mbgl::style::TextJustifyType, MGLTextJustification>().toDataDrivenPropertyValue(textJustification);
     self.rawLayer->setTextJustify(mbglValue);
 }
 
@@ -684,9 +684,9 @@ namespace mbgl {
 
     auto propertyValue = self.rawLayer->getTextJustify();
     if (propertyValue.isUndefined()) {
-        return MGLStyleValueTransformer<mbgl::style::TextJustifyType, NSValue *, mbgl::style::TextJustifyType, MGLTextJustification>().toEnumStyleValue(self.rawLayer->getDefaultTextJustify());
+        return MGLStyleValueTransformer<mbgl::style::TextJustifyType, NSValue *, mbgl::style::TextJustifyType, MGLTextJustification>().toDataDrivenStyleValue(self.rawLayer->getDefaultTextJustify());
     }
-    return MGLStyleValueTransformer<mbgl::style::TextJustifyType, NSValue *, mbgl::style::TextJustifyType, MGLTextJustification>().toEnumStyleValue(propertyValue);
+    return MGLStyleValueTransformer<mbgl::style::TextJustifyType, NSValue *, mbgl::style::TextJustifyType, MGLTextJustification>().toDataDrivenStyleValue(propertyValue);
 }
 
 - (void)setTextJustify:(MGLStyleValue<NSValue *> *)textJustify {
