@@ -94,7 +94,7 @@ public:
     // sent to a paused `Object` will be queued and only processed after
     // `resume()` is called.
     void pause() {
-        MBGL_VERIFY_THREAD(tid);
+        std::unique_lock<std::mutex> lock(pauseMutex);
 
         assert(!paused);
 
@@ -114,7 +114,7 @@ public:
 
     // Resumes the `Object` thread previously paused by `pause()`.
     void resume() {
-        MBGL_VERIFY_THREAD(tid);
+        std::unique_lock<std::mutex> lock(pauseMutex);
 
         assert(paused);
 
