@@ -1280,8 +1280,6 @@ public:
 {
     if ( ! self.isZoomEnabled) return;
 
-    if (_mbglMap->getZoom() <= _mbglMap->getMinZoom() && pinch.scale < 1) return;
-
     _mbglMap->cancelTransitions();
 
     CGPoint centerPoint = [self anchorPointForGesture:pinch];
@@ -1297,17 +1295,17 @@ public:
     }
     else if (pinch.state == UIGestureRecognizerStateChanged)
     {
+        // Zoom limiting happens at the core level.
         CGFloat newScale = self.scale * pinch.scale;
-        double zoom = log2(newScale);
-        if (zoom < _mbglMap->getMinZoom()) return;
-        
+        double newZoom = log2(newScale);
+
         // Calculates the final camera zoom, has no effect within current map camera.
-        MGLMapCamera *toCamera = [self cameraByZoomingToZoomLevel:zoom aroundAnchorPoint:centerPoint];
+        MGLMapCamera *toCamera = [self cameraByZoomingToZoomLevel:newZoom aroundAnchorPoint:centerPoint];
         
         if (![self.delegate respondsToSelector:@selector(mapView:shouldChangeFromCamera:toCamera:)] ||
             [self.delegate mapView:self shouldChangeFromCamera:oldCamera toCamera:toCamera])
         {
-            _mbglMap->setZoom(zoom, mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y });
+            _mbglMap->setZoom(newZoom, mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y });
             // The gesture recognizer only reports the gesture’s current center
             // point, so use the previous center point to anchor the transition.
             // If the number of touches has changed, the remembered center point is
@@ -1655,9 +1653,9 @@ public:
     {
         CGFloat distance = [quickZoom locationInView:quickZoom.view].y - self.quickZoomStart;
 
-        CGFloat newZoom = log2f(self.scale) + (distance / 75);
+        CGFloat newZoom = MAX(log2f(self.scale) + (distance / 75), _mbglMap->getMinZoom());
 
-        if (newZoom < _mbglMap->getMinZoom()) return;
+        if (_mbglMap->getZoom() == newZoom) return;
 
         CGPoint centerPoint = [self anchorPointForGesture:quickZoom];
         
