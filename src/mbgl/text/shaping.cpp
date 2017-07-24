@@ -7,6 +7,7 @@
 #include <boost/algorithm/string.hpp>
 
 #include <algorithm>
+#include <cmath>
 
 namespace mbgl {
 
@@ -72,7 +73,7 @@ float determineAverageLineWidth(const std::u16string& logicalInput,
         }
     }
     
-    int32_t targetLineCount = std::fmax(1, std::ceil(totalWidth / maxWidth));
+    int32_t targetLineCount = ::fmax(1, std::ceil(totalWidth / maxWidth));
     return totalWidth / targetLineCount;
 }
 

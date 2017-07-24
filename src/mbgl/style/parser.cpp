@@ -8,6 +8,7 @@
 #include <mbgl/style/conversion/light.hpp>
 
 #include <mbgl/util/logging.hpp>
+#include <mbgl/util/string.hpp>
 
 #include <mapbox/geojsonvt.hpp>
 

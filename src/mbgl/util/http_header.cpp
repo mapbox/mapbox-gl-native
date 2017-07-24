@@ -1,5 +1,7 @@
 #include <mbgl/util/http_header.hpp>
 
+#include <mbgl/util/string.hpp>
+
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunknown-pragmas"
 #pragma GCC diagnostic ignored "-Wunused-parameter"

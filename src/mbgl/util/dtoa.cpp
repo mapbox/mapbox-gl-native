@@ -6,6 +6,8 @@
 #include <rapidjson/internal/dtoa.h>
 #endif
 
+#include <mbgl/util/string.hpp>
+
 namespace mbgl {
 namespace util {
 
