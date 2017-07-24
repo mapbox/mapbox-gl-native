@@ -1,6 +1,5 @@
 package com.mapbox.mapboxsdk.maps;
 
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
@@ -56,12 +55,8 @@ class InfoWindowManager {
     return allowConcurrentMultipleInfoWindows;
   }
 
-  List<InfoWindow> getInfoWindows() {
-    return infoWindows;
-  }
-
-  boolean isInfoWindowValidForMarker(@NonNull Marker marker) {
-    return !TextUtils.isEmpty(marker.getTitle()) || !TextUtils.isEmpty(marker.getSnippet());
+  boolean isInfoWindowValidForMarker(Marker marker) {
+    return marker != null && (!TextUtils.isEmpty(marker.getTitle()) || !TextUtils.isEmpty(marker.getSnippet()));
   }
 
   void setOnInfoWindowClickListener(@Nullable MapboxMap.OnInfoWindowClickListener listener) {
