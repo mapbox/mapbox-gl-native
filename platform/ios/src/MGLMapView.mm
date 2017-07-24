@@ -1128,66 +1128,7 @@ public:
         [self validateLocationServices];
 
         [MGLMapboxEvents pushEvent:MGLEventTypeMapLoad withAttributes:@{}];
-        
-        [self updateLocalization];
     }
-}
-
-- (void)updateLocalization
-{
-    NSString *mapboxLanguage = [[NSUserDefaults standardUserDefaults] stringForKey:@"MGLMapboxLanguage"];
-    NSString *language = [[[NSBundle mainBundle] preferredLocalizations] firstObject];
-    NSString *preferredLanguageCode = [self preferredLanguageCode];
-    
-    if (![mapboxLanguage isEqualToString:language] && ![mapboxLanguage isEqualToString:preferredLanguageCode]) {
-        mapboxLanguage = preferredLanguageCode;
-        [[NSUserDefaults standardUserDefaults] setObject:mapboxLanguage forKey:@"MGLMapboxLanguage"];
-        [self setLabelLanguage:mapboxLanguage];
-        [[NSNotificationCenter defaultCenter] postNotificationName:NSCurrentLocaleDidChangeNotification object:nil];
-    }
-}
-
-- (void)setLabelLanguage:(NSString *)language
-{
-    NSString *preferredNameToken = [NSString stringWithFormat:@"{name_%@}", language];
-    
-    for (MGLSymbolStyleLayer *layer in [[self style] layers]) {
-        if (![layer isKindOfClass:[MGLSymbolStyleLayer class]]) {
-            continue;
-        }
-        
-        if ([layer.text isKindOfClass:[MGLConstantStyleValue class]]) {
-            MGLConstantStyleValue *label = (MGLConstantStyleValue<NSString *> *)layer.text;
-            if ([label.rawValue hasPrefix:@"{name"]) {
-                layer.text = [MGLStyleValue valueWithRawValue:preferredNameToken];
-            }
-        } else if ([layer.text isKindOfClass:[MGLCameraStyleFunction class]]) {
-            MGLCameraStyleFunction *function = (MGLCameraStyleFunction<NSString *> *)layer.text;
-            NSMutableDictionary *stops = function.stops.mutableCopy;
-            [stops enumerateKeysAndObjectsUsingBlock:^(NSNumber *zoomLevel, MGLConstantStyleValue<NSString *> *stop, BOOL *done) {
-                if ([stop.rawValue hasPrefix:@"{name"]) {
-                    stops[zoomLevel] = [MGLStyleValue<NSString *> valueWithRawValue:preferredNameToken];
-                }
-            }];
-            function.stops = stops;
-            layer.text = function;
-        }
-    }
-}
-
-- (NSString *)preferredLanguageCode {
-    // Languages supported by Mapbox Streets v10.
-    NSSet *supportedLanguages = [NSSet setWithObjects:@"en", @"es", @"fr", @"de", @"ru", @"zh", nil];
-    NSArray *preferredLanguages = [NSLocale preferredLanguages];
-    
-    for (NSString *language in preferredLanguages) {
-        NSString *languageCode = [[NSLocale localeWithLocaleIdentifier:language] objectForKey:NSLocaleLanguageCode];
-        if ([supportedLanguages containsObject:languageCode]) {
-            return languageCode;
-        }
-    }
-    
-    return @"en";
 }
 
 - (void)setHidden:(BOOL)hidden
