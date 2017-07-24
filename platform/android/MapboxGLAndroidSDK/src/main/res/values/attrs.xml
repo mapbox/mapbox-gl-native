@@ -118,6 +118,7 @@
         <attr name="mapbox_renderTextureMode" format="boolean"/>
 
         <attr name="mapbox_enableTilePrefetch" format="boolean"/>
+        <attr name="mapbox_enableZMediaOverlay" format="boolean"/>
 
     </declare-styleable>
 

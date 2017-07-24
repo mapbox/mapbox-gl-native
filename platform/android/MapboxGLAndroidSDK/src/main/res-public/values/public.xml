@@ -75,6 +75,9 @@
     <!-- Deprecated to use TextureView-->
     <public name="mapbox_renderTextureMode" type="attr" />
 
+    <public name="mapbox_enableTilePrefetch" type="attr" />
+    <public name="mapbox_enableZMediaOverlay" type="attr" />
+
     <!-- Exposed content descriptions -->
     <public name="mapbox_logoContentDescription" type="string" />
 

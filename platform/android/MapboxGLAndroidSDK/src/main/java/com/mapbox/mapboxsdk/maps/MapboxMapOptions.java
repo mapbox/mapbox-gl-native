@@ -81,6 +81,7 @@ public class MapboxMapOptions implements Parcelable {
   private int myLocationAccuracyAlpha;
   private float myLocationAccuracyThreshold;
   private boolean prefetchesTiles = true;
+  private boolean zMediaOverlay = false;
 
   private String apiBaseUrl;
 
@@ -156,6 +157,7 @@ public class MapboxMapOptions implements Parcelable {
     apiBaseUrl = in.readString();
     textureMode = in.readByte() != 0;
     prefetchesTiles = in.readByte() != 0;
+    zMediaOverlay = in.readByte() != 0;
   }
 
   static Bitmap getBitmapFromDrawable(Drawable drawable) {
@@ -301,6 +303,8 @@ public class MapboxMapOptions implements Parcelable {
         typedArray.getBoolean(R.styleable.mapbox_MapView_mapbox_renderTextureMode, false));
       mapboxMapOptions.setPrefetchesTiles(
         typedArray.getBoolean(R.styleable.mapbox_MapView_mapbox_enableTilePrefetch, true));
+      mapboxMapOptions.renderSurfaceOnTop(
+        typedArray.getBoolean(R.styleable.mapbox_MapView_mapbox_enableZMediaOverlay, false));
     } finally {
       typedArray.recycle();
     }
@@ -718,7 +722,6 @@ public class MapboxMapOptions implements Parcelable {
   /**
    * Enable tile pre-fetching. Loads tiles at a lower zoom-level to pre-render
    * a low resolution preview while more detailed tiles are loaded.
-   *
    * Enabled by default
    *
    * @param enable true to enable
@@ -737,6 +740,25 @@ public class MapboxMapOptions implements Parcelable {
    */
   public boolean getPrefetchesTiles() {
     return prefetchesTiles;
+  }
+
+
+  /**
+   * Set the flag to render the map surface on top of another surface.
+   *
+   * @param renderOnTop true if this map is shown on top of another one, false if bottom.
+   */
+  public void renderSurfaceOnTop(boolean renderOnTop) {
+    this.zMediaOverlay = renderOnTop;
+  }
+
+  /**
+   * Get the flag to render the map surface on top of another surface.
+   *
+   * @return true if this map is
+   */
+  public boolean getRenderSurfaceOnTop() {
+    return zMediaOverlay;
   }
 
   /**
@@ -1123,6 +1145,7 @@ public class MapboxMapOptions implements Parcelable {
     dest.writeString(apiBaseUrl);
     dest.writeByte((byte) (textureMode ? 1 : 0));
     dest.writeByte((byte) (prefetchesTiles ? 1 : 0));
+    dest.writeByte((byte) (zMediaOverlay ? 1 : 0));
   }
 
   @Override
@@ -1249,6 +1272,10 @@ public class MapboxMapOptions implements Parcelable {
     if (prefetchesTiles != options.prefetchesTiles) {
       return false;
     }
+    if (zMediaOverlay != options.zMediaOverlay) {
+      return false;
+    }
+
     return false;
   }
 
@@ -1296,6 +1323,7 @@ public class MapboxMapOptions implements Parcelable {
     result = 31 * result + (textureMode ? 1 : 0);
     result = 31 * result + (style != null ? style.hashCode() : 0);
     result = 31 * result + (prefetchesTiles ? 1 : 0);
+    result = 31 * result + (zMediaOverlay ? 1 : 0);
     return result;
   }
 }
