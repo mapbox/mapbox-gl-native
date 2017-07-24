@@ -38,6 +38,7 @@ Style::Impl::Impl(Scheduler& scheduler_, FileSource& fileSource_, float pixelRat
 Style::Impl::~Impl() = default;
 
 void Style::Impl::loadJSON(const std::string& json_) {
+    lastError = nullptr;
     observer->onStyleLoading();
 
     url.clear();
@@ -45,6 +46,7 @@ void Style::Impl::loadJSON(const std::string& json_) {
 }
 
 void Style::Impl::loadURL(const std::string& url_) {
+    lastError = nullptr;
     observer->onStyleLoading();
 
     loaded = false;
