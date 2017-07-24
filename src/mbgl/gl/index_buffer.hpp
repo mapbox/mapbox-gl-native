@@ -26,6 +26,7 @@ public:
     bool empty() const { return v.empty(); }
     void clear() { v.clear(); }
     const uint16_t* data() const { return v.data(); }
+    const std::vector<uint16_t>& vector() const { return v; }
 
 private:
     std::vector<uint16_t> v;

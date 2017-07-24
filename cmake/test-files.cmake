@@ -10,6 +10,7 @@ set(MBGL_TEST_FILES
     test/algorithm/generate_clip_ids.test.cpp
     test/algorithm/mock.hpp
     test/algorithm/update_renderables.test.cpp
+    test/algorithm/update_tile_masks.test.cpp
 
     # api
     test/api/annotations.test.cpp

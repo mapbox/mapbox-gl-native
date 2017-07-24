@@ -1,6 +1,7 @@
 #include <mbgl/renderer/sources/render_raster_source.hpp>
 #include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/tile/raster_tile.hpp>
+#include <mbgl/algorithm/update_tile_masks.hpp>
 
 namespace mbgl {
 
@@ -57,6 +58,7 @@ void RenderRasterSource::update(Immutable<style::Source::Impl> baseImpl_,
 }
 
 void RenderRasterSource::startRender(PaintParameters& parameters) {
+    algorithm::updateTileMasks(tilePyramid.getRenderTiles());
     tilePyramid.startRender(parameters);
 }
 

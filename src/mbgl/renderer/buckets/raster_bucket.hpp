@@ -5,6 +5,7 @@
 #include <mbgl/gl/vertex_buffer.hpp>
 #include <mbgl/programs/raster_program.hpp>
 #include <mbgl/renderer/bucket.hpp>
+#include <mbgl/renderer/tile_mask.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/mat4.hpp>
 #include <mbgl/util/optional.hpp>
@@ -21,8 +22,11 @@ public:
 
     void clear();
     void setImage(std::shared_ptr<PremultipliedImage>);
+    void setMask(TileMask&&);
+
     std::shared_ptr<PremultipliedImage> image;
     optional<gl::Texture> texture;
+    TileMask mask{ { 0, 0, 0 } };
 
     // Bucket specific vertices are used for Image Sources only
     // Raster Tile Sources use the default buffers from Painter

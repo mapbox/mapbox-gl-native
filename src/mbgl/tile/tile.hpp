@@ -6,6 +6,7 @@
 #include <mbgl/util/feature.hpp>
 #include <mbgl/util/tile_coordinate.hpp>
 #include <mbgl/tile/tile_id.hpp>
+#include <mbgl/renderer/tile_mask.hpp>
 #include <mbgl/renderer/bucket.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
 #include <mbgl/storage/resource.hpp>
@@ -54,6 +55,7 @@ public:
 
     virtual void setPlacementConfig(const PlacementConfig&) {}
     virtual void setLayers(const std::vector<Immutable<style::Layer::Impl>>&) {}
+    virtual void setMask(TileMask&&) {}
 
     virtual void queryRenderedFeatures(
             std::unordered_map<std::string, std::vector<Feature>>& result,

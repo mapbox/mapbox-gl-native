@@ -19,6 +19,7 @@ target_link_libraries(mbgl-benchmark
     PRIVATE mbgl-core
 )
 
+target_add_mason_package(mbgl-benchmark PRIVATE boost)
 target_add_mason_package(mbgl-benchmark PRIVATE benchmark)
 target_add_mason_package(mbgl-benchmark PRIVATE rapidjson)
 target_add_mason_package(mbgl-benchmark PRIVATE protozero)
