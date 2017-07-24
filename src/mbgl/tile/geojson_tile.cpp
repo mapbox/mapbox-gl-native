@@ -2,6 +2,7 @@
 #include <mbgl/tile/geometry_tile_data.hpp>
 #include <mbgl/renderer/query.hpp>
 #include <mbgl/renderer/tile_parameters.hpp>
+#include <mbgl/util/string.hpp>
 
 #include <mapbox/geojsonvt.hpp>
 #include <supercluster.hpp>
