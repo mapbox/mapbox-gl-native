@@ -1144,8 +1144,10 @@ public:
 
 - (void)updateTintColorForView:(UIView *)view
 {
-    // stop at recursing container & annotation views (#8522)
-    if ([view isEqual:self.annotationContainerView]) return;
+    // Don't update:
+    //   - annotation views
+    //   - attribution button (handled automatically)
+    if ([view isEqual:self.annotationContainerView] || [view isEqual:self.attributionButton]) return;
 
     if ([view respondsToSelector:@selector(setTintColor:)]) view.tintColor = self.tintColor;
 
