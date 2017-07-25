@@ -166,7 +166,7 @@ public:
         onlineFileSource.setOnlineStatus(status);
     }
 
-    void put(const Resource& resource, const Response& response) {
+    void put(Resource resource, Response response) {
         offlineDatabase.put(resource, response);
     }
 
