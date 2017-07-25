@@ -11,8 +11,6 @@ import com.mapbox.mapboxsdk.annotations.PolylineOptions;
 import java.util.ArrayList;
 import java.util.List;
 
-import timber.log.Timber;
-
 /**
  * Encapsulates {@link Polyline}'s functionality.
  */
@@ -78,11 +76,6 @@ class PolylineContainer implements Polylines {
 
   @Override
   public void update(Polyline polyline) {
-    if (!isAddedToMap(polyline)) {
-      Timber.w("Attempting to update non-added Polyline with value %s", polyline);
-      return;
-    }
-
     nativeMapView.updatePolyline(polyline);
     annotations.setValueAt(annotations.indexOfKey(polyline.getId()), polyline);
   }
@@ -98,9 +91,5 @@ class PolylineContainer implements Polylines {
       }
     }
     return polylines;
-  }
-
-  private boolean isAddedToMap(Annotation annotation) {
-    return annotation != null && annotation.getId() != -1 && annotations.indexOfKey(annotation.getId()) != -1;
   }
 }
