@@ -40,7 +40,7 @@ public:
     OffscreenView view{ backend.getContext(), { 1000, 1000 } };
     DefaultFileSource fileSource{ "benchmark/fixtures/api/cache.db", "." };
     ThreadPool threadPool{ 4 };
-    AsyncRendererFrontend rendererFrontend { std::make_unique<Renderer>(backend, 1, fileSource, threadPool), view };
+    AsyncRendererFrontend rendererFrontend { std::make_unique<Renderer>(backend, 1, fileSource, threadPool), backend, view };
     Map map { rendererFrontend, MapObserver::nullObserver(), view.getSize(), 1, fileSource, threadPool, MapMode::Still };
     ScreenBox box{{ 0, 0 }, { 1000, 1000 }};
 };
