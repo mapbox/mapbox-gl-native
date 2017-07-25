@@ -10,9 +10,18 @@ workflows:
               ignore: master
       - android-debug-arm-v7
       - android-release-all
-      - node4-clang39-release
-      - node6-clang39-release
-      - node6-clang39-debug
+      - node4-clang39-release:
+          filters:
+            tags:
+              only: /node-.*/
+      - node6-clang39-release:
+          filters:
+            tags:
+              only: /node-.*/
+      - node6-clang39-debug:
+          filters:
+            tags:
+              only: /node-.*/
       - linux-clang39-debug
       - linux-clang4-sanitize-address
       - linux-clang4-sanitize-undefined
@@ -298,8 +307,7 @@ jobs:
       JOBS: 4
       BUILDTYPE: RelWithDebInfo
       WITH_EGL: 1
-      PACKAGE_JSON_VERSION: $(node -e "console.log(require('./package.json').version)")
-      PUBLISH: $([[ "${CIRCLE_BRANCH}" == "node-v${PACKAGE_JSON_VERSION}" ]] && echo true)
+      WITH_CXX11ABI: 0
     steps:
       - checkout
       - *generate-cache-key
@@ -322,8 +330,7 @@ jobs:
       JOBS: 4
       BUILDTYPE: RelWithDebInfo
       WITH_EGL: 1
-      PACKAGE_JSON_VERSION: $(node -e "console.log(require('./package.json').version)")
-      PUBLISH: $([[ "${CIRCLE_BRANCH}" == "node-v${PACKAGE_JSON_VERSION}" ]] && echo true)
+      WITH_CXX11ABI: 0
     steps:
       - checkout
       - *generate-cache-key
@@ -346,8 +353,7 @@ jobs:
       JOBS: 4
       BUILDTYPE: Debug
       WITH_EGL: 1
-      PACKAGE_JSON_VERSION: $(node -e "console.log(require('./package.json').version)")
-      PUBLISH: $([[ "${CIRCLE_BRANCH}" == "node-v${PACKAGE_JSON_VERSION}" ]] && echo true)
+      WITH_CXX11ABI: 0
     steps:
       - checkout
       - *generate-cache-key
