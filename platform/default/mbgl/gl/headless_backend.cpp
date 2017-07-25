@@ -12,7 +12,7 @@ namespace mbgl {
 HeadlessBackend::HeadlessBackend() = default;
 
 HeadlessBackend::~HeadlessBackend() {
-    BackendScope guard { *this, getScopeType() };
+    BackendScope guard { *this };
     context.reset();
 }
 
