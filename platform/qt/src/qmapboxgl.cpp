@@ -1446,9 +1446,6 @@ void QMapboxGL::render()
     }
 #endif
 
-    // The OpenGL implementation automatically enables the OpenGL context for us.
-    mbgl::BackendScope scope { *d_ptr, mbgl::BackendScope::ScopeType::Implicit };
-
     d_ptr->dirty = false;
     d_ptr->render();
 }
@@ -1505,6 +1502,7 @@ QMapboxGLPrivate::QMapboxGLPrivate(QMapboxGL *q, const QMapboxGLSettings &settin
     frontend = std::make_unique<QMapboxGLRendererFrontend>(
             std::make_unique<mbgl::Renderer>(*this, pixelRatio, *fileSourceObj, *threadPool,
                                              static_cast<mbgl::GLContextMode>(settings.contextMode())),
+            *this,
             *this);
     connect(frontend.get(), SIGNAL(updated()), this, SLOT(invalidate()));
     
