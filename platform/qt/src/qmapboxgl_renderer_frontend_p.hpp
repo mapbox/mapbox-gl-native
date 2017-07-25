@@ -1,5 +1,6 @@
 #pragma once
 
+#include <mbgl/renderer/renderer_backend.hpp>
 #include <mbgl/renderer/renderer_frontend.hpp>
 
 #include <QObject>
@@ -14,7 +15,7 @@ class QMapboxGLRendererFrontend : public QObject, public mbgl::RendererFrontend
     Q_OBJECT
 
 public:
-    explicit QMapboxGLRendererFrontend(std::unique_ptr<mbgl::Renderer>, mbgl::View&);
+    explicit QMapboxGLRendererFrontend(std::unique_ptr<mbgl::Renderer>, mbgl::RendererBackend&, mbgl::View&);
     ~QMapboxGLRendererFrontend() override;
     
     void reset() override;
@@ -30,6 +31,7 @@ signals:
     
 private:
     std::unique_ptr<mbgl::Renderer> renderer;
+    mbgl::RendererBackend& backend;
     mbgl::View& view;
     std::shared_ptr<mbgl::UpdateParameters> updateParameters;
 };

@@ -1,13 +1,16 @@
 #include "async_renderer_frontend.hpp"
+
+#include <mbgl/renderer/backend_scope.hpp>
 #include <mbgl/renderer/renderer.hpp>
 
 namespace mbgl {
 
-AsyncRendererFrontend::AsyncRendererFrontend(std::unique_ptr<Renderer> renderer_, View& view_)
+AsyncRendererFrontend::AsyncRendererFrontend(std::unique_ptr<Renderer> renderer_, RendererBackend& backend, View& view_)
     : renderer(std::move(renderer_))
     , view(view_)
-    , asyncInvalidate([this] {
+    , asyncInvalidate([&] {
         if (renderer && updateParameters) {
+            BackendScope guard { backend };
             renderer->render(view, *updateParameters);
         }
     }) {

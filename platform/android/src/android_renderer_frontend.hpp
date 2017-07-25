@@ -2,6 +2,7 @@
 #pragma once
 
 #include <mbgl/annotation/annotation.hpp>
+#include <mbgl/renderer/renderer_backend.hpp>
 #include <mbgl/renderer/renderer_frontend.hpp>
 #include <mbgl/util/async_task.hpp>
 #include <mbgl/util/geo.hpp>
@@ -23,7 +24,7 @@ namespace android {
 class AndroidRendererFrontend : public RendererFrontend {
 public:
     using InvalidateCallback = std::function<void ()>;
-    AndroidRendererFrontend(std::unique_ptr<Renderer>, InvalidateCallback);
+    AndroidRendererFrontend(std::unique_ptr<Renderer>, RendererBackend&, InvalidateCallback);
     ~AndroidRendererFrontend() override;
 
     void reset() override;
@@ -43,6 +44,7 @@ public:
 
 private:
     std::unique_ptr<Renderer> renderer;
+    RendererBackend& backend;
     std::shared_ptr<UpdateParameters> updateParameters;
     util::AsyncTask asyncInvalidate;
 };

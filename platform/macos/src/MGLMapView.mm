@@ -275,7 +275,7 @@ public:
     _mbglThreadPool = mbgl::sharedThreadPool();
 
     auto renderer = std::make_unique<mbgl::Renderer>(*_mbglView, [NSScreen mainScreen].backingScaleFactor, *mbglFileSource, *_mbglThreadPool, mbgl::GLContextMode::Unique);
-    _rendererFrontend = std::make_unique<MGLRenderFrontend>(std::move(renderer), self, _mbglView, true);
+    _rendererFrontend = std::make_unique<MGLRenderFrontend>(std::move(renderer), self, *_mbglView, *_mbglView, true);
     _mbglMap = new mbgl::Map(*_rendererFrontend, *_mbglView, self.size, [NSScreen mainScreen].backingScaleFactor, *mbglFileSource, *_mbglThreadPool, mbgl::MapMode::Continuous, mbgl::ConstrainMode::None, mbgl::ViewportMode::Default);
 
     // Install the OpenGL layer. Interface Builder’s synchronous drawing means
@@ -2877,10 +2877,6 @@ public:
         glGetIntegerv(GL_FRAMEBUFFER_BINDING, &fbo);
         assumeFramebufferBinding(fbo);
         assumeViewport(0, 0, nativeView.framebufferSize);
-    }
-    
-    mbgl::BackendScope::ScopeType getScopeType() const override {
-        return mbgl::BackendScope::ScopeType::Implicit;
     }
 
     void bind() override {
