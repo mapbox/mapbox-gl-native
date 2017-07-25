@@ -503,7 +503,6 @@ void GLFWView::run() {
                 animateRouteCallback(map);
 
             activate();
-            mbgl::BackendScope guard { *this, getScopeType() };
 
             rendererFrontend->render();
 
