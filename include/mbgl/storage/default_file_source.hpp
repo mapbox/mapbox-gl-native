@@ -140,6 +140,7 @@ public:
     void resume();
 
     // For testing only.
+    void setOnlineStatus(bool);
     void put(const Resource&, const Response&);
 
     class Impl;
