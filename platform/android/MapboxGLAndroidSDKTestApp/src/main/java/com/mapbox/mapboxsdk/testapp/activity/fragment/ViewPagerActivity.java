@@ -31,11 +31,11 @@ public class ViewPagerActivity extends AppCompatActivity {
     }
   }
 
-  public static class MapFragmentAdapter extends FragmentPagerAdapter {
+  static class MapFragmentAdapter extends FragmentPagerAdapter {
 
     private static int NUM_ITEMS = 3;
 
-    public MapFragmentAdapter(FragmentManager fragmentManager) {
+    MapFragmentAdapter(FragmentManager fragmentManager) {
       super(fragmentManager);
     }
 
