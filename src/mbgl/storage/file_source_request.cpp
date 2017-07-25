@@ -1,13 +1,13 @@
 #include <mbgl/storage/file_source_request.hpp>
 
 #include <mbgl/actor/mailbox.hpp>
-#include <mbgl/util/run_loop.hpp>
+#include <mbgl/actor/scheduler.hpp>
 
 namespace mbgl {
 
 FileSourceRequest::FileSourceRequest(FileSource::Callback&& callback)
     : responseCallback(callback)
-    , mailbox(std::make_shared<Mailbox>(*util::RunLoop::Get())) {
+    , mailbox(std::make_shared<Mailbox>(*Scheduler::GetCurrent())) {
 }
 
 FileSourceRequest::~FileSourceRequest() {
