@@ -612,11 +612,11 @@ static NSURL *MGLStyleURL_emerald;
 
 #pragma mark Style language preferences
 
-- (void)setLocalizingLabels:(BOOL)localizingLabels
+- (void)setLocalizeLabels:(BOOL)localizeLabels
 {
-    _localizingLabels = localizingLabels;
+    _localizeLabels = localizeLabels;
     
-    if (localizingLabels) {
+    if (_localizeLabels) {
         NSString *preferredLanguage = [MGLVectorSource preferredMapboxStreetsLanguage];
         NSMutableDictionary *localizedKeysByKeyBySourceIdentifier = [NSMutableDictionary dictionary];
         for (MGLSymbolStyleLayer *layer in self.layers) {

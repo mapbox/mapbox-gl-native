@@ -613,12 +613,14 @@ MGL_EXPORT
 #pragma mark Managing Style's localization
 
 /**
- Set to true to determine the localization according to the languages
- supported by <a href="https://www.mapbox.com/vector-tiles/mapbox-streets-v7/#overview">Mapbox Streets</a>, 
- it will look for the Preferred Language Order setting in the Language & Region section of Settings. 
- If it doesn't fing a match it will fall back to english localization.
+ Enable it to determine the localization according to the languages
+ supported by the Vector Style source <a
+ href="https://www.mapbox.com/vector-tiles/mapbox-streets-v7/#overview">
+ Mapbox Streets</a>, it will look for the Preferred Language Order setting in
+ the system's Language & Region section of Settings. If it doesn't find a
+ match it will fall back to english localization.
  */
-@property (nonatomic, getter=isLocalizingLabels) BOOL localizingLabels;
+@property (nonatomic, getter=isLocalizeLabels) BOOL localizeLabels;
 
 @end
 
