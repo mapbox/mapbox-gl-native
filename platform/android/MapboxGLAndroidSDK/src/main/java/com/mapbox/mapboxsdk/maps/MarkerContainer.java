@@ -18,8 +18,6 @@ import com.mapbox.mapboxsdk.annotations.MarkerViewManager;
 import java.util.ArrayList;
 import java.util.List;
 
-import timber.log.Timber;
-
 /**
  * Encapsulates {@link Marker}'s functionality.
  */
@@ -92,11 +90,6 @@ class MarkerContainer implements Markers {
 
   @Override
   public void update(@NonNull Marker updatedMarker, @NonNull MapboxMap mapboxMap) {
-    if (!isAddedToMap(updatedMarker)) {
-      Timber.w("Attempting to update non-added Marker with value %s", updatedMarker);
-      return;
-    }
-
     ensureIconLoaded(updatedMarker, mapboxMap);
     nativeMapView.updateMarker(updatedMarker);
     annotations.setValueAt(annotations.indexOfKey(updatedMarker.getId()), updatedMarker);
@@ -235,10 +228,6 @@ class MarkerContainer implements Markers {
     Icon icon = iconManager.loadIconForMarker(marker);
     marker.setTopOffsetPixels(iconManager.getTopOffsetPixelsForIcon(icon));
     return marker;
-  }
-
-  private boolean isAddedToMap(Annotation annotation) {
-    return annotation != null && annotation.getId() != -1 && annotations.indexOfKey(annotation.getId()) != -1;
   }
 
   private void ensureIconLoaded(Marker marker, MapboxMap mapboxMap) {
