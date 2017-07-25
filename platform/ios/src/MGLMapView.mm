@@ -455,7 +455,7 @@ public:
     _mbglThreadPool = mbgl::sharedThreadPool();
     
     auto renderer = std::make_unique<mbgl::Renderer>(*_mbglView, scaleFactor, *mbglFileSource, *_mbglThreadPool, mbgl::GLContextMode::Unique);
-    _rendererFrontend = std::make_unique<MGLRenderFrontend>(std::move(renderer), self, _mbglView);
+    _rendererFrontend = std::make_unique<MGLRenderFrontend>(std::move(renderer), self, *_mbglView, *_mbglView);
     _mbglMap = new mbgl::Map(*_rendererFrontend, *_mbglView, self.size, scaleFactor, *mbglFileSource, *_mbglThreadPool, mbgl::MapMode::Continuous, mbgl::ConstrainMode::None, mbgl::ViewportMode::Default);
 
     // start paused if in IB
@@ -5527,10 +5527,6 @@ public:
         CFRelease(str);
 
         return reinterpret_cast<mbgl::gl::ProcAddress>(symbol);
-    }
-    
-    mbgl::BackendScope::ScopeType getScopeType() const override {
-        return mbgl::BackendScope::ScopeType::Implicit;
     }
 
     void activate() override
