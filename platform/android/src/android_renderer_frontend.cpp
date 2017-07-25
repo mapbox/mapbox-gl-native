@@ -1,6 +1,7 @@
 #include "android_renderer_frontend.hpp"
 
 #include <mbgl/map/view.hpp>
+#include <mbgl/renderer/backend_scope.hpp>
 #include <mbgl/renderer/renderer.hpp>
 
 namespace mbgl {
@@ -8,8 +9,10 @@ namespace android {
 
 AndroidRendererFrontend::AndroidRendererFrontend(
         std::unique_ptr<Renderer> renderer_,
+        RendererBackend& backend_,
         InvalidateCallback invalidate)
         : renderer(std::move(renderer_))
+        , backend(backend_)
         , asyncInvalidate([=, invalidate=std::move(invalidate)]() {
             invalidate();
         }) {
@@ -37,6 +40,8 @@ void AndroidRendererFrontend::update(std::shared_ptr<UpdateParameters> params) {
 void AndroidRendererFrontend::render(View& view) {
     assert (renderer);
     if (!updateParameters) return;
+
+    BackendScope guard { backend };
 
     renderer->render(view, *updateParameters);
 }
