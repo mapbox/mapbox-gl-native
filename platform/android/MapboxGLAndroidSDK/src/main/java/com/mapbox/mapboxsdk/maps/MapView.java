@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.PointF;
 import android.graphics.SurfaceTexture;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
 import android.support.annotation.IntDef;
@@ -21,6 +22,7 @@ import android.view.SurfaceView;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ZoomButtonsController;
@@ -122,6 +124,18 @@ public class MapView extends FrameLayout {
     // add accessibility support
     setContentDescription(context.getString(R.string.mapbox_mapActionDescription));
     setWillNotDraw(false);
+
+    getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+      @Override
+      public void onGlobalLayout() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+          getViewTreeObserver().removeOnGlobalLayoutListener(this);
+        } else {
+          getViewTreeObserver().removeGlobalOnLayoutListener(this);
+        }
+        initialiseDrawingSurface(mapboxMapOptions.getTextureMode());
+      }
+    });
   }
 
   private void initialiseMap() {
@@ -552,9 +566,6 @@ public class MapView extends FrameLayout {
   protected void onVisibilityChanged(@NonNull View changedView, int visibility) {
     if (isInEditMode()) {
       return;
-    }
-    if (visibility == View.VISIBLE && nativeMapView == null) {
-      initialiseDrawingSurface(mapboxMapOptions.getTextureMode());
     }
 
     if (mapZoomButtonController != null && nativeMapView != null) {
