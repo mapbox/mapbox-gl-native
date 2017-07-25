@@ -181,6 +181,10 @@ class AnnotationManager {
   }
 
   void updateMarker(@NonNull Marker updatedMarker, @NonNull MapboxMap mapboxMap) {
+    if (!isAddedToMap(updatedMarker)) {
+      logNonAdded(updatedMarker);
+      return;
+    }
     markers.update(updatedMarker, mapboxMap);
   }
 
@@ -230,6 +234,10 @@ class AnnotationManager {
   }
 
   void updatePolygon(Polygon polygon) {
+    if (!isAddedToMap(polygon)) {
+      logNonAdded(polygon);
+      return;
+    }
     polygons.update(polygon);
   }
 
@@ -256,6 +264,10 @@ class AnnotationManager {
   }
 
   void updatePolyline(Polyline polyline) {
+    if (!isAddedToMap(polyline)) {
+      logNonAdded(polyline);
+      return;
+    }
     polylines.update(polyline);
   }
 
@@ -363,6 +375,14 @@ class AnnotationManager {
         marker.showInfoWindow(mapboxMap, mapView);
       }
     }
+  }
+
+  private boolean isAddedToMap(Annotation annotation) {
+    return annotation != null && annotation.getId() != -1 && annotationsArray.indexOfKey(annotation.getId()) > -1;
+  }
+
+  private void logNonAdded(Annotation annotation) {
+    Timber.w("Attempting to update non-added %s with value %s", annotation.getClass().getCanonicalName(), annotation);
   }
 
   //
