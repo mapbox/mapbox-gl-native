@@ -11,6 +11,7 @@
 #include <cstring>
 #include <cstdio>
 #include <chrono>
+#include <limits>
 
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/logging.hpp>
@@ -141,7 +142,11 @@ Database::~Database() {
 
 void Database::setBusyTimeout(std::chrono::milliseconds timeout) {
     assert(impl);
-    std::string timeoutStr = mbgl::util::toString(timeout.count());
+
+    // std::chrono::milliseconds.count() is a long and Qt will cast
+    // internally to int, so we need to make sure the limits apply.
+    std::string timeoutStr = mbgl::util::toString(timeout.count() & INT_MAX);
+
     QString connectOptions = impl->db->connectOptions();
     if (connectOptions.isEmpty()) {
         if (!connectOptions.isEmpty()) connectOptions.append(';');
