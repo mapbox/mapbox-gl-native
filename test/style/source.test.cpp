@@ -92,7 +92,7 @@ TEST(Source, LoadingFail) {
         EXPECT_EQ("url", resource.url);
         Response response;
         response.error = std::make_unique<Response::Error>(
-            Response::Error::Reason::Other,
+            ResourceStatus::OtherError,
             "Failed by the test case");
         return response;
     };
@@ -217,7 +217,7 @@ TEST(Source, RasterTileFail) {
     test.fileSource.tileResponse = [&] (const Resource&) {
         Response response;
         response.error = std::make_unique<Response::Error>(
-            Response::Error::Reason::Other,
+            ResourceStatus::OtherError,
             "Failed by the test case");
         return response;
     };
@@ -255,7 +255,7 @@ TEST(Source, VectorTileFail) {
     test.fileSource.tileResponse = [&] (const Resource&) {
         Response response;
         response.error = std::make_unique<Response::Error>(
-            Response::Error::Reason::Other,
+            ResourceStatus::OtherError,
             "Failed by the test case");
         return response;
     };

@@ -193,7 +193,7 @@ TEST(Map, SetStyleInvalidURL) {
     test.fileSource.styleResponse = [] (const Resource&) {
         Response response;
         response.error = std::make_unique<Response::Error>(
-            Response::Error::Reason::Other,
+            ResourceStatus::OtherError,
             "Failed by the test case");
         return response;
     };
@@ -226,7 +226,7 @@ TEST(Map, StyleFresh) {
     response.data = std::make_shared<std::string>(util::read_file("test/fixtures/api/empty.json"));
     response.expires = Timestamp::max();
 
-    test.fileSource.respond(Resource::Style, response);
+    test.fileSource.respond(ResourceKind::Style, response);
     EXPECT_EQ(0u, test.fileSource.requests.size());
 }
 
@@ -244,13 +244,13 @@ TEST(Map, StyleExpired) {
     response.data = std::make_shared<std::string>(util::read_file("test/fixtures/api/empty.json"));
     response.expires = util::now() - 1h;
 
-    test.fileSource.respond(Resource::Style, response);
+    test.fileSource.respond(ResourceKind::Style, response);
     EXPECT_EQ(1u, test.fileSource.requests.size());
 
     test.map.getStyle().addLayer(std::make_unique<style::BackgroundLayer>("bg"));
     EXPECT_EQ(1u, test.fileSource.requests.size());
 
-    test.fileSource.respond(Resource::Style, response);
+    test.fileSource.respond(ResourceKind::Style, response);
     EXPECT_EQ(0u, test.fileSource.requests.size());
     EXPECT_NE(nullptr, test.map.getStyle().getLayer("bg"));
 }
@@ -269,13 +269,13 @@ TEST(Map, StyleExpiredWithAnnotations) {
     response.data = std::make_shared<std::string>(util::read_file("test/fixtures/api/empty.json"));
     response.expires = util::now() - 1h;
 
-    test.fileSource.respond(Resource::Style, response);
+    test.fileSource.respond(ResourceKind::Style, response);
     EXPECT_EQ(1u, test.fileSource.requests.size());
 
     test.map.addAnnotation(LineAnnotation { LineString<double> {{ { 0, 0 }, { 10, 10 } }} });
     EXPECT_EQ(1u, test.fileSource.requests.size());
 
-    test.fileSource.respond(Resource::Style, response);
+    test.fileSource.respond(ResourceKind::Style, response);
     EXPECT_EQ(1u, test.fileSource.requests.size());
 }
 
@@ -293,13 +293,13 @@ TEST(Map, StyleExpiredWithRender) {
     response.data = std::make_shared<std::string>(util::read_file("test/fixtures/api/empty.json"));
     response.expires = util::now() - 1h;
 
-    test.fileSource.respond(Resource::Style, response);
+    test.fileSource.respond(ResourceKind::Style, response);
     EXPECT_EQ(1u, test.fileSource.requests.size());
 
     test::render(test.map, test.view);
     EXPECT_EQ(1u, test.fileSource.requests.size());
 
-    test.fileSource.respond(Resource::Style, response);
+    test.fileSource.respond(ResourceKind::Style, response);
     EXPECT_EQ(1u, test.fileSource.requests.size());
 }
 
@@ -313,7 +313,7 @@ TEST(Map, StyleEarlyMutation) {
 
     Response response;
     response.data = std::make_shared<std::string>(util::read_file("test/fixtures/api/water.json"));
-    test.fileSource.respond(Resource::Style, response);
+    test.fileSource.respond(ResourceKind::Style, response);
 
     EXPECT_EQ(0u, test.fileSource.requests.size());
     EXPECT_NE(nullptr, test.map.getStyle().getLayer("water"));

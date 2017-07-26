@@ -8,36 +8,36 @@ using namespace mbgl::http;
 
 TEST(HttpRetry, OtherError) {
     // Non-retryable
-    ASSERT_EQ(Duration::max(), errorRetryTimeout(Response::Error::Reason::Other, 1));
+    ASSERT_EQ(Duration::max(), errorRetryTimeout(ResourceStatus::OtherError, 1));
 }
 
 TEST(HttpRetry, NotFound) {
     // Non-retryable
-    ASSERT_EQ(Duration::max(), errorRetryTimeout(Response::Error::Reason::NotFound, 1));
+    ASSERT_EQ(Duration::max(), errorRetryTimeout(ResourceStatus::NotFoundError, 1));
 }
 
 TEST(HttpRetry, ServerError) {
     // 1-3 failures -> 1 sec
-    ASSERT_EQ(Seconds(1), errorRetryTimeout(Response::Error::Reason::Server, 1));
-    ASSERT_EQ(Seconds(1), errorRetryTimeout(Response::Error::Reason::Server, 3));
+    ASSERT_EQ(Seconds(1), errorRetryTimeout(ResourceStatus::ServerError, 1));
+    ASSERT_EQ(Seconds(1), errorRetryTimeout(ResourceStatus::ServerError, 3));
 
     // After 3, exponential backoff
-    ASSERT_EQ(Seconds(2), errorRetryTimeout(Response::Error::Reason::Server, 4));
-    ASSERT_EQ(Seconds(1u << 31), errorRetryTimeout(Response::Error::Reason::Server, 50));
+    ASSERT_EQ(Seconds(2), errorRetryTimeout(ResourceStatus::ServerError, 4));
+    ASSERT_EQ(Seconds(1u << 31), errorRetryTimeout(ResourceStatus::ServerError, 50));
 }
 
 TEST(HttpRetry, ConnectionError) {
     // Exponential backoff
-    ASSERT_EQ(Seconds(1), errorRetryTimeout(Response::Error::Reason::Server, 1));
-    ASSERT_EQ(Seconds(1u << 31), errorRetryTimeout(Response::Error::Reason::Connection, 50));
+    ASSERT_EQ(Seconds(1), errorRetryTimeout(ResourceStatus::ServerError, 1));
+    ASSERT_EQ(Seconds(1u << 31), errorRetryTimeout(ResourceStatus::ConnectionError, 50));
 }
 
 TEST(HttpRetry, RateLimit) {
     // Pre-set value from header
-    ASSERT_EQ(Seconds(1), errorRetryTimeout(Response::Error::Reason::Server, 1, { util::now() + Seconds(1) }));
+    ASSERT_EQ(Seconds(1), errorRetryTimeout(ResourceStatus::ServerError, 1, { util::now() + Seconds(1) }));
 
     // Default
-    ASSERT_EQ(Seconds(5), errorRetryTimeout(Response::Error::Reason::RateLimit, 1, {}));
+    ASSERT_EQ(Seconds(5), errorRetryTimeout(ResourceStatus::RateLimitError, 1, {}));
 }
 
 TEST(HttpRetry, ExpiredInitial) {

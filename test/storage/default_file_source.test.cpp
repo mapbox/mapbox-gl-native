@@ -10,7 +10,7 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(CacheResponse)) {
     util::RunLoop loop;
     DefaultFileSource fs(":memory:", ".");
 
-    const Resource resource { Resource::Unknown, "http://127.0.0.1:3000/cache" };
+    const Resource resource { ResourceKind::Unknown, "http://127.0.0.1:3000/cache" };
     Response response;
 
     std::unique_ptr<AsyncRequest> req1;
@@ -48,7 +48,7 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(CacheRevalidateSame)) {
     util::RunLoop loop;
     DefaultFileSource fs(":memory:", ".");
 
-    const Resource revalidateSame { Resource::Unknown, "http://127.0.0.1:3000/revalidate-same" };
+    const Resource revalidateSame { ResourceKind::Unknown, "http://127.0.0.1:3000/revalidate-same" };
     std::unique_ptr<AsyncRequest> req1;
     std::unique_ptr<AsyncRequest> req2;
     uint16_t counter = 0;
@@ -92,7 +92,7 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(CacheRevalidateModified)) {
     util::RunLoop loop;
     DefaultFileSource fs(":memory:", ".");
 
-    const Resource revalidateModified{ Resource::Unknown,
+    const Resource revalidateModified{ ResourceKind::Unknown,
                                        "http://127.0.0.1:3000/revalidate-modified" };
     std::unique_ptr<AsyncRequest> req1;
     std::unique_ptr<AsyncRequest> req2;
@@ -136,7 +136,7 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(CacheRevalidateEtag)) {
     util::RunLoop loop;
     DefaultFileSource fs(":memory:", ".");
 
-    const Resource revalidateEtag { Resource::Unknown, "http://127.0.0.1:3000/revalidate-etag" };
+    const Resource revalidateEtag { ResourceKind::Unknown, "http://127.0.0.1:3000/revalidate-etag" };
     std::unique_ptr<AsyncRequest> req1;
     std::unique_ptr<AsyncRequest> req2;
     uint16_t counter = 0;
@@ -191,7 +191,7 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(HTTPIssue1369)) {
     util::RunLoop loop;
     DefaultFileSource fs(":memory:", ".");
 
-    const Resource resource { Resource::Unknown, "http://127.0.0.1:3000/test" };
+    const Resource resource { ResourceKind::Unknown, "http://127.0.0.1:3000/test" };
 
     auto req = fs.request(resource, [&](Response) {
         ADD_FAILURE() << "Callback should not be called";
@@ -215,7 +215,7 @@ TEST(DefaultFileSource, OptionalNonExpired) {
     util::RunLoop loop;
     DefaultFileSource fs(":memory:", ".");
 
-    const Resource optionalResource { Resource::Unknown, "http://127.0.0.1:3000/test", {}, Resource::Optional };
+    const Resource optionalResource { ResourceKind::Unknown, "http://127.0.0.1:3000/test", {}, Resource::Optional };
 
     using namespace std::chrono_literals;
 
@@ -244,7 +244,7 @@ TEST(DefaultFileSource, OptionalExpired) {
     util::RunLoop loop;
     DefaultFileSource fs(":memory:", ".");
 
-    const Resource optionalResource { Resource::Unknown, "http://127.0.0.1:3000/test", {}, Resource::Optional };
+    const Resource optionalResource { ResourceKind::Unknown, "http://127.0.0.1:3000/test", {}, Resource::Optional };
 
     using namespace std::chrono_literals;
 
@@ -289,7 +289,7 @@ TEST(DefaultFileSource, OptionalNotFound) {
     util::RunLoop loop;
     DefaultFileSource fs(":memory:", ".");
 
-    const Resource optionalResource { Resource::Unknown, "http://127.0.0.1:3000/test", {}, Resource::Optional };
+    const Resource optionalResource { ResourceKind::Unknown, "http://127.0.0.1:3000/test", {}, Resource::Optional };
 
     using namespace std::chrono_literals;
 
@@ -297,7 +297,7 @@ TEST(DefaultFileSource, OptionalNotFound) {
     req = fs.request(optionalResource, [&](Response res) {
         req.reset();
         ASSERT_TRUE(res.error.get());
-        EXPECT_EQ(Response::Error::Reason::NotFound, res.error->reason);
+        EXPECT_EQ(ResourceStatus::NotFoundError, res.error->status);
         EXPECT_EQ("Not found in offline database", res.error->message);
         EXPECT_FALSE(res.data);
         EXPECT_FALSE(bool(res.expires));
@@ -315,7 +315,7 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(NoCacheRefreshEtagNotModified)) {
     util::RunLoop loop;
     DefaultFileSource fs(":memory:", ".");
 
-    Resource resource { Resource::Unknown, "http://127.0.0.1:3000/revalidate-same" };
+    Resource resource { ResourceKind::Unknown, "http://127.0.0.1:3000/revalidate-same" };
     resource.priorEtag.emplace("snowfall");
 
     using namespace std::chrono_literals;
@@ -349,7 +349,7 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(NoCacheRefreshEtagModified)) {
     util::RunLoop loop;
     DefaultFileSource fs(":memory:", ".");
 
-    Resource resource { Resource::Unknown, "http://127.0.0.1:3000/revalidate-same" };
+    Resource resource { ResourceKind::Unknown, "http://127.0.0.1:3000/revalidate-same" };
     resource.priorEtag.emplace("sunshine");
 
     using namespace std::chrono_literals;
@@ -383,7 +383,7 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(NoCacheFull)) {
     util::RunLoop loop;
     DefaultFileSource fs(":memory:", ".");
 
-    Resource resource { Resource::Unknown, "http://127.0.0.1:3000/revalidate-same" };
+    Resource resource { ResourceKind::Unknown, "http://127.0.0.1:3000/revalidate-same" };
     // Setting any prior field results in skipping the cache.
     resource.priorExpires.emplace(Seconds(0));
 
@@ -418,7 +418,7 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(NoCacheRefreshModifiedNotModified))
     util::RunLoop loop;
     DefaultFileSource fs(":memory:", ".");
 
-    Resource resource { Resource::Unknown, "http://127.0.0.1:3000/revalidate-modified" };
+    Resource resource { ResourceKind::Unknown, "http://127.0.0.1:3000/revalidate-modified" };
     resource.priorModified.emplace(Seconds(1420070400)); // January 1, 2015
 
     using namespace std::chrono_literals;
@@ -452,7 +452,7 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(NoCacheRefreshModifiedModified)) {
     util::RunLoop loop;
     DefaultFileSource fs(":memory:", ".");
 
-    Resource resource { Resource::Unknown, "http://127.0.0.1:3000/revalidate-modified" };
+    Resource resource { ResourceKind::Unknown, "http://127.0.0.1:3000/revalidate-modified" };
     resource.priorModified.emplace(Seconds(1417392000)); // December 1, 2014
 
     using namespace std::chrono_literals;
@@ -484,7 +484,7 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(SetResourceTransform)) {
     DefaultFileSource fs(":memory:", ".");
 
     // Translates the URL "localhost://test to http://127.0.0.1:3000/test
-    Actor<ResourceTransform> transform(loop, [](Resource::Kind, const std::string&& url) -> std::string {
+    Actor<ResourceTransform> transform(loop, [](ResourceKind, const std::string&& url) -> std::string {
         if (url == "localhost://test") {
             return "http://127.0.0.1:3000/test";
         } else {
@@ -493,7 +493,7 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(SetResourceTransform)) {
     });
 
     fs.setResourceTransform(transform.self());
-    const Resource resource1 { Resource::Unknown, "localhost://test" };
+    const Resource resource1 { ResourceKind::Unknown, "localhost://test" };
 
     std::unique_ptr<AsyncRequest> req;
     req = fs.request(resource1, [&](Response res) {
@@ -510,7 +510,7 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(SetResourceTransform)) {
     loop.run();
 
     fs.setResourceTransform({});
-    const Resource resource2 { Resource::Unknown, "http://127.0.0.1:3000/test" };
+    const Resource resource2 { ResourceKind::Unknown, "http://127.0.0.1:3000/test" };
 
     req = fs.request(resource2, [&](Response res) {
         req.reset();

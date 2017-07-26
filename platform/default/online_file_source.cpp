@@ -56,7 +56,7 @@ public:
     // Counts the number of subsequent failed requests. We're using this value for exponential
     // backoff when retrying requests.
     uint32_t failedRequests = 0;
-    Response::Error::Reason failedRequestReason = Response::Error::Reason::Success;
+    ResourceStatus failedRequestReason = ResourceStatus::Success;
     optional<Timestamp> retryAfter;
 };
 
@@ -130,7 +130,7 @@ public:
             request->request = httpFileSource.request(request->resource, callback);
         } else {
             Response response;
-            response.error = std::make_unique<Response::Error>(Response::Error::Reason::Connection,
+            response.error = std::make_unique<Response::Error>(ResourceStatus::ConnectionError,
                                                                "Online connectivity is disabled.");
             callback(response);
         }
@@ -209,28 +209,28 @@ std::unique_ptr<AsyncRequest> OnlineFileSource::request(const Resource& resource
     Resource res = resource;
 
     switch (resource.kind) {
-    case Resource::Kind::Unknown:
-    case Resource::Kind::Image:
+    case ResourceKind::Unknown:
+    case ResourceKind::Image:
         break;
 
-    case Resource::Kind::Style:
+    case ResourceKind::Style:
         res.url = mbgl::util::mapbox::normalizeStyleURL(apiBaseURL, resource.url, accessToken);
         break;
 
-    case Resource::Kind::Source:
+    case ResourceKind::Source:
         res.url = util::mapbox::normalizeSourceURL(apiBaseURL, resource.url, accessToken);
         break;
 
-    case Resource::Kind::Glyphs:
+    case ResourceKind::Glyphs:
         res.url = util::mapbox::normalizeGlyphsURL(apiBaseURL, resource.url, accessToken);
         break;
 
-    case Resource::Kind::SpriteImage:
-    case Resource::Kind::SpriteJSON:
+    case ResourceKind::SpriteImage:
+    case ResourceKind::SpriteJSON:
         res.url = util::mapbox::normalizeSpriteURL(apiBaseURL, resource.url, accessToken);
         break;
 
-    case Resource::Kind::Tile:
+    case ResourceKind::Tile:
         res.url = util::mapbox::normalizeTileURL(apiBaseURL, resource.url, accessToken);
         break;
     }
@@ -317,7 +317,7 @@ void OnlineFileRequest::schedule(optional<Timestamp> expires) {
     // a really long timeout. The request will get re-triggered when
     // the NetworkStatus is set back to Online.
     if (NetworkStatus::Get() == NetworkStatus::Status::Offline) {
-        failedRequestReason = Response::Error::Reason::Connection;
+        failedRequestReason = ResourceStatus::ConnectionError;
         failedRequests = 1;
         timeout = Duration::max();
     }
@@ -359,11 +359,11 @@ void OnlineFileRequest::completed(Response response) {
 
     if (response.error) {
         failedRequests++;
-        failedRequestReason = response.error->reason;
+        failedRequestReason = response.error->status;
         retryAfter = response.error->retryAfter;
     } else {
         failedRequests = 0;
-        failedRequestReason = Response::Error::Reason::Success;
+        failedRequestReason = ResourceStatus::Success;
     }
 
     schedule(response.expires);
@@ -378,7 +378,7 @@ void OnlineFileRequest::completed(Response response) {
 void OnlineFileRequest::networkIsReachableAgain() {
     // We need all requests to fail at least once before we are going to start retrying
     // them, and we only immediately restart request that failed due to connection issues.
-    if (failedRequestReason == Response::Error::Reason::Connection) {
+    if (failedRequestReason == ResourceStatus::ConnectionError) {
         schedule(util::now());
     }
 }

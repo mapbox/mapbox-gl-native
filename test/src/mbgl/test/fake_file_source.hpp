@@ -41,7 +41,7 @@ public:
         return std::make_unique<FakeFileRequest>(resource, callback, requests);
     }
 
-    bool respond(Resource::Kind kind, const Response& response) {
+    bool respond(ResourceKind kind, const Response& response) {
         auto it = std::find_if(requests.begin(), requests.end(), [&] (FakeFileRequest* fakeRequest) {
             return fakeRequest->resource.kind == kind;
         });

@@ -89,7 +89,7 @@ TEST(OfflineDatabase, TEST_REQUIRES_WRITE(Create)) {
     Log::setObserver(std::make_unique<FixtureLogObserver>());
 
     OfflineDatabase db("test/fixtures/offline_database/offline.db");
-    EXPECT_FALSE(bool(db.get({ Resource::Unknown, "mapbox://test" })));
+    EXPECT_FALSE(bool(db.get({ ResourceKind::Unknown, "mapbox://test" })));
 
     Log::removeObserver();
 }
@@ -137,9 +137,9 @@ TEST(OfflineDatabase, PutDoesNotStoreConnectionErrors) {
 
     OfflineDatabase db(":memory:");
 
-    Resource resource { Resource::Unknown, "http://example.com/" };
+    Resource resource { ResourceKind::Unknown, "http://example.com/" };
     Response response;
-    response.error = std::make_unique<Response::Error>(Response::Error::Reason::Connection);
+    response.error = std::make_unique<Response::Error>(ResourceStatus::ConnectionError);
 
     db.put(resource, response);
     EXPECT_FALSE(bool(db.get(resource)));
@@ -150,9 +150,9 @@ TEST(OfflineDatabase, PutDoesNotStoreServerErrors) {
 
     OfflineDatabase db(":memory:");
 
-    Resource resource { Resource::Unknown, "http://example.com/" };
+    Resource resource { ResourceKind::Unknown, "http://example.com/" };
     Response response;
-    response.error = std::make_unique<Response::Error>(Response::Error::Reason::Server);
+    response.error = std::make_unique<Response::Error>(ResourceStatus::ServerError);
 
     db.put(resource, response);
     EXPECT_FALSE(bool(db.get(resource)));
@@ -163,7 +163,7 @@ TEST(OfflineDatabase, PutResource) {
 
     OfflineDatabase db(":memory:");
 
-    Resource resource { Resource::Style, "http://example.com/" };
+    Resource resource { ResourceKind::Style, "http://example.com/" };
     Response response;
 
     response.data = std::make_shared<std::string>("first");
@@ -190,7 +190,7 @@ TEST(OfflineDatabase, PutTile) {
 
     OfflineDatabase db(":memory:");
 
-    Resource resource { Resource::Tile, "http://example.com/" };
+    Resource resource { ResourceKind::Tile, "http://example.com/" };
     resource.tileData = Resource::TileData {
         "http://example.com/",
         1,
@@ -224,7 +224,7 @@ TEST(OfflineDatabase, PutResourceNoContent) {
 
     OfflineDatabase db(":memory:");
 
-    Resource resource { Resource::Style, "http://example.com/" };
+    Resource resource { ResourceKind::Style, "http://example.com/" };
     Response response;
     response.noContent = true;
 
@@ -240,7 +240,7 @@ TEST(OfflineDatabase, PutTileNotFound) {
 
     OfflineDatabase db(":memory:");
 
-    Resource resource { Resource::Tile, "http://example.com/" };
+    Resource resource { ResourceKind::Tile, "http://example.com/" };
     resource.tileData = Resource::TileData {
         "http://example.com/",
         1,
@@ -364,7 +364,7 @@ TEST(OfflineDatabase, TEST_REQUIRES_WRITE(ConcurrentUse)) {
     OfflineDatabase db1("test/fixtures/offline_database/offline.db");
     OfflineDatabase db2("test/fixtures/offline_database/offline.db");
 
-    Resource resource { Resource::Style, "http://example.com/" };
+    Resource resource { ResourceKind::Style, "http://example.com/" };
     Response response;
     response.noContent = true;
 
@@ -525,7 +525,7 @@ TEST(OfflineDatabase, HasRegionResourceTile) {
     OfflineRegionDefinition definition { "", LatLngBounds::world(), 0, INFINITY, 1.0 };
     OfflineRegion region = db.createRegion(definition, OfflineRegionMetadata());
 
-    Resource resource { Resource::Tile, "http://example.com/" };
+    Resource resource { ResourceKind::Tile, "http://example.com/" };
     resource.tileData = Resource::TileData {
         "http://example.com/",
         1,

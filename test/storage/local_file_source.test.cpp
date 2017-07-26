@@ -25,7 +25,7 @@ TEST(LocalFileSource, EmptyFile) {
 
     LocalFileSource fs;
 
-    std::unique_ptr<AsyncRequest> req = fs.request({ Resource::Unknown, toAbsoluteURL("empty") }, [&](Response res) {
+    std::unique_ptr<AsyncRequest> req = fs.request({ ResourceKind::Unknown, toAbsoluteURL("empty") }, [&](Response res) {
         req.reset();
         EXPECT_EQ(nullptr, res.error);
         ASSERT_TRUE(res.data.get());
@@ -41,7 +41,7 @@ TEST(LocalFileSource, NonEmptyFile) {
 
     LocalFileSource fs;
 
-    std::unique_ptr<AsyncRequest> req = fs.request({ Resource::Unknown, toAbsoluteURL("nonempty") }, [&](Response res) {
+    std::unique_ptr<AsyncRequest> req = fs.request({ ResourceKind::Unknown, toAbsoluteURL("nonempty") }, [&](Response res) {
         req.reset();
         EXPECT_EQ(nullptr, res.error);
         ASSERT_TRUE(res.data.get());
@@ -57,10 +57,10 @@ TEST(LocalFileSource, NonExistentFile) {
 
     LocalFileSource fs;
 
-    std::unique_ptr<AsyncRequest> req = fs.request({ Resource::Unknown, toAbsoluteURL("does_not_exist") }, [&](Response res) {
+    std::unique_ptr<AsyncRequest> req = fs.request({ ResourceKind::Unknown, toAbsoluteURL("does_not_exist") }, [&](Response res) {
         req.reset();
         ASSERT_NE(nullptr, res.error);
-        EXPECT_EQ(Response::Error::Reason::NotFound, res.error->reason);
+        EXPECT_EQ(ResourceStatus::NotFoundError, res.error->status);
         ASSERT_FALSE(res.data.get());
         // Do not assert on platform-specific error message.
         loop.stop();
@@ -74,10 +74,10 @@ TEST(LocalFileSource, ReadDirectory) {
 
     LocalFileSource fs;
 
-    std::unique_ptr<AsyncRequest> req = fs.request({ Resource::Unknown, toAbsoluteURL("directory") }, [&](Response res) {
+    std::unique_ptr<AsyncRequest> req = fs.request({ ResourceKind::Unknown, toAbsoluteURL("directory") }, [&](Response res) {
         req.reset();
         ASSERT_NE(nullptr, res.error);
-        EXPECT_EQ(Response::Error::Reason::NotFound, res.error->reason);
+        EXPECT_EQ(ResourceStatus::NotFoundError, res.error->status);
         ASSERT_FALSE(res.data.get());
         // Do not assert on platform-specific error message.
         loop.stop();
@@ -91,7 +91,7 @@ TEST(LocalFileSource, URLEncoding) {
 
     LocalFileSource fs;
 
-    std::unique_ptr<AsyncRequest> req = fs.request({ Resource::Unknown, toAbsoluteURL("%6eonempty") }, [&](Response res) {
+    std::unique_ptr<AsyncRequest> req = fs.request({ ResourceKind::Unknown, toAbsoluteURL("%6eonempty") }, [&](Response res) {
         req.reset();
         EXPECT_EQ(nullptr, res.error);
         ASSERT_TRUE(res.data.get());
@@ -112,10 +112,10 @@ TEST(LocalFileSource, URLLimit) {
 
     std::string url(filename, length);
 
-    std::unique_ptr<AsyncRequest> req = fs.request({ Resource::Unknown, toAbsoluteURL(url) }, [&](Response res) {
+    std::unique_ptr<AsyncRequest> req = fs.request({ ResourceKind::Unknown, toAbsoluteURL(url) }, [&](Response res) {
         req.reset();
         ASSERT_NE(nullptr, res.error);
-        EXPECT_EQ(Response::Error::Reason::Other, res.error->reason);
+        EXPECT_EQ(ResourceStatus::OtherError, res.error->status);
         ASSERT_FALSE(res.data.get());
         loop.stop();
     });

@@ -6,7 +6,7 @@ ResourceTransform::ResourceTransform(ActorRef<ResourceTransform>, TransformCallb
     : transformCallback(std::move(callback)) {
 }
 
-void ResourceTransform::transform(Resource::Kind kind, const std::string&& url, FinishedCallback&& finished) {
+void ResourceTransform::transform(ResourceKind kind, const std::string&& url, FinishedCallback&& finished) {
     finished(transformCallback(kind, std::move(url)));
 }
 

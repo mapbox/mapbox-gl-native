@@ -26,31 +26,31 @@ void RegisterModule(v8::Local<v8::Object> target, v8::Local<v8::Object> module) 
 
     Nan::Set(resource,
         Nan::New("Unknown").ToLocalChecked(),
-        Nan::New(mbgl::Resource::Unknown));
+        Nan::New(static_cast<int32_t>(mbgl::ResourceKind::Unknown)));
 
     Nan::Set(resource,
         Nan::New("Style").ToLocalChecked(),
-        Nan::New(mbgl::Resource::Style));
+        Nan::New(static_cast<int32_t>(mbgl::ResourceKind::Style)));
 
     Nan::Set(resource,
         Nan::New("Source").ToLocalChecked(),
-        Nan::New(mbgl::Resource::Source));
+        Nan::New(static_cast<int32_t>(mbgl::ResourceKind::Source)));
 
     Nan::Set(resource,
         Nan::New("Tile").ToLocalChecked(),
-        Nan::New(mbgl::Resource::Tile));
+        Nan::New(static_cast<int32_t>(mbgl::ResourceKind::Tile)));
 
     Nan::Set(resource,
         Nan::New("Glyphs").ToLocalChecked(),
-        Nan::New(mbgl::Resource::Glyphs));
+        Nan::New(static_cast<int32_t>(mbgl::ResourceKind::Glyphs)));
 
     Nan::Set(resource,
         Nan::New("SpriteImage").ToLocalChecked(),
-        Nan::New(mbgl::Resource::SpriteImage));
+        Nan::New(static_cast<int32_t>(mbgl::ResourceKind::SpriteImage)));
 
     Nan::Set(resource,
         Nan::New("SpriteJSON").ToLocalChecked(),
-        Nan::New(mbgl::Resource::SpriteJSON));
+        Nan::New(static_cast<int32_t>(mbgl::ResourceKind::SpriteJSON)));
 
     Nan::Set(target,
         Nan::New("Resource").ToLocalChecked(),

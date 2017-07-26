@@ -41,42 +41,42 @@ static std::string getTileBBox(int32_t x, int32_t y, int8_t z) {
 
 Resource Resource::style(const std::string& url) {
     return Resource {
-        Resource::Kind::Style,
+        ResourceKind::Style,
         url
     };
 }
 
 Resource Resource::source(const std::string& url) {
     return Resource {
-        Resource::Kind::Source,
+        ResourceKind::Source,
         url
     };
 }
 
 Resource Resource::image(const std::string& url) {
     return Resource {
-        Resource::Kind::Image,
+        ResourceKind::Image,
         url
     };
 }
 
 Resource Resource::spriteImage(const std::string& base, float pixelRatio) {
     return Resource {
-        Resource::Kind::SpriteImage,
+        ResourceKind::SpriteImage,
         base + (pixelRatio > 1 ? "@2x" : "") + ".png"
     };
 }
 
 Resource Resource::spriteJSON(const std::string& base, float pixelRatio) {
     return Resource {
-        Resource::Kind::SpriteJSON,
+        ResourceKind::SpriteJSON,
         base + (pixelRatio > 1 ? "@2x" : "") + ".json"
     };
 }
 
 Resource Resource::glyphs(const std::string& urlTemplate, const FontStack& fontStack, const std::pair<uint16_t, uint16_t>& glyphRange) {
     return Resource {
-        Resource::Kind::Glyphs,
+        ResourceKind::Glyphs,
         util::replaceTokens(urlTemplate, [&](const std::string& token) {
             if (token == "fontstack") {
                 return util::percentEncode(fontStackToString(fontStack));
@@ -101,7 +101,7 @@ Resource Resource::tile(const std::string& urlTemplate,
         y = (1 << z) - y - 1;
     }
     return Resource {
-        Resource::Kind::Tile,
+        ResourceKind::Tile,
         util::replaceTokens(urlTemplate, [&](const std::string& token) {
             if (token == "z") {
                 return util::toString(z);

@@ -111,7 +111,7 @@ void NodeRequest::HandleCallback(const Nan::FunctionCallbackInfo<v8::Value>& inf
 
     if (request->ErrorMessage()) {
         response.error = std::make_unique<mbgl::Response::Error>(
-            mbgl::Response::Error::Reason::Other,
+            mbgl::ResourceStatus::OtherError,
             request->ErrorMessage()
         );
     }

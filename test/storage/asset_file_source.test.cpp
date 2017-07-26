@@ -40,11 +40,11 @@ TEST(AssetFileSource, Load) {
                     endCallback();
                     request.reset();
                 } else {
-                    request = fs->request({ mbgl::Resource::Unknown, asset }, requestCallback);
+                    request = fs->request({ mbgl::ResourceKind::Unknown, asset }, requestCallback);
                 }
             };
 
-            request = fs->request({ mbgl::Resource::Unknown, asset }, requestCallback);
+            request = fs->request({ mbgl::ResourceKind::Unknown, asset }, requestCallback);
         }
 
     private:
@@ -74,7 +74,7 @@ TEST(AssetFileSource, EmptyFile) {
 
     AssetFileSource fs("test/fixtures/storage/assets");
 
-    std::unique_ptr<AsyncRequest> req = fs.request({ Resource::Unknown, "asset://empty" }, [&](Response res) {
+    std::unique_ptr<AsyncRequest> req = fs.request({ ResourceKind::Unknown, "asset://empty" }, [&](Response res) {
         req.reset();
         EXPECT_EQ(nullptr, res.error);
         ASSERT_TRUE(res.data.get());
@@ -90,7 +90,7 @@ TEST(AssetFileSource, NonEmptyFile) {
 
     AssetFileSource fs("test/fixtures/storage/assets");
 
-    std::unique_ptr<AsyncRequest> req = fs.request({ Resource::Unknown, "asset://nonempty" }, [&](Response res) {
+    std::unique_ptr<AsyncRequest> req = fs.request({ ResourceKind::Unknown, "asset://nonempty" }, [&](Response res) {
         req.reset();
         EXPECT_EQ(nullptr, res.error);
         ASSERT_TRUE(res.data.get());
@@ -106,10 +106,10 @@ TEST(AssetFileSource, NonExistentFile) {
 
     AssetFileSource fs("test/fixtures/storage/assets");
 
-    std::unique_ptr<AsyncRequest> req = fs.request({ Resource::Unknown, "asset://does_not_exist" }, [&](Response res) {
+    std::unique_ptr<AsyncRequest> req = fs.request({ ResourceKind::Unknown, "asset://does_not_exist" }, [&](Response res) {
         req.reset();
         ASSERT_NE(nullptr, res.error);
-        EXPECT_EQ(Response::Error::Reason::NotFound, res.error->reason);
+        EXPECT_EQ(ResourceStatus::NotFoundError, res.error->status);
         ASSERT_FALSE(res.data.get());
         // Do not assert on platform-specific error message.
         loop.stop();
@@ -123,10 +123,10 @@ TEST(AssetFileSource, ReadDirectory) {
 
     AssetFileSource fs("test/fixtures/storage/assets");
 
-    std::unique_ptr<AsyncRequest> req = fs.request({ Resource::Unknown, "asset://directory" }, [&](Response res) {
+    std::unique_ptr<AsyncRequest> req = fs.request({ ResourceKind::Unknown, "asset://directory" }, [&](Response res) {
         req.reset();
         ASSERT_NE(nullptr, res.error);
-        EXPECT_EQ(Response::Error::Reason::NotFound, res.error->reason);
+        EXPECT_EQ(ResourceStatus::NotFoundError, res.error->status);
         ASSERT_FALSE(res.data.get());
         // Do not assert on platform-specific error message.
         loop.stop();
@@ -140,7 +140,7 @@ TEST(AssetFileSource, URLEncoding) {
 
     AssetFileSource fs("test/fixtures/storage/assets");
 
-    std::unique_ptr<AsyncRequest> req = fs.request({ Resource::Unknown, "asset://%6eonempty" }, [&](Response res) {
+    std::unique_ptr<AsyncRequest> req = fs.request({ ResourceKind::Unknown, "asset://%6eonempty" }, [&](Response res) {
         req.reset();
         EXPECT_EQ(nullptr, res.error);
         ASSERT_TRUE(res.data.get());

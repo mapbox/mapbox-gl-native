@@ -35,15 +35,15 @@ public:
         int result = stat(path.c_str(), &buf);
 
         if (result == 0 && (S_IFDIR & buf.st_mode)) {
-            response.error = std::make_unique<Response::Error>(Response::Error::Reason::NotFound);
+            response.error = std::make_unique<Response::Error>(ResourceStatus::NotFoundError);
         } else if (result == -1 && errno == ENOENT) {
-            response.error = std::make_unique<Response::Error>(Response::Error::Reason::NotFound);
+            response.error = std::make_unique<Response::Error>(ResourceStatus::NotFoundError);
         } else {
             try {
                 response.data = std::make_shared<std::string>(util::read_file(path));
             } catch (...) {
                 response.error = std::make_unique<Response::Error>(
-                    Response::Error::Reason::Other,
+                    ResourceStatus::OtherError,
                     util::toString(std::current_exception()));
             }
         }

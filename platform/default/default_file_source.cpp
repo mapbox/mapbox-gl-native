@@ -133,7 +133,7 @@ public:
                     offlineResponse.emplace();
                     offlineResponse->noContent = true;
                     offlineResponse->error = std::make_unique<Response::Error>(
-                            Response::Error::Reason::NotFound, "Not found in offline database");
+                            ResourceStatus::NotFoundError, "Not found in offline database");
                 }
 
                 if (offlineResponse) {

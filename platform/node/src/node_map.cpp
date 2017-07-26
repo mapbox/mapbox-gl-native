@@ -1019,7 +1019,7 @@ std::unique_ptr<mbgl::AsyncRequest> NodeMap::request(const mbgl::Resource& resou
     auto instance = Nan::New(NodeRequest::constructor)->NewInstance(2, argv);
 
     Nan::Set(instance, Nan::New("url").ToLocalChecked(), Nan::New(resource.url).ToLocalChecked());
-    Nan::Set(instance, Nan::New("kind").ToLocalChecked(), Nan::New<v8::Integer>(resource.kind));
+    Nan::Set(instance, Nan::New("kind").ToLocalChecked(), Nan::New<v8::Integer>(static_cast<int32_t>(resource.kind)));
 
     auto request = Nan::ObjectWrap::Unwrap<NodeRequest>(instance);
     request->Execute();

@@ -57,7 +57,7 @@ void TileLoader<T>::loadOptional() {
 
         tile.setTriedOptional();
 
-        if (res.error && res.error->reason == Response::Error::Reason::NotFound) {
+        if (res.error && res.error->status == ResourceStatus::NotFoundError) {
             // When the optional request could not be satisfied, don't treat it as an error.
             // Instead, we make sure that the next request knows that there has been an optional
             // request before by setting one of the prior* fields.
@@ -89,7 +89,7 @@ void TileLoader<T>::makeOptional() {
 
 template <typename T>
 void TileLoader<T>::loadedData(const Response& res) {
-    if (res.error && res.error->reason != Response::Error::Reason::NotFound) {
+    if (res.error && res.error->status != ResourceStatus::NotFoundError) {
         tile.setError(std::make_exception_ptr(std::runtime_error(res.error->message)));
     } else if (res.notModified) {
         resource.priorExpires = res.expires;

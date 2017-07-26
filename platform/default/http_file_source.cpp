@@ -355,12 +355,12 @@ void HTTPRequest::handleResult(CURLcode code) {
         case CURLE_OPERATION_TIMEDOUT:
 
             response->error = std::make_unique<Error>(
-                Error::Reason::Connection, std::string{ curl_easy_strerror(code) } + ": " + error);
+                ResourceStatus::Connection, std::string{ curl_easy_strerror(code) } + ": " + error);
             break;
 
         default:
             response->error = std::make_unique<Error>(
-                Error::Reason::Other, std::string{ curl_easy_strerror(code) } + ": " + error);
+                ResourceStatus::Other, std::string{ curl_easy_strerror(code) } + ": " + error);
             break;
         }
     } else {
@@ -373,24 +373,24 @@ void HTTPRequest::handleResult(CURLcode code) {
             } else {
                 response->data = std::make_shared<std::string>();
             }
-        } else if (responseCode == 204 || (responseCode == 404 && resource.kind == Resource::Kind::Tile)) {
+        } else if (responseCode == 204 || (responseCode == 404 && resource.kind == ResourceKind::Tile)) {
             response->noContent = true;
         } else if (responseCode == 304) {
             response->notModified = true;
         } else if (responseCode == 404) {
             response->error =
-                std::make_unique<Error>(Error::Reason::NotFound, "HTTP status code 404");
+                std::make_unique<Error>(ResourceStatus::NotFound, "HTTP status code 404");
         } else if (responseCode == 429) {
             response->error =
-                std::make_unique<Error>(Error::Reason::RateLimit, "HTTP status code 429",
+                std::make_unique<Error>(ResourceStatus::RateLimit, "HTTP status code 429",
                                         http::parseRetryHeaders(retryAfter, xRateLimitReset));
         } else if (responseCode >= 500 && responseCode < 600) {
             response->error =
-                std::make_unique<Error>(Error::Reason::Server, std::string{ "HTTP status code " } +
+                std::make_unique<Error>(ResourceStatus::Server, std::string{ "HTTP status code " } +
                                                                    util::toString(responseCode));
         } else {
             response->error =
-                std::make_unique<Error>(Error::Reason::Other, std::string{ "HTTP status code " } +
+                std::make_unique<Error>(ResourceStatus::Other, std::string{ "HTTP status code " } +
                                                                   util::toString(responseCode));
         }
     }

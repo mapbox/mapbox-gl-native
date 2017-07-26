@@ -72,7 +72,7 @@ Response successfulSpriteJSONResponse(const Resource& resource) {
 Response failedSpriteResponse(const Resource&) {
     Response response;
     response.error = std::make_unique<Response::Error>(
-        Response::Error::Reason::Other,
+        ResourceStatus::OtherError,
         "Failed by the test case");
     return response;
 }

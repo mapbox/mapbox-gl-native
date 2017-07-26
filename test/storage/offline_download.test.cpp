@@ -264,7 +264,7 @@ TEST(OfflineDownload, DoesNotFloodTheFileSourceWithRequests) {
 
     EXPECT_EQ(1u, fileSource.requests.size());
 
-    fileSource.respond(Resource::Kind::Style, test.response("style.json"));
+    fileSource.respond(ResourceKind::Style, test.response("style.json"));
     test.loop.runOnce();
 
     EXPECT_EQ(HTTPFileSource::maximumConcurrentRequests(), fileSource.requests.size());
@@ -345,14 +345,14 @@ TEST(OfflineDownload, RequestError) {
 
     test.fileSource.styleResponse = [&] (const Resource&) {
         Response response;
-        response.error = std::make_unique<Response::Error>(Response::Error::Reason::Connection, "connection error");
+        response.error = std::make_unique<Response::Error>(ResourceStatus::ConnectionError, "connection error");
         return response;
     };
 
     auto observer = std::make_unique<MockObserver>();
 
     observer->responseErrorFn = [&] (Response::Error error) {
-        EXPECT_EQ(Response::Error::Reason::Connection, error.reason);
+        EXPECT_EQ(ResourceStatus::ConnectionError, error.status);
         EXPECT_EQ("connection error", error.message);
         test.loop.stop();
     };
@@ -377,7 +377,7 @@ TEST(OfflineDownload, RequestErrorsAreRetried) {
         };
 
         Response response;
-        response.error = std::make_unique<Response::Error>(Response::Error::Reason::Connection, "connection error");
+        response.error = std::make_unique<Response::Error>(ResourceStatus::ConnectionError, "connection error");
         return response;
     };
 

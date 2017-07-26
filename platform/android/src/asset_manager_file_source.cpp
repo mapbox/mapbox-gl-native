@@ -27,7 +27,7 @@ public:
                 reinterpret_cast<const char*>(AAsset_getBuffer(asset)), AAsset_getLength64(asset));
             AAsset_close(asset);
         } else {
-            response.error = std::make_unique<Response::Error>(Response::Error::Reason::NotFound,
+            response.error = std::make_unique<Response::Error>(ResourceStatus::NotFoundError,
                                                                "Could not read asset");
         }
 

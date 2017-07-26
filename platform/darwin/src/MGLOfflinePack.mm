@@ -204,15 +204,15 @@ private:
 NSError *MGLErrorFromResponseError(mbgl::Response::Error error) {
     NSInteger errorCode = MGLErrorCodeUnknown;
     switch (error.reason) {
-        case mbgl::Response::Error::Reason::NotFound:
+        case mbgl::ResourceStatus::NotFoundError:
             errorCode = MGLErrorCodeNotFound;
             break;
 
-        case mbgl::Response::Error::Reason::Server:
+        case mbgl::ResourceStatus::ServerError:
             errorCode = MGLErrorCodeBadServerResponse;
             break;
 
-        case mbgl::Response::Error::Reason::Connection:
+        case mbgl::ResourceStatus::ConnectionError:
             errorCode = MGLErrorCodeConnectionFailed;
             break;
 

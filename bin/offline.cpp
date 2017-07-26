@@ -100,7 +100,7 @@ int main(int argc, char *argv[]) {
         }
 
         void responseError(Response::Error error) override {
-            std::cerr << error.reason << " downloading resource: " << error.message << std::endl;
+            std::cerr << error.status << " downloading resource: " << error.message << std::endl;
         }
 
         void mapboxTileCountLimitExceeded(uint64_t limit) override {

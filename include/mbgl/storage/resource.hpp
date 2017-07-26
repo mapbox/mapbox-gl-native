@@ -1,7 +1,8 @@
 #pragma once
 
-#include <mbgl/storage/response.hpp>
+#include <mbgl/storage/resource_kind.hpp>
 #include <mbgl/util/optional.hpp>
+#include <mbgl/util/chrono.hpp>
 #include <mbgl/util/font_stack.hpp>
 #include <mbgl/util/tileset.hpp>
 
@@ -11,17 +12,6 @@ namespace mbgl {
 
 class Resource {
 public:
-    enum Kind : uint8_t {
-        Unknown = 0,
-        Style,
-        Source,
-        Tile,
-        Glyphs,
-        SpriteImage,
-        SpriteJSON,
-        Image
-    };
-
     struct TileData {
         std::string urlTemplate;
         uint8_t pixelRatio;
@@ -35,7 +25,7 @@ public:
         Required = true,
     };
 
-    Resource(Kind kind_, std::string url_, optional<TileData> tileData_ = {}, Necessity necessity_ = Required)
+    Resource(ResourceKind kind_, std::string url_, optional<TileData> tileData_ = {}, Necessity necessity_ = Required)
         : kind(kind_),
           necessity(necessity_),
           url(std::move(url_)),
@@ -57,8 +47,8 @@ public:
     static Resource spriteImage(const std::string& base, float pixelRatio);
     static Resource spriteJSON(const std::string& base, float pixelRatio);
     static Resource image(const std::string& url);
-    
-    Kind kind;
+
+    ResourceKind kind;
     Necessity necessity;
     std::string url;
 

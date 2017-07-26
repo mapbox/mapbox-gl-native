@@ -59,28 +59,28 @@ void StubFileSource::remove(AsyncRequest* req) {
 
 optional<Response> StubFileSource::defaultResponse(const Resource& resource) {
     switch (resource.kind) {
-    case Resource::Kind::Style:
+    case ResourceKind::Style:
         if (!styleResponse) throw std::runtime_error("unexpected style request");
         return styleResponse(resource);
-    case Resource::Kind::Source:
+    case ResourceKind::Source:
         if (!sourceResponse) throw std::runtime_error("unexpected source request");
         return sourceResponse(resource);
-    case Resource::Kind::Tile:
+    case ResourceKind::Tile:
         if (!tileResponse) throw std::runtime_error("unexpected tile request");
         return tileResponse(resource);
-    case Resource::Kind::Glyphs:
+    case ResourceKind::Glyphs:
         if (!glyphsResponse) throw std::runtime_error("unexpected glyphs request");
         return glyphsResponse(resource);
-    case Resource::Kind::SpriteJSON:
+    case ResourceKind::SpriteJSON:
         if (!spriteJSONResponse) throw std::runtime_error("unexpected sprite JSON request");
         return spriteJSONResponse(resource);
-    case Resource::Kind::SpriteImage:
+    case ResourceKind::SpriteImage:
         if (!spriteImageResponse) throw std::runtime_error("unexpected sprite image request");
         return spriteImageResponse(resource);
-    case Resource::Kind::Image:
+    case ResourceKind::Image:
         if (!imageResponse) throw std::runtime_error("unexpected image request");
         return imageResponse(resource);
-    case Resource::Kind::Unknown:
+    case ResourceKind::Unknown:
         throw std::runtime_error("unknown resource type");
     }
 

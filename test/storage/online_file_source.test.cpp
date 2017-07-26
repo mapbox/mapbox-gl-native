@@ -14,7 +14,7 @@ TEST(OnlineFileSource, Cancel) {
     util::RunLoop loop;
     OnlineFileSource fs;
 
-    fs.request({ Resource::Unknown, "http://127.0.0.1:3000/test" }, [&](Response) {
+    fs.request({ ResourceKind::Unknown, "http://127.0.0.1:3000/test" }, [&](Response) {
         ADD_FAILURE() << "Callback should not be called";
     });
 
@@ -25,7 +25,7 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(CancelMultiple)) {
     util::RunLoop loop;
     OnlineFileSource fs;
 
-    const Resource resource { Resource::Unknown, "http://127.0.0.1:3000/test" };
+    const Resource resource { ResourceKind::Unknown, "http://127.0.0.1:3000/test" };
 
     std::unique_ptr<AsyncRequest> req2 = fs.request(resource, [&](Response) {
         ADD_FAILURE() << "Callback should not be called";
@@ -51,14 +51,14 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(TemporaryError)) {
 
     const auto start = Clock::now();
 
-    auto req = fs.request({ Resource::Unknown, "http://127.0.0.1:3000/temporary-error" }, [&](Response res) {
+    auto req = fs.request({ ResourceKind::Unknown, "http://127.0.0.1:3000/temporary-error" }, [&](Response res) {
         static int counter = 0;
         switch (counter++) {
         case 0: {
             const auto duration = std::chrono::duration<const double>(Clock::now() - start).count();
             EXPECT_GT(0.2, duration) << "Initial error request took too long";
             ASSERT_NE(nullptr, res.error);
-            EXPECT_EQ(Response::Error::Reason::Server, res.error->reason);
+            EXPECT_EQ(ResourceStatus::ServerError, res.error->status);
             EXPECT_EQ("HTTP status code 500", res.error->message);
             ASSERT_FALSE(bool(res.data));
             EXPECT_FALSE(bool(res.expires));
@@ -89,14 +89,14 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(ConnectionError)) {
 
     const auto start = Clock::now();
 
-    std::unique_ptr<AsyncRequest> req = fs.request({ Resource::Unknown, "http://127.0.0.1:3001/" }, [&](Response res) {
+    std::unique_ptr<AsyncRequest> req = fs.request({ ResourceKind::Unknown, "http://127.0.0.1:3001/" }, [&](Response res) {
         static int counter = 0;
         static int wait = 0;
         const auto duration = std::chrono::duration<const double>(Clock::now() - start).count();
         EXPECT_LT(wait - 0.01, duration) << "Backoff timer didn't wait 1 second";
         EXPECT_GT(wait + 0.2, duration) << "Backoff timer fired too late";
         ASSERT_NE(nullptr, res.error);
-        EXPECT_EQ(Response::Error::Reason::Connection, res.error->reason);
+        EXPECT_EQ(ResourceStatus::ConnectionError, res.error->status);
         ASSERT_FALSE(res.data.get());
         EXPECT_FALSE(bool(res.expires));
         EXPECT_FALSE(bool(res.modified));
@@ -119,7 +119,7 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(Timeout)) {
 
     int counter = 0;
 
-    const Resource resource { Resource::Unknown, "http://127.0.0.1:3000/test?cachecontrol=max-age=1" };
+    const Resource resource { ResourceKind::Unknown, "http://127.0.0.1:3000/test?cachecontrol=max-age=1" };
     std::unique_ptr<AsyncRequest> req = fs.request(resource, [&](Response res) {
         counter++;
         EXPECT_EQ(nullptr, res.error);
@@ -145,7 +145,7 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(RetryDelayOnExpiredTile)) {
 
     int counter = 0;
 
-    const Resource resource { Resource::Unknown, "http://127.0.0.1:3000/test?expires=10000" };
+    const Resource resource { ResourceKind::Unknown, "http://127.0.0.1:3000/test?expires=10000" };
     std::unique_ptr<AsyncRequest> req = fs.request(resource, [&](Response res) {
         counter++;
         EXPECT_EQ(nullptr, res.error);
@@ -168,7 +168,7 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(RetryOnClockSkew)) {
 
     int counter = 0;
 
-    const Resource resource { Resource::Unknown, "http://127.0.0.1:3000/clockskew" };
+    const Resource resource { ResourceKind::Unknown, "http://127.0.0.1:3000/clockskew" };
     std::unique_ptr<AsyncRequest> req1 = fs.request(resource, [&](Response res) {
         switch (counter++) {
         case 0: {
@@ -195,7 +195,7 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(RespectPriorExpires)) {
     OnlineFileSource fs;
 
     // Very long expiration time, should never arrive.
-    Resource resource1{ Resource::Unknown, "http://127.0.0.1:3000/test" };
+    Resource resource1{ ResourceKind::Unknown, "http://127.0.0.1:3000/test" };
     resource1.priorExpires = util::now() + Seconds(100000);
 
     std::unique_ptr<AsyncRequest> req1 = fs.request(resource1, [&](Response) {
@@ -203,14 +203,14 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(RespectPriorExpires)) {
     });
 
     // No expiration time, should be requested immediately.
-    Resource resource2{ Resource::Unknown, "http://127.0.0.1:3000/test" };
+    Resource resource2{ ResourceKind::Unknown, "http://127.0.0.1:3000/test" };
 
     std::unique_ptr<AsyncRequest> req2 = fs.request(resource2, [&](Response) {
         loop.stop();
     });
 
     // Very long expiration time, should never arrive.
-    Resource resource3{ Resource::Unknown, "http://127.0.0.1:3000/test" };
+    Resource resource3{ ResourceKind::Unknown, "http://127.0.0.1:3000/test" };
     resource3.priorExpires = util::now() + Seconds(100000);
 
     std::unique_ptr<AsyncRequest> req3 = fs.request(resource3, [&](Response) {
@@ -232,7 +232,7 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(Load)) {
 
     std::function<void(int)> req = [&](int i) {
         const auto current = number++;
-        reqs[i] = fs.request({ Resource::Unknown,
+        reqs[i] = fs.request({ ResourceKind::Unknown,
                      std::string("http://127.0.0.1:3000/load/") + std::to_string(current) },
                    [&, i, current](Response res) {
             reqs[i].reset();
@@ -268,7 +268,7 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(NetworkStatusChange)) {
     util::RunLoop loop;
     OnlineFileSource fs;
 
-    const Resource resource { Resource::Unknown, "http://127.0.0.1:3000/delayed" };
+    const Resource resource { ResourceKind::Unknown, "http://127.0.0.1:3000/delayed" };
 
     // This request takes 200 milliseconds to answer.
     std::unique_ptr<AsyncRequest> req = fs.request(resource, [&](Response res) {
@@ -299,7 +299,7 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(NetworkStatusChangePreempt)) {
 
     const auto start = Clock::now();
 
-    const Resource resource{ Resource::Unknown, "http://127.0.0.1:3001/test" };
+    const Resource resource{ ResourceKind::Unknown, "http://127.0.0.1:3001/test" };
     std::unique_ptr<AsyncRequest> req = fs.request(resource, [&](Response res) {
         static int counter = 0;
         const auto duration = std::chrono::duration<const double>(Clock::now() - start).count();
@@ -312,7 +312,7 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(NetworkStatusChangePreempt)) {
             FAIL() << "Retried too often";
         }
         ASSERT_NE(nullptr, res.error);
-        EXPECT_EQ(Response::Error::Reason::Connection, res.error->reason);
+        EXPECT_EQ(ResourceStatus::ConnectionError, res.error->status);
         ASSERT_FALSE(res.data.get());
         EXPECT_FALSE(bool(res.expires));
         EXPECT_FALSE(bool(res.modified));
@@ -337,7 +337,7 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(NetworkStatusOnlineOffline)) {
     util::RunLoop loop;
     OnlineFileSource fs;
 
-    const Resource resource { Resource::Unknown, "http://127.0.0.1:3000/test" };
+    const Resource resource { ResourceKind::Unknown, "http://127.0.0.1:3000/test" };
 
     EXPECT_EQ(NetworkStatus::Get(), NetworkStatus::Status::Online) << "Default status should be Online";
     NetworkStatus::Set(NetworkStatus::Status::Offline);
@@ -365,9 +365,9 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(RateLimitStandard)) {
     util::RunLoop loop;
     OnlineFileSource fs;
 
-    auto req = fs.request({ Resource::Unknown, "http://127.0.0.1:3000/rate-limit?std=true" }, [&](Response res) {
+    auto req = fs.request({ ResourceKind::Unknown, "http://127.0.0.1:3000/rate-limit?std=true" }, [&](Response res) {
         ASSERT_NE(nullptr, res.error);
-        EXPECT_EQ(Response::Error::Reason::RateLimit, res.error->reason);
+        EXPECT_EQ(ResourceStatus::RateLimitError, res.error->status);
         ASSERT_EQ(true, bool(res.error->retryAfter));
         ASSERT_LT(util::now(), res.error->retryAfter);
         loop.stop();
@@ -380,9 +380,9 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(RateLimitMBX)) {
     util::RunLoop loop;
     OnlineFileSource fs;
 
-    auto req = fs.request({ Resource::Unknown, "http://127.0.0.1:3000/rate-limit?mbx=true" }, [&](Response res) {
+    auto req = fs.request({ ResourceKind::Unknown, "http://127.0.0.1:3000/rate-limit?mbx=true" }, [&](Response res) {
         ASSERT_NE(nullptr, res.error);
-        EXPECT_EQ(Response::Error::Reason::RateLimit, res.error->reason);
+        EXPECT_EQ(ResourceStatus::RateLimitError, res.error->status);
         ASSERT_EQ(true, bool(res.error->retryAfter));
         ASSERT_LT(util::now(), res.error->retryAfter);
         loop.stop();
@@ -395,9 +395,9 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(RateLimitDefault)) {
     util::RunLoop loop;
     OnlineFileSource fs;
 
-    auto req = fs.request({ Resource::Unknown, "http://127.0.0.1:3000/rate-limit" }, [&](Response res) {
+    auto req = fs.request({ ResourceKind::Unknown, "http://127.0.0.1:3000/rate-limit" }, [&](Response res) {
         ASSERT_NE(nullptr, res.error);
-        EXPECT_EQ(Response::Error::Reason::RateLimit, res.error->reason);
+        EXPECT_EQ(ResourceStatus::RateLimitError, res.error->status);
         ASSERT_FALSE(res.error->retryAfter);
         loop.stop();
     });

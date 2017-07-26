@@ -4,16 +4,16 @@
 namespace mbgl {
 namespace http {
 
-Duration errorRetryTimeout(Response::Error::Reason failedRequestReason, uint32_t failedRequests, optional<Timestamp> retryAfter) {
+Duration errorRetryTimeout(ResourceStatus failedRequestReason, uint32_t failedRequests, optional<Timestamp> retryAfter) {
 
-    if (failedRequestReason == Response::Error::Reason::Server) {
+    if (failedRequestReason == ResourceStatus::ServerError) {
         // Retry after one second three times, then start exponential backoff.
         return Seconds(failedRequests <= 3 ? 1 : 1u << std::min(failedRequests - 3, 31u));
-    } else if (failedRequestReason == Response::Error::Reason::Connection) {
+    } else if (failedRequestReason == ResourceStatus::ConnectionError) {
         // Immediate exponential backoff.
         assert(failedRequests > 0);
         return Seconds(1u << std::min(failedRequests - 1, 31u));
-    } else if (failedRequestReason == Response::Error::Reason::RateLimit) {
+    } else if (failedRequestReason == ResourceStatus::RateLimitError) {
         if (retryAfter) {
             return *retryAfter - util::now();
         } else {

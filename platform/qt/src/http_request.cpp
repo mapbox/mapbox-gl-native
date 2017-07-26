@@ -66,7 +66,7 @@ void HTTPRequest::handleNetworkReply(QNetworkReply *reply)
     // Handle non-HTTP errors (i.e. like connection).
     if (reply->error() && reply->error() < 100) {
         response.error = std::make_unique<Error>(
-            Error::Reason::Connection, reply->errorString().toStdString());
+            ResourceStatus::Connection, reply->errorString().toStdString());
         callback(response);
         return;
     }
@@ -111,22 +111,22 @@ void HTTPRequest::handleNetworkReply(QNetworkReply *reply)
         response.notModified = true;
         break;
     case 404: {
-        if (m_resource.kind == Resource::Kind::Tile) {
+        if (m_resource.kind == ResourceKind::Tile) {
             response.noContent = true;
         } else {
             response.error = std::make_unique<Error>(
-                Error::Reason::NotFound, "HTTP status code 404");
+                ResourceStatus::NotFound, "HTTP status code 404");
         }
         break;
     }
     case 429:
         response.error = std::make_unique<Error>(
-                Error::Reason::RateLimit, "HTTP status code 429",
+                ResourceStatus::RateLimit, "HTTP status code 429",
                 http::parseRetryHeaders(retryAfter, xRateLimitReset));
         break;
     default:
-        Response::Error::Reason reason = (responseCode >= 500 && responseCode < 600) ?
-            Error::Reason::Server : Error::Reason::Other;
+        ResourceStatus reason = (responseCode >= 500 && responseCode < 600) ?
+            ResourceStatus::Server : ResourceStatus::Other;
 
         response.error = std::make_unique<Error>(
             reason, "HTTP status code " + util::toString(responseCode));

@@ -142,7 +142,7 @@ optional<Response> OfflineDatabase::get(const Resource& resource) {
 }
 
 optional<std::pair<Response, uint64_t>> OfflineDatabase::getInternal(const Resource& resource) {
-    if (resource.kind == Resource::Kind::Tile) {
+    if (resource.kind == ResourceKind::Tile) {
         assert(resource.tileData);
         return getTile(*resource.tileData);
     } else {
@@ -151,7 +151,7 @@ optional<std::pair<Response, uint64_t>> OfflineDatabase::getInternal(const Resou
 }
 
 optional<int64_t> OfflineDatabase::hasInternal(const Resource& resource) {
-    if (resource.kind == Resource::Kind::Tile) {
+    if (resource.kind == ResourceKind::Tile) {
         assert(resource.tileData);
         return hasTile(*resource.tileData);
     } else {
@@ -185,7 +185,7 @@ std::pair<bool, uint64_t> OfflineDatabase::putInternal(const Resource& resource,
 
     bool inserted;
 
-    if (resource.kind == Resource::Kind::Tile) {
+    if (resource.kind == ResourceKind::Tile) {
         assert(resource.tileData);
         inserted = putTile(*resource.tileData, response,
                 compressed ? compressedData : response.data ? *response.data : "",
@@ -623,7 +623,7 @@ uint64_t OfflineDatabase::putRegionResource(int64_t regionID, const Resource& re
     bool previouslyUnused = markUsed(regionID, resource);
 
     if (offlineMapboxTileCount
-        && resource.kind == Resource::Kind::Tile
+        && resource.kind == ResourceKind::Tile
         && util::mapbox::isMapboxURL(resource.url)
         && previouslyUnused) {
         *offlineMapboxTileCount += 1;
@@ -633,7 +633,7 @@ uint64_t OfflineDatabase::putRegionResource(int64_t regionID, const Resource& re
 }
 
 bool OfflineDatabase::markUsed(int64_t regionID, const Resource& resource) {
-    if (resource.kind == Resource::Kind::Tile) {
+    if (resource.kind == ResourceKind::Tile) {
         // clang-format off
         Statement insert = getStatement(
             "INSERT OR IGNORE INTO region_tiles (region_id, tile_id) "

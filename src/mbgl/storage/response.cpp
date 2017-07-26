@@ -21,24 +21,24 @@ Response& Response::operator=(const Response& res) {
     return *this;
 }
 
-Response::Error::Error(Reason reason_, std::string message_, optional<Timestamp> retryAfter_)
-    : reason(reason_), message(std::move(message_)), retryAfter(std::move(retryAfter_)) {
+Response::Error::Error(ResourceStatus reason_, std::string message_, optional<Timestamp> retryAfter_)
+    : status(reason_), message(std::move(message_)), retryAfter(std::move(retryAfter_)) {
 }
 
-std::ostream& operator<<(std::ostream& os, Response::Error::Reason r) {
+std::ostream& operator<<(std::ostream& os, ResourceStatus r) {
     switch (r) {
-    case Response::Error::Reason::Success:
-        return os << "Response::Error::Reason::Success";
-    case Response::Error::Reason::NotFound:
-        return os << "Response::Error::Reason::NotFound";
-    case Response::Error::Reason::Server:
-        return os << "Response::Error::Reason::Server";
-    case Response::Error::Reason::Connection:
-        return os << "Response::Error::Reason::Connection";
-    case Response::Error::Reason::RateLimit:
-        return os << "Response::Error::Reason::RateLimit";
-    case Response::Error::Reason::Other:
-        return os << "Response::Error::Reason::Other";
+    case ResourceStatus::Success:
+        return os << "ResourceStatus::Success";
+    case ResourceStatus::NotFoundError:
+        return os << "ResourceStatus::NotFoundError";
+    case ResourceStatus::ServerError:
+        return os << "ResourceStatus::ServerError";
+    case ResourceStatus::ConnectionError:
+        return os << "ResourceStatus::ConnectionError";
+    case ResourceStatus::RateLimitError:
+        return os << "ResourceStatus::RateLimitError";
+    case ResourceStatus::OtherError:
+        return os << "ResourceStatus::OtherError";
     }
 
     // The above switch is exhaustive, but placate GCC nonetheless:

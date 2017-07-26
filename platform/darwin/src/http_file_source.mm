@@ -239,7 +239,7 @@ std::unique_ptr<AsyncRequest> HTTPFileSource::request(const Resource& resource, 
                     switch ([error code]) {
                     case NSURLErrorBadServerResponse: // 5xx errors
                         response.error = std::make_unique<Error>(
-                            Error::Reason::Server, [[error localizedDescription] UTF8String]);
+                            ResourceStatus::ServerError, [[error localizedDescription] UTF8String]);
                         break;
 
                     case NSURLErrorNetworkConnectionLost:
@@ -252,12 +252,12 @@ std::unique_ptr<AsyncRequest> HTTPFileSource::request(const Resource& resource, 
                     case NSURLErrorDataNotAllowed:
                     case NSURLErrorTimedOut:
                         response.error = std::make_unique<Error>(
-                            Error::Reason::Connection, [[error localizedDescription] UTF8String]);
+                            ResourceStatus::ConnectionError, [[error localizedDescription] UTF8String]);
                         break;
 
                     default:
                         response.error = std::make_unique<Error>(
-                            Error::Reason::Other, [[error localizedDescription] UTF8String]);
+                            ResourceStatus::OtherError, [[error localizedDescription] UTF8String]);
                         break;
                     }
                 } else if ([res isKindOfClass:[NSHTTPURLResponse class]]) {
@@ -286,13 +286,13 @@ std::unique_ptr<AsyncRequest> HTTPFileSource::request(const Resource& resource, 
 
                     if (responseCode == 200) {
                         response.data = std::make_shared<std::string>((const char *)[data bytes], [data length]);
-                    } else if (responseCode == 204 || (responseCode == 404 && resource.kind == Resource::Kind::Tile)) {
+                    } else if (responseCode == 204 || (responseCode == 404 && resource.kind == ResourceKind::Tile)) {
                         response.noContent = true;
                     } else if (responseCode == 304) {
                         response.notModified = true;
                     } else if (responseCode == 404) {
                         response.error =
-                            std::make_unique<Error>(Error::Reason::NotFound, "HTTP status code 404");
+                            std::make_unique<Error>(ResourceStatus::NotFoundError, "HTTP status code 404");
                     } else if (responseCode == 429) {
                         // Get the standard header
                         optional<std::string> retryAfter;
@@ -308,19 +308,19 @@ std::unique_ptr<AsyncRequest> HTTPFileSource::request(const Resource& resource, 
                             xRateLimitReset = std::string([xReset UTF8String]);
                         }
 
-                        response.error = std::make_unique<Error>(Error::Reason::RateLimit, "HTTP status code 429", http::parseRetryHeaders(retryAfter, xRateLimitReset));
+                        response.error = std::make_unique<Error>(ResourceStatus::RateLimitError, "HTTP status code 429", http::parseRetryHeaders(retryAfter, xRateLimitReset));
                     } else if (responseCode >= 500 && responseCode < 600) {
                         response.error =
-                            std::make_unique<Error>(Error::Reason::Server, std::string{ "HTTP status code " } +
+                            std::make_unique<Error>(ResourceStatus::ServerError, std::string{ "HTTP status code " } +
                                                                                std::to_string(responseCode));
                     } else {
                         response.error =
-                            std::make_unique<Error>(Error::Reason::Other, std::string{ "HTTP status code " } +
+                            std::make_unique<Error>(ResourceStatus::OtherError, std::string{ "HTTP status code " } +
                                                                               std::to_string(responseCode));
                     }
                 } else {
                     // This should never happen.
-                    response.error = std::make_unique<Error>(Error::Reason::Other,
+                    response.error = std::make_unique<Error>(ResourceStatus::OtherError,
                                                               "Response class is not NSHTTPURLResponse");
                 }
 

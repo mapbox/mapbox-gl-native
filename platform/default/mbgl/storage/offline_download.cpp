@@ -305,7 +305,7 @@ void OfflineDownload::ensureResource(const Resource& resource,
         if (offlineResponse) {
             status.completedResourceCount++;
             status.completedResourceSize += *offlineResponse;
-            if (resource.kind == Resource::Kind::Tile) {
+            if (resource.kind == ResourceKind::Tile) {
                 status.completedTileCount += 1;
                 status.completedTileSize += *offlineResponse;
             }
@@ -335,7 +335,7 @@ void OfflineDownload::ensureResource(const Resource& resource,
             status.completedResourceCount++;
             uint64_t resourceSize = offlineDatabase.putRegionResource(id, resource, onlineResponse);
             status.completedResourceSize += resourceSize;
-            if (resource.kind == Resource::Kind::Tile) {
+            if (resource.kind == ResourceKind::Tile) {
                 status.completedTileCount += 1;
                 status.completedTileSize += resourceSize;
             }
@@ -352,7 +352,7 @@ void OfflineDownload::ensureResource(const Resource& resource,
 }
 
 bool OfflineDownload::checkTileCountLimit(const Resource& resource) {
-    if (resource.kind == Resource::Kind::Tile && util::mapbox::isMapboxURL(resource.url) &&
+    if (resource.kind == ResourceKind::Tile && util::mapbox::isMapboxURL(resource.url) &&
         offlineDatabase.offlineMapboxTileCountLimitExceeded()) {
         observer->mapboxTileCountLimitExceeded(offlineDatabase.getOfflineMapboxTileCountLimit());
         setState(OfflineRegionDownloadState::Inactive);

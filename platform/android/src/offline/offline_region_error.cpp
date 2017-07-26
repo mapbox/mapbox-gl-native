@@ -8,22 +8,22 @@ jni::Object<OfflineRegionError> OfflineRegionError::New(jni::JNIEnv& env, mbgl::
     // Handle the value of reason independently of the underlying int value
     std::string reason;
     switch(error.reason) {
-        case mbgl::Response::Error::Reason::Success:
+        case mbgl::ResourceStatus::Success:
             reason = "REASON_SUCCESS";
             break;
-        case mbgl::Response::Error::Reason::NotFound:
+        case mbgl::ResourceStatus::NotFoundError:
             reason = "REASON_NOT_FOUND";
             break;
-        case mbgl::Response::Error::Reason::Server:
+        case mbgl::ResourceStatus::ServerError:
             reason = "REASON_SERVER";
             break;
-        case mbgl::Response::Error::Reason::Connection:
+        case mbgl::ResourceStatus::ConnectionError:
             reason = "REASON_CONNECTION";
             break;
-        case mbgl::Response::Error::Reason::RateLimit:
+        case mbgl::ResourceStatus::RateLimitError:
             reason = "REASON_RATE_LIMIT";
             break;
-        case mbgl::Response::Error::Reason::Other:
+        case mbgl::ResourceStatus::OtherError:
             reason = "REASON_OTHER";
             break;
     }

@@ -52,7 +52,7 @@ void FileSource::setResourceTransform(jni::JNIEnv& env, jni::Object<FileSource::
             // Note: we're converting it to shared_ptr because this lambda is converted to a std::function,
             // which requires copyability of its captured variables.
             [callback = std::shared_ptr<jni::jobject>(transformCallback.NewGlobalRef(env).release()->Get(), GenericGlobalRefDeleter())]
-            (mbgl::Resource::Kind kind, const std::string&& url_) {
+            (mbgl::ResourceKind kind, const std::string&& url_) {
                 android::UniqueEnv _env = android::AttachEnv();
                 return FileSource::ResourceTransformCallback::onURL(*_env, jni::Object<FileSource::ResourceTransformCallback>(*callback), int(kind), url_);
             });

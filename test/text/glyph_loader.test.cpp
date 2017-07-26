@@ -60,7 +60,7 @@ TEST(GlyphManager, LoadingSuccess) {
     GlyphManagerTest test;
 
     test.fileSource.glyphsResponse = [&] (const Resource& resource) {
-        EXPECT_EQ(Resource::Kind::Glyphs, resource.kind);
+        EXPECT_EQ(ResourceKind::Glyphs, resource.kind);
         Response response;
         response.data = std::make_shared<std::string>(util::read_file("test/fixtures/resources/glyphs.pbf"));
         return response;
@@ -101,7 +101,7 @@ TEST(GlyphManager, LoadingFail) {
     test.fileSource.glyphsResponse = [&] (const Resource&) {
         Response response;
         response.error = std::make_unique<Response::Error>(
-            Response::Error::Reason::Other,
+            ResourceStatus::OtherError,
             "Failed by the test case");
         return response;
     };
@@ -182,7 +182,7 @@ TEST(GlyphManager, LoadingInvalid) {
     GlyphManagerTest test;
 
     test.fileSource.glyphsResponse = [&] (const Resource& resource) {
-        EXPECT_EQ(Resource::Kind::Glyphs, resource.kind);
+        EXPECT_EQ(ResourceKind::Glyphs, resource.kind);
         Response response;
         response.data = std::make_shared<std::string>(util::read_file("test/fixtures/resources/fake_glyphs-0-255.pbf"));
         return response;
