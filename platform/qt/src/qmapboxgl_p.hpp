@@ -31,9 +31,6 @@ public:
     void updateAssumedState() final;
     void activate() final {}
     void deactivate() final {}
-    mbgl::BackendScope::ScopeType getScopeType() const final {
-        return mbgl::BackendScope::ScopeType::Implicit;
-    }
 
     // mbgl::MapObserver implementation.
     void onCameraWillChange(mbgl::MapObserver::CameraChangeMode) final;

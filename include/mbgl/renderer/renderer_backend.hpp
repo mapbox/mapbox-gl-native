@@ -30,10 +30,6 @@ public:
     // Called prior to rendering to update the internally assumed OpenGL state.
     virtual void updateAssumedState() = 0;
 
-    virtual BackendScope::ScopeType getScopeType() const {
-        return BackendScope::ScopeType::Explicit;
-    }
-
 protected:
     // Called with the name of an OpenGL extension that should be loaded. RendererBackend implementations
     // must call the API-specific version that obtains the function pointer for this function,

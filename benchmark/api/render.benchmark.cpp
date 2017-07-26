@@ -47,7 +47,7 @@ static void prepare(Map& map, optional<std::string> json = {}) {
 
 static void API_renderStill_reuse_map(::benchmark::State& state) {
     RenderBenchmark bench;
-    AsyncRendererFrontend frontend { std::make_unique<Renderer>(bench.backend, 1, bench.fileSource, bench.threadPool), bench.view };
+    AsyncRendererFrontend frontend { std::make_unique<Renderer>(bench.backend, 1, bench.fileSource, bench.threadPool), bench.backend, bench.view };
     Map map { frontend, MapObserver::nullObserver(), bench.view.getSize(), 1, bench.fileSource, bench.threadPool, MapMode::Still };
     prepare(map);
 
@@ -58,7 +58,7 @@ static void API_renderStill_reuse_map(::benchmark::State& state) {
 
 static void API_renderStill_reuse_map_switch_styles(::benchmark::State& state) {
     RenderBenchmark bench;
-    AsyncRendererFrontend frontend { std::make_unique<Renderer>(bench.backend, 1, bench.fileSource, bench.threadPool), bench.view };
+    AsyncRendererFrontend frontend { std::make_unique<Renderer>(bench.backend, 1, bench.fileSource, bench.threadPool), bench.backend, bench.view };
     Map map { frontend, MapObserver::nullObserver(), bench.view.getSize(), 1, bench.fileSource, bench.threadPool, MapMode::Still };
     
     while (state.KeepRunning()) {
@@ -73,7 +73,7 @@ static void API_renderStill_recreate_map(::benchmark::State& state) {
     RenderBenchmark bench;
     
     while (state.KeepRunning()) {
-        AsyncRendererFrontend frontend { std::make_unique<Renderer>(bench.backend, 1, bench.fileSource, bench.threadPool), bench.view };
+        AsyncRendererFrontend frontend { std::make_unique<Renderer>(bench.backend, 1, bench.fileSource, bench.threadPool), bench.backend, bench.view };
         Map map { frontend, MapObserver::nullObserver(), bench.view.getSize(), 1, bench.fileSource, bench.threadPool, MapMode::Still };
         prepare(map);
         mbgl::benchmark::render(map, bench.view);

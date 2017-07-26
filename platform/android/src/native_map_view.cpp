@@ -78,6 +78,7 @@ NativeMapView::NativeMapView(jni::JNIEnv& _env,
 
     // Create a renderer frontend
     rendererFrontend = std::make_unique<AndroidRendererFrontend>(std::move(renderer),
+                                                                 *this,
                                                                  [this] { this->invalidate(); });
 
     // Create the core map

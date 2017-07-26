@@ -10,11 +10,12 @@
 namespace mbgl {
     
 class Renderer;
+class RendererBackend;
 
 // Default implementation for RendererFrontend
 class AsyncRendererFrontend : public mbgl::RendererFrontend {
 public:
-    AsyncRendererFrontend(std::unique_ptr<Renderer>, View&);
+    AsyncRendererFrontend(std::unique_ptr<Renderer>, RendererBackend&, View&);
     ~AsyncRendererFrontend() override;
 
     void reset() override;

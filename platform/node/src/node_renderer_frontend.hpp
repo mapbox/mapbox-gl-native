@@ -1,6 +1,5 @@
 #pragma once
 
-#include <mbgl/renderer/renderer_backend.hpp>
 #include <mbgl/renderer/renderer_frontend.hpp>
 #include <mbgl/renderer/query.hpp>
 #include <mbgl/util/async_task.hpp>
@@ -12,6 +11,8 @@
 
 namespace mbgl {
     class Renderer;
+    class RendererBackend;
+    class View;
 } //  namespace mbgl
 
 namespace node_mbgl {
@@ -19,7 +20,7 @@ namespace node_mbgl {
 class NodeRendererFrontend : public mbgl::RendererFrontend {
 public:
     using ViewAccessorFunction = std::function<mbgl::View* ()>;
-    NodeRendererFrontend(std::unique_ptr<mbgl::Renderer>, ViewAccessorFunction);
+    NodeRendererFrontend(std::unique_ptr<mbgl::Renderer>, mbgl::RendererBackend&, ViewAccessorFunction);
 
     ~NodeRendererFrontend();
     

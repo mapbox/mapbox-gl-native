@@ -29,6 +29,8 @@ void GLFWRendererFrontend::render() {
     assert(renderer);
     
     if (!updateParameters) return;
+    
+    mbgl::BackendScope guard { glfwView, mbgl::BackendScope::ScopeType::Implicit };
 
     renderer->render(glfwView, *updateParameters);
 }
