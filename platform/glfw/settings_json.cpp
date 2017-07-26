@@ -14,6 +14,7 @@ void Settings_JSON::load() {
         file >> bearing;
         file >> pitch;
         file >> debug;
+        file >> online;
     }
 }
 
@@ -26,6 +27,7 @@ void Settings_JSON::save() {
         file << bearing << std::endl;
         file << pitch << std::endl;
         file << debug << std::endl;
+        file << online << std::endl;
     }
 }
 
@@ -36,6 +38,7 @@ void Settings_JSON::clear() {
     bearing = 0;
     pitch = 0;
     debug = 0;
+    online = true;
 }
 
 } // namespace mbgl

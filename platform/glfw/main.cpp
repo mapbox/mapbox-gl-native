@@ -44,6 +44,7 @@ int main(int argc, char *argv[]) {
     const struct option long_options[] = {
         {"fullscreen", no_argument, nullptr, 'f'},
         {"benchmark", no_argument, nullptr, 'b'},
+        {"offline", no_argument, nullptr, 'o'},
         {"style", required_argument, nullptr, 's'},
         {"lon", required_argument, nullptr, 'x'},
         {"lat", required_argument, nullptr, 'y'},
@@ -67,6 +68,9 @@ int main(int argc, char *argv[]) {
             break;
         case 'b':
             benchmark = true;
+            break;
+        case 'o':
+            settings.online = false;
             break;
         case 's':
             style = std::string("asset://") + std::string(optarg);
@@ -107,6 +111,10 @@ int main(int argc, char *argv[]) {
     view = &backend;
 
     mbgl::DefaultFileSource fileSource("/tmp/mbgl-cache.db", ".");
+    if (!settings.online) {
+        fileSource.setOnlineStatus(false);
+        mbgl::Log::Warning(mbgl::Event::Setup, "Application is offline. Press `O` to toggle online status.");
+    }
 
     // Set access token if present
     const char *token = getenv("MAPBOX_ACCESS_TOKEN");
@@ -127,6 +135,10 @@ int main(int argc, char *argv[]) {
     map.setPitch(settings.pitch);
     map.setDebug(mbgl::MapDebugOptions(settings.debug));
 
+    view->setOnlineStatusCallback([&settings, &fileSource]() {
+        settings.online = !settings.online;
+        fileSource.setOnlineStatus(settings.online);
+    });
 
     view->setChangeStyleCallback([&map] () {
         static uint8_t currentStyleIndex;
