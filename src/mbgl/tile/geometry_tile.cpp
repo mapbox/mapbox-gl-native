@@ -42,7 +42,7 @@ GeometryTile::GeometryTile(const OverscaledTileID& id_,
              parameters.pixelRatio),
       glyphManager(parameters.glyphManager),
       imageManager(parameters.imageManager),
-      placementThrottler(Milliseconds(300), [this] { invokePlacement(); }),
+      placementThrottler(ActorRef<GeometryTile>(*this, mailbox), Milliseconds(300)),
       lastYStretch(1.0f) {
 }
 
@@ -86,7 +86,7 @@ void GeometryTile::setPlacementConfig(const PlacementConfig& desiredConfig) {
 
     ++correlationID;
     requestedConfig = desiredConfig;
-    placementThrottler.invoke();
+    placementThrottler.invoke(&GeometryTile::invokePlacement);
 }
 
 void GeometryTile::invokePlacement() {
