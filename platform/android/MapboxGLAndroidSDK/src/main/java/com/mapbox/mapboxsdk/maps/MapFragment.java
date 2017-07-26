@@ -76,6 +76,9 @@ public final class MapFragment extends Fragment {
   public void onViewCreated(View view, Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
     map.onCreate(savedInstanceState);
+    if (onMapReadyCallback != null) {
+      map.getMapAsync(onMapReadyCallback);
+    }
   }
 
   /**
@@ -85,7 +88,6 @@ public final class MapFragment extends Fragment {
   public void onStart() {
     super.onStart();
     map.onStart();
-    map.getMapAsync(onMapReadyCallback);
   }
 
   /**
@@ -150,6 +152,10 @@ public final class MapFragment extends Fragment {
    * @param onMapReadyCallback The callback to be invoked.
    */
   public void getMapAsync(@NonNull final OnMapReadyCallback onMapReadyCallback) {
-    this.onMapReadyCallback = onMapReadyCallback;
+    if (map == null) {
+      this.onMapReadyCallback = onMapReadyCallback;
+    } else {
+      map.getMapAsync(onMapReadyCallback);
+    }
   }
 }
