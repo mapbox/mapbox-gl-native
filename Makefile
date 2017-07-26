@@ -460,21 +460,7 @@ MBGL_ANDROID_GRADLE = ./gradlew --parallel --max-workers=$(JOBS) -Pmapbox.buildt
 # Some devices return \r\n, so we'll have to remove the carriage return before concatenating.
 MBGL_ANDROID_ACTIVE_ARCHS = $(shell adb devices | sed '1d;/^\*/d;s/[[:space:]].*//' | xargs -n 1 -I DEV `type -P adb` -s DEV shell getprop ro.product.cpu.abi | tr -d '\r')
 
-.PHONY: android-help
-android-help:
-	@echo
-	@echo "Available Android architecture targets:"
-	@echo
-	@echo "    make android-arm-v5"
-	@echo "    make android-arm-v7, make android"
-	@echo "    make android-arm-v8"
-	@echo "    make android-mips"
-	@echo "    make android-mips-64"
-	@echo "    make android-x86"
-	@echo "    make android-x86-64"
-	@echo "    make apackage"
-	@echo
-
+# Generate code based on the style specification
 .PHONY: android-style-code
 android-style-code:
 	node platform/android/scripts/generate-style-code.js
@@ -492,14 +478,17 @@ define ANDROID_RULES
 android-test-lib-$1: platform/android/configuration.gradle
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=$2 -Pmapbox.with_test=true :MapboxGLAndroidSDKTestApp:assemble$(BUILDTYPE)
 
+# Build SDK for for specified abi
 .PHONY: android-lib-$1
 android-lib-$1: platform/android/configuration.gradle
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=$2 :MapboxGLAndroidSDK:assemble$(BUILDTYPE)
 
+# Build test app and SDK for for specified abi
 .PHONY: android-$1
 android-$1: platform/android/configuration.gradle
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=$2 :MapboxGLAndroidSDKTestApp:assemble$(BUILDTYPE)
 
+# Build the core test for specified abi
 .PHONY: android-core-test-$1
 android-core-test-$1: android-test-lib-$1
 	# Compile main sources and extract the classes (using the test app to get all transitive dependencies in one place)
@@ -532,24 +521,28 @@ run-android-core-test-$1-%: android-core-test-$1
 	rm -rf $(MBGL_ANDROID_CORE_TEST_DIR)/results && mkdir -p $(MBGL_ANDROID_CORE_TEST_DIR)/results
 	tar -xzf $(MBGL_ANDROID_CORE_TEST_DIR)/results.tgz --strip-components=2 -C $(MBGL_ANDROID_CORE_TEST_DIR)/results
 
+# Run the core test for specified abi
 .PHONY: run-android-core-test-$1
 run-android-core-test-$1: run-android-core-test-$1-*
 
+# Run the test app on connected android device with specified abi
 .PHONY: run-android-$1
 run-android-$1: platform/android/configuration.gradle
 	adb uninstall com.mapbox.mapboxsdk.testapp > /dev/null
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=$2 :MapboxGLAndroidSDKTestApp:install$(BUILDTYPE) && adb shell am start -n com.mapbox.mapboxsdk.testapp/.activity.FeatureOverviewActivity
 
+# Build test app instrumentation tests apk and test app apk for specified abi
 .PHONY: android-ui-test-$1
 android-ui-test-$1: platform/android/configuration.gradle
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=$2 :MapboxGLAndroidSDKTestApp:assembleDebug :MapboxGLAndroidSDKTestApp:assembleAndroidTest
 
-# This test assumes that you have Android Simulator started locally.
+# Run test app instrumentation tests on a connected android device or emulator with specified abi
 .PHONY: run-android-ui-test-$1
 run-android-ui-test-$1: platform/android/configuration.gradle
 	adb uninstall com.mapbox.mapboxsdk.testapp > /dev/null
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=$2 :MapboxGLAndroidSDKTestApp:connectedAndroidTest
 
+# Run Java Instrumentation tests on a connected android device or emulator with specified abi and test filter
 run-android-ui-test-$1-%: platform/android/configuration.gradle
 	adb uninstall com.mapbox.mapboxsdk.testapp > /dev/null
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=$2 :MapboxGLAndroidSDKTestApp:connectedAndroidTest -Pandroid.testInstrumentationRunnerArguments.class="$$*"
@@ -563,37 +556,43 @@ endef
 
 $(foreach abi,$(MBGL_ANDROID_ABIS),$(eval $(call ANDROID_RULES_INVOKER,$(subst ;, ,$(abi)))))
 
+# Build the Android SDK and test app with abi set to arm-v7
 .PHONY: android
 android: android-arm-v7
 
+# Build the Android SDK with abi set to arm-v7
 .PHONY: android-lib
 android-lib: android-lib-arm-v7
 
+# Run the test app on connected android device with abi set to arm-v7
 .PHONY: run-android
 run-android: run-android-arm-v7
 
+# Run Java Instrumentation tests on a connected android device or emulator with abi set to arm-v7
 .PHONY: run-android-ui-test
 run-android-ui-test: run-android-ui-test-arm-v7
 run-android-ui-test-%: run-android-ui-test-arm-v7-%
 
-# Java-only test
+# Run Java Unit tests on the JVM of the development machine executing this
 .PHONY: run-android-unit-test
 run-android-unit-test: platform/android/configuration.gradle
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=none :MapboxGLAndroidSDKTestApp:testDebugUnitTest
 run-android-unit-test-%: platform/android/configuration.gradle
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=none :MapboxGLAndroidSDKTestApp:testDebugUnitTest --tests "$*"
 
-# Java-only test
+# Run Java Unit tests on the JVM of the machine executing this
 .PHONY: run-android-wear-unit-test
 run-android-wear-unit-test: platform/android/configuration.gradle
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=none :MapboxGLAndroidSDKWearTestApp:testDebugUnitTest
 run-android-wear-unit-test-%: platform/android/configuration.gradle
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=none :MapboxGLAndroidSDKWearTestApp:testDebugUnitTest --tests "$*"
 
+# Run Instrumentation tests on AWS device farm, requires additional authentication through gradle.properties
 .PHONY: run-android-ui-test-aws
 run-android-ui-test-aws: platform/android/configuration.gradle
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=all devicefarmUpload
 
+# Builds a release package of the Android SDK
 .PHONY: apackage
 apackage: platform/android/configuration.gradle
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=all assemble$(BUILDTYPE)
@@ -608,36 +607,44 @@ run-android-upload-archives: platform/android/configuration.gradle
 run-android-ui-test-spoon: platform/android/configuration.gradle
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis="$(MBGL_ANDROID_ACTIVE_ARCHS)" spoon
 
+# Generates Activity sanity tests
 .PHONY: test-code-android
 test-code-android:
 	node platform/android/scripts/generate-test-code.js
 
+# Runs checkstyle on the Android code
 .PHONY: android-checkstyle
 android-checkstyle: platform/android/configuration.gradle
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=none checkstyle
 
+# Runs lint on the Android SDK code
 .PHONY: android-lint-sdk
 android-lint-sdk: platform/android/configuration.gradle
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=none :MapboxGLAndroidSDK:lint
 
+# Runs lint on the Android test app code
 .PHONY: android-lint-test-app
 android-lint-test-app: platform/android/configuration.gradle
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=none :MapboxGLAndroidSDKTestApp:lint
 
+# Runs lint on the Android wear test app code
 .PHONY: android-lint-wear-app
 android-lint-wear-app: platform/android/configuration.gradle
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=none :MapboxGLAndroidSDKWearTestApp:lint
 
+# Generates javadoc from the Android SDK
 .PHONY: android-javadoc
 android-javadoc: platform/android/configuration.gradle
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=none :MapboxGLAndroidSDK:javadocrelease
 
+# Open Android Studio if machine is macos
 ifeq ($(HOST_PLATFORM), macos)
 .PHONY: aproj
 aproj: platform/android/configuration.gradle
 	open -b com.google.android.studio platform/android
 endif
 
+# Creates the configuration needed to build with Android Studio
 .PHONY: android-configuration
 android-configuration: platform/android/configuration.gradle
 	cat platform/android/configuration.gradle
