@@ -95,7 +95,7 @@
 
         MGLStyleValue<NSValue *> *constantStyleValue = [MGLStyleValue<NSValue *> valueWithRawValue:[NSValue valueWithMGLLineJoin:MGLLineJoinMiter]];
         layer.lineJoin = constantStyleValue;
-        mbgl::style::PropertyValue<mbgl::style::LineJoinType> propertyValue = { mbgl::style::LineJoinType::Miter };
+        mbgl::style::DataDrivenPropertyValue<mbgl::style::LineJoinType> propertyValue = { mbgl::style::LineJoinType::Miter };
         XCTAssertEqual(rawLayer->getLineJoin(), propertyValue,
                        @"Setting lineJoin to a constant value should update line-join.");
         XCTAssertEqualObjects(layer.lineJoin, constantStyleValue,
@@ -119,11 +119,6 @@
                       @"Unsetting lineJoin should return line-join to the default value.");
         XCTAssertEqualObjects(layer.lineJoin, defaultStyleValue,
                               @"lineJoin should return the default value after being unset.");
-
-        functionStyleValue = [MGLStyleValue<NSValue *> valueWithInterpolationMode:MGLInterpolationModeIdentity sourceStops:nil attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.lineJoin = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
-        functionStyleValue = [MGLStyleValue<NSValue *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.lineJoin = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
     }
 
     // line-miter-limit

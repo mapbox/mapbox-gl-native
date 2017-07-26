@@ -476,15 +476,15 @@ void SymbolLayer::setTextLetterSpacing(PropertyValue<float> value) {
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
-PropertyValue<TextJustifyType> SymbolLayer::getDefaultTextJustify() {
+DataDrivenPropertyValue<TextJustifyType> SymbolLayer::getDefaultTextJustify() {
     return TextJustify::defaultValue();
 }
 
-PropertyValue<TextJustifyType> SymbolLayer::getTextJustify() const {
+DataDrivenPropertyValue<TextJustifyType> SymbolLayer::getTextJustify() const {
     return impl().layout.get<TextJustify>();
 }
 
-void SymbolLayer::setTextJustify(PropertyValue<TextJustifyType> value) {
+void SymbolLayer::setTextJustify(DataDrivenPropertyValue<TextJustifyType> value) {
     if (value == getTextJustify())
         return;
     auto impl_ = mutableImpl();
@@ -492,15 +492,15 @@ void SymbolLayer::setTextJustify(PropertyValue<TextJustifyType> value) {
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
-PropertyValue<TextAnchorType> SymbolLayer::getDefaultTextAnchor() {
+DataDrivenPropertyValue<TextAnchorType> SymbolLayer::getDefaultTextAnchor() {
     return TextAnchor::defaultValue();
 }
 
-PropertyValue<TextAnchorType> SymbolLayer::getTextAnchor() const {
+DataDrivenPropertyValue<TextAnchorType> SymbolLayer::getTextAnchor() const {
     return impl().layout.get<TextAnchor>();
 }
 
-void SymbolLayer::setTextAnchor(PropertyValue<TextAnchorType> value) {
+void SymbolLayer::setTextAnchor(DataDrivenPropertyValue<TextAnchorType> value) {
     if (value == getTextAnchor())
         return;
     auto impl_ = mutableImpl();

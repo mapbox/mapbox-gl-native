@@ -134,13 +134,13 @@ public:
     PropertyValue<float> getTextLetterSpacing() const;
     void setTextLetterSpacing(PropertyValue<float>);
 
-    static PropertyValue<TextJustifyType> getDefaultTextJustify();
-    PropertyValue<TextJustifyType> getTextJustify() const;
-    void setTextJustify(PropertyValue<TextJustifyType>);
+    static DataDrivenPropertyValue<TextJustifyType> getDefaultTextJustify();
+    DataDrivenPropertyValue<TextJustifyType> getTextJustify() const;
+    void setTextJustify(DataDrivenPropertyValue<TextJustifyType>);
 
-    static PropertyValue<TextAnchorType> getDefaultTextAnchor();
-    PropertyValue<TextAnchorType> getTextAnchor() const;
-    void setTextAnchor(PropertyValue<TextAnchorType>);
+    static DataDrivenPropertyValue<TextAnchorType> getDefaultTextAnchor();
+    DataDrivenPropertyValue<TextAnchorType> getTextAnchor() const;
+    void setTextAnchor(DataDrivenPropertyValue<TextAnchorType>);
 
     static PropertyValue<float> getDefaultTextMaxAngle();
     PropertyValue<float> getTextMaxAngle() const;
