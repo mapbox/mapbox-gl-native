@@ -1,9 +1,12 @@
 #include <mbgl/style/sources/geojson_source_impl.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/tile/tile_id.hpp>
+#include <mbgl/util/string.hpp>
 
 #include <mapbox/geojsonvt.hpp>
 #include <supercluster.hpp>
+
+#include <cmath>
 
 namespace mbgl {
 namespace style {
@@ -52,14 +55,14 @@ GeoJSONSource::Impl::Impl(const Impl& other, const GeoJSON& geoJSON)
         mapbox::supercluster::Options clusterOptions;
         clusterOptions.maxZoom = options.clusterMaxZoom;
         clusterOptions.extent = util::EXTENT;
-        clusterOptions.radius = std::round(scale * options.clusterRadius);
+        clusterOptions.radius = ::round(scale * options.clusterRadius);
         data = std::make_unique<SuperclusterData>(
             geoJSON.get<mapbox::geometry::feature_collection<double>>(), clusterOptions);
     } else {
         mapbox::geojsonvt::Options vtOptions;
         vtOptions.maxZoom = options.maxzoom;
         vtOptions.extent = util::EXTENT;
-        vtOptions.buffer = std::round(scale * options.buffer);
+        vtOptions.buffer = ::round(scale * options.buffer);
         vtOptions.tolerance = scale * options.tolerance;
         data = std::make_unique<GeoJSONVTData>(geoJSON, vtOptions);
     }
