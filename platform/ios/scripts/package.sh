@@ -237,6 +237,10 @@ if [[ ${BUILD_STATIC} == true ]]; then
     mkdir "${OUTPUT}/static/${NAME}.framework/Modules"
     cp -pv platform/ios/framework/modulemap "${OUTPUT}/static/${NAME}.framework/Modules/module.modulemap"
 fi
+if [[ ${BUILD_DYNAMIC} == true && ${BUILD_FOR_DEVICE} == true ]]; then
+    step "Copying bitcode symbol maps…"
+    find "${PRODUCTS}/${BUILDTYPE}-iphoneos" -name '*.bcsymbolmap' -type f -exec cp -pv {} "${OUTPUT}/dynamic/" \;
+fi
 sed -n -e '/^## /,$p' platform/ios/CHANGELOG.md > "${OUTPUT}/CHANGELOG.md"
 
 rm -rf /tmp/mbgl
