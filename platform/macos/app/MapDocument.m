@@ -344,7 +344,7 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
 }
 
 - (void)updateLabels {
-    [self.mapView.style setLocalizeLabels:YES];
+    [self.mapView.style setLocalizesLabels:YES];
 }
 
 - (void)applyPendingState {

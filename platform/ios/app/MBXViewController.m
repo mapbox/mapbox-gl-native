@@ -1274,7 +1274,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
 
 -(void)styleCountryLabelsLanguage
 {
-    [self.mapView.style setLocalizeLabels:YES];
+    [self.mapView.style setLocalizesLabels:YES];
 }
 
 - (void)styleRouteLine

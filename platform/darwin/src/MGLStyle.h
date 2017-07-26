@@ -613,14 +613,17 @@ MGL_EXPORT
 #pragma mark Managing Style's localization
 
 /**
- Enable it to determine the localization according to the languages
- supported by the Vector Style source <a
- href="https://www.mapbox.com/vector-tiles/mapbox-streets-v7/#overview">
- Mapbox Streets</a>, it will look for the Preferred Language Order setting in
- the system's Language & Region section of Settings. If it doesn't find a
- match it will fall back to english localization.
+ A Boolean value that determines whether the style attempts to localize labels in 
+ the style into the system’s preferred language.
+ 
+ When this property is enabled, the style automatically modifies the text property 
+ of any symbol style layer whose source is the 
+ <a href="https://www.mapbox.com/vector-tiles/mapbox-streets-v7/#overview">Mapbox 
+ Streets source</a>. On iOS, the user can set the system’s preferred language in 
+ Settings, General Settings, Language & Region. On macOS, the user can set the 
+ system’s preferred language in the Language & Region pane of System Preferences.
  */
-@property (nonatomic, getter=isLocalizeLabels) BOOL localizeLabels;
+@property (nonatomic) BOOL localizesLabels;
 
 @end
 
