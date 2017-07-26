@@ -34,12 +34,12 @@ void quit_handler(int) {
 }
 
 int main(int argc, char *argv[]) {
+    // Load settings
+    mbgl::Settings_JSON settings;
+
     bool fullscreen = false;
     bool benchmark = false;
     std::string style;
-    double latitude = 0, longitude = 0;
-    double bearing = 0, zoom = 1, pitch = 0;
-    bool skipConfig = false;
 
     const struct option long_options[] = {
         {"fullscreen", no_argument, nullptr, 'f'},
@@ -69,24 +69,19 @@ int main(int argc, char *argv[]) {
             style = std::string(optarg);
             break;
         case 'x':
-            longitude = atof(optarg);
-            skipConfig = true;
+            settings.longitude = atof(optarg);
             break;
         case 'y':
-            latitude = atof(optarg);
-            skipConfig = true;
+            settings.latitude = atof(optarg);
             break;
         case 'z':
-            zoom = atof(optarg);
-            skipConfig = true;
+            settings.zoom = atof(optarg);
             break;
         case 'r':
-            bearing = atof(optarg);
-            skipConfig = true;
+            settings.bearing = atof(optarg);
             break;
         case 'p':
-            pitch = atof(optarg);
-            skipConfig = true;
+            settings.pitch = atof(optarg);
             break;
         default:
             break;
@@ -124,24 +119,15 @@ int main(int argc, char *argv[]) {
 
     backend.setMap(&map);
 
-    if (style.find("://") == std::string::npos) {
+    if (!style.empty() && style.find("://") == std::string::npos) {
         style = std::string("file://") + style;
     }
 
-    // Load settings
-    mbgl::Settings_JSON settings;
+    map.setLatLngZoom(mbgl::LatLng(settings.latitude, settings.longitude), settings.zoom);
+    map.setBearing(settings.bearing);
+    map.setPitch(settings.pitch);
+    map.setDebug(mbgl::MapDebugOptions(settings.debug));
 
-    if (skipConfig) {
-        map.setLatLngZoom(mbgl::LatLng(latitude, longitude), zoom);
-        map.setBearing(bearing);
-        map.setPitch(pitch);
-        mbgl::Log::Info(mbgl::Event::General, "Location: %f/%f (z%.2f, %.2f deg)", latitude, longitude, zoom, bearing);
-    } else {
-        map.setLatLngZoom(mbgl::LatLng(settings.latitude, settings.longitude), settings.zoom);
-        map.setBearing(settings.bearing);
-        map.setPitch(settings.pitch);
-        map.setDebug(mbgl::MapDebugOptions(settings.debug));
-    }
 
     view->setChangeStyleCallback([&map] () {
         static uint8_t currentStyleIndex;
@@ -194,9 +180,7 @@ int main(int argc, char *argv[]) {
     settings.bearing = map.getBearing();
     settings.pitch = map.getPitch();
     settings.debug = mbgl::EnumType(map.getDebug());
-    if (!skipConfig) {
-        settings.save();
-    }
+    settings.save();
     mbgl::Log::Info(mbgl::Event::General,
                     R"(Exit location: --lat="%f" --lon="%f" --zoom="%f" --bearing "%f")",
                     settings.latitude, settings.longitude, settings.zoom, settings.bearing);
