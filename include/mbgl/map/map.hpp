@@ -17,8 +17,6 @@
 
 namespace mbgl {
 
-class Backend;
-class View;
 class FileSource;
 class Scheduler;
 class RendererFrontend;

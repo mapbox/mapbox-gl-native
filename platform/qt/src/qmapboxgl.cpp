@@ -1502,7 +1502,6 @@ QMapboxGLPrivate::QMapboxGLPrivate(QMapboxGL *q, const QMapboxGLSettings &settin
     frontend = std::make_unique<QMapboxGLRendererFrontend>(
             std::make_unique<mbgl::Renderer>(*this, pixelRatio, *fileSourceObj, *threadPool,
                                              static_cast<mbgl::GLContextMode>(settings.contextMode())),
-            *this,
             *this);
     connect(frontend.get(), SIGNAL(updated()), this, SLOT(invalidate()));
     

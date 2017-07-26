@@ -1,13 +1,9 @@
 #include <benchmark/benchmark.h>
 
-#include <mbgl/benchmark/util.hpp>
 #include <mbgl/map/map.hpp>
-#include <mbgl/gl/headless_backend.hpp>
-#include <mbgl/gl/offscreen_view.hpp>
+#include <mbgl/gl/headless_frontend.hpp>
 #include <mbgl/util/default_thread_pool.hpp>
 #include <mbgl/renderer/renderer.hpp>
-#include <mbgl/renderer/backend_scope.hpp>
-#include <mbgl/renderer/async_renderer_frontend.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/image.hpp>
 #include <mbgl/storage/default_file_source.hpp>
@@ -31,17 +27,14 @@ public:
         map.getStyle().addImage(std::make_unique<style::Image>("test-icon",
             decodeImage(util::read_file("benchmark/fixtures/api/default_marker.png")), 1.0));
 
-        mbgl::benchmark::render(map, view);
+        frontend.render(map);
     }
 
     util::RunLoop loop;
-    HeadlessBackend backend;
-    BackendScope scope { backend };
-    OffscreenView view{ backend.getContext(), { 1000, 1000 } };
     DefaultFileSource fileSource{ "benchmark/fixtures/api/cache.db", "." };
     ThreadPool threadPool{ 4 };
-    AsyncRendererFrontend rendererFrontend { std::make_unique<Renderer>(backend, 1, fileSource, threadPool), backend, view };
-    Map map { rendererFrontend, MapObserver::nullObserver(), view.getSize(), 1, fileSource, threadPool, MapMode::Still };
+    HeadlessFrontend frontend { { 1000, 1000 }, 1, fileSource, threadPool };
+    Map map { frontend, MapObserver::nullObserver(), frontend.getSize(), 1, fileSource, threadPool, MapMode::Still };
     ScreenBox box{{ 0, 0 }, { 1000, 1000 }};
 };
 
@@ -51,7 +44,7 @@ static void API_queryRenderedFeaturesAll(::benchmark::State& state) {
     QueryBenchmark bench;
 
     while (state.KeepRunning()) {
-        bench.rendererFrontend.getRenderer()->queryRenderedFeatures(bench.box, {});
+        bench.frontend.getRenderer()->queryRenderedFeatures(bench.box, {});
     }
 }
 
@@ -59,7 +52,7 @@ static void API_queryRenderedFeaturesLayerFromLowDensity(::benchmark::State& sta
     QueryBenchmark bench;
 
     while (state.KeepRunning()) {
-        bench.rendererFrontend.getRenderer()->queryRenderedFeatures(bench.box, {{{ "testlayer" }}, {}});
+        bench.frontend.getRenderer()->queryRenderedFeatures(bench.box, {{{ "testlayer" }}, {}});
     }
 }
 
@@ -67,7 +60,7 @@ static void API_queryRenderedFeaturesLayerFromHighDensity(::benchmark::State& st
     QueryBenchmark bench;
 
     while (state.KeepRunning()) {
-        bench.rendererFrontend.getRenderer()->queryRenderedFeatures(bench.box, {{{"road-street" }}, {}});
+        bench.frontend.getRenderer()->queryRenderedFeatures(bench.box, {{{"road-street" }}, {}});
     }
 }
 

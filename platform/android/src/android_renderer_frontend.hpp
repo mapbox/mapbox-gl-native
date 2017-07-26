@@ -13,9 +13,7 @@
 
 namespace mbgl {
 
-class View;
 class Renderer;
-class View;
 class RenderedQueryOptions;
 class SourceQueryOptions;
 
@@ -31,7 +29,7 @@ public:
     void setObserver(RendererObserver&) override;
 
     void update(std::shared_ptr<UpdateParameters>) override;
-    void render(View& view);
+    void render();
 
     // Feature querying
     std::vector<Feature> queryRenderedFeatures(const ScreenCoordinate&, const RenderedQueryOptions&) const;

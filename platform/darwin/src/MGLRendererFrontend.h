@@ -13,12 +13,10 @@
 class MGLRenderFrontend : public mbgl::RendererFrontend
 {
 public:
-    MGLRenderFrontend(std::unique_ptr<mbgl::Renderer> renderer_, MGLMapView* nativeView_, mbgl::RendererBackend& mbglBackend_, mbgl::View& mbglView_, bool async = false)
+    MGLRenderFrontend(std::unique_ptr<mbgl::Renderer> renderer_, MGLMapView* nativeView_, mbgl::RendererBackend& mbglBackend_, bool async = false)
         : renderer(std::move(renderer_))
         , nativeView(nativeView_)
-        , mbglBackend(mbglBackend_)
-        , mbglView(mbglView_) {
-            
+        , mbglBackend(mbglBackend_) {
         if (async) {
             asyncInvalidate.emplace([&]() {
                 [nativeView setNeedsGLDisplay];
@@ -51,7 +49,7 @@ public:
         
         mbgl::BackendScope guard { mbglBackend, mbgl::BackendScope::ScopeType::Implicit };
         
-        renderer->render(mbglView, *updateParameters);
+        renderer->render(*updateParameters);
     }
     
     mbgl::Renderer* getRenderer() {
@@ -67,7 +65,6 @@ private:
     std::unique_ptr<mbgl::Renderer> renderer;
     __weak MGLMapView *nativeView = nullptr;
     mbgl::RendererBackend& mbglBackend;
-    mbgl::View& mbglView;
     std::shared_ptr<mbgl::UpdateParameters> updateParameters;
     mbgl::optional<mbgl::util::AsyncTask> asyncInvalidate;
 };

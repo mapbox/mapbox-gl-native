@@ -49,13 +49,13 @@ macro(mbgl_platform_core)
         PRIVATE platform/default/png_writer.cpp
 
         # Headless view
+        PRIVATE platform/default/mbgl/gl/headless_frontend.cpp
+        PRIVATE platform/default/mbgl/gl/headless_frontend.hpp
         PRIVATE platform/default/mbgl/gl/headless_backend.cpp
         PRIVATE platform/default/mbgl/gl/headless_backend.hpp
         PRIVATE platform/darwin/src/headless_backend_eagl.mm
         PRIVATE platform/default/mbgl/gl/headless_display.cpp
         PRIVATE platform/default/mbgl/gl/headless_display.hpp
-        PRIVATE platform/default/mbgl/gl/offscreen_view.cpp
-        PRIVATE platform/default/mbgl/gl/offscreen_view.hpp
 
         # Thread pool
         PRIVATE platform/default/mbgl/util/shared_thread_pool.cpp

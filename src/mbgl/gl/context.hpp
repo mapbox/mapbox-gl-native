@@ -25,9 +25,6 @@
 #include <string>
 
 namespace mbgl {
-
-class View;
-
 namespace gl {
 
 constexpr size_t TextureMax = 64;

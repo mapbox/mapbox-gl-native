@@ -17,8 +17,6 @@ set(MBGL_TEST_FILES
     test/api/api_misuse.test.cpp
     test/api/custom_layer.test.cpp
     test/api/query.test.cpp
-    test/api/render_missing.test.cpp
-    test/api/repeated_render.test.cpp
 
     # gl
     test/gl/bucket.test.cpp
@@ -62,8 +60,6 @@ set(MBGL_TEST_FILES
     test/src/mbgl/test/stub_geometry_tile_feature.hpp
     test/src/mbgl/test/stub_layer_observer.hpp
     test/src/mbgl/test/stub_render_source_observer.hpp
-    test/src/mbgl/test/stub_renderer_frontend.cpp
-    test/src/mbgl/test/stub_renderer_frontend.hpp
     test/src/mbgl/test/stub_style_observer.hpp
     test/src/mbgl/test/stub_tile_observer.hpp
     test/src/mbgl/test/test.cpp

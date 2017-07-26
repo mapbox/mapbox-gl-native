@@ -3,10 +3,9 @@
 #include <mbgl/renderer/backend_scope.hpp>
 #include <mbgl/renderer/renderer.hpp>
 
-QMapboxGLRendererFrontend::QMapboxGLRendererFrontend(std::unique_ptr<mbgl::Renderer> renderer_, mbgl::RendererBackend& backend_, mbgl::View& view_)
+QMapboxGLRendererFrontend::QMapboxGLRendererFrontend(std::unique_ptr<mbgl::Renderer> renderer_, mbgl::RendererBackend& backend_)
     : renderer(std::move(renderer_))
-    , backend(backend_)
-    , view(view_) {
+    , backend(backend_) {
 }
 
 QMapboxGLRendererFrontend::~QMapboxGLRendererFrontend() = default;
@@ -34,5 +33,5 @@ void QMapboxGLRendererFrontend::render() {
     // The OpenGL implementation automatically enables the OpenGL context for us.
     mbgl::BackendScope scope { backend, mbgl::BackendScope::ScopeType::Implicit };
     
-    renderer->render(view, *updateParameters);
+    renderer->render(*updateParameters);
 }

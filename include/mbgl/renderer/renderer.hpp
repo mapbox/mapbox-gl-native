@@ -20,7 +20,6 @@ class RenderedQueryOptions;
 class Scheduler;
 class SourceQueryOptions;
 class UpdateParameters;
-class View;
 
 class Renderer {
 public:
@@ -31,7 +30,7 @@ public:
 
     void setObserver(RendererObserver*);
 
-    void render(View& view, const UpdateParameters&);
+    void render(const UpdateParameters&);
 
     // Feature queries
     std::vector<Feature> queryRenderedFeatures(const ScreenLineString&, const RenderedQueryOptions& options = {}) const;

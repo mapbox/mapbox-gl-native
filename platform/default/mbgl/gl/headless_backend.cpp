@@ -9,10 +9,26 @@
 
 namespace mbgl {
 
-HeadlessBackend::HeadlessBackend() = default;
+class HeadlessBackend::View {
+public:
+    View(gl::Context& context, Size size)
+        : color(context.createRenderbuffer<gl::RenderbufferType::RGBA>(size)),
+          depthStencil(context.createRenderbuffer<gl::RenderbufferType::DepthStencil>(size)),
+          framebuffer(context.createFramebuffer(color, depthStencil)) {
+    }
+
+    gl::Renderbuffer<gl::RenderbufferType::RGBA> color;
+    gl::Renderbuffer<gl::RenderbufferType::DepthStencil> depthStencil;
+    gl::Framebuffer framebuffer;
+};
+
+HeadlessBackend::HeadlessBackend(Size size_)
+    : size(size_) {
+}
 
 HeadlessBackend::~HeadlessBackend() {
     BackendScope guard { *this };
+    view.reset();
     context.reset();
 }
 
@@ -36,8 +52,29 @@ void HeadlessBackend::deactivate() {
     active = false;
 }
 
+void HeadlessBackend::bind() {
+    gl::Context& context_ = getContext();
+
+    if (!view) {
+        view = std::make_unique<View>(context_, size);
+    }
+
+    context_.bindFramebuffer = view->framebuffer.framebuffer;
+    context_.scissorTest = false;
+    context_.viewport = { 0, 0, size };
+}
+
 void HeadlessBackend::updateAssumedState() {
     // no-op
+}
+
+void HeadlessBackend::setSize(Size size_) {
+    size = size_;
+    view.reset();
+}
+
+PremultipliedImage HeadlessBackend::readStillImage() {
+    return getContext().readFramebuffer<PremultipliedImage>(size);
 }
 
 } // namespace mbgl

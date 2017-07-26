@@ -11,10 +11,14 @@ class HeadlessDisplay;
 
 class HeadlessBackend : public RendererBackend {
 public:
-    HeadlessBackend();
+    HeadlessBackend(Size = { 256, 256 });
     ~HeadlessBackend() override;
 
+    void bind() override;
     void updateAssumedState() override;
+
+    void setSize(Size);
+    PremultipliedImage readStillImage();
 
     struct Impl {
         virtual ~Impl() = default;
@@ -37,7 +41,12 @@ private:
     std::shared_ptr<HeadlessDisplay> display;
     std::unique_ptr<Impl> impl;
 
+    Size size;
+    float pixelRatio;
     bool active = false;
+
+    class View;
+    std::unique_ptr<View> view;
 };
 
 } // namespace mbgl

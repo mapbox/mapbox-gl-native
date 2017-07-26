@@ -1,6 +1,4 @@
 add_executable(mbgl-benchmark
-    platform/default/mbgl/renderer/async_renderer_frontend.cpp
-    platform/default/mbgl/renderer/async_renderer_frontend.hpp
     ${MBGL_BENCHMARK_FILES}
 )
 

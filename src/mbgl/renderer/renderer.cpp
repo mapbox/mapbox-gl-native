@@ -21,8 +21,8 @@ void Renderer::setObserver(RendererObserver* observer) {
     impl->setObserver(observer);
 }
 
-void Renderer::render(View& view, const UpdateParameters& updateParameters) {
-    impl->render(view, updateParameters);
+void Renderer::render(const UpdateParameters& updateParameters) {
+    impl->render(updateParameters);
 }
 
 std::vector<Feature> Renderer::queryRenderedFeatures(const ScreenLineString& geometry, const RenderedQueryOptions& options) const {
