@@ -1268,9 +1268,8 @@ public:
     else if (pinch.state == UIGestureRecognizerStateChanged)
     {
         CGFloat newScale = self.scale * pinch.scale;
-        double zoom = log2(newScale);
-        if (zoom < _mbglMap->getMinZoom()) return;
-        
+        double zoom = MAX(log2(newScale), _mbglMap->getMinZoom());
+
         // Calculates the final camera zoom, has no effect within current map camera.
         MGLMapCamera *toCamera = [self cameraByZoomingToZoomLevel:zoom aroundAnchorPoint:centerPoint];
         
@@ -1625,9 +1624,7 @@ public:
     {
         CGFloat distance = [quickZoom locationInView:quickZoom.view].y - self.quickZoomStart;
 
-        CGFloat newZoom = log2f(self.scale) + (distance / 75);
-
-        if (newZoom < _mbglMap->getMinZoom()) return;
+        CGFloat newZoom = MAX(log2f(self.scale) + (distance / 75), _mbglMap->getMinZoom());
 
         CGPoint centerPoint = [self anchorPointForGesture:quickZoom];
         
