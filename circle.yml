@@ -2,6 +2,11 @@ version: 2
 
 workflows:
   version: 2
+  deployment:
+    fake_deploy_for_cci2:
+      tag: /.*/
+      commands:
+        - echo "make tags run in 2.0"
   default:
     jobs:
       - clang-tidy:
@@ -567,9 +572,3 @@ jobs:
           command: |
             xvfb-run --server-args="-screen 0 1024x768x24" \
               scripts/valgrind.sh build/qt-linux-x86_64/Release/mbgl-test --gtest_filter=-*.Load --gtest_filter=-Memory.Vector
-
-deployment:
-  fake_deploy_for_cci2:
-    tag: /.*/
-    commands:
-      - echo "make tags run in 2.0"
