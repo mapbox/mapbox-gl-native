@@ -580,13 +580,6 @@ run-android-unit-test: platform/android/configuration.gradle
 run-android-unit-test-%: platform/android/configuration.gradle
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=none :MapboxGLAndroidSDKTestApp:testDebugUnitTest --tests "$*"
 
-# Run Java Unit tests on the JVM of the machine executing this
-.PHONY: run-android-wear-unit-test
-run-android-wear-unit-test: platform/android/configuration.gradle
-	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=none :MapboxGLAndroidSDKWearTestApp:testDebugUnitTest
-run-android-wear-unit-test-%: platform/android/configuration.gradle
-	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=none :MapboxGLAndroidSDKWearTestApp:testDebugUnitTest --tests "$*"
-
 # Run Instrumentation tests on AWS device farm, requires additional authentication through gradle.properties
 .PHONY: run-android-ui-test-aws
 run-android-ui-test-aws: platform/android/configuration.gradle
@@ -632,11 +625,6 @@ android-lint-sdk: platform/android/configuration.gradle
 android-lint-test-app: platform/android/configuration.gradle
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=none :MapboxGLAndroidSDKTestApp:lint
 
-# Runs lint on the Android wear test app code
-.PHONY: android-lint-wear-app
-android-lint-wear-app: platform/android/configuration.gradle
-	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=none :MapboxGLAndroidSDKWearTestApp:lint
-
 # Generates javadoc from the Android SDK
 .PHONY: android-javadoc
 android-javadoc: platform/android/configuration.gradle
@@ -672,7 +660,6 @@ clean:
 	        ./platform/android/MapboxGLAndroidSDK/build \
 	        ./platform/android/MapboxGLAndroidSDK/.externalNativeBuild \
 	        ./platform/android/MapboxGLAndroidSDKTestApp/build \
-	        ./platform/android/MapboxGLAndroidSDKWearTestApp/build \
 	        ./platform/android/MapboxGLAndroidSDKTestApp/src/androidTest/java/com/mapbox/mapboxsdk/testapp/activity/gen \
 	        ./platform/android/MapboxGLAndroidSDK/src/main/assets
 
