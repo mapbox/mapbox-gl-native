@@ -21,13 +21,13 @@ workflows:
       - linux-gcc5-debug-coverage
       - linux-gcc5-release-qt4
       - linux-gcc5-release-qt5
-    deployment:
-        fake_deploy_for_cci2:
-            tag: /.*/
-            commands:
-                # NOTE: this command doesn't actually get run, rather this simply triggers that the above deploy runs when a tag is pushed.
-                # See https://discuss.circleci.com/t/git-tag-deploys-in-2-0/9493/6
-                - echo "make tags run in 2.0"
+  deployment:
+      fake_deploy_for_cci2:
+          tag: /.*/
+          commands:
+              # NOTE: this command doesn't actually get run, rather this simply triggers that the above deploy runs when a tag is pushed.
+              # See https://discuss.circleci.com/t/git-tag-deploys-in-2-0/9493/6
+              - echo "make tags run in 2.0"
 
 step-library:
   - &generate-cache-key
