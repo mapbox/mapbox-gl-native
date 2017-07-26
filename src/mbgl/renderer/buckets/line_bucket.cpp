@@ -15,7 +15,8 @@ LineBucket::LineBucket(const BucketParameters& parameters,
                        const std::vector<const RenderLayer*>& layers,
                        const style::LineLayoutProperties::Unevaluated& layout_)
     : layout(layout_.evaluate(PropertyEvaluationParameters(parameters.tileID.overscaledZ))),
-      overscaling(parameters.tileID.overscaleFactor()) {
+      overscaling(parameters.tileID.overscaleFactor()),
+      zoom(parameters.tileID.overscaledZ) {
     for (const auto& layer : layers) {
         paintPropertyBinders.emplace(
             std::piecewise_construct,
@@ -29,7 +30,7 @@ LineBucket::LineBucket(const BucketParameters& parameters,
 void LineBucket::addFeature(const GeometryTileFeature& feature,
                             const GeometryCollection& geometryCollection) {
     for (auto& line : geometryCollection) {
-        addGeometry(line, feature.getType());
+        addGeometry(line, feature);
     }
 
     for (auto& pair : paintPropertyBinders) {
@@ -62,7 +63,8 @@ const float LINE_DISTANCE_SCALE = 1.0 / 2.0;
 // The maximum line distance, in tile units, that fits in the buffer.
 const float MAX_LINE_DISTANCE = std::pow(2, LINE_DISTANCE_BUFFER_BITS) / LINE_DISTANCE_SCALE;
 
-void LineBucket::addGeometry(const GeometryCoordinates& coordinates, FeatureType type) {
+void LineBucket::addGeometry(const GeometryCoordinates& coordinates, const GeometryTileFeature& feature) {
+    const FeatureType type = feature.getType();
     const std::size_t len = [&coordinates] {
         std::size_t l = coordinates.size();
         // If the line has duplicate vertices at the end, adjust length to remove them.
@@ -86,7 +88,9 @@ void LineBucket::addGeometry(const GeometryCoordinates& coordinates, FeatureType
         return;
     }
 
-    const float miterLimit = layout.get<LineJoin>() == LineJoinType::Bevel ? 1.05f : float(layout.get<LineMiterLimit>());
+    const LineJoinType joinType = layout.evaluate<LineJoin>(zoom, feature);
+
+    const float miterLimit = joinType == LineJoinType::Bevel ? 1.05f : float(layout.get<LineMiterLimit>());
 
     const double sharpCornerOffset = SHARP_CORNER_OFFSET * (float(util::EXTENT) / (util::tileSize * overscaling));
 
@@ -193,7 +197,7 @@ void LineBucket::addGeometry(const GeometryCoordinates& coordinates, FeatureType
 
         // The join if a middle vertex, otherwise the cap
         const bool middleVertex = prevCoordinate && nextCoordinate;
-        LineJoinType currentJoin = layout.get<LineJoin>();
+        LineJoinType currentJoin = joinType;
         const LineCapType currentCap = nextCoordinate ? beginCap : endCap;
 
         if (middleVertex) {

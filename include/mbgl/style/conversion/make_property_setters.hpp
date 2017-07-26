@@ -26,7 +26,7 @@ auto makeLayoutPropertySetters() {
 
 
     result["line-cap"] = &setProperty<V, LineLayer, PropertyValue<LineCapType>, &LineLayer::setLineCap>;
-    result["line-join"] = &setProperty<V, LineLayer, PropertyValue<LineJoinType>, &LineLayer::setLineJoin>;
+    result["line-join"] = &setProperty<V, LineLayer, DataDrivenPropertyValue<LineJoinType>, &LineLayer::setLineJoin>;
     result["line-miter-limit"] = &setProperty<V, LineLayer, PropertyValue<float>, &LineLayer::setLineMiterLimit>;
     result["line-round-limit"] = &setProperty<V, LineLayer, PropertyValue<float>, &LineLayer::setLineRoundLimit>;
 
@@ -54,8 +54,8 @@ auto makeLayoutPropertySetters() {
     result["text-max-width"] = &setProperty<V, SymbolLayer, PropertyValue<float>, &SymbolLayer::setTextMaxWidth>;
     result["text-line-height"] = &setProperty<V, SymbolLayer, PropertyValue<float>, &SymbolLayer::setTextLineHeight>;
     result["text-letter-spacing"] = &setProperty<V, SymbolLayer, PropertyValue<float>, &SymbolLayer::setTextLetterSpacing>;
-    result["text-justify"] = &setProperty<V, SymbolLayer, PropertyValue<TextJustifyType>, &SymbolLayer::setTextJustify>;
-    result["text-anchor"] = &setProperty<V, SymbolLayer, PropertyValue<TextAnchorType>, &SymbolLayer::setTextAnchor>;
+    result["text-justify"] = &setProperty<V, SymbolLayer, DataDrivenPropertyValue<TextJustifyType>, &SymbolLayer::setTextJustify>;
+    result["text-anchor"] = &setProperty<V, SymbolLayer, DataDrivenPropertyValue<TextAnchorType>, &SymbolLayer::setTextAnchor>;
     result["text-max-angle"] = &setProperty<V, SymbolLayer, PropertyValue<float>, &SymbolLayer::setTextMaxAngle>;
     result["text-rotate"] = &setProperty<V, SymbolLayer, DataDrivenPropertyValue<float>, &SymbolLayer::setTextRotate>;
     result["text-padding"] = &setProperty<V, SymbolLayer, PropertyValue<float>, &SymbolLayer::setTextPadding>;
