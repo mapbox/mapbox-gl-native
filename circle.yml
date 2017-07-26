@@ -2,13 +2,9 @@ version: 2
 
 workflows:
   version: 2
-  deployment:
-    fake_deploy_for_cci2:
-      tag: /.*/
-      commands:
-        - echo "make tags run in 2.0"
   default:
     jobs:
+      - build
       - clang-tidy:
           filters:
             branches:
@@ -26,6 +22,11 @@ workflows:
       - linux-gcc5-debug-coverage
       - linux-gcc5-release-qt4
       - linux-gcc5-release-qt5
+  deployment:
+    fake_deploy_for_cci2:
+      tag: /.*/
+      commands:
+        - echo "make tags run in 2.0"
 
 step-library:
   - &generate-cache-key
