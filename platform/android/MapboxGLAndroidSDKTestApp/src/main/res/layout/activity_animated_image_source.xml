@@ -14,16 +14,4 @@
     app:mapbox_cameraZoom="3"
     app:mapbox_styleUrl="@string/mapbox_style_mapbox_streets"/>
 
-<android.support.design.widget.FloatingActionButton
-    android:id="@+id/fabStartStop"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_alignParentBottom="true"
-    android:layout_alignParentEnd="true"
-    android:layout_alignParentRight="true"
-    android:layout_marginBottom="@dimen/fab_margin"
-    android:layout_marginRight="@dimen/fab_margin"
-    android:src="@android:drawable/ic_media_play"
-    app:backgroundTint="@color/primary"/>
-
 </RelativeLayout>

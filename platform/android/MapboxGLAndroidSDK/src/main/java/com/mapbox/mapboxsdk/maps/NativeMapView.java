@@ -17,7 +17,6 @@ import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.Polygon;
 import com.mapbox.mapboxsdk.annotations.Polyline;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
-import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.geometry.ProjectedMeters;
@@ -84,9 +83,10 @@ final class NativeMapView {
 
   private boolean isDestroyedOn(String callingMethod) {
     if (destroyed && !TextUtils.isEmpty(callingMethod)) {
-      Timber.e(String.format(MapboxConstants.MAPBOX_LOCALE,
+      Timber.e(
         "You're calling `%s` after the `MapView` was destroyed, were you invoking it after `onDestroy()`?",
-        callingMethod));
+        callingMethod
+      );
     }
     return destroyed;
   }
@@ -143,14 +143,14 @@ final class NativeMapView {
     if (width > 65535) {
       // we have seen edge cases where devices return incorrect values #6111
       Timber.e("Device returned an out of range width size, "
-        + "capping value at 65535 instead of " + width);
+        + "capping value at 65535 instead of %s", width);
       width = 65535;
     }
 
     if (height > 65535) {
       // we have seen edge cases where devices return incorrect values #6111
       Timber.e("Device returned an out of range height size, "
-        + "capping value at 65535 instead of " + height);
+        + "capping value at 65535 instead of %s", height);
       height = 65535;
     }
     nativeResizeView(width, height);

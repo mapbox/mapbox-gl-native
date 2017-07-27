@@ -32,7 +32,7 @@ public class OfflineListRegionsDialog extends DialogFragment {
       .setItems(items, new DialogInterface.OnClickListener() {
         @Override
         public void onClick(DialogInterface dialog, int which) {
-          Timber.d("Selected item: " + which);
+          Timber.d("Selected item: %s", which);
         }
       })
       .setPositiveButton("Accept", new DialogInterface.OnClickListener() {

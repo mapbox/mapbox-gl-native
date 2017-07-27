@@ -272,7 +272,6 @@ public final class MapboxMap {
    * Check whether tile pre-fetching is enabled or not.
    *
    * @return true if enabled
-   *
    * @see MapboxMap#setPrefetchesTiles(boolean)
    */
   @UiThread
@@ -316,7 +315,7 @@ public final class MapboxMap {
       // noinspection unchecked
       return (T) nativeMapView.getLayer(layerId);
     } catch (ClassCastException exception) {
-      Timber.e(String.format("Layer: %s is a different type: %s", layerId, exception));
+      Timber.e(exception, "Layer: %s is a different type: ", layerId);
       return null;
     }
   }
@@ -437,7 +436,7 @@ public final class MapboxMap {
       // noinspection unchecked
       return (T) nativeMapView.getSource(sourceId);
     } catch (ClassCastException exception) {
-      Timber.e(String.format("Source: %s is a different type: %s", sourceId, exception));
+      Timber.e(exception, "Source: %s is a different type: ", sourceId);
       return null;
     }
   }

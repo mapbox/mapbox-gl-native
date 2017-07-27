@@ -3,14 +3,14 @@
 
     <item
         android:id="@+id/action_toggle_text_size"
-        android:title="Toggle text size"/>
+        android:title="@string/toggle_text_size"/>
 
     <item
         android:id="@+id/action_toggle_text_field"
-        android:title="Toggle text field contents"/>
+        android:title="@string/toggle_text_field_contents"/>
 
     <item
         android:id="@+id/action_toggle_text_font"
-        android:title="Toggle text font"/>
+        android:title="@string/toggle_text_font"/>
 
 </menu>

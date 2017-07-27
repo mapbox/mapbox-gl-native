@@ -21,6 +21,8 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.utils.IconUtils;
 
+import java.util.Locale;
+
 /**
  * Test activity showcasing how to dynamically update InfoWindow when Using an MapboxMap.InfoWindowAdapter.
  */
@@ -69,7 +71,7 @@ public class DynamicInfoWindowAdapterActivity extends AppCompatActivity implemen
         // Get the view from the info window
         if (infoWindow != null && infoWindow.getView() != null) {
           // Set the new text on the text view in the info window
-          ((TextView) infoWindow.getView()).setText(String.format("%.2fkm", distanceKm));
+          ((TextView) infoWindow.getView()).setText(String.format(Locale.getDefault(), "%.2fkm", distanceKm));
 
           // Update the info window position (as the text length changes)
           infoWindow.update();
@@ -100,9 +102,8 @@ public class DynamicInfoWindowAdapterActivity extends AppCompatActivity implemen
         TextView textView = new TextView(DynamicInfoWindowAdapterActivity.this);
         textView.setText(marker.getTitle());
         textView.setBackgroundColor(Color.WHITE);
-        textView.setText("Click the map to calculate the distance");
+        textView.setText(R.string.action_calculate_distance);
         textView.setPadding(padding, padding, padding, padding);
-
         return textView;
       }
     });

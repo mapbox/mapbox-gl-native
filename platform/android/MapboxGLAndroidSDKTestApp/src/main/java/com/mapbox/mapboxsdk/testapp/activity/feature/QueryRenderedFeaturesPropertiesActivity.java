@@ -59,9 +59,9 @@ public class QueryRenderedFeaturesPropertiesActivity extends AppCompatActivity {
           public void onMapClick(@NonNull LatLng point) {
             // Query
             final PointF pixel = mapboxMap.getProjection().toScreenLocation(point);
-            Timber.i(String.format(
+            Timber.i(
               "Requesting features for %sx%s (%sx%s adjusted for density)",
-              pixel.x, pixel.y, pixel.x / density, pixel.y / density)
+              pixel.x, pixel.y, pixel.x / density, pixel.y / density
             );
             List<Feature> features = mapboxMap.queryRenderedFeatures(pixel);
 
@@ -84,22 +84,21 @@ public class QueryRenderedFeaturesPropertiesActivity extends AppCompatActivity {
   }
 
   private void debugOutput(List<Feature> features) {
-    Timber.i(String.format("Got %s features", features.size()));
+    Timber.i("Got %s features", features.size());
     for (Feature feature : features) {
       if (feature != null) {
-        Timber.i(String.format("Got feature %s with %s properties and Geometry %s",
+        Timber.i("Got feature %s with %s properties and Geometry %s",
           feature.getId(),
           feature.getProperties() != null ? feature.getProperties().entrySet().size() : "<null>",
-          feature.getGeometry() != null ? feature.getGeometry().getClass().getSimpleName() : "<null>")
+          feature.getGeometry() != null ? feature.getGeometry().getClass().getSimpleName() : "<null>"
         );
         if (feature.getProperties() != null) {
           for (Map.Entry<String, JsonElement> entry : feature.getProperties().entrySet()) {
-            Timber.i(String.format("Prop %s - %s", entry.getKey(), entry.getValue()));
+            Timber.i("Prop %s - %s", entry.getKey(), entry.getValue());
           }
         }
       } else {
-        // TODO Question: Why not formatting here??
-        Timber.i("Got NULL feature %s");
+        Timber.i("Got NULL feature");
       }
     }
   }
@@ -185,7 +184,7 @@ public class QueryRenderedFeaturesPropertiesActivity extends AppCompatActivity {
 
     private final List<Feature> features;
 
-    public CustomMarker(BaseMarkerOptions baseMarkerOptions, List<Feature> features) {
+    CustomMarker(BaseMarkerOptions baseMarkerOptions, List<Feature> features) {
       super(baseMarkerOptions);
       this.features = features;
     }
@@ -201,7 +200,7 @@ public class QueryRenderedFeaturesPropertiesActivity extends AppCompatActivity {
       return this;
     }
 
-    public CustomMarkerOptions() {
+    CustomMarkerOptions() {
     }
 
     private CustomMarkerOptions(Parcel in) {

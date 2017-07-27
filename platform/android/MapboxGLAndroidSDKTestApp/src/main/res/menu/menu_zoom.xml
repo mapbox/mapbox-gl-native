@@ -3,23 +3,23 @@
     xmlns:mapbox="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/action_zoom_in"
-        android:title="Zoom in"
+        android:title="@string/zoom_in"
         mapbox:showAsAction="never" />
     <item
         android:id="@+id/action_zoom_out"
-        android:title="Zoom out"
+        android:title="@string/zoom_out"
         mapbox:showAsAction="never" />
     <item
         android:id="@+id/action_zoom_by"
-        android:title="Zoom by 2"
+        android:title="@string/zoom_by_2"
         mapbox:showAsAction="never" />
     <item
         android:id="@+id/action_zoom_to_point"
-        android:title="Zoom to point"
+        android:title="@string/zoom_to_point"
         mapbox:showAsAction="never" />
     <item
         android:id="@+id/action_zoom_to"
-        android:title="Zoom to 4"
+        android:title="@string/zoom_to_4"
         mapbox:showAsAction="never" />
 
 </menu>

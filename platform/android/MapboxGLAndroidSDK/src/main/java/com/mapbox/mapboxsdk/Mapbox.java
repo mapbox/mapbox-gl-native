@@ -1,5 +1,6 @@
 package com.mapbox.mapboxsdk;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -26,6 +27,7 @@ import com.mapbox.services.android.telemetry.location.LocationEnginePriority;
 @UiThread
 public final class Mapbox {
 
+  @SuppressLint("StaticFieldLeak")
   private static Mapbox INSTANCE;
   private Context context;
   private String accessToken;

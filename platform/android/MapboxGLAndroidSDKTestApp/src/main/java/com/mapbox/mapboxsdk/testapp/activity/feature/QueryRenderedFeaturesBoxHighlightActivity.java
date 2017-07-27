@@ -53,7 +53,7 @@ public class QueryRenderedFeaturesBoxHighlightActivity extends AppCompatActivity
             int top = selectionBox.getTop() - mapView.getTop();
             int left = selectionBox.getLeft() - mapView.getLeft();
             RectF box = new RectF(left, top, left + selectionBox.getWidth(), top + selectionBox.getHeight());
-            Timber.i(String.format("Querying box %s for buildings", box));
+            Timber.i("Querying box %s for buildings", box);
             List<Feature> features = mapboxMap.queryRenderedFeatures(box, Filter.lt("height", 10), "building");
 
             // Show count

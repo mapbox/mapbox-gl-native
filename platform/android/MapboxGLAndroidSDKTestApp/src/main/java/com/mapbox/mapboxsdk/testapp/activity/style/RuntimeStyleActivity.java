@@ -317,12 +317,12 @@ public class RuntimeStyleActivity extends AppCompatActivity {
     layer = mapboxMap.getLayerAs("parksLayer");
     // And get some properties
     PropertyValue<Boolean> fillAntialias = layer.getFillAntialias();
-    Timber.d("Fill anti alias: " + fillAntialias.getValue());
+    Timber.d("Fill anti alias: %s", fillAntialias.getValue());
     layer.setProperties(fillTranslateAnchor(FILL_TRANSLATE_ANCHOR_MAP));
     PropertyValue<String> fillTranslateAnchor = layer.getFillTranslateAnchor();
-    Timber.d("Fill translate anchor: " + fillTranslateAnchor.getValue());
+    Timber.d("Fill translate anchor: %s", fillTranslateAnchor.getValue());
     PropertyValue<String> visibility = layer.getVisibility();
-    Timber.d("Visibility: " + visibility.getValue());
+    Timber.d("Visibility: %s", visibility.getValue());
 
     // Get a good look at it all
     mapboxMap.animateCamera(CameraUpdateFactory.zoomTo(12));
@@ -477,11 +477,11 @@ public class RuntimeStyleActivity extends AppCompatActivity {
     Function<Float, String> function = (Function<Float, String>) fillColor.getFunction();
     if (function != null) {
       ExponentialStops<Float, String> stops = (ExponentialStops) function.getStops();
-      Timber.d("Fill color base: " + stops.getBase());
-      Timber.d("Fill color #stops: " + stops.size());
+      Timber.d("Fill color base: %s", stops.getBase());
+      Timber.d("Fill color #stops: %s", stops.size());
       if (function.getStops() != null) {
         for (Stop<Float, String> stop : stops) {
-          Timber.d("Fill color #stops: " + stop);
+          Timber.d("Fill color #stops: %s", stop);
         }
       }
     }
