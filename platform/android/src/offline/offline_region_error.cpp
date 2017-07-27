@@ -7,7 +7,7 @@ jni::Object<OfflineRegionError> OfflineRegionError::New(jni::JNIEnv& env, mbgl::
 
     // Handle the value of reason independently of the underlying int value
     std::string reason;
-    switch(error.reason) {
+    switch(error.status) {
         case mbgl::ResourceStatus::Success:
             reason = "REASON_SUCCESS";
             break;

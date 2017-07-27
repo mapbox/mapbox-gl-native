@@ -203,7 +203,7 @@ private:
 
 NSError *MGLErrorFromResponseError(mbgl::Response::Error error) {
     NSInteger errorCode = MGLErrorCodeUnknown;
-    switch (error.reason) {
+    switch (error.status) {
         case mbgl::ResourceStatus::NotFoundError:
             errorCode = MGLErrorCodeNotFound;
             break;

@@ -137,7 +137,7 @@ void HTTPRequest::onResponse(jni::JNIEnv& env, int code,
     } else if (code == 304) {
         response.notModified = true;
     } else if (code == 404) {
-        response.error = std::make_unique<Error>(ResourceStatus::NotFound, "HTTP status code 404");
+        response.error = std::make_unique<Error>(ResourceStatus::NotFoundError, "HTTP status code 404");
     } else if (code == 429) {
         optional<std::string> retryAfter;
         optional<std::string> xRateLimitReset;
@@ -147,11 +147,11 @@ void HTTPRequest::onResponse(jni::JNIEnv& env, int code,
         if (jXRateLimitReset) {
             xRateLimitReset = jni::Make<std::string>(env, jXRateLimitReset);
         }
-        response.error = std::make_unique<Error>(ResourceStatus::RateLimit, "HTTP status code 429", http::parseRetryHeaders(retryAfter, xRateLimitReset));
+        response.error = std::make_unique<Error>(ResourceStatus::RateLimitError, "HTTP status code 429", http::parseRetryHeaders(retryAfter, xRateLimitReset));
     } else if (code >= 500 && code < 600) {
-        response.error = std::make_unique<Error>(ResourceStatus::Server, std::string{ "HTTP status code " } + std::to_string(code));
+        response.error = std::make_unique<Error>(ResourceStatus::ServerError, std::string{ "HTTP status code " } + std::to_string(code));
     } else {
-        response.error = std::make_unique<Error>(ResourceStatus::Other, std::string{ "HTTP status code " } + std::to_string(code));
+        response.error = std::make_unique<Error>(ResourceStatus::OtherError, std::string{ "HTTP status code " } + std::to_string(code));
     }
 
     async.send();
@@ -164,13 +164,13 @@ void HTTPRequest::onFailure(jni::JNIEnv& env, int type, jni::String message) {
 
     switch (type) {
         case connectionError:
-            response.error = std::make_unique<Error>(ResourceStatus::Connection, messageStr);
+            response.error = std::make_unique<Error>(ResourceStatus::ConnectionError, messageStr);
             break;
         case temporaryError:
-            response.error = std::make_unique<Error>(ResourceStatus::Server, messageStr);
+            response.error = std::make_unique<Error>(ResourceStatus::ServerError, messageStr);
             break;
         default:
-            response.error = std::make_unique<Error>(ResourceStatus::Other, messageStr);
+            response.error = std::make_unique<Error>(ResourceStatus::OtherError, messageStr);
     }
 
     async.send();

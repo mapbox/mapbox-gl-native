@@ -88,28 +88,28 @@ NSString * const MGLOfflinePackMaximumCountUserInfoKey = MGLOfflinePackUserInfoK
                                                         encoding:NSUTF8StringEncoding]];
             MGLResourceKind kind = MGLResourceKindUnknown;
             switch (kind_) {
-                case mbgl::Resource::Kind::Tile:
+                case mbgl::ResourceKind::Tile:
                     kind = MGLResourceKindTile;
                     break;
-                case mbgl::Resource::Kind::Glyphs:
+                case mbgl::ResourceKind::Glyphs:
                     kind = MGLResourceKindGlyphs;
                     break;
-                case mbgl::Resource::Kind::Style:
+                case mbgl::ResourceKind::Style:
                     kind = MGLResourceKindStyle;
                     break;
-                case mbgl::Resource::Kind::Source:
+                case mbgl::ResourceKind::Source:
                     kind = MGLResourceKindSource;
                     break;
-                case mbgl::Resource::Kind::SpriteImage:
+                case mbgl::ResourceKind::SpriteImage:
                     kind = MGLResourceKindSpriteImage;
                     break;
-                case mbgl::Resource::Kind::SpriteJSON:
+                case mbgl::ResourceKind::SpriteJSON:
                     kind = MGLResourceKindSpriteJSON;
                     break;
-                case mbgl::Resource::Kind::Image:
+                case mbgl::ResourceKind::Image:
                     kind = MGLResourceKindImage;
                     break;
-                case mbgl::Resource::Kind::Unknown:
+                case mbgl::ResourceKind::Unknown:
                     kind = MGLResourceKindUnknown;
                     break;
 

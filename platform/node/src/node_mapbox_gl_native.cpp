@@ -21,7 +21,7 @@ void RegisterModule(v8::Local<v8::Object> target, v8::Local<v8::Object> module) 
     node_mbgl::NodeMap::Init(target);
     node_mbgl::NodeRequest::Init();
 
-    // Exports Resource constants.
+    // Exports ResourceKind constants.
     v8::Local<v8::Object> resource = Nan::New<v8::Object>();
 
     Nan::Set(resource,
