@@ -5,7 +5,7 @@
 #import "DroppedPinAnnotation.h"
 
 #import "MGLStyle+MBXAdditions.h"
-#import "MGLVectorSource+MBXAdditions.h"
+#import "MGLVectorSource+MGLAdditions.h"
 
 #import <Mapbox/Mapbox.h>
 

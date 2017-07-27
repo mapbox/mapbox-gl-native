@@ -21,7 +21,7 @@
 #import "MGLSource.h"
 #import "MGLTileSource_Private.h"
 #import "MGLVectorSource.h"
-#import "MGLVectorSource+MBXAdditions.h"
+#import "MGLVectorSource+MGLAdditions.h"
 #import "MGLRasterSource.h"
 #import "MGLShapeSource.h"
 
