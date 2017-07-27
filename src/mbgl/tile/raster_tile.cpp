@@ -36,17 +36,19 @@ void RasterTile::setError(std::exception_ptr err, const bool complete) {
 }
 
 // Called when new data is available for this tile. It can be called even if there is already data
-// in this tile.
-void RasterTile::setData(std::shared_ptr<const std::string> data,
-                         const optional<Timestamp> modified_,
-                         const optional<Timestamp> expires_,
+// in this tile. When the existing data should remain the same, the optional data field is empty.
+void RasterTile::setData(optional<std::shared_ptr<const std::string>> data,
+                         optional<Timestamp> modified_,
+                         optional<Timestamp> expires_,
                          const bool complete) {
     (void)complete;
     modified = modified_;
     expires = expires_;
 
-    ++correlationID;
-    worker.invoke(&RasterTileWorker::parse, data, correlationID);
+    if (data) {
+        ++correlationID;
+        worker.invoke(&RasterTileWorker::parse, *data, correlationID);
+    }
 }
 
 // Invoked once the worker thread finished parsing the image.

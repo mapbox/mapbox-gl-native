@@ -25,7 +25,7 @@ public:
     void setNecessity(Necessity) final;
 
     void setError(std::exception_ptr, bool complete);
-    void setData(std::shared_ptr<const std::string> data,
+    void setData(optional<std::shared_ptr<const std::string>> data,
                  optional<Timestamp> modified_,
                  optional<Timestamp> expires_,
                  bool complete);

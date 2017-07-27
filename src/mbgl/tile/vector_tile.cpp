@@ -21,7 +21,7 @@ void VectorTile::setError(std::exception_ptr err, const bool complete) {
     GeometryTile::setError(err);
 }
 
-void VectorTile::setData(std::shared_ptr<const std::string> data_,
+void VectorTile::setData(optional<std::shared_ptr<const std::string>> data,
                          optional<Timestamp> modified_,
                          optional<Timestamp> expires_,
                          const bool complete) {
@@ -29,7 +29,9 @@ void VectorTile::setData(std::shared_ptr<const std::string> data_,
     modified = modified_;
     expires = expires_;
 
-    GeometryTile::setData(data_ ? std::make_unique<VectorTileData>(data_) : nullptr);
+    if (data) {
+        GeometryTile::setData(*data ? std::make_unique<VectorTileData>(*data) : nullptr);
+    }
 }
 
 } // namespace mbgl
