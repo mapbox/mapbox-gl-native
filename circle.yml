@@ -12,7 +12,13 @@ workflows:
       - android-debug-arm-v7
       - android-release-all
       - node4-clang39-release
+        filters:
+          tags:
+            only: /node-.*/
       - node6-clang39-release
+        filters:
+          tags:
+            only: /node-.*/
       - node6-clang39-debug
       - linux-clang39-debug
       - linux-clang4-sanitize-address
@@ -22,11 +28,6 @@ workflows:
       - linux-gcc5-debug-coverage
       - linux-gcc5-release-qt4
       - linux-gcc5-release-qt5
-  deployment:
-    fake_deploy_for_cci2:
-      tag: /.*/
-      commands:
-        - echo "make tags run in 2.0"
 
 step-library:
   - &generate-cache-key
