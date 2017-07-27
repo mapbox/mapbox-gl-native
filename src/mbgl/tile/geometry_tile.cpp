@@ -120,20 +120,21 @@ void GeometryTile::setLayers(const std::vector<Immutable<Layer::Impl>>& layers) 
     worker.invoke(&GeometryTileWorker::setLayers, std::move(impls), correlationID);
 }
 
-void GeometryTile::onLayout(LayoutResult result) {
+void GeometryTile::onLayout(LayoutResult result, const uint64_t resultCorrelationID) {
     loaded = true;
     renderable = true;
     nonSymbolBuckets = std::move(result.nonSymbolBuckets);
     featureIndex = std::move(result.featureIndex);
     data = std::move(result.tileData);
     collisionTile.reset();
+    (void)resultCorrelationID;
     observer->onTileChanged(*this);
 }
 
-void GeometryTile::onPlacement(PlacementResult result) {
+void GeometryTile::onPlacement(PlacementResult result, const uint64_t resultCorrelationID) {
     loaded = true;
     renderable = true;
-    if (result.correlationID == correlationID) {
+    if (resultCorrelationID == correlationID) {
         pending = false;
     }
     symbolBuckets = std::move(result.symbolBuckets);
@@ -150,9 +151,10 @@ void GeometryTile::onPlacement(PlacementResult result) {
     observer->onTileChanged(*this);
 }
 
-void GeometryTile::onError(std::exception_ptr err) {
+void GeometryTile::onError(std::exception_ptr err, const uint64_t resultCorrelationID) {
     loaded = true;
     pending = false;
+    (void)resultCorrelationID;
     renderable = false;
     observer->onTileError(*this, err);
 }

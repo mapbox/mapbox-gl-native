@@ -27,28 +27,37 @@ RasterTile::~RasterTile() = default;
 void RasterTile::cancel() {
 }
 
+// Called instead of setData() when the data source returns an error while loading this tile.
 void RasterTile::setError(std::exception_ptr err) {
     loaded = true;
     renderable = false;
     observer->onTileError(*this, err);
 }
 
+// Called when new data is available for this tile. It can be called even if there is already data
+// in this tile.
 void RasterTile::setData(std::shared_ptr<const std::string> data,
                              optional<Timestamp> modified_,
                              optional<Timestamp> expires_) {
     modified = modified_;
     expires = expires_;
-    worker.invoke(&RasterTileWorker::parse, data);
+
+    ++correlationID;
+    worker.invoke(&RasterTileWorker::parse, data, correlationID);
 }
 
-void RasterTile::onParsed(std::unique_ptr<RasterBucket> result) {
+// Invoked once the worker thread finished parsing the image.
+void RasterTile::onParsed(std::unique_ptr<RasterBucket> result, const uint64_t resultCorrelationID) {
+    (void)resultCorrelationID;
     bucket = std::move(result);
     loaded = true;
     renderable = bucket ? true : false;
     observer->onTileChanged(*this);
 }
 
-void RasterTile::onError(std::exception_ptr err) {
+// Invoked when the worker thread fails to parse the image.
+void RasterTile::onError(std::exception_ptr err, const uint64_t resultCorrelationID) {
+    (void)resultCorrelationID;
     bucket.reset();
     loaded = true;
     renderable = false;

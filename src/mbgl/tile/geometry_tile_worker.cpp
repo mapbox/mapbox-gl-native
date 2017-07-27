@@ -88,7 +88,7 @@ void GeometryTileWorker::setData(std::unique_ptr<const GeometryTileData> data_, 
             break;
         }
     } catch (...) {
-        parent.invoke(&GeometryTile::onError, std::current_exception());
+        parent.invoke(&GeometryTile::onError, std::current_exception(), correlationID);
     }
 }
 
@@ -112,7 +112,7 @@ void GeometryTileWorker::setLayers(std::vector<Immutable<Layer::Impl>> layers_, 
             break;
         }
     } catch (...) {
-        parent.invoke(&GeometryTile::onError, std::current_exception());
+        parent.invoke(&GeometryTile::onError, std::current_exception(), correlationID);
     }
 }
 
@@ -136,7 +136,7 @@ void GeometryTileWorker::setPlacementConfig(PlacementConfig placementConfig_, ui
             break;
         }
     } catch (...) {
-        parent.invoke(&GeometryTile::onError, std::current_exception());
+        parent.invoke(&GeometryTile::onError, std::current_exception(), correlationID);
     }
 }
 
@@ -161,7 +161,7 @@ void GeometryTileWorker::symbolDependenciesChanged() {
             break;
         }
     } catch (...) {
-        parent.invoke(&GeometryTile::onError, std::current_exception());
+        parent.invoke(&GeometryTile::onError, std::current_exception(), correlationID);
     }
 }
 
@@ -187,7 +187,7 @@ void GeometryTileWorker::coalesced() {
             break;
         }
     } catch (...) {
-        parent.invoke(&GeometryTile::onError, std::current_exception());
+        parent.invoke(&GeometryTile::onError, std::current_exception(), correlationID);
     }
 }
 
@@ -353,9 +353,8 @@ void GeometryTileWorker::redoLayout() {
     parent.invoke(&GeometryTile::onLayout, GeometryTile::LayoutResult {
         std::move(buckets),
         std::move(featureIndex),
-        *data ? (*data)->clone() : nullptr,
-        correlationID
-    });
+        *data ? (*data)->clone() : nullptr
+    }, correlationID);
 
     attemptPlacement();
 }
@@ -418,9 +417,8 @@ void GeometryTileWorker::attemptPlacement() {
         std::move(buckets),
         std::move(collisionTile),
         std::move(glyphAtlasImage),
-        std::move(iconAtlasImage),
-        correlationID
-    });
+        std::move(iconAtlasImage)
+    }, correlationID);
 }
 
 } // namespace mbgl
