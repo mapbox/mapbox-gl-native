@@ -92,6 +92,11 @@ TEST(Actor, DestructionBlocksOnSend) {
             std::this_thread::sleep_for(1ms);
             waited = true;
         }
+        
+        std::unique_ptr<Scheduled> schedule(Duration, std::weak_ptr<Mailbox>, std::unique_ptr<Message>) final {
+            assert(false);
+            return {};
+        }
     };
 
     struct Test {

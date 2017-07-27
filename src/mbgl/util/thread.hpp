@@ -82,6 +82,10 @@ public:
         loop->stop();
         thread.join();
     }
+    
+    std::unique_ptr<Scheduled> schedule(Duration timeout, std::weak_ptr<Mailbox> mailbox, std::unique_ptr<Message> message) override {
+        return loop->schedule(timeout, std::move(mailbox), std::move(message));
+    }
 
     // Returns a non-owning reference to `Object` that
     // can be used to send messages to `Object`. It is safe
