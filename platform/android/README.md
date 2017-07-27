@@ -24,7 +24,7 @@ have -SNAPSHOT appended to the SDK version number. For example `5.2.0-SNAPSHOT` 
 ```java
 // Mapbox SDK dependency
     compile('com.mapbox.mapboxsdk:mapbox-android-sdk:5.2.0-SNAPSHOT@aar') {
-        transitive = true
+    transitive = true
     }
 ```
 
