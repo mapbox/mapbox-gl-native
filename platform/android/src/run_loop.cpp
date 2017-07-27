@@ -1,9 +1,9 @@
 #include "run_loop_impl.hpp"
 
 #include <mbgl/util/platform.hpp>
-#include <mbgl/util/thread_local.hpp>
 #include <mbgl/util/thread.hpp>
 #include <mbgl/util/timer.hpp>
+#include <mbgl/util/scheduled_timer.hpp>
 #include <mbgl/actor/scheduler.hpp>
 
 #include <android/looper.h>
@@ -200,7 +200,7 @@ Milliseconds RunLoop::Impl::processRunnables() {
 }
 
 RunLoop* RunLoop::Get() {
-    assert(static_cast<RunLoop*>(Scheduler::GetCurrent()));
+    assert(dynamic_cast<RunLoop*>(Scheduler::GetCurrent()));
     return static_cast<RunLoop*>(Scheduler::GetCurrent());
 }
 
@@ -256,6 +256,10 @@ void RunLoop::addWatch(int, Event, std::function<void(int, Event)>&&) {
 
 void RunLoop::removeWatch(int) {
     throw std::runtime_error("Not implemented.");
+}
+
+std::unique_ptr<Scheduler::Scheduled> RunLoop::schedule(Duration timeout, std::weak_ptr<Mailbox> mailbox, std::unique_ptr<Message> message) {
+    return std::make_unique<ScheduledTimer>(*this, timeout, std::move(mailbox), std::move(message));
 }
 
 } // namespace util

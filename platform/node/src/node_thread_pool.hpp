@@ -18,6 +18,12 @@ public:
     ~NodeThreadPool();
 
     void schedule(std::weak_ptr<mbgl::Mailbox>) override;
+    
+    std::unique_ptr<Scheduled> schedule(mbgl::Duration, std::weak_ptr<mbgl::Mailbox>, std::unique_ptr<mbgl::Message>) override {
+        // Not implemented
+        assert(false);
+        return {};
+    };
 
 private:
     util::AsyncQueue<std::weak_ptr<mbgl::Mailbox>>* queue;
