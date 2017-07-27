@@ -1,5 +1,9 @@
 # Changelog for Mapbox macOS SDK
 
+## 0.5.1
+
+* Added support to adapt Mapbox Streets–sourced layers for user preferred language. ([#9582](https://github.com/mapbox/mapbox-gl-native/pull/9582))
+
 ## 0.5.0
 
 This version of the Mapbox macOS SDK corresponds to version 3.6.0 of the Mapbox iOS SDK.
