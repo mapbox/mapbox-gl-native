@@ -1788,39 +1788,6 @@ public:
     return [gesture locationInView:gesture.view];
 }
 
-- (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer
-{
-    if ([gestureRecognizer isKindOfClass:[UIPanGestureRecognizer class]])
-    {
-        UIPanGestureRecognizer *panGesture = (UIPanGestureRecognizer *)gestureRecognizer;
-
-        if (panGesture.minimumNumberOfTouches == 2)
-        {
-            CGPoint velocity = [panGesture velocityInView:panGesture.view];
-            double gestureAngle = MGLDegreesFromRadians(atan(velocity.y / velocity.x));
-            double horizontalToleranceDegrees = 20.0;
-
-            // cancel if gesture angle is not 90º±20º (more or less vertical)
-            if ( ! (fabs((fabs(gestureAngle) - 90.0)) < horizontalToleranceDegrees))
-            {
-                return NO;
-            }
-        }
-    }
-    else if (gestureRecognizer == _singleTapGestureRecognizer)
-    {
-      // Gesture will be recognized if it could deselect an annotation
-      if(!self.selectedAnnotation)
-      {
-          id<MGLAnnotation>annotation = [self annotationForGestureRecognizer:(UITapGestureRecognizer*)gestureRecognizer persistingResults:NO];
-          if(!annotation) {
-              return NO;
-          }
-      }
-    }
-    return YES;
-}
-
 - (void)handleCalloutAccessoryTapGesture:(UITapGestureRecognizer *)tap
 {
     if ([self.delegate respondsToSelector:@selector(mapView:annotation:calloutAccessoryControlTapped:)])
@@ -1864,11 +1831,59 @@ public:
     UIAccessibilityPostNotification(UIAccessibilityLayoutChangedNotification, calloutView);
 }
 
+- (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer
+{
+    if ([gestureRecognizer isKindOfClass:[UIPanGestureRecognizer class]])
+    {
+        UIPanGestureRecognizer *panGesture = (UIPanGestureRecognizer *)gestureRecognizer;
+        
+        if (panGesture.minimumNumberOfTouches == 2)
+        {
+            CGPoint west = [panGesture locationOfTouch:0 inView:panGesture.view];
+            CGPoint east = [panGesture locationOfTouch:1 inView:panGesture.view];
+            
+            if (west.x > east.x) {
+                CGPoint swap = west;
+                west = east;
+                east = swap;
+            }
+            
+            float horizontalToleranceDegrees = 60.0;
+            if ([self angleBetweenPoints:west east:east] > horizontalToleranceDegrees) {
+                return NO;
+            }
+            
+        }
+    }
+    else if (gestureRecognizer == _singleTapGestureRecognizer)
+    {
+        // Gesture will be recognized if it could deselect an annotation
+        if(!self.selectedAnnotation)
+        {
+            id<MGLAnnotation>annotation = [self annotationForGestureRecognizer:(UITapGestureRecognizer*)gestureRecognizer persistingResults:NO];
+            if(!annotation) {
+                return NO;
+            }
+        }
+    }
+    return YES;
+}
+
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer
 {
     NSArray *validSimultaneousGestures = @[ self.pan, self.pinch, self.rotate ];
 
     return ([validSimultaneousGestures containsObject:gestureRecognizer] && [validSimultaneousGestures containsObject:otherGestureRecognizer]);
+}
+             
+- (float)angleBetweenPoints:(CGPoint)west east:(CGPoint)east
+{
+    float slope = (west.y - east.y) / (west.x - east.x);
+                 
+    float angle = atan(fabs(slope));
+    float degrees = MGLDegreesFromRadians(angle);
+                 
+    return degrees;
 }
 
 - (void)trackGestureEvent:(NSString *)gestureID forRecognizer:(UIGestureRecognizer *)recognizer
