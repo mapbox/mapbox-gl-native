@@ -16,9 +16,12 @@ public:
                const Tileset&);
 
     void setNecessity(Necessity) final;
+
+    void setError(std::exception_ptr, bool complete);
     void setData(std::shared_ptr<const std::string> data,
                  optional<Timestamp> modified,
-                 optional<Timestamp> expires);
+                 optional<Timestamp> expires,
+                 bool complete);
 
 private:
     TileLoader<VectorTile> loader;

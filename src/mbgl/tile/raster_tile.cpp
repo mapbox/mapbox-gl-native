@@ -28,7 +28,8 @@ void RasterTile::cancel() {
 }
 
 // Called instead of setData() when the data source returns an error while loading this tile.
-void RasterTile::setError(std::exception_ptr err) {
+void RasterTile::setError(std::exception_ptr err, const bool complete) {
+    (void)complete;
     loaded = true;
     renderable = false;
     observer->onTileError(*this, err);
@@ -37,8 +38,10 @@ void RasterTile::setError(std::exception_ptr err) {
 // Called when new data is available for this tile. It can be called even if there is already data
 // in this tile.
 void RasterTile::setData(std::shared_ptr<const std::string> data,
-                             optional<Timestamp> modified_,
-                             optional<Timestamp> expires_) {
+                         const optional<Timestamp> modified_,
+                         const optional<Timestamp> expires_,
+                         const bool complete) {
+    (void)complete;
     modified = modified_;
     expires = expires_;
 

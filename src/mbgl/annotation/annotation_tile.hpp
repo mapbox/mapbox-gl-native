@@ -16,6 +16,8 @@ public:
 
     void setNecessity(Necessity) final;
 
+    void setData(std::unique_ptr<const GeometryTileData>);
+
 private:
     AnnotationManager& annotationManager;
 };

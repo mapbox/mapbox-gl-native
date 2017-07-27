@@ -16,9 +16,16 @@ void VectorTile::setNecessity(Necessity necessity) {
     loader.setNecessity(necessity);
 }
 
+void VectorTile::setError(std::exception_ptr err, const bool complete) {
+    (void)complete;
+    GeometryTile::setError(err);
+}
+
 void VectorTile::setData(std::shared_ptr<const std::string> data_,
                          optional<Timestamp> modified_,
-                         optional<Timestamp> expires_) {
+                         optional<Timestamp> expires_,
+                         const bool complete) {
+    (void)complete;
     modified = modified_;
     expires = expires_;
 

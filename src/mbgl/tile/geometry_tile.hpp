@@ -27,7 +27,7 @@ class GlyphAtlas;
 class ImageAtlas;
 
 class GeometryTile : public Tile, public GlyphRequestor, ImageRequestor {
-public:
+protected:
     GeometryTile(const OverscaledTileID&,
                  std::string sourceID,
                  const TileParameters&);
@@ -37,6 +37,7 @@ public:
     void setError(std::exception_ptr);
     void setData(std::unique_ptr<const GeometryTileData>);
 
+public:
     void setPlacementConfig(const PlacementConfig&) override;
     void setLayers(const std::vector<Immutable<style::Layer::Impl>>&) override;
     

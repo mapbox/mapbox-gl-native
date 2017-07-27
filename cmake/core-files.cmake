@@ -311,6 +311,7 @@ set(MBGL_CORE_FILES
     include/mbgl/storage/offline.hpp
     include/mbgl/storage/online_file_source.hpp
     include/mbgl/storage/resource.hpp
+    include/mbgl/storage/resource_error.hpp
     include/mbgl/storage/resource_kind.hpp
     include/mbgl/storage/resource_status.hpp
     include/mbgl/storage/resource_transform.hpp

@@ -2,6 +2,7 @@
 
 #include <mbgl/tile/tile_loader.hpp>
 #include <mbgl/storage/file_source.hpp>
+#include <mbgl/storage/resource_error.hpp>
 #include <mbgl/renderer/tile_parameters.hpp>
 #include <mbgl/util/tileset.hpp>
 
@@ -89,8 +90,11 @@ void TileLoader<T>::makeOptional() {
 
 template <typename T>
 void TileLoader<T>::loadedData(const Response& res) {
-    if (res.error && res.error->status != ResourceStatus::NotFoundError) {
-        tile.setError(std::make_exception_ptr(std::runtime_error(res.error->message)));
+    const bool complete = necessity == Necessity::Optional || resource.necessity == Necessity::Required;
+    if (res.error) {
+        tile.setError(std::make_exception_ptr(util::ResourceError(res.error->message, resource.kind,
+                                                                  res.error->status, resource.url)),
+                      complete);
     } else if (res.notModified) {
         resource.priorExpires = res.expires;
         // Do not notify the tile; when we get this message, it already has the current
@@ -99,7 +103,7 @@ void TileLoader<T>::loadedData(const Response& res) {
         resource.priorModified = res.modified;
         resource.priorExpires = res.expires;
         resource.priorEtag = res.etag;
-        tile.setData(res.noContent ? nullptr : res.data, res.modified, res.expires);
+        tile.setData(res.noContent ? nullptr : res.data, res.modified, res.expires, complete);
     }
 }
 
