@@ -10,6 +10,7 @@
 #include <mbgl/util/tile_coordinate.hpp>
 #include <mbgl/util/tile_cover.hpp>
 #include <mbgl/util/logging.hpp>
+#include <mbgl/util/constants.hpp>
 
 namespace mbgl {
 
@@ -193,11 +194,11 @@ void RenderImageSource::update(Immutable<style::Source::Impl> baseImpl_,
     bucket->vertices.emplace_back(
         RasterProgram::layoutVertex({ geomCoords[0].x, geomCoords[0].y }, { 0, 0 }));
     bucket->vertices.emplace_back(
-        RasterProgram::layoutVertex({ geomCoords[1].x, geomCoords[1].y }, { 32767, 0 }));
+        RasterProgram::layoutVertex({ geomCoords[1].x, geomCoords[1].y }, { util::EXTENT, 0 }));
     bucket->vertices.emplace_back(
-        RasterProgram::layoutVertex({ geomCoords[3].x, geomCoords[3].y }, { 0, 32767 }));
+        RasterProgram::layoutVertex({ geomCoords[3].x, geomCoords[3].y }, { 0, util::EXTENT }));
     bucket->vertices.emplace_back(
-        RasterProgram::layoutVertex({ geomCoords[2].x, geomCoords[2].y }, { 32767, 32767 }));
+        RasterProgram::layoutVertex({ geomCoords[2].x, geomCoords[2].y }, { util::EXTENT, util::EXTENT }));
 
     bucket->indices.emplace_back(0, 1, 2);
     bucket->indices.emplace_back(1, 2, 3);

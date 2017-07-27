@@ -32,9 +32,9 @@ static gl::IndexVector<gl::LineStrip> tileLineStripIndices() {
 static gl::VertexVector<RasterLayoutVertex> rasterVertices() {
     gl::VertexVector<RasterLayoutVertex> result;
     result.emplace_back(RasterProgram::layoutVertex({ 0, 0 }, { 0, 0 }));
-    result.emplace_back(RasterProgram::layoutVertex({ util::EXTENT, 0 }, { 32767, 0 }));
-    result.emplace_back(RasterProgram::layoutVertex({ 0, util::EXTENT }, { 0, 32767 }));
-    result.emplace_back(RasterProgram::layoutVertex({ util::EXTENT, util::EXTENT }, { 32767, 32767 }));
+    result.emplace_back(RasterProgram::layoutVertex({ util::EXTENT, 0 }, { util::EXTENT, 0 }));
+    result.emplace_back(RasterProgram::layoutVertex({ 0, util::EXTENT }, { 0, util::EXTENT }));
+    result.emplace_back(RasterProgram::layoutVertex({ util::EXTENT, util::EXTENT }, { util::EXTENT, util::EXTENT }));
     return result;
 }
 
