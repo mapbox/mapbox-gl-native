@@ -427,7 +427,8 @@ public final class UiSettings {
       return;
     }
 
-    compassView.update(cameraPosition.bearing);
+    double clockwiseBearing = -cameraPosition.bearing;
+    compassView.update(clockwiseBearing);
   }
 
   /**
