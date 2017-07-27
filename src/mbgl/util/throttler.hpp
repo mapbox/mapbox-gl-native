@@ -1,6 +1,7 @@
+#include <mbgl/actor/scheduler.hpp>
 #include <mbgl/actor/actor_ref.hpp>
+#include <mbgl/actor/message.hpp>
 #include <mbgl/util/chrono.hpp>
-#include <mbgl/util/timer.hpp>
 
 namespace mbgl {
 namespace util {
@@ -14,13 +15,13 @@ class Throttler {
 
 public:
     Throttler(ActorRef<Delegate> delegate_, Duration frequency_)
-            : delegate(delegate_)
+            : delegate(std::move(delegate_))
             , frequency(frequency_) {
     }
     
     template <typename Fn, class... Args>
     void invoke(Fn fn, Args&&... args) {
-        if (pendingInvocation) {
+        if (pendingInvocation && !pendingInvocation->isFinished()) {
             return;
         }
         
@@ -32,13 +33,8 @@ public:
             lastInvocation = Clock::now();
             delegate.invoke(fn, std::forward<Args>(args)...);
         } else {
-            pendingInvocation = true;
-            timer.start(timeToNextInvocation, Duration::zero(), [&, fn=std::move(fn), args...] {
-                pendingInvocation = false;
-                lastInvocation = Clock::now();
-                
-                delegate.invoke(fn, std::forward<Args>(args)...);
-            });
+            pendingInvocation = delegate.invokeDelayed(timeToNextInvocation, fn, std::forward<Args>(args)...);
+            lastInvocation = Clock::now() + timeToNextInvocation;
         }
     }
 
@@ -46,10 +42,8 @@ private:
     ActorRef<Delegate> delegate;
     Duration frequency;
     
-    bool pendingInvocation = false;
+    std::unique_ptr<Scheduler::Scheduled> pendingInvocation;
     TimePoint lastInvocation = TimePoint::min();
-    
-    Timer timer;
 };
 
 } // namespace util
