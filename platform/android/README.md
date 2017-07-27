@@ -14,6 +14,21 @@ Alright. So, actually, you may be in the wrong place. From here on in, this READ
 
 [![](https://www.mapbox.com/android-sdk/images/splash.png)](https://www.mapbox.com/android-sdk/)
 
+#### Open project in Android Studio
+
+#### Using the SDK snapshot
+
+Instead of using the latest stable release of the Mapbox Android SDK, you can use the nightly build/"snapshot" or the beta version if there is one available. If you'd like to use a snapshot build,  your Android project's gradle file should
+have -SNAPSHOT appended to the SDK version number. For example `5.2.0-SNAPSHOT` or:
+
+```java
+// Mapbox SDK dependency
+    compile('com.mapbox.mapboxsdk:mapbox-android-sdk:5.2.0-SNAPSHOT@aar') {
+        transitive = true
+    }
+```
+
+
 ### Setup environment
 
 **These instructions are for developers interested in making code-level contributions to the SDK itself. If you instead want to use the SDK in your app, see above.**
@@ -65,6 +80,13 @@ $ sudo apt-get install -y build-essential curl lib32stdc++6 lib32z1 pkg-config p
 
 
 #### Open project in Android Studio
+
+We recommend that you open this repository's `android` folder in Android Studio. 
+
+mapbox-gl-native > platform > android
+
+Once you open it in Android Studio and switch to the Android view in the left-hand sidebar,  you should see the `MapboxGLAndroidSDK` and `MapboxGLAndroidSDKTestApp` folders.
+
 
 ##### macOS
 
