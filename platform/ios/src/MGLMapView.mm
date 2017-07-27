@@ -1850,8 +1850,8 @@ public:
                 east = swap;
             }
             
-            float angleThreshold = 20.0;
-            if ([self angleBetweenPoints:west east:east] > angleThreshold) {
+            float horizontalToleranceDegrees = 60.0;
+            if ([self angleBetweenPoints:west east:east] > horizontalToleranceDegrees) {
                 return NO;
             }
             
@@ -1876,16 +1876,6 @@ public:
     NSArray *validSimultaneousGestures = @[ self.pan, self.pinch, self.rotate ];
 
     return ([validSimultaneousGestures containsObject:gestureRecognizer] && [validSimultaneousGestures containsObject:otherGestureRecognizer]);
-}
-
-- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldBeRequiredToFailByGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer
-{
-        if (gestureRecognizer == self.twoFingerDrag && otherGestureRecognizer == self.pinch) {
-            return YES;
-        } else if (gestureRecognizer == self.twoFingerDrag && otherGestureRecognizer == self.pan) {
-            return YES;
-        }
-    return NO;
 }
              
 - (float)angleBetweenPoints:(CGPoint)west east:(CGPoint)east
