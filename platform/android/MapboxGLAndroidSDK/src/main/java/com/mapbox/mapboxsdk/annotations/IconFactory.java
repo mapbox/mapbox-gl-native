@@ -1,5 +1,6 @@
 package com.mapbox.mapboxsdk.annotations;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -35,6 +36,7 @@ public final class IconFactory {
   public static final String ICON_MARKERVIEW_ID = ICON_ID_PREFIX + "marker_view";
 
   private Context context;
+  @SuppressLint("StaticFieldLeak")
   private static IconFactory instance;
   private Icon defaultMarker;
   private Icon defaultMarkerView;

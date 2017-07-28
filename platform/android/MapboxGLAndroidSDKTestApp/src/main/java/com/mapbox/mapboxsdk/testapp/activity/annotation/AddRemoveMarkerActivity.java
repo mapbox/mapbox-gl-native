@@ -115,14 +115,14 @@ public class AddRemoveMarkerActivity extends AppCompatActivity {
     isShowingHighThresholdMarker = false;
 
     if (activeMarker != null) {
-      Timber.d("Remove marker with " + activeMarker.getId());
+      Timber.d("Remove marker with id %s", activeMarker.getId());
       mapboxMap.removeMarker(activeMarker);
     } else {
       Timber.e("active marker is null");
     }
 
     activeMarker = mapboxMap.addMarker(lowThresholdMarker);
-    Timber.d("showLowThresholdMarker() " + activeMarker.getId());
+    Timber.d("showLowThresholdMarker() with id %s ", activeMarker.getId());
   }
 
   private void showHighThresholdMarker() {
@@ -134,14 +134,14 @@ public class AddRemoveMarkerActivity extends AppCompatActivity {
     isShowingHighThresholdMarker = true;
 
     if (activeMarker != null) {
-      Timber.d("Remove marker with " + activeMarker.getId());
+      Timber.d("Remove marker with id %s", activeMarker.getId());
       mapboxMap.removeMarker(activeMarker);
     } else {
       Timber.e("active marker is null");
     }
 
     activeMarker = mapboxMap.addMarker(highThresholdMarker);
-    Timber.d("showHighThresholdMarker() " + activeMarker.getId());
+    Timber.d("showHighThresholdMarker() with id %s", activeMarker.getId());
   }
 
   @Override

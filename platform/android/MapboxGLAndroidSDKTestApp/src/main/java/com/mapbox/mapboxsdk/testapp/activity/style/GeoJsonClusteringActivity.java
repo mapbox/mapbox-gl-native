@@ -128,7 +128,7 @@ public class GeoJsonClusteringActivity extends AppCompatActivity {
         )
       );
     } catch (MalformedURLException malformedUrlException) {
-      Timber.e("That's not an url... " + malformedUrlException.getMessage());
+      Timber.e(malformedUrlException,"That's not an url... ");
     }
 
     // Add unclustered layer

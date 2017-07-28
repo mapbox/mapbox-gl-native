@@ -59,7 +59,7 @@ public class QueryRenderedFeaturesBoxSymbolCountActivity extends AppCompatActivi
         try {
           mapboxMap.addSource(new GeoJsonSource("symbols-source", readRawResource(R.raw.test_points_utrecht)));
         } catch (IOException ioException) {
-          Timber.e("Could not load geojson: " + ioException.getMessage());
+          Timber.e(ioException,"Could not load geojson");
           return;
         }
         mapboxMap.addImage(
@@ -76,7 +76,7 @@ public class QueryRenderedFeaturesBoxSymbolCountActivity extends AppCompatActivi
             int top = selectionBox.getTop() - mapView.getTop();
             int left = selectionBox.getLeft() - mapView.getLeft();
             RectF box = new RectF(left, top, left + selectionBox.getWidth(), top + selectionBox.getHeight());
-            Timber.i(String.format("Querying box %s", box));
+            Timber.i("Querying box %s", box);
             List<Feature> features = mapboxMap.queryRenderedFeatures(box, "symbols-layer");
 
             // Show count

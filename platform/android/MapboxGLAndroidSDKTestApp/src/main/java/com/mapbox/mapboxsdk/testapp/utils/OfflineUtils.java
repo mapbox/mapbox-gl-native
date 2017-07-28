@@ -29,7 +29,7 @@ public class OfflineUtils {
       String json = jsonObject.toString();
       metadata = json.getBytes(JSON_CHARSET);
     } catch (Exception exception) {
-      Timber.e("Failed to encode metadata: " + exception.getMessage());
+      Timber.e(exception, "Failed to encode metadata: ");
     }
     return metadata;
   }

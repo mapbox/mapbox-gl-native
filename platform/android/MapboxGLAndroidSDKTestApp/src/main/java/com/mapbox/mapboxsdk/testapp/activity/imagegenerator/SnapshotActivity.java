@@ -15,6 +15,8 @@ import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.R;
 
+import java.util.Locale;
+
 /**
  * Test activity showcasing the Snapshot API to create and display a bitmap of the current shown Map.
  */
@@ -56,7 +58,7 @@ public class SnapshotActivity extends AppCompatActivity implements OnMapReadyCal
         snapshotView.setImageBitmap(snapshot);
         Toast.makeText(
           SnapshotActivity.this,
-          String.format("Snapshot taken in %d ms", duration),
+          String.format(Locale.getDefault(), "Snapshot taken in %d ms", duration),
           Toast.LENGTH_LONG).show();
       }
     });

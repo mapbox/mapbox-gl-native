@@ -55,7 +55,7 @@ public class RealTimeGeoJsonActivity extends AppCompatActivity implements OnMapR
     try {
       mapboxMap.addSource(new GeoJsonSource(ID_GEOJSON_SOURCE, new URL(URL_GEOJSON_SOURCE)));
     } catch (MalformedURLException malformedUrlException) {
-      Timber.e("Invalid URL", malformedUrlException);
+      Timber.e(malformedUrlException, "Invalid URL");
     }
 
     // add layer

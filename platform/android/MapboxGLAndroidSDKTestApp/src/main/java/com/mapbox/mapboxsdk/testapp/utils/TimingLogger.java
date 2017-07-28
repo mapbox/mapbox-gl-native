@@ -146,15 +146,15 @@ public class TimingLogger {
     if (disabled) {
       return;
     }
-    Timber.d(label + ": begin");
+    Timber.d("%s: begin", label);
     final long first = splits.get(0);
     long now = first;
     for (int i = 1; i < splits.size(); i++) {
       now = splits.get(i);
       final String splitLabel = splitLabels.get(i);
       final long prev = splits.get(i - 1);
-      Timber.d(label + ":      " + (now - prev) + " ms, " + splitLabel);
+      Timber.d("%s:      %s ms, %s", label, (now - prev), splitLabel);
     }
-    Timber.d(label + ": end, " + (now - first) + " ms");
+    Timber.d("%s: end, %s ms", label, (now - first));
   }
 }

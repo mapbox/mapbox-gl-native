@@ -16,7 +16,7 @@
             android:layout_marginEnd="4dp"
             android:layout_marginRight="4dp"
             android:gravity="center"
-            android:text="Latitude"
+            android:text="@string/latitude"
             android:textColor="@android:color/white" />
 
         <SeekBar
@@ -25,7 +25,9 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="4dp"
             android:layout_marginRight="4dp"
+            android:layout_toStartOf="@+id/value_lat"
             android:layout_toLeftOf="@+id/value_lat"
+            android:layout_toEndOf="@+id/text_lat"
             android:layout_toRightOf="@id/text_lat"
             android:max="360" />
 
@@ -38,7 +40,7 @@
             android:layout_marginLeft="4dp"
             android:layout_marginStart="4dp"
             android:gravity="center"
-            android:text="-180"
+            android:text="@string/min_value"
             android:textColor="@android:color/white" />
 
     </RelativeLayout>
@@ -56,7 +58,7 @@
             android:textColor="@android:color/white"
             android:layout_marginRight="4dp"
             android:gravity="center"
-            android:text="Longitude" />
+            android:text="@string/longitude" />
 
         <SeekBar
             android:id="@+id/seekbar_lon"
@@ -64,8 +66,10 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="4dp"
             android:layout_marginRight="4dp"
+            android:layout_toStartOf="@+id/value_lon"
             android:layout_toLeftOf="@+id/value_lon"
             android:layout_toRightOf="@id/text_lon"
+            android:layout_toEndOf="@id/text_lon"
             android:max="360" />
 
         <TextView
@@ -78,7 +82,7 @@
             android:layout_marginLeft="4dp"
             android:layout_marginStart="4dp"
             android:gravity="center"
-            android:text="-180" />
+            android:text="@string/min_value" />
 
     </RelativeLayout>
 
@@ -95,7 +99,7 @@
             android:textColor="@android:color/white"
             android:layout_marginRight="4dp"
             android:gravity="center"
-            android:text="Zoom" />
+            android:text="@string/zoom" />
 
         <SeekBar
             android:id="@+id/seekbar_zoom"
@@ -103,8 +107,10 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="4dp"
             android:layout_marginRight="4dp"
+            android:layout_toStartOf="@+id/value_zoom"
             android:layout_toLeftOf="@+id/value_zoom"
             android:layout_toRightOf="@id/text_zoom"
+            android:layout_toEndOf="@+id/text_zoom"
             android:max="18" />
 
         <TextView
@@ -117,7 +123,7 @@
             android:textColor="@android:color/white"
             android:layout_marginStart="4dp"
             android:gravity="center"
-            android:text="18" />
+            android:text="@string/default_zoom_value" />
 
     </RelativeLayout>
 
@@ -134,7 +140,7 @@
             android:layout_marginEnd="4dp"
             android:layout_marginRight="4dp"
             android:gravity="center"
-            android:text="Bearing" />
+            android:text="@string/bearing" />
 
         <SeekBar
             android:id="@+id/seekbar_bearing"
@@ -142,8 +148,10 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="4dp"
             android:layout_marginRight="4dp"
+            android:layout_toStartOf="@+id/value_bearing"
             android:layout_toLeftOf="@+id/value_bearing"
             android:layout_toRightOf="@id/text_bearing"
+            android:layout_toEndOf="@id/text_bearing"
             android:max="360" />
 
         <TextView
@@ -156,7 +164,7 @@
             android:layout_marginLeft="4dp"
             android:layout_marginStart="4dp"
             android:gravity="center"
-            android:text="0" />
+            android:text="@string/default_tilt_value" />
 
     </RelativeLayout>
 
@@ -173,7 +181,7 @@
             android:textColor="@android:color/white"
             android:layout_marginRight="4dp"
             android:gravity="center"
-            android:text="Tilt" />
+            android:text="@string/tilt" />
 
         <SeekBar
             android:id="@+id/seekbar_tilt"
@@ -181,8 +189,10 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="4dp"
             android:layout_marginRight="4dp"
+            android:layout_toStartOf="@+id/value_tilt"
             android:layout_toLeftOf="@+id/value_tilt"
             android:layout_toRightOf="@id/text_tilt"
+            android:layout_toEndOf="@id/text_tilt"
             android:max="60" />
 
         <TextView
@@ -195,7 +205,7 @@
             android:layout_marginLeft="4dp"
             android:layout_marginStart="4dp"
             android:gravity="center"
-            android:text="0" />
+            android:text="@string/default_tilt_value" />
 
     </RelativeLayout>
 
