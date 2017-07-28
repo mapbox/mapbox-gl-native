@@ -1848,7 +1848,7 @@ public:
                 east = swap;
             }
             
-            float horizontalToleranceDegrees = 60.0;
+            CLLocationDegrees horizontalToleranceDegrees = 60.0;
             if ([self angleBetweenPoints:west east:east] > horizontalToleranceDegrees) {
                 return NO;
             }
@@ -1876,12 +1876,12 @@ public:
     return ([validSimultaneousGestures containsObject:gestureRecognizer] && [validSimultaneousGestures containsObject:otherGestureRecognizer]);
 }
              
-- (float)angleBetweenPoints:(CGPoint)west east:(CGPoint)east
+- (CLLocationDegrees)angleBetweenPoints:(CGPoint)west east:(CGPoint)east
 {
-    float slope = (west.y - east.y) / (west.x - east.x);
+    CGFloat slope = (west.y - east.y) / (west.x - east.x);
                  
-    float angle = atan(fabs(slope));
-    float degrees = MGLDegreesFromRadians(angle);
+    CGFloat angle = atan(fabs(slope));
+    CLLocationDegrees degrees = MGLDegreesFromRadians(angle);
                  
     return degrees;
 }
