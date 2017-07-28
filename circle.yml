@@ -11,13 +11,13 @@ workflows:
       - android-debug-arm-v7
       - android-release-all
       - node4-clang39-release
-        filters:
-          tags:
-            only: /node-.*/
+          filters:
+            tags:
+              only: /node-.*/
       - node6-clang39-release
-        filters:
-          tags:
-            only: /node-.*/
+          filters:
+            tags:
+              only: /node-.*/
       - node6-clang39-debug
       - linux-clang39-debug
       - linux-clang4-sanitize-address
