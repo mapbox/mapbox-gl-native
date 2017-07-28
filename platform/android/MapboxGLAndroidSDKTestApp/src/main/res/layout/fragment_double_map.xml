@@ -9,7 +9,6 @@
         android:layout_height="match_parent" />
 
     <FrameLayout
-        android:id="@+id/map_card"
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:layout_marginLeft="5dp"

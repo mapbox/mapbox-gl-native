@@ -109,13 +109,11 @@ class HTTPRequest implements Callback {
   @Override
   public void onResponse(Call call, Response response) throws IOException {
     if (response.isSuccessful()) {
-      Timber.v(String.format("[HTTP] Request was successful (code = %d).", response.code()));
+      Timber.v("[HTTP] Request was successful (code = %s).", response.code());
     } else {
       // We don't want to call this unsuccessful because a 304 isn't really an error
       String message = !TextUtils.isEmpty(response.message()) ? response.message() : "No additional information";
-      Timber.d(String.format(
-        "[HTTP] Request with response code = %d: %s",
-        response.code(), message));
+      Timber.d("[HTTP] Request with response code = %s: %s", response.code(), message);
     }
 
     byte[] body;
@@ -160,15 +158,12 @@ class HTTPRequest implements Callback {
     String errorMessage = e.getMessage() != null ? e.getMessage() : "Error processing the request";
 
     if (type == TEMPORARY_ERROR) {
-      Timber.d(String.format(MapboxConstants.MAPBOX_LOCALE,
-        "Request failed due to a temporary error: %s", errorMessage));
+      Timber.d("Request failed due to a temporary error: %s", errorMessage);
     } else if (type == CONNECTION_ERROR) {
-      Timber.i(String.format(MapboxConstants.MAPBOX_LOCALE,
-        "Request failed due to a connection error: %s", errorMessage));
+      Timber.i("Request failed due to a connection error: %s", errorMessage);
     } else {
       // PERMANENT_ERROR
-      Timber.w(String.format(MapboxConstants.MAPBOX_LOCALE,
-        "Request failed due to a permanent error: %s", errorMessage));
+      Timber.w("Request failed due to a permanent error: %s", errorMessage);
     }
 
     mLock.lock();

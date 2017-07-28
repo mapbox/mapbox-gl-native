@@ -116,7 +116,7 @@ android {
     }
 
     lintOptions {
-        baseline file("lint-baseline.xml")
+        baseline file("lint-baseline-local.xml")
         checkAllWarnings true
         warningsAsErrors true
     }

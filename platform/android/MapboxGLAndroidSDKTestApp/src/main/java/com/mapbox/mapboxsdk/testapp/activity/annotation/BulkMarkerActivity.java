@@ -274,7 +274,7 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
         String json = GeoParseUtil.loadStringFromAssets(activity.getApplicationContext(), "points.geojson");
         return GeoParseUtil.parseGeoJsonCoordinates(json);
       } catch (IOException | JSONException exception) {
-        Timber.e("Could not add markers,", exception);
+        Timber.e(exception, "Could not add markers");
         return null;
       }
     }

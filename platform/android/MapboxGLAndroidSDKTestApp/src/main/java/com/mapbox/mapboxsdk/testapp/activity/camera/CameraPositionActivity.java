@@ -1,5 +1,6 @@
 package com.mapbox.mapboxsdk.testapp.activity.camera;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -83,6 +84,7 @@ public class CameraPositionActivity extends AppCompatActivity implements OnMapRe
     fab = (FloatingActionButton) findViewById(R.id.fab);
     fab.setColorFilter(ContextCompat.getColor(CameraPositionActivity.this, R.color.primary));
     fab.setOnClickListener(new View.OnClickListener() {
+      @SuppressLint("InflateParams")
       @Override
       public void onClick(View view) {
         Context context = view.getContext();

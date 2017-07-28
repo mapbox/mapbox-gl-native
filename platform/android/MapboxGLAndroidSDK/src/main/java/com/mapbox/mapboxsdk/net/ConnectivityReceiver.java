@@ -1,5 +1,6 @@
 package com.mapbox.mapboxsdk.net;
 
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -21,6 +22,7 @@ import timber.log.Timber;
  * Not public api.
  */
 public class ConnectivityReceiver extends BroadcastReceiver {
+  @SuppressLint("StaticFieldLeak")
   private static ConnectivityReceiver INSTANCE;
 
   /**
@@ -82,7 +84,7 @@ public class ConnectivityReceiver extends BroadcastReceiver {
   @Override
   public void onReceive(Context context, Intent intent) {
     boolean connected = isConnected(context);
-    Timber.v("Connected: " + connected);
+    Timber.v("Connected: %s", connected);
 
     // Loop over listeners
     for (ConnectivityListener listener : listeners) {

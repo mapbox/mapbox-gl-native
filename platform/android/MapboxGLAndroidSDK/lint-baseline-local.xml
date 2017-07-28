@@ -1,11 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- REMEMBER! First you run Lint locally you'll need to move lint-baseline-local.xml.xml file
-    generated into the lint folder and called it lint-baseline-local.xml
-    If you remove any error when running Lint locally, you'll get a warning from the command
-    line advising you to remove it from the baseline. If you remove it (remember to remove it
-    from lint-baseline-local.xml file) you should remove it too from
-    lint-baseline-ci.xml (THIS FILE) which is the only one included in the repo.
-    Eventually, it'll be removed (when we remove all current lint errors included). -->
 <issues format="4" by="lint 2.3.1">
 
     <issue

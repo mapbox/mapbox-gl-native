@@ -72,7 +72,7 @@ public class StyleFileActivity extends AppCompatActivity {
       try {
         cacheStyleFile = File.createTempFile("my-", ".style.json");
         cacheStyleFile.createNewFile();
-        Timber.i("Writing style file to: " + cacheStyleFile.getAbsolutePath());
+        Timber.i("Writing style file to: %s", cacheStyleFile.getAbsolutePath());
         writeToFile(cacheStyleFile, readRawResource(R.raw.local_style));
       } catch (Exception exception) {
         Toast.makeText(StyleFileActivity.this, "Could not create style file in cache dir", Toast.LENGTH_SHORT).show();

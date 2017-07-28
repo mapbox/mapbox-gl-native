@@ -1,5 +1,6 @@
 package com.mapbox.mapboxsdk.testapp.maps.widgets;
 
+import android.annotation.SuppressLint;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -97,6 +98,7 @@ public class MyLocationViewTest extends BaseActivityTest {
       return getClass().getSimpleName();
     }
 
+    @SuppressLint("MissingPermission")
     @Override
     public void perform(UiController uiController, View view) {
       if (isEnabled) {

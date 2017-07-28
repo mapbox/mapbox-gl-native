@@ -1,6 +1,7 @@
 package com.mapbox.mapboxsdk.maps.widgets;
 
 import android.animation.ValueAnimator;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Camera;
 import android.graphics.Canvas;
@@ -775,6 +776,7 @@ public class MyLocationView extends View {
       locationSource = new WeakReference<>(locationEngine);
     }
 
+    @SuppressLint("MissingPermission")
     @Override
     public void onConnected() {
       MyLocationView locationView = userLocationView.get();

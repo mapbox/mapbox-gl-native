@@ -43,10 +43,10 @@ public class OnMapReadyIdlingResource implements IdlingResource {
       Field field = activity.getClass().getDeclaredField("mapboxMap");
       field.setAccessible(true);
       mapboxMap = (MapboxMap) field.get(activity);
-      Timber.e("isMapboxReady called with value " + (mapboxMap != null));
+      Timber.e("isMapboxReady called with value %s", (mapboxMap != null));
       return mapboxMap != null;
     } catch (Exception exception) {
-      Timber.e("could not reflect", exception);
+      Timber.e(exception, "could not reflect");
       return false;
     }
   }

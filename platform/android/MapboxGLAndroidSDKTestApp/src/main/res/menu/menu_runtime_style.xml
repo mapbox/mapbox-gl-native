@@ -4,66 +4,66 @@
 
     <item
         android:id="@+id/action_list_layers"
-        android:title="List all layers in the style"
+        android:title="@string/list_all_layers_in_the_style"
         mapbox:showAsAction="never" />
     <item
         android:id="@+id/action_list_sources"
-        android:title="List all sources in the style"
+        android:title="@string/list_all_sources_in_the_style"
         mapbox:showAsAction="never" />
     <item
         android:id="@+id/action_water_color"
-        android:title="Color the water"
+        android:title="@string/color_the_water"
         mapbox:showAsAction="never" />
     <item
         android:id="@+id/action_background_opacity"
-        android:title="Set background opacity"
+        android:title="@string/set_background_opacity"
         mapbox:showAsAction="never" />
     <item
         android:id="@+id/action_road_avoid_edges"
-        android:title="Set road symbol placement to Point"
+        android:title="@string/set_road_symbol_placement_to_point"
         mapbox:showAsAction="never" />
     <item
         android:id="@+id/action_layer_visibility"
-        android:title="Set layer visibility to false"
+        android:title="@string/set_layer_visibility_to_false"
         mapbox:showAsAction="never" />
     <item
         android:id="@+id/action_add_parks_layer"
-        android:title="Add a parks layer"
+        android:title="@string/add_a_parks_layer"
         mapbox:showAsAction="never" />
     <item
         android:id="@+id/action_add_dynamic_parks_layer"
-        android:title="Add a dynamic GeoJSON source"
+        android:title="@string/add_a_dynamic_geojson_source"
         mapbox:showAsAction="never" />
     <item
         android:id="@+id/action_remove_layer"
-        android:title="Remove buildings layer"
+        android:title="@string/remove_buildings_layer"
         mapbox:showAsAction="never" />
     <item
         android:id="@+id/action_add_terrain_layer"
-        android:title="Add a terrain layer"
+        android:title="@string/add_a_terrain_layer"
         mapbox:showAsAction="never" />
     <item
         android:id="@+id/action_add_satellite_layer"
-        android:title="Add a satellite layer"
+        android:title="@string/add_a_satellite_layer"
         mapbox:showAsAction="never" />
     <item
         android:id="@+id/action_update_water_color_on_zoom"
-        android:title="Change the water color on zoom"
+        android:title="@string/change_the_water_color_on_zoom"
         mapbox:showAsAction="never" />
     <item
         android:id="@+id/action_add_custom_tiles"
-        android:title="Custom tiles"
+        android:title="@string/custom_tiles"
         mapbox:showAsAction="never" />
     <item
         android:id="@+id/action_fill_filter"
-        android:title="Apply filtered fill"
+        android:title="@string/apply_filtered_fill"
         mapbox:showAsAction="never" />
     <item
         android:id="@+id/action_line_filter"
-        android:title="Apply filtered line"
+        android:title="@string/apply_filtered_line"
         mapbox:showAsAction="never" />
     <item
         android:id="@+id/action_numeric_filter"
-        android:title="Apply numeric fill filter"
+        android:title="@string/apply_numeric_fill_filter"
         mapbox:showAsAction="never" />
 </menu>

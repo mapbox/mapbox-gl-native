@@ -74,7 +74,7 @@ public class CircleLayerActivity extends AppCompatActivity implements View.OnCli
       source = new GeoJsonSource("bus_stop",
         new URL("https://raw.githubusercontent.com/cheeaun/busrouter-sg/master/data/2/bus-stops.geojson"));
     } catch (MalformedURLException exception) {
-      Timber.e("That's not an url... ", exception);
+      Timber.e(exception, "That's not an url... ");
     }
     mapboxMap.addSource(source);
   }
@@ -132,7 +132,7 @@ public class CircleLayerActivity extends AppCompatActivity implements View.OnCli
         new URL("https://gist.githubusercontent.com/tobrun/7fbc0fe7e9ffea509f7608cda2601d5d/raw/"
           + "a4b8cc289020f91fa2e1553524820054395e36f5/line.geojson")));
     } catch (MalformedURLException malformedUrlException) {
-      Timber.e("That's not an url... ", malformedUrlException);
+      Timber.e(malformedUrlException, "That's not an url... ");
     }
   }
 

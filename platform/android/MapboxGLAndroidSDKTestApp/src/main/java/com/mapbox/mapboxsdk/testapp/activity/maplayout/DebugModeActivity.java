@@ -69,7 +69,7 @@ public class DebugModeActivity extends AppCompatActivity {
       @Override
       public void onClick(View view) {
         if (mapboxMap != null) {
-          Timber.d("Debug FAB: isDebug Active? " + mapboxMap.isDebugActive());
+          Timber.d("Debug FAB: isDebug Active? %s" , mapboxMap.isDebugActive());
           mapboxMap.cycleDebugOptions();
         }
       }

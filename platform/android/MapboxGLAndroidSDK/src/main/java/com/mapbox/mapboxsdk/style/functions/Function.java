@@ -279,7 +279,7 @@ public class Function<I, O> {
       // noinspection unchecked
       return (S) stops;
     } catch (ClassCastException exception) {
-      Timber.e(String.format("Stops: %s is a different type: %s", stops.getClass(), exception));
+      Timber.e(exception, "Stops: %s is a different type: ", stops.getClass());
       return null;
     }
   }
