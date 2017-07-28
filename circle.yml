@@ -12,10 +12,14 @@ workflows:
       - android-release-all
       - node4-clang39-release:
           filters:
+            commands:
+              - echo "export PUBLISH=true"
             tags:
               only: /node-.*/
       - node6-clang39-release:
           filters:
+            commands:
+              - echo "export PUBLISH=true"
             tags:
               only: /node-.*/
       - node6-clang39-debug
