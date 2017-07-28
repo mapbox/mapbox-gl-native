@@ -199,6 +199,8 @@ public:
 
     void addAnnotationIcon(JNIEnv&, jni::String, jint, jint, jfloat, jni::Array<jbyte>);
 
+    void removeAnnotationIcon(JNIEnv&, jni::String);
+
     jni::jdouble getTopOffsetPixelsForAnnotationSymbol(JNIEnv&, jni::String);
 
     jni::jlong getTransitionDuration(JNIEnv&);

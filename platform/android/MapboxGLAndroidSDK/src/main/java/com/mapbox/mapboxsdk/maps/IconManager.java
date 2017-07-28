@@ -1,16 +1,17 @@
 package com.mapbox.mapboxsdk.maps;
 
 import android.graphics.Bitmap;
+import android.os.Build;
 
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.annotations.Icon;
 import com.mapbox.mapboxsdk.annotations.IconFactory;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerView;
-import com.mapbox.mapboxsdk.exceptions.IconBitmapChangedException;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Responsible for managing icons added to the Map.
@@ -25,15 +26,14 @@ import java.util.List;
  */
 class IconManager {
 
-  private NativeMapView nativeMapView;
-  private List<Icon> icons;
+  private final Map<Icon, Integer> iconMap = new HashMap<>();
 
+  private NativeMapView nativeMapView;
   private int highestIconWidth;
   private int highestIconHeight;
 
   IconManager(NativeMapView nativeMapView) {
     this.nativeMapView = nativeMapView;
-    this.icons = new ArrayList<>();
     // load transparent icon for MarkerView to trace actual markers, see #6352
     loadIcon(IconFactory.recreate(IconFactory.ICON_MARKERVIEW_ID, IconFactory.ICON_MARKERVIEW_BITMAP));
   }
@@ -83,13 +83,13 @@ class IconManager {
   }
 
   private void addIcon(Icon icon, boolean addIconToMap) {
-    if (!icons.contains(icon)) {
-      icons.add(icon);
+    if (!iconMap.keySet().contains(icon)) {
+      iconMap.put(icon, 1);
       if (addIconToMap) {
         loadIcon(icon);
       }
     } else {
-      validateIconChanged(icon);
+      iconMap.put(icon, iconMap.get(icon) + 1);
     }
   }
 
@@ -121,15 +121,8 @@ class IconManager {
   }
 
   void reloadIcons() {
-    for (Icon icon : icons) {
+    for (Icon icon : iconMap.keySet()) {
       loadIcon(icon);
-    }
-  }
-
-  private void validateIconChanged(Icon icon) {
-    Icon oldIcon = icons.get(icons.indexOf(icon));
-    if (!oldIcon.getBitmap().sameAs(icon.getBitmap())) {
-      throw new IconBitmapChangedException();
     }
   }
 
@@ -147,6 +140,33 @@ class IconManager {
     Marker previousMarker = marker.getId() != -1 ? (Marker) mapboxMap.getAnnotation(marker.getId()) : null;
     if (previousMarker == null || previousMarker.getIcon() == null || previousMarker.getIcon() != marker.getIcon()) {
       marker.setTopOffsetPixels(getTopOffsetPixelsForIcon(icon));
+    }
+  }
+
+  public void iconCleanup(Icon icon) {
+    int refCounter = iconMap.get(icon) - 1;
+    if (refCounter == 0) {
+      remove(icon);
+    } else {
+      updateIconRefCounter(icon, refCounter);
+    }
+  }
+
+  private void remove(Icon icon) {
+    nativeMapView.removeAnnotationIcon(icon.getId());
+    iconMap.remove(icon);
+    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+      recycleBitmap(icon.getBitmap());
+    }
+  }
+
+  private void updateIconRefCounter(Icon icon, int refCounter) {
+    iconMap.put(icon, refCounter);
+  }
+
+  private void recycleBitmap(Bitmap bitmap) {
+    if (!bitmap.isRecycled()) {
+      bitmap.recycle();
     }
   }
 }
