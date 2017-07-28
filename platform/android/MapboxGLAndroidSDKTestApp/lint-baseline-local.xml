@@ -57,21 +57,6 @@
     </issue>
 
     <issue
-        id="IconDipSize"
-        message="The image `icon_burned.png` varies significantly in its density-independent (dip) size across the various density versions: drawable-hdpi/icon_burned.png: 64x64 dp (96x96 px), drawable-xxxhdpi/icon_burned.png: 48x48 dp (192x192 px), drawable-xxhdpi/icon_burned.png: 48x48 dp (144x144 px), drawable-xhdpi/icon_burned.png: 48x48 dp (96x96 px), drawable-mdpi/icon_burned.png: 48x48 dp (48x48 px)">
-        <location
-            file="src/main/res/drawable-mdpi/icon_burned.png"/>
-        <location
-            file="src/main/res/drawable-xhdpi/icon_burned.png"/>
-        <location
-            file="src/main/res/drawable-xxhdpi/icon_burned.png"/>
-        <location
-            file="src/main/res/drawable-xxxhdpi/icon_burned.png"/>
-        <location
-            file="src/main/res/drawable-hdpi/icon_burned.png"/>
-    </issue>
-
-    <issue
         id="IconDuplicatesConfig"
         message="The `icon_burned.png` icon has identical contents in the following configuration folders: drawable-hdpi, drawable-xhdpi">
         <location

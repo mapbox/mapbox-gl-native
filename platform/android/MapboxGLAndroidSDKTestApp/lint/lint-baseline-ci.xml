@@ -6,61 +6,50 @@
     from lint-baseline-local.xml file) you should remove it too from
     lint-baseline-ci.xml (THIS FILE) which is the only one included in the repo.
     Eventually, it'll be removed (when we remove all current lint errors included). -->
-<issues format="4" by="lint 2.3.1">
-
+<issues by="lint 2.3.1" format="4">
+    
     <issue
-        id="UnusedResources"
-        message="The resource `R.string.mapbox_access_token` appears to be unused"
-        errorLine1="    &lt;string name=&quot;mapbox_access_token&quot;>YOUR_MAPBOX_ACCESS_TOKEN_GOES_HERE&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/developer-config.xml"
-            line="3"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="Overdraw"
-        message="Possible overdraw: Root element paints background `#cccc` with a theme that also paints a background (inferred theme is `@style/AppTheme`)"
         errorLine1="    android:background=&quot;#cccc&quot;"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~"
+        id="Overdraw"
+        message="Possible overdraw: Root element paints background `#cccc` with a theme that also paints a background (inferred theme is `@style/AppTheme`)">
         <location
+            column="5"
             file="src/main/res/layout/drawer_navigation_drawer.xml"
-            line="4"
-            column="5"/>
+            line="4"/>
     </issue>
 
     <issue
-        id="Overdraw"
-        message="Possible overdraw: Root element paints background `?android:attr/selectableItemBackground` with a theme that also paints a background (inferred theme is `@style/AppTheme`)"
         errorLine1="    android:background=&quot;?android:attr/selectableItemBackground&quot;"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/item_main_feature.xml"
-            line="6"
-            column="5"/>
-    </issue>
-
-    <issue
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
         id="Overdraw"
-        message="Possible overdraw: Root element paints background `@color/mapboxGreen` with a theme that also paints a background (inferred theme is `@style/AppTheme`)"
-        errorLine1="    android:background=&quot;@color/mapboxGreen&quot;>"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        message="Possible overdraw: Root element paints background `?android:attr/selectableItemBackground` with a theme that also paints a background (inferred theme is `@style/AppTheme`)">
         <location
-            file="src/main/res/layout/view_text_marker.xml"
-            line="5"
-            column="5"/>
+            column="5"
+            file="src/main/res/layout/item_main_feature.xml"
+            line="6"/>
     </issue>
 
     <issue
-        id="TypographyQuotes"
-        message="Replace straight quotes (&apos;&apos;) with directional quotes (‘’, &amp;#8216; and &amp;#8217;) ?"
-        errorLine1="    &lt;string name=&quot;mapbox_attributionTelemetryMessage&quot;>Estàs ajudant a millorar els mapes d\&apos;OpenStreetMap i de Mapbox aportant dades d\&apos;ús anònimes.&lt;/string>"
-        errorLine2="                                                      ^">
+        errorLine1="    android:background=&quot;@color/mapboxGreen&quot;>"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+        id="Overdraw"
+        message="Possible overdraw: Root element paints background `@color/mapboxGreen` with a theme that also paints a background (inferred theme is `@style/AppTheme`)">
         <location
+            column="5"
+            file="src/main/res/layout/view_text_marker.xml"
+            line="5"/>
+    </issue>
+
+    <issue
+        errorLine1="    &lt;string name=&quot;mapbox_attributionTelemetryMessage&quot;>Estàs ajudant a millorar els mapes d\&apos;OpenStreetMap i de Mapbox aportant dades d\&apos;ús anònimes.&lt;/string>"
+        errorLine2="                                                      ^"
+        id="TypographyQuotes"
+        message="Replace straight quotes (&apos;&apos;) with directional quotes (‘’, &amp;#8216; and &amp;#8217;) ?">
+        <location
+            column="55"
             file="src/main/res/values-ca/strings.xml"
-            line="9"
-            column="55"/>
+            line="9"/>
     </issue>
 
     <issue
