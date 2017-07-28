@@ -27,6 +27,15 @@ have -SNAPSHOT appended to the SDK version number. For example `5.2.0-SNAPSHOT` 
     transitive = true
     }
 ```
+You need to have the section below in your build.gradle root folder to be able to resolve the SNAPSHOT dependencies:
+```
+allprojects {
+    repositories {
+        jcenter()
+        maven { url "http://oss.sonatype.org/content/repositories/snapshots/" }
+    }
+}
+```
 
 
 ### Setup environment
