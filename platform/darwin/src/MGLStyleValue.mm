@@ -52,6 +52,10 @@ const MGLStyleFunctionOption MGLStyleFunctionOptionDefaultValue = @"MGLStyleFunc
     return [self.rawValue debugDescription];
 }
 
+- (id)debugQuickLookObject {
+    return self.rawValue;
+}
+
 - (BOOL)isEqual:(MGLConstantStyleValue *)other {
     return [other isKindOfClass:[self class]] && [other.rawValue isEqual:self.rawValue];
 }
@@ -153,6 +157,21 @@ const MGLStyleFunctionOption MGLStyleFunctionOptionDefaultValue = @"MGLStyleFunc
             (unsigned long)self.interpolationMode,
             self.stops,
             self.interpolationBase];
+}
+
+- (id)debugQuickLookObject {
+    UIBezierPath *path = [UIBezierPath bezierPath];
+    [path moveToPoint:CGPointMake(0, 0)];
+    [self.stops enumerateKeysAndObjectsUsingBlock:^(NSNumber * _Nonnull zoomLevel, id _Nonnull obj, BOOL * _Nonnull stop) {
+        NSNumber *value = obj;
+        if (![value isKindOfClass:[NSNumber class]]) {
+            *stop = YES;
+            return;
+        }
+        [path addCurveToPoint:CGPointMake([zoomLevel doubleValue] * 20, [value doubleValue]) controlPoint1:CGPointMake(([zoomLevel doubleValue] - 0.7) * 20, [value doubleValue]) controlPoint2:CGPointMake(([zoomLevel doubleValue] - 0.3) * 20, [value doubleValue])];
+    }];
+    [path stroke];
+    return path;
 }
 
 - (BOOL)isEqual:(MGLCameraStyleFunction *)other {

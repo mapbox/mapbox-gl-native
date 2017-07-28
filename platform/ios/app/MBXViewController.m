@@ -1826,6 +1826,9 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     // that a device with an English-language locale is already effectively
     // using locale-based country labels.
     _usingLocaleBasedCountryLabels = [[self bestLanguageForUser] isEqualToString:@"en"];
+    
+    MGLStyleLayer *layer = [style layerWithIdentifier:@"road-secondary-tertiary"];
+    NSLog(@"%@", layer);
 }
 
 - (void)mapViewRegionIsChanging:(MGLMapView *)mapView
