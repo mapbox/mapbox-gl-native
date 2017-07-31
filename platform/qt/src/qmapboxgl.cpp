@@ -8,6 +8,7 @@
 #include <mbgl/annotation/annotation.hpp>
 #include <mbgl/map/camera.hpp>
 #include <mbgl/map/map.hpp>
+#include <mbgl/math/log2.hpp>
 #include <mbgl/math/minmax.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/conversion.hpp>
@@ -583,7 +584,7 @@ double QMapboxGL::scale() const
 
 void QMapboxGL::setScale(double scale_, const QPointF &center)
 {
-    d_ptr->mapObj->setZoom(std::log2(scale_), mbgl::ScreenCoordinate { center.x(), center.y() });
+    d_ptr->mapObj->setZoom(mbgl::util::log2(scale_), mbgl::ScreenCoordinate { center.x(), center.y() });
 }
 
 /*!
@@ -991,7 +992,7 @@ void QMapboxGL::moveBy(const QPointF &offset)
     can be used for implementing a pinch gesture.
 */
 void QMapboxGL::scaleBy(double scale_, const QPointF &center) {
-    d_ptr->mapObj->setZoom(d_ptr->mapObj->getZoom() + std::log2(scale_), mbgl::ScreenCoordinate { center.x(), center.y() });
+    d_ptr->mapObj->setZoom(d_ptr->mapObj->getZoom() + mbgl::util::log2(scale_), mbgl::ScreenCoordinate { center.x(), center.y() });
 }
 
 /*!
