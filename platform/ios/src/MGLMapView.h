@@ -765,6 +765,23 @@ MGL_EXPORT IB_DESIGNABLE
 - (void)setCamera:(MGLMapCamera *)camera withDuration:(NSTimeInterval)duration animationTimingFunction:(nullable CAMediaTimingFunction *)function completionHandler:(nullable void (^)(void))completion;
 
 /**
+ Moves the viewpoint to a different location with respect to the map with an
+ optional transition duration and timing function.
+ 
+ @param camera The new viewpoint.
+ @param duration The amount of time, measured in seconds, that the transition
+ animation should take. Specify `0` to jump to the new viewpoint
+ instantaneously.
+ @param function A timing function used for the animation. Set this parameter to
+ `nil` for a transition that matches most system animations. If the duration
+ is `0`, this parameter is ignored.
+ @param edgePadding The minimum padding (in screen points) that would be visible
+ around the returned camera object if it were set as the receiver’s camera.
+ @param completion The block to execute after the animation finishes.
+ */
+- (void)setCamera:(MGLMapCamera *)camera withDuration:(NSTimeInterval)duration animationTimingFunction:(nullable CAMediaTimingFunction *)function edgePadding:(UIEdgeInsets)edgePadding completionHandler:(nullable void (^)(void))completion;
+
+/**
  Moves the viewpoint to a different location using a transition animation that
  evokes powered flight and a default duration based on the length of the flight
  path.
