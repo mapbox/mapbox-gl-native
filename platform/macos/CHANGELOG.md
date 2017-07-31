@@ -2,7 +2,7 @@
 
 ## 0.5.1
 
-* Added support to adapt Mapbox Streets–sourced layers for user preferred language. ([#9582](https://github.com/mapbox/mapbox-gl-native/pull/9582))
+* Added an MGLStyle.localizesLabels property, off by default, that localizes any Mapbox Streets–sourced symbol layer into the user’s preferred language. ([#9582](https://github.com/mapbox/mapbox-gl-native/pull/9582))
 
 ## 0.5.0
 

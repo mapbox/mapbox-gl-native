@@ -49,12 +49,34 @@
     #import "NSImage+MGLAdditions.h"
 #endif
 
+/**
+ Model class for localization changes.
+ */
+@interface MGLTextLanguage: NSObject
+@property (strong, nonatomic) NSString *originalTextField;
+@property (strong, nonatomic) NSString *updatedTextField;
+
+- (instancetype)initWithTextLanguage:(NSString *)originalTextField updatedTextField:(NSString *)updatedTextField;
+
+@end
+
+@implementation MGLTextLanguage
+- (instancetype)initWithTextLanguage:(NSString *)originalTextField updatedTextField:(NSString *)updatedTextField
+{
+    if (self = [super init]) {
+        _originalTextField = originalTextField;
+        _updatedTextField = updatedTextField;
+    }
+    return self;
+}
+@end
+
 @interface MGLStyle()
 
 @property (nonatomic, readwrite, weak) MGLMapView *mapView;
 @property (readonly, copy, nullable) NSURL *URL;
 @property (nonatomic, readwrite, strong) NS_MUTABLE_DICTIONARY_OF(NSString *, MGLOpenGLStyleLayer *) *openGLLayers;
-@property (nonatomic) NS_MUTABLE_DICTIONARY_OF(NSString *, NS_DICTIONARY_OF(NSString *, NSString*) *) *localizedLayersByIdentifier;
+@property (nonatomic) NS_MUTABLE_DICTIONARY_OF(NSString *, NS_DICTIONARY_OF(NSObject *, MGLTextLanguage *) *) *localizedLayersByIdentifier;
 
 @end
 
@@ -657,54 +679,68 @@ static NSURL *MGLStyleURL_emerald;
                 NSString *textField = [(MGLConstantStyleValue<NSString *> *)layer.text rawValue];
                 NSString *localizingString = stringByLocalizingString(textField);
                 if (![textField isEqualToString:localizingString]) {
-                    [self.localizedLayersByIdentifier setObject:@{ textField : localizingString } forKey:layer.identifier];
+                    MGLTextLanguage *textLanguage = [[MGLTextLanguage alloc] initWithTextLanguage:textField
+                                                                                 updatedTextField:localizingString];
+                    [self.localizedLayersByIdentifier setObject:@{ textField : textLanguage } forKey:layer.identifier];
                     layer.text = [MGLStyleValue<NSString *> valueWithRawValue:localizingString];
                 }
             }
             else if ([layer.text isKindOfClass:[MGLCameraStyleFunction class]]) {
                 MGLCameraStyleFunction *function = (MGLCameraStyleFunction<NSString *> *)layer.text;
                 NSMutableDictionary *stops = function.stops.mutableCopy;
+                NSMutableDictionary *cameraStops = [NSMutableDictionary dictionary];
                 [stops enumerateKeysAndObjectsUsingBlock:^(NSNumber *zoomLevel, MGLConstantStyleValue<NSString *> *stop, BOOL *done) {
                     NSString *textField = stop.rawValue;
                     NSString *localizingString = stringByLocalizingString(textField);
                     if (![textField isEqualToString:localizingString]) {
-                        [self.localizedLayersByIdentifier setObject:@{ textField : localizingString } forKey:layer.identifier];
+                        MGLTextLanguage *textLanguage = [[MGLTextLanguage alloc] initWithTextLanguage:textField
+                                                                                     updatedTextField:localizingString];
+                        [cameraStops setObject:textLanguage forKey:zoomLevel];
                         stops[zoomLevel] = [MGLStyleValue<NSString *> valueWithRawValue:localizingString];
                     }
                     
                 }];
+                if (cameraStops.count > 0) {
+                    [self.localizedLayersByIdentifier setObject:cameraStops forKey:layer.identifier];
+                }
                 function.stops = stops;
                 layer.text = function;
             }
         }
     } else {
-        for (NSString *identifier in self.localizedLayersByIdentifier) {
+        
+        [self.localizedLayersByIdentifier enumerateKeysAndObjectsUsingBlock:^(NSString *identifier, NSDictionary<NSObject *, MGLTextLanguage *> *textFields, BOOL *done) {
             MGLSymbolStyleLayer *layer = (MGLSymbolStyleLayer *)[self.mapView.style layerWithIdentifier:identifier];
-            NSDictionary *languages = [self.localizedLayersByIdentifier objectForKey:identifier];
-            NSString *originalLanguage = [languages allKeys].firstObject;
-            NSString *changedLanguage = [languages objectForKey:originalLanguage];
             
             if ([layer.text isKindOfClass:[MGLConstantStyleValue class]]) {
                 NSString *textField = [(MGLConstantStyleValue<NSString *> *)layer.text rawValue];
-                if ([changedLanguage isEqualToString:textField]) {
-                    layer.text = [MGLStyleValue<NSString *> valueWithRawValue:originalLanguage];
-                }
-                
+                [textFields enumerateKeysAndObjectsUsingBlock:^(NSObject *originalLanguage, MGLTextLanguage *textLanguage, BOOL *done) {
+                    if ([textLanguage.updatedTextField isEqualToString:textField]) {
+                        layer.text = [MGLStyleValue<NSString *> valueWithRawValue:textLanguage.originalTextField];
+                    }
+                }];
+
             }
             else if ([layer.text isKindOfClass:[MGLCameraStyleFunction class]]) {
                 MGLCameraStyleFunction *function = (MGLCameraStyleFunction<NSString *> *)layer.text;
                 NSMutableDictionary *stops = function.stops.mutableCopy;
-                [stops enumerateKeysAndObjectsUsingBlock:^(NSNumber *zoomLevel, MGLConstantStyleValue<NSString *> *stop, BOOL *done) {
-                    NSString *textField = stop.rawValue;
-                    if ([changedLanguage isEqualToString:textField]) {
-                        stops[zoomLevel] = [MGLStyleValue<NSString *> valueWithRawValue:originalLanguage];
+                [textFields enumerateKeysAndObjectsUsingBlock:^(NSObject *zoomKey, MGLTextLanguage *textLanguage, BOOL *done) {
+                    if ([zoomKey isKindOfClass:[NSNumber class]]) {
+                        NSNumber *zoomLevel = (NSNumber*)zoomKey;
+                        MGLConstantStyleValue<NSString *> *stop = [stops objectForKey:zoomLevel];
+                        NSString *textField = stop.rawValue;
+                        if ([textLanguage.updatedTextField isEqualToString:textField]) {
+                            stops[zoomLevel] = [MGLStyleValue<NSString *> valueWithRawValue:textLanguage.originalTextField];
+                        }
                     }
-                    
                 }];
+
                 function.stops = stops;
                 layer.text = function;
             }
-        }
+
+        }];
+
         self.localizedLayersByIdentifier = [NSMutableDictionary dictionary];
     }
 }

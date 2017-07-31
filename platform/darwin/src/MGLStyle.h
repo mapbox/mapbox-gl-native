@@ -610,7 +610,7 @@ MGL_EXPORT
  */
 @property (nonatomic, strong) MGLLight *light;
 
-#pragma mark Style's localization
+#pragma mark Localizing Map Content
 
 /**
  A Boolean value that determines whether the style attempts to localize labels in 
