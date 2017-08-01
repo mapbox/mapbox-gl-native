@@ -12,4 +12,6 @@ if [[ "${PUBLISH:-}" == true ]]; then
         echo "error: must provide either Debug or RelWithDebInfo for BUILDTYPE"
         exit 1
     fi
+else
+    echo "Not publishing. $PUBLISH $CIRCLE_TAG"
 fi
