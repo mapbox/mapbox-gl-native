@@ -58,6 +58,8 @@
   "render-tests/runtime-styling/source-add-geojson-inline": "skip - needs issue",
   "render-tests/symbol-placement/line": "needs issue",
   "render-tests/text-keep-upright/line-placement-true-offset": "https://github.com/mapbox/mapbox-gl-native/issues/9271",
+  "render-tests/text-max-width/property-function": "https://github.com/mapbox/mapbox-gl-native/issues/9654",
+  "render-tests/text-max-width/zoom-and-property-function": "https://github.com/mapbox/mapbox-gl-native/issues/9654",
   "render-tests/text-size/composite-function-high-base": "https://github.com/mapbox/mapbox-gl-native/issues/8654",
   "render-tests/video/default": "skip - needs issue"
 }
