@@ -1708,7 +1708,7 @@ public final class MapboxMap {
    * @param listener the listener to notify
    */
   @UiThread
-  public void setOnCameraMoveStartedistener(@Nullable OnCameraMoveStartedListener listener) {
+  public void setOnCameraMoveStartedListener(@Nullable OnCameraMoveStartedListener listener) {
     cameraChangeDispatcher.setOnCameraMoveStartedListener(listener);
   }
 
