@@ -120,6 +120,7 @@ public class MapView extends FrameLayout {
     myLocationView = (MyLocationView) view.findViewById(R.id.userLocationView);
     attrView = (ImageView) view.findViewById(R.id.attributionView);
     logoView = (ImageView) view.findViewById(R.id.logoView);
+    mapZoomButtonController = new MapZoomButtonController(new ZoomButtonsController(this));
 
     // add accessibility support
     setContentDescription(context.getString(R.string.mapbox_mapActionDescription));
@@ -180,7 +181,7 @@ public class MapView extends FrameLayout {
     mapKeyListener = new MapKeyListener(transform, trackingSettings, uiSettings);
 
     MapZoomControllerListener zoomListener = new MapZoomControllerListener(mapGestureDetector, uiSettings, transform);
-    mapZoomButtonController = new MapZoomButtonController(this, uiSettings, zoomListener);
+    mapZoomButtonController.bind(uiSettings, zoomListener);
 
     // inject widgets with MapboxMap
     compassView.setMapboxMap(mapboxMap);
@@ -557,9 +558,7 @@ public class MapView extends FrameLayout {
   @CallSuper
   protected void onDetachedFromWindow() {
     super.onDetachedFromWindow();
-    if (mapZoomButtonController != null) {
-      mapZoomButtonController.setVisible(false);
-    }
+    mapZoomButtonController.setVisible(false);
   }
 
   // Called when view is hidden and shown
@@ -569,7 +568,7 @@ public class MapView extends FrameLayout {
       return;
     }
 
-    if (mapZoomButtonController != null && nativeMapView != null) {
+    if (nativeMapView != null) {
       mapZoomButtonController.setVisible(visibility == View.VISIBLE);
     }
   }
