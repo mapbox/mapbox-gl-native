@@ -15,6 +15,8 @@ import com.mapbox.services.android.telemetry.MapboxTelemetry;
 import com.mapbox.services.android.telemetry.location.LocationEngine;
 import com.mapbox.services.android.telemetry.location.LocationEnginePriority;
 
+import timber.log.Timber;
+
 /**
  * The entry point to initialize the Mapbox Android SDK.
  * <p>
@@ -48,8 +50,14 @@ public final class Mapbox {
       INSTANCE = new Mapbox(appContext, accessToken, new LocationSource(appContext));
       LocationEngine locationEngine = new LocationSource(appContext);
       locationEngine.setPriority(LocationEnginePriority.NO_POWER);
-      MapboxTelemetry.getInstance().initialize(
-        appContext, accessToken, BuildConfig.MAPBOX_EVENTS_USER_AGENT, locationEngine);
+
+      try {
+        MapboxTelemetry.getInstance().initialize(
+          appContext, accessToken, BuildConfig.MAPBOX_EVENTS_USER_AGENT, locationEngine);
+      } catch (Exception exception) {
+        Timber.e(exception, "Unable to instantiate Mapbox telemetry");
+      }
+
       ConnectivityReceiver.instance(appContext);
     }
     return INSTANCE;
