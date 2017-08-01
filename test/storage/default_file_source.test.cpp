@@ -22,6 +22,7 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(CacheResponse)) {
         ASSERT_TRUE(res.data.get());
         EXPECT_EQ("Response 1", *res.data);
         EXPECT_TRUE(bool(res.expires));
+        EXPECT_FALSE(res.mustRevalidate);
         EXPECT_FALSE(bool(res.modified));
         EXPECT_FALSE(bool(res.etag));
         response = res;
@@ -34,6 +35,7 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(CacheResponse)) {
             ASSERT_TRUE(res2.data.get());
             EXPECT_EQ(*response.data, *res2.data);
             EXPECT_EQ(response.expires, res2.expires);
+            EXPECT_EQ(response.mustRevalidate, res2.mustRevalidate);
             EXPECT_EQ(response.modified, res2.modified);
             EXPECT_EQ(response.etag, res2.etag);
 
@@ -51,35 +53,53 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(CacheRevalidateSame)) {
     const Resource revalidateSame { Resource::Unknown, "http://127.0.0.1:3000/revalidate-same" };
     std::unique_ptr<AsyncRequest> req1;
     std::unique_ptr<AsyncRequest> req2;
-    uint16_t counter = 0;
+    bool gotResponse = false;
 
     // First request causes the response to get cached.
     req1 = fs.request(revalidateSame, [&](Response res) {
         req1.reset();
 
         EXPECT_EQ(nullptr, res.error);
+        EXPECT_FALSE(res.notModified);
         ASSERT_TRUE(res.data.get());
         EXPECT_EQ("Response", *res.data);
         EXPECT_FALSE(bool(res.expires));
+        EXPECT_TRUE(res.mustRevalidate);
         EXPECT_FALSE(bool(res.modified));
         EXPECT_EQ("snowfall", *res.etag);
 
-        // Second request returns the cached response, then immediately revalidates.
-        req2 = fs.request(revalidateSame, [&, res](Response res2) {
-            if (counter == 0) {
-                ++counter;
+        // The first response is stored in the cache, but it has 'must-revalidate' set. This means
+        // it can't return the cached response right away and we must wait for the revalidation
+        // request to complete. We can distinguish the cached response from the revalided response
+        // because the latter has an expiration date, while the cached response doesn't.
+        req2 = fs.request(revalidateSame, [&](Response res2) {
+            if (!gotResponse) {
+                // Even though we could find the response in the database, we send a revalidation
+                // request and get a 304 response. Since we haven't sent a reply yet, we're forcing
+                // notModified to be false so that implementations can continue to use the
+                // notModified flag to skip parsing new data.
+                gotResponse = true;
+                EXPECT_EQ(nullptr, res2.error);
                 EXPECT_FALSE(res2.notModified);
+                ASSERT_TRUE(res2.data.get());
+                EXPECT_EQ("Response", *res2.data);
+                EXPECT_TRUE(bool(res2.expires));
+                EXPECT_TRUE(res2.mustRevalidate);
+                EXPECT_FALSE(bool(res2.modified));
+                EXPECT_EQ("snowfall", *res2.etag);
             } else {
+                // The test server sends a Cache-Control header with a max-age of 1 second. This
+                // means that our OnlineFileSource implementation will request the tile again after
+                // 1 second. This time, our request already had a prior response, so we don't need
+                // to send the data again, and instead can actually forward the notModified flag.
                 req2.reset();
-
                 EXPECT_EQ(nullptr, res2.error);
                 EXPECT_TRUE(res2.notModified);
-                ASSERT_FALSE(res2.data.get());
+                EXPECT_FALSE(res2.data.get());
                 EXPECT_TRUE(bool(res2.expires));
+                EXPECT_TRUE(res2.mustRevalidate);
                 EXPECT_FALSE(bool(res2.modified));
-                // We're not sending the ETag in the 304 reply, but it should still be there.
                 EXPECT_EQ("snowfall", *res2.etag);
-
                 loop.stop();
             }
         });
@@ -96,34 +116,53 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(CacheRevalidateModified)) {
                                        "http://127.0.0.1:3000/revalidate-modified" };
     std::unique_ptr<AsyncRequest> req1;
     std::unique_ptr<AsyncRequest> req2;
-    uint16_t counter = 0;
+    bool gotResponse = false;
 
     // First request causes the response to get cached.
     req1 = fs.request(revalidateModified, [&](Response res) {
         req1.reset();
 
         EXPECT_EQ(nullptr, res.error);
+        EXPECT_FALSE(res.notModified);
         ASSERT_TRUE(res.data.get());
         EXPECT_EQ("Response", *res.data);
         EXPECT_FALSE(bool(res.expires));
+        EXPECT_TRUE(res.mustRevalidate);
         EXPECT_EQ(Timestamp{ Seconds(1420070400) }, *res.modified);
         EXPECT_FALSE(res.etag);
 
-        // Second request returns the cached response, then immediately revalidates.
+        // The first response is stored in the cache, but it has 'must-revalidate' set. This means
+        // it can't return the cached response right away and we must wait for the revalidation
+        // request to complete. We can distinguish the cached response from the revalided response
+        // because the latter has an expiration date, while the cached response doesn't.
         req2 = fs.request(revalidateModified, [&, res](Response res2) {
-            if (counter == 0) {
-                ++counter;
-                EXPECT_FALSE(res2.notModified);
-            } else {
-                req2.reset();
-
+            if (!gotResponse) {
+                // Even though we could find the response in the database, we send a revalidation
+                // request and get a 304 response. Since we haven't sent a reply yet, we're forcing
+                // notModified to be false so that implementations can continue to use the
+                // notModified flag to skip parsing new data.
+                gotResponse = true;
                 EXPECT_EQ(nullptr, res2.error);
-                EXPECT_TRUE(res2.notModified);
-                ASSERT_FALSE(res2.data.get());
+                EXPECT_FALSE(res2.notModified);
+                ASSERT_TRUE(res2.data.get());
+                EXPECT_EQ("Response", *res2.data);
                 EXPECT_TRUE(bool(res2.expires));
+                EXPECT_TRUE(res2.mustRevalidate);
                 EXPECT_EQ(Timestamp{ Seconds(1420070400) }, *res2.modified);
                 EXPECT_FALSE(res2.etag);
-
+            } else {
+                // The test server sends a Cache-Control header with a max-age of 1 second. This
+                // means that our OnlineFileSource implementation will request the tile again after
+                // 1 second. This time, our request already had a prior response, so we don't need
+                // to send the data again, and instead can actually forward the notModified flag.
+                req2.reset();
+                EXPECT_EQ(nullptr, res2.error);
+                EXPECT_TRUE(res2.notModified);
+                EXPECT_FALSE(res2.data.get());
+                EXPECT_TRUE(bool(res2.expires));
+                EXPECT_TRUE(res2.mustRevalidate);
+                EXPECT_EQ(Timestamp{ Seconds(1420070400) }, *res2.modified);
+                EXPECT_FALSE(res2.etag);
                 loop.stop();
             }
         });
@@ -139,7 +178,6 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(CacheRevalidateEtag)) {
     const Resource revalidateEtag { Resource::Unknown, "http://127.0.0.1:3000/revalidate-etag" };
     std::unique_ptr<AsyncRequest> req1;
     std::unique_ptr<AsyncRequest> req2;
-    uint16_t counter = 0;
 
     // First request causes the response to get cached.
     req1 = fs.request(revalidateEtag, [&](Response res) {
@@ -149,27 +187,24 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(CacheRevalidateEtag)) {
         ASSERT_TRUE(res.data.get());
         EXPECT_EQ("Response 1", *res.data);
         EXPECT_FALSE(bool(res.expires));
+        EXPECT_TRUE(res.mustRevalidate);
         EXPECT_FALSE(bool(res.modified));
         EXPECT_EQ("response-1", *res.etag);
 
-        // Second request returns the cached response, then immediately revalidates.
+        // Second request does not return the cached response, since it had Cache-Control: must-revalidate set.
         req2 = fs.request(revalidateEtag, [&, res](Response res2) {
-            if (counter == 0) {
-                ++counter;
-                EXPECT_FALSE(res2.notModified);
-            } else {
-                req2.reset();
+            req2.reset();
 
-                EXPECT_EQ(nullptr, res2.error);
-                ASSERT_TRUE(res2.data.get());
-                EXPECT_NE(res.data, res2.data);
-                EXPECT_EQ("Response 2", *res2.data);
-                EXPECT_FALSE(bool(res2.expires));
-                EXPECT_FALSE(bool(res2.modified));
-                EXPECT_EQ("response-2", *res2.etag);
+            EXPECT_EQ(nullptr, res2.error);
+            ASSERT_TRUE(res2.data.get());
+            EXPECT_NE(res.data, res2.data);
+            EXPECT_EQ("Response 2", *res2.data);
+            EXPECT_FALSE(bool(res2.expires));
+            EXPECT_TRUE(res2.mustRevalidate);
+            EXPECT_FALSE(bool(res2.modified));
+            EXPECT_EQ("response-2", *res2.etag);
 
-                loop.stop();
-            }
+            loop.stop();
         });
     });
 
@@ -203,6 +238,7 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(HTTPIssue1369)) {
         ASSERT_TRUE(res.data.get());
         EXPECT_EQ("Hello World!", *res.data);
         EXPECT_FALSE(bool(res.expires));
+        EXPECT_FALSE(res.mustRevalidate);
         EXPECT_FALSE(bool(res.modified));
         EXPECT_FALSE(bool(res.etag));
         loop.stop();
@@ -232,6 +268,7 @@ TEST(DefaultFileSource, OptionalNonExpired) {
         EXPECT_EQ("Cached value", *res.data);
         ASSERT_TRUE(bool(res.expires));
         EXPECT_EQ(*response.expires, *res.expires);
+        EXPECT_FALSE(res.mustRevalidate);
         EXPECT_FALSE(bool(res.modified));
         EXPECT_FALSE(bool(res.etag));
         loop.stop();
@@ -261,6 +298,7 @@ TEST(DefaultFileSource, OptionalExpired) {
         EXPECT_EQ("Cached value", *res.data);
         ASSERT_TRUE(bool(res.expires));
         EXPECT_EQ(*response.expires, *res.expires);
+        EXPECT_FALSE(res.mustRevalidate);
         EXPECT_FALSE(bool(res.modified));
         EXPECT_FALSE(bool(res.etag));
         loop.stop();
@@ -301,6 +339,7 @@ TEST(DefaultFileSource, OptionalNotFound) {
         EXPECT_EQ("Not found in offline database", res.error->message);
         EXPECT_FALSE(res.data);
         EXPECT_FALSE(bool(res.expires));
+        EXPECT_FALSE(res.mustRevalidate);
         EXPECT_FALSE(bool(res.modified));
         EXPECT_FALSE(bool(res.etag));
         loop.stop();
@@ -334,6 +373,7 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(NoCacheRefreshEtagNotModified)) {
         EXPECT_FALSE(res.data.get());
         ASSERT_TRUE(bool(res.expires));
         EXPECT_LT(util::now(), *res.expires);
+        EXPECT_TRUE(res.mustRevalidate);
         EXPECT_FALSE(bool(res.modified));
         ASSERT_TRUE(bool(res.etag));
         EXPECT_EQ("snowfall", *res.etag);
@@ -368,6 +408,7 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(NoCacheRefreshEtagModified)) {
         ASSERT_TRUE(res.data.get());
         EXPECT_EQ("Response", *res.data);
         EXPECT_FALSE(bool(res.expires));
+        EXPECT_TRUE(res.mustRevalidate);
         EXPECT_FALSE(bool(res.modified));
         ASSERT_TRUE(bool(res.etag));
         EXPECT_EQ("snowfall", *res.etag);
@@ -403,6 +444,7 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(NoCacheFull)) {
         ASSERT_TRUE(res.data.get());
         EXPECT_EQ("Response", *res.data);
         EXPECT_FALSE(bool(res.expires));
+        EXPECT_TRUE(res.mustRevalidate);
         EXPECT_FALSE(bool(res.modified));
         ASSERT_TRUE(bool(res.etag));
         EXPECT_EQ("snowfall", *res.etag);
@@ -437,6 +479,7 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(NoCacheRefreshModifiedNotModified))
         EXPECT_FALSE(res.data.get());
         ASSERT_TRUE(bool(res.expires));
         EXPECT_LT(util::now(), *res.expires);
+        EXPECT_TRUE(res.mustRevalidate);
         ASSERT_TRUE(bool(res.modified));
         EXPECT_EQ(Timestamp{ Seconds(1420070400) }, *res.modified);
         EXPECT_FALSE(bool(res.etag));
@@ -471,6 +514,7 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(NoCacheRefreshModifiedModified)) {
         ASSERT_TRUE(res.data.get());
         EXPECT_EQ("Response", *res.data);
         EXPECT_FALSE(bool(res.expires));
+        EXPECT_TRUE(res.mustRevalidate);
         EXPECT_EQ(Timestamp{ Seconds(1420070400) }, *res.modified);
         EXPECT_FALSE(res.etag);
         loop.stop();
@@ -502,6 +546,7 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(SetResourceTransform)) {
         ASSERT_TRUE(res.data.get());
         EXPECT_EQ("Hello World!", *res.data);
         EXPECT_FALSE(bool(res.expires));
+        EXPECT_FALSE(res.mustRevalidate);
         EXPECT_FALSE(bool(res.modified));
         EXPECT_FALSE(bool(res.etag));
         loop.stop();
@@ -518,6 +563,7 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(SetResourceTransform)) {
         ASSERT_TRUE(res.data.get());
         EXPECT_EQ("Hello World!", *res.data);
         EXPECT_FALSE(bool(res.expires));
+        EXPECT_FALSE(res.mustRevalidate);
         EXPECT_FALSE(bool(res.modified));
         EXPECT_FALSE(bool(res.etag));
         loop.stop();
