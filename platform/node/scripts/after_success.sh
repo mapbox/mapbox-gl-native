@@ -8,7 +8,7 @@ PACKAGE_JSON_VERSION=`node -e "console.log(require('./package.json').version)"`
 echo $PACKAGE_JSON_VERSION
 echo $CIRCLE_TAG
 
-if [[ "${CIRCLE_TAG}" == "node-v${PACKAGE_JSON_VERSION}" ]]; then
+if [[ "${CIRCLE_TAG}" == "node-v${PACKAGE_JSON_VERSION}" ]] || [[ "${PUBLISH:-}" == true ]]; then
     if [[ "${BUILDTYPE}" == "RelWithDebInfo" ]]; then
         ./node_modules/.bin/node-pre-gyp package publish info
     elif [[ "${BUILDTYPE}" == "Debug" ]]; then
