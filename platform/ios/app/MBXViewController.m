@@ -343,7 +343,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                 @"Update Shape Source: Features",
                 @"Style Vector Source",
                 @"Style Raster Source",
-                [NSString stringWithFormat:@"Label Countries in %@", (_usingLocaleBasedCountryLabels ? @"Local Language" : [[NSLocale currentLocale] displayNameForKey:NSLocaleIdentifier value:[self bestLanguageForUser]])],
+                [NSString stringWithFormat:@"Show Labels in %@", (_usingLocaleBasedCountryLabels ? @"Local Language" : [[NSLocale currentLocale] displayNameForKey:NSLocaleIdentifier value:[self bestLanguageForUser]])],
                 @"Add Route Line",
                 @"Dynamically Style Polygon",
             ]];
@@ -1274,12 +1274,8 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
 
 -(void)styleCountryLabelsLanguage
 {
-    NSArray<NSString *> *labelLayers = @[
-        @"country-label-lg",
-        @"country-label-md",
-        @"country-label-sm",
-    ];
-    [self styleLabelLanguageForLayersNamed:labelLayers];
+    _usingLocaleBasedCountryLabels = !_usingLocaleBasedCountryLabels;
+    self.mapView.style.localizesLabels = _usingLocaleBasedCountryLabels;
 }
 
 - (void)styleRouteLine
@@ -1360,39 +1356,6 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                                                                          attributeName:@"opacity"
                                                                                options:fillOpacityOptions];
     [self.mapView.style addLayer:fillStyleLayer];
-}
-
-- (void)styleLabelLanguageForLayersNamed:(NSArray<NSString *> *)layers
-{
-    _usingLocaleBasedCountryLabels = !_usingLocaleBasedCountryLabels;
-    NSString *bestLanguageForUser = [NSString stringWithFormat:@"{name_%@}", [self bestLanguageForUser]];
-    NSString *language = _usingLocaleBasedCountryLabels ? bestLanguageForUser : @"{name}";
-
-    for (NSString *layerName in layers) {
-        MGLSymbolStyleLayer *layer = (MGLSymbolStyleLayer *)[self.mapView.style layerWithIdentifier:layerName];
-
-        if ([layer isKindOfClass:[MGLSymbolStyleLayer class]]) {
-            if ([layer.text isKindOfClass:[MGLConstantStyleValue class]]) {
-                MGLConstantStyleValue *label = (MGLConstantStyleValue<NSString *> *)layer.text;
-                if ([label.rawValue hasPrefix:@"{name"]) {
-                    layer.text = [MGLStyleValue valueWithRawValue:language];
-                }
-            }
-            else if ([layer.text isKindOfClass:[MGLCameraStyleFunction class]]) {
-                MGLCameraStyleFunction *function = (MGLCameraStyleFunction<NSString *> *)layer.text;
-                NSMutableDictionary *stops = function.stops.mutableCopy;
-                [stops enumerateKeysAndObjectsUsingBlock:^(NSNumber *zoomLevel, MGLConstantStyleValue<NSString *> *stop, BOOL *done) {
-                    if ([stop.rawValue hasPrefix:@"{name"]) {
-                        stops[zoomLevel] = [MGLStyleValue<NSString *> valueWithRawValue:language];
-                    }
-                }];
-                function.stops = stops;
-                layer.text = function;
-            }
-        } else {
-            NSLog(@"%@ is not a symbol style layer", layerName);
-        }
-    }
 }
 
 - (NSString *)bestLanguageForUser

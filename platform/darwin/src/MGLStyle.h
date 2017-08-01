@@ -610,6 +610,21 @@ MGL_EXPORT
  */
 @property (nonatomic, strong) MGLLight *light;
 
+#pragma mark Localizing Map Content
+
+/**
+ A Boolean value that determines whether the style attempts to localize labels in 
+ the style into the system’s preferred language.
+ 
+ When this property is enabled, the style automatically modifies the text property 
+ of any symbol style layer whose source is the 
+ <a href="https://www.mapbox.com/vector-tiles/mapbox-streets-v7/#overview">Mapbox 
+ Streets source</a>. On iOS, the user can set the system’s preferred language in 
+ Settings, General Settings, Language & Region. On macOS, the user can set the 
+ system’s preferred language in the Language & Region pane of System Preferences.
+ */
+@property (nonatomic) BOOL localizesLabels;
+
 @end
 
 NS_ASSUME_NONNULL_END
