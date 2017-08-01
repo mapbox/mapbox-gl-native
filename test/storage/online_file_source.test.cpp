@@ -36,6 +36,7 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(CancelMultiple)) {
         ASSERT_TRUE(res.data.get());
         EXPECT_EQ("Hello World!", *res.data);
         EXPECT_FALSE(bool(res.expires));
+        EXPECT_FALSE(res.mustRevalidate);
         EXPECT_FALSE(bool(res.modified));
         EXPECT_FALSE(bool(res.etag));
         loop.stop();
@@ -62,6 +63,7 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(TemporaryError)) {
             EXPECT_EQ("HTTP status code 500", res.error->message);
             ASSERT_FALSE(bool(res.data));
             EXPECT_FALSE(bool(res.expires));
+            EXPECT_FALSE(res.mustRevalidate);
             EXPECT_FALSE(bool(res.modified));
             EXPECT_FALSE(bool(res.etag));
         } break;
@@ -73,6 +75,7 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(TemporaryError)) {
             ASSERT_TRUE(res.data.get());
             EXPECT_EQ("Hello World!", *res.data);
             EXPECT_FALSE(bool(res.expires));
+            EXPECT_FALSE(res.mustRevalidate);
             EXPECT_FALSE(bool(res.modified));
             EXPECT_FALSE(bool(res.etag));
             loop.stop();
@@ -99,6 +102,7 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(ConnectionError)) {
         EXPECT_EQ(Response::Error::Reason::Connection, res.error->reason);
         ASSERT_FALSE(res.data.get());
         EXPECT_FALSE(bool(res.expires));
+        EXPECT_FALSE(res.mustRevalidate);
         EXPECT_FALSE(bool(res.modified));
         EXPECT_FALSE(bool(res.etag));
 
@@ -126,6 +130,7 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(Timeout)) {
         ASSERT_TRUE(res.data.get());
         EXPECT_EQ("Hello World!", *res.data);
         EXPECT_TRUE(bool(res.expires));
+        EXPECT_FALSE(res.mustRevalidate);
         EXPECT_FALSE(bool(res.modified));
         EXPECT_FALSE(bool(res.etag));
         if (counter == 4) {
@@ -150,6 +155,7 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(RetryDelayOnExpiredTile)) {
         counter++;
         EXPECT_EQ(nullptr, res.error);
         EXPECT_GT(util::now(), *res.expires);
+        EXPECT_FALSE(res.mustRevalidate);
     });
 
     util::Timer timer;
@@ -170,6 +176,7 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(RetryOnClockSkew)) {
 
     const Resource resource { Resource::Unknown, "http://127.0.0.1:3000/clockskew" };
     std::unique_ptr<AsyncRequest> req1 = fs.request(resource, [&](Response res) {
+        EXPECT_FALSE(res.mustRevalidate);
         switch (counter++) {
         case 0: {
             EXPECT_EQ(nullptr, res.error);
@@ -240,6 +247,7 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(Load)) {
             ASSERT_TRUE(res.data.get());
             EXPECT_EQ(std::string("Request ") +  std::to_string(current), *res.data);
             EXPECT_FALSE(bool(res.expires));
+            EXPECT_FALSE(res.mustRevalidate);
             EXPECT_FALSE(bool(res.modified));
             EXPECT_FALSE(bool(res.etag));
 
@@ -277,6 +285,7 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(NetworkStatusChange)) {
          ASSERT_TRUE(res.data.get());
          EXPECT_EQ("Response", *res.data);
          EXPECT_FALSE(bool(res.expires));
+         EXPECT_FALSE(res.mustRevalidate);
          EXPECT_FALSE(bool(res.modified));
          EXPECT_FALSE(bool(res.etag));
          loop.stop();
@@ -315,6 +324,7 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(NetworkStatusChangePreempt)) {
         EXPECT_EQ(Response::Error::Reason::Connection, res.error->reason);
         ASSERT_FALSE(res.data.get());
         EXPECT_FALSE(bool(res.expires));
+        EXPECT_FALSE(res.mustRevalidate);
         EXPECT_FALSE(bool(res.modified));
         EXPECT_FALSE(bool(res.etag));
 

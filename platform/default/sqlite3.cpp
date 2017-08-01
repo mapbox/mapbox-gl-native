@@ -287,6 +287,11 @@ bool Statement::run() {
     }
 }
 
+template <> bool Statement::get(int offset) {
+    assert(impl);
+    return sqlite3_column_int(impl->stmt, offset);
+}
+
 template <> int Statement::get(int offset) {
     assert(impl);
     return sqlite3_column_int(impl->stmt, offset);
