@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
-const path = require('path');
-const fs = require('fs');
+require('flow-remove-types/register');
 
+const path = require('path');
 const shaders = require('../mapbox-gl-js/src/shaders');
 const outputPath = 'src/mbgl/shaders';
 
