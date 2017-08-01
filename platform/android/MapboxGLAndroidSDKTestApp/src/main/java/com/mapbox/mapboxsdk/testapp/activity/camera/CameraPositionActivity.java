@@ -68,7 +68,7 @@ public class CameraPositionActivity extends AppCompatActivity implements OnMapRe
       }
     });
 
-    mapboxMap.setOnCameraMoveStartedistener(new MapboxMap.OnCameraMoveStartedListener() {
+    mapboxMap.setOnCameraMoveStartedListener(new MapboxMap.OnCameraMoveStartedListener() {
 
       private final String[] REASONS = {"REASON_API_GESTURE", "REASON_DEVELOPER_ANIMATION", "REASON_API_ANIMATION"};
 
