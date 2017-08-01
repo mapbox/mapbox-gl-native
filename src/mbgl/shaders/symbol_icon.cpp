@@ -32,6 +32,7 @@ varying lowp float opacity;
 uniform lowp float u_opacity;
 #endif
 
+
 uniform mat4 u_matrix;
 uniform mat4 u_label_plane_matrix;
 uniform mat4 u_gl_coord_matrix;
@@ -45,12 +46,13 @@ varying vec2 v_tex;
 varying vec2 v_fade_tex;
 
 void main() {
-
+    
 #ifndef HAS_UNIFORM_u_opacity
     opacity = unpack_mix_vec2(a_opacity, a_opacity_t);
 #else
     lowp float opacity = u_opacity;
 #endif
+
 
     vec2 a_pos = a_pos_offset.xy;
     vec2 a_offset = a_pos_offset.zw;
@@ -125,14 +127,16 @@ varying lowp float opacity;
 uniform lowp float u_opacity;
 #endif
 
+
 varying vec2 v_tex;
 varying vec2 v_fade_tex;
 
 void main() {
-
+    
 #ifdef HAS_UNIFORM_u_opacity
     lowp float opacity = u_opacity;
 #endif
+
 
     lowp float alpha = texture2D(u_fadetexture, v_fade_tex).a * opacity;
     gl_FragColor = texture2D(u_texture, v_tex) * alpha;
