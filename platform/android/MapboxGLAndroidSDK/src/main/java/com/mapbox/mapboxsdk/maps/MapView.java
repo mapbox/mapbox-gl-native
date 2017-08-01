@@ -108,8 +108,7 @@ public class MapView extends FrameLayout {
 
   private void initialise(@NonNull final Context context, @NonNull final MapboxMapOptions options) {
     if (isInEditMode()) {
-      // in IDE, show preview map
-      LayoutInflater.from(context).inflate(R.layout.mapbox_mapview_preview, this);
+      // in IDE layout editor, just return
       return;
     }
     mapboxMapOptions = options;
