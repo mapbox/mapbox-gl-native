@@ -2,7 +2,21 @@
 
 Mapbox welcomes participation and contributions from everyone.  If you'd like to do so please see the [`Contributing Guide`](https://github.com/mapbox/mapbox-gl-native/blob/master/CONTRIBUTING.md) first to get started.
 
-## 5.1.1 - TBA
+## 5.1.2 - August 2, 20017
+
+* Disable program caching on Ardreno GPU 3xx, 4xx and 5xx [#9625](https://github.com/mapbox/mapbox-gl-native/pull/9625)
+* GeoJSON proguard issue [#9577](https://github.com/mapbox/mapbox-gl-native/pull/9577)
+* Harden click events of shape annotations [#9585](https://github.com/mapbox/mapbox-gl-native/pull/9585)
+* Validate Marker before opening InfoWindow [#9586](https://github.com/mapbox/mapbox-gl-native/pull/9586)
+* Fix added to map check [#9602](https://github.com/mapbox/mapbox-gl-native/pull/9602)
+* Don't query shape annotations if none were added [#9606](https://github.com/mapbox/mapbox-gl-native/pull/9606)
+* Fix compass direction [#9632](https://github.com/mapbox/mapbox-gl-native/pull/9632)
+* Remove preview image integration [#9657](https://github.com/mapbox/mapbox-gl-native/pull/9657)
+* Try/catch initialization of telemetry [#9658](https://github.com/mapbox/mapbox-gl-native/pull/9658)
+* Fix typo OnCameraMoveStartedListener [#9664](https://github.com/mapbox/mapbox-gl-native/pull/9664)
+* Bump MAS dependency to 5.2.0 [#9671](https://github.com/mapbox/mapbox-gl-native/pull/9671)
+
+## 5.1.1 - July 21, 2017
 
 * Rework attribution binding [#9433](https://github.com/mapbox/mapbox-gl-native/pull/9433)
 * BackendScope changes [#9538](https://github.com/mapbox/mapbox-gl-native/pull/9538)
