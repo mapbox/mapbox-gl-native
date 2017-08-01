@@ -7,7 +7,7 @@ ext {
     versionCode = 11
     versionName = "5.0.0"
 
-    mapboxServicesVersion = "2.1.3"
+    mapboxServicesVersion = "2.2.0"
     supportLibVersion = "25.3.1"
     espressoVersion = '2.2.2'
     testRunnerVersion = '0.5'
