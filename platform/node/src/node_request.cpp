@@ -58,43 +58,47 @@ void NodeRequest::HandleCallback(const Nan::FunctionCallbackInfo<v8::Value>& inf
 
     mbgl::Response response;
 
-    if (info.Length() < 1) {
-        response.noContent = true;
-    } else if (info[0]->IsObject()) {
+    if (info.Length() >= 1 && info[0]->BooleanValue()) {
+        // First parameter is an error argument.
         auto err = Nan::To<v8::Object>(info[0]).ToLocalChecked();
-        auto msg = Nan::New("message").ToLocalChecked();
 
-        if (Nan::Has(err, msg).FromJust()) {
-            request->SetErrorMessage(*Nan::Utf8String(
-                Nan::Get(err, msg).ToLocalChecked()));
+        // Extract the status code from the Error object, if it has one.
+        mbgl::ResourceStatus status = mbgl::ResourceStatus::OtherError;
+        if (Nan::Has(err, Nan::New("code").ToLocalChecked()).FromJust()) {
+            status = static_cast<mbgl::ResourceStatus>(
+                Nan::To<uint32_t>(Nan::Get(err, Nan::New("code").ToLocalChecked()).ToLocalChecked())
+                    .FromMaybe(static_cast<uint32_t>(mbgl::ResourceStatus::OtherError)));
+            // Validate the enum value.
+            switch (status) {
+                    case mbgl::ResourceStatus::NotFoundError:
+                    case mbgl::ResourceStatus::ServerError:
+                    case mbgl::ResourceStatus::ConnectionError:
+                    case mbgl::ResourceStatus::RateLimitError:
+                    case mbgl::ResourceStatus::OtherError:
+                        // Valid error enums.
+                        break;
+                    default:
+                        // Invalid error enums.
+                        return Nan::ThrowTypeError("Invalid error code. Must be one of NotFound, server, Connection, RateLimit, or Other");
+            }
         }
-    } else if (info[0]->IsString()) {
-        request->SetErrorMessage(*Nan::Utf8String(info[0]));
-    } else if (info.Length() < 2 || !info[1]->IsObject()) {
-        return Nan::ThrowTypeError("Second argument must be a response object");
-    } else {
+
+        // Extract the error message from the Error object.
+        std::string message;
+        if (Nan::Has(err, Nan::New("message").ToLocalChecked()).FromJust()) {
+            Nan::Utf8String string(
+                Nan::Get(err, Nan::New("message").ToLocalChecked()).ToLocalChecked());
+            message.assign(*string, string.length());
+        } else {
+            Nan::Utf8String string(err);
+            message.assign(*string, string.length());
+        }
+
+        response.error = std::make_unique<mbgl::Response::Error>(status, message);
+    } else if (info.Length() >= 2) {
+        // This is a successful response. It has an object as the second parameter that
+        // may contain data.
         auto res = Nan::To<v8::Object>(info[1]).ToLocalChecked();
-
-        if (Nan::Has(res, Nan::New("modified").ToLocalChecked()).FromJust()) {
-            const double modified = Nan::To<double>(Nan::Get(res, Nan::New("modified").ToLocalChecked()).ToLocalChecked()).FromJust();
-            if (!std::isnan(modified)) {
-                response.modified = mbgl::Timestamp{ mbgl::Seconds(
-                    static_cast<mbgl::Seconds::rep>(modified / 1000)) };
-            }
-        }
-
-        if (Nan::Has(res, Nan::New("expires").ToLocalChecked()).FromJust()) {
-            const double expires = Nan::To<double>(Nan::Get(res, Nan::New("expires").ToLocalChecked()).ToLocalChecked()).FromJust();
-            if (!std::isnan(expires)) {
-                response.expires = mbgl::Timestamp{ mbgl::Seconds(
-                    static_cast<mbgl::Seconds::rep>(expires / 1000)) };
-            }
-        }
-
-        if (Nan::Has(res, Nan::New("etag").ToLocalChecked()).FromJust()) {
-            const Nan::Utf8String etag(Nan::Get(res, Nan::New("etag").ToLocalChecked()).ToLocalChecked());
-            response.etag = std::string { *etag, size_t(etag.length()) };
-        }
 
         if (Nan::Has(res, Nan::New("data").ToLocalChecked()).FromJust()) {
             auto data = Nan::Get(res, Nan::New("data").ToLocalChecked()).ToLocalChecked();
@@ -106,7 +110,11 @@ void NodeRequest::HandleCallback(const Nan::FunctionCallbackInfo<v8::Value>& inf
             } else {
                 return Nan::ThrowTypeError("Response data must be a Buffer");
             }
+        } else {
+            response.noContent = true;
         }
+    } else {
+        response.noContent = true;
     }
 
     if (request->ErrorMessage()) {

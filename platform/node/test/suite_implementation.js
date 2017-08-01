@@ -15,15 +15,25 @@ module.exports = function (style, options, callback) {
         ratio: options.pixelRatio,
         request: function(req, callback) {
             request(req.url, {encoding: null}, function (err, response, body) {
+                var result;
                 if (err) {
-                    callback(err);
+                    err.code = mbgl.ErrorCode.Connection;
+                } else if (response.statusCode == 200) {
+                    result = { data: body };
+                } else if (response.statusCode == 204) {
+                    result = {}; // no content
                 } else if (response.statusCode == 404) {
-                    callback();
-                } else if (response.statusCode != 200) {
-                    callback(new Error(response.statusMessage));
+                    err = new Error(response.statusMessage);
+                    err.code = mbgl.ErrorCode.NotFound;
+                } else if (response.statusCode == 429) {
+                    err = new Error(response.statusMessage);
+                    err.code = mbgl.ErrorCode.RateLimit;
                 } else {
-                    callback(null, {data: body});
+                    err = new Error(response.statusMessage);
+                    err.code = (response.statusCode >= 500 && response.statusCode < 600) ?
+                                    mbgl.ErrorCode.ServerError : mbgl.ErrorCode.OtherError;
                 }
+                callback(err, result);
             });
         }
     });

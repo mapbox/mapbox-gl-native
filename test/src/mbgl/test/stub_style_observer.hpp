@@ -18,7 +18,7 @@ public:
         if (sourceChanged) sourceChanged(source);
     }
 
-    void onSourceError(Source& source, std::exception_ptr error) override {
+    void onSourceError(Source& source, std::exception_ptr error, EventSeverity) override {
         if (sourceError) sourceError(source, error);
     }
 
@@ -26,7 +26,7 @@ public:
         if (sourceDescriptionChanged) sourceDescriptionChanged(source);
     }
 
-    void onResourceError(std::exception_ptr error) override {
+    void onResourceError(std::exception_ptr error, EventSeverity) override {
         if (resourceError) resourceError(error);
     };
 

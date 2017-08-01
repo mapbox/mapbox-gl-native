@@ -47,7 +47,6 @@ TEST(RasterTile, setError) {
     tile.setError(std::make_exception_ptr(std::runtime_error("test")), 0);
     EXPECT_FALSE(tile.isRenderable());
     EXPECT_TRUE(tile.isLoaded());
-    EXPECT_TRUE(tile.isComplete());
 }
 
 TEST(RasterTile, onError) {
@@ -56,7 +55,6 @@ TEST(RasterTile, onError) {
     tile.onError(std::make_exception_ptr(std::runtime_error("test")), 0);
     EXPECT_FALSE(tile.isRenderable());
     EXPECT_TRUE(tile.isLoaded());
-    EXPECT_TRUE(tile.isComplete());
 }
 
 TEST(RasterTile, onParsed) {
@@ -65,7 +63,6 @@ TEST(RasterTile, onParsed) {
     tile.onParsed(std::make_unique<RasterBucket>(PremultipliedImage{}), 0);
     EXPECT_TRUE(tile.isRenderable());
     EXPECT_TRUE(tile.isLoaded());
-    EXPECT_TRUE(tile.isComplete());
 }
 
 TEST(RasterTile, onParsedEmpty) {
@@ -74,5 +71,4 @@ TEST(RasterTile, onParsedEmpty) {
     tile.onParsed(nullptr, 0);
     EXPECT_FALSE(tile.isRenderable());
     EXPECT_TRUE(tile.isLoaded());
-    EXPECT_TRUE(tile.isComplete());
 }

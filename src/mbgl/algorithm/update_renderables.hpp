@@ -44,7 +44,6 @@ void updateRenderables(GetTileFn getTile,
             renderTile(idealRenderTileID, *tile);
         } else {
             // We are now attempting to load child and parent tiles.
-            bool parentHasTriedOptional = tile->hasTriedOptional();
             bool parentIsLoaded = tile->isLoaded();
 
             // The tile isn't loaded yet, but retain it anyway because it's an ideal tile.
@@ -92,7 +91,7 @@ void updateRenderables(GetTileFn getTile,
                     }
 
                     tile = getTile(parentDataTileID);
-                    if (!tile && (parentHasTriedOptional || parentIsLoaded)) {
+                    if (!tile && parentIsLoaded) {
                         tile = createTile(parentDataTileID);
                     }
 
@@ -102,7 +101,6 @@ void updateRenderables(GetTileFn getTile,
 
                         // Save the current values, since they're the parent of the next iteration
                         // of the parent tile ascent loop.
-                        parentHasTriedOptional = tile->hasTriedOptional();
                         parentIsLoaded = tile->isLoaded();
 
                         if (tile->isRenderable()) {

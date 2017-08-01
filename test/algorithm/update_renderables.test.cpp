@@ -171,7 +171,7 @@ TEST(UpdateRenderables, SingleTile) {
 
     // Mark the created tile as having the optional request tried.
     log.clear();
-    source.dataTiles[{ 1, 0, { 1, 0, 1 } }]->triedOptional = true;
+    source.dataTiles[{ 1, 0, { 1, 0, 1 } }]->loaded = true;
     algorithm::updateRenderables(getTileData, createTileData, retainTileData, renderTile,
                                  source.idealTiles, source.zoomRange, 1);
     EXPECT_EQ(ActionLog({
@@ -183,7 +183,7 @@ TEST(UpdateRenderables, SingleTile) {
                   GetTileDataAction{ { 2, 0, { 2, 1, 3 } }, NotFound },    // ...
                   GetTileDataAction{ { 0, 0, { 0, 0, 0 } }, NotFound },    // parent tile
                   CreateTileDataAction{ { 0, 0, { 0, 0, 0 } } },           // load parent tile
-                  RetainTileDataAction{ { 0, 0, { 0, 0, 0 } }, Resource::Necessity::Optional }, //
+                  RetainTileDataAction{ { 0, 0, { 0, 0, 0 } }, Resource::Necessity::Required }, //
 
                   GetTileDataAction{ { 1, 0, { 1, 1, 1 } }, Found },       // found ideal tile
                   RetainTileDataAction{ { 1, 0, { 1, 1, 1 } }, Resource::Necessity::Required }, //
@@ -333,7 +333,7 @@ TEST(UpdateRenderables, DontUseWrongParentTile) {
 
     // Now mark the created tile as having the optional request tried.
     log.clear();
-    source.dataTiles[{ 2, 0, { 2, 0, 0 } }]->triedOptional = true;
+    source.dataTiles[{ 2, 0, { 2, 0, 0 } }]->loaded = true;
     algorithm::updateRenderables(getTileData, createTileData, retainTileData, renderTile,
                                  source.idealTiles, source.zoomRange, 2);
     EXPECT_EQ(ActionLog({
@@ -345,7 +345,7 @@ TEST(UpdateRenderables, DontUseWrongParentTile) {
                   GetTileDataAction{ { 3, 0, { 3, 1, 1 } }, NotFound },    // ...
                   GetTileDataAction{ { 1, 0, { 1, 0, 0 } }, NotFound },    // parent tile, missing
                   CreateTileDataAction{ { 1, 0, { 1, 0, 0 } } },           // find optional parent
-                  RetainTileDataAction{ { 1, 0, { 1, 0, 0 } }, Resource::Necessity::Optional }, //
+                  RetainTileDataAction{ { 1, 0, { 1, 0, 0 } }, Resource::Necessity::Required }, //
                   GetTileDataAction{ { 0, 0, { 0, 0, 0 } }, NotFound },    // parent tile, missing
               }),
               log);
@@ -364,7 +364,7 @@ TEST(UpdateRenderables, DontUseWrongParentTile) {
                   GetTileDataAction{ { 3, 0, { 3, 1, 0 } }, NotFound },    // ...
                   GetTileDataAction{ { 3, 0, { 3, 1, 1 } }, NotFound },    // ...
                   GetTileDataAction{ { 1, 0, { 1, 0, 0 } }, Found },       // parent tile not ready
-                  RetainTileDataAction{ { 1, 0, { 1, 0, 0 } }, Resource::Necessity::Optional }, //
+                  RetainTileDataAction{ { 1, 0, { 1, 0, 0 } }, Resource::Necessity::Required }, //
                   GetTileDataAction{ { 0, 0, { 0, 0, 0 } }, NotFound },    // missing parent tile
 
                   GetTileDataAction{ { 2, 0, { 2, 2, 0 } }, NotFound },    // missing ideal tile
@@ -718,7 +718,7 @@ TEST(UpdateRenderables, UseOverzoomedTileAfterMaxzoom) {
 
     // Mark the created tile as having tried the optional request.
     log.clear();
-    source.dataTiles[{ 2, 0, { 2, 0, 0 } }]->triedOptional = true;
+    source.dataTiles[{ 2, 0, { 2, 0, 0 } }]->loaded = true;
     algorithm::updateRenderables(getTileData, createTileData, retainTileData, renderTile,
                                  source.idealTiles, source.zoomRange, 2);
     EXPECT_EQ(
@@ -728,7 +728,7 @@ TEST(UpdateRenderables, UseOverzoomedTileAfterMaxzoom) {
             GetTileDataAction{ { 3, 0, { 2, 0, 0 } }, NotFound },    // overzoomed tile, not children!
             GetTileDataAction{ { 1, 0, { 1, 0, 0 } }, NotFound },    //
             CreateTileDataAction{ { 1, 0, { 1, 0, 0 } } },           //
-            RetainTileDataAction{ { 1, 0, { 1, 0, 0 } }, Resource::Necessity::Optional }, //
+            RetainTileDataAction{ { 1, 0, { 1, 0, 0 } }, Resource::Necessity::Required }, //
             GetTileDataAction{ { 0, 0, { 0, 0, 0 } }, NotFound },    //
         }),
         log);
@@ -856,7 +856,7 @@ TEST(UpdateRenderables, AscendToNonOverzoomedTiles) {
 
     // Now, mark the created tile as found.
     log.clear();
-    source.dataTiles[{ 3, 0, { 2, 0, 0 } }]->triedOptional = true;
+    source.dataTiles[{ 3, 0, { 2, 0, 0 } }]->loaded = true;
     algorithm::updateRenderables(getTileData, createTileData, retainTileData, renderTile,
                                  source.idealTiles, source.zoomRange, 3);
     EXPECT_EQ(ActionLog({
@@ -865,7 +865,7 @@ TEST(UpdateRenderables, AscendToNonOverzoomedTiles) {
                   GetTileDataAction{ { 4, 0, { 2, 0, 0 } }, NotFound },    //
                   GetTileDataAction{ { 2, 0, { 2, 0, 0 } }, NotFound },    //
                   CreateTileDataAction{ { 2, 0, { 2, 0, 0 } } },           //
-                  RetainTileDataAction{ { 2, 0, { 2, 0, 0 } }, Resource::Necessity::Optional }, //
+                  RetainTileDataAction{ { 2, 0, { 2, 0, 0 } }, Resource::Necessity::Required }, //
                   GetTileDataAction{ { 1, 0, { 1, 0, 0 } }, Found },       //
                   RetainTileDataAction{ { 1, 0, { 1, 0, 0 } }, Resource::Necessity::Optional }, //
                   RenderTileAction{ { 1, 0, 0 }, *tile_1_1_0_0 },       //
@@ -1086,7 +1086,7 @@ TEST(UpdateRenderables, RepeatedRenderWithMissingOptionals) {
 
     // Mark next level has having tried optional.
     log.clear();
-    source.dataTiles[{ 6, 0, { 6, 0, 0 } }]->triedOptional = true;
+    source.dataTiles[{ 6, 0, { 6, 0, 0 } }]->loaded = true;
     algorithm::updateRenderables(getTileData, createTileData, retainTileData, renderTile,
                                  source.idealTiles, source.zoomRange, 6);
     EXPECT_EQ(ActionLog({
@@ -1098,7 +1098,7 @@ TEST(UpdateRenderables, RepeatedRenderWithMissingOptionals) {
                   GetTileDataAction{ { 7, 0, { 7, 1, 1 } }, NotFound },    // ...
                   GetTileDataAction{ { 5, 0, { 5, 0, 0 } }, NotFound },    // ascent
                   CreateTileDataAction{ { 5, 0, { 5, 0, 0 } } },           //
-                  RetainTileDataAction{ { 5, 0, { 5, 0, 0 } }, Resource::Necessity::Optional }, //
+                  RetainTileDataAction{ { 5, 0, { 5, 0, 0 } }, Resource::Necessity::Required }, //
                   GetTileDataAction{ { 4, 0, { 4, 0, 0 } }, NotFound },    // ...
                   GetTileDataAction{ { 3, 0, { 3, 0, 0 } }, NotFound },    // ...
                   GetTileDataAction{ { 2, 0, { 2, 0, 0 } }, NotFound },    // ...
@@ -1119,7 +1119,7 @@ TEST(UpdateRenderables, RepeatedRenderWithMissingOptionals) {
                   GetTileDataAction{ { 7, 0, { 7, 1, 0 } }, NotFound },    // ...
                   GetTileDataAction{ { 7, 0, { 7, 1, 1 } }, NotFound },    // ...
                   GetTileDataAction{ { 5, 0, { 5, 0, 0 } }, Found },       // ascent
-                  RetainTileDataAction{ { 5, 0, { 5, 0, 0 } }, Resource::Necessity::Optional }, //
+                  RetainTileDataAction{ { 5, 0, { 5, 0, 0 } }, Resource::Necessity::Required }, //
                   GetTileDataAction{ { 4, 0, { 4, 0, 0 } }, NotFound },    // ...
                   GetTileDataAction{ { 3, 0, { 3, 0, 0 } }, NotFound },    // ...
                   GetTileDataAction{ { 2, 0, { 2, 0, 0 } }, NotFound },    // ...
@@ -1130,7 +1130,7 @@ TEST(UpdateRenderables, RepeatedRenderWithMissingOptionals) {
 
     // Mark next level has having tried optional.
     log.clear();
-    source.dataTiles[{ 5, 0, { 5, 0, 0 } }]->triedOptional = true;
+    source.dataTiles[{ 5, 0, { 5, 0, 0 } }]->loaded = true;
     algorithm::updateRenderables(getTileData, createTileData, retainTileData, renderTile,
                                  source.idealTiles, source.zoomRange, 6);
     EXPECT_EQ(ActionLog({
@@ -1141,10 +1141,10 @@ TEST(UpdateRenderables, RepeatedRenderWithMissingOptionals) {
                   GetTileDataAction{ { 7, 0, { 7, 1, 0 } }, NotFound },    // ...
                   GetTileDataAction{ { 7, 0, { 7, 1, 1 } }, NotFound },    // ...
                   GetTileDataAction{ { 5, 0, { 5, 0, 0 } }, Found },       // ascent
-                  RetainTileDataAction{ { 5, 0, { 5, 0, 0 } }, Resource::Necessity::Optional }, //
+                  RetainTileDataAction{ { 5, 0, { 5, 0, 0 } }, Resource::Necessity::Required }, //
                   GetTileDataAction{ { 4, 0, { 4, 0, 0 } }, NotFound },    // ...
                   CreateTileDataAction{ { 4, 0, { 4, 0, 0 } } },           //
-                  RetainTileDataAction{ { 4, 0, { 4, 0, 0 } }, Resource::Necessity::Optional }, //
+                  RetainTileDataAction{ { 4, 0, { 4, 0, 0 } }, Resource::Necessity::Required }, //
                   GetTileDataAction{ { 3, 0, { 3, 0, 0 } }, NotFound },    // ...
                   GetTileDataAction{ { 2, 0, { 2, 0, 0 } }, NotFound },    // ...
                   GetTileDataAction{ { 1, 0, { 1, 0, 0 } }, NotFound },    // ...
@@ -1154,7 +1154,7 @@ TEST(UpdateRenderables, RepeatedRenderWithMissingOptionals) {
 
     // Mark next level has having tried optional.
     log.clear();
-    source.dataTiles[{ 4, 0, { 4, 0, 0 } }]->triedOptional = true;
+    source.dataTiles[{ 4, 0, { 4, 0, 0 } }]->loaded = true;
     algorithm::updateRenderables(getTileData, createTileData, retainTileData, renderTile,
                                  source.idealTiles, source.zoomRange, 6);
     EXPECT_EQ(ActionLog({
@@ -1165,12 +1165,12 @@ TEST(UpdateRenderables, RepeatedRenderWithMissingOptionals) {
                   GetTileDataAction{ { 7, 0, { 7, 1, 0 } }, NotFound },    // ...
                   GetTileDataAction{ { 7, 0, { 7, 1, 1 } }, NotFound },    // ...
                   GetTileDataAction{ { 5, 0, { 5, 0, 0 } }, Found },       // ascent
-                  RetainTileDataAction{ { 5, 0, { 5, 0, 0 } }, Resource::Necessity::Optional }, //
+                  RetainTileDataAction{ { 5, 0, { 5, 0, 0 } }, Resource::Necessity::Required }, //
                   GetTileDataAction{ { 4, 0, { 4, 0, 0 } }, Found },       // ...
-                  RetainTileDataAction{ { 4, 0, { 4, 0, 0 } }, Resource::Necessity::Optional }, //
+                  RetainTileDataAction{ { 4, 0, { 4, 0, 0 } }, Resource::Necessity::Required }, //
                   GetTileDataAction{ { 3, 0, { 3, 0, 0 } }, NotFound },    // ...
                   CreateTileDataAction{ { 3, 0, { 3, 0, 0 } } },           //
-                  RetainTileDataAction{ { 3, 0, { 3, 0, 0 } }, Resource::Necessity::Optional }, //
+                  RetainTileDataAction{ { 3, 0, { 3, 0, 0 } }, Resource::Necessity::Required }, //
                   GetTileDataAction{ { 2, 0, { 2, 0, 0 } }, NotFound },    // ...
                   GetTileDataAction{ { 1, 0, { 1, 0, 0 } }, NotFound },    // ...
                   GetTileDataAction{ { 0, 0, { 0, 0, 0 } }, NotFound },    // ...
@@ -1179,7 +1179,7 @@ TEST(UpdateRenderables, RepeatedRenderWithMissingOptionals) {
 
     // Mark next level has having tried optional.
     log.clear();
-    source.dataTiles[{ 3, 0, { 3, 0, 0 } }]->triedOptional = true;
+    source.dataTiles[{ 3, 0, { 3, 0, 0 } }]->loaded = true;
     algorithm::updateRenderables(getTileData, createTileData, retainTileData, renderTile,
                                  source.idealTiles, source.zoomRange, 6);
     EXPECT_EQ(ActionLog({
@@ -1190,14 +1190,14 @@ TEST(UpdateRenderables, RepeatedRenderWithMissingOptionals) {
                   GetTileDataAction{ { 7, 0, { 7, 1, 0 } }, NotFound },    // ...
                   GetTileDataAction{ { 7, 0, { 7, 1, 1 } }, NotFound },    // ...
                   GetTileDataAction{ { 5, 0, { 5, 0, 0 } }, Found },       // ascent
-                  RetainTileDataAction{ { 5, 0, { 5, 0, 0 } }, Resource::Necessity::Optional }, //
+                  RetainTileDataAction{ { 5, 0, { 5, 0, 0 } }, Resource::Necessity::Required }, //
                   GetTileDataAction{ { 4, 0, { 4, 0, 0 } }, Found },       // ...
-                  RetainTileDataAction{ { 4, 0, { 4, 0, 0 } }, Resource::Necessity::Optional }, //
+                  RetainTileDataAction{ { 4, 0, { 4, 0, 0 } }, Resource::Necessity::Required }, //
                   GetTileDataAction{ { 3, 0, { 3, 0, 0 } }, Found },       // ...
-                  RetainTileDataAction{ { 3, 0, { 3, 0, 0 } }, Resource::Necessity::Optional }, //
+                  RetainTileDataAction{ { 3, 0, { 3, 0, 0 } }, Resource::Necessity::Required }, //
                   GetTileDataAction{ { 2, 0, { 2, 0, 0 } }, NotFound },    // ...
                   CreateTileDataAction{ { 2, 0, { 2, 0, 0 } } },           //
-                  RetainTileDataAction{ { 2, 0, { 2, 0, 0 } }, Resource::Necessity::Optional }, //
+                  RetainTileDataAction{ { 2, 0, { 2, 0, 0 } }, Resource::Necessity::Required }, //
                   GetTileDataAction{ { 1, 0, { 1, 0, 0 } }, NotFound },    // ...
                   GetTileDataAction{ { 0, 0, { 0, 0, 0 } }, NotFound },    // ...
               }),
@@ -1217,11 +1217,11 @@ TEST(UpdateRenderables, RepeatedRenderWithMissingOptionals) {
                   GetTileDataAction{ { 7, 0, { 7, 1, 0 } }, NotFound },    // ...
                   GetTileDataAction{ { 7, 0, { 7, 1, 1 } }, NotFound },    // ...
                   GetTileDataAction{ { 5, 0, { 5, 0, 0 } }, Found },       // ascent
-                  RetainTileDataAction{ { 5, 0, { 5, 0, 0 } }, Resource::Necessity::Optional }, //
+                  RetainTileDataAction{ { 5, 0, { 5, 0, 0 } }, Resource::Necessity::Required }, //
                   GetTileDataAction{ { 4, 0, { 4, 0, 0 } }, Found },       // ...
-                  RetainTileDataAction{ { 4, 0, { 4, 0, 0 } }, Resource::Necessity::Optional }, //
+                  RetainTileDataAction{ { 4, 0, { 4, 0, 0 } }, Resource::Necessity::Required }, //
                   GetTileDataAction{ { 3, 0, { 3, 0, 0 } }, Found },       // ...
-                  RetainTileDataAction{ { 3, 0, { 3, 0, 0 } }, Resource::Necessity::Optional }, //
+                  RetainTileDataAction{ { 3, 0, { 3, 0, 0 } }, Resource::Necessity::Required }, //
                   RenderTileAction{ { 3, 0, 0 }, *tile_3_3_0_0 },       //
               }),
               log);
@@ -1239,7 +1239,6 @@ TEST(UpdateRenderables, LoadRequiredIfIdealTileCantBeFound) {
     source.idealTiles.emplace(UnwrappedTileID{ 6, 0, 0 });
 
     auto tile_6_6_0_0 = source.createTileData(OverscaledTileID{ 6, 0, { 6, 0, 0 } });
-    tile_6_6_0_0->triedOptional = true;
     tile_6_6_0_0->loaded = true;
 
     algorithm::updateRenderables(getTileData, createTileData, retainTileData, renderTile,

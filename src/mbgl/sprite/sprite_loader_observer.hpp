@@ -1,5 +1,7 @@
 #pragma once
 
+#include <mbgl/util/event.hpp>
+
 #include <exception>
 #include <memory>
 #include <vector>
@@ -15,7 +17,7 @@ public:
     virtual ~SpriteLoaderObserver() = default;
 
     virtual void onSpriteLoaded(std::vector<std::unique_ptr<style::Image>>&&) {}
-    virtual void onSpriteError(std::exception_ptr) {}
+    virtual void onSpriteError(std::exception_ptr, EventSeverity = EventSeverity::Error) {}
 };
 
 } // namespace mbgl

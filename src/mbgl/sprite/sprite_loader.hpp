@@ -23,6 +23,8 @@ public:
 
     void load(const std::string& url, Scheduler&, FileSource&);
 
+    bool isLoaded() const;
+
     void setObserver(SpriteLoaderObserver*);
 
 private:
@@ -30,8 +32,8 @@ private:
 
     // Invoked by SpriteAtlasWorker
     friend class SpriteLoaderWorker;
-    void onParsed(std::vector<std::unique_ptr<style::Image>>&&);
-    void onError(std::exception_ptr);
+    void onParsed(std::vector<std::unique_ptr<style::Image>>&&, uint64_t resultCorrelationID);
+    void onError(std::exception_ptr, uint64_t resultCorrelationID);
 
     const float pixelRatio;
 

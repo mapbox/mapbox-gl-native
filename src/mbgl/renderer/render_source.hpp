@@ -84,7 +84,7 @@ protected:
     bool enabled = false;
 
     void onTileChanged(Tile&) final;
-    void onTileError(Tile&, std::exception_ptr) final;
+    void onTileError(Tile&, std::exception_ptr, EventSeverity) final;
 };
 
 } // namespace mbgl

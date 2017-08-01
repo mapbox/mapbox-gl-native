@@ -1,5 +1,7 @@
 #pragma once
 
+#include <mbgl/util/event.hpp>
+
 #include <exception>
 
 namespace mbgl {
@@ -17,7 +19,7 @@ public:
     virtual void onInvalidate() {}
 
     // Resource failed to download / parse
-    virtual void onResourceError(std::exception_ptr) {}
+    virtual void onResourceError(std::exception_ptr, EventSeverity = EventSeverity::Error) {}
 
     // First frame
     virtual void onWillStartRenderingMap() {}

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <mbgl/util/event.hpp>
+
 #include <exception>
 
 namespace mbgl {
@@ -12,7 +14,10 @@ public:
     virtual ~RenderSourceObserver() = default;
 
     virtual void onTileChanged(RenderSource&, const OverscaledTileID&) {}
-    virtual void onTileError(RenderSource&, const OverscaledTileID&, std::exception_ptr) {}
+    virtual void onTileError(RenderSource&,
+                             const OverscaledTileID&,
+                             std::exception_ptr,
+                             EventSeverity = EventSeverity::Error) {}
 };
 
 } // namespace mbgl

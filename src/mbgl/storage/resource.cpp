@@ -4,10 +4,22 @@
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/token.hpp>
 #include <mbgl/util/url.hpp>
+#include <mbgl/util/enum.hpp>
 
 #include <cmath>
 
 namespace mbgl {
+
+MBGL_DEFINE_ENUM(ResourceKind, {
+    { ResourceKind::Unknown, "Unknown" },
+    { ResourceKind::Style, "Style" },
+    { ResourceKind::Source, "Source" },
+    { ResourceKind::Tile, "Tile" },
+    { ResourceKind::Glyphs, "Glyphs" },
+    { ResourceKind::SpriteImage, "SpriteImage" },
+    { ResourceKind::SpriteJSON, "SpriteJSON" },
+    { ResourceKind::Image, "Image" },
+});
 
 static std::string getQuadKey(int32_t x, int32_t y, int8_t z) {
     std::string quadKey;

@@ -53,7 +53,6 @@ TEST(VectorTile, setError) {
     tile.setError(std::make_exception_ptr(std::runtime_error("test")), 0);
     EXPECT_FALSE(tile.isRenderable());
     EXPECT_TRUE(tile.isLoaded());
-    EXPECT_TRUE(tile.isComplete());
 }
 
 TEST(VectorTile, onError) {
@@ -62,7 +61,6 @@ TEST(VectorTile, onError) {
     tile.onError(std::make_exception_ptr(std::runtime_error("test")), 0);
     EXPECT_FALSE(tile.isRenderable());
     EXPECT_TRUE(tile.isLoaded());
-    EXPECT_TRUE(tile.isComplete());
 }
 
 TEST(VectorTile, Issue7615) {

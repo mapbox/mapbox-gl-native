@@ -10,6 +10,7 @@ VectorTile::VectorTile(const OverscaledTileID& id_,
                        const TileParameters& parameters,
                        const Tileset& tileset)
     : GeometryTile(id_, sourceID_, parameters), loader(*this, id_, parameters, tileset) {
+    logDebug("VectorTile::VectorTile");
 }
 
 void VectorTile::setNecessity(Necessity necessity) {
@@ -17,7 +18,10 @@ void VectorTile::setNecessity(Necessity necessity) {
 }
 
 void VectorTile::setError(std::exception_ptr err, const bool complete) {
-    (void)complete;
+    if (complete) {
+        failed = true;
+    }
+    logDebug("VectorTile::setError");
     GeometryTile::setError(err);
 }
 
@@ -28,6 +32,10 @@ void VectorTile::setData(optional<std::shared_ptr<const std::string>> data,
     (void)complete;
     modified = modified_;
     expires = expires_;
+    if (complete) {
+        loaded = true;
+    }
+    logDebug("VectorTile::setData");
 
     if (data) {
         GeometryTile::setData(*data ? std::make_unique<VectorTileData>(*data) : nullptr);

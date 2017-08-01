@@ -422,16 +422,25 @@ void RenderStyle::onLowMemory() {
     }
 }
 
-void RenderStyle::onGlyphsError(const FontStack& fontStack, const GlyphRange& glyphRange, std::exception_ptr error) {
-    Log::Error(Event::Style, "Failed to load glyph range %d-%d for font stack %s: %s",
-               glyphRange.first, glyphRange.second, fontStackToString(fontStack).c_str(), util::toString(error).c_str());
-    observer->onResourceError(error);
+void RenderStyle::onGlyphsError(const FontStack& fontStack,
+                                const GlyphRange& glyphRange,
+                                std::exception_ptr error,
+                                const EventSeverity severity) {
+    Log::Record(severity, Event::Style, "Failed to load glyph range %d-%d for font stack %s: %s",
+                glyphRange.first, glyphRange.second, fontStackToString(fontStack).c_str(),
+                util::toString(error).c_str());
+    observer->onResourceError(error, severity);
 }
 
-void RenderStyle::onTileError(RenderSource& source, const OverscaledTileID& tileID, std::exception_ptr error) {
-    Log::Error(Event::Style, "Failed to load tile %s for source %s: %s",
-               util::toString(tileID).c_str(), source.baseImpl->id.c_str(), util::toString(error).c_str());
-    observer->onResourceError(error);
+void RenderStyle::onTileError(RenderSource& source,
+                              const OverscaledTileID& tileID,
+                              std::exception_ptr error,
+                              const EventSeverity severity) {
+    Log::Record(severity, Event::Style, "Failed to load tile %s for source %s: %s",
+                util::toString(tileID).c_str(), source.baseImpl->id.c_str(),
+                util::toString(error).c_str());
+    observer->onResourceError(error, severity);
+    observer->onInvalidate();
 }
 
 void RenderStyle::onTileChanged(RenderSource&, const OverscaledTileID&) {

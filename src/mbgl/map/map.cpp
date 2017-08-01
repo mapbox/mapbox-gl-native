@@ -11,10 +11,12 @@
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
+#include <mbgl/storage/resource_error.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/exception.hpp>
 #include <mbgl/util/mapbox.hpp>
+#include <mbgl/util/enum.hpp>
 #include <mbgl/util/tile_coordinate.hpp>
 #include <mbgl/actor/scheduler.hpp>
 #include <mbgl/util/logging.hpp>
@@ -53,11 +55,11 @@ public:
     void onUpdate(Update) override;
     void onStyleLoading() override;
     void onStyleLoaded() override;
-    void onStyleError(std::exception_ptr) override;
+    void onStyleError(std::exception_ptr, EventSeverity) override;
 
     // RendererObserver
     void onInvalidate() override;
-    void onResourceError(std::exception_ptr) override;
+    void onResourceError(std::exception_ptr, EventSeverity) override;
     void onWillStartRenderingFrame() override;
     void onDidFinishRenderingFrame(RenderMode, bool) override;
     void onWillStartRenderingMap() override;
@@ -703,7 +705,7 @@ void Map::Impl::onUpdate(Update flags) {
         timePoint,
         transform.getState(),
         style->impl->getGlyphURL(),
-        style->impl->spriteLoaded,
+        style->impl->isSpriteLoaded(),
         style->impl->getTransitionOptions(),
         style->impl->getLight()->impl,
         style->impl->getImageImpls(),
@@ -738,12 +740,22 @@ void Map::Impl::onStyleLoaded() {
     observer.onDidFinishLoadingStyle();
 }
 
-void Map::Impl::onStyleError(std::exception_ptr error) {
+void Map::Impl::onStyleError(std::exception_ptr error, const EventSeverity) {
     observer.onDidFailLoadingMap(error);
 }
 
-void Map::Impl::onResourceError(std::exception_ptr error) {
-    if (mode == MapMode::Still && stillImageRequest) {
+void Map::Impl::onResourceError(std::exception_ptr error, const EventSeverity severity) {
+    try {
+        std::rethrow_exception(error);
+    } catch (const util::ResourceError& err) {
+        Log::Record(severity, Event::Resource, "%s loading %s from %s: %s",
+                    Enum<ResourceStatus>::toString(err.status),
+                    Enum<ResourceKind>::toString(err.kind), err.url.c_str(), err.what());
+    } catch (const std::exception& err) {
+        Log::Record(severity, Event::Resource, err.what());
+    }
+
+    if (severity == EventSeverity::Error && mode == MapMode::Still && stillImageRequest) {
         auto request = std::move(stillImageRequest);
         request->callback(error);
     }

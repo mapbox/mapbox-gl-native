@@ -37,7 +37,7 @@ public:
 
     // RenderStyleObserver implementation
     void onInvalidate() override;
-    void onResourceError(std::exception_ptr) override;
+    void onResourceError(std::exception_ptr, EventSeverity) override;
 
 private:
     void doRender(PaintParameters&);

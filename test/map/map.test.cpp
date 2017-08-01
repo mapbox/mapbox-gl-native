@@ -152,7 +152,7 @@ TEST(Map, Offline) {
     test.fileSource.put(Resource::spriteImage(prefix + "sprite", 1.0), expiredItem("sprite.png"));
     test.fileSource.put(Resource::tile(prefix + "{z}-{x}-{y}.vector.pbf", 1.0, 0, 0, 0, Tileset::Scheme::XYZ), expiredItem("0-0-0.vector.pbf"));
     test.fileSource.put(Resource::glyphs(prefix + "{fontstack}/{range}.pbf", {{"Helvetica"}}, {0, 255}), expiredItem("glyph.pbf"));
-    NetworkStatus::Set(NetworkStatus::Status::Offline);
+    test.fileSource.setOnlineStatus(false);
 
     test.map.getStyle().loadURL(prefix + "style.json");
 
@@ -160,8 +160,6 @@ TEST(Map, Offline) {
                      test::render(test.map, test.view),
                      0.0015,
                      0.1);
-
-    NetworkStatus::Set(NetworkStatus::Status::Online);
 }
 
 TEST(Map, SetStyleInvalidJSON) {

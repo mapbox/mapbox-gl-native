@@ -18,6 +18,7 @@ void RasterTileWorker::parse(std::shared_ptr<const std::string> data, const uint
 
     try {
         auto bucket = std::make_unique<RasterBucket>(decodeImage(*data));
+//        sleep(2);
         parent.invoke(&RasterTile::onParsed, std::move(bucket), correlationID);
     } catch (...) {
         parent.invoke(&RasterTile::onError, std::current_exception(), correlationID);

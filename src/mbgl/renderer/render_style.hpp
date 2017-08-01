@@ -79,11 +79,11 @@ private:
     RenderLight renderLight;
 
     // GlyphManagerObserver implementation.
-    void onGlyphsError(const FontStack&, const GlyphRange&, std::exception_ptr) override;
+    void onGlyphsError(const FontStack&, const GlyphRange&, std::exception_ptr, EventSeverity) override;
 
     // RenderSourceObserver implementation.
     void onTileChanged(RenderSource&, const OverscaledTileID&) override;
-    void onTileError(RenderSource&, const OverscaledTileID&, std::exception_ptr) override;
+    void onTileError(RenderSource&, const OverscaledTileID&, std::exception_ptr, EventSeverity) override;
 
     RenderStyleObserver* observer;
     ZoomHistory zoomHistory;

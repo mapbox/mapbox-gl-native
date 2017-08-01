@@ -22,7 +22,7 @@ public:
         if (spriteLoaded) spriteLoaded(std::move(images));
     }
 
-    void onSpriteError(std::exception_ptr error) override {
+    void onSpriteError(std::exception_ptr error, const EventSeverity) override {
         if (spriteError) spriteError(error);
     }
 

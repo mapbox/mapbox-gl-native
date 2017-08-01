@@ -54,6 +54,4 @@ public:
     Error(ResourceStatus, std::string = "", optional<Timestamp> = {});
 };
 
-std::ostream& operator<<(std::ostream&, ResourceStatus);
-
 } // namespace mbgl

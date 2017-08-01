@@ -106,6 +106,8 @@ GeoJSONTile::GeoJSONTile(const OverscaledTileID& overscaledTileID,
 }
 
 void GeoJSONTile::updateData(mapbox::geometry::feature_collection<int16_t> features) {
+    loaded = true;
+    logDebug("GeoJSONTile::setData");
     GeometryTile::setData(std::make_unique<GeoJSONTileData>(std::move(features)));
 }
 

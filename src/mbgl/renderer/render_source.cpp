@@ -49,8 +49,8 @@ void RenderSource::onTileChanged(Tile& tile) {
     observer->onTileChanged(*this, tile.id);
 }
 
-void RenderSource::onTileError(Tile& tile, std::exception_ptr error) {
-    observer->onTileError(*this, tile.id, error);
+void RenderSource::onTileError(Tile& tile, std::exception_ptr error, const EventSeverity severity) {
+    observer->onTileError(*this, tile.id, error, severity);
 }
 
 bool RenderSource::isEnabled() const {

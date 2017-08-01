@@ -13,7 +13,7 @@ public:
         if (tileChanged) tileChanged(tile);
     }
 
-    void onTileError(Tile& tile, std::exception_ptr error) override {
+    void onTileError(Tile& tile, std::exception_ptr error, EventSeverity) override {
         if (tileError) tileError(tile, error);
     }
 

@@ -19,6 +19,7 @@
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
+#include <mbgl/storage/resource_error.hpp>
 
 namespace mbgl {
 namespace style {
@@ -62,10 +63,15 @@ void Style::Impl::loadURL(const std::string& url_) {
         }
 
         if (res.error) {
-            const std::string message = "loading style failed: " + res.error->message;
-            Log::Error(Event::Setup, message.c_str());
-            observer->onStyleError(std::make_exception_ptr(util::StyleLoadException(message)));
-            observer->onResourceError(std::make_exception_ptr(std::runtime_error(res.error->message)));
+            const std::string message = "Failed to load style: " + res.error->message;
+            const auto severity = loaded ? EventSeverity::Warning : EventSeverity::Error;
+            Log::Record(severity, Event::Setup, message.c_str());
+            observer->onStyleError(std::make_exception_ptr(util::StyleLoadException(message)),
+                                   severity);
+            observer->onResourceError(
+                std::make_exception_ptr(util::ResourceError(res.error->message, ResourceKind::Style,
+                                                            res.error->status, url)),
+                severity);
         } else if (res.notModified || res.noContent) {
             return;
         } else {
@@ -111,7 +117,6 @@ void Style::Impl::parse(const std::string& json_) {
     defaultPitch = parser.pitch;
     setLight(std::make_unique<Light>(parser.light));
 
-    spriteLoaded = false;
     spriteLoader->load(parser.spriteURL, scheduler, fileSource);
     glyphURL = parser.glyphURL;
 
@@ -264,7 +269,7 @@ bool Style::Impl::isLoaded() const {
         return false;
     }
 
-    if (!spriteLoaded) {
+    if (!isSpriteLoaded()) {
         return false;
     }
 
@@ -275,6 +280,10 @@ bool Style::Impl::isLoaded() const {
     }
 
     return true;
+}
+
+bool Style::Impl::isSpriteLoaded() const {
+    return spriteLoader->isLoaded();
 }
 
 void Style::Impl::addImage(std::unique_ptr<style::Image> image) {
@@ -306,12 +315,16 @@ void Style::Impl::onSourceChanged(Source& source) {
     observer->onUpdate(Update::Repaint);
 }
 
-void Style::Impl::onSourceError(Source& source, std::exception_ptr error) {
-    lastError = error;
-    Log::Error(Event::Style, "Failed to load source %s: %s",
-               source.getID().c_str(), util::toString(error).c_str());
-    observer->onSourceError(source, error);
-    observer->onResourceError(error);
+void Style::Impl::onSourceError(Source& source,
+                                std::exception_ptr error,
+                                const EventSeverity severity) {
+    if (severity == EventSeverity::Error) {
+        lastError = error;
+    }
+    Log::Record(severity, Event::Style, "Failed to load source %s: %s", source.getID().c_str(),
+                util::toString(error).c_str());
+    observer->onSourceError(source, error, severity);
+    observer->onResourceError(error, severity);
 }
 
 void Style::Impl::onSourceDescriptionChanged(Source& source) {
@@ -326,14 +339,15 @@ void Style::Impl::onSpriteLoaded(std::vector<std::unique_ptr<Image>>&& images_) 
     for (auto& image : images_) {
         addImage(std::move(image));
     }
-    spriteLoaded = true;
     observer->onUpdate(Update::Repaint); // For *-pattern properties.
 }
 
-void Style::Impl::onSpriteError(std::exception_ptr error) {
-    lastError = error;
-    Log::Error(Event::Style, "Failed to load sprite: %s", util::toString(error).c_str());
-    observer->onResourceError(error);
+void Style::Impl::onSpriteError(std::exception_ptr error, const EventSeverity severity) {
+    if (severity == EventSeverity::Error) {
+        lastError = error;
+    }
+    Log::Record(severity, Event::Style, "Failed to load sprite: %s", util::toString(error).c_str());
+    observer->onResourceError(error, severity);
 }
 
 void Style::Impl::onLayerChanged(Layer& layer) {

@@ -15,8 +15,12 @@ public:
         if (glyphsLoaded) glyphsLoaded(fontStack, glyphRange);
     }
 
-    void onGlyphsError(const FontStack& fontStack, const GlyphRange& glyphRange, std::exception_ptr error) override {
-        if (glyphsError) glyphsError(fontStack, glyphRange, error);
+    void onGlyphsError(const FontStack& fontStack,
+                       const GlyphRange& glyphRange,
+                       std::exception_ptr error,
+                       const EventSeverity) override {
+        if (glyphsError)
+            glyphsError(fontStack, glyphRange, error);
     }
 
     std::function<void (const FontStack&, const GlyphRange&)> glyphsLoaded;

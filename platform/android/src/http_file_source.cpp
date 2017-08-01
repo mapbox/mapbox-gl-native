@@ -132,7 +132,7 @@ void HTTPRequest::onResponse(jni::JNIEnv& env, int code,
         } else {
             response.data = std::make_shared<std::string>();
         }
-    } else if (code == 204 || (code == 404 && resource.kind == ResourceKind::Tile)) {
+    } else if (code == 204) {
         response.noContent = true;
     } else if (code == 304) {
         response.notModified = true;

@@ -28,6 +28,8 @@ TEST(API, TEST_REQUIRES_SERVER(RenderMissingTile)) {
 
     util::RunLoop loop;
 
+    Log::setObserver(std::make_unique<FixtureLogObserver>());
+
     const auto style = util::read_file("test/fixtures/api/water_missing_tiles.json");
 
     HeadlessBackend backend;
@@ -37,8 +39,6 @@ TEST(API, TEST_REQUIRES_SERVER(RenderMissingTile)) {
     DefaultFileSource fileSource(":memory:", "test/fixtures/api/assets");
     ThreadPool threadPool(4);
     StubRendererFrontend rendererFrontend { std::make_unique<Renderer>(backend, pixelRatio, fileSource, threadPool), view };
-
-    Log::setObserver(std::make_unique<FixtureLogObserver>());
 
     Map map { rendererFrontend, MapObserver::nullObserver(), view.getSize(), pixelRatio, fileSource,
         threadPool, MapMode::Still };

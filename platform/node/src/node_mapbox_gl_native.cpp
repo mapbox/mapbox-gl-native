@@ -56,6 +56,33 @@ void RegisterModule(v8::Local<v8::Object> target, v8::Local<v8::Object> module) 
         Nan::New("Resource").ToLocalChecked(),
         resource);
 
+     // Exports ResourceStatus constants.
+    v8::Local<v8::Object> errorCode = Nan::New<v8::Object>();
+
+    Nan::Set(errorCode,
+        Nan::New("NotFound").ToLocalChecked(),
+        Nan::New(static_cast<int32_t>(mbgl::ResourceStatus::NotFoundError)));
+
+    Nan::Set(errorCode,
+        Nan::New("Server").ToLocalChecked(),
+        Nan::New(static_cast<int32_t>(mbgl::ResourceStatus::ServerError)));
+
+    Nan::Set(errorCode,
+        Nan::New("Connection").ToLocalChecked(),
+        Nan::New(static_cast<int32_t>(mbgl::ResourceStatus::ConnectionError)));
+
+    Nan::Set(errorCode,
+        Nan::New("RateLimit").ToLocalChecked(),
+        Nan::New(static_cast<int32_t>(mbgl::ResourceStatus::RateLimitError)));
+
+    Nan::Set(errorCode,
+        Nan::New("Other").ToLocalChecked(),
+        Nan::New(static_cast<int32_t>(mbgl::ResourceStatus::OtherError)));
+
+    Nan::Set(target,
+        Nan::New("ErrorCode").ToLocalChecked(),
+        errorCode);
+
     // Make the exported object inherit from EventEmitter
     v8::Local<v8::Function> require = Nan::Get(module,
         Nan::New("require").ToLocalChecked()).ToLocalChecked().As<v8::Function>();

@@ -68,39 +68,29 @@ public:
             std::vector<Feature>& result,
             const SourceQueryOptions&);
 
-    void setTriedOptional();
-
-    // Returns true when the tile source has received a first response, regardless of whether a load
-    // error occurred or actual data was loaded.
-    bool hasTriedOptional() const {
-        return triedOptional;
-    }
-
-    // Tile data considered "Renderable" can be used for rendering. Data in
-    // partial state is still waiting for network resources but can also
-    // be rendered, although layers will be missing.
+    // Tile data considered "Renderable" can be used for rendering. It doesn't necessarily mean that
+    // there is anything to render, since tiles can be empty. Tiles that are still waiting for
+    // network resources but can also be rendered, although layers will be missing.
     bool isRenderable() const {
         return renderable;
     }
 
-    // A tile is "Loaded" when we have received a response from a FileSource, and have attempted to
-    // parse the tile (if applicable). Tile implementations should set this to true when a load
-    // error occurred, or after the tile was parsed successfully.
+    // A tile is "loaded" when we have received a response from a FileSource, and have attempted
+    // to parse the tile (if applicable), and there are no further operations in progress to acquire
+    // more, newer, or better data. Furthermore, it means that there are no pending layout/placement
+    // or parsing operations going on. Completeness doesn't mean that the tile can be rendered, but
+    // merely that we have exhausted all options to get this tile to a renderable state. Some tiles
+    // may not be renderable, but complete, e.g. when a raster tile couldn't be loaded, or parsing
+    // failed.
     bool isLoaded() const {
-        return loaded;
-    }
-
-    // "Completion" of a tile means that we have attempted to load it, and parsed it completely,
-    // i.e. no parsing or placement operations are pending for that tile.
-    // Completeness doesn't mean that the tile can be rendered, but merely that we have exhausted
-    // all options to get this tile to a renderable state. Some tiles may not be renderable, but
-    // complete, e.g. when a raster tile couldn't be loaded, or parsing failed.
-    bool isComplete() const {
-        return loaded && !pending;
+        return (loaded ? parsed : failed) && !pending;
     }
 
     void dumpDebugLogs() const;
 
+    void logDebug(const char*) const;
+
+    // This information is only used for displaying debugging information.
     const OverscaledTileID id;
     optional<Timestamp> modified;
     optional<Timestamp> expires;
@@ -111,10 +101,24 @@ public:
     virtual float yStretch() const { return 1.0f; }
 
 protected:
-    bool triedOptional = false;
-    bool renderable = false;
-    bool pending = false;
+    // A tile is loaded when we acquired data for it, and no further operations to acquire more,
+    // newer, or better data are in progress.
     bool loaded = false;
+
+    // A tile is marked as failed when we tried to acquire data, but couldn't, and no further
+    // operations to acquire more, newer, or better data are in progress.
+    bool failed = false;
+
+    // A tile is marked as parsed when we attempted to parse its contents. It doesn't necessairly
+    // mean that we *successfully* parsed it, just that there's been an attempt.
+    bool parsed = false;
+
+    // Renderability means that we successfully parsed a tile. Note that it doesn't mean there's
+    // anything to render (e.g. vector tiles may be empty).
+    bool renderable = false;
+
+    // A tile is pending while parsing or placement operations are going on.
+    bool pending = false;
 
     TileObserver* observer = nullptr;
 };

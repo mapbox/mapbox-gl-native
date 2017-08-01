@@ -111,12 +111,8 @@ void HTTPRequest::handleNetworkReply(QNetworkReply *reply)
         response.notModified = true;
         break;
     case 404: {
-        if (m_resource.kind == ResourceKind::Tile) {
-            response.noContent = true;
-        } else {
-            response.error = std::make_unique<Error>(
-                ResourceStatus::NotFoundError, "HTTP status code 404");
-        }
+        response.error = std::make_unique<Error>(
+            ResourceStatus::NotFoundError, "HTTP status code 404");
         break;
     }
     case 429:

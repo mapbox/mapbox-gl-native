@@ -97,12 +97,12 @@ void RenderTile::finishRender(PaintParameters& parameters) {
 
     if (parameters.debugOptions & (MapDebugOptions::Timestamps | MapDebugOptions::ParseStatus)) {
         if (!tile.debugBucket || tile.debugBucket->renderable != tile.isRenderable() ||
-            tile.debugBucket->complete != tile.isComplete() ||
+            tile.debugBucket->loaded != tile.isLoaded() ||
             !(tile.debugBucket->modified == tile.modified) ||
             !(tile.debugBucket->expires == tile.expires) ||
             tile.debugBucket->debugMode != parameters.debugOptions) {
             tile.debugBucket = std::make_unique<DebugBucket>(
-                tile.id, tile.isRenderable(), tile.isComplete(), tile.modified,
+                tile.id, tile.isRenderable(), tile.isLoaded(), tile.modified,
                 tile.expires, parameters.debugOptions, parameters.context);
         }
 

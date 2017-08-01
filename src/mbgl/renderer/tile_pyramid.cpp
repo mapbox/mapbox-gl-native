@@ -31,7 +31,7 @@ TilePyramid::~TilePyramid() = default;
 
 bool TilePyramid::isLoaded() const {
     for (const auto& pair : tiles) {
-        if (!pair.second->isComplete()) {
+        if (!pair.second->isLoaded()) {
             return false;
         }
     }

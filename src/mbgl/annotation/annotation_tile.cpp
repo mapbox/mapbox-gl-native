@@ -23,8 +23,11 @@ void AnnotationTile::setNecessity(Necessity) {
 }
 
 void AnnotationTile::setData(std::unique_ptr<const GeometryTileData> data_) {
+    loaded = true;
+    logDebug("AnnotationTile::setData");
     GeometryTile::setData(std::move(data_));
 }
+
 
 class AnnotationTileFeatureData {
 public:

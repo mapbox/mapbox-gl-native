@@ -1,5 +1,7 @@
 #pragma once
 
+#include <mbgl/util/event.hpp>
+
 #include <exception>
 
 namespace mbgl {
@@ -11,7 +13,7 @@ public:
     virtual ~TileObserver() = default;
 
     virtual void onTileChanged(Tile&) {}
-    virtual void onTileError(Tile&, std::exception_ptr) {}
+    virtual void onTileError(Tile&, std::exception_ptr, EventSeverity = EventSeverity::Error) {}
 };
 
 } // namespace mbgl

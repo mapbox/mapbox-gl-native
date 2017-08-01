@@ -10,6 +10,7 @@
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
+#include <mbgl/storage/resource_error.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/actor/actor.hpp>
 
@@ -31,6 +32,10 @@ struct SpriteLoader::Loader {
     std::unique_ptr<AsyncRequest> spriteRequest;
     std::shared_ptr<Mailbox> mailbox;
     Actor<SpriteLoaderWorker> worker;
+    uint64_t correlationID = 0;
+
+    bool parsed = false;
+    bool pending = false;
 };
 
 SpriteLoader::SpriteLoader(float pixelRatio_)
@@ -43,15 +48,20 @@ SpriteLoader::~SpriteLoader() = default;
 void SpriteLoader::load(const std::string& url, Scheduler& scheduler, FileSource& fileSource) {
     if (url.empty()) {
         // Treat a non-existent sprite as a successfully loaded empty sprite.
+        loader.reset();
         observer->onSpriteLoaded({});
         return;
     }
 
     loader = std::make_unique<Loader>(scheduler, *this);
 
-    loader->jsonRequest = fileSource.request(Resource::spriteJSON(url, pixelRatio), [this](Response res) {
+    const auto jsonResource = Resource::spriteJSON(url, pixelRatio);
+    loader->jsonRequest = fileSource.request(jsonResource, [this, url = jsonResource.url](Response res) {
         if (res.error) {
-            observer->onSpriteError(std::make_exception_ptr(std::runtime_error(res.error->message)));
+            const auto severity = loader->json ? EventSeverity::Warning : EventSeverity::Error;
+            util::ResourceError err(res.error->message, ResourceKind::SpriteJSON, res.error->status,
+                                    url);
+            observer->onSpriteError(std::make_exception_ptr(err), severity);
         } else if (res.notModified) {
             return;
         } else if (res.noContent) {
@@ -64,9 +74,13 @@ void SpriteLoader::load(const std::string& url, Scheduler& scheduler, FileSource
         }
     });
 
-    loader->spriteRequest = fileSource.request(Resource::spriteImage(url, pixelRatio), [this](Response res) {
+    const auto spriteResource = Resource::spriteImage(url, pixelRatio);
+    loader->spriteRequest = fileSource.request(spriteResource, [this, url = spriteResource.url](Response res) {
         if (res.error) {
-            observer->onSpriteError(std::make_exception_ptr(std::runtime_error(res.error->message)));
+            const auto severity = loader->json ? EventSeverity::Warning : EventSeverity::Error;
+            util::ResourceError err(res.error->message, ResourceKind::SpriteImage,
+                                    res.error->status, url);
+            observer->onSpriteError(std::make_exception_ptr(err), severity);
         } else if (res.notModified) {
             return;
         } else if (res.noContent) {
@@ -79,6 +93,10 @@ void SpriteLoader::load(const std::string& url, Scheduler& scheduler, FileSource
     });
 }
 
+bool SpriteLoader::isLoaded() const {
+    return !loader || (loader->parsed && !loader->pending);
+}
+
 void SpriteLoader::emitSpriteLoadedIfComplete() {
     assert(loader);
 
@@ -86,14 +104,26 @@ void SpriteLoader::emitSpriteLoadedIfComplete() {
         return;
     }
 
-    loader->worker.invoke(&SpriteLoaderWorker::parse, loader->image, loader->json);
+    loader->pending = true;
+
+    ++loader->correlationID;
+    loader->worker.invoke(&SpriteLoaderWorker::parse, loader->image, loader->json,
+                          loader->correlationID);
 }
 
-void SpriteLoader::onParsed(std::vector<std::unique_ptr<style::Image>>&& result) {
+void SpriteLoader::onParsed(std::vector<std::unique_ptr<style::Image>>&& result, const uint64_t resultCorrelationID) {
+    loader->parsed = true;
+    if (resultCorrelationID == loader->correlationID) {
+        loader->pending = false;
+    }
     observer->onSpriteLoaded(std::move(result));
 }
 
-void SpriteLoader::onError(std::exception_ptr err) {
+void SpriteLoader::onError(std::exception_ptr err, uint64_t const resultCorrelationID) {
+    loader->parsed = true;
+    if (resultCorrelationID == loader->correlationID) {
+        loader->pending = false;
+    }
     observer->onSpriteError(err);
 }
 
@@ -102,3 +132,4 @@ void SpriteLoader::setObserver(SpriteLoaderObserver* observer_) {
 }
 
 } // namespace mbgl
+

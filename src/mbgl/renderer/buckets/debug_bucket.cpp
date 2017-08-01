@@ -12,13 +12,13 @@ namespace mbgl {
 
 DebugBucket::DebugBucket(const OverscaledTileID& id,
                          const bool renderable_,
-                         const bool complete_,
+                         const bool loaded_,
                          optional<Timestamp> modified_,
                          optional<Timestamp> expires_,
                          MapDebugOptions debugMode_,
                          gl::Context& context)
     : renderable(renderable_),
-      complete(complete_),
+      loaded(loaded_),
       modified(std::move(modified_)),
       expires(std::move(expires_)),
       debugMode(debugMode_) {
@@ -61,7 +61,7 @@ DebugBucket::DebugBucket(const OverscaledTileID& id,
     double baseline = 200;
     if (debugMode & MapDebugOptions::ParseStatus) {
         const std::string text = util::toString(id) + " - " +
-                                 (complete ? "complete" : renderable ? "renderable" : "pending");
+                                 (loaded ? "loaded" : renderable ? "renderable" : "pending");
         addText(text, 50, baseline, 5);
         baseline += 200;
     }

@@ -21,14 +21,14 @@ class DebugBucket : private util::noncopyable {
 public:
     DebugBucket(const OverscaledTileID& id,
                 bool renderable,
-                bool complete,
+                bool loaded,
                 optional<Timestamp> modified,
                 optional<Timestamp> expires,
                 MapDebugOptions,
                 gl::Context&);
 
     const bool renderable;
-    const bool complete;
+    const bool loaded;
     const optional<Timestamp> modified;
     const optional<Timestamp> expires;
     const MapDebugOptions debugMode;

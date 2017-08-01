@@ -4,6 +4,7 @@
 #include <mbgl/style/conversion/json.hpp>
 #include <mbgl/style/conversion/tileset.hpp>
 #include <mbgl/storage/file_source.hpp>
+#include <mbgl/storage/resource_error.hpp>
 #include <mbgl/util/mapbox.hpp>
 #include <mbgl/util/constants.hpp>
 
@@ -46,17 +47,21 @@ void VectorSource::loadDescription(FileSource& fileSource) {
 
     const std::string& url = urlOrTileset.get<std::string>();
     req = fileSource.request(Resource::source(url), [this, url](Response res) {
-        if (res.error) {
-            observer->onSourceError(*this, std::make_exception_ptr(std::runtime_error(res.error->message)));
-        } else if (res.notModified) {
+        if (!res.error && res.notModified) {
             return;
-        } else if (res.noContent) {
-            observer->onSourceError(*this, std::make_exception_ptr(std::runtime_error("unexpectedly empty TileJSON")));
+        } else if (res.error || res.noContent) {
+            const auto severity = loaded ? EventSeverity::Warning : EventSeverity::Error;
+            const std::string& message =
+                res.error ? res.error->message : "unexpectedly empty TileJSON";
+            const util::ResourceError err(message, ResourceKind::Source, res.error->status, url);
+            observer->onSourceError(*this, std::make_exception_ptr(err), severity);
         } else {
             conversion::Error error;
             optional<Tileset> tileset = conversion::convertJSON<Tileset>(*res.data, error);
             if (!tileset) {
-                observer->onSourceError(*this, std::make_exception_ptr(std::runtime_error(error.message)));
+                const auto severity = loaded ? EventSeverity::Warning : EventSeverity::Error;
+                observer->onSourceError(
+                    *this, std::make_exception_ptr(std::runtime_error(error.message)), severity);
                 return;
             }
 

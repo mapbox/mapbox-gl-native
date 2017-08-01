@@ -21,21 +21,19 @@ class FrameObserver : public mbgl::MapObserver {
 public:
     void onDidFinishRenderingFrame(RenderMode mode) {
         if (mode == RenderMode::Full) {
-            fprintf(stderr, "onDidFinishRenderingFrame: full\n");
+//            fprintf(stderr, "onDidFinishRenderingFrame: full\n");
 //            mbgl::util::RunLoop::Get()->stop();
         } else {
-            fprintf(stderr, "onDidFinishRenderingFrame: partial\n");
-
+//            fprintf(stderr, "onDidFinishRenderingFrame: partial\n");
         }
     }
     void onDidFinishRenderingMap(RenderMode mode) {
 //        fprintf(stderr, "onDidFinishRenderingMap\n");
         if (mode == RenderMode::Full) {
-            fprintf(stderr, "onDidFinishRenderingMap: full\n");
+//            fprintf(stderr, "onDidFinishRenderingMap: full\n");
             mbgl::util::RunLoop::Get()->stop();
         } else {
-
-            fprintf(stderr, "onDidFinishRenderingMap: partial\n");
+//            fprintf(stderr, "onDidFinishRenderingMap: partial\n");
         }
     }
 };

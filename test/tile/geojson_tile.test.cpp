@@ -68,12 +68,12 @@ TEST(GeoJSONTile, Issue7648) {
     tile.setObserver(&observer);
     tile.setPlacementConfig({});
 
-    while (!tile.isComplete()) {
+    while (!tile.isLoaded()) {
         test.loop.runOnce();
     }
 
     tile.updateData(features);
-    while (!tile.isComplete()) {
+    while (!tile.isLoaded()) {
         test.loop.runOnce();
     }
 }

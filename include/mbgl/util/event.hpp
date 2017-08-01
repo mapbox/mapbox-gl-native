@@ -28,6 +28,7 @@ enum class Event : uint8_t {
     Android,
     Crash,
     Glyph,
+    Resource,
 };
 
 struct EventPermutation {

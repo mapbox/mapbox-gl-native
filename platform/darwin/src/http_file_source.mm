@@ -286,7 +286,7 @@ std::unique_ptr<AsyncRequest> HTTPFileSource::request(const Resource& resource, 
 
                     if (responseCode == 200) {
                         response.data = std::make_shared<std::string>((const char *)[data bytes], [data length]);
-                    } else if (responseCode == 204 || (responseCode == 404 && resource.kind == ResourceKind::Tile)) {
+                    } else if (responseCode == 204) {
                         response.noContent = true;
                     } else if (responseCode == 304) {
                         response.notModified = true;

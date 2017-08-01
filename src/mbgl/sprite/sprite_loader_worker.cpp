@@ -9,7 +9,8 @@ SpriteLoaderWorker::SpriteLoaderWorker(ActorRef<SpriteLoaderWorker>, ActorRef<Sp
 }
 
 void SpriteLoaderWorker::parse(std::shared_ptr<const std::string> image,
-                              std::shared_ptr<const std::string> json) {
+                               std::shared_ptr<const std::string> json,
+                               const uint64_t correlationID) {
     try {
         if (!image) {
             // This shouldn't happen, since we always invoke it with a non-empty pointer.
@@ -20,9 +21,9 @@ void SpriteLoaderWorker::parse(std::shared_ptr<const std::string> image,
             throw std::runtime_error("missing sprite metadata");
         }
 
-        parent.invoke(&SpriteLoader::onParsed, parseSprite(*image, *json));
+        parent.invoke(&SpriteLoader::onParsed, parseSprite(*image, *json), correlationID);
     } catch (...) {
-        parent.invoke(&SpriteLoader::onError, std::current_exception());
+        parent.invoke(&SpriteLoader::onError, std::current_exception(), correlationID);
     }
 }
 

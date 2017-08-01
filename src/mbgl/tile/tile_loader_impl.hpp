@@ -53,10 +53,9 @@ void TileLoader<T>::loadOptional() {
     assert(!request);
 
     resource.necessity = Resource::Optional;
+//    fprintf(stderr, "requesting %s\n", resource.url.c_str());
     request = fileSource.request(resource, [this](Response res) {
         request.reset();
-
-        tile.setTriedOptional();
 
         if (res.error && res.error->status == ResourceStatus::NotFoundError) {
             // When the optional request could not be satisfied, don't treat it as an error.
@@ -92,18 +91,18 @@ template <typename T>
 void TileLoader<T>::loadedData(const Response& res) {
     const bool complete = necessity == Necessity::Optional || resource.necessity == Necessity::Required;
     if (res.error) {
-        tile.setError(std::make_exception_ptr(util::ResourceError(res.error->message, resource.kind,
-                                                                  res.error->status, resource.url)),
-                      complete);
+        util::ResourceError err(res.error->message, resource.kind, res.error->status, resource.url);
+        tile.setError(std::make_exception_ptr(err), complete);
     } else if (res.notModified) {
         resource.priorExpires = res.expires;
-        // Do not notify the tile; when we get this message, it already has the current
+        tile.setData({}, res.modified, res.expires, complete);
+        // Do not notify the tile of new data; when we get this message, it already has the current
         // version of the data.
     } else {
         resource.priorModified = res.modified;
         resource.priorExpires = res.expires;
         resource.priorEtag = res.etag;
-        tile.setData(res.noContent ? nullptr : res.data, res.modified, res.expires, complete);
+        tile.setData({ res.noContent ? nullptr : res.data }, res.modified, res.expires, complete);
     }
 }
 
@@ -112,7 +111,9 @@ void TileLoader<T>::loadRequired() {
     assert(!request);
 
     resource.necessity = Resource::Required;
+//    fprintf(stderr, "requesting %s\n", resource.url.c_str());
     request = fileSource.request(resource, [this](Response res) { loadedData(res); });
 }
 
 } // namespace mbgl
+

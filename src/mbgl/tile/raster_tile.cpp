@@ -20,6 +20,7 @@ RasterTile::RasterTile(const OverscaledTileID& id_,
       mailbox(std::make_shared<Mailbox>(*util::RunLoop::Get())),
       worker(parameters.workerScheduler,
              ActorRef<RasterTile>(*this, mailbox)) {
+    logDebug("RasterTile::RasterTile");
 }
 
 RasterTile::~RasterTile() = default;
@@ -29,9 +30,10 @@ void RasterTile::cancel() {
 
 // Called instead of setData() when the data source returns an error while loading this tile.
 void RasterTile::setError(std::exception_ptr err, const bool complete) {
-    (void)complete;
-    loaded = true;
-    renderable = false;
+    if (complete) {
+        failed = true;
+    }
+    logDebug("RasterTile::setError");
     observer->onTileError(*this, err);
 }
 
@@ -41,11 +43,19 @@ void RasterTile::setData(optional<std::shared_ptr<const std::string>> data,
                          optional<Timestamp> modified_,
                          optional<Timestamp> expires_,
                          const bool complete) {
-    (void)complete;
     modified = modified_;
     expires = expires_;
+    if (complete) {
+        loaded = true;
+    }
 
     if (data) {
+        // Mark the tile as pending again if it was complete before to prevent signaling a complete
+        // state despite pending parse operations.
+        pending = true;
+
+        logDebug("RasterTile::setData");
+
         ++correlationID;
         worker.invoke(&RasterTileWorker::parse, *data, correlationID);
     }
@@ -53,19 +63,23 @@ void RasterTile::setData(optional<std::shared_ptr<const std::string>> data,
 
 // Invoked once the worker thread finished parsing the image.
 void RasterTile::onParsed(std::unique_ptr<RasterBucket> result, const uint64_t resultCorrelationID) {
-    (void)resultCorrelationID;
     bucket = std::move(result);
-    loaded = true;
-    renderable = bucket ? true : false;
+    parsed = true;
+    renderable = true;
+    if (resultCorrelationID == correlationID) {
+        pending = false;
+    }
+    logDebug("RasterTile::onParsed");
     observer->onTileChanged(*this);
 }
 
 // Invoked when the worker thread fails to parse the image.
 void RasterTile::onError(std::exception_ptr err, const uint64_t resultCorrelationID) {
-    (void)resultCorrelationID;
-    bucket.reset();
-    loaded = true;
-    renderable = false;
+    parsed = true;
+    if (resultCorrelationID == correlationID) {
+        pending = false;
+    }
+    logDebug("RasterTile::onError");
     observer->onTileError(*this, err);
 }
 

@@ -5,6 +5,8 @@
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/logging.hpp>
 
+#include <iostream>
+
 namespace mbgl {
 
 static TileObserver nullObserver;
@@ -18,15 +20,20 @@ void Tile::setObserver(TileObserver* observer_) {
     observer = observer_;
 }
 
-void Tile::setTriedOptional() {
-    triedOptional = true;
-    observer->onTileChanged(*this);
-}
-
 void Tile::dumpDebugLogs() const {
     Log::Info(Event::General, "Tile::id: %s", util::toString(id).c_str());
+    Log::Info(Event::General, "Tile::loaded: %s", isLoaded() ? "yes" : "no");
     Log::Info(Event::General, "Tile::renderable: %s", isRenderable() ? "yes" : "no");
-    Log::Info(Event::General, "Tile::complete: %s", isComplete() ? "yes" : "no");
+}
+
+void Tile::logDebug(const char* name) const {
+     // std::cerr << "[" << this << "] " << name << " " << id << " ("
+     //           << "loaded: " << loaded << ", "
+     //           << "parsed: " << parsed << ", "
+     //           << "failed: " << failed << ", "
+     //           << "renderable: " << renderable << ", "
+     //           << "pending: " << pending << ")" << std::endl;
+    (void)name;
 }
 
 void Tile::queryRenderedFeatures(

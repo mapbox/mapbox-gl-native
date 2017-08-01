@@ -69,6 +69,7 @@ void Renderer::Impl::render(View& view, const UpdateParameters& updateParameters
     };
 
     bool loaded = updateParameters.styleLoaded && renderStyle->isLoaded();
+    // fprintf(stderr, "loaded: %d\n", loaded);
 
     if (updateParameters.mode == MapMode::Continuous) {
         if (renderState == RenderState::Never) {
@@ -343,8 +344,8 @@ void Renderer::Impl::onInvalidate() {
     observer->onInvalidate();
 }
 
-void Renderer::Impl::onResourceError(std::exception_ptr ptr) {
-    observer->onResourceError(ptr);
+void Renderer::Impl::onResourceError(std::exception_ptr ptr, const EventSeverity severity) {
+    observer->onResourceError(ptr, severity);
 }
 
 void Renderer::Impl::onLowMemory() {

@@ -14,7 +14,9 @@ class SpriteLoaderWorker {
 public:
     SpriteLoaderWorker(ActorRef<SpriteLoaderWorker>, ActorRef<SpriteLoader>);
 
-    void parse(std::shared_ptr<const std::string> image, std::shared_ptr<const std::string> json);
+    void parse(std::shared_ptr<const std::string> image,
+               std::shared_ptr<const std::string> json,
+               uint64_t correlationID);
 
 private:
     ActorRef<SpriteLoader> parent;

@@ -61,8 +61,7 @@ void GeometryTile::markObsolete() {
 }
 
 void GeometryTile::setError(std::exception_ptr err) {
-    loaded = true;
-    renderable = false;
+    logDebug("GeometryTile::setError");
     observer->onTileError(*this, err);
 }
 
@@ -70,6 +69,8 @@ void GeometryTile::setData(std::unique_ptr<const GeometryTileData> data_) {
     // Mark the tile as pending again if it was complete before to prevent signaling a complete
     // state despite pending parse operations.
     pending = true;
+
+    logDebug("GeometryTile::setData");
 
     ++correlationID;
     worker.invoke(&GeometryTileWorker::setData, std::move(data_), correlationID);
@@ -81,8 +82,13 @@ void GeometryTile::setPlacementConfig(const PlacementConfig& desiredConfig) {
     }
 
     // Mark the tile as pending again if it was complete before to prevent signaling a complete
-    // state despite pending parse operations.
-    pending = true;
+    // state despite pending parse operations. However, we only need to worry about this when we
+    // know that there's data, merely sending layers over doesn't qualify.
+    if (parsed) {
+        pending = true;
+    }
+
+    logDebug("GeometryTile::setPlacementConfig");
 
     ++correlationID;
     requestedConfig = desiredConfig;
@@ -97,8 +103,13 @@ void GeometryTile::invokePlacement() {
 
 void GeometryTile::setLayers(const std::vector<Immutable<Layer::Impl>>& layers) {
     // Mark the tile as pending again if it was complete before to prevent signaling a complete
-    // state despite pending parse operations.
-    pending = true;
+    // state despite pending parse operations. However, we only need to worry about this when we
+    // know that there's data, merely sending layers over doesn't qualify.
+    if (parsed) {
+        pending = true;
+    }
+
+    logDebug("GeometryTile::setLayers");
 
     std::vector<Immutable<Layer::Impl>> impls;
 
@@ -121,22 +132,19 @@ void GeometryTile::setLayers(const std::vector<Immutable<Layer::Impl>>& layers) 
 }
 
 void GeometryTile::onLayout(LayoutResult result, const uint64_t resultCorrelationID) {
-    loaded = true;
-    renderable = true;
     nonSymbolBuckets = std::move(result.nonSymbolBuckets);
     featureIndex = std::move(result.featureIndex);
     data = std::move(result.tileData);
     collisionTile.reset();
+    parsed = true;
+    renderable = true;
+    // We're waiting on a onPlacement event for this correlation ID to reset the pending state.
     (void)resultCorrelationID;
+    logDebug("GeometryTile::onLayout");
     observer->onTileChanged(*this);
 }
 
 void GeometryTile::onPlacement(PlacementResult result, const uint64_t resultCorrelationID) {
-    loaded = true;
-    renderable = true;
-    if (resultCorrelationID == correlationID) {
-        pending = false;
-    }
     symbolBuckets = std::move(result.symbolBuckets);
     collisionTile = std::move(result.collisionTile);
     if (result.glyphAtlasImage) {
@@ -148,14 +156,21 @@ void GeometryTile::onPlacement(PlacementResult result, const uint64_t resultCorr
     if (collisionTile.get()) {
         lastYStretch = collisionTile->yStretch;
     }
+    parsed = true;
+    renderable = true;
+    if (resultCorrelationID == correlationID) {
+        pending = false;
+    }
+    logDebug("GeometryTile::onPlacement");
     observer->onTileChanged(*this);
 }
 
 void GeometryTile::onError(std::exception_ptr err, const uint64_t resultCorrelationID) {
-    loaded = true;
-    pending = false;
-    (void)resultCorrelationID;
-    renderable = false;
+    parsed = true;
+    if (resultCorrelationID == correlationID) {
+        pending = false;
+    }
+    logDebug("GeometryTile::onError");
     observer->onTileError(*this, err);
 }
     

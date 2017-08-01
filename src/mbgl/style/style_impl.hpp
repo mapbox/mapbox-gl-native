@@ -48,6 +48,7 @@ public:
     void setObserver(Observer*);
 
     bool isLoaded() const;
+    bool isSpriteLoaded() const;
 
     std::exception_ptr getLastError() const {
         return lastError;
@@ -94,7 +95,6 @@ public:
 
     bool mutated = false;
     bool loaded = false;
-    bool spriteLoaded = false;
 
 private:
     void parse(const std::string&);
@@ -124,12 +124,12 @@ private:
 
     // SpriteLoaderObserver implementation.
     void onSpriteLoaded(std::vector<std::unique_ptr<Image>>&&) override;
-    void onSpriteError(std::exception_ptr) override;
+    void onSpriteError(std::exception_ptr, EventSeverity) override;
 
     // SourceObserver implementation.
     void onSourceLoaded(Source&) override;
     void onSourceChanged(Source&) override;
-    void onSourceError(Source&, std::exception_ptr) override;
+    void onSourceError(Source&, std::exception_ptr, EventSeverity) override;
     void onSourceDescriptionChanged(Source&) override;
 
     // LayerObserver implementation.

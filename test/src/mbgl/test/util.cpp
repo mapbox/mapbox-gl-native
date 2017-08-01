@@ -100,7 +100,10 @@ Server::~Server() {
 
 PremultipliedImage render(Map& map, OffscreenView& view) {
     PremultipliedImage result;
-    map.renderStill([&](std::exception_ptr) {
+    map.renderStill([&](std::exception_ptr err) {
+        if (err) {
+            std::rethrow_exception(err);
+        }
         result = view.readStillImage();
     });
 
