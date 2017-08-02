@@ -495,7 +495,7 @@ public final class MapboxMap {
 
   /**
    * <p>
-   * Gets the maximum zoom level the map can be displayed at.
+   * Gets the minimum zoom level the map can be displayed at.
    * </p>
    *
    * @return The minimum zoom level.
@@ -512,7 +512,9 @@ public final class MapboxMap {
    * <p>
    * Sets the maximum zoom level the map can be displayed at.
    * </p>
-   *
+   * <p>
+   *   The default maximum zoomn level is 22. The upper bound for this value is 25.5.
+   * </p>
    * @param maxZoom The new maximum zoom level.
    */
   public void setMaxZoomPreference(@FloatRange(from = MapboxConstants.MINIMUM_ZOOM,
