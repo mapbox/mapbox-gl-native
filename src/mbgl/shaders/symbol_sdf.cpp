@@ -34,6 +34,7 @@ varying highp vec4 fill_color;
 uniform highp vec4 u_fill_color;
 #endif
 
+
 #ifndef HAS_UNIFORM_u_halo_color
 uniform lowp float a_halo_color_t;
 attribute highp vec4 a_halo_color;
@@ -41,6 +42,7 @@ varying highp vec4 halo_color;
 #else
 uniform highp vec4 u_halo_color;
 #endif
+
 
 #ifndef HAS_UNIFORM_u_opacity
 uniform lowp float a_opacity_t;
@@ -50,6 +52,7 @@ varying lowp float opacity;
 uniform lowp float u_opacity;
 #endif
 
+
 #ifndef HAS_UNIFORM_u_halo_width
 uniform lowp float a_halo_width_t;
 attribute lowp vec2 a_halo_width;
@@ -58,6 +61,7 @@ varying lowp float halo_width;
 uniform lowp float u_halo_width;
 #endif
 
+
 #ifndef HAS_UNIFORM_u_halo_blur
 uniform lowp float a_halo_blur_t;
 attribute lowp vec2 a_halo_blur;
@@ -65,6 +69,7 @@ varying lowp float halo_blur;
 #else
 uniform lowp float u_halo_blur;
 #endif
+
 
 uniform mat4 u_matrix;
 uniform mat4 u_label_plane_matrix;
@@ -84,36 +89,41 @@ varying vec4 v_data0;
 varying vec2 v_data1;
 
 void main() {
-
+    
 #ifndef HAS_UNIFORM_u_fill_color
     fill_color = unpack_mix_vec4(a_fill_color, a_fill_color_t);
 #else
     highp vec4 fill_color = u_fill_color;
 #endif
 
+    
 #ifndef HAS_UNIFORM_u_halo_color
     halo_color = unpack_mix_vec4(a_halo_color, a_halo_color_t);
 #else
     highp vec4 halo_color = u_halo_color;
 #endif
 
+    
 #ifndef HAS_UNIFORM_u_opacity
     opacity = unpack_mix_vec2(a_opacity, a_opacity_t);
 #else
     lowp float opacity = u_opacity;
 #endif
 
+    
 #ifndef HAS_UNIFORM_u_halo_width
     halo_width = unpack_mix_vec2(a_halo_width, a_halo_width_t);
 #else
     lowp float halo_width = u_halo_width;
 #endif
 
+    
 #ifndef HAS_UNIFORM_u_halo_blur
     halo_blur = unpack_mix_vec2(a_halo_blur, a_halo_blur_t);
 #else
     lowp float halo_blur = u_halo_blur;
 #endif
+
 
     vec2 a_pos = a_pos_offset.xy;
     vec2 a_offset = a_pos_offset.zw;
@@ -215,11 +225,13 @@ varying highp vec4 fill_color;
 uniform highp vec4 u_fill_color;
 #endif
 
+
 #ifndef HAS_UNIFORM_u_halo_color
 varying highp vec4 halo_color;
 #else
 uniform highp vec4 u_halo_color;
 #endif
+
 
 #ifndef HAS_UNIFORM_u_opacity
 varying lowp float opacity;
@@ -227,17 +239,20 @@ varying lowp float opacity;
 uniform lowp float u_opacity;
 #endif
 
+
 #ifndef HAS_UNIFORM_u_halo_width
 varying lowp float halo_width;
 #else
 uniform lowp float u_halo_width;
 #endif
 
+
 #ifndef HAS_UNIFORM_u_halo_blur
 varying lowp float halo_blur;
 #else
 uniform lowp float u_halo_blur;
 #endif
+
 
 uniform sampler2D u_texture;
 uniform sampler2D u_fadetexture;
@@ -248,26 +263,31 @@ varying vec4 v_data0;
 varying vec2 v_data1;
 
 void main() {
-
+    
 #ifdef HAS_UNIFORM_u_fill_color
     highp vec4 fill_color = u_fill_color;
 #endif
 
+    
 #ifdef HAS_UNIFORM_u_halo_color
     highp vec4 halo_color = u_halo_color;
 #endif
 
+    
 #ifdef HAS_UNIFORM_u_opacity
     lowp float opacity = u_opacity;
 #endif
 
+    
 #ifdef HAS_UNIFORM_u_halo_width
     lowp float halo_width = u_halo_width;
 #endif
 
+    
 #ifdef HAS_UNIFORM_u_halo_blur
     lowp float halo_blur = u_halo_blur;
 #endif
+
 
     vec2 tex = v_data0.xy;
     vec2 fade_tex = v_data0.zw;
