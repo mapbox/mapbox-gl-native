@@ -292,6 +292,7 @@ jobs:
       JOBS: 4
       BUILDTYPE: RelWithDebInfo
       WITH_EGL: 1
+      WITH_CXX11ABI: 0
     steps:
       - checkout
       - *generate-cache-key
@@ -314,6 +315,7 @@ jobs:
       JOBS: 4
       BUILDTYPE: RelWithDebInfo
       WITH_EGL: 1
+      WITH_CXX11ABI: 0
     steps:
       - checkout
       - *generate-cache-key
@@ -336,6 +338,7 @@ jobs:
       JOBS: 4
       BUILDTYPE: Debug
       WITH_EGL: 1
+      WITH_CXX11ABI: 0
     steps:
       - checkout
       - *generate-cache-key
