@@ -152,6 +152,11 @@ typedef std::unordered_map<MGLAnnotationTag, MGLAnnotationContext> MGLAnnotation
 /// Mapping from an annotation object to an annotation tag.
 typedef std::map<id<MGLAnnotation>, MGLAnnotationTag> MGLAnnotationObjectTagMap;
 
+/// Mapping from a shape annotation object to shape layer id.
+typedef std::map<id<MGLAnnotation>, std::string> MGLShapeAnnotationObjectLayerIDMap;
+
+const NSString *MGLLayerIDShapeAnnotation = @"com.mapbox.annotations.shape.";
+
 mbgl::util::UnitBezier MGLUnitBezierForMediaTimingFunction(CAMediaTimingFunction *function)
 {
     if ( ! function)
@@ -285,6 +290,7 @@ public:
 
     MGLAnnotationTagContextMap _annotationContextsByAnnotationTag;
     MGLAnnotationObjectTagMap _annotationTagsByAnnotation;
+    MGLShapeAnnotationObjectLayerIDMap _shapeAnnotationLayerIDs;
 
     /// Tag of the selected annotation. If the user location annotation is selected, this ivar is set to `MGLAnnotationTagNotFound`.
     MGLAnnotationTag _selectedAnnotationTag;
@@ -294,6 +300,7 @@ public:
     CGSize _unionedAnnotationRepresentationSize;
     CGSize _largestAnnotationViewSize;
     std::vector<MGLAnnotationTag> _annotationsNearbyLastTap;
+    std::vector<MGLAnnotationTag> _shapesNearbyLastTap;
     CGPoint _initialImplicitCalloutViewOffset;
     NSDate *_userLocationAnimationCompletionDate;
     /// True if a willChange notification has been issued for shape annotation layers and a didChange notification is pending.
@@ -468,9 +475,11 @@ public:
     _annotationImagesByIdentifier = [NSMutableDictionary dictionary];
     _annotationContextsByAnnotationTag = {};
     _annotationTagsByAnnotation = {};
+    _shapeAnnotationLayerIDs = {};
     _annotationViewReuseQueueByIdentifier = [NSMutableDictionary dictionary];
     _selectedAnnotationTag = MGLAnnotationTagNotFound;
     _annotationsNearbyLastTap = {};
+    _shapesNearbyLastTap = {};
 
     // setup logo bug
     //
@@ -1548,6 +1557,15 @@ public:
     MGLAnnotationTag hitAnnotationTag = [self annotationTagAtPoint:tapPoint persistingResults:persist];
     if (hitAnnotationTag != MGLAnnotationTagNotFound)
     {
+        if (hitAnnotationTag != _selectedAnnotationTag)
+        {
+            id <MGLAnnotation> annotation = [self annotationWithTag:hitAnnotationTag];
+            NSAssert(annotation, @"Cannot select nonexistent annotation with tag %u", hitAnnotationTag);
+            return annotation;
+        }
+    } else {
+        // Handle the case is a shape
+        hitAnnotationTag = [self shapesTagAtPoint:tapPoint persistingResults:persist];
         if (hitAnnotationTag != _selectedAnnotationTag)
         {
             id <MGLAnnotation> annotation = [self annotationWithTag:hitAnnotationTag];
@@ -3125,6 +3143,7 @@ public:
     }
 
     std::vector<MGLAnnotationTag> annotationTags = [self annotationTagsInRect:rect];
+    
     if (annotationTags.size())
     {
         NSMutableArray *annotations = [NSMutableArray arrayWithCapacity:annotationTags.size()];
@@ -3222,6 +3241,8 @@ public:
             context.annotation = annotation;
             _annotationContextsByAnnotationTag[annotationTag] = context;
             _annotationTagsByAnnotation[annotation] = annotationTag;
+            NSString *layerID = [NSString stringWithFormat:@"%@%u", MGLLayerIDShapeAnnotation, annotationTag];
+            _shapeAnnotationLayerIDs[annotation] = layerID.UTF8String;
 
             [(NSObject *)annotation addObserver:self forKeyPath:@"coordinates" options:0 context:(void *)(NSUInteger)annotationTag];
         }
@@ -3520,6 +3541,7 @@ public:
 
         _annotationContextsByAnnotationTag.erase(annotationTag);
         _annotationTagsByAnnotation.erase(annotation);
+        _shapeAnnotationLayerIDs.erase(annotation);
 
         if ([annotation isKindOfClass:[NSObject class]] && ![annotation isKindOfClass:[MGLMultiPoint class]])
         {
@@ -3614,6 +3636,8 @@ public:
     queryRect = CGRectInset(queryRect, -MGLAnnotationImagePaddingForHitTest,
                             -MGLAnnotationImagePaddingForHitTest);
     std::vector<MGLAnnotationTag> nearbyAnnotations = [self annotationTagsInRect:queryRect];
+    
+    
 
     if (nearbyAnnotations.size())
     {
@@ -3742,6 +3766,86 @@ public:
     return hitAnnotationTag;
 }
 
+- (MGLAnnotationTag)shapesTagAtPoint:(CGPoint)point persistingResults:(BOOL)persist
+{
+    CGRect queryRect = CGRectInset({ point, CGSizeZero },
+                                   -_unionedAnnotationRepresentationSize.width,
+                                   -_unionedAnnotationRepresentationSize.height);
+    queryRect = CGRectInset(queryRect, -MGLAnnotationImagePaddingForHitTest,
+                            -MGLAnnotationImagePaddingForHitTest);
+    std::vector<MGLAnnotationTag> nearbyShapes = [self shapesTagsInRect:queryRect];
+    
+    MGLAnnotationTag hitAnnotationTag = MGLAnnotationTagNotFound;
+    if (nearbyShapes.size())
+    {
+        // The annotation tags need to be stable in order to compare them with
+        // the remembered tags.
+        std::sort(nearbyShapes.begin(), nearbyShapes.end());
+        
+        if (nearbyShapes == _shapesNearbyLastTap)
+        {
+            // The first selection in the cycle should be the one nearest to the
+            // tap.
+            CLLocationCoordinate2D currentCoordinate = [self convertPoint:point toCoordinateFromView:self];
+            std::sort(nearbyShapes.begin(), nearbyShapes.end(), [&](const MGLAnnotationTag tagA, const MGLAnnotationTag tagB) {
+                CLLocationCoordinate2D coordinateA = [[self annotationWithTag:tagA] coordinate];
+                CLLocationCoordinate2D coordinateB = [[self annotationWithTag:tagB] coordinate];
+                CLLocationDegrees deltaA = hypot(coordinateA.latitude - currentCoordinate.latitude,
+                                                 coordinateA.longitude - currentCoordinate.longitude);
+                CLLocationDegrees deltaB = hypot(coordinateB.latitude - currentCoordinate.latitude,
+                                                 coordinateB.longitude - currentCoordinate.longitude);
+                return deltaA < deltaB;
+            });
+            
+            // The last time we persisted a set of annotations, we had the same
+            // set of annotations as we do now. Cycle through them.
+            if (_selectedAnnotationTag == MGLAnnotationTagNotFound
+                || _selectedAnnotationTag == _shapesNearbyLastTap.back())
+            {
+                // Either no annotation is selected or the last annotation in
+                // the set was selected. Wrap around to the first annotation in
+                // the set.
+                hitAnnotationTag = _shapesNearbyLastTap.front();
+            }
+            else
+            {
+                auto result = std::find(_shapesNearbyLastTap.begin(),
+                                        _shapesNearbyLastTap.end(),
+                                        _selectedAnnotationTag);
+                if (result == _shapesNearbyLastTap.end())
+                {
+                    // An annotation from this set hasn’t been selected before.
+                    // Select the first (nearest) one.
+                    hitAnnotationTag = _shapesNearbyLastTap.front();
+                }
+                else
+                {
+                    // Step to the next annotation in the set.
+                    auto distance = std::distance(_shapesNearbyLastTap.begin(), result);
+                    hitAnnotationTag = _shapesNearbyLastTap[distance + 1];
+                }
+            }
+        }
+        else
+        {
+            // Remember the nearby annotations for the next time this method is
+            // called.
+            if (persist)
+            {
+                _shapesNearbyLastTap = nearbyShapes;
+            }
+            
+            // Choose the first nearby annotation.
+            if (nearbyShapes.size())
+            {
+                hitAnnotationTag = nearbyShapes.front();
+            }
+        }
+    }
+    
+    return hitAnnotationTag;
+}
+
 /// Returns the tags of the annotations coincident with the given rectangle.
 - (std::vector<MGLAnnotationTag>)annotationTagsInRect:(CGRect)rect
 {
@@ -3749,6 +3853,25 @@ public:
         { CGRectGetMinX(rect), CGRectGetMinY(rect) },
         { CGRectGetMaxX(rect), CGRectGetMaxY(rect) },
     });
+}
+
+/// Returns the tags of the shapes annotations coincident with the given rectangle.
+- (std::vector<MGLAnnotationTag>)shapesTagsInRect:(CGRect)rect
+{
+    std::vector<std::string> layerIDs;
+    for (const auto &annotation : _shapeAnnotationLayerIDs) {
+        layerIDs.push_back(annotation.second);
+    }
+
+    mbgl::RenderedQueryOptions options;
+    options.layerIDs = {{ layerIDs }};
+    mbgl::ScreenBox box = {
+        { CGRectGetMinX(rect), CGRectGetMinY(rect) },
+        { CGRectGetMaxX(rect), CGRectGetMaxY(rect) },
+    };
+    
+    return _mbglMap->queryShapeAnnotations(box, options);
+    
 }
 
 - (id <MGLAnnotation>)selectedAnnotation
@@ -3802,7 +3925,7 @@ public:
 {
     if ( ! annotation) return;
 
-    if ([annotation isKindOfClass:[MGLMultiPoint class]]) return;
+//    if ([annotation isKindOfClass:[MGLMultiPoint class]]) return;
 
     if (annotation == self.selectedAnnotation) return;
 
