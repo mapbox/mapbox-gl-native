@@ -64,15 +64,15 @@ void RenderFillLayer::render(PaintParameters& parameters, RenderSource*) {
             assert(dynamic_cast<FillBucket*>(tile.tile.getBucket(*baseImpl)));
             FillBucket& bucket = *reinterpret_cast<FillBucket*>(tile.tile.getBucket(*baseImpl));
 
-            auto draw = [&] (uint8_t sublayer,
-                             auto& program,
+            auto draw = [&] (auto& program,
                              const auto& drawMode,
+                             const auto& depthMode,
                              const auto& indexBuffer,
                              const auto& segments) {
                 program.get(evaluated).draw(
                     parameters.context,
                     drawMode,
-                    parameters.depthModeForSublayer(sublayer, gl::DepthMode::ReadWrite),
+                    depthMode,
                     parameters.stencilModeForClipping(tile.clip),
                     parameters.colorModeForRenderPass(),
                     FillProgram::UniformValues {
@@ -93,29 +93,23 @@ void RenderFillLayer::render(PaintParameters& parameters, RenderSource*) {
                 );
             };
 
-            if (evaluated.get<FillAntialias>() && !unevaluated.get<FillOutlineColor>().isUndefined() && parameters.pass == RenderPass::Translucent) {
-                draw(2,
-                     parameters.programs.fillOutline,
-                     gl::Lines { 2.0f },
-                     *bucket.lineIndexBuffer,
-                     bucket.lineSegments);
-            }
-
             // Only draw the fill when it's opaque and we're drawing opaque fragments,
             // or when it's translucent and we're drawing translucent fragments.
             if ((evaluated.get<FillColor>().constantOr(Color()).a >= 1.0f
               && evaluated.get<FillOpacity>().constantOr(0) >= 1.0f) == (parameters.pass == RenderPass::Opaque)) {
-                draw(1,
-                     parameters.programs.fill,
+                draw(parameters.programs.fill,
                      gl::Triangles(),
+                     parameters.depthModeForSublayer(1, gl::DepthMode::ReadWrite),
                      *bucket.triangleIndexBuffer,
                      bucket.triangleSegments);
             }
 
-            if (evaluated.get<FillAntialias>() && unevaluated.get<FillOutlineColor>().isUndefined() && parameters.pass == RenderPass::Translucent) {
-                draw(2,
-                     parameters.programs.fillOutline,
-                     gl::Lines { 2.0f },
+            if (evaluated.get<FillAntialias>() && parameters.pass == RenderPass::Translucent) {
+                draw(parameters.programs.fillOutline,
+                     gl::Lines{ 2.0f },
+                     parameters.depthModeForSublayer(
+                         unevaluated.get<FillOutlineColor>().isUndefined() ? 2 : 0,
+                         gl::DepthMode::ReadOnly),
                      *bucket.lineIndexBuffer,
                      bucket.lineSegments);
             }
@@ -138,15 +132,15 @@ void RenderFillLayer::render(PaintParameters& parameters, RenderSource*) {
             assert(dynamic_cast<FillBucket*>(tile.tile.getBucket(*baseImpl)));
             FillBucket& bucket = *reinterpret_cast<FillBucket*>(tile.tile.getBucket(*baseImpl));
 
-            auto draw = [&] (uint8_t sublayer,
-                             auto& program,
+            auto draw = [&] (auto& program,
                              const auto& drawMode,
+                             const auto& depthMode,
                              const auto& indexBuffer,
                              const auto& segments) {
                 program.get(evaluated).draw(
                     parameters.context,
                     drawMode,
-                    parameters.depthModeForSublayer(sublayer, gl::DepthMode::ReadWrite),
+                    depthMode,
                     parameters.stencilModeForClipping(tile.clip),
                     parameters.colorModeForRenderPass(),
                     FillPatternUniforms::values(
@@ -171,21 +165,19 @@ void RenderFillLayer::render(PaintParameters& parameters, RenderSource*) {
                 );
             };
 
-            draw(0,
-                 parameters.programs.fillPattern,
+            draw(parameters.programs.fillPattern,
                  gl::Triangles(),
+                 parameters.depthModeForSublayer(1, gl::DepthMode::ReadWrite),
                  *bucket.triangleIndexBuffer,
                  bucket.triangleSegments);
 
-            if (!evaluated.get<FillAntialias>() || !unevaluated.get<FillOutlineColor>().isUndefined()) {
-                continue;
+            if (evaluated.get<FillAntialias>() && unevaluated.get<FillOutlineColor>().isUndefined()) {
+                draw(parameters.programs.fillOutlinePattern,
+                     gl::Lines { 2.0f },
+                     parameters.depthModeForSublayer(2, gl::DepthMode::ReadOnly),
+                     *bucket.lineIndexBuffer,
+                     bucket.lineSegments);
             }
-
-            draw(2,
-                 parameters.programs.fillOutlinePattern,
-                 gl::Lines { 2.0f },
-                 *bucket.lineIndexBuffer,
-                 bucket.lineSegments);
         }
     }
 }
