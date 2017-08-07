@@ -41,10 +41,18 @@ public class DebugModeActivity extends AppCompatActivity {
     setContentView(R.layout.activity_debug_mode);
 
     mapView = (MapView) findViewById(R.id.mapView);
+    mapView.addOnMapChangedListener(new MapView.OnMapChangedListener() {
+      @Override
+      public void onMapChanged(int change) {
+        if (change == MapView.DID_FINISH_LOADING_STYLE && mapboxMap != null) {
+          Timber.e("New loaded style = %s", mapboxMap.getStyleJson());
+        }
+      }
+    });
+
     mapView.setTag(true);
     mapView.setStyleUrl(STYLES[currentStyleIndex]);
     mapView.onCreate(savedInstanceState);
-
     mapView.getMapAsync(new OnMapReadyCallback() {
       @Override
       public void onMapReady(@NonNull MapboxMap map) {
@@ -63,13 +71,12 @@ public class DebugModeActivity extends AppCompatActivity {
       }
     });
 
-
     FloatingActionButton fabDebug = (FloatingActionButton) findViewById(R.id.fabDebug);
     fabDebug.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
         if (mapboxMap != null) {
-          Timber.d("Debug FAB: isDebug Active? %s" , mapboxMap.isDebugActive());
+          Timber.d("Debug FAB: isDebug Active? %s", mapboxMap.isDebugActive());
           mapboxMap.cycleDebugOptions();
         }
       }

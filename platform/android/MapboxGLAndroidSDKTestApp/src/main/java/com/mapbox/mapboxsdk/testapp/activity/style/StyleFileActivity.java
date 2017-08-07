@@ -1,5 +1,6 @@
 package com.mapbox.mapboxsdk.testapp.activity.style;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -25,11 +26,12 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.lang.ref.WeakReference;
 
 import timber.log.Timber;
 
 /**
- * Test activity showcasing how to use a file:// resource for the style.json
+ * Test activity showcasing how to use a file:// resource for the style.json and how to use MapboxMap#setStyleJson.
  */
 public class StyleFileActivity extends AppCompatActivity {
 
@@ -48,13 +50,21 @@ public class StyleFileActivity extends AppCompatActivity {
       public void onMapReady(@NonNull final MapboxMap map) {
         mapboxMap = map;
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab_file);
         fab.setColorFilter(ContextCompat.getColor(StyleFileActivity.this, R.color.primary));
         fab.setOnClickListener(new View.OnClickListener() {
           @Override
           public void onClick(View view) {
-            Timber.i("Loading style file");
-            new CreateStyleFileTask().execute();
+            new CreateStyleFileTask(view.getContext(), mapboxMap).execute();
+          }
+        });
+
+        FloatingActionButton fabStyleJson = (FloatingActionButton) findViewById(R.id.fab_style_json);
+        fabStyleJson.setColorFilter(ContextCompat.getColor(StyleFileActivity.this, R.color.primary));
+        fabStyleJson.setOnClickListener(new View.OnClickListener() {
+          @Override
+          public void onClick(View view) {
+            new LoadStyleFileTask(view.getContext(), mapboxMap).execute();
           }
         });
       }
@@ -62,10 +72,51 @@ public class StyleFileActivity extends AppCompatActivity {
   }
 
   /**
+   * Task to read a style file from the raw folder
+   */
+  private static class LoadStyleFileTask extends AsyncTask<Void, Void, String> {
+    private WeakReference<Context> context;
+    private WeakReference<MapboxMap> mapboxMap;
+
+    LoadStyleFileTask(Context context, MapboxMap mapboxMap) {
+      this.context = new WeakReference<>(context);
+      this.mapboxMap = new WeakReference<>(mapboxMap);
+    }
+
+    @Override
+    protected String doInBackground(Void... voids) {
+      String styleJson = "";
+      try {
+        styleJson = RawResourceReaderWriter.readRawResource(context.get(), R.raw.sat_style);
+      } catch (Exception exception) {
+        Timber.e(exception, "Can't load local file style");
+      }
+      return styleJson;
+    }
+
+    @Override
+    protected void onPostExecute(String json) {
+      super.onPostExecute(json);
+      Timber.d("Read json, %s", json);
+      MapboxMap mapboxMap = this.mapboxMap.get();
+      if (mapboxMap != null) {
+        mapboxMap.setStyleJson(json);
+      }
+    }
+  }
+
+  /**
    * Task to write a style file to local disk and load it in the map view
    */
-  private class CreateStyleFileTask extends AsyncTask<Void, Integer, Long> {
+  private static class CreateStyleFileTask extends AsyncTask<Void, Integer, Long> {
     private File cacheStyleFile;
+    private WeakReference<Context> context;
+    private WeakReference<MapboxMap> mapboxMap;
+
+    CreateStyleFileTask(Context context, MapboxMap mapboxMap) {
+      this.context = new WeakReference<>(context);
+      this.mapboxMap = new WeakReference<>(mapboxMap);
+    }
 
     @Override
     protected Long doInBackground(Void... params) {
@@ -73,33 +124,22 @@ public class StyleFileActivity extends AppCompatActivity {
         cacheStyleFile = File.createTempFile("my-", ".style.json");
         cacheStyleFile.createNewFile();
         Timber.i("Writing style file to: %s", cacheStyleFile.getAbsolutePath());
-        writeToFile(cacheStyleFile, readRawResource(R.raw.local_style));
+        Context context = this.context.get();
+        if (context != null) {
+          writeToFile(cacheStyleFile, RawResourceReaderWriter.readRawResource(context, R.raw.local_style));
+        }
       } catch (Exception exception) {
-        Toast.makeText(StyleFileActivity.this, "Could not create style file in cache dir", Toast.LENGTH_SHORT).show();
+        Toast.makeText(context.get(), "Could not create style file in cache dir", Toast.LENGTH_SHORT).show();
       }
       return 1L;
     }
 
     protected void onPostExecute(Long result) {
       // Actual file:// usage
-      mapboxMap.setStyleUrl("file://" + cacheStyleFile.getAbsolutePath());
-    }
-
-    private String readRawResource(@RawRes int rawResource) throws IOException {
-      InputStream is = getResources().openRawResource(rawResource);
-      Writer writer = new StringWriter();
-      char[] buffer = new char[1024];
-      try {
-        Reader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-        int numRead;
-        while ((numRead = reader.read(buffer)) != -1) {
-          writer.write(buffer, 0, numRead);
-        }
-      } finally {
-        is.close();
+      MapboxMap mapboxMap = this.mapboxMap.get();
+      if (mapboxMap != null) {
+        mapboxMap.setStyleUrl("file://" + cacheStyleFile.getAbsolutePath());
       }
-
-      return writer.toString();
     }
 
     private void writeToFile(File file, String contents) throws IOException {
@@ -112,6 +152,28 @@ public class StyleFileActivity extends AppCompatActivity {
           writer.close();
         }
       }
+    }
+  }
+
+  static class RawResourceReaderWriter {
+    static String readRawResource(Context context, @RawRes int rawResource) throws IOException {
+      String json = "";
+      if (context != null) {
+        InputStream is = context.getResources().openRawResource(rawResource);
+        Writer writer = new StringWriter();
+        char[] buffer = new char[1024];
+        try {
+          Reader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+          int numRead;
+          while ((numRead = reader.read(buffer)) != -1) {
+            writer.write(buffer, 0, numRead);
+          }
+        } finally {
+          is.close();
+        }
+        json = writer.toString();
+      }
+      return json;
     }
   }
 
