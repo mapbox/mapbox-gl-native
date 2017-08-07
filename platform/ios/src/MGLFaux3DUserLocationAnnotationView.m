@@ -460,11 +460,8 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
 
 - (CGFloat)calculateAccuracyRingSize
 {
-    CGFloat latitudeRadians = MGLRadiansFromDegrees(self.userLocation.coordinate.latitude);
-    CGFloat metersPerPoint = [self.mapView metersPerPointAtLatitude:self.userLocation.coordinate.latitude];
-    CGFloat pixelRadius = self.userLocation.location.horizontalAccuracy / cos(latitudeRadians) / metersPerPoint;
-
-    return pixelRadius * 2.0;
+    // diameter in screen points
+    return self.userLocation.location.horizontalAccuracy / [self.mapView metersPerPointAtLatitude:self.userLocation.coordinate.latitude] * 2.0;
 }
 
 - (UIImage *)headingIndicatorTintedGradientImage
