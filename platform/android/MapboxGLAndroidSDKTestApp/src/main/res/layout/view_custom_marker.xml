@@ -15,7 +15,7 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:padding="2dp"
-        android:textIsSelectable="true"
+        android:textIsSelectable="false"
         android:textColor="@android:color/white"
         android:textStyle="bold"/>
 
