@@ -15,7 +15,18 @@
         app:mapbox_styleUrl="@string/mapbox_style_mapbox_streets"/>
 
     <android.support.design.widget.FloatingActionButton
-        android:id="@id/fab"
+        android:id="@+id/fab_style_json"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_above="@+id/fab_file"
+        android:layout_margin="@dimen/fab_margin"
+        android:src="@drawable/ic_add"
+        app:backgroundTint="@android:color/white"/>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@id/fab_file"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
