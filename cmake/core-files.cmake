@@ -606,6 +606,8 @@ set(MBGL_CORE_FILES
     src/mbgl/util/premultiply.cpp
     src/mbgl/util/rapidjson.hpp
     src/mbgl/util/rect.hpp
+    src/mbgl/util/scheduled_timer.cpp
+    src/mbgl/util/scheduled_timer.hpp
     src/mbgl/util/std.hpp
     src/mbgl/util/stopwatch.cpp
     src/mbgl/util/stopwatch.hpp
