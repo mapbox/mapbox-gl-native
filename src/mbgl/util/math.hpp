@@ -112,7 +112,7 @@ inline T division(const T dividend, const T divisor, const T nan) {
         if (dividend == 0) {
             return nan;
         } else {
-            return std::copysign(std::numeric_limits<T>::infinity(), dividend);
+            return ::copysign(std::numeric_limits<T>::infinity(), dividend);
         }
     } else {
         return dividend / divisor;

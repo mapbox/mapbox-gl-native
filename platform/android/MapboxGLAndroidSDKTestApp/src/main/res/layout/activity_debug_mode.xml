@@ -21,7 +21,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|start"
         android:layout_margin="8dp"
-        android:textIsSelectable="true"
+        android:textIsSelectable="false"
         android:textSize="14sp"/>
 
     <android.support.design.widget.FloatingActionButton
